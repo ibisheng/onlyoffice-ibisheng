@@ -2,6 +2,11 @@
 
 var g_bDate1904 = false;
 
+var c_oAscAsyncActionType = {
+	Information			: 0,
+	BlockInteraction	: 1
+};
+
 var CellValueType = 
 {
 	Number:0,
@@ -422,4 +427,11 @@ var c_oAscFormatPainterState = {
 	     kOff : 0,
 	      kOn : 1,
 	kMultiple : 2
+};
+
+var c_oAscSaveTypes = {
+	PartStart	: 0,
+	Part		: 1,
+	Complete	: 2,
+	CompleteAll	: 3
 };

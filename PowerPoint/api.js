@@ -5154,23 +5154,23 @@ function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)
 		if(dd.isComleteRenderer2())
 		{
 			if(false == bStart)
-				oAdditionalData["savetype"] = "complete";
+				oAdditionalData["savetype"] = c_oAscSaveTypes.Complete;
 			else
-				oAdditionalData["savetype"] = "completeall";
+				oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 		}
 		else
 		{
 			if(false == bStart)
-				oAdditionalData["savetype"] = "part";
+				oAdditionalData["savetype"] = c_oAscSaveTypes.Part;
 			else
-				oAdditionalData["savetype"] = "partstart";
+				oAdditionalData["savetype"] = c_oAscSaveTypes.PartStart;
 		}
 		oAdditionalData["data"] = dd.ToRendererPart();
 		sendCommand(editor, fCallback, oAdditionalData);
 	}
 	else
 	{
-		oAdditionalData["savetype"] = "completeall";
+		oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 		oAdditionalData["data"] = editor.WordControl.SaveDocument();
 		sendCommand(editor, fCallback, oAdditionalData);
 	}

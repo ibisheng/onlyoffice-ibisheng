@@ -1058,7 +1058,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			var data;
 			this.wb._initCommentsToSave();
 			var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
-			oAdditionalData["savetype"] = "completeall";
+			oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 			data = oBinaryFileWriter.Write();
 
 			oAdditionalData["data"] = data;
@@ -1086,7 +1086,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				oAdditionalData["delimiter"] = this.documentFormatSaveCsvDelimiter;
 			}
 			oAdditionalData["innersave"] = true;
-			oAdditionalData["savetype"] = "completeall";
+			oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 			oAdditionalData["data"] = data;
 			this._asc_sendCommand (/*callback*/ function(incomeObject){
 				if(null != incomeObject && "save" == incomeObject["type"])
@@ -1121,10 +1121,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					// Закончили печатить
 					if (bStart) {
 						// Первый раз отправляем данные
-						oAdditionalData["savetype"] = "completeall";
+						oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 					} else {
 						// Не в первый раз отправляем данные
-						oAdditionalData["savetype"] = "complete";
+						oAdditionalData["savetype"] = c_oAscSaveTypes.Complete;
 					}
 					// Очищаем данные о печати
 					this.printPagesData = null;
@@ -1132,10 +1132,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					// Продолжаем печать
 					if (bStart) {
 						// Первый раз отправляем данные
-						oAdditionalData["savetype"] = "partstart";
+						oAdditionalData["savetype"] = c_oAscSaveTypes.PartStart;
 					} else {
 						// Не в первый раз отправляем данные
-						oAdditionalData["savetype"] = "part";
+						oAdditionalData["savetype"] = c_oAscSaveTypes.Part;
 					}
 				}
 			} else if (c_oAscFileType.CSV === sFormat && !options) {
@@ -1151,7 +1151,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			} else {
 				this.wb._initCommentsToSave();
 				var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
-				oAdditionalData["savetype"] = "completeall";
+				oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 				if (c_oAscFileType.CSV === sFormat) {
 					if (options instanceof asc.asc_CCSVAdvancedOptions) {
 						oAdditionalData["codepage"] = options.asc_getCodePage();
@@ -3324,7 +3324,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 						t.wb._initCommentsToSave();
 						var oBinaryFileWriter = new Asc.BinaryFileWriter(t.wbModel);
-						oAdditionalData["savetype"] = "completeall";
+						oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 
 						var data = oBinaryFileWriter.Write();
 						return data;

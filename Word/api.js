@@ -562,7 +562,7 @@ function asc_docs_api(name)
     this.isApplyChangesOnOpen = false;
     this.isApplyChangesOnOpenEnabled = true;
 
-	this.mailMergeFileUrl = null;
+	this.mailMergeFileData = null;
 
     // CoAuthoring and Chat
     this.User = undefined;
@@ -2823,7 +2823,7 @@ asc_docs_api.prototype.asc_Save = function ()
 };
 
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile) {//передаем число соответствующее своему формату.
-	var actionType = this.mailMergeFileUrl ? c_oAscAsyncAction.MailMergeLoadFile : c_oAscAsyncAction.DownloadAs;
+	var actionType = this.mailMergeFileData ? c_oAscAsyncAction.MailMergeLoadFile : c_oAscAsyncAction.DownloadAs;
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 	var t = this;
 	_downloadAs(this, typeFile, function (incomeObject) {
@@ -2880,8 +2880,8 @@ asc_docs_api.prototype.SetFontRenderingMode = function(mode)
 };
 asc_docs_api.prototype.processSavedFile = function(url, bInner) {
 	var t = this;
-	if (this.mailMergeFileUrl) {
-		this.mailMergeFileUrl = null;
+	if (this.mailMergeFileData) {
+		this.mailMergeFileData = null;
 		asc_ajax({
 			url: url,
 			dataType: "text",
@@ -7551,23 +7551,20 @@ function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey) {
 	if (c_oAscFileType.PDF === filetype) {
 		var dd = editor.WordControl.m_oDrawingDocument;
 		if (dd.isComleteRenderer2()) {
-			if (false == bStart)
-				oAdditionalData["savetype"] = "complete";
-			else
-				oAdditionalData["savetype"] = "completeall";
+			oAdditionalData["savetype"] = bStart ? c_oAscSaveTypes.Complete : c_oAscSaveTypes.CompleteAll;
 		} else {
-			if (false == bStart)
-				oAdditionalData["savetype"] = "part";
-			else
-				oAdditionalData["savetype"] = "partstart";
 		}
 		oAdditionalData["data"] = dd.ToRendererPart();
 	} else if (c_oAscFileType.JSON === filetype) {
-		oAdditionalData["savetype"] = "completeall";
-		oAdditionalData["url"] = editor.mailMergeFileUrl;
+		oAdditionalData['savetype'] = c_oAscSaveTypes.CompleteAll;
+		oAdditionalData['url'] = editor.mailMergeFileData['url'];
+		oAdditionalData['format'] = editor.mailMergeFileData['fileType'];
+		// ToDo select csv params
+		oAdditionalData['codepage'] = 65001;
+		oAdditionalData['delimiter'] = 4; // c_oAscCsvDelimiter.Comma
 	} else {
 		var oBinaryFileWriter = new BinaryFileWriter(editor.WordControl.m_oLogicDocument);
-		oAdditionalData["savetype"] = "completeall";
+		oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 		oAdditionalData["data"] = oBinaryFileWriter.Write();
 	}
 	sendCommand(editor, fCallback, oAdditionalData);
@@ -7829,7 +7826,7 @@ asc_docs_api.prototype.asc_AddMath2 = function(Type)
 //----------------------------------------------------------------------------------------------------------------------
 asc_docs_api.prototype.asc_StartMailMerge = function(oData)
 {
-	this.mailMergeFileUrl = oData["url"];
+	this.mailMergeFileData = oData;
 	this.asc_DownloadAs(c_oAscFileType.JSON);
 };
 asc_docs_api.prototype.asc_StartMailMergeByList = function(aList)

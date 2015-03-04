@@ -6,11 +6,6 @@ var c_oAscZoomType = {
 	FitPage :2
 };
 
-var c_oAscAsyncActionType = {
-    Information : 0,
-    BlockInteraction : 1
-};
-
 var c_oAscAsyncAction = {
 	Open				: 0, // открытие документа
 	Save				: 1,
