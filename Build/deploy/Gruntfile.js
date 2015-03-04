@@ -181,6 +181,9 @@ module.exports = function(grunt) {
 		if(undefined !== process.env['SVN_REVISION']){
 			packageFile['info']['rev'] = process.env['SVN_REVISION'];
 		}
+		else{
+			packageFile['info']['rev'] = "unknown";
+		}
 		grunt.file.write(defaultConfig, JSON.stringify(pkg, null, 4));
     });
 
