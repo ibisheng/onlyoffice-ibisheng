@@ -61,20 +61,6 @@ var c_oAscConfirm = {
 	ConfirmReplaceRange : 0
 };
 
-var c_oAscAsyncAction = {
-	Open				: 0,  // открытие документа
-	Save				: 1,
-	LoadDocumentFonts	: 2,  // загружаем фонты документа (сразу после открытия)
-	LoadDocumentImages	: 3,  // загружаем картинки документа (сразу после загрузки шрифтов)
-	LoadFont			: 4,  // подгрузка нужного шрифта
-	LoadImage			: 5,  // подгрузка картинки
-	DownloadAs			: 6,
-	Print				: 7,  //конвертация в PDF и сохранение у пользователя
-	UploadImage			: 8,
-	Recalc				: 9,
-	SlowOperation		: 10
-};
-
 var c_oAscAlignType = {
 	NONE		: "none",
 	LEFT		: "left",

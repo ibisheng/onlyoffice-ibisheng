@@ -41,20 +41,6 @@ var c_oAscVAnchor = {
     Text   : 0x02
 };
 
-var c_oAscAsyncAction = {
-	Open				: 0, // открытие документа
-	Save				: 1,
-	LoadDocumentFonts	: 2, // загружаем фонты документа (сразу после открытия)
-    LoadDocumentImages	: 3, // загружаем картинки документа (сразу после загрузки шрифтов)
-    LoadFont			: 4, // подгрузка нужного шрифта
-    LoadImage			: 5, // подгрузка картинки
-	DownloadAs			: 6,
-	Print				: 7, // конвертация в PDF и сохранение у пользователя
-	UploadImage			: 8,
-    LoadTheme			: 9,
-	ApplyChanges		: 10 // применение изменений от другого пользователя.
-};
-
 var c_oAscVertAlignJc = {
     Top    : 0x00, // var vertalignjc_Top    = 0x00;
     Center : 0x01, // var vertalignjc_Center = 0x01;

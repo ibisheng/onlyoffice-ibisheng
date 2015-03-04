@@ -35,6 +35,24 @@ var c_oAscFileType = {
 	ODP		: 0x0083
 };
 
+var c_oAscAsyncAction = {
+	Open				: 0,  // открытие документа
+	Save				: 1,  // сохранение
+	LoadDocumentFonts	: 2,  // загружаем фонты документа (сразу после открытия)
+	LoadDocumentImages	: 3,  // загружаем картинки документа (сразу после загрузки шрифтов)
+	LoadFont			: 4,  // подгрузка нужного шрифта
+	LoadImage			: 5,  // подгрузка картинки
+	DownloadAs			: 6,  // cкачать
+	Print				: 7,  // конвертация в PDF и сохранение у пользователя
+	UploadImage			: 8,  // загрузка картинки
+
+	ApplyChanges		: 9,  // применение изменений от другого пользователя.
+	Recalc				: 10, // пересчет формул
+	SlowOperation		: 11, // медленная операция
+	LoadTheme			: 12, // загрузка темы
+	MailMergeLoadFile	: 13  // загрузка файла для mail merge
+};
+
 // Режимы отрисовки
 var c_oAscFontRenderingModeType = {
 	noHinting				: 1,
