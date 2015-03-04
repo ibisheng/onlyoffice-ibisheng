@@ -605,7 +605,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				return;
 			}
 
-			this.asc_DownloadAs(c_oAscFileType.PDFPRINT);
+			this.asc_DownloadAs(c_oAscFileType.PDF);
 		};
 
 		spreadsheet_api.prototype.asc_Copy = function(){
@@ -1105,7 +1105,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			if(null != sSaveKey)
 				oAdditionalData["savekey"] = sSaveKey;
 			var data;
-			if(c_oAscFileType.PDFPRINT === sFormat)
+			if(c_oAscFileType.PDF === sFormat)
 			{
 				if (null === this.printPagesData) {
 					// Рассчитываем данные о страницах
@@ -3276,7 +3276,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						var oAdditionalData = {};
 						oAdditionalData["documentId"] = t.documentId+ "." + t.documentFormat;
 						oAdditionalData["vkey"] = t.documentVKey;
-						oAdditionalData["outputformat"] = c_oAscFileType.PDFPRINT;
+						oAdditionalData["outputformat"] = c_oAscFileType.PDF;
 
 						t.adjustPrint = new asc_CAdjustPrint();
 						t.printPagesData = t.wb.calcPagesPrint(t.adjustPrint);

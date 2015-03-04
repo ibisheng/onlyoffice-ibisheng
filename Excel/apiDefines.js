@@ -60,17 +60,6 @@ var c_oAscError = {
 var c_oAscConfirm = {
 	ConfirmReplaceRange : 0
 };
-var c_oAscFileType = {
-	INNER		: 0x0101,
-	XLSX		: 0x0101,
-	XLS			: 0x0102,
-	ODS			: 0x0103,
-	CSV			: 0x0104,
-	HTML		: 0x0803,
-	PDFPRINT	: 0x0201,
-	ZIP			: 0x0803,
-	XLSY		: 0x1002
-};
 
 var c_oAscAsyncAction = {
 	Open				: 0,  // открытие документа

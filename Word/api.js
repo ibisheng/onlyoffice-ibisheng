@@ -974,7 +974,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 				// case "rtf" : documentFormatSave = c_oAscFileType.RTF;break;
 				// case "txt" : documentFormatSave = c_oAscFileType.TXT;break;
 				// case "htm" :
-				// case "html" : documentFormatSave = c_oAscFileType.HTML_ZIP;break;
+				// case "html" : documentFormatSave = c_oAscFileType.HTML;break;
 				// case "mht" : documentFormatSave = c_oAscFileType.MHT;break;
 				// case "pdf" : documentFormatSave = c_oAscFileType.PDF;break;
 				// case "epub" : documentFormatSave = c_oAscFileType.EPUB;break;

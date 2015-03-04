@@ -60,14 +60,6 @@ var c_oAscVertAlignJc = {
     Center : 0x01, // var vertalignjc_Center = 0x01;
     Bottom : 0x02  // var vertalignjc_Bottom = 0x02
 };
-//files type for Saving & DownloadAs
-var c_oAscFileType = {
-	INNER:	0x0081,
-	PDF:	0x0201,
-	PPTX:	0x0081,
-	PPT:	0x0082,
-	ODP:	0x0083
-};
 
 // Right = 0; Left = 1; Center = 2; Justify = 3;
 var c_oAscAlignType = {

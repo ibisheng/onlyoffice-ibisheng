@@ -3,6 +3,38 @@
 var g_bDate1904 = false;
 var FONT_THUMBNAIL_HEIGHT = (7 * 96.0 / 25.4) >> 0;
 
+//files type for Saving & DownloadAs
+var c_oAscFileType = {
+	PDF		: 0x0201,
+	HTML	: 0x0803,
+
+	// Word
+	DOCX	: 0x0041,
+	DOC		: 0x0042,
+	ODT		: 0x0043,
+	RTF		: 0x0044,
+	TXT		: 0x0045,
+	HTML_ZIP: 0x0803,	// ToDo Убрать
+	MHT		: 0x0047,
+	EPUB	: 0x0048,
+	FB2		: 0x0049,
+	MOBI	: 0x004a,
+	DOCY	: 0x1001,
+	JSON	: 0x0808,	// Для mail-merge
+
+	// Excel
+	XLSX	: 0x0101,
+	XLS		: 0x0102,
+	ODS		: 0x0103,
+	CSV		: 0x0104,
+	XLSY	: 0x1002,
+
+	// PowerPoint
+	PPTX	: 0x0081,
+	PPT		: 0x0082,
+	ODP		: 0x0083
+};
+
 // Режимы отрисовки
 var c_oAscFontRenderingModeType = {
 	noHinting				: 1,

@@ -19,24 +19,6 @@ var c_oAscAsyncAction = {
 	ApplyChanges		: 9, // применение изменений от другого пользователя.
 	MailMergeLoadFile	: 10// загрузка файла для mail merge
 };
-//files type for Saving & DownloadAs
-var c_oAscFileType = {
-	INNER: 		0x0041,
-	DOCX: 		0x0041,
-	DOC: 		0x0042,
-	ODT: 		0x0043,
-	RTF: 		0x0044,
-	TXT: 		0x0045,
-	HTML_ZIP: 	0x0803,
-	MHT: 		0x0047,
-	PDF: 		0x0201,
-	EPUB: 		0x0048,
-	FB2: 		0x0049,
-	MOBI: 		0x004a,
-	DOCY: 		0x1001,
-
-	JSON:		0x0808		// Для mail-merge
-};
 
 // Right = 0; Left = 1; Center = 2; Justify = 3;
 var c_oAscAlignType = {
