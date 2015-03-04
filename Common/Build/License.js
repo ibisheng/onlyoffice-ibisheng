@@ -1,7 +1,7 @@
 /**
-* @license Copyright (c) Ascensio System SIA 2012-2014. All rights reserved
+* @license Copyright (c) Ascensio System SIA 2012-2015. All rights reserved
 *
-* http://www.teamlab.com
+* http://www.onlyoffice.com
 *
-* Version: @@Version (build:@@Build)
+* Version: @@Version (build:@@Build, rev:@@Rev)
 */
