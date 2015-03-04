@@ -177,7 +177,9 @@ module.exports = function(grunt) {
 			grunt.log.ok('Use Jenkins build number as sdk-all build number!'.yellow);
 			packageFile['info']['build'] = parseInt(process.env['BUILD_NUMBER']);
 			pkg.info.build = packageFile['info']['build'];
-			pkg.info.rev = process.env['SVN_REVISION'];
+		}
+		if(undefined !== process.env['SVN_REVISION']){
+			packageFile['info']['rev'] = process.env['SVN_REVISION'];
 		}
 		grunt.file.write(defaultConfig, JSON.stringify(pkg, null, 4));
     });
