@@ -622,6 +622,11 @@ CShapeDrawer.prototype =
 
     draw : function(geom)
     {
+        if (this.Graphics.RENDERER_PDF_FLAG)
+        {
+            return this.drawPDF(geom);
+        }
+
         if (this.bIsNoStrokeAttack && this.bIsNoFillAttack)
             return;
 			
@@ -668,6 +673,47 @@ CShapeDrawer.prototype =
             this._e();
         }
         this.NativeGraphics["PD_EndShapeDraw"]();
+    },
+
+    drawPDF : function(geom)
+    {
+        if (this.bIsNoStrokeAttack && this.bIsNoFillAttack)
+            return;
+
+        var bIsPatt = false;
+        if (this.UniFill != null && this.UniFill.fill != null &&
+            ((this.UniFill.fill.type == FILL_TYPE_PATT) || (this.UniFill.fill.type == FILL_TYPE_GRAD)))
+        {
+            bIsPatt = true;
+        }
+
+        if (this.bIsTexture || bIsPatt)
+        {
+            this.Graphics.put_TextureBoundsEnabled(true);
+            this.Graphics.put_TextureBounds(this.min_x, this.min_y, this.max_x - this.min_x, this.max_y - this.min_y);
+        }
+
+        if (geom)
+        {
+            geom.draw(this);
+        }
+        else
+        {
+            this._s();
+            this._m(0, 0);
+            this._l(this.Shape.extX, 0);
+            this._l(this.Shape.extX, this.Shape.extY);
+            this._l(0, this.Shape.extY);
+            this._z();
+            this.drawFillStroke(true, "norm", true && !this.bIsNoStrokeAttack);
+            this._e();
+        }
+        this.Graphics.ArrayPoints = null;
+
+        if (this.bIsTexture || bIsPatt)
+        {
+            this.Graphics.put_TextureBoundsEnabled(false);
+        }
     },
 
     p_width : function(w)
@@ -900,10 +946,299 @@ CShapeDrawer.prototype =
 
     drawFillStroke : function(bIsFill, fill_mode, bIsStroke)
     {
+        if (this.Graphics.RENDERER_PDF_FLAG)
+        {
+            return this.drawFillStrokePDF(bIsFill, fill_mode, bIsStroke);
+        }
+
         if (bIsFill)
             this.df(fill_mode);
         if (bIsStroke)
             this.ds();
+    },
+
+    drawFillStrokePDF : function(bIsFill, fill_mode, bIsStroke)
+    {
+        if (this.bIsNoStrokeAttack)
+            bIsStroke = false;
+
+        if (bIsStroke)
+        {
+            if (null != this.OldLineJoin && !this.IsArrowsDrawing)
+            {
+                this.Graphics.put_PenLineJoin(ConvertJoinAggType(this.Ln.Join.type));
+            }
+
+            var rgba = this.StrokeUniColor;
+            this.Graphics.p_color(rgba.R, rgba.G, rgba.B, rgba.A);
+        }
+
+        if (fill_mode == "none" || this.bIsNoFillAttack)
+            bIsFill = false;
+
+        var bIsPattern = false;
+
+        if (bIsFill)
+        {
+            if (this.bIsTexture)
+            {
+                if (null == this.UniFill.fill.tile)
+                {
+                    if (null == this.UniFill.fill.srcRect)
+                    {
+                        if (this.UniFill.fill.RasterImageId && this.UniFill.fill.RasterImageId.indexOf(".svg") != 0)
+                        {
+                            this.Graphics.drawImage(_getFullImageSrc(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, undefined);
+                            bIsFill = false;
+                        }
+                        else
+                        {
+                            if (this.UniFill.fill.canvas)
+                            {
+                                this.Graphics.put_brushTexture(this.UniFill.fill.canvas.toDataURL("image/png"), 0);
+                            }
+                            else
+                            {
+                                this.Graphics.put_brushTexture(_getFullImageSrc(this.UniFill.fill.RasterImageId), 0);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        this.Graphics.drawImage(_getFullImageSrc(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect);
+                        bIsFill = false;
+                    }
+                }
+                else
+                {
+                    if (this.UniFill.fill.canvas)
+                    {
+                        this.Graphics.put_brushTexture(this.UniFill.fill.canvas.toDataURL("image/png"), 1);
+                    }
+                    else
+                    {
+                        this.Graphics.put_brushTexture(_getFullImageSrc(this.UniFill.fill.RasterImageId), 1);
+                    }
+                }
+                this.Graphics.put_BrushTextureAlpha(this.UniFill.transparent);
+            }
+            else
+            {
+                var _fill = this.UniFill.fill;
+                if (_fill.type == FILL_TYPE_PATT)
+                {
+                    var _patt_name = global_hatch_names[_fill.ftype];
+                    if (undefined == _patt_name)
+                        _patt_name = "cross";
+
+                    var _fc = _fill.fgClr.RGBA;
+                    var _bc = _fill.bgClr.RGBA;
+
+                    var __fa = (null === this.UniFill.transparent) ? _fc.A : 255;
+                    var __ba = (null === this.UniFill.transparent) ? _bc.A : 255;
+
+                    var _pattern = GetHatchBrush(_patt_name, _fc.R, _fc.G, _fc.B, __fa, _bc.R, _bc.G, _bc.B, __ba);
+
+                    var _url64 = "";
+                    try
+                    {
+                        _url64 = _pattern.Canvas.toDataURL("image/png");
+                    }
+                    catch (err)
+                    {
+                        _url64 = "";
+                    }
+
+                    this.Graphics.put_brushTexture(_url64, 1);
+
+                    if (null != this.UniFill.transparent)
+                        this.Graphics.put_BrushTextureAlpha(this.UniFill.transparent);
+                    else
+                        this.Graphics.put_BrushTextureAlpha(255);
+
+                    bIsPattern = true;
+                }
+                else if (_fill.type == FILL_TYPE_GRAD)
+                {
+                    var points = null;
+                    if (_fill.lin)
+                    {
+                        points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, _fill.lin.angle, _fill.lin.scale);
+                    }
+                    else if (_fill.path)
+                    {
+                        var _cx = (this.min_x + this.max_x) / 2;
+                        var _cy = (this.min_y + this.max_y) / 2;
+                        var _r = Math.max(this.max_x - this.min_x, this.max_y - this.min_y) / 2;
+
+                        points = { x0 : _cx, y0 : _cy, x1 : _cx, y1 : _cy, r0 : 1, r1 : _r };
+                    }
+                    else
+                    {
+                        points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, 90 * 60000, false);
+                    }
+
+                    this.Graphics.put_BrushGradient(_fill, points, this.UniFill.transparent);
+                }
+                else
+                {
+                    var rgba = this.FillUniColor;
+                    if (fill_mode == "darken")
+                    {
+                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                        var rgb = _color1.darken();
+                        rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
+                    }
+                    else if (fill_mode == "darkenLess")
+                    {
+                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                        var rgb = _color1.darkenLess();
+                        rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
+                    }
+                    else if (fill_mode == "lighten")
+                    {
+                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                        var rgb = _color1.lighten();
+                        rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
+                    }
+                    else if (fill_mode == "lightenLess")
+                    {
+                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                        var rgb = _color1.lightenLess();
+                        rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
+                    }
+                    if (rgba)
+                    {
+                        if (this.UniFill != null && this.UniFill.transparent != null)
+                            rgba.A = this.UniFill.transparent;
+                        this.Graphics.b_color1(rgba.R, rgba.G, rgba.B, rgba.A);
+                    }
+                }
+            }
+        }
+
+        if (bIsFill && bIsStroke)
+        {
+            if (this.bIsTexture || bIsPattern)
+            {
+                this.Graphics.drawpath(256);
+                this.Graphics.drawpath(1);
+            }
+            else
+            {
+                this.Graphics.drawpath(256 + 1);
+            }
+        }
+        else if (bIsFill)
+        {
+            this.Graphics.drawpath(256);
+        }
+        else if (bIsStroke)
+        {
+            this.Graphics.drawpath(1);
+        }
+        else
+        {
+            // такого быть не должно по идее
+            this.Graphics.b_color1(0, 0, 0, 0);
+            this.Graphics.drawpath(256);
+        }
+
+        var arr = this.Graphics.ArrayPoints;
+        if (arr != null && arr.length > 1 && this.IsCurrentPathCanArrows === true)
+        {
+            this.IsArrowsDrawing = true;
+            // значит стрелки есть. теперь:
+            // определяем толщину линии "как есть"
+            // трансформируем точки в окончательные.
+            // и отправляем на отрисовку (с матрицей)
+
+            var trans = this.Graphics.GetTransform();
+            var trans1 = global_MatrixTransformer.Invert(trans);
+
+            var lineSize = this.Graphics.GetLineWidth();
+
+            var x1 = trans.TransformPointX(0, 0);
+            var y1 = trans.TransformPointY(0, 0);
+            var x2 = trans.TransformPointX(1, 1);
+            var y2 = trans.TransformPointY(1, 1);
+            var dKoef = Math.sqrt(((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1))/2);
+            var _pen_w = lineSize * dKoef;
+
+            if (this.Ln.headEnd != null)
+            {
+                var _x1 = trans.TransformPointX(arr[0].x, arr[0].y);
+                var _y1 = trans.TransformPointY(arr[0].x, arr[0].y);
+                var _x2 = trans.TransformPointX(arr[1].x, arr[1].y);
+                var _y2 = trans.TransformPointY(arr[1].x, arr[1].y);
+
+                var _max_delta = Math.max(Math.abs(_x1 - _x2), Math.abs(_y1 - _y2));
+                var cur_point = 2;
+                while (_max_delta < 0.001 && cur_point < arr.length)
+                {
+                    _x2 = trans.TransformPointX(arr[cur_point].x, arr[cur_point].y);
+                    _y2 = trans.TransformPointY(arr[cur_point].x, arr[cur_point].y);
+                    _max_delta = Math.max(Math.abs(_x1 - _x2), Math.abs(_y1 - _y2));
+                    cur_point++;
+                }
+
+                if (_max_delta > 0.001)
+                {
+                    this.Graphics.ArrayPoints = null;
+                    DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.headEnd.type, this.Ln.headEnd.GetWidth(_pen_w), this.Ln.headEnd.GetLen(_pen_w), this, trans1);
+                    this.Graphics.ArrayPoints = arr;
+                }
+            }
+            if (this.Ln.tailEnd != null)
+            {
+                var _1 = arr.length-1;
+                var _2 = arr.length-2;
+                var _x1 = trans.TransformPointX(arr[_1].x, arr[_1].y);
+                var _y1 = trans.TransformPointY(arr[_1].x, arr[_1].y);
+                var _x2 = trans.TransformPointX(arr[_2].x, arr[_2].y);
+                var _y2 = trans.TransformPointY(arr[_2].x, arr[_2].y);
+
+                var _max_delta = Math.max(Math.abs(_x1 - _x2), Math.abs(_y1 - _y2));
+                var cur_point = _2 - 1;
+                while (_max_delta < 0.001 && cur_point >= 0)
+                {
+                    _x2 = trans.TransformPointX(arr[cur_point].x, arr[cur_point].y);
+                    _y2 = trans.TransformPointY(arr[cur_point].x, arr[cur_point].y);
+                    _max_delta = Math.max(Math.abs(_x1 - _x2), Math.abs(_y1 - _y2));
+                    cur_point--;
+                }
+
+                if (_max_delta > 0.001)
+                {
+                    this.Graphics.ArrayPoints = null;
+                    DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.tailEnd.type, this.Ln.tailEnd.GetWidth(_pen_w), this.Ln.tailEnd.GetLen(_pen_w), this, trans1);
+                    this.Graphics.ArrayPoints = arr;
+                }
+            }
+            this.IsArrowsDrawing = false;
+        }
+    },
+
+    drawStrokeFillStyle : function()
+    {
+        if (this.Graphics.RENDERER_PDF_FLAG === undefined)
+        {
+            var gr = (this.Graphics.IsTrack == true) ? this.Graphics.Graphics : this.Graphics;
+
+            var tmp = gr.m_oBrush.Color1;
+            var p_c = gr.m_oPen.Color;
+            gr.b_color1(p_c.R, p_c.G, p_c.B, p_c.A);
+            gr.df();
+            gr.b_color1(tmp.R, tmp.G, tmp.B, tmp.A);
+        }
+        else
+        {
+            var tmp = this.Graphics.GetBrush().Color1;
+            var p_c = this.Graphics.GetPen().Color;
+            this.Graphics.b_color1(p_c.R, p_c.G, p_c.B, p_c.A);
+            this.Graphics.df();
+            this.Graphics.b_color1(tmp.R, tmp.G, tmp.B, tmp.A);
+        }
     },
 
     check_bounds : function()

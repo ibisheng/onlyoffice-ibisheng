@@ -514,6 +514,9 @@ function CDrawingStream(_writer)
     this.m_oLastFont2   = null;
 
     this.m_bIntegerGrid = true;
+
+    this.m_oPen     = new CPen();
+    this.m_oBrush   = new CBrush();
 }
 
 CDrawingStream.prototype =
@@ -550,6 +553,11 @@ CDrawingStream.prototype =
     // pen methods
     p_color : function(r,g,b,a)
     {
+        var _c = this.m_oPen.Color;
+        _c.R = r;
+        _c.G = g;
+        _c.B = b;
+        _c.A = a;
         this.Native["PD_p_color"](r,g,b,a);
     },
     p_width : function(w)
@@ -559,6 +567,11 @@ CDrawingStream.prototype =
     // brush methods
     b_color1 : function(r,g,b,a)
     {
+        var _c = this.m_oBrush.Color1;
+        _c.R = r;
+        _c.G = g;
+        _c.B = b;
+        _c.A = a;
         this.Native["PD_b_color1"](r,g,b,a);
     },
     b_color2 : function(r,g,b,a)

@@ -2014,6 +2014,14 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             _return = _stream;
             break;
         }
+        case 202: // ASC_MENU_EVENT_TYPE_DOCUMENT_PDFBASE64
+        {
+            var _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteStringA"](this.WordControl.m_oDrawingDocument.ToRenderer());
+            _return = _stream;
+            break;
+        }
         case 110: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_COPY
         {
             _return = this.Call_Menu_Context_Copy();

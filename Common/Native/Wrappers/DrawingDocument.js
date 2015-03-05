@@ -2669,6 +2669,32 @@ CDrawingDocument.prototype =
 
             this.AutoShapesTrack.DrawInlineMoveCursor(_near.Page, _near.X, _near.Y, _near.Height, _near.transform);
         }
+    },
+
+    RenderDocument : function(Renderer)
+    {
+        var _count = this.LogicDocument.Pages.length;
+        for (var i = 0; i < _count; i++)
+        {
+            var _info = this.LogicDocument.Get_PageLimits(i);
+
+            Renderer.BeginPage(_info.XLimit, _info.YLimit);
+            this.LogicDocument.DrawPage(i, Renderer);
+            Renderer.EndPage();
+        }
+    },
+
+    ToRenderer : function()
+    {
+        var Renderer = new CDocumentRenderer();
+        Renderer.VectorMemoryForPrint = new CMemory();
+        var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
+        this.m_oWordControl.m_oApi.ShowParaMarks = false;
+        this.RenderDocument(Renderer);
+        this.m_oWordControl.m_oApi.ShowParaMarks = old_marks;
+        var ret = Renderer.Memory.GetBase64Memory();
+        //console.log(ret);
+        return ret;
     }
 };
 
