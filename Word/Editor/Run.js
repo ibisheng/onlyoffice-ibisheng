@@ -2365,6 +2365,15 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
                 break;
             }
             case para_Math_BreakOperator:
+            {
+                if ( true === PRSC.Word )
+                {
+                    PRSC.Word        = false;
+                }
+
+                PRSC.Range.W += Item.Width / TEXTWIDTH_DIVIDER;
+                break;
+            }
             case para_Space:
             {
                 if ( true === PRSC.Word )

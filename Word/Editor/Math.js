@@ -75,7 +75,10 @@ CMathPropertiesSettings.prototype.Merge = function(Pr)
         this.defJc = Pr.defJc;
 
     if(Pr.brkBin !== null && Pr.brkBin !== undefined)
-        this.brkBin = Pr.brkBin
+        this.brkBin = Pr.brkBin;
+
+    if(Pr.dispDef !== null && Pr.dispDef !== undefined)
+        this.dispDef = Pr.dispDef;
 };
 
 var g_oMathSettings = {};
@@ -211,7 +214,7 @@ function ParaMath()
     this.X                  = 0;
     this.Y                  = 0;
 
-    this.FirstPage          = 0;
+    this.FirstPage          = -1;
     this.LinesWidths        = []; // в тч для отрисовки рамки
     this.LinesPositions     = [];
 
@@ -438,16 +441,22 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, Page, _X, _XL
 
     var wrapIndent = MathSettings.Get_WrapIndent(this.State);
 
+    var CurrentPage = Page - this.FirstPage;
+
     _X      +=  MathSettings.Get_LeftMargin(this.State);
     _XLimit -=  MathSettings.Get_RightMargin(this.State);
 
     var Jc = this.Get_Align();
-    var FirstWidth = Page == 0 ? this.LinesWidths[0] : 0; // если страница не первая, то ширину первой строки формулы не учитываем
+    var FirstWidth = CurrentPage == 0 ? this.LinesWidths[0] : 0; // если страница не первая, то ширину первой строки формулы не учитываем
 
     var W = 0;
     var MaxW =  this.CurPageInfo.MaxLineW;
 
-    if(this.FirstPage == Page)
+    var LineCount = this.Root.protected_GetLinesCount();
+
+    if(LineCount == 1)  // чтобы не сравнивать с wrapIndent, когда формула занимает одну строку
+        W = FirstWidth;
+    else if(CurrentPage == 0)
         W = Math.max(MaxW + wrapIndent, FirstWidth);
     else
         W = MaxW;
@@ -831,12 +840,25 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var ParaRange = PRS.Range;
     var Page      = PRS.Page;
 
+    var RecalCurrentMath = PRS.PrevLineRecalcInfo.Object == null ||  PRS.PrevLineRecalcInfo.Object == this;
     var bFirstLine = this.Root.IsFirstLine(ParaLine);
+
+    var RecalcResult     = PRS.RecalcResult,
+        RecalcInfoObject = PRS.PrevLineRecalcInfo.Object;
+
+    var CurrentPage = Page - this.FirstPage;
+    var MathSettings = Get_WordDocumentDefaultMathSettings();
 
     // первый пересчет
     if(PRS.PrevLineRecalcInfo.Object == null && true == bFirstLine)
     {
-        this.State              = ALIGN_MARGIN_WRAP;
+        if(false == MathSettings.Get_DispDef() || this.ParaMathRPI.bInline)
+            this.State = ALIGN_EMPTY;
+        else if(CurrentPage == 0)
+            this.State = ALIGN_MARGIN_WRAP;
+        else
+            this.State = ALIGN_MARGIN;
+
         this.FirstPage          = Page;
         this.CurPageInfo.Page   = -1;
         this.LinesWidths.length = 0;
@@ -858,14 +880,6 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.CurPageInfo.MaxLineW   = 0;
     }
 
-    var bFirstPage = this.FirstPage == Page;
-    var MathSettings = Get_WordDocumentDefaultMathSettings();
-
-    if(false == MathSettings.Get_DispDef())
-        this.State = ALIGN_EMPTY;
-    else if(bFirstPage == false)
-        this.State = ALIGN_MARGIN;
-
     PRS.X    += MathSettings.Get_LeftMargin(this.State);
     PRS.XEnd -= MathSettings.Get_RightMargin(this.State);
 
@@ -874,12 +888,15 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     PRS.XRange = PRS.X;
 
-    PRS.RecalcResult = recalcresult_NextLine;
-    PRS.PrevLineRecalcInfo.Object = null;
+    if(RecalCurrentMath == true)
+    {
+        PRS.RecalcResult = recalcresult_NextLine;
+        PRS.PrevLineRecalcInfo.Object = null;
+    }
 
     this.Root.Recalculate_Range(PRS, ParaPr, Depth);
 
-    if(bFirstPage && PRS.bMathWordLarge && this.State !== ALIGN_EMPTY)
+    if(CurrentPage == 0 && PRS.bMathWordLarge && this.State !== ALIGN_EMPTY)
     {
         this.UpdateInfoForBreak(PRS);
         this.State++;
@@ -914,23 +931,30 @@ ParaMath.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cu
 };
 ParaMath.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 {
+    var SpaceLen   = PRSC.SpaceLen;
+
     this.Root.Recalculate_Range_Width(PRSC, _CurLine, _CurRange);
 
-    var W = PRSC.Range.W + PRSC.SpaceLen;
+    PRSC.Range.W        += PRSC.SpaceLen - SpaceLen;
+    PRSC.Range.SpaceLen = SpaceLen;
+
+    var W = PRSC.Range.W;
 
     var CurLine  = _CurLine - this.Root.StartLine;
     this.LinesWidths[CurLine] = W;
 };
 ParaMath.prototype.UpdateWidthLine = function(PRS, Width)
 {
+    var RecalCurrentMath = PRS.PrevLineRecalcInfo.Object == null ||  PRS.PrevLineRecalcInfo.Object == this;
+
     var MaxW    = this.CurPageInfo.MaxLineW,
         CurLine = PRS.Line - this.Root.StartLine;
 
-    if(MaxW < Width && CurLine !== 0)
+    if(MaxW < Width && CurLine !== 0 && RecalCurrentMath == true)
     {
         this.CurPageInfo.MaxLineW = Width;
 
-        if(align_Justify == this.Get_Align())
+        if(align_Justify == this.Get_Align() && this.ParaMathRPI.bInline == false)
             this.UpdateInfoForBreak(PRS);
     }
 };
