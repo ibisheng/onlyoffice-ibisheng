@@ -4361,7 +4361,7 @@ function BinarySettingsTableWriter(memory, doc)
 	this.WriteMathPr = function()
 	{
 		var oThis = this;
-		var oMathPr = g_oMathSettings;
+		var oMathPr = editor.WordControl.m_oLogicDocument.Settings.MathSettings.GetPr();
 		if ( null != oMathPr.brkBin)
 			this.bs.WriteItem(c_oSer_MathPrType.BrkBin, function(){oThis.WriteMathBrkBin(oMathPr.brkBin);});
 		if ( null != oMathPr.brkBinSub)
@@ -4475,7 +4475,7 @@ function BinarySettingsTableWriter(memory, doc)
 	{
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
 		this.memory.WriteByte(c_oSerPropLenType.Variable);
-		this.memory.WriteString2(MathFont);
+		this.memory.WriteString2(MathFont.Name);
 	}
 	this.WriteMathNaryLim = function(NaryLim)
 	{
@@ -11109,10 +11109,12 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
 				Default_Tab_Stop = dNewTab_Stop;
         }
 		else if ( c_oSer_SettingsType.MathPr === type )
-        {
+        {			
+			var props = new CMathPropertiesSettings();
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadMathPr(t,l,g_oMathSettings);
-            });			
+                return oThis.ReadMathPr(t,l,props);
+            });
+			editor.WordControl.m_oLogicDocument.Settings.MathSettings.SetPr(props);
         }
         else
             res = c_oSerConstants.ReadUnknown;
@@ -11310,7 +11312,7 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
         var oThis = this;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-			props.mathFont = this.stream.GetString2LE(length);
+			props.mathFont = {Name : this.stream.GetString2LE(length), Index : -1};
         }
 		else
             res = c_oSerConstants.ReadUnknown;

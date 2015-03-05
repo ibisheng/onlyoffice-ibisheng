@@ -79,9 +79,10 @@ CMathPropertiesSettings.prototype.Merge = function(Pr)
 
     if(Pr.dispDef !== null && Pr.dispDef !== undefined)
         this.dispDef = Pr.dispDef;
+	
+    if(Pr.mathFont !== null && Pr.mathFont !== undefined)
+        this.mathFont = Pr.mathFont;
 };
-
-var g_oMathSettings = {};
 
 function CMathSettings()
 {
