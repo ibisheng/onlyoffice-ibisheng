@@ -14,7 +14,6 @@ var c_oAscFileType = {
 	ODT		: 0x0043,
 	RTF		: 0x0044,
 	TXT		: 0x0045,
-	HTML_ZIP: 0x0803,	// ToDo Убрать
 	MHT		: 0x0047,
 	EPUB	: 0x0048,
 	FB2		: 0x0049,
