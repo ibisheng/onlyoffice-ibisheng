@@ -1400,7 +1400,7 @@ NumFormat.prototype =
                     if(null != numFormat)
                         return numFormat.format(number, nValType, dDigitsCount, oAdditionalResult)
                 }
-                return [{text: number}];
+                return [{text: number.toString()}];
             }
             var aDec = [];
             var aFrac = [];
@@ -1709,8 +1709,20 @@ NumFormat.prototype =
         else
         {
             if(0 == res.length)
-                res = [{text: number}];
+                res = [{text: number.toString()}];
         }
+		//длина результирующей строки не должна быть длиннее c_oAscMaxColumnWidth
+		var nLen = 0;
+		for(var i = 0; i < res.length; ++i){
+			var elem = res[i];
+			if(elem.text)
+				nLen += elem.text.length;
+		}
+		if(nLen > c_oAscMaxColumnWidth){
+			var oNewFont = new NumFormatFont();
+			oNewFont.repeat = true;
+			res = [{text: "#", format: oNewFont}];
+		}
         return res;
     },
     toString : function(output, nShift)
@@ -2214,7 +2226,7 @@ CellFormat.prototype =
                 }
             }
         }
-        res = [{text: number}];
+        res = [{text: number.toString()}];
         var dNumber = number - 0;
         var oFormat = null;
 		if(CellValueType.String != nValType && number == dNumber)
