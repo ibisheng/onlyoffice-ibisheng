@@ -1996,7 +1996,7 @@ function CBinaryFileWriter()
                 oThis.EndRecord();
                 break;
             }
-            case c_oAscColor.c_oAscColor.COLOR_TYPE_SRGB:
+            case c_oAscColor.COLOR_TYPE_SRGB:
             {
                 oThis.StartRecord(c_oAscColor.COLOR_TYPE_SRGB);
 
