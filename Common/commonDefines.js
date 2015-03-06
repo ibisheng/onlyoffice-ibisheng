@@ -505,9 +505,11 @@ var c_oAscSaveTypes = {
 };
 
 var c_oAscColor = {
+	COLOR_TYPE_NONE		: 0,
 	COLOR_TYPE_SRGB		: 1,
 	COLOR_TYPE_PRST		: 2,
-	COLOR_TYPE_SCHEME	: 3
+	COLOR_TYPE_SCHEME	: 3,
+	COLOR_TYPE_SYS		: 4
 };
 
 var c_oAscFill = {

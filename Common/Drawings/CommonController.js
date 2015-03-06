@@ -5936,17 +5936,6 @@ DrawingObjectsController.prototype =
         this.startRecalculate();
     },
 
-
-    applyColorScheme: function()
-    {
-        // var aObjects = this.drawingObjects.getDrawingObjects();
-        // for (var i = 0; i < aObjects.length; i++)
-        // {
-        //     if(typeof aObjects[i].graphicObject.recalculateColors === "function")
-        //         aObjects[i].graphicObject.recalculateColors();
-        // }
-    },
-
     // layers
     setGraphicObjectLayer: function(layerType)
     {
@@ -6463,18 +6452,18 @@ function CreateAscColorEx(unicolor) {
     var _color = unicolor.color;
     switch (_color.type)
     {
-        case COLOR_TYPE_SRGB:
-        case COLOR_TYPE_SYS:
+        case c_oAscColor.COLOR_TYPE_SRGB:
+        case c_oAscColor.COLOR_TYPE_SYS:
         {
             break;
         }
-        case COLOR_TYPE_PRST:
+        case c_oAscColor.COLOR_TYPE_PRST:
         {
             ret.type = c_oAscColor.COLOR_TYPE_PRST;
             ret.value = _color.id;
             break;
         }
-        case COLOR_TYPE_SCHEME:
+        case c_oAscColor.COLOR_TYPE_SCHEME:
         {
             ret.type = c_oAscColor.COLOR_TYPE_SCHEME;
             ret.value = _color.id;

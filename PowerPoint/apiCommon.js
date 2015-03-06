@@ -1,87 +1,5 @@
 "use strict";
 
-
-function CAscTexture()
-{
-    this.Id = 0;
-    this.Image = "";
-}
-CAscTexture.prototype.get_id = function() { return this.Id; }
-CAscTexture.prototype.get_image = function() { return this.Image; }
-
-function CAscColorScheme()
-{
-    this.Colors = [];
-    this.Name = "";
-}
-CAscColorScheme.prototype.get_colors = function() { return this.Colors; }
-CAscColorScheme.prototype.get_name = function() { return this.Name; }
-
-
-function CAscColor()
-{
-    this.type = c_oAscColor.COLOR_TYPE_SRGB;
-    this.value = null;
-    this.r = 0;
-    this.g = 0;
-    this.b = 0;
-    this.a = 255;
-
-    this.Auto = false;
-
-    this.Mods = [];
-    this.ColorSchemeId = -1;
-
-    if (1 === arguments.length) {
-        this.r = arguments[0].r;
-        this.g = arguments[0].g;
-        this.b = arguments[0].b;
-    } else {
-        if (3 <= arguments.length) {
-            this.r = arguments[0];
-            this.g = arguments[1];
-            this.b = arguments[2];
-        }
-        if (4 === arguments.length)
-            this.a = arguments[3];
-    }
-}
-CAscColor.prototype.get_r = function(){return this.r}
-CAscColor.prototype.put_r = function(v){this.r = v; this.hex = undefined;}
-CAscColor.prototype.get_g = function(){return this.g;}
-CAscColor.prototype.put_g = function(v){this.g = v; this.hex = undefined;}
-CAscColor.prototype.get_b = function(){return this.b;}
-CAscColor.prototype.put_b = function(v){this.b = v; this.hex = undefined;}
-CAscColor.prototype.get_a = function(){return this.a;}
-CAscColor.prototype.put_a = function(v){this.a = v; this.hex = undefined;}
-CAscColor.prototype.get_type = function(){return this.type;}
-CAscColor.prototype.put_type = function(v){this.type = v;}
-CAscColor.prototype.get_value = function(){return this.value;}
-CAscColor.prototype.put_value = function(v){this.value = v;}
-CAscColor.prototype.put_auto = function(v){this.Auto = v;}
-CAscColor.prototype.get_auto = function(){return this.Auto;}
-CAscColor.prototype.get_hex = function()
-{
-    if(!this.hex)
-    {
-        var a = this.a.toString(16);
-        var r = this.r.toString(16);
-        var g = this.g.toString(16);
-        var b = this.b.toString(16);
-        this.hex = ( a.length == 1? "0" + a: a) +
-            ( r.length == 1? "0" + r: r) +
-            ( g.length == 1? "0" + g: g) +
-            ( b.length == 1? "0" + b: b);
-    }
-    return this.hex;
-}
-
-CAscColor.prototype.get_color = function()
-{
-    var ret = new CColor(this.r, this.g, this.b);
-    return ret;
-}
-
 function CDocOpenProgress()
 {
     this.Type = c_oAscAsyncAction.Open;
@@ -93,11 +11,11 @@ function CDocOpenProgress()
     this.CurrentImage = 0;
 }
 
-CDocOpenProgress.prototype.get_Type = function(){return this.Type}
-CDocOpenProgress.prototype.get_FontsCount = function(){return this.FontsCount}
-CDocOpenProgress.prototype.get_CurrentFont = function(){return this.CurrentFont}
-CDocOpenProgress.prototype.get_ImagesCount = function(){return this.ImagesCount}
-CDocOpenProgress.prototype.get_CurrentImage = function(){return this.CurrentImage}
+CDocOpenProgress.prototype.get_Type = function(){return this.Type};
+CDocOpenProgress.prototype.get_FontsCount = function(){return this.FontsCount};
+CDocOpenProgress.prototype.get_CurrentFont = function(){return this.CurrentFont};
+CDocOpenProgress.prototype.get_ImagesCount = function(){return this.ImagesCount};
+CDocOpenProgress.prototype.get_CurrentImage = function(){return this.CurrentImage};
 
 function CDocInfo (obj){
     if(obj){

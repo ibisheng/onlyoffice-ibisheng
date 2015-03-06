@@ -1959,7 +1959,7 @@ function CBinaryFileWriter()
         oThis._WriteLimit2(19, bodyPr.wrap);
 
         oThis.WriteUChar(g_nodeAttributeEnd);
-    }
+    };
 
     // fill-stroke ---------------------------------------------------------------
     this.WriteUniColor = function(unicolor)
@@ -1970,9 +1970,9 @@ function CBinaryFileWriter()
         var color = unicolor.color;
         switch (color.type)
         {
-            case COLOR_TYPE_PRST:
+            case c_oAscColor.COLOR_TYPE_PRST:
             {
-                oThis.StartRecord(COLOR_TYPE_PRST);
+                oThis.StartRecord(c_oAscColor.COLOR_TYPE_PRST);
 
                 oThis.WriteUChar(g_nodeAttributeStart);
                 oThis._WriteString1(0, color.id);
@@ -1983,9 +1983,9 @@ function CBinaryFileWriter()
                 oThis.EndRecord();
                 break;
             }
-            case COLOR_TYPE_SCHEME:
+            case c_oAscColor.COLOR_TYPE_SCHEME:
             {
-                oThis.StartRecord(COLOR_TYPE_SCHEME);
+                oThis.StartRecord(c_oAscColor.COLOR_TYPE_SCHEME);
 
                 oThis.WriteUChar(g_nodeAttributeStart);
                 oThis._WriteUChar1(0, color.id);
@@ -1996,9 +1996,9 @@ function CBinaryFileWriter()
                 oThis.EndRecord();
                 break;
             }
-            case COLOR_TYPE_SRGB:
+            case c_oAscColor.c_oAscColor.COLOR_TYPE_SRGB:
             {
-                oThis.StartRecord(COLOR_TYPE_SRGB);
+                oThis.StartRecord(c_oAscColor.COLOR_TYPE_SRGB);
 
                 oThis.WriteUChar(g_nodeAttributeStart);
                 oThis._WriteUChar1(0, color.RGBA.R);
@@ -2011,9 +2011,9 @@ function CBinaryFileWriter()
                 oThis.EndRecord();
                 break;
             }
-            case COLOR_TYPE_SYS:
+            case c_oAscColor.COLOR_TYPE_SYS:
             {
-                oThis.StartRecord(COLOR_TYPE_SYS);
+                oThis.StartRecord(c_oAscColor.COLOR_TYPE_SYS);
 
                 oThis.WriteUChar(g_nodeAttributeStart);
                 oThis._WriteString1(0, color.id);
@@ -2028,7 +2028,7 @@ function CBinaryFileWriter()
                 break;
             }
         }
-    }
+    };
 
     this.WriteMods = function(mods)
     {

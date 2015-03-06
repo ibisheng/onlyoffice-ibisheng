@@ -354,15 +354,6 @@ var TYPE_TRACK_GROUP_PASSIVE = 1;
 var TYPE_TRACK_TEXT = 2;
 var TYPE_TRACK_EMPTY_PH = 3;
 
-
-var GLOBAL_BLIP_FILL_MAP = {};
-
-var COLOR_TYPE_NONE		= 0;
-var COLOR_TYPE_SRGB		= 1;
-var COLOR_TYPE_PRST		= 2;
-var COLOR_TYPE_SCHEME	= 3;
-var COLOR_TYPE_SYS		= 4;
-
 var SLIDE_KIND = 0;
 var LAYOUT_KIND = 1;
 var MASTER_KIND = 2;
@@ -1215,7 +1206,7 @@ CColorModifiers.prototype =
 
 function CSysColor()
 {
-    this.type = COLOR_TYPE_SYS;
+    this.type = c_oAscColor.COLOR_TYPE_SYS;
     this.id = "";
     this.RGBA = {
         R: 0,
@@ -1224,10 +1215,6 @@ function CSysColor()
         A: 255,
         needRecalc: true
     };
-
-
-    //this.Id = g_oIdCounter.Get_NewId();
-    //g_oTableId.Add(this, this.Id);
 }
 
 CSysColor.prototype =
@@ -1243,17 +1230,14 @@ CSysColor.prototype =
 
     setR: function(pr)
     {
-        //History.Add(this, {Type:historyitem_SysColor_SetR, oldPr: this.RGBA.R, newPr:pr});
         this.RGBA.R = pr;
     },
     setG: function(pr)
     {
-        //History.Add(this, {Type:historyitem_SysColor_SetG, oldPr: this.RGBA.G, newPr:pr});
         this.RGBA.G = pr;
     },
     setB: function(pr)
     {
-        //History.Add(this, {Type:historyitem_SysColor_SetB, oldPr: this.RGBA.B, newPr:pr});
         this.RGBA.B = pr;
     },
 
@@ -1283,7 +1267,7 @@ CSysColor.prototype =
 
     Write_ToBinary: function (w)
     {
-        w.WriteLong(COLOR_TYPE_SYS);
+        w.WriteLong(this.type);
         w.WriteString2(this.id);
         w.WriteLong(((this.RGBA.R << 16) & 0xFF0000) + ((this.RGBA.G << 8) & 0xFF00) + this.RGBA.B);
     },
@@ -1354,7 +1338,6 @@ CSysColor.prototype =
 
     setId: function(id)
     {
-        //History.Add(this, {Type: historyitem_SysColor_SetId, oldId: this.id, newId: id});
         this.id = id;
     },
 
@@ -1414,7 +1397,7 @@ CSysColor.prototype =
 
     IsIdentical :  function(color)
     {
-        return color && color.type == COLOR_TYPE_SYS && color.id == this.id;
+        return color && color.type == this.type && color.id == this.id;
     },
     Calculate : function(obj)
     {
@@ -1433,13 +1416,11 @@ CSysColor.prototype =
 };
 function CPrstColor()
 {
-    this.type = COLOR_TYPE_PRST;
+    this.type = c_oAscColor.COLOR_TYPE_PRST;
     this.id = "";
     this.RGBA = {
         R:0, G:0, B:0, A:255, needRecalc: true
     };
-    //this.Id = g_oIdCounter.Get_NewId();
-    //g_oTableId.Add(this, this.Id);
 }
 
 CPrstColor.prototype =
@@ -1471,7 +1452,7 @@ CPrstColor.prototype =
 
     Write_ToBinary: function (w)
     {
-        w.WriteLong(COLOR_TYPE_PRST);
+        w.WriteLong(this.type);
         w.WriteString2(this.id);
     },
 
@@ -1482,7 +1463,6 @@ CPrstColor.prototype =
 
     setId: function(id)
     {
-        //History.Add(this, {Type: historyitem_PrstColor_SetId, oldId: this.id, newId: id});
         this.id = id;
     },
 
@@ -1512,7 +1492,7 @@ CPrstColor.prototype =
 
     IsIdentical : function(color)
     {
-        return color && color.type == COLOR_TYPE_PRST && color.id == this.id;
+        return color && color.type == this.type && color.id == this.id;
     },
 
     createDuplicate : function()
@@ -1567,10 +1547,8 @@ CPrstColor.prototype =
 };
 function CRGBColor()
 {
-    this.type = COLOR_TYPE_SRGB;
+    this.type = c_oAscColor.COLOR_TYPE_SRGB;
     this.RGBA = {R:0, G:0, B:0, A:255, needRecalc: true};
-    //this.Id = g_oIdCounter.Get_NewId();
-    //g_oTableId.Add(this, this.Id);
 }
 
 CRGBColor.prototype =
@@ -1611,7 +1589,7 @@ CRGBColor.prototype =
 
     Write_ToBinary: function(w)
     {
-        w.WriteLong(COLOR_TYPE_SRGB);
+        w.WriteLong(this.type);
         w.WriteLong(((this.RGBA.R << 16) & 0xFF0000) + ((this.RGBA.G << 8) & 0xFF00) + this.RGBA.B);
     },
 
@@ -1625,8 +1603,6 @@ CRGBColor.prototype =
 
     setColor: function(r, g, b)
     {
-        var rgba = this.RGBA;
-        // History.Add(this, {Type: historyitem_RGBColor_SetColor, oldColor: {r: rgba.R, g: rgba.G, b: rgba.B}, newColor: {r: r, g: g, b: b}});
         this.RGBA.R = r;
         this.RGBA.G = g;
         this.RGBA.B = b;
@@ -1704,7 +1680,7 @@ CRGBColor.prototype =
     },
     IsIdentical : function(color)
     {
-        return color && color.type == COLOR_TYPE_SRGB && color.RGBA.R == this.RGBA.R && color.RGBA.G == this.RGBA.G && color.RGBA.B == this.RGBA.B && color.RGBA.A == this.RGBA.A;
+        return color && color.type == this.type && color.RGBA.R == this.RGBA.R && color.RGBA.G == this.RGBA.G && color.RGBA.B == this.RGBA.B && color.RGBA.A == this.RGBA.A;
     },
 
     createDuplicate : function()
@@ -1725,7 +1701,7 @@ CRGBColor.prototype =
 
 function CSchemeColor()
 {
-    this.type = COLOR_TYPE_SCHEME;
+    this.type = c_oAscColor.COLOR_TYPE_SCHEME;
     this.id = 0;
     this.RGBA = {
         R:0,
@@ -1734,8 +1710,6 @@ function CSchemeColor()
         A:255,
         needRecalc: true
     };
-    //this.Id = g_oIdCounter.Get_NewId();
-    //g_oTableId.Add(this, this.Id);
 }
 
 CSchemeColor.prototype =
@@ -1804,7 +1778,7 @@ CSchemeColor.prototype =
 
     Write_ToBinary: function (w)
     {
-        w.WriteLong(COLOR_TYPE_SCHEME);
+        w.WriteLong(this.type);
         w.WriteLong(this.id);
     },
 
@@ -1815,7 +1789,6 @@ CSchemeColor.prototype =
 
     setId: function(id)
     {
-        //History.Add(this, {Type: historyitem_SchemeColor_SetId, oldId: this.id, newId: id});
         this.id = id;
     },
 
@@ -1874,7 +1847,7 @@ CSchemeColor.prototype =
 
     IsIdentical : function(color)
     {
-        return color && color.type == COLOR_TYPE_SCHEME && color.id == this.id;
+        return color && color.type == this.type && color.id == this.id;
     },
     createDuplicate : function()
     {
@@ -1933,8 +1906,6 @@ function CUniColor()
         B: 0,
         A: 255
     };
-    //this.Id = g_oIdCounter.Get_NewId();
-    //g_oTableId.Add(this, this.Id);
 }
 
 CUniColor.prototype =
@@ -1949,7 +1920,7 @@ CUniColor.prototype =
 
     checkPhColor: function(unicolor)
     {
-        if(this.color && this.color.type === COLOR_TYPE_SCHEME && this.color.id === 14)
+        if(this.color && this.color.type === c_oAscColor.COLOR_TYPE_SCHEME && this.color.id === 14)
         {
             if(unicolor)
             {
@@ -2187,29 +2158,29 @@ CUniColor.prototype =
             var type = r.GetLong();
             switch(type)
             {
-                case COLOR_TYPE_NONE:
+                case c_oAscColor.COLOR_TYPE_NONE:
                 {
                     break;
                 }
-                case COLOR_TYPE_SRGB:
+                case c_oAscColor.COLOR_TYPE_SRGB:
                 {
                     this.color = new CRGBColor();
                     this.color.Read_FromBinary(r);
                     break;
                 }
-                case COLOR_TYPE_PRST:
+                case c_oAscColor.COLOR_TYPE_PRST:
                 {
                     this.color = new CPrstColor();
                     this.color.Read_FromBinary(r);
                     break;
                 }
-                case COLOR_TYPE_SCHEME:
+                case c_oAscColor.COLOR_TYPE_SCHEME:
                 {
                     this.color = new CSchemeColor();
                     this.color.Read_FromBinary(r);
                     break;
                 }
-                case COLOR_TYPE_SYS:
+                case c_oAscColor.COLOR_TYPE_SYS:
                 {
                     this.color = new CSysColor();
                     this.color.Read_FromBinary(r);
@@ -2289,11 +2260,11 @@ CUniColor.prototype =
 
         switch(this.color.type)
         {
-            case COLOR_TYPE_NONE:
+            case c_oAscColor.COLOR_TYPE_NONE:
             {
                 break;
             }
-            case COLOR_TYPE_PRST:
+            case c_oAscColor.COLOR_TYPE_PRST:
             {
                 _ret.color = new CPrstColor();
                 if(unicolor.color.id == this.color.id)
@@ -2310,7 +2281,7 @@ CUniColor.prototype =
                 }
                 break;
             }
-            case COLOR_TYPE_SCHEME:
+            case c_oAscColor.COLOR_TYPE_SCHEME:
             {
                 _ret.color = new CSchemeColor();
                 if(unicolor.color.id == this.color.id)
@@ -2327,7 +2298,7 @@ CUniColor.prototype =
                 }
                 break;
             }
-            case COLOR_TYPE_SRGB:
+            case c_oAscColor.COLOR_TYPE_SRGB:
             {
                 _ret.color = new CRGBColor();
                 var _RGBA1 = this.color.RGBA;
@@ -2350,7 +2321,7 @@ CUniColor.prototype =
 
                 break;
             }
-            case COLOR_TYPE_SYS:
+            case c_oAscColor.COLOR_TYPE_SYS:
             {
                 if(unicolor.color.id == this.color.id)
                 {
@@ -5053,11 +5024,11 @@ function CompareUniColor(u1, u2)
             return false;
         switch (u1.color.type)
         {
-            case COLOR_TYPE_NONE:
+            case c_oAscColor.COLOR_TYPE_NONE:
             {
                 break;
             }
-            case COLOR_TYPE_SRGB:
+            case c_oAscColor.COLOR_TYPE_SRGB:
             {
                 if(u1.color.RGBA.R !== u2.color.RGBA.R
                     || u1.color.RGBA.G !== u2.color.RGBA.G
@@ -5068,14 +5039,14 @@ function CompareUniColor(u1, u2)
                 }
                 break;
             }
-            case COLOR_TYPE_PRST:
-            case COLOR_TYPE_SCHEME:
+            case c_oAscColor.COLOR_TYPE_PRST:
+            case c_oAscColor.COLOR_TYPE_SCHEME:
             {
                 if(u1.color.id !== u2.color.id)
                     return false;
                 break;
             }
-            case COLOR_TYPE_SYS:
+            case c_oAscColor.COLOR_TYPE_SYS:
             {
                 if(u1.color.RGBA.R !== u2.color.RGBA.R
                     || u1.color.RGBA.G !== u2.color.RGBA.G

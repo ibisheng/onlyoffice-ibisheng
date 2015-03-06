@@ -1382,7 +1382,7 @@ function BinaryPPTYLoader()
 
             switch (_type)
             {
-                case COLOR_TYPE_PRST:
+                case c_oAscColor.COLOR_TYPE_PRST:
                 {
                     s.Skip2(2);
                     uni_color.setColor(new CPrstColor());
@@ -1399,7 +1399,7 @@ function BinaryPPTYLoader()
 
                     break;
                 }
-                case COLOR_TYPE_SCHEME:
+                case c_oAscColor.COLOR_TYPE_SCHEME:
                 {
                     s.Skip2(2);
                     uni_color.setColor(new CSchemeColor());
@@ -1416,7 +1416,7 @@ function BinaryPPTYLoader()
 
                     break;
                 }
-                case COLOR_TYPE_SRGB:
+                case c_oAscColor.COLOR_TYPE_SRGB:
                 {
                     var r, g, b;
                     s.Skip2(1);
@@ -1439,7 +1439,7 @@ function BinaryPPTYLoader()
 
                     break;
                 }
-                case COLOR_TYPE_SYS:
+                case c_oAscColor.COLOR_TYPE_SYS:
                 {
                     s.Skip2(1);
                     uni_color.setColor(new CSysColor());

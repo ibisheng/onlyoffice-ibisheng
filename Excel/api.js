@@ -3166,8 +3166,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                 }
                 this.chartPreviewManager.clearPreviews();
             }
-			var ws = this.wb.getWorksheet();
-			//ws.objectRender.controller.applyColorScheme();
 
 			// На view-режиме не нужно отправлять стили
 			if (true !== this.asc_getViewerMode() && !this.isMobileVersion) {
