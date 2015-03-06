@@ -1624,7 +1624,7 @@
 				 var k = 0;
 				 for (var n = 0;n < nodes.length; ++n)
 				 {
-					if(!(nodes[n].nodeName.toLowerCase() == 'meta' || nodes[n].nodeName.toLowerCase() == 'style' || nodes[n].nodeName.toLowerCase() == '#comment' || (nodes[n].nodeName.toLowerCase() == '#text' && nodes[n].textContent.replace(/(\r|\t|\n| )/g, '') == '')))
+					if(!(nodes[n].nodeName.toLowerCase() == 'meta' || nodes[n].nodeName.toLowerCase() == 'style' || nodes[n].nodeName.toLowerCase() == '#comment' ||  nodes[n].nodeName.toLowerCase() == 'font' || (nodes[n].nodeName.toLowerCase() == '#text' && nodes[n].textContent.replace(/(\r|\t|\n| )/g, '') == '')))
 					{
 						/*if($(nodes[n]).find("img").length != 0 && nodes[n].nodeName.toLowerCase() != 'table')//если в вставляемом фрагменте присутствует изображение
 						{
@@ -2266,7 +2266,8 @@
 								arrCount[i]  = 0;
 								for(var j = 0;j < tableBody.children[i].children.length;++j)
 								{
-									arrCount[i] += tableBody.children[i].children[j].colSpan;
+									if(tableBody.children[i].children[j] && tableBody.children[i].children[j].colSpan !== undefined)
+										arrCount[i] += tableBody.children[i].children[j].colSpan;
 								}
                             }
 							cellCount = Math.max.apply({}, arrCount);
@@ -2290,17 +2291,30 @@
 							cellCountAll[s] = cellCount;
 							s++;
 
-							
+							var rowCountTrue = startNum;
 							for (var tR = startNum; tR < tableBody.children.length + startNum; ++tR) {
-								aResult[tR] = [];
+							
+								if(tableBody.children[tR - startNum] && tableBody.children[tR -startNum ] && tableBody.children[tR -startNum ].nodeName.toLowerCase() !== "tr")
+								{
+									continue;
+								}
+								
+								aResult[rowCountTrue] = [];
 								var cNew = 0;
 								for(var tC = range.c1; tC < range.c1 + cellCount; ++tC) {
+									
+									if(tableBody.children[tR - startNum] && tableBody.children[tR -startNum ].children[cNew] && tableBody.children[tR -startNum ].children[cNew].nodeName.toLowerCase() !== "td")
+									{
+										cNew++;
+										tC--;
+										continue;
+									}
 									
 									if(0 != mergeArr.length)
 									{
 										for(var k = 0; k < mergeArr.length; ++k)
 										{
-											if(tC >= mergeArr[k].c1 && tC <= mergeArr[k].c2 && tR >= mergeArr[k].r1 && tR <= mergeArr[k].r2)
+											if(tC >= mergeArr[k].c1 && tC <= mergeArr[k].c2 && rowCountTrue >= mergeArr[k].r1 && rowCountTrue <= mergeArr[k].r2)
 											{
 												break;
 											}
@@ -2316,7 +2330,7 @@
 															addImages = [];
 														var curCell = {
 															col: tC ,
-															row: tR + imgCol
+															row: rowCountTrue + imgCol
 														};
 														var tag = $(_tBody).find('img')[imgCol];
 														addImages[imCount] = 
@@ -2329,12 +2343,12 @@
 												}
 												if(_tBody == undefined)
 													_tBody = document.createElement('td');
-												aResult[tR][tC] = t._getArray(_tBody,isText);
+												aResult[rowCountTrue][tC] = t._getArray(_tBody,isText);
 												if(undefined != _tBody && (_tBody.colSpan > 1 || _tBody.rowSpan > 1))
 												{
 													mergeArr[n++] = {
-														r1: tR,
-														r2: tR + _tBody.rowSpan - 1,
+														r1: rowCountTrue,
+														r2: rowCountTrue + _tBody.rowSpan - 1,
 														c1: tC,
 														c2: tC + _tBody.colSpan - 1
 													}
@@ -2345,7 +2359,7 @@
 									}
 									else
 									{
-										var _tBody = tableBody.children[tR -startNum ].children[cNew];
+										var _tBody = tableBody.children[tR - startNum ].children[cNew];
 										var findImg = $(_tBody).find('img');
 										if(findImg.length != 0)
 										{
@@ -2355,7 +2369,7 @@
 													addImages = [];
 												var curCell = {
 													col: tC,
-													row: tR + imgCol
+													row: rowCountTrue + imgCol
 												};
 												var tag = $(_tBody).find('img')[imgCol];
 												addImages[imCount] = 
@@ -2366,12 +2380,12 @@
 												imCount++;
 											}
 										}
-										aResult[tR][tC] = t._getArray(_tBody,isText);
+										aResult[rowCountTrue][tC] = t._getArray(_tBody,isText);
 										if(undefined != _tBody && (_tBody.colSpan > 1 || _tBody.rowSpan > 1))
 										{
 											mergeArr[n++] = {
-												r1: tR,
-												r2: tR + _tBody.rowSpan - 1,
+												r1: rowCountTrue,
+												r2: rowCountTrue + _tBody.rowSpan - 1,
 												c1: tC,
 												c2: tC + _tBody.colSpan - 1
 											}
@@ -2379,13 +2393,16 @@
 										cNew++;
 									}
 								}
+								
+								rowCountTrue++;
+								
 							}
 							
 							
 							if(countChild == 1)//если только таблица приходит
-								r = tR;
+								r = rowCountTrue;
 							else//если помимо таблицы есть ещё и прочее содержимое
-								tableRowCount += tableBody.children.length -1;
+								tableRowCount += rowCountTrue - startNum - 1;
 							break;
 						
 							onlyImages = false;
