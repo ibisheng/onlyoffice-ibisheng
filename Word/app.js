@@ -104,7 +104,8 @@ require([
             'RightMenu',
             'LeftMenu',
             'Main',
-            'Common.Controllers.Fonts'
+            'Common.Controllers.Fonts',
+            'Common.Controllers.History'
             /** coauthoring begin **/
             ,'Common.Controllers.Chat'
             ,'Common.Controllers.Comments'
@@ -131,7 +132,8 @@ require([
         'documenteditor/main/app/view/TableSettings',
         'documenteditor/main/app/view/ShapeSettings',
         'common/main/lib/util/utils',
-        'common/main/lib/controller/Fonts'
+        'common/main/lib/controller/Fonts',
+        'common/main/lib/controller/History'
         /** coauthoring begin **/
         ,'common/main/lib/controller/Comments'
         ,'common/main/lib/controller/Chat'
