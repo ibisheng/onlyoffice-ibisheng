@@ -1048,9 +1048,9 @@ function addToArrRecalc(sheetId, cell){
 		}
 		temp.push(cell);
 	}
-function buildRecalc(_wb,notrec){
+function buildRecalc(_wb,notrec, bForce){
 	var ws;
-    if( lc > 1 ) return;
+    if( lc > 1 && !bForce) return;
 	for( var id in arrRecalc ){
 		ws = _wb.getWorksheetById(id);
 		if (ws) {
@@ -2500,6 +2500,10 @@ Woorksheet.prototype.removeRows=function(start, stop){
 	oRange.deleteCellsShiftUp();
 };
 Woorksheet.prototype._removeRows=function(start, stop){
+	//до перемещения ячеек, перед функцией, в которой используются nodesSheetArea/nodesSheetCell move/shift нужно обязательно вызвать force buildRecalc
+	//чтобы формулы, которые копим попали в струкруры nodesSheet, иначе формулы не сдвинутся
+	//например принимаем изменения: добавление формул, сдвиг с помощью _removeRows. результат формулы указывают на теже ячейки, что и до _removeRows
+	buildRecalc(this.workbook, true, true);
 	lockDraw(this.workbook);
 	History.Create_NewPoint();
 	//start, stop 0 based
@@ -2557,6 +2561,10 @@ Woorksheet.prototype.insertRowsBefore=function(index, count){
 	oRange.addCellsShiftBottom();
 };
 Woorksheet.prototype._insertRowsBefore=function(index, count){
+	//до перемещения ячеек, перед функцией, в которой используются nodesSheetArea/nodesSheetCell move/shift нужно обязательно вызвать force buildRecalc
+	//чтобы формулы, которые копим попали в струкруры nodesSheet, иначе формулы не сдвинутся
+	//например принимаем изменения: добавление формул, сдвиг с помощью _removeRows. результат формулы указывают на теже ячейки, что и до _removeRows
+	buildRecalc(this.workbook, true, true);
 	lockDraw(this.workbook);
 	var oActualRange = {r1: index, c1: 0, r2: index + count - 1, c2: gc_nMaxCol0};
 	History.Create_NewPoint();
@@ -2622,6 +2630,10 @@ Woorksheet.prototype.removeCols=function(start, stop){
 	oRange.deleteCellsShiftLeft();
 };
 Woorksheet.prototype._removeCols=function(start, stop){
+	//до перемещения ячеек, перед функцией, в которой используются nodesSheetArea/nodesSheetCell move/shift нужно обязательно вызвать force buildRecalc
+	//чтобы формулы, которые копим попали в струкруры nodesSheet, иначе формулы не сдвинутся
+	//например принимаем изменения: добавление формул, сдвиг с помощью _removeRows. результат формулы указывают на теже ячейки, что и до _removeRows
+	buildRecalc(this.workbook, true, true);
 	lockDraw(this.workbook);
 	History.Create_NewPoint();
 	//start, stop 0 based
@@ -2688,6 +2700,10 @@ Woorksheet.prototype.insertColsBefore=function(index, count){
 	oRange.addCellsShiftRight();
 };
 Woorksheet.prototype._insertColsBefore=function(index, count){
+	//до перемещения ячеек, перед функцией, в которой используются nodesSheetArea/nodesSheetCell move/shift нужно обязательно вызвать force buildRecalc
+	//чтобы формулы, которые копим попали в струкруры nodesSheet, иначе формулы не сдвинутся
+	//например принимаем изменения: добавление формул, сдвиг с помощью _removeRows. результат формулы указывают на теже ячейки, что и до _removeRows
+	buildRecalc(this.workbook, true, true);
 	lockDraw(this.workbook);
 	var oActualRange = {r1: 0, c1: index, r2: gc_nMaxRow0, c2: index + count - 1};
 	History.Create_NewPoint();
@@ -3456,6 +3472,10 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 		}
 	}
     if(!copyRange){
+		//до перемещения ячеек, перед функцией, в которой используются nodesSheetArea/nodesSheetCell move/shift нужно обязательно вызвать force buildRecalc
+		//чтобы формулы, которые копим попали в струкруры nodesSheet, иначе формулы не сдвинутся
+		//например принимаем изменения: добавление формул, сдвиг с помощью _removeRows. результат формулы указывают на теже ячейки, что и до _removeRows
+		buildRecalc(this.workbook, true, true);
         this.workbook.dependencyFormulas.helper(oBBoxFrom, oBBoxTo,this.Id);
     }
 
@@ -3555,6 +3575,10 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 	return true;
 };
 Woorksheet.prototype._shiftCellsLeft=function(oBBox){
+	//до перемещения ячеек, перед функцией, в которой используются nodesSheetArea/nodesSheetCell move/shift нужно обязательно вызвать force buildRecalc
+	//чтобы формулы, которые копим попали в струкруры nodesSheet, иначе формулы не сдвинутся
+	//например принимаем изменения: добавление формул, сдвиг с помощью _removeRows. результат формулы указывают на теже ячейки, что и до _removeRows
+	buildRecalc(this.workbook, true, true);
 	//todo удаление когда есть замерженые ячейки
 	var nLeft = oBBox.c1;
 	var nRight = oBBox.c2;
@@ -3590,6 +3614,10 @@ Woorksheet.prototype._shiftCellsLeft=function(oBBox){
 	//todo проверить не уменьшились ли границы таблицы
 };
 Woorksheet.prototype._shiftCellsUp=function(oBBox){
+	//до перемещения ячеек, перед функцией, в которой используются nodesSheetArea/nodesSheetCell move/shift нужно обязательно вызвать force buildRecalc
+	//чтобы формулы, которые копим попали в струкруры nodesSheet, иначе формулы не сдвинутся
+	//например принимаем изменения: добавление формул, сдвиг с помощью _removeRows. результат формулы указывают на теже ячейки, что и до _removeRows
+	buildRecalc(this.workbook, true, true);
 	var nTop = oBBox.r1;
 	var nBottom = oBBox.r2;
 	var dif = nTop - nBottom - 1;
@@ -3629,6 +3657,10 @@ Woorksheet.prototype._shiftCellsUp=function(oBBox){
 	//todo проверить не уменьшились ли границы таблицы
 };
 Woorksheet.prototype._shiftCellsRight=function(oBBox){
+	//до перемещения ячеек, перед функцией, в которой используются nodesSheetArea/nodesSheetCell move/shift нужно обязательно вызвать force buildRecalc
+	//чтобы формулы, которые копим попали в струкруры nodesSheet, иначе формулы не сдвинутся
+	//например принимаем изменения: добавление формул, сдвиг с помощью _removeRows. результат формулы указывают на теже ячейки, что и до _removeRows
+	buildRecalc(this.workbook, true, true);
 	var nLeft = oBBox.c1;
 	var nRight = oBBox.c2;
 	var dif = nRight - nLeft + 1;
@@ -3661,6 +3693,10 @@ Woorksheet.prototype._shiftCellsRight=function(oBBox){
 	this.renameDependencyNodes({offsetRow:0,offsetCol:dif}, oBBox);
 };
 Woorksheet.prototype._shiftCellsBottom=function(oBBox){
+	//до перемещения ячеек, перед функцией, в которой используются nodesSheetArea/nodesSheetCell move/shift нужно обязательно вызвать force buildRecalc
+	//чтобы формулы, которые копим попали в струкруры nodesSheet, иначе формулы не сдвинутся
+	//например принимаем изменения: добавление формул, сдвиг с помощью _removeRows. результат формулы указывают на теже ячейки, что и до _removeRows
+	buildRecalc(this.workbook, true, true);
 	var nTop = oBBox.r1;
 	var nBottom = oBBox.r2;
 	var dif = nBottom - nTop + 1;
