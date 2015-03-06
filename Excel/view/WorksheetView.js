@@ -642,7 +642,7 @@
 			var w = Math.max(x2 - x1, 0);
 			if (w === t.cols[col].width)
 				return;
-			var cc = Math.min(t._colWidthToCharCount(w), /*max col width*/255);
+			var cc = Math.min(t._colWidthToCharCount(w), c_oAscMaxColumnWidth);
 			var cw = t._charCountToModelColWidth(cc);
 
 			var onChangeWidthCallback = function (isSuccess) {
@@ -4201,7 +4201,7 @@
 		};
 
 		WorksheetView.prototype._changeColWidth = function (col, width, pad) {
-			var cc = Math.min(this._colWidthToCharCount(width + pad), /*max col width*/255);
+			var cc = Math.min(this._colWidthToCharCount(width + pad), c_oAscMaxColumnWidth);
 			var modelw = this._charCountToModelColWidth(cc);
 			var colw = this._calcColWidth(modelw);
 
@@ -9951,7 +9951,7 @@
 			var pad, cc, cw;
 			if (width > 0) {
 				pad = this.width_padding * 2 + this.width_1px;
-				cc = Math.min(this._colWidthToCharCount(width + pad), /*max col width*/255);
+				cc = Math.min(this._colWidthToCharCount(width + pad), c_oAscMaxColumnWidth);
 				cw = this._charCountToModelColWidth(cc);
 			} else {
 				cw = gc_dDefaultColWidthCharsAttribute;
