@@ -4041,7 +4041,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             if(Type == para_Math_Composition)
             {
                 // перед мат объектом идет break_operator и он не является первым элементом в строке
-                if(Item.kind == MATH_BOX )
+                if(Item.kind == MATH_BOX)
                 {
                     var BoxLen = Item.size.width;
 
@@ -4054,9 +4054,6 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                             PRS.Update_CurPos(PRS.PosEndRun.Get(Depth), Depth);
                             PRS.Set_LineBreakPos(PRS.PosEndRun.Get(Depth + 1));
-
-                            //PRS.Update_CurPos(Pos - 1, Depth);
-                            //this.Content[Pos - 1].Update_LineBreakPos(PRS, true);
                         }
 
                         PRS.X += PRS.SpaceLen + PRS.WordLen;
@@ -4104,10 +4101,6 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     if(Brk_Before == false && PRS.Word == false)
                     {
-                        // Отмечаем начало нового слова
-                        //PRS.Update_CurPos(Pos - 1, Depth);
-                        //this.Content[Pos - 1].Update_LineBreakPos(PRS, true); // обновим : начало нового слова - конец предыдущего Run
-
                         // обновим : начало нового слова - конец предыдущего Run
                         PRS.Update_CurPos(PRS.PosEndRun.Get(Depth), Depth);
                         PRS.Set_LineBreakPos(PRS.PosEndRun.Get(Depth + 1));
@@ -4117,6 +4110,24 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                 }
 
+                if(PRS.NewRange == false && 0 === CurRange && 0 === CurLine)
+                {
+                    var PrevRecalcInfo = PRS.RunRecalcInfoLast,
+                        NumberingAdd;
+
+                    if(null === PrevRecalcInfo)
+                        NumberingAdd = true;
+                    else
+                        NumberingAdd = PrevRecalcInfo.NumberingAdd;
+
+                    if(NumberingAdd)
+                    {
+                        PRS.X = PRS.Recalculate_Numbering(Item, this, ParaPr, PRS.X);
+                        PRS.RunRecalcInfoLast.NumberingAdd = false;
+                        PRS.RunRecalcInfoLast.NumberingUse = true;
+                        PRS.RunRecalcInfoLast.NumberingItem = PRS.Paragraph.Numbering;
+                    }
+                }
             }
 
             if ( true === PRS.NewRange )
