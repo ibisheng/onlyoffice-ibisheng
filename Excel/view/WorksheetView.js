@@ -1145,7 +1145,7 @@
 
 			var defaultFontSize = this.model.getDefaultFontSize();
 			// ToDo разобраться со значениями
-			this.maxRowHeight = asc_calcnpt(409, this._getPPIY());
+			this.maxRowHeight = asc_calcnpt(c_oAscMaxRowHeight, this._getPPIY());
 			this.defaultRowDescender = this._calcRowDescender(defaultFontSize);
 			gc_dDefaultRowHeightAttribute = this.defaultRowHeight = this.model.getDefaultHeight() ||
 				asc_calcnpt(defaultFontSize * this.vspRatio, this._getPPIY()) + this.height_1px;
