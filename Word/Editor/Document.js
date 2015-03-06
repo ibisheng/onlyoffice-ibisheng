@@ -745,7 +745,7 @@ function CDocument(DrawingDocument)
     this.FieldsManager = new CDocumentFieldsManager();
 
     // Проверяем режим редактирования
-    this.m_eEditType = document_EditingType_Common;
+    this.EditingType = document_EditingType_Common;
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -14448,6 +14448,10 @@ CDocument.prototype.private_ProcessTemplateReplacement = function(TemplateReplac
         this.Search(Id, {MatchCase : true}, false);
         this.SearchEngine.Replace_All(TemplateReplacementData[Id], false);
     }
+};
+CDocument.prototype.Get_EditingType = function()
+{
+    return this.EditingType;
 };
 
 //-----------------------------------------------------------------------------------

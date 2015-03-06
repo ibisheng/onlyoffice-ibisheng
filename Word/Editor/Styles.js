@@ -6568,6 +6568,26 @@ CRFonts.prototype =
         // Hint
         if ( Flags & 16 )
             this.Hint = Reader.GetLong();
+    },
+
+    Is_Equal : function(RFonts)
+    {
+        if ((undefined === this.Ascii && undefined !== RFonts.Ascii) || (undefined !== this.Ascii && (undefined === RFonts.Ascii || this.Ascii.Name !== RFonts.Ascii.Name)))
+            return false;
+
+        if ((undefined === this.EastAsia && undefined !== RFonts.EastAsia) || (undefined !== this.EastAsia && (undefined === RFonts.EastAsia || this.EastAsia.Name !== RFonts.EastAsia.Name)))
+            return false;
+
+        if ((undefined === this.HAnsi && undefined !== RFonts.HAnsi) || (undefined !== this.HAnsi && (undefined === RFonts.HAnsi || this.HAnsi.Name !== RFonts.HAnsi.Name)))
+            return false;
+
+        if ((undefined == this.CS && undefined !== RFonts.CS) || (undefined !== this.CS && (undefined === RFonts.CS || this.CS.Name !== RFonts.CS.Name)))
+            return false;
+
+        if ((undefined === this.Hint && undefined !== RFonts.Hint) || (undefined !== this.Hint && (undefined === RFonts.Hint || this.Hint !== RFonts.Hint)))
+            return false;
+
+        return true;
     }
 };
 
@@ -6675,6 +6695,14 @@ CLang.prototype =
         // Val
         if ( Flags & 4 )
             this.Val = Reader.GetLong();
+    },
+
+    Is_Equal : function(Lang)
+    {
+        if (this.Bidi !== Lang.Bidi || this.EastAsia !== Lang.EastAsia || this.Val !== Lang.Val)
+            return false;
+
+        return true;
     }
 };
 
@@ -6743,7 +6771,7 @@ CTextPr.prototype =
         this.Vanish     = undefined;
     },
 
-    Copy : function()
+    Copy : function(bCopyPrChange)
     {
         var TextPr = new CTextPr();
         TextPr.Bold      = this.Bold;
@@ -6794,6 +6822,12 @@ CTextPr.prototype =
             TextPr.Shd = this.Shd.Copy();
         
         TextPr.Vanish     = this.Vanish;
+
+        if (true === bCopyPrChange)
+        {
+            if (undefined !== this.PrChange)
+                TextPr.PrChange = this.PrChange.Copy();
+        }
 
         return TextPr;
     },
@@ -7306,6 +7340,12 @@ CTextPr.prototype =
             Flags |= 33554432;
         }
 
+        if (undefined !== this.PrChange)
+        {
+            this.PrChange.Write_ToBinary(Writer);
+            Flags |= 67108864;
+        }
+
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
         Writer.WriteLong( Flags );
@@ -7438,6 +7478,12 @@ CTextPr.prototype =
         {
             this.FontRef = new FontRef();
             this.FontRef.Read_FromBinary(Reader);
+        }
+
+        if (Flags & 67108864)
+        {
+            this.PrChange = new CTextPr();
+            this.PrChange.Read_FromBinary(Reader);
         }
     },
 
@@ -7627,6 +7673,101 @@ CTextPr.prototype =
             }
         }
         return true;
+    },
+
+    Is_Equal : function(TextPr)
+    {
+        if (this.Bold !== TextPr.Bold)
+            return false;
+
+        if (this.Italic !== TextPr.Italic)
+            return false;
+
+        if (this.Strikeout !== TextPr.Strikeout)
+            return false;
+
+        if (this.Underline !== TextPr.Underline)
+            return false;
+
+        if ((undefined === this.FontFamily && undefined !== TextPr.FontFamily) || (undefined !== this.FontFamily && (undefined === TextPr.FontFamily || this.FontFamily.Name !== TextPr.FontFamily.Name)))
+            return false;
+
+        if ((undefined === this.FontSize && undefined !== TextPr.FontSize) || (undefined !== this.FontSize && (undefined === TextPr.FontSize || Math.abs( this.FontSize - TextPr.FontSize ) >= 0.001)))
+            return false;
+
+        if ((undefined === this.Color && undefined !== TextPr.Color) || (undefined !== this.Color && (undefined === TextPr.Color || true !== this.Color.Compare(TextPr.Color))))
+            return false;
+
+        if (this.VertAlign !== TextPr.VertAlign)
+            return false;
+
+        if ((undefined === this.HighLight && undefined !== TextPr.HighLight) || (undefined !== this.HighLight && (undefined === TextPr.HighLight || (highlight_None === this.HighLight && highlight_None !== TextPr.HighLight)  || (highlight_None !== this.HighLight && highlight_None === TextPr.HighLight) || (highlight_None !== this.HighLight && highlight_None !== TextPr.HighLight && true !== this.HighLight.Compare(TextPr.HighLight)))))
+            return false;
+
+        if (this.RStyle !== TextPr.RStyle)
+            return false;
+
+        if ((undefined === this.Spacing && undefined !== TextPr.Spacing) || (undefined !== this.Spacing && (undefined === TextPr.Spacing || Math.abs(this.Spacing - TextPr.Spacing) >= 0.001)))
+            return false;
+
+        if (this.DStrikeout !== TextPr.DStrikeout)
+            return false;
+
+        if (this.Caps !== TextPr.Caps)
+            return false;
+
+        if (this.SmallCaps !== TextPr.SmallCaps)
+            return false;
+
+        if ((undefined === this.Position && undefined !== TextPr.Position) || (undefined !== this.Position && (undefined === TextPr.Position || Math.abs(this.Position - TextPr.Position) >= 0.001)))
+            return false;
+
+        if (true !== this.RFonts.Is_Equal(TextPr.RFonts))
+            return false;
+
+        if (this.BoldCS !== TextPr.BoldCS)
+            return false;
+
+        if (this.ItalicCS !== TextPr.ItalicCS)
+            return false;
+
+        if ((undefined === this.FontSizeCS && undefined !== TextPr.FontSize) || (undefined !== this.FontSizeCS && (undefined === TextPr.FontSizeCS || Math.abs(this.FontSizeCS - TextPr.FontSizeCS) >= 0.001)))
+            return false;
+
+        if (this.CS !== TextPr.CS)
+            return false;
+
+        if (this.RTL !== TextPr.RTL)
+            return false;
+
+        if (true !== this.Lang.Is_Equal(TextPr.Lang))
+            return false;
+
+        if ((undefined === this.Unifill && undefined !== TextPr.Unifill) || (undefined !== this.Unifill && (undefined === TextPr.Unifill || true !== this.Unifill.IsIdentical(TextPr.Unifill))))
+            return false;
+
+        if (this.Vanish !== TextPr.Vanish)
+            return false;
+
+        return true;
+    },
+
+    Have_PrChange : function()
+    {
+        if (undefined === this.PrChange || null === this.PrChange)
+            return false;
+
+        return true;
+    },
+
+    Add_PrChange : function()
+    {
+        this.PrChange = this.Copy();
+    },
+
+    Remove_PrChange : function()
+    {
+        delete this.PrChange;
     }
 }
 

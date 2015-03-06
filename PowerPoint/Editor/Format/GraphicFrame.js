@@ -743,7 +743,7 @@ CGraphicFrame.prototype =
 
     deselect: CShape.prototype.deselect,
 
-    Update_ConentIndexing: function()
+    Update_ContentIndexing: function()
     {},
 
     draw: function(graphics)

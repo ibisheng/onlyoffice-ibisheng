@@ -581,9 +581,19 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove = function(Direction,
                 this.Remove_FromContent(EndPos, 1, true);
             }
 
-            for (var CurPos = EndPos - 1; CurPos > StartPos; CurPos--)
+            if (this.Paragraph && this.Paragraph.LogicDocument && document_EditingType_Review === this.Paragraph.LogicDocument.Get_EditingType())
             {
-                this.Remove_FromContent(CurPos, 1, true);
+                for (var CurPos = EndPos - 1; CurPos > StartPos; CurPos--)
+                {
+                    this.Content[CurPos].Set_ReviewType(paragraphcontent_Reviewtype_Deleted, false);
+                }
+            }
+            else
+            {
+                for (var CurPos = EndPos - 1; CurPos > StartPos; CurPos--)
+                {
+                    this.Remove_FromContent(CurPos, 1, true);
+                }
             }
 
             this.Content[StartPos].Remove(Direction, bOnAddText);
@@ -2089,6 +2099,25 @@ CParagraphContentWithParagraphLikeContent.prototype.Search_GetId = function(bNex
     }
 
     return null;
+};
+//----------------------------------------------------------------------------------------------------------------------
+// Разное
+//----------------------------------------------------------------------------------------------------------------------
+CParagraphContentWithParagraphLikeContent.prototype.Set_ReviewType = function(ReviewType, RemovePrChange)
+{
+    for (var Index = 0, Count = this.Content.length; Index < Count; Index++)
+    {
+        var Element = this.Content[Index];
+        if (para_Run === Element.Type)
+        {
+            Element.Set_ReviewType(ReviewType);
+
+            if (true === RemovePrChange)
+                Element.Remove_PrChange();
+        }
+        else if (Element.Set_ReviewType)
+            Element.Set_ReviewType(ReviewType);
+    }
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые должны быть реализованы в классах наследниках

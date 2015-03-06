@@ -2685,7 +2685,7 @@ ParaNewLine.prototype =
         return para_NewLine;
     },
     
-    Draw : function(X,Y,Context)
+    Draw : function(X, Y, Context)
     {
         if ( false === this.Flags.Use )
             return;

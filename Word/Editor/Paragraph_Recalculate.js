@@ -2264,6 +2264,166 @@ CParagraphRecalculateStateWrap.prototype =
     Restore_RunRecalcInfo : function()
     {
         this.RunRecalcInfoLast = this.RunRecalcInfoBreak;
+    },
+
+    Recalculate_Numbering : function(Item, Run, ParaPr, _X)
+    {
+        var CurPage = this.Page, CurLine = this.Line, CurRange = this.Range;
+        var Para = this.Paragraph;
+        var X = _X, LineAscent = this.LineAscent;
+
+        // Если нужно добавить нумерацию и на текущем элементе ее можно добавить, тогда добавляем её
+        var NumberingItem = Para.Numbering;
+        var NumberingType = Para.Numbering.Type;
+
+        if ( para_Numbering === NumberingType )
+        {
+            var NumPr = ParaPr.NumPr;
+            if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId || ( undefined !== Para.Get_SectionPr() && true === Para.IsEmpty() ) )
+            {
+                // Так мы обнуляем все рассчитанные ширины данного элемента
+                NumberingItem.Measure( g_oTextMeasurer, undefined );
+            }
+            else
+            {
+                var Numbering = Para.Parent.Get_Numbering();
+                var NumLvl    = Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl];
+                var NumSuff   = NumLvl.Suff;
+                var NumJc     = NumLvl.Jc;
+                var NumInfo   = Para.Parent.Internal_GetNumInfo( Para.Id, NumPr );
+                var NumTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
+                NumTextPr.Merge( Para.TextPr.Value );
+                NumTextPr.Merge( NumLvl.TextPr );
+
+
+                // Здесь измеряется только ширина символов нумерации, без суффикса
+                NumberingItem.Measure( g_oTextMeasurer, Numbering, NumInfo, NumTextPr, NumPr, Para.Get_Theme() );
+
+                // При рассчете высоты строки, если у нас параграф со списком, то размер символа
+                // в списке влияет только на высоту строки над Baseline, но не влияет на высоту строки
+                // ниже baseline.
+                if ( LineAscent < NumberingItem.Height )
+                    LineAscent = NumberingItem.Height;
+
+                switch ( NumJc )
+                {
+                    case align_Right:
+                    {
+                        NumberingItem.WidthVisible = 0;
+                        break;
+                    }
+                    case align_Center:
+                    {
+                        NumberingItem.WidthVisible = NumberingItem.WidthNum / 2;
+                        break;
+                    }
+                    case align_Left:
+                    default:
+                    {
+                        NumberingItem.WidthVisible = NumberingItem.WidthNum;
+                        break;
+                    }
+                }
+
+                X += NumberingItem.WidthVisible;
+
+                switch( NumSuff )
+                {
+                    case numbering_suff_Nothing:
+                    {
+                        // Ничего не делаем
+                        break;
+                    }
+                    case numbering_suff_Space:
+                    {
+                        var OldTextPr = g_oTextMeasurer.GetTextPr();
+
+
+
+                        var Theme = Para.Get_Theme();
+                        g_oTextMeasurer.SetTextPr( NumTextPr, Theme );
+                        g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
+                        NumberingItem.WidthSuff = g_oTextMeasurer.Measure( " " ).Width;
+                        g_oTextMeasurer.SetTextPr( OldTextPr, Theme );
+                        break;
+                    }
+                    case numbering_suff_Tab:
+                    {
+                        var NewX = Para.Internal_GetTabPos(X, ParaPr, CurPage).NewX;
+
+                        NumberingItem.WidthSuff = NewX - X;
+
+                        break;
+                    }
+                }
+
+                NumberingItem.Width         = NumberingItem.WidthNum;
+                NumberingItem.WidthVisible += NumberingItem.WidthSuff;
+
+                X += NumberingItem.WidthSuff;
+            }
+        }
+        else if ( para_PresentationNumbering === NumberingType )
+        {
+            var Level = Para.PresentationPr.Level;
+            var Bullet = Para.PresentationPr.Bullet;
+
+            var BulletNum = 0;
+            if (Bullet.Get_Type() >= numbering_presentationnumfrmt_ArabicPeriod)
+            {
+                var Prev = Para.Prev;
+                while (null != Prev && type_Paragraph === Prev.GetType())
+                {
+                    var PrevLevel = Prev.PresentationPr.Level;
+                    var PrevBullet = Prev.Get_PresentationNumbering();
+
+                    // Если предыдущий параграф более низкого уровня, тогда его не учитываем
+                    if (Level < PrevLevel)
+                    {
+                        Prev = Prev.Prev;
+                        continue;
+                    }
+                    else if (Level > PrevLevel)
+                        break;
+                    else if (PrevBullet.Get_Type() === Bullet.Get_Type() && PrevBullet.Get_StartAt() === PrevBullet.Get_StartAt())
+                    {
+                        if (true != Prev.IsEmpty())
+                            BulletNum++;
+
+                        Prev = Prev.Prev;
+                    }
+                    else
+                        break;
+                }
+            }
+
+            // Найдем настройки для первого текстового элемента
+            var FirstTextPr = Para.Get_FirstTextPr();
+
+            NumberingItem.Bullet = Bullet;
+            NumberingItem.BulletNum = BulletNum + 1;
+            NumberingItem.Measure(g_oTextMeasurer, FirstTextPr, Para.Get_Theme());
+
+
+            if ( numbering_presentationnumfrmt_None != Bullet.Get_Type() )
+            {
+                if ( ParaPr.Ind.FirstLine < 0 )
+                    NumberingItem.WidthVisible = Math.max( NumberingItem.Width, Para.X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine - X, Para.X + ParaPr.Ind.Left - X );
+                else
+                    NumberingItem.WidthVisible = Math.max( Para.X + ParaPr.Ind.Left + NumberingItem.Width - X, Para.X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine - X, Para.X + ParaPr.Ind.Left - X );
+            }
+
+            X += NumberingItem.WidthVisible;
+        }
+
+        // Заполним обратные данные в элементе нумерации
+        NumberingItem.Item       = Item;
+        NumberingItem.Run        = Run;
+        NumberingItem.Line       = CurLine;
+        NumberingItem.Range      = CurRange;
+        NumberingItem.LineAscent = LineAscent;
+
+        return X;
     }
 };
 

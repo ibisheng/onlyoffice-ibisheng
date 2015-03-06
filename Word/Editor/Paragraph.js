@@ -2021,6 +2021,7 @@ Paragraph.prototype =
             var aDStrikeout = PDSL.DStrikeout;
             var aUnderline  = PDSL.Underline;
             var aSpelling   = PDSL.Spelling;
+            var aRunReview  = PDSL.RunReview;
 
             // Рисуем зачеркивание
             var Element = aStrikeout.Get_Next();
@@ -2048,6 +2049,15 @@ Paragraph.prototype =
                 pGraphics.p_color( Element.r, Element.g, Element.b, 255 );
                 pGraphics.drawHorLine(0, Element.y0, Element.x0, Element.x1, Element.w );
                 Element = aUnderline.Get_Next();
+            }
+
+            // Рисуем красный рект вокруг изменных ранов
+            Element = aRunReview.Get_Next();
+            while (null !== Element)
+            {
+                pGraphics.p_color(Element.r, Element.g, Element.b, 255);
+                pGraphics.AddSmartRect(Element.x0, Page.Y + Line.Top, Element.x1 - Element.x0, Line.Bottom - Line.Top, 0);
+                Element = aRunReview.Get_Next();
             }
 
             // Рисуем подчеркивание орфографии
@@ -2338,7 +2348,15 @@ Paragraph.prototype =
                     this.Content[EndPos].Cursor_MoveToStartPos();
                 }
 
-                this.Internal_Content_Remove2( StartPos + 1, EndPos - StartPos - 1 );
+                if (this.LogicDocument && document_EditingType_Review === this.LogicDocument.Get_EditingType())
+                {
+                    for (var Pos = StartPos + 1; Pos <= EndPos - 1; Pos++)
+                    {
+                        this.Content[Pos].Set_ReviewType(paragraphcontent_Reviewtype_Deleted, false);
+                    }
+                }
+                else
+                    this.Internal_Content_Remove2( StartPos + 1, EndPos - StartPos - 1 );
 
                 this.Content[StartPos].Remove(nCount, bOnAddText);
 
@@ -2349,6 +2367,15 @@ Paragraph.prototype =
                         this.Selection.Use = false;
 
                     this.Internal_Content_Remove( StartPos );
+                }
+
+                if (this.LogicDocument && document_EditingType_Review === this.LogicDocument.Get_EditingType())
+                {
+                    for (var Pos = StartPos; Pos <= EndPos; Pos++)
+                    {
+                        this.Content[Pos].Selection_Remove();
+                    }
+                    this.CurPos.ContentPos = StartPos;
                 }
 
                 this.Correct_ContentPos2();
@@ -2433,7 +2460,9 @@ Paragraph.prototype =
                 }
                 else
                 {
-                    this.CurPos.ContentPos = ContentPos;
+                    // TODO: В режиме рецензии элементы не удаляются, а позиция меняется прямо в ранах
+                    if (document_EditingType_Review !== this.LogicDocument.Get_EditingType())
+                        this.CurPos.ContentPos = ContentPos;
                 }
             }
 
@@ -2705,7 +2734,7 @@ Paragraph.prototype =
             case para_NewLine:
             {
                 // Элементы данного типа добавляем во внутренний элемент
-                this.Content[this.CurPos.ContentPos].Add( Item );
+                this.Content[this.CurPos.ContentPos].Add(Item);
 
                 break;
             }
@@ -5218,6 +5247,10 @@ Paragraph.prototype =
                 TextPr.Underline = true;
             }
             Hyperlink.Apply_TextPr( TextPr, undefined, false );
+
+            // Если мы находимся в режиме рецензирования, то пробегаемся по всему содержимому гиперссылки и
+            // проставляем, что все раны новые.
+            Hyperlink.Set_ReviewType(paragraphcontent_Reviewtype_Added, true);
         }
         else if ( null !== HyperProps.Text && "" !== HyperProps.Text )
         {
@@ -12585,7 +12618,7 @@ CParaDrawingRangeLines.prototype =
             var PrevEl = this.Elements[Count - 1];
 
             if ( Math.abs( PrevEl.y0 - Element.y0 ) < 0.001 && Math.abs( PrevEl.y1 - Element.y1 ) < 0.001 && Math.abs( PrevEl.x1 - Element.x0 ) < 0.001 && Math.abs( PrevEl.w - Element.w ) < 0.001 && PrevEl.r === Element.r && PrevEl.g === Element.g && PrevEl.b === Element.b
-                && ( (undefined === PrevEl.Additional && undefined === Element.Additional) || ( undefined !== PrevEl.Additional && undefined !== Element.Additional && PrevEl.Additional.Active === Element.Additional.Active ) ) )
+                && ( (undefined === PrevEl.Additional && undefined === Element.Additional) || ( undefined !== PrevEl.Additional && undefined !== Element.Additional && ((undefined !== PrevEl.Additional.Active && PrevEl.Additional.Active === Element.Additional.Active) || (undefined !== PrevEl.Additional.RunPr && true === Element.Additional.RunPr.Is_Equal(PrevEl.Additional.RunPr))) ) ) )
             {
                 Element.x0 = PrevEl.x0;
                 Count--;
@@ -12988,6 +13021,7 @@ function CParagraphDrawStateLines()
     this.DStrikeout = new CParaDrawingRangeLines();
     this.Underline  = new CParaDrawingRangeLines();
     this.Spelling   = new CParaDrawingRangeLines();
+    this.RunReview  = new CParaDrawingRangeLines();
 
     this.SpellingCounter = 0;
 
