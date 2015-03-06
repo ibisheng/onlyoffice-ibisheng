@@ -257,7 +257,6 @@
             var posv = (angle === 90 || angle === -90) ? 0 : Math.abs(Math.cos(angle * Math.PI / 180.0) * textW);
 
             if ("bottom" === alignVertical) {
-
                 if (angle < 0) {
                     if ("left" === alignHorizontal) {
                         dx = (1 - mul) * tm.height;

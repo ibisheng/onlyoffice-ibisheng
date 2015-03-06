@@ -1465,6 +1465,7 @@
 				x += this.cols[i].width;
 				this.isChanged = true;
 			}
+			this.nColsCount = Math.min(Math.max(this.nColsCount, i), gc_nMaxCol);
 		};
 
 		/** Устанаваливает видимый диапазон ячеек максимально возможным */
