@@ -2121,10 +2121,10 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 }
                 case para_Math_BreakOperator:
                 {
+                    var BrkLen = Item.Width/TEXTWIDTH_DIVIDER;
+
                     if(this.ParaMath.Is_BrkBinBefore() == true)
                     {
-                        var BrkLen = Item.Width/TEXTWIDTH_DIVIDER;
-
                         if(X + WordLen + SpaceLen + BrkLen > XEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                         {
                             MoveToLBP = true;
@@ -2144,14 +2144,12 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         }
                         else
                         {
-                            SpaceLen += BrkLen;//SpaceLen += Item.Get_Width();
+                            SpaceLen += BrkLen;
                         }
                     }
                     else
                     {
-                        SpaceLen  = Item.Width / TEXTWIDTH_DIVIDER;
-
-                        if(X + WordLen + SpaceLen > XEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                        if(X + WordLen + BrkLen > XEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                         {
                             MoveToLBP = true;
                             NewRange = true;
@@ -2161,7 +2159,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         }
                         else
                         {
-                            X += SpaceLen + WordLen;
+                            X += BrkLen + WordLen;
 
                             EmptyLine = false;
                             SpaceLen = 0;

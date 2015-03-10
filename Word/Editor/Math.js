@@ -96,6 +96,7 @@ function CMathSettings()
 }
 CMathSettings.prototype.SetPr = function(Pr)
 {
+    this.bNeedCompile = true;
     this.Pr.Merge(Pr);
     this.SetCompiledPr();
 };
