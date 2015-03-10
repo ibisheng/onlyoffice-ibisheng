@@ -157,14 +157,19 @@ CDocumentSpelling.prototype =
         }
     },
     
-    Add_WaitingParagraph : function(Para)
+    Add_WaitingParagraph : function(Para, RecalcId, Words, Langs)
     {
         var ParaId = Para.Get_Id();
-        if (undefined === this.WaitingParagraphs[ParaId])
+        var WPara = this.WaitingParagraphs[ParaId];
+        if (undefined === WPara || RecalcId !== WPara.RecalcId || true !== this.private_CompareWordsAndLangs(WPara.Words, Words, WPara.Langs, Langs))
         {
-            this.WaitingParagraphs[Para.Get_Id()] = Para;
+            this.WaitingParagraphs[ParaId] = {Words : Words, Langs : Langs, RecalcId : RecalcId};
             this.WaitingParagraphsCount++;
+
+            return true;
         }
+
+        return false;
     },
 
     Check_WaitingParagraph : function(Para)
@@ -184,6 +189,20 @@ CDocumentSpelling.prototype =
             delete this.WaitingParagraphs[ParaId];
             this.WaitingParagraphsCount--;
         }
+    },
+
+    private_CompareWordsAndLangs : function(Words1, Words2, Langs1, Langs2)
+    {
+        if (undefined === Words1 || undefined === Words2 || undefined === Langs1 || undefined === Langs2 || Words1.length !== Words2.length || Words1.length !== Langs1.length || Words1.length !== Langs2.length)
+            return false;
+
+        for (var nIndex = 0, nCount = Words1.length; nIndex < nCount; nIndex++)
+        {
+            if (Words1[nIndex] !== Words2[nIndex] || Langs1[nIndex] !== Langs2[nIndex])
+                return false;
+        }
+
+        return true;
     }
 };
 
@@ -298,9 +317,14 @@ CParaSpellChecker.prototype =
 
         if ( 0 < usrWords.length )        
         {
-            editor.WordControl.m_oLogicDocument.Spelling.Add_WaitingParagraph(this.Paragraph);
-            this.RecalcId += "_checked";
-            spellCheck(editor, {"type": "spell", "ParagraphId": this.ParaId, "RecalcId" : this.RecalcId, "ElementId" : 0, "usrWords" : usrWords, "usrLang" : usrLang });            
+            if (true === editor.WordControl.m_oLogicDocument.Spelling.Add_WaitingParagraph(this.Paragraph, this.RecalcId, usrWords, usrLang))
+            {
+                spellCheck(editor, {"type" : "spell", "ParagraphId" : this.ParaId, "RecalcId" : this.RecalcId, "ElementId" : 0, "usrWords" : usrWords, "usrLang" : usrLang });
+            }
+            else
+            {
+                // Значит данный параграф с таким запросом уже обрабатывается
+            }
         }
         else if ( undefined != ParagraphForceRedraw )
             ParagraphForceRedraw.ReDraw();
@@ -443,7 +467,7 @@ CParaSpellChecker.prototype =
 
     Check_CallBack2: function(RecalcId, ElementId, usrVariants)
     {
-        if ( RecalcId == this.RecalcId )
+        if (RecalcId == this.RecalcId && undefined !== this.Elements[ElementId])
         {
             this.Elements[ElementId].Variants = usrVariants[0];
             
