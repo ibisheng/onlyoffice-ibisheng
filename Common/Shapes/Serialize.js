@@ -2878,7 +2878,7 @@ function BinaryPPTYLoader()
                         }
                     }
 
-                    if (_paramNames.length == _paramValues.length)
+                    if (_paramNames.length == _paramValues.length && _type != "")
                     {
                         var _len = _paramNames.length;
                         // тут все поддерживаемые переходы
