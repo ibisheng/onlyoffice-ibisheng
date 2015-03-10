@@ -7545,8 +7545,9 @@ function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey) {
 	if (c_oAscFileType.PDF === filetype) {
 		var dd = editor.WordControl.m_oDrawingDocument;
 		if (dd.isComleteRenderer2()) {
-			oAdditionalData["savetype"] = bStart ? c_oAscSaveTypes.Complete : c_oAscSaveTypes.CompleteAll;
+			oAdditionalData["savetype"] = bStart ? c_oAscSaveTypes.CompleteAll : c_oAscSaveTypes.Complete;
 		} else {
+			oAdditionalData["savetype"] = bStart ? c_oAscSaveTypes.PartStart : c_oAscSaveTypes.Part;
 		}
 		oAdditionalData["data"] = dd.ToRendererPart();
 	} else if (c_oAscFileType.JSON === filetype) {
