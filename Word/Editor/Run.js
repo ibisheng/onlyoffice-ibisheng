@@ -2123,19 +2123,28 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 {
                     if(this.ParaMath.Is_BrkBinBefore() == true)
                     {
-                        if(Word == true)
+                        var BrkLen = Item.Width/TEXTWIDTH_DIVIDER;
+
+                        if(X + WordLen + SpaceLen + BrkLen > XEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                        {
+                            MoveToLBP = true;
+                            NewRange = true;
+
+                            PRS.Set_LineBreakPos(Pos);
+                        }
+                        else if(Word == true)
                         {
                             X += SpaceLen + WordLen;
                             PRS.Set_LineBreakPos(Pos);
                             EmptyLine = false;
-                            WordLen = Item.Width/TEXTWIDTH_DIVIDER;
+                            WordLen = BrkLen;
                             SpaceLen = 0;
 
                             FirstItemOnLine = false;
                         }
                         else
                         {
-                            SpaceLen += Item.Width / TEXTWIDTH_DIVIDER;//SpaceLen += Item.Get_Width();
+                            SpaceLen += BrkLen;//SpaceLen += Item.Get_Width();
                         }
                     }
                     else
@@ -2163,7 +2172,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                             Word = false;
                         }
-
                     }
 
                     break;
@@ -4223,7 +4231,7 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
         if(this.Type == para_Math_Run)
         {
             var PosLine = this.ParaMath.GetLinePosition(_CurLine);
-            var loc = this.Content[CurPos].GetLocationOfLetter()
+            var loc = this.Content[CurPos].GetLocationOfLetter();
             SearchPos.CurX = PosLine.x + loc.x; // позиция формулы в строке + смещение буквы в контенте
         }
 

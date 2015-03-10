@@ -847,7 +847,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var RecalcResult     = PRS.RecalcResult,
         RecalcInfoObject = PRS.PrevLineRecalcInfo.Object;
 
-    var CurrentPage = Page - this.FirstPage;
+
     var MathSettings = Get_WordDocumentDefaultMathSettings();
 
     // первый пересчет
@@ -855,10 +855,8 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     {
         if(false == MathSettings.Get_DispDef() || this.ParaMathRPI.bInline)
             this.State = ALIGN_EMPTY;
-        else if(CurrentPage == 0)
-            this.State = ALIGN_MARGIN_WRAP;
         else
-            this.State = ALIGN_MARGIN;
+            this.State = ALIGN_MARGIN_WRAP;
 
         this.FirstPage          = Page;
         this.CurPageInfo.Page   = -1;
@@ -874,11 +872,16 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.Root.PreRecalc(null, this, ArgSize, RPI);
     }
 
+    var CurrentPage = Page - this.FirstPage;
+
     if(this.CurPageInfo.Page < Page)
     {
         this.CurPageInfo.Page       = Page;
         this.CurPageInfo.FirstLine  = ParaLine - this.Root.StartLine;
         this.CurPageInfo.MaxLineW   = 0;
+
+        if(CurrentPage !== 0)
+            this.State = ALIGN_MARGIN;
     }
 
     PRS.X    += MathSettings.Get_LeftMargin(this.State);
