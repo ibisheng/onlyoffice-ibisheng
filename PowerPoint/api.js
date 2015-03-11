@@ -2619,21 +2619,21 @@ asc_docs_api.prototype.selectTable = function()
 }
 asc_docs_api.prototype.setColumnWidth = function(width){
 
-}
+};
 asc_docs_api.prototype.setRowHeight = function(height){
 
-}
+};
 asc_docs_api.prototype.set_TblDistanceFromText = function(left,top,right,bottom){
 	
-}
+};
 asc_docs_api.prototype.CheckBeforeMergeCells = function()
 {
     return this.WordControl.m_oLogicDocument.Table_CheckMerge();
-}
+};
 asc_docs_api.prototype.CheckBeforeSplitCells = function()
 {
     return this.WordControl.m_oLogicDocument.Table_CheckSplit();
-}
+};
 asc_docs_api.prototype.MergeCells = function()
 {
     var doc = this.WordControl.m_oLogicDocument;
@@ -2642,7 +2642,7 @@ asc_docs_api.prototype.MergeCells = function()
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Table_MergeCells();
     }
-}
+};
 asc_docs_api.prototype.SplitCell = function(Cols, Rows)
 {
     var doc = this.WordControl.m_oLogicDocument;
@@ -2651,26 +2651,26 @@ asc_docs_api.prototype.SplitCell = function(Cols, Rows)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Table_SplitCell(Cols, Rows);
     }
-}
+};
 asc_docs_api.prototype.widthTable = function(width){
 
-}
+};
 asc_docs_api.prototype.put_CellsMargin = function(left,top,right,bottom){
 	
-}
+};
 asc_docs_api.prototype.set_TblWrap = function(type){
 
-}
+};
 asc_docs_api.prototype.set_TblIndentLeft = function(spacing){
 
-}
+};
 asc_docs_api.prototype.set_Borders = function(typeBorders,size,Color){//если size == 0 то границы нет.
 
-}
+};
 asc_docs_api.prototype.set_TableBackground = function(Color)
 {
 
-}
+};
 asc_docs_api.prototype.set_AlignCell = function(align){// c_oAscAlignType.RIGHT, c_oAscAlignType.LEFT, c_oAscAlignType.CENTER
 	switch(align)
 	{
@@ -2678,7 +2678,7 @@ asc_docs_api.prototype.set_AlignCell = function(align){// c_oAscAlignType.RIGHT,
 		case c_oAscAlignType.CENTER : break;
 		case c_oAscAlignType.RIGHT : break;
 	}
-}
+};
 asc_docs_api.prototype.set_TblAlign = function(align){// c_oAscAlignType.RIGHT, c_oAscAlignType.LEFT, c_oAscAlignType.CENTER
 	switch(align)
 	{
@@ -2686,12 +2686,12 @@ asc_docs_api.prototype.set_TblAlign = function(align){// c_oAscAlignType.RIGHT, 
 		case c_oAscAlignType.CENTER : break;
 		case c_oAscAlignType.RIGHT : break;
 	}
-}
+};
 asc_docs_api.prototype.set_SpacingBetweenCells = function(isOn,spacing){// c_oAscAlignType.RIGHT, c_oAscAlignType.LEFT, c_oAscAlignType.CENTER
 	if(isOn){
 	
 	}
-}
+};
 
 
 /*

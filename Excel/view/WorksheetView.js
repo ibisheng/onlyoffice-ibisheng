@@ -31,7 +31,7 @@
 		var asc_Range   = asc.Range;
 		var asc_ActiveRange   = asc.ActiveRange;
 		var asc_CMM		= asc.asc_CMouseMoveData;
-		var asc_VR		= asc.VisibleRange
+		var asc_VR		= asc.VisibleRange;
 
 		var asc_CCellFlag		= asc.asc_CCellFlag;
 		var asc_CFont			= asc.asc_CFont;
@@ -113,7 +113,6 @@
 		function calcDecades(num) {
 			return Math.abs(num) < 10 ? 1 : 1 + calcDecades( asc_floor(num * 0.1) );
 		}
-
 
 		function CacheElement() {
 			if ( !(this instanceof CacheElement) ) {

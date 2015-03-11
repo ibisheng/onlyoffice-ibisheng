@@ -272,7 +272,7 @@
 		this.saveLockCallbackErrorTimeOutId = null;
 		this.saveCallbackErrorTimeOutId = null;
         this._id = "";
-		this._indexuser = -1;
+		this._indexuser = 0;
 		// Если пользователей больше 1, то совместно редактируем
 		this.isCoAuthoring = false;
 		// Мы сами отключились от совместного редактирования
@@ -695,9 +695,8 @@
 	};
 	
 	DocsCoApi.prototype._onSetIndexUser = function (data) {
-		if (data && this.onSetIndexUser) {
-			this.onSetIndexUser (data);
-		}
+		if (this.onSetIndexUser)
+			this.onSetIndexUser(data);
 	};
 	
 	DocsCoApi.prototype._onSavePartChanges = function (data) {
@@ -805,26 +804,24 @@
 	DocsCoApi.prototype._onAuth = function (data) {
 		if (true === this._isAuth) {
 			// Мы уже авторизовывались, это просто reconnect и нужно проверить не было ли изменений пока не было сети
-			if (this._checkSaveChangesInDisconnect(data["changes"] || [])) {
+			if (this._checkSaveChangesInDisconnect(data['changes'] || [])) {
 				// делаем drop
 				this._onDrop();
 			}
 			return;
 		}
-		if (data["result"] === 1) {
+		if (data['result'] === 1) {
 			// Выставляем флаг, что мы уже авторизовывались
 			this._isAuth = true;
 
 			//TODO: add checks
 			this._state = 2; // Authorized
-			this._id = data["sessionId"];
+			this._id = data['sessionId'];
 
-			this._onAuthParticipantsChanged(data["participants"]);
+			this._onAuthParticipantsChanged(data['participants']);
 
-			if (data["indexUser"]) {
-				this._indexuser = data["indexUser"];
-				this._onSetIndexUser (this._indexuser);
-			}
+			if (data.hasOwnProperty('indexUser'))
+				this._onSetIndexUser(this._indexuser = data['indexUser']);
 
 			this._userId = this._user.asc_getId() + this._indexuser;
 
