@@ -1550,9 +1550,7 @@ var gUndoInsDelCellsFlag = true;
 						if(isTurnOffHistory)
 							History.TurnOn();
 					}
-					else
-						return false;
-				}
+				};
 				
 				if(cellId)
 					activeRange = t._idToRange(cellId);

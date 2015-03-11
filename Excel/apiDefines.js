@@ -311,4 +311,3 @@ var c_oAscFormulaRangeBorderColor = [
 
 var c_oAscLockNameFrozenPane	= "frozenPane";
 var c_oAscLockNameTabColor		= "tabColor";
-var c_oAscMaxRowHeight			= 409;
