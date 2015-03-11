@@ -2,6 +2,7 @@
 
 var g_bDate1904 = false;
 var FONT_THUMBNAIL_HEIGHT = (7 * 96.0 / 25.4) >> 0;
+var c_oAscMaxColumnWidth = 255;
 
 //files type for Saving & DownloadAs
 var c_oAscFileType = {
