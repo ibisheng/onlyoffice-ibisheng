@@ -626,7 +626,7 @@ CNaryUndOvr.prototype.recalculateSize = function()
 
     this.size = {width: width, height: height, ascent: ascent};
 }
-CNaryUndOvr.prototype.setPosition = function(pos, PDSE)
+CNaryUndOvr.prototype.setPosition = function(pos, Line, Range)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y;
@@ -652,9 +652,9 @@ CNaryUndOvr.prototype.setPosition = function(pos, PDSE)
     PosLowIter.x = pos.x + this.GapLeft + this.align(2,0).x;
     PosLowIter.y = PosSign.y + Sign.size.height + this.gapBottom + LowIter.size.ascent;
 
-    UpIter.setPosition(PosUpIter, PDSE);
-    Sign.setPosition(PosSign, PDSE);
-    LowIter.setPosition(PosLowIter, PDSE);
+    UpIter.setPosition(PosUpIter, Line, Range);
+    Sign.setPosition(PosSign, Line, Range);
+    LowIter.setPosition(PosLowIter, Line, Range);
 }
 CNaryUndOvr.prototype.setBase = function(base)
 {

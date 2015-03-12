@@ -359,7 +359,7 @@ CBorderBox.prototype.Draw_Elements = function(PDSE)
     PDSE.X = _X + this.size.width;
 
 }
-CBorderBox.prototype.setPosition = function(pos, PDSE)
+CBorderBox.prototype.setPosition = function(pos, Line, Range)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
@@ -379,7 +379,7 @@ CBorderBox.prototype.setPosition = function(pos, PDSE)
     else
         NewPos.y = this.pos.y + Base.size.ascent;
 
-    Base.setPosition(NewPos, PDSE); // base
+    Base.setPosition(NewPos, Line, Range); // base
 
     pos.x += this.size.width;
 }

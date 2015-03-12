@@ -276,7 +276,7 @@ CMathBase.prototype.align = function(pos_x, pos_y)
 
     return PosAlign;
 };
-CMathBase.prototype.setPosition = function(pos, PDSE)
+CMathBase.prototype.setPosition = function(pos, Line, Range)
 {
     this.pos.x = pos.x;
 
@@ -305,7 +305,7 @@ CMathBase.prototype.setPosition = function(pos, PDSE)
             if(this.elements[i][j].Type == para_Math_Content) // прибавим ascent только для контентов, для вложенных мат объектов не добавляем !
                 NewPos.y += this.elements[i][j].size.ascent;
 
-            this.elements[i][j].setPosition(NewPos, PDSE);
+            this.elements[i][j].setPosition(NewPos, Line, Range);
             w += Widths[j];
         }
         h += Heights[i];
@@ -1002,8 +1002,35 @@ CMathBase.prototype.SelectToParent = function(bCorrect)
     this.bSelectionUse = true;
     this.Parent.SelectToParent(bCorrect);
 };
-CMathBase.prototype.Set_Paragraph    = CParagraphContentWithParagraphLikeContent.prototype.Set_Paragraph;
-CMathBase.prototype.Get_ElementByPos = CParagraphContentWithParagraphLikeContent.prototype.Get_ElementByPos;
+CMathBase.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchPos, Depth)
+{
+    var Result = this.Content[this.CurPos].Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth+1);
+
+    if ( true === Result )
+        SearchPos.Pos.Update( this.CurPos, Depth );
+
+    return Result;
+
+};
+CMathBase.prototype.Get_EndRangePos = function(_CurLine, _CurRange, SearchPos, Depth)
+{
+    var Result = this.Content[this.CurPos].Get_EndRangePos(_CurLine, _CurRange, SearchPos, Depth+1);
+
+    if ( true === Result )
+        SearchPos.Pos.Update( this.CurPos, Depth );
+
+    return Result;
+
+};
+CMathBase.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange, _CurPage)
+{
+    PRSA.X    += this.size.width;
+    PRSA.LastW = this.size.width;
+};
+CMathBase.prototype.Set_Paragraph           = CParagraphContentWithParagraphLikeContent.prototype.Set_Paragraph;
+CMathBase.prototype.Get_ElementByPos        = CParagraphContentWithParagraphLikeContent.prototype.Get_ElementByPos;
+CMathBase.prototype.Get_ParaPosByContentPos = CParagraphContentWithParagraphLikeContent.prototype.Get_ParaPosByContentPos;
+
 CMathBase.prototype.Set_ParaMath     = CMathContent.prototype.Set_ParaMath;
 CMathBase.prototype.Recalculate_Reset = function(StartRange, StartLine)
 {

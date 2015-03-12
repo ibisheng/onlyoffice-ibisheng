@@ -85,18 +85,10 @@ CDegreeBase.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsI
     this.bNaryInline = RPI.bNaryInline;
 
     this.iterContent.PreRecalc(this, ParaMath, ArgSzDegr, RPIDegr);
-}
+};
 CDegreeBase.prototype.Resize = function(oMeasure, RPI)
 {
-    //this.Parent = Parent;
-    //this.ParaMath = ParaMath;
-
-    //this.Set_CompiledCtrPrp(ParaMath);
-
     this.baseContent.Resize(oMeasure, RPI);
-
-    //var ArgSzDegr = ArgSize.Copy();
-    //ArgSzDegr.decrease();
 
     this.iterContent.Resize(oMeasure, RPI);
 
@@ -114,11 +106,10 @@ CDegreeBase.prototype.recalculateSize = function(oMeasure)
 };
 CDegreeBase.prototype.recalculateSup = function(oMeasure)
 {
-    var base = this.elements[0][0].size,
-        iter   = this.elements[0][1].size;
+    var base   = this.baseContent.size,
+        iter   = this.iterContent.size;
 
     var mgCtrPrp = this.Get_TxtPrControlLetter();
-    //var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
     this.upBase = 0;
     this.upIter = 0;
@@ -271,7 +262,7 @@ CDegreeBase.prototype.recalculateSubScript = function(oMeasure)
 
     this.size = {width: width, height: height, ascent: ascent};
 };
-CDegreeBase.prototype.setPosition = function(pos, PDSE)
+CDegreeBase.prototype.setPosition = function(pos, Line, Range)
 {
     this.pos.x = pos.x;
 
@@ -296,33 +287,10 @@ CDegreeBase.prototype.setPosition = function(pos, PDSE)
     PosIter.x = this.pos.x + this.GapLeft + oBase.size.width + this.dW;
     PosIter.y = this.pos.y + this.upIter + oIter.size.ascent;
 
-    oBase.setPosition(PosBase, PDSE);
-    oIter.setPosition(PosIter, PDSE);
+    oBase.setPosition(PosBase, Line, Range);
+    oIter.setPosition(PosIter, Line, Range);
 
     pos.x += this.size.width;
-};
-CDegreeBase.prototype.old_setPosition = function(pos, PosInfo)
-{
-    this.pos.x = pos.x;
-
-    if(this.bInside === true)
-        this.pos.y = pos.y;
-    else
-        this.pos.y = pos.y - this.size.ascent;
-
-    var PosBase = new CMathPosition();
-
-    PosBase.x = this.pos.x + this.GapLeft;
-    PosBase.y = this.pos.y + this.upBase;
-
-    var PosIter = new CMathPosition();
-
-    PosIter.x = this.pos.x + this.GapLeft + this.elements[0][0].size.width + this.dW;
-    PosIter.y = this.pos.y + this.upIter;
-
-    this.elements[0][0].setPosition(PosBase, PosInfo);
-    this.elements[0][1].setPosition(PosIter, PosInfo);
-
 };
 CDegreeBase.prototype.getIterator = function()
 {

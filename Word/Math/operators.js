@@ -3762,7 +3762,7 @@ CDelimiter.prototype.alignOperator = function(operator) // в качестве �
 
     return align;
 }
-CDelimiter.prototype.setPosition = function(position, PDSE)
+CDelimiter.prototype.setPosition = function(position, Line, Range)
 {
     this.pos.x = position.x;
     this.pos.y = position.y - this.size.ascent;
@@ -3785,7 +3785,7 @@ CDelimiter.prototype.setPosition = function(position, PDSE)
     PosContent.y = y + this.align_2(content) + content.size.ascent;
     x += content.size.width;
 
-    content.setPosition(PosContent, PDSE); // CMathContent
+    content.setPosition(PosContent, Line, Range); // CMathContent
 
     var Positions = [];
 
@@ -3804,7 +3804,7 @@ CDelimiter.prototype.setPosition = function(position, PDSE)
         NewPosContent.x = x;
         NewPosContent.y = y + this.align_2(content) + content.size.ascent;
 
-        content.setPosition(NewPosContent, PDSE);
+        content.setPosition(NewPosContent, Line, Range);
         x += content.size.width;
     }
 
@@ -3920,7 +3920,7 @@ CCharacter.prototype.recalculateSize = function(oMeasure)
 
     this.size = {height: height, width: width, ascent: ascent};
 }
-CCharacter.prototype.setPosition = function(pos, PDSE)
+CCharacter.prototype.setPosition = function(pos, Line, Range)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
@@ -3945,14 +3945,14 @@ CCharacter.prototype.setPosition = function(pos, PDSE)
         PosBase.x = this.pos.x + this.GapLeft + alignCnt;
         PosBase.y = this.pos.y + this.operator.size.height + Base.size.ascent;
 
-        Base.setPosition(PosBase, PDSE);
+        Base.setPosition(PosBase, Line, Range);
     }
     else if(this.Pr.pos === LOCATION_BOT)
     {
         PosBase.x = this.pos.x + this.GapLeft + alignCnt;
         PosBase.y = this.pos.y + Base.size.ascent;
 
-        Base.setPosition(PosBase, PDSE);
+        Base.setPosition(PosBase, Line, Range);
 
         PosOper.x = this.pos.x + this.GapLeft + alignOp;
         PosOper.y = this.pos.y + Base.size.height;

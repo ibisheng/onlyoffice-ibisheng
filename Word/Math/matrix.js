@@ -462,7 +462,7 @@ CMathMatrix.prototype.init = function(props)
 
     this.fillContent();
 }
-CMathMatrix.prototype.setPosition = function(pos, PDSE)
+CMathMatrix.prototype.setPosition = function(pos, Line, Range)
 {
     this.pos.x = pos.x;
 
@@ -489,7 +489,7 @@ CMathMatrix.prototype.setPosition = function(pos, PDSE)
             NewPos.x = this.pos.x + this.GapLeft + al.x + w;
             NewPos.y = this.pos.y + al.y + h + Item.size.ascent;
 
-            Item.setPosition(NewPos, PDSE);
+            Item.setPosition(NewPos, Line, Range);
             w += Widths[j] + this.gaps.column[j];
         }
         h += Heights[i] + this.gaps.row[i];
@@ -838,27 +838,9 @@ CEqArray.prototype.getMetrics = function()
         DescentsMetrics[i] = size.height - size.ascent;
     }
 
-
-    /*for(var tt = 0; tt < this.nCol; tt++ )
-     Widths[tt] = 0;
-
-     for(var i=0; i < this.nRow; i++)
-     {
-     Ascents[i]  = 0;
-     Descents[i] = 0;
-
-     for(var j = 0; j < this.nCol ; j++)
-     {
-     var size = this.elements[i][j].size;
-     Widths[j]   =  i > 0 && ( Widths[j] > size.width ) ? Widths[j] : size.width;
-     Ascents[i]  = (Ascents[i] > size.ascent ) ? Ascents[i] : size.ascent;
-     Descents[i] = (Descents[i] > size.height - size.ascent ) ? Descents[i] : size.height - size.ascent;
-     }
-     }*/
-
     return {ascents: AscentsMetrics, descents: DescentsMetrics, widths: WidthsMetrics};
 }
-CEqArray.prototype.setPosition = function(pos, PDSE)
+CEqArray.prototype.setPosition = function(pos, Line, Range)
 {
     this.pos.x = pos.x;
 
@@ -880,7 +862,7 @@ CEqArray.prototype.setPosition = function(pos, PDSE)
         NewPos.x = this.pos.x + this.GapLeft;
         NewPos.y = this.pos.y + h + Item.size.ascent;
 
-        Item.setPosition(NewPos, PDSE);
+        Item.setPosition(NewPos, Line, Range);
 
         h += Heights[i] + this.gaps.row[i];
     }

@@ -378,7 +378,7 @@ CFraction.prototype.recalculateLinear = function()
 
     this.size = {height: height, width: width, ascent: ascent};
 }
-CFraction.prototype.setPosition = function(pos, PDSE)
+CFraction.prototype.setPosition = function(pos, Line, Range)
 {
     if(this.Pr.type == SKEWED_FRACTION)
     {
@@ -401,13 +401,13 @@ CFraction.prototype.setPosition = function(pos, PDSE)
         PosDen.x = X + Numerator.size.width + this.dW;
         PosDen.y = Y + Numerator.size.height + Denominator.size.ascent;
 
-        Numerator.setPosition(PosNum, PDSE);
-        Denominator.setPosition(PosDen, PDSE);
+        Numerator.setPosition(PosNum, Line, Range);
+        Denominator.setPosition(PosDen, Line, Range);
 
         pos.x += this.size.width;
     }
     else
-        CFraction.superclass.setPosition.call(this, pos, PDSE);
+        CFraction.superclass.setPosition.call(this, pos, Line, Range);
 }
 CFraction.prototype.fillContent = function()
 {
@@ -559,10 +559,10 @@ CDenominator.prototype.recalculateSize = function()
 
     this.size = {width : width, height: height, ascent: ascent};
 }
-CDenominator.prototype.setPosition = function(pos, PDSE)
+CDenominator.prototype.setPosition = function(pos, Line, Range)
 {
     pos.y += this.gap;
 
-    CDenominator.superclass.setPosition.call(this, pos, PDSE);
+    CDenominator.superclass.setPosition.call(this, pos, Line, Range);
 }
 //////////

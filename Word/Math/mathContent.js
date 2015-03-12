@@ -680,7 +680,7 @@ function CMathContent()
 
     this.plhHide        = false;
     this.bRoot          = false;
-    this.bMath_OneLine  = false;
+    this.bOneLine  = false;
 
     //////////////////
 
@@ -991,14 +991,14 @@ CMathContent.prototype.ApplyPoints = function(WidthsPoints, Points, MaxDimWidths
     }
 
 };
-CMathContent.prototype.setPosition = function(pos, PDSE)
+CMathContent.prototype.setPosition = function(pos, Line, Range)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y;
     var StartPos, EndPos;
 
-    var CurLine  = PDSE.Line - this.StartLine;
-    var CurRange = ( 0 === CurLine ? PDSE.Range - this.StartRange : PDSE.Range );
+    var CurLine  = Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
 
     StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
     EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
@@ -1015,9 +1015,9 @@ CMathContent.prototype.setPosition = function(pos, PDSE)
     for(var i = StartPos; i <= EndPos; i++)
     {
         if(this.Content[i].Type == para_Math_Run)
-            this.Content[i].Math_SetPosition(pos, PDSE);
+            this.Content[i].Math_SetPosition(pos, Line, Range);
         else
-            this.Content[i].setPosition(pos, PDSE);
+            this.Content[i].setPosition(pos, Line, Range);
     }
 };
 CMathContent.prototype.old_setPosition = function(pos)
@@ -3970,7 +3970,7 @@ CMathContent.prototype.private_SetNeedResize = function()
 };
 CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 {
-    this.bMath_OneLine = PRS.bMath_OneLine;
+    this.bOneLine = PRS.bMath_OneLine;
 
     var CurLine  = PRS.Line - this.StartLine;
     var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
@@ -3978,7 +3978,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var ContentLen = this.Content.length;
 
     var RangeStartPos = this.protected_AddRange(CurLine, CurRange);
-    var RangeEndPos   = this.bMath_OneLine ? ContentLen - 1 : 0;
+    var RangeEndPos   = this.bOneLine ? ContentLen - 1 : 0;
 
     this.InfoPoints.SetDefault();
 
@@ -4011,12 +4011,12 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             Type = Item.Type;
 
         // для однострочных мат объектов обновляем CurLine и CurRange, Run в этом случае не могут разбиваться на несколько строк
-        if (this.bMath_OneLine || (0 === Pos && 0 === CurLine && 0 === CurRange ) || Pos !== RangeStartPos)
+        if (this.bOneLine || (0 === Pos && 0 === CurLine && 0 === CurRange ) || Pos !== RangeStartPos)
             Item.Recalculate_Reset( PRS.Range, PRS.Line );
 
         PRS.Update_CurPos( Pos, Depth );
 
-        if(this.bMath_OneLine) // контент занимает всегда(!) одну строку
+        if(this.bOneLine) // контент занимает всегда(!) одну строку
         {
             Item.Recalculate_Range_OneLine(PRS, ParaPr, Depth + 1);
 
@@ -4146,6 +4146,85 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 
+};
+CMathContent.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchPos, Depth)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var CurPos = this.CurPos;
+    var Result;
+
+    if(this.Content[CurPos].Type == para_Math_Composition)
+    {
+        Result = this.Content[CurPos].Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth + 1);
+
+        if ( true === Result )
+        {
+            SearchPos.Pos.Update( CurPos, Depth );
+        }
+        else if(this.bRoot)
+        {
+            Result = this.Content[StartPos].Math_Get_StartRangePos(true, _CurLine, _CurRange, SearchPos, Depth + 1);
+
+            if ( true === Result )
+                SearchPos.Pos.Update(StartPos, Depth);
+        }
+    }
+    else
+    {
+        // в начале контента может стоять пустой Run перед мат объектом, поэтому здесь важно различать две ситуации: мы стоим в начале контента или нет(когда нажата клавиша Home). В последнем случае нужно встать в пустой Run в начале контента, если в начале стоит мат объект.
+        var bUpdStartLine = StartPos < CurPos;
+        var bUpdNotFirstLine = this.bRoot && CurLine !== 0;
+
+        Result = this.Content[StartPos].Math_Get_StartRangePos(bUpdStartLine || bUpdNotFirstLine, _CurLine, _CurRange, SearchPos, Depth + 1);
+
+        if ( true === Result )
+            SearchPos.Pos.Update(StartPos, Depth );
+
+    }
+
+    return Result;
+};
+CMathContent.prototype.Get_EndRangePos = function(_CurLine, _CurRange, SearchPos, Depth)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var EndPos = this.protected_GetRangeEndPos(CurLine, CurRange);
+    var CurPos = this.CurPos;
+    var Result;
+
+    if(this.Content[CurPos].Type == para_Math_Composition)
+    {
+        Result = this.Content[CurPos].Get_EndRangePos(_CurLine, _CurRange, SearchPos, Depth + 1);
+
+        if ( true === Result )
+        {
+            SearchPos.Pos.Update( CurPos, Depth );
+        }
+        else if(this.bRoot)
+        {
+            Result = this.Content[EndPos].Math_Get_EndRangePos(true, _CurLine, _CurRange, SearchPos, Depth + 1);
+
+            if ( true === Result )
+                SearchPos.Pos.Update(EndPos, Depth );
+        }
+    }
+    else
+    {
+        var bUpdEndLine = CurPos < EndPos;
+        var bUpdNotLastLine = this.bRoot && CurLine !== this.protected_GetLinesCount() - 1;
+
+        Result = this.Content[EndPos].Math_Get_EndRangePos(bUpdEndLine || bUpdNotLastLine, _CurLine, _CurRange, SearchPos, Depth + 1);
+
+        if ( true === Result )
+            SearchPos.Pos.Update(EndPos, Depth );
+
+    }
+
+    return Result;
 };
 CMathContent.prototype.IsFirstLine = function(Line)
 {

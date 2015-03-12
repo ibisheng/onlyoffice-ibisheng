@@ -946,7 +946,9 @@ ParaRun.prototype.Get_ParaPosByContentPos = function(ContentPos, Depth)
         {
             var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
             var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-            if (Pos < EndPos && Pos >= StartPos)
+
+            var bUpdateMathRun = Pos == EndPos && StartPos == EndPos && EndPos == this.Content.length && this.Type == para_Math_Run; // для para_Run позиция может быть после последнего элемента (пример: Run, за ним идет мат объект)
+            if (Pos < EndPos && Pos >= StartPos || bUpdateMathRun)
                 return new CParaPos((CurLine === 0 ? CurRange + this.StartRange : CurRange), CurLine + this.StartLine, 0, 0);
         }
     }
@@ -990,7 +992,7 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
             X += loc.x;
             Y += loc.y;
         }
-        else
+        else if(!(StartPos == EndPos)) // исключаем этот случай StartPos == EndPos && EndPos == Pos, это возможно когда конец Run находится в начале строки, при этом ни одна из букв этого Run не входит в эту строку
         {
             var Letter = this.Content[Pos - 1];
             loc = Letter.GetLocationOfLetter();
@@ -2814,6 +2816,8 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
         {
             case para_Sym:
             case para_Text:
+            case para_Math_Text:
+            case para_Math_BreakOperator:
             {
                 var WidthVisible = 0;
 
@@ -3145,7 +3149,6 @@ ParaRun.prototype.Refresh_RecalcData = function(Data)
         Para.Refresh_RecalcData2(0);
     }
 };
-
 ParaRun.prototype.Save_RecalculateObject = function(Copy)
 {
     var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
@@ -3153,13 +3156,11 @@ ParaRun.prototype.Save_RecalculateObject = function(Copy)
     RecalcObj.Save_RunContent( this, Copy );
     return RecalcObj;
 };
-
 ParaRun.prototype.Load_RecalculateObject = function(RecalcObj)
 {
     RecalcObj.Load_Lines(this);
     RecalcObj.Load_RunContent(this);
 };
-
 ParaRun.prototype.Prepare_RecalculateObject = function()
 {
     this.protected_ClearLines();
@@ -3174,7 +3175,6 @@ ParaRun.prototype.Prepare_RecalculateObject = function()
             Item.Prepare_RecalculateObject();
     }
 };
-
 ParaRun.prototype.Is_EmptyRange = function(_CurLine, _CurRange)
 {
     var CurLine  = _CurLine - this.StartLine;
@@ -3188,7 +3188,6 @@ ParaRun.prototype.Is_EmptyRange = function(_CurLine, _CurRange)
 
     return false;
 };
-
 ParaRun.prototype.Check_Range_OnlyMath = function(Checker, _CurRange, _CurLine)
 {
     var CurLine  = _CurLine - this.StartLine;
@@ -4686,11 +4685,6 @@ ParaRun.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchPos, D
     if ( -1 !== FirstPos )
     {
         SearchPos.Pos.Update( FirstPos, Depth );
-        return true;
-    }
-    else if(this.Type == para_Math_Run && this.Parent.Is_FirstComposition())
-    {
-        SearchPos.Pos.Update( 0, Depth );
         return true;
     }
     else
@@ -8353,10 +8347,10 @@ function CRunCollaborativeRange(PosS, PosE, Color)
     this.PosE  = PosE;
     this.Color = Color;
 }
-ParaRun.prototype.Math_SetPosition = function(pos, PDSE)
+ParaRun.prototype.Math_SetPosition = function(pos, Line, Range)
 {
-    var CurLine  = PDSE.Line - this.StartLine;
-    var CurRange = ( 0 === CurLine ? PDSE.Range - this.StartRange : PDSE.Range );
+    var CurLine  = Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
 
     var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
     var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
@@ -8367,11 +8361,6 @@ ParaRun.prototype.Math_SetPosition = function(pos, PDSE)
 
     for(var i = StartPos; i < EndPos; i++)
     {
-        //var NewPos = new CMathPosition();
-
-        //NewPos.x = pos.x + w;
-        //NewPos.y = pos.y - this.size.ascent;
-
         this.Content[i].setPosition(pos);
         pos.x += this.Content[i].size.width;
     }
@@ -8501,6 +8490,48 @@ ParaRun.prototype.Math_GetWidth = function(_CurLine, _CurRange)
 
     return W;
 
+};
+ParaRun.prototype.Math_Get_StartRangePos = function(bStartLine, _CurLine, _CurRange, SearchPos, Depth)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+
+    var Pos = this.State.ContentPos;
+    var Result = true;
+
+    if(bStartLine || StartPos < Pos)
+    {
+        SearchPos.Pos.Update(StartPos, Depth);
+    }
+    else
+    {
+        Result = false;
+    }
+
+    return Result;
+};
+ParaRun.prototype.Math_Get_EndRangePos = function(bEndLine, _CurLine, _CurRange, SearchPos, Depth)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var EndPos = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    var Pos = this.State.ContentPos;
+    var Result = true;
+
+    if(bEndLine  || Pos < EndPos)
+    {
+        SearchPos.Pos.Update(EndPos, Depth);
+    }
+    else
+    {
+        Result = false;
+    }
+
+    return Result;
 };
 ParaRun.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
 {
