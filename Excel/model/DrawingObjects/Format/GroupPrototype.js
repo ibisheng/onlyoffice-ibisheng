@@ -42,7 +42,6 @@ CGroupShape.prototype.recalcText = function()
 
 CGroupShape.prototype.setRecalculateInfo = function()
 {
-    var recalcInfo = this.recalcInfo;
     this.recalcInfo =
     {
         recalculateBrush: true,
