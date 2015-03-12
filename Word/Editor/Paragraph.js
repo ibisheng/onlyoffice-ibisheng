@@ -2461,7 +2461,7 @@ Paragraph.prototype =
                 else
                 {
                     // TODO: В режиме рецензии элементы не удаляются, а позиция меняется прямо в ранах
-                    if (document_EditingType_Review !== this.LogicDocument.Get_EditingType())
+                    if (this.LogicDocument == null || document_EditingType_Review !== this.LogicDocument.Get_EditingType())
                         this.CurPos.ContentPos = ContentPos;
                 }
             }
