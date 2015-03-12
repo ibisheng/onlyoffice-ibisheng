@@ -1212,6 +1212,10 @@
 )(window);
 
 var CColor = window["CColor"];
+var asc_CRect = window["asc_CRect"];
+var CAscTexture = window["CAscTexture"];
+var CAscColorScheme = window["CAscColorScheme"];
+var CAscColor = window["CAscColor"];
 var asc_ChartSettings = window["asc_ChartSettings"];
 var asc_ValAxisSettings = window["asc_ValAxisSettings"];
 var asc_CatAxisSettings = window["asc_CatAxisSettings"];

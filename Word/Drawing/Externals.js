@@ -1446,6 +1446,12 @@ function DecodeBase64(imData, szSrc)
 // ALL_FONTS_PART -------------------------------------------------------------
 (function(document){
 
+    if (undefined === window["__fonts_files"] && window["native"]["GenerateAllFonts"])
+    {
+        // тогда должны быть глобальные переменные такие, без window
+        window["native"]["GenerateAllFonts"]();
+    }
+
     var __len_files = window["__fonts_files"].length;
 
     window.g_font_files = new Array(__len_files);
