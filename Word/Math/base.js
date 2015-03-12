@@ -1024,8 +1024,18 @@ CMathBase.prototype.Get_EndRangePos = function(_CurLine, _CurRange, SearchPos, D
 };
 CMathBase.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange, _CurPage)
 {
-    PRSA.X    += this.size.width;
-    PRSA.LastW = this.size.width;
+    var WidthVisible;
+
+    if ( 0 !== PRSA.LettersSkip )
+    {
+        WidthVisible = this.size.width;
+        PRSA.LettersSkip--;
+    }
+    else
+        WidthVisible = this.size.width + PRSA.JustifyWord;
+
+    PRSA.X    += WidthVisible;
+    PRSA.LastW = WidthVisible;
 };
 CMathBase.prototype.Set_Paragraph           = CParagraphContentWithParagraphLikeContent.prototype.Set_Paragraph;
 CMathBase.prototype.Get_ElementByPos        = CParagraphContentWithParagraphLikeContent.prototype.Get_ElementByPos;

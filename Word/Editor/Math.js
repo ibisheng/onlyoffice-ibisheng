@@ -945,6 +945,8 @@ ParaMath.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 
     var W = PRSC.Range.W;
 
+    PRSC.Words++;
+
     var CurLine  = _CurLine - this.Root.StartLine;
     this.LinesWidths[CurLine] = W;
 };
