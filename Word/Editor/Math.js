@@ -961,7 +961,7 @@ ParaMath.prototype.UpdateWidthLine = function(PRS, Width)
     {
         this.CurPageInfo.MaxLineW = Width;
 
-        if(align_Justify == this.Get_Align() && this.ParaMathRPI.bInline == false)
+        if(this.ParaMathRPI.bInline == false && align_Justify == this.Get_Align())
             this.UpdateInfoForBreak(PRS);
     }
 };
@@ -1189,9 +1189,9 @@ ParaMath.prototype.Is_Inline = function()
 ParaMath.prototype.Get_Align = function()
 {
     var Jc;
-    if(this.bInline)
+    if(this.ParaMathRPI.bInline)
     {
-        var ParaPr = this.Paragraph.Get_CompiledPr2(false);
+        var ParaPr = this.Paragraph.Get_CompiledPr2(false).ParaPr;
         Jc = ParaPr.Jc;
     }
     else if (undefined !== this.Jc)
@@ -1204,7 +1204,6 @@ ParaMath.prototype.Get_Align = function()
 
         Jc = MathSettings.Get_DefJc();
     }
-
 
     return Jc;
 };
