@@ -1188,12 +1188,25 @@ ParaMath.prototype.Is_Inline = function()
 };
 ParaMath.prototype.Get_Align = function()
 {
-    if (undefined !== this.Jc)
-        return this.Jc;
+    var Jc;
+    if(this.bInline)
+    {
+        var ParaPr = this.Paragraph.Get_CompiledPr2(false);
+        Jc = ParaPr.Jc;
+    }
+    else if (undefined !== this.Jc)
+    {
+        Jc = this.Jc;
+    }
+    else
+    {
+        var MathSettings = Get_WordDocumentDefaultMathSettings();
 
-    var MathSettings = Get_WordDocumentDefaultMathSettings();
+        Jc = MathSettings.Get_DefJc();
+    }
 
-    return MathSettings.Get_DefJc();
+
+    return Jc;
 };
 ParaMath.prototype.Set_Align = function(Align)
 {
