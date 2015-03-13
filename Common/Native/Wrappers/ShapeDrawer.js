@@ -970,6 +970,7 @@ CShapeDrawer.prototype =
             }
 
             var rgba = this.StrokeUniColor;
+            this.Graphics.p_width(this.StrokeWidth);
             this.Graphics.p_color(rgba.R, rgba.G, rgba.B, rgba.A);
         }
 
