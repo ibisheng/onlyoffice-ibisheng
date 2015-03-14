@@ -1290,8 +1290,14 @@ CMetafile.prototype =
         var _font_info = window.g_font_infos[window.g_map_font_index[this.m_oFont.Name]];
         var _is_face_index_no_0 = (_font_info.faceIndexR <= 0 && _font_info.faceIndexI <= 0 && _font_info.faceIndexB <= 0 && _font_info.faceIndexBI <= 0);
 
-        if (code < 0xFFFF && _is_face_index_no_0)
+        if (code < 0xFFFF && (_is_face_index_no_0 || window["native"] !== undefined))
             return this.FillText(x, y, String.fromCharCode(code));
+
+        if (window["native"] !== undefined)
+        {
+            // TODO:
+            return;
+        }
 
         var _old_pos = this.Memory.pos;
 
@@ -1317,6 +1323,12 @@ CMetafile.prototype =
     },
 	tg : function(gid,x,y)
     {
+        if (window["native"] !== undefined)
+        {
+            // TODO:
+            return;
+        }
+
         var _old_pos = this.Memory.pos;
 
         g_fontApplication.LoadFont(this.m_oFont.Name, window.g_font_loader, g_oTextMeasurer.m_oManager, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0), 72, 72);
