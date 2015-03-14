@@ -1460,8 +1460,17 @@ CDrawingDocument.prototype =
             }
 
             var _selectCircleEpsMM = 10; // 1cm;
+            var _selectCircleEpsMM_square = _selectCircleEpsMM * _selectCircleEpsMM;
 
-            if (Math.abs(pos.X - _circlePos1_x) < _selectCircleEpsMM && Math.abs(pos.Y - _circlePos1_y) < _selectCircleEpsMM)
+            var _distance1 = ((pos.X - _circlePos1_x) * (pos.X - _circlePos1_x) + (pos.Y - _circlePos1_y) * (pos.Y - _circlePos1_y));
+            var _distance2 = ((pos.X - _circlePos2_x) * (pos.X - _circlePos2_x) + (pos.Y - _circlePos2_y) * (pos.Y - _circlePos2_y));
+
+            var candidate = 1;
+            if (_distance2 < _distance1)
+                candidate = 2;
+
+
+            if (1 == candidate && _distance1 < _selectCircleEpsMM_square)
             {
                 this.SelectClearLock = true;
                 this.SelectDrag = 1;
@@ -1497,7 +1506,7 @@ CDrawingDocument.prototype =
                 this.SelectClearLock = false;
             }
 
-            if (Math.abs(pos.X - _circlePos2_x) < _selectCircleEpsMM && Math.abs(pos.Y - _circlePos2_y) < _selectCircleEpsMM)
+            if (2 == candidate && _distance2 < _selectCircleEpsMM_square)
             {
                 this.SelectClearLock = true;
                 this.SelectDrag = 2;
