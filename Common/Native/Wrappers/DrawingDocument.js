@@ -600,6 +600,7 @@ function CDrawingDocument()
 
     this.SelectRect1 = null;
     this.SelectRect2 = null;
+    this.SelectClearLock = false;
 
     this.SelectMobileXOffset = 0;
     this.SelectMobileYOffset = 0;
@@ -886,6 +887,12 @@ CDrawingDocument.prototype =
     },
     SelectClear : function()
     {
+        if (!this.SelectClearLock)
+        {
+            this.SelectDrag = -1;
+            this.SelectRect1 = null;
+            this.SelectRect2 = null;
+        }
         this.Native["DD_SelectClear"]();
     },
     AddPageSelection : function(pageIndex, x, y, w, h)
@@ -1387,8 +1394,8 @@ CDrawingDocument.prototype =
 
         if (this.InlineTextTrackEnabled && null != this.InlineTextTrack)
         {
-            this.AutoShapesTrack.DrawInlineMoveCursor(this.InlineTextTrackPage,
-                this.InlineTextTrack.X, this.InlineTextTrack.Y, this.InlineTextTrack.Height,
+            this.AutoShapesTrack.SetCurrentPage(this.InlineTextTrackPage);
+            this.AutoShapesTrack.DrawInlineMoveCursor(this.InlineTextTrack.X, this.InlineTextTrack.Y, this.InlineTextTrack.Height,
                 this.InlineTextTrack.transform);
         }
 
@@ -1456,6 +1463,7 @@ CDrawingDocument.prototype =
 
             if (Math.abs(pos.X - _circlePos1_x) < _selectCircleEpsMM && Math.abs(pos.Y - _circlePos1_y) < _selectCircleEpsMM)
             {
+                this.SelectClearLock = true;
                 this.SelectDrag = 1;
                 this.LogicDocument.Cursor_MoveRight();
 
@@ -1486,10 +1494,12 @@ CDrawingDocument.prototype =
                 this.SelectMobileYOffset = (ret.Y + ret2.Y) - global_mouseEvent.Y;
 
                 this.OnMouseMove(e);
+                this.SelectClearLock = false;
             }
 
             if (Math.abs(pos.X - _circlePos2_x) < _selectCircleEpsMM && Math.abs(pos.Y - _circlePos2_y) < _selectCircleEpsMM)
             {
+                this.SelectClearLock = true;
                 this.SelectDrag = 2;
                 this.LogicDocument.Cursor_MoveLeft();
 
@@ -1521,6 +1531,7 @@ CDrawingDocument.prototype =
                 this.SelectMobileYOffset = (ret.Y - ret2.Y) - global_mouseEvent.Y;
 
                 this.OnMouseMove(e);
+                this.SelectClearLock = false;
             }
 
             if (this.SelectDrag != -1)
@@ -1529,7 +1540,7 @@ CDrawingDocument.prototype =
 
         if (true)
         {
-            // проверям на попадание в графические объекты (грубо говоря - треки)
+            // проверям н]а попадание в графические объекты (грубо говоря - треки)
             if (!this.IsViewMode)
             {
                 global_mouseEvent.KoefPixToMM = 5;
@@ -2667,7 +2678,8 @@ CDrawingDocument.prototype =
 
             var _near = this.TableOutlineDr.InlinePos;
 
-            this.AutoShapesTrack.DrawInlineMoveCursor(_near.Page, _near.X, _near.Y, _near.Height, _near.transform);
+            this.AutoShapesTrack.SetCurrentPage(_near.Page);
+            this.AutoShapesTrack.DrawInlineMoveCursor(_near.X, _near.Y, _near.Height, _near.transform);
         }
     },
 

@@ -27,6 +27,7 @@ CAutoshapeTrack.prototype =
         if (nPageIndex == this.PageIndex)
             return;
 
+        this.PageIndex = nPageIndex;
         this.Native["DD_SetCurrentPage"](nPageIndex);
     },
     
@@ -93,15 +94,15 @@ CAutoshapeTrack.prototype =
         this.Native["DD_DrawEditWrapPointsTrackLines"](points);
     },
 
-    DrawInlineMoveCursor : function(page, x, y, h, m)
+    DrawInlineMoveCursor : function(x, y, h, m)
     {
         if (!m)
         {
-            this.Native["DD_DrawInlineMoveCursor"](page, x, y, h);
+            this.Native["DD_DrawInlineMoveCursor"](this.PageIndex, x, y, h);
         }
         else
         {
-            this.Native["DD_DrawInlineMoveCursor"](page, x, y, h, m.sx, m.shy, m.shx, m.sy, m.tx, m.ty);
+            this.Native["DD_DrawInlineMoveCursor"](this.PageIndex, x, y, h, m.sx, m.shy, m.shx, m.sy, m.tx, m.ty);
         }
     },
 
