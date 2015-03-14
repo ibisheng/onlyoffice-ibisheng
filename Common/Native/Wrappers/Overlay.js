@@ -24,8 +24,8 @@ CAutoshapeTrack.prototype =
 
     SetCurrentPage : function(nPageIndex)
     {
-        if (nPageIndex == this.PageIndex)
-            return;
+        //if (nPageIndex == this.PageIndex)
+        //    return;
 
         this.PageIndex = nPageIndex;
         this.Native["DD_SetCurrentPage"](nPageIndex);
