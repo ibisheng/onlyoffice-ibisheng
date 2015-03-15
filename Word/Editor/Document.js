@@ -1498,8 +1498,14 @@ CDocument.prototype =
                 {
                     if ( PageIndex + 1 > this.FullRecalc.StartPage + 2 )
                     {
-                        if (window["native"]["WC_CheckSuspendRecalculate"] && window["native"]["WC_CheckSuspendRecalculate"]())
+                        if (window["native"]["WC_CheckSuspendRecalculate"] !== undefined)
+                        {
+                            //if (window["native"]["WC_CheckSuspendRecalculate"]())
+                            //    return;
+
+                            this.FullRecalc.Id = setTimeout( Document_Recalculate_Page, 10 );
                             return;
+                        }
                     }
 
                     this.Recalculate_Page();
@@ -2131,19 +2137,25 @@ CDocument.prototype =
             this.FullRecalc.StartIndex   = _StartIndex;
             this.FullRecalc.NewSection   = _bStartNewSection;
             this.FullRecalc.MainStartPos = _StartIndex;
-            
+
             if (window["NATIVE_EDITOR_ENJINE_SYNC_RECALC"] === true)
             {
                 if ( _PageIndex > this.FullRecalc.StartPage + 2 )
                 {
-					if (window["native"]["WC_CheckSuspendRecalculate"] && window["native"]["WC_CheckSuspendRecalculate"]())
-						return;                    
+                    if (window["native"]["WC_CheckSuspendRecalculate"] !== undefined)
+                    {
+                        //if (window["native"]["WC_CheckSuspendRecalculate"]())
+                        //    return;
+
+                        this.FullRecalc.Id = setTimeout( Document_Recalculate_Page, 10 );
+                        return;
+                    }
                 }
 
                 this.Recalculate_Page();
                 return;
             }
-			
+
             if ( _PageIndex > this.FullRecalc.StartPage + 2 )
             {
                 this.FullRecalc.Id = setTimeout( Document_Recalculate_Page, 20 );

@@ -1892,7 +1892,10 @@ CDrawingDocument.prototype =
 
         var _len = _params.length / 4;
 
-        this.LogicDocument.TurnOff_Recalculate();
+        //this.LogicDocument.TurnOff_Recalculate();
+        // если выключить - падает на некоторых документах. Например в списке если заселектить
+        // несколько параграфов и ввести букву
+
         this.LogicDocument.TurnOff_InterfaceEvents();
 
         this.StartUpdateOverlay();
@@ -1930,7 +1933,7 @@ CDrawingDocument.prototype =
 
         this.EndUpdateOverlay();
 
-        this.LogicDocument.TurnOn_Recalculate(true);
+        //this.LogicDocument.TurnOn_Recalculate(true);
         this.LogicDocument.TurnOn_InterfaceEvents(true);
     },
 
