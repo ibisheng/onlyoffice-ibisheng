@@ -1780,6 +1780,8 @@ CDrawingDocument.prototype =
                 _ret.push(this.TextMatrix.tx);
                 _ret.push(this.TextMatrix.ty);
             }
+
+            return _ret;
         }
 
         var _select = this.LogicDocument.Get_SelectionBounds();
@@ -1792,21 +1794,40 @@ CDrawingDocument.prototype =
             this.SelectRect1 = _rect1;
             this.SelectRect2 = _rect2;
 
-            _ret.push(_select.Start.X);
-            _ret.push(_select.Start.Y);
-            _ret.push(_select.Start.Page);
-            _ret.push(_select.End.X + _select.End.W);
-            _ret.push(_select.End.Y + _select.End.H);
-            _ret.push(_select.End.Page);
+            var _x1 = _rect1.X;
+            var _y1 = _rect1.Y;
+            var _y11 = _rect1.Y + _rect.H;
+            var _x2 = _rect2.X + _rect2.W;
+            var _y2 = _rect2.Y;
+            var _y22 = _rect2.Y + _rect2.Y;
 
-            if (this.TextMatrix && !this.TextMatrix.IsIdentity())
+            var _eps = 0.0001;
+            if (Math.abs(_x1 - _x2) < _eps &&
+                Math.abs(_y1 - _y2) < _eps &&
+                Math.abs(_y11 - _y22) < _eps)
             {
-                _ret.push(this.TextMatrix.sx);
-                _ret.push(this.TextMatrix.shy);
-                _ret.push(this.TextMatrix.shx);
-                _ret.push(this.TextMatrix.sy);
-                _ret.push(this.TextMatrix.tx);
-                _ret.push(this.TextMatrix.ty);
+                _ret[0] = 0;
+            }
+            else
+            {
+                _ret.push(_select.Start.X);
+                _ret.push(_select.Start.Y);
+                _ret.push(_select.Start.Page);
+                _ret.push(_select.End.X + _select.End.W);
+                _ret.push(_select.End.Y + _select.End.H);
+                _ret.push(_select.End.Page);
+
+                if (this.TextMatrix && !this.TextMatrix.IsIdentity())
+                {
+                    _ret.push(this.TextMatrix.sx);
+                    _ret.push(this.TextMatrix.shy);
+                    _ret.push(this.TextMatrix.shx);
+                    _ret.push(this.TextMatrix.sy);
+                    _ret.push(this.TextMatrix.tx);
+                    _ret.push(this.TextMatrix.ty);
+                }
+
+                return _ret;
             }
         }
 
@@ -1819,6 +1840,8 @@ CDrawingDocument.prototype =
             _ret.push(_object_bounds.maxX);
             _ret.push(_object_bounds.maxY);
             _ret.push(_object_bounds.pageIndex);
+
+            return _ret;
         }
 
         return _ret;
