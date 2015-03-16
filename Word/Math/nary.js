@@ -207,7 +207,6 @@ CNary.prototype.fillBase = function(PropsInfo)
             base.setBase(Sign);
             base.setIterator(this.LowerIterator);
             base.fillContent();
-            //base.Set_CompiledCtrPrp(this.ParaMath);
         }
         else if( !PropsInfo.supHide && PropsInfo.subHide )
         {
@@ -217,7 +216,6 @@ CNary.prototype.fillBase = function(PropsInfo)
             base.setIterator(this.UpperIterator);
 
             base.fillContent();
-            //base.Set_CompiledCtrPrp(this.ParaMath);
 
         }
         else if(PropsInfo.supHide && PropsInfo.subHide)
@@ -233,7 +231,6 @@ CNary.prototype.fillBase = function(PropsInfo)
             base.setUpperIterator(this.UpperIterator);
             
             base.fillContent();
-            //base.Set_CompiledCtrPrp(this.ParaMath);
         }
     }
 

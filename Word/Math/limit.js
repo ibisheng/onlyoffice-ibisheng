@@ -206,7 +206,7 @@ function CMathFunc(props)
 
 	g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CMathFunc, CMathBase);
+Asc.extendClass(CMathFunc, CMathBase_2);
 
 CMathFunc.prototype.ClassType = historyitem_type_mathFunc;
 CMathFunc.prototype.kind      = MATH_FUNCTION;
@@ -217,6 +217,8 @@ CMathFunc.prototype.init = function(props)
 
     this.setProperties(props);
     this.fillContent();
+
+    this.Set_NumberBreakContent(1);
 };
 CMathFunc.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 {

@@ -995,13 +995,12 @@ CMathContent.prototype.setPosition = function(pos, Line, Range)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y;
-    var StartPos, EndPos;
 
     var CurLine  = Line - this.StartLine;
     var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
 
-    StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-    EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
 
     if(this.RecalcInfo.bEqArray)
     {
@@ -3814,13 +3813,13 @@ CMathContent.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selec
     }
 
     // Выставляем высоту селекта. В верхнем контенте высота задается параграфом
-    if(true !== this.bRoot)
+    /*if(true !== this.bRoot)
     {
         var PosLine = this.ParaMath.GetLinePosition(_CurLine);
         SelectionDraw.StartX = PosLine.x + this.pos.x;
         SelectionDraw.StartY = PosLine.y + this.pos.y - this.size.ascent;
         SelectionDraw.H      = this.size.height;
-    }
+    }*/
 
     var SelectionUse = this.Selection.Use;
 
@@ -3833,7 +3832,18 @@ CMathContent.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selec
     for(var CurPos = StartPos; CurPos <= EndPos; CurPos++)
     {
         var Item = this.Content[CurPos];
-        if(Item.Type == para_Math_Composition)
+
+        var bSelectAll = SelectionUse && SelectionStartPos <= CurPos && CurPos <= SelectionEndPos && SelectionStartPos !== SelectionEndPos;
+
+        if(Item.Type == para_Math_Composition && bSelectAll)
+        {
+            var Direction = SelectionStartPos > SelectionEndPos ? -1 : 1;
+            Item.Select_All(Direction);
+        }
+
+        Item.Selection_DrawRange( _CurLine, _CurRange, SelectionDraw );
+
+        /*if(Item.Type == para_Math_Composition)
         {
             if(SelectionUse && SelectionStartPos == CurPos && SelectionStartPos == SelectionEndPos)
             {
@@ -3849,7 +3859,7 @@ CMathContent.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selec
                 SelectionDraw.StartX += Item.size.width;
         }
         else
-            Item.Selection_DrawRange( _CurLine, _CurRange, SelectionDraw );
+            Item.Selection_DrawRange( _CurLine, _CurRange, SelectionDraw );*/
     }
 };
 CMathContent.prototype.Select_ElementByPos = function(nPos, bWhole)

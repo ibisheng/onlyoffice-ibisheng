@@ -2,6 +2,8 @@
 
 function CMathBase(bInside)
 {
+    CMathBase.superclass.constructor.call(this);
+
     this.Type = para_Math_Composition;
 
     this.pos  = new CMathPosition();
@@ -58,6 +60,7 @@ function CMathBase(bInside)
 
     return this;
 }
+Asc.extendClass(CMathBase, CParagraphContentWithParagraphLikeContent);
 CMathBase.prototype.setContent = function()
 {
     for(var i=0; i < this.nRow; i++)
@@ -1333,14 +1336,20 @@ CMathBase.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine
     }
     else
     {
-        for (var nIndex = 0; nIndex < nCount; nIndex++)
+        var CurLine  = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+        var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+        for (var Pos = StartPos; Pos <= EndPos; Pos++)
         {
             if ( false === SearchPos.InText )
-                SearchPos.InTextPos.Update2( nIndex, Depth );
+                SearchPos.InTextPos.Update2( Pos, Depth );
 
-            if(true == this.Content[nIndex].Get_ParaContentPosByXY(SearchPos, Depth + 1, _CurLine, _CurRange, StepEnd))
+            if(true == this.Content[Pos].Get_ParaContentPosByXY(SearchPos, Depth + 1, _CurLine, _CurRange, StepEnd))
             {
-                SearchPos.Pos.Update2( nIndex, Depth );
+                SearchPos.Pos.Update2( Pos, Depth );
                 bResult = true;
             }
         }
@@ -1383,14 +1392,108 @@ CMathBase.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selectio
 
     var SelectionUse = this.Selection.Use;
 
-    if(SelectionStartPos !== SelectionEndPos)
+    if(this.bMath_OneLine)
     {
-        SelectionDraw.FindStart = false;
-        SelectionDraw.DrawSelection = true;
-        SelectionDraw.W += this.size.width;
+        if(SelectionUse == true)
+        {
+            if(SelectionStartPos !== SelectionEndPos)
+            {
+                SelectionDraw.FindStart = false;
+                SelectionDraw.W += this.size.width;
+            }
+            else
+            {
+                var Item = this.Content[SelectionStartPos];
+
+                var PosLine = this.ParaMath.GetLinePosition(_CurLine);
+
+                SelectionDraw.StartX = PosLine.x + Item.pos.x;
+                SelectionDraw.StartY = PosLine.y + Item.pos.y - Item.size.ascent;
+                SelectionDraw.H      = Item.size.height;
+
+                Item.Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
+            }
+        }
+        else if(SelectionDraw.FindStart == true)
+        {
+            SelectionDraw.StartX += this.size.width;
+        }
     }
     else
-        this.Content[SelectionStartPos].Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
+    {
+        var CurLine  = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+        var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+        var LinesCount = this.protected_GetLinesCount();
+
+        if(SelectionUse == true)
+        {
+            if(SelectionStartPos !== SelectionEndPos)
+            {
+                SelectionDraw.FindStart = false;
+
+                var Direction = SelectionStartPos > SelectionEndPos ? - 1 : 1;
+                this.Select_All(Direction);
+
+                if(CurLine == 0)
+                    SelectionDraw.W += this.GapLeft;
+
+                for(var Pos = StartPos; Pos <= EndPos; Pos++)
+                {
+                    this.Content[Pos].Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
+                }
+
+                SelectionDraw.W += this.dW*(EndPos - StartPos);
+
+                if(LinesCount - 1 == CurLine)
+                    SelectionDraw.W += this.GapRight;
+            }
+            else
+            {
+                if(CurLine == 0)
+                {
+                    if(SelectionDraw.FindStart == true)
+                        SelectionDraw.StartX += this.GapLeft;
+                    else
+                        SelectionDraw.W += this.GapLeft;
+                }
+
+                this.Content[StartPos].Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
+
+                for(var Pos = StartPos + 1; Pos <= SelectionStartPos; Pos++)
+                {
+                    var Item = this.Content[Pos];
+
+                    if(SelectionDraw.FindStart == true)
+                        SelectionDraw.StartX += this.dW;
+                    else
+                        SelectionDraw.W += this.dW;
+
+                    Item.Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
+                }
+            }
+        }
+        else if(SelectionDraw.FindStart == true)
+        {
+            if(CurLine == 0)
+                SelectionDraw.StartX += this.GapLeft;
+
+            this.Content[StartPos].Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
+
+            for(var Pos = StartPos + 1; Pos <= EndPos; Pos++)
+            {
+                var Item = this.Content[Pos];
+                SelectionDraw.StartX += this.dW;
+                Item.Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
+            }
+
+            if(LinesCount - 1 == CurLine)
+                SelectionDraw.StartX += this.GapRight;
+        }
+    }
 
 };
 CMathBase.prototype.Selection_IsEmpty = function()
@@ -1778,3 +1881,327 @@ CMathBasePr.prototype.Set_FromObject  = function(Obj){};
 CMathBasePr.prototype.Copy            = function(){return new CMathBasePr();};
 CMathBasePr.prototype.Write_ToBinary  = function(Writer){};
 CMathBasePr.prototype.Read_FromBinary = function(Reader){};
+
+function CMathBase_2()
+{
+    CMathBase_2.superclass.constructor.call(this);
+    this.NumberBreak = -1;
+}
+Asc.extendClass(CMathBase_2, CMathBase);
+CMathBase_2.prototype.Set_NumberBreakContent = function(Numb)
+{
+    this.NumberBreak = Numb;
+};
+CMathBase_2.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
+{
+    this.setDistance();
+
+    if(PRS.bMath_OneLine == false)
+    {
+        this.bMath_OneLine = false;
+
+        var CurLine  = PRS.Line - this.StartLine;
+        var CurRange = (0 === CurLine ? PRS.Range - this.StartRange : PRS.Range);
+
+        var Numb = this.NumberBreak;
+
+        var RangeStartPos = this.protected_AddRange(CurLine, CurRange),
+            RangeEndPos = 0;
+
+        if(CurLine == 0 && CurRange == 0)
+        {
+            this.Recalculate_Range_OneLineContents(0, Numb, PRS, ParaPr, Depth);
+            this.Content[Numb].Recalculate_Reset(PRS.Range, PRS.Line);
+
+            PRS.WordLen += this.GapLeft;
+        }
+
+        PRS.Update_CurPos(Numb, Depth);
+
+        PRS.bMath_OneLine  = false;
+        this.Content[Numb].Recalculate_Range(PRS, ParaPr, Depth+1);
+
+        if(true === PRS.NewRange)
+        {
+            RangeEndPos = Numb;
+        }
+        else
+        {
+            var Len = this.Content.length;
+            this.Recalculate_Range_OneLineContents(Numb+1, Len, PRS, ParaPr, Depth);
+            RangeEndPos = Len - 1;
+
+            PRS.WordLen += this.GapRight;
+        }
+
+        this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
+
+        PRS.bMath_OneLine  = false;
+    }
+    else
+    {
+        CMathBase_2.superclass.Recalculate_Range.call(this, PRS, ParaPr, Depth);
+    }
+};
+CMathBase_2.prototype.Recalculate_Range_OneLineContents = function(FirstPos, EndPos, PRS, ParaPr, Depth)
+{
+    var WordLen = PRS.WordLen;
+    var Word    = PRS.Word;
+
+    PRS.bMath_OneLine  = true;
+
+    for(var Pos = FirstPos; Pos < EndPos; Pos++)
+    {
+        var Item = this.Content[Pos];
+
+        if(Item.Type == para_Math_Content)
+            Item.Recalculate_Reset( PRS.Range, PRS.Line ); // обновим StartLine и StartRange
+
+        Item.Recalculate_Range(PRS, ParaPr, Depth);
+
+        if(true !== PRS.Word)
+        {
+            WordLen = Item.size.width;
+            Word    = true;
+        }
+        else
+        {
+            WordLen += Item.size.width;
+        }
+
+    }
+
+    PRS.WordLen = WordLen + (EndPos - FirstPos)*this.dW;
+    PRS.Word    = Word;
+
+};
+CMathBase_2.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
+{
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+    {
+        var Item = this.Content[CurPos];
+
+        if(CurPos == this.NumberBreak)
+        {
+            Item.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
+        }
+        else
+        {
+            if ( PRS.LineAscent < Item.size.ascent )
+                PRS.LineAscent = Item.size.ascent;
+
+            if ( PRS.LineDescent < Item.size.height - Item.size.ascent )
+                PRS.LineDescent = Item.size.height - Item.size.ascent;
+        }
+    }
+};
+CMathBase_2.prototype.Recalculate_Reset = function(StartRange, StartLine)
+{
+    this.StartLine   = StartLine;
+    this.StartRange  = StartRange;
+
+    this.protected_ClearLines();
+
+    for (var nPos = 0, nCount = this.Content.length; nPos < nCount; nPos++)
+    {
+        this.Content[nPos].Recalculate_Reset(StartRange, StartLine);
+    }
+};
+CMathBase_2.prototype.setPosition = function(pos, Line, Range)
+{
+    var CurLine  = Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    if(CurLine == 0 && CurRange == 0)
+        pos.x += this.GapLeft;
+
+    this.Content[StartPos].setPosition(pos, Line, Range);
+
+    for(var Pos = StartPos + 1; Pos <= EndPos; Pos++)
+    {
+        pos.x += this.dW;
+        this.Content[Pos].setPosition(pos, Line, Range);
+    }
+
+    var LinesCount = this.protected_GetLinesCount();
+
+    if(LinesCount - 1 == CurLine)
+        pos.x += this.GapRight;
+};
+CMathBase_2.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange, _CurPage)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    if(CurLine == 0 && CurRange == 0)
+        PRSA.X += this.GapLeft;
+
+    var WidthVisible;
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+    {
+        var Item = this.Content[CurPos];
+
+        if(CurPos == this.NumberBreak)
+        {
+            Item.Recalculate_Range_Spaces( PRSA, _CurLine, _CurRange, _CurPage );
+        }
+        else
+        {
+            if ( 0 !== PRSA.LettersSkip )
+            {
+                WidthVisible = Item.size.width;
+                PRSA.LettersSkip--;
+            }
+            else
+                WidthVisible = Item.size.width + PRSA.JustifyWord;
+
+            PRSA.LastW = WidthVisible;
+            PRSA.X    += WidthVisible;
+        }
+    }
+
+    PRSA.X += this.dW*(EndPos - StartPos);
+
+    var LinesCount = this.protected_GetLinesCount();
+
+    if(LinesCount - 1 == CurLine)
+    {
+        PRSA.X += this.GapRight;
+    }
+};
+CMathBase_2.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
+{
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    if(CurLine == 0 && CurRange == 0)
+        PRSC.Range.W += this.GapLeft;
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+    {
+        var Item = this.Content[CurPos];
+
+        if(CurPos == this.NumberBreak)
+        {
+            Item.Recalculate_Range_Width( PRSC, _CurLine, _CurRange );
+        }
+        else
+        {
+            PRSC.Range.W += Item.size.width;
+        }
+    }
+
+    PRSC.Range.W += this.dW*(EndPos - StartPos);
+
+    var LinesCount = this.protected_GetLinesCount();
+
+    if(LinesCount - 1 == CurLine)
+    {
+        PRSC.Range.W += this.GapRight;
+    }
+};
+CMathBase_2.prototype.Draw_Elements = function(PDSE)
+{
+    var CurLine  = PDSE.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PDSE.Range - this.StartRange : PDSE.Range );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    if(CurLine == 0 && CurRange == 0)
+        PDSE.X += this.GapLeft;
+
+    this.Content[StartPos].Draw_Elements(PDSE);
+
+    for (var CurPos = StartPos + 1; CurPos <= EndPos; CurPos++ )
+    {
+        PDSE.X += this.dW;
+        this.Content[CurPos].Draw_Elements(PDSE);
+    }
+
+    var LinesCount = this.protected_GetLinesCount();
+
+    if(LinesCount - 1 == CurLine)
+    {
+        PDSE.X += this.GapRight;
+    }
+};
+CMathBase_2.prototype.Selection_DrawRange_2 = function(_CurLine, _CurRange, SelectionDraw)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    var SelectionStartPos = this.Selection.StartPos;
+    var SelectionEndPos   = this.Selection.EndPos;
+
+    var SelectionUse = this.Selection.Use;
+    var LenContent = this.Content.length;
+
+    var LinesCount = this.protected_GetLinesCount();
+
+    if(SelectionStartPos !== SelectionEndPos && SelectionUse == true)
+    {
+        SelectionDraw.FindStart = false;
+        SelectionDraw.DrawSelection = true;
+
+        this.Select_All();
+
+        if(CurLine == 0)
+            SelectionDraw.W += this.GapLeft;
+
+        for(var Pos = StartPos; Pos <= EndPos; Pos++)
+        {
+            SelectionDraw.W += this.dW*Pos;
+            this.Content[Pos].Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
+        }
+
+        if(SelectionUse == false && LinesCount - 1 == CurLine)
+            SelectionDraw.W += this.GapRight;
+    }
+    else
+    {
+        if(CurLine == 0)
+            SelectionDraw.StartX += this.GapLeft;
+
+        var Len = SelectionUse == false ? EndPos : Math.min(EndPos, SelectionStartPos);
+
+        for(var Pos = StartPos; Pos <= Len; Pos++)
+        {
+            var Item = this.Content[Pos];
+
+            SelectionDraw.StartX += this.dW*Pos;
+
+            var bNeed_changeSelection = Item.bOneLine == false || (SelectionUse == true && Pos == SelectionStartPos);
+
+            if(bNeed_changeSelection)
+            {
+                Item.Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
+            }
+            else
+            {
+                SelectionDraw.StartX += Item.size.width;
+            }
+        }
+
+        if(SelectionUse == false && LinesCount - 1 == CurLine)
+            SelectionDraw.StartX += this.GapRight;
+    }
+};
