@@ -311,7 +311,7 @@ CGraphicObjects.prototype =
         {
             if(props_by_types.shapeProps)
             {
-                shape_props = new CImgProperty(para_drawing_props);
+                shape_props = new asc_CImgProperty(para_drawing_props);
                 shape_props.ShapeProperties = CreateAscShapePropFromProp(props_by_types.shapeProps);
                 shape_props.verticalTextAlign = props_by_types.shapeProps.verticalTextAlign;
                 shape_props.Width = props_by_types.shapeProps.w;
@@ -319,14 +319,14 @@ CGraphicObjects.prototype =
             }
             if(props_by_types.imageProps)
             {
-                image_props = new CImgProperty(para_drawing_props);
+                image_props = new asc_CImgProperty(para_drawing_props);
                 image_props.ImageUrl = props_by_types.imageProps.imageUrl;
                 image_props.Width = props_by_types.imageProps.w;
                 image_props.Height = props_by_types.imageProps.h;
             }
             if(props_by_types.chartProps && !(props_by_types.chartProps.severalCharts === true))
             {
-                chart_props = new CImgProperty(para_drawing_props);
+                chart_props = new asc_CImgProperty(para_drawing_props);
                 chart_props.ChartProperties = props_by_types.chartProps.chartProps;
                 chart_props.severalCharts = props_by_types.chartProps.severalCharts;
                 chart_props.severalChartStyles = props_by_types.chartProps.severalChartStyles;
@@ -1975,7 +1975,7 @@ CGraphicObjects.prototype =
             objects_for_grouping[i].parent.Remove_FromDocument(false);
         }
         para_drawing.Set_XYForAdd( common_bounds.minX,  common_bounds.minY, nearest_pos, objects_for_grouping[0].parent.pageIndex);
-        para_drawing.Set_Props(new CImgProperty(
+        para_drawing.Set_Props(new asc_CImgProperty(
             {
                 PositionH:
                 {
@@ -2046,7 +2046,7 @@ CGraphicObjects.prototype =
             }
             for(i = 0; i < a_objects.length; ++i)
             {
-                a_objects[i].drawing.Set_Props(new CImgProperty(
+                a_objects[i].drawing.Set_Props(new asc_CImgProperty(
                     {
                         PositionH:
                         {

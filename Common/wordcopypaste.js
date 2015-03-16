@@ -2947,6 +2947,19 @@ PasteProcessor.prototype =
         this.bInBlock = oRes.bInBlock;
         return oRes;
 	},
+
+    SetShortImageId: function(aPastedImages)
+    {
+        for(var i = 0, length = aPastedImages.length; i < length; ++i)
+        {
+            var imageElem = aPastedImages[i];
+            if(null != imageElem)
+            {
+                imageElem.SetUrl(imageElem.Url);
+            }
+        }
+    },
+
 	Start : function(node, nodeDisplay, bDuplicate, onlyBinary)
     {
 		//PASTE
@@ -3145,7 +3158,10 @@ PasteProcessor.prototype =
 						}
 					}
 					else
-						oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
+                    {
+                        this.SetShortImageId(aContent.aPastedImages);
+                        oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
+                    }
 					return;
 				}
 				else if(base64FromPresentation)
@@ -3454,6 +3470,8 @@ PasteProcessor.prototype =
                                 var im_arr = [];
                                 for(var key  in images)
                                     im_arr.push(key);
+
+                                this.SetShortImageId(objects.arrImages);
                                 this.api.pre_Paste(fonts, im_arr, paste_callback);
                             }
                             return;
@@ -3753,6 +3771,8 @@ PasteProcessor.prototype =
                                 var im_arr = [];
                                 for(var key  in images)
                                     im_arr.push(key);
+
+                                this.SetShortImageId(objects.arrImages);
                                 this.api.pre_Paste(fonts, im_arr, paste_callback);
                             }
                             return;
@@ -4032,8 +4052,9 @@ PasteProcessor.prototype =
 						var arr_shapes = aContentExcel.aWorksheets[0].Drawings;
 						var arrImages = [];
 						var shape;
-						
-						var aContent = this._getImagesFromExcelShapes(arr_shapes);
+
+                        var aContent = {aPastedImages: [], images: []};
+						this._getImagesFromExcelShapes(arr_shapes, null, aContent.aPastedImages, aContent.images);
 						
 						for(var i = 0; i < arr_shapes.length; ++i)
 						{
@@ -4135,6 +4156,8 @@ PasteProcessor.prototype =
 							var im_arr = [];
 							for(var key  in images)
 								im_arr.push(key);
+
+                            this.SetShortImageId(arrImages);
 							this.api.pre_Paste(fonts, im_arr, paste_callback);
 						}
 						
@@ -4310,7 +4333,10 @@ PasteProcessor.prototype =
 						}, rData );
 					}
 					else
-						oThis.api.pre_Paste(aContent.fonts, aContent.images, paste_callback);
+                    {
+                        this.SetShortImageId(aContent.aPastedImages);
+                        oThis.api.pre_Paste(aContent.fonts, aContent.images, paste_callback);
+                    }
 					
 					nodeDisplay.blur();
 					nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;	
@@ -4362,7 +4388,7 @@ PasteProcessor.prototype =
 					
 					tempParagraph.Content.splice(tempParagraph.Content.length - 1, 0, tempParaRun);
 					
-					aPastedImages[aPastedImages.length] = new CBuilderImages(graphicObj.blipFill, imageUrl);
+					aPastedImages[aPastedImages.length] = new CBuilderImages(graphicObj.blipFill, imageUrl, graphicObj, null, null);
 					images[images.length] = imageUrl;
 				}
 				else if(isGraphicFrame)
@@ -4403,7 +4429,7 @@ PasteProcessor.prototype =
 					{	
 						imageUrl = graphicObj.getImageUrl();
 						
-						aPastedImages[aPastedImages.length] = new CBuilderImages(graphicObj.blipFill, imageUrl);
+						aPastedImages[aPastedImages.length] = new CBuilderImages(graphicObj.blipFill, imageUrl, graphicObj, null, null);
 						images[images.length] = imageUrl;
 					}
 					else if(graphicObj.spPr && graphicObj.spPr.Fill && graphicObj.spPr.Fill.fill && graphicObj.spPr.Fill.fill.RasterImageId && graphicObj.spPr.Fill.fill.RasterImageId != null)
@@ -4700,54 +4726,79 @@ PasteProcessor.prototype =
 		return table;
 	},
 	
-	_getImagesFromExcelShapes: function(pDrawings)
+	_getImagesFromExcelShapes: function(aDrawings, aSpTree, aPastedImages, aUrls)
 	{
 		//пока только распознаём только графические объекты
-		var aContent = null;
-		var aPastedImages = [];
-		var imageUrl, images = [];
-		
-		var drawings = pDrawings;
-		if(drawings && drawings.length)
-		{
-			var drawing, graphicObj;
-		
-			for(var i = 0; i < drawings.length; i++)
-			{
-				drawing = drawings[i] && drawings[i].Drawing ? drawings[i].Drawing : drawings[i];
-				graphicObj = drawing.graphicObject;
-				
-				if(graphicObj.isImage())
-				{	
-					imageUrl = graphicObj.getImageUrl();
-					
-					aPastedImages[aPastedImages.length] = new CBuilderImages(graphicObj.blipFill, imageUrl);
-					images[images.length] = imageUrl;
-				}
-				else if(graphicObj.spPr && graphicObj.spPr.Fill && graphicObj.spPr.Fill.fill && graphicObj.spPr.Fill.fill.RasterImageId && graphicObj.spPr.Fill.fill.RasterImageId != null)
-				{
-					imageUrl = graphicObj.spPr.Fill.fill.RasterImageId;
-					
-					images[images.length] = imageUrl;
-				}
-				else if(graphicObj.isGroup() && graphicObj.spTree && graphicObj.spTree.length)
-				{
-					var spTree = graphicObj.spTree;
-					for(var j = 0; j < spTree.length; j++)
-					{
-						if(spTree[j].isImage())
-						{
-							imageUrl = spTree[j].getImageUrl();
-					
-							aPastedImages[aPastedImages.length] = new CBuilderImages(spTree[j].blipFill, imageUrl);
-							images[images.length] = imageUrl;
-						}
-					}
-				}				
-			}
-		}
-		
-		return {aPastedImages: aPastedImages, images: images};			
+		var sImageUrl, nDrawingsCount, oGraphicObj, bDrawings;
+        if(Array.isArray(aDrawings))
+        {
+            nDrawingsCount = aDrawings.length;
+            bDrawings = true;
+        }
+        else if(Array.isArray(aSpTree))
+        {
+            nDrawingsCount = aSpTree.length;
+            bDrawings = false;
+        }
+        else
+        {
+            return;
+        }
+        for(var i = 0; i < nDrawingsCount; i++)
+        {
+            if(bDrawings)
+            {
+                oGraphicObj = aDrawings[i].graphicObject;
+            }
+            else
+            {
+                oGraphicObj = aSpTree[i];
+            }
+            if(oGraphicObj)
+            {
+                if(oGraphicObj.spPr)
+                {
+                    if(oGraphicObj.spPr.Fill && oGraphicObj.spPr.Fill.fill && typeof oGraphicObj.spPr.Fill.fill.RasterImageId === "string" && oGraphicObj.spPr.Fill.fill.RasterImageId.length > 0)
+                    {
+                        sImageUrl = oGraphicObj.spPr.Fill.fill.RasterImageId;
+                        aPastedImages[aPastedImages.length] = new CBuilderImages(oGraphicObj.spPr.Fill.fill, sImageUrl, null, oGraphicObj.spPr, null);
+                        aUrls[aUrls.length] = sImageUrl;
+                    }
+                    if(oGraphicObj.spPr.ln && oGraphicObj.spPr.ln.Fill && oGraphicObj.spPr.ln.Fill.fill && typeof oGraphicObj.spPr.ln.Fill.fill.RasterImageId === "string" && oGraphicObj.spPr.ln.Fill.fill.RasterImageId.length > 0)
+                    {
+                        sImageUrl = oGraphicObj.spPr.ln.Fill.fill.RasterImageId;
+                        aPastedImages[aPastedImages.length] = new CBuilderImages(oGraphicObj.spPr.ln.Fill.fill, sImageUrl, null, oGraphicObj.spPr, oGraphicObj.spPr.ln.Fill.fill.RasterImageId);
+                        aUrls[aUrls.length] = sImageUrl;
+                    }
+                }
+                switch(oGraphicObj.getObjectType())
+                {
+                    case historyitem_type_ImageShape:
+                    {
+                        sImageUrl = oGraphicObj.getImageUrl();
+                        if(typeof sImageUrl === "string" && sImageUrl.length > 0)
+                        {
+                            aPastedImages[aPastedImages.length] = new CBuilderImages(oGraphicObj.blipFill, sImageUrl, oGraphicObj, null, null);
+                            aUrls[aUrls.length] = sImageUrl;
+                        }
+                        break;
+                    }
+                    case historyitem_type_Shape:
+                    {
+                        break;
+                    }
+                    case historyitem_type_ChartSpace:
+                    {
+                        break;
+                    }
+                    case historyitem_type_GroupShape:
+                    {
+                        this._getImagesFromExcelShapes(null, oGraphicObj.spTree, aPastedImages, aUrls);
+                        break;
+                    }
+                }
+            }
+        }
 	},
 
 	_selectShapesBeforeInsert: function(aNewContent, oDoc)
@@ -6606,9 +6657,9 @@ PasteProcessor.prototype =
                     if(isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")
                         ||  nWidth === 0 ||  nHeight === 0)
                     {
-                        var img_prop = new CImgProperty();
-                        img_prop.put_ImageUrl(sSrc);
-                        var or_sz = img_prop.get_OriginSize(editor);
+                        var img_prop = new asc_CImgProperty();
+                        img_prop.asc_putImageUrl(sSrc);
+                        var or_sz = img_prop.asc_getOriginSize(editor);
                         nWidth = or_sz.Width / g_dKoef_pix_to_mm;
                         nHeight = or_sz.Height / g_dKoef_pix_to_mm;
                     }
@@ -6992,9 +7043,9 @@ PasteProcessor.prototype =
                 if(isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")
                     ||  nWidth === 0 ||  nHeight === 0)
                 {
-                    var img_prop = new CImgProperty();
-                    img_prop.put_ImageUrl(sSrc);
-                    var or_sz = img_prop.get_OriginSize(editor);
+                    var img_prop = new asc_CImgProperty();
+                    img_prop.asc_putImageUrl(sSrc);
+                    var or_sz = img_prop.asc_getOriginSize(editor);
                     nWidth = or_sz.Width / g_dKoef_pix_to_mm;
                     nHeight = or_sz.Height / g_dKoef_pix_to_mm;
                 }

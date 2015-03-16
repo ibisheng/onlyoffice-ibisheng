@@ -76,18 +76,24 @@ function checkRasterImageId(rasterImageId)
    // if ( 0 !== rasterImageId.indexOf("http:") && 0 !== rasterImageId.indexOf("data:") && 0 !== rasterImageId.indexOf("https:") && 0 !== rasterImageId.indexOf("ftp:") && 0 !== rasterImageId.indexOf("file:") )
    // {
         var api_sheet = window["Asc"]["editor"];
-        var sFindString;
+        var sFindString, sFindString2;
         if(api_sheet)
         {
             sFindString = api_sheet.wbModel.sUrlPath + "media/";
+            sFindString2 = api_sheet.documentOrigin + sFindString;
         }
         else
         {
             sFindString = window.editor.DocumentUrl + "media/";
+            sFindString2 = documentOrigin + sFindString;
         }
         if(0 === rasterImageId.indexOf(sFindString))
         {
             return rasterImageId.substring(sFindString.length);
+        }
+        else if(0 === rasterImageId.indexOf(sFindString2))
+        {
+            return rasterImageId.substring(sFindString2.length);
         }
         else
         {
@@ -5135,7 +5141,7 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
     _result_shape_prop.IsLocked = shapeProp1.IsLocked === true || shapeProp2.IsLocked === true;
     if(isRealObject(shapeProp1.paddings) && isRealObject(shapeProp2.paddings))
     {
-        _result_shape_prop.paddings = new CPaddings();
+        _result_shape_prop.paddings = new asc_CPaddings();
         _result_shape_prop.paddings.Left = isRealNumber(shapeProp1.paddings.Left) ? (shapeProp1.paddings.Left === shapeProp2.paddings.Left ? shapeProp1.paddings.Left : undefined) : undefined;
         _result_shape_prop.paddings.Top = isRealNumber(shapeProp1.paddings.Top) ? (shapeProp1.paddings.Top === shapeProp2.paddings.Top ? shapeProp1.paddings.Top : undefined) : undefined;
         _result_shape_prop.paddings.Right = isRealNumber(shapeProp1.paddings.Right) ? (shapeProp1.paddings.Right === shapeProp2.paddings.Right ? shapeProp1.paddings.Right : undefined) : undefined;
@@ -10031,137 +10037,7 @@ function ThemeElements()
     this.clrScheme = new ClrScheme();
     this.fontScheme = new FontScheme();
     this.fmtScheme = new FmtScheme();
-
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
 }
-
-ThemeElements.prototype =
-{
-    Get_Id: function()
-    {
-        return this.Id;
-    },
-
-    Refresh_RecalcData: function()
-    {},
-
-    getObjectType: function()
-    {
-        return historyitem_type_ThemeElements;
-    },
-
-    setClrScheme: function(pr)
-    {
-        History.Add(this, {Type: historyitem_ThemeElements_SetClrScheme, oldPr: this.clrScheme, newPr: pr});
-        this.clrScheme = pr;
-    },
-
-    setFontScheme: function(pr)
-    {
-        History.Add(this, {Type: historyitem_ThemeElements_SetFontScheme, oldPr: this.fontScheme, newPr: pr});
-        this.fontScheme = pr;
-    },
-
-    setFmtScheme: function(pr)
-    {
-        History.Add(this, {Type: historyitem_ThemeElements_SetFmtScheme, oldPr: this.fmtScheme, newPr: pr});
-        this.fmtScheme = pr;
-    },
-
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_ThemeElements_SetClrScheme:
-            {
-                this.clrScheme = data.oldPr;
-                break;
-            }
-            case historyitem_ThemeElements_SetFontScheme:
-            {
-                this.fontScheme = data.oldPr;
-                break;
-            }
-            case historyitem_ThemeElements_SetFmtScheme:
-            {
-                this.fmtScheme = data.oldPr;
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_ThemeElements_SetClrScheme:
-            {
-                this.clrScheme = data.newPr;
-                break;
-            }
-            case historyitem_ThemeElements_SetFontScheme:
-            {
-                this.fontScheme = data.newPr;
-                break;
-            }
-            case historyitem_ThemeElements_SetFmtScheme:
-            {
-                this.fmtScheme = data.newPr;
-                break;
-            }
-        }
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case historyitem_ThemeElements_SetClrScheme:
-            case historyitem_ThemeElements_SetFontScheme:
-            case historyitem_ThemeElements_SetFmtScheme:
-            {
-                writeObject(w, data.newPr);
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        var type = r.GetLong();
-        switch (type)
-        {
-            case historyitem_ThemeElements_SetClrScheme:
-            {
-                this.clrScheme = readObject(r);
-                break;
-            }
-            case historyitem_ThemeElements_SetFontScheme:
-            {
-                this.fontScheme = readObject(r);
-                break;
-            }
-            case historyitem_ThemeElements_SetFmtScheme:
-            {
-                this.fmtScheme = readObject(r);
-                break;
-            }
-        }
-    },
-
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
-    }
-};
 
 function CTheme()
 {
@@ -10237,6 +10113,7 @@ CTheme.prototype =
         }
         return CreateSolidFillRGBA(0, 0, 0, 255);
     },
+
     getLnStyle: function(idx, unicolor)
     {
         if (this.themeElements.fmtScheme.lnStyleLst[idx-1])
@@ -10250,7 +10127,6 @@ CTheme.prototype =
         }
         return new CLn();
     },
-
 
     changeColorScheme: function(clrScheme)
     {

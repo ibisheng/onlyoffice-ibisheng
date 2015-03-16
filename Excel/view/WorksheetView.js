@@ -6544,7 +6544,7 @@
 			cell_info.font.strikeout = c.getStrikeout();
 			cell_info.font.subscript = fa === "subscript";
 			cell_info.font.superscript = fa === "superscript";
-			cell_info.font.color = (fc ? asc_obj2Color(fc) : new CAscColor(c_opt.defaultState.color));
+			cell_info.font.color = (fc ? asc_obj2Color(fc) : new asc_CColor(c_opt.defaultState.color));
 
 			cell_info.fill = new asc_CFill((null != bg) ? asc_obj2Color(bg) : bg);
 
@@ -7960,7 +7960,7 @@
 					} else if (b) {
 						if (b.style !== null && b.style !== undefined) {border.setStyle(b.style);}
 						if (b.color !== null && b.color !== undefined) {
-							if(b.color instanceof CAscColor)
+							if(b.color instanceof asc_CColor)
 								border.c = CorrectAscColor(b.color);
 						}
 					}

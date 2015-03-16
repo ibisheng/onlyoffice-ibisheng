@@ -13,19 +13,7 @@ var Default_Tab_Stop = 12.5;
 var Default_Heading_Font = "Arial";
 var Default_Font         = "Arial";
 
-var align_Right   = 0;
-var align_Left    = 1;
-var align_Center  = 2;
-var align_Justify = 3;
-
-var vertalign_Baseline    = 0;
-var vertalign_SuperScript = 1;
-var vertalign_SubScript   = 2;
-
 var highlight_None = -1;
-
-var shd_Clear = 0;
-var shd_Nil   = 1;
 
 var vertalign_Koef_Size  =  0.65;  // Коэффициент изменения размера текста для верхнего и нижнего индексов
 var vertalign_Koef_Super =  0.35;  // Позиция верхнего индекса (относительно размера текста)

@@ -382,28 +382,28 @@ $(document).ready(function(){
     $("#td_bringToFront").click(
         function()
         {
-            editor.ImgApply(new CImgProperty({ChangeLevel:c_oAscChangeLevel.BringToFront}));
+            editor.ImgApply(new asc_CImgProperty({ChangeLevel:c_oAscChangeLevel.BringToFront}));
         }
     );
 
     $("#td_bringToForward").click(
         function()
         {
-            editor.ImgApply(new CImgProperty({ChangeLevel:c_oAscChangeLevel.BringForward}));
+            editor.ImgApply(new asc_CImgProperty({ChangeLevel:c_oAscChangeLevel.BringForward}));
         }
     );
 
     $("#td_sendToBack").click(
         function()
         {
-            editor.ImgApply(new CImgProperty({ChangeLevel:c_oAscChangeLevel.SendToBack}));
+            editor.ImgApply(new asc_CImgProperty({ChangeLevel:c_oAscChangeLevel.SendToBack}));
         }
     );
 
     $("#td_bringToBackward").click(
         function()
         {
-            editor.ImgApply(new CImgProperty({ChangeLevel:c_oAscChangeLevel.BringBackward}));
+            editor.ImgApply(new asc_CImgProperty({ChangeLevel:c_oAscChangeLevel.BringBackward}));
         }
     );
 
@@ -2249,7 +2249,7 @@ $(".colorWatch").mouseover(function(){
 			var elemArg = arg[i];
 			if ( elemArg != undefined )
 			{
-				var ObjectType = elemArg.get_ObjectType();
+				var ObjectType = elemArg.asc_getObjectType();
 				if ( ObjectType == c_oAscTypeSelectElement.Image)
                 {
                     g_oToolBox.Enable_Image();
@@ -2262,7 +2262,7 @@ $(".colorWatch").mouseover(function(){
                         document.getElementById("imgProp").style.left = sLeft;
                     };
 
-                    var elemVal = elemArg.get_ObjectValue();
+                    var elemVal = elemArg.asc_getObjectValue();
 
                     g_oImagePr = elemVal;
 
@@ -2435,7 +2435,7 @@ $(".colorWatch").mouseover(function(){
                     }
 
 					if (elemVal.get_ImageUrl())
-						$("#imgURL").val(elemVal.get_ImageUrl());
+						$("#imgURL").val(elemVal.asc_getImageUrl());
 				}
 				else if ( ObjectType == c_oAscTypeSelectElement.Table)
                 {
@@ -2455,7 +2455,7 @@ $(".colorWatch").mouseover(function(){
                         $("#tblProp").show();
                     }
 
-                    var elemVal = elemArg.get_ObjectValue();
+                    var elemVal = elemArg.asc_getObjectValue();
                     g_oTablePr = elemVal;
 
                     if ( true === elemVal.get_AllowOverlap() )
@@ -2852,7 +2852,7 @@ $(".colorWatch").mouseover(function(){
                         $("#hafPropDrag").show();
                         $("#hafProp").show();
                     }
-                    var elemVal = elemArg.get_ObjectValue();
+                    var elemVal = elemArg.asc_getObjectValue();
 					$("#hafHF").val(elemVal.Position);
 					document.getElementById("hafFP").checked = elemVal.DifferentFirst;
 					document.getElementById("hafOE").checked = elemVal.DifferentEvenOdd;
@@ -2892,7 +2892,7 @@ $(".colorWatch").mouseover(function(){
                         $("#prProp").show();
                     }
 					
-					var elemVal = elemArg.get_ObjectValue();
+					var elemVal = elemArg.asc_getObjectValue();
 
                     var Caption = "";
                     if ( elemVal.Locked )
@@ -3193,7 +3193,7 @@ $(".colorWatch").mouseover(function(){
 
                     $("#hyperPropDrag").show();
                     $("#hyperProp").show();
-                    var elemVal = elemArg.get_ObjectValue();
+                    var elemVal = elemArg.asc_getObjectValue();
 
                     if ( null === elemVal.Text )
                     {
@@ -3219,7 +3219,7 @@ $(".colorWatch").mouseover(function(){
                 }
                 else if ( ObjectType == c_oAscTypeSelectElement.SpellCheck )
                 {
-                    var elemVal = elemArg.get_ObjectValue();
+                    var elemVal = elemArg.asc_getObjectValue();
                     g_oSpellCheck = elemVal;
 
                     var Word     = elemVal.get_Word();
@@ -3307,18 +3307,18 @@ $(".colorWatch").mouseover(function(){
 
 	$("#imgApply").click(function()
     {
-		var oImgProp = new CImgProperty();
-		oImgProp.put_Width( parseFloat($("#imgW").val()) );
-		oImgProp.put_Height( parseFloat($("#imgH").val()) );
-		oImgProp.put_WrappingStyle( g_nImageWrap );
+		var oImgProp = new asc_CImgProperty();
+		oImgProp.asc_putWidth( parseFloat($("#imgW").val()) );
+		oImgProp.asc_putHeight( parseFloat($("#imgH").val()) );
+		oImgProp.asc_putWrappingStyle( g_nImageWrap );
 		
-		var oPaddings = new CPaddings();
+		var oPaddings = new asc_CPaddings();
 		oPaddings.put_Left( ($("#imgLeft").val()!="")?parseFloat($("#imgLeft").val()):null );
 		oPaddings.put_Top( ($("#imgTop").val()!="")?parseFloat($("#imgTop").val()):null );
 		oPaddings.put_Right( ($("#imgRight").val()!="")?parseFloat($("#imgRight").val()):null );
 		oPaddings.put_Bottom( ($("#imgBottom").val()!="")?parseFloat($("#imgBottom").val()):null );
 		
-		oImgProp.put_Paddings( oPaddings );
+		oImgProp.asc_putPaddings( oPaddings );
 
         if ( g_nImageWrap != c_oAscWrapStyle2.Inline )
         {
@@ -3399,18 +3399,18 @@ $(".colorWatch").mouseover(function(){
                 }
             }
 
-            oImgProp.put_PositionH( oPosH );
-            oImgProp.put_PositionV( oPosV );
+            oImgProp.asc_putPositionH( oPosH );
+            oImgProp.asc_putPositionV( oPosV );
         }
 		
 		var oPos = new CPosition();
 		oPos.put_X( ($("#imgX").val()!="")?parseFloat($("#imgX").val()):null );
 		oPos.put_Y( ($("#imgY").val()!="")?parseFloat($("#imgY").val()):null );
 		
-		oImgProp.put_Position( oPos );
+		oImgProp.asc_putPosition( oPos );
 		
-		oImgProp.put_ImageUrl( ($("#imgURL").val()!="")?$("#imgURL").val():null );
-        oImgProp.put_AllowOverlap( document.getElementById("imgAllowOverlap").checked === true ? true : false );
+		oImgProp.asc_putImageUrl( ($("#imgURL").val()!="")?$("#imgURL").val():null );
+        oImgProp.asc_putAllowOverlap( document.getElementById("imgAllowOverlap").checked === true ? true : false );
 		
 		editor.ImgApply( oImgProp );
 	});
@@ -3542,7 +3542,7 @@ $(".colorWatch").mouseover(function(){
 
      $("#prFrameApply").click(function()
      {
-         var FramePr = new CParagraphFrame();
+         var FramePr = new asc_CParagraphFrame();
          FramePr.put_Wrap( g_nParaWrap );
 
          if ( 0 === document.getElementById('prFrameWidthType').selectedIndex )

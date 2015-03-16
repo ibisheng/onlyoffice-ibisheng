@@ -188,15 +188,40 @@ function FileStream(data, size)
 var g_nodeAttributeStart = 0xFA;
 var g_nodeAttributeEnd	= 0xFB;
 
-function CBuilderImages(blip_fill, full_url)
+function CBuilderImages(blip_fill, full_url, image_shape, sp_pr, ln)
 {
     this.Url = full_url;
     this.BlipFill = blip_fill;
+    this.ImageShape = image_shape;
+    this.SpPr = sp_pr;
+    this.Ln = ln;
 }
 CBuilderImages.prototype =
 {
     SetUrl : function(url)
     {
+        var oCopyFill, oCopyBlipFill, oCopyLn;
+        if(!this.Ln && this.SpPr && this.SpPr.Fill)
+        {
+            oCopyFill = this.SpPr.Fill.createDuplicate();
+            if(oCopyFill.fill && oCopyFill.fill.type === FILL_TYPE_BLIP)
+            {
+                oCopyFill.fill.setRasterImageId(url);
+                this.SpPr.setFill(oCopyFill);
+            }
+        }
+        if(this.Ln && this.SpPr && this.SpPr === this.Ln && this.Ln.Fill && this.Ln.Fill.fill && this.Ln.Fill.fill.type === FILL_TYPE_BLIP)
+        {
+            oCopyLn = this.Ln.createDuplicate();
+            oCopyLn.Fill.fill.setRasterImageId(url);
+            this.SpPr.setLn(oCopyLn);
+        }
+        if(this.ImageShape && this.ImageShape.blipFill)
+        {
+            oCopyBlipFill = this.ImageShape.blipFill.createDuplicate();
+            oCopyBlipFill.setRasterImageId(url);
+            this.ImageShape.setBlipFill(oCopyBlipFill);
+        }
         this.BlipFill.RasterImageId = url;
     }
 };
@@ -1720,7 +1745,7 @@ function BinaryPPTYLoader()
         return _path;
     }
 
-    this.ReadUniFill = function()
+    this.ReadUniFill = function(oSpPr, oImageShape, oLn)
     {
         var s = this.stream;
         var read_start = s.cur;
@@ -1872,7 +1897,7 @@ function BinaryPPTYLoader()
                                                 this.ImageMapChecker[uni_fill.fill.RasterImageId] = true;
 
                                             if (this.IsUseFullUrl)
-                                                this.RebuildImages.push(new CBuilderImages(uni_fill.fill, uni_fill.fill.RasterImageId));
+                                                this.RebuildImages.push(new CBuilderImages(uni_fill.fill, uni_fill.fill.RasterImageId, oImageShape, oSpPr, oLn));
 
                                             s.Skip2(1); // end attribute
                                             break;
@@ -2235,7 +2260,7 @@ function BinaryPPTYLoader()
 
     // LINE PROPERTIES --------------------------
 
-    this.ReadLn = function()
+    this.ReadLn = function(spPr)
     {
         var ln = new CLn();
 
@@ -2288,7 +2313,7 @@ function BinaryPPTYLoader()
                 case 0:
                 {
                     // themeElements
-                    ln.setFill(this.ReadUniFill());
+                    ln.setFill(this.ReadUniFill(spPr, null, ln));
                     break;
                 }
                 case 1:
@@ -3755,12 +3780,12 @@ function BinaryPPTYLoader()
                 }
                 case 2:
                 {
-                    spPr.setFill(this.ReadUniFill());
+                    spPr.setFill(this.ReadUniFill(spPr, null, null));
                     break;
                 }
                 case 3:
                 {
-                    spPr.setLn(this.ReadLn());
+                    spPr.setLn(this.ReadLn(spPr));
                     break;
                 }
                 case 4:
@@ -3823,7 +3848,7 @@ function BinaryPPTYLoader()
                 }
                 case 1:
                 {
-                    spPr.setFill(this.ReadUniFill());
+                    spPr.setFill(this.ReadUniFill(spPr, null, null));
                     break;
                 }
                 case 2:
@@ -4796,7 +4821,7 @@ function BinaryPPTYLoader()
                 }
                 case 1:
                 {
-                    pic.setBlipFill(this.ReadUniFill().fill);
+                    pic.setBlipFill(this.ReadUniFill(null, pic, null).fill);
                     break;
                 }
                 case 2:
@@ -6876,9 +6901,6 @@ function BinaryPPTYLoader()
                     }
                     if(shape && (this.TempMainObject && typeof Slide !== "undefined" && this.TempMainObject instanceof  Slide && shape.isPlaceholder && shape.isPlaceholder() && (shape.getPlaceholderType() === phType_sldNum || shape.getPlaceholderType() === phType_dt)) && _last_field_type)
                     {
-                       /// txbody.textFieldFlag = true;
-
-
                         var str_field = txbody.getFieldText(_last_field_type, this.TempMainObject, (this.presentation && this.presentation.pres && isRealNumber(this.presentation.pres.attrFirstSlideNum)) ? this.presentation.pres.attrFirstSlideNum : 1);
                         if(str_field.length > 0)
                         {

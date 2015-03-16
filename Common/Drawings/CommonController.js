@@ -11,10 +11,6 @@ var HANDLE_EVENT_MODE_CURSOR = 1;
 
 var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
 
-var global_canvas = null;
-
-var g_nZIndexCounter = -1;
-
 function CDistance(L, T, R, B)
 {
     this.L = L;
@@ -222,7 +218,6 @@ function CreateBlipFillRasterImageId(url)
     return oBlipFill;
 }
 
-
 function getTargetTextObject(controller)
 {
     if(controller.selection.textSelection)
@@ -271,8 +266,6 @@ function DrawingObjectsController(drawingObjects)
 
     this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
 }
-
-
 
 DrawingObjectsController.prototype =
 {
@@ -1423,9 +1416,9 @@ DrawingObjectsController.prototype =
 
     setCellBackgroundColor: function (color)
     {
-        var fill = new CAscFill();
+        var fill = new asc_CShapeFill();
         fill.type = c_oAscFill.FILL_TYPE_SOLID;
-        fill.fill = new CAscFillSolid();
+        fill.fill = new asc_CFillSolid();
         fill.fill.color = color;
 
         this.checkSelectedObjectsAndCallback(this.applyDrawingProps, [{fill: fill}]);
@@ -5525,9 +5518,9 @@ DrawingObjectsController.prototype =
                     this.drawingObjects.drawingDocument.DrawImageTextureFillShape(null);
                 }
             }
-            shape_props.ShapeProperties.fill = CreateAscFillEx(shape_props.ShapeProperties.fill);
-            shape_props.ShapeProperties.stroke = CreateAscStrokeEx(shape_props.ShapeProperties.stroke);
-            shape_props.ShapeProperties.stroke.canChangeArrows  = shape_props.ShapeProperties.canChangeArrows === true;
+            shape_props.ShapeProperties.fill = CreateAscFill(shape_props.ShapeProperties.fill);
+            shape_props.ShapeProperties.stroke = CreateAscStroke(shape_props.ShapeProperties.stroke, shape_props.ShapeProperties.canChangeArrows === true);
+            shape_props.ShapeProperties.stroke.canChangeArrows = shape_props.ShapeProperties.canChangeArrows === true;
             shape_props.Locked = props.shapeChartProps.locked === true;
 
             ret.push(shape_props);
@@ -5565,8 +5558,8 @@ DrawingObjectsController.prototype =
                     this.drawingObjects.drawingDocument.InitGuiCanvasShape(api.shapeElementId);
                 this.drawingObjects.drawingDocument.DrawImageTextureFillShape(null);
             }
-            shape_props.ShapeProperties.fill = CreateAscFillEx(shape_props.ShapeProperties.fill);
-            shape_props.ShapeProperties.stroke = CreateAscStrokeEx(shape_props.ShapeProperties.stroke);
+            shape_props.ShapeProperties.fill = CreateAscFill(shape_props.ShapeProperties.fill);
+            shape_props.ShapeProperties.stroke = CreateAscStroke(shape_props.ShapeProperties.stroke, shape_props.ShapeProperties.canChangeArrows === true);
             shape_props.ShapeProperties.stroke.canChangeArrows  = shape_props.ShapeProperties.canChangeArrows === true;
             shape_props.Locked = props.shapeProps.locked === true;
 
@@ -5592,7 +5585,7 @@ DrawingObjectsController.prototype =
         }
         for (i = 0; i < ret.length; i++)
         {
-            ascSelectedObjects.push(new asc_CSelectedObject( c_oAscTypeSelectElement.Image, new asc_CImgProperty(ret[i]) ));
+            ascSelectedObjects.push(new asc_CSelectedObject ( c_oAscTypeSelectElement.Image, new asc_CImgProperty(ret[i]) ));
         }
 
         // Текстовые свойства объекта
@@ -5671,7 +5664,7 @@ DrawingObjectsController.prototype =
         // ParaPr.Jc
         trigger("asc_onPrAlign", ParaPr.Jc);
 
-        ascSelectedObjects.push(new asc_CSelectedObject( c_oAscTypeSelectElement.Paragraph, new asc_CParagraphProperty( ParaPr ) ));
+        ascSelectedObjects.push(new asc_CSelectedObject ( c_oAscTypeSelectElement.Paragraph, new asc_CParagraphProperty( ParaPr ) ));
     },
 
     createImage: function(rasterImageId, x, y, extX, extY)
@@ -6362,517 +6355,6 @@ DrawingObjectsController.prototype =
 //-----------------------------------------------------------------------------------
 // ASC Classes
 //-----------------------------------------------------------------------------------
-
-function asc_CColor() {
-    this.type = c_oAscColor.COLOR_TYPE_SRGB;
-    this.value = null;
-    this.r = 0;
-    this.g = 0;
-    this.b = 0;
-    this.a = 255;
-
-    this.Mods = [];
-    this.ColorSchemeId = -1;
-}
-
-asc_CColor.prototype = {
-    asc_getR: function() { return this.r },
-    asc_putR: function(v) { this.r = v; this.hex = undefined; },
-    asc_getG: function() { return this.g; },
-    asc_putG: function(v) { this.g = v; this.hex = undefined; },
-    asc_getB: function() { return this.b; },
-    asc_putB: function(v) { this.b = v; this.hex = undefined; },
-    asc_getA: function() { return this.a; },
-    asc_putA: function(v) { this.a = v; this.hex = undefined; },
-    asc_getType: function() { return this.type; },
-    asc_putType: function(v) { this.type = v; },
-    asc_getValue: function() { return this.value; },
-    asc_putValue: function(v) { this.value = v; },
-    asc_getHex: function() {
-        if(!this.hex)
-        {
-            var a = this.a.toString(16);
-            var r = this.r.toString(16);
-            var g = this.g.toString(16);
-            var b = this.b.toString(16);
-            this.hex = ( a.length == 1? "0" + a: a) +
-                ( r.length == 1? "0" + r: r) +
-                ( g.length == 1? "0" + g: g) +
-                ( b.length == 1? "0" + b: b);
-        }
-        return this.hex;
-    },
-    asc_getColor: function() {
-        var ret = new CColor(this.r, this.g, this.b);
-        return ret;
-    }
-}
-
-//{ asc_CColor export
-window["Asc"].asc_CColor = asc_CColor;
-window["Asc"]["asc_CColor"] = asc_CColor;
-prot = asc_CColor.prototype;
-
-prot["asc_getR"] = prot.asc_getR;
-prot["asc_putR"] = prot.asc_putR;
-prot["asc_getG"] = prot.asc_getG;
-prot["asc_putG"] = prot.asc_putG;
-prot["asc_getB"] = prot.asc_getB;
-prot["asc_putB"] = prot.asc_putB;
-prot["asc_getA"] = prot.asc_getA;
-prot["asc_putA"] = prot.asc_putA;
-prot["asc_getType"] = prot.asc_getType;
-prot["asc_putType"] = prot.asc_putType;
-prot["asc_getValue"] = prot.asc_getValue;
-prot["asc_putValue"] = prot.asc_putValue;
-prot["asc_getHex"] = prot.asc_getHex;
-prot["asc_getColor"] = prot.asc_getColor;
-//}
-
-function CreateAscColorCustomEx(r, g, b) {
-    var ret = new asc_CColor();
-    ret.type = c_oAscColor.COLOR_TYPE_SRGB;
-    ret.r = r;
-    ret.g = g;
-    ret.b = b;
-    ret.a = 255;
-    return ret;
-}
-
-function CreateAscColorEx(unicolor) {
-    if (null == unicolor || null == unicolor.color)
-        return new asc_CColor();
-
-    var ret = new asc_CColor();
-    ret.r = unicolor.RGBA.R;
-    ret.g = unicolor.RGBA.G;
-    ret.b = unicolor.RGBA.B;
-    ret.a = unicolor.RGBA.A;
-
-    var _color = unicolor.color;
-    switch (_color.type)
-    {
-        case c_oAscColor.COLOR_TYPE_SRGB:
-        case c_oAscColor.COLOR_TYPE_SYS:
-        {
-            break;
-        }
-        case c_oAscColor.COLOR_TYPE_PRST:
-        {
-            ret.type = c_oAscColor.COLOR_TYPE_PRST;
-            ret.value = _color.id;
-            break;
-        }
-        case c_oAscColor.COLOR_TYPE_SCHEME:
-        {
-            ret.type = c_oAscColor.COLOR_TYPE_SCHEME;
-            ret.value = _color.id;
-            break;
-        }
-        default:
-            break;
-    }
-    return ret;
-}
-
-function asc_CShapeFill() {
-    this.type = null;
-    this.fill = null;
-    this.transparent = null;
-}
-
-asc_CShapeFill.prototype = {
-    asc_getType: function() { return this.type; },
-    asc_putType: function(v) { this.type = v; },
-    asc_getFill: function() { return this.fill; },
-    asc_putFill: function(v) { this.fill = v; },
-    asc_getTransparent: function() { return this.transparent; },
-    asc_putTransparent: function(v) { this.transparent = v; }
-}
-
-//{ asc_CShapeFill export
-window["Asc"].asc_CShapeFill = asc_CShapeFill;
-window["Asc"]["asc_CShapeFill"] = asc_CShapeFill;
-prot = asc_CShapeFill.prototype;
-
-prot["asc_getType"] = prot.asc_getType;
-prot["asc_putType"] = prot.asc_putType;
-
-prot["asc_getFill"] = prot.asc_getFill;
-prot["asc_putFill"] = prot.asc_putFill;
-
-prot["asc_getTransparent"] = prot.asc_getTransparent;
-prot["asc_putTransparent"] = prot.asc_putTransparent;
-//}
-
-function asc_CFillBlip() {
-    this.type = c_oAscFillBlipType.STRETCH;
-    this.url = "";
-    this.texture_id = null;
-}
-
-asc_CFillBlip.prototype = {
-    asc_getType: function(){return this.type},
-    asc_putType: function(v){this.type = v;},
-    asc_getUrl: function(){return this.url;},
-    asc_putUrl: function(v){this.url = v;},
-    asc_getTextureId: function(){return this.texture_id;},
-    asc_putTextureId: function(v){this.texture_id = v;}
-}
-
-//{ asc_CFillBlip export
-window["Asc"].asc_CFillBlip = asc_CFillBlip;
-window["Asc"]["asc_CFillBlip"] = asc_CFillBlip;
-prot = asc_CFillBlip.prototype;
-
-prot["asc_getType"] = prot.asc_getType;
-prot["asc_putType"] = prot.asc_putType;
-
-prot["asc_getUrl"] = prot.asc_getUrl;
-prot["asc_putUrl"] = prot.asc_putUrl;
-
-prot["asc_getTextureId"] = prot.asc_getTextureId;
-prot["asc_putTextureId"] = prot.asc_putTextureId;
-//}
-
-function asc_CFillHatch() {
-    this.PatternType = undefined;
-    this.fgClr = undefined;
-    this.bgClr = undefined;
-}
-
-asc_CFillHatch.prototype = {
-    asc_getPatternType: function(){return this.PatternType;},
-    asc_putPatternType: function(v){this.PatternType = v;},
-    asc_getColorFg: function(){return this.fgClr;},
-    asc_putColorFg: function(v){this.fgClr = v;},
-    asc_getColorBg: function(){return this.bgClr;},
-    asc_putColorBg: function(v){this.bgClr = v;}
-}
-
-//{ asc_CFillHatch export
-window["Asc"].asc_CFillHatch = asc_CFillHatch;
-window["Asc"]["asc_CFillHatch"] = asc_CFillHatch;
-prot = asc_CFillHatch.prototype;
-
-prot["asc_getPatternType"] = prot.asc_getPatternType;
-prot["asc_putPatternType"] = prot.asc_putPatternType;
-
-prot["asc_getColorFg"] = prot.asc_getColorFg;
-prot["asc_putColorFg"] = prot.asc_putColorFg;
-
-prot["asc_getColorBg"] = prot.asc_getColorBg;
-prot["asc_putColorBg"] = prot.asc_putColorBg;
-//}
-
-function asc_CFillGrad() {
-    this.Colors = undefined;
-    this.Positions = undefined;
-    this.GradType = 0;
-
-    this.LinearAngle = undefined;
-    this.LinearScale = true;
-
-    this.PathType = 0;
-}
-
-asc_CFillGrad.prototype = {
-    asc_getColors: function(){return this.Colors;},
-    asc_putColors: function(v){this.Colors = v;},
-    asc_getPositions: function(){return this.Positions;},
-    asc_putPositions: function(v){this.Positions = v;},
-    asc_getGradType: function(){return this.GradType;},
-    asc_putGradType: function(v){this.GradType = v;},
-    asc_getLinearAngle: function(){return this.LinearAngle;},
-    asc_putLinearAngle: function(v){this.LinearAngle = v;},
-    asc_getLinearScale: function(){return this.LinearScale;},
-    asc_putLinearScale: function(v){this.LinearScale = v;},
-    asc_getPathType: function(){return this.PathType;},
-    asc_putPathType: function(v){this.PathType = v;}
-}
-
-//{ asc_CFillGrad export
-window["Asc"].asc_CFillGrad = asc_CFillGrad;
-window["Asc"]["asc_CFillGrad"] = asc_CFillGrad;
-prot = asc_CFillGrad.prototype;
-
-prot["asc_getColors"] = prot.asc_getColors;
-prot["asc_putColors"] = prot.asc_putColors;
-prot["asc_getPositions"] = prot.asc_getPositions;
-prot["asc_putPositions"] = prot.asc_putPositions;
-prot["asc_getGradType"] = prot.asc_getGradType;
-prot["asc_putGradType"] = prot.asc_putGradType;
-prot["asc_getLinearAngle"] = prot.asc_getLinearAngle;
-prot["asc_putLinearAngle"] = prot.asc_putLinearAngle;
-prot["asc_getLinearScale"] = prot.asc_getLinearScale;
-prot["asc_putLinearScale"] = prot.asc_putLinearScale;
-prot["asc_getPathType"] = prot.asc_getPathType;
-prot["asc_putPathType"] = prot.asc_putPathType;
-//}
-
-function asc_CFillSolid() {
-    this.color = new CAscColor();
-}
-
-asc_CFillSolid.prototype = {
-    asc_getColor: function() { return this.color },
-    asc_putColor: function(v) { this.color = v; }
-}
-
-//{ asc_CFillSolid export
-window["Asc"].asc_CFillSolid = asc_CFillSolid;
-window["Asc"]["asc_CFillSolid"] = asc_CFillSolid;
-var prot = asc_CFillSolid.prototype;
-
-prot["asc_getColor"] = prot.asc_getColor;
-prot["asc_putColor"] = prot.asc_putColor;
-//}
-
-function CreateAscFillEx(unifill) {
-    if (null == unifill || null == unifill.fill)
-        return new asc_CShapeFill();
-
-    var ret = new asc_CShapeFill();
-
-    var _fill = unifill.fill;
-    switch (_fill.type)
-    {
-        case FILL_TYPE_SOLID:
-        {
-            ret.type = c_oAscFill.FILL_TYPE_SOLID;
-            ret.fill = new asc_CFillSolid();
-            ret.fill.color = CreateAscColorEx(_fill.color);
-            break;
-        }
-        case FILL_TYPE_PATT:
-        {
-            ret.type = c_oAscFill.FILL_TYPE_PATT;
-            ret.fill = new asc_CFillHatch();
-            ret.fill.PatternType = _fill.ftype;
-            ret.fill.fgClr = CreateAscColorEx(_fill.fgClr);
-            ret.fill.bgClr = CreateAscColorEx(_fill.bgClr);
-            break;
-        }
-        case FILL_TYPE_GRAD:
-        {
-            ret.type = c_oAscFill.FILL_TYPE_GRAD;
-            ret.fill = new asc_CFillGrad();
-
-            for (var i = 0; i < _fill.colors.length; i++)
-            {
-                if (0 == i)
-                {
-                    ret.fill.Colors = [];
-                    ret.fill.Positions = [];
-                }
-
-                ret.fill.Colors.push(CreateAscColorEx(_fill.colors[i].color));
-                ret.fill.Positions.push(_fill.colors[i].pos);
-            }
-
-            if (_fill.lin)
-            {
-                ret.fill.GradType = c_oAscFillGradType.GRAD_LINEAR;
-                ret.fill.LinearAngle = _fill.lin.angle;
-                ret.fill.LinearScale = _fill.lin.scale;
-            }
-            else
-            {
-                ret.fill.GradType = c_oAscFillGradType.GRAD_PATH;
-                ret.fill.PathType = 0;
-            }
-
-            break;
-        }
-        case FILL_TYPE_BLIP:
-        {
-            ret.type = c_oAscFill.FILL_TYPE_BLIP;
-            ret.fill = new asc_CFillBlip();
-
-            ret.fill.url = _fill.RasterImageId;
-            ret.fill.type = (_fill.tile == null) ? c_oAscFillBlipType.STRETCH : c_oAscFillBlipType.TILE;
-            break;
-        }
-
-        case FILL_TYPE_NOFILL:
-        case FILL_TYPE_NONE:
-        {
-            ret.type = c_oAscFill.FILL_TYPE_NOFILL;
-            break;
-        }
-        default:
-            break;
-    }
-
-    ret.transparent = unifill.transparent;
-    return ret;
-}
-
-function asc_CStroke() {
-    this.type = null;
-    this.width = null;
-    this.color = null;
-
-    this.LineJoin = null;
-    this.LineCap = null;
-
-    this.LineBeginStyle = null;
-    this.LineBeginSize = null;
-
-    this.LineEndStyle = null;
-    this.LineEndSize = null;
-
-    this.canChangeArrows = false;
-}
-
-asc_CStroke.prototype = {
-    asc_getType: function(){return this.type;},
-    asc_putType: function(v){this.type = v;},
-    asc_getWidth: function(){return this.width;},
-    asc_putWidth: function(v){this.width = v;},
-    asc_getColor: function(){return this.color;},
-    asc_putColor: function(v){this.color = v;},
-
-    asc_getLinejoin: function(){return this.LineJoin;},
-    asc_putLinejoin: function(v){this.LineJoin = v;},
-    asc_getLinecap: function(){return this.LineCap;},
-    asc_putLinecap: function(v){this.LineCap = v;},
-
-    asc_getLinebeginstyle: function(){return this.LineBeginStyle;},
-    asc_putLinebeginstyle: function(v){this.LineBeginStyle = v;},
-    asc_getLinebeginsize: function(){return this.LineBeginSize;},
-    asc_putLinebeginsize: function(v){this.LineBeginSize = v;},
-    asc_getLineendstyle: function(){return this.LineEndStyle;},
-    asc_putLineendstyle: function(v){this.LineEndStyle = v;},
-    asc_getLineendsize: function(){return this.LineEndSize;},
-    asc_putLineendsize: function(v){this.LineEndSize = v;},
-
-    asc_getCanChangeArrows: function(){return this.canChangeArrows;}
-}
-
-//{ asc_CStroke export
-window["Asc"].asc_CStroke = asc_CStroke;
-window["Asc"]["asc_CStroke"] = asc_CStroke;
-prot = asc_CStroke.prototype;
-
-prot["asc_getType"] = prot.asc_getType;
-prot["asc_putType"] = prot.asc_putType;
-prot["asc_getWidth"] = prot.asc_getWidth;
-prot["asc_putWidth"] = prot.asc_putWidth;
-prot["asc_getColor"] = prot.asc_getColor;
-prot["asc_putColor"] = prot.asc_putColor;
-
-prot["asc_getLinejoin"] = prot.asc_getLinejoin;
-prot["asc_putLinejoin"] = prot.asc_putLinejoin;
-prot["asc_getLinecap"] = prot.asc_getLinecap;
-prot["asc_putLinecap"] = prot.asc_putLinecap;
-
-prot["asc_getLinebeginstyle"] = prot.asc_getLinebeginstyle;
-prot["asc_putLinebeginstyle"] = prot.asc_putLinebeginstyle;
-prot["asc_getLinebeginsize"] = prot.asc_getLinebeginsize;
-prot["asc_putLinebeginsize"] = prot.asc_putLinebeginsize;
-prot["asc_getLineendstyle"] = prot.asc_getLineendstyle;
-prot["asc_putLineendstyle"] = prot.asc_putLineendstyle;
-prot["asc_getLineendsize"] = prot.asc_getLineendsize;
-prot["asc_putLineendsize"] = prot.asc_putLineendsize;
-
-prot["asc_getCanChangeArrows"] = prot.asc_getCanChangeArrows;
-//}
-
-function CreateAscStrokeEx(ln, _canChangeArrows) {
-    if (null == ln || null == ln.Fill || ln.Fill.fill == null)
-        return new asc_CStroke();
-
-    var ret = new asc_CStroke();
-
-    var _fill = ln.Fill.fill;
-    if(_fill != null)
-    {
-        switch (_fill.type)
-        {
-            case FILL_TYPE_BLIP:
-            {
-                break;
-            }
-            case FILL_TYPE_SOLID:
-            {
-                ret.color = CreateAscColorEx(_fill.color);
-                ret.type = c_oAscStrokeType.STROKE_COLOR;
-                break;
-            }
-            case FILL_TYPE_GRAD:
-            {
-                var _c = _fill.colors;
-                if (_c != 0)
-                {
-                    ret.color = CreateAscColorEx(_fill.colors[0]);
-                    ret.type = c_oAscStrokeType.STROKE_COLOR;
-                }
-
-                break;
-            }
-            case FILL_TYPE_PATT:
-            {
-                ret.color = CreateAscColorEx(_fill.fgClr);
-                ret.type = c_oAscStrokeType.STROKE_COLOR;
-                break;
-            }
-            case FILL_TYPE_NOFILL:
-            {
-                ret.color = null;
-                ret.type = c_oAscStrokeType.STROKE_NONE;
-                break;
-            }
-            default:
-            {
-                break;
-            }
-        }
-    }
-
-
-    ret.width = (ln.w == null) ? 12700 : (ln.w >> 0);
-    ret.width /= 36000.0;
-
-    if (ln.cap != null)
-        ret.asc_putLinecap(ln.cap);
-
-    if (ln.Join != null)
-        ret.asc_putLinejoin(ln.Join.type);
-
-    if (ln.headEnd != null)
-    {
-        ret.asc_putLinebeginstyle((ln.headEnd.type == null) ? LineEndType.None : ln.headEnd.type);
-
-        var _len = (null == ln.headEnd.len) ? 1 : (2 - ln.headEnd.len);
-        var _w = (null == ln.headEnd.w) ? 1 : (2 - ln.headEnd.w);
-
-        ret.asc_putLinebeginsize(_w * 3 + _len);
-    }
-    else
-    {
-        ret.asc_putLinebeginstyle(LineEndType.None);
-    }
-
-    if (ln.tailEnd != null)
-    {
-        ret.asc_putLineendstyle((ln.tailEnd.type == null) ? LineEndType.None : ln.tailEnd.type);
-
-        var _len = (null == ln.tailEnd.len) ? 1 : (2 - ln.tailEnd.len);
-        var _w = (null == ln.tailEnd.w) ? 1 : (2 - ln.tailEnd.w);
-
-        ret.asc_putLineendsize(_w * 3 + _len);
-    }
-    else
-    {
-        ret.asc_putLineendstyle(LineEndType.None);
-    }
-
-    if (true === _canChangeArrows)
-        ret.canChangeArrows = true;
-
-    return ret;
-}
 
 function CreateImageDrawingObject(imageUrl, options, drawingObjects) {
 

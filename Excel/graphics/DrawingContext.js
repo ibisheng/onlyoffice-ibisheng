@@ -48,7 +48,7 @@
 			}
 			if(bTheme)
 			{
-				oRes = new CAscColor();
+				oRes = new asc_CColor();
 				oRes.r = r;
 				oRes.g = g;
 				oRes.b = b;

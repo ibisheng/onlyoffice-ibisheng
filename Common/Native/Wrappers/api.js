@@ -262,7 +262,7 @@ function asc_menu_WriteFontFamily(_type, _family, _stream)
 // ASCCOLOR
 function asc_menu_ReadColor(_params, _cursor)
 {
-    var _color = new CAscColor();
+    var _color = new asc_CColor();
     var _continue = true;
     while (_continue)
     {
@@ -550,7 +550,7 @@ function asc_menu_WriteParaSpacing(_type, _spacing, _stream)
 // PARAASCBORDER
 function asc_menu_ReadParaBorder(_params, _cursor)
 {
-    var _border = new CBorder();
+    var _border = new asc_CTextBorder();
     var _continue = true;
     while (_continue)
     {
@@ -618,7 +618,7 @@ function asc_menu_WriteParaBorder(_type, _border, _stream)
 // PARAASCBORDERS
 function asc_menu_ReadParaBorders(_params, _cursor)
 {
-    var _border = new CParagraphBorders();
+    var _border = new asc_CParagraph();
     var _continue = true;
     while (_continue)
     {
@@ -679,7 +679,7 @@ function asc_menu_WriteParaBorders(_type, _borders, _stream)
 // PARASHD
 function asc_menu_ReadParaShd(_params, _cursor)
 {
-    var _shd = new CParagraphShd();
+    var _shd = new asc_CParagraphShd();
     var _continue = true;
     while (_continue)
     {
@@ -727,7 +727,7 @@ function asc_menu_WriteParaShd(_type, _shd, _stream)
 // PARALISTTYPE
 function asc_menu_ReadParaListType(_params, _cursor)
 {
-    var _list = new CListType();
+    var _list = new asc_CListType();
     var _continue = true;
     while (_continue)
     {
@@ -778,13 +778,13 @@ function asc_menu_WriteParaListType(_type, _list, _stream)
 // PARATABS
 function asc_menu_ReadParaTabs(_params, _cursor)
 {
-    var _tabs = new CParagraphTabs();
+    var _tabs = new asc_CParagraphTabs();
 
     var _count = _params[_cursor.pos++];
 
     for (var i = 0; i < _count; i++)
     {
-        var _tab = new CParagraphTab();
+        var _tab = new asc_CParagraphTab();
         var _continue = true;
         while (_continue)
         {
@@ -843,7 +843,7 @@ function asc_menu_WriteParaTabs(_type, _tabs, _stream)
 // ASCPARARGAPHFRAME
 function asc_menu_ReadParaFrame(_params, _cursor)
 {
-    var _frame = new CParagraphFrame();
+    var _frame = new asc_CParagraphFrame();
     var _continue = true;
     while (_continue)
     {
@@ -1605,7 +1605,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
         }
         case 9 : // ASC_MENU_EVENT_TYPE_IMAGE
         {
-            var _imagePr = new CImgProperty();
+            var _imagePr = new asc_CImgProperty();
             while (_continue)
             {
                 var _attr = _params[_current.pos++];
@@ -2225,7 +2225,7 @@ function asc_menu_WriteParagraphPr(_paraPr, _stream)
 ///////////////////////////////////////////////////////////////////////////
 function asc_menu_ReadPaddings(_params, _cursor)
 {
-    var _paddings = new CPaddings();
+    var _paddings = new asc_CPaddings();
     var _continue = true;
     while (_continue)
     {
@@ -3300,7 +3300,7 @@ function asc_menu_WriteChartPr(_type, _chartPr, _stream)
 
 function asc_menu_ReadAscFill_solid(_params, _cursor)
 {
-    var _fill = new CAscFillSolid();
+    var _fill = new asc_CFillSolid();
 
     var _continue = true;
     while (_continue)
@@ -3337,7 +3337,7 @@ function asc_menu_WriteAscFill_solid(_type, _fill, _stream)
 };
 function asc_menu_ReadAscFill_patt(_params, _cursor)
 {
-    var _fill = new CAscFillHatch();
+    var _fill = new asc_CFillHatch();
 
     var _continue = true;
     while (_continue)
@@ -3391,7 +3391,7 @@ function asc_menu_WriteAscFill_patt(_type, _fill, _stream)
 };
 function asc_menu_ReadAscFill_grad(_params, _cursor)
 {
-    var _fill = new CAscFillGrad();
+    var _fill = new asc_CFillGrad();
 
     var _continue = true;
     while (_continue)
@@ -3529,7 +3529,7 @@ function asc_menu_WriteAscFill_grad(_type, _fill, _stream)
 };
 function asc_menu_ReadAscFill_blip(_params, _cursor)
 {
-    var _fill = new CAscFillBlip();
+    var _fill = new asc_CFillBlip();
 
     var _continue = true;
     while (_continue)
@@ -3593,7 +3593,7 @@ function asc_menu_WriteAscFill_blip(_type, _fill, _stream)
 
 function asc_menu_ReadAscFill(_params, _cursor)
 {
-    var _fill = new CAscFill();
+    var _fill = new asc_CShapeFill();
 
     //_fill.type = c_oAscFill.FILL_TYPE_NOFILL;
     var _continue = true;
@@ -3706,7 +3706,7 @@ function asc_menu_WriteAscFill(_type, _fill, _stream)
 
 function asc_menu_ReadAscStroke(_params, _cursor)
 {
-    var _stroke = new CAscStroke();
+    var _stroke = new asc_CStroke();
 
     var _continue = true;
     while (_continue)
@@ -3838,7 +3838,7 @@ function asc_menu_WriteAscStroke(_type, _stroke, _stream)
 
 function asc_menu_ReadShapePr(_params, _cursor)
 {
-    var _settings = new CAscShapeProp();
+    var _settings = new asc_CShapeProperty();
 
     var _continue = true;
     while (_continue)
@@ -4295,7 +4295,7 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
         }
     }
 
-    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.Paragraph, ParaPr );
+    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject ( c_oAscTypeSelectElement.Paragraph, ParaPr );
 };
 
 asc_docs_api.prototype.put_PageNum = function(where,align)

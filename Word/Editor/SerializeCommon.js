@@ -441,7 +441,7 @@ function CPPTXContentLoader()
                 }
                 case 1:
                 {
-                    var unifill = this.Reader.ReadUniFill();
+                    var unifill = this.Reader.ReadUniFill(null, pic, null);
                     pic.setBlipFill(unifill.fill);//this.Reader.ReadUniFill();
 
                     //pic.spPr.Fill = new CUniFill();
@@ -622,7 +622,7 @@ function CPPTXContentLoader()
                 }
                 case 2:
                 {
-                    spPr.setFill(this.Reader.ReadUniFill());
+                    spPr.setFill(this.Reader.ReadUniFill(spPr, null, null));
                     break;
                 }
                 case 3:

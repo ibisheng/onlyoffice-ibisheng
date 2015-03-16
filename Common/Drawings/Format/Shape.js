@@ -769,7 +769,7 @@ CShape.prototype =
         }
         if(body_pr)
         {
-            paddings = new CPaddings();
+            paddings = new asc_CPaddings();
             if (typeof body_pr.lIns === "number")
                 paddings.Left = body_pr.lIns;
             else

@@ -26,7 +26,6 @@ var Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
 var Y_Top_Field    = Y_Top_Margin;
 
 var docpostype_Content     = 0x00;
-var docpostype_FlowObjects = 0x01;
 var docpostype_HdrFtr      = 0x02;
 
 var selectionflag_Common        = 0x00;

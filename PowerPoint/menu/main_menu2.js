@@ -1703,18 +1703,18 @@ $(".colorWatch").mouseover(function(){
 		 window.parent.postMessage(JSON.stringify(arguments[0]),"*");
 	})
 	$("#imgApply").click(function(){
-		var oImgProp = new CImgProperty();
-		oImgProp.put_Width( parseFloat($("#imgW").val()) );
-		oImgProp.put_Height( parseFloat($("#imgH").val()) );
-		oImgProp.put_WrappingStyle( document.getElementById("imgWrapStyleInline").checked? c_oAscWrapStyle.Inline: (document.getElementById("imgWrapStyleFlow").checked? c_oAscWrapStyle.Flow: null) );
+		var oImgProp = new asc_CImgProperty();
+		oImgProp.asc_putWidth( parseFloat($("#imgW").val()) );
+		oImgProp.asc_putHeight( parseFloat($("#imgH").val()) );
+		oImgProp.asc_putWrappingStyle( document.getElementById("imgWrapStyleInline").checked? c_oAscWrapStyle.Inline: (document.getElementById("imgWrapStyleFlow").checked? c_oAscWrapStyle.Flow: null) );
 		
-		var oPaddings = new CPaddings();
-		oPaddings.put_Left( ($("#imgLeft").val()!="")?parseFloat($("#imgLeft").val()):null );
-		oPaddings.put_Top( ($("#imgTop").val()!="")?parseFloat($("#imgTop").val()):null );
-		oPaddings.put_Right( ($("#imgRight").val()!="")?parseFloat($("#imgRight").val()):null );
-		oPaddings.put_Bottom( ($("#imgBottom").val()!="")?parseFloat($("#imgBottom").val()):null );
+		var oPaddings = new asc_CPaddings();
+		oPaddings.asc_putLeft( ($("#imgLeft").val()!="")?parseFloat($("#imgLeft").val()):null );
+		oPaddings.asc_putTop( ($("#imgTop").val()!="")?parseFloat($("#imgTop").val()):null );
+		oPaddings.asc_putRight( ($("#imgRight").val()!="")?parseFloat($("#imgRight").val()):null );
+		oPaddings.asc_putBottom( ($("#imgBottom").val()!="")?parseFloat($("#imgBottom").val()):null );
 		
-		oImgProp.put_Paddings( oPaddings );
+		oImgProp.asc_putPaddings( oPaddings );
 		
 		var oPos = new CPosition();
 		oPos.put_X( ($("#imgX").val()!="")?parseFloat($("#imgX").val()):null );

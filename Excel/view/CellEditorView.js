@@ -1678,7 +1678,7 @@
 			result.strikeout = tmp.s;
 			result.subscript = tmp.va === "subscript";
 			result.superscript = tmp.va === "superscript";
-			result.color = (tmp.c ? asc.colorObjToAscColor(tmp.c) : new CAscColor(this.options.textColor));
+			result.color = (tmp.c ? asc.colorObjToAscColor(tmp.c) : new asc_CColor(this.options.textColor));
 
 			this.handlers.trigger("updateEditorSelectionInfo", result);
 		};

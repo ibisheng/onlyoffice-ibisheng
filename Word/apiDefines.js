@@ -69,14 +69,7 @@ var c_oAscError = {
 	}
 };
 
-var align_Right   = 0;
-var align_Left    = 1;
-var align_Center  = 2;
-var align_Justify = 3;
 
-var vertalign_Baseline    = 0;
-var vertalign_SuperScript = 1;
-var vertalign_SubScript   = 2;
 var hdrftr_Header = 0x01;
 var hdrftr_Footer = 0x02;
 
@@ -87,12 +80,6 @@ var c_oAscTableSelectionType = {
     Table  : 3
 };
 
-var linerule_AtLeast = 0;
-var linerule_Auto    = 1;
-var linerule_Exact   = 2;
-
-var shd_Clear = 0;
-var shd_Nil   = 1;
 
 var c_oAscContextMenuTypes = {
     Common       : 0, // Обычное контекстное меню

@@ -66,6 +66,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.chartEditor = undefined;
 			this.documentOpenOptions = undefined;		// Опции при открытии (пока только опции для CSV)
 			this.documentCallbackUrl = undefined;		// Ссылка для отправления информации о документе
+            this.documentOrigin = "";
 			this.DocInfo = null;
 
 			// объекты, нужные для отправки в тулбар (шрифты, стили)
@@ -466,6 +467,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.User.asc_setId(this.DocInfo["UserId"]);
 				this.User.asc_setUserName(this.DocInfo["UserName"]);
 			}
+
+            var sProtocol = window.location.protocol;
+            var sHost = window.location.host;
+            this.documentOrigin = "";
+            if(sProtocol && "" != sProtocol)
+                this.documentOrigin = sProtocol + "//" + sHost;
+            else
+                this.documentOrigin = sHost;
 
 			if (this.DocInfo["OfflineApp"] && (true == this.DocInfo["OfflineApp"])) {
 				this.isCoAuthoringEnable = false;
@@ -2923,7 +2932,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellTextColor )
 				ws.objectRender.controller.setCellTextColor(color);
 			else {
-				if (color instanceof CAscColor) {
+				if (color instanceof asc_CColor) {
 					color = CorrectAscColor(color);
 					this.wb.setFontAttributes("c", color);
 					this.wb.restoreFocus();
@@ -2938,7 +2947,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				ws.objectRender.controller.setCellBackgroundColor(color);
 			else
 			{
-				if(color instanceof CAscColor || null == color)
+				if(color instanceof asc_CColor || null == color)
 				{
 					if(null != color)
 						color = CorrectAscColor(color);

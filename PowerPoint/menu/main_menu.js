@@ -350,28 +350,28 @@ $(document).ready(function(){
     $("#td_bringToFront").click(
         function()
         {
-            editor.ImgApply(new CImgProperty({ChangeLevel:c_oAscChangeLevel.BringToFront}));
+            editor.ImgApply(new asc_CImgProperty({ChangeLevel:c_oAscChangeLevel.BringToFront}));
         }
     );
 
     $("#td_bringToForward").click(
         function()
         {
-            editor.ImgApply(new CImgProperty({ChangeLevel:c_oAscChangeLevel.BringForward}));
+            editor.ImgApply(new asc_CImgProperty({ChangeLevel:c_oAscChangeLevel.BringForward}));
         }
     );
 
     $("#td_sendToBack").click(
         function()
         {
-            editor.ImgApply(new CImgProperty({ChangeLevel:c_oAscChangeLevel.SendToBack}));
+            editor.ImgApply(new asc_CImgProperty({ChangeLevel:c_oAscChangeLevel.SendToBack}));
         }
     );
 
     $("#td_bringToBackward").click(
         function()
         {
-            editor.ImgApply(new CImgProperty({ChangeLevel:c_oAscChangeLevel.BringBackward}));
+            editor.ImgApply(new asc_CImgProperty({ChangeLevel:c_oAscChangeLevel.BringBackward}));
         }
     );
 
@@ -2162,18 +2162,18 @@ $(document).ready(function(){
 
         $("#imgApply").click(function()
         {
-            var oImgProp = new CImgProperty();
-            oImgProp.put_Width( parseFloat($("#imgW").val()) );
-            oImgProp.put_Height( parseFloat($("#imgH").val()) );
-            oImgProp.put_WrappingStyle( g_nImageWrap );
+            var oImgProp = new asc_CImgProperty();
+            oImgProp.asc_putWidth( parseFloat($("#imgW").val()) );
+            oImgProp.asc_putHeight( parseFloat($("#imgH").val()) );
+            oImgProp.asc_putWrappingStyle( g_nImageWrap );
 
-            var oPaddings = new CPaddings();
-            oPaddings.put_Left( ($("#imgLeft").val()!="")?parseFloat($("#imgLeft").val()):null );
-            oPaddings.put_Top( ($("#imgTop").val()!="")?parseFloat($("#imgTop").val()):null );
-            oPaddings.put_Right( ($("#imgRight").val()!="")?parseFloat($("#imgRight").val()):null );
-            oPaddings.put_Bottom( ($("#imgBottom").val()!="")?parseFloat($("#imgBottom").val()):null );
+            var oPaddings = new asc_CPaddings();
+            oPaddings.asc_putLeft( ($("#imgLeft").val()!="")?parseFloat($("#imgLeft").val()):null );
+            oPaddings.asc_putTop( ($("#imgTop").val()!="")?parseFloat($("#imgTop").val()):null );
+            oPaddings.asc_putRight( ($("#imgRight").val()!="")?parseFloat($("#imgRight").val()):null );
+            oPaddings.asc_putBottom( ($("#imgBottom").val()!="")?parseFloat($("#imgBottom").val()):null );
 
-            oImgProp.put_Paddings( oPaddings );
+            oImgProp.asc_putPaddings( oPaddings );
 
             if ( g_nImageWrap != c_oAscWrapStyle2.Inline )
             {

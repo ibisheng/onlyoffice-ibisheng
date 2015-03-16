@@ -678,9 +678,9 @@ asc_docs_api.prototype.sync_ChangeLastSelectedElement = function(type, obj)
 			
 	switch( type )
 	{
-		case c_oAscTypeSelectElement.Paragraph: oUnkTypeObj = new CParagraphProp( obj );
+		case c_oAscTypeSelectElement.Paragraph: oUnkTypeObj = new asc_CParagraphProperty( obj );
 			break;
-		case c_oAscTypeSelectElement.Image: oUnkTypeObj = new CImgProperty( obj );
+		case c_oAscTypeSelectElement.Image: oUnkTypeObj = new asc_CImgProperty( obj );
 			break;
 		case c_oAscTypeSelectElement.Table: oUnkTypeObj = new CTableProp( obj );
 			break;
@@ -704,7 +704,7 @@ asc_docs_api.prototype.sync_ChangeLastSelectedElement = function(type, obj)
 
     if (!bIsFound)
     {
-        this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( type, oUnkTypeObj );
+        this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject ( type, oUnkTypeObj );
     }
 };
 
@@ -1075,21 +1075,21 @@ asc_docs_api.prototype.OfflineAppDocumentEndLoad = function()
 	OnUnderline, 
 	OnTextPrBaseline(возвращается расположение строки - supstring, superstring, baseline), 
 	OnPrAlign(выравнивание по ширине, правому краю, левому краю, по центру), 
-	OnListType( возвращается CListType )
+	OnListType( возвращается asc_CListType )
 
 	фейк-функции ожидающие TODO:
 	Print,Undo,Redo,Copy,Cut,Paste,Share,Save,Download & callbacks
 	OnFontName, OnFontSize, OnLineSpacing
 
-	OnFocusObject( возвращается массив CSelectedObject )
+	OnFocusObject( возвращается массив asc_CSelectedObject )
 	OnInitEditorStyles( возвращается CStylesPainter )
 	OnSearchFound( возвращается CSearchResult );
-	OnParaSpacingLine( возвращается CParagraphSpacing ) 
+	OnParaSpacingLine( возвращается asc_CParagraphSpacing )
 	OnLineSpacing( не используется? )
 	OnTextColor( возвращается CColor )
 	OnTextHightLight( возвращается CColor )
 	OnInitEditorFonts( возвращается массив объектов СFont )
-	OnFontFamily( возвращается CTextFontFamily )
+	OnFontFamily( возвращается asc_CTextFontFamily )
 */
 var _callbacks = {};
 
@@ -1158,7 +1158,7 @@ asc_docs_api.prototype.get_PropertyStandartTextures = function()
     var arr = new Array(_count);
     for (var i = 0; i < _count; ++i)
     {
-        arr[i] = new CAscTexture();
+        arr[i] = new asc_CTexture();
         arr[i].Id = i;
         arr[i].Image = g_oUserTexturePresets[i];
     }
@@ -1813,13 +1813,13 @@ asc_docs_api.prototype.sync_StrikeoutCallBack = function(isStrikeout){
 	this.asc_fireCallback("asc_onStrikeout",isStrikeout);
 }
 asc_docs_api.prototype.sync_TextPrFontFamilyCallBack = function(FontFamily){
-	this.asc_fireCallback("asc_onFontFamily", new CTextFontFamily( FontFamily ));
+	this.asc_fireCallback("asc_onFontFamily", new asc_CTextFontFamily( FontFamily ));
 }	
 asc_docs_api.prototype.sync_TextPrFontSizeCallBack = function(FontSize){
-	this.asc_fireCallback("asc_onFontSize",FontSize);
+	this.asc_fireCallback("asc_onFontSize", FontSize);
 }	
 asc_docs_api.prototype.sync_PrLineSpacingCallBack = function(LineSpacing){
-	this.asc_fireCallback("asc_onLineSpacing", new CParagraphSpacing( LineSpacing ) );
+	this.asc_fireCallback("asc_onLineSpacing", new asc_CParagraphSpacing ( LineSpacing ) );
 }
 
 
@@ -2079,7 +2079,7 @@ asc_docs_api.prototype.ShapeApply = function(prop)
         if(0 == image_url.indexOf(sFindString))
         {
             image_url = image_url.substring(sFindString.length);
-            prop.fill.fill.put_url(image_url); // erase documentUrl
+            prop.fill.fill.asc_putUrl(image_url); // erase documentUrl
         }
 
         if (null != _image)
@@ -2358,7 +2358,7 @@ asc_docs_api.prototype.sync_PrAlignCallBack = function(value){
 	this.asc_fireCallback("asc_onPrAlign",value);
 }
 asc_docs_api.prototype.sync_ListType = function(NumPr){
-	this.asc_fireCallback("asc_onListType", new CListType( NumPr ) );
+	this.asc_fireCallback("asc_onListType", new asc_CListType( NumPr ) );
 }
 asc_docs_api.prototype.sync_TextColor = function(Color){
 	this.asc_fireCallback("asc_onTextColor", new CColor( Color.r, Color.g, Color.b ));
@@ -2372,27 +2372,27 @@ asc_docs_api.prototype.sync_TextColor2 = function(unifill)
     {
         _color = unifill.getRGBAColor();
         var color = CreateAscColor(unifill.fill.color);
-        color.put_r(_color.R);
-        color.put_g(_color.G);
-        color.put_b(_color.B);
+        color.asc_putR(_color.R);
+        color.asc_putG(_color.G);
+        color.asc_putB(_color.B);
         this.asc_fireCallback("asc_onTextColor", color);
     }
     else if (unifill.fill.type == FILL_TYPE_GRAD)
     {
         _color = unifill.getRGBAColor();
         var color = CreateAscColor(unifill.fill.colors[0].color);
-        color.put_r(_color.R);
-        color.put_g(_color.G);
-        color.put_b(_color.B);
+        color.asc_putR(_color.R);
+        color.asc_putG(_color.G);
+        color.asc_putB(_color.B);
         this.asc_fireCallback("asc_onTextColor", color);
     }
     else
     {
         _color = unifill.getRGBAColor();
-        var color = new CAscColor();
-        color.put_r(_color.R);
-        color.put_g(_color.G);
-        color.put_b(_color.B);
+        var color = new asc_CColor();
+        color.asc_putR(_color.R);
+        color.asc_putG(_color.G);
+        color.asc_putB(_color.B);
         this.asc_fireCallback("asc_onTextColor", color);
     }
 }
@@ -2403,7 +2403,7 @@ asc_docs_api.prototype.sync_ParaStyleName = function(Name){
 	this.asc_fireCallback("asc_onParaStyleName",Name);
 }
 asc_docs_api.prototype.sync_ParaSpacingLine = function(SpacingLine){
-	this.asc_fireCallback("asc_onParaSpacingLine", new CParagraphSpacing( SpacingLine ));
+	this.asc_fireCallback("asc_onParaSpacingLine", new asc_CParagraphSpacing ( SpacingLine ));
 }
 asc_docs_api.prototype.sync_PageBreakCallback = function(isBreak){
 	this.asc_fireCallback("asc_onPageBreak",isBreak);
@@ -2423,12 +2423,12 @@ asc_docs_api.prototype.sync_PrPropCallback = function(prProp){
     {
         if (this.SelectedObjectsStack[_len - 1].Type == c_oAscTypeSelectElement.Paragraph)
         {
-            this.SelectedObjectsStack[_len - 1].Value = new CParagraphProp( prProp );
+            this.SelectedObjectsStack[_len - 1].Value = new asc_CParagraphProperty( prProp );
             return;
         }
     }
 
-    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.Paragraph, new CParagraphProp( prProp ) );
+    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject( c_oAscTypeSelectElement.Paragraph, new asc_CParagraphProperty( prProp ) );
 }
 
 asc_docs_api.prototype.SetDrawImagePlaceParagraph = function(element_id, props)
@@ -2529,7 +2529,7 @@ asc_docs_api.prototype.sync_PageOrientCallback = function(isPortrait){
 	this.asc_fireCallback("asc_onPageOrient",isPortrait);
 }
 asc_docs_api.prototype.sync_HeadersAndFootersPropCallback = function(hafProp){
-    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.Header, new CHeaderProp( hafProp ) );
+    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject( c_oAscTypeSelectElement.Header, new CHeaderProp( hafProp ) );
 }
 
 /*----------------------------------------------------------------*/
@@ -2901,7 +2901,7 @@ asc_docs_api.prototype.sync_AlignCellCallback = function(align){
 	this.asc_fireCallback("asc_onAlignCell",align);
 }	
 asc_docs_api.prototype.sync_TblPropCallback = function(tblProp){
-    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.Table, new CTableProp( tblProp ));
+    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject( c_oAscTypeSelectElement.Table, new CTableProp( tblProp ));
 }
 asc_docs_api.prototype.sync_TblWrapStyleChangedCallback = function(style){
 	this.asc_fireCallback("asc_onTblWrapStyleChanged",style);
@@ -3035,27 +3035,27 @@ asc_docs_api.prototype.AddImageUrlAction = function(url){
         var src = _image.src;
         if (this.isShapeImageChangeUrl)
         {
-            var AscShapeProp = new CAscShapeProp();
-            AscShapeProp.fill = new CAscFill();
+            var AscShapeProp = new asc_CShapeProperty();
+            AscShapeProp.fill = new asc_CShapeFill();
             AscShapeProp.fill.type = c_oAscFill.FILL_TYPE_BLIP;
-            AscShapeProp.fill.fill = new CAscFillBlip();
-            AscShapeProp.fill.fill.put_url(src);
+            AscShapeProp.fill.fill = new asc_CFillBlip();
+            AscShapeProp.fill.fill.asc_putUrl(src);
             this.ShapeApply(AscShapeProp);
 			this.isShapeImageChangeUrl = false;
         }
         else if (this.isSlideImageChangeUrl)
         {
             var AscSlideProp = new CAscSlideProps();
-            AscSlideProp.Background = new CAscFill();
+            AscSlideProp.Background = new asc_CShapeFill();
             AscSlideProp.Background.type = c_oAscFill.FILL_TYPE_BLIP;
-            AscSlideProp.Background.fill = new CAscFillBlip();
-            AscSlideProp.Background.fill.put_url(src);
+            AscSlideProp.Background.fill = new asc_CFillBlip();
+            AscSlideProp.Background.fill.asc_putUrl(src);
             this.SetSlideProps(AscSlideProp);
             this.isSlideImageChangeUrl = false;
         }
         else if (this.isImageChangeUrl)
         {
-            var AscImageProp = new CImgProperty();
+            var AscImageProp = new asc_CImgProperty();
             AscImageProp.ImageUrl = src;
             this.ImgApply(AscImageProp);
             this.isImageChangeUrl = false;
@@ -3089,27 +3089,27 @@ asc_docs_api.prototype.AddImageUrlAction = function(url){
             //this.WordControl.m_oLogicDocument.Add_FlowImage(_w, _h, src);
             if (this.isShapeImageChangeUrl)
             {
-                var AscShapeProp = new CAscShapeProp();
-                AscShapeProp.fill = new CAscFill();
+                var AscShapeProp = new asc_CShapeProperty();
+                AscShapeProp.fill = new asc_CShapeFill();
                 AscShapeProp.fill.type = c_oAscFill.FILL_TYPE_BLIP;
-                AscShapeProp.fill.fill = new CAscFillBlip();
-                AscShapeProp.fill.fill.put_url(src);
+                AscShapeProp.fill.fill = new asc_CFillBlip();
+                AscShapeProp.fill.fill.asc_putUrl(src);
                 this.ShapeApply(AscShapeProp);
                 this.isShapeImageChangeUrl = false;
             }
             else if (this.isSlideImageChangeUrl)
             {
                 var AscSlideProp = new CAscSlideProps();
-                AscSlideProp.Background = new CAscFill();
+                AscSlideProp.Background = new asc_CShapeFill();
                 AscSlideProp.Background.type = c_oAscFill.FILL_TYPE_BLIP;
-                AscSlideProp.Background.fill = new CAscFillBlip();
-                AscSlideProp.Background.fill.put_url(src);
+                AscSlideProp.Background.fill = new asc_CFillBlip();
+                AscSlideProp.Background.fill.asc_putUrl(src);
                 this.SetSlideProps(AscSlideProp);
                 this.isSlideImageChangeUrl = false;
             }
             else if (this.isImageChangeUrl)
             {
-                var AscImageProp = new CImgProperty();
+                var AscImageProp = new asc_CImgProperty();
                 AscImageProp.ImageUrl = src;
                 this.ImgApply(AscImageProp);
                 this.isImageChangeUrl = false;
@@ -3129,8 +3129,8 @@ asc_docs_api.prototype.AddImageUrlAction = function(url){
 		}
 	}
 }
-/* В качестве параметра  передается объект класса CImgProperty, он же приходит на OnImgProp
-CImgProperty заменяет пережнюю структуру:
+/* В качестве параметра  передается объект класса asc_CImgProperty, он же приходит на OnImgProp
+ asc_CImgProperty заменяет пережнюю структуру:
 если параметр не имеет значения то передвать следует null, напримере inline-картинок: в качестве left,top,bottom,right,X,Y,ImageUrl необходимо передавать null.
 	{
 		Width: 0,
@@ -3240,7 +3240,7 @@ asc_docs_api.prototype.get_OriginalSizeImage = function(){
     if (obj == null)
         return null;
     if (obj.Type == c_oAscTypeSelectElement.Image)
-        return obj.Value.get_OriginSize(this);
+        return obj.Value.asc_getOriginSize(this);
 }
 /*callbacks*/
 asc_docs_api.prototype.sync_AddImageCallback = function(){
@@ -3255,9 +3255,9 @@ asc_docs_api.prototype.sync_ImgPropCallback = function(imgProp){
     }
     else
     {
-        objects = new CImgProperty(imgProp);
+        objects = new asc_CImgProperty(imgProp);
     }
-    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( type,  objects);
+    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject( type,  objects);
 }
 
 asc_docs_api.prototype.SetDrawingFreeze = function(bIsFreeze)
@@ -4329,7 +4329,7 @@ CHyperlinkProperty.prototype.put_Text    = function(v) { this.Text = v; }
 
 asc_docs_api.prototype.sync_HyperlinkPropCallback = function(hyperProp)
 {
-    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.Hyperlink, new CHyperlinkProperty( hyperProp ) );
+    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject( c_oAscTypeSelectElement.Hyperlink, new CHyperlinkProperty( hyperProp ) );
 }
 
 asc_docs_api.prototype.sync_HyperlinkClickCallback = function(Url)
@@ -4387,7 +4387,7 @@ asc_docs_api.prototype.sync_shapePropCallback = function(pr)
         }
     }
 
-    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.Shape, obj );
+    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject( c_oAscTypeSelectElement.Shape, obj );
 }
 
 asc_docs_api.prototype.sync_slidePropCallback = function(slide)
@@ -4404,7 +4404,7 @@ asc_docs_api.prototype.sync_slidePropCallback = function(slide)
 
     if(!bgFill)
     {
-        obj.Background = new CAscFill();
+        obj.Background = new asc_CShapeFill();
         obj.Background.type = c_oAscFill.FILL_TYPE_NOFILL;
 
         this.WordControl.m_oDrawingDocument.DrawImageTextureFillSlide(null);
@@ -4446,7 +4446,7 @@ asc_docs_api.prototype.sync_slidePropCallback = function(slide)
         }
     }
 
-    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.Slide, obj );
+    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject( c_oAscTypeSelectElement.Slide, obj );
 }
 
 asc_docs_api.prototype.ExitHeader_Footer = function(pageNumber)

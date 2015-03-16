@@ -2,7 +2,7 @@
 	var  IsVisibleMenu = false, elem, contextGrad, gradient, gradSelectPosTop = 1, colorSelecterClick, newColorSelected={r:255,g:0,b:0},lastColorSelected={r:255,g:0,b:0};
 	var autoFilterObj;
 	var g_sheetViewSettings = null;
-	var colorDefault = new CAscColor(0, 0, 0);
+	var colorDefault = new asc_CColor(0, 0, 0);
 	
 	var docTitle = window.location.toString().match(/&title=([^&]+)&/);
 	if (docTitle) {
@@ -1019,7 +1019,7 @@
 		$("#td_BackgroundColor").removeClass("iconPressed");
 		var oColor = parseColor(color);
 		if (null !== oColor)
-			api.asc_setCellBackgroundColor(new CAscColor(oColor.r, oColor.g, oColor.b));
+			api.asc_setCellBackgroundColor(new asc_CColor(oColor.r, oColor.g, oColor.b));
 		return false;
 	});
 	$(".clrPicker2, .clrPicker3").mousedown(function(event){
@@ -1066,7 +1066,7 @@
 		// changeFontColor(a2,"text");
 		var oColor = parseColor(color);
 		if (null !== oColor)
-			api.asc_setCellTextColor(new CAscColor(oColor.r, oColor.g, oColor.b));
+			api.asc_setCellTextColor(new asc_CColor(oColor.r, oColor.g, oColor.b));
 		return false;
 	});
 	$("#td_func_choose").mousedown(function () {
