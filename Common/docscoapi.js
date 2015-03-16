@@ -271,7 +271,7 @@
 		this._saveCallback = [];
 		this.saveLockCallbackErrorTimeOutId = null;
 		this.saveCallbackErrorTimeOutId = null;
-        this._id = "";
+        this._id = null;
 		this._indexuser = -1;
 		// Если пользователей больше 1, то совместно редактируем
 		this.isCoAuthoring = false;
@@ -668,11 +668,13 @@
 	};
 
 	DocsCoApi.prototype._checkSaveChangesInDisconnect = function (allServerChanges) {
-		for (var changeId in allServerChanges) {
-			var change = allServerChanges[changeId];
-			var changesOneUser = change["changes"];
-			if (changesOneUser && change["user"] !== this._userId && this.lastOtherSaveTime !== change["time"])
-				return true;
+		if (0 < allServerChanges.length) {
+			var change = allServerChanges[allServerChanges.length - 1];
+			var changesOneUser = change['change'];
+			if (changesOneUser) {
+				if (change['user'] !== this._userId)
+					return this.lastOtherSaveTime !== change['time'];
+			}
 		}
 		return false;
 	};
@@ -681,13 +683,13 @@
 		if (this.onSaveChanges) {
 			this.changesIndex = changesIndex;
 			if (allServerChanges) {
-				for (var changeId in allServerChanges) {
-					var change = allServerChanges[changeId];
-					var changesOneUser = change["change"];
+				for (var i = 0; i < allServerChanges.length; ++i) {
+					var change = allServerChanges[i];
+					var changesOneUser = change['change'];
 					if (changesOneUser) {
-						if (change["user"] !== this._userId)
-							this.lastOtherSaveTime = change["time"];
-						this.onSaveChanges(JSON.parse(changesOneUser), change["user"], bFirstLoad);
+						if (change['user'] !== this._userId)
+							this.lastOtherSaveTime = change['time'];
+						this.onSaveChanges(JSON.parse(changesOneUser), change['user'], bFirstLoad);
 					}
 				}
 			}
