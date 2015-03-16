@@ -2461,7 +2461,7 @@ Paragraph.prototype =
                 else
                 {
                     // TODO: В режиме рецензии элементы не удаляются, а позиция меняется прямо в ранах
-                    if (this.LogicDocument == null || document_EditingType_Review !== this.LogicDocument.Get_EditingType())
+                    if (!this.LogicDocument || document_EditingType_Review !== this.LogicDocument.Get_EditingType())
                         this.CurPos.ContentPos = ContentPos;
                 }
             }
@@ -5250,7 +5250,8 @@ Paragraph.prototype =
 
             // Если мы находимся в режиме рецензирования, то пробегаемся по всему содержимому гиперссылки и
             // проставляем, что все раны новые.
-            Hyperlink.Set_ReviewType(paragraphcontent_Reviewtype_Added, true);
+            if (this.LogicDocument && document_EditingType_Review === this.LogicDocument.Get_EditingType())
+                Hyperlink.Set_ReviewType(paragraphcontent_Reviewtype_Added, true);
         }
         else if ( null !== HyperProps.Text && "" !== HyperProps.Text )
         {

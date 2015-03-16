@@ -668,6 +668,7 @@ function CDocument(DrawingDocument)
     
     this.TurnOffRecalc          = false;
     this.TurnOffInterfaceEvents = false;
+    this.TurnOffRecalcCurPos    = false;
 
     this.CheckEmptyElementsOnSelection = true; // При выделении проверять или нет пустой параграф в конце/начале выделения.
 
@@ -2262,6 +2263,9 @@ CDocument.prototype =
 
     RecalculateCurPos : function()
     {
+        if (true === this.TurnOffRecalcCurPos)
+            return;
+
         if ( true === CollaborativeEditing.m_bGlobalLockSelection )
             return;
 
@@ -2290,6 +2294,9 @@ CDocument.prototype =
 
     Internal_CheckCurPage : function()
     {
+        if (true === this.TurnOffRecalcCurPos)
+            return;
+
         if ( true === CollaborativeEditing.m_bGlobalLockSelection )
             return;
 
@@ -12114,6 +12121,19 @@ CDocument.prototype =
         }
     },
 
+    TurnOff_RecalculateCurPos : function()
+    {
+        this.TurnOffRecalcCurPos = true;
+    },
+
+    TurnOn_RecalculateCurPos : function(bUpdate)
+    {
+        this.TurnOffRecalcCurPos = false;
+
+        if (true === bUpdate)
+            this.Document_UpdateSelectionState();
+    },
+
     Can_CopyCut : function()
     {
         var bCanCopyCut = false;
@@ -13490,6 +13510,8 @@ CDocument.prototype =
                 // Отключаем пересчет, включим перед последним добавлением. Поскольку,
                 // у нас все добавляется в 1 параграф, так можно делать.
                 this.TurnOffRecalc = true;
+                this.TurnOff_InterfaceEvents();
+                this.TurnOff_RecalculateCurPos();
 
                 var Count = sText.length;
                 var e = global_keyboardEvent;
@@ -13507,6 +13529,8 @@ CDocument.prototype =
 
                 // На случай, если Count = 0
                 this.TurnOffRecalc = false;
+                this.TurnOn_RecalculateCurPos(false);
+                this.TurnOn_InterfaceEvents(true);
             }
             else
             {
@@ -14293,6 +14317,9 @@ CDocument.prototype.private_StopSelection = function()
 };
 CDocument.prototype.private_UpdateCurPage = function()
 {
+    if (true === this.TurnOffRecalcCurPos)
+        return;
+
     this.Internal_CheckCurPage();
 };
 CDocument.prototype.private_UpdateCursorXY = function(bUpdateX, bUpdateY)

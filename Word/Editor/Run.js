@@ -7890,7 +7890,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
         case historyitem_ParaRun_ReviewType:
         {
             // Long : ReviewType
-            Writer.WriteLong(Data.New);
+            this.ReviewType = Reader.GetLong();
             break;
         }
 
