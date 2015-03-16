@@ -809,6 +809,9 @@
 			if (this._checkSaveChangesInDisconnect(data['changes'] || [])) {
 				// делаем drop
 				this._onDrop();
+			} else {
+				// Нужно обновить пользователей (т.к. пользователи могли входить и выходить пока у нас не было соединения)
+				this._onAuthParticipantsChanged(data['participants']);
 			}
 			return;
 		}
