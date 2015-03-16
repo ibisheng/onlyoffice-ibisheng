@@ -72,15 +72,12 @@ CWrapPolygon.prototype =
         {
             this.setEdited(wrapPolygon.edited);
         }
-        if(wrapPolygon.edited)
+        var rel = [];
+        for(var i = 0; i < wrapPolygon.relativeArrPoints.length; ++i)
         {
-            var rel = [];
-            for(var i = 0; i < wrapPolygon.relativeArrPoints.length; ++i)
-            {
-                rel.push({x: wrapPolygon.relativeArrPoints[i].x, y: wrapPolygon.relativeArrPoints[i].y});
-            }
-            this.setArrRelPoints(rel);
+            rel.push({x: wrapPolygon.relativeArrPoints[i].x, y: wrapPolygon.relativeArrPoints[i].y});
         }
+        this.setArrRelPoints(rel);
 
         if(this.wrapSide !== wrapPolygon.wrapSide)
         {
