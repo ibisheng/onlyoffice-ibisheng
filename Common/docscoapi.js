@@ -272,7 +272,7 @@
 		this.saveLockCallbackErrorTimeOutId = null;
 		this.saveCallbackErrorTimeOutId = null;
         this._id = "";
-		this._indexuser = 0;
+		this._indexuser = -1;
 		// Если пользователей больше 1, то совместно редактируем
 		this.isCoAuthoring = false;
 		// Мы сами отключились от совместного редактирования
@@ -820,9 +820,7 @@
 
 			this._onAuthParticipantsChanged(data['participants']);
 
-			if (data.hasOwnProperty('indexUser'))
-				this._onSetIndexUser(this._indexuser = data['indexUser']);
-
+			this._onSetIndexUser(this._indexuser = data['indexUser']);
 			this._userId = this._user.asc_getId() + this._indexuser;
 
 			if (data["messages"] && this.onMessage) {
