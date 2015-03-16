@@ -3385,9 +3385,12 @@ CDocument.prototype =
                         this.Recalculate(true);
                     }
 
-                    Item.RecalculateCurPos();
-                    Item.CurPos.RealX = Item.CurPos.X;
-                    Item.CurPos.RealY = Item.CurPos.Y;
+                    if (false === this.TurnOffRecalcCurPos)
+                    {
+                        Item.RecalculateCurPos();
+                        Item.CurPos.RealX = Item.CurPos.X;
+                        Item.CurPos.RealY = Item.CurPos.Y;
+                    }
                 }
 
                 this.Document_UpdateSelectionState();
