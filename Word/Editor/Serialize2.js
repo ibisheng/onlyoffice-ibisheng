@@ -3812,10 +3812,10 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                     break;
                 case para_Drawing:
                     sCurText = this.WriteText(sCurText);
-                    if (item.Extent && item.GraphicObj && item.GraphicObj.spPr && item.GraphicObj.spPr.xfrm) {
-                        item.Extent.W = item.GraphicObj.spPr.xfrm.extX;
-                        item.Extent.H = item.GraphicObj.spPr.xfrm.extY;
-                    }
+                    //if (item.Extent && item.GraphicObj && item.GraphicObj.spPr && item.GraphicObj.spPr.xfrm) {
+                    //    item.Extent.W = item.GraphicObj.spPr.xfrm.extX;
+                    //    item.Extent.H = item.GraphicObj.spPr.xfrm.extY;
+                    //}
                     if(this.copyParams)
                     {
                         CheckSpPrXfrm2(item.GraphicObj)
