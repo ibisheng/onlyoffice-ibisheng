@@ -1632,12 +1632,30 @@ CGraphicObjects.prototype =
         this.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
         var cursor_type = this.nullState.onMouseDown(global_mouseEvent, x, y, pageIndex);
         this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
-        if(cursor_type && cursor_type.cursorType === "text")
+        var object;
+        if(cursor_type )
         {
-            var object = g_oTableId.Get_ById(cursor_type.objectId);
-            if(object && object.getNearestPos)
+            object = g_oTableId.Get_ById(cursor_type.objectId);
+            if(object)
             {
-                return object.getNearestPos(x, y, pageIndex);
+                if(cursor_type.cursorType === "text")
+                {
+                    if(object.getNearestPos)
+                    {
+                        return object.getNearestPos(x, y, pageIndex);
+                    }
+                }
+                else
+                {
+                    if(object.getObjectType() === historyitem_type_ImageShape && object.parent)
+                    {
+                        var oShape = object.parent.isShapeChild(true);
+                        if(oShape)
+                        {
+                            return oShape.getNearestPos(x, y, pageIndex);
+                        }
+                    }
+                }
             }
         }
         return null;
