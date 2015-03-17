@@ -3812,15 +3812,6 @@ CMathContent.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selec
         SelectionEndPos   = this.Selection.Start;
     }
 
-    // Выставляем высоту селекта. В верхнем контенте высота задается параграфом
-    /*if(true !== this.bRoot)
-    {
-        var PosLine = this.ParaMath.GetLinePosition(_CurLine);
-        SelectionDraw.StartX = PosLine.x + this.pos.x;
-        SelectionDraw.StartY = PosLine.y + this.pos.y - this.size.ascent;
-        SelectionDraw.H      = this.size.height;
-    }*/
-
     var SelectionUse = this.Selection.Use;
 
     var CurLine = _CurLine - this.StartLine;
@@ -3837,29 +3828,11 @@ CMathContent.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selec
 
         if(Item.Type == para_Math_Composition && bSelectAll)
         {
-            var Direction = SelectionStartPos > SelectionEndPos ? -1 : 1;
-            Item.Select_All(Direction);
-        }
-
-        Item.Selection_DrawRange( _CurLine, _CurRange, SelectionDraw );
-
-        /*if(Item.Type == para_Math_Composition)
-        {
-            if(SelectionUse && SelectionStartPos == CurPos && SelectionStartPos == SelectionEndPos)
-            {
-                Item.Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
-            }
-            else if(SelectionUse && SelectionStartPos <= CurPos && CurPos <= SelectionEndPos)
-            {
-                SelectionDraw.FindStart = false;
-                SelectionDraw.DrawSelection = true;
-                SelectionDraw.W += Item.size.width;
-            }
-            else if(SelectionDraw.FindStart == true)
-                SelectionDraw.StartX += Item.size.width;
+            SelectionDraw.FindStart = false;
+            SelectionDraw.W += Item.Get_Width(_CurLine);
         }
         else
-            Item.Selection_DrawRange( _CurLine, _CurRange, SelectionDraw );*/
+            Item.Selection_DrawRange( _CurLine, _CurRange, SelectionDraw );
     }
 };
 CMathContent.prototype.Select_ElementByPos = function(nPos, bWhole)
