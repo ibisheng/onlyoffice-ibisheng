@@ -1235,14 +1235,15 @@ Paragraph.prototype.private_RecalculateLineBaseLine    = function(CurLine, CurPa
     if (this.Lines[CurLine].Info & paralineinfo_RangeY)
     {
         this.Lines[CurLine].Y = PRS.Y - this.Pages[CurPage].Y;
+        PRS.BaseLineOffset = this.Lines[CurLine].Metrics.Ascent;
     }
     else
     {
-        if ( CurLine > 0 )
+        if (CurLine > 0)
         {
             // Первая линия на странице не должна двигаться
-            if ( CurLine != this.Pages[CurPage].FirstLine && ( true === PRS.End || true !== PRS.EmptyLine || PRS.RangesCount <= 0 || true === PRS.NewPage  ) )
-                PRS.Y += this.Lines[CurLine - 1].Metrics.Descent + this.Lines[CurLine - 1].Metrics.LineGap +  this.Lines[CurLine].Metrics.Ascent;
+            if (CurLine != this.Pages[CurPage].FirstLine && ( true === PRS.End || true !== PRS.EmptyLine || PRS.RangesCount <= 0 || true === PRS.NewPage  ))
+                PRS.Y += this.Lines[CurLine - 1].Metrics.Descent + this.Lines[CurLine - 1].Metrics.LineGap + this.Lines[CurLine].Metrics.Ascent;
 
             this.Lines[CurLine].Y = PRS.Y - this.Pages[CurPage].Y;
         }
