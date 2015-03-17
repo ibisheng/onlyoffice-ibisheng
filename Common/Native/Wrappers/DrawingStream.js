@@ -562,7 +562,7 @@ CDrawingStream.prototype =
     },
     p_width : function(w)
     {
-        this.Native["PD_p_width"](w);
+        this.Native["PD_p_width"](w / 1000);
     },
     // brush methods
     b_color1 : function(r,g,b,a)

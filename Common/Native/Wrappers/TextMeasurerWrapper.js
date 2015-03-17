@@ -202,8 +202,13 @@ CTextMeasurerWrapper.prototype =
         if (null != this.LastFontOriginInfo.Replace)
             lUnicode = g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
 
-        var _width = this.Measurer["MeasureChar"](lUnicode);
-        return { Width : _width, Height : 0 };
+        var _bounds = this.Measurer["GetDrawingBox"](lUnicode);
+
+        return {
+            Width  : _bounds[0],
+            Ascent : _bounds[4],
+            Height : _bounds[4] - _bounds[3]
+        };
     },
     Measure2Code : function(lUnicode)
     {
