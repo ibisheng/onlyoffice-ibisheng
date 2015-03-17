@@ -7861,7 +7861,7 @@
 		WorksheetView.prototype.moveRangeHandle = function (arnFrom, arnTo, copyRange){
 			var t = this;
 			var onApplyMoveRangeHandleCallback = function (isSuccess) {
-				if (false === isSuccess) {
+				if (false === isSuccess || false === t.autoFilters.isCheckMoveRange(arnFrom)) {
 					t._cleanSelectionMoveRange();
 					return;
 				}
@@ -8549,7 +8549,7 @@
 								range.setWrap(currentObj.wrap);
 								if(currentObj.bc && currentObj.bc.rgb)
 									range.setFill(currentObj.bc);
-									var link = values[r][c][0].hyperLink;
+								var link = values[r][c][0].hyperLink;
 								if(link)
 								{
 									var newHyperlink = new Hyperlink();

@@ -2555,6 +2555,38 @@ var gUndoInsDelCellsFlag = true;
 				return false;
 			},
 			
+			isCheckMoveRange: function(arnFrom)
+			{	
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
+				
+				var tableParts = aWs.TableParts;
+				var tablePart;
+				
+				//1) если выделена часть форматированной таблицы и ещё часть(либо полностью)
+				var counterIntersection = 0;
+				var counterContains = 0;
+				for(var i = 0; i < tableParts.length; i++)
+				{
+					tablePart = tableParts[i];
+					if(tablePart.Ref.intersection(arnFrom))
+					{
+						if(arnFrom.containsRange(tablePart.Ref))
+							counterContains++;
+						else
+							counterIntersection++;
+					}
+				}
+				
+				if((counterIntersection > 0 && counterContains > 0) || (counterIntersection > 1))
+				{
+					ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
+					return false;
+				}
+				
+				return true;
+			},
+			
 			_isIntersectionTableParts: function(range)
 			{
 				var ws = this.worksheet;
