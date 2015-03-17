@@ -272,7 +272,7 @@
 		this.saveLockCallbackErrorTimeOutId = null;
 		this.saveCallbackErrorTimeOutId = null;
         this._id = null;
-		this._indexuser = -1;
+		this._indexUser = -1;
 		// Если пользователей больше 1, то совместно редактируем
 		this.isCoAuthoring = false;
 		// Мы сами отключились от совместного редактирования
@@ -311,6 +311,7 @@
 		this.ownedLockBlocks = [];
 		this.sockjs_url = null;
 		this.sockjs = null;
+		this.editorType = -1;
 		this._isExcel = false;
 		this._isPresentation = false;
 		this._isAuth = false;
@@ -329,9 +330,9 @@
 	DocsCoApi.prototype.get_state = function () {
         return this._state;
     };
-	
+
 	DocsCoApi.prototype.get_indexUser = function () {
-        return this._indexuser;
+        return this._indexUser;
     };
 
     DocsCoApi.prototype.getSessionId = function () {
@@ -353,7 +354,7 @@
 		var isLock = false;
 		var idLockInArray = null;
 		for (; i < lengthArray; ++i) {
-			idLockInArray = (this._isExcel) ? arrayBlockId[i].guid : (this._isPresentation) ? arrayBlockId[i]["guid"] : arrayBlockId[i];
+			idLockInArray = (this._isExcel || this._isPresentation) ? arrayBlockId[i]['guid'] : arrayBlockId[i];
 			if (this._locks[idLockInArray] && 0 !== this._locks[idLockInArray].state) {
 				isLock = true;
 				break;
@@ -362,11 +363,11 @@
 		if (0 === lengthArray)
 			isLock = true;
 
-		idLockInArray = (this._isExcel) ? arrayBlockId[0].guid : (this._isPresentation) ? arrayBlockId[0]["guid"] : arrayBlockId[0];
+		idLockInArray = (this._isExcel || this._isPresentation) ? arrayBlockId[0]['guid'] : arrayBlockId[0];
 
 		if (!isLock) {
 			//Ask
-            this._locks[idLockInArray] = {"state": 1};//1-asked for block
+            this._locks[idLockInArray] = {'state': 1};//1-asked for block
             if (callback && _.isFunction(callback)) {
                 this._lockCallbacks[idLockInArray] = callback;
                 var lockCalbacks = this._lockCallbacks;
@@ -375,22 +376,17 @@
                 window.setTimeout(function () {
                     if (lockCalbacks.hasOwnProperty(idLockInArray)) {
                         //Not signaled already
-                        callback({error: "Timed out"});
+                        callback({error: 'Timed out'});
                         delete lockCalbacks[idLockInArray];
                     }
                 }, this.errorTimeOut);
             }
-			if (this._isExcel)
-				this._send({"type": "getLockRange", "block": arrayBlockId});
-			else if (this._isPresentation)
-				this._send({"type": "getLockPresentation", "block": arrayBlockId});
-			else
-            	this._send({"type": "getLock", "block": arrayBlockId});
+			this._send({"type": 'getLock', 'editorType': this.editorType, 'block': arrayBlockId});
 		} else {
 			// Вернем ошибку, т.к. залочены элементы
 			window.setTimeout(function () {
 				if (callback && _.isFunction(callback)) {
-					callback({error: idLockInArray + "-lock"});
+					callback({error: idLockInArray + '-lock'});
 				}
 			}, 100);
 		}
@@ -528,9 +524,8 @@
     };
 
     DocsCoApi.prototype._onMessages = function (data) {
-        if (data["messages"] && this.onMessage) {
+        if (data["messages"] && this.onMessage)
             this.onMessage(data["messages"]);
-        }
     };
 
     DocsCoApi.prototype._onGetLock = function (data) {
@@ -538,8 +533,8 @@
             for (var key in data["locks"]) {
                 if (data["locks"].hasOwnProperty(key)) {
                     var lock = data["locks"][key],
-						blockTmp = (this._isExcel) ? lock["block"]["guid"] : (this._isPresentation) ? lock["block"]["guid"] : key,
-						blockValue = (this._isExcel) ? lock["block"] : (this._isPresentation) ? lock["block"] : key;
+						blockTmp = (this._isExcel || this._isPresentation) ? lock["block"]["guid"] : key,
+						blockValue = (this._isExcel || this._isPresentation) ? lock["block"] : key;
                     if (lock !== null) {
                         var changed = true;
                         if (this._locks[blockTmp] && 1 !== this._locks[blockTmp].state /*asked for it*/) {
@@ -581,7 +576,7 @@
             for (var block in data["locks"]) {
                 if (data["locks"].hasOwnProperty(block)) {
                     var lock = data["locks"][block],
-						blockTmp = (this._isExcel) ? lock["block"]["guid"] : (this._isPresentation) ? lock["block"]["guid"] : lock["block"];
+						blockTmp = (this._isExcel || this._isPresentation) ? lock["block"]["guid"] : lock["block"];
                     if (lock !== null) {
                         this._locks[blockTmp] = {"state":0, "user":lock["user"], "time":lock["time"], "changes":lock["changes"], "block":lock["block"]};
                         if (this.onLocksReleased) {
@@ -603,7 +598,7 @@
             for (var block in data["locks"]) {
                 if (data["locks"].hasOwnProperty(block)) {
                     var lock = data["locks"][block],
-						blockTmp = (this._isExcel) ? lock["block"]["guid"] : (this._isPresentation) ? lock["block"]["guid"] : lock["block"];
+						blockTmp = (this._isExcel || this._isPresentation) ? lock["block"]["guid"] : lock["block"];
                     if (lock !== null) {
                         this._locks[blockTmp] = {"state":0, "user":lock["user"], "time":lock["time"], "changes":lock["changes"], "block":lock["block"]};
                         if (this.onLocksReleased) {
@@ -665,18 +660,6 @@
 
 		if (this.onUnSaveLock)
 			this.onUnSaveLock();
-	};
-
-	DocsCoApi.prototype._checkSaveChangesInDisconnect = function (allServerChanges) {
-		if (0 < allServerChanges.length) {
-			var change = allServerChanges[allServerChanges.length - 1];
-			var changesOneUser = change['change'];
-			if (changesOneUser) {
-				if (change['user'] !== this._userId)
-					return this.lastOtherSaveTime !== change['time'];
-			}
-		}
-		return false;
 	};
 
 	DocsCoApi.prototype._updateChanges = function (allServerChanges, changesIndex, bFirstLoad) {
@@ -805,14 +788,14 @@
 
 	DocsCoApi.prototype._onAuth = function (data) {
 		if (true === this._isAuth) {
-			// Мы уже авторизовывались, это просто reconnect и нужно проверить не было ли изменений пока не было сети
-			if (this._checkSaveChangesInDisconnect(data['changes'] || [])) {
-				// делаем drop
-				this._onDrop();
-			} else {
-				// Нужно обновить пользователей (т.к. пользователи могли входить и выходить пока у нас не было соединения)
-				this._onAuthParticipantsChanged(data['participants']);
-			}
+			this._state = 2; // Authorized
+			// Мы уже авторизовывались, нужно обновить пользователей (т.к. пользователи могли входить и выходить пока у нас не было соединения)
+			this._onAuthParticipantsChanged(data['participants']);
+
+			//if (this.ownedLockBlocks && this.ownedLockBlocks.length > 0) {
+			//	this._onPreviousLocks(data["locks"], this.ownedLockBlocks);
+			//}
+			this._onGetLock(data);
 			return;
 		}
 		if (data['result'] === 1) {
@@ -825,18 +808,12 @@
 
 			this._onAuthParticipantsChanged(data['participants']);
 
-			this._onSetIndexUser(this._indexuser = data['indexUser']);
-			this._userId = this._user.asc_getId() + this._indexuser;
+			this._onSetIndexUser(this._indexUser = data['indexUser']);
+			this._userId = this._user.asc_getId() + this._indexUser;
 
-			if (data["messages"] && this.onMessage) {
-				this._onMessages(data);
-			}
-			if (data["locks"]) {
-				if (this.ownedLockBlocks && this.ownedLockBlocks.length > 0) {
-					this._onPreviousLocks(data["locks"], this.ownedLockBlocks);
-				}
-				this._onGetLock(data);
-			}
+			this._onMessages(data);
+			this._onGetLock(data);
+
 			// Применения изменений пользователя
 			if (window['AscApplyChanges'] && window['AscChanges']) {
 				var userOfflineChanges = window['AscChanges'], changeOneUser;
@@ -868,6 +845,7 @@
         this._initCallback = callback;
         this.ownedLockBlocks = [];
 		this.sockjs_url = this._url + '/doc/'+docid+'/c';
+		this.editorType = editorType;
 		this._isExcel = c_oEditorId.Spreadsheet === editorType;
 		this._isPresentation = c_oEditorId.Presentation === editorType;
 		this._isAuth = false;
@@ -894,13 +872,11 @@
 			if (t._locks) {
 				t.ownedLockBlocks = [];
 				//If we already have locks
-				for (var block in t._locks) {
-					if (t._locks.hasOwnProperty(block)) {
-						var lock = t._locks[block];
-						if (lock["state"] === 2) {
-							//Our lock.
-							t.ownedLockBlocks.push(lock["block"]);
-						}
+				for (var block in t._locks) if (t._locks.hasOwnProperty(block)) {
+					var lock = t._locks[block];
+					if (lock["state"] === 2) {
+						//Our lock.
+						t.ownedLockBlocks.push(lock["blockValue"]);
 					}
 				}
 				t._locks = {};
@@ -912,10 +888,13 @@
 					'documentCallbackUrl' : t._documentCallbackUrl,
 					'token'	: t._token,
 					'user'	: {
-						'id'	: t._user.asc_getId(),
-						'name'	: t._user.asc_getUserName()
+						'id'		: t._user.asc_getId(),
+						'name'		: t._user.asc_getUserName(),
+						'indexUser'	: t._indexUser
 					},
-					'locks'		: t.ownedLockBlocks,
+					'editorType': t.editorType,
+					'lastOtherSaveTime' : t.lastOtherSaveTime,
+					'block'		: t.ownedLockBlocks,
 					'sessionId'	: t._id,
 					'server'	: window.location.protocol + '//' + window.location.host + g_sMainServiceLocalUrl,
 					'documentFormatSave'	: t._documentFormatSave,
