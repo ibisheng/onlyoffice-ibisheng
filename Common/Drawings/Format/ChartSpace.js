@@ -7574,7 +7574,7 @@ CChartSpace.prototype =
         if(!this.group)
         {
             var oLock;
-            if(this.parent && this.parent.Lock)
+            if(this.parent instanceof ParaDrawing)
             {
                 oLock = this.parent.Lock;
             }
