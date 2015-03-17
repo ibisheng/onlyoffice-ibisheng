@@ -2300,7 +2300,7 @@ function CEditorPage(api)
             return;
         }
 
-        if (oWordControl.m_bIsMouseLock === true)
+        if (oWordControl.m_bIsMouseLock === true && 27 !== e.keyCode) // Esc даем всегда делать с клавы
         {
             if (!window.USER_AGENT_MACOS)
             {

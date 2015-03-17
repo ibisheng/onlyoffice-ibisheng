@@ -9335,11 +9335,20 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 27 ) // Esc
         {
-            // 1. Если у нас сейчас происходит выделение маркером, тогда его отменяем
-            // 2. Если у нас сейчас происходит форматирование по образцу, тогда его отменяем
-            // 3. Если у нас выделена автофигура (в колонтитуле или документе), тогда снимаем выделение с нее
-            // 4. Если мы просто находимся в колонтитуле (автофигура не выделена) выходим из колонтитула
-            if ( true === editor.isMarkerFormat )
+            // 1. Если начался drag-n-drop сбрасываем его.
+            // 2. Если у нас сейчас происходит выделение маркером, тогда его отменяем
+            // 3. Если у нас сейчас происходит форматирование по образцу, тогда его отменяем
+            // 4. Если у нас выделена автофигура (в колонтитуле или документе), тогда снимаем выделение с нее
+            // 5. Если мы просто находимся в колонтитуле (автофигура не выделена) выходим из колонтитула
+            if (true === this.DrawingDocument.IsTrackText())
+            {
+                // Сбрасываем проверку Drag-n-Drop
+                this.Selection.DragDrop.Flag = 0;
+                this.Selection.DragDrop.Data = null;
+
+                this.DrawingDocument.CancelTrackText();
+            }
+            else if ( true === editor.isMarkerFormat )
             {
                 editor.sync_MarkerFormatCallback( false );
                 this.Update_CursorType( this.CurPos.RealX, this.CurPos.RealY, this.CurPage, new CMouseEventHandler() );
@@ -10537,7 +10546,7 @@ CDocument.prototype =
                 this.Selection.DragDrop.Flag = 0;
                 this.Selection.DragDrop.Data = null;
 
-                // Вызываем стандартное событие mouseMove, чтобы сбросить раличные подсказки, если они были
+                // Вызываем стандартное событие mouseMove, чтобы сбросить различные подсказки, если они были
                 editor.sync_MouseMoveStartCallback();
                 editor.sync_MouseMoveCallback(new CMouseMoveData());
                 editor.sync_MouseMoveEndCallback();

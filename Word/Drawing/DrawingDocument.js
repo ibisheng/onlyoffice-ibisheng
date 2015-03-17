@@ -6145,6 +6145,18 @@ function CDrawingDocument()
         this.InlineTextTrackPage = -1;
     }
 
+    this.IsTrackText = function()
+    {
+        return this.InlineTextTrackEnabled;
+    }
+
+    this.CancelTrackText = function()
+    {
+        this.InlineTextTrackEnabled = false;
+        this.InlineTextTrack        = null;
+        this.InlineTextTrackPage    = -1;
+    }
+
     this.SendMathToMenu = function()
     {
         if (this.MathMenuLoad)
