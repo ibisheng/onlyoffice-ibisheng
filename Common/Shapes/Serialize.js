@@ -200,29 +200,32 @@ CBuilderImages.prototype =
 {
     SetUrl : function(url)
     {
-        var oCopyFill, oCopyBlipFill, oCopyLn;
-        if(!this.Ln && this.SpPr && this.SpPr.Fill)
+        if(url !== "error")
         {
-            oCopyFill = this.SpPr.Fill.createDuplicate();
-            if(oCopyFill.fill && oCopyFill.fill.type === FILL_TYPE_BLIP)
+            var oCopyFill, oCopyBlipFill, oCopyLn;
+            if(!this.Ln && this.SpPr && this.SpPr.Fill)
             {
-                oCopyFill.fill.setRasterImageId(url);
-                this.SpPr.setFill(oCopyFill);
+                oCopyFill = this.SpPr.Fill.createDuplicate();
+                if(oCopyFill.fill && oCopyFill.fill.type === FILL_TYPE_BLIP)
+                {
+                    oCopyFill.fill.setRasterImageId(url);
+                    this.SpPr.setFill(oCopyFill);
+                }
             }
+            if(this.Ln && this.SpPr && this.SpPr === this.Ln && this.Ln.Fill && this.Ln.Fill.fill && this.Ln.Fill.fill.type === FILL_TYPE_BLIP)
+            {
+                oCopyLn = this.Ln.createDuplicate();
+                oCopyLn.Fill.fill.setRasterImageId(url);
+                this.SpPr.setLn(oCopyLn);
+            }
+            if(this.ImageShape && this.ImageShape.blipFill)
+            {
+                oCopyBlipFill = this.ImageShape.blipFill.createDuplicate();
+                oCopyBlipFill.setRasterImageId(url);
+                this.ImageShape.setBlipFill(oCopyBlipFill);
+            }
+            this.BlipFill.RasterImageId = url;
         }
-        if(this.Ln && this.SpPr && this.SpPr === this.Ln && this.Ln.Fill && this.Ln.Fill.fill && this.Ln.Fill.fill.type === FILL_TYPE_BLIP)
-        {
-            oCopyLn = this.Ln.createDuplicate();
-            oCopyLn.Fill.fill.setRasterImageId(url);
-            this.SpPr.setLn(oCopyLn);
-        }
-        if(this.ImageShape && this.ImageShape.blipFill)
-        {
-            oCopyBlipFill = this.ImageShape.blipFill.createDuplicate();
-            oCopyBlipFill.setRasterImageId(url);
-            this.ImageShape.setBlipFill(oCopyBlipFill);
-        }
-        this.BlipFill.RasterImageId = url;
     }
 };
 
@@ -1872,10 +1875,12 @@ function BinaryPPTYLoader()
                                         case 3:
                                         {
                                             s.Skip2(6); // len + start attributes + type
-                                            uni_fill.fill.setRasterImageId(s.GetString2());
+
+                                            var sReadPath = s.GetString2();
+                                            uni_fill.fill.setRasterImageId(sReadPath);
 
                                             // TEST version ---------------
-                                            var _s = uni_fill.fill.RasterImageId;
+                                            var _s = sReadPath;
                                             var indS = _s.lastIndexOf("emf");
                                             if (indS == -1)
                                                 indS = _s.lastIndexOf("wmf");
@@ -1890,14 +1895,14 @@ function BinaryPPTYLoader()
 
                                             if (this.IsThemeLoader)
                                             {
-                                                uni_fill.fill.setRasterImageId("theme" + (this.Api.ThemeLoader.CurrentLoadThemeIndex + 1) + "/media/" + uni_fill.fill.RasterImageId);
+                                                uni_fill.fill.setRasterImageId("theme" + (this.Api.ThemeLoader.CurrentLoadThemeIndex + 1) + "/media/" + sReadPath);
                                             }
 
                                             if (this.ImageMapChecker != null)
-                                                this.ImageMapChecker[uni_fill.fill.RasterImageId] = true;
+                                                this.ImageMapChecker[sReadPath] = true;
 
                                             if (this.IsUseFullUrl)
-                                                this.RebuildImages.push(new CBuilderImages(uni_fill.fill, uni_fill.fill.RasterImageId, oImageShape, oSpPr, oLn));
+                                                this.RebuildImages.push(new CBuilderImages(uni_fill.fill, sReadPath, oImageShape, oSpPr, oLn));
 
                                             s.Skip2(1); // end attribute
                                             break;
