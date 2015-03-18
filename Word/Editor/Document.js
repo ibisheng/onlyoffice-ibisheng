@@ -13516,33 +13516,23 @@ CDocument.prototype =
         if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
         {
             this.Create_NewHistoryPoint();
-            
+
+            // Отключаем пересчет, включим перед последним добавлением. Поскольку,
+            // у нас все добавляется в 1 параграф, так можно делать.
+            this.Start_SilentMode();
+
             if ( undefined === rFonts )
             {
-                // Отключаем пересчет, включим перед последним добавлением. Поскольку,
-                // у нас все добавляется в 1 параграф, так можно делать.
-                this.TurnOffRecalc = true;
-                this.TurnOff_InterfaceEvents();
-                this.TurnOff_RecalculateCurPos();
-
                 var Count = sText.length;
                 var e = global_keyboardEvent;
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    if ( Index === Count - 1 )
-                        this.TurnOffRecalc = false;
-
                     var _char = sText.charAt(Index);
                     if (" " == _char)
                         this.Paragraph_Add(new ParaSpace());
                     else
                         this.Paragraph_Add(new ParaText(_char));
                 }
-
-                // На случай, если Count = 0
-                this.TurnOffRecalc = false;
-                this.TurnOn_RecalculateCurPos(false);
-                this.TurnOn_InterfaceEvents(true);
             }
             else
             {
@@ -13570,11 +13560,9 @@ CDocument.prototype =
                 }
 
                 Para.Add( Run );
-                
-                this.Recalculate();
             }
 
-            this.Document_UpdateUndoRedoState();
+            this.End_SilentMode(true);
         }
     },
 //-----------------------------------------------------------------------------------
@@ -14503,6 +14491,18 @@ CDocument.prototype.private_ProcessTemplateReplacement = function(TemplateReplac
 CDocument.prototype.Get_EditingType = function()
 {
     return this.EditingType;
+};
+CDocument.prototype.Start_SilentMode = function()
+{
+    this.TurnOff_Recalculate();
+    this.TurnOff_InterfaceEvents();
+    this.TurnOff_RecalculateCurPos();
+};
+CDocument.prototype.End_SilentMode = function(bUpdate)
+{
+    this.TurnOn_Recalculate(bUpdate);
+    this.TurnOn_RecalculateCurPos(bUpdate);
+    this.TurnOn_InterfaceEvents(bUpdate);
 };
 
 //-----------------------------------------------------------------------------------

@@ -4681,6 +4681,43 @@ asc_docs_api.prototype.AddImageUrlAction = function(url, imgProp)
         }
     }
 };
+/*
+    Добавляем картинку на заданную страницу. Преполагаем, что картинка уже доступна по ссылке.
+ */
+asc_docs_api.prototype.AddImageToPage = function(sUrl, nPageIndex, dX, dY, dW, dH)
+{
+    var LogicDocument = this.WordControl.m_oLogicDocument;
+
+    var oldClickCount = global_mouseEvent.ClickCount;
+    global_mouseEvent.Button = 0;
+    global_mouseEvent.ClickCount = 1;
+    LogicDocument.OnMouseDown(global_mouseEvent, dX, dY, nPageIndex);
+    LogicDocument.OnMouseUp  (global_mouseEvent, dX, dY, nPageIndex);
+    LogicDocument.OnMouseMove(global_mouseEvent, dX, dY, nPageIndex);
+    global_mouseEvent.ClickCount = oldClickCount;
+
+    if (false === LogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+    {
+        var oPosH = new CImagePositionH();
+        oPosH.put_RelativeFrom(c_oAscRelativeFromH.Page);
+        oPosH.put_Align(false);
+        oPosH.put_Value(dX);
+        var oPosV = new CImagePositionV();
+        oPosV.put_RelativeFrom(c_oAscRelativeFromV.Page);
+        oPosV.put_Align(false);
+        oPosV.put_Value(dY);
+        var oImageProps = new asc_CImgProperty();
+        oImageProps.put_WrappingStyle(c_oAscWrapStyle2.Square);
+        oImageProps.put_PositionH(oPosH);
+        oImageProps.put_PositionV(oPosV);
+
+        LogicDocument.Create_NewHistoryPoint();
+        LogicDocument.Start_SilentMode();
+        LogicDocument.Add_InlineImage(dW, dH, sUrl);
+        LogicDocument.Set_ImageProps(oImageProps);
+        LogicDocument.End_SilentMode(true);
+    }
+};
 /* В качестве параметра  передается объект класса asc_CImgProperty, он же приходит на OnImgProp
  asc_CImgProperty заменяет пережнюю структуру:
 если параметр не имеет значения то передвать следует null, напримере inline-картинок: в качестве left,top,bottom,right,X,Y,ImageUrl необходимо передавать null.
