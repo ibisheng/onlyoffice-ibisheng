@@ -1042,7 +1042,7 @@ function asc_menu_WriteParaFrame(_type, _frame, _stream)
 
 asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
 {
-    if (this.m_oWordControl.m_oDrawingDocument.m_bIsMouseLock)
+    if (this.WordControl.m_oDrawingDocument.m_bIsMouseLockDocument)
     {
         // не делаем ничего. Как в веб версии отрубаем клавиатуру
         return undefined;
