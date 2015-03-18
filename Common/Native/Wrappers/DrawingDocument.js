@@ -571,7 +571,7 @@ function CDrawingDocument()
     this.TargetShowNeedFlag     = false;
 
     this.m_bIsSelection         = false;
-    this.m_bIsMouseLock         = false;
+    this.m_bIsMouseLockDocument = false;
 
     this.IsKeyDownButNoPress    = false;
     this.bIsUseKeyPress         = false;
@@ -1409,23 +1409,23 @@ CDrawingDocument.prototype =
 
     LogicDocumentOnMouseDown : function(e, x, y, page)
     {
-        if (this.m_bIsMouseLock)
+        if (this.m_bIsMouseLockDocument)
         {
             this.LogicDocument.OnMouseUp(e, x, y, page);
-            this.m_bIsMouseLock = false;
+            this.m_bIsMouseLockDocument = false;
         }
         this.LogicDocument.OnMouseDown(e, x, y, page);
-        this.m_bIsMouseLock = true;
+        this.m_bIsMouseLockDocument = true;
     },
     LogicDocumentOnMouseUp : function(e, x, y, page)
     {
-        if (!this.m_bIsMouseLock)
+        if (!this.m_bIsMouseLockDocument)
         {
             this.LogicDocument.OnMouseDown(e, x, y, page);
-            this.m_bIsMouseLock = true;
+            this.m_bIsMouseLockDocument = true;
         }
         this.LogicDocument.OnMouseUp(e, x, y, page);
-        this.m_bIsMouseLock = false;
+        this.m_bIsMouseLockDocument = false;
     },
 
     OnCheckMouseDown : function(e)
@@ -1633,7 +1633,7 @@ CDrawingDocument.prototype =
                 return;
 
             this.Native["DD_NeedScrollToTargetFlag"](true);
-            this.LogicDocumentOnMouseDown.OnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
+            this.LogicDocumentOnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
             this.Native["DD_NeedScrollToTargetFlag"](false);
         }
 
