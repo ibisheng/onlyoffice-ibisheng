@@ -1042,6 +1042,12 @@ function asc_menu_WriteParaFrame(_type, _frame, _stream)
 
 asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
 {
+    if (this.m_oWordControl.m_oDrawingDocument.m_bIsMouseLock)
+    {
+        // не делаем ничего. Как в веб версии отрубаем клавиатуру
+        return undefined;
+    }
+
     var _return = undefined;
     var _current = { pos : 0 };
     var _continue = true;
@@ -4523,8 +4529,8 @@ asc_docs_api.prototype.AddImageUrlNative = function(url, _w, _h)
             _page_height = _section_select.H;
     }
 
-    var __w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
-    var __h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
+    var __w = Math.max(1, (_page_width - (_page_x_left_margin + _page_x_right_margin)) / 2);
+    var __h = Math.max(1, (_page_height - (_page_y_top_margin + _page_y_bottom_margin)) / 2);
 
     var wI = (undefined !== _w) ? Math.max(_w * g_dKoef_pix_to_mm, 1) : 1;
     var hI = (undefined !== _h) ? Math.max(_h * g_dKoef_pix_to_mm, 1) : 1;
