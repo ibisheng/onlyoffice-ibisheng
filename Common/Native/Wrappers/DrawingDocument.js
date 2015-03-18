@@ -545,6 +545,7 @@ function CDrawingDocument()
 
     this.IsLockObjectsEnable    = false;
     this.LogicDocument          = null;
+    this.m_bIsMouseLock         = false;
     
     this.CanvasHitContext       = CreateHitControl();
 
@@ -1406,6 +1407,27 @@ CDrawingDocument.prototype =
         return true;
     },
 
+    LogicDocumentOnMouseDown : function(e, x, y, page)
+    {
+        if (this.m_bIsMouseLock)
+        {
+            this.LogicDocument.OnMouseUp(e, x, y, page);
+            this.m_bIsMouseLock = false;
+        }
+        this.LogicDocument.OnMouseDown(e, x, y, page);
+        this.m_bIsMouseLock = true;
+    },
+    LogicDocumentOnMouseUp : function(e, x, y, page)
+    {
+        if (!this.m_bIsMouseLock)
+        {
+            this.LogicDocument.OnMouseDown(e, x, y, page);
+            this.m_bIsMouseLock = true;
+        }
+        this.LogicDocument.OnMouseUp(e, x, y, page);
+        this.m_bIsMouseLock = false;
+    },
+
     OnCheckMouseDown : function(e)
     {
         // 0 - none
@@ -1480,11 +1502,11 @@ CDrawingDocument.prototype =
                 var _yDown = this.SelectRect2.Y + this.SelectRect2.H / 2;
                 if (!this.TextMatrix)
                 {
-                    this.LogicDocument.OnMouseDown(global_mouseEvent, _xDown, _yDown, this.SelectRect2.Page);
+                    this.LogicDocumentOnMouseDown(global_mouseEvent, _xDown, _yDown, this.SelectRect2.Page);
                 }
                 else
                 {
-                    this.LogicDocument.OnMouseDown(global_mouseEvent, this.TextMatrix.TransformPointX(_xDown, _yDown),
+                    this.LogicDocumentOnMouseDown(global_mouseEvent, this.TextMatrix.TransformPointX(_xDown, _yDown),
                         this.TextMatrix.TransformPointY(_xDown, _yDown), this.SelectRect2.Page);
                 }
 
@@ -1516,11 +1538,11 @@ CDrawingDocument.prototype =
                 var _yDown = this.SelectRect1.Y + this.SelectRect1.H / 2;
                 if (!this.TextMatrix)
                 {
-                    this.LogicDocument.OnMouseDown(global_mouseEvent, _xDown, _yDown, this.SelectRect1.Page);
+                    this.LogicDocumentOnMouseDown(global_mouseEvent, _xDown, _yDown, this.SelectRect1.Page);
                 }
                 else
                 {
-                    this.LogicDocument.OnMouseDown(global_mouseEvent, this.TextMatrix.TransformPointX(_xDown, _yDown),
+                    this.LogicDocumentOnMouseDown(global_mouseEvent, this.TextMatrix.TransformPointX(_xDown, _yDown),
                         this.TextMatrix.TransformPointY(_xDown, _yDown), this.SelectRect1.Page);
                 }
 
@@ -1611,7 +1633,7 @@ CDrawingDocument.prototype =
                 return;
 
             this.Native["DD_NeedScrollToTargetFlag"](true);
-            this.LogicDocument.OnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
+            this.LogicDocumentOnMouseDown.OnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
             this.Native["DD_NeedScrollToTargetFlag"](false);
         }
 
@@ -1663,7 +1685,8 @@ CDrawingDocument.prototype =
         this.Native.m_bIsMouseUpSend = true;
 
         this.Native["DD_NeedScrollToTargetFlag"](true);
-        this.LogicDocument.OnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
+
+        this.LogicDocumentOnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
         this.Native["DD_NeedScrollToTargetFlag"](false);
 
         this.Native.m_bIsMouseUpSend = false;
