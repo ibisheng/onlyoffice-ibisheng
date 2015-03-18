@@ -254,7 +254,7 @@
             // сначала заполняем массив this.fonts_loading объекстами fontinfo
             for (var i in _fonts)
             {
-                if (_fonts[i].Type != FONT_TYPE_EMBEDDED)
+                if (_fonts[i].type != FONT_TYPE_EMBEDDED)
                 {
                     var info = this.AddLoadFonts(_fonts[i].name, _fonts[i].NeedStyles);
 
@@ -274,7 +274,7 @@
                     {
                         if (this.embeddedFontInfos[j].Name == _fonts[i].name)
                         {
-                            this.AddLoadFontsNotPick(this.embeddedFontInfos[j], 0);
+                            this.AddLoadFontsNotPick(this.embeddedFontInfos[j], 0x0F);
                             break;
                         }
                     }
