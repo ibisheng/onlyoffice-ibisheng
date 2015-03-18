@@ -3039,8 +3039,8 @@ PasteProcessor.prototype =
 					var isImageInNode = node.getElementsByTagName('img') && node.getElementsByTagName('img').length ? true : false;
 					if(base64 != null)
 						aContent = this.ReadFromBinary(base64);
-					else if(base64FromExcel != null && isImageInNode)
-						aContentExcel = this._readFromBinaryExcel(base64FromExcel);
+					/*else if(base64FromExcel != null && isImageInNode)
+						aContentExcel = this._readFromBinaryExcel(base64FromExcel);*/
 					
 					if(aContentExcel)
 						aContent = this._convertExcelBinary(aContentExcel);
@@ -3051,7 +3051,9 @@ PasteProcessor.prototype =
 						pasteFromBinary = true;
 				}
 				
-				if(base64FromExcel && pasteFromBinary === false && false)//вставка из редактора таблиц
+				
+				//***вставка из редактора таблиц в документы***
+				if(base64FromExcel/* && pasteFromBinary === false && false*/)
 				{
 					var fPrepasteCallback = function(){
                         if(false == oThis.bNested)
@@ -3071,8 +3073,52 @@ PasteProcessor.prototype =
 					aContentExcel = this._readFromBinaryExcel(base64FromExcel);
 					History.TurnOn();
 					
-					this._convertExcelBinary(aContentExcel);
-					oThis.api.pre_Paste(oThis.aContent.fonts, oThis.aContent.images, fPrepasteCallback);
+					
+					if(aContentExcel.arrImages && aContentExcel.arrImages.length)
+					{
+						var aImagesToDownload = [];
+						for(var i = 0; i < aContentExcel.arrImages.length; i++)
+						{
+							aImagesToDownload.push(aContentExcel.arrImages[i].Url);
+						}
+						
+						var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+						sendCommand( this.api, function(incomeObject){
+							if(incomeObject && "imgurls" == incomeObject.type)
+							{
+								var oFromTo = JSON.parse(incomeObject.data);
+								for(var i = 0, length = aImagesToDownload.length; i < length; ++i)
+								{
+									var sFrom = aImagesToDownload[i];
+									var sTo = oFromTo[sFrom];
+									if(sTo)
+										aImagesToDownload[i] = sTo;
+								}
+								for(var i = 0, length = aContentExcel.arrImages.length; i < length; ++i)
+								{
+									var imageElem = aContentExcel.arrImages[i];
+									if(null != imageElem)
+									{
+										var sNewSrc = oFromTo[imageElem.Url];
+										if(null != sNewSrc)
+											imageElem.SetUrl(sNewSrc);
+									}
+								}
+							}
+							
+							var aContent = oThis._convertExcelBinary(aContentExcel);
+							oThis.aContent = aContent.content;
+							oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
+							
+						}, rData );
+					}
+					else
+					{
+						var aContent = oThis._convertExcelBinary(aContentExcel);
+						this.aContent = aContent.content;
+						oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
+					}
+					
 					return;
 				}
 				else if(pasteFromBinary)//вставка из редактора документов
@@ -3164,7 +3210,7 @@ PasteProcessor.prototype =
                     }
 					return;
 				}
-				else if(base64FromPresentation)
+				else if(base64FromPresentation)//вставка из редактора презентаций
 				{
 					var fPrepasteCallback = function(){
                         if(false == oThis.bNested)
@@ -3234,7 +3280,9 @@ PasteProcessor.prototype =
 					}
 				}
             }
-
+			
+			
+			//***вставляем извне в редактор документов***
             var presentation = editor.WordControl.m_oLogicDocument;
             this.oRootNode = node;
 			this.bIsPlainText = this._CheckIsPlainText(node);
@@ -4834,9 +4882,11 @@ PasteProcessor.prototype =
 			tempWorkbook.theme = this.oLogicDocument.themes[0];
 		
 		Asc.getBinaryOtherTableGVar(tempWorkbook);
+		
+		window.global_pptx_content_loader.Start_UseFullUrl();
 		oBinaryFileReader.Read(base64, tempWorkbook);
 		
-		return {workbook: tempWorkbook, activeRange: oBinaryFileReader.copyPasteObj.activeRange};
+		return {workbook: tempWorkbook, activeRange: oBinaryFileReader.copyPasteObj.activeRange, arrImages: window.global_pptx_content_loader.End_UseFullUrl()};
 	},
 	
     ReadPresentationText: function(stream)
