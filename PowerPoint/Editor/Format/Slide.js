@@ -822,6 +822,10 @@ Slide.prototype =
                         nv_sp_pr.cNvPr.setId(++this.maxId);
                         drawing.setNvSpPr(nv_sp_pr);
                     }
+                    for(var i = 0; i < drawing.spTree.length; ++i)
+                    {
+                        this.checkDrawingUniNvPr(drawing.spTree[i]);
+                    }
                     break;
                 }
                 case historyitem_type_ImageShape:
