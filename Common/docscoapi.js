@@ -35,7 +35,7 @@
 			var t = this;
 			this._CoAuthoringApi.onAuthParticipantsChanged = function (e, count) {t.callback_OnAuthParticipantsChanged(e, count);};
 			this._CoAuthoringApi.onParticipantsChanged = function (e, count) {t.callback_OnParticipantsChanged(e, count);};
-			this._CoAuthoringApi.onMessage = function (e) {t.callback_OnMessage(e);};
+			this._CoAuthoringApi.onMessage = function (e, clear) {t.callback_OnMessage(e, clear);};
 			this._CoAuthoringApi.onLocksAcquired = function (e) {t.callback_OnLocksAcquired(e);};
 			this._CoAuthoringApi.onLocksReleased = function (e, bChanges) {t.callback_OnLocksReleased(e, bChanges);};
 			this._CoAuthoringApi.onLocksReleasedEnd = function () {t.callback_OnLocksReleasedEnd();};
@@ -166,9 +166,9 @@
 			this.onParticipantsChanged(e, count);
 	};
 
-	CDocsCoApi.prototype.callback_OnMessage = function (e) {
+	CDocsCoApi.prototype.callback_OnMessage = function (e, clear) {
 		if (this.onMessage)
-			this.onMessage(e);
+			this.onMessage(e, clear);
 	};
 
 	CDocsCoApi.prototype.callback_OnLocksAcquired = function (e) {
@@ -523,9 +523,9 @@
         }
     };
 
-    DocsCoApi.prototype._onMessages = function (data) {
+    DocsCoApi.prototype._onMessages = function (data, clear) {
         if (data["messages"] && this.onMessage)
-            this.onMessage(data["messages"]);
+            this.onMessage(data["messages"], clear);
     };
 
     DocsCoApi.prototype._onGetLock = function (data) {
@@ -795,6 +795,7 @@
 			//if (this.ownedLockBlocks && this.ownedLockBlocks.length > 0) {
 			//	this._onPreviousLocks(data["locks"], this.ownedLockBlocks);
 			//}
+			this._onMessages(data, true);
 			this._onGetLock(data);
 			return;
 		}
@@ -811,7 +812,7 @@
 			this._onSetIndexUser(this._indexUser = data['indexUser']);
 			this._userId = this._user.asc_getId() + this._indexUser;
 
-			this._onMessages(data);
+			this._onMessages(data, false);
 			this._onGetLock(data);
 
 			// Применения изменений пользователя
@@ -910,7 +911,7 @@
 			var type = dataObject.type;
 			switch (type) {
 				case 'auth'				: t._onAuth(dataObject); break;
-				case 'message'			: t._onMessages(dataObject); break;
+				case 'message'			: t._onMessages(dataObject, false); break;
 				case 'getLock'			: t._onGetLock(dataObject); break;
 				case 'releaseLock'		: t._onReleaseLock(dataObject); break;
 				case 'connectState'		: t._onConnectionStateChanged(dataObject); break;

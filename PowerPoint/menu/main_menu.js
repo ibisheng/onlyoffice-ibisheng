@@ -2140,8 +2140,10 @@ $(document).ready(function(){
             if ( Count > 0 )
                 g_oToolBox.Activate_Users();
         });
-        editor.asc_registerCallback("asc_onCoAuthoringChatReceiveMessage", function(messages){
+        editor.asc_registerCallback("asc_onCoAuthoringChatReceiveMessage", function(messages, clear){
             var messagesElement = $('#messagesView');
+			if (clear)
+				messagesElement.empty();
             for (var message in messages)
                 messagesElement.append("<div>" + messages[message].user + ": " + messages[message].message + "</div>");
         });
