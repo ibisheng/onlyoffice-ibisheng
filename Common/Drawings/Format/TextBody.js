@@ -467,14 +467,6 @@ CTextBody.prototype =
                                         new_spacing.Line = spc;
                                     }
                                 }
-
-                                spc = spacing2.Before*spacing_scale;
-                                if(isRealNumber(spc))
-                                    new_spacing.Before = spc;
-
-                                spc = spacing2.After*spacing_scale;
-                                if(isRealNumber(spc))
-                                    new_spacing.After = spc;
                                 parg.Set_Spacing(new_spacing);
                             }
                             if(isRealNumber(font_scale))
