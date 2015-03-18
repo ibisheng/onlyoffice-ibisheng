@@ -1844,6 +1844,10 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             PRS.WordLen += this.GapLeft;
         }
 
+        //var PosEndRun = PRS.PosEndRun.Copy();
+        //var Word = PRS.Word;
+        //var WordLen = PRS.WordLen;
+
         for(var Pos = RangeStartPos; Pos < Len; Pos++)
         {
             var Item = this.Content[Pos];
@@ -1856,12 +1860,11 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             {
                 PRS.Update_CurPos(Pos, Depth);
                 PRS.bMath_OneLine  = false;
-
             }
 
             var NeedSetReset = CurLine == 0 && CurRange == 0  || Pos !== RangeStartPos;
             if(Item.Type == para_Math_Content && NeedSetReset)
-                Item.Recalculate_Reset( PRS.Range, PRS.Line ); // обновим StartLine и StartRange
+                Item.Recalculate_Reset(PRS.Range, PRS.Line); // обновим StartLine и StartRange
 
             Item.Recalculate_Range(PRS, ParaPr, Depth+1);
 
@@ -1885,6 +1888,10 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             }
         }
 
+        /*PRS.Word    = true;
+        */
+
+
         if(PRS.NewRange == false)
         {
             PRS.WordLen += this.GapRight;
@@ -1892,7 +1899,6 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
         this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
     }
-
 
     PRS.bMath_OneLine = bOneLine;
 };

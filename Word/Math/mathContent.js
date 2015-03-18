@@ -3832,7 +3832,9 @@ CMathContent.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selec
             SelectionDraw.W += Item.Get_Width(_CurLine);
         }
         else
+        {
             Item.Selection_DrawRange( _CurLine, _CurRange, SelectionDraw );
+        }
     }
 };
 CMathContent.prototype.Select_ElementByPos = function(nPos, bWhole)
@@ -4034,9 +4036,10 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         {
                             // обновим : начало нового слова - конец предыдущего Run
                             PRS.FirstItemOnLine = false;
+                            var _Depth = PRS.PosEndRun.Depth;
 
-                            PRS.Update_CurPos(PRS.PosEndRun.Get(Depth), Depth);
-                            PRS.Set_LineBreakPos(PRS.PosEndRun.Get(Depth + 1));
+                            PRS.Update_CurPos(PRS.PosEndRun.Get(_Depth-1), _Depth-1);
+                            PRS.Set_LineBreakPos(PRS.PosEndRun.Get(_Depth));
                         }
 
                         PRS.X += PRS.SpaceLen + PRS.WordLen;
@@ -4074,6 +4077,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 {
                     // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                     // FirstItemOnLine == false - слово оказалось не единственным элементом в промежутке, делаем перенос
+
                     if (PRS.FirstItemOnLine == false && PRS.X + PRS.SpaceLen + PRS.WordLen > PRS.XEnd)
                     {
                         PRS.MoveToLBP = true;
@@ -4085,8 +4089,10 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     if(Brk_Before == false && PRS.Word == false)
                     {
                         // обновим : начало нового слова - конец предыдущего Run
-                        PRS.Update_CurPos(PRS.PosEndRun.Get(Depth), Depth);
-                        PRS.Set_LineBreakPos(PRS.PosEndRun.Get(Depth + 1));
+                        var _Depth = PRS.PosEndRun.Depth;
+
+                        PRS.Update_CurPos(PRS.PosEndRun.Get(_Depth-1), _Depth-1);
+                        PRS.Set_LineBreakPos(PRS.PosEndRun.Get(_Depth));
                     }
 
                     PRS.Word = true;
@@ -4126,7 +4132,6 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         RangeEndPos = Pos - 1;
     }
 
-
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 
 };
@@ -4141,7 +4146,7 @@ CMathContent.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchP
 
     if(this.Content[CurPos].Type == para_Math_Composition)
     {
-        Result = this.Content[CurPos].Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth + 1);
+        Result = this.Content[CurPos].Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth + 1); // пытаемся встать в начало внутреннего контента
 
         if ( true === Result )
         {
@@ -4149,7 +4154,10 @@ CMathContent.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchP
         }
         else if(this.bRoot)
         {
-            Result = this.Content[StartPos].Math_Get_StartRangePos(true, _CurLine, _CurRange, SearchPos, Depth + 1);
+            if(this.Content[StartPos].Type == para_Math_Composition) /// убрать
+                Result = this.Content[StartPos].Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth + 1);
+            else
+                Result = this.Content[StartPos].Math_Get_StartRangePos(true, _CurLine, _CurRange, SearchPos, Depth + 1);
 
             if ( true === Result )
                 SearchPos.Pos.Update(StartPos, Depth);
@@ -4181,7 +4189,7 @@ CMathContent.prototype.Get_EndRangePos = function(_CurLine, _CurRange, SearchPos
 
     if(this.Content[CurPos].Type == para_Math_Composition)
     {
-        Result = this.Content[CurPos].Get_EndRangePos(_CurLine, _CurRange, SearchPos, Depth + 1);
+        Result = this.Content[CurPos].Get_EndRangePos(_CurLine, _CurRange, SearchPos, Depth + 1); // пытаемся встать в конец внутреннего контента
 
         if ( true === Result )
         {
@@ -4189,7 +4197,10 @@ CMathContent.prototype.Get_EndRangePos = function(_CurLine, _CurRange, SearchPos
         }
         else if(this.bRoot)
         {
-            Result = this.Content[EndPos].Math_Get_EndRangePos(true, _CurLine, _CurRange, SearchPos, Depth + 1);
+            if(this.Content[EndPos].Type == para_Math_Composition) /// убрать
+                Result = this.Content[EndPos].Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth + 1);
+            else
+                Result = this.Content[EndPos].Math_Get_EndRangePos(true, _CurLine, _CurRange, SearchPos, Depth + 1);
 
             if ( true === Result )
                 SearchPos.Pos.Update(EndPos, Depth );
