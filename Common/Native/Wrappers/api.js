@@ -1841,8 +1841,9 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             var _src = _params[_current.pos++];
             var _w = _params[_current.pos++];
             var _h = _params[_current.pos++];
+            var _pageNum = _params[_current.pos++];
 
-            this.AddImageUrlNative(_src, _w, _h);
+            this.AddImageUrlNative(_src, _w, _h, _pageNum);
             break;
         }
         case 53: // ASC_MENU_EVENT_TYPE_INSERT_SHAPE
@@ -1852,11 +1853,14 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             var _pageNum = _shapeProp.InsertPageNum;
             // получаем размеры страницы
             var _sectionPr = this.WordControl.m_oLogicDocument.Get_PageLimits(_pageNum);
+
+            var _min = Math.min(_sectionPr.XLimit / 2, _sectionPr.YLimit / 2);
+
             this.WordControl.m_oLogicDocument.DrawingObjects.addShapeOnPage(_shapeProp.type, _pageNum,
                     _sectionPr.X + _sectionPr.XLimit / 4,
                     _sectionPr.Y + _sectionPr.YLimit / 4,
-                    _sectionPr.XLimit / 2,
-                    _sectionPr.YLimit / 2);
+                    _min,
+                    _min);
             //this.StartAddShape(_shapeProp.type, true);
             break;
         }
@@ -4510,7 +4514,7 @@ asc_docs_api.prototype.StartAddShape = function(sPreset, is_apply)
     }
 };
 
-asc_docs_api.prototype.AddImageUrlNative = function(url, _w, _h)
+asc_docs_api.prototype.AddImageUrlNative = function(url, _w, _h, _pageNum)
 {
     var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
     var _page_width             = Page_Width;
@@ -4540,7 +4544,15 @@ asc_docs_api.prototype.AddImageUrlNative = function(url, _w, _h)
 
     this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
 
-    this.WordControl.m_oLogicDocument.Add_InlineImage(wI, hI, url);
+    if (undefined === _pageNum)
+    {
+        this.WordControl.m_oLogicDocument.Add_InlineImage(wI, hI, url);
+    }
+    else
+    {
+        var _sectionPr = this.WordControl.m_oLogicDocument.Get_PageLimits(_pageNum);
+        this.AddImageToPage(url, _pageNum, (_sectionPr.XLimit - wI) / 2, (_sectionPr.YLimit - hI) / 2, wI, hI);
+    }
 };
 
 asc_docs_api.prototype.Send_Menu_Event = function(type)
