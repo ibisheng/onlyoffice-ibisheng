@@ -7619,7 +7619,9 @@ CTable.prototype =
             var Y = this.RowsInfo[StartPos.Row].Y[CurPage];
             var H = this.RowsInfo[StartPos.Row].H[CurPage];
 
-            var BeginRect = { X : X0, Y : Y, W : X1 - X0, H : H, Page : CurPage + this.Get_StartPage_Absolute() };
+            var TableX = this.Pages[CurPage].X + this.RowsInfo[StartPos.Row].X0;
+
+            var BeginRect = { X : TableX + X0, Y : Y, W : X1 - X0, H : H, Page : CurPage + this.Get_StartPage_Absolute() };
 
             var EndPos = Cells_array[Cells_array.length - 1];
 
@@ -7640,7 +7642,7 @@ CTable.prototype =
             else
                 Direction = -1;
 
-            var EndRect = { X : X0, Y : Y, W : X1 - X0, H : H, Page : CurPage + this.Get_StartPage_Absolute() };
+            var EndRect = { X : TableX + X0, Y : Y, W : X1 - X0, H : H, Page : CurPage + this.Get_StartPage_Absolute() };
 
             return { Start : BeginRect, End : EndRect, Direction : Direction };
         }
