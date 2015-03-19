@@ -4131,7 +4131,12 @@ asc_docs_api.prototype.UpdateTextPr = function(TextPr)
         _stream["WriteDouble2"](TextPr.FontSize);
     }
 
-    if (TextPr.Color !== undefined)
+    if(TextPr.Unifill && TextPr.Unifill.fill && TextPr.Unifill.fill.type === FILL_TYPE_SOLID && TextPr.Unifill.fill.color)
+    {
+        var _color = CreateAscColor(TextPr.Unifill.fill.color);
+        asc_menu_WriteColor(6, CreateAscColorCustom(_color.r, _color.g, _color.b, false), _stream);
+    }
+    else if (TextPr.Color !== undefined)
     {
         asc_menu_WriteColor(6, CreateAscColorCustom(TextPr.Color.r, TextPr.Color.g, TextPr.Color.b, TextPr.Color.Auto), _stream);
     }

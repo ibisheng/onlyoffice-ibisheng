@@ -7371,6 +7371,10 @@ window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
 
     Document.Recalculate(false, false, RecalculateData);
 
+    Document.Document_UpdateInterfaceState();
+    //Document.Document_UpdateRulersState();
+    Document.Document_UpdateSelectionState();
+
     this.ShowParaMarks = false;
 };
 
