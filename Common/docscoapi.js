@@ -305,7 +305,7 @@
 		this._docid = null;
 		this._documentCallbackUrl = null;
 		this._token = null;
-		this._user = "Anonymous";
+		this._user = null;
 		this._userId = "Anonymous";
 		this._initCallback = null;
 		this.ownedLockBlocks = [];
