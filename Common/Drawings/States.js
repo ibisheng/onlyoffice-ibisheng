@@ -80,7 +80,7 @@ StartAddNewShape.prototype =
 
                 if(bLock)
                 {
-                    History.Create_NewPoint();
+                    History.Create_NewPoint(historydescription_CommonStatesAddNewShape);
                     var shape = track.getShape(false, oThis.drawingObjects.getDrawingDocument(), oThis.drawingObjects.drawingObjects);
 
                     if(!(oThis.drawingObjects.drawingObjects && oThis.drawingObjects.drawingObjects.cSld))
@@ -472,7 +472,7 @@ RotateState.prototype =
             {
                 var i, copy;
                 this.drawingObjects.resetSelection();
-                History.Create_NewPoint();
+                History.Create_NewPoint(historydescription_CommonStatesRotate);
                 for(i = 0; i < tracks.length; ++i)
                 {
                     copy = tracks[i].originalObject.copy();

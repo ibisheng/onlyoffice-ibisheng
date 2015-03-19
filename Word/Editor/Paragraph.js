@@ -5684,7 +5684,7 @@ Paragraph.prototype =
             {
                 if ( this.bFromDocument && false === editor.isViewMode && false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : this, CheckType : changestype_Paragraph_Content } ) )
                 {
-                    History.Create_NewPoint();
+                    History.Create_NewPoint(historydescription_Document_ParagraphExtendToPos);
                     History.Set_Additional_ExtendDocumentToPos();
 
                     if ( true === this.Extend_ToPos( X ) )
@@ -9204,7 +9204,7 @@ Paragraph.prototype =
         var FrameParas = this.Internal_Get_FrameParagraphs();
         if ( false === LogicDocument.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : FrameParas, CheckType : changestype_Paragraph_Content } ) )
         {
-            History.Create_NewPoint();
+            History.Create_NewPoint(historydescription_Document_ParagraphChangeFrame);
             var NewFramePr = FramePr.Copy();
 
             if ( Math.abs( X - this.CalculatedFrame.L ) > 0.001 )

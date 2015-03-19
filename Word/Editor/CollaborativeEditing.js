@@ -320,6 +320,31 @@ function CTableId()
 
                 break;
             }
+
+            case historyitem_TableId_Description:
+            {
+                // Long : FileCheckSum
+                // Long : FileSize
+                // Long : Description
+                // Long : ItemsCount
+                // Long : PointIndex
+                // Long : StartPoint
+                // Long : LastPoint
+                // Long : SumIndex
+                // Long : DeletedIndex
+
+                Writer.WriteLong(Data.FileCheckSum);
+                Writer.WriteLong(Data.FileSize);
+                Writer.WriteLong(Data.Description);
+                Writer.WriteLong(Data.ItemsCount);
+                Writer.WriteLong(Data.PointIndex);
+                Writer.WriteLong(Data.StartPoint);
+                Writer.WriteLong(Data.LastPoint);
+                Writer.WriteLong(Data.SumIndex);
+                Writer.WriteLong(null === Data.DeletedIndex ? -10 : Data.DeletedIndex);
+
+                break;
+            }
         }
     };
 
@@ -373,6 +398,41 @@ function CTableId()
                 break;
             }
 
+            case historyitem_TableId_Description:
+            {
+                // Long : FileCheckSum
+                // Long : FileSize
+                // Long : Description
+                // Long : ItemsCount
+                // Long : PointIndex
+                // Long : StartPoint
+                // Long : LastPoint
+                // Long : SumIndex
+                // Long : DeletedIndex
+
+                var FileCheckSum = Reader.GetLong();
+                var FileSize     = Reader.GetLong();
+                var Description  = Reader.GetLong();
+                var ItemsCount   = Reader.GetLong();
+                var PointIndex   = Reader.GetLong();
+                var StartPoint   = Reader.GetLong();
+                var LastPoint    = Reader.GetLong();
+                var SumIndex     = Reader.GetLong();
+                var DeletedIndex = Reader.GetLong();
+
+                console.log("----------------------------");
+                console.log("FileCheckSum " + FileCheckSum);
+                console.log("FileSize     " + FileSize);
+                console.log("Description  " + Description + " " + Get_HistoryPointStringDescription(Description));
+                console.log("ItemsCount   " + ItemsCount);
+                console.log("PointIndex   " + PointIndex);
+                console.log("StartPoint   " + StartPoint);
+                console.log("LastPoint    " + LastPoint);
+                console.log("SumIndex     " + SumIndex);
+                console.log("DeletedIndex " + (-10 === DeletedIndex ? null : DeletedIndex));
+
+                break;
+            }
         }
 
         return true;
@@ -763,10 +823,21 @@ function CCollaborativeEditing()
             LastPoint = History.Index;
         }
 
+        // Просчитаем сколько изменений на сервер пересылать не надо
+        var SumIndex = 0;
+        var StartPoint2 = Math.min( StartPoint, LastPoint + 1 );
+        for ( var PointIndex = 0; PointIndex < StartPoint2; PointIndex++ )
+        {
+            var Point = History.Points[PointIndex];
+            SumIndex += Point.Items.length;
+        }
+        var deleteIndex = ( null === History.SavedIndex ? null : SumIndex );
+
         var aChanges = [];
         for ( var PointIndex = StartPoint; PointIndex <= LastPoint; PointIndex++ )
         {
             var Point = History.Points[PointIndex];
+            History.Update_PointInfoItem(PointIndex, StartPoint, LastPoint, SumIndex, deleteIndex);
 
             for ( var Index = 0; Index < Point.Items.length; Index++ )
             {
@@ -775,15 +846,6 @@ function CCollaborativeEditing()
                 oChanges.Set_FromUndoRedo( Item.Class, Item.Data, Item.Binary );
                 aChanges.push(oChanges.m_pData);
             }
-        }
-        
-        // Просчитаем сколько изменений на сервер пересылать не надо
-        var SumIndex = 0;
-        var StartPoint2 = Math.min( StartPoint, LastPoint + 1 );
-        for ( var PointIndex = 0; PointIndex < StartPoint2; PointIndex++ )
-        {
-            var Point = History.Points[PointIndex];
-            SumIndex += Point.Items.length;
         }
 
         this.Release_Locks();

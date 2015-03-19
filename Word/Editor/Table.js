@@ -2855,7 +2855,7 @@ CTable.prototype =
         {
             if ( false === oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties) )
             {
-                oLogicDocument.Create_NewHistoryPoint();
+                oLogicDocument.Create_NewHistoryPoint(historydescription_Document_MoveInlineTable);
 
                 // Обновляем координаты
 
@@ -2960,7 +2960,7 @@ CTable.prototype =
             // Проверяем, можно ли двигать данную таблицу
             if ( false === oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties, { Type : changestype_2_InlineObjectMove, PageNum : PageNum, X : X, Y : Y }) )
             {
-                oLogicDocument.Create_NewHistoryPoint();
+                oLogicDocument.Create_NewHistoryPoint(historydescription_Document_MoveFlowTable);
 
                 var NewDocContent = NearestPos.Paragraph.Parent;
                 var OldDocContent = this.Parent;
@@ -9657,7 +9657,7 @@ CTable.prototype =
                 {
                     if ( false == editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : this, CheckType : changestype_Table_Properties }) )
                     {
-                        History.Create_NewPoint();
+                        History.Create_NewPoint(historydescription_Document_TableAddNewRowByTab);
                         this.Row_Add(false);
                     }
                     else

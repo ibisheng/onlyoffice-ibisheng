@@ -95,7 +95,7 @@ function Editor_Copy_Button(api, bCut)
 {
 	
 	if(bCut)
-		History.Create_NewPoint();
+		History.Create_NewPoint(historydescription_Cut);
 	
     if(AscBrowser.isIE)
     {
@@ -2266,7 +2266,7 @@ function Editor_Paste_Button(api)
         document.body.style["user-select"] = "none";
         document.body.style["-webkit-user-select"] = "none";
 
-		History.Create_NewPoint();
+		History.Create_NewPoint(historydescription_PasteButtonIE);
         editor.waitSave = true;
         Editor_Paste(api, false);
         return true;
@@ -2276,7 +2276,7 @@ function Editor_Paste_Button(api)
 		var ElemToSelect = document.getElementById( COPY_ELEMENT_ID );
 		if(ElemToSelect && ElemToSelect.innerHTML !== "&nbsp;" && ElemToSelect.innerHTML !== "")
 		{
-			History.Create_NewPoint();
+			History.Create_NewPoint(historydescription_PasteButtonNotIE);
             editor.waitSave = true;
 			Editor_Paste_Exec(api, ElemToSelect);
 		}

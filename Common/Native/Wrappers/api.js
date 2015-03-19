@@ -5406,7 +5406,7 @@ asc_docs_api.prototype.Call_Menu_Context_SelectAll = function()
 };
 asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
 {
-    History.Create_NewPoint();
+    History.Create_NewPoint(historydescription_PasteNative);
     callback();
 };
 /************************************************************************/

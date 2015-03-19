@@ -4622,7 +4622,7 @@ DrawingObjectsController.prototype =
                 {
                     if(chart_selection.selection.title && chart_selection.selection.title.parent)
                     {
-                        History.Create_NewPoint();
+                        History.Create_NewPoint(historydescription_CommonControllerCheckChartText);
                         chart_selection.selection.title.parent.setTitle(null);
                     }
                 }
@@ -4868,7 +4868,7 @@ DrawingObjectsController.prototype =
         var ungroup_arr = this.canUnGroup(true);
         if(ungroup_arr.length > 0)
         {
-            History.Create_NewPoint();
+            History.Create_NewPoint(historydescription_CommonControllerUnGroup);
             this.resetSelection();
             var i, j,   cur_group, sp_tree, sp;
             for(i = 0; i < ungroup_arr.length; ++i)
@@ -5777,7 +5777,7 @@ DrawingObjectsController.prototype =
         {
             if(bLock)
             {
-                History.Create_NewPoint();
+                History.Create_NewPoint(historydescription_CommonControllerCheckSelected);
                 if(bSync !== true)
                 {
                     _this.setSelectionState(selection_state);
@@ -5938,7 +5938,7 @@ DrawingObjectsController.prototype =
         }
         else
         {
-            History.Create_NewPoint();
+            History.Create_NewPoint(historydescription_CommonControllerSetGraphicObject);
             this.setGraphicObjectLayerCallBack(layerType);
             this.startRecalculate();
         }

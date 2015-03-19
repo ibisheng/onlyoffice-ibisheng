@@ -237,7 +237,7 @@ CDocument.prototype.Search_Replace = function(NewStr, bAll, Id)
 
     if ( false === this.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : CheckParagraphs, CheckType : changestype_Paragraph_Content } ) )
     {
-        History.Create_NewPoint();
+        History.Create_NewPoint(bAll ? historydescription_Document_ReplaceAll : historydescription_Document_ReplaceSingle);
 
         if ( true === bAll )
             this.SearchEngine.Replace_All( NewStr, true );

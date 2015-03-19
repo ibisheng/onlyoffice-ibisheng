@@ -1951,7 +1951,7 @@ CHeaderFooterController.prototype =
                 {
                     // Меняем старый режим редактирования, чтобы при Undo/Redo возвращаться в режим редактирования документа
                     this.LogicDocument.CurPos.Type = docpostype_Content;
-                    History.Create_NewPoint();
+                    History.Create_NewPoint(historydescription_Document_AddHeader);
                     this.LogicDocument.CurPos.Type = docpostype_HdrFtr;
                     HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Header, PageIndex );
                     this.LogicDocument.Recalculate();
@@ -1970,7 +1970,7 @@ CHeaderFooterController.prototype =
                 {
                     // Меняем старый режим редактирования, чтобы при Undo/Redo возвращаться в режим редактирования документа
                     this.LogicDocument.CurPos.Type = docpostype_Content;
-                    History.Create_NewPoint();
+                    History.Create_NewPoint(historydescription_Document_AddFooter);
                     this.LogicDocument.CurPos.Type = docpostype_HdrFtr;
                     HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Footer, PageIndex );
                     this.LogicDocument.Recalculate();

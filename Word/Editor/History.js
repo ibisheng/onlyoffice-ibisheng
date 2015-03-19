@@ -34,10 +34,75 @@ function CHistory(Document)
     this.MinorChanges   = false; // Данный параметр нужен, чтобы определить влияют ли добавленные изменения на пересчет
 
     this.BinaryWriter = new CMemory();
+
+    this.FileCheckSum = 0;
+    this.FileSize     = 0;
 }
 
 CHistory.prototype =
 {
+    Update_FileDescription : function(oStream)
+    {
+        var pData = oStream.data;
+        var nSize = oStream.size;
+
+        this.FileCheckSum = g_oCRC32.Calculate_ByByteArray(pData, nSize);
+        this.FileSize     = nSize;
+    },
+
+    Update_PointInfoItem : function(PointIndex, StartPoint, LastPoint, SumIndex, DeletedIndex)
+    {
+        var Point = this.Points[PointIndex];
+        if (Point)
+        {
+            // Проверяем первое изменение. Если оно уже нужного типа, тогда мы его удаляем. Добавляем специфическое
+            // первое изменение с описанием.
+            var Class = g_oTableId;
+
+            if (Point.Items.length > 0)
+            {
+                var FirstItem = Point.Items[0];
+                if (FirstItem.Class === Class && historyitem_TableId_Description === FirstItem.Data.Type)
+                    Point.Items.splice(0, 1);
+            }
+
+            var Data =
+            {
+                Type         : historyitem_TableId_Description,
+                FileCheckSum : this.FileCheckSum,
+                FileSize     : this.FileSize,
+                Description  : Point.Description,
+                ItemsCount   : Point.Items.length,
+                PointIndex   : PointIndex,
+                StartPoint   : StartPoint,
+                LastPoint    : LastPoint,
+                SumIndex     : SumIndex,
+                DeletedIndex : DeletedIndex
+            };
+
+            var Binary_Pos = this.BinaryWriter.GetCurPosition();
+            this.BinaryWriter.WriteString2(Class.Get_Id());
+            Class.Save_Changes(Data, this.BinaryWriter);
+
+            var Binary_Len = this.BinaryWriter.GetCurPosition() - Binary_Pos;
+
+            var Item =
+            {
+                Class : Class,
+                Data  : Data,
+                Binary:
+                {
+                    Pos : Binary_Pos,
+                    Len : Binary_Len
+                },
+
+                NeedRecalc : false
+            };
+
+            Point.Items.splice(0, 0, Item);
+        }
+    },
+
     Is_Clear : function()
     {
         if ( this.Points.length <= 0 )
@@ -141,7 +206,7 @@ CHistory.prototype =
         return this.RecalculateData;
     },
 
-    Create_NewPoint : function()
+    Create_NewPoint : function(Description)
     {
 		if ( 0 !== this.TurnOffHistory )
 			return;
@@ -166,7 +231,8 @@ CHistory.prototype =
             State      : State, // Текущее состояние документа (курсор, селект)
             Items      : Items, // Массив изменений, начиная с текущего момента
             Time       : Time,  // Текущее время
-            Additional : {}     // Дополнительная информация
+            Additional : {},    // Дополнительная информация
+            Description: Description
         };
 
         // Удаляем ненужные точки
@@ -430,10 +496,11 @@ CHistory.prototype =
 
         var NewPoint =
         {
-            State : Point1.State,
-            Items : Point1.Items.concat(Point2.Items),
-            Time  : Point1.Time,
-            Additional : {}
+            State      : Point1.State,
+            Items      : Point1.Items.concat(Point2.Items),
+            Time       : Point1.Time,
+            Additional : {},
+            Description: historydescription_Document_AddLetter
         };
 
 		if ( this.SavedIndex >= this.Points.length - 2 && null !== this.SavedIndex )
@@ -625,3 +692,51 @@ CHistory.prototype =
 };
 
 var History = null;
+
+function CRC32()
+{
+    this.m_aTable = [];
+    this.private_InitTable();
+}
+CRC32.prototype.private_InitTable = function()
+{
+    var CRC_POLY = 0xEDB88320;
+    var nChar;
+    for(var nIndex = 0; nIndex < 256; nIndex++)
+    {
+        nChar = nIndex;
+        for(var nCounter = 0; nCounter < 8; nCounter++)
+        {
+            nChar = ((nChar & 1) ? ((nChar >>> 1) ^ CRC_POLY) : (nChar >>> 1));
+        }
+        this.m_aTable[nIndex] = nChar;
+    }
+};
+CRC32.prototype.Calculate_ByString = function(sStr, nSize)
+{
+    var CRC_MASK = 0xD202EF8D;
+    var nCRC = 0 ^ (-1);
+
+    for (var nIndex = 0; nIndex < nSize; nIndex++)
+    {
+        nCRC = this.m_aTable[(nCRC ^ sStr.charCodeAt(nIndex)) & 0xFF] ^ (nCRC >>> 8);
+        nCRC ^= CRC_MASK;
+    }
+
+    return (nCRC ^ (-1)) >>> 0;
+};
+CRC32.prototype.Calculate_ByByteArray = function(aArray, nSize)
+{
+    var CRC_MASK = 0xD202EF8D;
+    var nCRC = 0 ^ (-1);
+
+    for (var nIndex = 0; nIndex < nSize; nIndex++)
+    {
+        nCRC = (nCRC >>> 8) ^ this.m_aTable[(nCRC ^ aArray[nIndex]) & 0xFF];
+        nCRC ^= CRC_MASK;
+    }
+
+    return (nCRC ^ (-1)) >>> 0;
+};
+
+var g_oCRC32 = new CRC32();

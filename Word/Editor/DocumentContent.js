@@ -2122,7 +2122,7 @@ CDocumentContent.prototype =
         var LastPara = this.Content[this.Content.length - 1];
         var LastPara2 = LastPara;
 
-        History.Create_NewPoint();
+        History.Create_NewPoint(historydescription_Document_DocumentContentExtendToPos);
         History.Set_Additional_ExtendDocumentToPos();
 
         while ( true )

@@ -4274,7 +4274,7 @@ CMathContent.prototype.Process_AutoCorrect = function(ActionElement)
         AutoCorrectEngine.MathPr = new CMPrp();
 
     // Создаем новую точку здесь, потому что если автозамену можно будет сделать классы сразу будут создаваться
-    History.Create_NewPoint();
+    History.Create_NewPoint(historydescription_Document_MathAutoCorrect);
 
     var bCursorStepRight = false;
 	// Смотрим возможно ли выполнить автозамену, если нет, тогда пробуем произвести автозамену пропуская последний символ

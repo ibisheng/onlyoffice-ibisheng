@@ -2700,7 +2700,7 @@ CDocument.prototype =
         var LastPara = this.Content[this.Content.length - 1];
         var LastPara2 = LastPara;
 
-        this.Create_NewHistoryPoint();
+        this.Create_NewHistoryPoint(historydescription_Document_DocumentExtendToPos);
         this.History.Set_Additional_ExtendDocumentToPos();
 
         while ( true )
@@ -3017,7 +3017,7 @@ CDocument.prototype =
 
         if ( false === this.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_Element_and_Type, Element : OldParagraph, CheckType : changestype_Paragraph_Content } ) )
         {
-            this.Create_NewHistoryPoint();
+            this.Create_NewHistoryPoint(historydescription_Document_AddDropCap);
 
             var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
 
@@ -3091,7 +3091,7 @@ CDocument.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : FrameParas, CheckType : changestype_Paragraph_Content } ) )
             {
-                this.Create_NewHistoryPoint();
+                this.Create_NewHistoryPoint(historydescription_Document_RemoveDropCap);
                 var Count = FrameParas.length;
                 for ( var Index = 0; Index < Count; Index++ )
                 {
@@ -3122,7 +3122,7 @@ CDocument.prototype =
                 FrameParas.push(Next);
                 if ( false === this.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : FrameParas, CheckType : changestype_Paragraph_Content } ) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_RemoveDropCap);
 
                     // Удалим ненужный элемент
                     FrameParas.splice( FrameParas.length - 1, 1 );
@@ -3161,7 +3161,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : FrameParas, CheckType : changestype_Paragraph_Content } ) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_RemoveDropCap);
                     var Count = FrameParas.length;
                     for ( var Index = 0; Index < Count; Index++ )
                     {
@@ -7095,7 +7095,7 @@ CDocument.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
             {
-                this.Create_NewHistoryPoint();
+                this.Create_NewHistoryPoint(historydescription_Document_SetTextHighlight);
 
                 if (false === IsColor)
                     this.Paragraph_Add( new ParaTextPr( { HighLight : highlight_None  } ) );
@@ -8687,7 +8687,7 @@ CDocument.prototype =
             // Создаем сразу точку в истории, т.к. при выполнении функции Get_SelectedContent нам надо, чтобы данная
             // точка уже набивалась изменениями. Если из-за совместного редактирования действие сделать невозможно будет,
             // тогда последнюю точку удаляем.
-            History.Create_NewPoint();
+            History.Create_NewPoint(historydescription_Document_DragText);
 
             NearPos.Paragraph.Check_NearestPos( NearPos );
 
@@ -9233,7 +9233,7 @@ CDocument.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked(changestype_Remove) )
             {
-                this.Create_NewHistoryPoint();
+                this.Create_NewHistoryPoint(historydescription_Document_BackSpaceButton);
                 this.Remove( -1, true );
             }
             bRetValue = true;
@@ -9267,7 +9267,7 @@ CDocument.prototype =
                     {
                         if ( false === this.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : Paragraph, CheckType : changestype_Paragraph_Properties } ) )
                         {
-                            this.Create_NewHistoryPoint();
+                            this.Create_NewHistoryPoint(historydescription_Document_MoveParagraphByTab);
                             Paragraph.Add_Tab(e.ShiftKey);
                             this.Recalculate();
 
@@ -9277,7 +9277,7 @@ CDocument.prototype =
                     }
                     else if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                     {
-                        this.Create_NewHistoryPoint();
+                        this.Create_NewHistoryPoint(historydescription_Document_AddTab);
                         this.Paragraph_Add( new ParaTab() );
                     }
                 }
@@ -9303,7 +9303,7 @@ CDocument.prototype =
                     var CheckType = ( e.ShiftKey || e.CtrlKey ? changestype_Paragraph_Content : changestype_Document_Content_Add );
                     if (false === this.Document_Is_SelectionLocked(CheckType))
                     {
-                        this.Create_NewHistoryPoint();
+                        this.Create_NewHistoryPoint(historydescription_Document_EnterButton);
 
                         var oSelectedInfo = this.Get_SelectedElementsInfo();
                         var oMath = oSelectedInfo.Get_Math();
@@ -9381,7 +9381,7 @@ CDocument.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
             {
-                this.Create_NewHistoryPoint();
+                this.Create_NewHistoryPoint(historydescription_Document_SpaceButton);
 
                 // Если мы находимся в формуле, тогда пытаемся выполнить автозамену
 
@@ -9711,7 +9711,7 @@ CDocument.prototype =
                     {
                         if (!window.USER_AGENT_SAFARI_MACOS)
                         {
-                            this.Create_NewHistoryPoint();
+                            this.Create_NewHistoryPoint(historydescription_Document_ShiftInsert);
 
                             window.GlobalPasteFlag = true;
                             editor.waitSave = true;
@@ -9722,7 +9722,7 @@ CDocument.prototype =
                         {
                             if (0 === window.GlobalPasteFlagCounter)
                             {
-                                this.Create_NewHistoryPoint();
+                                this.Create_NewHistoryPoint(historydescription_Document_ShiftInsertSafari);
 
                                 SafariIntervalFocus();
                                 window.GlobalPasteFlag = true;
@@ -9742,7 +9742,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Delete) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_DeleteButton);
                     this.Remove( 1, true );
                 }
                 bRetValue = true;
@@ -9751,7 +9751,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_ShiftDeleteButton);
                     Editor_Copy(this.DrawingDocument.m_oWordControl.m_oApi, true);
                 }
                 //не возвращаем true чтобы не было preventDefault
@@ -9761,7 +9761,7 @@ CDocument.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
             {
-                this.Create_NewHistoryPoint();
+                this.Create_NewHistoryPoint(historydescription_Document_SetStyleHeading1);
                 this.Set_ParagraphStyle( "Heading 1" );
                 this.Document_UpdateInterfaceState();
             }
@@ -9771,7 +9771,7 @@ CDocument.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
             {
-                this.Create_NewHistoryPoint();
+                this.Create_NewHistoryPoint(historydescription_Document_SetStyleHeading2);
                 this.Set_ParagraphStyle( "Heading 2" );
                 this.Document_UpdateInterfaceState();
             }
@@ -9781,7 +9781,7 @@ CDocument.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
             {
-                this.Create_NewHistoryPoint();
+                this.Create_NewHistoryPoint(historydescription_Document_SetStyleHeading3);
                 this.Set_ParagraphStyle( "Heading 3" );
                 this.Document_UpdateInterfaceState();
             }
@@ -9794,7 +9794,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_SetTextStrikeoutHotKey);
                     this.Paragraph_Add( new ParaTextPr( { Strikeout : TextPr.Strikeout === true ? false : true } ) );
                     this.Document_UpdateInterfaceState();
                 }
@@ -9814,7 +9814,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_SetTextBoldHotKey);
                     this.Paragraph_Add( new ParaTextPr( { Bold : TextPr.Bold === true ? false : true } ) );
                     this.Document_UpdateInterfaceState();
                 }
@@ -9843,7 +9843,7 @@ CDocument.prototype =
                 {
                     if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
                     {
-                        this.Create_NewHistoryPoint();
+                        this.Create_NewHistoryPoint(historydescription_Document_SetParagraphAlignHotKey);
                         this.Set_ParagraphAlign( ParaPr.Jc === align_Center ? align_Left : align_Center );
                         this.Document_UpdateInterfaceState();
                     }
@@ -9854,7 +9854,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_AddEuroLetter);
 
                     this.DrawingDocument.TargetStart();
                     this.DrawingDocument.TargetShow();
@@ -9870,7 +9870,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_SetTextItalicHotKey);
                     this.Paragraph_Add( new ParaTextPr( { Italic : TextPr.Italic === true ? false : true } ) );
                     this.Document_UpdateInterfaceState();
                 }
@@ -9884,7 +9884,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_SetParagraphAlignHotKey2);
                     this.Set_ParagraphAlign( ParaPr.Jc === align_Justify ? align_Left : align_Justify );
                     this.Document_UpdateInterfaceState();
                 }
@@ -9904,7 +9904,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_SetParagraphNumberingHotKey);
                     this.Set_ParagraphNumbering( { Type : 0, SubType : 1 } );
                     this.Document_UpdateInterfaceState();
                 }
@@ -9917,7 +9917,7 @@ CDocument.prototype =
                 {
                     if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
                     {
-                        this.Create_NewHistoryPoint();
+                        this.Create_NewHistoryPoint(historydescription_Document_SetParagraphAlignHotKey3);
                         this.Set_ParagraphAlign( ParaPr.Jc === align_Left ? align_Justify : align_Left );
                         this.Document_UpdateInterfaceState();
                     }
@@ -9940,7 +9940,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_AddPageNumHotKey);
                     this.Paragraph_Add( new ParaPageNum() );
                 }
                 bRetValue = true;
@@ -9958,7 +9958,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_SetParagraphAlignHotKey4);
                     this.Set_ParagraphAlign( ParaPr.Jc === align_Right ? align_Left : align_Right );
                     this.Document_UpdateInterfaceState();
                 }
@@ -9980,7 +9980,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_SetTextUnderlineHotKey);
                     this.Paragraph_Add( new ParaTextPr( { Underline : TextPr.Underline === true ? false : true } ) );
                     this.Document_UpdateInterfaceState();
                 }
@@ -9993,7 +9993,7 @@ CDocument.prototype =
             {
                 if ( true === e.ShiftKey ) // Ctrl + Shift + V - вставляем по образцу
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_FormatPasteHotKey);
                     this.Document_Format_Paste();
                     bRetValue = true;
                 }
@@ -10003,7 +10003,7 @@ CDocument.prototype =
                     {
                         if (!window.USER_AGENT_SAFARI_MACOS)
                         {
-                            this.Create_NewHistoryPoint();
+                            this.Create_NewHistoryPoint(historydescription_Document_PasteHotKey);
 
                             window.GlobalPasteFlag = true;
                             editor.waitSave = true;
@@ -10014,7 +10014,7 @@ CDocument.prototype =
                         {
                             if (0 === window.GlobalPasteFlagCounter)
                             {
-                                this.Create_NewHistoryPoint();
+                                this.Create_NewHistoryPoint(historydescription_Document_PasteSafariHotKey);
 
                                 SafariIntervalFocus();
                                 window.GlobalPasteFlag = true;
@@ -10036,7 +10036,7 @@ CDocument.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
             {
-                this.Create_NewHistoryPoint();
+                this.Create_NewHistoryPoint(historydescription_Document_CurHotKey);
                 Editor_Copy(this.DrawingDocument.m_oWordControl.m_oApi, true);
             }
             //не возвращаем true чтобы не было preventDefault
@@ -10112,7 +10112,7 @@ CDocument.prototype =
                 {
                     if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
                     {
-                        this.Create_NewHistoryPoint();
+                        this.Create_NewHistoryPoint(historydescription_Document_SetTextVertAlignHotKey);
                         if (true === e.ShiftKey)
                             this.Paragraph_Add(new ParaTextPr({ VertAlign : TextPr.VertAlign === vertalign_SuperScript ? vertalign_Baseline : vertalign_SuperScript }));
                         else
@@ -10130,7 +10130,7 @@ CDocument.prototype =
                 {
                     if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
                     {
-                        this.Create_NewHistoryPoint();
+                        this.Create_NewHistoryPoint(historydescription_Document_AddMathHotKey);
                         this.Paragraph_Add(new MathMenu (-1));
                         bRetValue = true;
                     }
@@ -10144,7 +10144,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_SetTextVertAlignHotKey2);
                     this.Paragraph_Add( new ParaTextPr( { VertAlign : TextPr.VertAlign === vertalign_SuperScript ? vertalign_Baseline : vertalign_SuperScript } ) );
                     this.Document_UpdateInterfaceState();
                 }
@@ -10155,7 +10155,7 @@ CDocument.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
             {
-                this.Create_NewHistoryPoint();
+                this.Create_NewHistoryPoint(historydescription_Document_MinusButton);
 
                 this.DrawingDocument.TargetStart();
                 this.DrawingDocument.TargetShow();
@@ -10182,7 +10182,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_SetTextVertAlignHotKey3);
                     this.Paragraph_Add( new ParaTextPr( { VertAlign : TextPr.VertAlign === vertalign_SubScript ? vertalign_Baseline : vertalign_SubScript } ) );
                     this.Document_UpdateInterfaceState();
                 }
@@ -10230,7 +10230,7 @@ CDocument.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
             {
-                this.Create_NewHistoryPoint();
+                this.Create_NewHistoryPoint(historydescription_Document_AddLetter);
 
                 this.DrawingDocument.TargetStart();
                 this.DrawingDocument.TargetShow();
@@ -10273,7 +10273,7 @@ CDocument.prototype =
             if ( true === editor.isViewMode || true === this.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : Table, CheckType : changestype_Table_Properties } ) )
                 return;
 
-            this.Create_NewHistoryPoint();
+            this.Create_NewHistoryPoint(historydescription_Document_MoveTableBorder);
         }
 
         var OldCurPage = this.CurPage;
@@ -10493,7 +10493,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_FormatPasteHotKey2);
                     this.Document_Format_Paste();
                 }
                 
@@ -10518,7 +10518,7 @@ CDocument.prototype =
                     else
                         ParaItem = new ParaTextPr( { HighLight : this.HighlightColor } );
 
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_SetTextHighlight2);
                     this.Paragraph_Add( ParaItem );
                     this.Cursor_MoveAt(X, Y, false);
                     this.Document_UpdateSelectionState();
@@ -12226,9 +12226,9 @@ CDocument.prototype =
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Create_NewHistoryPoint : function()
+    Create_NewHistoryPoint : function(Description)
     {
-        this.History.Create_NewPoint();
+        this.History.Create_NewPoint(Description);
     },
 
     Document_Undo : function()
@@ -13515,7 +13515,7 @@ CDocument.prototype =
     {
         if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
         {
-            this.Create_NewHistoryPoint();
+            this.Create_NewHistoryPoint(historydescription_Document_AddTextFromTextBox);
 
             // Отключаем пересчет, включим перед последним добавлением. Поскольку,
             // у нас все добавляется в 1 параграф, так можно делать.
@@ -14122,7 +14122,7 @@ CDocument.prototype.Add_MailMergeField = function(Name)
 {
     if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
     {
-        this.Create_NewHistoryPoint();
+        this.Create_NewHistoryPoint(historydescription_Document_AddMailMergeField);
 
         var oField = new ParaField(fieldtype_MERGEFIELD, [Name], []);
         var oRun = new ParaRun();

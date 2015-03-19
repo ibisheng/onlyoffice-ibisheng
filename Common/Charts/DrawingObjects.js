@@ -2329,7 +2329,7 @@ function DrawingObjects() {
                 var callbackCheck = function (result) {
                     if(result)
                     {
-                        History.Create_NewPoint();
+                        History.Create_NewPoint(historydescription_ChartDrawingObjects);
                         editChart(chart);
                         _this.showDrawingObjects(true);
                     }
