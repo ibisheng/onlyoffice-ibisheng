@@ -4923,8 +4923,11 @@ ParaRun.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionD
 
         if ( true === DrawSelection )
         {
-            if (true === SelectionDraw.Draw && para_Drawing === ItemType && true !== Item.Is_Inline())
-                Item.Draw_Selection();
+            if (para_Drawing === ItemType && true !== Item.Is_Inline())
+            {
+                if (true === SelectionDraw.Draw)
+                    Item.Draw_Selection();
+            }
             else
                 SelectionDraw.W += Item.Get_WidthVisible();
         }
