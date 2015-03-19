@@ -9192,7 +9192,7 @@ CDocumentContent.prototype =
 
     Get_SelectionBounds : function()
     {
-        if (true === this.Selection.Use)
+        if (true === this.Selection.Use && selectionflag_Common === this.Selection.Flag)
         {
             var Start = this.Selection.StartPos;
             var End   = this.Selection.EndPos;
