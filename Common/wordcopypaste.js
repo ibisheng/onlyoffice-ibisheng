@@ -3039,11 +3039,6 @@ PasteProcessor.prototype =
 					var isImageInNode = node.getElementsByTagName('img') && node.getElementsByTagName('img').length ? true : false;
 					if(base64 != null)
 						aContent = this.ReadFromBinary(base64);
-					/*else if(base64FromExcel != null && isImageInNode)
-						aContentExcel = this._readFromBinaryExcel(base64FromExcel);*/
-					
-					if(aContentExcel)
-						aContent = this._convertExcelBinary(aContentExcel);
 						
 					if(base64 != null && aContent)
 						pasteFromBinary = true;
@@ -3087,12 +3082,16 @@ PasteProcessor.prototype =
 							if(incomeObject && "imgurls" == incomeObject.type)
 							{
 								var oFromTo = JSON.parse(incomeObject.data);
+								
+								var arr_images =[];
+								var image_map = {};
+								
 								for(var i = 0, length = aImagesToDownload.length; i < length; ++i)
 								{
 									var sFrom = aImagesToDownload[i];
 									var sTo = oFromTo[sFrom];
 									if(sTo)
-										aImagesToDownload[i] = sTo;
+										arr_images.push(sTo);
 								}
 								for(var i = 0, length = aContentExcel.arrImages.length; i < length; ++i)
 								{
@@ -3101,14 +3100,22 @@ PasteProcessor.prototype =
 									{
 										var sNewSrc = oFromTo[imageElem.Url];
 										if(null != sNewSrc)
+										{
+											image_map[sNewSrc] = sNewSrc;
 											imageElem.SetUrl(sNewSrc);
+										}
+										else
+										{
+											image_map[imageElem.Url] = imageElem.Url;
+										}
+											
 									}
 								}
 							}
 							
 							var aContent = oThis._convertExcelBinary(aContentExcel);
 							oThis.aContent = aContent.content;
-							oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
+							oThis.api.pre_Paste(aContent.fonts, image_map, fPrepasteCallback);
 							
 						}, rData );
 					}
@@ -3210,7 +3217,7 @@ PasteProcessor.prototype =
                     }
 					return;
 				}
-				else if(base64FromPresentation)//вставка из редактора презентаций
+				else if(base64FromPresentation)//вставка из редактора презентаций в документы
 				{
 					var fPrepasteCallback = function(){
                         if(false == oThis.bNested)
@@ -3267,14 +3274,60 @@ PasteProcessor.prototype =
 							if(!objects.arrImages.length && objects.arrShapes.length === 1 && objects.arrShapes[0] && objects.arrShapes[0].Drawing && objects.arrShapes[0].Drawing.graphicObject)
 							{
 								var drawing = objects.arrShapes[0].Drawing;
+								//TODO в данном вставляется как html
 								if(typeof CGraphicFrame !== "undefined" && drawing instanceof CGraphicFrame)
 									break;
 							}
 							
-							var aContent = oThis._convertExcelBinary(null, arr_shapes);
-							this.aContent = aContent.content;
+								
+							var aImagesToDownload = [];
+							for(var i = 0; i < objects.arrImages.length; i++)
+							{
+								aImagesToDownload.push(objects.arrImages[i].Url);
+							}
 							
-							oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
+							var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+							sendCommand( this.api, function(incomeObject){
+								if(incomeObject && "imgurls" == incomeObject.type)
+								{
+									var oFromTo = JSON.parse(incomeObject.data);
+									
+									var arr_images =[];
+									var image_map = {};
+									
+									for(var i = 0, length = aImagesToDownload.length; i < length; ++i)
+									{
+										var sFrom = aImagesToDownload[i];
+										var sTo = oFromTo[sFrom];
+										if(sTo)
+											arr_images.push(sTo);
+									}
+									for(var i = 0, length = objects.arrImages.length; i < length; ++i)
+									{
+										var imageElem = objects.arrImages[i];
+										if(null != imageElem)
+										{
+											var sNewSrc = oFromTo[imageElem.Url];
+											if(null != sNewSrc)
+											{
+												image_map[sNewSrc] = sNewSrc;
+												imageElem.SetUrl(sNewSrc);
+											}
+											else
+											{
+												image_map[imageElem.Url] = imageElem.Url;
+											}
+												
+										}
+									}
+								}
+								
+								aContent = oThis._convertExcelBinary(null, arr_shapes);
+								oThis.aContent = aContent.content;
+								oThis.api.pre_Paste(aContent.fonts, image_map, fPrepasteCallback);
+								
+							}, rData );
+							
 							return;
 						}
 					}
@@ -4092,17 +4145,23 @@ PasteProcessor.prototype =
 				}
 				else if(base64FromExcel)//вставляем в презентации из таблиц
 				{	
-					var aContentExcel = this._readFromBinaryExcel(base64FromExcel).workbook;
+					var excelContent = this._readFromBinaryExcel(base64FromExcel)
+					var aContentExcel = excelContent.workbook;
+					var aPastedImages = excelContent.arrImages;
 					
 					//если есть шейпы, то вставляем их из excel
 					if(aContentExcel && aContentExcel.aWorksheets && aContentExcel.aWorksheets[0] && aContentExcel.aWorksheets[0].Drawings && aContentExcel.aWorksheets[0].Drawings.length)
 					{
 						var arr_shapes = aContentExcel.aWorksheets[0].Drawings;
-						var arrImages = [];
 						var shape;
-
-                        var aContent = {aPastedImages: [], images: []};
-						this._getImagesFromExcelShapes(arr_shapes, null, aContent.aPastedImages, aContent.images);
+						
+						var aImagesToDownload = [];
+						for(var i = 0; i < aPastedImages.length; i++)
+						{
+							aImagesToDownload.push(aPastedImages[i].Url);
+						}
+						
+                        var aContent = {aPastedImages: aPastedImages, images: aImagesToDownload};
 						
 						for(var i = 0; i < arr_shapes.length; ++i)
 						{
@@ -4140,30 +4199,14 @@ PasteProcessor.prototype =
 							}
 						}
 
-						var oImagesToDownload = {};
-						if(arrImages.length > 0)
-						{
-							for(var i = 0, length = arrImages.length; i < length; ++i)
-							{
-								var imageElem = arrImages[i];
-								var src = imageElem.Url;
-								//TODO!!!!!!!!!!
-								//if(false == (0 == src.indexOf("data:") || 0 == src.indexOf(documentOrigin + this.api.DocumentUrl) || 0 == src.indexOf(this.api.DocumentUrl)))
-									oImagesToDownload[src] = 1;
-							}
-						}
-						
 						var fonts = [];
-						var aImagesToDownload = [];
 						//грузим картинки и фонты
 						for(var i in font_map)
 							fonts.push(new CFont(i, 0, "", 0));
-						var aImagesToDownload = [];
-						for(var i in oImagesToDownload)
-							aImagesToDownload.push(i);
-						if(aImagesToDownload.length > 0)
+
+						if(images.length > 0)
 						{
-							var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+							var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(images)};
 							sendCommand( this.api, function(incomeObject){
 								if(incomeObject && "imgurls" == incomeObject.type)
 								{
@@ -4396,16 +4439,12 @@ PasteProcessor.prototype =
 	{
 		//пока только распознаём только графические объекты
 		var aContent = null, tempParagraph = null;
-		var aPastedImages = [];
-		var imageUrl, images = [], isGraphicFrame, extX, extY;
+		var imageUrl, isGraphicFrame, extX, extY;
 		
 		var drawings = pDrawings ? pDrawings : aContentExcel.workbook.aWorksheets[0].Drawings;
 		if(drawings && drawings.length)
 		{
 			var drawing, graphicObj, paraRun, tempParaRun;
-			
-			//var wrappingType = this.oDocument.DrawingObjects.selection.groupSelection.parent.wrappingType;
-			//var DrawingType = this.oDocument.DrawingObjects.selection.groupSelection.parent.DrawingType;
 			
 			aContent = [];
 			
@@ -4433,11 +4472,9 @@ PasteProcessor.prototype =
 
 					tempParaRun.Content[0].Set_GraphicObject(graphicObj);
 					tempParaRun.Content[0].GraphicObj.setParent(tempParaRun.Content[0]);
+					tempParaRun.Content[0].CheckWH();
 					
 					tempParagraph.Content.splice(tempParagraph.Content.length - 1, 0, tempParaRun);
-					
-					aPastedImages[aPastedImages.length] = new CBuilderImages(graphicObj.blipFill, imageUrl, graphicObj, null, null);
-					images[images.length] = imageUrl;
 				}
 				else if(isGraphicFrame)
 				{
@@ -4458,45 +4495,15 @@ PasteProcessor.prototype =
 					
 					graphicObj = drawing.graphicObject ? drawing.graphicObject.convertToWord(this.oLogicDocument) : drawing.convertToWord(this.oLogicDocument) ;
 					
-					/*graphicObj.spPr.setXfrm(new CXfrm());
-					if(extX)
-						graphicObj.spPr.xfrm.setExtX(extX);
-					if(extY)
-						graphicObj.spPr.xfrm.setExtY(extY);*/
-					
 					tempParaRun = new ParaRun();
 					tempParaRun.Paragraph = null;
 					tempParaRun.Add_ToContent( 0, new ParaDrawing(), false );
 					
 					tempParaRun.Content[0].Set_GraphicObject(graphicObj);
 					tempParaRun.Content[0].GraphicObj.setParent(tempParaRun.Content[0]);
+					tempParaRun.Content[0].CheckWH();
 					
 					tempParagraph.Content.splice(tempParagraph.Content.length - 1, 0, tempParaRun);
-					
-					if(graphicObj.isImage())
-					{	
-						imageUrl = graphicObj.getImageUrl();
-						
-						aPastedImages[aPastedImages.length] = new CBuilderImages(graphicObj.blipFill, imageUrl, graphicObj, null, null);
-						images[images.length] = imageUrl;
-					}
-					else if(graphicObj.spPr && graphicObj.spPr.Fill && graphicObj.spPr.Fill.fill && graphicObj.spPr.Fill.fill.RasterImageId && graphicObj.spPr.Fill.fill.RasterImageId != null)
-					{
-						imageUrl = graphicObj.spPr.Fill.fill.RasterImageId;
-						
-						images[images.length] = imageUrl;
-					}
-					else if(graphicObj.isGroup() && graphicObj.spTree && graphicObj.spTree.length)
-					{
-						var spTree = graphicObj.spTree;
-						for(var j = 0; j < spTree.length; j++)
-						{
-							if(spTree[j].isImage())
-							{
-								images.push(spTree[j].getImageUrl());
-							}
-						}
-					}	
 				}		
 			}
 			
@@ -4509,7 +4516,7 @@ PasteProcessor.prototype =
 			aContent = this.aContent;
 		}
 		
-		return {content: aContent, aPastedImages: aPastedImages, images: images};			
+		return {content: aContent};
 	},
 	
 	_convertTableFromExcel: function(aContentExcel)
