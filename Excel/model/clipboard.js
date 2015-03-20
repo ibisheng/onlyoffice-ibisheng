@@ -2502,13 +2502,12 @@
 			    var openParams = { checkFileSize: false, charCount: 0, parCount: 0 };
 			    var oBinaryFileReader = new BinaryFileReader(newCDocument, openParams);
 			    var oRes = oBinaryFileReader.ReadFromString(sBase64);
-			  
+				
+				window.global_pptx_content_loader.End_UseFullUrl();
 				History.TurnOn();
 			    editor = oOldEditor;
 				
-				window.global_pptx_content_loader.End_UseFullUrl();
-				
-			    return oBinaryFileReader.oReadResult;
+			    return oRes;
 			},
 			
 			_isEqualText: function(node, table){
@@ -3388,10 +3387,12 @@
 				History.Create_NewPoint();
 				History.StartTransaction();
 				
+				var api = window["Asc"]["editor"];
+				var addImagesFromWord = data.addImagesFromWord;
 				//определяем стартовую позицию, если изображений несколько вставляется
-				for(var i = 0; i < data.length; i++)
+				for(var i = 0; i < addImagesFromWord.length; i++)
 				{
-					graphicObject = data[i].image.GraphicObj;
+					graphicObject = addImagesFromWord[i].image.GraphicObj;
 					
 					//convert from word
                     if(graphicObject.setBDeleted2)
@@ -3473,8 +3474,8 @@
 					CheckSpPrXfrm(drawingObject.graphicObject);
 					xfrm = drawingObject.graphicObject.spPr.xfrm;
 
-					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[data[i].col].left - ws.getCellLeft(0, 1), 1, 3);
-					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.rows[data[i].row].top  - ws.getCellTop(0, 1), 1, 3);
+					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[addImagesFromWord[i].col].left - ws.getCellLeft(0, 1), 1, 3);
+					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.rows[addImagesFromWord[i].row].top  - ws.getCellTop(0, 1), 1, 3);
 					
 					xfrm.setOffX(curCol);
 					xfrm.setOffY(curRow);
@@ -3494,23 +3495,11 @@
                     }
 					drawingObject.graphicObject.recalculate();
                     drawingObject.graphicObject.select(ws.objectRender.controller, 0);
-					
-					if(drawingObject.graphicObject.isImage())
-						aImagesSync.push(drawingObject.graphicObject.getImageUrl());
-					else if(drawingObject.graphicObject.spPr && drawingObject.graphicObject.spPr.Fill && drawingObject.graphicObject.spPr.Fill.fill && drawingObject.graphicObject.spPr.Fill.fill.RasterImageId && drawingObject.graphicObject.spPr.Fill.fill.RasterImageId != null)
-						aImagesSync.push(drawingObject.graphicObject.spPr.Fill.fill.RasterImageId);
-					else if(drawingObject.graphicObject.isGroup() && drawingObject.graphicObject.spTree && drawingObject.graphicObject.spTree.length)
-					{
-						var spTree = drawingObject.graphicObject.spTree;
-						for(var j = 0; j < spTree.length; j++)
-						{
-							if(spTree[j].isImage())
-							{
-								aImagesSync.push(spTree[j].getImageUrl());
-							}
-						}
-					}
 				};
+				
+				if(data._images)
+					aImagesSync = data._images;
+				
 				
 				window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null, ws.objectRender.asyncImagesDocumentEndLoaded);
 				ws.objectRender.showDrawingObjects(true);
@@ -3593,7 +3582,7 @@
 			
 			_paste : function(worksheet, pasteData)
 			{
-				var documentContent = pasteData.DocumentContent;
+				var documentContent = pasteData.content;
 				var activeRange = worksheet.activeRange.clone(true);
 				
 				if(documentContent && documentContent.length)
@@ -3606,6 +3595,9 @@
 				this.aResult.fontsNew = this.fontsNew;
 				this.aResult.rowSpanSpCount = 0;
 				this.aResult.cellCount = coverDocument.width;
+				this.aResult._images = pasteData.images;
+				this.aResult._aPastedImages = pasteData.aPastedImages;
+				
 				worksheet.setSelectionInfo('paste', this.aResult, this);
 			},
 			

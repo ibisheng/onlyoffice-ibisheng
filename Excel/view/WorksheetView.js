@@ -8315,7 +8315,7 @@
 				}
 				else if(val.addImagesFromWord && val.addImagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 				{
-					window["Asc"]["editor"].wb.clipboard._insertImagesFromBinaryWord(t, val.addImagesFromWord);
+					window["Asc"]["editor"].wb.clipboard._insertImagesFromBinaryWord(t, val);
 				}
 				
 				History.EndTransaction();
