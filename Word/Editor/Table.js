@@ -21248,6 +21248,24 @@ CTableCell.prototype =
         {
             TextPr = TablePr.TableWholeTable.TextPr.Copy();
         }
+
+        // Совместим настройки с настройками для групп строк. Сначала группы строк, потом группы колонок.
+        if ( true === TableLook.Is_BandHor() )
+        {
+            var RowBandSize = TablePr.TablePr.TableStyleRowBandSize;
+            var __RowIndex  = ( true != TableLook.Is_FirstRow() ? RowIndex : RowIndex - 1 )
+            var _RowIndex = ( 1 != RowBandSize ? Math.floor( __RowIndex / RowBandSize ) : __RowIndex );
+            var TableBandStyle = null;
+            if ( 0 === _RowIndex % 2 )
+                TableBandStyle = TablePr.TableBand1Horz;
+            else
+                TableBandStyle = TablePr.TableBand2Horz;
+
+            CellPr.Merge( TableBandStyle.TableCellPr );
+            TextPr.Merge( TableBandStyle.TextPr );
+            ParaPr.Merge( TableBandStyle.ParaPr );
+        }
+
         // Совместим с настройками для групп колонок
         // Согласно спецификации DOCX, совмещать надо всегда, но для первой и последней колонок Word
         // не совмещает, поэтому делаем также.
@@ -21267,22 +21285,6 @@ CTableCell.prototype =
             ParaPr.Merge( TableBandStyle.ParaPr );
         }
 
-        // Совместим настройки с настройками для групп строк
-        if ( true === TableLook.Is_BandHor() )
-        {
-            var RowBandSize = TablePr.TablePr.TableStyleRowBandSize;
-            var __RowIndex  = ( true != TableLook.Is_FirstRow() ? RowIndex : RowIndex - 1 )
-            var _RowIndex = ( 1 != RowBandSize ? Math.floor( __RowIndex / RowBandSize ) : __RowIndex );
-            var TableBandStyle = null;
-            if ( 0 === _RowIndex % 2 )
-                TableBandStyle = TablePr.TableBand1Horz;
-            else
-                TableBandStyle = TablePr.TableBand2Horz;
-
-            CellPr.Merge( TableBandStyle.TableCellPr );
-            TextPr.Merge( TableBandStyle.TextPr );
-            ParaPr.Merge( TableBandStyle.ParaPr );
-        }
 
         // Совместим настройки с настройками для последней колонки
         if ( true === TableLook.Is_LastCol() && this.Row.Get_CellsCount() - 1 === CellIndex )

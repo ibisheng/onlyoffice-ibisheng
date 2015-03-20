@@ -1116,7 +1116,7 @@ CStyle.prototype =
 
                 Left :
                 {
-                    W    : 1.9, // 5.4pt
+                    W    : 1.9,
                     Type : tblwidth_Mm
                 },
 
@@ -1128,15 +1128,15 @@ CStyle.prototype =
 
                 Right :
                 {
-                    W    : 1.9, // 5.4pt
+                    W    : 1.9,
                     Type : tblwidth_Mm
                 }
             }
         };
 
-        this.Set_UiPriority( 59 );
-        this.Set_TablePr( TablePr );
-        this.Set_ParaPr( ParaPr );
+        this.Set_UiPriority(59);
+        this.Set_TablePr(TablePr);
+        this.Set_ParaPr(ParaPr);
     },
 
     Create_Quote : function()
@@ -1992,9 +1992,29 @@ CStyle.prototype =
 
     Create_Table_Lined : function(Color1, Color2)
     {
-        this.uiPriority = 99;
+        var TextColor1 = new CDocumentColor(0xF2, 0xF2, 0xF2, false);
+        var TextFont1  = { Name : "Arial", Index : -1 };
+        var TextSize1  = 11;
 
-        // ParaPr
+        var CellShd1   = new CDocumentShd();
+        CellShd1.Value = shd_Clear;
+        CellShd1.Color = new CDocumentColor(Color1.r, Color1.g, Color1.b);
+
+        var TableStylePrBoundary =
+        {
+            TextPr :
+            {
+                RFonts   : { Ascii : TextFont1, HAnsi : TextFont1 },
+                Color    : TextColor1,
+                FontSize : TextSize1
+            },
+
+            TableCellPr :
+            {
+                Shd : CellShd1
+            }
+        };
+
         var ParaPr =
         {
             Spacing :
@@ -2002,81 +2022,91 @@ CStyle.prototype =
                 After    : 0,
                 Line     : 1,
                 LineRule : linerule_Auto
+            },
+
+            Borders :
+            {
+                Top :
+                {
+                    Color : { r : 0, g : 0, b : 0, Auto : true },
+                    Space : 0,
+                    Size  : 0,
+                    Value : border_None
+                },
+
+                Left :
+                {
+                    Color : { r : 0, g : 0, b : 0, Auto : true },
+                    Space : 0,
+                    Size  : 0,
+                    Value : border_None
+                },
+
+                Bottom :
+                {
+                    Color : { r : 0, g : 0, b : 0, Auto : true },
+                    Space : 0,
+                    Size  : 0,
+                    Value : border_None
+                },
+
+                Right :
+                {
+                    Color : { r : 0, g : 0, b : 0, Auto : true },
+                    Space : 0,
+                    Size  : 0,
+                    Value : border_None
+                },
+
+                Between :
+                {
+                    Color : { r : 0, g : 0, b : 0, Auto : true },
+                    Space : 0,
+                    Size  : 0,
+                    Value : border_None
+                }
             }
         };
 
-        // TablePr
+        var TextPr =
+        {
+            Color : { r : 0x40, g : 0x40, b : 0x40 }
+        };
+
         var TablePr =
         {
-
             TableStyleColBandSize : 1,
             TableStyleRowBandSize : 1,
             TableInd : 0,
 
             TableCellMar :
             {
-                Top    : new CTableMeasurement( tblwidth_Auto, 0 ),
-                Left   : new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm ),
-                Bottom : new CTableMeasurement( tblwidth_Auto, 0 ),
-                Right  : new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm )
+                Top    : new CTableMeasurement(tblwidth_Mm, 4.8 * g_dKoef_pt_to_mm),
+                Left   : new CTableMeasurement(tblwidth_Mm, 8.5 * g_dKoef_pt_to_mm),
+                Bottom : new CTableMeasurement(tblwidth_Mm, 4.8 * g_dKoef_pt_to_mm),
+                Right  : new CTableMeasurement(tblwidth_Mm, 8.5 * g_dKoef_pt_to_mm)
             }
         };
 
-        // TableFirstRow
-        var TableFirstRow =
+        var TableStylePrBand1 =
         {
-            TableCellPr :
+            TextPr :
             {
-                Shd :
-                {
-                    Value : shd_Clear,
-                    Color : { r : Color1.r, g : Color1.g, b : Color1.b}
-                }
+                RFonts   : { Ascii : TextFont1, HAnsi : TextFont1 },
+                Color    : { r : 0x40, g : 0x40, b : 0x40 },
+                FontSize : TextSize1
             }
         };
 
-        // TableLastRow
-        var TableLastRow =
+        var TableStylePrBand2 =
         {
-            TableCellPr :
+            TextPr :
             {
-                Shd :
-                {
-                    Value : shd_Clear,
-                    Color : { r : Color1.r, g : Color1.g, b : Color1.b}
-                }
-            }
-        };
+                RFonts   : { Ascii : TextFont1, HAnsi : TextFont1 },
+                Color    : { r : 0x40, g : 0x40, b : 0x40 },
+                FontSize : TextSize1
+            },
 
-        // TableFirstCol
-        var TableFirstCol =
-        {
-            TableCellPr :
-            {
-                Shd :
-                {
-                    Value : shd_Clear,
-                    Color : { r : Color1.r, g : Color1.g, b : Color1.b}
-                }
-            }
-        };
-
-        // TableLastCol
-        var TableLastCol =
-        {
-            TableCellPr :
-            {
-                Shd :
-                {
-                    Value : shd_Clear,
-                    Color : { r : Color1.r, g : Color1.g, b : Color1.b}
-                }
-            }
-        };
-
-        // TableBand2Vert
-        var TableBand2Vert =
-        {
             TableCellPr :
             {
                 Shd :
@@ -2087,33 +2117,32 @@ CStyle.prototype =
             }
         };
 
-        // TableBand2Horz
-        var TableBand2Horz =
-        {
-            TableCellPr :
-            {
-                Shd :
-                {
-                    Value : shd_Clear,
-                    Color : { r : Color2.r, g : Color2.g, b : Color2.b}
-                }
-            }
-        };
+        this.Set_UiPriority(99);
+        this.Set_ParaPr(ParaPr);
+        this.Set_TextPr(TextPr);
+        this.Set_TablePr(TablePr);
 
-        this.Set_UiPriority( 99 );
-        this.Set_ParaPr( ParaPr );
-        this.Set_TablePr( TablePr );
-        this.Set_TableFirstRow( TableFirstRow );
-        this.Set_TableLastRow( TableLastRow );
-        this.Set_TableFirstCol( TableFirstCol );
-        this.Set_TableLastCol( TableLastCol );
-        this.Set_TableBand2Horz( TableBand2Horz );
-        this.Set_TableBand2Vert( TableBand2Vert );
+        this.Set_TableFirstRow(TableStylePrBoundary);
+        this.Set_TableLastRow(TableStylePrBoundary);
+        this.Set_TableFirstCol(TableStylePrBoundary);
+        this.Set_TableLastCol(TableStylePrBoundary);
+
+        this.Set_TableBand1Horz(TableStylePrBand1);
+        this.Set_TableBand1Vert(TableStylePrBand1);
+
+        this.Set_TableBand2Horz(TableStylePrBand2);
+        this.Set_TableBand2Vert(TableStylePrBand2);
     },
 
     Create_Table_Bordered : function(Color1, Color2)
     {
-        // ParaPr
+        var TableTextPr =
+        {
+            RFonts   : {Ascii : {Name : "Arial", Index : -1}, HAnsi : {Name : "Arial", Index : -1}},
+            Color    : { r : 0x40, g : 0x40, b : 0x40 },
+            FontSize : 11
+        };
+
         var ParaPr =
         {
             Spacing :
@@ -2121,160 +2150,217 @@ CStyle.prototype =
                 After    : 0,
                 Line     : 1,
                 LineRule : linerule_Auto
-            }
-        };
+            },
 
-        // TablePr
-        var TablePr =
-        {
-            TableInd : 0,
-
-            TableBorders :
+            Borders :
             {
                 Top :
                 {
-                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
-                    Value : border_Single,
-                    Size  : 0.5 * g_dKoef_pt_to_mm,
-                    Space : 0
+                    Color : { r : 0, g : 0, b : 0, Auto : true },
+                    Space : 0,
+                    Size  : 0,
+                    Value : border_None
                 },
 
                 Left :
                 {
-                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
-                    Value : border_Single,
-                    Size  : 0.5 * g_dKoef_pt_to_mm,
-                    Space : 0
+                    Color : { r : 0, g : 0, b : 0, Auto : true },
+                    Space : 0,
+                    Size  : 0,
+                    Value : border_None
                 },
 
                 Bottom :
                 {
-                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
-                    Value : border_Single,
-                    Size  : 0.5 * g_dKoef_pt_to_mm,
-                    Space : 0
+                    Color : { r : 0, g : 0, b : 0, Auto : true },
+                    Space : 0,
+                    Size  : 0,
+                    Value : border_None
                 },
 
                 Right :
                 {
-                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
-                    Value : border_Single,
-                    Size  : 0.5 * g_dKoef_pt_to_mm,
-                    Space : 0
+                    Color : { r : 0, g : 0, b : 0, Auto : true },
+                    Space : 0,
+                    Size  : 0,
+                    Value : border_None
                 },
 
-                InsideH :
+                Between :
                 {
-                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
-                    Value : border_Single,
-                    Size  : 0.5 * g_dKoef_pt_to_mm,
-                    Space : 0
-                },
-
-                InsideV :
-                {
-                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
-                    Value : border_Single,
-                    Size  : 0.5 * g_dKoef_pt_to_mm,
-                    Space : 0
+                    Color : { r : 0, g : 0, b : 0, Auto : true },
+                    Space : 0,
+                    Size  : 0,
+                    Value : border_None
                 }
+            }
+        };
+
+        var TextPr =
+        {
+            Color : { r : 0x40, g : 0x40, b : 0x40 }
+        };
+
+        var TableBorder1 =
+        {
+            Color : { r : Color1.r, g : Color1.g, b : Color1.b },
+            Value : border_Single,
+            Size  : 0.5 * g_dKoef_pt_to_mm,
+            Space : 0
+        };
+
+        var TableBorder2 =
+        {
+            Color : { r : Color2.r, g : Color2.g, b : Color2.b },
+            Value : border_Single,
+            Size  : 1.5 * g_dKoef_pt_to_mm,
+            Space : 0
+        };
+
+        var TablePr =
+        {
+            TableStyleColBandSize : 1,
+            TableStyleRowBandSize : 1,
+            TableInd : 0,
+
+            TableBorders :
+            {
+                Top     : TableBorder1,
+                Left    : TableBorder1,
+                Bottom  : TableBorder1,
+                Right   : TableBorder1,
+                InsideH : TableBorder1,
+                InsideV : TableBorder1
             },
 
             TableCellMar :
             {
-                Top    : new CTableMeasurement( tblwidth_Auto, 0 ),
-                Left   : new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm ),
-                Bottom : new CTableMeasurement( tblwidth_Auto, 0 ),
-                Right  : new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm )
+                Top    : new CTableMeasurement(tblwidth_Mm, 4.8 * g_dKoef_pt_to_mm),
+                Left   : new CTableMeasurement(tblwidth_Mm, 8.5 * g_dKoef_pt_to_mm),
+                Bottom : new CTableMeasurement(tblwidth_Mm, 4.8 * g_dKoef_pt_to_mm),
+                Right  : new CTableMeasurement(tblwidth_Mm, 8.5 * g_dKoef_pt_to_mm)
             }
         };
 
-        // TableFirstRow
         var TableFirstRow =
         {
+            TextPr : TableTextPr,
+
             TableCellPr :
             {
                 TableCellBorders :
                 {
-                    Bottom :
-                    {
-                        Color : { r : Color2.r, g : Color2.g, b : Color2.b },
-                        Value : border_Single,
-                        Size  : 2.25 * g_dKoef_pt_to_mm,
-                        Space : 0
-                    }
+                    Bottom : TableBorder2
                 }
             }
         };
 
-        // TableLastRow
         var TableLastRow =
         {
+            TextPr      : TableTextPr,
             TableCellPr :
             {
                 TableCellBorders :
                 {
-                    Top :
-                    {
-                        Color : { r : Color2.r, g : Color2.g, b : Color2.b },
-                        Value : border_Single,
-                        Size  : 2.25 * g_dKoef_pt_to_mm,
-                        Space : 0
-                    }
+                    Top : TableBorder2
                 }
             }
         };
 
-        // TableFirstCol
         var TableFirstCol =
         {
+            TextPr      : TableTextPr,
             TableCellPr :
             {
                 TableCellBorders :
                 {
-                    Right :
-                    {
-                        Color : { r : Color2.r, g : Color2.g, b : Color2.b },
-                        Value : border_Single,
-                        Size  : 2.25 * g_dKoef_pt_to_mm,
-                        Space : 0
-                    }
+                    Right : TableBorder2
                 }
             }
         };
 
-        // TableLastCol
         var TableLastCol =
         {
+            TextPr      : TableTextPr,
             TableCellPr :
             {
                 TableCellBorders :
                 {
-                    Left :
-                    {
-                        Color : { r : Color2.r, g : Color2.g, b : Color2.b },
-                        Value : border_Single,
-                        Size  : 2.25 * g_dKoef_pt_to_mm,
-                        Space : 0
-                    }
+                    Left : TableBorder2
                 }
             }
         };
 
-        this.Set_UiPriority( 99 );
-        this.Set_ParaPr( ParaPr );
-        this.Set_TablePr( TablePr );
-        this.Set_TableFirstRow( TableFirstRow );
-        this.Set_TableLastRow( TableLastRow );
-        this.Set_TableFirstCol( TableFirstCol );
-        this.Set_TableLastCol( TableLastCol );
+        var TableBand1Horz =
+        {
+            TextPr : TableTextPr,
+            TableCellPr :
+            {
+                TableCellBorders :
+                {
+                    Top     : TableBorder1,
+                    Left    : TableBorder1,
+                    Bottom  : TableBorder1,
+                    Right   : TableBorder1,
+                    InsideH : TableBorder1,
+                    InsideV : TableBorder1
+                }
+            }
+        };
+
+        this.Set_UiPriority(99);
+        this.Set_ParaPr(ParaPr);
+        this.Set_TablePr(TablePr);
+        this.Set_TableFirstRow(TableFirstRow);
+        this.Set_TableLastRow(TableLastRow);
+        this.Set_TableFirstCol(TableFirstCol);
+        this.Set_TableLastCol(TableLastCol);
+        this.Set_TableBand1Horz(TableBand1Horz);
     },
 
-    Create_Table_BorderedAndLined : function(Color1, Color2, Color3)
+    Create_Table_BorderedAndLined : function(TableBorder, TableShdColorBoundary, TableShdColorVertBand, TableShdColorHorzBand)
     {
-        this.uiPriority = 99;
+        var TextPr1 =
+        {
+            RFonts   : { Ascii : { Name : "Arial", Index : -1 }, HAnsi : { Name : "Arial", Index : -1 } },
+            Color    : { r : 0xF2, g : 0xF2, b : 0xF2 },
+            FontSize : 11
+        };
 
-        // ParaPr
+        var TextPr2 =
+        {
+            RFonts   : { Ascii : { Name : "Arial", Index : -1 }, HAnsi : { Name : "Arial", Index : -1 } },
+            Color    : { r : 0x40, g : 0x40, b : 0x40 },
+            FontSize : 11
+        };
+
+        var TableCellPr1 =
+        {
+            Shd :
+            {
+                Value : shd_Clear,
+                Color : { r : TableShdColorBoundary.r, g : TableShdColorBoundary.g, b : TableShdColorBoundary.b}
+            }
+        };
+
+        var TableCellPrVert =
+        {
+            Shd :
+            {
+                Value : shd_Clear,
+                Color : { r : TableShdColorVertBand.r, g : TableShdColorVertBand.g, b : TableShdColorVertBand.b}
+            }
+        };
+
+        var TableCellPrHorz =
+        {
+            Shd :
+            {
+                Value : shd_Clear,
+                Color : { r : TableShdColorHorzBand.r, g : TableShdColorHorzBand.g, b : TableShdColorHorzBand.b}
+            }
+        };
+
         var ParaPr =
         {
             Spacing :
@@ -2282,10 +2368,65 @@ CStyle.prototype =
                 After    : 0,
                 Line     : 1,
                 LineRule : linerule_Auto
+            },
+
+            Borders :
+            {
+                Top :
+                {
+                    Color : { r : 0, g : 0, b : 0, Auto : true },
+                    Space : 0,
+                    Size  : 0,
+                    Value : border_None
+                },
+
+                Left :
+                {
+                    Color : { r : 0, g : 0, b : 0, Auto : true },
+                    Space : 0,
+                    Size  : 0,
+                    Value : border_None
+                },
+
+                Bottom :
+                {
+                    Color : { r : 0, g : 0, b : 0, Auto : true },
+                    Space : 0,
+                    Size  : 0,
+                    Value : border_None
+                },
+
+                Right :
+                {
+                    Color : { r : 0, g : 0, b : 0, Auto : true },
+                    Space : 0,
+                    Size  : 0,
+                    Value : border_None
+                },
+
+                Between :
+                {
+                    Color : { r : 0, g : 0, b : 0, Auto : true },
+                    Space : 0,
+                    Size  : 0,
+                    Value : border_None
+                }
             }
         };
 
-        // TablePr
+        var TextPr =
+        {
+            Color : { r : 0x40, g : 0x40, b : 0x40 }
+        };
+
+        var TableBorder1 =
+        {
+            Color : { r : TableBorder.r, g : TableBorder.g, b : TableBorder.b },
+            Value : border_Single,
+            Size  : 0.5 * g_dKoef_pt_to_mm,
+            Space : 0
+        };
+
         var TablePr =
         {
             TableStyleColBandSize : 1,
@@ -2294,151 +2435,81 @@ CStyle.prototype =
 
             TableCellMar :
             {
-                Top    : new CTableMeasurement( tblwidth_Auto, 0 ),
-                Left   : new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm ),
-                Bottom : new CTableMeasurement( tblwidth_Auto, 0 ),
-                Right  : new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm )
+                Top    : new CTableMeasurement(tblwidth_Mm, 4.8 * g_dKoef_pt_to_mm),
+                Left   : new CTableMeasurement(tblwidth_Mm, 8.5 * g_dKoef_pt_to_mm),
+                Bottom : new CTableMeasurement(tblwidth_Mm, 4.8 * g_dKoef_pt_to_mm),
+                Right  : new CTableMeasurement(tblwidth_Mm, 8.5 * g_dKoef_pt_to_mm)
             },
 
             TableBorders :
             {
-                Top :
-                {
-                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
-                    Value : border_Single,
-                    Size  : 0.5 * g_dKoef_pt_to_mm,
-                    Space : 0
-                },
-
-                Left :
-                {
-                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
-                    Value : border_Single,
-                    Size  : 0.5 * g_dKoef_pt_to_mm,
-                    Space : 0
-                },
-
-                Bottom :
-                {
-                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
-                    Value : border_Single,
-                    Size  : 0.5 * g_dKoef_pt_to_mm,
-                    Space : 0
-                },
-
-                Right :
-                {
-                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
-                    Value : border_Single,
-                    Size  : 0.5 * g_dKoef_pt_to_mm,
-                    Space : 0
-                },
-
-                InsideH :
-                {
-                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
-                    Value : border_Single,
-                    Size  : 0.5 * g_dKoef_pt_to_mm,
-                    Space : 0
-                },
-
-                InsideV :
-                {
-                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
-                    Value : border_Single,
-                    Size  : 0.5 * g_dKoef_pt_to_mm,
-                    Space : 0
-                }
+                Top     : TableBorder1,
+                Left    : TableBorder1,
+                Bottom  : TableBorder1,
+                Right   : TableBorder1,
+                InsideH : TableBorder1,
+                InsideV : TableBorder1
             }
         };
 
-        // TableFirstRow
         var TableFirstRow =
         {
-            TableCellPr :
-            {
-                Shd :
-                {
-                    Value : shd_Clear,
-                    Color : { r : Color2.r, g : Color2.g, b : Color2.b}
-                }
-            }
+            TextPr      : TextPr1,
+            TableCellPr : TableCellPr1
         };
 
-        // TableLastRow
         var TableLastRow =
         {
-            TableCellPr :
-            {
-                Shd :
-                {
-                    Value : shd_Clear,
-                    Color : { r : Color2.r, g : Color2.g, b : Color2.b}
-                }
-            }
+            TextPr      : TextPr1,
+            TableCellPr : TableCellPr1
         };
 
-        // TableFirstCol
         var TableFirstCol =
         {
-            TableCellPr :
-            {
-                Shd :
-                {
-                    Value : shd_Clear,
-                    Color : { r : Color2.r, g : Color2.g, b : Color2.b}
-                }
-            }
+            TextPr      : TextPr1,
+            TableCellPr : TableCellPr1
         };
 
-        // TableLastCol
         var TableLastCol =
         {
-            TableCellPr :
-            {
-                Shd :
-                {
-                    Value : shd_Clear,
-                    Color : { r : Color2.r, g : Color2.g, b : Color2.b}
-                }
-            }
+            TextPr      : TextPr1,
+            TableCellPr : TableCellPr1
         };
 
-        // TableBand2Vert
+        var TableBand1Vert =
+        {
+            TextPr : TextPr2
+        };
+
         var TableBand2Vert =
         {
-            TableCellPr :
-            {
-                Shd :
-                {
-                    Value : shd_Clear,
-                    Color : { r : Color3.r, g : Color3.g, b : Color3.b}
-                }
-            }
+            TextPr      : TextPr2,
+            TableCellPr : TableCellPrVert
         };
 
-        // TableBand2Horz
+        var TableBand1Horz =
+        {
+            TextPr : TextPr2
+        };
+
         var TableBand2Horz =
         {
-            TableCellPr :
-            {
-                Shd :
-                {
-                    Value : shd_Clear,
-                    Color : { r : Color3.r, g : Color3.g, b : Color3.b}
-                }
-            }
+            TextPr      : TextPr2,
+            TableCellPr : TableCellPrHorz
         };
 
-        this.Set_UiPriority( 99 );
-        this.Set_ParaPr( ParaPr );
-        this.Set_TablePr( TablePr );
-        this.Set_TableFirstRow( TableFirstRow );
-        this.Set_TableLastRow( TableLastRow );
-        this.Set_TableFirstCol( TableFirstCol );
-        this.Set_TableLastCol( TableLastCol );
-        this.Set_TableBand2Horz( TableBand2Horz );
-        this.Set_TableBand2Vert( TableBand2Vert );
+        this.Set_UiPriority(99);
+        this.Set_ParaPr(ParaPr);
+        this.Set_TextPr(TextPr);
+        this.Set_TablePr(TablePr);
+        this.Set_TableFirstRow(TableFirstRow);
+        this.Set_TableLastRow(TableLastRow);
+        this.Set_TableFirstCol(TableFirstCol);
+        this.Set_TableLastCol(TableLastCol);
+        this.Set_TableBand1Horz(TableBand1Horz);
+        this.Set_TableBand1Vert(TableBand1Vert);
+        this.Set_TableBand2Horz(TableBand2Horz);
+        this.Set_TableBand2Vert(TableBand2Vert);
     },
 
     Create_Character_Hyperlink : function()
@@ -3760,87 +3831,87 @@ function CStyles(bCreateDefault)
 
         // Стандартные стили таблиц
         var Style_Table_Lined = new CStyle("Lined", this.Default.Table, null, styletype_Table );
-        Style_Table_Lined.Create_Table_Lined( new CDocumentColor( 0xA6, 0xA6, 0xA6 ), new CDocumentColor( 0xD9, 0xD9, 0xD9 ) );
+        Style_Table_Lined.Create_Table_Lined(new CDocumentColor(0x7F, 0x7F, 0x7F), new CDocumentColor(0xF2, 0xF2, 0xF2));
         this.Add( Style_Table_Lined );
 
         var Style_Table_Lined_Accent1 = new CStyle("Lined - Accent 1", this.Default.Table, null, styletype_Table );
-        Style_Table_Lined_Accent1.Create_Table_Lined( new CDocumentColor( 0x95, 0xB3, 0xD7 ), new CDocumentColor( 0xDB, 0xE5, 0xF1 ) );
+        Style_Table_Lined_Accent1.Create_Table_Lined( new CDocumentColor(0x54, 0x8D, 0xD4), new CDocumentColor(0xC6, 0xD9, 0xF1));
         this.Add( Style_Table_Lined_Accent1 );
 
         var Style_Table_Lined_Accent2 = new CStyle("Lined - Accent 2", this.Default.Table, null, styletype_Table );
-        Style_Table_Lined_Accent2.Create_Table_Lined( new CDocumentColor( 0xD9, 0x95, 0x94 ), new CDocumentColor( 0xF2, 0xDB, 0xDB ) );
+        Style_Table_Lined_Accent2.Create_Table_Lined( new CDocumentColor(0xD9, 0x95, 0x94), new CDocumentColor(0xF2, 0xDB, 0xDB));
         this.Add( Style_Table_Lined_Accent2 );
 
         var Style_Table_Lined_Accent3 = new CStyle("Lined - Accent 3", this.Default.Table, null, styletype_Table );
-        Style_Table_Lined_Accent3.Create_Table_Lined( new CDocumentColor( 0xC2, 0xD6, 0x9B ), new CDocumentColor( 0xEA, 0xF1, 0xDD ) );
+        Style_Table_Lined_Accent3.Create_Table_Lined( new CDocumentColor(0x9B, 0xB5, 0x59), new CDocumentColor(0xEA, 0xF1, 0xDD));
         this.Add( Style_Table_Lined_Accent3 );
 
         var Style_Table_Lined_Accent4 = new CStyle("Lined - Accent 4", this.Default.Table, null, styletype_Table );
-        Style_Table_Lined_Accent4.Create_Table_Lined( new CDocumentColor( 0xB2, 0xA1, 0xC7 ), new CDocumentColor( 0xE5, 0xDF, 0xEC ) );
+        Style_Table_Lined_Accent4.Create_Table_Lined( new CDocumentColor(0xB2, 0xA1, 0xC7), new CDocumentColor(0xE5, 0xDF, 0xEC));
         this.Add( Style_Table_Lined_Accent4 );
 
         var Style_Table_Lined_Accent5 = new CStyle("Lined - Accent 5", this.Default.Table, null, styletype_Table );
-        Style_Table_Lined_Accent5.Create_Table_Lined( new CDocumentColor( 0x92, 0xCD, 0xDC ), new CDocumentColor( 0xDA, 0xEE, 0xF3 ) );
+        Style_Table_Lined_Accent5.Create_Table_Lined( new CDocumentColor(0x4B, 0xAC, 0xC6), new CDocumentColor(0xDA, 0xEE, 0xF3));
         this.Add( Style_Table_Lined_Accent5 );
 
         var Style_Table_Lined_Accent6 = new CStyle("Lined - Accent 6", this.Default.Table, null, styletype_Table );
-        Style_Table_Lined_Accent6.Create_Table_Lined( new CDocumentColor( 0xFA, 0xBF, 0x8F ), new CDocumentColor( 0xFD, 0xE9, 0xE9 ) );
+        Style_Table_Lined_Accent6.Create_Table_Lined( new CDocumentColor(0xF7, 0x96, 0x46), new CDocumentColor(0xFD, 0xE9, 0xD9));
         this.Add( Style_Table_Lined_Accent6 );
 
         var Style_Table_Bordered = new CStyle("Bordered", this.Default.Table, null, styletype_Table );
-        Style_Table_Bordered.Create_Table_Bordered( new CDocumentColor( 0xBF, 0xBF, 0xBF ), new CDocumentColor( 0x00, 0x00, 0x00 ) );
+        Style_Table_Bordered.Create_Table_Bordered( new CDocumentColor(0xD9, 0xD9, 0xD9), new CDocumentColor(0x7F, 0x7F, 0x7F));
         this.Add( Style_Table_Bordered );
 
         var Style_Table_Bordered_Accent_1 = new CStyle("Bordered - Accent 1", this.Default.Table, null, styletype_Table );
-        Style_Table_Bordered_Accent_1.Create_Table_Bordered( new CDocumentColor( 0xB8, 0xCC, 0xE4 ), new CDocumentColor( 0x36, 0x5F, 0x91 ) );
+        Style_Table_Bordered_Accent_1.Create_Table_Bordered( new CDocumentColor(0xB8, 0xCC, 0xE4), new CDocumentColor(0x4F, 0x81, 0xBD));
         this.Add( Style_Table_Bordered_Accent_1 );
 
         var Style_Table_Bordered_Accent_2 = new CStyle("Bordered - Accent 2", this.Default.Table, null, styletype_Table );
-        Style_Table_Bordered_Accent_2.Create_Table_Bordered( new CDocumentColor( 0xE5, 0xB8, 0xB7 ), new CDocumentColor( 0x94, 0x36, 0x34 ) );
+        Style_Table_Bordered_Accent_2.Create_Table_Bordered( new CDocumentColor(0xE5, 0xB8, 0xB7), new CDocumentColor(0xD9, 0x95, 0x94));
         this.Add( Style_Table_Bordered_Accent_2 );
 
         var Style_Table_Bordered_Accent_3 = new CStyle("Bordered - Accent 3", this.Default.Table, null, styletype_Table );
-        Style_Table_Bordered_Accent_3.Create_Table_Bordered( new CDocumentColor( 0xD6, 0xE3, 0xBC ), new CDocumentColor( 0x76, 0x92, 0x3C ) );
+        Style_Table_Bordered_Accent_3.Create_Table_Bordered( new CDocumentColor(0xD6, 0xE3, 0xBC), new CDocumentColor(0xC2, 0xD6, 0x9B));
         this.Add( Style_Table_Bordered_Accent_3 );
 
         var Style_Table_Bordered_Accent_4 = new CStyle("Bordered - Accent 4", this.Default.Table, null, styletype_Table );
-        Style_Table_Bordered_Accent_4.Create_Table_Bordered( new CDocumentColor( 0xCC, 0xC0, 0xD9 ), new CDocumentColor( 0x5F, 0x49, 0x7A ) );
+        Style_Table_Bordered_Accent_4.Create_Table_Bordered( new CDocumentColor(0xCC, 0xC0, 0xD9), new CDocumentColor(0xB2, 0xA1, 0xC7));
         this.Add( Style_Table_Bordered_Accent_4 );
 
         var Style_Table_Bordered_Accent_5 = new CStyle("Bordered - Accent 5", this.Default.Table, null, styletype_Table );
-        Style_Table_Bordered_Accent_5.Create_Table_Bordered( new CDocumentColor( 0xB6, 0xDD, 0xE8 ), new CDocumentColor( 0x31, 0x84, 0x9B ) );
+        Style_Table_Bordered_Accent_5.Create_Table_Bordered( new CDocumentColor(0xB6, 0xDD, 0xE8), new CDocumentColor(0x92, 0xCD, 0xDC));
         this.Add( Style_Table_Bordered_Accent_5 );
 
         var Style_Table_Bordered_Accent_6 = new CStyle("Bordered - Accent 6", this.Default.Table, null, styletype_Table );
-        Style_Table_Bordered_Accent_6.Create_Table_Bordered( new CDocumentColor( 0xFB, 0xD4, 0xB4 ), new CDocumentColor( 0xE3, 0x6C, 0x0A ) );
+        Style_Table_Bordered_Accent_6.Create_Table_Bordered( new CDocumentColor(0xFB, 0xD4, 0xB4), new CDocumentColor(0xFA, 0xBF, 0x8F));
         this.Add( Style_Table_Bordered_Accent_6 );
 
         var Style_Table_BorderedLined = new CStyle("Bordered & Lined", this.Default.Table, null, styletype_Table );
-        Style_Table_BorderedLined.Create_Table_BorderedAndLined( new CDocumentColor( 0x00, 0x00, 0x00 ), new CDocumentColor( 0xA6, 0xA6, 0xA6 ), new CDocumentColor( 0xD9, 0xD9, 0xD9 ) );
+        Style_Table_BorderedLined.Create_Table_BorderedAndLined(new CDocumentColor(0x59, 0x59, 0x59), new CDocumentColor(0x7F, 0x7F, 0x7F), new CDocumentColor(0xD9, 0xD9, 0xD9), new CDocumentColor(0xF2, 0xF2, 0xF2));
         this.Add( Style_Table_BorderedLined );
 
         var Style_Table_BorderedLined_Accent1 = new CStyle("Bordered & Lined - Accent 1", this.Default.Table, null, styletype_Table );
-        Style_Table_BorderedLined_Accent1.Create_Table_BorderedAndLined( new CDocumentColor( 0x17, 0x36, 0x5D ), new CDocumentColor( 0x8D, 0xB3, 0xE2 ), new CDocumentColor( 0xDB, 0xE5, 0xF1 ) );
+        Style_Table_BorderedLined_Accent1.Create_Table_BorderedAndLined(new CDocumentColor(0x1F, 0x49, 0x7D), new CDocumentColor(0x54, 0x8D, 0xD4), new CDocumentColor(0xC6, 0xD9, 0xF1), new CDocumentColor(0xC6, 0xD9, 0xF1));
         this.Add( Style_Table_BorderedLined_Accent1 );
 
         var Style_Table_BorderedLined_Accent2 = new CStyle("Bordered & Lined - Accent 2", this.Default.Table, null, styletype_Table );
-        Style_Table_BorderedLined_Accent2.Create_Table_BorderedAndLined( new CDocumentColor( 0x94, 0x36, 0x34 ), new CDocumentColor( 0xD9, 0x95, 0x94 ), new CDocumentColor( 0xF2, 0xDB, 0xDB ) );
+        Style_Table_BorderedLined_Accent2.Create_Table_BorderedAndLined( new CDocumentColor(0xC0, 0x50, 0x4D), new CDocumentColor(0xD9, 0x95, 0x94), new CDocumentColor(0xF2, 0xDB, 0xDB), new CDocumentColor(0xF2, 0xDB, 0xDB));
         this.Add( Style_Table_BorderedLined_Accent2 );
 
         var Style_Table_BorderedLined_Accent3 = new CStyle("Bordered & Lined - Accent 3", this.Default.Table, null, styletype_Table );
-        Style_Table_BorderedLined_Accent3.Create_Table_BorderedAndLined( new CDocumentColor( 0x76, 0x92, 0x3C ), new CDocumentColor( 0xC2, 0xD6, 0x9B ), new CDocumentColor( 0xEA, 0xF1, 0xDD ) );
+        Style_Table_BorderedLined_Accent3.Create_Table_BorderedAndLined( new CDocumentColor(0x76, 0x92, 0x3C), new CDocumentColor(0x9B, 0xBB, 0x59), new CDocumentColor(0xEA, 0xF1, 0xDD), new CDocumentColor(0xEA, 0xF1, 0xDD));
         this.Add( Style_Table_BorderedLined_Accent3 );
 
         var Style_Table_BorderedLined_Accent4 = new CStyle("Bordered & Lined - Accent 4", this.Default.Table, null, styletype_Table );
-        Style_Table_BorderedLined_Accent4.Create_Table_BorderedAndLined( new CDocumentColor( 0x5F, 0x49, 0x7A ), new CDocumentColor( 0xB2, 0xA1, 0xC7 ), new CDocumentColor( 0xE5, 0xDF, 0xEC ) );
+        Style_Table_BorderedLined_Accent4.Create_Table_BorderedAndLined( new CDocumentColor(0x80, 0x64, 0xA2), new CDocumentColor(0xB2, 0xA1, 0xC7), new CDocumentColor(0xE5, 0xDF, 0xEC), new CDocumentColor(0xE5, 0xDF, 0xEC));
         this.Add( Style_Table_BorderedLined_Accent4 );
 
         var Style_Table_BorderedLined_Accent5 = new CStyle("Bordered & Lined - Accent 5", this.Default.Table, null, styletype_Table );
-        Style_Table_BorderedLined_Accent5.Create_Table_BorderedAndLined( new CDocumentColor( 0x31, 0x84, 0x9B ), new CDocumentColor( 0x92, 0xCD, 0xDC ), new CDocumentColor( 0xDA, 0xEE, 0xF3 ) );
+        Style_Table_BorderedLined_Accent5.Create_Table_BorderedAndLined( new CDocumentColor(0x31, 0x84, 0x9B), new CDocumentColor(0x4B, 0xAC, 0xC6), new CDocumentColor(0xDA, 0xEE, 0xF3), new CDocumentColor(0xDA, 0xEE, 0xF3));
         this.Add( Style_Table_BorderedLined_Accent5 );
 
         var Style_Table_BorderedLined_Accent6 = new CStyle("Bordered & Lined - Accent 6", this.Default.Table, null, styletype_Table );
-        Style_Table_BorderedLined_Accent6.Create_Table_BorderedAndLined( new CDocumentColor( 0xE3, 0x6C, 0x0A ), new CDocumentColor( 0xFA, 0xBF, 0x8F ), new CDocumentColor( 0xFD, 0xE9, 0xD9 ) );
+        Style_Table_BorderedLined_Accent6.Create_Table_BorderedAndLined( new CDocumentColor(0xE3, 0x6C, 0x0A), new CDocumentColor(0xF7, 0x96, 0x46), new CDocumentColor(0xFD, 0xE9, 0xD9), new CDocumentColor(0xFD, 0xE9, 0xD9));
         this.Add( Style_Table_BorderedLined_Accent6 );
 
         // Создаем стиль гиперссылки
@@ -4762,7 +4833,7 @@ CDocumentShd.prototype =
         if ( shd_Nil != Shd.Value )
         {
             if( undefined != Shd.Color )
-                this.Color.Set( Shd.Color.r, Shd.Color.g, Shd.Color.b );
+                this.Color.Set( Shd.Color.r, Shd.Color.g, Shd.Color.b, Shd.Color.Auto );
             if(undefined != Shd.Unifill)
             {
                 this.Unifill = Shd.Unifill.createDuplicate();
