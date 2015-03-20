@@ -4544,8 +4544,17 @@ asc_docs_api.prototype.AddImageUrlNative = function(url, _w, _h, _pageNum)
     var wI = (undefined !== _w) ? Math.max(_w * g_dKoef_pix_to_mm, 1) : 1;
     var hI = (undefined !== _h) ? Math.max(_h * g_dKoef_pix_to_mm, 1) : 1;
 
-    wI = Math.max(5, Math.min(wI, __w));
-    hI = Math.max(5, Math.min(hI, __h));
+    if (wI < 5)
+        wI = 5;
+    if (hI < 5)
+        hI = 5;
+
+    if (wI > __w || hI > __h)
+    {
+        var _koef = Math.min(__w / wI, __h / hI);
+        wI *= _koef;
+        hI *= _koef;
+    }
 
     this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
 
