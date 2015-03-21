@@ -456,8 +456,9 @@ function CHorRuler()
 
         var dKoef_mm_to_pix = g_dKoef_mm_to_pix * this.m_dZoom;
 
-        this.m_nTop     = (1.8 * g_dKoef_mm_to_pix) >> 0;
-        this.m_nBottom  = (5.2 * g_dKoef_mm_to_pix) >> 0;
+        // не править !!!
+        this.m_nTop     = 6;//(1.8 * g_dKoef_mm_to_pix) >> 0;
+        this.m_nBottom  = 19;//(5.2 * g_dKoef_mm_to_pix) >> 0;
 
         var context = this.m_oCanvas.getContext('2d');
         if (!this.IsRetina)
@@ -1640,8 +1641,9 @@ function CHorRuler()
             var _positon_y = this.m_nBottom - 5;
 
             context.strokeStyle = "#81878F";
-            var2 = parseInt(1.4 * g_dKoef_mm_to_pix);
-            var3 = parseInt(1 * g_dKoef_mm_to_pix);
+            // не менять!!!
+            var2 = 5;//(1.4 * g_dKoef_mm_to_pix) >> 0;
+            var3 = 3;//(1 * g_dKoef_mm_to_pix) >> 0;
 
             checker.BlitMarginLeftInd = _margin_left;
             checker.BlitMarginRightInd = _margin_right;
@@ -1769,8 +1771,10 @@ function CHorRuler()
                 // left indent
                 dCenterX = left + (_margin_left +  this.m_dIndentLeft) * dKoef_mm_to_pix;
 
-                var1 = parseInt(dCenterX - 1 * g_dKoef_mm_to_pix) - 0.5;
-                var4 = parseInt(dCenterX + 1 * g_dKoef_mm_to_pix) + 0.5;
+                var _1mm_to_pix = g_dKoef_mm_to_pix;
+
+                var1 = parseInt(dCenterX - _1mm_to_pix) - 0.5;
+                var4 = parseInt(dCenterX + _1mm_to_pix) + 0.5;
 
                 context.beginPath();
                 context.moveTo(var1, this.m_nBottom + 0.5);
@@ -1788,8 +1792,8 @@ function CHorRuler()
 
                 // right indent
                 dCenterX = left + (_margin_right - this.m_dIndentRight) * dKoef_mm_to_pix;
-                var1 = parseInt(dCenterX - 1 * g_dKoef_mm_to_pix) - 0.5;
-                var4 = parseInt(dCenterX + 1 * g_dKoef_mm_to_pix) + 0.5;
+                var1 = parseInt(dCenterX - _1mm_to_pix) - 0.5;
+                var4 = parseInt(dCenterX + _1mm_to_pix) + 0.5;
 
                 context.beginPath();
                 context.moveTo(var1, this.m_nBottom + 0.5);
@@ -1804,8 +1808,8 @@ function CHorRuler()
 
                 // first line indent
                 dCenterX = left + (_margin_left +  this.m_dIndentLeftFirst) * dKoef_mm_to_pix;
-                var1 = parseInt(dCenterX - 1 * g_dKoef_mm_to_pix) - 0.5;
-                var4 = parseInt(dCenterX + 1 * g_dKoef_mm_to_pix) + 0.5;
+                var1 = parseInt(dCenterX - _1mm_to_pix) - 0.5;
+                var4 = parseInt(dCenterX + _1mm_to_pix) + 0.5;
 
                 context.beginPath();
                 context.moveTo(var1, this.m_nTop + 0.5);
@@ -2068,8 +2072,9 @@ function CVerRuler()
 
         var dKoef_mm_to_pix = g_dKoef_mm_to_pix * this.m_dZoom;
 
-        this.m_nLeft   = (0.8 * g_dKoef_mm_to_pix) >> 0;
-        this.m_nRight  = (4.2 * g_dKoef_mm_to_pix) >> 0;
+        // не править !!!
+        this.m_nLeft   = 3;//(0.8 * g_dKoef_mm_to_pix) >> 0;
+        this.m_nRight  = 15;//(4.2 * g_dKoef_mm_to_pix) >> 0;
 
         var context = this.m_oCanvas.getContext('2d');
         if (!this.IsRetina)
