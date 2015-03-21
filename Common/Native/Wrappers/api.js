@@ -5296,6 +5296,7 @@ asc_docs_api.prototype["Native_Editor_Initialize_Settings"] = function(_params)
             case 101:
             {
                 this.WordControl.m_oDrawingDocument.IsMobile = _params[_current.pos++];
+                window.AscAlwaysSaveAspectOnResizeTrack = true;
                 break;
             }
             case 255:
