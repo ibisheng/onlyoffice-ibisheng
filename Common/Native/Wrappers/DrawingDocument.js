@@ -1575,6 +1575,15 @@ CDrawingDocument.prototype =
             if (!this.IsViewMode)
             {
                 global_mouseEvent.KoefPixToMM = 5;
+
+                if (this.Native["GetDeviceDPI"])
+                {
+                    // 1см
+                    global_mouseEvent.KoefPixToMM = 10 * this.Native["GetDeviceDPI"] / g_dKoef_in_to_mm;
+                    // Серега ориентируется на эту константу
+                    global_mouseEvent.KoefPixToMM /= TRACK_CIRCLE_RADIUS;
+                }
+
                 var _isDrawings = this.LogicDocument.DrawingObjects.isPointInDrawingObjects2(pos.X, pos.Y, pos.Page, true);
 
                 if (_isDrawings)

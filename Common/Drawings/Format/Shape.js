@@ -19,58 +19,107 @@ function hitToHandles(x, y, object)
         radius *= global_mouseEvent.KoefPixToMM;
     }
 
+    // чтобы не считать корни
+    radius *= radius;
+
+    // считаем ближайший маркер, так как окрестность может быть большой, и пересекаться.
+
+    var _min_dist = 2 * radius; // главное что больше
+    var _ret_value = -1;
+
     var check_line = CheckObjectLine(object);
+
     var sqr_x = t_x * t_x, sqr_y = t_y * t_y;
-    if (Math.sqrt(sqr_x + sqr_y) < radius)
-        return 0;
+    var _tmp_dist = sqr_x + sqr_y;
+    if (_tmp_dist < _min_dist)
+    {
+        _min_dist = _tmp_dist;
+        _ret_value = 0;
+    }
 
     var hc = object.extX * 0.5;
     var dist_x = t_x - hc;
     sqr_x = dist_x * dist_x;
-    if (Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
-        return 1;
+    _tmp_dist = sqr_x + sqr_y;
+    if (_tmp_dist < _min_dist && !check_line)
+    {
+        _min_dist = _tmp_dist;
+        _ret_value = 1;
+    }
 
     dist_x = t_x - object.extX;
     sqr_x = dist_x * dist_x;
-    if (Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
-        return 2;
+    _tmp_dist = sqr_x + sqr_y;
+    if (_tmp_dist < _min_dist && !check_line)
+    {
+        _min_dist = _tmp_dist;
+        _ret_value = 2;
+    }
 
     var vc = object.extY * 0.5;
     var dist_y = t_y - vc;
     sqr_y = dist_y * dist_y;
-    if (Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
-        return 3;
+    _tmp_dist = sqr_x + sqr_y;
+    if (_tmp_dist < _min_dist && !check_line)
+    {
+        _min_dist = _tmp_dist;
+        _ret_value = 3;
+    }
 
     dist_y = t_y - object.extY;
     sqr_y = dist_y * dist_y;
-    if (Math.sqrt(sqr_x + sqr_y) < radius)
-        return 4;
+    _tmp_dist = sqr_x + sqr_y;
+    if (_tmp_dist < _min_dist)
+    {
+        _min_dist = _tmp_dist;
+        _ret_value = 4;
+    }
 
     dist_x = t_x - hc;
     sqr_x = dist_x * dist_x;
-    if (Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
-        return 5;
+    _tmp_dist = sqr_x + sqr_y;
+    if (_tmp_dist < _min_dist && !check_line)
+    {
+        _min_dist = _tmp_dist;
+        _ret_value = 5;
+    }
 
     dist_x = t_x;
     sqr_x = dist_x * dist_x;
-    if (Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
-        return 6;
+    _tmp_dist = sqr_x + sqr_y;
+    if (_tmp_dist < _min_dist && !check_line)
+    {
+        _min_dist = _tmp_dist;
+        _ret_value = 6;
+    }
 
     dist_y = t_y - vc;
     sqr_y = dist_y * dist_y;
-    if (Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
-        return 7;
+    _tmp_dist = sqr_x + sqr_y;
+    if (_tmp_dist < _min_dist && !check_line)
+    {
+        _min_dist = _tmp_dist;
+        _ret_value = 7;
+    }
 
-    if(object.canRotate && object.canRotate())
+    if(object.canRotate && object.canRotate() && !check_line)
     {
         var rotate_distance = object.convertPixToMM(TRACK_DISTANCE_ROTATE);
         dist_y = t_y + rotate_distance;
         sqr_y = dist_y * dist_y;
         dist_x = t_x - hc;
         sqr_x = dist_x * dist_x;
-        if (Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
-            return 8;
+
+        _tmp_dist = sqr_x + sqr_y;
+        if (_tmp_dist < _min_dist)
+        {
+            _min_dist = _tmp_dist;
+            _ret_value = 8;
+        }
     }
+
+    if (_min_dist < radius)
+        return _ret_value;
 
     return -1;
 }
