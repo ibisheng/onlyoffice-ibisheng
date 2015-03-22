@@ -1498,6 +1498,8 @@ CDrawingDocument.prototype =
                 this.SelectDrag = 1;
                 this.LogicDocument.Cursor_MoveRight();
 
+                /*
+                это старая версия. грамотная реализация - моус даун и ап с шифтом. Так и проще и правильнее
                 var _xDown = this.SelectRect2.X + this.SelectRect2.W;
                 var _yDown = this.SelectRect2.Y + this.SelectRect2.H / 2;
                 if (!this.TextMatrix)
@@ -1525,6 +1527,31 @@ CDrawingDocument.prototype =
                 this.SelectMobileYOffset = (ret.Y + ret2.Y) - global_mouseEvent.Y;
 
                 this.OnMouseMove(e);
+                */
+
+                var _xStamp = this.SelectRect1.X;
+                var _yStamp = this.SelectRect1.Y;
+                if (this.TextMatrix)
+                {
+                    _xStamp = this.TextMatrix.TransformPointX(this.SelectRect1.X, this.SelectRect1.Y);
+                    _yStamp = this.TextMatrix.TransformPointY(this.SelectRect1.X, this.SelectRect1.Y);
+                }
+
+                var ret = this.__DD_ConvertCoordsToCursor(_xStamp, _yStamp, this.SelectRect1.Page);
+                var ret2 = this.CorrectMouseSelectPosition(Math.min(this.SelectMobileConstantOffsetEpsilon, this.SelectRect1.H / 2));
+                this.SelectMobileXOffset = (ret.X + ret2.X) - global_mouseEvent.X;
+                this.SelectMobileYOffset = (ret.Y + ret2.Y) - global_mouseEvent.Y;
+
+                var pos = this.GetMouseMoveCoords();
+                if (pos.Page == -1)
+                    return;
+
+                var _oldShift = global_mouseEvent.ShiftKey;
+                global_mouseEvent.ShiftKey = true;
+                this.LogicDocumentOnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
+                this.LogicDocumentOnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
+                global_mouseEvent.ShiftKey = _oldShift;
+
                 this.SelectClearLock = false;
             }
 
@@ -1534,6 +1561,8 @@ CDrawingDocument.prototype =
                 this.SelectDrag = 2;
                 this.LogicDocument.Cursor_MoveLeft();
 
+                /*
+                это старая версия. грамотная реализация - моус даун и ап с шифтом. Так и проще и правильнее
                 var _xDown = this.SelectRect1.X;
                 var _yDown = this.SelectRect1.Y + this.SelectRect1.H / 2;
                 if (!this.TextMatrix)
@@ -1562,6 +1591,32 @@ CDrawingDocument.prototype =
                 this.SelectMobileYOffset = (ret.Y - ret2.Y) - global_mouseEvent.Y;
 
                 this.OnMouseMove(e);
+                */
+
+                var _xStamp = this.SelectRect2.X + this.SelectRect2.W;
+                var _yStamp = this.SelectRect2.Y + this.SelectRect2.H;
+                if (this.TextMatrix)
+                {
+                    var _xTmp = _xStamp;
+                    _xStamp = this.TextMatrix.TransformPointX(_xTmp, _yStamp);
+                    _yStamp = this.TextMatrix.TransformPointY(_xTmp, _yStamp);
+                }
+
+                var ret = this.__DD_ConvertCoordsToCursor(_xStamp, _yStamp, this.SelectRect2.Page);
+                var ret2 = this.CorrectMouseSelectPosition(Math.min(this.SelectMobileConstantOffsetEpsilon, this.SelectRect2.H / 2));
+                this.SelectMobileXOffset = (ret.X - ret2.X) - global_mouseEvent.X;
+                this.SelectMobileYOffset = (ret.Y - ret2.Y) - global_mouseEvent.Y;
+
+                var pos = this.GetMouseMoveCoords();
+                if (pos.Page == -1)
+                    return;
+
+                var _oldShift = global_mouseEvent.ShiftKey;
+                global_mouseEvent.ShiftKey = true;
+                this.LogicDocumentOnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
+                this.LogicDocumentOnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
+                global_mouseEvent.ShiftKey = _oldShift;
+
                 this.SelectClearLock = false;
             }
 
@@ -1652,18 +1707,13 @@ CDrawingDocument.prototype =
     {
         check_MouseUpEvent(e);
 
+        var pos = this.GetMouseMoveCoords();
+        var _is_select = false;
         if (this.SelectDrag == 1 || this.SelectDrag == 2)
         {
-            global_mouseEvent.X += this.SelectMobileXOffset;
-            global_mouseEvent.Y += this.SelectMobileYOffset;
+            _is_select = true;
         }
         this.SelectDrag = -1;
-
-        var pos = null;
-        if (this.AutoShapesTrackLockPageNum == -1)
-            pos = this.__DD_ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
-        else
-            pos = this.__DD_ConvetToPageCoords(global_mouseEvent.X, global_mouseEvent.Y, this.AutoShapesTrackLockPageNum);
 
         if (pos.Page == -1)
             return this.CheckReturnMouseUp();
@@ -1693,7 +1743,18 @@ CDrawingDocument.prototype =
 
         this.Native["DD_NeedScrollToTargetFlag"](true);
 
-        this.LogicDocumentOnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
+        if (_is_select)
+        {
+            var _oldShift = global_mouseEvent.ShiftKey;
+            global_mouseEvent.ShiftKey = true;
+            this.LogicDocumentOnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
+            this.LogicDocumentOnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
+            global_mouseEvent.ShiftKey = _oldShift;
+        }
+        else
+        {
+            this.LogicDocumentOnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
+        }
         this.Native["DD_NeedScrollToTargetFlag"](false);
 
         this.Native.m_bIsMouseUpSend = false;
@@ -1708,18 +1769,7 @@ CDrawingDocument.prototype =
     {
         check_MouseMoveEvent(e);
 
-        if (this.SelectDrag == 1 || this.SelectDrag == 2)
-        {
-            global_mouseEvent.X += this.SelectMobileXOffset;
-            global_mouseEvent.Y += this.SelectMobileYOffset;
-        }
-
-        var pos = null;
-        if (this.AutoShapesTrackLockPageNum == -1)
-            pos = this.__DD_ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
-        else
-            pos = this.__DD_ConvetToPageCoords(global_mouseEvent.X, global_mouseEvent.Y, this.AutoShapesTrackLockPageNum);
-
+        var pos = this.GetMouseMoveCoords();
         if (pos.Page == -1)
             return;
 
@@ -1741,7 +1791,21 @@ CDrawingDocument.prototype =
             return;
 
         this.TableOutlineDr.bIsNoTable = true;
-        this.LogicDocument.OnMouseMove(global_mouseEvent, pos.X, pos.Y, pos.Page);
+
+        if (this.SelectDrag == 1 || this.SelectDrag == 2)
+        {
+            this.SelectClearLock = true;
+            var _oldShift = global_mouseEvent.ShiftKey;
+            global_mouseEvent.ShiftKey = true;
+            this.LogicDocumentOnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
+            this.LogicDocumentOnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
+            global_mouseEvent.ShiftKey = _oldShift;
+            this.SelectClearLock = false;
+        }
+        else
+        {
+            this.LogicDocument.OnMouseMove(global_mouseEvent, pos.X, pos.Y, pos.Page);
+        }
 
         if (this.TableOutlineDr.bIsNoTable === false)
         {
@@ -1750,6 +1814,23 @@ CDrawingDocument.prototype =
         }
 
         this.EndUpdateOverlay();
+    },
+
+    GetMouseMoveCoords : function()
+    {
+        if (this.SelectDrag == 1 || this.SelectDrag == 2)
+        {
+            global_mouseEvent.X += this.SelectMobileXOffset;
+            global_mouseEvent.Y += this.SelectMobileYOffset;
+        }
+
+        var pos = null;
+        if (this.AutoShapesTrackLockPageNum == -1)
+            pos = this.__DD_ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
+        else
+            pos = this.__DD_ConvetToPageCoords(global_mouseEvent.X, global_mouseEvent.Y, this.AutoShapesTrackLockPageNum);
+
+        return pos;
     },
 
     CorrectMouseSelectPosition : function(eps)
