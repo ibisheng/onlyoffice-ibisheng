@@ -6770,6 +6770,10 @@ var gUndoInsDelCellsFlag = true;
 				if(copyRange)
 				{
 					this._cloneCtrlAutoFilters(arnTo, arnFrom);
+					//если не пересекаемся с форматированной таблицей arnTo, но пересекаемся arnFrom
+					var intersectionFromRange = this._intersectionRangeWithTableParts(arnFrom, aWs);
+					if(intersectionFromRange !== false && intersectionFromRange.length === 1 && this._intersectionRangeWithTableParts(arnTo, aWs) === false)
+						this._setStyleAfterMoveTablePart(arnTo, arnFrom);
 				}
 				else
 				{
@@ -6895,6 +6899,27 @@ var gUndoInsDelCellsFlag = true;
 					}
 				}
 				
+			},
+			
+			//проставляем стили перенесённым ячейкам из форматированной таблицыы
+			_setStyleAfterMoveTablePart: function(arnTo, arnFrom)
+			{
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
+				var cell, toCell, tableStyle;
+				
+				var diffCol = arnTo.c1 - arnFrom.c1;
+				var diffRow = arnTo.r1 - arnFrom.r1;
+				for(var i = arnFrom.r1; i <= arnFrom.r2; i++)
+				{
+					for(var j = arnFrom.c1; j <= arnFrom.c2; j++)
+					{	
+						cell = ws.model._getCell(i, j);
+						tableStyle = cell.tableXfs;
+						toCell = ws.model._getCell(i + diffRow, j + diffCol);
+						toCell.setStyle(tableStyle);
+					}
+				}
 			},
 			
 			_cloneCtrlAutoFilters: function(arnTo, arnFrom)
