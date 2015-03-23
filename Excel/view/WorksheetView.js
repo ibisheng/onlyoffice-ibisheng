@@ -11009,11 +11009,37 @@
 			api._loadFonts(fonts, callback);
 		};
 
-		WorksheetView.prototype.setData = function (data) {
-			// ToDo Add code here
+		WorksheetView.prototype.setData = function (oData) {
+			History.Clear();
+			History.TurnOff();
+			var oAllRange = new Range(this.model, 0, 0, this.nRowsCount - 1, this.nColsCount - 1);
+			oAllRange.cleanAll();
+			History.TurnOn();
+
+			var row, oCell;
+			for (var r = 0; r < oData.length; ++r) {
+				row = oData[r];
+				for (var c = 0; c < row.length; ++c) {
+					if (row[c]) {
+						oCell = this._getVisibleCell(c, r);
+						oCell.setValue(row[c]);
+					}
+				}
+			}
 		};
 		WorksheetView.prototype.getData = function () {
-			// ToDo Add code here
+			var arrResult = [], cell, c, r, row;
+			var maxCols = Math.min(this.model.getColsCount(), gc_nMaxCol);
+			var maxRows = Math.min(this.model.getRowsCount(), gc_nMaxRow);
+
+			for (r = 0; r < maxRows; ++r) {
+				row = [];
+				for (c = 0; c < maxCols; ++c) {
+					cell = this.model._getCellNoEmpty(r, c);
+					row.push(cell ? cell.getValue() : '');
+				}
+				arrResult.push(row);
+			}
 		};
 
 		/*

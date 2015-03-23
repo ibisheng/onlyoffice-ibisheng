@@ -2566,10 +2566,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
             }
 		};
 
-		// Выставление данных
-		spreadsheet_api.prototype.asc_setData = function(data) {
-			this.wb.getWorksheet().setData(data);
+		// Выставление данных (пока используется только для MailMerge)
+		spreadsheet_api.prototype.asc_setData = function(oData) {
+			this.wb.getWorksheet().setData(oData);
 		};
+		// Получение данных
 		spreadsheet_api.prototype.asc_getData = function() {
 			return this.wb.getWorksheet().getData();
 		};
