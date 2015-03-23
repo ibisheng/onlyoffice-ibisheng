@@ -2694,7 +2694,15 @@ DrawingObjectsController.prototype =
 
         if(chart_type.getObjectType() === historyitem_type_LineChart )
         {
-            if(isRealBool(chartSettings.showMarker))
+            if(!isRealBool(chartSettings.showMarker))
+            {
+                chartSettings.showMarker = false;
+            }
+            if(!isRealBool(chartSettings.bLine))
+            {
+                chartSettings.bLine = true;
+            }
+            if(chartSettings.showMarker)
             {
                 //for(var j = 0; j < chart_type.series.length; ++j)
                 //{
@@ -2735,55 +2743,62 @@ DrawingObjectsController.prototype =
                     }
                 }
             }
-            if(isRealBool(chartSettings.bLine))
-            {
-                if(!chartSettings.bLine)
-                {
-                    for(var j = 0; j < chart_type.series.length; ++j)
-                    {
-                        removeDPtsFromSeries(chart_type.series[j]);
-                        if(!chart_type.series[j].spPr)
-                        {
-                            chart_type.series[j].setSpPr(new CSpPr());
-                        }
 
-                        if(isRealBool(chart_type.series[j].smooth))
-                        {
-                            chart_type.series[j].setSmooth(null);
-                        }
-                        chart_type.series[j].spPr.setLn(CreateNoFillLine());
-                    }
-                }
-                else
-                {
-                    for(var j = 0; j < chart_type.series.length; ++j)
-                    {
-                        removeDPtsFromSeries(chart_type.series[j]);
-                        if(chart_type.series[j].smooth !== (chartSettings.smooth === true))
-                        {
-                            chart_type.series[j].setSmooth(chartSettings.smooth === true);
-                        }
-                        if(chart_type.series[j].spPr && chart_type.series[j].spPr.ln)
-                        {
-                            chart_type.series[j].spPr.setLn(null);
-                        }
-                    }
-                }
-                if(chart_type.smooth !== (chartSettings.smooth === true))
-                {
-                    chart_type.setSmooth(chartSettings.smooth === true);
-                }
+            if(!chartSettings.bLine)
+            {
                 for(var j = 0; j < chart_type.series.length; ++j)
                 {
+                    removeDPtsFromSeries(chart_type.series[j]);
+                    if(!chart_type.series[j].spPr)
+                    {
+                        chart_type.series[j].setSpPr(new CSpPr());
+                    }
+
+                    if(isRealBool(chart_type.series[j].smooth))
+                    {
+                        chart_type.series[j].setSmooth(null);
+                    }
+                    chart_type.series[j].spPr.setLn(CreateNoFillLine());
+                }
+            }
+            else
+            {
+                for(var j = 0; j < chart_type.series.length; ++j)
+                {
+                    removeDPtsFromSeries(chart_type.series[j]);
                     if(chart_type.series[j].smooth !== (chartSettings.smooth === true))
                     {
                         chart_type.series[j].setSmooth(chartSettings.smooth === true);
                     }
+                    if(chart_type.series[j].spPr && chart_type.series[j].spPr.ln)
+                    {
+                        chart_type.series[j].spPr.setLn(null);
+                    }
+                }
+            }
+            if(chart_type.smooth !== (chartSettings.smooth === true))
+            {
+                chart_type.setSmooth(chartSettings.smooth === true);
+            }
+            for(var j = 0; j < chart_type.series.length; ++j)
+            {
+                if(chart_type.series[j].smooth !== (chartSettings.smooth === true))
+                {
+                    chart_type.series[j].setSmooth(chartSettings.smooth === true);
                 }
             }
         }
         if(chart_type.getObjectType() === historyitem_type_ScatterChart)
         {
+            if(!isRealBool(chartSettings.showMarker))
+            {
+                chartSettings.showMarker = true;
+            }
+            if(!isRealBool(chartSettings.bLine))
+            {
+                chartSettings.bLine = false;
+            }
+
             for(var i = 0; i < chart_type.series.length; ++i)
             {
                 if(chart_type.series[i].marker)
