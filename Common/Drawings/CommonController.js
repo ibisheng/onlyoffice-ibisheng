@@ -5227,7 +5227,7 @@ DrawingObjectsController.prototype =
                 {
                     new_image_props =
                     {
-                        imageUrl: drawing.getImageUrl(),
+                        ImageUrl: drawing.getImageUrl(),
                         w: drawing.extX,
                         h: drawing.extY,
                         locked: locked,
@@ -5238,8 +5238,8 @@ DrawingObjectsController.prototype =
                         image_props = new_image_props;
                     else
                     {
-                        if(image_props.imageUrl !== null && image_props.imageUrl !== new_image_props.imageUrl)
-                            image_props.imageUrl = null;
+                        if(image_props.ImageUrl !== null && image_props.ImageUrl !== new_image_props.ImageUrl)
+                            image_props.ImageUrl = null;
                         if(image_props.w != null && image_props.w !== new_image_props.w)
                             image_props.w = null;
                         if(image_props.h != null && image_props.h !== new_image_props.h)
@@ -5410,8 +5410,8 @@ DrawingObjectsController.prototype =
                             image_props = group_drawing_props.imageProps;
                         else
                         {
-                            if(image_props.imageUrl !== null && image_props.imageUrl !== group_drawing_props.imageProps.imageUrl)
-                                image_props.imageUrl = null;
+                            if(image_props.ImageUrl !== null && image_props.ImageUrl !== group_drawing_props.imageProps.ImageUrl)
+                                image_props.ImageUrl = null;
 
                             if(image_props.w != null && image_props.w !== group_drawing_props.imageProps.w)
                                 image_props.w = null;
@@ -5585,7 +5585,7 @@ DrawingObjectsController.prototype =
             image_props = new asc_CImgProperty();
             image_props.Width = props.imageProps.w;
             image_props.Height = props.imageProps.h;
-            image_props.ImageUrl = props.imageProps.imageUrl;
+            image_props.ImageUrl = props.imageProps.ImageUrl;
             image_props.Locked = props.imageProps.locked === true;
             ret.push(image_props);
         }

@@ -320,7 +320,7 @@ CGraphicObjects.prototype =
             if(props_by_types.imageProps)
             {
                 image_props = new asc_CImgProperty(para_drawing_props);
-                image_props.ImageUrl = props_by_types.imageProps.imageUrl;
+                image_props.ImageUrl = props_by_types.imageProps.ImageUrl;
                 image_props.Width = props_by_types.imageProps.w;
                 image_props.Height = props_by_types.imageProps.h;
             }

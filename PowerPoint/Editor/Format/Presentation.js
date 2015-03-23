@@ -251,6 +251,9 @@ function CPresentation(DrawingDocument)
     this.notes        = [];
     this.globalTableStyles = null;
 
+
+    this.Width = 254;
+    this.Height = 142;
     this.updateSlideIndex = false;
     this.recalcMap = {};
     this.bClearSearch = true;
@@ -2702,6 +2705,12 @@ CPresentation.prototype =
     {
         return false;
     },
+
+
+    Get_PageSizesByDrawingObjects: function()
+    {
+        return {W: Page_Width, H: Page_Height};
+    },
 //-----------------------------------------------------------------------------------
 // Дополнительные функции
 //-----------------------------------------------------------------------------------
@@ -2777,6 +2786,8 @@ CPresentation.prototype =
 
             if(drawing_props.imageProps)
             {
+                drawing_props.imageProps.Width = drawing_props.imageProps.w;
+                drawing_props.imageProps.Height = drawing_props.imageProps.h;
                 editor.sync_ImgPropCallback(drawing_props.imageProps);
             }
 
@@ -3315,8 +3326,6 @@ CPresentation.prototype =
             }
             case historyitem_Presentation_SlideSize:
             {
-                var kw = Data.oldW/this.Width;
-                var kh = Data.oldH/this.Height;
 
                 this.Width = Data.oldW;
                 this.Height = Data.oldH;
