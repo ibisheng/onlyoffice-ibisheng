@@ -2944,7 +2944,7 @@ function CreateAscStroke(ln, _canChangeArrows)
 
     if (ln.headEnd != null)
     {
-        ret.asc_getLinebeginstyle((ln.headEnd.type == null) ? LineEndType.None : ln.headEnd.type);
+        ret.asc_putLinebeginstyle((ln.headEnd.type == null) ? LineEndType.None : ln.headEnd.type);
 
         var _len = (null == ln.headEnd.len) ? 1 : (2 - ln.headEnd.len);
         var _w = (null == ln.headEnd.w) ? 1 : (2 - ln.headEnd.w);
