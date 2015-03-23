@@ -1889,6 +1889,7 @@ function BinaryPPTYLoader()
                                             {
                                                 _s = _s.substring(0, indS);
                                                 _s += "svg";
+                                                sReadPath = _s;
                                                 uni_fill.fill.setRasterImageId(_s);
                                             }
                                             // ----------------------------
