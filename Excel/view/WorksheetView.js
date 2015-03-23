@@ -8266,8 +8266,10 @@
 
 		WorksheetView.prototype._pasteFromGlobalBuff = function (isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth, onlyActive) {
 			var t = this;
+			
 			//загрузка шрифтов, в случае удачи на callback вставляем текст
 			t._loadFonts(val.fontsNew, function () {
+			
 				if(val.onlyImages !== true)
 					t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
 					
@@ -8315,7 +8317,35 @@
 				}
 				else if(val.addImagesFromWord && val.addImagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 				{
-					window["Asc"]["editor"].wb.clipboard._insertImagesFromBinaryWord(t, val);
+					var api = window["Asc"]["editor"];
+					var rData = {"id": api.documentId, "c":"imgurls", "vkey": api.documentVKey, "data": JSON.stringify(val._images)};
+					api._asc_sendCommand(function(incomeObject){
+						if(incomeObject && "imgurls" == incomeObject.type)
+						{
+							var oFromTo = JSON.parse(incomeObject.data);
+							var nC, height, width;
+							var aImagesSync = [];
+							
+							for(var i = 0, length = val._aPastedImages.length; i < length; ++i)
+							{	
+								var sTo = oFromTo[val._aPastedImages[i].Url];
+								if(sTo)
+								{									
+									var imageElem = val._aPastedImages[i];
+									if(null != imageElem)
+									{
+										var sNewSrc = oFromTo[imageElem.Url];
+										aImagesSync.push(sNewSrc);
+										if(null != sNewSrc)
+											imageElem.SetUrl(sNewSrc);
+											
+									}															
+								}						
+							}
+						}
+						api.wb.clipboard._insertImagesFromBinaryWord(t, val, aImagesSync);
+					}, rData );
+					
 				}
 				
 				History.EndTransaction();

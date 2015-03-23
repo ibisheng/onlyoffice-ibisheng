@@ -3379,10 +3379,10 @@
 
 			},
 			
-			_insertImagesFromBinaryWord: function(ws, data)
+			_insertImagesFromBinaryWord: function(ws, data, aImagesSync)
 			{
 				var activeRange = ws.activeRange;
-				var curCol, drawingObject, curRow, startCol = 0, startRow = 0, xfrm, drawingBase, graphicObject, aImagesSync = [], offX, offY, rot;
+				var curCol, drawingObject, curRow, startCol = 0, startRow = 0, xfrm, drawingBase, graphicObject, offX, offY, rot;
 
 				History.Create_NewPoint();
 				History.StartTransaction();
@@ -3469,7 +3469,7 @@
 								startRow = drawingObject.from.row;
 							}	
 						}
-					};
+					}
 
 					CheckSpPrXfrm(drawingObject.graphicObject);
 					xfrm = drawingObject.graphicObject.spPr.xfrm;
@@ -3495,11 +3495,7 @@
                     }
 					drawingObject.graphicObject.recalculate();
                     drawingObject.graphicObject.select(ws.objectRender.controller, 0);
-				};
-				
-				if(data._images)
-					aImagesSync = data._images;
-				
+				}
 				
 				window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null, ws.objectRender.asyncImagesDocumentEndLoaded);
 				ws.objectRender.showDrawingObjects(true);
