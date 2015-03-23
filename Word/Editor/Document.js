@@ -14063,6 +14063,8 @@ CDocument.prototype.Recalculate_FromStart = function(bUpdateStates)
 };
 CDocument.prototype.Start_MailMerge = function(MailMergeMap)
 {
+    this.EndPreview_MailMergeResult();
+
     this.MailMergeMap = MailMergeMap;
     editor.sync_HighlightMailMergeFields(this.MailMergeFieldsHighlight);
     editor.sync_StartMailMerge();
@@ -14085,6 +14087,36 @@ CDocument.prototype.Get_MailMergeFieldsNameList = function()
     for (var sId in Element)
     {
         aList.push(sId);
+    }
+
+    return aList;
+};
+CDocument.prototype.Get_MailMergeReceptionsList = function()
+{
+    var aList = [];
+
+    var aHeaders = [];
+    var nCount = this.MailMergeMap.length
+    if (nCount <= 0)
+        return [];
+
+    for (var sId in this.MailMergeMap[0])
+        aHeaders.push(sId);
+
+    var nHeadersCount = aHeaders.length;
+
+    aList.push(aHeaders);
+    for (var nIndex = 0; nIndex < nCount; nIndex++)
+    {
+        var aReception = [];
+        var oReception = this.MailMergeMap[nIndex];
+        for (var nHeaderIndex = 0; nHeaderIndex < nHeadersCount; nHeaderIndex++)
+        {
+            var sValue = oReception[aHeaders[nHeaderIndex]];
+            aReception.push(sValue ? sValue : "");
+        }
+
+        aList.push(aReception);
     }
 
     return aList;

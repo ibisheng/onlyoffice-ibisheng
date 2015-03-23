@@ -96,8 +96,16 @@ ParaHyperlink.prototype.Add = function(Item)
 
                 this.Add_ToContent(CurPos + 1, Item);
 
-                this.State.ContentPos = CurPos + 1;
-                this.Content[this.State.ContentPos].Cursor_MoveToEndPos(false);
+                if (para_Field === Item.Type)
+                {
+                    this.State.ContentPos = CurPos + 2;
+                    this.Content[this.State.ContentPos].Cursor_MoveToStartPos(false);
+                }
+                else
+                {
+                    this.State.ContentPos = CurPos + 1;
+                    this.Content[this.State.ContentPos].Cursor_MoveToEndPos(false);
+                }
             }
             else
                 CurItem.Add(Item);

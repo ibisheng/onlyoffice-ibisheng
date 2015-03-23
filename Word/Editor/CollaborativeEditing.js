@@ -410,26 +410,26 @@ function CTableId()
                 // Long : SumIndex
                 // Long : DeletedIndex
 
-                var FileCheckSum = Reader.GetLong();
-                var FileSize     = Reader.GetLong();
-                var Description  = Reader.GetLong();
-                var ItemsCount   = Reader.GetLong();
-                var PointIndex   = Reader.GetLong();
-                var StartPoint   = Reader.GetLong();
-                var LastPoint    = Reader.GetLong();
-                var SumIndex     = Reader.GetLong();
-                var DeletedIndex = Reader.GetLong();
-
-                console.log("----------------------------");
-                console.log("FileCheckSum " + FileCheckSum);
-                console.log("FileSize     " + FileSize);
-                console.log("Description  " + Description + " " + Get_HistoryPointStringDescription(Description));
-                console.log("ItemsCount   " + ItemsCount);
-                console.log("PointIndex   " + PointIndex);
-                console.log("StartPoint   " + StartPoint);
-                console.log("LastPoint    " + LastPoint);
-                console.log("SumIndex     " + SumIndex);
-                console.log("DeletedIndex " + (-10 === DeletedIndex ? null : DeletedIndex));
+//                var FileCheckSum = Reader.GetLong();
+//                var FileSize     = Reader.GetLong();
+//                var Description  = Reader.GetLong();
+//                var ItemsCount   = Reader.GetLong();
+//                var PointIndex   = Reader.GetLong();
+//                var StartPoint   = Reader.GetLong();
+//                var LastPoint    = Reader.GetLong();
+//                var SumIndex     = Reader.GetLong();
+//                var DeletedIndex = Reader.GetLong();
+//
+//                console.log("----------------------------");
+//                console.log("FileCheckSum " + FileCheckSum);
+//                console.log("FileSize     " + FileSize);
+//                console.log("Description  " + Description + " " + Get_HistoryPointStringDescription(Description));
+//                console.log("ItemsCount   " + ItemsCount);
+//                console.log("PointIndex   " + PointIndex);
+//                console.log("StartPoint   " + StartPoint);
+//                console.log("LastPoint    " + LastPoint);
+//                console.log("SumIndex     " + SumIndex);
+//                console.log("DeletedIndex " + (-10 === DeletedIndex ? null : DeletedIndex));
 
                 break;
             }

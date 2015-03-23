@@ -2872,9 +2872,9 @@ Paragraph.prototype =
 
                     this.Internal_Content_Add(CurPos + 1, Item);
 
-                    // Перемещаем кусор в конец формулы
-                    this.CurPos.ContentPos = CurPos + 1;
-                    this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(false);
+                    // Перемещаем в начало следующейго элемента
+                    this.CurPos.ContentPos = CurPos + 2;
+                    this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos(false);
                 }
                 else
                     this.Content[CurPos].Add(Item);

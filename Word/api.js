@@ -7157,15 +7157,6 @@ asc_docs_api.prototype.sync_closeChartEditor = function()
     this.asc_fireCallback("asc_onCloseChartEditor");
 };
 
-asc_docs_api.prototype.asc_getMailMergeData = function()
-{
-	// ToDo Add code here
-};
-asc_docs_api.prototype.asc_setMailMergeData = function(data)
-{
-	// ToDo Add code here
-};
-
 asc_docs_api.prototype.asc_setDrawCollaborationMarks = function (bDraw)
 {
     if ( bDraw !== this.isCoMarksDraw )
@@ -7275,6 +7266,14 @@ asc_docs_api.prototype.sync_EndPreviewMailMergeResult = function()
 asc_docs_api.prototype.sync_HighlightMailMergeFields = function(Value)
 {
     this.asc_fireCallback("asc_onHighlightMailMergeFields", Value);
+};
+asc_docs_api.prototype.asc_getMailMergeData = function()
+{
+    return this.WordControl.m_oLogicDocument.Get_MailMergeReceptionsList();
+};
+asc_docs_api.prototype.asc_setMailMergeData = function(aList)
+{
+    this.asc_StartMailMergeByList(aList);
 };
 
 
