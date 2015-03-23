@@ -123,6 +123,16 @@ function hitToHandles(x, y, object)
         }
     }
 
+    // теперь смотрим расстояние до центра фигуры, чтобы можно было двигать маленькую
+    dist_x = t_x - hc;
+    dist_y = t_y - vc;
+    _tmp_dist =  dist_x * dist_x + dist_y * dist_y;
+    if (_tmp_dist < _min_dist && !check_line)
+    {
+        _min_dist = _tmp_dist;
+        _ret_value = -1;
+    }
+
     if (_min_dist < radius)
         return _ret_value;
 

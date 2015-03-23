@@ -1634,7 +1634,7 @@ CDrawingDocument.prototype =
                 if (this.Native["GetDeviceDPI"])
                 {
                     // 1см
-                    window.AscHitToHandlesEpsilon = 10 * this.Native["GetDeviceDPI"]() / (25.4 * this.Native["DD_GetDotsPerMM"]() );
+                    window.AscHitToHandlesEpsilon = 5 * this.Native["GetDeviceDPI"]() / (25.4 * this.Native["DD_GetDotsPerMM"]() );
                 }
 
                 var _isDrawings = this.LogicDocument.DrawingObjects.isPointInDrawingObjects2(pos.X, pos.Y, pos.Page, true);

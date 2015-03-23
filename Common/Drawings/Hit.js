@@ -20,6 +20,11 @@ function HitInLine(context, px, py, x0, y0, x1, y1)
         d *= global_mouseEvent.KoefPixToMM;
     }
 
+    if (undefined !== window.AscHitToHandlesEpsilon)
+    {
+        d = window.AscHitToHandlesEpsilon/Math.sqrt(tx*tx+ty*ty);
+    }
+
     dx=-ty*d;
     dy=tx*d;
 
@@ -52,6 +57,11 @@ function HitInBezier4(context, px, py, x0, y0, x1, y1, x2, y2, x3, y3)
         d *= global_mouseEvent.KoefPixToMM;
     }
 
+    if (undefined !== window.AscHitToHandlesEpsilon)
+    {
+        d = window.AscHitToHandlesEpsilon/Math.sqrt(tx*tx+ty*ty);
+    }
+
     dx=-ty*d;
     dy=tx*d;
 
@@ -82,6 +92,11 @@ function HitInBezier3(context, px, py, x0, y0, x1, y1, x2, y2)
     if(typeof global_mouseEvent !== "undefined" && isRealObject(global_mouseEvent) && isRealNumber(global_mouseEvent.KoefPixToMM))
     {
         d *= global_mouseEvent.KoefPixToMM;
+    }
+
+    if (undefined !== window.AscHitToHandlesEpsilon)
+    {
+        d = window.AscHitToHandlesEpsilon/Math.sqrt(tx*tx+ty*ty);
     }
 
     dx=-ty*d;
