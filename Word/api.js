@@ -7157,6 +7157,15 @@ asc_docs_api.prototype.sync_closeChartEditor = function()
     this.asc_fireCallback("asc_onCloseChartEditor");
 };
 
+asc_docs_api.prototype.asc_getMailMergeData = function()
+{
+	// ToDo Add code here
+};
+asc_docs_api.prototype.asc_setMailMergeData = function(data)
+{
+	// ToDo Add code here
+};
+
 asc_docs_api.prototype.asc_setDrawCollaborationMarks = function (bDraw)
 {
     if ( bDraw !== this.isCoMarksDraw )

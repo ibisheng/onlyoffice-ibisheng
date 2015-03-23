@@ -10979,6 +10979,13 @@
 			api._loadFonts(fonts, callback);
 		};
 
+		WorksheetView.prototype.setData = function (data) {
+			// ToDo Add code here
+		};
+		WorksheetView.prototype.getData = function () {
+			// ToDo Add code here
+		};
+
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------

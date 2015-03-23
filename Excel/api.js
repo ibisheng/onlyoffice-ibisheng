@@ -491,7 +491,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 
 		spreadsheet_api.prototype.asc_LoadEmptyDocument = function () {
-
 			var emptyWorkbook = getEmptyWorkbook() + "";
 			if (emptyWorkbook.length && (Asc.c_oSerFormat.Signature === emptyWorkbook.substring(0, Asc.c_oSerFormat.Signature.length))) {
 				this.isChartEditor = true;
@@ -2525,7 +2524,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			}, rData );
 		};
 
-		spreadsheet_api.prototype.asc_showImageFileDialog = function (options) {
+		spreadsheet_api.prototype.asc_showImageFileDialog = function () {
 			if (undefined != window['appBridge']) {
 				window['appBridge']['dummyCommandAddImage'] ();
 				return;
@@ -2565,6 +2564,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
             {
                 ws.objectRender.cleanWorksheet();
             }
+		};
+
+		// Выставление данных
+		spreadsheet_api.prototype.asc_setData = function(data) {
+			this.wb.getWorksheet().setData(data);
+		};
+		spreadsheet_api.prototype.asc_getData = function() {
+			return this.wb.getWorksheet().getData();
 		};
 
 		// Cell comment interface
@@ -3799,6 +3806,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_getWordChartObject"] = prot.asc_getWordChartObject;
 		prot["asc_cleanWorksheet"] = prot.asc_cleanWorksheet;
 		prot["asc_showImageFileDialog"] = prot.asc_showImageFileDialog;
+		prot["asc_setData"] = prot.asc_setData;
+		prot["asc_getData"] = prot.asc_getData;
 		
 		// Cell comment interface
 		prot["asc_addComment"] = prot.asc_addComment;
