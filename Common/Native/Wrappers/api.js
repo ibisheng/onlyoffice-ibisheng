@@ -2069,6 +2069,65 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             _return = global_memory_stream_menu;
             break;
         }
+        case 71: // ASC_MENU_EVENT_TYPE_TABLE_INSERTDELETE_ROWCOLUMN
+        {
+            var _type = 0;
+            var _is_add = true;
+            var _is_above = true;
+            while (_continue)
+            {
+                var _attr = _params[_current.pos++];
+                switch (_attr)
+                {
+                    case 0:
+                    {
+                        _type = _params[_current.pos++];
+                        break;
+                    }
+                    case 1:
+                    {
+                        _is_add = _params[_current.pos++];
+                        break;
+                    }
+                    case 2:
+                    {
+                        _is_above = _params[_current.pos++];
+                        break;
+                    }
+                    case 255:
+                    default:
+                    {
+                        _continue = false;
+                        break;
+                    }
+                }
+            }
+
+            if (1 == _type)
+            {
+                if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties) )
+                {
+                    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_TableAddColumnLeft);
+                    if (_is_add)
+                        this.WordControl.m_oLogicDocument.Table_AddCol(!_is_above);
+                    else
+                        this.WordControl.m_oLogicDocument.Table_RemoveCol();
+                }
+            }
+            else if (2 == _type)
+            {
+                if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties) )
+                {
+                    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_TableAddColumnLeft);
+                    if (_is_add)
+                        this.WordControl.m_oLogicDocument.Table_AddRow(!_is_above);
+                    else
+                        this.WordControl.m_oLogicDocument.Table_RemoveRow();
+                }
+            }
+
+            break;
+        }
         default:
             break;
     }
