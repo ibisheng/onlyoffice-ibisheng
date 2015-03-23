@@ -7283,7 +7283,7 @@ CDocumentContent.prototype =
 
             if ( true === SelectionUse_old && true === MouseEvent.ShiftKey && true === bOldSelectionIsCommon )
             {
-                this.Selection_SetEnd( X, Y, {Type : g_mouse_event_type_up, ClickCount : 1} );
+                this.Selection_SetEnd( X, Y, this.CurPage + this.StartPage, {Type : g_mouse_event_type_up, ClickCount : 1} );
                 this.Selection.Use      = true;
                 this.Selection.Start    = true;
                 this.Selection.EndPos   = ContentPos;

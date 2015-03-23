@@ -10325,31 +10325,10 @@ CDocument.prototype =
 
                     if ( null !== CurPara )
                     {
-                        var MouseEvent = new CMouseEventHandler();
-
-                        MouseEvent.ClickCount = 1;
-                        MouseEvent.Type = g_mouse_event_type_down;
-
-                        var OldX = CurPara.CurPos.X;
-                        var OldY = CurPara.CurPos.Y;
-
-
-                        var DrawMatrix = CurPara.Get_ParentTextTransform();
-                        if (DrawMatrix)
-                        {
-                            var _OldX = DrawMatrix.TransformPointX(OldX, OldY);
-                            var _OldY = DrawMatrix.TransformPointY(OldX, OldY);
-
-                            OldX = _OldX;
-                            OldY = _OldY;
-                        }
-
-                        this.CurPage = CurPara.Get_StartPage_Absolute() + CurPara.CurPos.PagesPos;
-                        this.Selection_SetStart( OldX, OldY, MouseEvent );
-
-                        this.CurPage = PageIndex;
+                        this.Cursor_MoveLeft(true, false);
+                        this.Selection.Start = false;
                         this.Selection_SetEnd( X, Y, e );
-
+                        this.Document_UpdateSelectionState();
                         return;
                     }
                 }
@@ -14536,6 +14515,7 @@ CDocument.prototype.End_SilentMode = function(bUpdate)
     this.TurnOn_RecalculateCurPos(bUpdate);
     this.TurnOn_InterfaceEvents(bUpdate);
 };
+//CDocument.prototype.
 
 //-----------------------------------------------------------------------------------
 //
