@@ -12141,12 +12141,16 @@ CBullet.prototype =
         return this.bulletType != null && this.bulletType.type != null;
     },
 
-    getBulletType: function()
+    getPresentationBullet: function()
     {
         var para_pr = new CParaPr();
         para_pr.Bullet = this;
-        var pres_bullet = para_pr.Get_PresentationBullet();
-        return pres_bullet.m_nType;
+        return para_pr.Get_PresentationBullet();
+    },
+
+    getBulletType: function()
+    {
+        return this.getPresentationBullet().m_nType;
     },
 
     Write_ToBinary: function(w)

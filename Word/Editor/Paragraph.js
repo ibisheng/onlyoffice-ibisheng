@@ -7048,29 +7048,90 @@ Paragraph.prototype =
     // Добавляем нумерацию к данному параграфу
     Add_PresentationNumbering : function(_Bullet)
     {
-
         var ParaPr = this.Get_CompiledPr2(false).ParaPr;
-        var OldType = ParaPr.Bullet ? ParaPr.Bullet.getBulletType() : numbering_presentationnumfrmt_None;
-        var NewType = _Bullet ? _Bullet.getBulletType() : numbering_presentationnumfrmt_None;
+        this.Pr.Bullet = undefined;
+        this.CompiledPr.NeedRecalc = true;
 
-        var Bullet = _Bullet ? _Bullet.createDuplicate() : undefined;
-        this.Set_Bullet(Bullet);
-        if ( OldType != NewType )
+        var oBullet2;
+        if(_Bullet)
         {
-            var ParaPr = this.Get_CompiledPr2(false).ParaPr;
-            var LeftInd = Math.min( ParaPr.Ind.Left, ParaPr.Ind.Left + ParaPr.Ind.FirstLine );
+            oBullet2 = _Bullet;
+        }
+        else
+        {
+            oBullet2 = new CBullet();
+            oBullet2.bulletType = new CBulletType();
+            oBullet2.bulletType.type = BULLET_TYPE_BULLET_NONE;
+        }
+        var oUndefParaPr = this.Get_CompiledPr2(false).ParaPr;
+        var NewType = oBullet2.getBulletType();
+        var UndefType = oUndefParaPr.Bullet ? oUndefParaPr.Bullet.getBulletType() : numbering_presentationnumfrmt_None;
+        var LeftInd;
 
-            if ( numbering_presentationnumfrmt_None === NewType )
+        if(NewType === UndefType)
+        {
+            if(NewType === numbering_presentationnumfrmt_Char)//буллеты
             {
-                this.Set_Ind( { FirstLine : 0, Left : LeftInd } );
+                var oUndefPresentationBullet = oUndefParaPr.Bullet.getPresentationBullet();
+                var oNewPresentationBullet = oBullet2.getPresentationBullet();
+                if(oUndefPresentationBullet.m_sChar === oNewPresentationBullet.m_sChar)//символы совпали. ничего выставлять не надо.
+                {
+                    this.Set_Bullet(undefined);
+                }
+                else
+                {
+                    this.Set_Bullet(oBullet2.createDuplicate());//тип совпал, но не совпали символы. выставляем Bullet. Indent в данном случае не выставляем как это делает PowerPoint.
+                }
             }
-            else if ( numbering_presentationnumfrmt_RomanLcPeriod === NewType || numbering_presentationnumfrmt_RomanUcPeriod === NewType )
+            else //нумерация или отсутствие нумерации
             {
-                this.Set_Ind( { Left : LeftInd + 15.9, FirstLine : -15.9 } );
+                this.Set_Bullet(undefined);
+            }
+            this.Set_Ind({Left: undefined, FirstLine: undefined}, true);
+        }
+        else//тип не совпал. выставляем буллет, а также проверим нужно ли выставлять Indent.
+        {
+            this.Set_Bullet(oBullet2.createDuplicate());
+            LeftInd = Math.min( ParaPr.Ind.Left, ParaPr.Ind.Left + ParaPr.Ind.FirstLine );
+            if(NewType === numbering_presentationnumfrmt_Char)
+            {
+                this.Set_Ind({ Left : LeftInd + 14.3, FirstLine : -14.3 }, false);
+            }
+            else if(NewType === numbering_presentationnumfrmt_None)
+            {
+                this.Set_Ind({ FirstLine : 0, Left : LeftInd }, false);
             }
             else
             {
-                this.Set_Ind( { Left : LeftInd + 14.3, FirstLine : -14.3 } );
+                var oArabicAlphaMap =
+                {
+                    numbering_presentationnumfrmt_ArabicPeriod: true,
+                    numbering_presentationnumfrmt_ArabicParenR: true,
+                    numbering_presentationnumfrmt_AlphaLcParenR: true,
+                    numbering_presentationnumfrmt_AlphaLcPeriod: true,
+                    numbering_presentationnumfrmt_AlphaUcParenR: true,
+                    numbering_presentationnumfrmt_AlphaUcPeriod: true
+                };
+                var oRomanMap =
+                {
+                    numbering_presentationnumfrmt_RomanUcPeriod: true,
+                    numbering_presentationnumfrmt_RomanLcPeriod: true
+                };
+                if(!(oArabicAlphaMap[NewType] && oArabicAlphaMap[UndefType] || oRomanMap[NewType] && oRomanMap[UndefType]))
+                {
+                    if(oArabicAlphaMap[NewType])
+                    {
+                        this.Set_Ind({ Left : LeftInd + 14.3, FirstLine : -14.3 }, false);
+                    }
+                    else
+                    {
+                        this.Set_Ind({ Left : LeftInd + 15.9, FirstLine : -15.9 }, false);
+                    }
+                }
+                else
+                {
+                    this.Set_Ind({Left: undefined, FirstLine: undefined}, true);
+                }
             }
         }
     },
