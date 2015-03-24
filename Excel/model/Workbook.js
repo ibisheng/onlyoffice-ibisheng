@@ -4969,16 +4969,17 @@ Range.prototype._setProperty=function(actionRow, actionCol, actionCell){
 Range.prototype._setPropertyNoEmpty=function(actionRow, actionCol, actionCell){
 	var nRangeType = this._getRangeType();
 	if(c_oRangeType.Range == nRangeType)
-		this._foreachNoEmpty(actionCell);
+		return this._foreachNoEmpty(actionCell);
 	else if(c_oRangeType.Row == nRangeType)
-		this._foreachRowNoEmpty(actionRow, actionCell);
+		return this._foreachRowNoEmpty(actionRow, actionCell);
 	else if(c_oRangeType.Col == nRangeType)
-		this._foreachColNoEmpty(actionCol, actionCell);
+		return this._foreachColNoEmpty(actionCol, actionCell);
 	else
 	{
-		this._foreachRowNoEmpty(actionRow, actionCell);
-		if(null != actionCol)
-			this._foreachColNoEmpty(actionCol, null);
+		var oRes = this._foreachRowNoEmpty(actionRow, actionCell);
+		if(null != oRes && null != actionCol)
+			oRes = this._foreachColNoEmpty(actionCol, null);
+		return oRes;
 	}
 };
 Range.prototype.containCell=function(cellId){
@@ -6713,11 +6714,56 @@ Range.prototype.addCellsShiftRight=function(){
 Range.prototype.deleteCellsShiftLeft=function(){
 	return this._shiftLeftRight(true);
 };
-Range.prototype._shiftLeftRight=function(bLeft){
+Range.prototype._canShiftLeftRight=function(bLeft){
 	var oBBox = this.bbox;
 	var nWidth = oBBox.c2 - oBBox.c1 + 1;
 	var nRangeType = this._getRangeType(oBBox);
 	if(c_oRangeType.Range != nRangeType && c_oRangeType.Col != nRangeType)
+		return false;
+	if(!bLeft && !this.worksheet.workbook.bUndoChanges && !this.worksheet.workbook.bRedoChanges){
+		var rangeEdge = this.worksheet.getRange3(oBBox.r1, gc_nMaxCol0 - nWidth + 1, oBBox.r2, gc_nMaxCol0);
+		var aColsToDelete = [];
+		var aCellsToDelete = [];
+		var bError = rangeEdge._setPropertyNoEmpty(null, function(col){
+			if(null != col){
+				if(null != col && null != col.xfs && null != col.xfs.fill && null != col.xfs.fill.getRgbOrNull())
+					return true;
+				aColsToDelete.push(col);
+			}
+		}, function(cell){
+			if(null != cell){
+				if(null != cell.xfs && null != cell.xfs.fill && null != cell.xfs.fill.getRgbOrNull())
+					return true;
+				if(!cell.isEmptyText())
+					return true;
+				aCellsToDelete.push(cell);
+			}
+		});
+		if(bError)
+			return false;
+		var aMerged = this.worksheet.mergeManager.get(rangeEdge.bbox);
+		if(aMerged.all.length > 0)
+			return false;
+		var aHyperlink = this.worksheet.hyperlinkManager.get(rangeEdge.bbox);
+		if(aHyperlink.all.length > 0)
+			return false;
+		//удаляем крайние колонки и ячейки
+		for(var i = 0; i < aColsToDelete.length; ++i){
+			var col = aColsToDelete[i];
+			this.worksheet._removeCols(col.index, col.index);
+		}
+		for(var i = 0; i < aCellsToDelete.length; ++i){
+			var cell = aCellsToDelete[i];
+			this.worksheet._removeCell(null, null, cell);
+		}
+	}
+	return true;
+};
+Range.prototype._shiftLeftRight=function(bLeft){
+	var oBBox = this.bbox;
+	var nWidth = oBBox.c2 - oBBox.c1 + 1;
+	var nRangeType = this._getRangeType(oBBox);
+	if(!this._canShiftLeftRight(bLeft))
 		return false;
 	var mergeManager = this.worksheet.mergeManager;
 	lockDraw(this.worksheet.workbook);
@@ -6774,11 +6820,56 @@ Range.prototype._shiftLeftRight=function(bLeft){
     unLockDraw(this.worksheet.workbook);
 	return true;
 };
-Range.prototype._shiftUpDown = function (bUp) {
+Range.prototype._canShiftUpDown=function(bUp){
 	var oBBox = this.bbox;
 	var nHeight = oBBox.r2 - oBBox.r1 + 1;
 	var nRangeType = this._getRangeType(oBBox);
 	if(c_oRangeType.Range != nRangeType && c_oRangeType.Row != nRangeType)
+		return false;
+	if(!bUp && !this.worksheet.workbook.bUndoChanges && !this.worksheet.workbook.bRedoChanges){
+		var rangeEdge = this.worksheet.getRange3(gc_nMaxRow0 - nHeight + 1, oBBox.c1, gc_nMaxRow0, oBBox.c2);
+		var aRowsToDelete = [];
+		var aCellsToDelete = [];
+		var bError = rangeEdge._setPropertyNoEmpty(function(row){
+			if(null != row){
+				if(null != row && null != row.xfs && null != row.xfs.fill && null != row.xfs.fill.getRgbOrNull())
+					return true;
+				aRowsToDelete.push(row);
+			}
+		}, null,  function(cell){
+			if(null != cell){
+				if(null != cell.xfs && null != cell.xfs.fill && null != cell.xfs.fill.getRgbOrNull())
+					return true;
+				if(!cell.isEmptyText())
+					return true;
+				aCellsToDelete.push(cell);
+			}
+		});
+		if(bError)
+			return false;
+		var aMerged = this.worksheet.mergeManager.get(rangeEdge.bbox);
+		if(aMerged.all.length > 0)
+			return false;
+		var aHyperlink = this.worksheet.hyperlinkManager.get(rangeEdge.bbox);
+		if(aHyperlink.all.length > 0)
+			return false;
+		//удаляем крайние колонки и ячейки
+		for(var i = 0; i < aRowsToDelete.length; ++i){
+			var row = aRowsToDelete[i];
+			this.worksheet._removeRows(row.index, row.index);
+		}
+		for(var i = 0; i < aCellsToDelete.length; ++i){
+			var cell = aCellsToDelete[i];
+			this.worksheet._removeCell(null, null, cell);
+		}
+	}
+	return true;
+};
+Range.prototype._shiftUpDown = function (bUp) {
+	var oBBox = this.bbox;
+	var nHeight = oBBox.r2 - oBBox.r1 + 1;
+	var nRangeType = this._getRangeType(oBBox);
+	if(!this._canShiftUpDown(bUp))
 		return false;
 	var mergeManager = this.worksheet.mergeManager;
 	lockDraw(this.worksheet.workbook);
