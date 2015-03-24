@@ -2300,7 +2300,9 @@ function CEditorPage(api)
             return;
         }
 
-        if (oWordControl.m_bIsMouseLock === true && 27 !== e.keyCode) // Esc даем всегда делать с клавы
+        // Esc даем делать с клавы, даже когда мышка зажата, чтобы можно было сбросить drag-n-drop, но если у нас
+        // идет работа с автофигурами (любые движения), тогда не пропускаем.
+        if (oWordControl.m_bIsMouseLock === true && (27 !== e.keyCode || true === oWordControl.m_oLogicDocument.Is_TrackingDrawingObjects()))
         {
             if (!window.USER_AGENT_MACOS)
             {

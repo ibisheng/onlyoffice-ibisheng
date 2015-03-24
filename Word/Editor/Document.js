@@ -14528,6 +14528,10 @@ CDocument.prototype.Start_SelectionFromCurPos = function()
         this.Content[this.CurPos.ContentPos].Start_SelectionFromCurPos();
     }
 };
+CDocument.prototype.Is_TrackingDrawingObjects = function()
+{
+    return this.DrawingObjects.Check_TrackObjects();
+};
 
 //-----------------------------------------------------------------------------------
 //
