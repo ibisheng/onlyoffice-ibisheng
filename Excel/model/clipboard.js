@@ -1678,8 +1678,6 @@
 						}
 						else
 						{
-							//worksheet.setSelectionInfo('paste',t,false,true);
-							
 							window.GlobalPasteFlag = false;
 							window.GlobalPasteFlagCounter = 0;
 							return true;
@@ -1690,138 +1688,240 @@
 				}
 				else//find class xslData or docData
 				{
-					var classNode;
-					if(node.children[0] && node.children[0].getAttribute("class") != null && (node.children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].getAttribute("class").indexOf("docData;") > -1 || node.children[0].getAttribute("class").indexOf("pptData;") > -1))
-						classNode = node.children[0].getAttribute("class");
-					else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("docData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("pptData;") > -1))
-						classNode = node.children[0].children[0].getAttribute("class");
-					else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].children[0] && node.children[0].children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].children[0].getAttribute("class").indexOf("docData;") > -1  || node.children[0].children[0].children[0].getAttribute("class").indexOf("pptData;") > -1))
-						classNode = node.children[0].children[0].children[0].getAttribute("class");
-					
-					if( classNode != null ){
-						var cL = classNode.split(" ");
-						for (var i = 0; i < cL.length; i++){
-							if(cL[i].indexOf("xslData;") > -1)
-							{
-								base64 = cL[i].split('xslData;')[1];
-							}
-							else if(cL[i].indexOf("docData;") > -1)
-							{
-								base64FromWord = cL[i].split('docData;')[1];
-							}
-							else if(cL[i].indexOf("pptData;") > -1)
-							{
-								base64FromPresentation = cL[i].split('pptData;')[1];
-							}
-						}
-					}
+					var returnBinary = this._getClassBinaryFromHtml(node);
+					base64 = returnBinary.base64;
+					base64FromWord = returnBinary.base64FromWord;
+					base64FromPresentation = returnBinary.base64FromPresentation;
 				}
-				
+					
+				var result = false;
 				if(base64 != null)//from excel
 				{
-					var oBinaryFileReader = new Asc.BinaryFileReader(null, true);
-					var tempWorkbook = new Workbook;
-					oBinaryFileReader.Read(base64, tempWorkbook);
-					this.activeRange = oBinaryFileReader.copyPasteObj.activeRange;
-					var pasteData = null;
-					if (tempWorkbook)
-						pasteData = tempWorkbook.aWorksheets[0];
-					if (pasteData) {
-						if(pasteData.Drawings && pasteData.Drawings.length)
+					result = this._pasteFromBinaryExcel(worksheet, base64, isIntoShape);
+				} 
+				else if (base64FromWord && copyPasteFromWordUseBinary)//from word
+				{
+					result = this._pasteFromBinaryWord(worksheet, base64FromWord, isIntoShape);
+				}
+				else if(base64FromPresentation)
+				{
+					result = this._pasteFromBinaryPresentation(worksheet, base64FromPresentation, isIntoShape);
+				}
+				
+				if(result === true)
+				{
+					window.GlobalPasteFlag = false;
+					window.GlobalPasteFlagCounter = 0;
+				}
+				
+				return result;
+			},
+			
+			_pasteFromBinaryExcel: function(worksheet, base64, isIntoShape)
+			{
+				var oBinaryFileReader = new Asc.BinaryFileReader(null, true);
+				var tempWorkbook = new Workbook;
+				var t = this;
+				
+				window.global_pptx_content_loader.Start_UseFullUrl();
+				oBinaryFileReader.Read(base64, tempWorkbook);
+				this.activeRange = oBinaryFileReader.copyPasteObj.activeRange;
+				var aPastedImages = window.global_pptx_content_loader.End_UseFullUrl();
+				
+				var pasteData = null;
+				if (tempWorkbook)
+					pasteData = tempWorkbook.aWorksheets[0];
+				if (pasteData) {
+					if(pasteData.Drawings && pasteData.Drawings.length)
+					{
+						if(!(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 						{
-							if(!(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
+							if(aPastedImages && aPastedImages.length)
+							{
+								t._loadImagesOnServer(aPastedImages, function() {
+									t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
+								});
+							}
+							else
 							{
 								t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
 							}
 						}
-						else {
-							var newFonts = {};
-							pasteData.generateFontMap(newFonts);
-							worksheet._loadFonts(newFonts, function() {
-								worksheet.setSelectionInfo('paste', pasteData, false, "binary");
-							});
-						}
-						window.GlobalPasteFlag = false;
-						window.GlobalPasteFlagCounter = 0;
-						
-						return true;
 					}
-				} 
-				else if (base64FromWord && copyPasteFromWordUseBinary)//from word
-				{
-					var pasteData = this.ReadFromBinaryWord(base64FromWord, worksheet);
-					var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(this, worksheet);
-					
-					pasteFromBinaryWord._paste(worksheet, pasteData);
-					
-					window.GlobalPasteFlag = false;
-					window.GlobalPasteFlagCounter = 0;
+					else {
+						var newFonts = {};
+						pasteData.generateFontMap(newFonts);
+						worksheet._loadFonts(newFonts, function() {
+							worksheet.setSelectionInfo('paste', pasteData, false, "binary");
+						});
+					}
 					
 					return true;
 				}
-				else if(base64FromPresentation)
-				{
-					window.global_pptx_content_loader.Clear();
+				
+				return false;
+			},
+			
+			_pasteFromBinaryWord: function(worksheet, base64, isIntoShape)
+			{
+				var pasteData = this.ReadFromBinaryWord(base64, worksheet);
+				var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(this, worksheet);
+				
+				pasteFromBinaryWord._paste(worksheet, pasteData);
+				
+				return true;
+			},
+			
+			_pasteFromBinaryPresentation: function(worksheet, base64, isIntoShape)
+			{
+				window.global_pptx_content_loader.Clear();
 
-					var _stream = CreateBinaryReader(base64FromPresentation, 0, base64FromPresentation.length);
-                    var stream = new FileStream(_stream.data, _stream.size);
-                    var p_url = stream.GetString2();
-                    var p_width = stream.GetULong()/100000;
-                    var p_height = stream.GetULong()/100000;
-                    var fonts = [];
-					
-					var first_string = stream.GetString2();
-					
-                    switch(first_string)
-                    {
-                        case "Content":
-                        {
-							//пока вставляем через html
-							return false;
-							
-							//TODO вставка через бинарник требует переконвертировать контент в вордовский, либо сделать парсинг из презентационных параграфов
-							var docContent = this.ReadPresentationText(stream, worksheet);
-							var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(this, worksheet);
-							
-							pasteFromBinaryWord._paste(worksheet, {DocumentContent: docContent});
-							
-							window.GlobalPasteFlag = false;
-							window.GlobalPasteFlagCounter = 0;
-							
-							return true;
-                        }
-                        case "Drawings":
-                        {
-                            var objects = this.ReadPresentationShapes(stream, worksheet);
-							
-							//****если записана одна табличка, то вставляем html и поддерживаем все цвета и стили****
-							if(!objects.arrImages.length && objects.arrShapes.length === 1)
+				var _stream = CreateBinaryReader(base64, 0, base64.length);
+				var stream = new FileStream(_stream.data, _stream.size);
+				var p_url = stream.GetString2();
+				var p_width = stream.GetULong()/100000;
+				var p_height = stream.GetULong()/100000;
+				var fonts = [];
+				var t = this;
+				
+				var first_string = stream.GetString2();
+				
+				switch(first_string)
+				{
+					case "Content":
+					{
+						//пока вставляем через html
+						return false;
+						
+						//TODO вставка через бинарник требует переконвертировать контент в вордовский, либо сделать парсинг из презентационных параграфов
+						var docContent = this.ReadPresentationText(stream, worksheet);
+						var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(this, worksheet);
+						
+						pasteFromBinaryWord._paste(worksheet, {DocumentContent: docContent});
+						
+						return true;
+					}
+					case "Drawings":
+					{
+						var objects = this.ReadPresentationShapes(stream, worksheet);
+						
+						//****если записана одна табличка, то вставляем html и поддерживаем все цвета и стили****
+						if(!objects.arrImages.length && objects.arrShapes.length === 1)
+						{
+							var drawing = objects.arrShapes[0].graphicObject;
+							if(typeof CGraphicFrame !== "undefined" && drawing instanceof CGraphicFrame)
+								return false;
+						}
+						
+						var arr_shapes = objects.arrShapes;
+						if(arr_shapes && arr_shapes.length)
+						{
+							var aPastedImages = objects.arrImages;
+							if(!(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 							{
-								var drawing = objects.arrShapes[0].graphicObject;
-								if(typeof CGraphicFrame !== "undefined" && drawing instanceof CGraphicFrame)
-									return false;
-							}
-							
-                            var arr_shapes = objects.arrShapes;
-							if(arr_shapes && arr_shapes.length)
-							{
-								if(!(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
+								if(aPastedImages && aPastedImages.length)
+								{
+									t._loadImagesOnServer(aPastedImages, function() {
+										t._insertImagesFromBinary(worksheet, {Drawings: arr_shapes}, isIntoShape);
+									});
+								}
+								else
 									t._insertImagesFromBinary(worksheet, {Drawings: arr_shapes}, isIntoShape);
 							}
-							
-							window.GlobalPasteFlag = false;
-							window.GlobalPasteFlagCounter = 0;
-							
-							return true;
-                        }
-                        case "SlideObjects":
-                        {
-							break;
 						}
-                    }
+						
+						return true;
+					}
+					case "SlideObjects":
+					{
+						break;
+					}
 				}
 				
 				return false;
+			},
+			
+			_getClassBinaryFromHtml: function(node)
+			{
+				var classNode, base64 = null, base64FromWord = null, base64FromPresentation = null;
+				if(node.children[0] && node.children[0].getAttribute("class") != null && (node.children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].getAttribute("class").indexOf("docData;") > -1 || node.children[0].getAttribute("class").indexOf("pptData;") > -1))
+					classNode = node.children[0].getAttribute("class");
+				else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("docData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("pptData;") > -1))
+					classNode = node.children[0].children[0].getAttribute("class");
+				else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].children[0] && node.children[0].children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].children[0].getAttribute("class").indexOf("docData;") > -1  || node.children[0].children[0].children[0].getAttribute("class").indexOf("pptData;") > -1))
+					classNode = node.children[0].children[0].children[0].getAttribute("class");
+				
+				if( classNode != null ){
+					var cL = classNode.split(" ");
+					for (var i = 0; i < cL.length; i++){
+						if(cL[i].indexOf("xslData;") > -1)
+						{
+							base64 = cL[i].split('xslData;')[1];
+						}
+						else if(cL[i].indexOf("docData;") > -1)
+						{
+							base64FromWord = cL[i].split('docData;')[1];
+						}
+						else if(cL[i].indexOf("pptData;") > -1)
+						{
+							base64FromPresentation = cL[i].split('pptData;')[1];
+						}
+					}
+				}
+				
+				return {base64: base64, base64FromWord: base64FromWord, base64FromPresentation: base64FromPresentation};
+			},
+			
+			_loadImagesOnServer: function(aPastedImages, callback)
+			{
+				var api = asc["editor"];
+				var aImagesToDownload = [];
+				var t = this;
+				
+				for(var k = 0; k < aPastedImages.length; k++)
+				{
+					var src = aPastedImages[k].Url;
+					
+					if(false == (/*0 == src.indexOf("data:") ||*/ 0 == src.indexOf(api.documentUrl) || 0 == src.indexOf(api.documentUrl)))
+						aImagesToDownload.push(src);
+				}
+				
+				if(aImagesToDownload.length > 0)
+				{
+					var rData = {"id": api.documentId, "c":"imgurls", "vkey": api.documentVKey, "data": JSON.stringify(aImagesToDownload)};
+					
+					api._asc_sendCommand(function(incomeObject){
+							if(incomeObject && "imgurls" == incomeObject.type)
+							{
+								if(incomeObject && "imgurls" == incomeObject.type)
+								{
+									var oFromTo = JSON.parse(incomeObject.data);
+									var aImagesSync = [];
+									
+									for(var i = 0, length = aPastedImages.length; i < length; ++i)
+									{	
+										var sTo = oFromTo[aPastedImages[i].Url];
+										if(sTo)
+										{									
+											var imageElem = aPastedImages[i];
+											if(null != imageElem)
+											{
+												var sNewSrc = oFromTo[imageElem.Url];
+												aImagesSync.push(sNewSrc);
+												if(null != sNewSrc)
+													imageElem.SetUrl(sNewSrc);	
+											}															
+										}						
+									}
+								}
+							}
+							
+							callback();
+							
+						}, rData );
+				}
+				else
+					callback();
 			},
 			
 			ReadPresentationShapes: function(stream, worksheet)

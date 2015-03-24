@@ -8323,7 +8323,6 @@
 						if(incomeObject && "imgurls" == incomeObject.type)
 						{
 							var oFromTo = JSON.parse(incomeObject.data);
-							var nC, height, width;
 							var aImagesSync = [];
 							
 							for(var i = 0, length = val._aPastedImages.length; i < length; ++i)
