@@ -2572,6 +2572,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 		// Получение данных
 		spreadsheet_api.prototype.asc_getData = function() {
+			this.asc_closeCellEditor();
 			return this.wb.getWorksheet().getData();
 		};
 
