@@ -4118,6 +4118,14 @@ PasteProcessor.prototype =
 							{
 								if(!(presentationSelectedContent.Drawings[i].Drawing instanceof CGraphicFrame))
                                 {
+                                    if(presentationSelectedContent.Drawings[i].Drawing.setBDeleted2)
+                                    {
+                                        presentationSelectedContent.Drawings[i].Drawing.setBDeleted2(true);
+                                    }
+                                    else
+                                    {
+                                        presentationSelectedContent.Drawings[i].Drawing.setBDeleted(true);
+                                    }
                                     presentationSelectedContent.Drawings[i].Drawing = presentationSelectedContent.Drawings[i].Drawing.convertToPPTX(oThis.oDocument.DrawingDocument);
                                     checkBlipFillRasterImages(presentationSelectedContent.Drawings[i].Drawing);
                                 }
