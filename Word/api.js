@@ -4710,9 +4710,9 @@ asc_docs_api.prototype.AddImageToPage = function(sUrl, nPageIndex, dX, dY, dW, d
         oPosV.put_Align(false);
         oPosV.put_Value(dY);
         var oImageProps = new asc_CImgProperty();
-        oImageProps.put_WrappingStyle(c_oAscWrapStyle2.Square);
-        oImageProps.put_PositionH(oPosH);
-        oImageProps.put_PositionV(oPosV);
+        oImageProps.asc_putWrappingStyle(c_oAscWrapStyle2.Square);
+        oImageProps.asc_putPositionH(oPosH);
+        oImageProps.asc_putPositionV(oPosV);
 
         LogicDocument.Create_NewHistoryPoint(historydescription_Document_AddImageToPage);
         LogicDocument.Start_SilentMode();

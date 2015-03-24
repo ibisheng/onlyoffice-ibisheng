@@ -1235,7 +1235,7 @@
     prot["get_Count"] = prot["asc_getCount"] = prot.asc_getCount;
     prot["get_Tab"] = prot["asc_getTab"] = prot.asc_getTab;
     prot["add_Tab"] = prot["asc_addTab"] = prot.asc_addTab;
-    prot["clear"] = prot["asc_clear"] = prot.asc_clear;
+    prot["clear"] = prot.clear = prot["asc_clear"] = prot.asc_clear;
 
 
     /** @constructor */
@@ -2169,7 +2169,6 @@
     prot["get_hex"] = prot["asc_getHex"] = prot.asc_getHex;
     prot["get_color"] = prot["asc_getColor"] = prot.asc_getColor;
     prot["get_hex"] = prot["asc_getHex"] = prot.asc_getHex;
-    prot["get_color"] = prot["asc_getColor"] = prot.asc_getColor;
 
 
 
@@ -2340,7 +2339,7 @@
         asc_putLineendsize: function(v){this.LineEndSize = v;},
 
         asc_getCanChangeArrows: function(){return this.canChangeArrows;}
-    }
+    };
 
 //{ asc_CStroke export
     window["CAscStroke"] = window["Asc"]["asc_CStroke"] = window["asc_CStroke"] = asc_CStroke;

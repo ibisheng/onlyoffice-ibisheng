@@ -284,13 +284,13 @@ function CorrectAscColor(asc_color)
 
 	var ret = null;
 
-	var _type = asc_color.get_type();
+	var _type = asc_color.asc_getType();
 	switch (_type)
 	{
 		case c_oAscColor.COLOR_TYPE_SCHEME:
 		{
 			// тут выставляется ТОЛЬКО из меню. поэтому:
-			var _index = asc_color.get_value() >> 0;
+			var _index = asc_color.asc_getValue() >> 0;
 			var _id = (_index / 6) >> 0;
 			var _pos = _index - _id * 6;
 			var basecolor = g_oColorManager.getThemeColor(_id);
@@ -301,7 +301,7 @@ function CorrectAscColor(asc_color)
 		}
 		default:
 		{
-			ret = new RgbColor((asc_color.get_r() << 16) + (asc_color.get_g() << 8) + asc_color.get_b());
+			ret = new RgbColor((asc_color.asc_getR() << 16) + (asc_color.asc_getG() << 8) + asc_color.asc_getB());
 		}
 	}
 	return ret;

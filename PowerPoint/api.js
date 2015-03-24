@@ -2062,9 +2062,9 @@ asc_docs_api.prototype.ShapeApply = function(prop)
     {
         if (prop.fill.fill != null && prop.fill.type == c_oAscFill.FILL_TYPE_BLIP)
         {
-            image_url = prop.fill.fill.get_url();
+            image_url = prop.fill.fill.asc_getUrl();
 
-            var _tx_id = prop.fill.fill.get_texture_id();
+            var _tx_id = prop.fill.fill.asc_getTextureId();
             if (null != _tx_id && 0 <= _tx_id && _tx_id < g_oUserTexturePresets.length)
             {
                 image_url = g_oUserTexturePresets[_tx_id];
@@ -2157,7 +2157,7 @@ asc_docs_api.prototype.SetSlideProps = function(prop)
 
     if (_back_fill)
     {
-        if (_back_fill.get_type() == c_oAscFill.FILL_TYPE_NOFILL)
+        if (_back_fill.asc_getType() == c_oAscFill.FILL_TYPE_NOFILL)
         {
             var bg = new CBg();
             bg.bgPr = new CBgPr();
