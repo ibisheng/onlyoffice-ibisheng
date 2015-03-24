@@ -9256,7 +9256,6 @@ CDocumentContent.prototype.Get_TopElement = function()
 
     return null;
 };
-
 CDocumentContent.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
 {
     for (var Index = 0, Count = this.Content.length; Index < Count; Index++)
@@ -9266,6 +9265,21 @@ CDocumentContent.prototype.Compare_DrawingsLogicPositions = function(CompareObje
 
         if (0 !== CompareObject.Result)
             return;
+    }
+};
+CDocumentContent.prototype.Start_SelectionFromCurPos = function()
+{
+    if (docpostype_DrawingObjects === this.CurPos.Type)
+    {
+        return this.DrawingObject.startSelectionFromCurPos();
+    }
+    else //if (docpostype_Content === this.CurPos.Type)
+    {
+        this.Selection.Use      = true;
+        this.Selection.Start    = false;
+        this.Selection.StartPos = this.CurPos.ContentPos;
+        this.Selection.EndPos   = this.CurPos.ContentPos;
+        this.Content[this.CurPos.ContentPos].Start_SelectionFromCurPos();
     }
 };
 

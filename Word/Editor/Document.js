@@ -10311,27 +10311,14 @@ CDocument.prototype =
                 ( (docpostype_DrawingObjects !== this.CurPos.Type && !(docpostype_HdrFtr === this.CurPos.Type && this.HdrFtr.CurHdrFtr && this.HdrFtr.CurHdrFtr.Content.CurPos.Type === docpostype_DrawingObjects))
                     || true === this.DrawingObjects.checkTextObject(X, Y, PageIndex) ) )
             {
-                if ( true === this.Is_SelectionUse() )
-                {
+                if (true === this.Is_SelectionUse())
                     this.Selection.Start = false;
-                    this.Selection_SetEnd( X, Y, e );
-                    this.Document_UpdateSelectionState();
-
-                    return;
-                }
                 else
-                {
-                    var CurPara = this.Get_CurrentParagraph();
+                    this.Start_SelectionFromCurPos();
 
-                    if ( null !== CurPara )
-                    {
-                        this.Cursor_MoveLeft(true, false);
-                        this.Selection.Start = false;
-                        this.Selection_SetEnd( X, Y, e );
-                        this.Document_UpdateSelectionState();
-                        return;
-                    }
-                }
+                this.Selection_SetEnd(X, Y, e);
+                this.Document_UpdateSelectionState();
+                return;
             }
 
             this.Selection_SetStart( X, Y, e );
@@ -14515,7 +14502,32 @@ CDocument.prototype.End_SilentMode = function(bUpdate)
     this.TurnOn_RecalculateCurPos(bUpdate);
     this.TurnOn_InterfaceEvents(bUpdate);
 };
-//CDocument.prototype.
+/*
+ Начинаем селект с текущей точки. Если селект уже есть, тогда ничего не делаем.
+ */
+CDocument.prototype.Start_SelectionFromCurPos = function()
+{
+    if (true === this.Is_SelectionUse())
+        return true;
+
+    this.Selection.Use   = true;
+    this.Selection.Start = false;
+
+    if (docpostype_HdrFtr === this.CurPos.Type)
+    {
+        return this.HdrFtr.Start_SelectionFromCurPos();
+    }
+    else if (docpostype_DrawingObjects === this.CurPos.Type)
+    {
+        return this.DrawingObject.startSelectionFromCurPos();
+    }
+    else //if (docpostype_Content === this.CurPos.Type)
+    {
+        this.Selection.StartPos = this.CurPos.ContentPos;
+        this.Selection.EndPos   = this.CurPos.ContentPos;
+        this.Content[this.CurPos.ContentPos].Start_SelectionFromCurPos();
+    }
+};
 
 //-----------------------------------------------------------------------------------
 //

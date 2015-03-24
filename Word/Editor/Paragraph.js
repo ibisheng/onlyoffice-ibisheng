@@ -12487,6 +12487,16 @@ Paragraph.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
     }
 };
 
+Paragraph.prototype.Start_SelectionFromCurPos = function()
+{
+    var ContentPos = this.Get_ParaContentPos(false, false);
+    this.Selection.Use           = true;
+    this.Selection.Start         = false;
+    this.Selection.StartManually = true;
+    this.Selection.EndManually   = true;
+    this.Set_SelectionContentPos(ContentPos, ContentPos);
+};
+
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;
 

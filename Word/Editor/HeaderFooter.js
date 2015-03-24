@@ -913,6 +913,11 @@ CHeaderFooter.prototype =
     {
         return this.Content.Get_CurrentParagraph();
     },
+
+    Start_SelectionFromCurPos : function()
+    {
+        this.Content.Start_SelectionFromCurPos();
+    },
 //-----------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //-----------------------------------------------------------------------------------
@@ -2094,6 +2099,12 @@ CHeaderFooterController.prototype =
     Get_CurrentParagraph : function()
     {
         return this.CurHdrFtr.Get_CurrentParagraph();
+    },
+
+    Start_SelectionFromCurPos : function()
+    {
+        if (null !== this.CurHdrFtr)
+            this.CurHdrFtr.Start_SelectionFromCurPos();
     },
 //-----------------------------------------------------------------------------------
 // Внутренние(вспомогательные) функции
