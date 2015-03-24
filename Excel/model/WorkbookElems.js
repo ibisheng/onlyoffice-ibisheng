@@ -3238,14 +3238,14 @@ CCellValue.prototype =
 				}
 			}
 		}
-		if(0 == val.indexOf("http://") || 0 == val.indexOf("https://") || (0 == val.indexOf("www.") && val.length > 4))
+		if((0 == val.indexOf("http://") || 0 == val.indexOf("https://") || (0 == val.indexOf("www.") && val.length > 4)) && -1 == val.indexOf("\n"))
 		{
 			var sRealUrl = val;
 			if(0 != val.indexOf("http://") && 0 != val.indexOf("https://"))
 				sRealUrl = "http://" + sRealUrl;
 			var oNewHyperlink = new Hyperlink();
 			oNewHyperlink.Ref = cell.ws.getCell3(cell.nRow, cell.nCol);
-			oNewHyperlink.Hyperlink = sRealUrl;
+			oNewHyperlink.Hyperlink = encodeURI(sRealUrl);
 			oNewHyperlink.Ref.setHyperlink(oNewHyperlink);
 		}
 	},
