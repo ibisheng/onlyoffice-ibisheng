@@ -1884,6 +1884,22 @@ CGraphicObjects.prototype =
         return this.canGroup(true);
     },
 
+
+    startSelectionFromCurPos: function()
+    {
+        var content = this.getTargetDocContent();
+        if(content)
+        {
+            content.Start_SelectionFromCurPos();
+        }
+    },
+
+
+    Check_TrackObjects: function()
+    {
+        return this.arrTrackObjects.length > 0;
+    },
+
     getGroup: DrawingObjectsController.prototype.getGroup,
 
     addObjectOnPage: function(pageIndex, object)

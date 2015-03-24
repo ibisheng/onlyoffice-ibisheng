@@ -9271,7 +9271,7 @@ CDocumentContent.prototype.Start_SelectionFromCurPos = function()
 {
     if (docpostype_DrawingObjects === this.CurPos.Type)
     {
-        return this.DrawingObject.startSelectionFromCurPos();
+        return this.DrawingObjects.startSelectionFromCurPos();
     }
     else //if (docpostype_Content === this.CurPos.Type)
     {
