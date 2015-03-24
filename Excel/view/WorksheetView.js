@@ -11013,7 +11013,6 @@
 			History.TurnOff();
 			var oAllRange = new Range(this.model, 0, 0, this.nRowsCount - 1, this.nColsCount - 1);
 			oAllRange.cleanAll();
-			History.TurnOn();
 
 			var row, oCell;
 			for (var r = 0; r < oData.length; ++r) {
@@ -11025,6 +11024,8 @@
 					}
 				}
 			}
+			History.TurnOn();
+			this._updateCellsRange(oAllRange.bbox); // ToDo Стоит обновить nRowsCount и nColsCount
 		};
 		WorksheetView.prototype.getData = function () {
 			var arrResult = [], cell, c, r, row;
@@ -11039,6 +11040,7 @@
 				}
 				arrResult.push(row);
 			}
+			return arrResult;
 		};
 
 		/*
