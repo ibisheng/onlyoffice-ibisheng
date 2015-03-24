@@ -1641,6 +1641,14 @@ function DrawingObjects() {
         }
         else if ( isObject(chart) && chart["binary"] )
         {
+            for (var i = 0; i < aObjects.length; i++) {
+                aObjects[i].graphicObject.deleteDrawingBase();
+            }
+            var listRange = new Range(worksheet.model, 0, 0, worksheet.nRowsCount - 1, worksheet.nColsCount - 1);
+            listRange.cleanAll();
+            worksheet._clean();
+            History.Clear();
+
             History.TurnOff();
             aObjects.length = 0;
             var listRange = new Range(worksheet.model, 0, 0, worksheet.nRowsCount - 1, worksheet.nColsCount - 1);
@@ -2783,19 +2791,6 @@ function DrawingObjects() {
     //-----------------------------------------------------------------------------------
 
     _this.cleanWorksheet = function() {
-        for (var i = 0; i < aObjects.length; i++) {
-            aObjects[i].graphicObject.deleteDrawingBase();
-        }
-
-        worksheet._clean();
-        var listRange = new Range(worksheet.model, 0, 0, worksheet.nRowsCount - 1, worksheet.nColsCount - 1);
-        listRange.cleanAll();
-
-        _this.controller.resetSelection();
-        shapeCtx.m_oContext.clearRect(0, 0, shapeCtx.m_lWidthPix, shapeCtx.m_lHeightPix);
-        shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
-        _this.OnUpdateOverlay();
-        History.Clear();
     };
 
     _this.getWordChartObject = function() {
@@ -2803,9 +2798,7 @@ function DrawingObjects() {
             var drawingObject = aObjects[i];
 
             if ( drawingObject.isChart() ) {
-                var chart = new asc_CChartBinary(drawingObject.graphicObject);
-                _this.cleanWorksheet();
-                return chart;
+                return new asc_CChartBinary(drawingObject.graphicObject);
             }
         }
         return null;
