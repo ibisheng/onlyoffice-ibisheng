@@ -214,6 +214,10 @@ CParagraphContentWithParagraphLikeContent.prototype.Copy = function(Selected)
 
     return NewElement;
 };
+CParagraphContentWithParagraphLikeContent.prototype.Get_Paragraph = function()
+{
+    return this.Paragraph;
+};
 CParagraphContentWithParagraphLikeContent.prototype.Clear_ContentChanges = function()
 {
     this.m_oContentChanges.Clear();

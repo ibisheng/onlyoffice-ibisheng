@@ -230,11 +230,47 @@ ParaField.prototype.Map_MailMerge = function(Value)
 
     History.TurnOn();
 };
+ParaField.prototype.Restore_StandardTemplate = function()
+{
+    // В любом случае сначала восстанавливаем исходное содержимое.
+    this.Restore_Template();
+
+    if (fieldtype_MERGEFIELD === this.FieldType && true === CollaborativeEditing.Is_SingleUser() && 1 === this.Arguments.length)
+    {
+        var oRun = this.private_GetMappedRun("«" + this.Arguments[0] + "»");
+        this.Remove_FromContent(0, this.Content.length);
+        this.Add_ToContent(0, oRun);
+        this.Cursor_MoveToStartPos();
+
+        this.TemplateContent = this.Content;
+    }
+};
 ParaField.prototype.Restore_Template = function()
 {
     // Восстанавливаем содержимое поля.
     this.Content = this.TemplateContent;
     this.Cursor_MoveToStartPos();
+};
+ParaField.prototype.Is_NeedRestoreTemplate = function()
+{
+    if (1 !== this.TemplateContent.length)
+        return true;
+
+    var oRun = this.TemplateContent[0];
+    if (fieldtype_MERGEFIELD === this.FieldType)
+    {
+        var sStandardText = "«" + this.Arguments[0] + "»";
+
+        var oRunText = new CParagraphGetText();
+        oRun.Get_Text(oRunText);
+
+        if (sStandardText === oRunText.Text)
+            return false;
+
+        return true;
+    }
+
+    return false;
 };
 ParaField.prototype.Replace_MailMerge = function(Value)
 {

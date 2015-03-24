@@ -1440,6 +1440,7 @@ var historydescription_Document_AddTextFromTextBox                 = 0x00ab;
 var historydescription_Document_AddMailMergeField                  = 0x00ac;
 var historydescription_Document_MoveInlineTable                    = 0x00ad;
 var historydescription_Document_MoveFlowTable                      = 0x00ae;
+var historydescription_Document_RestoreFieldTemplateText           = 0x00af;
 
 
 function Get_HistoryPointStringDescription(nDescription)
@@ -1621,6 +1622,7 @@ function Get_HistoryPointStringDescription(nDescription)
         case historydescription_Document_AddMailMergeField                  : sString = "Document_AddMailMergeField                 "; break;
         case historydescription_Document_MoveInlineTable                    : sString = "Document_MoveInlineTable                   "; break;
         case historydescription_Document_MoveFlowTable                      : sString = "Document_MoveFlowTable                     "; break;
+        case historydescription_Document_RestoreFieldTemplateText           : sString = "Document_RestoreFieldTemplateText          "; break;
     }
 
     return sString;

@@ -589,12 +589,71 @@ CDocumentFieldsManager.prototype.Replace_MailMergeFields = function(Map)
 };
 CDocumentFieldsManager.prototype.Restore_MailMergeTemplate = function()
 {
-    for (var FieldName in this.m_oMailMergeFields)
+    if (true === CollaborativeEditing.Is_SingleUser())
     {
-        for (var Index = 0, Count = this.m_oMailMergeFields[FieldName].length; Index < Count; Index++)
+        // В такой ситуации мы восстанавливаем стандартный текст полей. Чтобы это сделать нам сначала надо пробежаться
+        // по всем таким полям, определить параграфы, в которых необходимо восстановить поля. Залочить эти параграфы,
+        // и произвести восстановление полей.
+
+        var FieldsToRestore    = [];
+        var FieldsRemain       = [];
+        var ParagrapsToRestore = [];
+        for (var FieldName in this.m_oMailMergeFields)
         {
-            var oField = this.m_oMailMergeFields[FieldName][Index];
-            oField.Restore_Template();
+            for (var Index = 0, Count = this.m_oMailMergeFields[FieldName].length; Index < Count; Index++)
+            {
+                var oField = this.m_oMailMergeFields[FieldName][Index];
+                var oFieldPara = oField.Get_Paragraph();
+
+                if (oFieldPara && oField.Is_NeedRestoreTemplate())
+                {
+                    var bNeedAddPara = true;
+                    for (var ParaIndex = 0, ParasCount = ParagrapsToRestore.length; ParaIndex < ParasCount; ParaIndex++)
+                    {
+                        if (oFieldPara === ParagrapsToRestore[ParaIndex])
+                        {
+                            bNeedAddPara = false;
+                            break;
+                        }
+                    }
+                    if (true === bNeedAddPara)
+                        ParagrapsToRestore.push(oFieldPara);
+
+                    FieldsToRestore.push(oField);
+                }
+                else
+                {
+                    FieldsRemain.push(oField);
+                }
+            }
+        }
+
+        var LogicDocument = (ParagrapsToRestore.length > 0 ? ParagrapsToRestore[0].LogicDocument : null);
+        if (LogicDocument && false === LogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : ParagrapsToRestore, CheckType : changestype_Paragraph_Content }))
+        {
+            History.Create_NewPoint(historydescription_Document_RestoreFieldTemplateText);
+            for (var nIndex = 0, nCount = FieldsToRestore.length; nIndex < nCount; nIndex++)
+            {
+                var oField = FieldsToRestore[nIndex];
+                oField.Restore_StandardTemplate();
+            }
+
+            for (var nIndex = 0, nCount = FieldsRemain.length; nIndex < nCount; nIndex++)
+            {
+                var oField = FieldsRemain[nIndex];
+                oField.Restore_Template();
+            }
+        }
+    }
+    else
+    {
+        for (var FieldName in this.m_oMailMergeFields)
+        {
+            for (var Index = 0, Count = this.m_oMailMergeFields[FieldName].length; Index < Count; Index++)
+            {
+                var oField = this.m_oMailMergeFields[FieldName][Index];
+                oField.Restore_Template();
+            }
         }
     }
 };
@@ -3234,6 +3293,7 @@ CDocument.prototype =
                     case para_Space:
                     case para_Tab:
                     case para_PageNum:
+                    case para_Field:
                     {
                         // Если у нас что-то заселекчено и мы вводим текст или пробел
                         // и т.д., тогда сначала удаляем весь селект.
@@ -14234,6 +14294,7 @@ CDocument.prototype.Set_HightlightMailMergeFields = function(Value)
         this.MailMergeFieldsHighlight = Value;
         this.DrawingDocument.ClearCachePages();
         this.DrawingDocument.FirePaint();
+        this.DrawingDocument.Update_FieldTrack(false);
         editor.sync_HighlightMailMergeFields(this.MailMergeFieldsHighlight);
     }
 };

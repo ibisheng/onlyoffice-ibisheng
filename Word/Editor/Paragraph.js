@@ -4931,7 +4931,7 @@ Paragraph.prototype =
     {
         // В данной функции мы корректируем содержимое параграфа:
         // 1. Спаренные пустые раны мы удаляем (удаляем 1 ран)
-        // 2. Удаляем пустые гиперссылки и пустые формулы
+        // 2. Удаляем пустые гиперссылки, пустые формулы, пустые поля
         // 3. Добавляем пустой ран в место, где нет рана (например, между двумя идущими подряд гиперссылками)
         // 4. Удаляем пустые комментарии
 
@@ -4943,7 +4943,7 @@ Paragraph.prototype =
         {
             var CurElement = this.Content[CurPos];
 
-            if ((para_Hyperlink === CurElement.Type || para_Math === CurElement.Type) && true === CurElement.Is_Empty() && true !== CurElement.Is_CheckingNearestPos())
+            if ((para_Hyperlink === CurElement.Type || para_Math === CurElement.Type || para_Field === CurElement.Type) && true === CurElement.Is_Empty() && true !== CurElement.Is_CheckingNearestPos())
             {
                 this.Internal_Content_Remove( CurPos );
                 CurPos++;

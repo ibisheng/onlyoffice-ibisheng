@@ -668,6 +668,14 @@ function CCollaborativeEditing()
 
     var oThis = this;
 
+    this.Is_SingleUser = function()
+    {
+        if (1 === this.m_nUseType)
+            return true;
+
+        return false;
+    };
+
     this.Start_CollaborationEditing = function()
     {
         this.m_nUseType = -1;
