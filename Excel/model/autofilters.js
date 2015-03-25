@@ -1550,7 +1550,7 @@ var gUndoInsDelCellsFlag = true;
 						if(isTurnOffHistory)
 							History.TurnOn();
 					}
-				};
+				}
 				
 				if(cellId)
 					activeRange = t._idToRange(cellId);
@@ -1576,6 +1576,8 @@ var gUndoInsDelCellsFlag = true;
 					if(curFilter && (filterRef.isEqual(activeRange) || cellId))
 					{
 						startCol = activeRange.startCol;
+						if(startCol === undefined)
+							startCol = activeRange.c1;
 					}
 					else//внутри а/ф либо без а/ф либо часть а/ф
 					{
@@ -1590,6 +1592,8 @@ var gUndoInsDelCellsFlag = true;
 					filterRef = curFilter.Ref;
 					
 					startCol = activeRange.startCol;
+					if(startCol === undefined)
+						startCol = activeRange.c1;
 				}
 			
 				sortRange = ws.model.getRange3(filterRef.r1 + 1, filterRef.c1, filterRef.r2, filterRef.c2);
