@@ -3418,13 +3418,13 @@ DrawingObjectsController.prototype =
 
             var bIsScatter = (c_oAscChartTypeSettings.scatter <= type && type <= c_oAscChartTypeSettings.scatterSmoothMarker);
 
-            Cat = { Formula: "Sheet1!A2:A7", NumCache: [createItem("USA"), createItem("CHN"), createItem("RUS"), createItem("GBR"), createItem("GER"), createItem("JPN")] };
+            Cat = { Formula: "Sheet1!$A$2:$A$7", NumCache: [createItem("USA"), createItem("CHN"), createItem("RUS"), createItem("GBR"), createItem("GER"), createItem("JPN")] };
 
 
             seria = new asc_CChartSeria();
-            seria.Val.Formula = "Sheet1!B2:B7";
+            seria.Val.Formula = "Sheet1!$B$2:$B$7";
             seria.Val.NumCache = [ createItem(46), createItem(38), createItem(24), createItem(29), createItem(11), createItem(7) ];
-            seria.TxCache.Formula = "Sheet1!B1";
+            seria.TxCache.Formula = "Sheet1!$B$1";
             seria.TxCache.Tx = "Gold";
             if (!bIsScatter)
                 seria.Cat = Cat;
@@ -3433,9 +3433,9 @@ DrawingObjectsController.prototype =
             series.push(seria);
 
             seria = new asc_CChartSeria();
-            seria.Val.Formula = "Sheet1!C2:C7";
+            seria.Val.Formula = "Sheet1!$C$2:$C$7";
             seria.Val.NumCache = [ createItem(29), createItem(27), createItem(26), createItem(17), createItem(19), createItem(14) ];
-            seria.TxCache.Formula = "Sheet1!C1";
+            seria.TxCache.Formula = "Sheet1!$C$1";
             seria.TxCache.Tx = "Silver";
             if (!bIsScatter)
                 seria.Cat = Cat;
@@ -3444,9 +3444,9 @@ DrawingObjectsController.prototype =
             series.push(seria);
 
             seria = new asc_CChartSeria();
-            seria.Val.Formula = "Sheet1!D2:D7";
+            seria.Val.Formula = "Sheet1!$D$2:$D$7";
             seria.Val.NumCache = [ createItem(29), createItem(23), createItem(32), createItem(19), createItem(14), createItem(17) ];
-            seria.TxCache.Formula = "Sheet1!D1";
+            seria.TxCache.Formula = "Sheet1!$D$1";
             seria.TxCache.Tx = "Bronze";
             if (!bIsScatter)
                 seria.Cat = Cat;
@@ -3458,35 +3458,35 @@ DrawingObjectsController.prototype =
         }
         else
         {
-            Cat = { Formula: "Sheet1!A2:A6", NumCache: [createItem2(38719, "d\-mmm\-yy"), createItem2(38720, "d\-mmm\-yy"), createItem2(38721, "d\-mmm\-yy"), createItem2(38722, "d\-mmm\-yy"), createItem2(38723, "d\-mmm\-yy")], formatCode: "d\-mmm\-yy" };
+            Cat = { Formula: "Sheet1!$A$2:$A$6", NumCache: [createItem2(38719, "d\-mmm\-yy"), createItem2(38720, "d\-mmm\-yy"), createItem2(38721, "d\-mmm\-yy"), createItem2(38722, "d\-mmm\-yy"), createItem2(38723, "d\-mmm\-yy")], formatCode: "d\-mmm\-yy" };
             seria = new asc_CChartSeria();
-            seria.Val.Formula = "Sheet1!B2:B6";
+            seria.Val.Formula = "Sheet1!$B$2:$B$6";
             seria.Val.NumCache = [ createItem(40), createItem(21), createItem(37), createItem(49), createItem(32)];
-            seria.TxCache.Formula = "Sheet1!B1";
+            seria.TxCache.Formula = "Sheet1!$B$1";
             seria.TxCache.Tx = "Open";
             seria.Cat = Cat;
             series.push(seria);
 
             seria = new asc_CChartSeria();
-            seria.Val.Formula = "Sheet1!C2:C6";
+            seria.Val.Formula = "Sheet1!$C$2:$C$6";
             seria.Val.NumCache = [ createItem(57), createItem(54), createItem(52), createItem(59), createItem(34)];
-            seria.TxCache.Formula = "Sheet1!C1";
+            seria.TxCache.Formula = "Sheet1!$C$1";
             seria.TxCache.Tx = "High";
             seria.Cat = Cat;
             series.push(seria);
 
             seria = new asc_CChartSeria();
-            seria.Val.Formula = "Sheet1!D2:D6";
+            seria.Val.Formula = "Sheet1!$D$2:$D$6";
             seria.Val.NumCache = [ createItem(10), createItem(14), createItem(14), createItem(12), createItem(6)];
-            seria.TxCache.Formula = "Sheet1!D1";
+            seria.TxCache.Formula = "Sheet1!$D$1";
             seria.TxCache.Tx = "Low";
             seria.Cat = Cat;
             series.push(seria);
 
             seria = new asc_CChartSeria();
-            seria.Val.Formula = "Sheet1!E2:E6";
+            seria.Val.Formula = "Sheet1!$E$2:$E$6";
             seria.Val.NumCache = [ createItem(24), createItem(35), createItem(48), createItem(35), createItem(15)];
-            seria.TxCache.Formula = "Sheet1!E1";
+            seria.TxCache.Formula = "Sheet1!$E$1";
             seria.TxCache.Tx = "Close";
             seria.Cat = Cat;
             series.push(seria);

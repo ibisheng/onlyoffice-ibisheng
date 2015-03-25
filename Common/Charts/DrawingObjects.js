@@ -2323,11 +2323,13 @@ function DrawingObjects() {
                     var startCell = new CellAddress(final_bbox.r1, final_bbox.c1, 0);
                     var endCell = new CellAddress(final_bbox.r2, final_bbox.c2, 0);
 
+
                     if (startCell && endCell)
                     {
+                        var sStartCellId = startCell.getIDAbsolute(), sEndCellId = endCell.getIDAbsolute();
 						options.range = parserHelp.get3DRef(worksheet.model.sName,
-								startCell.getID() === endCell.getID() ? startCell.getID() :
-									startCell.getID() + ':' + endCell.getID());
+                            sStartCellId === sEndCellId ? sStartCellId :
+                                sStartCellId + ':' + sEndCellId);
                     }
 					var chartSeries = getChartSeries(worksheet.model, options, catHeadersBBox, serHeadersBBox);
 					drawingObject.rebuildSeriesFromAsc(chartSeries);
@@ -2356,24 +2358,6 @@ function DrawingObjects() {
     //-----------------------------------------------------------------------------------
     // Chart
     //-----------------------------------------------------------------------------------
-
-    _this.calcChartInterval = function(chart) {
-        if (chart.range.intervalObject)
-        {
-            chart.range.interval = _this.bboxToInterval(chart.range.intervalObject.getBBox0(), chart.range.intervalObject.worksheet.sName);
-        }
-    };
-
-    _this.bboxToInterval = function(box, wsName)
-    {
-        var startCell = new CellAddress(box.r1, box.c1, 0);
-        var endCell = new CellAddress(box.r2, box.c2, 0);
-
-        if (startCell && endCell)
-			return startCell.getID() === endCell.getID() ? startCell.getID() :
-				parserHelp.get3DRef(wsName, startCell.getID() + ':' + endCell.getID());
-        return "";
-    };
 
     _this.updateChartReferences = function(oldWorksheet, newWorksheet, bNoRedraw)
     {
