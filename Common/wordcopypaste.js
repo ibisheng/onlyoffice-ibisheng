@@ -645,10 +645,11 @@ CopyProcessor.prototype =
                 if( break_Page == ParaItem.BreakType)
                 {
                     //todo ��������� ���� �������� � ������ �����
-                    sRes += "<br clear=\"all\" style=\"mso-special-character:line-break;page-break-before:always;\" />";
+					//добавил неразрвной пробел для того, чтобы информация попадала в буфер обмена
+                    sRes += "<br clear=\"all\" style=\"mso-special-character:line-break;page-break-before:always;\" /><span>&nbsp</span>";
                 }
                 else
-                    sRes += "<br style=\"mso-special-character:line-break;\" />";
+                    sRes += "<br style=\"mso-special-character:line-break;\" /><span>&nbsp</span>";
                 break;
             //������� ������� ����� ��������� ������ �� ���������� ��������
             case para_End:        this.bOccurEndPar = true; break;
