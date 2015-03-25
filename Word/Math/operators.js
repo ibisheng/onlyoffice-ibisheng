@@ -32,7 +32,7 @@ CGlyphOperator.prototype.init = function(props)
     this.turn = props.turn;
     this.bStretch = (props.bStretch == true || props.bStretch == false) ? props.bStretch : true;
 
-}
+};
 CGlyphOperator.prototype.fixSize = function(stretch)
 {
     var sizeGlyph = this.calcSize(stretch);
@@ -67,7 +67,7 @@ CGlyphOperator.prototype.fixSize = function(stretch)
     }
 
     this.size = {width: width, height: height, ascent: ascent};
-}
+};
 CGlyphOperator.prototype.draw_other = function() //  с выравниванием к краю (относительно аргумента)
 {
     var coord = this.calcCoord(this.stretch);
@@ -196,7 +196,7 @@ CGlyphOperator.prototype.draw_other = function() //  с выравнивание
     MathControl.pGraph.df();
     MathControl.pGraph.SetIntegerGrid(intGrid);
 
-}
+};
 CGlyphOperator.prototype.getCoordinateGlyph = function()
 {
     var coord = this.calcCoord(this.stretch);
@@ -377,7 +377,7 @@ CGlyphOperator.prototype.getCoordinateGlyph = function()
     }
 
     return {XX: XX, YY: YY, Width: glW, Height: glH};
-}
+};
 CGlyphOperator.prototype.draw = function(pGraphics, XX, YY, PDSE)
 {
     this.Parent.Make_ShdColor(PDSE);
@@ -392,21 +392,21 @@ CGlyphOperator.prototype.draw = function(pGraphics, XX, YY, PDSE)
 
     pGraphics.df();
     pGraphics.SetIntegerGrid(intGrid);
-}
+};
 CGlyphOperator.prototype.drawOnlyLines = function(x, y, pGraphics, PDSE)
 {
     this.Parent.Make_ShdColor(PDSE);
 
     this.draw(x, y, pGraphics);
-}
+};
 CGlyphOperator.prototype.getCtrPrp = function()
 {
     return this.Parent.Get_TxtPrControlLetter();
-}
+};
 CGlyphOperator.prototype.PreRecalc = function(Parent)
 {
     this.Parent = Parent;
-}
+};
 
 
 function COperatorBracket()
@@ -451,7 +451,7 @@ COperatorBracket.prototype.calcSize = function( stretch )
     }
 
     return {width: widthBr, height: heightBr};
-}
+};
 COperatorBracket.prototype.calcCoord = function(stretch)
 {
     var X = [],
@@ -879,7 +879,7 @@ COperatorBracket.prototype.calcCoord = function(stretch)
         H = YY[26]; // высота глифа
 
     return {XX: XX, YY: YY, W: W, H: H};
-}
+};
 COperatorBracket.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -940,7 +940,7 @@ COperatorBracket.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._c(XX[98], YY[98], XX[99], YY[99], XX[100], YY[100] );
     pGraphics._c(XX[100], YY[100], XX[101], YY[101], XX[102], YY[102]);
     pGraphics._c(XX[102], YY[102], XX[103], YY[103], XX[0], YY[0]);
-}
+};
 
 
 function COperatorParenthesis()
@@ -977,7 +977,7 @@ COperatorParenthesis.prototype.calcSize = function(stretch)
 
 
     return {height: heightBr, width : widthBr};
-}
+};
 COperatorParenthesis.prototype.calcCoord = function(stretch)
 {
     //cкобка перевернутая на 90 градусов
@@ -1069,7 +1069,7 @@ COperatorParenthesis.prototype.calcCoord = function(stretch)
         H = YY[4];
 
     return {XX: XX, YY: YY, W: W, H: H };
-}
+};
 COperatorParenthesis.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]); //mm
@@ -1085,7 +1085,7 @@ COperatorParenthesis.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._c(XX[15], YY[15], XX[16], YY[16], XX[17], YY[17]);
     pGraphics._c(XX[17], YY[17], XX[18], YY[18], XX[19], YY[19]);
     pGraphics._l(XX[20], YY[20]);
-}
+};
 
 // TODO
 // установить минимальный размер стрелок
@@ -1109,7 +1109,7 @@ COperatorAngleBracket.prototype.calcSize = function(stretch)
         heightBr = 4.828645833333333*betta;
 
     return {width : widthBr, height: heightBr};
-}
+};
 COperatorAngleBracket.prototype.calcCoord = function(stretch)
 {
     var X = [],
@@ -1188,7 +1188,7 @@ COperatorAngleBracket.prototype.calcCoord = function(stretch)
         H = YY[1];
 
     return {XX: XX, YY: YY, W: W, H: H};
-}
+};
 COperatorAngleBracket.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1199,7 +1199,7 @@ COperatorAngleBracket.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[5], YY[5]);
     pGraphics._l(XX[6], YY[6]);
     pGraphics._l(XX[7], YY[7]);
-}
+};
 
 function CSquareBracket()
 {
@@ -1248,7 +1248,7 @@ CSquareBracket.prototype.calcCoord = function(stretch)
         H = YY[1];
 
     return {XX: XX, YY: YY, W: W, H: H};
-}
+};
 CSquareBracket.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1260,7 +1260,7 @@ CSquareBracket.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[6], YY[6]);
     pGraphics._l(XX[7], YY[7]);
     pGraphics._l(XX[8], YY[8]);
-}
+};
 CSquareBracket.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1270,7 +1270,7 @@ CSquareBracket.prototype.calcSize = function()
     var width = 12.347222222222221*betta;
 
     return {width: width, height: height};
-}
+};
 
 function CHalfSquareBracket()
 {
@@ -1318,7 +1318,7 @@ CHalfSquareBracket.prototype.calcCoord = function(stretch)
         H = YY[4];
 
     return {XX: XX, YY: YY, W: W, H: H};
-}
+};
 CHalfSquareBracket.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1327,7 +1327,7 @@ CHalfSquareBracket.prototype.calcSize = function()
     var width = 11.99444444444*betta;
 
     return {width: width, height: height};
-}
+};
 CHalfSquareBracket.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1337,7 +1337,7 @@ CHalfSquareBracket.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[4], YY[4]);
     pGraphics._l(XX[5], YY[5]);
     pGraphics._l(XX[6], YY[6]);
-}
+};
 
 
 function COperatorLine()
@@ -1353,7 +1353,7 @@ COperatorLine.prototype.calcSize = function()
     var width = 11.99444444444*betta;
 
     return {width: width, height: height};
-}
+};
 COperatorLine.prototype.calcCoord = function(stretch)
 {
     var X = [],
@@ -1393,7 +1393,7 @@ COperatorLine.prototype.calcCoord = function(stretch)
 
     return {XX: XX, YY: YY, W: W, H: H};
 
-}
+};
 COperatorLine.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1401,7 +1401,7 @@ COperatorLine.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[2], YY[2]);
     pGraphics._l(XX[3], YY[3]);
     pGraphics._l(XX[4], YY[4]);
-}
+};
 
 function CWhiteSquareBracket()
 {
@@ -1416,7 +1416,7 @@ CWhiteSquareBracket.prototype.calcSize = function()
     var width = 11.99444444444*betta;
 
     return {width: width, height: height};
-}
+};
 CWhiteSquareBracket.prototype.calcCoord = function(stretch)
 {
     var X = [],
@@ -1479,7 +1479,7 @@ CWhiteSquareBracket.prototype.calcCoord = function(stretch)
         H = YY[3];
 
     return {XX: XX, YY: YY, W: W, H: H};
-}
+};
 CWhiteSquareBracket.prototype.drawPath = function(pGraphics, XX, YY, PDSE)
 {
 
@@ -1502,7 +1502,7 @@ CWhiteSquareBracket.prototype.drawPath = function(pGraphics, XX, YY, PDSE)
     pGraphics._l(XX[11], YY[11]);
     pGraphics._l(XX[12], YY[12]);
     pGraphics._l(XX[13], YY[13]);
-}
+};
 
 function COperatorDoubleLine()
 {
@@ -1517,7 +1517,7 @@ COperatorDoubleLine.prototype.calcSize = function()
         width = 11.99444444444*betta;
 
     return {width: width, height: height};
-}
+};
 COperatorDoubleLine.prototype.calcCoord = function(stretch)
 {
     var X = [],
@@ -1562,7 +1562,7 @@ COperatorDoubleLine.prototype.calcCoord = function(stretch)
         H = YY[7];
 
     return {XX: XX, YY: YY, W: W, H: H};
-}
+};
 COperatorDoubleLine.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1578,7 +1578,7 @@ COperatorDoubleLine.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[7], YY[7]);
     pGraphics._l(XX[8], YY[8]);
     pGraphics._l(XX[9], YY[9]);
-}
+};
 
 
 function CSingleArrow()
@@ -1593,7 +1593,7 @@ CSingleArrow.prototype.calcSize = function()
     var width = 10.641210937499999*betta;
 
     return {width: width, height: height};
-}
+};
 CSingleArrow.prototype.calcCoord = function(stretch)
 {
     var X = [],
@@ -1637,7 +1637,7 @@ CSingleArrow.prototype.calcCoord = function(stretch)
         H = YY[6];
 
     return {XX: XX, YY: YY, W: W, H: H};
-}
+};
 CSingleArrow.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1651,7 +1651,7 @@ CSingleArrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[8], YY[8]);
     pGraphics._l(XX[9], YY[9]);
     pGraphics._l(XX[10], YY[10]);
-}
+};
 
 function CLeftRightArrow()
 {
@@ -1666,7 +1666,7 @@ CLeftRightArrow.prototype.calcSize = function()
     var width = 11.695410156249999*betta;
 
     return {width: width, height: height};
-}
+};
 CLeftRightArrow.prototype.calcCoord = function(stretch)
 {
     var X = [],
@@ -1715,7 +1715,7 @@ CLeftRightArrow.prototype.calcCoord = function(stretch)
         H = YY[1];
 
     return {XX: XX, YY: YY, W: W, H: H};
-}
+};
 CLeftRightArrow.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1736,7 +1736,7 @@ CLeftRightArrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[15], YY[15]);
     pGraphics._l(XX[16], YY[16]);
 
-}
+};
 
 function CDoubleArrow()
 {
@@ -1751,7 +1751,7 @@ CDoubleArrow.prototype.calcSize = function()
     var width = 10.994677734375*betta;
 
     return {width: width, height: height};
-}
+};
 CDoubleArrow.prototype.calcCoord = function(stretch)
 {
     var X = [],
@@ -1807,7 +1807,7 @@ CDoubleArrow.prototype.calcCoord = function(stretch)
         H = YY[2];
 
     return {XX: XX, YY: YY, W: W, H: H};
-}
+};
 CDoubleArrow.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1831,7 +1831,7 @@ CDoubleArrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._s();
     pGraphics._m(XX[16], YY[16]);
     pGraphics._l(XX[17], YY[17]);
-}
+};
 
 
 function CLR_DoubleArrow()
@@ -1847,7 +1847,7 @@ CLR_DoubleArrow.prototype.calcSize = function()
     var width = 13.146484375*betta;
 
     return {width: width, height: height};
-}
+};
 CLR_DoubleArrow.prototype.calcCoord = function(stretch)
 {
     var X = [],
@@ -1906,7 +1906,7 @@ CLR_DoubleArrow.prototype.calcCoord = function(stretch)
         H = YY[11];
 
     return {XX: XX, YY: YY, W: W, H: H};
-}
+};
 CLR_DoubleArrow.prototype.drawPath = function(pGraphics, XX, YY, PDSE)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1940,7 +1940,7 @@ CLR_DoubleArrow.prototype.drawPath = function(pGraphics, XX, YY, PDSE)
     pGraphics._l(XX[21], YY[21]);
     pGraphics._l(XX[22], YY[22]);
     pGraphics._l(XX[23], YY[23]);
-}
+};
 
 
 function CCombiningArrow()
@@ -1956,7 +1956,7 @@ CCombiningArrow.prototype.calcSize = function()
     var width = 4.938*betta;
 
     return {width: width, height: height};
-}
+};
 CCombiningArrow.prototype.calcCoord = function(stretch)
 {
     // px                       mm
@@ -1997,7 +1997,7 @@ CCombiningArrow.prototype.calcCoord = function(stretch)
         H = YY[8];
 
     return {XX: XX, YY: YY, W: W, H: H};
-}
+};
 CCombiningArrow.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -2011,7 +2011,7 @@ CCombiningArrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[8], YY[8]);
     pGraphics._l(XX[9], YY[9]);
     pGraphics._l(XX[10], YY[10]);
-}
+};
 
 function CCombiningHalfArrow()
 {
@@ -2028,7 +2028,7 @@ CCombiningHalfArrow.prototype.calcSize = function()
     var width = 4.938*betta;
 
     return {width: width, height: height};
-}
+};
 CCombiningHalfArrow.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -2039,7 +2039,7 @@ CCombiningHalfArrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[5], YY[5]);
     pGraphics._l(XX[6], YY[6]);
     pGraphics._l(XX[7], YY[7]);
-}
+};
 CCombiningHalfArrow.prototype.calcCoord = function(stretch)
 {
     // px                       mm
@@ -2077,7 +2077,7 @@ CCombiningHalfArrow.prototype.calcCoord = function(stretch)
         H = YY[5];
 
     return {XX: XX, YY: YY, W: W, H: H};
-}
+};
 
 function CCombining_LR_Arrow()
 {
@@ -2092,7 +2092,7 @@ CCombining_LR_Arrow.prototype.calcSize = function()
     var width = 4.938*betta;
 
     return {width: width, height: height};
-}
+};
 CCombining_LR_Arrow.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -2113,7 +2113,7 @@ CCombining_LR_Arrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[15], YY[15]);
     pGraphics._l(XX[16], YY[16]);
 
-}
+};
 CCombining_LR_Arrow.prototype.calcCoord = function(stretch)
 {
     var X = [],
@@ -2161,7 +2161,7 @@ CCombining_LR_Arrow.prototype.calcCoord = function(stretch)
 
     return {XX: XX, YY: YY, W: W, H: H};
 
-}
+};
 
 
 function COperator(type)
@@ -2176,7 +2176,8 @@ function COperator(type)
     this.defaultType = null;
     this.grow       = true;
 
-    this.Positions = [];
+    this.pos = new CMathPosition();
+
     this.coordGlyph = null;
 
     this.size = new CMathSize();
@@ -2895,7 +2896,7 @@ COperator.prototype.mergeProperties = function(properties, defaultProps)   // pr
     this.operator = operator;
     this.code = codeChr;
     this.typeOper = typeOper;
-}
+};
 COperator.prototype.getProps = function(props, defaultProps)
 {
     var location = props.loc,
@@ -2928,46 +2929,64 @@ COperator.prototype.getProps = function(props, defaultProps)
         location = defaultProps.loc;
 
     return  {loc: location, type: type, code: code};
-}
+};
 COperator.prototype.draw = function(x, y, pGraphics, PDSE)
 {
+    var XX = this.pos.x + x,
+        YY = this.pos.y + y;
+
     if(this.typeOper === OPERATOR_TEXT)
     {
-        // выставляем font, если нужно отрисовать текст
-        //pGraphics.b_color1(0,0,0,255);
-
-        this.Make_ShdColor(PDSE);
-
-        var ctrPrp =  this.Get_TxtPrControlLetter();
-
-        var Font =
-        {
-            FontSize:   ctrPrp.FontSize,
-            FontFamily: {Name : ctrPrp.FontFamily.Name, Index : ctrPrp.FontFamily.Index},
-            Italic:     false,
-            Bold:       false
-        };
-
-        pGraphics.SetFont(Font);
-
-        ////////////////////////////////////////////////
-
-        this.operator.Draw(x, y, pGraphics, PDSE);
+        this.drawText(XX, YY, pGraphics, PDSE);
+    }
+    else if(this.IsLineGlyph())
+    {
+        this.drawLines(XX, YY, pGraphics, PDSE);
     }
     else
     {
-        if(this.IsLineGlyph())
-            this.drawLines(x, y, pGraphics, PDSE);
-        else if(this.type === OPER_SEPARATOR)
-            this.drawSeparator(x, y, pGraphics, PDSE);
-        else
-            this.drawOperator(x, y, pGraphics, PDSE);
+        this.drawOperator(XX, YY, pGraphics, PDSE);
     }
-}
+};
+COperator.prototype.setPosition = function(_pos)
+{
+    this.pos.x = _pos.x;
+    this.pos.y = _pos.y;
+
+    if(this.typeOper === OPERATOR_TEXT)
+    {
+        var pos = new CMathPosition();
+
+        pos.x = 0;
+        pos.y = 0;
+
+        this.operator.setPosition(pos);
+    }
+};
 COperator.prototype.Make_ShdColor = function(PDSE)
 {
     return this.Parent.Make_ShdColor(PDSE, this.Parent.Get_CompiledCtrPrp());
-}
+};
+COperator.prototype.drawText = function(absX, absY, pGraphics, PDSE)
+{
+    this.Make_ShdColor(PDSE);
+
+    var ctrPrp =  this.Get_TxtPrControlLetter();
+
+    var Font =
+    {
+        FontSize:   ctrPrp.FontSize,
+        FontFamily: {Name : ctrPrp.FontFamily.Name, Index : ctrPrp.FontFamily.Index},
+        Italic:     false,
+        Bold:       false
+    };
+
+    pGraphics.SetFont(Font);
+
+    ////////////////////////////////////////////////
+
+    this.operator.Draw(absX, absY, pGraphics, PDSE);
+};
 COperator.prototype.drawOperator = function(absX, absY, pGraphics, PDSE)
 {
     if(this.typeOper !== OPERATOR_EMPTY)
@@ -2977,52 +2996,26 @@ COperator.prototype.drawOperator = function(absX, absY, pGraphics, PDSE)
         var X = [],
             Y = [];
 
-        var PosOper = this.Positions[0];
-
         for(var j = 0; j < lng; j++)
         {
-            X.push(PosOper.x + absX + this.coordGlyph.XX[j]);
-            Y.push(PosOper.y + absY + this.coordGlyph.YY[j]);
+            X.push(absX + this.coordGlyph.XX[j]);
+            Y.push(absY + this.coordGlyph.YY[j]);
         }
 
         this.operator.draw(pGraphics, X, Y, PDSE);
     }
-}
-COperator.prototype.drawSeparator = function(absX, absY, pGraphics, PDSE)
-{
-    if(this.typeOper !== OPERATOR_EMPTY)
-    {
-        var lng = this.coordGlyph.XX.length;
-
-        for(var i = 0; i < this.Positions.length; i++)
-        {
-            var X = [],
-                Y = [];
-
-            var PosOper = this.Positions[i];
-
-            for(var j = 0; j < lng; j++)
-            {
-                X.push(PosOper.x + absX + this.coordGlyph.XX[j]);
-                Y.push(PosOper.y + absY + this.coordGlyph.YY[j]);
-            }
-
-            this.operator.draw(pGraphics, X, Y, PDSE);
-        }
-    }
-}
+};
 COperator.prototype.drawLines = function(absX, absY, pGraphics, PDSE)
 {
     if(this.typeOper !== OPERATOR_EMPTY)
     {
-        var PosOper = this.Positions[0];
-        this.operator.drawOnlyLines(PosOper.x + absX, PosOper.y + absY, pGraphics, PDSE);
+        this.operator.drawOnlyLines(absX, absY, pGraphics, PDSE);
     }
-}
+};
 COperator.prototype.IsLineGlyph = function()
 {
     return this.typeOper == ACCENT_LINE || this.typeOper == ACCENT_DOUBLE_LINE;
-}
+};
 COperator.prototype.fixSize = function(oMeasure, stretch)
 {
     if(this.typeOper !== OPERATOR_EMPTY)
@@ -3115,60 +3108,11 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
         this.size.height = height;
         this.size.ascent = ascent;
     }
-}
-COperator.prototype.setPosition = function(Positions)
-{
-    // для оператора, это будет просто позиция
-    // для сепаратора - массив позиций
-
-    if(this.type == OPER_SEPARATOR)
-        this.Positions = Positions;
-    else
-    {
-        this.Positions.length = 0;
-        this.Positions[0] = Positions;
-    }
-
-    if(this.typeOper == OPERATOR_TEXT)
-    {
-        var NewPos = new CMathPosition();
-        NewPos.x = this.Positions[0].x;
-        NewPos.y = this.Positions[0].y;
-
-
-        this.operator.setPosition(NewPos);
-    }
-}
-COperator.prototype._setPosition = function(Positions)
-{
-    // для оператора, это будет просто позиция
-    // для сепаратора - массив позиций
-
-    if(this.type == OPER_SEPARATOR)
-        this.Positions = Positions;
-    else
-    {
-        this.Positions.length = 0;
-        this.Positions[0] = Positions;
-    }
-
-    if(this.typeOper == OPERATOR_TEXT)
-    {
-        var NewPos = new CMathPosition();
-        NewPos.x = this.Positions[0].x;
-
-        if(this.type == OPER_ACCENT)
-            NewPos.y = this.Positions[0].y + this.operator.size.height;
-        else
-            NewPos.y = this.Positions[0].y;
-
-        this.operator.setPosition(NewPos);
-    }
-}
+};
 COperator.prototype.IsJustDraw = function()
 {
     return true;
-}
+};
 COperator.prototype.Resize = function(oMeasure)
 {
     if(this.typeOper !== OPERATOR_EMPTY)
@@ -3180,18 +3124,18 @@ COperator.prototype.Resize = function(oMeasure)
         else
             this.fixSize(oMeasure, this.size.height);
     }
-}
+};
 COperator.prototype.PreRecalc = function(Parent, ParaMath)
 {
     this.Parent   = Parent;
     this.ParaMath = ParaMath;
     if(this.typeOper !== OPERATOR_EMPTY)
         this.operator.PreRecalc(this); // в данном случае mathText нужен только один параметр
-}
+};
 COperator.prototype.Get_TxtPrControlLetter = function()
 {
     return this.Parent.Get_TxtPrControlLetter();
-}
+};
 COperator.prototype.getChr = function()
 {
     var chr = null; //если operator не определен, то this.code = null
@@ -3202,7 +3146,7 @@ COperator.prototype.getChr = function()
 		chr = "";
 
     return chr;
-}
+};
 COperator.prototype.IsArrow = function()
 {
     //return this.operator.IsArrow();
@@ -3212,7 +3156,7 @@ COperator.prototype.IsArrow = function()
         bAccentArrow = his.typeOper == ACCENT_ARROW_LEFT || this.typeOper == ACCENT_ARROW_RIGHT || this.typeOper == ACCENT_ARROW_LR || this.typeOper == ACCENT_HALF_ARROW_LEFT || this.typeOper == ACCENT_HALF_ARROW_RIGHT;
 
     return bArrow || bDoubleArrow;
-}
+};
 
 function CMathDelimiterPr()
 {
@@ -3389,6 +3333,8 @@ function CDelimiter(props)
 
 	this.Id = g_oIdCounter.Get_NewId();
 
+    this.MaxMetrics = new CMathSize();
+
     this.begOper = new COperator (OPER_DELIMITER);
     this.endOper = new COperator (OPER_DELIMITER);
     this.sepOper = new COperator (OPER_SEPARATOR);
@@ -3413,7 +3359,7 @@ CDelimiter.prototype.init = function(props)
     this.Fill_LogicalContent(this.getColumnsCount());
 
     this.fillContent();
-}
+};
 CDelimiter.prototype.getColumnsCount = function()
 {
     return this.Pr.column;
@@ -3426,7 +3372,7 @@ CDelimiter.prototype.fillContent = function()
 
     for (var nIndex = 0; nIndex < nColumnsCount; nIndex++)
         this.elements[0][nIndex] = this.Content[nIndex];
-}
+};
 CDelimiter.prototype.ApplyProperties = function(RPI)
 {
     if(this.RecalcInfo.bProps == true)
@@ -3480,7 +3426,7 @@ CDelimiter.prototype.ApplyProperties = function(RPI)
 
         this.RecalcInfo.bProps = false;
     }
-}
+};
 CDelimiter.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 {
     this.ApplyProperties(RPI);
@@ -3490,7 +3436,158 @@ CDelimiter.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsIn
     this.sepOper.PreRecalc(this, ParaMath);
 
     CDelimiter.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
-}
+};
+CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
+{
+    this.bOneLine = PRS.bMath_OneLine == true || this.Content.length > 1; // this.Content.length > 1 - несколько контентов, разделлные сепараторами
+
+    if(this.bOneLine == false)
+    {
+        var CurLine  = PRS.Line - this.StartLine;
+        var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
+
+        this.protected_AddRange(CurLine, CurRange);
+
+        this.NumBreakContent = 0;
+
+        var Content = this.Content[0];
+
+        if(CurLine == 0 && CurRange == 0)
+        {
+            PRS.bMath_OneLine = true;
+            Content.Recalculate_Range(PRS, ParaPr, Depth + 1);
+            this.UpdateMetricsDelimiters(g_oTextMeasurer, Content.size.height, Content.size.ascent);
+            Content.Recalculate_Reset(PRS.Range, PRS.Line);
+
+            PRS.WordLen += this.BrGapLeft;
+        }
+
+        PRS.bMath_OneLine = false;
+        PRS.Update_CurPos(0, Depth);
+        Content.Recalculate_Range(PRS, ParaPr, Depth + 1);
+
+        if(PRS.NewRange == false)
+        {
+            PRS.WordLen += this.BrGapRight;
+        }
+
+        this.protected_FillRange(CurLine, CurRange, 0, 0);
+
+        PRS.bMath_OneLine = false;
+    }
+    else
+    {
+        PRS.bMath_OneLine = true;
+        this.NumBreakContent = -1;
+        CDelimiter.superclass.Recalculate_Range.call(this, PRS, ParaPr, Depth);
+    }
+
+    this.BrGapLeft  = this.GapLeft  + this.begOper.size.width;
+    this.BrGapRight = this.GapRight + this.endOper.size.width;
+};
+CDelimiter.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
+{
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
+
+    if(CurLine == 0 && CurRange == 0)
+    {
+        if(PRS.LineAscent < this.begOper.size.ascent)
+            PRS.LineAscent = this.begOper.size.ascent;
+
+        if ( PRS.LineDescent < this.begOper.size.height - this.begOper.size.ascent )
+            PRS.LineDescent = this.begOper.size.height - this.begOper.size.ascent;
+    }
+
+    var bEnd = this.Content[0].Math_Is_End(_CurLine, _CurRange);
+
+    if(bEnd)
+    {
+        if(PRS.LineAscent < this.endOper.size.ascent)
+            PRS.LineAscent = this.endOper.size.ascent;
+
+        if ( PRS.LineDescent < this.endOper.size.height - this.endOper.size.ascent )
+            PRS.LineDescent = this.endOper.size.height - this.endOper.size.ascent;
+    }
+
+    CDelimiter.superclass.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange);
+};
+CDelimiter.prototype.UpdateMetricsDelimiters = function(oMeasure, height, ascent)
+{
+    var descent = height - ascent;
+    var mgCtrPrp = this.Get_TxtPrControlLetter();
+    var ShCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
+    var maxAD    = ascent - ShCenter  > descent + ShCenter ? ascent - ShCenter: descent + ShCenter;
+
+    var plH = this.ParaMath.GetPlh(oMeasure, mgCtrPrp);
+    this.TextInContent = ascent < 1.01*plH && descent < 0.4*plH; // для текста операторы в случае центрирования не увеличиваем
+
+    var bCentered = this.Pr.shp == DELIMITER_SHAPE_CENTERED,
+        b2Max = bCentered && (2*maxAD - height > 0.001);
+
+    var heightStretch = b2Max && !this.TextInContent ? 2*maxAD : height;
+
+    this.begOper.fixSize(oMeasure, heightStretch);
+    this.endOper.fixSize(oMeasure, heightStretch);
+    this.sepOper.fixSize(oMeasure, heightStretch);
+
+    var HeigthMaxOper = Math.max(this.begOper.size.height, this.endOper.size.height, this.sepOper.size.height);
+    var AscentMaxOper = HeigthMaxOper/2 + ShCenter;
+
+    g_oTextMeasurer.SetFont(mgCtrPrp);
+    var Height = g_oTextMeasurer.GetHeight();
+
+    if(this.Pr.shp == DELIMITER_SHAPE_CENTERED)
+    {
+        var deltaHeight = height - HeigthMaxOper;
+        if(deltaHeight < 0)
+            deltaHeight = -deltaHeight;
+
+        /*var deltaMaxAD = maxAD - HeigthMaxOper/2;
+        if(deltaMaxAD < 0)
+            deltaMaxAD = -deltaMaxAD;
+
+        var deltaMinAD = (height - maxAD) - HeigthMaxOper/2;*/
+
+        var bEqualOper = deltaHeight < 0.001,
+            bLText = height < Height;
+
+        var DimHeight, DimAscent;
+
+        if(bEqualOper)
+        {
+            DimHeight = 2*maxAD;
+            DimAscent = maxAD + ShCenter;
+        }
+        else if(bLText)
+        {
+            DimAscent = ascent > AscentMaxOper ? ascent : AscentMaxOper;
+            DimHeight = HeigthMaxOper;
+        }
+        else // для случаев когда скобку можно расстянуть не по всей высоте (угловые скобки, аскент >> дескента)
+        {
+            DimHeight = HeigthMaxOper/2 + maxAD;
+            DimAscent = ascent > AscentMaxOper? ascent : AscentMaxOper;
+        }
+    }
+    else
+    {
+        if(height < Height)
+        {
+            DimAscent = ascent > AscentMaxOper ? ascent : AscentMaxOper;
+            DimHeight = HeigthMaxOper;
+        }
+        else
+        {
+            DimAscent = ascent;
+            DimHeight = height;
+        }
+    }
+
+    this.MaxMetrics.ascent = DimAscent;
+    this.MaxMetrics.height = DimHeight;
+
+};
 CDelimiter.prototype.Resize = function(oMeasure, RPI)
 {
     // размеры аргумента
@@ -3611,14 +3708,12 @@ CDelimiter.prototype.Resize = function(oMeasure, RPI)
     this.size.width  = width;
     this.size.height = height;
     this.size.ascent = ascent;
-}
+};
 CDelimiter.prototype.recalculateSize = function(oMeasure)
 {
     // размеры аргумента
-    var heightG = 0, widthG = 0,
+    var widthG = 0,
         ascentG = 0, descentG = 0;
-
-    // Аргумент
 
     for(var j = 0; j < this.nCol; j++)
     {
@@ -3628,106 +3723,17 @@ CDelimiter.prototype.recalculateSize = function(oMeasure)
         descentG = content.height - content.ascent > descentG ? content.height - content.ascent: descentG;
     }
 
-    heightG = ascentG + descentG;
-
-    var mgCtrPrp = this.Get_TxtPrControlLetter();
-    var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
-    var maxAD = ascentG - shCenter  > descentG + shCenter ? ascentG - shCenter: descentG + shCenter;
-
-    var plH = this.ParaMath.GetPlh(oMeasure, mgCtrPrp);
-    //var plH = 10.8 * mgCtrPrp.FontSize/36;
-    //var bTextContent = ascentG < plH || descentG < plH ; // для текста операторы в случае центрирования не увеличиваем
-    var bTextContent = ascentG < 1.01*plH && (heightG - ascentG) < 0.4*plH; // для текста операторы в случае центрирования не увеличиваем
-
-    var bCentered = this.Pr.shp == DELIMITER_SHAPE_CENTERED,
-        b2Max = bCentered && (2*maxAD - heightG > 0.001);
-
-    this.TextInContent = bTextContent;
-
-    var heightStretch = b2Max && !bTextContent ? 2*maxAD : ascentG + descentG;
-
-    this.begOper.fixSize(oMeasure, heightStretch);
-    this.endOper.fixSize(oMeasure, heightStretch);
-    this.sepOper.fixSize(oMeasure, heightStretch);
+    this.UpdateMetricsDelimiters(oMeasure, ascentG + descentG, ascentG);
 
     // Общая ширина
     var width = widthG + this.begOper.size.width + this.endOper.size.width + (this.nCol - 1)*this.sepOper.size.width;
     width += this.GapLeft + this.GapRight;
 
-    var maxDimOper;
-    if(this.begOper.size.height > this.endOper.size.height && this.begOper.size.height > this.sepOper.size.height)
-        maxDimOper = this.begOper.size;
-    else if(this.endOper.size.height > this.sepOper.size.height)
-        maxDimOper = this.endOper.size;
-    else
-        maxDimOper = this.sepOper.size;
 
-    // Общие высота и ascent
-    var height, ascent, descent;
+    this.size.ascent = this.MaxMetrics.ascent;
+    this.size.height = this.MaxMetrics.height;
 
-    if(this.Pr.shp == DELIMITER_SHAPE_CENTERED)
-    {
-        var deltaHeight = heightG - maxDimOper.height;
-        if(deltaHeight < 0)
-            deltaHeight = -deltaHeight;
-
-        var deltaMaxAD = maxAD - maxDimOper.height/ 2;
-        if(deltaMaxAD < 0)
-            deltaMaxAD = -deltaMaxAD;
-
-        var deltaMinAD = (heightG - maxAD)  - maxDimOper.height/2;
-
-        var bLHeight = deltaHeight < 0.001,
-            bLMaxAD = deltaMaxAD > 0.001,
-            bLMinAD = deltaMinAD > 0.001,
-            bLText = deltaMinAD < - 0.001;
-
-        var bEqualOper  = bLHeight,
-            bMiddleOper = bLMaxAD && !bLMinAD,
-            bLittleOper = bLMinAD,
-            bText = bLText;
-
-        if(bEqualOper)
-        {
-            height = 2*maxAD;
-            ascent = maxAD + shCenter;
-        }
-        else if(bText)
-        {
-            //ascent = maxDimOper.ascent;
-            ascent = ascentG > maxDimOper.ascent ? ascentG : maxDimOper.ascent;
-            height = maxDimOper.height;
-        }
-        else if(bMiddleOper)
-        {
-            height = maxDimOper.height/2 + maxAD;
-            ascent = ascentG > maxDimOper.ascent? ascentG : maxDimOper.ascent;
-        }
-        else
-        {
-            ascent = ascentG;
-            height = ascentG + descentG;
-        }
-
-    }
-    else
-    {
-        g_oTextMeasurer.SetFont(mgCtrPrp);
-        var Height = g_oTextMeasurer.GetHeight();
-
-        if(heightG < Height)
-        {
-            ascent = ascentG > maxDimOper.ascent ? ascentG : maxDimOper.ascent;
-            height = maxDimOper.height;
-        }
-        else
-        {
-            ascent = ascentG;
-            height = ascentG + descentG;
-        }
-    }
-
-    this.size = {width: width, height: height, ascent: ascent};
+    this.size.width = width;
 };
 CDelimiter.prototype.alignOperator = function(operator) // в качестве аргумента передаем высоту оператора
 {
@@ -3742,7 +3748,7 @@ CDelimiter.prototype.alignOperator = function(operator) // в качестве �
     {
         if(this.Pr.shp == DELIMITER_SHAPE_CENTERED)
         {
-            align = this.size.ascent > dimOper.ascent ? this.size.ascent - dimOper.ascent : 0;
+            align = this.MaxMetrics.ascent > dimOper.ascent ? this.MaxMetrics.ascent - dimOper.ascent : 0;
 
         }
         else if(this.Pr.shp === DELIMITER_SHAPE_MATH)
@@ -3750,89 +3756,147 @@ CDelimiter.prototype.alignOperator = function(operator) // в качестве �
             var shCenter = dimOper.ascent - dimOper.height/2; // так получаем shCenter, иначе соотношение м/ду ascent и descent будет неверное
 
 
-            var k = 2*(this.size.ascent - shCenter)/this.size.height ;
+            var k = 2*(this.MaxMetrics.ascent - shCenter)/this.size.height ;
 
             // k/(k + 1)
             // 0.2/(0.2 + 1) = 1/6
 
             k = k > 1/4 ? k : 1/4;
-            align = this.size.ascent - shCenter - k*(dimOper.ascent - shCenter);
+            align = this.MaxMetrics.ascent - shCenter - k*(dimOper.ascent - shCenter);
         }
     }
 
     return align;
-}
-CDelimiter.prototype.setPosition = function(position, Line, Range)
+};
+CDelimiter.prototype.setPosition = function(pos, Line, Range)
 {
-    this.pos.x = position.x;
-    this.pos.y = position.y - this.size.ascent;
+    if(this.bOneLine == false)
+    {
+        var CurLine  = Line - this.StartLine;
+        var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
 
-    var x = this.pos.x + this.GapLeft,
-        y = this.pos.y;
+        var LinesCount = this.protected_GetLinesCount();
+        var PosOper = new CMathPosition();
 
+        if(CurLine == 0 && CurRange == 0)
+        {
+            PosOper.x = pos.x;
+            PosOper.y = pos.y - this.begOper.size.ascent;
+
+            this.UpdatePosOperBeg(pos);
+        }
+
+        this.Content[0].setPosition(pos, Line, Range);
+
+        if(LinesCount - 1 == CurLine)
+        {
+            PosOper.x = pos.x;
+            PosOper.y = pos.y - this.endOper.size.ascent;
+
+            this.UpdatePosOperEnd(pos);
+        }
+
+    }
+    else
+    {
+        this.pos.x = pos.x;
+        this.pos.y = pos.y - this.size.ascent;
+
+        var CurrPos = new CMathPosition();
+        CurrPos.x = pos.x;
+        CurrPos.y = pos.y;
+
+        this.UpdatePosOperBeg(CurrPos);
+
+        this.Content[0].setPosition(CurrPos, Line, Range); // CMathContent
+
+        var PosSep = new CMathPosition();
+        PosSep.x = CurrPos.x;
+        PosSep.y = CurrPos.y + this.alignOperator(this.sepOper) - this.sepOper.size.ascent;
+
+        this.sepOper.setPosition(PosSep);
+
+        for(var j = 1 ; j < this.nCol; j++)
+        {
+            CurrPos.x += this.sepOper.size.width;
+
+            this.Content[j].setPosition(CurrPos, Line, Range);
+            pos.x += this.Content[j].size.width;
+        }
+
+        this.UpdatePosOperEnd(CurrPos);
+
+        pos.x = CurrPos.x;
+    }
+};
+CDelimiter.prototype.Draw_Elements = function(PDSE)
+{
+    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+
+    if(this.bOneLine == false)
+    {
+        var CurLine  = PDSE.Line - this.StartLine;
+        var CurRange = ( 0 === CurLine ? PDSE.Range - this.StartRange : PDSE.Range );
+
+        if(CurLine == 0 && CurRange == 0)
+        {
+            this.begOper.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
+            PDSE.X += this.BrGapLeft;
+        }
+
+        this.Content[0].Draw_Elements(PDSE);
+
+        var LinesCount = this.protected_GetLinesCount();
+
+        if(LinesCount - 1 == CurLine)
+        {
+            this.endOper.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
+            PDSE.X += this.BrGapRight;
+        }
+    }
+    else
+    {
+        this.begOper.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
+        PDSE.X += this.BrGapLeft;
+
+        this.Content[0].Draw_Elements(PDSE);
+
+        var X = PosLine.x;
+
+        for(var j = 1; j < this.nCol; j++)
+        {
+            this.sepOper.draw(X, PosLine.y, PDSE.Graphics, PDSE);
+
+            PDSE.X += this.sepOper.size.width;
+            this.Content[j].Draw_Elements(PDSE);
+
+            X += this.sepOper.size.width + this.Content[j].size.width;
+        }
+
+        this.endOper.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
+        PDSE.X += this.BrGapRight;
+    }
+};
+CDelimiter.prototype.UpdatePosOperBeg = function(pos)
+{
     var PosBegOper = new CMathPosition();
-    PosBegOper.x = x;
-    PosBegOper.y = y + this.alignOperator(this.begOper);
-
+    PosBegOper.x = pos.x + this.GapLeft;
+    PosBegOper.y = pos.y + this.alignOperator(this.begOper) - this.begOper.size.ascent;
 
     this.begOper.setPosition(PosBegOper);
-    x += this.begOper.size.width;
 
-    var content = this.elements[0][0];
-
-    var PosContent = new CMathPosition();
-    PosContent.x = x;
-    PosContent.y = y + this.align_2(content) + content.size.ascent;
-    x += content.size.width;
-
-    content.setPosition(PosContent, Line, Range); // CMathContent
-
-    var Positions = [];
-
-    for(var j = 1 ; j < this.nCol; j++)
-    {
-        var PosSep = new CMathPosition();
-        PosSep.x = x;
-        PosSep.y = y + this.alignOperator(this.sepOper);
-
-        Positions.push(PosSep);
-        x += this.sepOper.size.width;
-
-        content = this.elements[0][j];
-
-        var NewPosContent = new CMathPosition();
-        NewPosContent.x = x;
-        NewPosContent.y = y + this.align_2(content) + content.size.ascent;
-
-        content.setPosition(NewPosContent, Line, Range);
-        x += content.size.width;
-    }
-
-    this.sepOper.setPosition(Positions);
-
+    pos.x += this.BrGapLeft; // BrGapLeft = GapLeft + size of beginning Operator
+};
+CDelimiter.prototype.UpdatePosOperEnd = function(pos)
+{
     var PosEndOper = new CMathPosition();
-    PosEndOper.x = x;
-    PosEndOper.y = y + this.alignOperator(this.endOper);
+    PosEndOper.x = pos.x;
+    PosEndOper.y = pos.y + this.alignOperator(this.endOper) - this.endOper.size.ascent;
 
     this.endOper.setPosition(PosEndOper);
 
-    position.x += this.size.width;
-}
-CDelimiter.prototype.Draw_Elements = function(PDSE)
-{
-    var X = PDSE.X;
-
-    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
-
-    this.begOper.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
-    this.sepOper.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
-    this.endOper.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
-
-    for(var j = 0; j < this.nCol; j++)
-        this.elements[0][j].Draw_Elements(PDSE);
-
-    PDSE.X = X + this.size.width;
-}
+    pos.x += this.BrGapRight; // BrGapRight = GapRight + size of ending Operator
+};
 CDelimiter.prototype.align_2 = function(element)
 {
     var align = 0;
@@ -3841,16 +3905,15 @@ CDelimiter.prototype.align_2 = function(element)
     else
         align = (this.size.height - element.size.height)/2;
 
-
     return align;
-}
+};
 CDelimiter.prototype.getBase = function(numb)
 {
     if(numb !== numb - 0)
         numb = 0;
 
     return this.elements[0][numb];
-}
+};
 CDelimiter.prototype.getElementMathContent = function(Index)
 {
     return this.Content[Index];
@@ -3905,7 +3968,7 @@ Asc.extendClass(CCharacter, CMathBase);
 CCharacter.prototype.setCharacter = function(props, defaultProps)
 {
     this.operator.mergeProperties(props, defaultProps);
-}
+};
 CCharacter.prototype.recalculateSize = function(oMeasure)
 {
     var Base = this.Content[0];
@@ -3919,7 +3982,7 @@ CCharacter.prototype.recalculateSize = function(oMeasure)
     width += this.GapLeft + this.GapRight;
 
     this.size = {height: height, width: width, ascent: ascent};
-}
+};
 CCharacter.prototype.setPosition = function(pos, Line, Range)
 {
     this.pos.x = pos.x;
@@ -3961,7 +4024,7 @@ CCharacter.prototype.setPosition = function(pos, Line, Range)
     }
 
     pos.x += this.size.width;
-}
+};
 CCharacter.prototype.Draw_Elements = function(PDSE)
 {
     var X = PDSE.X;
@@ -3986,11 +4049,11 @@ CCharacter.prototype.Draw_Elements = function(PDSE)
     this.operator.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
 
     PDSE.X = X + this.size.width;
-}
+};
 CCharacter.prototype.getBase = function()
 {
     return this.elements[0][0];
-}
+};
 
 function CMathGroupChrPr()
 {
@@ -3999,7 +4062,6 @@ function CMathGroupChrPr()
     this.vertJc  = VJUST_TOP;
     this.pos     = LOCATION_BOT;
 }
-
 CMathGroupChrPr.prototype.Set_FromObject = function(Obj)
 {
     this.chr     = Obj.chr;
@@ -4098,17 +4160,15 @@ function CGroupCharacter(props)
     g_oTableId.Add( this, this.Id );
 }
 Asc.extendClass(CGroupCharacter, CCharacter);
-
 CGroupCharacter.prototype.ClassType = historyitem_type_groupChr;
 CGroupCharacter.prototype.kind      = MATH_GROUP_CHARACTER;
-
 CGroupCharacter.prototype.init = function(props)
 {
     this.Fill_LogicalContent(1);
 
     this.setProperties(props);
     this.fillContent();
-}
+};
 CGroupCharacter.prototype.ApplyProperties = function(RPI)
 {
     if(this.RecalcInfo.bProps == true)
@@ -4145,7 +4205,7 @@ CGroupCharacter.prototype.ApplyProperties = function(RPI)
             this.elements[0][0] = this.getBase();
 
     }
-}
+};
 CGroupCharacter.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 {
     this.ApplyProperties(RPI);
@@ -4158,16 +4218,16 @@ CGroupCharacter.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, G
         ArgSz.decrease();
 
     CGroupCharacter.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSz, RPI, GapsInfo);
-}
+};
 CGroupCharacter.prototype.getBase = function()
 {
     return this.Content[0];
-}
+};
 CGroupCharacter.prototype.fillContent = function()
 {
     this.setDimension(1, 1);
     this.elements[0][0] = this.getBase();
-}
+};
 CGroupCharacter.prototype.getAscent = function(oMeasure)
 {
     var ascent;
@@ -4190,7 +4250,7 @@ CGroupCharacter.prototype.getAscent = function(oMeasure)
 
 
     return ascent;
-}
+};
 CGroupCharacter.prototype.Document_UpdateInterfaceState = function(MathProps)
 {
     MathProps.Type = c_oAscMathInterfaceType.GroupChar;

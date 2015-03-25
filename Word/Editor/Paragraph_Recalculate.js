@@ -2168,9 +2168,11 @@ function CParagraphRecalculateStateWrap(Para)
         Object : null         // Объект, который вызвал пересчет
     };
 
+    // for ParaMath
     this.bMath_OneLine  = false; // for ParaMath
     this.bMathWordLarge = false; // for ParaMath
     this.PosEndRun      = new CParagraphContentPos();
+    this.ContentMetrics = new CMathMetrics();
 }
 
 CParagraphRecalculateStateWrap.prototype =

@@ -2572,11 +2572,17 @@ ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
         {
             case para_Sym:
             case para_Text:
+            case para_PageNum:
+            {
+                UpdateLineMetricsText = true;
+                break;
+            }
             case para_Math_Text:
             case para_Math_Placeholder:
             case para_Math_BreakOperator:
-            case para_PageNum:
             {
+                PRS.ContentMetrics.UpdateMetrics(Item.size);
+
                 UpdateLineMetricsText = true;
                 break;
             }
@@ -8535,6 +8541,15 @@ ParaRun.prototype.Math_Get_EndRangePos = function(bEndLine, _CurLine, _CurRange,
     }
 
     return Result;
+};
+ParaRun.prototype.Math_Is_End = function(_CurLine, _CurRange)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var EndPos = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    return EndPos == this.Content.length;
 };
 ParaRun.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
 {

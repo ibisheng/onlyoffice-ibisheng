@@ -1751,7 +1751,7 @@ ParaMath.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchPos, 
 };
 ParaMath.prototype.Get_StartRangePos2 = function(_CurLine, _CurRange, ContentPos, Depth)
 {
-    return this.Root.Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth);
+    return this.Root.Get_StartRangePos2(_CurLine, _CurRange, ContentPos, Depth);
 };
 
 ParaMath.prototype.Get_StartPos = function(ContentPos, Depth)

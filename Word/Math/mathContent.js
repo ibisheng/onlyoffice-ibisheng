@@ -678,6 +678,8 @@ function CMathContent()
     this.InfoPoints = new CInfoPoints();
     ///////////////
 
+    this.LineMetrics    = new CMathLineMetrics();
+
     this.plhHide        = false;
     this.bRoot          = false;
     this.bOneLine  = false;
@@ -4135,6 +4137,35 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 
 };
+CMathContent.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
+{
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    if(CurLine == 0 && CurRange == 0)
+    {
+        this.LineMetrics.Reset();
+    }
+
+    var ParentContentMetric = PRS.ContentMetrics;
+
+    PRS.ContentMetrics = new CMathMetrics();
+
+    for(var Pos = StartPos; Pos <= EndPos; Pos++)
+    {
+        var Item = this.Content[Pos];
+
+        Item.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
+    }
+
+    this.LineMetrics.UpdateMetrics(CurLine, PRS.ContentMetrics);
+    ParentContentMetric.UpdateMetrics(PRS.ContentMetrics);
+
+    PRS.ContentMetrics = ParentContentMetric;
+};
 CMathContent.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchPos, Depth)
 {
     var CurLine  = _CurLine - this.StartLine;
@@ -4173,7 +4204,6 @@ CMathContent.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchP
 
         if ( true === Result )
             SearchPos.Pos.Update(StartPos, Depth );
-
     }
 
     return Result;
@@ -4219,6 +4249,24 @@ CMathContent.prototype.Get_EndRangePos = function(_CurLine, _CurRange, SearchPos
     }
 
     return Result;
+};
+CMathContent.prototype.Math_Is_End = function(_CurLine, _CurRange)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var EndPos = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    var Len = this.Content.length;
+
+    var result = false;
+
+    if(EndPos == Len - 1)
+    {
+        result = this.Content[Len - 1].Math_Is_End(_CurLine, _CurRange);
+    }
+
+    return result;
 };
 CMathContent.prototype.IsFirstLine = function(Line)
 {
