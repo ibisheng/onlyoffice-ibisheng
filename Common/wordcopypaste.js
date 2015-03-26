@@ -5457,9 +5457,9 @@ PasteProcessor.prototype =
             var margin_bottom = computedStyle.getPropertyValue( "margin-bottom" );
             if(margin_bottom && null != (margin_bottom = this._ValueToMm(margin_bottom)))
                 Spacing.After = margin_bottom;
-			/*var line_height = computedStyle.getPropertyValue( "line-height" );
+			var line_height = computedStyle.getPropertyValue( "line-height" );
 			if(line_height && null != (line_height = this._ValueToMm(line_height)))
-                Spacing.Line = line_height;*/
+                Spacing.After = line_height;
             if(false == this._isEmptyProperty(Spacing))
                 Para.Set_Spacing(Spacing);
             //Shd
@@ -5805,6 +5805,11 @@ PasteProcessor.prototype =
             {
                 rPr.Color = color;
             }
+			
+			var spacing = computedStyle.getPropertyValue( "letter-spacing" );
+            if(spacing && null != (spacing = this._ValueToMm(spacing)))
+                rPr.Spacing = spacing;
+			
             //������� �� ��������, ������� �� �����������, ���� �������� ������������ ��������
             var background_color = null;
             var underline = null;
