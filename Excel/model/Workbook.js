@@ -562,7 +562,7 @@ DependencyGraph.prototype = {
 		    nodesSheetCell.removeAll();
 		this.changeNodeEnd();
     },
-    getNodeDependence:function ( aElems ) {
+    getNodeDependence:function ( aElems, aDefinedNames ) {
         var oRes = { oMasterNodes: {}, oMasterAreaNodes: {}, oMasterAreaNodesRestricted: {}, oWeightMap: {}, oNodeToArea: {}, nCounter: 0 };
         var aWeightMapMasters = [];
         var aWeightMapMastersNodes = [];
@@ -570,26 +570,42 @@ DependencyGraph.prototype = {
         var elem;
         var oSheetRanges = {};
         var oSheetWithArea = {};//все sheet на которых есть area для пересчета
-        while ( null != aElems ) {
-            for ( var i in aElems ) {
-                elem = aElems[i];
-				var sheetId = elem[0];
-				var cellId = elem[1];
-				//нужно обавлять в oSheetRanges даже несушествующие node, чтобы поддержать именении ячеек в SUM(A1:B2)
-				this._getNodeDependenceNodeToRange(sheetId, Asc.g_oRangeCache.getAscRange(cellId), oSheetRanges);
-				node = this.getNode(sheetId, cellId);
-                if ( node && null == oRes.oWeightMap[node.nodeId] ) {
-                    //все node из aElems записываем в master
-                    var oWeightMapElem = { id: oRes.nCounter++, cur: 0, max: 0, gray: false, bad: false, master: true, area: node.isArea };
-                    if (node.isArea)
-                        oSheetWithArea[node.sheetId] = 1;
-                    aWeightMapMasters.push( oWeightMapElem );
-                    aWeightMapMastersNodes.push( node );
-                    oRes.oWeightMap[node.nodeId] = oWeightMapElem;
-                    this._getNodeDependence( oRes, oSheetRanges, node );
-                }
-            }
+        while ( null != aElems || null != aDefinedNames ) {
+            if(null != aElems){
+				for ( var i in aElems ) {
+					elem = aElems[i];
+					var sheetId = elem[0];
+					var cellId = elem[1];
+					//нужно обавлять в oSheetRanges даже несушествующие node, чтобы поддержать именении ячеек в SUM(A1:B2)
+					this._getNodeDependenceNodeToRange(sheetId, Asc.g_oRangeCache.getAscRange(cellId), oSheetRanges);
+					node = this.getNode(sheetId, cellId);
+					if ( node && null == oRes.oWeightMap[node.nodeId] ) {
+						//все node из aElems записываем в master
+						var oWeightMapElem = { id: oRes.nCounter++, cur: 0, max: 0, gray: false, bad: false, master: true, area: node.isArea };
+						if (node.isArea)
+							oSheetWithArea[node.sheetId] = 1;
+						aWeightMapMasters.push( oWeightMapElem );
+						aWeightMapMastersNodes.push( node );
+						oRes.oWeightMap[node.nodeId] = oWeightMapElem;
+						this._getNodeDependence( oRes, oSheetRanges, node );
+					}
+				}
+			}
+			if(null != aDefinedNames){
+				for(var i = 0; i < aDefinedNames.length; ++i){
+					var node = aDefinedNames[i];
+					if ( node && null == oRes.oWeightMap[node.nodeId] ) {
+						//все node из aDefinedNames записываем в master
+						var oWeightMapElem = { id: oRes.nCounter++, cur: 0, max: 0, gray: false, bad: false, master: true, area: false };
+						aWeightMapMasters.push( oWeightMapElem );
+						aWeightMapMastersNodes.push( node );
+						oRes.oWeightMap[node.nodeId] = oWeightMapElem;
+						this._getNodeDependence( oRes, oSheetRanges, node );
+					}
+				}
+			}
             aElems = null;
+			aDefinedNames = null;
             //расширяем за счет area nodes
             for ( var i in oSheetRanges ) {
                 var oSheetRange = oSheetRanges[i];
@@ -720,7 +736,10 @@ DependencyGraph.prototype = {
         var bStop = false;
         var oWeightMapElem = oRes.oWeightMap[node.nodeId];
         if ( null == oWeightMapElem ) {
-            oWeightMapElem = { id: oRes.nCounter++, cur: 0, max: 1, gray: false, bad: false, master: false, area: node.isArea };
+			if(node.isDefinedName)
+				oWeightMapElem = { id: oRes.nCounter++, cur: 0, max: 1, gray: false, bad: false, master: false, area: false };
+			else
+				oWeightMapElem = { id: oRes.nCounter++, cur: 0, max: 1, gray: false, bad: false, master: false, area: node.isArea };
             oRes.oWeightMap[node.nodeId] = oWeightMapElem;
         }
         else {
@@ -740,7 +759,7 @@ DependencyGraph.prototype = {
                 oWeightMapElem.max--;
             }
 		}
-        if (!bStop && 1 == oWeightMapElem.max )
+        if (!bStop && 1 == oWeightMapElem.max && !node.isDefinedName )
             this._getNodeDependenceNodeToRange( node.sheetId, node.getBBox(), oSheetRanges );
         if (!bStop && oWeightMapElem.max <= 1) {
             oWeightMapElem.gray = true;
@@ -813,6 +832,8 @@ function Vertex(sheetId, cellId, wb){
 	this.slaveEdges = null;
 	
 	this.refCount = 0;
+	
+	this.isDefinedName = false;
 }
 Vertex.prototype = {	
 	
@@ -1134,17 +1155,22 @@ function _sortDependency(wb, node, oNodeDependence, oNewMasterAreaNodes, bBad, o
 					}
 				}
                 var bCurBad = oWeightMapElem.bad || bBad;
-                //пересчитываем функцию
-                var ws = wb.getWorksheetById( node.sheetId );
-                ws._RecalculatedFunctions(node.cellId, bCurBad, setCellFormat);
-                //запоминаем области для удаления cache
-                var sheetArea = oCleanCellCacheArea[node.sheetId];
-                if ( null == sheetArea ) {
-                    sheetArea = {};
-                    oCleanCellCacheArea[node.sheetId] = sheetArea;
-                }
-				if(!node.isArea)
-					sheetArea[node.cellId] = node.getBBox();
+				if(node.isDefinedName){
+					//todo
+				}
+				else{
+					//пересчитываем функцию
+					var ws = wb.getWorksheetById( node.sheetId );
+					ws._RecalculatedFunctions(node.cellId, bCurBad, setCellFormat);
+					//запоминаем области для удаления cache
+					var sheetArea = oCleanCellCacheArea[node.sheetId];
+					if ( null == sheetArea ) {
+						sheetArea = {};
+						oCleanCellCacheArea[node.sheetId] = sheetArea;
+					}
+					if(!node.isArea)
+						sheetArea[node.cellId] = node.getBBox();
+				}
                 //обрабатываем child
                 oWeightMapElem.gray = true;
                 var oSlaveNodes = node.getSlaveEdges();
