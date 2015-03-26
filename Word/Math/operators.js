@@ -5,7 +5,7 @@ function CGlyphOperator()
     this.loc =  null;
     this.turn = null;
 
-    this.size = null;
+    this.size = new CMathSize();
     this.stretch = 0;
     this.bStretch = true;
 
@@ -66,7 +66,9 @@ CGlyphOperator.prototype.fixSize = function(stretch)
         this.stretch = stretch > height ? stretch : height;
     }
 
-    this.size = {width: width, height: height, ascent: ascent};
+    this.size.width  = width;
+    this.size.ascent = ascent;
+    this.size.height = height;
 };
 CGlyphOperator.prototype.draw_other = function() //  с выравниванием к краю (относительно аргумента)
 {
@@ -2955,12 +2957,12 @@ COperator.prototype.setPosition = function(_pos)
 
     if(this.typeOper === OPERATOR_TEXT)
     {
-        var pos = new CMathPosition();
+        /*var pos = new CMathPosition();
 
         pos.x = 0;
-        pos.y = 0;
+        pos.y = 0;*/
 
-        this.operator.setPosition(pos);
+        this.operator.setPosition(_pos);
     }
 };
 COperator.prototype.Make_ShdColor = function(PDSE)
@@ -3333,7 +3335,7 @@ function CDelimiter(props)
 
 	this.Id = g_oIdCounter.Get_NewId();
 
-    this.MaxMetrics = new CMathSize();
+    this.GeneralMetrics = new CMathSize();
 
     this.begOper = new COperator (OPER_DELIMITER);
     this.endOper = new COperator (OPER_DELIMITER);
@@ -3439,7 +3441,7 @@ CDelimiter.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsIn
 };
 CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 {
-    this.bOneLine = PRS.bMath_OneLine == true || this.Content.length > 1; // this.Content.length > 1 - несколько контентов, разделлные сепараторами
+    this.bOneLine = PRS.bMath_OneLine == true || this.Content.length > 1; // this.Content.length > 1 - несколько контентов, разделенные сепараторами
 
     if(this.bOneLine == false)
     {
@@ -3454,14 +3456,17 @@ CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
         if(CurLine == 0 && CurRange == 0)
         {
+            // посчитаем контент как одностроковый для вычисления размера скобок
+            // далее будем считать объект как многостроковый на Recalculate_Range
             PRS.bMath_OneLine = true;
             Content.Recalculate_Range(PRS, ParaPr, Depth + 1);
-            this.UpdateMetricsDelimiters(g_oTextMeasurer, Content.size.height, Content.size.ascent);
+            this.RecalculateGeneralSize(g_oTextMeasurer, Content.size.height, Content.size.ascent);
+
+            //
             Content.Recalculate_Reset(PRS.Range, PRS.Line);
 
             PRS.WordLen += this.BrGapLeft;
         }
-
         PRS.bMath_OneLine = false;
         PRS.Update_CurPos(0, Depth);
         Content.Recalculate_Range(PRS, ParaPr, Depth + 1);
@@ -3492,27 +3497,35 @@ CDelimiter.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _
 
     if(CurLine == 0 && CurRange == 0)
     {
-        if(PRS.LineAscent < this.begOper.size.ascent)
-            PRS.LineAscent = this.begOper.size.ascent;
+        var BegHeight  = this.begOper.size.height;
+        var BegAscent  = this.GetAscentOperator(this.begOper),
+            BegDescent =  BegHeight - BegAscent;
 
-        if ( PRS.LineDescent < this.begOper.size.height - this.begOper.size.ascent )
-            PRS.LineDescent = this.begOper.size.height - this.begOper.size.ascent;
+        if(PRS.LineAscent < BegAscent)
+            PRS.LineAscent = BegAscent;
+
+        if ( PRS.LineDescent < BegDescent )
+            PRS.LineDescent = BegDescent;
     }
 
     var bEnd = this.Content[0].Math_Is_End(_CurLine, _CurRange);
 
     if(bEnd)
     {
-        if(PRS.LineAscent < this.endOper.size.ascent)
-            PRS.LineAscent = this.endOper.size.ascent;
+        var EndHeight  = this.endOper.size.height;
+        var EndAscent  = this.GetAscentOperator(this.endOper),
+            EndDescent =  EndHeight - EndAscent;
 
-        if ( PRS.LineDescent < this.endOper.size.height - this.endOper.size.ascent )
-            PRS.LineDescent = this.endOper.size.height - this.endOper.size.ascent;
+        if(PRS.LineAscent < EndAscent)
+            PRS.LineAscent = EndAscent;
+
+        if ( PRS.LineDescent < EndDescent )
+            PRS.LineDescent = EndDescent;
     }
 
     CDelimiter.superclass.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange);
 };
-CDelimiter.prototype.UpdateMetricsDelimiters = function(oMeasure, height, ascent)
+CDelimiter.prototype.RecalculateGeneralSize = function(oMeasure, height, ascent) // здесь пересчитываем скобки, общий максимальный размер delimiters
 {
     var descent = height - ascent;
     var mgCtrPrp = this.Get_TxtPrControlLetter();
@@ -3566,7 +3579,7 @@ CDelimiter.prototype.UpdateMetricsDelimiters = function(oMeasure, height, ascent
         }
         else // для случаев когда скобку можно расстянуть не по всей высоте (угловые скобки, аскент >> дескента)
         {
-            DimHeight = HeigthMaxOper/2 + maxAD;
+            DimHeight = HeigthMaxOper/2 + maxAD > height ? HeigthMaxOper/2 + maxAD : height;
             DimAscent = ascent > AscentMaxOper? ascent : AscentMaxOper;
         }
     }
@@ -3584,130 +3597,9 @@ CDelimiter.prototype.UpdateMetricsDelimiters = function(oMeasure, height, ascent
         }
     }
 
-    this.MaxMetrics.ascent = DimAscent;
-    this.MaxMetrics.height = DimHeight;
+    this.GeneralMetrics.ascent = DimAscent;
+    this.GeneralMetrics.height = DimHeight;
 
-};
-CDelimiter.prototype.Resize = function(oMeasure, RPI)
-{
-    // размеры аргумента
-    var heightG = 0, widthG = 0,
-        ascentG = 0, descentG = 0;
-
-    // Аргумент
-
-    for(var j = 0; j < this.nCol; j++)
-    {
-        this.elements[0][j].Resize(oMeasure, RPI);
-        var content = this.elements[0][j].size;
-        widthG += content.width;
-        ascentG = content.ascent > ascentG ? content.ascent : ascentG;
-        descentG = content.height - content.ascent > descentG ? content.height - content.ascent: descentG;
-    }
-
-    heightG = ascentG + descentG;
-
-    var mgCtrPrp = this.Get_TxtPrControlLetter();
-    var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
-    var maxAD = ascentG - shCenter  > descentG + shCenter ? ascentG - shCenter: descentG + shCenter;
-
-
-    var plH = this.ParaMath.GetPlh(oMeasure, mgCtrPrp);
-    //var plH = 10.8 * mgCtrPrp.FontSize/36;
-    //var bTextContent = ascentG < plH || descentG < plH ; // для текста операторы в случае центрирования не увеличиваем
-    var bTextContent = ascentG < 1.01*plH && (heightG - ascentG) < 0.4*plH; // для текста операторы в случае центрирования не увеличиваем
-
-    var bCentered = this.Pr.shp == DELIMITER_SHAPE_CENTERED,
-        b2Max = bCentered && (2*maxAD - heightG > 0.001);
-
-    this.TextInContent = bTextContent;
-
-    var heightStretch = b2Max && !bTextContent ? 2*maxAD : ascentG + descentG;
-
-    this.begOper.fixSize(oMeasure, heightStretch);
-    this.endOper.fixSize(oMeasure, heightStretch);
-    this.sepOper.fixSize(oMeasure, heightStretch);
-
-    // Общая ширина
-    var width = widthG + this.begOper.size.width + this.endOper.size.width + (this.nCol - 1)*this.sepOper.size.width;
-    width += this.GapLeft + this.GapRight;
-
-    var maxDimOper;
-    if(this.begOper.size.height > this.endOper.size.height && this.begOper.size.height > this.sepOper.size.height)
-        maxDimOper = this.begOper.size;
-    else if(this.endOper.size.height > this.sepOper.size.height)
-        maxDimOper = this.endOper.size;
-    else
-        maxDimOper = this.sepOper.size;
-
-    // Общие высота и ascent
-    var height, ascent, descent;
-
-    if(this.Pr.shp == DELIMITER_SHAPE_CENTERED)
-    {
-        var deltaHeight = heightG - maxDimOper.height;
-        if(deltaHeight < 0)
-            deltaHeight = -deltaHeight;
-
-        var deltaMaxAD = maxAD - maxDimOper.height/ 2;
-        if(deltaMaxAD < 0)
-            deltaMaxAD = -deltaMaxAD;
-
-        var deltaMinAD = (heightG - maxAD)  - maxDimOper.height/2;
-
-        var bLHeight = deltaHeight < 0.001,
-            bLMaxAD = deltaMaxAD > 0.001,
-            bLMinAD = deltaMinAD > 0.001,
-            bLText = deltaMinAD < - 0.001;
-
-        var bEqualOper  = bLHeight,
-            bMiddleOper = bLMaxAD && !bLMinAD,
-            bLittleOper = bLMinAD,
-            bText = bLText;
-
-            if(bEqualOper)
-            {
-                height = 2*maxAD;
-                ascent = maxAD + shCenter;
-            }
-            else if(bText)
-            {
-                //ascent = maxDimOper.ascent;
-                ascent = ascentG > maxDimOper.ascent ? ascentG : maxDimOper.ascent;
-                height = maxDimOper.height;
-            }
-            else if(bMiddleOper)
-            {
-                height = maxDimOper.height/2 + maxAD;
-                ascent = ascentG > maxDimOper.ascent? ascentG : maxDimOper.ascent;
-            }
-            else
-            {
-                ascent = ascentG;
-                height = ascentG + descentG;
-            }
-
-    }
-    else
-    {
-        g_oTextMeasurer.SetFont(mgCtrPrp);
-        var Height = g_oTextMeasurer.GetHeight();
-
-        if(heightG < Height)
-        {
-            ascent = ascentG > maxDimOper.ascent ? ascentG : maxDimOper.ascent;
-            height = maxDimOper.height;
-        }
-        else
-        {
-            ascent = ascentG;
-            height = ascentG + descentG;
-        }
-    }
-
-    this.size.width  = width;
-    this.size.height = height;
-    this.size.ascent = ascent;
 };
 CDelimiter.prototype.recalculateSize = function(oMeasure)
 {
@@ -3723,58 +3615,50 @@ CDelimiter.prototype.recalculateSize = function(oMeasure)
         descentG = content.height - content.ascent > descentG ? content.height - content.ascent: descentG;
     }
 
-    this.UpdateMetricsDelimiters(oMeasure, ascentG + descentG, ascentG);
+    this.RecalculateGeneralSize(oMeasure, ascentG + descentG, ascentG);
 
     // Общая ширина
     var width = widthG + this.begOper.size.width + this.endOper.size.width + (this.nCol - 1)*this.sepOper.size.width;
     width += this.GapLeft + this.GapRight;
 
 
-    this.size.ascent = this.MaxMetrics.ascent;
-    this.size.height = this.MaxMetrics.height;
+    this.size.ascent = this.GeneralMetrics.ascent;
+    this.size.height = this.GeneralMetrics.height;
 
     this.size.width = width;
 };
-CDelimiter.prototype.alignOperator = function(operator) // в качестве аргумента передаем высоту оператора
+CDelimiter.prototype.GetAscentOperator = function(operator) // в качестве аргумента передаем высоту оператора
 {
-    var align = 0;
-    var dimOper = operator.size;
+    var GeneralAscent = this.GeneralMetrics.ascent,
+        GeneralHeight = this.GeneralMetrics.height;
 
-    var bAlign = this.size.height - dimOper.height > 0.001;
+    var OperHeight = operator.size.height,
+        OperAscent = operator.size.ascent;
 
-    // ascent идет по бейзлайну, соответствено и сравнивать надо относительно бейзлайна (или центра)
+    var Ascent;
 
-    if(bAlign)
+    if(this.Pr.shp == DELIMITER_SHAPE_CENTERED)
     {
-        if(this.Pr.shp == DELIMITER_SHAPE_CENTERED)
-        {
-            align = this.MaxMetrics.ascent > dimOper.ascent ? this.MaxMetrics.ascent - dimOper.ascent : 0;
+        Ascent = OperAscent;
+    }
+    else
+    {
+        var shCenter = OperAscent - OperHeight/2; // так получаем shCenter, иначе соотношение м/ду ascent и descent будет неверное
 
-        }
-        else if(this.Pr.shp === DELIMITER_SHAPE_MATH)
-        {
-            var shCenter = dimOper.ascent - dimOper.height/2; // так получаем shCenter, иначе соотношение м/ду ascent и descent будет неверное
+        var k = (GeneralAscent - shCenter)/GeneralHeight;
 
-
-            var k = 2*(this.MaxMetrics.ascent - shCenter)/this.size.height ;
-
-            // k/(k + 1)
-            // 0.2/(0.2 + 1) = 1/6
-
-            k = k > 1/4 ? k : 1/4;
-            align = this.MaxMetrics.ascent - shCenter - k*(dimOper.ascent - shCenter);
-        }
+        Ascent = (k*OperHeight + shCenter);
     }
 
-    return align;
+    return Ascent;
 };
 CDelimiter.prototype.setPosition = function(pos, Line, Range)
 {
+    var CurLine  = Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
+
     if(this.bOneLine == false)
     {
-        var CurLine  = Line - this.StartLine;
-        var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
-
         var LinesCount = this.protected_GetLinesCount();
         var PosOper = new CMathPosition();
 
@@ -3783,7 +3667,7 @@ CDelimiter.prototype.setPosition = function(pos, Line, Range)
             PosOper.x = pos.x;
             PosOper.y = pos.y - this.begOper.size.ascent;
 
-            this.UpdatePosOperBeg(pos);
+            this.UpdatePosOperBeg(pos, Line);
         }
 
         this.Content[0].setPosition(pos, Line, Range);
@@ -3793,9 +3677,8 @@ CDelimiter.prototype.setPosition = function(pos, Line, Range)
             PosOper.x = pos.x;
             PosOper.y = pos.y - this.endOper.size.ascent;
 
-            this.UpdatePosOperEnd(pos);
+            this.UpdatePosOperEnd(pos, Line);
         }
-
     }
     else
     {
@@ -3806,13 +3689,14 @@ CDelimiter.prototype.setPosition = function(pos, Line, Range)
         CurrPos.x = pos.x;
         CurrPos.y = pos.y;
 
-        this.UpdatePosOperBeg(CurrPos);
+        this.UpdatePosOperBeg(CurrPos, Line);
 
         this.Content[0].setPosition(CurrPos, Line, Range); // CMathContent
 
         var PosSep = new CMathPosition();
         PosSep.x = CurrPos.x;
-        PosSep.y = CurrPos.y + this.alignOperator(this.sepOper) - this.sepOper.size.ascent;
+        //PosSep.y = CurrPos.y + this.alignOperator(this.sepOper, Line);
+        PosSep.y = CurrPos.y - this.GetAscentOperator(this.sepOper);
 
         this.sepOper.setPosition(PosSep);
 
@@ -3824,7 +3708,7 @@ CDelimiter.prototype.setPosition = function(pos, Line, Range)
             pos.x += this.Content[j].size.width;
         }
 
-        this.UpdatePosOperEnd(CurrPos);
+        this.UpdatePosOperEnd(CurrPos, Line);
 
         pos.x = CurrPos.x;
     }
@@ -3877,35 +3761,27 @@ CDelimiter.prototype.Draw_Elements = function(PDSE)
         PDSE.X += this.BrGapRight;
     }
 };
-CDelimiter.prototype.UpdatePosOperBeg = function(pos)
+CDelimiter.prototype.UpdatePosOperBeg = function(pos, Line)
 {
     var PosBegOper = new CMathPosition();
     PosBegOper.x = pos.x + this.GapLeft;
-    PosBegOper.y = pos.y + this.alignOperator(this.begOper) - this.begOper.size.ascent;
+    //PosBegOper.y = pos.y + this.alignOperator(this.begOper, Line);
+    PosBegOper.y = pos.y - this.GetAscentOperator(this.begOper);
 
     this.begOper.setPosition(PosBegOper);
 
     pos.x += this.BrGapLeft; // BrGapLeft = GapLeft + size of beginning Operator
 };
-CDelimiter.prototype.UpdatePosOperEnd = function(pos)
+CDelimiter.prototype.UpdatePosOperEnd = function(pos, Line)
 {
     var PosEndOper = new CMathPosition();
     PosEndOper.x = pos.x;
-    PosEndOper.y = pos.y + this.alignOperator(this.endOper) - this.endOper.size.ascent;
+    //PosEndOper.y = pos.y + this.alignOperator(this.endOper, Line);
+    PosEndOper.y = pos.y - this.GetAscentOperator(this.endOper);
 
     this.endOper.setPosition(PosEndOper);
 
     pos.x += this.BrGapRight; // BrGapRight = GapRight + size of ending Operator
-};
-CDelimiter.prototype.align_2 = function(element)
-{
-    var align = 0;
-    if(!element.IsJustDraw())
-        align = this.size.ascent - element.size.ascent;
-    else
-        align = (this.size.height - element.size.height)/2;
-
-    return align;
 };
 CDelimiter.prototype.getBase = function(numb)
 {

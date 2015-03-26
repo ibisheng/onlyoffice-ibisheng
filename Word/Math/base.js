@@ -1121,11 +1121,17 @@ CMathBase.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRang
 
         PRSA.X += this.dW*(EndPos - StartPos);
 
-        var LinesCount = this.protected_GetLinesCount();
+        var Len = this.Content.length;
 
-        if(LinesCount - 1 == CurLine)
+        // Здесь проверяем не на колво строк, т.к. на данном этапе еще идет вычисление строк, а на конец контента !
+
+        if(EndPos == Len - 1)
         {
-            PRSA.X += this.BrGapRight;
+            var EndBrContentEnd = this.NumBreakContent == EndPos && this.Content[EndPos].Math_Is_End( _CurLine, _CurRange),
+                NotBrContent = this.NumBreakContent !== EndPos;
+
+            if(EndBrContentEnd || NotBrContent)
+                PRSA.X += this.BrGapRight;
         }
     }
 };
@@ -1538,7 +1544,7 @@ CMathBase.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selectio
         var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
         var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
 
-        var LinesCount = this.protected_GetLinesCount();
+
 
         var SelectionStartPos = this.Selection.StartPos;
         var SelectionEndPos   = this.Selection.EndPos;
@@ -1575,6 +1581,8 @@ CMathBase.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selectio
 
                 Item.Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
             }
+
+            var LinesCount = this.protected_GetLinesCount();
 
             if(SelectionDraw.FindStart == true && LinesCount - 1 == CurLine)
                 SelectionDraw.StartX += this.BrGapRight;
@@ -1899,9 +1907,6 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             }
         }
 
-        /*PRS.Word    = true;
-        */
-
 
         if(PRS.NewRange == false)
         {
@@ -2013,14 +2018,20 @@ CMathBase.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange
 
         PRSC.Range.W += this.dW*(EndPos - StartPos);
 
-        var LinesCount = this.protected_GetLinesCount();
 
-        if(LinesCount - 1 == CurLine)
+        // Здесь проверяем не на колво строк, т.к. на данном этапе еще идет вычисление строк, а на конец контента !
+
+        var Len = this.Content.length;
+
+        if(EndPos == Len - 1)
         {
-            PRSC.Range.W += this.BrGapRight;
+            var EndBrContentEnd = this.NumBreakContent == EndPos && this.Content[EndPos].Math_Is_End( _CurLine, _CurRange),
+                NotBrContent = this.NumBreakContent !== EndPos;
+
+            if(EndBrContentEnd || NotBrContent)
+                PRSC.Range.W += this.BrGapRight;
         }
 
-        //this.LinesWidths[CurLine] = PRSC.Range.W - RangeW;
         this.LineMetrics.SetWidth(CurLine, PRSC.Range.W - RangeW);
     }
 };
