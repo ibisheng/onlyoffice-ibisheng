@@ -2216,13 +2216,22 @@ asc_docs_api.prototype.Paste = function()
             }
         }
     }
-}
+};
 asc_docs_api.prototype.Share = function(){
 
-}
+};
 
 function OnSave_Callback(e) {
 	if (false == e["saveLock"]) {
+		if (false !== editor.waitSave) {
+			// Мы не можем в этот момент сохранять, т.к. попали в ситуацию, когда мы залочили сохранение и успели нажать вставку до ответа
+			// Нужно снять lock с сохранения
+			editor.CoAuthoringApi.onUnSaveLock = function () {
+				editor.canSave = true;
+			};
+			editor.CoAuthoringApi.unSaveLock();
+			return;
+		}
 		editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
 		if (c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType)

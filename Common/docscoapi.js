@@ -120,6 +120,18 @@
 		}
 	};
 
+	CDocsCoApi.prototype.unSaveLock = function () {
+		if (this._CoAuthoringApi && this._onlineWork) {
+			this._CoAuthoringApi.unSaveLock();
+		} else {
+			var t = this;
+			window.setTimeout(function () {
+				// Фиктивные вызовы
+				t.callback_OnUnSaveLock();
+			}, 100);
+		}
+	};
+
 	CDocsCoApi.prototype.saveChanges = function (arrayChanges, deleteIndex, excelAdditionalInfo) {
 		if (this._CoAuthoringApi && this._onlineWork) {
 			this._CoAuthoringApi.saveChanges(arrayChanges, null, deleteIndex, excelAdditionalInfo);
@@ -271,6 +283,7 @@
 		this._saveCallback = [];
 		this.saveLockCallbackErrorTimeOutId = null;
 		this.saveCallbackErrorTimeOutId = null;
+		this.unSaveLockCallbackErrorTimeOutId = null;
         this._id = null;
 		this._indexUser = -1;
 		// Если пользователей больше 1, то совместно редактируем
@@ -429,6 +442,16 @@
 			}, this.errorTimeOut);
 		}
 		this._send({"type": "isSaveLock"});
+	};
+
+	DocsCoApi.prototype.unSaveLock = function () {
+		// ToDo при разрыве соединения нужно перестать делать unSaveLock!
+		var t = this;
+		this.unSaveLockCallbackErrorTimeOutId = window.setTimeout(function () {
+			t.unSaveLockCallbackErrorTimeOutId = null;
+			t.unSaveLock();
+		}, this.errorTimeOut);
+		this._send({"type": "unSaveLock"});
 	};
 
     DocsCoApi.prototype.releaseLocks = function (blockId) {
@@ -651,9 +674,12 @@
 	};
 	
 	DocsCoApi.prototype._onUnSaveLock = function (data) {
-		// Очищаем предыдущий таймер
+		// Очищаем предыдущий таймер сохранения
 		if (null !== this.saveCallbackErrorTimeOutId)
 			clearTimeout(this.saveCallbackErrorTimeOutId);
+		// Очищаем предыдущий таймер снятия блокировки
+		if (null !== this.unSaveLockCallbackErrorTimeOutId)
+			clearTimeout(this.unSaveLockCallbackErrorTimeOutId);
 
 		if (-1 !== data['index'])
 			this.changesIndex = data['index'];
