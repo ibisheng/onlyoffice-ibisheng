@@ -2561,7 +2561,7 @@ function CBlipFill()
 {
     this.type = FILL_TYPE_BLIP;
 
-    this.RasterImageId = null;
+    this.RasterImageId = "";
     this.VectorImageBin = null;
 
     this.srcRect = null;
