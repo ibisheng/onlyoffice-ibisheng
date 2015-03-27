@@ -712,7 +712,7 @@ function CellAddressUtils(){
 	};
 	this.getCellId = function(row, col){
 		return g_oCellAddressUtils.colnumToColstr(col + 1) + (row + 1);
-	}
+	};
 	this.getCellAddress = function(sId)
 	{
 		var oRes = this.oCellAddressCache[sId];

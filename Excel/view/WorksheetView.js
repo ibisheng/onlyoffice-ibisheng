@@ -6471,9 +6471,7 @@
 		WorksheetView.prototype.getSelectionRangeValue = function () {
 			// ToDo проблема с выбором целого столбца/строки
 			var ar = this.activeRange.clone(true);
-			// ToDo делаем ссылки только для форматированной таблицы
-			if (c_oAscSelectionDialogType.FormatTable === this.selectionDialogType)
-				ar.r1Abs = ar.c1Abs = ar.r2Abs = ar.c2Abs = true;
+			ar.r1Abs = ar.c1Abs = ar.r2Abs = ar.c2Abs = true;
 			var sName = ar.getName();
 			return (c_oAscSelectionDialogType.FormatTable === this.selectionDialogType) ? sName :
 				parserHelp.get3DRef(this.model.getName(), sName);
