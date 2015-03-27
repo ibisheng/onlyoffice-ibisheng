@@ -2417,7 +2417,7 @@ function DrawingObjects() {
     _this.groupGraphicObjects = function() {
 
         if ( _this.controller.canGroup() ) {
-            _this.controller.createGroup(null);
+            _this.controller.checkSelectedObjectsAndCallback(_this.controller.createGroup, [], false, historydescription_Spreadsheet_CreateGroup);
             worksheet.setSelectionShape(true);
         }
     };

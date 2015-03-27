@@ -11,7 +11,7 @@ DrawingObjectsController.prototype.getDrawingArray = function()
     return this.drawingObjects.cSld.spTree;
 };
 
-DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(callback, args)
+DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(callback, args, bNoSendProps, nHistoryPointType)
 {
     var check_type = changestype_Drawing_Props, comment;
     if(this.drawingObjects.slideComments)
@@ -25,7 +25,8 @@ DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(ca
     }
     if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(check_type, comment) === false)
     {
-        History.Create_NewPoint();
+        var nPointType = isRealNumber(nHistoryPointType) ? nHistoryPointType : historydescription_CommonControllerCheckSelected;
+        History.Create_NewPoint(nPointType);
         callback.apply(this, args);
         this.startRecalculate();
     }
@@ -47,7 +48,7 @@ DrawingObjectsController.prototype.paragraphFormatPaste = function( CopyTextPr, 
     this.checkSelectedObjectsAndCallback(function()
     {
         this.applyTextFunction(CDocumentContent.prototype.Paragraph_Format_Paste, CTable.prototype.Paragraph_Format_Paste, [CopyTextPr, CopyParaPr, Bool]);
-    }, [CopyTextPr, CopyParaPr, Bool]);
+    }, [CopyTextPr, CopyParaPr, Bool], false, historydescription_Presentation_ParaFormatPaste);
 };
 
 
@@ -109,7 +110,27 @@ DrawingObjectsController.prototype.resetSelect = function()
 
 
 
-DrawingObjectsController.prototype.checkSelectedObjectsAndFireCallback  =  DrawingObjectsController.prototype.checkSelectedObjectsAndCallback;
+
+DrawingObjectsController.prototype.checkSelectedObjectsAndFireCallback = function(callback, args)
+{
+    var check_type = changestype_Drawing_Props, comment;
+    if(this.drawingObjects.slideComments)
+    {
+        comment = this.drawingObjects.slideComments.getSelectedComment();
+        if(comment)
+        {
+            check_type = changestype_MoveComment;
+            comment = comment.Get_Id();
+        }
+    }
+    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(check_type, comment) === false)
+    {
+        callback.apply(this, args);
+        this.startRecalculate();
+    }
+};
+
+
 DrawingObjectsController.prototype.showChartSettings  =  function()
 {
     editor.asc_doubleClickOnChart(this.getChartObject());
@@ -311,7 +332,7 @@ MoveCommentState.prototype =
     {
         if(!this.drawingObjects.isViewMode() && editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_MoveComment, this.comment.Get_Id()) === false)
         {
-            History.Create_NewPoint();
+            History.Create_NewPoint(historydescription_Presentation_MoveComments);
             var tracks = this.drawingObjects.arrTrackObjects;
             for(var i = 0; i < tracks.length; ++i)
             {

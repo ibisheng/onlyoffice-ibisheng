@@ -207,30 +207,9 @@ DrawingObjectsController.prototype.RefreshAfterChangeColorScheme = function()
         }
     }
 };
-DrawingObjectsController.prototype.getLayout = function()
-{
-    return null;
-};
-DrawingObjectsController.prototype.getMaster = function()
-{
-    return null;
-};
 DrawingObjectsController.prototype.updateOverlay = function()
 {
     this.drawingObjects.OnUpdateOverlay();
-};
-DrawingObjectsController.prototype.endTrackNewShape = function()
-{
-    History.Create_NewPoint();
-    var shape = this.arrTrackObjects[0].getShape();
-    shape.setDrawingObjects(this.drawingObjects);
-    shape.addToDrawingObjects();
-    shape.addToRecalculate();
-    this.arrTrackObjects.length = 0;
-    this.changeCurrentState(new NullState(this));
-    this.resetSelection();
-    this.selectObject(shape, 0);
-    this.startRecalculate();
 };
 DrawingObjectsController.prototype.recalculate = function(bAll, Point)
 {
@@ -382,7 +361,6 @@ DrawingObjectsController.prototype.OnMouseUp = DrawingObjectsController.prototyp
 
 DrawingObjectsController.prototype.createGroup = function()
 {
-    History.Create_NewPoint();
     var group = this.getGroup();
     if(group)
     {
@@ -579,7 +557,7 @@ DrawingObjectsController.prototype.onKeyPress = function(e)
         this.checkSelectedObjectsAndCallback(function()
         {
             this.paragraphAdd( new ParaText( String.fromCharCode( Code ) ) );
-        }, []);
+        }, [], false, historydescription_Spreadsheet_ParagraphAdd);
         bRetValue = true;
     }
     //if ( true == bRetValue )

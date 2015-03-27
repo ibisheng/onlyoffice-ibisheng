@@ -656,7 +656,7 @@ CGraphicFrame.prototype =
                 {
                     if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
                     {
-                        History.Create_NewPoint();
+                        History.Create_NewPoint(historydescription_Presentation_TableBorder);
                     }
                     else
                     {

@@ -597,7 +597,7 @@ CPresentation.prototype =
 
     Add_NewParagraph : function(bRecalculate)
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.addNewParagraph, []);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.addNewParagraph, [], false, historydescription_Presentation_AddNewParagraph);
         this.Document_UpdateInterfaceState();
     },
 
@@ -913,13 +913,13 @@ CPresentation.prototype =
 
     groupShapes: function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.createGroup, []);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.createGroup, [], false, historydescription_Presentation_CreateGroup);
         this.Document_UpdateInterfaceState();
     },
 
     unGroupShapes: function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.unGroupCallback, []);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.unGroupCallback, [], false, historydescription_Presentation_UnGroup);
         this.Document_UpdateInterfaceState();
     },
 
@@ -927,7 +927,7 @@ CPresentation.prototype =
     {
         if(this.Slides[this.CurPage])
         {
-            History.Create_NewPoint();
+            History.Create_NewPoint(historydescription_Presentation_AddFlowImage);
             var Image = this.Slides[this.CurPage].graphicObjects.createImage(Img, (this.Slides[this.CurPage].Width - W)/2, (this.Slides[this.CurPage].Height - H)/2, W, H);
             Image.setParent(this.Slides[this.CurPage]);
             Image.addToDrawingObjects();
@@ -951,7 +951,7 @@ CPresentation.prototype =
             _this.Slides[_this.CurPage].graphicObjects.resetSelection();
             _this.Slides[_this.CurPage].graphicObjects.selectObject(Image, 0);
             _this.Document_UpdateInterfaceState();
-        }, []);
+        }, [], false, historydescription_Presentation_AddChart);
     },
 
     Selection_Remove: function()
@@ -964,7 +964,7 @@ CPresentation.prototype =
         {
             _this.Slides[_this.CurPage].graphicObjects.editChart(binary);
             _this.Document_UpdateInterfaceState();
-        }, [binary]);
+        }, [binary], false, historydescription_Presentation_EditChart);
     },
 
     Get_ChartObject: function(type)
@@ -987,7 +987,7 @@ CPresentation.prototype =
         if(!this.Slides[this.CurPage])
             return;
 
-        History.Create_NewPoint();
+        History.Create_NewPoint(historydescription_Presentation_AddFlowTable);
         var graphic_frame = this.Create_TableGraphicFrame(Cols, Rows, this.Slides[this.CurPage], this.DefaultTableStyleId);
         if(this.Document_Is_SelectionLocked(changestype_AddShape, graphic_frame) === false)
         {
@@ -1098,13 +1098,13 @@ CPresentation.prototype =
 
     Paragraph_Add : function( ParaItem, bRecalculate )
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphAdd, [ParaItem, bRecalculate]);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphAdd, [ParaItem, bRecalculate], false, historydescription_Presentation_ParagraphAdd);
 
     },
 
     Paragraph_ClearFormatting : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphClearFormatting, []);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphClearFormatting, [], false, historydescription_Presentation_ParagraphClearFormatting);
         this.Document_UpdateInterfaceState();
     },
 
@@ -1333,43 +1333,43 @@ CPresentation.prototype =
 
     Set_ParagraphAlign : function(Align)
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphAlign, [Align]);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphAlign, [Align], false, historydescription_Presentation_SetParagraphAlign);
         this.Document_UpdateInterfaceState();
     },
 
     Set_ParagraphSpacing : function(Spacing)
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphSpacing, [Spacing]);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphSpacing, [Spacing], false, historydescription_Presentation_SetParagraphSpacing);
         this.Document_UpdateInterfaceState();
     },
 
     Set_ParagraphTabs : function(Tabs)
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphTabs, [Tabs]);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphTabs, [Tabs], false, historydescription_Presentation_SetParagraphTabs);
         this.Document_UpdateInterfaceState();
     },
 
     Set_ParagraphIndent : function(Ind)
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphIndent, [Ind]);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphIndent, [Ind], false, historydescription_Presentation_SetParagraphIndent);
         this.Document_UpdateInterfaceState();
     },
 
     Set_ParagraphNumbering : function(NumInfo)
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphNumbering, [this.Get_PresentationBulletByNumInfo(NumInfo)]);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphNumbering, [this.Get_PresentationBulletByNumInfo(NumInfo)], false, historydescription_Presentation_SetParagraphNumbering);
         this.Document_UpdateInterfaceState();   //TODO
     },
 
     Paragraph_IncDecFontSize : function(bIncrease)
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphIncDecFontSize, [bIncrease]);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphIncDecFontSize, [bIncrease], false, historydescription_Presentation_ParagraphIncDecFontSize);
         this.Document_UpdateInterfaceState();
     },
 
     Paragraph_IncDecIndent : function(bIncrease)
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphIncDecIndent, [bIncrease]);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphIncDecIndent, [bIncrease], false, historydescription_Presentation_ParagraphIncDecIndent);
         this.Document_UpdateInterfaceState();
     },
 
@@ -1380,26 +1380,26 @@ CPresentation.prototype =
 
     Set_ImageProps : function(Props)
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [Props]);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [Props], false, historydescription_Presentation_SetImageProps);
         this.Document_UpdateInterfaceState();
     },
 
     ShapeApply: function(shapeProps)
     {
 
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [shapeProps]);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [shapeProps], false, historydescription_Presentation_SetShapeProps);
         this.Document_UpdateInterfaceState();
     },
 
     ChartApply: function(chartProps)
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [chartProps]);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [chartProps], false, historydescription_Presentation_ChartApply);
         this.Document_UpdateInterfaceState();
     },
 
     changeShapeType : function(shapeType)
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [{type:shapeType}]);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [{type:shapeType}], false, historydescription_Presentation_ChangeShapeType);
         this.Document_UpdateInterfaceState();
     },
 
@@ -1407,7 +1407,7 @@ CPresentation.prototype =
     {
         if(this.Slides[this.CurPage])
         {
-            this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [{verticalTextAlign: align}]);
+            this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [{verticalTextAlign: align}], false, historydescription_Presentation_SetVerticalAlign);
             this.Document_UpdateInterfaceState();
         }
     },
@@ -1911,7 +1911,7 @@ CPresentation.prototype =
                     {
                         if (!window.USER_AGENT_SAFARI_MACOS)
                         {
-                            this.Create_NewHistoryPoint();
+                            this.Create_NewHistoryPoint(historydescription_Document_ShiftInsert);
 
                             window.GlobalPasteFlag = true;
                             editor.waitSave = true;
@@ -1922,7 +1922,7 @@ CPresentation.prototype =
                         {
                             if (0 === window.GlobalPasteFlagCounter)
                             {
-                                this.Create_NewHistoryPoint();
+                                this.Create_NewHistoryPoint(historydescription_Document_ShiftInsertSafari);
 
                                 SafariIntervalFocus();
                                 window.GlobalPasteFlag = true;
@@ -1951,7 +1951,7 @@ CPresentation.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_ShiftDeleteButton);
                     Editor_Copy(this.DrawingDocument.m_oWordControl.m_oApi, true);
                 }
                 //не возвращаем true чтобы не было preventDefault
@@ -1959,32 +1959,14 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 49 && false === editor.isViewMode && true === e.CtrlKey && true === e.AltKey ) // Alt + Ctrl + Num1 - применяем стиль Heading1
         {
-            if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
-            {
-                this.Create_NewHistoryPoint();
-                this.Set_ParagraphStyle( "Heading 1" );
-                this.Document_UpdateInterfaceState();
-            }
             bRetValue = true;
         }
         else if ( e.KeyCode == 50 && false === editor.isViewMode && true === e.CtrlKey && true === e.AltKey ) // Alt + Ctrl + Num2 - применяем стиль Heading2
         {
-            if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
-            {
-                this.Create_NewHistoryPoint();
-                this.Set_ParagraphStyle( "Heading 2" );
-                this.Document_UpdateInterfaceState();
-            }
             bRetValue = true;
         }
         else if ( e.KeyCode == 51 && false === editor.isViewMode && true === e.CtrlKey && true === e.AltKey ) // Alt + Ctrl + Num3 - применяем стиль Heading3
         {
-            if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
-            {
-                this.Create_NewHistoryPoint();
-                this.Set_ParagraphStyle( "Heading 3" );
-                this.Document_UpdateInterfaceState();
-            }
             bRetValue = true;
         }
         else if ( e.KeyCode == 56 && true === e.CtrlKey && true === e.ShiftKey ) // Ctrl + Shift + 8 - showParaMarks
@@ -2028,7 +2010,7 @@ CPresentation.prototype =
                 var ParaPr = this.Get_Paragraph_ParaPr();
                 if ( null != ParaPr )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_SetParagraphAlignHotKey);
                     this.Set_ParagraphAlign( ParaPr.Jc === align_Center ? align_Left : align_Center );
                     this.Document_UpdateInterfaceState();
                     bRetValue = true;
@@ -2036,7 +2018,7 @@ CPresentation.prototype =
             }
             else // Ctrl + Alt + E - добавляем знак евро €
             {
-
+                this.Create_NewHistoryPoint(historydescription_Document_AddEuroLetter);
                 this.Paragraph_Add( new ParaText( "€" ) );
                 this.Document_UpdateInterfaceState();
                 bRetValue = true;
@@ -2071,7 +2053,7 @@ CPresentation.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_SetParagraphAlignHotKey);
                     this.Set_ParagraphAlign( ParaPr.Jc === align_Justify ? align_Left : align_Justify );
                     this.Document_UpdateInterfaceState();
                 }
@@ -2091,7 +2073,7 @@ CPresentation.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_SetParagraphNumberingHotKey);
                     this.Set_ParagraphNumbering( { Type : 0, SubType : 1 } );
                     this.Document_UpdateInterfaceState();
                 }
@@ -2104,7 +2086,7 @@ CPresentation.prototype =
                 {
                     if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
                     {
-                        this.Create_NewHistoryPoint();
+                        this.Create_NewHistoryPoint(historydescription_Document_SetParagraphNumberingHotKey);
                         this.Set_ParagraphAlign( ParaPr.Jc === align_Left ? align_Justify : align_Left );
                         this.Document_UpdateInterfaceState();
                     }
@@ -2138,7 +2120,7 @@ CPresentation.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
                 {
-                    this.Create_NewHistoryPoint();
+                    this.Create_NewHistoryPoint(historydescription_Document_SetParagraphAlignHotKey4);
                     this.Set_ParagraphAlign( ParaPr.Jc === align_Right ? align_Left : align_Right );
                     this.Document_UpdateInterfaceState();
                 }
@@ -2188,7 +2170,7 @@ CPresentation.prototype =
                     {
                         if (!window.USER_AGENT_SAFARI_MACOS)
                         {
-                            this.Create_NewHistoryPoint();
+                            this.Create_NewHistoryPoint(historydescription_Document_PasteHotKey);
 
                             window.GlobalPasteFlag = true;
                             editor.waitSave = true;
@@ -2199,7 +2181,7 @@ CPresentation.prototype =
                         {
                             if (0 === window.GlobalPasteFlagCounter)
                             {
-                                this.Create_NewHistoryPoint();
+                                this.Create_NewHistoryPoint(historydescription_Document_PasteSafariHotKey);
 
                                 SafariIntervalFocus();
                                 window.GlobalPasteFlag = true;
@@ -2221,7 +2203,7 @@ CPresentation.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
             {
-                this.Create_NewHistoryPoint();
+                this.Create_NewHistoryPoint(historydescription_Document_CurHotKey);
                 Editor_Copy(this.DrawingDocument.m_oWordControl.m_oApi, true);
             }
             //не возвращаем true чтобы не было preventDefault
@@ -2862,7 +2844,7 @@ CPresentation.prototype =
         {
             if(!(bNoCreatePoint === true ))
             {
-                History.Create_NewPoint();
+                History.Create_NewPoint(historydescription_Presentation_ChangeBackground);
             }
             for(var i = 0; i <arr_ind.length; ++i)
             {
@@ -3061,9 +3043,9 @@ CPresentation.prototype =
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Create_NewHistoryPoint : function()
+    Create_NewHistoryPoint : function(Description)
     {
-        this.History.Create_NewPoint();
+        this.History.Create_NewPoint(Description);
     },
 
     Document_Undo : function()
@@ -3507,7 +3489,7 @@ CPresentation.prototype =
     {
         if(this.Slides[this.CurPage])
         {
-            this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.hyperlinkAdd, [HyperProps]);
+            this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.hyperlinkAdd, [HyperProps], false, historydescription_Presentation_HyperlinkAdd);
             this.Document_UpdateInterfaceState();
         }
     },
@@ -3516,7 +3498,7 @@ CPresentation.prototype =
     {
         if(this.Slides[this.CurPage])
         {
-            this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.hyperlinkModify, [HyperProps]);
+            this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.hyperlinkModify, [HyperProps], false, historydescription_Presentation_HyperlinkModify);
             this.Document_UpdateInterfaceState();
         }
     },
@@ -3525,7 +3507,7 @@ CPresentation.prototype =
     {
         if(this.Slides[this.CurPage])
         {
-            this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.hyperlinkRemove, []);
+            this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.hyperlinkRemove, [], false, historydescription_Presentation_HyperlinkRemove);
             this.Document_UpdateInterfaceState();
         }
     },
@@ -3589,38 +3571,38 @@ CPresentation.prototype =
 
     distributeHor : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.distributeHor, [editor.bAlignBySelected]);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.distributeHor, [editor.bAlignBySelected], false, historydescription_Presentation_DistHor);
         this.Document_UpdateInterfaceState();
     },
     distributeVer : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.distributeVer, [editor.bAlignBySelected]);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.distributeVer, [editor.bAlignBySelected], false, historydescription_Presentation_DistVer);
         this.Document_UpdateInterfaceState();
     },
 
     bringToFront : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.bringToFront);   //TODO: Передавать тип проверки
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.bringToFront, false, historydescription_Presentation_BringToFront);   //TODO: Передавать тип проверки
         this.Document_UpdateInterfaceState();
     },
 
     bringForward : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.bringForward);   //TODO: Передавать тип проверки
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.bringForward, false, historydescription_Presentation_BringForward);   //TODO: Передавать тип проверки
         this.Document_UpdateInterfaceState();
     },
 
     sendToBack : function()
     {
 
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.sendToBack);   //TODO: Передавать тип проверки
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.sendToBack, false, historydescription_Presentation_SendToBack);   //TODO: Передавать тип проверки
         this.Document_UpdateInterfaceState();
     },
 
 
     bringBackward : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.bringBackward);   //TODO: Передавать тип проверки
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.bringBackward, false, historydescription_Presentation_BringBackward);   //TODO: Передавать тип проверки
         this.Document_UpdateInterfaceState();
     },
 
@@ -3633,7 +3615,7 @@ CPresentation.prototype =
 
     addNextSlide: function(layoutIndex)
     {
-        History.Create_NewPoint();
+        History.Create_NewPoint(historydescription_Presentation_AddNextSlide);
         var  new_slide, layout, i, _ph_type, sp;
         if(this.Slides[this.CurPage])
         {
@@ -3705,7 +3687,7 @@ CPresentation.prototype =
 
     shiftSlides: function(pos, array, bCopy)
     {
-        History.Create_NewPoint();
+        History.Create_NewPoint(historydescription_Presentation_ShiftSlides);
         array.sort(fSortAscending);
         var deleted = [], i;
 
@@ -3758,7 +3740,7 @@ CPresentation.prototype =
     {
         if(array.length > 0 && this.Document_Is_SelectionLocked(changestype_RemoveSlide, null) === false)
         {
-            History.Create_NewPoint();
+            History.Create_NewPoint(historydescription_Presentation_DeleteSlides);
             var oldLen = this.Slides.length;
             array.sort(fSortAscending);
             for(var i = array.length -1; i > - 1; --i)
@@ -3792,7 +3774,7 @@ CPresentation.prototype =
     {
         if(this.Document_Is_SelectionLocked(changestype_Layout) === false)
         {
-            History.Create_NewPoint();
+            History.Create_NewPoint(historydescription_Presentation_ChangeLayout);
             if(this.Slides[this.CurPage])
             {
                 this.Slides[this.CurPage].graphicObjects.resetSelection();
@@ -3959,7 +3941,7 @@ CPresentation.prototype =
     {
         if(this.Document_Is_SelectionLocked(changestype_SlideSize) === false)
         {
-            History.Create_NewPoint();
+            History.Create_NewPoint(historydescription_Presentation_ChangeSlideSize);
             History.Add(this, {Type: historyitem_Presentation_SlideSize, oldW: this.Width, newW: width, oldH: this.Height, newH:  height});
             this.Width = width;
             this.Height = height;
@@ -3983,7 +3965,7 @@ CPresentation.prototype =
         {
             return;
         }
-        History.Create_NewPoint();
+        History.Create_NewPoint(historydescription_Presentation_ChangeColorScheme);
 
         var arrInd = [];
         for(var i = 0; i < this.Slides.length; ++i)
@@ -4463,7 +4445,7 @@ CPresentation.prototype =
     {
         if(this.Slides[this.CurPage])
         {
-            History.Create_NewPoint();
+            History.Create_NewPoint(historydescription_Presentation_AddComment);
             var Comment = new CComment( this.Comments, CommentData );
             Comment.selected = true;
             var slide = this.Slides[this.CurPage];
@@ -4513,7 +4495,7 @@ CPresentation.prototype =
     {
         if(this.Document_Is_SelectionLocked(changestype_MoveComment, Id) === false)
         {
-            History.Create_NewPoint();
+            History.Create_NewPoint(historydescription_Presentation_ChangeComment);
             var comment = g_oTableId.Get_ById(Id);
             if(isRealObject(comment))
             {
@@ -4556,7 +4538,6 @@ CPresentation.prototype =
                 }
             }
         }
-
     },
 
     Remove_Comment : function(Id, bSendEvent)

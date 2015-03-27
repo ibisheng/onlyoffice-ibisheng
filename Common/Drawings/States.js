@@ -392,7 +392,7 @@ ChangeAdjState.prototype =
             {
                 track.trackEnd();
                 drawingObjects.startRecalculate();
-            },[]);
+            },[], false, historydescription_CommonDrawings_ChangeAdj);
 
         }
         this.drawingObjects.clearTrackObjects();
@@ -472,7 +472,7 @@ RotateState.prototype =
             {
                 var i, copy;
                 this.drawingObjects.resetSelection();
-                History.Create_NewPoint(historydescription_CommonStatesRotate);
+                History.Create_NewPoint(historydescription_CommonDrawings_CopyCtrl);
                 for(i = 0; i < tracks.length; ++i)
                 {
                     copy = tracks[i].originalObject.copy();
@@ -575,7 +575,7 @@ RotateState.prototype =
                             }
                             oThis.drawingObjects.drawingObjects.checkGraphicObjectPosition(0, 0, Math.max.apply(Math, arr_x2), Math.max.apply(Math, arr_y2));
                         }
-                    }, []);
+                    }, [], false, historydescription_CommonDrawings_EndTrack);
             }
 
         }

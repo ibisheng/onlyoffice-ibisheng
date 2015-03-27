@@ -1221,40 +1221,6 @@ DrawingObjectsController.prototype =
     paragraphAdd: function(paraItem, bRecalculate)
     {
         this.applyTextFunction(CDocumentContent.prototype.Paragraph_Add, CTable.prototype.Paragraph_Add, [paraItem, bRecalculate]);
-        return;
-        if(this.selection.textSelection)
-        {
-            this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
-        }
-        else if(this.selection.groupSelection)
-        {
-            this.selection.groupSelection.paragraphAdd(paraItem, bRecalculate);
-        }
-        else if(this.selection.chartSelection)
-        {
-            this.selection.chartSelection.paragraphAdd(paraItem, bRecalculate);
-        }
-        else
-        {
-            var i;
-            if(paraItem.Type === para_TextPr)
-            {
-                this.applyDocContentFunction(CDocumentContent.prototype.Paragraph_Add, [paraItem, bRecalculate], CTable.prototype.Paragraph_Add);
-            }
-            else if(this.selectedObjects.length === 1
-                && this.selectedObjects[0].getObjectType() === historyitem_type_Shape
-                &&  !CheckLinePreset(this.selectedObjects[0].getPresetGeom()))
-            {
-                this.selection.textSelection = this.selectedObjects[0];
-                this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
-                this.selection.textSelection.select(this, this.selection.textSelection.selectStartPage);
-            }
-            else if(this.selectedObjects.length > 0 && this.selectedObjects[0].parent && this.selectedObjects[0].parent.GoTo_Text)
-            {
-                this.selectedObjects[0].parent.GoTo_Text();
-                this.resetSelection();
-            }
-        }
     },
 
     paragraphIncDecFontSize: function(bIncrease)
@@ -1295,46 +1261,46 @@ DrawingObjectsController.prototype =
 
     setCellFontName: function (fontName) {
         var text_pr = new ParaTextPr({ FontFamily : { Name : fontName , Index : -1 } });
-        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr]);
+        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr], false, historydescription_Spreadsheet_SetCellFontName);
 
     },
 
     setCellFontSize: function (fontSize) {
         var text_pr = new ParaTextPr({ FontSize : fontSize});
-        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr]);
+        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr], false, historydescription_Spreadsheet_SetCellFontSize);
     },
 
     setCellBold: function (isBold) {
         var text_pr = new ParaTextPr({ Bold : isBold});
-        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr]);
+        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr], false, historydescription_Spreadsheet_SetCellBold);
 
     },
 
     setCellItalic: function (isItalic) {
 
         var text_pr = new ParaTextPr({ Italic : isItalic});
-        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr]);
+        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr], false, historydescription_Spreadsheet_SetCellItalic);
     },
 
     setCellUnderline: function (isUnderline) {
         var text_pr = new ParaTextPr({ Underline : isUnderline});
-        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr]);
+        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr], false, historydescription_Spreadsheet_SetCellUnderline);
     },
 
     setCellStrikeout: function (isStrikeout) {
         var text_pr = new ParaTextPr({ Strikeout : isStrikeout});
-        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr]);
+        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr], false, historydescription_Spreadsheet_SetCellStrikeout);
     },
 
     setCellSubscript: function (isSubscript) {
         var text_pr = new ParaTextPr({ VertAlign : isSubscript ? vertalign_SubScript : vertalign_Baseline});
-        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr]);
+        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr], false, historydescription_Spreadsheet_SetCellSubscript);
     },
 
     setCellSuperscript: function (isSuperscript) {
 
         var text_pr = new ParaTextPr({ VertAlign : isSuperscript ? vertalign_SubScript : vertalign_Baseline});
-        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr]);
+        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr], false, historydescription_Spreadsheet_SetCellSuperscript);
     },
 
     setCellAlign: function (align) {
@@ -1361,7 +1327,7 @@ DrawingObjectsController.prototype =
                 align_ = align_Justify;
             }
         }
-        this.checkSelectedObjectsAndCallback(this.setParagraphAlign, [align_]);
+        this.checkSelectedObjectsAndCallback(this.setParagraphAlign, [align_], false, historydescription_Spreadsheet_SetCellAlign);
     },
 
     setCellVertAlign: function (align) {
@@ -1394,7 +1360,7 @@ DrawingObjectsController.prototype =
                 vert_align = 4
             }
         }
-        this.checkSelectedObjectsAndCallback(this.applyDrawingProps, [{verticalTextAlign: vert_align}]);
+        this.checkSelectedObjectsAndCallback(this.applyDrawingProps, [{verticalTextAlign: vert_align}], false, historydescription_Spreadsheet_SetCellVertAlign);
     },
 
     setCellTextWrap: function (isWrapped) {
@@ -1411,7 +1377,7 @@ DrawingObjectsController.prototype =
         var unifill = new CUniFill();
         unifill.setFill(new CSolidFill());
         unifill.fill.setColor(CorrectUniColor(color, null));
-        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [new ParaTextPr({Unifill: unifill})]);
+        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [new ParaTextPr({Unifill: unifill})], false, historydescription_Spreadsheet_SetCellTextColor);
     },
 
     setCellBackgroundColor: function (color)
@@ -1421,7 +1387,7 @@ DrawingObjectsController.prototype =
         fill.fill = new asc_CFillSolid();
         fill.fill.color = color;
 
-        this.checkSelectedObjectsAndCallback(this.applyDrawingProps, [{fill: fill}]);
+        this.checkSelectedObjectsAndCallback(this.applyDrawingProps, [{fill: fill}], false, historydescription_Spreadsheet_SetCellBackgroundColor);
     },
 
 
@@ -1435,13 +1401,13 @@ DrawingObjectsController.prototype =
 
     // Увеличение размера шрифта
     increaseFontSize: function () {
-        this.checkSelectedObjectsAndCallback(this.paragraphIncDecFontSize, [true]);
+        this.checkSelectedObjectsAndCallback(this.paragraphIncDecFontSize, [true], false, historydescription_Spreadsheet_SetCellIncreaseFontSize);
 
     },
 
     // Уменьшение размера шрифта
     decreaseFontSize: function () {
-        this.checkSelectedObjectsAndCallback(this.paragraphIncDecFontSize, [false]);
+        this.checkSelectedObjectsAndCallback(this.paragraphIncDecFontSize, [false], false, historydescription_Spreadsheet_SetCellDecreaseFontSize);
 
     },
 
@@ -1507,16 +1473,16 @@ DrawingObjectsController.prototype =
     insertHyperlink: function (options) {
         if(!this.getHyperlinkInfo())
         {
-            this.checkSelectedObjectsAndCallback(this.hyperlinkAdd, [{Text: options.text, Value: options.hyperlinkModel.Hyperlink, ToolTip: options.hyperlinkModel.Tooltip}]);
+            this.checkSelectedObjectsAndCallback(this.hyperlinkAdd, [{Text: options.text, Value: options.hyperlinkModel.Hyperlink, ToolTip: options.hyperlinkModel.Tooltip}], false, historydescription_Spreadsheet_SetCellHyperlinkAdd);
         }
         else
         {
-            this.checkSelectedObjectsAndCallback(this.hyperlinkModify, [{Text: options.text, Value: options.hyperlinkModel.Hyperlink, ToolTip: options.hyperlinkModel.Tooltip}]);
+            this.checkSelectedObjectsAndCallback(this.hyperlinkModify, [{Text: options.text, Value: options.hyperlinkModel.Hyperlink, ToolTip: options.hyperlinkModel.Tooltip}], false, historydescription_Spreadsheet_SetCellHyperlinkModify);
         }
     },
 
     removeHyperlink: function () {
-        this.checkSelectedObjectsAndCallback(this.hyperlinkRemove, []);
+        this.checkSelectedObjectsAndCallback(this.hyperlinkRemove, [], false, historydescription_Spreadsheet_SetCellHyperlinkRemove);
     },
 
     canAddHyperlink: function() {
@@ -1706,7 +1672,7 @@ DrawingObjectsController.prototype =
         var objects_by_types = this.getSelectedObjectsByTypes();
         if(objects_by_types.charts.length === 1)
         {
-            this.checkSelectedObjectsAndCallback(this.editChartCallback, [chart]);
+            this.checkSelectedObjectsAndCallback(this.editChartCallback, [chart], false, historydescription_Spreadsheet_EditChart);
         }
     },
 
@@ -3419,8 +3385,6 @@ DrawingObjectsController.prototype =
             var bIsScatter = (c_oAscChartTypeSettings.scatter <= type && type <= c_oAscChartTypeSettings.scatterSmoothMarker);
 
             Cat = { Formula: "Sheet1!$A$2:$A$7", NumCache: [createItem("USA"), createItem("CHN"), createItem("RUS"), createItem("GBR"), createItem("GER"), createItem("JPN")] };
-
-
             seria = new asc_CChartSeria();
             seria.Val.Formula = "Sheet1!$B$2:$B$7";
             seria.Val.NumCache = [ createItem(46), createItem(38), createItem(24), createItem(29), createItem(11), createItem(7) ];
@@ -3545,7 +3509,7 @@ DrawingObjectsController.prototype =
         {
             return;
         }
-        this.checkSelectedObjectsAndCallback(this.removeCallback, [dir, bOnlyText, bRemoveOnlySelection]);
+        this.checkSelectedObjectsAndCallback(this.removeCallback, [dir, bOnlyText, bRemoveOnlySelection], false, historydescription_Spreadsheet_Remove);
     },
 
     removeCallback: function(dir, bOnlyText, bRemoveOnlySelection)
@@ -4092,7 +4056,7 @@ DrawingObjectsController.prototype =
         {
             if(this.getTargetDocContent())
             {
-                this.checkSelectedObjectsAndCallback(this.paragraphAdd, [new ParaTab()])
+                this.checkSelectedObjectsAndCallback(this.paragraphAdd, [new ParaTab()], false, historydescription_Spreadsheet_AddTab)
             }
             else
             {
@@ -4113,7 +4077,7 @@ DrawingObjectsController.prototype =
                 }
                 else
                 {
-                    this.checkSelectedObjectsAndCallback(this.addNewParagraph, []);
+                    this.checkSelectedObjectsAndCallback(this.addNewParagraph, [], false, historydescription_Spreadsheet_AddNewParagraph);
                     this.recalculate();
                 }
             }
@@ -4197,7 +4161,7 @@ DrawingObjectsController.prototype =
                 //if(this.selection.textSelection || this.selection.groupSelection && this.selection.groupSelection.selection.textSelection
                 //    || this.selection.chartSelection && this.selection.chartSelection.selection.textSelection)
                 //{
-                    this.checkSelectedObjectsAndCallback(this.paragraphAdd, [new ParaSpace(1)]);
+                    this.checkSelectedObjectsAndCallback(this.paragraphAdd, [new ParaSpace(1)], false, historydescription_Spreadsheet_AddSpace);
                     this.recalculate();
                 //}
                // else
@@ -4440,7 +4404,7 @@ DrawingObjectsController.prototype =
             else
                 Item = new ParaText( "-" );
 
-            this.checkSelectedObjectsAndCallback(this.paragraphAdd, [Item]);
+            this.checkSelectedObjectsAndCallback(this.paragraphAdd, [Item], false, historydescription_Spreadsheet_AddItem);
             this.recalculate();
             bRetValue = true;
         }
@@ -4839,7 +4803,7 @@ DrawingObjectsController.prototype =
 
     unGroup: function()
     {
-        this.checkSelectedObjectsAndCallback(this.unGroupCallback, null)
+        this.checkSelectedObjectsAndCallback(this.unGroupCallback, null, false, historydescription_CommonControllerUnGroup)
     },
 
     getSelectedObjectsBounds: function()
@@ -4883,7 +4847,6 @@ DrawingObjectsController.prototype =
         var ungroup_arr = this.canUnGroup(true);
         if(ungroup_arr.length > 0)
         {
-            History.Create_NewPoint(historydescription_CommonControllerUnGroup);
             this.resetSelection();
             var i, j,   cur_group, sp_tree, sp;
             for(i = 0; i < ungroup_arr.length; ++i)
@@ -5719,7 +5682,7 @@ DrawingObjectsController.prototype =
 
     putPrLineSpacing: function(type, value)
     {
-        this.checkSelectedObjectsAndCallback(this.setParagraphSpacing, [{ LineRule : type,  Line : value }]);
+        this.checkSelectedObjectsAndCallback(this.setParagraphSpacing, [{ LineRule : type,  Line : value }], false, historydescription_Spreadsheet_PutPrLineSpacing);
         //TODO
     },
 
@@ -5750,7 +5713,7 @@ DrawingObjectsController.prototype =
         }
         if(arg)
         {
-            this.checkSelectedObjectsAndCallback(this.setParagraphSpacing, [arg]);
+            this.checkSelectedObjectsAndCallback(this.setParagraphSpacing, [arg], false, historydescription_Spreadsheet_SetParagraphSpacing);
         }
     },
 
@@ -5771,15 +5734,15 @@ DrawingObjectsController.prototype =
                     return;
                 }
             }
-            this.checkSelectedObjectsAndCallback(this.setGraphicObjectPropsCallBack, [props], true);
+            this.checkSelectedObjectsAndCallback(this.setGraphicObjectPropsCallBack, [props], true, historydescription_Spreadsheet_SetGraphicObjectsProps);
         }
         else
         {
-            this.checkSelectedObjectsAndCallback(this.paraApplyCallback, [props]);
+            this.checkSelectedObjectsAndCallback(this.paraApplyCallback, [props], false, historydescription_Spreadsheet_ParaApply);
         }
     },
 
-    checkSelectedObjectsAndCallback: function(callback, args, bNoSendProps)
+    checkSelectedObjectsAndCallback: function(callback, args, bNoSendProps, nHistoryPointType)
     {
         var selection_state = this.getSelectionState();
         this.drawingObjects.objectLocker.reset();
@@ -5792,7 +5755,8 @@ DrawingObjectsController.prototype =
         {
             if(bLock)
             {
-                History.Create_NewPoint(historydescription_CommonControllerCheckSelected);
+                var nPointType = isRealNumber(nHistoryPointType) ? nHistoryPointType : historydescription_CommonControllerCheckSelected;
+                History.Create_NewPoint(nPointType);
                 if(bSync !== true)
                 {
                     _this.setSelectionState(selection_state);
@@ -5949,11 +5913,11 @@ DrawingObjectsController.prototype =
     {
         if(this.selection.groupSelection)
         {
-            this.checkSelectedObjectsAndCallback(this.setGraphicObjectLayerCallBack, [layerType]);
+            this.checkSelectedObjectsAndCallback(this.setGraphicObjectLayerCallBack, [layerType], false, historydescription_Spreadsheet_GraphicObjectLayer);
         }
         else
         {
-            History.Create_NewPoint(historydescription_CommonControllerSetGraphicObject);
+            History.Create_NewPoint(historydescription_Spreadsheet_GraphicObjectLayer);
             this.setGraphicObjectLayerCallBack(layerType);
             this.startRecalculate();
         }

@@ -990,15 +990,6 @@ $(document).ready(function(){
                 break;
             case "td_imageInText":
 
-                var _img = new Image();
-                _img.onload = function(){
-                    editor.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-                    editor.WordControl.m_oLogicDocument.Add_InlineImage( 50, 50, this.src );
-                };
-                //_img.innerHtml = "./Images/Test.jpg";
-                _img.src = "./Images/Test.jpg";
-
-                //editor.AddImage(true);
                 break;
             case "td_imageInText2":
                 editor.AddImageUrl("./Images/Test.jpg");

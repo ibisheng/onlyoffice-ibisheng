@@ -1008,6 +1008,9 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
     _loader.Load(gObject, this.WordControl.m_oLogicDocument);
     _loader.Check_TextFit();
 
+    if (History && History.Update_FileDescription)
+        History.Update_FileDescription(_loader.stream);
+
 	this.LoadedObject = 1;
     g_oIdCounter.Set_Load(false);
 
@@ -1733,43 +1736,43 @@ asc_docs_api.prototype.put_TextPrFontName = function(name)
 	var isasync = loader.LoadFont(fontinfo);
 	if (false === isasync)
     {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrFontName);
 		this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { FontFamily : { Name : fontinfo.Name , Index : -1 } } ) );
     }
 }
 asc_docs_api.prototype.put_TextPrFontSize = function(size)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrFontSize);
 	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { FontSize : Math.min(size, 100) } ) );
 }
 asc_docs_api.prototype.put_TextPrBold = function(value)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrBold);
 	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Bold : value } ) );
 }
 asc_docs_api.prototype.put_TextPrItalic = function(value)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrItalic);
 	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Italic : value } ) );
 }
 asc_docs_api.prototype.put_TextPrUnderline = function(value)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrUnderline);
 	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Underline : value } ) );
 }
 asc_docs_api.prototype.put_TextPrStrikeout = function(value)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrStrikeout);
 	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Strikeout : value } ) );
 }
 asc_docs_api.prototype.put_PrLineSpacing = function(Type, Value)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrLineSpacing);
 	this.WordControl.m_oLogicDocument.Set_ParagraphSpacing( { LineRule : Type,  Line : Value } );
 }
 asc_docs_api.prototype.put_LineSpacingBeforeAfter = function(type,value)//"type == 0" means "Before", "type == 1" means "After"
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrSpacingBeforeAfter);
 	switch (type)
     {
 		case 0:
@@ -1780,12 +1783,12 @@ asc_docs_api.prototype.put_LineSpacingBeforeAfter = function(type,value)//"type 
 }
 asc_docs_api.prototype.FontSizeIn = function()
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrIncreaseFontSize);
     this.WordControl.m_oLogicDocument.Paragraph_IncDecFontSize(true);
 }
 asc_docs_api.prototype.FontSizeOut = function()
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrDecreaseFontSize);
     this.WordControl.m_oLogicDocument.Paragraph_IncDecFontSize(false);
 }
 
@@ -1932,19 +1935,19 @@ asc_docs_api.prototype.paraApply = function(Props)
                 graphicObjects.paragraphAdd( new ParaTextPr(TextPr) );
                 _presentation.Recalculate();
                 _presentation.Document_UpdateInterfaceState();
-            }, []);
+            }, [], false, historydescription_Presentation_ParaApply);
         }
 }
 
 asc_docs_api.prototype.put_PrAlign = function(value)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrAlign);
 	this.WordControl.m_oLogicDocument.Set_ParagraphAlign(value);
 }
 // 0- baseline, 2-subscript, 1-superscript
 asc_docs_api.prototype.put_TextPrBaseline = function(value)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrBaseline);
 	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { VertAlign : value } ) );
 }
 /* 	Маркированный список Type = 0
@@ -1983,13 +1986,8 @@ asc_docs_api.prototype.put_ListType = function(type, subtype)
 
 	NumberInfo.Type = type;
 	NumberInfo.SubType = subtype;
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrListType);
 	this.WordControl.m_oLogicDocument.Set_ParagraphNumbering( NumberInfo );
-}
-asc_docs_api.prototype.put_Style = function(name)
-{
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-	this.WordControl.m_oLogicDocument.Set_ParagraphStyle(name);
 }
 
 asc_docs_api.prototype.put_ShowSnapLines = function(isShow)
@@ -2020,38 +2018,6 @@ asc_docs_api.prototype.get_ShowTableEmptyLine = function(){
     return this.isShowTableEmptyLine;
 }
 
-asc_docs_api.prototype.put_KeepLines = function(isKeepLines){
-	this.isKeepLinesTogether = isKeepLines;
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    this.WordControl.m_oLogicDocument.Set_ParagraphKeepLines(isKeepLines);
-	this.sync_KeepLinesCallback(isKeepLines);
-}
-asc_docs_api.prototype.put_AddSpaceBetweenPrg = function(isSpacePrg){
-	this.isAddSpaceBetweenPrg = isSpacePrg;
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    this.WordControl.m_oLogicDocument.Set_ParagraphContextualSpacing(isSpacePrg);
-}
-asc_docs_api.prototype.put_ShapeFillColor = function(is_flag, r, g, b)
-{
-	if (false === is_flag)
-    {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        var Unifill = new CUniFill();
-        Unifill.fill = new CNoFill();
-        Unifill.calculate();
-        this.WordControl.m_oLogicDocument.changeShapeFill( Unifill );
-    }
-	else
-	{
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        var Unifill = new CUniFill();
-        Unifill.fill = new CSolidFill();
-        Unifill.fill.color = new CRGBColor();
-        Unifill.fill.color.RGBA = { R : r, G : g, B: b, A : 255};
-        Unifill.calculate();
-		this.WordControl.m_oLogicDocument.changeShapeFill( Unifill );
-	}
-}
 asc_docs_api.prototype.ShapeApply = function(prop)
 {
     // нужно определить, картинка это или нет
@@ -2084,7 +2050,6 @@ asc_docs_api.prototype.ShapeApply = function(prop)
 
         if (null != _image)
         {
-            var doc = this.WordControl.m_oLogicDocument;
             this.WordControl.m_oLogicDocument.ShapeApply(prop);
             this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(image_url);
         }
@@ -2302,7 +2267,7 @@ asc_docs_api.prototype.put_LineEndSize = function(_size)
 
 asc_docs_api.prototype.put_TextColor2 = function(r, g, b)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextColor2);
 	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Color : { r : r, g : g, b: b}  } ) );
 }
 asc_docs_api.prototype.put_TextColor = function(color)
@@ -2310,22 +2275,13 @@ asc_docs_api.prototype.put_TextColor = function(color)
     var _unifill = new CUniFill();
     _unifill.fill = new CSolidFill();
     _unifill.fill.color = CorrectUniColor(color, _unifill.fill.color, 0);
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextColor);
     this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Unifill : _unifill } ) );
 }
-asc_docs_api.prototype.put_ParagraphShade = function(is_flag, r, g, b)
-{
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-	if (false === is_flag)
-		this.WordControl.m_oLogicDocument.Set_ParagraphShd( { Value : shd_Nil  }  );
-	else
-	{
-		this.WordControl.m_oLogicDocument.Set_ParagraphShd( { Value : shd_Clear, Color : { r : r, g : g, b: b} } );
-	}
-}
+
 asc_docs_api.prototype.put_PrIndent = function(value,levelValue)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutPrIndent);
 	this.WordControl.m_oLogicDocument.Set_ParagraphIndent( { Left : value, ChangeLevel: levelValue } );
 }
 asc_docs_api.prototype.IncreaseIndent = function()
@@ -2338,12 +2294,12 @@ asc_docs_api.prototype.DecreaseIndent = function()
 }
 asc_docs_api.prototype.put_PrIndentRight = function(value)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutPrIndentRight);
 	this.WordControl.m_oLogicDocument.Set_ParagraphIndent( { Right : value } );
 }
 asc_docs_api.prototype.put_PrFirstLineIndent = function(value)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutPrFirstLineIndent);
 	this.WordControl.m_oLogicDocument.Set_ParagraphIndent( { FirstLine : value } );
 }
 asc_docs_api.prototype.getFocusObject = function(){//возвратит тип элемента - параграф c_oAscTypeSelectElement.Paragraph, изображение c_oAscTypeSelectElement.Image, таблица c_oAscTypeSelectElement.Table, колонтитул c_oAscTypeSelectElement.Header.
@@ -2438,41 +2394,16 @@ asc_docs_api.prototype.SetDrawImagePlaceParagraph = function(element_id, props)
 }
 
 /*----------------------------------------------------------------*/
-/*functions for working with page*/
-asc_docs_api.prototype.change_PageOrient = function(isPortrait)
-{
-    this.WordControl.m_oDrawingDocument.m_bIsUpdateDocSize = true;
 
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    if (isPortrait)
-    {
-        this.WordControl.m_oLogicDocument.Set_DocumentOrientation(orientation_Portrait);
-        this.DocumentOrientation = orientation_Portrait ? true : false ;
-    }
-    else
-    {
-        this.WordControl.m_oLogicDocument.Set_DocumentOrientation(orientation_Landscape);
-        this.DocumentOrientation = orientation_Landscape ? true : false;
-    }
-	this.sync_PageOrientCallback(!editor.get_DocumentOrientation());
-}
 asc_docs_api.prototype.get_DocumentOrientation = function()
 {
 	return this.DocumentOrientation;
 }
-asc_docs_api.prototype.change_DocSize = function(width,height)
-{
-    this.WordControl.m_oDrawingDocument.m_bIsUpdateDocSize = true;
 
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    if (this.DocumentOrientation == orientation_Portrait)
-        this.WordControl.m_oLogicDocument.Set_DocumentPageSize(width, height);
-    else
-        this.WordControl.m_oLogicDocument.Set_DocumentPageSize(height, width);
-}
+
 asc_docs_api.prototype.put_AddPageBreak = function()
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_AddPageBreak);
 	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaNewLine( break_Page ) );
 }
 asc_docs_api.prototype.Update_ParaInd = function( Ind ){
@@ -2543,7 +2474,7 @@ asc_docs_api.prototype.addRowAbove = function(count)
     var doc = this.WordControl.m_oLogicDocument;
     if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
     {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_AddRowAbove);
         this.WordControl.m_oLogicDocument.Table_AddRow(true);
     }
 }
@@ -2552,7 +2483,7 @@ asc_docs_api.prototype.addRowBelow = function(count)
     var doc = this.WordControl.m_oLogicDocument;
     if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
     {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_AddRowBelow);
         this.WordControl.m_oLogicDocument.Table_AddRow(false);
     }
 }
@@ -2561,7 +2492,7 @@ asc_docs_api.prototype.addColumnLeft = function(count)
     var doc = this.WordControl.m_oLogicDocument;
     if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
     {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_AddColLeft);
         this.WordControl.m_oLogicDocument.Table_AddCol(true);
     }
 }
@@ -2570,7 +2501,7 @@ asc_docs_api.prototype.addColumnRight = function(count)
     var doc = this.WordControl.m_oLogicDocument;
     if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
     {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_AddColRight);
         this.WordControl.m_oLogicDocument.Table_AddCol(false);
     }
 }
@@ -2579,7 +2510,7 @@ asc_docs_api.prototype.remRow = function()
     var doc = this.WordControl.m_oLogicDocument;
     if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
     {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_RemoveRow);
         this.WordControl.m_oLogicDocument.Table_RemoveRow();
     }
 }
@@ -2588,7 +2519,7 @@ asc_docs_api.prototype.remColumn = function()
     var doc = this.WordControl.m_oLogicDocument;
     if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
     {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_RemoveCol);
         this.WordControl.m_oLogicDocument.Table_RemoveCol();
     }
 }
@@ -2597,7 +2528,7 @@ asc_docs_api.prototype.remTable = function()
     var doc = this.WordControl.m_oLogicDocument;
     if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
     {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_RemoveTable);
         this.WordControl.m_oLogicDocument.Table_RemoveTable();
     }
 }
@@ -2639,7 +2570,7 @@ asc_docs_api.prototype.MergeCells = function()
     var doc = this.WordControl.m_oLogicDocument;
     if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
     {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_MergeCells);
         this.WordControl.m_oLogicDocument.Table_MergeCells();
     }
 };
@@ -2648,7 +2579,7 @@ asc_docs_api.prototype.SplitCell = function(Cols, Rows)
     var doc = this.WordControl.m_oLogicDocument;
     if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
     {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_SplitCells);
         this.WordControl.m_oLogicDocument.Table_SplitCell(Cols, Rows);
     }
 };
@@ -2858,7 +2789,7 @@ asc_docs_api.prototype.tblApply = function(obj)
     var doc = this.WordControl.m_oLogicDocument;
     if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
     {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_TblApply);
         if(obj.CellBorders)
         {
             if(obj.CellBorders.Left && obj.CellBorders.Left.Color)
@@ -3030,7 +2961,6 @@ asc_docs_api.prototype.AddImageUrlAction = function(url){
             _w = Math.max(5, Math.min(_w, __w));
             _h = Math.max(5, Math.min((_w * __h / __w) >> 0));
         }
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
 
         var src = _image.src;
         if (this.isShapeImageChangeUrl)
@@ -3523,7 +3453,7 @@ asc_docs_api.prototype.asc_removeComment = function(Id)
 
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_MoveComment, Id ) )
     {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_RemoveComment);
         this.WordControl.m_oLogicDocument.Remove_Comment( Id, true );
     }
 }
@@ -3935,7 +3865,7 @@ asc_docs_api.prototype.asyncFontStartLoaded = function()
 asc_docs_api.prototype.asyncFontEndLoaded = function(fontinfo)
 {
     this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_EndFontLoad);
 	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { FontFamily : { Name : fontinfo.Name , Index : -1 } } ) );
 	// отжать заморозку меню
 }
@@ -3951,12 +3881,7 @@ asc_docs_api.prototype.asyncImageEndLoaded = function(_image)
 		this.asyncImageEndLoaded2(_image);
 	else
     {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-
-		if (_image.Type == 0)
-			this.WordControl.m_oLogicDocument.Add_FlowImage(50, 50, _image.src);
-		else
-			this.WordControl.m_oLogicDocument.Add_InlineImage(50, 50, _image.src);
+        this.WordControl.m_oLogicDocument.Add_FlowImage(50, 50, _image.src);
 	}
 }
 
@@ -4171,7 +4096,6 @@ asc_docs_api.prototype.AddShape = function(shapetype)
 }
 asc_docs_api.prototype.ChangeShapeType = function(shapetype)
 {
-    History.Create_NewPoint();
     this.WordControl.m_oLogicDocument.changeShapeType(shapetype);
 }
 asc_docs_api.prototype.AddText = function()
@@ -4190,7 +4114,6 @@ asc_docs_api.prototype.unGroupShapes = function()
 
 asc_docs_api.prototype.setVerticalAlign = function(align)
 {
-    History.Create_NewPoint();
     this.WordControl.m_oLogicDocument.setVerticalAlign(align);
 }
 
@@ -4662,7 +4585,7 @@ asc_docs_api.prototype.ChangeTheme = function(indexTheme)
     if (!this.isViewMode && this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Theme) === false)
     {
         CollaborativeEditing.m_bGlobalLock = true;
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_ChangeTheme);
         this.ThemeLoader.StartLoadTheme(indexTheme);
     }
 }
@@ -4843,7 +4766,7 @@ asc_docs_api.prototype.ApplySlideTiming = function(oTiming)
 {
     if(this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_SlideTiming) === false)
     {
-        History.Create_NewPoint();
+        History.Create_NewPoint(historydescription_Presentation_ApplyTiming);
         var _count = this.WordControl.m_oDrawingDocument.SlidesCount;
         var _cur = this.WordControl.m_oDrawingDocument.SlideCurrent;
         if (_cur < 0 || _cur >= _count)

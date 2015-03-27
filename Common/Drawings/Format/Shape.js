@@ -1260,11 +1260,11 @@ CShape.prototype =
             if(this.spPr && isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect))
             {
                 var rect = this.spPr.geometry.rect;
-                this.clipRect = {x: rect.l + _body_pr.lIns, y: rect.t + _body_pr.tIns, w: rect.r - rect.l - _body_pr.rIns, h: rect.b - rect.t - _body_pr.bIns};
+                this.clipRect = {x: -1, y: rect.t + _body_pr.tIns, w: this.extX + 2, h: rect.b - rect.t - _body_pr.bIns};
             }
             else
             {
-                this.clipRect = {x: _body_pr.lIns, y: _body_pr.tIns, w: this.extX - _body_pr.rIns, h: this.extY - _body_pr.bIns};
+                this.clipRect = {x: -1, y: _body_pr.tIns, w: this.extX + 2, h: this.extY - _body_pr.bIns};
             }
         }
         else {
@@ -1382,9 +1382,9 @@ CShape.prototype =
             var r_ins = typeof body_pr.rIns === "number" ? body_pr.rIns : 2.54;
             var b_ins = typeof body_pr.bIns === "number" ? body_pr.bIns : 1.27;
             this.clipRect = {
-                x: -l_ins,
+                x: -1,
                 y: -_vertical_shift - t_ins,
-                w: this.contentWidth + (r_ins + l_ins),
+                w: Math.max(this.extX, this.extY) + 2,
                 h: this.contentHeight + (b_ins + t_ins)
             };
         }
@@ -1492,7 +1492,7 @@ CShape.prototype =
         var _vertical_shift;
         var _text_rect_height = _b - _t;
         var _text_rect_width = _r - _l;
-        if (_body_pr.upright === false) {
+        if (!_body_pr.upright) {
             if (!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270)) {
                 if (/*_content_height < _text_rect_height*/true) {
                     switch (_body_pr.anchor) {
@@ -1616,10 +1616,10 @@ CShape.prototype =
             }
             if (this.spPr && isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect)) {
                 var rect = this.spPr.geometry.rect;
-                this.clipRect = { x: rect.l, y: rect.t, w: rect.r - rect.l, h: rect.b - rect.t };
+                this.clipRect = { x: -1, y: rect.t, w: this.extX + 2, h: rect.b - rect.t };
             }
             else {
-                this.clipRect = { x: 0, y: 0, w: this.extX, h: this.extY };
+                this.clipRect = { x: -1, y: 0, w: this.extX + 2, h: this.extY };
             }
         }
         else {
@@ -1738,9 +1738,9 @@ CShape.prototype =
             var r_ins = typeof body_pr.rIns === "number" ? body_pr.rIns : 2.54;
             var b_ins = typeof body_pr.bIns === "number" ? body_pr.bIns : 1.27;
             this.clipRect = {
-                x: -l_ins,
+                x: -1,
                 y: -_vertical_shift - t_ins,
-                w: this.contentWidth + (r_ins + l_ins),
+                w: Math.max(this.extX, this.extY) + 2,
                 h: this.contentHeight + (b_ins + t_ins)
             };
         }

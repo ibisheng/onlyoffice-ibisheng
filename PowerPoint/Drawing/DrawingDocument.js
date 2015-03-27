@@ -685,7 +685,7 @@ function CTableOutlineDr()
 
         if (!_table.Is_Inline())
         {
-            word_control.m_oLogicDocument.Create_NewHistoryPoint();
+            word_control.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_TableMoveFromRulers);
             switch (this.TrackTablePos)
             {
                 case 1:
@@ -736,7 +736,7 @@ function CTableOutlineDr()
             if (null != this.InlinePos)
             {
                 // inline move
-                word_control.m_oLogicDocument.Create_NewHistoryPoint();
+                word_control.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_TableMoveFromRulersInline);
                 _table.Move(this.InlinePos.X, this.InlinePos.Y, this.InlinePos.Page);
             }
         }
@@ -4659,7 +4659,7 @@ function CThumbnailsManager()
 					if(this.m_oWordControl.m_oLogicDocument.viewMode === false)
 					{
 						var _presentation = this.m_oWordControl.m_oLogicDocument;
-						History.Create_NewPoint();
+						History.Create_NewPoint(historydescription_Presentation_MoveSlidesToEnd);
 						var _selection_array = this.GetSelectedArray();
 						_presentation.moveSlides(_selection_array, _presentation.Slides.length);
 						_presentation.Recalculate();
@@ -4697,7 +4697,7 @@ function CThumbnailsManager()
 						}
 						if(can_move)
 						{
-							History.Create_NewPoint();
+							History.Create_NewPoint(historydescription_Presentation_MoveSlidesNextPos);
 							for(var i = first_index; i > -1; --i)
 							{
 								_presentation.moveSlides([_selected_array[i]], _selected_array[i] + 2);
@@ -4820,7 +4820,7 @@ function CThumbnailsManager()
 						{							
 							if (!window.USER_AGENT_SAFARI_MACOS)
 							{
-								this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint();
+								this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PasteOnThumbnails);
 
 								window.GlobalPasteFlag = true;
                                 editor.waitSave = true;
@@ -4832,7 +4832,7 @@ function CThumbnailsManager()
 							{
 								if (0 === window.GlobalPasteFlagCounter)
 								{
-									this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint();
+									this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PasteOnThumbnailsSafari);
 
 									SafariIntervalFocus();
 									window.GlobalPasteFlag = true;
@@ -4904,7 +4904,7 @@ function CThumbnailsManager()
 					if(this.m_oWordControl.m_oLogicDocument.viewMode === false)
 					{
 						var _presentation = this.m_oWordControl.m_oLogicDocument;
-						History.Create_NewPoint();
+						History.Create_NewPoint(historydescription_Presentation_MoveSlidesToStart);
 						var _selection_array = this.GetSelectedArray();
 						_presentation.moveSlides(_selection_array, 0);
 						_presentation.Recalculate();
@@ -4942,7 +4942,7 @@ function CThumbnailsManager()
 						}
 						if(can_move)
 						{
-							History.Create_NewPoint();
+							History.Create_NewPoint(historydescription_Presentation_MoveSlidesPrevPos);
 							for(var i = first_index; i > -1; --i)
 							{
 								_presentation.moveSlides([_selected_array[i]], _selected_array[i] - 1);
