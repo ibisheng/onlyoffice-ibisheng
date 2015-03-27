@@ -1549,7 +1549,7 @@ function DrawingObjects() {
                         if (bLock !== true)
                             return;
                         _this.controller.resetSelection();
-                        _this.controller.addImageFromParams(_image.src, pxToMm(coordsFrom.x), pxToMm(coordsFrom.y), pxToMm(coordsTo.x - coordsFrom.x), pxToMm(coordsTo.y - coordsFrom.y));
+                        _this.controller.addImageFromParams(_image.src, pxToMm(coordsFrom.x) + MOVE_DELTA, pxToMm(coordsFrom.y) + MOVE_DELTA, pxToMm(coordsTo.x - coordsFrom.x), pxToMm(coordsTo.y - coordsFrom.y));
                     });
                 }
 
