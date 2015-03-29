@@ -4743,7 +4743,10 @@ function CThumbnailsManager()
                 }
                 else
                 {
-                    this.CorrectShiftSelect(true, true);
+                    if(drDoc.SlideCurrent > 0)
+                    {
+                        this.CorrectShiftSelect(true, true);
+                    }
                 }
                 break;
             }
@@ -4761,7 +4764,10 @@ function CThumbnailsManager()
                 }
                 else
                 {
-                    this.CorrectShiftSelect(false, true);
+                    if(drDoc.SlideCurrent > 0)
+                    {
+                        this.CorrectShiftSelect(false, true);
+                    }
                 }
                 break;
             }
@@ -5019,6 +5025,11 @@ function CThumbnailsManager()
                     return false;
                 }
                 break;
+            }
+            case 122:
+            case 123:
+            {
+                return;
             }
 
 

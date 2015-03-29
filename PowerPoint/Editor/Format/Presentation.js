@@ -1836,28 +1836,67 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 35 ) // клавиша End
         {
-            if ( true === e.CtrlKey ) // Ctrl + End - переход в конец документа
+            if(this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.getTargetDocContent())
             {
-                this.Cursor_MoveToEndPos();
+                if ( true === e.CtrlKey ) // Ctrl + End - переход в конец документа
+                {
+                    this.Cursor_MoveToEndPos();
+                }
+                else // Переходим в конец строки
+                {
+                    this.Cursor_MoveEndOfLine( true === e.ShiftKey );
+                }
             }
-            else // Переходим в конец строки
+            else
             {
-                this.Cursor_MoveEndOfLine( true === e.ShiftKey );
+                if (!e.ShiftKey)
+                {
+                    if (this.CurPage !== (this.Slides.length - 1))
+                    {
+                        editor.WordControl.GoToPage(this.Slides.length - 1);
+                    }
+                }
+                else
+                {
+                    if(this.Slides.length > 0)
+                    {
+                        editor.WordControl.Thumbnails.CorrectShiftSelect(false, true);
+                    }
+                }
             }
 
             bRetValue = true;
         }
         else if ( e.KeyCode == 36 ) // клавиша Home
         {
-            if ( true === e.CtrlKey ) // Ctrl + Home - переход в начало документа
+            if(this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.getTargetDocContent())
             {
-                this.Cursor_MoveToStartPos();
+                if (true === e.CtrlKey) // Ctrl + Home - переход в начало документа
+                {
+                    this.Cursor_MoveToStartPos();
+                }
+                else // Переходим в начало строки
+                {
+                    this.Cursor_MoveStartOfLine(true === e.ShiftKey);
+                }
             }
-            else // Переходим в начало строки
+            else
             {
-                this.Cursor_MoveStartOfLine( true === e.ShiftKey );
+                if (!e.ShiftKey)
+                {
+                    if (this.Slides.length > 0)
+                    {
+                        editor.WordControl.GoToPage(0);
+                    }
+                }
+                else
+                {
+                    if(this.Slides.length > 0)
+                    {
+                        editor.WordControl.Thumbnails.CorrectShiftSelect(true, true);
+                    }
+                }
             }
-
             bRetValue = true;
         }
         else if ( e.KeyCode == 37 ) // Left Arrow
@@ -2003,6 +2042,11 @@ CPresentation.prototype =
                 //не возвращаем true чтобы не было preventDefault
             }
         }
+        else if ( e.KeyCode == 68 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + E - переключение прилегания параграфа между center и left
+        {
+            editor.DublicateSlide();
+            bRetValue = true;
+        }
         else if ( e.KeyCode == 69 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + E - переключение прилегания параграфа между center и left
         {
             if ( true !== e.AltKey ) // Ctrl + E - переключение прилегания параграфа между center и left
@@ -2096,10 +2140,24 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 77 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + M + ...
         {
-            if ( true === e.ShiftKey ) // Ctrl + Shift + M - уменьшаем левый отступ
-                editor.DecreaseIndent();
-            else // Ctrl + M - увеличиваем левый отступ
-                editor.IncreaseIndent();
+            if(this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.getTargetDocContent())
+            {
+                if ( true === e.ShiftKey ) // Ctrl + Shift + M - уменьшаем левый отступ
+                    editor.DecreaseIndent();
+                else // Ctrl + M - увеличиваем левый отступ
+                    editor.IncreaseIndent();
+            }
+            else
+            {
+                var _selected_thumbnails = editor.WordControl.Thumbnails.GetSelectedArray();
+                if(_selected_thumbnails.length > 0)
+                {
+                    var _last_selected_slide_num = _selected_thumbnails[_selected_thumbnails.length - 1];
+                    editor.WordControl.GoToPage(_last_selected_slide_num);
+                    editor.WordControl.m_oLogicDocument.addNextSlide();
+                }
+            }
+            bRetValue = true;
         }
         else if ( e.KeyCode == 80 && true === e.CtrlKey ) // Ctrl + P + ...
         {
