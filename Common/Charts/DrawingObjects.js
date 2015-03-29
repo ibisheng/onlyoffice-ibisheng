@@ -2427,37 +2427,6 @@ function DrawingObjects() {
         }
     };
 
-    _this.insertUngroupedObjects = function(idGroup, aGraphics) {
-
-        if ( idGroup && aGraphics.length ) {
-
-            var i, aSingleObjects = [];
-            for (i = 0; i < aGraphics.length; i++) {
-
-                var obj = _this.createDrawingObject();
-                obj.graphicObject = aGraphics[i];
-                aGraphics[i].setDrawingBase(obj);
-                obj.graphicObject.select(_this.controller);
-                obj.setGraphicObjectCoords();
-                aSingleObjects.push(obj);
-            }
-
-            for (i = 0; i < aObjects.length; i++) {
-
-                if ( idGroup == aObjects[i].graphicObject.Id ) {
-
-                    aObjects.splice(i, 1);
-
-                    for (var j = aSingleObjects.length - 1; j > -1; j--) {
-                        aObjects.splice(i, 0, aSingleObjects[j]);
-                    }
-                    _this.showDrawingObjects(true);
-                    break;
-                }
-            }
-        }
-    };
-
     _this.getDrawingBase = function(graphicId) {
         for (var i = 0; i < aObjects.length; i++) {
             if ( aObjects[i].graphicObject.Id == graphicId )

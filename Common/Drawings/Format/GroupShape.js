@@ -809,10 +809,10 @@ CGroupShape.prototype =
             global_MatrixTransformer.MultiplyAppend(this.transform, this.group.getTransformMatrix());
         }
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
-        if(this.drawingBase && !this.group)
-        {
-            this.drawingBase.setGraphicObjectCoords();
-        }
+        //if(this.drawingBase && !this.group)
+        //{
+        //    this.drawingBase.setGraphicObjectCoords();
+        //}
     },
 
     getTransformMatrix: function()

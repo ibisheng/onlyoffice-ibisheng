@@ -2126,10 +2126,10 @@ CShape.prototype =
         this.cachedImage = null;
         this.recalculateLocalTransform(this.transform);
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
-        if(this.drawingBase && !this.group)
-        {
-            this.drawingBase.setGraphicObjectCoords();
-        }
+        //if(this.drawingBase && !this.group)
+        //{
+        //    this.drawingBase.setGraphicObjectCoords();
+        //}
         this.localTransform = this.transform.CreateDublicate();
     },
 
