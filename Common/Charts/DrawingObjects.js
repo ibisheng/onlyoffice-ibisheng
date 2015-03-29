@@ -551,10 +551,6 @@ function DrawingObjects() {
 
         if ( _t.isGraphicObject() ) {
 
-            if ( (_t.graphicObject.x < 0) || (_t.graphicObject.y < 0) || (_t.graphicObject.extX < 0) || (_t.graphicObject.extY < 0) )
-                return;
-
-
             var rot = isRealNumber(_t.graphicObject.rot) ? _t.graphicObject.rot : 0;
             rot = normalizeRotate(rot);
 

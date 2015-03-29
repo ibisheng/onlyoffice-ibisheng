@@ -537,32 +537,32 @@ RotateState.prototype =
                         {
                             group.updateCoordinatesAfterInternalResize();
                         }
-                        //drawingObjects.recalculate();
                         if(!oThis.drawingObjects.drawingObjects || !oThis.drawingObjects.drawingObjects.cSld)
                         {
-                            var arr_x = [], arr_y = [], transform, min_x, min_y, drawing, arr_x2 = [], arr_y2 = [], min_x2, min_y2;
+                            var min_x, min_y, drawing, arr_x2 = [], arr_y2 = [], oTransform;
                             for(i = 0; i < oThis.drawingObjects.selectedObjects.length; ++i)
                             {
-                                arr_x.length = 0;
-                                arr_y.length = 0;
                                 drawing = oThis.drawingObjects.selectedObjects[i];
-                                drawing.recalculateTransform();
-                                transform = drawing.transform;
-                                arr_x.push(transform.TransformPointX(0, 0));
-                                arr_y.push(transform.TransformPointY(0, 0));
-                                arr_x.push(transform.TransformPointX(drawing.spPr.xfrm.extX, 0));
-                                arr_y.push(transform.TransformPointY(drawing.spPr.xfrm.extX, 0));
-                                arr_x.push(transform.TransformPointX(drawing.spPr.xfrm.extX, drawing.spPr.xfrm.extY));
-                                arr_y.push(transform.TransformPointY(drawing.spPr.xfrm.extX, drawing.spPr.xfrm.extY));
-                                arr_x.push(transform.TransformPointX(0, drawing.spPr.xfrm.extY));
-                                arr_y.push(transform.TransformPointY(0, drawing.spPr.xfrm.extY));
-
+                                var rot = isRealNumber(drawing.spPr.xfrm.rot) ? drawing.spPr.xfrm.rot : 0;
+                                rot = normalizeRotate(rot);
+                                arr_x2.push(drawing.spPr.xfrm.offX);
+                                arr_y2.push(drawing.spPr.xfrm.offY);
                                 arr_x2.push(drawing.spPr.xfrm.offX + drawing.spPr.xfrm.extX);
                                 arr_y2.push(drawing.spPr.xfrm.offY + drawing.spPr.xfrm.extY);
-
-                                min_x =  Math.min(Math.min.apply(Math, arr_x), drawing.spPr.xfrm.offX);
-                                min_y =  Math.min(Math.min.apply(Math, arr_y), drawing.spPr.xfrm.offY);
-
+                                if (checkNormalRotate(rot))
+                                {
+                                    min_x = drawing.spPr.xfrm.offX;
+                                    min_y = drawing.spPr.xfrm.offY;
+                                }
+                                else
+                                {
+                                    min_x = drawing.spPr.xfrm.offX + drawing.spPr.xfrm.extX/2 - drawing.spPr.xfrm.extY/2;
+                                    min_y = drawing.spPr.xfrm.offY + drawing.spPr.xfrm.extY/2 - drawing.spPr.xfrm.extX/2;
+                                    arr_x2.push(min_x);
+                                    arr_y2.push(min_y);
+                                    arr_x2.push(min_x + drawing.spPr.xfrm.extY);
+                                    arr_y2.push(min_y + drawing.spPr.xfrm.extX);
+                                }
                                 if(min_x < 0)
                                 {
                                     drawing.spPr.xfrm.setOffX(drawing.spPr.xfrm.offX - min_x);
@@ -572,6 +572,16 @@ RotateState.prototype =
                                     drawing.spPr.xfrm.setOffY(drawing.spPr.xfrm.offY - min_y);
                                 }
                                 drawing.checkDrawingBaseCoords();
+                                drawing.recalculateTransform();
+                                oTransform = drawing.transform;
+                                arr_x2.push(oTransform.TransformPointX(0, 0));
+                                arr_y2.push(oTransform.TransformPointY(0, 0));
+                                arr_x2.push(oTransform.TransformPointX(drawing.extX, 0));
+                                arr_y2.push(oTransform.TransformPointY(drawing.extX, 0));
+                                arr_x2.push(oTransform.TransformPointX(drawing.extX, drawing.extY));
+                                arr_y2.push(oTransform.TransformPointY(drawing.extX, drawing.extY));
+                                arr_x2.push(oTransform.TransformPointX(0, drawing.extY));
+                                arr_y2.push(oTransform.TransformPointY(0, drawing.extY));
                             }
                             oThis.drawingObjects.drawingObjects.checkGraphicObjectPosition(0, 0, Math.max.apply(Math, arr_x2), Math.max.apply(Math, arr_y2));
                         }
@@ -763,10 +773,6 @@ MoveState.prototype =
             }
         }
 
-        var tr_to_start_page_x;
-        var tr_to_start_page_y;
-
-        var t = CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.getDrawingDocument());
 
         var startPos = {x: this.startX, y: this.startY};
         var start_arr = this.drawingObjects.getAllObjectsOnPage(0);
@@ -775,12 +781,6 @@ MoveState.prototype =
         var snap_x = null, snap_y = null;
 
         var snapHorArray = [], snapVerArray = [];
-       // snapHorArray.push(X_Left_Field);
-       // snapHorArray.push(X_Right_Field);
-       // snapHorArray.push(Page_Width/2);
-       // snapVerArray.push(Y_Top_Field);
-       // snapVerArray.push(Y_Bottom_Field);
-       // snapVerArray.push(Page_Height/2);
         if(result_x === this.startX)
         {
             min_dx = 0;
