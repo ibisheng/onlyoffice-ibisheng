@@ -403,12 +403,18 @@ Paragraph.prototype =
 
     Get_Theme: function()
     {
-        return this.Parent.Get_Theme();
+        if (this.Parent)
+            return this.Parent.Get_Theme();
+
+        return null;
     },
 
     Get_ColorMap: function()
     {
-        return this.Parent.Get_ColorMap();
+        if (this.Parent)
+            return this.Parent.Get_ColorMap();
+
+        return null;
     },
 
     Reset : function (X,Y, XLimit, YLimit, PageNum)

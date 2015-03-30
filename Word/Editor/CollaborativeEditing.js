@@ -410,26 +410,60 @@ function CTableId()
                 // Long : SumIndex
                 // Long : DeletedIndex
 
-//                var FileCheckSum = Reader.GetLong();
-//                var FileSize     = Reader.GetLong();
-//                var Description  = Reader.GetLong();
-//                var ItemsCount   = Reader.GetLong();
-//                var PointIndex   = Reader.GetLong();
-//                var StartPoint   = Reader.GetLong();
-//                var LastPoint    = Reader.GetLong();
-//                var SumIndex     = Reader.GetLong();
-//                var DeletedIndex = Reader.GetLong();
+                var FileCheckSum = Reader.GetLong();
+                var FileSize     = Reader.GetLong();
+                var Description  = Reader.GetLong();
+                var ItemsCount   = Reader.GetLong();
+                var PointIndex   = Reader.GetLong();
+                var StartPoint   = Reader.GetLong();
+                var LastPoint    = Reader.GetLong();
+                var SumIndex     = Reader.GetLong();
+                var DeletedIndex = Reader.GetLong();
+
+//                // CollaborativeEditing LOG
+//                console.log("ItemsCount2  " + CollaborativeEditing.m_nErrorLog_PointChangesCount);
+//                if (CollaborativeEditing.m_nErrorLog_PointChangesCount !== CollaborativeEditing.m_nErrorLog_SavedPCC)
+//                    console.log("========================= BAD Changes Count in Point =============================");
+//
+//                if (CollaborativeEditing.m_nErrorLog_CurPointIndex + 1 !== PointIndex && 0 !== PointIndex)
+//                    console.log("========================= BAD Point index ========================================");
+//
+//                var bBadSumIndex = false;
+//                if (0 === PointIndex)
+//                {
+//                    CollaborativeEditing.m_nErrorLog_SumIndex = 0;
+//                }
+//                else
+//                {
+//                    CollaborativeEditing.m_nErrorLog_SumIndex += CollaborativeEditing.m_nErrorLog_SavedPCC + 1; // Потому что мы не учитываем данное изменение
+//                    if (PointIndex === StartPoint)
+//                    {
+//                        if (CollaborativeEditing.m_nErrorLog_SumIndex !== SumIndex)
+//                            bBadSumIndex = true;
+//
+//                        console.log("SumIndex2    " + CollaborativeEditing.m_nErrorLog_SumIndex);
+//                        CollaborativeEditing.m_nErrorLog_SumIndex = SumIndex;
+//                    }
+//                }
 //
 //                console.log("----------------------------");
 //                console.log("FileCheckSum " + FileCheckSum);
 //                console.log("FileSize     " + FileSize);
 //                console.log("Description  " + Description + " " + Get_HistoryPointStringDescription(Description));
-//                console.log("ItemsCount   " + ItemsCount);
 //                console.log("PointIndex   " + PointIndex);
 //                console.log("StartPoint   " + StartPoint);
 //                console.log("LastPoint    " + LastPoint);
+//                console.log("ItemsCount   " + ItemsCount);
 //                console.log("SumIndex     " + SumIndex);
 //                console.log("DeletedIndex " + (-10 === DeletedIndex ? null : DeletedIndex));
+//
+//                // -1 Чтобы не учитывалось данное изменение
+//                CollaborativeEditing.m_nErrorLog_SavedPCC          = ItemsCount;
+//                CollaborativeEditing.m_nErrorLog_PointChangesCount = -1;
+//                CollaborativeEditing.m_nErrorLog_CurPointIndex     = PointIndex;
+//
+//                if (bBadSumIndex)
+//                    console.log("========================= BAD Sum index ==========================================");
 
                 break;
             }
@@ -666,6 +700,12 @@ function CCollaborativeEditing()
 
     this.m_oMemory      = new CMemory(); // Глобальные класс для сохранения
 
+//    // CollaborativeEditing LOG
+//    this.m_nErrorLog_PointChangesCount = 0;
+//    this.m_nErrorLog_SavedPCC          = 0;
+//    this.m_nErrorLog_CurPointIndex     = -1;
+//    this.m_nErrorLog_SumIndex          = 0;
+
     var oThis = this;
 
     this.Is_SingleUser = function()
@@ -745,6 +785,8 @@ function CCollaborativeEditing()
         
             var Changes = this.m_aChanges[i];
             Changes.Apply_Data();
+//            // CollaborativeEditing LOG
+//            this.m_nErrorLog_PointChangesCount++;
         }
 		
 		this.m_aChanges = [];

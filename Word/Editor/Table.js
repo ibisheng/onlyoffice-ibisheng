@@ -7914,372 +7914,376 @@ CTable.prototype =
                     
                     return;
                 }
-                
-                if ( true === this.Selection.Data2.bCol )
+
+                var LogicDocument = (editor && true !== editor.isViewMode ? editor.WordControl.m_oLogicDocument : null);
+                if (LogicDocument && false === LogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : this, CheckType : changestype_Table_Properties }))
                 {
-                    // Найдем колонку в TableGrid, с которой мы работаем
-                    var Index  = this.Selection.Data2.Index;
-                    var CurRow = this.Selection.Data2.Pos.Row;
-                    var Row = this.Content[CurRow];
+                    History.Create_NewPoint(historydescription_Document_MoveTableBorder);
 
-                    var Col = 0;
-
-                    // границ на 1 больше, чем самих ячеек в строке
-                    if ( Index === this.Markup.Cols.length )
-                        Col = Row.Get_CellInfo( Index - 1 ).StartGridCol + Row.Get_Cell( Index - 1 ).Get_GridSpan();
-                    else
-                        Col = Row.Get_CellInfo( Index ).StartGridCol;
-
-                    var Dx = _X - (this.X + this.TableSumGrid[Col - 1]);
-
-                    // Строим новую секту для таблицы
-                    var Rows_info = [];
-
-                    // Если граница, которую мы двигаем не попадает в селект, тогда работает, как будто селекта и нет
-                    var bBorderInSelection = false;
-                    if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 && !this.bPresentation)
+                    if (true === this.Selection.Data2.bCol)
                     {
-                        var CellsFlag = [];
-                        for ( CurRow = 0; CurRow < this.Content.length; CurRow++ )
-                        {
-                            CellsFlag[CurRow] = [];
-                            Row = this.Content[CurRow];
-                            var CellsCount = Row.Get_CellsCount();
-                            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                            {
-                                CellsFlag[CurRow][CurCell] = 0;
-                            }
-                        }
+                        // Найдем колонку в TableGrid, с которой мы работаем
+                        var Index = this.Selection.Data2.Index;
+                        var CurRow = this.Selection.Data2.Pos.Row;
+                        var Row = this.Content[CurRow];
 
-                        var CurSelectedCell = this.Selection.Data[0];
-                        var CurSelectedIndex = 0;
-                        for ( CurRow = 0; CurRow < this.Content.length; CurRow++ )
+                        var Col = 0;
+
+                        // границ на 1 больше, чем самих ячеек в строке
+                        if (Index === this.Markup.Cols.length)
+                            Col = Row.Get_CellInfo(Index - 1).StartGridCol + Row.Get_Cell(Index - 1).Get_GridSpan();
+                        else
+                            Col = Row.Get_CellInfo(Index).StartGridCol;
+
+                        var Dx = _X - (this.X + this.TableSumGrid[Col - 1]);
+
+                        // Строим новую секту для таблицы
+                        var Rows_info = [];
+
+                        // Если граница, которую мы двигаем не попадает в селект, тогда работает, как будто селекта и нет
+                        var bBorderInSelection = false;
+                        if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 && !this.bPresentation)
                         {
-                            Row = this.Content[CurRow];
-                            var CellsCount = Row.Get_CellsCount();
-                            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
+                            var CellsFlag = [];
+                            for (CurRow = 0; CurRow < this.Content.length; CurRow++)
                             {
-                                if ( CurSelectedCell.Cell === CurCell && CurSelectedCell.Row === CurRow )
+                                CellsFlag[CurRow] = [];
+                                Row = this.Content[CurRow];
+                                var CellsCount = Row.Get_CellsCount();
+                                for (var CurCell = 0; CurCell < CellsCount; CurCell++)
                                 {
-                                    CellsFlag[CurRow][CurCell] = 1;
-
-                                    var StartGridCol = Row.Get_CellInfo(CurCell).StartGridCol;
-                                    var GridSpan     = Row.Get_Cell(CurCell).Get_GridSpan();
-                                    var VMergeCount = this.Internal_GetVertMergeCount( CurRow, StartGridCol, GridSpan );
-
-                                    if ( CurRow === this.Selection.Data2.Pos.Row && Col >= StartGridCol && Col <= StartGridCol + GridSpan )
-                                        bBorderInSelection = true;
-
-                                    for ( var TempIndex = 1; TempIndex < VMergeCount; TempIndex++ )
-                                    {
-                                        var TempCell = this.Internal_Get_Cell_ByStartGridCol( CurRow + TempIndex, StartGridCol );
-                                        if ( -1 != TempCell )
-                                        {
-                                            CellsFlag[CurRow + TempIndex][TempCell] = 1;
-
-                                            if ( CurRow + TempIndex === this.Selection.Data2.Pos.Row && Col >= StartGridCol && Col <= StartGridCol + GridSpan )
-                                                bBorderInSelection = true;
-                                        }
-                                    }
-
-                                    if ( CurSelectedIndex < this.Selection.Data.length - 1 )
-                                        CurSelectedCell = this.Selection.Data[++CurSelectedIndex];
-                                    else
-                                        CurSelectedCell = { Row : -1, Cell : -1 };
+                                    CellsFlag[CurRow][CurCell] = 0;
                                 }
                             }
+
+                            var CurSelectedCell = this.Selection.Data[0];
+                            var CurSelectedIndex = 0;
+                            for (CurRow = 0; CurRow < this.Content.length; CurRow++)
+                            {
+                                Row = this.Content[CurRow];
+                                var CellsCount = Row.Get_CellsCount();
+                                for (var CurCell = 0; CurCell < CellsCount; CurCell++)
+                                {
+                                    if (CurSelectedCell.Cell === CurCell && CurSelectedCell.Row === CurRow)
+                                    {
+                                        CellsFlag[CurRow][CurCell] = 1;
+
+                                        var StartGridCol = Row.Get_CellInfo(CurCell).StartGridCol;
+                                        var GridSpan = Row.Get_Cell(CurCell).Get_GridSpan();
+                                        var VMergeCount = this.Internal_GetVertMergeCount(CurRow, StartGridCol, GridSpan);
+
+                                        if (CurRow === this.Selection.Data2.Pos.Row && Col >= StartGridCol && Col <= StartGridCol + GridSpan)
+                                            bBorderInSelection = true;
+
+                                        for (var TempIndex = 1; TempIndex < VMergeCount; TempIndex++)
+                                        {
+                                            var TempCell = this.Internal_Get_Cell_ByStartGridCol(CurRow + TempIndex, StartGridCol);
+                                            if (-1 != TempCell)
+                                            {
+                                                CellsFlag[CurRow + TempIndex][TempCell] = 1;
+
+                                                if (CurRow + TempIndex === this.Selection.Data2.Pos.Row && Col >= StartGridCol && Col <= StartGridCol + GridSpan)
+                                                    bBorderInSelection = true;
+                                            }
+                                        }
+
+                                        if (CurSelectedIndex < this.Selection.Data.length - 1)
+                                            CurSelectedCell = this.Selection.Data[++CurSelectedIndex];
+                                        else
+                                            CurSelectedCell = { Row : -1, Cell : -1 };
+                                    }
+                                }
+                            }
+
                         }
 
-                    }
-
-                    var OldTableInd = TablePr.TableInd;
-                    var NewTableInd = TablePr.TableInd;
-                    if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && true === bBorderInSelection && !this.bPresentation )
-                    {
-                        var BeforeFlag   = false;
-                        var BeforeSpace2 = null;
-                        if ( 0 === Col )
+                        var OldTableInd = TablePr.TableInd;
+                        var NewTableInd = TablePr.TableInd;
+                        if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && true === bBorderInSelection && !this.bPresentation)
                         {
-                            BeforeSpace2 = _X - this.X;
-
-                            if ( BeforeSpace2 < 0 )
+                            var BeforeFlag = false;
+                            var BeforeSpace2 = null;
+                            if (0 === Col)
                             {
-                                this.Set_TableW( tblwidth_Auto, 0 );
-                                this.X += BeforeSpace2;
+                                BeforeSpace2 = _X - this.X;
 
-                                if ( true === this.Is_Inline() )
-                                    NewTableInd = NewTableInd + BeforeSpace2;
+                                if (BeforeSpace2 < 0)
+                                {
+                                    this.Set_TableW(tblwidth_Auto, 0);
+                                    this.X += BeforeSpace2;
+
+                                    if (true === this.Is_Inline())
+                                        NewTableInd = NewTableInd + BeforeSpace2;
+                                    else
+                                        this.Internal_UpdateFlowPosition(this.X, this.Y);
+                                }
+                            }
+
+                            var BeforeSpace = null;
+                            if (0 === Index && 0 != Col && _X < this.X)
+                            {
+                                BeforeSpace = this.X - _X;
+                                this.X -= BeforeSpace;
+                                this.Set_TableW(tblwidth_Auto, 0);
+
+                                if (true === this.Is_Inline())
+                                    NewTableInd = NewTableInd - BeforeSpace;
                                 else
-                                    this.Internal_UpdateFlowPosition( this.X, this.Y );
+                                    this.Internal_UpdateFlowPosition(this.X, this.Y);
+                            }
+
+                            if (Index === this.Markup.Cols.length)
+                                this.Set_TableW(tblwidth_Auto, 0);
+
+                            for (CurRow = 0; CurRow < this.Content.length; CurRow++)
+                            {
+                                Rows_info[CurRow] = [];
+                                Row = this.Content[CurRow];
+                                var Before_Info = Row.Get_Before();
+
+                                var WBefore = 0;
+
+                                if (null === BeforeSpace2)
+                                {
+                                    if (Before_Info.GridBefore > 0 && Col === Before_Info.GridBefore && 1 === CellsFlag[CurRow][0])
+                                        WBefore = this.TableSumGrid[Before_Info.GridBefore - 1] + Dx;
+                                    else
+                                    {
+                                        if (null != BeforeSpace)
+                                            WBefore = this.TableSumGrid[Before_Info.GridBefore - 1] + BeforeSpace;
+                                        else
+                                            WBefore = this.TableSumGrid[Before_Info.GridBefore - 1];
+                                    }
+                                }
+                                else
+                                {
+                                    if (BeforeSpace2 > 0)
+                                    {
+                                        if (0 === Before_Info.GridBefore && 1 === CellsFlag[CurRow][0])
+                                            WBefore = BeforeSpace2;
+                                        else if (0 != Before_Info.GridBefore)
+                                            WBefore = this.TableSumGrid[Before_Info.GridBefore - 1];
+                                    }
+                                    else
+                                    {
+                                        if (0 === Before_Info.GridBefore && 1 != CellsFlag[CurRow][0])
+                                            WBefore = -BeforeSpace2;
+                                        else if (0 != Before_Info.GridBefore)
+                                            WBefore = -BeforeSpace2 + this.TableSumGrid[Before_Info.GridBefore - 1];
+                                    }
+                                }
+
+                                if (WBefore > 0.001)
+                                    Rows_info[CurRow].push({ W : WBefore, Type : -1, GridSpan : 1 });
+
+
+                                var CellsCount = Row.Get_CellsCount();
+                                var TempDx = Dx;
+                                for (var CurCell = 0; CurCell < CellsCount; CurCell++)
+                                {
+                                    var Cell = Row.Get_Cell(CurCell);
+                                    var CellMargins = Cell.Get_Margins();
+                                    var Cur_Grid_start = Row.Get_CellInfo(CurCell).StartGridCol;
+                                    var Cur_Grid_end = Cur_Grid_start + Cell.Get_GridSpan() - 1;
+
+                                    var W = 0;
+                                    if (Cur_Grid_end + 1 === Col && ( 1 === CellsFlag[CurRow][CurCell] || ( CurCell + 1 < CellsCount && 1 === CellsFlag[CurRow][CurCell + 1] ) ))
+                                        W = this.TableSumGrid[Cur_Grid_end] - this.TableSumGrid[Cur_Grid_start - 1] + Dx;
+                                    else if (Cur_Grid_start === Col && ( 1 === CellsFlag[CurRow][CurCell] || ( CurCell > 0 && 1 === CellsFlag[CurRow][CurCell - 1] ) ))
+                                        W = this.TableSumGrid[Cur_Grid_end] - this.TableSumGrid[Cur_Grid_start - 1] - TempDx;
+                                    else
+                                        W = this.TableSumGrid[Cur_Grid_end] - this.TableSumGrid[Cur_Grid_start - 1];
+
+                                    W = Math.max(1, Math.max(W, CellMargins.Left.W + CellMargins.Right.W));
+                                    if (Cur_Grid_end + 1 === Col && ( 1 === CellsFlag[CurRow][CurCell] || ( CurCell + 1 < CellsCount && 1 === CellsFlag[CurRow][CurCell + 1] ) ))
+                                        TempDx = W - (this.TableSumGrid[Cur_Grid_end] - this.TableSumGrid[Cur_Grid_start - 1]);
+
+                                    Rows_info[CurRow].push({ W : W, Type : 0, GridSpan : 1 });
+                                }
+                            }
+
+                            // Возможно, что во всех рядах RowsInfo в начале есть запись BeforeGrid
+                            var MinBefore = 0;
+                            for (CurRow = 0; CurRow < this.Content.length; CurRow++)
+                            {
+                                if (-1 != Rows_info[CurRow][0].Type)
+                                {
+                                    MinBefore = 0;
+                                    break;
+                                }
+
+                                if (0 === MinBefore || MinBefore > Rows_info[CurRow][0].W)
+                                    MinBefore = Rows_info[CurRow][0].W;
+                            }
+
+                            if (0 != MinBefore)
+                            {
+                                for (CurRow = 0; CurRow < this.Content.length; CurRow++)
+                                {
+                                    if (Math.abs(MinBefore - Rows_info[CurRow][0].W) < 0.001)
+                                        Rows_info[CurRow].splice(0, 1);
+                                    else // if ( MinBefore < Rows_info[CurRow][0].W )
+                                        Rows_info[CurRow][0].W -= MinBefore;
+                                }
+
+                                this.X += MinBefore;
+                                if (true === this.Is_Inline())
+                                    NewTableInd = NewTableInd + MinBefore;
+                                else
+                                    this.Internal_UpdateFlowPosition(this.X, this.Y);
                             }
                         }
-
-                        var BeforeSpace = null;
-                        if ( 0 === Index && 0 != Col && _X < this.X )
+                        else
                         {
-                            BeforeSpace = this.X - _X;
-                            this.X -= BeforeSpace;
-                            this.Set_TableW( tblwidth_Auto, 0 );
-
-                            if ( true === this.Is_Inline() )
-                                NewTableInd = NewTableInd - BeforeSpace;
-                            else
-                                this.Internal_UpdateFlowPosition( this.X, this.Y );
-                        }
-
-                        if ( Index === this.Markup.Cols.length )
-                            this.Set_TableW( tblwidth_Auto, 0 );
-
-                        for ( CurRow = 0; CurRow < this.Content.length; CurRow++ )
-                        {
-                            Rows_info[CurRow]   = [];
-                            Row = this.Content[CurRow];
-                            var Before_Info = Row.Get_Before();
-
-                            var WBefore = 0;
-
-                            if ( null === BeforeSpace2 )
+                            var BeforeFlag = false;
+                            var BeforeSpace2 = null;
+                            if (0 === Col)
                             {
-                                if ( Before_Info.GridBefore > 0 && Col === Before_Info.GridBefore && 1 === CellsFlag[CurRow][0] )
+                                BeforeSpace2 = this.X - _X;
+
+                                if (-BeforeSpace2 > this.TableSumGrid[0])
+                                {
+                                    BeforeFlag = true;
+                                    this.X += this.TableSumGrid[0];
+                                }
+                                else
+                                    this.X += Dx;
+
+                                this.Set_TableW(tblwidth_Auto, 0);
+
+                                if (true === this.Is_Inline())
+                                {
+                                    if (-BeforeSpace2 > this.TableSumGrid[0])
+                                        NewTableInd = NewTableInd + this.TableSumGrid[0];
+                                    else
+                                        NewTableInd = NewTableInd + Dx;
+                                }
+                                else
+                                    this.Internal_UpdateFlowPosition(this.X, this.Y);
+                            }
+
+                            if (Index === this.Markup.Cols.length)
+                                this.Set_TableW(tblwidth_Auto, 0);
+
+                            var BeforeSpace = null;
+                            if (0 === Index && 0 != Col && _X < this.X)
+                            {
+                                BeforeSpace = this.X - _X;
+                                this.X -= BeforeSpace;
+                                if (true === this.Is_Inline())
+                                    NewTableInd = NewTableInd - BeforeSpace;
+                                else
+                                    this.Internal_UpdateFlowPosition(this.X, this.Y);
+                            }
+
+                            for (CurRow = 0; CurRow < this.Content.length; CurRow++)
+                            {
+                                Rows_info[CurRow] = [];
+                                Row = this.Content[CurRow];
+                                var Before_Info = Row.Get_Before();
+
+                                var WBefore = 0;
+
+                                if (Before_Info.GridBefore > 0 && Col === Before_Info.GridBefore)
                                     WBefore = this.TableSumGrid[Before_Info.GridBefore - 1] + Dx;
                                 else
                                 {
-                                    if ( null != BeforeSpace )
+                                    if (null != BeforeSpace)
                                         WBefore = this.TableSumGrid[Before_Info.GridBefore - 1] + BeforeSpace;
                                     else
                                         WBefore = this.TableSumGrid[Before_Info.GridBefore - 1];
-                                }
-                            }
-                            else
-                            {
-                                if ( BeforeSpace2 > 0 )
-                                {
-                                    if ( 0 === Before_Info.GridBefore && 1 === CellsFlag[CurRow][0] )
-                                        WBefore = BeforeSpace2;
-                                    else if ( 0 != Before_Info.GridBefore )
-                                        WBefore = this.TableSumGrid[Before_Info.GridBefore - 1];
-                                }
-                                else
-                                {
-                                    if ( 0 === Before_Info.GridBefore && 1 != CellsFlag[CurRow][0] )
-                                        WBefore = -BeforeSpace2;
-                                    else if ( 0 != Before_Info.GridBefore )
-                                        WBefore = -BeforeSpace2 + this.TableSumGrid[Before_Info.GridBefore - 1];
-                                }
-                            }
 
-                            if ( WBefore > 0.001 )
-                                Rows_info[CurRow].push( { W : WBefore, Type : -1, GridSpan : 1 } );
-
-
-                            var CellsCount = Row.Get_CellsCount();
-                            var TempDx = Dx;
-                            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                            {
-                                var Cell = Row.Get_Cell( CurCell );
-                                var CellMargins = Cell.Get_Margins();
-                                var Cur_Grid_start = Row.Get_CellInfo( CurCell ).StartGridCol;
-                                var Cur_Grid_end   = Cur_Grid_start + Cell.Get_GridSpan() - 1;
-
-                                var W = 0;
-                                if ( Cur_Grid_end + 1 === Col && ( 1 === CellsFlag[CurRow][CurCell] || ( CurCell + 1 < CellsCount && 1 === CellsFlag[CurRow][CurCell + 1] ) ) )
-                                    W = this.TableSumGrid[Cur_Grid_end] - this.TableSumGrid[Cur_Grid_start - 1] + Dx;
-                                else if ( Cur_Grid_start === Col && ( 1 === CellsFlag[CurRow][CurCell] || ( CurCell > 0 && 1 === CellsFlag[CurRow][CurCell - 1] ) ) )
-                                    W = this.TableSumGrid[Cur_Grid_end] - this.TableSumGrid[Cur_Grid_start - 1] - TempDx;
-                                else
-                                    W = this.TableSumGrid[Cur_Grid_end] - this.TableSumGrid[Cur_Grid_start - 1];
-
-                                W = Math.max( 1, Math.max( W, CellMargins.Left.W + CellMargins.Right.W ) );
-                                if ( Cur_Grid_end + 1 === Col && ( 1 === CellsFlag[CurRow][CurCell] || ( CurCell + 1 < CellsCount && 1 === CellsFlag[CurRow][CurCell + 1] ) ) )
-                                    TempDx = W - (this.TableSumGrid[Cur_Grid_end] - this.TableSumGrid[Cur_Grid_start - 1]);
-
-                                Rows_info[CurRow].push( { W : W, Type : 0, GridSpan : 1 } );
-                            }
-                        }
-
-                        // Возможно, что во всех рядах RowsInfo в начале есть запись BeforeGrid
-                        var MinBefore = 0;
-                        for ( CurRow = 0; CurRow < this.Content.length; CurRow++ )
-                        {
-                            if ( -1 != Rows_info[CurRow][0].Type )
-                            {
-                                MinBefore = 0;
-                                break;
-                            }
-
-                            if ( 0 === MinBefore || MinBefore > Rows_info[CurRow][0].W )
-                                MinBefore = Rows_info[CurRow][0].W;
-                        }
-
-                        if ( 0 != MinBefore )
-                        {
-                            for ( CurRow = 0; CurRow < this.Content.length; CurRow++ )
-                            {
-                                if ( Math.abs( MinBefore - Rows_info[CurRow][0].W ) < 0.001 )
-                                    Rows_info[CurRow].splice( 0, 1 );
-                                else // if ( MinBefore < Rows_info[CurRow][0].W )
-                                    Rows_info[CurRow][0].W -= MinBefore;
-                            }
-
-                            this.X += MinBefore;
-                            if ( true === this.Is_Inline() )
-                                NewTableInd = NewTableInd + MinBefore;
-                            else
-                                this.Internal_UpdateFlowPosition( this.X, this.Y );
-                        }
-                    }
-                    else
-                    {
-                        var BeforeFlag   = false;
-                        var BeforeSpace2 = null;
-                        if ( 0 === Col )
-                        {
-                            BeforeSpace2 = this.X - _X;
-
-                            if ( -BeforeSpace2 > this.TableSumGrid[0] )
-                            {
-                                BeforeFlag = true;
-                                this.X += this.TableSumGrid[0];
-                            }
-                            else
-                                this.X += Dx;
-
-                            this.Set_TableW( tblwidth_Auto, 0 );
-
-                            if ( true === this.Is_Inline() )
-                            {
-                                if ( -BeforeSpace2 > this.TableSumGrid[0] )
-                                    NewTableInd = NewTableInd + this.TableSumGrid[0];
-                                else
-                                    NewTableInd = NewTableInd + Dx;
-                            }
-                            else
-                                this.Internal_UpdateFlowPosition( this.X, this.Y );
-                        }
-
-                        if ( Index === this.Markup.Cols.length )
-                            this.Set_TableW( tblwidth_Auto, 0 );
-
-                        var BeforeSpace = null;
-                        if ( 0 === Index && 0 != Col && _X < this.X )
-                        {
-                            BeforeSpace = this.X - _X;
-                            this.X -= BeforeSpace;
-                            if ( true === this.Is_Inline() )
-                                NewTableInd = NewTableInd - BeforeSpace;
-                            else
-                                this.Internal_UpdateFlowPosition( this.X, this.Y );
-                        }
-
-                        for ( CurRow = 0; CurRow < this.Content.length; CurRow++ )
-                        {
-                            Rows_info[CurRow]   = [];
-                            Row = this.Content[CurRow];
-                            var Before_Info = Row.Get_Before();
-
-                            var WBefore = 0;
-
-                            if ( Before_Info.GridBefore > 0 && Col === Before_Info.GridBefore )
-                                WBefore = this.TableSumGrid[Before_Info.GridBefore - 1] + Dx;
-                            else
-                            {
-                                if ( null != BeforeSpace )
-                                    WBefore = this.TableSumGrid[Before_Info.GridBefore - 1] + BeforeSpace;
-                                else
-                                    WBefore = this.TableSumGrid[Before_Info.GridBefore - 1];
-
-                                if ( null != BeforeSpace2 )
-                                {
-                                    if ( Before_Info.GridBefore > 0 )
+                                    if (null != BeforeSpace2)
                                     {
-                                        if ( true === BeforeFlag )
-                                            WBefore = this.TableSumGrid[Before_Info.GridBefore - 1] - this.TableSumGrid[0];
-                                        else
-                                            WBefore = this.TableSumGrid[Before_Info.GridBefore - 1] + BeforeSpace2;
+                                        if (Before_Info.GridBefore > 0)
+                                        {
+                                            if (true === BeforeFlag)
+                                                WBefore = this.TableSumGrid[Before_Info.GridBefore - 1] - this.TableSumGrid[0];
+                                            else
+                                                WBefore = this.TableSumGrid[Before_Info.GridBefore - 1] + BeforeSpace2;
 
+                                        }
+                                        else if (0 === Before_Info.GridBefore && true === BeforeFlag)
+                                            WBefore = ( -BeforeSpace2 ) - this.TableSumGrid[0];
                                     }
-                                    else if ( 0 === Before_Info.GridBefore && true === BeforeFlag )
-                                        WBefore = ( -BeforeSpace2 ) - this.TableSumGrid[0];
+                                }
+
+                                if (WBefore > 0.001)
+                                    Rows_info[CurRow].push({ W : WBefore, Type : -1, GridSpan : 1 });
+
+                                var CellsCount = Row.Get_CellsCount();
+                                var TempDx = Dx;
+                                for (var CurCell = 0; CurCell < CellsCount; CurCell++)
+                                {
+                                    var Cell = Row.Get_Cell(CurCell);
+                                    var CellMargins = Cell.Get_Margins();
+                                    var Cur_Grid_start = Row.Get_CellInfo(CurCell).StartGridCol;
+                                    var Cur_Grid_end = Cur_Grid_start + Cell.Get_GridSpan() - 1;
+
+                                    var W = 0;
+                                    if (Cur_Grid_end + 1 === Col)
+                                        W = this.TableSumGrid[Cur_Grid_end] - this.TableSumGrid[Cur_Grid_start - 1] + Dx;
+                                    else if (Cur_Grid_start === Col)
+                                        W = this.TableSumGrid[Cur_Grid_end] - this.TableSumGrid[Cur_Grid_start - 1] - TempDx;
+                                    else
+                                        W = this.TableSumGrid[Cur_Grid_end] - this.TableSumGrid[Cur_Grid_start - 1];
+
+                                    W = Math.max(1, Math.max(W, CellMargins.Left.W + CellMargins.Right.W));
+                                    if (Cur_Grid_end + 1 === Col)
+                                        TempDx = W - (this.TableSumGrid[Cur_Grid_end] - this.TableSumGrid[Cur_Grid_start - 1]);
+
+                                    Rows_info[CurRow].push({ W : W, Type : 0, GridSpan : 1 });
                                 }
                             }
-
-                            if ( WBefore > 0.001 )
-                                Rows_info[CurRow].push( { W : WBefore, Type : -1, GridSpan : 1 } );
-
-                            var CellsCount = Row.Get_CellsCount();
-                            var TempDx = Dx;
-                            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                            {
-                                var Cell = Row.Get_Cell( CurCell );
-                                var CellMargins = Cell.Get_Margins();
-                                var Cur_Grid_start = Row.Get_CellInfo( CurCell ).StartGridCol;
-                                var Cur_Grid_end   = Cur_Grid_start + Cell.Get_GridSpan() - 1;
-
-                                var W = 0;
-                                if ( Cur_Grid_end + 1 === Col )
-                                    W = this.TableSumGrid[Cur_Grid_end] - this.TableSumGrid[Cur_Grid_start - 1] + Dx;
-                                else if ( Cur_Grid_start === Col )
-                                    W = this.TableSumGrid[Cur_Grid_end] - this.TableSumGrid[Cur_Grid_start - 1] - TempDx;
-                                else
-                                    W = this.TableSumGrid[Cur_Grid_end] - this.TableSumGrid[Cur_Grid_start - 1];
-
-                                W = Math.max( 1, Math.max( W, CellMargins.Left.W + CellMargins.Right.W ) );
-                                if ( Cur_Grid_end + 1 === Col )
-                                    TempDx = W - (this.TableSumGrid[Cur_Grid_end] - this.TableSumGrid[Cur_Grid_start - 1]);
-
-                                Rows_info[CurRow].push( { W : W, Type : 0, GridSpan : 1 } );
-                            }
                         }
-                    }
 
-                    if ( Math.abs(NewTableInd - OldTableInd) > 0.001 )
-                        this.Set_TableInd( NewTableInd );
+                        if (Math.abs(NewTableInd - OldTableInd) > 0.001)
+                            this.Set_TableInd(NewTableInd);
 
-                    if ( tbllayout_AutoFit === this.Get_CompiledPr(false).TablePr.TableLayout )
-                        this.Set_TableLayout(tbllayout_Fixed);
+                        if (tbllayout_AutoFit === this.Get_CompiledPr(false).TablePr.TableLayout)
+                            this.Set_TableLayout(tbllayout_Fixed);
 
-                    this.Internal_CreateNewGrid( Rows_info );
-                    this.Internal_RecalculateGrid();
-                }
-                else
-                {
-                    var RowIndex = this.Pages[this.Selection.Data2.PageNum].FirstRow + this.Selection.Data2.Index;
-                    if ( 0 === RowIndex )
-                    {
-                        if ( true === this.Is_Inline() )
-                        {
-                            // Ничего не делаем
-                        }
-                        else
-                        {
-                            var Dy = _Y - this.Markup.Rows[0].Y;
-                            this.Y += Dy;
-                            this.Internal_UpdateFlowPosition( this.X, this.Y );
-
-                            //var NewH = this.Markup.Rows[0].H + Dy;
-                            //this.Content[0].Set_Height( NewH, heightrule_AtLeast );
-                        }
+                        this.Internal_CreateNewGrid(Rows_info);
+                        this.Internal_RecalculateGrid();
                     }
                     else
                     {
-                        if ( this.Selection.Data2.PageNum > 0 && 0 === this.Selection.Data2.Index )
+                        var RowIndex = this.Pages[this.Selection.Data2.PageNum].FirstRow + this.Selection.Data2.Index;
+                        if (0 === RowIndex)
                         {
-                            // Ничего не делаем
+                            if (true === this.Is_Inline())
+                            {
+                                // Ничего не делаем
+                            }
+                            else
+                            {
+                                var Dy = _Y - this.Markup.Rows[0].Y;
+                                this.Y += Dy;
+                                this.Internal_UpdateFlowPosition(this.X, this.Y);
+
+                                //var NewH = this.Markup.Rows[0].H + Dy;
+                                //this.Content[0].Set_Height( NewH, heightrule_AtLeast );
+                            }
                         }
                         else
                         {
-                            var _Y_old = this.Markup.Rows[this.Selection.Data2.Index - 1].Y + this.Markup.Rows[this.Selection.Data2.Index - 1].H;
-                            var Dy = _Y - _Y_old;
-                            var NewH = this.Markup.Rows[this.Selection.Data2.Index - 1].H + Dy;
-                            this.Content[RowIndex - 1].Set_Height( NewH, heightrule_AtLeast );
+                            if (this.Selection.Data2.PageNum > 0 && 0 === this.Selection.Data2.Index)
+                            {
+                                // Ничего не делаем
+                            }
+                            else
+                            {
+                                var _Y_old = this.Markup.Rows[this.Selection.Data2.Index - 1].Y + this.Markup.Rows[this.Selection.Data2.Index - 1].H;
+                                var Dy = _Y - _Y_old;
+                                var NewH = this.Markup.Rows[this.Selection.Data2.Index - 1].H + Dy;
+                                this.Content[RowIndex - 1].Set_Height(NewH, heightrule_AtLeast);
+                            }
                         }
                     }
+
+                    this.Internal_Recalculate_1();
+                    this.Internal_OnContentRecalculate(true, 0, this.Index);
                 }
-
-
-                this.Internal_Recalculate_1();
-
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
 
                 this.Selection.Type2 = table_Selection_Common;
                 this.Selection.Data2 = null;

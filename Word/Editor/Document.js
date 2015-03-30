@@ -9291,10 +9291,10 @@ CDocument.prototype =
 
         if ( e.KeyCode == 8 && false === editor.isViewMode ) // BackSpace
         {
-            if ( false === this.Document_Is_SelectionLocked(changestype_Remove) )
+            if (false === this.Document_Is_SelectionLocked(changestype_Remove))
             {
                 this.Create_NewHistoryPoint(historydescription_Document_BackSpaceButton);
-                this.Remove( -1, true );
+                this.Remove(-1, true);
             }
             bRetValue = true;
         }
@@ -10325,16 +10325,6 @@ CDocument.prototype =
         // Если мы только что расширяли документ двойным щелчком, то отменяем это действие
         if ( true === this.History.Is_ExtendDocumentToPos() )
             this.Document_Undo();
-
-        // Если мы двигаем границу таблицы, тогда создаем новую точку для отката.
-        var Table = this.Is_TableBorder( X, Y, PageIndex );
-        if ( null != Table )
-        {
-            if ( true === editor.isViewMode || true === this.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : Table, CheckType : changestype_Table_Properties } ) )
-                return;
-
-            this.Create_NewHistoryPoint(historydescription_Document_MoveTableBorder);
-        }
 
         var OldCurPage = this.CurPage;
         this.CurPage = PageIndex;
@@ -14550,6 +14540,10 @@ CDocument.prototype.private_ProcessTemplateReplacement = function(TemplateReplac
 CDocument.prototype.Get_EditingType = function()
 {
     return this.EditingType;
+};
+CDocument.prototype.Set_EditingType = function(EditingType)
+{
+    this.EditingType = EditingType;
 };
 CDocument.prototype.Start_SilentMode = function()
 {
