@@ -2311,7 +2311,7 @@ CGraphicObjects.prototype =
                                 cur_group.spPr.xfrm.setOffX(0);
                                 cur_group.spPr.xfrm.setOffY(0);
 
-                                para_drawing.Set_XY(new_x, new_y, nearest_pos, cur_group.selectStartPage, false);//X, Y, Paragraph, PageNum, bResetAlign
+                                para_drawing.Set_XY(new_x, new_y, cur_group.parent.Get_ParentParagraph(), cur_group.selectStartPage, false);//X, Y, Paragraph, PageNum, bResetAlign
                                 this.document.Recalculate();
                                 break;
                             }
