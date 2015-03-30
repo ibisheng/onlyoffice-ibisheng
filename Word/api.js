@@ -2169,7 +2169,7 @@ asc_docs_api.prototype.asc_Print = function()
 				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);}, rData);
 		}
 		else
-			_downloadAs(this, c_oAscFileType.PDF, function(incomeObject){
+			_downloadAs(this, null, c_oAscFileType.PDF, function(incomeObject){
 				if(null != incomeObject && "save" == incomeObject["type"])
 					editor.processSavedFile(incomeObject["data"], false);
 				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);}, true);
@@ -2281,11 +2281,25 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile) {//передаем �
 	var actionType = this.mailMergeFileData ? c_oAscAsyncAction.MailMergeLoadFile : c_oAscAsyncAction.DownloadAs;
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 	var t = this;
-	_downloadAs(this, typeFile, function (incomeObject) {
+	_downloadAs(this, null, typeFile, function (incomeObject) {
 		if (null != incomeObject && "save" == incomeObject["type"])
 			t.processSavedFile(incomeObject["data"], false);
 		t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 	}, true);
+};
+asc_docs_api.prototype.asc_DownloadAsMailMerge = function(typeFile, StartIndex, EndIndex) {
+	var oDocumentMailMerge = this.WordControl.m_oLogicDocument.Get_MailMergedDocument(StartIndex, EndIndex);
+	if(null != oDocumentMailMerge){
+		var actionType = c_oAscAsyncAction.DownloadAs;
+		this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+		var t = this;
+		_downloadAs(this, oDocumentMailMerge, typeFile, function (incomeObject) {
+			if (null != incomeObject && "save" == incomeObject["type"])
+				t.processSavedFile(incomeObject["data"], false);
+			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+		}, true);
+	}
+	return null != oDocumentMailMerge ? true : false;
 };
 asc_docs_api.prototype.Resize = function(){
 	if (false === this.bInit_word_control)
@@ -6846,7 +6860,7 @@ function sendCommand(editor, fCallback, rdata){
                 break;
 				case "savepart":
 					var outputData = JSON.parse(incomeObject["data"]);
-                    _downloadAs(editor, outputData["format"], fCallback, false, outputData["savekey"]);
+                    _downloadAs(editor, null, outputData["format"], fCallback, false, outputData["savekey"]);
                 break;
 				case "getsettings":
 					if(fCallback)
@@ -6919,7 +6933,7 @@ function _onOpenCommand(fCallback, incomeObject) {
 		}
 	});
 }
-function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey) {
+function _downloadAs(editor, oDocumentMailMerge, filetype, fCallback, bStart, sSaveKey) {
 	var oAdditionalData = {};
     oAdditionalData["c"] = "save";
     oAdditionalData["id"] = documentId;
@@ -6928,7 +6942,7 @@ function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey) {
     oAdditionalData["outputformat"] = filetype;
 	if (null != sSaveKey)
 		oAdditionalData["savekey"] = sSaveKey;
-	if (c_oAscFileType.PDF === filetype) {
+	if (null == oDocumentMailMerge &&  c_oAscFileType.PDF === filetype) {
 		var dd = editor.WordControl.m_oDrawingDocument;
 		if (dd.isComleteRenderer2()) {
 			oAdditionalData["savetype"] = bStart ? c_oAscSaveTypes.CompleteAll : c_oAscSaveTypes.Complete;
@@ -6944,7 +6958,12 @@ function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey) {
 		oAdditionalData['codepage'] = 65001;
 		oAdditionalData['delimiter'] = 4; // c_oAscCsvDelimiter.Comma
 	} else {
-		var oBinaryFileWriter = new BinaryFileWriter(editor.WordControl.m_oLogicDocument);
+		var oLogicDocument;
+		if(null != oDocumentMailMerge)
+			oLogicDocument = oDocumentMailMerge;
+		else
+			oLogicDocument = editor.WordControl.m_oLogicDocument;
+		var oBinaryFileWriter = new BinaryFileWriter(oLogicDocument);
 		oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 		oAdditionalData["data"] = oBinaryFileWriter.Write();
 	}
