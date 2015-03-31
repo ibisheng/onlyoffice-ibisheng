@@ -2632,6 +2632,21 @@ var gUndoInsDelCellsFlag = true;
 					ref = aWs.TableParts[filtersOp[0]].AutoFilter.Ref;
 				}
 				
+				var oldFilter = currentFilter.clone(aWs);
+				
+				var filterRange = ref;
+				if(ref)
+				{
+					//в случае а/ф находим последнюю точку со значением
+					if(currentFilter.TableStyleInfo === undefined)
+					{
+						var endRow = this._getEndValueRow(ref);
+						filterRange = filterRange.clone();
+						filterRange.r2 = endRow;
+					}
+				}
+				
+				
 				//проходим от начала до конца диапазона данного фильтра
 				var startIdCell = currentFilter.result[filtersOp[1]].id;
 				var endIdCell = currentFilter.result[filtersOp[1]].idNext;
@@ -2641,7 +2656,7 @@ var gUndoInsDelCellsFlag = true;
 				
 				var isMerged = startRange.hasMerged();
 				var startCell = this._idToRange(startIdCell);
-				if(isMerged && startCell.c1 != isMerged.c1 && ref && ref.containsRange(isMerged))
+				if(isMerged && startCell.c1 != isMerged.c1 && filterRange && filterRange.containsRange(isMerged))
 				{
 					var endCell = this._idToRange(endIdCell);
 					var diff = startCell.c1 - isMerged.c1;
@@ -2664,19 +2679,20 @@ var gUndoInsDelCellsFlag = true;
 				var n = 0;
 				//проверка на спец. символы
 				//this._isSpecValueCustomFilter(conFilter);
-				for(var i = startRange.first.row; i < endRange.first.row; i++)
+				for(var i = filterRange.r1 + 1; i <= filterRange.r2; i++)
 				{
-					var cell = ws.model.getCell3(i,startRange.first.col - 1);
+					var cell = ws.model.getCell3(i, filterRange.c1);
 					var val = cell.getValue();
 					var type = cell.getType();
 					var valWithFormat = cell.getValueWithFormat();
 					arrayFil[n] = this._getLogical(conFilter,{type: type, val: val, valWithFormat: valWithFormat});
-					var isHidden = this._isHiddenAnotherFilter(conFilter.cellId,i,currentFilter.Ref);
+					var isHidden = this._isHiddenAnotherFilter(conFilter.cellId, i, filterRange);
 					if(isHidden != undefined)
 						arrayFil[n] = isHidden;
 					n++;
 				}
-				var oldFilter = currentFilter.clone(aWs);
+				
+				currentFilter.Ref = filterRange;
 				//**добавляем данные в aWs.AutoFilter или aWs.TableParts**
 				this._addCustomFilters(filtersOp,aWs,conFilter,isMerged);
 				
@@ -2727,7 +2743,7 @@ var gUndoInsDelCellsFlag = true;
 					c1: activeCells.c1,
 					r2: activeCells.r1,
 					c2: activeCells.c1
-				};
+				}
 				
 				//**получаем нужный фильтр**
 				var indexFilter = this._findArrayFromAllFilter3(newAcCells,cellId);
@@ -2760,6 +2776,18 @@ var gUndoInsDelCellsFlag = true;
 				var cell = ws.model.getCell3(activeCells.r1, activeCells.c1);
 				
 				var filterRange = ref;
+				
+				if(ref && true !== customFilter)
+				{
+					//в случае а/ф находим последнюю точку со значением
+					if(currentFilter.TableStyleInfo === undefined)
+					{
+						var endRow = this._getEndValueRow(ref);
+						filterRange = filterRange.clone();
+						filterRange.r2 = endRow;
+						filterObj.Ref = filterRange;
+					}
+				}
 				var rangeStart = filterRange;
 
 				if(newAcCells.c1 == (rangeStart.c1 + parseInt(filtersOp[1])))
@@ -4427,8 +4455,20 @@ var gUndoInsDelCellsFlag = true;
 			_getOpenAndClosedValues: function(numFilter, currentFilter, opFil, buttonId)
 			{
 				var isFilterCol = false, idDigitalFilter = false, result = [], ws = this.worksheet;
-		
-		
+				
+				//находим стартовую и конечную строку а/ф
+				if(currentFilter && currentFilter.Ref)
+				{
+					var startRow = currentFilter.Ref.r1;
+					var endRow = currentFilter.Ref.r2;
+					
+					//в случае а/ф находим последнюю точку со значением
+					if(currentFilter.TableStyleInfo === undefined)
+					{
+						endRow = this._getEndValueRow(currentFilter.Ref);
+					}
+				}
+				
 				for(var fN = 0; fN < opFil.length; fN++)
 				{
 					var curFilter = opFil[fN];
@@ -4458,8 +4498,6 @@ var gUndoInsDelCellsFlag = true;
 							if(sb && sb == numFilter)
 								numFilter = curFilter.ColId;
 							
-							var startRow = ws.model.getCell(new CellAddress(acCell.id)).first.row - 1;
-							var endRow = ws.model.getCell(new CellAddress(acCell.idNext)).first.row - 1;
 							var col = ws.model.getCell(new CellAddress(acCell.id)).first.col - 1;
 							var visible;
 							for(var nRow = startRow + 1; nRow <= endRow; nRow++)
@@ -4611,8 +4649,7 @@ var gUndoInsDelCellsFlag = true;
 						}
 						if(sb && sb == numFilter)
 							numFilter = curFilter.ColId;
-						var startRow = ws.model.getCell(new CellAddress(acCell.id)).first.row - 1;
-						var endRow = ws.model.getCell(new CellAddress(acCell.idNext)).first.row - 1;
+
 						var col = ws.model.getCell(new CellAddress(acCell.id)).first.col - 1;
 						for(nRow = startRow + 1; nRow <= endRow; nRow++)
 						{
@@ -4667,8 +4704,7 @@ var gUndoInsDelCellsFlag = true;
 						//пересматриваем все значения
 						var nC = 0;
 						var acCell = currentFilter.result[curFilter.ColId];
-						var startRow = ws.model.getCell(new CellAddress(acCell.id)).first.row - 1;
-						var endRow = ws.model.getCell(new CellAddress(acCell.idNext)).first.row - 1;
+						
 						var col = ws.model.getCell(new CellAddress(acCell.id)).first.col - 1;
 						var top10Arr = [];
 						for(nRow = startRow + 1; nRow <= endRow; nRow++)
@@ -4770,11 +4806,8 @@ var gUndoInsDelCellsFlag = true;
 					
 					var col = ws.model.getCell(new CellAddress(buttonId)).first.col - 1;
 					
-					var startRow = rangeFilter.r1 + 1;
-					var endRow = rangeFilter.r2;
-					
 					var nC = 0;
-					for(var s = startRow; s <= endRow; s++)
+					for(var s = startRow + 1; s <= endRow; s++)
 					{
 						var cell = ws.model.getCell3(s,col);
 						if(!result[nC])
@@ -4806,6 +4839,47 @@ var gUndoInsDelCellsFlag = true;
 				
 				if(idDigitalFilter)
 					result.dF = true;
+				
+				return result;
+			},
+			
+			//находим непустые ячейки под данным фильтром
+			_getEndValueRow: function(ref)
+			{
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
+				
+				var r2 = ref.r2;
+				var aGCells = aWs.aGCells;
+				var result = r2;
+				var isEnd = false;
+				if(aWs.nRowsCount - 1 > r2)
+				{
+					for(var i = r2 + 1; i <= aWs.nRowsCount; i++)
+					{
+						if(aGCells[i])
+						{
+							for(var j = ref.c1; j <= ref.c2; j++)
+							{
+								if(aGCells[i].c[j] && aGCells[i].c[j].oValue && false === aGCells[i].c[j].oValue.isEmpty())
+								{
+									result++;
+									break;
+								}
+								else if(j === ref.c2)
+								{
+									isEnd = true;
+									break;
+								}
+							}
+						}
+						else
+							break;
+							
+						if(isEnd)
+							break;
+					}
+				}
 				
 				return result;
 			},
