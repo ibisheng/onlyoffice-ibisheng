@@ -114,7 +114,9 @@ CLimitPrimary.prototype.recalculateSize = function(oMeasure)
 
     width += this.GapLeft + this.GapRight;
 
-    this.size = {width: width, height: height, ascent: ascent};
+    this.size.height = height;
+    this.size.width  = width;
+    this.size.ascent = ascent;
 };
 
 function CLimit(props)

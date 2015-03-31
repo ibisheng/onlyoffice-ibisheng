@@ -11,14 +11,14 @@ CMathBreak.prototype.Set_FromObject = function(Obj)
         if(Obj.AlnAt >= 1 && Obj.AlnAt <= 255)
             this.AlnAt = Obj.AlnAt;
     }
-}
+};
 CMathBreak.prototype.Copy = function()
 {
     var NewMBreak = new CMathBreak();
     NewMBreak.AlnAt = this.AlnAt;
 
     return NewMBreak;
-}
+};
 CMathBreak.prototype.Write_ToBinary = function(Writer)
 {
     if(this.AlnAt !== undefined)
@@ -30,7 +30,7 @@ CMathBreak.prototype.Write_ToBinary = function(Writer)
     {
         Writer.WriteBool(true);
     }
-}
+};
 CMathBreak.prototype.Read_FromBinary = function(Reader)
 {
     if(Reader.GetBool() == false)
@@ -41,7 +41,7 @@ CMathBreak.prototype.Read_FromBinary = function(Reader)
     {
         this.AlnAt = undefined;
     }
-}
+};
 
 function CMathBorderBoxPr()
 {
@@ -164,7 +164,7 @@ CBorderBox.prototype.init = function(props)
 
     this.setProperties(props);
     this.fillContent();
-}
+};
 CBorderBox.prototype.getBase = function()
 {
     return this.Content[0];
@@ -173,7 +173,7 @@ CBorderBox.prototype.fillContent = function()
 {
     this.setDimension(1, 1);
     this.elements[0][0] = this.getBase();
-}
+};
 CBorderBox.prototype.recalculateSize = function()
 {
     var base = this.elements[0][0].size;
@@ -199,8 +199,10 @@ CBorderBox.prototype.recalculateSize = function()
 
     width += this.GapLeft + this.GapRight;
 
-    this.size = {width : width, height: height, ascent: ascent};
-}
+    this.size.width  = width;
+    this.size.height = height;
+    this.size.ascent = ascent;
+};
 CBorderBox.prototype.Draw_Elements = function(PDSE)
 {
     var _X = PDSE.X;
@@ -358,8 +360,8 @@ CBorderBox.prototype.Draw_Elements = function(PDSE)
 
     PDSE.X = _X + this.size.width;
 
-}
-CBorderBox.prototype.setPosition = function(pos, Line, Range)
+};
+CBorderBox.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
@@ -379,10 +381,10 @@ CBorderBox.prototype.setPosition = function(pos, Line, Range)
     else
         NewPos.y = this.pos.y + Base.size.ascent;
 
-    Base.setPosition(NewPos, Line, Range); // base
+    Base.setPosition(NewPos, PRSA, Line, Range, Page); // base
 
     pos.x += this.size.width;
-}
+};
 
 function CMathBoxPr()
 {
@@ -581,7 +583,7 @@ CBar.prototype.init = function(props)
 
     this.setProperties(props);
     this.fillContent();
-}
+};
 CBar.prototype.getBase = function()
 {
     return this.Content[0];
@@ -590,7 +592,7 @@ CBar.prototype.fillContent = function()
 {
     this.setDimension(1, 1);
     this.elements[0][0] = this.getBase();
-}
+};
 CBar.prototype.ApplyProperties = function(RPI)
 {
     if(this.RecalcInfo.bProps == true)
@@ -602,14 +604,14 @@ CBar.prototype.ApplyProperties = function(RPI)
         this.setCharacter(prp, defaultProps);
         this.RecalcInfo.bProps = false;
     }
-}
+};
 CBar.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 {
     this.ApplyProperties(RPI);
     this.operator.PreRecalc(this, ParaMath);
 
     CBar.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
-}
+};
 CBar.prototype.getAscent = function()
 {
     var ascent;
@@ -620,7 +622,7 @@ CBar.prototype.getAscent = function()
         ascent = this.elements[0][0].size.ascent;
 
     return ascent;
-}
+};
 
 function CMathPhantomPr()
 {
@@ -726,13 +728,13 @@ CPhantom.prototype.init = function(props)
 
     this.setProperties(props);
     this.fillContent();
-}
+};
 CPhantom.prototype.getBase = function()
 {
     return this.Content[0];
-}
+};
 CPhantom.prototype.fillContent = function()
 {
     this.setDimension(1, 1);
     this.elements[0][0] = this.getBase();
-}
+};

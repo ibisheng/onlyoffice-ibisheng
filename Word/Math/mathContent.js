@@ -1,35 +1,5 @@
 "use strict";
 
-/// TODO
-
-//  1.  Пересмотреть схему для findDisposition(base.js), т.к. если нажали за границами элемента, то происходит селект, т.к. теперь на mouseDown и mouseDown одни и те же функции
-//  2.  поправить центр для delimiters (когда оператор текст)
-//  3.  поправить accent расположение глифов в случае небольшого размера шрифта (н-р, 14)
-//  5.  сделать gaps для мат. объектов, +, - в зависимости от расположения в контенте
-//  6.  Размер разделительной черты для линейной дроби ограничить также как и для наклонной дроби
-//  7.  баг с отрисовкой кругового интеграла
-//  8.  cursor_Up, cursor_Down (+ c зажитым shift)
-//  9.  Merge textPrp и mathTextPrp (bold, italic)
-//  10. Поправить баги для CAccent с точками : смещение, когда идут подряд с одной точкой, двумя и тремя они перекрываются
-//  11. Для управляющих символов запрашивать не getCtrPrp, getPrpToControlLetter (реализована, нужно только протащить для всех управляющих элементов)
-//  12. объединение формул на remove и add
-//  13. Для N-арных операторов в случае со степенью : итераторы занимают не 2/3 от основание, а примерно половину (когда один итератор сверху или снизу)
-//  14. Для дробей, n-арных операторов и пр. считать расстояние исходя из shiftCenter
-//  15. Для числителя/знаменателя сделать меньшие расстояния для внутренних дробей, меньшие по размеру n-арные операторы, значок радикала
-
-
-//  TODO Refactoring
-//  1. CAccent ~> COperator
-//  2. COperator : объединить все классы связанные с отрисовкой и пересчетом операторов в один
-
-
-/// TODO
-
-// 1. Посмотреть стрелки и прочее для delimiters (которые используются для accent), при необходимости привести к одному типу
-
-// 3. Проверить что будет, если какие-то настройки убрать/добавить из ctrPrp, влияют ли они на отрисовку управляющих элементов (например, Italic, Bold)
-// 4. Протестировать n-арные операторы, когда добавляется текст вместо оператора
-
 function CRPI()
 {
     this.NeedResize      = true;
@@ -518,10 +488,13 @@ CMathGapsInfo.prototype =
 
         return direct == -1 ? coeffLeft : coeffRight;
     },
-    checkGapKind: function(kind)
+    checkGapKind: function(Comp)
     {
-        var bEmptyGaps = kind == MATH_DELIMITER || kind == MATH_MATRIX,
-            bChildGaps = kind == MATH_DEGREE || kind == MATH_DEGREESubSup || kind == MATH_ACCENT || kind == MATH_RADICAL || kind == MATH_LIMIT || kind == MATH_BORDER_BOX || (kind == MATH_DELIMITER);
+        var kind       = Comp.kind;
+
+        var bEmptyGaps = kind == MATH_MATRIX || (kind == MATH_DELIMITER && Comp.Is_EmptyGaps()),
+            bChildGaps = kind == MATH_DEGREE || kind == MATH_DEGREESubSup || kind == MATH_ACCENT || kind == MATH_RADICAL || kind == MATH_LIMIT || kind == MATH_BORDER_BOX;
+
 
         return  {bEmptyGaps: bEmptyGaps, bChildGaps: bChildGaps};
     }
@@ -652,9 +625,6 @@ CMPrp.prototype =
 }
 
 
-//TODO
-//пересмотреть this.dW и this.dH
-
 
 function CMathContent()
 {
@@ -678,7 +648,7 @@ function CMathContent()
     this.InfoPoints = new CInfoPoints();
     ///////////////
 
-    this.LineMetrics    = new CMathLineMetrics();
+    this.Bounds = new CMathBounds();
 
     this.plhHide        = false;
     this.bRoot          = false;
@@ -993,13 +963,16 @@ CMathContent.prototype.ApplyPoints = function(WidthsPoints, Points, MaxDimWidths
     }
 
 };
-CMathContent.prototype.setPosition = function(pos, Line, Range)
+CMathContent.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y;
 
     var CurLine  = Line - this.StartLine;
     var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
+
+    this.Bounds.SetPos(CurLine, this.pos, PRSA);
+    this.Bounds.SetPage(CurLine, Page);
 
     var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
     var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
@@ -1016,9 +989,9 @@ CMathContent.prototype.setPosition = function(pos, Line, Range)
     for(var i = StartPos; i <= EndPos; i++)
     {
         if(this.Content[i].Type == para_Math_Run)
-            this.Content[i].Math_SetPosition(pos, Line, Range);
+            this.Content[i].Math_SetPosition(pos, PRSA, Line, Range, Page);
         else
-            this.Content[i].setPosition(pos, Line, Range);
+            this.Content[i].setPosition(pos, PRSA, Line, Range, Page);
     }
 };
 CMathContent.prototype.old_setPosition = function(pos)
@@ -1095,6 +1068,42 @@ CMathContent.prototype.SetArgSize = function(val)
 CMathContent.prototype.GetArgSize = function()
 {
     return this.ArgSize.value;
+};
+CMathContent.prototype.Get_Bounds_2 = function()
+{
+    var LinesCount = this.protected_GetLinesCount();
+
+    var Bounds = [];
+
+    /*var Bounds =
+    {
+        X: 0,
+        Y: 0,
+        W: 0,
+        H: 0
+    };*/
+
+    if(this.bOneLine)
+    {
+        var bound = new CMathBound();
+
+        bound.X = this.pos.x;
+        bound.Y = this.pos.y - this.size.ascent;
+        bound.W = this.size.width;
+        bound.H = this.size.height;
+
+        Bounds.push(bound);
+
+    }
+    else
+    {
+        for(var Pos = 0; Pos < LinesCount; Pos++)
+        {
+            var LinePos = this.ParaMath.GetLinePosition();
+
+
+        }
+    }
 };
 /////////   Перемещение     ////////////
 
@@ -3133,32 +3142,6 @@ CMathContent.prototype.Add_MatrixWithBrackets = function(begChr, endChr, ctrPr, 
     var MathContent = Delimiter.getElementMathContent(0);
     return MathContent.Add_Matrix(ctrPr, RowsCount, ColsCount, plcHide, aText);
 };
-CMathContent.prototype.old_Get_Bounds = function()
-{
-    var X = 0, Y = 0, W = 0, H = 0;
-    if (null !== this.ParaMath)
-    {
-        X = this.ParaMath.X + this.pos.x;
-        Y = this.ParaMath.Y + this.pos.y;
-        W = this.size.width;
-        H = this.size.height;
-    }
-
-    return {X : X, Y : Y, W : W, H : H};
-};
-CMathContent.prototype.Get_Bounds = function()
-{
-    var X = 0, Y = 0, W = 0, H = 0;
-    if (null !== this.ParaMath)
-    {
-        X = this.pos.x;
-        Y = this.pos.y - this.size.ascent;
-        W = this.size.width;
-        H = this.size.height;
-    }
-
-    return {X : X, Y : Y, W : W, H : H, Asc: Asc};
-};
 CMathContent.prototype.Recalculate_CurPos = function(_X, _Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
 {
     var CurLine  = _CurLine - this.StartLine;
@@ -4129,6 +4112,12 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         }
     }
 
+    if(this.bOneLine)
+    {
+        this.Bounds.SetWidth(0, this.size.width);
+        this.Bounds.UpdateMetrics(0, this.size);
+    }
+
     if ( Pos >= ContentLen )
     {
         RangeEndPos = Pos - 1;
@@ -4136,6 +4125,15 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 
+};
+CMathContent.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
+{
+    var RangeW = PRSC.Range.W;
+    var CurLine = _CurLine - this.StartLine;
+
+    CMathContent.superclass.Recalculate_Range_Width.call(this, PRSC, _CurLine, _CurRange);
+
+    this.Bounds.SetWidth(CurLine, PRSC.Range.W - RangeW);
 };
 CMathContent.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
 {
@@ -4147,24 +4145,47 @@ CMathContent.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine,
 
     if(CurLine == 0 && CurRange == 0)
     {
-        this.LineMetrics.Reset();
+        this.Bounds.Reset();
     }
 
     var ParentContentMetric = PRS.ContentMetrics;
 
-    PRS.ContentMetrics = new CMathMetrics();
+    PRS.ContentMetrics = new CMathBoundsMeasures();
 
     for(var Pos = StartPos; Pos <= EndPos; Pos++)
     {
         var Item = this.Content[Pos];
-
         Item.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
     }
 
-    this.LineMetrics.UpdateMetrics(CurLine, PRS.ContentMetrics);
-    ParentContentMetric.UpdateMetrics(PRS.ContentMetrics);
+    this.Bounds.UpdateMetrics(CurLine, PRS.ContentMetrics);
 
+    ParentContentMetric.UpdateMetrics(PRS.ContentMetrics);
     PRS.ContentMetrics = ParentContentMetric;
+};
+CMathContent.prototype.Get_Bounds = function()
+{
+    return this.Bounds.Get_Bounds();
+};
+CMathContent.prototype.Get_LineBound = function(_CurLine)
+{
+    var CurLine = _CurLine - this.StartLine;
+    return this.Bounds.Get_LineBound(CurLine);
+};
+CMathContent.prototype.SetPage = function(Line, Page)
+{
+    var CurLine = Line - this.StartLine;
+    this.Bounds.SetPage(CurLine, Page);
+};
+CMathContent.prototype.GetPos = function(Line)
+{
+    var CurLine = Line - this.StartLine;
+    return this.Bounds.GetPos(CurLine);
+};
+CMathContent.prototype.GetWidth = function(Line)
+{
+    var CurLine = Line - this.StartLine;
+    return this.Bounds.GetWidth(CurLine);
 };
 CMathContent.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchPos, Depth)
 {
@@ -4400,7 +4421,6 @@ CMathContent.prototype.Process_AutoCorrect = function(ActionElement)
         History.Remove_LastPoint();
     }
 };
-
 CMathContent.prototype.private_NeedAutoCorrect = function(ActionElement)
 {
     var CharCode = ActionElement.value;
@@ -4409,7 +4429,6 @@ CMathContent.prototype.private_NeedAutoCorrect = function(ActionElement)
 
     return false;
 };
-
 CMathContent.prototype.private_CanAutoCorrect = function(AutoCorrectionEngine, bSkipLast)
 {
 	var CanMakeAutoCorrect = false;

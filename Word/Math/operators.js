@@ -2939,7 +2939,7 @@ COperator.prototype.draw = function(x, y, pGraphics, PDSE)
 
     if(this.typeOper === OPERATOR_TEXT)
     {
-        this.drawText(XX, YY, pGraphics, PDSE);
+        this.drawText(x, y, pGraphics, PDSE);
     }
     else if(this.IsLineGlyph())
     {
@@ -2957,11 +2957,6 @@ COperator.prototype.setPosition = function(_pos)
 
     if(this.typeOper === OPERATOR_TEXT)
     {
-        /*var pos = new CMathPosition();
-
-        pos.x = 0;
-        pos.y = 0;*/
-
         this.operator.setPosition(_pos);
     }
 };
@@ -3490,6 +3485,13 @@ CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     this.BrGapLeft  = this.GapLeft  + this.begOper.size.width;
     this.BrGapRight = this.GapRight + this.endOper.size.width;
 };
+CDelimiter.prototype.Is_EmptyGaps = function()
+{
+    var Height = g_oTextMeasurer.GetHeight();
+    var result = this.GeneralMetrics.size.height < Height;
+
+    return result;
+};
 CDelimiter.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
 {
     var CurLine = _CurLine - this.StartLine;
@@ -3652,7 +3654,7 @@ CDelimiter.prototype.GetAscentOperator = function(operator) // в качеств
 
     return Ascent;
 };
-CDelimiter.prototype.setPosition = function(pos, Line, Range)
+CDelimiter.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 {
     var CurLine  = Line - this.StartLine;
     var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
@@ -3670,7 +3672,7 @@ CDelimiter.prototype.setPosition = function(pos, Line, Range)
             this.UpdatePosOperBeg(pos, Line);
         }
 
-        this.Content[0].setPosition(pos, Line, Range);
+        this.Content[0].setPosition(pos, PRSA, Line, Range, Page);
 
         if(LinesCount - 1 == CurLine)
         {
@@ -3691,7 +3693,7 @@ CDelimiter.prototype.setPosition = function(pos, Line, Range)
 
         this.UpdatePosOperBeg(CurrPos, Line);
 
-        this.Content[0].setPosition(CurrPos, Line, Range); // CMathContent
+        this.Content[0].setPosition(CurrPos, PRSA, Line, Range, Page); // CMathContent
 
         var PosSep = new CMathPosition();
         PosSep.x = CurrPos.x;
@@ -3704,7 +3706,7 @@ CDelimiter.prototype.setPosition = function(pos, Line, Range)
         {
             CurrPos.x += this.sepOper.size.width;
 
-            this.Content[j].setPosition(CurrPos, Line, Range);
+            this.Content[j].setPosition(CurrPos, PRSA, Line, Range, Page);
             pos.x += this.Content[j].size.width;
         }
 
@@ -3857,9 +3859,11 @@ CCharacter.prototype.recalculateSize = function(oMeasure)
 
     width += this.GapLeft + this.GapRight;
 
-    this.size = {height: height, width: width, ascent: ascent};
+    this.size.height = height;
+    this.size.width  = width;
+    this.size.ascent = ascent;
 };
-CCharacter.prototype.setPosition = function(pos, Line, Range)
+CCharacter.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
@@ -3884,14 +3888,14 @@ CCharacter.prototype.setPosition = function(pos, Line, Range)
         PosBase.x = this.pos.x + this.GapLeft + alignCnt;
         PosBase.y = this.pos.y + this.operator.size.height + Base.size.ascent;
 
-        Base.setPosition(PosBase, Line, Range);
+        Base.setPosition(PosBase, PRSA, Line, Range, Page);
     }
     else if(this.Pr.pos === LOCATION_BOT)
     {
         PosBase.x = this.pos.x + this.GapLeft + alignCnt;
         PosBase.y = this.pos.y + Base.size.ascent;
 
-        Base.setPosition(PosBase, Line, Range);
+        Base.setPosition(PosBase, PRSA, Line, Range, Page);
 
         PosOper.x = this.pos.x + this.GapLeft + alignOp;
         PosOper.y = this.pos.y + Base.size.height;

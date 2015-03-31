@@ -19,6 +19,7 @@ var StartTextElement = 0x2B1A; // Cambria Math
 
 function CMathSize()
 {
+    this.Type   = MATH_SIZE;
     this.width  = 0;
     this.height = 0;
     this.ascent = 0;
@@ -885,7 +886,7 @@ CMathText.prototype =
         this.value = Reader.GetLong();
     }
 
-}
+};
 
 function CMathAmp()
 {
@@ -1023,7 +1024,7 @@ CMathAmp.prototype =
     {
     }
 
-}
+};
 
 var MathFont_ForMathText        = 1;
 var MathFont_ForSpecialOperator = 2;

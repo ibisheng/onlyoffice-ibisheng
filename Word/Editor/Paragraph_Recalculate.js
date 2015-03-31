@@ -2172,7 +2172,7 @@ function CParagraphRecalculateStateWrap(Para)
     this.bMath_OneLine  = false; // for ParaMath
     this.bMathWordLarge = false; // for ParaMath
     this.PosEndRun      = new CParagraphContentPos();
-    this.ContentMetrics = new CMathMetrics();
+    this.ContentMetrics = new CMathBoundsMeasures();
 }
 
 CParagraphRecalculateStateWrap.prototype =

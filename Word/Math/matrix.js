@@ -314,8 +314,10 @@ CMatrixBase.prototype.recalculateSize = function(oMeasure, RPI)
 
     width += this.GapLeft + this.GapRight;
 
-    this.size = {width: width, height: height, ascent: ascent};
-}
+    this.size.height = height;
+    this.size.width  = width;
+    this.size.ascent = ascent;
+};
 CMatrixBase.prototype.baseJustification = function(type)
 {
     this.Pr.baseJc = type;
@@ -342,7 +344,7 @@ CMatrixBase.prototype.setDefaultSpace = function()
         row: [],
         column: []
     };
-}
+};
 CMatrixBase.prototype.setRuleGap = function(oSpace, rule, gap, minGap)
 {
     var bInt  =  rule == rule - 0 && rule == rule^0,
@@ -461,8 +463,8 @@ CMathMatrix.prototype.init = function(props)
     this.Fill_LogicalContent(nRowsCount * nColsCount);
 
     this.fillContent();
-}
-CMathMatrix.prototype.setPosition = function(pos, Line, Range)
+};
+CMathMatrix.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 {
     this.pos.x = pos.x;
 
@@ -489,14 +491,14 @@ CMathMatrix.prototype.setPosition = function(pos, Line, Range)
             NewPos.x = this.pos.x + this.GapLeft + al.x + w;
             NewPos.y = this.pos.y + al.y + h + Item.size.ascent;
 
-            Item.setPosition(NewPos, Line, Range);
+            Item.setPosition(NewPos, PRSA, Line, Range, Page);
             w += Widths[j] + this.gaps.column[j];
         }
         h += Heights[i] + this.gaps.row[i];
     }
 
     pos.x += this.size.width;
-}
+};
 CMathMatrix.prototype.getMetrics = function(RPI)
 {
     var Ascents = [];
@@ -692,7 +694,7 @@ CEqArray.prototype.init = function(props)
 
     this.setProperties(props);
     this.fillContent();
-}
+};
 CEqArray.prototype.addRow = function()
 {
     var NewContent = new CMathContent();
@@ -704,7 +706,7 @@ CEqArray.prototype.addRow = function()
     this.setPr(NewPr);
 
     return NewContent;
-}
+};
 CEqArray.prototype.setPr = function(NewPr)
 {
     History.Add(this, new CChangesMathEqArrayPr(NewPr, this.Pr));
@@ -714,7 +716,7 @@ CEqArray.prototype.raw_SetPr = function(NewPr)
 {
     this.Pr = NewPr;
     this.private_SetNeedResize();
-}
+};
 CEqArray.prototype.fillContent = function()
 {
     var nRowsCount = this.Content.length;
@@ -745,7 +747,7 @@ CEqArray.prototype.Resize = function(oMeasure, RPI)
         this.elements[i][0].Resize(oMeasure, NewRPI);
 
     this.recalculateSize(oMeasure);
-}
+};
 CEqArray.prototype.getMetrics = function()
 {
     var AscentsMetrics = [];
@@ -839,8 +841,8 @@ CEqArray.prototype.getMetrics = function()
     }
 
     return {ascents: AscentsMetrics, descents: DescentsMetrics, widths: WidthsMetrics};
-}
-CEqArray.prototype.setPosition = function(pos, Line, Range)
+};
+CEqArray.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 {
     this.pos.x = pos.x;
 
@@ -862,17 +864,17 @@ CEqArray.prototype.setPosition = function(pos, Line, Range)
         NewPos.x = this.pos.x + this.GapLeft;
         NewPos.y = this.pos.y + h + Item.size.ascent;
 
-        Item.setPosition(NewPos, Line, Range);
+        Item.setPosition(NewPos, PRSA, Line, Range, Page);
 
         h += Heights[i] + this.gaps.row[i];
     }
 
     pos.x += this.size.width;
-}
+};
 CEqArray.prototype.getElement = function(num)
 {
     return this.elements[num][0];
-}
+};
 CEqArray.prototype.getElementMathContent = function(Index)
 {
     return this.Content[Index];

@@ -97,12 +97,115 @@ CDegreeBase.prototype.Resize = function(oMeasure, RPI)
     else if(this.Pr.type === DEGREE_SUBSCRIPT)
         this.recalculateSubScript(oMeasure);
 };
+/*CDegreeBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
+{
+    if(PRS.bMath_OneLine == false)
+    {
+        var CurLine  = PRS.Line - this.StartLine;
+        var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
+
+        var RangeStartPos = this.protected_AddRange(CurLine, CurRange);
+        var RangeEndPos   = 0;
+
+        this.baseContent.Recalculate_Range(PRS, ParaPr, Depth + 1);
+
+        if(PRS.NewRange == false)
+        {
+            RangeEndPos = 1;
+            this.iterContent.Recalculate_Range(PRS, ParaPr, Depth + 1);
+        }
+    }
+    else
+    {
+        CDegreeBase.superclass.Recalculate_Range.call(this, PRS, ParaPr, Depth);
+    }
+};*/
 CDegreeBase.prototype.recalculateSize = function(oMeasure)
 {
     if(this.Pr.type === DEGREE_SUPERSCRIPT)
         this.recalculateSup(oMeasure);
     else if(this.Pr.type === DEGREE_SUBSCRIPT)
         this.recalculateSubScript(oMeasure);
+};
+CDegreeBase.prototype.new_recalculateSup = function(oMeasure, PRS)
+{
+    var mgCtrPrp = this.Get_TxtPrControlLetter();
+    var iterSize = this.iterContent.size;
+
+    var base   = this.baseContent.size,
+        iter   = this.iterContent.size;
+
+    this.upBase = 0;
+    this.upIter = 0;
+
+    var HeightLine = AscentLine + DescentLine;
+
+    // для итератора степени выравниваем по последнему текстовому элементу (в случае если размер шрифта для основания один и то же)
+    // исключая случай, когда итератор в N-арном операторе
+
+
+    var BaseJustDraw = this.baseContent.IsJustDraw();
+    var lastElem = this.baseContent.GetLastElement();
+
+    var BaseRun  = lastElem.Type == para_Math_Run && mgCtrPrp.FontSize == lastElem.Get_CompiledPr(false).FontSize;
+    var bTextElement = BaseJustDraw && (BaseRun || (lastElem.Type !== para_Math_Run && lastElem.IsJustDraw()));
+
+    var UpBaseline = 0.5*TextAscent;
+
+    if(bTextElement)
+    {
+        var minR = 0.3*TextAscent;
+
+        var last = lastElem.size,
+            upBaseLast = 0,
+            upBaseIter = 0;
+
+        if(base.ascent > UpBaseline + iter.ascent && iter.height + minR < base.ascent) // размер шрифта итератора << размера шрифта основания => iter << base; дробь + текст
+        {
+            this.upIter = base.ascent - (UpBaseline + iter.ascent);
+        }
+        else if(UpBaseline - (iter.height - iter.ascent) > minR)
+        {
+            this.upBase = UpBaseline + iter.ascent - base.ascent;
+        }
+        else
+        {
+            this.upBase = iter.height + minR - base.ascent;
+        }
+    }
+    else
+    {
+        var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
+
+        if(iter.height - iter.ascent + shCenter > base.ascent) // для дробей и т.п.
+        {
+            this.upBase = iter.height - (base.ascent - shCenter);
+        }
+        else if(iter.ascent > shCenter)
+        {
+            this.upBase = iter.ascent - shCenter;
+        }
+        else
+        {
+            this.upIter = shCenter - iter.ascent;
+        }
+    }
+
+
+    if( this.bNaryInline)
+        this.dW = 0.17*PlH;
+    else
+        this.dW = 0.056*PlH;
+
+    if(PRS.bMath_OneLine == true)
+    {
+        this.size.height = this.upBase + base.height;
+        this.size.ascent = this.upBase + base.ascent;
+
+        this.size.width  = base.width + iter.width + this.dW;
+        this.size.width  += this.GapLeft + this.GapRight;
+    }
+
 };
 CDegreeBase.prototype.recalculateSup = function(oMeasure)
 {
@@ -182,7 +285,9 @@ CDegreeBase.prototype.recalculateSup = function(oMeasure)
     var width = base.width + iter.width + this.dW;
     width += this.GapLeft + this.GapRight;
 
-    this.size = {width: width, height: height, ascent: ascent};
+    this.size.height = height;
+    this.size.width  = width;
+    this.size.ascent = ascent;
 };
 CDegreeBase.prototype.recalculateSubScript = function(oMeasure)
 {
@@ -260,9 +365,11 @@ CDegreeBase.prototype.recalculateSubScript = function(oMeasure)
     var width = base.width + iter.width + this.dW;
     width += this.GapLeft + this.GapRight;
 
-    this.size = {width: width, height: height, ascent: ascent};
+    this.size.height = height;
+    this.size.width  = width;
+    this.size.ascent = ascent;
 };
-CDegreeBase.prototype.setPosition = function(pos, Line, Range)
+CDegreeBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 {
     this.pos.x = pos.x;
 
@@ -287,8 +394,8 @@ CDegreeBase.prototype.setPosition = function(pos, Line, Range)
     PosIter.x = this.pos.x + this.GapLeft + oBase.size.width + this.dW;
     PosIter.y = this.pos.y + this.upIter + oIter.size.ascent;
 
-    oBase.setPosition(PosBase, Line, Range);
-    oIter.setPosition(PosIter, Line, Range);
+    oBase.setPosition(PosBase, PRSA, Line, Range, Page);
+    oIter.setPosition(PosIter, PRSA, Line, Range, Page);
 
     pos.x += this.size.width;
 };
@@ -632,7 +739,9 @@ CDegreeSubSupBase.prototype.recalculateSize = function(oMeasure, RPI)
     width  = this.iters.size.width + base.width + this.dW;
     width += this.GapLeft + this.GapRight;
 
-    this.size = {width: width, height: height, ascent: ascent};
+    this.size.height = height;
+    this.size.width  = width;
+    this.size.ascent = ascent;
 
 }
 CDegreeSubSupBase.prototype.getBase = function()

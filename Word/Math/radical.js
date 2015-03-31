@@ -5,7 +5,7 @@ function CSignRadical()
     this.Parent = null;
     this.pos = null;
 
-    this.size = null;
+    this.size = new CMathSize();
     this.gapArg = 0;
     this.gapSign = 0;   /// расстояние до значка радикала
 
@@ -112,7 +112,7 @@ CSignRadical.prototype.new_draw = function(x, y, pGraphics)
     pGraphics._l(x5 + penW/3*sin, y4 - penW/5);
     pGraphics.ds();
 
-}
+};
 CSignRadical.prototype.draw = function(x, y, pGraphics, PDSE)
 {
     var txtPrp = this.Parent.Get_CompiledCtrPrp();
@@ -210,7 +210,7 @@ CSignRadical.prototype.draw = function(x, y, pGraphics, PDSE)
     pGraphics.ds();
 
 
-}
+};
 CSignRadical.prototype.recalculateSize = function(oMeasure, sizeArg)
 {
     var txtPrp = this.Parent.Get_CompiledCtrPrp();
@@ -322,16 +322,17 @@ CSignRadical.prototype.recalculateSize = function(oMeasure, sizeArg)
     height += this.gapSign;
     //////////////////////////////
 
-    this.size = {height: height, width: width};
-}
+    this.size.height = height;
+    this.size.width  = width;
+};
 CSignRadical.prototype.setPosition = function(pos)
 {
     this.pos = pos;
-}
+};
 CSignRadical.prototype.relate = function(parent)
 {
     this.Parent = parent;
-}
+};
 
 function CMathRadicalPr()
 {
@@ -419,7 +420,7 @@ CRadical.prototype.init = function(props)
     this.Fill_LogicalContent(2);
 
     this.fillContent();
-}
+};
 CRadical.prototype.fillContent = function()
 {
     this.Iterator = this.getDegree();
@@ -447,7 +448,7 @@ CRadical.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo
 
     if(this.bInside == false)
         GapsInfo.setGaps(this, this.TextPrControlLetter.FontSize);
-}
+};
 CRadical.prototype.ApplyProperties = function(RPI)
 {
     if(this.RecalcInfo.bProps)
@@ -496,7 +497,7 @@ CRadical.prototype.ApplyProperties = function(RPI)
 
         this.RecalcInfo.bProps = false;
     }
-}
+};
 CRadical.prototype.recalculateSize = function(oMeasure)
 {
     var shTop,
@@ -527,8 +528,6 @@ CRadical.prototype.recalculateSize = function(oMeasure)
         //ascent = height - (base.height - base.ascent);
 
         width += this.GapLeft + this.GapRight;
-
-        this.size = {width: width, height: height, ascent: ascent};
     }
     else if(this.Pr.type == DEGREE_RADICAL)
     {
@@ -571,10 +570,12 @@ CRadical.prototype.recalculateSize = function(oMeasure)
         }
 
         this.gapDegree = height - h1 + gapHeight;
-
-        this.size = {width: width, height: height, ascent: ascent};
     }
-}
+
+    this.size.height = height;
+    this.size.width  = width;
+    this.size.ascent = ascent;
+};
 CRadical.prototype.Resize = function(oMeasure, RPI)
 {
     if(this.Pr.type == SQUARE_RADICAL)
@@ -586,8 +587,8 @@ CRadical.prototype.Resize = function(oMeasure, RPI)
     }
 
     this.recalculateSize(oMeasure);
-}
-CRadical.prototype.setPosition = function(pos, Line, Range)
+};
+CRadical.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
@@ -607,7 +608,7 @@ CRadical.prototype.setPosition = function(pos, Line, Range)
         PosBase.y = this.pos.y + gapTop + this.RealBase.size.ascent;
 
         this.signRadical.setPosition(PosRadical);
-        this.RealBase.setPosition(PosBase, Line, Range);
+        this.RealBase.setPosition(PosBase, PRSA, Line, Range, Page);
     }
     else if(this.Pr.type == DEGREE_RADICAL)
     {
@@ -618,7 +619,7 @@ CRadical.prototype.setPosition = function(pos, Line, Range)
         PosDegree.x = this.pos.x + this.GapLeft + this.gapWidth;
         PosDegree.y = this.pos.y + this.gapDegree + this.Iterator.size.ascent;
 
-        this.Iterator.setPosition(PosDegree, Line, Range);
+        this.Iterator.setPosition(PosDegree, PRSA, Line, Range, Page);
 
         var wDegree = this.Iterator.size.width > wTick ? this.Iterator.size.width - wTick : 0;
 
@@ -630,11 +631,11 @@ CRadical.prototype.setPosition = function(pos, Line, Range)
         PosBase.x = this.pos.x + this.size.width - this.RealBase.size.width - this.GapRight;
         PosBase.y = this.pos.y + this.size.ascent;
 
-        this.RealBase.setPosition(PosBase, Line, Range);
+        this.RealBase.setPosition(PosBase, PRSA, Line, Range, Page);
     }
 
     pos.x += this.size.width;
-}
+};
 CRadical.prototype.Draw_Elements = function(PDSE)
 {
     var X = PDSE.X;
@@ -645,15 +646,15 @@ CRadical.prototype.Draw_Elements = function(PDSE)
     CRadical.superclass.Draw_Elements.call(this, PDSE);
 
     PDSE.X = X + this.size.width;
-}
+};
 CRadical.prototype.getBase = function()
 {
     return this.Content[1];
-}
+};
 CRadical.prototype.getDegree = function()
 {
     return this.Content[0];
-}
+};
 CRadical.prototype.Document_UpdateInterfaceState = function(MathProps)
 {
     MathProps.Type = c_oAscMathInterfaceType.Radical;

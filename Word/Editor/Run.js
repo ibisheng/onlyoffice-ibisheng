@@ -8356,7 +8356,7 @@ function CRunCollaborativeRange(PosS, PosE, Color)
     this.PosE  = PosE;
     this.Color = Color;
 }
-ParaRun.prototype.Math_SetPosition = function(pos, Line, Range)
+ParaRun.prototype.Math_SetPosition = function(pos, PRSA, Line, Range, Page)
 {
     var CurLine  = Line - this.StartLine;
     var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );

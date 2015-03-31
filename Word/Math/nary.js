@@ -154,7 +154,7 @@ CNary.prototype.init = function(props)
 
     this.setProperties(props);
     this.fillContent();
-}
+};
 CNary.prototype.fillContent = function()
 {
     this.LowerIterator = this.Content[0];
@@ -238,7 +238,7 @@ CNary.prototype.fillBase = function(PropsInfo)
 
     this.addMCToContent( [base, this.Arg] );
 
-}
+};
 CNary.prototype.ApplyProperties = function(RPI)
 {
     if(this.RecalcInfo.bProps || RPI.bChangeInline == true)
@@ -281,7 +281,7 @@ CNary.prototype.ApplyProperties = function(RPI)
 
         this.RecalcInfo.bProps = false;
     }
-}
+};
 CNary.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 {
     var NewRPI = RPI.Copy();
@@ -290,7 +290,7 @@ CNary.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
         NewRPI.bNaryInline = true;
 
     CNary.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, NewRPI, GapsInfo);
-}
+};
 CNary.prototype.getSign = function(chrCode, chrType)
 {    
     var result = 
@@ -396,7 +396,7 @@ CNary.prototype.getSign = function(chrCode, chrType)
     }
 
     return result;
-}
+};
 CNary.prototype.setCtrPrp = function(txtPrp)
 {
     this.CtrPrp.Merge(txtPrp); // only runPrp for paragraph
@@ -406,25 +406,25 @@ CNary.prototype.setCtrPrp = function(txtPrp)
     {
         this.elements[0][0].setCtrPrp(this.CtrPrp);
     }
-}
+};
 CNary.prototype.setDistance = function()
 {
     this.dW = this.Get_TxtPrControlLetter().FontSize/36*2.45;
-}
+};
 CNary.prototype.getBase = function()
 {
     return this.Arg;
-}
+};
 CNary.prototype.getUpperIterator = function()
 {
 	if (!this.Pr.supHide)
 		return this.UpperIterator;
-}
+};
 CNary.prototype.getLowerIterator = function()
 {
 	if (!this.Pr.subHide)
 		return this.LowerIterator;
-}
+};
 CNary.prototype.getBaseMathContent = function()
 {
     return this.Arg;
@@ -469,15 +469,15 @@ CNaryUnd.prototype.setDistance = function()
 {
     var zetta = this.Get_TxtPrControlLetter().FontSize*25.4/96;
     this.dH = zetta*0.25;
-}
+};
 CNaryUnd.prototype.getAscent = function()
 {
     return this.elements[0][0].size.height + this.dH + this.elements[1][0].size.ascent;
-}
+};
 CNaryUnd.prototype.getUpperIterator = function()
 {
     return this.elements[0][0];
-}
+};
 CNaryUnd.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
 {
     this.Parent = Parent;
@@ -493,15 +493,15 @@ CNaryUnd.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
 
     this.elements[0][0].PreRecalc(this, ParaMath, ArgSzUnd, RPIUnd);
     this.elements[1][0].PreRecalc(this, ParaMath, ArgSize,  RPI);
-}
+};
 CNaryUnd.prototype.setBase = function(base)
 {
     this.elements[1][0] = base;
-}
+};
 CNaryUnd.prototype.setUpperIterator = function(iterator)
 {
     this.elements[0][0] = iterator;
-}
+};
 
 
 function CNaryOvr(bInside)
@@ -515,7 +515,7 @@ CNaryOvr.prototype.old_setDistance = function()
 {
     var zetta = this.Get_TxtPrControlLetter().FontSize* 25.4/96;
     this.dH = zetta*0.1;
-}
+};
 CNaryOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
 {
     this.Parent = Parent;
@@ -531,7 +531,7 @@ CNaryOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
 
     this.elements[0][0].PreRecalc(this, ParaMath, ArgSize,  RPI);
     this.elements[1][0].PreRecalc(this, ParaMath, ArgSzOvr, RPIOvr);
-}
+};
 CNaryOvr.prototype.recalculateSize = function()
 {
     var FontSize = this.Get_TxtPrControlLetter().FontSize;
@@ -551,24 +551,26 @@ CNaryOvr.prototype.recalculateSize = function()
 
     var height = nOper.height + this.dH + iter.height;
 
-    this.size = {width: width, height: height, ascent: ascent};
-}
+    this.size.height = height;
+    this.size.width  = width;
+    this.size.ascent = ascent;
+};
 CNaryOvr.prototype.old_getAscent = function()
 {
     return this.elements[0][0].size.ascent;
-}
+};
 CNaryOvr.prototype.getLowerIterator = function()
 {
     return this.elements[1][0];
-}
+};
 CNaryOvr.prototype.setBase = function(base)
 {
     this.elements[0][0] = base;
-}
+};
 CNaryOvr.prototype.setLowerIterator = function(iterator)
 {
     this.elements[1][0] = iterator;
-}
+};
 
 function CNaryUndOvr(bInside)
 {
@@ -596,7 +598,7 @@ CNaryUndOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
     this.elements[0][0].PreRecalc(this, ParaMath, ArgSzIter, RPI_Iter);
     this.elements[1][0].PreRecalc(this, ParaMath, ArgSize,  RPI);
     this.elements[2][0].PreRecalc(this, ParaMath, ArgSzIter, RPI_Iter);
-}
+};
 CNaryUndOvr.prototype.recalculateSize = function()
 {
     var FontSize = this.Get_TxtPrControlLetter().FontSize;
@@ -621,9 +623,11 @@ CNaryUndOvr.prototype.recalculateSize = function()
     width += this.GapLeft + this.GapRight;
     height += this.gapTop + this.gapBottom;
 
-    this.size = {width: width, height: height, ascent: ascent};
-}
-CNaryUndOvr.prototype.setPosition = function(pos, Line, Range)
+    this.size.height = height;
+    this.size.width  = width;
+    this.size.ascent = ascent;
+};
+CNaryUndOvr.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y;
@@ -649,34 +653,35 @@ CNaryUndOvr.prototype.setPosition = function(pos, Line, Range)
     PosLowIter.x = pos.x + this.GapLeft + this.align(2,0).x;
     PosLowIter.y = PosSign.y + Sign.size.height + this.gapBottom + LowIter.size.ascent;
 
-    UpIter.setPosition(PosUpIter, Line, Range);
-    Sign.setPosition(PosSign, Line, Range);
-    LowIter.setPosition(PosLowIter, Line, Range);
-}
+    UpIter.setPosition(PosUpIter, PRSA, Line, Range, Page);
+    Sign.setPosition(PosSign, PRSA, Line, Range, Page);
+    LowIter.setPosition(PosLowIter, PRSA, Line, Range, Page);
+};
 CNaryUndOvr.prototype.setBase = function(base)
 {
     this.elements[1][0] = base;
-}
+};
 CNaryUndOvr.prototype.setUpperIterator = function(iterator)
 {
     this.elements[0][0] = iterator;
-}
+};
 CNaryUndOvr.prototype.setLowerIterator = function(iterator)
 {
     this.elements[2][0] = iterator;
-}
+};
 CNaryUndOvr.prototype.getLowerIterator = function()
 {
     return this.elements[2][0];
-}
+};
 CNaryUndOvr.prototype.getUpperIterator = function()
 {
     return this.elements[0][0];
-}
+};
 
 
 function CNaryOperator(flip)
 {
+    this.size = new CMathSize();
     this.pos = new CMathPosition();
     this.ParaMath = null;
     this.bFlip = (flip == -1);
@@ -692,7 +697,7 @@ CNaryOperator.prototype.Draw_Elements = function(PDSE)
         this.drawTextElem(PosLine.x, PosLine.y, PDSE.Graphics);
     else
         this.drawGlyph(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
-}
+};
 CNaryOperator.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
 {
     var coord = this.getCoord();
@@ -739,7 +744,7 @@ CNaryOperator.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
 
     pGraphics.df();
     pGraphics.SetIntegerGrid(intGrid);
-}
+};
 CNaryOperator.prototype.drawTextElem = function(x, y, pGraphics)
 {
     //pGraphics.b_color1(0,0,0,255);
@@ -757,16 +762,16 @@ CNaryOperator.prototype.drawTextElem = function(x, y, pGraphics)
     pGraphics.SetFont(Font);
 
     CNaryOperator.superclass.call.draw(this, x, y, pGraphics);
-}
+};
 CNaryOperator.prototype.IsJustDraw = function()
 {
     return true;
-}
+};
 CNaryOperator.prototype.setPosition = function(pos)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y;
-}
+};
 CNaryOperator.prototype.recalculateSize = function()
 {
     this.sizeGlyph = this.calculateSizeGlyph();
@@ -775,25 +780,23 @@ CNaryOperator.prototype.recalculateSize = function()
         width =  this.sizeGlyph.width,
         ascent = this.sizeGlyph.height/2 + DIV_CENT*this.Get_TxtPrControlLetter().FontSize;
 
-    this.size = {height: height, width: width, ascent: ascent};
-}
+    this.size.height = height;
+    this.size.width  = width;
+    this.size.ascent = ascent;
+};
 CNaryOperator.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
 {
     this.Parent = Parent;
     this.ParaMath = ParaMath;
-}
+};
 CNaryOperator.prototype.Measure = function(oMeasure, RPI)
 {
     this.recalculateSize(); //обычный пересчет, oMeasure не нужен
-}
+};
 CNaryOperator.prototype.Get_TxtPrControlLetter = function()
 {
     return this.Parent.Get_TxtPrControlLetter();
-}
-/*CNaryOperator.prototype.IsOnlyText = function()
-{
-    return false;
-}*/
+};
 
 function CSigma()
 {
@@ -829,7 +832,7 @@ CSigma.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._c(XX[32], YY[32], XX[33], YY[33], XX[34], YY[34] );
     pGraphics._l(XX[35], YY[35]);
 
-}
+};
 CSigma.prototype.getCoord = function()
 {
     var X = [],
@@ -977,7 +980,7 @@ CSigma.prototype.getCoord = function()
         X[i] = X[15] - (x15 - X[i]);
 
     return {X: X, Y: Y};
-}
+};
 CSigma.prototype.calculateSizeGlyph = function()
 {
     // пока размер не меняем в зависимости от высоты аргумента
@@ -994,7 +997,7 @@ CSigma.prototype.calculateSizeGlyph = function()
         height = 2*_height;
 
     return {width : width, height : height};
-}
+};
 
 function CProduct(bFlip)
 {
@@ -1043,7 +1046,7 @@ CProduct.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[61], YY[61]);
     pGraphics._l(XX[62], YY[62]);
 
-}
+};
 CProduct.prototype.getCoord = function()
 {
     var X = [],
@@ -1142,7 +1145,7 @@ CProduct.prototype.getCoord = function()
 
     return {X: X, Y: Y};
 
-}
+};
 CProduct.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
@@ -1159,7 +1162,7 @@ CProduct.prototype.calculateSizeGlyph = function()
     //this.size = {width : width, height : height, center: height/2 };
 
     return {width : width, height : height};
-}
+};
 
 function CUnion(bFlip)
 {
@@ -1183,7 +1186,7 @@ CUnion.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[18], YY[18]);
     pGraphics._c(XX[18], YY[18], XX[19], YY[19], XX[20], YY[20]);
     pGraphics._c(XX[20], YY[20], XX[21], YY[21], XX[22], YY[22]);
-}
+};
 CUnion.prototype.getCoord = function()
 {
     var X = [],
@@ -1214,7 +1217,7 @@ CUnion.prototype.getCoord = function()
     X[22] = 49526.184566929136; Y[22] = 127087.84;
 
     return {X: X, Y: Y};
-}
+};
 CUnion.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
@@ -1228,7 +1231,7 @@ CUnion.prototype.calculateSizeGlyph = function()
         height = 2*_height;
 
     return {width : width, height : height};
-}
+};
 
 function CLogicalOr(bFlip)
 {
@@ -1246,82 +1249,7 @@ CLogicalOr.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[6], YY[6]);
     pGraphics._l(XX[7], YY[7]);
 
-}
-CLogicalOr.prototype.old_getCoord = function()
-{
-    var X = [],
-        Y = [];
-
-    X[0] = 73240; Y[0] = 0;
-    X[1] = 38428; Y[1] = 89801;
-    X[2] = 29448; Y[2] = 89801;
-    X[3] = 0; Y[3] = 0;
-    X[4] = 10613; Y[4] = 0;
-    X[5] = 34521; Y[5] = 77322;
-    X[6] = 63269; Y[6] = 0;
-    X[7] = 73240; Y[7] = 0;
-
-    var textScale = this.params.font.FontSize/850, // 1000 pt
-        alpha = textScale*25.4/96 /64;
-
-    var w1 = X[2],
-        w2 = X[1] - X[2],
-        w3 = X[0] - X[1],
-        w4 = X[2] - X[5],
-        w5 = X[7] - X[6];
-
-    var Height = this.sizeGlyph.height/alpha,
-        Width = (this.sizeGlyph.width - this.gap)/alpha - w2;
-
-    var _W = X[7] - w2,
-        k1 = w1/_W;
-
-    X[2] = k1*Width;
-    X[1] = X[2] + w2;
-    X[5] = X[2] + w4;
-
-    X[7] = X[0] = Width + w2;
-    X[6] = Width + w2 - w5;
-
-    var hh = Height - Y[2];
-
-    Y[1] += hh;
-    Y[2] += hh;
-    Y[5] += hh;
-
-
-    /* var w1 = X[7] - X[6],
-     w2 = X[1] - X[2],
-     w3 = X[4],
-     w4 = X[1];
-
-     var textScale = this.params.font.FontSize/850, // 1000 pt
-     alpha = textScale*25.4/96 /64;
-
-     var Height = this.size.height/alpha,
-     Width = (this.size.width - this.gap)/alpha - w2;
-
-     var k1 = X[2]/(X[0] - w2);
-
-     var ww1 = Width*k1 - X[2],
-     ww2 = Width*(1- k1) - w1,
-     hh = Height - Y[2];
-
-     X[1] += ww1;
-     X[2] += ww1;
-     X[5] += ww1;
-
-     X[6] += ww2 + X[1] - w4;
-     X[7] += ww2 + X[1] - w4;
-     X[0] += ww2 + X[1] - w4;
-
-
-     Y[1] += hh;
-     Y[2] += hh;
-     Y[5] += hh;*/
-
-    return {X: X, Y: Y};
-}
+};
 CLogicalOr.prototype.getCoord = function()
 {
     var X = [],
@@ -1365,7 +1293,7 @@ CLogicalOr.prototype.getCoord = function()
     Y[5] += hh;
 
     return {X: X, Y: Y};
-}
+};
 CLogicalOr.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
@@ -1380,7 +1308,7 @@ CLogicalOr.prototype.calculateSizeGlyph = function()
         height = 2*_height;
 
     return {width : width, height : height};
-}
+};
 
 function CIntegral()
 {
@@ -1467,7 +1395,7 @@ CIntegral.prototype.getCoord = function()
         H = Y[27];
 
     return {X: X, Y: Y, W : W, H: H};
-}
+};
 CIntegral.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1502,7 +1430,7 @@ CIntegral.prototype.drawPath = function(pGraphics, XX, YY)
 
     pGraphics._c(XX[42], YY[42], XX[43], YY[43], XX[44], YY[44] );
 
-}
+};
 CIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
@@ -1517,7 +1445,7 @@ CIntegral.prototype.calculateSizeGlyph = function()
         height = 2*_height;
 
     return {width : width, height : height};
-}
+};
 
 function CDoubleIntegral()
 {
@@ -1543,7 +1471,7 @@ CDoubleIntegral.prototype.drawPath = function(pGraphics, XX, YY)
 
     pGraphics._s();
     CDoubleIntegral.superclass.drawPath.call(this, pGraphics, XX2, YY2);
-}
+};
 CDoubleIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
@@ -1558,7 +1486,7 @@ CDoubleIntegral.prototype.calculateSizeGlyph = function()
         height = 2*_height;
 
     return {width : width, height : height};
-}
+};
 
 function CTripleIntegral()
 {
@@ -1594,7 +1522,7 @@ CTripleIntegral.prototype.drawPath = function(pGraphics, XX, YY)
 
     pGraphics._s();
     CTripleIntegral.superclass.drawPath.call(this, pGraphics, XX3, YY3);
-}
+};
 CTripleIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
@@ -1609,7 +1537,7 @@ CTripleIntegral.prototype.calculateSizeGlyph = function()
         height = 2*_height;
 
     return {width : width, height : height};
-}
+};
 
 
 function CCircle()
@@ -1669,7 +1597,7 @@ CCircle.prototype.getCoord = function()
 
     return {X: X, Y: Y, W: W, H: H};
 
-}
+};
 CCircle.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._s();
@@ -1693,7 +1621,7 @@ CCircle.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._c(XX[31], YY[31], XX[32], YY[32], XX[33], YY[33]);
     pGraphics.ds();
 
-}
+};
 
 
 function CSurface()
@@ -1778,7 +1706,7 @@ CSurface.prototype.getCoord = function()
 
 
     return {X: X, Y: Y, W: W, H: H};
-}
+};
 CSurface.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._s();
@@ -1806,7 +1734,7 @@ CSurface.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._c(XX[38], YY[38], XX[39], YY[39], XX[40], YY[40] );
     pGraphics._c(XX[40], YY[40], XX[41], YY[41], XX[42], YY[42] );
     pGraphics.ds();
-}
+};
 
 function CVolume()
 {
@@ -1905,7 +1833,7 @@ CVolume.prototype.getCoord = function()
 
 
     return {X: X, Y: Y, W : W, H : H};
-}
+};
 CVolume.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._s();
@@ -1936,7 +1864,7 @@ CVolume.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._c(XX[46], YY[46], XX[47], YY[47], XX[48], YY[48] );
     pGraphics._c(XX[48], YY[48], XX[49], YY[49], XX[50], YY[50] );
     pGraphics.ds();
-}
+};
 
 function CContourIntegral()
 {
@@ -2006,7 +1934,7 @@ CContourIntegral.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
     pGraphics.df();
     pGraphics.SetIntegerGrid(intGrid);
 
-}
+};
 CContourIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
@@ -2021,7 +1949,7 @@ CContourIntegral.prototype.calculateSizeGlyph = function()
         height = 2*_height;
 
     return {width : width, height : height};
-}
+};
 
 
 function CSurfaceIntegral()
@@ -2092,7 +2020,7 @@ CSurfaceIntegral.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
 
     pGraphics.SetIntegerGrid(intGrid);
 
-}
+};
 CSurfaceIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
@@ -2107,7 +2035,7 @@ CSurfaceIntegral.prototype.calculateSizeGlyph = function()
         height = 2*_height;
 
     return {width : width, height : height};
-}
+};
 
 function CVolumeIntegral()
 {
@@ -2176,7 +2104,7 @@ CVolumeIntegral.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
 
     pGraphics.SetIntegerGrid(intGrid);
 
-}
+};
 CVolumeIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
@@ -2191,4 +2119,4 @@ CVolumeIntegral.prototype.calculateSizeGlyph = function()
         height = 2*_height;
 
     return {width : width, height : height};
-}
+};

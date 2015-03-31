@@ -55,11 +55,11 @@ CFraction.prototype.init = function(props)
 
     this.setProperties(props);
     this.fillContent();
-}
+};
 CFraction.prototype.getType = function()
 {
     return this.Pr.type;
-}
+};
 CFraction.prototype.draw = function(x, y, pGraphics, PDSE)
 {
     if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
@@ -68,7 +68,7 @@ CFraction.prototype.draw = function(x, y, pGraphics, PDSE)
         this.drawSkewedFraction(x, y, pGraphics, PDSE);
     else if(this.Pr.type == LINEAR_FRACTION)
         this.drawLinearFraction(x, y, pGraphics, PDSE);
-}
+};
 CFraction.prototype.Draw_Elements = function(PDSE)
 {
     var X = PDSE.X;
@@ -81,7 +81,7 @@ CFraction.prototype.Draw_Elements = function(PDSE)
         this.drawLinearFraction(PDSE);
 
     PDSE.X = X + this.size.width;
-}
+};
 CFraction.prototype.drawBarFraction = function(PDSE)
 {
     var mgCtrPrp = this.Get_TxtPrControlLetter();
@@ -107,7 +107,7 @@ CFraction.prototype.drawBarFraction = function(PDSE)
     }
 
     CFraction.superclass.Draw_Elements.call(this, PDSE);
-}
+};
 CFraction.prototype.drawSkewedFraction = function(PDSE)
 {
     var mgCtrPrp = this.Get_TxtPrControlLetter();
@@ -203,7 +203,7 @@ CFraction.prototype.drawSkewedFraction = function(PDSE)
     PDSE.Graphics.ds();
 
     CFraction.superclass.Draw_Elements.call(this, PDSE);
-}
+};
 CFraction.prototype.drawLinearFraction = function(PDSE)
 {
     var shift = 0.1*this.dW;
@@ -232,7 +232,7 @@ CFraction.prototype.drawLinearFraction = function(PDSE)
     PDSE.Graphics.ds();
 
     CFraction.superclass.Draw_Elements.call(this, PDSE);
-}
+};
 CFraction.prototype.getNumerator = function()
 {
     var numerator;
@@ -243,7 +243,7 @@ CFraction.prototype.getNumerator = function()
         numerator = this.elements[0][0];
 
     return numerator;
-}
+};
 CFraction.prototype.getDenominator = function()
 {
     var denominator;
@@ -254,7 +254,7 @@ CFraction.prototype.getDenominator = function()
         denominator = this.elements[0][1];
 
     return denominator;
-}
+};
 CFraction.prototype.getNumeratorMathContent = function()
 {
     return this.Content[0];
@@ -302,7 +302,7 @@ CFraction.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInf
 
     this.Numerator.PreRecalc(this, ParaMath, ArgSzNumDen, NewRPI);
     this.Denominator.PreRecalc(this, ParaMath, ArgSzNumDen, NewRPI);
-}
+};
 CFraction.prototype.recalculateSize = function(oMeasure)
 {
     if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
@@ -311,7 +311,7 @@ CFraction.prototype.recalculateSize = function(oMeasure)
         this.recalculateSkewed(oMeasure);
     else if(this.Pr.type == LINEAR_FRACTION)
         this.recalculateLinear(oMeasure);
-}
+};
 CFraction.prototype.recalculateBarFraction = function(oMeasure)
 {
     var num = this.elements[0][0].size,
@@ -325,8 +325,10 @@ CFraction.prototype.recalculateBarFraction = function(oMeasure)
 
     width += this.GapLeft + this.GapRight;
 
-    this.size =  {width: width, height: height, ascent: ascent};
-}
+    this.size.height = height;
+    this.size.width  = width;
+    this.size.ascent = ascent;
+};
 CFraction.prototype.recalculateSkewed = function(oMeasure)
 {
     var mgCtrPrp = this.Get_TxtPrControlLetter();
@@ -339,8 +341,10 @@ CFraction.prototype.recalculateSkewed = function(oMeasure)
 
     width += this.GapLeft + this.GapRight;
 
-    this.size =  {width: width, height: height, ascent: ascent};
-}
+    this.size.height = height;
+    this.size.width  = width;
+    this.size.ascent = ascent;
+};
 CFraction.prototype.recalculateLinear = function()
 {
     var AscentFirst   = this.elements[0][0].size.ascent,
@@ -376,9 +380,11 @@ CFraction.prototype.recalculateLinear = function()
 
     width += this.GapLeft + this.GapRight;
 
-    this.size = {height: height, width: width, ascent: ascent};
-}
-CFraction.prototype.setPosition = function(pos, Line, Range)
+    this.size.height = height;
+    this.size.width  = width;
+    this.size.ascent = ascent;
+};
+CFraction.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 {
     if(this.Pr.type == SKEWED_FRACTION)
     {
@@ -401,14 +407,14 @@ CFraction.prototype.setPosition = function(pos, Line, Range)
         PosDen.x = X + Numerator.size.width + this.dW;
         PosDen.y = Y + Numerator.size.height + Denominator.size.ascent;
 
-        Numerator.setPosition(PosNum, Line, Range);
-        Denominator.setPosition(PosDen, Line, Range);
+        Numerator.setPosition(PosNum, PRSA, Line, Range, Page);
+        Denominator.setPosition(PosDen, PRSA, Line, Range, Page);
 
         pos.x += this.size.width;
     }
     else
-        CFraction.superclass.setPosition.call(this, pos, Line, Range);
-}
+        CFraction.superclass.setPosition.call(this, pos, PRSA, Line, Range, Page);
+};
 CFraction.prototype.fillContent = function()
 {
     this.Numerator   = new CNumerator(this.Content[0]);
@@ -436,7 +442,7 @@ CFraction.prototype.fillContent = function()
         this.elements[0][0] = this.Numerator.getElement();
         this.elements[0][1] = this.Denominator.getElement();
     }
-}
+};
 CFraction.prototype.Document_UpdateInterfaceState = function(MathProps)
 {
     MathProps.Type = c_oAscMathInterfaceType.Fraction;
@@ -454,11 +460,11 @@ CFractionBase.prototype.init = function(MathContent)
 {
     this.setDimension(1, 1);
     this.elements[0][0] = MathContent;
-}
+};
 CFractionBase.prototype.getElement = function()
 {
     return this.elements[0][0];
-}
+};
 CFractionBase.prototype.setElement = function(Element)
 {
     this.elements[0][0] = Element;
@@ -466,7 +472,7 @@ CFractionBase.prototype.setElement = function(Element)
 CFractionBase.prototype.getPropsForWrite = function()
 {
     return {};
-}
+};
 CFractionBase.prototype.Get_Id = function()
 {
     return this.elements[0][0].Get_Id();
@@ -517,8 +523,10 @@ CNumerator.prototype.recalculateSize = function()
     var height = arg.height + this.gap;
     var ascent = arg.ascent;
 
-    this.size = {width : width, height: height, ascent: ascent};
-}
+    this.size.height = height;
+    this.size.width  = width;
+    this.size.ascent = ascent;
+};
 
 function CDenominator(MathContent)
 {
@@ -557,12 +565,14 @@ CDenominator.prototype.recalculateSize = function()
     var height = arg.height + this.gap;
     var ascent = arg.ascent + this.gap;
 
-    this.size = {width : width, height: height, ascent: ascent};
-}
-CDenominator.prototype.setPosition = function(pos, Line, Range)
+    this.size.height = height;
+    this.size.width  = width;
+    this.size.ascent = ascent;
+};
+CDenominator.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 {
     pos.y += this.gap;
 
-    CDenominator.superclass.setPosition.call(this, pos, Line, Range);
-}
+    CDenominator.superclass.setPosition.call(this, pos, PRSA, Line, Range, Page);
+};
 //////////

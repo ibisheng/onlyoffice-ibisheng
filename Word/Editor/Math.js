@@ -217,8 +217,7 @@ function ParaMath()
     this.Y                  = 0;
 
     this.FirstPage          = -1;
-    this.LinesWidths        = []; // в тч для отрисовки рамки
-    this.LinesPositions     = [];
+    //this.Bounds             = [];
 
     this.CurPageInfo        =
     {
@@ -449,12 +448,22 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, Page, _X, _XL
     _XLimit -=  MathSettings.Get_RightMargin(this.State);
 
     var Jc = this.Get_Align();
-    var FirstWidth = CurrentPage == 0 ? this.LinesWidths[0] : 0; // если страница не первая, то ширину первой строки формулы не учитываем
+
+    var WidthFirstLine = 0;
+
+    var LineCount = this.Root.protected_GetLinesCount();
+
+    if(LineCount > 0)
+        WidthFirstLine = this.Root.GetWidth(_CurLine);
+
+    /*if(this.Bounds.length > 0)
+        WidthFirstLine = this.Bounds[0].W;*/
+
+    var FirstWidth = CurrentPage == 0 ? WidthFirstLine : 0; // если страница не первая, то ширину первой строки формулы не учитываем
 
     var W = 0;
     var MaxW =  this.CurPageInfo.MaxLineW;
 
-    var LineCount = this.Root.protected_GetLinesCount();
 
     if(LineCount == 1)  // чтобы не сравнивать с wrapIndent, когда формула занимает одну строку
         W = FirstWidth;
@@ -856,7 +865,6 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
         this.FirstPage          = Page;
         this.CurPageInfo.Page   = -1;
-        this.LinesWidths.length = 0;
     }
 
     // пока будем каждый раз обновлять информацию (т.к. когда не inline формула становиться inline может получиться так, что пересчет для первой строки не придет)
@@ -887,7 +895,6 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     PRS.X    += MathSettings.Get_LeftMargin(this.State);
     PRS.XEnd -= MathSettings.Get_RightMargin(this.State);
-
     if(bFirstLine == false)
         PRS.X += MathSettings.Get_WrapIndent(this.State);
 
@@ -943,12 +950,7 @@ ParaMath.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
     PRSC.Range.W        += PRSC.SpaceLen - SpaceLen;
     PRSC.Range.SpaceLen = SpaceLen;
 
-    var W = PRSC.Range.W;
-
     PRSC.Words++;
-
-    var CurLine  = _CurLine - this.Root.StartLine;
-    this.LinesWidths[CurLine] = W;
 };
 ParaMath.prototype.UpdateWidthLine = function(PRS, Width)
 {
@@ -970,42 +972,12 @@ ParaMath.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange
     var CurLine = _CurLine - this.Root.StartLine;
     var CurRange = ( 0 === CurLine ? _CurRange - this.Root.StartRange : _CurRange );
 
-    var Pos = new CMathPosition();
-    Pos.x = PRSA.X;
-    Pos.y = PRSA.Y;
-
-    this.LinesPositions[CurLine] = Pos;
+    // до пересчета Bounds для текущей строки ранее должны быть вызваны Recalculate_Range_Width (для ширины), Recalculate_LineMetrics(для высоты и аскента)
 
     var pos = new CMathPosition();
-    this.Root.setPosition(pos, _CurLine, _CurRange);
+    this.Root.setPosition(pos, PRSA, _CurLine, _CurRange, _CurPage);
 
     this.Root.Recalculate_Range_Spaces(PRSA, _CurLine, _CurRange, _CurPage);
-
-    /*
-    // Позиция в документе для формулы
-     //this.Math.absPos = {x: PRSA.X, y: PRSA.Y - this.Root.size.ascent};
-     this.X     = PRSA.X;
-     this.Y     = PRSA.Y - this.Root.size.ascent;
-    */
-
-    /*var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-    if (EndPos >= 1)
-    {
-        if ( 0 !== PRSA.LettersSkip )
-        {
-            this.WidthVisible = this.Width;
-            PRSA.LettersSkip--;
-        }
-        else
-            this.WidthVisible = this.Width + PRSA.JustifyWord;
-
-
-
-        PRSA.X    += this.WidthVisible;
-        PRSA.LastW = this.WidthVisible;
-    }*/
 };
 ParaMath.prototype.Recalculate_PageEndInfo = function(PRSI, _CurLine, _CurRange)
 {
@@ -1530,14 +1502,22 @@ ParaMath.prototype.Draw_Elements = function(PDSE)
 
     this.Root.Draw_Elements(PDSE);
 
-
     /*PDSE.Graphics.p_color(255,0,0, 255);
      PDSE.Graphics.drawHorLine(0, PDSE.Y - this.Ascent + this.Height, PDSE.X - 30, PDSE.X + this.Width + 30 , 1);*/
 };
 ParaMath.prototype.GetLinePosition = function(Line)
 {
-    var CurLine  = Line - this.Root.StartLine;
-    return this.LinesPositions[CurLine];
+    /*var CurLine  = Line - this.Root.StartLine;
+
+    var Bounds = this.Root.Get_Bounds();
+    Bounds.Get_LineBound(CurLine);
+
+    var Pos = new CMathPosition();
+
+    Pos.x = this.Bounds[CurLine].X;
+    Pos.y = this.Bounds[CurLine].Y + RootLineMetrics.ascent;*/
+
+    return this.Root.GetPos(Line);
 };
 ParaMath.prototype.Draw_Lines = function(PDSL)
 {
@@ -1793,29 +1773,6 @@ ParaMath.prototype.Select_All = function(Direction)
     this.Root.Select_All();
 };
 
-ParaMath.prototype.old_Selection_DrawRange = function(_CurLine, _CurRange, SelectionDraw)
-{
-    var CurLine = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-    if (EndPos >= 1)
-    {
-        if (true === this.bSelectionUse)
-        {
-            var oSelectedContent = this.GetSelectContent();
-            oSelectedContent.Content.Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
-        }
-        else
-        {
-            if ( true === SelectionDraw.FindStart )
-            {
-                SelectionDraw.StartX += this.Width;
-            }
-        }
-    }
-};
 ParaMath.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionDraw)
 {
     this.Root.Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
@@ -1919,10 +1876,11 @@ ParaMath.prototype.Get_ContentSelection = function()
     if (oContent.bRoot)
         return null;
 
-    var X = oContent.pos.x + this.X;
-    var Y = oContent.pos.y + this.Y;
+    var Bounds = oContent.Get_Bounds();
 
-    return {X : X, Y : Y, W : oContent.size.width, H : oContent.size.height};
+    var LinesCount = oContent.protected_GetLinesCount();
+
+    return Bounds[LinesCount - 1];
 };
 
 ParaMath.prototype.Recalc_RunsCompiledPr = function()
@@ -2064,18 +2022,19 @@ ParaMath.prototype.Make_AutoCorrect = function()
 ParaMath.prototype.Get_Bounds = function()
 {
     if (undefined === this.Paragraph || null === this.Paragraph)
-        return {X : this.X, Y : this.Y, W : this.Width, H : this.Height, Page : 0};
+        return {X : 0, Y : 0, W : 0, H : 0, Page : 0};
     else
     {
+        //var LinesCount = this.Root.protected_GetLinesCount();
+
+        /*if(LinesCount < this.Bounds.length)
+            this.Bounds.splice(LinesCount, this.Bounds.length - LinesCount);
+
+        return this.Bounds[LinesCount - 1];*/
+
         var LinesCount = this.Root.protected_GetLinesCount();
-        var CurLine = this.Root.StartLine + LinesCount - 1;
 
-        var CurPage = this.Paragraph.Get_PageByLine(CurLine);
-
-        var Y = this.Paragraph.Pages[CurPage].Y      + this.Paragraph.Lines[CurLine].Top;
-        var H = this.Paragraph.Lines[CurLine].Bottom - this.Paragraph.Lines[CurLine].Top;
-
-        return {X : this.X, Y : Y, W : this.Width, H : H, Page : this.Paragraph.Get_StartPage_Absolute() + CurPage};
+        return this.Root.Get_Bounds()[LinesCount - 1];
     }
 };
 

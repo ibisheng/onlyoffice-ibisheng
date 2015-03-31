@@ -208,3 +208,6 @@ var ALIGN_EMPTY       = 3;
 var MATH_LEFT_MARGIN   = 0;
 var MATH_RIGHT_MARGIN  = 1;
 var MATH_WRAP_INDENT   = 2;
+
+var MATH_SIZE            = 0;
+var MATH_BOUNDS_MEASURES = 1;
