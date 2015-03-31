@@ -969,9 +969,6 @@ ParaMath.prototype.UpdateWidthLine = function(PRS, Width)
 };
 ParaMath.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange, _CurPage)
 {
-    var CurLine = _CurLine - this.Root.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.Root.StartRange : _CurRange );
-
     // до пересчета Bounds для текущей строки ранее должны быть вызваны Recalculate_Range_Width (для ширины), Recalculate_LineMetrics(для высоты и аскента)
 
     var pos = new CMathPosition();

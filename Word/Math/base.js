@@ -2138,23 +2138,10 @@ CMathBounds.prototype.CheckLineBound = function(Line)
         this.Bounds[Line] = new CMathBoundsMeasures();
     }
 };
-CMathBounds.prototype.UpdateMetrics = function(Line, Object)
+CMathBounds.prototype.UpdateMetrics = function(Line, Metric)
 {
     this.CheckLineBound(Line);
-
-    if(Object.Type == MATH_SIZE)
-    {
-        var Metric = new CMathBoundsMeasures();
-
-        Metric.H   = Object.height;
-        Metric.Asc = Object.ascent;
-
-        this.Bounds[Line].UpdateMetrics(Metric);
-    }
-    else
-    {
-        this.Bounds[Line].UpdateMetrics(Object);
-    }
+    this.Bounds[Line].UpdateMetrics(Metric);
 };
 CMathBounds.prototype.UpdateWidth = function(Line, Width)
 {
@@ -2239,7 +2226,13 @@ CMathBoundsMeasures.prototype.UpdateMetrics = function(Metric)
         this.Asc = MetricAsc;
 
     if(Descent < MetricDescent)
+    {
         this.H = MetricDescent + this.Asc;
+    }
+    else
+    {
+        this.H = Descent + this.Asc;
+    }
 };
 CMathBoundsMeasures.prototype.UpdateWidth = function(Width)
 {
