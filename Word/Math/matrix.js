@@ -725,15 +725,6 @@ CEqArray.prototype.fillContent = function()
     for (var nIndex = 0; nIndex < nRowsCount; nIndex++)
         this.elements[nIndex][0] = this.Content[nIndex];
 };
-/*CEqArray.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
-{
-    PRS.bMath_OneLine = true;
-
-    for (var Pos = 0, Count = this.Content.length; Pos < Count; Pos++)
-        this.Content[Pos].Recalculate_Range(PRS, ParaPr, Depth);
-
-    this.recalculateSize(g_oTextMeasurer);
-};*/
 CEqArray.prototype.Resize = function(oMeasure, RPI)
 {
     // на случай, чтобы не затереть массив

@@ -1996,6 +1996,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 case para_Sym:
                 case para_Text:
                 case para_Math_Text:
+                case para_Math_Ampersand:
                 case para_Math_Placeholder:
                 {
                     // Отмечаем, что началось слово
@@ -2578,6 +2579,7 @@ ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
                 break;
             }
             case para_Math_Text:
+            case para_Math_Ampersand:
             case para_Math_Placeholder:
             case para_Math_BreakOperator:
             {
@@ -2672,6 +2674,7 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
             case para_Text:
             case para_Math_Text:
             case para_Math_Placeholder:
+            case para_Math_Ampersand:
             {
                 PRSC.Letters++;
 
@@ -2823,7 +2826,9 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
             case para_Sym:
             case para_Text:
             case para_Math_Text:
+            case para_Math_Placeholder:
             case para_Math_BreakOperator:
+            case para_Math_Ampersand:
             {
                 var WidthVisible = 0;
 
@@ -3611,6 +3616,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
             case para_Tab:
             case para_Text:
             case para_Math_Text:
+            case para_Math_Placeholder:
             case para_Math_BreakOperator:
             case para_Math_Ampersand:
             case para_Sym:
@@ -8631,11 +8637,6 @@ ParaRun.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
     if (PRS.LineTextDescent < this.TextDescent)
         PRS.LineTextDescent = this.TextDescent;*/
 };
-/*ParaRun.prototype.Recalculate_WidthPoints_EqArray = function(WidthPoints)
-{
-    this.bEqArray = true;
-    this.Recalculate_MeasureContent(WidthPoints);
-};*/
 ParaRun.prototype.Math_Apply_Style = function(Value)
 {
     if(Value !== this.MathPrp.sty)
