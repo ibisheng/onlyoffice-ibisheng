@@ -180,6 +180,19 @@ CHistory.prototype.UndoRedoPrepare = function (oRedoObjectParam, bUndo) {
 		this.workbook.bUndoChanges = true;
 	else
 		this.workbook.bRedoChanges = true;
+
+	if(!window["NATIVE_EDITOR_ENJINE"]) {
+		var wsViews = Asc["editor"].wb.wsViews;
+		for (var i = 0; i < wsViews.length; ++i) {
+			if (wsViews[i] && wsViews[i].objectRender && wsViews[i].objectRender.controller) {
+				wsViews[i].objectRender.controller.resetSelection();
+			}
+			if ( wsViews[i].isChartAreaEditMode ) {
+				wsViews[i].isChartAreaEditMode = false;
+				wsViews[i].arrActiveChartsRanges = [];
+			}
+		}
+	}
 };
 CHistory.prototype.RedoAdd = function(oRedoObjectParam, Class, Type, sheetid, range, Data, LocalChange)
 {

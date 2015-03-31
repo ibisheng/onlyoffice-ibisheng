@@ -990,8 +990,9 @@ var historyitem_Drawing_SetGraphicObject  = 11;
 var historyitem_SetSimplePos              = 12;
 var historyitem_SetExtent                 = 13;
 var historyitem_SetWrapPolygon            = 14;
-var historyitem_Drawing_SetLocked         = 15;// Устанавливаем привязку к конкретному параграфу
-var historyitem_Drawing_SetRelativeHeight = 15;// Устанавливаем Z-Index
+var historyitem_Drawing_SetLocked         = 15;// Устанавливаем привязку к конкретному параграфу]
+var historyitem_Drawing_SetRelativeHeight = 16;// Устанавливаем Z-Index
+var historyitem_Drawing_SetEffectExtent   = 17;// Устанавливаем EffectExtent
 
 
 
