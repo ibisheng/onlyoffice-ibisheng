@@ -2166,12 +2166,24 @@ asc_docs_api.prototype.asc_Print = function()
 			sendCommand(editor, function(incomeObject){
 				if(null != incomeObject && "save" == incomeObject["type"])
 					editor.processSavedFile(incomeObject["data"], false);
+				else{
+					if(null != incomeObject && "err" == incomeObject["type"])
+						editor.asc_fireCallback("asc_onError", _mapAscServerErrorToAscError(parseInt(incomeObject["data"])), c_oAscError.Level.NoCritical);
+					else
+						editor.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+				}
 				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);}, rData);
 		}
 		else
 			_downloadAs(this, null, c_oAscFileType.PDF, function(incomeObject){
 				if(null != incomeObject && "save" == incomeObject["type"])
 					editor.processSavedFile(incomeObject["data"], false);
+				else{
+					if(null != incomeObject && "err" == incomeObject["type"])
+						editor.asc_fireCallback("asc_onError", _mapAscServerErrorToAscError(parseInt(incomeObject["data"])), c_oAscError.Level.NoCritical);
+					else
+						editor.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+				}
 				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);}, true);
 	}
 }
@@ -2284,19 +2296,36 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile) {//передаем �
 	_downloadAs(this, null, typeFile, function (incomeObject) {
 		if (null != incomeObject && "save" == incomeObject["type"])
 			t.processSavedFile(incomeObject["data"], false);
+		else{
+			if(null != incomeObject && "err" == incomeObject["type"])
+				t.asc_fireCallback("asc_onError", _mapAscServerErrorToAscError(parseInt(incomeObject["data"])), c_oAscError.Level.NoCritical);
+			else
+				t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+		}
 		t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 	}, true);
 };
-asc_docs_api.prototype.asc_DownloadAsMailMerge = function(typeFile, StartIndex, EndIndex) {
+asc_docs_api.prototype.asc_DownloadAsMailMerge = function(typeFile, StartIndex, EndIndex, bIsDownload) {
 	var oDocumentMailMerge = this.WordControl.m_oLogicDocument.Get_MailMergedDocument(StartIndex, EndIndex);
 	if(null != oDocumentMailMerge){
 		var actionType = c_oAscAsyncAction.DownloadAs;
-		this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+		if(bIsDownload)
+			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 		var t = this;
 		_downloadAs(this, oDocumentMailMerge, typeFile, function (incomeObject) {
-			if (null != incomeObject && "save" == incomeObject["type"])
-				t.processSavedFile(incomeObject["data"], false);
-			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+			if(bIsDownload){
+				if (null != incomeObject && "save" == incomeObject["type"])
+					t.processSavedFile(incomeObject["data"], false);
+				else
+					t.asc_fireCallback("asc_onError", c_oAscError.ID.MailMergeSaveFile, c_oAscError.Level.NoCritical);
+				t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+			}
+			else{
+				if (null != incomeObject && "save" == incomeObject["type"])
+					t.asc_fireCallback("asc_onSaveMailMerge", incomeObject["data"]);
+				else
+					t.asc_fireCallback("asc_onError", c_oAscError.ID.MailMergeSaveFile, c_oAscError.Level.NoCritical);
+			}
 		}, true);
 	}
 	return null != oDocumentMailMerge ? true : false;
@@ -6790,7 +6819,8 @@ function sendCommand(editor, fCallback, rdata){
         data: sData,
         contentType: sRequestContentType,
         error: function(){
-				editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
+				if("save" != rdata["c"])
+					editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
 				if(fCallback)
 					fCallback();
             },
@@ -6867,11 +6897,13 @@ function sendCommand(editor, fCallback, rdata){
                         fCallback(incomeObject);
 				break;
                 case "err":
-					var nErrorLevel = c_oAscError.Level.NoCritical;
-					//todo передалеть работу с callback
-					if("getsettings" == rdata["c"] || "open" == rdata["c"] || "chopen" == rdata["c"] || "create" == rdata["c"])
-						nErrorLevel = c_oAscError.Level.Critical;
-					editor.asc_fireCallback("asc_onError", _mapAscServerErrorToAscError(parseInt(incomeObject["data"])), nErrorLevel);
+					if("save" != rdata["c"]){
+						var nErrorLevel = c_oAscError.Level.NoCritical;
+						//todo передалеть работу с callback
+						if("getsettings" == rdata["c"] || "open" == rdata["c"] || "chopen" == rdata["c"] || "create" == rdata["c"])
+							nErrorLevel = c_oAscError.Level.Critical;
+						editor.asc_fireCallback("asc_onError", _mapAscServerErrorToAscError(parseInt(incomeObject["data"])), nErrorLevel);
+					}
 					if(fCallback)
 						fCallback(incomeObject);
                 break;

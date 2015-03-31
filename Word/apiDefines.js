@@ -64,6 +64,7 @@ var c_oAscError = {
 		MobileUnexpectedCharCount: -23,
 
 		MailMergeLoadFile:		-24,
+		MailMergeSaveFile:		-25,
 
         UserDrop:				-100
 	}
