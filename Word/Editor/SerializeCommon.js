@@ -110,6 +110,7 @@ function CPPTXContentLoader()
         {
             this.Reader.presentation = presentation;
         }
+        var oLogicDocument = this.LogicDocument;
         this.LogicDocument = null;
 
         this.Reader.ImageMapChecker = this.ImageMapChecker;
@@ -140,6 +141,7 @@ function CPPTXContentLoader()
         s.Seek2(_end_rec);
         stream.pos = s.pos;
         stream.cur = s.cur;
+        this.LogicDocument = oLogicDocument;
         return GrObject;
     }
 
@@ -151,6 +153,7 @@ function CPPTXContentLoader()
         if(!this.Reader.presentation && presentation)
             this.Reader.presentation = presentation;
 
+        var oLogicDocument = this.LogicDocument;
         this.LogicDocument = null;
 
         this.Reader.ImageMapChecker = this.ImageMapChecker;
@@ -175,7 +178,7 @@ function CPPTXContentLoader()
 
         stream.pos = s.pos;
         stream.cur = s.cur;
-
+        this.LogicDocument = oLogicDocument;
         return txBody;
     }
 
@@ -185,6 +188,7 @@ function CPPTXContentLoader()
         if (this.Reader == null)
             this.Reader = new BinaryPPTYLoader();
 
+        var oLogicDocument = this.LogicDocument;
         this.LogicDocument = null;
 
         this.Reader.ImageMapChecker = this.ImageMapChecker;
@@ -209,7 +213,7 @@ function CPPTXContentLoader()
 
         stream.pos = s.pos;
         stream.cur = s.cur;
-
+        this.LogicDocument = oLogicDocument;
         return txBody;
     }
 
@@ -218,6 +222,7 @@ function CPPTXContentLoader()
         if (this.Reader == null)
             this.Reader = new BinaryPPTYLoader();
 
+        var oLogicDocument = this.LogicDocument;
         this.LogicDocument = null;
 
         this.Reader.ImageMapChecker = this.ImageMapChecker;
@@ -245,6 +250,7 @@ function CPPTXContentLoader()
         stream.pos = s.pos;
         stream.cur = s.cur;
 
+        this.LogicDocument = oLogicDocument;
         return oNewSpPr;
     }
 
