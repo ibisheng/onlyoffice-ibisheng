@@ -35,7 +35,7 @@ CRPI.prototype.MergeMathInfo = function(MathInfo)
     this.NeedResize    = MathInfo.NeedResize;
     this.bRecalcCtrPrp = MathInfo.bRecalcCtrPrp;
     this.bChangeInline = MathInfo.bChangeInline;
-}
+};
 
 function CMathPointInfo()
 {
@@ -53,7 +53,7 @@ CMathPointInfo.prototype.SetInfoPoints = function(InfoPoints)
     this.InfoPoints.GPoints       = InfoPoints.GPoints;
     this.InfoPoints.ContentPoints = InfoPoints.ContentPoints.Widths;
     this.InfoPoints.GMaxDimWidths = InfoPoints.GMaxDimWidths;
-}
+};
 CMathPointInfo.prototype.NextAlignRange = function()
 {
     if(this.bEven)
@@ -63,7 +63,7 @@ CMathPointInfo.prototype.NextAlignRange = function()
         this.CurrPoint++;
         this.bEven = true;
     }
-}
+};
 CMathPointInfo.prototype.GetAlign = function()
 {
     var align = 0;
@@ -107,7 +107,7 @@ CMathPointInfo.prototype.GetAlign = function()
     }
 
     return align;
-}
+};
 
 function CInfoPoints()
 {
@@ -122,7 +122,7 @@ CInfoPoints.prototype.SetDefault = function()
     this.GPoints       = null;
     this.GMaxDimWidths = null;
     this.ContentPoints.SetDefault();
-}
+};
 
 
 function CMathPosition()
@@ -155,7 +155,7 @@ AmperWidths.prototype.UpdatePoint = function(value)
             this.Widths[len-1].odd += value;
     }
 
-}
+};
 AmperWidths.prototype.AddNewAlignRange = function()
 {
     var len = this.Widths.length;
@@ -176,12 +176,12 @@ AmperWidths.prototype.AddNewAlignRange = function()
 
     this.bEven = !this.bEven;
 
-}
+};
 AmperWidths.prototype.SetDefault = function()
 {
     this.bEven         = true;
     this.Widths.length = 0;
-}
+};
 
 
 function CGaps(oSign, oEqual, oZeroOper, oLett)
@@ -284,7 +284,7 @@ CCoeffGaps.prototype =
 
         return bOper || bLeftBracket || bRightBracket;
     }
-}
+};
 
 var COEFF_GAPS = new CCoeffGaps();
 
@@ -341,7 +341,7 @@ CMathArgSize.prototype =
 
         this.SetValue(this.value + ArgSize.value);
     }
-}
+};
 
 function CMathGapsInfo(argSize)
 {
@@ -499,7 +499,7 @@ CMathGapsInfo.prototype =
         return  {bEmptyGaps: bEmptyGaps, bChildGaps: bChildGaps};
     }
 
-}
+};
 
 function CMPrp()
 {
@@ -622,7 +622,7 @@ CMPrp.prototype =
 
         return Object;
     }
-}
+};
 
 
 
@@ -962,6 +962,7 @@ CMathContent.prototype.ApplyPoints = function(WidthsPoints, Points, MaxDimWidths
         this.size.width += this.Content[i].size.width;
     }
 
+    this.Bounds.SetWidth(0, this.size.width);
 };
 CMathContent.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 {
@@ -970,9 +971,6 @@ CMathContent.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 
     var CurLine  = Line - this.StartLine;
     var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
-
-    this.Bounds.SetPos(CurLine, this.pos, PRSA);
-    this.Bounds.SetPage(CurLine, Page);
 
     var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
     var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
@@ -985,6 +983,9 @@ CMathContent.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
         pos.x += PosInfoEqq.GetAlign();
         this.pos.x = pos.x;
     }
+
+    this.Bounds.SetPos(CurLine, this.pos, PRSA);
+    this.Bounds.SetPage(CurLine, Page);
 
     for(var i = StartPos; i <= EndPos; i++)
     {

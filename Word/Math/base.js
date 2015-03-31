@@ -1854,6 +1854,8 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.recalculateSize(g_oTextMeasurer);
 
         this.Update_WordLen(PRS, WordLen);
+        this.Bounds.SetWidth(0, this.size.width);
+        this.Bounds.UpdateMetrics(0, this.size);
     }
     else
     {

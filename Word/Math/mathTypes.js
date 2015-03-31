@@ -118,9 +118,6 @@ var ACCENT_TEXT                 = 46;
 
 ///////////////////////////////////////////////////
 
-/*var TXT_NORMAL                  =  0;
-var TXT_PLAIN                   =  1;*/
-
 
 var TXT_ROMAN                   =  0;   // math roman
 var TXT_SCRIPT                  =  1;
