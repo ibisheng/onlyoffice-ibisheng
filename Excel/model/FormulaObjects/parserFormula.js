@@ -2931,6 +2931,7 @@ function parserFormula( formula, _cellId, _ws ) {
     this.operand_str = null;
     this.parenthesesNotEnough = false;
     this.f = [];
+    this.reRowCol = new RegExp("^(ROW|ROWS|COLUMN|COLUMNS)$","gi");
 }
 
 parserFormula.prototype = {
@@ -3882,7 +3883,7 @@ parserFormula.prototype = {
     buildDependencies:function () {
 
         var node = this.wb.dependencyFormulas.addNode( this.ws.Id, this.cellId ),
-         ref, nTo, wsR;
+            ref, nTo, wsR;
 
         for ( var i = 0; i < this.outStack.length; i++ ) {
             ref = this.outStack[i];
@@ -3894,9 +3895,9 @@ parserFormula.prototype = {
             }
 
             if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea || ref instanceof cArea3D) &&
-                ref.isValid() && this.outStack[i + 1] &&
-                this.outStack[i + 1] instanceof cBaseFunction &&
-                ( this.outStack[i + 1].name == "ROWS" || this.outStack[i + 1].name == "COLUMNS" ) ) {
+                ref.isValid() && this.outStack[i + 1] && this.outStack[i + 1] instanceof cBaseFunction &&
+                this.reRowCol.test( this.outStack[i + 1].name ) ) {
+                this.reRowCol.lastIndex = 0;
                 continue;
             }
 
