@@ -4428,10 +4428,10 @@ function BinarySettingsTableWriter(memory, doc)
 		var val = c_oAscMathJc.CenterGroup;
 		switch (DefJc)
 		{
-			case JC_CENTER: 		val = c_oAscMathJc.Center; break;
-			case JC_CENTERGROUP: 	val = c_oAscMathJc.CenterGroup;	break;
-			case JC_LEFT: 			val = c_oAscMathJc.Left;	break;
-			case JC_RIGHT: 			val = c_oAscMathJc.Right; 
+			case align_Center: 			val = c_oAscMathJc.Center; break;
+			case align_Justify: 		val = c_oAscMathJc.CenterGroup;	break;
+			case align_Left: 			val = c_oAscMathJc.Left;	break;
+			case align_Right: 			val = c_oAscMathJc.Right; 
 		}
 		this.memory.WriteByte(val);
 	}
@@ -11271,11 +11271,11 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
 			var defJc = this.stream.GetUChar(length);
 			switch (defJc)
 			{
-				case c_oAscMathJc.Center:		props.defJc = JC_CENTER; break;
-				case c_oAscMathJc.CenterGroup:	props.defJc = JC_CENTERGROUP; break;
-				case c_oAscMathJc.Left:			props.defJc = JC_LEFT; break;
-				case c_oAscMathJc.Right: 		props.defJc = JC_RIGHT; break;
-				default: 						props.defJc = JC_CENTERGROUP;
+				case c_oAscMathJc.Center:		props.defJc = align_Center; break;
+				case c_oAscMathJc.CenterGroup:	props.defJc = align_Justify; break;
+				case c_oAscMathJc.Left:			props.defJc = align_Left; break;
+				case c_oAscMathJc.Right: 		props.defJc = align_Right; break;
+				default: 						props.defJc = align_Justify;
 			}
         }
 		else
