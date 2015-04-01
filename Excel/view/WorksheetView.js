@@ -6263,7 +6263,7 @@
 			return res;
 		};
 
-		WorksheetView.prototype._calcActiveRangeOffset = function () {
+		WorksheetView.prototype._calcActiveRangeOffset = function (x,y) {
 			var vr = this.visibleRange;
 			var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] : this.activeRange;
 			if (this.isFormulaEditMode) {
@@ -6274,25 +6274,55 @@
 					ar.r2 = (ar.r2 >= this.nRowsCount) ? this.nRowsCount - 1 : ar.r2;
 				}
 			}
-			var arn = ar.clone(true);
-			var isMC = this._isMergedCells(arn);
-			var adjustRight = ar.c2 >= vr.c2 || ar.c1 >= vr.c2 && isMC;
-			var adjustBottom = ar.r2 >= vr.r2 || ar.r1 >= vr.r2 && isMC;
-			var incX = ar.c1 < vr.c1 && isMC ? arn.c1 - vr.c1 : ar.c2 < vr.c1 ? ar.c2 - vr.c1 : 0;
-			var incY = ar.r1 < vr.r1 && isMC ? arn.r1 - vr.r1 : ar.r2 < vr.r1 ? ar.r2 - vr.r1 : 0;
+//			var arn = ar.clone(true);
+//			var isMC = this._isMergedCells(arn);
+//			var adjustRight = ar.c2 >= vr.c2 || ar.c1 >= vr.c2 && isMC;
+//			var adjustBottom = ar.r2 >= vr.r2 || ar.r1 >= vr.r2 && isMC;
+//			var incX = ar.c1 < vr.c1 && isMC ? arn.c1 - vr.c1 : ar.c2 < vr.c1 ? ar.c2 - vr.c1 : 0;
+//			var incY = ar.r1 < vr.r1 && isMC ? arn.r1 - vr.r1 : ar.r2 < vr.r1 ? ar.r2 - vr.r1 : 0;
 
-			var offsetFrozen = this.getFrozenPaneOffset();
+//			var offsetFrozen = this.getFrozenPaneOffset();
 
-			if (adjustRight) {
-				while (this._isColDrawnPartially(isMC ? arn.c2 : ar.c2, vr.c1 + incX, offsetFrozen.offsetX)) {++incX;}
-			}
-			if (adjustBottom) {
-				while (this._isRowDrawnPartially(isMC ? arn.r2 : ar.r2, vr.r1 + incY, offsetFrozen.offsetY)) {++incY;}
-			}
-			return {
-				deltaX: ar.type === c_oAscSelectionType.RangeCol || ar.type === c_oAscSelectionType.RangeCells ? incX : 0,
-				deltaY: ar.type === c_oAscSelectionType.RangeRow || ar.type === c_oAscSelectionType.RangeCells ? incY : 0
-			};
+//			if (adjustRight) {
+//				while (this._isColDrawnPartially(isMC ? arn.c2 : ar.c2, vr.c1 + incX, offsetFrozen.offsetX)) {++incX;}
+//			}
+//			if (adjustBottom) {
+//				while (this._isRowDrawnPartially(isMC ? arn.r2 : ar.r2, vr.r1 + incY, offsetFrozen.offsetY)) {++incY;}
+//			}
+//          return {
+//              deltaX: ar.type === c_oAscSelectionType.RangeCol || ar.type === c_oAscSelectionType.RangeCells ? incX : 0,
+//              deltaY: ar.type === c_oAscSelectionType.RangeRow || ar.type === c_oAscSelectionType.RangeCells ? incY : 0
+//          };
+
+            x *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
+            y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
+
+            var d={};
+
+            if (y <= this.cellsTop + this.height_2px /*+ offsetFrozen.offsetY*/ ){
+                d.deltaY = -1;
+            }else if ( y >= this.drawingCtx.getHeight() - this.height_2px)
+                d.deltaY = 1;
+
+            if (x <= this.cellsLeft + this.width_2px /*+ offsetFrozen.offsetX*/ ){
+                d.deltaX = -1;
+            }else if ( x >= this.drawingCtx.getWidth() - this.width_2px)
+                d.deltaX = 1;
+
+//            d.deltaX += incX;
+//            d.deltaY += incY;
+
+            if (ar.type === c_oAscSelectionType.RangeRow)
+                d.deltaX = 0;
+            else if (ar.type === c_oAscSelectionType.RangeCol)
+                d.deltaY = 0;
+            else if (ar.type === c_oAscSelectionType.RangeMax) {
+                d.deltaX = 0;
+                d.deltaY = 0;
+            }
+
+            return d;
+
 		};
 
 		/**
@@ -6974,7 +7004,7 @@
 
 			this.model.workbook.handlers.trigger("asc_onHideComment");
 
-			return this._calcActiveRangeOffset();
+			return this._calcActiveRangeOffset(x,y);
 		};
 
 		// Окончание выделения
