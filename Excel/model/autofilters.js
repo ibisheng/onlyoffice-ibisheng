@@ -1,5 +1,7 @@
 ﻿"use strict";
 var gUndoInsDelCellsFlag = true;
+var maxValCol = 20000;
+var maxValRow = 100000;
 (	/**
 	 * @param {jQuery} $
 	 * @param {Window} window
@@ -649,6 +651,16 @@ var gUndoInsDelCellsFlag = true;
 								if(paramsForCallBackAdd == "addTableFilterOneCell")
 									tempCells = mainAdjacentCells;
 								
+								if((tempCells.r2 - tempCells.r1) > maxValRow)
+								{	
+									tempCells.r2 = tempCells.r1 + maxValRow;
+									if(addNameColumn)
+										tempCells.r2--;
+								}
+								if((tempCells.c2 - tempCells.c1) > maxValCol)
+									tempCells.c2 = tempCells.c1 + maxValCol;
+									
+								
 								//при добавлении строки заголовков - сдвигаем диапазон на строку ниже
 								if(!isTurnOffHistory && addNameColumn)
 								{
@@ -766,13 +778,13 @@ var gUndoInsDelCellsFlag = true;
 							{
 								result: result,
 								isVis:  true
-							};
+							}
 							
 							//TODO пересмотреть Asc.g_oRangeCache.getAscRange
 							var ref = 
 							{
 								Ref: Asc.g_oRangeCache.getAscRange(result[0].id + ':' + result[result.length -1].idNext).clone()
-							};
+							}
 							
 							if(addNameColumn && addFormatTableOptionsObj)
 								addFormatTableOptionsObj.range = ref;
@@ -4303,8 +4315,6 @@ var gUndoInsDelCellsFlag = true;
 				//var endCellAddress = new CellAddress(idNext);
 				var bbox = range;
 				//ограничим количество строчек/столбцов				
-				var maxValCol = 20000;
-				var maxValRow = 100000;
 				if((bbox.r2 - bbox.r1) > maxValRow)
 					bbox.r2 = bbox.r1 + maxValRow;
 				if((bbox.c2 - bbox.c1) > maxValCol)
