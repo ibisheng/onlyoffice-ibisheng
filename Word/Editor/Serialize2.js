@@ -3577,7 +3577,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 		var Content = par.Content;
         //todo commentStart для копирования
         var oThis = this;
-        for ( var i = ParaStart; i <= ParaEnd; ++i )
+        for ( var i = ParaStart; i <= ParaEnd && i < Content.length; ++i )
         {
             var item = Content[i];
             switch ( item.Type )
@@ -3731,7 +3731,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
         //разбиваем по para_PageNum на массив диапазонов.
         var nPrevIndex = ParaStart;
         var aRunRanges = [];
-        for (var i = ParaStart; i < ParaEnd; i++) {
+        for (var i = ParaStart; i < ParaEnd && i < oRun.Content.length; i++) {
             var item = oRun.Content[i];
             if (item.Type == para_PageNum) {
                 var elem;
@@ -3786,7 +3786,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
         
         var Content = oRun.Content;
         var sCurText = "";
-        for (var i = nStart; i < nEnd; ++i)
+        for (var i = nStart; i < nEnd && i < Content.length; ++i)
         {
             var item = Content[i];
             switch ( item.Type )
@@ -4157,7 +4157,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 			nStart = aRowElems[0].row;
 			nEnd = aRowElems[aRowElems.length - 1].row;
 		}
-        for(var i = nStart; i <= nEnd; ++i)
+        for(var i = nStart; i <= nEnd && i < Content.length; ++i)
 		{
 			var oRowElem = null;
 			if(null != aRowElems)
@@ -4204,7 +4204,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 			nStart = oRowElem.indexStart;
 			nEnd = oRowElem.indexEnd;
 		}
-        for(var i = nStart; i <= nEnd; i++)
+        for(var i = nStart; i <= nEnd && i < Content.length; i++)
         {
             this.bs.WriteItem(c_oSerDocTableType.Cell, function(){oThis.WriteCell(Content[i], nRowIndex, i);});
         }
