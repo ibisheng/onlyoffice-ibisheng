@@ -51,7 +51,8 @@ var c_oAscAsyncAction = {
 	Recalc				: 10, // пересчет формул
 	SlowOperation		: 11, // медленная операция
 	LoadTheme			: 12, // загрузка темы
-	MailMergeLoadFile	: 13  // загрузка файла для mail merge
+	MailMergeLoadFile	: 13, // загрузка файла для mail merge
+	DownloadMerge		: 14  // cкачать файл с mail merge
 };
 
 // Режимы отрисовки

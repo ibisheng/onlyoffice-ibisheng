@@ -2308,7 +2308,7 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile) {//передаем �
 asc_docs_api.prototype.asc_DownloadAsMailMerge = function(typeFile, StartIndex, EndIndex, bIsDownload) {
 	var oDocumentMailMerge = this.WordControl.m_oLogicDocument.Get_MailMergedDocument(StartIndex, EndIndex);
 	if(null != oDocumentMailMerge){
-		var actionType = c_oAscAsyncAction.DownloadAs;
+		var actionType = c_oAscAsyncAction.DownloadMerge;
 		if(bIsDownload)
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 		var t = this;
