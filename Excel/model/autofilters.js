@@ -326,12 +326,12 @@ var maxValRow = 100000;
 							var isAddCellsShiftBottom = t._isAddCellsShiftBottom(activeCells);
 							if(isAddCellsShiftBottom === true)
 							{
-								ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+								aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 								return false;
 							}
 							else if(isAddCellsShiftBottom === "error")
 							{
-								ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+								aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 								return false;
 							}
 						}
@@ -353,7 +353,7 @@ var maxValRow = 100000;
 						}
 						
 						if(rangeShift && rangeShift.r1 != undefined)
-							rangeShift = ws.model.getRange3(rangeShift.r1, rangeShift.c1, rangeShift.r1, rangeShift.c2);
+							rangeShift = aWs.getRange3(rangeShift.r1, rangeShift.c1, rangeShift.r1, rangeShift.c2);
 						
 						
 						var isUpdateRange = null;
@@ -436,9 +436,9 @@ var maxValRow = 100000;
 									{
 										for(var i = apocal.range.r1; i <= apocal.range.r2; i++)
 										{
-											if(ws.model.getRowHidden(i))
+											if(aWs.getRowHidden(i))
 											{
-												ws.model.setRowHidden(/*bHidden*/false, i, i);
+												aWs.setRowHidden(/*bHidden*/false, i, i);
 												isInsert = true;
 											}	
 										}	
@@ -470,7 +470,7 @@ var maxValRow = 100000;
 									aWs.AutoFilter = null;
 									if(addNameColumn && rangeShift && !isTurnOffHistory)
 									{
-										ws.model._moveRange(activeCells,  new Asc.Range(activeCells.c1, activeCells.r1 + 1, activeCells.c2, activeCells.r2 + 1));
+										aWs._moveRange(activeCells,  new Asc.Range(activeCells.c1, activeCells.r1 + 1, activeCells.c2, activeCells.r2 + 1));
 
 										ws.cellCommentator.updateCommentsDependencies(true, 4, rangeShift.bbox);
                                         ws.objectRender && ws.objectRender.updateDrawingObject(true, 4, rangeShift.bbox);
@@ -490,14 +490,14 @@ var maxValRow = 100000;
 									}
 									
 									//делаем unmerge
-									ws.model.getRange3(activeCells.r1, activeCells.c1, activeCells.r2, activeCells.c2).unmerge();
+									aWs.getRange3(activeCells.r1, activeCells.c1, activeCells.r2, activeCells.c2).unmerge();
 									changeRows = true;
 									
 									for(var i = activeCells.r1; i <= activeCells.r2; i++)
 									{
-										if(ws.model.getRowHidden(i))
+										if(aWs.getRowHidden(i))
 										{
-											ws.model.setRowHidden(/*bHidden*/false, i, i);
+											aWs.setRowHidden(/*bHidden*/false, i, i);
 											isInsert = true;
 										}	
 									}	
@@ -526,8 +526,8 @@ var maxValRow = 100000;
 									if(!isAll)
 									{
 										t._setColorStyleTable(aWs.TableParts[aWs.TableParts.length - 1].Ref, aWs.TableParts[aWs.TableParts.length - 1], null, true);
-										var firstCell = ws.model.getCell(new CellAddress((result[0].id)));
-										var endCell = ws.model.getCell(new CellAddress((result[result.length -1].idNext)));
+										var firstCell = aWs.getCell(new CellAddress((result[0].id)));
+										var endCell = aWs.getCell(new CellAddress((result[result.length -1].idNext)));
 										var arn = 
 										{
 											r1: firstCell.first.row,
@@ -668,7 +668,7 @@ var maxValRow = 100000;
 									if(isAddCellsShiftBottom === true)
 									{
 										//TODO пока обрубаем в случае если нужно сдвинуть таблицу внизу, затем нужно обрабатывать сдвиг и грамотно записывать в историю
-										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+										aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 										History.EndTransaction();
 										if(isTurnOffHistory)
 											History.TurnOn();
@@ -685,7 +685,7 @@ var maxValRow = 100000;
 									}
 									else if(isAddCellsShiftBottom === "error")
 									{
-										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+										aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 										History.EndTransaction();
 										if(isTurnOffHistory)
 											History.TurnOn();
@@ -693,7 +693,7 @@ var maxValRow = 100000;
 									}
 									else
 									{
-										ws.model._moveRange(tempCells,  new Asc.Range(tempCells.c1, tempCells.r1 + 1, tempCells.c2, tempCells.r2 + 1));
+										aWs._moveRange(tempCells,  new Asc.Range(tempCells.c1, tempCells.r1 + 1, tempCells.c2, tempCells.r2 + 1));
 									}	
 								}
 								
@@ -701,9 +701,9 @@ var maxValRow = 100000;
 								if(lTable)
 								{
 									if(addNameColumn && !isTurnOffHistory)
-										ws.model.getRange3(tempCells.r1, tempCells.c1, tempCells.r2 + 1, tempCells.c2).unmerge();
+										aWs.getRange3(tempCells.r1, tempCells.c1, tempCells.r2 + 1, tempCells.c2).unmerge();
 									else
-										ws.model.getRange3(tempCells.r1, tempCells.c1, tempCells.r2, tempCells.c2).unmerge();
+										aWs.getRange3(tempCells.r1, tempCells.c1, tempCells.r2, tempCells.c2).unmerge();
 									
 									changeRows = true;
 								}
@@ -753,8 +753,8 @@ var maxValRow = 100000;
 							if(!isAll)
 							{
 								t._setColorStyleTable(aWs.TableParts[aWs.TableParts.length - 1].Ref, aWs.TableParts[aWs.TableParts.length - 1], null,true);
-								var firstCell = ws.model.getCell(new CellAddress((result[0].id)));
-								var endCell = ws.model.getCell(new CellAddress((result[result.length -1].idNext)));
+								var firstCell = aWs.getCell(new CellAddress((result[0].id)));
+								var endCell = aWs.getCell(new CellAddress((result[result.length -1].idNext)));
 								var arn = 
 								{
 									r1: firstCell.first.row,
@@ -852,7 +852,7 @@ var maxValRow = 100000;
 					var changesElemHistory = null;
 					if(apocal == 'error')
 					{
-						ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
+						aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
 						return false;
 					}
 					else if(apocal && apocal.changeStyle)
@@ -868,7 +868,6 @@ var maxValRow = 100000;
 						{
 							filterChange =  allAutoFilters[apocal.num];
 						}
-						//rangeShift = ws.model.getRange(new CellAddress(filterChange.Ref.split(":")[0]), new CellAddress(filterChange.Ref.split(":")[1]));
 						
 						rangeShift = filterChange.Ref;
 						
@@ -957,7 +956,6 @@ var maxValRow = 100000;
 								filterChange =  allAutoFilters[apocal.num];
 							}
 							
-							//rangeShift = ws.model.getRange(new CellAddress(filterChange.Ref.split(":")[0]), new CellAddress(filterChange.Ref.split(":")[1]));
 							rangeShift = filterChange.Ref;
 							
 							paramsForCallBack = 'changeStyleWithoutFilter';
@@ -975,10 +973,9 @@ var maxValRow = 100000;
 							newRes = {
 								result: allAutoFilters[apocal.num - 1].result,
 								isVis:  true
-							};
+							}
 							var ourFilter = allAutoFilters[apocal.num - 1];
 							
-							//rangeShift = ws.model.getRange(new CellAddress(ourFilter.Ref.split(":")[0]), new CellAddress(ourFilter.Ref.split(":")[1]));
 							rangeShift = ourFilter.Ref;
 							
 							paramsForCallBack = 'setStyleTableForAutoFilter';
@@ -1000,7 +997,6 @@ var maxValRow = 100000;
 							};
 							var ourFilter = allAutoFilters[apocal.num];
 							
-							//rangeShift = ws.model.getRange(new CellAddress(ourFilter.Ref.split(":")[0]), new CellAddress(ourFilter.Ref.split(":")[1]));
 							rangeShift = ourFilter.Ref;
 							
 							paramsForCallBack = 'setStyleTableForAutoFilter1';
@@ -1022,7 +1018,7 @@ var maxValRow = 100000;
 				
 				var mergedRange;
 				if(activeCells && activeCells != null)
-					mergedRange = ws.model.getRange3(activeCells.r1, activeCells.c1, activeCells.r2, activeCells.c2).hasMerged();
+					mergedRange = aWs.getRange3(activeCells.r1, activeCells.c1, activeCells.r2, activeCells.c2).hasMerged();
 				
 				//при открытии
 				if(openFilter != undefined)
@@ -1105,7 +1101,7 @@ var maxValRow = 100000;
 				else if((activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2) || (!lTable && mergedRange && activeCells.r1 == mergedRange.r1 && activeCells.c1 == mergedRange.c1 && activeCells.r2 == mergedRange.r2 && activeCells.c2 == mergedRange.c2))//если ячейка выделенная одна
 				{
 					var mainAdjacentCells = this._getAdjacentCellsAF(activeCells, aWs);
-					rangeShift = ws.model.getRange3(mainAdjacentCells.r1, mainAdjacentCells.c1, mainAdjacentCells.r1, mainAdjacentCells.c2);
+					rangeShift = aWs.getRange3(mainAdjacentCells.r1, mainAdjacentCells.c1, mainAdjacentCells.r1, mainAdjacentCells.c2);
 					var rowAdd = 0;
 					//в случае таблице меняем контент и добавляем строку с названиями
 					if(lTable)
@@ -1139,7 +1135,7 @@ var maxValRow = 100000;
 				}
 				else//выделено > 1 ячейки
 				{		
-					rangeShift = ws.model.getRange3(activeCells.r1, activeCells.c1, activeCells.r1, activeCells.c2);
+					rangeShift = aWs.getRange3(activeCells.r1, activeCells.c1, activeCells.r1, activeCells.c2);
 					var rowAdd = 0;
 					if(lTable)
 					{
@@ -1608,7 +1604,7 @@ var maxValRow = 100000;
 						startCol = activeRange.c1;
 				}
 			
-				sortRange = ws.model.getRange3(filterRef.r1 + 1, filterRef.c1, filterRef.r2, filterRef.c2);
+				sortRange = aWs.getRange3(filterRef.r1 + 1, filterRef.c1, filterRef.r2, filterRef.c2);
 				if(isTurnOffHistory)
 					onSortAutoFilterCallback(true);
 				else
@@ -2301,7 +2297,15 @@ var maxValRow = 100000;
 				else if(activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2)//если ячейка выделенная одна
 					mainAdjacentCells = this._getAdjacentCellsAF(activeCells,aWs);
 				else//выделено > 1 ячейки
-					mainAdjacentCells = activeCells;
+				{
+					//если выделен весь столбец - смотрим нет ли пересекающих его объедененных строчек
+					if(c_oAscSelectionType.RangeCol === activeCells.type)
+					{
+						
+					}
+					else
+						mainAdjacentCells = activeCells;
+				}
 					
 				//имеется ввиду то, что при выставленном флаге title используется первая строка в качестве заголовка, в противном случае - добавлются заголовки
 				var isTitle = this._isAddNameColumn(mainAdjacentCells);
@@ -2336,7 +2340,6 @@ var maxValRow = 100000;
 				var DeleteColumns = (val == c_oAscDeleteOptions.DeleteColumns && prop == 'delCell') ? true : false;
 				var DeleteRows = (val == c_oAscDeleteOptions.DeleteRows && prop == 'delCell') ? true : false;
 				
-				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				var tableParts = aWs.TableParts;
 				var autoFilter = aWs.AutoFilter;
@@ -2348,11 +2351,11 @@ var maxValRow = 100000;
 					var newActiveRange;
 					if(DeleteRows)
 					{
-						newActiveRange = new Asc.Range(0, activeCells.r1, ws.nColsCount - 1, activeCells.r2);
+						newActiveRange = new Asc.Range(0, activeCells.r1, gc_nMaxCol - 1, activeCells.r2);
 					}
 					else
 					{
-						newActiveRange = new Asc.Range(activeCells.c1, 0, activeCells.c2, ws.nRowsCount - 1);
+						newActiveRange = new Asc.Range(activeCells.c1, 0, activeCells.c2, gc_nMaxRow - 1);
 					}
 					//если активной областью захвачена полнотью форматированная таблица(или её часть) + часть форматированной таблицы - выдаём ошибку
 					if(tableParts)
@@ -2368,7 +2371,7 @@ var maxValRow = 100000;
 							{
 								if(isExp && isPart)//часть + целая
 								{
-									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+									aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}	
 								if(newActiveRange.c1 <= tableRange.c1 && newActiveRange.c2 >= tableRange.c2 && newActiveRange.r1 <= tableRange.r1 && newActiveRange.r2 >= tableRange.r2)
@@ -2376,36 +2379,36 @@ var maxValRow = 100000;
 									isExp = true;
 									if(isPart)
 									{
-										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+										aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 										return false;
 									}
 								}
 								else if(isExp)
 								{
-									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+									aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 								else if(isPart)//уже часть захвачена + ещё одна часть
 								{
-									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+									aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 								else if(DeleteRows)
 								{
 									if(!this.checkRemoveTableParts(newActiveRange, tableRange))
 									{
-										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+										aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 										return false;
 									}
 									else if(activeCells.r1 < tableRange.r1 && activeCells.r2 >= tableRange.r1 && activeCells.r2 < tableRange.r2)//TODO заглушка!!!
 									{
-										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+										aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 										return false;
 									}
 								}
 								else if(DeleteColumns && activeCells.c1 < tableRange.c1 && activeCells.c2 >= tableRange.c1 && activeCells.c2 < tableRange.c2)//TODO заглушка!!!
 								{
-									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+									aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 								else	
@@ -2448,7 +2451,7 @@ var maxValRow = 100000;
 								if(!isExp)
 								{
 
-									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+									aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 							}
@@ -2462,7 +2465,7 @@ var maxValRow = 100000;
 								if(tableRange.c1 > activeCells.c1 && (((tableRange.r1 <= activeCells.r1 && tableRange.r2 >= activeCells.r1) || (tableRange.r1 <= activeCells.r2  && tableRange.r2 >= activeCells.r2))  && !(tableRange.r1 == activeCells.r1 && tableRange.r2 == activeCells.r2)))
 								{
 
-									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+									aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 							}
@@ -2472,7 +2475,7 @@ var maxValRow = 100000;
 								if(tableRange.r1 > activeCells.r1 && (((tableRange.c1 <= activeCells.c1 && tableRange.c2 >= activeCells.c1) || (tableRange.c1 <= activeCells.c2  && tableRange.c2 >= activeCells.c2))  && !(tableRange.c1 == activeCells.c1 && tableRange.c2 == activeCells.c2)))
 								{
 
-									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+									aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 								
@@ -2483,7 +2486,7 @@ var maxValRow = 100000;
 								if(tableRange.c1 > activeCells.c1 && (((tableRange.r1 <= activeCells.r1 && tableRange.r2 >= activeCells.r1) || (tableRange.r1 <= activeCells.r2  && tableRange.r2 >= activeCells.r2)) && !(tableRange.r1 == activeCells.r1 && tableRange.r2 == activeCells.r2)))
 								{
 
-									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+									aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 							}
@@ -2493,7 +2496,7 @@ var maxValRow = 100000;
 								if(tableRange.r1 > activeCells.r1 && (((tableRange.c1 <= activeCells.c1 && tableRange.c2 >= activeCells.c1) || (tableRange.c1 <= activeCells.c2  && tableRange.c2 >= activeCells.c2))  && !(tableRange.c1 >= activeCells.c1 && tableRange.c2 <= activeCells.c2)))
 								{
 
-									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+									aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 							}
@@ -2541,7 +2544,7 @@ var maxValRow = 100000;
 					if((InsertCellsAndShiftDown || DeleteCellsAndShiftTop) && tableRange.r1 > activeCells.r1 && (((tableRange.c1 <= activeCells.c1 && tableRange.c2 >= activeCells.c1) || (tableRange.c1 <= activeCells.c2  && tableRange.c2 >= activeCells.c2))  && !(tableRange.c1 >= activeCells.c1 && tableRange.c2 <= activeCells.c2)))
 					{
 
-						ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+						aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 						return false;
 					}
 					//если выделенная область находится до а/ф
@@ -2573,7 +2576,6 @@ var maxValRow = 100000;
 			
 			isCheckMoveRange: function(arnFrom)
 			{	
-				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				
 				var tableParts = aWs.TableParts;
@@ -2596,7 +2598,7 @@ var maxValRow = 100000;
 				
 				if((counterIntersection > 0 && counterContains > 0) || (counterIntersection > 1))
 				{
-					ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
+					aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
 					return false;
 				}
 				
@@ -2605,7 +2607,6 @@ var maxValRow = 100000;
 			
 			_isIntersectionTableParts: function(range)
 			{
-				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				
 				var tableParts = aWs.TableParts;
@@ -2621,7 +2622,6 @@ var maxValRow = 100000;
 			
 			//при закрытии диалогового окна числового фильтра
 			_applyDigitalFilter: function(ar, autoFiltersObject) {
-				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				var conFilter = autoFiltersObject;
 				var activeCells = this._idToRange(conFilter.cellId);
@@ -2663,8 +2663,8 @@ var maxValRow = 100000;
 				var startIdCell = currentFilter.result[filtersOp[1]].id;
 				var endIdCell = currentFilter.result[filtersOp[1]].idNext;
 				
-				var startRange = ws.model.getCell(new CellAddress(startIdCell));
-				var endRange = ws.model.getCell(new CellAddress(endIdCell));
+				var startRange = aWs.getCell(new CellAddress(startIdCell));
+				var endRange = aWs.getCell(new CellAddress(endIdCell));
 				
 				var isMerged = startRange.hasMerged();
 				var startCell = this._idToRange(startIdCell);
@@ -2677,8 +2677,8 @@ var maxValRow = 100000;
 					endCell.c1 = isMerged.c1;
 					startIdCell = this._rangeToId(startCell);
 					endIdCell = this._rangeToId(endCell);
-					startRange = ws.model.getCell(new CellAddress(startIdCell));
-					endRange = ws.model.getCell(new CellAddress(endIdCell));
+					startRange = aWs.getCell(new CellAddress(startIdCell));
+					endRange = aWs.getCell(new CellAddress(endIdCell));
 					isMerged = true;
 				}
 				else
@@ -2693,7 +2693,7 @@ var maxValRow = 100000;
 				//this._isSpecValueCustomFilter(conFilter);
 				for(var i = filterRange.r1 + 1; i <= filterRange.r2; i++)
 				{
-					var cell = ws.model.getCell3(i, filterRange.c1);
+					var cell = aWs.getCell3(i, filterRange.c1);
 					var val = cell.getValue();
 					var type = cell.getType();
 					var valWithFormat = cell.getValueWithFormat();
@@ -2744,8 +2744,8 @@ var maxValRow = 100000;
 					var curCellId = cellId.split('af')[0];
 					activeCells = 
 					{
-						c1: ws.model.getCell(new CellAddress(curCellId)).first.col - 1,
-						r1: ws.model.getCell(new CellAddress(curCellId)).first.row - 1
+						c1: aWs.getCell(new CellAddress(curCellId)).first.col - 1,
+						r1: aWs.getCell(new CellAddress(curCellId)).first.row - 1
 					}
 				}
 				
@@ -2785,7 +2785,7 @@ var maxValRow = 100000;
 					filterObj = aWs.TableParts[filtersOp[0]];
 				}
 				var oldFilter = filterObj.clone(aWs);
-				var cell = ws.model.getCell3(activeCells.r1, activeCells.c1);
+				var cell = aWs.getCell3(activeCells.r1, activeCells.c1);
 				
 				var filterRange = ref;
 				
@@ -2849,7 +2849,7 @@ var maxValRow = 100000;
 					}
 					for(var m = 0; m < lengthRows; m++)
 					{
-						var val = ws.model.getCell3(activeCells.r1 + m + 1,activeCells.c1).getValueWithFormat();
+						var val = aWs.getCell3(activeCells.r1 + m + 1,activeCells.c1).getValueWithFormat();
 						var anotherFilterHidden = this._isHiddenAnotherFilter2(curCellId,activeCells.r1 + m + 1,ref);
 						if(anotherFilterHidden == 'hidden')
 							newArray[m] = 'hidden';
@@ -2889,12 +2889,12 @@ var maxValRow = 100000;
 					//проверка на повторяющиеся элементы
 					if(array[i] == 'rep')
 					{
-						var mainVal = ws.model.getCell3(activeCells.r1 + i + 1, activeCells.c1).getValueWithFormat();
+						var mainVal = aWs.getCell3(activeCells.r1 + i + 1, activeCells.c1).getValueWithFormat();
 						for(var k = 0;k < array.length; k++)
 						{							
 							if(array[k] == false || array[k] == true)
 							{
-								var val2 = ws.model.getCell3(activeCells.r1 + k + 1, activeCells.c1).getValueWithFormat();
+								var val2 = aWs.getCell3(activeCells.r1 + k + 1, activeCells.c1).getValueWithFormat();
 								if(val2 == mainVal)
 								{
 									array[i] = array[k];
@@ -2908,13 +2908,13 @@ var maxValRow = 100000;
 					//схлопываем строки 
 					if(array[i] == false || array[i] == 'hidden')
 					{
-						if(!ws.model.getRowHidden(row))
-							ws.model.setRowHidden(/*bHidden*/true, row, row);
+						if(!aWs.getRowHidden(row))
+							aWs.setRowHidden(/*bHidden*/true, row, row);
 					}
 					else if(array[i] == true)
 					{
-						if(ws.model.getRowHidden(row))
-							ws.model.setRowHidden(/*bHidden*/false, row, row);
+						if(aWs.getRowHidden(row))
+							aWs.setRowHidden(/*bHidden*/false, row, row);
 					}
 				}
 				
@@ -2928,7 +2928,7 @@ var maxValRow = 100000;
 					{
 						if(allFilterOpenElements)
 							break;
-						var cell = ws.model.getCell3(activeCells.r1 + i + 1, activeCells.c1);
+						var cell = aWs.getCell3(activeCells.r1 + i + 1, activeCells.c1);
 						var valActive = cell.getValueWithFormat();
 						var valWithoutFormat = cell.getValueWithoutFormat();
 						var arrVal;
@@ -3062,13 +3062,13 @@ var maxValRow = 100000;
 			_getAutoFilterArray: function(cell) {
 				var curId = cell.id;
 				var nextId = cell.idNext;
-				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				var activeCells =
 				{
-					c1: ws.model.getCell(new CellAddress(curId)).first.col - 1,
-					r1: ws.model.getCell(new CellAddress(curId)).first.row - 1,
-					c2: ws.model.getCell(new CellAddress(nextId)).first.col - 1,
-					r2: ws.model.getCell(new CellAddress(nextId)).first.row - 1
+					c1: aWs.getCell(new CellAddress(curId)).first.col - 1,
+					r1: aWs.getCell(new CellAddress(curId)).first.row - 1,
+					c2: aWs.getCell(new CellAddress(nextId)).first.col - 1,
+					r2: aWs.getCell(new CellAddress(nextId)).first.row - 1
 				};
 				//проверяем какому фильтру принадлежит
 				var indexFilter = this._findArrayFromAllFilter3(activeCells,curId);
@@ -3078,8 +3078,8 @@ var maxValRow = 100000;
 			
 			_checkValueInCells: function(n, k, cloneActiveRange)
 			{
-				var ws = this.worksheet;
-				var cell = ws.model.getRange3(n, k, n, k);
+				var aWs = this._getCurrentWS();
+				var cell = aWs.getRange3(n, k, n, k);
 				var isEmptyCell = cell.isEmptyText();
 				var isEnd = true, range, merged, valueMerg;
 				
@@ -3090,7 +3090,7 @@ var maxValRow = 100000;
 					valueMerg = null;
 					if(merged)
 					{
-						valueMerg = ws.model.getRange3(merged.r1, merged.c1, merged.r2, merged.c2).getValue();
+						valueMerg = aWs.getRange3(merged.r1, merged.c1, merged.r2, merged.c2).getValue();
 						if(valueMerg != null && valueMerg != "")
 						{	
 							if(merged.r1 < cloneActiveRange.r1)
@@ -3383,7 +3383,7 @@ var maxValRow = 100000;
 			},
 			
 			//функция поиска среди смежных ячеек 
-			_getAdjacentCellsAF: function(ar,aWs) 
+			_getAdjacentCellsAF: function(ar, aWs) 
 			{
 				var ws = this.worksheet;
 				var cloneActiveRange = ar.clone(true); // ToDo слишком много клонирования
@@ -3392,7 +3392,7 @@ var maxValRow = 100000;
 				
 				//есть ли вообще на странице мерженные ячейки
 				//TODO стоит пересмотреть проверку мерженных ячеек
-				var allRange = ws.model.getRange3(0, 0, ws.nRowsCount, ws.nColsCount);
+				var allRange = aWs.getRange3(0, 0, ws.nRowsCount, ws.nColsCount);
 				var isMergedCells = allRange.hasMerged();
 				
 				for(var n = cloneActiveRange.r1 - 1; n <= cloneActiveRange.r2 + 1; n++)
@@ -3421,7 +3421,7 @@ var maxValRow = 100000;
 						if(k >= cloneActiveRange.c1 && k <= cloneActiveRange.c2 && n >= cloneActiveRange.r1 && n <= cloneActiveRange.r2)
 							continue;
 							
-						cell = ws.model.getRange3(n, k, n, k);
+						cell = aWs.getRange3(n, k, n, k);
 						isEmptyCell = cell.isEmptyText();
 						
 						//если мерженная ячейка
@@ -3431,7 +3431,7 @@ var maxValRow = 100000;
 							valueMerg = null;
 							if(merged)
 							{
-								valueMerg = ws.model.getRange3(merged.r1, merged.c1, merged.r2, merged.c2).getValue();
+								valueMerg = aWs.getRange3(merged.r1, merged.c1, merged.r2, merged.c2).getValue();
 								if(valueMerg != null && valueMerg != "")
 								{	
 									if(merged.r1 < cloneActiveRange.r1)
@@ -3459,7 +3459,7 @@ var maxValRow = 100000;
 									if(k < 0)
 										k = 0;
 										
-									cell = ws.model.getRange3(n, k, n, k);	
+									cell = aWs.getRange3(n, k, n, k);	
 								}
 							}
 						}
@@ -3494,7 +3494,7 @@ var maxValRow = 100000;
 				{
 					for(var n = cloneActiveRange.c1; n <= cloneActiveRange.c2; n++)
 					{
-						cell = ws.model.getRange3(cloneActiveRange.r1, n, cloneActiveRange.r1, n);
+						cell = aWs.getRange3(cloneActiveRange.r1, n, cloneActiveRange.r1, n);
 						if(cell.getValueWithoutFormat() != '')
 							break;
 						if(n == cloneActiveRange.c2 && cloneActiveRange.r2 > cloneActiveRange.r1/*&& cloneActiveRange.c2 > cloneActiveRange.c1*/)
@@ -3505,7 +3505,7 @@ var maxValRow = 100000;
 				{
 					for(var n = cloneActiveRange.c1; n <= cloneActiveRange.c2; n++)
 					{
-						cell = ws.model.getRange3(cloneActiveRange.r2, n, cloneActiveRange.r2, n);
+						cell = aWs.getRange3(cloneActiveRange.r2, n, cloneActiveRange.r2, n);
 						if(cell.getValueWithoutFormat() != '')
 							break;
 						if(n == cloneActiveRange.c2 && cloneActiveRange.r2 > cloneActiveRange.r1)
@@ -3517,7 +3517,7 @@ var maxValRow = 100000;
 				{
 					for(var n = cloneActiveRange.r1; n <= cloneActiveRange.r2; n++)
 					{
-						cell = ws.model.getRange3(n, cloneActiveRange.c1, n, cloneActiveRange.c1);
+						cell = aWs.getRange3(n, cloneActiveRange.c1, n, cloneActiveRange.c1);
 						if(cell.getValueWithoutFormat() != '')
 							break;
 						if(n == cloneActiveRange.r2 && cloneActiveRange.r2 > cloneActiveRange.r1)
@@ -3528,15 +3528,15 @@ var maxValRow = 100000;
 				{
 					for(var n = cloneActiveRange.r1; n <= cloneActiveRange.r2; n++)
 					{
-						cell = ws.model.getRange3(n, cloneActiveRange.c2, n, cloneActiveRange.c2);
+						cell = aWs.getRange3(n, cloneActiveRange.c2, n, cloneActiveRange.c2);
 						if(cell.getValueWithoutFormat() != '')
 							break;
 						if(n == cloneActiveRange.r2 && cloneActiveRange.c2 > cloneActiveRange.c1)
 						{
-							mergeCells = ws.model.getRange3(n, cloneActiveRange.c2, n, cloneActiveRange.c2).hasMerged();
+							mergeCells = aWs.getRange3(n, cloneActiveRange.c2, n, cloneActiveRange.c2).hasMerged();
 							if(!mergeCells || mergeCells === null)//если не мерженная ячейка
 								cloneActiveRange.c2--;
-							else if(ws.model.getRange3(mergeCells.r1, mergeCells.c1, mergeCells.r2, mergeCells.c2).getValue() == "")//если мерженная ячейка пустая
+							else if(aWs.getRange3(mergeCells.r1, mergeCells.c1, mergeCells.r2, mergeCells.c2).getValue() == "")//если мерженная ячейка пустая
 								cloneActiveRange.c2--;
 						}
 					}
@@ -4024,7 +4024,6 @@ var maxValRow = 100000;
 				// ToDo по хорошему стоит порефакторить код. ws.model легко можно заменить на aWs (хотя aWs как мне кажется не совсем хорошее название)
 				// Условие на вхождение диапазона заменить на containsRange. Возвращаемое значение привести к одному типу
 				// После правки поправить функцию parserHelper.checkDataRange
-				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				var allF =[];
 				
@@ -4052,7 +4051,7 @@ var maxValRow = 100000;
 				var numAll = -1;
 				if(typeof activeCells == 'string')
 				{
-					var newCell = ws.model.getCell(new CellAddress(activeCells));
+					var newCell = aWs.getCell(new CellAddress(activeCells));
 					if(newCell)
 					{
 						var newActiveCell = 
@@ -4179,7 +4178,6 @@ var maxValRow = 100000;
 			
 			_findArrayFromAllFilter3: function(range,id)
 			{
-				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				var index = undefined;
 				if(aWs.AutoFilter)
@@ -4310,7 +4308,7 @@ var maxValRow = 100000;
 			
 			_setColorStyleTable: function(range, options, isOpenFilter, isSetVal)
 			{
-				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				//var firstCellAddress = new CellAddress(id);
 				//var endCellAddress = new CellAddress(idNext);
 				var bbox = range;
@@ -4329,14 +4327,14 @@ var maxValRow = 100000;
 					headerRowCount = options.HeaderRowCount;
 				if(null != options.TotalsRowCount)
 					totalsRowCount = options.TotalsRowCount;
-				if(style && style.Name && ws.model.workbook.TableStyles && ws.model.workbook.TableStyles.AllStyles && (styleForCurTable = ws.model.workbook.TableStyles.AllStyles[style.Name]))
+				if(style && style.Name && aWs.workbook.TableStyles && aWs.workbook.TableStyles.AllStyles && (styleForCurTable = aWs.workbook.TableStyles.AllStyles[style.Name]))
 				{
 					//заполняем названия столбцов
 					if(true != isOpenFilter && headerRowCount > 0 && options.TableColumns)
 					{
 						for(var ncol = bbox.c1; ncol <= bbox.c2; ncol++)
 						{
-							var range = ws.model.getCell3(bbox.r1, ncol);
+							var range = aWs.getCell3(bbox.r1, ncol);
 							var num = ncol - bbox.c1;
 							var tableColumn = options.TableColumns[num];
 							if(null != tableColumn && null != tableColumn.Name && !startRedo && isSetVal)
@@ -4350,7 +4348,7 @@ var maxValRow = 100000;
 					var aNoHiddenCol = [];
 					for(var i = bbox.c1; i <= bbox.c2; i++)
 					{
-						if (!ws.model.getColHidden(i))
+						if (!aWs.getColHidden(i))
 							aNoHiddenCol.push(i);
 					}
 					aNoHiddenCol.sort(fSortAscending);
@@ -4365,8 +4363,8 @@ var maxValRow = 100000;
 					var aNoHiddenRow = [];
 					for(var i = bbox.r1; i <= bbox.r2; i++)
 					{
-						var row = ws.model._getRowNoEmpty(i);
-						if (!ws.model.getRowHidden(i))
+						var row = aWs._getRowNoEmpty(i);
+						if (!aWs.getRowHidden(i))
 							aNoHiddenRow.push(i);
 					}
 					aNoHiddenRow.sort(fSortAscending);
@@ -4386,7 +4384,7 @@ var maxValRow = 100000;
 						for(var j = 0, length2 = aNoHiddenCol.length; j < length2; j++)
 						{
 							var nColIndexAbs = aNoHiddenCol[j];
-							var cell = ws.model.getRange3(nRowIndexAbs, nColIndexAbs, nRowIndexAbs, nColIndexAbs);
+							var cell = aWs.getRange3(nRowIndexAbs, nColIndexAbs, nRowIndexAbs, nColIndexAbs);
 							var dxf = styleForCurTable.getStyle(bbox, i, j, style, headerRowCount, totalsRowCount);
 							if(null != dxf)
 								cell.setTableStyle(dxf);
@@ -4464,7 +4462,7 @@ var maxValRow = 100000;
 			
 			_getOpenAndClosedValues: function(numFilter, currentFilter, opFil, buttonId)
 			{
-				var isFilterCol = false, idDigitalFilter = false, result = [], ws = this.worksheet;
+				var isFilterCol = false, idDigitalFilter = false, result = [], aWs = this._getCurrentWS();
 				
 				//находим стартовую и конечную строку а/ф
 				if(currentFilter && currentFilter.Ref)
@@ -4508,11 +4506,11 @@ var maxValRow = 100000;
 							if(sb && sb == numFilter)
 								numFilter = curFilter.ColId;
 							
-							var col = ws.model.getCell(new CellAddress(acCell.id)).first.col - 1;
+							var col = aWs.getCell(new CellAddress(acCell.id)).first.col - 1;
 							var visible;
 							for(var nRow = startRow + 1; nRow <= endRow; nRow++)
 							{
-								var cell = ws.model.getCell3(nRow,col);
+								var cell = aWs.getCell3(nRow,col);
 								var val, val2;
 								val = val2 = cell.getValueWithFormat();
 								var isDateFormatCell = cell.getNumFormat().isDateTimeFormat();
@@ -4621,12 +4619,6 @@ var maxValRow = 100000;
 										result[nC].val = val;
 										result[nC].val2 = val2;
 									}
-										
-									/*var anotherFilterHidden = this._isHiddenAnotherFilter(buttonId,nRow,ws);
-									if(anotherFilterHidden != undefined)
-										result[nC].visible = anotherFilterHidden;
-									if(anotherFilterHidden == undefined && result[nC].visible == undefined)
-										result[nC].visible = false;*/
 								}
 								
 								if(nC >= 1000)
@@ -4660,10 +4652,10 @@ var maxValRow = 100000;
 						if(sb && sb == numFilter)
 							numFilter = curFilter.ColId;
 
-						var col = ws.model.getCell(new CellAddress(acCell.id)).first.col - 1;
+						var col = aWs.getCell(new CellAddress(acCell.id)).first.col - 1;
 						for(nRow = startRow + 1; nRow <= endRow; nRow++)
 						{
-							var cell = ws.model.getCell3(nRow,col);
+							var cell = aWs.getCell3(nRow,col);
 							var val, val2;
 							val = val2 = cell.getValueWithFormat();
 							var type = cell.getType();
@@ -4715,11 +4707,11 @@ var maxValRow = 100000;
 						var nC = 0;
 						var acCell = currentFilter.result[curFilter.ColId];
 						
-						var col = ws.model.getCell(new CellAddress(acCell.id)).first.col - 1;
+						var col = aWs.getCell(new CellAddress(acCell.id)).first.col - 1;
 						var top10Arr = [];
 						for(nRow = startRow + 1; nRow <= endRow; nRow++)
 						{
-							var cell = ws.model.getCell3(nRow,col);
+							var cell = aWs.getCell3(nRow,col);
 							var val, val2;
 							val = val2 = cell.getValueWithoutFormat();
 							if(!result[nC])
@@ -4768,7 +4760,7 @@ var maxValRow = 100000;
 								var limit = sortTop10[top10Filter.Val - 1];
 								for(nRow = startRow + 1; nRow <= endRow; nRow++)
 								{
-									var cell = ws.model.getCell3(nRow,col);
+									var cell = aWs.getCell3(nRow,col);
 									var val2 = cell.getValueWithoutFormat();
 									if(!isNaN(parseFloat(val2)))
 										val2 = parseFloat(val2);
@@ -4805,7 +4797,7 @@ var maxValRow = 100000;
 					var rangeFilter = ref;
 					
 					//если есть мерженные ячейки в головной строке
-					var cell = ws.model.getCell(new CellAddress(buttonId));
+					var cell = aWs.getCell(new CellAddress(buttonId));
 					var isMerged = cell.hasMerged();
 					if(isMerged && ref && ref.containsRange(isMerged))
 					{
@@ -4814,12 +4806,12 @@ var maxValRow = 100000;
 						buttonId = this._rangeToId(range);
 					}
 					
-					var col = ws.model.getCell(new CellAddress(buttonId)).first.col - 1;
+					var col = aWs.getCell(new CellAddress(buttonId)).first.col - 1;
 					
 					var nC = 0;
 					for(var s = startRow + 1; s <= endRow; s++)
 					{
-						var cell = ws.model.getCell3(s,col);
+						var cell = aWs.getCell3(s,col);
 						if(!result[nC])
 							result[nC] = new AutoFiltersOptionsElements();
 
@@ -4827,7 +4819,7 @@ var maxValRow = 100000;
 						if(result[nC].visible != 'hidden')
 						{
 							// ToDo неправильно использовате string и bool в качестве значений одной переменной (смена типа)
-							result[nC].visible = ws.model.getRowHidden(s) ? 'hidden' : true;
+							result[nC].visible = aWs.getRowHidden(s) ? 'hidden' : true;
 						}
 						if(nC >= 1000)
 						{
@@ -4856,7 +4848,6 @@ var maxValRow = 100000;
 			//находим непустые ячейки под данным фильтром
 			_getEndValueRow: function(ref)
 			{
-				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				
 				var r2 = ref.r2;
@@ -5083,7 +5074,7 @@ var maxValRow = 100000;
 			
 			_getHiddenRows: function(id,idNext,filter)
 			{
-				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				var startCell = this._idToRange(id);
 				var endCell   = this._idToRange(idNext);
 				var result = [];
@@ -5102,7 +5093,7 @@ var maxValRow = 100000;
 					//для головных мерженных ячеек
 					if(filter.ShowButton == false)
 					{
-						var isMerged = ws.model.getCell3(startCell.r1, startCell.c1).hasMerged();
+						var isMerged = aWs.getCell3(startCell.r1, startCell.c1).hasMerged();
 						if(isMerged)
 						{
 							startCell.c1 = isMerged.c1;
@@ -5111,7 +5102,7 @@ var maxValRow = 100000;
 					
 					for(var m = startCell.r1 + 1; m <= endCell.r1; m++)
 					{
-						var cell = ws.model.getCell3(m, startCell.c1);
+						var cell = aWs.getCell3(m, startCell.c1);
 						var val = cell.getValue();
 						var type = cell.getType();
 						var valWithFormat = cell.getValueWithFormat();
@@ -5128,7 +5119,7 @@ var maxValRow = 100000;
 					//для головных мерженных ячеек
 					if(filter.ShowButton == false)
 					{
-						var isMerged = ws.model.getCell3(startCell.r1, startCell.c1).hasMerged();
+						var isMerged = aWs.getCell3(startCell.r1, startCell.c1).hasMerged();
 						if(isMerged)
 						{
 							startCell.c1 = isMerged.c1;
@@ -5136,7 +5127,7 @@ var maxValRow = 100000;
 					}
 					for(var m = startCell.r1 + 1; m <= endCell.r1; m++)
 					{
-						var val = ws.model.getCell3(m, startCell.c1).getValue();
+						var val = aWs.getCell3(m, startCell.c1).getValue();
 						var isVis = false;
 						var dataVal = NumFormat.prototype.parseDate(val);
 						for(var k = 0; k < customFilter.length;k++)
@@ -5157,7 +5148,7 @@ var maxValRow = 100000;
 					//для головных мерженных ячеек
 					if(filter.ShowButton == false)
 					{
-						var isMerged = ws.model.getCell3(startCell.r1, startCell.c1).hasMerged();
+						var isMerged = aWs.getCell3(startCell.r1, startCell.c1).hasMerged();
 						if(isMerged)
 						{
 							startCell.c1 = isMerged.c1;
@@ -5165,7 +5156,7 @@ var maxValRow = 100000;
 					}
 					for(var m = startCell.r1 + 1; m <= endCell.r1; m++)
 					{
-						var val = ws.model.getCell3(m, startCell.c1).getValueWithFormat();
+						var val = aWs.getCell3(m, startCell.c1).getValueWithFormat();
 						var isVis = false;
 						for(var k = 0; k < customFilter.length;k++)
 						{
@@ -5431,10 +5422,9 @@ var maxValRow = 100000;
 			//change current filter after insert column
 			_editFilterAfterInsertColumn: function(cRange,val,col,type,activeCells, notAddToHistory, oldFilter)
 			{
-				var bUndoChanges = this.worksheet.model.workbook.bUndoChanges;
-				var bRedoChanges = this.worksheet.model.workbook.bRedoChanges;
-				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
+				var bUndoChanges = aWs.workbook.bUndoChanges;
+				var bRedoChanges = aWs.workbook.bRedoChanges;
 				var filter;
 				var filterColums;
 				if(cRange.index == 'all')
@@ -5555,7 +5545,8 @@ var maxValRow = 100000;
 			
 			_changeInfoFilterAfterInsert: function(filter, type, col, cRange, val, filterColums)
 			{
-				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
+				
 				var inFilter = Asc.Range(cRange.start.c1, cRange.start.r1, cRange.end.c1, cRange.end.r1);
 				
 				var cloneFilterColums = [];
@@ -5574,7 +5565,7 @@ var maxValRow = 100000;
 					var isInsertIntoMergeCell = false;
 					if(type == "insCol" && val > 0)
 					{
-						var tempRangeInsert = ws.model.getRange3(filter.Ref.r1, col, filter.Ref.r1, col);
+						var tempRangeInsert = aWs.getRange3(filter.Ref.r1, col, filter.Ref.r1, col);
 						if(tempRangeInsert.hasMerged())
 							isInsertIntoMergeCell = true;
 					}
@@ -5802,7 +5793,7 @@ var maxValRow = 100000;
 										newTableColumn[l] = new TableColumn();
 										newTableColumn[l].Name = newNameColumn;
 
-										ws.model.getCell3(range2.r1,range2.c1 + l).setValue(newNameColumn);
+										aWs.getCell3(range2.r1,range2.c1 + l).setValue(newNameColumn);
 									}
 								}
 								else
@@ -5843,7 +5834,7 @@ var maxValRow = 100000;
 			
 			_changeContentButton: function(array, val, type, inFilter, oldId)
 			{
-				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				var buttons = this.allButtonAF;
 				if(type == 'add')
 				{
@@ -5897,8 +5888,8 @@ var maxValRow = 100000;
 									var result = this._getArrayOpenCells(indexFilter,buttons[but].id);
 									for(var rez = 0; rez < result.length;rez++)
 									{
-										if(result[rez].visible == false && ws.model.getRowHidden(rez + cells.r1 + 1))
-											ws.model.setRowHidden(/*bHidden*/false, rez + cells.r1 + 1, rez + cells.r1 + 1);
+										if(result[rez].visible == false && aWs.getRowHidden(rez + cells.r1 + 1))
+											aWs.model.setRowHidden(/*bHidden*/false, rez + cells.r1 + 1, rez + cells.r1 + 1);
 									}
 								}
 								buttons.splice(but,1);
@@ -5989,7 +5980,7 @@ var maxValRow = 100000;
 					return
 				var canvas = document.getElementById('drawIcon');*/
 				
-				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				var ctx = new Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
 				if(style == undefined)
@@ -5999,11 +5990,11 @@ var maxValRow = 100000;
 				if(typeof style == 'object')
 					styleOptions = style;
 				else
-					styleOptions = ws.model.workbook.TableStyles.AllStyles[style];
+					styleOptions = aWs.workbook.TableStyles.AllStyles[style];
 				//по умолчанию ставим строку заголовка и чередующиеся строки, позже нужно будет получать параметр
 				var styleInfo = false;
 				var tableParts = undefined;
-				if(ws && tableParts)
+				if(aWs && tableParts)
 				{
 					styleInfo = {
 						ShowColumnStripes: tableParts.TableStyleInfo.ShowColumnStripes,
@@ -6463,17 +6454,17 @@ var maxValRow = 100000;
 			{
 				//если в трёх первых строчках любых столбцов содержится текстовые данные
 				var result = false;
-				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				if(range.r1 != range.r2)
 				{
 					for(var col = range.c1; col <= range.c2; col++)
 					{	
-						var valFirst = ws.model.getCell3(range.r1,col);
+						var valFirst = aWs.getCell3(range.r1,col);
 						if(valFirst != '')
 						{
 							for(var row = range.r1; row <= range.r1 + 2; row++)
 							{
-								var cell = ws.model.getCell3(row,col);
+								var cell = aWs.getCell3(row,col);
 								var type = cell.getType();
 								if(type == CellValueType.String)
 								{
@@ -6489,7 +6480,6 @@ var maxValRow = 100000;
 			
 			_reDrawCurrentFilter: function(fColumns, result, tableParts)
 			{
-				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				
 				if(result && result[0] && tableParts && tableParts.AutoFilter && tableParts.AutoFilter && tableParts.AutoFilter.FilterColumns)
@@ -6499,13 +6489,13 @@ var maxValRow = 100000;
 					for(var row = startRow; row <= endRow; row++)
 					{
 						//все открываем
-						if(ws.model.getRowHidden(row))
+						if(aWs.getRowHidden(row))
 						{
 							for(var i = 0; i < tableParts.result.length; i++)
 							{
 								if(tableParts.result[i].hiddenRows && tableParts.result[i].hiddenRows[row])
 								{
-									ws.model.setRowHidden(/*bHidden*/false, row, row);
+									aWs.setRowHidden(/*bHidden*/false, row, row);
 									break;
 								}
 							}
@@ -6530,9 +6520,9 @@ var maxValRow = 100000;
 							var arrHiddens = result[index].hiddenRows;
 							for(var row = 0; row < arrHiddens.length; row++)
 							{
-								if(arrHiddens[row] != undefined && arrHiddens[row] == true && !ws.model.getRowHidden(row))
+								if(arrHiddens[row] != undefined && arrHiddens[row] == true && !aWs.getRowHidden(row))
 								{
-									ws.model.setRowHidden(true, row, row);
+									aWs.setRowHidden(true, row, row);
 								}
 							}
 							
@@ -6612,14 +6602,14 @@ var maxValRow = 100000;
 			
 			_generateColumnNameWithoutTitle: function(range)
 			{
-				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				var newTableColumn;
 				var tableColumns = [];
 				var cell;
 				var val;
 				for(var col1 = range.c1; col1 <= range.c2; col1++)
 				{
-					cell = ws.model.getCell3(range.r1, col1);
+					cell = aWs.getCell3(range.r1, col1);
 					val = cell.getValue();
 					//если ячейка пустая, то генерируем название
 					if(val == '')
@@ -6646,14 +6636,14 @@ var maxValRow = 100000;
 			
 			_generateColumnsName: function(addNameColumn, tempCells, isTurnOffHistory)
 			{
-				var tableColumns = [], j = 0, ws = this.worksheet, cell, range, strNum;
+				var tableColumns = [], j = 0, aWs = this._getCurrentWS(), cell, range, strNum;
 				
 				if(addNameColumn)
 				{
 					for(var col = tempCells.c1; col <= tempCells.c2; col++)
 					{
 						cell = new CellAddress(tempCells.r1, col, 0);
-						range = ws.model.getCell(cell);
+						range = aWs.getCell(cell);
 						strNum = "Column" + (col - tempCells.c1 + 1).toString();
 						if(!isTurnOffHistory)
 							range.setValue(strNum);
@@ -6671,14 +6661,14 @@ var maxValRow = 100000;
 			
 			_getResultAddFilter: function(paramsForCallBackAdd, activeCells, mainAdjacentCells, lTable)
 			{
-				var result = [], isEndRowEmpty, ws = this.worksheet, idCell, idCellNext;
+				var result = [], isEndRowEmpty, ws = this.worksheet, aWs = this._getCurrentWS(), idCell, idCellNext;
 				
 				if(paramsForCallBackAdd == "addTableFilterOneCell" || paramsForCallBackAdd == "addAutoFilterOneCell")
 				{
 					//при добавлении общего фильтра проверка на пустой диапазон
 					if(paramsForCallBackAdd == "addAutoFilterOneCell" && this._isEmptyRange(activeCells, true))
 					{
-						ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
+						aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
 						return false;
 					}
 					
@@ -6687,7 +6677,7 @@ var maxValRow = 100000;
 					for(var col = mainAdjacentCells.c1; col <= mainAdjacentCells.c2; col++)
 					{
 						// ToDo стоит использовать isEmptyText или isEmptyTextString
-						 if(isEndRowEmpty && ws.model.getCell3(mainAdjacentCells.r2, col).getValue() != '')
+						 if(isEndRowEmpty && aWs.getCell3(mainAdjacentCells.r2, col).getValue() != '')
 						 {
 							isEndRowEmpty = false;
 						 }
@@ -6747,7 +6737,7 @@ var maxValRow = 100000;
 						}
 						else
 						{
-							ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
+							aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
 							return false;
 						}
 					}
@@ -6760,7 +6750,7 @@ var maxValRow = 100000;
 					//при добавлении общего фильтра проверка на пустой диапазон
 					if(paramsForCallBackAdd == "addAutoFilterManyCells" && this._isEmptyRange(activeCells))
 					{
-						ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
+						aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
 						return false;
 					}
 					
@@ -6787,7 +6777,6 @@ var maxValRow = 100000;
 
 			_renameTableColumn: function(range, bUndo)
 			{
-				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				var val;
 				var cell;
@@ -6811,7 +6800,7 @@ var maxValRow = 100000;
 								if(j < range.c1 || j > range.c2)
 									continue;	
 									
-								cell = ws.model.getCell3(ref.r1, j);
+								cell = aWs.getCell3(ref.r1, j);
 								val = cell.getValue();
 								//если не пустая изменяем TableColumns
 								if(val != "" && intersection.c1 <= j && intersection.c2 >= j )
@@ -6983,7 +6972,7 @@ var maxValRow = 100000;
 					{
 						tablePart = intersectionRangeWithTableParts[i];
 						this._setColorStyleTable(tablePart.Ref, tablePart);
-						ws.model.getRange3(tablePart.Ref.r1, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2).unmerge();
+						aWs.getRange3(tablePart.Ref.r1, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2).unmerge();
 					}
 				}
 				
@@ -6992,7 +6981,6 @@ var maxValRow = 100000;
 			//проставляем стили перенесённым ячейкам из форматированной таблицыы
 			_setStyleAfterMoveTablePart: function(arnTo, arnFrom)
 			{
-				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				var cell, toCell, tableStyle;
 				
@@ -7002,9 +6990,9 @@ var maxValRow = 100000;
 				{
 					for(var j = arnFrom.c1; j <= arnFrom.c2; j++)
 					{	
-						cell = ws.model._getCell(i, j);
+						cell = aWs._getCell(i, j);
 						tableStyle = cell.tableXfs;
-						toCell = ws.model._getCell(i + diffRow, j + diffCol);
+						toCell = aWs._getCell(i + diffRow, j + diffCol);
 						toCell.setStyle(tableStyle);
 					}
 				}
@@ -7012,7 +7000,6 @@ var maxValRow = 100000;
 			
 			_cloneCtrlAutoFilters: function(arnTo, arnFrom)
 			{
-				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				var findFilters = this._searchFiltersInRange(arnFrom , aWs);
 				
@@ -7491,7 +7478,7 @@ var maxValRow = 100000;
 			//открываем строки скрытые данным фильтром
 			_openHiddenRows: function(filter)
 			{
-				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				if(filter && this.allButtonAF)
 				{
 					var buttons = this.allButtonAF;
@@ -7504,7 +7491,7 @@ var maxValRow = 100000;
 							{
 								if(arrHiddens[row] != undefined && arrHiddens[row] == true)
 								{
-									ws.model.setRowHidden(/*bHidden*/false, row, row);
+									aWs.setRowHidden(/*bHidden*/false, row, row);
 								}
 							}
 						}
@@ -7514,7 +7501,7 @@ var maxValRow = 100000;
 			
 			_openHiddenRowsColId: function(refFilter, ColId)
 			{
-				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				if(refFilter && this.allButtonAF)
 				{
 					var buttons = this.allButtonAF;
@@ -7528,7 +7515,7 @@ var maxValRow = 100000;
 							{
 								if( this._isHiddenAnotherFilter2(buttons[n].id, row, refFilter) !== "hidden" && arrHiddens[row] != undefined && arrHiddens[row] == true)
 								{
-									ws.model.setRowHidden(/*bHidden*/false, row, row);
+									aWs.setRowHidden(/*bHidden*/false, row, row);
 								}
 							}
 						}
@@ -7538,7 +7525,7 @@ var maxValRow = 100000;
 			
 			_isEmptyRange: function(activeCells, isAllAutoFilter)
 			{
-				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				var cell;
 				//в данном случае проверяем близлежащие ячейки
 				if(isAllAutoFilter && activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2)
@@ -7551,7 +7538,7 @@ var maxValRow = 100000;
 						{
 							if(k < 0)
 								k = 0;
-							cell = ws.model.getRange3(n,k, n,k);
+							cell = aWs.getRange3(n,k, n,k);
 							if(cell.getValueWithoutFormat() != '')
 							{
 								return false;	
@@ -7565,7 +7552,7 @@ var maxValRow = 100000;
 					{
 						for(var k = activeCells.c1; k <= activeCells.c2; k++)
 						{
-							cell = ws.model.getRange3(n,k, n,k);
+							cell = aWs.getRange3(n,k, n,k);
 							if(cell.getValueWithoutFormat() != '')
 							{
 								return false;	
@@ -7586,12 +7573,12 @@ var maxValRow = 100000;
 			{
 				if(range && typeof range == 'object')
 				{
-					var ws = this.worksheet;
+					var aWs = this._getCurrentWS();
 					for(var i = range.r1; i <= range.r2; i++)
 					{
 						for(var n = range.c1; n <= range.c2; n++)
 						{
-							var cell = ws.model.getRange3(i, n, i, n);
+							var cell = aWs.getRange3(i, n, i, n);
 							cell.setTableStyle(null);
 						}
 					}
@@ -7679,12 +7666,11 @@ var maxValRow = 100000;
 			{
 				//проверяем, все ли под таблицей ячейки пустые
 				var cell, isEmptyCell, result = true;
-				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				
 				for(var i = tempCells.c1; i <= tempCells.c2; i++)
 				{
-					cell = ws.model.getRange3(tempCells.r2 + 1, i, tempCells.r2 + 1, i);
+					cell = aWs.getRange3(tempCells.r2 + 1, i, tempCells.r2 + 1, i);
 					isEmptyCell = cell.isEmptyText();
 					if(!isEmptyCell)
 					{
