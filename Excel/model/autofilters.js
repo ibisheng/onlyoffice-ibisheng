@@ -1366,7 +1366,7 @@ var maxValRow = 100000;
 				if(DeleteColumns)//в случае, если удаляем столбцы, тогда расширяем активную область область по всем строкам
 				{
 					activeCells.r1 = 0;
-					activeCells.r2 = this.worksheet.nRowsCount - 1;
+					activeCells.r2 = gc_nMaxRow - 1;
 				}
 				
 				//определим какую колонку вставляем
@@ -1401,7 +1401,7 @@ var maxValRow = 100000;
 				if(DeleteRows)//в случае, если удаляем строки, тогда расширяем активную область область по всем столбцам
 				{
 					activeCells.c1 = 0;
-					activeCells.c2 = this.worksheet.nColsCount - 1;
+					activeCells.c2 = gc_nMaxCol - 1;
 				}
 				
 				//определим какую колонку вставляем
