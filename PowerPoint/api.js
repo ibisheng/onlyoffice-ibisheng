@@ -4256,7 +4256,7 @@ function CHyperlinkProperty( obj )
 CHyperlinkProperty.prototype.get_Value   = function()  { return this.Value; };
 CHyperlinkProperty.prototype.put_Value   = function(v) { this.Value = v; };
 CHyperlinkProperty.prototype.get_ToolTip = function()  { return this.ToolTip; };
-CHyperlinkProperty.prototype.put_ToolTip = function(v) { this.ToolTip = v; };
+CHyperlinkProperty.prototype.put_ToolTip = function(v) { this.ToolTip = v ? v.slice(0, c_oAscMaxTooltipLength) : v; };
 CHyperlinkProperty.prototype.get_Text    = function()  { return this.Text; };
 CHyperlinkProperty.prototype.put_Text    = function(v) { this.Text = v; };
 
