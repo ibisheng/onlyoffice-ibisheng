@@ -703,24 +703,7 @@ CopyProcessor.prototype =
     },
     CopyRunContent: function (Container, bUseSelection, bOmitHyperlink) {
         var sRes = "";
-        var ParaStart = 0;
-        var ParaEnd = Container.Content.length - 1;
-        if (true == bUseSelection) {
-            ParaStart = Container.Selection.StartPos;
-            ParaEnd = Container.Selection.EndPos;
-            if (ParaStart > ParaEnd) {
-                var Temp2 = ParaEnd;
-                ParaEnd = ParaStart;
-                ParaStart = Temp2;
-            }
-        };
 
-		//TODO Стоит пересмотреть флаг bUseSelection и учитывать внутри Selection флаг use.
-		if(ParaEnd < 0)
-			ParaEnd = 0;
-		if(ParaStart < 0)
-			ParaStart = 0;	
-		
         for (var i = 0; i < Container.Content.length; i++) {
             var item = Container.Content[i];
             if (para_Run == item.Type) {
