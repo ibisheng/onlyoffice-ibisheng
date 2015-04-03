@@ -3270,6 +3270,19 @@ PasteProcessor.prototype =
 								aImagesToDownload.push(objects.arrImages[i].Url);
 							}
 							
+							//если несколько графических объектов, то собираем base64 у таблиц(graphicFrame)
+							if(objects.arrShapes.length > 1)
+							{
+								for(var i = 0; i < objects.arrShapes.length; i++)
+								{
+									if(typeof CGraphicFrame !== "undefined" && objects.arrShapes[i].Drawing instanceof CGraphicFrame)
+									{
+										aImagesToDownload.push(objects.arrShapes[i].base64);
+										objects.arrImages.push(objects.arrShapes[i]);
+									}
+								}
+							}
+							
 							var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
 							sendCommand( this.api, function(incomeObject){
 								if(incomeObject && "imgurls" == incomeObject.type)
@@ -3291,17 +3304,33 @@ PasteProcessor.prototype =
 										var imageElem = objects.arrImages[i];
 										if(null != imageElem)
 										{
-											var sNewSrc = oFromTo[imageElem.Url];
-											if(null != sNewSrc)
+											//для вставки graphicFrame в виде картинки(если было при копировании выделено несколько графических объектов)
+											if(imageElem.base64)
 											{
-												image_map[sNewSrc] = sNewSrc;
-												imageElem.SetUrl(sNewSrc);
+												var sNewSrc = oFromTo[imageElem.base64];
+												if(null != sNewSrc)
+												{
+													image_map[sNewSrc] = sNewSrc;
+													imageElem.base64 = sNewSrc;
+												}
+												else
+												{
+													image_map[imageElem.base64] = imageElem.base64;
+												}
 											}
 											else
 											{
-												image_map[imageElem.Url] = imageElem.Url;
-											}
-												
+												var sNewSrc = oFromTo[imageElem.Url];
+												if(null != sNewSrc)
+												{
+													image_map[sNewSrc] = sNewSrc;
+													imageElem.SetUrl(sNewSrc);
+												}
+												else
+												{
+													image_map[imageElem.Url] = imageElem.Url;
+												}
+											}	
 										}
 									}
 								}
