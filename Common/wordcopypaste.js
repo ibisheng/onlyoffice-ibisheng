@@ -5058,7 +5058,7 @@ PasteProcessor.prototype =
 				var src = this.oImages[image];
 				if(0 == src.indexOf("file:"))
 					this.oImages[image] = "local";
-				else if(false == (0 == src.indexOf("data:") || 0 == src.indexOf(documentOrigin + this.api.DocumentUrl) || 0 == src.indexOf(this.api.DocumentUrl)))
+				else if(false == (0 == src.indexOf(documentOrigin + this.api.DocumentUrl) || 0 == src.indexOf(this.api.DocumentUrl)))
 					aImagesToDownload.push(src);
 			}
 			var oPrepeareImages = {};
