@@ -589,3 +589,5 @@ var c_oAscLineBeginSize = {
 	large_mid	: 7,
 	large_large	: 8
 };
+
+var c_oAscMaxTooltipLength = 256;

@@ -916,7 +916,7 @@
 				}
 			},
 			asc_setHyperlinkUrl: function (val) { this.hyperlinkModel.Hyperlink = val; },
-			asc_setTooltip: function (val) { this.hyperlinkModel.Tooltip = val; },
+			asc_setTooltip: function (val) { this.hyperlinkModel.Tooltip = val ? val.slice(0, c_oAscMaxTooltipLength) : val; },
 			asc_setLocation: function (val) { this.hyperlinkModel.setLocation(val); },
 			asc_setSheet: function (val) { this.hyperlinkModel.setLocationSheet(val); },
 			asc_setRange: function (val) { this.hyperlinkModel.setLocationRange(val); },
