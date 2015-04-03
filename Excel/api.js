@@ -109,7 +109,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.autoSaveGap = 0;					// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
 			this.isAutoSave = false;				// Флаг, означает что запущено автосохранение
 
-			this.canSave = true;					//Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
+			this.canSave = true;					// Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
+			this.waitSave = false;					// Отложенное сохранение, происходит во время долгих операций
 			
 			// Режим вставки диаграмм в редакторе документов
 			this.isChartEditor = false;
@@ -577,12 +578,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 
 		spreadsheet_api.prototype.asc_Save = function (isAutoSave) {
-			if (undefined != window['appBridge']) {
-				window['appBridge']['dummyCommandSave'] ();     // TEST
-				return;
-			}
-
-			if (!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction)
+			if (!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction
+				|| this.waitSave)
 				return;
 
 			this.isAutoSave = !!isAutoSave;
@@ -596,23 +593,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.canSave = false;
 
 			var t = this;
-			this.CoAuthoringApi.askSaveChanges (function (e) { t.onSaveCallback (e); });
+			this.CoAuthoringApi.askSaveChanges(function (e) { t.onSaveCallback (e); });
 		};
 
-		spreadsheet_api.prototype.asc_Print = function(adjustPrint){
-			if (adjustPrint)
-				this.adjustPrint = adjustPrint;
-			else {
-				this.adjustPrint = new asc_CAdjustPrint();
-			}
-
-			if (undefined != window['appBridge']) {
-				this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
-				window['appBridge']['dummyCommandPrint'] ();
-				this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
-				return;
-			}
-
+		spreadsheet_api.prototype.asc_Print = function (adjustPrint){
+			this.adjustPrint = adjustPrint ? adjustPrint : new asc_CAdjustPrint();
 			this.asc_DownloadAs(c_oAscFileType.PDF);
 		};
 
@@ -1927,11 +1912,23 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			var t = this;
 			var nState;
 			if (false == e["saveLock"]) {
+				if (this.waitSave) {
+					// Мы не можем в этот момент сохранять, т.к. попали в ситуацию, когда мы залочили сохранение и успели нажать вставку до ответа
+					// Нужно снять lock с сохранения
+					this.CoAuthoringApi.onUnSaveLock = function () {
+						t.canSave = true;
+						t.isAutoSave = false;
+						t.lastSaveTime = null;
+					};
+					this.CoAuthoringApi.unSaveLock();
+					return;
+				}
+
 				if (this.isAutoSave)
 					this.asc_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
 				// Принимаем чужие изменения
-				t.collaborativeEditing.applyChanges();
+				this.collaborativeEditing.applyChanges();
 
 				// Сохраняем файл на сервер
 				//this._asc_save();
@@ -3270,6 +3267,15 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			}
 		};
 
+		// Other
+
+		spreadsheet_api.prototype.asc_stopSaving = function () {
+			this.waitSave = true;
+		};
+		spreadsheet_api.prototype.asc_continueSaving = function () {
+			this.waitSave = false;
+		};
+
 		// offline mode
 
 		spreadsheet_api.prototype.offlineModeInit = function() {
@@ -3897,6 +3903,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_coAuthoringGetUsers"] = prot.asc_coAuthoringGetUsers;
 		prot["asc_coAuthoringChatGetMessages"] = prot.asc_coAuthoringChatGetMessages;
 		prot["asc_coAuthoringDisconnect"] = prot.asc_coAuthoringDisconnect;
+
+		// other
+		prot["asc_stopSaving"] = prot.asc_stopSaving;
+		prot["asc_continueSaving"] = prot.asc_continueSaving;
 
         // offline mode
 
