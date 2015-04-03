@@ -1871,7 +1871,7 @@ var maxValRow = 100000;
 								displayName: customStyles[i].displayName,
 								type: 'custom',
 								image: this._drawSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont)
-							};
+							}
 							result[n] = new formatTablePictures(options);
 							n++;
 						}
@@ -1890,7 +1890,7 @@ var maxValRow = 100000;
 								displayName: defaultStyles[i].displayName,
 								type: 'default',
 								image: this._drawSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont)
-							};
+							}
 							result[n] = new formatTablePictures(options);
 							n++;
 						}
@@ -5980,20 +5980,12 @@ var maxValRow = 100000;
 					return
 				var canvas = document.getElementById('drawIcon');*/
 				
-				var aWs = this._getCurrentWS();
 				var ctx = new Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
-
-				if(style == undefined)
-					style = 'TableStyleLight1';
-
-				var styleOptions;
-				if(typeof style == 'object')
-					styleOptions = style;
-				else
-					styleOptions = aWs.workbook.TableStyles.AllStyles[style];
+				var styleOptions = style;
 				//по умолчанию ставим строку заголовка и чередующиеся строки, позже нужно будет получать параметр
 				var styleInfo = false;
-				var tableParts = undefined;
+				
+				/*var tableParts = undefined;
 				if(aWs && tableParts)
 				{
 					styleInfo = {
@@ -6004,7 +5996,7 @@ var maxValRow = 100000;
 						TotalsRowCount: tableParts.TotalsRowCount
 					}
 
-				}
+				}*/
 
 				if(!styleInfo)
 				{

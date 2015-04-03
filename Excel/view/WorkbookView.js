@@ -1207,7 +1207,7 @@
 		};
 
 		WorkbookView.prototype.getTablePictures = function () {
-			var autoFilters = new asc.AutoFilters(this.getWorksheet(this.wsActive));
+			var autoFilters = new asc.AutoFilters();
 			return autoFilters.getTablePictures(this.model, this.fmgrGraphics, this.m_oFont);
 		};
 
