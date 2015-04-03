@@ -520,7 +520,7 @@ asc_docs_api.prototype._coAuthoringInit = function () {
 	 * @param {Bool} isCloseCoAuthoring
 	 */
 	this.CoAuthoringApi.onDisconnect				= function (e, isDisconnectAtAll, isCloseCoAuthoring) {
-        if (0 === t.CoAuthoringApi.get_state())
+        if (ConnectionState.None === t.CoAuthoringApi.get_state())
             t.asyncServerIdEndLoaded();
         if (isDisconnectAtAll) {
             // Посылаем наверх эвент об отключении от сервера
@@ -1468,7 +1468,7 @@ function OnSave_Callback(e) {
 		CollaborativeEditing.Send_Changes();
 	} else {
 		var nState = editor.CoAuthoringApi.get_state();
-		if (3 === nState) {
+		if (ConnectionState.Close === nState) {
 			// Отключаемся от сохранения, соединение потеряно
 			editor.canSave = true;
 		} else {

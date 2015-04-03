@@ -1705,7 +1705,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			 * @param {Bool} isCloseCoAuthoring
 			 */
 			this.CoAuthoringApi.onDisconnect				= function (e, isDisconnectAtAll, isCloseCoAuthoring) {
-				if (0 === t.CoAuthoringApi.get_state())
+				if (ConnectionState.None === t.CoAuthoringApi.get_state())
 					t.asyncServerIdEndLoaded();
 				if (isDisconnectAtAll) {
 					// Посылаем наверх эвент об отключении от сервера
@@ -1961,7 +1961,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.collaborativeEditing.sendChanges();
 			} else {
 				nState = t.CoAuthoringApi.get_state();
-				if (3 === nState) {
+				if (ConnectionState.Close === nState) {
 					// Отключаемся от сохранения, соединение потеряно
 					if (!this.isAutoSave)
 						this.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);

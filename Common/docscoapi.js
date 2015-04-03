@@ -247,13 +247,6 @@
 			this.onRecalcLocks(e);
 	};
 
-    /** States
-	 * -1 - reconnect state
-     *  0 - not initialized
-     *  1 - waiting session id
-     *  2 - authorized
-	 *  3 - closed
-     */
     function DocsCoApi (options) {
 		if (options) {
 			this.onAuthParticipantsChanged = options.onAuthParticipantsChanged;
@@ -271,7 +264,7 @@
 			this.onUnSaveLock = options.onUnSaveLock;
 			this.onRecalcLocks = options.onRecalcLocks;
 		}
-        this._state = 0;
+        this._state = ConnectionState.None;
 		// Online-пользователи в документе
         this._participants = {};
 		this._countEditUsers = 0;
@@ -330,6 +323,7 @@
 		this._isAuth = false;
 		this._documentFormatSave = 0;
 		this._isViewer = false;
+		this._isReSaveAfterAuth = false;	// Флаг для сохранения после повторной авторизации (для разрыва соединения во время сохранения)
     }
 	
 	DocsCoApi.prototype.isRightURL = function () {
@@ -416,7 +410,7 @@
 			clearTimeout(this.saveLockCallbackErrorTimeOutId);
 
 		// Проверим состояние, если мы не подсоединились, то сразу отправим ошибку
-		if (-1 === this.get_state()) {
+		if (ConnectionState.Reconnect === this.get_state()) {
 			this.saveLockCallbackErrorTimeOutId = window.setTimeout(function () {
 				if (callback && _.isFunction(callback)) {
 					// Фиктивные вызовы
@@ -491,6 +485,9 @@
 			t.saveCallbackErrorTimeOutId = null;
 			t._reSaveChanges();
 		}, this.errorTimeOutSave);
+
+		// Выставляем состояние сохранения
+		this._state = ConnectionState.SaveChanges;
 
 		this._send({'type': 'saveChanges', 'changes': JSON.stringify(arrayChanges.slice(startIndex, endIndex)),
 			'startSaveChanges': (startIndex === 0), 'endSaveChanges': (endIndex === arrayChanges.length),
@@ -681,6 +678,9 @@
 		if (null !== this.unSaveLockCallbackErrorTimeOutId)
 			clearTimeout(this.unSaveLockCallbackErrorTimeOutId);
 
+		// Возвращаем состояние
+		this._state = ConnectionState.Authorized;
+
 		if (-1 !== data['index'])
 			this.changesIndex = data['index'];
 
@@ -814,7 +814,7 @@
 
 	DocsCoApi.prototype._onAuth = function (data) {
 		if (true === this._isAuth) {
-			this._state = 2; // Authorized
+			this._state = ConnectionState.Authorized;
 			// Мы уже авторизовывались, нужно обновить пользователей (т.к. пользователи могли входить и выходить пока у нас не было соединения)
 			this._onAuthParticipantsChanged(data['participants']);
 
@@ -823,6 +823,21 @@
 			//}
 			this._onMessages(data, true);
 			this._onGetLock(data);
+
+			if (this._isReSaveAfterAuth) {
+				var t = this;
+				var callbackAskSaveChanges = function (e) {
+					if (false == e["saveLock"]) {
+						t._reSaveChanges();
+					} else {
+						setTimeout(function () {
+							t.askSaveChanges(callbackAskSaveChanges);
+						}, 1000);
+					}
+				};
+				this.askSaveChanges(callbackAskSaveChanges);
+			}
+
 			return;
 		}
 		if (data['result'] === 1) {
@@ -830,7 +845,7 @@
 			this._isAuth = true;
 
 			//TODO: add checks
-			this._state = 2; // Authorized
+			this._state = ConnectionState.Authorized;
 			this._id = data['sessionId'];
 
 			this._onAuthParticipantsChanged(data['participants']);
@@ -892,7 +907,7 @@
 				t.attemptCount = 0;
 			}
 
-			t._state = 1; // Opened state
+			t._state = ConnectionState.WaitAuth;
 			if (t.onConnect) {
 				t.onConnect();
 			}
@@ -951,10 +966,17 @@
 			}
 		};
 		sockjs.onclose = function (evt) {
-			t._state = -1; // Reconnect state
+			if (ConnectionState.SaveChanges === t._state) {
+				// Мы сохраняли изменения и разорвалось соединение
+				t._isReSaveAfterAuth = true;
+				// Очищаем предыдущий таймер
+				if (null !== t.saveCallbackErrorTimeOutId)
+					clearTimeout(t.saveCallbackErrorTimeOutId);
+			}
+			t._state = ConnectionState.Reconnect;
 			var bIsDisconnectAtAll = t.attemptCount >= t.maxAttemptCount || t.isCloseCoAuthoring;
 			if (bIsDisconnectAtAll)
-				t._state = 3; // Closed state
+				t._state = ConnectionState.Closed;
 			if (t.isCloseCoAuthoring)
 				return;
 			if (t.onDisconnect)
