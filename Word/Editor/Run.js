@@ -282,6 +282,52 @@ ParaRun.prototype.Is_StartFromNewLine = function()
 // Добавляем элемент в текущую позицию
 ParaRun.prototype.Add = function(Item, bMath)
 {
+    if (this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.CheckLanguageOnTextAdd && editor)
+    {
+        var nRequiredLanguage = editor.asc_getKeyboardLanguage();
+        var nCurrentLanguage  = this.Get_CompiledPr(false).Lang.Val;
+        if (-1 !== nRequiredLanguage && nRequiredLanguage !== nCurrentLanguage)
+        {
+            var NewLang = new CLang();
+            NewLang.Val = nRequiredLanguage;
+
+            if (this.Is_Empty())
+                this.Set_Lang(NewLang);
+            else
+            {
+                var Parent  = this.Get_Parent();
+                var RunPos = this.private_GetPosInParent();
+                if (null !== Parent && -1 !== RunPos)
+                {
+                    // Если мы стоим в начале рана, тогда добавим новый ран в начало, если мы стоим в конце рана, тогда
+                    // добавим новый ран после текущего, а если мы в середине рана, тогда надо разбивать текущий ран.
+
+                    var NewRun = new ParaRun(this.Paragraph, bMath);
+                    NewRun.Set_Pr(this.Pr.Copy());
+                    NewRun.Set_Lang(NewLang);
+                    NewRun.Cursor_MoveToStartPos();
+                    NewRun.Add(Item, bMath);
+
+                    var CurPos = this.State.ContentPos;
+                    if (0 === CurPos)
+                        Parent.Add_ToContent(RunPos, NewRun);
+                    else if (this.Content.length === CurPos)
+                        Parent.Add_ToContent(RunPos + 1, NewRun);
+                    else
+                    {
+                        // Нужно разделить данный ран в текущей позиции
+                        var RightRun = this.Split2(CurPos);
+                        Parent.Add_ToContent(RunPos + 1, NewRun);
+                        Parent.Add_ToContent(RunPos + 2, RightRun);
+                    }
+
+                    NewRun.Make_ThisElementCurrent();
+                    return;
+                }
+            }
+        }
+    }
+
     var EditType = null;
     if (this.Paragraph && this.Paragraph.LogicDocument)
         EditType = this.Paragraph.LogicDocument.Get_EditingType();

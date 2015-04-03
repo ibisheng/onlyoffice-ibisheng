@@ -5267,6 +5267,11 @@ asc_docs_api.prototype.asc_getDefaultLanguage = function()
     return editor.WordControl.m_oLogicDocument.Get_DefaultLanguage();
 };
 
+asc_docs_api.prototype.asc_getKeyboardLanguage = function()
+{
+    return -1;
+};
+
 asc_docs_api.prototype.asc_setSpellCheck = function(isOn)
 {
     if (editor.WordControl.m_oLogicDocument)

@@ -792,9 +792,10 @@ function CDocument(DrawingDocument)
     this.Spelling = new CDocumentSpelling();
 
     // Дополнительные настройки
-    this.UseTextShd = true; // Использовать ли заливку текста
-    this.ForceCopySectPr = false; // Копировать ли настройки секции, если родительский класс параграфа не документ
-    this.CopyNumberingMap = null; // Мап старый индекс -> новый индекс для копирования нумерации
+    this.UseTextShd             = true;  // Использовать ли заливку текста
+    this.ForceCopySectPr        = false; // Копировать ли настройки секции, если родительский класс параграфа не документ
+    this.CopyNumberingMap       = null;  // Мап старый индекс -> новый индекс для копирования нумерации
+    this.CheckLanguageOnTextAdd = false; // Проверять ли язык при добавлении текста в ран
 
     // Мап для рассылки
     this.MailMergeMap = null;
@@ -9470,7 +9471,9 @@ CDocument.prototype =
                         this.DrawingDocument.TargetStart();
                         this.DrawingDocument.TargetShow();
 
+                        this.CheckLanguageOnTextAdd = true;
                         this.Paragraph_Add(new ParaSpace());
+                        this.CheckLanguageOnTextAdd = false;
                     }
                 }
             }
@@ -10294,7 +10297,10 @@ CDocument.prototype =
 
                 this.DrawingDocument.TargetStart();
                 this.DrawingDocument.TargetShow();
+
+                this.CheckLanguageOnTextAdd = true;
                 this.Paragraph_Add(new ParaText(String.fromCharCode(Code)));
+                this.CheckLanguageOnTextAdd = false;
             }
             bRetValue = true;
         }
