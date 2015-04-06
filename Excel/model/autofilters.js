@@ -6834,10 +6834,6 @@ var maxValRow = 100000;
 				if(copyRange)
 				{
 					this._cloneCtrlAutoFilters(arnTo, arnFrom);
-					//если не пересекаемся с форматированной таблицей arnTo, но пересекаемся arnFrom
-					var intersectionFromRange = this._intersectionRangeWithTableParts(arnFrom, aWs);
-					if(intersectionFromRange !== false && intersectionFromRange.length === 1 && this._intersectionRangeWithTableParts(arnTo, aWs) === false)
-						this._setStyleAfterMoveTablePart(arnTo, arnFrom);
 				}
 				else
 				{
@@ -7410,54 +7406,80 @@ var maxValRow = 100000;
 				return result;
 			},
 			
-			_preMoveAutoFilters: function(arnFrom, arnTo)
+			_preMoveAutoFilters: function(arnFrom, arnTo, copyRange)
 			{
 				var aWs = this._getCurrentWS();
 				
 				var diffCol = arnTo.c1 - arnFrom.c1;
 				var diffRow = arnTo.r1 - arnFrom.r1;
 				
-				var findFilters = this._searchFiltersInRange(arnFrom , aWs);
-				if(findFilters)
+				var applyStyleByCells = true;
+				
+				if(!copyRange)
 				{
-					for(var i = 0; i < findFilters.length; i++)
+					var findFilters = this._searchFiltersInRange(arnFrom , aWs);
+					if(findFilters)
 					{
-						var ref = findFilters[i].Ref;
-						var newRange = Asc.Range(ref.c1 + diffCol, ref.r1 + diffRow, ref.c2 + diffCol, ref.r2 + diffRow);
-						
-						//если затрагиваем форматированной таблицей часть а/ф
-						if(aWs.AutoFilter && aWs.AutoFilter.Ref && newRange.intersection(aWs.AutoFilter.Ref) && aWs.AutoFilter !== findFilters[i])
+						for(var i = 0; i < findFilters.length; i++)
 						{
-							this._deleteAutoFilter();
+							var ref = findFilters[i].Ref;
+							var newRange = Asc.Range(ref.c1 + diffCol, ref.r1 + diffRow, ref.c2 + diffCol, ref.r2 + diffRow);
+							
+							//если затрагиваем форматированной таблицей часть а/ф
+							if(aWs.AutoFilter && aWs.AutoFilter.Ref && newRange.intersection(aWs.AutoFilter.Ref) && aWs.AutoFilter !== findFilters[i])
+							{
+								this._deleteAutoFilter();
+							}
+							
+							//если область вставки содержит форматированную таблицу, которая пересекается с вставляемой форматированной таблицей
+							var findFiltersFromTo = this._intersectionRangeWithTableParts(newRange , aWs, arnFrom);
+							if(findFiltersFromTo && findFiltersFromTo.length)//удаляем данный фильтр
+							{
+								this.isEmptyAutoFilters(ref);
+								continue;
+							}
+							
+							this._openHiddenRows(findFilters[i]);
 						}
-						
-						//если область вставки содержит форматированную таблицу, которая пересекается с вставляемой форматированной таблицей
-						var findFiltersFromTo = this._intersectionRangeWithTableParts(newRange , aWs, arnFrom);
-						if(findFiltersFromTo && findFiltersFromTo.length)//удаляем данный фильтр
+						applyStyleByCells = false;
+					}
+					
+					//TODO пока будем всегда чистить фильтры, которые будут в месте вставки. Позже сделать аналогично MS либо пересмотреть все возможные ситуации.
+					var findFiltersTo = this._searchFiltersInRange(arnTo , aWs);
+					if(arnTo && findFiltersTo)
+					{
+						for(var i = 0; i < findFiltersTo.length; i++)
 						{
-							this.isEmptyAutoFilters(ref);
-							continue;
+							var ref = findFiltersTo[i].Ref;
+							
+							//если переносим просто данные, причём шапки совпадают, то фильтр не очищаем
+							if(arnTo.r1 === ref.r1 && arnTo.c1 === ref.c1)
+							{
+								continue;
+							}
+							else
+								this.isEmptyAutoFilters(ref, null, null, null, findFilters);
 						}
-						
-						this._openHiddenRows(findFilters[i]);
+						applyStyleByCells = false;
 					}
 				}
 				
-				//TODO пока будем всегда чистить фильтры, которые будут в месте вставки. Позже сделать аналогично MS либо пересмотреть все возможные ситуации.
-				var findFiltersTo = this._searchFiltersInRange(arnTo , aWs);
-				if(arnTo && findFiltersTo)
+				if(applyStyleByCells)
 				{
-					for(var i = 0; i < findFiltersTo.length; i++)
+					var intersectionRangeWithTablePartsFrom = this._intersectionRangeWithTableParts(arnFrom, aWs);
+					var intersectionRangeWithTablePartsTo = this._intersectionRangeWithTableParts(arnTo, aWs);
+					if(intersectionRangeWithTablePartsFrom && intersectionRangeWithTablePartsFrom.length === 1 && intersectionRangeWithTablePartsTo === false)
 					{
-						var ref = findFiltersTo[i].Ref;
-						
-						//если переносим просто данные, причём шапки совпадают, то фильтр не очищаем
-						if(arnTo.r1 === ref.r1 && arnTo.c1 === ref.c1)
+						//проходимся по всем ячейкам
+						var cell;
+						for(var i = arnFrom.r1; i <= arnFrom.r2; i++)
 						{
-							continue;
+							for(var j = arnFrom.c1; j <= arnFrom.c2; j++)
+							{
+								cell = aWs._getCell(i, j);
+								cell.setStyle(cell.compiledXfs);
+							}
 						}
-						else
-							this.isEmptyAutoFilters(ref, null, null, null, findFilters);
 					}
 				}
 			},

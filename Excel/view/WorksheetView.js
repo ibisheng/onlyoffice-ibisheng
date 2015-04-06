@@ -7903,8 +7903,7 @@
 				History.SetSelectionRedo(arnTo.clone());
 				History.StartTransaction();
 				
-				if(!copyRange)
-					t.autoFilters._preMoveAutoFilters(arnFrom, arnTo);
+				t.autoFilters._preMoveAutoFilters(arnFrom, arnTo, copyRange);
 				
 				t.model._moveRange(arnFrom, arnTo, copyRange);
 				t.cellCommentator.moveRangeComments(arnFrom, arnTo);
