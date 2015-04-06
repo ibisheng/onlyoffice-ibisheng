@@ -2934,7 +2934,10 @@ PasteProcessor.prototype =
 
     SetShortImageId: function(aPastedImages)
     {
-        for(var i = 0, length = aPastedImages.length; i < length; ++i)
+        if(!aPastedImages)
+			return;
+		
+		for(var i = 0, length = aPastedImages.length; i < length; ++i)
         {
             var imageElem = aPastedImages[i];
             if(null != imageElem)
@@ -3196,7 +3199,7 @@ PasteProcessor.prototype =
 					}
 					else
                     {
-                        this.SetShortImageId(aContent.aPastedImages);
+                        oThis.SetShortImageId(aContent.aPastedImages);
                         oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
                     }
 					return;
@@ -4446,7 +4449,7 @@ PasteProcessor.prototype =
 					}
 					else
                     {
-                        this.SetShortImageId(aContent.aPastedImages);
+                        oThis.SetShortImageId(aContent.aPastedImages);
                         oThis.api.pre_Paste(aContent.fonts, aContent.images, paste_callback);
                     }
 					
