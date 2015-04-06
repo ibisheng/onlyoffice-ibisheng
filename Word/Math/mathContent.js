@@ -3806,6 +3806,14 @@ CMathContent.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selec
     var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
     var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
 
+
+    if(this.bRoot == false)
+    {
+        var Bound = this.Get_LineBound(_CurLine);
+        SelectionDraw.StartY   = Bound.Y;
+        SelectionDraw.H        = Bound.H;
+    }
+
     for(var CurPos = StartPos; CurPos <= EndPos; CurPos++)
     {
         var Item = this.Content[CurPos];

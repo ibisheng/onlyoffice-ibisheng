@@ -455,7 +455,237 @@ CNary.prototype.Is_ContentUse = function(MathContent)
 
     return false;
 };
+CNary.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
+{
+    this.bOneLine = PRS.bMath_OneLine;
 
+    if(this.bOneLine === true)
+    {
+        CNary.superclass.Recalculate_Range.call(this, PRS, ParaPr, Depth);
+    }
+    else
+    {
+        var CurLine  = PRS.Line - this.StartLine;
+        var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
+
+        this.setDistance();
+
+        var RangeStartPos = this.protected_AddRange(CurLine, CurRange),
+            RangeEndPos = 2;
+
+        if(CurLine == 0 && CurRange == 0)
+        {
+            PRS.WordLen += this.BrGapLeft;
+        }
+
+        if(CurLine == 0 && CurRange == 0)
+        {
+            if(this.Base.IsJustDraw())
+            {
+                this.MeasureJustDraw(this.Base);
+            }
+            else
+            {
+                PRS.bMath_OneLine = true;
+                this.Base.Recalculate_Range(PRS, ParaPr, Depth);
+            }
+
+            if(true !== PRS.Word)
+            {
+                PRS.WordLen = this.Base.size.width;
+                PRS.Word    = true;
+            }
+            else
+            {
+                PRS.WordLen += this.Base.size.width;
+            }
+
+            PRS.WordLen += this.dW;
+
+            this.Arg.Recalculate_Reset(PRS.Range, PRS.Line); // обновим StartLine и StartRange
+        }
+
+        PRS.Update_CurPos(2, Depth); // this.Arg = this.Content[2]
+        PRS.bMath_OneLine  = false;
+        this.Arg.Recalculate_Range(PRS, ParaPr, Depth+1);
+
+
+        if(PRS.NewRange == false)
+        {
+            PRS.WordLen += this.BrGapRight;
+        }
+
+        this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
+
+        PRS.bMath_OneLine = false;
+    }
+};
+CNary.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
+{
+    if(this.bOneLine == true)
+    {
+        CNary.superclass.Recalculate_Range_Width.call(this, PRSC, _CurLine, _CurRange);
+    }
+    else
+    {
+        var CurLine = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var RangeW = PRSC.Range.W;
+
+        if(CurLine == 0 && CurRange == 0)
+        {
+            PRSC.Range.W += this.BrGapLeft;
+            var RangeW2 = PRSC.Range.W;
+
+            if(this.Base.IsJustDraw() == false)
+            {
+                this.Content[0].Recalculate_Range_Width(PRSC, _CurLine, _CurRange);
+                this.Content[1].Recalculate_Range_Width(PRSC, _CurLine, _CurRange);
+
+                this.Base.Bounds.SetWidth(CurLine, this.Base.size.width);
+            }
+
+            PRSC.Range.W = RangeW2 + this.Base.size.width + this.dW;
+
+        }
+
+        this.Arg.Recalculate_Range_Width( PRSC, _CurLine, _CurRange );
+
+        if(this.Arg.Math_Is_End( _CurLine, _CurRange))
+        {
+            PRSC.Range.W += this.BrGapRight;
+        }
+
+        this.Bounds.SetWidth(CurLine, PRSC.Range.W - RangeW);
+    }
+};
+CNary.prototype.Draw_Elements = function(PDSE)
+{
+    var CurLine  = PDSE.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PDSE.Range - this.StartRange : PDSE.Range );
+
+    if(CurLine == 0 && CurRange == 0)
+    {
+        this.Base.Draw_Elements(PDSE);
+    }
+
+    this.Arg.Draw_Elements(PDSE);
+};
+CNary.prototype.Recalculate_LineMetrics_2 = function(PRS, ParaPr, _CurLine, _CurRange)
+{
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
+
+    if(CurLine == 0 && CurRange == 0)
+    {
+        this.Bounds.Reset();
+        if(this.Base.IsJustDraw())
+        {
+            PRS.ContentMetrics.UpdateMetrics(this.Base.size);
+        }
+        else
+        {
+            this.Base.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
+        }
+
+    }
+
+    var ParentContentMetric = PRS.ContentMetrics;
+
+    PRS.ContentMetrics = new CMathBoundsMeasures();
+
+    this.Arg.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
+
+    this.Bounds.UpdateMetrics(CurLine, PRS.ContentMetrics);
+
+    ParentContentMetric.UpdateMetrics(PRS.ContentMetrics);
+    PRS.ContentMetrics = ParentContentMetric;
+};
+CNary.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
+{
+    if(this.bOneLine)
+    {
+        CNary.superclass.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange);
+    }
+    else
+    {
+        var CurLine = _CurLine - this.StartLine;
+        var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
+
+        // т.к. ParaNumbering привязывается к первому текстовому элементы, он может находится в аргументе
+        // обновляем LineMetrics для Base после того, как обновим метрики для аргумента
+
+        this.Arg.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
+
+        var BoundArg = this.Arg.Get_LineBound(_CurLine);
+
+        this.Bounds.UpdateMetrics(CurLine, BoundArg);
+        PRS.ContentMetrics.UpdateMetrics(BoundArg);
+
+        this.UpdatePRS(PRS, BoundArg);
+
+
+        if(CurLine == 0 && CurRange == 0)
+        {
+            this.Bounds.Reset();
+
+            if(this.Base.IsJustDraw())
+            {
+                this.Bounds.UpdateMetrics(CurLine, this.Base.size);
+                PRS.ContentMetrics.UpdateMetrics(this.Base.size);
+                this.UpdatePRS(PRS, this.Base.size);
+            }
+            else
+            {
+                this.Base.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
+                this.Content[0].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
+                this.Content[1].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
+
+
+                this.Bounds.UpdateMetrics(CurLine, this.Base.size);
+                PRS.ContentMetrics.UpdateMetrics(this.Base.size);
+
+                this.UpdatePRS(PRS, this.Base.size);
+            }
+
+        }
+    }
+};
+CNary.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
+{
+    if(this.bOneLine)
+    {
+        CNary.superclass.setPosition.call(this, pos, PRSA, Line, Range, Page);
+    }
+    else
+    {
+        var CurLine  = Line - this.StartLine;
+        var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
+
+        this.UpdatePosBound(pos, PRSA, Line, Range, Page);
+
+        if(CurLine == 0 && CurRange == 0)
+        {
+            pos.x += this.BrGapLeft;
+
+            var PosBase = new CMathPosition();
+            PosBase.x = pos.x;
+            PosBase.y = pos.y - this.Base.size.ascent;
+
+            this.Base.setPosition(PosBase, PRSA, Line, Range, Page);
+
+            pos.x += this.Base.size.width + this.dW;
+        }
+
+        this.Arg.setPosition(pos, PRSA, Line, Range, Page);
+
+        if(this.Arg.Math_Is_End(Line, Range))
+        {
+            pos.x += this.BrGapRight;
+        }
+    }
+};
 
 function CNaryUnd(bInside)
 {

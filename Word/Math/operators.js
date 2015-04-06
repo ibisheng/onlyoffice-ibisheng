@@ -3497,6 +3497,8 @@ CDelimiter.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _
     var CurLine = _CurLine - this.StartLine;
     var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
 
+    CDelimiter.superclass.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange);
+
     if(CurLine == 0 && CurRange == 0)
     {
         var BegHeight  = this.begOper.size.height;
@@ -3508,6 +3510,8 @@ CDelimiter.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _
 
         if ( PRS.LineDescent < BegDescent )
             PRS.LineDescent = BegDescent;
+
+        PRS.ContentMetrics.UpdateMetrics(this.begOper.size);
     }
 
     var bEnd = this.Content[0].Math_Is_End(_CurLine, _CurRange);
@@ -3523,9 +3527,9 @@ CDelimiter.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _
 
         if ( PRS.LineDescent < EndDescent )
             PRS.LineDescent = EndDescent;
-    }
 
-    CDelimiter.superclass.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange);
+        PRS.ContentMetrics.UpdateMetrics(this.endOper.size);
+    }
 };
 CDelimiter.prototype.RecalculateGeneralSize = function(oMeasure, height, ascent) // здесь пересчитываем скобки, общий максимальный размер delimiters
 {
@@ -3658,6 +3662,8 @@ CDelimiter.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 {
     var CurLine  = Line - this.StartLine;
     var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
+
+    this.UpdatePosBound(pos, PRSA, Line, Range, Page);
 
     if(this.bOneLine == false)
     {
@@ -3867,6 +3873,8 @@ CCharacter.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
+
+    this.UpdatePosBound(pos, PRSA, Line, Range, Page);
 
     var width = this.size.width - this.GapLeft - this.GapRight;
 

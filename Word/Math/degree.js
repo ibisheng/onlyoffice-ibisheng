@@ -48,7 +48,6 @@ function CDegreeBase(props, bInside)
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
-        //CDegreeBase.prototype.init.call(this, props);
 }
 Asc.extendClass(CDegreeBase, CMathBase);
 CDegreeBase.prototype.init = function(props)
@@ -377,6 +376,8 @@ CDegreeBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
         this.pos.y = pos.y;
     else
         this.pos.y = pos.y - this.size.ascent;
+
+    this.UpdatePosBound(pos, PRSA, Line, Range, Page);
 
     var oBase = this.elements[0][0],
         oIter = this.elements[0][1];

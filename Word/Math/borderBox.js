@@ -366,6 +366,8 @@ CBorderBox.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
 
+    this.UpdatePosBound(pos, PRSA, Line, Range, Page);
+
     var NewPos = new CMathPosition();
 
     var Base = this.Content[0];

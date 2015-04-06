@@ -939,6 +939,7 @@ ParaMath.prototype.Recalculate_Set_RangeEndPos = function(PRS, PRP, Depth)
 };
 ParaMath.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
 {
+    PRS.ContentMetrics = new CMathBoundsMeasures();
     this.Root.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
 };
 ParaMath.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
@@ -1497,7 +1498,11 @@ ParaMath.prototype.Draw_Elements = function(PDSE)
     /*PDSE.Graphics.p_color(255,0,0, 255);
      PDSE.Graphics.drawHorLine(0, PDSE.Y - this.Ascent, PDSE.X - 30, PDSE.X + this.Width + 30 , 1);*/
 
+    var X = PDSE.X;
+
     this.Root.Draw_Elements(PDSE);
+
+    PDSE.X = X + this.Root.Get_LineBound(PDSE.Line).W;
 
     /*PDSE.Graphics.p_color(255,0,0, 255);
      PDSE.Graphics.drawHorLine(0, PDSE.Y - this.Ascent + this.Height, PDSE.X - 30, PDSE.X + this.Width + 30 , 1);*/
@@ -1877,7 +1882,7 @@ ParaMath.prototype.Get_ContentSelection = function()
 
     var LinesCount = oContent.protected_GetLinesCount();
 
-    return Bounds[LinesCount - 1];
+    return Bounds[0];
 };
 
 ParaMath.prototype.Recalc_RunsCompiledPr = function()
@@ -2031,7 +2036,9 @@ ParaMath.prototype.Get_Bounds = function()
 
         var LinesCount = this.Root.protected_GetLinesCount();
 
-        return this.Root.Get_Bounds()[LinesCount - 1];
+        var PosLine = Math.min(3, LinesCount - 1);
+
+        return this.Root.Get_Bounds()[PosLine];
     }
 };
 

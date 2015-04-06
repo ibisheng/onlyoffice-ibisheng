@@ -472,6 +472,8 @@ CAccent.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
 
+    this.UpdatePosBound(pos, PRSA, Line, Range, Page);
+
     var width = this.size.width - this.GapLeft - this.GapRight;
     var oBase = this.Content[0];
 

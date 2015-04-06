@@ -8032,6 +8032,7 @@ ParaRun.prototype.Read_FromBinary2 = function(Reader)
 	{
         this.MathPrp = new CMPrp();
 		this.size    = new CMathSize();
+        this.pos     = new CMathPosition();
 	}
 
     if(undefined !== editor && true === editor.isDocumentEditor)

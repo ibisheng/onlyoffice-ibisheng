@@ -388,6 +388,8 @@ CFraction.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 {
     if(this.Pr.type == SKEWED_FRACTION)
     {
+        this.UpdatePosBound(pos, PRSA, Line, Range, Page);
+
         var Numerator   = this.Content[0],
             Denominator = this.Content[1];
 
