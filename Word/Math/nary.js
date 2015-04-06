@@ -572,36 +572,6 @@ CNary.prototype.Draw_Elements = function(PDSE)
 
     this.Arg.Draw_Elements(PDSE);
 };
-CNary.prototype.Recalculate_LineMetrics_2 = function(PRS, ParaPr, _CurLine, _CurRange)
-{
-    var CurLine = _CurLine - this.StartLine;
-    var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
-
-    if(CurLine == 0 && CurRange == 0)
-    {
-        this.Bounds.Reset();
-        if(this.Base.IsJustDraw())
-        {
-            PRS.ContentMetrics.UpdateMetrics(this.Base.size);
-        }
-        else
-        {
-            this.Base.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
-        }
-
-    }
-
-    var ParentContentMetric = PRS.ContentMetrics;
-
-    PRS.ContentMetrics = new CMathBoundsMeasures();
-
-    this.Arg.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
-
-    this.Bounds.UpdateMetrics(CurLine, PRS.ContentMetrics);
-
-    ParentContentMetric.UpdateMetrics(PRS.ContentMetrics);
-    PRS.ContentMetrics = ParentContentMetric;
-};
 CNary.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
 {
     if(this.bOneLine)
@@ -741,11 +711,6 @@ function CNaryOvr(bInside)
     this.setDimension(2, 1);
 }
 Asc.extendClass(CNaryOvr, CMathBase);
-CNaryOvr.prototype.old_setDistance = function()
-{
-    var zetta = this.Get_TxtPrControlLetter().FontSize* 25.4/96;
-    this.dH = zetta*0.1;
-};
 CNaryOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
 {
     this.Parent = Parent;
@@ -784,10 +749,6 @@ CNaryOvr.prototype.recalculateSize = function()
     this.size.height = height;
     this.size.width  = width;
     this.size.ascent = ascent;
-};
-CNaryOvr.prototype.old_getAscent = function()
-{
-    return this.elements[0][0].size.ascent;
 };
 CNaryOvr.prototype.getLowerIterator = function()
 {
