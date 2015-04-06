@@ -7531,7 +7531,7 @@ var maxValRow = 100000;
 							if(k < 0)
 								k = 0;
 							cell = aWs.getRange3(n,k, n,k);
-							if(cell.getValueWithoutFormat() != '')
+							if(cell.getValueWithoutFormat() != '' && this._intersectionRangeWithTableParts(cell.bbox, aWs) === false)
 							{
 								return false;	
 							}
