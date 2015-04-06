@@ -2298,13 +2298,8 @@ var maxValRow = 100000;
 					mainAdjacentCells = this._getAdjacentCellsAF(activeCells,aWs);
 				else//выделено > 1 ячейки
 				{
-					//если выделен весь столбец - смотрим нет ли пересекающих его объедененных строчек
-					if(c_oAscSelectionType.RangeCol === activeCells.type)
-					{
-						
-					}
-					else
-						mainAdjacentCells = activeCells;
+					//TODO если выделен весь столбец - нужно посмотреть, нет ли пересекающих его объедененных строчек
+					mainAdjacentCells = activeCells;
 				}
 					
 				//имеется ввиду то, что при выставленном флаге title используется первая строка в качестве заголовка, в противном случае - добавлются заголовки
