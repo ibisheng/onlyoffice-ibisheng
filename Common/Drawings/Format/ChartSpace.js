@@ -2471,6 +2471,11 @@ CChartSpace.prototype =
 
         var charts, series, i, j, ser;
         charts = this.chart.plotArea.charts;
+        var bVert = undefined;
+        if(this.bbox && this.bbox.seriesBBox && isRealBool(this.bbox.seriesBBox.bVert))
+        {
+            bVert = this.bbox.seriesBBox.bVert;
+        }
         for(i = 0; i < charts.length; ++i)
         {
             series = charts[i].series;
@@ -2483,10 +2488,10 @@ CChartSpace.prototype =
                     //val
                     checkValByNumRef(this, ser, ser.val);
                     //cat
-                    checkValByNumRef(this, ser, ser.cat, this.bbox.seriesBBox.bVert);
-                    checkCatByNumRef(this, ser, ser.cat, this.bbox.seriesBBox.bVert);
+                    checkValByNumRef(this, ser, ser.cat, bVert);
+                    checkCatByNumRef(this, ser, ser.cat, bVert);
                     //tx
-                    checkCatByNumRef(this, ser, ser.tx, !this.bbox.seriesBBox.bVert);
+                    checkCatByNumRef(this, ser, ser.tx, isRealBool(bVert) ? !bVert : undefined);
 
                     if(ser.isHidden)
                     {
@@ -2504,9 +2509,9 @@ CChartSpace.prototype =
                 for(j = 0; j < series.length; ++j)
                 {
                     ser = series[j];
-                    checkValByNumRef(this, ser, ser.xVal, this.bbox.seriesBBox.bVert);
+                    checkValByNumRef(this, ser, ser.xVal, bVert);
                     checkValByNumRef(this, ser, ser.yVal);
-                    checkCatByNumRef(this, ser, ser.tx, !this.bbox.seriesBBox.bVert);
+                    checkCatByNumRef(this, ser, ser.tx, isRealBool(bVert) ? !bVert : undefined);
 
                     if(ser.isHidden)
                     {
