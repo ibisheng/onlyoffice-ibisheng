@@ -589,9 +589,14 @@ DrawingObjectsController.prototype =
             {
                 tx = invert_transform_text.TransformPointX(x, y);
                 ty = invert_transform_text.TransformPointY(x, y);
-                if(this.document || (this.drawingObjects.cSld && !(this.noNeedUpdateCursorType === true)))
+                if( this.document || (this.drawingObjects.cSld && !(this.noNeedUpdateCursorType === true)) )
                 {
-                    content.Update_CursorType(tx, ty, pageIndex);
+                    var nPageIndex = pageIndex;
+                    if(this.drawingObjects.cSld && !( this.noNeedUpdateCursorType === true ) && isRealNumber(this.drawingObjects.num))
+                    {
+                        nPageIndex = this.drawingObjects.num;
+                    }
+                    content.Update_CursorType(tx, ty, nPageIndex);
                     ret.updated = true;
                 }
                 else if(this.drawingObjects)

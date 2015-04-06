@@ -271,11 +271,12 @@ CHistory.prototype.RedoExecute = function(Point, oRedoObjectParam)
 	}
 };
 CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
-	var wsViews, i, oState;
+	var wsViews, i, oState = null, bCoaut = false;
 	if (!bUndo && null == Point) {
 		this._checkCurPoint();
 		Point = this.Points[this.Index];
 		CollaborativeEditing.Apply_LinkData();
+		bCoaut = true;
         if(!window["NATIVE_EDITOR_ENJINE"]) {
             this.Get_RecalcData(Point);
             wsViews = Asc["editor"].wb.wsViews;
@@ -295,8 +296,11 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 		if (oRedoObjectParam.bUpdateWorksheetByModel)
 			this.workbook.handlers.trigger("updateWorksheetByModel");
 
-		oState = bUndo ? Point.SelectionState : ((this.Index === this.Points.length - 1) ?
-			this.LastState : this.Points[this.Index + 1].SelectionState);
+		if(!bCoaut)
+		{
+			oState = bUndo ? Point.SelectionState : ((this.Index === this.Points.length - 1) ?
+				this.LastState : this.Points[this.Index + 1].SelectionState);
+		}
 
 		if (this.workbook.bCollaborativeChanges) {
 		    //active может поменяться только при remove, hide листов
