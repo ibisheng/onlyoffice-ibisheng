@@ -825,7 +825,7 @@ CMathText.prototype =
     },
     Is_BreakOperator: function(val)
     {
-        var bSimpleOper   = val == 0x2D || val == 0x2B || val == 0x3D || val == 0x2A || val == 0x2F || val == 0x5C || val == 0x3C || val == 0x3E || val == 0xB1 || val == 0x2213,
+        var bSimpleOper   = val == 0x2D || val == 0x2B || val == 0x3D || val == 0x2A || val == 0x2F || val == 0x5C || val == 0x3C || val == 0x3E || val == 0xB1 || val == 0x2213 || val == 0x2219,
             bArrows       = (val >= 0x2190 && val <= 0x21B3) || val == 0x21B6 || val == 0x21B7 || (val >= 0x21BA && val <= 0x21E9) || (val >= 0x21F4 && val <= 0x21FF),
             bOtherSymbols = (val >= 0x2234 && val <= 0x2237) || val == 0x2239 || (val >= 0x223B && val <= 0x228B) || (val >= 0x228F && val <= 0x2292) || (val >= 0x22A2 && val <= 0x22B9),
             bFishes       = (val >= 0x22C8 && val <= 0x22CD) || val == 0x22D0 ||val == 0x22D1 || (val >= 0x22D5 && val <= 0x22EE) || (val >= 0x22F0 && val <= 0x22FF) || (val >= 0x27F0 && val <= 0x297F ) || ( val >= 0x29CE && val <= 0x29D5);
