@@ -10938,7 +10938,10 @@
 			var ar = t.activeRange.clone(true);
 			var onChangeAutoFilterCallback = function (isSuccess) {
 				if (false === isSuccess)
+				{
+					t.handlers.trigger("selectionChanged", t.getSelectionInfo());
 					return;
+				}
 
 				t.autoFilters.addAutoFilter(lTable, ar, undefined, false, addFormatTableOptionsObj);
 			};
