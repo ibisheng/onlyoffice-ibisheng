@@ -3957,7 +3957,13 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var ContentLen = this.Content.length;
 
     var RangeStartPos = this.protected_AddRange(CurLine, CurRange);
-    var RangeEndPos   = this.bOneLine ? ContentLen - 1 : 0;
+    var RangeEndPos   = 0;
+
+    if(this.bOneLine)
+    {
+        RangeStartPos = 0;
+        RangeEndPos   = ContentLen - 1;
+    }
 
     this.InfoPoints.SetDefault();
 
