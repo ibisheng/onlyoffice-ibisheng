@@ -229,7 +229,28 @@ function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent)
     var _new_parent = isRealObject(newParent) ? newParent : paragraph.Parent;
 
     var new_paragraph = new Paragraph(_drawing_document, _new_parent, 0, 0, 0, 0, 0, true);
-    new_paragraph.Set_Pr(paragraph.Pr.Copy());
+    var oCopyPr = paragraph.Pr.Copy();
+
+    oCopyPr.ContextualSpacing = undefined;
+    oCopyPr.KeepLines       = undefined;
+    oCopyPr.KeepNext        = undefined;
+    oCopyPr.PageBreakBefore = undefined;
+    oCopyPr.Shd = undefined;
+    oCopyPr.Brd.First = undefined;
+    oCopyPr.Brd.Last  = undefined;
+    oCopyPr.Brd.Between = undefined;
+    oCopyPr.Brd.Bottom = undefined;
+    oCopyPr.Brd.Left = undefined;
+    oCopyPr.Brd.Right = undefined;
+    oCopyPr.Brd.Top = undefined;
+    oCopyPr.WidowControl = undefined;
+    oCopyPr.Tabs = undefined;
+    oCopyPr.NumPr = undefined;
+    oCopyPr.PStyle = undefined;
+    oCopyPr.FramePr = undefined;
+
+
+    new_paragraph.Set_Pr(oCopyPr);
     new_paragraph.TextPr.Set_Value( paragraph.TextPr.Value );
     new_paragraph.Internal_Content_Remove2(0, new_paragraph.Content.length);
     var Count = paragraph.Content.length;

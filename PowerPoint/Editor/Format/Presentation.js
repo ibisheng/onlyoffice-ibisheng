@@ -3640,27 +3640,27 @@ CPresentation.prototype =
 
     bringToFront : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.bringToFront, false, historydescription_Presentation_BringToFront);   //TODO: Передавать тип проверки
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.bringToFront, [], false, historydescription_Presentation_BringToFront);   //TODO: Передавать тип проверки
         this.Document_UpdateInterfaceState();
     },
 
     bringForward : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.bringForward, false, historydescription_Presentation_BringForward);   //TODO: Передавать тип проверки
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.bringForward, [],false, historydescription_Presentation_BringForward);   //TODO: Передавать тип проверки
         this.Document_UpdateInterfaceState();
     },
 
     sendToBack : function()
     {
 
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.sendToBack, false, historydescription_Presentation_SendToBack);   //TODO: Передавать тип проверки
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.sendToBack, [],false, historydescription_Presentation_SendToBack);   //TODO: Передавать тип проверки
         this.Document_UpdateInterfaceState();
     },
 
 
     bringBackward : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.bringBackward, false, historydescription_Presentation_BringBackward);   //TODO: Передавать тип проверки
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.bringBackward, [], false, historydescription_Presentation_BringBackward);   //TODO: Передавать тип проверки
         this.Document_UpdateInterfaceState();
     },
 
