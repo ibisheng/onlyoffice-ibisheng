@@ -349,6 +349,18 @@ function CFontFileLoader(id)
 
     this.LoadFontAsync = function(basePath, _callback)
     {
+        if (window["AscDesktopEditor"] !== undefined)
+        {
+            if (-1 != this.Status)
+                return true;
+
+            this.callback = null;
+            this.Status = 2;
+            window["AscDesktopEditor"]["LoadFontBase64"](this.Id);
+            this._callback_font_load();
+            return;
+        }
+
         if (ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT && // проставляется в true на этапе сборки
 			this.CanUseOriginalFormat && // false if load embedded fonts
 			bIsSupportOriginalFormatFonts && // false if work on ie9

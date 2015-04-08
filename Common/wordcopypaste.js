@@ -263,6 +263,47 @@ function Editor_Copy(api, bCut)
         }
     }
 
+    if (window["AscDesktopEditorButtonMode"] === true && window["AscDesktopEditor"]) {
+        
+        if (bCut)
+        {
+            var __oncut = ElemToSelect.oncut;
+
+            ElemToSelect.oncut = function (e) {
+
+                ElemToSelect.oncut = __oncut;
+                __oncut = null;
+
+                if (false === api.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content)) {
+                    ElemToSelect.innerHTML = "";
+                    Editor_Copy_Event(e, ElemToSelect);
+
+                    api.WordControl.m_oLogicDocument.Remove(1, true, true);
+                    api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
+                }
+            }
+
+            window["AscDesktopEditor"]["Cut"]();
+        }
+        else
+        {
+            var __oncopy = ElemToSelect.oncopy;
+
+            ElemToSelect.oncopy = function (e) {
+
+                ElemToSelect.oncopy = __oncopy;
+                __oncopy = null;
+
+                ElemToSelect.innerHTML = "";
+                Editor_Copy_Event(e, ElemToSelect);
+            }
+
+            window["AscDesktopEditor"]["Copy"]();
+        }
+
+        return;
+    }       
+
     //���� ���������� copy
     var time_interval = 200;
     if (window.USER_AGENT_SAFARI_MACOS)
@@ -2332,6 +2373,33 @@ function Editor_Paste(api, bClean)
             rangeToSelect.select ();
         }
     }
+
+    if (window["AscDesktopEditorButtonMode"] === true && window["AscDesktopEditor"])
+    {
+        var __onpaste = pastebin.onpaste;
+
+        pastebin.onpaste = function (e) {
+
+            pastebin.onpaste = __onpaste;
+            __onpaste = null;
+
+            if (!window.GlobalPasteFlag)
+                return;
+
+            // тут onpaste не обрубаем, так как он в сафари под macos приходить должен
+            if (window.GlobalPasteFlagCounter == 1) {
+                Body_Paste(api, e);
+
+                if (window.GlobalPasteFlag)
+                    window.GlobalPasteFlagCounter = 2;
+            }
+        }
+
+        window["AscDesktopEditor"]["Paste"]();
+
+        return;
+    }
+
     //���� ���������� paste
     var func_timeout = function() {
 

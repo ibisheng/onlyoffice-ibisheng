@@ -295,6 +295,11 @@ var DocumentPageSize = new function() {
 /** @constructor */
 function asc_docs_api(name)
 {
+    if (window["AscDesktopEditor"])
+    {
+        window["AscDesktopEditor"]["CreateEditorApi"]();
+    }
+
     g_fontApplication.Init();
 
     var CDocsCoApi      = window["CDocsCoApi"];
@@ -2198,6 +2203,20 @@ asc_docs_api.prototype.Redo = function()
 };
 asc_docs_api.prototype.Copy = function()
 {
+    if (window["AscDesktopEditor"])
+    {
+        window["AscDesktopEditorButtonMode"] = true;
+
+        var _e = new CKeyboardEvent();
+        _e.CtrlKey = true;
+        _e.KeyCode = 67;
+
+        this.WordControl.m_oLogicDocument.OnKeyDown(_e);
+
+        window["AscDesktopEditorButtonMode"] = false;
+
+        return;
+    }
 	return Editor_Copy_Button(this)
 };
 asc_docs_api.prototype.Update_ParaTab = function(Default_Tab, ParaTabs){
@@ -2205,10 +2224,39 @@ asc_docs_api.prototype.Update_ParaTab = function(Default_Tab, ParaTabs){
 };
 asc_docs_api.prototype.Cut = function()
 {
+    if (window["AscDesktopEditor"])
+    {
+        window["AscDesktopEditorButtonMode"] = true;
+
+        var _e = new CKeyboardEvent();
+        _e.CtrlKey = true;
+        _e.KeyCode = 88;
+
+        this.WordControl.m_oLogicDocument.OnKeyDown(_e);
+
+        window["AscDesktopEditorButtonMode"] = false;
+
+        return;
+    }
 	return Editor_Copy_Button(this, true);
 };
 asc_docs_api.prototype.Paste = function()
 {
+    if (window["AscDesktopEditor"])
+    {
+        window["AscDesktopEditorButtonMode"] = true;
+
+        var _e = new CKeyboardEvent();
+        _e.CtrlKey = true;
+        _e.KeyCode = 86;
+
+        this.WordControl.m_oLogicDocument.OnKeyDown(_e);
+
+        window["AscDesktopEditorButtonMode"] = false;
+
+        return;
+    }
+
     if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
     {
         if (!window.GlobalPasteFlag)
@@ -5269,6 +5317,8 @@ asc_docs_api.prototype.asc_getDefaultLanguage = function()
 
 asc_docs_api.prototype.asc_getKeyboardLanguage = function()
 {
+    if (undefined !== window["asc_current_keyboard_layout"])
+        return window["asc_current_keyboard_layout"];
     return -1;
 };
 
@@ -6757,6 +6807,10 @@ function spellCheck (editor, rdata) {
 				// push data to native QT code
 				window['qtDocBridge']['spellCheck'] (JSON.stringify(rdata));
 			}
+			else if (undefined !== window["AscDesktopEditor"])
+			{
+			    window["AscDesktopEditor"]["SpellCheck"](JSON.stringify(rdata));
+			}
 			else
 			{
 				editor.SpellCheckApi.spellCheck(JSON.stringify(rdata));
@@ -6765,6 +6819,12 @@ function spellCheck (editor, rdata) {
 			break;
 	}
 }
+
+window["asc_nativeOnSpellCheck"] = function (response)
+{
+    var incomeObject = JSON.parse(response);
+    SpellCheck_CallBack(incomeObject);
+};
 
 function _onSpellCheck_Callback2 (response)
 {
