@@ -1286,6 +1286,10 @@
 				}
 				if (isNaN(oNewItem.format.fs))
 					oNewItem.format.fs = 11;
+					
+				if(oNewItem.format.fs === 0)
+					oNewItem.format.fs = 1;
+				
                 oNewItem.format.b = (jqSpanObject.css('font-weight') == 'bold');
                 oNewItem.format.i = (jqSpanObject.css('font-style') == 'italic');
                 oNewItem.format.u = (jqSpanObject.css('text-decoration') == 'underline') ?
@@ -3476,7 +3480,104 @@
                             ws.objectRender.controller.getGraphicObjectProps();
                         });
                 }
+			},
+			
+			_insertImagesFromHTML: function(ws, data)
+			{
+				var activeRange = ws.activeRange;
+				var curCol, drawingObject, curRow, startCol, startRow, xfrm, aImagesSync = [], activeRow, activeCol, tempArr, offX, offY, rot, a_drawings = [];
+				
+				for (var im = 0; im < data.addImages.length; im++) 
+				{
+					var src = data.addImages[im].tag.src;
+					var extX = ws.objectRender.convertPixToMM(data.addImages[im].tag.width);
+					var extY = ws.objectRender.convertPixToMM(data.addImages[im].tag.height);
+					var x = ws.objectRender.convertMetric(ws.cols[data.addImages[im].curCell.col].left - ws.getCellLeft(0, 1), 1, 3);
+					var y = ws.objectRender.convertMetric(ws.rows[data.addImages[im].curCell.row].top - ws.getCellTop(0, 1), 1, 3);
 
+					if(src) 
+					{
+						var drawing = DrawingObjectsController.prototype.createImage(src, x, y, extX, extY);
+						var drawingBase = ws.objectRender.createDrawingObject();
+						drawingBase.graphicObject = drawing;
+						
+						a_drawings.push(drawingBase);
+					}
+				}
+				
+				History.Create_NewPoint();
+				History.StartTransaction();
+
+				for(var i = 0; i < a_drawings.length; i++)
+				{	
+					a_drawings[i].graphicObject = a_drawings[i].graphicObject.copy();
+					drawingObject = a_drawings[i];
+					
+					//отдельная обработка для вставки таблички из презентаций
+					if(a_drawings.length === 1 && typeof CGraphicFrame !== "undefined" && drawingObject.graphicObject instanceof CGraphicFrame)
+					{
+						//вставляем табличку из презентаций
+						var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(this, ws);
+						
+						var newCDocument = new CDocument(oTempDrawingDocument);
+						newCDocument.bFromDocument = true;
+						newCDocument.theme = this.Api.wbModel.theme;
+						
+						drawingObject.graphicObject.setBDeleted(true);
+						drawingObject.graphicObject.setWordFlag(false, newCDocument);
+						
+						var oTempDrawingDocument = ws.model.DrawingDocument;
+						oTempDrawingDocument.m_oLogicDocument = newCDocument;
+						
+						drawingObject.graphicObject.graphicObject.Set_Parent(newCDocument);
+						pasteFromBinaryWord._paste(ws, {DocumentContent: [drawingObject.graphicObject.graphicObject]});
+						
+						return;
+					}
+
+					CheckSpPrXfrm(drawingObject.graphicObject);
+					xfrm = drawingObject.graphicObject.spPr.xfrm;
+
+					drawingObject = ws.objectRender.cloneDrawingObject(drawingObject);
+					drawingObject.graphicObject.setDrawingBase(drawingObject);
+					
+					drawingObject.graphicObject.setDrawingObjects(ws.objectRender);
+					drawingObject.graphicObject.setWorksheet(ws.model);
+
+                    drawingObject.graphicObject.checkRemoveCache &&  drawingObject.graphicObject.checkRemoveCache();
+
+					drawingObject.graphicObject.addToDrawingObjects();
+                    if(drawingObject.graphicObject.checkDrawingBaseCoords)
+                    {
+                        drawingObject.graphicObject.checkDrawingBaseCoords();
+                    }
+                    drawingObject.graphicObject.recalculate();
+					drawingObject.graphicObject.select(ws.objectRender.controller, 0);
+					
+					tempArr = [];
+					drawingObject.graphicObject.getAllRasterImages(tempArr);
+					
+					if(tempArr.length)
+					{	
+						for(var n = 0; n < tempArr.length; n++)
+						{
+							aImagesSync.push(tempArr[n]);
+						}
+					}
+				}
+
+                ws.objectRender.showDrawingObjects(true);
+                ws.objectRender.controller.updateOverlay();
+                ws.setSelectionShape(true);
+                History.EndTransaction();
+                if(aImagesSync.length > 0)
+                {
+                    window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null,
+                        function(){
+                            ws.objectRender.showDrawingObjects(true);
+                            ws.objectRender.controller.getGraphicObjectProps();
+                    });
+                }
 			},
 			
 			_insertImagesFromBinaryWord: function(ws, data, aImagesSync)

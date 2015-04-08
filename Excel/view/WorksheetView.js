@@ -8301,50 +8301,13 @@
 					t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
 					
 				var a_drawings = [];
-				if (val.addImages && val.addImages.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor)) {
-					var api = asc["editor"];
-					var aImagesSync = [];
-					for (var im = 0; im < val.addImages.length; im++) {
-							aImagesSync.push(val.addImages[im].tag.src);
-						}
-					t.objectRender.asyncImagesDocumentEndLoaded = function() {
-						//вставляем изображения
-						for (var im = 0; im < val.addImages.length; im++) {
-							var src = val.addImages[im].tag.src;
-
-							if (src /*&& 0 != src.indexOf("file://")*/) {
-								var drawing = CreateImageDrawingObject(src,  { cell: val.addImages[im].curCell, width: val.addImages[im].tag.width, height: val.addImages[im].tag.height },  t.objectRender);
-								if(drawing && drawing.graphicObject)
-									a_drawings.push(drawing.graphicObject);
-							}
-						}
-
-						t.objectRender.objectLocker.reset();
-
-						function callbackUngroupedObjects(result) {
-								if ( result ) {
-									for (var j = 0; j < a_drawings.length; ++j) {
-										a_drawings[j].recalculateTransform();
-										a_drawings[j].addToDrawingObjects();
-										a_drawings[j].select( t.objectRender.controller, 0);
-									}
-                                    t.objectRender.controller.startRecalculate();
-                                    t.objectRender.controller.updateOverlay();
-                                    t.setSelectionShape(true);
-								}
-							}
-						for(var j = 0; j < a_drawings.length; ++j)
-						{
-								t.objectRender.objectLocker.addObjectId(a_drawings[j].Get_Id());
-							}
-						t.objectRender.objectLocker.checkObjects(callbackUngroupedObjects);
-					};
-
-					api.ImageLoader.LoadDocumentImages(aImagesSync, null, t.objectRender.asyncImagesDocumentEndLoaded);
+				var api = asc["editor"];
+				if (val.addImages && val.addImages.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor)) 
+				{	
+					api.wb.clipboard._insertImagesFromHTML(t, val);
 				}
 				else if(val.addImagesFromWord && val.addImagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 				{
-					var api = window["Asc"]["editor"];
 					var rData = {"id": api.documentId, "c":"imgurls", "vkey": api.documentVKey, "data": JSON.stringify(val._images)};
 					api._asc_sendCommand(function(incomeObject){
 						if(incomeObject && "imgurls" == incomeObject.type)
