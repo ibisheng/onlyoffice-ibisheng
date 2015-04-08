@@ -5173,7 +5173,6 @@
         this.bcr = new Binary_CommonReader(this.stream);
         this.aMerged = [];
         this.aHyperlinks = [];
-		this.aFormulaExt = [];
         this.copyPasteObj = copyPasteObj;
         this.curWorksheet = null;
         this.Read = function()
@@ -5191,8 +5190,8 @@
             {
                 this.aMerged = [];
                 this.aHyperlinks = [];
-				this.aFormulaExt = [];
                 var oNewWorksheet = new Woorksheet(this.wb, wb.aWorksheets.length);
+                oNewWorksheet.aFormulaExt = [];
 				
 				//TODO при copy/paste в word из excel необходимо подменить DrawingDocument из word - пересмотреть правку!
 				if(typeof editor != "undefined" && editor && editor.WordControl && editor.WordControl.m_oLogicDocument && editor.WordControl.m_oLogicDocument.DrawingDocument)
@@ -5227,7 +5226,6 @@
                     if (null !== hyperlink.Ref)
                         hyperlink.Ref.setHyperlinkOpen(hyperlink);
                 }
-                oNewWorksheet.init(this.aFormulaExt);
                 this.wb.aWorksheets.push(oNewWorksheet);
                 this.wb.aWorksheetsById[oNewWorksheet.getId()] = oNewWorksheet;
             }
@@ -5736,7 +5734,7 @@
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadFormula(t,l, oFormulaExt);
                 });
-				this.aFormulaExt.push({cell: oCell, ext: oFormulaExt});
+				ws.aFormulaExt.push({cell: oCell, ext: oFormulaExt});
             }
             else if( c_oSerCellTypes.Value == type )
                 oCell.oValue.number = this.stream.GetDoubleLE();

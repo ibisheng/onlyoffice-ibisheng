@@ -1364,7 +1364,6 @@ Workbook.prototype.createWorksheet=function(indexBefore, sName, sId){
 		if(true == this.checkValidSheetName(sName))
 			oNewWorksheet.sName = sName;
 	}
-    oNewWorksheet.init();
 	oNewWorksheet.initPostOpen();
 	if(null != indexBefore && indexBefore >= 0 && indexBefore < this.aWorksheets.length)
 		this.aWorksheets.splice(indexBefore, 0, oNewWorksheet);
@@ -1395,7 +1394,6 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
 			if(true == this.checkValidSheetName(sName))
 				newSheet.sName = sName;
 		}
-		newSheet.init();
 		newSheet.initPostOpen();
 		if(null != insertBefore && insertBefore >= 0 && insertBefore < this.aWorksheets.length){
 			//помещаем новый sheet перед insertBefore
@@ -2105,6 +2103,7 @@ function Woorksheet(wb, _index, sId){
 	this.sheetViews = [];
 	this.aConditionalFormatting = [];
 	this.sheetPr = null;
+	this.aFormulaExt = null;
 
     this.oDrawingOjectsManager = new DrawingObjectsManager(this);
     this.contentChanges = new CContentChanges();
@@ -2252,12 +2251,12 @@ Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
         drawingObjects.updateChartReferences2(parserHelp.getEscapeSheetName(wsFrom.sName), parserHelp.getEscapeSheetName(oNewWs.sName));
     }
 };
-Woorksheet.prototype.init=function(aFormulaExt){
+Woorksheet.prototype.initPostOpen = function(){
 	this.workbook.cwf[this.Id]={ cells:{} };
-	if(aFormulaExt){
+	if(this.aFormulaExt){
 		var formulaShared = {};
-		for(var i = 0; i < aFormulaExt.length; ++i){
-			var elem = aFormulaExt[i];
+		for(var i = 0; i < this.aFormulaExt.length; ++i){
+			var elem = this.aFormulaExt[i];
 			var oCell = elem.cell;
 			var sCellId = g_oCellAddressUtils.getCellId(oCell.nRow, oCell.nCol);
 			var oFormulaExt = elem.ext;
@@ -2314,9 +2313,9 @@ Woorksheet.prototype.init=function(aFormulaExt){
 				this.workbook.needRecalc.length++;
 			}
 		}
+		this.aFormulaExt = null;
 	}
-};
-Woorksheet.prototype.initPostOpen = function(){
+	
 	if (!this.PagePrintOptions) {
 		// Даже если не было, создадим
 		this.PagePrintOptions = new Asc.asc_CPageOptions();
