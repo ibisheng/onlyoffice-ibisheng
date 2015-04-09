@@ -511,72 +511,77 @@
 		};
 
 		CellEditor.prototype.pasteText = function (text) {
-			var t = this;
 			text = text.replace(/\t/g," ");
 			text = text.replace(/\r/g, "");
 			text = text.replace(/^\n+|\n+$/g, "");
+
+			var length = text.length;
+			if (!(length > 0)) {return;}
+			// Ограничение на ввод (ToDo учитывать удаляемые символы)
+			if (this._getFragmentsLength(this.options.fragments) + length > c_oAscMaxCellOrCommentLength)
+				return false;
+
 			var wrap = text.indexOf("\n") >= 0;
-
-			if (!(text.length > 0)) {return;}
-
-			if (t.selectionBegin !== t.selectionEnd)
-				t._removeChars();
+			if (this.selectionBegin !== this.selectionEnd)
+				this._removeChars();
 			else
-				t.undoList.push({fn: "fake", args: []});//фейковый undo(потому что у нас делает undo по 2 действия)
+				this.undoList.push({fn: "fake", args: []});//фейковый undo(потому что у нас делает undo по 2 действия)
 
 			// save info to undo/redo
-			t.undoList.push({fn: t._removeChars, args: [t.cursorPos, text.length]});
-			t.redoList = [];
+			this.undoList.push({fn: this._removeChars, args: [this.cursorPos, length]});
+			this.redoList = [];
 
-			var opt = t.options;
-			var nInsertPos = t.cursorPos;
+			var opt = this.options;
+			var nInsertPos = this.cursorPos;
 			var fr;
-			fr = t._findFragmentToInsertInto(nInsertPos - (nInsertPos > 0 ? 1 : 0));
+			fr = this._findFragmentToInsertInto(nInsertPos - (nInsertPos > 0 ? 1 : 0));
 			if (fr) {
 				var oCurFragment = opt.fragments[fr.index];
 				if(fr.end <= nInsertPos)
 					oCurFragment.text += text;
-				else
-				{
+				else {
 					var sNewText = oCurFragment.text.substring(0, nInsertPos);
 					sNewText += text;
 					sNewText += oCurFragment.text.substring(nInsertPos);
 					oCurFragment.text = sNewText;
 				}
-				t.cursorPos = nInsertPos + text.length;
-				t._update();
+				this.cursorPos = nInsertPos + length;
+				this._update();
 			}
 
 			if (wrap) {
-				t._wrapText();
-				t._update();
+				this._wrapText();
+				this._update();
 			}
 		};
 
 		CellEditor.prototype.paste = function (fragments, cursorPos) {
-			var t = this;
+			if (!(fragments.length > 0)) {return;}
+			var length = this._getFragmentsLength(fragments);
+			// Ограничение на ввод (ToDo учитывать удаляемые символы)
+			if (this._getFragmentsLength(this.options.fragments) + length > c_oAscMaxCellOrCommentLength)
+				return false;
+
 			var wrap = fragments.some(function(val){return val.text.indexOf("\n")>=0;});
 
-			t._cleanFragments(fragments);
+			this._cleanFragments(fragments);
 
-			if (!(fragments.length > 0)) {return;}
-
-			if (t.selectionBegin !== t.selectionEnd) {t._removeChars();}
+			if (this.selectionBegin !== this.selectionEnd) {this._removeChars();}
 
 			// save info to undo/redo
-			t.undoList.push({fn: t._removeChars, args: [t.cursorPos, t._getFragmentsLength(fragments)]});
-			t.redoList = [];
+			this.undoList.push({fn: this._removeChars, args: [this.cursorPos, length]});
+			this.redoList = [];
 
-			t._addFragments(fragments, t.cursorPos);
+			this._addFragments(fragments, this.cursorPos);
 
 			if (wrap) {
-				t._wrapText();
-				t._update();
+				this._wrapText();
+				this._update();
 			}
 
 			// Сделано только для вставки формулы в ячейку (когда не открыт редактор)
 			if (undefined !== cursorPos)
-				t._moveCursor(kPosition, cursorPos);
+				this._moveCursor(kPosition, cursorPos);
 		};
 
 		/** @param flag {Boolean} */
@@ -1290,7 +1295,11 @@
 		};
 
 		CellEditor.prototype._addChars = function (str, pos, isRange) {
-			var opt = this.options, f, l, s;
+			var opt = this.options, f, l, s, length = str.length;
+
+			// Ограничение на ввод (ToDo учитывать удаляемые символы)
+			if (this._getFragmentsLength(this.options.fragments) + length > c_oAscMaxCellOrCommentLength)
+				return false;
 
 			if (this.selectionBegin !== this.selectionEnd) {this._removeChars(undefined, undefined, isRange);}
 
@@ -1298,7 +1307,7 @@
 
 			if (!this.undoMode) {
 				// save info to undo/redo
-				this.undoList.push({fn: this._removeChars, args: [pos, str.length], isRange: isRange});
+				this.undoList.push({fn: this._removeChars, args: [pos, length], isRange: isRange});
 				this.redoList = [];
 			}
 
