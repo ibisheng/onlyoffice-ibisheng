@@ -5368,7 +5368,7 @@ function asc_CCommentDataWord( obj )
 }
 
 asc_CCommentDataWord.prototype.asc_getText         = function()  { return this.m_sText; };
-asc_CCommentDataWord.prototype.asc_putText         = function(v) { this.m_sText = v; };
+asc_CCommentDataWord.prototype.asc_putText         = function(v) { this.m_sText = v ? v.slice(0, c_oAscMaxCellOrCommentLength) : v; };
 asc_CCommentDataWord.prototype.asc_getTime         = function()  { return this.m_sTime; };
 asc_CCommentDataWord.prototype.asc_putTime         = function(v) { this.m_sTime = v; };
 asc_CCommentDataWord.prototype.asc_getUserId       = function()  { return this.m_sUserId; };

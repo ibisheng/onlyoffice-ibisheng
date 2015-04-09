@@ -3396,7 +3396,7 @@ function asc_CCommentData( obj )
 }
 
 asc_CCommentData.prototype.asc_getText         = function()  { return this.m_sText; };
-asc_CCommentData.prototype.asc_putText         = function(v) { this.m_sText = v; };
+asc_CCommentData.prototype.asc_putText         = function(v) { this.m_sText = v ? v.slice(0, c_oAscMaxCellOrCommentLength) : v; };
 asc_CCommentData.prototype.asc_getTime         = function()  { return this.m_sTime; };
 asc_CCommentData.prototype.asc_putTime         = function(v) { this.m_sTime = v; };
 asc_CCommentData.prototype.asc_getUserId       = function()  { return this.m_sUserId; };

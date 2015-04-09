@@ -591,3 +591,4 @@ var c_oAscLineBeginSize = {
 };
 
 var c_oAscMaxTooltipLength = 256;
+var c_oAscMaxCellOrCommentLength = 32767; // По идее должно быть 32768, но видимо сравнение идеть на меньше (а не меньше либо равно)
