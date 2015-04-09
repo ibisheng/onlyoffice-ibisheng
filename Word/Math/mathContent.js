@@ -4127,12 +4127,6 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         }
     }
 
-    if(this.bOneLine)
-    {
-        this.Bounds.SetWidth(0, this.size.width);
-        this.Bounds.UpdateMetrics(0, this.size);
-    }
-
     if ( Pos >= ContentLen )
     {
         RangeEndPos = Pos - 1;

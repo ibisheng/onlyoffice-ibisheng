@@ -1743,14 +1743,12 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         var RangeStartPos = this.protected_AddRange(CurLine, CurRange),
             RangeEndPos = Len - 1;
 
+        this.VerifyWordLen(PRS);
+
         if(CurLine == 0 && CurRange == 0)
         {
             PRS.WordLen += this.BrGapLeft;
         }
-
-        //var PosEndRun = PRS.PosEndRun.Copy();
-        //var Word = PRS.Word;
-        //var WordLen = PRS.WordLen;
 
         for(var Pos = RangeStartPos; Pos < Len; Pos++)
         {
@@ -1792,42 +1790,6 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 if(Pos < Len - 1)
                     PRS.WordLen += this.dW;
             }
-
-
-            /*PRS.bMath_OneLine = true;
-
-            var bOneLineContent = Pos !== Numb;
-
-            if(bOneLineContent == false)
-            {
-                PRS.Update_CurPos(Pos, Depth);
-                PRS.bMath_OneLine  = false;
-            }
-
-            var NeedSetReset = CurLine == 0 && CurRange == 0  || Pos !== RangeStartPos;
-            if(Item.Type == para_Math_Content && NeedSetReset)
-                Item.Recalculate_Reset(PRS.Range, PRS.Line); // обновим StartLine и StartRange
-
-            Item.Recalculate_Range(PRS, ParaPr, Depth+1);
-
-            if(bOneLineContent == true)
-            {
-                if(true !== PRS.Word)
-                {
-                    PRS.WordLen = Item.size.width;
-                    PRS.Word    = true;
-                }
-                else
-                {
-                    PRS.WordLen += Item.size.width;
-                }
-            }
-
-            if(true === PRS.NewRange)
-            {
-                RangeEndPos = Numb;
-                break;
-            }*/
         }
 
 
@@ -1861,10 +1823,18 @@ CMathBase.prototype.Math_GetWidth = function(_CurLine, _CurRange)
 {
     return this.size.width;
 };
+CMathBase.prototype.VerifyWordLen = function(PRS)
+{
+    if(true !== PRS.Word)
+        PRS.WordLen = 0;
+};
 CMathBase.prototype.Update_WordLen = function(PRS, WordLen)
 {
     if(this.bInside == false)
     {
+        PRS.WordLen = WordLen + this.size.width;
+
+        /*
         if(true !== PRS.Word)
         {
             PRS.WordLen = this.size.width;
@@ -1872,7 +1842,7 @@ CMathBase.prototype.Update_WordLen = function(PRS, WordLen)
         else
         {
             PRS.WordLen = WordLen + this.size.width;
-        }
+        }*/
     }
 };
 CMathBase.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)

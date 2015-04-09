@@ -3449,18 +3449,27 @@ CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
         var Content = this.Content[0];
 
+        this.VerifyWordLen(PRS);
+
         if(CurLine == 0 && CurRange == 0)
         {
             // посчитаем контент как одностроковый для вычисления размера скобок
             // далее будем считать объект как многостроковый на Recalculate_Range
             PRS.bMath_OneLine = true;
+
+            var WordLen = PRS.WordLen;
+
             Content.Recalculate_Range(PRS, ParaPr, Depth + 1);
             this.RecalculateGeneralSize(g_oTextMeasurer, Content.size.height, Content.size.ascent);
+
+            // вычисляем до изменения PRS.WordLen
+            this.BrGapLeft  = this.GapLeft  + this.begOper.size.width;
+            this.BrGapRight = this.GapRight + this.endOper.size.width;
 
             //
             Content.Recalculate_Reset(PRS.Range, PRS.Line);
 
-            PRS.WordLen += this.BrGapLeft;
+            PRS.WordLen = WordLen + this.BrGapLeft;
         }
         PRS.bMath_OneLine = false;
         PRS.Update_CurPos(0, Depth);
@@ -3479,11 +3488,12 @@ CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     {
         PRS.bMath_OneLine = true;
         this.NumBreakContent = -1;
-        CDelimiter.superclass.Recalculate_Range.call(this, PRS, ParaPr, Depth);
-    }
 
-    this.BrGapLeft  = this.GapLeft  + this.begOper.size.width;
-    this.BrGapRight = this.GapRight + this.endOper.size.width;
+        CDelimiter.superclass.Recalculate_Range.call(this, PRS, ParaPr, Depth);
+
+        this.BrGapLeft  = this.GapLeft  + this.begOper.size.width;
+        this.BrGapRight = this.GapRight + this.endOper.size.width;
+    }
 };
 CDelimiter.prototype.Is_EmptyGaps = function()
 {

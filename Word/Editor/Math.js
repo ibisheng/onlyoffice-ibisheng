@@ -2036,9 +2036,9 @@ ParaMath.prototype.Get_Bounds = function()
 
         var LinesCount = this.Root.protected_GetLinesCount();
 
-        var PosLine = Math.min(3, LinesCount - 1);
+        //var PosLine = Math.min(3, LinesCount - 1);
 
-        return this.Root.Get_Bounds()[PosLine];
+        return this.Root.Get_Bounds()[LinesCount - 1];
     }
 };
 

@@ -30,6 +30,12 @@ CMathSize.prototype.SetZero = function()
     this.descent = 0;
     this.ascent = 0;
 }
+CMathSize.prototype.Set = function(size)
+{
+    this.width  = size.width;
+    this.height = size.height;
+    this.ascent = size.ascent;
+};
 
 function CMathText(bJDraw)
 {

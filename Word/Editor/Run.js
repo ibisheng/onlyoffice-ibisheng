@@ -2174,12 +2174,12 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     if(this.ParaMath.Is_BrkBinBefore() == true)
                     {
-                        if(X + WordLen + SpaceLen + BrkLen > XEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                        if(X + WordLen + SpaceLen /*+ BrkLen*/ > XEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                         {
                             MoveToLBP = true;
                             NewRange = true;
 
-                            PRS.Set_LineBreakPos(Pos);
+                            //PRS.Set_LineBreakPos(Pos);
                         }
                         else if(Word == true)
                         {
@@ -2214,7 +2214,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             SpaceLen = 0;
                             WordLen = 0;
 
-                            if(Word == true)
+                            //if(Word == true)
                                 FirstItemOnLine = false;
 
                             Word = false;
