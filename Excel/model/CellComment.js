@@ -142,21 +142,21 @@ window["Asc"]["asc_CCommentCoords"] = window["Asc"].asc_CCommentCoords = asc_CCo
 // CommentData
 //-----------------------------------------------------------------------------------
 var g_oCCommentDataProperties = {
-		wsId: 0,
-		nCol: 1,
-		nRow: 2,
-		nId: 3,
-		nLevel: 5,
-		sText: 6,
-		sQuoteText: 7,
-		sTime: 8,
-		sUserId: 9,
-		sUserName: 10,
-		bDocument: 11,
-		bSolved: 12,
-		aReplies: 13,
-		bHidden: 14
-	};
+	wsId: 0,
+	nCol: 1,
+	nRow: 2,
+	nId: 3,
+	nLevel: 5,
+	sText: 6,
+	sQuoteText: 7,
+	sTime: 8,
+	sUserId: 9,
+	sUserName: 10,
+	bDocument: 11,
+	bSolved: 12,
+	aReplies: 13,
+	bHidden: 14
+};
 /** @constructor */
 function asc_CCommentData(obj) {
 	this.Properties = g_oCCommentDataProperties;
@@ -238,7 +238,7 @@ asc_CCommentData.prototype = {
 	asc_putParent: function(obj) { this.oParent = obj; },
 	asc_getParent: function() { return this.oParent; },
 
-	asc_putText: function(val) { this.sText = val; },
+	asc_putText: function(val) {this.sText = val ? val.slice(0, c_oAscMaxCellOrCommentLength) : val; },
 	asc_getText: function() { return this.sText; },
 
 	asc_putTime: function(val) { this.sTime = val; },

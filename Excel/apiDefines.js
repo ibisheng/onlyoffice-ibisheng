@@ -311,3 +311,5 @@ var c_oAscFormulaRangeBorderColor = [
 
 var c_oAscLockNameFrozenPane	= "frozenPane";
 var c_oAscLockNameTabColor		= "tabColor";
+
+var c_oAscMaxCellOrCommentLength = 32767; // По идее должно быть 32768, но видимо сравнение идеть на меньше (а не меньше либо равно)
