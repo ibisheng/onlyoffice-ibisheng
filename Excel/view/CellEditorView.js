@@ -5,7 +5,8 @@
  * Author: Dmitry.Sokolov@avsmedia.net
  * Date:   May 30, 2012
  */
-(	/**
+(
+	/**
 	 * @param {jQuery} $
 	 * @param {Window} window
 	 * @param {undefined} undefined
@@ -517,9 +518,7 @@
 
 			var length = text.length;
 			if (!(length > 0)) {return;}
-			// Ограничение на ввод (ToDo учитывать удаляемые символы)
-			if (this._getFragmentsLength(this.options.fragments) + length > c_oAscMaxCellOrCommentLength)
-				return false;
+			if (!this._checkMaxCellLength(length)) {return;}
 
 			var wrap = text.indexOf("\n") >= 0;
 			if (this.selectionBegin !== this.selectionEnd)
@@ -558,9 +557,7 @@
 		CellEditor.prototype.paste = function (fragments, cursorPos) {
 			if (!(fragments.length > 0)) {return;}
 			var length = this._getFragmentsLength(fragments);
-			// Ограничение на ввод (ToDo учитывать удаляемые символы)
-			if (this._getFragmentsLength(this.options.fragments) + length > c_oAscMaxCellOrCommentLength)
-				return false;
+			if (!this._checkMaxCellLength(length)) {return;}
 
 			var wrap = fragments.some(function(val){return val.text.indexOf("\n")>=0;});
 
@@ -619,9 +616,9 @@
 
 			this.skipTLUpdate = false;
 			// Вставим форумулу в текущую позицию
-			this._addChars (functionName);
+			this._addChars(functionName);
 			// Меняем позицию курсора внутрь скобок
-			this._moveCursor (kPosition, this.cursorPos - 1);
+			this._moveCursor(kPosition, this.cursorPos - 1);
 		};
 
 		CellEditor.prototype.replaceText = function (pos, len, newText) {
@@ -1297,9 +1294,7 @@
 		CellEditor.prototype._addChars = function (str, pos, isRange) {
 			var opt = this.options, f, l, s, length = str.length;
 
-			// Ограничение на ввод (ToDo учитывать удаляемые символы)
-			if (this._getFragmentsLength(this.options.fragments) + length > c_oAscMaxCellOrCommentLength)
-				return false;
+			if (!this._checkMaxCellLength(length)) {return false;}
 
 			if (this.selectionBegin !== this.selectionEnd) {this._removeChars(undefined, undefined, isRange);}
 
@@ -1690,6 +1685,21 @@
 			result.color = (tmp.c ? asc.colorObjToAscColor(tmp.c) : new asc_CColor(this.options.textColor));
 
 			this.handlers.trigger("updateEditorSelectionInfo", result);
+		};
+
+		CellEditor.prototype._checkMaxCellLength = function (length) {
+			var newLength = this._getFragmentsLength(this.options.fragments) + length;
+			// Ограничение на ввод
+			if (newLength > c_oAscMaxCellOrCommentLength) {
+				if (this.selectionBegin === this.selectionEnd)
+					return false;
+
+				var b = Math.min(this.selectionBegin, this.selectionEnd);
+				var e = Math.max(this.selectionBegin, this.selectionEnd);
+				if (newLength - this._getFragmentsLength(this._getFragments(b, e - b)) > c_oAscMaxCellOrCommentLength)
+					return false;
+			}
+			return true;
 		};
 
 		// Event handlers
