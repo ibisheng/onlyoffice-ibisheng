@@ -227,8 +227,7 @@ module.exports = function(grunt) {
 		grunt.initConfig({
 			closureCompiler: {
 				options: {
-					compilerFile: toolsFile['closure_compiler'],
-					d32: true
+					compilerFile: toolsFile['closure_compiler']
 				},
 				sdk: {
 					TEMPcompilerOpts: {
