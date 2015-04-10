@@ -1775,17 +1775,12 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             {
                 PRS.bMath_OneLine = true;
 
+                var WWordLen = PRS.WordLen;
+
                 Item.Recalculate_Range(PRS, ParaPr, Depth+1);
 
-                if(true !== PRS.Word)
-                {
-                    PRS.WordLen = Item.size.width;
-                    PRS.Word    = true;
-                }
-                else
-                {
-                    PRS.WordLen += Item.size.width;
-                }
+                PRS.WordLen = WWordLen + Item.size.width;
+                PRS.Word    = true;
 
                 if(Pos < Len - 1)
                     PRS.WordLen += this.dW;
@@ -1955,7 +1950,7 @@ CMathBase.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange
         PRSC.Range.W += this.dW*(EndPos - StartPos);
 
 
-        // Здесь проверяем не на колво строк, т.к. на данном этапе еще идет вычисление строк, а на конец контента !
+        // Здесь проверяем не на кол-во строк, т.к. на данном этапе еще идет вычисление строк, а на конец контента !
 
         var Len = this.Content.length;
 

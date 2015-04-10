@@ -219,8 +219,6 @@ CMathFunc.prototype.init = function(props)
 
     this.setProperties(props);
     this.fillContent();
-
-    this.NeedBreakContent(1);
 };
 CMathFunc.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 {
@@ -251,6 +249,8 @@ CMathFunc.prototype.getArgument = function()
 };
 CMathFunc.prototype.fillContent = function()
 {
+    this.NeedBreakContent(1);
+
     this.setDimension(1, 2);
     this.elements[0][0] = this.getFName();
     this.elements[0][1] = this.getArgument();

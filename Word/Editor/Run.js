@@ -2172,52 +2172,76 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 {
                     var BrkLen = Item.Width/TEXTWIDTH_DIVIDER;
 
-                    if(this.ParaMath.Is_BrkBinBefore() == true)
+                    if(PRS.bEndRunToContent == true && Pos == ContentLen - 1 && Word == true)
                     {
-                        if(X + WordLen + SpaceLen /*+ BrkLen*/ > XEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                        if(X + SpaceLen + WordLen + LetterLen + BrkLen > XEnd)
                         {
-                            MoveToLBP = true;
-                            NewRange = true;
-
-                            //PRS.Set_LineBreakPos(Pos);
+                            if(true === FirstItemOnLine)
+                            {
+                                bMathWordLarge = true;
+                            }
+                            else
+                            {
+                                // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                                MoveToLBP = true;
+                                NewRange = true;
+                            }
                         }
-                        else if(Word == true)
+                        else
                         {
-                            X += SpaceLen + WordLen;
-                            PRS.Set_LineBreakPos(Pos);
-                            EmptyLine = false;
-                            WordLen = BrkLen;
-                            SpaceLen = 0;
+                            WordLen += BrkLen;
+                        }
+                    }
+                    else
+                    {
+                        if(this.ParaMath.Is_BrkBinBefore() == true)
+                        {
+                            if(X + WordLen + SpaceLen > XEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                            {
+                                MoveToLBP = true;
+                                NewRange = true;
+                            }
+                            else if(Word == true)
+                            {
+                                X += SpaceLen + WordLen;
+                                PRS.Set_LineBreakPos(Pos);
+                                EmptyLine = false;
+                                WordLen = BrkLen;
+                                SpaceLen = 0;
+
+                            }
+                            else
+                            {
+                                PRS.Set_LineBreakPos(Pos);
+                                SpaceLen += BrkLen;
+                            }
 
                             FirstItemOnLine = false;
                         }
                         else
                         {
-                            SpaceLen += BrkLen;
-                        }
-                    }
-                    else
-                    {
-                        if(X + WordLen + BrkLen > XEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
-                        {
-                            MoveToLBP = true;
-                            NewRange = true;
+                            if(X + WordLen + BrkLen > XEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                            {
+                                MoveToLBP = true;
+                                NewRange = true;
 
-                            if(Word == false)
-                                PRS.Set_LineBreakPos(Pos);
-                        }
-                        else
-                        {
-                            X += BrkLen + WordLen;
+                                if(Word == false)
+                                    PRS.Set_LineBreakPos(Pos);
+                            }
+                            else
+                            {
+                                X += BrkLen + WordLen;
 
-                            EmptyLine = false;
-                            SpaceLen = 0;
-                            WordLen = 0;
+                                EmptyLine = false;
+                                SpaceLen = 0;
+                                WordLen = 0;
 
-                            //if(Word == true)
+                                PRS.Set_LineBreakPos(Pos+1); // LineBreakPos обновляем здесь, т.к. слово может начаться с мат объекта, а не с Run, в мат объекте нет соответствующей проверки
+
                                 FirstItemOnLine = false;
 
-                            Word = false;
+                                Word = false;
+                            }
                         }
                     }
 

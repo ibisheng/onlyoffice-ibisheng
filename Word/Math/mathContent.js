@@ -3987,6 +3987,9 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             PRS.EmptyLine = false;
             PRS.SpaceLen = 0;
             PRS.WordLen = 0;
+
+
+            PRS.XRange = PRS.X;
         }
     }
 
@@ -3994,6 +3997,8 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     {
         var Item = this.Content[Pos],
             Type = Item.Type;
+
+        PRS.bEndRunToContent = Pos == ContentLen - 1;
 
         // для однострочных мат объектов обновляем CurLine и CurRange, Run в этом случае не могут разбиваться на несколько строк
         if (this.bOneLine || (0 === Pos && 0 === CurLine && 0 === CurRange ) || Pos !== RangeStartPos)
@@ -4302,6 +4307,13 @@ CMathContent.prototype.IsFirstLine = function(Line)
 {
     var CurLine  = Line - this.StartLine;
     return CurLine == 0;
+};
+CMathContent.prototype.IsEndLine = function(Line)
+{
+    var CurLine  = Line - this.StartLine;
+    var LinesCount = this.protected_GetLinesCount();
+
+    return CurLine == LinesCount - 1;
 };
 CMathContent.prototype.Get_SelectionDirection = function()
 {
