@@ -1326,7 +1326,10 @@ CMathBase.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine
     for (var nIndex = 0; nIndex < nCount; nIndex++)
     {
         var oBounds = this.Content[nIndex].Get_LineBound(_CurLine);
-        if (oBounds.W > 0.001 && oBounds.H > 0.001)
+
+        if(oBounds == undefined)
+            aBounds.push(null);
+        else if (oBounds.W > 0.001 && oBounds.H > 0.001)
             aBounds.push(oBounds);
         else
             aBounds.push(null);

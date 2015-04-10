@@ -2209,14 +2209,21 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 WordLen = BrkLen;
                                 SpaceLen = 0;
 
+                                FirstItemOnLine = false;
+
                             }
                             else
                             {
-                                PRS.Set_LineBreakPos(Pos);
+                                if(SpaceLen !== 0)
+                                    FirstItemOnLine = false;
+
+                                if(FirstItemOnLine == false)
+                                    PRS.Set_LineBreakPos(Pos);
                                 SpaceLen += BrkLen;
                             }
 
-                            FirstItemOnLine = false;
+
+
                         }
                         else
                         {
@@ -2563,17 +2570,20 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
             this.ParaMath.UpdateWidthLine(PRS, WidthLine);
         }
-        // для пустого Run, обновляем LineBreakPos на случай, если пустой Run находится между break_operator и мат объектом
-        else if(this.Content.length == 0 && this.ParaMath.Is_BrkBinBefore() == false && Word == false && FirstItemOnLine == false)
+        else
         {
-            PRS.Set_LineBreakPos(Pos);
-            X += SpaceLen;
-            SpaceLen = 0;
-        }
+            // для пустого Run, обновляем LineBreakPos на случай, если пустой Run находится между break_operator и мат объектом
+            if(this.Content.length == 0 && this.ParaMath.Is_BrkBinBefore() == false && Word == false && FirstItemOnLine == false)
+            {
+                PRS.Set_LineBreakPos(Pos);
+                X += SpaceLen;
+                SpaceLen = 0;
+            }
 
-        // запоминаем конец Run
-        PRS.PosEndRun = PRS.CurPos.Copy();
-        PRS.PosEndRun.Update2(this.Content.length, Depth);
+            // запоминаем конец Run
+            PRS.PosEndRun = PRS.CurPos.Copy();
+            PRS.PosEndRun.Update2(this.Content.length, Depth);
+        }
     }
 
     PRS.MoveToLBP       = MoveToLBP;
