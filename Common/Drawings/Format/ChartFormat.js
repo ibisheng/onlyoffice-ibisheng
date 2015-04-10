@@ -67,6 +67,25 @@ function removeAllSeriesFromChart(chart)
 }
 
 
+function getMinMaxFromArrPoints(aPoints)
+{
+    if(Array.isArray(aPoints) && aPoints.length > 0)
+    {
+        if(isRealObject(aPoints[0]) && isRealNumber(aPoints[0].val) && isRealObject(aPoints[aPoints.length - 1]) && isRealNumber(aPoints[aPoints.length - 1].val))
+        {
+            if(aPoints[0].val - aPoints[aPoints.length - 1].val <= 0)
+            {
+                return {min: aPoints[0].val, max: aPoints[aPoints.length - 1].val};
+            }
+            else
+            {
+                return {min: aPoints[aPoints.length - 1].val, max: aPoints[0].val};
+            }
+        }
+    }
+    return {min: null, max: null};
+}
+
 
 var SCALE_INSET_COEFF = 1.016;//Возможно придется уточнять
 var NEW_WORKSHEET_DRAWING_DOCUMENT = null;
@@ -4275,6 +4294,11 @@ CCatAx.prototype =
 
         if(crossAx)
         {
+            if(isRealNumber(this.maxCatVal))
+            {
+                ret.putCrossMaxVal(this.maxCatVal);
+            }
+            ret.putCrossMinVal(1);
             if(isRealNumber(crossAx.crossesAt))
             {
                 ret.putCrossesRule(c_oAscCrossesRule.value);
@@ -4283,19 +4307,22 @@ CCatAx.prototype =
             else if(crossAx.crosses === CROSSES_MAX)
             {
                 ret.putCrossesRule(c_oAscCrossesRule.maxValue);
+                if(isRealNumber(this.maxCatVal))
+                {
+                    ret.putCrosses(this.maxCatVal);
+                }
             }
             else if(crossAx.crosses === CROSSES_MIN)
             {
                 ret.putCrossesRule(c_oAscCrossesRule.minValue);
+                ret.putCrosses(1);
             }
             else
             {
                 ret.putCrossesRule(c_oAscCrossesRule.auto);
+                ret.putCrosses(1);
             }
         }
-
-
-
 
         if(isRealNumber(this.lblOffset))
             ret.putLabelsAxisDistance(this.lblOffset);
@@ -8603,6 +8630,15 @@ CValAx.prototype =
             ret.putLogScale(false);
         }
 
+        var oMinMaxOnAxis;
+        if(this.axPos === AX_POS_L || this.axPos === AX_POS_R)
+        {
+            oMinMaxOnAxis = getMinMaxFromArrPoints(this.yPoints);
+        }
+        else
+        {
+            oMinMaxOnAxis = getMinMaxFromArrPoints(this.xPoints);
+        }
         //настроки максимального значения по оси
         if(scaling && isRealNumber(scaling.max))
         {
@@ -8612,6 +8648,7 @@ CValAx.prototype =
         else
         {
             ret.putMaxValRule(c_oAscValAxisRule.auto);
+            ret.putMaxVal(oMinMaxOnAxis.max);
         }
 
         //настройки минимального значения по оси
@@ -8623,6 +8660,7 @@ CValAx.prototype =
         else
         {
             ret.putMinValRule(c_oAscValAxisRule.auto);
+            ret.putMaxVal(oMinMaxOnAxis.min);
         }
 
         //настройка ориентации оси
@@ -8671,11 +8709,7 @@ CValAx.prototype =
         else
             ret.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
 
-
-
-
         var crossAx = this.crossAx;
-
         if(crossAx)
         {
             //настройки пересечения с другой осью
@@ -8687,18 +8721,33 @@ CValAx.prototype =
             else if(crossAx.crosses === CROSSES_MAX)
             {
                 ret.putCrossesRule(c_oAscCrossesRule.maxValue);
+                ret.putCrosses(oMinMaxOnAxis.max);
             }
             else if(crossAx.crosses === CROSSES_MIN)
             {
                 ret.putCrossesRule(c_oAscCrossesRule.minValue);
+                ret.putCrosses(oMinMaxOnAxis.min);
             }
             else
             {
                 ret.putCrossesRule(c_oAscCrossesRule.auto);
+                if(isRealNumber(oMinMaxOnAxis.min) && isRealNumber(oMinMaxOnAxis.max))
+                {
+                    if(0 >= oMinMaxOnAxis.min && 0 <= oMinMaxOnAxis.max)
+                    {
+                        ret.putCrosses(0);
+                    }
+                    else if(oMinMaxOnAxis.min > 0)
+                    {
+                        ret.putCrosses(oMinMaxOnAxis.min);
+                    }
+                    else
+                    {
+                        ret.putCrosses(oMinMaxOnAxis.max);
+                    }
+                }
             }
         }
-
-
         return ret;
     },
 

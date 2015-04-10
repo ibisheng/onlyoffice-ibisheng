@@ -3529,6 +3529,8 @@ CChartSpace.prototype =
                     else
                         crosses = 1;
 
+                    cat_ax.maxCatVal = string_pts.length;
+
                     var cat_ax_orientation = cat_ax.scaling && isRealNumber(cat_ax.scaling.orientation) ?  cat_ax.scaling.orientation : ORIENTATION_MIN_MAX;
                     var point_width = rect.w/string_pts.length;
                     var labels_pos = val_ax.tickLblPos;
@@ -3693,7 +3695,6 @@ CChartSpace.prototype =
                                     {
                                         for(i = 0; i < string_pts.length; ++i)
                                             arr_cat_labels_points[i] = start_point_right - point_interval*i;
-
                                     }
                                     else
                                     {
@@ -3708,7 +3709,6 @@ CChartSpace.prototype =
                                     {
                                         for(i = 0; i < string_pts.length; ++i)
                                             arr_cat_labels_points[i] = rect.x + rect.w - point_interval*i;
-
                                     }
                                     else
                                     {
@@ -3752,7 +3752,6 @@ CChartSpace.prototype =
                                 for(i = 0; i < string_pts.length; ++i)
                                     arr_cat_labels_points[i] = rect.x + rect.w - point_interval/2 - point_interval*i;
                             }
-
                             val_ax.posX = rect.x + rect.w - point_interval*(crosses-1);
                         }
                         else
@@ -4615,6 +4614,9 @@ CChartSpace.prototype =
                     }
                     else
                         crosses = 1;
+
+
+                    cat_ax.maxCatVal = string_pts.length;
 
                     var cat_ax_orientation = cat_ax.scaling && isRealNumber(cat_ax.scaling.orientation) ?  cat_ax.scaling.orientation : ORIENTATION_MIN_MAX;
                     var labels_pos = val_ax.tickLblPos;

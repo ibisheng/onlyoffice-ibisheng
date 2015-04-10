@@ -869,6 +869,8 @@
         this.crosses                   = null;
         this.labelsPosition            = null;
         this.axisType                  = c_oAscAxisType.cat;
+        this.crossMinVal               = null;
+        this.crossMaxVal               = null;
     }
 
     asc_CatAxisSettings.prototype =
@@ -977,6 +979,28 @@
             return this.labelsPosition;
         },
 
+        getCrossMinVal: function()
+        {
+            return this.crossMinVal;
+        },
+
+        getCrossMaxVal: function()
+        {
+            return this.crossMaxVal;
+        },
+
+
+
+        putCrossMinVal: function(val)
+        {
+            this.crossMinVal = val;
+        },
+
+        putCrossMaxVal: function(val)
+        {
+            this.crossMaxVal = val;
+        },
+
         setDefault: function()
         {
             this.putIntervalBetweenLabelsRule(c_oAscBetweenLabelsRule.auto);
@@ -1003,6 +1027,8 @@
     prot["putCrosses"] = prot.putCrosses;
     prot["putAxisType"] = prot.putAxisType;
     prot["putLabelsPosition"] = prot.putLabelsPosition;
+    prot["putCrossMaxVal"] = prot.putCrossMaxVal;
+    prot["putCrossMinVal"] = prot.putCrossMinVal;
 
 
     prot["getIntervalBetweenTick"] = prot.getIntervalBetweenTick;
@@ -1017,6 +1043,8 @@
     prot["getCrosses"]     = prot.getCrosses                   ;
     prot["getAxisType"]     = prot.getAxisType                   ;
     prot["getLabelsPosition"] = prot.getLabelsPosition;
+    prot["getCrossMaxVal"] = prot.getCrossMaxVal;
+    prot["getCrossMinVal"] = prot.getCrossMinVal;
     prot["setDefault"] = prot.setDefault;
 
 
