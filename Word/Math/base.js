@@ -102,9 +102,6 @@ CMathBase.prototype.NeedBreakContent = function(Number)
 {
     this.bCanBreak       = true;
     this.NumBreakContent = Number;
-
-    this.BrGapLeft  = this.GapLeft;
-    this.BrGapRight = this.GapRight;
 };
 ///////// RunPrp, CtrPrp
 CMathBase.prototype.setCtrPrp = function(txtPrp) // выставляем ctrPrp на чтение
@@ -1701,6 +1698,12 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     var bOneLine = PRS.bMath_OneLine;
     this.bOneLine = this.bCanBreak == false || PRS.bMath_OneLine == true;
+
+    if(this.kind !== MATH_DELIMITER)
+    {
+        this.BrGapLeft  = this.GapLeft;
+        this.BrGapRight = this.GapRight;
+    }
 
     if(this.bOneLine == true)
     {
