@@ -1070,42 +1070,6 @@ CMathContent.prototype.GetArgSize = function()
 {
     return this.ArgSize.value;
 };
-CMathContent.prototype.Get_Bounds_2 = function()
-{
-    var LinesCount = this.protected_GetLinesCount();
-
-    var Bounds = [];
-
-    /*var Bounds =
-    {
-        X: 0,
-        Y: 0,
-        W: 0,
-        H: 0
-    };*/
-
-    if(this.bOneLine)
-    {
-        var bound = new CMathBound();
-
-        bound.X = this.pos.x;
-        bound.Y = this.pos.y - this.size.ascent;
-        bound.W = this.size.width;
-        bound.H = this.size.height;
-
-        Bounds.push(bound);
-
-    }
-    else
-    {
-        for(var Pos = 0; Pos < LinesCount; Pos++)
-        {
-            var LinePos = this.ParaMath.GetLinePosition();
-
-
-        }
-    }
-};
 /////////   Перемещение     ////////////
 
 // Поиск позиции, селект

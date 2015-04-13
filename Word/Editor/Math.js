@@ -456,16 +456,14 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, Page, _X, _XL
     if(LineCount > 0)
         WidthFirstLine = this.Root.GetWidth(_CurLine);
 
-    /*if(this.Bounds.length > 0)
-        WidthFirstLine = this.Bounds[0].W;*/
-
     var FirstWidth = CurrentPage == 0 ? WidthFirstLine : 0; // если страница не первая, то ширину первой строки формулы не учитываем
 
     var W = 0;
     var MaxW =  this.CurPageInfo.MaxLineW;
 
 
-    if(LineCount == 1)  // чтобы не сравнивать с wrapIndent, когда формула занимает одну строку
+    var bSingleLine = LineCount == 1 && this.Root.Math_Is_End(_CurLine, _CurRange);
+    if(bSingleLine)  // чтобы не сравнивать с wrapIndent, когда формула занимает одну строку
         W = FirstWidth;
     else if(CurrentPage == 0)
         W = Math.max(MaxW + wrapIndent, FirstWidth);
@@ -645,23 +643,6 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
 ParaMath.prototype.GetSelectContent = function()
 {
     return this.Root.GetSelectContent();
-};
-
-ParaMath.prototype.old_Get_CurrentParaPos = function()
-{
-    var nLinesCount = this.protected_GetLinesCount();
-    for (var nLineIndex = 0; nLineIndex < nLinesCount; nLineIndex++)
-    {
-        var nRangesCount = this.protected_GetRangesCount(nLineIndex);
-        for (var nRangeIndex = 0; nRangeIndex < nRangesCount; nRangeIndex++)
-        {
-            var nEndPos = this.protected_GetRangeEndPos(nLineIndex, nRangeIndex);
-            if (nEndPos > 0)
-                return new CParaPos(0 === nLineIndex ? this.StartRange + nRangeIndex : nRangeIndex, this.StartLine + nLineIndex, 0, 0);
-        }
-    }
-
-    return new CParaPos(this.StartRange, this.StartLine, 0, 0);
 };
 
 ParaMath.prototype.Get_CurrentParaPos = function()
@@ -1030,24 +1011,6 @@ ParaMath.prototype.Check_BreakPageEnd = function(PBChecker)
 ParaMath.prototype.Get_ParaPosByContentPos = function(ContentPos, Depth)
 {
     return this.Root.Get_ParaPosByContentPos(ContentPos, Depth);
-};
-ParaMath.prototype.old_Recalculate_CurPos = function(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
-{
-    var CurLine  = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-    var result = {X: _X + this.Root.size.width};
-
-
-    if ( EndPos >= 1 && CurrentRun == true)
-    {
-        result = this.Root.Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
-    }
-
-    return result;
 };
 
 ParaMath.prototype.Recalculate_CurPos = function(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)

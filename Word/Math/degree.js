@@ -96,120 +96,31 @@ CDegreeBase.prototype.Resize = function(oMeasure, RPI)
     else if(this.Pr.type === DEGREE_SUBSCRIPT)
         this.recalculateSubScript(oMeasure);
 };
-/*CDegreeBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
-{
-    if(PRS.bMath_OneLine == false)
-    {
-        var CurLine  = PRS.Line - this.StartLine;
-        var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
-
-        var RangeStartPos = this.protected_AddRange(CurLine, CurRange);
-        var RangeEndPos   = 0;
-
-        this.baseContent.Recalculate_Range(PRS, ParaPr, Depth + 1);
-
-        if(PRS.NewRange == false)
-        {
-            RangeEndPos = 1;
-            this.iterContent.Recalculate_Range(PRS, ParaPr, Depth + 1);
-        }
-    }
-    else
-    {
-        CDegreeBase.superclass.Recalculate_Range.call(this, PRS, ParaPr, Depth);
-    }
-};*/
 CDegreeBase.prototype.recalculateSize = function(oMeasure)
 {
+    var Metric = new CMathBoundsMeasures();
+    Metric.UpdateMetrics(this.baseContent.size);
+    Metric.UpdateWidth(this.baseContent.size.width);
+
+    var ResultSize;
+
     if(this.Pr.type === DEGREE_SUPERSCRIPT)
-        this.recalculateSup(oMeasure);
+    {
+        ResultSize = this.recalculateSup(oMeasure, Metric);
+    }
     else if(this.Pr.type === DEGREE_SUBSCRIPT)
-        this.recalculateSubScript(oMeasure);
+    {
+        ResultSize = this.recalculateSubScript(oMeasure, Metric);
+    }
+
+    this.size.Set(ResultSize);
 };
-CDegreeBase.prototype.new_recalculateSup = function(oMeasure, PRS)
+CDegreeBase.prototype.recalculateSup = function(oMeasure, Metric)
 {
-    var mgCtrPrp = this.Get_TxtPrControlLetter();
-    var iterSize = this.iterContent.size;
-
-    var base   = this.baseContent.size,
-        iter   = this.iterContent.size;
-
-    this.upBase = 0;
-    this.upIter = 0;
-
-    var HeightLine = AscentLine + DescentLine;
-
-    // для итератора степени выравниваем по последнему текстовому элементу (в случае если размер шрифта для основания один и то же)
-    // исключая случай, когда итератор в N-арном операторе
-
-
-    var BaseJustDraw = this.baseContent.IsJustDraw();
-    var lastElem = this.baseContent.GetLastElement();
-
-    var BaseRun  = lastElem.Type == para_Math_Run && mgCtrPrp.FontSize == lastElem.Get_CompiledPr(false).FontSize;
-    var bTextElement = BaseJustDraw && (BaseRun || (lastElem.Type !== para_Math_Run && lastElem.IsJustDraw()));
-
-    var UpBaseline = 0.5*TextAscent;
-
-    if(bTextElement)
-    {
-        var minR = 0.3*TextAscent;
-
-        var last = lastElem.size,
-            upBaseLast = 0,
-            upBaseIter = 0;
-
-        if(base.ascent > UpBaseline + iter.ascent && iter.height + minR < base.ascent) // размер шрифта итератора << размера шрифта основания => iter << base; дробь + текст
-        {
-            this.upIter = base.ascent - (UpBaseline + iter.ascent);
-        }
-        else if(UpBaseline - (iter.height - iter.ascent) > minR)
-        {
-            this.upBase = UpBaseline + iter.ascent - base.ascent;
-        }
-        else
-        {
-            this.upBase = iter.height + minR - base.ascent;
-        }
-    }
-    else
-    {
-        var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
-
-        if(iter.height - iter.ascent + shCenter > base.ascent) // для дробей и т.п.
-        {
-            this.upBase = iter.height - (base.ascent - shCenter);
-        }
-        else if(iter.ascent > shCenter)
-        {
-            this.upBase = iter.ascent - shCenter;
-        }
-        else
-        {
-            this.upIter = shCenter - iter.ascent;
-        }
-    }
-
-
-    if( this.bNaryInline)
-        this.dW = 0.17*PlH;
-    else
-        this.dW = 0.056*PlH;
-
-    if(PRS.bMath_OneLine == true)
-    {
-        this.size.height = this.upBase + base.height;
-        this.size.ascent = this.upBase + base.ascent;
-
-        this.size.width  = base.width + iter.width + this.dW;
-        this.size.width  += this.GapLeft + this.GapRight;
-    }
-
-};
-CDegreeBase.prototype.recalculateSup = function(oMeasure)
-{
-    var base   = this.baseContent.size,
-        iter   = this.iterContent.size;
+    var iter       = this.iterContent.size,
+        baseAsc    = Metric.Asc,
+        baseHeight = Metric.H,
+        baseWidth  = Metric.W;
 
     var mgCtrPrp = this.Get_TxtPrControlLetter();
 
@@ -229,7 +140,7 @@ CDegreeBase.prototype.recalculateSup = function(oMeasure)
 
     var PlH = 0.64*this.ParaMath.GetPlh(oMeasure, mgCtrPrp);
     //var UpBaseline = 1.65*shCenter; // расстояние от baseline основания до бейзлайна итератора
-     var UpBaseline = 0.75*PlH; // расстояние от baseline основания до бейзлайна итератора
+    var UpBaseline = 0.75*PlH; // расстояние от baseline основания до бейзлайна итератора
 
     if(bTextElement)
     {
@@ -244,24 +155,24 @@ CDegreeBase.prototype.recalculateSup = function(oMeasure)
         else
             upBaseIter = last.ascent - UpBaseline - iter.ascent;
 
-        if(upBaseLast + last.ascent > base.ascent)
+        if(upBaseLast + last.ascent > baseAsc)
         {
-            this.upBase = upBaseLast - (base.ascent - last.ascent);
+            this.upBase = upBaseLast - (baseAsc - last.ascent);
             this.upIter = upBaseIter;
         }
         else
         {
             this.upBase = 0;
-            this.upIter = (base.ascent - upBaseLast - last.ascent) + upBaseIter;
+            this.upIter = (baseAsc - upBaseLast - last.ascent) + upBaseIter;
         }
     }
     else
     {
         var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
-        if(iter.height - iter.ascent + shCenter > base.ascent) // для дробей и т.п.
+        if(iter.height - iter.ascent + shCenter > baseAsc) // для дробей и т.п.
         {
-            this.upBase = iter.height - (base.ascent - shCenter);
+            this.upBase = iter.height - (baseAsc - shCenter);
         }
         else if(iter.ascent > shCenter)
         {
@@ -273,22 +184,28 @@ CDegreeBase.prototype.recalculateSup = function(oMeasure)
         }
     }
 
-    var height = this.upBase + base.height;
-    var ascent = this.upBase + base.ascent;
+    var height = this.upBase + baseHeight;
+    var ascent = this.upBase + baseAsc;
+
+    this.upIter -= ascent;
 
     if( this.bNaryInline)
         this.dW = 0.17*PlH;
     else
         this.dW = 0.056*PlH;
 
-    var width = base.width + iter.width + this.dW;
+    var width = baseWidth + iter.width + this.dW;
     width += this.GapLeft + this.GapRight;
 
-    this.size.height = height;
-    this.size.width  = width;
-    this.size.ascent = ascent;
+    var ResultSize = new CMathSize();
+
+    ResultSize.height = height;
+    ResultSize.width  = width;
+    ResultSize.ascent = ascent;
+
+    return ResultSize;
 };
-CDegreeBase.prototype.recalculateSubScript = function(oMeasure)
+CDegreeBase.prototype.old_recalculateSubScript = function(oMeasure)
 {
     var base = this.elements[0][0].size,
         iter   = this.elements[0][1].size;
@@ -368,7 +285,91 @@ CDegreeBase.prototype.recalculateSubScript = function(oMeasure)
     this.size.width  = width;
     this.size.ascent = ascent;
 };
-CDegreeBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
+CDegreeBase.prototype.recalculateSubScript = function(oMeasure, Metric)
+{
+    var iter       = this.iterContent.size,
+        baseAsc    = Metric.Asc,
+        baseHeight = Metric.H,
+        baseWidth  = Metric.W;
+
+    var mgCtrPrp = this.Get_TxtPrControlLetter();
+    var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
+
+    var bTextElement = false,
+        lastElem;
+
+
+    if(!this.baseContent.IsJustDraw())
+    {
+        lastElem = this.baseContent.GetLastElement();
+
+        var txtPrpControl = this.ParaMath.GetFirstRPrp();// нам нужен текстовые настройки для управляющих элементов без учета ArgSize, а это как раз будут текстовые настройки первого рана
+        // если учтем ArgSize, то для вложенных дробей эта проверка на Run не сработает
+        var BaseRun       = lastElem.Type == para_Math_Run && txtPrpControl.FontSize == lastElem.Get_CompiledPr(false).FontSize;
+        bTextElement      = BaseRun || (lastElem.Type !== para_Math_Run && lastElem.IsJustDraw());
+    }
+
+    var height, ascent, descent;
+
+    var PlH = 0.64*this.ParaMath.GetPlh(oMeasure, mgCtrPrp);
+
+    if(bTextElement)
+    {
+        //var last = lastElem.size;
+        var DownBaseline = 0.9*shCenter;
+
+
+        if(iter.ascent - DownBaseline > 3/4*PlH)
+            this.upIter = 1/4*PlH;
+        else
+            this.upIter = PlH + DownBaseline - iter.ascent;
+
+        if(baseAsc > PlH)
+        {
+            this.upIter += baseAsc - PlH;
+        }
+
+        //this.upIter = base.ascent + DownBaseline - iter.ascent;
+
+        var descentBase = baseHeight - baseAsc,
+            descentIter = this.upIter + iter.height - baseAsc;
+
+        descent = descentBase > descentIter ? descentBase : descentIter;
+        ascent  = baseAsc;
+
+        height = ascent + descent;
+    }
+    else
+    {
+        this.upIter = baseHeight + shCenter - iter.ascent;
+
+        // ограничение для случая, когда аскент итератора >> высоты основания
+        if(baseAsc - 1.5*shCenter > this.upIter)
+            this.upIter = baseAsc - 1.5*shCenter;
+
+        height = this.upIter + iter.height;
+        ascent = baseAsc;
+    }
+
+    this.upIter -= ascent;
+
+    if( this.bNaryInline)
+        this.dW = 0.17*PlH;
+    else
+        this.dW = 0.056*PlH;
+
+    var width = baseWidth + iter.width + this.dW;
+    width += this.GapLeft + this.GapRight;
+
+    var ResultSize = new CMathSize();
+
+    ResultSize.height = height;
+    ResultSize.width  = width;
+    ResultSize.ascent = ascent;
+
+    return ResultSize;
+};
+CDegreeBase.prototype.old_setPosition = function(pos, PRSA, Line, Range, Page)
 {
     this.pos.x = pos.x;
 
@@ -399,6 +400,40 @@ CDegreeBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
     oIter.setPosition(PosIter, PRSA, Line, Range, Page);
 
     pos.x += this.size.width;
+};
+CDegreeBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
+{
+    if(this.bOneLine)
+    {
+        this.pos.x = pos.x;
+
+        if(this.bInside === true)
+            this.pos.y = pos.y;
+        else
+            this.pos.y = pos.y - this.size.ascent;
+    }
+
+    this.UpdatePosBound(pos, PRSA, Line, Range, Page);
+
+    var CurLine = Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
+
+    if(this.bOneLine || CurLine == 0 && CurRange == 0)
+        pos.x += this.BrGapLeft;
+
+    this.baseContent.setPosition(pos, PRSA, Line, Range, Page);
+
+    pos.x += this.dW;
+
+    var Y = pos.y;
+
+    pos.y += this.upIter + this.iterContent.size.ascent;
+
+    this.iterContent.setPosition(pos, PRSA, Line, Range, Page);
+
+    pos.x += this.BrGapRight;
+
+    pos.y = Y;
 };
 CDegreeBase.prototype.getIterator = function()
 {
@@ -441,10 +476,8 @@ function CDegree(props, bInside)
     g_oTableId.Add( this, this.Id );
 }
 Asc.extendClass(CDegree, CDegreeBase);
-
 CDegree.prototype.ClassType = historyitem_type_deg;
 CDegree.prototype.kind      = MATH_DEGREE;
-
 CDegree.prototype.init = function(props)
 {
     this.Fill_LogicalContent(2);
@@ -454,15 +487,71 @@ CDegree.prototype.init = function(props)
 };
 CDegree.prototype.fillContent = function()
 {
+    this.NeedBreakContent(0);
+
     this.iterContent = this.Content[1];
     this.baseContent = this.Content[0];
 
-    CDegree.superclass.fillContent.apply(this, arguments);
+    CDegree.superclass.fillContent.call(this);
 };
 CDegree.prototype.Document_UpdateInterfaceState = function(MathProps)
 {
     MathProps.Type = c_oAscMathInterfaceType.Script;
     MathProps.Pr   = null;
+};
+CDegree.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
+{
+    if(this.bOneLine == false && this.baseContent.Math_Is_End( _CurLine, _CurRange))
+    {
+        this.iterContent.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
+        this.baseContent.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
+
+        var BoundBase = this.baseContent.Get_LineBound(_CurLine);
+        var CurLine = _CurLine - this.StartLine;
+        var Bound;
+
+        if(this.Pr.type === DEGREE_SUPERSCRIPT)
+        {
+            Bound = this.recalculateSup(g_oTextMeasurer, BoundBase);
+
+            this.Bounds.UpdateMetrics(CurLine, Bound);
+            PRS.ContentMetrics.UpdateMetrics(Bound);
+
+            this.UpdatePRS(PRS, Bound);
+        }
+        else
+        {
+            Bound = this.recalculateSubScript(g_oTextMeasurer, BoundBase);
+
+            this.Bounds.UpdateMetrics(CurLine, Bound);
+            PRS.ContentMetrics.UpdateMetrics(Bound);
+
+            this.UpdatePRS(PRS, Bound);
+        }
+    }
+    else
+    {
+        CDegreeBase.prototype.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange);
+    }
+
+};
+CDegree.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
+{
+    var CurLine = Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
+
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+    var Len = this.Content.length;
+
+    if(this.bOneLine || (EndPos == Len - 1 && this.Content[EndPos].Math_Is_End( Line, Range)))
+    {
+        CDegree.superclass.setPosition.call(this, pos, PRSA, Line, Range, Page);
+    }
+    else
+    {
+        CMathBase.prototype.setPosition.call(this, pos, PRSA, Line, Range, Page);
+    }
+
 };
 
 function CIterators(iterUp, iterDn)

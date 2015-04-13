@@ -2221,9 +2221,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                     PRS.Set_LineBreakPos(Pos);
                                 SpaceLen += BrkLen;
                             }
-
-
-
                         }
                         else
                         {
