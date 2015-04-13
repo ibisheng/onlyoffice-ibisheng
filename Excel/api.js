@@ -1329,6 +1329,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			if (this.asyncMethodCallback !== undefined) {
 				this.asyncMethodCallback();
 				this.asyncMethodCallback = undefined;
+				this.waitSave = false;
 			} else {
 				// Шрифты загрузились, возможно стоит подождать совместное редактирование
 				this.FontLoadWaitComplete = true;
@@ -1375,11 +1376,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		spreadsheet_api.prototype._loadFonts = function (fonts, callback) {
 			if (window["NATIVE_EDITOR_ENJINE"])
 				return callback();
-			History.loadFonts(fonts);
+			this.waitSave = true;
 			this.asyncMethodCallback = callback;
 			var arrLoadFonts = [];
 			for(var i in fonts)
 				arrLoadFonts.push(new CFont(i, 0, "", 0));
+			History.loadFonts(arrLoadFonts);
 			this.FontLoader.LoadDocumentFonts2(arrLoadFonts);
 		};
 

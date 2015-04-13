@@ -1373,7 +1373,7 @@ var ImageLoadStatus =
 {
     Loading : 0,
     Complete : 1
-}
+};
 
 function CImage(src)
 {

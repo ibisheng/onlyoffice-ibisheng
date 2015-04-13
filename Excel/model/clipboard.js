@@ -2019,7 +2019,7 @@
 				{
 					var changeTag = $(node).find("a");
 					this._changeHtmlTag(changeTag);
-				};
+				}
 				
 				oPasteProcessor._Prepeare_recursive(node, true, true);
 				
@@ -2029,9 +2029,12 @@
 
 
                 History.Create_NewPoint();
+				History.StartTransaction();
 				oPasteProcessor._Execute(node, {}, true, true, false);
-				if(!oPasteProcessor.aContent || !oPasteProcessor.aContent.length)
+				if(!oPasteProcessor.aContent || !oPasteProcessor.aContent.length) {
+					History.EndTransaction();
 					return false;
+				}
 
                 var targetContent = worksheet.objectRender.controller.getTargetDocContent(true);//нужно для заголовков диаграмм
                 targetContent.Remove(1, true, true);
@@ -2043,6 +2046,7 @@
                     worksheet.objectRender.controller.cursorMoveRight(false, false);
 					window.GlobalPasteFlag = false;
 					window.GlobalPasteFlagCounter = 0;
+					History.EndTransaction();
 				});
 				
  				return true;

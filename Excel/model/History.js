@@ -112,6 +112,7 @@ function CHistory(workbook)
 	this.lastDrawingObjects = null;
 	this.LastState = null;
 	this.LoadFonts = {};//собираем все загруженные шрифты между моментами сохранения
+	this.HasLoadFonts = false;
 
 	this.SavedIndex = null;			// Номер точки отката, на которой произошло последнее сохранение
 }
@@ -125,6 +126,7 @@ CHistory.prototype.Clear = function()
 	this.TurnOffHistory = 0;
 	this.Transaction = 0;
 	this.LoadFonts = {};
+	this.HasLoadFonts = false;
 
 	this.SavedIndex = null;
 
@@ -569,6 +571,8 @@ CHistory.prototype.Create_NewPoint = function()
 		Time  : Time,   // Текущее время
 		SelectionState : oSelectionState
 	};
+
+	this._addFonts(true);
 };
 
 // Регистрируем новое изменение:
@@ -790,17 +794,8 @@ CHistory.prototype.GetSerializeArray = function()
 		{
 			var elem = point.Items[j];
 			aPointChanges.push(new UndoRedoItemSerializable(elem.Class, elem.Type, elem.SheetId, elem.Range, elem.Data, elem.LocalChange));
-
 		}
 		aRes.push(aPointChanges);
-	}
-	if (aRes.length > 0) {
-	    var aFonts = [];
-	    for (var i in this.LoadFonts)
-	        aFonts.push(i);
-        //добавляем в начало, чтобы не потерять это изменение при undo/redo и обрезке изменений
-	    if(aFonts.length > 0)
-	        aRes[0].push(new UndoRedoItemSerializable(g_oUndoRedoWorkbook, historyitem_Workbook_AddFont, null, null, new UndoRedoData_SingleProperty(aFonts)));
 	}
 	return aRes;
 };
@@ -814,6 +809,21 @@ CHistory.prototype.ChangeActionsEndToStart = function()
 	}
 };
 CHistory.prototype.loadFonts = function (fonts) {
-    for (var i in fonts)
-        this.LoadFonts[i] = 1;
+    for (var i = 0; i < fonts.length; ++i) {
+		this.LoadFonts[fonts[i].name] = 1;
+		this.HasLoadFonts = true;
+	}
+	this._addFonts(false);
+};
+CHistory.prototype._addFonts = function (isCreateNew) {
+	// Если мы начали транзакцию или мы только создаем точку, то можно добавлять
+	if (this.HasLoadFonts && (isCreateNew || !this.IsEndTransaction())) {
+		var arrFonts = [];
+		for (var i in this.LoadFonts)
+			arrFonts.push(i);
+		this.Add(g_oUndoRedoWorkbook, historyitem_Workbook_AddFont, null, null, new UndoRedoData_SingleProperty(arrFonts));
+
+		this.LoadFonts = {};
+		this.HasLoadFonts = false;
+	}
 };

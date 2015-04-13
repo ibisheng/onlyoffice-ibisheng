@@ -8118,7 +8118,7 @@
 						break;
 					case "paste":
 						// Вставляем текст из локального буфера или нет
-						isLocal ? t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth, onlyActive) : t._pasteFromGlobalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth, onlyActive);
+						isLocal ? t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth, onlyActive) : t._pasteFromGlobalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
 						bIsUpdate = false;
 						break;
 					case "hyperlink":
@@ -8291,7 +8291,7 @@
 			}
 		};
 
-		WorksheetView.prototype._pasteFromGlobalBuff = function (isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth, onlyActive) {
+		WorksheetView.prototype._pasteFromGlobalBuff = function (isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth) {
 			var t = this;
 			
 			//загрузка шрифтов, в случае удачи на callback вставляем текст
@@ -8299,8 +8299,7 @@
 			
 				if(val.onlyImages !== true)
 					t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
-					
-				var a_drawings = [];
+
 				var api = asc["editor"];
 				if (val.addImages && val.addImages.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor)) 
 				{	
