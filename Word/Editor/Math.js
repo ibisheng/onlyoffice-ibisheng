@@ -2042,6 +2042,11 @@ ParaMath.prototype.Get_Bounds = function()
     }
 };
 
+ParaMath.prototype.getPropsForWrite = function()
+{
+    return {Jc : this.Jc};
+};
+
 /**
  * Обновляем состояние интерфейса.
  */

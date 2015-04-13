@@ -10170,7 +10170,7 @@ function Binary_oMathReader(stream)
 		if (c_oSer_OMathContentType.OMath === type)
         {
 			var oMath = new ParaMath();
-            oMath.Set_Align(props.mJc === JC_CENTER || props.mJc === JC_CENTERGROUP ? align_Center : (props.mJc === JC_LEFT ? align_Left : (props.mJc === JC_RIGHT ? align_Right : props.mJc)));
+            oMath.Set_Align(props.mJc === JC_CENTER ? align_Center : props.mJc === JC_CENTERGROUP ? align_Justify : (props.mJc === JC_LEFT ? align_Left : (props.mJc === JC_RIGHT ? align_Right : props.mJc)));
 			oParStruct.addToContent(oMath);
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oMath.Root,oParStruct);
