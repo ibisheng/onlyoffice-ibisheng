@@ -4363,8 +4363,6 @@ CCatAx.prototype =
             &&(props.getAxisType() === c_oAscAxisType.cat || props.getAxisType() === c_oAscAxisType.date)))
             return;
 
-
-
         var  intervalBetweenTick       = props.getIntervalBetweenTick();
         var  intervalBetweenLabelsRule = props.getIntervalBetweenLabelsRule();
         var  intervalBetweenLabels     = props.getIntervalBetweenLabels();
@@ -8660,7 +8658,7 @@ CValAx.prototype =
         else
         {
             ret.putMinValRule(c_oAscValAxisRule.auto);
-            ret.putMaxVal(oMinMaxOnAxis.min);
+            ret.putMinVal(oMinMaxOnAxis.min);
         }
 
         //настройка ориентации оси
