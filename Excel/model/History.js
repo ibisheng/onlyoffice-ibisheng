@@ -189,7 +189,7 @@ CHistory.prototype.UndoRedoPrepare = function (oRedoObjectParam, bUndo) {
 			if (wsViews[i] && wsViews[i].objectRender && wsViews[i].objectRender.controller) {
 				wsViews[i].objectRender.controller.resetSelection();
 			}
-			if ( wsViews[i].isChartAreaEditMode ) {
+			if (wsViews[i] && wsViews[i].isChartAreaEditMode ) {
 				wsViews[i].isChartAreaEditMode = false;
 				wsViews[i].arrActiveChartsRanges = [];
 			}

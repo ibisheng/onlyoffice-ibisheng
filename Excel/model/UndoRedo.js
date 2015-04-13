@@ -2687,67 +2687,69 @@ UndoRedoWorkbook.prototype = {
 		}
 		else if(historyitem_Workbook_SheetPositions == Type)
 		{
-		    var wsActive = this.wb.getActiveWs();
-			//делаем вспомогательным map из sheetid
-			var oTempSheetMap = {};
-			for(var i = 0, length = Data.positions.length; i < length; ++i)
-				oTempSheetMap[Data.positions[i]] = 1;
-			//находим sheet уникальные для данного пользователя и запоминаем перед каким sheetid они идут
-			var oUniqueSheetId = {};
-			var nLastId = null;
-			for(var i = 0, length = this.wb.aWorksheets.length; i < length; ++i)
-			{
-				var ws = this.wb.aWorksheets[i];
-				var id = ws.getId();
-				if(null == oTempSheetMap[id])
-				{
-					if(i < length - 1)
-						oUniqueSheetId[this.wb.aWorksheets[i + 1].getId()] = id;
-					else
-						nLastId = id;
-				}
-			}
-			//расставляем в соответствии с изменениями
-			this.wb.aWorksheets = [];
-			for(var i = 0, length = Data.positions.length; i < length; ++i)
-			{
-				var sheetId = Data.positions[i];
-				var ws = this.wb.aWorksheetsById[sheetId];
-				if(null != ws)
-					this.wb.aWorksheets.push(ws);
-			}
-			if(null != nLastId)
-			{
-				var ws = this.wb.aWorksheetsById[nLastId];
-				if(null != ws)
-					this.wb.aWorksheets.push(ws);
-			}
-			//не стал оптимизировать по скорости, потому что много добавленых sheet быть не может
-			while(true)
-			{
+			if(Data.positions){
+				var wsActive = this.wb.getActiveWs();
+				//делаем вспомогательным map из sheetid
+				var oTempSheetMap = {};
+				for(var i = 0, length = Data.positions.length; i < length; ++i)
+					oTempSheetMap[Data.positions[i]] = 1;
+				//находим sheet уникальные для данного пользователя и запоминаем перед каким sheetid они идут
+				var oUniqueSheetId = {};
+				var nLastId = null;
 				for(var i = 0, length = this.wb.aWorksheets.length; i < length; ++i)
 				{
 					var ws = this.wb.aWorksheets[i];
-					var insertId = oUniqueSheetId[ws.getId()];
-					if(null != insertId)
+					var id = ws.getId();
+					if(null == oTempSheetMap[id])
 					{
-						var insertWs = this.wb.aWorksheetsById[insertId];
-						if(null != insertWs)
-							this.wb.aWorksheets.splice(i, 0, insertWs);
-						delete oUniqueSheetId[ws.getId()];
+						if(i < length - 1)
+							oUniqueSheetId[this.wb.aWorksheets[i + 1].getId()] = id;
+						else
+							nLastId = id;
 					}
 				}
-				var bEmpty = true;
-				for(var i in oUniqueSheetId)
+				//расставляем в соответствии с изменениями
+				this.wb.aWorksheets = [];
+				for(var i = 0, length = Data.positions.length; i < length; ++i)
 				{
-					bEmpty = false;
-					break;
+					var sheetId = Data.positions[i];
+					var ws = this.wb.aWorksheetsById[sheetId];
+					if(null != ws)
+						this.wb.aWorksheets.push(ws);
 				}
-				if(bEmpty)
-					break;
+				if(null != nLastId)
+				{
+					var ws = this.wb.aWorksheetsById[nLastId];
+					if(null != ws)
+						this.wb.aWorksheets.push(ws);
+				}
+				//не стал оптимизировать по скорости, потому что много добавленых sheet быть не может
+				while(true)
+				{
+					for(var i = 0, length = this.wb.aWorksheets.length; i < length; ++i)
+					{
+						var ws = this.wb.aWorksheets[i];
+						var insertId = oUniqueSheetId[ws.getId()];
+						if(null != insertId)
+						{
+							var insertWs = this.wb.aWorksheetsById[insertId];
+							if(null != insertWs)
+								this.wb.aWorksheets.splice(i, 0, insertWs);
+							delete oUniqueSheetId[ws.getId()];
+						}
+					}
+					var bEmpty = true;
+					for(var i in oUniqueSheetId)
+					{
+						bEmpty = false;
+						break;
+					}
+					if(bEmpty)
+						break;
+				}
+				this.wb._updateWorksheetIndexes(wsActive);
+				this.wb.handlers.trigger("updateWorksheetByModel");
 			}
-			this.wb._updateWorksheetIndexes(wsActive);
-			this.wb.handlers.trigger("updateWorksheetByModel");
 		}
 		else if(historyitem_Workbook_ChangeColorScheme == Type)
 		{

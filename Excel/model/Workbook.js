@@ -1850,14 +1850,18 @@ Workbook.prototype.SerializeHistory = function(){
 		        }
 		        this._SerializeHistoryBase64(oMemory, item, aPointChangesBase64);
 		    }
+			var oUndoRedoData_SheetPositions;
 		    if (bChangeSheetPlace) {
 		        //создаем еще один элемент в undo/redo - взаимное расположение Sheet, чтобы не запутываться в add, move событиях
 		        //добавляем не после конца aActions, чтобы можно было делать undo/redo и просто удалять хвост изменений.
 		        var oSheetPlaceData = [];
 		        for (var j = 0, length2 = this.aWorksheets.length; j < length2; ++j)
 		            oSheetPlaceData.push(this.aWorksheets[j].getId());
-		        this._SerializeHistoryBase64(oMemory, new UndoRedoItemSerializable(g_oUndoRedoWorkbook, historyitem_Workbook_SheetPositions, null, null, new UndoRedoData_SheetPositions(oSheetPlaceData)), aPointChangesBase64);
+		        oUndoRedoData_SheetPositions = new UndoRedoData_SheetPositions(oSheetPlaceData);
 		    }
+			else
+				oUndoRedoData_SheetPositions = new UndoRedoData_SheetPositions();
+			this._SerializeHistoryBase64(oMemory, new UndoRedoItemSerializable(g_oUndoRedoWorkbook, historyitem_Workbook_SheetPositions, null, null, oUndoRedoData_SheetPositions), aPointChangesBase64);
 		    aRes.push(aPointChangesBase64);
 		}
 		this.aCollaborativeActions = [];
