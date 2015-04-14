@@ -1463,6 +1463,9 @@ asc_docs_api.prototype.asc_coAuthoringDisconnect = function () {
 	if (!this.CoAuthoringApi)
 		return; // Error
 	this.CoAuthoringApi.disconnect();
+
+	// Выставляем view-режим
+	this.SetViewMode(true);
 };
 
 /////////////////////////////////////////////////////////////////////////
