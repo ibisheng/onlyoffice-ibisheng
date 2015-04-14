@@ -6825,7 +6825,6 @@ function spellCheck (editor, rdata) {
 
 window["asc_nativeOnSpellCheck"] = function (response)
 {
-    var incomeObject = JSON.parse(response);
     SpellCheck_CallBack(incomeObject);
 };
 
