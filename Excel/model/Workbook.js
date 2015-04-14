@@ -1822,7 +1822,7 @@ Workbook.prototype.SerializeHistory = function(){
 	var aRes = [];
 	//соединяем изменения, которые были до приема данных с теми, что получились после.
 
-    var worksheets = this.aWorksheets, t;
+    var worksheets = this.aWorksheets, t, j, length2;
     for(t = 0; t < worksheets.length; ++t)
     {
         worksheets[t] && worksheets[t].refreshContentChanges();
@@ -1831,15 +1831,12 @@ Workbook.prototype.SerializeHistory = function(){
 	if(aActions.length > 0)
 	{
 		var oMemory = new CMemory();
-		var oThis = this;
 		var bChangeSheetPlace = false;
-		var aPointChangesBase64;
 		for(var i = 0, length = aActions.length; i < length; ++i)
 		{
 		    var aPointChanges = aActions[i];
-		    aPointChangesBase64 = [];
 		    bChangeSheetPlace = false;
-		    for (var j = 0, length2 = aPointChanges.length; j < length2; ++j) {
+		    for (j = 0, length2 = aPointChanges.length; j < length2; ++j) {
 		        var item = aPointChanges[j];
 		        if (g_oUndoRedoWorkbook == item.oClass) {
 		            if (historyitem_Workbook_SheetAdd == item.nActionType || historyitem_Workbook_SheetRemove == item.nActionType || historyitem_Workbook_SheetMove == item.nActionType)
@@ -1848,21 +1845,20 @@ Workbook.prototype.SerializeHistory = function(){
 		        else if (g_oUndoRedoWorksheet === item.oClass && historyitem_Worksheet_Hide === item.nActionType) {
 		            bChangeSheetPlace = true;
 		        }
-		        this._SerializeHistoryBase64(oMemory, item, aPointChangesBase64);
+		        this._SerializeHistoryBase64(oMemory, item, aRes);
 		    }
 			var oUndoRedoData_SheetPositions;
 		    if (bChangeSheetPlace) {
 		        //создаем еще один элемент в undo/redo - взаимное расположение Sheet, чтобы не запутываться в add, move событиях
 		        //добавляем не после конца aActions, чтобы можно было делать undo/redo и просто удалять хвост изменений.
 		        var oSheetPlaceData = [];
-		        for (var j = 0, length2 = this.aWorksheets.length; j < length2; ++j)
+		        for (j = 0, length2 = this.aWorksheets.length; j < length2; ++j)
 		            oSheetPlaceData.push(this.aWorksheets[j].getId());
 		        oUndoRedoData_SheetPositions = new UndoRedoData_SheetPositions(oSheetPlaceData);
 		    }
 			else
 				oUndoRedoData_SheetPositions = new UndoRedoData_SheetPositions();
-			this._SerializeHistoryBase64(oMemory, new UndoRedoItemSerializable(g_oUndoRedoWorkbook, historyitem_Workbook_SheetPositions, null, null, oUndoRedoData_SheetPositions), aPointChangesBase64);
-		    aRes.push(aPointChangesBase64);
+			this._SerializeHistoryBase64(oMemory, new UndoRedoItemSerializable(g_oUndoRedoWorkbook, historyitem_Workbook_SheetPositions, null, null, oUndoRedoData_SheetPositions), aRes);
 		}
 		this.aCollaborativeActions = [];
 	}
@@ -1877,21 +1873,16 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 		this.bCollaborativeChanges = true;
 		//собираем общую длину
 		var dstLen = 0;
-		var aIndexes = [];
-		for(var i = 0, length = aChanges.length;i < length; ++i)
+		var aIndexes = [], i, length = aChanges.length, sChange;
+		for(i = 0; i < length; ++i)
 		{
-		    var aPointChanges = aChanges[i];
-		    var aIndexesPoint = [];
-		    for (var j = 0, length2 = aPointChanges.length; j < length2; ++j) {
-		        var sChange = aPointChanges[j];
-		        var nIndex = sChange.indexOf(";");
-		        if (-1 != nIndex) {
-		            dstLen += parseInt(sChange.substring(0, nIndex));
-		            nIndex++;
-		        }
-		        aIndexesPoint.push(nIndex);
-		    }
-		    aIndexes.push(aIndexesPoint);
+		    sChange = aChanges[i];
+			var nIndex = sChange.indexOf(";");
+			if (-1 != nIndex) {
+				dstLen += parseInt(sChange.substring(0, nIndex));
+				nIndex++;
+			}
+			aIndexes.push(nIndex);
 		}
 		var pointer = g_memory.Alloc(dstLen);
 		var stream = new FT_Stream2(pointer.data, dstLen);
@@ -1900,24 +1891,20 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 		//пробегаемся первый раз чтобы заполнить oFontMap
 		var oFontMap = {};//собираем все шрифтры со всех изменений
 		var aUndoRedoElems = [];
-		for (var i = 0, length = aChanges.length; i < length; ++i) {
-		    var aPointChanges = aChanges[i];
-		    var aIndexesPoint = aIndexes[i];
-		    for (var j = 0, length2 = aPointChanges.length; j < length2; ++j) {
-		        var sChange = aPointChanges[j];
-		        var oBinaryFileReader = new Asc.BinaryFileReader();
-		        nCurOffset = oBinaryFileReader.getbase64DecodedData2(sChange, aIndexesPoint[j], stream, nCurOffset);
-		        var item = new UndoRedoItemSerializable();
-		        item.Deserialize(stream);
-		        if (g_oUndoRedoWorkbook == item.oClass && historyitem_Workbook_AddFont == item.nActionType) {
-		            for (var k = 0, length3 = item.oData.elem.length; k < length3; ++k)
-		                oFontMap[item.oData.elem[k]] = 1;
-		        }
-		        aUndoRedoElems.push(item);
-		    }
+		for (i = 0; i < length; ++i) {
+		    sChange = aChanges[i];
+			var oBinaryFileReader = new Asc.BinaryFileReader();
+			nCurOffset = oBinaryFileReader.getbase64DecodedData2(sChange, aIndexes[i], stream, nCurOffset);
+			var item = new UndoRedoItemSerializable();
+			item.Deserialize(stream);
+			if (g_oUndoRedoWorkbook == item.oClass && historyitem_Workbook_AddFont == item.nActionType) {
+				for (var k = 0, length3 = item.oData.elem.length; k < length3; ++k)
+					oFontMap[item.oData.elem[k]] = 1;
+			}
+			aUndoRedoElems.push(item);
 		}
-		window["Asc"]["editor"]._loadFonts(oFontMap, function(){
 
+		window["Asc"]["editor"]._loadFonts(oFontMap, function(){
                 var wsViews = window["Asc"]["editor"].wb.wsViews;
                 for(var i in wsViews)
                 {
@@ -2026,7 +2013,7 @@ Workbook.prototype.DeserializeHistoryNative = function(oRedoObjectParam, data, i
 		this.bCollaborativeChanges = false;
 	}
 	return oRedoObjectParam;
-}
+};
 //-------------------------------------------------------------------------------------------------
 /**
  * @constructor
