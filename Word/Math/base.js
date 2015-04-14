@@ -1429,15 +1429,7 @@ CMathBase.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selectio
     // для каждой новой строки в ParaMath FindStart будет true независимо от того нашли или нет начало селекта на предыдущей строке
     // поэтому для контентов разбивающихся на несколько строк сделаем проверку, чтобы не попасть в контенты, которые не относятся к текущей строке
 
-    var ContentSelect = true;
-
-    if(this.bOneLine == false)
-    {
-        var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-        var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-        ContentSelect = SelectionStartPos >= StartPos && SelectionEndPos <= EndPos;
-    }
+    var ContentSelect = this.IsContentSelect(SelectionStartPos, SelectionEndPos, _CurLine, _CurRange);
 
     if(SelectionUse == true && SelectionStartPos !== SelectionEndPos)
     {
@@ -1485,6 +1477,23 @@ CMathBase.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selectio
         SelectionDraw.StartX += this.Bounds.GetWidth(CurLine);
     }
 
+};
+CMathBase.prototype.IsContentSelect = function(SelectionStartPos, SelectionEndPos, _CurLine, _CurRange)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var ContentSelect = true;
+
+    if(this.bOneLine == false)
+    {
+        var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+        var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+        ContentSelect = SelectionStartPos >= StartPos && SelectionEndPos <= EndPos;
+    }
+
+    return ContentSelect;
 };
 CMathBase.prototype.Selection_IsEmpty = function()
 {

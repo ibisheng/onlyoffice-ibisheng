@@ -478,10 +478,7 @@ CNary.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         if(CurLine == 0 && CurRange == 0)
         {
             PRS.WordLen += this.BrGapLeft;
-        }
 
-        if(CurLine == 0 && CurRange == 0)
-        {
             if(this.Base.IsJustDraw())
             {
                 this.MeasureJustDraw(this.Base);
