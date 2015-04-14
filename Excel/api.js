@@ -1716,9 +1716,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.CoAuthoringApi.set_url(url);
 		};
 
-		spreadsheet_api.prototype._onSaveChanges = function (deleteIndex, recalcIndexColumns, recalcIndexRows) {
+		spreadsheet_api.prototype._onSaveChanges = function (recalcIndexColumns, recalcIndexRows) {
 			if (this.IsSendDocumentLoadCompleate) {
 				var arrChanges = this.wbModel.SerializeHistory();
+				var deleteIndex = History.Get_DeleteIndex();
 				var excelAdditionalInfo = null;
 				if (this.collaborativeEditing.getCollaborativeEditing()) {
 					// Пересчетные индексы добавляем только если мы не одни

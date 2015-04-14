@@ -758,6 +758,18 @@ CHistory.prototype.Reset_SavedIndex = function()
 {
 	this.SavedIndex = this.Index;
 };
+/** @returns {number|null} */
+CHistory.prototype.Get_DeleteIndex = function () {
+	var DeletePointIndex = null !== this.SavedIndex ? Math.min(this.SavedIndex + 1, this.Index + 1) : null;
+	if (null === DeletePointIndex)
+		return null;
+	var DeleteIndex = 0;
+	for (var i = 0; i < DeletePointIndex; ++i) {
+		DeleteIndex += this.Points[i].Items.length;
+		DeleteIndex += 1; // Это на взаимное расположение Sheet. Пишется в каждой точке изменений.
+	}
+	return DeleteIndex;
+};
 /** @returns {boolean} */
 CHistory.prototype.Is_Modified = function()
 {
