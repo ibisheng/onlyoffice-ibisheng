@@ -4962,12 +4962,7 @@ function BinaryFileReader(doc, openParams)
 			{
 				var sOldId = oCollisionStyle.Get_Id();
 				var nCounter = 1;
-				var sNewId = sOldId + "_" + nCounter;
-				while(null != styles[sNewId] || null != this.oReadResult.styles[sNewId])
-				{
-					nCounter++;
-					sNewId = sOldId + "_" + nCounter;
-				}
+				var sNewId = g_oIdCounter.Get_NewId();
 				var oNewId = {id: sNewId, def: false, type: oCollisionStyle.Type, newName: oCollisionStyle.Name.toLowerCase().replace(/\s/g,"")};
 				oIdRenameMap[sOldId] = oNewId;
 				if(stDefault.Character == sOldId || stDefault.Numbering == sOldId || stDefault.Paragraph == sOldId || stDefault.Table == sOldId)
