@@ -1896,7 +1896,8 @@ function BinaryPPTYLoader()
 
                                             if (this.IsThemeLoader)
                                             {
-                                                uni_fill.fill.setRasterImageId("theme" + (this.Api.ThemeLoader.CurrentLoadThemeIndex + 1) + "/media/" + sReadPath);
+                                                sReadPath = "theme" + (this.Api.ThemeLoader.CurrentLoadThemeIndex + 1) + "/media/" + sReadPath;
+                                                uni_fill.fill.setRasterImageId(sReadPath);
                                             }
 
                                             if (this.ImageMapChecker != null)
