@@ -5111,7 +5111,6 @@ function BinaryFileReader(doc, openParams)
             styles[nStId] = oNewStyle;
             nStId++;
         }
-        this.Document.Styles.Id = nStId;
 		//проверяем циклы в styles по BasedOn
 		var aStylesGrey = {};
 		for(var stId in styles)
