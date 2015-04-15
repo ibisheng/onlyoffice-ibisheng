@@ -1418,7 +1418,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 				this.handlers.trigger("asc_onGetEditorPermissions", oEditorPermissions);
 
-				if (undefined != oSettings['trackingInfo'] && null != oSettings['trackingInfo']) {
+				if (undefined != oSettings['trackingInfo'] && null != oSettings['trackingInfo'] && oEditorPermissions.asc_getCanEdit()) {
 					this.TrackFile = new asc_CTrackFile(oSettings['trackingInfo']);
 
 					this.TrackFile.setDocId(this.DocInfo["Id"]);

@@ -704,7 +704,7 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(response) {
 		var oEditorPermissions = new asc_CAscEditorPermissions(oSettings);
 		this.asc_fireCallback("asc_onGetEditorPermissions", oEditorPermissions);
 
-		if (undefined != oSettings['trackingInfo'] && null != oSettings['trackingInfo']) {
+		if (undefined != oSettings['trackingInfo'] && null != oSettings['trackingInfo'] && oEditorPermissions.asc_getCanEdit()) {
 			var asc_CTrackFile = window["Asc"].CTrackFile;
 			this.TrackFile = new asc_CTrackFile(oSettings['trackingInfo']);
 

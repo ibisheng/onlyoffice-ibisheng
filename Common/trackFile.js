@@ -26,6 +26,7 @@
 			this.isPeriodicalyTracking = false;
 			this.isAliveTrackingOnly = false;
 			this.isTrackDone = false;
+			this.bAliveUser2 = false;
 
 			if (undefined != obj && null != obj) {
 				if (undefined != obj["licenseId"] && null != obj["licenseId"])
@@ -46,7 +47,12 @@
 					break;
 
 				case c_TrackingType.TT_DOCUMENT_SESSION:
+					this.isPeriodicalyTracking = false;
+					this.isAliveTrackingOnly = true;
+					break;
+
 				case c_TrackingType.TT_USER_COUNT_2:
+					this.bAliveUser2 = true;				// Сразу выставляем, что пользователь активный
 					this.isPeriodicalyTracking = false;
 					this.isAliveTrackingOnly = true;
 					break;
@@ -80,7 +86,7 @@
 					setTimeout(_OnTrackingTimer, oThis.trackingInterval);
 				};
 
-				if (this.isAliveTrackingOnly && !this.bAliveUser) {
+				if (this.isAliveTrackingOnly && !this.bAliveUser && !this.bAliveUser2) {
 					_OnSendTrack();
 				} else {
 					this.isTrackDone = true;
