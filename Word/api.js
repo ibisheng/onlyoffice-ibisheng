@@ -357,7 +357,7 @@ function asc_docs_api(name)
 	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
 	// Spell Checking
-	this.SpellCheckApi = new CSpellCheckApi();
+	this.SpellCheckApi = (window["AscDesktopEditor"] === undefined) ? new CSpellCheckApi() : new CSpellCheckApi_desktop();
 	this.isSpellCheckEnable = true;
 	
 	// Chart
@@ -1480,18 +1480,21 @@ asc_docs_api.prototype._coSpellCheckInit = function() {
 	if(undefined !== window['g_cAscSpellCheckUrl'])
 		window.g_cAscSpellCheckUrl = window['g_cAscSpellCheckUrl'];
 
-	if(undefined !== window.g_cAscSpellCheckUrl) {
-		//Turn off SpellCheck feature if it disabled
-		if(!this.isSpellCheckEnable)
-			window.g_cAscSpellCheckUrl = "";
+    if (undefined === window["AscDesktopEditor"])
+    {
+        if(undefined !== window.g_cAscSpellCheckUrl) {
+            //Turn off SpellCheck feature if it disabled
+            if(!this.isSpellCheckEnable)
+                window.g_cAscSpellCheckUrl = "";
 
-		this.SpellCheckApi.set_url(window.g_cAscSpellCheckUrl);
-	}
+            this.SpellCheckApi.set_url(window.g_cAscSpellCheckUrl);
+        }
 
-	this.SpellCheckApi.onSpellCheck	= function (e) {
-		var incomeObject = JSON.parse(e);
-		SpellCheck_CallBack(incomeObject);
-	};
+        this.SpellCheckApi.onSpellCheck	= function (e) {
+            var incomeObject = JSON.parse(e);
+            SpellCheck_CallBack(incomeObject);
+        };
+    }
 
 	this.SpellCheckApi.init (documentId);
 };
@@ -6810,10 +6813,6 @@ function spellCheck (editor, rdata) {
 				// push data to native QT code
 				window['qtDocBridge']['spellCheck'] (JSON.stringify(rdata));
 			}
-			else if (undefined !== window["AscDesktopEditor"])
-			{
-			    window["AscDesktopEditor"]["SpellCheck"](JSON.stringify(rdata));
-			}
 			else
 			{
 				editor.SpellCheckApi.spellCheck(JSON.stringify(rdata));
@@ -6825,7 +6824,8 @@ function spellCheck (editor, rdata) {
 
 window["asc_nativeOnSpellCheck"] = function (response)
 {
-    SpellCheck_CallBack(incomeObject);
+    if (editor.SpellCheckApi)
+        editor.SpellCheckApi.onSpellCheck(response);
 };
 
 function _onSpellCheck_Callback2 (response)
@@ -7658,3 +7658,26 @@ window["asc_docs_api"].prototype["asc_nativePrintPagesCount"] = function()
 {
 	return this.WordControl.m_oDrawingDocument.m_lPagesCount;
 };
+
+// desktop editor spellcheck
+function CSpellCheckApi_desktop()
+{
+    this.docId  = undefined;
+
+    this.init = function(docid)
+    {
+        this.docId = docid;
+    };
+
+    this.set_url = function(url) {};
+
+    this.spellCheck = function(spellData)
+    {
+        window["AscDesktopEditor"]["SpellCheck"](spellData);
+    };
+
+    this.onSpellCheck = function(spellData)
+    {
+        SpellCheck_CallBack(spellData);
+    };
+}
