@@ -1429,24 +1429,19 @@ CMathBase.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selectio
     // для каждой новой строки в ParaMath FindStart будет true независимо от того нашли или нет начало селекта на предыдущей строке
     // поэтому для контентов разбивающихся на несколько строк сделаем проверку, чтобы не попасть в контенты, которые не относятся к текущей строке
 
-    var ContentSelect = this.IsContentSelect(SelectionStartPos, SelectionEndPos, _CurLine, _CurRange);
+    var ContentSelect = true;
+
+    if(this.bOneLine == false)
+    {
+        var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+        var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+        ContentSelect = SelectionStartPos >= StartPos && SelectionEndPos <= EndPos;
+    }
 
     if(SelectionUse == true && SelectionStartPos !== SelectionEndPos)
     {
         var Bound = this.Bounds.Get_LineBound(CurLine);
-        /*var Bound = this.Bounds.Get_LineBound(CurLine);
-        var ParentBound = this.Parent.Get_LineBound(_CurLine);
-
-        SelectionDraw.StartY   = ParentBound.Y;
-        SelectionDraw.H        = ParentBound.H;*/
-
-        /*if(this.bOneLine)
-        {
-            //SelectionDraw.StartY = Bound.Y;
-            //SelectionDraw.H      = Bound.H;
-            SelectionDraw.StartY   = ParentBound.Y;
-            SelectionDraw.H        = ParentBound.H;
-        }*/
 
         SelectionDraw.FindStart = false;
         SelectionDraw.W += Bound.W;
@@ -1454,21 +1449,10 @@ CMathBase.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selectio
     else if(SelectionUse == true && ContentSelect == true)
     {
         var Item = this.Content[SelectionStartPos];
-
-        //var PosLine = this.ParaMath.GetLinePosition(_CurLine);
-        //SelectionDraw.StartX = PosLine.x + Item.pos.x;
-        //SelectionDraw.StartY = PosLine.y + Item.pos.y - Item.size.ascent;
-        //SelectionDraw.H      = Item.size.height;
-
         var BoundItem = Item.Get_LineBound(_CurLine);
 
         SelectionDraw.StartX = BoundItem.X;
 
-        /*if(this.bOneLine)
-        {
-            SelectionDraw.StartY = BoundItem.Y;
-            SelectionDraw.H      = BoundItem.H;
-        }*/
 
         Item.Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
     }
@@ -1478,7 +1462,7 @@ CMathBase.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selectio
     }
 
 };
-CMathBase.prototype.IsContentSelect = function(SelectionStartPos, SelectionEndPos, _CurLine, _CurRange)
+/*CMathBase.prototype.IsContentSelect = function(SelectionStartPos, SelectionEndPos, _CurLine, _CurRange)
 {
     var CurLine  = _CurLine - this.StartLine;
     var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
@@ -1494,7 +1478,7 @@ CMathBase.prototype.IsContentSelect = function(SelectionStartPos, SelectionEndPo
     }
 
     return ContentSelect;
-};
+};*/
 CMathBase.prototype.Selection_IsEmpty = function()
 {
     if (true !== this.Selection.Use)
@@ -1567,8 +1551,11 @@ CMathBase.prototype.Draw_Lines = function(PDSL)
     var aStrikeout  = PDSL.Strikeout;
     var aDStrikeout = PDSL.DStrikeout;
 
+    var ArgSize     = this.Get_CompiledArgSize();
+    var fontCoeff   = MatGetKoeffArgSize(CtrPrp.FontSize, ArgSize.value);
+
     var X          = PDSL.X;
-    var Y          = PDSL.Baseline - CtrPrp.FontSize * g_dKoef_pt_to_mm * 0.27;
+    var Y          = PDSL.Baseline - CtrPrp.FontSize * fontCoeff * g_dKoef_pt_to_mm * 0.27;
 
     var LineW      = (CtrPrp.FontSize / 18) * g_dKoef_pt_to_mm;
 
@@ -1599,15 +1586,34 @@ CMathBase.prototype.Draw_Lines = function(PDSL)
         }
     }
 
-    if ( true === CtrPrp.DStrikeout )
-        aDStrikeout.Add( Y, Y, X, X + this.size.width, LineW, CurColor.r, CurColor.g, CurColor.b );
-    else if ( true === CtrPrp.Strikeout )
-        aStrikeout.Add( Y, Y, X, X + this.size.width, LineW, CurColor.r, CurColor.g, CurColor.b );
+    var CurLine  = PDSL.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PDSL.Range - this.StartRange : PDSL.Range );
 
-    for ( var CurPos = 0; CurPos < this.Content.length; CurPos++ )
+    var Bound = this.Bounds.Get_LineBound(CurLine);
+
+    if ( true === CtrPrp.DStrikeout )
+        aDStrikeout.Add( Y, Y, X, X + Bound.W, LineW, CurColor.r, CurColor.g, CurColor.b );
+    else if ( true === CtrPrp.Strikeout )
+        aStrikeout.Add( Y, Y, X, X + Bound.W, LineW, CurColor.r, CurColor.g, CurColor.b );
+
+    var StartPos, EndPos;
+
+    if(this.bOneLine)
+    {
+        StartPos = 0;
+        EndPos   = this.Content.length - 1;
+    }
+    else
+    {
+        StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+        EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+    }
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
         this.Content[CurPos].Draw_Lines(PDSL);
 
-    PDSL.X = this.pos.x + this.ParaMath.X + this.size.width;
+
+    PDSL.X = Bound.X + Bound.W;
 };
 CMathBase.prototype.Make_ShdColor = function(PDSE, CurTextPr)
 {

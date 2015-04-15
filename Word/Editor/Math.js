@@ -217,7 +217,6 @@ function ParaMath()
     this.Y                  = 0;
 
     this.FirstPage          = -1;
-    //this.Bounds             = [];
 
     this.CurPageInfo        =
     {
@@ -1472,27 +1471,11 @@ ParaMath.prototype.Draw_Elements = function(PDSE)
 };
 ParaMath.prototype.GetLinePosition = function(Line)
 {
-    /*var CurLine  = Line - this.Root.StartLine;
-
-    var Bounds = this.Root.Get_Bounds();
-    Bounds.Get_LineBound(CurLine);
-
-    var Pos = new CMathPosition();
-
-    Pos.x = this.Bounds[CurLine].X;
-    Pos.y = this.Bounds[CurLine].Y + RootLineMetrics.ascent;*/
-
     return this.Root.GetPos(Line);
 };
 ParaMath.prototype.Draw_Lines = function(PDSL)
 {
-    var CurLine  = PDSL.Line - this.StartLine;
-    var CurRange = ( 0 === CurLine ? PDSL.Range - this.StartRange : PDSL.Range );
-
-    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-    if ( EndPos >= 1 )
+    if(false == this.Root.IsEmptyLine(PDSL.Line, PDSL.Range))
     {
         // Underline всей формулы
         var FirstRPrp = this.GetFirstRPrp();
@@ -1533,13 +1516,16 @@ ParaMath.prototype.Draw_Lines = function(PDSL)
             }
         }
 
+        var Bound = this.Root.Get_LineBound(PDSL.Line),
+            Width = Bound.W;
+
         if ( true === FirstRPrp.Underline )
-            aUnderline.Add( UnderlineY, UnderlineY, X, X + this.Width, LineW, CurColor.r, CurColor.g, CurColor.b );
+            aUnderline.Add( UnderlineY, UnderlineY, X, X + Width, LineW, CurColor.r, CurColor.g, CurColor.b );
 
 
         this.Root.Draw_Lines(PDSL);
 
-        PDSL.X = this.X + this.Width;
+        PDSL.X = Bound.X + Width;
     }
 };
 
@@ -1990,16 +1976,8 @@ ParaMath.prototype.Get_Bounds = function()
         return {X : 0, Y : 0, W : 0, H : 0, Page : 0};
     else
     {
-        //var LinesCount = this.Root.protected_GetLinesCount();
-
-        /*if(LinesCount < this.Bounds.length)
-            this.Bounds.splice(LinesCount, this.Bounds.length - LinesCount);
-
-        return this.Bounds[LinesCount - 1];*/
-
         var LinesCount = this.Root.protected_GetLinesCount();
 
-        //var PosLine = Math.min(3, LinesCount - 1);
 
         return this.Root.Get_Bounds()[LinesCount - 1];
     }

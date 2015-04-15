@@ -800,7 +800,7 @@ CDegreeSubSup.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine
         this.Bounds.Reset();
     }
 
-    if(this.bOneLine == false && this.Check_UpdateIter(_CurLine, _CurRange))
+    if(this.bOneLine == false && this.Need_Iters(_CurLine, _CurRange))
     {
         this.Content[0].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
         this.Content[1].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
@@ -812,6 +812,7 @@ CDegreeSubSup.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine
         this.Bounds.UpdateMetrics(CurLine, Bound);
         PRS.ContentMetrics.UpdateMetrics(Bound);
 
+        this.iters.Bounds.Reset();
         this.iters.Bounds.UpdateMetrics(0, this.iters.size);
 
         this.UpdatePRS(PRS, Bound);
@@ -911,7 +912,7 @@ CDegreeSubSup.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurR
         if(this.Pr.type == DEGREE_SubSup) // baseContent, iters
             this.baseContent.Recalculate_Range_Width(PRSC, _CurLine, _CurRange);
 
-        if(this.Check_UpdateIter(_CurLine, _CurRange))
+        if(this.Need_Iters(_CurLine, _CurRange))
         {
             var RangeW2 = PRSC.Range.W;
 
@@ -991,29 +992,22 @@ CDegreeSubSup.prototype.Draw_Elements = function(PDSE)
 {
     this.baseContent.Draw_Elements(PDSE);
 
-    if(this.Check_UpdateIter(PDSE.Line, PDSE.Range))
+    if(this.Need_Iters(PDSE.Line, PDSE.Range))
         this.iters.Draw_Elements(PDSE);
 };
-CDegreeSubSup.prototype.Check_UpdateIter = function(_CurLine, _CurRange)
+CDegreeSubSup.prototype.Need_Iters = function(_CurLine, _CurRange)
 {
     var CurLine = _CurLine - this.StartLine;
     var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
 
     return  (this.Pr.type == DEGREE_SubSup && this.baseContent.Math_Is_End(_CurLine, _CurRange)) || (CurLine == 0 && CurRange == 0 && this.Pr.type == DEGREE_PreSubSup);
 };
-CDegreeSubSup.prototype.IsContentSelect = function(SelectionStartPos, SelectionEndPos, _CurLine, _CurRange)
+CDegreeSubSup.prototype.protected_GetRangeEndPos = function(CurLine, CurRange)
 {
-    var ContentSelect = true;
+    var _CurLine  = CurLine + this.StartLine;
+    var _CurRange = ( 0 === CurLine ? CurRange + this.StartRange : CurRange );
 
-    if(this.bOneLine == false)
-    {
-        var StartPos = 0,
-            EndPos   = this.Check_UpdateIter(_CurLine, _CurRange) ? 2 : 0;
-
-        ContentSelect = SelectionStartPos >= StartPos && SelectionEndPos <= EndPos;
-    }
-
-    return ContentSelect;
+    return this.Need_Iters(_CurLine, _CurRange) ? 2 : 0;
 };
 CDegreeSubSup.prototype.Document_UpdateInterfaceState = function(MathProps)
 {

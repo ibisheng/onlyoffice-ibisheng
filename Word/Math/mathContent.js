@@ -3117,33 +3117,6 @@ CMathContent.prototype.Recalculate_CurPos = function(_X, _Y, CurrentRun, _CurRan
 
     return this.Content[_EndPos].Recalculate_CurPos(_X, _Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
 };
-CMathContent.prototype.n_Recalculate_CurPos = function(_X, _Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
-{
-    var CurLine  = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-    var X = _X,
-        Y = _Y;
-
-    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-    var bCurr = false;
-
-    for ( var CurPos = StartPos; CurPos <= EndPos && bCurr !== true; CurPos++ )
-    {
-        bCurr = CurrentRun == true && this.CurPos == CurPos;
-
-        if(para_Math_Composition == this.Content[CurPos].Type && bCurr !== true)
-            _X += this.Content[CurPos].size.width;
-        else
-        {
-            var Res = this.Content[CurPos].Recalculate_CurPos(_X, _Y, bCurr, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
-            _X = Res.X;
-        }
-    }
-
-    return Res;
-};
 CMathContent.prototype.Get_CurrentParaPos = function()
 {
     if ( this.CurPos >= 0 && this.CurPos < this.Content.length )
@@ -3663,17 +3636,24 @@ CMathContent.prototype.Draw_HighLights = function(PDSH, bAll)
 };
 CMathContent.prototype.Draw_Lines = function(PDSL)
 {
-    var lng = this.Content.length;
+    var CurLine  = PDSL.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PDSL.Range - this.StartRange : PDSL.Range );
 
-    var X = PDSL.X        = this.pos.x + this.ParaMath.X,
-        Y = PDSL.Baseline = this.pos.y + this.ParaMath.Y + this.size.ascent;
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
 
-    for ( var CurPos = 0; CurPos < lng; CurPos++ )
+    var Bound = this.Get_LineBound(PDSL.Line);
+
+    var Baseline = Bound.Y + Bound.Asc;
+
+    PDSL.Baseline = Baseline;
+    PDSL.X        = Bound.X;
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
     {
         this.Content[CurPos].Draw_Lines(PDSL);
-        PDSL.Baseline = Y;
+        PDSL.Baseline = Baseline;
     }
-
 };
 CMathContent.prototype.Selection_Remove = function()
 {
@@ -4103,6 +4083,21 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 
+};
+CMathContent.prototype.IsEmptyLine = function(_CurLine, _CurRange)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    var bEmpty = false;
+
+    if(StartPos == EndPos)
+        bEmpty = this.Content[StartPos].IsEmptyLine(_CurLine, _CurRange);
+
+    return bEmpty;
 };
 CMathContent.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 {

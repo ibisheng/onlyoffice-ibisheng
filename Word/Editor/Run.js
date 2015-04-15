@@ -4008,15 +4008,20 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
     var aSpelling   = PDSL.Spelling;
 
     var CurTextPr = this.Get_CompiledPr( false );
-
-
     var StrikeoutY = Y - this.YOffset;
+
+    var fontCoeff = 1; // учтем ArgSize
+    if(this.Type == para_Math_Run)
+    {
+        var ArgSize = this.Parent.Compiled_ArgSz;
+        fontCoeff   = MatGetKoeffArgSize(CurTextPr.FontSize, ArgSize.value);
+    }
 
     switch(CurTextPr.VertAlign)
     {
-        case vertalign_Baseline   : StrikeoutY += -CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27; break;
-        case vertalign_SubScript  : StrikeoutY += -CurTextPr.FontSize * vertalign_Koef_Size * g_dKoef_pt_to_mm * 0.27 - vertalign_Koef_Sub * CurTextPr.FontSize * g_dKoef_pt_to_mm; break;
-        case vertalign_SuperScript: StrikeoutY += -CurTextPr.FontSize * vertalign_Koef_Size * g_dKoef_pt_to_mm * 0.27 - vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm; break;
+        case vertalign_Baseline   : StrikeoutY += -CurTextPr.FontSize * fontCoeff * g_dKoef_pt_to_mm * 0.27; break;
+        case vertalign_SubScript  : StrikeoutY += -CurTextPr.FontSize * fontCoeff * vertalign_Koef_Size * g_dKoef_pt_to_mm * 0.27 - vertalign_Koef_Sub * CurTextPr.FontSize  * fontCoeff * g_dKoef_pt_to_mm; break;
+        case vertalign_SuperScript: StrikeoutY += -CurTextPr.FontSize * fontCoeff * vertalign_Koef_Size * g_dKoef_pt_to_mm * 0.27 - vertalign_Koef_Super * CurTextPr.FontSize * fontCoeff * g_dKoef_pt_to_mm; break;
     }
 
     var UnderlineY = Y + UndOff -  this.YOffset;
@@ -8634,6 +8639,16 @@ ParaRun.prototype.Math_Is_End = function(_CurLine, _CurRange)
     var EndPos = this.protected_GetRangeEndPos(CurLine, CurRange);
 
     return EndPos == this.Content.length;
+};
+ParaRun.prototype.IsEmptyLine = function(_CurLine, _CurRange)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    return StartPos == EndPos;
 };
 ParaRun.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
 {
