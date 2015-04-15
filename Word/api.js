@@ -2220,7 +2220,7 @@ asc_docs_api.prototype.Copy = function()
 
         return;
     }
-	return Editor_Copy_Button(this)
+	return Editor_Copy_Button(this);
 };
 asc_docs_api.prototype.Update_ParaTab = function(Default_Tab, ParaTabs){
     this.WordControl.m_oDrawingDocument.Update_ParaTab(Default_Tab, ParaTabs);
