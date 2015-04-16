@@ -4917,6 +4917,7 @@ function BinaryFileReader(doc, openParams)
 			else
 				numPr.NumId = 0;
 		}
+		var oDocStyle = this.Document.Styles;
 		var styles = this.Document.Styles.Style;
         var stDefault = this.Document.Styles.Default;
 		if(g_nCurFileVersion < 2){
@@ -4933,12 +4934,15 @@ function BinaryFileReader(doc, openParams)
 		}
 		//запоминаем default стили имена или id которых совпали с стилями открываемого документа и ссылки на них надо подменить
 		var oIdRenameMap = {};
+		var oIdMap = {};
 		//Удаляем стили с тем же именем
 		for(var i in this.oReadResult.styles)
 		{
 			var elem = this.oReadResult.styles[i];
 			var oNewStyle = elem.style;
+			var sNewStyleId = oNewStyle.Get_Id();
 			var oNewId = elem.param;
+			oIdMap[oNewId.id] = sNewStyleId;
             //такой код для сранения имен есть в DrawingDocument.js
             // как только меняется DrawingDocument - меняется и код здесь.
             var sNewStyleName = oNewStyle.Name.toLowerCase().replace(/\s/g,"");
@@ -4947,29 +4951,8 @@ function BinaryFileReader(doc, openParams)
             {
 				var stId = oStartDocStyle.Get_Id();
 				oNewStyle.Set_Name(oStartDocStyle.Name);
-				oIdRenameMap[stId] = {id: oNewId.id, def: oNewId.def, type: oNewStyle.Type, newName: sNewStyleName};
-				delete styles[stId];
-			}
-		}
-		//заменяем id стилей по умолчанию если они, если они совпали со стилями открываемого документа
-		for(var i in this.oReadResult.styles)
-		{
-			var elem = this.oReadResult.styles[i];
-			var oNewStyle = elem.style;
-			var oNewId = elem.param;
-			var oCollisionStyle = styles[oNewId.id];
-			if(oCollisionStyle)
-			{
-				var sOldId = oCollisionStyle.Get_Id();
-				var nCounter = 1;
-				var sNewId = g_oIdCounter.Get_NewId();
-				var oNewId = {id: sNewId, def: false, type: oCollisionStyle.Type, newName: oCollisionStyle.Name.toLowerCase().replace(/\s/g,"")};
-				oIdRenameMap[sOldId] = oNewId;
-				if(stDefault.Character == sOldId || stDefault.Numbering == sOldId || stDefault.Paragraph == sOldId || stDefault.Table == sOldId)
-					oNewId.def = true;
-				oCollisionStyle.Set_Id(sNewId);
-				delete styles[sOldId];
-				styles[sNewId] = oCollisionStyle;
+				oIdRenameMap[stId] = {id: sNewStyleId, def: oNewId.def, type: oNewStyle.Type, newName: sNewStyleName};
+				oDocStyle.Remove(stId);
 			}
 		}
 		//меняем BasedOn и Next
@@ -5036,27 +5019,28 @@ function BinaryFileReader(doc, openParams)
 		{
 			var elem = this.oReadResult.styles[i];
 			var oNewStyle = elem.style;
+			var sNewStyleId = oNewStyle.Get_Id();
 			var oNewId = elem.param;
 			var sNewStyleName = oNewStyle.Name.toLowerCase().replace(/\s/g,"");
 			if(true == oNewId.def)
             {
                 switch(oNewStyle.Type)
                 {
-                    case styletype_Character:stDefault.Character = oNewId.id;break;
-                    case styletype_Numbering:stDefault.Numbering = oNewId.id;break;
-                    case styletype_Paragraph:stDefault.Paragraph = oNewId.id;break;
-                    case styletype_Table:stDefault.Table = oNewId.id;break;
+                    case styletype_Character:stDefault.Character = sNewStyleId;break;
+                    case styletype_Numbering:stDefault.Numbering = sNewStyleId;break;
+                    case styletype_Paragraph:stDefault.Paragraph = sNewStyleId;break;
+                    case styletype_Table:stDefault.Table = sNewStyleId;break;
                 }
             }
             if("header" == sNewStyleName)
-                stDefault.Header = oNewId.id;
+                stDefault.Header = sNewStyleId;
             if("footer" == sNewStyleName)
-                stDefault.Footer = oNewId.id;
+                stDefault.Footer = sNewStyleId;
             if("hyperlink" == sNewStyleName)
-                stDefault.Hyperlink = oNewId.id;
+                stDefault.Hyperlink = sNewStyleId;
             if("table grid" == sNewStyleName)
-                stDefault.TableGrid = oNewId.id;
-			styles[oNewId.id] = oNewStyle;
+                stDefault.TableGrid = sNewStyleId;
+			oDocStyle.Add(oNewStyle);
 		}
 		var oStyleTypes = {par: 1, table: 2, lvl: 3};
 		var fParseStyle = function(aStyles, oDocumentStyles, nStyleType)
@@ -5064,52 +5048,48 @@ function BinaryFileReader(doc, openParams)
 			for(var i = 0, length = aStyles.length; i < length; ++i)
 			{
 				var elem = aStyles[i];
-				if(null != oDocumentStyles[elem.style])
+				var sStyleId = oIdMap[elem.style];
+				if(null != sStyleId && null != oDocumentStyles[sStyleId])
 				{
 					if(oStyleTypes.par == nStyleType)
-						elem.pPr.PStyle = elem.style;
+						elem.pPr.PStyle = sStyleId;
 					else if(oStyleTypes.table == nStyleType)
-						elem.pPr.TableStyle = elem.style;
+						elem.pPr.TableStyle = sStyleId;
 					else
-						elem.pPr.PStyle = elem.style;
+						elem.pPr.PStyle = sStyleId;
 				}
 			}
 		}
 		fParseStyle(this.oReadResult.paraStyles, styles, oStyleTypes.par);
 		fParseStyle(this.oReadResult.tableStyles, styles, oStyleTypes.table);
 		fParseStyle(this.oReadResult.lvlStyles, styles, oStyleTypes.lvl);
-		var nStId = styles.length;
 		if(null == stDefault.Character)
         {
             var oNewStyle = new CStyle( "GenStyleDefChar", null, null, styletype_Character );
 			//oNewStyle.Create_Default_Character();
-            stDefault.Character = nStId.toString();
-            styles[nStId] = oNewStyle;
-            nStId++;
+            stDefault.Character = oNewStyle.Get_Id();
+			oDocStyle.Add(oNewStyle);
         }
         if(null == stDefault.Numbering)
         {
             var oNewStyle = new CStyle( "GenStyleDefNum", null, null, styletype_Numbering );
 			//oNewStyle.Create_Default_Numbering();
-            stDefault.Numbering = nStId.toString();
-            styles[nStId] = oNewStyle;
-            nStId++;
+			stDefault.Numbering = oNewStyle.Get_Id();
+			oDocStyle.Add(oNewStyle);
         }
         if(null == stDefault.Paragraph)
         {
             var oNewStyle = new CStyle( "GenStyleDefPar", null, null, styletype_Paragraph );
 			//oNewStyle.Create_Default_Paragraph();
-            stDefault.Paragraph = nStId.toString();
-            styles[nStId] = oNewStyle;
-            nStId++;
+			stDefault.Paragraph = oNewStyle.Get_Id();
+			oDocStyle.Add(oNewStyle);
         }
 		if(null == stDefault.Table)
         {
             var oNewStyle = new CStyle( "GenStyleDefTable", null, null, styletype_Table );
 			//oNewStyle.Create_NormalTable();
-            stDefault.Table = nStId.toString();
-            styles[nStId] = oNewStyle;
-            nStId++;
+			stDefault.Table = oNewStyle.Get_Id();
+			oDocStyle.Add(oNewStyle);
         }
 		//проверяем циклы в styles по BasedOn
 		var aStylesGrey = {};
