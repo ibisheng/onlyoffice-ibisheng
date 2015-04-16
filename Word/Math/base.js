@@ -756,6 +756,9 @@ CMathBase.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
             this.Set_Color(undefined);
         }
 
+        if ( undefined != TextPr.HighLight )
+            this.Set_HighLight( null === TextPr.HighLight ? undefined : TextPr.HighLight );
+
         if(undefined !== TextPr.Underline)
         {
             this.Set_Underline(TextPr.Underline);
@@ -835,6 +838,15 @@ CMathBase.prototype.Set_Unifill = function(Value)
     {
         History.Add(this, new CChangesMathUnifill(Value, this.CtrPrp.Unifill));
         this.raw_SetUnifill(Value);
+    }
+};
+CMathBase.prototype.Set_HighLight = function(Value)
+{
+    var OldValue = this.CtrPrp.HighLight;
+    if ( (undefined === Value && undefined !== OldValue) || ( highlight_None === Value && highlight_None !== OldValue ) || ( Value instanceof CDocumentColor && ( undefined === OldValue || highlight_None === OldValue || false === Value.Compare(OldValue) ) ) )
+    {
+        History.Add(this, new CChangesMathHighLight(Value, this.CtrPrp.HighLight));
+        this.raw_SetHighLight(Value);
     }
 };
 CMathBase.prototype.Set_Shd = function(Shd)
@@ -977,6 +989,11 @@ CMathBase.prototype.raw_SetColor = function(Value)
 CMathBase.prototype.raw_SetUnifill = function(Value)
 {
     this.CtrPrp.Unifill = Value;
+    this.NeedUpdate_CtrPrp();
+};
+CMathBase.prototype.raw_SetHighLight = function(Value)
+{
+    this.CtrPrp.HighLight = Value;
     this.NeedUpdate_CtrPrp();
 };
 CMathBase.prototype.raw_SetRFonts = function(RFonts)
@@ -1525,7 +1542,8 @@ CMathBase.prototype.Select_MathContent = function(MathContent)
 };
 CMathBase.prototype.Draw_HighLights = function(PDSH, bAll)
 {
-    var oShd = this.Get_CompiledCtrPrp().Shd;
+    var ComplCtrPrp = this.Get_CompiledCtrPrp();
+    var oShd = ComplCtrPrp.Shd;
     var bDrawShd  = ( oShd === undefined || shd_Nil === oShd.Value ? false : true );
     var ShdColor  = ( true === bDrawShd ? oShd.Get_Color( PDSH.Paragraph ) : null );
 
@@ -1533,16 +1551,39 @@ CMathBase.prototype.Draw_HighLights = function(PDSH, bAll)
         Y0 = PDSH.Y0,
         Y1 = PDSH.Y1;
 
+    var CurLine  = PDSH.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PDSH.Range - this.StartRange : PDSH.Range );
+
+    var StartPos, EndPos;
+    if(this.bOneLine)
+    {
+        StartPos = 0;
+        EndPos   = this.Content.length - 1;
+    }
+    else
+    {
+        StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+        EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+    }
+
+
     var bAllCont = this.Selection.StartPos !== this.Selection.EndPos;
 
-    for (var CurPos = 0; CurPos < this.Content.length; CurPos++)
+    for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
         this.Content[CurPos].Draw_HighLights(PDSH, bAllCont);
 
+    var Bound = this.Get_LineBound(PDSH.Line);
+
     if (true === bDrawShd)
-        PDSH.Shd.Add(Y0, Y1, X, X + this.size.width, 0, ShdColor.r, ShdColor.g, ShdColor.b );
+        PDSH.Shd.Add(Y0, Y1, X, X + Bound.W, 0, ShdColor.r, ShdColor.g, ShdColor.b );
 
-    PDSH.X = this.pos.x + this.ParaMath.X + this.size.width;
+    var HighLight = ComplCtrPrp.HighLight;
 
+    if ( highlight_None != HighLight )
+        PDSH.High.Add( Y0, Y1, X, X + Bound.W, 0, HighLight.r, HighLight.g, HighLight.b );
+
+
+    PDSH.X = Bound.X + Bound.W;
 };
 CMathBase.prototype.Draw_Lines = function(PDSL)
 {
@@ -1909,6 +1950,18 @@ CMathBase.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _C
         }
     }
 };
+CMathBase.prototype.IsEmptyLine = function(_CurLine, _CurRange)
+{
+    var bEmpty = false;
+    var Numb = this.NumBreakContent;
+
+    if(this.bOneLine == false)
+    {
+        bEmpty = this.Content[Numb].IsEmptyLine(_CurLine, _CurRange);
+    }
+
+    return bEmpty;
+};
 CMathBase.prototype.Get_LineBound = function(_CurLine)
 {
     var CurLine = _CurLine - this.StartLine;
@@ -1991,6 +2044,11 @@ CMathBase.prototype.Is_EmptyRange = function()
 {
     return false;
 };
+CMathBase.prototype.IsShade = function()
+{
+    var oShd = this.Get_CompiledCtrPrp().Shd;
+    return !(oShd === undefined || shd_Nil === oShd.Value);
+};
 CMathBase.prototype.Get_CurrentParaPos          = CMathContent.prototype.Get_CurrentParaPos;
 CMathBase.prototype.private_UpdatePosOnAdd      = CMathContent.prototype.private_UpdatePosOnAdd;
 CMathBase.prototype.private_UpdatePosOnRemove   = CMathContent.prototype.private_UpdateOnRemove;
@@ -2011,21 +2069,6 @@ CMathBase.prototype.private_CorrectCurPos = function()
         this.Content[this.CurPos].Cursor_MoveToStartPos();
     }
 };
-
-CMathBase.prototype.Search                        = CParagraphContentWithParagraphLikeContent.prototype.Search;
-CMathBase.prototype.Add_SearchResult              = CParagraphContentWithParagraphLikeContent.prototype.Add_SearchResult;
-CMathBase.prototype.Clear_SearchResults           = CParagraphContentWithParagraphLikeContent.prototype.Clear_SearchResults;
-CMathBase.prototype.Remove_SearchResult           = CParagraphContentWithParagraphLikeContent.prototype.Remove_SearchResult;
-CMathBase.prototype.Search_GetId                  = CParagraphContentWithParagraphLikeContent.prototype.Search_GetId;
-CMathBase.prototype.Set_SelectionContentPos       = CParagraphContentWithParagraphLikeContent.prototype.Set_SelectionContentPos;
-CMathBase.prototype.Get_LeftPos                   = CParagraphContentWithParagraphLikeContent.prototype.Get_LeftPos;
-CMathBase.prototype.Get_RightPos                  = CParagraphContentWithParagraphLikeContent.prototype.Get_RightPos;
-CMathBase.prototype.Get_WordStartPos              = CParagraphContentWithParagraphLikeContent.prototype.Get_WordStartPos;
-CMathBase.prototype.Get_WordEndPos                = CParagraphContentWithParagraphLikeContent.prototype.Get_WordEndPos;
-CMathBase.prototype.Selection_Remove              = CParagraphContentWithParagraphLikeContent.prototype.Selection_Remove;
-CMathBase.prototype.Select_All                    = CParagraphContentWithParagraphLikeContent.prototype.Select_All;
-CMathBase.prototype.Check_NearestPos              = CParagraphContentWithParagraphLikeContent.prototype.Check_NearestPos;
-CMathBase.prototype.Get_SelectionDirection        = CParagraphContentWithParagraphLikeContent.prototype.Get_SelectionDirection;
 CMathBase.prototype.Selection_CheckParaContentPos = function(ContentPos, Depth, bStart, bEnd)
 {
     if (true !== this.Selection.Use)

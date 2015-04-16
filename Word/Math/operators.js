@@ -3363,6 +3363,8 @@ CDelimiter.prototype.getColumnsCount = function()
 };
 CDelimiter.prototype.fillContent = function()
 {
+    this.NeedBreakContent(0);
+
     var nColumnsCount = this.getColumnsCount();
 
     this.setDimension(1, nColumnsCount);

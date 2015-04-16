@@ -3605,24 +3605,27 @@ CMathContent.prototype.Get_EndPos = function(BehindEnd, ContentPos, Depth)
 };
 CMathContent.prototype.Draw_HighLights = function(PDSH, bAll)
 {
-    PDSH.X = this.ParaMath.X + this.pos.x;
+    var Bound = this.Get_LineBound(PDSH.Line);
+    PDSH.X    = Bound.X;
 
-    var len = this.Content.length;
+    var CurLine  = PDSH.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PDSH.Range - this.StartRange : PDSH.Range );
 
-    var H = 0;
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
 
     var Y0 = PDSH.Y0,
         Y1 = PDSH.Y1;
 
-    var FirstRootRunNotShd = this.bRoot && this.Content.length > 0 && !this.Content[0].IsShade();
+    var FirstRunInRootNotShd = this.bRoot && this.Content.length > 0 && this.Content[StartPos].IsShade() == false;
 
-    if( FirstRootRunNotShd || !this.bRoot)
+    if(FirstRunInRootNotShd || this.bRoot == false)
     {
-        Y0 = this.ParaMath.Y + this.pos.y;
-        Y1 = this.ParaMath.Y + this.pos.y + this.size.height;
+        Y0 = Bound.Y;
+        Y1 = Bound.Y + Bound.H;
     }
 
-    for ( var CurPos = 0; CurPos < len; CurPos++ )
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
     {
         PDSH.Y0 = Y0;
         PDSH.Y1 = Y1;
@@ -3632,7 +3635,6 @@ CMathContent.prototype.Draw_HighLights = function(PDSH, bAll)
 
         this.Content[CurPos].Draw_HighLights(PDSH, bAll);
     }
-
 };
 CMathContent.prototype.Draw_Lines = function(PDSL)
 {
@@ -4095,7 +4097,23 @@ CMathContent.prototype.IsEmptyLine = function(_CurLine, _CurRange)
     var bEmpty = false;
 
     if(StartPos == EndPos)
+    {
         bEmpty = this.Content[StartPos].IsEmptyLine(_CurLine, _CurRange);
+    }
+    else
+    {
+        var Pos = StartPos;
+
+        while(Pos < EndPos && this.Content[Pos].Type == para_Math_Run && this.Content[Pos].Is_Empty() == true)
+        {
+            Pos++;
+        }
+
+        if(Pos == EndPos && this.Content[Pos].Type == para_Math_Composition)
+        {
+            bEmpty = this.Content[Pos].IsEmptyLine(_CurLine, _CurRange);
+        }
+    }
 
     return bEmpty;
 };

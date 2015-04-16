@@ -1412,18 +1412,12 @@ ParaMath.prototype.Get_Default_TPrp = function()
 //-----------------------------------------------------------------------------------
 ParaMath.prototype.Draw_HighLights = function(PDSH)
 {
-    var CurLine  = PDSH.Line - this.StartLine;
-    var CurRange = ( 0 === CurLine ? PDSH.Range - this.StartRange : PDSH.Range );
-
-    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-    var X  = PDSH.X;
-    var Y0 = PDSH.Y0;
-    var Y1 = PDSH.Y1;
-
-    if ( EndPos >= 1 )
+    if(false == this.Root.IsEmptyLine(PDSH.Line, PDSH.Range))
     {
+        var X  = PDSH.X;
+        var Y0 = PDSH.Y0;
+        var Y1 = PDSH.Y1;
+
         var Comm = PDSH.Save_Comm();
         var Coll = PDSH.Save_Coll();
 
@@ -1441,19 +1435,20 @@ ParaMath.prototype.Draw_HighLights = function(PDSH)
             var CommentId     = ( CommentsCount > 0 ? PDSH.Comments[CommentsCount - 1] : null );
             var CommentsFlag  = PDSH.CommentsFlag;
 
-            var Bounds = this.Root.Get_Bounds();
+            var Bounds = this.Root.Get_LineBound(PDSH.Line);
             Comm.Add(Bounds.Y, Bounds.Y + Bounds.H, Bounds.X, Bounds.X + Bounds.W, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false, CommentId : CommentId } );
         }
 
         if (null !== CollFirst)
         {
-            var Bounds = this.Root.Get_Bounds();
+            var Bounds = this.Root.Get_LineBound(PDSH.Line);
             Coll.Add(Bounds.Y, Bounds.Y + Bounds.H, Bounds.X, Bounds.X + Bounds.W, 0, CollFirst.r, CollFirst.g, CollFirst.b);
         }
+
+        PDSH.Y0 = Y0;
+        PDSH.Y1 = Y1;
     }
 
-    PDSH.Y0 = Y0;
-    PDSH.Y1 = Y1;
 };
 ParaMath.prototype.Draw_Elements = function(PDSE)
 {
@@ -2045,6 +2040,7 @@ var historyitem_Math_RFontsHAnsi               =  16;
 var historyitem_Math_RFontsCS                  =  17;
 var historyitem_Math_RFontsEastAsia            =  18;
 var historyitem_Math_RFontsHint                =  19;
+var historyitem_Math_CtrPrpHighLight           =  20;
 
 
 function ReadChanges_FromBinary(Reader, Class)
@@ -2070,6 +2066,7 @@ function ReadChanges_FromBinary(Reader, Class)
         case historyitem_Math_RFontsCS              : Changes = new CChangesMath_RFontsCS(); break;
         case historyitem_Math_RFontsEastAsia        : Changes = new CChangesMath_RFontsEastAsia(); break;
         case historyitem_Math_RFontsHint            : Changes = new CChangesMath_RFontsHint(); break;
+        case historyitem_Math_CtrPrpHighLight       : Changes = new CChangesMathHighLight(); break;
     }
 
     if (null !== Changes)
@@ -2166,6 +2163,54 @@ CChangesMathShd.prototype.Load_Changes = function(Reader, Class)
     {
         this.New = undefined;
     }
+
+    this.Redo(Class);
+};
+
+function CChangesMathHighLight(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathHighLight.prototype.Type = historyitem_Math_CtrPrpHighLight;
+CChangesMathHighLight.prototype.Undo = function(Class)
+{
+    Class.raw_SetHighLight(this.Old);
+};
+CChangesMathHighLight.prototype.Redo = function(Class)
+{
+    Class.raw_SetHighLight(this.New);
+};
+CChangesMathHighLight.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined != this.New )
+    {
+        Writer.WriteBool(false);
+        if ( highlight_None != this.New )
+        {
+            Writer.WriteBool( false );
+            this.New.Write_ToBinary( Writer );
+        }
+        else
+            Writer.WriteBool( true );
+    }
+    else
+        Writer.WriteBool(true);
+};
+CChangesMathHighLight.prototype.Load_Changes = function(Reader, Class)
+{
+    if ( Reader.GetBool() == false )
+    {
+        if ( Reader.GetBool() == false )
+        {
+            this.New = new CDocumentColor(0,0,0);
+            this.New.Read_FromBinary(Reader);
+        }
+        else
+            this.New = highlight_None;
+    }
+    else
+        this.New = undefined;
 
     this.Redo(Class);
 };
