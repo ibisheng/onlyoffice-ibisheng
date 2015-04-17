@@ -332,6 +332,7 @@ function CTableId()
                 // Long : LastPoint
                 // Long : SumIndex
                 // Long : DeletedIndex
+                // String : Версия SDK
 
                 Writer.WriteLong(Data.FileCheckSum);
                 Writer.WriteLong(Data.FileSize);
@@ -342,6 +343,7 @@ function CTableId()
                 Writer.WriteLong(Data.LastPoint);
                 Writer.WriteLong(Data.SumIndex);
                 Writer.WriteLong(null === Data.DeletedIndex ? -10 : Data.DeletedIndex);
+                Writer.WriteString2("@@Version.@@Build.@@Rev");
 
                 break;
             }
@@ -409,6 +411,7 @@ function CTableId()
                 // Long : LastPoint
                 // Long : SumIndex
                 // Long : DeletedIndex
+                // String : Версия SDK
 
                 var FileCheckSum = Reader.GetLong();
                 var FileSize     = Reader.GetLong();
@@ -419,6 +422,7 @@ function CTableId()
                 var LastPoint    = Reader.GetLong();
                 var SumIndex     = Reader.GetLong();
                 var DeletedIndex = Reader.GetLong();
+                var VersionString= Reader.GetString2();
 
 //                // CollaborativeEditing LOG
 //                console.log("ItemsCount2  " + CollaborativeEditing.m_nErrorLog_PointChangesCount);
