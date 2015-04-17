@@ -317,7 +317,9 @@ CDegreeBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
         PosBase.x = this.pos.x;
 
         if(this.baseContent.Type == para_Math_Content)
-            PosBase.y += this.size.ascent;
+            PosBase.y += this.baseContent.size.ascent;
+        else
+            PosBase.y += this.size.ascent - this.baseContent.size.ascent;
 
         this.baseContent.setPosition(PosBase, PRSA, Line, Range, Page);
 
