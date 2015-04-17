@@ -1096,9 +1096,18 @@ CPresentation.prototype =
     },
 
 
-    Paragraph_Add : function( ParaItem, bRecalculate )
+    Paragraph_Add : function( ParaItem, bRecalculate, noUpdateInterface )
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphAdd, [ParaItem, bRecalculate], false, historydescription_Presentation_ParagraphAdd);
+        if(this.Slides[this.CurPage])
+        {
+            this.Slides[this.CurPage].graphicObjects.paragraphAdd(ParaItem, bRecalculate);
+            this.Slides[this.CurPage].graphicObjects.startRecalculate();
+            if(!(noUpdateInterface === true))
+            {
+                this.Document_UpdateInterfaceState();
+            }
+        }
+        // this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphAdd, [ParaItem, bRecalculate], false, historydescription_Presentation_ParagraphAdd, true);
 
     },
 
@@ -1632,7 +1641,10 @@ CPresentation.prototype =
                     }
                     else
                     {
-                        this.Paragraph_Add( new ParaTab() );
+                        if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                            History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+                            this.Paragraph_Add(new ParaTab());
+                        }
                     }
                 }
                 else
@@ -1659,13 +1671,17 @@ CPresentation.prototype =
             {
                 if ( e.ShiftKey )
                 {
-                    this.Paragraph_Add( new ParaNewLine( break_Line ) );
-                    this.Document_UpdateInterfaceState();
+                    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                        History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+                        this.Paragraph_Add(new ParaNewLine(break_Line));
+                    }
                 }
                 else if ( e.CtrlKey )
                 {
-                    this.Paragraph_Add( new ParaNewLine( break_Page ) );
-                    this.Document_UpdateInterfaceState();
+                    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                        History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+                        this.Paragraph_Add(new ParaNewLine(break_Page));
+                    }
                 }
                 else
                 {
@@ -1786,8 +1802,11 @@ CPresentation.prototype =
                 this.DrawingDocument.TargetStart();
                 this.DrawingDocument.TargetShow();
 
-                this.Paragraph_Add( new ParaText( String.fromCharCode( 0x00A0 ) ) );
-                this.Document_UpdateInterfaceState();
+
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                    History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+                    this.Paragraph_Add(new ParaText(String.fromCharCode(0x00A0)));
+                }
             }
             else if ( true === e.CtrlKey )
             {
@@ -1798,8 +1817,10 @@ CPresentation.prototype =
                // this.DrawingDocument.TargetStart();
                // this.DrawingDocument.TargetShow();
 
-                this.Paragraph_Add( new ParaSpace( 1 ) );
-                this.Document_UpdateInterfaceState();
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                    History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+                    this.Paragraph_Add(new ParaSpace(1));
+                }
             }
 
             bRetValue = true;
@@ -2024,8 +2045,10 @@ CPresentation.prototype =
             var TextPr = this.Get_Paragraph_TextPr();
             if ( null != TextPr )
             {
-                this.Paragraph_Add( new ParaTextPr( { Bold : TextPr.Bold === true ? false : true } ) );
-                this.Document_UpdateInterfaceState();
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                    History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+                    this.Paragraph_Add(new ParaTextPr({Bold: TextPr.Bold === true ? false : true}));
+                }
                 bRetValue = true;
             }
         }
@@ -2062,9 +2085,10 @@ CPresentation.prototype =
             }
             else // Ctrl + Alt + E - добавляем знак евро €
             {
-                this.Create_NewHistoryPoint(historydescription_Document_AddEuroLetter);
-                this.Paragraph_Add( new ParaText( "€" ) );
-                this.Document_UpdateInterfaceState();
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                    History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+                    this.Paragraph_Add(new ParaText("€"));
+                }
                 bRetValue = true;
             }
         }
@@ -2085,8 +2109,10 @@ CPresentation.prototype =
             var TextPr = this.Get_Paragraph_TextPr();
             if ( null != TextPr )
             {
-                this.Paragraph_Add( new ParaTextPr( { Italic : TextPr.Italic === true ? false : true } ) );
-                this.Document_UpdateInterfaceState();
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                    History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+                    this.Paragraph_Add(new ParaTextPr({Italic: TextPr.Italic === true ? false : true}));
+                }
                 bRetValue = true;
             }
         }
@@ -2198,8 +2224,10 @@ CPresentation.prototype =
             var TextPr = this.Get_Paragraph_TextPr();
             if ( null != TextPr )
             {
-                this.Paragraph_Add( new ParaTextPr( { Underline : TextPr.Underline === true ? false : true } ) );
-                this.Document_UpdateInterfaceState();
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                    History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+                    this.Paragraph_Add(new ParaTextPr({Underline: TextPr.Underline === true ? false : true}));
+                }
                 bRetValue = true;
             }
         }
@@ -2208,8 +2236,10 @@ CPresentation.prototype =
             var TextPr = this.Get_Paragraph_TextPr();
             if ( null != TextPr )
             {
-                this.Paragraph_Add( new ParaTextPr( { Strikeout : TextPr.Strikeout === true ? false : true } ) );
-                this.Document_UpdateInterfaceState();
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                    History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+                    this.Paragraph_Add(new ParaTextPr({Strikeout: TextPr.Strikeout === true ? false : true}));
+                }
                 bRetValue = true;
             }
         }
@@ -2306,11 +2336,13 @@ CPresentation.prototype =
             var TextPr = this.Get_Paragraph_TextPr();
             if ( null != TextPr )
             {
-                if ( true === e.ShiftKey )
-                    this.Paragraph_Add( new ParaTextPr( { VertAlign : TextPr.VertAlign === vertalign_SuperScript ? vertalign_Baseline : vertalign_SuperScript } ) );
-                else
-                    this.Paragraph_Add( new ParaTextPr( { VertAlign : TextPr.VertAlign === vertalign_SubScript ? vertalign_Baseline : vertalign_SubScript } ) );
-                this.Document_UpdateInterfaceState();
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                    History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+                    if (true === e.ShiftKey)
+                        this.Paragraph_Add(new ParaTextPr({VertAlign: TextPr.VertAlign === vertalign_SuperScript ? vertalign_Baseline : vertalign_SuperScript}));
+                    else
+                        this.Paragraph_Add(new ParaTextPr({VertAlign: TextPr.VertAlign === vertalign_SubScript ? vertalign_Baseline : vertalign_SubScript}));
+                }
                 bRetValue = true;
             }
         }
@@ -2319,8 +2351,10 @@ CPresentation.prototype =
             var TextPr = this.Get_Paragraph_TextPr();
             if ( null != TextPr )
             {
-                this.Paragraph_Add( new ParaTextPr( { VertAlign : TextPr.VertAlign === vertalign_SuperScript ? vertalign_Baseline : vertalign_SuperScript } ) );
-                this.Document_UpdateInterfaceState();
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                    History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+                    this.Paragraph_Add(new ParaTextPr({VertAlign: TextPr.VertAlign === vertalign_SuperScript ? vertalign_Baseline : vertalign_SuperScript}));
+                }
                 bRetValue = true;
             }
         }
@@ -2329,19 +2363,21 @@ CPresentation.prototype =
             this.DrawingDocument.TargetStart();
             this.DrawingDocument.TargetShow();
 
-            var Item = null;
-            if ( true === e.CtrlKey && true === e.ShiftKey )
-            {
-                Item = new ParaText( String.fromCharCode( 0x2013 ) );
-                Item.SpaceAfter = false;
-            }
-            else if ( true === e.ShiftKey )
-                Item = new ParaText( "_" );
-            else
-                Item = new ParaText( "-" );
+            if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+                var Item = null;
+                if ( true === e.CtrlKey && true === e.ShiftKey )
+                {
+                    Item = new ParaText( String.fromCharCode( 0x2013 ) );
+                    Item.SpaceAfter = false;
+                }
+                else if ( true === e.ShiftKey )
+                    Item = new ParaText( "_" );
+                else
+                    Item = new ParaText( "-" );
 
-            this.Paragraph_Add( Item );
-            this.Document_UpdateInterfaceState();
+                this.Paragraph_Add( Item );
+            }
             bRetValue = true;
         }
         else if ( e.KeyCode == 190 && true === e.CtrlKey ) // Ctrl + .
@@ -2349,8 +2385,10 @@ CPresentation.prototype =
             var TextPr = this.Get_Paragraph_TextPr();
             if ( null != TextPr )
             {
-                this.Paragraph_Add( new ParaTextPr( { VertAlign : TextPr.VertAlign === vertalign_SubScript ? vertalign_Baseline : vertalign_SubScript } ) );
-                this.Document_UpdateInterfaceState();
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                    History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+                    this.Paragraph_Add(new ParaTextPr({VertAlign: TextPr.VertAlign === vertalign_SubScript ? vertalign_Baseline : vertalign_SubScript}));
+                }
                 bRetValue = true;
             }
         }
@@ -2410,8 +2448,8 @@ CPresentation.prototype =
          }
          else*/ if ( Code > 0x20 )
     {
-        //if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
-        {
+        if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+            History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
             //this.Create_NewHistoryPoint();
 
            //this.DrawingDocument.TargetStart();
@@ -2421,7 +2459,7 @@ CPresentation.prototype =
             {
                 target_doc_content1 = this.Slides[this.CurPage].graphicObjects.getTargetDocContent();
             }
-            this.Paragraph_Add( new ParaText( String.fromCharCode( Code ) ) );
+            this.Paragraph_Add( new ParaText( String.fromCharCode( Code ) ), undefined, true );
             if(this.Slides[this.CurPage])
             {
                 target_doc_content2 = this.Slides[this.CurPage].graphicObjects.getTargetDocContent();
@@ -4678,20 +4716,22 @@ CPresentation.prototype =
         // у нас все добавляется в 1 параграф, так можно делать.
         this.TurnOffRecalc = true;
 
-        var Count = sText.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            if ( Index === Count - 1 )
+        if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+            History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+            var Count = sText.length;
+            for (var Index = 0; Index < Count; Index++) {
+                if (Index === Count - 1)
+                    this.TurnOffRecalc = false;
+
+                var _char = sText.charAt(Index);
+                if (" " == _char)
+                    this.Paragraph_Add(new ParaSpace(1));
+                else
+                    this.Paragraph_Add(new ParaText(_char));
+
+                // На случай, если Count = 0
                 this.TurnOffRecalc = false;
-
-            var _char = sText.charAt(Index);
-            if (" " == _char)
-                this.Paragraph_Add( new ParaSpace(1) );
-            else
-                this.Paragraph_Add( new ParaText(_char) );
-
-        // На случай, если Count = 0
-            this.TurnOffRecalc = false;
+            }
         }
         this.Document_UpdateUndoRedoState();
     },

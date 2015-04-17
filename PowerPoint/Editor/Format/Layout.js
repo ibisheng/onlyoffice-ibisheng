@@ -844,6 +844,7 @@ function CLayoutThumbnailDrawer()
                 {
                     _back_fill = new CUniFill();
                     _back_fill.fill = new CSolidFill();
+                    _back_fill.fill.color = new CUniColor();
                     _back_fill.fill.color.color = new CRGBColor();
                     _back_fill.fill.color.color.RGBA = {R:255, G:255, B:255, A:255};
                 }

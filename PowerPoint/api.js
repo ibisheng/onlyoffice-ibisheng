@@ -1791,43 +1791,58 @@ asc_docs_api.prototype.put_TextPrFontName = function(name)
 	var isasync = loader.LoadFont(fontinfo);
 	if (false === isasync)
     {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrFontName);
-		this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { FontFamily : { Name : fontinfo.Name , Index : -1 } } ) );
+        if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+            History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+            this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({
+                FontFamily: {
+                    Name: fontinfo.Name,
+                    Index: -1
+                }
+            }));
+        }
     }
 };
 asc_docs_api.prototype.put_TextPrFontSize = function(size)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrFontSize);
-	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { FontSize : Math.min(size, 100) } ) );
+    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+        History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+        this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({FontSize: Math.min(size, 100)}));
+    }
 };
 asc_docs_api.prototype.put_TextPrBold = function(value)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrBold);
-	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Bold : value } ) );
+    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+        History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+        this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({Bold: value}));
+    }
 };
 asc_docs_api.prototype.put_TextPrItalic = function(value)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrItalic);
-	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Italic : value } ) );
+    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+        History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+        this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({Italic: value}));
+    }
 };
 asc_docs_api.prototype.put_TextPrUnderline = function(value)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrUnderline);
-	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Underline : value } ) );
+    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+        History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+        this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({Underline: value}));
+    }
 };
 asc_docs_api.prototype.put_TextPrStrikeout = function(value)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrStrikeout);
-	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Strikeout : value } ) );
+    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+        History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+        this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({Strikeout: value}));
+    }
 };
 asc_docs_api.prototype.put_PrLineSpacing = function(Type, Value)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrLineSpacing);
 	this.WordControl.m_oLogicDocument.Set_ParagraphSpacing( { LineRule : Type,  Line : Value } );
 };
 asc_docs_api.prototype.put_LineSpacingBeforeAfter = function(type,value)//"type == 0" means "Before", "type == 1" means "After"
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrSpacingBeforeAfter);
 	switch (type)
     {
 		case 0:
@@ -1838,12 +1853,10 @@ asc_docs_api.prototype.put_LineSpacingBeforeAfter = function(type,value)//"type 
 };
 asc_docs_api.prototype.FontSizeIn = function()
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrIncreaseFontSize);
     this.WordControl.m_oLogicDocument.Paragraph_IncDecFontSize(true);
 };
 asc_docs_api.prototype.FontSizeOut = function()
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrDecreaseFontSize);
     this.WordControl.m_oLogicDocument.Paragraph_IncDecFontSize(false);
 };
 
@@ -2002,8 +2015,10 @@ asc_docs_api.prototype.put_PrAlign = function(value)
 // 0- baseline, 2-subscript, 1-superscript
 asc_docs_api.prototype.put_TextPrBaseline = function(value)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextPrBaseline);
-	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { VertAlign : value } ) );
+    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+        History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+        this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({VertAlign: value}));
+    }
 };
 /* 	Маркированный список Type = 0
 		нет         - SubType = -1
@@ -2322,16 +2337,20 @@ asc_docs_api.prototype.put_LineEndSize = function(_size)
 
 asc_docs_api.prototype.put_TextColor2 = function(r, g, b)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextColor2);
-	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Color : { r : r, g : g, b: b}  } ) );
+    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+        History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+        this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({Color: {r: r, g: g, b: b}}));
+    }
 };
 asc_docs_api.prototype.put_TextColor = function(color)
 {
-    var _unifill = new CUniFill();
-    _unifill.fill = new CSolidFill();
-    _unifill.fill.color = CorrectUniColor(color, _unifill.fill.color, 0);
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PutTextColor);
-    this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Unifill : _unifill } ) );
+    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+        History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+        var _unifill = new CUniFill();
+        _unifill.fill = new CSolidFill();
+        _unifill.fill.color = CorrectUniColor(color, _unifill.fill.color, 0);
+        this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({Unifill: _unifill}));
+    }
 };
 
 asc_docs_api.prototype.put_PrIndent = function(value,levelValue)
@@ -2458,8 +2477,10 @@ asc_docs_api.prototype.get_DocumentOrientation = function()
 
 asc_docs_api.prototype.put_AddPageBreak = function()
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_AddPageBreak);
-	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaNewLine( break_Page ) );
+    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+        History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+        this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaNewLine(break_Page));
+    }
 };
 asc_docs_api.prototype.Update_ParaInd = function( Ind ){
 	var FirstLine = 0;
@@ -3920,8 +3941,10 @@ asc_docs_api.prototype.asyncFontStartLoaded = function()
 asc_docs_api.prototype.asyncFontEndLoaded = function(fontinfo)
 {
     this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_EndFontLoad);
-	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { FontFamily : { Name : fontinfo.Name , Index : -1 } } ) );
+    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+        History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
+        this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({FontFamily: {Name: fontinfo.Name, Index: -1}}));
+    }
 	// отжать заморозку меню
 };
 

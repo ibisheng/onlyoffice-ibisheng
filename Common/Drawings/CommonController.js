@@ -1265,47 +1265,79 @@ DrawingObjectsController.prototype =
     },
 
     setCellFontName: function (fontName) {
-        var text_pr = new ParaTextPr({ FontFamily : { Name : fontName , Index : -1 } });
-        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr], false, historydescription_Spreadsheet_SetCellFontName);
+
+        var oThis = this;
+        var callBack = function()
+        {
+            oThis.paragraphAdd(new ParaTextPr({ FontFamily : { Name : fontName , Index : -1 } }));
+        };
+        this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_SetCellFontName);
 
     },
 
     setCellFontSize: function (fontSize) {
-        var text_pr = new ParaTextPr({ FontSize : fontSize});
-        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr], false, historydescription_Spreadsheet_SetCellFontSize);
+
+        var oThis = this;
+        var callBack = function()
+        {
+            oThis.paragraphAdd(new ParaTextPr({ FontSize : fontSize}));
+        };
+        this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_SetCellFontSize);
     },
 
     setCellBold: function (isBold) {
-        var text_pr = new ParaTextPr({ Bold : isBold});
-        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr], false, historydescription_Spreadsheet_SetCellBold);
+        var oThis = this;
+        var callBack = function()
+        {
+            oThis.paragraphAdd(new ParaTextPr({ Bold : isBold}));
+        };
+        this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_SetCellBold);
 
     },
 
     setCellItalic: function (isItalic) {
-
-        var text_pr = new ParaTextPr({ Italic : isItalic});
-        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr], false, historydescription_Spreadsheet_SetCellItalic);
+        var oThis = this;
+        var callBack = function()
+        {
+            oThis.paragraphAdd(new ParaTextPr({ Italic : isItalic}));
+        };
+        this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_SetCellItalic);
     },
 
     setCellUnderline: function (isUnderline) {
-        var text_pr = new ParaTextPr({ Underline : isUnderline});
-        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr], false, historydescription_Spreadsheet_SetCellUnderline);
+        var oThis = this;
+        var callBack = function()
+        {
+            oThis.paragraphAdd(new ParaTextPr({ Underline : isUnderline}));
+        };
+        this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_SetCellUnderline);
     },
 
     setCellStrikeout: function (isStrikeout) {
-        var text_pr = new ParaTextPr({ Strikeout : isStrikeout});
-        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr], false, historydescription_Spreadsheet_SetCellStrikeout);
+        var oThis = this;
+        var callBack = function()
+        {
+            oThis.paragraphAdd(new ParaTextPr({ Strikeout : isStrikeout}));
+        };
+        this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_SetCellStrikeout);
     },
 
     setCellSubscript: function (isSubscript) {
-        var text_pr = new ParaTextPr({ VertAlign : isSubscript ? vertalign_SubScript : vertalign_Baseline});
-        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr], false, historydescription_Spreadsheet_SetCellSubscript);
+        var oThis = this;
+        var callBack = function()
+        {
+            oThis.paragraphAdd(new ParaTextPr({ VertAlign : isSubscript ? vertalign_SubScript : vertalign_Baseline}));
+        };
+        this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_SetCellSubscript);
     },
 
     setCellSuperscript: function (isSuperscript) {
-
-        var text_pr = new ParaTextPr({ VertAlign : isSuperscript ? vertalign_SubScript : vertalign_Baseline});
-        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr], false, historydescription_Spreadsheet_SetCellSuperscript);
+        var oThis = this;
+        var callBack = function()
+        {
+            oThis.paragraphAdd(new ParaTextPr({ VertAlign : isSuperscript ? vertalign_SubScript : vertalign_Baseline}));
+        };
+        this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_SetCellSuperscript);
     },
 
     setCellAlign: function (align) {
@@ -1379,10 +1411,15 @@ DrawingObjectsController.prototype =
     },
 
     setCellTextColor: function (color) {
-        var unifill = new CUniFill();
-        unifill.setFill(new CSolidFill());
-        unifill.fill.setColor(CorrectUniColor(color, null));
-        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [new ParaTextPr({Unifill: unifill})], false, historydescription_Spreadsheet_SetCellTextColor);
+        var oThis = this;
+        var callBack = function()
+        {
+            var unifill = new CUniFill();
+            unifill.setFill(new CSolidFill());
+            unifill.fill.setColor(CorrectUniColor(color, null));
+            oThis.paragraphAdd(new ParaTextPr({Unifill: unifill}));
+        };
+        this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_SetCellTextColor);
     },
 
     setCellBackgroundColor: function (color)
@@ -4061,7 +4098,13 @@ DrawingObjectsController.prototype =
         {
             if(this.getTargetDocContent())
             {
-                this.checkSelectedObjectsAndCallback(this.paragraphAdd, [new ParaTab()], false, historydescription_Spreadsheet_AddTab)
+
+                var oThis = this;
+                var callBack = function()
+                {
+                    oThis.paragraphAdd(new ParaTab());
+                };
+                this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_AddTab)
             }
             else
             {
@@ -4166,8 +4209,14 @@ DrawingObjectsController.prototype =
                 //if(this.selection.textSelection || this.selection.groupSelection && this.selection.groupSelection.selection.textSelection
                 //    || this.selection.chartSelection && this.selection.chartSelection.selection.textSelection)
                 //{
-                    this.checkSelectedObjectsAndCallback(this.paragraphAdd, [new ParaSpace(1)], false, historydescription_Spreadsheet_AddSpace);
-                    this.recalculate();
+
+                var oThis = this;
+                var callBack = function()
+                {
+                    oThis.paragraphAdd(new ParaSpace(1));
+                };
+                this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_AddSpace);
+                this.recalculate();
                 //}
                // else
                // {
@@ -4399,17 +4448,22 @@ DrawingObjectsController.prototype =
         {
 
             var Item = null;
-            if ( true === ctrlKey && true === e.shiftKey )
+            var oThis = this;
+            var callBack = function()
             {
-                Item = new ParaText( String.fromCharCode( 0x2013 ) );
-                Item.SpaceAfter = false;
-            }
-            else if ( true === e.shiftKey )
-                Item = new ParaText( "_" );
-            else
-                Item = new ParaText( "-" );
-
-            this.checkSelectedObjectsAndCallback(this.paragraphAdd, [Item], false, historydescription_Spreadsheet_AddItem);
+                var Item = null;
+                if ( true === ctrlKey && true === e.shiftKey )
+                {
+                    Item = new ParaText( String.fromCharCode( 0x2013 ) );
+                    Item.SpaceAfter = false;
+                }
+                else if ( true === e.shiftKey )
+                    Item = new ParaText( "_" );
+                else
+                    Item = new ParaText( "-" );
+                oThis.paragraphAdd(Item);
+            };
+            this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_AddItem);
             this.recalculate();
             bRetValue = true;
         }
