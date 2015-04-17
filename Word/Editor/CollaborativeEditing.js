@@ -1118,7 +1118,7 @@ function CCollaborativeEditing()
     {
         if (true === oThis.m_bGlobalLock)
         {
-            if (false == editor.prototype.asc_CheckLongActionCallback(this.OnCallback_AskLock))
+            if (false == editor.asc_CheckLongActionCallback(this.OnCallback_AskLock, result))
                 return;
 
             // Снимаем глобальный лок
