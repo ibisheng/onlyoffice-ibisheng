@@ -5988,6 +5988,7 @@ asc_docs_api.prototype.asyncImagesDocumentStartLoaded = function()
 asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
 {
     this.ImageLoader.bIsLoadDocumentFirst = false;
+    var _bIsOldPaste = this.isPasteFonts_Images;
 
     if (null != this.WordControl.m_oDrawingDocument.m_oDocumentRenderer)
     {
@@ -6071,7 +6072,7 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
     }
     else if (this.EndActionLoadImages == 2)
     {
-        if (this.isPasteFonts_Images)
+        if (_bIsOldPaste)
             this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
         else
             this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
