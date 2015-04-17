@@ -291,16 +291,6 @@ CDegreeBase.prototype.GetSizeSubScript = function(oMeasure, Metric)
 };
 CDegreeBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 {
-    if(this.bOneLine)
-    {
-        this.pos.x = pos.x;
-
-        if(this.bInside === true)
-            this.pos.y = pos.y;
-        else
-            this.pos.y = pos.y - this.size.ascent;
-    }
-
     this.UpdatePosBound(pos, PRSA, Line, Range, Page);
 
     var CurLine = Line - this.StartLine;
@@ -309,19 +299,52 @@ CDegreeBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
     if(this.bOneLine || CurLine == 0 && CurRange == 0)
         pos.x += this.BrGapLeft;
 
-    this.baseContent.setPosition(pos, PRSA, Line, Range, Page);
+    if(this.bOneLine)
+    {
+        this.pos.x = pos.x;
 
-    pos.x += this.dW;
+        if(this.bInside === true)
+        {
+            this.pos.y = pos.y;
+        }
+        else
+        {
+            this.pos.y = pos.y - this.size.ascent;
+        }
 
-    var Y = pos.y;
+        var PosBase = new CMathPosition();
+        PosBase.y = this.pos.y;
+        PosBase.x = this.pos.x;
 
-    pos.y += this.upIter + this.iterContent.size.ascent;
+        if(this.baseContent.Type == para_Math_Content)
+            PosBase.y += this.size.ascent;
 
-    this.iterContent.setPosition(pos, PRSA, Line, Range, Page);
+        this.baseContent.setPosition(PosBase, PRSA, Line, Range, Page);
 
-    pos.x += this.BrGapRight;
+        var PosIter = new CMathPosition();
+        PosIter.x = this.pos.x + this.baseContent.size.width + this.dW;
+        PosIter.y = this.pos.y + this.size.ascent + this.upIter + this.iterContent.size.ascent;
 
-    pos.y = Y;
+        this.iterContent.setPosition(PosIter, PRSA, Line, Range, Page);
+
+        pos.x += this.size.width;
+    }
+    else
+    {
+        var Y = pos.y;
+
+        this.baseContent.setPosition(pos, PRSA, Line, Range, Page);
+
+        pos.x += this.dW;
+
+        pos.y += this.upIter + this.iterContent.size.ascent;
+
+        this.iterContent.setPosition(pos, PRSA, Line, Range, Page);
+
+        pos.x += this.BrGapRight;
+
+        pos.y = Y;
+    }
 };
 CDegreeBase.prototype.getIterator = function()
 {
@@ -441,7 +464,6 @@ CDegree.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
     {
         CMathBase.prototype.setPosition.call(this, pos, PRSA, Line, Range, Page);
     }
-
 };
 
 function CIterators(iterUp, iterDn)

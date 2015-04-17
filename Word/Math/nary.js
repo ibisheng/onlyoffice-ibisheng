@@ -486,6 +486,9 @@ CNary.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             else
             {
                 PRS.bMath_OneLine = true;
+                this.Base.Recalculate_Reset(PRS.Range, PRS.Line);
+                this.LowerIterator.Recalculate_Reset(PRS.Range, PRS.Line);
+                this.UpperIterator.Recalculate_Reset(PRS.Range, PRS.Line);
                 this.Base.Recalculate_Range(PRS, ParaPr, Depth);
             }
 
@@ -539,8 +542,8 @@ CNary.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 
             if(this.Base.IsJustDraw() == false)
             {
-                this.Content[0].Recalculate_Range_Width(PRSC, _CurLine, _CurRange);
-                this.Content[1].Recalculate_Range_Width(PRSC, _CurLine, _CurRange);
+                this.LowerIterator.Recalculate_Range_Width(PRSC, _CurLine, _CurRange);
+                this.UpperIterator.Recalculate_Range_Width(PRSC, _CurLine, _CurRange);
 
                 this.Base.Bounds.SetWidth(CurLine, this.Base.size.width);
             }
@@ -608,9 +611,8 @@ CNary.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRa
             else
             {
                 this.Base.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
-                this.Content[0].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
-                this.Content[1].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
-
+                this.LowerIterator.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
+                this.UpperIterator.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
 
                 this.Bounds.UpdateMetrics(CurLine, this.Base.size);
                 PRS.ContentMetrics.UpdateMetrics(this.Base.size);

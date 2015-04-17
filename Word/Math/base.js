@@ -1479,23 +1479,6 @@ CMathBase.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selectio
     }
 
 };
-/*CMathBase.prototype.IsContentSelect = function(SelectionStartPos, SelectionEndPos, _CurLine, _CurRange)
-{
-    var CurLine  = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-    var ContentSelect = true;
-
-    if(this.bOneLine == false)
-    {
-        var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-        var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-        ContentSelect = SelectionStartPos >= StartPos && SelectionEndPos <= EndPos;
-    }
-
-    return ContentSelect;
-};*/
 CMathBase.prototype.Selection_IsEmpty = function()
 {
     if (true !== this.Selection.Use)
@@ -1796,6 +1779,7 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     {
         var CurLine  = PRS.Line - this.StartLine;
         var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
+
 
         this.setDistance();
 

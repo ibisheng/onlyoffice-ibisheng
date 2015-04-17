@@ -130,6 +130,12 @@ function CMathPosition()
     this.x  = 0;
     this.y  = 0;
 }
+CMathPosition.prototype.Set = function(Pos)
+{
+    this.x = Pos.x;
+    this.y = Pos.y;
+};
+
 function AmperWidths()
 {
     this.bEven     = true; // является ли текущая точка нечетной
@@ -4291,6 +4297,16 @@ CMathContent.prototype.IsEndLine = function(Line)
     var LinesCount = this.protected_GetLinesCount();
 
     return CurLine == LinesCount - 1;
+};
+CMathContent.prototype.IsFirstMCompInContent = function(Class)
+{
+    var result = false;
+    if(this.Content[0].Type == para_Math_Run && this.Content[0].Is_Empty())
+    {
+        result = this.Content[1] == Class;
+    }
+
+    return result;
 };
 CMathContent.prototype.Get_SelectionDirection = function()
 {
