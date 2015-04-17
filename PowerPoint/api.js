@@ -156,6 +156,7 @@ function asc_docs_api(name)
 
     this.IsLongActionCurrent = 0;
     this.LongActionCallbacks = [];
+	this.LongActionCallbacksParams = [];
 	
 	this.TrackFile = null;
 	
@@ -1660,8 +1661,7 @@ asc_docs_api.prototype.sync_StartAction = function(type, id){
         this.IsLongActionCurrent++;
 };
 asc_docs_api.prototype.sync_EndAction = function(type, id){
-	//this.AsyncAction
-	this.asc_fireCallback("asc_onEndAction", type, id);
+    this.asc_fireCallback("asc_onEndAction", type, id);
 
     if (c_oAscAsyncActionType.BlockInteraction == type)
     {
@@ -1672,9 +1672,10 @@ asc_docs_api.prototype.sync_EndAction = function(type, id){
             var _length = this.LongActionCallbacks.length;
             for (var i = 0; i < _length; i++)
             {
-                this.LongActionCallbacks[i]();
+                this.LongActionCallbacks[i](this.LongActionCallbacksParams[i]);
             }
             this.LongActionCallbacks.splice(0, _length);
+            this.LongActionCallbacksParams.splice(0, _length);
         }
     }
 };
@@ -1683,11 +1684,12 @@ asc_docs_api.prototype.asc_IsLongAction = function()
 {
     return (0 == this.IsLongActionCurrent) ? false : true;
 };
-asc_docs_api.prototype.asc_CheckLongActionCallback = function(_callback)
+asc_docs_api.prototype.asc_CheckLongActionCallback = function(_callback, _param)
 {
     if (this.asc_IsLongAction())
     {
         this.LongActionCallbacks[this.LongActionCallbacks.length] = _callback;
+        this.LongActionCallbacksParams[this.LongActionCallbacksParams.length] = _param;
         return false;
     }
     else
