@@ -229,6 +229,8 @@ function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent)
     var _new_parent = isRealObject(newParent) ? newParent : paragraph.Parent;
 
     var new_paragraph = new Paragraph(_drawing_document, _new_parent, 0, 0, 0, 0, 0, true);
+    if(!(paragraph instanceof Paragraph))
+        return new_paragraph;
     var oCopyPr = paragraph.Pr.Copy();
 
     oCopyPr.ContextualSpacing = undefined;
@@ -468,11 +470,15 @@ CShape.prototype =
             new_content.Internal_Content_RemoveAll();
             var paragraphs = this.textBoxContent.Content;
 
+            var index = 0;
             for(var i = 0; i < paragraphs.length; ++i)
             {
                 var cur_par = paragraphs[i];
-                var new_paragraph = ConvertParagraphToPPTX(cur_par, drawingDocument, new_content);
-                new_content.Internal_Content_Add( i, new_paragraph, false );
+                if(cur_par instanceof Paragraph)
+                {
+                    var new_paragraph = ConvertParagraphToPPTX(cur_par, drawingDocument, new_content);
+                    new_content.Internal_Content_Add( index++, new_paragraph, false );
+                }
             }
             tx_body.setContent(new_content);
             c.setTxBody(tx_body);

@@ -4812,10 +4812,15 @@ PasteProcessor.prototype =
 			{
 				var cDocumentContent = table.Content[i].Content[j].Content;
 				cDocumentContent.bPresentation = true;
-				
+				var nIndex = 0;
 				for(var n = 0; n < cDocumentContent.Content.length; n++)
 				{
-					cDocumentContent.Content[n] = ConvertParagraphToPPTX(cDocumentContent.Content[n]);
+                    if(cDocumentContent.Content[n] instanceof Paragraph)
+                    {
+                        cDocumentContent.Content[nIndex] = ConvertParagraphToPPTX(cDocumentContent.Content[nIndex]);
+                        ++nIndex;
+                    }
+
 				}
 			}
 		}
