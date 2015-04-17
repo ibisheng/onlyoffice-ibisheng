@@ -10527,6 +10527,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
+                    this.Create_NewHistoryPoint(historydescription_Document_SetTextHighlight2);
                     var ParaItem = null;
                     if ( this.HighlightColor != highlight_None )
                     {
@@ -10540,7 +10541,6 @@ CDocument.prototype =
                     else
                         ParaItem = new ParaTextPr( { HighLight : this.HighlightColor } );
 
-                    this.Create_NewHistoryPoint(historydescription_Document_SetTextHighlight2);
                     this.Paragraph_Add( ParaItem );
                     this.Cursor_MoveAt(X, Y, false);
                     this.Document_UpdateSelectionState();
