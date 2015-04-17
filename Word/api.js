@@ -438,7 +438,9 @@ function asc_docs_api(name)
 	else
 		this.chartPreviewManager = null;
 	
-    this.IsLongActionCurrent = false;
+    this.IsLongActionCurrent = 0;
+    this.LongActionCallbacks = [];
+
     this.ParcedDocument = false;
 	this.isStartCoAuthoringOnEndLoad = false;	// Подсоединились раньше, чем документ загрузился
 	
@@ -2598,7 +2600,7 @@ asc_docs_api.prototype.sync_StartAction = function(type, id){
 	//console.log("asc_onStartAction: type = " + type + " id = " + id);
 
     if (c_oAscAsyncActionType.BlockInteraction == type)
-        this.IsLongActionCurrent = true;
+        this.IsLongActionCurrent++;
 };
 asc_docs_api.prototype.sync_EndAction = function(type, id){
 	//this.AsyncAction
@@ -2606,8 +2608,39 @@ asc_docs_api.prototype.sync_EndAction = function(type, id){
 	//console.log("asc_onEndAction: type = " + type + " id = " + id);
 
     if (c_oAscAsyncActionType.BlockInteraction == type)
-        this.IsLongActionCurrent = false;
+    {
+        this.IsLongActionCurrent--;
+
+        if (0 == this.asc_IsLongAction())
+        {
+            var _length = this.LongActionCallbacks.length;
+            for (var i = 0; i < _length; i++)
+            {
+                this.LongActionCallbacks[i]();
+            }
+            this.LongActionCallbacks.splice(0, _length);
+        }
+    }
 };
+
+asc_docs_api.prototype.asc_IsLongAction = function()
+{
+    return (0 == this.IsLongActionCurrent) ? false : true;
+};
+asc_docs_api.prototype.asc_CheckLongActionCallback = function(_callback)
+{
+    if (this.asc_IsLongAction())
+    {
+        this.LongActionCallbacks[this.LongActionCallbacks.length] = _callback;
+        return false;
+    }
+    else
+    {
+        _callback();
+        return true;
+    }
+};
+
 asc_docs_api.prototype.sync_AddURLCallback = function(){
 	this.asc_fireCallback("asc_onAddURL");
 };
@@ -5952,23 +5985,23 @@ asc_docs_api.prototype.asyncImagesDocumentStartLoaded = function()
 };
 asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
 {
-    if (this.EndActionLoadImages == 1)
-    {
-        this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentImages);
-    }
-    else if (this.EndActionLoadImages == 2)
-    {
-        if (this.isPasteFonts_Images)
-            this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-        else
-            this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
-    }
-
-    this.EndActionLoadImages = 0;
     this.ImageLoader.bIsLoadDocumentFirst = false;
 
     if (null != this.WordControl.m_oDrawingDocument.m_oDocumentRenderer)
     {
+        if (this.EndActionLoadImages == 1)
+        {
+            this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentImages);
+        }
+        else if (this.EndActionLoadImages == 2)
+        {
+            if (this.isPasteFonts_Images)
+                this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+            else
+                this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+        }
+        this.EndActionLoadImages = 0;
+
         this.WordControl.m_oDrawingDocument.OpenDocument();
 
         this.LoadedObject = null;
@@ -6029,6 +6062,19 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
                 this.SyncLoadImages_callback();
         }
     }
+
+    if (this.EndActionLoadImages == 1)
+    {
+        this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentImages);
+    }
+    else if (this.EndActionLoadImages == 2)
+    {
+        if (this.isPasteFonts_Images)
+            this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+        else
+            this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+    }
+    this.EndActionLoadImages = 0;
 };
 
 asc_docs_api.prototype.OpenDocumentEndCallback = function()
@@ -6705,7 +6751,6 @@ asc_docs_api.prototype.OnHandleMessage = function(event)
             {
                 if(PostMessageType.UploadImage == data["type"])
                 {
-                    editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
                     if(c_oAscServerError.NoError == data["error"])
 					{
 						var urls = data["urls"];
@@ -6714,6 +6759,8 @@ asc_docs_api.prototype.OnHandleMessage = function(event)
 					}
                     else
                         this.sync_ErrorCallback(_mapAscServerErrorToAscError(data["error"]), c_oAscError.Level.NoCritical);
+
+                    editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
                 }
             }
         }

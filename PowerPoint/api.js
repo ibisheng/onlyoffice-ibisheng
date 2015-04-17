@@ -154,7 +154,8 @@ function asc_docs_api(name)
     //выставляем тип copypaste
     g_bIsDocumentCopyPaste = false;
 
-    this.IsLongIteration = false;
+    this.IsLongActionCurrent = 0;
+    this.LongActionCallbacks = [];
 	
 	this.TrackFile = null;
 	
@@ -1655,17 +1656,47 @@ asc_docs_api.prototype.sync_StartAction = function(type, id){
 	//this.AsyncAction
 	this.asc_fireCallback("asc_onStartAction", type, id);
 
-    // по идее нужен счетчик, но перед выпуском делаем верняк
     if (c_oAscAsyncActionType.BlockInteraction == type)
-        this.IsLongIteration = true;
+        this.IsLongActionCurrent++;
 };
 asc_docs_api.prototype.sync_EndAction = function(type, id){
 	//this.AsyncAction
 	this.asc_fireCallback("asc_onEndAction", type, id);
 
     if (c_oAscAsyncActionType.BlockInteraction == type)
-        this.IsLongIteration = false;
+    {
+        this.IsLongActionCurrent--;
+
+        if (0 == this.asc_IsLongAction())
+        {
+            var _length = this.LongActionCallbacks.length;
+            for (var i = 0; i < _length; i++)
+            {
+                this.LongActionCallbacks[i]();
+            }
+            this.LongActionCallbacks.splice(0, _length);
+        }
+    }
 };
+
+asc_docs_api.prototype.asc_IsLongAction = function()
+{
+    return (0 == this.IsLongActionCurrent) ? false : true;
+};
+asc_docs_api.prototype.asc_CheckLongActionCallback = function(_callback)
+{
+    if (this.asc_IsLongAction())
+    {
+        this.LongActionCallbacks[this.LongActionCallbacks.length] = _callback;
+        return false;
+    }
+    else
+    {
+        _callback();
+        return true;
+    }
+};
+
 asc_docs_api.prototype.sync_AddURLCallback = function(){
 	this.asc_fireCallback("asc_onAddURL");
 };
@@ -3630,7 +3661,7 @@ asc_docs_api.prototype.asyncFontsDocumentStartLoaded = function()
 	// здесь прокинуть евент о заморозке меню
 	// и нужно вывести информацию в статус бар
     if (this.isPasteFonts_Images)
-        this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
+        this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadFont);
     else
     {
         this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentFonts);
@@ -3661,7 +3692,7 @@ asc_docs_api.prototype.asyncFontsDocumentEndLoaded = function()
 {
     // все, шрифты загружены. Теперь нужно подгрузить картинки
     if (this.isPasteFonts_Images)
-        this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
+        this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadFont);
     else
         this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentFonts);
 
@@ -3675,7 +3706,7 @@ asc_docs_api.prototype.asyncFontsDocumentEndLoaded = function()
         if (_count > 0)
         {
             this.EndActionLoadImages = 2;
-            this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+            this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
         }
 
         this.ImageLoader.LoadDocumentImages(this.pasteImageMap, false);
@@ -3737,18 +3768,9 @@ asc_docs_api.prototype.asyncImagesDocumentStartLoaded = function()
 };
 asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
 {
-    if (this.EndActionLoadImages == 1)
-    {
-        this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentImages);
-    }
-    else if (this.EndActionLoadImages == 2)
-    {
-        this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
-    }
-
-    this.EndActionLoadImages = 0;
     this.ImageLoader.bIsLoadDocumentFirst = false;
 
+    var _bIsOldPaste = this.isPasteFonts_Images;
     // размораживаем меню... и начинаем считать документ
     if (this.isPasteFonts_Images)
     {
@@ -3774,6 +3796,20 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
 
         this.asyncServerIdStartLoaded();
     }
+
+    if (this.EndActionLoadImages == 1)
+    {
+        this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentImages);
+    }
+    else if (this.EndActionLoadImages == 2)
+    {
+        if (_bIsOldPaste)
+            this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+        else
+            this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+    }
+
+    this.EndActionLoadImages = 0;
 };
 
 asc_docs_api.prototype.asc_getComments = function()
@@ -4640,7 +4676,6 @@ asc_docs_api.prototype.OnHandleMessage = function(event)
 		{
 			if(PostMessageType.UploadImage == data["type"])
 			{
-				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 				if(c_oAscServerError.NoError == data["error"])
 				{
 					var urls = data["urls"];
@@ -4649,6 +4684,8 @@ asc_docs_api.prototype.OnHandleMessage = function(event)
 				}
 				else
 					this.sync_ErrorCallback(_mapAscServerErrorToAscError(data["error"]), c_oAscError.Level.NoCritical);
+
+                editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 			}
 		}
 	}
@@ -4673,8 +4710,6 @@ asc_docs_api.prototype.StartLoadTheme = function()
 };
 asc_docs_api.prototype.EndLoadTheme = function(theme_load_info)
 {
-    this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadTheme);
-
     CollaborativeEditing.m_bGlobalLock = false;
 
     // применение темы
@@ -4683,6 +4718,8 @@ asc_docs_api.prototype.EndLoadTheme = function(theme_load_info)
     this.WordControl.ThemeGenerateThumbnails(theme_load_info.Master);
     // меняем шаблоны в меню
     this.WordControl.CheckLayouts();
+
+    this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadTheme);
 };
 
 asc_docs_api.prototype.ChangeLayout = function(layout_index)

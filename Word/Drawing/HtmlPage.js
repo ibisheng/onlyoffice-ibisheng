@@ -2273,7 +2273,7 @@ function CEditorPage(api)
 
     this.onKeyDown = function(e)
     {
-        if (oThis.m_oApi.IsLongActionCurrent)
+        if (oThis.m_oApi.asc_IsLongAction())
         {
             e.preventDefault();
             return;
@@ -2411,7 +2411,7 @@ function CEditorPage(api)
 
     this.onKeyDownTBIM = function(e)
     {
-        if (oThis.m_oApi.IsLongActionCurrent)
+        if (oThis.m_oApi.asc_IsLongAction())
         {
             e.preventDefault();
             return;
@@ -2517,7 +2517,7 @@ function CEditorPage(api)
     }
     this.onKeyPress = function(e)
     {
-        if (oThis.m_oApi.IsLongActionCurrent)
+        if (oThis.m_oApi.asc_IsLongAction())
         {
             e.preventDefault();
             return;
