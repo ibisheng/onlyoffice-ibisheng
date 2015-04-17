@@ -1667,7 +1667,7 @@ asc_docs_api.prototype.sync_EndAction = function(type, id){
     {
         this.IsLongActionCurrent--;
 
-        if (0 == this.asc_IsLongAction())
+        if (!this.asc_IsLongAction())
         {
             var _length = this.LongActionCallbacks.length;
             for (var i = 0; i < _length; i++)
@@ -1692,7 +1692,6 @@ asc_docs_api.prototype.asc_CheckLongActionCallback = function(_callback)
     }
     else
     {
-        _callback();
         return true;
     }
 };
