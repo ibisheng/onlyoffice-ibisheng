@@ -247,6 +247,11 @@
 			this.onRecalcLocks(e);
 	};
 
+	function LockBufferElement (arrayBlockId, callback) {
+		this._arrayBlockId = arrayBlockId;
+		this._callback = callback;
+	}
+
     function DocsCoApi (options) {
 		if (options) {
 			this.onAuthParticipantsChanged = options.onAuthParticipantsChanged;
@@ -324,6 +329,7 @@
 		this._documentFormatSave = 0;
 		this._isViewer = false;
 		this._isReSaveAfterAuth = false;	// Флаг для сохранения после повторной авторизации (для разрыва соединения во время сохранения)
+		this._lockBuffer = [];
     }
 	
 	DocsCoApi.prototype.isRightURL = function () {
@@ -354,7 +360,22 @@
         return this._locks;
     };
 
+	DocsCoApi.prototype._sendBufferedLocks = function () {
+		var elem;
+		for (var i = 0, length = this._lockBuffer.length; i < length; ++i) {
+			elem = this._lockBuffer[i];
+			this.askLock(elem._arrayBlockId, elem._callback);
+		}
+		this._lockBuffer = [];
+	};
+
     DocsCoApi.prototype.askLock = function (arrayBlockId, callback) {
+		if (ConnectionState.SaveChanges === this._state) {
+			// Мы в режиме сохранения. Lock-и запросим после окончания.
+			this._lockBuffer.push(new LockBufferElement(arrayBlockId, callback));
+			return;
+		}
+
 		// ask all elements in array
 		var i = 0;
 		var lengthArray = (arrayBlockId) ? arrayBlockId.length : 0;
@@ -410,7 +431,7 @@
 			clearTimeout(this.saveLockCallbackErrorTimeOutId);
 
 		// Проверим состояние, если мы не подсоединились, то сразу отправим ошибку
-		if (ConnectionState.Reconnect === this.get_state()) {
+		if (ConnectionState.Reconnect === this._state) {
 			this.saveLockCallbackErrorTimeOutId = window.setTimeout(function () {
 				if (callback && _.isFunction(callback)) {
 					// Фиктивные вызовы
@@ -534,12 +555,10 @@
 
     DocsCoApi.prototype._send = function (data) {
         if (data !== null && typeof data === "object") {
-            if (this._state > 0) {
+            if (this._state > 0)
                 this.sockjs.send(JSON.stringify(data));
-            }
-            else {
+            else
                 this._msgBuffer.push(data);
-            }
         }
     };
 
@@ -680,6 +699,9 @@
 
 		// Возвращаем состояние
 		this._state = ConnectionState.Authorized;
+
+		// Делаем отложенные lock-и
+		this._sendBufferedLocks();
 
 		if (-1 !== data['index'])
 			this.changesIndex = data['index'];
