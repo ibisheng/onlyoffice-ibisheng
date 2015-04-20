@@ -574,6 +574,11 @@ asc_docs_api.prototype.SetDocumentModified = function(bValue)
 {
     this.isDocumentModify = bValue;
     this.asc_fireCallback("asc_onDocumentModifiedChanged");
+
+    if (undefined !== window["AscDesktopEditor"])
+    {
+        window["AscDesktopEditor"]["onDocumentModifiedChanged"](bValue);
+    }
 };
 
 asc_docs_api.prototype.isDocumentModified = function()
