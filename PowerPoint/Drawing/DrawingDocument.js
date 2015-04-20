@@ -1210,7 +1210,7 @@ function CDrawingDocument()
     this.isComleteRenderer2 = function()
     {
         var start = Math.max(this.m_lCurrentRendererPage, 0);
-        var end = Math.min(start + 50, this.SlidesCount - 1);
+        var end = this.SlidesCount - 1;
 
         if ((end + 1) >= this.SlidesCount)
             return true;
@@ -1232,7 +1232,7 @@ function CDrawingDocument()
         }
 
         var start = this.m_lCurrentRendererPage;
-        var end = Math.min(this.m_lCurrentRendererPage + 50, pagescount - 1);
+        var end = pagescount - 1;
 
         var renderer = this.m_oDocRenderer;
         renderer.Memory.Seek(0);

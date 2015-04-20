@@ -5105,10 +5105,6 @@ function sendCommand(editor, fCallback, rdata){
 						
                     setTimeout( function(){sendCommand(editor, fCallback, rData)}, 3000);
                 break;
-				case "savepart":
-					var outputData = JSON.parse(incomeObject["data"]);
-                    _downloadAs(editor, outputData["format"], fCallback, false, outputData["savekey"]);
-                break;
 				case "getsettings":
 					if(fCallback)
 						fCallback(incomeObject);
@@ -5192,34 +5188,15 @@ function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)
 	oAdditionalData["userid"] = documentUserId;
 	oAdditionalData["vkey"] = documentVKey;
 	oAdditionalData["outputformat"] = filetype;
-	if(null != sSaveKey)
-		oAdditionalData["savekey"] = sSaveKey;
+	oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 	if(c_oAscFileType.PDF == filetype)
 	{
 		var dd = editor.WordControl.m_oDrawingDocument;
-		if(dd.isComleteRenderer2())
-		{
-			if(false == bStart)
-				oAdditionalData["savetype"] = c_oAscSaveTypes.Complete;
-			else
-				oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
-		}
-		else
-		{
-			if(false == bStart)
-				oAdditionalData["savetype"] = c_oAscSaveTypes.Part;
-			else
-				oAdditionalData["savetype"] = c_oAscSaveTypes.PartStart;
-		}
 		oAdditionalData["data"] = dd.ToRendererPart();
-		sendCommand(editor, fCallback, oAdditionalData);
 	}
 	else
-	{
-		oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 		oAdditionalData["data"] = editor.WordControl.SaveDocument();
-		sendCommand(editor, fCallback, oAdditionalData);
-	}
+	g_fSaveWithParts(function(fCallback1, oAdditionalData1){sendCommand(editor, fCallback1, oAdditionalData1);}, fCallback, oAdditionalData);
 }
 
 function _getFullImageSrc(src)

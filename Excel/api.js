@@ -36,8 +36,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.handlers = new asc.asc_CHandlersList(eventsHandlers);
 			// Вид печати
 			this.adjustPrint = null;
-			// Рассчитанные данные для печати
-			this.printPagesData = null;
 
 			this.isMobileVersion = false;
 
@@ -897,10 +895,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 								setTimeout(function(){oThis._asc_sendCommand(callback, rData);}, 3000);
 								break;
-							case "savepart":
-								var outputData = JSON.parse(incomeObject["data"]);
-								oThis._asc_downloadAs(outputData["format"], callback, false, null, outputData["savekey"]);
-								break;
 							case "getsettings":
 								if(callback)
 									callback(incomeObject);
@@ -1048,15 +1042,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			oAdditionalData["userid"] = this.documentUserId;
 			oAdditionalData["vkey"] = this.documentVKey;
 			oAdditionalData["outputformat"] = 0x1002;
-			var data;
 			this.wb._initCommentsToSave();
 			var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
 			oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
-			data = oBinaryFileWriter.Write();
-
-			oAdditionalData["data"] = data;
+			oAdditionalData["data"] = oBinaryFileWriter.Write();
 			var t = this;
-			this._asc_sendCommand (function (incomeObject) {
+			g_fSaveWithParts(function(fCallback1, oAdditionalData1){t._asc_sendCommand(fCallback1, oAdditionalData1);}, function (incomeObject) {
 				if(null != incomeObject && "save" == incomeObject["type"])
 					t.asc_processSavedFile(incomeObject["data"], false);
 			}, oAdditionalData);
@@ -1081,13 +1072,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			oAdditionalData["innersave"] = true;
 			oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 			oAdditionalData["data"] = data;
-			this._asc_sendCommand (/*callback*/ function(incomeObject){
+			g_fSaveWithParts(function(fCallback1, oAdditionalData1){that._asc_sendCommand(fCallback1, oAdditionalData1);}, /*callback*/ function(incomeObject){
 				if(null != incomeObject && "save" == incomeObject["type"])
 					that.asc_processSavedFile(incomeObject["data"], true);
 			}, oAdditionalData);
 		};
 
-		spreadsheet_api.prototype._asc_downloadAs = function (sFormat, fCallback, bStart, options, sSaveKey) { //fCallback({returnCode:"", ...})
+		spreadsheet_api.prototype._asc_downloadAs = function (sFormat, fCallback, bStart, options) { //fCallback({returnCode:"", ...})
 			//sFormat: xlsx, xls, ods, csv, html
 			var oAdditionalData = {};
 			oAdditionalData["c"] = "save";
@@ -1095,42 +1086,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			oAdditionalData["userid"] = this.documentUserId;
 			oAdditionalData["vkey"] = this.documentVKey;
 			oAdditionalData["outputformat"] = sFormat;
-			if(null != sSaveKey)
-				oAdditionalData["savekey"] = sSaveKey;
-			var data;
 			if(c_oAscFileType.PDF === sFormat)
 			{
-				if (null === this.printPagesData) {
-					// Рассчитываем данные о страницах
-					this.printPagesData = this.wb.calcPagesPrint(this.adjustPrint);
-				}
-
+				var printPagesData = this.wb.calcPagesPrint(this.adjustPrint);
 				var pdf_writer = new CPdfPrinter(this.wbModel.sUrlPath);
-				var isEndPrint = this.wb.printSheet(pdf_writer, this.printPagesData);
+				var isEndPrint = this.wb.printSheet(pdf_writer, printPagesData);
 
-				data = pdf_writer.DocumentRenderer.Memory.GetBase64Memory();
-
-				if (isEndPrint) {
-					// Закончили печатить
-					if (bStart) {
-						// Первый раз отправляем данные
-						oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
-					} else {
-						// Не в первый раз отправляем данные
-						oAdditionalData["savetype"] = c_oAscSaveTypes.Complete;
-					}
-					// Очищаем данные о печати
-					this.printPagesData = null;
-				} else {
-					// Продолжаем печать
-					if (bStart) {
-						// Первый раз отправляем данные
-						oAdditionalData["savetype"] = c_oAscSaveTypes.PartStart;
-					} else {
-						// Не в первый раз отправляем данные
-						oAdditionalData["savetype"] = c_oAscSaveTypes.Part;
-					}
-				}
+				oAdditionalData["data"] = pdf_writer.DocumentRenderer.Memory.GetBase64Memory();
+				oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 			} else if (c_oAscFileType.CSV === sFormat && !options) {
 				// Мы открывали команду, надо ее закрыть.
 				this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
@@ -1151,15 +1114,15 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						oAdditionalData["delimiter"] = options.asc_getDelimiter();
 					}
 				}
-				data = oBinaryFileWriter.Write();
+				oAdditionalData["data"] = oBinaryFileWriter.Write();
 
 				if (undefined != window['appBridge']) {
-					window['appBridge']['dummyCommandSave_CSV'] (data);
+					window['appBridge']['dummyCommandSave_CSV'] (oAdditionalData["data"]);
 					return;
 				}
 			}
-			oAdditionalData["data"] = data;
-			this._asc_sendCommand (fCallback, oAdditionalData);
+			var t = this;
+			g_fSaveWithParts(function(fCallback1, oAdditionalData1){t._asc_sendCommand(fCallback1, oAdditionalData1);}, fCallback, oAdditionalData);
 		};
 
 
@@ -3304,10 +3267,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						oAdditionalData["outputformat"] = c_oAscFileType.PDF;
 
 						t.adjustPrint = new asc_CAdjustPrint();
-						t.printPagesData = t.wb.calcPagesPrint(t.adjustPrint);
+						var printPagesData = t.wb.calcPagesPrint(t.adjustPrint);
 
 						var pdf_writer = new CPdfPrinter(t.wbModel.sUrlPath);
-						t.wb.printSheet(pdf_writer, t.printPagesData);
+						t.wb.printSheet(pdf_writer, printPagesData);
 
 						return pdf_writer.DocumentRenderer.Memory.GetBase64Memory();
 					};
@@ -3351,8 +3314,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						var oBinaryFileWriter = new Asc.BinaryFileWriter(t.wbModel);
 						oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 
-						var data = oBinaryFileWriter.Write();
-						return data;
+						return oBinaryFileWriter.Write();
 					}
 				}
 

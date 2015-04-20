@@ -7,6 +7,38 @@ var g_sSpellCheckServiceLocalUrl = "/SpellChecker.ashx";
 var g_sTrackingServiceLocalUrl = "/TrackingService.ashx";
 var g_nMaxJsonLength = 2097152;
 var g_nMaxJsonLengthChecked = g_nMaxJsonLength / 1000;
+var g_nMaxRequestLength = 1048576;//<requestLimits maxAllowedContentLength="30000000" /> default 30mb
+
+function g_fSaveWithParts(fSendCommand, fCallback, oAdditionalData, aParts) {
+	if(null == aParts){
+		var nDataLength = oAdditionalData["data"].length;
+		aParts = [];
+		if(nDataLength > g_nMaxRequestLength){
+			for(var i = 0; i < Math.ceil(nDataLength / g_nMaxRequestLength); ++i)
+				aParts.push(oAdditionalData["data"].substring(i * g_nMaxRequestLength, (i + 1) * g_nMaxRequestLength));
+			oAdditionalData["data"] = aParts.shift();
+			oAdditionalData["savetype"] = c_oAscSaveTypes.PartStart;
+		}
+		else
+			oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
+	}
+	else{
+		oAdditionalData["data"] = aParts.shift();
+		if(aParts.length > 0)
+			oAdditionalData["savetype"] = c_oAscSaveTypes.Part;
+		else
+			oAdditionalData["savetype"] = c_oAscSaveTypes.Complete;
+	}
+	fSendCommand(function (incomeObject) {
+		if(null != incomeObject && "savepart" == incomeObject["type"]){
+			var outputData = JSON.parse(incomeObject["data"]);
+			oAdditionalData["savekey"] = outputData["savekey"];
+			g_fSaveWithParts(fSendCommand, fCallback, oAdditionalData, aParts);
+		}
+		else
+			fCallback(incomeObject);
+	}, oAdditionalData);
+};
 
 function fSortAscending( a, b ) {
     return a - b;

@@ -1955,10 +1955,9 @@
 				ws.drawForPrint(pdf_writer, null);
 				isEndPrint = true;
 			} else {
-				var currentIndex = printPagesData.currentIndex;
 				var indexWorksheet = -1;
 				var indexWorksheetTmp = -1;
-				for (var i = currentIndex; i < printPagesData.arrPages.length && i < currentIndex + printPagesData.c_maxPagesCount; ++i) {
+				for (var i = 0; i < printPagesData.arrPages.length; ++i) {
 					indexWorksheetTmp = printPagesData.arrPages[i].indexWorksheet;
 					if (indexWorksheetTmp !== indexWorksheet) {
 						ws = this.getWorksheet(indexWorksheetTmp);
@@ -1967,7 +1966,6 @@
 					ws.drawForPrint(pdf_writer, printPagesData.arrPages[i]);
 				}
 				isEndPrint = (i === printPagesData.arrPages.length);
-				printPagesData.currentIndex = i;
 			}
 
 			return isEndPrint;

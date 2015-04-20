@@ -2138,7 +2138,7 @@ function CDrawingDocument()
     {
         var pagescount = Math.min(this.m_lPagesCount, this.m_lCountCalculatePages);
         var start = Math.max(this.m_lCurrentRendererPage, 0);
-        var end = Math.min(start + 50, pagescount - 1);
+        var end = pagescount - 1;
 
         if ((end + 1) >= pagescount)
             return true;
@@ -2159,7 +2159,7 @@ function CDrawingDocument()
         }
 
         var start = this.m_lCurrentRendererPage;
-        var end = Math.min(this.m_lCurrentRendererPage + 50, pagescount - 1);
+        var end = pagescount - 1;
 
         var renderer = this.m_oDocRenderer;
         renderer.Memory.Seek(0);

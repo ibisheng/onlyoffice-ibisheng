@@ -2204,7 +2204,7 @@ asc_docs_api.prototype.asc_Print = function()
 					else
 						editor.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 				}
-				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);}, true);
+				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);});
 	}
 };
 asc_docs_api.prototype.Undo = function()
@@ -2366,7 +2366,7 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile) {//передаем �
 				t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 		}
 		t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
-	}, true);
+	});
 };
 asc_docs_api.prototype.asc_DownloadAsMailMerge = function(typeFile, StartIndex, EndIndex, bIsDownload) {
 	var oDocumentMailMerge = this.WordControl.m_oLogicDocument.Get_MailMergedDocument(StartIndex, EndIndex);
@@ -2389,7 +2389,7 @@ asc_docs_api.prototype.asc_DownloadAsMailMerge = function(typeFile, StartIndex, 
 				else
 					t.asc_fireCallback("asc_onError", c_oAscError.ID.MailMergeSaveFile, c_oAscError.Level.NoCritical);
 			}
-		}, true);
+		});
 	}
 	return null != oDocumentMailMerge ? true : false;
 };
@@ -7011,10 +7011,6 @@ function sendCommand(editor, fCallback, rdata){
                     setTimeout( function(){sendCommand(editor, fCallback, rData)}, 3000);
 				}
                 break;
-				case "savepart":
-					var outputData = JSON.parse(incomeObject["data"]);
-                    _downloadAs(editor, null, outputData["format"], fCallback, false, outputData["savekey"]);
-                break;
 				case "getsettings":
 					if(fCallback)
                         fCallback(incomeObject);
@@ -7088,25 +7084,18 @@ function _onOpenCommand(fCallback, incomeObject) {
 		}
 	});
 }
-function _downloadAs(editor, oDocumentMailMerge, filetype, fCallback, bStart, sSaveKey) {
+function _downloadAs(editor, oDocumentMailMerge, filetype, fCallback) {
 	var oAdditionalData = {};
     oAdditionalData["c"] = "save";
     oAdditionalData["id"] = documentId;
     oAdditionalData["userid"] = documentUserId;
     oAdditionalData["vkey"] = documentVKey;
     oAdditionalData["outputformat"] = filetype;
-	if (null != sSaveKey)
-		oAdditionalData["savekey"] = sSaveKey;
+	oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 	if (null == oDocumentMailMerge &&  c_oAscFileType.PDF === filetype) {
 		var dd = editor.WordControl.m_oDrawingDocument;
-		if (dd.isComleteRenderer2()) {
-			oAdditionalData["savetype"] = bStart ? c_oAscSaveTypes.CompleteAll : c_oAscSaveTypes.Complete;
-		} else {
-			oAdditionalData["savetype"] = bStart ? c_oAscSaveTypes.PartStart : c_oAscSaveTypes.Part;
-		}
 		oAdditionalData["data"] = dd.ToRendererPart();
 	} else if (c_oAscFileType.JSON === filetype) {
-		oAdditionalData['savetype'] = c_oAscSaveTypes.CompleteAll;
 		oAdditionalData['url'] = editor.mailMergeFileData['url'];
 		oAdditionalData['format'] = editor.mailMergeFileData['fileType'];
 		// ToDo select csv params
@@ -7119,10 +7108,9 @@ function _downloadAs(editor, oDocumentMailMerge, filetype, fCallback, bStart, sS
 		else
 			oLogicDocument = editor.WordControl.m_oLogicDocument;
 		var oBinaryFileWriter = new BinaryFileWriter(oLogicDocument);
-		oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 		oAdditionalData["data"] = oBinaryFileWriter.Write();
 	}
-	sendCommand(editor, fCallback, oAdditionalData);
+	g_fSaveWithParts(function(fCallback1, oAdditionalData1){sendCommand(editor, fCallback1, oAdditionalData1);}, fCallback, oAdditionalData);
 }
 
 function _addImageUrl2 (url)
