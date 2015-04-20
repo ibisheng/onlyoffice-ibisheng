@@ -7054,6 +7054,9 @@
 				if (true === isSuccess)
 					oTmpRange.promoteFromTo(from, to);
 
+				t.expandColsOnScroll(false, true, to.c2 + 1);
+				t.expandRowsOnScroll(false, true, to.r2 + 1);
+
 				// Сбрасываем параметры
 				t._updateCellsRange(to, /*canChangeColWidth*/c_oAscCanChangeColWidth.none, /*lockDraw*/true);
 				if (c_oAscFormatPainterState.kMultiple !== t.stateFormatPainter)
