@@ -1875,15 +1875,6 @@ CMathBase.prototype.Update_WordLen = function(PRS, WordLen)
     {
         PRS.WordLen = WordLen + this.size.width;
 
-        /*
-        if(true !== PRS.Word)
-        {
-            PRS.WordLen = this.size.width;
-        }
-        else
-        {
-            PRS.WordLen = WordLen + this.size.width;
-        }*/
     }
 };
 CMathBase.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
@@ -1904,16 +1895,26 @@ CMathBase.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _C
 
     if(this.bOneLine)
     {
+        var ParentContentMetric = PRS.ContentMetrics;
+
         for (var CurPos = 0; CurPos <= this.Content.length - 1; CurPos++)
         {
+            PRS.ContentMetrics = new CMathBoundsMeasures();
             var Item = this.Content[CurPos];
             Item.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
         }
 
         this.Bounds.UpdateMetrics(CurLine, this.size);
-        PRS.ContentMetrics.UpdateMetrics(this.size);
 
-        this.UpdatePRS(PRS, this.size);
+        ParentContentMetric.UpdateMetrics(this.size);
+        PRS.ContentMetrics.SetBound(ParentContentMetric);
+
+        //PRS.ContentMetrics.UpdateMetrics(this.size);
+
+        if(this.Parent.bRoot)
+        {
+            this.UpdatePRS(PRS, this.size);
+        }
     }
     else
     {
@@ -2182,6 +2183,15 @@ function CMathBoundsMeasures()
     this.Asc  = 0;
     this.Page = 0;
 }
+CMathBoundsMeasures.prototype.SetBound = function(Bound)
+{
+    this.X    = Bound.X;
+    this.Y    = Bound.Y;
+    this.W    = Bound.W;
+    this.H    = Bound.H;
+    this.Asc  = Bound.Asc;
+    this.Page = Bound.Page;
+};
 CMathBoundsMeasures.prototype.UpdateMetrics = function(Metric)
 {
     var MetricH   = Metric.Type == MATH_SIZE ? Metric.height : Metric.H;

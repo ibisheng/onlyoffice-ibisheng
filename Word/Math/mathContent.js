@@ -4158,7 +4158,8 @@ CMathContent.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine,
     this.Bounds.UpdateMetrics(CurLine, PRS.ContentMetrics);
 
     ParentContentMetric.UpdateMetrics(PRS.ContentMetrics);
-    PRS.ContentMetrics = ParentContentMetric;
+    //PRS.ContentMetrics = ParentContentMetric;
+    PRS.ContentMetrics.SetBound(ParentContentMetric);
 };
 CMathContent.prototype.Get_Bounds = function()
 {
