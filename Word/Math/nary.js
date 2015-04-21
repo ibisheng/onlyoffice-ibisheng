@@ -157,6 +157,8 @@ CNary.prototype.init = function(props)
 };
 CNary.prototype.fillContent = function()
 {
+    this.NeedBreakContent(2);
+    
     this.LowerIterator = this.Content[0];
     this.UpperIterator = this.Content[1];
     this.Arg           = this.Content[2];
