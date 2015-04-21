@@ -569,6 +569,20 @@ CNary.prototype.Draw_Elements = function(PDSE)
 
     if(CurLine == 0 && CurRange == 0)
     {
+        if(this.Base.IsJustDraw()) // для Just-Draw элементов надо выставить Font
+        {
+            var ctrPrp = this.Get_TxtPrControlLetter();
+
+            var Font =
+            {
+                FontSize:   ctrPrp.FontSize,
+                FontFamily: {Name : ctrPrp.FontFamily.Name, Index : ctrPrp.FontFamily.Index},
+                Italic:     false,
+                Bold:       false //ctrPrp.Bold
+            };
+
+            PDSE.Graphics.SetFont(Font);
+        }
         this.Base.Draw_Elements(PDSE);
     }
 

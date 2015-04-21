@@ -918,7 +918,6 @@ CDegreeSubSup.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             PRS.WordLen += this.BrGapRight;
 
 
-
         this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 
     }
