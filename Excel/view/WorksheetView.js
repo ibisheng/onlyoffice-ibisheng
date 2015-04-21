@@ -996,7 +996,6 @@
 				}
 				result.type = c_oAscSelectionType.RangeCells;
 				this._fixSelectionOfMergedCells(result);
-				result.normalize();
 				if (result.c1 === result.c2 && result.r1 === result.r2)
 					result.text = this._getCellTitle (result.c1, result.r1);
 				else
@@ -1033,7 +1032,6 @@
 				}
 				result.type = c_oAscSelectionType.RangeCells;
 				this._fixSelectionOfMergedCells(result);
-				result.normalize();
 				if (result.c1 === result.c2 && result.r1 === result.r2)
 					result.text = this._getCellTitle(result.c1, result.r1);
 				else
@@ -6010,6 +6008,7 @@
 			ar.c2 = ar.c1 === res.c1 ? res.c2 : (res.c1);
 			if (ar.r1 !== res.r1 && ar.r1 !== res.r2) {ar.r1 = ar.r1 <= ar.r2 ? res.r1 : res.r2;}
 			ar.r2 = ar.r1 === res.r1 ? res.r2 : res.r1;
+			ar.normalize();
 		};
 
 		WorksheetView.prototype._findVisibleCol = function (from, dc, flag) {
@@ -6134,7 +6133,6 @@
 			ar.startCol = p.col;
 			ar.startRow = p.row;
 			this._fixSelectionOfMergedCells();
-			ar.normalize();
 			this._fixSelectionOfHiddenCells(dc>=0?+1:-1, dr>=0?+1:-1);
 		};
 
