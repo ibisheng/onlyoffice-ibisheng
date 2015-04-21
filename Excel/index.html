@@ -28,23 +28,36 @@
         }
 
         .loader-page {
-            top: 50%;
-            left: 50%;
-            height: 180px;
-            z-index: 100;
+            width: 100%;
+            height: 170px;
+            bottom: 42%;
+            margin-bottom: 50px;
             position: absolute;
-            margin-top: -100px;
-            margin-left: -75px;
+            text-align: center;
+        }
+
+        .loader-page-romb {
+            width: 50px;
+            display: inline-block;
         }
 
         .loader-page-text {
-            display: inline-block;
-            font-size: 14px;
-            margin-left: 80px;
-            margin-top: 125px;
+            width: 100%;
+            bottom: 42%;
+            position: absolute;
+            text-align: center;
             color: #888;
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             line-height: 20px;
+        }
+
+        .loader-page-text-loading {
+            font-size: 14px;
+        }
+
+        .loader-page-text-customer {
+            font-size: 16px;
+            margin-bottom: 5px;
         }
 
         .romb {
@@ -192,13 +205,19 @@
         else if ( lang == 'sl') loading = 'Nalaganje...';
         else if ( lang == 'tr') loading = 'Yükleniyor...';
 
+        var customer = getUrlParams()["customer"] || 'ONLYOFFICE';
+
         document.write(
             '<div id="loading-mask" class="loadmask">' +
                 '<div class="loader-page">' +
+                    '<div class="loader-page-romb">' +
                     '<div class="romb" id="blue"></div>' +
                     '<div class="romb" id="green"></div>' +
                     '<div class="romb" id="red"></div>' +
-                    '<div class="loader-page-text">' + loading + '</div>' +
+                    '</div></div>' +
+                    '<div class="loader-page-text">' +
+                    '<div class="loader-page-text-customer">' + customer + '</div>' +
+                    '<div class="loader-page-text-loading">' + loading + '</div>' +
                 '</div>' +
             '</div>');
     </script>
