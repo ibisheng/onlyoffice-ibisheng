@@ -1881,7 +1881,7 @@ CMathBase.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
 {
     this.Recalculate_Range(PRS, ParaPr, Depth);
 };
-CMathBase.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
+CMathBase.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
 {
     var CurLine = _CurLine - this.StartLine;
     var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
@@ -1895,21 +1895,19 @@ CMathBase.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _C
 
     if(this.bOneLine)
     {
-        var ParentContentMetric = PRS.ContentMetrics;
+        var NewContentMetrics = new CMathBoundsMeasures();
 
         for (var CurPos = 0; CurPos <= this.Content.length - 1; CurPos++)
         {
-            PRS.ContentMetrics = new CMathBoundsMeasures();
             var Item = this.Content[CurPos];
-            Item.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
+            Item.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
         }
 
         this.Bounds.UpdateMetrics(CurLine, this.size);
 
-        ParentContentMetric.UpdateMetrics(this.size);
-        PRS.ContentMetrics.SetBound(ParentContentMetric);
+        // чтобы внутр объекты не перебили метрики (например, у внутр мат объекта Asc может быть больше Asc текущего объекта)
 
-        //PRS.ContentMetrics.UpdateMetrics(this.size);
+        ContentMetrics.UpdateMetrics(this.size);
 
         if(this.Parent.bRoot)
         {
@@ -1924,12 +1922,12 @@ CMathBase.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _C
         for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
         {
             var Item = this.Content[CurPos];
-            Item.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
+            Item.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
 
             var BoundItem = Item.Get_LineBound(_CurLine);
 
             this.Bounds.UpdateMetrics(CurLine, BoundItem);
-            PRS.ContentMetrics.UpdateMetrics(BoundItem);
+            //ContentMetrics.UpdateMetrics(BoundItem);
 
             this.UpdatePRS(PRS, BoundItem);
         }
@@ -1973,7 +1971,7 @@ CMathBase.prototype.UpdateMetrics = function(PRS, Size)
     if(PRS.LineDescent < Size.height - Size.ascent)
         PRS.LineDescent = Size.height - Size.ascent;
 
-    PRS.ContentMetrics.UpdateMetrics(Size);
+    //PRS.ContentMetrics.UpdateMetrics(Size);
 };
 CMathBase.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 {
@@ -2183,15 +2181,6 @@ function CMathBoundsMeasures()
     this.Asc  = 0;
     this.Page = 0;
 }
-CMathBoundsMeasures.prototype.SetBound = function(Bound)
-{
-    this.X    = Bound.X;
-    this.Y    = Bound.Y;
-    this.W    = Bound.W;
-    this.H    = Bound.H;
-    this.Asc  = Bound.Asc;
-    this.Page = Bound.Page;
-};
 CMathBoundsMeasures.prototype.UpdateMetrics = function(Metric)
 {
     var MetricH   = Metric.Type == MATH_SIZE ? Metric.height : Metric.H;

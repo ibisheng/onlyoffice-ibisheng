@@ -2622,7 +2622,7 @@ ParaRun.prototype.Recalculate_Set_RangeEndPos = function(PRS, PRP, Depth)
     this.protected_FillRangeEndPos(CurLine, CurRange, CurPos);
 };
 
-ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
+ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
 {
     var Para = PRS.Paragraph;
 
@@ -2660,7 +2660,7 @@ ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
             case para_Math_Placeholder:
             case para_Math_BreakOperator:
             {
-                PRS.ContentMetrics.UpdateMetrics(Item.size);
+                ContentMetrics.UpdateMetrics(Item.size);
 
                 UpdateLineMetricsText = true;
                 break;

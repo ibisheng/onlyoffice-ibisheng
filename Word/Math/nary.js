@@ -574,11 +574,11 @@ CNary.prototype.Draw_Elements = function(PDSE)
 
     this.Arg.Draw_Elements(PDSE);
 };
-CNary.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
+CNary.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
 {
     if(this.bOneLine)
     {
-        CNary.superclass.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange);
+        CNary.superclass.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
     }
     else
     {
@@ -588,12 +588,11 @@ CNary.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRa
         // т.к. ParaNumbering привязывается к первому текстовому элементы, он может находится в аргументе
         // обновляем LineMetrics для Base после того, как обновим метрики для аргумента
 
-        this.Arg.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
+        this.Arg.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
 
         var BoundArg = this.Arg.Get_LineBound(_CurLine);
 
         this.Bounds.UpdateMetrics(CurLine, BoundArg);
-        PRS.ContentMetrics.UpdateMetrics(BoundArg);
 
         this.UpdatePRS(PRS, BoundArg);
 
@@ -605,18 +604,21 @@ CNary.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRa
             if(this.Base.IsJustDraw())
             {
                 this.Bounds.UpdateMetrics(CurLine, this.Base.size);
-                PRS.ContentMetrics.UpdateMetrics(this.Base.size);
+                ContentMetrics.UpdateMetrics(this.Base.size);
                 this.UpdatePRS(PRS, this.Base.size);
             }
             else
             {
-                this.Base.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
-                this.LowerIterator.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
-                this.UpperIterator.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
+                // чтобы при вычислении метрик итераторов не были перебили метрики (например, у внутр мат объекта Asc может быть больше Asc текущего объекта)
+
+                var NewContentMetrics = new CMathBoundsMeasures();
+
+                this.LowerIterator.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
+                this.UpperIterator.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
+
+                this.Base.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
 
                 this.Bounds.UpdateMetrics(CurLine, this.Base.size);
-                PRS.ContentMetrics.UpdateMetrics(this.Base.size);
-
                 this.UpdatePRS(PRS, this.Base.size);
             }
 

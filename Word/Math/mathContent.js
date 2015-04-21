@@ -4132,7 +4132,7 @@ CMathContent.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRa
 
     this.Bounds.SetWidth(CurLine, PRSC.Range.W - RangeW);
 };
-CMathContent.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
+CMathContent.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
 {
     var CurLine = _CurLine - this.StartLine;
     var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
@@ -4145,21 +4145,17 @@ CMathContent.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine,
         this.Bounds.Reset();
     }
 
-    var ParentContentMetric = PRS.ContentMetrics;
-
-    PRS.ContentMetrics = new CMathBoundsMeasures();
+    var NewContentMetrics = new CMathBoundsMeasures();
 
     for(var Pos = StartPos; Pos <= EndPos; Pos++)
     {
         var Item = this.Content[Pos];
-        Item.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
+        Item.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
     }
 
-    this.Bounds.UpdateMetrics(CurLine, PRS.ContentMetrics);
+    this.Bounds.UpdateMetrics(CurLine, NewContentMetrics);
 
-    ParentContentMetric.UpdateMetrics(PRS.ContentMetrics);
-    //PRS.ContentMetrics = ParentContentMetric;
-    PRS.ContentMetrics.SetBound(ParentContentMetric);
+    ContentMetrics.UpdateMetrics(NewContentMetrics);
 };
 CMathContent.prototype.Get_Bounds = function()
 {

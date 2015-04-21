@@ -412,7 +412,7 @@ CDegree.prototype.Document_UpdateInterfaceState = function(MathProps)
     MathProps.Type = c_oAscMathInterfaceType.Script;
     MathProps.Pr   = null;
 };
-CDegree.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
+CDegree.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
 {
     var CurLine  = PRS.Line - this.StartLine;
     var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
@@ -424,8 +424,11 @@ CDegree.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
 
     if(this.bOneLine == false && this.baseContent.Math_Is_End( _CurLine, _CurRange))
     {
-        this.iterContent.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
-        this.baseContent.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
+        // чтобы при вычислении метрик итератора не были перебили метрики (например, у внутр мат объекта Asc может быть больше Asc текущего объекта)
+
+        var NewContentMetrics = new CMathBoundsMeasures();
+        this.iterContent.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
+        this.baseContent.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
 
         var BoundBase = this.baseContent.Get_LineBound(_CurLine);
         var Bound;
@@ -440,13 +443,13 @@ CDegree.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
         }
 
         this.Bounds.UpdateMetrics(CurLine, Bound);
-        PRS.ContentMetrics.UpdateMetrics(Bound);
+        ContentMetrics.UpdateMetrics(Bound);
 
         this.UpdatePRS(PRS, Bound);
     }
     else
     {
-        CDegreeBase.prototype.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange);
+        CDegreeBase.prototype.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
     }
 
 };
@@ -814,7 +817,7 @@ CDegreeSubSup.prototype.fillContent = function()
 
     CDegreeSubSup.superclass.fillContent.call(this);
 };
-CDegreeSubSup.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
+CDegreeSubSup.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
 {
     var CurLine  = PRS.Line - this.StartLine;
     var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
@@ -826,15 +829,20 @@ CDegreeSubSup.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine
 
     if(this.bOneLine == false && this.Need_Iters(_CurLine, _CurRange))
     {
-        this.Content[0].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
-        this.Content[1].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
-        this.Content[2].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
+        // чтобы при вычислении метрик итератора не были перебили метрики (например, у внутр мат объекта Asc может быть больше Asc текущего объекта)
+
+        var NewContentMetrics = new CMathBoundsMeasures();
+
+        this.Content[1].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
+        this.Content[2].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
+        // основание, baseContent
+        this.Content[0].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
 
         var BoundBase = this.baseContent.Get_LineBound(_CurLine);
 
         var Bound = this.GetSize(g_oTextMeasurer, BoundBase);
         this.Bounds.UpdateMetrics(CurLine, Bound);
-        PRS.ContentMetrics.UpdateMetrics(Bound);
+        ContentMetrics.UpdateMetrics(Bound);
 
         this.iters.Bounds.Reset();
         this.iters.Bounds.UpdateMetrics(0, this.iters.size);
@@ -843,7 +851,7 @@ CDegreeSubSup.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine
     }
     else
     {
-        CDegreeBase.prototype.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange);
+        CDegreeBase.prototype.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
     }
 
 };

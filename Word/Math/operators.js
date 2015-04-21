@@ -3504,12 +3504,12 @@ CDelimiter.prototype.Is_EmptyGaps = function()
 
     return result;
 };
-CDelimiter.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
+CDelimiter.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
 {
     var CurLine = _CurLine - this.StartLine;
     var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
 
-    CDelimiter.superclass.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange);
+    CDelimiter.superclass.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
 
     if(CurLine == 0 && CurRange == 0)
     {
@@ -3523,7 +3523,7 @@ CDelimiter.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _
         if ( PRS.LineDescent < BegDescent )
             PRS.LineDescent = BegDescent;
 
-        PRS.ContentMetrics.UpdateMetrics(this.begOper.size);
+        ContentMetrics.UpdateMetrics(this.begOper.size);
     }
 
     var bEnd = this.Content[0].Math_Is_End(_CurLine, _CurRange);
@@ -3540,7 +3540,7 @@ CDelimiter.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _
         if ( PRS.LineDescent < EndDescent )
             PRS.LineDescent = EndDescent;
 
-        PRS.ContentMetrics.UpdateMetrics(this.endOper.size);
+        ContentMetrics.UpdateMetrics(this.endOper.size);
     }
 };
 CDelimiter.prototype.RecalculateGeneralSize = function(oMeasure, height, ascent) // здесь пересчитываем скобки, общий максимальный размер delimiters

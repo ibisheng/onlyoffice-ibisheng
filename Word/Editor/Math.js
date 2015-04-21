@@ -919,8 +919,9 @@ ParaMath.prototype.Recalculate_Set_RangeEndPos = function(PRS, PRP, Depth)
 };
 ParaMath.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
 {
-    PRS.ContentMetrics = new CMathBoundsMeasures();
-    this.Root.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
+    //PRS.ContentMetrics = new CMathBoundsMeasures();
+    var ContentMetrics = new CMathBoundsMeasures();
+    this.Root.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
 };
 ParaMath.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 {
