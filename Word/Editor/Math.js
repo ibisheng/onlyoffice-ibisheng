@@ -953,10 +953,14 @@ ParaMath.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange
 {
     // до пересчета Bounds для текущей строки ранее должны быть вызваны Recalculate_Range_Width (для ширины), Recalculate_LineMetrics(для высоты и аскента)
 
-    var pos = new CMathPosition();
-    this.Root.setPosition(pos, PRSA, _CurLine, _CurRange, _CurPage);
+    var Page = 0;
+    if ( this.Paragraph !== null)
+        Page = this.Paragraph.Get_StartPage_Absolute();
 
-    this.Root.Recalculate_Range_Spaces(PRSA, _CurLine, _CurRange, _CurPage);
+    var pos = new CMathPosition();
+    this.Root.setPosition(pos, PRSA, _CurLine, _CurRange, Page + _CurPage);
+
+    this.Root.Recalculate_Range_Spaces(PRSA, _CurLine, _CurRange, Page + _CurPage);
 };
 ParaMath.prototype.Recalculate_PageEndInfo = function(PRSI, _CurLine, _CurRange)
 {
