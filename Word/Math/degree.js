@@ -296,9 +296,7 @@ CDegreeBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
     var CurLine = Line - this.StartLine;
     var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
 
-    if(this.bOneLine || CurLine == 0 && CurRange == 0)
-        pos.x += this.BrGapLeft;
-
+    var X, Y;
     if(this.bOneLine)
     {
         this.pos.x = pos.x;
@@ -311,10 +309,12 @@ CDegreeBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
         {
             this.pos.y = pos.y - this.size.ascent;
         }
+        X = this.pos.x + this.BrGapLeft;
+        Y = this.pos.y;
 
         var PosBase = new CMathPosition();
-        PosBase.y = this.pos.y;
-        PosBase.x = this.pos.x;
+        PosBase.y = Y;
+        PosBase.x = X;
 
         PosBase.y += this.size.ascent - this.baseContent.size.ascent;
 
@@ -324,8 +324,8 @@ CDegreeBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
         this.baseContent.setPosition(PosBase, PRSA, Line, Range, Page);
 
         var PosIter = new CMathPosition();
-        PosIter.x = this.pos.x + this.baseContent.size.width + this.dW;
-        PosIter.y = this.pos.y + this.size.ascent + this.upIter + this.iterContent.size.ascent;
+        PosIter.x = X + this.baseContent.size.width + this.dW;
+        PosIter.y = Y + this.size.ascent + this.upIter + this.iterContent.size.ascent;
 
         this.iterContent.setPosition(PosIter, PRSA, Line, Range, Page);
 
@@ -333,7 +333,10 @@ CDegreeBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
     }
     else
     {
-        var Y = pos.y;
+        if(this.bOneLine || CurLine == 0 && CurRange == 0)
+            pos.x += this.BrGapLeft;
+
+        Y = pos.y;
 
         this.baseContent.setPosition(pos, PRSA, Line, Range, Page);
 
