@@ -3312,7 +3312,130 @@ function CDrawingDocument()
             this.AutoShapesTrack.AddRectDashClever(ctx, __x, __y, __r, __b, 3, 3, true);
             ctx.beginPath();
         }
-    }
+    };
+
+    this.private_DrawMathTrackPolygon = function(overlay, oBounds, Shift, Color, dKoefX, dKoefY, drPage)
+    {
+        var ctx = overlay.m_oContext;
+        ctx.strokeStyle = Color;
+        ctx.lineWidth   = 1;
+        ctx.beginPath();
+        var _x, _y;
+        // В первой половине полигона только левые точки, а во второй - правые.
+        for (var nPointIndex = 0; nPointIndex < oBounds.HalfCount; nPointIndex++)
+        {
+            var _x = (drPage.left + dKoefX * oBounds.Polygon[nPointIndex][0] - Shift);
+            var _y = (drPage.top  + dKoefY * oBounds.Polygon[nPointIndex][1]);
+
+            if (0 == nPointIndex)
+                _y -= Shift;
+            else if (oBounds.HalfCount - 1 == nPointIndex)
+                _y += Shift;
+            else
+            {
+                if (oBounds.Polygon[nPointIndex][0] < oBounds.Polygon[nPointIndex - 1][0] || oBounds.Polygon[nPointIndex + 1][0] < oBounds.Polygon[nPointIndex][0])
+                    _y -= Shift;
+                else if (oBounds.Polygon[nPointIndex][0] > oBounds.Polygon[nPointIndex - 1][0] || oBounds.Polygon[nPointIndex + 1][0] > oBounds.Polygon[nPointIndex][0])
+                    _y += Shift;
+            }
+
+            overlay.CheckPoint(_x, _y);
+
+            if (0 == nPointIndex)
+                ctx.moveTo((_x >> 0) + 0.5, (_y >> 0) + 0.5);
+            else
+                ctx.lineTo((_x >> 0) + 0.5, (_y >> 0) + 0.5);
+        }
+        for (var nPointIndex = 0; nPointIndex < oBounds.HalfCount; nPointIndex++)
+        {
+            var nRealPointIndex = nPointIndex + oBounds.HalfCount;
+            var _x = (drPage.left + dKoefX * oBounds.Polygon[nRealPointIndex][0] + Shift);
+            var _y = (drPage.top  + dKoefY * oBounds.Polygon[nRealPointIndex][1]);
+
+            if (0 == nPointIndex)
+                _y += Shift;
+            else if (oBounds.HalfCount - 1 == nPointIndex)
+                _y -= Shift;
+            else
+            {
+                if (oBounds.Polygon[nRealPointIndex][0] < oBounds.Polygon[nRealPointIndex - 1][0] || oBounds.Polygon[nRealPointIndex + 1][0] < oBounds.Polygon[nRealPointIndex][0])
+                    _y -= Shift;
+                else if (oBounds.Polygon[nRealPointIndex][0] > oBounds.Polygon[nRealPointIndex - 1][0] || oBounds.Polygon[nRealPointIndex + 1][0] > oBounds.Polygon[nRealPointIndex][0])
+                    _y += Shift;
+            }
+
+            overlay.CheckPoint(_x, _y);
+
+            ctx.lineTo((_x >> 0) + 0.5, (_y >> 0) + 0.5);
+        }
+        ctx.closePath();
+        ctx.stroke();
+        ctx.beginPath();
+    };
+
+    this.private_DrawMathTrackPolygonWithMatrix = function(overlay, oBounds, ShiftX, ShiftY, Color, dKoefX, dKoefY, drPage, m)
+    {
+        var ctx = overlay.m_oContext;
+        ctx.strokeStyle = Color;
+        ctx.lineWidth   = 1;
+        ctx.beginPath();
+        // В первой половине полигона только левые точки, а во второй - правые.
+        for (var nPointIndex = 0; nPointIndex < oBounds.HalfCount; nPointIndex++)
+        {
+            var x = oBounds.Polygon[nPointIndex][0] - ShiftX;
+            var y = oBounds.Polygon[nPointIndex][1];
+
+            if (0 == nPointIndex)
+                y -= ShiftY;
+            else if (oBounds.HalfCount - 1 == nPointIndex)
+                y += ShiftY;
+            else
+            {
+                if (oBounds.Polygon[nPointIndex][0] < oBounds.Polygon[nPointIndex - 1][0] || oBounds.Polygon[nPointIndex + 1][0] < oBounds.Polygon[nPointIndex][0])
+                    y -= ShiftY;
+                else if (oBounds.Polygon[nPointIndex][0] > oBounds.Polygon[nPointIndex - 1][0] || oBounds.Polygon[nPointIndex + 1][0] > oBounds.Polygon[nPointIndex][0])
+                    y += ShiftY;
+            }
+
+            var _x = (drPage.left + dKoefX * m.TransformPointX(x, y));
+            var _y = (drPage.top  + dKoefY * m.TransformPointY(x, y));
+
+            overlay.CheckPoint(_x, _y);
+
+            if (0 == nPointIndex)
+                ctx.moveTo(_x >> 0, _y >> 0);
+            else
+                ctx.lineTo(_x >> 0, _y >> 0);
+        }
+        for (var nPointIndex = 0; nPointIndex < oBounds.HalfCount; nPointIndex++)
+        {
+            var nRealPointIndex = nPointIndex + oBounds.HalfCount;
+            var x = oBounds.Polygon[nRealPointIndex][0] + ShiftX;
+            var y = oBounds.Polygon[nRealPointIndex][1];
+
+            if (0 == nPointIndex)
+                y += ShiftY;
+            else if (oBounds.HalfCount - 1 == nPointIndex)
+                y -= ShiftY;
+            else
+            {
+                if (oBounds.Polygon[nRealPointIndex][0] < oBounds.Polygon[nRealPointIndex - 1][0] || oBounds.Polygon[nRealPointIndex + 1][0] < oBounds.Polygon[nRealPointIndex][0])
+                    y -= ShiftY;
+                else if (oBounds.Polygon[nRealPointIndex][0] > oBounds.Polygon[nRealPointIndex - 1][0] || oBounds.Polygon[nRealPointIndex + 1][0] > oBounds.Polygon[nRealPointIndex][0])
+                    y += ShiftY;
+            }
+
+            var _x = (drPage.left + dKoefX * m.TransformPointX(x, y));
+            var _y = (drPage.top  + dKoefY * m.TransformPointY(x, y));
+
+            overlay.CheckPoint(_x, _y);
+
+            ctx.lineTo(_x >> 0, _y >> 0);
+        }
+        ctx.closePath();
+        ctx.stroke();
+        ctx.beginPath();
+    };
     
     this.DrawMathTrack = function(overlay)
     {
@@ -3332,37 +3455,8 @@ function CDrawingDocument()
                 var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
                 var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
 
-                var _x = (drPage.left + dKoefX * oBounds.X);
-                var _y = (drPage.top  + dKoefY * oBounds.Y);
-                var _r = (drPage.left + dKoefX * oBounds.R);
-                var _b = (drPage.top  + dKoefY * oBounds.B);
-
-                if (_x < overlay.min_x)
-                    overlay.min_x = _x;
-                if (_r > overlay.max_x)
-                    overlay.max_x = _r;
-
-                if (_y < overlay.min_y)
-                    overlay.min_y = _y;
-                if (_b > overlay.max_y)
-                    overlay.max_y = _b;
-
-                var ctx = overlay.m_oContext;
-                ctx.strokeStyle = "#939393";
-                ctx.lineWidth = 1;
-
-                ctx.beginPath();
-                this.AutoShapesTrack.AddRect(ctx, _x >> 0, _y >> 0, _r >> 0, _b >> 0, true);
-                ctx.stroke();
-                ctx.beginPath();
-
-                ctx.strokeStyle = "#FFFFFF";
-                ctx.lineWidth = 1;
-
-                ctx.beginPath();
-                this.AutoShapesTrack.AddRect(ctx, (_x - 1) >> 0, (_y - 1) >> 0, (_r + 1) >> 0, (_b + 1) >> 0, true);
-                ctx.stroke();
-                ctx.beginPath();
+                this.private_DrawMathTrackPolygon(overlay, oBounds, 0, "#939393", dKoefX, dKoefY, drPage);
+                this.private_DrawMathTrackPolygon(overlay, oBounds, 1, "#FFFFFF", dKoefX, dKoefY, drPage);
             }
 
             if (null !== this.MathRect.ContentSelection)
@@ -3376,20 +3470,13 @@ function CDrawingDocument()
                     var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
                     var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
 
-                    _x = (drPage.left + dKoefX * oContentSelection.X);
-                    _y = (drPage.top  + dKoefY * oContentSelection.Y);
-                    _r = (drPage.left + dKoefX * (oContentSelection.X + oContentSelection.W));
-                    _b = (drPage.top  + dKoefY * (oContentSelection.Y + oContentSelection.H));
+                    var _x = (drPage.left + dKoefX * oContentSelection.X);
+                    var _y = (drPage.top  + dKoefY * oContentSelection.Y);
+                    var _r = (drPage.left + dKoefX * (oContentSelection.X + oContentSelection.W));
+                    var _b = (drPage.top  + dKoefY * (oContentSelection.Y + oContentSelection.H));
 
-                    if (_x < overlay.min_x)
-                        overlay.min_x = _x;
-                    if (_r > overlay.max_x)
-                        overlay.max_x = _r;
-
-                    if (_y < overlay.min_y)
-                        overlay.min_y = _y;
-                    if (_b > overlay.max_y)
-                        overlay.max_y = _b;
+                    overlay.CheckPoint(_x, _y);
+                    overlay.CheckPoint(_r, _b);
 
                     var ctx = overlay.m_oContext;
                     ctx.fillStyle = "#375082";
@@ -3415,49 +3502,11 @@ function CDrawingDocument()
                 var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
                 var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
 
-                var _arrBorderBlack = TransformRectByMatrix(this.TextMatrix,
-                    [oBounds.X, oBounds.Y, oBounds.R, oBounds.B],
-                    drPage.left, drPage.top, dKoefX, dKoefY);
-
                 var _1px_mm_x = 1 / Math.max(dKoefX, 0.001);
                 var _1px_mm_y = 1 / Math.max(dKoefY, 0.001);
-                var _arrBorderWhite = TransformRectByMatrix(this.TextMatrix,
-                    [oBounds.X - _1px_mm_x, oBounds.Y - _1px_mm_y, oBounds.R - _1px_mm_x, oBounds.B - _1px_mm_y],
-                    drPage.left, drPage.top, dKoefX, dKoefY);
 
-                overlay.CheckPoint(_arrBorderWhite[0], _arrBorderWhite[1]);
-                overlay.CheckPoint(_arrBorderWhite[2], _arrBorderWhite[3]);
-                overlay.CheckPoint(_arrBorderWhite[4], _arrBorderWhite[5]);
-                overlay.CheckPoint(_arrBorderWhite[6], _arrBorderWhite[7]);
-
-                var ctx = overlay.m_oContext;
-                ctx.strokeStyle = "#FFFFFF";
-                ctx.lineWidth = 1;
-
-                ctx.beginPath();
-
-                ctx.moveTo(_arrBorderWhite[0], _arrBorderWhite[1]);
-                ctx.lineTo(_arrBorderWhite[2], _arrBorderWhite[3]);
-                ctx.lineTo(_arrBorderWhite[4], _arrBorderWhite[5]);
-                ctx.lineTo(_arrBorderWhite[6], _arrBorderWhite[7]);
-                ctx.closePath();
-
-                ctx.stroke();
-                ctx.beginPath();
-
-                ctx.strokeStyle = "#939393";
-                ctx.lineWidth = 1;
-
-                ctx.beginPath();
-
-                ctx.moveTo(_arrBorderBlack[0], _arrBorderBlack[1]);
-                ctx.lineTo(_arrBorderBlack[2], _arrBorderBlack[3]);
-                ctx.lineTo(_arrBorderBlack[4], _arrBorderBlack[5]);
-                ctx.lineTo(_arrBorderBlack[6], _arrBorderBlack[7]);
-                ctx.closePath();
-
-                ctx.stroke();
-                ctx.beginPath();
+                this.private_DrawMathTrackPolygonWithMatrix(overlay, oBounds, 0, 0, "#939393", dKoefX, dKoefY, drPage, this.TextMatrix);
+                this.private_DrawMathTrackPolygonWithMatrix(overlay, oBounds, _1px_mm_x, _1px_mm_y, "#FFFFFF", dKoefX, dKoefY, drPage, this.TextMatrix);
             }
 
             if (null !== this.MathRect.ContentSelection)
@@ -4588,34 +4637,97 @@ function CDrawingDocument()
         this.m_oWordControl.UpdateVerRuler();
     }
 
-    this.Update_MathTrack = function(IsActive, IsContentActive, Math)
+    this.Update_MathTrack = function(IsActive, IsContentActive, oMath)
     {       
         this.MathRect.IsActive = IsActive;
         
-        if (true === IsActive && null !== Math)
+        if (true === IsActive && null !== oMath)
         {
             if (true === IsContentActive)
-                this.MathRect.ContentSelection = Math.Get_ContentSelection();
+                this.MathRect.ContentSelection = oMath.Get_ContentSelection();
             else
                 this.MathRect.ContentSelection = null;
 
             var PixelError = this.GetMMPerDot(1) * 3;
 
-            var arrBounds = Math.Get_Bounds();
-            this.MathRect.Bounds = [];
-            for (var nIndex = 0, nCount = arrBounds.length; nIndex < nCount; nIndex++)
+            var arrBounds = oMath.Get_Bounds();
+            var arrPolygons = [];
+            // Границы должны идти последовательно. Объединяем, не смотрим на y, смотрим только на
+            // номер страницы и на x.
+            if (arrBounds.length <= 0)
+                return;
+
+            var oPrevBounds = arrBounds[0];
+            var arrGroups = [{Count : 1, Page : oPrevBounds.Page}];
+            for (var nIndex = 1, nCount = arrBounds.length, nGroupIndex = 0; nIndex < nCount; nIndex++)
             {
                 var oBounds = arrBounds[nIndex];
 
-                this.MathRect.Bounds[nIndex] =
+                if (oPrevBounds.Page !== oBounds.Page || oBounds.X + oBounds.W < oPrevBounds.X || oPrevBounds.X + oPrevBounds.W < oBounds.X)
                 {
-                    X    : oBounds.X - PixelError,
-                    Y    : oBounds.Y - PixelError,
-                    R    : oBounds.X + oBounds.W + PixelError,
-                    B    : oBounds.Y + oBounds.H + PixelError,
-                    Page : oBounds.Page
-                };
+                    nGroupIndex++;
+                    arrGroups[nGroupIndex] = {Count : 1, Page : oBounds.Page};
+                }
+                else
+                    arrGroups[nGroupIndex].Count++;
+
+                oPrevBounds = oBounds;
             }
+
+            // Объединим группы в полигоны
+            for (var nGroupIndex = 0, nCount = arrGroups.length, nStartRect = 0; nGroupIndex < nCount; nGroupIndex++)
+            {
+                var oPolygon = [];
+                var nRectsCount = arrGroups[nGroupIndex].Count;
+                for (var nRectIndex = 0; nRectIndex < nRectsCount; nRectIndex++)
+                {
+                    var nBIndex = nRectIndex + nStartRect;
+
+                    if (0 == nRectIndex)
+                        oPolygon.push([arrBounds[nBIndex].X - PixelError, arrBounds[nBIndex].Y - PixelError]);
+                    else
+                        oPolygon.push([arrBounds[nBIndex].X - PixelError, (arrBounds[nBIndex].Y + arrBounds[nBIndex - 1].Y + arrBounds[nBIndex - 1].H) / 2]);
+
+                    if (nRectsCount - 1 === nRectIndex)
+                        oPolygon.push([arrBounds[nBIndex].X - PixelError, arrBounds[nBIndex].Y + arrBounds[nBIndex].H + PixelError]);
+                    else
+                        oPolygon.push([arrBounds[nBIndex].X - PixelError, (arrBounds[nBIndex].Y + arrBounds[nBIndex].H + arrBounds[nBIndex + 1].Y) / 2]);
+                }
+                for (var nRectIndex = nRectsCount - 1; nRectIndex >= 0; nRectIndex--)
+                {
+                    var nBIndex = nRectIndex + nStartRect;
+
+                    if (nRectsCount - 1 == nRectIndex)
+                        oPolygon.push([arrBounds[nBIndex].X + arrBounds[nBIndex].W + PixelError, arrBounds[nBIndex].Y + arrBounds[nBIndex].H + PixelError]);
+                    else
+                        oPolygon.push([arrBounds[nBIndex].X + arrBounds[nBIndex].W + PixelError, (arrBounds[nBIndex].Y + arrBounds[nBIndex].H + arrBounds[nBIndex + 1].Y) / 2]);
+
+                    if (0 === nRectIndex)
+                        oPolygon.push([arrBounds[nBIndex].X + arrBounds[nBIndex].W + PixelError, arrBounds[nBIndex].Y - PixelError]);
+                    else
+                        oPolygon.push([arrBounds[nBIndex].X + arrBounds[nBIndex].W + PixelError, (arrBounds[nBIndex].Y + arrBounds[nBIndex - 1].Y + arrBounds[nBIndex - 1].H) / 2]);
+                }
+
+                arrPolygons.push({Polygon : oPolygon, Page : arrGroups[nGroupIndex].Page, HalfCount : nRectsCount * 2});
+                nStartRect += nRectsCount;
+            }
+
+            this.MathRect.Bounds = arrPolygons;
+
+//            this.MathRect.Bounds = [];
+//            for (var nIndex = 0, nCount = arrBounds.length; nIndex < nCount; nIndex++)
+//            {
+//                var oBounds = arrBounds[nIndex];
+//
+//                this.MathRect.Bounds[nIndex] =
+//                {
+//                    X    : oBounds.X - PixelError,
+//                    Y    : oBounds.Y - PixelError,
+//                    R    : oBounds.X + oBounds.W + PixelError,
+//                    B    : oBounds.Y + oBounds.H + PixelError,
+//                    Page : oBounds.Page
+//                };
+//            }
         }
     }
 
