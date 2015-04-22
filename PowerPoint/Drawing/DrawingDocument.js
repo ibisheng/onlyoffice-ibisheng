@@ -1268,12 +1268,9 @@ function CDrawingDocument()
         if (bIsAttack || !this.m_bIsSendApiDocChanged)
         {
             this.m_bIsSendApiDocChanged = true;
-            this.m_oWordControl.m_oApi.isDocumentModify = true;
-            this.m_oWordControl.m_oApi.asc_fireCallback("asc_onDocumentChanged");
+            this.m_oWordControl.m_oApi.SetDocumentModified(true);
 
-            // дублирование евента. когда будет undo-redo - тогда
-            // эти евенты начнут отличаться
-            this.m_oWordControl.m_oApi.asc_fireCallback("asc_onDocumentModifiedChanged");
+            this.m_oWordControl.m_oApi.asc_fireCallback("asc_onDocumentChanged");
         }
     }
 

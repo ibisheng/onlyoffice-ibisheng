@@ -641,9 +641,19 @@ asc_docs_api.prototype.setUserAlive = function () {
 ///////////////////////////////////////////
 asc_docs_api.prototype.SetUnchangedDocument = function()
 {
-    this.isDocumentModify = false;
-    this.asc_fireCallback("asc_onDocumentModifiedChanged");
+    this.SetDocumentModified(false);
     this._onUpdateDocumentCanSave();
+};
+
+asc_docs_api.prototype.SetDocumentModified = function(bValue)
+{
+    this.isDocumentModify = bValue;
+    this.asc_fireCallback("asc_onDocumentModifiedChanged");
+
+    if (undefined !== window["AscDesktopEditor"])
+    {
+        window["AscDesktopEditor"]["onDocumentModifiedChanged"](bValue);
+    }
 };
 
 asc_docs_api.prototype.isDocumentModified = function()
