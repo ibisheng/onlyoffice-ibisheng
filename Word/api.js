@@ -7734,3 +7734,8 @@ function CSpellCheckApi_desktop()
         SpellCheck_CallBack(spellData);
     };
 }
+
+window["AscDesktopEditor_Save"] = function()
+{
+    return editor.asc_Save();
+};

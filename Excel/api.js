@@ -3672,6 +3672,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		 * -----------------------------------------------------------------------------
 		 */
 
+		window["AscDesktopEditor_Save"] = function()
+        {
+            return window["Asc"]["editor"].asc_Save();
+        };
+
 		asc["spreadsheet_api"] = spreadsheet_api;
 		prot = spreadsheet_api.prototype;
 

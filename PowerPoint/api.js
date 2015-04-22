@@ -5546,3 +5546,8 @@ window["asc_docs_api"].prototype["asc_nativePrintPagesCount"] = function()
 {
 	return this.WordControl.m_oDrawingDocument.SlidesCount;
 }
+
+window["AscDesktopEditor_Save"] = function()
+{
+    return editor.asc_Save();
+};
