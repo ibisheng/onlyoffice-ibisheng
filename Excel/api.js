@@ -466,6 +466,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.User.asc_setId(this.DocInfo["UserId"]);
 				this.User.asc_setUserName(this.DocInfo["UserName"]);
 			}
+			
+			if (undefined != window["AscDesktopEditor"])
+			{
+				window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
+			}
 
             var sProtocol = window.location.protocol;
             var sHost = window.location.host;
@@ -600,6 +605,22 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 
 		spreadsheet_api.prototype.asc_Copy = function(){
+			if (window["AscDesktopEditor"])
+			{
+				window["AscDesktopEditorButtonMode"] = true;
+				
+				var _e = {};
+				_e.ctrlKey = true;
+				_e.shiftKey = false;
+				_e.which = 86;
+
+				this.controller._onWindowKeyDown(_e);
+
+				window["AscDesktopEditorButtonMode"] = false;
+
+				return;
+			}
+		
 			var result = this.wb.copyToClipboardButton();
 			this.wb.restoreFocus();
 			return result;

@@ -799,6 +799,11 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 	}
 	
     this.DocumentName = documentTitle;
+    if (undefined != window["AscDesktopEditor"])
+    {
+        window["AscDesktopEditor"]["SetDocumentName"](this.DocumentName);
+    }
+
 	var oThis = this;
 
     if (this.DocInfo.get_OfflineApp() === true)
