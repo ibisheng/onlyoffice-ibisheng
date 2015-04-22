@@ -11,7 +11,9 @@ var g_nMaxRequestLength = 1048576;//<requestLimits maxAllowedContentLength="3000
 
 function g_fSaveWithParts(fSendCommand, fCallback, oAdditionalData, aParts) {
 	if(null == aParts){
-		var nDataLength = oAdditionalData["data"].length;
+		var nDataLength = 0;
+		if(null != oAdditionalData["data"])
+			nDataLength = oAdditionalData["data"].length;
 		aParts = [];
 		if(nDataLength > g_nMaxRequestLength){
 			for(var i = 0; i < Math.ceil(nDataLength / g_nMaxRequestLength); ++i)
