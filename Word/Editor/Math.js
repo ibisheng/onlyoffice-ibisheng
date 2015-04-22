@@ -1824,10 +1824,7 @@ ParaMath.prototype.Get_ContentSelection = function()
         return null;
 
     var Bounds = oContent.Get_Bounds();
-
-    var LinesCount = oContent.protected_GetLinesCount();
-
-    return Bounds[0];
+    return Bounds;
 };
 
 ParaMath.prototype.Recalc_RunsCompiledPr = function()
@@ -1969,14 +1966,9 @@ ParaMath.prototype.Make_AutoCorrect = function()
 ParaMath.prototype.Get_Bounds = function()
 {
     if (undefined === this.Paragraph || null === this.Paragraph)
-        return {X : 0, Y : 0, W : 0, H : 0, Page : 0};
+        return [{X : 0, Y : 0, W : 0, H : 0, Page : 0}];
     else
-    {
-        var LinesCount = this.Root.protected_GetLinesCount();
-
-
-        return this.Root.Get_Bounds()[LinesCount - 1];
-    }
+        return this.Root.Get_Bounds();
 };
 
 ParaMath.prototype.getPropsForWrite = function()

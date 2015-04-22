@@ -1682,7 +1682,7 @@ function CDrawingDocument()
     this.FrameRect = { IsActive : false, Rect : { X : 0, Y : 0, R : 0, B : 0 }, Frame : null,
         Track : { X : 0, Y : 0, L : 0, T : 0, R : 0, B : 0, PageIndex : 0, Type : -1 }, IsTracked : false, PageIndex : 0 };
 
-    this.MathRect = { IsActive : false, Rect : { X : 0, Y : 0, R : 0, B : 0, PageIndex : 0 }, ContentSelection : null };
+    this.MathRect = { IsActive : false, Bounds : [], ContentSelection : null };
     this.FieldTrack = {IsActive : false, Rects : []};
 
     this.m_oCacheManager    = new CCacheManager();
@@ -3321,52 +3321,21 @@ function CDrawingDocument()
 
         overlay.Show();
 
-        var _page = this.m_arrPages[this.MathRect.Rect.PageIndex];
-        var drPage = _page.drawingPage;
-
-        var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
-        var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
-
         if (null == this.TextMatrix || global_MatrixTransformer.IsIdentity(this.TextMatrix))
         {
-            var _x = (drPage.left + dKoefX * this.MathRect.Rect.X);
-            var _y = (drPage.top  + dKoefY * this.MathRect.Rect.Y);
-            var _r = (drPage.left + dKoefX * this.MathRect.Rect.R);
-            var _b = (drPage.top  + dKoefY * this.MathRect.Rect.B);
-
-            if (_x < overlay.min_x)
-                overlay.min_x = _x;
-            if (_r > overlay.max_x)
-                overlay.max_x = _r;
-
-            if (_y < overlay.min_y)
-                overlay.min_y = _y;
-            if (_b > overlay.max_y)
-                overlay.max_y = _b;
-
-            var ctx = overlay.m_oContext;
-            ctx.strokeStyle = "#939393";
-            ctx.lineWidth = 1;
-
-            ctx.beginPath();
-            this.AutoShapesTrack.AddRect(ctx, _x >> 0, _y >> 0, _r >> 0, _b >> 0, true);
-            ctx.stroke();
-            ctx.beginPath();
-
-            ctx.strokeStyle = "#FFFFFF";
-            ctx.lineWidth = 1;
-
-            ctx.beginPath();
-            this.AutoShapesTrack.AddRect(ctx, (_x - 1) >> 0, (_y - 1) >> 0, (_r + 1) >> 0, (_b + 1) >> 0, true);
-            ctx.stroke();
-            ctx.beginPath();
-
-            if (null !== this.MathRect.ContentSelection)
+            for (var nIndex = 0, nCount = this.MathRect.Bounds.length; nIndex < nCount; nIndex++)
             {
-                _x = (drPage.left + dKoefX * this.MathRect.ContentSelection.X);
-                _y = (drPage.top  + dKoefY * this.MathRect.ContentSelection.Y);
-                _r = (drPage.left + dKoefX * (this.MathRect.ContentSelection.X + this.MathRect.ContentSelection.W));
-                _b = (drPage.top  + dKoefY * (this.MathRect.ContentSelection.Y + this.MathRect.ContentSelection.H));
+                var oBounds = this.MathRect.Bounds[nIndex];
+                var _page  = this.m_arrPages[oBounds.Page];
+                var drPage = _page.drawingPage;
+
+                var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+                var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+                var _x = (drPage.left + dKoefX * oBounds.X);
+                var _y = (drPage.top  + dKoefY * oBounds.Y);
+                var _r = (drPage.left + dKoefX * oBounds.R);
+                var _b = (drPage.top  + dKoefY * oBounds.B);
 
                 if (_x < overlay.min_x)
                     overlay.min_x = _x;
@@ -3379,94 +3348,157 @@ function CDrawingDocument()
                     overlay.max_y = _b;
 
                 var ctx = overlay.m_oContext;
-                ctx.fillStyle = "#375082";
+                ctx.strokeStyle = "#939393";
+                ctx.lineWidth = 1;
 
                 ctx.beginPath();
-                this.AutoShapesTrack.AddRect(ctx, _x >> 0, _y >> 0, _r >> 0, _b >> 0);
-
-                ctx.globalAlpha = 0.2;
-                ctx.fill();
-                ctx.globalAlpha = 1;
+                this.AutoShapesTrack.AddRect(ctx, _x >> 0, _y >> 0, _r >> 0, _b >> 0, true);
+                ctx.stroke();
                 ctx.beginPath();
+
+                ctx.strokeStyle = "#FFFFFF";
+                ctx.lineWidth = 1;
+
+                ctx.beginPath();
+                this.AutoShapesTrack.AddRect(ctx, (_x - 1) >> 0, (_y - 1) >> 0, (_r + 1) >> 0, (_b + 1) >> 0, true);
+                ctx.stroke();
+                ctx.beginPath();
+            }
+
+            if (null !== this.MathRect.ContentSelection)
+            {
+                for (var nIndex = 0, nCount = this.MathRect.ContentSelection.length; nIndex < nCount; nIndex++)
+                {
+                    var oContentSelection = this.MathRect.ContentSelection[nIndex];
+                    var _page  = this.m_arrPages[oContentSelection.Page];
+                    var drPage = _page.drawingPage;
+
+                    var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+                    var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+                    _x = (drPage.left + dKoefX * oContentSelection.X);
+                    _y = (drPage.top  + dKoefY * oContentSelection.Y);
+                    _r = (drPage.left + dKoefX * (oContentSelection.X + oContentSelection.W));
+                    _b = (drPage.top  + dKoefY * (oContentSelection.Y + oContentSelection.H));
+
+                    if (_x < overlay.min_x)
+                        overlay.min_x = _x;
+                    if (_r > overlay.max_x)
+                        overlay.max_x = _r;
+
+                    if (_y < overlay.min_y)
+                        overlay.min_y = _y;
+                    if (_b > overlay.max_y)
+                        overlay.max_y = _b;
+
+                    var ctx = overlay.m_oContext;
+                    ctx.fillStyle = "#375082";
+
+                    ctx.beginPath();
+                    this.AutoShapesTrack.AddRect(ctx, _x >> 0, _y >> 0, _r >> 0, _b >> 0);
+
+                    ctx.globalAlpha = 0.2;
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+                    ctx.beginPath();
+                }
             }
         }
         else
         {
-            var _arrBorderBlack = TransformRectByMatrix(this.TextMatrix,
-                [this.MathRect.Rect.X, this.MathRect.Rect.Y, this.MathRect.Rect.R, this.MathRect.Rect.B],
-                drPage.left, drPage.top, dKoefX, dKoefY);
-
-            var _1px_mm_x = 1 / Math.max(dKoefX, 0.001);
-            var _1px_mm_y = 1 / Math.max(dKoefY, 0.001);
-            var _arrBorderWhite = TransformRectByMatrix(this.TextMatrix,
-                [this.MathRect.Rect.X - _1px_mm_x, this.MathRect.Rect.Y - _1px_mm_y, this.MathRect.Rect.R - _1px_mm_x, this.MathRect.Rect.B - _1px_mm_y],
-                drPage.left, drPage.top, dKoefX, dKoefY);
-
-            overlay.CheckPoint(_arrBorderWhite[0], _arrBorderWhite[1]);
-            overlay.CheckPoint(_arrBorderWhite[2], _arrBorderWhite[3]);
-            overlay.CheckPoint(_arrBorderWhite[4], _arrBorderWhite[5]);
-            overlay.CheckPoint(_arrBorderWhite[6], _arrBorderWhite[7]);
-
-            var ctx = overlay.m_oContext;
-            ctx.strokeStyle = "#FFFFFF";
-            ctx.lineWidth = 1;
-
-            ctx.beginPath();
-
-            ctx.moveTo(_arrBorderWhite[0], _arrBorderWhite[1]);
-            ctx.lineTo(_arrBorderWhite[2], _arrBorderWhite[3]);
-            ctx.lineTo(_arrBorderWhite[4], _arrBorderWhite[5]);
-            ctx.lineTo(_arrBorderWhite[6], _arrBorderWhite[7]);
-            ctx.closePath();
-
-            ctx.stroke();
-            ctx.beginPath();
-
-            ctx.strokeStyle = "#939393";
-            ctx.lineWidth = 1;
-
-            ctx.beginPath();
-
-            ctx.moveTo(_arrBorderBlack[0], _arrBorderBlack[1]);
-            ctx.lineTo(_arrBorderBlack[2], _arrBorderBlack[3]);
-            ctx.lineTo(_arrBorderBlack[4], _arrBorderBlack[5]);
-            ctx.lineTo(_arrBorderBlack[6], _arrBorderBlack[7]);
-            ctx.closePath();
-
-            ctx.stroke();
-            ctx.beginPath();
-
-            if (null !== this.MathRect.ContentSelection)
+            for (var nIndex = 0, nCount = this.MathRect.Bounds.length; nIndex < nCount; nIndex++)
             {
-                var _arrSelect = TransformRectByMatrix(this.TextMatrix,
-                    [this.MathRect.ContentSelection.X, this.MathRect.ContentSelection.Y,
-                    this.MathRect.ContentSelection.X + this.MathRect.ContentSelection.W,
-                    this.MathRect.ContentSelection.Y + this.MathRect.ContentSelection.H],
+                var oBounds = this.MathRect.Bounds[nIndex];
+                var _page  = this.m_arrPages[oBounds.Page];
+                var drPage = _page.drawingPage;
+
+                var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+                var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+                var _arrBorderBlack = TransformRectByMatrix(this.TextMatrix,
+                    [oBounds.X, oBounds.Y, oBounds.R, oBounds.B],
                     drPage.left, drPage.top, dKoefX, dKoefY);
 
-                overlay.CheckPoint(_arrSelect[0], _arrSelect[1]);
-                overlay.CheckPoint(_arrSelect[2], _arrSelect[3]);
-                overlay.CheckPoint(_arrSelect[4], _arrSelect[5]);
-                overlay.CheckPoint(_arrSelect[6], _arrSelect[7]);
+                var _1px_mm_x = 1 / Math.max(dKoefX, 0.001);
+                var _1px_mm_y = 1 / Math.max(dKoefY, 0.001);
+                var _arrBorderWhite = TransformRectByMatrix(this.TextMatrix,
+                    [oBounds.X - _1px_mm_x, oBounds.Y - _1px_mm_y, oBounds.R - _1px_mm_x, oBounds.B - _1px_mm_y],
+                    drPage.left, drPage.top, dKoefX, dKoefY);
+
+                overlay.CheckPoint(_arrBorderWhite[0], _arrBorderWhite[1]);
+                overlay.CheckPoint(_arrBorderWhite[2], _arrBorderWhite[3]);
+                overlay.CheckPoint(_arrBorderWhite[4], _arrBorderWhite[5]);
+                overlay.CheckPoint(_arrBorderWhite[6], _arrBorderWhite[7]);
 
                 var ctx = overlay.m_oContext;
-                ctx.fillStyle = "#375082";
+                ctx.strokeStyle = "#FFFFFF";
+                ctx.lineWidth = 1;
 
                 ctx.beginPath();
 
-                ctx.moveTo(_arrSelect[0], _arrSelect[1]);
-                ctx.lineTo(_arrSelect[2], _arrSelect[3]);
-                ctx.lineTo(_arrSelect[4], _arrSelect[5]);
-                ctx.lineTo(_arrSelect[6], _arrSelect[7]);
+                ctx.moveTo(_arrBorderWhite[0], _arrBorderWhite[1]);
+                ctx.lineTo(_arrBorderWhite[2], _arrBorderWhite[3]);
+                ctx.lineTo(_arrBorderWhite[4], _arrBorderWhite[5]);
+                ctx.lineTo(_arrBorderWhite[6], _arrBorderWhite[7]);
                 ctx.closePath();
 
-                ctx.globalAlpha = 0.2;
-                ctx.fill();
-                ctx.globalAlpha = 1;
+                ctx.stroke();
+                ctx.beginPath();
+
+                ctx.strokeStyle = "#939393";
+                ctx.lineWidth = 1;
+
+                ctx.beginPath();
+
+                ctx.moveTo(_arrBorderBlack[0], _arrBorderBlack[1]);
+                ctx.lineTo(_arrBorderBlack[2], _arrBorderBlack[3]);
+                ctx.lineTo(_arrBorderBlack[4], _arrBorderBlack[5]);
+                ctx.lineTo(_arrBorderBlack[6], _arrBorderBlack[7]);
+                ctx.closePath();
+
+                ctx.stroke();
                 ctx.beginPath();
             }
 
+            if (null !== this.MathRect.ContentSelection)
+            {
+                for (var nIndex = 0, nCount = this.MathRect.ContentSelection.length; nIndex < nCount; nIndex++)
+                {
+                    var oContentSelection = this.MathRect.ContentSelection[nIndex];
+                    var _page  = this.m_arrPages[oContentSelection.Page];
+                    var drPage = _page.drawingPage;
 
+                    var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+                    var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+                    var _arrSelect = TransformRectByMatrix(this.TextMatrix,
+                        [oContentSelection.X, oContentSelection.Y,
+                                oContentSelection.X + oContentSelection.W,
+                                oContentSelection.Y + oContentSelection.H],
+                        drPage.left, drPage.top, dKoefX, dKoefY);
+
+                    overlay.CheckPoint(_arrSelect[0], _arrSelect[1]);
+                    overlay.CheckPoint(_arrSelect[2], _arrSelect[3]);
+                    overlay.CheckPoint(_arrSelect[4], _arrSelect[5]);
+                    overlay.CheckPoint(_arrSelect[6], _arrSelect[7]);
+
+                    var ctx = overlay.m_oContext;
+                    ctx.fillStyle = "#375082";
+
+                    ctx.beginPath();
+
+                    ctx.moveTo(_arrSelect[0], _arrSelect[1]);
+                    ctx.lineTo(_arrSelect[2], _arrSelect[3]);
+                    ctx.lineTo(_arrSelect[4], _arrSelect[5]);
+                    ctx.lineTo(_arrSelect[6], _arrSelect[7]);
+                    ctx.closePath();
+
+                    ctx.globalAlpha = 0.2;
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+                    ctx.beginPath();
+                }
+            }
         }
     }
 
@@ -4556,24 +4588,34 @@ function CDrawingDocument()
         this.m_oWordControl.UpdateVerRuler();
     }
 
-    this.Update_MathTrack = function(IsActive, IsContentActive, Math, X, Y, W, H, PageIndex)
+    this.Update_MathTrack = function(IsActive, IsContentActive, Math)
     {       
         this.MathRect.IsActive = IsActive;
         
-        if (true === IsActive)
+        if (true === IsActive && null !== Math)
         {
-            if (null !== Math && true === IsContentActive)
+            if (true === IsContentActive)
                 this.MathRect.ContentSelection = Math.Get_ContentSelection();
             else
                 this.MathRect.ContentSelection = null;
 
             var PixelError = this.GetMMPerDot(1) * 3;
 
-            this.MathRect.Rect.X = X - PixelError;
-            this.MathRect.Rect.Y = Y - PixelError;
-            this.MathRect.Rect.R = X + W + PixelError;
-            this.MathRect.Rect.B = Y + H + PixelError;
-            this.MathRect.Rect.PageIndex = PageIndex;
+            var arrBounds = Math.Get_Bounds();
+            this.MathRect.Bounds = [];
+            for (var nIndex = 0, nCount = arrBounds.length; nIndex < nCount; nIndex++)
+            {
+                var oBounds = arrBounds[nIndex];
+
+                this.MathRect.Bounds[nIndex] =
+                {
+                    X    : oBounds.X - PixelError,
+                    Y    : oBounds.Y - PixelError,
+                    R    : oBounds.X + oBounds.W + PixelError,
+                    B    : oBounds.Y + oBounds.H + PixelError,
+                    Page : oBounds.Page
+                };
+            }
         }
     }
 
