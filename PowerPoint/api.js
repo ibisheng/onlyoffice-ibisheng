@@ -824,7 +824,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
     }
 
     this.DocumentName = documentTitle;
-	if (undefined != window["AscDesktopEditor"])
+	if (undefined !== window["AscDesktopEditor"])
     {
         window["AscDesktopEditor"]["SetDocumentName"](this.DocumentName);
     }
@@ -1524,6 +1524,11 @@ function OnSave_Callback(e) {
 
 			// Обновляем состояние возможности сохранения документа
 			editor._onUpdateDocumentCanSave();
+
+			if (undefined !== window["AscDesktopEditor"])
+            {
+                window["AscDesktopEditor"]["OnSave"]();
+            }
 		};
 
 		// Пересылаем свои изменения

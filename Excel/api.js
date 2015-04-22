@@ -467,7 +467,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.User.asc_setUserName(this.DocInfo["UserName"]);
 			}
 			
-			if (undefined != window["AscDesktopEditor"])
+			if (undefined !== window["AscDesktopEditor"])
 			{
 				window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
 			}
@@ -1938,6 +1938,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					t.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 					// Обновляем состояние возможности сохранения документа
 					t.onUpdateDocumentModified(false);
+
+					if (undefined !== window["AscDesktopEditor"])
+                    {
+                        window["AscDesktopEditor"]["OnSave"]();
+                    }
 				};
 
 				// Пересылаем всегда, но чистим только если началось совместное редактирование
