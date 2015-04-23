@@ -653,7 +653,7 @@
 				t.changeWorksheet("update", {reinitRanges: true});
 				t._updateVisibleColsCount();
 			};
-			this._isLockedAll (onChangeWidthCallback);
+			this._isLockedAll(onChangeWidthCallback);
 		};
 
 		// mouseY - это разница стартовых координат от мыши при нажатии и границы
@@ -912,7 +912,7 @@
 				};
 
 				// Можно ли применять автоформулу
-				this._isLockedCells (changedRange, /*subType*/null, onAutoCompleteFormula);
+				this._isLockedCells(changedRange, /*subType*/null, onAutoCompleteFormula);
 
 				result.notEditCell = true;
 				return result;
@@ -7070,7 +7070,7 @@
 				return;
 			}
 
-			this._isLockedCells (to, null, onApplyFormatPainterCallback);
+			this._isLockedCells(to, null, onApplyFormatPainterCallback);
 		};
 		WorksheetView.prototype.formatPainter = function (stateFormatPainter) {
 			// Если передали состояние, то выставляем его. Если нет - то меняем на противоположное.
@@ -7585,7 +7585,7 @@
 				};
 
 				// Можно ли применять автозаполнение ?
-				this._isLockedCells (changedRange, /*subType*/null, applyFillHandleCallback);
+				this._isLockedCells(changedRange, /*subType*/null, applyFillHandleCallback);
 			}
 			else {
 				// Ничего не менялось, сбрасываем выделение
@@ -7931,7 +7931,7 @@
 				t._updateSelectionNameAndInfo();
 			};
 
-			this._isLockedCells ([arnFrom, arnTo], null, onApplyMoveRangeHandleCallback);
+			this._isLockedCells([arnFrom, arnTo], null, onApplyMoveRangeHandleCallback);
 		};
 
 		WorksheetView.prototype.emptySelection = function (options) {
@@ -8174,7 +8174,7 @@
 			if("paste" === prop && val.onlyImages === true)
 				onSelectionCallback();
 			else
-				this._isLockedCells (checkRange, /*subType*/null, onSelectionCallback);
+				this._isLockedCells(checkRange, /*subType*/null, onSelectionCallback);
 		};
 		
 		WorksheetView.prototype._pasteFromLocalBuff = function (isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth, onlyActive) {
@@ -9288,70 +9288,11 @@
 
 		// Залочена ли панель для закрепления
 		WorksheetView.prototype._isLockedFrozenPane = function (callback) {
-			if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
-				// Запрещено совместное редактирование
-				asc_applyFunction(callback, true);
-				return;
-			}
-			var sheetId = this.model.getId();
-			var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, c_oAscLockNameFrozenPane);
-
-			if (false === this.collaborativeEditing.getCollaborativeEditing()) {
-				// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-				asc_applyFunction(callback, true);
-				callback = undefined;
-			}
-			if (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
-				c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
-				// Редактируем сами
-				asc_applyFunction(callback, true);
-				return;
-			} else if (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
-				c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
-				// Уже ячейку кто-то редактирует
-				asc_applyFunction(callback, false);
-				return;
-			}
-
-			this.collaborativeEditing.onStartCheckLock();
-			this.collaborativeEditing.addCheckLock(lockInfo);
-			this.collaborativeEditing.onEndCheckLock(callback);
+			asc_applyFunction(callback, true);
 		};
-
 		// Залочен ли весь лист
 		WorksheetView.prototype._isLockedAll = function (callback) {
-			if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
-				// Запрещено совместное редактирование
-				asc_applyFunction(callback, true);
-				return;
-			}
-			var sheetId = this.model.getId();
-			var subType = c_oAscLockTypeElemSubType.ChangeProperties;
-			var ar = this.activeRange;
-
-			var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/subType,
-				sheetId, new asc.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
-
-			if (false === this.collaborativeEditing.getCollaborativeEditing()) {
-				// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-				asc_applyFunction(callback, true);
-				callback = undefined;
-			}
-			if (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
-			c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/true)) {
-				// Редактируем сами
-				asc_applyFunction(callback, true);
-				return;
-			} else if (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
-			c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/true)) {
-				// Уже ячейку кто-то редактирует
-				asc_applyFunction(callback, false);
-				return;
-			}
-
-			this.collaborativeEditing.onStartCheckLock();
-			this.collaborativeEditing.addCheckLock(lockInfo);
-			this.collaborativeEditing.onEndCheckLock(callback);
+			asc_applyFunction(callback, true);
 		};
 		// Пересчет для входящих ячеек в добавленные строки/столбцы
 		WorksheetView.prototype._recalcRangeByInsertRowsAndColumns = function (sheetId, ar) {
@@ -9398,98 +9339,7 @@
 		};
 		// Функция проверки lock (возвращаемый результат нельзя использовать в качестве ответа, он нужен только для редактирования ячейки)
 		WorksheetView.prototype._isLockedCells = function (range, subType, callback) {
-			if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
-				// Запрещено совместное редактирование
-				asc_applyFunction(callback, true);
-				return true;
-			}
-			var sheetId = this.model.getId();
-			var isIntersection = false;
-			var newCallback = callback;
-			var t = this;
-
-			this.collaborativeEditing.onStartCheckLock();
-			var isArrayRange = Array.isArray(range);
-			var nLength = isArrayRange ? range.length : 1;
-			var nIndex = 0;
-			var ar = null;
-
-			for (; nIndex < nLength; ++nIndex) {
-				ar = isArrayRange ? range[nIndex].clone(true) : range.clone(true);
-
-				if (c_oAscLockTypeElemSubType.InsertColumns !== subType && c_oAscLockTypeElemSubType.InsertRows !== subType) {
-					// Пересчет для входящих ячеек в добавленные строки/столбцы
-					isIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, ar);
-				}
-
-				if (false === isIntersection) {
-					var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/subType,
-						sheetId, new asc.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
-
-					if (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
-						c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
-						// Уже ячейку кто-то редактирует
-						asc_applyFunction(callback, false);
-						return false;
-					} else {
-						if (c_oAscLockTypeElemSubType.InsertColumns === subType) {
-							newCallback = function (isSuccess) {
-								if (isSuccess) {
-									t.collaborativeEditing.addColsRange(sheetId, range.clone(true));
-									t.collaborativeEditing.addCols(sheetId, range.c1, range.c2 - range.c1 + 1);
-								}
-								callback(isSuccess);
-							};
-						} else if (c_oAscLockTypeElemSubType.InsertRows === subType) {
-							newCallback = function (isSuccess) {
-								if (isSuccess) {
-									t.collaborativeEditing.addRowsRange(sheetId, range.clone(true));
-									t.collaborativeEditing.addRows(sheetId, range.r1, range.r2 - range.r1 + 1);
-								}
-								callback(isSuccess);
-							};
-						} else if (c_oAscLockTypeElemSubType.DeleteColumns === subType) {
-							newCallback = function (isSuccess) {
-								if (isSuccess) {
-									t.collaborativeEditing.removeColsRange(sheetId, range.clone(true));
-									t.collaborativeEditing.removeCols(sheetId, range.c1, range.c2 - range.c1 + 1);
-								}
-								callback(isSuccess);
-							};
-						} else if (c_oAscLockTypeElemSubType.DeleteRows === subType) {
-							newCallback = function (isSuccess) {
-								if (isSuccess) {
-									t.collaborativeEditing.removeRowsRange(sheetId, range.clone(true));
-									t.collaborativeEditing.removeRows(sheetId, range.r1, range.r2 - range.r1 + 1);
-								}
-								callback(isSuccess);
-							};
-						}
-						this.collaborativeEditing.addCheckLock(lockInfo);
-					}
-				} else {
-					if (c_oAscLockTypeElemSubType.InsertColumns === subType) {
-						t.collaborativeEditing.addColsRange(sheetId, range.clone(true));
-						t.collaborativeEditing.addCols(sheetId, range.c1, range.c2 - range.c1 + 1);
-					} else if (c_oAscLockTypeElemSubType.InsertRows === subType) {
-						t.collaborativeEditing.addRowsRange(sheetId, range.clone(true));
-						t.collaborativeEditing.addRows(sheetId, range.r1, range.r2 - range.r1 + 1);
-					} else if (c_oAscLockTypeElemSubType.DeleteColumns === subType) {
-						t.collaborativeEditing.removeColsRange(sheetId, range.clone(true));
-						t.collaborativeEditing.removeCols(sheetId, range.c1, range.c2 - range.c1 + 1);
-					} else if (c_oAscLockTypeElemSubType.DeleteRows === subType) {
-						t.collaborativeEditing.removeRowsRange(sheetId, range.clone(true));
-						t.collaborativeEditing.removeRows(sheetId, range.r1, range.r2 - range.r1 + 1);
-					}
-				}
-			}
-
-			if (false === this.collaborativeEditing.getCollaborativeEditing()) {
-				// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-				newCallback(true);
-				newCallback = undefined;
-			}
-			this.collaborativeEditing.onEndCheckLock(newCallback);
+			asc_applyFunction(callback, true);
 			return true;
 		};
 
@@ -10242,7 +10092,7 @@
 			options.countFind = aReplaceCells.length;
 			options.countReplace = 0;
 			if (options.isReplaceAll && false === this.collaborativeEditing.getCollaborativeEditing())
-				this._isLockedCells (aReplaceCells, /*subType*/null, function () {
+				this._isLockedCells(aReplaceCells, /*subType*/null, function () {
 					t._replaceCellText(aReplaceCells, valueForSearching, options, lockDraw, callback, true);
 				});
 			else
@@ -10908,7 +10758,7 @@
 
 				t.autoFilters.addAutoFilter(lTable, ar, undefined, false, addFormatTableOptionsObj);
 			};
-			this._isLockedAll (onChangeAutoFilterCallback);
+			this._isLockedAll(onChangeAutoFilterCallback);
 		};
 
 		WorksheetView.prototype.applyAutoFilter = function (type, autoFilterObject) {
@@ -10920,7 +10770,7 @@
 
 				t.autoFilters.applyAutoFilter(type, autoFilterObject, ar);
 			};
-			this._isLockedAll (onChangeAutoFilterCallback);
+			this._isLockedAll(onChangeAutoFilterCallback);
 		};
 
 		WorksheetView.prototype.sortColFilter = function (type,cellId) {
@@ -10932,7 +10782,7 @@
 
 				t.autoFilters.sortColFilter(type, cellId, ar);
 			};
-			this._isLockedAll (onChangeAutoFilterCallback);
+			this._isLockedAll(onChangeAutoFilterCallback);
 		};
 
 		WorksheetView.prototype.getAddFormatTableOptions = function () {
@@ -10949,7 +10799,7 @@
 				
 				t.autoFilters.isApplyAutoFilterInCell(ar, true);
 			};
-			this._isLockedAll (onChangeAutoFilterCallback);
+			this._isLockedAll(onChangeAutoFilterCallback);
 		};
 
 		/**

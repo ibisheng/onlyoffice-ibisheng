@@ -67,6 +67,7 @@
                 "../../Excel/model/History.js",
                 "../../Excel/model/UndoRedo.js",
                 "../../Excel/model/CellComment.js",
+				"../../Excel/model/Private/CellComment.js",
                 "../../Excel/view/mobileTouch.js",
                 "../../Excel/view/iscroll.js",
                 "../../Excel/view/PopUpSelector.js",
@@ -74,6 +75,7 @@
                 "../../Excel/view/CellTextRender.js",
                 "../../Excel/view/CellEditorView.js",
                 "../../Excel/view/WorksheetView.js",
+				"../../Excel/view/Private/WorksheetView.js",
                 "../../Excel/view/HandlerList.js",
                 "../../Excel/view/EventsController.js",
                 "../../Excel/view/WorkbookView.js",
@@ -158,7 +160,8 @@
                 "../../Excel/model/DrawingObjects/GlobalCounters.js",
                 "../../Word/apiCommon.js",
                 "../../Excel/Build/Log/apiCommonExport.js",
-                "../../Excel/api.js"
+                "../../Excel/api.js",
+				"../../Excel/Private/api.js"
             ],
             "dst": "../../Excel/sdk-all.js",
             "externs": [
@@ -200,12 +203,14 @@
                 "cwd": "../../Excel/",
                 "src": [
                     "api.js",
+					"Private/api.js",
                     "apiDefines.js",
                     "view/EventsController.js",
                     "view/HandlerList.js",
                     "model/AdvancedOptions.js",
                     "model/CellInfo.js",
                     "model/CellComment.js",
+					"model/Private/CellComment.js",
                     "utils/utils.js",
                     "css/*.css"
                 ],
