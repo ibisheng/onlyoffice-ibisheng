@@ -458,7 +458,7 @@ CMathGapsInfo.prototype =
     getGapsMComp: function(MComp, direct)
     {
         var kind = MComp.kind;
-        var checkGap = this.checkGapKind(kind);
+        var checkGap = this.checkGapKind(MComp);
 
         var bNeedGap = !checkGap.bEmptyGaps && !checkGap.bChildGaps;
 
@@ -839,7 +839,7 @@ CMathContent.prototype.getGapsInside = function(GapsInfo) // учитываем 
 
     if(bFirstComp)
     {
-        checkGap = GapsInfo.checkGapKind(this.Content[1].kind);
+        checkGap = GapsInfo.checkGapKind(this.Content[1]);
 
         if(!checkGap.bChildGaps)
         {
@@ -850,11 +850,11 @@ CMathContent.prototype.getGapsInside = function(GapsInfo) // учитываем 
 
     if(bLastComp)
     {
-        checkGap = GapsInfo.checkGapKind(this.Content[len - 1].kind);
+        checkGap = GapsInfo.checkGapKind(this.Content[len - 1]);
 
         if(!checkGap.bChildGaps)
         {
-            gaps.right = GapsInfo.getGapsMComp(this.Content[len - 1], 1);
+            gaps.right = GapsInfo.getGapsMComp(this.Content[len - 2], 1);
             //gaps.right = gapsMComp.right;
         }
     }

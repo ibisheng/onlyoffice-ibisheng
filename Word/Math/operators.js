@@ -3500,7 +3500,7 @@ CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 CDelimiter.prototype.Is_EmptyGaps = function()
 {
     var Height = g_oTextMeasurer.GetHeight();
-    var result = this.GeneralMetrics.size.height < Height;
+    var result = this.GeneralMetrics.height < Height;
 
     return result;
 };
