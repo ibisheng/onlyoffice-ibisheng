@@ -110,6 +110,7 @@
                 "../../Word/Editor/FontClassification.js",
                 "../../Word/Editor/Spelling.js",
                 "../../Word/Drawing/Graphics.js",
+				"../../Word/Drawing/Private/Graphics.js",
                 "../../Word/Drawing/Overlay.js",
                 "../../Word/Drawing/HatchPattern.js",
                 "../../Word/Drawing/ShapeDrawer.js",

@@ -259,6 +259,48 @@
 				}
 			},
 			
+			copyDesktopEditorButton: function(ElemToSelect, isCut)
+			{
+				if (isCut)
+				{
+					var __oncut = ElemToSelect.oncut;
+
+					ElemToSelect.oncut = function (e) {
+
+						ElemToSelect.oncut = __oncut;
+						__oncut = null;
+
+						var api = window["Asc"]["editor"];
+						if(api.controller.isCellEditMode)
+							return;
+						
+						Editor_Copy_Event_Excel(e, ElemToSelect, true, true);
+						e.preventDefault();
+					}
+
+					window["AscDesktopEditor"]["Cut"]();
+				}
+				else
+				{
+					var __oncopy = ElemToSelect.oncopy;
+
+					ElemToSelect.oncopy = function (e) {
+
+						ElemToSelect.oncopy = __oncopy;
+						__oncopy = null;
+
+						var api = window["Asc"]["editor"];
+						if(api.controller.isCellEditMode)
+							return;
+						
+						Editor_Copy_Event_Excel(e, ElemToSelect, null, true);
+						e.preventDefault();
+					}
+
+					window["AscDesktopEditor"]["Copy"]();
+				}
+
+			},
 			
 			//****copy cells ****
 			copyRange: function (range, worksheet, isCut) {
@@ -355,6 +397,13 @@
 					}
 								
 					History.TurnOn();
+					
+					if (window["AscDesktopEditorButtonMode"] === true && window["AscDesktopEditor"]) {
+					
+						this.copyDesktopEditorButton(this.element, isCut);
+						return;
+					} 
+					
 					
 					if(AscBrowser.isMozilla)
 						t._selectElement(t._getStylesSelect);
