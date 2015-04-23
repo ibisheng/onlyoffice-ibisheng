@@ -262,14 +262,6 @@ CGraphicObjects.prototype =
 
     checkSelectedObjectsForMove: DrawingObjectsController.prototype.checkSelectedObjectsForMove,
 
-    Document_Is_SelectionLocked: function(CheckType)
-    {
-        if(CheckType === changestype_ColorScheme)
-        {
-            this.Lock.Check(this.Get_Id());
-        }
-    },
-
     getDrawingPropsFromArray: DrawingObjectsController.prototype.getDrawingPropsFromArray,
     getPropsFromChart: DrawingObjectsController.prototype.getPropsFromChart,
     getSelectedObjectsByTypes: DrawingObjectsController.prototype.getSelectedObjectsByTypes,
@@ -1097,24 +1089,6 @@ CGraphicObjects.prototype =
     {
         var content = this.getTargetDocContent();
         return content && content.Add_Comment(commentData, true, true);
-    },
-
-    documentIsSelectionLocked: function(CheckType)
-    {
-        var oDrawing, i;
-        if(changestype_Drawing_Props === CheckType
-          || changestype_Image_Properties === CheckType
-            || changestype_Delete === CheckType
-                || changestype_Remove === CheckType
-                    || changestype_Paragraph_Content === CheckType
-                        || changestype_Document_Content_Add === CheckType)
-        {
-            for(i = 0; i < this.selectedObjects.length; ++i)
-            {
-                oDrawing = this.selectedObjects[i].parent;
-                oDrawing.Lock.Check(oDrawing.Get_Id());
-            }
-        }
     },
 
     hyperlinkCheck: DrawingObjectsController.prototype.hyperlinkCheck,

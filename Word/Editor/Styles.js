@@ -2952,28 +2952,6 @@ CStyle.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для совместного редактирования
 //-----------------------------------------------------------------------------------
-    Document_Is_SelectionLocked : function(CheckType)
-    {
-        switch ( CheckType )
-        {
-            case changestype_Paragraph_Content:
-            case changestype_Paragraph_Properties:
-            case changestype_Document_Content:
-            case changestype_Document_Content_Add:
-            case changestype_Image_Properties:
-            case changestype_Remove:
-            case changestype_Delete:
-            case changestype_Document_SectPr:
-            case changestype_Table_Properties:
-            case changestype_Table_RemoveCells:
-            case changestype_HdrFtr:
-            {
-                CollaborativeEditing.Add_CheckLock(true);
-                break;
-            }
-        }
-    },
-
     Save_Changes : function(Data, Writer)
     {
         // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
@@ -4568,28 +4546,6 @@ CStyles.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для совместного редактирования
 //-----------------------------------------------------------------------------------
-    Document_Is_SelectionLocked : function(CheckType)
-    {
-        switch ( CheckType )
-        {
-            case changestype_Paragraph_Content:
-            case changestype_Paragraph_Properties:
-            case changestype_Document_Content:
-            case changestype_Document_Content_Add:
-            case changestype_Image_Properties:
-            case changestype_Remove:
-            case changestype_Delete:
-            case changestype_Document_SectPr:
-            case changestype_Table_Properties:
-            case changestype_Table_RemoveCells:
-            case changestype_HdrFtr:
-            {
-                CollaborativeEditing.Add_CheckLock(true);
-                break;
-            }
-        }
-    },
-
     Save_Changes : function(Data, Writer)
     {
         // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.

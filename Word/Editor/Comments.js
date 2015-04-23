@@ -727,13 +727,6 @@ function CComments()
 //-----------------------------------------------------------------------------------
 // Функции для работы с совместным редактированием
 //-----------------------------------------------------------------------------------
-    this.Document_Is_SelectionLocked = function(Id)
-    {
-        var Comment = this.Get_ById( Id );
-        if ( null != Comment )
-            Comment.Lock.Check( Comment.Get_Id() );
-    };
-
     this.Save_Changes = function(Data, Writer)
     {
         // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.

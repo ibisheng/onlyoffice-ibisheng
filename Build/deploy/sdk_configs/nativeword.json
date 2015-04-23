@@ -159,8 +159,9 @@
                 "../../Common/Native/Wrappers/ShapeDrawer.js",
                 "../../Common/Native/Wrappers/Overlay.js",
                 "../../Common/Native/Wrappers/HtmlPage.js",
-                "../../Common/Native/Wrappers/api.js"
-				
+                "../../Common/Native/Wrappers/api.js",
+
+				"../../Word/Editor/Private/Locks.js"
             ],
             "dst": "../../Word/sdk-all.js",
             "externs": [

@@ -5239,14 +5239,6 @@ ParaDrawing.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для совместного редактирования
 //-----------------------------------------------------------------------------------
-    Document_Is_SelectionLocked : function(CheckType)
-    {
-        if(CheckType === changestype_Drawing_Props)
-        {
-            this.Lock.Check(this.Get_Id());
-        }
-    },
-
     hyperlinkCheck: function(bCheck)
     {
         if(isRealObject(this.GraphicObj) && typeof  this.GraphicObj.hyperlinkCheck === "function")

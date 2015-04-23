@@ -162,7 +162,9 @@
 				"../../Excel/model/WorkbookElems.js",
 				"../../Excel/model/Workbook.js",
 				"../../Excel/model/CellInfo.js",
-				"../../Excel/model/AdvancedOptions.js"
+                "../../Excel/model/AdvancedOptions.js",
+
+                "../../Word/Editor/Private/Locks.js"
             ],
             "dst": "../../PowerPoint/sdk-all.js",
             "externs": [

@@ -1519,26 +1519,6 @@ CAbstractNum.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с совместным редактирования
 //-----------------------------------------------------------------------------------
-    Document_Is_SelectionLocked : function(CheckType)
-    {
-        switch ( CheckType )
-        {
-            case changestype_Paragraph_Content:
-            case changestype_Paragraph_Properties:
-            {
-                this.Lock.Check( this.Get_Id() );
-                break;
-            }
-            case changestype_Document_Content:
-            case changestype_Document_Content_Add:
-            case changestype_Image_Properties:
-            {
-                CollaborativeEditing.Add_CheckLock(true);
-                break;
-            }
-        }
-    },
-
     Save_Changes : function(Data, Writer)
     {
         // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
