@@ -65,6 +65,7 @@ function CThemeLoader()
                 return;
             }
 
+			this.Api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadTheme);
             this.Api.EndLoadTheme(theme_load_info);
             return;
         }
