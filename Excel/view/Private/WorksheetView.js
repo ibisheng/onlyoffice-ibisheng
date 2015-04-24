@@ -53,7 +53,7 @@
 			this.collaborativeEditing.onEndCheckLock(callback);
 		};
 		// Залочен ли весь лист
-		asc.WorksheetView.prototype.prototype._isLockedAll = function (callback) {
+		asc.WorksheetView.prototype._isLockedAll = function (callback) {
 			if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
 				// Запрещено совместное редактирование
 				asc_applyFunction(callback, true);
