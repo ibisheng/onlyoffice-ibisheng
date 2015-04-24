@@ -6952,7 +6952,7 @@ function sendCommand(editor, fCallback, rdata){
         data: sData,
         contentType: sRequestContentType,
         error: function(){
-				if("save" != rdata["c"])
+				if("save" != rdata["c"] && "chsave" != rdata["c"])
 					editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
 				if(fCallback)
 					fCallback();
@@ -7026,7 +7026,7 @@ function sendCommand(editor, fCallback, rdata){
                         fCallback(incomeObject);
 				break;
                 case "err":
-					if("save" != rdata["c"]){
+					if("save" != rdata["c"] && "chsave" != rdata["c"]){
 						var nErrorLevel = c_oAscError.Level.NoCritical;
 						//todo передалеть работу с callback
 						if("getsettings" == rdata["c"] || "open" == rdata["c"] || "chopen" == rdata["c"] || "create" == rdata["c"])
