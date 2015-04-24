@@ -162,7 +162,7 @@
                 "../../Common/Native/Wrappers/HtmlPage.js",
                 "../../Common/Native/Wrappers/api.js",
 
-				"../../Word/Editor/Private/Locks.js"
+				"../../Common/Private/Locks.js"
             ],
             "dst": "../../Word/sdk-all.js",
             "externs": [
