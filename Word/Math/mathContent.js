@@ -844,7 +844,6 @@ CMathContent.prototype.getGapsInside = function(GapsInfo) // учитываем 
         if(!checkGap.bChildGaps)
         {
             gaps.left = GapsInfo.getGapsMComp(this.Content[1], -1);
-            //gaps.left = gapsMComp.left;
         }
     }
 
@@ -855,7 +854,6 @@ CMathContent.prototype.getGapsInside = function(GapsInfo) // учитываем 
         if(!checkGap.bChildGaps)
         {
             gaps.right = GapsInfo.getGapsMComp(this.Content[len - 2], 1);
-            //gaps.right = gapsMComp.right;
         }
     }
 
@@ -3917,7 +3915,8 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         RangeEndPos   = ContentLen - 1;
     }
 
-    this.InfoPoints.SetDefault();
+    if(this.RecalcInfo.bEqArray)
+        this.InfoPoints.SetDefault();
 
     var ascent = 0, descent = 0;
     this.size.width = 0;

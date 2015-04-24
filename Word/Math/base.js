@@ -1789,7 +1789,7 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         var RangeStartPos = this.protected_AddRange(CurLine, CurRange),
             RangeEndPos = Len - 1;
 
-        this.VerifyWordLen(PRS);
+        //this.VerifyWordLen(PRS);
 
         if(CurLine == 0 && CurRange == 0)
         {
@@ -1828,9 +1828,10 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 PRS.WordLen = WWordLen + Item.size.width;
                 PRS.Word    = true;
 
-                if(Pos < Len - 1)
-                    PRS.WordLen += this.dW;
             }
+
+            if(PRS.NewRange == false && Pos < Len - 1)
+                PRS.WordLen += this.dW
         }
 
 

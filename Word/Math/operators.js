@@ -3451,7 +3451,7 @@ CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
         var Content = this.Content[0];
 
-        this.VerifyWordLen(PRS);
+        //this.VerifyWordLen(PRS);
 
         if(CurLine == 0 && CurRange == 0)
         {
@@ -3459,7 +3459,8 @@ CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             // далее будем считать объект как многостроковый на Recalculate_Range
             PRS.bMath_OneLine = true;
 
-            var WordLen = PRS.WordLen;
+            var WordLen  = PRS.WordLen,
+                SpaceLen = PRS.SpaceLen;
 
             Content.Recalculate_Range(PRS, ParaPr, Depth + 1);
             this.RecalculateGeneralSize(g_oTextMeasurer, Content.size.height, Content.size.ascent);
@@ -3471,7 +3472,8 @@ CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             //
             Content.Recalculate_Reset(PRS.Range, PRS.Line);
 
-            PRS.WordLen = WordLen + this.BrGapLeft;
+            PRS.WordLen  = WordLen + this.BrGapLeft;
+            PRS.SpaceLen = SpaceLen;
         }
         PRS.bMath_OneLine = false;
         PRS.Update_CurPos(0, Depth);

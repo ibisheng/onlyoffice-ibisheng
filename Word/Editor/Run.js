@@ -2068,13 +2068,20 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             }
                         }
 
-                        if (true !== NewRange || (this.Type == para_Math_Run && this.ParaMath.Is_BrkBinBefore() == false))
+                        if(this.Type == para_Math_Run && this.ParaMath.Is_BrkBinBefore() == false)
+                        {
+                            PRS.Set_LineBreakPos(Pos);
+                            WordLen += LetterLen;
+                            Word = true;
+                        }
+                        else if (true !== NewRange)
                         {
                             // Отмечаем начало нового слова
                             PRS.Set_LineBreakPos(Pos);
                             WordLen = LetterLen;
                             Word = true;
                         }
+
                     }
                     else
                     {

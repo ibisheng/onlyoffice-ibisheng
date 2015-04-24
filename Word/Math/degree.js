@@ -879,7 +879,7 @@ CDegreeSubSup.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         var RangeStartPos = this.protected_AddRange(CurLine, CurRange),
             RangeEndPos = 0;
 
-        this.VerifyWordLen(PRS);
+        //this.VerifyWordLen(PRS);
 
         if(CurLine == 0 && CurRange == 0)
         {

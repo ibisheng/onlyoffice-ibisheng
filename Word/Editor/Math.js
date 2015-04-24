@@ -432,9 +432,6 @@ ParaMath.prototype.Add = function(Item)
 };
 ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, Page, _X, _XLimit)
 {
-    var CurLine  = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
     var X = _X;
 
     var MathSettings = Get_WordDocumentDefaultMathSettings();
@@ -452,8 +449,11 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, Page, _X, _XL
 
     var LineCount = this.Root.protected_GetLinesCount();
 
+    //if(LineCount > 0)
+    //    WidthFirstLine = this.Root.GetWidth(_CurLine);
+
     if(LineCount > 0)
-        WidthFirstLine = this.Root.GetWidth(_CurLine);
+        WidthFirstLine = this.Root.GetWidth(this.Root.StartLine);
 
     var FirstWidth = CurrentPage == 0 ? WidthFirstLine : 0; // если страница не первая, то ширину первой строки формулы не учитываем
 
