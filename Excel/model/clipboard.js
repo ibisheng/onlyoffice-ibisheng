@@ -5018,7 +5018,7 @@
 						if(sSrc.length > 0)
 						{
 							sSrc = this.getSrc(sSrc);
-							sRes += "<img style=\"max-width:100%;\" width=\""+Math.round(ParaItem.GraphicObj.bounds.w * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(ParaItem.GraphicObj.bounds.h * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
+							sRes += "<img style=\"max-width:100%;\" width=\""+Math.round(ParaItem.Extent.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(ParaItem.Extent.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
 							break;
 						}
 						// var _canvas     = document.createElement('canvas');
@@ -5455,7 +5455,7 @@
 									var base64_img = cur_element.getBase64Img();
 									var src = this.getSrc(base64_img);
 
-									this.Para.innerHTML = "<img style=\"max-width:100%;\" width=\""+Math.round(cur_element.GraphicObj.bounds.w * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(cur_element.GraphicObj.bounds.h * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" />";
+									this.Para.innerHTML = "<img style=\"max-width:100%;\" width=\""+Math.round(cur_element.Extent.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(cur_element.Extent.H * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" />";
 
 									this.ElemToSelect.appendChild( this.Para );
 

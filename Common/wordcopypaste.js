@@ -701,8 +701,8 @@ CopyProcessor.prototype =
                 {
                     sSrc = this.getSrc(sSrc);
 
-                    var _w = ParaItem.GraphicObj.bounds.w;
-                    var _h = ParaItem.GraphicObj.bounds.h;
+                    var _w = ParaItem.Extent.W;
+                    var _h = ParaItem.Extent.H;
 
                     sRes += "<img style=\"max-width:100%;\" width=\""+Math.round(_w * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(_h * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
                     break;
