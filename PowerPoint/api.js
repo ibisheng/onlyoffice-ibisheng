@@ -1686,6 +1686,8 @@ asc_docs_api.prototype.sync_EndAction = function(type, id){
     if (c_oAscAsyncActionType.BlockInteraction == type)
     {
         this.IsLongActionCurrent--;
+        if (this.IsLongActionCurrent < 0)
+            this.IsLongActionCurrent = 0;
 
         if (!this.asc_IsLongAction())
         {
