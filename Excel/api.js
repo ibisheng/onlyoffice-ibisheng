@@ -1038,7 +1038,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					"editorid"      : c_oEditorId.Spreadsheet,
 					"url"           : this.documentUrl,
 					"title"         : this.documentTitle,
-					"embeddedfonts" : this.isUseEmbeddedCutFonts
+					"embeddedfonts" : this.isUseEmbeddedCutFonts,
+					"viewmode"		: this.asc_getViewerMode()
 				};
 				if (false && this.documentOpenOptions && this.documentOpenOptions["isEmpty"]) {
 					var sEmptyWorkbook = getEmptyWorkbook();

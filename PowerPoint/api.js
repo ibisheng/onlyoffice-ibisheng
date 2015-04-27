@@ -859,7 +859,8 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 			"c":"open",
 			"url": documentUrl,
 			"title": documentTitle,
-			"embeddedfonts": this.isUseEmbeddedCutFonts};
+			"embeddedfonts": this.isUseEmbeddedCutFonts,
+			"viewmode": this.isViewMode};
 			
         sendCommand( oThis, function(){}, rData );
 
