@@ -1937,12 +1937,39 @@
 
 		// Поиск ячейки по ссылке
 		WorkbookView.prototype.findCell = function (reference) {
-			var ws = this.getWorksheet();
+			var ws = this.getWorksheet(), retRange;
 			// Останавливаем ввод данных в редакторе ввода
 			if (ws.getCellEditMode())
 				this._onStopCellEditing();
-			return ws.findCell(reference);
-		};
+
+
+            return ws.findCell(reference);
+        };
+
+        WorkbookView.prototype.getDefinedNames = function () {
+            return this.model.getDefinesNamesWB();
+        };
+
+        WorkbookView.prototype.setDefinedNames = function (defName) {
+            //ToDo проверка defName.ref на знак "=" в начале ссылки. знака нет тогда это либо число либо строка, так делает Excel.
+
+            this.handlers.trigger("asc_onDefName", this.model.setDefinesNames(defName.Name,defName.Ref,defName.Scope ));
+
+        };
+
+        WorkbookView.prototype.editDefinedNames = function (oldName, newName) {
+            //ToDo проверка defName.ref на знак "=" в начале ссылки. знака нет тогда это либо число либо строка, так делает Excel.
+
+            this.handlers.trigger("asc_onEditDefName", this.model.editDefinesNames(oldName, newName));
+
+        };
+
+        WorkbookView.prototype.delDefinedNames = function (oldName) {
+            //ToDo проверка defName.ref на знак "=" в начале ссылки. знака нет тогда это либо число либо строка, так делает Excel.
+
+            this.handlers.trigger("asc_onDelDefName", this.model.delDefinesNames(oldName));
+
+        };
 
 		// Печать
 		WorkbookView.prototype.printSheet = function (pdf_writer, printPagesData) {

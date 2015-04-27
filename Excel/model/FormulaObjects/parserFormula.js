@@ -1187,17 +1187,34 @@ cEmpty.prototype.toString = function () {
 };
 
 /** @constructor */
-function cName( val, wb ) {
+function cName( val, wb, ws ) {
     this.constructor.call( this, val, cElementType.name );
+    this.regSpace = /\$/g;
     this.wb = wb;
+    this.ws = ws;
+    this.defName = this.wb.getDefinesNames( this.value, this.ws.getId() );
+    if( this.defName ){
+        this.ref = new parserFormula( this.defName.Ref, "", this.ws );
+        this.ref.parse();
+    }
 }
 
 cName.prototype = Object.create( cBaseType.prototype );
-cName.prototype.toRef = function ( wsID ) {
+cName.prototype.reInit = function () {
+    this.defName = this.wb.getDefinesNames( this.value, this.ws.getId() );
+    this.ref = new parserFormula( this.defName.Ref, "", this.ws );
+    this.ref.parse();
+};
+cName.prototype.toRef = function () {
+
+    if(!this.defName){
+        return new cError( "#NAME?" );
+    }
+
     var _3DRefTmp,
-        ref = this.wb.getDefinesNames( this.value, wsID ).Ref;
+        ref = this.defName.Ref,
+        _wsFrom, _wsTo;
     if ( ref && (_3DRefTmp = parserHelp.is3DRef( ref, 0 ))[0] ) {
-        var _wsFrom, _wsTo;
         _wsFrom = _3DRefTmp[1];
         _wsTo = ( (_3DRefTmp[2] !== null) && (_3DRefTmp[2] !== undefined) ) ? _3DRefTmp[2] : _wsFrom;
         if ( parserHelp.isArea( ref, ref.indexOf( "!" ) + 1 ) ) {
@@ -1213,6 +1230,68 @@ cName.prototype.toRef = function ( wsID ) {
         }
     }
     return new cError( "#NAME?" );
+};
+cName.prototype.toString = function () {
+    return this.value;
+
+//    var dN = this.wb.getDefinesNames( this.value, this.ws.getId() );
+//    if ( dN ) {
+//        return dN.Name;
+//    }
+//
+//    return "#NAME?";
+};
+cName.prototype.getValue = function () {
+
+    if(!this.defName){
+        return new cError( "#NAME?" );
+    }
+
+    return this.ref.calculate();
+};
+cName.prototype.getRef = function () {
+
+};
+cName.prototype.reParse = function () {
+    var dN = this.wb.getDefinesNames( this.value, this.ws.getId() );
+     if( dN ){
+         this.ref = new parserFormula( dN, "", this.ws );
+         this.ref.parse();
+     }
+    else{
+         this.ref = null;
+     }
+};
+cName.prototype.addDefinedNameNode = function (nameReParse) {
+    if(nameReParse){
+        this.reParse();
+    }
+
+    if(!this.defName){
+        return this.wb.dependencyFormulas.addDefinedNameNode( this.value, null );
+    }
+
+    var dN = this.wb.getDefinesNames( this.value, this.ws.getId() );
+
+    var node = this.wb.dependencyFormulas.addDefinedNameNode( dN.Name, dN.LocalSheetId ),
+        wsR, ref, nTo;
+    for ( var i = 0; i < this.ref.outStack.length; i++ ) {
+        ref = this.ref.outStack[i];
+
+        if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid() ) {
+            nTo = this.wb.dependencyFormulas.addNode( ref.getWsId(), ref._cells.replace( this.regSpace, "" ) );
+
+            this.wb.dependencyFormulas.addEdge2( node, nTo );
+        }
+        else if ( ref instanceof cArea3D && ref.isValid() ) {
+            wsR = ref.wsRange();
+            for ( var j = 0; j < wsR.length; j++ ) {
+                nTo = this.wb.dependencyFormulas.addNode( wsR[j].Id, ref._cells.replace( this.regSpace, "" ) );
+                this.wb.dependencyFormulas.addEdge2( node, nTo );
+            }
+        }
+    }
+    return node;
 };
 
 /** @constructor */
@@ -2932,6 +3011,7 @@ function parserFormula( formula, _cellId, _ws ) {
     this.parenthesesNotEnough = false;
     this.f = [];
     this.reRowCol = new RegExp("^(ROW|ROWS|COLUMN|COLUMNS)$","gi");
+    this.regSpace = /\$/g;
 }
 
 parserFormula.prototype = {
@@ -3295,7 +3375,7 @@ parserFormula.prototype = {
                 }
                 /* Referens to DefinesNames */
                 else if ( parserHelp.isName.call( this, this.Formula, this.pCurrPos, this.wb, this.ws )[0] ) { // Shall be placed strongly before Area and Ref
-                    found_operand = new cName( this.operand_str, this.wb );
+                    found_operand = new cName( this.operand_str, this.wb, this.ws );
                 }
                 /* Referens to cells area A1:A10 */
                 else if ( parserHelp.isArea.call( this, this.Formula, this.pCurrPos ) ) {
@@ -3880,7 +3960,7 @@ parserFormula.prototype = {
         return bRes;
     },
 
-    buildDependencies:function () {
+    buildDependencies:function (nameReParse) {
 
         var node = this.wb.dependencyFormulas.addNode( this.ws.Id, this.cellId ),
             ref, nTo, wsR;
@@ -3889,9 +3969,11 @@ parserFormula.prototype = {
             ref = this.outStack[i];
 
             if ( ref instanceof cName ) {
-                ref = ref.toRef( this.ws.getId() );
-                if ( ref instanceof cError )
-                    continue;
+                nTo = ref.addDefinedNameNode(nameReParse);
+                this.wb.dependencyFormulas.addEdge2( node, nTo );
+//                ref = ref.toRef( this.ws.getId() );
+//                if ( ref instanceof cError )
+//                    continue;
             }
 
             if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea || ref instanceof cArea3D) &&
@@ -3903,7 +3985,7 @@ parserFormula.prototype = {
 
 
             if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid() ) {
-                nTo = this.wb.dependencyFormulas.addNode( ref.getWsId(), ref._cells.replace( /\$/g, "" ) );
+                nTo = this.wb.dependencyFormulas.addNode( ref.getWsId(), ref._cells.replace( this.regSpace, "" ) );
 
 //                ref.setNode( nTo );
 
@@ -3912,7 +3994,7 @@ parserFormula.prototype = {
             else if ( ref instanceof cArea3D && ref.isValid() ) {
                 wsR = ref.wsRange();
                 for ( var j = 0; j < wsR.length; j++ ){
-                    this.wb.dependencyFormulas.addEdge( this.ws.Id, this.cellId.replace( /\$/g, "" ), wsR[j].Id, ref._cells.replace( /\$/g, "" ) );
+                    this.wb.dependencyFormulas.addEdge( this.ws.Id, this.cellId.replace( this.regSpace, "" ), wsR[j].Id, ref._cells.replace( this.regSpace, "" ) );
                 }
             }
         }

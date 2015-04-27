@@ -2162,8 +2162,9 @@
                 for(var i in this.wb.oRealDefinedNames)
                 {
                     var oDefinedName = this.wb.oRealDefinedNames[i];
-                    if(null == allDefined[oDefinedName.Name])
+                    if(null == allDefined[oDefinedName.Name]){
                         allDefined[oDefinedName.Name] = {global: oDefinedName, local: {}};
+                    }
                 }
             }
             for(var i = 0, length = this.wb.aWorksheets.length; i < length; ++i)
@@ -5132,14 +5133,14 @@
                         var ws = this.oWorkbook.aWorksheets[oNewDefinedName.LocalSheetId];
                         if(null != ws)
                         {
-                            ws.DefinedNames[oNewDefinedName.Name] = oNewDefinedName;
+                            ws.DefinedNames[oNewDefinedName.Name.toLowerCase()] = oNewDefinedName;
                             this.oWorkbook.oNameGenerator.addLocalDefinedName(oNewDefinedName);
                         }
                     }
                     else
                     {
                         this.oWorkbook.oNameGenerator.addDefinedName(oNewDefinedName);
-                        this.oWorkbook.oRealDefinedNames[oNewDefinedName.Name] = oNewDefinedName;
+                        this.oWorkbook.oRealDefinedNames[oNewDefinedName.Name.toLowerCase()] = oNewDefinedName;
                     }
                 }
             }

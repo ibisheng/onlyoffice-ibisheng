@@ -2030,6 +2030,22 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			return this.wbModel.getWorksheet(index).getHidden();
 		};
 
+        spreadsheet_api.prototype.asc_getDefinedNames = function () {
+            return this.wb.getDefinedNames();
+        };
+
+        spreadsheet_api.prototype.asc_setDefinedNames = function (defName) {
+            return this.wb.setDefinedNames(defName);
+        };
+
+        spreadsheet_api.prototype.asc_editDefinedNames = function (oldName, newName) {
+            return this.wb.editDefinedNames(oldName, newName);
+        };
+
+        spreadsheet_api.prototype.asc_delDefinedNames = function (oldName) {
+            return this.wb.delDefinedNames(oldName);
+        };
+
 		// Залочена ли работа с листом
 		spreadsheet_api.prototype.asc_isWorksheetLockedOrDeleted = function (index) {
 			var ws = this.wbModel.getWorksheet(index);
@@ -2301,11 +2317,32 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		 * @param {String} reference  Ссылка на ячейку вида A1 или R1C1
 		 */
 		spreadsheet_api.prototype.asc_findCell = function(reference) {
-			var d = this.wb.findCell(reference);
+			var d = this.wb.findCell(reference );
+
+            // Получаем sheet по имени
+            var ws = this.wbModel.getWorksheetByName(d.sheet);
+            if (!ws || ws.getHidden())
+                return;
+            // Индекс листа
+            var sheetIndex = ws.getIndex();
+            // Если не совпали индекс листа и индекс текущего, то нужно сменить
+            if (this.asc_getActiveWorksheetIndex() !== sheetIndex) {
+                // Меняем активный лист
+                this.asc_showWorksheet (sheetIndex);
+                // Посылаем эвент о смене активного листа
+                this.handlers.trigger ("asc_onActiveSheetChanged", sheetIndex);
+            }
+
+            ws = this.wb.getWorksheet();
+            d = d.range ? ws.setSelection(d.range, true) : null;
+
 			if (d) {
 				if (d.deltaX) {this.controller.scrollHorizontal(d.deltaX);}
 				if (d.deltaY) {this.controller.scrollVertical(d.deltaY);}
 			}
+            else{
+                this.handlers.trigger("asc_onError", c_oAscError.ID.InvalidReferenceOrName, c_oAscError.Level.NoCritical);
+            }
 		};
 
 		spreadsheet_api.prototype.asc_closeCellEditor = function () {

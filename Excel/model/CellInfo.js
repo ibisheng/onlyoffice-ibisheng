@@ -217,5 +217,25 @@
 		prot["asc_getAngle"]			= prot.asc_getAngle;
 		prot["asc_getClearFilter"]	    = prot.asc_getClearFilter;
 		prot["asc_getIsAutoFilter"]	    = prot.asc_getIsAutoFilter;
+
+        function asc_CDefName(n, r, s) {
+            this.Name = n?n:null;
+            this.Scope = s?s:null;
+            this.Ref = r?r:null;
+        }
+
+        asc_CDefName.prototype = {
+            asc_getName: function(){return this.Name;},
+            asc_getScope: function(){return this.Scope;},
+            asc_getRef: function(){return this.Ref;}
+        }
+
+        window["Asc"].asc_CDefName = window["Asc"]["asc_CDefName"] = asc_CDefName;
+        prot = asc_CDefName.prototype;
+
+        prot["asc_getName"]				= prot.asc_getName;
+        prot["asc_getScope"]			= prot.asc_getScope;
+        prot["asc_getRef"]				= prot.asc_getRef;
+
 	}
 )(window);

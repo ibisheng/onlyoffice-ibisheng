@@ -5803,7 +5803,6 @@ cXIRR.prototype.Calculate = function ( arg ) {
 
     }
 
-
     var _dates = [], _values = [];
 
     if ( arg0 instanceof cArea ) {

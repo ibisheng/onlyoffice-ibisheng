@@ -364,6 +364,11 @@ var UndoRedoDataTypes = new function() {
 	this.RgbColor = 34;
 	this.ThemeColor = 35;
 
+
+    this.DefinedName = 39;
+    this.DefinedNamesChange = 40;
+
+
 	this.SheetViewSettings = 43;
     this.GlobalTableIdAdd = 44;
     this.GraphicObjects = 45;
@@ -454,6 +459,11 @@ var UndoRedoDataTypes = new function() {
             case this.GOSetAdjustmentValue: return new UndoRedoDataSetAdjustmentValue();
             case this.ParagraphAddParaItem: return new UndoRedoDataAddParaItem();
             case this.ParagraphParaItemAdd: return new UndoRedoData_historyitem_Paragraph_AddItem();
+
+
+            case this.DefinedName: return new UndoRedoData_DefinedNames();
+
+
         }
 		return null;
 	};
@@ -1560,6 +1570,88 @@ UndoRedoData_SheetPositions.prototype = {
 			case this.Properties.positions: this.positions = value;break;
 		}
 	}
+};
+
+var g_oUndoRedoData_DefinedNamesProperties = {
+    Name: 0,
+    Ref:1,
+    Scope:2,
+    slaveEdge:3
+};
+function UndoRedoData_DefinedNames(name, ref, scope, slaveEdge){
+    this.Properties = g_oUndoRedoData_DefinedNamesProperties;
+    this.Name = name;
+    this.Ref = ref;
+    this.Scope = scope;
+    this.slaveEdge = slaveEdge;
+}
+UndoRedoData_DefinedNames.prototype = {
+    getType : function()
+    {
+        return UndoRedoDataTypes.DefinedName;
+    },
+    getProperties : function()
+    {
+        return this.Properties;
+    },
+    getProperty : function(nType)
+    {
+        switch(nType)
+        {
+            case this.Properties.Name: return this.Name;break;
+            case this.Properties.Ref: return this.Ref;break;
+            case this.Properties.Scope: return this.Scope;break;
+            case this.Properties.slaveEdge: return this.slaveEdge;break;
+        }
+        return null;
+    },
+    setProperty : function(nType, value)
+    {
+        switch(nType)
+        {
+            case this.Properties.Name: this.Name = value;break;
+            case this.Properties.Ref: this.Ref = value;break;
+            case this.Properties.Scope: this.Scope = value;break;
+            case this.Properties.slaveEdge: this.slaveEdge = value;break;
+        }
+    }
+};
+
+var g_oUndoRedoData_DefinedNamesChangeProperties = {
+    oldName: 0,
+    newName:1
+};
+function UndoRedoData_DefinedNamesChange(oldName, newName){
+    this.Properties = g_oUndoRedoData_DefinedNamesChangeProperties;
+    this.oldName = oldName;
+    this.newName = newName;
+}
+UndoRedoData_DefinedNamesChange.prototype = {
+    getType : function()
+    {
+        return UndoRedoDataTypes.DefinedNamesChange;
+    },
+    getProperties : function()
+    {
+        return this.Properties;
+    },
+    getProperty : function(nType)
+    {
+        switch(nType)
+        {
+            case this.Properties.oldName: return this.oldName;break;
+            case this.Properties.newName: return this.newName;break;
+        }
+        return null;
+    },
+    setProperty : function(nType, value)
+    {
+        switch(nType)
+        {
+            case this.Properties.oldName: this.oldName = value;break;
+            case this.Properties.newName: this.newName = value;break;
+        }
+    }
 };
 
 function UndoRedoData_ClrScheme(oldVal, newVal){
@@ -2760,6 +2852,51 @@ UndoRedoWorkbook.prototype = {
 				this.wb.theme.themeElements.clrScheme = Data.newVal;
 			this.wb.oApi.asc_AfterChangeColorScheme();
 		}
+        else if(historyitem_Workbook_DefinedNamesAdd === Type ){
+            if(bUndo){
+                this.wb.delDefinesNames( Data );
+            }
+            else{
+                this.wb.setDefinesNames( Data );
+            }
+        }
+        else if(historyitem_Workbook_DefinedNamesChange === Type ){
+            var oldName, newName;
+            if(bUndo){
+                oldName = Data.oldName;
+                newName = Data.newName;
+            }
+            else{
+                oldName = Data.newName;
+                newName = Data.oldName;
+            }
+            this.wb.editDefinesNames( oldName, newName );
+        }
+        else if(historyitem_Workbook_DefinedNamesDelete === Type ){
+            if(bUndo){
+                this.wb.setDefinesNames( Data );
+                if( Data.slaveEdge ){
+                    var n;
+                    for(var i = 0; i < Data.slaveEdge.length; i++){
+                        n = this.wb.dependencyFormulas.getNode3(Data.slaveEdge[i]);
+
+                        this.wb.needRecalc.nodes[n.nodeId] = [n.sheetId, n.cellId ];
+                        this.wb.needRecalc.length++;
+
+                        n = n.returnCell();
+                        n ? function(){
+                            n.formulaParsed = new parserFormula( n.formulaParsed.Formula, n.formulaParsed.cellId, n.formulaParsed.ws )
+                            n.formulaParsed.parse();
+                            n.formulaParsed.buildDependencies();
+                        }() : null;
+                    }
+                    sortDependency(this.wb);
+                }
+            }
+            else{
+                this.wb.delDefinesNames( Data );
+            }
+        }
 	}
 };
 
@@ -3307,7 +3444,8 @@ UndoRedoWoorksheet.prototype = {
 				ws._removeCell(Data.nRow, Data.nCol);
 			else
 				ws._getCell(Data.nRow, Data.nCol);
-		} else if (historyitem_Worksheet_SetViewSettings === Type) {
+		}
+        else if (historyitem_Worksheet_SetViewSettings === Type) {
 			ws.setSheetViewSettings(bUndo ? Data.from : Data.to);
 		}
 		else if(historyitem_Worksheet_ChangeMerge === Type){
@@ -3376,11 +3514,13 @@ UndoRedoWoorksheet.prototype = {
 				data.Ref = ws.getRange3(to.r1, to.c1, to.r2, to.c2);
 				ws.hyperlinkManager.add(to, data);
 			}
-		} else if (historyitem_Worksheet_ChangeFrozenCell === Type) {
+		}
+        else if (historyitem_Worksheet_ChangeFrozenCell === Type) {
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
 			var updateData = bUndo ? Data.from : Data.to;
 			worksheetView._updateFreezePane(updateData.c1, updateData.r1, /*lockDraw*/true);
-		} else if (historyitem_Worksheet_SetTabColor === Type) {
+		}
+        else if (historyitem_Worksheet_SetTabColor === Type) {
 			ws.setTabColor(bUndo ? Data.from : Data.to);
 		}
 	}

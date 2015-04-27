@@ -6477,8 +6477,13 @@
 
 			var ar = this.activeRange;
 			var mc = this.model.getMergedByCell(ar.startRow, ar.startCol);
-			var c1 = mc ? mc.c1 : ar.startCol;
-			var r1 = mc ? mc.r1 : ar.startRow;
+			var c1 = mc ? mc.c1 : ar.startCol,
+                r1 = mc ? mc.r1 : ar.startRow,
+                ar_norm = ar.normalize(),
+                mc_norm = mc ? mc.normalize() : null;
+
+            var c2 = mc_norm ? mc_norm.isEqual(ar_norm)? mc_norm.c1 : ar_norm.c2 : ar_norm.c2,
+			    r2 = mc_norm ? mc_norm.isEqual(ar_norm)? mc_norm.r1 : ar_norm.r2 : ar_norm.r2;
 
 			var selectionSize = !bRangeText ? "" : (function (r) {
 				var rc = Math.abs(r.r2 - r.r1) + 1;
@@ -6492,8 +6497,20 @@
 				return "";
 			})(ar);
 
-			var cellName =  this._getColumnTitle(c1) + this._getRowTitle(r1);
-			return selectionSize || cellName;
+			var cellName =  this._getColumnTitle( c1 ) + this._getRowTitle( r1 ), defName = null, dN = new Asc.Range(c1, r1, c2 ,r2, true);
+
+            /*if( c1==c2 && r1==r2 ){
+                defName = this.model.getName() + "!" + dN.getAbsName();
+            }
+            else{
+                defName = this.model.getName() + "!" + dN.getAbsName();
+            }*/
+
+            defName = this.model.getName() + "!" + dN.getAbsName();
+
+            defName = defName ? this.model.workbook.findDefinesNames(defName,this.model.getId()) : null;
+
+			return selectionSize || defName || cellName;
 		};
 
 		WorksheetView.prototype.getSelectionRangeValue = function () {
@@ -6859,7 +6876,10 @@
 			} else {
 				// move active range to offset x,y
 				this._moveActiveCellToOffset(x, y);
-				ret = this._calcActiveRangeOffset();
+//                var x1 = this.getCellLeftRelative(this.activeRange.c1, /*pt*/0 ),
+//                    y1 = this.getCellTopRelative(this.activeRange.r1, /*pt*/0);
+//
+//				ret = this._calcActiveRangeOffset(x1,y1);
 			}
 
 			if (this.isSelectionDialogMode) {
@@ -10144,7 +10164,33 @@
 
 		WorksheetView.prototype.findCell = function (reference) {
 			var range = asc.g_oRangeCache.getAscRange(reference);
-			return range ? this.setSelection(range, true) : null;
+            if(!range){
+
+                var actRange = this.getActiveRangeObj(), ascRange;
+
+                var mc = this.model.getMergedByCell(actRange.startRow, actRange.startCol);
+                var c1 = mc ? mc.c1 : actRange.startCol;
+                var r1 = mc ? mc.r1 : actRange.startRow;
+                var ar_norm = actRange.normalize(),
+                    mc_norm = mc ? mc.normalize() : null;
+
+                var c2 = mc_norm ? mc_norm.isEqual(ar_norm)? mc_norm.c1 : ar_norm.c2 : ar_norm.c2;
+                var r2 = mc_norm ? mc_norm.isEqual(ar_norm)? mc_norm.r1 : ar_norm.r2 : ar_norm.r2;
+
+                ascRange = new asc_Range(c1, r1, c2, r2 );
+                var defName = new Asc.asc_CDefName( reference, this.model.getName()+"!"+ascRange.getAbsName(), null ),
+                    _C2H50H_ = this.model.workbook.setDefinesNames(defName), sheetName = "", ref = "";
+                if(_C2H50H_){
+                    sheetName = _C2H50H_.Ref.split("!");
+                    ref = sheetName[1];
+                    sheetName = sheetName[0];
+                    range = {range:asc.g_oRangeCache.getAscRange(ref), sheet:sheetName};
+
+                    this.model.workbook.handlers.trigger("asc_onDefName", defName);
+
+                }
+            }
+			return range;// ? this.setSelection(range, true) : null;
 		};
 
 		/* Ищет дополнение для ячейки */
@@ -10708,7 +10754,10 @@
 				currentRange.c2 = currentRange.c1;
 			}
 
-			editor.enterCellRange(currentRange.getName());
+/*            var defName = this.model.workbook.findDefinesNames(this.model.getName()+"!"+currentRange.getAbsName(),this.model.getId());
+            console.log("defName #2 " + defName);*/
+            editor.enterCellRange(/*defName || */currentRange.getName());
+
 			for (var tmpRange, i = 0; i < this.arrActiveFormulaRanges.length; ++i) {
 				tmpRange = this.arrActiveFormulaRanges[i];
 				if (tmpRange.isEqual(currentRange)) {

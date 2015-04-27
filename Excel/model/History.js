@@ -8,6 +8,9 @@ var historyitem_Workbook_SheetMove = 3;
 var historyitem_Workbook_SheetPositions = 4;
 var historyitem_Workbook_ChangeColorScheme = 5;
 var historyitem_Workbook_AddFont = 6;
+var historyitem_Workbook_DefinedNamesAdd = 7;
+var historyitem_Workbook_DefinedNamesChange = 8;
+var historyitem_Workbook_DefinedNamesDelete = 9;
 
 var historyitem_Worksheet_RemoveCell = 1;
 var historyitem_Worksheet_RemoveRows = 2;

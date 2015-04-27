@@ -46,6 +46,8 @@ var c_oAscError = {
 		FrmlWrongArgumentRange:		-36,
 		FrmlOperandExpected:		-37,
         FrmlParenthesesCorrectCount:		-38,
+
+        InvalidReferenceOrName:-40,
 		
 		AutoFilterDataRangeError:           -50,
 		AutoFilterChangeFormatTableError:   -51,
