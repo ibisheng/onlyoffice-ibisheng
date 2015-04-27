@@ -3459,7 +3459,7 @@ var maxValRow = 100000;
 							}
 						}
 						
-						if((!isEmptyCell || (valueMerg != null && valueMerg != "")) && cell.getTableStyle() == null)
+						if((!isEmptyCell || (valueMerg != null && valueMerg != "")) && cell.getTableStyle() == null && !(aWs.getRowHidden(cell.bbox.r1) && this.searchRangeInTableParts(cell.bbox) !== -1))
 						{
 							if(k < cloneActiveRange.c1)
 							{
