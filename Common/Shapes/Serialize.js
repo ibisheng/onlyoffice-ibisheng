@@ -6809,6 +6809,7 @@ function BinaryPPTYLoader()
                         }
                         para_pr.DefaultRunPr.Set_FromObject(r_pr);
                     }
+                    break;
                 }
                 default:
                 {
