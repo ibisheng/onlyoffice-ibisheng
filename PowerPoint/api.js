@@ -5549,6 +5549,48 @@ window["asc_docs_api"].prototype["asc_nativeCalculate"] = function()
 
 window["asc_docs_api"].prototype["asc_nativePrint"] = function(_printer, _page)
 {
+    if (undefined === _printer && _page === undefined)
+    {
+        if (undefined !== window["AscDesktopEditor"])
+        {
+            var _drawing_document = this.WordControl.m_oDrawingDocument;
+            var pagescount = _drawing_document.SlidesCount;
+
+            window["AscDesktopEditor"]["Print_Start"](this.DocumentUrl, pagescount);
+
+            var oDocRenderer = new CDocumentRenderer();
+            oDocRenderer.VectorMemoryForPrint = new CMemory();
+            var bOldShowMarks = this.ShowParaMarks;
+            this.ShowParaMarks = false;
+            oDocRenderer.IsNoDrawingEmptyPlaceholder = true;
+
+            for (var i = 0; i < pagescount; i++)
+            {
+                oDocRenderer.Memory.Seek(0);
+                oDocRenderer.VectorMemoryForPrint.ClearNoAttack();
+
+                oDocRenderer.BeginPage(_drawing_document.m_oLogicDocument.Width, _drawing_document.m_oLogicDocument.Height);
+                this.WordControl.m_oLogicDocument.DrawPage(i, oDocRenderer);
+                oDocRenderer.EndPage();
+
+                window["AscDesktopEditor"]["Print_Page"](oDocRenderer.Memory.GetBase64Memory());
+            }
+
+            if (0 == pagescount)
+            {
+                oDocRenderer.BeginPage(_drawing_document.m_oLogicDocument.Width, _drawing_document.m_oLogicDocument.Height);
+                oDocRenderer.EndPage();
+
+                window["AscDesktopEditor"]["Print_Page"](oDocRenderer.Memory.GetBase64Memory());
+            }
+
+            this.ShowParaMarks = bOldShowMarks;
+
+            window["AscDesktopEditor"]["Print_End"]();
+        }
+        return;
+    }
+
 	var _logic_doc = this.WordControl.m_oLogicDocument;
     _printer.BeginPage(_logic_doc.Width, _logic_doc.Height);
     _logic_doc.DrawPage(_page, _printer);

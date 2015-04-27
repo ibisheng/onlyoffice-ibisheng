@@ -846,6 +846,8 @@ function CMetafile(width, height)
     // просто чтобы не создавать каждый раз
     this.m_oFontSlotFont = new CFontSetup();
     this.LastFontOriginInfo = { Name : "", Replace : null };
+
+    this.StartOffset = 0;
 }
 
 CMetafile.prototype =
@@ -1504,6 +1506,7 @@ CDocumentRenderer.prototype =
         this.m_arrayPages[this.m_arrayPages.length] = new CMetafile(width,height);
         this.m_lPagesCount = this.m_arrayPages.length;
         this.m_arrayPages[this.m_lPagesCount-1].Memory = this.Memory;
+        this.m_arrayPages[this.m_lPagesCount-1].StartOffset = this.Memory.pos;
         this.m_arrayPages[this.m_lPagesCount-1].VectorMemoryForPrint = this.VectorMemoryForPrint;
 
         this.Memory.WriteByte(CommandType.ctPageStart);
