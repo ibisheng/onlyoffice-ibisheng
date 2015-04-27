@@ -2210,6 +2210,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             }
                             else if(Word == true)
                             {
+                                if(X + WordLen + SpaceLen > XEnd) // FirstItemOnLine == true
+                                    bMathWordLarge = true;
+
                                 X += SpaceLen + WordLen;
                                 PRS.Set_LineBreakPos(Pos);
                                 EmptyLine = false;
@@ -2241,6 +2244,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             }
                             else
                             {
+                                if(X + WordLen + BrkLen > XEnd) // FirstItemOnLine == true
+                                    bMathWordLarge = true;
+
                                 X += BrkLen + WordLen;
 
                                 EmptyLine = false;
