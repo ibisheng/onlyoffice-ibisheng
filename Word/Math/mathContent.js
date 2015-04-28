@@ -1008,35 +1008,6 @@ CMathContent.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 
     CMathContent.superclass.Shift_Range.call(this, Dx, Dy, _CurLine, _CurRange);
 };
-CMathContent.prototype.old_setPosition = function(pos)
-{
-    this.pos.x = pos.x;
-    this.pos.y = pos.y;
-
-    var w = 0;
-    if(this.RecalcInfo.bEqArray)
-    {
-        var PosInfo = new CMathPointInfo();
-        PosInfo.SetInfoPoints(this.InfoPoints);
-
-        this.pos.x += PosInfo.GetAlign();
-    }
-
-    for(var i=0; i < this.Content.length; i++)
-    {
-        var NewPos = new CMathPosition();
-        NewPos.x = this.pos.x + w;
-        NewPos.y = this.pos.y + this.size.ascent;
-
-        if(this.Content[i].Type == para_Math_Run)
-            this.Content[i].Math_SetPosition(NewPos);
-        else
-            this.Content[i].setPosition(NewPos);
-
-        w += this.Content[i].size.width;
-    }
-
-};
 CMathContent.prototype.SetParent = function(Parent, ParaMath)
 {
     this.Parent   = Parent;
