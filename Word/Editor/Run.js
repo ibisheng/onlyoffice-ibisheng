@@ -2179,9 +2179,14 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 {
                     var BrkLen = Item.Width/TEXTWIDTH_DIVIDER;
 
-                    if(PRS.bEndRunToContent == true && Pos == ContentLen - 1 && Word == true)
+                    var bCompareOper = Item.Is_CompareOperator();
+
+                    var bOperInEndContent = PRS.bEndRunToContent == true && Pos == ContentLen - 1 && Word == true, // необходимо для того, чтобы у контентов мат объектов (к-ые могут разбиваться на строки) не было отметки Set_LineBreakPos, иначе скобка (или GapLeft), перед которой стоит break_Operator, перенесется на следующую строку (без текста !)
+                        bLowPriority      = bCompareOper == false  && PRS.bFirstCompareOper == false;
+
+                    if(bOperInEndContent || bLowPriority)
                     {
-                        if(X + SpaceLen + WordLen + LetterLen + BrkLen > XEnd)
+                        if(X + SpaceLen + WordLen + BrkLen > XEnd)
                         {
                             if(true === FirstItemOnLine)
                             {
@@ -2201,7 +2206,14 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     }
                     else
                     {
-                        if(this.ParaMath.Is_BrkBinBefore() == true)
+                        var bOperBefore = this.ParaMath.Is_BrkBinBefore() == true;
+                        var WorLenCompareOper = WordLen + X - XRange + (bOperBefore  ? SpaceLen : BrkLen);
+
+
+                        if(bCompareOper && PRS.bFirstCompareOper == true && WorLenCompareOper > PRS.WrapIndent && !(Word == false && FirstItemOnLine == true)) // (Word == true && FirstItemOnLine == true) - не первый элемент в строке
+                            PRS.bFirstCompareOper = false;
+
+                        if(bOperBefore)  // оператор "до"
                         {
                             if(X + WordLen + SpaceLen > XEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                             {
@@ -2232,7 +2244,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 SpaceLen += BrkLen;
                             }
                         }
-                        else
+                        else   // оператор "после"
                         {
                             if(X + WordLen + BrkLen > XEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                             {
@@ -2260,6 +2272,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 Word = false;
                             }
                         }
+
                     }
 
                     break;

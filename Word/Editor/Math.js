@@ -875,8 +875,19 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     PRS.X    += MathSettings.Get_LeftMargin(this.State);
     PRS.XEnd -= MathSettings.Get_RightMargin(this.State);
+
+    //PRS.X += MathSettings.Get_WrapIndent(this.State);
+    var WrapIndent = MathSettings.Get_WrapIndent(this.State);
+
     if(bFirstLine == false)
-        PRS.X += MathSettings.Get_WrapIndent(this.State);
+    {
+        PRS.X += WrapIndent;
+        PRS.WrapIndent = 0;
+    }
+    else
+    {
+        PRS.WrapIndent = WrapIndent;
+    }
 
     PRS.XRange = PRS.X;
 

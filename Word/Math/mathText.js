@@ -798,25 +798,6 @@ CMathText.prototype =
     {
         this.Parent = parent;
     },
-    /*IsIncline: function()
-    {
-        // возвращаем не Italic, т.к. могут быть мат. текст, но буквы без наклона (placeholder и т.п.)
-
-        var bIncline = false;
-
-        bIncline = bIncline || (this.value == 0x210E);
-        bIncline = bIncline || (this.value == 0x1D6A4);
-        bIncline = bIncline || (this.value == 0x1D6A5);
-
-        bIncline = bIncline || (this.value > 0x0040 && this.value < 0x005B);
-        bIncline = bIncline || (this.value > 0x0060 && this.value < 0x007b);
-
-        return bIncline;
-    },
-    setJustDraw: function(bJustDraw)
-    {
-        this.bJDraw = bJustDraw;
-    },*/
     IsPlaceholder:  function()
     {
         return this.Type == para_Math_Placeholder;
@@ -837,6 +818,10 @@ CMathText.prototype =
             bFishes       = (val >= 0x22C8 && val <= 0x22CD) || val == 0x22D0 ||val == 0x22D1 || (val >= 0x22D5 && val <= 0x22EE) || (val >= 0x22F0 && val <= 0x22FF) || (val >= 0x27F0 && val <= 0x297F ) || ( val >= 0x29CE && val <= 0x29D5);
 
         return bSimpleOper || bArrows || bOtherSymbols || bFishes;
+    },
+    Is_CompareOperator: function()
+    {
+        return this.value == 0x3C || this.value  == 0x3D || this.value  == 0x3E;
     },
     // For ParaRun
     Is_Punctuation: function()

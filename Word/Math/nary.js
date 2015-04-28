@@ -496,8 +496,9 @@ CNary.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
             if(true !== PRS.Word)
             {
-                PRS.WordLen = this.Base.size.width;
-                PRS.Word    = true;
+                PRS.WordLen += this.Base.size.width;
+                if(false == PRS.FirstItemOnLine)
+                    PRS.Word    = true;
             }
             else
             {
