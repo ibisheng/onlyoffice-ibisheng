@@ -3564,7 +3564,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                 {
                     var pagescount = _printer.DocumentRenderer.m_lPagesCount;
 
-                    window["AscDesktopEditor"]["Print_Start"](this.documentUrl, pagescount);
+                    window["AscDesktopEditor"]["Print_Start"](this.documentUrl, pagescount, "");
 
                     for (var i = 0; i < pagescount; i++)
                     {
@@ -3573,7 +3573,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                         if (i != (pagescount - 1))
                             _end = _printer.DocumentRenderer.m_arrayPages[i + 1].StartOffset;
 
-                        window["AscDesktopEditor"]["Print_Page"](oDocRenderer.Memory.GetBase64Memory2(_start, _end - _start));
+                        window["AscDesktopEditor"]["Print_Page"](oDocRenderer.Memory.GetBase64Memory2(_start, _end - _start),
+                            _printer.DocumentRenderer.m_arrayPages[i].Width, _printer.DocumentRenderer.m_arrayPages[i].Height);
                     }
 
                     window["AscDesktopEditor"]["Print_End"]();

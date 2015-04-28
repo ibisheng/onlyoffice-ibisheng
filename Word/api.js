@@ -7711,7 +7711,7 @@ window["asc_docs_api"].prototype["asc_nativePrint"] = function(_printer, _page)
             var _drawing_document = this.WordControl.m_oDrawingDocument;
             var pagescount = Math.min(_drawing_document.m_lPagesCount, _drawing_document.m_lCountCalculatePages);
 
-            window["AscDesktopEditor"]["Print_Start"](this.DocumentUrl, pagescount);
+            window["AscDesktopEditor"]["Print_Start"](this.DocumentUrl, pagescount, "");
 
             var oDocRenderer = new CDocumentRenderer();
             oDocRenderer.VectorMemoryForPrint = new CMemory();
@@ -7728,7 +7728,7 @@ window["asc_docs_api"].prototype["asc_nativePrint"] = function(_printer, _page)
                 this.WordControl.m_oLogicDocument.DrawPage(i, oDocRenderer);
                 oDocRenderer.EndPage();
 
-                window["AscDesktopEditor"]["Print_Page"](oDocRenderer.Memory.GetBase64Memory());
+                window["AscDesktopEditor"]["Print_Page"](oDocRenderer.Memory.GetBase64Memory(), page.width_mm, page.height_mm);
             }
 
             this.ShowParaMarks = bOldShowMarks;

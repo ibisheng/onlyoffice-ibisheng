@@ -5556,7 +5556,7 @@ window["asc_docs_api"].prototype["asc_nativePrint"] = function(_printer, _page)
             var _drawing_document = this.WordControl.m_oDrawingDocument;
             var pagescount = _drawing_document.SlidesCount;
 
-            window["AscDesktopEditor"]["Print_Start"](this.DocumentUrl, pagescount);
+            window["AscDesktopEditor"]["Print_Start"](this.DocumentUrl, pagescount, this.ThemeLoader.ThemesUrl);
 
             var oDocRenderer = new CDocumentRenderer();
             oDocRenderer.VectorMemoryForPrint = new CMemory();
@@ -5573,7 +5573,7 @@ window["asc_docs_api"].prototype["asc_nativePrint"] = function(_printer, _page)
                 this.WordControl.m_oLogicDocument.DrawPage(i, oDocRenderer);
                 oDocRenderer.EndPage();
 
-                window["AscDesktopEditor"]["Print_Page"](oDocRenderer.Memory.GetBase64Memory());
+                window["AscDesktopEditor"]["Print_Page"](oDocRenderer.Memory.GetBase64Memory(), _drawing_document.m_oLogicDocument.Width, _drawing_document.m_oLogicDocument.Height);
             }
 
             if (0 == pagescount)
