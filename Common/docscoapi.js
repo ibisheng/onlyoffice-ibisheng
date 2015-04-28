@@ -27,6 +27,7 @@
 			this.onEndCoAuthoring = options.onEndCoAuthoring;
 			this.onUnSaveLock = options.onUnSaveLock;
 			this.onRecalcLocks = options.onRecalcLocks;
+			this.onMailMerge = options.onMailMerge;
 		}
 	}
 
@@ -49,6 +50,7 @@
 			this._CoAuthoringApi.onEndCoAuthoring = function (e) {t.callback_OnEndCoAuthoring(e);};
 			this._CoAuthoringApi.onUnSaveLock = function () {t.callback_OnUnSaveLock();};
 			this._CoAuthoringApi.onRecalcLocks = function (e) {t.callback_OnRecalcLocks(e);};
+			this._CoAuthoringApi.onMailMerge = function (e) {t.callback_OnMailMerge(e);};
 
 			this._CoAuthoringApi.init(user, docid, documentCallbackUrl, token, callback, editorType, documentFormatSave, isViewer);
 			this._onlineWork = true;
@@ -247,6 +249,11 @@
 			this.onRecalcLocks(e);
 	};
 
+	CDocsCoApi.prototype.callback_OnMailMerge = function (e) {
+		if (this.onMailMerge)
+			this.onMailMerge(e);
+	};
+
 	function LockBufferElement (arrayBlockId, callback) {
 		this._arrayBlockId = arrayBlockId;
 		this._callback = callback;
@@ -268,6 +275,7 @@
 			this.onConnectionStateChanged = options.onConnectionStateChanged;
 			this.onUnSaveLock = options.onUnSaveLock;
 			this.onRecalcLocks = options.onRecalcLocks;
+			this.onMailMerge = options.onMailMerge;
 		}
         this._state = ConnectionState.None;
 		// Online-пользователи в документе
@@ -834,6 +842,10 @@
 		this.onDisconnect(data ? data['description'] : '', true, this.isCloseCoAuthoring);
 	};
 
+	DocsCoApi.prototype._onMailMerge = function (data) {
+		this.onMailMerge(data['result']);
+	};
+
 	DocsCoApi.prototype._onAuth = function (data) {
 		if (true === this._isAuth) {
 			this._state = ConnectionState.Authorized;
@@ -985,6 +997,7 @@
 				case 'drop'				: t._onDrop(dataObject); break;
 				case 'waitAuth'			: /*Ждем, когда придет auth, документ залочен*/break;
 				case 'error'			: /*Старая версия sdk*/t._onDrop(dataObject); break;
+				case 'mailMerge'		: t._onMailMerge(dataObject); break;
 			}
 		};
 		sockjs.onclose = function (evt) {

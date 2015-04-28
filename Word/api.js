@@ -1444,6 +1444,9 @@ asc_docs_api.prototype._coAuthoringInit = function()
                 c_oAscError.Level.NoCritical);
 		}
 	};
+	this.CoAuthoringApi.onMailMerge					= function (isSuccess) {
+		// ToDo обработать результат isSuccess = true/false
+	};
 
     this.CoAuthoringApi.init(this.User, documentId, documentCallbackUrl, 'fghhfgsjdgfjs', function(){},
         c_oEditorId.Word, documentFormatSave, this.isViewMode);
