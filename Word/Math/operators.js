@@ -3525,7 +3525,12 @@ CDelimiter.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _
         if ( PRS.LineDescent < BegDescent )
             PRS.LineDescent = BegDescent;
 
-        ContentMetrics.UpdateMetrics(this.begOper.size);
+        // метрики скобок не зависят от выравнивания внутренних объектов(например, матриц mbaseJc = top || mbaseJc = bottom )
+        var Size_BeggingOper = new CMathSize();
+        Size_BeggingOper.ascent = BegAscent;
+        Size_BeggingOper.height = BegAscent + BegDescent;
+
+        ContentMetrics.UpdateMetrics(Size_BeggingOper);
     }
 
     var bEnd = this.Content[0].Math_Is_End(_CurLine, _CurRange);
@@ -3542,7 +3547,11 @@ CDelimiter.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _
         if ( PRS.LineDescent < EndDescent )
             PRS.LineDescent = EndDescent;
 
-        ContentMetrics.UpdateMetrics(this.endOper.size);
+        var Size_EndOper = new CMathSize();
+        Size_EndOper.ascent = EndAscent;
+        Size_EndOper.height = EndAscent + EndDescent;
+
+        ContentMetrics.UpdateMetrics(Size_EndOper);
     }
 };
 CDelimiter.prototype.RecalculateGeneralSize = function(oMeasure, height, ascent) // здесь пересчитываем скобки, общий максимальный размер delimiters
