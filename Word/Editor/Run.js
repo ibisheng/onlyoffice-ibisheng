@@ -2068,7 +2068,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             }
                         }
 
-                        if(this.Type == para_Math_Run && this.ParaMath.Is_BrkBinBefore() == false)
+                        if(this.Type == para_Math_Run && true !== NewRange)
                         {
                             PRS.Set_LineBreakPos(Pos);
                             WordLen += LetterLen;
