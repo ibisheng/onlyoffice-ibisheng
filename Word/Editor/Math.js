@@ -1100,17 +1100,7 @@ ParaMath.prototype.Is_BrkBinBefore = function()
 };
 ParaMath.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 {
-    var CurLine = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-    if ( EndPos >= 1 )
-    {
-        this.X += Dx;
-        this.Y += Dy;
-    }
+    this.Root.Shift_Range(Dx, Dy, _CurLine, _CurRange);
 };
 //-----------------------------------------------------------------------------------
 // Функция для работы с формулой

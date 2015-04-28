@@ -2039,6 +2039,7 @@ CMathBase.prototype.private_UpdatePosOnRemove   = CMathContent.prototype.private
 CMathBase.prototype.private_CorrectSelectionPos = CMathContent.prototype.private_CorrectSelectionPos;
 CMathBase.prototype.private_CorrectSelectionPos = CMathContent.prototype.private_CorrectSelectionPos;
 CMathBase.prototype.private_SetNeedResize       = CMathContent.prototype.private_SetNeedResize;
+CMathBase.prototype.Shift_Range                 = CMathContent.prototype.Shift_Range;
 CMathBase.prototype.private_CorrectCurPos = function()
 {
     if (this.CurPos > this.Content.length - 1)
@@ -2161,6 +2162,11 @@ CMathBounds.prototype.SetPos = function(Line, Pos, PRSA)
     this.CheckLineBound(Line);
     this.Bounds[Line].SetPos(Pos, PRSA);
 };
+CMathBounds.prototype.ShiftPos = function(Line, Dx, Dy)
+{
+    this.CheckLineBound(Line);
+    this.Bounds[Line].ShiftPos(Line, Dx, Dy);
+};
 CMathBounds.prototype.GetPos = function(Line)
 {
     var Pos = new CMathPosition();
@@ -2218,6 +2224,11 @@ CMathBoundsMeasures.prototype.SetPos = function(Pos, PRSA)
 {
     this.X = PRSA.X + Pos.x;
     this.Y = PRSA.Y + Pos.y - this.Asc;
+};
+CMathBoundsMeasures.prototype.ShiftPos = function(Line, Dx, Dy)
+{
+    this.X += Dx;
+    this.Y += Dy;
 };
 CMathBoundsMeasures.prototype.GetX = function()
 {

@@ -999,6 +999,15 @@ CMathContent.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
             this.Content[i].setPosition(pos, PRSA, Line, Range, Page);
     }
 };
+CMathContent.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    this.Bounds.ShiftPos(CurLine, Dx, Dy);
+
+    CMathContent.superclass.Shift_Range.call(this, Dx, Dy, _CurLine, _CurRange);
+};
 CMathContent.prototype.old_setPosition = function(pos)
 {
     this.pos.x = pos.x;
