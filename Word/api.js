@@ -286,6 +286,68 @@ var DocumentPageSize = new function() {
     };
 };
 
+function CMailMergeSendData (obj){
+	if(obj){
+		if (typeof obj.from != 'undefined'){
+			this.from = obj.from;
+		}
+		if (typeof obj.to != 'undefined'){
+			this.to = obj.to;
+		}
+		if (typeof obj.subject != 'undefined'){
+			this.subject = obj.subject;
+		}
+		if (typeof obj.mailFormat != 'undefined'){
+			this.mailFormat = obj.mailFormat;
+		}
+		if (typeof obj.fileName != 'undefined'){
+			this.fileName = obj.fileName;
+		}
+		if (typeof obj.message != 'undefined'){
+			this.message = obj.message;
+		}
+		if (typeof obj.recordFrom != 'undefined'){
+			this.recordFrom = obj.recordFrom;
+		}
+		if (typeof obj.recordTo != 'undefined'){
+			this.recordTo = obj.recordTo;
+		}
+		if (typeof obj.jsonKey != 'undefined'){
+			this.jsonKey = obj.jsonKey;
+		}
+	}
+	else
+    {
+		this.from = null;
+		this.to = null;
+		this.subject = null;
+		this.mailFormat = null;
+		this.fileName = null;
+		this.message = null;
+		this.recordFrom = null;
+		this.recordTo = null;
+		this.jsonKey = null;
+	}
+}
+CMailMergeSendData.prototype.get_From = function(){return this.from};
+CMailMergeSendData.prototype.put_From = function(v){this.from = v;};
+CMailMergeSendData.prototype.get_To = function(){return this.to};
+CMailMergeSendData.prototype.put_To = function(v){this.to = v;};
+CMailMergeSendData.prototype.get_Subject = function(){return this.subject};
+CMailMergeSendData.prototype.put_Subject = function(v){this.subject = v;};
+CMailMergeSendData.prototype.get_MailFormat = function(){return this.mailFormat};
+CMailMergeSendData.prototype.put_MailFormat = function(v){this.mailFormat = v;};
+CMailMergeSendData.prototype.get_FileName = function(){return this.fileName};
+CMailMergeSendData.prototype.put_FileName = function(v){this.fileName = v;};
+CMailMergeSendData.prototype.get_Message = function(){return this.message};
+CMailMergeSendData.prototype.put_Message = function(v){this.message = v;};
+CMailMergeSendData.prototype.get_RecordFrom = function(){return this.recordFrom};
+CMailMergeSendData.prototype.put_RecordFrom = function(v){this.recordFrom = v;};
+CMailMergeSendData.prototype.get_RecordTo = function(){return this.recordTo};
+CMailMergeSendData.prototype.put_RecordTo = function(v){this.recordTo = v;};
+CMailMergeSendData.prototype.get_JsonKey = function(){return this.jsonKey};
+CMailMergeSendData.prototype.put_JsonKey = function(v){this.jsonKey = v;};
+
 // пользоваться так:
 // подрубить его последним из скриптов к страничке
 // и вызвать, после подгрузки (конец метода OnInit <- Drawing/HtmlPage.js)
@@ -348,7 +410,10 @@ function asc_docs_api(name)
     this.isApplyChangesOnOpenEnabled = true;
 
 	this.mailMergeFileData = null;
-
+	this.mailMergeFileKey = null;
+	this.mailMergeSendData = null;
+	this.mailMergeSendTimeout = null;
+	
     // CoAuthoring and Chat
     this.User = undefined;
     this.CoAuthoringApi = new CDocsCoApi();
@@ -1445,7 +1510,20 @@ asc_docs_api.prototype._coAuthoringInit = function()
 		}
 	};
 	this.CoAuthoringApi.onMailMerge					= function (isSuccess) {
-		// ToDo обработать результат isSuccess = true/false
+		var oMailMergeSendData = t.mailMergeSendData;
+		t.mailMergeSendData = null;
+		oMailMergeSendData.put_JsonKey(t.mailMergeFileKey);
+		if(null != t.mailMergeSendTimeout)
+			clearTimeout(t.mailMergeSendTimeout);
+		if(isSuccess){
+			_downloadAs(t, "sendmm", null, oMailMergeSendData, c_oAscFileType.UNKNOWN, function(incomeObject){
+				t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SendMailMerge);
+			});
+		}
+		else{
+			// ToDo обработать результат isSuccess = true/false
+			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SendMailMerge);
+		}
 	};
 
     this.CoAuthoringApi.init(this.User, documentId, documentCallbackUrl, 'fghhfgsjdgfjs', function(){},
@@ -2204,7 +2282,7 @@ asc_docs_api.prototype.asc_Print = function()
 				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);}, rData);
 		}
 		else
-			_downloadAs(this, null, c_oAscFileType.PDF, function(incomeObject){
+			_downloadAs(this, "save", null, null, c_oAscFileType.PDF, function(incomeObject){
 				if(null != incomeObject && "save" == incomeObject["type"])
 					editor.processSavedFile(incomeObject["data"], false);
 				else{
@@ -2370,7 +2448,7 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile) {//передаем �
 	var actionType = this.mailMergeFileData ? c_oAscAsyncAction.MailMergeLoadFile : c_oAscAsyncAction.DownloadAs;
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 	var t = this;
-	_downloadAs(this, null, typeFile, function (incomeObject) {
+	_downloadAs(this, "save", null, null, typeFile, function (incomeObject) {
 		if (null != incomeObject && "save" == incomeObject["type"])
 			t.processSavedFile(incomeObject["data"], false);
 		else{
@@ -2389,7 +2467,7 @@ asc_docs_api.prototype.asc_DownloadAsMailMerge = function(typeFile, StartIndex, 
 		if(bIsDownload)
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 		var t = this;
-		_downloadAs(this, oDocumentMailMerge, typeFile, function (incomeObject) {
+		_downloadAs(this, "save", oDocumentMailMerge, null, typeFile, function (incomeObject) {
 			if(bIsDownload){
 				if (null != incomeObject && "save" == incomeObject["type"])
 					t.processSavedFile(incomeObject["data"], false);
@@ -7016,6 +7094,10 @@ function sendCommand(editor, fCallback, rdata){
                 break;
                 case "waitsave":
 				{
+					if( c_oAscFileType.JSON == rdata["outputformat"]){
+						var waitSaveData = JSON.parse(incomeObject["data"]);
+						editor.mailMergeFileKey = waitSaveData["key"]  + "/output.json";
+					}
 					rData = {
 						"id":documentId,
 						"userid": documentUserId,
@@ -7100,14 +7182,16 @@ function _onOpenCommand(fCallback, incomeObject) {
 		}
 	});
 }
-function _downloadAs(editor, oDocumentMailMerge, filetype, fCallback) {
+function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, filetype, fCallback) {
 	var oAdditionalData = {};
-    oAdditionalData["c"] = "save";
+    oAdditionalData["c"] = command;
     oAdditionalData["id"] = documentId;
     oAdditionalData["userid"] = documentUserId;
     oAdditionalData["vkey"] = documentVKey;
     oAdditionalData["outputformat"] = filetype;
 	oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
+	if(null != oMailMergeSendData)
+		oAdditionalData["mailmergesend"] = oMailMergeSendData;
 	if (null == oDocumentMailMerge &&  c_oAscFileType.PDF === filetype) {
 		var dd = editor.WordControl.m_oDrawingDocument;
 		oAdditionalData["data"] = dd.ToRendererPart();
@@ -7461,6 +7545,20 @@ asc_docs_api.prototype.asc_getMailMergeData = function()
 asc_docs_api.prototype.asc_setMailMergeData = function(aList)
 {
     this.asc_StartMailMergeByList(aList);
+};
+asc_docs_api.prototype.asc_sendMailMergeData = function(oData)
+{
+	var oThis = this;
+	var actionType = c_oAscAsyncAction.SendMailMerge;
+	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+	this.mailMergeSendData = oData;
+	this.mailMergeSendTimeout = setTimeout(function () {
+			if(null != oThis.mailMergeSendData){
+				oThis.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+				oThis.mailMergeSendData = null;
+				this.mailMergeSendTimeout = null;
+			}
+		}, 10000);
 };
 asc_docs_api.prototype.asc_stopSaving = function () {
 	this.waitSave = true;

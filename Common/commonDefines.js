@@ -7,6 +7,7 @@ var c_oAscMaxRowHeight = 409;
 
 //files type for Saving & DownloadAs
 var c_oAscFileType = {
+	UNKNOWN : 0,
 	PDF		: 0x0201,
 	HTML	: 0x0803,
 
@@ -52,7 +53,8 @@ var c_oAscAsyncAction = {
 	SlowOperation		: 11, // медленная операция
 	LoadTheme			: 12, // загрузка темы
 	MailMergeLoadFile	: 13, // загрузка файла для mail merge
-	DownloadMerge		: 14  // cкачать файл с mail merge
+	DownloadMerge		: 14, // cкачать файл с mail merge
+	SendMailMerge		: 15  // рассылка mail merge по почте
 };
 
 // Режимы отрисовки
@@ -588,6 +590,10 @@ var c_oAscLineBeginSize = {
 	large_small	: 6,
 	large_mid	: 7,
 	large_large	: 8
+};
+var c_oAscMailMergeMailFormat = {
+	html : 0,
+	attach : 1
 };
 
 var c_oAscMaxTooltipLength = 256;
