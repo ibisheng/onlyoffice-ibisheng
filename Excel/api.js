@@ -600,6 +600,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 
 		spreadsheet_api.prototype.asc_Print = function (adjustPrint){
+
+            if (window["AscDesktopEditor"])
+            {
+                window.AscDesktopEditor_PrintData = adjustPrint;
+                window["AscDesktopEditor"]["Print"]();
+                return;
+            }
+
 			this.adjustPrint = adjustPrint ? adjustPrint : new asc_CAdjustPrint();
 			this.asc_DownloadAs(c_oAscFileType.PDF);
 		};
@@ -3553,7 +3561,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		spreadsheet_api.prototype.asc_nativePrint = function(_printer, _page)
 		{
-			var _adjustPrint = new asc_CAdjustPrint();
+		    var _adjustPrint = window.AscDesktopEditor_PrintData ? window.AscDesktopEditor_PrintData : new asc_CAdjustPrint();
+		    window.AscDesktopEditor_PrintData = undefined;
+
 			var _printPagesData = this.wb.calcPagesPrint(_adjustPrint);
 
 			var isEndPrint = _api.wb.printSheet(_printer, _printPagesData);

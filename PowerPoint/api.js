@@ -1412,6 +1412,13 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr, bParaPr){
 /*functions for working with clipboard, document*/
 /*TODO: Print,Undo,Redo,Copy,Cut,Paste,Share,Save,DownloadAs,ReturnToDocuments(вернуться на предыдущую страницу) & callbacks for these functions*/
 asc_docs_api.prototype.asc_Print = function(){
+
+    if (window["AscDesktopEditor"])
+    {
+        window["AscDesktopEditor"]["Print"]();
+        return;
+    }
+
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);
 	var editor = this;
 	_downloadAs(this, c_oAscFileType.PDF, function(incomeObject){

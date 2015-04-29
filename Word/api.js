@@ -2253,6 +2253,12 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
 /*TODO: Print,Undo,Redo,Copy,Cut,Paste,Share,Save,DownloadAs,ReturnToDocuments(вернуться на предыдущую страницу) & callbacks for these functions*/
 asc_docs_api.prototype.asc_Print = function()
 {
+    if (window["AscDesktopEditor"])
+    {
+        window["AscDesktopEditor"]["Print"]();
+        return;
+    }
+
 	if (undefined != window['qtDocBridge'])
 	{
         this.async_SaveToPdf();
