@@ -114,8 +114,9 @@ function Editor_Copy_Button(api, bCut)
 
         if (null != api.WordControl.m_oLogicDocument)
         {
-            var oCopyProcessor = new CopyProcessor(api, ElemToSelect);
+            var oCopyProcessor = new CopyProcessor(api);
             oCopyProcessor.Start();
+            ElemToSelect.innerHTML = oCopyProcessor.getInnerHtml();
         }
         else
         {
@@ -157,8 +158,9 @@ function Editor_Copy_Button(api, bCut)
 			ElemToSelect.removeChild( ElemToSelect.lastChild );
 		if (null != api.WordControl.m_oLogicDocument)
 		{
-			var oCopyProcessor = new CopyProcessor(api, ElemToSelect);
+			var oCopyProcessor = new CopyProcessor(api);
 			oCopyProcessor.Start();
+			ElemToSelect.innerHTML = oCopyProcessor.getInnerHtml();
 		}
 		else
 		{
@@ -206,8 +208,9 @@ function Editor_Copy(api, bCut)
 	
     if (null != api.WordControl.m_oLogicDocument)
     {
-        var oCopyProcessor = new CopyProcessor(api, ElemToSelect);
+        var oCopyProcessor = new CopyProcessor(api);
         oCopyProcessor.Start();
+        ElemToSelect.innerHTML = oCopyProcessor.getInnerHtml();
     }
     else
     {
@@ -422,8 +425,9 @@ function Editor_Copy_Event(e, ElemToSelect)
 	if(!ElemToSelect)
 		ElemToSelect = document.createElement("div");
 		
-	var oCopyProcessor = new CopyProcessor(api, ElemToSelect);
+	var oCopyProcessor = new CopyProcessor(api);
 	var sBase64 = oCopyProcessor.Start();
+	ElemToSelect.innerHTML = oCopyProcessor.getInnerHtml();
 	
 	if(sBase64 !== false || g_bIsDocumentCopyPaste)
 	{
@@ -433,31 +437,84 @@ function Editor_Copy_Event(e, ElemToSelect)
 		e.preventDefault();
 	}
 }
-function CopyProcessor(api, ElemToSelect, onlyBinaryCopy)
+function CopyElement(sName, bText){
+	this.sName = sName;
+	this.oAttributes = {};
+	this.aChildren = [];
+	this.bText = bText;
+}
+CopyElement.prototype.addChild = function(child){
+	if(child.bText && this.aChildren.length > 0 && this.aChildren[this.aChildren.length - 1].bText)
+		this.aChildren[this.aChildren.length - 1].sName += child.sName;//обьединяем текст, потому что есть места где мы определяем количество child и будет неправильное значение, потому на getOuterHtml тест обьединится в один
+	else
+		this.aChildren.push(child);
+};
+CopyElement.prototype.wrapChild = function(child){
+	for(var i = 0; i < this.aChildren.length; ++i)
+		child.addChild(this.aChildren[i]);
+	this.aChildren = [child];
+};
+CopyElement.prototype.isEmptyChild = function(){
+	return 0 == this.aChildren.length;
+};
+CopyElement.prototype.getInnerText = function(){
+	if(this.bText)
+		return this.sName;
+	else{
+		var sRes = "";
+		for(var i = 0; i < this.aChildren.length; ++i)
+			sRes += this.aChildren[i].getInnerText();
+		return sRes;
+	}
+};
+CopyElement.prototype.getInnerHtml = function(){
+	if(this.bText)
+		return this.sName;
+	else{
+		var sRes = "";
+		for(var i = 0; i < this.aChildren.length; ++i)
+			sRes += this.aChildren[i].getOuterHtml();
+		return sRes;
+	}
+};
+CopyElement.prototype.getOuterHtml = function(){
+	if(this.bText)
+		return this.sName;
+	else{
+		var sRes = "<" + this.sName;
+		for(var i in this.oAttributes)
+			sRes += " " + i + "=\"" + this.oAttributes[i] + "\"";
+		var sInner = this.getInnerHtml();
+		if(sInner.length > 0)
+			sRes += ">" + sInner + "</" + this.sName + ">";
+		else
+			sRes += "/>";
+		return sRes;
+	}
+};
+function CopyProcessor(api, onlyBinaryCopy)
 {
 	this.api = api;
     this.oDocument = api.WordControl.m_oLogicDocument;
-	this.oBinaryFileWriter = new BinaryFileWriter(this.oDocument);
-    this.fontsArray = api.FontLoader.fontInfos;
-    this.ElemToSelect = ElemToSelect;
-	
-	if(!onlyBinaryCopy)
-	{
-		this.Ul = document.createElement( "ul" );
-		this.Ol = document.createElement( "ol" );
-	}
-	
 	this.onlyBinaryCopy = onlyBinaryCopy;
-    this.Para;
-    this.bOccurEndPar;
-    this.oCurHyperlink = null;
-    this.oCurHyperlinkElem = null;
-    this.oPresentationWriter = new CBinaryFileWriter();
+	
+	this.oBinaryFileWriter = new BinaryFileWriter(this.oDocument);
+	this.oPresentationWriter = new CBinaryFileWriter();
     this.oPresentationWriter.Start_UseFullUrl(documentOrigin + editor.DocumentUrl);
     this.oPresentationWriter.Start_UseDocumentOrigin(documentOrigin);
+	
+	this.oRoot = new CopyElement("root");
 };
 CopyProcessor.prototype =
 {
+    getInnerHtml : function()
+    {
+        return this.oRoot.getInnerHtml();
+    },
+    getInnerText : function()
+    {
+        return this.oRoot.getInnerText();
+    },
     getSrc : function(src)
     {
         //������� ����������� �� �� ��� editor.DocumentUrl ������������� ����.
@@ -487,22 +544,7 @@ CopyProcessor.prototype =
             sB = "0" + sB;
         return "#" + sR + sG + sB;
     },
-    CommitList : function(oDomTarget)
-    {
-        if(this.Ul.childNodes.length > 0)
-        {
-			this.Ul.style.paddingLeft = "40px";
-            oDomTarget.appendChild( this.Ul );
-            this.Ul = document.createElement( "ul" );
-        }
-        if(this.Ol.childNodes.length > 0)
-        {
-			this.Ol.style.paddingLeft = "40px";
-            oDomTarget.appendChild( this.Ol );
-            this.Ol = document.createElement( "ol" );
-        }
-    },
-    Commit_pPr : function(Item)
+    Commit_pPr : function(Item, Para)
     {
         //pPr
         var apPr = [];
@@ -573,15 +615,15 @@ CopyProcessor.prototype =
             //Tabs
             if(Item_pPr.Tabs.Get_Count() > 0)
             {
-                var sRes = "";
+                var sTabs = "";
                 //tab-stops:1.0cm 3.0cm 5.0cm
                 for(var i = 0, length = Item_pPr.Tabs.Get_Count(); i < length; i++)
                 {
                     if(0 != i)
-                        sRes += " ";
-                    sRes += Item_pPr.Tabs.Get(i).Pos / 10 + "cm";
+                        sTabs += " ";
+                    sTabs += Item_pPr.Tabs.Get(i).Pos / 10 + "cm";
                 }
-                apPr.push("tab-stops:" + sRes);
+                apPr.push("tab-stops:" + sTabs);
             }
             //Border
             if(null != Item_pPr.Brd)
@@ -598,14 +640,11 @@ CopyProcessor.prototype =
             }
         }
         if(apPr.length > 0)
-            this.Para.setAttribute("style", apPr.join(';'));
+            Para.oAttributes["style"] = apPr.join(';');
     },
-    parse_para_TextPr : function(Value)
+    parse_para_TextPr : function(Value, oTarget)
     {
         var aProp = [];
-        var aTagStart = [];
-        var aTagEnd = [];
-        var sRes = "";
         if (null != Value.RFonts) {
             var sFontName = null;
             if (null != Value.RFonts.Ascii)
@@ -625,26 +664,16 @@ CopyProcessor.prototype =
             else
                 aProp.push("font-size:" + this.api.DocumentReaderMode.CorrectFontSize(Value.FontSize));
         }
-        if (true == Value.Bold) {
-            aTagStart.push("<b>");
-            aTagEnd.push("</b>");
-        }
-        if (true == Value.Italic) {
-            aTagStart.push("<i>");
-            aTagEnd.push("</i>");
-        }
-		if (true == Value.Underline) {
-            aTagStart.push("<u>");
-            aTagEnd.push("</u>");
-        }
-        if (true == Value.Strikeout) {
-            aTagStart.push("<s>");
-            aTagEnd.push("</s>");
-        }
-		 if (true == Value.DStrikeout) {
-            aTagStart.push("<s>");
-            aTagEnd.push("</s>");
-        }
+        if (true == Value.Bold)
+			oTarget.wrapChild(new CopyElement("b"));
+        if (true == Value.Italic)
+			oTarget.wrapChild(new CopyElement("i"));
+		if (true == Value.Underline)
+			oTarget.wrapChild(new CopyElement("u"));
+        if (true == Value.Strikeout)
+			oTarget.wrapChild(new CopyElement("s"));
+		 if (true == Value.DStrikeout)
+			 oTarget.wrapChild(new CopyElement("s"));
         if (null != Value.Shd && shd_Nil != Value.Shd.Value && (null != Value.Shd.Color || null != Value.Shd.Unifill))
             aProp.push("background-color:" + this.RGBToCSS(Value.Shd.Color, Value.Shd.Unifill));
         else if (null != Value.HighLight && highlight_None != Value.HighLight)
@@ -666,45 +695,60 @@ CopyProcessor.prototype =
             else if(vertalign_SubScript == Value.VertAlign)
                 aProp.push("vertical-align:sub");
         }
-
-        return { style: aProp.join(';'), tagstart: aTagStart.join(''), tagend: aTagEnd.join('') };
+		if(aProp.length > 0)
+			oTarget.oAttributes["style"] = aProp.join(';');
     },
-    ParseItem : function(ParaItem)
+    ParseItem : function(ParaItem, oTarget)
     {
-        var sRes = "";
         switch ( ParaItem.Type )
         {
             case para_Text:
                 //���������� �����������
                 var sValue = encodeSurrogateChar(ParaItem.Value);
                 if(sValue)
-                    sRes += CopyPasteCorrectString(sValue);
+					oTarget.addChild(new CopyElement(CopyPasteCorrectString(sValue), true));
                 break;
-            case para_Space:    sRes += " "; break;
-			case para_Tab: sRes += "<span style='white-space:pre;'>" + String.fromCharCode(0x09) + "</span>"; break;
+            case para_Space:
+				oTarget.addChild(new CopyElement(" ", true));
+				break;
+			case para_Tab:
+				var oSpan = new CopyElement("span");
+				oSpan.oAttributes["style"] = "white-space:pre;";
+				oSpan.addChild(new CopyElement(String.fromCharCode(0x09), true));
+				oTarget.addChild(oSpan);
+				break;
             case para_NewLine:
+				var oBr = new CopyElement("br");
                 if( break_Page == ParaItem.BreakType)
                 {
-                    //todo ��������� ���� �������� � ������ �����
-					//добавил неразрвной пробел для того, чтобы информация попадала в буфер обмена
-                    sRes += "<br clear=\"all\" style=\"mso-special-character:line-break;page-break-before:always;\" /><span>&nbsp</span>";
+					oBr.oAttributes["clear"] = "all";
+					oBr.oAttributes["style"] = "mso-special-character:line-break;page-break-before:always;";
                 }
                 else
-                    sRes += "<br style=\"mso-special-character:line-break;\" /><span>&nbsp</span>";
+					oBr.oAttributes["style"] = "mso-special-character:line-break;";
+				oTarget.addChild(oBr);
+				//todo ��������� ���� �������� � ������ �����
+				//добавил неразрвной пробел для того, чтобы информация попадала в буфер обмена
+				var oSpan = new CopyElement("span");
+				oSpan.addChild(new CopyElement("&nbsp;", true));
+				oTarget.addChild(oSpan);
                 break;
-            //������� ������� ����� ��������� ������ �� ���������� ��������
-            case para_End:        this.bOccurEndPar = true; break;
             case para_Drawing:
                 var oGraphicObj = ParaItem.GraphicObj;
                 var sSrc = oGraphicObj.getBase64Img();
                 if(sSrc.length > 0)
                 {
-                    sSrc = this.getSrc(sSrc);
+                    //sSrc = this.getSrc(sSrc);
 
                     var _w = ParaItem.Extent.W;
                     var _h = ParaItem.Extent.H;
 
-                    sRes += "<img style=\"max-width:100%;\" width=\""+Math.round(_w * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(_h * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
+					var oImg = new CopyElement("img");
+					oImg.oAttributes["style"] = "max-width:100%;";
+					oImg.oAttributes["width"] = Math.round(_w * g_dKoef_mm_to_pix);
+					oImg.oAttributes["height"] = Math.round(_h * g_dKoef_mm_to_pix);
+					oImg.oAttributes["src"] = sSrc;
+					oTarget.addChild(oImg);
                     break;
                 }
                 // var _canvas     = document.createElement('canvas');
@@ -722,94 +766,59 @@ CopyProcessor.prototype =
                 // _ctx = null;
                 // delete _canvas;
                 break;
+			case para_PageNum:
+				if(null != ParaItem.String && "string" == typeof(ParaItem.String))
+					oTarget.addChild(new CopyElement(CopyPasteCorrectString(ParaItem.String), true));
+				break;
         }
-        return sRes;
     },
-    CopyRun: function (Item, bUseSelection) {
-        var sRes = "";
-        var ParaStart = 0;
-        var ParaEnd = Item.Content.length;
-        if (true == bUseSelection) {
-            ParaStart = Item.Selection.StartPos;
-            ParaEnd = Item.Selection.EndPos;
-            if (ParaStart > ParaEnd) {
-                var Temp2 = ParaEnd;
-                ParaEnd = ParaStart;
-                ParaStart = Temp2;
-            }
-        }
-        for (var i = ParaStart; i < ParaEnd; i++)
-            sRes += this.ParseItem(Item.Content[i]);
-        return sRes;
+    CopyRun: function (Item, oTarget) {
+        for (var i = 0; i < Item.Content.length; i++)
+            this.ParseItem(Item.Content[i], oTarget);
     },
-    CopyRunContent: function (Container, bUseSelection, bOmitHyperlink) {
-        var sRes = "";
-
+    CopyRunContent: function (Container, oTarget, bOmitHyperlink) {
         for (var i = 0; i < Container.Content.length; i++) {
             var item = Container.Content[i];
             if (para_Run == item.Type) {
-                var sRunContent = this.CopyRun(item, bUseSelection);
-                if(sRunContent)
-                {
-                    sRes += "<span";
-					
-					var oStyle;
-					if(g_bIsDocumentCopyPaste)
-						oStyle = this.parse_para_TextPr(item.Get_CompiledTextPr());
-					else
-						oStyle = this.parse_para_TextPr(item.Get_CompiledTextPr());
-					
-                    if (oStyle && oStyle.style)
-                        sRes += " style=\"" + oStyle.style + "\"";
-                    sRes += ">";
-                    if (oStyle.tagstart)
-                        sRes += oStyle.tagstart;
-                    sRes += sRunContent;
-                    if (oStyle.tagend)
-                        sRes += oStyle.tagend;
-                    sRes += "</span>";
-                }
+				var oSpan = new CopyElement("span");
+                this.CopyRun(item, oSpan);
+                if(!oSpan.isEmptyChild()){
+					this.parse_para_TextPr(item.Get_CompiledTextPr(), oSpan);
+					oTarget.addChild(oSpan);
+				}
             }
             else if (para_Hyperlink == item.Type) {
                 if (!bOmitHyperlink) {
-                    sRes += "<a";
+					var oHyperlink = new CopyElement("a");
                     var sValue = item.Get_Value();
                     var sToolTip = item.Get_ToolTip();
-                    if (null != sValue && "" != sValue)
-                        sRes += " href=\"" + CopyPasteCorrectString(sValue) + "\"";
-                    if (null != sToolTip && "" != sToolTip)
-                        sRes += " title=\"" + CopyPasteCorrectString(sToolTip) + "\"";
-                    sRes += ">";
+					oHyperlink.oAttributes["href"] = CopyPasteCorrectString(sValue);
+					oHyperlink.oAttributes["title"] = CopyPasteCorrectString(sToolTip);
+					//вложенные ссылки в html запрещены.
+					this.CopyRunContent(item, oHyperlink, true);
+					oTarget.addChild(oHyperlink);
                 }
-                //вложенные ссылки в html запрещены.
-                sRes += this.CopyRunContent(item, bUseSelection, true);
-                if (!bOmitHyperlink)
-                    sRes += "</a>";
+				else
+					this.CopyRunContent(item, oTarget, true);
             }
 			else if(para_Math == item.Type){
                 var sSrc = item.MathToImageConverter();
-				var width = item.Width;
-				var height = item.Height;
-				
-				sRes += "<img";
-				
-                if (null != width && "" != width)
-                    sRes += " width=\"" + width + "\"";
-                if (null != height && "" != height)
-                    sRes += " height=\"" + height + "\"";
-				if (null != sSrc && "" != sSrc && null != sSrc.ImageUrl)
-                    sRes += " src=\"" + sSrc.ImageUrl + "\"";
-				
-                sRes += ">";
-                sRes += "</img>";
+				if (null != sSrc && "" != sSrc && null != sSrc.ImageUrl){
+					var oImg = new CopyElement("img");
+					oImg.oAttributes["width"] = item.Width;
+					oImg.oAttributes["height"] = item.Height;
+					oImg.oAttributes["src"] = sSrc.ImageUrl;
+					oTarget.addChild(oImg);
+				}
 			}
+			else if(para_Field == item.Type)
+				this.CopyRunContent(item, oTarget);
         }
-        return sRes;
     },
-    CopyParagraph : function(oDomTarget, Item, bLast, bUseSelection, aDocumentContent, nDocumentContentIndex)
+    CopyParagraph : function(oDomTarget, Item, selectedAll)
     {
         var oDocument = this.oDocument;
-        this.Para = null;
+		var Para = null;
         //��� heading ����� � h1
         var styleId = Item.Style_Get();
         if(styleId)
@@ -820,13 +829,12 @@ CopyProcessor.prototype =
             {
                 var nLevel = parseInt(styleName.substring("heading".length));
                 if(1 <= nLevel && nLevel <= 6)
-                    this.Para = document.createElement( "h" + nLevel );
+                    Para = new CopyElement("h" + nLevel);
             }
         }
-        if(null == this.Para)
-            this.Para = document.createElement( "p" );
+        if(null == Para)
+            Para = new CopyElement("p");
 
-        this.bOccurEndPar = false;
         var oNumPr;
         var bIsNullNumPr = false;
         if(g_bIsDocumentCopyPaste)
@@ -839,12 +847,10 @@ CopyProcessor.prototype =
             oNumPr = Item.PresentationPr.Bullet;
             bIsNullNumPr = (0 == oNumPr.m_nType);
         }
-        if(bIsNullNumPr)
-            this.CommitList(oDomTarget);
-        else
+		var bBullet = false;
+        var sListStyle = "";
+        if(!bIsNullNumPr)
         {
-            var bBullet = false;
-            var sListStyle = "";
             if(g_bIsDocumentCopyPaste)
             {
 				var aNum = this.oDocument.Numbering.Get_AbstractNum( oNumPr.NumId );
@@ -901,42 +907,44 @@ CopyProcessor.prototype =
                         break;
                 }
             }
-			//если меняется тип списка
-			if((bBullet && this.Ol.childNodes.length > 0) || (!bBullet && this.Ul.childNodes.length > 0))
-                this.CommitList(oDomTarget);
-            var Li = document.createElement( "li" );
-            Li.setAttribute("style", "list-style-type: " + sListStyle);
-            Li.appendChild( this.Para );
-            if(bBullet)
-                this.Ul.appendChild( Li );
-            else
-                this.Ol.appendChild( Li );
         }
         //pPr
-        this.Commit_pPr(Item);
+        this.Commit_pPr(Item, Para);
 
-        this.Para.innerHTML = this.CopyRunContent(Item, bUseSelection, false);
-
-        if(bLast && false == this.bOccurEndPar)
+        if(false == selectedAll)
         {
-            if(false == bIsNullNumPr)
-            {
-                //������ �������� � ������. ������� ������� �� ������. ���������� ����� ��� span
-                var li = this.Para.parentNode;
-                var ul = li.parentNode;
-                ul.removeChild(li);
-                this.CommitList(oDomTarget);
-            }
-            for(var i = 0; i < this.Para.childNodes.length; i++)
-                oDomTarget.appendChild( this.Para.childNodes[i].cloneNode(true) );
+			//если последний элемент в выделении неполностью выделенный параграф, то он копируется как обычный текст без настроек параграфа и списков
+			this.CopyRunContent(Item, oDomTarget, false);
         }
         else
         {
-            //����� ��������� ������ ���������
-            if(this.Para.childNodes.length == 0)
-                this.Para.appendChild( document.createTextNode( '\xa0' ) );
+			this.CopyRunContent(Item, Para, false);
+			//добавляем &nbsp; потому что параграфы без содержимого не копируются
+            if(Para.isEmptyChild())
+                Para.addChild(new CopyElement("&nbsp;", true));
             if(bIsNullNumPr)
-                oDomTarget.appendChild( this.Para );
+                oDomTarget.addChild( Para );
+			else{
+				var Li = new CopyElement( "li" );
+				Li.oAttributes["style"] = "list-style-type: " + sListStyle;
+				Li.addChild( Para );
+				//пробуем добавить в предыдущий список
+				var oTargetList = null;
+				if(oDomTarget.aChildren.length > 0){
+					var oPrevElem = oDomTarget.aChildren[oDomTarget.aChildren.length - 1];
+					if((bBullet && "ul" == oPrevElem.sName) || (!bBullet && "ol" == oPrevElem.sName))
+						oTargetList = oPrevElem;
+				}
+				if(null == oTargetList){
+					if(bBullet)
+						oTargetList = new CopyElement("ul");
+					else
+						oTargetList = new CopyElement("ol");
+					oTargetList.oAttributes["style"] = "padding-left:40px";
+					oDomTarget.addChild(oTargetList);
+				}
+				oTargetList.addChild(Li);
+			}
         }
     },
     _BorderToStyle : function(border, name)
@@ -1024,16 +1032,16 @@ CopyProcessor.prototype =
     },
     CopyCell : function(tr, cell, tablePr, width, rowspan)
     {
-        var tc = document.createElement( "td" );
+        var tc = new CopyElement("td");
         //Pr
         var tcStyle = "";
         if(width > 0)
         {
-            tc.setAttribute("width", Math.round(width * g_dKoef_mm_to_pix));
+            tc.oAttributes["width"] = Math.round(width * g_dKoef_mm_to_pix);
             tcStyle += "width:"+(width * g_dKoef_mm_to_pt)+"pt;";
         }
         if(rowspan > 1)
-            tc.setAttribute("rowspan", rowspan);
+            tc.oAttributes["rowspan"] = rowspan;
         var cellPr = null;
 		
 		var tablePr = null;
@@ -1050,7 +1058,7 @@ CopyProcessor.prototype =
             cellPr = cell.CompiledPr.Pr;
             //��� ������ � �������� ����� ������������ margin � �� colspan
             if(null != cellPr.GridSpan && cellPr.GridSpan > 1)
-                tc.setAttribute("colspan", cellPr.GridSpan);
+				tc.oAttributes["colspan"] = cellPr.GridSpan;
         }
         if(null != cellPr && null != cellPr.Shd)
         {
@@ -1077,18 +1085,18 @@ CopyProcessor.prototype =
         tcStyle += this._BordersToStyle(oCellBorder, false, false);
 
         if("" != tcStyle)
-            tc.setAttribute("style", tcStyle);
+            tc.oAttributes["style"] = tcStyle;
         //Content
-        this.CopyDocument2(tc, cell.Content, false);
+        this.CopyDocument2(tc, cell.Content);
 
-        tr.appendChild(tc);
+        tr.addChild(tc);
     },
     CopyRow : function(oDomTarget, table, nCurRow, elems, nMaxRow)
     {
         var row = table.Content[nCurRow];
 		if(null == elems)
 			elems = {gridStart: 0, gridEnd: table.TableGrid.length - 1, indexStart: null, indexEnd: null, after: null, before: null, cells: row.Content};
-        var tr = document.createElement( "tr" );
+        var tr = new CopyElement("tr");
         //Pr
 		table.Internal_RecalculateGrid();
 		var gridSum = table.TableSumGrid;
@@ -1127,16 +1135,16 @@ CopyProcessor.prototype =
                 //���������� margin
                 trStyle += "mso-row-margin-left:"+(nWBefore * g_dKoef_mm_to_pt)+"pt;";
                 //��������� td ��� ��� ��� �� �������� mso-row-margin-left
-                var oNewTd = document.createElement( "td" );
-                oNewTd.setAttribute("style", "mso-cell-special:placeholder;border:none;padding:0cm 0cm 0cm 0cm");
-                oNewTd.setAttribute("width", Math.round(nWBefore * g_dKoef_mm_to_pix));
+                var oNewTd = new CopyElement("td");
+                oNewTd.oAttributes["style"] = "mso-cell-special:placeholder;border:none;padding:0cm 0cm 0cm 0cm";
+                oNewTd.oAttributes["width"] = Math.round(nWBefore * g_dKoef_mm_to_pix);
                 if(nGridBefore > 1)
-                    oNewTd.setAttribute("colspan", nGridBefore);
-                var oNewP = document.createElement( "p" );
-				oNewP.setAttribute("style", "margin:0cm");
-                oNewP.appendChild(document.createTextNode( '\xa0' ));
-                oNewTd.appendChild(oNewP);
-                tr.appendChild(oNewTd);
+                    oNewTd.oAttributes["colspan"] = nGridBefore;
+                var oNewP = new CopyElement("p");
+				oNewP.oAttributes["style"] = "margin:0cm";
+                oNewP.addChild(new CopyElement("&nbsp;", true));
+                oNewTd.addChild(oNewP);
+                tr.addChild(oNewTd);
             }
         }
 		
@@ -1174,27 +1182,26 @@ CopyProcessor.prototype =
                 //���������� margin
                 trStyle += "mso-row-margin-right:"+(nWAfter * g_dKoef_mm_to_pt)+"pt;";
                 //��������� td ��� ��� ��� �� �������� mso-row-margin-left
-                var oNewTd = document.createElement( "td" );
-                oNewTd.setAttribute("style", "mso-cell-special:placeholder;border:none;padding:0cm 0cm 0cm 0cm");
-                oNewTd.setAttribute("width", Math.round(nWAfter * g_dKoef_mm_to_pix));
+                var oNewTd = new CopyElement("td");
+                oNewTd.oAttributes["style"] = "mso-cell-special:placeholder;border:none;padding:0cm 0cm 0cm 0cm";
+				oNewTd.oAttributes["width"] = Math.round(nWAfter * g_dKoef_mm_to_pix);
                 if(nGridAfter > 1)
-                    oNewTd.setAttribute("colspan", nGridAfter);
-                var oNewP = document.createElement( "p" );
-				oNewP.setAttribute("style", "margin:0cm");
-                oNewP.appendChild(document.createTextNode( '\xa0' ));
-                oNewTd.appendChild(oNewP);
-                tr.appendChild(oNewTd);
+					oNewTd.oAttributes["colspan"] = nGridAfter;
+                var oNewP = new CopyElement("p");
+				oNewP.oAttributes["style"] = "margin:0cm";
+				oNewP.addChild(new CopyElement("&nbsp;", true));
+                oNewTd.addChild(oNewP);
+                tr.addChild(oNewTd);
             }
         }
         if("" != trStyle)
-            tr.setAttribute("style", trStyle);
+            tr.oAttributes["style"] = trStyle;
 			
-        oDomTarget.appendChild(tr);
+        oDomTarget.addChild(tr);
     },
     CopyTable : function(oDomTarget, table, aRowElems)
     {
-        this.CommitList(oDomTarget);
-        var DomTable = document.createElement( "table" );
+        var DomTable = new CopyElement("table");
 		
 		var compiledPr = table.Get_CompiledPr();
 		
@@ -1244,7 +1251,7 @@ CopyProcessor.prototype =
                 }
             }
 			if("" != align)
-				DomTable.setAttribute("align", align);
+				DomTable.oAttributes["align"] = align;
             if(null != Pr.TableInd)
                 tblStyle += "margin-left:"+(Pr.TableInd * g_dKoef_mm_to_pt)+"pt;";
             if (null != Pr.Shd && shd_Nil != Pr.Shd.Value && (null != Pr.Shd.Color || null != Pr.Shd.Unifill))
@@ -1265,15 +1272,15 @@ CopyProcessor.prototype =
                 bAddSpacing = true;
                 var cellSpacingMM = rowPr.TableCellSpacing;
                 tblStyle += "mso-cellspacing:"+(cellSpacingMM * g_dKoef_mm_to_pt)+"pt;";
-                DomTable.setAttribute("cellspacing", Math.round(cellSpacingMM * g_dKoef_mm_to_pix));
+				DomTable.oAttributes["cellspacing"] = Math.round(cellSpacingMM * g_dKoef_mm_to_pix);
             }
         }
         if(!bAddSpacing)
-            DomTable.setAttribute("cellspacing", 0);
-        DomTable.setAttribute("border", false == bBorder ? 0 : 1);
-        DomTable.setAttribute("cellpadding", 0);
+            DomTable.oAttributes["cellspacing"] = 0;
+        DomTable.oAttributes["border"] = false == bBorder ? 0 : 1;
+        DomTable.oAttributes["cellpadding"] = 0;
         if("" != tblStyle)
-            DomTable.setAttribute("style", tblStyle);
+            DomTable.oAttributes["style"] = tblStyle;
 
         //rows
 		if(null == aRowElems)
@@ -1297,202 +1304,10 @@ CopyProcessor.prototype =
 			}
 		}
 
-        oDomTarget.appendChild(DomTable);
-    },
-    CopyDocument : function(oDomTarget, oDocument, bUseSelection)
-    {
-        var Start = 0;
-        var End = 0;
-        if(bUseSelection)
-        {
-            if ( true === oDocument.Selection.Use)
-            {
-                if ( selectionflag_DrawingObject === oDocument.Selection.Flag )
-                {
-                    this.Para = document.createElement("p");
-                    this.Para.innerHTML = this.ParseItem(oDocument.Selection.Data.DrawingObject);
-
-                    for(var i = 0; i < this.Para.childNodes.length; i++)
-                        this.ElemToSelect.appendChild( this.Para.childNodes[i].cloneNode(true) );
-                }
-                else
-                {
-                    Start = oDocument.Selection.StartPos;
-                    End = oDocument.Selection.EndPos;
-                    if ( Start > End )
-                    {
-                        var Temp = End;
-                        End = Start;
-                        Start = Temp;
-                    }
-                }
-            }
-        }
-        else
-        {
-            Start = 0;
-            End = oDocument.Content.length - 1;
-        }
-        // HtmlText
-        for ( var Index = Start; Index <= End; Index++ )
-        {
-            var Item = oDocument.Content[Index];
-            if(type_Table === Item.GetType() )
-            {
-                if(bUseSelection)
-                {
-                    if(table_Selection_Text == Item.Selection.Type)
-                    {
-                        //������� ����� � ������.
-                        var rowIndex = Item.Selection.StartPos.Pos.Row;
-                        var colIndex = Item.Selection.StartPos.Pos.Cell;
-                        if(rowIndex < Item.Content.length)
-                        {
-                            var row = Item.Content[rowIndex];
-                            if(colIndex < row.Content.length)
-                            {
-                                var cell = row.Content[colIndex];
-                                this.CopyDocument(oDomTarget, cell.Content, bUseSelection);
-                            }
-                        }
-                    }
-                    else if(table_Selection_Cell == Item.Selection.Type)
-                    {
-                        //������� �������� �����
-						var aSelectedRows = [];
-						var oRowElems = {};
-						if(Item.Selection.Data.length > 0)
-						{
-							for(var i = 0, length = Item.Selection.Data.length; i < length; ++i)
-							{
-								var elem = Item.Selection.Data[i];
-								var rowElem = oRowElems[elem.Row];
-								if(null == rowElem)
-								{
-									rowElem = {row: elem.Row, gridStart: null, gridEnd: null, indexStart: null, indexEnd: null, after: null, before: null, cells: {}};
-									oRowElems[elem.Row] = rowElem;
-									aSelectedRows.push(rowElem);
-								}
-								if(null == rowElem.indexEnd || elem.Cell > rowElem.indexEnd)
-									rowElem.indexEnd = elem.Cell;
-								if(null == rowElem.indexStart || elem.Cell < rowElem.indexStart)
-									rowElem.indexStart = elem.Cell;
-								rowElem.cells[elem.Cell] = 1;
-							}
-						}
-						aSelectedRows.sort(function(a,b){
-							return a.row - b.row;
-						});
-						var nMinGrid = null;
-						var nMaxGrid = null;
-						var nPrevStartGrid = null;
-						var nPrevEndGrid = null;
-						var nPrevRowIndex = null;
-						for(var i = 0, length = aSelectedRows.length; i < length; ++i)
-						{
-							var elem = aSelectedRows[i];
-							var nRowIndex = elem.row;
-							if(null != nPrevRowIndex)
-							{
-								if(nPrevRowIndex + 1 != nRowIndex)
-								{
-									nMinGrid = null;
-									nMaxGrid = null;
-									break;
-								}
-							}
-							nPrevRowIndex = nRowIndex;
-							var row = Item.Content[nRowIndex];
-							var cellFirst = row.Get_Cell(elem.indexStart);
-							var cellLast = row.Get_Cell(elem.indexEnd);
-							var nCurStartGrid = cellFirst.Metrics.StartGridCol;
-							var nCurEndGrid = cellLast.Metrics.StartGridCol + cellLast.Get_GridSpan() - 1;
-							if(null != nPrevStartGrid && null != nPrevEndGrid)
-							{
-								//учитываем вертикальный merge, раздвигаем границы
-								if(nCurStartGrid > nPrevStartGrid)
-								{
-									for(var j = elem.indexStart - 1; j >= 0; --j)
-									{
-										var cellCur = row.Get_Cell(j);
-										if(vmerge_Continue == cellCur.Get_VMerge())
-										{
-											var nCurGridCol = cellCur.Metrics.StartGridCol;
-											if(nCurGridCol >= nPrevStartGrid)
-											{
-												nCurStartGrid = nCurGridCol;
-												elem.indexStart = j;
-											}
-											else
-												break;
-										}
-										else
-											break;
-									}
-								}
-								if(nCurEndGrid < nPrevEndGrid)
-								{
-									for(var j = elem.indexEnd + 1; j < row.Get_CellsCount(); ++j)
-									{
-										var cellCur = row.Get_Cell(j);
-										if(vmerge_Continue == cellCur.Get_VMerge())
-										{
-											var nCurGridCol = cellCur.Metrics.StartGridCol + cellCur.Get_GridSpan() - 1;
-											if(nCurGridCol <= nPrevEndGrid)
-											{
-												nCurEndGrid = nCurGridCol;
-												elem.indexEnd = j;
-											}
-											else
-												break;
-										}
-										else
-											break;
-									}
-								}
-							}
-							elem.gridStart = nPrevStartGrid = nCurStartGrid;
-							elem.gridEnd = nPrevEndGrid = nCurEndGrid;
-							if(null == nMinGrid || nMinGrid > nCurStartGrid)
-								nMinGrid = nCurStartGrid;
-							if(null == nMaxGrid || nMaxGrid < nCurEndGrid)
-								nMaxGrid = nCurEndGrid;
-						}
-						if(null != nMinGrid && null != nMaxGrid)
-						{
-							//выставляем after, before
-							for(var i = 0 ,length = aSelectedRows.length; i < length; ++i)
-							{
-								var elem = aSelectedRows[i];
-								elem.before = elem.gridStart - nMinGrid;
-								elem.after = nMaxGrid - elem.gridEnd;
-							}
-							this.oBinaryFileWriter.copyParams.bLockCopyElems++;
-							this.CopyTable(oDomTarget, Item, aSelectedRows);
-							this.oBinaryFileWriter.copyParams.bLockCopyElems--;
-							this.oBinaryFileWriter.CopyTable(Item, aSelectedRows, nMinGrid, nMaxGrid);
-						}
-                    }
-                }
-                else
-				{
-					this.oBinaryFileWriter.copyParams.bLockCopyElems++;
-                    this.CopyTable(oDomTarget, Item, null);
-					this.oBinaryFileWriter.copyParams.bLockCopyElems--;
-					this.oBinaryFileWriter.CopyTable(Item, null);
-				}
-            }
-            else if ( type_Paragraph === Item.GetType() )
-            {
-                //todo ����� ������ ��� �������� ������ ���� Index == End
-				this.oBinaryFileWriter.CopyParagraph(Item);
-                this.CopyParagraph(oDomTarget, Item, Index == End, bUseSelection, oDocument.Content, Index);
-            }
-        }
-        this.CommitList(oDomTarget);
+        oDomTarget.addChild(DomTable);
     },
 	
-	CopyDocument2 : function(oDomTarget, oDocument, bUseSelection, elementsContent, bFromPresentation)
+	CopyDocument2 : function(oDomTarget, oDocument, elementsContent, bFromPresentation)
     {	
         if(g_bIsDocumentCopyPaste)
 		{
@@ -1519,12 +1334,13 @@ CopyProcessor.prototype =
 				}
 				else if ( type_Paragraph === Item.GetType() )
 				{
+					var SelectedAll = Index == elementsContent.length - 1 ? elementsContent[Index].SelectedAll : true;
 					//todo ����� ������ ��� �������� ������ ���� Index == End
 					if(!bFromPresentation)
-						this.oBinaryFileWriter.CopyParagraph(Item, elementsContent[Index].SelectedAll);
+						this.oBinaryFileWriter.CopyParagraph(Item, SelectedAll);
 						
 					if(!this.onlyBinaryCopy)
-						this.CopyParagraph(oDomTarget, Item, true, false);
+						this.CopyParagraph(oDomTarget, Item, SelectedAll);
 				}
 			}
 		}
@@ -1566,16 +1382,11 @@ CopyProcessor.prototype =
 						
 						if ( type_Paragraph === Item.GetType() )
 						{
-							//todo ����� ������ ��� �������� ������ ���� Index == End
-							//this.oPresentationWriter.WriteParagraph(Item);
-							//this.CopyPresentationText(this.ElemToSelect, graphicObjects.State.textObject.graphicObject.CurCell.Content, true);
-							//this.CopyParagraph(oDomTarget, Item, true, false);
-							
 							this.oPresentationWriter.StartRecord(0);
 							this.oPresentationWriter.WriteParagraph(Item);
 							this.oPresentationWriter.EndRecord();
 
-							this.CopyParagraph(oDomTarget, Item, true, false);
+							this.CopyParagraph(oDomTarget, Item, true);
 						}
 					}
 				}
@@ -1583,8 +1394,6 @@ CopyProcessor.prototype =
 			else if(elementsContent.Drawings && elementsContent.Drawings.length)//пишем графические объекты
 			{
 				var elements = elementsContent.Drawings;
-					
-				this.Para = document.createElement("p");
 
 				//var selected_objects = graphicObjects.State.id === STATES_ID_GROUP ? graphicObjects.State.group.selectedObjects : graphicObjects.selectedObjects;
 				
@@ -1598,7 +1407,7 @@ CopyProcessor.prototype =
 					{
 						this.oPresentationWriter.WriteBool(true);
 
-						this.CopyGraphicObject(this.ElemToSelect, elements[i].Drawing, elements[i]);
+						this.CopyGraphicObject(oDomTarget, elements[i].Drawing, elements[i]);
 						this.oPresentationWriter.WriteDouble(elements[i].X);
 						this.oPresentationWriter.WriteDouble(elements[i].Y);
 						this.oPresentationWriter.WriteDouble(elements[i].ExtX);
@@ -1607,7 +1416,7 @@ CopyProcessor.prototype =
 					}
 					else
 					{
-						this.CopyPresentationTableFull(this.ElemToSelect, elements[i].Drawing);
+						this.CopyPresentationTableFull(oDomTarget, elements[i].Drawing);
 						
 						this.oPresentationWriter.WriteDouble(elements[i].X);
 						this.oPresentationWriter.WriteDouble(elements[i].Y);
@@ -1616,15 +1425,11 @@ CopyProcessor.prototype =
 						this.oPresentationWriter.WriteString2(elements[i].ImageUrl);
 					}
 				}
-
-				//for(var i = 0; i < this.Para.childNodes.length; i++)
-					//this.ElemToSelect.appendChild( this.Para.childNodes[i].cloneNode(true));
 			}
 			else if(elementsContent.SlideObjects && elementsContent.SlideObjects.length)//пишем слайды целиком
 			{
 				var selected_slides = elementsContent.SlideObjects;
 
-				this.Para = document.createElement( "p" );
 				this.oPresentationWriter.WriteString2("SlideObjects");
 				
 				this.oPresentationWriter.WriteULong(selected_slides.length);
@@ -1637,7 +1442,7 @@ CopyProcessor.prototype =
 				for(var i = 0; i < selected_slides.length; ++i)
 				{
 					slide = selected_slides[i].Slide;
-					this.CopySlide(this.ElemToSelect, slide);
+					this.CopySlide(oDomTarget, slide);
 					if(!layouts_map[slide.Layout.Get_Id()])
 						++layout_count;
 					layouts_map[slide.Layout.Get_Id()] = slide.Layout;
@@ -1670,8 +1475,6 @@ CopyProcessor.prototype =
 				{
 					this.oPresentationWriter.WriteULong(arr_ind[i]);
 				}
-				for(var i = 0; i < this.Para.childNodes.length; i++)
-					this.ElemToSelect.appendChild( this.Para.childNodes[i].cloneNode(true) );
 			}
 			else if(elementsContent && elementsContent.Content && elementsContent.Content.length)//пишем таблицу в html
 			{
@@ -1685,7 +1488,7 @@ CopyProcessor.prototype =
 					}
 					else if ( type_Paragraph === Item.GetType() )
 					{
-						this.CopyParagraph(oDomTarget, Item, true, false);
+						this.CopyParagraph(oDomTarget, Item, true);
 					}
 				}
 			}
@@ -1701,15 +1504,12 @@ CopyProcessor.prototype =
 					}
 					else if ( type_Paragraph === Item.GetType() )
 					{
-						this.CopyParagraph(oDomTarget, Item, true, false);
+						this.CopyParagraph(oDomTarget, Item, true);
 					}
 				}
 			}
 			
 		}
-		
-        if(!this.onlyBinaryCopy)
-			this.CommitList(oDomTarget);
     },
 	
 	getSelectedBinary : function()
@@ -1750,7 +1550,7 @@ CopyProcessor.prototype =
 			this.oBinaryFileWriter.Document = elementsContent[0].Element.LogicDocument;
 			
 			this.oBinaryFileWriter.CopyStart();
-			this.CopyDocument2(null, oDocument, false, elementsContent);
+			this.CopyDocument2(null, oDocument, elementsContent);
 			this.oBinaryFileWriter.CopyEnd();
 			
 			var sBase64 = this.oBinaryFileWriter.GetResult();
@@ -1762,7 +1562,7 @@ CopyProcessor.prototype =
 		}
 	},
 	
-    Start : function(node)
+    Start : function()
     {
 		var oDocument = this.oDocument;
 		var bFromPresentation;
@@ -1787,7 +1587,7 @@ CopyProcessor.prototype =
 			if(!bFromPresentation)
 				this.oBinaryFileWriter.CopyStart();
 				
-			this.CopyDocument2(this.ElemToSelect, oDocument, false, elementsContent, bFromPresentation);
+			this.CopyDocument2(this.oRoot, oDocument, elementsContent, bFromPresentation);
 			
 			if(!bFromPresentation)
 				this.oBinaryFileWriter.CopyEnd();			
@@ -1801,29 +1601,39 @@ CopyProcessor.prototype =
 			if(!selectedContent.DocContent && (!selectedContent.Drawings || (selectedContent.Drawings && !selectedContent.Drawings.length)) && (!selectedContent.SlideObjects || (selectedContent.SlideObjects && !selectedContent.SlideObjects.length)))
 				return false;
 			
-			this.CopyDocument2(this.ElemToSelect, oDocument, false, selectedContent);
+			this.CopyDocument2(this.oRoot, oDocument, selectedContent);
 
             var sBase64 = this.oPresentationWriter.GetBase64Memory();
             sBase64 = "" + this.oPresentationWriter.pos + ";" + sBase64;
-			if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
+			if(this.oRoot.aChildren && this.oRoot.aChildren.length == 1 && window.USER_AGENT_SAFARI_MACOS)
 			{
-				$(this.ElemToSelect.children[0]).css("font-weight", "normal");;
-				$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
+				var oElem = this.oRoot.aChildren[0];
+				var sStyle = oElem.oAttributes["style"];
+				if(null == sStyle)
+					oElem.oAttributes["style"] = "font-weight:normal";
+				else
+					oElem.oAttributes["style"] = sStyle + ";font-weight:normal";//просто добавляем потому что в sStyle не могло быть font-weight, мы всегда пишем <b>
+				this.oRoot.wrapChild(new CopyElement("b"));
 			}
-            if(this.ElemToSelect.children[0])
-                $(this.ElemToSelect.children[0]).addClass("pptData;" + sBase64);
+			if(this.oRoot.aChildren && this.oRoot.aChildren.length  > 0)
+				this.oRoot.aChildren[0].oAttributes["class"] = "pptData;" + sBase64;
         }
 		
 		if(g_bIsDocumentCopyPaste && copyPasteUseBinary && this.oBinaryFileWriter.copyParams.itemCount > 0 && !bFromPresentation)
 		{
 			var sBase64 = this.oBinaryFileWriter.GetResult();
-			if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
+			if(this.oRoot.aChildren && this.oRoot.aChildren.length == 1 && window.USER_AGENT_SAFARI_MACOS)
 			{
-				$(this.ElemToSelect.children[0]).css("font-weight", "normal");;
-				$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
+				var oElem = this.oRoot.aChildren[0];
+				var sStyle = oElem.oAttributes["style"];
+				if(null == sStyle)
+					oElem.oAttributes["style"] = "font-weight:normal";
+				else
+					oElem.oAttributes["style"] = sStyle + ";font-weight:normal";//просто добавляем потому что в sStyle не могло быть font-weight, мы всегда пишем <b>
+				this.oRoot.wrapChild(new CopyElement("b"));
 			}
-			if(this.ElemToSelect.children[0])
-				$(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
+			if(this.oRoot.aChildren && this.oRoot.aChildren.length  > 0)
+				this.oRoot.aChildren[0].oAttributes["class"] = "docData;" + sBase64;
 		}
 		
 		return sBase64;
@@ -1838,7 +1648,11 @@ CopyProcessor.prototype =
            // sSrc = this.getSrc(sSrc);
             var _bounds_cheker = new CSlideBoundsChecker();
             slide.draw(_bounds_cheker, 0);
-            this.Para.innerHTML += "<img width=\""+Math.round((_bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1) * g_dKoef_mm_to_pix)+"\" height=\""+Math.round((_bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1) * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
+			var oImg = new CopyElement("img");
+			oImg.oAttributes["width"] = Math.round((_bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1) * g_dKoef_mm_to_pix);
+			oImg.oAttributes["height"] = Math.round((_bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1) * g_dKoef_mm_to_pix);
+			oImg.oAttributes["src"] = sSrc;
+            oDomTarget.addChild(oImg);
             this.oPresentationWriter.WriteString2(slide.Layout.Get_Id());
             
 			var table_styles_ids = [];
@@ -2070,82 +1884,12 @@ CopyProcessor.prototype =
 		this.CopyTable(oDomTarget, Item, null);   
     },
 
-    CopyPresentationText : function(oDomTarget, oDocument, bUseSelection)
-    {
-        var Start = 0;
-        var End = 0;
-        if(bUseSelection)
-        {
-            if ( true === oDocument.Selection.Use)
-            {
-                if ( selectionflag_DrawingObject === oDocument.Selection.Flag )
-                {
-                    this.Para = document.createElement( "p" );
-                    //������ ���� �������� ������ ���� ��������
-                    this.Para.innerHTML = this.ParseItem(oDocument.Selection.Data.DrawingObject);
-
-                    for(var i = 0; i < this.Para.childNodes.length; i++)
-                        this.ElemToSelect.appendChild( this.Para.childNodes[i].cloneNode(true) );
-                }
-                else
-                {
-                    Start = oDocument.Selection.StartPos;
-                    End = oDocument.Selection.EndPos;
-                    if ( Start > End )
-                    {
-                        var Temp = End;
-                        End = Start;
-                        Start = Temp;
-                    }
-                }
-            }
-        }
-        else
-        {
-            Start = 0;
-            End = oDocument.Content.length - 1;
-        }
-        // HtmlText
-
-        this.oPresentationWriter.WriteULong(End - Start + 1);
-        for ( var Index = Start; Index <= End; Index++ )
-        {
-            var Item = oDocument.Content[Index];
-            var selectStart = Item.Selection.Use ? Item.Selection.StartPos : 0;
-            var selectEnd = Item.Selection.Use ? Item.Selection.EndPos : Item.Content.length;
-
-            if ( selectStart > selectEnd )
-            {
-                var Temp = selectEnd;
-                selectEnd = selectStart;
-                selectStart = Temp;
-            }
-            for(var i = 0;  i < selectStart; ++i)
-            {
-                var content = Item.Content;
-                if(content instanceof ParaText)
-                    break;
-            }
-            if(i == selectStart)
-            {
-                selectStart = 0;
-            }
-            this.oPresentationWriter.StartRecord(0);
-            this.oPresentationWriter.WriteParagraph(Item, selectStart, selectEnd);
-            this.oPresentationWriter.EndRecord();
-
-            this.CopyParagraph(oDomTarget, Item, Index == End, bUseSelection, oDocument.Content, Index);
-        }
-        this.CommitList(oDomTarget);
-    },
-
-
     CopyGraphicObject: function(oDomTarget, oGraphicObj, drawingCopyObject)
     {
         var sSrc = oGraphicObj.getBase64Img();
         if(sSrc.length > 0)
         {
-            sSrc = this.getSrc(sSrc);
+            //sSrc = this.getSrc(sSrc);
             var _bounds_cheker = new CSlideBoundsChecker();
             oGraphicObj.draw(_bounds_cheker, 0);
 			
@@ -2160,10 +1904,13 @@ CopyProcessor.prototype =
 			else
 				height = Math.round((_bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1) * g_dKoef_mm_to_pix);		
 			
+			var oImg = new CopyElement("img");
+			oImg.oAttributes["width"] = width;
+			oImg.oAttributes["height"] = height;
+			oImg.oAttributes["src"] = sSrc;
             if (this.api.DocumentReaderMode)
-                oDomTarget.innerHTML += "<img style=\"max-width:100%;\" width=\""+ width +"\" height=\""+ height +"\" src=\""+sSrc+"\" />";
-            else
-                oDomTarget.innerHTML += "<img width=\""+ width +"\" height=\""+ height +"\" src=\""+sSrc+"\" />";
+				oImg.oAttributes["style"] = "max-width:100%;";
+			oDomTarget.addChild(oImg);
 
             if(oGraphicObj instanceof CShape)
             {
