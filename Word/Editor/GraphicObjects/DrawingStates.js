@@ -381,7 +381,7 @@ MoveInlineObject.prototype =
             if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : changestype_Paragraph_Content}))
             {
                 History.Create_NewPoint(historydescription_Document_CopyAndMoveInlineObject);
-                var new_para_drawing = new ParaDrawing(this.majorObject.parent.W, this.majorObject.parent.H, null, this.drawingObjects.drawingDocument, null, null);
+                var new_para_drawing = new ParaDrawing(this.majorObject.parent.Extent.W, this.majorObject.parent.Extent.H, null, this.drawingObjects.drawingDocument, null, null);
                 var drawing = this.majorObject.copy();
                 drawing.setParent(new_para_drawing);
                 new_para_drawing.Set_GraphicObject(drawing);
