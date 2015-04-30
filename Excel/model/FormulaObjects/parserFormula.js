@@ -1545,9 +1545,8 @@ cBaseOperator.prototype = {
 };
 
 /** @constructor */
-function cBaseFunction( name, nameLocale, argMin, argMax ) {
+function cBaseFunction( name, argMin, argMax ) {
     this.name = name;
-    this.nameLocale = nameLocale || this.name;
     this.type = cElementType.func;
     this.value = null;
     this.argumentsMin = argMin ? argMin : 0;
@@ -1605,7 +1604,7 @@ cBaseFunction.prototype = {
     },
     Assemble2:function ( arg, start, count ) {
 
-        var str = "", c = start+count-1
+        var str = "", c = start+count-1;
         for ( var i = start; i <= c; i++ ) {
             str += arg[i].toString();
             if ( i !== c ) {
@@ -1613,35 +1612,17 @@ cBaseFunction.prototype = {
             }
         }
         return new cString( this.name + "(" + str + ")" );
-
-/*        var str = "";
-        if ( this.argumentsCurrent === 2 ){
-            str += arg[start + count - 1] + this.name + arg[start + count - 2];
-        }
-        else{
-            str += this.name + arg[start];
-        }
-        return new cString( str );*/
     },
-    Assemble2Locale:function ( arg, start, count ) {
+    Assemble2Locale:function ( arg, start, count, locale ) {
 
-        var str = "", c = start+count-1
+        var str = "", c = start + count - 1, localeName = locale(this.name) || this.name;
         for ( var i = start; i <= c; i++ ) {
             str += arg[i].toString();
             if ( i !== c ) {
                 str += ",";
             }
         }
-        return new cString( this.nameLocale + "(" + str + ")" );
-
-/*        var str = "";
-        if ( this.argumentsCurrent === 2 ){
-            str += arg[start + count - 1] + this.name + arg[start + count - 2];
-        }
-        else{
-            str += this.name + arg[start];
-        }
-        return new cString( str );*/
+        return new cString( localeName + "(" + str + ")" );
     },
     toString:function () {
         return this.name;
@@ -3791,7 +3772,7 @@ parserFormula.prototype = {
     },
 
     /* Сборка функции в инфиксную форму */
-    assembleLocale:function ( rFormula ) {
+    assembleLocale:function ( locale ) {
         /*if ( !rFormula && this.outStack.length == 1 && this.outStack[this.outStack.length - 1] instanceof cError ) {
             return this.Formula;
         }*/
@@ -3804,7 +3785,7 @@ parserFormula.prototype = {
             if ( currentElement.type == cElementType.operator || currentElement.type == cElementType.func ) {
                 _count_arg = currentElement.getArguments();
                 if( currentElement.type == cElementType.func ){
-                    res = currentElement.Assemble2Locale( elemArr, j - _count_arg, _count_arg );
+                    res = currentElement.Assemble2Locale( elemArr, j - _count_arg, _count_arg, locale);
                 }
                 else{
                     res = currentElement.Assemble2( elemArr, j - _count_arg, _count_arg );

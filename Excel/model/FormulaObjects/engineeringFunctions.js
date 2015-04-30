@@ -1029,7 +1029,7 @@ function cBESSELY() {
 cBESSELY.prototype = Object.create( cBaseFunction.prototype );
 
 function cBIN2DEC() {
-    cBaseFunction.call( this, "BIN2DEC", null, 1, 1 );
+    cBaseFunction.call( this, "BIN2DEC", 1, 1 );
 }
 
 cBIN2DEC.prototype = Object.create( cBaseFunction.prototype );
@@ -1077,7 +1077,7 @@ cBIN2DEC.prototype.getInfo = function () {
 }
 
 function cBIN2HEX() {
-    cBaseFunction.call( this, "BIN2HEX", null, 1, 2 );
+    cBaseFunction.call( this, "BIN2HEX", 1, 2 );
 }
 
 cBIN2HEX.prototype = Object.create( cBaseFunction.prototype );
@@ -1139,7 +1139,7 @@ cBIN2HEX.prototype.getInfo = function () {
 }
 
 function cBIN2OCT() {
-    cBaseFunction.call( this, "BIN2OCT", null, 1, 2 );
+    cBaseFunction.call( this, "BIN2OCT", 1, 2 );
 }
 
 cBIN2OCT.prototype = Object.create( cBaseFunction.prototype );
@@ -1201,7 +1201,7 @@ cBIN2OCT.prototype.getInfo = function () {
 }
 
 function cCOMPLEX() {
-    cBaseFunction.call( this, "COMPLEX", null, 2, 3 );
+    cBaseFunction.call( this, "COMPLEX", 2, 3 );
 }
 
 cCOMPLEX.prototype = Object.create( cBaseFunction.prototype );
@@ -1325,7 +1325,7 @@ cDEC2BIN.prototype.getInfo = function () {
 }
 
 function cDEC2HEX() {
-    cBaseFunction.call( this, "DEC2HEX", null, 1, 2 );
+    cBaseFunction.call( this, "DEC2HEX", 1, 2 );
 }
 
 cDEC2HEX.prototype = Object.create( cBaseFunction.prototype );
@@ -1382,7 +1382,7 @@ cDEC2HEX.prototype.getInfo = function () {
 }
 
 function cDEC2OCT() {
-    cBaseFunction.call( this, "DEC2OCT", null, 1, 2 );
+    cBaseFunction.call( this, "DEC2OCT", 1, 2 );
 }
 
 cDEC2OCT.prototype = Object.create( cBaseFunction.prototype );
@@ -1439,7 +1439,7 @@ cDEC2OCT.prototype.getInfo = function () {
 }
 
 function cDELTA() {
-    cBaseFunction.call( this, "DELTA", null, 1, 2 );
+    cBaseFunction.call( this, "DELTA", 1, 2 );
 }
 
 cDELTA.prototype = Object.create( cBaseFunction.prototype );
@@ -1483,7 +1483,7 @@ cDELTA.prototype.getInfo = function () {
 }
 
 function cERF() {
-    cBaseFunction.call( this, "ERF", null, 1, 2 );
+    cBaseFunction.call( this, "ERF", 1, 2 );
 }
 
 cERF.prototype = Object.create( cBaseFunction.prototype );
@@ -1537,7 +1537,7 @@ cERF.prototype.getInfo = function () {
 }
 
 function cERFC() {
-    cBaseFunction.call( this, "ERFC", null, 1, 1 );
+    cBaseFunction.call( this, "ERFC", 1, 1 );
 }
 
 cERFC.prototype = Object.create( cBaseFunction.prototype );
@@ -1571,7 +1571,7 @@ cERFC.prototype.getInfo = function () {
 }
 
 function cGESTEP() {
-    cBaseFunction.call( this, "GESTEP", null, 1, 2 );
+    cBaseFunction.call( this, "GESTEP", 1, 2 );
 }
 
 cGESTEP.prototype = Object.create( cBaseFunction.prototype );
@@ -1615,7 +1615,7 @@ cGESTEP.prototype.getInfo = function () {
 }
 
 function cHEX2BIN() {
-    cBaseFunction.call( this, "HEX2BIN", null, 1, 2 );
+    cBaseFunction.call( this, "HEX2BIN", 1, 2 );
 }
 
 cHEX2BIN.prototype = Object.create( cBaseFunction.prototype );
@@ -1687,7 +1687,7 @@ cHEX2BIN.prototype.getInfo = function () {
 }
 
 function cHEX2DEC() {
-    cBaseFunction.call( this, "HEX2DEC", null, 1, 1 );
+    cBaseFunction.call( this, "HEX2DEC", 1, 1 );
 }
 
 cHEX2DEC.prototype = Object.create( cBaseFunction.prototype );
@@ -1733,7 +1733,7 @@ cHEX2DEC.prototype.getInfo = function () {
 }
 
 function cHEX2OCT() {
-    cBaseFunction.call( this, "HEX2OCT", null, 1, 2 );
+    cBaseFunction.call( this, "HEX2OCT", 1, 2 );
 }
 
 cHEX2OCT.prototype = Object.create( cBaseFunction.prototype );
@@ -1804,7 +1804,7 @@ cHEX2OCT.prototype.getInfo = function () {
 }
 
 function cIMABS() {
-    cBaseFunction.call( this, "IMABS", null, 1, 1 );
+    cBaseFunction.call( this, "IMABS", 1, 1 );
 }
 
 cIMABS.prototype = Object.create( cBaseFunction.prototype );
@@ -1842,7 +1842,7 @@ cIMABS.prototype.getInfo = function () {
 }
 
 function cIMAGINARY() {
-    cBaseFunction.call( this, "IMAGINARY", null, 1, 1 );
+    cBaseFunction.call( this, "IMAGINARY", 1, 1 );
 }
 
 cIMAGINARY.prototype = Object.create( cBaseFunction.prototype );
@@ -1880,7 +1880,7 @@ cIMAGINARY.prototype.getInfo = function () {
 }
 
 function cIMARGUMENT() {
-    cBaseFunction.call( this, "IMARGUMENT", null, 1, 1 );
+    cBaseFunction.call( this, "IMARGUMENT", 1, 1 );
 }
 
 cIMARGUMENT.prototype = Object.create( cBaseFunction.prototype );
@@ -1918,7 +1918,7 @@ cIMARGUMENT.prototype.getInfo = function () {
 }
 
 function cIMCONJUGATE() {
-    cBaseFunction.call( this, "IMCONJUGATE", null, 1, 1 );
+    cBaseFunction.call( this, "IMCONJUGATE", 1, 1 );
 }
 
 cIMCONJUGATE.prototype = Object.create( cBaseFunction.prototype );
@@ -1956,7 +1956,7 @@ cIMCONJUGATE.prototype.getInfo = function () {
 }
 
 function cIMCOS() {
-    cBaseFunction.call( this, "IMCOS", null, 1, 1 );
+    cBaseFunction.call( this, "IMCOS", 1, 1 );
 }
 
 cIMCOS.prototype = Object.create( cBaseFunction.prototype );
@@ -1996,7 +1996,7 @@ cIMCOS.prototype.getInfo = function () {
 }
 
 function cIMDIV() {
-    cBaseFunction.call( this, "IMDIV", null, 2, 2);
+    cBaseFunction.call( this, "IMDIV", 2, 2);
 }
 
 cIMDIV.prototype = Object.create( cBaseFunction.prototype );
@@ -2047,7 +2047,7 @@ cIMDIV.prototype.getInfo = function () {
 }
 
 function cIMEXP() {
-    cBaseFunction.call( this, "IMEXP", null, 1, 1 );
+    cBaseFunction.call( this, "IMEXP", 1, 1 );
 }
 
 cIMEXP.prototype = Object.create( cBaseFunction.prototype );
@@ -2087,7 +2087,7 @@ cIMEXP.prototype.getInfo = function () {
 }
 
 function cIMLN() {
-    cBaseFunction.call( this, "IMLN", null, 1, 1 );
+    cBaseFunction.call( this, "IMLN", 1, 1 );
 }
 
 cIMLN.prototype = Object.create( cBaseFunction.prototype );
@@ -2131,7 +2131,7 @@ cIMLN.prototype.getInfo = function () {
 }
 
 function cIMLOG10() {
-    cBaseFunction.call( this, "IMLOG10", null, 1, 1 );
+    cBaseFunction.call( this, "IMLOG10", 1, 1 );
 }
 
 cIMLOG10.prototype = Object.create( cBaseFunction.prototype );
@@ -2175,7 +2175,7 @@ cIMLOG10.prototype.getInfo = function () {
 }
 
 function cIMLOG2() {
-    cBaseFunction.call( this, "IMLOG2", null, 1, 1 );
+    cBaseFunction.call( this, "IMLOG2", 1, 1 );
 }
 
 cIMLOG2.prototype = Object.create( cBaseFunction.prototype );
@@ -2219,7 +2219,7 @@ cIMLOG2.prototype.getInfo = function () {
 }
 
 function cIMPOWER() {
-    cBaseFunction.call( this, "IMPOWER", null, 2, 2 );
+    cBaseFunction.call( this, "IMPOWER", 2, 2 );
 }
 
 cIMPOWER.prototype = Object.create( cBaseFunction.prototype );
@@ -2273,7 +2273,7 @@ cIMPOWER.prototype.getInfo = function () {
 }
 
 function cIMPRODUCT() {
-    cBaseFunction.call( this, "IMPRODUCT", null, 1, 1 );
+    cBaseFunction.call( this, "IMPRODUCT", 1, 1 );
 }
 
 cIMPRODUCT.prototype = Object.create( cBaseFunction.prototype );
@@ -2359,7 +2359,7 @@ cIMPRODUCT.prototype.getInfo = function () {
 }
 
 function cIMREAL() {
-    cBaseFunction.call( this, "IMREAL", null, 1, 1 );
+    cBaseFunction.call( this, "IMREAL", 1, 1 );
 }
 
 cIMREAL.prototype = Object.create( cBaseFunction.prototype );
@@ -2397,7 +2397,7 @@ cIMREAL.prototype.getInfo = function () {
 }
 
 function cIMSIN() {
-    cBaseFunction.call( this, "IMSIN", null, 1, 1 );
+    cBaseFunction.call( this, "IMSIN", 1, 1 );
 }
 
 cIMSIN.prototype = Object.create( cBaseFunction.prototype );
@@ -2437,7 +2437,7 @@ cIMSIN.prototype.getInfo = function () {
 }
 
 function cIMSQRT() {
-    cBaseFunction.call( this, "IMSQRT", null, 1, 1 );
+    cBaseFunction.call( this, "IMSQRT", 1, 1 );
 }
 
 cIMSQRT.prototype = Object.create( cBaseFunction.prototype );
@@ -2477,7 +2477,7 @@ cIMSQRT.prototype.getInfo = function () {
 }
 
 function cIMSUB() {
-    cBaseFunction.call( this, "IMSUB", null, 2, 2 );
+    cBaseFunction.call( this, "IMSUB", 2, 2 );
 }
 
 cIMSUB.prototype = Object.create( cBaseFunction.prototype );
@@ -2528,7 +2528,7 @@ cIMSUB.prototype.getInfo = function () {
 }
 
 function cIMSUM() {
-    cBaseFunction.call( this, "IMSUM", null, 1, 1 );
+    cBaseFunction.call( this, "IMSUM", 1, 1 );
 }
 
 cIMSUM.prototype = Object.create( cBaseFunction.prototype );
@@ -2615,7 +2615,7 @@ cIMSUM.prototype.getInfo = function () {
 }
 
 function cOCT2BIN() {
-    cBaseFunction.call( this, "OCT2BIN", null, 1, 2 );
+    cBaseFunction.call( this, "OCT2BIN", 1, 2 );
 }
 
 cOCT2BIN.prototype = Object.create( cBaseFunction.prototype );
@@ -2687,7 +2687,7 @@ cOCT2BIN.prototype.getInfo = function () {
 }
 
 function cOCT2DEC() {
-    cBaseFunction.call( this, "OCT2DEC", null, 1, 1 );
+    cBaseFunction.call( this, "OCT2DEC", 1, 1 );
 }
 
 cOCT2DEC.prototype = Object.create( cBaseFunction.prototype );
@@ -2733,7 +2733,7 @@ cOCT2DEC.prototype.getInfo = function () {
 }
 
 function cOCT2HEX() {
-    cBaseFunction.call( this, "OCT2HEX", null, 1, 2 );
+    cBaseFunction.call( this, "OCT2HEX", 1, 2 );
 }
 
 cOCT2HEX.prototype = Object.create( cBaseFunction.prototype );
