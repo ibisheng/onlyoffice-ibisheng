@@ -1318,8 +1318,9 @@ CShapeDrawer.prototype =
                         {
                             if (this.UniFill.fill.RasterImageId && this.UniFill.fill.RasterImageId.indexOf(".svg") != 0)
                             {
-                                this.Graphics.drawImage(_getFullImageSrc(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, undefined);
-                                bIsFill = false;
+                                //this.Graphics.drawImage(_getFullImageSrc(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, undefined);
+                                this.Graphics.put_brushTexture(_getFullImageSrc(this.UniFill.fill.RasterImageId), 0);
+                                //bIsFill = false;
                             }
                             else
                             {
