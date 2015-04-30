@@ -1545,8 +1545,9 @@ cBaseOperator.prototype = {
 };
 
 /** @constructor */
-function cBaseFunction( name, argMin, argMax ) {
+function cBaseFunction( name, nameLocale, argMin, argMax ) {
     this.name = name;
+    this.nameLocale = nameLocale || this.name;
     this.type = cElementType.func;
     this.value = null;
     this.argumentsMin = argMin ? argMin : 0;
@@ -1612,6 +1613,26 @@ cBaseFunction.prototype = {
             }
         }
         return new cString( this.name + "(" + str + ")" );
+
+/*        var str = "";
+        if ( this.argumentsCurrent === 2 ){
+            str += arg[start + count - 1] + this.name + arg[start + count - 2];
+        }
+        else{
+            str += this.name + arg[start];
+        }
+        return new cString( str );*/
+    },
+    Assemble2Locale:function ( arg, start, count ) {
+
+        var str = "", c = start+count-1
+        for ( var i = start; i <= c; i++ ) {
+            str += arg[i].toString();
+            if ( i !== c ) {
+                str += ",";
+            }
+        }
+        return new cString( this.nameLocale + "(" + str + ")" );
 
 /*        var str = "";
         if ( this.argumentsCurrent === 2 ){
@@ -3002,6 +3023,7 @@ function parserFormula( formula, _cellId, _ws ) {
     this.outStack = [];
     this.error = [];
     this.Formula = formula;
+    this.FormulaLocale = null;
     this.isParsed = false;
     //для функции parse и parseDiagramRef
     this.pCurrPos = 0;
@@ -3061,7 +3083,7 @@ parserFormula.prototype = {
         this.cellAddress = g_oCellAddressUtils.getCellAddress( cellId );
     },
 
-    parse:function () {
+    parse:function ( local ) {
 
         if ( this.isParsed )
             return this.isParsed;
@@ -3749,6 +3771,44 @@ parserFormula.prototype = {
             if ( currentElement.type == cElementType.operator || currentElement.type == cElementType.func ) {
                 var _count_arg = currentElement.getArguments();
                 res = currentElement.Assemble2( elemArr, j - _count_arg, _count_arg );
+                j -= _count_arg;
+                elemArr[j] = res;
+            }
+            else {
+                if ( currentElement instanceof cString ) {
+                    currentElement = new cString( "\"" + currentElement.toString() + "\"" );
+                }
+                res = currentElement;
+                elemArr[j] = res;
+            }
+        }
+        if ( res != undefined && res != null ){
+            return res.toString();
+        }
+        else{
+            return this.Formula;
+        }
+    },
+
+    /* Сборка функции в инфиксную форму */
+    assembleLocale:function ( rFormula ) {
+        /*if ( !rFormula && this.outStack.length == 1 && this.outStack[this.outStack.length - 1] instanceof cError ) {
+            return this.Formula;
+        }*/
+        var currentElement = null,
+            _count = this.outStack.length,
+            elemArr = new Array( _count ),
+            res = undefined, _count_arg;
+        for ( var i = 0, j = 0; i < _count; i++,j++ ) {
+            currentElement = this.outStack[i];
+            if ( currentElement.type == cElementType.operator || currentElement.type == cElementType.func ) {
+                _count_arg = currentElement.getArguments();
+                if( currentElement.type == cElementType.func ){
+                    res = currentElement.Assemble2Locale( elemArr, j - _count_arg, _count_arg );
+                }
+                else{
+                    res = currentElement.Assemble2( elemArr, j - _count_arg, _count_arg );
+                }
                 j -= _count_arg;
                 elemArr[j] = res;
             }

@@ -367,8 +367,8 @@ var str_namedRanges = "A-Za-z\u005F\u0080-\u0081\u0083\u0085-\u0087\u0089-\u008A
     rx_Gt = /^ *> */,
     rx_Ge = /^ *>= */,
     rx_Ne = /^ *<> */,
-//    rg = new XRegExp( "^([\\p{L}\\d.]+ *)[-+*/^&%<=>:;\\(\\)]" ),
-    rg = /^([\w\d.]+ *)[-+*\/^&%<=>:;\(\)]/,
+    rg = new XRegExp( "^([\\p{L}\\d.]+ *)[-+*/^&%<=>:;\\(\\)]" ),
+//    rg = /^([\w\d.]+ *)[-+*\/^&%<=>:;\(\)]/,
     rgRange = /^\$?[A-Za-z]+\$?\d+:\$?[A-Za-z]+\$?\d+/,
     rgCols = /^\$?[A-Za-z]+:\$?[A-Za-z]+/,
     rgRows = /^\$?\d+:\$?\d+/,
@@ -401,7 +401,8 @@ var str_namedRanges = "A-Za-z\u005F\u0080-\u0081\u0083\u0085-\u0087\u0089-\u008A
     rg_validHEXNumber = /^[0-9A-F]{1,10}$/i,
     rg_validOCTNumber = /^[0-7]{1,10}$/,
     rg_complex_number = new XRegExp( "^(?<real>[-+]?(?:\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?))?(?<img>([-+]?(\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?)?[ij])?)", "g" ),
-    rx_name = new XRegExp( "^(?<name>" + "[" + str_namedRanges + "]" + "[" + str_namedRanges + "\\d.]*)([-+*\\/^&%<=>: ;),]|$)" );
+    rx_name = new XRegExp( "^(?<name>" + "[" + str_namedRanges + "]" + "[" + str_namedRanges + "\\d.]*)([-+*\\/^&%<=>: ;),]|$)" ),
+    rx_defName = new RegExp("(^(["+str_namedRanges+"_\\])(["+str_namedRanges+"_0-9]*)$)","i");
 
 
 /**
