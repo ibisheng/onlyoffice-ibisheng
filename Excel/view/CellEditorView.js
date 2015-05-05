@@ -922,8 +922,6 @@
 				funcPos = asc_lastidx(s, t.reNotFormula, t.cursorPos) + 1;
 				if (funcPos > 0) {
 					match = s.slice(funcPos).match( t.reFormula );
-                    console.log(s.slice(funcPos))
-                    console.log(match)
 				}
 				if (match) {
 					funcName = match[1];
