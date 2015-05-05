@@ -139,8 +139,8 @@
 			// RegExp с поддержкой рэнджей вида $E1:$F2
 			this.reRangeStr = "[^a-z0-9_$!:](\\$?[a-z]+\\$?\\d+:\\$?[a-z]+\\$?\\d+(?=[^a-z0-9_]|$)|\\$?[a-z]+:\\$?[a-z]+(?=[^a-z0-9_]|$)|\\$?\\d+:\\$?\\d+(?=[^a-z0-9_]|$)|\\$?[a-z]+\\$?\\d+(?=[^a-z0-9_]|$))";
 			this.rangeChars = "= - + * / ( { , < > ^ ! & : ;".split(' ');
-			this.reNotFormula = /[^a-z0-9_]/i;
-			this.reFormula = /^([a-z_][a-z0-9_]*)/i;
+            this.reNotFormula  = new XRegExp( "[^\\p{L}0-9_]", "i" );
+            this.reFormula = new XRegExp( "^([\\p{L}][\\p{L}0-9_]*)", "i" );
 
 			this.defaults = {
 				padding     : -1,
@@ -922,6 +922,8 @@
 				funcPos = asc_lastidx(s, t.reNotFormula, t.cursorPos) + 1;
 				if (funcPos > 0) {
 					match = s.slice(funcPos).match( t.reFormula );
+                    console.log(s.slice(funcPos))
+                    console.log(match)
 				}
 				if (match) {
 					funcName = match[1];
