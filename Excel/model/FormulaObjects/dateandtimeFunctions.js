@@ -247,32 +247,31 @@ function daysInYear( date, basis ){
     }
 }
 
-cFormulaFunction.DateAndTime = {
-    'groupName':"DateAndTime",
-    'DATE':cDATE,
-    'DATEDIF':cDATEDIF,
-    'DATEVALUE':cDATEVALUE,
-    'DAY':cDAY,
-    'DAYS360':cDAYS360,
-    'EDATE':cEDATE,
-    'EOMONTH':cEOMONTH,
-    'HOUR':cHOUR,
-    'MINUTE':cMINUTE,
-    'MONTH':cMONTH,
-    'NETWORKDAYS':cNETWORKDAYS,
-    'NETWORKDAYS.INTL':cNETWORKDAYS_INTL,
-    'NOW':cNOW,
-    'SECOND':cSECOND,
-    'TIME':cTIME,
-    'TIMEVALUE':cTIMEVALUE,
-    'TODAY':cTODAY,
-    'WEEKDAY':cWEEKDAY,
-    'WEEKNUM':cWEEKNUM,
-    'WORKDAY':cWORKDAY,
-    'WORKDAY.INTL':cWORKDAY_INTL,
-    'YEAR':cYEAR,
-    'YEARFRAC':cYEARFRAC
-}
+cFormulaFunctionGroup['DateAndTime'] = [
+    cDATE,
+    cDATEDIF,
+    cDATEVALUE,
+    cDAY,
+    cDAYS360,
+    cEDATE,
+    cEOMONTH,
+    cHOUR,
+    cMINUTE,
+    cMONTH,
+    cNETWORKDAYS,
+    cNETWORKDAYS_INTL,
+    cNOW,
+    cSECOND,
+    cTIME,
+    cTIMEVALUE,
+    cTODAY,
+    cWEEKDAY,
+    cWEEKNUM,
+    cWORKDAY,
+    cWORKDAY_INTL,
+    cYEAR,
+    cYEARFRAC
+];
 
 function cDATE() {
 //    cBaseFunction.call( this, "DATE" );

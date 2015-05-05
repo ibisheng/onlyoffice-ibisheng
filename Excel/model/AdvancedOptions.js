@@ -150,7 +150,7 @@
 			asc_getGroupName : function() { return this.groupName; },
 			asc_getFormulasArray : function() { return this.formulasArray; },
 			asc_addFormulaElement : function(o) { return this.formulasArray.push(o); }
-		}
+		};
 
 		window["Asc"].asc_CFormulaGroup = asc_CFormulaGroup;
 		window["Asc"]["asc_CFormulaGroup"] = asc_CFormulaGroup;
@@ -168,7 +168,7 @@
 		asc_CFormula.prototype = {
 			asc_getName : function() { return this.name; },
 			asc_getArguments : function() { return this.arg; }
-		}
+		};
 
 		window["Asc"].asc_CFormula = asc_CFormula;
 		window["Asc"]["asc_CFormula"] = asc_CFormula;

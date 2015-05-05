@@ -8,16 +8,15 @@
  * To change this template use File | Settings | File Templates.
  */
 
-cFormulaFunction.Logical = {
-    'groupName':"Logical",
-    'AND':cAND,
-    'FALSE':cFALSE,
-    'IF':cIF,
-    'IFERROR':cIFERROR,
-    'NOT':cNOT,
-    'OR':cOR,
-    'TRUE':cTRUE
-};
+cFormulaFunctionGroup['Logical'] = [
+    cAND,
+    cFALSE,
+    cIF,
+    cIFERROR,
+    cNOT,
+    cOR,
+    cTRUE
+];
 
 function cAND() {
 //    cBaseFunction.call( this, "AND" );

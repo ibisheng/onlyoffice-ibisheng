@@ -1615,7 +1615,7 @@ cBaseFunction.prototype = {
     },
     Assemble2Locale:function ( arg, start, count, locale ) {
 
-        var str = "", c = start + count - 1, localeName = locale(this.name) || this.name;
+        var str = "", c = start + count - 1, localeName = locale ? locale[this.name] : this.name;
         for ( var i = start; i <= c; i++ ) {
             str += arg[i].toString();
             if ( i !== c ) {
@@ -2057,7 +2057,7 @@ var cFormulaOperators = {
     /* 10 is lowest priopity */
 };
 
-/* cFormulaFunction is container for holding all ECMA-376 function, see chapter $18.17.7 in "ECMA-376, Second Edition, Part 1 - Fundamentals And Markup Language Reference" */
+/* cFormulaFunctionGroup is container for holding all ECMA-376 function, see chapter $18.17.7 in "ECMA-376, Second Edition, Part 1 - Fundamentals And Markup Language Reference" */
 /*
  Каждая формула представляет собой копию функции cBaseFunction.
  Для реализации очередной функции необходимо указать количество (минимальное и максимальное) принимаемых аргументов. Берем в спецификации.
@@ -2065,20 +2065,25 @@ var cFormulaOperators = {
  В методе Calculate необходимо отслеживать тип принимаемых аргументов. Для примера, если мы обращаемся к ячейке A1, в которой лежит 123, то этот аргумент будет числом. Если же там лежит "123", то это уже строка. Для более подробной информации смотреть спецификацию.
  Метод getInfo является обязательным, ибо через этот метод в интерфейс передается информация о реализованных функциях.
  */
+var cFormulaFunctionGroup = {};
 var cFormulaFunction = {};
+var cFormulaFunctionLocalized = null;
+var cFormulaFunctionToLocale = null;
 
 function getFormulasInfo() {
-    var list = [], a, b;
-    for ( var type in cFormulaFunction ) {
-        b = new Asc.asc_CFormulaGroup( cFormulaFunction[type]["groupName"] );
-        for ( var f in cFormulaFunction[type] ) {
-            if ( f != "groupName" ) {
-                a = new cFormulaFunction[type][f]();
-                if ( a.getInfo )
-                    b.asc_addFormulaElement( new Asc.asc_CFormula( a.getInfo() ) );
-            }
+
+    var list = [], a, b, f;
+    for (var type in cFormulaFunctionGroup) {
+        b = new Asc.asc_CFormulaGroup( type );
+        for (var i = 0; i < cFormulaFunctionGroup[type].length; ++i) {
+			a = new cFormulaFunctionGroup[type][i]();
+			if (a.getInfo) {
+				f = new Asc.asc_CFormula(a.getInfo());
+				b.asc_addFormulaElement(f);
+				cFormulaFunction[f.asc_getName()] = cFormulaFunctionGroup[type][i];
+			}
         }
-        list.push( b )
+        list.push(b);
     }
     return list;
 }
@@ -3075,6 +3080,7 @@ parserFormula.prototype = {
          */
         var operand_expected = true, wasLeftParentheses = false, wasRigthParentheses = false,
             found_operand = null, _3DRefTmp = null;
+		var cFormulaList = (local && cFormulaFunctionLocalized) ? cFormulaFunctionLocalized : cFormulaFunction;
         while ( this.pCurrPos < this.Formula.length ) {
             /* Operators*/
             if ( parserHelp.isOperator.call( this, this.Formula, this.pCurrPos )/*  || isNextPtg(this.formula,this.pCurrPos) */ ) {
@@ -3418,41 +3424,11 @@ parserFormula.prototype = {
                         this.elemArr.push( new cMultOperator() );
                     }
 
-                    var found_operator = null;
-                    if ( this.operand_str.toUpperCase() in cFormulaFunction.Mathematic )//Mathematic
-                        found_operator = new cFormulaFunction.Mathematic[this.operand_str.toUpperCase()]();
+                    var found_operator = null, operandStr = this.operand_str.toUpperCase();
+					if ( operandStr in cFormulaList )
+						found_operator = new cFormulaList[operandStr]();
 
-                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Logical )//Logical
-                        found_operator = new cFormulaFunction.Logical[this.operand_str.toUpperCase()]();
-
-                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Information )//Information
-                        found_operator = new cFormulaFunction.Information[this.operand_str.toUpperCase()]();
-
-                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Statistical )//Statistical
-                        found_operator = new cFormulaFunction.Statistical[this.operand_str.toUpperCase()]();
-
-                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.TextAndData )//Text and data
-                        found_operator = new cFormulaFunction.TextAndData[this.operand_str.toUpperCase()]();
-
-                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Cube )//Cube
-                        found_operator = new cFormulaFunction.Cube[this.operand_str.toUpperCase()]();
-
-                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Database )//Database
-                        found_operator = new cFormulaFunction.Database[this.operand_str.toUpperCase()]();
-
-                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.DateAndTime )//Date and time
-                        found_operator = new cFormulaFunction.DateAndTime[this.operand_str.toUpperCase()]();
-
-                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Engineering )//Engineering
-                        found_operator = new cFormulaFunction.Engineering[this.operand_str.toUpperCase()]();
-
-                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Financial )//Financial
-                        found_operator = new cFormulaFunction.Financial[this.operand_str.toUpperCase()]();
-
-                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.LookupAndReference )//Lookup and reference
-                        found_operator = new cFormulaFunction.LookupAndReference[this.operand_str.toUpperCase()]();
-
-                    if ( found_operator !== null && found_operator !== undefined ){
+                    if ( found_operator != null ) {
                         this.elemArr.push( found_operator );
                         this.f.push( found_operator );
                     }
@@ -3773,9 +3749,6 @@ parserFormula.prototype = {
 
     /* Сборка функции в инфиксную форму */
     assembleLocale:function ( locale ) {
-        /*if ( !rFormula && this.outStack.length == 1 && this.outStack[this.outStack.length - 1] instanceof cError ) {
-            return this.Formula;
-        }*/
         var currentElement = null,
             _count = this.outStack.length,
             elemArr = new Array( _count ),

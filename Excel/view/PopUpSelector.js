@@ -108,7 +108,7 @@
 					if (isFirst)
 						selectElement = item;
 
-					value = arrItems[i].name;
+					value = arrItems[i];
 					item.setAttribute('title', arrItems[i].arg);
 				} else
 					value = arrItems[i];

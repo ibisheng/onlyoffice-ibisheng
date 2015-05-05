@@ -8,24 +8,23 @@
  * To change this template use File | Settings | File Templates.
  */
 
-cFormulaFunction.Information = {
-    'groupName':"Information",
-    'ERROR.TYPE':cERROR_TYPE,
-    'ISBLANK':cISBLANK,
-    'ISERR':cISERR,
-    'ISERROR':cISERROR,
-    'ISEVEN':cISEVEN,
-    'ISLOGICAL':cISLOGICAL,
-    'ISNA':cISNA,
-    'ISNONTEXT':cISNONTEXT,
-    'ISNUMBER':cISNUMBER,
-    'ISODD':cISODD,
-    'ISREF':cISREF,
-    'ISTEXT':cISTEXT,
-    'N':cN,
-    'NA':cNA,
-    'TYPE':cTYPE
-};
+cFormulaFunctionGroup['Information'] = [
+    cERROR_TYPE,
+    cISBLANK,
+    cISERR,
+    cISERROR,
+    cISEVEN,
+    cISLOGICAL,
+    cISNA,
+    cISNONTEXT,
+    cISNUMBER,
+    cISODD,
+    cISREF,
+    cISTEXT,
+    cN,
+    cNA,
+    cTYPE
+];
 /*
  здесь вынесены функции, которы по назначению не могут быть использованы в веб редакторах документах.
  либо они будут реализованы с усеченным функционалом позже.

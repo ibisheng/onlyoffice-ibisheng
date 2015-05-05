@@ -8,55 +8,54 @@
  * To change this template use File | Settings | File Templates.
  */
 
-cFormulaFunction.TextAndData = {
-    'groupName':"TextAndData",
-    'ASC':cASC,
-    'BAHTTEXT':cBAHTTEXT,
-    'CHAR':cCHAR,
-    'CLEAN':cCLEAN,
-    'CODE':cCODE,
-    'CONCATENATE':cCONCATENATE,
-    'DOLLAR':cDOLLAR,
-    'EXACT':cEXACT,
-    'FIND':cFIND,
-    'FINDB':cFINDB,
-    'FIXED':cFIXED,
-    'JIS':cJIS,
-    'LEFT':cLEFT,
-    'LEFTB':cLEFTB,
-    'LEN':cLEN,
-    'LENB':cLENB,
-    'LOWER':cLOWER,
-    'MID':cMID,
-    'MIDB':cMIDB,
-    'PHONETIC':cPHONETIC,
-    'PROPER':cPROPER,
-    'REPLACE':cREPLACE,
-    'REPLACEB':cREPLACEB,
-    'REPT':cREPT,
-    'RIGHT':cRIGHT,
-    'RIGHTB':cRIGHTB,
-    'SEARCH':cSEARCH,
-    'SEARCHB':cSEARCHB,
-    'SUBSTITUTE':cSUBSTITUTE,
-    'T':cT,
-    'TEXT':cTEXT,
-    'TRIM':cTRIM,
-    'UPPER':cUPPER,
-    'VALUE':cVALUE
-}
+cFormulaFunctionGroup['TextAndData'] = [
+    cASC,
+    cBAHTTEXT,
+    cCHAR,
+    cCLEAN,
+    cCODE,
+    cCONCATENATE,
+    cDOLLAR,
+    cEXACT,
+    cFIND,
+    cFINDB,
+    cFIXED,
+    cJIS,
+    cLEFT,
+    cLEFTB,
+    cLEN,
+    cLENB,
+    cLOWER,
+    cMID,
+    cMIDB,
+    cPHONETIC,
+    cPROPER,
+    cREPLACE,
+    cREPLACEB,
+    cREPT,
+    cRIGHT,
+    cRIGHTB,
+    cSEARCH,
+    cSEARCHB,
+    cSUBSTITUTE,
+    cT,
+    cTEXT,
+    cTRIM,
+    cUPPER,
+    cVALUE
+];
 
 function cASC() {
     cBaseFunction.call( this, "ASC" );
 }
 
-cASC.prototype = Object.create( cBaseFunction.prototype )
+cASC.prototype = Object.create( cBaseFunction.prototype );
 
 function cBAHTTEXT() {
     cBaseFunction.call( this, "BAHTTEXT" );
 }
 
-cBAHTTEXT.prototype = Object.create( cBaseFunction.prototype )
+cBAHTTEXT.prototype = Object.create( cBaseFunction.prototype );
 
 function cCHAR() {
 //    cBaseFunction.call( this, "CHAR" );
@@ -77,7 +76,7 @@ function cCHAR() {
 
 }
 
-cCHAR.prototype = Object.create( cBaseFunction.prototype )
+cCHAR.prototype = Object.create( cBaseFunction.prototype );
 cCHAR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
@@ -549,7 +548,7 @@ function cFIND() {
 
 }
 
-cFIND.prototype = Object.create( cBaseFunction.prototype )
+cFIND.prototype = Object.create( cBaseFunction.prototype );
 cFIND.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = this.getArguments() == 3 ? arg[2] : null, res, str, searchStr, pos = -1;
 
@@ -610,16 +609,16 @@ cFIND.prototype.Calculate = function ( arg ) {
 
     return this.value = new cNumber( res + 1 );
 
-}
+};
 cFIND.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( string-1 , string-2 [ , start-pos ] )"
     };
-}
+};
 
 function cFINDB() {
-    var r = new cFormulaFunction.TextAndData["FIND"]()
+    var r = new cFIND();
     r.setName( "FINDB" );
     return r;
 }
@@ -884,7 +883,7 @@ cLEFT.prototype.getInfo = function () {
 };
 
 function cLEFTB() {
-    var r = new cFormulaFunction.TextAndData["LEFT"]()
+    var r = new cLEFT();
     r.setName( "LEFTB" );
     return r;
 }
@@ -934,7 +933,7 @@ cLEN.prototype.getInfo = function () {
 };
 
 function cLENB() {
-    var r = new cFormulaFunction.TextAndData["LEN"]();
+    var r = new cLEN();
     r.setName( "LENB" );
     return r;
 }
@@ -1042,16 +1041,16 @@ cMID.prototype.Calculate = function ( arg ) {
 
     return this.value = new cString( arg0.getValue().substr( arg1.getValue() == 0 ? 0 : arg1.getValue() - 1, arg2.getValue() ) )
 
-}
+};
 cMID.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( string , start-pos , number-chars )"
     };
-}
+};
 
 function cMIDB() {
-    var r = new cFormulaFunction.TextAndData["MID"]();
+    var r = new cMID();
     r.setName( "MIDB" );
     return r;
 }
@@ -1060,7 +1059,7 @@ function cPHONETIC() {
     cBaseFunction.call( this, "PHONETIC" );
 }
 
-cPHONETIC.prototype = Object.create( cBaseFunction.prototype )
+cPHONETIC.prototype = Object.create( cBaseFunction.prototype );
 
 function cPROPER() {
 //    cBaseFunction.call( this, "PROPER" );
@@ -1222,16 +1221,16 @@ cREPLACE.prototype.Calculate = function ( arg ) {
 
     return this.value = new cString( res );
 
-}
+};
 cREPLACE.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( string-1, start-pos, number-chars, string-2 )"
     };
-}
+};
 
 function cREPLACEB() {
-    var r = new cFormulaFunction.TextAndData["REPLACE"]();
+    var r = new cREPLACE();
     r.setName( "REPLACEB" );
     return r;
 }
@@ -1255,7 +1254,7 @@ function cREPT() {
 
 }
 
-cREPT.prototype = Object.create( cBaseFunction.prototype )
+cREPT.prototype = Object.create( cBaseFunction.prototype );
 cREPT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], res = "";
     if ( arg0 instanceof cError ) return this.value = arg0;
@@ -1358,16 +1357,16 @@ cRIGHT.prototype.Calculate = function ( arg ) {
     var l = arg0.getValue().length, _number = l - arg1.getValue();
     return this.value = new cString( arg0.getValue().substring( _number < 0 ? 0 : _number, l ) )
 
-}
+};
 cRIGHT.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( string [ , number-chars ] )"
     };
-}
+};
 
 function cRIGHTB() {
-    var r = new cFormulaFunction.TextAndData["RIGHT"]()
+    var r = new cRIGHT();
     r.setName( "RIGHTB" );
     return r;
 }
@@ -1465,16 +1464,16 @@ cSEARCH.prototype.Calculate = function ( arg ) {
 
     return this.value = new cNumber( res + 1 );
 
-}
+};
 cSEARCH.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( string-1 , string-2 [ , start-pos ] )"
     };
-}
+};
 
 function cSEARCHB() {
-    var r = new cFormulaFunction.TextAndData["SEARCH"]();
+    var r = new cSEARCH();
     r.setName( "SEARCHB" );
     return r;
 }
@@ -1560,17 +1559,17 @@ cSUBSTITUTE.prototype.Calculate = function ( arg ) {
             return new_string;
         }
         return equal;
-    } )
+    } );
 
     return this.value = new cString( res );
 
-}
+};
 cSUBSTITUTE.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( string , old-string , new-string [ , occurence ] )"
     };
-}
+};
 
 function cT() {
 //    cBaseFunction.call( this, "T" );

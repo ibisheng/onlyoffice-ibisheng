@@ -12,27 +12,26 @@ function _getRowTitle( row ) {
     return "" + (row + 1);
 }
 
-cFormulaFunction.LookupAndReference = {
-    'groupName':"LookupAndReference",
-    'ADDRESS':cADDRESS,
-    'AREAS':cAREAS,
-    'CHOOSE':cCHOOSE,
-    'COLUMN':cCOLUMN,
-    'COLUMNS':cCOLUMNS,
-    'GETPIVOTDATA':cGETPIVOTDATA,
-    'HLOOKUP':cHLOOKUP,
-    'HYPERLINK':cHYPERLINK,
-    'INDEX':cINDEX,
-    'INDIRECT':cINDIRECT,
-    'LOOKUP':cLOOKUP,
-    'MATCH':cMATCH,
-    'OFFSET':cOFFSET,
-    'ROW':cROW,
-    'ROWS':cROWS,
-    'RTD':cRTD,
-    'TRANSPOSE':cTRANSPOSE,
-    'VLOOKUP':cVLOOKUP
-};
+cFormulaFunctionGroup['LookupAndReference'] = [
+    cADDRESS,
+    cAREAS,
+    cCHOOSE,
+    cCOLUMN,
+    cCOLUMNS,
+    cGETPIVOTDATA,
+    cHLOOKUP,
+    cHYPERLINK,
+    cINDEX,
+    cINDIRECT,
+    cLOOKUP,
+    cMATCH,
+    cOFFSET,
+    cROW,
+    cROWS,
+    cRTD,
+    cTRANSPOSE,
+    cVLOOKUP
+];
 
 function cADDRESS() {
 //    cBaseFunction.call( this, "ADDRESS" );

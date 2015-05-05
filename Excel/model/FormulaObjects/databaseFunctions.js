@@ -8,21 +8,20 @@
  * To change this template use File | Settings | File Templates.
  */
 
-cFormulaFunction.Database = {
-    'groupName':"Database",
-    'DAVERAGE':cDAVERAGE,
-    'DCOUNT':cDCOUNT,
-    'DCOUNTA':cDCOUNTA,
-    'DGET':cDGET,
-    'DMAX':cDMAX,
-    'DMIN':cDMIN,
-    'DPRODUCT':cDPRODUCT,
-    'DSTDEV':cDSTDEV,
-    'DSTDEVP':cDSTDEVP,
-    'DSUM':cDSUM,
-    'DVAR':cDVAR,
-    'DVARP':cDVARP
-};
+cFormulaFunctionGroup['Database'] = [
+    cDAVERAGE,
+    cDCOUNT,
+    cDCOUNTA,
+    cDGET,
+    cDMAX,
+    cDMIN,
+    cDPRODUCT,
+    cDSTDEV,
+    cDSTDEVP,
+    cDSUM,
+    cDVAR,
+    cDVARP
+];
 
 function cDAVERAGE() {
     cBaseFunction.call( this, "DAVERAGE" );

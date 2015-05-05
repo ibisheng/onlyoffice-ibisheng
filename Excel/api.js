@@ -149,6 +149,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			// Использовать ли обрезанные шрифты
 			this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
+
+			this.formulasList = null;	// Список всех формул
 			
 			this.TrackFile = null;
 
@@ -165,6 +167,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.HtmlElement["ondragover"] = function (e) {t._onDragOverImage(e);};
 				this.HtmlElement["ondrop"] = function (e) {t._onDropImage(e);};
 			}
+
+			this.formulasList = getFormulasInfo();
 		};
 
 		spreadsheet_api.prototype._onDragOverImage = function(e) {
@@ -3090,7 +3094,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 
 		spreadsheet_api.prototype.asc_getFormulasInfo = function () {
-			return this.wb.getFormulasInfo();
+			return this.formulasList;
 		};
 
 		spreadsheet_api.prototype.asc_recalc = function(isRecalcWB){
@@ -3316,6 +3320,21 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 		spreadsheet_api.prototype.asc_continueSaving = function () {
 			this.waitSave = false;
+		};
+
+		// Выставление локали
+		spreadsheet_api.prototype.asc_setLocalization = function (oLocalizedData) {
+			cFormulaFunctionLocalized = {};
+			cFormulaFunctionToLocale = {};
+			var localName;
+			for (var i in cFormulaFunction) {
+				localName = oLocalizedData[i]['n'];
+				localName = localName ? localName : i;
+				cFormulaFunctionLocalized[localName] = cFormulaFunction[i];
+				cFormulaFunctionToLocale[i] = localName;
+			}
+			if (this.wb)
+				this.wb.initFormulasList();
 		};
 
 		// offline mode
@@ -3980,6 +3999,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		// other
 		prot["asc_stopSaving"] = prot.asc_stopSaving;
 		prot["asc_continueSaving"] = prot.asc_continueSaving;
+
+		prot["asc_setLocalization"] = prot.asc_setLocalization;
 
         // offline mode
 

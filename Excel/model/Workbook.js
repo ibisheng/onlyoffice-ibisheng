@@ -4739,7 +4739,7 @@ Cell.prototype.setValue=function(val,callback, isCopyPaste){
                 oldFP = this.formulaParsed;
 			var cellId = g_oCellAddressUtils.getCellId(this.nRow, this.nCol);
             this.formulaParsed = new parserFormula(val.substring(1),cellId,this.ws);
-			if( !this.formulaParsed.parse() ){
+			if( !this.formulaParsed.parse(true) ){
 				switch( this.formulaParsed.error[this.formulaParsed.error.length-1] ){
 					case c_oAscError.ID.FrmlWrongFunctionName:
 						break;
@@ -4758,7 +4758,7 @@ Cell.prototype.setValue=function(val,callback, isCopyPaste){
 				}
 			}
 			else{
-				val = "="+this.formulaParsed.assemble();
+				val = "="+this.formulaParsed.assembleLocale();
 			}
 
 		}

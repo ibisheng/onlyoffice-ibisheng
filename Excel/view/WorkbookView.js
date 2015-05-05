@@ -546,7 +546,7 @@
 			this.clipboard.Api = this.Api;
 			this.clipboard.init();
 
-			this.formulasList = getFormulasInfo();
+			this.initFormulasList();
 
 			this.fReplaceCallback = function () {self._replaceCellTextCallback.apply(self, arguments);};
 
@@ -1459,10 +1459,6 @@
 			this.wsMustDraw = false;
 		};
 
-		WorkbookView.prototype.getFormulasInfo = function () {
-			return this.formulasList;
-		};
-
 		// Получаем свойство: редактируем мы сейчас или нет
 		WorkbookView.prototype.getCellEditMode = function () {
 			return this.controller.isCellEditMode;
@@ -1528,12 +1524,8 @@
 			if (isFormula && formulaName) {
 				formulaName = formulaName.toUpperCase();
 				for (var i = 0; i < this.formulasList.length; ++i) {
-					var group = this.formulasList[i].formulasArray;
-					for (var j = 0; j < group.length; ++j) {
-						if (0 === group[j].name.indexOf(formulaName)) {
-							arrResult.push(group[j]);
-						}
-					}
+					if (0 === this.formulasList[i].indexOf(formulaName))
+						arrResult.push(this.formulasList[i]);
 				}
 			}
 			if (0 < arrResult.length) {
@@ -2111,6 +2103,13 @@
 					this.cellEditor.setFontRenderingMode(mode);
 				}
 			}
+		};
+
+		WorkbookView.prototype.initFormulasList = function () {
+			this.formulasList = [];
+			var oFormulaList = cFormulaFunctionLocalized ? cFormulaFunctionLocalized : cFormulaFunction;
+			for (var f in oFormulaList)
+				this.formulasList.push(f);
 		};
 
 		WorkbookView.prototype._setHintsProps = function (bIsHinting, bIsSubpixHinting) {
