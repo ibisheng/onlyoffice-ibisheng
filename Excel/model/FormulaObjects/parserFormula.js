@@ -68,6 +68,10 @@ Date.prototype.truncate = function () {
 };
 
 Date.prototype.getExcelDate = function () {
+    return Math.floor(this.getExcelDateWithTime());
+};
+
+Date.prototype.getExcelDateWithTime = function () {
 //    return Math.floor( ( this.getTime() / 1000 - this.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (g_bDate1904 ? 0 : 1) ) );
     var year =  this.getUTCFullYear(), month = this.getUTCMonth(), date = this.getUTCDate(), res;
 
@@ -78,7 +82,7 @@ Date.prototype.getExcelDate = function () {
     else
         res = (Date.UTC(year, month, date, this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds()) - this.getExcelNullDate() ) / c_msPerDay - 1;
 
-    return Math.floor(res);
+    return res;
 };
 
 Date.prototype.getDateFromExcel = function ( val ) {
