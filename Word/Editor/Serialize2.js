@@ -2519,7 +2519,7 @@ function Binary_oMathWriter(memory, oMathPara)
 	this.WriteOMathPara = function(oOMathPara)
 	{
 		var oThis = this;
-		var props = {};//oOMathPara.getPropsForWrite();
+		var props = oOMathPara.getPropsForWrite();
 		
 		oThis.bs.WriteItem(c_oSer_OMathContentType.OMathParaPr, function(){oThis.WriteOMathParaPr(props);});	
 		oThis.bs.WriteItem(c_oSer_OMathContentType.OMath, function(){oThis.WriteArgNodes(oOMathPara.Root);});
@@ -2528,8 +2528,8 @@ function Binary_oMathWriter(memory, oMathPara)
 	this.WriteOMathParaPr = function(props)
 	{
 		var oThis = this;
-		if (null != props.mJc)
-			this.bs.WriteItem(c_oSer_OMathBottomNodesType.MJc, function(){oThis.WriteMJc(props.mJc);});
+		if (null != props.Jc)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.MJc, function(){oThis.WriteMJc(props.Jc);});
 	}
 	this.WriteOpEmu = function(OpEmu)
 	{
@@ -7757,8 +7757,9 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             this.oReadResult.bLastRun = true;
 		else if (c_oSerRunType.object === type)
 		{	
+			var oDrawing = new Object();
 			res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadObject(t,l,oParStruct);
+                return oThis.ReadObject(t,l,oParStruct,oDrawing);
 			});
 		}
         else
@@ -7802,7 +7803,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         }
 		oDrawing.content = oParaDrawing;
 	}
-	this.ReadObject = function (type, length, oParStruct)
+	this.ReadObject = function (type, length, oParStruct, oDrawing)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -7811,7 +7812,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if ( length > 0 )
 			{
 				var oMathPara = new ParaMath();
-				oParStruct.addToContent(oMathPara);
+				oDrawing.oMathPara = oMathPara;
 				
 				res = this.bcr.Read1(length, function(t, l){
 					return oThis.boMathr.ReadMathArg(t,l,oMathPara.Root);
@@ -7821,7 +7822,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		else if(c_oSerRunType.pptxDrawing === type)
 		{
 			var oNewElem = null;
-			var oDrawing = new Object();
+			
 			this.ReadDrawing (type, length, oParStruct, oDrawing, res);
 			if(null != oDrawing.content.GraphicObj)
             {
