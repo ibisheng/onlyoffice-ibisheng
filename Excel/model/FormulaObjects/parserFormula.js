@@ -1192,7 +1192,7 @@ function cName( val, wb, ws ) {
     this.regSpace = /\$/g;
     this.wb = wb;
     this.ws = ws;
-    this.defName = this.wb.getDefinesNames( this.value, this.ws.getId() );
+    this.defName = this.wb.getDefinesNames( this.value, this.ws ? this.ws.getId() : null );
     if( this.defName ){
         this.ref = new parserFormula( this.defName.Ref, "", this.ws );
         this.ref.parse();
