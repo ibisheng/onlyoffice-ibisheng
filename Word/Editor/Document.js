@@ -1209,23 +1209,21 @@ CDocument.prototype =
 
             // TODO: Тут надо вставить заглушку, что если у нас в долгом пересчете находится страница <= PageIndex + 1,
             //       по отношению к данной, тогда не надо делать быстрый пересчет.
-            if (SimpleChanges.length >= 1)
+            var SimplePara = History.Is_ParagraphSimpleChanges();
+            if (null !== SimplePara)
             {
-                var Run  = SimpleChanges[0].Class;
-                var Para = Run.Paragraph;
-
-                var FastPages = Para.Recalculate_FastWholeParagraph();
+                var FastPages = SimplePara.Recalculate_FastWholeParagraph();
                 var FastPagesCount = FastPages.length;
 
                 if (FastPagesCount > 0)
                 {
                     // Если изменения произошли на последней странице параграфа, и за данным параграфом следовал
                     // пустой параграф с новой секцией, тогда его тоже надо пересчитать.
-                    var NextElement = Para.Get_DocumentNext();
+                    var NextElement = SimplePara.Get_DocumentNext();
                     var LastFastPage = FastPages[FastPagesCount - 1];
                     if (null !== NextElement && true === this.Pages[LastFastPage].Check_EndSectionPara(NextElement))
                     {
-                        var LastVisibleBounds = Para.Get_LastRangeVisibleBounds();
+                        var LastVisibleBounds = SimplePara.Get_LastRangeVisibleBounds();
 
                         var ___X = LastVisibleBounds.X + LastVisibleBounds.W;
                         var ___Y = LastVisibleBounds.Y;

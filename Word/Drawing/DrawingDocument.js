@@ -4657,28 +4657,57 @@ function CDrawingDocument()
             if (arrBounds.length <= 0)
                 return;
 
-            var oPrevBounds = arrBounds[0];
-            var arrGroups = [{Count : 1, Page : oPrevBounds.Page}];
-            for (var nIndex = 1, nCount = arrBounds.length, nGroupIndex = 0; nIndex < nCount; nIndex++)
+            var nStartIndex = 0;
+            while (nStartIndex < arrBounds.length)
             {
-                var oBounds = arrBounds[nIndex];
+                if (arrBounds[nStartIndex].W < 0.001)
+                    nStartIndex++;
+                else
+                    break;
+            }
 
-                if (oPrevBounds.Page !== oBounds.Page || oBounds.X + oBounds.W < oPrevBounds.X || oPrevBounds.X + oPrevBounds.W < oBounds.X)
+            if (nStartIndex >= arrBounds.length)
+                return;
+
+            var nPrevIndex = nStartIndex;
+            var oPrevBounds = arrBounds[nStartIndex];
+            var arrGroups = [{Count : 1, Page : oPrevBounds.Page, StartIndex : nStartIndex}];
+            for (var nIndex = nStartIndex + 1, nCount = arrBounds.length, nGroupIndex = 0; nIndex < nCount; nIndex++)
+            {
+                var nCurIndex = nIndex;
+                while (nCurIndex < nCount)
+                {
+                    if (arrBounds[nCurIndex].W < 0.001)
+                        nCurIndex++;
+                    else
+                        break;
+                }
+
+                if (nCurIndex >= nCount)
+                    break;
+
+                nIndex = nCurIndex;
+
+                var oBounds = arrBounds[nIndex];
+                if (oPrevBounds.Page !== oBounds.Page || oBounds.X + oBounds.W < oPrevBounds.X || oPrevBounds.X + oPrevBounds.W < oBounds.X || nIndex != nPrevIndex + 1)
                 {
                     nGroupIndex++;
-                    arrGroups[nGroupIndex] = {Count : 1, Page : oBounds.Page};
+                    arrGroups[nGroupIndex] = {Count : 1, Page : oBounds.Page, StartIndex : nIndex};
                 }
                 else
                     arrGroups[nGroupIndex].Count++;
+
+                nPrevIndex = nIndex;
 
                 oPrevBounds = oBounds;
             }
 
             // Объединим группы в полигоны
-            for (var nGroupIndex = 0, nCount = arrGroups.length, nStartRect = 0; nGroupIndex < nCount; nGroupIndex++)
+            for (var nGroupIndex = 0, nCount = arrGroups.length; nGroupIndex < nCount; nGroupIndex++)
             {
                 var oPolygon = [];
                 var nRectsCount = arrGroups[nGroupIndex].Count;
+                var nStartRect  = arrGroups[nGroupIndex].StartIndex;
                 for (var nRectIndex = 0; nRectIndex < nRectsCount; nRectIndex++)
                 {
                     var nBIndex = nRectIndex + nStartRect;
@@ -4709,27 +4738,11 @@ function CDrawingDocument()
                 }
 
                 arrPolygons.push({Polygon : oPolygon, Page : arrGroups[nGroupIndex].Page, HalfCount : nRectsCount * 2});
-                nStartRect += nRectsCount;
             }
 
             this.MathRect.Bounds = arrPolygons;
-
-//            this.MathRect.Bounds = [];
-//            for (var nIndex = 0, nCount = arrBounds.length; nIndex < nCount; nIndex++)
-//            {
-//                var oBounds = arrBounds[nIndex];
-//
-//                this.MathRect.Bounds[nIndex] =
-//                {
-//                    X    : oBounds.X - PixelError,
-//                    Y    : oBounds.Y - PixelError,
-//                    R    : oBounds.X + oBounds.W + PixelError,
-//                    B    : oBounds.Y + oBounds.H + PixelError,
-//                    Page : oBounds.Page
-//                };
-//            }
         }
-    }
+    };
 
     this.Update_FieldTrack = function(IsActive, aRects)
     {

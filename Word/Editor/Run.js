@@ -1256,9 +1256,6 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
 // Проверяем, произошло ли простейшее изменение (набор или удаление текста)
 ParaRun.prototype.Is_SimpleChanges = function(Changes)
 {
-    if ( para_Math_Run === this.Type )
-        return false;
-
     var ParaPos = null;
 
     var Count = Changes.length;
@@ -1294,6 +1291,36 @@ ParaRun.prototype.Is_SimpleChanges = function(Changes)
             ParaPos = CurParaPos;
         else if (ParaPos.Line !== CurParaPos.Line || ParaPos.Range !== CurParaPos.Range)
             return false;
+    }
+
+    return true;
+};
+
+/*
+    Проверяем произошло ли простое изменение параграфа, сейчас главное, чтобы это было не добавление или удаление картинки.
+    На вход приходит либо массив изменений, либо одно изменение (можно не в массиве).
+ */
+ParaRun.prototype.Is_ParagraphSimpleChanges = function(_Changes)
+{
+    var Changes = _Changes;
+    if (!_Changes.length)
+        Changes = [_Changes];
+
+    var ChangesCount = Changes.length;
+    for (var ChangesIndex = 0; ChangesIndex < ChangesCount; ChangesIndex++)
+    {
+        var Data = Changes[ChangesIndex].Data;
+        var ChangeType = Data.Type;
+
+        if (historyitem_ParaRun_AddItem === ChangeType || historyitem_ParaRun_RemoveItem === ChangeType)
+        {
+            for (var ItemIndex = 0, ItemsCount = Data.Items.length; ItemIndex < ItemsCount; ItemIndex++)
+            {
+                var Item = Data.Items[ItemIndex];
+                if (para_Drawing === Item.Type)
+                    return false;
+            }
+        }
     }
 
     return true;
