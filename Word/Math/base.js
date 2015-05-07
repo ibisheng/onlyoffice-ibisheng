@@ -1747,6 +1747,8 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.BrGapRight = this.GapRight;
     }
 
+    PRS.bInsideOper   = false;
+
     if(this.bOneLine == true)
     {
         PRS.bMath_OneLine = this.bOneLine;
@@ -1763,7 +1765,7 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 }
                 else
                 {
-                    Item.Recalculate_Reset( PRS.Range, PRS.Line ); // обновим StartLine и StartRange
+                    Item.Recalculate_Reset(PRS.Range, PRS.Line); // обновим StartLine и StartRange
                     Item.Recalculate_Range(PRS, ParaPr, Depth);
                 }
             }
@@ -1795,6 +1797,7 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         {
             PRS.WordLen += this.BrGapLeft;
         }
+
 
         for(var Pos = RangeStartPos; Pos < Len; Pos++)
         {
@@ -2023,6 +2026,35 @@ CMathBase.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange
     }
 
     this.Bounds.SetWidth(CurLine, PRSC.Range.W - RangeW);
+};
+CMathBase.prototype.UpdateOperators = function(_CurLine, _CurRange)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    if(this.bOneLine == true)
+    {
+        result = true;
+    }
+    else
+    {
+        var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+        var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+        var result = true;
+
+        if(this.ParaMath.Is_BrkBinBefore() == true)
+        {
+            result = this.Content[StartPos].UpdateOperators(_CurLine, _CurRange);
+        }
+        else
+        {
+            result = this.Content[EndPos].UpdateOperators(_CurLine, _CurRange);
+
+        }
+    }
+
+    return result;
 };
 CMathBase.prototype.Is_EmptyRange = function()
 {

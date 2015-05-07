@@ -2042,6 +2042,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var ParaLine        = PRS.Line;
     var ParaRange       = PRS.Range;
     var bMathWordLarge  = PRS.bMathWordLarge;
+    var OperGapRight    = PRS.OperGapRight;
+    var OperGapLeft     = PRS.OperGapLeft;
 
     var Pos = RangeStartPos;
 
@@ -2068,9 +2070,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             {
                 case para_Sym:
                 case para_Text:
-                case para_Math_Text:
-                case para_Math_Ampersand:
-                case para_Math_Placeholder:
                 {
                     // Отмечаем, что началось слово
                     StartWord = true;
@@ -2095,13 +2094,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             }
                         }
 
-                        if(this.Type == para_Math_Run && true !== NewRange)
-                        {
-                            PRS.Set_LineBreakPos(Pos);
-                            WordLen += LetterLen;
-                            Word = true;
-                        }
-                        else if (true !== NewRange)
+                        if (true !== NewRange)
                         {
                             // Отмечаем начало нового слова
                             PRS.Set_LineBreakPos(Pos);
@@ -2119,7 +2112,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 // Слово оказалось единственным элементом в промежутке, и, все равно,
                                 // не умещается целиком. Делаем следующее:
                                 //
-                                // 0) Для Формулы слово не разбиваем, перенос не делаем, пишем в одну строку (слово выйдет за границу как в Ворде)
+                                //
                                 // 1) Если у нас строка без вырезов, тогда ставим перенос строки на
                                 //    текущей позиции.
                                 // 2) Если у нас строка с вырезом, и данный вырез не последний, тогда
@@ -2127,13 +2120,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 // 3) Если у нас строка с вырезом и вырез последний, тогда ставим перенос
                                 //    строки в начале слова.
 
-                                if(this.Type == para_Math_Run)
-                                {
-                                    //
-                                    bMathWordLarge = true;
-
-                                }
-                                else if (false === Para.Internal_Check_Ranges(ParaLine, ParaRange))
+                                if (false === Para.Internal_Check_Ranges(ParaLine, ParaRange))
                                 {
                                     // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                                     MoveToLBP = true;
@@ -2180,6 +2167,73 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     break;
                 }
+                case para_Math_Text:
+                case para_Math_Ampersand:
+                case para_Math_Placeholder:
+                {
+                    // Отмечаем, что началось слово
+                    StartWord = true;
+
+                    // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.
+                    var LetterLen = Item.Get_Width2() / TEXTWIDTH_DIVIDER;//var LetterLen = Item.Get_Width();
+
+
+                    if (true !== Word)
+                    {
+                        // Слово только началось. Делаем следующее:
+                        // 1) Если до него на строке ничего не было и данная строка не
+                        //    имеет разрывов, тогда не надо проверять убирается ли слово в строке.
+                        // 2) В противном случае, проверяем убирается ли слово в промежутке.
+
+                        // Если слово только началось, и до него на строке ничего не было, и в строке нет разрывов, тогда не надо проверять убирается ли оно на строке.
+                        if (true !== FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange))
+                        {
+                            if (X + SpaceLen + LetterLen > XEnd)
+                            {
+                                NewRange = true;
+                                RangeEndPos = Pos;
+                            }
+                        }
+
+                        if(true !== NewRange)
+                        {
+                            PRS.Set_LineBreakPos(Pos);
+                            WordLen += LetterLen;
+                            Word = true;
+                        }
+
+                    }
+                    else
+                    {
+                        if(X + SpaceLen + WordLen + LetterLen > XEnd)
+                        {
+                            if(true === FirstItemOnLine)
+                            {
+                                // Слово оказалось единственным элементом в промежутке, и, все равно,
+                                // не умещается целиком. Делаем следующее:
+                                //
+                                // Для Формулы слово не разбиваем, перенос не делаем, пишем в одну строку (слово выйдет за границу как в Ворде)
+
+                                bMathWordLarge = true;
+
+                            }
+                            else
+                            {
+                                // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                                MoveToLBP = true;
+                                NewRange = true;
+                            }
+                        }
+
+                        if (true !== NewRange)
+                        {
+                            // Мы убираемся в пределах данной строки. Прибавляем ширину буквы к ширине слова
+                            WordLen += LetterLen;
+                        }
+                    }
+
+                    break;
+                }
                 case para_Space:
                 {
                     FirstItemOnLine = false;
@@ -2204,7 +2258,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 }
                 case para_Math_BreakOperator:
                 {
-                    var BrkLen = Item.Width/TEXTWIDTH_DIVIDER;
+                    var BrkLen = Item.Get_Width2()/TEXTWIDTH_DIVIDER;
 
                     var bCompareOper = Item.Is_CompareOperator();
 
@@ -2233,47 +2287,66 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     }
                     else
                     {
+
+                        PRS.bInsideOper = true;
+
                         var bOperBefore = this.ParaMath.Is_BrkBinBefore() == true;
                         var WorLenCompareOper = WordLen + X - XRange + (bOperBefore  ? SpaceLen : BrkLen);
 
+                        var bOverXEnd;
 
                         if(bCompareOper && PRS.bFirstCompareOper == true && WorLenCompareOper > PRS.WrapIndent && !(Word == false && FirstItemOnLine == true)) // (Word == true && FirstItemOnLine == true) - не первый элемент в строке
                             PRS.bFirstCompareOper = false;
 
                         if(bOperBefore)  // оператор "до"
                         {
-                            if(X + WordLen + SpaceLen > XEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                            bOverXEnd = X + WordLen + SpaceLen > XEnd;
+
+                            if(Word == false) // слово только началось
+                            {
+                                OperGapLeft = Item.GapLeft;
+                            }
+
+                            if(bOverXEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                             {
                                 MoveToLBP = true;
                                 NewRange = true;
                             }
-                            else if(Word == true)
-                            {
-                                if(X + WordLen + SpaceLen > XEnd) // FirstItemOnLine == true
-                                    bMathWordLarge = true;
-
-                                X += SpaceLen + WordLen;
-                                PRS.Set_LineBreakPos(Pos);
-                                EmptyLine = false;
-                                WordLen = BrkLen;
-                                SpaceLen = 0;
-
-                                FirstItemOnLine = false;
-
-                            }
                             else
                             {
-                                if(SpaceLen !== 0)
-                                    FirstItemOnLine = false;
+                                if(Word == true)
+                                {
+                                    if(bOverXEnd) // FirstItemOnLine == true
+                                        bMathWordLarge = true;
 
-                                if(FirstItemOnLine == false)
+                                    X += SpaceLen + WordLen;
                                     PRS.Set_LineBreakPos(Pos);
-                                SpaceLen += BrkLen;
+                                    EmptyLine = false;
+                                    WordLen = BrkLen;
+                                    SpaceLen = 0;
+
+                                    FirstItemOnLine = false;
+                                }
+                                else
+                                {
+                                    if(SpaceLen !== 0)
+                                        FirstItemOnLine = false;
+
+                                    if(FirstItemOnLine == false)
+                                        PRS.Set_LineBreakPos(Pos);
+
+                                    // FirstItemOnLine == true && Word == false
+                                    // первое слово в строке
+                                    if(FirstItemOnLine == true)
+                                        SpaceLen += BrkLen - OperGapLeft;
+                                }
                             }
                         }
                         else   // оператор "после"
                         {
-                            if(X + WordLen + BrkLen > XEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                            bOverXEnd = X + WordLen + BrkLen - Item.GapRight > XEnd;
+
+                            if(bOverXEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                             {
                                 MoveToLBP = true;
                                 NewRange = true;
@@ -2283,8 +2356,13 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             }
                             else
                             {
-                                if(X + WordLen + BrkLen > XEnd) // FirstItemOnLine == true
+                                // осуществляем здесь, чтобы не изменить GapRight в случае, когда новое слово не убирается на break_Operator
+                                OperGapRight = Item.GapRight;
+
+                                if(bOverXEnd) // FirstItemOnLine == true
+                                {
                                     bMathWordLarge = true;
+                                }
 
                                 X += BrkLen + WordLen;
 
@@ -2651,6 +2729,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     PRS.SpaceLen        = SpaceLen;
     PRS.WordLen         = WordLen;
     PRS.bMathWordLarge  = bMathWordLarge;
+    PRS.OperGapRight    = OperGapRight;
+    PRS.OperGapLeft     = OperGapLeft;
 
     PRS.X               = X;
     PRS.XEnd            = XEnd;
@@ -2802,9 +2882,6 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
         {
             case para_Sym:
             case para_Text:
-            case para_Math_Text:
-            case para_Math_Placeholder:
-            case para_Math_Ampersand:
             {
                 PRSC.Letters++;
 
@@ -2833,14 +2910,14 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 
                 break;
             }
+            case para_Math_Text:
+            case para_Math_Placeholder:
+            case para_Math_Ampersand:
             case para_Math_BreakOperator:
             {
-                if ( true === PRSC.Word )
-                {
-                    PRSC.Word        = false;
-                }
+                PRSC.Letters++;
 
-                PRSC.Range.W += Item.Width / TEXTWIDTH_DIVIDER;
+                PRSC.Range.W += Item.Get_Width2() / TEXTWIDTH_DIVIDER;
                 break;
             }
             case para_Space:
@@ -2955,10 +3032,6 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
         {
             case para_Sym:
             case para_Text:
-            case para_Math_Text:
-            case para_Math_Placeholder:
-            case para_Math_BreakOperator:
-            case para_Math_Ampersand:
             {
                 var WidthVisible = 0;
 
@@ -2971,6 +3044,19 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                     WidthVisible = Item.Width / TEXTWIDTH_DIVIDER + PRSA.JustifyWord;//WidthVisible = Item.Get_Width() + PRSA.JustifyWord;
 
                 Item.WidthVisible = (WidthVisible * TEXTWIDTH_DIVIDER) | 0;//Item.Set_WidthVisible(WidthVisible);
+
+                PRSA.X    += WidthVisible;
+                PRSA.LastW = WidthVisible;
+
+                break;
+            }
+            case para_Math_Text:
+            case para_Math_Placeholder:
+            case para_Math_BreakOperator:
+            case para_Math_Ampersand:
+            {
+                var WidthVisible = Item.Get_Width2() / TEXTWIDTH_DIVIDER;
+                Item.WidthVisible = (WidthVisible * TEXTWIDTH_DIVIDER)| 0;//Item.Set_WidthVisible(WidthVisible);
 
                 PRSA.X    += WidthVisible;
                 PRSA.LastW = WidthVisible;
@@ -8513,117 +8599,8 @@ ParaRun.prototype.Math_SetPosition = function(pos, PRSA, Line, Range, Page)
     for(var i = StartPos; i < EndPos; i++)
     {
         this.Content[i].setPosition(pos);
-        pos.x += this.Content[i].size.width;
+        pos.x += this.Content[i].Get_Width();
     }
-};
-ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
-{
-    var X = x;
-    var Y = y + this.size.ascent;
-
-    var oWPrp = this.Get_CompiledPr(false);
-
-    var Font =
-    {
-        Bold       : oWPrp.Bold,
-        Italic     : oWPrp.Italic,
-        FontFamily : {Name : oWPrp.FontFamily.Name, Index : oWPrp.FontFamily.Index},
-        FontSize   : MathApplyArgSize(oWPrp.FontSize, this.Parent.Compiled_ArgSz.value)
-    };
-
-    if(this.IsMathematicalText()) // выставляем false, чтобы не применился наклон к спец символам
-    {
-        Font.Italic = false;
-        Font.Bold   = false;
-    }
-
-    pGraphics.SetFont(Font);
-    pGraphics.b_color1(0,0,0,255);
-
-    for(var i=0; i < this.Content.length;i++)
-        this.Content[i].draw(X, Y, pGraphics);
-};
-ParaRun.prototype.old_Math_Recalculate = function(oMeasure, RPI, WidthPoints)
-{
-    // ParaText (ParagraphContent.js)
-    // для настройки TextPr
-    // Measure
-
-    // FontClassification.js
-    // Get_FontClass
-
-    var RangeStartPos = 0;
-    var RangeEndPos = this.Content.length;
-
-
-    // обновляем позиции start и end для Range
-    //this.Lines[0].Add_Range(0, RangeStartPos, RangeEndPos);
-    this.protected_AddRange(0, 0);
-    this.protected_FillRange(0, 0, RangeStartPos, RangeEndPos);
-
-
-    if(RPI.NeedResize)
-    {
-        var oWPrp = this.Get_CompiledPr(false);
-        var Theme = this.Paragraph.Get_Theme();
-
-        var ArgSize     = this.Parent.Compiled_ArgSz.value,
-            bNormalText = this.IsNormalText();
-
-        // argSize
-        g_oTextMeasurer.SetTextPr(oWPrp,Theme);
-
-        var InfoMathText = new CMathInfoTextPr_2(oWPrp, ArgSize, bNormalText);
-
-        this.bEqArray = RPI.bEqArray;
-
-        this.size.SetZero();
-
-        var ascent = 0, descent = 0;
-
-        var Lng = this.Content.length;
-
-        for (var i = 0 ; i < Lng; i++)
-        {
-            this.Content[i].Resize(oMeasure, RPI, InfoMathText);
-
-            var oSize = this.Content[i].size;
-
-            this.size.width += oSize.width;
-
-            var oDescent = oSize.height - oSize.ascent;
-
-            ascent = ascent > oSize.ascent ? ascent : oSize.ascent;
-            descent = descent < oDescent ? oDescent : descent;
-
-            if(RPI.bEqArray)
-            {
-                if(this.Content[i].Type !== para_Math_Ampersand)
-                    WidthPoints.UpdatePoint(oSize.width);
-                else
-                    WidthPoints.AddNewAlignRange();
-            }
-        }
-
-        this.size.ascent = ascent;
-        this.size.height = ascent + descent;
-
-        // Запрашиваем текущие метрики шрифта, под TextAscent мы будем понимать ascent + linegap(которые записаны в шрифте)
-        this.TextHeight  = g_oTextMeasurer.GetHeight();
-        this.TextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
-        this.TextAscent  = this.TextHeight - this.TextDescent;
-        this.TextAscent2 = g_oTextMeasurer.GetAscender();
-    }
-
-    // Пересчитаем метрику строки относительно размера данного текста
-    if (RPI.PRS.LineTextAscent < this.TextAscent)
-        RPI.PRS.LineTextAscent = this.TextAscent;
-
-    if (RPI.PRS.LineTextAscent2 < this.TextAscent2)
-        RPI.PRS.LineTextAscent2 = this.TextAscent2;
-
-    if (RPI.PRS.LineTextDescent < this.TextDescent)
-        RPI.PRS.LineTextDescent = this.TextDescent;
 };
 ParaRun.prototype.Math_GetWidth = function(_CurLine, _CurRange)
 {
@@ -8636,7 +8613,7 @@ ParaRun.prototype.Math_GetWidth = function(_CurLine, _CurRange)
     var W = 0;
     for(var i = StartPos; i < EndPos; i++)
     {
-        W += this.Content[i].size.width;
+        W += this.Content[i].Get_Width();
     }
 
     return W;
@@ -8739,7 +8716,9 @@ ParaRun.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
         var size = this.Content[i].size,
             Type = this.Content[i].Type;
 
-        width += size.width;
+        var WidthItem = this.Content[i].Get_Width();
+
+        width += WidthItem;
 
         if(ascent < size.ascent)
             ascent = size.ascent;
@@ -8751,7 +8730,7 @@ ParaRun.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
         if(this.bEqArray)
         {
             if(Type !== para_Math_Ampersand)
-                WidthPoints.UpdatePoint(size.width);
+                WidthPoints.UpdatePoint(WidthItem);
             else
                 WidthPoints.AddNewAlignRange();
         }
@@ -8762,26 +8741,34 @@ ParaRun.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
     this.size.height = ascent + descent;
 
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
+};
+ParaRun.prototype.UpdateOperators = function(_CurLine, _CurRange)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
 
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
 
-    // данная функция используется только для мат объектов, которые на строки не разбиваются
-    // поэтому далее можно убрать
+    var result = true;
 
-    // Запрашиваем текущие метрики шрифта, под TextAscent мы будем понимать ascent + linegap(которые записаны в шрифте)
-    /*this.TextHeight  = g_oTextMeasurer.GetHeight();
-    this.TextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
-    this.TextAscent  = this.TextHeight - this.TextDescent;
-    this.TextAscent2 = g_oTextMeasurer.GetAscender();
+    if(StartPos == EndPos)
+    {
+        result = false;
+    }
+    else
+    {
+        if(this.ParaMath.Is_BrkBinBefore() == true)
+        {
+            this.Content[StartPos].Update_GapLeft(0);
+        }
+        else
+        {
+            this.Content[EndPos-1].Update_GapRight(0);
+        }
+    }
 
-    // Пересчитаем метрику строки относительно размера данного текста
-    if (PRS.LineTextAscent < this.TextAscent)
-        PRS.LineTextAscent = this.TextAscent;
-
-    if (PRS.LineTextAscent2 < this.TextAscent2)
-        PRS.LineTextAscent2 = this.TextAscent2;
-
-    if (PRS.LineTextDescent < this.TextDescent)
-        PRS.LineTextDescent = this.TextDescent;*/
+    return result;
 };
 ParaRun.prototype.Math_Apply_Style = function(Value)
 {
@@ -8851,48 +8838,10 @@ ParaRun.prototype.Math_Correct_Content = function()
             this.Remove_FromContent(i, 1, true);
     }
 };
-ParaRun.prototype.Get_ParaContentPosByXY_2 = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+ParaRun.prototype.OnlyOnePlaceholder = function()
 {
-    var Result = false;
+    return this.Content.length == 1 && this.Content[0].Type == para_Math_Placeholder;
 
-    var CurLine  = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-    var CurPos = StartPos;
-    var Dx = 0;
-
-    for (; CurPos < EndPos; CurPos++ )
-    {
-        var Item = this.Content[CurPos];
-        var CurX = Item.pos.x;
-        Dx = Item.Get_WidthVisible();
-
-        // Проверяем, попали ли мы в данный элемент
-        var Diff = SearchPos.X - CurX;
-
-        if ((Math.abs( Diff ) < SearchPos.DiffX + 0.001 && (SearchPos.CenterMode || SearchPos.X > SearchPos.CurX)))
-        {
-            SearchPos.DiffX = Math.abs( Diff );
-            SearchPos.Pos.Update( CurPos, Depth );
-            Result = true;
-
-            if (Diff >= - 0.001 && Diff <= Dx + 0.001)
-            {
-                SearchPos.InTextPos.Update( CurPos, Depth );
-                SearchPos.InText = true;
-            }
-        }
-    }
-
-    if ((Math.abs(Diff -  Dx) < SearchPos.DiffX + 0.001 && (SearchPos.CenterMode || SearchPos.X > SearchPos.CurX)) )
-    {
-        SearchPos.Pos.Update( EndPos, Depth );
-        Result = true;
-
-    }
 };
 ParaRun.prototype.Set_MathPr = function(MPrp)
 {
@@ -8960,7 +8909,7 @@ ParaRun.prototype.ApplyPoints = function(PointsInfo)
                 this.Content[Pos].size.width = PointsInfo.GetAlign();
             }
 
-            this.size.width += this.Content[Pos].size.width;
+            this.size.width += this.Content[Pos].Get_Width();
         }
     }
 };

@@ -66,8 +66,8 @@ function CMathText(bJDraw)
 
     this.rasterOffsetX = 0;
     this.rasterOffsetY = 0;
-    this.GapLeft = 0;
-    this.GapRight = 0;
+    this.GapLeft       = 0;
+    this.GapRight      = 0;
 
     this.FontSlot  = fontslot_ASCII;
 
@@ -638,8 +638,7 @@ CMathText.prototype =
                 width = metricsTxt.Width;
         }
 
-
-        this.size.width  = this.GapLeft + this.GapRight + width;
+        this.size.width  = width;
         this.size.height = height;
         this.size.ascent = ascent;
 
@@ -654,9 +653,31 @@ CMathText.prototype =
         else
             this.Parent = null;
     },
+    Get_Width: function() // работаем через функцию, т.к. поля  GapLeft и GapRight могут измениться из-за изменения переноса, а пересчет (Measure) в этом случае не прийдет
+    {
+        return this.size.width + this.GapLeft + this.GapRight;
+    },
+    Get_Width2: function() // работаем через функцию, т.к. поля  GapLeft и GapRight могут измениться из-за изменения переноса, а пересчет (Measure) в этом случае не прийдет
+    {
+        return ( (this.size.width + this.GapLeft + this.GapRight)* TEXTWIDTH_DIVIDER ) | 0;
+    },
     Get_WidthVisible: function()
     {
-        return this.size.width;
+        return this.size.width + this.GapLeft + this.GapRight;
+    },
+    Update_GapLeft: function(Gap)
+    {
+        this.GapLeft = Gap;
+        //this.size.width = this.MeasureWidth + this.GapRight + this.GapLeft;
+
+        //this.Width = (this.size.width * TEXTWIDTH_DIVIDER) | 0;
+    },
+    Update_GapRight: function(Gap)
+    {
+        this.GapRight = Gap;
+        //this.size.width = this.MeasureWidth + this.GapRight + this.GapLeft;
+
+        //this.Width = (this.size.width * TEXTWIDTH_DIVIDER) | 0;
     },
     Draw_Elements: function(PDSE)
     {
@@ -920,7 +941,7 @@ CMathAmp.prototype =
         {
             this.size =
             {
-                width:          this.AmpText.size.width + this.GapLeft + this.GapRight,
+                width:          this.AmpText.size.width/* + this.GapLeft + this.GapRight*/,
                 height:         this.AmpText.size.height,
                 ascent:         this.AmpText.size.ascent
             };
@@ -947,9 +968,15 @@ CMathAmp.prototype =
     {
         return !this.bEqArray;
     },
+    // special for Run
     Get_WidthVisible: function()
     {
-        return this.size.width;
+        return this.size.width + this.GapLeft + this.GapRight;
+    },
+    // работаем через функцию, т.к. поля  GapLeft и GapRight могут измениться из-за изменения переноса, а пересчет (Measure) в этом случае не прийдет
+    Get_Width: function()
+    {
+        return this.size.width + this.GapLeft + this.GapRight;
     },
     setPosition: function(pos)
     {
@@ -965,7 +992,7 @@ CMathAmp.prototype =
             this.AmpText.Draw(x + this.GapLeft, y, pGraphics, InfoTextPr);
         else if(editor.ShowParaMarks) // показать метки выравнивания, если включена отметка о знаках параграфа
         {
-            var X  = x + this.pos.x + this.size.width,
+            var X  = x + this.pos.x + this.Get_Width(),
                 Y  = y + this.pos.y,
                 Y2 = y + this.pos.y - this.AmpText.size.height;
 

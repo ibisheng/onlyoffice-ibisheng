@@ -855,9 +855,14 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     RPI.MergeMathInfo(this.ParaMathRPI);
     var ArgSize = new CMathArgSize();
 
-    this.Root.Set_Paragraph(Para);
-    this.Root.Set_ParaMath(this, null);
-    this.Root.PreRecalc(null, this, ArgSize, RPI);
+    // в случае если нужно сделать для пересчета каждой строки этот блоки, необходимо переделать PreRecalc, чтобы не перезаписывались Gaps, которые были уже рассчитаны на UpdateOperators
+    if(this.Root.IsFirstRange(ParaLine, ParaRange))
+    {
+        this.Root.Set_Paragraph(Para);
+        this.Root.Set_ParaMath(this, null);
+        this.Root.PreRecalc(null, this, ArgSize, RPI);
+    }
+
 
     ////////////////////////////////////////////////////////////
 
@@ -899,16 +904,25 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     this.Root.Recalculate_Range(PRS, ParaPr, Depth);
 
+    if(PRS.NewRange == false)
+    {
+        // обнуляем GapRight для операторов
+        PRS.OperGapRight       = 0;
+
+        var WidthLine = PRS.X - PRS.XRange + PRS.SpaceLen + PRS.WordLen;
+
+        if(PRS.FirstItemOnLine == true && PRS.X + PRS.SpaceLen + PRS.WordLen > PRS.XEnd)
+        {
+            PRS.bMathWordLarge = true;
+        }
+
+        this.UpdateWidthLine(PRS, WidthLine);
+    }
+
     if(CurrentPage == 0 && PRS.bMathWordLarge && this.State !== ALIGN_EMPTY)
     {
         this.UpdateInfoForBreak(PRS);
         this.State++;
-    }
-
-    if(PRS.NewRange == false)
-    {
-        var WidthLine = PRS.X - PRS.XRange + PRS.SpaceLen + PRS.WordLen;
-        this.UpdateWidthLine(PRS, WidthLine);
     }
 
     this.ParaMathRPI.ClearRecalculate();
@@ -938,6 +952,8 @@ ParaMath.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 {
     var SpaceLen   = PRSC.SpaceLen;
 
+    this.Root.UpdateOperators(_CurLine, _CurRange);
+
     this.Root.Recalculate_Range_Width(PRSC, _CurLine, _CurRange);
 
     PRSC.Range.W        += PRSC.SpaceLen - SpaceLen;
@@ -951,6 +967,8 @@ ParaMath.prototype.UpdateWidthLine = function(PRS, Width)
 
     var MaxW    = this.CurPageInfo.MaxLineW,
         CurLine = PRS.Line - this.Root.StartLine;
+
+    Width -= PRS.OperGapRight + PRS.OperGapLeft;
 
     if(MaxW < Width && CurLine !== 0 && RecalCurrentMath == true)
     {
@@ -978,20 +996,15 @@ ParaMath.prototype.Recalculate_PageEndInfo = function(PRSI, _CurLine, _CurRange)
 };
 ParaMath.prototype.Save_RecalculateObject = function(Copy)
 {
-    var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
-    RecalcObj.Save_Lines( this, Copy );
-
-    // TODO: Сделать сохранение пересчета у формулы
-
-    return RecalcObj;
+    return this.Root.Save_RecalculateObject(Copy);
 };
 ParaMath.prototype.Load_RecalculateObject = function(RecalcObj)
 {
-    RecalcObj.Load_Lines(this);
+    this.Root.Load_RecalculateObject(RecalcObj);
 };
 ParaMath.prototype.Prepare_RecalculateObject = function()
 {
-    this.protected_ClearLines();
+    this.Root.Prepare_RecalculateObject();
 };
 ParaMath.prototype.Is_EmptyRange = function(_CurLine, _CurRange)
 {

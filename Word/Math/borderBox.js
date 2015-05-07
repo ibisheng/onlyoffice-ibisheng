@@ -528,6 +528,20 @@ CBox.prototype.Update_WordLen = function(PRS, WordLen)
 {
     PRS.WordLen   = WordLen;
 };
+CBox.prototype.UpdateOperators = function(_CurLine, _CurRange)
+{
+    if(true == this.ParaMath.Is_BrkBinBefore())
+    {
+        this.GapLeft = 0;
+    }
+    else
+    {
+        this.GapRight = 0;
+    }
+
+    this.size.width = this.Content[0].size.width + this.GapLeft + this.GapRight;
+
+};
 
 
 function CMathBarPr()

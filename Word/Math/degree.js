@@ -862,6 +862,8 @@ CDegreeSubSup.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 {
     this.bOneLine = PRS.bMath_OneLine;
 
+    PRS.bInsideOper   = false;
+
     if(this.bOneLine === true)
     {
         CDegreeSubSup.superclass.Recalculate_Range.call(this, PRS, ParaPr, Depth);
@@ -889,6 +891,8 @@ CDegreeSubSup.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
         PRS.Update_CurPos(0, Depth);
         PRS.bMath_OneLine  = false;
+
+        PRS.bInsideOper   = false;
 
         if(this.Pr.type == DEGREE_SubSup) // baseContent, iters
             this.baseContent.Recalculate_Range(PRS, ParaPr, Depth+1);

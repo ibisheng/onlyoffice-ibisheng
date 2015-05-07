@@ -461,6 +461,8 @@ CNary.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 {
     this.bOneLine = PRS.bMath_OneLine;
 
+    PRS.bInsideOper   = false;
+
     if(this.bOneLine === true)
     {
         CNary.superclass.Recalculate_Range.call(this, PRS, ParaPr, Depth);
@@ -564,6 +566,28 @@ CNary.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 
         this.Bounds.SetWidth(CurLine, PRSC.Range.W - RangeW);
     }
+};
+CNary.prototype.UpdateOperators = function(_CurLine, _CurRange)
+{
+    /*var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);*/
+
+    var result = true;
+
+    if(this.ParaMath.Is_BrkBinBefore() == true)
+    {
+        result = this.Arg.UpdateOperators(_CurLine, _CurRange);
+    }
+    else
+    {
+        result = this.Arg.UpdateOperators(_CurLine, _CurRange);
+
+    }
+
+    return result;
 };
 CNary.prototype.Draw_Elements = function(PDSE)
 {
