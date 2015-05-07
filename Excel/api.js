@@ -54,6 +54,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.documentId = undefined;
 			this.documentUserId = undefined;
 			this.documentUrl = "null";
+			this.documentUrlChanges = null;
 			this.documentTitle = "null";
 			this.documentTitleWithoutExtention = "null";
 			this.documentFormat = "null";
@@ -436,7 +437,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			this.asc_setDocInfo(c_DocInfo);
 
-			if(this.DocInfo){
+			if (this.DocInfo) {
 				this.documentId     		= this.DocInfo["Id"];
 				this.documentUserId			= this.DocInfo["UserId"];
 				this.documentUrl    		= this.DocInfo["Url"];
@@ -1041,10 +1042,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			} else if (!this.documentId || !this.documentUrl) {
 				// Назначим id-сами, если он не пришел (для открытия тестового документа)
 				if (!this.documentId)
-					this.documentId = "9876543210";
+					this.documentId = '9876543210';
 				this._OfflineAppDocumentStartLoad(fCallback);
 			} else {
 				var v = {
+					"c"				: '',
 					"id"            : this.documentId,
 					"userid"		: this.documentUserId,
 					"format"        : this.documentFormat,
@@ -1053,7 +1055,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					"url"           : this.documentUrl,
 					"title"         : this.documentTitle,
 					"embeddedfonts" : this.isUseEmbeddedCutFonts,
-					"viewmode"		: this.asc_getViewerMode()
+					"viewmode"		: this.asc_getViewerMode(),
+					"urlchanges"	: this.documentUrlChanges
 				};
 				if (false && this.documentOpenOptions && this.documentOpenOptions["isEmpty"]) {
 					var sEmptyWorkbook = getEmptyWorkbook();
@@ -1066,7 +1069,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					// Меняем тип состояния (на открытие)
 					this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
 					v["c"] = "open";
-					this._asc_sendCommand (fCallback, v);
+					this._asc_sendCommand(fCallback, v);
 				}
 			}
 		};
@@ -3326,14 +3329,17 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		// Version History
 
-		spreadsheet_api.prototype.asc_showRevision = function () {
+		spreadsheet_api.prototype.asc_showRevision = function (url, urlChanges, currentChangeId) {
 			var bUpdate = true;
 			if (null === this.VersionHistory)
 				this.VersionHistory = new asc.CVersionHistory(url, urlChanges, currentChangeId);
 			else
 				bUpdate = this.VersionHistory.update(url, urlChanges, currentChangeId);
 			if (bUpdate) {
-				// ToDo Add code load file with changes
+				this.documentUrl = url;
+				this.documentUrlChanges = urlChanges;
+				this.isCoAuthoringEnable = false;
+				this.asc_LoadDocument();
 			}
 		};
 

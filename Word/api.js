@@ -8,6 +8,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 var documentId = undefined;
 var documentUserId = undefined;
 var documentUrl = 'null';
+var documentUrlChanges = null;
 var documentTitle = 'null';
 var documentTitleWithoutExtention = 'null';
 var documentFormat = 'null';
@@ -813,11 +814,10 @@ asc_docs_api.prototype.asc_setLocale = function(val)
 };
 asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 {
-
 	this.asc_setDocInfo(c_DocInfo);
     this.WordControl.m_oDrawingDocument.m_bIsOpeningDocument = true;
 
-	if(this.DocInfo){
+	if (this.DocInfo) {
 		documentId = this.DocInfo.get_Id();
 		documentUserId = this.DocInfo.get_UserId();
 		documentUrl = this.DocInfo.get_Url();
@@ -882,20 +882,24 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 
 	if(documentId){
 		var oOpenOptions = this.DocInfo.get_Options();
+		var rData = {
+			"c"				: '',
+			"id"			: documentId,
+			"userid"		: documentUserId,
+			"format"		: documentFormat,
+			"vkey"			: documentVKey,
+			"editorid"		: c_oEditorId.Word,
+			"url"			: documentUrl,
+			"title"			: documentTitle,
+			"embeddedfonts"	: this.isUseEmbeddedCutFonts,
+			"viewmode"		: this.isViewMode,
+			"urlchanges"	: documentUrlChanges
+		};
+
 		if(false && oOpenOptions && oOpenOptions["isEmpty"])
 		{
-			var rData = {
-				"c": "create",
-				"id": documentId,
-				"userid": documentUserId,
-				"format": documentFormat,
-				"vkey": documentVKey,
-				"editorid": c_oEditorId.Word,
-				"url": documentUrl,
-				"title": documentTitle,
-				"embeddedfonts": this.isUseEmbeddedCutFonts,
-				"data": g_sEmpty_bin};
-				
+			rData['c'] = 'create';
+			rData['data'] = g_sEmpty_bin;
 			sendCommand( oThis, function(){}, rData );
 			editor.OpenDocument2(g_sResourceServiceLocalUrl + documentId + "/", g_sEmpty_bin);
 			if(this.InterfaceLocale)
@@ -907,19 +911,8 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 		}
 		else
 		{
+			rData['c'] = 'open';
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-			var rData = {
-				"id": documentId,
-				"userid": documentUserId,
-				"format": documentFormat,
-				"vkey": documentVKey,
-				"editorid": c_oEditorId.Word,
-				"c": "open",
-				"url": documentUrl,
-				"title": documentTitle,
-				"embeddedfonts": this.isUseEmbeddedCutFonts,
-				"viewmode": this.isViewMode};
-				
 			sendCommand( oThis, function(){}, rData );
 		}
 		this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, 0);
@@ -7577,14 +7570,17 @@ asc_docs_api.prototype.asc_continueSaving = function () {
 
 // Version History
 
-asc_docs_api.prototype.asc_showRevision = function () {
+asc_docs_api.prototype.asc_showRevision = function (url, urlChanges, currentChangeId) {
 	var bUpdate = true;
 	if (null === this.VersionHistory)
 		this.VersionHistory = new window["Asc"].CVersionHistory(url, urlChanges, currentChangeId);
 	else
 		bUpdate = this.VersionHistory.update(url, urlChanges, currentChangeId);
 	if (bUpdate) {
-		// ToDo Add code load file with changes
+		documentUrl = url;
+		documentUrlChanges = urlChanges;
+		this.isCoAuthoringEnable = false;
+		this.LoadDocument();
 	}
 };
 asc_docs_api.prototype.asc_undoAllChanges = function ()

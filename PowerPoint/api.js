@@ -7,6 +7,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 var documentId = undefined;
 var documentUserId = undefined;
 var documentUrl = 'null';
+var documentUrlChanges = null;
 var documentTitle = 'null';
 var documentTitleWithoutExtention = 'null';
 var documentFormat = 'null';
@@ -800,7 +801,6 @@ asc_docs_api.prototype.asc_setLocale = function(val)
 };
 asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 {
-
 	this.asc_setDocInfo(c_DocInfo);
 	
     this.WordControl.m_oDrawingDocument.m_bIsOpeningDocument = true;
@@ -853,16 +853,18 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
     {
         this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 		var rData = {
-			"id":documentId,
-			"userid": documentUserId,
-			"format": documentFormat,
-			"vkey": documentVKey,
-			"editorid": c_oEditorId.Presentation,
-			"c":"open",
-			"url": documentUrl,
-			"title": documentTitle,
-			"embeddedfonts": this.isUseEmbeddedCutFonts,
-			"viewmode": this.isViewMode};
+			"id"			: documentId,
+			"userid"		: documentUserId,
+			"format"		: documentFormat,
+			"vkey"			: documentVKey,
+			"editorid"		: c_oEditorId.Presentation,
+			"c"				: "open",
+			"url"			: documentUrl,
+			"title"			: documentTitle,
+			"embeddedfonts"	: this.isUseEmbeddedCutFonts,
+			"viewmode"		: this.isViewMode,
+			"urlchanges"	: documentUrlChanges
+		};
 			
         sendCommand( oThis, function(){}, rData );
 
@@ -5040,7 +5042,10 @@ asc_docs_api.prototype.asc_showRevision = function (url, urlChanges, currentChan
 	else
 		bUpdate = this.VersionHistory.update(url, urlChanges, currentChangeId);
 	if (bUpdate) {
-		// ToDo Add code load file with changes
+		documentUrl = url;
+		documentUrlChanges = urlChanges;
+		this.isCoAuthoringEnable = false;
+		this.LoadDocument();
 	}
 };
 asc_docs_api.prototype.asc_undoAllChanges = function () {
