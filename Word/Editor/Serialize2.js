@@ -7785,6 +7785,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             oParaDrawing.setExtent(oParaDrawing.Extent.W, oParaDrawing.Extent.H);
         if(null != oParaDrawing.wrappingPolygon)
             oParaDrawing.addWrapPolygon(oParaDrawing.wrappingPolygon);
+		if (oDrawing.ParaMath)
+			oParaDrawing.ParaMath = oDrawing.ParaMath;
 
         if(oParaDrawing.GraphicObj)
         {
@@ -7812,7 +7814,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if ( length > 0 )
 			{
 				var oMathPara = new ParaMath();
-				oDrawing.oMathPara = oMathPara;
+				oDrawing.ParaMath = oMathPara;
 				
 				res = this.bcr.Read1(length, function(t, l){
 					return oThis.boMathr.ReadMathArg(t,l,oMathPara.Root);
