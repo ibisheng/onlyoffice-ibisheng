@@ -327,6 +327,7 @@ function CMailMergeSendData (obj){
 		this.message = null;
 		this.recordFrom = null;
 		this.recordTo = null;
+		this.userId = null;
 		this.jsonKey = null;
 	}
 }
@@ -346,6 +347,8 @@ CMailMergeSendData.prototype.get_RecordFrom = function(){return this.recordFrom}
 CMailMergeSendData.prototype.put_RecordFrom = function(v){this.recordFrom = v;};
 CMailMergeSendData.prototype.get_RecordTo = function(){return this.recordTo};
 CMailMergeSendData.prototype.put_RecordTo = function(v){this.recordTo = v;};
+CMailMergeSendData.prototype.get_UserId = function(){return this.userId};
+CMailMergeSendData.prototype.put_UserId = function(v){this.userId = v;};
 CMailMergeSendData.prototype.get_JsonKey = function(){return this.jsonKey};
 CMailMergeSendData.prototype.put_JsonKey = function(v){this.jsonKey = v;};
 
@@ -1508,6 +1511,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
 		var oMailMergeSendData = t.mailMergeSendData;
 		t.mailMergeSendData = null;
 		oMailMergeSendData.put_JsonKey(t.mailMergeFileKey);
+		oMailMergeSendData.put_UserId(documentUserId);
 		if(null != t.mailMergeSendTimeout)
 			clearTimeout(t.mailMergeSendTimeout);
 		if(isSuccess){
