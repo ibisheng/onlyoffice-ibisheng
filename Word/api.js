@@ -421,6 +421,8 @@ function asc_docs_api(name)
     this.isCoMarksDraw = false;
 	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
+	this.VersionHistory = null;				// Объект, который отвечает за точку в списке версий
+
 	// Spell Checking
 	this.SpellCheckApi = (window["AscDesktopEditor"] === undefined) ? new CSpellCheckApi() : new CSpellCheckApi_desktop();
 	this.isSpellCheckEnable = true;
@@ -7571,6 +7573,22 @@ asc_docs_api.prototype.asc_stopSaving = function () {
 };
 asc_docs_api.prototype.asc_continueSaving = function () {
 	this.waitSave = false;
+};
+
+// Version History
+
+asc_docs_api.prototype.asc_showRevision = function () {
+	var bUpdate = true;
+	if (null === this.VersionHistory)
+		this.VersionHistory = new window["Asc"].CVersionHistory(url, urlChanges, currentChangeId);
+	else
+		bUpdate = this.VersionHistory.update(url, urlChanges, currentChangeId);
+	if (bUpdate) {
+		// ToDo Add code load file with changes
+	}
+};
+asc_docs_api.prototype.asc_undoAllChanges = function () {
+	// ToDo Add code here
 };
 
 window["asc_docs_api"] = asc_docs_api;

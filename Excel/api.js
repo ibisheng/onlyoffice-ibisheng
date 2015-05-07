@@ -99,6 +99,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.isCoAuthoringEnable = true;
 			this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
+			this.VersionHistory = null;				// Объект, который отвечает за точку в списке версий
+
 			// AutoSave
 			this.lastSaveTime = null;				// Время последнего сохранения
 			this.autoSaveGapFast = 2000;			// Интервал быстрого автосохранения (когда человек один) - 2 сек.
@@ -3322,6 +3324,23 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.waitSave = false;
 		};
 
+		// Version History
+
+		spreadsheet_api.prototype.asc_showRevision = function () {
+			var bUpdate = true;
+			if (null === this.VersionHistory)
+				this.VersionHistory = new asc.CVersionHistory(url, urlChanges, currentChangeId);
+			else
+				bUpdate = this.VersionHistory.update(url, urlChanges, currentChangeId);
+			if (bUpdate) {
+				// ToDo Add code load file with changes
+			}
+		};
+
+		spreadsheet_api.prototype.asc_undoAllChanges = function () {
+			// ToDo Add code here
+		};
+
 		// Выставление локали
 		spreadsheet_api.prototype.asc_setLocalization = function (oLocalizedData) {
 			cFormulaFunctionLocalized = {};
@@ -3999,6 +4018,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		// other
 		prot["asc_stopSaving"] = prot.asc_stopSaving;
 		prot["asc_continueSaving"] = prot.asc_continueSaving;
+
+		// Version History
+		prot["asc_showRevision"] = prot.asc_showRevision;
+		prot["asc_undoAllChanges"] = prot.asc_undoAllChanges;
 
 		prot["asc_setLocalization"] = prot.asc_setLocalization;
 

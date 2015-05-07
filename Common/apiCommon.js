@@ -2467,9 +2467,6 @@
     prot["get_LockedObjectType"] = CMouseMoveData.prototype.get_LockedObjectType;
     window["CMouseMoveData"] = CMouseMoveData;
 
-
-
-
     function generateColor() {
 		// Генерируем светлые цвета через HSV (h - любой, s = [25..50], v = 100)
 		// Используем 361 и 26, т.к. Math.random возвращает диапазон [0..1)
@@ -2517,6 +2514,22 @@
 
 	window["Asc"].generateColor = generateColor;
 	window["Asc"].hsvToRgb = hsvToRgb;
+
+	function CVersionHistory (url, urlChanges, currentChangeId) {
+		this.url = url;
+		this.urlChanges = urlChanges;
+		this.currentChangeId = currentChangeId;
+	}
+	CVersionHistory.prototype.update = function (url, urlChanges, currentChangeId) {
+		var bUpdate = (this.url !== url || this.urlChanges !== urlChanges || this.currentChangeId === currentChangeId);
+		if (bUpdate) {
+			this.url = url;
+			this.urlChanges = urlChanges;
+			this.currentChangeId = currentChangeId;
+		}
+		return bUpdate;
+	};
+	window["Asc"].CVersionHistory = CVersionHistory;
 }
 )(window);
 
