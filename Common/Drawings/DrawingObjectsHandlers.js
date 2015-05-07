@@ -467,10 +467,12 @@ function handleInlineHitNoText(drawing, drawingObjects, e, x, y, pageIndex)
             drawingObjects.resetSelection();
             drawing.select(drawingObjects, pageIndex);
             drawingObjects.changeCurrentState(new PreMoveInlineObject(drawingObjects, drawing, bIsSelected, true, pageIndex, x, y));
-            if(e.ClickCount > 1 && !e.ShiftKey && !e.CtrlKey && ((drawingObjects.selection.groupSelection && drawingObjects.selection.groupSelection.selectedObjects.length === 1) || drawingObjects.selectedObjects.length === 1)
-                && drawing.getObjectType() === historyitem_type_ChartSpace && drawingObjects.handleChartDoubleClick)
+            if(e.ClickCount > 1 && !e.ShiftKey && !e.CtrlKey && ((drawingObjects.selection.groupSelection && drawingObjects.selection.groupSelection.selectedObjects.length === 1) || drawingObjects.selectedObjects.length === 1))
             {
-                drawingObjects.handleChartDoubleClick(drawing.parent, drawing, e, x, y, pageIndex);
+                if (drawing.getObjectType() === historyitem_type_ChartSpace && drawingObjects.handleChartDoubleClick)
+                    drawingObjects.handleChartDoubleClick(drawing.parent, drawing, e, x, y, pageIndex);
+                else if (2 == e.ClickCount && drawing.parent instanceof ParaDrawing && drawing.parent.Is_MathEquation())
+                    drawingObjects.handleMathDrawingDoubleClick(drawing.parent, e, x, y, pageIndex);
             }
             drawingObjects.updateOverlay();
             return true;

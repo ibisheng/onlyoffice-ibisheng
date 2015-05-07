@@ -6609,6 +6609,63 @@ ParaDrawing.prototype =
     Restart_CheckSpelling : function()
     {
         this.GraphicObj && this.GraphicObj.Restart_CheckSpelling && this.GraphicObj.Restart_CheckSpelling();
+    },
+
+    Is_MathEquation : function()
+    {
+        if (undefined !== this.ParaMath && null !== this.ParaMath)
+            return true;
+
+        return false;
+    },
+
+    Convert_ToMathObject : function()
+    {
+        var Para = this.Get_Paragraph();
+        if (undefined === Para || null === Para || !(Para instanceof Paragraph))
+            return;
+
+        var ParaContentPos = Para.Get_PosByDrawing(this.Get_Id());
+        if (null === ParaContentPos)
+            return;
+
+        var Depth = ParaContentPos.Get_Depth();
+        var TopElementPos = ParaContentPos.Get(0);
+        var BotElementPos = ParaContentPos.Get(Depth);
+
+        var TopElement = Para.Content[TopElementPos];
+
+        // Уменьшаем глубину на 1, чтобы получить позицию родительского класса
+        var RunPos = ParaContentPos.Copy();
+        RunPos.Decrease_Depth(1);
+        var Run = Para.Get_ElementByPos(RunPos);
+
+        if (undefined === TopElement || undefined === TopElement.Content || !(Run instanceof ParaRun))
+            return;
+
+        var LogicDocument = editor.WordControl.m_oLogicDocument;
+        if (false === LogicDocument.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type, Element : Para, CheckType : changestype_Paragraph_Content}))
+        {
+            LogicDocument.Create_NewHistoryPoint(historydescription_Document_ConvertOldEquation);
+
+            // Сначала удаляем Drawing из рана
+            Run.Remove_FromContent(BotElementPos, 1);
+
+            // Теперь разделяем параграф по заданной позиции и добавляем туда новую формулу.
+            var RightElement = TopElement.Split(ParaContentPos, 1);
+            Para.Add_ToContent(TopElementPos + 1, RightElement);
+            Para.Add_ToContent(TopElementPos + 1, this.ParaMath);
+
+            // Устанавливаем курсор в начало правого элемента, полученного после Split
+            LogicDocument.Selection_Remove();
+            RightElement.Cursor_MoveToStartPos();
+            Para.CurPos.ContentPos = TopElementPos + 2;
+            Para.Document_SetThisElementCurrent();
+
+            LogicDocument.Recalculate();
+            LogicDocument.Document_UpdateSelectionState();
+            LogicDocument.Document_UpdateInterfaceState();
+        }
     }
 };
 

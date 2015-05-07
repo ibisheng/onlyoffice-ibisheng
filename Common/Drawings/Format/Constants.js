@@ -1560,6 +1560,7 @@ var historydescription_Presentation_TableMoveFromRulers            = 0x011d;
 var historydescription_Presentation_TableMoveFromRulersInline      = 0x011e;
 var historydescription_Presentation_PasteOnThumbnails              = 0x011f;
 var historydescription_Presentation_PasteOnThumbnailsSafari        = 0x0120;
+var historydescription_Document_ConvertOldEquation                 = 0x0121;
 
 
 
@@ -1863,6 +1864,7 @@ function Get_HistoryPointStringDescription(nDescription)
         case historydescription_Presentation_TableMoveFromRulersInline      : sString = "Presentation_TableMoveFromRulersInline     "; break;
         case historydescription_Presentation_PasteOnThumbnails              : sString = "Presentation_PasteOnThumbnails             "; break;
         case historydescription_Presentation_PasteOnThumbnailsSafari        : sString = "Presentation_PasteOnThumbnailsSafari       "; break;
+        case historydescription_Document_ConvertOldEquation                 : sString = "Document_ConvertOldEquation                "; break;
     }
     return sString;
 }

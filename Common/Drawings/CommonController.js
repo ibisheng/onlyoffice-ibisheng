@@ -481,11 +481,14 @@ DrawingObjectsController.prototype =
                     group.resetInternalSelection();
                     this.changeCurrentState(new PreMoveInGroupState(this, group, x, y, e.ShiftKey, e.CtrlKey, object,  is_selected));
                 }
-                if(e.ClickCount > 1 && !e.ShiftKey && !e.CtrlKey && ((this.selection.groupSelection && this.selection.groupSelection.selectedObjects.length === 1) || this.selectedObjects.length === 1)
-                    && object.getObjectType() === historyitem_type_ChartSpace && this.handleChartDoubleClick)
+                if(e.ClickCount > 1 && !e.ShiftKey && !e.CtrlKey && ((this.selection.groupSelection && this.selection.groupSelection.selectedObjects.length === 1) || this.selectedObjects.length === 1))
                 {
                     var drawing = this.selectedObjects[0].parent;
-                    this.handleChartDoubleClick(drawing, object, e, x, y, pageIndex);
+
+                    if (object.getObjectType() === historyitem_type_ChartSpace && this.handleChartDoubleClick)
+                        this.handleChartDoubleClick(drawing, object, e, x, y, pageIndex);
+                    else if (2 == e.ClickCount && drawing instanceof ParaDrawing && drawing.Is_MathEquation())
+                        this.handleMathDrawingDoubleClick(drawing, e, x, y, pageIndex);
                 }
             }
             return true;

@@ -12402,6 +12402,36 @@ Paragraph.prototype.Start_SelectionFromCurPos = function()
     this.Set_SelectionContentPos(ContentPos, ContentPos);
 };
 
+/*
+    Возвращается объект CParagraphContentPos по заданому Id ParaDrawing, если объект
+    не найдет, вернется null.
+ */
+Paragraph.prototype.Get_PosByDrawing = function(Id)
+{
+    var ContentPos = new CParagraphContentPos();
+
+    var ContentLen = this.Content.length;
+
+    var bFind = false;
+    for (var CurPos = 0; CurPos < ContentLen; CurPos++)
+    {
+        var Element = this.Content[CurPos];
+        ContentPos.Update(CurPos, 0);
+
+        if (true === Element.Get_PosByDrawing(Id, ContentPos, 1))
+        {
+            bFind = true;
+            break;
+        }
+    }
+
+    if (false === bFind || ContentPos.Depth <= 0)
+        return null;
+
+    return ContentPos;
+};
+
+
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;
 

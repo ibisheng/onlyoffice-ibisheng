@@ -1043,6 +1043,13 @@ CGraphicObjects.prototype =
         this.document.OnMouseUp(e, x, y, pageIndex);
     },
 
+    handleMathDrawingDoubleClick : function(drawing, e, x, y, pageIndex)
+    {
+        drawing.Convert_ToMathObject();
+        this.changeCurrentState(new NullState(this));
+        this.document.OnMouseUp(e, x, y, pageIndex);
+    },
+
     addInlineImage: function( W, H, Img, Chart, bFlow )
     {
         var content = this.getTargetDocContent();
