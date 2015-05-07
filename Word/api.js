@@ -7587,8 +7587,9 @@ asc_docs_api.prototype.asc_showRevision = function () {
 		// ToDo Add code load file with changes
 	}
 };
-asc_docs_api.prototype.asc_undoAllChanges = function () {
-	// ToDo Add code here
+asc_docs_api.prototype.asc_undoAllChanges = function ()
+{
+    this.WordControl.m_oLogicDocument.Document_Undo({All : true});
 };
 
 window["asc_docs_api"] = asc_docs_api;

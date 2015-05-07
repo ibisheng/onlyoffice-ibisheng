@@ -137,7 +137,7 @@ CHistory.prototype =
         return false;
     },
 
-    Undo : function()
+    Undo : function(Options)
     {
         this.Check_UninonLastPoints();
 
@@ -154,19 +154,39 @@ CHistory.prototype =
         
         this.Document.Selection_Remove();
 
-        var Point = this.Points[this.Index--];
-
         this.Internal_RecalcData_Clear();
 
-        // Откатываем все действия в обратном порядке (относительно их выполенения)
-        for ( var Index = Point.Items.length - 1; Index >= 0; Index-- )
+        var Point = null;
+        if (undefined !== Options && null !== Options && true === Options.All)
         {
-            var Item = Point.Items[Index];
-            Item.Class.Undo( Item.Data );
-            Item.Class.Refresh_RecalcData( Item.Data );
+            while (this.Index >= 0)
+            {
+                Point = this.Points[this.Index--];
+
+                // Откатываем все действия в обратном порядке (относительно их выполенения)
+                for (var Index = Point.Items.length - 1; Index >= 0; Index--)
+                {
+                    var Item = Point.Items[Index];
+                    Item.Class.Undo(Item.Data);
+                    Item.Class.Refresh_RecalcData(Item.Data);
+                }
+            }
+        }
+        else
+        {
+            Point = this.Points[this.Index--];
+
+            // Откатываем все действия в обратном порядке (относительно их выполенения)
+            for (var Index = Point.Items.length - 1; Index >= 0; Index--)
+            {
+                var Item = Point.Items[Index];
+                Item.Class.Undo(Item.Data);
+                Item.Class.Refresh_RecalcData(Item.Data);
+            }
         }
 
-        this.Document.Set_SelectionState( Point.State );
+        if (null != Point)
+            this.Document.Set_SelectionState( Point.State );
 
         return this.RecalculateData;
     },

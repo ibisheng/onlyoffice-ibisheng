@@ -12248,7 +12248,7 @@ CDocument.prototype =
         this.History.Create_NewPoint(Description);
     },
 
-    Document_Undo : function()
+    Document_Undo : function(Options)
     {
         if ( true === CollaborativeEditing.Get_GlobalLock() )
             return;
@@ -12256,7 +12256,7 @@ CDocument.prototype =
         this.DrawingDocument.EndTrackTable( null, true );
         this.DrawingObjects.TurnOffCheckChartSelection();
 
-        this.History.Undo();
+        this.History.Undo(Options);
         this.DrawingObjects.TurnOnCheckChartSelection();
         this.Recalculate( false, false, this.History.RecalculateData );
 
