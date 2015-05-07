@@ -5586,7 +5586,7 @@ window["asc_docs_api"].prototype["asc_nativePrint"] = function(_printer, _page)
             var _drawing_document = this.WordControl.m_oDrawingDocument;
             var pagescount = _drawing_document.SlidesCount;
 
-            window["AscDesktopEditor"]["Print_Start"](this.DocumentUrl, pagescount, this.ThemeLoader.ThemesUrl);
+            window["AscDesktopEditor"]["Print_Start"](this.DocumentUrl, pagescount, this.ThemeLoader.ThemesUrl, this.getCurrentPage());
 
             var oDocRenderer = new CDocumentRenderer();
             oDocRenderer.VectorMemoryForPrint = new CMemory();

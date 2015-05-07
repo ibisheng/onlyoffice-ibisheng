@@ -3660,25 +3660,26 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			var _printPagesData = this.wb.calcPagesPrint(_adjustPrint);
 
-			var isEndPrint = _api.wb.printSheet(_printer, _printPagesData);
-
 			if (undefined === _printer && _page === undefined)
             {
+                var pdf_writer = new CPdfPrinter(this.wbModel.sUrlPath);
+                var isEndPrint = this.wb.printSheet(pdf_writer, _printPagesData);
+
                 if (undefined !== window["AscDesktopEditor"])
                 {
-                    var pagescount = _printer.DocumentRenderer.m_lPagesCount;
+                    var pagescount = pdf_writer.DocumentRenderer.m_lPagesCount;
 
-                    window["AscDesktopEditor"]["Print_Start"](this.documentUrl, pagescount, "");
+                    window["AscDesktopEditor"]["Print_Start"](g_sResourceServiceLocalUrl + this.documentId + "/", pagescount, "", -1);
 
                     for (var i = 0; i < pagescount; i++)
                     {
-                        var _start = _printer.DocumentRenderer.m_arrayPages[i].StartOffset;
-                        var _end = _printer.DocumentRenderer.Memory.pos;
+                        var _start = pdf_writer.DocumentRenderer.m_arrayPages[i].StartOffset;
+                        var _end = pdf_writer.DocumentRenderer.Memory.pos;
                         if (i != (pagescount - 1))
-                            _end = _printer.DocumentRenderer.m_arrayPages[i + 1].StartOffset;
+                            _end = pdf_writer.DocumentRenderer.m_arrayPages[i + 1].StartOffset;
 
-                        window["AscDesktopEditor"]["Print_Page"](oDocRenderer.Memory.GetBase64Memory2(_start, _end - _start),
-                            _printer.DocumentRenderer.m_arrayPages[i].Width, _printer.DocumentRenderer.m_arrayPages[i].Height);
+                        window["AscDesktopEditor"]["Print_Page"](pdf_writer.DocumentRenderer.Memory.GetBase64Memory2(_start, _end - _start),
+                            pdf_writer.DocumentRenderer.m_arrayPages[i].Width, pdf_writer.DocumentRenderer.m_arrayPages[i].Height);
                     }
 
                     window["AscDesktopEditor"]["Print_End"]();
@@ -3686,6 +3687,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                 return;
             }
 
+            var isEndPrint = this.wb.printSheet(_printer, _printPagesData);
 			return _printer.DocumentRenderer.Memory;
 		};
 
