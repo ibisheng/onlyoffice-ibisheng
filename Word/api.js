@@ -7561,7 +7561,7 @@ asc_docs_api.prototype.asc_sendMailMergeData = function(oData)
 			if(null != oThis.mailMergeSendData){
 				oThis.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 				oThis.mailMergeSendData = null;
-				this.mailMergeSendTimeout = null;
+				oThis.mailMergeSendTimeout = null;
 			}
 		}, 10000);
 };
