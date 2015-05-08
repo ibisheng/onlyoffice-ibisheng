@@ -40,7 +40,7 @@ function g_fSaveWithParts(fSendCommand, fCallback, oAdditionalData, aParts) {
 		else
 			fCallback(incomeObject);
 	}, oAdditionalData);
-};
+}
 
 function fSortAscending( a, b ) {
     return a - b;
@@ -800,3 +800,96 @@ else
 		asc.extendClass = extendClass;
 	}
 )(window);
+
+function asc_ajax (obj) {
+	var url = "", type = "GET",
+		async = true, data = null, dataType = "text/xml",
+		error = null, success = null, httpRequest = null,
+		contentType = "application/x-www-form-urlencoded",
+
+		init = function (obj){
+			if ( typeof obj.url !== 'undefined' ){
+				url = obj.url;
+			}
+			if ( typeof obj.type !== 'undefined' ){
+				type = obj.type;
+			}
+			if ( typeof obj.async !== 'undefined' ){
+				async = obj.async;
+			}
+			if ( typeof obj.data !== 'undefined' ){
+				data = obj.data;
+			}
+			if ( typeof obj.dataType !== 'undefined' ){
+				dataType = obj.dataType;
+			}
+			if ( typeof obj.error !== 'undefined' ){
+				error = obj.error;
+			}
+			if ( typeof obj.success !== 'undefined' ){
+				success = obj.success;
+			}
+			if ( typeof (obj.contentType) !== 'undefined' ){
+				contentType = obj.contentType;
+			}
+
+			if (window.XMLHttpRequest) { // Mozilla, Safari, ...
+				httpRequest = new XMLHttpRequest();
+				if (httpRequest.overrideMimeType) {
+					httpRequest.overrideMimeType(dataType);
+				}
+			}
+			else if (window.ActiveXObject) { // IE
+				try {
+					httpRequest = new ActiveXObject("Msxml2.XMLHTTP");
+				}
+				catch (e) {
+					try {
+						httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+					}
+					catch (e) {}
+				}
+			}
+
+			httpRequest.onreadystatechange = function(){
+				respons(this);
+			};
+			send();
+		},
+
+		send = function(){
+			httpRequest.open(type, url, async);
+			if (type === "POST")
+				httpRequest.setRequestHeader("Content-Type", contentType);
+			httpRequest.send(data);
+		},
+
+		respons = function(httpRequest){
+			switch (httpRequest.readyState)
+			{
+				case 0:
+					// The object has been created, but not initialized (the open method has not been called).
+					break;
+				case 1:
+					// A request has been opened, but the send method has not been called.
+					break;
+				case 2:
+					// The send method has been called. No data is available yet.
+					break;
+				case 3:
+					// Some data has been received; however, neither responseText nor responseBody is available.
+					break;
+				case 4:
+					if (httpRequest.status === 200 || httpRequest.status === 1223) {
+						if (typeof success === "function")
+							success(httpRequest.responseText);
+					} else {
+						if (typeof error === "function")
+							error(httpRequest,httpRequest.statusText,httpRequest.status);
+					}
+					break;
+			}
+		};
+
+	init(obj);
+}
