@@ -258,7 +258,7 @@
 					this.element = undefined;
 				}
 			},
-			
+
 			copyDesktopEditorButton: function(ElemToSelect, isCut)
 			{
 				if (isCut)
@@ -273,11 +273,17 @@
 						var api = window["Asc"]["editor"];
 						if(api.controller.isCellEditMode)
 							return;
-						
-						Editor_Copy_Event_Excel(e, ElemToSelect, true, true);
-						e.preventDefault();
-					}
 
+						Editor_Copy_Event_Excel(e, ElemToSelect, true, true);
+
+                        var selection = window.getSelection();
+                        var rangeToSelect = window.document.createRange();
+                        rangeToSelect.selectNodeContents(ElemToSelect);
+                        selection.removeAllRanges();
+                        selection.addRange(rangeToSelect);
+					};
+
+                    ElemToSelect.focus();
 					window["AscDesktopEditor"]["Cut"]();
 				}
 				else
@@ -292,11 +298,17 @@
 						var api = window["Asc"]["editor"];
 						if(api.controller.isCellEditMode)
 							return;
-						
-						Editor_Copy_Event_Excel(e, ElemToSelect, null, true);
-						e.preventDefault();
-					}
 
+						Editor_Copy_Event_Excel(e, ElemToSelect, null, true);
+
+                        var selection = window.getSelection();
+                        var rangeToSelect = window.document.createRange();
+                        rangeToSelect.selectNodeContents(ElemToSelect);
+                        selection.removeAllRanges();
+                        selection.addRange(rangeToSelect);
+					};
+
+                    ElemToSelect.focus();
 					window["AscDesktopEditor"]["Copy"]();
 				}
 
@@ -412,6 +424,59 @@
 					
 					this._endCopyOrPaste();
 				}
+			},
+			
+			_getHtmlBase64: function(range, worksheet, isCut)
+			{
+				var t = this;
+				t._cleanElement();
+				
+				var objectRender = worksheet.objectRender;
+				var isIntoShape = objectRender.controller.getTargetDocContent();
+				
+				var text = t._makeTableNode(range, worksheet, isCut, isIntoShape);
+				
+				if(text == false)
+					return;
+			
+				this._startCopyOrPaste();
+
+				
+				t.element.appendChild(text);
+				
+				History.TurnOff();
+				//use binary strings
+				if(copyPasteUseBinary)
+				{	
+					if(isIntoShape)
+					{
+						this.lStorage = {};
+						this.lStorage.htmlInShape = text;
+					}	
+					else
+					{
+						var sBase64 = this._getBinaryForCopy(worksheet);
+						if(this.element.children && this.element.children.length == 1 && (window.USER_AGENT_WEBKIT || window.USER_AGENT_SAFARI_MACOS))
+						{
+							$(this.element.children[0]).css("font-weight", "normal");
+							$(this.element.children[0]).wrap(document.createElement("b"));
+						}
+						if(this.element.children[0])
+							$(this.element.children[0]).addClass("xslData;" + sBase64);
+						
+						//for buttons copy/paste
+						this.lStorage = sBase64;
+					}
+				}
+							
+				History.TurnOn();
+				
+				/*if(AscBrowser.isMozilla)
+					t._selectElement(t._getStylesSelect);
+				else
+					t._selectElement();*/
+				
+				this._endCopyOrPaste();
 			},
 			
 			_getBinaryForCopy: function(worksheet)
@@ -5621,14 +5686,22 @@ function SafariIntervalFocus2()
     }
 }
 
-function Editor_Copy_Event_Excel(e, ElemToSelect, isCut)
+function Editor_Copy_Event_Excel(e, ElemToSelect, isCut, isAlreadyReadyHtml)
 {	
 	var api = window["Asc"]["editor"];
 	var wb = api.wb;
 	var ws = wb.getWorksheet();
 	
-	var sBase64 = wb.clipboard.copyRange(ws.getSelectedRange(), ws, isCut, true);
-	
+	var sBase64;
+	if(!isAlreadyReadyHtml)
+	{
+		if (window["AscDesktopEditorButtonMode"] === true && window["AscDesktopEditor"])
+			sBase64 = wb.clipboard._getHtmlBase64(ws.getSelectedRange(), ws, isCut, true);
+		else
+			sBase64 = wb.clipboard.copyRange(ws.getSelectedRange(), ws, isCut, true);
+	}
+		
+
 	if(isCut)
 		ws.emptySelection(c_oAscCleanOptions.All);
 	

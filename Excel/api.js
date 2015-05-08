@@ -627,7 +627,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				var _e = {};
 				_e.ctrlKey = true;
 				_e.shiftKey = false;
-				_e.which = 86;
+				_e.which = 67;
 
 				this.controller._onWindowKeyDown(_e);
 
@@ -642,12 +642,46 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 
 		spreadsheet_api.prototype.asc_Paste = function(){
+			
+			if (window["AscDesktopEditor"])
+			{
+				window["AscDesktopEditorButtonMode"] = true;
+				
+				var _e = {};
+				_e.ctrlKey = true;
+				_e.shiftKey = false;
+				_e.which = 86;
+
+				this.controller._onWindowKeyDown(_e);
+
+				window["AscDesktopEditorButtonMode"] = false;
+
+				return;
+			}
+			
 			var result = this.wb.pasteFromClipboardButton();
 			this.wb.restoreFocus();
 			return result;
 		};
 
 		spreadsheet_api.prototype.asc_Cut = function(){
+
+		    if (window["AscDesktopEditor"])
+			{
+				window["AscDesktopEditorButtonMode"] = true;
+
+				var _e = {};
+				_e.ctrlKey = true;
+				_e.shiftKey = false;
+				_e.which = 88;
+
+				this.controller._onWindowKeyDown(_e);
+
+				window["AscDesktopEditorButtonMode"] = false;
+
+				return;
+			}
+
 			var result = this.wb.cutToClipboardButton();
 			this.wb.restoreFocus();
 			return result;
