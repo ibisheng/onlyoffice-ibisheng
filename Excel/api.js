@@ -1013,40 +1013,18 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				dataType: "text"});
 		};
 
-		spreadsheet_api.prototype._onOpenCommand = function (callback, url) {
+		spreadsheet_api.prototype._onOpenCommand = function (callback, data) {
 			var t = this;
-			var sJsonUrl = g_sResourceServiceLocalUrl + url;
-			asc_ajax({
-				url: sJsonUrl,
-				dataType: "text",
-				success: function(result) {
-					//получаем url к папке с файлом
-					var url;
-					var nIndex = sJsonUrl.lastIndexOf("/");
-					if(-1 !== nIndex)
-						url = sJsonUrl.substring(0, nIndex + 1);
-					else
-						url = sJsonUrl;
-					if (Asc.c_oSerFormat.Signature === result.substring(0, Asc.c_oSerFormat.Signature.length))
-					{
-						var wb = t.asc_OpenDocument(url, result);
-						if (callback)
-							callback({returnCode: 0, val:wb});
-					}
-					else
-					{
-						result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
-						t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
-						if(callback)
-							callback(result);
-					}
-				},
-				error:function(){
-					var result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
-					t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
-					if(callback)
-						callback(result);
+			g_fOpenFileCommand(data, Asc.c_oSerFormat.Signature, function (error, result) {
+				if (error || !result.bSerFormat) {
+					var oError = {returnCode: c_oAscError.Level.Critical, val: c_oAscError.ID.Unknown};
+					t.handlers.trigger("asc_onError", oError.val, oError.returnCode);
+					if (callback) callback(oError);
+					return;
 				}
+
+				var wb = t.asc_OpenDocument(result.url, result.data);
+				if (callback) callback({returnCode: 0, val: wb});
 			});
 		};
 

@@ -7155,36 +7155,18 @@ function sendTrack(fCallback, url, rdata){
 	})
 }
 function _onOpenCommand(fCallback, incomeObject) {
-	var sJsonUrl = g_sResourceServiceLocalUrl + incomeObject["data"];
-	asc_ajax({
-		url: sJsonUrl,
-		dataType: "text",
-		success: function(result) {
-			//получаем url к папке с файлом
-			var url;
-			var nIndex = sJsonUrl.lastIndexOf("/");
-			if(-1 != nIndex)
-				url = sJsonUrl.substring(0, nIndex + 1);
-			else
-				url = sJsonUrl;
-			var bIsViewer = false;
-			if(result.length > 0)
-			{
-				if(c_oSerFormat.Signature != result.substring(0, c_oSerFormat.Signature.length))
-					bIsViewer = true;
-			}
-			if(true == bIsViewer)
-				editor.OpenDocument(url, result);
-			else
-				editor.OpenDocument2(url, result);
-			if(fCallback)
-				fCallback(incomeObject);
-		},
-		error:function(){
+	g_fOpenFileCommand(incomeObject["data"], c_oSerFormat.Signature, function (error, result) {
+		if (error) {
 			editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
-			if(fCallback)
-				fCallback();
+			if(fCallback) fCallback();
+			return;
 		}
+
+		if (result.bSerFormat)
+			editor.OpenDocument2(result.url, result.data);
+		else
+			editor.OpenDocument(result.url, result.data);
+		if(fCallback) fCallback();
 	});
 }
 function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, filetype, fCallback) {

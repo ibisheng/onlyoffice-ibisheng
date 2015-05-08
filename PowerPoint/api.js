@@ -16,10 +16,9 @@ var documentOrigin = "";
 var documentFormatSave = c_oAscFileType.PPTX;//пока не во что другое сохранять не можем.
 var documentCallbackUrl = undefined;		// Ссылка для отправления информации о документе
 
-var c_oSerFormat =
-{
-    Version:1,
-    Signature: "PPTY"
+var c_oSerFormat = {
+    Version		: 1,
+    Signature	: "PPTY"
 };
 
 
@@ -5197,40 +5196,18 @@ function sendTrack(fCallback, url, rdata){
 	})
 }
 function _onOpenCommand(fCallback, incomeObject) {
-	var sJsonUrl = g_sResourceServiceLocalUrl + incomeObject["data"];
-	asc_ajax({
-		url: sJsonUrl,
-		dataType: "text",
-		success: function(result) {
-			//получаем url к папке с файлом
-			var url;
-			var nIndex = sJsonUrl.lastIndexOf("/");
-			if(-1 != nIndex)
-				url = sJsonUrl.substring(0, nIndex + 1);
-			else
-				url = sJsonUrl;
-			var bIsViewer = false;
-			if(result.length > 0)
-			{
-				if(c_oSerFormat.Signature != result.substring(0, c_oSerFormat.Signature.length))
-					bIsViewer = true;
-			}
-			if(true == bIsViewer)
-				editor.OpenDocument(url, result);
-			else
-				editor.OpenDocument2(url, result);
-			//callback
-			editor.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
-			editor.sync_DocSizeCallback(Page_Width, Page_Height);
-			editor.sync_PageOrientCallback(editor.get_DocumentOrientation());
-			if(fCallback)
-				fCallback(incomeObject);
-		},
-		error:function(){
+	g_fOpenFileCommand(incomeObject["data"], c_oSerFormat.Signature, function (error, result) {
+		if (error || !result.bSerFormat) {
 			editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
-			if(fCallback)
-				fCallback();
+			if(fCallback) fCallback();
+			return;
 		}
+
+		editor.OpenDocument2(result.url, result.data);
+		editor.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
+		editor.sync_DocSizeCallback(Page_Width, Page_Height);
+		editor.sync_PageOrientCallback(editor.get_DocumentOrientation());
+		if(fCallback) fCallback();
 	});
 }
 function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)

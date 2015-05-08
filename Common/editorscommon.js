@@ -42,6 +42,29 @@ function g_fSaveWithParts(fSendCommand, fCallback, oAdditionalData, aParts) {
 	}, oAdditionalData);
 }
 
+function g_fOpenFileCommand (data, Signature, callback) {
+	var openData = JSON.parse(data);
+	var sFileUrl = g_sResourceServiceLocalUrl + openData['urlfile'];
+	asc_ajax({
+		url: sFileUrl,
+		dataType: "text",
+		success: function(result) {
+			//получаем url к папке с файлом
+			var url;
+			var nIndex = sFileUrl.lastIndexOf("/");
+			url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
+			if (0 < result.length) {
+				if (callback) callback(false, {bSerFormat: Signature === result.substring(0, Signature.length), data: result, url: url});
+			} else {
+				if (callback) callback(true);
+			}
+		},
+		error: function () {
+			if (callback) callback(true);
+		}
+	});
+}
+
 function fSortAscending( a, b ) {
     return a - b;
 }

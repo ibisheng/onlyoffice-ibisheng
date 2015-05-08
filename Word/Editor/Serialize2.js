@@ -1,8 +1,8 @@
 "use strict";
 
 var c_oSerFormat = {
-    Version:5, //1.0.0.5
-    Signature: "DOCY"
+    Version		: 5, //1.0.0.5
+    Signature	: "DOCY"
 };
 var g_nCurFileVersion = c_oSerFormat.Version;
 //dif:

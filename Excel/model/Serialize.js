@@ -3,8 +3,8 @@
 
     /** @enum */
     var c_oSerFormat = {
-        Version:2, //1.0.0.2
-        Signature: "XLSY"
+        Version		: 2, //1.0.0.2
+        Signature	: "XLSY"
     };
     var g_nCurFileVersion = c_oSerFormat.Version;
 //dif:
