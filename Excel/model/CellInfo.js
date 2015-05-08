@@ -162,6 +162,7 @@
 			this.comments = [];
 			this.isLocked = false;
 			this.isFormatTable = false;	// Нужен для disable возможности делать merge
+			this.tableStyleName = false;
 			this.styleName = null;
 			this.numFormatType = null;
 			this.angle = null;
@@ -187,6 +188,7 @@
 			asc_getComments: function(){ return this.comments; },
 			asc_getLocked: function(){ return this.isLocked; },
 			asc_getIsFormatTable: function () { return this.isFormatTable; },
+			asc_getTableStyleName: function () { return this.tableStyleName; },
 			asc_getStyleName: function () { return this.styleName; },
 			asc_getNumFormatType: function(){ return this.numFormatType; },
 			asc_getAngle: function () { return this.angle; },
@@ -212,6 +214,7 @@
 		prot["asc_getComments"]			= prot.asc_getComments;
 		prot["asc_getLocked"]			= prot.asc_getLocked;
 		prot["asc_getIsFormatTable"]	= prot.asc_getIsFormatTable;
+		prot["asc_tableStyleName"]	    = prot.asc_tableStyleName;
 		prot["asc_getStyleName"]		= prot.asc_getStyleName;
 		prot["asc_getNumFormatType"]	= prot.asc_getNumFormatType;
 		prot["asc_getAngle"]			= prot.asc_getAngle;

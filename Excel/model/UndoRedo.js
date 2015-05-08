@@ -3121,7 +3121,8 @@ UndoRedoWoorksheet.prototype = {
 				row.setHeightProp(Data.oOldVal);
 			else
 				row.setHeightProp(Data.oNewVal);
-				
+			
+			//TODO проверить без этой перерисовки и убрать!!!
 			var workSheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);	
 			workSheetView.autoFilters.reDrawFilter(null, index);
 		}
@@ -3343,7 +3344,7 @@ UndoRedoWoorksheet.prototype = {
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
 			if(bUndo)//если на Undo перемещается диапазон из форматированной таблицы - стиль форматированной таблицы не должен цепляться
 			{
-				worksheetView.autoFilters._clearFormatTableStyle(to);
+				worksheetView.autoFilters._cleanStyleTable(to);
 			}
 			if(g_oUndoRedoAutoFiltersMoveData)
 			{

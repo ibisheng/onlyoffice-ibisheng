@@ -1119,8 +1119,8 @@
             var oThis = this;
             if(null != filters.Values)
             {
-                for(var i = 0, length = filters.Values.length; i < length; ++i)
-                    this.bs.WriteItem(c_oSer_FilterColumn.Filter, function(){oThis.WriteFilter(filters.Values[i]);});
+				for(var i in filters.Values)
+					this.bs.WriteItem(c_oSer_FilterColumn.Filter, function(){oThis.WriteFilter(i);});
             }
             if(null != filters.Dates)
             {
@@ -1301,7 +1301,7 @@
             {
                 this.memory.WriteByte(c_oSer_SortState.ConditionRef);
                 this.memory.WriteByte(c_oSerPropLenType.Variable);
-                this.memory.WriteString2(sortCondition.Ref);
+                this.memory.WriteString2(sortCondition.Ref.getName());
             }
             if(null != sortCondition.ConditionSortBy)
             {
@@ -3772,6 +3772,15 @@
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadFilters(t,l, oFilterColumn.Filters);
                 });
+				
+				//sort dates
+				if(oFilterColumn.Filters && oFilterColumn.Filters.Dates && oFilterColumn.Filters.Dates.length)
+				{
+					oFilterColumn.Filters.Dates.sort (function sortArr(a, b)
+					{
+						return a.start - b.start;
+					})
+				}
             }
             else if ( c_oSer_FilterColumn.CustomFilters == type )
             {
@@ -3819,7 +3828,7 @@
                     return oThis.ReadFilter(t,l, oFilterVal);
                 });
                 if(null != oFilterVal.Val)
-                    oFilters.Values.push(oFilterVal.Val);
+					oFilters.Values[oFilterVal.Val] = 1;
             }
             else if ( c_oSer_FilterColumn.DateGroupItem == type )
             {
@@ -3827,7 +3836,55 @@
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadDateGroupItem(t,l, oDateGroupItem);
                 });
-                oFilters.Dates.push(oDateGroupItem);
+				
+				var startDate, endDate, date;
+				switch(oDateGroupItem.DateTimeGrouping)
+				{
+					case 1://day
+					{
+						date = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day));
+						startDate = date.getExcelDateWithTime();
+						date.addDays(1)
+						endDate = date.getExcelDateWithTime();
+						break;
+					}
+					case 2://hour
+					{
+						startDate = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, 1)).getExcelDateWithTime();
+						endDate = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, 59)).getExcelDateWithTime();
+						break;
+					}
+					case 3://minute
+					{
+						startDate = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, oDateGroupItem.Minute, 1)).getExcelDateWithTime();
+						endDate = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, oDateGroupItem.Minute, 59)).getExcelDateWithTime();
+						break;
+					}
+					case 4://month
+					{
+						date = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, 1));
+						startDate = date.getExcelDateWithTime();
+						date.addMonths(1)
+						endDate = date.getExcelDateWithTime();
+						break;
+					}
+					case 5://second
+					{
+						startDate = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, oDateGroupItem.Second)).getExcelDateWithTime();
+						endDate = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, oDateGroupItem.Second )).getExcelDateWithTime();
+						break;
+					}
+					case 6://year
+					{
+						date = new Date(Date.UTC( oDateGroupItem.Year, 0));
+						startDate = date.getExcelDateWithTime();
+						date.addYears(1)
+						endDate = date.getExcelDateWithTime();
+						break;
+					}
+				}
+				
+				oFilters.Dates.push(new dateElem(startDate, endDate, oDateGroupItem.DateTimeGrouping));
             }
             else if ( c_oSer_FilterColumn.FiltersBlank == type )
                 oFilters.Blank = this.stream.GetBool();
@@ -3955,7 +4012,7 @@
         {
             var res = c_oSerConstants.ReadOk;
             if ( c_oSer_SortState.ConditionRef == type )
-                oSortCondition.Ref = this.stream.GetString2LE(length);
+                oSortCondition.Ref = Asc.g_oRangeCache.getAscRange(this.stream.GetString2LE(length));
             else if ( c_oSer_SortState.ConditionSortBy == type )
                 oSortCondition.ConditionSortBy = this.stream.GetUChar();
             else if ( c_oSer_SortState.ConditionDescending == type )

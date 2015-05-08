@@ -4375,6 +4375,16 @@ AutoFilter.prototype.clone = function() {
 	return res;
 };
 
+AutoFilter.prototype.addFilterColumn = function() {
+	if(this.FilterColumns === null)
+		this.FilterColumns = [];
+	
+	var oNewElem = new FilterColumn();
+	this.FilterColumns.push(oNewElem);
+	
+	return oNewElem;
+}
+
 function FilterColumns() {
 	this.ColId = null;
 	this.CustomFiltersObj = null;
@@ -4473,15 +4483,49 @@ FilterColumn.prototype.clone = function() {
 	res.ShowButton = this.ShowButton;
 	return res;
 };
+FilterColumn.prototype.isHideValue = function(val, isDateTimeFormat) {
+	var res = false;
+	if(this.Filters)
+		res = this.Filters.isHideValue(val, isDateTimeFormat);
+	else if(this.CustomFiltersObj)
+		res = this.CustomFiltersObj.isHideValue(val);
+	return res;
+};
+FilterColumn.prototype.clean = function(val) {
+	this.Filters = null;
+	this.CustomFiltersObj = null;
+	this.DynamicFilter = null;
+	this.ColorFilter = null;
+	this.Top10 = null;
+};
+FilterColumn.prototype.createFilter = function(obj) {
+	
+	var allFilterOpenElements = false;
+	var newFilter;
+	if(obj.result && obj.result.length)
+	{
+		newFilter = new Filters();
+		this.Filters = newFilter;
+	}
+	else
+	{
+		newFilter = new CustomFilters();
+		this.CustomFiltersObj = newFilter
+	}
+	allFilterOpenElements = newFilter.create(obj);
+		
+	return allFilterOpenElements;
+};
 /** @constructor */
 function Filters() {
-	this.Values = [];
+	this.Values = {};
 	this.Dates = [];
 	this.Blank = null;
 }
 Filters.prototype.clone = function() {
 	var i, res = new Filters();
-	res.Values = this.Values.slice();
+	for(var i in this.Values)
+		res.Values[i] = this.Values[i];
 	if (this.Dates) {
 		for (i = 0; i < this.Dates.length; ++i)
 			res.Dates.push(this.Dates[i].clone());
@@ -4489,6 +4533,60 @@ Filters.prototype.clone = function() {
 	res.Blank = this.Blank;
 	return res;
 };
+Filters.prototype.create = function(obj) {
+	var allFilterOpenElements = true;
+	for(var i = 0; i < obj.result.length; i++)
+	{
+		if(obj.result[i].visible)
+			this.Values[obj.result[i].val] = true;
+		else
+			allFilterOpenElements = false;
+	}
+	return allFilterOpenElements;
+};
+Filters.prototype.isHideValue = function(val, isDateTimeFormat) {
+	var res = false;
+	
+	if(isDateTimeFormat && this.Dates)
+		res = this.binarySearch(val, this.Dates) !== -1 ? false : true;
+	else if(this.Values)
+		res = !this.Values[val] ? true : false;
+	
+	return res;
+};
+
+Filters.prototype.binarySearch = function(val, array) {
+	var i = 0, j = array.length - 1, k;
+	val = parseFloat(val);
+
+	while (i <= j)
+	{
+		k = Math.floor((i + j) / 2);
+		
+		if (val >= array[k].start && val < array[k].end) 
+			return k;
+		else if (val < array[k].start)
+			j = k - 1;
+		else
+			i = k + 1;
+	}
+
+	return -1; 
+};
+
+Filters.prototype.linearSearch = function(val, array) {
+	var n = array.length, i = 0;
+	val = parseFloat(val);
+
+	while (i <= n && !(array[i] && val >= array[i].start && val < array[i].end))
+		i++;
+ 
+	if (i < n)
+		return i;
+	else
+		return -1;
+};
+
 /** @constructor */
 function Filter() {
 	this.Val = null;
@@ -4529,16 +4627,150 @@ CustomFilters.prototype.clone = function() {
 	}
 	return res;
 };
+CustomFilters.prototype.create = function(obj) {
+	this.And = !obj.isChecked;
+	this.CustomFilters = [];
+	
+	if(obj.filter1 != undefined)
+		this.CustomFilters[0] = new CustomFilter(obj.filter1, obj.valFilter1);
+	if(obj.filter2 != undefined)
+		this.CustomFilters[1] = new CustomFilter(obj.filter2, obj.valFilter2);
+};
+CustomFilters.prototype.isHideValue = function(val){
+	
+	var res = false;
+	var filterRes1 = this.CustomFilters[0] ? this.CustomFilters[0].isHideValue(val) : true;
+	var filterRes2 = this.CustomFilters[1] ? this.CustomFilters[1].isHideValue(val) : true;
+	
+	return this.And ? (filterRes1 && filterRes2) : (filterRes1 || filterRes2);
+};
 /** @constructor */
-function CustomFilter() {
-	this.Operator = null;
-	this.Val = null;
+function CustomFilter(operator, val) {
+	this.Operator = operator != undefined ? operator : null;
+	this.Val = val != undefined ? val : null;
 }
 CustomFilter.prototype.clone = function() {
 	var res = new CustomFilter();
 	res.Operator = this.Operator;
 	res.Val = this.Val;
 	return res;
+};
+CustomFilter.prototype.create = function(operator, val) {
+	this.Operator = operator;
+	this.Val = val;
+};
+CustomFilter.prototype.isHideValue = function(val) {
+
+	var result = false;
+
+	var checkComplexSymbols = null;
+	var filterVal;
+	if(checkComplexSymbols != null)
+		result = checkComplexSymbols;
+	else
+	{
+		if(this.Operator == c_oAscCustomAutoFilter.equals || this.Operator == c_oAscCustomAutoFilter.doesNotEqual)//общие для числа и текста
+		{
+			if (this.Operator == c_oAscCustomAutoFilter.equals)//equals
+			{
+				if(val == this.Val/* || valWithFormat == this.Val*/)
+					result = true;
+			}
+			else if (this.Operator == c_oAscCustomAutoFilter.doesNotEqual)//doesNotEqual
+			{
+				if(val != this.Val/* || valWithFormat != this.Val*/)
+					result = true;
+			}
+		}
+		else if(this.Operator == c_oAscCustomAutoFilter.isGreaterThan ||this.Operator == c_oAscCustomAutoFilter.isGreaterThanOrEqualTo || this.Operator == c_oAscCustomAutoFilter.isLessThan || this.Operator == c_oAscCustomAutoFilter.isLessThanOrEqualTo)//только для чисел
+		{
+			filterVal =  parseFloat(this.Val);
+			val = parseFloat(val);
+			
+			if(isNaN(filterVal))
+				filterVal = '';
+			
+			switch (this.Operator)
+			{
+				case c_oAscCustomAutoFilter.isGreaterThan:
+					if(val > filterVal)//isGreaterThan
+						result = true;
+					break;
+				case c_oAscCustomAutoFilter.isGreaterThanOrEqualTo:
+					if(val >= filterVal)//isGreaterThanOrEqualTo
+						result = true;
+					break;
+				case c_oAscCustomAutoFilter.isLessThan:
+					if(val < filterVal)//isLessThan
+						result = true;
+					break;
+				case c_oAscCustomAutoFilter.isLessThanOrEqualTo:
+					if(val <= filterVal)//isLessThanOrEqualTo
+						result = true;
+					break;
+			}
+		}
+		else if(this.Operator == c_oAscCustomAutoFilter.beginsWith || this.Operator == c_oAscCustomAutoFilter.doesNotBeginWith || this.Operator == c_oAscCustomAutoFilter.endsWith || this.Operator == c_oAscCustomAutoFilter.doesNotEndWith || this.Operator == c_oAscCustomAutoFilter.contains || this.Operator == c_oAscCustomAutoFilter.doesNotContain)//только для текста
+		{
+			filterVal = this.Val;
+			
+			switch (this.Operator)
+			{
+				case c_oAscCustomAutoFilter.beginsWith:
+					if(type == 1)
+					{
+						if(val.search(filterVal) == 0)//beginsWith
+							result = true;
+					}
+					break;
+				case c_oAscCustomAutoFilter.doesNotBeginWith: 
+					if(type == 1)
+					{
+						if(val.search(filterVal) != 0)//doesNotBeginWith
+							result = true;
+					}
+					else
+						result = true;
+					break;
+				case c_oAscCustomAutoFilter.endsWith: 
+					position = val.length - filterVal.length;
+					if(type == 1)
+					{
+						if(val.lastIndexOf(filterVal) == position && position > 0)//endsWith
+							result = true;
+					}
+					break;
+				case c_oAscCustomAutoFilter.doesNotEndWith: 
+					position = val.length - filterVal.length;
+					if(type == 1)
+					{
+						if(val.lastIndexOf(filterVal) != position && position > 0)//doesNotEndWith
+							result = true;
+					}
+					else
+						result = true;
+					break;
+				case c_oAscCustomAutoFilter.contains: 
+					if(type == 1)
+					{
+						if(val.search(filterVal) != -1)//contains
+							result = true;
+					}
+					break;
+				case c_oAscCustomAutoFilter.doesNotContain: 
+					if(type == 1)
+					{
+						if(val.search(filterVal) == -1)//doesNotContain
+							result = true;
+					}
+					else
+						result = true;
+					break
+			}
+		}
+	}
+
+	return !result;
 };
 /** @constructor */
 function DynamicFilter() {
@@ -4598,25 +4830,16 @@ SortCondition.prototype.clone = function() {
 	return res;
 };
 
-function Result() {
-	this.x = null;
-	this.y = null;
-	this.width = null;
-	this.height = null;
-	this.id = null;
-	this.idNext = null;
-	this.hiddenRows = null;
-}
-Result.prototype.clone = function() {
-	var res = new Result();
-	res.x = this.x;
-	res.y = this.y;
-	res.width = this.width;
-	res.height = this.height;
-	res.id = this.id;
-	res.idNext = this.idNext;
-	res.hiddenRows = this.hiddenRows;
-	res.showButton = this.showButton;
+function dateElem(start, end, dateTimeGrouping) {
+	this.start = start;
+	this.end = end;
+	this.dateTimeGrouping = dateTimeGrouping;
+} 
+dateElem.prototype.clone = function() {
+	var res = new dateElem();
+	res.start = this.start;
+	this.end = this.end;
+	this.dateTimeGrouping = this.dateTimeGrouping;
 	
 	return res;
 };

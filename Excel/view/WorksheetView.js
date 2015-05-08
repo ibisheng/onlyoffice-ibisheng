@@ -5845,10 +5845,6 @@
 			var xWithOffset = x + offsetX;
 			var yWithOffset = y + offsetY;
 
-			var autoFilterInfo = this.autoFilters.checkCursor(x, y, offsetX, offsetY, {cFrozen: cFrozen, rFrozen: rFrozen});
-			if (autoFilterInfo && !isViewerMode)
-				return {cursor: kCurAutoFilter, target: c_oTargetType.FilterObject, col: -1, row: -1, idFilter: autoFilterInfo.id};
-
 			isSelGraphicObject = this.objectRender.selectedGraphicObjectsExists();
 			if (!isViewerMode && !isSelGraphicObject) {
 				// Эпсилон для fillHandle
@@ -5957,7 +5953,11 @@
 						}
 					}
 				}
-
+				
+				var autoFilterInfo = this.autoFilters.checkCursor(x, y, offsetX, offsetY, {cFrozen: cFrozen, rFrozen: rFrozen}, r, c);
+				if (autoFilterInfo && !isViewerMode)
+					return {cursor: kCurAutoFilter, target: c_oTargetType.FilterObject, col: -1, row: -1, idFilter: autoFilterInfo.id};
+				
 				// Проверим есть ли комменты
 				var comments = this.cellCommentator.asc_getComments(c.col, r.row);
 				var coords = undefined;
@@ -6557,6 +6557,7 @@
 
 			var checkApplyFilterOrSort;
 			var tablePartsOptions = this.autoFilters.searchRangeInTableParts(activeCell);
+			cell_info.tableStyleName = tablePartsOptions !== -1 && tablePartsOptions !== -2 && this.model.TableParts && this.model.TableParts[tablePartsOptions].TableStyleInfo ? this.model.TableParts[tablePartsOptions].TableStyleInfo.Name : null;
 			cell_info.isFormatTable = (-1 !== tablePartsOptions);
 			if (-2 === tablePartsOptions) {
 				cell_info.isAutoFilter = null;
@@ -8250,9 +8251,9 @@
 					range = t.model.getRange3(aFilters[aF].range.r1 + selectionRange.r1, aFilters[aF].range.c1 + selectionRange.c1, aFilters[aF].range.r2 + selectionRange.r1, aFilters[aF].range.c2 + selectionRange.c1);
 					if(aFilters[aF].style)
 						range.cleanFormat();
-					t.autoFilters.addAutoFilter(aFilters[aF].style, range.bbox, null, null, true);
+					t.autoFilters.addAutoFilter(aFilters[aF].style, range.bbox, true);
 					if(!aFilters[aF].autoFilter)
-						t.autoFilters.addAutoFilter(null, range.bbox, null, null, true);
+						t.autoFilters.addAutoFilter(null, range.bbox, true);
 				}
 			}
 			else if(isLocal === 'binary' && val.TableParts && val.TableParts.length)
@@ -8277,7 +8278,7 @@
 					if(!aFilters[aF].AutoFilter)
 						bWithoutFilter = true;
 						
-					t.autoFilters.addAutoFilter(aFilters[aF].TableStyleInfo.Name, range.bbox, null, null, true, bWithoutFilter);
+					t.autoFilters.addAutoFilter(aFilters[aF].TableStyleInfo.Name, range.bbox, true);
 				}
 			}
 			
@@ -10791,7 +10792,7 @@
 			this.arrActiveFormulaRanges = [];
 		};
 
-		WorksheetView.prototype.addAutoFilter = function (lTable, addFormatTableOptionsObj) {
+		WorksheetView.prototype.addAutoFilter = function (lTable, addFormatTableOptionsObj, isApplyAutoFilter, isApplyFormatTable) {
 			// Проверка глобального лока
 			if (this.collaborativeEditing.getGlobalLock())
 				return;
@@ -10804,10 +10805,27 @@
 					t.handlers.trigger("selectionChanged", t.getSelectionInfo());
 					return;
 				}
-
-				t.autoFilters.addAutoFilter(lTable, ar, undefined, false, addFormatTableOptionsObj);
+				
+				//TODO брать info из меню
+				var info = t._getSelectionInfoCell();
+				isApplyAutoFilter = info.isAutoFilter;
+				isApplyFormatTable = info.tableStyleName;
+				
+				if(!lTable && isApplyAutoFilter)//delete filter in AutoFilter or TablePart
+					t.autoFilters.deleteAutoFilter(ar);
+				else if(!lTable && !isApplyAutoFilter)//add autoFilter
+					t.autoFilters.addAutoFilter(lTable, ar);
+				else if(lTable && !isApplyFormatTable && !isApplyAutoFilter)//add TablePart
+					t.autoFilters.addAutoFilter(lTable, ar, addFormatTableOptionsObj);
+				else if(lTable && isApplyFormatTable)//change TablePart
+					t.autoFilters.changeTableStyleInfo(lTable, ar);
+				else if(lTable && !isApplyFormatTable && isApplyAutoFilter)//change AutoFilter to TablePart
+					t.autoFilters.changeAutoFilterToTablePart(lTable, ar, addFormatTableOptionsObj);
+	
 			};
-			this._isLockedAll(onChangeAutoFilterCallback);
+			
+			if(t.autoFilters.checkAddAutoFilter(ar, lTable) === true)
+				this._isLockedAll (onChangeAutoFilterCallback);
 		};
 
 		WorksheetView.prototype.applyAutoFilter = function (type, autoFilterObject) {
@@ -10817,7 +10835,7 @@
 				if (false === isSuccess)
 					return;
 
-				t.autoFilters.applyAutoFilter(type, autoFilterObject, ar);
+				t.autoFilters.applyAutoFilter(autoFilterObject, ar);
 			};
 			this._isLockedAll(onChangeAutoFilterCallback);
 		};
