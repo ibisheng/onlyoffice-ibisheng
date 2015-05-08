@@ -314,6 +314,35 @@
 
 			},
 			
+			pasteDesktopEditorButton: function(ElemToSelect)
+			{
+				var __onpaste = ElemToSelect.onpaste;
+				
+				var selection = window.getSelection();
+				var rangeToSelect = window.document.createRange();
+				rangeToSelect.selectNodeContents(ElemToSelect);
+				selection.removeAllRanges();
+				selection.addRange(rangeToSelect);
+						
+				ElemToSelect.onpaste = function (e) {
+					if (!window.GlobalPasteFlag)
+						return;
+					
+					ElemToSelect.oncopy = __onpaste;
+					__onpaste = null;
+					
+					var api = window["Asc"]["editor"];
+					var wb = api.wb;
+					var ws = wb.getWorksheet();
+				
+					wb.clipboard._bodyPaste(ws, e);
+				};
+
+				ElemToSelect.focus();
+				window["AscDesktopEditor"]["Paste"]();
+			},
+			
+			
 			//****copy cells ****
 			copyRange: function (range, worksheet, isCut) {
 				var t = this;
@@ -650,7 +679,9 @@
 			pasteRange: function (worksheet) {
 				var t = this;
 				
-				if(AscBrowser.isMozilla)
+				if (window["AscDesktopEditorButtonMode"] === true && window["AscDesktopEditor"])
+					t.pasteDesktopEditorButton(t._editorPasteGetElem(worksheet, true));
+				else if(AscBrowser.isMozilla)
 					t._editorPaste(worksheet,t._getStylesSelect);
 				else
 					t._editorPaste(worksheet);
