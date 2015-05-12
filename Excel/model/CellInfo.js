@@ -162,7 +162,7 @@
 			this.comments = [];
 			this.isLocked = false;
 			this.isFormatTable = false;	// Нужен для disable возможности делать merge
-			this.tableStyleName = false;
+			this.tableStyleName = null;
 			this.styleName = null;
 			this.numFormatType = null;
 			this.angle = null;
