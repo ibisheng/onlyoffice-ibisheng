@@ -7128,9 +7128,11 @@ function _onOpenCommand(fCallback, incomeObject) {
 			return;
 		}
 
-		if (result.changes) {
+		if (result.changes && editor.VersionHistory) {
+			var arrColors = editor.VersionHistory.colors;
 			for (var i = 0; i < result.changes.length; ++i)
-				editor._coAuthoringSetChanges(result.changes[i], new CDocumentColor( 191, 255, 199 ));
+				editor._coAuthoringSetChanges(result.changes[i],
+					arrColors[i] ? arrColors[i] : new CDocumentColor(191, 255, 199));
 		}
 
 		if (result.bSerFormat)
