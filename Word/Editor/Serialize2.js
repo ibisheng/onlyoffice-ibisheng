@@ -4569,7 +4569,7 @@ function BinarySettingsTableWriter(memory, doc)
 			this.memory.WriteByte(nFileVal);
 		}
     }
-};
+}
 function BinaryFileReader(doc, openParams)
 {
     this.Document = doc;
@@ -5424,7 +5424,7 @@ function BinaryFileReader(doc, openParams)
 		window.global_pptx_content_loader.Clear(true);
         return { content: aContent, fonts: aPrepeareFonts, images: aPrepeareImages, bAddNewStyles: addNewStyles, aPastedImages: aPastedImages, bInBlock: bInBlock };
     }
-};
+}
 function BinaryStyleTableReader(doc, oReadResult, stream)
 {
     this.Document = doc;
