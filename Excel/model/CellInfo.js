@@ -221,6 +221,7 @@
 		prot["asc_getClearFilter"]	    = prot.asc_getClearFilter;
 		prot["asc_getIsAutoFilter"]	    = prot.asc_getIsAutoFilter;
 
+		/** @constructor */
         function asc_CDefName(n, r, s) {
             this.Name = n?n:null;
             this.Scope = s?s:null;
@@ -231,7 +232,7 @@
             asc_getName: function(){return this.Name;},
             asc_getScope: function(){return this.Scope;},
             asc_getRef: function(){return this.Ref;}
-        }
+        };
 
         window["Asc"].asc_CDefName = window["Asc"]["asc_CDefName"] = asc_CDefName;
         prot = asc_CDefName.prototype;
