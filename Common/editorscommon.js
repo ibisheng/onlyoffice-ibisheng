@@ -950,41 +950,478 @@ function asc_ajax (obj) {
 	init(obj);
 }
 
-function CIdCounter () {
-	this.m_sUserId        = null;
-	this.m_bLoad          = true;
-	this.m_nIdCounterLoad = 0; // Счетчик Id для загрузки
-	this.m_nIdCounterEdit = 0; // Счетчик Id для работы
 
-	this.Get_NewId = function()
-	{
-		if ( true === this.m_bLoad || null === this.m_sUserId )
-		{
-			this.m_nIdCounterLoad++;
-			return ("" + this.m_nIdCounterLoad);
-		}
-		else
-		{
-			this.m_nIdCounterEdit++;
-			return ("" + this.m_sUserId + "_" + this.m_nIdCounterEdit);
-		}
-	};
-
-	this.Set_UserId = function(sUserId)
-	{
-		this.m_sUserId = sUserId;
-	};
-
-	this.Set_Load = function(bValue)
-	{
-		this.m_bLoad = bValue;
-	};
-
-	this.Clear = function()
-	{
-		this.m_sUserId        = null;
-		this.m_bLoad          = true;
-		this.m_nIdCounterLoad = 0; // Счетчик Id для загрузки
-		this.m_nIdCounterEdit = 0; // Счетчик Id для работы
-	};
+function CIdCounter ()
+{
+    this.m_sUserId        = null;
+    this.m_bLoad          = true;
+    this.m_nIdCounterLoad = 0; // Счетчик Id для загрузки
+    this.m_nIdCounterEdit = 0; // Счетчик Id для работы
 }
+CIdCounter.prototype.Get_NewId = function()
+{
+    if (true === this.m_bLoad || null === this.m_sUserId)
+    {
+        this.m_nIdCounterLoad++;
+        return ("" + this.m_nIdCounterLoad);
+    }
+    else
+    {
+        this.m_nIdCounterEdit++;
+        return ("" + this.m_sUserId + "_" + this.m_nIdCounterEdit);
+    }
+};
+CIdCounter.prototype.Set_UserId = function(sUserId)
+{
+    this.m_sUserId = sUserId;
+};
+CIdCounter.prototype.Set_Load = function(bValue)
+{
+    this.m_bLoad = bValue;
+};
+CIdCounter.prototype.Clear = function()
+{
+    this.m_sUserId        = null;
+    this.m_bLoad          = true;
+    this.m_nIdCounterLoad = 0; // Счетчик Id для загрузки
+    this.m_nIdCounterEdit = 0; // Счетчик Id для работы
+};
+
+function CTableId()
+{
+    this.m_aPairs   = {};
+    this.m_bTurnOff = false;
+    this.Id         = g_oIdCounter.Get_NewId();
+    this.Add(this, this.Id);
+};
+CTableId.prototype.Add = function(Class, Id)
+{
+    if (false === this.m_bTurnOff)
+    {
+        Class.Id = Id;
+        this.m_aPairs[Id] = Class;
+
+        History.Add(this, { Type : historyitem_TableId_Add, Id : Id, Class : Class  });
+    }
+};
+CTableId.prototype.TurnOff = function()
+{
+    this.m_bTurnOff = true;
+};
+CTableId.prototype.TurnOn = function()
+{
+    this.m_bTurnOff = false;
+};
+/*
+ Получаем указатель на класс по Id
+ */
+CTableId.prototype.Get_ById = function(Id)
+{
+    if ("" === Id)
+        return null;
+
+    if ("undefined" != typeof(this.m_aPairs[Id]))
+        return this.m_aPairs[Id];
+
+    return null;
+};
+/*
+ Получаем Id, по классу (вообще, данную функцию лучше не использовать)
+ */
+CTableId.prototype.Get_ByClass = function(Class)
+{
+    if ("undefined" != typeof( Class.Get_Id ))
+        return Class.Get_Id();
+
+    if ("undefined" != typeof( Class.GetId() ))
+        return Class.GetId();
+
+    return null;
+};
+CTableId.prototype.Reset_Id = function(Class, Id_new, Id_old)
+{
+    if (Class === this.m_aPairs[Id_old])
+    {
+        delete this.m_aPairs[Id_old];
+        this.m_aPairs[Id_new] = Class;
+
+        History.Add(this, { Type : historyitem_TableId_Reset, Id_new : Id_new, Id_old : Id_old  });
+    }
+    else
+    {
+        this.Add(Class, Id_new);
+    }
+};
+CTableId.prototype.Get_Id = function()
+{
+    return this.Id;
+};
+CTableId.prototype.Clear = function()
+{
+    this.m_aPairs = {};
+    this.m_bTurnOff = false;
+    this.Add(this, g_oIdCounter.Get_NewId());
+};
+//-----------------------------------------------------------------------------------
+// Функции для работы с Undo/Redo
+//-----------------------------------------------------------------------------------
+CTableId.prototype.Undo = function(Data)
+{
+    // Ничего не делаем (можно удалять/добавлять ссылки на классы в данном классе
+    // но это не обяательно, т.к. Id всегда уникальные)
+};
+CTableId.prototype.Redo = function(Redo)
+{
+    // Ничего не делаем (можно удалять/добавлять ссылки на классы в данном классе
+    // но это не обяательно, т.к. Id всегда уникальные)
+};
+CTableId.prototype.Refresh_RecalcData = function(Data)
+{
+    // Ничего не делаем, добавление/удаление классов не влияет на пересчет
+};
+//-----------------------------------------------------------------------------------
+// Функции для работы с совместным редактирования
+//-----------------------------------------------------------------------------------
+CTableId.prototype.Read_Class_FromBinary = function(Reader)
+{
+    var ElementType = Reader.GetLong();
+    var Element = null;
+
+    // Временно отключаем регистрацию новых классов
+    this.m_bTurnOff = true;
+
+    switch( ElementType )
+    {
+        case historyitem_type_Paragraph                : Element = new Paragraph(); break;
+        case historyitem_type_TextPr                   : Element = new ParaTextPr(); break;
+        case historyitem_type_Hyperlink                : Element = new ParaHyperlink(); break;
+        case historyitem_type_Drawing                  : Element = new ParaDrawing(); break;
+        case historyitem_type_Table                    : Element = new CTable(); break;
+        case historyitem_type_TableRow                 : Element = new CTableRow(); break;
+        case historyitem_type_TableCell                : Element = new CTableCell(); break;
+        case historyitem_type_DocumentContent          : Element = new CDocumentContent(); break;
+        case historyitem_type_HdrFtr                   : Element = new CHeaderFooter(); break;
+        case historyitem_type_AbstractNum              : Element = new CAbstractNum(); break;
+        case historyitem_type_Comment                  : Element = new CComment(); break;
+        case historyitem_type_Style                    : Element = new CStyle(); break;
+        case historyitem_type_CommentMark              : Element = new ParaComment(); break;
+        case historyitem_type_ParaRun                  : Element = new ParaRun(); break;
+        case historyitem_type_Section                  : Element = new CSectionPr(); break;
+        case historyitem_type_Field                    : Element = new ParaField(); break;
+
+        case historyitem_type_DefaultShapeDefinition   : Element = new DefaultShapeDefinition(); break;
+        case historyitem_type_CNvPr                    : Element = new CNvPr(); break;
+        case historyitem_type_NvPr                     : Element = new NvPr(); break;
+        case historyitem_type_Ph                       : Element = new Ph(); break;
+        case historyitem_type_UniNvPr                  : Element = new UniNvPr(); break;
+        case historyitem_type_StyleRef                 : Element = new StyleRef(); break;
+        case historyitem_type_FontRef                  : Element = new FontRef(); break;
+        case historyitem_type_Chart                    : Element = new CChart(); break;
+        case historyitem_type_ChartSpace               : Element = new CChartSpace(); break;
+        case historyitem_type_Legend                   : Element = new CLegend(); break;
+        case historyitem_type_Layout                   : Element = new CLayout(); break;
+        case historyitem_type_LegendEntry              : Element = new CLegendEntry(); break;
+        case historyitem_type_PivotFmt                 : Element = new CPivotFmt(); break;
+        case historyitem_type_DLbl                     : Element = new CDLbl(); break;
+        case historyitem_type_Marker                   : Element = new CMarker(); break;
+        case historyitem_type_PlotArea                 : Element = new CPlotArea(); break;
+        case historyitem_type_NumFmt                   : Element = new CNumFmt(); break;
+        case historyitem_type_Scaling                  : Element = new CScaling(); break;
+        case historyitem_type_DTable                   : Element = new CDTable(); break;
+        case historyitem_type_LineChart                : Element = new CLineChart(); break;
+        case historyitem_type_DLbls                    : Element = new CDLbls(); break;
+        case historyitem_type_UpDownBars               : Element = new CUpDownBars(); break;
+        case historyitem_type_BarChart                 : Element = new CBarChart(); break;
+        case historyitem_type_BubbleChart              : Element = new CBubbleChart(); break;
+        case historyitem_type_DoughnutChart            : Element = new CDoughnutChart(); break;
+        case historyitem_type_OfPieChart               : Element = new COfPieChart(); break;
+        case historyitem_type_PieChart                 : Element = new CPieChart(); break;
+        case historyitem_type_RadarChart               : Element = new CRadarChart(); break;
+        case historyitem_type_ScatterChart             : Element = new CScatterChart(); break;
+        case historyitem_type_StockChart               : Element = new CStockChart(); break;
+        case historyitem_type_SurfaceChart             : Element = new CSurfaceChart(); break;
+        case historyitem_type_BandFmt                  : Element = new CBandFmt(); break;
+        case historyitem_type_AreaChart                : Element = new CAreaChart(); break;
+        case historyitem_type_ScatterSer               : Element = new CScatterSeries(); break;
+        case historyitem_type_DPt                      : Element = new CDPt(); break;
+        case historyitem_type_ErrBars                  : Element = new CErrBars(); break;
+        case historyitem_type_MinusPlus                : Element = new CMinusPlus(); break;
+        case historyitem_type_NumLit                   : Element = new CNumLit(); break;
+        case historyitem_type_NumericPoint             : Element = new CNumericPoint(); break;
+        case historyitem_type_NumRef                   : Element = new CNumRef(); break;
+        case historyitem_type_TrendLine                : Element = new CTrendLine(); break;
+        case historyitem_type_Tx                       : Element = new CTx(); break;
+        case historyitem_type_StrRef                   : Element = new CStrRef(); break;
+        case historyitem_type_StrCache                 : Element = new CStrCache(); break;
+        case historyitem_type_StrPoint                 : Element = new CStringPoint(); break;
+        case historyitem_type_XVal                     : Element = new CXVal(); break;
+        case historyitem_type_MultiLvlStrRef           : Element = new CMultiLvlStrRef(); break;
+        case historyitem_type_MultiLvlStrCache         : Element = new CMultiLvlStrCache(); break;
+        case historyitem_type_StringLiteral            : Element = new CStringLiteral(); break;
+        case historyitem_type_YVal                     : Element = new CYVal(); break;
+        case historyitem_type_AreaSeries               : Element = new CAreaSeries(); break;
+        case historyitem_type_Cat                      : Element = new CCat(); break;
+        case historyitem_type_PictureOptions           : Element = new CPictureOptions(); break;
+        case historyitem_type_RadarSeries              : Element = new CRadarSeries(); break;
+        case historyitem_type_BarSeries                : Element = new CBarSeries(); break;
+        case historyitem_type_LineSeries               : Element = new CLineSeries(); break;
+        case historyitem_type_PieSeries                : Element = new CPieSeries(); break;
+        case historyitem_type_SurfaceSeries            : Element = new CSurfaceSeries(); break;
+        case historyitem_type_BubbleSeries             : Element = new CBubbleSeries(); break;
+        case historyitem_type_ExternalData             : Element = new CExternalData(); break;
+        case historyitem_type_PivotSource              : Element = new CPivotSource(); break;
+        case historyitem_type_Protection               : Element = new CProtection(); break;
+        case historyitem_type_ChartWall                : Element = new CChartWall(); break;
+        case historyitem_type_View3d                   : Element = new CView3d(); break;
+        case historyitem_type_ChartText                : Element = new CChartText(); break;
+        case historyitem_type_ShapeStyle               : Element = new CShapeStyle(); break;
+        case historyitem_type_Xfrm                     : Element = new CXfrm(); break;
+        case historyitem_type_SpPr                     : Element = new CSpPr(); break;
+        case historyitem_type_ClrScheme                : Element = new ClrScheme(); break;
+        case historyitem_type_ClrMap                   : Element = new ClrMap(); break;
+        case historyitem_type_ExtraClrScheme           : Element = new ExtraClrScheme(); break;
+        case historyitem_type_FontCollection           : Element = new FontCollection(); break;
+        case historyitem_type_FontScheme               : Element = new FontScheme(); break;
+        case historyitem_type_FormatScheme             : Element = new FmtScheme(); break;
+        case historyitem_type_ThemeElements            : Element = new ThemeElements(); break;
+        case historyitem_type_HF                       : Element = new HF(); break;
+        case historyitem_type_BgPr                     : Element = new CBgPr(); break;
+        case historyitem_type_Bg                       : Element = new CBg(); break;
+        case historyitem_type_PrintSettings            : Element = new CPrintSettings(); break;
+        case historyitem_type_HeaderFooterChart        : Element = new CHeaderFooterChart(); break;
+        case historyitem_type_PageMarginsChart         : Element = new CPageMarginsChart(); break;
+        case historyitem_type_PageSetup                : Element = new CPageSetup(); break;
+        case historyitem_type_Shape                    : Element = new CShape(); break;
+        case historyitem_type_DispUnits                : Element = new CDispUnits(); break;
+        case historyitem_type_GroupShape               : Element = new CGroupShape(); break;
+        case historyitem_type_ImageShape               : Element = new CImageShape(); break;
+        case historyitem_type_Geometry                 : Element = new Geometry(); break;
+        case historyitem_type_Path                     : Element = new Path(); break;
+        case historyitem_type_TextBody                 : Element = new CTextBody(); break;
+        case historyitem_type_CatAx                    : Element = new CCatAx(); break;
+        case historyitem_type_ValAx                    : Element = new CValAx(); break;
+        case historyitem_type_WrapPolygon              : Element = new CWrapPolygon(); break;
+        case historyitem_type_DateAx                   : Element = new CDateAx(); break;
+        case historyitem_type_SerAx                    : Element = new CSerAx(); break;
+        case historyitem_type_Title                    : Element = new CTitle(); break;
+
+        case historyitem_type_Math						: Element = new ParaMath(false); break;
+        case historyitem_type_MathContent				: Element = new CMathContent(); break;
+        case historyitem_type_acc						: Element = new CAccent(); break;
+        case historyitem_type_bar						: Element = new CBar(); break;
+        case historyitem_type_box						: Element = new CBox(); break;
+        case historyitem_type_borderBox					: Element = new CBorderBox(); break;
+        case historyitem_type_delimiter					: Element = new CDelimiter(); break;
+        case historyitem_type_eqArr						: Element = new CEqArray(); break;
+        case historyitem_type_frac                      : Element = new CFraction(); break;
+        case historyitem_type_mathFunc					: Element = new CMathFunc(); break;
+        case historyitem_type_groupChr					: Element = new CGroupCharacter(); break;
+        case historyitem_type_lim						: Element = new CLimit(); break;
+        case historyitem_type_matrix					: Element = new CMathMatrix(); break;
+        case historyitem_type_nary						: Element = new CNary(); break;
+        case historyitem_type_phant						: Element = new CPhantom(); break;
+        case historyitem_type_rad						: Element = new CRadical(); break;
+        case historyitem_type_deg_subsup				: Element = new CDegreeSubSup(); break;
+        case historyitem_type_deg						: Element = new CDegree(); break;
+    }
+
+    if ( null !== Element )
+        Element.Read_FromBinary2(Reader);
+
+    // Включаем назад регистрацию новых классов
+    this.m_bTurnOff = false;
+
+    return Element;
+};
+CTableId.prototype.Save_Changes = function(Data, Writer)
+{
+    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+    // Long : тип класса
+    // Long : тип изменений
+
+    Writer.WriteLong( historyitem_type_TableId );
+
+    var Type = Data.Type;
+
+    // Пишем тип
+    Writer.WriteLong( Type );
+    switch ( Type )
+    {
+        case historyitem_TableId_Add :
+        {
+            // String   : Id элемента
+            // Varibale : сам элемент
+
+            Writer.WriteString2( Data.Id );
+            Data.Class.Write_ToBinary2( Writer );
+
+            break;
+        }
+
+        case historyitem_TableId_Reset:
+        {
+            // String : Id_new
+            // String : Id_old
+
+            Writer.WriteString2( Data.Id_new );
+            Writer.WriteString2( Data.Id_old );
+
+            break;
+        }
+
+        case historyitem_TableId_Description:
+        {
+            // Long : FileCheckSum
+            // Long : FileSize
+            // Long : Description
+            // Long : ItemsCount
+            // Long : PointIndex
+            // Long : StartPoint
+            // Long : LastPoint
+            // Long : SumIndex
+            // Long : DeletedIndex
+            // String : Версия SDK
+
+            Writer.WriteLong(Data.FileCheckSum);
+            Writer.WriteLong(Data.FileSize);
+            Writer.WriteLong(Data.Description);
+            Writer.WriteLong(Data.ItemsCount);
+            Writer.WriteLong(Data.PointIndex);
+            Writer.WriteLong(Data.StartPoint);
+            Writer.WriteLong(Data.LastPoint);
+            Writer.WriteLong(Data.SumIndex);
+            Writer.WriteLong(null === Data.DeletedIndex ? -10 : Data.DeletedIndex);
+            Writer.WriteString2("@@Version.@@Build.@@Rev");
+
+            break;
+        }
+    }
+};
+CTableId.prototype.Save_Changes2 = function(Data, Writer)
+{
+    return false;
+};
+CTableId.prototype.Load_Changes = function(Reader, Reader2)
+{
+    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+    // Long : тип класса
+    // Long : тип изменений
+
+    var ClassType = Reader.GetLong();
+    if ( historyitem_type_TableId != ClassType )
+        return;
+
+    var Type = Reader.GetLong();
+
+    switch ( Type )
+    {
+        case historyitem_TableId_Add:
+        {
+            // String   : Id элемента
+            // Varibale : сам элемент
+
+            var Id    = Reader.GetString2();
+            var Class = this.Read_Class_FromBinary( Reader );
+
+            this.m_aPairs[Id] = Class;
+
+            break;
+        }
+
+        case historyitem_TableId_Reset:
+        {
+            // String : Id_new
+            // String : Id_old
+
+            var Id_new = Reader.GetString2();
+            var Id_old = Reader.GetString2();
+
+            if ( "undefined" != this.m_aPairs[Id_old] )
+            {
+                var Class = this.m_aPairs[Id_old];
+                delete this.m_aPairs[Id_old];
+                this.m_aPairs[Id_new] = Class;
+            }
+
+            break;
+        }
+
+        case historyitem_TableId_Description:
+        {
+            // Long : FileCheckSum
+            // Long : FileSize
+            // Long : Description
+            // Long : ItemsCount
+            // Long : PointIndex
+            // Long : StartPoint
+            // Long : LastPoint
+            // Long : SumIndex
+            // Long : DeletedIndex
+            // String : Версия SDK
+
+            var FileCheckSum = Reader.GetLong();
+            var FileSize     = Reader.GetLong();
+            var Description  = Reader.GetLong();
+            var ItemsCount   = Reader.GetLong();
+            var PointIndex   = Reader.GetLong();
+            var StartPoint   = Reader.GetLong();
+            var LastPoint    = Reader.GetLong();
+            var SumIndex     = Reader.GetLong();
+            var DeletedIndex = Reader.GetLong();
+            var VersionString= Reader.GetString2();
+
+            //                // CollaborativeEditing LOG
+            //                console.log("ItemsCount2  " + CollaborativeEditing.m_nErrorLog_PointChangesCount);
+            //                if (CollaborativeEditing.m_nErrorLog_PointChangesCount !== CollaborativeEditing.m_nErrorLog_SavedPCC)
+            //                    console.log("========================= BAD Changes Count in Point =============================");
+            //
+            //                if (CollaborativeEditing.m_nErrorLog_CurPointIndex + 1 !== PointIndex && 0 !== PointIndex)
+            //                    console.log("========================= BAD Point index ========================================");
+            //
+            //                var bBadSumIndex = false;
+            //                if (0 === PointIndex)
+            //                {
+            //                    CollaborativeEditing.m_nErrorLog_SumIndex = 0;
+            //                }
+            //                else
+            //                {
+            //                    CollaborativeEditing.m_nErrorLog_SumIndex += CollaborativeEditing.m_nErrorLog_SavedPCC + 1; // Потому что мы не учитываем данное изменение
+            //                    if (PointIndex === StartPoint)
+            //                    {
+            //                        if (CollaborativeEditing.m_nErrorLog_SumIndex !== SumIndex)
+            //                            bBadSumIndex = true;
+            //
+            //                        console.log("SumIndex2    " + CollaborativeEditing.m_nErrorLog_SumIndex);
+            //                        CollaborativeEditing.m_nErrorLog_SumIndex = SumIndex;
+            //                    }
+            //                }
+            //
+            //                console.log("----------------------------");
+            //                console.log("FileCheckSum " + FileCheckSum);
+            //                console.log("FileSize     " + FileSize);
+            //                console.log("Description  " + Description + " " + Get_HistoryPointStringDescription(Description));
+            //                console.log("PointIndex   " + PointIndex);
+            //                console.log("StartPoint   " + StartPoint);
+            //                console.log("LastPoint    " + LastPoint);
+            //                console.log("ItemsCount   " + ItemsCount);
+            //                console.log("SumIndex     " + SumIndex);
+            //                console.log("DeletedIndex " + (-10 === DeletedIndex ? null : DeletedIndex));
+            //
+            //                // -1 Чтобы не учитывалось данное изменение
+            //                CollaborativeEditing.m_nErrorLog_SavedPCC          = ItemsCount;
+            //                CollaborativeEditing.m_nErrorLog_PointChangesCount = -1;
+            //                CollaborativeEditing.m_nErrorLog_CurPointIndex     = PointIndex;
+            //
+            //                if (bBadSumIndex)
+            //                    console.log("========================= BAD Sum index ==========================================");
+
+            break;
+        }
+    }
+
+    return true;
+};
+CTableId.prototype.Unlock = function(Data)
+{
+    // Ничего не делаем
+};
