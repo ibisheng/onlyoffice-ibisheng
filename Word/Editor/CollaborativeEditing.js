@@ -36,6 +36,14 @@ function CIdCounter()
     {
         this.m_bLoad = bValue;
     };
+
+    this.Clear = function()
+    {
+        this.m_sUserId        = null;
+        this.m_bLoad          = true;
+        this.m_nIdCounterLoad = 0; // Счетчик Id для загрузки
+        this.m_nIdCounterEdit = 0; // Счетчик Id для работы
+    }
 }
 
 var g_oIdCounter = new CIdCounter();
@@ -110,6 +118,13 @@ function CTableId()
     this.Get_Id = function()
     {
         return this.Id;
+    };
+
+    this.Clear = function()
+    {
+        this.m_aPairs   = {};
+        this.m_bTurnOff = false;
+        this.Add(this, g_oIdCounter.Get_NewId());
     };
 //-----------------------------------------------------------------------------------
 // Функции для работы с Undo/Redo
