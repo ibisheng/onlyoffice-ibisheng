@@ -949,3 +949,42 @@ function asc_ajax (obj) {
 
 	init(obj);
 }
+
+function CIdCounter () {
+	this.m_sUserId        = null;
+	this.m_bLoad          = true;
+	this.m_nIdCounterLoad = 0; // Счетчик Id для загрузки
+	this.m_nIdCounterEdit = 0; // Счетчик Id для работы
+
+	this.Get_NewId = function()
+	{
+		if ( true === this.m_bLoad || null === this.m_sUserId )
+		{
+			this.m_nIdCounterLoad++;
+			return ("" + this.m_nIdCounterLoad);
+		}
+		else
+		{
+			this.m_nIdCounterEdit++;
+			return ("" + this.m_sUserId + "_" + this.m_nIdCounterEdit);
+		}
+	};
+
+	this.Set_UserId = function(sUserId)
+	{
+		this.m_sUserId = sUserId;
+	};
+
+	this.Set_Load = function(bValue)
+	{
+		this.m_bLoad = bValue;
+	};
+
+	this.Clear = function()
+	{
+		this.m_sUserId        = null;
+		this.m_bLoad          = true;
+		this.m_nIdCounterLoad = 0; // Счетчик Id для загрузки
+		this.m_nIdCounterEdit = 0; // Счетчик Id для работы
+	};
+}

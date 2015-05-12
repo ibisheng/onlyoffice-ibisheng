@@ -63,40 +63,6 @@ function CLock()
         return false;
     };
 }
-function CIdCounter()
-{
-    this.m_sUserId        = null;
-    this.m_bLoad          = true;
-    this.m_nIdCounterLoad = 0; // Счетчик Id для загрузки
-    this.m_nIdCounterEdit = 0; // Счетчик Id для работы
-    this.Get_NewId = function()
-    {
-        if ( true === this.m_bLoad || null === this.m_sUserId )
-        {
-            this.m_nIdCounterLoad++;
-            return ("" + this.m_nIdCounterLoad);
-        }
-        else
-        {
-            this.m_nIdCounterEdit++;
-            var cur_id =  ("" + this.m_sUserId + "_" + this.m_nIdCounterEdit);
-            while(isRealObject(g_oTableId.Get_ById(cur_id)))
-            {
-                this.m_nIdCounterEdit++;
-                cur_id =  ("" + this.m_sUserId + "_" + this.m_nIdCounterEdit);
-            }
-            return cur_id;
-        }
-    };
-    this.Set_UserId = function(sUserId)
-    {
-        this.m_sUserId = sUserId;
-    };
-    this.Set_Load = function(bValue)
-    {
-        this.m_bLoad = bValue;
-    };
-}
 function CTableId()
 {
     this.m_aPairs   = {};
