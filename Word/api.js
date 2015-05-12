@@ -7116,7 +7116,7 @@ function sendTrack(fCallback, url, rdata){
         success: function(msg){
 			var incomeObject = JSON.parse(msg);
 			if(fCallback)
-				fCallback(incomeObject);			
+				fCallback(incomeObject);
 		}
 	})
 }
@@ -7126,6 +7126,14 @@ function _onOpenCommand(fCallback, incomeObject) {
 			editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
 			if(fCallback) fCallback();
 			return;
+		}
+
+		if (result.changes) {
+			g_oIdCounter.Clear();
+			g_oTableId.Clear();
+			editor.isApplyChangesOnOpenEnabled = true;
+			for (var i = 0; i < result.changes.length; ++i)
+				editor._coAuthoringSetChanges(result.changes[i], new CDocumentColor( 191, 255, 199 ));
 		}
 
 		if (result.bSerFormat)
@@ -7435,7 +7443,8 @@ asc_docs_api.prototype.asc_showRevision = function (url, urlChanges, currentChan
 	else
 		bUpdate = this.VersionHistory.update(url, urlChanges, currentChangeId);
 	if (bUpdate) {
-		documentUrl = url;
+		this.DocInfo.put_Id('1233211');
+		this.DocInfo.put_Url(url);
 		documentUrlChanges = urlChanges;
 		this.isCoAuthoringEnable = false;
 		this.LoadDocument();

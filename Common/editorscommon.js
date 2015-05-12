@@ -3,11 +3,17 @@
 var g_sMainServiceLocalUrl = "/CanvasService.ashx";
 var g_sResourceServiceLocalUrl = "/ResourceService.ashx?path=";
 var g_sUploadServiceLocalUrl = "/UploadService.ashx";
-var g_sSpellCheckServiceLocalUrl = "/SpellChecker.ashx";
 var g_sTrackingServiceLocalUrl = "/TrackingService.ashx";
 var g_nMaxJsonLength = 2097152;
 var g_nMaxJsonLengthChecked = g_nMaxJsonLength / 1000;
 var g_nMaxRequestLength = 1048576;//<requestLimits maxAllowedContentLength="30000000" /> default 30mb
+
+function OpenFileResult () {
+	this.bSerFormat = false;
+	this.data = null;
+	this.url = null;
+	this.changes = null;
+}
 
 function g_fSaveWithParts(fSendCommand, fCallback, oAdditionalData, aParts) {
 	if(null == aParts){
@@ -43,6 +49,11 @@ function g_fSaveWithParts(fSendCommand, fCallback, oAdditionalData, aParts) {
 }
 
 function g_fOpenFileCommand (data, Signature, callback) {
+	var bError = false, oResult = new OpenFileResult(), bEndLoadFile = false, bEndLoadChanges = false;
+	var onEndOpen = function () {
+		if (bEndLoadFile && bEndLoadChanges)
+			if (callback) callback(bError, oResult);
+	};
 	var openData = JSON.parse(data);
 	var sFileUrl = g_sResourceServiceLocalUrl + openData['urlfile'];
 	asc_ajax({
@@ -54,15 +65,37 @@ function g_fOpenFileCommand (data, Signature, callback) {
 			var nIndex = sFileUrl.lastIndexOf("/");
 			url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
 			if (0 < result.length) {
-				if (callback) callback(false, {bSerFormat: Signature === result.substring(0, Signature.length), data: result, url: url});
-			} else {
-				if (callback) callback(true);
-			}
+				oResult.bSerFormat = Signature === result.substring(0, Signature.length);
+				oResult.data = result;
+				oResult.url = url;
+			} else
+				bError = true;
+			bEndLoadFile = true;
+			onEndOpen();
 		},
 		error: function () {
-			if (callback) callback(true);
+			bEndLoadFile = true;
+			bError = true;
+			onEndOpen();
 		}
 	});
+	if (null != openData['urlchanges']) {
+		JSZipUtils.getBinaryContent(g_sResourceServiceLocalUrl + openData['urlchanges'], function(err, data) {
+			bEndLoadChanges = true;
+			if(err) {
+				bError = true;
+				onEndOpen();
+				return;
+			}
+
+			var oZipFile = new JSZip(data);
+			oResult.changes = [];
+			for(var i in oZipFile.files)
+				oResult.changes.push(JSON.parse(oZipFile.file(i).asText()))
+			onEndOpen();
+		});
+	} else
+		bEndLoadChanges = true;
 }
 
 function fSortAscending( a, b ) {
