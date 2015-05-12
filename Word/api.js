@@ -7129,9 +7129,6 @@ function _onOpenCommand(fCallback, incomeObject) {
 		}
 
 		if (result.changes) {
-			g_oIdCounter.Clear();
-			g_oTableId.Clear();
-			editor.isApplyChangesOnOpenEnabled = true;
 			for (var i = 0; i < result.changes.length; ++i)
 				editor._coAuthoringSetChanges(result.changes[i], new CDocumentColor( 191, 255, 199 ));
 		}
@@ -7436,16 +7433,30 @@ asc_docs_api.prototype.asc_continueSaving = function () {
 
 // Version History
 
-asc_docs_api.prototype.asc_showRevision = function (url, urlChanges, currentChangeId) {
+asc_docs_api.prototype.asc_showRevision = function (newObj) {
+	if (3 === arguments.length) {
+		var tmp = arguments[0];
+		newObj = new window["Asc"].asc_CVersionHistory();
+		newObj.docId = '1233211';
+		newObj.url = tmp;
+		newObj.urlChanges = arguments[1];
+		newObj.currentChangeId = arguments[2];
+		newObj.colors = [];
+	}
+
 	var bUpdate = true;
 	if (null === this.VersionHistory)
-		this.VersionHistory = new window["Asc"].CVersionHistory(url, urlChanges, currentChangeId);
+		this.VersionHistory = new window["Asc"].asc_CVersionHistory(newObj);
 	else
-		bUpdate = this.VersionHistory.update(url, urlChanges, currentChangeId);
+		bUpdate = this.VersionHistory.update(newObj);
 	if (bUpdate) {
-		this.DocInfo.put_Id('1233211');
-		this.DocInfo.put_Url(url);
-		documentUrlChanges = urlChanges;
+		g_oIdCounter.Clear();
+		g_oTableId.Clear();
+		this.isApplyChangesOnOpenEnabled = true;
+
+		this.DocInfo.put_Id(this.VersionHistory.docId);
+		this.DocInfo.put_Url(this.VersionHistory.url);
+		documentUrlChanges = this.VersionHistory.urlChanges;
 		this.isCoAuthoringEnable = false;
 		this.LoadDocument();
 	}

@@ -2515,21 +2515,41 @@
 	window["Asc"].generateColor = generateColor;
 	window["Asc"].hsvToRgb = hsvToRgb;
 
-	function CVersionHistory (url, urlChanges, currentChangeId) {
-		this.url = url;
-		this.urlChanges = urlChanges;
-		this.currentChangeId = currentChangeId;
+	/** @constructor */
+	function asc_CVersionHistory (newObj) {
+		this.docId = null;
+		this.url = null;
+		this.urlChanges = null;
+		this.currentChangeId = null;
+		this.colors = null;
+
+		if (newObj) this.update(newObj);
 	}
-	CVersionHistory.prototype.update = function (url, urlChanges, currentChangeId) {
-		var bUpdate = (this.url !== url || this.urlChanges !== urlChanges || this.currentChangeId === currentChangeId);
+	asc_CVersionHistory.prototype.update = function (newObj) {
+		var bUpdate = (this.docId !== newObj.docId || this.url !== newObj.url ||
+			this.urlChanges !== newObj.urlChanges || this.currentChangeId === newObj.currentChangeId);
 		if (bUpdate) {
-			this.url = url;
-			this.urlChanges = urlChanges;
-			this.currentChangeId = currentChangeId;
+			this.docId = newObj.docId;
+			this.url = newObj.url;
+			this.urlChanges = newObj.urlChanges;
+			this.currentChangeId = newObj.currentChangeId;
+			this.colors = newObj.colors;
 		}
 		return bUpdate;
 	};
-	window["Asc"].CVersionHistory = CVersionHistory;
+	asc_CVersionHistory.prototype.asc_setDocId = function(val) {this.docId = val;};
+	asc_CVersionHistory.prototype.asc_setUrl = function(val) {this.url = val;};
+	asc_CVersionHistory.prototype.asc_setUrlChanges = function(val) {this.urlChanges = val;};
+	asc_CVersionHistory.prototype.asc_setCurrentChangeId = function(val) {this.currentChangeId = val;};
+	asc_CVersionHistory.prototype.asc_setArrColors = function(val) {this.colors = val;};
+
+	window["Asc"].asc_CVersionHistory = window["Asc"]["asc_CVersionHistory"] = asc_CVersionHistory;
+	prot = asc_CVersionHistory.prototype;
+	prot["asc_setDocId"]			= prot.asc_setDocId;
+	prot["asc_setUrl"]				= prot.asc_setUrl;
+	prot["asc_setUrlChanges"]		= prot.asc_setUrlChanges;
+	prot["asc_setCurrentChangeId"]	= prot.asc_setCurrentChangeId;
+	prot["asc_setArrColors"]		= prot.asc_setArrColors;
 }
 )(window);
 
