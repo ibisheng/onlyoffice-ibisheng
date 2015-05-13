@@ -591,10 +591,6 @@ var c_oAscLineBeginSize = {
 	large_mid	: 7,
 	large_large	: 8
 };
-var c_oAscMailMergeMailFormat = {
-	html : 0,
-	attach : 1
-};
 
 var c_oAscMaxTooltipLength = 256;
 var c_oAscMaxCellOrCommentLength = 32767; // По идее должно быть 32768, но видимо сравнение идеть на меньше (а не меньше либо равно)
