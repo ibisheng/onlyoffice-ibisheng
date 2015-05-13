@@ -327,6 +327,7 @@ function CMailMergeSendData (obj){
 		this.message = null;
 		this.recordFrom = null;
 		this.recordTo = null;
+		this.recordCount = null;
 		this.userId = null;
 		this.jsonKey = null;
 	}
@@ -347,6 +348,8 @@ CMailMergeSendData.prototype.get_RecordFrom = function(){return this.recordFrom}
 CMailMergeSendData.prototype.put_RecordFrom = function(v){this.recordFrom = v;};
 CMailMergeSendData.prototype.get_RecordTo = function(){return this.recordTo};
 CMailMergeSendData.prototype.put_RecordTo = function(v){this.recordTo = v;};
+CMailMergeSendData.prototype.get_RecordCount = function(){return this.recordCount};
+CMailMergeSendData.prototype.put_RecordCount = function(v){this.recordCount = v;};
 CMailMergeSendData.prototype.get_UserId = function(){return this.userId};
 CMailMergeSendData.prototype.put_UserId = function(v){this.userId = v;};
 CMailMergeSendData.prototype.get_JsonKey = function(){return this.jsonKey};
@@ -1512,6 +1515,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
 		t.mailMergeSendData = null;
 		oMailMergeSendData.put_JsonKey(t.mailMergeFileKey);
 		oMailMergeSendData.put_UserId(documentUserId);
+		oMailMergeSendData.put_RecordCount(oMailMergeSendData.get_RecordTo() - oMailMergeSendData.get_RecordFrom() + 1);
 		if(null != t.mailMergeSendTimeout)
 			clearTimeout(t.mailMergeSendTimeout);
 		if(isSuccess){
