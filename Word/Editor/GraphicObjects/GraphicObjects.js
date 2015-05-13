@@ -306,6 +306,7 @@ CGraphicObjects.prototype =
                 shape_props = new asc_CImgProperty(para_drawing_props);
                 shape_props.ShapeProperties = CreateAscShapePropFromProp(props_by_types.shapeProps);
                 shape_props.verticalTextAlign = props_by_types.shapeProps.verticalTextAlign;
+                shape_props.vert = props_by_types.shapeProps.vert;
                 shape_props.Width = props_by_types.shapeProps.w;
                 shape_props.Height = props_by_types.shapeProps.h;
             }
@@ -386,7 +387,7 @@ CGraphicObjects.prototype =
             }
         }
         this.document.Recalculate();
-        oApplyProps && isRealNumber(oApplyProps.verticalTextAlign) && this.document.Document_UpdateSelectionState();
+        oApplyProps && (isRealNumber(oApplyProps.verticalTextAlign) || isRealNumber(oApplyProps.vert)) && this.document.Document_UpdateSelectionState();
     },
 
     applyDrawingProps: DrawingObjectsController.prototype.applyDrawingProps,
