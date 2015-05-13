@@ -1420,6 +1420,14 @@ CPresentation.prototype =
             this.Document_UpdateInterfaceState();
         }
     },
+    setVert: function(align)
+    {
+        if(this.Slides[this.CurPage])
+        {
+            this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [{vert: align}], false, historydescription_Presentation_SetVert);
+            this.Document_UpdateInterfaceState();
+        }
+    },
 
     Get_Styles: function()
     {
@@ -2873,6 +2881,7 @@ CPresentation.prototype =
             {
                 editor.sync_shapePropCallback(drawing_props.shapeProps);
                 editor.sync_VerticalTextAlign(drawing_props.shapeProps.verticalTextAlign);
+                editor.sync_Vert(drawing_props.shapeProps.vert);
             }
 
             if(drawing_props.chartProps && drawing_props.chartProps.chartProps)

@@ -2224,15 +2224,19 @@ CUniColor.prototype =
 
     IsIdentical : function(unicolor)
     {
-        if(unicolor == null)
+        if(!isRealObject(unicolor))
         {
             return false;
         }
-        if(!this.color.IsIdentical(unicolor.color))
+        if(!isRealObject(unicolor.color) && isRealObject(this.color)
+            || !isRealObject(this.color) && isRealObject(unicolor.color)
+            || isRealObject(this.color) && !this.color.IsIdentical(unicolor.color))
         {
             return false;
         }
-        if(!this.Mods.IsIdentical(unicolor.Mods))
+        if(!isRealObject(unicolor.Mods) && isRealObject(this.Mods)
+            || !isRealObject(this.Mods) && isRealObject(unicolor.Mods)
+            || isRealObject(this.Mods) && !this.Mods.IsIdentical(unicolor.Mods))
         {
             return false;
         }
@@ -5130,6 +5134,7 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
      else */
     {
         _result_shape_prop.verticalTextAlign = null;
+        _result_shape_prop.vert = null;
     }
 
     if(shapeProp1.canChangeArrows !== true || shapeProp2.canChangeArrows !== true)
@@ -11115,7 +11120,6 @@ CTextFit.prototype =
     {}
 };
 
-
 // ----------------------------------
 
 
@@ -11178,6 +11182,7 @@ function CBodyPr()
     this.vertOverflow     = null;
     this.wrap             = null;
     this.textFit          = null;
+    this.prstTxWarp       = null;
 
 
     this.parent = null;
@@ -11217,7 +11222,8 @@ CBodyPr.prototype =
         this.vert             !== null ||
         this.vertOverflow     !== null ||
         this.wrap             !== null ||
-        this.textFit          !== null;
+        this.textFit          !== null ||
+        this.prstTxWarp       !== null;
     },
 
     setAnchor: function(val)
@@ -11258,8 +11264,50 @@ CBodyPr.prototype =
         this.vertOverflow     = null;
         this.wrap             = null;
         this.textFit          = null;
+        this.prstTxWarp       = null;
     },
 
+
+    WritePrstTxWarp: function(w)
+    {
+        w.WriteBool(isRealObject(this.prstTxWarp));
+        if(isRealObject(this.prstTxWarp))
+        {
+            writeString(w, this.prstTxWarp.preset);
+            var startPos = w.GetCurPosition(), countAv = 0;
+            w.Skip(4);
+            for(var key in this.prstTxWarp.avLst)
+            {
+                if(this.prstTxWarp.avLst.hasOwnProperty(key))
+                {
+                    ++countAv;
+                    w.WriteString(key);
+                    w.WriteLong(this.prstTxWarp.gdLst[key]);
+                }
+            }
+            var endPos = w.GetCurPosition();
+            w.Seek(startPos);
+            w.WriteLong(countAv);
+            w.Seek(endPos);
+        }
+    },
+
+    ReadPrstTxWarp: function(r)
+    {
+        ExecuteNoHistory(function(){
+            if(r.GetBool())
+            {
+                this.prstTxWarp = CreatePrstTxWarpGeometry(readString(r));
+                var count = r.GetLong();
+                for(var i = 0; i < count; ++i)
+                {
+                    var sAdj = r.GetString2();
+                    var nVal = r.GetLong();
+                    this.prstTxWarp.AddAdj(sAdj, 15, nVal + "", undefined, undefined);
+                }
+            }
+        }, this, []);
+    },
 
     Write_ToBinary2: function(w)
     {
@@ -11404,6 +11452,8 @@ CBodyPr.prototype =
         {
             w.WriteLong(this.wrap);
         }
+
+        this.WritePrstTxWarp(w);
     },
 
     Read_FromBinary2: function(r)
@@ -11549,6 +11599,7 @@ CBodyPr.prototype =
         {
             this.wrap = r.GetLong();
         }
+        this.ReadPrstTxWarp(r);
     },
 
     setDefault:  function()
@@ -11573,6 +11624,7 @@ CBodyPr.prototype =
         this.vert           = nVertTThorz;
         this.vertOverflow   = nOTOwerflow;
         this.wrap           = nTWTSquare;
+        this.prstTxWarp     = null;
     },
 
     createDuplicate: function()
@@ -11598,7 +11650,10 @@ CBodyPr.prototype =
         duplicate.vert           = this.vert;
         duplicate.vertOverflow   = this.vertOverflow;
         duplicate.wrap           = this.wrap;
-
+        if(this.prstTxWarp)
+        {
+            duplicate.prstTxWarp = ExecuteNoHistory(function(){return this.prstTxWarp.createDuplicate();}, this, []);
+        }
         return duplicate;
     },
 
@@ -11689,6 +11744,10 @@ CBodyPr.prototype =
         if(bodyPr.wrap!=null)
         {
             this.wrap = bodyPr.wrap;
+        }
+        if(bodyPr.prstTxWarp)
+        {
+            this.prstTxWarp = ExecuteNoHistory(function(){return bodyPr.prstTxWarp.createDuplicate();}, this, []);
         }
         return this;
     },
@@ -11836,6 +11895,7 @@ CBodyPr.prototype =
         {
             w.WriteLong(this.wrap);
         }
+        this.WritePrstTxWarp(w);
     },
 
     Read_FromBinary: function(r)
@@ -11981,6 +12041,7 @@ CBodyPr.prototype =
         {
             this.wrap = r.GetLong();
         }
+        this.ReadPrstTxWarp(r);
     }
 };
 

@@ -562,6 +562,13 @@ var c_oAscVerticalTextAlign = {
 	TEXT_ALIGN_JUST		: 3, // (Text Anchor Enum ( Justified ))
 	TEXT_ALIGN_TOP		: 4  // Top
 };
+
+var c_oAscVertDrawingText =
+{
+    normal : 1,
+    vert   : 3,
+    vert270: 4
+};
 var c_oAscLineJoinType = {
 	Round : 1,
 	Bevel : 2,

@@ -1437,7 +1437,25 @@ DrawingObjectsController.prototype =
 
 
     setCellAngle: function (angle) {
-        //TODO:this.checkSelectedObjectsAndCallback(this.setCellAngleCallBack, [angle]);
+
+        switch (angle)
+        {
+            case 0 :
+            {
+                this.checkSelectedObjectsAndCallback(this.applyDrawingProps, [{vert: null}], false, historydescription_Spreadsheet_SetCellVertAlign);
+                break;
+            }
+            case 90 :
+            {
+                this.checkSelectedObjectsAndCallback(this.applyDrawingProps, [{vert: nVertTTvert}], false, historydescription_Spreadsheet_SetCellVertAlign);
+                break;
+            }
+            case 270:
+            {
+                this.checkSelectedObjectsAndCallback(this.applyDrawingProps, [{vert: nVertTTvert270}], false, historydescription_Spreadsheet_SetCellVertAlign);
+                break;
+            }
+        }
     },
 
     setCellStyle: function (name) {
@@ -1734,6 +1752,17 @@ DrawingObjectsController.prototype =
             for(i = 0; i < objects_by_type.groups.length; ++i)
             {
                 objects_by_type.groups[i].setVerticalAlign(props.verticalTextAlign);
+            }
+        }
+        if(isRealNumber(props.vert))
+        {
+            for(i = 0; i < objects_by_type.shapes.length; ++i)
+            {
+                objects_by_type.shapes[i].setVert(props.vert);
+            }
+            for(i = 0; i < objects_by_type.groups.length; ++i)
+            {
+                objects_by_type.groups[i].setVert(props.vert);
             }
         }
         if(isRealObject(props.paddings))
@@ -4695,6 +4724,34 @@ DrawingObjectsController.prototype =
                 chart_selection.recalcInfo.bRecalculatedTitle = false;
             }
         }
+        else {
+            var oTargetTextObject = getTargetTextObject(this);
+            if (oTargetTextObject) {
+                if (oTargetTextObject.recalcInfo.bRecalculatedTitle) {
+                    oTargetTextObject.recalcInfo.recalcTitle = null;
+                    oTargetTextObject.handleContent && oTargetTextObject.handleContent();
+                    if (this.document) {
+                        oTargetTextObject.recalculate();
+                        this.document.DrawingDocument.OnRecalculatePage(oTargetTextObject.selectStartPage, this.document.Pages[oTargetTextObject.selectStartPage]);
+                        this.document.DrawingDocument.OnEndRecalculate(false, true);
+                    }
+                    else if (this.drawingObjects.cSld) {
+                        oTargetTextObject.recalculate();
+                        if (!(bNoRedraw === true)) {
+                            editor.WordControl.m_oDrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
+                            editor.WordControl.m_oDrawingDocument.OnEndRecalculate(false, true);
+                        }
+                    }
+                    else {
+                        oTargetTextObject.addToRecalculate();
+                        this.startRecalculate();
+                    }
+                    oTargetTextObject.recalcInfo.bRecalculatedTitle = false;
+                }
+
+            }
+        }
+
     },
 
     resetSelection: function(noResetContentSelect)
@@ -5234,6 +5291,7 @@ DrawingObjectsController.prototype =
                         stroke: drawing.getStroke(),
                         paddings: drawing.getPaddings(),
                         verticalTextAlign: drawing.getBodyPr().anchor,
+                        vert: drawing.getBodyPr().vert,
                         w: drawing.extX,
                         h: drawing.extY ,
                         canChangeArrows: drawing.canChangeArrows(),
@@ -5329,6 +5387,7 @@ DrawingObjectsController.prototype =
                         stroke: drawing.getStroke(),
                         paddings: null,
                         verticalTextAlign: null,
+                        vert: null,
                         w: drawing.extX,
                         h: drawing.extY ,
                         canChangeArrows: false,
@@ -5538,6 +5597,7 @@ DrawingObjectsController.prototype =
                 shape_props.ShapeProperties.paddings = new asc_CPaddings(props.shapeChartProps.paddings);
             }
             shape_props.verticalTextAlign = props.shapeChartProps.verticalTextAlign;
+            shape_props.vert = props.shapeChartProps.vert;
             shape_props.ShapeProperties.canFill = props.shapeChartProps.canFill;
             shape_props.Width = props.shapeChartProps.w;
             shape_props.Height = props.shapeChartProps.h;
@@ -5581,6 +5641,7 @@ DrawingObjectsController.prototype =
                 shape_props.ShapeProperties.paddings = new asc_CPaddings(props.shapeProps.paddings);
             }
             shape_props.verticalTextAlign = props.shapeProps.verticalTextAlign;
+            shape_props.vert = props.shapeProps.vert;
             shape_props.ShapeProperties.canFill = props.shapeProps.canFill;
             shape_props.Width = props.shapeProps.w;
             shape_props.Height = props.shapeProps.h;

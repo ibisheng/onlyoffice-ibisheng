@@ -1561,6 +1561,7 @@ var historydescription_Presentation_TableMoveFromRulersInline      = 0x011e;
 var historydescription_Presentation_PasteOnThumbnails              = 0x011f;
 var historydescription_Presentation_PasteOnThumbnailsSafari        = 0x0120;
 var historydescription_Document_ConvertOldEquation                 = 0x0121;
+var historydescription_Presentation_SetVert                        = 0x0122;
 
 
 

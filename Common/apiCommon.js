@@ -1783,6 +1783,7 @@
         this.Locked = false;
         this.w = null;
         this.h = null;
+        this.vert = null;
     }
 
     asc_CShapeProperty.prototype = {
@@ -1809,7 +1810,9 @@
         asc_getHeight: function(){return this.h},
         asc_putHeight: function(v){this.h = v;},
         asc_getVerticalTextAlign: function(){return this.verticalTextAlign},
-        asc_putVerticalTextAlign: function(v){this.verticalTextAlign = v;}
+        asc_putVerticalTextAlign: function(v){this.verticalTextAlign = v;},
+        asc_getVert: function(){return this.vert},
+        asc_putVert: function(v){this.vert = v;}
     };
 
 //{ asc_CShapeProperty export
@@ -1838,6 +1841,8 @@
     prot["put_Height"] = prot["asc_putHeight"] = prot.asc_putHeight;
     prot["get_VerticalTextAlign"] = prot["asc_getVerticalTextAlign"] = prot.asc_getVerticalTextAlign;
     prot["put_VerticalTextAlign"] = prot["asc_putVerticalTextAlign"] = prot.asc_putVerticalTextAlign;
+    prot["get_Vert"] = prot["asc_getVert"] = prot.asc_getVert;
+    prot["put_Vert"] = prot["asc_putVert"] = prot.asc_putVert;
 
 // ---------------------------------------------------------------
 
@@ -1876,6 +1881,7 @@
             this.severalChartTypes = obj.severalChartTypes != undefined ? obj.severalChartTypes : undefined;
             this.severalChartStyles = obj.severalChartStyles != undefined ? obj.severalChartStyles : undefined;
             this.verticalTextAlign = obj.verticalTextAlign != undefined ? obj.verticalTextAlign : undefined;
+            this.vert = obj.vert != undefined ? obj.vert : undefined;
         }
         else {
             this.CanBeFlow = true;
@@ -1901,6 +1907,7 @@
             this.severalChartTypes = undefined;
             this.severalChartStyles = undefined;
             this.verticalTextAlign = undefined;
+            this.vert = undefined;
         }
     }
 
@@ -1953,6 +1960,8 @@
 
         asc_getVerticalTextAlign: function() { return this.verticalTextAlign; },
         asc_putVerticalTextAlign: function(v) { this.verticalTextAlign = v; },
+        asc_getVert: function() { return this.vert; },
+        asc_putVert: function(v) { this.vert = v; },
 
         asc_getLocked: function() { return this.Locked; },
         asc_getChartProperties: function() { return this.ChartProperties; },
@@ -2053,6 +2062,8 @@
     prot["put_SeveralChartStyles"] = prot["asc_putSeveralChartStyles"] = prot.asc_putSeveralChartStyles;
     prot["get_VerticalTextAlign"] = prot["asc_getVerticalTextAlign"] = prot.asc_getVerticalTextAlign;
     prot["put_VerticalTextAlign"] = prot["asc_putVerticalTextAlign"] = prot.asc_putVerticalTextAlign;
+    prot["get_Vert"] = prot["asc_getVert"] = prot.asc_getVert;
+    prot["put_Vert"] = prot["asc_putVert"] = prot.asc_putVert;
     prot["get_Locked"] = prot["asc_getLocked"] = prot.asc_getLocked;
     prot["get_ChartProperties"] = prot["asc_getChartProperties"] = prot.asc_getChartProperties;
     prot["put_ChartProperties"] = prot["asc_putChartProperties"] = prot.asc_putChartProperties;

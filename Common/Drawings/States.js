@@ -140,7 +140,7 @@ StartAddNewShape.prototype =
 
 function checkEmptyPlaceholderContent(content)
 {
-    if(!content || content.Is_Empty() && content.Parent && content.Parent.parent && content.Parent.parent.isPlaceholder && content.Parent.parent.isPlaceholder())
+    if(!content || content.Parent && content.Parent.parent && (content.Is_Empty() && content.Parent.parent.isPlaceholder && content.Parent.parent.isPlaceholder() || content.Parent.parent.txWarpStruct)  )
         return content;
     return null;
 }

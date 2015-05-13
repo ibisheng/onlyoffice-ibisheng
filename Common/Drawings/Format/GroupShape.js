@@ -310,22 +310,6 @@ CGroupShape.prototype =
         return c;
     },
 
-    isSimpleObject: function()
-    {
-        return false;
-    },
-
-    setDiagram: function(chartPr)
-    {
-        var bRecalc = false;
-        for(var i = 0; i < this.spTree.length; ++i)
-        {
-            if(this.spTree[i].setDiagram)
-            {
-                this.spTree[i].setDiagram(chartPr);
-            }
-        }
-    },
 
     getAllFonts: function(fonts)
     {
@@ -1059,6 +1043,17 @@ CGroupShape.prototype =
             if(this.spTree[_shape_index].setVerticalAlign)
             {
                 this.spTree[_shape_index].setVerticalAlign(align);
+            }
+        }
+    },
+
+    setVert : function(vert)
+    {
+        for(var _shape_index = 0; _shape_index < this.spTree.length; ++_shape_index)
+        {
+            if(this.spTree[_shape_index].setVert)
+            {
+                this.spTree[_shape_index].setVert(vert);
             }
         }
     },

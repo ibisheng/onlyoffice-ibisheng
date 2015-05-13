@@ -6677,6 +6677,7 @@
 				}
 				var vertAlign = "center";
                 var shape_props = this.objectRender.controller.getDrawingProps().shapeProps;
+				var angle = null;
                 if(shape_props)
                 {
                     switch (shape_props.verticalTextAlign) {
@@ -6687,10 +6688,17 @@
                         case VERTICAL_ANCHOR_TYPE_DISTRIBUTED:
                         case VERTICAL_ANCHOR_TYPE_JUSTIFIED:		vertAlign = "top"; break;
                     }
+                    switch (shape_props.vert) {
+                        case nVertTTvert:			angle = 90; break;
+                        case nVertTTvert270:		angle = 270; break;
+                        default:		            angle = 0; break;
+                    }
+
                 }
 
 				objectInfo.halign = horAlign;
 				objectInfo.valign = vertAlign;
+				objectInfo.angle = angle;
 
 				objectInfo.font = new asc_CFont();
 				objectInfo.font.name = textPr.FontFamily ? textPr.FontFamily.Name : "";

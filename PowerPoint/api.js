@@ -1308,6 +1308,10 @@ asc_docs_api.prototype.sync_VerticalTextAlign = function(align)
 {
     this.asc_fireCallback("asc_onVerticalTextAlign", align);
 };
+asc_docs_api.prototype.sync_Vert = function(vert)
+{
+    this.asc_fireCallback("asc_onVert", vert);
+};
 
 asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr, bParaPr){
 
@@ -4263,6 +4267,11 @@ asc_docs_api.prototype.unGroupShapes = function()
 asc_docs_api.prototype.setVerticalAlign = function(align)
 {
     this.WordControl.m_oLogicDocument.setVerticalAlign(align);
+};
+
+asc_docs_api.prototype.setVert = function(vert)
+{
+    this.WordControl.m_oLogicDocument.setVert(vert);
 };
 
 asc_docs_api.prototype.sync_MouseMoveStartCallback = function()
