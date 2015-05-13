@@ -131,7 +131,7 @@
 
     var reconnectTimeout, attemptCount=0;
 
-    function initSocksJs(url,docsCoApi)  {
+    function initSocksJs(url, docsCoApi)  {
         var sockjs = new SockJS(url, null, {debug: true});
 
         sockjs.onopen = function () {
@@ -189,11 +189,9 @@
         return sockjs;
     }
 
-
 	SpellCheckApi.prototype.init = function (docid) {
         this._docid = docid;
         //Begin send auth
-        var docsCoApi = this;
 		this.sockjs_url = this._url + '/doc/'+docid+'/c';
         this.sockjs = initSocksJs(this.sockjs_url, this);
     };

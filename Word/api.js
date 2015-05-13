@@ -7133,10 +7133,13 @@ function _onOpenCommand(fCallback, incomeObject) {
 		}
 
 		if (result.changes && editor.VersionHistory) {
-			var arrColors = editor.VersionHistory.colors;
-			for (var i = 0; i < result.changes.length; ++i)
-				editor._coAuthoringSetChanges(result.changes[i],
-					arrColors[i] ? arrColors[i] : new CDocumentColor(191, 255, 199));
+			var arrColors = editor.VersionHistory.colors, color;
+			for (var i = 0; i < result.changes.length; ++i) {
+				color = arrColors[i];
+				editor._coAuthoringSetChanges(result.changes[i], color ?
+					new CDocumentColor((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF) :
+					new CDocumentColor(191, 255, 199));
+			}
 		}
 
 		if (result.bSerFormat)
@@ -7440,15 +7443,9 @@ asc_docs_api.prototype.asc_continueSaving = function () {
 // Version History
 
 asc_docs_api.prototype.asc_showRevision = function (newObj) {
-	if (3 === arguments.length) {
-		var tmp = arguments[0];
-		newObj = new window["Asc"].asc_CVersionHistory();
+	// ToDo убрать эту проверку
+	if (!newObj.docId)
 		newObj.docId = '1233211';
-		newObj.url = tmp;
-		newObj.urlChanges = arguments[1];
-		newObj.currentChangeId = arguments[2];
-		newObj.colors = [];
-	}
 
 	var bUpdate = true;
 	if (null === this.VersionHistory)
