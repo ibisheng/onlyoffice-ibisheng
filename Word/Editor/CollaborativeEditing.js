@@ -858,82 +858,7 @@ var changestype_2_Comment                = 3; // Работает с комме�
 var changestype_2_Element_and_Type       = 4; // Проверяем возможно ли сделать изменение заданного типа с заданным элементом(а не с текущим)
 var changestype_2_ElementsArray_and_Type = 5; // Аналогично предыдущему, только идет массив элементов
 
-function CLock()
-{
-    this.Type   = locktype_None;
-    this.UserId = null;
-}
 
-CLock.prototype = 
-{
-    Get_Type : function()
-    {
-        return this.Type;
-    },
-
-    Set_Type : function(NewType, Redraw)
-    {
-        if ( NewType === locktype_None )
-            this.UserId = null;
-
-        this.Type = NewType;
-
-        if ( false != Redraw )
-        {
-            // TODO: переделать перерисовку тут
-            var DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
-            DrawingDocument.ClearCachePages();
-            DrawingDocument.FirePaint();
-        }
-    },
-
-    Check : function(Id)
-    {
-        if ( this.Type === locktype_Mine )
-            CollaborativeEditing.Add_CheckLock( false );
-        else if ( this.Type === locktype_Other || this.Type === locktype_Other2 || this.Type === locktype_Other3 )
-            CollaborativeEditing.Add_CheckLock( true );
-        else
-            CollaborativeEditing.Add_CheckLock( Id );
-    },
-
-    Lock : function(bMine)
-    {
-        if ( locktype_None === this.Type )
-        {
-            if ( true === bMine )
-                this.Type = locktype_Mine;
-            else
-                true.Type = locktype_Other;
-        }
-    },
-
-    Is_Locked : function()
-    {
-        if ( locktype_None != this.Type && locktype_Mine != this.Type )
-            return true;
-
-        return false;
-    },
-
-    Set_UserId : function(UserId)
-    {
-        this.UserId = UserId;
-    },
-
-    Get_UserId : function()
-    {
-        return this.UserId;
-    },
-
-    Have_Changes : function()
-    {
-        if ( locktype_Other2 === this.Type || locktype_Other3 === this.Type )
-            return true;
-
-        return false;
-    }
-}
 
 var contentchanges_Add    = 1;
 var contentchanges_Remove = 2;
@@ -1041,48 +966,5 @@ CContentChangesElement.prototype =
         }
 
         return Positions;
-    }
-};
-
-function CContentChanges()
-{
-    this.m_aChanges = [];
-}
-
-CContentChanges.prototype =
-{
-    Add : function(Changes)
-    {
-        this.m_aChanges.push( Changes );
-    },
-
-    Clear : function()
-    {
-        this.m_aChanges.length = 0;
-    },
-
-    Check : function(Type, Pos)
-    {
-        var CurPos = Pos;
-        var Count = this.m_aChanges.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var NewPos = this.m_aChanges[Index].Check_Changes(Type, CurPos);
-            if ( false === NewPos )
-                return false;
-
-            CurPos = NewPos;
-        }
-
-        return CurPos;
-    },
-
-    Refresh : function()
-    {
-        var Count = this.m_aChanges.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            this.m_aChanges[Index].Refresh_BinaryData();
-        }
     }
 };
