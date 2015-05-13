@@ -525,7 +525,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			// History & global counters
 			History = new CHistory(wbModel);
 
-			g_oIdCounter = new CIdCounter();
 			g_oTableId = new CTableId();
 			if ( this.User )
 				g_oIdCounter.Set_UserId(this.User.asc_getId());

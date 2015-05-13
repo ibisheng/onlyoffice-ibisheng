@@ -6,11 +6,6 @@
  * Time: 12:01
  */
 
-var g_oIdCounter = new CIdCounter();
-
-
-var g_oTableId = null;
-
 function CCollaborativeChanges()
 {
     this.m_pData         = null;

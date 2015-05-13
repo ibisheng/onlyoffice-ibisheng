@@ -993,7 +993,7 @@ function CTableId()
     this.m_bTurnOff = false;
     this.Id         = g_oIdCounter.Get_NewId();
     this.Add(this, this.Id);
-};
+}
 CTableId.prototype.Add = function(Class, Id)
 {
     if (false === this.m_bTurnOff)
@@ -1439,75 +1439,65 @@ function CLock()
     this.UserId = null;
 }
 
-CLock.prototype =
+CLock.prototype.Get_Type = function()
 {
-    Get_Type : function()
-    {
-        return this.Type;
-    },
+	return this.Type;
+};
+CLock.prototype.Set_Type = function(NewType, Redraw)
+{
+	if ( NewType === locktype_None )
+		this.UserId = null;
 
-    Set_Type : function(NewType, Redraw)
-    {
-        if ( NewType === locktype_None )
-            this.UserId = null;
+	this.Type = NewType;
 
-        this.Type = NewType;
+	if ( false != Redraw )
+	{
+		// TODO: переделать перерисовку тут
+		var DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+		DrawingDocument.ClearCachePages();
+		DrawingDocument.FirePaint();
+	}
+};
+CLock.prototype.Check = function(Id)
+{
+	if ( this.Type === locktype_Mine )
+		CollaborativeEditing.Add_CheckLock( false );
+	else if ( this.Type === locktype_Other || this.Type === locktype_Other2 || this.Type === locktype_Other3 )
+		CollaborativeEditing.Add_CheckLock( true );
+	else
+		CollaborativeEditing.Add_CheckLock( Id );
+};
+CLock.prototype.Lock = function(bMine)
+{
+	if ( locktype_None === this.Type )
+	{
+		if ( true === bMine )
+			this.Type = locktype_Mine;
+		else
+			true.Type = locktype_Other;
+	}
+};
+CLock.prototype.Is_Locked = function()
+{
+	if ( locktype_None != this.Type && locktype_Mine != this.Type )
+		return true;
 
-        if ( false != Redraw )
-        {
-            // TODO: переделать перерисовку тут
-            var DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
-            DrawingDocument.ClearCachePages();
-            DrawingDocument.FirePaint();
-        }
-    },
+	return false;
+};
+CLock.prototype.Set_UserId = function(UserId)
+{
+	this.UserId = UserId;
+};
+CLock.prototype.Get_UserId = function()
+{
+	return this.UserId;
+};
+CLock.prototype.Have_Changes = function()
+{
+	if ( locktype_Other2 === this.Type || locktype_Other3 === this.Type )
+		return true;
 
-    Check : function(Id)
-    {
-        if ( this.Type === locktype_Mine )
-            CollaborativeEditing.Add_CheckLock( false );
-        else if ( this.Type === locktype_Other || this.Type === locktype_Other2 || this.Type === locktype_Other3 )
-            CollaborativeEditing.Add_CheckLock( true );
-        else
-            CollaborativeEditing.Add_CheckLock( Id );
-    },
-
-    Lock : function(bMine)
-    {
-        if ( locktype_None === this.Type )
-        {
-            if ( true === bMine )
-                this.Type = locktype_Mine;
-            else
-                true.Type = locktype_Other;
-        }
-    },
-
-    Is_Locked : function()
-    {
-        if ( locktype_None != this.Type && locktype_Mine != this.Type )
-            return true;
-
-        return false;
-    },
-
-    Set_UserId : function(UserId)
-    {
-        this.UserId = UserId;
-    },
-
-    Get_UserId : function()
-    {
-        return this.UserId;
-    },
-
-    Have_Changes : function()
-    {
-        if ( locktype_Other2 === this.Type || locktype_Other3 === this.Type )
-            return true;
-
-        return false;
-    }
+	return false;
 };
 
 
@@ -1516,40 +1506,37 @@ function CContentChanges()
     this.m_aChanges = [];
 }
 
-CContentChanges.prototype =
+CContentChanges.prototype.Add = function(Changes)
 {
-    Add : function(Changes)
-    {
-        this.m_aChanges.push( Changes );
-    },
-
-    Clear : function()
-    {
-        this.m_aChanges.length = 0;
-    },
-
-    Check : function(Type, Pos)
-    {
-        var CurPos = Pos;
-        var Count = this.m_aChanges.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var NewPos = this.m_aChanges[Index].Check_Changes(Type, CurPos);
-            if ( false === NewPos )
-                return false;
-
-            CurPos = NewPos;
-        }
-
-        return CurPos;
-    },
-
-    Refresh : function()
-    {
-        var Count = this.m_aChanges.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            this.m_aChanges[Index].Refresh_BinaryData();
-        }
-    }
+	this.m_aChanges.push( Changes );
 };
+CContentChanges.prototype.Clear = function()
+{
+	this.m_aChanges.length = 0;
+};
+CContentChanges.prototype.Check = function(Type, Pos)
+{
+	var CurPos = Pos;
+	var Count = this.m_aChanges.length;
+	for ( var Index = 0; Index < Count; Index++ )
+	{
+		var NewPos = this.m_aChanges[Index].Check_Changes(Type, CurPos);
+		if ( false === NewPos )
+			return false;
+
+		CurPos = NewPos;
+	}
+
+	return CurPos;
+};
+CContentChanges.prototype.Refresh = function()
+{
+	var Count = this.m_aChanges.length;
+	for ( var Index = 0; Index < Count; Index++ )
+	{
+		this.m_aChanges[Index].Refresh_BinaryData();
+	}
+};
+
+var g_oIdCounter = new CIdCounter();
+var g_oTableId = null;

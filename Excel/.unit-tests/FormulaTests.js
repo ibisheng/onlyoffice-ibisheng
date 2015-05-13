@@ -389,7 +389,6 @@
 
         History = new CHistory(wb);
 
-        g_oIdCounter = new CIdCounter();
         g_oTableId = new CTableId();
         if ( this.User )
             g_oIdCounter.Set_UserId(this.User.asc_getId());
