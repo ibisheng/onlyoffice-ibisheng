@@ -9,7 +9,6 @@ if(window.editor === "undefined" && window["Asc"]["editor"])
 function CContentChangesElement(Type, Pos, Count, Data)
 {
     this.m_nType  = Type;  // Тип изменений (удаление или добавление)
-    this.m_nPos   = Pos;   // Позиция, в которой произошли изменения
     this.m_nCount = Count; // Количество добавленных/удаленных элементов
     this.m_pData  = Data;  // Связанные с данным изменением данные из истории
 
@@ -110,48 +109,6 @@ function CContentChangesElement(Type, Pos, Count, Data)
 
     // Разбиваем сложное действие на простейшие
     this.m_aPositions = this.Make_ArrayOfSimpleActions( Type, Pos, Count );
-}
-
-function CContentChanges()
-{
-    this.m_aChanges = [];
-
-
-
-    this.Add = function(Changes)
-    {
-        this.m_aChanges.push( Changes );
-    };
-
-    this.Clear = function()
-    {
-        this.m_aChanges.length = 0;
-    };
-
-    this.Check = function(Type, Pos)
-    {
-        var CurPos = Pos;
-        var Count = this.m_aChanges.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var NewPos = this.m_aChanges[Index].Check_Changes(Type, CurPos);
-            if ( false === NewPos )
-                return false;
-
-            CurPos = NewPos;
-        }
-
-        return CurPos;
-    };
-
-    this.Refresh = function()
-    {
-        var Count = this.m_aChanges.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            this.m_aChanges[Index].Refresh_BinaryData();
-        }
-    };
 }
 
 function CheckIdSatetShapeAdd(state)

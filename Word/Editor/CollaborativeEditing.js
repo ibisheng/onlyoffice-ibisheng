@@ -862,7 +862,6 @@ var contentchanges_Remove = 2;
 function CContentChangesElement(Type, Pos, Count, Data)
 {
     this.m_nType  = Type;  // Тип изменений (удаление или добавление)
-    this.m_nPos   = Pos;   // Позиция, в которой произошли изменения
     this.m_nCount = Count; // Количество добавленных/удаленных элементов
     this.m_pData  = Data;  // Связанные с данным изменением данные из истории
 
