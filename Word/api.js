@@ -418,8 +418,6 @@ function asc_docs_api(name)
 
 	this.mailMergeFileData = null;
 	this.mailMergeFileKey = null;
-	this.mailMergeSendData = null;
-	this.mailMergeSendTimeout = null;
 	
     // CoAuthoring and Chat
     this.User = undefined;
@@ -1508,24 +1506,6 @@ asc_docs_api.prototype._coAuthoringInit = function()
 			t.SetViewMode(true);
             t.sync_ErrorCallback(isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect,
                 c_oAscError.Level.NoCritical);
-		}
-	};
-	this.CoAuthoringApi.onMailMerge					= function (isSuccess) {
-		var oMailMergeSendData = t.mailMergeSendData;
-		t.mailMergeSendData = null;
-		oMailMergeSendData.put_JsonKey(t.mailMergeFileKey);
-		oMailMergeSendData.put_UserId(documentUserId);
-		oMailMergeSendData.put_RecordCount(oMailMergeSendData.get_RecordTo() - oMailMergeSendData.get_RecordFrom() + 1);
-		if(null != t.mailMergeSendTimeout)
-			clearTimeout(t.mailMergeSendTimeout);
-		if(isSuccess){
-			_downloadAs(t, "sendmm", null, oMailMergeSendData, c_oAscFileType.UNKNOWN, function(incomeObject){
-				t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SendMailMerge);
-			});
-		}
-		else{
-			// ToDo обработать результат isSuccess = true/false
-			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SendMailMerge);
 		}
 	};
 
@@ -7424,14 +7404,13 @@ asc_docs_api.prototype.asc_sendMailMergeData = function(oData)
 	var oThis = this;
 	var actionType = c_oAscAsyncAction.SendMailMerge;
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
-	this.mailMergeSendData = oData;
-	this.mailMergeSendTimeout = setTimeout(function () {
-			if(null != oThis.mailMergeSendData){
-				oThis.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
-				oThis.mailMergeSendData = null;
-				oThis.mailMergeSendTimeout = null;
-			}
-		}, 10000);
+
+	oData.put_JsonKey(this.mailMergeFileKey);
+	oData.put_UserId(documentUserId);
+	oData.put_RecordCount(oData.get_RecordTo() - oData.get_RecordFrom() + 1);
+	_downloadAs(this, "sendmm", null, oData, c_oAscFileType.UNKNOWN, function(incomeObject){
+		oThis.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+	});
 };
 asc_docs_api.prototype.asc_stopSaving = function () {
 	this.waitSave = true;
