@@ -3835,25 +3835,14 @@ var maxIndividualValues = 10000;
 
 				var ref = filter.Ref;
 				var filterColumns = filter.FilterColumns;
+				var aWs = this._getCurrentWS(), temp = {}, isDateTimeFormat, dataValue, values = [];
 				
-				var aWs = this._getCurrentWS(), result = {}, temp = {}, isDateTimeFormat, dataValue;
-				
-				var currentElemArray = null;//номер данного фильтра в массиве фильтров
-				if(filterColumns && filterColumns.length)
-				{
-					for(var i = 0; i < filterColumns.length; i++)
-					{
-						if(cellId === filterColumns[i].ColId)
-						{
-							currentElemArray = i;
-							break;
-						}
-					}
-				}
+				var currentElemArray = this._getFilterColumnNum(filterColumns, cellId);//номер данного фильтра в массиве фильтров
 				
 				var addValueToMenuObj = function(tempResult, count)
 				{
-					if(isDateTimeFormat)
+					//TODO ветка для добавления даты(как заделаем разделение год/месяц/число в меню)
+					if(false/*isDateTimeFormat*/)
 					{
 						if(!result.dates.year)
 							result.dates.year = [];
@@ -3873,14 +3862,13 @@ var maxIndividualValues = 10000;
 						result.dates.year[dataValue.year].month[dataValue.month].day[dataValue.d].val = tempResult;
 					}
 					else
-						result.values[count] = tempResult;
+						values[count] = tempResult;
 				};
 				
-				result.values = [];
-				result.dates = {};
 
-				var individualCount, count;
-				if(currentElemArray === null || (filterColumns[currentElemArray] && (filterColumns[currentElemArray].Filters || filterColumns[currentElemArray].Top10)))//all filter
+				var individualCount, count, tempResult;
+				var isCustomFilters = currentElemArray && filterColumns[currentElemArray] && filterColumns[currentElemArray].CustomFiltersObj;
+				if(currentElemArray === null || (filterColumns[currentElemArray] && (filterColumns[currentElemArray].Filters || filterColumns[currentElemArray].Top10) || isCustomFilters))
 				{
 					individualCount = 0;
 					count = 0;
@@ -3899,108 +3887,57 @@ var maxIndividualValues = 10000;
 						
 						//value in current column
 						var cell = aWs.getCell3(i, cellId + ref.c1);
-						var currentVal = cell.getValueWithFormat();
-						var val = currentVal;
-						
-						dataValue = null;
+						var text = cell.getValueWithFormat();
+						var val = cell.getValueWithoutFormat();
 						isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
 						
-						if(isDateTimeFormat)
-						{
-							val = cell.getValueWithoutFormat();
-							dataValue = NumFormat.prototype.parseDate(val);
-						}
+						//if(isDateTimeFormat)
+							//dataValue = NumFormat.prototype.parseDate(val);
 							
 						//check duplicate value
-						if(temp.hasOwnProperty(currentVal))
+						if(temp.hasOwnProperty(text))
 							continue;
-						
-						var tempResult = new AutoFiltersOptionsElements();
-						tempResult.visible = true;
-						tempResult.val = currentVal;
-						tempResult.text = val;
-						
-						temp[currentVal] = 1;
 						
 						//apply filter by current button
 						if(currentElemArray !== null)
 						{
-							//filter another button
-							if(this._hiddenAnotherFilter(filterColumns, cellId, i, ref.c1))
+							if(!this._hiddenAnotherFilter(filterColumns, cellId, i, ref.c1))//filter another button
 							{
-								tempResult.visible = null;
-							}
-							
-							//filter current button
-							if(tempResult.visible !== null)
-							{
-								if(!filterColumns[currentElemArray].Top10 && !filterColumns[currentElemArray].isHideValue(val, isDateTimeFormat))
+								tempResult = new AutoFiltersOptionsElements();
+								tempResult.val = val;
+								tempResult.text = text;
+								tempResult.isDateFormat = cell.getNumFormat().isDateTimeFormat();
+								
+								//filter current button
+								if(!filterColumns[currentElemArray].Top10 && !isCustomFilters && !filterColumns[currentElemArray].isHideValue(val, isDateTimeFormat))
 									tempResult.visible = true;
 								else
 									tempResult.visible = false;
 								
-								//TODO пока не разделяем фильтр по дате и общий
-								isDateTimeFormat = false;
-								
 								addValueToMenuObj(tempResult, count);
 								
-								if(!isDateTimeFormat)
-									count++;
-							}
-							else
-							{
-								delete result[count];
-								delete temp[currentVal];
+								temp[text] = 1;
+								count++;
 							}
 						}
 						else
 						{
-							//TODO пока не разделяем фильтр по дате и общий
-							isDateTimeFormat = false;
+							tempResult = new AutoFiltersOptionsElements();
+							tempResult.visible = true;
+							tempResult.val = val;
+							tempResult.text = text;
+							tempResult.isDateFormat = cell.getNumFormat().isDateTimeFormat();
 							
 							addValueToMenuObj(tempResult, count);
-							
-							if(!isDateTimeFormat)
-								count++;
-						}
-						
-						individualCount++;
-					}
-				}
-				else if(filterColumns[currentElemArray] && filterColumns[currentElemArray].CustomFiltersObj && filterColumns[currentElemArray].CustomFiltersObj.CustomFilters)//custom filter
-				{
-					individualCount = 0;
-					count = 0;
-					for(var i = ref.r1 + 1; i <= ref.r2; i++)
-					{
-						//max strings
-						if(individualCount > maxIndividualValues)
-							break;
-						
-						//value in current column
-						var cell = aWs.getCell3(i, cellId + ref.c1);
-						var currentVal = cell.getValueWithFormat();
-						
-						//check duplicate value
-						if(temp.hasOwnProperty(currentVal))
-							continue;
-						
-						if(!this._hiddenAnotherFilter(filterColumns, cellId, i, ref.c1))
-						{
-							result.values[count] = new AutoFiltersOptionsElements();
-							result.values[count].visible = false;
-							result.values[count].val = currentVal;
-							result.values[count].text = currentVal;
-							
-							temp[currentVal] = 1;
+							temp[text] = 1;
 							count++;
 						}
 						
 						individualCount++;
 					}
 				}
-				
-				return this._sortArrayMinMax(result.values);
+
+				return this._sortArrayMinMax(values);
 				
 				console.timeEnd("new");
 			},
@@ -4770,6 +4707,23 @@ var maxIndividualValues = 10000;
 					}
 				}
 				return filters;
+			},
+			
+			_getFilterColumnNum: function(filterColumns, colId)
+			{
+				var currentElemArray = null;
+				if(filterColumns && filterColumns.length)
+				{
+					for(var i = 0; i < filterColumns.length; i++)
+					{
+						if(colId === filterColumns[i].ColId)
+						{
+							currentElemArray = i;
+							break;
+						}
+					}
+				}
+				return currentElemArray;
 			}
 			
 		};
