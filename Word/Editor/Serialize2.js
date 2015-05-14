@@ -7761,6 +7761,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadObject(t,l,oParStruct,oDrawing);
 			});
+			if(null != oDrawing.content.GraphicObj)
+				oNewElem = oDrawing.content;
 		}
         else
             res = c_oSerConstants.ReadUnknown;
@@ -7823,16 +7825,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		}
 		else if(c_oSerRunType.pptxDrawing === type)
 		{
-			var oNewElem = null;
-			
 			this.ReadDrawing (type, length, oParStruct, oDrawing, res);
-			if(null != oDrawing.content.GraphicObj)
-            {
-                oNewElem = oDrawing.content;
-                var oNewRun = new ParaRun(oParStruct.paragraph);
-                oNewRun.Add_ToContent(0, oNewElem, false);
-                oParStruct.addToContent(oNewRun);
-            }
 		}
 		else
 			res = c_oSerConstants.ReadUnknown;
