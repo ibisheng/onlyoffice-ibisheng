@@ -3484,7 +3484,7 @@ function cPERCENTRANK() {
 //    this.setArgumentsMin( 2 );
 //    this.setArgumentsMax( 3 );
 
-    this.name = "PERCEBTRANK";
+    this.name = "PERCENTRANK";
     this.type = cElementType.func;
     this.value = null;
     this.argumentsMin = 2;

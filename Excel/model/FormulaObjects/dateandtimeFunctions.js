@@ -274,9 +274,7 @@ cFormulaFunctionGroup['DateAndTime'] = [
 ];
 
 function cDATE() {
-//    cBaseFunction.call( this, "DATE" );
-//    this.setArgumentsMin( 3 );
-//    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "DATE", 3, 3 );
 
     this.name = "DATE";
     this.type = cElementType.func;
@@ -351,9 +349,7 @@ cDATE.prototype.getInfo = function () {
 };
 
 function cDATEDIF() {
-//    cBaseFunction.call( this, "DATEDIF" );
-//    this.setArgumentsMin( 3 );
-//    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "DATEDIF", 3, 3 );
 //    this.setFormat( this.formatType.noneFormat );
 
     this.name = "DATEDIF";
@@ -467,9 +463,7 @@ cDATEDIF.prototype.getInfo = function () {
 };
 
 function cDATEVALUE() {
-//    cBaseFunction.call( this, "DATEVALUE" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
+//    cBaseFunction.call( this, "DATEVALUE", 1, 1 );
 //    this.setFormat( this.formatType.noneFormat );
 
     this.name = "DATEVALUE";
@@ -520,9 +514,7 @@ cDATEVALUE.prototype.getInfo = function () {
 };
 
 function cDAY() {
-//    cBaseFunction.call( this, "DAY" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
+//    cBaseFunction.call( this, "DAY", 1, 1 );
 //    this.setFormat( this.formatType.noneFormat );
 
     this.name = "DAY";
@@ -597,9 +589,7 @@ cDAY.prototype.getInfo = function () {
 };
 
 function cDAYS360() {
-//    cBaseFunction.call( this, "DAYS360" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "DAYS360", 2, 3 );
 //    this.setFormat( this.formatType.noneFormat );
 
     this.name = "DAYS360";
@@ -665,9 +655,7 @@ cDAYS360.prototype.getInfo = function () {
 };
 
 function cEDATE() {
-//    cBaseFunction.call( this, "EDATE" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
+//    cBaseFunction.call( this, "EDATE", 2, 2 );
 //    this.setFormat( this.formatType.noneFormat );
 
     this.name = "EDATE";
@@ -747,9 +735,7 @@ cEDATE.prototype.getInfo = function () {
 };
 
 function cEOMONTH() {
-//    cBaseFunction.call( this, "EOMONTH" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
+//    cBaseFunction.call( this, "EOMONTH", 2, 2 );
 //    this.setFormat( this.formatType.noneFormat );
 
     this.name = "EOMONTH";
@@ -819,9 +805,7 @@ cEOMONTH.prototype.getInfo = function () {
 };
 
 function cHOUR() {
-//    cBaseFunction.call( this, "HOUR" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
+//    cBaseFunction.call( this, "HOUR", 1, 1 );
 //    this.setFormat( this.formatType.noneFormat );
 
     this.name = "HOUR";
@@ -893,9 +877,7 @@ cHOUR.prototype.getInfo = function () {
 };
 
 function cMINUTE() {
-//    cBaseFunction.call( this, "MINUTE" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
+//    cBaseFunction.call( this, "MINUTE", 1, 1 );
 //    this.setFormat( this.formatType.noneFormat );
 
     this.name = "MINUTE";
@@ -969,9 +951,7 @@ cMINUTE.prototype.getInfo = function () {
 };
 
 function cMONTH() {
-//    cBaseFunction.call( this, "MONTH" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
+//    cBaseFunction.call( this, "MONTH", 1, 1 );
 //    this.setFormat( this.formatType.noneFormat );
 
     this.name = "MONTH";
@@ -1045,9 +1025,7 @@ cMONTH.prototype.getInfo = function () {
 };
 
 function cNETWORKDAYS() {
-//    cBaseFunction.call( this, "NETWORKDAYS" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "NETWORKDAYS", 2, 3 );
 //    this.setFormat( this.formatType.noneFormat );
 
     this.name = "NETWORKDAYS";
@@ -1183,9 +1161,7 @@ function cNETWORKDAYS_INTL() {
 cNETWORKDAYS_INTL.prototype = Object.create( cBaseFunction.prototype );
 
 function cNOW() {
-//    cBaseFunction.call( this, "NOW" );
-//    this.setArgumentsMin( 0 );
-//    this.setArgumentsMax( 0 );
+//    cBaseFunction.call( this, "NOW", 0, 0 );
 
     this.name = "NOW";
     this.type = cElementType.func;
@@ -1216,9 +1192,7 @@ cNOW.prototype.getInfo = function () {
 }
 
 function cSECOND() {
-//    cBaseFunction.call( this, "SECOND" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
+//    cBaseFunction.call( this, "SECOND", 1, 1 );
 //    this.setFormat( this.formatType.noneFormat );
 
     this.name = "SECOND";
@@ -1292,9 +1266,7 @@ cSECOND.prototype.getInfo = function () {
 };
 
 function cTIME() {
-//    cBaseFunction.call( this, "TIME" );
-//    this.setArgumentsMin( 3 );
-//    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "TIME", 3, 3 );
 
     this.name = "TIME";
     this.type = cElementType.func;
@@ -1359,9 +1331,7 @@ cTIME.prototype.getInfo = function () {
 }
 
 function cTIMEVALUE() {
-//    cBaseFunction.call( this, "TIMEVALUE" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
+//    cBaseFunction.call( this, "TIMEVALUE", 1, 1 );
 //    this.setFormat( this.formatType.noneFormat );
 
     this.name = "TIMEVALUE";
@@ -1412,9 +1382,7 @@ cTIMEVALUE.prototype.getInfo = function () {
 }
 
 function cTODAY() {
-//    cBaseFunction.call( this, "TODAY" );
-//    this.setArgumentsMin( 0 );
-//    this.setArgumentsMax( 0 );
+//    cBaseFunction.call( this, "TODAY", 0, 0 );
 
     this.name = "TODAY";
     this.type = cElementType.func;
@@ -1445,9 +1413,7 @@ cTODAY.prototype.getInfo = function () {
 }
 
 function cWEEKDAY() {
-//    cBaseFunction.call( this, "WEEKDAY" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 2 );
+//    cBaseFunction.call( this, "WEEKDAY", 1, 2 );
 //    this.setFormat( this.formatType.noneFormat );
 
     this.name = "WEEKDAY";
@@ -1536,9 +1502,7 @@ cWEEKDAY.prototype.getInfo = function () {
 }
 
 function cWEEKNUM() {
-//    cBaseFunction.call( this, "WEEKNUM" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 2 );
+//    cBaseFunction.call( this, "WEEKNUM", 1, 2 );
 //    this.setFormat( this.formatType.noneFormat );
 
     this.name = "WEEKNUM";
@@ -1659,9 +1623,7 @@ cWEEKNUM.prototype.getInfo = function () {
 }
 
 function cWORKDAY() {
-//    cBaseFunction.call( this, "WORKDAY" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "WORKDAY", 2, 3 );
 //    this.setFormat( this.formatType.noneFormat );
 
     this.name = "WORKDAY";
@@ -1793,9 +1755,7 @@ function cWORKDAY_INTL() {
 cWORKDAY_INTL.prototype = Object.create( cBaseFunction.prototype )
 
 function cYEAR() {
-//    cBaseFunction.call( this, "YEAR" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
+//    cBaseFunction.call( this, "YEAR", 1, 1 );
 //    this.setFormat( this.formatType.noneFormat );
 
     this.name = "YEAR";
@@ -1866,9 +1826,7 @@ cYEAR.prototype.getInfo = function () {
 }
 
 function cYEARFRAC() {
-//    cBaseFunction.call( this, "YEARFRAC" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "YEARFRAC", 2, 3 );
 //    this.setFormat( this.formatType.noneFormat );
 
     this.name = "YEARFRAC";
