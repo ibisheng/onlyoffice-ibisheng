@@ -832,29 +832,3 @@ function CCollaborativeEditing()
 }
 
 var CollaborativeEditing = new CCollaborativeEditing();
-
-var changestype_None                 =  0; // Ничего не происходит с выделенным элементом (проверка идет через дополнительный параметр)
-var changestype_Paragraph_Content    =  1; // Добавление/удаление элементов в параграф
-var changestype_Paragraph_Properties =  2; // Изменение свойств параграфа
-var changestype_Document_Content     = 10; // Добавление/удаление элементов в Document или в DocumentContent
-var changestype_Document_Content_Add = 11; // Добавление элемента в класс Document или в класс DocumentContent
-var changestype_Document_SectPr      = 12; // Изменения свойств данной секции (размер страницы, поля и ориентация)
-var changestype_Table_Properties     = 20; // Любые изменения в таблице
-var changestype_Table_RemoveCells    = 21; // Удаление ячеек (строк или столбцов)
-var changestype_Image_Properties     = 23; // Изменения настроек картинки
-var changestype_HdrFtr               = 30; // Изменения в колонтитуле (любые изменения)
-var changestype_Remove               = 40; // Удаление, через кнопку backspace (Удаление назад)
-var changestype_Delete               = 41; // Удаление, через кнопку delete (Удаление вперед)
-var changestype_Drawing_Props        = 51; // Изменение свойств фигуры
-var changestype_ColorScheme          = 60; // Изменение свойств фигуры
-
-var changestype_2_InlineObjectMove       = 1; // Передвигаем объект в заданную позцию (проверяем место, в которое пытаемся передвинуть)
-var changestype_2_HdrFtr                 = 2; // Изменения с колонтитулом
-var changestype_2_Comment                = 3; // Работает с комментариями
-var changestype_2_Element_and_Type       = 4; // Проверяем возможно ли сделать изменение заданного типа с заданным элементом(а не с текущим)
-var changestype_2_ElementsArray_and_Type = 5; // Аналогично предыдущему, только идет массив элементов
-
-
-
-var contentchanges_Add    = 1;
-var contentchanges_Remove = 2;
