@@ -299,6 +299,14 @@ var c_oTargetType = {
 	FrozenAnchorH	: 14,
 	FrozenAnchorV	: 15
 };
+
+var c_oAscAutoFilterTypes = {
+	ColorFilter: 0,
+	CustomFilters: 1,
+	DynamicFilter: 2,
+	Top10: 3,
+	Filters: 4
+};
  
 var c_oAscCoAuthoringMeBorderColor					= new window.CColor(22, 156, 0);
 var c_oAscCoAuthoringOtherBorderColor				= new window.CColor(238, 53, 37);

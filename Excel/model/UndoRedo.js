@@ -358,6 +358,7 @@ var UndoRedoDataTypes = new function() {
 	this.ClrScheme = 28;
 	this.AutoFilter = 29;
 	this.AutoFiltersOptions = 30;
+	this.AutoFilterObj = 31;
 
 	this.AutoFiltersOptionsElements = 32;
 	this.SingleProperty = 33;
@@ -431,6 +432,7 @@ var UndoRedoDataTypes = new function() {
 			case this.ClrScheme: return new UndoRedoData_ClrScheme();break;
 			case this.AutoFilter: return new UndoRedoData_AutoFilter(); break;
 			case this.AutoFiltersOptions: return new Asc.AutoFiltersOptions(); break;
+			case this.AutoFilterObj: return new Asc.AutoFilterObj(); break;
 			case this.AutoFiltersOptionsElements: return new Asc.AutoFiltersOptionsElements(); break;
 			case this.AddFormatTableOptions: return new Asc.AddFormatTableOptions(); break;
 			case this.SingleProperty: return new UndoRedoData_SingleProperty(); break;
@@ -2991,7 +2993,7 @@ UndoRedoCell.prototype = {
 			cell.setValueData(Val);
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
 			var worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-			worksheetView.autoFilters._renameTableColumn(new Asc.Range(nCol, nRow, nCol, nRow), bUndo);
+			worksheetView.autoFilters.renameTableColumn(new Asc.Range(nCol, nRow, nCol, nRow), bUndo);
 		}
 		else if(historyitem_Cell_SetStyle == Type)
 		{

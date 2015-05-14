@@ -214,7 +214,7 @@
 		prot["asc_getComments"]			= prot.asc_getComments;
 		prot["asc_getLocked"]			= prot.asc_getLocked;
 		prot["asc_getIsFormatTable"]	= prot.asc_getIsFormatTable;
-		prot["asc_tableStyleName"]	    = prot.asc_tableStyleName;
+		prot["asc_getTableStyleName"]	= prot.asc_getTableStyleName;
 		prot["asc_getStyleName"]		= prot.asc_getStyleName;
 		prot["asc_getNumFormatType"]	= prot.asc_getNumFormatType;
 		prot["asc_getAngle"]			= prot.asc_getAngle;

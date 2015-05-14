@@ -4339,7 +4339,8 @@ TablePart.prototype.clone = function(ws) {
 			res.result.push(this.result[i].clone());
 	}
 	
-	res.recalc(ws);
+	if(ws !== null)
+		res.recalc(ws);
 	return res;
 };
 TablePart.prototype.recalc = function(ws) {
@@ -4483,12 +4484,14 @@ FilterColumn.prototype.clone = function() {
 	res.ShowButton = this.ShowButton;
 	return res;
 };
-FilterColumn.prototype.isHideValue = function(val, isDateTimeFormat) {
+FilterColumn.prototype.isHideValue = function(val, isDateTimeFormat, top10Length) {
 	var res = false;
 	if(this.Filters)
 		res = this.Filters.isHideValue(val, isDateTimeFormat);
 	else if(this.CustomFiltersObj)
 		res = this.CustomFiltersObj.isHideValue(val);
+	else if(this.Top10)
+		res = this.Top10.isHideValue(val, top10Length);
 	return res;
 };
 FilterColumn.prototype.clean = function(val) {
@@ -4512,7 +4515,7 @@ FilterColumn.prototype.createFilter = function(obj) {
 		newFilter = new CustomFilters();
 		this.CustomFiltersObj = newFilter
 	}
-	allFilterOpenElements = newFilter.create(obj);
+	allFilterOpenElements = newFilter.init(obj);
 		
 	return allFilterOpenElements;
 };
@@ -4533,7 +4536,7 @@ Filters.prototype.clone = function() {
 	res.Blank = this.Blank;
 	return res;
 };
-Filters.prototype.create = function(obj) {
+Filters.prototype.init = function(obj) {
 	var allFilterOpenElements = true;
 	for(var i = 0; i < obj.result.length; i++)
 	{
@@ -4612,6 +4615,7 @@ DateGroupItem.prototype.clone = function() {
 	res.Year = this.Year;
 	return res;
 };
+
 /** @constructor */
 function CustomFilters() {
 	this.And = null;
@@ -4627,7 +4631,7 @@ CustomFilters.prototype.clone = function() {
 	}
 	return res;
 };
-CustomFilters.prototype.create = function(obj) {
+CustomFilters.prototype.init = function(obj) {
 	this.And = !obj.isChecked;
 	this.CustomFilters = [];
 	
@@ -4639,11 +4643,19 @@ CustomFilters.prototype.create = function(obj) {
 CustomFilters.prototype.isHideValue = function(val){
 	
 	var res = false;
-	var filterRes1 = this.CustomFilters[0] ? this.CustomFilters[0].isHideValue(val) : true;
-	var filterRes2 = this.CustomFilters[1] ? this.CustomFilters[1].isHideValue(val) : true;
+	var filterRes1 = this.CustomFilters[0] ? this.CustomFilters[0].isHideValue(val) : null;
+	var filterRes2 = this.CustomFilters[1] ? this.CustomFilters[1].isHideValue(val) : null;
 	
-	return this.And ? (filterRes1 && filterRes2) : (filterRes1 || filterRes2);
+	if(this.And && ((filterRes1 === null && filterRes2 === true || filterRes1 === true && filterRes2 === null || filterRes1 === true && filterRes2 === true)))
+		res = true;
+	if(!this.And && ((filterRes1 === true || filterRes2 === true)))
+		res = true;
+	
+	return res;
 };
+CustomFilters.prototype.asc_getAnd = function () { return this.And; }
+CustomFilters.prototype.asc_setAnd = function (val) { this.And = val; }
+
 /** @constructor */
 function CustomFilter(operator, val) {
 	this.Operator = operator != undefined ? operator : null;
@@ -4655,7 +4667,7 @@ CustomFilter.prototype.clone = function() {
 	res.Val = this.Val;
 	return res;
 };
-CustomFilter.prototype.create = function(operator, val) {
+CustomFilter.prototype.init = function(operator, val) {
 	this.Operator = operator;
 	this.Val = val;
 };
@@ -4664,7 +4676,7 @@ CustomFilter.prototype.isHideValue = function(val) {
 	var result = false;
 
 	var checkComplexSymbols = null;
-	var filterVal;
+	var filterVal, position;
 	if(checkComplexSymbols != null)
 		result = checkComplexSymbols;
 	else
@@ -4772,6 +4784,13 @@ CustomFilter.prototype.isHideValue = function(val) {
 
 	return !result;
 };
+
+CustomFilter.prototype.asc_getOperator = function () { return this.Operator; };
+CustomFilter.prototype.asc_getVal = function () { return this.Val; };
+
+CustomFilter.prototype.asc_setOperator = function (val) { this.Operator = val; };
+CustomFilter.prototype.asc_setVal = function (val) { this.Val = val; };
+
 /** @constructor */
 function DynamicFilter() {
 	this.Type = null;
@@ -4785,6 +4804,15 @@ DynamicFilter.prototype.clone = function() {
 	res.MaxVal = this.MaxVal;
 	return res;
 };
+
+DynamicFilter.prototype.asc_getType = function () { return this.Type; };
+DynamicFilter.prototype.asc_getVal = function () { return this.Val; };
+DynamicFilter.prototype.asc_getMaxVal = function () { return this.MaxVal; };
+
+DynamicFilter.prototype.asc_setType = function (val) { this.Type = val; };
+DynamicFilter.prototype.asc_setVal = function (val) { this.Val = val; };
+DynamicFilter.prototype.asc_setMaxVal = function (val) { this.MaxVal = val; };
+
 /** @constructor */
 function ColorFilter() {
 	this.CellColor = null;
@@ -4798,6 +4826,13 @@ ColorFilter.prototype.clone = function() {
 	}
 	return res;
 };
+
+ColorFilter.prototype.asc_getCellColor = function () { return this.CellColor; };
+ColorFilter.prototype.asc_getDxf = function () { return this.dxf; };
+
+ColorFilter.prototype.asc_setCellColor = function (val) { this.CellColor = val; };
+ColorFilter.prototype.asc_setDxf = function (val) { this.dxf = val; };
+
 /** @constructor */
 function Top10() {
 	this.FilterVal = null;
@@ -4813,6 +4848,20 @@ Top10.prototype.clone = function() {
 	res.Val = this.Val;
 	return res;
 };
+Top10.prototype.isHideValue = function(val, top10Length) {
+	return;
+};
+
+Top10.prototype.asc_getFilterVal = function () { return this.FilterVal; };
+Top10.prototype.asc_getPercent = function () { return this.Percent; };
+Top10.prototype.asc_getTop = function () { return this.Top; };
+Top10.prototype.asc_getVal = function () { return this.Val; };
+
+Top10.prototype.asc_setFilterVal = function (val) { this.FilterVal = val; };
+Top10.prototype.asc_setPercent = function (val) { this.Percent = val; };
+Top10.prototype.asc_setTop = function (val) { this.Top = val; };
+Top10.prototype.asc_setVal = function (val) { this.Val = val; };
+
 /** @constructor */
 function SortCondition() {
 	this.Ref = null;
@@ -4843,3 +4892,49 @@ dateElem.prototype.clone = function() {
 	
 	return res;
 };
+
+window["Asc"]["CustomFilters"]			= window["Asc"].CustomFilters = CustomFilters;
+prot									= CustomFilters.prototype;
+prot["asc_getAnd"]						= prot.asc_getAnd;
+prot["asc_setAnd"]						= prot.asc_setAnd;
+
+window["Asc"]["CustomFilter"]			= window["Asc"].CustomFilter = CustomFilter;
+prot									= CustomFilter.prototype;
+prot["asc_getOperator"]					= prot.asc_getOperator;
+prot["asc_getVal"]						= prot.asc_getVal;
+prot["asc_setOperator"]					= prot.asc_setOperator;
+prot["asc_setVal"]						= prot.asc_setVal;
+
+window["Asc"]["CustomFilter"]			= window["Asc"].CustomFilter = CustomFilter;
+prot									= CustomFilter.prototype;
+prot["asc_getOperator"]					= prot.asc_getOperator;
+prot["asc_getVal"]						= prot.asc_getVal;
+prot["asc_setOperator"]					= prot.asc_setOperator;
+prot["asc_setVal"]						= prot.asc_setVal;
+
+window["Asc"]["DynamicFilter"]			= window["Asc"].DynamicFilter = DynamicFilter;
+prot									= DynamicFilter.prototype;
+prot["asc_getType"]						= prot.asc_getType;
+prot["asc_getVal"]						= prot.asc_getVal;
+prot["asc_getMaxVal"]					= prot.asc_getMaxVal;
+prot["asc_setType"]						= prot.asc_setType;
+prot["asc_setVal"]						= prot.asc_setVal;
+prot["asc_setMaxVal"]					= prot.asc_setMaxVal;
+
+window["Asc"]["ColorFilter"]			= window["Asc"].ColorFilter = ColorFilter;
+prot									= ColorFilter.prototype;
+prot["asc_getCellColor"]				= prot.asc_getType;
+prot["asc_getDxf"]						= prot.asc_getVal;
+prot["asc_setCellColor"]				= prot.asc_setType;
+prot["asc_setDxf"]						= prot.asc_setVal;
+
+window["Asc"]["Top10"]					= window["Asc"].Top10 = Top10;
+prot									= Top10.prototype;
+prot["asc_getFilterVal"]				= prot.asc_getFilterVal;
+prot["asc_getPercent"]					= prot.asc_getPercent;
+prot["asc_getTop"]						= prot.asc_getTop;
+prot["asc_getVal"]						= prot.asc_getVal;
+prot["asc_setFilterVal"]				= prot.asc_setFilterVal;
+prot["asc_setPercent"]					= prot.asc_setPercent;
+prot["asc_setTop"]						= prot.asc_setTop;
+prot["asc_setVal"]						= prot.asc_setVal;

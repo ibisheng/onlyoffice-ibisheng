@@ -7597,7 +7597,7 @@
 						// Автозаполняем ячейки
 					    if (range.promote(/*bCtrl*/ctrlPress, /*bVertical*/(1 === t.fillHandleDirection), nIndex)) {
 					        // Вызываем функцию пересчета для заголовков форматированной таблицы
-					        t.autoFilters._renameTableColumn(arn);
+					        t.autoFilters.renameTableColumn(arn);
 					    } else {
 							t.handlers.trigger("onErrorEvent", c_oAscError.ID.CannotFillRange, c_oAscError.Level.NoCritical);
 							t.activeRange.assign2(range.bbox);
@@ -7941,8 +7941,8 @@
 
 				t.autoFilters._moveAutoFilters(arnTo, arnFrom, null, copyRange);
 				// Вызываем функцию пересчета для заголовков форматированной таблицы
-				t.autoFilters._renameTableColumn(arnFrom);
-				t.autoFilters._renameTableColumn(arnTo);
+				t.autoFilters.renameTableColumn(arnFrom);
+				t.autoFilters.renameTableColumn(arnTo);
 				t.autoFilters.reDrawFilter(arnFrom);
 
 				History.EndTransaction();
@@ -8117,7 +8117,7 @@
 							range.cleanHyperlinks();
 
 						// Вызываем функцию пересчета для заголовков форматированной таблицы
-						t.autoFilters._renameTableColumn(arn);
+						t.autoFilters.renameTableColumn(arn);
 
 						/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
 						buildRecalc(t.model.workbook);
@@ -8169,7 +8169,7 @@
 							if (null !== val.asc_getText()) {
 								t.model.getRange3(r, c, r, c).setValue(val.asc_getText());
 								// Вызываем функцию пересчета для заголовков форматированной таблицы
-								t.autoFilters._renameTableColumn(arn);
+								t.autoFilters.renameTableColumn(arn);
 							}
 							break;
 						} else {
@@ -8220,7 +8220,7 @@
 			else
 				selectData = t._setInfoAfterPaste(val,onlyActive);
 			
-			t.autoFilters._renameTableColumn(t.activeRange);
+			t.autoFilters.renameTableColumn(t.activeRange);
 			
 			if (!selectData) {
 				bIsUpdate = false;
@@ -10380,7 +10380,7 @@
 			} else {
 				c.setValue2(val);
 				// Вызываем функцию пересчета для заголовков форматированной таблицы
-				t.autoFilters._renameTableColumn(oCellEdit);
+				t.autoFilters.renameTableColumn(oCellEdit);
 			}
 
 			if (!isFormula) {
