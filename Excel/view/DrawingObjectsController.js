@@ -5,111 +5,27 @@ if(window.editor === "undefined" && window["Asc"]["editor"])
     window.editor = window["Asc"]["editor"];
 }
 
-
-function CContentChangesElement(Type, Pos, Count, Data)
+// ToDo убрать это отсюда!!!
+CContentChangesElement.prototype.Refresh_BinaryData = function()
 {
-    this.m_nType  = Type;  // Тип изменений (удаление или добавление)
-    this.m_nCount = Count; // Количество добавленных/удаленных элементов
-    this.m_pData  = Data;  // Связанные с данным изменением данные из истории
+	this.m_pData.Pos = this.m_aPositions[0];
 
-    this.Refresh_BinaryData = function()
-    {
-        this.m_pData.Pos = this.m_aPositions[0];
+	if(editor && editor.isPresentationEditor)
+	{
+		var Binary_Writer = History.BinaryWriter;
+		var Binary_Pos = Binary_Writer.GetCurPosition();
 
-        if(editor && editor.isPresentationEditor)
-        {
-            var Binary_Writer = History.BinaryWriter;
-            var Binary_Pos = Binary_Writer.GetCurPosition();
+		this.m_pData.Data.UseArray = true;
+		this.m_pData.Data.PosArray = this.m_aPositions;
+		Binary_Writer.WriteString2(this.m_pData.Class.Get_Id());
+		this.m_pData.Class.Save_Changes( this.m_pData.Data, Binary_Writer );
 
-            this.m_pData.Data.UseArray = true;
-            this.m_pData.Data.PosArray = this.m_aPositions;
-            Binary_Writer.WriteString2(this.m_pData.Class.Get_Id());
-            this.m_pData.Class.Save_Changes( this.m_pData.Data, Binary_Writer );
+		var Binary_Len = Binary_Writer.GetCurPosition() - Binary_Pos;
 
-            var Binary_Len = Binary_Writer.GetCurPosition() - Binary_Pos;
-
-            this.m_pData.Binary.Pos = Binary_Pos;
-            this.m_pData.Binary.Len = Binary_Len;
-        }
-    };
-
-    this.Check_Changes = function(Type, Pos)
-    {
-        var CurPos = Pos;
-        if ( contentchanges_Add === Type )
-        {
-            for ( var Index = 0; Index < this.m_nCount; Index++ )
-            {
-                if ( false !== this.m_aPositions[Index] )
-                {
-                    if ( CurPos <= this.m_aPositions[Index] )
-                        this.m_aPositions[Index]++;
-                    else
-                    {
-                        if ( contentchanges_Add === this.m_nType )
-                            CurPos++;
-                        else //if ( contentchanges_Remove === this.m_nType )
-                            CurPos--;
-                    }
-                }
-            }
-        }
-        else //if ( contentchanges_Remove === Type )
-        {
-            for ( var Index = 0; Index < this.m_nCount; Index++ )
-            {
-                if ( false !== this.m_aPositions[Index] )
-                {
-                    if ( CurPos < this.m_aPositions[Index] )
-                        this.m_aPositions[Index]--;
-                    else if ( CurPos > this.m_aPositions[Index] )
-                    {
-                        if ( contentchanges_Add === this.m_nType )
-                            CurPos++;
-                        else //if ( contentchanges_Remove === this.m_nType )
-                            CurPos--;
-                    }
-                    else //if ( CurPos === this.m_aPositions[Index] )
-                    {
-                        if ( contentchanges_Remove === this.m_nType )
-                        {
-                            // Отмечаем, что действия совпали
-                            this.m_aPositions[Index] = false;
-                            return false;
-                        }
-                        else
-                        {
-                            CurPos++;
-                        }
-                    }
-                }
-            }
-        }
-
-        return CurPos;
-    };
-
-    this.Make_ArrayOfSimpleActions = function(Type, Pos, Count)
-    {
-        // Разбиваем действие на простейшие
-        var Positions = [];
-        if ( contentchanges_Add === Type )
-        {
-            for ( var Index = 0; Index < Count; Index++ )
-                Positions[Index] = Pos + Index;
-        }
-        else //if ( contentchanges_Remove === Type )
-        {
-            for ( var Index = 0; Index < Count; Index++ )
-                Positions[Index] = Pos;
-        }
-
-        return Positions;
-    };
-
-    // Разбиваем сложное действие на простейшие
-    this.m_aPositions = this.Make_ArrayOfSimpleActions( Type, Pos, Count );
-}
+		this.m_pData.Binary.Pos = Binary_Pos;
+		this.m_pData.Binary.Len = Binary_Len;
+	}
+};
 
 function CheckIdSatetShapeAdd(state)
 {
