@@ -3195,6 +3195,7 @@ function CreateAscShapePropFromProp(shapeProp)
     obj.bFromChart = shapeProp.bFromChart;
     obj.w = shapeProp.w;
     obj.h = shapeProp.h;
+    obj.vert = shapeProp.vert;
     return obj;
 }
 
