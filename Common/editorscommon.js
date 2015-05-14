@@ -56,6 +56,7 @@ function g_fOpenFileCommand (data, Signature, callback) {
 	};
 	var openData = JSON.parse(data);
 	var sFileUrl = g_sResourceServiceLocalUrl + openData['urlfile'];
+	sFileUrl = sFileUrl.replace( /\\/g, "/" );
 	asc_ajax({
 		url: sFileUrl,
 		dataType: "text",
