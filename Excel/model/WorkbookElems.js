@@ -4541,7 +4541,7 @@ Filters.prototype.init = function(obj) {
 	for(var i = 0; i < obj.result.length; i++)
 	{
 		if(obj.result[i].visible)
-			this.Values[obj.result[i].val] = true;
+			this.Values[obj.result[i].text] = true;
 		else
 			allFilterOpenElements = false;
 	}
@@ -4653,8 +4653,12 @@ CustomFilters.prototype.isHideValue = function(val){
 	
 	return res;
 };
-CustomFilters.prototype.asc_getAnd = function () { return this.And; }
-CustomFilters.prototype.asc_setAnd = function (val) { this.And = val; }
+CustomFilters.prototype.asc_getAnd = function () { return this.And; };
+CustomFilters.prototype.asc_getCustomFilters = function () { return this.CustomFilters; };
+
+CustomFilters.prototype.asc_setAnd = function (val) { this.And = val; };
+CustomFilters.prototype.asc_setCustomFilters = function (val) { this.CustomFilters = val; };
+
 
 /** @constructor */
 function CustomFilter(operator, val) {
@@ -4896,6 +4900,7 @@ dateElem.prototype.clone = function() {
 window["Asc"]["CustomFilters"]			= window["Asc"].CustomFilters = CustomFilters;
 prot									= CustomFilters.prototype;
 prot["asc_getAnd"]						= prot.asc_getAnd;
+prot["asc_getCustomFilters"]			= prot.asc_getCustomFilters;
 prot["asc_setAnd"]						= prot.asc_setAnd;
 
 window["Asc"]["CustomFilter"]			= window["Asc"].CustomFilter = CustomFilter;

@@ -791,6 +791,7 @@ var maxIndividualValues = 10000;
 			{
 				var aWs = this._getCurrentWS();
 				var containRangeId = -1, tableRange;
+				var tableParts = aWs.TableParts;
 				if(tableParts)
 				{
 					for(var i = 0; i < tableParts.length; ++i)
@@ -804,8 +805,6 @@ var maxIndividualValues = 10000;
 						}
 					}
 				}
-
-				var tableParts = aWs.TableParts;
 
 				//если выделена часть форматир. таблицы, то отправляем -2
 				//если форматировання таблица содержит данный диапазон, то id
@@ -4786,6 +4785,8 @@ var maxIndividualValues = 10000;
 
 		prot["asc_setSortState"]				= prot.asc_setSortState;
 		prot["asc_getSortState"]				= prot.asc_getSortState;
+		prot["asc_getValues"]					= prot.asc_getValues;
+		prot["asc_getFilter"]					= prot.asc_getFilter;
 		
 		window["Asc"]["AutoFilterObj"]		    = window["Asc"].AutoFilterObj = AutoFilterObj;
 		prot									= AutoFilterObj.prototype;
