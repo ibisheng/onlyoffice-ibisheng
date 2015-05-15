@@ -3361,14 +3361,19 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		// Выставление локали
 		spreadsheet_api.prototype.asc_setLocalization = function (oLocalizedData) {
-			cFormulaFunctionLocalized = {};
-			cFormulaFunctionToLocale = {};
-			var localName;
-			for (var i in cFormulaFunction) {
-				localName = oLocalizedData[i]['n'];
-				localName = localName ? localName : i;
-				cFormulaFunctionLocalized[localName] = cFormulaFunction[i];
-				cFormulaFunctionToLocale[i] = localName;
+			if (null == oLocalizedData) {
+				cFormulaFunctionLocalized = null;
+				cFormulaFunctionToLocale = null;
+			} else {
+				cFormulaFunctionLocalized = {};
+				cFormulaFunctionToLocale = {};
+				var localName;
+				for (var i in cFormulaFunction) {
+					localName = oLocalizedData[i]['n'];
+					localName = localName ? localName : i;
+					cFormulaFunctionLocalized[localName] = cFormulaFunction[i];
+					cFormulaFunctionToLocale[i] = localName;
+				}
 			}
 			if (this.wb)
 				this.wb.initFormulasList();

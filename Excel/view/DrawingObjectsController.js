@@ -437,8 +437,3 @@ DrawingObjectsController.prototype.onKeyPress = function(e)
     //    this.updateSelectionState();
     return bRetValue;
 };
-
-function CheckRightButtonEvent(e)
-{
-    return e.button === 2;
-}
