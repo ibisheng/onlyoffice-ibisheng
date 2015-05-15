@@ -6751,6 +6751,9 @@ function CTextPr()
 
     this.Shd        = undefined;
     this.Vanish     = undefined;
+
+    this.TextOutline = undefined;
+    this.TextFill    = undefined;
 }
 
 CTextPr.prototype =
@@ -6784,6 +6787,8 @@ CTextPr.prototype =
         this.FontRef    = undefined;
         this.Shd        = undefined;
         this.Vanish     = undefined;
+        this.TextOutline = undefined;
+        this.TextFill    = undefined;
     },
 
     Copy : function(bCopyPrChange)
@@ -6843,7 +6848,14 @@ CTextPr.prototype =
             if (undefined !== this.PrChange)
                 TextPr.PrChange = this.PrChange.Copy();
         }
-
+        if(undefined != this.TextOutline)
+        {
+            TextPr.TextOutline = this.TextOutline.createDuplicate();
+        }
+        if(undefined != this.TextFill)
+        {
+            TextPr.TextFill = this.TextFill.createDuplicate();
+        }
         return TextPr;
     },
 
@@ -6940,6 +6952,23 @@ CTextPr.prototype =
         
         if ( undefined !== TextPr.Vanish )
             this.Vanish = TextPr.Vanish;
+
+        if(undefined != TextPr.TextOutline)
+        {
+            this.TextOutline = TextPr.TextOutline.createDuplicate();
+        }
+        else
+        {
+            this.TextOutline = undefined;
+        }
+        if(undefined != TextPr.TextFill)
+        {
+            this.TextFill = TextPr.TextFill.createDuplicate();
+        }
+        else
+        {
+            this.TextFill = undefined;
+        }
     },
 
     Init_Default : function()
@@ -6974,6 +7003,9 @@ CTextPr.prototype =
         this.FontRef    = undefined;
         this.Shd        = undefined;     
         this.Vanish     = false;
+
+        this.TextOutline = undefined;
+        this.TextFill    = undefined;
     },
 
     Set_FromObject : function(TextPr)
@@ -7045,7 +7077,18 @@ CTextPr.prototype =
         else
             this.Shd = undefined;
         
-        this.Vanish       = TextPr.Vanish;
+        this.Vanish   = TextPr.Vanish;
+
+
+        if(undefined != TextPr.TextFill)
+        {
+            this.TextFill = TextPr.TextFill;
+        }
+
+        if(undefined != TextPr.TextOutline)
+        {
+            this.TextOutline = TextPr.TextOutline;
+        }
     },
 
     Check_PresentationPr: function()
@@ -7180,6 +7223,19 @@ CTextPr.prototype =
         // Vanish
         if ( undefined !== this.Vanish && this.Vanish !== TextPr.Vanish )
             this.Vanish = undefined;
+
+        if(undefined !== this.Unifill && !this.Unifill.IsIdentical(TextPr.Unifill))
+            this.Unifill = undefined;
+
+
+        if(undefined !== this.TextFill &&  !this.TextFill.IsIdentical(TextPr.TextFill))
+            this.TextFill = undefined;
+
+
+        if(undefined !== this.TextOutline &&  !this.TextOutline.IsIdentical(TextPr.TextOutline))
+            this.TextOutline = undefined;
+
+
 
         return this;
     },
@@ -7360,6 +7416,16 @@ CTextPr.prototype =
             this.PrChange.Write_ToBinary(Writer);
             Flags |= 67108864;
         }
+        if(undefined !== this.TextOutline)
+        {
+            this.TextOutline.Write_ToBinary(Writer);
+            Flags |= 134217728;
+        }
+        if(undefined !== this.TextFill)
+        {
+            this.TextFill.Write_ToBinary(Writer);
+            Flags |= 268435456;
+        }
 
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
@@ -7499,6 +7565,18 @@ CTextPr.prototype =
         {
             this.PrChange = new CTextPr();
             this.PrChange.Read_FromBinary(Reader);
+        }
+
+        if(Flags & 134217728)
+        {
+            this.TextOutline = new CLn();
+            this.TextOutline.Read_FromBinary(Reader);
+        }
+
+        if(Flags & 268435456)
+        {
+            this.TextFill = new CUniFill();
+            this.TextFill.Read_FromBinary(Reader);
         }
     },
 
@@ -7759,6 +7837,13 @@ CTextPr.prototype =
             return false;
 
         if ((undefined === this.Unifill && undefined !== TextPr.Unifill) || (undefined !== this.Unifill && (undefined === TextPr.Unifill || true !== this.Unifill.IsIdentical(TextPr.Unifill))))
+            return false;
+
+
+        if ((undefined === this.TextOutline && undefined !== TextPr.TextOutline) || (undefined !== this.TextOutline && (undefined === TextPr.TextOutline || true !== this.TextOutline.IsIdentical(TextPr.TextOutline))))
+            return false;
+
+        if ((undefined === this.TextFill && undefined !== TextPr.TextFill) || (undefined !== this.TextFill && (undefined === TextPr.TextFill || true !== this.TextFill.IsIdentical(TextPr.TextFill))))
             return false;
 
         if (this.Vanish !== TextPr.Vanish)

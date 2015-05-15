@@ -8903,7 +8903,7 @@ ClrScheme.prototype =
         }
         for(var _clr_index = g_clr_MIN; _clr_index <= g_clr_MAX; ++_clr_index)
         {
-            if(this.colors[i] != clrScheme.colors[i])
+            if(this.colors[_clr_index] != clrScheme.colors[_clr_index])
             {
                 return false;
             }
