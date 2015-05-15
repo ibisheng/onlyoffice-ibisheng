@@ -3937,9 +3937,8 @@ var maxIndividualValues = 10000;
 					}
 				}
 
-				return this._sortArrayMinMax(values);
-				
 				console.timeEnd("new");
+				return this._sortArrayMinMax(values);
 			},
 			
 			_sortArrayMinMax: function(elements)
@@ -4741,9 +4740,12 @@ var maxIndividualValues = 10000;
 		prot["asc_getSortState"]				= prot.asc_getSortState;
 		prot["asc_getValues"]					= prot.asc_getValues;
 		prot["asc_getFilter"]					= prot.asc_getFilter;
+		prot["asc_getCellId"]					= prot.asc_getCellId;
 		
 		window["Asc"]["AutoFilterObj"]		    = window["Asc"].AutoFilterObj = AutoFilterObj;
 		prot									= AutoFilterObj.prototype;
+		prot["asc_getType"]						= prot.asc_getType;
+		prot["asc_getFilter"]					= prot.asc_getFilter;
 		
 		window["Asc"]["AutoFiltersOptionsElements"]	= window["Asc"].AutoFiltersOptionsElements = AutoFiltersOptionsElements;
 		prot									= AutoFiltersOptionsElements.prototype;
