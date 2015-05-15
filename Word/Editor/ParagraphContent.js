@@ -157,7 +157,9 @@ ParaText.prototype =
         var ResultCharCode = (this.Flags & PARATEXT_FLAGS_CAPITALS ? (String.fromCharCode(CharCode).toUpperCase()).charCodeAt(0) : CharCode);
 
         if ( true === this.Is_NBSP() && editor && editor.ShowParaMarks )
+        {
             Context.FillText(X, Y, String.fromCharCode(0x00B0));
+        }
         else
             Context.FillTextCode(X, Y, ResultCharCode);
     },
@@ -1421,6 +1423,7 @@ ParaTextPr.prototype =
 
         switch ( Type )
         {
+
             case historyitem_TextPr_Change:
             {
                 if ( undefined != Data.New )
@@ -2694,7 +2697,7 @@ ParaNewLine.prototype =
         {
             // Цвет и шрифт можно не запоминать и не выставлять старый, т.к. на данном элемента всегда заканчивается
             // отрезок обтекания или целая строка. 
-            
+
             switch( this.BreakType )
             {
                 case break_Line:
@@ -2722,6 +2725,7 @@ ParaNewLine.prototype =
                     break;
                 }
             }
+
         }
     },
 
@@ -3026,6 +3030,7 @@ ParaTab.prototype =
                 Context.FillText2( X + X0, Y, String.fromCharCode( tab_Symbol ), 0, this.Width );
             else
                 Context.FillText2( X, Y, String.fromCharCode( tab_Symbol ), this.RealWidth - this.Width, this.Width );
+
         }
     },
 
@@ -3854,6 +3859,14 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
         H : H
     };
 
+    this.EffectExtent =
+    {
+        L: 0,
+        T: 0,
+        R: 0,
+        B: 0
+    };
+
     this.AllowOverlap = true;
 
     //привязка к параграфу
@@ -4290,18 +4303,26 @@ ParaDrawing.prototype =
             this.GraphicObj.recalculate();
             this.wrappingPolygon.setArrRelPoints(this.wrappingPolygon.calculate(this.GraphicObj));
         }
-
     },
 
     Draw : function( X, Y, pGraphics, pageIndex, align)
     {
+        if(pGraphics.Start_Command)
+        {
+            pGraphics.Start_Command(DRAW_COMMAND_DRAWING);
+        }
         if ( drawing_Inline === this.DrawingType )
         {
             pGraphics.shapePageIndex = pageIndex;
             this.draw(pGraphics, pageIndex);
             pGraphics.shapePageIndex = null;
         }
+        if(pGraphics.End_Command)
+        {
+            pGraphics.End_Command();
+        }
     },
+
     Measure : function()
     {
         if(!this.GraphicObj)
@@ -4645,7 +4666,6 @@ ParaDrawing.prototype =
         this.updatePosition3( this.PageNum, this.X, this.Y );
     },
 
-
     Set_DrawingType : function(DrawingType)
     {
         History.Add( this, { Type : historyitem_Drawing_DrawingType, New : DrawingType, Old : this.DrawingType } );
@@ -4815,57 +4835,6 @@ ParaDrawing.prototype =
         this.Add_ToDocument( NearPos, true, RunPr );
     },
 
-    OnEnd_ResizeInline : function(W, H)
-    {
-        var LogicDocument = editor.WordControl.m_oLogicDocument;
-        this.setExtent( W, H );
-        LogicDocument.Recalculate();
-    },
-
-    OnEnd_ChangeFlow : function(X, Y, PageNum, W, H, NearPos, bMove, bLast)
-    {
-        this.setExtent( W, H );
-
-        if ( true === bMove && null !== NearPos )
-        {
-            var Layout = NearPos.Paragraph.Get_Layout( NearPos.ContentPos, this );
-
-            var _W = this.Extent.W;
-            var _H = this.Extent.H;
-
-            this.Internal_Position.Set( _W, _H, this.YOffset, Layout.ParagraphLayout, Layout.PageLimits);
-            this.Internal_Position.Calculate_X(false, c_oAscRelativeFromH.Page, false, X - Layout.PageLimits.X);
-            this.Internal_Position.Calculate_Y(false, c_oAscRelativeFromV.Page, false, Y - Layout.PageLimits.X);
-            this.Internal_Position.Correct_Values(false, Layout.PageLimits, this.AllowOverlap, this.Use_TextWrap(), []);
-
-            this.PageNum = PageNum;
-            this.X       = this.Internal_Position.CalcX;
-            this.Y       = this.Internal_Position.CalcY;
-
-            // Рассчитаем сдвиг с учетом старой привязки
-            var ValueX = this.Internal_Position.Calculate_X_Value(this.PositionH.RelativeFrom);
-            this.Set_PositionH( this.PositionH.RelativeFrom, false, ValueX );
-
-            // На всякий случай пересчитаем заново координату
-            this.X = this.Internal_Position.Calculate_X(false, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
-
-            // Рассчитаем сдвиг с учетом старой привязки
-            var ValueY = this.Internal_Position.Calculate_Y_Value(this.PositionV.RelativeFrom);
-            this.Set_PositionV( this.PositionV.RelativeFrom, false, ValueY );
-
-            // На всякий случай пересчитаем заново координату
-            this.Y = this.Internal_Position.Calculate_Y(false, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
-
-            NearPos.Paragraph.Check_NearestPos( NearPos );
-
-            this.Remove_FromDocument( false );
-            this.Add_ToDocument( NearPos, false );
-        }
-
-        if ( true === bLast )
-            editor.WordControl.m_oLogicDocument.Recalculate();
-    },
-
     GoTo_Text : function(bBefore, bUpdateStates)
     {                
         if ( undefined != this.Parent && null != this.Parent )
@@ -4892,8 +4861,6 @@ ParaDrawing.prototype =
         return Result;
     },
 
-
-
     Get_ParentParagraph: function()
     {
         if(this.Parent instanceof Paragraph )
@@ -4902,7 +4869,6 @@ ParaDrawing.prototype =
             return this.Parent.Paragraph;
         return null;
     },
-
 
     Add_ToDocument : function(NearPos, bRecalculate, RunPr)
     {
@@ -4978,6 +4944,14 @@ ParaDrawing.prototype =
 
         switch ( Type )
         {
+            case historyitem_Drawing_SetEffectExtent:
+            {
+                this.EffectExtent.L = Data.OldEE.L;
+                this.EffectExtent.T = Data.OldEE.T;
+                this.EffectExtent.R = Data.OldEE.R;
+                this.EffectExtent.B = Data.OldEE.B;
+                break;
+            }
             case historyitem_Drawing_SetRelativeHeight:
             {
                 this.Set_RelativeHeight2(Data.OldPr);
@@ -5092,6 +5066,14 @@ ParaDrawing.prototype =
 
         switch ( Type )
         {
+            case historyitem_Drawing_SetEffectExtent:
+            {
+                this.EffectExtent.L = Data.NewEE.L;
+                this.EffectExtent.T = Data.NewEE.T;
+                this.EffectExtent.R = Data.NewEE.R;
+                this.EffectExtent.B = Data.NewEE.B;
+                break;
+            }
             case historyitem_Drawing_SetRelativeHeight:
             {
                 this.Set_RelativeHeight2(Data.NewPr);
@@ -5434,6 +5416,14 @@ ParaDrawing.prototype =
 
         switch ( Type )
         {
+            case historyitem_Drawing_SetEffectExtent:
+            {
+                writeDouble(Writer, Data.NewEE.L);
+                writeDouble(Writer, Data.NewEE.T);
+                writeDouble(Writer, Data.NewEE.R);
+                writeDouble(Writer, Data.NewEE.B);
+                break;
+            }
             case historyitem_Drawing_SetRelativeHeight:
             {
                 writeLong(Writer, Data.NewPr);
@@ -5573,6 +5563,14 @@ ParaDrawing.prototype =
 
         switch ( Type )
         {
+            case historyitem_Drawing_SetEffectExtent:
+            {
+                this.EffectExtent.L = readDouble(Reader);
+                this.EffectExtent.T = readDouble(Reader);
+                this.EffectExtent.R = readDouble(Reader);
+                this.EffectExtent.B = readDouble(Reader);
+                break;
+            }
             case historyitem_Drawing_SetRelativeHeight:
             {
                 this.Set_RelativeHeight2(readLong(Reader));
@@ -5775,14 +5773,6 @@ ParaDrawing.prototype =
     {
     },
 
-
-    getPageIndex: function()
-    {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.getPageIndex === "function")
-            return this.GraphicObj.getPageIndex();
-        return -1;
-    },
-
     draw: function(graphics, pageIndex)
     {
         if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.draw === "function")
@@ -5801,21 +5791,11 @@ ParaDrawing.prototype =
         }
     },
 
-
     getTransformMatrix: function()
     {
         if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.getTransformMatrix === "function")
         {
             return this.GraphicObj.getTransformMatrix();
-        }
-        return null;
-    },
-
-    getOwnTransform: function()
-    {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.getOwnTransform === "function")
-        {
-            return this.GraphicObj.getOwnTransform();
         }
         return null;
     },
@@ -5852,24 +5832,6 @@ ParaDrawing.prototype =
 
         return bRetShape ? null : false;
     },
-
-    getParentShape: function()
-    {
-        if(!this.Is_Inline())
-            return null;
-
-        var cur_doc_content = this.DocumentContent;
-        while(cur_doc_content.Is_TableCellContent())
-        {
-            cur_doc_content = cur_doc_content.Parent.Row.Table.Parent;
-        }
-
-        if(isRealObject(cur_doc_content.Parent) && typeof cur_doc_content.Parent.isShape === "function")
-            return cur_doc_content.Parent;
-
-        return null;
-    },
-
 
     checkShapeChildAndGetTopParagraph: function(paragraph)
     {
@@ -5919,23 +5881,6 @@ ParaDrawing.prototype =
         return parent_paragraph;
     },
 
-
-
-    getArrContentDrawingObjects: function()
-    {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.getArrContentDrawingObjects === "function")
-            return this.GraphicObj.getArrContentDrawingObjects();
-        return [];
-    },
-
-
-    getSpTree: function()
-    {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.getSpTree === "function")
-            return this.GraphicObj.getSpTree();
-        return [];
-    },
-
     hitToAdj: function(x, y)
     {
         if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.hitToAdj === "function")
@@ -5943,15 +5888,6 @@ ParaDrawing.prototype =
             return this.GraphicObj.hitToAdj(x, y);
         }
         return {hit: false, adjPolarFlag: null, adjNum: null};
-    },
-
-    hitToHandle: function(x, y)
-    {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.hitToHandle === "function")
-        {
-            return this.GraphicObj.hitToHandle(x, y);
-        }
-        return {hit: false, handleRotate: false, handleNum: null};
     },
 
     hit: function(x, y)
@@ -5972,25 +5908,6 @@ ParaDrawing.prototype =
         return false;
     },
 
-    hitToPath: function(x, y)
-    {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.hitToPath === "function")
-        {
-            return this.GraphicObj.hitToPath(x, y);
-        }
-        return false;
-    },
-
-    numberToCardDirection: function(handleNumber)
-    {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.numberToCardDirection === "function")
-        {
-            return this.GraphicObj.numberToCardDirection(handleNumber);
-        }
-        return null;
-    },
-
-
     cursorGetPos: function()
     {
         if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.cursorGetPos === "function")
@@ -5998,23 +5915,6 @@ ParaDrawing.prototype =
             return this.GraphicObj.cursorGetPos();
         }
         return {X: 0, Y: 0};
-    },
-    cardDirectionToNumber: function(cardDirection)
-    {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.cardDirectionToNumber === "function")
-        {
-            return this.GraphicObj.cardDirectionToNumber(cardDirection);
-        }
-        return null;
-    },
-
-    getAbsolutePosition: function()
-    {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.getAbsolutePosition === "function")
-        {
-            return this.GraphicObj.getAbsolutePosition();
-        }
-        return null;
     },
 
     getResizeCoefficients: function(handleNum, x, y)
@@ -6024,24 +5924,6 @@ ParaDrawing.prototype =
             return this.GraphicObj.getResizeCoefficients(handleNum, x, y);
         }
         return {kd1: 1, kd2: 1};
-    },
-
-    getAllParagraphParaPr: function()
-    {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.getAllParagraphParaPr === "function")
-        {
-            return this.GraphicObj.getAllParagraphParaPr();
-        }
-        return null;
-    },
-
-    getAllParagraphTextPr: function()
-    {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.getAllParagraphTextPr === "function")
-        {
-            return this.GraphicObj.getAllParagraphTextPr();
-        }
-        return null;
     },
 
     getParagraphParaPr: function()
@@ -6076,58 +5958,6 @@ ParaDrawing.prototype =
         if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.calculateSnapArrays === "function")
             this.GraphicObj.calculateSnapArrays(this.GraphicObj.snapArrayX, this.GraphicObj.snapArrayY);
 
-    },
-
-    calculateAdjPolarRange: function(adjIndex)
-    {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.calculateAdjPolarRange === "function")
-        {
-            this.GraphicObj.calculateAdjPolarRange(adjIndex);
-        }
-    },
-
-    calculateAdjXYRange: function(adjIndex)
-    {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.calculateAdjXYRange === "function")
-        {
-            this.GraphicObj.calculateAdjXYRange(adjIndex);
-        }
-    },
-
-    checkAdjModify: function(adjPolarFlag, adjNum, compareShape)
-    {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.checkAdjModify === "function")
-        {
-            return this.GraphicObj.checkAdjModify(adjPolarFlag, adjNum, compareShape);
-        }
-        return false;
-    },
-
-    createTrackObjectForMove: function(majorOffsetX, majorOffsetY)
-    {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.createTrackObjectForMove === "function")
-        {
-            return this.GraphicObj.createTrackObjectForMove(majorOffsetX, majorOffsetY);
-        }
-        return null;
-    },
-
-    createTrackObjectForResize: function(handleNumber, pageIndex)
-    {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.createTrackObjectForResize === "function")
-        {
-            return this.GraphicObj.createTrackObjectForResize(handleNumber, pageIndex);
-        }
-        return null;
-    },
-
-    createTrackObjectForRotate: function(pageIndex)
-    {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.createTrackObjectForRotate === "function")
-        {
-            return this.GraphicObj.createTrackObjectForRotate(pageIndex);
-        }
-        return null;
     },
 
     recalculateCurPos: function()
@@ -6551,6 +6381,16 @@ ParaDrawing.prototype =
         History.Add(this,  {Type: historyitem_SetExtent, oldW: this.Extent.W, oldH: this.Extent.H, newW: extX, newH: extY});
         this.Extent.W = extX;
         this.Extent.H = extY;
+    },
+
+    setEffectExtent: function(L, T, R, B)
+    {
+        var oEE = this.EffectExtent;
+        History.Add(this, {Type: historyitem_Drawing_SetEffectExtent, OldEE: {L: oEE.L, T: oEE.T, R: oEE.R, B: oEE.B}, NewEE:  {L: L, T: T, R: R, B: B}});
+        this.EffectExtent.L = L;
+        this.EffectExtent.T = T;
+        this.EffectExtent.R = R;
+        this.EffectExtent.B = B;
     },
 
     addWrapPolygon: function(wrapPolygon)

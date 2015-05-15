@@ -2,6 +2,12 @@ var MOVE_DELTA = 1/100000;
 var SNAP_DISTANCE = 1.27;
 
 
+function checkEmptyPlaceholderContent(content)
+{
+    if(!content || content.Parent && content.Parent.txWarpStruct)
+        return content;
+    return null;
+}
 
 function StartAddNewShape(drawingObjects, preset)
 {
@@ -137,6 +143,13 @@ NullState.prototype =
         var ret;
         var selection = this.drawingObjects.selection;
         var b_no_handle_selected = false;
+
+        var start_target_doc_content, end_target_doc_content;
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        {
+            start_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+        }
+
         if(selection.wrapPolygonSelection)
         {
             b_no_handle_selected = true;
@@ -190,10 +203,26 @@ NullState.prototype =
         {
             ret = handleSelectedObjects(this.drawingObjects, e, x, y, selection.groupSelection, pageIndex, true);
             if(ret)
+            {
+                end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+                if((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
+                {
+                    this.drawingObjects.drawingDocument.OnRecalculatePage( pageIndex, this.document.Pages[pageIndex] );
+                    this.drawingObjects.drawingDocument.OnEndRecalculate( false, true );
+                }
                 return ret;
+            }
             ret = handleFloatObjects(this.drawingObjects, selection.groupSelection.arrGraphicObjects, e, x, y, selection.groupSelection, pageIndex, true);
             if(ret)
+            {
+                end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+                if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
+                {
+                    this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.document.Pages[pageIndex]);
+                    this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
+                }
                 return ret;
+            }
         }
         else if(selection.chartSelection)
         {}
@@ -213,7 +242,15 @@ NullState.prototype =
         {
             ret = handleSelectedObjects(this.drawingObjects, e, x, y, null, pageIndex, true);
             if(ret)
+            {
+                end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+                if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
+                {
+                    this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
+                    this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
+                }
                 return ret;
+            }
         }
 
         var drawing_page;
@@ -227,7 +264,15 @@ NullState.prototype =
         }
         ret = handleFloatObjects(this.drawingObjects, drawing_page.beforeTextObjects, e, x, y, null, pageIndex, true);
         if(ret)
+        {
+            end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+            if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
+            {
+                this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
+                this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
+            }
             return ret;
+        }
 
         var no_shape_child_array = [];
         for(var i = 0; i < drawing_page.inlineObjects.length; ++i)
@@ -237,17 +282,46 @@ NullState.prototype =
         }
         ret = handleInlineObjects(this.drawingObjects, no_shape_child_array, e, x, y, pageIndex, true);
         if(ret)
+        {
+            end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+            if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
+            {
+                this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
+                this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
+            }
             return ret;
+        }
 
         if(!bTextFlag)
         {
             ret = handleFloatObjects(this.drawingObjects, drawing_page.wrappingObjects, e, x, y, null, pageIndex, true);
             if(ret)
+            {
+                end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+                if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
+                {
+                    this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
+                    this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
+                }
                 return ret;
+            }
 
             ret = handleFloatObjects(this.drawingObjects, drawing_page.behindDocObjects, e, x, y, null, pageIndex, true);
             if(ret)
+            {
+                end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+                if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
+                {
+                    this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
+                    this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
+                }
                 return ret;
+            }
+        }
+        if(start_target_doc_content)
+        {
+            this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
+            this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
         }
         return null;
 

@@ -132,10 +132,6 @@ CImageShape.prototype =
             return this.blipFill.RasterImageId;
         return null;
     },
-    isSimpleObject: function()
-    {
-        return true;
-    },
 
     getSnapArrays: function(snapX, snapY)
     {
@@ -313,22 +309,6 @@ CImageShape.prototype =
     createMoveTrack: function()
     {
         return new MoveShapeImageTrack(this);
-    },
-
-
-    createRotateInGroupTrack: function()
-    {
-        return new RotateTrackShapeImageInGroup(this);
-    },
-
-    createResizeInGroupTrack: function(cardDirection)
-    {
-        return new ResizeTrackShapeImageInGroup(this, cardDirection);
-    },
-
-    createMoveInGroupTrack: function()
-    {
-        return new MoveShapeImageTrackInGroup(this);
     },
 
     getInvertTransform: function()

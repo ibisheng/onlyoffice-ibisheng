@@ -44,7 +44,6 @@ CShape.prototype.recalcContent = function()
     {
         this.recalcInfo.recalculateContent = true;
     }
-
 };
 
 CShape.prototype.getDrawingDocument = function()
@@ -199,7 +198,7 @@ CShape.prototype.recalculateTxBoxContent = function()
     if(this.textBoxContent === null || this.textBoxContent.Parent !== this)
         return;
     var _l, _t, _r, _b;
-
+    this.txWarpStruct = null;
     var body_pr = this.getBodyPr();
     var l_ins = typeof body_pr.lIns === "number" ? body_pr.lIns : 2.54;
     var t_ins = typeof body_pr.tIns === "number" ? body_pr.tIns : 1.27;
@@ -222,7 +221,6 @@ CShape.prototype.recalculateTxBoxContent = function()
         _r = this.extX - r_ins;
         _b = this.extY - b_ins;
     }
-
     if(!_body_pr.upright)
     {
         var _content_width;
@@ -279,6 +277,19 @@ CShape.prototype.recalculateTxBoxContent = function()
     var RecalcResult = recalcresult2_NextPage;
     while ( recalcresult2_End != RecalcResult  )
         RecalcResult = this.textBoxContent.Recalculate_Page( CurPage++, true );
+
+    if(this.recalcInfo.recalcTitle)
+    {
+        this.recalcInfo.bRecalculatedTitle = true;
+        this.recalcInfo.recalcTitle = null;
+    }
+    else
+    {
+       var oTextWarpContent = this.checkTextWarp(this.textBoxContent, _body_pr, _r - _l, _b - _t);
+       this.txWarpStructParamarks = oTextWarpContent.oTxWarpStructParamarks;
+       this.txWarpStruct = oTextWarpContent.oTxWarpStruct;
+    }
+
 };
 
 CShape.prototype.recalculate = function ()
@@ -417,6 +428,7 @@ CShape.prototype.recalculateContent = function()
         }
         content.Reset(0, 0, w, h);
         content.Recalculate_Page(content.StartPage, true);
+
     }
 };
 
@@ -926,4 +938,10 @@ CShape.prototype.setStartPage = function(pageIndex, bNoResetSelectPage)
 CShape.prototype.getStyles = function()
 {
     return {styles: editor.WordControl.m_oLogicDocument.Styles, styleId: null};
+};
+
+
+CShape.prototype.getDrawingObjectsController = function()
+{
+    return editor.WordControl.m_oLogicDocument.DrawingObjects;
 };

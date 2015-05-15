@@ -4667,6 +4667,7 @@ DrawingObjectsController.prototype =
         this.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
         oCursorInfo = this.curState.onMouseDown(e, x, y, pageIndex, bTextFlag);
         this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
+
         return !(isRealObject(oCursorInfo) && oTitle === oCursorInfo.title);
     },
 
@@ -4726,27 +4727,38 @@ DrawingObjectsController.prototype =
         }
         else {
             var oTargetTextObject = getTargetTextObject(this);
+
             if (oTargetTextObject) {
-                if (oTargetTextObject.recalcInfo.bRecalculatedTitle) {
-                    oTargetTextObject.recalcInfo.recalcTitle = null;
-                    oTargetTextObject.handleContent && oTargetTextObject.handleContent();
-                    if (this.document) {
+
+                var oBodyPr = oTargetTextObject.getBodyPr && oTargetTextObject.getBodyPr();
+                if(oBodyPr && oBodyPr.prstTxWarp)
+                {
+                    if (oTargetTextObject.recalcInfo.bRecalculatedTitle)
+                    {
+                        oTargetTextObject.recalcInfo.recalcTitle = null;
+                        oTargetTextObject.handleContent && oTargetTextObject.handleContent();
                         oTargetTextObject.recalculate();
+                        oTargetTextObject.recalcInfo.bRecalculatedTitle = false;
+
+                    }
+                    if (this.document)
+                    {
                         this.document.DrawingDocument.OnRecalculatePage(oTargetTextObject.selectStartPage, this.document.Pages[oTargetTextObject.selectStartPage]);
                         this.document.DrawingDocument.OnEndRecalculate(false, true);
                     }
-                    else if (this.drawingObjects.cSld) {
-                        oTargetTextObject.recalculate();
-                        if (!(bNoRedraw === true)) {
+                    else if (this.drawingObjects.cSld)
+                    {
+                        if (!(bNoRedraw === true))
+                        {
                             editor.WordControl.m_oDrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
                             editor.WordControl.m_oDrawingDocument.OnEndRecalculate(false, true);
                         }
                     }
-                    else {
+                    else
+                    {
                         oTargetTextObject.addToRecalculate();
                         this.startRecalculate();
                     }
-                    oTargetTextObject.recalcInfo.bRecalculatedTitle = false;
                 }
 
             }

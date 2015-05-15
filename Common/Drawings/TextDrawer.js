@@ -143,7 +143,7 @@ CTableStructure.prototype.Recalculate = function(oTheme, oColorMap, dWidth, dHei
         this.m_aBorders[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape);
     }
 };
-CTableStructure.prototype.draw = function(graphics)
+CTableStructure.prototype.draw = function(graphics, transform)
 {
     var i;
 

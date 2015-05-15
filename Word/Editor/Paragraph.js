@@ -1332,6 +1332,11 @@ Paragraph.prototype =
         if ( this.Pages[CurPage].EndLine < 0 )
             return;
 
+        if(pGraphics.Start_Command)
+        {
+            pGraphics.Start_Command(DRAW_COMMAND_PARAGRAPH);
+        }
+
         var Pr = this.Get_CompiledPr();
 
         // Задаем обрезку, если данный параграф является рамкой
@@ -1408,6 +1413,11 @@ Paragraph.prototype =
         {
             pGraphics.RestoreGrState();
         }
+        if(pGraphics.End_Command)
+        {
+            pGraphics.End_Command();
+        }
+
     },
 
     Internal_Draw_1 : function(CurPage, pGraphics, Pr)
@@ -1480,7 +1490,6 @@ Paragraph.prototype =
         {
             var _Line        = this.Lines[CurLine];
             var _LineMetrics = _Line.Metrics;
-
             var EndLinePos = _Line.EndPos;
 
             var Y0 = (_Page.Y + _Line.Y - _LineMetrics.Ascent);
@@ -1550,6 +1559,11 @@ Paragraph.prototype =
                 //----------------------------------------------------------------------------------------------------------
                 if ( (_Range.W > 0.001 || true === this.IsEmpty() || true !== this.Is_EmptyRange(CurLine, CurRange) ) && ( ( this.Pages.length - 1 === CurPage ) || ( CurLine < this.Pages[CurPage + 1].FirstLine ) ) && shd_Clear === Pr.ParaPr.Shd.Value && (Pr.ParaPr.Shd.Unifill || (Pr.ParaPr.Shd.Color && true !== Pr.ParaPr.Shd.Color.Auto)) )
                 {
+                    if(pGraphics.Start_Command)
+                    {
+                        pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[CurLine], CurLine, 4)
+                    }
+
                     var TempX0 = this.Lines[CurLine].Ranges[CurRange].X;
                     if ( 0 === CurRange )
                         TempX0 = Math.min( TempX0, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left + Pr.ParaPr.Ind.FirstLine );
@@ -1654,11 +1668,21 @@ Paragraph.prototype =
                     }
                     pGraphics.rect(TempX0, this.Pages[CurPage].Y + TempTop, TempX1 - TempX0, TempBottom - TempTop);
                     pGraphics.df();
+
+                    if(pGraphics.End_Command)
+                    {
+                        pGraphics.End_Command()
+                    }
                 }
 
                 //----------------------------------------------------------------------------------------------------------
                 // Рисуем заливку текста
                 //----------------------------------------------------------------------------------------------------------
+
+                if(pGraphics.Start_Command)
+                {
+                    pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[CurLine], CurLine, 2)
+                }
                 var aShd = PDSH.Shd;
                 var Element = aShd.Get_Next();
                 while ( null != Element )
@@ -1723,6 +1747,12 @@ Paragraph.prototype =
                     Element = aComm.Get_Next();
                 }
 
+
+                if(pGraphics.End_Command)
+                {
+                    pGraphics.End_Command()
+                }
+
                 //----------------------------------------------------------------------------------------------------------
                 // Рисуем выделение совместного редактирования
                 //----------------------------------------------------------------------------------------------------------
@@ -1746,6 +1776,11 @@ Paragraph.prototype =
                 }
             }
 
+
+            if(pGraphics.Start_Command)
+            {
+                pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[CurLine], CurLine, 1)
+            }
             //----------------------------------------------------------------------------------------------------------
             // Рисуем боковые линии границы параграфа
             //----------------------------------------------------------------------------------------------------------
@@ -1797,6 +1832,10 @@ Paragraph.prototype =
                 }
             }
 
+            if(pGraphics.End_Command)
+            {
+                pGraphics.End_Command()
+            }
         }
     },
 
@@ -1812,6 +1851,10 @@ Paragraph.prototype =
         {
             var Line = this.Lines[CurLine];
             var RangesCount = Line.Ranges.length;
+            if(pGraphics.Start_Command)
+            {
+                pGraphics.Start_Command(DRAW_COMMAND_LINE, Line, CurLine, 0);
+            }
 
             for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
             {
@@ -1970,6 +2013,11 @@ Paragraph.prototype =
                     Item.Draw_Elements( PDSE );
                 }
             }
+
+            if(pGraphics.End_Command)
+            {
+                pGraphics.End_Command();
+            }
         }
     },
 
@@ -1989,6 +2037,11 @@ Paragraph.prototype =
         {
             var Line      = this.Lines[CurLine];
             var LineM     = Line.Metrics;
+
+            if(pGraphics.Start_Command)
+            {
+                pGraphics.Start_Command(DRAW_COMMAND_LINE, Line, CurLine, 3)
+            }
 
             var Baseline        = Page.Y + Line.Y;
             var UnderlineOffset = LineM.TextDescent  * 0.4;
@@ -2078,6 +2131,10 @@ Paragraph.prototype =
                     Element = aSpelling.Get_Next();
                 }
             }
+            if(pGraphics.End_Command)
+            {
+                pGraphics.End_Command()
+            }
         }
     },
 
@@ -2085,7 +2142,7 @@ Paragraph.prototype =
     {
         if ( true !== this.Is_NeedDrawBorders() )
             return;
-        
+
         var bEmpty  = this.IsEmpty();
         var X_left  = Math.min( this.Pages[CurPage].X + Pr.ParaPr.Ind.Left, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left + Pr.ParaPr.Ind.FirstLine );
         var X_right = this.Pages[CurPage].XLimit - Pr.ParaPr.Ind.Right;
@@ -2107,6 +2164,7 @@ Paragraph.prototype =
         var RightMW =  ( border_Single === Pr.ParaPr.Brd.Right.Value ? Pr.ParaPr.Brd.Right.Size : 0 );
 
         var RGBA;
+
         // Рисуем линию до параграфа
         if ( true === Pr.ParaPr.Brd.First && border_Single === Pr.ParaPr.Brd.Top.Value && ( ( 0 === CurPage && ( false === this.Is_StartFromNewPage() || null === this.Get_DocumentPrev() ) ) || ( 1 === CurPage && true === this.Is_StartFromNewPage() )  ) )
         {
@@ -2119,6 +2177,11 @@ Paragraph.prototype =
 
             // Учтем разрывы из-за обтекания
             var StartLine = this.Pages[CurPage].StartLine;
+
+            if(pGraphics.Start_Command)
+            {
+                pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[StartLine], StartLine, 1);
+            }
             var RangesCount = this.Lines[StartLine].Ranges.length;
             for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
             {
@@ -2127,6 +2190,11 @@ Paragraph.prototype =
 
                 if ( false === this.Is_EmptyRange(StartLine, CurRange) || ( true === bEmpty && 1 === RangesCount ) )
                     pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y_top, X0, X1, Pr.ParaPr.Brd.Top.Size, LeftMW, RightMW );
+            }
+
+            if(pGraphics.End_Command)
+            {
+                pGraphics.End_Command();
             }
         }
         else if ( false === Pr.ParaPr.Brd.First )
@@ -2156,6 +2224,10 @@ Paragraph.prototype =
                 // Учтем разрывы из-за обтекания
                 var StartLine = this.Pages[CurPage].StartLine;
                 var RangesCount = this.Lines[StartLine].Ranges.length;
+                if(pGraphics.Start_Command)
+                {
+                    pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[StartLine], StartLine, 1);
+                }
                 for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
                 {
                     var X0 = ( 0 === CurRange ? X_left : this.Lines[StartLine].Ranges[CurRange].X );
@@ -2163,6 +2235,10 @@ Paragraph.prototype =
 
                     if ( false === this.Is_EmptyRange(StartLine, CurRange) || ( true === bEmpty && 1 === RangesCount ) )
                         pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y, X0, X1, Size, LeftMW, RightMW );
+                }
+                if(pGraphics.End_Command)
+                {
+                    pGraphics.End_Command();
                 }
             }
         }
@@ -2193,6 +2269,10 @@ Paragraph.prototype =
             // Учтем разрывы из-за обтекания
             var EndLine = this.Pages[CurPage].EndLine;
             var RangesCount = this.Lines[EndLine].Ranges.length;
+            if(pGraphics.Start_Command)
+            {
+                pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[EndLine], EndLine, 1);
+            }
             for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
             {
                 var X0 = ( 0 === CurRange ? X_left : this.Lines[EndLine].Ranges[CurRange].X );
@@ -2200,6 +2280,10 @@ Paragraph.prototype =
 
                 if ( false === this.Is_EmptyRange(EndLine, CurRange) || ( true === bEmpty && 1 === RangesCount ) )
                     pGraphics.drawHorLineExt( DrawLineRule, TempY, X0, X1, Pr.ParaPr.Brd.Bottom.Size, LeftMW, RightMW );
+            }
+            if(pGraphics.End_Command)
+            {
+                pGraphics.End_Command();
             }
         }
         else if ( true === bEnd && false === Pr.ParaPr.Brd.Last && border_Single === Pr.ParaPr.Brd.Bottom.Value )
@@ -2213,6 +2297,12 @@ Paragraph.prototype =
                 // Учтем разрывы из-за обтекания
                 var EndLine = this.Pages[CurPage].EndLine;
                 var RangesCount = this.Lines[EndLine].Ranges.length;
+
+                if(pGraphics.Start_Command)
+                {
+                    pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[EndLine], EndLine, 1);
+                }
+
                 for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
                 {
                     var X0 = ( 0 === CurRange ? X_left : this.Lines[EndLine].Ranges[CurRange].X );
@@ -2220,6 +2310,10 @@ Paragraph.prototype =
 
                     if ( false === this.Is_EmptyRange(EndLine, CurRange) || ( true === bEmpty && 1 === RangesCount ) )
                         pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, this.Pages[CurPage].Y + this.Lines[CurLine].Y + this.Lines[CurLine].Metrics.Descent + this.Lines[CurLine].Metrics.LineGap, X0, X1, Pr.ParaPr.Brd.Bottom.Size, LeftMW, RightMW );
+                }
+                if(pGraphics.End_Command)
+                {
+                    pGraphics.End_Command();
                 }
             }
         }

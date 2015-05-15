@@ -6351,6 +6351,43 @@ function BinaryPPTYLoader()
             var _at = s.GetUChar();
             switch (_at)
             {
+                case 0://prstTxWarp
+                {
+                    var _end_rec3 = s.cur + s.GetULong() + 4;
+                    s.Skip2(1);// start attributes
+                    while(true)
+                    {
+                        var _at2 = s.GetUChar();
+                        if (_at2 == g_nodeAttributeEnd)
+                            break;
+                        switch (_at2) {
+                            case 0:
+                            {
+                                var sPrst = s.GetUChar();
+                                bodyPr.prstTxWarp = ExecuteNoHistory(function () {
+                                    return CreatePrstTxWarpGeometry(getPrstByNumber(sPrst));
+                                }, this, []);
+                                break;
+                            }
+                        }
+                    }
+                    while (s.cur < _end_rec3)
+                    {
+                       var _at = s.GetUChar();
+                       switch (_at)
+                       {
+                           case 0:
+                           {
+                               this.ReadGeomAdj(bodyPr.prstTxWarp );
+                               break;
+                           }
+                           default:
+                               break;
+                       }
+                    }
+                    s.Seek2(_end_rec3);
+                    break;
+                }
                 case 1:
                 {
                     var _end_rec2 = s.cur + s.GetULong() + 4;
@@ -6387,7 +6424,6 @@ function BinaryPPTYLoader()
                                 break;
                         }
                     }
-
                     if (txFit.type != -1)
                     {
                         bodyPr.textFit = txFit;

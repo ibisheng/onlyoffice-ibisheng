@@ -242,11 +242,6 @@ CGraphicFrame.prototype =
         }
     },
 
-    isSimpleObject: function()
-    {
-        return true;
-    },
-
     Cursor_MoveToStartPos : function()
     {
         if(isRealObject(this.graphicObject))

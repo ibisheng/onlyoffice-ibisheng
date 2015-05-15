@@ -9023,3 +9023,1189 @@ function CreateGeometry(prst){
     }
     return f;
 }
+
+function getPrstByNumber(nPreset)
+{
+    switch(nPreset)
+    {
+         case  0:{
+            return  "textArchDown";
+    }
+             case  1:{
+                return  "textArchDownPour";
+    }
+             case  2:{
+                return  "textArchUp";
+    }
+             case  3:{
+                return  "textArchUpPour";
+    }
+             case  4:{
+                return  "textButton";
+    }
+             case  5:{
+                return  "textButtonPour";
+    }
+             case  6:{
+                return  "textCanDown";
+    }
+             case  7:{
+                return  "textCanUp";
+    }
+             case  8:{
+                return  "textCascadeDown";
+    }
+             case  9:{
+                return  "textCascadeUp";
+    }
+             case  10:{
+                return  "textChevron";
+    }
+             case  11:{
+                return  "textChevronInverted";
+    }
+             case  12:{
+                return  "textCircle";
+    }
+             case  13:{
+                return  "textCirclePour";
+    }
+             case  14:{
+                return  "textCurveDown";
+    }
+             case  15:{
+                return  "textCurveUp";
+    }
+             case  16:{
+                return  "textDeflate";
+    }
+             case  17:{
+                return  "textDeflateBottom";
+    }
+             case  18:{
+                return  "textDeflateInflate";
+    }
+             case  19:{
+                return  "textDeflateInflateDeflate";
+    }
+             case  20:{
+                return  "textDeflateTop";
+    }
+             case  21:{
+                return  "textDoubleWave1";
+    }
+             case  22:{
+                return  "textFadeDown";
+    }
+             case  23:{
+                return  "textFadeLeft";
+    }
+             case  24:{
+                return  "textFadeRight";
+    }
+             case  25:{
+                return  "textFadeUp";
+    }
+             case  26:{
+                return  "textInflate";
+    }
+             case  27:{
+                return  "textInflateBottom";
+    }
+             case  28:{
+                return  "textInflateTop";
+    }
+             case  29:{
+                return  "textNoShape";
+    }
+             case  30:{
+                return  "textPlain";
+    }
+             case  31:{
+                return  "textRingInside";
+    }
+             case  32:{
+                return  "textRingOutside";
+    }
+             case  33:{
+                return  "textSlantDown";
+    }
+             case  34:{
+                return  "textSlantUp";
+    }
+             case  35:{
+                return  "textStop";
+    }
+             case  36:{
+                return  "textTriangle";
+    }
+             case  37:{
+                return  "textTriangleInverted";
+    }
+             case  38:{
+                return  "textWave1";
+    }
+             case  39:{
+                return  "textWave2";
+    }
+             case  40:{
+                return  "textWave4";
+    }
+    }
+    return  "textNoShape";
+}
+
+function CreatePrstTxWarpGeometry(prst)
+{
+    var f = new Geometry();
+    switch(prst)
+    {
+        case 'textArchDown':{
+            f.AddAdj('adj', 15, '0');
+            f.AddGuide('adval', 10, '0', 'adj', '21599999');
+            f.AddGuide('v1', 1, '10800000', '0', 'adval');
+            f.AddGuide('v2', 1, '32400000', '0', 'adval');
+            f.AddGuide('nv1', 1, '0', '0', 'v1');
+            f.AddGuide('stAng', 3, 'nv1', 'v2', 'v1');
+            f.AddGuide('w1', 1, '5400000', '0', 'adval');
+            f.AddGuide('w2', 1, '16200000', '0', 'adval');
+            f.AddGuide('d1', 1, 'adval', '0', 'stAng');
+            f.AddGuide('d2', 1, 'd1', '0', '21600000');
+            f.AddGuide('v3', 1, '0', '0', '10800000');
+            f.AddGuide('c2', 3, 'w2', 'd1', 'd2');
+            f.AddGuide('c1', 3, 'v1', 'd2', 'c2');
+            f.AddGuide('c0', 3, 'w1', 'd1', 'c1');
+            f.AddGuide('swAng', 3, 'stAng', 'c0', 'v3');
+            f.AddGuide('wt1', 12, 'wd2', 'adj');
+            f.AddGuide('ht1', 7, 'hd2', 'adj');
+            f.AddGuide('dx1', 6, 'wd2', 'ht1', 'wt1');
+            f.AddGuide('dy1', 11, 'hd2', 'ht1', 'wt1');
+            f.AddGuide('x1', 1, 'hc', 'dx1', '0');
+            f.AddGuide('y1', 1, 'vc', 'dy1', '0');
+            f.AddGuide('wt2', 12, 'wd2', 'stAng');
+            f.AddGuide('ht2', 7, 'hd2', 'stAng');
+            f.AddGuide('dx2', 6, 'wd2', 'ht2', 'wt2');
+            f.AddGuide('dy2', 11, 'hd2', 'ht2', 'wt2');
+            f.AddGuide('x2', 1, 'hc', 'dx2', '0');
+            f.AddGuide('y2', 1, 'vc', 'dy2', '0');
+            f.AddHandlePolar('adj', '0', '21599999', undefined, '0', '0', 'x1', 'y1');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x2', 'y2');
+            f.AddPathCommand(3, 'wd2', 'wd2', 'stAng', 'swAng');
+            break;
+        }
+        case 'textArchDownPour':{
+            f.AddAdj('adj1', 15, '0');
+            f.AddAdj('adj2', 15, '25000');
+            f.AddGuide('adval', 10, '0', 'adj1', '21599999');
+            f.AddGuide('v1', 1, '10800000', '0', 'adval');
+            f.AddGuide('v2', 1, '32400000', '0', 'adval');
+            f.AddGuide('nv1', 1, '0', '0', 'v1');
+            f.AddGuide('stAng', 3, 'nv1', 'v2', 'v1');
+            f.AddGuide('w1', 1, '5400000', '0', 'adval');
+            f.AddGuide('w2', 1, '16200000', '0', 'adval');
+            f.AddGuide('d1', 1, 'adval', '0', 'stAng');
+            f.AddGuide('d2', 1, 'd1', '0', '21600000');
+            f.AddGuide('v3', 1, '0', '0', '10800000');
+            f.AddGuide('c2', 3, 'w2', 'd1', 'd2');
+            f.AddGuide('c1', 3, 'v1', 'd2', 'c2');
+            f.AddGuide('c0', 3, 'w1', 'd1', 'c1');
+            f.AddGuide('swAng', 3, 'stAng', 'c0', 'v3');
+            f.AddGuide('wt1', 12, 'wd2', 'stAng');
+            f.AddGuide('ht1', 7, 'hd2', 'stAng');
+            f.AddGuide('dx1', 6, 'wd2', 'ht1', 'wt1');
+            f.AddGuide('dy1', 11, 'hd2', 'ht1', 'wt1');
+            f.AddGuide('x1', 1, 'hc', 'dx1', '0');
+            f.AddGuide('y1', 1, 'vc', 'dy1', '0');
+            f.AddGuide('adval2', 10, '0', 'adj2', '99000');
+            f.AddGuide('ratio', 0, 'adval2', '1', '100000');
+            f.AddGuide('iwd2', 0, 'wd2', 'ratio', '1');
+            f.AddGuide('ihd2', 0, 'hd2', 'ratio', '1');
+            f.AddGuide('wt2', 12, 'iwd2', 'adval');
+            f.AddGuide('ht2', 7, 'ihd2', 'adval');
+            f.AddGuide('dx2', 6, 'iwd2', 'ht2', 'wt2');
+            f.AddGuide('dy2', 11, 'ihd2', 'ht2', 'wt2');
+            f.AddGuide('x2', 1, 'hc', 'dx2', '0');
+            f.AddGuide('y2', 1, 'vc', 'dy2', '0');
+            f.AddGuide('wt3', 12, 'iwd2', 'stAng');
+            f.AddGuide('ht3', 7, 'ihd2', 'stAng');
+            f.AddGuide('dx3', 6, 'iwd2', 'ht3', 'wt3');
+            f.AddGuide('dy3', 11, 'ihd2', 'ht3', 'wt3');
+            f.AddGuide('x3', 1, 'hc', 'dx3', '0');
+            f.AddGuide('y3', 1, 'vc', 'dy3', '0');
+            f.AddHandlePolar('adj1', '0', '21599999', 'adj2', '0', '100000', 'x2', 'y2');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x3', 'y3');
+            f.AddPathCommand(3, 'iwd2', 'ihd2', 'stAng', 'swAng');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x1', 'y1');
+            f.AddPathCommand(3, 'wd2', 'hd2', 'stAng', 'swAng');
+            break;
+        }
+        case 'textArchUp':{
+            f.AddAdj('adj', 15, 'cd2');
+            f.AddGuide('adval', 10, '0', 'adj', '21599999');
+            f.AddGuide('v1', 1, '10800000', '0', 'adval');
+            f.AddGuide('v2', 1, '32400000', '0', 'adval');
+            f.AddGuide('end', 3, 'v1', 'v1', 'v2');
+            f.AddGuide('w1', 1, '5400000', '0', 'adval');
+            f.AddGuide('w2', 1, '16200000', '0', 'adval');
+            f.AddGuide('d1', 1, 'end', '0', 'adval');
+            f.AddGuide('d2', 1, '21600000', 'd1', '0');
+            f.AddGuide('c2', 3, 'w2', 'd1', 'd2');
+            f.AddGuide('c1', 3, 'v1', 'd2', 'c2');
+            f.AddGuide('swAng', 3, 'w1', 'd1', 'c1');
+            f.AddGuide('wt1', 12, 'wd2', 'adj');
+            f.AddGuide('ht1', 7, 'hd2', 'adj');
+            f.AddGuide('dx1', 6, 'wd2', 'ht1', 'wt1');
+            f.AddGuide('dy1', 11, 'hd2', 'ht1', 'wt1');
+            f.AddGuide('x1', 1, 'hc', 'dx1', '0');
+            f.AddGuide('y1', 1, 'vc', 'dy1', '0');
+            f.AddHandlePolar('adj', '0', '21599999', undefined, '0', '0', 'x1', 'y1');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x1', 'y1');
+            f.AddPathCommand(3, 'wd2', 'wd2', 'adval', 'swAng');
+            break;
+        }
+        case 'textArchUpPour':{
+            f.AddAdj('adj1', 15, 'cd2');
+            f.AddAdj('adj2', 15, '50000');
+            f.AddGuide('adval', 10, '0', 'adj1', '21599999');
+            f.AddGuide('v1', 1, '10800000', '0', 'adval');
+            f.AddGuide('v2', 1, '32400000', '0', 'adval');
+            f.AddGuide('end', 3, 'v1', 'v1', 'v2');
+            f.AddGuide('w1', 1, '5400000', '0', 'adval');
+            f.AddGuide('w2', 1, '16200000', '0', 'adval');
+            f.AddGuide('d1', 1, 'end', '0', 'adval');
+            f.AddGuide('d2', 1, '21600000', 'd1', '0');
+            f.AddGuide('c2', 3, 'w2', 'd1', 'd2');
+            f.AddGuide('c1', 3, 'v1', 'd2', 'c2');
+            f.AddGuide('swAng', 3, 'w1', 'd1', 'c1');
+            f.AddGuide('wt1', 12, 'wd2', 'adval');
+            f.AddGuide('ht1', 7, 'hd2', 'adval');
+            f.AddGuide('dx1', 6, 'wd2', 'ht1', 'wt1');
+            f.AddGuide('dy1', 11, 'hd2', 'ht1', 'wt1');
+            f.AddGuide('x1', 1, 'hc', 'dx1', '0');
+            f.AddGuide('y1', 1, 'vc', 'dy1', '0');
+            f.AddGuide('adval2', 10, '0', 'adj2', '99000');
+            f.AddGuide('ratio', 0, 'adval2', '1', '100000');
+            f.AddGuide('iwd2', 0, 'wd2', 'ratio', '1');
+            f.AddGuide('ihd2', 0, 'hd2', 'ratio', '1');
+            f.AddGuide('wt2', 12, 'iwd2', 'adval');
+            f.AddGuide('ht2', 7, 'ihd2', 'adval');
+            f.AddGuide('dx2', 6, 'iwd2', 'ht2', 'wt2');
+            f.AddGuide('dy2', 11, 'ihd2', 'ht2', 'wt2');
+            f.AddGuide('x2', 1, 'hc', 'dx2', '0');
+            f.AddGuide('y2', 1, 'vc', 'dy2', '0');
+            f.AddHandlePolar('adj1', '0', '21599999', 'adj2', '0', '100000', 'x2', 'y2');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x1', 'y1');
+            f.AddPathCommand(3, 'wd2', 'y1', 'adval', 'swAng');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x2', 'y2');
+            f.AddPathCommand(3, 'iwd2', 'ihd2', 'adval', 'swAng');
+            break;
+        }
+        case 'textButton':{
+            f.AddAdj('adj', 15, '10800000');
+            f.AddGuide('adval', 10, '0', 'adj', '21599999');
+            f.AddGuide('bot', 1, '5400000', '0', 'adval');
+            f.AddGuide('lef', 1, '10800000', '0', 'adval');
+            f.AddGuide('top', 1, '16200000', '0', 'adval');
+            f.AddGuide('rig', 1, '21600000', '0', 'adval');
+            f.AddGuide('c3', 3, 'top', 'adval', '0');
+            f.AddGuide('c2', 3, 'lef', '10800000', 'c3');
+            f.AddGuide('c1', 3, 'bot', 'rig', 'c2');
+            f.AddGuide('stAng', 3, 'adval', 'c1', '0');
+            f.AddGuide('w1', 1, '21600000', '0', 'stAng');
+            f.AddGuide('stAngB', 3, 'stAng', 'w1', '0');
+            f.AddGuide('td1', 0, 'bot', '2', '1');
+            f.AddGuide('td2', 0, 'top', '2', '1');
+            f.AddGuide('ntd2', 1, '0', '0', 'td2');
+            f.AddGuide('w2', 1, '0', '0', '10800000');
+            f.AddGuide('c6', 3, 'top', 'ntd2', 'w2');
+            f.AddGuide('c5', 3, 'lef', '10800000', 'c6');
+            f.AddGuide('c4', 3, 'bot', 'td1', 'c5');
+            f.AddGuide('v1', 3, 'adval', 'c4', '10800000');
+            f.AddGuide('swAngT', 1, '0', '0', 'v1');
+            f.AddGuide('stT', 3, 'lef', 'stAngB', 'stAng');
+            f.AddGuide('stB', 3, 'lef', 'stAng', 'stAngB');
+            f.AddGuide('swT', 3, 'lef', 'v1', 'swAngT');
+            f.AddGuide('swB', 3, 'lef', 'swAngT', 'v1');
+            f.AddGuide('wt1', 12, 'wd2', 'stT');
+            f.AddGuide('ht1', 7, 'hd2', 'stT');
+            f.AddGuide('dx1', 6, 'wd2', 'ht1', 'wt1');
+            f.AddGuide('dy1', 11, 'hd2', 'ht1', 'wt1');
+            f.AddGuide('x1', 1, 'hc', 'dx1', '0');
+            f.AddGuide('y1', 1, 'vc', 'dy1', '0');
+            f.AddGuide('wt2', 12, 'wd2', 'stB');
+            f.AddGuide('ht2', 7, 'hd2', 'stB');
+            f.AddGuide('dx2', 6, 'wd2', 'ht2', 'wt2');
+            f.AddGuide('dy2', 11, 'hd2', 'ht2', 'wt2');
+            f.AddGuide('x2', 1, 'hc', 'dx2', '0');
+            f.AddGuide('y2', 1, 'vc', 'dy2', '0');
+            f.AddGuide('wt3', 12, 'wd2', 'adj');
+            f.AddGuide('ht3', 7, 'hd2', 'adj');
+            f.AddGuide('dx3', 6, 'wd2', 'ht3', 'wt3');
+            f.AddGuide('dy3', 11, 'hd2', 'ht3', 'wt3');
+            f.AddGuide('x3', 1, 'hc', 'dx3', '0');
+            f.AddGuide('y3', 1, 'vc', 'dy3', '0');
+            f.AddHandlePolar('adj', '0', '21599999', undefined, '0', '0', 'x3', 'y3');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x1', 'y1');
+            f.AddPathCommand(3, 'wd2', 'wd2', 'stT', 'swT');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'vc');
+            f.AddPathCommand(2, 'r', 'vc');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x2', 'y2');
+            f.AddPathCommand(3, 'wd2', 'wd2', 'stB', 'swB');
+            break;
+        }
+        case 'textButtonPour':{
+            f.AddAdj('adj1', 15, 'cd2');
+            f.AddAdj('adj2', 15, '50000');
+            f.AddGuide('adval', 10, '0', 'adj1', '21599999');
+            f.AddGuide('bot', 1, '5400000', '0', 'adval');
+            f.AddGuide('lef', 1, '10800000', '0', 'adval');
+            f.AddGuide('top', 1, '16200000', '0', 'adval');
+            f.AddGuide('rig', 1, '21600000', '0', 'adval');
+            f.AddGuide('c3', 3, 'top', 'adval', '0');
+            f.AddGuide('c2', 3, 'lef', '10800000', 'c3');
+            f.AddGuide('c1', 3, 'bot', 'rig', 'c2');
+            f.AddGuide('stAng', 3, 'adval', 'c1', '0');
+            f.AddGuide('w1', 1, '21600000', '0', 'stAng');
+            f.AddGuide('stAngB', 3, 'stAng', 'w1', '0');
+            f.AddGuide('td1', 0, 'bot', '2', '1');
+            f.AddGuide('td2', 0, 'top', '2', '1');
+            f.AddGuide('ntd2', 1, '0', '0', 'td2');
+            f.AddGuide('w2', 1, '0', '0', '10800000');
+            f.AddGuide('c6', 3, 'top', 'ntd2', 'w2');
+            f.AddGuide('c5', 3, 'lef', '10800000', 'c6');
+            f.AddGuide('c4', 3, 'bot', 'td1', 'c5');
+            f.AddGuide('v1', 3, 'adval', 'c4', '10800000');
+            f.AddGuide('swAngT', 1, '0', '0', 'v1');
+            f.AddGuide('stT', 3, 'lef', 'stAngB', 'stAng');
+            f.AddGuide('stB', 3, 'lef', 'stAng', 'stAngB');
+            f.AddGuide('swT', 3, 'lef', 'v1', 'swAngT');
+            f.AddGuide('swB', 3, 'lef', 'swAngT', 'v1');
+            f.AddGuide('wt1', 12, 'wd2', 'stT');
+            f.AddGuide('ht1', 7, 'hd2', 'stT');
+            f.AddGuide('dx1', 6, 'wd2', 'ht1', 'wt1');
+            f.AddGuide('dy1', 11, 'hd2', 'ht1', 'wt1');
+            f.AddGuide('x1', 1, 'hc', 'dx1', '0');
+            f.AddGuide('y1', 1, 'vc', 'dy1', '0');
+            f.AddGuide('wt6', 12, 'wd2', 'stB');
+            f.AddGuide('ht6', 7, 'hd2', 'stB');
+            f.AddGuide('dx6', 6, 'wd2', 'ht6', 'wt6');
+            f.AddGuide('dy6', 11, 'hd2', 'ht6', 'wt6');
+            f.AddGuide('x6', 1, 'hc', 'dx6', '0');
+            f.AddGuide('y6', 1, 'vc', 'dy6', '0');
+            f.AddGuide('adval2', 10, '40000', 'adj2', '99000');
+            f.AddGuide('ratio', 0, 'adval2', '1', '100000');
+            f.AddGuide('iwd2', 0, 'wd2', 'ratio', '1');
+            f.AddGuide('ihd2', 0, 'hd2', 'ratio', '1');
+            f.AddGuide('wt2', 12, 'iwd2', 'stT');
+            f.AddGuide('ht2', 7, 'ihd2', 'stT');
+            f.AddGuide('dx2', 6, 'iwd2', 'ht2', 'wt2');
+            f.AddGuide('dy2', 11, 'ihd2', 'ht2', 'wt2');
+            f.AddGuide('x2', 1, 'hc', 'dx2', '0');
+            f.AddGuide('y2', 1, 'vc', 'dy2', '0');
+            f.AddGuide('wt5', 12, 'iwd2', 'stB');
+            f.AddGuide('ht5', 7, 'ihd2', 'stB');
+            f.AddGuide('dx5', 6, 'iwd2', 'ht5', 'wt5');
+            f.AddGuide('dy5', 11, 'ihd2', 'ht5', 'wt5');
+            f.AddGuide('x5', 1, 'hc', 'dx5', '0');
+            f.AddGuide('y5', 1, 'vc', 'dy5', '0');
+            f.AddGuide('d1', 1, 'hd2', '0', 'ihd2');
+            f.AddGuide('d12', 0, 'd1', '1', '2');
+            f.AddGuide('yu', 1, 'vc', '0', 'd12');
+            f.AddGuide('yd', 1, 'vc', 'd12', '0');
+            f.AddGuide('v1', 0, 'd12', 'd12', '1');
+            f.AddGuide('v2', 0, 'ihd2', 'ihd2', '1');
+            f.AddGuide('v3', 0, 'v1', '1', 'v2');
+            f.AddGuide('v4', 1, '1', '0', 'v3');
+            f.AddGuide('v5', 0, 'iwd2', 'iwd2', '1');
+            f.AddGuide('v6', 0, 'v4', 'v5', '1');
+            f.AddGuide('v7', 13, 'v6');
+            f.AddGuide('xl', 1, 'hc', '0', 'v7');
+            f.AddGuide('xr', 1, 'hc', 'v7', '0');
+            f.AddGuide('wtadj', 12, 'iwd2', 'adj1');
+            f.AddGuide('htadj', 7, 'ihd2', 'adj1');
+            f.AddGuide('dxadj', 6, 'iwd2', 'htadj', 'wtadj');
+            f.AddGuide('dyadj', 11, 'ihd2', 'htadj', 'wtadj');
+            f.AddGuide('xadj', 1, 'hc', 'dxadj', '0');
+            f.AddGuide('yadj', 1, 'vc', 'dyadj', '0');
+            f.AddHandlePolar('adj1', '0', '21599999', 'adj2', '0', '100000', 'xadj', 'yadj');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x1', 'y1');
+            f.AddPathCommand(3, 'wd2', 'hd2', 'stT', 'swT');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x2', 'y2');
+            f.AddPathCommand(3, 'iwd2', 'ihd2', 'stT', 'swT');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'xl', 'yu');
+            f.AddPathCommand(2, 'xr', 'yu');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'xl', 'yd');
+            f.AddPathCommand(2, 'xr', 'yd');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x5', 'y5');
+            f.AddPathCommand(3, 'iwd2', 'ihd2', 'stB', 'swB');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x6', 'y6');
+            f.AddPathCommand(3, 'wd2', 'hd2', 'stB', 'swB');
+            break;
+        }
+        case 'textCanDown':{
+            f.AddAdj('adj', 15, '14286');
+            f.AddGuide('a', 10, '0', 'adj', '33333');
+            f.AddGuide('dy', 0, 'a', 'h', '100000');
+            f.AddGuide('y0', 1, 't', 'dy', '0');
+            f.AddGuide('y1', 1, 'b', '0', 'dy');
+            f.AddGuide('ncd2', 0, 'cd2', '-1', '1');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '0', '33333', 'hc', 'y0');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 't');
+            f.AddPathCommand(3, 'wd2', 'y0', 'cd2', 'ncd2');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y1');
+            f.AddPathCommand(3, 'wd2', 'y0', 'cd2', 'ncd2');
+            break;
+        }
+        case 'textCanUp':{
+            f.AddAdj('adj', 15, '85714');
+            f.AddGuide('a', 10, '66667', 'adj', '100000');
+            f.AddGuide('dy1', 0, 'a', 'h', '100000');
+            f.AddGuide('dy', 1, 'h', '0', 'dy1');
+            f.AddGuide('y0', 1, 't', 'dy1', '0');
+            f.AddGuide('y1', 1, 't', 'dy', '0');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '66667', '100000', 'hc', 'y0');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y1');
+            f.AddPathCommand(3, 'wd2', 'y1', 'cd2', 'cd2');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'b');
+            f.AddPathCommand(3, 'wd2', 'y1', 'cd2', 'cd2');
+            break;
+        }
+        case 'textCascadeDown':{
+            f.AddAdj('adj', 15, '44444');
+            f.AddGuide('a', 10, '28570', 'adj', '100000');
+            f.AddGuide('dy', 0, 'a', 'h', '100000');
+            f.AddGuide('y1', 1, 't', 'dy', '0');
+            f.AddGuide('dy2', 1, 'h', '0', 'dy');
+            f.AddGuide('dy3', 0, 'dy2', '1', '4');
+            f.AddGuide('y2', 1, 't', 'dy3', '0');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '28570', '100000', 'l', 'y1');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 't');
+            f.AddPathCommand(2, 'r', 'y2');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y1');
+            f.AddPathCommand(2, 'r', 'b');
+            break;
+        }
+        case 'textCascadeUp':{
+            f.AddAdj('adj', 15, '44444');
+            f.AddGuide('a', 10, '28570', 'adj', '100000');
+            f.AddGuide('dy', 0, 'a', 'h', '100000');
+            f.AddGuide('y1', 1, 't', 'dy', '0');
+            f.AddGuide('dy2', 1, 'h', '0', 'dy');
+            f.AddGuide('dy3', 0, 'dy2', '1', '4');
+            f.AddGuide('y2', 1, 't', 'dy3', '0');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '28570', '100000', 'r', 'y1');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y2');
+            f.AddPathCommand(2, 'r', 't');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'b');
+            f.AddPathCommand(2, 'r', 'y1');
+            break;
+        }
+        case 'textChevron':{
+            f.AddAdj('adj', 15, '25000');
+            f.AddGuide('a', 10, '0', 'adj', '50000');
+            f.AddGuide('y', 0, 'a', 'h', '100000');
+            f.AddGuide('y1', 1, 't', 'b', 'y');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '0', '50000', 'l', 'y');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y');
+            f.AddPathCommand(2, 'hc', 't');
+            f.AddPathCommand(2, 'r', 'y');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'b');
+            f.AddPathCommand(2, 'hc', 'y1');
+            f.AddPathCommand(2, 'r', 'b');
+            break;
+        }
+        case 'textChevronInverted':{
+            f.AddAdj('adj', 15, '75000');
+            f.AddGuide('a', 10, '50000', 'adj', '100000');
+            f.AddGuide('y', 0, 'a', 'h', '100000');
+            f.AddGuide('y1', 1, 'b', '0', 'y');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '50000', '100000', 'l', 'y');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 't');
+            f.AddPathCommand(2, 'hc', 'y1');
+            f.AddPathCommand(2, 'r', 't');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y');
+            f.AddPathCommand(2, 'hc', 'b');
+            f.AddPathCommand(2, 'r', 'y');
+            break;
+        }
+        case 'textCircle':{
+            f.AddAdj('adj', 15, '10800000');
+            f.AddGuide('adval', 10, '0', 'adj', '21599999');
+            f.AddGuide('d0', 1, 'adval', '0', '10800000');
+            f.AddGuide('d1', 1, '10800000', '0', 'adval');
+            f.AddGuide('d2', 1, '21600000', '0', 'adval');
+            f.AddGuide('d3', 3, 'd1', 'd1', '10799999');
+            f.AddGuide('d4', 3, 'd0', 'd2', 'd3');
+            f.AddGuide('swAng', 0, 'd4', '2', '1');
+            f.AddGuide('wt1', 12, 'wd2', 'adj');
+            f.AddGuide('ht1', 7, 'hd2', 'adj');
+            f.AddGuide('dx1', 6, 'wd2', 'ht1', 'wt1');
+            f.AddGuide('dy1', 11, 'hd2', 'ht1', 'wt1');
+            f.AddGuide('x1', 1, 'hc', 'dx1', '0');
+            f.AddGuide('y1', 1, 'vc', 'dy1', '0');
+            f.AddHandlePolar('adj', '0', '21599999', undefined, '0', '0', 'x1', 'y1');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x1', 'y1');
+            f.AddPathCommand(3, 'wd2', 'wd2', 'adval', 'swAng');
+            break;
+        }
+        case 'textCirclePour':{
+            f.AddAdj('adj1', 15, 'cd2');
+            f.AddAdj('adj2', 15, '50000');
+            f.AddGuide('adval', 10, '0', 'adj1', '21599999');
+            f.AddGuide('d0', 1, 'adval', '0', '10800000');
+            f.AddGuide('d1', 1, '10800000', '0', 'adval');
+            f.AddGuide('d2', 1, '21600000', '0', 'adval');
+            f.AddGuide('d3', 3, 'd1', 'd1', '10799999');
+            f.AddGuide('d4', 3, 'd0', 'd2', 'd3');
+            f.AddGuide('swAng', 0, 'd4', '2', '1');
+            f.AddGuide('wt1', 12, 'wd2', 'adval');
+            f.AddGuide('ht1', 7, 'hd2', 'adval');
+            f.AddGuide('dx1', 6, 'wd2', 'ht1', 'wt1');
+            f.AddGuide('dy1', 11, 'hd2', 'ht1', 'wt1');
+            f.AddGuide('x1', 1, 'hc', 'dx1', '0');
+            f.AddGuide('y1', 1, 'vc', 'dy1', '0');
+            f.AddGuide('adval2', 10, '0', 'adj2', '99000');
+            f.AddGuide('ratio', 0, 'adval2', '1', '100000');
+            f.AddGuide('iwd2', 0, 'wd2', 'ratio', '1');
+            f.AddGuide('ihd2', 0, 'hd2', 'ratio', '1');
+            f.AddGuide('wt2', 12, 'iwd2', 'adval');
+            f.AddGuide('ht2', 7, 'ihd2', 'adval');
+            f.AddGuide('dx2', 6, 'iwd2', 'ht2', 'wt2');
+            f.AddGuide('dy2', 11, 'ihd2', 'ht2', 'wt2');
+            f.AddGuide('x2', 1, 'hc', 'dx2', '0');
+            f.AddGuide('y2', 1, 'vc', 'dy2', '0');
+            f.AddHandlePolar('adj1', '0', '21599999', 'adj2', '0', '100000', 'x2', 'y2');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x1', 'y1');
+            f.AddPathCommand(3, 'wd2', 'hd2', 'adval', 'swAng');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x2', 'y2');
+            f.AddPathCommand(3, 'iwd2', 'ihd2', 'adval', 'swAng');
+            break;
+        }
+        case 'textCurveDown':{
+            f.AddAdj('adj', 15, '45977');
+            f.AddGuide('a', 10, '0', 'adj', '56338');
+            f.AddGuide('dy', 0, 'a', 'h', '100000');
+            f.AddGuide('gd1', 0, 'dy', '3', '4');
+            f.AddGuide('gd2', 0, 'dy', '5', '4');
+            f.AddGuide('gd3', 0, 'dy', '3', '8');
+            f.AddGuide('gd4', 0, 'dy', '1', '8');
+            f.AddGuide('gd5', 1, 'h', '0', 'gd3');
+            f.AddGuide('gd6', 1, 'gd4', 'h', '0');
+            f.AddGuide('y0', 1, 't', 'dy', '0');
+            f.AddGuide('y1', 1, 't', 'gd1', '0');
+            f.AddGuide('y2', 1, 't', 'gd2', '0');
+            f.AddGuide('y3', 1, 't', 'gd3', '0');
+            f.AddGuide('y4', 1, 't', 'gd4', '0');
+            f.AddGuide('y5', 1, 't', 'gd5', '0');
+            f.AddGuide('y6', 1, 't', 'gd6', '0');
+            f.AddGuide('x1', 1, 'l', 'wd3', '0');
+            f.AddGuide('x2', 1, 'r', '0', 'wd3');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '0', '56338', 'r', 'y0');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 't');
+            f.AddPathCommand(5, 'x1', 'y1', 'x2', 'y2', 'r', 'y0');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y5');
+            f.AddPathCommand(5, 'x1', 'y6', 'x2', 'y6', 'r', 'y5');
+            break;
+        }
+        case 'textCurveUp':{
+            f.AddAdj('adj', 15, '45977');
+            f.AddGuide('a', 10, '0', 'adj', '56338');
+            f.AddGuide('dy', 0, 'a', 'h', '100000');
+            f.AddGuide('gd1', 0, 'dy', '3', '4');
+            f.AddGuide('gd2', 0, 'dy', '5', '4');
+            f.AddGuide('gd3', 0, 'dy', '3', '8');
+            f.AddGuide('gd4', 0, 'dy', '1', '8');
+            f.AddGuide('gd5', 1, 'h', '0', 'gd3');
+            f.AddGuide('gd6', 1, 'gd4', 'h', '0');
+            f.AddGuide('y0', 1, 't', 'dy', '0');
+            f.AddGuide('y1', 1, 't', 'gd1', '0');
+            f.AddGuide('y2', 1, 't', 'gd2', '0');
+            f.AddGuide('y3', 1, 't', 'gd3', '0');
+            f.AddGuide('y4', 1, 't', 'gd4', '0');
+            f.AddGuide('y5', 1, 't', 'gd5', '0');
+            f.AddGuide('y6', 1, 't', 'gd6', '0');
+            f.AddGuide('x1', 1, 'l', 'wd3', '0');
+            f.AddGuide('x2', 1, 'r', '0', 'wd3');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '0', '56338', 'l', 'y0');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y0');
+            f.AddPathCommand(5, 'x1', 'y2', 'x2', 'y1', 'r', 't');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y5');
+            f.AddPathCommand(5, 'x1', 'y6', 'x2', 'y6', 'r', 'y5');
+            break;
+        }
+        case 'textDeflate':{
+            f.AddAdj('adj', 15, '18750');
+            f.AddGuide('a', 10, '0', 'adj', '37500');
+            f.AddGuide('dy', 0, 'a', 'ss', '100000');
+            f.AddGuide('gd0', 0, 'dy', '4', '3');
+            f.AddGuide('gd1', 1, 'h', '0', 'gd0');
+            f.AddGuide('adjY', 1, 't', 'dy', '0');
+            f.AddGuide('y0', 1, 't', 'gd0', '0');
+            f.AddGuide('y1', 1, 't', 'gd1', '0');
+            f.AddGuide('x0', 1, 'l', 'wd3', '0');
+            f.AddGuide('x1', 1, 'r', '0', 'wd3');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '0', '37500', 'hc', 'adjY');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 't');
+            f.AddPathCommand(5, 'x0', 'y0', 'x1', 'y0', 'r', 't');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'b');
+            f.AddPathCommand(5, 'x0', 'y1', 'x1', 'y1', 'r', 'b');
+            break;
+        }
+        case 'textDeflateBottom':{
+            f.AddAdj('adj', 15, '50000');
+            f.AddGuide('a', 10, '6250', 'adj', '100000');
+            f.AddGuide('dy', 0, 'a', 'ss', '100000');
+            f.AddGuide('dy2', 1, 'h', '0', 'dy');
+            f.AddGuide('y1', 1, 't', 'dy', '0');
+            f.AddGuide('cp', 1, 'y1', '0', 'dy2');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '6250', '100000', 'hc', 'y1');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 't');
+            f.AddPathCommand(2, 'r', 't');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'b');
+            f.AddPathCommand(4, 'hc', 'cp', 'r', 'b');
+            break;
+        }
+        case 'textDeflateInflate':{
+            f.AddAdj('adj', 15, '35000');
+            f.AddGuide('a', 10, '5000', 'adj', '95000');
+            f.AddGuide('dy', 0, 'a', 'h', '100000');
+            f.AddGuide('del', 0, 'h', '5', '100');
+            f.AddGuide('dh1', 0, 'h', '45', '100');
+            f.AddGuide('dh2', 0, 'h', '55', '100');
+            f.AddGuide('yh', 1, 'dy', '0', 'del');
+            f.AddGuide('yl', 1, 'dy', 'del', '0');
+            f.AddGuide('y3', 1, 'yh', 'yh', 'dh1');
+            f.AddGuide('y4', 1, 'yl', 'yl', 'dh2');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '5000', '95000', 'hc', 'dy');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 't');
+            f.AddPathCommand(2, 'r', 't');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'dh1');
+            f.AddPathCommand(4, 'hc', 'y3', 'r', 'dh1');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'dh2');
+            f.AddPathCommand(4, 'hc', 'y4', 'r', 'dh2');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'b');
+            f.AddPathCommand(2, 'r', 'b');
+            break;
+        }
+        case 'textDeflateInflateDeflate':{
+            f.AddAdj('adj', 15, '25000');
+            f.AddGuide('a', 10, '3000', 'adj', '47000');
+            f.AddGuide('dy', 0, 'a', 'h', '100000');
+            f.AddGuide('del', 0, 'h', '3', '100');
+            f.AddGuide('ey1', 0, 'h', '30', '100');
+            f.AddGuide('ey2', 0, 'h', '36', '100');
+            f.AddGuide('ey3', 0, 'h', '63', '100');
+            f.AddGuide('ey4', 0, 'h', '70', '100');
+            f.AddGuide('by', 1, 'b', '0', 'dy');
+            f.AddGuide('yh1', 1, 'dy', '0', 'del');
+            f.AddGuide('yl1', 1, 'dy', 'del', '0');
+            f.AddGuide('yh2', 1, 'by', '0', 'del');
+            f.AddGuide('yl2', 1, 'by', 'del', '0');
+            f.AddGuide('y1', 1, 'yh1', 'yh1', 'ey1');
+            f.AddGuide('y2', 1, 'yl1', 'yl1', 'ey2');
+            f.AddGuide('y3', 1, 'yh2', 'yh2', 'ey3');
+            f.AddGuide('y4', 1, 'yl2', 'yl2', 'ey4');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '3000', '47000', 'hc', 'dy');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 't');
+            f.AddPathCommand(2, 'r', 't');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'ey1');
+            f.AddPathCommand(4, 'hc', 'y1', 'r', 'ey1');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'ey2');
+            f.AddPathCommand(4, 'hc', 'y2', 'r', 'ey2');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'ey3');
+            f.AddPathCommand(4, 'hc', 'y3', 'r', 'ey3');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'ey4');
+            f.AddPathCommand(4, 'hc', 'y4', 'r', 'ey4');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'b');
+            f.AddPathCommand(2, 'r', 'b');
+            break;
+        }
+        case 'textDeflateTop':{
+            f.AddAdj('adj', 15, '50000');
+            f.AddGuide('a', 10, '0', 'adj', '93750');
+            f.AddGuide('dy', 0, 'a', 'h', '100000');
+            f.AddGuide('y1', 1, 't', 'dy', '0');
+            f.AddGuide('cp', 1, 'y1', 'dy', '0');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '0', '93750', 'hc', 'y1');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 't');
+            f.AddPathCommand(4, 'hc', 'cp', 'r', 't');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'b');
+            f.AddPathCommand(2, 'r', 'b');
+            break;
+        }
+        case 'textDoubleWave1':{
+            f.AddAdj('adj1', 15, '6250');
+            f.AddAdj('adj2', 15, '0');
+            f.AddGuide('a1', 10, '0', 'adj1', '12500');
+            f.AddGuide('a2', 10, '-10000', 'adj2', '10000');
+            f.AddGuide('y1', 0, 'h', 'a1', '100000');
+            f.AddGuide('dy2', 0, 'y1', '10', '3');
+            f.AddGuide('y2', 1, 'y1', '0', 'dy2');
+            f.AddGuide('y3', 1, 'y1', 'dy2', '0');
+            f.AddGuide('y4', 1, 'b', '0', 'y1');
+            f.AddGuide('y5', 1, 'y4', '0', 'dy2');
+            f.AddGuide('y6', 1, 'y4', 'dy2', '0');
+            f.AddGuide('of', 0, 'w', 'a2', '100000');
+            f.AddGuide('of2', 0, 'w', 'a2', '50000');
+            f.AddGuide('x1', 4, 'of');
+            f.AddGuide('dx2', 3, 'of2', '0', 'of2');
+            f.AddGuide('x2', 1, 'l', '0', 'dx2');
+            f.AddGuide('dx8', 3, 'of2', 'of2', '0');
+            f.AddGuide('x8', 1, 'r', '0', 'dx8');
+            f.AddGuide('dx3', 2, 'dx2', 'x8', '6');
+            f.AddGuide('x3', 1, 'x2', 'dx3', '0');
+            f.AddGuide('dx4', 2, 'dx2', 'x8', '3');
+            f.AddGuide('x4', 1, 'x2', 'dx4', '0');
+            f.AddGuide('x5', 2, 'x2', 'x8', '2');
+            f.AddGuide('x6', 1, 'x5', 'dx3', '0');
+            f.AddGuide('x7', 2, 'x6', 'x8', '2');
+            f.AddGuide('x9', 1, 'l', 'dx8', '0');
+            f.AddGuide('x15', 1, 'r', 'dx2', '0');
+            f.AddGuide('x10', 1, 'x9', 'dx3', '0');
+            f.AddGuide('x11', 1, 'x9', 'dx4', '0');
+            f.AddGuide('x12', 2, 'x9', 'x15', '2');
+            f.AddGuide('x13', 1, 'x12', 'dx3', '0');
+            f.AddGuide('x14', 2, 'x13', 'x15', '2');
+            f.AddGuide('x16', 1, 'r', '0', 'x1');
+            f.AddGuide('xAdj', 1, 'hc', 'of', '0');
+            f.AddHandleXY(undefined, '0', '0', 'adj1', '0', '12500', 'l', 'y1');
+            f.AddHandleXY('adj2', '-10000', '10000', undefined, '0', '0', 'xAdj', 'b');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x2', 'y1');
+            f.AddPathCommand(5, 'x3', 'y2', 'x4', 'y3', 'x5', 'y1');
+            f.AddPathCommand(5, 'x6', 'y2', 'x7', 'y3', 'x8', 'y1');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x9', 'y4');
+            f.AddPathCommand(5, 'x10', 'y5', 'x11', 'y6', 'x12', 'y4');
+            f.AddPathCommand(5, 'x13', 'y5', 'x14', 'y6', 'x15', 'y4');
+            break;
+        }
+        case 'textFadeDown':{
+            f.AddAdj('adj', 15, '33333');
+            f.AddGuide('a', 10, '0', 'adj', '49999');
+            f.AddGuide('dx', 0, 'a', 'w', '100000');
+            f.AddGuide('x1', 1, 'l', 'dx', '0');
+            f.AddGuide('x2', 1, 'r', '0', 'dx');
+            f.AddHandleXY('adj', '0', '49999', undefined, '0', '0', 'x1', 'b');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 't');
+            f.AddPathCommand(2, 'r', 't');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x1', 'b');
+            f.AddPathCommand(2, 'x2', 'b');
+            break;
+        }
+        case 'textFadeLeft':{
+            f.AddAdj('adj', 15, '33333');
+            f.AddGuide('a', 10, '0', 'adj', '49999');
+            f.AddGuide('dy', 0, 'a', 'h', '100000');
+            f.AddGuide('y1', 1, 't', 'dy', '0');
+            f.AddGuide('y2', 1, 'b', '0', 'dy');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '0', '49999', 'l', 'y1');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y1');
+            f.AddPathCommand(2, 'r', 't');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y2');
+            f.AddPathCommand(2, 'r', 'b');
+            break;
+        }
+        case 'textFadeRight':{
+            f.AddAdj('adj', 15, '33333');
+            f.AddGuide('a', 10, '0', 'adj', '49999');
+            f.AddGuide('dy', 0, 'a', 'h', '100000');
+            f.AddGuide('y1', 1, 't', 'dy', '0');
+            f.AddGuide('y2', 1, 'b', '0', 'dy');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '0', '49999', 'r', 'y1');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 't');
+            f.AddPathCommand(2, 'r', 'y1');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'b');
+            f.AddPathCommand(2, 'r', 'y2');
+            break;
+        }
+        case 'textFadeUp':{
+            f.AddAdj('adj', 15, '33333');
+            f.AddGuide('a', 10, '0', 'adj', '49999');
+            f.AddGuide('dx', 0, 'a', 'w', '100000');
+            f.AddGuide('x1', 1, 'l', 'dx', '0');
+            f.AddGuide('x2', 1, 'r', '0', 'dx');
+            f.AddHandleXY('adj', '0', '49999', undefined, '0', '0', 'x1', 't');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x1', 't');
+            f.AddPathCommand(2, 'x2', 't');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'b');
+            f.AddPathCommand(2, 'r', 'b');
+            break;
+        }
+        case 'textInflate':{
+            f.AddAdj('adj', 15, '18750');
+            f.AddGuide('a', 10, '0', 'adj', '20000');
+            f.AddGuide('dy', 0, 'a', 'h', '100000');
+            f.AddGuide('gd', 0, 'dy', '1', '3');
+            f.AddGuide('gd0', 1, '0', '0', 'gd');
+            f.AddGuide('gd1', 1, 'h', '0', 'gd0');
+            f.AddGuide('ty', 1, 't', 'dy', '0');
+            f.AddGuide('by', 1, 'b', '0', 'dy');
+            f.AddGuide('y0', 1, 't', 'gd0', '0');
+            f.AddGuide('y1', 1, 't', 'gd1', '0');
+            f.AddGuide('x0', 1, 'l', 'wd3', '0');
+            f.AddGuide('x1', 1, 'r', '0', 'wd3');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '0', '20000', 'l', 'ty');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'ty');
+            f.AddPathCommand(5, 'x0', 'y0', 'x1', 'y0', 'r', 'ty');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'by');
+            f.AddPathCommand(5, 'x0', 'y1', 'x1', 'y1', 'r', 'by');
+            break;
+        }
+        case 'textInflateBottom':{
+            f.AddAdj('adj', 15, '60000');
+            f.AddGuide('a', 10, '60000', 'adj', '100000');
+            f.AddGuide('dy', 0, 'a', 'h', '100000');
+            f.AddGuide('ty', 1, 't', 'dy', '0');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '60000', '100000', 'l', 'ty');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 't');
+            f.AddPathCommand(2, 'r', 't');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'ty');
+            f.AddPathCommand(4, 'hc', 'b', 'r', 'ty');
+            break;
+        }
+        case 'textInflateTop':{
+            f.AddAdj('adj', 15, '40000');
+            f.AddGuide('a', 10, '0', 'adj', '50000');
+            f.AddGuide('dy', 0, 'a', 'h', '100000');
+            f.AddGuide('ty', 1, 't', 'dy', '0');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '0', '50000', 'l', 'ty');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'ty');
+            f.AddPathCommand(4, 'hc', 't', 'r', 'ty');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'b');
+            f.AddPathCommand(2, 'r', 'b');
+            break;
+        }
+        case 'textPlain':{
+            f.AddAdj('adj', 15, '50000');
+            f.AddGuide('a', 10, '30000', 'adj', '70000');
+            f.AddGuide('mid', 0, 'a', 'w', '100000');
+            f.AddGuide('midDir', 1, 'mid', '0', 'hc');
+            f.AddGuide('dl', 1, 'mid', '0', 'l');
+            f.AddGuide('dr', 1, 'r', '0', 'mid');
+            f.AddGuide('dl2', 0, 'dl', '2', '1');
+            f.AddGuide('dr2', 0, 'dr', '2', '1');
+            f.AddGuide('dx', 3, 'midDir', 'dr2', 'dl2');
+            f.AddGuide('xr', 1, 'l', 'dx', '0');
+            f.AddGuide('xl', 1, 'r', '0', 'dx');
+            f.AddGuide('tlx', 3, 'midDir', 'l', 'xl');
+            f.AddGuide('trx', 3, 'midDir', 'xr', 'r');
+            f.AddGuide('blx', 3, 'midDir', 'xl', 'l');
+            f.AddGuide('brx', 3, 'midDir', 'r', 'xr');
+            f.AddHandleXY('adj', '30000', '70000', undefined, '0', '0', 'mid', 'b');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'tlx', 't');
+            f.AddPathCommand(2, 'trx', 't');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'blx', 'b');
+            f.AddPathCommand(2, 'brx', 'b');
+            break;
+        }
+        case 'textRingInside':{
+            f.AddAdj('adj', 15, '60000');
+            f.AddGuide('a', 10, '50000', 'adj', '99000');
+            f.AddGuide('dy', 0, 'a', 'h', '100000');
+            f.AddGuide('y', 1, 't', 'dy', '0');
+            f.AddGuide('r', 0, 'dy', '1', '2');
+            f.AddGuide('y1', 1, 't', 'r', '0');
+            f.AddGuide('y2', 1, 'b', '0', 'r');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '50000', '99000', 'hc', 'y');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y1');
+            f.AddPathCommand(3, 'wd2', 'y1', '10800000', '21599999');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y2');
+            f.AddPathCommand(3, 'wd2', 'r', '10800000', '21599999');
+            break;
+        }
+        case 'textRingOutside':{
+            f.AddAdj('adj', 15, '60000');
+            f.AddGuide('a', 10, '50000', 'adj', '99000');
+            f.AddGuide('dy', 0, 'a', 'h', '100000');
+            f.AddGuide('y', 1, 't', 'dy', '0');
+            f.AddGuide('r', 0, 'dy', '1', '2');
+            f.AddGuide('y1', 1, 't', 'r', '0');
+            f.AddGuide('y2', 1, 'b', '0', 'r');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '50000', '99000', 'hc', 'y');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y1');
+            f.AddPathCommand(3, 'wd2', 'y1', '10800000', '-21599999');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y2');
+            f.AddPathCommand(3, 'wd2', 'r', '10800000', '-21599999');
+            break;
+        }
+        case 'textSlantDown':{
+            f.AddAdj('adj', 15, '44445');
+            f.AddGuide('a', 10, '28569', 'adj', '100000');
+            f.AddGuide('dy', 0, 'a', 'h', '100000');
+            f.AddGuide('y1', 1, 't', 'dy', '0');
+            f.AddGuide('y2', 1, 'b', '0', 'dy');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '28569', '100000', 'l', 'y1');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 't');
+            f.AddPathCommand(2, 'r', 'y2');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y1');
+            f.AddPathCommand(2, 'r', 'b');
+            break;
+        }
+        case 'textSlantUp':{
+            f.AddAdj('adj', 15, '55555');
+            f.AddGuide('a', 10, '0', 'adj', '71431');
+            f.AddGuide('dy', 0, 'a', 'h', '100000');
+            f.AddGuide('y1', 1, 't', 'dy', '0');
+            f.AddGuide('y2', 1, 'b', '0', 'dy');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '0', '71431', 'l', 'y1');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y1');
+            f.AddPathCommand(2, 'r', 't');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'b');
+            f.AddPathCommand(2, 'r', 'y2');
+            break;
+        }
+        case 'textStop':{
+            f.AddAdj('adj', 15, '25000');
+            f.AddGuide('a', 10, '14286', 'adj', '50000');
+            f.AddGuide('dx', 0, 'w', '1', '3');
+            f.AddGuide('dy', 0, 'a', 'h', '100000');
+            f.AddGuide('x1', 1, 'l', 'dx', '0');
+            f.AddGuide('x2', 1, 'r', '0', 'dx');
+            f.AddGuide('y1', 1, 't', 'dy', '0');
+            f.AddGuide('y2', 1, 'b', '0', 'dy');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '14286', '50000', 'l', 'dy');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y1');
+            f.AddPathCommand(2, 'x1', 't');
+            f.AddPathCommand(2, 'x2', 't');
+            f.AddPathCommand(2, 'r', 'y1');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y2');
+            f.AddPathCommand(2, 'x1', 'b');
+            f.AddPathCommand(2, 'x2', 'b');
+            f.AddPathCommand(2, 'r', 'y2');
+            break;
+        }
+        case 'textTriangle':{
+            f.AddAdj('adj', 15, '50000');
+            f.AddGuide('a', 10, '0', 'adj', '100000');
+            f.AddGuide('y', 0, 'a', 'h', '100000');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '0', '100000', 'l', 'y');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y');
+            f.AddPathCommand(2, 'hc', 't');
+            f.AddPathCommand(2, 'r', 'y');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'b');
+            f.AddPathCommand(2, 'r', 'b');
+            break;
+        }
+        case 'textTriangleInverted':{
+            f.AddAdj('adj', 15, '50000');
+            f.AddGuide('a', 10, '0', 'adj', '100000');
+            f.AddGuide('y', 0, 'a', 'h', '100000');
+            f.AddHandleXY(undefined, '0', '0', 'adj', '0', '100000', 'l', 'y');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 't');
+            f.AddPathCommand(2, 'r', 't');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'l', 'y');
+            f.AddPathCommand(2, 'hc', 'b');
+            f.AddPathCommand(2, 'r', 'y');
+            break;
+        }
+        case 'textWave1':{
+            f.AddAdj('adj1', 15, '12500');
+            f.AddAdj('adj2', 15, '0');
+            f.AddGuide('a1', 10, '0', 'adj1', '20000');
+            f.AddGuide('a2', 10, '-10000', 'adj2', '10000');
+            f.AddGuide('y1', 0, 'h', 'a1', '100000');
+            f.AddGuide('dy2', 0, 'y1', '10', '3');
+            f.AddGuide('y2', 1, 'y1', '0', 'dy2');
+            f.AddGuide('y3', 1, 'y1', 'dy2', '0');
+            f.AddGuide('y4', 1, 'b', '0', 'y1');
+            f.AddGuide('y5', 1, 'y4', '0', 'dy2');
+            f.AddGuide('y6', 1, 'y4', 'dy2', '0');
+            f.AddGuide('of', 0, 'w', 'a2', '100000');
+            f.AddGuide('of2', 0, 'w', 'a2', '50000');
+            f.AddGuide('x1', 4, 'of');
+            f.AddGuide('dx2', 3, 'of2', '0', 'of2');
+            f.AddGuide('x2', 1, 'l', '0', 'dx2');
+            f.AddGuide('dx5', 3, 'of2', 'of2', '0');
+            f.AddGuide('x5', 1, 'r', '0', 'dx5');
+            f.AddGuide('dx3', 2, 'dx2', 'x5', '3');
+            f.AddGuide('x3', 1, 'x2', 'dx3', '0');
+            f.AddGuide('x4', 2, 'x3', 'x5', '2');
+            f.AddGuide('x6', 1, 'l', 'dx5', '0');
+            f.AddGuide('x10', 1, 'r', 'dx2', '0');
+            f.AddGuide('x7', 1, 'x6', 'dx3', '0');
+            f.AddGuide('x8', 2, 'x7', 'x10', '2');
+            f.AddGuide('x9', 1, 'r', '0', 'x1');
+            f.AddGuide('xAdj', 1, 'hc', 'of', '0');
+            f.AddHandleXY(undefined, '0', '0', 'adj1', '0', '20000', 'l', 'y1');
+            f.AddHandleXY('adj2', '-10000', '10000', undefined, '0', '0', 'xAdj', 'b');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x2', 'y1');
+            f.AddPathCommand(5, 'x3', 'y2', 'x4', 'y3', 'x5', 'y1');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x6', 'y4');
+            f.AddPathCommand(5, 'x7', 'y5', 'x8', 'y6', 'x10', 'y4');
+            break;
+        }
+        case 'textWave2':{
+            f.AddAdj('adj1', 15, '12500');
+            f.AddAdj('adj2', 15, '0');
+            f.AddGuide('a1', 10, '0', 'adj1', '20000');
+            f.AddGuide('a2', 10, '-10000', 'adj2', '10000');
+            f.AddGuide('y1', 0, 'h', 'a1', '100000');
+            f.AddGuide('dy2', 0, 'y1', '10', '3');
+            f.AddGuide('y2', 1, 'y1', '0', 'dy2');
+            f.AddGuide('y3', 1, 'y1', 'dy2', '0');
+            f.AddGuide('y4', 1, 'b', '0', 'y1');
+            f.AddGuide('y5', 1, 'y4', '0', 'dy2');
+            f.AddGuide('y6', 1, 'y4', 'dy2', '0');
+            f.AddGuide('of', 0, 'w', 'a2', '100000');
+            f.AddGuide('of2', 0, 'w', 'a2', '50000');
+            f.AddGuide('x1', 4, 'of');
+            f.AddGuide('dx2', 3, 'of2', '0', 'of2');
+            f.AddGuide('x2', 1, 'l', '0', 'dx2');
+            f.AddGuide('dx5', 3, 'of2', 'of2', '0');
+            f.AddGuide('x5', 1, 'r', '0', 'dx5');
+            f.AddGuide('dx3', 2, 'dx2', 'x5', '3');
+            f.AddGuide('x3', 1, 'x2', 'dx3', '0');
+            f.AddGuide('x4', 2, 'x3', 'x5', '2');
+            f.AddGuide('x6', 1, 'l', 'dx5', '0');
+            f.AddGuide('x10', 1, 'r', 'dx2', '0');
+            f.AddGuide('x7', 1, 'x6', 'dx3', '0');
+            f.AddGuide('x8', 2, 'x7', 'x10', '2');
+            f.AddGuide('x9', 1, 'r', '0', 'x1');
+            f.AddGuide('xAdj', 1, 'hc', 'of', '0');
+            f.AddHandleXY(undefined, '0', '0', 'adj1', '0', '20000', 'l', 'y1');
+            f.AddHandleXY('adj2', '-10000', '10000', undefined, '0', '0', 'xAdj', 'b');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x2', 'y1');
+            f.AddPathCommand(5, 'x3', 'y3', 'x4', 'y2', 'x5', 'y1');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x6', 'y4');
+            f.AddPathCommand(5, 'x7', 'y6', 'x8', 'y5', 'x10', 'y4');
+            break;
+        }
+        case 'textWave4':{
+            f.AddAdj('adj1', 15, '6250');
+            f.AddAdj('adj2', 15, '0');
+            f.AddGuide('a1', 10, '0', 'adj1', '12500');
+            f.AddGuide('a2', 10, '-10000', 'adj2', '10000');
+            f.AddGuide('y1', 0, 'h', 'a1', '100000');
+            f.AddGuide('dy2', 0, 'y1', '10', '3');
+            f.AddGuide('y2', 1, 'y1', '0', 'dy2');
+            f.AddGuide('y3', 1, 'y1', 'dy2', '0');
+            f.AddGuide('y4', 1, 'b', '0', 'y1');
+            f.AddGuide('y5', 1, 'y4', '0', 'dy2');
+            f.AddGuide('y6', 1, 'y4', 'dy2', '0');
+            f.AddGuide('of', 0, 'w', 'a2', '100000');
+            f.AddGuide('of2', 0, 'w', 'a2', '50000');
+            f.AddGuide('x1', 4, 'of');
+            f.AddGuide('dx2', 3, 'of2', '0', 'of2');
+            f.AddGuide('x2', 1, 'l', '0', 'dx2');
+            f.AddGuide('dx8', 3, 'of2', 'of2', '0');
+            f.AddGuide('x8', 1, 'r', '0', 'dx8');
+            f.AddGuide('dx3', 2, 'dx2', 'x8', '6');
+            f.AddGuide('x3', 1, 'x2', 'dx3', '0');
+            f.AddGuide('dx4', 2, 'dx2', 'x8', '3');
+            f.AddGuide('x4', 1, 'x2', 'dx4', '0');
+            f.AddGuide('x5', 2, 'x2', 'x8', '2');
+            f.AddGuide('x6', 1, 'x5', 'dx3', '0');
+            f.AddGuide('x7', 2, 'x6', 'x8', '2');
+            f.AddGuide('x9', 1, 'l', 'dx8', '0');
+            f.AddGuide('x15', 1, 'r', 'dx2', '0');
+            f.AddGuide('x10', 1, 'x9', 'dx3', '0');
+            f.AddGuide('x11', 1, 'x9', 'dx4', '0');
+            f.AddGuide('x12', 2, 'x9', 'x15', '2');
+            f.AddGuide('x13', 1, 'x12', 'dx3', '0');
+            f.AddGuide('x14', 2, 'x13', 'x15', '2');
+            f.AddGuide('x16', 1, 'r', '0', 'x1');
+            f.AddGuide('xAdj', 1, 'hc', 'of', '0');
+            f.AddHandleXY(undefined, '0', '0', 'adj1', '0', '12500', 'l', 'y1');
+            f.AddHandleXY('adj2', '-10000', '10000', undefined, '0', '0', 'xAdj', 'b');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x2', 'y1');
+            f.AddPathCommand(5, 'x3', 'y3', 'x4', 'y2', 'x5', 'y1');
+            f.AddPathCommand(5, 'x6', 'y3', 'x7', 'y2', 'x8', 'y1');
+            f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
+            f.AddPathCommand(1, 'x9', 'y4');
+            f.AddPathCommand(5, 'x10', 'y6', 'x11', 'y5', 'x12', 'y4');
+            f.AddPathCommand(5, 'x13', 'y6', 'x14', 'y5', 'x15', 'y4');
+            break;
+        }
+    }
+    if(typeof prst === "string" && prst.length > 0)
+    {
+        f.setPreset(prst);
+    }
+    return f;
+}

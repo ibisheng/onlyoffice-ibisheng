@@ -147,7 +147,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
     }
 }
 
-function ObjectToDraw(brush, pen, extX, extY, geometry, transform)
+function ObjectToDraw(brush, pen, extX, extY, geometry, transform, oTextDrawer)
 {
     this.brush = brush;
     this.pen = pen;
@@ -156,6 +156,7 @@ function ObjectToDraw(brush, pen, extX, extY, geometry, transform)
     this.transform = transform;
     this.TransformMatrix = transform;
     this.geometry = geometry;
+    this.parentShape = null;
 }
 ObjectToDraw.prototype =
 {
@@ -175,6 +176,62 @@ ObjectToDraw.prototype =
             boundsChecker._z();
             boundsChecker._e();
         }
+    },
+
+    resetBrushPen: function(brush, pen)
+    {
+        this.brush = brush;
+        this.pen = pen;
+    },
+
+    Recalculate: function(oTheme, oColorMap, dWidth, dHeight, oShape, oParaLine)
+    {
+        if(this.brush)
+        {
+            this.brush.check(oTheme, oColorMap);
+        }
+        if(this.pen && this.pen.Fill)
+        {
+            this.pen.Fill.check(oTheme, oColorMap);
+        }
+        if(this.geometry)
+        {
+            this.geometry.Recalculate(dWidth, dHeight);
+        }
+        this.parentShape = oShape;
+        this.oParaLine = oParaLine;
+    },
+
+    draw: function(graphics, bNoParentShapeTransform, oTransformMatrix)
+    {
+        var oTransform;
+        if(oTransformMatrix)
+        {
+            oTransform = oTransformMatrix;
+        }
+        else
+        {
+            if(this.parentShape && !(bNoParentShapeTransform === true))
+            {
+                oTransform = this.parentShape.transformText;
+            }
+            else
+            {
+                oTransform = this.TransformMatrix;
+            }
+        }
+        graphics.SaveGrState();
+        graphics.SetIntegerGrid(false);
+        graphics.transform3(oTransform, false);
+        var shape_drawer = new CShapeDrawer();
+        shape_drawer.fromShape2(this, graphics, this.geometry);
+        shape_drawer.draw(this.geometry);
+        graphics.RestoreGrState();
+    },
+
+    createDuplicate: function(bNoCopyHiddeen)
+    {
+        var oCopy = new ObjectToDraw()
     }
 };
 function RotateTrackShapeImage(originalObject)

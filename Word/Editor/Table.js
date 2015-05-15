@@ -3799,6 +3799,10 @@ CTable.prototype =
     {
         if ( this.HeaderInfo.Count > 0 && PNum > this.HeaderInfo.PageIndex && true === this.HeaderInfo.Pages[PNum].Draw )
         {
+            if(pGraphics.Start_Command)
+            {
+                pGraphics.Start_Command(DRAW_COMMAND_TABLE_ROW);
+            }
             var HeaderPage = this.HeaderInfo.Pages[PNum];
             for ( var CurRow = 0; CurRow < this.HeaderInfo.Count; CurRow++ )
             {
@@ -3817,6 +3821,10 @@ CTable.prototype =
                     Cell.Content_Draw(PNum, pGraphics);
                 }
             }
+            if(pGraphics.End_Command)
+            {
+                pGraphics.End_Command();
+            }
         }
 
         // Рисуем содержимое всех ячеек. Его рисуем в нормальном порядке, потому что некоторые элементы
@@ -3826,6 +3834,10 @@ CTable.prototype =
             var Row = this.Content[CurRow];
             var CellsCount = Row.Get_CellsCount();
 
+            if(pGraphics.Start_Command)
+            {
+                pGraphics.Start_Command(DRAW_COMMAND_TABLE_ROW);
+            }
             for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
             {
                 var Cell = Row.Get_Cell( CurCell );
@@ -3864,6 +3876,11 @@ CTable.prototype =
 
                 // Выводим содержимое таблицы
                 Cell.Content_Draw(PNum, pGraphics);
+            }
+
+            if(pGraphics.End_Command)
+            {
+                pGraphics.End_Command();
             }
         }
     },

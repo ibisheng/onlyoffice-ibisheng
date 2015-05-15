@@ -2131,8 +2131,6 @@ function CPresentationBullet()
             }
         }
 
-        Context.p_color( oColor.r, oColor.g, oColor.b, 255 );
-        Context.b_color1( oColor.r, oColor.g, oColor.b, 255 );
 
         var OldTextPr  = Context.GetTextPr();
         var OldTextPr2 = g_oTextMeasurer.GetTextPr();
@@ -2146,6 +2144,8 @@ function CPresentationBullet()
         var FontSlot = g_font_detector.Get_FontClass( sT.charCodeAt(0), Hint, lcid, bCS, bRTL );
         Context.SetTextPr( this.m_oTextPr, PDSE.Theme );
         Context.SetFontSlot( FontSlot );
+        Context.p_color( oColor.r, oColor.g, oColor.b, 255 );
+        Context.b_color1( oColor.r, oColor.g, oColor.b, 255 );
         g_oTextMeasurer.SetTextPr( this.m_oTextPr, PDSE.Theme  );
         g_oTextMeasurer.SetFontSlot( FontSlot );
 

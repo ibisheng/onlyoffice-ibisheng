@@ -480,6 +480,19 @@ CShape.prototype.recalculateContent = function()
         content.Set_StartPage(0);
         content.Reset(0, 0, this.contentWidth, 20000);
         content.Recalculate_Page(content.StartPage, true);
+
+        if(this.recalcInfo.recalcTitle)
+        {
+            this.recalcInfo.bRecalculatedTitle = true;
+            this.recalcInfo.recalcTitle = null;
+        }
+        else
+        {
+            var oTextWarpContent = this.checkTextWarp(content, body_pr, this.contentWidth, this.contentHeight);
+            this.txWarpStructParamarks = oTextWarpContent.oTxWarpStructParamarks;
+            this.txWarpStruct = oTextWarpContent.oTxWarpStruct;
+        }
+
     }
 };
 

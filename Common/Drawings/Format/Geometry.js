@@ -26,6 +26,17 @@ var APPROXIMATE_EPSILON3 = 5;
 var cToRad = Math.PI/(60000*180);
 var cToDeg = 1/cToRad;
 
+var oGdLst = {};
+oGdLst["_3cd4"]= 16200000;
+oGdLst["_3cd8"]= 8100000;
+oGdLst["_5cd8"]= 13500000;
+oGdLst["_7cd8"]= 18900000;
+oGdLst["cd2"]= 10800000;
+oGdLst["cd4"]= 5400000;
+oGdLst["cd8"]= 2700000;
+oGdLst["l"]= 0;
+oGdLst["t"]= 0;
+
 function Cos(angle)
 {
     return Math.cos(cToRad*angle);
@@ -386,6 +397,17 @@ Geometry.prototype=
         }
     },
 
+    isEmpty: function()
+    {
+        if(this.pathLst.length === 0)
+            return true;
+        if(this.pathLst.length === 1)
+        {
+            return this.pathLst[0].ArrPathCommandInfo.length === 0;
+        }
+        return false;
+    },
+
     createDuplicate: function()
     {
         var g = new Geometry();
@@ -440,7 +462,19 @@ Geometry.prototype=
     AddAdj: function(name, formula, x, y, z)
     {
         History.Add(this, {Type: historyitem_GeometryAddAdj, name:name, oldVal:this.gdLst[name], newVal:x, oldAvVal: this.avLst[name]});
-        this.gdLst[name] = parseInt(x);
+        var dVal = parseInt(x);
+        if(isNaN(dVal))
+        {
+            if(isRealNumber(oGdLst[x]))
+            {
+                dVal = oGdLst[x];
+            }
+            else
+            {
+                dVal = 0;
+            }
+        }
+        this.gdLst[name] = dVal;
         this.avLst[name] = true;
     },
 
@@ -564,6 +598,7 @@ Geometry.prototype=
             case 6:
             {
                 this.pathLst[this.pathLst.length-1].close();
+                break;
             }
         }
     },
@@ -954,38 +989,38 @@ Geometry.prototype=
 
     Recalculate: function(w, h)
     {
-        this.gdLst["_3cd4"]=16200000;
-        this.gdLst["_3cd8"]=8100000;
-        this.gdLst["_5cd8"]=13500000;
-        this.gdLst["_7cd8"]=18900000;
-        this.gdLst["cd2"]=10800000;
-        this.gdLst["cd4"]=5400000;
-        this.gdLst["cd8"]=2700000;
-        this.gdLst["l"]=0;
-        this.gdLst["t"]=0;
-        this.gdLst["h"]=h;
-        this.gdLst["b"]=h;
-        this.gdLst["hd2"]=h/2;
-        this.gdLst["hd3"]=h/3;
-        this.gdLst["hd4"]=h/4;
-        this.gdLst["hd5"]=h/5;
-        this.gdLst["hd6"]=h/6;
-        this.gdLst["hd8"]=h/8;
-        this.gdLst["hd10"]=h/10;
-        this.gdLst["hd12"]=h/12;
-        this.gdLst["hd32"]=h/32;
-        this.gdLst["vc"]=h/2;
-        this.gdLst["w"]=w;
-        this.gdLst["r"]=w;
-        this.gdLst["wd2"]=w/2;
-        this.gdLst["wd3"]=w/3;
-        this.gdLst["wd4"]=w/4;
-        this.gdLst["wd5"]=w/5;
-        this.gdLst["wd6"]=w/6;
-        this.gdLst["wd8"]=w/8;
-        this.gdLst["wd10"]=w/10;
-        this.gdLst["wd12"]=w/12;
-        this.gdLst["wd32"]=w/32;
+        this.gdLst["_3cd4"]= 16200000;
+        this.gdLst["_3cd8"]= 8100000;
+        this.gdLst["_5cd8"]= 13500000;
+        this.gdLst["_7cd8"]= 18900000;
+        this.gdLst["cd2"]= 10800000;
+        this.gdLst["cd4"]= 5400000;
+        this.gdLst["cd8"]= 2700000;
+        this.gdLst["l"]= 0;
+        this.gdLst["t"]= 0;
+        this.gdLst["h"]= h;
+        this.gdLst["b"]= h;
+        this.gdLst["hd2"]= h/2;
+        this.gdLst["hd3"]= h/3;
+        this.gdLst["hd4"]= h/4;
+        this.gdLst["hd5"]= h/5;
+        this.gdLst["hd6"]= h/6;
+        this.gdLst["hd8"]= h/8;
+        this.gdLst["hd10"]= h/10;
+        this.gdLst["hd12"]= h/12;
+        this.gdLst["hd32"]= h/32;
+        this.gdLst["vc"]= h/2;
+        this.gdLst["w"]= w;
+        this.gdLst["r"]= w;
+        this.gdLst["wd2"]= w/2;
+        this.gdLst["wd3"]= w/3;
+        this.gdLst["wd4"]= w/4;
+        this.gdLst["wd5"]= w/5;
+        this.gdLst["wd6"]= w/6;
+        this.gdLst["wd8"]= w/8;
+        this.gdLst["wd10"] = w/10;
+        this.gdLst["wd12"] = w/12;
+        this.gdLst["wd32"] = w/32;
         this.gdLst["hc"]=w/2;
         this.gdLst["ls"]=Math.max(w,h);
         this.gdLst["ss"]=Math.min(w,h);
@@ -1150,6 +1185,11 @@ Geometry.prototype=
             }
         }
         return {hit: false, adjPolarFlag: null, adjNum: null};
+    },
+
+    getArrayPolygonsByPaths: function(epsilon)
+    {
+        return GetArrayPolygonsByPaths(epsilon, this.pathLst);
     },
 
 
@@ -1491,6 +1531,25 @@ function GraphEdge(point1, point2)
             }
         }
     }
+}
+
+
+function GetArrayPolygonsByPaths(dEpsilon, aPathLst)
+{
+    var geom = new Geometry();
+    var aByPaths = [];
+    for(var i = 0; i < aPathLst.length; ++i)
+    {
+        geom.pathLst.length = 0;
+        geom.pathLst.push(aPathLst[i]);
+        var a = geom.getArrayPolygons(dEpsilon);
+        aByPaths[i] = [];
+        for(var t = 0; t < a.length; ++t)
+        {
+            aByPaths[i] = aByPaths[i].concat(a[t]);
+        }
+    }
+    return aByPaths;
 }
 
 function ComparisonEdgeByTopPoint(graphEdge1, graphEdge2)

@@ -1175,6 +1175,11 @@ CDocumentContent.prototype =
         if ( PageNum < 0 || PageNum >= this.Pages.length )
             return;
 
+
+        if(pGraphics.Start_Command)
+        {
+            pGraphics.Start_Command(DRAW_COMMAND_CONTENT);
+        }
         var Bounds = this.Pages[PageNum].Bounds;
 
         var bClip = false;
@@ -1203,6 +1208,10 @@ CDocumentContent.prototype =
         if ( true === bClip )
         {
             pGraphics.RestoreGrState();
+        }
+        if(pGraphics.End_Command)
+        {
+            pGraphics.End_Command();
         }
     },
 

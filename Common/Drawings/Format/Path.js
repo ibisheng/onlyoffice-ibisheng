@@ -25,6 +25,8 @@ function Path()
     this.ArrPathCommandInfo = [];
     this.ArrPathCommand = [];
 
+    this.IsHidden = false;//For WordArt
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -1155,7 +1157,9 @@ function partition_bezier3(x0, y0, x1, y1, x2, y2, epsilon)
     var r01 = Math.sqrt(dx01*dx01 + dy01*dy01);
     var r12 = Math.sqrt(dx12*dx12 + dy12*dy12);
     if(Math.max(r01, r12) < epsilon)
+    {
         return [{x: x0, y: y0}, {x: x1, y: y1}, {x: x2, y: y2}];
+    }
 
     var x01 = (x0 + x1)*0.5;
     var y01 = (y0 + y1)*0.5;
