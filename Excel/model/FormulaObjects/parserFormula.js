@@ -258,6 +258,9 @@ cBaseType.prototype = {
     toString:function () {
         return this.value.toString();
     },
+    toLocaleString:function(){
+        return this.toString();
+    },
     setNode:function ( node ) {
         this.node = node;
     }
@@ -283,13 +286,20 @@ function cNumber( val ) {
 
 cNumber.prototype = Object.create( cBaseType.prototype );
 cNumber.prototype.tocString = function () {
-    return new cString( "" + this.value );
+    return new cString( ("" + this.value).replace(digitSeparatorDef,digitSeparator) );
 };
 cNumber.prototype.tocNumber = function () {
     return this;
 };
 cNumber.prototype.tocBool = function () {
     return new cBool( this.value !== 0 );
+};
+cNumber.prototype.toLocaleString = function (digitDelim) {
+    var res = this.value.toString();
+    if(digitDelim)
+        return res.replace(digitSeparatorDef,digitSeparator);
+    else
+        return res;
 };
 
 /** @constructor */
@@ -307,15 +317,28 @@ cString.prototype.tocNumber = function () {
     /*if ( this.value[0] === '"' && this.value[this.value.length - 1] === '"' ) {
         m = this.value.substring( 1, this.value.length - 1 );
     }*/
-    if ( !parseNum( m ) ) {
-        res = new cError( cErrorType.wrong_value_type );
-    }
-    else {
-        var numberValue = parseFloat( m );
-        if ( !isNaN( numberValue ) ) {
-            res = new cNumber( numberValue );
+
+    if (g_oFormatParser.isLocaleNumber( this.value ))
+    {
+        if ("." != g_oDefaultCultureInfo.NumberDecimalSeparator) {
+            m = this.value.replace(".", "q");//заменяем на символ с которым не распознается, как в Excel
+            m = m.replace(g_oDefaultCultureInfo.NumberDecimalSeparator, ".");
+        }
+
+        if ( !parseNum( m ) ) {
+            res = new cError( cErrorType.wrong_value_type );
+        }
+        else {
+            var numberValue = g_oFormatParser.parseLocaleNumber( this.value );
+            if ( !isNaN( numberValue ) ) {
+                res = new cNumber( numberValue );
+            }
         }
     }
+    else{
+        res = new cError( cErrorType.wrong_value_type );
+    }
+
     return res;
 };
 cString.prototype.tocBool = function () {
@@ -1412,8 +1435,8 @@ cArray.prototype.tocBool = function () {
 };
 cArray.prototype.toString = function () {
     var ret = "";
-    for ( var ir = 0; ir < this.rowCount; ir++, ret += ";" ) {
-        for ( var ic = 0; ic < this.countElementInRow[ir]; ic++, ret += "," ) {
+    for ( var ir = 0; ir < this.rowCount; ir++, ret += arrayRowSeparatorDef ) {
+        for ( var ic = 0; ic < this.countElementInRow[ir]; ic++, ret += arrayColSeparatorDef ) {
             if ( this.array[ir][ic] instanceof cString ) {
                 ret += '"' + this.array[ir][ic].toString() + '"';
             }
@@ -1421,11 +1444,31 @@ cArray.prototype.toString = function () {
                 ret += this.array[ir][ic].toString() + "";
             }
         }
-        if ( ret[ret.length - 1] === "," ) {
+        if ( ret[ret.length - 1] === arrayColSeparatorDef ) {
             ret = ret.substring( 0, ret.length - 1 );
         }
     }
-    if ( ret[ret.length - 1] === ";" ) {
+    if ( ret[ret.length - 1] === arrayRowSeparatorDef ) {
+        ret = ret.substring( 0, ret.length - 1 );
+    }
+    return "{" + ret + "}";
+};
+cArray.prototype.toLocaleString = function (digitDelim) {
+    var ret = "";
+    for ( var ir = 0; ir < this.rowCount; ir++, ret += digitDelim?arrayRowSeparator:arrayRowSeparatorDef ) {
+        for ( var ic = 0; ic < this.countElementInRow[ir]; ic++, ret += digitDelim?arrayColSeparator:arrayColSeparatorDef ) {
+            if ( this.array[ir][ic] instanceof cString ) {
+                ret += '"' + this.array[ir][ic].toLocaleString(digitDelim) + '"';
+            }
+            else {
+                ret += this.array[ir][ic].toLocaleString(digitDelim) + "";
+            }
+        }
+        if ( ret[ret.length - 1] === digitDelim?arrayColSeparator:arrayColSeparatorDef ) {
+            ret = ret.substring( 0, ret.length - 1 );
+        }
+    }
+    if ( ret[ret.length - 1] === digitDelim?arrayRowSeparator:arrayRowSeparatorDef ) {
         ret = ret.substring( 0, ret.length - 1 );
     }
     return "{" + ret + "}";
@@ -1545,6 +1588,16 @@ cBaseOperator.prototype = {
             str += this.name + arg[start];
         }
         return new cString( str );
+    },
+    Assemble2Locale:function ( arg, start, count, locale, digitDelim ) {
+        var str = "";
+        if ( this.argumentsCurrent === 2 ){
+            str += arg[start + count - 2].toLocaleString(digitDelim) + this.name + arg[start + count - 1].toLocaleString(digitDelim);
+        }
+        else{
+            str += this.name + arg[start];
+        }
+        return new cString( str );
     }
 };
 
@@ -1617,13 +1670,13 @@ cBaseFunction.prototype = {
         }
         return new cString( this.name + "(" + str + ")" );
     },
-    Assemble2Locale:function ( arg, start, count, locale ) {
+    Assemble2Locale:function ( arg, start, count, locale, digitDelim ) {
 
         var str = "", c = start + count - 1, localeName = locale ? locale[this.name] : this.name;
         for ( var i = start; i <= c; i++ ) {
-            str += arg[i].toString();
+            str += arg[i].toLocaleString(digitDelim);
             if ( i !== c ) {
-                str += ",";
+                str += functionArgumentSeparator;
             }
         }
         return new cString( localeName + "(" + str + ")" );
@@ -1717,6 +1770,9 @@ cUnarMinusOperator.prototype.Assemble = function ( arg ) {
 cUnarMinusOperator.prototype.Assemble2 = function ( arg, start, count ) {
     return new cString( "-" + arg[start + count - 1] );
 };
+cUnarMinusOperator.prototype.Assemble2Locale = function ( arg, start, count ) {
+    return new cString( "-" + arg[start + count - 1] );
+};
 
 /** @constructor */
 function cUnarPlusOperator() {
@@ -1740,6 +1796,9 @@ cUnarPlusOperator.prototype.Assemble = function ( arg ) {
     return new cString( "+" + arg[0] );
 };
 cUnarPlusOperator.prototype.Assemble2 = function ( arg, start, count ) {
+    return new cString( "+" + arg[start + count - 1] );
+};
+cUnarPlusOperator.prototype.Assemble2Locale = function ( arg, start, count ) {
     return new cString( "+" + arg[start + count - 1] );
 };
 
@@ -1812,6 +1871,9 @@ cPercentOperator.prototype.Assemble = function ( arg ) {
     return new cString( arg[0] + this.name );
 };
 cPercentOperator.prototype.Assemble2 = function ( arg, start, count ) {
+    return new cString( arg[start + count - 1] + this.name );
+};
+cPercentOperator.prototype.Assemble2Locale = function ( arg, start, count ) {
     return new cString( arg[start + count - 1] + this.name );
 };
 
@@ -3073,7 +3135,7 @@ parserFormula.prototype = {
         this.cellAddress = g_oCellAddressUtils.getCellAddress( cellId );
     },
 
-    parse:function ( local ) {
+    parse:function ( local, digitDelim ) {
 
         if ( this.isParsed )
             return this.isParsed;
@@ -3271,14 +3333,14 @@ parserFormula.prototype = {
             }
 
             /* Array */
-            else if ( parserHelp.isArray.call( this, this.Formula, this.pCurrPos ) ) {
+            else if ( parserHelp.isArray.call( this, this.Formula, this.pCurrPos,digitDelim ) ) {
                 wasLeftParentheses = false; wasRigthParentheses = false;
                 var pH = new parserHelper(), tO = {pCurrPos:0, Formula:this.operand_str, operand_str:""};
                 var arr = new cArray(), operator = { isOperator:false, operatorName:""};
                 while ( tO.pCurrPos < tO.Formula.length ) {
 
-                    if ( pH.isComma.call( tO, tO.Formula, tO.pCurrPos ) ) {
-                        if ( tO.operand_str == ";" ) {
+                    if ( pH.isArraySeparator.call( tO, tO.Formula, tO.pCurrPos, digitDelim ) ) {
+                        if ( tO.operand_str == (digitDelim?arrayRowSeparator:arrayRowSeparatorDef) ) {
                             arr.addRow();
                         }
                     }
@@ -3291,7 +3353,7 @@ parserFormula.prototype = {
                     else if ( pH.isError.call( tO, tO.Formula, tO.pCurrPos ) ) {
                         arr.addElement( new cError( tO.operand_str ) );
                     }
-                    else if ( pH.isNumber.call( tO, tO.Formula, tO.pCurrPos ) ) {
+                    else if ( pH.isNumber.call( tO, tO.Formula, tO.pCurrPos, digitDelim ) ) {
                         if ( operator.isOperator ) {
                             if ( operator.operatorName == "+" || operator.operatorName == "-" ) {
                                 tO.operand_str = operator.operatorName + "" + tO.operand_str
@@ -3409,7 +3471,7 @@ parserFormula.prototype = {
                 }
 
                 /* Numbers*/
-                else if ( parserHelp.isNumber.call( this, this.Formula, this.pCurrPos ) ) {
+                else if ( parserHelp.isNumber.call( this, this.Formula, this.pCurrPos, digitDelim ) ) {
                     if ( this.operand_str != "." ) {
                         found_operand = new cNumber( parseFloat( this.operand_str ) );
                     }
@@ -3726,11 +3788,11 @@ parserFormula.prototype = {
         var currentElement = null,
             _count = this.outStack.length,
             elemArr = new Array( _count ),
-            res = undefined;
+            res = undefined, _count_arg;
         for ( var i = 0, j = 0; i < _count; i++,j++ ) {
             currentElement = this.outStack[i];
             if ( currentElement.type == cElementType.operator || currentElement.type == cElementType.func ) {
-                var _count_arg = currentElement.getArguments();
+                _count_arg = currentElement.getArguments();
                 res = currentElement.Assemble2( elemArr, j - _count_arg, _count_arg );
                 j -= _count_arg;
                 elemArr[j] = res;
@@ -3752,7 +3814,7 @@ parserFormula.prototype = {
     },
 
     /* Сборка функции в инфиксную форму */
-    assembleLocale:function ( locale ) {
+    assembleLocale:function ( locale, digitDelim ) {
         var currentElement = null,
             _count = this.outStack.length,
             elemArr = new Array( _count ),
@@ -3761,25 +3823,20 @@ parserFormula.prototype = {
             currentElement = this.outStack[i];
             if ( currentElement.type == cElementType.operator || currentElement.type == cElementType.func ) {
                 _count_arg = currentElement.getArguments();
-                if( currentElement.type == cElementType.func ){
-                    res = currentElement.Assemble2Locale( elemArr, j - _count_arg, _count_arg, locale);
-                }
-                else{
-                    res = currentElement.Assemble2( elemArr, j - _count_arg, _count_arg );
-                }
+                res = currentElement.Assemble2Locale( elemArr, j - _count_arg, _count_arg, locale, digitDelim);
                 j -= _count_arg;
                 elemArr[j] = res;
             }
             else {
                 if ( currentElement instanceof cString ) {
-                    currentElement = new cString( "\"" + currentElement.toString() + "\"" );
+                    currentElement = new cString( "\"" + currentElement.toLocaleString(digitDelim) + "\"" );
                 }
                 res = currentElement;
                 elemArr[j] = res;
             }
         }
         if ( res != undefined && res != null ){
-            return res.toString();
+            return res.toLocaleString(digitDelim);
         }
         else{
             return this.Formula;
@@ -4019,9 +4076,7 @@ parserFormula.prototype = {
     },
 
     parseDiagramRef:function () {
-        var res = [
-            []
-        ];
+        var res = [[]];
         while ( this.pCurrPos < this.Formula.length ) {
             if ( parserHelp.isComma.call( this, this.Formula, this.pCurrPos ) ) {
 

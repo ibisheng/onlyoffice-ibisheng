@@ -2856,11 +2856,16 @@ UndoRedoWorkbook.prototype = {
 		}
         else if(historyitem_Workbook_DefinedNamesAdd === Type ){
             if(bUndo){
-                this.wb.delDefinesNames( Data );
+                this.wb.delDefinesNames( Data.newName );
             }
             else{
-                this.wb.setDefinesNames( Data );
+                this.wb.setDefinesNames( Data.newName );
             }
+            /*TODO
+            * Ввели формулу в которой есть именованный диапазон, но ИД нет в списке ИД. Результат формулы #NAME!.
+            * Создаем ИД с таким же именем, что и в функции. Необходимо пересчитать функцию. Предварительно перестроив
+            * граф зависимостей.
+            * */
         }
         else if(historyitem_Workbook_DefinedNamesChange === Type ){
             var oldName, newName;

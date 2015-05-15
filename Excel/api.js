@@ -2113,7 +2113,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
         };
 
         spreadsheet_api.prototype.asc_setDefinedNames = function (defName) {
-            return this.wb.setDefinedNames(defName);
+//            return this.wb.setDefinedNames(defName);
+            return this.wb.editDefinedNames(null, defName);
         };
 
         spreadsheet_api.prototype.asc_editDefinedNames = function (oldName, newName) {
