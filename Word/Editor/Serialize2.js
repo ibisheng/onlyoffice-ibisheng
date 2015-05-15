@@ -7821,6 +7821,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				res = this.bcr.Read1(length, function(t, l){
 					return oThis.boMathr.ReadMathArg(t,l,oMathPara.Root);
 				});
+				oMathPara.Root.Correct_Content(true);
 			}
 		}
 		else if(c_oSerRunType.pptxDrawing === type)
