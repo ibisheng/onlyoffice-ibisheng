@@ -6488,6 +6488,9 @@ ParaDrawing.prototype =
         {
             LogicDocument.Create_NewHistoryPoint(historydescription_Document_ConvertOldEquation);
 
+            // Коректируем формулу после конвертации
+            this.ParaMath.Correct_AfterConvertFromEquation();
+
             // Сначала удаляем Drawing из рана
             Run.Remove_FromContent(BotElementPos, 1);
 
