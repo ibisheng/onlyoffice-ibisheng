@@ -149,13 +149,13 @@ var maxIndividualValues = 10000;
 			
 			asc_setCellId : function(cellId) { this.cellId = cellId;},
 			asc_setValues : function(values) { this.values = values; },
-			asc_setFilter : function(filter) { this.filter = filter; },
+			asc_setFilterObj : function(filter) { this.filter = filter; },
 			
 			asc_setSortState : function(sortVal) { this.sortVal = sortVal; },
 			
 			asc_getCellId : function() { return this.cellId; },
 			asc_getValues : function() { return this.values; },
-			asc_getFilter : function() { return this.filter; },
+			asc_getFilterObj : function() { return this.filter; },
 			
 			asc_getSortState : function() { return this.sortVal; }
 		};
@@ -3349,7 +3349,7 @@ var maxIndividualValues = 10000;
 				autoFilterObject.asc_setSortState(sortVal);
 				autoFilterObject.asc_setCellId(cellId);
 				autoFilterObject.asc_setValues(values);
-				autoFilterObject.asc_setFilter(filterObj);
+				autoFilterObject.asc_setFilterObj(filterObj);
 				
 				ws.handlers.trigger("setAutoFiltersDialog", autoFilterObject);
 			},
@@ -3867,7 +3867,7 @@ var maxIndividualValues = 10000;
 				
 
 				var individualCount, count, tempResult;
-				var isCustomFilters = currentElemArray && filterColumns[currentElemArray] && filterColumns[currentElemArray].CustomFiltersObj;
+				var isCustomFilters = currentElemArray !== null && filterColumns[currentElemArray] && filterColumns[currentElemArray].CustomFiltersObj;
 				if(currentElemArray === null || (filterColumns[currentElemArray] && (filterColumns[currentElemArray].Filters || filterColumns[currentElemArray].Top10) || isCustomFilters))
 				{
 					individualCount = 0;
@@ -4739,12 +4739,13 @@ var maxIndividualValues = 10000;
 		prot["asc_setSortState"]				= prot.asc_setSortState;
 		prot["asc_getSortState"]				= prot.asc_getSortState;
 		prot["asc_getValues"]					= prot.asc_getValues;
-		prot["asc_getFilter"]					= prot.asc_getFilter;
+		prot["asc_getFilterObj"]				= prot.asc_getFilterObj;
 		prot["asc_getCellId"]					= prot.asc_getCellId;
 		
 		window["Asc"]["AutoFilterObj"]		    = window["Asc"].AutoFilterObj = AutoFilterObj;
 		prot									= AutoFilterObj.prototype;
 		prot["asc_getType"]						= prot.asc_getType;
+		prot["asc_setType"]						= prot.asc_setType;
 		prot["asc_getFilter"]					= prot.asc_getFilter;
 		
 		window["Asc"]["AutoFiltersOptionsElements"]	= window["Asc"].AutoFiltersOptionsElements = AutoFiltersOptionsElements;

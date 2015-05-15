@@ -4505,18 +4505,35 @@ FilterColumn.prototype.createFilter = function(obj) {
 	
 	var allFilterOpenElements = false;
 	var newFilter;
-	if(obj.result && obj.result.length)
+	
+	switch (obj.filter.type)
 	{
-		newFilter = new Filters();
-		this.Filters = newFilter;
-	}
-	else
-	{
-		newFilter = new CustomFilters();
-		this.CustomFiltersObj = newFilter
-	}
-	allFilterOpenElements = newFilter.init(obj);
-		
+		case c_oAscAutoFilterTypes.ColorFilter:
+		{
+			break;
+		}
+		case c_oAscAutoFilterTypes.CustomFilters:
+		{
+			this.CustomFiltersObj = obj.filter.filter.clone();
+			break;
+		}	
+		case c_oAscAutoFilterTypes.DynamicFilter:
+		{
+			break;
+		}
+		case c_oAscAutoFilterTypes.Top10:
+		{
+			break;
+		}	
+		case c_oAscAutoFilterTypes.Filters:
+		{
+			newFilter = new Filters();
+			this.Filters = newFilter;
+			allFilterOpenElements = newFilter.init(obj);
+			break;
+		}	
+	}	
+	
 	return allFilterOpenElements;
 };
 /** @constructor */
@@ -4538,10 +4555,10 @@ Filters.prototype.clone = function() {
 };
 Filters.prototype.init = function(obj) {
 	var allFilterOpenElements = true;
-	for(var i = 0; i < obj.result.length; i++)
+	for(var i = 0; i < obj.values.length; i++)
 	{
-		if(obj.result[i].visible)
-			this.Values[obj.result[i].text] = true;
+		if(obj.values[i].visible)
+			this.Values[obj.values[i].text] = true;
 		else
 			allFilterOpenElements = false;
 	}
