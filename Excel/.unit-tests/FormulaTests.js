@@ -406,6 +406,7 @@
         var oBinaryFileReader = new Asc.BinaryFileReader( sUrlPath );
         oBinaryFileReader.Read( sData, wb );
         ws = wb.getWorksheet( wb.getActive() );
+        getFormulasInfo();
     }
 
     /*QUnit.log( function ( details ) {
