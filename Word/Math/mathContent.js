@@ -4416,7 +4416,7 @@ CMathContent.prototype.Process_AutoCorrect = function(ActionElement)
     if (false === CanMakeAutoCorrect)
     {
 		var CanMakeAutoCorrectEquation = false;
-		//if (CanMakeAutoCorrect || (0x28 != ActionElement.value && 0x29 != ActionElement.value && 0x5E!= ActionElement.value && 0x5F!= ActionElement.value && 0x5C!= ActionElement.value /*&& 0x2B!= ActionElement.value*/))
+		//if (CanMakeAutoCorrect || ( 0x28 != ActionElement.value && /*0x29 != ActionElement.value &&*/ /*0x5E!= ActionElement.value &&*/ /*0x5F!= ActionElement.value &&*/ 0x5C!= ActionElement.value /*&& 0x2B!= ActionElement.value*/))
 		//	CanMakeAutoCorrectEquation = this.private_CanAutoCorrectEquation(AutoCorrectEngine, CanMakeAutoCorrect, bCursorStepRight);
     }
 
@@ -4473,7 +4473,11 @@ CMathContent.prototype.Process_AutoCorrect = function(ActionElement)
 };
 CMathContent.prototype.private_NeedAutoCorrect = function(ActionElement)
 {
-    var CharCode = ActionElement.value;
+	var CharCode;
+	if (para_Math_Ampersand == ActionElement.Type)
+		CharCode = 0x26;
+	else
+		CharCode = ActionElement.value;
     if (1 === g_aMathAutoCorrectTriggerCharCodes[CharCode])
         return true;
 
@@ -4557,7 +4561,6 @@ CMathContent.prototype.private_CanAutoCorrectText = function(AutoCorrectionEngin
             MathRun.Add(ReplaceText, true);
         }
 
-		AutoCorrectionEngine.Type = this.CorrectTextToEquation(ReplaceText);
         AutoCorrectionEngine.RemoveCount = RemoveCount;
         AutoCorrectionEngine.ReplaceContent.push(MathRun);
 
@@ -4565,19 +4568,6 @@ CMathContent.prototype.private_CanAutoCorrectText = function(AutoCorrectionEngin
     }
 
     return Result;
-};
-CMathContent.prototype.CorrectTextToEquation = function(Text)
-{
-	var Type = null;
-	switch (Text.value)
-	{
-		case 0x25A0: Type = MATH_MATRIX;
-		case 0x25AD: Type = MATH_BORDER_BOX;
-		case 0x27E1: Type = MATH_PHANTOM;
-		case 0x25A1: Type = MATH_BOX;
-		case 0x033F: Type = MATH_BAR;
-	}
-	return Type;
 };
 CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionEngine, CanMakeAutoCorrect, bCursorStepRight)
 {	
@@ -4589,10 +4579,12 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
         return false;
 
     var TempElements = [];
+	var TempElements2 = [];
     var CurPos = ElementsCount - 1;
 
     // Пробел в начале пропускаем
     var Element = AutoCorrectionEngine.Elements[CurPos];
+	AutoCorrectionEngine.props = {};
 
 	var bOpenBrk = false;
 	var bCloseBrk = false;
@@ -4600,7 +4592,7 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 	var oCurElem = AutoCorrectionEngine.Elements[ElementsCount];
 	var BrAccount = new CMathBracketAcc();
 	
-    if (' ' === Element.Text)
+    if (' ' === Element.Text || ')' === Element.Text || '_' === Element.Text ||  0x5E === AutoCorrectionEngine.ActionElement.value || 0x5F === AutoCorrectionEngine.ActionElement.value)
 	{
 		//проверка открытых и закрытых скобок		
 		for (var i=ElementsCount-1; i>=0; i--)
@@ -4609,31 +4601,97 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 			if (')' === oCurElem.Text )
 			{
 				BrAccount.Counter++;
-				//if (!bCloseBrk)
-				//{
-					bCloseBrk = true;
-					BrAccount.RPos = i;
-				//}
+				bCloseBrk = true;
+				BrAccount.RPos = i;
 			}
-			if ('(' === oCurElem.Text && !bCloseBrk)
+			else if ('(' === oCurElem.Text && !bCloseBrk)
 				return;
 			else if ('(' === oCurElem.Text && bCloseBrk)
 			{
 				BrAccount.Counter--;
 				bOpenBrk = true;
-				BrAccount.LPos = i;
+				BrAccount.LPos = i;				
+				
+				//в первую очередь производим автозамену композиции в скобках
+				if ( i == BrAccount.RPos - 2)
+				{
+					var oBrElem = AutoCorrectionEngine.Elements[i+1].Element;
+					if (oBrElem.Type == para_Math_Composition)
+					{
+						var props = new CMathDelimiterPr();
+						props.column = 1;
+						var oDelimiter = new CDelimiter(props);
+						
+						var oDelElem = oDelimiter.getBase(0);
+						oDelElem.addElementToContent(oBrElem);
+						//AutoCorrectionEngine.ReplaceContent.push(AutoCorrectionEngine.Delimiter);
+						
+						AutoCorrectionEngine.RemoveCount = BrAccount.RPos - BrAccount.LPos + 1 ;
+						AutoCorrectionEngine.ReplaceContent.unshift(oDelimiter);		
+						return true;
+						
+					}
+				}
 			}
+			else if ('&' === oCurElem.Text || '@' === oCurElem.Text )
+				BrAccount.Separator = true;
 			else if (oCurElem.Text)
 			{
 				switch(oCurElem.Text.charCodeAt(0))
 				{
-					case 0x25A0: AutoCorrectionEngine.Type = MATH_MATRIX;break;
-					case 0x25AD: AutoCorrectionEngine.Type = MATH_BORDER_BOX;break;
-					case 0x27E1: AutoCorrectionEngine.Type = MATH_PHANTOM;break;
-					case 0x25A1: AutoCorrectionEngine.Type = MATH_BOX;break;
-					case 0x033F: AutoCorrectionEngine.Type = MATH_BAR;break;
-					case 0x221A: AutoCorrectionEngine.Type = MATH_RADICAL;break;
-					case 0x2211: AutoCorrectionEngine.Type = MATH_NARY;break;
+					case 0x2588:
+					case 0x25A0:	AutoCorrectionEngine.Type = MATH_MATRIX;break;
+					case 0x24A8:	AutoCorrectionEngine.Type = MATH_MATRIX;
+									props = new CMathDelimiterPr();
+									props.column = 1;
+									AutoCorrectionEngine.Delimiter = new CDelimiter(props);
+									break;
+					case 0x24A9:	AutoCorrectionEngine.Type = MATH_MATRIX;
+									props = new CMathDelimiterPr();
+									props.column = 1;
+									props.begChr = 0x2016;
+									props.endChr = 0x2016;
+									AutoCorrectionEngine.Delimiter = new CDelimiter(props);
+									break;
+					case 0x25AD:	AutoCorrectionEngine.Type = MATH_BORDER_BOX;break;
+					case 0x25A1:	AutoCorrectionEngine.Type = MATH_BOX;break;
+					case 0x00AF:	
+					case 0x033F:	AutoCorrectionEngine.Type = MATH_BAR;
+									AutoCorrectionEngine.props = {pos: LOCATION_TOP};
+									break;
+					case 0x2581:	AutoCorrectionEngine.Type = MATH_BAR;
+									break;
+					case 0x221A:	AutoCorrectionEngine.Type = MATH_RADICAL;break;
+					case 0x221B:	TempElements2.splice(0, 0, {Text:'3'});
+									AutoCorrectionEngine.Type = MATH_RADICAL;
+									break;
+					case 0x221C:	TempElements2.splice(0, 0, {Text:'4'});
+									AutoCorrectionEngine.Type = MATH_RADICAL;
+									break;
+					case 0x2211:	AutoCorrectionEngine.Type = MATH_NARY;break;
+					case 0x23E0:
+					case 0x23DC:	AutoCorrectionEngine.Type = MATH_GROUP_CHARACTER;
+									AutoCorrectionEngine.props = {chr: oCurElem.Text.charCodeAt(0), pos: LOCATION_TOP, vertJc: VJUST_BOT};
+									break;
+					case 0x23DD:	AutoCorrectionEngine.Type = MATH_GROUP_CHARACTER;
+									AutoCorrectionEngine.props = {chr: oCurElem.Text.charCodeAt(0)};
+									break;
+					case 0x23DF:	AutoCorrectionEngine.Type = MATH_GROUP_CHARACTER;
+									break;
+					case 0x23DE:	AutoCorrectionEngine.Type = MATH_GROUP_CHARACTER;
+									AutoCorrectionEngine.props = {chr: 0x23DE, pos: LOCATION_TOP, vertJc: VJUST_BOT};
+									break;
+					case 0x27E1:	AutoCorrectionEngine.Type = MATH_PHANTOM;
+									AutoCorrectionEngine.props = {show: 0};
+									break;
+					case 0x2B04:	AutoCorrectionEngine.Type = MATH_PHANTOM;
+									AutoCorrectionEngine.props = {show: 0, zeroAsc: 1, zeroDesc: 1};
+									break;
+					case 0x21F3:	AutoCorrectionEngine.Type = MATH_PHANTOM;
+									AutoCorrectionEngine.props = {show: 0, zeroWid: 1};
+									break;
+					case 0x24B8:	break;
+					
 					
 				}
 				if (AutoCorrectionEngine.Type)
@@ -4641,8 +4699,77 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 			}
 		}
 		//если это пробел не в скобках оставляем его
-		if (!bOpenBrk || (bOpenBrk && bCloseBrk))
+		if (' ' === Element.Text && (!bOpenBrk || (bOpenBrk && bCloseBrk)))
 			CurPos--;
+	}
+	
+	if ( AutoCorrectionEngine.Type == MATH_RADICAL && bOpenBrk && bCloseBrk && BrAccount.Counter == 0 && BrAccount.Separator)
+	{
+		var arrContent = [];
+		var col = 0;
+		arrContent[col] = [];
+		for (var i=BrAccount.LPos+1; i<BrAccount.RPos; i++)
+		{
+			oCurElem = AutoCorrectionEngine.Elements[i];
+			if ( '&' === oCurElem.Text )
+			{
+				col++;
+				arrContent[col] = [];
+			}
+			else
+			{
+				if (oCurElem.Text)
+				{
+					var MathText = new CMathText();
+					MathText.add(oCurElem.Text.charCodeAt(0));
+					arrContent[col].push( MathText );
+				}
+				else 
+					arrContent[col].push( oCurElem.Element );
+			}
+		}
+		
+		var props = new CMathRadicalPr();
+		props.ctrPrp = AutoCorrectionEngine.TextPr.Copy();
+		var Radical = new CRadical(props);
+
+		var Base = Radical.getBase();
+		var Degree = Radical.getDegree();
+		
+
+		for (var i=0; i<arrContent[1].length; i++)
+		{
+			var CurElem = arrContent[1][i];
+			if (para_Math_Text == CurElem.Type)
+			{
+				var MathRun = new ParaRun(this.ParaMath.Paragraph, true);
+				MathRun.Set_Pr(AutoCorrectionEngine.TextPr.Copy());
+				MathRun.Set_MathPr(AutoCorrectionEngine.MathPr.Copy());
+				MathRun.Add_ToContent(0, CurElem);
+				Base.Internal_Content_Add(Base.length, MathRun);
+			}
+			else
+				Base.Internal_Content_Add(Base.length, CurElem);			
+		}
+		for (var i=0; i<arrContent[0].length; i++)
+		{
+			var CurElem = arrContent[0][i];
+			if (para_Math_Text == CurElem.Type)
+			{
+				var MathRun = new ParaRun(this.ParaMath.Paragraph, true);
+				MathRun.Set_Pr(AutoCorrectionEngine.TextPr.Copy());
+				MathRun.Set_MathPr(AutoCorrectionEngine.MathPr.Copy());
+				MathRun.Add_ToContent(0, CurElem);
+				Degree.Internal_Content_Add(Degree.length, MathRun);
+			}
+			else
+				Degree.Internal_Content_Add(Degree.length, CurElem);			
+		}
+		
+
+		AutoCorrectionEngine.RemoveCount = BrAccount.RPos - BrAccount.LPos + 2 + 1;
+		AutoCorrectionEngine.ReplaceContent.unshift(Radical);		
+		return true;
 	}
 	
 	if ( AutoCorrectionEngine.Type == MATH_MATRIX && bOpenBrk && bCloseBrk && BrAccount.Counter == 0)
@@ -4650,10 +4777,9 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 		var arrContent = [];
 		var col = 0;
 		var row = 0;
-		var nContent = 0;
 		var mcs = [];
 		arrContent[row] = [];
-		arrContent[row][col] = "";
+		arrContent[row][col] = [];
 		mcs[0] = {count: 1, mcJc: 0};
 		
 		for (var i=BrAccount.LPos+1; i<BrAccount.RPos; i++)
@@ -4661,32 +4787,31 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 			oCurElem = AutoCorrectionEngine.Elements[i];
 			if ( '&' === oCurElem.Text || '@' === oCurElem.Text)
 			{
-				nContent = 0;
 				if ('&' === oCurElem.Text)
 				{					
 					col++;
 					if (col+1 > mcs[0].count)
 						mcs[0] = {count: col+1, mcJc: 0};
-					arrContent[row][col] = "";					
+					arrContent[row][col] = [];					
 				}
 				else if ('@' === oCurElem.Text)
 				{
 					row++;
 					col = 0;
-					//mcs[row] = {count: 1, mcJc: 0};
 					arrContent[row] = [];
-					arrContent[row][col] = "";					
+					arrContent[row][col] = [];
 				}
 			}
 			else
 			{
-				var Element;
 				if (oCurElem.Text)
-					Element = oCurElem.Text;
+				{
+					var MathText = new CMathText();
+					MathText.add(oCurElem.Text.charCodeAt(0));
+					arrContent[row][col].push( MathText );
+				}
 				else 
-					Element = oCurElem.Element;
-				arrContent[row][col] = arrContent[row][col] + oCurElem.Text;
-				nContent++;
+					arrContent[row][col].push( oCurElem.Element );
 			}
 		}
 		
@@ -4700,31 +4825,37 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 			for (var j=0; j<arrContent[i].length; j++)
 			{
 				var Elem = Matrix.getElement(i,j);
-				var MathRun = new ParaRun(this.ParaMath.Paragraph, true);
-
-				MathRun.Set_Pr(AutoCorrectionEngine.TextPr.Copy());
-				MathRun.Set_MathPr(AutoCorrectionEngine.MathPr.Copy());
-
-				var MathText = new CMathText();
-				
-				var text = arrContent[i][j];
-				for(var l=0; l<text.length; l++)
+				var Content = arrContent[i][j];
+				for (var l=0; l<Content.length; l++)
 				{
-					MathText.add(text[l].charCodeAt(0));
-					MathRun.Add_ToContent(l, MathText);
+					var CurElem = Content[l];
+					if (para_Math_Text == CurElem.Type)
+					{
+						var MathRun = new ParaRun(this.ParaMath.Paragraph, true);
+						MathRun.Set_Pr(AutoCorrectionEngine.TextPr.Copy());
+						MathRun.Set_MathPr(AutoCorrectionEngine.MathPr.Copy());
+						MathRun.Add_ToContent(0, CurElem);
+						Elem.Internal_Content_Add(Elem.length, MathRun);
+					}
+					else
+						Elem.Internal_Content_Add(Elem.length, CurElem);
+					
 				}				
-				
-				Elem.Internal_Content_Add(0, MathRun);
 			}
 			
 		AutoCorrectionEngine.RemoveCount = BrAccount.RPos - BrAccount.LPos + 2 + 1;
-		AutoCorrectionEngine.ReplaceContent.push(Matrix);
+		
+		if (AutoCorrectionEngine.Delimiter)
+		{
+			var oDelElem = AutoCorrectionEngine.Delimiter.getBase(0);
+			oDelElem.addElementToContent(Matrix);
+			AutoCorrectionEngine.ReplaceContent.push(AutoCorrectionEngine.Delimiter);
+		}
+		else
+			AutoCorrectionEngine.ReplaceContent.push(Matrix);
 
 		return true;
 	}
-	//var AutoCorrectEngineEq = new CMathAutoCorrectEngine(AutoCorrectionEngine.ActionElement);
-	//if (bOpenBrk && bCloseBrk)
-	//	AutoCorrectEngineEq.Type = MATH_DELIMITER;
 
 	bOpenBrk = false;
 	bCloseBrk = false;
@@ -4751,15 +4882,32 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
         else if ('/' === Element.Text)
         {
 			AutoCorrectionEngine.Type = MATH_FRACTION;
+			if (CurPos-1 > 0)
+			{
+				Element = AutoCorrectionEngine.Elements[CurPos-1];
+				if ( 0x005C === Element.Text.charCodeAt(0))
+				{
+					AutoCorrectionEngine.props = {type: LINEAR_FRACTION};
+					CurPos--;
+				}
+			}		
+			
             CurPos--;
             break;
         }
+		else if ( 0x2044 ===  Element.Text.charCodeAt(0))
+		{
+			AutoCorrectionEngine.Type = MATH_FRACTION;
+			AutoCorrectionEngine.props = {type: SKEWED_FRACTION};
+			CurPos--;
+            break;
+		}
 		else if  ('^' === Element.Text)
 		{
 			TempElements.Type = DEGREE_SUPERSCRIPT;
 			AutoCorrectionEngine.Kind = DEGREE_SUPERSCRIPT;
 			AutoCorrectionEngine.Type = MATH_DEGREE;
-            CurPos--;
+			CurPos--;
             break;
         }
 		else if  ('_' === Element.Text)
@@ -4770,8 +4918,15 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
             CurPos--;
             break;
         }
+		else if ( 0x00A6 === Element.Text.charCodeAt(0) )
+		{
+			AutoCorrectionEngine.Type = MATH_FRACTION;
+			AutoCorrectionEngine.props = {type: NO_BAR_FRACTION};
+			CurPos--;
+            break;
+		}
         else if (g_aMathAutoCorrectTriggerCharCodes[Element.Text.charCodeAt(0)] && bOpenBrk && bCloseBrk)
-            return false;
+            break;
 		else if (q_aMathAutoCorrectControlCharCodes[Element.Text.charCodeAt(0)])
 			break;
         else
@@ -4781,13 +4936,25 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
     }
 
 	bOpenBrk = false;
-	bCloseBrk = false;
-    var TempElements2 = [];
+	bCloseBrk = false;    
     while (CurPos >= 0)
     {
         var Element = AutoCorrectionEngine.Elements[CurPos];
         if (undefined === Element.Text)
-            TempElements2.splice(0, 0, Element);
+		{
+			if (Element.Element.kind == MATH_GROUP_CHARACTER && AutoCorrectionEngine.Type == MATH_DEGREE)
+			{
+				if ( DEGREE_SUPERSCRIPT == AutoCorrectionEngine.Kind )
+					AutoCorrectionEngine.props = {type: LIMIT_UP};
+				else if ( DEGREE_SUBSCRIPT == AutoCorrectionEngine.Kind )
+					AutoCorrectionEngine.props = {type: LIMIT_LOW};
+				AutoCorrectionEngine.Type = MATH_LIMIT;
+				TempElements2.splice(0, 0, Element);
+				break;
+			}
+			else
+				TempElements2.splice(0, 0, Element);
+		}
 		else if ('(' === Element.Text)
 		{
 			if (!bCloseBrk)
@@ -4842,8 +5009,12 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 			CurPos--;
             break;
 		}
+		else if  ('@' === Element.Text || '&' === Element.Text )
+			break;
         else if (g_aMathAutoCorrectTriggerCharCodes[Element.Text.charCodeAt(0)] && bOpenBrk && bCloseBrk)
             break;
+		else if (q_aMathAutoCorrectControlCharCodes[Element.Text.charCodeAt(0)])
+			break;
         else
             TempElements2.splice(0, 0, Element);
 
@@ -4872,6 +5043,8 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 				TempElements3.splice(0, 0, Element);
 				bCloseBrk = true;
 			}
+			else if  ('@' === Element.Text || '&' === Element.Text )
+				break;
 			else if (g_aMathAutoCorrectTriggerCharCodes[Element.Text.charCodeAt(0)])
 				break;
 			else if (q_aMathAutoCorrectControlAggregationCodes[Element.Text.charCodeAt(0)]) //sum
@@ -4894,6 +5067,7 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 		if (TempElements2.length > 0)
 		{
             var props = new CMathFractionPr();
+			props.Set_FromObject(AutoCorrectionEngine.props);
             props.ctrPrp = AutoCorrectionEngine.TextPr.Copy();
 			var Fraction = new CFraction(props);
 
@@ -4911,7 +5085,9 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 	}
 	else if (AutoCorrectionEngine.Type == MATH_DEGREE)
 	{
-		if (TempElements2.length > 0)
+		if ( 0x5E === AutoCorrectionEngine.ActionElement.value || 0x5F === AutoCorrectionEngine.ActionElement.value)
+			return false;		
+		else if (TempElements2.length > 0)
 		{
 		
 		//this.ReplaceAutoCorrect(AutoCorrectionEngine, bCursorStepRight);
@@ -4938,7 +5114,9 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 	}
 	else if (AutoCorrectionEngine.Type == MATH_DEGREESubSup)
 	{
-		if (TempElements2.length > 0 || TempElements3.length > 0)
+		if ( 0x5E === AutoCorrectionEngine.ActionElement.value || 0x5F === AutoCorrectionEngine.ActionElement.value)
+			return false;		
+		else if (TempElements2.length > 0 || TempElements3.length > 0)
 		{
 			var props = new CMathDegreePr();
             props.ctrPrp = AutoCorrectionEngine.TextPr.Copy();
@@ -4971,7 +5149,10 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 	else if (AutoCorrectionEngine.Type == MATH_RADICAL)
 	{
 		var props = new CMathRadicalPr();
-		props.degHide = 1;
+		if (TempElements2.length > 0)
+			props.degHide = 0;
+		else
+			props.degHide = 1;
         props.ctrPrp = AutoCorrectionEngine.TextPr.Copy();
 		var Radical = new CRadical(props);
 
@@ -4979,9 +5160,11 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 		var Degree = Radical.getDegree();
 
 		this.PackTextToContent(Base, TempElements, AutoCorrectionEngine);
-		//this.PackTextToContent(NumMathContent, TempElements, AutoCorrectionEngine);
+		if (!props.degHide)
+			this.PackTextToContent(Degree, TempElements2, AutoCorrectionEngine);
+		
 
-		AutoCorrectionEngine.RemoveCount = ElementsCount - CurPos - 1;
+		AutoCorrectionEngine.RemoveCount = ElementsCount - CurPos ;
 		AutoCorrectionEngine.ReplaceContent.unshift(Radical);
 		return true;
 	}
@@ -4995,7 +5178,7 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 
 		this.PackTextToContent(Base, TempElements, AutoCorrectionEngine);
 
-		AutoCorrectionEngine.RemoveCount = ElementsCount - CurPos - 1;
+		AutoCorrectionEngine.RemoveCount = ElementsCount - CurPos ;
 		AutoCorrectionEngine.ReplaceContent.unshift(BorderBox);
 		return true;
 	}
@@ -5038,6 +5221,86 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 		AutoCorrectionEngine.RemoveCount = ElementsCount - CurPos - 1;
 		AutoCorrectionEngine.ReplaceContent.unshift(oNary);
 		
+		return true;
+	}
+	/*else if (AutoCorrectionEngine.Type == MATH_LIMIT)
+	{
+		var props = {type: LIMIT_LOW};
+		props.ctrPrp = AutoCorrectionEngine.TextPr.Copy();
+		var oLimit = new CLimit(props);			
+		
+		if (TempElements.Type == DEGREE_SUPERSCRIPT)
+		{
+			this.PackTextToContent(oSub, TempElements2, AutoCorrectionEngine);
+			this.PackTextToContent(oSup, TempElements, AutoCorrectionEngine);
+		}
+		else if (TempElements.Type == DEGREE_SUBSCRIPT)
+		{
+			this.PackTextToContent(oSub, TempElements, AutoCorrectionEngine);
+			this.PackTextToContent(oSup, TempElements2, AutoCorrectionEngine);
+		}
+		
+		AutoCorrectionEngine.RemoveCount = ElementsCount - CurPos - 1;
+		AutoCorrectionEngine.ReplaceContent.unshift(oNary);
+		
+		return true;
+	}*/
+	else if (AutoCorrectionEngine.Type == MATH_GROUP_CHARACTER)
+	{
+		var props = AutoCorrectionEngine.props;
+		props.ctrPrp = AutoCorrectionEngine.TextPr.Copy();
+		var oGroupChr = new CGroupCharacter(props);
+		
+		var oBase = oGroupChr.getBase();
+		
+		this.PackTextToContent(oBase, TempElements, AutoCorrectionEngine);
+
+		AutoCorrectionEngine.RemoveCount = ElementsCount - CurPos ;
+		AutoCorrectionEngine.ReplaceContent.unshift(oGroupChr);
+		return true;
+	}
+	else if (AutoCorrectionEngine.Type == MATH_BAR)
+	{
+		var props = AutoCorrectionEngine.props;
+		props.ctrPrp = AutoCorrectionEngine.TextPr.Copy();
+		var oBar = new CBar(props);
+		
+		var oBase = oBar.getBase();
+		
+		this.PackTextToContent(oBase, TempElements, AutoCorrectionEngine);
+
+		AutoCorrectionEngine.RemoveCount = ElementsCount - CurPos ;
+		AutoCorrectionEngine.ReplaceContent.unshift(oBar);
+		return true;
+	}
+	else if (AutoCorrectionEngine.Type == MATH_LIMIT)
+	{
+		var props = AutoCorrectionEngine.props;
+		props.ctrPrp = AutoCorrectionEngine.TextPr.Copy();
+		var oLimit = new CLimit(props);
+		
+		var oBase = oLimit.getFName();
+		var oIter = oLimit.getIterator();
+		
+		this.PackTextToContent(oBase, TempElements2, AutoCorrectionEngine);
+		this.PackTextToContent(oIter, TempElements, AutoCorrectionEngine);
+
+		AutoCorrectionEngine.RemoveCount = ElementsCount - CurPos ;
+		AutoCorrectionEngine.ReplaceContent.unshift(oLimit);
+		return true;
+	}
+	else if (AutoCorrectionEngine.Type == MATH_PHANTOM)
+	{
+		var props = AutoCorrectionEngine.props;
+		props.ctrPrp = AutoCorrectionEngine.TextPr.Copy();
+		var oPhantom = new CPhantom(props);
+		
+		var oBase = oPhantom.getBase();
+		
+		this.PackTextToContent(oBase, TempElements, AutoCorrectionEngine);
+
+		AutoCorrectionEngine.RemoveCount = ElementsCount - CurPos - 1;
+		AutoCorrectionEngine.ReplaceContent.unshift(oPhantom);
 		return true;
 	}
 
@@ -5122,9 +5385,12 @@ function CMathBracketAcc()
 {
 	this.LBracket	= false;
 	this.RBracket	= false;
+	this.Separator	= false;
 	this.Counter	= 0;
 	this.LPos		= -1;
+	this.LRPos		= -1;
 	this.RPos		= -1;
+	this.RLPos		= -1;
 }
 function CMathAutoCorrectEngine(Element)
 {
@@ -5134,12 +5400,13 @@ function CMathAutoCorrectEngine(Element)
     this.CollectText    = true;
 	this.Type			= null;
 	this.Kind			= null;
+	this.Delimiter		= null;
 
     this.RemoveCount    = 0;
     this.ReplaceContent = [];
 
     this.TextPr         = null;
-    this.MathPr         = null;
+    this.MathPr         = null;	
 }
 
 CMathAutoCorrectEngine.prototype.Add_Element = function(Element, ElementPos)
@@ -5207,6 +5474,7 @@ var g_aAutoCorrectMathSymbols =
         ['\\bullet', 0x2219],
         ['\\cap', 0x2229],
         ['\\cbrt', 0x221B],
+		['\\cases', 0x24B8],
         ['\\cdot', 0x22C5],
         ['\\cdots', 0x22EF],
         ['\\check', 0x030C],
@@ -5446,9 +5714,12 @@ var g_aAutoCorrectMathSymbols =
         ['\\over', 0x002F],
         ['\\overbar', 0x00AF],
         ['\\overbrace', 0x23DE],
+		['\\overline', 0x00AF],
         ['\\overparen', 0x23DC],
+		['\\overshell', 0x23E0],
         ['\\parallel', 0x2225],
         ['\\partial', 0x2202],
+		['\\pmatrix', 0x24A8],
         ['\\phantom', 0x27E1],
         ['\\phi', 0x03D5],
         ['\\Phi', 0x03A6],
@@ -5596,6 +5867,7 @@ var g_aAutoCorrectMathSymbols =
         ['\\vee', 0x2228],
         ['\\vert', 0x007C],
         ['\\Vert', 0x2016],
+		['\\Vmatrix', 0x24A9],
         ['\\vphantom', 0x21F3],
         ['\\vthicksp', 0x2004],
         ['\\wedge', 0x2227],
@@ -5616,9 +5888,12 @@ var g_aAutoCorrectMathSymbols =
         ['>=', 0x2265],
         ['>>', 0x226B]
 ];
+//символы начала формулы
 var q_aMathAutoCorrectControlCharCodes = 
 {
-	0x221A : 1, 0x25AD : 1, 0x25A1 : 1
+	0x221A : 1, 0x221B : 1, 0x221C : 1, 0x25AD : 1, 0x25A1 : 1, 0x23DC : 1,
+	0x23E0 : 1, 0x23DD : 1, 0x00AF : 1, 0x033F : 1, 0x2581 : 1, 0x222E : 1,
+	0x23DF : 1, 0x23DE : 1
 };
 var q_aMathAutoCorrectControlAggregationCodes = 
 {
