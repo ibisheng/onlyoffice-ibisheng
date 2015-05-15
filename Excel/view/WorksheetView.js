@@ -6885,10 +6885,9 @@
 			} else {
 				// move active range to offset x,y
 				this._moveActiveCellToOffset(x, y);
-//                var x1 = this.getCellLeftRelative(this.activeRange.c1, /*pt*/0 ),
-//                    y1 = this.getCellTopRelative(this.activeRange.r1, /*pt*/0);
-//
-//				ret = this._calcActiveRangeOffset(x1,y1);
+                var x1 = this.getCellLeftRelative(this.activeRange.c1, /*pt*/0 ),
+                    y1 = this.getCellTopRelative(this.activeRange.r1, /*pt*/0);
+				ret = this._calcActiveRangeOffset(x1,y1);
 			}
 
 			if (this.isSelectionDialogMode) {
@@ -9959,7 +9958,10 @@
 			this._fixSelectionOfHiddenCells();
 			this._drawSelection();
 
-			offs = this._calcActiveRangeOffset();
+            var x1 = this.getCellLeftRelative(this.activeRange.c1, /*pt*/0 ),
+                y1 = this.getCellTopRelative(this.activeRange.r1, /*pt*/0);
+
+			offs = this._calcActiveRangeOffset(x1,y1);
 			if (sc !== ar.startCol || sr !== ar.startRow) {
 				this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
 				this.handlers.trigger("selectionChanged", this.getSelectionInfo());
@@ -10188,7 +10190,7 @@
 
                 ascRange = new asc_Range(c1, r1, c2, r2 );
                 var defName = new Asc.asc_CDefName( reference, this.model.getName()+"!"+ascRange.getAbsName(), null ),
-                    _C2H50H_ = this.model.workbook.setDefinesNames(defName), sheetName = "", ref = "";
+                    _C2H50H_ = this.model.workbook.editDefinesNames( null, defName ), sheetName = "", ref = "";
                 if(_C2H50H_){
                     sheetName = _C2H50H_.Ref.split("!");
                     ref = sheetName[1];

@@ -2859,7 +2859,7 @@ UndoRedoWorkbook.prototype = {
                 this.wb.delDefinesNames( Data.newName );
             }
             else{
-                this.wb.setDefinesNames( Data.newName );
+                this.wb.editDefinesNames( null, Data.newName );
             }
             /*TODO
             * Ввели формулу в которой есть именованный диапазон, но ИД нет в списке ИД. Результат формулы #NAME!.
@@ -2881,7 +2881,7 @@ UndoRedoWorkbook.prototype = {
         }
         else if(historyitem_Workbook_DefinedNamesDelete === Type ){
             if(bUndo){
-                this.wb.setDefinesNames( Data );
+                this.wb.editDefinesNames( null, Data );
                 if( Data.slaveEdge ){
                     var n;
                     for(var i = 0; i < Data.slaveEdge.length; i++){
