@@ -7412,6 +7412,10 @@ asc_docs_api.prototype.asc_sendMailMergeData = function(oData)
 		oThis.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 	});
 };
+asc_docs_api.prototype.asc_GetMailMergeFiledValue = function(nIndex, sName)
+{
+    return editor.WordControl.m_oLogicDocument.Get_MailMergeFileldValue(nIndex, sName);
+};
 asc_docs_api.prototype.asc_stopSaving = function () {
 	this.waitSave = true;
 };

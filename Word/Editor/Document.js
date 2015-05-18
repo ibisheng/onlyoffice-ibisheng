@@ -14175,6 +14175,13 @@ CDocument.prototype.Set_HightlightMailMergeFields = function(Value)
         editor.sync_HighlightMailMergeFields(this.MailMergeFieldsHighlight);
     }
 };
+CDocument.prototype.Get_MailMergeFileldValue = function(nIndex, sName)
+{
+    if (null === this.MailMergeMap)
+        return null;
+
+    return this.MailMergeMap[nIndex][sName];
+};
 CDocument.prototype.Compare_DrawingsLogicPositions = function(Drawing1, Drawing2)
 {
     var ParentPara1 = Drawing1.Get_Paragraph();
