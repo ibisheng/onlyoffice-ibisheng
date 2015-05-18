@@ -642,7 +642,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aContent.length === 0)
                             {
-                                oLastCommand.m_aContent.push(new ObjectToDraw(this.m_oTextPr.Unifill, this.m_oTextPr.Outline, this.Width, this.Height, new Geometry(), this.m_oTransform, this));
+                                oLastCommand.m_aContent.push(new ObjectToDraw(this.m_oTextPr.Unifill, this.m_oTextPr.TextOutline, this.Width, this.Height, new Geometry(), this.m_oTransform, this));
                             }
                             oLastObjectToDraw = oLastCommand.m_aContent[oLastCommand.m_aContent.length - 1];
 
@@ -650,11 +650,11 @@ CTextDrawer.prototype =
                             {
                                 if(oLastObjectToDraw.geometry.pathLst.length === 0 || (oLastObjectToDraw.geometry.pathLst.length === 1 && oLastObjectToDraw.geometry.pathLst[0].ArrPathCommandInfo.length === 0))
                                 {
-                                    oLastObjectToDraw.resetBrushPen(this.m_oTextPr.Unifill, this.m_oTextPr.Outline)
+                                    oLastObjectToDraw.resetBrushPen(this.m_oTextPr.Unifill, this.m_oTextPr.TextOutline)
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aContent.push(new ObjectToDraw(this.m_oTextPr.Unifill, this.m_oTextPr.Outline, this.Width, this.Height, new Geometry(), this.m_oTransform, this));
+                                    oLastCommand.m_aContent.push(new ObjectToDraw(this.m_oTextPr.Unifill, this.m_oTextPr.TextOutline, this.Width, this.Height, new Geometry(), this.m_oTransform, this));
                                     oLastObjectToDraw = oLastCommand.m_aContent[oLastCommand.m_aContent.length - 1];
                                 }
                             }

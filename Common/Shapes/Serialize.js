@@ -6053,7 +6053,7 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    s.SkipRecord();
+                    rPr.TextOutline = this.ReadLn();
                     break;
                 }
                 case 1:
