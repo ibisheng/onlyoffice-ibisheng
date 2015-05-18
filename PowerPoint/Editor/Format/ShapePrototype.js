@@ -679,9 +679,6 @@ CShape.prototype.recalculateContent2 = function()
                 }
 
 
-                var oTextWarpContent = this.checkTextWarp(content, body_pr, this.txBody.contentWidth2, this.txBody.contentHeight2);
-                this.txWarpStructParamarks2 = oTextWarpContent.oTxWarpStructParamarks;
-                this.txWarpStruct2 = oTextWarpContent.oTxWarpStruct;
             }
             this.contentWidth2 = this.txBody.contentWidth2;
             this.contentHeight2 = this.txBody.contentHeight2;
@@ -700,10 +697,16 @@ CShape.prototype.recalculateContent2 = function()
             content.Reset(0, 0, w, 20000);
             content.Recalculate_Page(content.StartPage, true);
 
+            var oTextWarpContent = this.checkTextWarp(content, body_pr, this.txBody.contentWidth2, this.txBody.contentHeight2);
+            this.txWarpStructParamarks2 = oTextWarpContent.oTxWarpStructParamarks;
+            this.txWarpStruct2 = oTextWarpContent.oTxWarpStruct;
+
         }
         else
         {
             this.txBody.content2 = null;
+            this.txWarpStructParamarks2 = null;
+            this.txWarpStruct2 = null;
         }
     }
 

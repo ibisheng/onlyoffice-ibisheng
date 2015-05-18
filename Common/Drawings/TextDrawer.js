@@ -146,7 +146,6 @@ CTableStructure.prototype.Recalculate = function(oTheme, oColorMap, dWidth, dHei
 CTableStructure.prototype.draw = function(graphics, transform)
 {
     var i;
-
     for(i = 0; i < this.m_aBorders.length; ++i)
     {
         this.m_aBorders[i].draw(graphics);

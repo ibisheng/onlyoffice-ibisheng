@@ -1,5 +1,5 @@
 "use strict";
-function CGraphicObjects(document, drawingDocument, api, documentContent)
+function CGraphicObjects(document, drawingDocument, api)
 {
     this.api = api;
     this.document = document;

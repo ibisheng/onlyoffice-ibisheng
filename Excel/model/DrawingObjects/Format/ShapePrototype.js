@@ -331,8 +331,6 @@ CShape.prototype.recalculate = function ()
     if(this.bDeleted)
         return;
     ExecuteNoHistory(function(){
-
-
         if (this.recalcInfo.recalculateBrush) {
             this.recalculateBrush();
             this.recalcInfo.recalculateBrush = false;
@@ -360,6 +358,7 @@ CShape.prototype.recalculate = function ()
 
         if (this.recalcInfo.recalculateTransformText) {
             this.recalculateTransformText();
+            this.recalcInfo.recalculateTransformText = false;
         }
 
         if(this.recalcInfo.recalculateBounds)
@@ -492,7 +491,6 @@ CShape.prototype.recalculateContent = function()
             this.txWarpStructParamarks = oTextWarpContent.oTxWarpStructParamarks;
             this.txWarpStruct = oTextWarpContent.oTxWarpStruct;
         }
-
     }
 };
 

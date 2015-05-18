@@ -1132,6 +1132,12 @@ CShape.prototype =
         this.transformText = this.localTransformText.CreateDublicate();
         this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
 
+        if(this.txBody && this.txBody.content2)
+        {
+            this.transformText2 = new CMatrix();
+            this.clipRect2 = this.checkTransformTextMatrix(this.transformText2, this.txBody.content2, oBodyPr, false);
+            this.invertTransformText2 = global_MatrixTransformer.Invert(this.transformText);
+        }
         if(oBodyPr.prstTxWarp)
         {
             if(this.bWordShape)
@@ -4172,6 +4178,7 @@ CShape.prototype =
         var oRet = {oTxWarpStruct: null, oTxWarpStructParamarks: null};
         if(oBodyPr.prstTxWarp)
         {
+            var bNeedRecalcContent = (oBodyPr.prstTxWarp.pathLst.length % 2) === 1;
             var oTextDrawer = new CTextDrawer(dWidth, dHeight, true);
             var warpGeometry = oBodyPr.prstTxWarp;
             warpGeometry.Recalculate(dWidth, dHeight);
