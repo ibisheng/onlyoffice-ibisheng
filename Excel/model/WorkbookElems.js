@@ -4558,10 +4558,24 @@ Filters.prototype.init = function(obj) {
 	for(var i = 0; i < obj.values.length; i++)
 	{
 		if(obj.values[i].visible)
-			this.Values[obj.values[i].text] = true;
+		{
+			if(obj.values[i].isDateFormat)
+			{
+				var dateGroupItem = new DateGroupItem();
+				var autoFilterDateElem = new AutoFilterDateElem(obj.values[i].val, obj.values[i].val, 1);
+				dateGroupItem.convertRangeToDateGroupItem(autoFilterDateElem);
+				autoFilterDateElem.convertDateGroupItemToRange(dateGroupItem);
+				
+				this.Dates.push(autoFilterDateElem);
+			}
+			else
+				this.Values[obj.values[i].text] = true;
+		}	
 		else
 			allFilterOpenElements = false;
 	}
+	this._sortDate();
+
 	return allFilterOpenElements;
 };
 Filters.prototype.isHideValue = function(val, isDateTimeFormat) {
@@ -4606,6 +4620,16 @@ Filters.prototype.linearSearch = function(val, array) {
 	else
 		return -1;
 };
+Filters.prototype._sortDate = function()
+{
+	if(this.Dates && this.Dates.length)
+	{
+		this.Dates.sort (function sortArr(a, b)
+		{
+			return a.start - b.start;
+		})
+	}
+};
 
 /** @constructor */
 function Filter() {
@@ -4631,6 +4655,66 @@ DateGroupItem.prototype.clone = function() {
 	res.Second = this.Second;
 	res.Year = this.Year;
 	return res;
+};
+DateGroupItem.prototype.convertRangeToDateGroupItem = function(range) {
+	var startUtcDate = NumFormat.prototype.parseDate(range.start);
+	var year = startUtcDate.year;
+	var month = startUtcDate.month + 1;
+	var day = startUtcDate.d;
+	var hour = startUtcDate.hour;
+	var minute = startUtcDate.minute;
+	var second = startUtcDate.second;
+	
+	this.DateTimeGrouping = range.dateTimeGrouping;
+	
+	switch(this.DateTimeGrouping)
+	{
+		case 1://day
+		{
+			this.Year = year;
+			this.Month = month;
+			this.Day = day;
+			break;
+		}
+		case 2://hour
+		{
+			this.Year = year;
+			this.Month = month;
+			this.Day = day;
+			this.Hour = hour;
+			break;
+		}
+		case 3://minute
+		{
+			this.Year = year;
+			this.Month = month;
+			this.Day = day;
+			this.Hour = hour;
+			this.Minute = minute;
+			break;
+		}
+		case 4://month
+		{
+			this.Year = year;
+			this.Month = month;
+			break;
+		}
+		case 5://second
+		{
+			this.Year = year;
+			this.Month = month;
+			this.Day = day;
+			this.Hour = hour;
+			this.Minute = minute;
+			this.Second = second;
+			break;
+		}
+		case 6://year
+		{
+			this.Year = year;
+			break;
+		}
+	}
 };
 
 /** @constructor */
@@ -4900,18 +4984,70 @@ SortCondition.prototype.clone = function() {
 	return res;
 };
 
-function dateElem(start, end, dateTimeGrouping) {
+function AutoFilterDateElem(start, end, dateTimeGrouping) {
 	this.start = start;
 	this.end = end;
 	this.dateTimeGrouping = dateTimeGrouping;
 } 
-dateElem.prototype.clone = function() {
-	var res = new dateElem();
+AutoFilterDateElem.prototype.clone = function() {
+	var res = new AutoFilterDateElem();
 	res.start = this.start;
 	this.end = this.end;
 	this.dateTimeGrouping = this.dateTimeGrouping;
 	
 	return res;
+};
+AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupItem) {
+	var startDate, endDate, date;
+	switch(oDateGroupItem.DateTimeGrouping)
+	{
+		case 1://day
+		{
+			date = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day));
+			startDate = date.getExcelDateWithTime();
+			date.addDays(1)
+			endDate = date.getExcelDateWithTime();
+			break;
+		}
+		case 2://hour
+		{
+			startDate = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, 1)).getExcelDateWithTime();
+			endDate = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, 59)).getExcelDateWithTime();
+			break;
+		}
+		case 3://minute
+		{
+			startDate = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, oDateGroupItem.Minute, 1)).getExcelDateWithTime();
+			endDate = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, oDateGroupItem.Minute, 59)).getExcelDateWithTime();
+			break;
+		}
+		case 4://month
+		{
+			date = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, 1));
+			startDate = date.getExcelDateWithTime();
+			date.addMonths(1)
+			endDate = date.getExcelDateWithTime();
+			break;
+		}
+		case 5://second
+		{
+			startDate = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, oDateGroupItem.Second)).getExcelDateWithTime();
+			endDate = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, oDateGroupItem.Second )).getExcelDateWithTime();
+			break;
+		}
+		case 6://year
+		{
+			date = new Date(Date.UTC( oDateGroupItem.Year, 0));
+			startDate = date.getExcelDateWithTime();
+			date.addYears(1)
+			endDate = date.getExcelDateWithTime();
+			break;
+		}
+	}
+	
+	this.start = startDate;
+	this.end = endDate;
+	this.dateTimeGrouping = oDateGroupItem.DateTimeGrouping;
 };
 
 window["Asc"]["CustomFilters"]			= window["Asc"].CustomFilters = CustomFilters;
