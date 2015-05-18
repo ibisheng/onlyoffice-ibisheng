@@ -230,6 +230,8 @@ String.prototype.repeat = function (s, n){
     return a.join('');
 };
 
+parserHelp.setDigitSeparator(g_oDefaultCultureInfo.NumberDecimalSeparator);
+
 /** @constructor */
 function cBaseType( val, type ) {
     this.needRecalc = false;
