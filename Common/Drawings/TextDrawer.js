@@ -36,11 +36,11 @@ CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct)
         {
             var nDivCount = oWarpStruct.pathLst.length >> 1;
             var aByPaths = oWarpStruct.getArrayPolygonsByPaths(PATH_DIV_EPSILON);
-            var nLastIndex = 0, aIndex = [],  aWarpedObjects = [], dTmp, oBoundsChecker, oTemp, nIndex;
+            var nLastIndex = 0, aIndex = [],  aWarpedObjects = [], dTmp, oBoundsChecker, oTemp, nIndex, aWarpedObjects2 = [];
             oBoundsChecker = new CSlideBoundsChecker();
             oBoundsChecker.init(100, 100, 100, 100);
             var bCheckBounds = false, dMinX, dMaxX;
-            if(oWarpStruct.pathLst.length > 2)
+            //if(oWarpStruct.pathLst.length > 2)
             {
                 bCheckBounds = true;
                 for(j = 0; j < this.m_aByLines.length; ++j)
@@ -48,13 +48,15 @@ CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct)
                     oTemp = this.m_aByLines[j];
                     for(t = 0; t < oTemp.length; ++t)
                     {
-                        oTemp[t].GetAllWarped(aWarpedObjects);
+                        oTemp[t].GetAllWarped(aWarpedObjects2);
                         oTemp[t].CheckBoundsWarped(oBoundsChecker);
                     }
                 }
                 dMinX = oBoundsChecker.Bounds.min_x;
                 dMaxX = oBoundsChecker.Bounds.max_x;
             }
+
+
 
             for( i = 0; i < nDivCount; ++i)
             {
@@ -85,6 +87,26 @@ CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct)
                 ObjectsToDrawBetweenTwoPolygons(aWarpedObjects, oBoundsChecker.Bounds, new PolygonWrapper(aByPaths[i << 1]), new PolygonWrapper(aByPaths[(i << 1) + 1]));
                 nLastIndex = nIndex;
             }
+
+            var oLastObjectToDraw = null, oCurObjectToDraw;
+            for(i = 0; i < aWarpedObjects2.length; ++i)
+            {
+                if(oLastObjectToDraw === null)
+                {
+                    oLastObjectToDraw = aWarpedObjects2[i];
+                    continue;
+                }
+                oCurObjectToDraw = aWarpedObjects2[i];
+                if(oLastObjectToDraw  && CompareBrushes(oLastObjectToDraw.brush, oCurObjectToDraw.brush) && ComparePens(oLastObjectToDraw.pen, oCurObjectToDraw.pen))
+                {
+                    oLastObjectToDraw.geometry.pathLst = oLastObjectToDraw.geometry.pathLst.concat(oCurObjectToDraw.geometry.pathLst);
+                    oCurObjectToDraw.geometry.pathLst.length = 0;
+                }
+                else
+                {
+                    oLastObjectToDraw = oCurObjectToDraw;
+                }
+            }
             break;
         }
         case 3:
@@ -97,6 +119,7 @@ CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct)
             break;
         }
     }
+
 };
 
 function CParagraphStructure()
@@ -1339,13 +1362,45 @@ CTextDrawer.prototype =
 
     SetTextPr : function(textPr, theme)
     {
+
+        if(!this.CheckCompareFillBrush(textPr, this.m_oTextPr))
+        {
+            this.Get_PathToDraw(false, true);
+        }
         this.m_oTextPr = textPr;
         if (theme)
             this.m_oGrFonts.checkFromTheme(theme.themeElements.fontScheme, this.m_oTextPr.RFonts);
         else
             this.m_oGrFonts = this.m_oTextPr.RFonts;
-        this.Get_PathToDraw(false, true);
     },
+
+    CheckCompareFillBrush: function(oTextPr1, oTextPr2)
+    {
+        if(oTextPr1 && oTextPr2)
+        {
+            var oFill1 = this.GetFillFromTextPr(oTextPr1);
+            var oFill2 = this.GetFillFromTextPr(oTextPr2);
+            if(!CompareBrushes(oFill1, oFill2))
+                return false;
+            var oPen1 = this.GetPenFromTextPr(oTextPr1);
+            var oPen2 = this.GetPenFromTextPr(oTextPr2);
+            if(!CompareBrushes(oPen1, oPen2))
+                return false;
+        }
+        return true;
+    },
+
+    GetFillFromTextPr: function(oTextPr)
+    {
+        return oTextPr.Unifill;
+    },
+
+    GetPenFromTextPr: function(oTextPr)
+    {
+        return oTextPr.TextOutline;
+    },
+
+
 
     GetTextPr : function()
     {
@@ -1505,4 +1560,17 @@ function ObjectsToDrawBetweenTwoPolygons(aObjectsToDraw, oBoundsController, oPol
 
         }
     }
+}
+
+function CompareBrushes(oFill1, oFill2)
+{
+    if(oFill1 && !oFill2 || !oFill1 && oFill2 || (oFill1 && oFill2 && !oFill1.IsIdentical(oFill2)))
+        return false;
+    return true;
+}
+function ComparePens(oPen1, oPen2)
+{
+    if(oPen1 && !oPen2 || !oPen1 && oPen2 || (oPen1 && oPen2 && !oPen1.IsIdentical(oPen2)))
+        return false;
+    return true;
 }

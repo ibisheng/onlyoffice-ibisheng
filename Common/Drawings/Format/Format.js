@@ -3386,7 +3386,14 @@ CGs.prototype =
 
     IsIdentical : function(fill)
     {
-        return false;
+        if(!fill)
+            return false;
+        if(this.pos !== fill.pos)
+            return false;
+
+        if(!this.color && fill.color || this.color && !fill.color || (this.color && fill.color && !this.color.IsIdentical(fill.color)))
+            return false;
+        return true;
     },
 
     createDuplicate : function()
@@ -4032,6 +4039,13 @@ CGradFill.prototype =
                 return false;
             }
         }
+
+        if(!this.path && fill.path || this.path && !fill.path || (this.path && fill.path && !this.path.IsIdentical(fill.path)))
+            return false;
+
+        if(!this.lin && fill.lin || !fill.lin && this.lin || (this.lin && fill.lin && !this.lin.IsIdentical(fill.lin)))
+            return false;
+
         return true;
     },
 
@@ -5488,6 +5502,20 @@ LineJoin.prototype =
     Refresh_RecalcData: function()
     {},
 
+
+    IsIdentical : function(oJoin)
+    {
+        if(!oJoin)
+            return false;
+        if(this.type !== oJoin.type)
+        {
+            return false;
+        }
+        if(this.limit !== oJoin.limit)
+            return false;
+        return true;
+    },
+
     getObjectType: function()
     {
         return historyitem_type_LineJoin;
@@ -5778,7 +5806,7 @@ CLn.prototype =
 
     IsIdentical: function(ln)
     {
-        return ln && (this.Fill == null ? ln.Fill == null : this.Fill.IsIdentical(ln.Fill) )&& this.Join == ln.Join
+        return ln && (this.Fill == null ? ln.Fill == null : this.Fill.IsIdentical(ln.Fill) )&& (this.Join == null ? ln.Join == null : this.Join.IsIdentical(ln.Join) )
             && (this.headEnd == null ? ln.headEnd == null : this.headEnd.IsIdentical(ln.headEnd) )
             && (this.tailEnd == null ? ln.tailEnd == null : this.tailEnd.IsIdentical(ln.headEnd)) &&
             this.algn == ln.algn && this.cap == ln.cap && this.cmpd == ln.cmpd && this.w== ln.w;

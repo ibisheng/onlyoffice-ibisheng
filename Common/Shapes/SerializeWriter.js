@@ -1829,6 +1829,9 @@ function CBinaryFileWriter()
 
         oThis.WriteUChar(g_nodeAttributeEnd);
 
+        if(rPr.TextOutline)
+            oThis.WriteRecord1(0, rPr.TextOutline, oThis.WriteLn);
+
         if(rPr.Unifill)
             oThis.WriteRecord1(1, rPr.Unifill, oThis.WriteUniFill);
 

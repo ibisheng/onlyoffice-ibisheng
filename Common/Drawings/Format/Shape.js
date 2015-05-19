@@ -6,6 +6,14 @@ function CheckObjectLine(obj)
     return (obj instanceof CShape && obj.spPr && obj.spPr.geometry && obj.spPr.geometry.preset === "line");
 }
 
+
+function CheckWordArtTextPr(oTextPr)
+{
+    if(oTextPr.TextFill || oTextPr.TextOutline || (oTextPr.Unifill && oTextPr.Unifill.fill.type !== FILL_TYPE_SOLID))
+        return true;
+    return false;
+}
+
 function hitToHandles(x, y, object)
 {
     var invert_transform = object.getInvertTransform();
@@ -691,7 +699,7 @@ CShape.prototype =
             //dd.EndSearchTransform();
         }
     },
-    
+
     Search_GetId : function(bNext, bCurrent)
     {
         if(this.textBoxContent)
@@ -701,7 +709,7 @@ CShape.prototype =
         {
             return this.txBody.content.Search_GetId(bNext, bCurrent);
         }
-        
+
         return null;
     },
 
@@ -4173,15 +4181,69 @@ CShape.prototype =
         this.bounds.h = this.bounds.b - this.bounds.t;
     },
 
+    checkRunWordArtContent: function(aContent)
+    {
+        for(var j = 0; j < aContent.length; ++j)
+        {
+            if(aContent[j].Type === para_Run)
+            {
+                if( CheckWordArtTextPr(aContent[j].Get_CompiledPr()))
+                {
+                    return true;
+                }
+            }
+            else if(aContent[j].Type === para_Hyperlink)
+            {
+                if(this.checkRunWordArtContent(aContent[j].Content))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    },
+
+
+    checkContentWordArt: function(oContent)
+    {
+        var i, j, k, oElement, aRows, oRow;
+        for(i = 0; i < oContent.Content.length; ++i)
+        {
+            oElement = oContent.Content[i];
+            if(oElement.Get_Type() === type_Paragraph)
+            {
+                if(this.checkRunWordArtContent(oElement.Content))
+                {
+                    return true;
+                }
+            }
+            else if(oElement.Get_Type() === type_Table)
+            {
+                aRows = oElement.Content;
+                for(j = 0; j < aRows.length; ++j)
+                {
+                    oRow = aRows[j];
+                    for(k = 0; k < oRow.Content.length; ++k)
+                    {
+                        if(this.checkContentWordArt(oRow.Content[k].Content))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    },
+
     checkTextWarp: function(oContent, oBodyPr, dWidth, dHeight)
     {
         var oRet = {oTxWarpStruct: null, oTxWarpStructParamarks: null};
-        if(oBodyPr.prstTxWarp)
+        if((oBodyPr.prstTxWarp && oBodyPr.prstTxWarp.preset !== "textNoShape") || this.checkContentWordArt(oContent))
         {
-            var bNeedRecalcContent = (oBodyPr.prstTxWarp.pathLst.length % 2) === 1;
             var oTextDrawer = new CTextDrawer(dWidth, dHeight, true);
             var warpGeometry = oBodyPr.prstTxWarp;
-            warpGeometry.Recalculate(dWidth, dHeight);
+            warpGeometry && warpGeometry.Recalculate(dWidth, dHeight);
             var OldShowParaMarks;
             if(isRealObject(editor))
             {
@@ -4195,7 +4257,7 @@ CShape.prototype =
             }
             oRet.oTxWarpStructParamarks = oTextDrawer.m_oDocContentStructure;
             oRet.oTxWarpStructParamarks.Recalculate(this.Get_Theme(), this.Get_ColorMap(), dWidth, dHeight, this);
-            oRet.oTxWarpStructParamarks.checkByWarpStruct(warpGeometry);
+            warpGeometry && oRet.oTxWarpStructParamarks.checkByWarpStruct(warpGeometry);
 
             if(isRealObject(editor))
             {
@@ -4209,7 +4271,7 @@ CShape.prototype =
             }
             oRet.oTxWarpStruct = oTextDrawer.m_oDocContentStructure;
             oRet.oTxWarpStruct.Recalculate(this.Get_Theme(), this.Get_ColorMap(), dWidth, dHeight, this);
-            oRet.oTxWarpStruct.checkByWarpStruct(warpGeometry);
+            warpGeometry && oRet.oTxWarpStruct.checkByWarpStruct(warpGeometry);
         }
         return oRet;
     }

@@ -6957,17 +6957,9 @@ CTextPr.prototype =
         {
             this.TextOutline = TextPr.TextOutline.createDuplicate();
         }
-        else
-        {
-            this.TextOutline = undefined;
-        }
         if(undefined != TextPr.TextFill)
         {
             this.TextFill = TextPr.TextFill.createDuplicate();
-        }
-        else
-        {
-            this.TextFill = undefined;
         }
     },
 
