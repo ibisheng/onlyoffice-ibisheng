@@ -4717,11 +4717,38 @@ DateGroupItem.prototype.convertRangeToDateGroupItem = function(range) {
 	}
 };
 
+
+var g_oCustomFilters = {
+	And	 : 0,
+	CustomFilters	: 1
+};
 /** @constructor */
 function CustomFilters() {
+	this.Properties = g_oCustomFilters;
+	
 	this.And = null;
 	this.CustomFilters = null;
 }
+CustomFilters.prototype.getType = function() {
+	return UndoRedoDataTypes.CustomFilters;
+};
+CustomFilters.prototype.getProperties = function() {
+	return this.Properties;
+};
+CustomFilters.prototype.getProperty = function(nType) {
+	switch (nType) {
+		case this.Properties.And: return this.And; break;
+		case this.Properties.CustomFilters: return this.CustomFilters; break;
+	}
+	return null;
+};
+CustomFilters.prototype.setProperty = function(nType, value) {
+	switch (nType) {
+		case this.Properties.And: this.And = value;break;
+		case this.Properties.CustomFilters: this.CustomFilters = value;break;
+	}
+};
+	
 CustomFilters.prototype.clone = function() {
 	var i, res = new CustomFilters();
 	res.And = this.And;
@@ -4760,12 +4787,38 @@ CustomFilters.prototype.asc_getCustomFilters = function () { return this.CustomF
 CustomFilters.prototype.asc_setAnd = function (val) { this.And = val; };
 CustomFilters.prototype.asc_setCustomFilters = function (val) { this.CustomFilters = val; };
 
+var g_oCustomFilter = {
+	Operator	 : 0,
+	Val	: 1
+};
 
 /** @constructor */
 function CustomFilter(operator, val) {
+	this.Properties = g_oCustomFilter;
+	
 	this.Operator = operator != undefined ? operator : null;
 	this.Val = val != undefined ? val : null;
 }
+CustomFilter.prototype.getType = function() {
+	return UndoRedoDataTypes.CustomFilter;
+};
+CustomFilter.prototype.getProperties = function() {
+	return this.Properties;
+};
+CustomFilter.prototype.getProperty = function(nType) {
+	switch (nType) {
+		case this.Properties.Operator: return this.Operator; break;
+		case this.Properties.Val: return this.Val; break;
+	}
+	return null;
+};
+CustomFilter.prototype.setProperty = function(nType, value) {
+	switch (nType) {
+		case this.Properties.Operator: this.Operator = value;break;
+		case this.Properties.Val: this.Val = value;break;
+	}
+};
+
 CustomFilter.prototype.clone = function() {
 	var res = new CustomFilter();
 	res.Operator = this.Operator;

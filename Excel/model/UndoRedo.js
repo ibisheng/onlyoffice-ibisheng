@@ -364,7 +364,9 @@ var UndoRedoDataTypes = new function() {
 	this.SingleProperty = 33;
 	this.RgbColor = 34;
 	this.ThemeColor = 35;
-
+	
+	this.CustomFilters = 36;
+	this.CustomFilter = 37;
 
     this.DefinedName = 39;
     this.DefinedNamesChange = 40;
@@ -433,6 +435,8 @@ var UndoRedoDataTypes = new function() {
 			case this.AutoFilter: return new UndoRedoData_AutoFilter(); break;
 			case this.AutoFiltersOptions: return new Asc.AutoFiltersOptions(); break;
 			case this.AutoFilterObj: return new Asc.AutoFilterObj(); break;
+			case this.CustomFilters: return new Asc.CustomFilters(); break;
+			case this.CustomFilter: return new Asc.CustomFilter(); break;
 			case this.AutoFiltersOptionsElements: return new Asc.AutoFiltersOptionsElements(); break;
 			case this.AddFormatTableOptions: return new Asc.AddFormatTableOptions(); break;
 			case this.SingleProperty: return new UndoRedoData_SingleProperty(); break;
@@ -1677,7 +1681,7 @@ UndoRedoData_ClrScheme.prototype = {
 };
 var g_oUndoRedoData_AutoFilterProperties = {
 		activeCells			: 0,
-		lTable				: 1,
+		styleName			: 1,
 		type				: 2,
 		cellId				: 3,
 		autoFiltersObject	: 4,
@@ -1692,7 +1696,7 @@ function UndoRedoData_AutoFilter() {
 	this.undo				= null;
 
 	this.activeCells		= null;
-	this.lTable				= null;
+	this.styleName			= null;
 	this.type				= null;
 	this.cellId				= null;
 	this.autoFiltersObject	= null;
@@ -1715,7 +1719,7 @@ UndoRedoData_AutoFilter.prototype = {
 		switch (nType)
 		{
 			case this.Properties.activeCells: return new UndoRedoData_BBox(this.activeCells); break;
-			case this.Properties.lTable: return this.lTable; break;
+			case this.Properties.styleName: return this.styleName; break;
 			case this.Properties.type: return this.type; break;
 			case this.Properties.cellId: return this.cellId; break;
 			case this.Properties.autoFiltersObject: return this.autoFiltersObject; break;
@@ -1732,7 +1736,7 @@ UndoRedoData_AutoFilter.prototype = {
 		switch (nType)
 		{
 			case this.Properties.activeCells: this.activeCells = new Asc.Range(value.c1, value.r1, value.c2, value.r2);break;
-			case this.Properties.lTable: this.lTable = value;break;
+			case this.Properties.styleName: this.styleName = value;break;
 			case this.Properties.type: this.type = value;break;
 			case this.Properties.cellId: this.cellId = value;break;
 			case this.Properties.autoFiltersObject: this.autoFiltersObject = value;break;

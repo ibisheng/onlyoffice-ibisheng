@@ -342,7 +342,7 @@ var maxIndividualValues = 10000;
 					}
 					
 					//updates
-					ws._onUpdateFormatTable(filterRange, true, true);
+					ws._onUpdateFormatTable(filterRange, !!(styleName), true);
 					
 					History.EndTransaction();
 				};
@@ -431,7 +431,7 @@ var maxIndividualValues = 10000;
 					isTablePartsContainsRange.TableStyleInfo.Name = styleName;
 					t._setColorStyleTable(isTablePartsContainsRange.Ref, isTablePartsContainsRange);
 					
-					ws._onUpdateFormatTable(isTablePartsContainsRange.Ref, true, true);
+					ws._onUpdateFormatTable(isTablePartsContainsRange.Ref, false, true);
 					
 					//history
 					t._addHistoryObj(cloneFilter, historyitem_AutoFilter_ChangeTableStyle,
@@ -1296,6 +1296,7 @@ var maxIndividualValues = 10000;
 			{
 				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
+				activeRange = activeRange.clone();
 				var diff = activeRange.c2 - activeRange.c1 + 1;
 				var oldFilter;
 				
@@ -1304,6 +1305,13 @@ var maxIndividualValues = 10000;
 				
 				var bUndoChanges = aWs.workbook.bUndoChanges;
 				var bRedoChanges = aWs.workbook.bRedoChanges;
+				
+				var DeleteColumns = ((insertType == c_oAscDeleteOptions.DeleteColumns && type == 'delCell') || insertType == c_oAscInsertOptions.InsertColumns) ? true : false;
+				if(DeleteColumns)//в случае, если удаляем столбцы, тогда расширяем активную область область по всем строкам
+				{
+					activeRange.r1 = 0;
+					activeRange.r2 = gc_nMaxRow - 1;
+				}
 				
 				History.StartTransaction();
 				History.Create_NewPoint();
@@ -1322,7 +1330,10 @@ var maxIndividualValues = 10000;
 						{
 							oldFilter = aWs.AutoFilter.clone(null);
 							
-							aWs.AutoFilter.Ref = new Asc.Range(ref.c1 + diff, ref.r1, ref.c2 + diff, ref.r2);
+							var start = (ref.c1 + diff) >= 0 ? ref.c1 + diff : 0;
+							var end = ref.c2 + diff;
+							
+							aWs.AutoFilter.Ref = new Asc.Range(start, ref.r1, end, ref.r2);
 						}
 						else if(activeRange.c1 > ref.c1 && activeRange.c1 <= ref.c2)//inside
 						{
@@ -1364,9 +1375,11 @@ var maxIndividualValues = 10000;
 						{
 							oldFilter = tableParts[i].clone(null);
 							
-							tableParts[i].Ref = new Asc.Range(ref.c1 + diff, ref.r1, ref.c2 + diff, ref.r2);
+							var start = (ref.c1 + diff) >= 0 ? ref.c1 + diff : 0;
+							var end = ref.c2 + diff;
+							tableParts[i].Ref = new Asc.Range(start, ref.r1, end, ref.r2);
 							if(tableParts[i].AutoFilter)
-								tableParts[i].AutoFilter.Ref = new Asc.Range(ref.c1 + diff, ref.r1, ref.c2 + diff, ref.r2);
+								tableParts[i].AutoFilter.Ref = new Asc.Range(start, ref.r1, end, ref.r2);
 						}
 						else if(activeRange.c1 > ref.c1 && activeRange.c1 <= ref.c2)//inside
 						{
@@ -1440,6 +1453,7 @@ var maxIndividualValues = 10000;
 			{
 				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
+				activeRange = activeRange.clone();
 				var diff = activeRange.r2 - activeRange.r1 + 1;
 				var oldFilter;
 				
@@ -1448,6 +1462,14 @@ var maxIndividualValues = 10000;
 				
 				var bUndoChanges = aWs.workbook.bUndoChanges;
 				var bRedoChanges = aWs.workbook.bRedoChanges;
+				
+				
+				var DeleteRows = ((insertType == c_oAscDeleteOptions.DeleteRows && type == 'delCell') || insertType == c_oAscInsertOptions.InsertRows) ? true : false;
+				if(DeleteRows)//в случае, если удаляем строки, тогда расширяем активную область область по всем столбцам
+				{
+					activeRange.c1 = 0;
+					activeRange.c2 = gc_nMaxCol - 1;
+				}
 				
 				History.StartTransaction();
 				History.Create_NewPoint();
