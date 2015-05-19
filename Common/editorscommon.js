@@ -81,7 +81,7 @@ function g_fOpenFileCommand (data, Signature, callback) {
 		}
 	});
 	if (null != openData['urlchanges']) {
-		JSZipUtils.getBinaryContent(g_sResourceServiceLocalUrl + openData['urlchanges'], function(err, data) {
+		require('jsziputils').getBinaryContent(g_sResourceServiceLocalUrl + openData['urlchanges'], function(err, data) {
 			bEndLoadChanges = true;
 			if(err) {
 				bError = true;
@@ -89,7 +89,7 @@ function g_fOpenFileCommand (data, Signature, callback) {
 				return;
 			}
 
-			var oZipFile = new JSZip(data);
+			var oZipFile = new (require('jszip'))(data);
 			oResult.changes = [];
 			for(var i in oZipFile.files)
 				oResult.changes.push(JSON.parse(oZipFile.file(i).asText()))
