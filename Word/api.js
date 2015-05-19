@@ -7656,14 +7656,14 @@ window["asc_docs_api"].prototype["asc_nativeGetFileData"] = function()
 
 window["asc_docs_api"].prototype["asc_nativeGetHtml"] = function()
 {
-    var _old = window.copyPasteUseBinary;
-    window.copyPasteUseBinary = false;
+    var _old = copyPasteUseBinary;
+    copyPasteUseBinary = false;
     this.WordControl.m_oLogicDocument.Select_All();
-    var oCopyProcessor = new CopyProcessor(api);
+    var oCopyProcessor = new CopyProcessor(this);
     oCopyProcessor.Start();
     var _ret = oCopyProcessor.getInnerHtml();
     this.WordControl.m_oLogicDocument.Selection_Remove();
-    window.copyPasteUseBinary = _old;
+    copyPasteUseBinary = _old;
     return _ret;
 };
 

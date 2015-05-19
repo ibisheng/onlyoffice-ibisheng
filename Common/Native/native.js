@@ -379,7 +379,7 @@ function NativeGetFileDataHtml()
 function NativeStartMailMergeByList(database)
 {
     if (_api.asc_StartMailMergeByList)
-        return _api.asc_StartMailMergeByList(JSON.parse(database));
+        return _api.asc_StartMailMergeByList(database);
     return undefined;
 }
 function NativePreviewMailMergeResult(index)
