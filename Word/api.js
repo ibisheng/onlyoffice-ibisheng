@@ -7452,6 +7452,15 @@ asc_docs_api.prototype.asc_undoAllChanges = function ()
 {
     this.WordControl.m_oLogicDocument.Document_Undo({All : true});
 };
+asc_docs_api.prototyp.asc_CloseFile = function()
+{
+    History.Clear();
+    g_oTableId.Clear();
+    g_oIdCounter.Clear();
+
+    this.WordControl.m_oLogicDocument.Stop_Recalculate();
+    this.WordControl.m_oLogicDocument.Stop_CheckSpelling();
+}
 
 window["asc_docs_api"] = asc_docs_api;
 window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, version)

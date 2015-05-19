@@ -697,6 +697,11 @@ CDocument.prototype.Restart_CheckSpelling = function()
     }
 };
 
+CDocument.prototype.Stop_CheckSpelling = function()
+{
+    this.Spelling.Reset();
+};
+
 CDocument.prototype.Continue_CheckSpelling = function()
 {
     this.Spelling.Continue_CheckSpelling();
