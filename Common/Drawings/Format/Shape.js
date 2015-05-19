@@ -4206,6 +4206,8 @@ CShape.prototype =
 
     checkContentWordArt: function(oContent)
     {
+        if(!oContent)
+            return false;
         var i, j, k, oElement, aRows, oRow;
         for(i = 0; i < oContent.Content.length; ++i)
         {

@@ -4731,7 +4731,7 @@ DrawingObjectsController.prototype =
             if (oTargetTextObject) {
 
                 var oBodyPr = oTargetTextObject.getBodyPr && oTargetTextObject.getBodyPr();
-                if(oBodyPr && oBodyPr.prstTxWarp)
+                if((oBodyPr && oBodyPr.prstTxWarp && oBodyPr.prstTxWarp.preset !== "textNoShape") || oTargetTextObject.checkContentWordArt && oTargetTextObject.checkContentWordArt(oTargetTextObject.getDocContent()))
                 {
                     if (oTargetTextObject.recalcInfo.bRecalculatedTitle)
                     {
