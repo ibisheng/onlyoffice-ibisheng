@@ -7436,6 +7436,7 @@ asc_docs_api.prototype.asc_showRevision = function (newObj) {
 	else
 		bUpdate = this.VersionHistory.update(newObj);
 	if (bUpdate) {
+		this.asc_CloseFile();
 		g_oIdCounter.Clear();
 		g_oTableId.Clear();
 		this.isApplyChangesOnOpenEnabled = true;
