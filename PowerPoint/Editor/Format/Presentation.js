@@ -368,6 +368,7 @@ CPresentation.prototype =
                         this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
                         this.DrawingDocument.OnEndRecalculate();
                     }
+                    History.Get_RecalcData();
                     History.Reset_RecalcIndex();
                     return;
                 }
