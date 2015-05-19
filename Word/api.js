@@ -7444,6 +7444,7 @@ asc_docs_api.prototype.asc_showRevision = function (newObj) {
 		this.DocInfo.put_Url(this.VersionHistory.url);
 		documentUrlChanges = this.VersionHistory.urlChanges;
 		this.isCoAuthoringEnable = false;
+		this.isSpellCheckEnable = false;
 		this.LoadDocument();
 	}
 };
