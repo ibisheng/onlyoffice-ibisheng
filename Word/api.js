@@ -7414,7 +7414,7 @@ asc_docs_api.prototype.asc_sendMailMergeData = function(oData)
 };
 asc_docs_api.prototype.asc_GetMailMergeFiledValue = function(nIndex, sName)
 {
-    return editor.WordControl.m_oLogicDocument.Get_MailMergeFileldValue(nIndex, sName);
+    return this.WordControl.m_oLogicDocument.Get_MailMergeFileldValue(nIndex, sName);
 };
 asc_docs_api.prototype.asc_stopSaving = function () {
 	this.waitSave = true;
@@ -7653,6 +7653,19 @@ window["asc_docs_api"].prototype["asc_nativeGetFileData"] = function()
 	return _memory.ImData.data;
 };
 
+window["asc_docs_api"].prototype["asc_nativeGetHtml"] = function()
+{
+    var _old = window.copyPasteUseBinary;
+    window.copyPasteUseBinary = false;
+    this.WordControl.m_oLogicDocument.Select_All();
+    var oCopyProcessor = new CopyProcessor(api);
+    oCopyProcessor.Start();
+    var _ret = oCopyProcessor.getInnerHtml();
+    this.WordControl.m_oLogicDocument.Selection_Remove();
+    window.copyPasteUseBinary = _old;
+    return _ret;
+};
+
 window["asc_docs_api"].prototype["asc_nativeCheckPdfRenderer"] = function(_memory1, _memory2)
 {
 	if (true)
@@ -7733,6 +7746,27 @@ window["asc_docs_api"].prototype["asc_nativePrint"] = function(_printer, _page)
 window["asc_docs_api"].prototype["asc_nativePrintPagesCount"] = function()
 {
 	return this.WordControl.m_oDrawingDocument.m_lPagesCount;
+};
+
+window["asc_docs_api"].prototype["asc_nativeGetPDF"] = function()
+{
+    var pagescount = this["asc_nativePrintPagesCount"]();
+
+    var _renderer = new CDocumentRenderer();
+    _renderer.VectorMemoryForPrint = new CMemory();
+    var _bOldShowMarks = this.ShowParaMarks;
+    this.ShowParaMarks = false;
+
+    for (var i = 0; i < pagescount; i++)
+    {
+        this["asc_nativePrint"](_renderer, i);
+    }
+
+    this.ShowParaMarks = _bOldShowMarks;
+
+    window["native"]["Save_End"]("", _renderer.Memory.GetCurPosition());
+
+    return _renderer.Memory.data;
 };
 
 // desktop editor spellcheck

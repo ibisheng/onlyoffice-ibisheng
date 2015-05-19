@@ -5525,6 +5525,28 @@ window["asc_docs_api"].prototype["asc_nativePrintPagesCount"] = function()
 	return this.WordControl.m_oDrawingDocument.SlidesCount;
 }
 
+window["asc_docs_api"].prototype["asc_nativeGetPDF"] = function()
+{
+    var pagescount = this["asc_nativePrintPagesCount"]();
+
+    var _renderer = new CDocumentRenderer();
+    _renderer.VectorMemoryForPrint = new CMemory();
+    var _bOldShowMarks = this.ShowParaMarks;
+    this.ShowParaMarks = false;
+    _renderer.IsNoDrawingEmptyPlaceholder = true;
+
+    for (var i = 0; i < pagescount; i++)
+    {
+        this["asc_nativePrint"](_renderer, i);
+    }
+
+    this.ShowParaMarks = _bOldShowMarks;
+
+    window["native"]["Save_End"]("", _renderer.Memory.GetCurPosition());
+
+    return _renderer.Memory.data;
+};
+
 window["AscDesktopEditor_Save"] = function()
 {
     return editor.asc_Save();

@@ -3712,6 +3712,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		{
 			return 1;
 		};
+
+		spreadsheet_api.prototype.asc_nativeGetPDF = function()
+        {
+            var _ret = this.asc_nativePrint();
+            return _ret.data;
+        };
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------
@@ -3971,5 +3977,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
         prot["asc_nativeCalculate"] = prot.asc_nativeCalculate;
         prot["asc_nativePrint"] = prot.asc_nativePrint;
         prot["asc_nativePrintPagesCount"] = prot.asc_nativePrintPagesCount;
+        prot["asc_nativeGetPDF"] = prot.asc_nativeGetPDF;
 	}
 )(jQuery, window);

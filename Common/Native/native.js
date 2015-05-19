@@ -369,10 +369,40 @@ function NativeGetFileData()
 {
     return _api.asc_nativeGetFileData();
 }
+function NativeGetFileDataHtml()
+{
+    if (_api.asc_nativeGetHtml)
+        return _api.asc_nativeGetHtml();
+    return "";
+}
+
+function NativeStartMailMergeByList(database)
+{
+    if (_api.asc_StartMailMergeByList)
+        return _api.asc_StartMailMergeByList(JSON.parse(database));
+    return undefined;
+}
+function NativePreviewMailMergeResult(index)
+{
+    if (_api.asc_PreviewMailMergeResult)
+        return _api.asc_PreviewMailMergeResult(index);
+    return undefined;
+}
+function NativeGetMailMergeFiledValue(index, name)
+{
+    if (_api.asc_GetMailMergeFiledValue)
+        return _api.asc_GetMailMergeFiledValue(index, name);
+    return "";
+}
 
 function GetNativeCountPages()
 {
     return _api.asc_nativePrintPagesCount();
+}
+
+function GetNativeFileDataPDF()
+{
+    return _api.asc_nativeGetPDF();
 }
 
 window.memory1 = null;
