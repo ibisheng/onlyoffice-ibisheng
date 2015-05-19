@@ -395,7 +395,7 @@ Paragraph.prototype.private_RecalculateFastRange       = function(CurRange, CurL
     // Обнуляем параметры PRS для строки и отрезка
     PRS.Reset_Line();
 
-    PRS.Page  = 0;
+    PRS.Page  = CurPage;
     PRS.Line  = CurLine;
     PRS.Range = CurRange;
 
