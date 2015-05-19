@@ -3522,7 +3522,10 @@ parserFormula.prototype = {
                     this.outStack = [];
                     this.elemArr = [];
                     return false;*/
-//                    this.outStack.push( new cError(cErrorType.wrong_name) );
+                    if( this.operand_str == null ){
+                        this.outStack.push( new cError(cErrorType.wrong_name) );
+                        return this.isParsed = false;
+                    }
                     this.outStack.push(  new cName( this.operand_str, this.wb ) );
                     operand_expected = false;
                     if( this.operand_str != null ){
