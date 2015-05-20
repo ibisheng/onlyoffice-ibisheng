@@ -1727,6 +1727,9 @@ parentLeft.prototype.Assemble = function ( arg ) {
 parentLeft.prototype.Assemble2 = function ( arg, start, count ) {
     return new cString( "(" + arg[start + count - 1] + ")" );
 };
+parentLeft.prototype.Assemble2Locale = function ( arg, start, count ) {
+    return this.Assemble2(arg, start, count);
+};
 
 /** @constructor */
 function parentRight() {
