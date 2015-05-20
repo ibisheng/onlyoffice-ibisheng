@@ -349,7 +349,7 @@ function CFontFileLoader(id)
 
     this.LoadFontAsync = function(basePath, _callback)
     {
-        if (window["AscDesktopEditor"] !== undefined)
+        if (window["AscDesktopEditor"] !== undefined && this.CanUseOriginalFormat)
         {
             if (-1 != this.Status)
                 return true;
