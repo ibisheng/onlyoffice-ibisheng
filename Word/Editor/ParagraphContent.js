@@ -6503,7 +6503,7 @@ ParaDrawing.prototype =
             LogicDocument.Selection_Remove();
             RightElement.Cursor_MoveToStartPos();
             Para.CurPos.ContentPos = TopElementPos + 2;
-            Para.Document_SetThisElementCurrent();
+            Para.Document_SetThisElementCurrent(false);
 
             LogicDocument.Recalculate();
             LogicDocument.Document_UpdateSelectionState();
