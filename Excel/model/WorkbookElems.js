@@ -4346,6 +4346,27 @@ TablePart.prototype.clone = function(ws) {
 TablePart.prototype.recalc = function(ws) {
 	this.DisplayName = ws.workbook.oNameGenerator.getNextTableName(ws, this.Ref);
 };
+TablePart.prototype.moveRef = function(col, row) {
+	var ref = this.Ref.clone();
+	ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+	
+	this.Ref = ref;
+	if(this.AutoFilter)
+		this.AutoFilter.moveRef(col, row);
+};
+TablePart.prototype.changeRef = function(col, row, bIsFirst) {
+	var ref = this.Ref.clone();
+	if(bIsFirst)
+		ref.setOffsetFirst({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+	else
+		ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+	
+	this.Ref = ref;
+	if(this.AutoFilter)
+		this.AutoFilter.changeRef(col, row, bIsFirst);
+};
+
+
 /** @constructor */
 function AutoFilter() {
 	this.Ref = null;
@@ -4384,7 +4405,22 @@ AutoFilter.prototype.addFilterColumn = function() {
 	this.FilterColumns.push(oNewElem);
 	
 	return oNewElem;
-}
+};
+AutoFilter.prototype.moveRef = function(col, row) {
+	var ref = this.Ref.clone();
+	ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+	
+	this.Ref = ref;
+};
+AutoFilter.prototype.changeRef = function(col, row, bIsFirst) {
+	var ref = this.Ref.clone();
+	if(bIsFirst)
+		ref.setOffsetFirst({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+	else
+		ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+	
+	this.Ref = ref;
+};
 
 function FilterColumns() {
 	this.ColId = null;

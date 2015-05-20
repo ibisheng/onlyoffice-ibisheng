@@ -9613,6 +9613,8 @@
 							functionModelAction = function () {
 								History.Create_NewPoint();
 								History.StartTransaction();
+								if(isCheckChangeAutoFilter === true)
+									t.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteCellsAndShiftLeft);
 								if (range.deleteCellsShiftLeft()) {
 									t._cleanCache(oChangeData.changedRange);
 									if(isCheckChangeAutoFilter === true)
@@ -9634,6 +9636,8 @@
 							functionModelAction = function () {
 									History.Create_NewPoint();
 									History.StartTransaction();
+									if(isCheckChangeAutoFilter === true)
+										t.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteCellsAndShiftTop);
 									if (range.deleteCellsShiftUp()) {
 										t._cleanCache(oChangeData.changedRange);
 										if(isCheckChangeAutoFilter === true)
@@ -9656,6 +9660,7 @@
 								fullRecalc = true;
 								History.Create_NewPoint();
 								History.StartTransaction();
+								t.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteColumns);
 								t.model.removeCols(checkRange.c1, checkRange.c2);
 								t.autoFilters.insertColumn(prop, arn, c_oAscDeleteOptions.DeleteColumns);
 								t.objectRender.updateDrawingObject(false, val, checkRange);
@@ -9676,6 +9681,7 @@
 								fullRecalc = true;
 								History.Create_NewPoint();
 								History.StartTransaction();
+								t.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteRows);
 								t.model.removeRows(checkRange.r1, checkRange.r2);
 								t.autoFilters.insertRows(prop, checkRange, c_oAscDeleteOptions.DeleteRows);
 								t.objectRender.updateDrawingObject(false, val, checkRange);

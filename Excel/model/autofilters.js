@@ -564,6 +564,19 @@ var maxIndividualValues = 10000;
 				return result;
 			},
 			
+			checkRemoveTableParts: function(delRange, tableRange)
+			{
+				var result = true, firstRowRange;
+				
+				if(tableRange && delRange.containsRange(tableRange) == false)
+				{
+					firstRowRange = new Asc.Range(tableRange.c1, tableRange.r1, tableRange.c2, tableRange.r1);
+					result = !firstRowRange.isIntersect(delRange);
+				}
+				
+				return result;
+			},
+			
 			checkCursor: function (x, y, offsetX, offsetY, frozenObj, r, c) {
 				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
@@ -883,22 +896,7 @@ var maxIndividualValues = 10000;
 			{
 				var aWs = this._getCurrentWS();
 				var objOptions = new AddFormatTableOptions();
-				/*var isMAddFilter = this._searchFilters(activeCells,false,ws,aWs);
-				if(isMAddFilter == "error")
-					return isMAddFilter;//нельзя применять к этому диапазону форматированную таблицы
-				if(aWs.TableParts)
-				{
-					for(var i = 0; i < aWs.TableParts.length; i++)
-					{
-						var ref = aWs.TableParts[i].Ref.split(":");
-						var startRange = this._idToRange(ref[0]);
-						var endRange = this._idToRange(ref[1]);
-						var tableRange = new Asc.Range(startRange.c1, startRange.r1, endRange.c1, endRange.r1);
-						if(activeCells.c1 >= tableRange.c1 && activeCells.c2 <= tableRange.c2 && activeCells.r1 >= tableRange.r1 && activeCells.r2 <= tableRange.r2)
-							return aWs.TableParts[i].TableStyleInfo.Name;//посылаем название стиля, чтобы подсветитьь его в меню
-					}
-				}
-				return false;//к данному диапазону не применены форматированные таблицы и конфликтов с другими фильтрами нет*/
+				
 				var alreadyAddFilter = this._searchFilters(activeCells, false);
 				//в случае если меняем стиль фильтра
 				if((alreadyAddFilter && alreadyAddFilter.changeStyle) ||(alreadyAddFilter && !alreadyAddFilter.containsFilter && !alreadyAddFilter.all))
@@ -1149,19 +1147,29 @@ var maxIndividualValues = 10000;
 				}
 			},
 			
-			isEmptyAutoFilters: function(ar, turnOnHistory, insCells, deleteFilterAfterDeleteColRow, exceptionArray, doNotChangeFilters)
+			isEmptyAutoFilters: function(ar, insertType, insCells, deleteFilterAfterDeleteColRow, exceptionArray, doNotChangeFilters)
 			{
-				if(turnOnHistory && !this.historyTempObj)
+				var aWs = this._getCurrentWS();
+				var activeCells = ar.clone();
+				
+				var DeleteColumns = insertType && (insertType == c_oAscDeleteOptions.DeleteColumns || insertType == c_oAscInsertOptions.InsertColumns) ? true : false;
+				var DeleteRows = insertType && (insertType == c_oAscDeleteOptions.DeleteRows || insertType == c_oAscInsertOptions.InsertRows) ? true : false;
+
+				if(DeleteColumns)//в случае, если удаляем столбцы, тогда расширяем активную область область по всем строкам
 				{
-					History.TurnOn();
-					History.Create_NewPoint();
+					activeCells.r1 = 0;
+					activeCells.r2 = gc_nMaxRow - 1;
+				}
+				else if(DeleteRows)//в случае, если удаляем строки, тогда расширяем активную область область по всем столбцам
+				{
+					activeCells.c1 = 0;
+					activeCells.c2 = gc_nMaxCol - 1;
 				}
 				
 				if(!this.historyTempObj)
 					History.StartTransaction();
 					
-				var aWs = this._getCurrentWS();
-				var activeCells = ar;
+				
 				if(aWs.AutoFilter)
 				{
 					var oRange = Range.prototype.createFromBBox(aWs, aWs.AutoFilter.Ref);
@@ -1238,9 +1246,6 @@ var maxIndividualValues = 10000;
 				
 				if(!this.historyTempObj)
 					History.EndTransaction();
-					
-				if(turnOnHistory && !this.historyTempObj)
-					History.TurnOff();
 			},
 			
 			isCheckMoveRange: function(arnFrom)
@@ -1296,17 +1301,16 @@ var maxIndividualValues = 10000;
 			{
 				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
+				var t  = this;
+				var bUndoChanges = aWs.workbook.bUndoChanges;
+				var bRedoChanges = aWs.workbook.bRedoChanges;
+				var DeleteColumns = ((insertType == c_oAscDeleteOptions.DeleteColumns && type == 'delCell') || insertType == c_oAscInsertOptions.InsertColumns) ? true : false;
 				activeRange = activeRange.clone();
 				var diff = activeRange.c2 - activeRange.c1 + 1;
 				var oldFilter;
 				
 				if(type === "delCell")
 					diff = - diff;
-				
-				var bUndoChanges = aWs.workbook.bUndoChanges;
-				var bRedoChanges = aWs.workbook.bRedoChanges;
-				
-				var DeleteColumns = ((insertType == c_oAscDeleteOptions.DeleteColumns && type == 'delCell') || insertType == c_oAscInsertOptions.InsertColumns) ? true : false;
 				if(DeleteColumns)//в случае, если удаляем столбцы, тогда расширяем активную область область по всем строкам
 				{
 					activeRange.r1 = 0;
@@ -1316,90 +1320,85 @@ var maxIndividualValues = 10000;
 				History.StartTransaction();
 				History.Create_NewPoint();
 				
-				//заранее удаляем все вошедшие в активную область фильтры
-				if(diff < 0)
-					this.isEmptyAutoFilters(activeRange);
-				
-				//change autoFilter
-				if(aWs.AutoFilter)
+				var changeFilter = function(filter, bTablePart)
 				{
-					var ref = aWs.AutoFilter.Ref;
+					var ref = filter.Ref;
+					var oldFilter = null;
+					var diffColId = null;
+					var changeTableColumns = null;
+					
 					if(activeRange.r1 <= ref.r1 && activeRange.r2 >= ref.r2)
 					{
-						if(activeRange.c1 <= ref.c1)//until
+						if(activeRange.c1 < ref.c1 && activeRange.c2 < ref.c1)//until
 						{
-							oldFilter = aWs.AutoFilter.clone(null);
-							
-							var start = (ref.c1 + diff) >= 0 ? ref.c1 + diff : 0;
-							var end = ref.c2 + diff;
-							
-							aWs.AutoFilter.Ref = new Asc.Range(start, ref.r1, end, ref.r2);
+							oldFilter = filter.clone(null);
+							filter.moveRef(diff);
 						}
-						else if(activeRange.c1 > ref.c1 && activeRange.c1 <= ref.c2)//inside
+						else if(activeRange.c1 < ref.c1 && activeRange.c2 >= ref.c1)//parts of until filter
 						{
-							oldFilter = aWs.AutoFilter.clone(null);
-							
-							aWs.AutoFilter.Ref = new Asc.Range(ref.c1, ref.r1, ref.c2 + diff, ref.r2);
+							oldFilter = filter.clone(null);
+
+							if(diff < 0)
+							{
+								diffColId = ref.c1 - activeRange.c2 - 1;
+								filter.changeRef(-diffColId, null, true);
+							}
+								
+							filter.moveRef(diff);								
 						}
-					}
-					
-					//change filterColumns
-					if(aWs.AutoFilter.FilterColumns && aWs.AutoFilter.FilterColumns.length)
-					{
-						for(var i = 0; i < aWs.AutoFilter.FilterColumns.length; i++)
+						else if(activeRange.c1 > ref.c1 && activeRange.c2 >= ref.c2 && diff < 0)//parts of after filter
 						{
-							if(aWs.AutoFilter.FilterColumns[i].ColId + ref.c1 > activeRange.c1)
-								aWs.AutoFilter.FilterColumns[i].ColId = aWs.AutoFilter.FilterColumns[i].ColId + diff;
+							oldFilter = filter.clone(null);
+								
+							filter.changeRef(activeRange.c1 - ref.c2 - 1);								
 						}
-					}
-					
-					if(!bUndoChanges && !bRedoChanges /*&& !notAddToHistory*/ && oldFilter)
-					{
-						var changeElement = 
+						else if((activeRange.c1 >= ref.c1 && activeRange.c1 <= ref.c2 && activeRange.c2 <= ref.c2) || (activeRange.c1 > ref.c1 && activeRange.c2 >= ref.c2 && diff > 0))//inside
 						{
-							oldFilter: oldFilter,
-							newFilterRef: aWs.AutoFilter.Ref.clone()
-						};
-						this._addHistoryObj(changeElement, null, null, true, oldFilter.Ref, null, true);
-					}
-				}
-				
-				//change TableParts
-				var tableParts = aWs.TableParts;
-				for(var i = 0; i < tableParts.length; i++)
-				{
-					var ref = tableParts[i].Ref;
-					if(activeRange.r1 <= ref.r1 && activeRange.r2 >= ref.r2)
-					{
-						if(activeRange.c1 <= ref.c1)//until
-						{
-							oldFilter = tableParts[i].clone(null);
+							oldFilter = filter.clone(null);
+							filter.changeRef(diff);
 							
-							var start = (ref.c1 + diff) >= 0 ? ref.c1 + diff : 0;
-							var end = ref.c2 + diff;
-							tableParts[i].Ref = new Asc.Range(start, ref.r1, end, ref.r2);
-							if(tableParts[i].AutoFilter)
-								tableParts[i].AutoFilter.Ref = new Asc.Range(start, ref.r1, end, ref.r2);
+							diffColId = diff;
+							changeTableColumns = true;
 						}
-						else if(activeRange.c1 > ref.c1 && activeRange.c1 <= ref.c2)//inside
+						
+						//change filterColumns
+						if(diffColId !== null)
 						{
-							oldFilter = tableParts[i].clone(null);
-							
-							tableParts[i].Ref = new Asc.Range(ref.c1, ref.r1, ref.c2 + diff, ref.r2);
-							if(tableParts[i].AutoFilter)
-								tableParts[i].AutoFilter.Ref = new Asc.Range(ref.c1, ref.r1, ref.c2 + diff, ref.r2);
-							
+							var autoFilter = bTablePart ? filter.AutoFilter : filter;
+							if(autoFilter && autoFilter.FilterColumns && autoFilter.FilterColumns.length)
+							{
+								for(var j = 0; j < autoFilter.FilterColumns.length; j++)
+								{
+									var col = autoFilter.FilterColumns[j].ColId + ref.c1;
+									if(col > activeRange.c1)
+									{
+										var newColId = autoFilter.FilterColumns[j].ColId + diffColId;
+										if(newColId < 0 || (diff < 0 && col >= activeRange.c1 && col <= activeRange.c2))
+										{
+											autoFilter.FilterColumns.splice(j, 1);
+											j--;
+										}	
+										else
+											autoFilter.FilterColumns[j].ColId = newColId;
+									}
+								}
+							}
+						}
+						
+						//change TableColumns
+						if(oldFilter && bTablePart && changeTableColumns)
+						{
 							//add TableColumns
 							if(diff > 0)
 							{
 								var newTableColumns = [];
 								var num = 0;
-								for(var j = 0; j < tableParts[i].TableColumns.length;)
+								for(var j = 0; j < filter.TableColumns.length;)
 								{
-									var curCol = num + tableParts[i].Ref.c1;
+									var curCol = num + filter.Ref.c1;
 									if(activeRange.c1 <= curCol && activeRange.c2 >= curCol)
 									{
-										var newNameColumn = this._generateColumnName(newTableColumns.concat(tableParts[i].TableColumns), curCol - 1);
+										var newNameColumn = t._generateColumnName(newTableColumns.concat(filter.TableColumns), curCol - 1);
 										var newTableColumn = new TableColumn();
 										newTableColumn.Name = newNameColumn;
 										
@@ -1407,44 +1406,49 @@ var maxIndividualValues = 10000;
 									}
 									else
 									{
-										newTableColumns[newTableColumns.length] = tableParts[i].TableColumns[j];
+										newTableColumns[newTableColumns.length] = filter.TableColumns[j];
 										j++
 									}
 									
 									num++;
 								}
-								tableParts[i].TableColumns = newTableColumns;
+								filter.TableColumns = newTableColumns;
 							}
 							else//delete TableColumns
 							{
-								tableParts[i].TableColumns.splice(activeRange.c1 - tableParts[i].Ref.c1, Math.abs(diff));
+								filter.TableColumns.splice(activeRange.c1 - filter.Ref.c1, Math.abs(diff));
 							}
-							
-							//change filterColumns
-							if(tableParts[i].AutoFilter && tableParts[i].AutoFilter.FilterColumns && tableParts[i].AutoFilter.FilterColumns.length)
+						}
+						
+						//History
+						if(!bUndoChanges && !bRedoChanges /*&& !notAddToHistory*/ && oldFilter)
+						{
+							var changeElement = 
 							{
-								for(var j = 0; j < tableParts[i].AutoFilter.FilterColumns.length; j++)
-								{
-									if(tableParts[i].AutoFilter.FilterColumns[j].ColId + ref.c1 > activeRange.c1)
-										tableParts[i].AutoFilter.FilterColumns[j].ColId = tableParts[i].AutoFilter.FilterColumns[j].ColId + diff;
-								}
-							}
-							
-							this._cleanStyleTable(oldFilter.Ref);
-							this._setColorStyleTable(tableParts[i].Ref, aWs.TableParts[i], null, true);
+								oldFilter: oldFilter,
+								newFilterRef: filter.Ref.clone()
+							};
+							t._addHistoryObj(changeElement, null, null, true, oldFilter.Ref, null, true);
+						}
+						
+						//set style
+						if(oldFilter && bTablePart)
+						{
+							t._cleanStyleTable(oldFilter.Ref);
+							t._setColorStyleTable(filter.Ref, filter, null, true);
 						}
 					}
-					
-					if(!bUndoChanges && !bRedoChanges /*&& !notAddToHistory*/ && oldFilter)
-					{
-						var changeElement = 
-						{
-							oldFilter: oldFilter,
-							newFilterRef: tableParts[i].Ref.clone()
-						};
-						this._addHistoryObj(changeElement, null, null, true, oldFilter.Ref, null, true);
-					}
-				}
+				};
+				
+				
+				//change autoFilter
+				if(aWs.AutoFilter)
+					changeFilter(aWs.AutoFilter);
+				
+				//change TableParts
+				var tableParts = aWs.TableParts;
+				for(var i = 0; i < tableParts.length; i++)
+					changeFilter(tableParts[i], true);
 				
 				History.EndTransaction();
 			},
@@ -1453,18 +1457,17 @@ var maxIndividualValues = 10000;
 			{
 				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
+				var t  = this;
+				var bUndoChanges = aWs.workbook.bUndoChanges;
+				var bRedoChanges = aWs.workbook.bRedoChanges;
+				var DeleteRows = ((insertType == c_oAscDeleteOptions.DeleteRows && type == 'delCell') || insertType == c_oAscInsertOptions.InsertRows) ? true : false;
 				activeRange = activeRange.clone();
 				var diff = activeRange.r2 - activeRange.r1 + 1;
 				var oldFilter;
 				
 				if(type === "delCell")
-					diff = - diff;
+					diff = - diff
 				
-				var bUndoChanges = aWs.workbook.bUndoChanges;
-				var bRedoChanges = aWs.workbook.bRedoChanges;
-				
-				
-				var DeleteRows = ((insertType == c_oAscDeleteOptions.DeleteRows && type == 'delCell') || insertType == c_oAscInsertOptions.InsertRows) ? true : false;
 				if(DeleteRows)//в случае, если удаляем строки, тогда расширяем активную область область по всем столбцам
 				{
 					activeRange.c1 = 0;
@@ -1473,87 +1476,53 @@ var maxIndividualValues = 10000;
 				
 				History.StartTransaction();
 				History.Create_NewPoint();
-				
-				//заранее удаляем все вошедшие в активную область фильтры
-				if(diff < 0)
-					this.isEmptyAutoFilters(activeRange);
-				
-				//change autoFilter
-				var ref, changeElement;
-				if(aWs.AutoFilter)
+
+				var changeFilter = function(filter, bTablePart)
 				{
-					ref = aWs.AutoFilter.Ref;
+					var ref = filter.Ref;
 					if(activeRange.c1 <= ref.c1 && activeRange.c2 >= ref.c2)
 					{
 						if(activeRange.r1 <= ref.r1)//until
 						{
-							oldFilter = aWs.AutoFilter.clone(null);
+							oldFilter = filter.clone(null);
 							
-							aWs.AutoFilter.Ref  = new Asc.Range(ref.c1, ref.r1 + diff, ref.c2, ref.r2 + diff);
+							filter.moveRef(null, diff);
 						}
 						else if(activeRange.r1 > ref.r1 && activeRange.r1 <= ref.r2)//inside
 						{
-							oldFilter = aWs.AutoFilter.clone(null);
+							oldFilter = filter.clone(null);
 							
-							aWs.AutoFilter.Ref = new Asc.Range(ref.c1, ref.r1, ref.c2, ref.r2 + diff);
+							filter.changeRef(null, diff);
 						}
 					}
 					
 					if(!bUndoChanges && !bRedoChanges /*&& !notAddToHistory*/ && oldFilter)
 					{
-						changeElement =
+						var changeElement =
 						{
 							oldFilter: oldFilter,
-							newFilterRef: aWs.AutoFilter.Ref.clone()
+							newFilterRef: filter.Ref.clone()
 						};
-						this._addHistoryObj(changeElement, null, null, true, oldFilter.Ref, null, true);
+						t._addHistoryObj(changeElement, null, null, true, oldFilter.Ref, null, true);
 					}
-				}
+					
+					if(oldFilter && bTablePart)
+					{
+						t._cleanStyleTable(oldFilter.Ref);
+						t._setColorStyleTable(filter.Ref, filter, null, true);
+					}
+				};
+				
+				//change autoFilter
+				if(aWs.AutoFilter)
+					changeFilter(aWs.AutoFilter);
 				
 				//change TableParts
 				var tableParts = aWs.TableParts;
 				for(var i = 0; i < tableParts.length; i++)
-				{
-					ref = tableParts[i].Ref;
-					if(activeRange.c1 <= ref.c1 && activeRange.c2 >= ref.c2)
-					{
-						if(activeRange.r1 <= ref.r1)//until
-						{
-							oldFilter = tableParts[i].clone(null);
-							
-							tableParts[i].Ref = new Asc.Range(ref.c1, ref.r1 + diff, ref.c2, ref.r2 + diff);
-							if(tableParts[i].AutoFilter)
-								tableParts[i].AutoFilter.Ref = new Asc.Range(ref.c1, ref.r1 + diff, ref.c2, ref.r2 + diff);
-						}
-						else if(activeRange.r1 > ref.r1 && activeRange.r1 <= ref.r2)//inside
-						{
-							oldFilter = tableParts[i].clone(null);
-							
-							tableParts[i].Ref = new Asc.Range(ref.c1, ref.r1, ref.c2, ref.r2 + diff);
-							if(tableParts[i].AutoFilter)
-								tableParts[i].AutoFilter.Ref = new Asc.Range(ref.c1, ref.r1, ref.c2, ref.r2 + diff);
-							
-							this._cleanStyleTable(oldFilter.Ref);
-							this._setColorStyleTable(tableParts[i].Ref, aWs.TableParts[i], null, true);
-						}
-					}
-					
-					if(!bUndoChanges && !bRedoChanges /*&& !notAddToHistory*/ && oldFilter)
-					{
-						changeElement =
-						{
-							oldFilter: oldFilter,
-							newFilterRef: tableParts[i].Ref.clone()
-						};
-						this._addHistoryObj(changeElement, null, null, true, oldFilter.Ref, null, true);
-					}
-				}
+					changeFilter(tableParts[i], true);
 				
 				History.EndTransaction();
-				/*var updateRange = new Asc.Range(ref.c1, ref.r1, ref.c2 + diff, ref.r2);
-					ws._onUpdateFormatTable(ref, true, true);
-					this.drawAutoF(ref);*/
-				//this._reDrawFilters();
 			},
 			
 			sortColFilter: function(type, cellId, activeRange, isTurnOffHistory) {
@@ -4595,7 +4564,7 @@ var maxIndividualValues = 10000;
 							bWithoutFilter = findFilters[i].AutoFilter === null;
 							
 							if(!ref.intersection(newRange) && !this._intersectionRangeWithTableParts(newRange, aWs, arnFrom))
-								this.addAutoFilter(findFilters[i].TableStyleInfo.Name, newRange, null, null, true, bWithoutFilter);
+								this.addAutoFilter(findFilters[i].TableStyleInfo.Name, newRange);
 						}
 					}
 				}
