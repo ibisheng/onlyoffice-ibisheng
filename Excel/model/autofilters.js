@@ -1346,13 +1346,13 @@ var maxIndividualValues = 10000;
 								
 							filter.moveRef(diff);								
 						}
-						else if(activeRange.c1 > ref.c1 && activeRange.c2 >= ref.c2 && diff < 0)//parts of after filter
+						else if(activeRange.c1 > ref.c1 && activeRange.c2 >= ref.c2 && activeRange.c1 < ref.c2 && diff < 0)//parts of after filter
 						{
 							oldFilter = filter.clone(null);
 								
 							filter.changeRef(activeRange.c1 - ref.c2 - 1);								
 						}
-						else if((activeRange.c1 >= ref.c1 && activeRange.c1 <= ref.c2 && activeRange.c2 <= ref.c2) || (activeRange.c1 > ref.c1 && activeRange.c2 >= ref.c2 && diff > 0))//inside
+						else if((activeRange.c1 >= ref.c1 && activeRange.c1 <= ref.c2 && activeRange.c2 <= ref.c2) || (activeRange.c1 > ref.c1 && activeRange.c2 >= ref.c2 && activeRange.c1 < ref.c2 && diff > 0))//inside
 						{
 							oldFilter = filter.clone(null);
 							filter.changeRef(diff);
@@ -1664,6 +1664,18 @@ var maxIndividualValues = 10000;
 				}
 				
 				return false;
+			},
+			
+			isActiveRangeIntersectionAutoFilter: function(addFormatTableOptionsObj)
+			{
+				var res = false;
+				var aWs = this._getCurrentWS();
+
+				var activeRange = Asc.g_oRangeCache.getAscRange(addFormatTableOptionsObj.asc_getRange());
+				if(activeRange && aWs.AutoFilter && aWs.AutoFilter.Ref.intersection(activeRange))
+					res = true;
+					
+				return res;
 			},
 			
 			_moveAutoFilters: function(arnTo, arnFrom, data, copyRange)

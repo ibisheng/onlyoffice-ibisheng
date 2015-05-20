@@ -4339,8 +4339,10 @@ TablePart.prototype.clone = function(ws) {
 			res.result.push(this.result[i].clone());
 	}
 	
+	res.DisplayName = this.DisplayName;
 	if(ws !== null)
 		res.recalc(ws);
+		
 	return res;
 };
 TablePart.prototype.recalc = function(ws) {

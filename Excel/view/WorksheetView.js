@@ -10827,11 +10827,15 @@
 				isApplyAutoFilter = info.isAutoFilter;
 				isApplyFormatTable = info.tableStyleName;
 				
+				var isActiveRangeIntersectionAutoFilter = null;
+				if(lTable && addFormatTableOptionsObj && isApplyAutoFilter)
+					isActiveRangeIntersectionAutoFilter = t.autoFilters.isActiveRangeIntersectionAutoFilter(addFormatTableOptionsObj);
+					
 				if(!lTable && isApplyAutoFilter)//delete filter in AutoFilter or TablePart
 					t.autoFilters.deleteAutoFilter(ar);
 				else if(!lTable && !isApplyAutoFilter)//add autoFilter
 					t.autoFilters.addAutoFilter(lTable, ar);
-				else if(lTable && !isApplyFormatTable && !isApplyAutoFilter)//add TablePart
+				else if(lTable && !isApplyFormatTable && (!isApplyAutoFilter || (isApplyAutoFilter && !isActiveRangeIntersectionAutoFilter)))//add TablePart
 					t.autoFilters.addAutoFilter(lTable, ar, addFormatTableOptionsObj);
 				else if(lTable && isApplyFormatTable)//change TablePart
 					t.autoFilters.changeTableStyleInfo(lTable, ar);
