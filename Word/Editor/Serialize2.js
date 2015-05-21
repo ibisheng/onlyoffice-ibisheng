@@ -2322,18 +2322,15 @@ function Binary_oMathWriter(memory, oMathPara)
 	}
 	this.WriteLimLoc = function(LimLoc)
 	{
-		if (LimLoc != 1)
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		var val = c_oAscLimLoc.SubSup;
+		switch (LimLoc)
 		{
-			this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
-			this.memory.WriteByte(c_oSerPropLenType.Byte);
-			var val = c_oAscLimLoc.SubSup;
-			switch (LimLoc)
-			{
-				case NARY_SubSup: val = c_oAscLimLoc.SubSup; break;
-				case NARY_UndOvr: val = c_oAscLimLoc.UndOvr;
-			}
-			this.memory.WriteByte(val);
+			case NARY_SubSup: val = c_oAscLimLoc.SubSup; break;
+			case NARY_UndOvr: val = c_oAscLimLoc.UndOvr;
 		}
+		this.memory.WriteByte(val);		
 	}
 	this.WriteLimLow = function(oLimLow)
 	{
