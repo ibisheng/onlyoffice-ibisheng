@@ -2405,10 +2405,10 @@ function Binary_oMathWriter(memory, oMathPara)
 		var val = c_oAscXAlign.Left;
 		switch (MJc)
 		{
-			case JC_CENTER: 	val = c_oAscMathJc.Center; break;
-			case JC_CENTERGROUP: 	val = c_oAscMathJc.CenterGroup; break;
-			case JC_LEFT: 	val = c_oAscMathJc.Left; break;
-			case JC_RIGHT: 	val = c_oAscMathJc.Right;
+			case align_Center: 	val = c_oAscMathJc.Center; break;
+			case align_Justify: val = c_oAscMathJc.CenterGroup; break;
+			case align_Left: 	val = c_oAscMathJc.Left; break;
+			case align_Right: 	val = c_oAscMathJc.Right;
 		}
 		this.memory.WriteByte(val);
 	}
