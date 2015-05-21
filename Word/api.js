@@ -2231,8 +2231,16 @@ asc_docs_api.prototype.asc_Print = function()
 {
     if (window["AscDesktopEditor"])
     {
-        window["AscDesktopEditor"]["Print"]();
-        return;
+        if (null != this.WordControl.m_oDrawingDocument.m_oDocumentRenderer)
+        {
+            if (window["AscDesktopEditor"]["IsSupportNativePrint"](this.DocumentUrl) === true)
+                return;
+        }
+        else
+        {
+            window["AscDesktopEditor"]["Print"]();
+            return;
+        }
     }
 
 	if (undefined != window['qtDocBridge'])
