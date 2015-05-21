@@ -13290,9 +13290,12 @@ function CParagraphGetDropCapText()
 function CRunRecalculateObject(StartLine, StartRange)
 {
     this.StartLine   = StartLine;
-    this.StartRange  = StartRange
+    this.StartRange  = StartRange;
     this.Lines       = [];
     this.Content     = [];
+
+    this.MathInfo    = null;
+    //this.WrapState   = ALIGN_EMPTY;
 }
 
 CRunRecalculateObject.prototype =
@@ -13322,6 +13325,13 @@ CRunRecalculateObject.prototype =
         }
     },
 
+    Save_MathInfo: function(Obj, Copy)
+    {
+        this.MathInfo = Obj.Save_MathInfo(Copy);
+
+        //this.WrapState = Obj.GetCurrentWrapState();
+    },
+
     Load_Lines : function(Obj)
     {
         Obj.StartLine  = this.StartLine;
@@ -13336,6 +13346,11 @@ CRunRecalculateObject.prototype =
         {
             Obj.Content[Index].Load_RecalculateObject( this.Content[Index] );
         }
+    },
+
+    Load_MathInfo: function(Obj)
+    {
+        Obj.Load_MathInfo(this.MathInfo);
     },
 
     Save_RunContent : function(Run, Copy)
@@ -13376,7 +13391,12 @@ CRunRecalculateObject.prototype =
 
     Compare : function(_CurLine, _CurRange, OtherLinesInfo)
     {
-        var OLI = OtherLinesInfo;
+        var OLI = para_Math === OtherLinesInfo.Type ? OtherLinesInfo.Root : OtherLinesInfo;
+
+        if(para_Math === OtherLinesInfo.Type && OtherLinesInfo.CompareMathInfo(this.MathInfo) == false /*this.WrapState !== OtherLinesInfo.GetCurrentWrapState()*/)
+        {
+            return false;
+        }
 
         var CurLine = _CurLine - this.StartLine;
         var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
@@ -13385,8 +13405,10 @@ CRunRecalculateObject.prototype =
         if ( ( 0 === this.Lines.length || 0 === this.LinesLength ) && ( 0 === OLI.Lines.length || 0 === OLI.LinesLength ) )
             return true;
 
+
         if ( this.StartLine !== OLI.StartLine || this.StartRange !== OLI.StartRange || CurLine < 0 || CurLine >= this.private_Get_LinesCount() || CurLine >= OLI.protected_GetLinesCount() || CurRange < 0 || CurRange >= this.private_Get_RangesCount(CurLine) || CurRange >= OLI.protected_GetRangesCount(CurLine) )
             return false;
+
 
         var ThisSP = this.private_Get_RangeStartPos(CurLine, CurRange);
         var ThisEP = this.private_Get_RangeEndPos(CurLine, CurRange);
@@ -13397,7 +13419,7 @@ CRunRecalculateObject.prototype =
         if ( ThisSP !== OtherSP || ThisEP !== OtherEP )
             return false;
 
-        if ( ( (OLI.Content === undefined || para_Run === OLI.Type) && this.Content.length > 0 ) || ( OLI.Content !== undefined && para_Run !== OLI.Type && OLI.Content.length !== this.Content.length) )
+        if ( ( (OLI.Content === undefined || para_Run === OLI.Type || para_Math_Run === OLI.Type) && this.Content.length > 0 ) || ( OLI.Content !== undefined && para_Run !== OLI.Type && para_Math_Run !== OLI.Type && OLI.Content.length !== this.Content.length) )
             return false;
 
         var ContentLen = this.Content.length;

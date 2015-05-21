@@ -490,9 +490,9 @@ CNary.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             else
             {
                 PRS.bMath_OneLine = true;
-                this.Base.Recalculate_Reset(PRS.Range, PRS.Line);
-                this.LowerIterator.Recalculate_Reset(PRS.Range, PRS.Line);
-                this.UpperIterator.Recalculate_Reset(PRS.Range, PRS.Line);
+                this.Base.Recalculate_Reset(PRS.Range, PRS.Line, PRS);
+                this.LowerIterator.Recalculate_Reset(PRS.Range, PRS.Line, PRS);
+                this.UpperIterator.Recalculate_Reset(PRS.Range, PRS.Line, PRS);
                 this.Base.Recalculate_Range(PRS, ParaPr, Depth);
             }
 
@@ -509,7 +509,7 @@ CNary.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
             PRS.WordLen += this.dW;
 
-            this.Arg.Recalculate_Reset(PRS.Range, PRS.Line); // обновим StartLine и StartRange
+            this.Arg.Recalculate_Reset(PRS.Range, PRS.Line, PRS); // обновим StartLine и StartRange
         }
 
         PRS.Update_CurPos(2, Depth); // this.Arg = this.Content[2]

@@ -7,7 +7,7 @@ function CRPI()
     this.bInline         = false;
     this.bChangeInline   = false;
     this.bNaryInline     = false; /*для CDegreeSupSub внутри N-арного оператора, этот флаг необходим, чтобы итераторы максимально близко друг к другу расположить*/
-    this.bEqArray       = false; /*для амперсанда*/
+    this.bEqArray        = false; /*для амперсанда*/
     this.bMathFunc       = false;
     this.bRecalcCtrPrp   = false; // пересчет ctrPrp нужен, когда на Undo и тп изменился размер первого Run, а ctrPrp уже для мат объектов пересчитались
     this.PRS             = null;
@@ -21,9 +21,9 @@ CRPI.prototype.Copy = function()
     RPI.bDecreasedComp  = this.bDecreasedComp;
     RPI.bChangeInline   = this.bChangeInline;
     RPI.bNaryInline     = this.bNaryInline;
-    RPI.bEqArray       = this.bEqArray;
+    RPI.bEqArray        = this.bEqArray;
     RPI.bMathFunc       = this.bMathFunc;
-    RPI.bRecalcCtrPrp    = this.bRecalcCtrPrp;
+    RPI.bRecalcCtrPrp   = this.bRecalcCtrPrp;
     RPI.PRS             = this.PRS;
 
     return RPI;
@@ -189,6 +189,12 @@ AmperWidths.prototype.SetDefault = function()
     this.Widths.length = 0;
 };
 
+function CGeneralObjectGaps(Left, Right)
+{
+    this.left  = Left;
+    this.right = Right;
+}
+
 
 function CGaps(oSign, oEqual, oZeroOper, oLett)
 {
@@ -200,29 +206,25 @@ function CGaps(oSign, oEqual, oZeroOper, oLett)
 
 function CCoeffGaps()
 {
-    this.Sign =
-    {
-        left:   new CGaps(0.52, 0.26, 0, 0.52),
-        right:  new CGaps(0.49, 0, 0, 0.49)
-    };
+    var LeftSign  = new CGaps(0.52, 0.26, 0, 0.52),
+        RightSign = new CGaps(0.49, 0, 0, 0.49);
 
-    this.Mult =
-    {
-        left:   new CGaps(0, 0, 0, 0.46),
-        right:  new CGaps(0, 0, 0, 0.49)
-    };
+    this.Sign = new CGeneralObjectGaps(LeftSign, RightSign);
 
-    this.Equal =
-    {
-        left:   new CGaps(0, 0, 0, 0.7),
-        right:  new CGaps(0, 0, 0, 0.5)
-    };
+    var LeftMult  = new CGaps(0, 0, 0, 0.46),
+        RightMult = new CGaps(0, 0, 0, 0.49);
 
-    this.Default =
-    {
-        left:   new CGaps(0, 0, 0, 0),
-        right:  new CGaps(0, 0, 0, 0)
-    };
+    this.Mult = new CGeneralObjectGaps(LeftMult, RightMult);
+
+    var LeftEqual  = new CGaps(0, 0, 0, 0.7),
+        RightEqual = new CGaps(0, 0, 0, 0.5);
+
+    this.Equal = new CGeneralObjectGaps(LeftEqual, RightEqual);
+
+    var LeftDefault  = new CGaps(0, 0, 0, 0),
+        RightDefault = new CGaps(0, 0, 0, 0);
+
+    this.Default = new CGeneralObjectGaps(LeftDefault, RightDefault);
 }
 CCoeffGaps.prototype =
 {
@@ -3938,7 +3940,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
         // для однострочных мат объектов обновляем CurLine и CurRange, Run в этом случае не могут разбиваться на несколько строк
         if (this.bOneLine || (0 === Pos && 0 === CurLine && 0 === CurRange ) || Pos !== RangeStartPos)
-            Item.Recalculate_Reset( PRS.Range, PRS.Line );
+            Item.Recalculate_Reset( PRS.Range, PRS.Line, PRS );
 
         PRS.Update_CurPos( Pos, Depth );
 
@@ -4086,6 +4088,17 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 
+};
+CMathContent.prototype.Recalculate_Reset = function(StartRange, StartLine, PRS)
+{
+    var bNotUpdate = PRS !== null && PRS!== undefined && PRS.bFastRecalculate == true;
+    if(bNotUpdate == false)
+    {
+        this.StartLine   = StartLine;
+        this.StartRange  = StartRange;
+
+        this.protected_ClearLines();
+    }
 };
 CMathContent.prototype.IsEmptyLine = function(_CurLine, _CurRange)
 {
@@ -4315,10 +4328,9 @@ CMathContent.prototype.Math_Is_End = function(_CurLine, _CurRange)
 
     return result;
 };
-CMathContent.prototype.IsFirstLine = function(Line)
+CMathContent.prototype.IsStartLine = function(Line)
 {
-    var CurLine  = Line - this.StartLine;
-    return CurLine == 0;
+    return Line - this.StartLine == 0;
 };
 CMathContent.prototype.IsFirstRange = function(Line, Range)
 {

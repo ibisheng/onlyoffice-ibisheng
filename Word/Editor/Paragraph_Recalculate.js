@@ -424,6 +424,7 @@ Paragraph.prototype.private_RecalculateFastRange       = function(CurRange, CurL
         {
             // TODO: Надо бы перенести эту проверку на изменение контента параграфа
             Item.Set_Inline(true === this.Check_MathPara(Pos)? false : true);
+            PRS.bFastRecalculate = true; // чтобы не обновить случайно StartLine (Recalculate_Reset)
         }
 
         PRS.Update_CurPos( Pos, 0 );
@@ -2181,6 +2182,7 @@ function CParagraphRecalculateStateWrap(Para)
     this.OperGapRight       = 0;
     this.OperGapLeft        = 0;
     this.bInsideOper        = false; // учитываем есть ли разбивка внутри мат объекта, чтобы случайно не вставить в конец пред оператора (при Brk_Before == false)
+    this.bFastRecalculate   = false;
 }
 
 CParagraphRecalculateStateWrap.prototype =
@@ -2213,7 +2215,8 @@ CParagraphRecalculateStateWrap.prototype =
         this.OperGapLeft         = 0;
         this.WrapIndent          = 0;
         this.bFirstCompareOper   = true;
-        this.bInsideOper        = false;
+        this.bInsideOper         = false;
+        this.bFastRecalculate    = false;
     },
 
     // Обнуляем некоторые параметры перед новым отрезком
@@ -2242,10 +2245,11 @@ CParagraphRecalculateStateWrap.prototype =
         this.PosEndRun        = new CParagraphContentPos();
 
         this.OperGapRight       = 0;
-        this.OperGapLeft         = 0;
+        this.OperGapLeft        = 0;
         this.WrapIndent         = 0;
         this.bFirstCompareOper  = true;
         this.bInsideOper        = false;
+        this.bFastRecalculate   = false;
     },
 
     Reset_PrevLineRecalcInfo : function()

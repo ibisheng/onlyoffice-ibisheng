@@ -91,6 +91,8 @@ CDegreeBase.prototype.Resize = function(oMeasure, RPI)
 
     this.iterContent.Resize(oMeasure, RPI);
 
+    this.setDistance();
+
     if(this.Pr.type === DEGREE_SUPERSCRIPT)
         this.GetSizeSup(oMeasure);
     else if(this.Pr.type === DEGREE_SUBSCRIPT)
@@ -101,6 +103,8 @@ CDegreeBase.prototype.recalculateSize = function(oMeasure)
     var Metric = new CMathBoundsMeasures();
     Metric.UpdateMetrics(this.baseContent.size);
     Metric.UpdateWidth(this.baseContent.size.width);
+
+    this.setDistance();
 
     var ResultSize;
 
@@ -189,11 +193,6 @@ CDegreeBase.prototype.GetSizeSup = function(oMeasure, Metric)
 
     this.upIter -= ascent;
 
-    if( this.bNaryInline)
-        this.dW = 0.17*PlH;
-    else
-        this.dW = 0.056*PlH;
-
     var width = baseWidth + iter.width + this.dW;
     width += this.GapLeft + this.GapRight;
 
@@ -273,11 +272,6 @@ CDegreeBase.prototype.GetSizeSubScript = function(oMeasure, Metric)
 
     this.upIter -= ascent;
 
-    if( this.bNaryInline)
-        this.dW = 0.17*PlH;
-    else
-        this.dW = 0.056*PlH;
-
     var width = baseWidth + iter.width + this.dW;
     width += this.GapLeft + this.GapRight;
 
@@ -288,6 +282,16 @@ CDegreeBase.prototype.GetSizeSubScript = function(oMeasure, Metric)
     ResultSize.ascent = ascent;
 
     return ResultSize;
+};
+CDegreeBase.prototype.setDistance = function()
+{
+    var mgCtrPrp = this.Get_TxtPrControlLetter();
+    var PlH = 0.64*this.ParaMath.GetPlh(g_oTextMeasurer, mgCtrPrp);
+
+    if( this.bNaryInline)
+        this.dW = 0.17*PlH;
+    else
+        this.dW = 0.056*PlH;
 };
 CDegreeBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 {
@@ -886,7 +890,7 @@ CDegreeSubSup.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         if(CurLine == 0 && CurRange == 0)
         {
             PRS.WordLen += this.BrGapLeft;
-            this.baseContent.Recalculate_Reset(PRS.Range, PRS.Line);
+            this.baseContent.Recalculate_Reset(PRS.Range, PRS.Line, PRS);
         }
 
         PRS.Update_CurPos(0, Depth);

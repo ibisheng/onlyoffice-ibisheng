@@ -3472,7 +3472,7 @@ CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             this.BrGapRight = this.GapRight + this.endOper.size.width;
 
             //
-            Content.Recalculate_Reset(PRS.Range, PRS.Line);
+            Content.Recalculate_Reset(PRS.Range, PRS.Line, PRS);
 
             PRS.WordLen  = WordLen + this.BrGapLeft;
             PRS.SpaceLen = SpaceLen;

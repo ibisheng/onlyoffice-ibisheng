@@ -97,9 +97,15 @@ ParaRun.prototype.Set_Paragraph = function(Paragraph)
     this.Paragraph = Paragraph;
 };
 
-ParaRun.prototype.Set_ParaMath = function(ParaMath)
+ParaRun.prototype.Set_ParaMath = function(ParaMath, Parent)
 {
     this.ParaMath = ParaMath;
+    this.Parent   = Parent;
+
+    for(var i = 0; i < this.Content.length; i++)
+    {
+        this.Content[i].relate(this);
+    }
 };
 ParaRun.prototype.Save_StartState = function()
 {

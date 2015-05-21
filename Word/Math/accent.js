@@ -550,7 +550,7 @@ CAccent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     PRS.bInsideOper   = false;
 
     var oBase = this.getBase();
-    oBase.Recalculate_Reset(PRS.Range, PRS.Line ); // обновим StartLine и StartRange
+    oBase.Recalculate_Reset(PRS.Range, PRS.Line, PRS ); // обновим StartLine и StartRange
     oBase.Recalculate_Range(PRS, ParaPr, Depth);
 
     this.operator.fixSize(g_oTextMeasurer, oBase.size.width);

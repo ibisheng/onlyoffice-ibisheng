@@ -741,23 +741,18 @@ CMathText.prototype =
     },
     setPosition: function(pos)
     {
-        try
-        {
-            if (!this.bJDraw)                      // for text
-            {
-                this.pos.x = pos.x;
-                this.pos.y = pos.y;
-            }
-            else                                    // for symbol only drawing
-            {
-                this.pos.x = pos.x - this.rasterOffsetX;
-                this.pos.y = pos.y - this.rasterOffsetY + this.size.ascent;
-            }
-        }
-        catch(e)
-        {
 
+        if (!this.bJDraw)                      // for text
+        {
+            this.pos.x = pos.x;
+            this.pos.y = pos.y;
         }
+        else                                    // for symbol only drawing
+        {
+            this.pos.x = pos.x - this.rasterOffsetX;
+            this.pos.y = pos.y - this.rasterOffsetY + this.size.ascent;
+        }
+
 
     },
     GetLocationOfLetter: function()
@@ -977,6 +972,14 @@ CMathAmp.prototype =
     Get_Width: function()
     {
         return this.size.width + this.GapLeft + this.GapRight;
+    },
+    Get_Width2: function()
+    {
+        return ( (this.size.width + this.GapLeft + this.GapRight)* TEXTWIDTH_DIVIDER ) | 0;
+    },
+    relate: function(parent)
+    {
+        this.Parent = parent;
     },
     setPosition: function(pos)
     {

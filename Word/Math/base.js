@@ -1104,23 +1104,32 @@ CMathBase.prototype.Get_Width = function(_CurLine)
     var CurLine  = _CurLine - this.StartLine;
     return this.Bounds.GetWidth(CurLine);
 };
+CMathBase.prototype.Save_RecalculateObject = function(Copy)
+{
+    var RecalcObj;
+    if(this.bOneLine)
+    {
+        RecalcObj = new CEmptyRunRecalculateObject(this.StartLine, this.StartRange);
+    }
+    else
+    {
+        RecalcObj = CMathBase.superclass.Save_RecalculateObject.call(this, Copy);
+    }
+
+    return RecalcObj;
+};
+CMathBase.prototype.Load_RecalculateObject = function(RecalcObj)
+{
+    if(this.bOneLine == false)
+        CMathBase.superclass.Load_RecalculateObject.call(this, RecalcObj);
+
+};
 CMathBase.prototype.Set_Paragraph           = CParagraphContentWithParagraphLikeContent.prototype.Set_Paragraph;
 CMathBase.prototype.Get_ElementByPos        = CParagraphContentWithParagraphLikeContent.prototype.Get_ElementByPos;
 CMathBase.prototype.Get_ParaPosByContentPos = CParagraphContentWithParagraphLikeContent.prototype.Get_ParaPosByContentPos;
 
-CMathBase.prototype.Set_ParaMath     = CMathContent.prototype.Set_ParaMath;
-CMathBase.prototype.Recalculate_Reset = function(StartRange, StartLine)
-{
-    this.StartLine   = StartLine;
-    this.StartRange  = StartRange;
-
-    this.protected_ClearLines();
-
-    /*for (var nPos = 0, nCount = this.Content.length; nPos < nCount; nPos++)
-    {
-        this.Content[nPos].Recalculate_Reset(StartRange, StartLine);
-    }*/
-};
+CMathBase.prototype.Set_ParaMath      = CMathContent.prototype.Set_ParaMath;
+CMathBase.prototype.Recalculate_Reset = CMathContent.prototype.Recalculate_Reset;
 CMathBase.prototype.Fill_LogicalContent = function(nCount)
 {
     for (var nIndex = 0; nIndex < nCount; nIndex++)
@@ -1765,7 +1774,7 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 }
                 else
                 {
-                    Item.Recalculate_Reset(PRS.Range, PRS.Line); // обновим StartLine и StartRange
+                    Item.Recalculate_Reset(PRS.Range, PRS.Line, PRS); // обновим StartLine и StartRange
                     Item.Recalculate_Range(PRS, ParaPr, Depth);
                 }
             }
@@ -1805,7 +1814,7 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
             var NeedSetReset = CurLine == 0 && CurRange == 0  || Pos !== RangeStartPos;
             if(Item.Type == para_Math_Content && NeedSetReset)
-                Item.Recalculate_Reset(PRS.Range, PRS.Line); // обновим StartLine и StartRange
+                Item.Recalculate_Reset(PRS.Range, PRS.Line, PRS); // обновим StartLine и StartRange
 
             if(Pos == Numb)
             {
@@ -2269,4 +2278,69 @@ CMathBoundsMeasures.prototype.GetX = function()
 CMathBoundsMeasures.prototype.GetY = function()
 {
     return this.Y + this.Asc;
+};
+
+
+function CEmptyRunRecalculateObject(StartLine, StartRange)
+{
+    this.StartLine   = StartLine;
+    this.StartRange  = StartRange;
+    this.Lines       = [];
+    this.Content     = [];
+
+    this.WrapState   = ALIGN_EMPTY;
+}
+
+CEmptyRunRecalculateObject.prototype =
+{
+    Save_Lines : function(Obj, Copy)
+    {
+
+    },
+
+    Save_Content : function(Obj, Copy)
+    {
+
+    },
+
+    Save_WrapState: function(Obj, Copy)
+    {
+
+    },
+
+    Load_Lines : function(Obj)
+    {
+
+    },
+
+    Load_Content : function(Obj)
+    {
+
+    },
+
+    Load_WrapState: function(Obj)
+    {
+
+    },
+
+    Save_RunContent : function(Run, Copy)
+    {
+
+    },
+
+    Load_RunContent : function(Run)
+    {
+
+    },
+
+    Get_DrawingFlowPos : function(FlowPos)
+    {
+
+    },
+
+    Compare : function(_CurLine, _CurRange, OtherLinesInfo)
+    {
+        return true;
+    }
+
 };
