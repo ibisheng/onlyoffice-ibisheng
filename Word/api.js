@@ -1123,6 +1123,8 @@ asc_docs_api.prototype.OpenDocument = function(url, gObject)
     this.DocumentType = 1;
     this.ServerIdWaitComplete = true;
 
+    this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+
     this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Load(url, gObject);
     this.FontLoader.LoadDocumentFonts(this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Fonts, true);
 };
