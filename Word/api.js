@@ -313,9 +313,6 @@ function CMailMergeSendData (obj){
 		if (typeof obj.recordTo != 'undefined'){
 			this["recordTo"] = obj.recordTo;
 		}
-		if (typeof obj.jsonKey != 'undefined'){
-			this["jsonKey"] = obj.jsonKey;
-		}
 	}
 	else
     {
@@ -329,7 +326,6 @@ function CMailMergeSendData (obj){
 		this["recordTo"] = null;
 		this["recordCount"] = null;
 		this["userId"] = null;
-		this["jsonKey"] = null;
 	}
 }
 CMailMergeSendData.prototype.get_From = function(){return this["from"]};
@@ -352,8 +348,6 @@ CMailMergeSendData.prototype.get_RecordCount = function(){return this["recordCou
 CMailMergeSendData.prototype.put_RecordCount = function(v){this["recordCount"] = v;};
 CMailMergeSendData.prototype.get_UserId = function(){return this["userId"]};
 CMailMergeSendData.prototype.put_UserId = function(v){this["userId"] = v;};
-CMailMergeSendData.prototype.get_JsonKey = function(){return this["jsonKey"]};
-CMailMergeSendData.prototype.put_JsonKey = function(v){this["jsonKey"] = v;};
 
 // пользоваться так:
 // подрубить его последним из скриптов к страничке
@@ -417,7 +411,6 @@ function asc_docs_api(name)
     this.isApplyChangesOnOpenEnabled = true;
 
 	this.mailMergeFileData = null;
-	this.mailMergeFileKey = null;
 	
     // CoAuthoring and Chat
     this.User = undefined;
@@ -7049,10 +7042,6 @@ function sendCommand(editor, fCallback, rdata){
                 break;
                 case "waitsave":
 				{
-					if( c_oAscFileType.JSON == rdata["outputformat"]){
-						var waitSaveData = JSON.parse(incomeObject["data"]);
-						editor.mailMergeFileKey = waitSaveData["key"]  + "/output.json";
-					}
 					rData = {
 						"id":documentId,
 						"userid": documentUserId,
@@ -7137,8 +7126,6 @@ function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, fi
     oAdditionalData["vkey"] = documentVKey;
     oAdditionalData["outputformat"] = filetype;
 	oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
-	if(null != oMailMergeSendData)
-		oAdditionalData["mailmergesend"] = oMailMergeSendData;
 	if (null == oDocumentMailMerge &&  c_oAscFileType.PDF === filetype) {
 		var dd = editor.WordControl.m_oDrawingDocument;
 		oAdditionalData["data"] = dd.ToRendererPart();
@@ -7156,6 +7143,27 @@ function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, fi
 			oLogicDocument = editor.WordControl.m_oLogicDocument;
 		var oBinaryFileWriter = new BinaryFileWriter(oLogicDocument);
 		oAdditionalData["data"] = oBinaryFileWriter.Write();
+	}
+	if(null != oMailMergeSendData){
+		oAdditionalData["mailmergesend"] = oMailMergeSendData;
+		var MailMergeMap = editor.WordControl.m_oLogicDocument.MailMergeMap;
+		var aJsonOut = [];
+		if(MailMergeMap.length > 0){
+			var oFirstRow = MailMergeMap[0];
+			var aRowOut = [];
+			for(var i in oFirstRow)
+				aRowOut.push(i);
+			aJsonOut.push(aRowOut);
+		}
+		//todo может надо запоминать порядок for in в первом столбце, если for in будет по-разному обходить строки
+		for(var i = 0; i < MailMergeMap.length; ++i){
+			var oRow = MailMergeMap[i];
+			var aRowOut = [];
+			for(var j in oRow)
+				aRowOut.push(oRow[j]);
+			aJsonOut.push(aRowOut);
+		}
+		oAdditionalData["data"] += cCharDelimiter + JSON.stringify(aJsonOut);
 	}
 	g_fSaveWithParts(function(fCallback1, oAdditionalData1){sendCommand(editor, fCallback1, oAdditionalData1);}, fCallback, oAdditionalData);
 }
@@ -7405,7 +7413,6 @@ asc_docs_api.prototype.asc_sendMailMergeData = function(oData)
 	var actionType = c_oAscAsyncAction.SendMailMerge;
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 
-	oData.put_JsonKey(this.mailMergeFileKey);
 	oData.put_UserId(documentUserId);
 	oData.put_RecordCount(oData.get_RecordTo() - oData.get_RecordFrom() + 1);
 	_downloadAs(this, "sendmm", null, oData, c_oAscFileType.UNKNOWN, function(incomeObject){
@@ -7671,7 +7678,7 @@ window["asc_docs_api"].prototype["asc_nativeGetHtml"] = function()
     this.WordControl.m_oLogicDocument.Select_All();
     var oCopyProcessor = new CopyProcessor(this);
     oCopyProcessor.Start();
-    var _ret = oCopyProcessor.getInnerHtml();
+    var _ret = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /></head><body>" + oCopyProcessor.getInnerHtml() + "</body></html>";
     this.WordControl.m_oLogicDocument.Selection_Remove();
     copyPasteUseBinary = _old;
     return _ret;
