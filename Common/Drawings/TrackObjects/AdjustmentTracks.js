@@ -223,6 +223,8 @@ function PolarAdjustmentTrack(originalShape, adjIndex)
         this.refR = null;
         this.refAng = null;
 
+        this.originalObject = originalShape;
+
         if(this.adjastment !== null && typeof this.adjastment === "object")
         {
             var _ref_r = this.adjastment.gdRefR;
