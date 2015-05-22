@@ -6213,7 +6213,8 @@ PasteProcessor.prototype =
     {
         var oThis = this;
         var table = row.Table;
-        if(null != spacing && spacing >= tableSpacingMinValue)
+		var oTableSpacingMinValue = ("undefined" != typeof tableSpacingMinValue) ? tableSpacingMinValue : 0.02;
+        if(null != spacing && spacing >= oTableSpacingMinValue)
             row.Set_CellSpacing(spacing);
         if(node.style.height)
         {
@@ -6560,8 +6561,8 @@ PasteProcessor.prototype =
                         }
                     }
                     var sSrc = node.getAttribute("src");
-                    if(isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")
-                        ||  nWidth === 0 ||  nHeight === 0)
+                    if((!window["Asc"] || (window["Asc"] && window["Asc"]["editor"] === undefined)) && (isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")//первое условие - мы не в редакторе таблиц, тогда выполняем
+                        ||  nWidth === 0 ||  nHeight === 0))
                     {
                         var img_prop = new asc_CImgProperty();
                         img_prop.asc_putImageUrl(sSrc);
@@ -7756,4 +7757,59 @@ function Editor_CopyPaste_Create(api)
     }
 
     document.body.appendChild( ElemToSelect );
+}
+
+function CreateImageFromBinary(bin, nW, nH)
+{
+    var w, h;
+
+    if (nW === undefined || nH === undefined)
+    {
+        var _image = editor.ImageLoader.map_image_index[bin];
+        if (_image != undefined && _image.Image != null && _image.Status == ImageLoadStatus.Complete)
+        {
+            var _w = Math.max(1, Page_Width - (X_Left_Margin + X_Right_Margin));
+            var _h = Math.max(1, Page_Height - (Y_Top_Margin + Y_Bottom_Margin));
+
+            var bIsCorrect = false;
+            if (_image.Image != null)
+            {
+                var __w = Math.max(parseInt(_image.Image.width * g_dKoef_pix_to_mm), 1);
+                var __h = Math.max(parseInt(_image.Image.height * g_dKoef_pix_to_mm), 1);
+
+                var dKoef = Math.max(__w / _w, __h / _h);
+                if (dKoef > 1)
+                {
+                    _w = Math.max(5, __w / dKoef);
+                    _h = Math.max(5, __h / dKoef);
+
+                    bIsCorrect = true;
+                }
+                else
+                {
+                    _w = __w;
+                    _h = __h;
+                }
+            }
+
+            w = __w;
+            h = __h;
+        }
+        else
+        {
+            w = 50;
+            h = 50;
+        }
+    }
+    else
+    {
+        w = nW;
+        h = nH;
+    }
+    var para_drawing = new ParaDrawing(w, h, null, editor.WordControl.m_oLogicDocument.DrawingDocument, editor.WordControl.m_oLogicDocument, null);
+    var word_image = DrawingObjectsController.prototype.createImage(bin, 0, 0, w, h);
+    para_drawing.Set_GraphicObject(word_image);
+    word_image.setParent(para_drawing);
+    para_drawing.Set_GraphicObject(word_image);
+    return para_drawing;
 }

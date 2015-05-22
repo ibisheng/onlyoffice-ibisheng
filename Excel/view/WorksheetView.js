@@ -8325,17 +8325,19 @@
 			
 			//загрузка шрифтов, в случае удачи на callback вставляем текст
 			t._loadFonts(val.fontsNew, function () {
-			
-				if(val.onlyImages !== true)
-					t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
 
 				var api = asc["editor"];
 				if (val.addImages && val.addImages.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor)) 
 				{	
+					if(val.onlyImages !== true)
+						t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
 					api.wb.clipboard._insertImagesFromHTML(t, val);
 				}
 				else if(val.addImagesFromWord && val.addImagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 				{
+					//показываем плашку для отправки изображений на сервер
+					api.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+					
 					var rData = {"id": api.documentId, "c":"imgurls", "vkey": api.documentVKey, "data": JSON.stringify(val._images)};
 					api._asc_sendCommand(function(incomeObject){
 						if(incomeObject && "imgurls" == incomeObject.type)
@@ -8360,10 +8362,16 @@
 								}						
 							}
 						}
+						api.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+						
+						if(val.onlyImages !== true)
+							t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
 						api.wb.clipboard._insertImagesFromBinaryWord(t, val, aImagesSync);
 					}, rData );
 					
 				}
+				else if(val.onlyImages !== true)
+						t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
 				
 				History.EndTransaction();
 			});
