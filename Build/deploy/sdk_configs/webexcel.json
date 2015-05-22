@@ -166,7 +166,7 @@
             "dst": "../../Excel/sdk-all.js",
             "externs": [
                 "../../Common/Build/Externs.js",
-                "../../Excel/jquery/jquery-1.7.1.js",
+                "../../Common/3rdparty/jquery/jquery.min.js",
                 "../../Common/3rdparty/XRegExp/xregexp-all-min.js",
                 "../../Common/3rdparty/perfect-scrollbar/jquery.mousewheel.js",
                 "../../Common/3rdparty/perfect-scrollbar/perfect-scrollbar.js"
