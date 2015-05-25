@@ -9239,10 +9239,10 @@
 									}
 									else if(isOneMerge && range && range.bbox)
 									{
-										this._getCell(range.bbox.c1, range.bbox.r1).setValue(value2[numStyle].text);
+										this._getCell(range.bbox.c1, range.bbox.r1).setValue(newVal.getValue());
 									}
 									else
-										firstRange.setValue(value2[numStyle].text);
+										firstRange.setValue(newVal.getValue());
 
 									if(!isOneMerge)//settings for text
 									{
