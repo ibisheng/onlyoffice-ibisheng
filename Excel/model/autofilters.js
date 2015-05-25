@@ -394,8 +394,10 @@ var maxIndividualValues = 10000;
 						{activeCells: activeRange}, null, cloneFilter.Ref);
 
 					//updates
-					ws._onUpdateFormatTable(filterRange, false, true);
+					
 					t.drawAutoF(filterRange);
+					t._setStyleTablePartsAfterOpenRows(filterRange);
+					ws._onUpdateFormatTable(filterRange, false, true);
 					
 					History.EndTransaction();
 				};
@@ -1676,6 +1678,20 @@ var maxIndividualValues = 10000;
 					res = true;
 					
 				return res;
+			},
+			
+			_setStyleTablePartsAfterOpenRows: function(ref)
+			{
+				var aWs = this._getCurrentWS();
+				var tableParts = aWs.TableParts; 
+				
+				for(var i = 0; i < tableParts.length; i++ )
+				{
+					if((tableParts[i].Ref.r1 >= ref.r1 && tableParts[i].Ref.r1 <= ref.r2) || (tableParts[i].Ref.r2 >= ref.r1 && tableParts[i].Ref.r2 <= ref.r2))
+					{
+						this._setColorStyleTable(tableParts[i].Ref, tableParts[i]);
+					}
+				}
 			},
 			
 			_moveAutoFilters: function(arnTo, arnFrom, data, copyRange)
