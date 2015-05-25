@@ -14493,6 +14493,20 @@ CDocument.prototype.Is_TrackingDrawingObjects = function()
 {
     return this.DrawingObjects.Check_TrackObjects();
 };
+/*
+ * Получаем стиль по выделенному фрагменту.
+ */
+CDocument.prototype.Get_StyleFromFormatting = function()
+{
+    return new CStyleProp();
+};
+/*
+ * Добавляем новый стиль (или заменяем старый с таким же названием).
+ */
+CDocument.prototype.Add_NewStyle = function(oStyle)
+{
+
+};
 
 //-----------------------------------------------------------------------------------
 //
