@@ -5623,6 +5623,13 @@ PasteProcessor.prototype =
                         font_size = Math.round(font_size * g_dKoef_mm_to_pt);
                     else
                         font_size = Math.round(2 * font_size * g_dKoef_mm_to_pt) / 2;//���������� �������� ���������.
+					
+					//TODO use constant
+					if(font_size > 300)
+						font_size = 300;
+					else if(font_size === 0)
+						font_size = 1;
+						
                     rPr.FontSize = font_size;
                 }
             }
