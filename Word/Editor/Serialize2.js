@@ -3652,7 +3652,27 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				case para_Math:
 					{
 						if (null != item.Root)
-							this.bs.WriteItem(c_oSerParType.OMathPara, function(){oThis.boMaths.WriteOMathPara(item);});	
+						{
+							if(this.saveParams && this.saveParams.bMailMergeHtml)
+							{
+								//заменяем на картинку, если бы был аналог CachedImage не надо было бы заменять
+								var sSrc = item.MathToImageConverter();
+								if (null != sSrc && "" != sSrc && null != sSrc.ImageUrl && item.Width > 0 && item.Height > 0){
+									var doc = this.Document;
+									//todo paragraph
+									var drawing = new ParaDrawing(item.Width, item.Height, null, this.Document.DrawingDocument, this.Document, par);
+									var Image = editor.WordControl.m_oLogicDocument.DrawingObjects.createImage(sSrc.ImageUrl, 0, 0, item.Width, item.Height);
+									Image.cachedImage = sSrc.ImageUrl;
+									drawing.Set_GraphicObject(Image);
+									Image.setParent(drawing);
+									this.WriteRun2( function () {
+										oThis.bs.WriteItem(c_oSerRunType.pptxDrawing, function () { oThis.WriteImage(drawing); });
+									});
+								}
+							}
+							else 
+								this.bs.WriteItem(c_oSerParType.OMathPara, function(){oThis.boMaths.WriteOMathPara(item);});	
+						}
 					}
 					break;
 				
