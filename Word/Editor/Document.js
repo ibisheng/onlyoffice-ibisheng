@@ -644,6 +644,18 @@ CDocumentFieldsManager.prototype.Restore_MailMergeTemplate = function()
                 oField.Restore_Template();
             }
         }
+        else
+        {
+            // Восстанавливать ничего не надо просто возващаем значения тимплейтов
+            for (var FieldName in this.m_oMailMergeFields)
+            {
+                for (var Index = 0, Count = this.m_oMailMergeFields[FieldName].length; Index < Count; Index++)
+                {
+                    var oField = this.m_oMailMergeFields[FieldName][Index];
+                    oField.Restore_Template();
+                }
+            }
+        }
     }
     else
     {
