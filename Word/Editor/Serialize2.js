@@ -329,7 +329,8 @@ var c_oSerImageType2 = {
 	WrapTopAndBottom: 22,
 	Chart: 23,
 	ChartImg: 24,
-	Chart2: 25
+	Chart2: 25,
+	CachedImage: 26
 };
 var c_oSerEffectExtent = {
 	Left: 0,
@@ -753,7 +754,7 @@ function CreateThemeUnifill(color, tint, shade){
 	return ret;
 }
 
-function BinaryFileWriter(doc)
+function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml)
 {
     this.memory = new CMemory();
     this.Document = doc;
@@ -768,6 +769,10 @@ function BinaryFileWriter(doc)
 		oUsedNumIdMap: null,
 		nNumIdIndex: null,
 		oUsedStyleMap: null
+	};
+	this.saveParams = {
+		bMailMergeDocx: bMailMergeDocx,
+		bMailMergeHtml: bMailMergeHtml
 	};
     this.Write = function()
     {
@@ -824,8 +829,8 @@ function BinaryFileWriter(doc)
         //Write StyleTable
         this.WriteTable(c_oSerTableTypes.Style, new BinaryStyleTableWriter(this.memory, this.Document, oNumIdMap));
         //Write DocumentTable
-		var oBinaryHeaderFooterTableWriter = new BinaryHeaderFooterTableWriter(this.memory, this.Document, oNumIdMap, oMapCommentId);
-        this.WriteTable(c_oSerTableTypes.Document, new BinaryDocumentTableWriter(this.memory, this.Document, oMapCommentId, oNumIdMap, null, oBinaryHeaderFooterTableWriter));
+		var oBinaryHeaderFooterTableWriter = new BinaryHeaderFooterTableWriter(this.memory, this.Document, oNumIdMap, oMapCommentId, this.saveParams);
+        this.WriteTable(c_oSerTableTypes.Document, new BinaryDocumentTableWriter(this.memory, this.Document, oMapCommentId, oNumIdMap, null, this.saveParams, oBinaryHeaderFooterTableWriter));
         //Write HeaderFooter
         this.WriteTable(c_oSerTableTypes.HdrFtr, oBinaryHeaderFooterTableWriter);
         //Write OtherTable
@@ -852,7 +857,7 @@ function BinaryFileWriter(doc)
 		this.copyParams.oUsedNumIdMap = {};
 		this.copyParams.nNumIdIndex = 1;
 		this.copyParams.oUsedStyleMap = {};
-		this.copyParams.bdtw = new BinaryDocumentTableWriter(this.memory, this.Document, null, this.copyParams.oUsedNumIdMap, this.copyParams, null);
+		this.copyParams.bdtw = new BinaryDocumentTableWriter(this.memory, this.Document, null, this.copyParams.oUsedNumIdMap, this.copyParams, this.saveParams, null);
 		this.copyParams.nDocumentWriterTablePos = 0;
 		this.copyParams.nDocumentWriterPos = 0;
 		
@@ -3208,7 +3213,7 @@ Binary_tblPrWriter.prototype =
         }
     }
 };
-function BinaryHeaderFooterTableWriter(memory, doc, oNumIdMap, oMapCommentId)
+function BinaryHeaderFooterTableWriter(memory, doc, oNumIdMap, oMapCommentId, saveParams)
 {
     this.memory = memory;
     this.Document = doc;
@@ -3216,6 +3221,7 @@ function BinaryHeaderFooterTableWriter(memory, doc, oNumIdMap, oMapCommentId)
 	this.oMapCommentId = oMapCommentId;
 	this.aHeaders = [];
 	this.aFooters = [];
+	this.saveParams = saveParams;
     this.bs = new BinaryCommonWriter(this.memory);
     this.Write = function()
     {
@@ -3245,7 +3251,7 @@ function BinaryHeaderFooterTableWriter(memory, doc, oNumIdMap, oMapCommentId)
     {
         var oThis = this;
         //Content
-        var dtw = new BinaryDocumentTableWriter(this.memory, this.Document, this.oMapCommentId, this.oNumIdMap, null, null);
+        var dtw = new BinaryDocumentTableWriter(this.memory, this.Document, this.oMapCommentId, this.oNumIdMap, null, this.saveParams, null);
         this.bs.WriteItem(c_oSerHdrFtrTypes.HdrFtr_Content, function(){dtw.WriteDocumentContent(item.Content);});
     };
 };
@@ -3449,7 +3455,7 @@ function BinaryNumberingTableWriter(memory, doc, oNumIdMap, oUsedNumIdMap)
         }
     };
 };
-function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyParams, oBinaryHeaderFooterTableWriter)
+function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyParams, saveParams, oBinaryHeaderFooterTableWriter)
 {
     this.memory = memory;
     this.Document = doc;
@@ -3461,6 +3467,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 	this.boMaths = new Binary_oMathWriter(this.memory);
 	this.oMapCommentId = oMapCommentId;
 	this.copyParams = copyParams;
+	this.saveParams = saveParams;
     this.Write = function()
     {
         var oThis = this;
@@ -3585,19 +3592,24 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                     break;
 				case para_Field:
 					if(fieldtype_MERGEFIELD == item.FieldType){
-						var Instr = "MERGEFIELD";
-						for(var j = 0; j < item.Arguments.length; ++j){
-							var argument = item.Arguments[j];
-							argument = argument.replace(/(\\|")/g, "\\$1");
-							if(-1 != argument.indexOf(' '))
-								argument = "\"" + argument + "\"";
-							Instr += " " + argument;
+						if(this.saveParams && this.saveParams.bMailMergeDocx)
+							oThis.WriteParagraphContent(item, bUseSelection, false);
+						else
+						{
+							var Instr = "MERGEFIELD";
+							for(var j = 0; j < item.Arguments.length; ++j){
+								var argument = item.Arguments[j];
+								argument = argument.replace(/(\\|")/g, "\\$1");
+								if(-1 != argument.indexOf(' '))
+									argument = "\"" + argument + "\"";
+								Instr += " " + argument;
+							}
+							for(var j = 0; j < item.Switches.length; ++j)
+								Instr += " \\" + item.Switches[j];
+							this.bs.WriteItem(c_oSerParType.FldSimple, function () {
+								oThis.WriteFldSimple(Instr, function(){oThis.WriteParagraphContent(item, bUseSelection, false);});
+							});
 						}
-						for(var j = 0; j < item.Switches.length; ++j)
-							Instr += " \\" + item.Switches[j];
-						this.bs.WriteItem(c_oSerParType.FldSimple, function () {
-							oThis.WriteFldSimple(Instr, function(){oThis.WriteParagraphContent(item, bUseSelection, false);});
-						});
 					}
                     break;
 				case para_Hyperlink:
@@ -3848,7 +3860,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 			{
 				this.memory.WriteByte(c_oSerImageType2.PptxData);
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
-				this.bs.WriteItemWithLength(function(){window.global_pptx_content_writer.WriteDrawing(oThis.memory, img.GraphicObj, oThis.Document, oThis.oMapCommentId, oThis.oNumIdMap, oThis.copyParams);});
+				this.bs.WriteItemWithLength(function(){window.global_pptx_content_writer.WriteDrawing(oThis.memory, img.GraphicObj, oThis.Document, oThis.oMapCommentId, oThis.oNumIdMap, oThis.copyParams, oThis.saveParams);});
 			}
 		}
 		else
@@ -3973,8 +3985,14 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 			{
 				this.memory.WriteByte(c_oSerImageType2.PptxData);
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
-				this.bs.WriteItemWithLength(function(){window.global_pptx_content_writer.WriteDrawing(oThis.memory, img.GraphicObj, oThis.Document, oThis.oMapCommentId, oThis.oNumIdMap, oThis.copyParams);});
+				this.bs.WriteItemWithLength(function(){window.global_pptx_content_writer.WriteDrawing(oThis.memory, img.GraphicObj, oThis.Document, oThis.oMapCommentId, oThis.oNumIdMap, oThis.copyParams, oThis.saveParams);});
 			}
+		}
+		if(this.saveParams && this.saveParams.bMailMergeHtml)
+		{
+			this.memory.WriteByte(c_oSerImageType2.CachedImage);
+			this.memory.WriteByte(c_oSerPropLenType.Variable);
+			this.memory.WriteString2(img.getBase64Img());
 		}
     };
 	this.WriteEffectExtent = function(EffectExtent)
@@ -4239,7 +4257,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
         //Content
         if(null != cell.Content)
         {
-            var oInnerDocument = new BinaryDocumentTableWriter(this.memory, this.Document, this.oMapCommentId, this.oNumIdMap, this.copyParams, this.oBinaryHeaderFooterTableWriter);
+            var oInnerDocument = new BinaryDocumentTableWriter(this.memory, this.Document, this.oMapCommentId, this.oNumIdMap, this.copyParams, this.saveParams, this.oBinaryHeaderFooterTableWriter);
             this.bs.WriteItem(c_oSerDocTableType.Cell_Content, function(){oInnerDocument.WriteDocumentContent(cell.Content);});
         }
     };
@@ -8104,6 +8122,13 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			res = this.bcr.Read2(length, function(t, l){
                     return oThis.ReadWrapThroughTight(t, l,  oParaDrawing.wrappingPolygon);
                 });
+		}
+		else if( c_oSerImageType2.CachedImage === type )
+		{
+			if(null != oParaDrawing.GraphicObj)
+				oParaDrawing.GraphicObj.cachedImage = this.stream.GetString2LE(length);
+			else
+				res = c_oSerConstants.ReadUnknown;
 		}
 		else
             res = c_oSerConstants.ReadUnknown;

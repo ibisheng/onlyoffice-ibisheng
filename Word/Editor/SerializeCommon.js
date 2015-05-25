@@ -851,7 +851,7 @@ function CPPTXContentWriter()
             this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
         }
     }
-    this.WriteDrawing = function(memory, grObject, Document, oMapCommentId, oNumIdMap, copyParams)
+    this.WriteDrawing = function(memory, grObject, Document, oMapCommentId, oNumIdMap, copyParams, saveParams)
     {
         this.TreeDrawingIndex++;
 
@@ -865,11 +865,11 @@ function CPPTXContentWriter()
             {
                 if(grObject.bWordShape)
                 {
-                    this.WriteShape(grObject, Document, oMapCommentId, oNumIdMap, copyParams);
+                    this.WriteShape(grObject, Document, oMapCommentId, oNumIdMap, copyParams, saveParams);
                 }
                 else
                 {
-                    this.WriteShape2(grObject, Document, oMapCommentId, oNumIdMap, copyParams);
+                    this.WriteShape2(grObject, Document, oMapCommentId, oNumIdMap, copyParams, saveParams);
                 }
                 break;
             }
@@ -880,7 +880,7 @@ function CPPTXContentWriter()
             }
             case historyitem_type_GroupShape:
             {
-                this.WriteGroup(grObject, Document, oMapCommentId, oNumIdMap, copyParams);
+                this.WriteGroup(grObject, Document, oMapCommentId, oNumIdMap, copyParams, saveParams);
                 break;
             }
         }
@@ -896,13 +896,13 @@ function CPPTXContentWriter()
         this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
     }
 
-    this.WriteShape2 = function(shape, Document, oMapCommentId, oNumIdMap, copyParams)
+    this.WriteShape2 = function(shape, Document, oMapCommentId, oNumIdMap, copyParams, saveParams)
     {
         var _writer = this.BinaryFileWriter;
         _writer.WriteShape(shape);
     }
 
-    this.WriteShape = function(shape, Document, oMapCommentId, oNumIdMap, copyParams)
+    this.WriteShape = function(shape, Document, oMapCommentId, oNumIdMap, copyParams, saveParams)
     {
         var _writer = this.BinaryFileWriter;
         _writer.StartRecord(1);
@@ -943,7 +943,7 @@ function CPPTXContentWriter()
 
             this.arrayStackStartsTextBoxContent.push(memory.pos);
 
-            var bdtw = new BinaryDocumentTableWriter(memory, Document, oMapCommentId, oNumIdMap, copyParams);
+            var bdtw = new BinaryDocumentTableWriter(memory, Document, oMapCommentId, oNumIdMap, copyParams, saveParams);
             var bcw = new BinaryCommonWriter(memory);
             bcw.WriteItemWithLength(function(){bdtw.WriteDocumentContent(shape.textBoxContent);});
 
@@ -1047,7 +1047,7 @@ function CPPTXContentWriter()
         this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
     }
 
-    this.WriteGroup = function(group, Document, oMapCommentId, oNumIdMap, copyParams)
+    this.WriteGroup = function(group, Document, oMapCommentId, oNumIdMap, copyParams, saveParams)
     {
         var _writer = this.BinaryFileWriter;
 
@@ -1085,11 +1085,11 @@ function CPPTXContentWriter()
                     {
                         if(elem.bWordShape)
                         {
-                            this.WriteShape(elem, Document, oMapCommentId, oNumIdMap, copyParams);
+                            this.WriteShape(elem, Document, oMapCommentId, oNumIdMap, copyParams, saveParams);
                         }
                         else
                         {
-                            this.WriteShape2(elem, Document, oMapCommentId, oNumIdMap, copyParams);
+                            this.WriteShape2(elem, Document, oMapCommentId, oNumIdMap, copyParams, saveParams);
                         }
                         break;
                     }
@@ -1100,7 +1100,7 @@ function CPPTXContentWriter()
                     }
                     case historyitem_type_GroupShape:
                     {
-                        this.WriteGroup(elem, Document, oMapCommentId, oNumIdMap, copyParams);
+                        this.WriteGroup(elem, Document, oMapCommentId, oNumIdMap, copyParams, saveParams);
                         break;
                     }
                     case historyitem_type_ChartSpace:
