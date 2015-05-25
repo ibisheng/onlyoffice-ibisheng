@@ -7155,7 +7155,7 @@ function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, fi
 		if(null != oMailMergeSendData && c_oAscFileType.HTML == oMailMergeSendData.get_MailFormat())
 			oBinaryFileWriter = new BinaryFileWriter(oLogicDocument, false, true);
 		else
-			oBinaryFileWriter = new BinaryFileWriter(oLogicDocument, true, true);
+			oBinaryFileWriter = new BinaryFileWriter(oLogicDocument);
 		oAdditionalData["data"] = oBinaryFileWriter.Write();
 	}
 	if(null != oMailMergeSendData){
