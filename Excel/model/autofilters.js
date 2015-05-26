@@ -1300,8 +1300,8 @@ var maxIndividualValues = 10000;
 						else if(activeRange.c1 > ref.c1 && activeRange.c2 >= ref.c2 && activeRange.c1 < ref.c2 && diff < 0)//parts of after filter
 						{
 							oldFilter = filter.clone(null);
-								
-							filter.changeRef(activeRange.c1 - ref.c2 - 1);								
+							diffColId = activeRange.c1 - ref.c2 - 1;
+							filter.changeRef(diffColId);								
 						}
 						else if((activeRange.c1 >= ref.c1 && activeRange.c1 <= ref.c2 && activeRange.c2 <= ref.c2) || (activeRange.c1 > ref.c1 && activeRange.c2 >= ref.c2 && activeRange.c1 < ref.c2 && diff > 0))//inside
 						{
@@ -1321,11 +1321,12 @@ var maxIndividualValues = 10000;
 								for(var j = 0; j < autoFilter.FilterColumns.length; j++)
 								{
 									var col = autoFilter.FilterColumns[j].ColId + ref.c1;
-									if(col > activeRange.c1)
+									if(col >= activeRange.c1)
 									{
 										var newColId = autoFilter.FilterColumns[j].ColId + diffColId;
 										if(newColId < 0 || (diff < 0 && col >= activeRange.c1 && col <= activeRange.c2))
 										{
+											t._openHiddenRowsFilterColumn(autoFilter, autoFilter.FilterColumns[j].ColId);
 											autoFilter.FilterColumns.splice(j, 1);
 											j--;
 										}	
@@ -3529,7 +3530,7 @@ var maxIndividualValues = 10000;
 				}	
 			},
 			
-			_getOpenAndClosedValues: function(filter, cellId)
+			_getOpenAndClosedValues: function(filter, cellId, isOpenHiddenRows)
 			{
 				console.time("new");
 
@@ -3612,7 +3613,12 @@ var maxIndividualValues = 10000;
 								if(!filterColumns[currentElemArray].Top10 && !isCustomFilters && !filterColumns[currentElemArray].isHideValue(val, isDateTimeFormat))
 									tempResult.visible = true;
 								else
+								{
+									if(isOpenHiddenRows)
+										aWs.setRowHidden(false, i, i);
 									tempResult.visible = false;
+								}
+									
 								
 								addValueToMenuObj(tempResult, count);
 								
@@ -3701,6 +3707,11 @@ var maxIndividualValues = 10000;
 				{
 					aWs.setRowHidden(false, filter.Ref.r1, filter.Ref.r2);
 				}
+			},
+			
+			_openHiddenRowsFilterColumn: function(autoFilter, colId)
+			{
+				this._getOpenAndClosedValues(autoFilter, colId, true);
 			},
 			
 			//TODO CHANGE!!!
