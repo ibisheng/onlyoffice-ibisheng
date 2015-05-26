@@ -1077,7 +1077,7 @@ var maxIndividualValues = 10000;
 				{
 					if(aWs.AutoFilter && cloneData.oldFilter.Ref.isIntersect(aWs.AutoFilter.Ref))
 					{
-						aWs.AutoFilter = cloneData.oldFilter;
+						aWs.AutoFilter = cloneData.oldFilter.clone(null);
 					}
 					else if(aWs.TableParts)
 					{
@@ -1085,7 +1085,7 @@ var maxIndividualValues = 10000;
 						{
 							if(cloneData.oldFilter.Ref.isIntersect(aWs.TableParts[l].Ref))
 							{
-								aWs.TableParts[l] = cloneData.oldFilter;
+								aWs.TableParts[l] = cloneData.oldFilter.clone(null);
 								
 								//var splitRange = cloneData.oldFilter.Ref.split(':');
 								var splitRange = cloneData.oldFilter.Ref;
@@ -1532,6 +1532,8 @@ var maxIndividualValues = 10000;
 				var aWs = this._getCurrentWS();
 				var ws = this.worksheet;
 				var t = this;
+				var bUndoChanges = aWs.workbook.bUndoChanges;
+				var bRedoChanges = aWs.workbook.bRedoChanges;
 				var curFilter, sortRange, filterRef, startCol;
 				
 				var onSortAutoFilterCallback = function(success)
@@ -1560,12 +1562,13 @@ var maxIndividualValues = 10000;
 						var sortCol = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
 						
 						curFilter.SortState.SortConditions[0].Ref = sortCol;
-						curFilter.SortState.SortConditions[0].ConditionDescending = type;
+						curFilter.SortState.SortConditions[0].ConditionDescending = resType;
 						
 						cellId = t._rangeToId(cellIdRange);
 						
 						//сама сортировка
-						ws.cellCommentator.sortComments(sortRange.sort(type, startCol));
+						if(!bRedoChanges && !bUndoChanges)
+							ws.cellCommentator.sortComments(sortRange.sort(resType, startCol));
 
 						if(curFilter.TableStyleInfo)
 							t._setColorStyleTable(curFilter.Ref, curFilter);
@@ -1584,7 +1587,7 @@ var maxIndividualValues = 10000;
 				if(cellId)
 					activeRange = t._idToRange(cellId);
 				
-				type = type == 'ascending';
+				var resType = type == 'ascending';
 					
 				var filter = t.searchRangeInTableParts(activeRange);
 				if(filter === -2)//если захвачена часть ф/т
@@ -1607,7 +1610,7 @@ var maxIndividualValues = 10000;
 					}
 					else//внутри а/ф либо без а/ф либо часть а/ф
 					{
-						ws.setSelectionInfo("sort", type);
+						ws.setSelectionInfo("sort", resType);
 						return;
 					}
 				}
