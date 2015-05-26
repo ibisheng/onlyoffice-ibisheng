@@ -482,10 +482,10 @@ var maxIndividualValues = 10000;
 			},
 			
 			applyAutoFilter: function (autoFiltersObject, ar) {
-				console.time("_applyMainFilter2");
-				
 				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
+				var bUndoChanges = aWs.workbook.bUndoChanges;
+				var bRedoChanges = aWs.workbook.bRedoChanges;
 				
 				//**get filter**
 				var filterObj = this._getPressedFilter(ar, autoFiltersObject.cellId);
@@ -519,21 +519,24 @@ var maxIndividualValues = 10000;
 				
 				
 				//open/close rows
-				for(var i = currentFilter.Ref.r1 + 1; i <= currentFilter.Ref.r2; i++)
-				{	
-					var isHidden = false;
-					if(currentFilter.FilterColumns && currentFilter.FilterColumns.length)
-						isHidden = this._hiddenAnotherFilter(currentFilter.FilterColumns, filterObj.ColId, i, currentFilter.Ref.c1);
-					
-					if(!isHidden)
+				if(!bUndoChanges && !bRedoChanges)
+				{
+					for(var i = currentFilter.Ref.r1 + 1; i <= currentFilter.Ref.r2; i++)
 					{	
-						var cell = aWs.getCell3(i, filterObj.activeRange.c1);
-						var currentValue = cell.getValueWithFormat();
-						var isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
-						if(isDateTimeFormat)
-							currentValue = cell.getValueWithoutFormat();
+						var isHidden = false;
+						if(currentFilter.FilterColumns && currentFilter.FilterColumns.length)
+							isHidden = this._hiddenAnotherFilter(currentFilter.FilterColumns, filterObj.ColId, i, currentFilter.Ref.c1);
+						
+						if(!isHidden)
+						{	
+							var cell = aWs.getCell3(i, filterObj.activeRange.c1);
+							var currentValue = cell.getValueWithFormat();
+							var isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
+							if(isDateTimeFormat)
+								currentValue = cell.getValueWithoutFormat();
 
-						aWs.setRowHidden(newFilterColumn.isHideValue(currentValue, isDateTimeFormat), i, i);
+							aWs.setRowHidden(newFilterColumn.isHideValue(currentValue, isDateTimeFormat), i, i);
+						}
 					}
 				}
 				
@@ -546,8 +549,6 @@ var maxIndividualValues = 10000;
 				this._reDrawFilters();
 				if(!aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
 					ws._onUpdateFormatTable(oldFilter.Ref, false, true);
-					
-				console.timeEnd("_applyMainFilter2");
 			},
 			
 			checkAddAutoFilter: function(activeRange, styleName)
