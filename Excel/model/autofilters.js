@@ -247,19 +247,10 @@ var maxIndividualValues = 10000;
 			asc_getIsTitle : function() { return this.isTitle; }
 		};
 		
-		var g_addAutoFiltersOptions = {
-			changeTableStyle		: 0,
-			deleteTableFilter		: 1,
-			deleteFilter			: 2,
-			autoFilterToTablePart	: 3,
-			addFilter           	: 4
-		};
-		
 		/** @constructor */
 		function AutoFilters(currentSheet) {
 			this.worksheet = currentSheet;
 			this.changeFilters = null;
-			this.historyTempObj = null;
 
 			this.m_oColor = new CColor(120, 120, 120);
 			return this;
@@ -866,32 +857,28 @@ var maxIndividualValues = 10000;
 			{
 				var ws = this.worksheet;
 				var result = null;
-				if(this.allButtonAF)
+				
+				var ascRange = new Asc.Range(range.c1, range.r1, range.c1, range.r1);
+				if(this.isApplyAutoFilterInCell(ascRange))
 				{
-					var id = this._rangeToId(range);
-					for(var i = 0; i < this.allButtonAF.length; i++)
+					var height = 11;
+					var width = 11;
+					var rowHeight = ws.rows[range.r1].height;
+					var index = 1;
+					if(rowHeight < height)
 					{
-						if(this.allButtonAF[i].id == id)
-						{
-							var height = 11;
-							var width = 11;
-							var rowHeight = ws.rows[range.r1].height;
-							var index = 1;
-							if(rowHeight < height)
-							{
-								index = rowHeight/height;
-								width = width*index;
-								height = rowHeight;
-							}
-							result = 
-							{
-								width: width,
-								height: height
-							};
-							return result;
-						}
+						index = rowHeight / height;
+						width = width * index;
+						height = rowHeight;
 					}
+					result = 
+					{
+						width: width,
+						height: height
+					};
+					return result;
 				}
+
 				return result;
 			},
 			
@@ -1034,8 +1021,7 @@ var maxIndividualValues = 10000;
 									aWs.TableParts = [];
 								aWs.TableParts[aWs.TableParts.length] = cloneData;
 
-								var splitRange = cloneData.Ref;
-								this._setColorStyleTable(splitRange, cloneData, null, true);
+								this._setColorStyleTable(cloneData.Ref, cloneData, null, true);
 							}
 							else
 							{
@@ -1056,17 +1042,13 @@ var maxIndividualValues = 10000;
 						{
 							if(cloneData.newFilterRef && cloneData.newFilterRef.isEqual(aWs.TableParts[l].Ref))
 							{
-								var isIntersectionTableParts = this._isIntersectionTableParts(aWs.TableParts[l].Ref);
-									
 								aWs.TableParts[l] = cloneData.oldFilter.clone(null);
-								
-								var splitRange = cloneData.oldFilter.Ref;
-								
+
 								//чистим стиль от старой таблицы
 								var clearRange = new Range(aWs, cloneData.newFilterRef.r1, cloneData.newFilterRef.c1, cloneData.newFilterRef.r2, cloneData.newFilterRef.c2);
 								clearRange.setTableStyle(null);
 								
-								this._setColorStyleTable(splitRange, cloneData.oldFilter, null, true);
+								this._setColorStyleTable(cloneData.oldFilter.Ref, cloneData.oldFilter, null, true);
 								
 								break;
 							}	
@@ -1087,10 +1069,7 @@ var maxIndividualValues = 10000;
 							{
 								aWs.TableParts[l] = cloneData.oldFilter.clone(null);
 								
-								//var splitRange = cloneData.oldFilter.Ref.split(':');
-								var splitRange = cloneData.oldFilter.Ref;
-								
-								this._setColorStyleTable(splitRange, cloneData.oldFilter, null, true);
+								this._setColorStyleTable(cloneData.oldFilter.Ref, cloneData.oldFilter, null, true);
 								
 								break;
 							}	
@@ -1150,10 +1129,11 @@ var maxIndividualValues = 10000;
 				}
 			},
 			
-			isEmptyAutoFilters: function(ar, insertType, insCells, deleteFilterAfterDeleteColRow, exceptionArray, doNotChangeFilters)
+			isEmptyAutoFilters: function(ar, insertType, insCells, deleteFilterAfterDeleteColRow, exceptionArray)
 			{
 				var aWs = this._getCurrentWS();
 				var activeCells = ar.clone();
+				var t = this;
 				
 				var DeleteColumns = insertType && (insertType == c_oAscDeleteOptions.DeleteColumns || insertType == c_oAscInsertOptions.InsertColumns) ? true : false;
 				var DeleteRows = insertType && (insertType == c_oAscDeleteOptions.DeleteRows || insertType == c_oAscInsertOptions.InsertRows) ? true : false;
@@ -1169,86 +1149,56 @@ var maxIndividualValues = 10000;
 					activeCells.c2 = gc_nMaxCol - 1;
 				}
 				
-				if(!this.historyTempObj)
-					History.StartTransaction();
-					
+				History.StartTransaction();
 				
-				if(aWs.AutoFilter)
+				var changeFilter = function(filter, isTablePart)
 				{
-					var oRange = Range.prototype.createFromBBox(aWs, aWs.AutoFilter.Ref);
+					var oldFilter = filter.clone(null);
+					var oRange = Range.prototype.createFromBBox(aWs, oldFilter.Ref);
+					if(insCells)
+						oldFilter.insCells = true;
 					var bbox = oRange.getBBox0();
+
 					//смотрим находится ли фильтр(первая его строчка) внутри выделенного фрагмента
 					if(activeCells.r1 <= bbox.r1 && activeCells.r2 >= bbox.r1 && activeCells.c1 <= bbox.c1 && activeCells.c2 >= bbox.c2)
 					{
-						var oldFilter = aWs.AutoFilter.clone();
-						
-						if(doNotChangeFilters)
-						{
-							if(!this.changeFilters.deleteFilters)
-								this.changeFilters.deleteFilters = [];
-							this.changeFilters.deleteFilters[this.changeFilters.deleteFilters.length] = oldFilter.name;
-						}
+						if(isTablePart)
+							oRange.setTableStyle(null);
 						else
 							aWs.AutoFilter = null;
 							
 						//открываем скрытые строки
 						aWs.setRowHidden(false, bbox.r1, bbox.r2);
-						
-						if(insCells)
-							oldFilter.insCells = true;
-							
+
 						//заносим в историю
-						if(this.historyTempObj)
-							this._addHistoryTempObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, oldFilter.Ref);
+						if(isTablePart)
+							t._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, deleteFilterAfterDeleteColRow, bbox);
 						else
-							this._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, oldFilter.Ref);
+							t._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, oldFilter.Ref);
 					}
+					else
+						return oldFilter;
+				};
+				
+				if(aWs.AutoFilter)
+				{
+					changeFilter(aWs.AutoFilter);
 				}
 				if(aWs.TableParts)
 				{
 					var newTableParts = [];
-					var k = 0;
+					
 					for(var i = 0; i < aWs.TableParts.length; i++)
 					{
-						var oCurFilter = aWs.TableParts[i].clone(null);
-						var oRange = Range.prototype.createFromBBox(aWs, oCurFilter.Ref);
-						if(insCells)
-							oCurFilter.insCells = true;
-						var bbox = oRange.getBBox0();
-						//смотрим находится ли фильтр внутри выделенного фрагмента
-						if(activeCells.r1 <= bbox.r1 && activeCells.r2 >= bbox.r2 && activeCells.c1 <= bbox.c1 && activeCells.c2 >= bbox.c2 && !this._checkExceptionArray(oCurFilter.Ref, exceptionArray))
-						{	
-							//удаляем форматирование
-							oRange.setTableStyle(null);
-							//открываем скрытые строки
-							aWs.setRowHidden(false, bbox.r1, bbox.r2);
-							
-							//заносим в историю
-							if(this.historyTempObj)
-								this._addHistoryTempObj(oCurFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, deleteFilterAfterDeleteColRow, bbox);
-							else
-								this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, deleteFilterAfterDeleteColRow, bbox);
-							
-							if(doNotChangeFilters)
-							{
-								if(!this.changeFilters.deleteFilters)
-									this.changeFilters.deleteFilters = [];
-								this.changeFilters.deleteFilters[this.changeFilters.deleteFilters.length] = aWs.TableParts[i].DisplayName;
-							}
-						}
-						else
-						{
-							newTableParts[k] = oCurFilter;
-							k++;
-						}
+						var filter = changeFilter(aWs.TableParts[i], true);
+						if(filter)
+							newTableParts.push(filter);
 					}
 					
-					if(!doNotChangeFilters)
-						aWs.TableParts = newTableParts;
+					aWs.TableParts = newTableParts;
 				}
 				
-				if(!this.historyTempObj)
-					History.EndTransaction();
+				History.EndTransaction();
 			},
 			
 			isCheckMoveRange: function(arnFrom)
@@ -1302,7 +1252,6 @@ var maxIndividualValues = 10000;
 			
 			insertColumn: function(type, activeRange, insertType)
 			{
-				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				var t  = this;
 				var bUndoChanges = aWs.workbook.bUndoChanges;
@@ -1310,7 +1259,6 @@ var maxIndividualValues = 10000;
 				var DeleteColumns = ((insertType == c_oAscDeleteOptions.DeleteColumns && type == 'delCell') || insertType == c_oAscInsertOptions.InsertColumns) ? true : false;
 				activeRange = activeRange.clone();
 				var diff = activeRange.c2 - activeRange.c1 + 1;
-				var oldFilter;
 				
 				if(type === "delCell")
 					diff = - diff;
@@ -1332,7 +1280,7 @@ var maxIndividualValues = 10000;
 					
 					if(activeRange.r1 <= ref.r1 && activeRange.r2 >= ref.r2)
 					{
-						if(activeRange.c1 < ref.c1 && activeRange.c2 < ref.c1)//until
+						if(activeRange.c2 < ref.c1)//until
 						{
 							oldFilter = filter.clone(null);
 							filter.moveRef(diff);
@@ -1458,7 +1406,6 @@ var maxIndividualValues = 10000;
 			
 			insertRows: function(type, activeRange, insertType)
 			{
-				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				var t  = this;
 				var bUndoChanges = aWs.workbook.bUndoChanges;
@@ -1469,7 +1416,7 @@ var maxIndividualValues = 10000;
 				var oldFilter;
 				
 				if(type === "delCell")
-					diff = - diff
+					diff = - diff;
 				
 				if(DeleteRows)//в случае, если удаляем строки, тогда расширяем активную область область по всем столбцам
 				{
@@ -1559,9 +1506,8 @@ var maxIndividualValues = 10000;
 							curFilter.SortState.SortConditions[0] = new SortCondition();
 							
 						var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
-						var sortCol = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
 						
-						curFilter.SortState.SortConditions[0].Ref = sortCol;
+						curFilter.SortState.SortConditions[0].Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
 						curFilter.SortState.SortConditions[0].ConditionDescending = resType;
 						
 						cellId = t._rangeToId(cellIdRange);
@@ -2028,7 +1974,6 @@ var maxIndividualValues = 10000;
 			_getPressedFilter: function(activeRange, cellId)
 			{
 				var aWs = this._getCurrentWS();
-				var result;
 				
 				if(cellId !== undefined)
 				{
@@ -2879,7 +2824,7 @@ var maxIndividualValues = 10000;
 				var ws = this.worksheet;
 				var cloneActiveRange = ar.clone(true); // ToDo слишком много клонирования
 				
-				var isEnd = true, cell, range, merged, valueMerg, rowNum = cloneActiveRange.r1, isEmptyCell;
+				var isEnd = true, cell, merged, valueMerg, rowNum = cloneActiveRange.r1, isEmptyCell;
 				
 				//есть ли вообще на странице мерженные ячейки
 				//TODO стоит пересмотреть проверку мерженных ячеек
@@ -3233,20 +3178,21 @@ var maxIndividualValues = 10000;
 				//координаты левого верхнего угла кнопки
 				var upLeftXButton = x1 + diffX;
 				var upLeftYButton = y1 + diffY;
+				var centerX, centerY;
 				if(isSet)
 				{
-					var centerX = upLeftXButton + (width/2);
+					centerX = upLeftXButton + (width/2);
 					var heigthObj = Math.ceil((height/2)/0.75)*0.75;
 					var marginTop = Math.floor(((height - heigthObj)/2)/0.75)*0.75;
 					
-					var coordY = upLeftYButton + heigthObj + marginTop;
-					this._drawFilterMark(centerX, coordY, heigthObj, index);
+					centerY = upLeftYButton + heigthObj + marginTop;
+					this._drawFilterMark(centerX, centerY, heigthObj, index);
 				}
 				else
 				{
 					//центр кнопки
-					var centerX = upLeftXButton + (width/2);
-					var centerY = upLeftYButton + (height/2);
+					centerX = upLeftXButton + (width/2);
+					centerY = upLeftYButton + (height/2);
 					this._drawFilterDreieck(centerX, centerY, index);
 				}
 			},
@@ -3375,189 +3321,6 @@ var maxIndividualValues = 10000;
 				autoFilterObject.asc_setFilterObj(filterObj);
 				
 				ws.handlers.trigger("setAutoFiltersDialog", autoFilterObject);
-			},
-			
-			//TODO temp function(move to workbookElems)
-			_getLogical: function(conFilter, options)
-			{
-				var val = options.val;
-				var type = options.type;
-				var valWithFormat = options.valWithFormat;
-				if(type == 0)
-					val = parseFloat(val);
-				//просмартиваем первый фильтр
-				var arrLog = [];
-				arrLog[0] = conFilter.filter1;
-				arrLog[1] = conFilter.filter2;
-				var valLog = [];
-				valLog[0] = conFilter.valFilter1;
-				valLog[1] = conFilter.valFilter2;
-
-
-				//пока в случае появления спецсимволов, игнорируем их
-				var trueStr;
-				if(false && valLog[0] && typeof valLog[0] == "string" && (valLog[0].split("?").length > 1 || valLog[0].split("*").length > 1) && (conFilter.filterDisableSpecSymbols1 || this._getPositionSpecSymbols(valLog[0]) != null))
-				{
-					trueStr = "";
-					for(var i = 0; i < valLog[0].length; i++)
-					{
-						if(valLog[0][i] != "?" && valLog[0][i] != "*")
-							trueStr += valLog[0][i];
-					}
-					valLog[0] = trueStr;
-				}
-				if(false && typeof valLog[1] == "string" && valLog[1] && (valLog[1].split("?").length > 1 || valLog[1].split("*").length > 1) && (conFilter.filterDisableSpecSymbols1 || this._getPositionSpecSymbols(valLog[1]) != null))
-				{
-					trueStr = "";
-					for(var i = 0; i < valLog[1].length; i++)
-					{
-						if(valLog[1][i] != "?" && valLog[1][i] != "*")
-							trueStr += valLog[1][i];
-					}
-					valLog[1] = trueStr;
-				}
-			
-				var result = [];
-				for(var s = 0; s < arrLog.length; s++)
-				{
-					if(valLog[s] === undefined)
-						valLog[s] = "";
-					
-					var checkComplexSymbols = this._parseComplexSpecSymbols(val, arrLog[s], valLog[s],type);
-					var filterVal;
-					if(checkComplexSymbols != null)
-						result[s] = checkComplexSymbols;
-					else
-					{
-					    if (arrLog[s] == c_oAscCustomAutoFilter.equals || arrLog[s] == c_oAscCustomAutoFilter.doesNotEqual)//общие для числа и текста
-						{
-							val = val.toString();
-							filterVal = valLog[s].toString();
-							if (arrLog[s] == c_oAscCustomAutoFilter.equals)//equals
-							{
-								if(val == filterVal || valWithFormat == filterVal)
-									result[s] = true;
-							}
-							else if (arrLog[s] == c_oAscCustomAutoFilter.doesNotEqual)//doesNotEqual
-							{
-								if(val != filterVal || valWithFormat != filterVal)
-									result[s] = true;
-							}
-						}
-					    else if (arrLog[s] == c_oAscCustomAutoFilter.isGreaterThan || arrLog[s] == c_oAscCustomAutoFilter.isGreaterThanOrEqualTo || arrLog[s] == c_oAscCustomAutoFilter.isLessThan || arrLog[s] == c_oAscCustomAutoFilter.isLessThanOrEqualTo)//только для чисел
-						{
-							filterVal =  parseFloat(valLog[s]);
-							if(g_oFormatParser && g_oFormatParser.parse && g_oFormatParser.parse(valLog[s]) != null)
-								filterVal = g_oFormatParser.parse(valLog[s]).value;
-							if(isNaN(filterVal))
-								filterVal = '';
-							else
-							{
-								switch (arrLog[s])
-								{
-								    case c_oAscCustomAutoFilter.isGreaterThan:
-										if(val > filterVal)//isGreaterThan
-											result[s] = true;
-										break;
-								    case c_oAscCustomAutoFilter.isGreaterThanOrEqualTo:
-										if(val >= filterVal)//isGreaterThanOrEqualTo
-											result[s] = true;
-										break;
-								    case c_oAscCustomAutoFilter.isLessThan:
-										if(val < valLog[s])//isLessThan
-											result[s] = true;
-										break;
-								    case c_oAscCustomAutoFilter.isLessThanOrEqualTo:
-										if(val <= filterVal)//isLessThanOrEqualTo
-											result[s] = true;
-										break;
-								}
-							}
-						}
-						else if(arrLog[s] == c_oAscCustomAutoFilter.beginsWith || arrLog[s] == c_oAscCustomAutoFilter.doesNotBeginWith || arrLog[s] == c_oAscCustomAutoFilter.endsWith || arrLog[s] == c_oAscCustomAutoFilter.doesNotEndWith || arrLog[s] == c_oAscCustomAutoFilter.contains || arrLog[s] == c_oAscCustomAutoFilter.doesNotContain)//только для текста
-						{
-							
-							filterVal = valLog[s];
-							var newVal = val;
-							if(!isNaN(parseFloat(newVal)))
-								newVal = valWithFormat;
-								var position;
-								switch (arrLog[s])
-								{
-									case c_oAscCustomAutoFilter.beginsWith:
-										if(type == 1)
-										{
-											//if(newVal.search("?") || newVal.search("*"))
-											if(newVal.search(filterVal) == 0)//beginsWith
-												result[s] = true;
-										}
-										break;
-									case c_oAscCustomAutoFilter.doesNotBeginWith: 
-										if(type == 1)
-										{
-											if(newVal.search(filterVal) != 0)//doesNotBeginWith
-												result[s] = true;
-										}
-										else
-											result[s] = true;
-										break;
-									case c_oAscCustomAutoFilter.endsWith: 
-										position = newVal.length - filterVal.length;
-										if(type == 1)
-										{
-											if(newVal.lastIndexOf(filterVal) == position && position > 0)//endsWith
-												result[s] = true;
-										}
-										break;
-									case c_oAscCustomAutoFilter.doesNotEndWith: 
-										position = newVal.length - filterVal.length;
-										if(type == 1)
-										{
-											if(newVal.lastIndexOf(filterVal) != position && position > 0)//doesNotEndWith
-												result[s] = true;
-										}
-										else
-											result[s] = true;
-										break;
-									case c_oAscCustomAutoFilter.contains: 
-										if(type == 1)
-										{
-											if(newVal.search(filterVal) != -1)//contains
-												result[s] = true;
-										}
-										break;
-									case c_oAscCustomAutoFilter.doesNotContain: 
-										if(type == 1)
-										{
-											if(newVal.search(filterVal) == -1)//doesNotContain
-												result[s] = true;
-										}
-										else
-											result[s] = true;
-										break
-								}
-						}
-						
-						if(!result[s])
-						{
-							if(filterVal == '' || arrLog[s] == null)
-								result[s] = 'hidden';
-							else
-								result[s] = false;
-						}
-					}
-				}
-				if(conFilter.isChecked == false)
-				{
-					if((result[0] == true && result[1] == true) || (result[0] == 'hidden' && result[1] == true) || (result[0] == true && result[1] == 'hidden'))
-						return true
-				}
-				else
-				{
-					if((result[0] == true || result[1] == true) || (result[0] == 'hidden' && result[1] == true) || (result[0] == true && result[1] == 'hidden'))
-						return true
-				}
-				return false;
 			},
 			
 			_parseComplexSpecSymbols: function(val, filter, filterVal, type)
@@ -3766,106 +3529,20 @@ var maxIndividualValues = 10000;
 				}	
 			},
 			
-			_addCustomFilters: function(colId, valFilter, curFilter, isMerged)
-			{
-				var aWs = this._getCurrentWS();
-
-				var isEn  = undefined; 
-				var addFilterColumn;
-				if(curFilter.FilterColumns)
-				{
-					//проверка на уже существующий фильтр
-					for(var l = 0; l < curFilter.FilterColumns.length; l++)
-					{
-						if(curFilter.FilterColumns[l].ColId == colId)
-							isEn = l;	
-					}
-					
-					if(isEn == undefined)
-					{
-						var length = curFilter.FilterColumns.length;
-						curFilter.FilterColumns[curFilter.FilterColumns.length] = this._addNewCustomFilter(valFilter, colId);
-						if(isMerged)
-							curFilter.FilterColumns[length].ShowButton = false;
-						
-						addFilterColumn = curFilter.FilterColumns[length];
-					}
-					else
-					{
-						curFilter.FilterColumns[isEn] =  this._addNewCustomFilter(valFilter, colId);
-						if(isMerged)
-							curFilter.FilterColumns[isEn].ShowButton = false;
-							
-						addFilterColumn = curFilter.FilterColumns[isEn];
-					}
-					
-				}
-				else
-				{
-					curFilter.FilterColumns = [];
-					curFilter.FilterColumns[0] = this._addNewCustomFilter(valFilter, colId);
-					if(isMerged)
-							curFilter.FilterColumns[0].ShowButton = false;
-							
-					addFilterColumn = curFilter.FilterColumns[0];
-				}
-				
-				return addFilterColumn;
-			},
-			
-			_addNewCustomFilter: function (valFilter, colId)
-			{
-				var result = new FilterColumn();
-				result.ColId = colId;
-				result.CustomFiltersObj = new CustomFilters();
-				
-				if(valFilter.filter1 && valFilter.valFilter1 !== null)
-				{
-					result.CustomFiltersObj = new CustomFilters();
-					result.CustomFiltersObj.CustomFilters = [];
-					result.CustomFiltersObj.CustomFilters[0] = new CustomFilter();
-					result.CustomFiltersObj.CustomFilters[0].Operator = valFilter.filter1;
-					result.CustomFiltersObj.CustomFilters[0].Val = valFilter.valFilter1;
-				}
-					
-				if(valFilter.filter2 && valFilter.valFilter2 !== null)
-				{
-					if(result.CustomFiltersObj.CustomFilters[0])
-					{
-						result.CustomFiltersObj.CustomFilters[1] = new CustomFilter();
-						result.CustomFiltersObj.CustomFilters[1].Operator = valFilter.filter2;
-						result.CustomFiltersObj.CustomFilters[1].Val = valFilter.valFilter2;
-					}
-					else
-					{
-						result.CustomFiltersObj = new CustomFilters();
-						result.CustomFiltersObj.CustomFilters = [];
-						result.CustomFiltersObj.CustomFilters[0] = new CustomFilter();
-						result.CustomFiltersObj.CustomFilters[0].Operator = valFilter.filter2;
-						result.CustomFiltersObj.CustomFilters[0].Val = valFilter.valFilter2;
-					}
-				}
-				
-				if(valFilter.isChecked == true && valFilter.filter2)
-					result.CustomFiltersObj.And = true;
-				
-				return result;
-			},
-			
 			_getOpenAndClosedValues: function(filter, cellId)
 			{
 				console.time("new");
 
 				var ref = filter.Ref;
 				var filterColumns = filter.FilterColumns;
-				var aWs = this._getCurrentWS(), temp = {}, isDateTimeFormat, dataValue, values = [];
+				var aWs = this._getCurrentWS(), temp = {}, isDateTimeFormat, /*dataValue,*/ values = [];
 				
 				var currentElemArray = this._getFilterColumnNum(filterColumns, cellId);//номер данного фильтра в массиве фильтров
 				
 				var addValueToMenuObj = function(tempResult, count)
 				{
 					//TODO ветка для добавления даты(как заделаем разделение год/месяц/число в меню)
-					if(false/*isDateTimeFormat*/)
+					/*if(isDateTimeFormat)
 					{
 						if(!result.dates.year)
 							result.dates.year = [];
@@ -3884,7 +3561,7 @@ var maxIndividualValues = 10000;
 							
 						result.dates.year[dataValue.year].month[dataValue.month].day[dataValue.d].val = tempResult;
 					}
-					else
+					else*/
 						values[count] = tempResult;
 				};
 				
@@ -4062,14 +3739,13 @@ var maxIndividualValues = 10000;
 					var newCell = aWs.getCell(new CellAddress(activeCells));
 					if(newCell)
 					{
-						var newActiveCell = 
+						activeCells = 
 						{
 							c1: newCell.first.col -1,
 							c2: newCell.first.col -1,
 							r1: newCell.first.row -1,
 							r2: newCell.first.row -1
 						};
-						activeCells = newActiveCell;
 					}
 					
 				}
@@ -4078,8 +3754,7 @@ var maxIndividualValues = 10000;
 					if(!allF[i].Ref || allF[i].Ref == "")
 						continue;
 
-					var cCell = allF[i].Ref;
-					var range = cCell;
+					var range = allF[i].Ref;
 					
 					if(!allF[i].AutoFilter && !allF[i].TableStyleInfo)
 					{
@@ -4303,7 +3978,6 @@ var maxIndividualValues = 10000;
 			_setColorStyleTable: function(range, options, isOpenFilter, isSetVal)
 			{
 				var aWs = this._getCurrentWS();
-				var bUndoChanges = aWs.workbook.bUndoChanges;
 				var bRedoChanges = aWs.workbook.bRedoChanges;
 				
 				var bbox = range;
@@ -4398,9 +4072,7 @@ var maxIndividualValues = 10000;
 			//TODO CHANGE!!!
 			_reDrawCurrentFilter: function(fColumns, tableParts)
 			{
-				var aWs = this._getCurrentWS();
 				//TODO сделать открытие и закрытие строк
-				
 				//перерисовываем таблицу со стилем 
 				if(tableParts)
 				{
@@ -4650,7 +4322,7 @@ var maxIndividualValues = 10000;
 				var aWs = this._getCurrentWS();
 				var cell = aWs.getRange3(n, k, n, k);
 				var isEmptyCell = cell.isEmptyText();
-				var isEnd = true, range, merged, valueMerg;
+				var isEnd = true, merged, valueMerg;
 				
 				//если мерженная ячейка
 				if(isEmptyCell)
