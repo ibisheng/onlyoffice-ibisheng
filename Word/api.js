@@ -7474,9 +7474,8 @@ asc_docs_api.prototype.asc_continueSaving = function () {
 // Version History
 
 asc_docs_api.prototype.asc_showRevision = function (newObj) {
-	// ToDo убрать эту проверку
 	if (!newObj.docId)
-		newObj.docId = '1233211';
+		return;
 
 	var bUpdate = true;
 	if (null === this.VersionHistory)
@@ -7485,9 +7484,6 @@ asc_docs_api.prototype.asc_showRevision = function (newObj) {
 		bUpdate = this.VersionHistory.update(newObj);
 	if (bUpdate) {
 		this.asc_CloseFile();
-		g_oIdCounter.Clear();
-		g_oTableId.Clear();
-		this.isApplyChangesOnOpenEnabled = true;
 
 		this.DocInfo.put_Id(this.VersionHistory.docId);
 		this.DocInfo.put_Url(this.VersionHistory.url);
@@ -7506,6 +7502,7 @@ asc_docs_api.prototype.asc_CloseFile = function()
     History.Clear();
     g_oTableId.Clear();
     g_oIdCounter.Clear();
+	this.isApplyChangesOnOpenEnabled = true;
 
     this.WordControl.m_oLogicDocument.Stop_Recalculate();
     this.WordControl.m_oLogicDocument.Stop_CheckSpelling();
