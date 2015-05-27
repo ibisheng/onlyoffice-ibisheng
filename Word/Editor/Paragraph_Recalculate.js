@@ -2170,20 +2170,21 @@ function CParagraphRecalculateStateWrap(Para)
     };
 
     // for ParaMath
-    this.bMath_OneLine    = false; // for ParaMath
-    this.bMathWordLarge   = false; // for ParaMath
-    this.bEndRunToContent = false;
-    this.PosEndRun        = new CParagraphContentPos();
+    this.bMath_OneLine       = false; // for ParaMath
+    this.bMathWordLarge      = false; // for ParaMath
+    this.bEndRunToContent    = false;
+    this.PosEndRun           = new CParagraphContentPos();
 
-    this.WrapIndent         = 0; // WrapIndent нужен для сравнения с длиной слова (когда слово разбивается по Compare Oper): ширина первой строки формулы не должна быть меньше WrapIndent
-    this.bFirstCompareOper  = true;
-    this.bCompareWrapIndent = false;
+    this.WrapIndent          = 0; // WrapIndent нужен для сравнения с длиной слова (когда слово разбивается по Compare Oper): ширина первой строки формулы не должна быть меньше WrapIndent
+    this.bFirstCompareOper   = true;
+    this.bCompareWrapIndent  = false;
 
     // у "крайних" в строке операторов/мат объектов сооответствующий Gap равен нулю
-    this.OperGapRight       = 0;
-    this.OperGapLeft        = 0;
-    this.bInsideOper        = false; // учитываем есть ли разбивка внутри мат объекта, чтобы случайно не вставить в конец пред оператора (при Brk_Before == false)
-    this.bFastRecalculate   = false;
+    this.OperGapRight        = 0;
+    this.OperGapLeft         = 0;
+    this.bNoOneBreakOperator = true; // прежде чем обновлять позицию в контент Run, учтем были ли до этого операторы (проверки на Word == false не достаточно, т.к. формула мб инлайновая и тогда не нужно обновлять позицию)
+    this.bInsideOper         = false; // учитываем есть ли разбивка внутри мат объекта, чтобы случайно не вставить в конец пред оператора (при Brk_Before == false)
+    this.bFastRecalculate    = false;
 }
 
 CParagraphRecalculateStateWrap.prototype =
@@ -2217,6 +2218,7 @@ CParagraphRecalculateStateWrap.prototype =
         this.WrapIndent          = 0;
         this.bFirstCompareOper   = true;
         this.bInsideOper         = false;
+        this.bNoOneBreakOperator = true;
         this.bFastRecalculate    = false;
         this.bCompareWrapIndent  = false;
     },
@@ -2251,6 +2253,7 @@ CParagraphRecalculateStateWrap.prototype =
         this.WrapIndent         = 0;
         this.bFirstCompareOper  = true;
         this.bInsideOper        = false;
+        this.bNoOneBreakOperator = true;
         this.bFastRecalculate   = false;
         this.bCompareWrapIndent = false;
     },

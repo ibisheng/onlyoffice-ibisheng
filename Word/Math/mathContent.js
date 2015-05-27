@@ -3942,6 +3942,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         {
             var FirstItemOnLine = PRS.FirstItemOnLine,
                 Word            = PRS.Word;
+            var bNoOneBreakOperator = PRS.bNoOneBreakOperator;
 
             Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
 
@@ -4016,7 +4017,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     var bInsideOperator = Item.bOneLine == false && PRS.bInsideOper == true;
 
-                    if(Brk_Before == false && Word == false && bInsideOperator == false)
+                    if(Brk_Before == false && bNoOneBreakOperator == false/*Word == false*/   && bInsideOperator == false)
                     {
                         // обновим : начало нового слова - конец предыдущего Run
                         var _Depth = PRS.PosEndRun.Depth;
