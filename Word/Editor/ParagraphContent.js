@@ -5975,10 +5975,10 @@ ParaDrawing.prototype =
     },
 
 
-    Get_AllParagraphs_ByNumbering : function(NumPr, ParaArray)
+    Get_AllParagraphs : function(Props, ParaArray)
     {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.Get_AllParagraphs_ByNumbering === "function" )
-            this.GraphicObj.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
+        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.Get_AllParagraphs === "function" )
+            this.GraphicObj.Get_AllParagraphs(Props, ParaArray);
     },
 
 
@@ -6498,6 +6498,7 @@ ParaDrawing.prototype =
             var RightElement = TopElement.Split(ParaContentPos, 1);
             Para.Add_ToContent(TopElementPos + 1, RightElement);
             Para.Add_ToContent(TopElementPos + 1, this.ParaMath);
+            Para.Correct_Content(TopElementPos, TopElementPos + 2);
 
             // Устанавливаем курсор в начало правого элемента, полученного после Split
             LogicDocument.Selection_Remove();

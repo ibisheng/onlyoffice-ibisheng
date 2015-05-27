@@ -614,6 +614,7 @@ var changestype_Paragraph_Properties =  2; // Изменение свойств 
 var changestype_Document_Content     = 10; // Добавление/удаление элементов в Document или в DocumentContent
 var changestype_Document_Content_Add = 11; // Добавление элемента в класс Document или в класс DocumentContent
 var changestype_Document_SectPr      = 12; // Изменения свойств данной секции (размер страницы, поля и ориентация)
+var changestype_Document_Styles      = 13; // Изменяем стили документа (добавление/удаление/модифицирование)
 var changestype_Table_Properties     = 20; // Любые изменения в таблице
 var changestype_Table_RemoveCells    = 21; // Удаление ячеек (строк или столбцов)
 var changestype_Image_Properties     = 23; // Изменения настроек картинки

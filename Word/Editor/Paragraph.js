@@ -368,19 +368,31 @@ Paragraph.prototype =
         return List;
     },
 
-    Get_AllParagraphs_ByNumbering : function(NumPr, ParaArray)
+    Get_AllParagraphs : function(Props, ParaArray)
     {
-        var _NumPr = this.Numbering_Get();
-
-        if ( undefined != _NumPr && _NumPr.NumId === NumPr.NumId && ( _NumPr.Lvl === NumPr.Lvl || undefined === NumPr.Lvl ) )
-            ParaArray.push( this );
-
-        var Count = this.Content.length;
-        for ( var Pos = 0; Pos < Count; Pos++ )
+        var ContentLen = this.Content.length;
+        for (var CurPos = 0; CurPos < ContentLen; CurPos++)
         {
-            var Item = this.Content[Pos];
-            if ( para_Drawing === Item.Type )
-                Item.Get_AllParagraphs_ByNumbering( NumPr, ParaArray );
+            if (this.Content[CurPos].Get_AllParagraphs)
+                this.Content[CurPos].Get_AllParagraphs(Props, ParaArray);
+        }
+
+        if (true === Props.All)
+        {
+            ParaArray.push(this);
+        }
+        else if (true === Props.Numbering)
+        {
+            var NumPr = Props.NumPr;
+            var _NumPr = this.Numbering_Get();
+
+            if (undefined != _NumPr && _NumPr.NumId === NumPr.NumId && ( _NumPr.Lvl === NumPr.Lvl || undefined === NumPr.Lvl ))
+                ParaArray.push(this);
+        }
+        else if (true === Props.Style)
+        {
+            if (this.Pr.PStyle === Props.StyleId)
+                ParaArray.push(this);
         }
     },
 
@@ -8152,7 +8164,6 @@ Paragraph.prototype =
         this.CompiledPr.NeedRecalc = true;
     },
 
-
     Set_ContextualSpacing : function(Value)
     {
         if ( Value != this.Pr.ContextualSpacing )
@@ -10707,6 +10718,10 @@ Paragraph.prototype =
             {
                 this.RecalcInfo.Set_Type_0(pararecalc_0_All);
                 bNeedRecalc = true;
+
+                this.CompiledPr.NeedRecalc = true;
+                this.Recalc_RunsCompiledPr();
+
                 break;
             }
 
@@ -12496,9 +12511,9 @@ Paragraph.prototype.Start_SelectionFromCurPos = function()
     this.Set_SelectionContentPos(ContentPos, ContentPos);
 };
 
-/*
-    Возвращается объект CParagraphContentPos по заданому Id ParaDrawing, если объект
-    не найдет, вернется null.
+/**
+ *  Возвращается объект CParagraphContentPos по заданому Id ParaDrawing, если объект
+ *  не найдет, вернется null.
  */
 Paragraph.prototype.Get_PosByDrawing = function(Id)
 {
@@ -12523,6 +12538,49 @@ Paragraph.prototype.Get_PosByDrawing = function(Id)
         return null;
 
     return ContentPos;
+};
+Paragraph.prototype.Get_StyleFromFormatting = function()
+{
+    // Получим настройки первого рана попавшего в выделение
+    var TextPr = null;
+    if (true === this.Selection.Use)
+        TextPr = this.Content[this.Selection.StartPos > this.Selection.EndPos? this.Selection.EndPos : this.Selection.StartPos].Get_FirstTextPr();
+    else
+        TextPr = this.Content[this.CurPos.ContentPos].Get_FirstTextPr();
+
+    // Мы создаем стиль параграфа и стиль рана, линкуем их и возвращаем стиль параграфа.
+    var oParaStyle = new asc_CStyle();
+    oParaStyle.put_Type(styletype_Paragraph);
+    oParaStyle.fill_ParaPr(this.Pr);
+
+    var oStyles = this.Parent.Get_Styles();
+    var oPStyle = oStyles.Get(this.Pr.PStyle);
+    if (null !== oPStyle)
+    {
+        oParaStyle.put_BasedOn(oPStyle.Get_Name());
+        var oPNextStyle = oStyles.Get(oPStyle.Get_Next());
+        if (null !== oPNextStyle)
+            oParaStyle.put_Next(oPNextStyle.Get_Name());
+    }
+    oParaStyle.fill_TextPr(TextPr);
+
+    var oRunStyle = new asc_CStyle();
+    oRunStyle.put_Type(styletype_Character);
+    oRunStyle.fill_TextPr(TextPr);
+    var oRStyle = oStyles.Get(TextPr.RStyle);
+    if (null !== oRStyle)
+    {
+        oRunStyle.put_BasedOn(oRStyle.Get_Name());
+        var oRNextStyle = oStyles.Get(oRStyle.Get_Next());
+        if (null !== oRNextStyle)
+            oRunStyle.put_Next(oRNextStyle.Get_Name());
+    }
+
+    // Линкуем стили
+    oParaStyle.put_Link(oRunStyle);
+    oRunStyle.put_Link(oParaStyle);
+
+    return oParaStyle;
 };
 
 

@@ -296,7 +296,7 @@ CAbstractNum.prototype =
         }
 
         var LogicDocument = editor.WordControl.m_oLogicDocument;
-        var AllParagraphs = LogicDocument.Get_AllParagraphs_ByNumbering( { NumId : this.Id, Lvl : undefined } );
+        var AllParagraphs = LogicDocument.Get_AllParagraphsByNumbering( { NumId : this.Id, Lvl : undefined } );
 
         var Count = AllParagraphs.length;
         for ( var Index = 0; Index < Count; Index++ )
@@ -1507,7 +1507,7 @@ CAbstractNum.prototype =
         NumPr.Lvl   = Data.Index;
 
         var LogicDocument = editor.WordControl.m_oLogicDocument;
-        var AllParagraphs = LogicDocument.Get_AllParagraphs_ByNumbering( NumPr );
+        var AllParagraphs = LogicDocument.Get_AllParagraphsByNumbering( NumPr );
 
         var Count = AllParagraphs.length;
         for ( var Index = 0; Index < Count; Index++ )
@@ -1661,7 +1661,7 @@ CAbstractNum.prototype =
         NumPr.Lvl   = iLvl;
 
         var LogicDocument = editor.WordControl.m_oLogicDocument;
-        var AllParagraphs = LogicDocument.Get_AllParagraphs_ByNumbering( NumPr );
+        var AllParagraphs = LogicDocument.Get_AllParagraphsByNumbering( NumPr );
 
         var Count = AllParagraphs.length;
         for ( var Index = 0; Index < Count; Index++ )

@@ -7440,21 +7440,9 @@ asc_docs_api.prototype.asc_GetMailMergeFiledValue = function(nIndex, sName)
 //----------------------------------------------------------------------------------------------------------------------
 // Работаем со стилями
 //----------------------------------------------------------------------------------------------------------------------
-function asc_CStyle()
-{
-    this.Name = "";
-};
-asc_CStyle.prototype.get_Name = function()
-{
-    return this.Name;
-};
-asc_CStyle.prototype.put_Name = function(sName)
-{
-    this.Name = sName;
-};
 asc_docs_api.prototype.asc_GetStyleFromFormatting = function()
 {
-    this.WordControl.m_oLogicDocument.Get_StyleFromFormatting();
+    return this.WordControl.m_oLogicDocument.Get_StyleFromFormatting();
 };
 asc_docs_api.prototype.asc_AddNewStyle = function(oStyle)
 {
@@ -7462,6 +7450,7 @@ asc_docs_api.prototype.asc_AddNewStyle = function(oStyle)
 };
 asc_docs_api.prototype.asc_RemoveStyle = function(sName)
 {
+    this.WordControl.m_oLogicDocument.Remove_Style(sName);
 };
 
 asc_docs_api.prototype.asc_stopSaving = function () {

@@ -252,7 +252,6 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_AllDrawingObjects = func
             Item.Get_AllDrawingObjects(DrawingObjs);
     }
 };
-
 CParagraphContentWithParagraphLikeContent.prototype.Set_Paragraph = function(Paragraph)
 {
     this.Paragraph = Paragraph;
@@ -330,15 +329,38 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_TextPr = function(_Conte
     else
         return this.Content[_ContentPos.Get(Depth)].Get_TextPr(_ContentPos, Depth + 1);
 };
-CParagraphContentWithParagraphLikeContent.prototype.Get_FirstTextPr = function()
+CParagraphContentWithParagraphLikeContent.prototype.Get_FirstTextPr = function(bByPos)
 {
-    if (this.Content.length <= 0)
-        return new CTextPr();
+    var oElement = null;
+    if (this.Content.length > 0)
+    {
+        if (true === bByPos)
+        {
+            if (true === this.Selection.Use)
+            {
+                if (this.Selection.StartPos > this.Selection.EndPos)
+                    oElement = this.Content[this.Selection.EndPos];
+                else
+                    oElement = this.Content[this.Selection.StartPos];
+            }
+            else
+                oElement = this.Content[this.State.ContentPos];
+        }
+        else
+        {
+            oElement = this.Content[0];
+        }
+    }
 
-    if (para_Run === this.Content[0].Type)
-        return this.Content[0].Get_TextPr();
+    if (null !== oElement && undefined !== oElement)
+    {
+        if (para_Run === this.Content[0].Type)
+            return this.Content[0].Get_TextPr();
+        else
+            return this.Content[0].Get_FirstTextPr();
+    }
     else
-        return this.Content[0].Get_FirstTextPr();
+        return new CTextPr();
 };
 CParagraphContentWithParagraphLikeContent.prototype.Get_CompiledTextPr = function(Copy)
 {
@@ -1030,6 +1052,15 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_Text = function(Text)
     for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
     {
         this.Content[CurPos].Get_Text( Text );
+    }
+};
+CParagraphContentWithParagraphLikeContent.prototype.Get_AllParagraphs = function(Props, ParaArray)
+{
+    var ContentLen = this.Content.length;
+    for (var CurPos = 0; CurPos < ContentLen; CurPos++)
+    {
+        if (this.Content[CurPos].Get_AllParagraphs)
+            this.Content[CurPos].Get_AllParagraphs(Props, ParaArray);
     }
 };
 //----------------------------------------------------------------------------------------------------------------------

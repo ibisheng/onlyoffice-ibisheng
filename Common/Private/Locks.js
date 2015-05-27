@@ -19,6 +19,10 @@ if(typeof CDocument !== "undefined")
             {
                 this.Lock.Check( this.Get_Id() );
             }
+            else if (changestype_Document_Styles === CheckType)
+            {
+                this.Styles.Lock.Check(this.Styles.Get_Id());
+            }
             else if(changestype_ColorScheme === CheckType )
             {
                 this.DrawingObjects.Lock.Check( this.DrawingObjects.Get_Id());

@@ -5290,6 +5290,11 @@ ParaRun.prototype.Get_TextPr = function()
     return this.Pr.Copy();
 };
 
+ParaRun.prototype.Get_FirstTextPr = function()
+{
+    return this.Pr;
+};
+
 ParaRun.prototype.Get_CompiledTextPr = function(Copy)
 {
     if ( true === this.State.Selection.Use && true === this.Selection_CheckParaEnd() )
@@ -8972,7 +8977,6 @@ ParaRun.prototype.IsShade = function()
     var oShd = this.Get_CompiledPr(false).Shd;
     return !(oShd === undefined || shd_Nil === oShd.Value);
 };
-
 ParaRun.prototype.Get_RangesByPos = function(Pos)
 {
     var Ranges = [];
@@ -8992,7 +8996,6 @@ ParaRun.prototype.Get_RangesByPos = function(Pos)
 
     return Ranges;
 };
-
 ParaRun.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
 {
     var Drawing1 = CompareObject.Drawing1;
@@ -9014,12 +9017,10 @@ ParaRun.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
         }
     }
 };
-
 ParaRun.prototype.Get_ReviewType = function()
 {
     return this.ReviewType;
 };
-
 ParaRun.prototype.Set_ReviewType = function(Value)
 {
     if (Value !== this.ReviewType)
@@ -9028,20 +9029,18 @@ ParaRun.prototype.Set_ReviewType = function(Value)
         this.ReviewType = Value;
     }
 };
-
 ParaRun.prototype.Get_Parent = function()
 {
     if (!this.Paragraph)
         return null;
 
     var ContentPos = this.Paragraph.Get_PosByElement(this);
-    if (ContentPos.Get_Depth() < 0)
+    if (null == ContentPos || undefined == ContentPos || ContentPos.Get_Depth() < 0)
         return null;
 
     ContentPos.Decrease_Depth(1);
     return this.Paragraph.Get_ElementByPos(ContentPos);
 };
-
 ParaRun.prototype.private_GetPosInParent = function(_Parent)
 {
     var Parent = (_Parent? _Parent : this.Get_Parent());
@@ -9061,7 +9060,6 @@ ParaRun.prototype.private_GetPosInParent = function(_Parent)
 
     return RunPos;
 };
-
 ParaRun.prototype.Make_ThisElementCurrent = function()
 {
     if (this.Paragraph)
@@ -9070,6 +9068,15 @@ ParaRun.prototype.Make_ThisElementCurrent = function()
         ContentPos.Add(this.State.ContentPos);
         this.Paragraph.Set_ParaContentPos(ContentPos, true, -1, -1);
         this.Paragraph.Document_SetThisElementCurrent(false);
+    }
+};
+ParaRun.prototype.Get_AllParagraphs = function(Props, ParaArray)
+{
+    var ContentLen = this.Content.length;
+    for (var CurPos = 0; CurPos < ContentLen; CurPos++)
+    {
+        if (para_Drawing == this.Content[CurPos].Type)
+            this.Content[CurPos].Get_AllParagraphs(Props, ParaArray);
     }
 };
 

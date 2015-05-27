@@ -1398,6 +1398,7 @@ CTableId.prototype.Load_Changes = function(Reader, Reader2)
                 var Class = this.m_aPairs[Id_old];
                 delete this.m_aPairs[Id_old];
                 this.m_aPairs[Id_new] = Class;
+                Class.Id = Id_new;
             }
 
             break;

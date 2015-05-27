@@ -1418,13 +1418,13 @@ CDocumentContent.prototype =
         return null;
     },
 
-    Get_AllParagraphs_ByNumbering : function(NumPr, ParaArray)
+    Get_AllParagraphs : function(Props, ParaArray)
     {
         var Count = this.Content.length;
         for ( var Index = 0; Index < Count; Index++ )
         {
             var Element = this.Content[Index];
-            Element.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
+            Element.Get_AllParagraphs(Props, ParaArray);
         }
     },
 
@@ -9223,6 +9223,27 @@ CDocumentContent.prototype.Start_SelectionFromCurPos = function()
         this.Selection.StartPos = this.CurPos.ContentPos;
         this.Selection.EndPos   = this.CurPos.ContentPos;
         this.Content[this.CurPos.ContentPos].Start_SelectionFromCurPos();
+    }
+};
+CDocumentContent.prototype.Get_StyleFromFormatting = function()
+{
+    if (docpostype_DrawingObjects === this.CurPos.Type)
+    {
+        return this.DrawingObjects.Get_StyleFromFormatting();
+    }
+    else //if (docpostype_Content === this.CurPos.Type)
+    {
+        if (true == this.Selection.Use)
+        {
+            if (this.Selection.StartPos > this.Selection.EndPos)
+                return this.Content[this.Selection.EndPos].Get_StyleFromFormatting(oStyle);
+            else
+                return this.Content[this.Selection.StartPos].Get_StyleFromFormatting(oStyle);
+        }
+        else
+        {
+            return this.Content[this.CurPos.ContentPos].Get_StyleFromFormatting(oStyle);
+        }
     }
 };
 

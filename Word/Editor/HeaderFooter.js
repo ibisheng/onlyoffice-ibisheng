@@ -837,9 +837,9 @@ CHeaderFooter.prototype =
         return this.Content.Get_Paragraph_ParaPr_Copy();
     },
 
-    Get_AllParagraphs_ByNumbering : function(NumPr, ParaArray)
+    Get_AllParagraphs : function(Props, ParaArray)
     {
-        return this.Content.Get_AllParagraphs_ByNumbering( NumPr, ParaArray );
+        return this.Content.Get_AllParagraphs(Props, ParaArray);
     },
 
     Get_PrevElementEndInfo : function(CurElement)
@@ -2292,8 +2292,15 @@ CHeaderFooterController.prototype =
         
         return { X : 0, Y : 0, Page : 0 };
     }
-    
-}
+};
+CHeaderFooterController.prototype.Get_StyleFromFormatting = function()
+{
+    if (null != this.CurHdrFtr)
+        return this.CurHdrFtr.Content.Get_StyleFromFormatting();
+
+    return null;
+};
+
 
 function CHdrFtrPage()
 {

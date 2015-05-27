@@ -140,10 +140,8 @@ function CStyle(Name, BasedOnId, NextId, type, bNoCreateTablePr)
     this.Name    = Name;
     this.BasedOn = BasedOnId;
     this.Next    = NextId;
-    if(null != type)
-        this.Type = type;
-    else
-        this.Type = styletype_Paragraph;
+    this.Type    = (null != type ? type : styletype_Paragraph);
+    this.Link    = null;
 
     this.qFormat        = null;// false
     this.uiPriority     = null;// -1
@@ -454,10 +452,20 @@ CStyle.prototype =
         this.Name = Value;
     },
 
+    Get_Name : function()
+    {
+        return this.Name;
+    },
+
     Set_BasedOn : function(Value)
     {
         History.Add( this, { Type : historyitem_Style_BasedOn, Old : this.BasedOn, New : Value } );
         this.BasedOn = Value;
+    },
+
+    Get_BasedOn : function()
+    {
+        return this.BasedOn;
     },
 
     Set_Next : function(Value)
@@ -466,10 +474,26 @@ CStyle.prototype =
         this.Next = Value;
     },
 
+    Get_Next : function()
+    {
+        return this.Next;
+    },
+
+    Set_Link : function(Value)
+    {
+        History.Add(this, { Type : historyitem_Style_Link, Old : this.Link, New : Value });
+        this.Link = Value;
+    },
+
     Set_Type : function(Value)
     {
         History.Add( this, { Type : historyitem_Style_Type, Old : this.Type, New : Value } );
         this.Type = Value;
+    },
+
+    Get_Type : function()
+    {
+        return this.Type;
     },
 
     Set_QFormat : function(Value)
@@ -500,6 +524,52 @@ CStyle.prototype =
     {
         History.Add( this, { Type : historyitem_Style_UnhideWhenUsed, Old : this.unhideWhenUsed, New : Value } );
         this.unhideWhenUsed = Value;
+    },
+
+    Clear : function(Name, BasedOnId, NextId, Type)
+    {
+        this.Set_Name(Name);
+        this.Set_BasedOn(BasedOnId);
+        this.Set_Next(NextId);
+        this.Set_Type(Type);
+
+        if (undefined != this.Link && null != this.Link)
+            this.Set_Link(null);
+
+        if (undefined != this.qFormat && null != this.qFormat)
+            this.Set_QFormat(null);
+
+        if (undefined != this.uiPriority && null != this.uiPriority)
+            this.Set_UiPriority(null);
+
+        if (undefined != this.hidden && null != this.hidden)
+            this.Set_Hidden(null);
+
+        if (undefined != this.semiHidden && null != this.semiHidden)
+            this.Set_SemiHidden(null);
+
+        if (undefined != this.unhideWhenUsed && null != this.unhideWhenUsed)
+            this.Set_UnhideWhenUsed(null);
+
+        this.Set_TextPr(new CTextPr());
+        this.Set_ParaPr(new CParaPr());
+        this.Set_TablePr(new CTablePr());
+        this.Set_TableRowPr(new CTableRowPr());
+        this.Set_TableCellPr(new CTableCellPr());
+
+        if (undefined != this.TableBand1Horz ) this.Set_TableBand1Horz (new CTableStylePr());
+        if (undefined != this.TableBand1Vert ) this.Set_TableBand1Vert (new CTableStylePr());
+        if (undefined != this.TableBand2Horz ) this.Set_TableBand2Horz (new CTableStylePr());
+        if (undefined != this.TableBand2Vert ) this.Set_TableBand2Vert (new CTableStylePr());
+        if (undefined != this.TableFirstCol  ) this.Set_TableFirstCol  (new CTableStylePr());
+        if (undefined != this.TableFirstRow  ) this.Set_TableFirstRow  (new CTableStylePr());
+        if (undefined != this.TableLastCol   ) this.Set_TableLastCol   (new CTableStylePr());
+        if (undefined != this.TableLastRow   ) this.Set_TableLastRow   (new CTableStylePr());
+        if (undefined != this.TableTLCell    ) this.Set_TableTLCell    (new CTableStylePr());
+        if (undefined != this.TableTRCell    ) this.Set_TableTRCell    (new CTableStylePr());
+        if (undefined != this.TableBLCell    ) this.Set_TableBLCell    (new CTableStylePr());
+        if (undefined != this.TableBRCell    ) this.Set_TableBRCell    (new CTableStylePr());
+        if (undefined != this.TableWholeTable) this.Set_TableWholeTable(new CTableStylePr());
     },
 //-----------------------------------------------------------------------------------
 //
@@ -2712,6 +2782,12 @@ CStyle.prototype =
                 this.unhideWhenUsed = Data.Old;
                 break;
             }
+
+            case historyitem_Style_Link:
+            {
+                this.Link = Data.Old;
+                break;
+            }
         }
     },
 
@@ -2882,6 +2958,12 @@ CStyle.prototype =
                 this.unhideWhenUsed = Data.New;
                 break;
             }
+
+            case historyitem_Style_Link:
+            {
+                this.Link = Data.New;
+                break;
+            }
         }
     },
 
@@ -2933,7 +3015,9 @@ CStyle.prototype =
             case historyitem_Style_Hidden          :
             case historyitem_Style_SemiHidden      :
             case historyitem_Style_UnhideWhenUsed  :
+            case historyitem_Style_Link            :
             {
+                bNeedRecalc = true;
                 break;
             }
         }
@@ -2947,7 +3031,16 @@ CStyle.prototype =
 
     Refresh_RecalcData2 : function()
     {
-        //editor.WordControl.m_oLogicDocument.Refresh_RecalcData2( 0, 0 );
+        // TODO: Надо сделать механизм, чтобы данное действие не вызывалось много раз подряд, а только 1.
+        var LogicDocument = editor.WordControl.m_oLogicDocument;
+        var AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(this.Id);
+
+        var Count = AllParagraphs.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Para = AllParagraphs[Index];
+            Para.Refresh_RecalcData( { Type : historyitem_Paragraph_PStyle } );
+        }
     },
 //-----------------------------------------------------------------------------------
 // Функции для совместного редактирования
@@ -2994,6 +3087,7 @@ CStyle.prototype =
             case historyitem_Style_Name:
             case historyitem_Style_BasedOn:
             case historyitem_Style_Next:
+            case historyitem_Style_Link:
             {
                 // Bool : is undefined
                 // (false)
@@ -3377,7 +3471,23 @@ CStyle.prototype =
                 break;
             }
 
+            case historyitem_Style_Link:
+            {
+                // Bool : is undefined
+                // (false)
+                //   Bool : is null
+                //   (false)
+                //     String : value
 
+                if ( true === Reader.GetBool() )
+                    this.Link = undefined;
+                else if ( true === Reader.GetBool() )
+                    this.Link = null;
+                else
+                    this.Link = Reader.GetString2();
+
+                break;
+            }
         }
     },
 
@@ -3654,6 +3764,7 @@ function CStyles(bCreateDefault)
     if (bCreateDefault !== false)
     {
         this.Id = g_oIdCounter.Get_NewId();
+        this.Lock = new CLock();
 
         this.Default =
         {
@@ -3930,6 +4041,8 @@ function CStyles(bCreateDefault)
 
         this.Style = [];
     }
+
+    this.LogicDocument = null;
 }
 
 CStyles.prototype =
@@ -3964,10 +4077,9 @@ CStyles.prototype =
     Add : function(Style)
     {
         var Id = Style.Get_Id();
-
         History.Add( this, { Type : historyitem_Styles_Add, Id : Id, Style : Style } );
         this.Style[Id] = Style;
-
+        this.Update_Interface(Id);
         return Id;
     },
 
@@ -3975,7 +4087,9 @@ CStyles.prototype =
     {
         History.Add( this, { Type : historyitem_Styles_Remove, Id : Id, Style : this.Style[Id] } );
         delete this.Style[Id];
+        this.Update_Interface(Id);
     },
+
     Copy : function()
     {
         var Styles = new CStyles();
@@ -4012,6 +4126,11 @@ CStyles.prototype =
 //-----------------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------------
+    Set_LogicDocument : function(LogicDocument)
+    {
+        this.LogicDocument = LogicDocument;
+    },
+
     Get_Pr : function(StyleId, Type, TableStyle, ShapeStyle)
     {
         var Pr = {TextPr: new CTextPr(), ParaPr: new CParaPr()};
@@ -4089,7 +4208,7 @@ CStyles.prototype =
         }
 
         // Рассчитываем стиль
-        this.Internal_Get_Pr( Pr, StyleId, Type, ( null === TableStyle && null == ShapeStyle  ? true : false ) );
+        this.Internal_Get_Pr( Pr, StyleId, Type, ( null === TableStyle && null == ShapeStyle  ? true : false ), [] );
 
         if ( styletype_Table === Type )
         {
@@ -4125,6 +4244,14 @@ CStyles.prototype =
             return this.Style[StyleId].Name;
 
         return "";
+    },
+
+    Get : function(StyleId)
+    {
+        if (undefined != this.Style[StyleId])
+            return this.Style[StyleId].Name;
+
+        return null;
     },
 
     Get_Default_Paragraph : function()
@@ -4178,7 +4305,7 @@ CStyles.prototype =
         return this.Default.Hyperlink;
     },
 
-    Get_StyleIdByName : function (Name)
+    Get_StyleIdByName : function (Name, bUseDefault)
     {
         for ( var Id in this.Style )
         {
@@ -4187,11 +4314,22 @@ CStyles.prototype =
                 return Id;
         }
 
-        return this.Default.Paragraph;
+        if (false !== bUseDefault)
+            return this.Default.Paragraph;
+
+        return null;
     },
 
-    Internal_Get_Pr : function(Pr, StyleId, Type, bUseDefault)
+    Internal_Get_Pr : function(Pr, StyleId, Type, bUseDefault, PassedStyles)
     {
+        // Делаем проверку от зацикливания, среди уже пройденных стилей ищем текущий стриль.
+        for (var nIndex = 0, nCount = PassedStyles.length; nIndex < nCount; nIndex++)
+        {
+            if (PassedStyles[nIndex] == StyleId)
+                return;
+        }
+        PassedStyles.push(StyleId);
+
         var Style = this.Style[StyleId];
         if ( undefined == StyleId || undefined === Style )
         {
@@ -4344,7 +4482,7 @@ CStyles.prototype =
         else
         {
             // Копируем свойства родительского стиля
-            this.Internal_Get_Pr( Pr, Style.BasedOn, Type );
+            this.Internal_Get_Pr( Pr, Style.BasedOn, Type, false, PassedStyles );
 
             // Копируем свойства из стиля нумерации, если она задана
             if ( (styletype_Paragraph === Type || styletype_Table === Type) && ( undefined != Style.ParaPr.NumPr ) )
@@ -4436,6 +4574,170 @@ CStyles.prototype =
 
         return TableStyles;
     },
+
+    Remove_StyleFromInterface : function(StyleId)
+    {
+        // Если этот стиль не один из стилей по умолчанию, тогда мы просто удаляем этот стиль
+        // и очищаем все параграфы с сылкой на этот стиль.
+
+        var Style = this.Style[StyleId];
+        if (StyleId == this.Default.Paragraph)
+        {
+            Style.Clear("Normal", null, null, styletype_Paragraph);
+            Style.Create_Default_Paragraph();
+        }
+        else if (StyleId == this.Default.Character)
+        {
+            Style.Clear("Default Paragraph Font", null, null, styletype_Character);
+            Style.Create_Default_Character();
+        }
+        else if (StyleId == this.Default.Numbering)
+        {
+            Style.Clear("No List", null, null, styletype_Numbering);
+            Style.Create_Default_Numbering();
+        }
+        else if (StyleId == this.Default.Table)
+        {
+            Style.Clear("Normal Table", null, null, styletype_Table);
+            Style.Create_NormalTable();
+        }
+        else if (StyleId == this.Default.TableGrid)
+        {
+            Style.Clear("Table Grid", this.Default.Table, null, styletype_Table);
+            Style.Create_TableGrid();
+        }
+        else if (StyleId == this.Default.Headings[0])
+        {
+            Style.Clear("Heading 1", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+            Style.Create_Heading1();
+        }
+        else if (StyleId == this.Default.Headings[1])
+        {
+            Style.Clear("Heading 2", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+            Style.Create_Heading2();
+        }
+        else if (StyleId == this.Default.Headings[2])
+        {
+            Style.Clear("Heading 3", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+            Style.Create_Heading3();
+        }
+        else if (StyleId == this.Default.Headings[3])
+        {
+            Style.Clear("Heading 4", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+            Style.Create_Heading4();
+        }
+        else if (StyleId == this.Default.Headings[4])
+        {
+            Style.Clear("Heading 5", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+            Style.Create_Heading5();
+        }
+        else if (StyleId == this.Default.Headings[5])
+        {
+            Style.Clear("Heading 6", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+            Style.Create_Heading6();
+        }
+        else if (StyleId == this.Default.Headings[6])
+        {
+            Style.Clear("Heading 7", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+            Style.Create_Heading7();
+        }
+        else if (StyleId == this.Default.Headings[7])
+        {
+            Style.Clear("Heading 8", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+            Style.Create_Heading8();
+        }
+        else if (StyleId == this.Default.Headings[8])
+        {
+            Style.Clear("Heading 9", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+            Style.Create_Heading9();
+        }
+        else if (StyleId == this.Default.ParaList)
+        {
+            Style.Clear("List Paragraph", this.Default.Paragraph, null, styletype_Paragraph);
+            Style.Create_ListParagraph();
+        }
+        else if (StyleId == this.Default.Header)
+        {
+            Style.Clear("Header", this.Default.Paragraph, null, styletype_Paragraph);
+            Style.Create_Header();
+        }
+        else if (StyleId == this.Default.Footer)
+        {
+            Style.Clear("Footer", this.Default.Paragraph, null, styletype_Paragraph);
+            Style.Create_Footer();
+        }
+        else if (StyleId == this.Default.Hyperlink)
+        {
+            Style.Clear("Hyperlink", null, null, styletype_Character);
+            Style.Create_Character_Hyperlink();
+        }
+        else
+        {
+            this.Remove(StyleId);
+
+            if (this.LogicDocument)
+            {
+                var AllParagraphs = this.LogicDocument.Get_AllParagraphsByStyle(StyleId);
+                var Count = AllParagraphs.length;
+                for (var Index = 0; Index < Count; Index++)
+                {
+                    var Para = AllParagraphs[Index];
+                    Para.Style_Remove();
+                }
+            }
+        }
+        this.Update_Interface(StyleId);
+    },
+
+    Create_StyleFromInterface : function(oAscStyle, bCheckLink)
+    {
+        var oStyle = new CStyle();
+
+        oStyle.Set_BasedOn(this.Get_StyleIdByName(oAscStyle.get_BasedOn(), false));
+        oStyle.Set_Next(this.Get_StyleIdByName(oAscStyle.get_Next(), false));
+        oStyle.Set_Type(oAscStyle.get_Type());
+
+        // Если у нас есть стиль с данным именем, тогда мы старый стиль удаляем, а новый добавляем со старым Id,
+        // чтобы если были ссылки на старый стиль - теперь они стали на новый.
+        var sStyleName = oAscStyle.get_Name();
+        var OldId = this.Get_StyleIdByName(sStyleName, false);
+        if (null != OldId)
+        {
+            var oOldStyle = this.Style[OldId];
+            if (null != oOldStyle.Get_Next() && null == oStyle.Get_Next())
+            {
+                oStyle.Set_Next(oOldStyle.Get_Next());
+            }
+
+            this.Remove(OldId);
+            oStyle.Set_Id(OldId);
+        }
+
+        oStyle.Set_Name(sStyleName);
+
+        if (styletype_Paragraph === oStyle.Get_Type())
+            oStyle.Set_QFormat(true);
+
+        var oAscLink = oAscStyle.get_Link();
+        if (false != bCheckLink && null != oAscLink && undefined !== oAscLink)
+        {
+            var oLinkedStyle = this.Create_StyleFromInterface(oAscLink, false);
+            oStyle.Set_Link(oLinkedStyle.Get_Id());
+            oLinkedStyle.Set_Link(oStyle.Get_Id());
+        }
+
+        oStyle.Set_TextPr(oAscStyle.get_TextPr());
+        oStyle.Set_ParaPr(oAscStyle.get_ParaPr());
+
+        this.Add(oStyle);
+        return oStyle;
+    },
+
+    Update_Interface : function(StyleId)
+    {
+        if (null != this.LogicDocument && undefined !== this.LogicDocument)
+            this.LogicDocument.Add_ChangedStyle(StyleId);
+    },
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
@@ -4448,12 +4750,14 @@ CStyles.prototype =
             case historyitem_Styles_Add:
             {
                 delete this.Style[Data.Id];
+                this.Update_Interface(Data.Id);
                 break;
             }
 
             case historyitem_Styles_Remove:
             {
                 this.Style[Data.Id] = Data.Style;
+                this.Update_Interface(Data.Id);
                 break;
             }
         }
@@ -4468,12 +4772,14 @@ CStyles.prototype =
             case historyitem_Styles_Add:
             {
                 this.Style[Data.Id] = Data.Style;
+                this.Update_Interface(Data.Id);
                 break;
             }
 
             case historyitem_Styles_Remove:
             {
                 delete this.Style[Data.Id];
+                this.Update_Interface(Data.Id);
                 break;
             }
         }
@@ -4500,34 +4806,10 @@ CStyles.prototype =
 
         switch ( Type )
         {
-            case historyitem_Style_TextPr          :
-            case historyitem_Style_ParaPr          :
-            case historyitem_Style_TablePr         :
-            case historyitem_Style_TableRowPr      :
-            case historyitem_Style_TableCellPr     :
-            case historyitem_Style_TableBand1Horz  :
-            case historyitem_Style_TableBand1Vert  :
-            case historyitem_Style_TableBand2Horz  :
-            case historyitem_Style_TableBand2Vert  :
-            case historyitem_Style_TableFirstCol   :
-            case historyitem_Style_TableFirstRow   :
-            case historyitem_Style_TableLastCol    :
-            case historyitem_Style_TableLastRow    :
-            case historyitem_Style_TableTLCell     :
-            case historyitem_Style_TableTRCell     :
-            case historyitem_Style_TableBLCell     :
-            case historyitem_Style_TableBRCell     :
-            case historyitem_Style_TableWholeTable :
-            case historyitem_Style_Name            :
-            case historyitem_Style_BasedOn         :
-            case historyitem_Style_Next            :
-            case historyitem_Style_Type            :
-            case historyitem_Style_QFormat         :
-            case historyitem_Style_UiPriority      :
-            case historyitem_Style_Hidden          :
-            case historyitem_Style_SemiHidden      :
-            case historyitem_Style_UnhideWhenUsed  :
+            case historyitem_Styles_Add   :
+            case historyitem_Styles_Remove:
             {
+                bNeedRecalc = true;
                 break;
             }
         }
@@ -4535,13 +4817,25 @@ CStyles.prototype =
         if ( true === bNeedRecalc )
         {
             // Сообщаем родительскому классу, что изменения произошли в элементе с номером this.Index и на странице this.PageNum
-            return this.Refresh_RecalcData2();
+            return this.Refresh_RecalcData2(Data.Id);
         }
     },
 
-    Refresh_RecalcData2 : function()
+    Refresh_RecalcData2 : function(StyleId)
     {
-        //editor.WordControl.m_oLogicDocument.Refresh_RecalcData2( 0, 0 );
+        if (undefined != StyleId)
+        {
+            // TODO: Надо сделать механизм, чтобы данное действие не вызывалось много раз подряд, а только 1.
+            var LogicDocument = editor.WordControl.m_oLogicDocument;
+            var AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(StyleId);
+
+            var Count = AllParagraphs.length;
+            for (var Index = 0; Index < Count; Index++)
+            {
+                var Para = AllParagraphs[Index];
+                Para.Refresh_RecalcData({ Type : historyitem_Paragraph_PStyle });
+            }
+        }
     },
 //-----------------------------------------------------------------------------------
 // Функции для совместного редактирования
@@ -4597,7 +4891,7 @@ CStyles.prototype =
 
                 var Id = Reader.GetString2();
                 this.Style[Id] = g_oTableId.Get_ById( Id );
-
+                this.Update_Interface(Id);
                 break;
             }
             case historyitem_Styles_Remove:
@@ -4606,7 +4900,7 @@ CStyles.prototype =
 
                 var Id = Reader.GetString2();
                 delete this.Style[Id];
-
+                this.Update_Interface(Id);
                 break;
             }
         }
@@ -9370,3 +9664,72 @@ function Copy_Bounds(Bounds)
     Bounds_new.Top    = Bounds.Top;
     return Bounds_new;
 }
+
+function asc_CStyle()
+{
+    this.Name    = "";
+
+    this.BasedOn = "";
+    this.Next    = "";
+    this.Link    = "";
+    this.Type    = styletype_Paragraph;
+
+    this.TextPr = new CTextPr();
+    this.ParaPr = new CParaPr();
+};
+asc_CStyle.prototype.get_Name = function()
+{
+    return this.Name;
+};
+asc_CStyle.prototype.put_Name = function(sName)
+{
+    this.Name = sName;
+};
+asc_CStyle.prototype.put_BasedOn = function(Name)
+{
+    this.BasedOn = Name;
+};
+asc_CStyle.prototype.get_BasedOn = function()
+{
+    return this.BasedOn;
+};
+asc_CStyle.prototype.put_Next = function(Name)
+{
+    this.Next = Name;
+};
+asc_CStyle.prototype.get_Next = function()
+{
+    return this.Next;
+};
+asc_CStyle.prototype.put_Type = function(Type)
+{
+    this.Type = Type;
+};
+asc_CStyle.prototype.get_Type = function()
+{
+    return this.Type;
+};
+asc_CStyle.prototype.put_Link = function(LinkStyle)
+{
+    this.Link = LinkStyle;
+};
+asc_CStyle.prototype.get_Link = function()
+{
+    return this.Link;
+};
+asc_CStyle.prototype.fill_ParaPr = function(oPr)
+{
+    this.ParaPr = oPr.Copy();
+};
+asc_CStyle.prototype.get_ParaPr = function()
+{
+    return this.ParaPr;
+};
+asc_CStyle.prototype.fill_TextPr = function(oPr)
+{
+    this.TextPr = oPr.Copy();
+};
+asc_CStyle.prototype.get_TextPr = function()
+{
+    return this.TextPr;
+};

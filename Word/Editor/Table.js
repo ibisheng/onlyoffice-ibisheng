@@ -2673,7 +2673,7 @@ CTable.prototype =
         return this.Content[0].Content[0].Content.Get_FirstParagraph();
     },
 
-    Get_AllParagraphs_ByNumbering : function(NumPr, ParaArray)
+    Get_AllParagraphs : function(Props, ParaArray)
     {
         var Count = this.Content.length;
         for ( var CurRow = 0; CurRow < Count; CurRow++ )
@@ -2683,7 +2683,7 @@ CTable.prototype =
             for ( var CurCell = 0; CurCell < Cells_Count; CurCell++ )
             {
                 var Cell = Row.Get_Cell( CurCell );
-                Cell.Content.Get_AllParagraphs_ByNumbering( NumPr, ParaArray );
+                Cell.Content.Get_AllParagraphs(Props, ParaArray);
             }
         }
     },
@@ -4875,7 +4875,6 @@ CTable.prototype =
 
         return { X : X_start, Y : Y, W : X_end - X_start, H : H, BaseLine : H, XLimit : this.XLimit };
     },
-
 
     Get_NearestPos : function( PageNum, X, Y, bAnchor, Drawing )
     {
@@ -19518,7 +19517,6 @@ CTable.prototype =
         return Pos;
     }
 };
-
 CTable.prototype.Get_TopElement = function()
 {
     if (!this.Parent)
@@ -19529,7 +19527,6 @@ CTable.prototype.Get_TopElement = function()
 
     return this.Parent.Get_TopElement();
 };
-
 CTable.prototype.Get_Index = function()
 {
     if (!this.Parent)
@@ -19539,12 +19536,10 @@ CTable.prototype.Get_Index = function()
 
     return this.Index;
 };
-
 CTable.prototype.Get_RowsCount = function()
 {
     return this.Content.length;
 };
-
 CTable.prototype.Get_Row = function(Index)
 {
     return this.Content[Index];
@@ -19575,6 +19570,17 @@ CTable.prototype.Start_SelectionFromCurPos = function()
     this.Internal_Selection_UpdateCells();
 
     this.CurCell.Content.Start_SelectionFromCurPos();
+};
+CTable.prototype.Get_StyleFromFormatting = function()
+{
+    var SelectionArray = this.Internal_Get_SelectionArray();
+    if (SelectionArray.length > 0)
+    {
+        var Pos = SelectionArray[0];
+        var Cell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
+        return Cell.Content.Get_StyleFromFormatting();
+    }
+    return null;
 };
 
 // Класс CTableRow

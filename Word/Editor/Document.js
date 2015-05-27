@@ -745,6 +745,7 @@ function CDocument(DrawingDocument)
 
     this.Numbering = new CNumbering();
     this.Styles    = new CStyles();
+    this.Styles.Set_LogicDocument(this);
 
     this.DrawingDocument = DrawingDocument;
 
@@ -819,6 +820,9 @@ function CDocument(DrawingDocument)
 
     // Проверяем режим редактирования
     this.EditingType = document_EditingType_Common;
+
+    // Контролируем изменения интерфейса
+    this.ChangedStyles = []; // Объект с Id стилями, которые были изменены/удалены/добавлены
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -7553,23 +7557,6 @@ CDocument.prototype =
         }
     },
 
-    Get_AllParagraphs_ByNumbering : function(NumPr)
-    {
-        var ParaArray = [];
-
-        this.SectionsInfo.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
-
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var Element = this.Content[Index];
-            Element.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
-        }
-
-        return ParaArray;
-    },
-
-
     Get_PageSizesByDrawingObjects : function()
     {
         return this.DrawingObjects.getPageSizesByDrawingObjects();
@@ -11857,6 +11844,7 @@ CDocument.prototype =
         this.Document_UpdateUndoRedoState();
         this.Document_UpdateCanAddHyperlinkState();
         this.Document_UpdateSectionPr();
+        this.Document_UpdateStylesPanel();
     },
     // Обновляем линейки
     Document_UpdateRulersState : function()
@@ -14498,14 +14486,99 @@ CDocument.prototype.Is_TrackingDrawingObjects = function()
  */
 CDocument.prototype.Get_StyleFromFormatting = function()
 {
-    return new CStyleProp();
+    if (docpostype_HdrFtr === this.CurPos.Type)
+    {
+        return this.HdrFtr.Get_StyleFromFormatting();
+    }
+    else if (docpostype_DrawingObjects === this.CurPos.Type)
+    {
+        return this.DrawingObjects.Get_StyleFromFormatting();
+    }
+    else //if (docpostype_Content === this.CurPos.Type)
+    {
+        if (true == this.Selection.Use)
+        {
+            if (this.Selection.StartPos > this.Selection.EndPos)
+                return this.Content[this.Selection.EndPos].Get_StyleFromFormatting();
+            else
+                return this.Content[this.Selection.StartPos].Get_StyleFromFormatting();
+        }
+        else
+        {
+            return this.Content[this.CurPos.ContentPos].Get_StyleFromFormatting();
+        }
+    }
 };
 /*
  * Добавляем новый стиль (или заменяем старый с таким же названием).
  */
 CDocument.prototype.Add_NewStyle = function(oStyle)
 {
+    if (false === this.Document_Is_SelectionLocked(changestype_Document_Styles))
+    {
+        History.Create_NewPoint(historydescription_Document_AddNewStyle);
+        this.Styles.Create_StyleFromInterface(oStyle);
+        this.Recalculate();
+        this.Document_UpdateInterfaceState();
+    }
+};
+CDocument.prototype.Remove_Style = function(sStyleName)
+{
+    var StyleId = this.Styles.Get_StyleIdByName(sStyleName, false);
+    // Сначала проверим есть ли стиль с таким именем
+    if (null == StyleId)
+        return;
 
+    if (false === this.Document_Is_SelectionLocked(changestype_Document_Styles))
+    {
+        History.Create_NewPoint(historydescription_Document_RemoveStyle);
+        this.Styles.Remove_StyleFromInterface(StyleId);
+        this.Recalculate();
+        this.Document_UpdateInterfaceState();
+    }
+};
+CDocument.prototype.Add_ChangedStyle = function(StyleId)
+{
+    this.ChangedStyles[StyleId] = true;
+};
+CDocument.prototype.Document_UpdateStylesPanel = function()
+{
+    var bNeedUpdate = false;
+    for (var StyleId in this.ChangedStyles)
+    {
+        bNeedUpdate = true;
+        break;
+    }
+
+    this.ChangedStyles = {};
+
+    if (true === bNeedUpdate)
+    {
+        editor.GenerateStyles();
+    }
+};
+CDocument.prototype.Get_AllParagraphs = function(Props)
+{
+    var ParaArray = [];
+
+    this.SectionsInfo.Get_AllParagraphs(Props, ParaArray);
+
+    var Count = this.Content.length;
+    for ( var Index = 0; Index < Count; Index++ )
+    {
+        var Element = this.Content[Index];
+        Element.Get_AllParagraphs(Props, ParaArray);
+    }
+
+    return ParaArray;
+};
+CDocument.prototype.Get_AllParagraphsByNumbering = function(NumPr)
+{
+    return this.Get_AllParagraphs({Numbering : true, NumPr : NumPr});
+};
+CDocument.prototype.Get_AllParagraphsByStyle = function(StyleId)
+{
+    return this.Get_AllParagraphs({Style : true, StyleId : StyleId});
 };
 
 //-----------------------------------------------------------------------------------
@@ -14582,7 +14655,7 @@ CDocumentSectionsInfo.prototype =
         }
     },
 
-    Get_AllParagraphs_ByNumbering : function(NumPr, ParaArray)
+    Get_AllParagraphs : function(Props, ParaArray)
     {
         var Count = this.Elements.length;
         for ( var Index = 0; Index < Count; Index++ )
@@ -14590,22 +14663,22 @@ CDocumentSectionsInfo.prototype =
             var SectPr = this.Elements[Index].SectPr;
 
             if ( null != SectPr.HeaderFirst )
-                SectPr.HeaderFirst.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
+                SectPr.HeaderFirst.Get_AllParagraphs(Props, ParaArray);
 
             if ( null != SectPr.HeaderDefault )
-                SectPr.HeaderDefault.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
+                SectPr.HeaderDefault.Get_AllParagraphs(Props, ParaArray);
 
             if ( null != SectPr.HeaderEven )
-                SectPr.HeaderEven.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
+                SectPr.HeaderEven.Get_AllParagraphs(Props, ParaArray);
 
             if ( null != SectPr.FooterFirst )
-                SectPr.FooterFirst.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
+                SectPr.FooterFirst.Get_AllParagraphs(Props, ParaArray);
 
             if ( null != SectPr.FooterDefault )
-                SectPr.FooterDefault.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
+                SectPr.FooterDefault.Get_AllParagraphs(Props, ParaArray);
 
             if ( null != SectPr.FooterEven )
-                SectPr.FooterEven.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
+                SectPr.FooterEven.Get_AllParagraphs(Props, ParaArray);
         }
     },
 

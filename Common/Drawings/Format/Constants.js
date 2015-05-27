@@ -1164,6 +1164,7 @@ var historyitem_Style_UiPriority      = 106; // Изменяем UiPriority
 var historyitem_Style_Hidden          = 107; // Изменяем Hidden
 var historyitem_Style_SemiHidden      = 108; // Изменяем SemiHidden
 var historyitem_Style_UnhideWhenUsed  = 109; // Изменяем UnhideWhenUsed
+var historyitem_Style_Link            = 110; // Изменяем Link
 
 // Типы изменений в классе CStyles
 var historyitem_Styles_Add    = 1; // Добавляем стиль
@@ -1562,9 +1563,8 @@ var historydescription_Presentation_PasteOnThumbnails              = 0x011f;
 var historydescription_Presentation_PasteOnThumbnailsSafari        = 0x0120;
 var historydescription_Document_ConvertOldEquation                 = 0x0121;
 var historydescription_Presentation_SetVert                        = 0x0122;
-
-
-
+var historydescription_Document_AddNewStyle                        = 0x0123;
+var historydescription_Document_RemoveStyle                        = 0x0124;
 
 
 function Get_HistoryPointStringDescription(nDescription)
@@ -1866,6 +1866,8 @@ function Get_HistoryPointStringDescription(nDescription)
         case historydescription_Presentation_PasteOnThumbnails              : sString = "Presentation_PasteOnThumbnails             "; break;
         case historydescription_Presentation_PasteOnThumbnailsSafari        : sString = "Presentation_PasteOnThumbnailsSafari       "; break;
         case historydescription_Document_ConvertOldEquation                 : sString = "Document_ConvertOldEquation                "; break;
+        case historydescription_Document_AddNewStyle                        : sString = "Document_AddNewStyle                       "; break;
+        case historydescription_Document_RemoveStyle                        : sString = "Document_RemoveStyle                       "; break;
     }
     return sString;
 }
