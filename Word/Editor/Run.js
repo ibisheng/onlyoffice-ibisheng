@@ -2301,7 +2301,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                         var bOverXEnd;
 
-                        if(bCompareOper && PRS.bFirstCompareOper == true && WorLenCompareOper > PRS.WrapIndent && !(Word == false && FirstItemOnLine == true)) // (Word == true && FirstItemOnLine == true) - не первый элемент в строке
+                        if(bCompareOper && PRS.bFirstCompareOper == true && PRS.bCompareWrapIndent == true && WorLenCompareOper > PRS.WrapIndent && !(Word == false && FirstItemOnLine == true)) // (Word == true && FirstItemOnLine == true) - не первый элемент в строке
                             PRS.bFirstCompareOper = false;
 
                         if(bOperBefore)  // оператор "до"
@@ -5315,7 +5315,6 @@ ParaRun.prototype.Recalc_CompiledPr = function(RecalcMeasure)
         this.RecalcInfo.Measure = true;
 
     // Если мы в формуле, тогда ее надо пересчитывать
-    this.private_UpdateMathResize();
     this.private_RecalcCtrPrp();
 };
 
@@ -6371,7 +6370,6 @@ ParaRun.prototype.Undo = function(Data)
 
             this.RecalcInfo.Measure = true;
             this.protected_UpdateSpellChecking();
-            this.private_UpdateMathResize();
 
             break;
         }
@@ -6387,7 +6385,6 @@ ParaRun.prototype.Undo = function(Data)
 
             this.RecalcInfo.Measure = true;
             this.protected_UpdateSpellChecking();
-            this.private_UpdateMathResize();
 
             break;
         }
@@ -6758,7 +6755,6 @@ ParaRun.prototype.Redo = function(Data)
 
             this.RecalcInfo.Measure = true;
             this.protected_UpdateSpellChecking();
-            this.private_UpdateMathResize();
 
             break;
 
@@ -6770,7 +6766,6 @@ ParaRun.prototype.Redo = function(Data)
 
             this.RecalcInfo.Measure = true;
             this.protected_UpdateSpellChecking();
-            this.private_UpdateMathResize();
 
             break;
         }
@@ -7614,7 +7609,6 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
 
             this.RecalcInfo.Measure = true;
             this.protected_UpdateSpellChecking();
-            this.private_UpdateMathResize();
 
             break;
         }
@@ -7640,7 +7634,6 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
 
             this.RecalcInfo.Measure = true;
             this.protected_UpdateSpellChecking();
-            this.private_UpdateMathResize();
 
             break;
         }
@@ -8233,11 +8226,6 @@ ParaRun.prototype.Clear_CollaborativeMarks = function()
 {
     this.CollaborativeMarks.Clear();
 };
-ParaRun.prototype.private_UpdateMathResize = function()
-{
-    if (para_Math_Run === this.Type && undefined !== this.Parent && null !== this.Parent && null !== this.Parent.ParaMath)
-        this.Parent.ParaMath.SetNeedResize();
-};
 ParaRun.prototype.private_RecalcCtrPrp = function()
 {
     if (para_Math_Run === this.Type && undefined !== this.Parent && null !== this.Parent && null !== this.Parent.ParaMath)
@@ -8816,6 +8804,35 @@ ParaRun.prototype.Math_PreRecalc = function(Parent, ParaMath, ArgSize, RPI, Gaps
 
     if(RPI.bChangeInline)
         this.RecalcInfo.Measure = true; // нужно сделать пересчет элементов, например для дроби, т.к. ArgSize у внутренних контентов будет другой => размер
+
+    if(RPI.bCorrect_FontSize)
+    {
+        var ArgSize     = this.Parent.Compiled_ArgSz.value;
+        var FontKoef;
+
+        if(ArgSize == -1 || ArgSize == -2)
+        {
+            var Pr = new CTextPr();
+
+            if(this.Pr.FontSize !== null && this.Pr.FontSize !== undefined)
+            {
+                FontKoef = MatGetKoeffArgSize(this.Pr.FontSize, ArgSize);
+                Pr.FontSize = MatReverseFontSize(this.Pr.FontSize, FontKoef);
+                this.RecalcInfo.TextPr  = true;
+                this.RecalcInfo.Measure = true;
+            }
+
+            if(this.Pr.FontSizeCS !== null && this.Pr.FontSizeCS !== undefined)
+            {
+                FontKoef = MatGetKoeffArgSize( this.Pr.FontSizeCS, ArgSize);
+                Pr.FontSizeCS = MatReverseFontSize(this.Pr.FontSizeCS, FontKoef);
+                this.RecalcInfo.TextPr  = true;
+                this.RecalcInfo.Measure = true;
+            }
+
+            this.Apply_Pr(Pr);
+        }
+    }
 
     for (var Pos = 0 ; Pos < this.Content.length; Pos++ )
     {

@@ -13405,6 +13405,9 @@ CRunRecalculateObject.prototype =
         if ( ( 0 === this.Lines.length || 0 === this.LinesLength ) && ( 0 === OLI.Lines.length || 0 === OLI.LinesLength ) )
             return true;
 
+        // заглушка для однострочных контентов
+        if(OLI.Type == para_Math_Content && OLI.bOneLine == true)
+            return true;
 
         if ( this.StartLine !== OLI.StartLine || this.StartRange !== OLI.StartRange || CurLine < 0 || CurLine >= this.private_Get_LinesCount() || CurLine >= OLI.protected_GetLinesCount() || CurRange < 0 || CurRange >= this.private_Get_RangesCount(CurLine) || CurRange >= OLI.protected_GetRangesCount(CurLine) )
             return false;

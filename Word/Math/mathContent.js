@@ -2,39 +2,40 @@
 
 function CRPI()
 {
-    this.NeedResize      = true;
-    this.bDecreasedComp  = false;
-    this.bInline         = false;
-    this.bChangeInline   = false;
-    this.bNaryInline     = false; /*для CDegreeSupSub внутри N-арного оператора, этот флаг необходим, чтобы итераторы максимально близко друг к другу расположить*/
-    this.bEqArray        = false; /*для амперсанда*/
-    this.bMathFunc       = false;
-    this.bRecalcCtrPrp   = false; // пересчет ctrPrp нужен, когда на Undo и тп изменился размер первого Run, а ctrPrp уже для мат объектов пересчитались
-    this.PRS             = null;
+    this.bDecreasedComp    = false;
+    this.bInline           = false;
+    this.bChangeInline     = false;
+    this.bNaryInline       = false; /*для CDegreeSupSub внутри N-арного оператора, этот флаг необходим, чтобы итераторы максимально близко друг к другу расположить*/
+    this.bEqArray          = false; /*для амперсанда*/
+    this.bMathFunc         = false;
+    this.bRecalcCtrPrp     = false; // пересчет ctrPrp нужен, когда на Undo и тп изменился размер первого Run, а ctrPrp уже для мат объектов пересчитались
+    this.PRS               = null;
+
+    this.bCorrect_FontSize = false;
 }
 CRPI.prototype.Copy = function()
 {
     var RPI = new CRPI();
 
-    RPI.NeedResize      = this.NeedResize;
-    RPI.bInline         = this.bInline;
-    RPI.bDecreasedComp  = this.bDecreasedComp;
-    RPI.bChangeInline   = this.bChangeInline;
-    RPI.bNaryInline     = this.bNaryInline;
-    RPI.bEqArray        = this.bEqArray;
-    RPI.bMathFunc       = this.bMathFunc;
-    RPI.bRecalcCtrPrp   = this.bRecalcCtrPrp;
-    RPI.PRS             = this.PRS;
+    RPI.bInline           = this.bInline;
+    RPI.bDecreasedComp    = this.bDecreasedComp;
+    RPI.bChangeInline     = this.bChangeInline;
+    RPI.bNaryInline       = this.bNaryInline;
+    RPI.bEqArray          = this.bEqArray;
+    RPI.bMathFunc         = this.bMathFunc;
+    RPI.bRecalcCtrPrp     = this.bRecalcCtrPrp;
+    RPI.PRS               = this.PRS;
+    RPI.bCorrect_FontSize = this.bCorrect_FontSize;
 
     return RPI;
 };
 CRPI.prototype.MergeMathInfo = function(MathInfo)
 {
-    this.bInline       = MathInfo.bInline;
+    this.bInline           = MathInfo.bInline;
 
-    this.NeedResize    = MathInfo.NeedResize;
-    this.bRecalcCtrPrp = MathInfo.bRecalcCtrPrp;
-    this.bChangeInline = MathInfo.bChangeInline;
+    this.bRecalcCtrPrp     = MathInfo.bRecalcCtrPrp;
+    this.bChangeInline     = MathInfo.bChangeInline;
+    this.bCorrect_FontSize = MathInfo.bCorrect_FontSize;
 };
 
 function CMathPointInfo()
@@ -1675,7 +1676,6 @@ CMathContent.prototype.SplitContent = function(NewContent, ContentPos, Depth)
         }
     }
 
-    this.private_SetNeedResize();
 };
 CMathContent.prototype.Add_ToContent = function(Pos, Item)
 {
@@ -1855,9 +1855,6 @@ CMathContent.prototype.Undo = function(Data)
         {
             this.Content.splice(Data.Pos, Data.EndPos - Data.Pos + 1);
 
-            if (null !== this.ParaMath)
-                this.ParaMath.SetNeedResize();
-
             break;
         }
         case historyitem_Math_RemoveItem:
@@ -1868,9 +1865,6 @@ CMathContent.prototype.Undo = function(Data)
             var Array_end   = this.Content.slice(Pos);
 
             this.Content = Array_start.concat(Data.Items, Array_end);
-
-            if (null !== this.ParaMath)
-                this.ParaMath.SetNeedResize();
 
             break;
         }
@@ -1891,17 +1885,11 @@ CMathContent.prototype.Redo = function(Data)
 
             this.Content = Array_start.concat(Data.Items, Array_end);
 
-            if (null !== this.ParaMath)
-                this.ParaMath.SetNeedResize();
-
             break;
         }
         case historyitem_Math_RemoveItem:
         {
             this.Content.splice(Data.Pos, Data.EndPos - Data.Pos + 1);
-
-            if (null !== this.ParaMath)
-                this.ParaMath.SetNeedResize();
 
             break;
         }
@@ -1989,8 +1977,6 @@ CMathContent.prototype.Load_Changes = function(Reader)
                     this.Content.splice(Pos, 0, Element);
             }
 
-            this.private_SetNeedResize();
-
             break;
         }
         case historyitem_Math_RemoveItem:
@@ -2005,8 +1991,6 @@ CMathContent.prototype.Load_Changes = function(Reader)
                 var ChangesPos = Reader.GetLong();
                 this.Content.splice(ChangesPos, 1);
             }
-
-            this.private_SetNeedResize();
 
             break;
         }
@@ -2047,9 +2031,6 @@ CMathContent.prototype.Insert_MathContent = function(oMathContent, Pos, bSelect)
             oMathContent.Content[nIndex].Select_All();
         }
     }
-
-    if (null !== this.ParaMath)
-        this.ParaMath.SetNeedResize();
 
     this.CurPos = Pos + nCount;
 
@@ -3878,11 +3859,6 @@ CMathContent.prototype.Check_NearestPos = function(ParaNearPos, Depth)
 
     var CurPos = ParaNearPos.NearPos.ContentPos.Get(Depth);
     this.Content[CurPos].Check_NearestPos(ParaNearPos, Depth + 1);
-};
-CMathContent.prototype.private_SetNeedResize = function()
-{
-    if (null !== this.ParaMath)
-        this.ParaMath.SetNeedResize();
 };
 CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 {

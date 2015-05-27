@@ -2177,6 +2177,7 @@ function CParagraphRecalculateStateWrap(Para)
 
     this.WrapIndent         = 0; // WrapIndent нужен для сравнения с длиной слова (когда слово разбивается по Compare Oper): ширина первой строки формулы не должна быть меньше WrapIndent
     this.bFirstCompareOper  = true;
+    this.bCompareWrapIndent = false;
 
     // у "крайних" в строке операторов/мат объектов сооответствующий Gap равен нулю
     this.OperGapRight       = 0;
@@ -2217,6 +2218,7 @@ CParagraphRecalculateStateWrap.prototype =
         this.bFirstCompareOper   = true;
         this.bInsideOper         = false;
         this.bFastRecalculate    = false;
+        this.bCompareWrapIndent  = false;
     },
 
     // Обнуляем некоторые параметры перед новым отрезком
@@ -2250,6 +2252,7 @@ CParagraphRecalculateStateWrap.prototype =
         this.bFirstCompareOper  = true;
         this.bInsideOper        = false;
         this.bFastRecalculate   = false;
+        this.bCompareWrapIndent = false;
     },
 
     Reset_PrevLineRecalcInfo : function()

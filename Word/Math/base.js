@@ -1052,9 +1052,6 @@ CMathBase.prototype.raw_SetRFontsHint = function(Value)
 CMathBase.prototype.NeedUpdate_CtrPrp = function()
 {
     this.RecalcInfo.bCtrPrp = true;
-
-    if(null !== this.ParaMath)
-        this.ParaMath.SetNeedResize();
 };
 CMathBase.prototype.SelectToParent = function(bCorrect)
 {
@@ -1113,7 +1110,23 @@ CMathBase.prototype.Save_RecalculateObject = function(Copy)
     }
     else
     {
-        RecalcObj = CMathBase.superclass.Save_RecalculateObject.call(this, Copy);
+
+        var Num = this.NumBreakContent;
+
+        RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
+        RecalcObj.Save_Lines( this, Copy );
+
+        for(var Pos = 0; Pos < this.Content.length; Pos++)
+        {
+            if(Pos == Num)
+            {
+                RecalcObj.Content[Pos] = this.Content[Pos].Save_RecalculateObject(Copy);
+            }
+            else
+            {
+                RecalcObj.Content[Pos] = new CEmptyRunRecalculateObject(this.StartLine, this.StartRange);
+            }
+        }
     }
 
     return RecalcObj;
@@ -1721,14 +1734,12 @@ CMathBase.prototype.raw_AddToContent = function(Pos, Items, bUpdatePosition)
     }
 
     this.fillContent();
-    this.private_SetNeedResize();
 };
 CMathBase.prototype.raw_RemoveFromContent = function(Pos, Count)
 {
     this.Content.splice(Pos, Count);
 
     this.fillContent();
-    this.private_SetNeedResize();
 };
 CMathBase.prototype.Recalc_RunsCompiledPr = function()
 {
@@ -2079,7 +2090,6 @@ CMathBase.prototype.private_UpdatePosOnAdd      = CMathContent.prototype.private
 CMathBase.prototype.private_UpdatePosOnRemove   = CMathContent.prototype.private_UpdateOnRemove;
 CMathBase.prototype.private_CorrectSelectionPos = CMathContent.prototype.private_CorrectSelectionPos;
 CMathBase.prototype.private_CorrectSelectionPos = CMathContent.prototype.private_CorrectSelectionPos;
-CMathBase.prototype.private_SetNeedResize       = CMathContent.prototype.private_SetNeedResize;
 CMathBase.prototype.Shift_Range                 = CMathContent.prototype.Shift_Range;
 CMathBase.prototype.private_CorrectCurPos = function()
 {

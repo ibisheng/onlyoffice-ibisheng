@@ -251,6 +251,10 @@ CParaMathLineWidths.prototype.Get = function(Line)
 {
     return this.private_GetW(Line);
 };
+CParaMathLineWidths.prototype.GetFirst = function()
+{
+    return this.private_GetW(0);
+};
 CParaMathLineWidths.prototype.GetMax = function()
 {
     return this.MaxW;
@@ -388,6 +392,28 @@ CMathPageInfo.prototype.GetCurrentMaxWidth = function()
 {
     return this.Info[this.CurPage].LineWidths.GetMax();
 };
+CMathPageInfo.prototype.GetCurrentMaxWidthAllLines = function()
+{
+    var MaxW = 0;
+    if(this.CurPage !== 0)
+    {
+        MaxW = this.Info[this.CurPage].LineWidths.GetMax();
+    }
+    else
+    {
+        var MaxWOFirst = this.Info[this.CurPage].LineWidths.GetMax(),
+            FirstW     = this.Info[this.CurPage].LineWidths.GetFirst();
+
+        var MathSettings = Get_WordDocumentDefaultMathSettings(),
+            WrapState = this.GetCurrentWrapState();
+
+        var wrapIndent = MathSettings.Get_WrapIndent(WrapState);
+
+        MaxW = FirstW + wrapIndent > MaxWOFirst ? FirstW + wrapIndent : MaxWOFirst;
+    }
+
+    return MaxW;
+};
 CMathPageInfo.prototype.GetMaxWidthOnPage = function(_Page) // without first page
 {
     var Page = _Page - this.StartPage;
@@ -489,7 +515,6 @@ ParaMath.prototype.Copy = function(Selected)
 
     /// argSize, bDot и bRoot выставить на объединении контентов
 
-    NewMath.SetNeedResize();
     NewMath.Root.Correct_Content(true);
 
     return NewMath;
@@ -554,8 +579,6 @@ ParaMath.prototype.Get_CompiledTextPr = function(Copy)
 
 ParaMath.prototype.Add = function(Item)
 {
-    this.ParaMathRPI.NeedResize = true;
-
     var Type = Item.Type;
     var oSelectedContent = this.GetSelectContent();
 
@@ -713,7 +736,6 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
 };
 ParaMath.prototype.Remove = function(Direction, bOnAddText)
 {
-    this.ParaMathRPI.NeedResize = true;
     var oSelectedContent = this.GetSelectContent();
 
     var nStartPos = oSelectedContent.Start;
@@ -865,9 +887,6 @@ ParaMath.prototype.Get_CurrentParaPos = function()
 ParaMath.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 {
     // TODO: ParaMath.Apply_TextPr
-
-    this.ParaMathRPI.NeedResize = true;
-
 
     if(ApplyToAll == true) // для ситуации, когда ApplyToAll = true, в Root формулы при этом позиции селекта не проставлены
     {
@@ -1091,6 +1110,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var DispDef = MathSettings.Get_DispDef(),
         bInline = this.ParaMathRPI.bInline;
 
+    //здесь обновляем WrapState, исходя из этого параметра будем считать WrapIndent
     this.PageInfo.UpdateCurrentWrap(DispDef, bInline);
 
     var WrapState = this.PageInfo.GetCurrentWrapState();
@@ -1100,14 +1120,16 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     var WrapIndent = MathSettings.Get_WrapIndent(WrapState);
 
+    PRS.WrapIndent = WrapIndent;
+
     if(bStartLine == false)
     {
         PRS.X += WrapIndent;
-        PRS.WrapIndent = 0;
+        //PRS.bCompareWrapIndent = false;
     }
     else
     {
-        PRS.WrapIndent = WrapIndent;
+        PRS.bCompareWrapIndent = true;
     }
 
     PRS.XRange = PRS.X;
@@ -1118,6 +1140,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         PRS.PrevLineRecalcInfo.Object = null;
     }
 
+    //console.log("Line " + PRS.Line);
 
     this.Root.Recalculate_Range(PRS, ParaPr, Depth);
 
@@ -1292,6 +1315,7 @@ ParaMath.prototype.Refresh_RecalcData2 = function(Data)
 
 ParaMath.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
 {
+    // TODO переделать
     if (true === this.NeedResize)
     {
         var RPI = new CRPI();
@@ -1358,8 +1382,6 @@ ParaMath.prototype.Set_Inline = function(value)
     if(value !== this.ParaMathRPI.bInline)
     {
         this.ParaMathRPI.bChangeInline = true;
-        this.ParaMathRPI.NeedResize   = true;
-
         this.ParaMathRPI.bInline = value;
     }
 };
@@ -1403,11 +1425,6 @@ ParaMath.prototype.Set_Align = function(Align)
 ParaMath.prototype.raw_SetAlign = function(Align)
 {
     this.Jc = Align;
-    this.SetNeedResize();
-};
-ParaMath.prototype.SetNeedResize = function()
-{
-    this.ParaMathRPI.NeedResize = true;
 };
 ParaMath.prototype.SetRecalcCtrPrp = function(Class)
 {
@@ -2158,8 +2175,6 @@ ParaMath.prototype.Handle_AddNewLine = function()
         NeedRecalculate = true;
     }
 
-    if (true === NeedRecalculate)
-        this.SetNeedResize();
 
     return NeedRecalculate;
 };
@@ -2268,7 +2283,8 @@ ParaMath.prototype.Is_ContentUse  = function(MathContent)
  */
 ParaMath.prototype.Correct_AfterConvertFromEquation = function()
 {
-
+    this.ParaMathRPI.bCorrect_FontSize = true;
+    //this.Root.Correct_AfterConvertFromEquation();
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -3149,21 +3165,24 @@ function MatGetKoeffArgSize(FontSize, ArgSize)
 
     return FontKoef;
 }
-
+function MatReverseFontSize(FontSize, FontKoef)
+{
+    return (((FontSize/FontKoef * 2 + 0.5) | 0) / 2) ;
+}
 
 function CMathRecalculateInfo()
 {
-    this.NeedResize      = true;
-    this.bChangeInline   = true;
-    this.bRecalcCtrPrp   = false; // необходимо для пересчета CtrPrp (когда изменились текстовые настройки у первого элемнента, ctrPrp нужно пересчитать заново для всей формулы)
-
-    this.bInline         = false;
+    this.bChangeInline     = true;
+    this.bRecalcCtrPrp     = false; // необходимо для пересчета CtrPrp (когда изменились текстовые настройки у первого элемнента, ctrPrp нужно пересчитать заново для всей формулы)
+    this.bInline           = false;
+    this.bCorrect_FontSize = false;
 }
 CMathRecalculateInfo.prototype.ClearRecalculate = function()
 {
-    this.NeedResize      = false;
     this.bRecalcCtrPrp   = false;
     this.bChangeInline   = false;
+    this.bRecalcCtrPrp   = false;
+    this.bCorrect_FontSize = false;
 };
 
 
@@ -3175,12 +3194,14 @@ function CMathRecalculateObject()
 CMathRecalculateObject.prototype.Fill = function(PageInfo)
 {
     this.WrapState = PageInfo.GetCurrentWrapState();
-    this.MaxW      = PageInfo.GetCurrentMaxWidth();
+    this.MaxW      = PageInfo.GetCurrentMaxWidthAllLines();
 };
 CMathRecalculateObject.prototype.Load_MathInfo = function(PageInfo)
 {
     PageInfo.SetCurrentWrapState(this.WrapState);
-    PageInfo.SetCurrentMaxWidth(this.MaxW);
+
+    // текущая MaxW и MaxW в PageInfo это не одно и то же
+    //PageInfo.SetCurrentMaxWidth(this.MaxW);
 };
 CMathRecalculateObject.prototype.Compare = function(PageInfo)
 {
@@ -3189,7 +3210,7 @@ CMathRecalculateObject.prototype.Compare = function(PageInfo)
     if(this.WrapState !== PageInfo.GetCurrentWrapState())
         result = false;
 
-    if(this.MaxW !== PageInfo.GetCurrentMaxWidth())
+    if(this.MaxW !== PageInfo.GetCurrentMaxWidthAllLines())
         result = false;
 
     return result;

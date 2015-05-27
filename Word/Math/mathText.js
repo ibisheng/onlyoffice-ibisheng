@@ -977,6 +977,14 @@ CMathAmp.prototype =
     {
         return ( (this.size.width + this.GapLeft + this.GapRight)* TEXTWIDTH_DIVIDER ) | 0;
     },
+    Update_GapLeft: function(Gap)
+    {
+        this.GapLeft = Gap;
+    },
+    Update_GapRight: function(Gap)
+    {
+        this.GapRight = Gap;
+    },
     relate: function(parent)
     {
         this.Parent = parent;

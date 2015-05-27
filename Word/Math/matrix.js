@@ -717,7 +717,6 @@ CEqArray.prototype.setPr = function(NewPr)
 CEqArray.prototype.raw_SetPr = function(NewPr)
 {
     this.Pr = NewPr;
-    this.private_SetNeedResize();
 };
 CEqArray.prototype.fillContent = function()
 {
