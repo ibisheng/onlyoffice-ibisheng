@@ -9733,3 +9733,20 @@ asc_CStyle.prototype.get_TextPr = function()
 {
     return this.TextPr;
 };
+
+/*
+ * Export
+ * -----------------------------------------------------------------------------
+ */
+window["Asc"]["asc_CStyle"] = window["Asc"].asc_CStyle = asc_CStyle;
+asc_CStyle.prototype["get_Name"]    = asc_CStyle.prototype.get_Name;
+asc_CStyle.prototype["put_Name"]    = asc_CStyle.prototype.put_Name;
+asc_CStyle.prototype["get_BasedOn"] = asc_CStyle.prototype.get_BasedOn;
+asc_CStyle.prototype["put_BasedOn"] = asc_CStyle.prototype.put_BasedOn;
+asc_CStyle.prototype["get_Next"]    = asc_CStyle.prototype.get_Next;
+asc_CStyle.prototype["put_Next"]    = asc_CStyle.prototype.put_Next;
+asc_CStyle.prototype["get_Type"]    = asc_CStyle.prototype.get_Type;
+asc_CStyle.prototype["put_Type"]    = asc_CStyle.prototype.put_Type;
+asc_CStyle.prototype["get_Link"]    = asc_CStyle.prototype.get_Link;
+asc_CStyle.prototype["put_Link"]    = asc_CStyle.prototype.put_Link;
+
