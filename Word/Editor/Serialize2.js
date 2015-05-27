@@ -5055,6 +5055,20 @@ function BinaryFileReader(doc, openParams)
 			var elem = this.oReadResult.styles[i];
 			var oNewStyle = elem.style;
 			var sNewStyleId = oNewStyle.Get_Id();
+			if(null != oNewStyle.BasedOn){
+				var oStyleBasedOn = this.oReadResult.styles[oNewStyle.BasedOn];
+				if(oStyleBasedOn)
+					oNewStyle.Set_BasedOn(oStyleBasedOn.style.Get_Id());
+				else
+					oNewStyle.Set_BasedOn(null);
+			}
+			if(null != oNewStyle.Next){
+				var oStyleNext = this.oReadResult.styles[oNewStyle.Next];
+				if(oStyleNext)
+					oNewStyle.Set_Next(oStyleNext.style.Get_Id());
+				else
+					oNewStyle.Set_Next(null);
+			}
 			var oNewId = elem.param;
 			var sNewStyleName = oNewStyle.Name.toLowerCase().replace(/\s/g,"");
 			if(true == oNewId.def)
