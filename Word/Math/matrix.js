@@ -865,6 +865,18 @@ CEqArray.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 
     pos.x += this.size.width;
 };
+CEqArray.prototype.setJustification = function(js)
+{
+    if(js == MCJC_RIGHT)
+    {
+
+    }
+    else if(js == MCJC_LEFT)
+    {
+
+    }
+
+};
 CEqArray.prototype.getElement = function(num)
 {
     return this.elements[num][0];
