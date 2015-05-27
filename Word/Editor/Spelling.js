@@ -23,7 +23,8 @@ var DOCUMENT_SPELLING_EXCEPTIONAL_WORDS =
 
 function CDocumentSpelling()
 {
-    this.Use          = true; 
+    this.Use          = true;
+    this.TurnOn       = 1;
     this.ErrorsExceed = false;
     this.Paragraphs  = {}; // Параграфы, в которых есть ошибки в орфографии (объект с ключом - Id параграфа)
     this.Words       = {}; // Слова, которые пользователь решил пропустить(нажал "пропустить все") при проверке орфографии
@@ -39,6 +40,16 @@ function CDocumentSpelling()
 
 CDocumentSpelling.prototype =
 {
+    TurnOff : function()
+    {
+        this.TurnOn -= 1;
+    },
+
+    TurnOn : function()
+    {
+        this.TurnOn += 1;
+    },
+
     Add_Paragraph : function(Id, Para)
     {
         this.Paragraphs[Id] = Para;
@@ -99,6 +110,9 @@ CDocumentSpelling.prototype =
 
     Continue_CheckSpelling : function()
     {
+        if (0 == this.TurnOn)
+            return;
+
         if (true === this.ErrorsExceed)
             return;
         
@@ -705,6 +719,15 @@ CDocument.prototype.Stop_CheckSpelling = function()
 CDocument.prototype.Continue_CheckSpelling = function()
 {
     this.Spelling.Continue_CheckSpelling();
+};
+
+CDocument.prototype.TurnOff_CheckSpelling = function()
+{
+    this.Spelling.TurnOff();
+};
+CDocument.prototype.TurnOn_CheckSpelling = function()
+{
+    this.Spelling.TurnOn();
 };
 
 //----------------------------------------------------------------------------------------------------------------------
