@@ -867,13 +867,29 @@ CEqArray.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 };
 CEqArray.prototype.setJustification = function(js)
 {
-    if(js == MCJC_RIGHT)
-    {
+    var lng = this.Content.length;
+    var NewElement, Run;
 
+    if(js == MCJC_LEFT)
+    {
+        for(var i = 0; i < lng; i++)
+        {
+            NewElement = new CMathAmp();
+            Run = this.Content[i].Content[0];
+            Run.Cursor_MoveToStartPos();
+            Run.Add(NewElement, true);
+        }
     }
-    else if(js == MCJC_LEFT)
+    else if(js == MCJC_RIGHT)
     {
-
+        for(var i = 0; i < lng; i++)
+        {
+            NewElement = new CMathAmp();
+            var EndPos = this.Content[i].Content.length - 1;
+            Run = this.Content[i].Content[EndPos];
+            Run.Cursor_MoveToEndPos();
+            Run.Add(NewElement, true);
+        }
     }
 
 };
