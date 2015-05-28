@@ -553,9 +553,10 @@ function asc_docs_api(name)
 								frameWindow.document.write(content);
 								frameWindow.document.close();
 							}
-							else
+							else{
 								oThis.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
-							oThis.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+								oThis.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+							}
 						}
 					};
 					xhr.send(fd);
