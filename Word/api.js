@@ -1575,6 +1575,12 @@ asc_docs_api.prototype._coSpellCheckInit = function() {
 asc_docs_api.prototype.asc_getSpellCheckLanguages = function() {
 	return g_spellCheckLanguages;
 };
+asc_docs_api.prototype.asc_SpellCheckDisconnect = function() {
+	if (!this.SpellCheckApi)
+		return; // Error
+	this.SpellCheckApi.disconnect();
+	this.WordControl.m_oLogicDocument.TurnOff_CheckSpelling();
+};
 
 asc_docs_api.prototype._onUpdateDocumentCanSave = function () {
 	// Можно модифицировать это условие на более быстрое (менять самим состояние в аргументах, а не запрашивать каждый раз)
@@ -6771,6 +6777,8 @@ asc_docs_api.prototype.SetViewMode = function( isViewMode )
 {
     if (isViewMode)
     {
+		this.asc_SpellCheckDisconnect();
+
         this.isViewMode = true;
         this.ShowParaMarks = false;
 		CollaborativeEditing.m_bGlobalLock = true;
