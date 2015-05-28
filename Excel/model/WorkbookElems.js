@@ -4346,7 +4346,7 @@ TablePart.prototype.clone = function(ws) {
 	return res;
 };
 TablePart.prototype.recalc = function(ws) {
-	this.DisplayName = ws.workbook.oNameGenerator.getNextTableName(ws, this.Ref);
+	this.DisplayName = ws.workbook.dependencyFormulas.getNextTableName(ws, this.Ref);
 };
 TablePart.prototype.moveRef = function(col, row) {
 	var ref = this.Ref.clone();

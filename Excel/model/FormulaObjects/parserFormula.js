@@ -1222,7 +1222,7 @@ function cName( val, wb, ws ) {
     this.wb = wb;
     this.ws = ws;
     this.defName = this.wb.getDefinesNames( this.value, this.ws ? this.ws.getId() : null );
-    if( this.defName ){
+    if( this.defName && this.defName.Ref ){
         this.ref = new parserFormula( this.defName.Ref, "", this.ws );
         this.ref.parse();
     }
@@ -1236,7 +1236,7 @@ cName.prototype.reInit = function () {
 };
 cName.prototype.toRef = function () {
 
-    if(!this.defName){
+    if(!this.defName || !this.defName.Ref ){
         return new cError( "#NAME?" );
     }
 
@@ -1261,7 +1261,8 @@ cName.prototype.toRef = function () {
     return new cError( "#NAME?" );
 };
 cName.prototype.toString = function () {
-    return this.value;
+    return this.defName.Name;
+//    return this.value;
 
 //    var dN = this.wb.getDefinesNames( this.value, this.ws.getId() );
 //    if ( dN ) {
@@ -1282,26 +1283,26 @@ cName.prototype.getRef = function () {
 
 };
 cName.prototype.reParse = function () {
-    var dN = this.wb.getDefinesNames( this.value, this.ws.getId() );
+    var dN = this.wb.getDefinesNames( this.defName.Name, this.ws.getId() );
      if( dN ){
          this.ref = new parserFormula( dN, "", this.ws );
          this.ref.parse();
      }
     else{
          this.ref = null;
-     }
+    }
 };
 cName.prototype.addDefinedNameNode = function (nameReParse) {
     if(nameReParse){
         this.reParse();
     }
 
-    if(!this.defName){
-        return this.wb.dependencyFormulas.addDefinedNameNode( this.value, null );
+    if(!this.defName || !this.defName.Ref){
+        return this.wb.dependencyFormulas.addDefinedNameNode( this.defName.Name, null );
     }
 
-    var dN = this.wb.getDefinesNames( this.value, this.ws.getId() );
-
+    var dN = this.wb.getDefinesNames( this.defName.Name, this.ws.getId() );
+    dN = dN.getAscCDefName();
     var node = this.wb.dependencyFormulas.addDefinedNameNode( dN.Name, dN.LocalSheetId ),
         wsR, ref, nTo;
     for ( var i = 0; i < this.ref.outStack.length; i++ ) {
@@ -3141,6 +3142,8 @@ parserFormula.prototype = {
     },
 
     parse:function ( local, digitDelim ) {
+
+        this.pCurrPos = 0;
 
         if ( this.isParsed )
             return this.isParsed;

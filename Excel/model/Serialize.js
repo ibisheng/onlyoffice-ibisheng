@@ -2159,49 +2159,15 @@
         this.WriteDefinedNames = function()
         {
             var oThis = this;
-            //собираем все defined names в массив
-            var allDefined = {};
-            if(null != this.wb.oRealDefinedNames)
-            {
-                for(var i in this.wb.oRealDefinedNames)
-                {
-                    var oDefinedName = this.wb.oRealDefinedNames[i];
-                    if(null == allDefined[oDefinedName.Name]){
-                        allDefined[oDefinedName.Name] = {global: oDefinedName, local: {}};
-                    }
+
+            var defNameList = this.wb.dependencyFormulas.saveDefName();
+
+            if(null != defNameList ){
+                for(var i = 0; i < defNameList.length; i++){
+                    this.bs.WriteItem(c_oSerWorkbookTypes.DefinedName, function(){oThis.WriteDefinedName(defNameList[i]);});
                 }
             }
-            for(var i = 0, length = this.wb.aWorksheets.length; i < length; ++i)
-            {
-                var ws = this.wb.aWorksheets[i];
-                if(null != ws.DefinedNames)
-                {
-                    for(var j in ws.DefinedNames)
-                    {
-                        var oDefinedName = ws.DefinedNames[j];
-                        var elem = allDefined[oDefinedName.Name];
-                        if(null == elem)
-                        {
-                            elem = {global: null, local: {}};
-                            allDefined[oDefinedName.Name] = elem;
-                        }
-                        elem.local[i] = oDefinedName;
-                    }
-                }
-            }
-            for(var i in allDefined)
-            {
-                var elem = allDefined[i];
-                for(var j in elem.local)
-                {
-                    var localElem = elem.local[j];
-                    var nLocalIndex = j - 0;
-                    if(null != localElem)
-                        this.bs.WriteItem(c_oSerWorkbookTypes.DefinedName, function(){oThis.WriteDefinedName(localElem, nLocalIndex);});
-                }
-                if(null != elem.global)
-                    this.bs.WriteItem(c_oSerWorkbookTypes.DefinedName, function(){oThis.WriteDefinedName(elem.global);});
-            }
+
         };
         this.WriteDefinedName = function(oDefinedName, LocalSheetId)
         {
@@ -2216,8 +2182,9 @@
                 this.memory.WriteByte(c_oSerDefinedNameTypes.Ref);
                 this.memory.WriteString2(oDefinedName.Ref);
             }
-            if (null != LocalSheetId)
-                this.bs.WriteItem(c_oSerDefinedNameTypes.LocalSheetId, function(){oThis.memory.WriteLong(LocalSheetId);});
+            if (null !== oDefinedName.LocalSheetId){
+                this.bs.WriteItem(c_oSerDefinedNameTypes.LocalSheetId, function(){oThis.memory.WriteLong(oDefinedName.LocalSheetId);});
+            }
         };
     }
     function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aFonts, aFills, aBorders, aNums, idWorksheet, isCopyPaste)
@@ -3673,7 +3640,7 @@
                     return oThis.ReadTable(t,l, oNewTable);
                 });
                 if(null != oNewTable.Ref && null != oNewTable.DisplayName)
-                    this.ws.workbook.oNameGenerator.addTableName(oNewTable.DisplayName, this.ws, oNewTable.Ref);
+                    this.ws.workbook.dependencyFormulas.addTableName(oNewTable.DisplayName, this.ws, oNewTable.Ref);
                 aTables.push(oNewTable);
             }
             else
@@ -5134,7 +5101,7 @@
         };
         this.ReadDefinedNames = function(type, length)
         {
-            var res = c_oSerConstants.ReadOk;
+            var res = c_oSerConstants.ReadOk, LocalSheetId;
             var oThis = this;
             if ( c_oSerWorkbookTypes.DefinedName == type )
             {
@@ -5144,20 +5111,13 @@
                 });
                 if(null != oNewDefinedName.Name && null != oNewDefinedName.Ref)
                 {
-                    if(null != oNewDefinedName.LocalSheetId)
-                    {
-                        var ws = this.oWorkbook.aWorksheets[oNewDefinedName.LocalSheetId];
-                        if(null != ws)
-                        {
-                            ws.DefinedNames[oNewDefinedName.Name.toLowerCase()] = oNewDefinedName;
-                            this.oWorkbook.oNameGenerator.addLocalDefinedName(oNewDefinedName);
-                        }
+                    LocalSheetId = oNewDefinedName.LocalSheetId;
+                    if(LocalSheetId !== null ){
+                        LocalSheetId = this.oWorkbook.aWorksheets[oNewDefinedName.LocalSheetId].getId();
                     }
-                    else
-                    {
-                        this.oWorkbook.oNameGenerator.addDefinedName(oNewDefinedName);
-                        this.oWorkbook.oRealDefinedNames[oNewDefinedName.Name.toLowerCase()] = oNewDefinedName;
-                    }
+
+                    this.oWorkbook.dependencyFormulas.addDefinedNameNode(oNewDefinedName.Name, LocalSheetId, oNewDefinedName.Ref);
+
                 }
             }
             else

@@ -2076,6 +2076,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			return this.wbModel.getWorksheet(index).getName();
 		};
 
+        spreadsheet_api.prototype.asc_getWorksheetNameById = function (id) {
+			return this.wbModel.getWorksheetById(id).getName();
+		};
+
 
 		spreadsheet_api.prototype.asc_getWorksheetTabColor = function (index) {
 			return this.wbModel.getWorksheet(index).getTabColor();

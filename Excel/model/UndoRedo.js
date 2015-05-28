@@ -2863,7 +2863,7 @@ UndoRedoWorkbook.prototype = {
                 this.wb.delDefinesNames( Data.newName );
             }
             else{
-                this.wb.editDefinesNames( null, Data.newName );
+                this.wb.editDefinesNames( null, Data.newName, bUndo );
             }
             /*TODO
             * Ввели формулу в которой есть именованный диапазон, но ИД нет в списке ИД. Результат формулы #NAME!.
@@ -2872,20 +2872,21 @@ UndoRedoWorkbook.prototype = {
             * */
         }
         else if(historyitem_Workbook_DefinedNamesChange === Type ){
-            var oldName, newName;
+            var oldName, newName, res;
             if(bUndo){
+                oldName = Data.newName;
+                newName= Data.oldName;
+            }
+            else{
                 oldName = Data.oldName;
                 newName = Data.newName;
             }
-            else{
-                oldName = Data.newName;
-                newName = Data.oldName;
-            }
-            this.wb.editDefinesNames( oldName, newName );
+            res = this.wb.editDefinesNames( oldName, newName );
+            this.wb.handlers.trigger("asc_onEditDefName", oldName, newName);
         }
         else if(historyitem_Workbook_DefinedNamesDelete === Type ){
             if(bUndo){
-                this.wb.editDefinesNames( null, Data );
+                this.wb.editDefinesNames( null, Data, bUndo );
                 if( Data.slaveEdge ){
                     var n;
                     for(var i = 0; i < Data.slaveEdge.length; i++){
@@ -2903,6 +2904,7 @@ UndoRedoWorkbook.prototype = {
                     }
                     sortDependency(this.wb);
                 }
+                this.wb.handlers.trigger("asc_onEditDefName", null, Data);
             }
             else{
                 this.wb.delDefinesNames( Data );

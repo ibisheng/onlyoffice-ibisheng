@@ -1953,7 +1953,7 @@
             //ToDo проверка defName.ref на знак "=" в начале ссылки. знака нет тогда это либо число либо строка, так делает Excel.
             var res = this.model.editDefinesNames(oldName, newName);
             if( oldName ){
-                this.handlers.trigger("asc_onEditDefName", res);
+                this.handlers.trigger("asc_onEditDefName", oldName, newName);
             }
             else{
                 this.handlers.trigger("asc_onDefName", res);

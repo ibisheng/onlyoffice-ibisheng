@@ -3106,8 +3106,8 @@ var maxIndividualValues = 10000;
 						newFilter.AutoFilter = new AutoFilter();
 						newFilter.AutoFilter.Ref = ref;
 					}
-					
-					newFilter.DisplayName = aWs.workbook.oNameGenerator.getNextTableName(aWs, ref);
+
+					newFilter.DisplayName = aWs.workbook.dependencyFormulas.getNextTableName(aWs, ref);
 					
 					newFilter.TableStyleInfo = new TableStyleInfo();
 					newFilter.TableStyleInfo.Name = style;

@@ -224,13 +224,13 @@
 		/** @constructor */
         function asc_CDefName(n, r, s) {
             this.Name = n?n:null;
-            this.Scope = s?s:null;
+            this.LocalSheetId = s?s:null;
             this.Ref = r?r:null;
         }
 
         asc_CDefName.prototype = {
             asc_getName: function(){return this.Name;},
-            asc_getScope: function(){return this.Scope;},
+            asc_getScope: function(){return this.LocalSheetId;},
             asc_getRef: function(){return this.Ref;}
         };
 

@@ -44,9 +44,12 @@ function DependencyGraph( wb ) {
     this.nodesCell = null;
     this.nodesArea = null;
     this.defNameList = {};
+    this.defNameSheets = {};
     this.nodeslength = null;
     this.bSetRefError = false;
     this.oChangeNodeSlave = null;
+    this.sTableNamePattern = "Table";
+    this.nTableNameMaxIndex = 0;
     this.clear();
 }
 DependencyGraph.prototype = {
@@ -83,13 +86,7 @@ DependencyGraph.prototype = {
     getNode:function ( sheetId, cellId ) {
         return this.nodesId[getVertexId( sheetId, cellId )];
     },
-    getDefNameNode:function ( node ) {
-        return this.defNameList[node];
-    },
-    addDefinedNameNode:function(defName, defScope){
-        var dfv = new DefNameVertex(defScope,defName,this.wb);
-        return this.defNameList[dfv.nodeId] = dfv;
-    },
+
     addNode2:function ( node ) {
         return this.addNode( node.sheetId, node.cellId );
     },
@@ -811,6 +808,157 @@ DependencyGraph.prototype = {
     },
     getAll:function () {
         return this.nodesId;
+    },
+
+
+    /*Defined Names section*/
+    getDefNameNode:function ( node ) {
+        return this.defNameList[node];
+    },
+    getDefNameNodeByName:function(name, sheetId){
+
+        name = name.toLowerCase();
+
+        var _this = this, sheetNodeList,
+            nodeId = getDefNameVertexId( sheetId, name ),
+            oRes = false;
+
+        if ( null != sheetId ) {
+            sheetNodeList = this.defNameSheets[sheetId];
+            if(sheetNodeList ){
+                nodeId = getDefNameVertexId( sheetId, name );
+                oRes = sheetNodeList[nodeId];
+                if( oRes ) return oRes;
+            }
+        }
+
+        sheetNodeList = this.defNameSheets["WB"];
+        nodeId = getDefNameVertexId( null, name );
+        oRes = sheetNodeList[nodeId];
+        if( oRes ) return oRes;
+
+        return oRes;
+    },
+    getDefNameNodeByRef:function(ref, sheetId){
+        var sheetNodeList;
+
+        if ( null != sheetId ) {
+            sheetNodeList = this.defNameSheets[sheetId];
+            for(var id in sheetNodeList){
+                if( sheetNodeList[id].Ref == ref ){
+                    return sheetNodeList[id].Name;
+                }
+            }
+        }
+
+        sheetNodeList = this.defNameSheets["WB"];
+        for ( var id in sheetNodeList ) {
+            if ( sheetNodeList[id].Ref === ref ) {
+                return sheetNodeList[id].Name;
+            }
+        }
+
+        return false;
+    },
+    addDefinedNameNode:function(defName, defScope, defRef, bUndo){
+        var _this = this,
+            nodeId = getDefNameVertexId( defScope, defName ),
+            oRes = this.defNameList[nodeId],
+            dfv, defNameSheetsList;
+
+        if( null == oRes ){
+            dfv = new DefNameVertex(defScope,defName,defRef,this.wb);
+            oRes = (this.defNameList[dfv.nodeId] = dfv);
+            defNameSheetsList = this.defNameSheets[dfv.sheetId];
+            if( defNameSheetsList  == null ){
+                defNameSheetsList = {};
+                this.defNameSheets[dfv.sheetId] = defNameSheetsList;
+            }
+            defNameSheetsList[dfv.nodeId] = dfv;
+        }
+
+        if(bUndo){
+            oRes.Ref = defRef;
+        }
+
+        return oRes;
+
+    },
+    remoteDefName:function(sheetId, name){
+        var nodeId = getDefNameVertexId( sheetId, name ),
+            oRes = this.defNameList[nodeId],
+            ret = null;
+
+        if( oRes ){
+            this.defNameList[nodeId].Ref = null;
+            ret = oRes;
+        }
+
+        return ret;
+
+    },
+    changeDefName: function( oldDefName, newDefName ){
+        var oldN = this.getDefNameNodeByName( oldDefName.Name, oldDefName.Scope ),
+            res = null, sheetNodeList, nodeId,
+            sheetId = oldDefName.Scope,
+            name = oldDefName.Name;
+
+
+        sheetNodeList = this.defNameSheets[sheetId||"WB"];
+        nodeId = getDefNameVertexId( sheetId||"WB", name );
+
+        sheetNodeList[nodeId] = null;
+        delete sheetNodeList[nodeId];
+
+        this.defNameList[nodeId] = null;
+        delete this.defNameList[nodeId];
+
+        oldN.changeDefName(newDefName);
+
+        this.defNameList[oldN.nodeId] = oldN;
+        sheetNodeList[oldN.nodeId] = oldN;
+
+        return oldN;
+    },
+    saveDefName:function(){
+        var list = [], defN;
+        for(var id in this.defNameList){
+            defN = this.defNameList[id];
+            if( defN.isTable ){continue;}
+            if(defN.Ref != null){
+                defN = defN.getAscCDefName()
+                if(defN.LocalSheetId !== null){
+                    defN.LocalSheetId = this.wb.aWorksheetsById[defN.LocalSheetId].index;
+                }
+                list.push(defN);
+            }
+        }
+        return list;
+    },
+    getNextTableName:function(ws, Ref){
+        this.nTableNameMaxIndex++;
+        var sNewName = this.sTableNamePattern + this.nTableNameMaxIndex,
+            name = getDefNameVertexId(null,sNewName);
+        while(this.defNameList[name])
+        {
+            this.nTableNameMaxIndex++;
+            sNewName = this.sTableNamePattern + this.nTableNameMaxIndex;
+            name = getDefNameVertexId(null,sNewName);
+        }
+        this.addTableName(sNewName,ws,Ref);
+        console.log( sNewName );
+        return sNewName;
+    },
+    addTableName : function(sName, ws, Ref){
+
+        var dfv = new DefNameVertex(null,sName,parserHelp.get3DRef(ws.getName(), Ref.getAbsName()),this.wb,true ),
+            defNameSheetsList = this.defNameSheets[dfv.sheetId];
+        this.defNameList[dfv.nodeId] = dfv;
+        if( defNameSheetsList  == null ){
+            defNameSheetsList = {};
+            this.defNameSheets[dfv.sheetId] = defNameSheetsList;
+        }
+        defNameSheetsList[dfv.nodeId] = dfv;
     }
 };
 
@@ -1059,10 +1207,15 @@ Vertex.prototype = {
 	
 };
 
-function DefNameVertex(scope,defName,wb){
+function DefNameVertex(scope,defName,defRef,wb,isTable){
 
-	this.sheetId = scope || "WB";
-	this.cellId = defName;
+    this.sheetId  = scope === null || scope === undefined ? "WB" : scope
+
+//	this.sheetId = scope || "WB";
+	this.cellId = defName.toLowerCase();
+	this.Ref = defRef;
+    this.Name = defName
+    this.isTable = isTable;
 	this.nodeId = getDefNameVertexId(this.sheetId, defName);
     this.wb = wb;
 
@@ -1267,7 +1420,18 @@ DefNameVertex.prototype = {
 				this.cell = ws._getCellNoEmpty(this.bbox.r1, this.bbox.c1);
 		}
 		return this.cell;
-	}
+	},
+
+    getAscCDefName:function(){
+        return new Asc.asc_CDefName( this.Name, this.Ref, this.sheetId == "WB" ? null : this.sheetId );
+    },
+
+    changeDefName:function(newName){
+        this.cellId = newName.Name.toLowerCase();
+        this.Ref = newName.Ref;
+        this.Name = newName.Name;
+        this.nodeId = getDefNameVertexId(this.sheetId, newName.Name);
+    }
 
 };
 
@@ -1275,7 +1439,7 @@ function getVertexId(sheetId, cellId){
 	return sheetId + cCharDelimiter + cellId;
 }
 function getDefNameVertexId(scope, name){
-	return (scope || "WB") + cCharDelimiter + name.toLowerCase();
+	return ( scope === null || scope === undefined ? "WB" : scope ) + cCharDelimiter + name.toLowerCase();
 }
 function lockDraw(wb){
     lc++;
@@ -1513,7 +1677,7 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	
 	this.DefinedNames = {};
 	this.oRealDefinedNames = {};
-	this.oNameGenerator = new NameGenerator(this);
+//	this.oNameGenerator = new NameGenerator(this);
 	this.CellStyles = new CCellStyles();
 	this.TableStyles = new Asc.CTableStyles();
 	this.oStyleManager = new StyleManager();
@@ -1997,45 +2161,16 @@ Workbook.prototype.isDefinedNamesExists = function(name, sheetId){
 Workbook.prototype.getDefinesNamesWB = function () {
     var names = [];
 
-    for ( var id in this.aWorksheetsById ) {
-        var ws = this.getWorksheetById( id );
-        if ( null != ws ) {
-            if ( ws.DefinedNames ) {
-                for ( var _id in ws.DefinedNames ) {
-                    names.push( ws.DefinedNames[_id] );
-                }
-            }
-        }
-    }
-
-    if ( this.DefinedNames ) {
-        for ( var _id in this.DefinedNames ) {
-            names.push( this.DefinedNames[_id] );
-        }
+    for(var id in this.dependencyFormulas.defNameList ){
+        names.push(this.dependencyFormulas.defNameList[id].getAscCDefName());
     }
 
     return names;
 }
 Workbook.prototype.getDefinesNames = function ( name, sheetId ) {
 
-    var n = name.toLowerCase();
-
-    if ( null != sheetId ) {
-        var ws = this.getWorksheetById( sheetId );
-        if ( null != ws ) {
-            if ( ws.DefinedNames ) {
-                var oDefName = ws.DefinedNames[n];
-                if ( null != oDefName )
-                    return oDefName;
-            }
-        }
-    }
-    if ( this.DefinedNames ) {
-        var oDefName = this.DefinedNames[n];
-        if ( null != oDefName )
-            return oDefName;
-    }
-    return false;
+    var res = this.dependencyFormulas.getDefNameNodeByName(name, sheetId);
+    return res;
 };
 Workbook.prototype.setDefinesNames = function ( defName ) {
     var n = defName.Name.toLowerCase(),
@@ -2093,42 +2228,9 @@ Workbook.prototype.setDefinesNames = function ( defName ) {
 };
 Workbook.prototype.delDefinesNames = function ( defName ) {
     History.Create_NewPoint();
-    var n = defName.Name.toLowerCase(),
-        retRes = false;
+    var retRes = false, res = null;
 
-    var dN = this.DefinedNames || {};
-    if ( null != n.Scope ) {
-        var ws = this.getWorksheetByName( n.Scope );
-        if ( ws ) {
-            if ( ws.DefinedNames ) {
-                if ( null == ws.DefinedNames[n] ) {
-                    retRes = false;
-                }
-                else {
-//                    History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames(ws.DefinedNames[n].Name, ws.DefinedNames[n].Ref, ws.DefinedNames[n].Scope));
-                    ws.DefinedNames[n] = null;
-                    delete ws.DefinedNames[n];
-
-                    retRes = true;
-                }
-            }
-        }
-    }
-    else {
-        if ( null != dN[n] ) {
-
-            if( this.oRealDefinedNames[n] ){
-                this.oRealDefinedNames[n] = null;
-                delete this.oRealDefinedNames[n];
-            }
-
-//            History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames(dN[n].Name, dN[n].Ref, dN[n].Scope));
-            dN[n] = null;
-            delete dN[n];
-
-            retRes = true;
-        }
-    }
+    retRes = this.dependencyFormulas.remoteDefName(defName.LocalSheetId,defName.Name);
 
     if( retRes ){
         /*
@@ -2138,19 +2240,15 @@ Workbook.prototype.delDefinesNames = function ( defName ) {
          *  удаляем старые master и добавляем новые, которые получились в результате разбора новой ссылки; пересчитываем формулу.
          * */
 
+        var nSE, se, seUndoRedo = [];
+            nSE = retRes.getSlaveEdges();
 
-
-        var defNameID = getDefNameVertexId( defName.Scope, n ),
-            n = this.dependencyFormulas.getDefNameNode( defNameID ), nSE, se, seUndoRedo = [];
-        if(n){
-            nSE = n.getSlaveEdges();
-
-            n.deleteAllMasterEdges();
+            retRes.deleteAllMasterEdges();
 
             for( var id in nSE ){
                 seUndoRedo.push(id);
                 se = nSE[id];
-                se.deleteMasterEdge(n);
+                se.deleteMasterEdge(retRes);
 
                 this.needRecalc.nodes[se.nodeId] = [se.sheetId, se.cellId ];
                 this.needRecalc.length++;
@@ -2166,7 +2264,6 @@ Workbook.prototype.delDefinesNames = function ( defName ) {
             }
 
             sortDependency(this);
-        }
 
         History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames(defName.Name, defName.Ref, defName.Scope, seUndoRedo));
     }
@@ -2174,96 +2271,32 @@ Workbook.prototype.delDefinesNames = function ( defName ) {
     return retRes;
 
 }
-Workbook.prototype.editDefinesNames = function ( oldName, newName ) {
+Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
 
-    var oldN, newN = newName.Name.toLowerCase(), retRes = null, _tmp,
-        dN = this.DefinedNames || {};
+    var newN = newName.Name.toLowerCase(), retRes = null, rename = false;
 
     if ( !rx_defName.test( newN ) ) {
         return retRes;
     }
 
     if(oldName){
-        oldN = oldName.Name.toLowerCase();
-
-        if ( null != oldName.Scope ) {
-            var ws = this.getWorksheetByName( oldName.Scope );
-            if ( ws ) {
-                if ( ws.DefinedNames ) {
-                    if ( null == ws.DefinedNames[oldN] ) {
-                        retRes = null;
-                    }
-                    else {
-                        ws.DefinedNames[newN] = ws.DefinedNames[oldN];
-                        ws.DefinedNames[newN].Name = newName.Name;
-                        ws.DefinedNames[newN].Ref = newName.Ref;
-//                    ws.DefinedNames[newN].LocalSheetId = ws.getId();
-
-                        if ( oldN != newN ) {
-                            ws.DefinedNames[oldN] = null;
-                            delete ws.DefinedNames[oldN];
-                        }
-
-                        _tmp = [ws.DefinedNames[newN].LocalSheetId,oldN,newN];
-
-                        retRes = new Asc.asc_CDefName( ws.DefinedNames[newN].Name, ws.DefinedNames[newN].Ref, newName.Scope );
-                    }
-                }
-            }
-        }
-        else {
-            if ( null != dN[oldN] ) {
-                dN[newN] = dN[oldN];
-                dN[newN].Name = newName.Name;
-                dN[newN].Ref = newName.Ref;
-                dN[newN].LocalSheetId = null;
-
-                if ( oldN != newN ) {
-                    dN[oldN] = null;
-                    delete dN[oldN];
-                }
-
-                _tmp = [null,oldN,newN];
-
-                retRes = new Asc.asc_CDefName( dN[newN].Name, dN[newN].Ref, null );
-            }
-        }
-
+        retRes = this.dependencyFormulas.changeDefName( oldName, newName );
+        rename = true;
     }
     else{
-        if ( null != newName.Scope ) {
-            var ws = this.getWorksheetById( newName.Scope );
-            if ( ws ) {
-                if ( ws.DefinedNames ) {
-                    if ( ws.DefinedNames[newN] ) {
-                        retRes = new Asc.asc_CDefName( ws.DefinedNames[newN].Name, ws.DefinedNames[newN].Ref, ws.getIndex() );
-                    }
-                    else {
-                        if ( dN[newN] ) {
-                            return new Asc.asc_CDefName( dN[newN].Name, dN[newN].Ref, null );
-                        }
-                        ws.DefinedNames[newN] = { LocalSheetId:newName.Scope, Name:newName.Name, Ref:newName.Ref, bTable:false };
-                        retRes = new Asc.asc_CDefName( ws.DefinedNames[newN].Name, ws.DefinedNames[newN].Ref, ws.getIndex() );
-                    }
-                }
-            }
-            return null;
-        }
-
-        if ( dN[newN] ) {
-            return new Asc.asc_CDefName( dN[newN].Name, dN[newN].Ref, null );
-        }
-        else {
-            dN[newN] = { LocalSheetId:null, Name:newName.Name, Ref:newName.Ref, bTable:false };
-            retRes = new Asc.asc_CDefName( dN[newN].Name, dN[newN].Ref, null );
-        }
-
+        retRes = this.dependencyFormulas.addDefinedNameNode(newName.Name, newName.Scope, newName.Ref, bUndo);
     }
 
     if( retRes ){
 
         History.Create_NewPoint();
-        History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesAdd, null, null, new UndoRedoData_DefinedNamesChange(oldName, newName));
+
+        if(rename){
+            History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesChange, null, null, new UndoRedoData_DefinedNamesChange(oldName, newName));
+        }
+        else{
+            History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesAdd, null, null, new UndoRedoData_DefinedNamesChange(oldName, newName));
+        }
 
         /*
         * #1. поменяли название - перестроили формулу. нужно вызвать пересборку формул в ячейках, в которыйх есть эта именованная ссылка.
@@ -2272,61 +2305,44 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName ) {
         *  удаляем старые master и добавляем новые, которые получились в результате разбора новой ссылки; пересчитываем формулу.
         * */
 
-        if(_tmp){
-            var defNameID = getDefNameVertexId(_tmp[0], _tmp[1]);
-            var n = this.dependencyFormulas.getDefNameNode( defNameID );
-            var nSE = n.getSlaveEdges(), se;
+        if(rename){
+            var nSE = retRes.getSlaveEdges(), se;
 
-            n.deleteAllMasterEdges();
+            retRes.deleteAllMasterEdges();
 
             for( var id in nSE ){
                 se = nSE[id];
-                se.deleteMasterEdge(n);
+                se.deleteMasterEdge(retRes);
 
                 this.needRecalc.nodes[se.nodeId] = [se.sheetId, se.cellId ];
                 this.needRecalc.length++;
 
                 se = se.returnCell();
                 se ? function(){
-                                    se.setFormula(se.formulaParsed.assemble());
-                                    se.formulaParsed.buildDependencies(true);
-                               }() : null;
+                        se.setFormula(se.formulaParsed.assemble());
+                        se.formulaParsed.buildDependencies(true);
+                   }() : null;
 
             }
 
             sortDependency(this);
         }
+
+        retRes = retRes.getAscCDefName();
     }
 
     return retRes;
 
 };
 Workbook.prototype.findDefinesNames = function(ref, sheetId){
-    if ( null != sheetId ) {
-        var ws = this.getWorksheetById( sheetId );
-        if ( null != ws ) {
-            if ( ws.DefinedNames ) {
-                for ( var id in ws.DefinedNames ) {
-                    if ( ws.DefinedNames[id].Ref === ref ) {
-                        return ws.DefinedNames[id].Name;
-                    }
-                }
-            }
-        }
-    }
-    if ( this.DefinedNames ) {
-        for ( var id in this.DefinedNames ) {
-            if ( this.DefinedNames[id].Ref === ref ) {
-                return this.DefinedNames[id].Name;
-            }
-        }
-    }
-    return false;
+
+    return this.dependencyFormulas.getDefNameNodeByRef(ref, sheetId);
+
 }
 Workbook.prototype.buildDependency = function(){
 	this.dependencyFormulas.clear();
-	this.dependencyFormulas = null;
-	this.dependencyFormulas = new DependencyGraph(this);
+//	this.dependencyFormulas = null;
+//	this.dependencyFormulas = new DependencyGraph(this);
 	for(var i in this.cwf){
 		this.getWorksheetById(i)._BuildDependencies(this.cwf[i].cells);
 	}
@@ -8887,47 +8903,6 @@ function DefinedName(){
 	this.LocalSheetId = null;
 	this.bTable = false;
 }
-function NameGenerator(wb){
-	this.wb = wb;
-	this.aExistNames = {};
-	this.sTableNamePattern = "Table";
-	this.nTableNameMaxIndex = 0;
-}
-NameGenerator.prototype = {
-	addName : function(sName){
-		this.aExistNames[sName] = 1;
-	},
-	addLocalDefinedName : function(oDefinedName){
-		this.addName(oDefinedName.Name);
-	},
-	addDefinedName : function(oDefinedName){
-		this.wb.DefinedNames[oDefinedName.Name.toLowerCase()] = oDefinedName;
-		this.addName(oDefinedName.Name);
-	},
-	addTableName : function(sName, ws, Ref){
-		var oNewDefinedName = new DefinedName();
-		oNewDefinedName.Name = sName;
-		oNewDefinedName.Ref = parserHelp.get3DRef(ws.getName(), Ref);
-		oNewDefinedName.bTable = true;
-		this.addDefinedName(oNewDefinedName);
-	},
-	isExist : function(sName)
-	{
-		return null != this.aExistNames[sName];
-	},
-	getNextTableName : function(ws, Ref){
-		this.nTableNameMaxIndex++;
-		var sNewName = this.sTableNamePattern + this.nTableNameMaxIndex;
-		while(null != this.aExistNames[sNewName])
-		{
-			this.nTableNameMaxIndex++;
-			sNewName = this.sTableNamePattern + this.nTableNameMaxIndex;
-		}
-		this.addTableName(sNewName, ws, Ref);
-		return sNewName;
-	}
-};
-
 
 //-------------------------------------------------------------------------------------------------
 

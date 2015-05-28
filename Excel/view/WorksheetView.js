@@ -10203,14 +10203,15 @@
                 var r2 = mc_norm ? mc_norm.isEqual(ar_norm)? mc_norm.r1 : ar_norm.r2 : ar_norm.r2;
 
                 ascRange = new asc_Range(c1, r1, c2, r2 );
+                /*TODO: сделать поиск по названиям автофигур, должен искать до того как вызвать поиск по именованным диапазонам*/
                 var defName = new Asc.asc_CDefName( reference, this.model.getName()+"!"+ascRange.getAbsName(), null ),
                     _C2H50H_ = this.model.workbook.editDefinesNames( null, defName ), sheetName = "", ref = "";
                 if(_C2H50H_){
+
                     sheetName = _C2H50H_.Ref.split("!");
                     ref = sheetName[1];
                     sheetName = sheetName[0];
                     range = {range:asc.g_oRangeCache.getAscRange(ref), sheet:sheetName};
-
                     this.model.workbook.handlers.trigger("asc_onDefName", defName);
 
                 }
