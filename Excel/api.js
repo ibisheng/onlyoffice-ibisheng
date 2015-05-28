@@ -2129,6 +2129,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
             return this.wb.delDefinedNames(oldName);
         };
 
+        spreadsheet_api.prototype.asc_getDefaultDefinedName = function () {
+            return this.wb.getDefaultDefinedName();
+        };
+
 		// Залочена ли работа с листом
 		spreadsheet_api.prototype.asc_isWorksheetLockedOrDeleted = function (index) {
 			var ws = this.wbModel.getWorksheet(index);
