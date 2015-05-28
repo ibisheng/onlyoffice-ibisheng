@@ -1968,6 +1968,15 @@
 
         };
 
+        WorkbookView.prototype.getDefaultDefinedName = function () {
+            //ToDo проверка defName.ref на знак "=" в начале ссылки. знака нет тогда это либо число либо строка, так делает Excel.
+
+            var ws = this.getWorksheet();
+
+            return new Asc.asc_CDefName( "", ws.getSelectionRangeValue(), null );
+
+        };
+
 		// Печать
 		WorkbookView.prototype.printSheet = function (pdf_writer, printPagesData) {
 			var ws;

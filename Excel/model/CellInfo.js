@@ -223,9 +223,9 @@
 
 		/** @constructor */
         function asc_CDefName(n, r, s) {
-            this.Name = n?n:null;
-            this.LocalSheetId = s?s:null;
-            this.Ref = r?r:null;
+            this.Name = n;
+            this.LocalSheetId = s;
+            this.Ref = r;
         }
 
         asc_CDefName.prototype = {

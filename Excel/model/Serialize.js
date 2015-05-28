@@ -5111,12 +5111,8 @@
                 });
                 if(null != oNewDefinedName.Name && null != oNewDefinedName.Ref)
                 {
-                    LocalSheetId = oNewDefinedName.LocalSheetId;
-                    if(LocalSheetId !== null ){
-                        LocalSheetId = this.oWorkbook.aWorksheets[oNewDefinedName.LocalSheetId].getId();
-                    }
 
-                    this.oWorkbook.dependencyFormulas.addDefinedNameNode(oNewDefinedName.Name, LocalSheetId, oNewDefinedName.Ref);
+                    this.oWorkbook.dependencyFormulas.addDefinedNameNode(oNewDefinedName.Name, oNewDefinedName.LocalSheetId, oNewDefinedName.Ref);
 
                 }
             }

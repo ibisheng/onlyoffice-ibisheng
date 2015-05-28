@@ -860,14 +860,18 @@ DependencyGraph.prototype = {
 
         return false;
     },
-    addDefinedNameNode:function(defName, defScope, defRef, bUndo){
+    addDefinedNameNode:function(defName, sheetId, defRef, bUndo){
+
+        var ws = this.wb.getWorksheet(sheetId)
+        ws ? sheetId = ws.getId() : null;
+
         var _this = this,
-            nodeId = getDefNameVertexId( defScope, defName ),
+            nodeId = getDefNameVertexId( sheetId, defName ),
             oRes = this.defNameList[nodeId],
             dfv, defNameSheetsList;
 
         if( null == oRes ){
-            dfv = new DefNameVertex(defScope,defName,defRef,this.wb);
+            dfv = new DefNameVertex(sheetId,defName,defRef,this.wb);
             oRes = (this.defNameList[dfv.nodeId] = dfv);
             defNameSheetsList = this.defNameSheets[dfv.sheetId];
             if( defNameSheetsList  == null ){
@@ -885,6 +889,10 @@ DependencyGraph.prototype = {
 
     },
     remoteDefName:function(sheetId, name){
+
+        var ws = this.wb.getWorksheet(sheetId)
+        ws ? sheetId = ws.getId() : null;
+
         var nodeId = getDefNameVertexId( sheetId, name ),
             oRes = this.defNameList[nodeId],
             ret = null;
@@ -898,11 +906,13 @@ DependencyGraph.prototype = {
 
     },
     changeDefName: function( oldDefName, newDefName ){
-        var oldN = this.getDefNameNodeByName( oldDefName.Name, oldDefName.Scope ),
-            res = null, sheetNodeList, nodeId,
-            sheetId = oldDefName.Scope,
-            name = oldDefName.Name;
 
+        var ws = this.wb.getWorksheet(oldDefName.LocalSheetId ), sheetId = null;
+        ws ? sheetId = ws.getId() : null;
+
+        var oldN = this.getDefNameNodeByName( oldDefName.Name, sheetId ),
+            res = null, sheetNodeList, nodeId,
+            name = oldDefName.Name;
 
         sheetNodeList = this.defNameSheets[sheetId||"WB"];
         nodeId = getDefNameVertexId( sheetId||"WB", name );
@@ -926,11 +936,7 @@ DependencyGraph.prototype = {
             defN = this.defNameList[id];
             if( defN.isTable ){continue;}
             if(defN.Ref != null){
-                defN = defN.getAscCDefName()
-                if(defN.LocalSheetId !== null){
-                    defN.LocalSheetId = this.wb.aWorksheetsById[defN.LocalSheetId].index;
-                }
-                list.push(defN);
+                list.push(defN.getAscCDefName());
             }
         }
         return list;
@@ -1423,7 +1429,7 @@ DefNameVertex.prototype = {
 	},
 
     getAscCDefName:function(){
-        return new Asc.asc_CDefName( this.Name, this.Ref, this.sheetId == "WB" ? null : this.sheetId );
+        return new Asc.asc_CDefName( this.Name, this.Ref, this.sheetId == "WB" ? null : this.wb.getWorksheetById(this.sheetId ).getIndex() );
     },
 
     changeDefName:function(newName){
@@ -2172,7 +2178,7 @@ Workbook.prototype.getDefinesNames = function ( name, sheetId ) {
     var res = this.dependencyFormulas.getDefNameNodeByName(name, sheetId);
     return res;
 };
-Workbook.prototype.setDefinesNames = function ( defName ) {
+/*Workbook.prototype.setDefinesNames = function ( defName ) {
     var n = defName.Name.toLowerCase(),
         retRes = null;
 
@@ -2212,12 +2218,12 @@ Workbook.prototype.setDefinesNames = function ( defName ) {
         History.Create_NewPoint();
         History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesAdd, null, null, new UndoRedoData_DefinedNames(retRes.Name, retRes.Ref, retRes.Scope));
 
-        /*
+        *//*
           TODO
           добавить в граф зависимостей ноду с новым именованным диапазоном.
           если функция содержит именованный диапазон с область видимости книга, а вводится диапазон с таким же именем,
           но с областью видимости лист, то функция пересчитывается на диапазон с областью видимости лист
-        */
+        *//*
 
 
 
@@ -2225,7 +2231,7 @@ Workbook.prototype.setDefinesNames = function ( defName ) {
 
     return retRes;
 
-};
+};*/
 Workbook.prototype.delDefinesNames = function ( defName ) {
     History.Create_NewPoint();
     var retRes = false, res = null;
@@ -2284,7 +2290,7 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
         rename = true;
     }
     else{
-        retRes = this.dependencyFormulas.addDefinedNameNode(newName.Name, newName.Scope, newName.Ref, bUndo);
+        retRes = this.dependencyFormulas.addDefinedNameNode(newName.Name, newName.LocalSheetId, newName.Ref, bUndo);
     }
 
     if( retRes ){
