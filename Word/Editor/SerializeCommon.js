@@ -217,7 +217,7 @@ function CPPTXContentLoader()
         return txBody;
     }
 
-    this.ReadShapeProperty = function(stream)
+    this.ReadShapeProperty = function(stream, type)
     {
         if (this.Reader == null)
             this.Reader = new BinaryPPTYLoader();
@@ -243,9 +243,17 @@ function CPPTXContentLoader()
         var s = this.stream;
         var _main_type = s.GetUChar(); // 0!!!
 
-        var oNewSpPr = new CSpPr();
-
-        this.Reader.ReadSpPr(oNewSpPr);
+        var oNewSpPr;
+		if(0 == type){
+			oNewSpPr = this.Reader.ReadLn()
+		}
+		else if(1 == type){
+			oNewSpPr = this.Reader.ReadUniFill();
+		}
+		else{
+			oNewSpPr = new CSpPr();
+			this.Reader.ReadSpPr(oNewSpPr);
+		}
 
         stream.pos = s.pos;
         stream.cur = s.cur;
@@ -813,7 +821,7 @@ function CPPTXContentWriter()
             this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
         }
     }
-    this.WriteSpPr = function(memory, spPr)
+    this.WriteSpPr = function(memory, spPr, type)
     {
         if (this.BinaryFileWriter.UseContinueWriter)
         {
@@ -830,7 +838,12 @@ function CPPTXContentWriter()
 
         var _writer = this.BinaryFileWriter;
         _writer.StartRecord(0);
-        _writer.WriteSpPr(spPr);
+		if(0 == type)
+			_writer.WriteLn(spPr);
+		else if(1 == type)
+			_writer.WriteUniFill(spPr);
+		else
+			_writer.WriteSpPr(spPr);
         _writer.EndRecord();
 
         if (this.BinaryFileWriter.UseContinueWriter)

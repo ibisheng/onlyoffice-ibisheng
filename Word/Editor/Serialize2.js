@@ -205,7 +205,9 @@ var c_oSerProp_rPrType = {
 	LangEA: 27,
 	ColorTheme: 28,
 	Shd: 29,
-	Vanish: 30
+	Vanish: 30,
+	TextOutline: 31,
+	TextFill : 32
 };
 var c_oSerProp_rowPrType = {
     CantSplit:0,
@@ -1846,6 +1848,18 @@ function Binary_rPrWriter(memory)
 			this.memory.WriteByte(c_oSerProp_rPrType.Vanish);
             this.memory.WriteByte(c_oSerPropLenType.Byte);
             this.memory.WriteBool(rPr.Vanish);
+		}
+		if(null != rPr.TextOutline)
+		{
+			this.memory.WriteByte(c_oSerProp_rPrType.TextOutline);
+            this.memory.WriteByte(c_oSerPropLenType.Variable);
+			this.bs.WriteItemWithLength(function () { window.global_pptx_content_writer.WriteSpPr(_this.memory, rPr.TextOutline, 0); });
+		}
+		if(null != rPr.TextFill)
+		{
+			this.memory.WriteByte(c_oSerProp_rPrType.TextFill);
+            this.memory.WriteByte(c_oSerPropLenType.Variable);
+			this.bs.WriteItemWithLength(function () { window.global_pptx_content_writer.WriteSpPr(_this.memory, rPr.TextFill, 1); });
 		}
     };
 };
@@ -6441,6 +6455,24 @@ function Binary_rPrReader(doc, stream)
 			case c_oSerProp_rPrType.Vanish:
                 rPr.Vanish = this.stream.GetBool();
                 break;
+			case c_oSerProp_rPrType.TextOutline:
+				if(length > 0){
+					var TextOutline = window.global_pptx_content_loader.ReadShapeProperty(this.stream, 0);
+					if(null != TextOutline)
+						rPr.TextOutline = TextOutline;
+				}
+				else
+					res = c_oSerConstants.ReadUnknown;
+				break;
+			case c_oSerProp_rPrType.TextFill:
+				if(length > 0){
+					var TextFill = window.global_pptx_content_loader.ReadShapeProperty(this.stream, 1);
+					if(null != TextFill)
+						rPr.TextFill = TextFill;
+				}
+				else
+					res = c_oSerConstants.ReadUnknown;
+				break;
             default:
                 res = c_oSerConstants.ReadUnknown;
                 break;
