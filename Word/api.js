@@ -2705,17 +2705,6 @@ asc_docs_api.prototype.sync_EndAction = function(type, id){
     if (c_oAscAsyncActionType.BlockInteraction == type)
     {
         this.asc_DecrementCounterLongAction();
-
-        if (!this.asc_IsLongAction())
-        {
-            var _length = this.LongActionCallbacks.length;
-            for (var i = 0; i < _length; i++)
-            {
-                this.LongActionCallbacks[i](this.LongActionCallbacksParams[i]);
-            }
-            this.LongActionCallbacks.splice(0, _length);
-            this.LongActionCallbacksParams.splice(0, _length);
-        }
     }
 };
 
@@ -2728,6 +2717,17 @@ asc_docs_api.prototype.asc_DecrementCounterLongAction = function()
     this.IsLongActionCurrent--;
     if (this.IsLongActionCurrent < 0)
         this.IsLongActionCurrent = 0;
+
+    if (!this.asc_IsLongAction())
+    {
+        var _length = this.LongActionCallbacks.length;
+        for (var i = 0; i < _length; i++)
+        {
+            this.LongActionCallbacks[i](this.LongActionCallbacksParams[i]);
+        }
+        this.LongActionCallbacks.splice(0, _length);
+        this.LongActionCallbacksParams.splice(0, _length);
+    }
 };
 
 asc_docs_api.prototype.asc_IsLongAction = function()

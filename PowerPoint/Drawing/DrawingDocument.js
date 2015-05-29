@@ -4826,7 +4826,7 @@ function CThumbnailsManager()
 								this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PasteOnThumbnails);
 
 								window.GlobalPasteFlag = true;
-                                editor.waitSave = true;
+                                editor.asc_IncrementCounterLongAction();
 								Editor_Paste(this.m_oWordControl.m_oApi, true);
 								return undefined;
 								//не возвращаем true чтобы не было preventDefault
@@ -4839,7 +4839,7 @@ function CThumbnailsManager()
 
 									SafariIntervalFocus();
 									window.GlobalPasteFlag = true;
-                                    editor.waitSave = true;
+                                    editor.asc_IncrementCounterLongAction();
 									Editor_Paste(this.m_oWordControl.m_oApi, true);
 									return undefined;
 									//не возвращаем true чтобы не было preventDefault
