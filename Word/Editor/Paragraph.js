@@ -4389,6 +4389,28 @@ Paragraph.prototype =
         return ContentPos;
     },
 
+    Get_EndPos2 : function(BehindEnd)
+    {
+        var ContentPos = new CParagraphContentPos();
+        var Depth = 0;
+
+        var ContentLen = this.Content.length;
+        var Pos;
+        if(this.Content.length > 1)
+        {
+            Pos = ContentLen - 2;
+        }
+        else
+        {
+            Pos = ContentLen - 1;
+        }
+
+        ContentPos.Update( Pos, Depth );
+
+        this.Content[Pos].Get_EndPos( BehindEnd, ContentPos, Depth + 1 );
+        return ContentPos;
+    },
+
     Get_NextRunElements : function(RunElements)
     {
         var ContentPos = RunElements.ContentPos;
@@ -9816,7 +9838,7 @@ Paragraph.prototype =
         this.Set_SectionPr( undefined );
 
         // Если на втором параграфе оканчивалась секция, тогда переносим конец секции на данный параграф
-        var SectPr = Para.Get_SectionPr()
+        var SectPr = Para.Get_SectionPr();
         if ( undefined !== SectPr )
         {
             Para.Set_SectionPr( undefined );
@@ -9833,7 +9855,15 @@ Paragraph.prototype =
         // Копируем настройки параграфа
         this.CopyPr( NewParagraph );
 
-        var TextPr = this.Get_TextPr(this.Get_EndPos(false));
+        var TextPr;
+        if(this.bFromDocument)
+        {
+            TextPr = this.Get_TextPr(this.Get_EndPos(false));
+        }
+        else
+        {
+            TextPr = this.Get_TextPr(this.Get_EndPos2(false));
+        }
 
         NewParagraph.Internal_Content_Add(0, new ParaRun(NewParagraph));
         NewParagraph.Correct_Content();
