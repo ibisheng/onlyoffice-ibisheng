@@ -3846,7 +3846,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_mergeCellsDataLost"] = prot.asc_mergeCellsDataLost;
 		prot["asc_getSheetViewSettings"] = prot.asc_getSheetViewSettings;
 		prot["asc_setSheetViewSettings"] = prot.asc_setSheetViewSettings;
-		
+
+        // Defined Names
+        prot["asc_getDefinedNames"] = prot.asc_getDefinedNames;
+        prot["asc_setDefinedNames"] = prot.asc_setDefinedNames;
+        prot["asc_editDefinedNames"] = prot.asc_editDefinedNames;
+        prot["asc_delDefinedNames"] = prot.asc_delDefinedNames;
+        prot["asc_getDefaultDefinedName"] = prot.asc_getDefaultDefinedName;
+
 		// Auto filters interface
 		prot["asc_addAutoFilter"] = prot.asc_addAutoFilter;
 		prot["asc_applyAutoFilter"] = prot.asc_applyAutoFilter;
