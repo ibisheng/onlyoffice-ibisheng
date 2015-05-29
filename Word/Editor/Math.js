@@ -604,15 +604,12 @@ ParaMath.prototype.Add = function(Item)
     var NewElement = null;
     if (para_Text === Type)
     {
-
         // заглушка для текстовых настроек плейсхолдера
 
         if(oContent.bRoot == false && Run.IsPlaceholder())
         {
-
             var ctrPrp = oContent.Parent.Get_CtrPrp(); // копия ctrPrp
             Run.Apply_TextPr(ctrPrp, undefined, true);
-            //Run.Apply_TextPr();
         }
 
         if(Item.Value == 38)
@@ -3202,7 +3199,6 @@ CMathRecalculateInfo.prototype.ClearRecalculate = function()
     this.bRecalcCtrPrp   = false;
     this.bCorrect_FontSize = false;
 };
-
 
 function CMathRecalculateObject()
 {

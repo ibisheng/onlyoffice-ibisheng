@@ -1994,8 +1994,6 @@ CMathBase.prototype.UpdateMetrics = function(PRS, Size)
 
     if(PRS.LineDescent < Size.height - Size.ascent)
         PRS.LineDescent = Size.height - Size.ascent;
-
-    //PRS.ContentMetrics.UpdateMetrics(Size);
 };
 CMathBase.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 {
