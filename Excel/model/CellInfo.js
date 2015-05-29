@@ -242,6 +242,7 @@
         prot["asc_getName"]				= prot.asc_getName;
         prot["asc_getScope"]			= prot.asc_getScope;
         prot["asc_getRef"]				= prot.asc_getRef;
+        prot["asc_getIsTable"]		    = prot.asc_getIsTable;
 
 	}
 )(window);
