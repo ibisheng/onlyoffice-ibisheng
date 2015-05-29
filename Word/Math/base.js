@@ -2047,34 +2047,14 @@ CMathBase.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange
 
     this.Bounds.SetWidth(CurLine, PRSC.Range.W - RangeW);
 };
-CMathBase.prototype.UpdateOperators = function(_CurLine, _CurRange)
+CMathBase.prototype.UpdateOperators = function(_CurLine, _CurRange, bEmptyGapLeft, bEmptyGapRight)
 {
-    var CurLine  = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-    if(this.bOneLine == true)
+    if(this.bOneLine == false)
     {
-        result = true;
-    }
-    else
-    {
-        var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-        var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-        var result = true;
-
-        if(this.ParaMath.Is_BrkBinBefore() == true)
-        {
-            result = this.Content[StartPos].UpdateOperators(_CurLine, _CurRange);
-        }
-        else
-        {
-            result = this.Content[EndPos].UpdateOperators(_CurLine, _CurRange);
-
-        }
+         // Content[this.NumBreakContent] должен содержаться в каждой строке многострочного объекта
+         this.Content[this.NumBreakContent].UpdateOperators(_CurLine, _CurRange, bEmptyGapLeft, bEmptyGapRight);
     }
 
-    return result;
 };
 CMathBase.prototype.Is_EmptyRange = function()
 {

@@ -3940,9 +3940,9 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         }
         else // контент может занимать несколько строк
         {
-            var FirstItemOnLine = PRS.FirstItemOnLine,
-                Word            = PRS.Word;
             var bNoOneBreakOperator = PRS.bNoOneBreakOperator;
+
+            var W_Before = PRS.WordLen + PRS.SpaceLen + PRS.X;
 
             Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
 
@@ -4149,7 +4149,7 @@ CMathContent.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine,
 
     ContentMetrics.UpdateMetrics(NewContentMetrics);
 };
-CMathContent.prototype.UpdateOperators = function(_CurLine, _CurRange)
+CMathContent.prototype.UpdateOperators = function(_CurLine, _CurRange, bEmptyGapLeft, bEmptyGapRight)
 {
     var CurLine  = _CurLine - this.StartLine;
     var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
@@ -4157,27 +4157,13 @@ CMathContent.prototype.UpdateOperators = function(_CurLine, _CurRange)
     var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
     var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
 
-    var result = false;
-
-    if(this.ParaMath.Is_BrkBinBefore() == true)
+    for(var Pos = StartPos; Pos <= EndPos; Pos++)
     {
-        while(StartPos <= EndPos && result == false)
-        {
-            result = this.Content[StartPos].UpdateOperators(_CurLine, _CurRange);
-            StartPos++;
-        }
-    }
-    else
-    {
-        while(StartPos <= EndPos && result == false)
-        {
-            result = this.Content[EndPos].UpdateOperators(_CurLine, _CurRange);
-            EndPos--;
-        }
-    }
+        var _bEmptyGapLeft  = bEmptyGapLeft  && Pos == StartPos,
+            _bEmptyGapRight = bEmptyGapRight && Pos == EndPos;
 
-    return result;
-
+        this.Content[Pos].UpdateOperators(_CurLine, _CurRange, _bEmptyGapLeft, _bEmptyGapRight);
+    }
 };
 CMathContent.prototype.Get_Bounds = function()
 {

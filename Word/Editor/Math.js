@@ -301,8 +301,8 @@ function CMathInfo()
     this.FirstLineOnPage  = -1;
     this.WrapState        = ALIGN_EMPTY;
     this.LineWidths       = new CParaMathLineWidths();
-
-    this.NeedUpdateWrap = true;
+    this.bWordLarge       = false;
+    this.NeedUpdateWrap   = true;
 }
 CMathInfo.prototype.GetFirstLineOnPage = function()
 {
@@ -368,11 +368,20 @@ CMathPageInfo.prototype.SetNextWrapState = function()
     if(InfoPage.WrapState !== ALIGN_EMPTY)
         InfoPage.WrapState++;
 };
+CMathPageInfo.prototype.SetStateWordLarge = function(bWordLarge)
+{
+    this.private_CheckInfo(this.CurPage);
+    this.Info[this.CurPage].bWordLarge = bWordLarge;
+};
 CMathPageInfo.prototype.GetWrap = function(_Page)
 {
     var Page = _Page - this.StartPage;
 
     return this.Info[Page].WrapState;
+};
+CMathPageInfo.prototype.GetCurrentStateWordLarge = function()
+{
+    return this.Info[this.CurPage].bWordLarge;
 };
 CMathPageInfo.prototype.IsFirstPage = function(_Page)
 {
@@ -384,6 +393,8 @@ CMathPageInfo.prototype.GetStarLinetWidth = function()
 };
 CMathPageInfo.prototype.UpdateCurrentWidth = function(_Line, Width)
 {
+    this.private_CheckInfo(this.CurPage);
+
     var Line = _Line - this.StartLine - this.Info[this.CurPage].FirstLineOnPage;
 
     return this.Info[this.CurPage].LineWidths.UpdateWidth(Line, Width);
@@ -465,19 +476,18 @@ function ParaMath()
     this.FirstPage          = -1;
     this.PageInfo           = new CMathPageInfo();
 
-    this.ParaMathRPI       = new CMathRecalculateInfo();
+    this.ParaMathRPI        = new CMathRecalculateInfo();
 
-    this.bSelectionUse     = false;
-    this.Paragraph         = null;
+    this.bSelectionUse      = false;
+    this.Paragraph          = null;
 
-    this.NearPosArray      = [];
+    this.NearPosArray       = [];
 
-    this.Width             = 0;
-    this.WidthVisible      = 0;
-    this.Height            = 0;
-    this.Ascent            = 0;
-    this.Descent           = 0;
-
+    this.Width              = 0;
+    this.WidthVisible       = 0;
+    this.Height             = 0;
+    this.Ascent             = 0;
+    this.Descent            = 0;
 
     this.DefaultTextPr     = new CTextPr();
 
@@ -1061,6 +1071,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     // Paragraph.js
     // CRunRecalculateObject.Compare
 
+
     if ( this.Paragraph !== PRS.Paragraph )
     {
         this.Paragraph = PRS.Paragraph;
@@ -1125,7 +1136,6 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     if(bStartLine == false)
     {
         PRS.X += WrapIndent;
-        //PRS.bCompareWrapIndent = false;
     }
     else
     {
@@ -1139,8 +1149,6 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         PRS.RecalcResult = recalcresult_NextLine;
         PRS.PrevLineRecalcInfo.Object = null;
     }
-
-    //console.log("Line " + PRS.Line);
 
     this.Root.Recalculate_Range(PRS, ParaPr, Depth);
 
@@ -1157,6 +1165,11 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         }
 
         this.UpdateWidthLine(PRS, WidthLine);
+    }
+
+    if(PRS.X + PRS.SpaceLen + PRS.WordLen > PRS.XEnd && WrapState == ALIGN_EMPTY)
+    {
+        this.PageInfo.SetStateWordLarge(true);
     }
 
     if(PRS.bMathWordLarge == true && WrapState !== ALIGN_EMPTY)
@@ -1180,7 +1193,7 @@ ParaMath.prototype.UpdateInfoForBreak = function(PRS)
 ParaMath.prototype.Save_MathInfo = function(Copy)
 {
     var RecalculateObject = new CMathRecalculateObject();
-    RecalculateObject.Fill(this.PageInfo);
+    RecalculateObject.Fill(this.PageInfo, this.ParaMathRPI.bInline, this.Get_Align());
 
     return RecalculateObject;
 };
@@ -1209,7 +1222,12 @@ ParaMath.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 {
     var SpaceLen   = PRSC.SpaceLen;
 
-    this.Root.UpdateOperators(_CurLine, _CurRange);
+    var bBrkBefore = this.Is_BrkBinBefore();
+
+    var bGapLeft  = bBrkBefore == true,
+        bGapRight = bBrkBefore == false;
+
+    this.Root.UpdateOperators(_CurLine, _CurRange, bGapLeft, bGapRight);
 
     this.Root.Recalculate_Range_Width(PRSC, _CurLine, _CurRange);
 
@@ -3188,13 +3206,21 @@ CMathRecalculateInfo.prototype.ClearRecalculate = function()
 
 function CMathRecalculateObject()
 {
-    this.WrapState = ALIGN_EMPTY;
-    this.MaxW      = 0;
+    this.WrapState  = ALIGN_EMPTY;
+    this.MaxW       = 0;
+    this.bWordLarge = false;
+
+    this.bInline   = false;
+    this.align     = align_Justify;
+
 }
-CMathRecalculateObject.prototype.Fill = function(PageInfo)
+CMathRecalculateObject.prototype.Fill = function(PageInfo, bInline, align)
 {
-    this.WrapState = PageInfo.GetCurrentWrapState();
-    this.MaxW      = PageInfo.GetCurrentMaxWidthAllLines();
+    this.WrapState  = PageInfo.GetCurrentWrapState();
+    this.MaxW       = PageInfo.GetCurrentMaxWidthAllLines();
+    this.bWordLarge = PageInfo.GetCurrentStateWordLarge();
+    this.bInline    = bInline;
+    this.align      = align;
 };
 CMathRecalculateObject.prototype.Load_MathInfo = function(PageInfo)
 {
@@ -3210,7 +3236,14 @@ CMathRecalculateObject.prototype.Compare = function(PageInfo)
     if(this.WrapState !== PageInfo.GetCurrentWrapState())
         result = false;
 
-    if(this.MaxW !== PageInfo.GetCurrentMaxWidthAllLines())
+    var DiffMaxW = this.MaxW - PageInfo.GetCurrentMaxWidthAllLines();
+
+    if(DiffMaxW < 0)
+        DiffMaxW = -DiffMaxW;
+
+    var LargeComposition = this.bWordLarge == true && true == PageInfo.GetCurrentStateWordLarge();
+
+    if(LargeComposition == false && this.bInline == false && this.align == align_Justify && DiffMaxW > 0.001)
         result = false;
 
     return result;

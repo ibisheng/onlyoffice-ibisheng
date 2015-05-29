@@ -13353,7 +13353,6 @@ function CRunRecalculateObject(StartLine, StartRange)
     this.Content     = [];
 
     this.MathInfo    = null;
-    //this.WrapState   = ALIGN_EMPTY;
 }
 
 CRunRecalculateObject.prototype =
@@ -13386,8 +13385,6 @@ CRunRecalculateObject.prototype =
     Save_MathInfo: function(Obj, Copy)
     {
         this.MathInfo = Obj.Save_MathInfo(Copy);
-
-        //this.WrapState = Obj.GetCurrentWrapState();
     },
 
     Load_Lines : function(Obj)

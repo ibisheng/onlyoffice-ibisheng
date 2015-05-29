@@ -528,7 +528,9 @@ CBox.prototype.Update_WordLen = function(PRS, WordLen)
 {
     PRS.WordLen   = WordLen;
 };
-CBox.prototype.UpdateOperators = function(_CurLine, _CurRange)
+
+// TO DO передела в base.js
+CBox.prototype.UpdateOperators____2 = function(_CurLine, _CurRange)
 {
     if(true == this.ParaMath.Is_BrkBinBefore())
     {

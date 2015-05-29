@@ -40,15 +40,12 @@ CMathSize.prototype.Set = function(size)
 function CMathText(bJDraw)
 {
     // для Para_Run
-    this.Type = para_Math_Text;
-
-    this.bJDraw = (undefined === bJDraw ? false : bJDraw);
-
-    this.value = null;
+    this.Type           = para_Math_Text;
+    this.bJDraw         = (undefined === bJDraw ? false : bJDraw);
+    this.value          = null;
 
     this.RecalcInfo =
     {
-        //NewLetter:  true,
         StyleCode:        null,
         bAccentIJ:        false,
         bSpaceSpecial:    false,
@@ -56,20 +53,23 @@ function CMathText(bJDraw)
         bSpecialOperator: false
     };
 
-    this.ParaMath = null;
-    this.Flags  = 0;
-    this.Parent = null;
-    this.size = new CMathSize();
-    this.Width = 0; // для Recalculate_Range
+    this.bEmptyGapLeft  = false;
+    this.bEmptyGapRight = false;
 
-    this.pos = new CMathPosition();
+    this.ParaMath       = null;
+    this.Flags          = 0;
+    this.Parent         = null;
+    this.size           = new CMathSize();
+    this.Width          = 0; // для Recalculate_Range
 
-    this.rasterOffsetX = 0;
-    this.rasterOffsetY = 0;
-    this.GapLeft       = 0;
-    this.GapRight      = 0;
+    this.pos            = new CMathPosition();
 
-    this.FontSlot  = fontslot_ASCII;
+    this.rasterOffsetX  = 0;
+    this.rasterOffsetY  = 0;
+    this.GapLeft        = 0;
+    this.GapRight       = 0;
+
+    this.FontSlot       = fontslot_ASCII;
 
     // TO DO
     // убрать
@@ -655,7 +655,15 @@ CMathText.prototype =
     },
     Get_Width: function() // работаем через функцию, т.к. поля  GapLeft и GapRight могут измениться из-за изменения переноса, а пересчет (Measure) в этом случае не прийдет
     {
-        return this.size.width + this.GapLeft + this.GapRight;
+        var Width = this.size.width;
+
+        if(this.bEmptyGapLeft == false)
+            Width += this.GapLeft;
+
+        if(this.bEmptyGapRight == false)
+            Width += this.GapRight;
+
+        return (Width*TEXTWIDTH_DIVIDER) | 0;
     },
     Get_Width2: function() // работаем через функцию, т.к. поля  GapLeft и GapRight могут измениться из-за изменения переноса, а пересчет (Measure) в этом случае не прийдет
     {
@@ -663,21 +671,23 @@ CMathText.prototype =
     },
     Get_WidthVisible: function()
     {
-        return this.size.width + this.GapLeft + this.GapRight;
-    },
-    Update_GapLeft: function(Gap)
-    {
-        this.GapLeft = Gap;
-        //this.size.width = this.MeasureWidth + this.GapRight + this.GapLeft;
+        var Width = this.size.width;
 
-        //this.Width = (this.size.width * TEXTWIDTH_DIVIDER) | 0;
-    },
-    Update_GapRight: function(Gap)
-    {
-        this.GapRight = Gap;
-        //this.size.width = this.MeasureWidth + this.GapRight + this.GapLeft;
+        if(this.bEmptyGapLeft == false)
+            Width += this.GapLeft;
 
-        //this.Width = (this.size.width * TEXTWIDTH_DIVIDER) | 0;
+        if(this.bEmptyGapRight == false)
+            Width += this.GapRight;
+
+        return Width;
+    },
+    Update_StateGapLeft: function(bState)
+    {
+        this.bEmptyGapLeft = bState;
+    },
+    Update_StateGapRight: function(bState)
+    {
+        this.bEmptyGapRight = bState;
     },
     Draw_Elements: function(PDSE)
     {
@@ -686,8 +696,13 @@ CMathText.prototype =
     },
     Draw: function(x, y, pGraphics, InfoTextPr)
     {
-        var X = this.pos.x + x + this.GapLeft,
+
+
+        var X = this.pos.x + x,
             Y = this.pos.y + y;
+
+        if(this.bEmptyGapLeft == false)
+            X += this.GapLeft;
 
         /*var tx = 0;
          var ty = 0;

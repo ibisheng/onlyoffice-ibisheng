@@ -2310,10 +2310,10 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         {
                             bOverXEnd = X + WordLen + SpaceLen > XEnd;
 
-                            if(Word == false) // слово только началось
+                            /*if(Word == false) // слово только началось
                             {
                                 OperGapLeft = Item.GapLeft;
-                            }
+                            }*/
 
                             if(bOverXEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                             {
@@ -2346,7 +2346,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                     // FirstItemOnLine == true && Word == false
                                     // первое слово в строке
                                     if(FirstItemOnLine == true)
-                                        SpaceLen += BrkLen - OperGapLeft;
+                                    {
+                                        SpaceLen += BrkLen - Item.GapLeft;
+                                    }
                                 }
                             }
                         }
@@ -2925,7 +2927,7 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
             {
                 PRSC.Letters++;
 
-                PRSC.Range.W += Item.Get_Width2() / TEXTWIDTH_DIVIDER;
+                PRSC.Range.W += Item.Get_Width() / TEXTWIDTH_DIVIDER; // Get_Width рассчитываем ширину с учетом состояний Gaps
                 break;
             }
             case para_Space:
@@ -3063,7 +3065,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
             case para_Math_BreakOperator:
             case para_Math_Ampersand:
             {
-                var WidthVisible = Item.Get_Width2() / TEXTWIDTH_DIVIDER;
+                var WidthVisible = Item.Get_Width() / TEXTWIDTH_DIVIDER; // Get_Width рассчитываем ширину с учетом состояний Gaps
                 Item.WidthVisible = (WidthVisible * TEXTWIDTH_DIVIDER)| 0;//Item.Set_WidthVisible(WidthVisible);
 
                 PRSA.X    += WidthVisible;
@@ -8600,7 +8602,8 @@ ParaRun.prototype.Math_SetPosition = function(pos, PRSA, Line, Range, Page)
     for(var i = StartPos; i < EndPos; i++)
     {
         this.Content[i].setPosition(pos);
-        pos.x += this.Content[i].Get_Width();
+        pos.x += this.Content[i].Get_WidthVisible(); // Get_Width => Get_WidthVisible
+                                                     // Get_WidthVisible - Width + Gaps с учетом настроек состояния
     }
 };
 ParaRun.prototype.Math_GetWidth = function(_CurLine, _CurRange)
@@ -8614,7 +8617,8 @@ ParaRun.prototype.Math_GetWidth = function(_CurLine, _CurRange)
     var W = 0;
     for(var i = StartPos; i < EndPos; i++)
     {
-        W += this.Content[i].Get_Width();
+        W += this.Content[i].Get_WidthVisible(); // Get_Width => Get_WidthVisible
+                                                 // Get_WidthVisible - Width + Gaps с учетом настроек состояния
     }
 
     return W;
@@ -8717,7 +8721,8 @@ ParaRun.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
         var size = this.Content[i].size,
             Type = this.Content[i].Type;
 
-        var WidthItem = this.Content[i].Get_Width();
+        var WidthItem = this.Content[i].Get_WidthVisible(); // Get_Width => Get_WidthVisible
+                                                            // Get_WidthVisible - Width + Gaps с учетом настроек состояния
 
         width += WidthItem;
 
@@ -8743,7 +8748,8 @@ ParaRun.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
 
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 };
-ParaRun.prototype.UpdateOperators = function(_CurLine, _CurRange)
+// в этой функции проставляем состояние Gaps (крайние или нет) для всех операторов, к-ые участвуют в разбиении, чтобы не получилось случайно, что при изменении разбивки формулы на строки произошло, что у оператора не будет проставлен Gap
+ParaRun.prototype.UpdateOperators = function(_CurLine, _CurRange, bEmptyGapLeft, bEmptyGapRight)
 {
     var CurLine  = _CurLine - this.StartLine;
     var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
@@ -8751,25 +8757,14 @@ ParaRun.prototype.UpdateOperators = function(_CurLine, _CurRange)
     var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
     var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
 
-    var result = true;
-
-    if(StartPos == EndPos)
+    for(var Pos = StartPos; Pos < EndPos; Pos++)
     {
-        result = false;
-    }
-    else
-    {
-        if(this.ParaMath.Is_BrkBinBefore() == true)
-        {
-            this.Content[StartPos].Update_GapLeft(0);
-        }
-        else
-        {
-            this.Content[EndPos-1].Update_GapRight(0);
-        }
-    }
+        var _bEmptyGapLeft  = bEmptyGapLeft && Pos == StartPos,
+            _bEmptyGapRight = bEmptyGapRight && Pos == EndPos - 1;
 
-    return result;
+        this.Content[Pos].Update_StateGapLeft(_bEmptyGapLeft);
+        this.Content[Pos].Update_StateGapRight(_bEmptyGapRight);
+    }
 };
 ParaRun.prototype.Math_Apply_Style = function(Value)
 {
@@ -8939,7 +8934,8 @@ ParaRun.prototype.ApplyPoints = function(PointsInfo)
                 this.Content[Pos].size.width = PointsInfo.GetAlign();
             }
 
-            this.size.width += this.Content[Pos].Get_Width();
+            this.size.width += this.Content[Pos].Get_WidthVisible(); // Get_Width => Get_WidthVisible
+                                                                     // Get_WidthVisible - Width + Gaps с учетом настроек состояния
         }
     }
 };

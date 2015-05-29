@@ -567,28 +567,6 @@ CNary.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
         this.Bounds.SetWidth(CurLine, PRSC.Range.W - RangeW);
     }
 };
-CNary.prototype.UpdateOperators = function(_CurLine, _CurRange)
-{
-    /*var CurLine  = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);*/
-
-    var result = true;
-
-    if(this.ParaMath.Is_BrkBinBefore() == true)
-    {
-        result = this.Arg.UpdateOperators(_CurLine, _CurRange);
-    }
-    else
-    {
-        result = this.Arg.UpdateOperators(_CurLine, _CurRange);
-
-    }
-
-    return result;
-};
 CNary.prototype.Draw_Elements = function(PDSE)
 {
     var CurLine  = PDSE.Line - this.StartLine;
@@ -1619,13 +1597,6 @@ CIntegral.prototype.getCoord = function()
     X[44] = X[0]; Y[44] = Y[0];
     X[43] = (X[42] + X[44])/2; Y[43] = (Y[44] + Y[42])/2;
 
-    /*for(var i = 0; i < X.length; i++)
-     {
-     var k = i + 34;
-     var str = "X[" + k + "] = " + X[i] + "; Y[" + k + "] = " + Y[i] + ";";
-     console.log(str);
-     }*/
-
     var W = X[9],
         H = Y[27];
 
@@ -1819,14 +1790,6 @@ CCircle.prototype.getCoord = function()
     X[32] = 11930.6; Y[32] = 407.15;
     X[33] = 18345.98; Y[33] = 0;
 
-
-    /*
-     for(var i = 0; i < 34; i++)
-     {
-     var str = "X[" + i + "] = " + Math.round(X[i]*85)/100 + "; Y[" + i + "] = " + Math.round(Y[i]*85)/100 + ";";
-     console.log(str);
-     }*/
-
     var W = X[7],
         H = Y[16];
 
@@ -1912,32 +1875,9 @@ CSurface.prototype.getCoord = function()
     X[41] = 21192.77; Y[41] = 841.7;
     X[42] = 24855.55; Y[42] = 312.82;
 
-
-    /*var t = Y[1];
-    for(var i = 0 ; i < X.length; i++)
-    {
-        var yy = Math.round((Y[i] - t)*100)/100;
-        var str = "X[" + i + "] = " + X[i] + "; Y[" + i + "] = " + yy + ";";
-        console.log(str);
-
-    }*/
-
     var W = X[11],
         H = Y[21];
 
-
-    /*for(var i = 0; i < X.length; i++)
-     {
-     X[i] *= 1.03;
-     Y[i] *= 0.97;
-
-     var xx = Math.round(X[i]*100)/100;
-     var yy = Math.round(Y[i]*100)/100;
-
-     var str = "X[" + i + "] = " + xx + "; Y[" + i + "] = " + yy + ";";
-     console.log(str);
-
-     }*/
 
 
     return {X: X, Y: Y, W: W, H: H};
@@ -2031,37 +1971,6 @@ CVolume.prototype.getCoord = function()
     X[48] = 13503.4; Y[48] = 4341.15;
     X[49] = 18795; Y[49] = 2963.07;
     X[50] = 24086.6; Y[50] = 1584.99;
-
-    /*var min_y = 23530,
-     ind_y;
-
-     for(var i = 0; i < X.length; i++)
-     {
-
-     if(Y[i] < min_y)
-     {
-     ind_y = i;
-     min_y = Y[i];
-     }
-
-     }
-
-     for(var i = 0; i < 51; i++)
-     {
-     X[i] *= 1.074;
-     Y[i] *= 0.99;
-     }
-     var t = Y[ind_y];
-
-     for(var i = 0; i < 51; i++)
-     {
-     var yy = Math.round((Y[i] - t)*100)/100;
-     var xx = Math.round(X[i]*100)/100;
-
-     var str = "X["+i+"] = " + xx + "; Y["+i+ "] = "+ yy + ";";
-     console.log(str);
-     }*/
-
 
     var W = X[15],
         H = Y[28];
