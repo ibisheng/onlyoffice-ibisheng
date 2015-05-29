@@ -232,7 +232,7 @@
         asc_CDefName.prototype = {
             asc_getName: function(){return this.Name;},
             asc_getScope: function(){return this.LocalSheetId;},
-            asc_getRef: function(){return this.Ref;}
+            asc_getRef: function(){return this.Ref;},
             asc_getIsTable: function(){return this.isTable;}
         };
 
