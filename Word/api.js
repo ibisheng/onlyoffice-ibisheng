@@ -460,7 +460,6 @@ function asc_docs_api(name)
     this.isSaveFonts_Images = false;
     this.saveImageMap = null;
 	this.canSave  = true;//Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
-    this.waitSave = false; // Отложенное сохранение, происходит во время долгих операций
 
     this.isLoadImagesCustom = false;
     this.loadCustomImageMap = null;
@@ -502,7 +501,7 @@ function asc_docs_api(name)
 		this.chartPreviewManager = new ChartPreviewManager();
 	else
 		this.chartPreviewManager = null;
-	
+
     this.IsLongActionCurrent = 0;
     this.LongActionCallbacks = [];
     this.LongActionCallbacksParams = [];
@@ -2384,7 +2383,7 @@ asc_docs_api.prototype.Share = function(){
 
 function OnSave_Callback(e) {
 	if (false == e["saveLock"]) {
-		if (editor.waitSave) {
+		if (editor.asc_IsLongAction()) {
 			// Мы не можем в этот момент сохранять, т.к. попали в ситуацию, когда мы залочили сохранение и успели нажать вставку до ответа
 			// Нужно снять lock с сохранения
 			editor.CoAuthoringApi.onUnSaveLock = function () {
@@ -2435,8 +2434,7 @@ function OnSave_Callback(e) {
 
 asc_docs_api.prototype.asc_Save = function ()
 {
-    // waitSave - означает, что сейчас происходит вставка данных и сохранять до окончания нельзя
-    if (false === this.waitSave && true === this.canSave)
+    if (true === this.canSave && !this.asc_IsLongAction())
 	{
 		this.canSave = false;
 		this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
@@ -2697,7 +2695,7 @@ asc_docs_api.prototype.sync_StartAction = function(type, id){
 	//console.log("asc_onStartAction: type = " + type + " id = " + id);
 
     if (c_oAscAsyncActionType.BlockInteraction == type)
-        this.IsLongActionCurrent++;
+        this.asc_IncrementCounterLongAction(this.IsLongActionCurrent);
 };
 asc_docs_api.prototype.sync_EndAction = function(type, id){
 	//this.AsyncAction
@@ -2706,9 +2704,7 @@ asc_docs_api.prototype.sync_EndAction = function(type, id){
 
     if (c_oAscAsyncActionType.BlockInteraction == type)
     {
-        this.IsLongActionCurrent--;
-        if (this.IsLongActionCurrent < 0)
-            this.IsLongActionCurrent = 0;
+        this.asc_DecrementCounterLongAction();
 
         if (!this.asc_IsLongAction())
         {
@@ -2721,6 +2717,17 @@ asc_docs_api.prototype.sync_EndAction = function(type, id){
             this.LongActionCallbacksParams.splice(0, _length);
         }
     }
+};
+
+asc_docs_api.prototype.asc_IncrementCounterLongAction = function()
+{
+    this.IsLongActionCurrent++;
+};
+asc_docs_api.prototype.asc_DecrementCounterLongAction = function()
+{
+    this.IsLongActionCurrent--;
+    if (this.IsLongActionCurrent < 0)
+        this.IsLongActionCurrent = 0;
 };
 
 asc_docs_api.prototype.asc_IsLongAction = function()
@@ -6136,7 +6143,7 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
         {
             this.isPasteFonts_Images = false;
             this.pasteImageMap = null;
-			this.waitSave = false;
+            this.asc_DecrementCounterLongAction();
             this.pasteCallback();
             window.GlobalPasteFlag = false;
             window.GlobalPasteFlagCounter = 0;
@@ -6382,7 +6389,7 @@ asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
     {
         // никаких евентов. ничего грузить не нужно. сделано для сафари под макОс.
         // там при LongActions теряется фокус и вставляются пробелы
-		this.waitSave = false;
+        this.asc_DecrementCounterLongAction();
         this.pasteCallback();
         window.GlobalPasteFlag = false;
         window.GlobalPasteFlagCounter = 0;
@@ -7463,10 +7470,10 @@ asc_docs_api.prototype.asc_RemoveStyle = function(sName)
 };
 
 asc_docs_api.prototype.asc_stopSaving = function () {
-	this.waitSave = true;
+	this.asc_IncrementCounterLongAction();
 };
 asc_docs_api.prototype.asc_continueSaving = function () {
-	this.waitSave = false;
+	this.asc_DecrementCounterLongAction();
 };
 
 // Version History

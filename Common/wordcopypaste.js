@@ -2039,7 +2039,7 @@ function Editor_Paste_Button(api)
         document.body.style["-webkit-user-select"] = "none";
 
 		History.Create_NewPoint(historydescription_PasteButtonIE);
-        editor.waitSave = true;
+        editor.asc_IncrementCounterLongAction();
         Editor_Paste(api, false);
         return true;
     }
@@ -2049,7 +2049,7 @@ function Editor_Paste_Button(api)
 		if(ElemToSelect && ElemToSelect.innerHTML !== "&nbsp;" && ElemToSelect.innerHTML !== "")
 		{
 			History.Create_NewPoint(historydescription_PasteButtonNotIE);
-            editor.waitSave = true;
+            editor.asc_IncrementCounterLongAction();
 			Editor_Paste_Exec(api, ElemToSelect);
 		}
 		else
@@ -4888,11 +4888,28 @@ PasteProcessor.prototype =
             var aPrepeareFonts = this._Prepeare_recursive(node, true, true);
      
 			var aImagesToDownload = [];
+			var _mapLocal = {};
 			for(var image in this.oImages)
             {
 				var src = this.oImages[image];
 				if(0 == src.indexOf("file:"))
-					this.oImages[image] = "local";
+				{
+					if (window["AscDesktopEditor"] !== undefined)
+					{
+						var _base64 = window["AscDesktopEditor"]["GetImageBase64"](src);
+						if (_base64 != "")
+						{
+							aImagesToDownload.push(_base64);
+							_mapLocal[_base64] = src;
+						}
+						else
+						{
+							this.oImages[image] = "local";
+						}							
+					}
+					else
+						this.oImages[image] = "local";
+				}
 				else if(false == (0 == src.indexOf(documentOrigin + this.api.DocumentUrl) || 0 == src.indexOf(this.api.DocumentUrl)))
 					aImagesToDownload.push(src);
 			}
@@ -4912,7 +4929,14 @@ PasteProcessor.prototype =
 								var sFrom = aImagesToDownload[i];
 								var sTo = oFromTo[sFrom];
 								if(sTo)
-								{									oThis.oImages[sFrom] = sTo;									oPrepeareImages[i] = sTo;								}							}
+								{						
+									if (_mapLocal[sFrom] !== undefined)
+										sFrom = _mapLocal[sFrom];							
+									
+									oThis.oImages[sFrom] = sTo;
+									oPrepeareImages[i] = sTo;	
+								}							
+							}
 						}
 						oThis.api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 						oThis.api.pre_Paste(aPrepeareFonts, oPrepeareImages, fCallback);

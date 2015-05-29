@@ -9774,7 +9774,7 @@ CDocument.prototype =
                             this.Create_NewHistoryPoint(historydescription_Document_ShiftInsert);
 
                             window.GlobalPasteFlag = true;
-                            editor.waitSave = true;
+                            editor.asc_IncrementCounterLongAction();
                             Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                             //не возвращаем true чтобы не было preventDefault
                         }
@@ -9786,7 +9786,7 @@ CDocument.prototype =
 
                                 SafariIntervalFocus();
                                 window.GlobalPasteFlag = true;
-                                editor.waitSave = true;
+                                editor.asc_IncrementCounterLongAction();
                                 Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                                 //не возвращаем true чтобы не было preventDefault
                             }
@@ -10066,7 +10066,7 @@ CDocument.prototype =
                             this.Create_NewHistoryPoint(historydescription_Document_PasteHotKey);
 
                             window.GlobalPasteFlag = true;
-                            editor.waitSave = true;
+                            editor.asc_IncrementCounterLongAction();
                             Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                             //не возвращаем true чтобы не было preventDefault
                         }
@@ -10078,7 +10078,7 @@ CDocument.prototype =
 
                                 SafariIntervalFocus();
                                 window.GlobalPasteFlag = true;
-                                editor.waitSave = true;
+                                editor.asc_IncrementCounterLongAction();
                                 Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                                 //не возвращаем true чтобы не было preventDefault
                             }
