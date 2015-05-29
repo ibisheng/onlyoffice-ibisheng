@@ -2861,9 +2861,11 @@ UndoRedoWorkbook.prototype = {
         else if(historyitem_Workbook_DefinedNamesAdd === Type ){
             if(bUndo){
                 this.wb.delDefinesNames( Data.newName );
+                this.wb.handlers.trigger("asc_onDelDefName")
             }
             else{
-                this.wb.editDefinesNames( null, Data.newName, bUndo );
+                this.wb.editDefinesNames( null, Data.newName, !bUndo );
+                this.wb.handlers.trigger("asc_onEditDefName", null, Data.newName);
             }
             /*TODO
             * Ввели формулу в которой есть именованный диапазон, но ИД нет в списке ИД. Результат формулы #NAME!.

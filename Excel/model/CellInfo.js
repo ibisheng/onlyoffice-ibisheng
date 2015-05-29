@@ -222,16 +222,18 @@
 		prot["asc_getIsAutoFilter"]	    = prot.asc_getIsAutoFilter;
 
 		/** @constructor */
-        function asc_CDefName(n, r, s) {
+        function asc_CDefName(n, r, s, t) {
             this.Name = n;
             this.LocalSheetId = s;
             this.Ref = r;
+            this.isTable = t;
         }
 
         asc_CDefName.prototype = {
             asc_getName: function(){return this.Name;},
             asc_getScope: function(){return this.LocalSheetId;},
             asc_getRef: function(){return this.Ref;}
+            asc_getIsTable: function(){return this.isTable;}
         };
 
         window["Asc"].asc_CDefName = window["Asc"]["asc_CDefName"] = asc_CDefName;

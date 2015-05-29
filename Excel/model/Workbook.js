@@ -1429,7 +1429,7 @@ DefNameVertex.prototype = {
 	},
 
     getAscCDefName:function(){
-        return new Asc.asc_CDefName( this.Name, this.Ref, this.sheetId == "WB" ? null : this.wb.getWorksheetById(this.sheetId ).getIndex() );
+        return new Asc.asc_CDefName( this.Name, this.Ref, this.sheetId == "WB" ? null : this.wb.getWorksheetById(this.sheetId ).getIndex(), this.isTable );
     },
 
     changeDefName:function(newName){
@@ -2165,10 +2165,13 @@ Workbook.prototype.isDefinedNamesExists = function(name, sheetId){
 	return false;
 };
 Workbook.prototype.getDefinesNamesWB = function () {
-    var names = [];
+    var names = [], name;
 
     for(var id in this.dependencyFormulas.defNameList ){
-        names.push(this.dependencyFormulas.defNameList[id].getAscCDefName());
+        name = this.dependencyFormulas.defNameList[id].getAscCDefName()
+        if(name.Ref){
+            names.push(name);
+        }
     }
 
     return names;
@@ -2218,12 +2221,12 @@ Workbook.prototype.getDefinesNames = function ( name, sheetId ) {
         History.Create_NewPoint();
         History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesAdd, null, null, new UndoRedoData_DefinedNames(retRes.Name, retRes.Ref, retRes.Scope));
 
-        *//*
-          TODO
-          добавить в граф зависимостей ноду с новым именованным диапазоном.
-          если функция содержит именованный диапазон с область видимости книга, а вводится диапазон с таким же именем,
-          но с областью видимости лист, то функция пересчитывается на диапазон с областью видимости лист
-        *//*
+//
+//          TODO
+//          добавить в граф зависимостей ноду с новым именованным диапазоном.
+//          если функция содержит именованный диапазон с область видимости книга, а вводится диапазон с таким же именем,
+//          но с областью видимости лист, то функция пересчитывается на диапазон с областью видимости лист
+//
 
 
 
