@@ -127,6 +127,11 @@ CMathBaseText.prototype.Can_AddNumbering = function()
 {
     return true;
 };
+CMathBaseText.prototype.Draw_Elements = function(PDSE)  // эта функция необходима для Draw_Elements основания Nary, когда в основании находится только JustDraw элемент
+{
+    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+    this.Draw(PosLine.x, PosLine.y, PDSE.Graphics);
+};
 
 function CMathText(bJDraw)
 {
