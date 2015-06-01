@@ -1949,6 +1949,12 @@
 
         };
 
+        WorkbookView.prototype.checkDefName = function (checkName,scope) {
+
+            return this.model.checkDefName(checkName,scope);
+
+        };
+
         WorkbookView.prototype.editDefinedNames = function (oldName, newName) {
             //ToDo проверка defName.ref на знак "=" в начале ссылки. знака нет тогда это либо число либо строка, так делает Excel.
             var res = this.model.editDefinesNames(oldName, newName);

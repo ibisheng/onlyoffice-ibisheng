@@ -2130,6 +2130,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
             return this.wb.delDefinedNames(oldName);
         };
 
+        spreadsheet_api.prototype.asc_checkDefinedName = function (checkName, scope) {
+            return this.wb.checkDefName(checkName, scope);
+        };
+
         spreadsheet_api.prototype.asc_getDefaultDefinedName = function () {
             return this.wb.getDefaultDefinedName();
         };
@@ -2406,6 +2410,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		 */
 		spreadsheet_api.prototype.asc_findCell = function(reference) {
 			var d = this.wb.findCell(reference );
+
+            if( !d ){
+                this.handlers.trigger("asc_onError", c_oAscError.ID.InvalidReferenceOrName, c_oAscError.Level.NoCritical);
+                return;
+            }
 
             // Получаем sheet по имени
             var ws = this.wbModel.getWorksheetByName(d.sheet);
@@ -3853,6 +3862,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
         prot["asc_editDefinedNames"] = prot.asc_editDefinedNames;
         prot["asc_delDefinedNames"] = prot.asc_delDefinedNames;
         prot["asc_getDefaultDefinedName"] = prot.asc_getDefaultDefinedName;
+        prot["asc_getDefaultDefinedName"] = prot.asc_checkDefinedName;
 
 		// Auto filters interface
 		prot["asc_addAutoFilter"] = prot.asc_addAutoFilter;
