@@ -1063,6 +1063,8 @@ asc_docs_api.prototype.InitEditor = function()
 {
     this.WordControl.m_oLogicDocument   = new CDocument(this.WordControl.m_oDrawingDocument);
     this.WordControl.m_oDrawingDocument.m_oLogicDocument = this.WordControl.m_oLogicDocument;
+	if (!this.isSpellCheckEnable)
+		this.WordControl.m_oLogicDocument.TurnOff_CheckSpelling();
 
     if (this.WordControl.MobileTouchManager)
         this.WordControl.MobileTouchManager.LogicDocument = this.WordControl.m_oLogicDocument;
@@ -1536,6 +1538,7 @@ asc_docs_api.prototype.asc_coAuthoringDisconnect = function () {
 	if (!this.CoAuthoringApi)
 		return; // Error
 	this.CoAuthoringApi.disconnect();
+	this.isCoAuthoringEnable = false;
 
 	// Выставляем view-режим
 	this.SetViewMode(true);
@@ -1579,7 +1582,9 @@ asc_docs_api.prototype.asc_SpellCheckDisconnect = function() {
 	if (!this.SpellCheckApi)
 		return; // Error
 	this.SpellCheckApi.disconnect();
-	this.WordControl.m_oLogicDocument.TurnOff_CheckSpelling();
+	this.isSpellCheckEnable = false;
+	if (this.WordControl.m_oLogicDocument)
+		this.WordControl.m_oLogicDocument.TurnOff_CheckSpelling();
 };
 
 asc_docs_api.prototype._onUpdateDocumentCanSave = function () {
@@ -7481,6 +7486,8 @@ asc_docs_api.prototype.asc_continueSaving = function () {
 asc_docs_api.prototype.asc_showRevision = function (newObj) {
 	if (!newObj.docId)
 		return;
+	if (this.isCoAuthoringEnable)
+		this.asc_coAuthoringDisconnect();
 
 	var bUpdate = true;
 	if (null === this.VersionHistory)
@@ -7493,8 +7500,6 @@ asc_docs_api.prototype.asc_showRevision = function (newObj) {
 		this.DocInfo.put_Id(this.VersionHistory.docId);
 		this.DocInfo.put_Url(this.VersionHistory.url);
 		documentUrlChanges = this.VersionHistory.urlChanges;
-		this.isCoAuthoringEnable = false;
-		this.isSpellCheckEnable = false;
 		this.LoadDocument();
 	}
 };
