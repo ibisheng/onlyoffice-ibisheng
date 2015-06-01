@@ -3669,6 +3669,7 @@ DrawingObjectsController.prototype =
                 {
                     content.Remove(dir, true, bRemoveOnlySelection)
                 }
+                target_text_object.checkExtentsByDocContent();
             }
         }
         else if(this.selectedObjects.length > 0)

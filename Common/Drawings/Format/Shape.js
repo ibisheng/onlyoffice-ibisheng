@@ -358,6 +358,36 @@ function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDr
 }
 
 
+function CheckExcelDrawingXfrm(xfrm)
+{
+    var rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+
+    if (checkNormalRotate(rot))
+    {
+        if(xfrm.offX < 0)
+        {
+            xfrm.setOffX(0);
+        }
+        if(xfrm.offY < 0)
+        {
+            xfrm.setOffY(0);
+        }
+    }
+    else
+    {
+        var dPosX = xfrm.offX + xfrm.extX/2 - xfrm.extY/2;
+        var dPosY = xfrm.offY + xfrm.extY/2 - xfrm.extX/2;
+        if(dPosX < 0)
+        {
+            xfrm.setOffX(xfrm.offX - dPosX);
+        }
+        if(dPosY < 0)
+        {
+            xfrm.setOffY(xfrm.offY - dPosY);
+        }
+    }
+};
+
 function CShape()
 {
     this.nvSpPr         = null;
@@ -1864,6 +1894,13 @@ CShape.prototype =
             default_style.ParaPr.Spacing.Before = 0;
             default_style.ParaPr.Spacing.After = 0;
             default_style.ParaPr.Align = align_Center;
+            if(parent_objects.theme)
+            {
+                default_style.TextPr.RFonts.Ascii = {Name: "+mn-lt", Index: -1};
+                default_style.TextPr.RFonts.EastAsia = {Name: "+mn-ea", Index: -1};
+                default_style.TextPr.RFonts.CS = {Name: "+mn-cs", Index: -1};
+                default_style.TextPr.RFonts.HAnsi = {Name: "+mn-lt", Index: -1};
+            }
             if (isRealObject(parent_objects.presentation) && isRealObject(parent_objects.presentation.defaultTextStyle)
                 && isRealObject(parent_objects.presentation.defaultTextStyle.levels[level])) {
                 var default_ppt_style = parent_objects.presentation.defaultTextStyle.levels[level];
@@ -1874,7 +1911,7 @@ CShape.prototype =
             var master_style;
             if (isRealObject(parent_objects.master) && isRealObject(parent_objects.master.txStyles)) {
                 var master_ppt_styles;
-                master_style = new CStyle("masterStyele", null, null, null, true);
+                master_style = new CStyle("masterStyle", null, null, null, true);
                 if (this.isPlaceholder()) {
                     switch (this.getPlaceholderType()) {
                         case phType_ctrTitle:
@@ -2335,8 +2372,11 @@ CShape.prototype =
                     if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
                         if (oGeometry) {
                             oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + l_ins + r_ins, oContentMetrics.contentH + t_ins + b_ins);
-                            this.extX = oWH.W;
-                            this.extY = oWH.H;
+                            if(!oWH.bError)
+                            {
+                                this.extX = oWH.W;
+                                this.extY = oWH.H;
+                            }
                         }
                         else {
                             this.extX = oContentMetrics.w + l_ins + r_ins;
@@ -2347,8 +2387,11 @@ CShape.prototype =
                     else {
                         if (oGeometry) {
                             oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + t_ins + b_ins, oContentMetrics.contentH + l_ins + r_ins);
-                            this.extX = oWH.H;
-                            this.extY = oWH.W;
+                            if(!oWH.bError)
+                            {
+                                this.extX = oWH.H;
+                                this.extY = oWH.W;
+                            }
                         }
                         else {
                             this.extY = oContentMetrics.w + t_ins + b_ins;
@@ -2363,8 +2406,10 @@ CShape.prototype =
 
                             if (oGeometry) {
                                 oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + l_ins + r_ins, oContentMetrics.contentH + t_ins + b_ins);
-                                this.extX = oWH.W;
-                                this.extY = oWH.H;
+                                if(!oWH.bError) {
+                                    this.extX = oWH.W;
+                                    this.extY = oWH.H;
+                                }
                             }
                             else {
                                 this.extX = oContentMetrics.w + l_ins + r_ins;
@@ -2374,8 +2419,10 @@ CShape.prototype =
                         else {
                             if (oGeometry) {
                                 oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + t_ins + b_ins, oContentMetrics.contentH + l_ins + r_ins);
-                                this.extX = oWH.H;
-                                this.extY = oWH.W;
+                                if(!oWH.bError) {
+                                    this.extX = oWH.H;
+                                    this.extY = oWH.W;
+                                }
                             }
                             else {
                                 this.extY = oContentMetrics.w + t_ins + b_ins;
@@ -2388,8 +2435,10 @@ CShape.prototype =
                         if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
                             if (oGeometry) {
                                 oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + l_ins + r_ins, oContentMetrics.contentH + t_ins + b_ins);
-                                this.extX = oWH.W;
-                                this.extY = oWH.H;
+                                if(!oWH.bError) {
+                                    this.extX = oWH.W;
+                                    this.extY = oWH.H;
+                                }
                             }
                             else {
                                 this.extX = oContentMetrics.w + l_ins + r_ins;
@@ -2399,8 +2448,10 @@ CShape.prototype =
                         else {
                             if (oGeometry) {
                                 oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + t_ins + b_ins, oContentMetrics.contentH + l_ins + r_ins);
-                                this.extX = oWH.H;
-                                this.extY = oWH.W;
+                                if(!oWH.bError) {
+                                    this.extX = oWH.H;
+                                    this.extY = oWH.W;
+                                }
                             }
                             else {
                                 this.extY = oContentMetrics.w + t_ins + b_ins;
@@ -2415,7 +2466,9 @@ CShape.prototype =
                     if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
                         if (oGeometry) {
                             oWH = oGeometry.getNewWHByTextRect(undefined, oContentMetrics.contentH + t_ins + b_ins, this.extX, undefined);
-                            this.extY = oWH.H;
+                            if(!oWH.bError) {
+                                this.extY = oWH.H;
+                            }
                         }
                         else {
                             this.extY = oContentMetrics.contentH + t_ins + b_ins;
@@ -2424,7 +2477,9 @@ CShape.prototype =
                     else {
                         if (oGeometry) {
                             oWH = oGeometry.getNewWHByTextRect(oContentMetrics.contentH + l_ins + b_ins, undefined, undefined, this.extY);
-                            this.extX = oWH.W;
+                            if(!oWH.bError) {
+                                this.extX = oWH.W;
+                            }
                         }
                         else {
                             this.extX = oContentMetrics.contentH + l_ins + r_ins;
@@ -2437,7 +2492,9 @@ CShape.prototype =
                         if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
                             if (oGeometry) {
                                 oWH = oGeometry.getNewWHByTextRect(undefined, oContentMetrics.contentH + t_ins + b_ins, this.extX, undefined);
-                                this.extY = oWH.H;
+                                if(!oWH.bError) {
+                                    this.extY = oWH.H;
+                                }
                             }
                             else {
                                 this.extY = oContentMetrics.contentH + t_ins + b_ins;
@@ -2447,7 +2504,9 @@ CShape.prototype =
                         else {
                             if (oGeometry) {
                                 oWH = oGeometry.getNewWHByTextRect(oContentMetrics.contentH + l_ins + r_ins, undefined, undefined, this.extY);
-                                this.extX = oWH.W;
+                                if(!oWH.bError) {
+                                    this.extX = oWH.W;
+                                }
                             }
                             else {
                                 this.extX = oContentMetrics.contentH + l_ins + r_ins;
@@ -2458,7 +2517,9 @@ CShape.prototype =
                         if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
                             if (oGeometry) {
                                 oWH = oGeometry.getNewWHByTextRect(oContentMetrics.contentH + l_ins + r_ins, undefined, undefined, this.extY);
-                                this.extX = oWH.W;
+                                if(!oWH.bError) {
+                                    this.extX = oWH.W;
+                                }
                             }
                             else {
                                 this.extX = oContentMetrics.contentH + l_ins + r_ins;
@@ -2467,7 +2528,9 @@ CShape.prototype =
                         else {
                             if (oGeometry) {
                                 oWH = oGeometry.getNewWHByTextRect(undefined, oContentMetrics.contentH + t_ins + b_ins, this.extX, undefined);
-                                this.extY = oWH.H;
+                                if(!oWH.bError) {
+                                    this.extY = oWH.H;
+                                }
                             }
                             else {
                                 this.extY = oContentMetrics.contentH + t_ins + b_ins;
@@ -2704,10 +2767,22 @@ CShape.prototype =
             {
                 this.spPr.xfrm.setOffX(this.x);
                 this.spPr.xfrm.setOffY(this.y);
+                if(this.drawingBase)
+                {
+                    CheckExcelDrawingXfrm(this.spPr.xfrm);
+                }
             }
-            this.checkDrawingBaseCoords();
+            if(oMainGroup)
+            {
+                oMainGroup.updateCoordinatesAfterInternalResize();
+            }
+            else
+            {
+                this.checkDrawingBaseCoords();
+            }
         }
     },
+
 
     checkDrawingBaseCoords: function()
     {

@@ -25,6 +25,7 @@ var APPROXIMATE_EPSILON3 = 5;
 
 var cToRad = Math.PI/(60000*180);
 var cToDeg = 1/cToRad;
+var MAX_ITER_COUNT = 50;
 
 var oGdLst = {};
 oGdLst["_3cd4"]= 16200000;
@@ -1330,7 +1331,7 @@ Geometry.prototype=
         var dDelta = 0;
         var dWi = dTextWidth, dHi = dTextHeight, dWNext, dHNext;
         var oGeometry = ExecuteNoHistory(function(){return this.createDuplicate()}, this, []);
-
+        var iter_Count = 0;
         if(!isRealNumber(dGeometryWidth) && !isRealNumber(dGeometryHeight))
         {
             do
@@ -1341,9 +1342,10 @@ Geometry.prototype=
                 dDelta = Math.max(Math.abs(dWNext - dWi), Math.abs(dHNext - dHi));
                 dWi = dWNext;
                 dHi = dHNext;
+                ++iter_Count;
             }
-            while(dDelta > EPSILON_TEXT_AUTOFIT);
-            return {W: dWi, H: dHi};
+            while(dDelta > EPSILON_TEXT_AUTOFIT && iter_Count < MAX_ITER_COUNT);
+            return {W: dWi, H: dHi, bError: dDelta > EPSILON_TEXT_AUTOFIT};
         }
         else if(isRealNumber(dGeometryWidth))
         {
@@ -1353,9 +1355,10 @@ Geometry.prototype=
                 dHNext = dTextHeight - (oGeometry.rect.b - oGeometry.rect.t) + dHi;
                 dDelta = Math.abs(dHNext - dHi);
                 dHi = dHNext;
+                ++iter_Count;
             }
-            while(dDelta > EPSILON_TEXT_AUTOFIT);
-            return {W: dGeometryWidth, H: dHi};
+            while(dDelta > EPSILON_TEXT_AUTOFIT && iter_Count < MAX_ITER_COUNT);
+            return {W: dGeometryWidth, H: dHi, bError: dDelta > EPSILON_TEXT_AUTOFIT};
         }
         else
         {
@@ -1365,9 +1368,10 @@ Geometry.prototype=
                 dWNext = dTextWidth - (oGeometry.rect.r - oGeometry.rect.l) + dWi;
                 dDelta = Math.abs(dWNext - dWi);
                 dWi = dWNext;
+                ++iter_Count;
             }
-            while(dDelta > EPSILON_TEXT_AUTOFIT);
-            return {W: dWi, H: dGeometryHeight};
+            while(dDelta > EPSILON_TEXT_AUTOFIT && iter_Count < MAX_ITER_COUNT);
+            return {W: dWi, H: dGeometryHeight, bError: dDelta > EPSILON_TEXT_AUTOFIT};
         }
     }
 };
