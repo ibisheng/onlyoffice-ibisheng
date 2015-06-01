@@ -2160,7 +2160,7 @@ Workbook.prototype.checkDefName = function ( checkName, scope ) {
 
     var defName = this.dependencyFormulas.getDefNameNode(getDefNameVertexId(scope, checkName));
 
-    return defName || true;
+    return defName ? defName.getAscCDefName() : true;
 
 }
 Workbook.prototype.isDefinedNamesExists = function ( name, sheetId ) {
