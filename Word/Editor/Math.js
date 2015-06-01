@@ -5,7 +5,7 @@
  */
 
 var g_dMathArgSizeKoeff_1 = 0.76;
-var g_dMathArgSizeKoeff_2 = 0.76 * 0.855;
+var g_dMathArgSizeKoeff_2 = 0.6498; // 0.76 * 0.855
 
 function CMathPropertiesSettings()
 {
@@ -480,6 +480,7 @@ function ParaMath()
 
     this.bSelectionUse      = false;
     this.Paragraph          = null;
+    this.bFastRecalculate   = true;
 
     this.NearPosArray       = [];
 
@@ -666,6 +667,8 @@ ParaMath.prototype.Add = function(Item)
 
     if ((para_Text === Type || para_Space === Type) && null !== NewElement)
     {
+        this.bFastRecalculate = oContent.bOneLine == false; // многострочный контент => можно осуществлять быстрый пересчет
+
         // Пробуем произвести автозамену
         oContent.Process_AutoCorrect(NewElement);
     }
@@ -1068,6 +1071,8 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     // Paragraph.js
     // CRunRecalculateObject.Compare
 
+    if(PRS.bFastRecalculate == true && this.bFastRecalculate == false)
+        return;
 
     if ( this.Paragraph !== PRS.Paragraph )
     {
@@ -1190,7 +1195,16 @@ ParaMath.prototype.UpdateInfoForBreak = function(PRS)
 ParaMath.prototype.Save_MathInfo = function(Copy)
 {
     var RecalculateObject = new CMathRecalculateObject();
-    RecalculateObject.Fill(this.PageInfo, this.ParaMathRPI.bInline, this.Get_Align());
+
+    var StructRecalc =
+    {
+        bFastRecalculate:   this.bFastRecalculate,
+        PageInfo:           this.PageInfo,
+        bInline:            this.ParaMathRPI.bInline,
+        Align:              this.Get_Align()
+    };
+
+    RecalculateObject.Fill(StructRecalc);
 
     return RecalculateObject;
 };
@@ -3201,21 +3215,27 @@ CMathRecalculateInfo.prototype.ClearRecalculate = function()
 
 function CMathRecalculateObject()
 {
-    this.WrapState  = ALIGN_EMPTY;
-    this.MaxW       = 0;
-    this.bWordLarge = false;
+    this.WrapState        = ALIGN_EMPTY;
+    this.MaxW             = 0;
+    this.bWordLarge       = false;
+    this.bFastRecalculate = true;   /*если добавляем буквы во внутренний контент, который не бьется на строки, то отменяем быстрый пересчет,
+                                      т.к. высота контента может поменяться (она рассчитывается точно исходя из размеров внутр элементов)*/
 
-    this.bInline   = false;
-    this.align     = align_Justify;
-
+    this.bInline          = false;
+    this.Align            = align_Justify;
 }
-CMathRecalculateObject.prototype.Fill = function(PageInfo, bInline, align)
+CMathRecalculateObject.prototype.Fill = function(StructRecalc)
 {
-    this.WrapState  = PageInfo.GetCurrentWrapState();
-    this.MaxW       = PageInfo.GetCurrentMaxWidthAllLines();
-    this.bWordLarge = PageInfo.GetCurrentStateWordLarge();
-    this.bInline    = bInline;
-    this.align      = align;
+    this.bFastRecalculate = StructRecalc.bFastRecalculate;
+    this.bInline          = StructRecalc.bInline;
+    this.Align            = StructRecalc.Align;
+
+    var PageInfo = StructRecalc.PageInfo;
+
+    this.WrapState        = PageInfo.GetCurrentWrapState();
+    this.MaxW             = PageInfo.GetCurrentMaxWidthAllLines();
+    this.bWordLarge       = PageInfo.GetCurrentStateWordLarge();
+
 };
 CMathRecalculateObject.prototype.Load_MathInfo = function(PageInfo)
 {
@@ -3228,6 +3248,9 @@ CMathRecalculateObject.prototype.Compare = function(PageInfo)
 {
     var result = true;
 
+    if(this.bFastRecalculate == false)
+        result = false;
+
     if(this.WrapState !== PageInfo.GetCurrentWrapState())
         result = false;
 
@@ -3238,7 +3261,7 @@ CMathRecalculateObject.prototype.Compare = function(PageInfo)
 
     var LargeComposition = this.bWordLarge == true && true == PageInfo.GetCurrentStateWordLarge();
 
-    if(LargeComposition == false && this.bInline == false && this.align == align_Justify && DiffMaxW > 0.001)
+    if(LargeComposition == false && this.bInline == false && this.Align == align_Justify && DiffMaxW > 0.001)
         result = false;
 
     return result;

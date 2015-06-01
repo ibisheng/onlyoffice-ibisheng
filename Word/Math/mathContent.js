@@ -3942,8 +3942,6 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         {
             var bNoOneBreakOperator = PRS.bNoOneBreakOperator;
 
-            var W_Before = PRS.WordLen + PRS.SpaceLen + PRS.X;
-
             Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
 
             if(Type == para_Math_Composition)
