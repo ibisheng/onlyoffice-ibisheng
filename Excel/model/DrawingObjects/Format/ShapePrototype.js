@@ -399,6 +399,11 @@ CShape.prototype.recalculateContent = function()
         var oRecalcObj = this.recalculateDocContent(content, body_pr);
         this.contentWidth = oRecalcObj.w;
         this.contentHeight = oRecalcObj.contentH;
+        if(this.txBody)
+        {
+            this.txBody.contentWidth = this.contentWidth;
+            this.txBody.contentHeight = this.contentHeight;
+        }
         this.recalcInfo.oContentMetrics = oRecalcObj;
         if(this.recalcInfo.recalcTitle)
         {
