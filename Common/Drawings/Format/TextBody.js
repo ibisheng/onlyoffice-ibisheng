@@ -79,19 +79,6 @@ var nTextATDist = 2;// (Text Anchor Enum ( Distributed ))
 var nTextATJust = 3;// (Text Anchor Enum ( Justified ))
 var nTextATT = 4;// Top
 
-//Vertical Text Types
-var nVertTTeaVert          = 0; //( ( East Asian Vertical ))
-var nVertTThorz            = 1; //( ( Horizontal ))
-var nVertTTmongolianVert   = 2; //( ( Mongolian Vertical ))
-var nVertTTvert            = 3; //( ( Vertical ))
-var nVertTTvert270         = 4;//( ( Vertical 270 ))
-var nVertTTwordArtVert     = 5;//( ( WordArt Vertical ))
-var nVertTTwordArtVertRtl  = 6;//(Vertical WordArt Right to Left)
-//-------------------------------------------------------------------
-//Text Wrapping Types
-var nTWTNone   = 0;
-var nTWTSquare = 1;
-//-------------------
 
 
 function CTextBody()
@@ -476,10 +463,10 @@ CTextBody.prototype =
                             }
                         }
                     }
+                    this.bodyPr.textFit = null;
                 }
             }
         }
-        this.bodyPr.textFit = null;
     },
 
     checkParagraphContent: function(parg, fontScale, bParagraph, paragrRedFontSize)
@@ -508,6 +495,11 @@ CTextBody.prototype =
                 }
             }
         }
+    },
+
+    Check_AutoFit: function()
+    {
+        return this.parent && this.parent.checkAutofit && this.parent.checkAutofit(true) || false;
     },
 
     Refresh_RecalcData: function()

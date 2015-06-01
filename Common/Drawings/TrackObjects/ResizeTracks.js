@@ -762,6 +762,8 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                 xfrm.setFlipH(this.resizedflipH);
                 xfrm.setFlipV(this.resizedflipV);
             }
+
+            CheckShapeBodyAutoFitReset(this.originalObject);
             this.originalObject.checkDrawingBaseCoords();
         };
     }, this, []);
@@ -1432,6 +1434,9 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
             }
             this.original.checkDrawingBaseCoords();
 
+            CheckShapeBodyAutoFitReset(this.original);
+
+
         };
     }, this, []);
 
@@ -1529,6 +1534,8 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
             xfrm.setOffY(this.y);
             xfrm.setExtX(this.extX);
             xfrm.setExtY(this.extY);
+
+            CheckShapeBodyAutoFitReset(this.originalObject);
         };
 
         this.updateTransform = function()

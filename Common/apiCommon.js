@@ -1784,6 +1784,7 @@
         this.w = null;
         this.h = null;
         this.vert = null;
+        this.verticalTextAlign = null
     }
 
     asc_CShapeProperty.prototype = {
@@ -3196,6 +3197,7 @@ function CreateAscShapePropFromProp(shapeProp)
     obj.w = shapeProp.w;
     obj.h = shapeProp.h;
     obj.vert = shapeProp.vert;
+    obj.verticalTextAlign = shapeProp.verticalTextAlign;
     return obj;
 }
 

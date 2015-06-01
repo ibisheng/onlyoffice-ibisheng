@@ -1441,6 +1441,11 @@ CPresentation.prototype =
         return false;
     },
 
+    Check_AutoFit: function()
+    {
+        return false;
+    },
+
 
     Get_Theme: function()
     {

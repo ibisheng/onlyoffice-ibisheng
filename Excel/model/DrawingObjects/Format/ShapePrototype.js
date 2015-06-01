@@ -165,12 +165,12 @@ CShape.prototype.setRecalculateInfo = function()
         recalculateFill:           true,
         recalculateLine:           true,
         recalculateTransparent:    true,
-        recalculateTextStyles:     [true, true, true, true, true, true, true, true, true]
+        recalculateTextStyles:     [true, true, true, true, true, true, true, true, true],
+        oContentMetrics: null
     };
     this.compiledStyles = [];
-    this.textPropsForRecalc = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
-    this.lockType = c_oAscLockTypes.kLockTypeNone;
+   // this.lockType = c_oAscLockTypes.kLockTypeNone;
 };
 CShape.prototype.recalcContent = function()
 {
@@ -352,7 +352,7 @@ CShape.prototype.recalculate = function ()
         }
 
         if (this.recalcInfo.recalculateContent) {
-            this.recalculateContent();
+            this.recalcInfo.oContentMetrics = this.recalculateContent();
             this.recalcInfo.recalculateContent = false;
         }
 
@@ -394,92 +394,12 @@ CShape.prototype.recalculateContent = function()
     var content = this.getDocContent();
     if(content)
     {
-        var w, h;
-        var l_ins, t_ins, r_ins, b_ins;
         var body_pr = this.getBodyPr();
-        if(body_pr)
-        {
-            l_ins = isRealNumber(body_pr.lIns) ? body_pr.lIns : 2.54;
-            r_ins = isRealNumber(body_pr.rIns) ? body_pr.rIns : 2.54;
-            t_ins = isRealNumber(body_pr.tIns) ? body_pr.tIns : 1.27;
-            b_ins = isRealNumber(body_pr.bIns) ? body_pr.bIns : 1.27;
-        }
-        else
-        {
-            l_ins = 2.54;
-            r_ins = 2.54;
-            t_ins = 1.27;
-            b_ins = 1.27;
-        }
-        if(this.spPr.geometry && this.spPr.geometry.rect
-            && isRealNumber(this.spPr.geometry.rect.l) && isRealNumber(this.spPr.geometry.rect.t)
-            && isRealNumber(this.spPr.geometry.rect.r) && isRealNumber(this.spPr.geometry.rect.r))
-        {
-            w = this.spPr.geometry.rect.r - this.spPr.geometry.rect.l - (l_ins + r_ins);
-            h = this.spPr.geometry.rect.b - this.spPr.geometry.rect.t - (t_ins + b_ins);
-        }
-        else
-        {
-            w = this.extX - (l_ins + r_ins);
-            h = this.extY - (t_ins + b_ins);
-        }
 
-        if(this.txBody)
-        {
-            if(!body_pr.upright)
-            {
-                if(!(body_pr.vert === nVertTTvert || body_pr.vert === nVertTTvert270))
-                {
-                    this.txBody.contentWidth = w;
-                    this.txBody.contentHeight = h;
-                }
-                else
-                {
-                    this.txBody.contentWidth = h;
-                    this.txBody.contentHeight = w;
-                }
-
-            }
-            else
-            {
-                var _full_rotate = this.getFullRotate();
-                if(checkNormalRotate(_full_rotate))
-                {
-                    if(!(body_pr.vert === nVertTTvert || body_pr.vert === nVertTTvert270))
-                    {
-
-                        this.txBody.contentWidth = w;
-                        this.txBody.contentHeight = h;
-                    }
-                    else
-                    {
-                        this.txBody.contentWidth = h;
-                        this.txBody.contentHeight = w;
-                    }
-                }
-                else
-                {
-                    if(!(body_pr.vert === nVertTTvert || body_pr.vert === nVertTTvert270))
-                    {
-
-                        this.txBody.contentWidth = h;
-                        this.txBody.contentHeight = w;
-                    }
-                    else
-                    {
-                        this.txBody.contentWidth = w;
-                        this.txBody.contentHeight = h;
-                    }
-                }
-            }
-        }
-        this.contentWidth = this.txBody.contentWidth;
-        this.contentHeight = this.txBody.contentHeight;
-
-        content.Set_StartPage(0);
-        content.Reset(0, 0, this.contentWidth, 20000);
-        content.Recalculate_Page(content.StartPage, true);
-
+        var oRecalcObj = this.recalculateDocContent(content, body_pr);
+        this.contentWidth = oRecalcObj.w;
+        this.contentHeight = oRecalcObj.contentH;
+        this.recalcInfo.oContentMetrics = oRecalcObj;
         if(this.recalcInfo.recalcTitle)
         {
             this.recalcInfo.bRecalculatedTitle = true;
@@ -491,7 +411,9 @@ CShape.prototype.recalculateContent = function()
             this.txWarpStructParamarks = oTextWarpContent.oTxWarpStructParamarks;
             this.txWarpStruct = oTextWarpContent.oTxWarpStruct;
         }
+        return oRecalcObj;
     }
+    return null;
 };
 
 CShape.prototype.Get_ColorMap = function()

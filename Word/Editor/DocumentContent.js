@@ -493,6 +493,11 @@ CDocumentContent.prototype =
         return this.Parent.Is_Cell();
     },
 
+    Check_AutoFit : function()
+    {
+        return this.Parent.Check_AutoFit();
+    },
+
     // Проверяем, лежит ли данный класс в таблице
     Is_InTable : function(bReturnTopTable)
     {

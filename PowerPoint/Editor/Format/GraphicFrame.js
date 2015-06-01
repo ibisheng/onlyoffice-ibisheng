@@ -627,6 +627,11 @@ CGraphicFrame.prototype =
         return false;
     },
 
+    Check_AutoFit: function()
+    {
+        return false;
+    },
+
     Is_InTable: function()
     {
         return null;

@@ -7145,6 +7145,9 @@ function BinaryPPTYLoader()
                     }
                     _value_text_pr.Set_FromObject(endRunPr);
                     par.TextPr.Apply_TextPr(_value_text_pr);//endRunProperties
+                    var oTextPrEnd = new CTextPr();
+                    oTextPrEnd.Set_FromObject(oTextPrEnd);
+                    par.Content[0].Set_Pr(oTextPrEnd);
                     break;
                 }
                 case 2:

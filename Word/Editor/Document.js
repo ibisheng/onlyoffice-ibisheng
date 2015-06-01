@@ -11190,6 +11190,11 @@ CDocument.prototype =
         return false;
     },
 
+    Check_AutoFit : function()
+    {
+        return false;
+    },
+
     Is_TopDocument : function(bReturnTopDocument)
     {
         if ( true === bReturnTopDocument )

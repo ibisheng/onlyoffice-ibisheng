@@ -11118,9 +11118,6 @@ function redrawSlide(slide, presentation, arrInd, pos,  direction, arr_slides)
     }
 }
 
-var text_fit_No         = 0;
-var text_fit_Auto       = 1;
-var text_fit_NormAuto   = 2;
 
 function CTextFit()
 {
@@ -11138,6 +11135,21 @@ CTextFit.prototype =
         d.fontScale = this.fontScale;
         d.lnSpcReduction = this.lnSpcReduction;
         return d;
+    },
+
+
+    Write_ToBinary: function(w)
+    {
+        writeLong(w, this.type);
+        writeDouble(w, this.fontScale);
+        writeDouble(w, this.lnSpcReduction);
+    },
+
+    Read_FromBinary: function(r)
+    {
+        this.type = readLong(r);
+        this.fontScale = readDouble(r);
+        this.lnSpcReduction = readDouble(r);
     },
 
     Get_Id: function()
@@ -11482,6 +11494,12 @@ CBodyPr.prototype =
         }
 
         this.WritePrstTxWarp(w);
+
+        w.WriteBool(isRealObject(this.textFit));
+        if(this.textFit)
+        {
+            this.textFit.Write_ToBinary(w);
+        }
     },
 
     Read_FromBinary2: function(r)
@@ -11628,6 +11646,12 @@ CBodyPr.prototype =
             this.wrap = r.GetLong();
         }
         this.ReadPrstTxWarp(r);
+
+        if(r.GetBool())
+        {
+            this.textFit = new CTextFit();
+            this.textFit.Read_FromBinary(r);
+        }
     },
 
     setDefault:  function()
@@ -11657,7 +11681,6 @@ CBodyPr.prototype =
 
     createDuplicate: function()
     {
-
         var duplicate = new CBodyPr();
         duplicate.flatTx         = this.flatTx;
         duplicate.anchor         = this.anchor;
@@ -11681,6 +11704,10 @@ CBodyPr.prototype =
         if(this.prstTxWarp)
         {
             duplicate.prstTxWarp = ExecuteNoHistory(function(){return this.prstTxWarp.createDuplicate();}, this, []);
+        }
+        if(this.textFit)
+        {
+            duplicate.textFit = this.textFit.CreateDublicate();
         }
         return duplicate;
     },
@@ -11776,6 +11803,10 @@ CBodyPr.prototype =
         if(bodyPr.prstTxWarp)
         {
             this.prstTxWarp = ExecuteNoHistory(function(){return bodyPr.prstTxWarp.createDuplicate();}, this, []);
+        }
+        if(bodyPr.textFit)
+        {
+            this.textFit = bodyPr.textFit.CreateDublicate();
         }
         return this;
     },
@@ -11924,6 +11955,11 @@ CBodyPr.prototype =
             w.WriteLong(this.wrap);
         }
         this.WritePrstTxWarp(w);
+        w.WriteBool(isRealObject(this.textFit));
+        if(this.textFit)
+        {
+            this.textFit.Write_ToBinary(w);
+        }
     },
 
     Read_FromBinary: function(r)
@@ -12070,6 +12106,12 @@ CBodyPr.prototype =
             this.wrap = r.GetLong();
         }
         this.ReadPrstTxWarp(r);
+
+        if(r.GetBool())
+        {
+            this.textFit = new CTextFit();
+            this.textFit.Read_FromBinary(r)
+        }
     }
 };
 

@@ -1,5 +1,5 @@
 "use strict";
-
+var EPSILON_TEXT_AUTOFIT = 0.001;
 var FORMULA_TYPE_MULT_DIV = 0,
     FORMULA_TYPE_PLUS_MINUS = 1,
     FORMULA_TYPE_PLUS_DIV = 2,
@@ -200,7 +200,6 @@ function CalculateGuideLst(gdLstInfo, gdLst)
         info=gdLstInfo[i];
         CalculateGuideValue(info.name, info.formula, info.x, info.y, info.z, gdLst);
     }
-
 }
 
 function CalculateCnxLst(cnxLstInfo, cnxLst, gdLst)
@@ -361,13 +360,20 @@ function Geometry()
 
     this.parent = null;
 
+    //коэффиценты линейной связи размеров автофигуры с размерами текстового ректа
+    this.kW = null;
+    this.bW = null;
+    this.kH = null;
+    this.bH = null;
+    this.bNeedRecalcCoeff = true;
+
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
 
 Geometry.prototype=
 {
-
     Get_Id: function()
     {
         return this.Id;
@@ -391,6 +397,7 @@ Geometry.prototype=
 
     Refresh_RecalcData: function(data)
     {
+        this.bNeedRecalcCoeff = true;
         if(this.parent && this.parent.handleUpdateGeometry)
         {
             this.parent.handleUpdateGeometry();
@@ -481,6 +488,7 @@ Geometry.prototype=
     setAdjValue: function(name, val)
     {
         this.AddAdj(name, 15, val + "", undefined, undefined);
+        this.bNeedRecalcCoeff = true;
         if(this.parent && this.parent.handleUpdateGeometry)
         {
             this.parent.handleUpdateGeometry();
@@ -613,7 +621,6 @@ Geometry.prototype=
         this.rectS.b = b;
     },
 
-
     Undo: function(data)
     {
         switch(data.Type)
@@ -627,6 +634,8 @@ Geometry.prototype=
             {
                 this.gdLst[data.name] = data.oldVal;
                 this.avLst[data.name] = data.oldAvVal;
+
+                this.bNeedRecalcCoeff = true;
                 if(this.parent && this.parent.handleUpdateGeometry)
                 {
                     this.parent.handleUpdateGeometry();
@@ -739,6 +748,7 @@ Geometry.prototype=
             {
                 this.gdLst[data.name] = parseInt(data.newVal);
                 this.avLst[data.name] = true;
+                this.bNeedRecalcCoeff = true;
                 if(this.parent && this.parent.handleUpdateGeometry)
                 {
                     this.parent.handleUpdateGeometry();
@@ -801,7 +811,6 @@ Geometry.prototype=
             }
         }
     },
-
 
     Save_Changes: function(data, w)
     {
@@ -903,6 +912,7 @@ Geometry.prototype=
                 }
                 if(oldAvVal)
                 {
+                    this.bNeedRecalcCoeff = true;
                     if(this.parent && this.parent.handleUpdateGeometry)
                     {
                         this.parent.handleUpdateGeometry();
@@ -1062,7 +1072,10 @@ Geometry.prototype=
             {
                 this.rect.b=parseInt(this.rectS.b);
             }
+
+
         }
+
     },
 
     draw: function(shape_drawer)
@@ -1102,8 +1115,6 @@ Geometry.prototype=
             drawingDocument.DrawAdjustment(transform, _adjustments[_adj_index].posX, _adjustments[_adj_index].posY);
     },
 
-
-
     canFill: function()
     {
         if(this.preset === "line")
@@ -1114,24 +1125,6 @@ Geometry.prototype=
                 return true;
         }
         return  false;
-    },
-
-    setAdjustmentValue: function(ref1, value1, ref2, value2)
-    {
-
-    },
-
-    setGuideValue: function(gdRef, gdValue)
-    {
-        if(isRealNumber(this.gdLst[gdRef]))
-        {
-            this.gdLst[gdRef] = gdValue;
-        }
-    },
-
-    hit: function(x, y)
-    {
-
     },
 
     hitInInnerArea: function(canvasContext, x, y)
@@ -1330,135 +1323,56 @@ Geometry.prototype=
     getBounds: function()
     {
 
+    },
+
+    getNewWHByTextRect: function(dTextWidth, dTextHeight, dGeometryWidth, dGeometryHeight)
+    {
+        var dDelta = 0;
+        var dWi = dTextWidth, dHi = dTextHeight, dWNext, dHNext;
+        var oGeometry = ExecuteNoHistory(function(){return this.createDuplicate()}, this, []);
+
+        if(!isRealNumber(dGeometryWidth) && !isRealNumber(dGeometryHeight))
+        {
+            do
+            {
+                oGeometry.Recalculate(dWi, dHi);
+                dWNext = dTextWidth - (oGeometry.rect.r - oGeometry.rect.l) + dWi;
+                dHNext = dTextHeight - (oGeometry.rect.b - oGeometry.rect.t) + dHi;
+                dDelta = Math.max(Math.abs(dWNext - dWi), Math.abs(dHNext - dHi));
+                dWi = dWNext;
+                dHi = dHNext;
+            }
+            while(dDelta > EPSILON_TEXT_AUTOFIT);
+            return {W: dWi, H: dHi};
+        }
+        else if(isRealNumber(dGeometryWidth))
+        {
+            do
+            {
+                oGeometry.Recalculate(dGeometryWidth, dHi);
+                dHNext = dTextHeight - (oGeometry.rect.b - oGeometry.rect.t) + dHi;
+                dDelta = Math.abs(dHNext - dHi);
+                dHi = dHNext;
+            }
+            while(dDelta > EPSILON_TEXT_AUTOFIT);
+            return {W: dGeometryWidth, H: dHi};
+        }
+        else
+        {
+            do
+            {
+                oGeometry.Recalculate(dWi, dGeometryHeight);
+                dWNext = dTextWidth - (oGeometry.rect.r - oGeometry.rect.l) + dWi;
+                dDelta = Math.abs(dWNext - dWi);
+                dWi = dWNext;
+            }
+            while(dDelta > EPSILON_TEXT_AUTOFIT);
+            return {W: dWi, H: dGeometryHeight};
+        }
     }
 };
 
-function WriteGdInfo(Writer, gdInfo)
-{
-    Writer.WriteString2(gdInfo.name);
-    Writer.WriteLong(gdInfo.formula);
 
-    var flag = typeof gdInfo.x === "string";
-    Writer.WriteBool(flag);
-    if(flag)
-        Writer.WriteString2(gdInfo.x);
-    else
-        return;
-
-    flag = typeof gdInfo.y === "string";
-    Writer.WriteBool(flag);
-    if(flag)
-        Writer.WriteString2(gdInfo.y);
-    else
-        return;
-
-    flag = typeof gdInfo.z === "string";
-    Writer.WriteBool(flag);
-    if(flag)
-        Writer.WriteString2(gdInfo.z);
-}
-
-function ReadGdInfo(Reader)
-{
-    var ret = {};
-    ret.name = Reader.GetString2();
-    ret.formula = Reader.GetLong();
-
-    if(Reader.GetBool())
-        ret.x = Reader.GetString2();
-    else
-        return;
-
-    if(Reader.GetBool())
-        ret.y = Reader.GetString2();
-    else
-        return;
-
-    if(Reader.GetBool())
-        ret.z = Reader.GetString2();
-}
-
-function WriteObjectDouble(Writer, Object)
-{
-    var field_count = 0;
-    for(var key in Object)
-    {
-        ++field_count;
-    }
-    Writer.WriteLong(field_count);
-    for(key in Object)
-    {
-        Writer.WriteString2(key);
-        Writer.WriteDouble(Object[key]);
-    }
-}
-
-function ReadObjectDouble(Reader)
-{
-    var ret = {};
-    var field_count = Reader.GetLong();
-    for(var index =0; index < field_count; ++index)
-    {
-        var key = Reader.GetString2();
-        ret[key] =  Reader.GetDouble();
-    }
-    return ret;
-}
-
-
-function WriteObjectString(Writer, Object)
-{
-    var field_count = 0;
-    for(var key in Object)
-    {
-        ++field_count;
-    }
-    Writer.WriteLong(field_count);
-    for(key in Object)
-    {
-        Writer.WriteString2(key);
-        Writer.WriteString2(Object[key]);
-    }
-}
-
-function ReadObjectString(Reader)
-{
-    var ret = {};
-    var field_count = Reader.GetLong();
-    for(var index = 0; index < field_count; ++index)
-    {
-        var key = Reader.GetString2();
-        ret[key] = Reader.GetString2();
-    }
-    return ret;
-}
-
-function WriteObjectBool(Writer, Object)
-{
-    var field_count = 0;
-    for(var key in Object)
-    {
-        ++field_count;
-    }
-    Writer.WriteLong(field_count);
-    for(key in Object)
-    {
-        Writer.WriteString2(key);
-        Writer.WriteBool(Object[key]);
-    }
-}
-
-function ReadObjectBool(Reader)
-{
-    var ret = {};
-    var field_count = Reader.GetLong();
-    for(var index =0; index < field_count; ++index)
-    {
-        var key = Reader.GetString2();
-        ret[key] = Reader.GetBool();
-    }
-    return ret;
-}
 
 function PathAccumulator()
 {

@@ -707,6 +707,17 @@ CGroupShape.prototype =
         }
     },
 
+    checkExtentsByDocContent: function()
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].checkExtentsByDocContent === "function")
+            {
+                this.spTree[i].checkExtentsByDocContent();
+            }
+        }
+    },
+
     Paragraph_IncDecFontSizeAll: function(val)
     {
         for(var i = 0; i < this.spTree.length; ++i)

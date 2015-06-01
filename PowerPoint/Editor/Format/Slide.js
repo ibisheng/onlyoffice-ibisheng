@@ -1240,7 +1240,7 @@ Slide.prototype =
                     }
                     if(j === hierarchy.length)
                     {
-                        CheckSpPrXfrm(sp);
+                        CheckSpPrXfrm(sp, true);
                     }
                 }
             }

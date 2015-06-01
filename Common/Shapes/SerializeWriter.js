@@ -1962,6 +1962,22 @@ function CBinaryFileWriter()
         oThis._WriteLimit2(19, bodyPr.wrap);
 
         oThis.WriteUChar(g_nodeAttributeEnd);
+
+        oThis.WriteRecord2(0, bodyPr.prstTxWarp, oThis.WritePrstTxWarp);
+        if(bodyPr.textFit)
+        {
+            oThis.WriteRecord1(1, bodyPr.textFit, oThis.WriteTextFit);
+        }
+    };
+
+
+    this.WriteTextFit = function(oTextFit)
+    {
+        oThis.WriteUChar(g_nodeAttributeStart);
+        oThis._WriteInt1(0, oTextFit.type + 1);
+        oThis._WriteInt2(1, oTextFit.fontScale);
+        oThis._WriteInt2(2, oTextFit.lnSpcReduction);
+        oThis.WriteUChar(g_nodeAttributeEnd);
     };
 
     // fill-stroke ---------------------------------------------------------------
@@ -3313,6 +3329,14 @@ function CBinaryFileWriter()
 
             oThis.EndRecord();
         }
+    }
+
+    this.WritePrstTxWarp = function(prstTxWarp)
+    {
+        oThis.WriteUChar(g_nodeAttributeStart);
+        oThis._WriteLimit1(0, getNumByTxPrst(prstTxWarp.preset));
+        oThis.WriteUChar(g_nodeAttributeEnd);
+        oThis.WriteAdj(prstTxWarp.gdLst, prstTxWarp.avLst, 0);
     }
 
     this.WriteAdj = function(gdLst, avLst, rec_num)

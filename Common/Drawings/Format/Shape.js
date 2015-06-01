@@ -312,7 +312,50 @@ function ConvertParagraphToWord(paragraph, docContent)
     return new_paragraph;
 }
 
+function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDrawings)
+{
 
+    var max_width = 0, arr_content = oDocContent.Content, paragraph_lines, i, j;
+    oDocContent.Reset(0, 0, dMaxWidth, 20000);
+    if(bNeedRecalcAllDrawings)
+    {
+        var aAllDrawings = oDocContent.Get_AllDrawingObjects();
+        for(i = 0; i < aAllDrawings.length; ++i)
+        {
+            aAllDrawings[i].GraphicObj.recalculate();
+        }
+    }
+    oDocContent.Recalculate_Page(0, true);
+    for(i = 0;  i < arr_content.length; ++i)
+    {
+        var oContentElement = arr_content[i];
+        if(oContentElement.Get_Type() === type_Paragraph)
+        {
+            paragraph_lines = arr_content[i].Lines;
+            for(j = 0;  j < paragraph_lines.length; ++j)
+            {
+                if(paragraph_lines[j].Ranges[0].W > max_width)
+                    max_width = paragraph_lines[j].Ranges[0].W;
+            }
+        }
+        else if(oContentElement.Get_Type() === type_Table)
+        {
+
+        }
+    }
+    if(max_width === 0)
+    {
+        if(oDocContent.Is_Empty())
+        {
+            if(oDocContent.Content[0] && oDocContent.Content[0].Content[0] && oDocContent.Content[0].Content[0].Content[0])
+            {
+                return oDocContent.Content[0].Content[0].Content[0].WidthVisible/TEXTWIDTH_DIVIDER;
+            }
+        }
+        return 0.001;
+    }
+    return max_width;
+}
 
 
 function CShape()
@@ -328,6 +371,7 @@ function CShape()
     this.drawingBase    = null;//DrawingBase в Excell'е
     this.bWordShape     = null;//если этот флаг стоит в true то автофигура имеет формат как в редакторе документов
     this.bDeleted = true;
+    this.bCheckAutoFitFlag = false;
 
 
 
@@ -367,85 +411,73 @@ function CShape()
 
 CShape.prototype =
 {
-    Get_Id: function ()
-    {
+    Get_Id: function () {
         return this.Id;
     },
 
-    getObjectType: function()
-    {
+    getObjectType: function () {
         return historyitem_type_Shape;
     },
 
-    Write_ToBinary2: function (w)
-    {
+    Write_ToBinary2: function (w) {
         w.WriteLong(historyitem_type_Shape);
         w.WriteString2(this.Id);
     },
 
-    Read_FromBinary2: function (r)
-    {
+    Read_FromBinary2: function (r) {
         this.Id = r.GetString2();
     },
 
-    convertToWord: function(document)
-    {
+    convertToWord: function (document) {
         this.setBDeleted(true);
         var c = new CShape();
         c.setWordShape(true);
         c.setBDeleted(false);
-        if(this.nvSpPr)
-        {
+        if (this.nvSpPr) {
             c.setNvSpPr(this.nvSpPr.createDuplicate());
         }
-        if(this.spPr)
-        {
+        if (this.spPr) {
             c.setSpPr(this.spPr.createDuplicate());
             c.spPr.setParent(c);
         }
-        if(this.style)
-        {
+        if (this.style) {
             c.setStyle(this.style.createDuplicate());
         }
-        if(this.txBody)
-        {
-            if(this.txBody.bodyPr)
-            {
+        if (this.txBody) {
+            if (this.txBody.bodyPr) {
                 c.setBodyPr(this.txBody.bodyPr.createDuplicate());
             }
-            if(this.txBody.content)
-            {
+            if (this.txBody.content) {
                 var new_content = new CDocumentContent(c, document.DrawingDocument, 0, 0, 0, 20000, false, false, false);
                 var paragraphs = this.txBody.content.Content;
 
                 new_content.Internal_Content_RemoveAll();
-                for(var i = 0; i < paragraphs.length; ++i)
-                {
+                for (var i = 0; i < paragraphs.length; ++i) {
                     var cur_par = paragraphs[i];
                     var new_paragraph = ConvertParagraphToWord(cur_par, new_content);
-                    new_content.Internal_Content_Add( i, new_paragraph, false );
+                    new_content.Internal_Content_Add(i, new_paragraph, false);
                     /*var bullet = cur_par.Pr.Bullet;
-                    if(bullet && bullet.bulletType && bullet.bulletType.type !== BULLET_TYPE_BULLET_NONE)
-                    {
-                        switch(bullet.bulletType.type)
-                        {
-                            case BULLET_TYPE_BULLET_CHAR:
-                            case BULLET_TYPE_BULLET_BLIP :
-                            {
-                                _bullet.m_nType = numbering_presentationnumfrmt_Char;
-                                _bullet.m_sChar = _final_bullet.bulletType.Char[0];
-                                _cur_paragraph.Add_PresentationNumbering(_bullet, true);
-                                break;
-                            }
-                            case BULLET_TYPE_BULLET_AUTONUM :
-                            {
-                                _bullet.m_nType = g_NumberingArr[_final_bullet.bulletType.AutoNumType];
-                                _bullet.m_nStartAt = _final_bullet.bulletType.startAt;
-                                _cur_paragraph.Add_PresentationNumbering(_bullet, true);
-                                break;
-                            }
-                        }
-                    } */
+                     if(bullet && bullet.bulletType && bullet.bulletType.type !== BULLET_TYPE_BULLET_NONE)
+                     {
+                     switch(bullet.bulletType.type)
+                     {
+                     case BULLET_TYPE_BULLET_CHAR:
+                     case BULLET_TYPE_BULLET_BLIP :
+                     {
+                     _bullet.m_nType = numbering_presentationnumfrmt_Char;
+                     _bullet.m_sChar = _final_bullet.bulletType.Char[0];
+                     _cur_paragraph.Add_PresentationNumbering(_bullet, true);
+                     break;
+                     }
+                     case BULLET_TYPE_BULLET_AUTONUM :
+                     {
+                     _bullet.m_nType = g_NumberingArr[_final_bullet.bulletType.AutoNumType];
+                     _bullet.m_nStartAt = _final_bullet.bulletType.startAt;
+                     _cur_paragraph.Add_PresentationNumbering(_bullet, true);
+                     break;
+                     }
+                     }
+                     } */
                 }
                 c.setTextBoxContent(new_content);
             }
@@ -453,31 +485,25 @@ CShape.prototype =
         return c;
     },
 
-    convertToPPTX: function(drawingDocument, worksheet)
-    {
+    convertToPPTX: function (drawingDocument, worksheet) {
         var c = new CShape();
         c.setWordShape(false);
         c.setBDeleted(false);
         c.setWorksheet(worksheet);
-        if(this.nvSpPr)
-        {
+        if (this.nvSpPr) {
             c.setNvSpPr(this.nvSpPr.createDuplicate());
         }
-        if(this.spPr)
-        {
+        if (this.spPr) {
             c.setSpPr(this.spPr.createDuplicate());
             c.spPr.setParent(c);
         }
-        if(this.style)
-        {
+        if (this.style) {
             c.setStyle(this.style.createDuplicate());
         }
-        if(this.textBoxContent)
-        {
+        if (this.textBoxContent) {
             var tx_body = new CTextBody();
             tx_body.setParent(c);
-            if(this.bodyPr)
-            {
+            if (this.bodyPr) {
                 tx_body.setBodyPr(this.bodyPr.createDuplicate());
             }
             var new_content = new CDocumentContent(tx_body, drawingDocument, 0, 0, 0, 0, false, false, true);
@@ -485,13 +511,11 @@ CShape.prototype =
             var paragraphs = this.textBoxContent.Content;
 
             var index = 0;
-            for(var i = 0; i < paragraphs.length; ++i)
-            {
+            for (var i = 0; i < paragraphs.length; ++i) {
                 var cur_par = paragraphs[i];
-                if(cur_par instanceof Paragraph)
-                {
+                if (cur_par instanceof Paragraph) {
                     var new_paragraph = ConvertParagraphToPPTX(cur_par, drawingDocument, new_content);
-                    new_content.Internal_Content_Add( index++, new_paragraph, false );
+                    new_content.Internal_Content_Add(index++, new_paragraph, false);
                 }
             }
             tx_body.setContent(new_content);
@@ -500,72 +524,64 @@ CShape.prototype =
         return c;
     },
 
-    documentGetAllFontNames: function(AllFonts)
-    {
+    documentGetAllFontNames: function (AllFonts) {
         //TODO
         var content = this.getDocContent();
-        if(content)
-        {
+        if (content) {
             content.Document_Get_AllFontNames(AllFonts);
         }
     },
 
-    documentCreateFontMap: function(map)
-    {
+    documentCreateFontMap: function (map) {
         var content = this.getDocContent();
-        if(content)
-        {
+        if (content) {
             content.Document_CreateFontMap(map);
         }
     },
 
-    setBDeleted: function(pr)
-    {
+    setBDeleted: function (pr) {
         History.Add(this, {Type: historyitem_ShapeSetBDeleted, oldPr: this.bDeleted, newPr: pr});
         this.bDeleted = pr;
     },
 
-    setNvSpPr: function (pr)
-    {
-        History.Add(this, { Type: historyitem_ShapeSetNvSpPr, oldPr: this.nvSpPr, newPr: pr });
+    setNvSpPr: function (pr) {
+        History.Add(this, {Type: historyitem_ShapeSetNvSpPr, oldPr: this.nvSpPr, newPr: pr});
         this.nvSpPr = pr;
     },
 
-    setSpPr: function (spPr)
-    {
-        History.Add(this, { Type: historyitem_ShapeSetSpPr, oldPr: this.spPr, newPr: spPr });
+    setSpPr: function (spPr) {
+        History.Add(this, {Type: historyitem_ShapeSetSpPr, oldPr: this.spPr, newPr: spPr});
         this.spPr = spPr;
     },
 
-    setStyle: function (style)
-    {
-        History.Add(this, { Type: historyitem_ShapeSetStyle, oldPr: this.style, newPr: style });
+    setStyle: function (style) {
+        History.Add(this, {Type: historyitem_ShapeSetStyle, oldPr: this.style, newPr: style});
         this.style = style;
         var content = this.getDocContent();
 
         this.recalcInfo.recalculateShapeStyleForParagraph = true;
-        if(this.recalcTextStyles)
+        if (this.recalcTextStyles)
             this.recalcTextStyles();
-        if(content)
-        {
+        if (content) {
             content.Recalc_AllParagraphs_CompiledPr();
         }
     },
 
-    setTxBody: function (txBody)
-    {
-        History.Add(this, { Type: historyitem_ShapeSetTxBody, oldPr: this.txBody, newPr: txBody });
+    setTxBody: function (txBody) {
+        History.Add(this, {Type: historyitem_ShapeSetTxBody, oldPr: this.txBody, newPr: txBody});
         this.txBody = txBody;
     },
 
-    setTextBoxContent: function(textBoxContent)
-    {
-        History.Add(this, {Type: historyitem_ShapeSetTextBoxContent, oldPr: this.textBoxContent, newPr: textBoxContent});
+    setTextBoxContent: function (textBoxContent) {
+        History.Add(this, {
+            Type: historyitem_ShapeSetTextBoxContent,
+            oldPr: this.textBoxContent,
+            newPr: textBoxContent
+        });
         this.textBoxContent = textBoxContent;
     },
 
-    setBodyPr: function(pr)
-    {
+    setBodyPr: function (pr) {
         History.Add(this, {Type: historyitem_ShapeSetBodyPr, oldPr: this.bodyPr, newPr: pr});
         this.bodyPr = pr;
         this.recalcInfo.recalcContent = true;
@@ -573,8 +589,7 @@ CShape.prototype =
         this.addToRecalculate();
     },
 
-    createTextBody: function()
-    {
+    createTextBody: function () {
         var tx_body = new CTextBody();
         tx_body.setParent(this);
         tx_body.setContent(new CDocumentContent(tx_body, this.getDrawingDocument(), 0, 0, 0, 20000, false, false, true));
@@ -583,8 +598,7 @@ CShape.prototype =
         this.setTxBody(tx_body);
     },
 
-    createTextBoxContent: function()
-    {
+    createTextBoxContent: function () {
         var body_pr = new CBodyPr();
         body_pr.setAnchor(1);
         this.setBodyPr(body_pr);
@@ -593,87 +607,70 @@ CShape.prototype =
         this.textBoxContent.Content[0].Set_DocumentIndex(0);
     },
 
-    paragraphAdd: function (paraItem, bRecalculate)
-    {
-        var content_to_add =  this.getDocContent();
-        if(!content_to_add)
-        {
-            if(this.bWordShape)
-            {
+    paragraphAdd: function (paraItem, bRecalculate) {
+        var content_to_add = this.getDocContent();
+        if (!content_to_add) {
+            if (this.bWordShape) {
                 this.createTextBoxContent();
             }
-            else
-            {
+            else {
                 this.createTextBody();
             }
-            content_to_add =  this.getDocContent();
+            content_to_add = this.getDocContent();
         }
-        if(content_to_add)
-        {
+        if (content_to_add) {
             content_to_add.Paragraph_Add(paraItem, bRecalculate);
         }
     },
 
-    applyTextFunction: function (docContentFunction, tableFunction, args)
-    {
-        var content_to_add =  this.getDocContent();
-        if(!content_to_add)
-        {
-            if(this.bWordShape)
-            {
+    applyTextFunction: function (docContentFunction, tableFunction, args) {
+        var content_to_add = this.getDocContent();
+        if (!content_to_add) {
+            if (this.bWordShape) {
                 this.createTextBoxContent();
             }
-            else
-            {
+            else {
                 this.createTextBody();
             }
-            content_to_add =  this.getDocContent();
+            content_to_add = this.getDocContent();
         }
-        if(content_to_add)
-        {
+        if (content_to_add) {
             docContentFunction.apply(content_to_add, args);
         }
+        this.checkExtentsByDocContent();
     },
 
-    clearContent: function()
-    {
+    clearContent: function () {
         var content = this.getDocContent();
-        if(content)
-        {
+        if (content) {
             content.Set_ApplyToAll(true);
             content.Remove(-1);
             content.Set_ApplyToAll(false);
         }
     },
 
-    getDocContent: function()
-    {
-        if(this.txBody)
-        {
+    getDocContent: function () {
+        if (this.txBody) {
             return this.txBody.content;
         }
-        else if(this.textBoxContent)
-        {
+        else if (this.textBoxContent) {
             return this.textBoxContent;
         }
         return null;
     },
 
-    getBodyPr: function()
-    {
-        return ExecuteNoHistory(function(){
+    getBodyPr: function () {
+        return ExecuteNoHistory(function () {
 
-            if(this.bWordShape)
-            {
+            if (this.bWordShape) {
                 var ret = new CBodyPr();
                 ret.setDefault();
-                if(this.bodyPr)
+                if (this.bodyPr)
                     ret.merge(this.bodyPr);
                 return ret;
             }
-            else
-            {
-                if(this.txBody && this.txBody.bodyPr)
+            else {
+                if (this.txBody && this.txBody.bodyPr)
                     return this.txBody.getCompiledBodyPr();
                 var ret = new CBodyPr();
                 ret.setDefault();
@@ -682,17 +679,14 @@ CShape.prototype =
         }, this, []);
     },
 
-    Search : function(Str, Props, SearchEngine, Type)
-    {
-        if(this.textBoxContent)
-        {
+    Search: function (Str, Props, SearchEngine, Type) {
+        if (this.textBoxContent) {
             var dd = this.getDrawingDocument();
             dd.StartSearchTransform(this.transformText);
             this.textBoxContent.Search(Str, Props, SearchEngine, Type);
             dd.EndSearchTransform();
         }
-        else if(this.txBody && this.txBody.content)
-        {
+        else if (this.txBody && this.txBody.content) {
             //var dd = this.getDrawingDocument();
             //dd.StartSearchTransform(this.transformText);
             this.txBody.content.Search(Str, Props, SearchEngine, Type);
@@ -700,62 +694,57 @@ CShape.prototype =
         }
     },
 
-    Search_GetId : function(bNext, bCurrent)
-    {
-        if(this.textBoxContent)
+    Search_GetId: function (bNext, bCurrent) {
+        if (this.textBoxContent)
             return this.textBoxContent.Search_GetId(bNext, bCurrent);
 
-        else if(this.txBody && this.txBody.content)
-        {
+        else if (this.txBody && this.txBody.content) {
             return this.txBody.content.Search_GetId(bNext, bCurrent);
         }
 
         return null;
     },
 
-    documentUpdateRulersState: function()
-    {
+    documentUpdateRulersState: function () {
         var content = this.getDocContent();
-        if(!content)
+        if (!content)
             return;
         var xc, yc;
         var l, t, r, b;
         var body_pr = this.getBodyPr();
         var l_ins, t_ins, r_ins, b_ins;
-        if(typeof body_pr.lIns === "number")
+        if (typeof body_pr.lIns === "number")
             l_ins = body_pr.lIns;
         else
             l_ins = 2.54;
 
-        if(typeof body_pr.tIns === "number")
+        if (typeof body_pr.tIns === "number")
             t_ins = body_pr.tIns;
         else
             t_ins = 1.27;
 
-        if(typeof body_pr.rIns === "number")
+        if (typeof body_pr.rIns === "number")
             r_ins = body_pr.rIns;
         else
             r_ins = 2.54;
 
-        if(typeof body_pr.bIns === "number")
+        if (typeof body_pr.bIns === "number")
             b_ins = body_pr.bIns;
         else
             b_ins = 1.27;
 
-        if(this.spPr && isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect))
-        {
-            l = this.spPr.geometry.rect.l+l_ins;
-            t = this.spPr.geometry.rect.t+t_ins;
-            r = this.spPr.geometry.rect.r-r_ins;
-            b = this.spPr.geometry.rect.b-b_ins;
+        if (this.spPr && isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect)) {
+            l = this.spPr.geometry.rect.l + l_ins;
+            t = this.spPr.geometry.rect.t + t_ins;
+            r = this.spPr.geometry.rect.r - r_ins;
+            b = this.spPr.geometry.rect.b - b_ins;
 
         }
-        else
-        {
+        else {
             l = l_ins;
             t = t_ins;
-            r = this.extX-r_ins;
-            b = this.extY-b_ins;
+            r = this.extX - r_ins;
+            b = this.extY - b_ins;
         }
 
         var x_lt, y_lt, x_rt, y_rt, x_rb, y_rb, x_lb, y_lb;
@@ -767,25 +756,23 @@ CShape.prototype =
         y_rb = tr.TransformPointY(r, b);
 
 
-        xc = (x_lt + x_rb)*0.5;
-        yc = (y_lt + y_rb)*0.5;
+        xc = (x_lt + x_rb) * 0.5;
+        yc = (y_lt + y_rb) * 0.5;
 
-        var hc = (r - l)*0.5;
-        var vc = (b - t)*0.5;
+        var hc = (r - l) * 0.5;
+        var vc = (b - t) * 0.5;
 
         this.getDrawingDocument().Set_RulerState_Paragraph({L: xc - hc, T: yc - vc, R: xc + hc, B: yc + vc});
         content.Document_UpdateRulersState(isRealNumber(this.selectStartPage) ? this.selectStartPage : 0);
     },
 
-    setParent: function (parent)
-    {
-        History.Add(this, { Type: historyitem_ShapeSetParent, oldPr: this.parent, newPr: parent });
+    setParent: function (parent) {
+        History.Add(this, {Type: historyitem_ShapeSetParent, oldPr: this.parent, newPr: parent});
         this.parent = parent;
     },
 
-    setGroup: function (group)
-    {
-        History.Add(this, { Type: historyitem_ShapeSetGroup, oldPr: this.group, newPr: group });
+    setGroup: function (group) {
+        History.Add(this, {Type: historyitem_ShapeSetGroup, oldPr: this.group, newPr: group});
         this.group = group;
     },
 
@@ -807,10 +794,8 @@ CShape.prototype =
         }
     },
 
-    canFill: function()
-    {
-        if(this.spPr && this.spPr.geometry)
-        {
+    canFill: function () {
+        if (this.spPr && this.spPr.geometry) {
             return this.spPr.geometry.canFill();
         }
         return true;
@@ -864,16 +849,13 @@ CShape.prototype =
         var paddings = null;
         var shape = this;
         var body_pr;
-        if (shape.txBody)
-        {
+        if (shape.txBody) {
             body_pr = shape.txBody.bodyPr;
         }
-        else if(shape.textBoxContent)
-        {
+        else if (shape.textBoxContent) {
             body_pr = shape.bodyPr;
         }
-        if(body_pr)
-        {
+        if (body_pr) {
             paddings = new asc_CPaddings();
             if (typeof body_pr.lIns === "number")
                 paddings.Left = body_pr.lIns;
@@ -1046,25 +1028,20 @@ CShape.prototype =
         return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.type : null;
     },
 
-    getPhIndex: function ()
-    {
+    getPhIndex: function () {
         return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.idx : null;
     },
 
     setVerticalAlign: function (align) {
         var new_body_pr = this.getBodyPr();
-        if(new_body_pr)
-        {
+        if (new_body_pr) {
             new_body_pr = new_body_pr.createDuplicate();
             new_body_pr.anchor = align;
-            if(this.bWordShape)
-            {
+            if (this.bWordShape) {
                 this.setBodyPr(new_body_pr);
             }
-            else
-            {
-                if(this.txBody)
-                {
+            else {
+                if (this.txBody) {
                     this.txBody.setBodyPr(new_body_pr);
                 }
             }
@@ -1072,32 +1049,25 @@ CShape.prototype =
     },
     setVert: function (vert) {
         var new_body_pr = this.getBodyPr();
-        if(new_body_pr)
-        {
+        if (new_body_pr) {
             new_body_pr = new_body_pr.createDuplicate();
             new_body_pr.vert = vert;
-            if(this.bWordShape)
-            {
+            if (this.bWordShape) {
                 this.setBodyPr(new_body_pr);
             }
-            else
-            {
-                if(this.txBody)
-                {
+            else {
+                if (this.txBody) {
                     this.txBody.setBodyPr(new_body_pr);
                 }
             }
         }
     },
 
-    setPaddings: function (paddings)
-    {
-        if (paddings)
-        {
+    setPaddings: function (paddings) {
+        if (paddings) {
 
             var new_body_pr = this.getBodyPr();
-            if(new_body_pr)
-            {
+            if (new_body_pr) {
                 new_body_pr = new_body_pr.createDuplicate();
                 if (isRealNumber(paddings.Left)) {
                     new_body_pr.lIns = paddings.Left;
@@ -1114,14 +1084,11 @@ CShape.prototype =
                     new_body_pr.bIns = paddings.Bottom;
                 }
 
-                if(this.bWordShape)
-                {
+                if (this.bWordShape) {
                     this.setBodyPr(new_body_pr);
                 }
-                else
-                {
-                    if(this.txBody)
-                    {
+                else {
+                    if (this.txBody) {
                         this.txBody.setBodyPr(new_body_pr);
                     }
                 }
@@ -1140,43 +1107,35 @@ CShape.prototype =
         this.transformText = this.localTransformText.CreateDublicate();
         this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
 
-        if(this.txBody && this.txBody.content2)
-        {
+        if (this.txBody && this.txBody.content2) {
             this.transformText2 = new CMatrix();
             this.clipRect2 = this.checkTransformTextMatrix(this.transformText2, this.txBody.content2, oBodyPr, false);
             this.invertTransformText2 = global_MatrixTransformer.Invert(this.transformText);
         }
-        if(oBodyPr.prstTxWarp)
-        {
-            if(this.bWordShape)
-            {
+        if (oBodyPr.prstTxWarp) {
+            if (this.bWordShape) {
                 this.transformTextWordArt = this.transformText;
             }
-            else
-            {
+            else {
                 this.transformTextWordArt = new CMatrix();
                 this.checkTransformTextMatrix(this.transformTextWordArt, oContent, oBodyPr, oBodyPr.prstTxWarp.preset !== "textNoShape");
             }
-            if(this.txBody && this.txBody.content2)
-            {
+            if (this.txBody && this.txBody.content2) {
                 this.checkTransformTextMatrix(this.transformText2, this.txBody.content2, oBodyPr, oBodyPr.prstTxWarp.preset !== "textNoShape");
                 this.transformTextWordArt2 = new CMatrix();
                 this.checkTransformTextMatrix(this.transformTextWordArt2, this.txBody.content2, oBodyPr, oBodyPr.prstTxWarp.preset !== "textNoShape");
             }
         }
 
-        if(this.checkPosTransformText)
-        {
+        if (this.checkPosTransformText) {
             this.checkPosTransformText();
         }
-        if(this.checkContentDrawings)
-        {
+        if (this.checkContentDrawings) {
             this.checkContentDrawings();
         }
     },
 
-    getFullFlip: function()
-    {
+    getFullFlip: function () {
         var _transform = this.localTransform;
         var _full_rotate = this.getFullRotate();
         var _full_pos_x_lt = _transform.TransformPointX(0, 0);
@@ -1389,10 +1348,10 @@ CShape.prototype =
             }
             if (this.spPr && isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect)) {
                 var rect = this.spPr.geometry.rect;
-                this.clipRect = { x: -1, y: rect.t, w: this.extX + 2, h: rect.b - rect.t };
+                this.clipRect = {x: -1, y: rect.t, w: this.extX + 2, h: rect.b - rect.t};
             }
             else {
-                this.clipRect = { x: -1, y: 0, w: this.extX + 2, h: this.extY };
+                this.clipRect = {x: -1, y: 0, w: this.extX + 2, h: this.extY};
             }
         }
         else {
@@ -1406,8 +1365,7 @@ CShape.prototype =
 
 
             var _content_width, content_height2;
-            if (checkNormalRotate(_full_rotate))
-            {
+            if (checkNormalRotate(_full_rotate)) {
                 if (!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270)) {
                     _content_width = _r - _l;
                     content_height2 = _b - _t;
@@ -1520,13 +1478,16 @@ CShape.prototype =
         this.invertTransformText2 = global_MatrixTransformer.Invert(this.transformText2);
     },
 
-    getTextRect: function()
-    {
-        return this.spPr && this.spPr.geometry && this.spPr.geometry.rect ? this.spPr && this.spPr.geometry && this.spPr.geometry.rect : {l: 0, t: 0, r: this.extX, b: this.extY};
+    getTextRect: function () {
+        return this.spPr && this.spPr.geometry && this.spPr.geometry.rect ? this.spPr && this.spPr.geometry && this.spPr.geometry.rect : {
+            l: 0,
+            t: 0,
+            r: this.extX,
+            b: this.extY
+        };
     },
 
-    checkTransformTextMatrix: function(oMatrix, oContent, oBodyPr, bWordArtTransform)
-    {
+    checkTransformTextMatrix: function (oMatrix, oContent, oBodyPr, bWordArtTransform) {
         oMatrix.Reset();
         var _shape_transform = this.localTransform;
         var _content_height = oContent.Get_SummaryHeight();
@@ -1579,12 +1540,10 @@ CShape.prototype =
         var oClipRect;
         if (!oBodyPr.upright) {
             if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
-                if(bWordArtTransform)
-                {
+                if (bWordArtTransform) {
                     _vertical_shift = 0;
                 }
-                else
-                {
+                else {
                     if (!(this.bWordShape ) || _content_height < _text_rect_height) {
                         switch (oBodyPr.anchor) {
                             case 0: //b
@@ -1615,13 +1574,11 @@ CShape.prototype =
                         }
                     }
                     else {
-                        _vertical_shift =  _text_rect_height - _content_height;
-                        if(oBodyPr.anchor === 0)
-                        {
-                            _vertical_shift =  _text_rect_height - _content_height;
+                        _vertical_shift = _text_rect_height - _content_height;
+                        if (oBodyPr.anchor === 0) {
+                            _vertical_shift = _text_rect_height - _content_height;
                         }
-                        else
-                        {
+                        else {
                             _vertical_shift = 0;
                         }
                     }
@@ -1639,12 +1596,10 @@ CShape.prototype =
                 }
             }
             else {
-                if(bWordArtTransform)
-                {
+                if (bWordArtTransform) {
                     _vertical_shift = 0;
                 }
-                else
-                {
+                else {
                     if (!(this.bWordShape) || _content_height < _text_rect_width) {
                         switch (oBodyPr.anchor) {
                             case 0: //b
@@ -1675,12 +1630,10 @@ CShape.prototype =
                         }
                     }
                     else {
-                        if(oBodyPr.anchor === 0)
-                        {
-                            _vertical_shift =  _text_rect_width - _content_height;
+                        if (oBodyPr.anchor === 0) {
+                            _vertical_shift = _text_rect_width - _content_height;
                         }
-                        else
-                        {
+                        else {
                             _vertical_shift = 0;
                         }
                     }
@@ -1709,13 +1662,11 @@ CShape.prototype =
                     }
                 }
             }
-            if(this.spPr && isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect))
-            {
+            if (this.spPr && isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect)) {
                 var rect = this.spPr.geometry.rect;
                 oClipRect = {x: -1, y: rect.t + t_ins, w: this.extX + 2, h: rect.b - rect.t - b_ins};
             }
-            else
-            {
+            else {
                 oClipRect = {x: -1, y: t_ins, w: this.extX + 2, h: this.extY - b_ins};
             }
         }
@@ -1730,8 +1681,7 @@ CShape.prototype =
 
 
             var _content_width, content_height2;
-            if (checkNormalRotate(_full_rotate))
-            {
+            if (checkNormalRotate(_full_rotate)) {
                 if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
                     _content_width = _r - _l;
                     content_height2 = _b - _t;
@@ -1753,12 +1703,10 @@ CShape.prototype =
                 }
             }
 
-            if(bWordArtTransform)
-            {
+            if (bWordArtTransform) {
                 _vertical_shift = 0;
             }
-            else
-            {
+            else {
                 if (!(this.bWordShape) || _content_height < content_height2) {
                     switch (oBodyPr.anchor) {
                         case 0: //b
@@ -1789,12 +1737,10 @@ CShape.prototype =
                     }
                 }
                 else {
-                    if(oBodyPr.anchor === 0)
-                    {
-                        _vertical_shift =  content_height2 - _content_height;
+                    if (oBodyPr.anchor === 0) {
+                        _vertical_shift = content_height2 - _content_height;
                     }
-                    else
-                    {
+                    else {
                         _vertical_shift = 0;
                     }
                 }
@@ -1846,56 +1792,46 @@ CShape.prototype =
         return oClipRect;
     },
 
-    setWordShape: function(pr)
-    {
+    setWordShape: function (pr) {
         History.Add(this, {Type: historyitem_ShapeSetWordShape, oldPr: this.bWordShape, newPr: pr});
         this.bWordShape = pr;
     },
 
-    selectionCheck: function( X, Y, Page_Abs, NearPos)
-    {
+    selectionCheck: function (X, Y, Page_Abs, NearPos) {
 
         var content = this.getDocContent();
-        if(content)
-        {
-            if ( undefined !== NearPos )
+        if (content) {
+            if (undefined !== NearPos)
                 return content.Selection_Check(X, Y, Page_Abs, NearPos);
 
-            if(isRealObject(content) && this.hitInTextRect(X, Y) && this.invertTransformText)
-            {
+            if (isRealObject(content) && this.hitInTextRect(X, Y) && this.invertTransformText) {
                 var t_x = this.invertTransformText.TransformPointX(X, Y);
                 var t_y = this.invertTransformText.TransformPointY(X, Y);
-                return content.Selection_Check(t_x, t_y, Page_Abs,  NearPos);
+                return content.Selection_Check(t_x, t_y, Page_Abs, NearPos);
             }
         }
         return false;
     },
 
-    copy: function ()
-    {
+    copy: function () {
         var copy = new CShape();
-        if(this.nvSpPr)
+        if (this.nvSpPr)
             copy.setNvSpPr(this.nvSpPr.createDuplicate());
-        if(this.spPr)
-        {
+        if (this.spPr) {
             copy.setSpPr(this.spPr.createDuplicate());
             copy.spPr.setParent(copy);
         }
-        if(this.style)
-        {
+        if (this.style) {
             copy.setStyle(this.style.createDuplicate());
         }
-        if(this.txBody)
-        {
+        if (this.txBody) {
             copy.setTxBody(this.txBody.createDuplicate());
             copy.txBody.setParent(copy);
         }
-        if(this.bodyPr)
-        {
+        if (this.bodyPr) {
             copy.setBodyPr(this.bodyPr.createDuplicate());
         }
-        if(this.textBoxContent)
-        {
+        if (this.textBoxContent) {
             copy.setTextBoxContent(this.textBoxContent.Copy(copy));
         }
         copy.setWordShape(this.bWordShape);
@@ -1907,8 +1843,7 @@ CShape.prototype =
     Get_Styles: function (level) {
 
         var _level = isRealNumber(level) ? level : 0;
-        if (this.recalcInfo.recalculateTextStyles[_level])
-        {
+        if (this.recalcInfo.recalculateTextStyles[_level]) {
             this.recalculateTextStyles(_level);
             this.recalcInfo.recalculateTextStyles[_level] = false;
         }
@@ -1916,15 +1851,12 @@ CShape.prototype =
         var ret = this.compiledStyles[_level];
         this.compiledStyles[_level] = undefined;
         return ret;
-     //   return this.compiledStyles[_level];
+        //   return this.compiledStyles[_level];
     },
 
 
-
-    recalculateTextStyles: function (level)
-    {
-        return ExecuteNoHistory(function()
-        {
+    recalculateTextStyles: function (level) {
+        return ExecuteNoHistory(function () {
             var parent_objects = this.getParentObjects();
             var default_style = new CStyle("defaultStyle", null, null, null, true);
             default_style.ParaPr.Spacing.LineRule = linerule_Auto;
@@ -1933,22 +1865,18 @@ CShape.prototype =
             default_style.ParaPr.Spacing.After = 0;
             default_style.ParaPr.Align = align_Center;
             if (isRealObject(parent_objects.presentation) && isRealObject(parent_objects.presentation.defaultTextStyle)
-                && isRealObject(parent_objects.presentation.defaultTextStyle.levels[level]))
-            {
+                && isRealObject(parent_objects.presentation.defaultTextStyle.levels[level])) {
                 var default_ppt_style = parent_objects.presentation.defaultTextStyle.levels[level];
                 default_style.ParaPr.Merge(default_ppt_style.Copy());
                 default_ppt_style.DefaultRunPr && default_style.TextPr.Merge(default_ppt_style.DefaultRunPr.Copy());
             }
 
             var master_style;
-            if (isRealObject(parent_objects.master) && isRealObject(parent_objects.master.txStyles))
-            {
+            if (isRealObject(parent_objects.master) && isRealObject(parent_objects.master.txStyles)) {
                 var master_ppt_styles;
                 master_style = new CStyle("masterStyele", null, null, null, true);
-                if (this.isPlaceholder())
-                {
-                    switch (this.getPlaceholderType())
-                    {
+                if (this.isPlaceholder()) {
+                    switch (this.getPlaceholderType()) {
                         case phType_ctrTitle:
                         case phType_title:
                         {
@@ -1970,17 +1898,14 @@ CShape.prototype =
                         }
                     }
                 }
-                else
-                {
+                else {
                     master_ppt_styles = parent_objects.master.txStyles.otherStyle;
                 }
 
-                if (isRealObject(master_ppt_styles) && isRealObject(master_ppt_styles.levels) && isRealObject(master_ppt_styles.levels[level]))
-                {
+                if (isRealObject(master_ppt_styles) && isRealObject(master_ppt_styles.levels) && isRealObject(master_ppt_styles.levels[level])) {
                     var master_ppt_style = master_ppt_styles.levels[level];
                     master_style.ParaPr = master_ppt_style.Copy();
-                    if(master_ppt_style.DefaultRunPr)
-                    {
+                    if (master_ppt_style.DefaultRunPr) {
                         master_style.TextPr = master_ppt_style.DefaultRunPr.Copy();
                     }
                 }
@@ -1988,20 +1913,17 @@ CShape.prototype =
 
             var hierarchy = this.getHierarchy();
             var hierarchy_styles = [];
-            for (var i = 0; i < hierarchy.length; ++i)
-            {
+            for (var i = 0; i < hierarchy.length; ++i) {
                 var hierarchy_shape = hierarchy[i];
                 if (isRealObject(hierarchy_shape)
                     && isRealObject(hierarchy_shape.txBody)
                     && isRealObject(hierarchy_shape.txBody.lstStyle)
                     && isRealObject(hierarchy_shape.txBody.lstStyle.levels)
-                    && isRealObject(hierarchy_shape.txBody.lstStyle.levels[level]))
-                {
+                    && isRealObject(hierarchy_shape.txBody.lstStyle.levels[level])) {
                     var hierarchy_ppt_style = hierarchy_shape.txBody.lstStyle.levels[level];
                     var hierarchy_style = new CStyle("hierarchyStyle" + i, null, null, null, true);
                     hierarchy_style.ParaPr = hierarchy_ppt_style.Copy();
-                    if(hierarchy_ppt_style.DefaultRunPr)
-                    {
+                    if (hierarchy_ppt_style.DefaultRunPr) {
                         hierarchy_style.TextPr = hierarchy_ppt_style.DefaultRunPr.Copy();
                     }
                     hierarchy_styles.push(hierarchy_style);
@@ -2009,34 +1931,30 @@ CShape.prototype =
             }
 
             var ownStyle;
-            if (isRealObject(this.txBody) && isRealObject(this.txBody.lstStyle) && isRealObject(this.txBody.lstStyle.levels[level]))
-            {
+            if (isRealObject(this.txBody) && isRealObject(this.txBody.lstStyle) && isRealObject(this.txBody.lstStyle.levels[level])) {
                 ownStyle = new CStyle("ownStyle", null, null, null, true);
                 var own_ppt_style = this.txBody.lstStyle.levels[level];
                 ownStyle.ParaPr = own_ppt_style.Copy();
-                if(own_ppt_style.DefaultRunPr)
-                {
+                if (own_ppt_style.DefaultRunPr) {
                     ownStyle.TextPr = own_ppt_style.DefaultRunPr.Copy();
                 }
                 hierarchy_styles.splice(0, 0, ownStyle);
             }
             var shape_text_style;
-            if (isRealObject(this.style) && isRealObject(this.style.fontRef))
-            {
+            if (isRealObject(this.style) && isRealObject(this.style.fontRef)) {
                 shape_text_style = new CStyle("shapeTextStyle", null, null, null, true);
                 var first_name;
-                if(this.style.fontRef.idx === fntStyleInd_major)
+                if (this.style.fontRef.idx === fntStyleInd_major)
                     first_name = "+mj-";
                 else
                     first_name = "+mn-";
 
-                shape_text_style.TextPr.RFonts.Ascii =  { Name: first_name + "lt", Index: -1 };
-                shape_text_style.TextPr.RFonts.EastAsia =  { Name: first_name +"ea", Index: -1 };
-                shape_text_style.TextPr.RFonts.CS =  { Name: first_name +"cs", Index: -1 };
-                shape_text_style.TextPr.RFonts.HAnsi =  { Name: first_name +"lt", Index: -1 };
+                shape_text_style.TextPr.RFonts.Ascii = {Name: first_name + "lt", Index: -1};
+                shape_text_style.TextPr.RFonts.EastAsia = {Name: first_name + "ea", Index: -1};
+                shape_text_style.TextPr.RFonts.CS = {Name: first_name + "cs", Index: -1};
+                shape_text_style.TextPr.RFonts.HAnsi = {Name: first_name + "lt", Index: -1};
 
-                if (this.style.fontRef.Color != null && this.style.fontRef.Color.color != null)
-                {
+                if (this.style.fontRef.Color != null && this.style.fontRef.Color.color != null) {
                     var unifill = new CUniFill();
                     unifill.fill = new CSolidFill();
                     unifill.fill.color = this.style.fontRef.Color;
@@ -2067,7 +1985,7 @@ CShape.prototype =
             }
             else {
                 if (master_style) {
-                   // checkTextPr(master_style.TextPr);
+                    // checkTextPr(master_style.TextPr);
                     b_checked = true;
                     Styles.Add(master_style);
                     master_style.BasedOn = null;
@@ -2107,10 +2025,9 @@ CShape.prototype =
 
     recalculateBrush: function () {
         var compiled_style = this.getCompiledStyle();
-        var RGBA = { R: 0, G: 0, B: 0, A: 255 };
+        var RGBA = {R: 0, G: 0, B: 0, A: 255};
         var parents = this.getParentObjects();
-        if (isRealObject(parents.theme) && isRealObject(compiled_style) && isRealObject(compiled_style.fillRef))
-        {
+        if (isRealObject(parents.theme) && isRealObject(compiled_style) && isRealObject(compiled_style.fillRef)) {
             //compiled_style.fillRef.Color.Calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A:255});
             //RGBA = compiled_style.fillRef.Color.RGBA;
             this.brush = parents.theme.getFillStyle(compiled_style.fillRef.idx, compiled_style.fillRef.Color);
@@ -2129,8 +2046,7 @@ CShape.prototype =
             //    this.brush = new CUniFill();
             //}
         }
-        else
-        {
+        else {
             this.brush = new CUniFill();
         }
 
@@ -2141,25 +2057,25 @@ CShape.prototype =
 
     recalculatePen: function () {
         var compiled_style = this.getCompiledStyle();
-        var RGBA = { R: 0, G: 0, B: 0, A: 255 };
+        var RGBA = {R: 0, G: 0, B: 0, A: 255};
         var parents = this.getParentObjects();
         if (isRealObject(parents.theme) && isRealObject(compiled_style) && isRealObject(compiled_style.lnRef)) {
             //compiled_style.lnRef.Color.Calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A:255});
             //RGBA = compiled_style.lnRef.Color.RGBA;
             this.pen = parents.theme.getLnStyle(compiled_style.lnRef.idx, compiled_style.lnRef.Color);
-           //if (isRealObject(this.pen)) {
-           //    if (isRealObject(compiled_style.lnRef.Color.color)
-           //        && isRealObject(this.pen)
-           //        && isRealObject(this.pen.Fill)
-           //        && isRealObject(this.pen.Fill.fill)
-           //        && this.pen.Fill.fill.type === FILL_TYPE_SOLID) {
-           //        this.pen.Fill.fill.color = compiled_style.lnRef.Color.createDuplicate();
-           //    }
-           //}
-           //else
-           //{
-           //    this.pen = new CLn();
-           //}
+            //if (isRealObject(this.pen)) {
+            //    if (isRealObject(compiled_style.lnRef.Color.color)
+            //        && isRealObject(this.pen)
+            //        && isRealObject(this.pen.Fill)
+            //        && isRealObject(this.pen.Fill.fill)
+            //        && this.pen.Fill.fill.type === FILL_TYPE_SOLID) {
+            //        this.pen.Fill.fill.color = compiled_style.lnRef.Color.createDuplicate();
+            //    }
+            //}
+            //else
+            //{
+            //    this.pen = new CLn();
+            //}
         }
         else {
             this.pen = new CLn();
@@ -2216,12 +2132,12 @@ CShape.prototype =
             xfrm.setOffY(xfrm.offY * kh);
             xfrm.setExtX(xfrm.extX * kw);
             xfrm.setExtY(xfrm.extY * kh);
+            CheckShapeBodyAutoFitReset(this);
         }
         this.recalcTransform && this.recalcTransform();
     },
 
-    recalculateTransform: function ()
-    {
+    recalculateTransform: function () {
         this.cachedImage = null;
         this.recalculateLocalTransform(this.transform);
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
@@ -2230,6 +2146,24 @@ CShape.prototype =
         //    this.drawingBase.setGraphicObjectCoords();
         //}
         this.localTransform = this.transform.CreateDublicate();
+    },
+
+
+    checkAutofit: function (bIgnoreWordShape) {
+        if (this.bWordShape || bIgnoreWordShape || this.bCheckAutoFitFlag) {
+            var content = this.getDocContent();
+            if (content) {
+                var oBodyPr = this.getBodyPr();
+                if (oBodyPr.textFit && oBodyPr.textFit.type === text_fit_Auto || oBodyPr.wrap === nTWTNone) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    },
+
+    Check_AutoFit: function () {
+        return this.checkAutofit(true);
     },
 
 
@@ -2356,6 +2290,289 @@ CShape.prototype =
             this.flipH = xfrm.flipH === true;
             this.flipV = xfrm.flipV === true;
         }
+
+
+        if(this.checkAutofit && this.checkAutofit()) {
+            var oBodyPr = this.getBodyPr();
+            if(this.recalcInfo.recalculateGeometry)
+            {
+                this.recalculateGeometry();
+                this.recalcInfo.recalculateGeometry = true;
+            }
+            if (this.bWordShape) {
+                if (this.recalcInfo.recalculateTxBoxContent) {
+                    this.recalcInfo.oContentMetrics = this.recalculateTxBoxContent();
+                    this.recalcInfo.recalculateTxBoxContent = false;
+                }
+            }
+            else {
+                if (this.recalcInfo.recalculateContent) {
+                    this.recalcInfo.oContentMetrics = this.recalculateContent();
+                    this.recalcInfo.recalculateContent = false;
+                }
+            }
+            var oContentMetrics = this.recalcInfo.oContentMetrics;
+
+            var l_ins, t_ins, r_ins, b_ins;
+            if (oBodyPr) {
+                l_ins = isRealNumber(oBodyPr.lIns) ? oBodyPr.lIns : 2.54;
+                r_ins = isRealNumber(oBodyPr.rIns) ? oBodyPr.rIns : 2.54;
+                t_ins = isRealNumber(oBodyPr.tIns) ? oBodyPr.tIns : 1.27;
+                b_ins = isRealNumber(oBodyPr.bIns) ? oBodyPr.bIns : 1.27;
+            }
+            else {
+                l_ins = 2.54;
+                r_ins = 2.54;
+                t_ins = 1.27;
+                b_ins = 1.27;
+            }
+            var oGeometry = this.spPr && this.spPr.geometry, oWH;
+            var dOldExtX = this.extX, dOldExtY = this.extY, dDeltaX = 0, dDeltaY = 0;
+
+
+            if (oBodyPr.wrap === nTWTNone) {
+                if (!oBodyPr.upright) {
+                    if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
+                        if (oGeometry) {
+                            oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + l_ins + r_ins, oContentMetrics.contentH + t_ins + b_ins);
+                            this.extX = oWH.W;
+                            this.extY = oWH.H;
+                        }
+                        else {
+                            this.extX = oContentMetrics.w + l_ins + r_ins;
+                            this.extY = oContentMetrics.contentH + t_ins + b_ins;
+                        }
+
+                    }
+                    else {
+                        if (oGeometry) {
+                            oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + t_ins + b_ins, oContentMetrics.contentH + l_ins + r_ins);
+                            this.extX = oWH.H;
+                            this.extY = oWH.W;
+                        }
+                        else {
+                            this.extY = oContentMetrics.w + t_ins + b_ins;
+                            this.extX = oContentMetrics.contentH + l_ins + r_ins;
+                        }
+                    }
+                }
+                else {
+                    var _full_rotate = this.getFullRotate();
+                    if (checkNormalRotate(_full_rotate)) {
+                        if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
+
+                            if (oGeometry) {
+                                oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + l_ins + r_ins, oContentMetrics.contentH + t_ins + b_ins);
+                                this.extX = oWH.W;
+                                this.extY = oWH.H;
+                            }
+                            else {
+                                this.extX = oContentMetrics.w + l_ins + r_ins;
+                                this.extY = oContentMetrics.contentH + t_ins + b_ins;
+                            }
+                        }
+                        else {
+                            if (oGeometry) {
+                                oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + t_ins + b_ins, oContentMetrics.contentH + l_ins + r_ins);
+                                this.extX = oWH.H;
+                                this.extY = oWH.W;
+                            }
+                            else {
+                                this.extY = oContentMetrics.w + t_ins + b_ins;
+                                this.extX = oContentMetrics.contentH + l_ins + r_ins;
+                            }
+
+                        }
+                    }
+                    else {
+                        if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
+                            if (oGeometry) {
+                                oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + l_ins + r_ins, oContentMetrics.contentH + t_ins + b_ins);
+                                this.extX = oWH.W;
+                                this.extY = oWH.H;
+                            }
+                            else {
+                                this.extX = oContentMetrics.w + l_ins + r_ins;
+                                this.extY = oContentMetrics.contentH + t_ins + b_ins;
+                            }
+                        }
+                        else {
+                            if (oGeometry) {
+                                oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + t_ins + b_ins, oContentMetrics.contentH + l_ins + r_ins);
+                                this.extX = oWH.H;
+                                this.extY = oWH.W;
+                            }
+                            else {
+                                this.extY = oContentMetrics.w + t_ins + b_ins;
+                                this.extX = oContentMetrics.contentH + l_ins + r_ins;
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                if (!oBodyPr.upright) {
+                    if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
+                        if (oGeometry) {
+                            oWH = oGeometry.getNewWHByTextRect(undefined, oContentMetrics.contentH + t_ins + b_ins, this.extX, undefined);
+                            this.extY = oWH.H;
+                        }
+                        else {
+                            this.extY = oContentMetrics.contentH + t_ins + b_ins;
+                        }
+                    }
+                    else {
+                        if (oGeometry) {
+                            oWH = oGeometry.getNewWHByTextRect(oContentMetrics.contentH + l_ins + b_ins, undefined, undefined, this.extY);
+                            this.extX = oWH.W;
+                        }
+                        else {
+                            this.extX = oContentMetrics.contentH + l_ins + r_ins;
+                        }
+                    }
+                }
+                else {
+                    var _full_rotate = this.getFullRotate();
+                    if (checkNormalRotate(_full_rotate)) {
+                        if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
+                            if (oGeometry) {
+                                oWH = oGeometry.getNewWHByTextRect(undefined, oContentMetrics.contentH + t_ins + b_ins, this.extX, undefined);
+                                this.extY = oWH.H;
+                            }
+                            else {
+                                this.extY = oContentMetrics.contentH + t_ins + b_ins;
+                            }
+
+                        }
+                        else {
+                            if (oGeometry) {
+                                oWH = oGeometry.getNewWHByTextRect(oContentMetrics.contentH + l_ins + r_ins, undefined, undefined, this.extY);
+                                this.extX = oWH.W;
+                            }
+                            else {
+                                this.extX = oContentMetrics.contentH + l_ins + r_ins;
+                            }
+                        }
+                    }
+                    else {
+                        if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
+                            if (oGeometry) {
+                                oWH = oGeometry.getNewWHByTextRect(oContentMetrics.contentH + l_ins + r_ins, undefined, undefined, this.extY);
+                                this.extX = oWH.W;
+                            }
+                            else {
+                                this.extX = oContentMetrics.contentH + l_ins + r_ins;
+                            }
+                        }
+                        else {
+                            if (oGeometry) {
+                                oWH = oGeometry.getNewWHByTextRect(undefined, oContentMetrics.contentH + t_ins + b_ins, this.extX, undefined);
+                                this.extY = oWH.H;
+                            }
+                            else {
+                                this.extY = oContentMetrics.contentH + t_ins + b_ins;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(!this.bWordShape)//в презентациях и в таблицах изменям позицию: по горизонтали - в зависимости от выравнивания первого параграфа в контенте,
+            // по вертикали - в зависимости от вертикального выравнивания контента.
+            {
+                var dSin = Math.sin(this.rot), dCos = Math.cos(this.rot);
+                var nJc = this.getDocContent().Content[0].CompiledPr.Pr.ParaPr.Jc;
+                switch(nJc)
+                {
+                    case align_Right:
+                    {
+                        dDeltaX = dOldExtX - this.extX;
+                        break;
+                    }
+                    case align_Left:
+                    {
+                        dDeltaX = 0;
+                        break;
+                    }
+                    case align_Center:
+                    case align_Justify:
+                    {
+                        dDeltaX = (dOldExtX - this.extX)/2;
+                        break;
+                    }
+                }
+                switch (oBodyPr.anchor)
+                {
+                    case 0: //b
+                    {
+                        dDeltaY = dOldExtY - this.extY;
+                        break;
+                    }
+                    case 1:    //ctr
+                    case 2: //dist
+                    case 3: //just
+                    {// (Text Anchor Enum ( Center ))
+                        dDeltaY = (dOldExtY - this.extY) / 2;
+                        break;
+                    }
+                    case 4: //t
+                    {//Top
+                        break;
+                    }
+                }
+                var dTrDeltaX, dTrDeltaY;
+                dTrDeltaX = dCos*dDeltaX - dSin*dDeltaY;
+                dTrDeltaY = dSin*dDeltaX + dCos*dDeltaY;
+                this.x += dTrDeltaX;
+                this.y += dTrDeltaY;
+            }
+
+
+            /*if(!this.bWordShape)
+            {
+                switch (oBodyPr.anchor) {
+                    case 0: //b
+                    {
+                        dDeltaY = dOldExtY - this.extY;
+                        break;
+                    }
+                    case 1:    //ctr
+                    case 2: //dist
+                    case 3: //just
+                    {// (Text Anchor Enum ( Center ))
+                        dDeltaY = (dOldExtY - this.extY) / 2;
+                        break;
+                    }
+                    case 4: //t
+                    {//Top
+                        break;
+                    }
+                }
+                if (oBodyPr.wrap === nTWTNone){
+                    oContent = this.getDocContent();
+                    oParaPr = oContent.Content[0].CompiledPr.ParaPr;
+                    switch (oParaPr.Jc) {
+                        case align_Right:
+                        {
+                            dDeltaX = dOldExtX - this.extX;
+                            break;
+                        }
+                        case align_Left:
+                        {
+
+                            break;
+                        }
+                        default:
+                            //case align_Center:
+                            //case align_Justify:
+                        {
+                            dDeltaX = (dOldExtX - this.extX) / 2;
+                            break;
+                        }
+                    }
+                }
+            }*/
+        }
         this.localX = this.x;
         this.localY = this.y;
         transform.Reset();
@@ -2375,6 +2592,122 @@ CShape.prototype =
         this.transform = transform;
     },
 
+
+    recalculateDocContent: function(oDocContent, oBodyPr)
+    {
+        var oRet = {w: 0, h: 0, contentH: 0};
+        if(oBodyPr.wrap === nTWTNone)
+        {
+            var dMaxWidth = this.bWordShape ? 1000/*TODO: to get size of the text area*/ : 100000;
+            var dMaxWidthRec = RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, this.bWordShape);
+            oDocContent.Set_StartPage(0);
+            oDocContent.Reset(0, 0, dMaxWidthRec, 20000);
+            oDocContent.Recalculate_Page(oDocContent.StartPage, true);
+            oRet.w = dMaxWidthRec;
+            oRet.contentH = oDocContent.Get_SummaryHeight();
+            oRet.h = oRet.contentH;
+        }
+        else//nTWTSquare
+        {
+            var w, h;
+            var l_ins, t_ins, r_ins, b_ins;
+            if(oBodyPr)
+            {
+                l_ins = isRealNumber(oBodyPr.lIns) ? oBodyPr.lIns : 2.54;
+                r_ins = isRealNumber(oBodyPr.rIns) ? oBodyPr.rIns : 2.54;
+                t_ins = isRealNumber(oBodyPr.tIns) ? oBodyPr.tIns : 1.27;
+                b_ins = isRealNumber(oBodyPr.bIns) ? oBodyPr.bIns : 1.27;
+            }
+            else
+            {
+                l_ins = 2.54;
+                r_ins = 2.54;
+                t_ins = 1.27;
+                b_ins = 1.27;
+            }
+
+            var oRect = this.getTextRect();
+            w = oRect.r - oRect.l - (l_ins + r_ins);
+            h = oRect.b - oRect.t - (t_ins + b_ins);
+            if(!oBodyPr.upright)
+            {
+                if(!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270))
+                {
+                    oRet.w = w;
+                    oRet.h = h;
+                }
+                else
+                {
+                    oRet.w = h;
+                    oRet.h = w;
+                }
+            }
+            else
+            {
+                var _full_rotate = this.getFullRotate();
+                if(checkNormalRotate(_full_rotate))
+                {
+                    if(!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270))
+                    {
+                        oRet.w = w;
+                        oRet.h = h;
+                    }
+                    else
+                    {
+                        oRet.w = h;
+                        oRet.h = w;
+                    }
+                }
+                else
+                {
+                    if(!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270))
+                    {
+                        oRet.w = h;
+                        oRet.h = w;
+                    }
+                    else
+                    {
+                        oRet.w = w;
+                        oRet.h = h;
+                    }
+                }
+            }
+
+            //oDocContent.Set_StartPage(0);
+            oDocContent.Reset(0, 0, oRet.w, 20000);
+            var CurPage = 0;
+            var RecalcResult = recalcresult2_NextPage;
+            while ( recalcresult2_End !== RecalcResult  )
+                RecalcResult = oDocContent.Recalculate_Page( CurPage++, true );
+            oRet.contentH = oDocContent.Get_SummaryHeight();
+        }
+        return oRet;
+    },
+
+    checkExtentsByDocContent: function()
+    {
+        if(!this.bWordShape && this.checkAutofit(true))
+        {
+            var oMainGroup = this.getMainGroup();
+            if(oMainGroup)
+            {
+                oMainGroup.normalize();
+            }
+            this.bCheckAutoFitFlag = true;
+            this.handleUpdateExtents();
+            this.recalculate();
+            this.bCheckAutoFitFlag = false;
+            CheckSpPrXfrm(this, true);
+            this.spPr.xfrm.setExtX(this.extX);
+            this.spPr.xfrm.setExtY(this.extY);
+            if(!this.bWordShape)
+            {
+                this.spPr.xfrm.setOffX(this.x);
+                this.spPr.xfrm.setOffY(this.y);
+            }
+            this.checkDrawingBaseCoords();
+        }
+    },
 
     checkDrawingBaseCoords: function()
     {
@@ -3500,6 +3833,10 @@ CShape.prototype =
         }
         else {
             this.spPr.geometry = null;
+        }
+        if(!this.bWordShape)
+        {
+            this.checkExtentsByDocContent();
         }
         if ((!this.brush || !this.brush.fill) && (!this.pen || !this.pen.Fill || !this.pen.Fill.fill)) {
             var new_line2 = new CLn();

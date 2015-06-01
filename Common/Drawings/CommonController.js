@@ -11,6 +11,61 @@ var HANDLE_EVENT_MODE_CURSOR = 1;
 
 var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
 
+function CheckShapeBodyAutoFitReset(oShape)
+{
+    if(oShape instanceof CShape)
+    {
+        var oPropsToSet = null;
+        if(oShape.bWordShape)
+        {
+            if(!oShape.textBoxContent)
+                return;
+            if(oShape.bodyPr)
+            {
+                oPropsToSet = oShape.bodyPr.createDuplicate();
+            }
+            else
+            {
+                oPropsToSet = new CBodyPr();
+            }
+        }
+        else
+        {
+            if(!oShape.txBody)
+                return;
+            if(oShape.txBody.bodyPr)
+            {
+                oPropsToSet = oShape.txBody.bodyPr.createDuplicate();
+            }
+            else
+            {
+                oPropsToSet = new CBodyPr();
+            }
+        }
+        var oBodyPr = oShape.getBodyPr();
+        if(oBodyPr.textFit && oBodyPr.textFit.type === text_fit_Auto)
+        {
+            if(!oPropsToSet.textFit)
+            {
+                oPropsToSet.textFit = new CTextFit();
+            }
+            oPropsToSet.textFit.type = text_fit_No;
+        }
+        if(oBodyPr.wrap === nTWTNone)
+        {
+            oPropsToSet.wrap = nTWTSquare;
+        }
+        if(oShape.bWordShape)
+        {
+           oShape.setBodyPr(oPropsToSet);
+        }
+        else
+        {
+            oShape.txBody.setBodyPr(oPropsToSet);
+        }
+    }
+}
+
 function CDistance(L, T, R, B)
 {
     this.L = L;
@@ -109,7 +164,7 @@ function CompareGroups(a, b)
     return count1 - count2;
 }
 
-function CheckSpPrXfrm(object)
+function CheckSpPrXfrm(object, bNoResetAutofit)
 {
     if(!object.spPr)
     {
@@ -124,6 +179,10 @@ function CheckSpPrXfrm(object)
         object.spPr.xfrm.setOffY(object.y);
         object.spPr.xfrm.setExtX(object.extX);
         object.spPr.xfrm.setExtY(object.extY);
+        if(bNoResetAutofit !== true)
+        {
+            CheckShapeBodyAutoFitReset(object);
+        }
     }
 }
 
@@ -1033,6 +1092,11 @@ DrawingObjectsController.prototype =
                         }
                     }
                 }
+
+                if(arr[i].checkExtentsByDocContent)
+                {
+                    arr[i].checkExtentsByDocContent();
+                }
             }
             return ret;
         }
@@ -1064,6 +1128,7 @@ DrawingObjectsController.prototype =
             if(this.selection.textSelection.getObjectType() !== historyitem_type_GraphicFrame)
             {
                 f.apply(this.selection.textSelection.getDocContent(), args);
+                this.selection.textSelection.checkExtentsByDocContent();
             }
             else
             {
@@ -1077,6 +1142,7 @@ DrawingObjectsController.prototype =
                 if(this.selection.groupSelection.selection.textSelection.getObjectType() !== historyitem_type_GraphicFrame)
                 {
                     f.apply(this.selection.groupSelection.selection.textSelection.getDocContent(), args);
+                    this.selection.groupSelection.selection.textSelection.checkExtentsByDocContent();
                 }
                 else
                 {
@@ -1839,6 +1905,7 @@ DrawingObjectsController.prototype =
                 CheckSpPrXfrm(objects_by_type.shapes[i]);
                 objects_by_type.shapes[i].spPr.xfrm.setExtX(props.Width);
                 objects_by_type.shapes[i].spPr.xfrm.setExtY(props.Height);
+                CheckShapeBodyAutoFitReset(objects_by_type.shapes[i]);
                 if(objects_by_type.shapes[i].group)
                 {
                     checkObjectInArray(aGroups, objects_by_type.shapes[i].group.getMainGroup());
@@ -4736,9 +4803,20 @@ DrawingObjectsController.prototype =
                     if (oTargetTextObject.recalcInfo.bRecalculatedTitle)
                     {
                         oTargetTextObject.recalcInfo.recalcTitle = null;
-                        oTargetTextObject.handleContent && oTargetTextObject.handleContent();
-                        oTargetTextObject.recalculate();
                         oTargetTextObject.recalcInfo.bRecalculatedTitle = false;
+                        ExecuteNoHistory(function()
+                        {
+                            if(oTargetTextObject.bWordShape)
+                            {
+                                oTargetTextObject.recalcInfo.oContentMetrics = oTargetTextObject.recalculateTxBoxContent();
+                                oTargetTextObject.recalcInfo.recalculateTxBoxContent = false;
+                            }
+                            else
+                            {
+                                oTargetTextObject.recalcInfo.oContentMetrics = oTargetTextObject.recalculateContent();
+                                oTargetTextObject.recalcInfo.recalculateContent = false;
+                            }
+                        }, this, []);
 
                     }
                     if (this.document)

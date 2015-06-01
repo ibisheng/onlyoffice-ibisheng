@@ -21376,6 +21376,11 @@ CTableCell.prototype =
         return true;
     },
 
+    Check_AutoFit : function()
+    {
+        return false;
+    },
+
     Is_DrawingShape : function()
     {
         return this.Row.Table.Parent.Is_DrawingShape();

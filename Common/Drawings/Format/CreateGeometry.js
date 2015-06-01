@@ -9155,6 +9155,53 @@ function getPrstByNumber(nPreset)
     return  "textNoShape";
 }
 
+
+function getNumByTxPrst(sPreset)
+{
+    if ("textArchDown" == sPreset) return 0;
+    if ("textArchDownPour" == sPreset) return 1;
+    if ("textArchUp" == sPreset) return 2;
+    if ("textArchUpPour" == sPreset) return 3;
+    if ("textButton" == sPreset) return 4;
+    if ("textButtonPour" == sPreset) return 5;
+    if ("textCanDown" == sPreset) return 6;
+    if ("textCanUp" == sPreset) return 7;
+    if ("textCascadeDown" == sPreset) return 8;
+    if ("textCascadeUp" == sPreset) return 9;
+    if ("textChevron" == sPreset) return 10;
+    if ("textChevronInverted" == sPreset) return 11;
+    if ("textCircle" == sPreset) return 12;
+    if ("textCirclePour" == sPreset) return 13;
+    if ("textCurveDown" == sPreset) return 14;
+    if ("textCurveUp" == sPreset) return 15;
+    if ("textDeflate" == sPreset) return 16;
+    if ("textDeflateBottom" == sPreset) return 17;
+    if ("textDeflateInflate" == sPreset) return 18;
+    if ("textDeflateInflateDeflate" == sPreset) return 19;
+    if ("textDeflateTop" == sPreset) return 20;
+    if ("textDoubleWave1" == sPreset) return 21;
+    if ("textFadeDown" == sPreset) return 22;
+    if ("textFadeLeft" == sPreset) return 23;
+    if ("textFadeRight" == sPreset) return 24;
+    if ("textFadeUp" == sPreset) return 25;
+    if ("textInflate" == sPreset) return 26;
+    if ("textInflateBottom" == sPreset) return 27;
+    if ("textInflateTop" == sPreset) return 28;
+    if ("textNoShape" == sPreset) return 29;
+    if ("textPlain" == sPreset) return 30;
+    if ("textRingInside" == sPreset) return 31;
+    if ("textRingOutside" == sPreset) return 32;
+    if ("textSlantDown" == sPreset) return 33;
+    if ("textSlantUp" == sPreset) return 34;
+    if ("textStop" == sPreset) return 35;
+    if ("textTriangle" == sPreset) return 36;
+    if ("textTriangleInverted" == sPreset) return 37;
+    if ("textWave1" == sPreset) return 38;
+    if ("textWave2" == sPreset) return 39;
+    if ("textWave4" == sPreset) return 40;
+    return 29;
+}
+
 function CreatePrstTxWarpGeometry(prst)
 {
     var f = new Geometry();

@@ -412,6 +412,11 @@ CHeaderFooter.prototype =
         return false;
     },
 
+    Check_AutoFit : function()
+    {
+        return false;
+    },
+
     Is_HdrFtr : function(bReturnHdrFtr)
     {
         if ( true === bReturnHdrFtr )

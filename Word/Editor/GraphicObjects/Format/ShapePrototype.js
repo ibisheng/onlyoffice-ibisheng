@@ -16,7 +16,8 @@ CShape.prototype.setRecalculateInfo = function()
         recalculateTransparent:    true,
         recalculateTextStyles:     [true, true, true, true, true, true, true, true, true],
         recalculateShapeStyleForParagraph: true,
-        recalculateWrapPolygon: true
+        recalculateWrapPolygon: true,
+        oContentMetrics: null
     };
 
     this.bNeedUpdatePosition = true;
@@ -39,6 +40,10 @@ CShape.prototype.recalcContent = function()
     if(this.bWordShape)
     {
         this.recalcInfo.recalculateTxBoxContent = true;
+        if(this.checkAutofit && this.checkAutofit())
+        {
+            this.recalcTransform();
+        }
     }
     else
     {
@@ -60,6 +65,7 @@ CShape.prototype.recalcPen = function()
 {
     this.recalcInfo.recalculatePen = true;
 };
+
 CShape.prototype.recalcTransform = function()
 {
     this.recalcInfo.recalculateTransform = true;
@@ -197,87 +203,11 @@ CShape.prototype.recalculateTxBoxContent = function()
 {
     if(this.textBoxContent === null || this.textBoxContent.Parent !== this)
         return;
-    var _l, _t, _r, _b;
     this.txWarpStruct = null;
-    var body_pr = this.getBodyPr();
-    var l_ins = typeof body_pr.lIns === "number" ? body_pr.lIns : 2.54;
-    var t_ins = typeof body_pr.tIns === "number" ? body_pr.tIns : 1.27;
-    var r_ins = typeof body_pr.rIns === "number" ? body_pr.rIns : 2.54;
-    var b_ins = typeof body_pr.bIns === "number" ? body_pr.bIns : 1.27;
-
-    var _body_pr = this.getBodyPr();
-    if(this.spPr && isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect))
-    {
-        var _rect = this.spPr.geometry.rect;
-        _l = _rect.l + l_ins;
-        _t = _rect.t + t_ins;
-        _r = _rect.r - r_ins;
-        _b = _rect.b - b_ins;
-    }
-    else
-    {
-        _l = l_ins;
-        _t = t_ins;
-        _r = this.extX - r_ins;
-        _b = this.extY - b_ins;
-    }
-    if(!_body_pr.upright)
-    {
-        var _content_width;
-        if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
-        {
-            _content_width = _r - _l;
-            this.contentWidth = _content_width;
-            this.contentHeight = _b - _t;
-        }
-        else
-        {
-            _content_width = _b - _t;
-            this.contentWidth = _content_width;
-            this.contentHeight = _r - _l;
-        }
-
-    }
-    else
-    {
-        var _full_rotate = this.getFullRotate();
-        if(checkNormalRotate(_full_rotate))
-        {
-            if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
-            {
-                _content_width = _r - _l;
-                this.contentWidth = _content_width;
-                this.contentHeight = _b - _t;
-            }
-            else
-            {
-                _content_width = _b - _t;
-                this.contentWidth = _content_width;
-                this.contentHeight = _r - _l;
-            }
-        }
-        else
-        {
-            if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
-            {
-                _content_width = _b - _t;
-                this.contentWidth = _content_width;
-                this.contentHeight = _r - _l;
-            }
-            else
-            {
-                _content_width = _r - _l;
-                this.contentWidth  = _content_width;
-                this.contentHeight = _b - _t;
-            }
-        }
-    }
-    this.textBoxContent.Reset(0, 0, _content_width, 20000);
-    var CurPage = 0;
-    var RecalcResult = recalcresult2_NextPage;
-    while ( recalcresult2_End != RecalcResult  )
-        RecalcResult = this.textBoxContent.Recalculate_Page( CurPage++, true );
-
+    var oBodyPr = this.getBodyPr();
+    var oRecalcObj = this.recalculateDocContent(this.textBoxContent, oBodyPr);
+    this.contentHeight = oRecalcObj.contentH;
+    this.contentWidth = oRecalcObj.w;
     if(this.recalcInfo.recalcTitle)
     {
         this.recalcInfo.bRecalculatedTitle = true;
@@ -285,11 +215,11 @@ CShape.prototype.recalculateTxBoxContent = function()
     }
     else
     {
-       var oTextWarpContent = this.checkTextWarp(this.textBoxContent, _body_pr, _r - _l, _b - _t);
+       var oTextWarpContent = this.checkTextWarp(this.textBoxContent, oBodyPr, oRecalcObj.w, oRecalcObj.h);
        this.txWarpStructParamarks = oTextWarpContent.oTxWarpStructParamarks;
        this.txWarpStruct = oTextWarpContent.oTxWarpStruct;
     }
-
+    return oRecalcObj;
 };
 
 CShape.prototype.recalculate = function ()
@@ -341,7 +271,7 @@ CShape.prototype.recalculateText = function()
         {
             if (this.recalcInfo.recalculateTxBoxContent)
             {
-                this.recalculateTxBoxContent();
+                this.recalcInfo.oContentMetrics = this.recalculateTxBoxContent();
                 this.recalcInfo.recalculateTxBoxContent = false;
             }
         }
@@ -349,7 +279,7 @@ CShape.prototype.recalculateText = function()
         {
             if (this.recalcInfo.recalculateContent)
             {
-                this.recalculateContent();
+                this.recalcInfo.oContentMetrics = this.recalculateContent();
                 this.recalcInfo.recalculateContent = false;
             }
         }
@@ -370,7 +300,6 @@ CShape.prototype.recalculateWrapPolygon = function()
 
 CShape.prototype.getArrayWrapPolygons = function()
 {
-
     var ret;
     if(this.spPr && this.spPr.geometry)
         ret =  this.spPr.geometry.getArrayPolygons();
@@ -397,39 +326,13 @@ CShape.prototype.recalculateContent = function()
     var content = this.getDocContent();
     if(content)
     {
-        var w, h;
-        var l_ins, t_ins, r_ins, b_ins;
         var body_pr = this.getBodyPr();
-        if(body_pr)
-        {
-            l_ins = isRealNumber(body_pr.lIns) ? body_pr.lIns : 2.54;
-            r_ins = isRealNumber(body_pr.rIns) ? body_pr.rIns : 2.54;
-            t_ins = isRealNumber(body_pr.tIns) ? body_pr.tIns : 1.27;
-            b_ins = isRealNumber(body_pr.bIns) ? body_pr.bIns : 1.27;
-        }
-        else
-        {
-            l_ins = 2.54;
-            r_ins = 2.54;
-            t_ins = 1.27;
-            b_ins = 1.27;
-        }
-        if(this.spPr && this.spPr.geometry && this.spPr.geometry.rect
-            && isRealNumber(this.spPr.geometry.rect.l) && isRealNumber(this.spPr.geometry.rect.t)
-            && isRealNumber(this.spPr.geometry.rect.r) && isRealNumber(this.spPr.geometry.rect.r))
-        {
-            w = this.spPr.geometry.rect.r - this.spPr.geometry.rect.l - (l_ins + r_ins);
-            h = this.spPr.geometry.rect.b - this.spPr.geometry.rect.t - (t_ins + b_ins);
-        }
-        else
-        {
-            w = this.extX - (l_ins + r_ins);
-            h = this.extY - (t_ins + b_ins);
-        }
-        content.Reset(0, 0, w, h);
-        content.Recalculate_Page(content.StartPage, true);
-
+        var oRecalcObj = this.recalculateDocContent(content, body_pr);
+        this.contentHeight = oRecalcObj.contentH;
+        this.contentWidth = oRecalcObj.w;
+        return oRecalcObj;
     }
+    return null;
 };
 
 CShape.prototype.recalculateTransform =  function()
@@ -560,6 +463,33 @@ CShape.prototype.Refresh_RecalcData = function(data)
 
 CShape.prototype.Refresh_RecalcData2 = function()
 {
+
+    var oController = this.getDrawingObjectsController();
+    if(oController && getTargetTextObject(oController) === this)
+    {
+        this.recalcInfo.recalcTitle = this.getDocContent();
+        this.recalcInfo.bRecalculatedTitle = true;
+    }
+    if(this.checkAutofit && this.checkAutofit())
+    {
+        this.handleUpdateExtents();
+        if(this.group)
+        {
+            var oMainGroup = this.getMainGroup();
+            if(oMainGroup.parent)
+            {
+                oMainGroup.parent.Refresh_RecalcData({Type: historyitem_SetExtent});
+            }
+        }
+        else
+        {
+            if(this.parent)
+            {
+                this.parent.Refresh_RecalcData({Type: historyitem_SetExtent});
+            }
+        }
+        return;
+    }
     this.recalcTxBoxContent();
     this.recalcTransformText();
     this.addToRecalculate();
