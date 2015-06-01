@@ -215,7 +215,7 @@ CParaMathLineWidths.prototype.UpdateWidth = function(Line, W)
 
     var bUpdMaxWidth = false;
 
-    var bNeedUpdate = bFastUpdate == false && Math.abs(this.Widths[CurLine] - W) < 0.00001;
+    var bNeedUpdate = bFastUpdate == false && Math.abs(this.Widths[CurLine] - W) > 0.00001;
 
     this.Widths[CurLine] = W; // присваиваем до RecalcMaxMin
 
@@ -420,7 +420,7 @@ CMathPageInfo.prototype.GetCurrentMaxWidthAllLines = function()
 
         var wrapIndent = MathSettings.Get_WrapIndent(WrapState);
 
-        MaxW = FirstW + wrapIndent > MaxWOFirst ? FirstW + wrapIndent : MaxWOFirst;
+        MaxW = FirstW > wrapIndent + MaxWOFirst ? FirstW: MaxWOFirst + wrapIndent;
     }
 
     return MaxW;
@@ -3124,7 +3124,6 @@ function CChangesMathEqArrayPr(NewPr, OldPr)
     this.New = NewPr;
     this.Old = OldPr;
 }
-
 CChangesMathEqArrayPr.prototype.Type = historyitem_Math_EqArrayPr;
 CChangesMathEqArrayPr.prototype.Undo = function(Class)
 {
