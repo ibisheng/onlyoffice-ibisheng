@@ -1015,7 +1015,7 @@ var MathTextInfo_MathText        = 1;
 var MathTextInfo_SpecialOperator = 2;
 var MathTextInfo_NormalText      = 3;
 
-function CMathInfoTextPr_2(TextPr, ArgSize, bNormalText, bEqArray)
+function CMathInfoTextPr(TextPr, ArgSize, bNormalText, bEqArray)
 {
     this.CurrType         = -1; // в первый раз Font всегда выставляем
     this.TextPr           = TextPr;
@@ -1042,7 +1042,7 @@ function CMathInfoTextPr_2(TextPr, ArgSize, bNormalText, bEqArray)
     this.RFontsCompare[fontslot_EastAsia] = undefined !== this.TextPr.RFonts.EastAsia && this.TextPr.RFonts.EastAsia.Name == "Cambria Math";
 
 }
-CMathInfoTextPr_2.prototype.NeedUpdateFont = function(code, fontSlot, IsPlaceholder)
+CMathInfoTextPr.prototype.NeedUpdateFont = function(code, fontSlot, IsPlaceholder)
 {
     var NeedUpdateFont = false;
     var bMathText = this.bNormalText == false || IsPlaceholder;
@@ -1069,13 +1069,13 @@ CMathInfoTextPr_2.prototype.NeedUpdateFont = function(code, fontSlot, IsPlacehol
 
     return NeedUpdateFont;
 };
-CMathInfoTextPr_2.prototype.GetFontKoef = function(fontSlot)
+CMathInfoTextPr.prototype.GetFontKoef = function(fontSlot)
 {
     var FontSize = fontSlot == fontslot_CS ? this.TextPr.FontSizeCS : this.TextPr.FontSize;
 
     return MatGetKoeffArgSize(FontSize, this.ArgSize);
 };
-CMathInfoTextPr_2.prototype.GetFontSlot = function(code)
+CMathInfoTextPr.prototype.GetFontSlot = function(code)
 {
     var Hint = this.TextPr.RFonts.Hint;
     var bCS  = this.TextPr.CS;
@@ -1084,7 +1084,7 @@ CMathInfoTextPr_2.prototype.GetFontSlot = function(code)
 
     return g_font_detector.Get_FontClass(code, Hint, lcid, bCS, bRTL);
 };
-CMathInfoTextPr_2.prototype.IsSpecilalOperator = function(val)
+CMathInfoTextPr.prototype.IsSpecilalOperator = function(val)
 {
     var bSpecialOperator = val == 0x21 || val == 0x23 || (val >= 0x28 && val <= 0x2F) || (val >= 0x3A && val <= 0x3F) || (val >=0x5B && val <= 0x5F) || (val >= 0x7B && val <= 0xA1) || val == 0xAC || val == 0xB1 || val == 0xB7 || val == 0xBF || val == 0xD7 || val == 0xF7 || (val >= 0x2010 && val <= 0x2014) || val == 0x2016 || (val >= 0x2020 && val <= 0x2022) || val == 0x2026,
         bSpecialArrow    = val >= 0x2190 && val <= 0x21FF,

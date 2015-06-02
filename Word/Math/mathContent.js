@@ -4053,7 +4053,6 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             }
 
 
-
             if ( true === PRS.NewRange )
             {
                 RangeEndPos = Pos;

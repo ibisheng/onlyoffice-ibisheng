@@ -1915,7 +1915,7 @@ ParaRun.prototype.Recalculate_MeasureContent = function()
             bNormalText = this.IsNormalText(),
             bEqArray   = this.Parent.IsEqArray();
 
-        InfoMathText = new CMathInfoTextPr_2(Pr, ArgSize, bNormalText, bEqArray);
+        InfoMathText = new CMathInfoTextPr(Pr, ArgSize, bNormalText, bEqArray);
     }
 
     for ( var Pos = 0; Pos < ContentLength; Pos++ )
@@ -3950,7 +3950,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
         var ArgSize = this.Parent.Compiled_ArgSz.value,
             bNormalText = this.IsNormalText();
 
-        InfoMathText = new CMathInfoTextPr_2(CurTextPr, ArgSize, bNormalText, this.bEqArray);
+        InfoMathText = new CMathInfoTextPr(CurTextPr, ArgSize, bNormalText, this.bEqArray);
     }
 
     if ( undefined !== CurTextPr.Shd && shd_Nil !== CurTextPr.Shd.Value )
