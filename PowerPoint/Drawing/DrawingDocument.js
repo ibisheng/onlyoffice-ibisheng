@@ -3835,6 +3835,12 @@ function CThumbnailsManager()
         if (false === this.m_bIsScrollVisible || !oThis.m_oWordControl.m_oScrollThumbApi)
             return;
 
+        if (undefined !== window["AscDesktopEditor"])
+        {
+            if (false === window["AscDesktopEditor"]["CheckNeedWheel"]())
+                return;
+        }
+
         var delta = 0;
         if (undefined != e.wheelDelta && e.wheelDelta != 0)
         {

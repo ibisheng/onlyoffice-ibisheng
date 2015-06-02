@@ -3212,6 +3212,12 @@ function CDemonstrationManager(htmlpage)
 
     this.onMouseWhell = function(e)
     {
+        if (undefined !== window["AscDesktopEditor"])
+        {
+            if (false === window["AscDesktopEditor"]["CheckNeedWheel"]())
+                return;
+        }
+
         var delta = 0;
         if (undefined != e.wheelDelta)
             delta = (e.wheelDelta > 0) ? -1 : 1;

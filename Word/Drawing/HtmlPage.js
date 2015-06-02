@@ -1963,6 +1963,12 @@ function CEditorPage(api)
         if (false === oThis.m_oApi.bInit_word_control)
             return;
 
+        if (undefined !== window["AscDesktopEditor"])
+        {
+            if (false === window["AscDesktopEditor"]["CheckNeedWheel"]())
+                return;
+        }
+
         var _ctrl = false;
         if (e.metaKey !== undefined)
             _ctrl = e.ctrlKey || e.metaKey;
