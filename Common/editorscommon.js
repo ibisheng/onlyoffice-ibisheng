@@ -48,14 +48,13 @@ function g_fSaveWithParts(fSendCommand, fCallback, oAdditionalData, aParts) {
 	}, oAdditionalData);
 }
 
-function g_fOpenFileCommand (data, Signature, callback) {
+function g_fOpenFileCommand (binUrl, changesUrl, Signature, callback) {
 	var bError = false, oResult = new OpenFileResult(), bEndLoadFile = false, bEndLoadChanges = false;
 	var onEndOpen = function () {
 		if (bEndLoadFile && bEndLoadChanges)
 			if (callback) callback(bError, oResult);
 	};
-	var openData = JSON.parse(data);
-	var sFileUrl = g_sResourceServiceLocalUrl + openData['urlfile'];
+	var sFileUrl = g_sResourceServiceLocalUrl + binUrl;
 	sFileUrl = sFileUrl.replace( /\\/g, "/" );
 	asc_ajax({
 		url: sFileUrl,
@@ -80,8 +79,8 @@ function g_fOpenFileCommand (data, Signature, callback) {
 			onEndOpen();
 		}
 	});
-	if (null != openData['urlchanges']) {
-		require('jsziputils').getBinaryContent(g_sResourceServiceLocalUrl + openData['urlchanges'], function(err, data) {
+	if (null != changesUrl) {
+		require('jsziputils').getBinaryContent(changesUrl, function(err, data) {
 			bEndLoadChanges = true;
 			if(err) {
 				bError = true;

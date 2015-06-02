@@ -861,8 +861,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 			"url"			: documentUrl,
 			"title"			: documentTitle,
 			"embeddedfonts"	: this.isUseEmbeddedCutFonts,
-			"viewmode"		: this.isViewMode,
-			"urlchanges"	: documentUrlChanges
+			"viewmode"		: this.isViewMode
 		};
 			
         sendCommand( oThis, function(){}, rData );
@@ -5213,7 +5212,7 @@ function sendTrack(fCallback, url, rdata){
 	})
 }
 function _onOpenCommand(fCallback, incomeObject) {
-	g_fOpenFileCommand(incomeObject["data"], c_oSerFormat.Signature, function (error, result) {
+	g_fOpenFileCommand(incomeObject["data"], documentUrlChanges, c_oSerFormat.Signature, function (error, result) {
 		if (error || !result.bSerFormat) {
 			editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
 			if(fCallback) fCallback();

@@ -18,10 +18,12 @@ require.config({
 			backbone        : '../vendor/backbone/backbone',
 			bootstrap       : '../vendor/bootstrap/dist/js/bootstrap',
 			text            : '../vendor/requirejs-text/text',
-        perfectscrollbar: 'common/main/lib/mods/perfect-scrollbar',
+			perfectscrollbar: 'common/main/lib/mods/perfect-scrollbar',
 			jmousewheel     : '../vendor/perfect-scrollbar/src/jquery.mousewheel',
 			xregexp         : '../vendor/xregexp/xregexp-all-min',
 			sockjs          : '../vendor/sockjs/sockjs.min',
+			jszip           : '../vendor/jszip/jszip.min',
+			jsziputils      : '../vendor/jszip-utils/jszip-utils.min',
 			api             : 'api/documents/api',
 			core            : 'common/main/lib/core/application',
 			notification    : 'common/main/lib/core/NotificationCenter',
@@ -66,6 +68,17 @@ require.config({
                 'irregularstack'
             ]
         },
+        sdk: {
+            deps: [
+                'jquery',
+                'underscore',
+                'allfonts',
+                'xregexp',
+                'sockjs',
+                'jszip',
+                'jsziputils'
+            ]
+        },
         gateway: {
             deps: [
                 'jquery'
@@ -86,7 +99,9 @@ require([
 	'api',
 	'analytics',
 	'gateway',
-	'locale'
+	'locale',
+	'jszip',
+	'jsziputils'
 ], function (Backbone, Bootstrap, Core) {
     Backbone.history.start();
 
@@ -113,6 +128,7 @@ require([
             /** proprietary begin **/
             ,'Common.Controllers.ExternalDiagramEditor'
             /** proprietary end **/
+			,'Common.Controllers.ExternalMergeEditor'
         ]
     });
 
@@ -142,6 +158,7 @@ require([
         ,'documenteditor/main/app/view/ChartSettings'
         ,'common/main/lib/controller/ExternalDiagramEditor'
         /** proprietary end **/
+		,'common/main/lib/controller/ExternalMergeEditor'
     ], function() {
         app.start();
     });

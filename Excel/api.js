@@ -1015,7 +1015,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		spreadsheet_api.prototype._onOpenCommand = function (callback, data) {
 			var t = this;
-			g_fOpenFileCommand(data, Asc.c_oSerFormat.Signature, function (error, result) {
+			g_fOpenFileCommand(data, this.documentUrlChanges, Asc.c_oSerFormat.Signature, function (error, result) {
 				if (error || !result.bSerFormat) {
 					var oError = {returnCode: c_oAscError.Level.Critical, val: c_oAscError.ID.Unknown};
 					t.handlers.trigger("asc_onError", oError.val, oError.returnCode);
@@ -1067,8 +1067,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					"url"           : this.documentUrl,
 					"title"         : this.documentTitle,
 					"embeddedfonts" : this.isUseEmbeddedCutFonts,
-					"viewmode"		: this.asc_getViewerMode(),
-					"urlchanges"	: this.documentUrlChanges
+					"viewmode"		: this.asc_getViewerMode()
 				};
 				if (false && this.documentOpenOptions && this.documentOpenOptions["isEmpty"]) {
 					var sEmptyWorkbook = getEmptyWorkbook();
