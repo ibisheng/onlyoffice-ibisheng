@@ -7132,13 +7132,8 @@ function _onOpenCommand(fCallback, incomeObject) {
 		}
 
 		if (result.changes && editor.VersionHistory) {
-			var arrColors = editor.VersionHistory.colors, color;
-			for (var i = 0; i < result.changes.length; ++i) {
-				color = arrColors[i];
-				editor._coAuthoringSetChanges(result.changes[i], color ?
-					new CDocumentColor((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF) :
-					new CDocumentColor(191, 255, 199));
-			}
+			editor.VersionHistory.changes = result.changes;
+			editor.VersionHistory.applyChanges(editor);
 		}
 
 		if (result.bSerFormat)
@@ -7500,6 +7495,10 @@ asc_docs_api.prototype.asc_showRevision = function (newObj) {
 		this.DocInfo.put_Url(this.VersionHistory.url);
 		documentUrlChanges = this.VersionHistory.urlChanges;
 		this.LoadDocument();
+	} else if (this.VersionHistory.currentChangeId < newObj.currentChangeId) {
+		// Нужно только добавить некоторые изменения
+		editor.VersionHistory.applyChanges(editor);
+		CollaborativeEditing.Apply_OtherChanges();
 	}
 };
 asc_docs_api.prototype.asc_undoAllChanges = function ()
