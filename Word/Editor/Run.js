@@ -2051,6 +2051,11 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var OperGapRight    = PRS.OperGapRight;
     var OperGapLeft     = PRS.OperGapLeft;
 
+    var bInsideOper         = PRS.bInsideOper;
+    var bFirstCompareOper   = PRS.bFirstCompareOper;
+    var bEndRunToContent    = PRS.bEndRunToContent;
+    var bNoOneBreakOperator = PRS.bNoOneBreakOperator;
+
     var Pos = RangeStartPos;
 
     var ContentLen = this.Content.length;
@@ -2268,10 +2273,10 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     var bCompareOper = Item.Is_CompareOperator();
 
-                    var bOperInEndContent = PRS.bEndRunToContent == true && Pos == ContentLen - 1 && Word == true, // необходимо для того, чтобы у контентов мат объектов (к-ые могут разбиваться на строки) не было отметки Set_LineBreakPos, иначе скобка (или GapLeft), перед которой стоит break_Operator, перенесется на следующую строку (без текста !)
-                        bLowPriority      = bCompareOper == false  && PRS.bFirstCompareOper == false;
+                    var bOperInEndContent = bEndRunToContent == true && Pos == ContentLen - 1 && Word == true, // необходимо для того, чтобы у контентов мат объектов (к-ые могут разбиваться на строки) не было отметки Set_LineBreakPos, иначе скобка (или GapLeft), перед которой стоит break_Operator, перенесется на следующую строку (без текста !)
+                        bLowPriority      = bCompareOper == false  && bFirstCompareOper == false;
 
-                    PRS.bNoOneBreakOperator = false;
+                    bNoOneBreakOperator = false;
 
                     if(bOperInEndContent || bLowPriority)
                     {
@@ -2296,24 +2301,20 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     else
                     {
 
-                        PRS.bInsideOper = true;
+                        bInsideOper = true;
 
                         var bOperBefore = this.ParaMath.Is_BrkBinBefore() == true;
                         var WorLenCompareOper = WordLen + X - XRange + (bOperBefore  ? SpaceLen : BrkLen);
 
                         var bOverXEnd;
 
-                        if(bCompareOper && PRS.bFirstCompareOper == true && PRS.bCompareWrapIndent == true && WorLenCompareOper > PRS.WrapIndent && !(Word == false && FirstItemOnLine == true)) // (Word == true && FirstItemOnLine == true) - не первый элемент в строке
-                            PRS.bFirstCompareOper = false;
+                        if(bCompareOper && bFirstCompareOper == true && PRS.bCompareWrapIndent == true && WorLenCompareOper > PRS.WrapIndent && !(Word == false && FirstItemOnLine == true)) // (Word == true && FirstItemOnLine == true) - не первый элемент в строке
+                            bFirstCompareOper = false;
 
                         if(bOperBefore)  // оператор "до"
                         {
                             bOverXEnd = X + WordLen + SpaceLen > XEnd;
 
-                            /*if(Word == false) // слово только началось
-                            {
-                                OperGapLeft = Item.GapLeft;
-                            }*/
 
                             if(bOverXEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                             {
@@ -2710,8 +2711,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         }
         else
         {
-            // для пустого Run, обновляем LineBreakPos на случай, если пустой Run находится между break_operator и мат объектом
-            if(this.Content.length == 0 && this.ParaMath.Is_BrkBinBefore() == false && Word == false && FirstItemOnLine == false)
+            // для пустого Run, обновляем LineBreakPos на случай, если пустой Run находится между break_operator (мат. объект) и мат объектом
+            if(this.Content.length == 0 && this.ParaMath.Is_BrkBinBefore() == false && Word == false && PRS.bBoxOperator == true)
             {
                 PRS.Set_LineBreakPos(Pos);
                 X += SpaceLen;
@@ -2721,6 +2722,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             // запоминаем конец Run
             PRS.PosEndRun = PRS.CurPos.Copy();
             PRS.PosEndRun.Update2(this.Content.length, Depth);
+
         }
     }
 
@@ -2744,6 +2746,11 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     PRS.X               = X;
     PRS.XEnd            = XEnd;
+
+    PRS.bInsideOper         = bInsideOper;
+    PRS.bFirstCompareOper   = bFirstCompareOper;
+    PRS.bEndRunToContent    = bEndRunToContent;
+    PRS.bNoOneBreakOperator = bNoOneBreakOperator;
 
 
     if ( Pos >= ContentLen )

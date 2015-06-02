@@ -1138,6 +1138,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     if(bStartLine == false)
     {
         PRS.X += WrapIndent;
+        PRS.bCompareWrapIndent = false;
     }
     else
     {

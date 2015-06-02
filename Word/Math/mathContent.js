@@ -3942,11 +3942,18 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         {
             var bNoOneBreakOperator = PRS.bNoOneBreakOperator;
 
+            // запомним позицию конца Run перед тем как зайдем во внутр мат объект (конечная позиция Run может измениться при пересчете внутр мат объекта)
+            var _Depth = PRS.PosEndRun.Depth;
+            var PrevLastPos = PRS.PosEndRun.Get(_Depth-1),
+                LastPos     = PRS.PosEndRun.Get(_Depth);
+
             Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
+
+            PRS.bBoxOperator = Type == para_Math_Composition && Item.kind == MATH_BOX;
 
             if(Type == para_Math_Composition)
             {
-                // перед мат объектом идет break_operator и он не является первым элементом в строке
+                // перед мат объектом идет box break_operator и он не является первым элементом в строке
                 if(Item.kind == MATH_BOX)
                 {
                     var BoxLen      = Item.size.width,
@@ -3961,18 +3968,14 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         {
                             // обновим : начало нового слова - конец предыдущего Run
                             PRS.FirstItemOnLine = false;
-                            var _Depth = PRS.PosEndRun.Depth;
 
-                            PRS.Update_CurPos(PRS.PosEndRun.Get(_Depth-1), _Depth-1);
-                            PRS.Set_LineBreakPos(PRS.PosEndRun.Get(_Depth));
+                            PRS.Update_CurPos(PrevLastPos, _Depth-1);
+                            PRS.Set_LineBreakPos(LastPos);
 
                             PRS.SpaceLen = BoxLen;
                         }
 
                         PRS.WordLen = 0;
-
-                        if(PRS.Word)
-                            PRS.FirstItemOnLine = false;
 
                         PRS.Word = true;
                     }
@@ -4015,14 +4018,15 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     var bInsideOperator = Item.bOneLine == false && PRS.bInsideOper == true;
 
-                    if(Brk_Before == false && bNoOneBreakOperator == false/*Word == false*/   && bInsideOperator == false)
+                    // обновляем BreakPos на конец Run, т.к. внутри мат объекта BreakPos  может измениться на  if(true !== Word)
+                    if(Brk_Before == false && bNoOneBreakOperator == false && bInsideOperator == false)
                     {
                         // обновим : начало нового слова - конец предыдущего Run
-                        var _Depth = PRS.PosEndRun.Depth;
 
-                        PRS.Update_CurPos(PRS.PosEndRun.Get(_Depth-1), _Depth-1);
-                        PRS.Set_LineBreakPos(PRS.PosEndRun.Get(_Depth));
+                        PRS.Update_CurPos(PrevLastPos, _Depth-1);
+                        PRS.Set_LineBreakPos(LastPos);
                     }
+
 
                     PRS.Word = true;
 
@@ -4047,6 +4051,8 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     }
                 }
             }
+
+
 
             if ( true === PRS.NewRange )
             {

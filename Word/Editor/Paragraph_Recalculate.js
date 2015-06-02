@@ -2184,8 +2184,8 @@ function CParagraphRecalculateStateWrap(Para)
     };
 
     // for ParaMath
-    this.bMath_OneLine       = false; // for ParaMath
-    this.bMathWordLarge      = false; // for ParaMath
+    this.bMath_OneLine       = false;
+    this.bMathWordLarge      = false;
     this.bEndRunToContent    = false;
     this.PosEndRun           = new CParagraphContentPos();
 
@@ -2196,9 +2196,10 @@ function CParagraphRecalculateStateWrap(Para)
     // у "крайних" в строке операторов/мат объектов сооответствующий Gap равен нулю
     this.OperGapRight        = 0;
     this.OperGapLeft         = 0;
-    this.bNoOneBreakOperator = true; // прежде чем обновлять позицию в контент Run, учтем были ли до этого операторы (проверки на Word == false не достаточно, т.к. формула мб инлайновая и тогда не нужно обновлять позицию)
+    //this.bNoOneBreakOperator = true; // прежде чем обновлять позицию в контент Run, учтем были ли до этого операторы (проверки на Word == false не достаточно, т.к. формула мб инлайновая и тогда не нужно обновлять позицию)
     this.bInsideOper         = false; // учитываем есть ли разбивка внутри мат объекта, чтобы случайно не вставить в конец пред оператора (при Brk_Before == false)
     this.bFastRecalculate    = false;
+    this.bBoxOperator        = false;
 }
 
 CParagraphRecalculateStateWrap.prototype =
@@ -2235,6 +2236,7 @@ CParagraphRecalculateStateWrap.prototype =
         this.bNoOneBreakOperator = true;
         this.bFastRecalculate    = false;
         this.bCompareWrapIndent  = false;
+        this.bBoxOperator        = false;
     },
 
     // Обнуляем некоторые параметры перед новым отрезком
@@ -2270,6 +2272,7 @@ CParagraphRecalculateStateWrap.prototype =
         this.bNoOneBreakOperator = true;
         this.bFastRecalculate   = false;
         this.bCompareWrapIndent = false;
+        this.bBoxOperator        = false;
     },
 
     Reset_PrevLineRecalcInfo : function()
