@@ -431,6 +431,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			if(c_DocInfo)
 				this.DocInfo = c_DocInfo;
 		};
+		spreadsheet_api.prototype.asc_getLocaleExample = function (number, date) {
+
+		};
 		spreadsheet_api.prototype.asc_setLocale = function (val) {
 			//ToDo add code here
 			g_oDefaultCultureInfo = g_aCultureInfos[val];
@@ -3754,6 +3757,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_GetFontThumbnailsPath"] = prot.asc_GetFontThumbnailsPath;
 		prot["asc_Init"] = prot.asc_Init;
 		prot["asc_setDocInfo"] = prot.asc_setDocInfo;
+		prot["asc_getLocaleExample"] = prot.asc_getLocaleExample;
 		prot["asc_setLocale"] = prot.asc_setLocale;
 		prot["asc_getEditorPermissions"] = prot.asc_getEditorPermissions;
 		prot["asc_getLicense"] = prot.asc_getLicense;
