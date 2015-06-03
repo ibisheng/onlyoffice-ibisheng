@@ -432,6 +432,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.DocInfo = c_DocInfo;
 		};
 		spreadsheet_api.prototype.asc_setLocale = function (val) {
+			//ToDo add code here
+			g_oDefaultCultureInfo = g_aCultureInfos[val];
+			this.wbModel.rebuildColors();
 		};
 		spreadsheet_api.prototype.asc_LoadDocument = function (c_DocInfo) {
 			var t = this;
