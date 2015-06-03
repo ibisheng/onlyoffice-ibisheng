@@ -462,6 +462,25 @@ CMathBase.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInf
             this.elements[i][j].PreRecalc(this, ParaMath, ArgSize, RPI);
 
 };
+CMathBase.prototype.Math_UpdateGaps = function(_CurLine, _CurRange, GapsInfo)
+{
+    GapsInfo.updateCurrentObject(this, this.TextPrControlLetter.FontSize);
+
+    if(GapsInfo.bUpdate == true)
+    {
+        GapsInfo.updateGaps();
+    }
+
+    if(this.bOneLine == false)
+    {
+        var BrPos = this.NumBreakContent;
+        this.Content[BrPos].Math_UpdateGaps(_CurLine, _CurRange);
+    }
+};
+CMathBase.prototype.UpdLastElementForGaps = function(CurLine, CurRange, GapsInfo)
+{
+    GapsInfo.updateCurrentObject(this, this.TextPrControlLetter.FontSize);
+};
 CMathBase.prototype.recalculateSize = function(oMeasure, RPI)
 {
     var width = 0;

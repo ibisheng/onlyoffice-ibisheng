@@ -9,8 +9,6 @@ function CRPI()
     this.bEqArray          = false; /*для амперсанда*/
     this.bMathFunc         = false;
     this.bRecalcCtrPrp     = false; // пересчет ctrPrp нужен, когда на Undo и тп изменился размер первого Run, а ctrPrp уже для мат объектов пересчитались
-    this.PRS               = null;
-
     this.bCorrect_FontSize = false;
 }
 CRPI.prototype.Copy = function()
@@ -24,7 +22,6 @@ CRPI.prototype.Copy = function()
     RPI.bEqArray          = this.bEqArray;
     RPI.bMathFunc         = this.bMathFunc;
     RPI.bRecalcCtrPrp     = this.bRecalcCtrPrp;
-    RPI.PRS               = this.PRS;
     RPI.bCorrect_FontSize = this.bCorrect_FontSize;
 
     return RPI;
@@ -32,7 +29,6 @@ CRPI.prototype.Copy = function()
 CRPI.prototype.MergeMathInfo = function(MathInfo)
 {
     this.bInline           = MathInfo.bInline;
-
     this.bRecalcCtrPrp     = MathInfo.bRecalcCtrPrp;
     this.bChangeInline     = MathInfo.bChangeInline;
     this.bCorrect_FontSize = MathInfo.bCorrect_FontSize;
@@ -195,7 +191,6 @@ function CGeneralObjectGaps(Left, Right)
     this.left  = Left;
     this.right = Right;
 }
-
 
 function CGaps(oSign, oEqual, oZeroOper, oLett)
 {
@@ -361,18 +356,25 @@ function CMathGapsInfo(argSize)
 
     this.LeftFontSize    = null;
     this.CurrentFontSize = null;
-
+    this.bUpdate         = false;
 }
 CMathGapsInfo.prototype =
 {
     setGaps: function(Current, CurrentFontSize)
+    {
+        this.updateCurrentObject(Current, CurrentFontSize);
+        this.updateGaps();
+    },
+    updateCurrentObject: function(Current, CurrentFontSize)
     {
         this.Left = this.Current;
         this.LeftFontSize = this.CurrentFontSize;
 
         this.Current = Current;
         this.CurrentFontSize = CurrentFontSize;
-
+    },
+    updateGaps: function()
+    {
         if(this.argSize < 0)
         {
             this.Current.GapLeft = 0;
@@ -445,16 +447,13 @@ CMathGapsInfo.prototype =
                     leftCoeff = 0;
             }
 
-            leftCoeff = Math.ceil(leftCoeff*10)/10;
-            rightCoeff = Math.ceil(rightCoeff*10)/10;
-
             var LGapSign = 0.1513*this.CurrentFontSize;
-            this.Current.GapLeft = Math.ceil(leftCoeff*LGapSign*10)/10; // если ни один случай не выполнился, выставляем "нулевые" gaps (default): необходимо, если что-то удалили и объект стал первый или последним в контенте
+            this.Current.GapLeft = (leftCoeff*LGapSign*100 | 0)/100; // если ни один случай не выполнился, выставляем "нулевые" gaps (default): необходимо, если что-то удалили и объект стал первый или последним в контенте
 
             if(this.Left != null)
             {
                 var RGapSign = 0.1513*this.LeftFontSize;
-                this.Left.GapRight = Math.ceil(rightCoeff*RGapSign*10)/10;
+                this.Left.GapRight = (rightCoeff*RGapSign*100 | 0)/100;
             }
         }
     },
@@ -507,7 +506,6 @@ CMathGapsInfo.prototype =
 
         return  {bEmptyGaps: bEmptyGaps, bChildGaps: bChildGaps};
     }
-
 };
 
 function CMPrp()
@@ -634,7 +632,6 @@ CMPrp.prototype =
 };
 
 
-
 function CMathContent()
 {
     CMathContent.superclass.constructor.call(this);
@@ -749,6 +746,31 @@ CMathContent.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
     if(GapsInfo.Current !== null)
         GapsInfo.Current.GapRight = 0;
 
+};
+CMathContent.prototype.Math_UpdateGaps = function(_CurLine, _CurRange)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    var GapsInfo = new CMathGapsInfo(this.Compiled_ArgSz.value);
+
+    if(StartPos !== undefined && EndPos !== undefined && CurLine < this.protected_GetLinesCount())
+    {
+        if(CurLine > 0 && StartPos !== EndPos) // выставим объект, который будет Left для первого элемента в текущей строке
+        {
+            var EndPosPrev   = this.protected_GetRangeEndPos(CurLine - 1, CurRange);
+            this.Content[EndPosPrev].UpdLastElementForGaps(_CurLine - 1, _CurRange, GapsInfo);
+        }
+
+
+        for(var Pos = StartPos; Pos <= EndPos; Pos++)
+        {
+            this.Content[Pos].Math_UpdateGaps(_CurLine, _CurRange, GapsInfo);
+        }
+    }
 };
 CMathContent.prototype.Resize = function(oMeasure, RPI)      // пересчитываем всю формулу
 {
@@ -2051,8 +2073,6 @@ CMathContent.prototype.Insert_MathContent = function(oMathContent, Pos, bSelect)
     this.Correct_Content(true);
     this.Correct_ContentPos(-1);
 };
-CMathContent.prototype.Set_Paragraph    = ParaHyperlink.prototype.Set_Paragraph;
-CMathContent.prototype.Get_ElementByPos = ParaHyperlink.prototype.Get_ElementByPos;
 CMathContent.prototype.Set_ParaMath = function(ParaMath, Parent)
 {
     this.Parent   = Parent;

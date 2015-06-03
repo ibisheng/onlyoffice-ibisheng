@@ -14,8 +14,11 @@
 // http://www.dpva.info/Guide/GuideMathematics/GuideMathematicsNumericalSystems/TableCodeEquivalent/
 
 var DIV_CENT = 0.1386;
-
 var StartTextElement = 0x2B1A; // Cambria Math
+
+var MathTextInfo_MathText        = 1;
+var MathTextInfo_SpecialOperator = 2;
+var MathTextInfo_NormalText      = 3;
 
 function CMathSize()
 {
@@ -139,6 +142,7 @@ function CMathText(bJDraw)
 
     this.Type           = para_Math_Text;
     this.bJDraw         = (undefined === bJDraw ? false : bJDraw);
+    this.bUpdateGaps    = true;
 
     this.RecalcInfo =
     {
@@ -658,7 +662,7 @@ CMathText.prototype.Measure = function(oMeasure, TextPr, InfoMathText)
 
         this.RecalcInfo.StyleCode = this.value;
         metricsTxt = oMeasure.Measure2Code(this.value);
-}
+    }
     else
     {
         var ascent, width, height, descent;
@@ -726,13 +730,23 @@ CMathText.prototype.Measure = function(oMeasure, TextPr, InfoMathText)
     this.Width = (this.size.width * TEXTWIDTH_DIVIDER) | 0;
 
 };
-CMathText.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
+CMathText.prototype.PreRecalc = function(Parent, ParaMath)
 {
     this.ParaMath = ParaMath;
     if(!this.bJDraw)
         this.Parent = Parent;
     else
         this.Parent = null;
+
+    this.bUpdateGaps = false;
+};
+CMathText.prototype.SetUpdateGaps = function(bUpd)
+{
+    this.bUpdateGaps = bUpd;
+};
+CMathText.prototype.IsNeedUpdateGaps = function()
+{
+    return this.bUpdateGaps;
 };
 CMathText.prototype.Draw = function(x, y, pGraphics, InfoTextPr)
 {
@@ -1011,25 +1025,21 @@ CMathAmp.prototype.Read_FromBinary = function(Reader)
 {
 };
 
-var MathTextInfo_MathText        = 1;
-var MathTextInfo_SpecialOperator = 2;
-var MathTextInfo_NormalText      = 3;
-
-function CMathInfoTextPr(TextPr, ArgSize, bNormalText, bEqArray)
+function CMathInfoTextPr(InfoTextPr)
 {
     this.CurrType         = -1; // в первый раз Font всегда выставляем
-    this.TextPr           = TextPr;
-    this.ArgSize          = ArgSize;
+    this.TextPr           = InfoTextPr.TextPr;
+    this.ArgSize          = InfoTextPr.ArgSize;
     this.Font =
     {
         FontFamily:     {Name:  "Cambria Math", Index : -1},
-        FontSize:       TextPr.FontSize,
+        FontSize:       this.TextPr.FontSize,
         Italic:         false,
         Bold:           false
     };
 
-    this.bNormalText      = bNormalText;
-    this.bEqArray        = bEqArray;
+    this.bNormalText     = InfoTextPr.bNormalText;
+    this.bEqArray        = InfoTextPr.bEqArray;
 
     this.RFontsCompare = [];
 

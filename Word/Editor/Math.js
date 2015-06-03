@@ -1092,29 +1092,25 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     var MathSettings = Get_WordDocumentDefaultMathSettings();
 
-    // первый пересчет
-    if(PrevLineObject == null && true == bStartLine && PRS.bFastRecalculate == false)
-    {
-        this.PageInfo.Reset();
-        this.PageInfo.SetStartPos(Page, ParaLine);
-    }
-
-    // пока будем каждый раз обновлять информацию (т.к. когда не inline формула становиться inline может получиться так, что пересчет для первой строки не придет)
-    // когда пересчет всегда будет приходить для первой строки, эта часть будет выполняться только при первом пересчете первой строки
-
     // информация о пересчете
     var RPI = new CRPI();
     RPI.MergeMathInfo(this.ParaMathRPI);
     var ArgSize = new CMathArgSize();
 
-    this.Root.Set_Paragraph(Para);
-    this.Root.Set_ParaMath(this, null);
-
-    // в случае если нужно сделать для пересчета каждой строки этот блоки, необходимо переделать PreRecalc, чтобы не перезаписывались Gaps, которые были уже рассчитаны на UpdateOperators
-    if(this.Root.IsFirstRange(ParaLine, ParaRange))
+    // первый пересчет
+    if(PrevLineObject == null && true == bStartLine && PRS.bFastRecalculate == false)
     {
+        this.PageInfo.Reset();
+        this.PageInfo.SetStartPos(Page, ParaLine);
+
         this.Root.PreRecalc(null, this, ArgSize, RPI);
     }
+
+    // пока будем каждый раз обновлять информацию (т.к. когда не inline формула становиться inline может получиться так, что пересчет для первой строки не придет)
+    // когда пересчет всегда будет приходить для первой строки, эта часть будет выполняться только при первом пересчете первой строки
+
+    this.Root.Set_Paragraph(Para);
+    this.Root.Set_ParaMath(this, null);
 
     ////////////////////////////////////////////////////////////
 
@@ -1152,6 +1148,14 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         PRS.RecalcResult = recalcresult_NextLine;
         PRS.PrevLineRecalcInfo.Object = null;
     }
+
+    // заглушка для пересчета Gaps элементов в текущей строке
+    // если быстрый пересчет проверим нужно ли пересчитывать gaps у элементов текущей строки
+    if(PRS.bFastRecalculate == true)
+    {
+        this.Root.Math_UpdateGaps(ParaLine, ParaRange);
+    }
+
 
     this.Root.Recalculate_Range(PRS, ParaPr, Depth);
 
@@ -1350,9 +1354,6 @@ ParaMath.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
     {
         var RPI = new CRPI();
         RPI.MergeMathInfo(this.ParaMathRPI);
-
-        RPI.NeedResize = true;
-        RPI.PRS        = this.Paragraph.m_oPRSW;
 
         this.Root.PreRecalc(null, this,  new CMathArgSize(), RPI);
         this.Root.Resize(g_oTextMeasurer, RPI);
@@ -3194,10 +3195,6 @@ function MatGetKoeffArgSize(FontSize, ArgSize)
 
     return FontKoef;
 }
-function MatReverseFontSize(FontSize, FontKoef)
-{
-    return (((FontSize/FontKoef * 2 + 0.5) | 0) / 2) ;
-}
 
 function CMathRecalculateInfo()
 {
@@ -3248,6 +3245,7 @@ CMathRecalculateObject.prototype.Load_MathInfo = function(PageInfo)
 CMathRecalculateObject.prototype.Compare = function(PageInfo)
 {
     var result = true;
+
 
     if(this.bFastRecalculate == false)
         result = false;

@@ -1911,11 +1911,16 @@ ParaRun.prototype.Recalculate_MeasureContent = function()
     var InfoMathText;
     if(para_Math_Run == this.Type)
     {
-        var ArgSize     = this.Parent.Compiled_ArgSz.value,
-            bNormalText = this.IsNormalText(),
-            bEqArray   = this.Parent.IsEqArray();
+        var InfoTextPr =
+        {
+            TextPr:         Pr,
+            ArgSize:        this.Parent.Compiled_ArgSz.value,
+            bNormalText:    this.IsNormalText(),
+            bEqArray:       this.Parent.IsEqArray()
+        };
 
-        InfoMathText = new CMathInfoTextPr(Pr, ArgSize, bNormalText, bEqArray);
+
+        InfoMathText = new CMathInfoTextPr(InfoTextPr);
     }
 
     for ( var Pos = 0; Pos < ContentLength; Pos++ )
@@ -3950,7 +3955,15 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
         var ArgSize = this.Parent.Compiled_ArgSz.value,
             bNormalText = this.IsNormalText();
 
-        InfoMathText = new CMathInfoTextPr(CurTextPr, ArgSize, bNormalText, this.bEqArray);
+        var InfoTextPr =
+        {
+            TextPr:         CurTextPr,
+            ArgSize:        ArgSize,
+            bNormalText:    bNormalText,
+            bEqArray:       this.bEqArray
+        };
+
+        InfoMathText = new CMathInfoTextPr(InfoTextPr);
     }
 
     if ( undefined !== CurTextPr.Shd && shd_Nil !== CurTextPr.Shd.Value )
@@ -8682,6 +8695,7 @@ ParaRun.prototype.Math_Is_End = function(_CurLine, _CurRange)
 
     return EndPos == this.Content.length;
 };
+
 ParaRun.prototype.IsEmptyLine = function(_CurLine, _CurRange)
 {
     var CurLine  = _CurLine - this.StartLine;
@@ -8826,7 +8840,7 @@ ParaRun.prototype.Math_PreRecalc = function(Parent, ParaMath, ArgSize, RPI, Gaps
             if(this.Pr.FontSize !== null && this.Pr.FontSize !== undefined)
             {
                 FontKoef = MatGetKoeffArgSize(this.Pr.FontSize, ArgSize);
-                Pr.FontSize = MatReverseFontSize(this.Pr.FontSize, FontKoef);
+                Pr.FontSize = (((this.Pr.FontSize/FontKoef * 2 + 0.5) | 0) / 2);
                 this.RecalcInfo.TextPr  = true;
                 this.RecalcInfo.Measure = true;
             }
@@ -8834,7 +8848,7 @@ ParaRun.prototype.Math_PreRecalc = function(Parent, ParaMath, ArgSize, RPI, Gaps
             if(this.Pr.FontSizeCS !== null && this.Pr.FontSizeCS !== undefined)
             {
                 FontKoef = MatGetKoeffArgSize( this.Pr.FontSizeCS, ArgSize);
-                Pr.FontSizeCS = MatReverseFontSize(this.Pr.FontSizeCS, FontKoef);
+                Pr.FontSizeCS = (((this.Pr.FontSizeCS/FontKoef * 2 + 0.5) | 0) / 2);
                 this.RecalcInfo.TextPr  = true;
                 this.RecalcInfo.Measure = true;
             }
@@ -8848,8 +8862,49 @@ ParaRun.prototype.Math_PreRecalc = function(Parent, ParaMath, ArgSize, RPI, Gaps
         if( !this.Content[Pos].IsAlignPoint() )
             GapsInfo.setGaps(this.Content[Pos], FontSize);
 
-        this.Content[Pos].PreRecalc(this);
+        this.Content[Pos].PreRecalc(this, ParaMath);
+        this.Content[Pos].SetUpdateGaps(false);
     }
+
+};
+ParaRun.prototype.Math_UpdateGaps = function(_CurLine, _CurRange, GapsInfo)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    var FontSize = this.Get_CompiledPr(false).FontSize;
+
+    for(var Pos = StartPos; Pos < EndPos; Pos++)
+    {
+        GapsInfo.updateCurrentObject(this.Content[Pos], FontSize);
+
+        var bUpdateCurrent = this.Content[Pos].IsNeedUpdateGaps();
+
+        if(bUpdateCurrent || GapsInfo.bUpdate)
+        {
+            GapsInfo.updateGaps();
+        }
+
+        GapsInfo.bUpdate = bUpdateCurrent;
+
+        this.Content[Pos].SetUpdateGaps(false);
+
+    }
+};
+ParaRun.prototype.UpdLastElementForGaps = function(_CurLine, _CurRange, GapsInfo)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+    var FontSize = this.Get_CompiledPr(false).FontSize;
+    var Last     = this.Content[EndPos];
+
+    GapsInfo.updateCurrentObject(Last, FontSize);
+
 };
 ParaRun.prototype.IsPlaceholder = function()
 {
