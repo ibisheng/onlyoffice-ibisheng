@@ -2562,6 +2562,7 @@
 				new CDocumentColor((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF) :
 				new CDocumentColor(191, 255, 199));
 		}
+		this.currentChangeId = this.newChangeId;
 	};
 	asc_CVersionHistory.prototype.asc_setDocId = function(val) {this.docId = val;};
 	asc_CVersionHistory.prototype.asc_setUrl = function(val) {this.url = val;};
