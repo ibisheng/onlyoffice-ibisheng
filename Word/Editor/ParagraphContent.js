@@ -6461,6 +6461,19 @@ ParaDrawing.prototype =
 
     Convert_ToMathObject : function()
     {
+        // TODO: Вообще здесь нужно запрашивать шрифты, которые использовались в старой формуле,
+        //      но пока это только 1 шрифт "Cambria Math".
+        var loader = window.g_font_loader;
+        var fontinfo = g_fontApplication.GetFontInfo("Cambria Math");
+        var isasync = loader.LoadFont(fontinfo, ConvertEquationToMathCallback, this);
+        if (false === isasync)
+        {
+            this.private_ConvertToMathObject();
+        }
+    },
+
+    private_ConvertToMathObject : function()
+    {
         var Para = this.Get_Paragraph();
         if (undefined === Para || null === Para || !(Para instanceof Paragraph))
             return;
@@ -6512,6 +6525,11 @@ ParaDrawing.prototype =
         }
     }
 };
+
+function ConvertEquationToMathCallback(ParaDrawing)
+{
+    ParaDrawing.private_ConvertToMathObject();
+}
 
 // Класс GraphicPicture
 function GraphicPicture(Img)
