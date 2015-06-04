@@ -154,6 +154,9 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     
     this.m_oPDSE = new CParagraphDrawStateElements();
     this.StartState = null;
+
+    this.CollPrChange = false;
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
     if(bFromPresentation === true)
@@ -391,8 +394,15 @@ Paragraph.prototype =
         }
         else if (true === Props.Style)
         {
-            if (this.Pr.PStyle === Props.StyleId)
-                ParaArray.push(this);
+            for (var nIndex = 0, nCount = Props.StylesId.length; nIndex < nCount; nIndex++)
+            {
+                var StyleId = Props.StylesId[nIndex];
+                if (this.Pr.PStyle === StyleId)
+                {
+                    ParaArray.push(this);
+                    break;
+                }
+            }
         }
     },
 
@@ -1434,9 +1444,9 @@ Paragraph.prototype =
 
     Internal_Draw_1 : function(CurPage, pGraphics, Pr)
     {
-        // Если данный параграф зажат другим пользователем, рисуем соответствующий знак
         if(this.bFromDocument)
         {
+            // Если данный параграф зажат другим пользователем, рисуем соответствующий знак
             if ( locktype_None != this.Lock.Get_Type() )
             {
                 if ( ( CurPage > 0 || false === this.Is_StartFromNewPage() || null === this.Get_DocumentPrev() ) )
@@ -1447,6 +1457,21 @@ Paragraph.prototype =
 
                     if ( true === editor.isCoMarksDraw || locktype_Mine != this.Lock.Get_Type() )
                         pGraphics.DrawLockParagraph(this.Lock.Get_Type(), X_min, Y_top, Y_bottom);
+                }
+            }
+
+            // Если данный параграф был изменен другим пользователем, тогда рисуем знак
+            var oColor = this.private_GetCollPrChange();
+            if (false !== oColor)
+            {
+                if ( ( CurPage > 0 || false === this.Is_StartFromNewPage() || null === this.Get_DocumentPrev() ) )
+                {
+                    var X_min    = -3 + Math.min( this.Pages[CurPage].X, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left + Pr.ParaPr.Ind.FirstLine );
+                    var Y_top    = this.Pages[CurPage].Bounds.Top;
+                    var Y_bottom = this.Pages[CurPage].Bounds.Bottom;
+
+                    pGraphics.p_color(oColor.r, oColor.g, oColor.b, 255);
+                    pGraphics.drawVerLine(0, X_min, Y_top, Y_bottom, 0);
                 }
             }
         }
@@ -2093,6 +2118,7 @@ Paragraph.prototype =
             var aUnderline  = PDSL.Underline;
             var aSpelling   = PDSL.Spelling;
             var aRunReview  = PDSL.RunReview;
+            var aCollChange = PDSL.CollChange;
 
             // Рисуем зачеркивание
             var Element = aStrikeout.Get_Next();
@@ -2122,7 +2148,7 @@ Paragraph.prototype =
                 Element = aUnderline.Get_Next();
             }
 
-            // Рисуем красный рект вокруг изменных ранов
+            // Рисуем красный рект вокруг измененных ранов
             Element = aRunReview.Get_Next();
             while (null !== Element)
             {
@@ -2131,7 +2157,15 @@ Paragraph.prototype =
                 Element = aRunReview.Get_Next();
             }
 
-            // Рисуем подчеркивание орфографии
+            // Рисуем рект вокруг измененных ранов (измененных другим пользователем)
+            Element = aCollChange.Get_Next();
+            while (null !== Element)
+            {
+                pGraphics.p_color(Element.r, Element.g, Element.b, 255);
+                pGraphics.AddSmartRect(Element.x0, Page.Y + Line.Top, Element.x1 - Element.x0, Line.Bottom - Line.Top, 0);
+                Element = aCollChange.Get_Next();
+            }
+                        // Рисуем подчеркивание орфографии
             if(this.bFromDocument && this.LogicDocument && true === this.LogicDocument.Spelling.Use)
             {
                 pGraphics.p_color( 255, 0, 0, 255 );
@@ -11186,7 +11220,7 @@ Paragraph.prototype =
         return Writer;
     },
 
-    Load_Changes : function(Reader)
+    Load_Changes : function(Reader, Reader2, oColor)
     {
         // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
         // Long : тип класса
@@ -11197,7 +11231,7 @@ Paragraph.prototype =
             return;
 
         var Type = Reader.GetLong();
-
+        var bPrChanged = false;
         switch ( Type )
         {
             case  historyitem_Paragraph_AddItem:
@@ -11284,6 +11318,7 @@ Paragraph.prototype =
                 }
 
                 this.CompiledPr.NeedRecalc = true;
+                bPrChanged = true;
 
                 break;
             }
@@ -11301,6 +11336,7 @@ Paragraph.prototype =
                     this.Pr.Jc = Reader.GetLong();
 
                 this.CompiledPr.NeedRecalc = true;
+                bPrChanged = true;
 
                 break;
             }
@@ -11321,7 +11357,7 @@ Paragraph.prototype =
                     this.Pr.Ind.FirstLine = Reader.GetDouble();
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11341,7 +11377,7 @@ Paragraph.prototype =
                     this.Pr.Ind.Left = Reader.GetDouble();
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11361,7 +11397,7 @@ Paragraph.prototype =
                     this.Pr.Ind.Right = Reader.GetDouble();
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11378,7 +11414,7 @@ Paragraph.prototype =
                     this.Pr.ContextualSpacing = Reader.GetBool();
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11395,7 +11431,7 @@ Paragraph.prototype =
                     this.Pr.KeepLines = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11412,7 +11448,7 @@ Paragraph.prototype =
                     this.Pr.KeepNext = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11429,7 +11465,7 @@ Paragraph.prototype =
                     this.Pr.PageBreakBefore = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11449,7 +11485,7 @@ Paragraph.prototype =
                     this.Pr.Spacing.Line = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11469,7 +11505,7 @@ Paragraph.prototype =
                     this.Pr.Spacing.LineRule = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11489,7 +11525,7 @@ Paragraph.prototype =
                     this.Pr.Spacing.Before = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11509,7 +11545,7 @@ Paragraph.prototype =
                     this.Pr.Spacing.After = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11529,7 +11565,7 @@ Paragraph.prototype =
                     this.Pr.Spacing.AfterAutoSpacing = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11549,7 +11585,7 @@ Paragraph.prototype =
                     this.Pr.Spacing.BeforeAutoSpacing = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11570,7 +11606,7 @@ Paragraph.prototype =
                     this.Pr.Shd.Value = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11593,7 +11629,7 @@ Paragraph.prototype =
                     this.Pr.Shd.Color = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11611,7 +11647,7 @@ Paragraph.prototype =
                     this.Pr.Shd.Unifill = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11630,7 +11666,7 @@ Paragraph.prototype =
                     this.Pr.Shd = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11647,7 +11683,7 @@ Paragraph.prototype =
                     this.Pr.WidowControl = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11666,7 +11702,7 @@ Paragraph.prototype =
                     this.Pr.Tabs = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11684,7 +11720,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 this.Recalc_RunsCompiledPr();
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11728,7 +11764,7 @@ Paragraph.prototype =
                     this.Pr.Brd.Between = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11747,7 +11783,7 @@ Paragraph.prototype =
                     this.Pr.Brd.Bottom = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11766,7 +11802,7 @@ Paragraph.prototype =
                     this.Pr.Brd.Left = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11785,7 +11821,7 @@ Paragraph.prototype =
                     this.Pr.Brd.Right = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11804,7 +11840,7 @@ Paragraph.prototype =
                     this.Pr.Brd.Top = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                bPrChanged = true;
                 break;
             }
 
@@ -11886,6 +11922,9 @@ Paragraph.prototype =
 
         this.RecalcInfo.Set_Type_0(pararecalc_0_All);
         this.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
+
+        if (bPrChanged && oColor)
+            this.private_AddCollPrChange(oColor);
     },
 
     Write_ToBinary2 : function(Writer)
@@ -11980,10 +12019,6 @@ Paragraph.prototype =
         {
             this.DrawingDocument = this.Parent.Parent.getDrawingDocument();
         }
-    },
-
-    Clear_CollaborativeMarks : function()
-    {
     },
 
     Get_SelectionState2 : function()
@@ -12402,7 +12437,6 @@ Paragraph.prototype.private_ResetSelection = function()
 
     this.CurPos.ContentPos  = 0;
 };
-
 Paragraph.prototype.private_CorrectCurPosRangeLine = function()
 {
     if (-1 !== this.CurPos.Line)
@@ -12434,7 +12468,6 @@ Paragraph.prototype.private_CorrectCurPosRangeLine = function()
         }
     }
 };
-
 /**
  * Получаем массив отрезков, в которые попадает заданная позиция. Их может быть больше 1, например,
  * на месте разрыва строки.
@@ -12450,7 +12483,6 @@ Paragraph.prototype.Get_RangesByPos = function(ContentPos)
 
     return Run.Get_RangesByPos(ContentPos.Get(ContentPos.Depth - 1));
 };
-
 /**
  * Получаем элемент по заданной позиции
  * @param ContentPos - заданная позиция
@@ -12464,7 +12496,6 @@ Paragraph.prototype.Get_ElementByPos = function(ContentPos)
     var CurPos = ContentPos.Get(0);
     return this.Content[CurPos].Get_ElementByPos(ContentPos, 1);
 };
-
 Paragraph.prototype.private_RecalculateTextMetrics = function(TextMetrics)
 {
     for (var Index = 0, Count = this.Content.length; Index < Count; Index++)
@@ -12474,7 +12505,6 @@ Paragraph.prototype.private_RecalculateTextMetrics = function(TextMetrics)
             this.Content[Index].Recalculate_Measure2(TextMetrics);
     }
 };
-
 Paragraph.prototype.private_GetPageByLine = function(CurLine)
 {
     var CurPage = 0;
@@ -12487,7 +12517,6 @@ Paragraph.prototype.private_GetPageByLine = function(CurLine)
 
     return Math.min(PagesCount - 1, CurPage);
 };
-
 Paragraph.prototype.Get_TopElement = function()
 {
     if (true === this.Parent.Is_TopDocument(false))
@@ -12495,7 +12524,6 @@ Paragraph.prototype.Get_TopElement = function()
 
     return this.Parent.Get_TopElement();
 };
-
 Paragraph.prototype.Get_Index = function()
 {
     if (!this.Parent)
@@ -12505,7 +12533,6 @@ Paragraph.prototype.Get_Index = function()
 
     return this.Index;
 };
-
 Paragraph.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
 {
     var Run1 = this.Get_DrawingObjectRun(CompareObject.Drawing1.Get_Id());
@@ -12530,7 +12557,6 @@ Paragraph.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
         }
     }
 };
-
 Paragraph.prototype.Start_SelectionFromCurPos = function()
 {
     var ContentPos = this.Get_ParaContentPos(false, false);
@@ -12540,7 +12566,6 @@ Paragraph.prototype.Start_SelectionFromCurPos = function()
     this.Selection.EndManually   = true;
     this.Set_SelectionContentPos(ContentPos, ContentPos);
 };
-
 /**
  *  Возвращается объект CParagraphContentPos по заданому Id ParaDrawing, если объект
  *  не найдет, вернется null.
@@ -12611,6 +12636,19 @@ Paragraph.prototype.Get_StyleFromFormatting = function()
     oRunStyle.put_Link(oParaStyle);
 
     return oParaStyle;
+};
+Paragraph.prototype.private_AddCollPrChange = function(Color)
+{
+    this.CollPrChange = Color;
+    CollaborativeEditing.Add_ChangedClass(this);
+};
+Paragraph.prototype.private_GetCollPrChange = function()
+{
+    return this.CollPrChange;
+};
+Paragraph.prototype.Clear_CollaborativeMarks = function()
+{
+    this.CollPrChange = false;
 };
 
 
@@ -13211,6 +13249,7 @@ function CParagraphDrawStateLines()
     this.Underline  = new CParaDrawingRangeLines();
     this.Spelling   = new CParaDrawingRangeLines();
     this.RunReview  = new CParaDrawingRangeLines();
+    this.CollChange = new CParaDrawingRangeLines();
 
     this.SpellingCounter = 0;
 

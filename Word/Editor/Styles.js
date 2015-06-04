@@ -3033,7 +3033,21 @@ CStyle.prototype =
     {
         // TODO: Надо сделать механизм, чтобы данное действие не вызывалось много раз подряд, а только 1.
         var LogicDocument = editor.WordControl.m_oLogicDocument;
-        var AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(this.Id);
+        var Styles = LogicDocument.Get_Styles();
+
+        var AllParagraphs = [];
+
+        if (this.Id != Styles.Default.Paragraph)
+        {
+            var AllStylesId = Styles.private_GetAllBasedStylesId(this.Id);
+            AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(AllStylesId);
+            LogicDocument.Add_ChangedStyle(AllStylesId);
+        }
+        else
+        {
+            AllParagraphs = LogicDocument.Get_AllParagraphs({All : true});
+            LogicDocument.Add_ChangedStyle([this.Id]);
+        }
 
         var Count = AllParagraphs.length;
         for ( var Index = 0; Index < Count; Index++ )
@@ -4249,7 +4263,7 @@ CStyles.prototype =
     Get : function(StyleId)
     {
         if (undefined != this.Style[StyleId])
-            return this.Style[StyleId].Name;
+            return this.Style[StyleId];
 
         return null;
     },
@@ -4342,8 +4356,11 @@ CStyles.prototype =
                     {
                         var DefId = this.Default.Paragraph;
 
-                        Pr.ParaPr.Merge( this.Style[DefId].ParaPr );
-                        Pr.TextPr.Merge( this.Style[DefId].TextPr );
+                        if (undefined != this.Style[DefId])
+                        {
+                            Pr.ParaPr.Merge(this.Style[DefId].ParaPr);
+                            Pr.TextPr.Merge(this.Style[DefId].TextPr);
+                        }
 
                         break;
                     }
@@ -4356,11 +4373,14 @@ CStyles.prototype =
                     {
                         var DefId = this.Default.Table;
 
-                        Pr.ParaPr.Merge( this.Style[DefId].ParaPr );
-                        Pr.TextPr.Merge( this.Style[DefId].TextPr );
-                        Pr.TablePr.Merge( this.Styles[DefId].TablePr );
-                        Pr.TableRowPr.Merge( this.Styles[DefId].TableRowPr );
-                        Pr.TableCellPr.Merge( this.Styles[DefId].TableCellPr );
+                        if (undefined != this.Style[DefId])
+                        {
+                            Pr.ParaPr.Merge(this.Style[DefId].ParaPr);
+                            Pr.TextPr.Merge(this.Style[DefId].TextPr);
+                            Pr.TablePr.Merge(this.Styles[DefId].TablePr);
+                            Pr.TableRowPr.Merge(this.Styles[DefId].TableRowPr);
+                            Pr.TableCellPr.Merge(this.Styles[DefId].TableCellPr);
+                        }
 
                         break;
                     }
@@ -4368,7 +4388,10 @@ CStyles.prototype =
                     {
                         var DefId = this.Default.Character;
 
-                        Pr.TextPr.Merge( this.Style[DefId].TextPr );
+                        if (undefined != this.Style[DefId])
+                        {
+                            Pr.TextPr.Merge(this.Style[DefId].TextPr);
+                        }
 
                         break;
                     }
@@ -4421,7 +4444,10 @@ CStyles.prototype =
                     {
                         var DefId = this.Default.Character;
 
-                        Pr.TextPr.Merge( this.Style[DefId].TextPr );
+                        if (undefined != this.Style[DefId])
+                        {
+                            Pr.TextPr.Merge(this.Style[DefId].TextPr);
+                        }
 
                         break;
                     }
@@ -4677,7 +4703,7 @@ CStyles.prototype =
 
             if (this.LogicDocument)
             {
-                var AllParagraphs = this.LogicDocument.Get_AllParagraphsByStyle(StyleId);
+                var AllParagraphs = this.LogicDocument.Get_AllParagraphsByStyle([StyleId]);
                 var Count = AllParagraphs.length;
                 for (var Index = 0; Index < Count; Index++)
                 {
@@ -4736,7 +4762,65 @@ CStyles.prototype =
     Update_Interface : function(StyleId)
     {
         if (null != this.LogicDocument && undefined !== this.LogicDocument)
-            this.LogicDocument.Add_ChangedStyle(StyleId);
+        {
+            // Данный стиль может быть базовым для других стилей, поэтому нам нужно пересчитать все параграфы, не только у
+            // которых выставлен данный стиль, но и у которых выставлен стиль, для которого данный будет базовым (в любом поколении).
+
+            this.LogicDocument.Add_ChangedStyle(this.private_GetAllBasedStylesId(StyleId));
+        }
+    },
+
+    private_GetAllBasedStylesId : function(StyleId)
+    {
+        var arrStyles = [];
+
+        // Отдельно добавляем StyleId, т.к. данная функция вызывается и после удаления стиля из списка,
+        // но при этом в данный массив стиль должен попасть.
+        arrStyles.push(StyleId);
+
+        for (var CurStyleId in this.Style)
+        {
+            if (CurStyleId == StyleId)
+            {
+                arrStyles.push(StyleId);
+            }
+
+            var oStyle = this.Style[CurStyleId];
+            var BaseId = oStyle.Get_BasedOn();
+            var PassedStyles = [];
+            while (null != BaseId && undefined != BaseId)
+            {
+                var bBreak = false;
+                // Делаем проверку от зацикливания, среди уже пройденных стилей ищем текущий стриль.
+                for (var nIndex = 0, nCount = PassedStyles.length; nIndex < nCount; nIndex++)
+                {
+                    if (PassedStyles[nIndex] == BaseId)
+                    {
+                        bBreak = true;
+                        break;
+                    }
+                }
+
+                if (true === bBreak)
+                    break;
+
+                PassedStyles.push(BaseId);
+
+                if (BaseId == StyleId)
+                {
+                    arrStyles.push(CurStyleId);
+                    break;
+                }
+
+                var BaseStyle = this.Style[BaseId];
+                if (!BaseStyle)
+                    break;
+
+                BaseId = BaseStyle.Get_BasedOn();
+            }
+        }
+
+        return arrStyles;
     },
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
@@ -4827,7 +4911,18 @@ CStyles.prototype =
         {
             // TODO: Надо сделать механизм, чтобы данное действие не вызывалось много раз подряд, а только 1.
             var LogicDocument = editor.WordControl.m_oLogicDocument;
-            var AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(StyleId);
+
+            var AllParagraphs = [];
+
+            if (StyleId != this.Default.Paragraph)
+            {
+                var AllStylesId = this.private_GetAllBasedStylesId(StyleId);
+                AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(AllStylesId);
+            }
+            else
+            {
+                AllParagraphs = LogicDocument.Get_AllParagraphs({All : true});
+            }
 
             var Count = AllParagraphs.length;
             for (var Index = 0; Index < Count; Index++)
@@ -7150,6 +7245,7 @@ CTextPr.prototype =
         {
             TextPr.TextFill = this.TextFill.createDuplicate();
         }
+
         return TextPr;
     },
 
@@ -8155,7 +8251,7 @@ CTextPr.prototype =
     {
         delete this.PrChange;
     }
-}
+};
 
 function CParaTab(Value, Pos)
 {

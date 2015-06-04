@@ -640,6 +640,8 @@ function CCollaborativeEditing()
     {
         if (true === oThis.m_bGlobalLock)
         {
+            // Здесь проверяем есть ли длинная операция, если она есть, то до ее окончания нельзя делать
+            // Undo, иначе точка истории уберется, а изменения допишутся в предыдущую.
             if (false == editor.asc_CheckLongActionCallback(oThis.OnCallback_AskLock, result))
                 return;
 

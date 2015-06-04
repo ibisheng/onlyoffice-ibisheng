@@ -14542,9 +14542,12 @@ CDocument.prototype.Remove_Style = function(sStyleName)
         this.Document_UpdateInterfaceState();
     }
 };
-CDocument.prototype.Add_ChangedStyle = function(StyleId)
+CDocument.prototype.Add_ChangedStyle = function(arrStylesId)
 {
-    this.ChangedStyles[StyleId] = true;
+    for (var nIndex = 0, nCount = arrStylesId.length; nIndex < nCount; nIndex++)
+    {
+        this.ChangedStyles[arrStylesId[nIndex]] = true;
+    }
 };
 CDocument.prototype.Document_UpdateStylesPanel = function()
 {
@@ -14581,11 +14584,10 @@ CDocument.prototype.Get_AllParagraphsByNumbering = function(NumPr)
 {
     return this.Get_AllParagraphs({Numbering : true, NumPr : NumPr});
 };
-CDocument.prototype.Get_AllParagraphsByStyle = function(StyleId)
+CDocument.prototype.Get_AllParagraphsByStyle = function(StylesId)
 {
-    return this.Get_AllParagraphs({Style : true, StyleId : StyleId});
+    return this.Get_AllParagraphs({Style : true, StylesId : StylesId});
 };
-
 //-----------------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------------
