@@ -365,7 +365,7 @@ ParaRun.prototype.Add = function(Item, bMath)
             if (para_Run === PrevElement.Type && DstReviewType === PrevElement.Get_ReviewType() && true === this.Pr.Is_Equal(PrevElement.Pr))
             {
                 PrevElement.State.ContentPos = PrevElement.Content.length;
-                PrevElement.Add_ToContent(PrevElement.Content.length, Item, true, bMath);
+                PrevElement.Add_ToContent(PrevElement.Content.length, Item, true);
                 PrevElement.Make_ThisElementCurrent();
                 return;
             }
@@ -377,7 +377,7 @@ ParaRun.prototype.Add = function(Item, bMath)
             if (para_Run === NextElement.Type && DstReviewType === NextElement.Get_ReviewType() && true === this.Pr.Is_Equal(NextElement.Pr))
             {
                 NextElement.State.ContentPos = 0;
-                NextElement.Add_ToContent(0, Item, true, bMath);
+                NextElement.Add_ToContent(0, Item, true);
                 NextElement.Make_ThisElementCurrent();
                 return;
             }
@@ -387,7 +387,7 @@ ParaRun.prototype.Add = function(Item, bMath)
         var NewRun = new ParaRun(this.Paragraph, bMath);
         NewRun.Set_Pr(this.Pr.Copy());
         NewRun.Set_ReviewType(DstReviewType);
-        NewRun.Add_ToContent(0, Item, true, bMath);
+        NewRun.Add_ToContent(0, Item, true);
 
         if (0 === CurPos)
             Parent.Add_ToContent(RunPos, NewRun);
@@ -404,7 +404,7 @@ ParaRun.prototype.Add = function(Item, bMath)
         NewRun.Make_ThisElementCurrent();
     }
     else
-        this.Add_ToContent(this.State.ContentPos, Item, true, bMath);
+        this.Add_ToContent(this.State.ContentPos, Item, true);
 };
 
 ParaRun.prototype.Remove = function(Direction, bOnAddText)
@@ -712,7 +712,7 @@ ParaRun.prototype.Remove_ParaEnd = function()
 };
 
 // Добавляем элемент в позицию с сохранием в историю
-ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition, bMath)
+ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 {
     History.Add( this, { Type : historyitem_ParaRun_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
     this.Content.splice( Pos, 0, Item );
@@ -754,7 +754,7 @@ ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition, bMath)
             }
 
             // Особый случай, когда мы добавляем элемент в самый последний ран
-            if (Pos === this.Content.length - 1 && LinesCount - 1 === CurLine && !bMath)
+            if (Pos === this.Content.length - 1 && LinesCount - 1 === CurLine)
             {
                 this.protected_FillRangeEndPos(CurLine, RangesCount - 1, this.protected_GetRangeEndPos(CurLine, RangesCount - 1) + 1);
             }
