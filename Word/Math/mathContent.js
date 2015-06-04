@@ -3912,6 +3912,8 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         PRS.Update_CurPos(0, Depth);
         PRS.Update_CurPos(0, Depth+1); // нулевой элемент всегда Run
 
+        PRS.Set_LineBreakPos(0);
+
         if(PRS.Word == true)
         {
             PRS.FirstItemOnLine = false;
