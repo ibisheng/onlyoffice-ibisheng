@@ -5097,6 +5097,11 @@ Paragraph.prototype =
 
     Correct_Content : function(_StartPos, _EndPos)
     {
+        // Если у нас сейчас в данном параграфе используется ссылка на позицию, тогда мы не корректируем контент, чтобы
+        // не удалить место, на которое идет ссылка.
+        if (this.NearPosArray.length >= 1)
+            return;
+
         // В данной функции мы корректируем содержимое параграфа:
         // 1. Спаренные пустые раны мы удаляем (удаляем 1 ран)
         // 2. Удаляем пустые гиперссылки, пустые формулы, пустые поля
@@ -5113,46 +5118,46 @@ Paragraph.prototype =
 
             if ((para_Hyperlink === CurElement.Type || para_Math === CurElement.Type || para_Field === CurElement.Type) && true === CurElement.Is_Empty() && true !== CurElement.Is_CheckingNearestPos())
             {
-                this.Internal_Content_Remove( CurPos );
+                this.Internal_Content_Remove(CurPos);
                 CurPos++;
             }
-            else if ( para_Comment === CurElement.Type && false === CurElement.Start )
+            else if (para_Comment === CurElement.Type && false === CurElement.Start)
             {
                 var CommentId = CurElement.CommentId;
-                for ( var CurPos2 = CurPos - 1; CurPos2 >= 0; CurPos2-- )
+                for (var CurPos2 = CurPos - 1; CurPos2 >= 0; CurPos2--)
                 {
                     var CurElement2 = this.Content[CurPos2];
-                    
-                    if ( para_Comment === CurElement2.Type && CommentId === CurElement2.CommentId )
+
+                    if (para_Comment === CurElement2.Type && CommentId === CurElement2.CommentId)
                     {
-                        CommentsToDelete.push( CommentId );
+                        CommentsToDelete.push(CommentId);
                         break;
                     }
-                    else if ( true !== CurElement2.Is_Empty() )
+                    else if (true !== CurElement2.Is_Empty())
                         break;
                 }
-                
+
             }
-            else if ( para_Run !== CurElement.Type )
-            {                                
-                if ( CurPos === this.Content.length - 1 || para_Run !== this.Content[CurPos + 1].Type || CurPos === this.Content.length - 2 )
+            else if (para_Run !== CurElement.Type)
+            {
+                if (CurPos === this.Content.length - 1 || para_Run !== this.Content[CurPos + 1].Type || CurPos === this.Content.length - 2)
                 {
                     var NewRun = new ParaRun(this);
-                    this.Internal_Content_Add( CurPos + 1, NewRun );
+                    this.Internal_Content_Add(CurPos + 1, NewRun);
                 }
 
                 // Для начального элемента проверим еще и предыдущий
-                if ( StartPos === CurPos && ( 0 === CurPos || para_Run !== this.Content[CurPos - 1].Type  ) )
+                if (StartPos === CurPos && ( 0 === CurPos || para_Run !== this.Content[CurPos - 1].Type  ))
                 {
                     var NewRun = new ParaRun(this);
-                    this.Internal_Content_Add( CurPos, NewRun );
+                    this.Internal_Content_Add(CurPos, NewRun);
                 }
             }
             else
             {
                 // TODO (Para_End): Предпоследний элемент мы не проверяем, т.к. на ран с Para_End мы не ориентируемся
-                if (true === CurElement.Is_Empty() && (0 < CurPos || para_Run !== this.Content[CurPos].Type)  && CurPos < this.Content.length - 1 && para_Run === this.Content[CurPos + 1].Type)
-                    this.Internal_Content_Remove( CurPos );
+                if (true === CurElement.Is_Empty() && (0 < CurPos || para_Run !== this.Content[CurPos].Type) && CurPos < this.Content.length - 2 && para_Run === this.Content[CurPos + 1].Type)
+                    this.Internal_Content_Remove(CurPos);
             }
         }
 
