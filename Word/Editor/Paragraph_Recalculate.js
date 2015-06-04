@@ -413,6 +413,7 @@ Paragraph.prototype.private_RecalculateFastRange       = function(CurRange, CurL
     PRS.Line  = CurLine;
     PRS.Range = CurRange;
 
+    PRS.Ranges      = this.Lines[CurLine].Ranges;
     PRS.RangesCount = this.Lines[CurLine].Ranges.length - 1;
 
     PRS.Paragraph = this;
