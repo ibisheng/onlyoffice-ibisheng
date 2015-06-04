@@ -1087,7 +1087,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var ParaRange = PRS.Range;
     var Page      = AbsolutePage + PRS.Page;
 
-    var PrevLineObject = PRS.PrevLineRecalcInfo.Object;
+    var PrevLineObject = PRS.RestartPageRecalcInfo.Object;
     var bStartLine = this.Root.IsStartLine(ParaLine);
 
     var MathSettings = Get_WordDocumentDefaultMathSettings();
@@ -1146,7 +1146,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     if(PrevLineObject == null ||  PrevLineObject == this)
     {
         PRS.RecalcResult = recalcresult_NextLine;
-        PRS.PrevLineRecalcInfo.Object = null;
+        PRS.Reset_RestartPageRecalcInfo();
     }
 
     // заглушка для пересчета Gaps элементов в текущей строке
@@ -1192,9 +1192,8 @@ ParaMath.prototype.UpdateInfoForBreak = function(PRS)
     var AbsolutePage = this.Paragraph == null ? 0 : this.Paragraph.Get_StartPage_Absolute();
     var Page      = AbsolutePage + PRS.Page;
 
-    PRS.PrevLineRecalcInfo.Object = this;
+    PRS.Set_RestartPageRecalcInfo(this.PageInfo.GetFirstLineOnPage(Page), this);
     PRS.RecalcResult = recalcresult_PrevLine;
-    PRS.PrevLineRecalcInfo.Line = this.PageInfo.GetFirstLineOnPage(Page)/*this.CurPageInfo.FirstLine + this.Root.StartLine*/;
     PRS.NewRange = true;
 };
 ParaMath.prototype.Save_MathInfo = function(Copy)
@@ -1254,7 +1253,7 @@ ParaMath.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 };
 ParaMath.prototype.UpdateWidthLine = function(PRS, Width)
 {
-    var PrevRecalcObject = PRS.PrevLineRecalcInfo.Object;
+    var PrevRecalcObject = PRS.RestartPageRecalcInfo.Object;
 
     if(PrevRecalcObject == null || PrevRecalcObject == this)
     {

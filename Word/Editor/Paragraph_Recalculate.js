@@ -472,7 +472,7 @@ Paragraph.prototype.private_RecalculateFastRange       = function(CurRange, CurL
     return this.Get_StartPage_Absolute() + CurPage;
 };
 
-Paragraph.prototype.private_RecalculatePage            = function(CurPage, bResetPrevLineInfo)
+Paragraph.prototype.private_RecalculatePage            = function(CurPage, bFirstRecalculate)
 {
     var PRS = this.m_oPRSW;
 
@@ -506,8 +506,8 @@ Paragraph.prototype.private_RecalculatePage            = function(CurPage, bRese
     PRS.Reset_Ranges();
     PRS.Reset_PageBreak();
 
-    if (false !== bResetPrevLineInfo)
-        PRS.Reset_PrevLineRecalcInfo();
+    if (false !== bFirstRecalculate)
+        PRS.Reset_RestartPageRecalcInfo();
 
     var RecalcResult;
     while (true)
@@ -526,7 +526,6 @@ Paragraph.prototype.private_RecalculatePage            = function(CurPage, bRese
             PRS.Reset_Ranges();
             PRS.Reset_PageBreak();
             PRS.Reset_RunRecalcInfo();
-            PRS.Reset_PrevLineRecalcInfo();
         }
         else if (recalcresult_PrevLine === RecalcResult)
         {
@@ -2177,7 +2176,7 @@ function CParagraphRecalculateStateWrap(Para)
 
     this.RecalcResult = 0x00;//recalcresult_NextElement;
 
-    this.PrevLineRecalcInfo = // Информация для пересчета предыдущей строки
+    this.RestartPageRecalcInfo =     // Информация о том, почему текущая страница параграфа пересчитывается заново
     {
         Line   : 0,           // Номер строки, начиная с которой надо пересчитать
         Object : null         // Объект, который вызвал пересчет
@@ -2275,10 +2274,16 @@ CParagraphRecalculateStateWrap.prototype =
         this.bBoxOperator        = false;
     },
 
-    Reset_PrevLineRecalcInfo : function()
+    Reset_RestartPageRecalcInfo : function()
     {
-        this.PrevLineRecalcInfo.Line   = 0;
-        this.PrevLineRecalcInfo.Object = null;
+        this.RestartPageRecalcInfo.Line   = 0;
+        this.RestartPageRecalcInfo.Object = null;
+    },
+
+    Set_RestartPageRecalcInfo : function(Line, Object)
+    {
+        this.RestartPageRecalcInfo.Line   = Line;
+        this.RestartPageRecalcInfo.Object = Object;
     },
 
     Set_LineBreakPos : function(PosObj)
