@@ -393,6 +393,7 @@ CGlyphOperator.prototype.draw = function(pGraphics, XX, YY, PDSE)
     this.drawPath(pGraphics, XX,YY, PDSE);
 
     pGraphics.df();
+    pGraphics._s();
     pGraphics.SetIntegerGrid(intGrid);
 };
 CGlyphOperator.prototype.drawOnlyLines = function(x, y, pGraphics, PDSE)

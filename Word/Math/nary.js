@@ -956,6 +956,7 @@ CNaryOperator.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
     this.drawPath(pGraphics, XX,YY);
 
     pGraphics.df();
+    pGraphics._s();
     pGraphics.SetIntegerGrid(intGrid);
 };
 CNaryOperator.prototype.drawTextElem = function(x, y, pGraphics)

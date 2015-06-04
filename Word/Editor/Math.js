@@ -187,7 +187,7 @@ function Get_WordDocumentDefaultMathSettings()
     return editor.WordControl.m_oLogicDocument.Settings.MathSettings;
 }
 
-function MathMenu (type)
+function MathMenu(type)
 {
 	this.Type = para_Math;
 	this.Menu = type;
@@ -198,32 +198,43 @@ MathMenu.prototype =
     {
         return this.Type;
     }
+};
+
+function CMathParametersWidth()
+{
+    this.Measure = 0;
+    this.bMathWordLarge = false;
 }
 
 function CParaMathLineWidths()
 {
-    this.Widths     = [];
+    this.Widths         = [];
 
-    this.MinW       = 0; // without first line
-    this.MaxW       = 0; // without first line
+    this.bLarge         = false;
+    this.MinW           = 0; // without first line
+    this.MaxW           = 0; // without first line
 }
 CParaMathLineWidths.prototype.UpdateWidth = function(Line, W)
 {
-    var CurLine = Line;
+    var bFastUpdate = false;
 
-    var bFastUpdate = CurLine >= this.Widths.length;
+    if(Line >= this.Widths.length)
+    {
+        bFastUpdate = true;
+        this.Widths[Line] = new CMathParametersWidth();
+    }
 
     var bUpdMaxWidth = false;
 
-    var bNeedUpdate = bFastUpdate == false && Math.abs(this.Widths[CurLine] - W) > 0.00001;
+    var bNeedUpdate = bFastUpdate == false && Math.abs(this.Widths[Line].Measure - W) > 0.00001;
 
-    this.Widths[CurLine] = W; // присваиваем до RecalcMaxMin
+    this.Widths[Line].Measure = W; // присваиваем до RecalcMaxMin
 
-    if(CurLine !== 0)
+    if(Line !== 0)
     {
         if(bFastUpdate)
         {
-            bUpdMaxWidth = this.UpdateMinMax(CurLine);
+            bUpdMaxWidth = this.UpdateMinMax(Line);
         }
         else if(bNeedUpdate)
         {
@@ -232,8 +243,8 @@ CParaMathLineWidths.prototype.UpdateWidth = function(Line, W)
 
             if(lng > 1)
             {
-                this.MaxW = this.Widths[1];
-                this.MinW = this.Widths[1];
+                this.MaxW = this.Widths[1].Measure;
+                this.MinW = this.Widths[1].Measure;
 
                 for(var i = 2; i < lng; i++)
                 {
@@ -246,6 +257,38 @@ CParaMathLineWidths.prototype.UpdateWidth = function(Line, W)
     }
 
     return bUpdMaxWidth;
+};
+CParaMathLineWidths.prototype.SetWordLarge = function(Line, bWordLarge)
+{
+    if(Line >= this.Widths.length)
+    {
+        this.Widths[Line] = new CMathParametersWidth();
+
+        this.bLarge = this.bLarge || bWordLarge;
+    }
+    else
+    {
+        if(this.Widths[Line].bMathWordLarge !== bWordLarge)
+        {
+            this.Widths[Line].bMathWordLarge = bWordLarge;
+
+            var Lng = this.Widths.length;
+
+            this.bLarge = false;
+            for(var Pos = 0; Pos < Lng; Pos++)
+            {
+                if(this.Widths[Pos].bMathWordLarge == true)
+                {
+                    this.bLarge = true;
+                    break;
+                }
+            }
+        }
+    }
+};
+CParaMathLineWidths.prototype.IsLarge = function()
+{
+    return this.bLarge;
 };
 CParaMathLineWidths.prototype.Get = function(Line)
 {
@@ -267,7 +310,7 @@ CParaMathLineWidths.prototype.UpdateMinMax = function(Pos)
 {
     var bUpdMaxWidth = false;
 
-    var Item = this.Widths[Pos];
+    var Item = this.Widths[Pos].Measure;
 
     if(this.MaxW < Item)
     {
@@ -287,7 +330,7 @@ CParaMathLineWidths.prototype.private_GetW = function(CurLine)
     var res;
 
     if(CurLine < this.Widths.length)
-        res = this.Widths[CurLine];
+        res = this.Widths[CurLine].Measure;
 
     return res;
 };
@@ -311,6 +354,10 @@ CMathInfo.prototype.GetFirstLineOnPage = function()
 CMathInfo.prototype.GetCountLines = function()
 {
     return this.LineWidths.GetCountLines();
+};
+CMathInfo.prototype.GetNumberLine = function(Line)
+{
+    return Line - this.FirstLineOnPage;
 };
 
 function CMathPageInfo()
@@ -368,10 +415,15 @@ CMathPageInfo.prototype.SetNextWrapState = function()
     if(InfoPage.WrapState !== ALIGN_EMPTY)
         InfoPage.WrapState++;
 };
-CMathPageInfo.prototype.SetStateWordLarge = function(bWordLarge)
+CMathPageInfo.prototype.SetStateWordLarge = function(_Line, bWordLarge)
 {
     this.private_CheckInfo(this.CurPage);
-    this.Info[this.CurPage].bWordLarge = bWordLarge;
+
+    var Line = this.Info[this.CurPage].GetNumberLine(_Line - this.StartLine);
+
+    this.Info[this.CurPage].LineWidths.SetWordLarge(Line, bWordLarge);
+
+    //var Line = _Line - this.StartLine - this.Info[this.CurPage].FirstLineOnPage;
 };
 CMathPageInfo.prototype.GetWrap = function(_Page)
 {
@@ -381,7 +433,7 @@ CMathPageInfo.prototype.GetWrap = function(_Page)
 };
 CMathPageInfo.prototype.GetCurrentStateWordLarge = function()
 {
-    return this.Info[this.CurPage].bWordLarge;
+    return this.Info[this.CurPage].LineWidths.IsLarge();
 };
 CMathPageInfo.prototype.IsFirstPage = function(_Page)
 {
@@ -395,7 +447,8 @@ CMathPageInfo.prototype.UpdateCurrentWidth = function(_Line, Width)
 {
     this.private_CheckInfo(this.CurPage);
 
-    var Line = _Line - this.StartLine - this.Info[this.CurPage].FirstLineOnPage;
+    var Line = this.Info[this.CurPage].GetNumberLine(_Line - this.StartLine);
+    //var Line = _Line - this.StartLine - this.Info[this.CurPage].FirstLineOnPage;
 
     return this.Info[this.CurPage].LineWidths.UpdateWidth(Line, Width);
 };
@@ -1156,7 +1209,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.Root.Math_UpdateGaps(ParaLine, ParaRange);
     }
 
-
+    console.log("Line " + PRS.Line);
     this.Root.Recalculate_Range(PRS, ParaPr, Depth);
 
     if(PRS.NewRange == false)
@@ -1174,10 +1227,8 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.UpdateWidthLine(PRS, WidthLine);
     }
 
-    if(PRS.X + PRS.SpaceLen + PRS.WordLen > PRS.XEnd && WrapState == ALIGN_EMPTY)
-    {
-        this.PageInfo.SetStateWordLarge(true);
-    }
+    var bWordLarge =  PRS.bMathWordLarge == true && WrapState == ALIGN_EMPTY;
+    this.PageInfo.SetStateWordLarge(PRS.Line, bWordLarge);
 
     if(PRS.bMathWordLarge == true && WrapState !== ALIGN_EMPTY)
     {
@@ -3213,8 +3264,8 @@ CMathRecalculateInfo.prototype.ClearRecalculate = function()
 function CMathRecalculateObject()
 {
     this.WrapState        = ALIGN_EMPTY;
-    this.MaxW             = 0;
-    this.bWordLarge       = false;
+    this.MaxW             = 0;              // для рассчета выравнивания формулы нужно учитывать изменилась ли максимальная ширина или нет
+    this.bWordLarge       = false;          // если формула выходит за границы докумена, то не нужно учитывать выравнивание, а значит можно сделать быстрый пересчет
     this.bFastRecalculate = true;   /*если добавляем буквы во внутренний контент, который не бьется на строки, то отменяем быстрый пересчет,
                                       т.к. высота контента может поменяться (она рассчитывается точно исходя из размеров внутр элементов)*/
 
@@ -3227,7 +3278,7 @@ CMathRecalculateObject.prototype.Fill = function(StructRecalc)
     this.bInline          = StructRecalc.bInline;
     this.Align            = StructRecalc.Align;
 
-    var PageInfo = StructRecalc.PageInfo;
+    var PageInfo          = StructRecalc.PageInfo;
 
     this.WrapState        = PageInfo.GetCurrentWrapState();
     this.MaxW             = PageInfo.GetCurrentMaxWidthAllLines();

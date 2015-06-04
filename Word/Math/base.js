@@ -1619,6 +1619,7 @@ CMathBase.prototype.Draw_Lines = function(PDSL)
     var ArgSize     = this.Get_CompiledArgSize();
     var fontCoeff   = MatGetKoeffArgSize(CtrPrp.FontSize, ArgSize.value);
 
+    // вычисляем координату Y и LineW также как в Run
     var X          = PDSL.X;
     var Y          = PDSL.Baseline - CtrPrp.FontSize * fontCoeff * g_dKoef_pt_to_mm * 0.27;
 

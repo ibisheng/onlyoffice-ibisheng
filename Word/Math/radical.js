@@ -112,6 +112,8 @@ CSignRadical.prototype.new_draw = function(x, y, pGraphics)
     pGraphics._l(x5 + penW/3*sin, y4 - penW/5);
     pGraphics.ds();
 
+    pGraphics._s();
+
 };
 CSignRadical.prototype.draw = function(x, y, pGraphics, PDSE)
 {
@@ -209,7 +211,7 @@ CSignRadical.prototype.draw = function(x, y, pGraphics, PDSE)
     pGraphics._l(x9, y9);
     pGraphics.ds();
 
-
+    pGraphics._s();
 };
 CSignRadical.prototype.recalculateSize = function(oMeasure, sizeArg)
 {

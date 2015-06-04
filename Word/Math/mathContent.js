@@ -3924,7 +3924,6 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             PRS.SpaceLen = 0;
             PRS.WordLen = 0;
 
-
             PRS.XRange = PRS.X;
         }
     }
