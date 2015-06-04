@@ -9162,6 +9162,9 @@ CDocument.prototype =
 
     Update_CursorType : function( X, Y, PageIndex, MouseEvent )
     {
+        if (null !== this.FullRecalc.Id && this.FullRecalc.PageIndex <= PageIndex)
+            return;
+
         editor.sync_MouseMoveStartCallback();
 
         // Ничего не делаем
@@ -9178,8 +9181,8 @@ CDocument.prototype =
         }
         else
         {
-            var bInText      = (null === this.Is_InText(X, Y, this.CurPage)      ? false : true);
-            var bTableBorder = (null === this.Is_TableBorder(X, Y, this.CurPage) ? false : true);
+            var bInText      = (null === this.Is_InText(X, Y, PageIndex)      ? false : true);
+            var bTableBorder = (null === this.Is_TableBorder(X, Y, PageIndex) ? false : true);
 
             // Ничего не делаем
             if ( true === this.DrawingObjects.updateCursorType(PageIndex, X, Y, MouseEvent, ( true === bInText || true === bTableBorder ? true : false )) )

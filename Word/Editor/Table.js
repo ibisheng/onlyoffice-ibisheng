@@ -18003,16 +18003,17 @@ CTable.prototype =
         {
             // Определим какие строки попадают на данную страницу
             Row_start = this.Pages[PNum].FirstRow;
-            Row_last = Row_start;
-
-            if (PNum + 1 < this.Pages.length)
-            {
-                Row_last = this.Pages[PNum + 1].FirstRow;
-                if (Row_last != Row_start && false === this.RowsInfo[Row_last].FirstPage)
-                    Row_last--;
-            }
-            else
-                Row_last = this.Content.length - 1;
+            Row_last  = this.Pages[PNum].LastRow;
+//            Row_last = Row_start;
+//
+//            if (PNum + 1 < this.Pages.length)
+//            {
+//                Row_last = this.Pages[PNum + 1].FirstRow;
+//                if (Row_last != Row_start && false === this.RowsInfo[Row_last].FirstPage)
+//                    Row_last--;
+//            }
+//            else
+//                Row_last = this.Content.length - 1;
         }
 
         if ( Row_last < Row_start )
