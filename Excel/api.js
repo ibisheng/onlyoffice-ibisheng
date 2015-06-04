@@ -3869,7 +3869,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
         prot["asc_editDefinedNames"] = prot.asc_editDefinedNames;
         prot["asc_delDefinedNames"] = prot.asc_delDefinedNames;
         prot["asc_getDefaultDefinedName"] = prot.asc_getDefaultDefinedName;
-        prot["asc_getDefaultDefinedName"] = prot.asc_checkDefinedName;
+        prot["asc_checkDefinedName"] = prot.asc_checkDefinedName;
 
 		// Auto filters interface
 		prot["asc_addAutoFilter"] = prot.asc_addAutoFilter;
