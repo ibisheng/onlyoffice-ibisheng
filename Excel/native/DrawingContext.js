@@ -413,7 +413,6 @@
         this.ppiX = parseInt(this.ppiX * this.deviceScale, 10);
         this.ppiY = parseInt(this.ppiY * this.deviceScale, 10);
 
-
         ppiTest.remove();
 
 		this._mct  = new Matrix();  // units transform
@@ -422,6 +421,8 @@
 		this._mft  = new Matrix();  // full transform
 		this._mift = new Matrix();  // inverted full transform
 		this._im   = new Matrix();
+
+		this.nppiX = parseInt(this.ppiX * this.deviceScale, 10);
 
 		this.scaleFactor = 1;
 
@@ -863,7 +864,9 @@
 		this.font.copyFrom(font);
 
         // sample: 132 (ipad) * device_scale(is_retina=2) / 96 (default) * 2.54
-        this.font.FontSize = this.font.FontSize * this.deviceDPI * this.deviceScale / this.ppiX * 2.54;
+
+		///var rel = this.ppiX / this.nppiX
+        this.font.FontSize = this.font.FontSize * this.deviceDPI * this.deviceScale / this.nppiX * 2.54 * this.scaleFactor * this.deviceScale;// * rel;
 
         italic = true === font.Italic;
 		bold   = true === font.Bold;
@@ -925,17 +928,17 @@
 
             this.nctx["PD_LoadFont"](_info.Path, _info.FaceIndex, this.font.FontSize, flag);
 
-            var dKoef = g_dKoef_pt_to_mm * font.FontSize / napi_fontInfo[3];
-
-            this.napi_fmt[0].m_lUnits_Per_Em    = napi_fontInfo[3];
-            this.napi_fmt[0].m_lAscender        = napi_fontInfo[0];// * dKoef;
-            this.napi_fmt[0].m_lDescender       = napi_fontInfo[2];// * dKoef;
-            this.napi_fmt[0].m_lLineHeight      = napi_fontInfo[2];// * dKoef;
-
-            this.napi_fmt[3].m_lUnits_Per_Em    = napi_fontInfo[3];
-            this.napi_fmt[3].m_lAscender        = napi_fontInfo[0];// * dKoef;
-            this.napi_fmt[3].m_lDescender       = napi_fontInfo[2];// * dKoef;
-            this.napi_fmt[3].m_lLineHeight      = napi_fontInfo[2];// * dKoef;
+            //var dKoef = g_dKoef_pt_to_mm * font.FontSize / napi_fontInfo[3];
+            //
+            //this.napi_fmt[0].m_lUnits_Per_Em    = napi_fontInfo[3];
+            //this.napi_fmt[0].m_lAscender        = napi_fontInfo[0];// * dKoef;
+            //this.napi_fmt[0].m_lDescender       = napi_fontInfo[2];// * dKoef;
+            //this.napi_fmt[0].m_lLineHeight      = napi_fontInfo[2];// * dKoef;
+            //
+            //this.napi_fmt[3].m_lUnits_Per_Em    = napi_fontInfo[3];
+            //this.napi_fmt[3].m_lAscender        = napi_fontInfo[0];// * dKoef;
+            //this.napi_fmt[3].m_lDescender       = napi_fontInfo[2];// * dKoef;
+            //this.napi_fmt[3].m_lLineHeight      = napi_fontInfo[2];// * dKoef;
 
             r = true;
 

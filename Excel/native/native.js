@@ -23,6 +23,43 @@ window.NATIVE_EDITOR_ENJINE_SYNC_RECALC = true;
 var document = {};
 window.document = document;
 
+//-------------------------------------------------------------------------------------------------
+aStandartNumFormats = [];
+aStandartNumFormats[0] = "General";
+aStandartNumFormats[1] = "0";
+aStandartNumFormats[2] = "0.00";
+aStandartNumFormats[3] = "#,##0";
+aStandartNumFormats[4] = "#,##0.00";
+aStandartNumFormats[9] = "0%";
+aStandartNumFormats[10] = "0.00%";
+aStandartNumFormats[11] = "0.00E+00";
+aStandartNumFormats[12] = "# ?/?";
+aStandartNumFormats[13] = "# ??/??";
+aStandartNumFormats[14] = "m/d/yyyy";
+aStandartNumFormats[15] = "d-mmm-yy";
+aStandartNumFormats[16] = "d-mmm";
+aStandartNumFormats[17] = "mmm-yy";
+aStandartNumFormats[18] = "h:mm AM/PM";
+aStandartNumFormats[19] = "h:mm:ss AM/PM";
+aStandartNumFormats[20] = "h:mm";
+aStandartNumFormats[21] = "h:mm:ss";
+aStandartNumFormats[22] = "m/d/yyyy h:mm";
+aStandartNumFormats[37] = "#,##0_);(#,##0)";
+aStandartNumFormats[38] = "#,##0_);[Red](#,##0)";
+aStandartNumFormats[39] = "#,##0.00_);(#,##0.00)";
+aStandartNumFormats[40] = "#,##0.00_);[Red](#,##0.00)";
+aStandartNumFormats[45] = "mm:ss";
+aStandartNumFormats[46] = "[h]:mm:ss";
+aStandartNumFormats[47] = "mm:ss.0";
+aStandartNumFormats[48] = "##0.0E+0";
+aStandartNumFormats[49] = "@";
+aStandartNumFormatsId = {};
+for(var i in aStandartNumFormats)
+{
+    aStandartNumFormatsId[aStandartNumFormats[i]] = i - 0;
+}
+//-------------------------------------------------------------------------------------------------
+
 function ConvertJSC_Array(_array)
 {
     var _len = _array.length;
@@ -760,6 +797,7 @@ function CFontManager()
 {
     this.m_oLibrary = {};
     this.Initialize = function(){};
+    this.ClearFontsRasterCache = function(){};
 };
 
 function CStylesPainter()
@@ -1185,21 +1223,26 @@ var FT_Common = new _FT_Common();
 // internal invoke
 //--------------------------------------------------------------------------------
 
-function internal_drawWorksheet(sheet, corner, frozenPaneLines) {
-    sheet._clean();
+function internal_drawWorksheet(sheet, corner, frozenPaneLines, selection) {
+    //sheet._clean();
     
-    if (corner) sheet._drawCorner();
+    if (corner)  sheet._drawCorner();
     sheet._drawColumnHeaders();
     sheet._drawRowHeaders();
+
     sheet._drawGrid();
     sheet._drawCellsAndBorders();
+
     sheet._drawFrozenPane();
     if (frozenPaneLines) sheet._drawFrozenPaneLines();
+
     sheet._fixSelectionOfMergedCells();
     sheet._drawAutoF();
     sheet.cellCommentator.drawCommentCells();
+
     // sheet.objectRender.showDrawingObjectsEx(true);
-    if (sheet.overlayCtx) {
+
+    if (selection && sheet.overlayCtx) {
         sheet._drawSelection();
     }
 }
@@ -1208,6 +1251,12 @@ function internal_drawWorksheet(sheet, corner, frozenPaneLines) {
 // native invoke
 //--------------------------------------------------------------------------------
 
+var PageType = {
+    PageDefaultType: 0,
+    PageTopType: 1,
+    PageLeftType: 2,
+    PageCornerType: 3
+};
 var scrollIndX = 0;
 var scrollIndY = 0;
 var deviceScale = 1;
@@ -1223,7 +1272,7 @@ function napi_openFile() {
     window.g_file_path = "native_open_file";
     window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
     _api = new window["Asc"]["spreadsheet_api"]();
-    _api.asc_nativeOpenFile(window.native["GetFileString"]());    
+    _api.asc_nativeOpenFile(window.native["GetFileString"]());
 }
 
 function napi_drawWorksheet(x, y, width, height, xind, yind) {
@@ -1232,7 +1281,7 @@ function napi_drawWorksheet(x, y, width, height, xind, yind) {
         _null_object.width = width;
         _null_object.height = height;
         
-        var worksheet = _api.wb.getWorksheet(0), indX = 0, indY = 0, offX = 0, offY = 0;
+        var worksheet = _api.wb.getWorksheet(0), indX = 0, indY = 0, offX = 0, offY = 0, i = 0;
 
         x = x / deviceScale * (72.0 / 96.0) + worksheet.headersWidth;
         y = y / deviceScale * (72.0 / 96.0) + worksheet.headersHeight;
@@ -1251,7 +1300,7 @@ function napi_drawWorksheet(x, y, width, height, xind, yind) {
         
         if (0 == xind && scrollIndX != 0)
         {
-            for (var i = scrollIndX; i >= 0; --i)
+            for (i = scrollIndX; i >= 0; --i)
                 worksheet.scrollHorizontal(-1);
             
             scrollIndX = 0;
@@ -1259,7 +1308,7 @@ function napi_drawWorksheet(x, y, width, height, xind, yind) {
        
         if (0 == yind && scrollIndY != 0)
         {
-            for (var i = scrollIndY; i >= 0; --i)
+            for (i = scrollIndY; i >= 0; --i)
                 worksheet.scrollVertical(-1);
             
             scrollIndY = 0;
@@ -1267,7 +1316,7 @@ function napi_drawWorksheet(x, y, width, height, xind, yind) {
         
         // ищем ячейку для начальной точки отрисовки
         
-        for (var i = 0; i < worksheet.cols.length; ++i) {
+        for (i = 0; i < worksheet.cols.length; ++i) {
             if (worksheet.cols[i].left <= x && x < worksheet.cols[i].left + worksheet.cols[i].width) {
 
 //                if (xind == 1 && yind == 1) {
@@ -1283,7 +1332,7 @@ function napi_drawWorksheet(x, y, width, height, xind, yind) {
             }
         }
         
-        for (var i = 0; i < worksheet.rows.length; ++i) {
+        for (i = 0; i < worksheet.rows.length; ++i) {
             // if ((xind == 1 || xind == 0)&& yind == 1)
                //  console.log('top-height: ' + worksheet.rows[i].top + ',' + worksheet.rows[i].height);
             
@@ -1311,7 +1360,7 @@ function napi_drawWorksheet(x, y, width, height, xind, yind) {
 //        
         if (indX - scrollIndX > 0) {
             
-            for (var i = scrollIndX; i < indX; ++i)
+            for (i = scrollIndX; i < indX; ++i)
                 worksheet.scrollHorizontal(1);
             
             scrollIndX = indX;
@@ -1319,7 +1368,7 @@ function napi_drawWorksheet(x, y, width, height, xind, yind) {
       
         if (indY - scrollIndY > 0) {
             
-            for (var i = scrollIndY; i < indY; ++i)
+            for (i = scrollIndY; i < indY; ++i)
                 worksheet.scrollVertical(1);
             
             scrollIndY = indY;
@@ -1335,19 +1384,13 @@ function napi_drawWorksheet(x, y, width, height, xind, yind) {
     }
 }
 function napi_drawWorksheetHeader(x, y, width, height, xind, yind, type) {
-    
-    //  direction
-    //  0 - default
-    //  1 - top pages
-    // -1 - left pages
-    //  2 - top_left rectangle
-    
+
     if (_api) {
         _null_object.width = width;
         _null_object.height = height;
         
-        var worksheet = _api.wb.getWorksheet(0), indX = 0, indY = 0, offX = 0, offY = 0;
-        
+        var worksheet = _api.wb.getWorksheet(0), indX = 0, indY = 0, offX = 0, offY = 0, i = 0;
+
         x = x  / deviceScale * (72.0 / 96.0) + worksheet.headersWidth;
         y = y  / deviceScale * (72.0 / 96.0) + worksheet.headersHeight;
         
@@ -1365,7 +1408,7 @@ function napi_drawWorksheetHeader(x, y, width, height, xind, yind, type) {
         
         if (0 == xind && scrollIndX != 0)
         {
-            for (var i = scrollIndX; i >= 0; --i)
+            for (i = scrollIndX; i >= 0; --i)
                 worksheet.scrollHorizontal(-1);
             
             scrollIndX = 0;
@@ -1373,7 +1416,7 @@ function napi_drawWorksheetHeader(x, y, width, height, xind, yind, type) {
         
         if (0 == yind && scrollIndY != 0)
         {
-            for (var i = scrollIndY; i >= 0; --i)
+            for (i = scrollIndY; i >= 0; --i)
                 worksheet.scrollVertical(-1);
             
             scrollIndY = 0;
@@ -1381,7 +1424,7 @@ function napi_drawWorksheetHeader(x, y, width, height, xind, yind, type) {
         
         // ищем ячейку для начальной точки отрисовки
         
-        for (var i = 0; i < worksheet.cols.length; ++i) {
+        for (i = 0; i < worksheet.cols.length; ++i) {
             if (worksheet.cols[i].left <= x && x < worksheet.cols[i].left + worksheet.cols[i].width) {
                 indX = i;
                 offX = x  - worksheet.cols[i].left;
@@ -1389,7 +1432,7 @@ function napi_drawWorksheetHeader(x, y, width, height, xind, yind, type) {
             }
         }
         
-        for (var i = 0; i < worksheet.rows.length; ++i) {
+        for (i = 0; i < worksheet.rows.length; ++i) {
             if (worksheet.rows[i].top <= y && y < worksheet.rows[i].top + worksheet.rows[i].height) {
                 indY = i;
                 offY = y - worksheet.rows[i].top;
@@ -1399,7 +1442,7 @@ function napi_drawWorksheetHeader(x, y, width, height, xind, yind, type) {
         
         if (indX - scrollIndX > 0) {
             
-            for (var i = scrollIndX; i < indX; ++i)
+            for (i = scrollIndX; i < indX; ++i)
                 worksheet.scrollHorizontal(1);
             
             scrollIndX = indX;
@@ -1407,7 +1450,7 @@ function napi_drawWorksheetHeader(x, y, width, height, xind, yind, type) {
         
         if (indY - scrollIndY > 0) {
             
-            for (var i = scrollIndY; i < indY; ++i)
+            for (i = scrollIndY; i < indY; ++i)
                 worksheet.scrollVertical(1);
             
             scrollIndY = indY;
@@ -1416,22 +1459,15 @@ function napi_drawWorksheetHeader(x, y, width, height, xind, yind, type) {
         worksheet.cellsLeft = -offX;
         worksheet.cellsTop  = -offY;      
        
-        if ((0 == yind && type == 1) || type == 2) {
+        if ((0 == yind && type == PageType.PageTopType) || type == PageType.PageCornerType) {
             worksheet.cellsTop += worksheet.headersHeight;
         }
         
-        if ((0 == xind && type == -1) || type == 2) {
+        if ((0 == xind && type == PageType.PageLeftType) || type == PageType.PageCornerType) {
            worksheet.cellsLeft += worksheet.headersWidth;
         }
-        
-        if (type == 2)
-        {
-            internal_drawWorksheet(worksheet, true);
-        }
-        else
-        {
-            internal_drawWorksheet(worksheet);
-        }
+
+        internal_drawWorksheet(worksheet, true);
     }
 }
 
@@ -1444,7 +1480,6 @@ function napi_getContentMaxSizeX() {
     
     return 50000;
 }
-
 function napi_getContentMaxSizeY() {
     
     // высота таблицы с учетом размеров ячеек
@@ -1453,5 +1488,9 @@ function napi_getContentMaxSizeY() {
     //var gc_nMaxCol = 16384;
     
     return 50000;
+}
+
+function napi_setZoom(zoom) {
+    _api.asc_setZoom(zoom);
 }
 
