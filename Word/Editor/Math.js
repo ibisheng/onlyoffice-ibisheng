@@ -1209,7 +1209,6 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.Root.Math_UpdateGaps(ParaLine, ParaRange);
     }
 
-    console.log("Line " + PRS.Line);
     this.Root.Recalculate_Range(PRS, ParaPr, Depth);
 
     if(PRS.NewRange == false)
