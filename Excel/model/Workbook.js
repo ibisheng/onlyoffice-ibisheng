@@ -957,7 +957,6 @@ DependencyGraph.prototype = {
             name = getDefNameVertexId( null, sNewName );
         }
         this.addTableName( sNewName, ws, Ref );
-        console.log( sNewName );
         return sNewName;
     },
     addTableName:function ( sName, ws, Ref ) {
