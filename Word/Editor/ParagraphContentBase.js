@@ -1012,7 +1012,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Document_UpdateInterfaceStat
 };
 CParagraphContentWithParagraphLikeContent.prototype.Split = function (ContentPos, Depth)
 {
-    var Element = new this.contructor();
+    var Element = new this.constructor();
 
     var CurPos = ContentPos.Get(Depth);
 
@@ -2158,7 +2158,6 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_ReviewType = function(Re
 // Функции, которые должны быть реализованы в классах наследниках
 //----------------------------------------------------------------------------------------------------------------------
 CParagraphContentWithParagraphLikeContent.prototype.Add = function(Item){};
-CParagraphContentWithParagraphLikeContent.prototype.Split = function(ContentPos, Depth){};
 CParagraphContentWithParagraphLikeContent.prototype.Undo = function(Data){};
 CParagraphContentWithParagraphLikeContent.prototype.Redo = function(Data){};
 CParagraphContentWithParagraphLikeContent.prototype.Save_Changes = function(Data, Writer){};
