@@ -12076,18 +12076,7 @@ CDocument.prototype =
         // Проверяем состояние Undo/Redo
         editor.sync_CanUndoCallback( this.History.Can_Undo() );
         editor.sync_CanRedoCallback( this.History.Can_Redo() );
-
-        if ( true === History.Have_Changes() )
-        {
-            // дублирование евента. когда будет undo-redo - тогда
-            // эти евенты начнут отличаться
-            editor.SetDocumentModified(true);
-			editor._onUpdateDocumentCanSave();
-        }
-        else
-        {
-            editor.SetUnchangedDocument();
-        }
+        editor.CheckChangedDocument();
     },
     
     Document_UpdateCopyCutState : function()

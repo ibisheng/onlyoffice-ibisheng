@@ -628,7 +628,21 @@ asc_docs_api.prototype.TranslateStyleName = function(style_name)
 
     return style_name;
 };
+asc_docs_api.prototype.CheckChangedDocument = function()
+{
+    if (true === History.Have_Changes())
+    {
+        // дублирование евента. когда будет undo-redo - тогда
+        // эти евенты начнут отличаться
+        this.SetDocumentModified(true);
+    }
+    else
+    {
+        this.SetDocumentModified(false);
+    }
 
+    this._onUpdateDocumentCanSave();
+};
 asc_docs_api.prototype.SetUnchangedDocument = function()
 {
     this.SetDocumentModified(false);
@@ -2408,7 +2422,7 @@ function OnSave_Callback(e) {
 			editor.CoAuthoringApi.onUnSaveLock = null;
 
 			// Выставляем, что документ не модифицирован
-			editor.SetUnchangedDocument();
+			editor.CheckChangedDocument();
 			editor.canSave = true;
 			editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
