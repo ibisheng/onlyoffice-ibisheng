@@ -377,14 +377,23 @@ CMathPageInfo.prototype.SetStartPos = function(Page, StartLine)
     this.StartPage   = Page;
     this.StartLine   = StartLine;
 };
-CMathPageInfo.prototype.UpdateCurrentPage = function(Page)
+CMathPageInfo.prototype.UpdateCurrentPage = function(Page, ParaLine)
 {
     this.CurPage = Page - this.StartPage;
+
+    var Lng = this.Info.length;
+    if(this.CurPage >= Lng)
+    {
+        var PrevInfo = this.Info[Lng - 1];
+        //var FirstLineOnPage = Lng == 0 ? 0 : PrevInfo.FirstLineOnPage + PrevInfo.GetCountLines();
+        var FirstLineOnPage = ParaLine - this.StartLine;
+
+        this.Info[this.CurPage] = new CMathInfo();
+        this.Info[this.CurPage].FirstLineOnPage = FirstLineOnPage;
+    }
 };
 CMathPageInfo.prototype.UpdateCurrentWrap = function(DispDef, bInline)
 {
-    this.private_CheckInfo(this.CurPage);
-
     if(this.Info[this.CurPage].NeedUpdateWrap == true)
     {
         var WrapState;
@@ -417,8 +426,6 @@ CMathPageInfo.prototype.SetNextWrapState = function()
 };
 CMathPageInfo.prototype.SetStateWordLarge = function(_Line, bWordLarge)
 {
-    this.private_CheckInfo(this.CurPage);
-
     var Line = this.Info[this.CurPage].GetNumberLine(_Line - this.StartLine);
 
     this.Info[this.CurPage].LineWidths.SetWordLarge(Line, bWordLarge);
@@ -445,8 +452,6 @@ CMathPageInfo.prototype.GetStarLinetWidth = function()
 };
 CMathPageInfo.prototype.UpdateCurrentWidth = function(_Line, Width)
 {
-    this.private_CheckInfo(this.CurPage);
-
     var Line = this.Info[this.CurPage].GetNumberLine(_Line - this.StartLine);
     //var Line = _Line - this.StartLine - this.Info[this.CurPage].FirstLineOnPage;
 
@@ -1167,7 +1172,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     ////////////////////////////////////////////////////////////
 
-    this.PageInfo.UpdateCurrentPage(Page);
+    this.PageInfo.UpdateCurrentPage(Page, ParaLine);
 
     var DispDef = MathSettings.Get_DispDef(),
         bInline = this.ParaMathRPI.bInline;
@@ -1463,7 +1468,7 @@ ParaMath.prototype.Set_Inline = function(value)
     {
         this.ParaMathRPI.bChangeInline = true;
         this.ParaMathRPI.bInline = value;
-        this.bFastRecalculate = false;
+        this.bFastRecalculate = false;          // после смены инлайновости, требуется полностью пересчитать формулу
     }
 };
 ParaMath.prototype.Get_Inline = function()
