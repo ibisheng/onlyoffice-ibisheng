@@ -1463,6 +1463,7 @@ ParaMath.prototype.Set_Inline = function(value)
     {
         this.ParaMathRPI.bChangeInline = true;
         this.ParaMathRPI.bInline = value;
+        this.bFastRecalculate = false;
     }
 };
 ParaMath.prototype.Get_Inline = function()
