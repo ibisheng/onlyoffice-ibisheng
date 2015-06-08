@@ -3740,6 +3740,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		spreadsheet_api.prototype.asc_nativeGetPDF = function()
         {
             var _ret = this.asc_nativePrint();
+
+            window["native"]["Save_End"]("", _ret.GetCurPosition());
             return _ret.data;
         };
 		/*
