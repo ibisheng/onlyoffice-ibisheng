@@ -105,12 +105,12 @@ native_gradient_fill.prototype =
 function native_context2d(parent)
 {
     this.canvas = parent;
-    
+
     this.globalAlpha = 0;
     this.globalCompositeOperation = "";
     this.fillStyle = "";
     this.strokeStyle = "";
-    
+
     this.lineWidth = 0;
     this.lineCap = 0;
     this.lineJoin = 0;
@@ -127,21 +127,21 @@ native_context2d.prototype =
 {
     save : function() {},
     restore : function() {},
-    
+
     scale : function(x,y) {},
     rotate : function(angle) {},
     translate : function(x,y) {},
     transform : function(m11,m12,m21,m22,dx,dy) {},
     setTransform : function(m11,m12,m21,m22,dx,dy) {},
-    
+
     createLinearGradient : function(x0,y0,x1,y1) { return new native_gradient_fill(); },
     createRadialGradient : function(x0,y0,r0,x1,y1,r1) { return null; },
     createPattern : function(image,repetition) { return new native_pattern_fill(); },
-    
+
     clearRect : function(x,y,w,h) {},
     fillRect : function(x,y,w,h) {},
     strokeRect : function(x,y,w,h) {},
-    
+
     beginPath : function() {},
     closePath : function() {},
     moveTo : function(x,y) {},
@@ -151,19 +151,19 @@ native_context2d.prototype =
     arcTo : function(x1,y1,x2,y2,radius) {},
     rect : function(x,y,w,h) {},
     arc : function(x,y,radius,startAngle,endAngle,anticlockwise) {},
-    
+
     fill : function() {},
     stroke : function() {},
     clip : function() {},
     isPointInPath : function(x,y) {},
     drawFocusRing : function(element,xCaret,yCaret,canDrawCustom) {},
-    
+
     fillText : function(text,x,y,maxWidth) {},
     strokeText : function(text,x,y,maxWidth) {},
     measureText : function(text) {},
-    
+
     drawImage : function(img_elem,dx_or_sx,dy_or_sy,dw_or_sw,dh_or_sh,dx,dy,dw,dh) {},
-    
+
     createImageData : function(imagedata_or_sw,sh)
     {
         var _data = new _image_data();
@@ -180,7 +180,7 @@ function native_canvas()
     this.id = "";
     this.width = 300;
     this.height = 150;
-    
+
     this.nodeType = 1;
 }
 native_canvas.prototype =
@@ -191,16 +191,16 @@ native_canvas.prototype =
             return new native_context2d(this);
         return null;
     },
-    
+
     toDataUrl : function(type)
     {
         return "";
     },
-    
+
     addEventListener : function()
     {
     },
-    
+
     attr : function()
     {
     }
@@ -257,7 +257,7 @@ document.createElement = function(type)
         if (type.toLowerCase() == "canvas")
             return new native_canvas();
     }
-    
+
     return _null_object;
 }
 
@@ -295,7 +295,7 @@ var Asc = window["Asc"];
 function NativeOpenFileData(data, version)
 {
     window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
-    
+
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
         _api = new window["asc_docs_api"]("");
@@ -314,7 +314,7 @@ function NativeOpenFile(arguments)
 
     var doc_bin = window.native.GetFileString(window.native.GetFilePath());
     window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
-    
+
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
         _api = new window["asc_docs_api"]("");
@@ -330,21 +330,21 @@ function NativeOpenFile(arguments)
 function NativeOpenFile2(_params)
 {
     window["CreateMainTextMeasurerWrapper"]();
-    
+
     window.g_file_path = "native_open_file";
     window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
     var doc_bin = window.native.GetFileString(window.g_file_path);
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
         _api = new window["asc_docs_api"]("");
-        
+
         if (undefined !== _api.Native_Editor_Initialize_Settings)
         {
             _api.Native_Editor_Initialize_Settings(_params);
         }
-        
+
         _api.asc_nativeOpenFile(doc_bin);
-        
+
         if (_api.NativeAfterLoad)
             _api.NativeAfterLoad();
     }
@@ -359,10 +359,10 @@ function NativeOpenFile2(_params)
 function SEOpenFile()
 {
     window["CreateMainTextMeasurerWrapper"]();
-    
+
     window.g_file_path = "native_open_file";
     window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
- 
+
     _api = new window["Asc"]["spreadsheet_api"]();
     _api.asc_nativeOpenFile(window.native["GetFileString"]());
 }
@@ -394,7 +394,7 @@ function NativeApplyChanges()
         {
             var _changes_file = window.native.GetChangesFile(i);
             var _changes = JSON.parse(window.native.GetFileString(_changes_file));
-            
+
             for (var j = 0; j < _changes.length; j++)
             {
                 __changes.push(_changes[j]);
@@ -410,13 +410,13 @@ function NativeApplyChanges()
         {
             var _changes_file = window.native.GetChangesFile(i);
             var _changes = JSON.parse(window.native.GetFileString(_changes_file));
-            
+
             for (var j = 0; j < _changes.length; j++)
             {
                 __changes.push(_changes[j]);
             }
         }
-        
+
         _api.asc_nativeApplyChanges(__changes);
     }
 }
@@ -443,12 +443,12 @@ function GetNativePageBase64(pageIndex)
         window.memory1 = CreateNativeMemoryStream();
     else
         window.memory1.ClearNoAttack();
-    
+
     if (null == window.memory2)
         window.memory2 = CreateNativeMemoryStream();
     else
         window.memory2.ClearNoAttack();
-    
+
     if (native_renderer == null)
     {
         native_renderer = _api.asc_nativeCheckPdfRenderer(window.memory1, window.memory2);
@@ -458,7 +458,7 @@ function GetNativePageBase64(pageIndex)
         window.memory1.ClearNoAttack();
         window.memory2.ClearNoAttack();
     }
-    
+
     _api.asc_nativePrint(native_renderer, pageIndex);
     return window.memory1;
 }
@@ -481,7 +481,7 @@ function clearTimeout(_id)
 {
     if (!window.NativeSupportTimeouts)
         return;
-    
+
     window.NativeTimeoutObject["" + _id] = undefined;
     window.native["ClearTimeout"](_id);
 }
@@ -489,7 +489,7 @@ function setTimeout(func, interval)
 {
     if (!window.NativeSupportTimeouts)
         return;
-    
+
     var _id = window.native["GenerateTimeoutId"](interval);
     window.NativeTimeoutObject["" + _id] = func;
     return _id;
@@ -499,14 +499,14 @@ window.native.Call_TimeoutFire = function(_id)
 {
     if (!window.NativeSupportTimeouts)
         return;
-    
+
     var _prop = "" + _id;
     var _func = window.NativeTimeoutObject[_prop];
     window.NativeTimeoutObject[_prop] = undefined;
-    
+
     if (!_func)
         return;
-    
+
     _func.call(null);
     _func = null;
 };
@@ -515,7 +515,7 @@ function clearInterval(_id)
 {
     if (!window.NativeSupportTimeouts)
         return;
-    
+
     window.NativeTimeoutObject["" + _id] = undefined;
     window.native["ClearTimeout"](_id);
 }
@@ -523,13 +523,13 @@ function setInterval(func, interval)
 {
     if (!window.NativeSupportTimeouts)
         return;
-    
+
     var _intervalFunc = function()
     {
         func.call(null);
         setTimeout(func, interval);
     };
-    
+
     var _id = window.native["GenerateTimeoutId"](interval);
     window.NativeTimeoutObject["" + _id] = _intervalFunc;
     return _id;
@@ -1219,32 +1219,62 @@ function _FT_Common()
 }
 var FT_Common = new _FT_Common();
 
+//========================================================================================
+
+function drawColumnHeaders (sheet, drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
+    if (undefined === drawingCtx && false === sheet.model.sheetViews[0].asc_getShowRowColHeaders())
+        return;
+    var vr  = sheet.visibleRange;
+    var c = sheet.cols;
+    var offsetX = (undefined !== offsetXForDraw) ? offsetXForDraw : c[vr.c1].left - sheet.cellsLeft;
+    var offsetY = (undefined !== offsetYForDraw) ? offsetYForDraw : sheet.headersTop;
+    if (undefined === drawingCtx && sheet.topLeftFrozenCell && undefined === offsetXForDraw) {
+        var cFrozen = sheet.topLeftFrozenCell.getCol0();
+        if (start < vr.c1)
+            offsetX = c[0].left - sheet.cellsLeft;
+        else
+            offsetX -= c[cFrozen].left - c[0].left;
+    }
+
+    if (asc_typeof(start) !== "number") {start = vr.c1;}
+    if (asc_typeof(end) !== "number") {end = vr.c2;}
+    if (style === undefined) {style = kHeaderDefault;}
+
+    sheet._setFont(drawingCtx, sheet.model.getDefaultFontName(), sheet.model.getDefaultFontSize());
+
+    // draw column headers
+    for (var i = start; i <= end; ++i) {
+        sheet._drawHeader(drawingCtx, c[i].left - c[start].left, offsetY,
+            c[i].width, sheet.headersHeight, style, true, i);
+    }
+}
+
 //--------------------------------------------------------------------------------
 // internal invoke
 //--------------------------------------------------------------------------------
 
 function internal_drawWorksheet(sheet, corner, frozenPaneLines, selection) {
     //sheet._clean();
-    
-    if (corner)  sheet._drawCorner();
-    sheet._drawColumnHeaders();
-    sheet._drawRowHeaders();
+
+    // if (corner)  sheet._drawCorner();
+    //sheet._drawColumnHeaders();
+    //sheet._drawRowHeaders();
 
     sheet._drawGrid();
     sheet._drawCellsAndBorders();
 
-    sheet._drawFrozenPane();
-    if (frozenPaneLines) sheet._drawFrozenPaneLines();
+    //sheet._drawFrozenPane();
+    //if (frozenPaneLines) sheet._drawFrozenPaneLines();
 
-    sheet._fixSelectionOfMergedCells();
-    sheet._drawAutoF();
-    sheet.cellCommentator.drawCommentCells();
+    //sheet._fixSelectionOfMergedCells();
+    //sheet._drawAutoF();
+    // sheet.cellCommentator.drawCommentCells();
 
     // sheet.objectRender.showDrawingObjectsEx(true);
 
-    if (selection && sheet.overlayCtx) {
-        sheet._drawSelection();
-    }
+    //if (selection && sheet.overlayCtx) {
+    //    sheet._drawSelection();
+    //}
 }
 
 //--------------------------------------------------------------------------------
@@ -1266,9 +1296,9 @@ var cellsTop  = undefined;
 
 function napi_openFile() {
     window["CreateMainTextMeasurerWrapper"]();
-    
+
     deviceScale = window.native["GetDeviceScale"]();
-    
+
     window.g_file_path = "native_open_file";
     window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
     _api = new window["Asc"]["spreadsheet_api"]();
@@ -1278,219 +1308,158 @@ function napi_openFile() {
 function napi_drawWorksheet(x, y, width, height, xind, yind) {
 
     if (_api) {
-        _null_object.width = width;
-        _null_object.height = height;
-        
-        var worksheet = _api.wb.getWorksheet(0), indX = 0, indY = 0, offX = 0, offY = 0, i = 0;
+        _null_object.width = width  * 1.5;
+        _null_object.height = height  * 1.5;
 
-        x = x / deviceScale * (72.0 / 96.0) + worksheet.headersWidth;
-        y = y / deviceScale * (72.0 / 96.0) + worksheet.headersHeight;
-       
-        // сброс текущего отступа по ячейке (пока через костыль делаем скроллы)
-        
-        if (undefined == cellsLeft) {
-            cellsLeft = worksheet.cellsLeft; //console.log('left: ' + cellsLeft);
-        }
-        if (undefined == cellsTop) {
-            cellsTop = worksheet.cellsTop; //console.log('top: ' + cellsTop);
-        }
-        
-        worksheet.cellsLeft = cellsLeft;
-        worksheet.cellsTop  = cellsTop;
-        
-        if (0 == xind && scrollIndX != 0)
-        {
-            for (i = scrollIndX; i >= 0; --i)
-                worksheet.scrollHorizontal(-1);
-            
-            scrollIndX = 0;
-        }
-       
-        if (0 == yind && scrollIndY != 0)
-        {
-            for (i = scrollIndY; i >= 0; --i)
-                worksheet.scrollVertical(-1);
-            
-            scrollIndY = 0;
-        }
-        
-        // ищем ячейку для начальной точки отрисовки
-        
-        for (i = 0; i < worksheet.cols.length; ++i) {
-            if (worksheet.cols[i].left <= x && x < worksheet.cols[i].left + worksheet.cols[i].width) {
+        var worksheet = _api.wb.getWorksheet(0);
+        var region = updateRegion(worksheet, x, y, width * 1.5, height * 1.5);
 
-//                if (xind == 1 && yind == 1) {
-//                    console.log('x: ' + x +
-//                                ' worksheet.cols[i].left: ' + worksheet.cols[i].left+
-//                                ' worksheet.cols[i].width: ' + worksheet.cols[i].width
-//                                );
-//                }
-                
-                indX = i;
-                offX = x  - worksheet.cols[i].left;
-                break;
-            }
-        }
-        
-        for (i = 0; i < worksheet.rows.length; ++i) {
-            // if ((xind == 1 || xind == 0)&& yind == 1)
-               //  console.log('top-height: ' + worksheet.rows[i].top + ',' + worksheet.rows[i].height);
-            
-            if (worksheet.rows[i].top <= y && y < worksheet.rows[i].top + worksheet.rows[i].height) {
-               // if ((xind == 1 || xind == 0)&& yind == 1) {
-//                    console.log('y: ' + y +
-//                                ' worksheet.rows[i].top: ' + worksheet.rows[i].top +
-//                                ' worksheet.rows[i].height: ' + worksheet.rows[i].height +
-//                                ' bottom: ' + ( worksheet.rows[i].top + worksheet.rows[i].height) +
-//                                ' indY: ' + i + ' offY: ' + offY
-//                                );
-//                //}
-                
-                indY = i;
-                offY = y - worksheet.rows[i].top;
-                break;
-            }
-        }
+        worksheet._drawGrid_Local(undefined,
+            region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd ,
+            worksheet.cols[region.columnBeg].left + region.columnOff, worksheet.rows[region.rowBeg].top + region.rowOff,
+            width + region.columnOff, height + region.rowOff);
 
-
-        
-//        for (var i = 0; i < worksheet.rows.length; ++i)
-//            console.log(xind + ',' + yind + ' before top-height: ' + worksheet.rows[i].top + ',' + worksheet.rows[i].height);
-//
-//        
-        if (indX - scrollIndX > 0) {
-            
-            for (i = scrollIndX; i < indX; ++i)
-                worksheet.scrollHorizontal(1);
-            
-            scrollIndX = indX;
-        }
-      
-        if (indY - scrollIndY > 0) {
-            
-            for (i = scrollIndY; i < indY; ++i)
-                worksheet.scrollVertical(1);
-            
-            scrollIndY = indY;
-        }
-//        
-//        for (var i = 0; i < worksheet.rows.length; ++i)
-//            console.log(xind + ',' + yind + ' after top-height: ' + worksheet.rows[i].top + ',' + worksheet.rows[i].height);
-
-        worksheet.cellsLeft = -offX;
-        worksheet.cellsTop  = -offY;
-        
-        internal_drawWorksheet(worksheet);
+        worksheet._drawCellsAndBorders_Local(undefined,
+            region.columnBeg, region.rowBeg, region.columnEnd + 1, region.rowEnd + 1,
+            worksheet.cols[region.columnBeg].left + region.columnOff, worksheet.rows[region.rowBeg].top + region.rowOff);
     }
 }
 function napi_drawWorksheetHeader(x, y, width, height, xind, yind, type) {
 
     if (_api) {
-        _null_object.width = width;
-        _null_object.height = height;
-        
-        var worksheet = _api.wb.getWorksheet(0), indX = 0, indY = 0, offX = 0, offY = 0, i = 0;
+        _null_object.width = width * 1.5;
+        _null_object.height = height * 1.5;
 
-        x = x  / deviceScale * (72.0 / 96.0) + worksheet.headersWidth;
-        y = y  / deviceScale * (72.0 / 96.0) + worksheet.headersHeight;
-        
-        // сброс текущего отступа по ячейке (пока через костыль делаем скроллы)
-      
-        if (undefined == cellsLeft) {
-            cellsLeft = worksheet.cellsLeft; //console.log('left: ' + cellsLeft);
-        }
-        if (undefined == cellsTop) {
-            cellsTop = worksheet.cellsTop; //console.log('top: ' + cellsTop);
-        }
-     
-        worksheet.cellsLeft = cellsLeft;
-        worksheet.cellsTop  = cellsTop;
-        
-        if (0 == xind && scrollIndX != 0)
-        {
-            for (i = scrollIndX; i >= 0; --i)
-                worksheet.scrollHorizontal(-1);
-            
-            scrollIndX = 0;
-        }
-        
-        if (0 == yind && scrollIndY != 0)
-        {
-            for (i = scrollIndY; i >= 0; --i)
-                worksheet.scrollVertical(-1);
-            
-            scrollIndY = 0;
-        }
-        
-        // ищем ячейку для начальной точки отрисовки
-        
-        for (i = 0; i < worksheet.cols.length; ++i) {
-            if (worksheet.cols[i].left <= x && x < worksheet.cols[i].left + worksheet.cols[i].width) {
-                indX = i;
-                offX = x  - worksheet.cols[i].left;
-                break;
-            }
-        }
-        
-        for (i = 0; i < worksheet.rows.length; ++i) {
-            if (worksheet.rows[i].top <= y && y < worksheet.rows[i].top + worksheet.rows[i].height) {
-                indY = i;
-                offY = y - worksheet.rows[i].top;
-                break;
-            }
-        }
-        
-        if (indX - scrollIndX > 0) {
-            
-            for (i = scrollIndX; i < indX; ++i)
-                worksheet.scrollHorizontal(1);
-            
-            scrollIndX = indX;
-        }
-        
-        if (indY - scrollIndY > 0) {
-            
-            for (i = scrollIndY; i < indY; ++i)
-                worksheet.scrollVertical(1);
-            
-            scrollIndY = indY;
-        }
-        
-        worksheet.cellsLeft = -offX;
-        worksheet.cellsTop  = -offY;      
-       
-        if ((0 == yind && type == PageType.PageTopType) || type == PageType.PageCornerType) {
-            worksheet.cellsTop += worksheet.headersHeight;
-        }
-        
-        if ((0 == xind && type == PageType.PageLeftType) || type == PageType.PageCornerType) {
-           worksheet.cellsLeft += worksheet.headersWidth;
-        }
+        var worksheet = _api.wb.getWorksheet(0);
+        var region = updateRegion(worksheet, x, y, width * 1.5, height * 1.5);
 
-        internal_drawWorksheet(worksheet, true);
+        var isColumn = type == PageType.PageTopType  || type == PageType.PageCornerType;
+        var isRow = type == PageType.PageLeftType || type == PageType.PageCornerType;
+
+        if (!isColumn && isRow)
+            worksheet._drawRowHeaders_Local(undefined, region.rowBeg, region.rowEnd, undefined, 0, region.rowOff);
+        else if (isColumn && !isRow)
+            worksheet._drawColumnHeaders_Local(undefined, region.columnBeg, region.columnEnd, undefined, region.columnOff, 0);
+        else if (isColumn && isRow)
+            worksheet._drawCorner();
     }
 }
 
+
 function napi_getContentMaxSizeX() {
-    
+
     // ширина таблицы с учетом размеров ячеек
-    
-   // var gc_nMaxRow = 1048576;
-   // var gc_nMaxCol = 16384;
-    
+
+    // var gc_nMaxRow = 1048576;
+    // var gc_nMaxCol = 16384;
+
     return 50000;
 }
 function napi_getContentMaxSizeY() {
-    
+
     // высота таблицы с учетом размеров ячеек
 
     //var gc_nMaxRow = 1048576;
     //var gc_nMaxCol = 16384;
-    
+
     return 50000;
 }
 
 function napi_setZoom(zoom) {
     _api.asc_setZoom(zoom);
+}
+
+/////////////////
+
+function updateRegion(worksheet, x, y, width, height) {
+
+    var  indX = 0, indY = 0, offX = 0, offY = 0, i = 0;
+
+    var nativeToEditor = 1.0 / deviceScale * (72.0 / 96.0);
+
+    // координаты в СО редактора
+
+    var logicX = x * nativeToEditor + worksheet.headersWidth;
+    var logicY = y  * nativeToEditor + worksheet.headersHeight;
+    var logicToX = ( x + width ) * nativeToEditor + worksheet.headersWidth;
+    var logicToY = ( y + height ) * nativeToEditor + worksheet.headersHeight;
+
+    var columnBeg = -1;
+    var columnEnd = -1;
+    var columnOff = 0;
+    var rowBeg = -1;
+    var rowEnd = -1;
+    var rowOff = 0;
+
+    // добавляем отсутствующие колонки
+
+    if (logicToX >= worksheet.cols[worksheet.cols.length - 1].left) {
+
+        do {
+            worksheet.nColsCount = worksheet.cols.length + 1;
+            worksheet._calcWidthColumns(2); // fullRecalc
+
+            if (logicToX < worksheet.cols[worksheet.cols.length - 1].left) {
+                break
+            }
+        } while (1);
+    }
+
+
+    if (logicX < worksheet.cols[worksheet.cols.length - 1].left) {
+        for (i = 0; i < worksheet.cols.length; ++i) {
+            if (-1 === columnBeg) {
+                if (worksheet.cols[i].left <= logicX && logicX < worksheet.cols[i].left + worksheet.cols[i].width) {
+                    columnBeg = i;
+                    columnOff = logicX - worksheet.cols[i].left;
+                }
+            }
+
+            if (worksheet.cols[i].left <= logicToX && logicToX < worksheet.cols[i].left + worksheet.cols[i].width) {
+                columnEnd = i;
+                break;
+            }
+        }
+    }
+
+    // добавляем отсутствующие строки
+
+    if (logicToY >= worksheet.rows[worksheet.rows.length - 1].top) {
+
+        do {
+            worksheet.nRowsCount = worksheet.rows.length + 1;
+            worksheet._calcHeightRows(2); // fullRecalc
+
+            if (logicToY < worksheet.rows[worksheet.rows.length - 1].top) {
+                break
+            }
+        } while (1);
+    }
+
+
+    if (logicY < worksheet.rows[worksheet.rows.length - 1].top) {
+        for (i = 0; i < worksheet.rows.length; ++i) {
+            if (-1 === rowBeg) {
+                if (worksheet.rows[i].top <= logicY && logicY < worksheet.rows[i].top + worksheet.rows[i].height) {
+                    rowBeg = i;
+                    rowOff = logicY - worksheet.rows[i].top;
+                }
+            }
+
+            if (worksheet.rows[i].top <= logicToY && logicToY < worksheet.rows[i].top + worksheet.rows[i].height) {
+                rowEnd = i;
+                break;
+            }
+        }
+    }
+
+    return {
+        columnBeg: columnBeg,
+        columnEnd: columnEnd,
+        columnOff: columnOff,
+        rowBeg: rowBeg,
+        rowEnd: rowEnd,
+        rowOff: rowOff
+    };
 }
 
