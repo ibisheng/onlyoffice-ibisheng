@@ -1143,17 +1143,21 @@ CShape.prototype =
             this.invertTransformText2 = global_MatrixTransformer.Invert(this.transformText);
         }
         if (oBodyPr.prstTxWarp) {
-            if (this.bWordShape) {
+            var bNoTextNoShape = oBodyPr.prstTxWarp.preset !== "textNoShape";
+            /*if (this.bWordShape) {
                 this.transformTextWordArt = this.transformText;
+                this.invertTransformTextWordArt = this.invertTransformText;
             }
-            else {
-                this.transformTextWordArt = new CMatrix();
-                this.checkTransformTextMatrix(this.transformTextWordArt, oContent, oBodyPr, oBodyPr.prstTxWarp.preset !== "textNoShape");
+            else*/ {
+                this.localTransformTextWordArt = new CMatrix();
+                this.checkTransformTextMatrix(this.localTransformTextWordArt, oContent, oBodyPr, bNoTextNoShape, !this.bWordShape && bNoTextNoShape);
+                this.transformTextWordArt = this.localTransformTextWordArt.CreateDublicate();
+                this.invertTransformTextWordArt = global_MatrixTransformer.Invert(this.transformTextWordArt);
             }
             if (this.txBody && this.txBody.content2) {
-                this.checkTransformTextMatrix(this.transformText2, this.txBody.content2, oBodyPr, oBodyPr.prstTxWarp.preset !== "textNoShape");
+                this.checkTransformTextMatrix(this.transformText2, this.txBody.content2, oBodyPr, bNoTextNoShape, !this.bWordShape && bNoTextNoShape);
                 this.transformTextWordArt2 = new CMatrix();
-                this.checkTransformTextMatrix(this.transformTextWordArt2, this.txBody.content2, oBodyPr, oBodyPr.prstTxWarp.preset !== "textNoShape");
+                this.checkTransformTextMatrix(this.transformTextWordArt2, this.txBody.content2, oBodyPr, bNoTextNoShape, !this.bWordShape && bNoTextNoShape);
             }
         }
 
@@ -1517,17 +1521,17 @@ CShape.prototype =
         };
     },
 
-    checkTransformTextMatrix: function (oMatrix, oContent, oBodyPr, bWordArtTransform) {
+    checkTransformTextMatrix: function (oMatrix, oContent, oBodyPr, bWordArtTransform, bIgnoreInsets) {
         oMatrix.Reset();
         var _shape_transform = this.localTransform;
         var _content_height = oContent.Get_SummaryHeight();
         var _l, _t, _r, _b;
         var _t_x_lt, _t_y_lt, _t_x_rt, _t_y_rt, _t_x_lb, _t_y_lb, _t_x_rb, _t_y_rb;
         var oRect = this.getTextRect();
-        var l_ins = isRealNumber(oBodyPr.lIns) ? oBodyPr.lIns : 2.54;
-        var t_ins = isRealNumber(oBodyPr.tIns) ? oBodyPr.tIns : 1.27;
-        var r_ins = isRealNumber(oBodyPr.rIns) ? oBodyPr.rIns : 2.54;
-        var b_ins = isRealNumber(oBodyPr.bIns) ? oBodyPr.bIns : 1.27;
+        var l_ins = bIgnoreInsets ? 0 : (isRealNumber(oBodyPr.lIns) ? oBodyPr.lIns : 2.54);
+        var t_ins = bIgnoreInsets ? 0 : (isRealNumber(oBodyPr.tIns) ? oBodyPr.tIns : 1.27);
+        var r_ins = bIgnoreInsets ? 0 : (isRealNumber(oBodyPr.rIns) ? oBodyPr.rIns : 2.54);
+        var b_ins = bIgnoreInsets ? 0 : (isRealNumber(oBodyPr.bIns) ? oBodyPr.bIns : 1.27);
         _l = oRect.l + l_ins;
         _t = oRect.t + t_ins;
         _r = oRect.r - r_ins;
@@ -2340,6 +2344,12 @@ CShape.prototype =
                 if (this.recalcInfo.recalculateTxBoxContent) {
                     this.recalcInfo.oContentMetrics = this.recalculateTxBoxContent();
                     this.recalcInfo.recalculateTxBoxContent = false;
+                    this.recalcInfo.AllDrawings = [];
+                    var oContent = this.getDocContent();
+                    if(oContent)
+                    {
+                        oContent.Get_AllDrawingObjects(this.recalcInfo.AllDrawings);
+                    }
                 }
             }
             else {
@@ -2659,6 +2669,21 @@ CShape.prototype =
     recalculateDocContent: function(oDocContent, oBodyPr)
     {
         var oRet = {w: 0, h: 0, contentH: 0};
+        var l_ins, t_ins, r_ins, b_ins;
+        if(oBodyPr)
+        {
+            l_ins = isRealNumber(oBodyPr.lIns) ? oBodyPr.lIns : 2.54;
+            r_ins = isRealNumber(oBodyPr.rIns) ? oBodyPr.rIns : 2.54;
+            t_ins = isRealNumber(oBodyPr.tIns) ? oBodyPr.tIns : 1.27;
+            b_ins = isRealNumber(oBodyPr.bIns) ? oBodyPr.bIns : 1.27;
+        }
+        else
+        {
+            l_ins = 2.54;
+            r_ins = 2.54;
+            t_ins = 1.27;
+            b_ins = 1.27;
+        }
         if(oBodyPr.wrap === nTWTNone)
         {
             var dMaxWidth = this.bWordShape ? 1000/*TODO: to get size of the text area*/ : 100000;
@@ -2669,25 +2694,21 @@ CShape.prototype =
             oRet.w = dMaxWidthRec;
             oRet.contentH = oDocContent.Get_SummaryHeight();
             oRet.h = oRet.contentH;
+            if(!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270))
+            {
+                oRet.correctW = l_ins + r_ins;
+                oRet.correctH = t_ins + b_ins;
+            }
+            else
+            {
+                oRet.correctW = t_ins + b_ins;
+                oRet.correctH = l_ins + r_ins;
+            }
         }
         else//nTWTSquare
         {
             var w, h;
-            var l_ins, t_ins, r_ins, b_ins;
-            if(oBodyPr)
-            {
-                l_ins = isRealNumber(oBodyPr.lIns) ? oBodyPr.lIns : 2.54;
-                r_ins = isRealNumber(oBodyPr.rIns) ? oBodyPr.rIns : 2.54;
-                t_ins = isRealNumber(oBodyPr.tIns) ? oBodyPr.tIns : 1.27;
-                b_ins = isRealNumber(oBodyPr.bIns) ? oBodyPr.bIns : 1.27;
-            }
-            else
-            {
-                l_ins = 2.54;
-                r_ins = 2.54;
-                t_ins = 1.27;
-                b_ins = 1.27;
-            }
+
 
             var oRect = this.getTextRect();
             w = oRect.r - oRect.l - (l_ins + r_ins);
@@ -2698,11 +2719,15 @@ CShape.prototype =
                 {
                     oRet.w = w;
                     oRet.h = h;
+                    oRet.correctW = l_ins + r_ins;
+                    oRet.correctH = t_ins + b_ins;
                 }
                 else
                 {
                     oRet.w = h;
                     oRet.h = w;
+                    oRet.correctW = t_ins + b_ins;
+                    oRet.correctH = l_ins + r_ins;
                 }
             }
             else
@@ -2714,11 +2739,15 @@ CShape.prototype =
                     {
                         oRet.w = w;
                         oRet.h = h;
+                        oRet.correctW = l_ins + r_ins;
+                        oRet.correctH = t_ins + b_ins;
                     }
                     else
                     {
                         oRet.w = h;
                         oRet.h = w;
+                        oRet.correctW = t_ins + b_ins;
+                        oRet.correctH = l_ins + r_ins;
                     }
                 }
                 else
@@ -2727,11 +2756,15 @@ CShape.prototype =
                     {
                         oRet.w = h;
                         oRet.h = w;
+                        oRet.correctW = t_ins + b_ins;
+                        oRet.correctH = l_ins + r_ins;
                     }
                     else
                     {
                         oRet.w = w;
                         oRet.h = h;
+                        oRet.correctW = l_ins + r_ins;
+                        oRet.correctH = t_ins + b_ins;
                     }
                 }
             }
@@ -2757,9 +2790,15 @@ CShape.prototype =
                 oMainGroup.normalize();
             }
             this.bCheckAutoFitFlag = true;
+            var oOldRecalcTitle = this.recalcInfo.recalcTitle;
+            var bOldRecalcTitle = this.recalcInfo.bRecalculatedTitle;
             this.handleUpdateExtents();
+            this.recalcInfo.bRecalculatedTitle = false;
+            this.recalcInfo.recalcTitle = this;
             this.recalculate();
             this.bCheckAutoFitFlag = false;
+            this.recalcInfo.recalcTitle =  oOldRecalcTitle;
+            this.recalcInfo.bRecalculatedTitle =  bOldRecalcTitle;
             CheckSpPrXfrm(this, true);
             this.spPr.xfrm.setExtX(this.extX);
             this.spPr.xfrm.setExtY(this.extY);
@@ -2867,7 +2906,11 @@ CShape.prototype =
     },
     drawAdjustments: function (drawingDocument) {
         if (this.spPr && isRealObject(this.spPr.geometry)) {
-            this.spPr.geometry.drawAdjustments(drawingDocument, this.transform);
+            this.spPr.geometry.drawAdjustments(drawingDocument, this.transform, false);
+        }
+        if(this.recalcInfo.warpGeometry)
+        {
+            this.recalcInfo.warpGeometry.drawAdjustments(drawingDocument, this.transformTextWordArt, true);
         }
     },
 
@@ -3042,27 +3085,60 @@ CShape.prototype =
 
     },
 
-    hitToAdj: function (x, y) {
-        if (this.spPr && isRealObject(this.spPr.geometry)) {
-            var px, py;
-            px = this.invertTransform.TransformPointX(x, y);
-            py = this.invertTransform.TransformPointY(x, y);
-            return this.spPr.geometry.hitToAdj(px, py);
+    hitInTextRectWord: function(x, y)
+    {
+
+        var content = this.getDocContent && this.getDocContent();
+        if (content)
+        {
+            var t_x, t_y;
+            t_x = this.invertTransform.TransformPointX(x, y);
+            t_y = this.invertTransform.TransformPointY(x, y);
+
+            var w, h, x_, y_;
+
+            if(this.spPr && this.spPr.geometry && this.spPr.geometry.rect
+                && isRealNumber(this.spPr.geometry.rect.l) && isRealNumber(this.spPr.geometry.rect.t)
+                && isRealNumber(this.spPr.geometry.rect.r) && isRealNumber(this.spPr.geometry.rect.r))
+            {
+                x_ = this.spPr.geometry.rect.l;
+                y_ = this.spPr.geometry.rect.t;
+                w = this.spPr.geometry.rect.r - this.spPr.geometry.rect.l;
+                h = this.spPr.geometry.rect.b - this.spPr.geometry.rect.t;
+            }
+            else
+            {
+                x_ = 0;
+                y_ = 0;
+                w = this.extX ;
+                h = this.extY ;
+            }
+            return t_x > x_  && t_x < x_ + w && t_y > y_ && t_y < y_ + h;
         }
-        return { hit: false, num: -1, polar: false };
+        return false;
     },
 
 
     hitInTextRect: function (x, y) {
-        var tx_body = this.bWordShape ? this : this.txBody;
-        var content = this.getDocContent && this.getDocContent();
-        if (isRealObject(tx_body) && content && this.invertTransformText) {
+        var oController = this.getDrawingObjectsController && this.getDrawingObjectsController();
+        if(!this.txWarpStruct ||
+            this.recalcInfo.warpGeometry.preset === "textNoShape" ||
+            oController && (getTargetTextObject(oController) === this || (oController.curState.startTargetTextObject === this)))
+        {
+            var content = this.getDocContent && this.getDocContent();
+            if ( content && this.invertTransformText) {
 
-            var t_x, t_y;
-            t_x = this.invertTransformText.TransformPointX(x, y);
-            t_y = this.invertTransformText.TransformPointY(x, y);
-            return t_x > 0 && t_x < tx_body.contentWidth && t_y > 0 && t_y < tx_body.contentHeight;
+                var t_x, t_y;
+                t_x = this.invertTransformText.TransformPointX(x, y);
+                t_y = this.invertTransformText.TransformPointY(x, y);
+                return t_x > 0 && t_x < this.contentWidth && t_y > 0 && t_y < this.contentHeight;
+            }
         }
+        else
+        {
+            return this.hitInTextRectWord(x, y);
+        }
+
         return false;
     },
 
@@ -3078,19 +3154,6 @@ CShape.prototype =
     },
 
 
-    sendMouseData: function () {
-        if (true === this.Lock.Is_Locked()) {
-            var MMData = new CMouseMoveData();
-            var Coords = editor.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(this.x, this.y, this.parent.num, null);
-            MMData.X_abs = Coords.X - 5;
-            MMData.Y_abs = Coords.Y;
-            MMData.Type = c_oAscMouseMoveDataTypes.LockedObject;
-            MMData.UserId = this.Lock.Get_UserId();
-            MMData.HaveChanges = this.Lock.Have_Changes();
-            MMData.LockedObjectType = 0;
-            editor.sync_MouseMoveCallback(MMData);
-        }
-    },
 
     selectionSetStart: function (e, x, y, slideIndex) {
 
@@ -3257,6 +3320,22 @@ CShape.prototype =
         }
     },
 
+    haveSelectedDrawingInContent: function()
+    {
+        if(this.bWordShape)
+        {
+            var aAllDrawings = this.recalcInfo.AllDrawings;
+            for(var i = 0; i < aAllDrawings.length; ++i)
+            {
+                if(aAllDrawings[i] && aAllDrawings[i].GraphicObj && aAllDrawings[i].GraphicObj.selected)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    },
+
     draw: function (graphics, transform, transformText, pageIndex) {
 
         if(graphics.updatedRect && this.bounds)
@@ -3383,7 +3462,7 @@ CShape.prototype =
         }
 
         var oController = this.getDrawingObjectsController && this.getDrawingObjectsController();
-        if(!this.txWarpStruct || oController && (getTargetTextObject(oController) === this))
+        if(!this.txWarpStruct || oController && (getTargetTextObject(oController) === this) || this.haveSelectedDrawingInContent())
         {
             if (this.txBody)
             {
@@ -3488,7 +3567,7 @@ CShape.prototype =
             }
             else
             {
-                var oTransform = this.bWordShape ? this.transformText : this.transformTextWordArt;
+                var oTransform = this.transformTextWordArt;
                 if(editor && editor.ShowParaMarks)
                 {
                     this.txWarpStructParamarks.draw(graphics, oTransform);
@@ -3960,12 +4039,32 @@ CShape.prototype =
 
     hitToAdjustment: function (x, y) {
         var invert_transform = this.getInvertTransform();
-        var t_x, t_y;
+        var t_x, t_y, ret;
         t_x = invert_transform.TransformPointX(x, y);
         t_y = invert_transform.TransformPointY(x, y);
         if (this.spPr && isRealObject(this.spPr.geometry))
-            return this.spPr.geometry.hitToAdj(t_x, t_y, this.convertPixToMM(global_mouseEvent.KoefPixToMM * TRACK_CIRCLE_RADIUS));
-        return { hit: false, adjPolarFlag: null, adjNum: null };
+        {
+            invert_transform = this.getInvertTransform();
+            t_x = invert_transform.TransformPointX(x, y);
+            t_y = invert_transform.TransformPointY(x, y);
+            ret = this.spPr.geometry.hitToAdj(t_x, t_y, this.convertPixToMM(global_mouseEvent.KoefPixToMM * TRACK_CIRCLE_RADIUS));
+            if(ret.hit)
+            {
+                ret.warp = false;
+                return ret;
+            }
+        }
+        if(this.recalcInfo.warpGeometry)
+        {
+            invert_transform = this.invertTransformTextWordArt;
+            t_x = invert_transform.TransformPointX(x, y);
+            t_y = invert_transform.TransformPointY(x, y);
+            ret = this.recalcInfo.warpGeometry.hitToAdj(t_x, t_y, this.convertPixToMM(global_mouseEvent.KoefPixToMM * TRACK_CIRCLE_RADIUS));
+            ret.warp = true;
+            return ret;
+        }
+
+        return { hit: false, adjPolarFlag: null, adjNum: null, warp: false };
     },
 
     hitToHandles: function (x, y) {
@@ -4686,6 +4785,11 @@ CShape.prototype =
             oRet.oTxWarpStruct = oTextDrawer.m_oDocContentStructure;
             oRet.oTxWarpStruct.Recalculate(this.Get_Theme(), this.Get_ColorMap(), dWidth, dHeight, this);
             warpGeometry && oRet.oTxWarpStruct.checkByWarpStruct(warpGeometry);
+            this.recalcInfo.warpGeometry = warpGeometry;
+        }
+        else
+        {
+            this.recalcInfo.warpGeometry = null;
         }
         return oRet;
     }

@@ -4048,9 +4048,9 @@ function CDrawingDocument(drawingObjects)
         this.AutoShapesTrack.DrawTrackSelectShapes(x, y, w, h);
     }
 
-    this.DrawAdjustment = function(matrix, x, y)
+    this.DrawAdjustment = function(matrix, x, y, bTextWarp)
     {
-        this.AutoShapesTrack.DrawAdjustment(matrix, x, y);
+        this.AutoShapesTrack.DrawAdjustment(matrix, x, y, bTextWarp);
     }
 
     this.LockTrackPageNum = function(nPageNum)

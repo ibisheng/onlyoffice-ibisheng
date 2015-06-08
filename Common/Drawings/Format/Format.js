@@ -11321,7 +11321,7 @@ CBodyPr.prototype =
                 if(this.prstTxWarp.avLst.hasOwnProperty(key))
                 {
                     ++countAv;
-                    w.WriteString(key);
+                    w.WriteString2(key);
                     w.WriteLong(this.prstTxWarp.gdLst[key]);
                 }
             }

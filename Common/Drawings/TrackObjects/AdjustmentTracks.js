@@ -1,12 +1,32 @@
 "use strict";
 
-function XYAdjustmentTrack(originalShape, adjIndex)
+function XYAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 {
     ExecuteNoHistory(function(){
         this.originalShape = originalShape;
-        this.shapeWidth = this.originalShape.extX;
-        this.shapeHeight = this.originalShape.extY;
-        this.geometry = originalShape.spPr.geometry.createDuplicate();
+
+        var oPen, oBrush;
+        if(bTextWarp !== true)
+        {
+            this.geometry = originalShape.spPr.geometry.createDuplicate();
+            this.shapeWidth = originalShape.extX;
+            this.shapeHeight = originalShape.extY;
+            this.transform = originalShape.transform;
+            this.invertTransform = originalShape.invertTransform;
+            oPen = originalShape.pen;
+            oBrush = originalShape.brush;
+        }
+        else
+        {
+            this.geometry = originalShape.recalcInfo.warpGeometry.createDuplicate();
+            this.shapeWidth = originalShape.recalcInfo.warpGeometry.gdLst["w"];
+            this.shapeHeight = originalShape.recalcInfo.warpGeometry.gdLst["h"];
+            this.transform = originalShape.transformTextWordArt;
+            this.invertTransform = originalShape.invertTransformTextWordArt;
+            oPen = null;
+            oBrush = null;
+        }
+        this.bTextWarp = bTextWarp === true;
         this.geometry.Recalculate(this.shapeWidth, this.shapeHeight);
         this.adjastment = this.geometry.ahXYLst[adjIndex];
 
@@ -74,7 +94,6 @@ function XYAdjustmentTrack(originalShape, adjIndex)
                     this.yFlag = true;
                 }
             }
-
             if(this.xFlag)
             {
                 this.refX = _ref_x;
@@ -84,7 +103,7 @@ function XYAdjustmentTrack(originalShape, adjIndex)
                 this.refY = _ref_y;
             }
         }
-        this.overlayObject = new OverlayObject(this.geometry, originalShape.extX, originalShape.extY, originalShape.brush, originalShape.pen, originalShape.transform);
+        this.overlayObject = new OverlayObject(this.geometry, this.shapeWidth, this.shapeHeight, oBrush, oPen, this.transform);
 
 
     }, this, []);
@@ -101,7 +120,7 @@ function XYAdjustmentTrack(originalShape, adjIndex)
 
     this.track = function(posX, posY)
     {
-        var invert_transform = this.originalShape.invertTransform;
+        var invert_transform = this.invertTransform;
         var _relative_x = invert_transform.TransformPointX(posX, posY);
         var _relative_y = invert_transform.TransformPointY(posX, posY);
 
@@ -160,16 +179,50 @@ function XYAdjustmentTrack(originalShape, adjIndex)
 
     this.trackEnd = function()
     {
-        if(this.xFlag)
+        var oGeometryToSet;
+        if(!this.bTextWarp)
         {
-            this.originalShape.spPr.geometry.setAdjValue(this.refX, this.geometry.gdLst[this.adjastment.gdRefX]+"");
+            oGeometryToSet =  this.originalShape.spPr.geometry;
+            if(this.xFlag)
+            {
+                oGeometryToSet.setAdjValue(this.refX, this.geometry.gdLst[this.adjastment.gdRefX]+"");
+            }
+            if(this.yFlag)
+            {
+                oGeometryToSet.setAdjValue(this.refY, this.geometry.gdLst[this.adjastment.gdRefY]+"");
+            }
         }
-        if(this.yFlag)
+        else
         {
-            this.originalShape.spPr.geometry.setAdjValue(this.refY, this.geometry.gdLst[this.adjastment.gdRefY]+"");
+            var new_body_pr = this.originalShape.getBodyPr();
+            if (new_body_pr) {
+                oGeometryToSet = ExecuteNoHistory(function(){
+                    var oGeom = this.geometry.createDuplicate();
+                    if(this.xFlag)
+                    {
+                        oGeom.setAdjValue(this.refX, this.geometry.gdLst[this.adjastment.gdRefX]+"");
+                    }
+                    if(this.yFlag)
+                    {
+                        oGeom.setAdjValue(this.refY, this.geometry.gdLst[this.adjastment.gdRefY]+"");
+                    }
+                    return oGeom;
+                }, this, []);
+
+                new_body_pr = new_body_pr.createDuplicate();
+                new_body_pr.prstTxWarp = oGeometryToSet;
+                if (this.originalShape.bWordShape) {
+                    this.originalShape.setBodyPr(new_body_pr);
+                }
+                else {
+                    if (this.originalShape.txBody) {
+                        this.originalShape.txBody.setBodyPr(new_body_pr);
+                    }
+                }
+            }
+
         }
     };
-
 }
 
 XYAdjustmentTrack.prototype.getBounds = function()
@@ -201,27 +254,48 @@ XYAdjustmentTrack.prototype.getBounds = function()
 
     bounds_checker.Bounds.posX = this.originalShape.x;
     bounds_checker.Bounds.posY = this.originalShape.y;
-    bounds_checker.Bounds.extX = this.originalShape.extY;
+    bounds_checker.Bounds.extX = this.originalShape.extX;
     bounds_checker.Bounds.extY = this.originalShape.extY;
 
     return bounds_checker.Bounds;
 };
 
-function PolarAdjustmentTrack(originalShape, adjIndex)
+function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 {
     ExecuteNoHistory(function(){
         this.originalShape = originalShape;
-        this.shapeWidth = this.originalShape.extX;
-        this.shapeHeight = this.originalShape.extY;
-        this.geometry = originalShape.spPr.geometry.createDuplicate();
+
+
+
+        var oPen, oBrush;
+        if(bTextWarp !== true)
+        {
+            this.geometry = originalShape.spPr.geometry.createDuplicate();
+            this.shapeWidth = originalShape.extX;
+            this.shapeHeight = originalShape.extY;
+            this.transform = originalShape.transform;
+            this.invertTransform = originalShape.invertTransform;
+            oPen = originalShape.pen;
+            oBrush = originalShape.brush;
+        }
+        else
+        {
+            this.geometry = originalShape.recalcInfo.warpGeometry.createDuplicate();
+            this.shapeWidth = originalShape.recalcInfo.warpGeometry.gdLst["w"];
+            this.shapeHeight = originalShape.recalcInfo.warpGeometry.gdLst["h"];
+            this.transform = originalShape.transformTextWordArt;
+            this.invertTransform = originalShape.invertTransformTextWordArt;
+            oPen = null;
+            oBrush = null;
+        }
+
         this.geometry.Recalculate(this.shapeWidth, this.shapeHeight);
         this.adjastment = this.geometry.ahPolarLst[adjIndex];
+        this.bTextWarp = bTextWarp === true;
 
         this.radiusFlag = false;
         this.angleFlag = false;
 
-        this.refR = null;
-        this.refAng = null;
 
         this.originalObject = originalShape;
 
@@ -268,17 +342,9 @@ function PolarAdjustmentTrack(originalShape, adjIndex)
                 this.maximalAngle = Math.max(this.adjastment.minAng, this.adjastment.maxAng);
             }
 
-            if(this.radiusFlag)
-            {
-                this.refR = _ref_r;
-            }
-            if(this.angleFlag)
-            {
-                this.refAng = _ref_ang;
-            }
         }
 
-        this.overlayObject = new OverlayObject(this.geometry, this.originalShape.extX, this.originalShape.extY, this.originalShape.brush, this.originalShape.pen, this.originalShape.transform);
+        this.overlayObject = new OverlayObject(this.geometry, this.shapeWidth, this.shapeHeight, oBrush, oPen, this.transform);
 
     }, this, []);
 
@@ -293,7 +359,7 @@ function PolarAdjustmentTrack(originalShape, adjIndex)
 
     this.track = function(posX, posY)
     {
-        var invert_transform = this.originalShape.invertTransform;
+        var invert_transform = this.invertTransform;
         var _relative_x = invert_transform.TransformPointX(posX, posY);
         var _relative_y = invert_transform.TransformPointY(posX, posY);
 
@@ -347,13 +413,49 @@ function PolarAdjustmentTrack(originalShape, adjIndex)
 
     this.trackEnd = function()
     {
-        if(this.radiusFlag)
+        var oGeometryToSet;
+        if(!this.bTextWarp)
         {
-            this.originalShape.spPr.geometry.setAdjValue(this.adjastment.gdRefR, this.geometry.gdLst[this.adjastment.gdRefR]+"");
+            oGeometryToSet =  this.originalShape.spPr.geometry;
+            if(this.radiusFlag)
+            {
+                oGeometryToSet.setAdjValue(this.adjastment.gdRefR, this.geometry.gdLst[this.adjastment.gdRefR]+"");
+            }
+            if(this.angleFlag)
+            {
+                oGeometryToSet.setAdjValue(this.adjastment.gdRefAng, this.geometry.gdLst[this.adjastment.gdRefAng]+"");
+            }
+
         }
-        if(this.angleFlag)
+        else
         {
-            this.originalShape.spPr.geometry.setAdjValue(this.adjastment.gdRefAng, this.geometry.gdLst[this.adjastment.gdRefAng]+"");
+            var new_body_pr = this.originalShape.getBodyPr();
+            if (new_body_pr) {
+                oGeometryToSet = ExecuteNoHistory(function(){
+                    var oGeom = this.geometry.createDuplicate();
+                    if(this.radiusFlag)
+                    {
+                        oGeom.setAdjValue(this.adjastment.gdRefR, this.geometry.gdLst[this.adjastment.gdRefR]+"");
+                    }
+                    if(this.angleFlag)
+                    {
+                        oGeom.setAdjValue(this.adjastment.gdRefAng, this.geometry.gdLst[this.adjastment.gdRefAng]+"");
+                    }
+                    return oGeom;
+                }, this, []);
+
+                new_body_pr = new_body_pr.createDuplicate();
+                new_body_pr.prstTxWarp = oGeometryToSet;
+                if (this.originalShape.bWordShape) {
+                    this.originalShape.setBodyPr(new_body_pr);
+                }
+                else {
+                    if (this.originalShape.txBody) {
+                        this.originalShape.txBody.setBodyPr(new_body_pr);
+                    }
+                }
+            }
+
         }
     };
 }

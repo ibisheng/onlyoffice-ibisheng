@@ -316,8 +316,7 @@ CGraphicFrame.prototype =
         var ty = this.invertTransform.TransformPointY(x, y);
         this.graphicObject.Update_CursorType(tx, ty, 0)
     },
-    sendMouseData: function()
-    {},
+
 
     Get_Id: function()
     {

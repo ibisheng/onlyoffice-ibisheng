@@ -690,6 +690,14 @@ ParaTextPr.prototype =
             this.Set_Unifill(TextPr.Unifill.createDuplicate());
             this.Set_Color(undefined);
         }
+        if(undefined != TextPr.TextOutline)
+        {
+            this.Set_TextOutline(TextPr.TextOutline);
+        }
+        if(undefined != TextPr.TextFill)
+        {
+            this.Set_TextFill(TextPr.TextFill);
+        }
     },
 
     Clear_Style : function()
@@ -1128,6 +1136,28 @@ ParaTextPr.prototype =
             this.Value.Unifill = undefined;
         History.Add(this, {Type: historyitem_TextPr_Unifill, New: Value, Old: OldValue});
     },
+
+    Set_TextOutline : function(Value)
+    {
+        var OldValue = this.Value.TextOutline;
+
+        if ( undefined != Value )
+            this.Value.TextOutline = Value;
+        else
+            this.Value.TextOutline = undefined;
+        History.Add(this, {Type: historyitem_TextPr_Outline, New: Value, Old: OldValue});
+    },
+
+    Set_TextFill : function(Value)
+    {
+        var OldValue = this.Value.TextFill;
+
+        if ( undefined != Value )
+            this.Value.TextFill = Value;
+        else
+            this.Value.TextFill = undefined;
+        History.Add(this, {Type: historyitem_TextPr_Fill, New: Value, Old: OldValue});
+    },
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
@@ -1412,6 +1442,22 @@ ParaTextPr.prototype =
                     this.Value.Unifill = Data.Old;
                 else
                     this.Value.Unifill = undefined;
+                break;
+            }
+            case historyitem_TextPr_Outline:
+            {
+                if ( undefined != Data.Old )
+                    this.Value.TextOutline = Data.Old;
+                else
+                    this.Value.TextOutline = undefined;
+                break;
+            }
+            case historyitem_TextPr_Fill:
+            {
+                if ( undefined != Data.Old )
+                    this.Value.TextFill = Data.Old;
+                else
+                    this.Value.TextFill = undefined;
                 break;
             }
         }
@@ -1709,6 +1755,22 @@ ParaTextPr.prototype =
 
                 break;
             }
+            case historyitem_TextPr_Outline:
+            {
+                if ( undefined != Data.New )
+                    this.Value.TextOutline = Data.New;
+                else
+                    this.Value.TextOutline = undefined;
+                break;
+            }
+            case historyitem_TextPr_Fill:
+            {
+                if ( undefined != Data.New )
+                    this.Value.TextFill = Data.New;
+                else
+                    this.Value.TextFill = undefined;
+                break;
+            }
         }
     },
 
@@ -1837,6 +1899,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_Color:
             case historyitem_TextPr_Unifill:
+            case historyitem_TextPr_Outline:
+            case historyitem_TextPr_Fill   :
             {
                 // Bool     : IsUndefined
                 // Variable : Color (CDocumentColor)
@@ -1950,7 +2014,7 @@ ParaTextPr.prototype =
             case historyitem_TextPr_Value:
             {
                 // CTextPr
-                Data.New.Write_ToBinary(Writer)
+                Data.New.Write_ToBinary(Writer);
 
                 break;
             }
@@ -2191,6 +2255,30 @@ ParaTextPr.prototype =
                 }
                 else
                     this.Value.Unifill = undefined;
+                break;
+            }
+            case historyitem_TextPr_Fill:
+            {
+                if ( true != Reader.GetBool() )
+                {
+                    var unifill = new CUniFill();
+                    unifill.Read_FromBinary(Reader);
+                    this.Value.TextFill = unifill;
+                }
+                else
+                    this.Value.TextFill = undefined;
+                break;
+            }
+            case historyitem_TextPr_Outline:
+            {
+                if ( true != Reader.GetBool() )
+                {
+                    var line = new CLn();
+                    line.Read_FromBinary(Reader);
+                    this.Value.TextOutline = line;
+                }
+                else
+                    this.Value.TextOutline = undefined;
                 break;
             }
 
@@ -2476,6 +2564,7 @@ ParaTextPr.prototype =
 
                 break;
             }
+
         }
     }
 };
@@ -4309,6 +4398,7 @@ ParaDrawing.prototype =
     {
         if(pGraphics.Start_Command)
         {
+            return;
             pGraphics.Start_Command(DRAW_COMMAND_DRAWING);
         }
         if ( drawing_Inline === this.DrawingType )
@@ -4654,8 +4744,8 @@ ParaDrawing.prototype =
 
     recalculateDocContent: function()
     {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.recalculateDocContent === "function")
-            return this.GraphicObj.recalculateDocContent();
+        //if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.recalculateDocContent === "function")
+        //    return this.GraphicObj.recalculateDocContent();
     },
 
     Shift : function(Dx, Dy)
@@ -5881,14 +5971,6 @@ ParaDrawing.prototype =
         return parent_paragraph;
     },
 
-    hitToAdj: function(x, y)
-    {
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.hitToAdj === "function")
-        {
-            return this.GraphicObj.hitToAdj(x, y);
-        }
-        return {hit: false, adjPolarFlag: null, adjNum: null};
-    },
 
     hit: function(x, y)
     {

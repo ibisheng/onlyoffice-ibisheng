@@ -276,67 +276,6 @@ CLineStructure.prototype.draw = function(graphics, transform)
 };
 
 
-function CTextDrawer(dWidth, dHeight, bDivByLInes)
-{
-    this.m_oFont =
-    {
-        Name     : "",
-        FontSize : -1,
-        Style    : -1
-    };
-
-    this.Width = dWidth;
-    this.Height = dHeight;
-    this.m_oTransform = new CMatrix();
-    this.pathW = 43200;
-    this.pathH = 43200;
-
-    this.xKoeff = this.pathW/this.Width;
-    this.yKoeff = this.pathH/this.Height;
-
-    this.m_aStack = [];
-    this.m_oDocContentStructure = null;
-    this.m_aCommands = [];
-    // RFonts
-    this.m_oTextPr      = null;
-    this.m_oGrFonts     = new CGrRFonts();
-
-    this.m_oPen     = new CPen();
-    this.m_oBrush   = new CBrush();
-
-    this.BrushType = MetaBrushType.Solid;
-
-    // чтобы выставилось в первый раз
-    this.m_oPen.Color.R     = -1;
-    this.m_oBrush.Color1.R  = -1;
-    this.m_oBrush.Color2.R  = -1;
-
-    // просто чтобы не создавать каждый раз
-    this.m_oFontSlotFont = new CFontSetup();
-    this.LastFontOriginInfo = { Name : "", Replace : null };
-
-    this.GrState = new CGrState();
-    this.GrState.Parent = this;
-
-    this.m_bDivByLines = bDivByLInes === true;
-    this.m_aByLines = null;
-    this.m_nCurLineIndex = -1;
-    this.m_aStackLineIndex = null;
-    this.m_aStackCurRowMaxIndex = null;
-    this.m_aByParagraphs = null;
-
-    if(this.m_bDivByLines)
-    {
-        this.m_aByLines = [];
-        this.m_aStackLineIndex = [];
-        this.m_aStackCurRowMaxIndex = [];
-    }
-    else
-    {
-        this.m_aByParagraphs = [];
-    }
-}
-
 
 var DRAW_COMMAND_TABLE = 0x01;
 var DRAW_COMMAND_CONTENT = 0x02;
@@ -346,8 +285,6 @@ var DRAW_COMMAND_DRAWING = 0x05;
 var DRAW_COMMAND_HIDDEN_ELEM = 0x06;
 var DRAW_COMMAND_NO_CREATE_GEOM = 0x07;
 var DRAW_COMMAND_TABLE_ROW = 0x08;
-
-
 
 function GetConstDescription(nConst)
 {
@@ -408,6 +345,67 @@ function CreatePenFromParams(oUnifill, nStyle, nLineCap, nLineJoin, dLineWidth, 
     // this.LineWidth  = 1;
 
     return oLine;
+}
+
+function CTextDrawer(dWidth, dHeight, bDivByLInes)
+{
+    this.m_oFont =
+    {
+        Name     : "",
+        FontSize : -1,
+        Style    : -1
+    };
+
+    this.Width = dWidth;
+    this.Height = dHeight;
+    this.m_oTransform = new CMatrix();
+    this.pathW = 43200;
+    this.pathH = 43200;
+
+    this.xKoeff = this.pathW/this.Width;
+    this.yKoeff = this.pathH/this.Height;
+
+    this.m_aStack = [];
+    this.m_oDocContentStructure = null;
+    this.m_aCommands = [];
+    // RFonts
+    this.m_oTextPr      = null;
+    this.m_oGrFonts     = new CGrRFonts();
+
+    this.m_oPen     = new CPen();
+    this.m_oBrush   = new CBrush();
+
+    this.BrushType = MetaBrushType.Solid;
+
+    // чтобы выставилось в первый раз
+    this.m_oPen.Color.R     = -1;
+    this.m_oBrush.Color1.R  = -1;
+    this.m_oBrush.Color2.R  = -1;
+
+    // просто чтобы не создавать каждый раз
+    this.m_oFontSlotFont = new CFontSetup();
+    this.LastFontOriginInfo = { Name : "", Replace : null };
+
+    this.GrState = new CGrState();
+    this.GrState.Parent = this;
+
+    this.m_bDivByLines = bDivByLInes === true;
+    this.m_aByLines = null;
+    this.m_nCurLineIndex = -1;
+    this.m_aStackLineIndex = null;
+    this.m_aStackCurRowMaxIndex = null;
+    this.m_aByParagraphs = null;
+
+    if(this.m_bDivByLines)
+    {
+        this.m_aByLines = [];
+        this.m_aStackLineIndex = [];
+        this.m_aStackCurRowMaxIndex = [];
+    }
+    else
+    {
+        this.m_aByParagraphs = [];
+    }
 }
 
 CTextDrawer.prototype =
@@ -665,7 +663,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aContent.length === 0)
                             {
-                                oLastCommand.m_aContent.push(new ObjectToDraw(this.m_oTextPr.Unifill, this.m_oTextPr.TextOutline, this.Width, this.Height, new Geometry(), this.m_oTransform, this));
+                                oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.m_oTextPr.TextOutline, this.Width, this.Height, new Geometry(), this.m_oTransform, this));
                             }
                             oLastObjectToDraw = oLastCommand.m_aContent[oLastCommand.m_aContent.length - 1];
 
@@ -673,11 +671,11 @@ CTextDrawer.prototype =
                             {
                                 if(oLastObjectToDraw.geometry.pathLst.length === 0 || (oLastObjectToDraw.geometry.pathLst.length === 1 && oLastObjectToDraw.geometry.pathLst[0].ArrPathCommandInfo.length === 0))
                                 {
-                                    oLastObjectToDraw.resetBrushPen(this.m_oTextPr.Unifill, this.m_oTextPr.TextOutline)
+                                    oLastObjectToDraw.resetBrushPen(this.GetFillFromTextPr(this.m_oTextPr), this.m_oTextPr.TextOutline)
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aContent.push(new ObjectToDraw(this.m_oTextPr.Unifill, this.m_oTextPr.TextOutline, this.Width, this.Height, new Geometry(), this.m_oTransform, this));
+                                    oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.m_oTextPr.TextOutline, this.Width, this.Height, new Geometry(), this.m_oTransform, this));
                                     oLastObjectToDraw = oLastCommand.m_aContent[oLastCommand.m_aContent.length - 1];
                                 }
                             }
@@ -1392,7 +1390,7 @@ CTextDrawer.prototype =
 
     GetFillFromTextPr: function(oTextPr)
     {
-        return oTextPr.Unifill;
+        return oTextPr.TextFill ? oTextPr.TextFill : oTextPr.Unifill;
     },
 
     GetPenFromTextPr: function(oTextPr)

@@ -1102,18 +1102,18 @@ Geometry.prototype=
             this.pathLst[i].check_bounds(checker);
     },
 
-    drawAdjustments: function(drawingDocument, transform)
+    drawAdjustments: function(drawingDocument, transform, bTextWarp)
     {
         var _adjustments = this.ahXYLst;
         var _adj_count = _adjustments.length;
         var _adj_index;
         for(_adj_index = 0; _adj_index < _adj_count; ++_adj_index)
-            drawingDocument.DrawAdjustment(transform, _adjustments[_adj_index].posX, _adjustments[_adj_index].posY);
+            drawingDocument.DrawAdjustment(transform, _adjustments[_adj_index].posX, _adjustments[_adj_index].posY, bTextWarp);
 
         _adjustments = this.ahPolarLst;
         _adj_count = _adjustments.length;
         for(_adj_index = 0; _adj_index < _adj_count; ++_adj_index)
-            drawingDocument.DrawAdjustment(transform, _adjustments[_adj_index].posX, _adjustments[_adj_index].posY);
+            drawingDocument.DrawAdjustment(transform, _adjustments[_adj_index].posX, _adjustments[_adj_index].posY, bTextWarp);
     },
 
     canFill: function()
@@ -1314,6 +1314,11 @@ Geometry.prototype=
                  {
                  cur_polygon.push({x: first_point_x, y: first_point_y});
                  }             */
+                arr_polygons.push(cur_polygon);
+            }
+            if(cur_polygon.length === 1)
+            {
+                cur_polygon.push({x:cur_polygon[0].x, y:cur_polygon[0].y});
                 arr_polygons.push(cur_polygon);
             }
         }

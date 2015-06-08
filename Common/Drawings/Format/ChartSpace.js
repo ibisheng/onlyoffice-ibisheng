@@ -11225,7 +11225,10 @@ function checkBlipFillRasterImages(sp)
         }
         case historyitem_type_GroupShape:
         {
-            checkBlipFillRasterImages(sp.spTree);
+            for(var i = 0; i < sp.spTree.length; ++i)
+            {
+                checkBlipFillRasterImages(sp.spTree[i]);
+            }
             break;
         }
         case historyitem_type_GraphicFrame:

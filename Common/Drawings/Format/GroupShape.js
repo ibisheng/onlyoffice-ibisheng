@@ -320,22 +320,6 @@ CGroupShape.prototype =
         }
     },
 
-    sendMouseData: function()
-    {
-        if ( true === this.Lock.Is_Locked() )
-        {
-
-            var MMData = new CMouseMoveData();
-            var Coords = editor.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(this.x, this.y, this.parent.num, null);
-            MMData.X_abs            = Coords.X - 5;
-            MMData.Y_abs            = Coords.Y;
-            MMData.Type             = c_oAscMouseMoveDataTypes.LockedObject;
-            MMData.UserId           = this.Lock.Get_UserId();
-            MMData.HaveChanges      = this.Lock.Have_Changes();
-            MMData.LockedObjectType = 0;
-            editor.sync_MouseMoveCallback( MMData );
-        }
-    },
 
     isShape: function()
     {
@@ -1482,10 +1466,6 @@ CGroupShape.prototype =
         }
     },
 
-    hitToAdj: function(x, y)
-    {
-        return {hit: false, num: -1, polar: false};
-    },
 
     setNvSpPr: function(pr)
     {

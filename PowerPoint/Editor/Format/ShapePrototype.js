@@ -490,10 +490,20 @@ CShape.prototype.recalculateContent = function()
         {
             this.recalcInfo.bRecalculatedTitle = true;
             this.recalcInfo.recalcTitle = null;
+
+            if(body_pr.prstTxWarp && body_pr.prstTxWarp.preset !== "textNoShape")
+            {
+                body_pr.prstTxWarp.Recalculate(oRecalcObject.w + oRecalcObject.correctW, oRecalcObject.h + oRecalcObject.correctH);
+                this.recalcInfo.warpGeometry = body_pr.prstTxWarp;
+            }
+            else
+            {
+                this.recalcInfo.warpGeometry = null;
+            }
         }
         else
         {
-            var oTextWarpContent = this.checkTextWarp(content, body_pr, this.contentWidth, this.contentHeight);
+            var oTextWarpContent = this.checkTextWarp(content, body_pr, oRecalcObject.w + oRecalcObject.correctW, oRecalcObject.h + oRecalcObject.correctH);
             this.txWarpStructParamarks = oTextWarpContent.oTxWarpStructParamarks;
             this.txWarpStruct = oTextWarpContent.oTxWarpStruct;
         }
@@ -671,18 +681,6 @@ CShape.prototype.setParent2 = function(parent)
             this.spTree[i].setParent2(parent);
         }
     }
-};
-CShape.prototype.hitInTextRect = function(x, y)
-{
-    var content = this.getDocContent && this.getDocContent();
-    if (content && this.invertTransformText) {
-
-        var t_x, t_y;
-        t_x = this.invertTransformText.TransformPointX(x, y);
-        t_y = this.invertTransformText.TransformPointY(x, y);
-        return t_x > 0 && t_x < content.XLimit && t_y > 0 && t_y < content.Get_SummaryHeight();
-    }
-    return false;
 };
 CShape.prototype.getIsSingleBody = function(x, y)
 {

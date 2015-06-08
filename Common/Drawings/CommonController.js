@@ -341,11 +341,11 @@ DrawingObjectsController.prototype =
             this.arrPreTrackObjects.length = 0;
             if(hit.adjPolarFlag === false)
             {
-                this.arrPreTrackObjects.push(new XYAdjustmentTrack(selectedObject, hit.adjNum));
+                this.arrPreTrackObjects.push(new XYAdjustmentTrack(selectedObject, hit.adjNum, hit.warp));
             }
             else
             {
-                this.arrPreTrackObjects.push(new PolarAdjustmentTrack(selectedObject, hit.adjNum));
+                this.arrPreTrackObjects.push(new PolarAdjustmentTrack(selectedObject, hit.adjNum, hit.warp));
             }
             if(!isRealObject(group))
             {
@@ -3827,7 +3827,7 @@ DrawingObjectsController.prototype =
                         }
                     }
 
-                }
+                };
 
                 if(this.selection.groupSelection)
                 {
@@ -4795,7 +4795,24 @@ DrawingObjectsController.prototype =
         }
         else {
             var oTargetTextObject = getTargetTextObject(this);
-
+            var nSelectStartPage = 0, bNoNeedRecalc = false;
+            if(oTargetTextObject)
+            {
+                nSelectStartPage = oTargetTextObject.selectStartPage;
+            }
+            if(!oTargetTextObject && this.document)
+            {
+                if(this.selectedObjects.length === 1 && this.selectedObjects[0].parent)
+                {
+                    var oShape =  this.selectedObjects[0].parent.isShapeChild(true);
+                    if(oShape)
+                    {
+                        oTargetTextObject = oShape;
+                        nSelectStartPage = this.selectedObjects[0].selectStartPage;
+                        bNoNeedRecalc = true;
+                    }
+                }
+            }
             if (oTargetTextObject) {
 
                 var oBodyPr = oTargetTextObject.getBodyPr && oTargetTextObject.getBodyPr();
@@ -4809,8 +4826,17 @@ DrawingObjectsController.prototype =
                         {
                             if(oTargetTextObject.bWordShape)
                             {
-                                oTargetTextObject.recalcInfo.oContentMetrics = oTargetTextObject.recalculateTxBoxContent();
-                                oTargetTextObject.recalcInfo.recalculateTxBoxContent = false;
+                                if(!bNoNeedRecalc)
+                                {
+                                    oTargetTextObject.recalcInfo.oContentMetrics = oTargetTextObject.recalculateTxBoxContent();
+                                    oTargetTextObject.recalcInfo.recalculateTxBoxContent = false;
+                                    oTargetTextObject.recalcInfo.AllDrawings = [];
+                                    var oContent = oTargetTextObject.getDocContent();
+                                    if(oContent)
+                                    {
+                                        oContent.Get_AllDrawingObjects(oTargetTextObject.recalcInfo.AllDrawings);
+                                    }
+                                }
                             }
                             else
                             {
@@ -4822,7 +4848,7 @@ DrawingObjectsController.prototype =
                     }
                     if (this.document)
                     {
-                        this.document.DrawingDocument.OnRecalculatePage(oTargetTextObject.selectStartPage, this.document.Pages[oTargetTextObject.selectStartPage]);
+                        this.document.DrawingDocument.OnRecalculatePage(nSelectStartPage, this.document.Pages[nSelectStartPage]);
                         this.document.DrawingDocument.OnEndRecalculate(false, true);
                     }
                     else if (this.drawingObjects.cSld)
@@ -4841,6 +4867,7 @@ DrawingObjectsController.prototype =
                 }
 
             }
+
         }
 
     },

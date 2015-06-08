@@ -409,10 +409,19 @@ CShape.prototype.recalculateContent = function()
         {
             this.recalcInfo.bRecalculatedTitle = true;
             this.recalcInfo.recalcTitle = null;
+            if(body_pr.prstTxWarp && body_pr.prstTxWarp.preset !== "textNoShape")
+            {
+                body_pr.prstTxWarp.Recalculate(oRecalcObj.w + oRecalcObj.correctW, oRecalcObj.h + oRecalcObj.correctH);
+                this.recalcInfo.warpGeometry = body_pr.prstTxWarp;
+            }
+            else
+            {
+                this.recalcInfo.warpGeometry = null;
+            }
         }
         else
         {
-            var oTextWarpContent = this.checkTextWarp(content, body_pr, this.contentWidth, this.contentHeight);
+            var oTextWarpContent = this.checkTextWarp(content, body_pr, oRecalcObj.w + oRecalcObj.correctW, oRecalcObj.h + oRecalcObj.correctH);
             this.txWarpStructParamarks = oTextWarpContent.oTxWarpStructParamarks;
             this.txWarpStruct = oTextWarpContent.oTxWarpStruct;
         }

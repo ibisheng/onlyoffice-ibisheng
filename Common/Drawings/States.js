@@ -149,16 +149,35 @@ function checkEmptyPlaceholderContent(content)
 function NullState(drawingObjects)
 {
     this.drawingObjects = drawingObjects;
+    this.startTargetTextObject = null;
 }
 
 NullState.prototype =
 {
+    checkInternalSelection: function(oSelection, e, x, y, pageIndex, bTextFlag)
+    {
+
+        if(oSelection && this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        {
+            if(this.drawingObjects.checkNeedResetChartSelection(e, x, y, pageIndex, bTextFlag))
+            {
+                this.drawingObjects.checkChartTextSelection();
+            }
+            oSelection.resetInternalSelection();
+            if(e.ClickCount < 2)
+            {
+                this.drawingObjects.updateOverlay();
+            }
+        }
+    },
+
     onMouseDown: function(e, x, y, pageIndex, bTextFlag)
     {
         var start_target_doc_content, end_target_doc_content, selected_comment_index = -1;
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
             start_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+            this.startTargetTextObject = getTargetTextObject(this.drawingObjects);
         }
         var ret;
         ret = this.drawingObjects.handleSlideComments(e, x, y, pageIndex);
@@ -171,12 +190,25 @@ NullState.prototype =
             selected_comment_index = ret.selectedIndex;
         }
         var selection = this.drawingObjects.selection;
-        var b_no_handle_selected = false;
         if(selection.groupSelection)
         {
+
+            this.checkInternalSelection(selection.groupSelection, e, x, y, pageIndex, bTextFlag);
             ret = handleSelectedObjects(this.drawingObjects, e, x, y, selection.groupSelection, pageIndex, false);
             if(ret)
             {
+                if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+                {
+                    if(this.drawingObjects.checkNeedResetChartSelection(e, x, y, pageIndex, bTextFlag))
+                    {
+                        this.drawingObjects.checkChartTextSelection();
+                    }
+                    selection.groupSelection.resetInternalSelection();
+                    if(e.ClickCount < 2)
+                    {
+                        this.drawingObjects.updateOverlay();
+                    }
+                }
                 end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
                 if((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
                 {
@@ -200,29 +232,19 @@ NullState.prototype =
         }
         else if(selection.chartSelection)
         {}
-        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        this.checkInternalSelection(this.drawingObjects, e, x, y, pageIndex, bTextFlag);
+        ret = handleSelectedObjects(this.drawingObjects, e, x, y, null, pageIndex, false);
+        if(ret)
         {
-            if(this.drawingObjects.checkNeedResetChartSelection(e, x, y, pageIndex, bTextFlag))
+            if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
             {
-                this.drawingObjects.checkChartTextSelection();
-            }
-            this.drawingObjects.resetInternalSelection(true);
-        }
-        if(!b_no_handle_selected)
-        {
-            ret = handleSelectedObjects(this.drawingObjects, e, x, y, null, pageIndex, false);
-            if(ret)
-            {
-                if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+                end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+                if((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
                 {
-                    end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
-                    if((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
-                    {
-                        this.drawingObjects.drawingObjects.showDrawingObjects(true);
-                    }
+                    this.drawingObjects.drawingObjects.showDrawingObjects(true);
                 }
-                return ret;
             }
+            return ret;
         }
 
         ret = handleFloatObjects(this.drawingObjects, this.drawingObjects.getDrawingArray(), e, x, y, null, pageIndex, false);

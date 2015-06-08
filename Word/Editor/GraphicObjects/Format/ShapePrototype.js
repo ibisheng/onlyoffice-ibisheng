@@ -17,7 +17,8 @@ CShape.prototype.setRecalculateInfo = function()
         recalculateTextStyles:     [true, true, true, true, true, true, true, true, true],
         recalculateShapeStyleForParagraph: true,
         recalculateWrapPolygon: true,
-        oContentMetrics: null
+        oContentMetrics: null,
+        AllDrawings: []
     };
 
     this.bNeedUpdatePosition = true;
@@ -40,6 +41,7 @@ CShape.prototype.recalcContent = function()
     if(this.bWordShape)
     {
         this.recalcInfo.recalculateTxBoxContent = true;
+        this.recalcInfo.AllDrawings = [];
         if(this.checkAutofit && this.checkAutofit())
         {
             this.recalcTransform();
@@ -107,6 +109,7 @@ CShape.prototype.recalcTextStyles = function()
 CShape.prototype.recalcTxBoxContent = function()
 {
     this.recalcInfo.recalculateTxBoxContent = true;
+    this.recalcInfo.AllDrawings = [];
 };
 
 CShape.prototype.recalcWrapPolygon = function()
@@ -212,6 +215,15 @@ CShape.prototype.recalculateTxBoxContent = function()
     {
         this.recalcInfo.bRecalculatedTitle = true;
         this.recalcInfo.recalcTitle = null;
+        if(oBodyPr.prstTxWarp && oBodyPr.prstTxWarp.preset !== "textNoShape")
+        {
+            oBodyPr.prstTxWarp.Recalculate(oRecalcObj.w, oRecalcObj.h);
+            this.recalcInfo.warpGeometry = oBodyPr.prstTxWarp;
+        }
+        else
+        {
+            this.recalcInfo.warpGeometry = null;
+        }
     }
     else
     {
@@ -273,6 +285,12 @@ CShape.prototype.recalculateText = function()
             {
                 this.recalcInfo.oContentMetrics = this.recalculateTxBoxContent();
                 this.recalcInfo.recalculateTxBoxContent = false;
+                this.recalcInfo.AllDrawings = [];
+                var oContent = this.getDocContent();
+                if(oContent)
+                {
+                    oContent.Get_AllDrawingObjects(this.recalcInfo.AllDrawings);
+                }
             }
         }
         else
@@ -385,6 +403,13 @@ CShape.prototype.updateTransformMatrix = function()
         global_MatrixTransformer.TranslateAppend(this.transformText, this.posX, this.posY);
         this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
     }
+    if(this.localTransformTextWordArt)
+    {
+        this.transformTextWordArt = this.localTransformTextWordArt.CreateDublicate();
+        global_MatrixTransformer.TranslateAppend(this.transformTextWordArt, this.posX, this.posY);
+        this.invertTransformTextWordArt = global_MatrixTransformer.Invert(this.transformTextWordArt);
+    }
+
     this.checkShapeChildTransform();
     this.checkContentDrawings();
 };
@@ -522,34 +547,7 @@ CShape.prototype.Is_Cell = function()
 
 CShape.prototype.hitInTextRect = function(x, y)
 {
-    var content = this.getDocContent && this.getDocContent();
-    if (content)
-    {
-        var t_x, t_y;
-        t_x = this.invertTransform.TransformPointX(x, y);
-        t_y = this.invertTransform.TransformPointY(x, y);
-
-        var w, h, x, y;
-
-        if(this.spPr && this.spPr.geometry && this.spPr.geometry.rect
-            && isRealNumber(this.spPr.geometry.rect.l) && isRealNumber(this.spPr.geometry.rect.t)
-            && isRealNumber(this.spPr.geometry.rect.r) && isRealNumber(this.spPr.geometry.rect.r))
-        {
-            x = this.spPr.geometry.rect.l;
-            y = this.spPr.geometry.rect.t;
-            w = this.spPr.geometry.rect.r - this.spPr.geometry.rect.l;
-            h = this.spPr.geometry.rect.b - this.spPr.geometry.rect.t;
-        }
-        else
-        {
-            x = 0;
-            y = 0;
-            w = this.extX ;
-            h = this.extY ;
-        }
-        return t_x > x  && t_x < x + w && t_y > y && t_y < y + h;
-    }
-    return false;
+    return this.hitInTextRectWord(x, y);
 };
 
 CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
@@ -706,6 +704,13 @@ CShape.prototype.checkPosTransformText = function()
         this.transformText = this.localTransformText.CreateDublicate();
         global_MatrixTransformer.TranslateAppend(this.transformText, this.posX, this.posY);
         this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
+
+        if(this.localTransformTextWordArt)
+        {
+            this.transformTextWordArt = this.localTransformTextWordArt.CreateDublicate();
+            global_MatrixTransformer.TranslateAppend(this.transformTextWordArt, this.posX, this.posY);
+            this.invertTransformTextWordArt = global_MatrixTransformer.Invert(this.transformTextWordArt);
+        }
     }
 };
 CShape.prototype.getNearestPos = function(x, y, pageIndex)

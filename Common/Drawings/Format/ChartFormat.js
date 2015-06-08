@@ -929,6 +929,8 @@ CDLbl.prototype =
 
                     this.txBody.contentWidth = this.extY;
                     this.txBody.contentHeight = this.extX;
+                    this.contentWidth = this.extY;
+                    this.contentHeight = this.extX;
                     break;
                 }
                 default:
@@ -955,6 +957,8 @@ CDLbl.prototype =
 
                     this.txBody.contentWidth = this.extX;
                     this.txBody.contentHeight = this.extY;
+                    this.contentWidth = this.extX;
+                    this.contentHeight = this.extY;
                     break;
                 }
             }

@@ -974,7 +974,9 @@ var historyitem_TextPr_Lang_Bidi       = 25; // Изменяем настрой�
 var historyitem_TextPr_Lang_EastAsia   = 26; // Изменяем настройку языка
 var historyitem_TextPr_Lang_Val        = 27; // Изменяем настройку языка
 var historyitem_TextPr_Unifill         = 28; // Изменяем настройку языка
-var historyitem_TextPr_FontSizeCS = 29;
+var historyitem_TextPr_FontSizeCS      = 29;
+var historyitem_TextPr_Outline         = 30; // Изменяем обводку текста
+var historyitem_TextPr_Fill            = 30; // Изменяем заливку текста
 
 // Типы изменений в классе ParaDrawing
 var historyitem_Drawing_Size              = 1; // Изменяем размер картинки

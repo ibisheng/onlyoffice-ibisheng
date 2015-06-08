@@ -2120,7 +2120,7 @@ CAutoshapeTrack.prototype =
             ctx.stroke();
     },
 
-    DrawAdjustment : function(matrix, x, y)
+    DrawAdjustment : function(matrix, x, y, bTextWarp)
     {
         var overlay = this.m_oOverlay;
         this.CurrentPageInfo = overlay.m_oHtmlPage.GetDrawingPageInfo(this.PageIndex);
@@ -2140,6 +2140,7 @@ CAutoshapeTrack.prototype =
 
         var _style_blue = "#4D7399";
         var _style_yellow = "#FDF54A";
+        var _style_text_adj = "#F888FF";
 
         var ctx = overlay.m_oContext;
 
@@ -2152,11 +2153,19 @@ CAutoshapeTrack.prototype =
 
         overlay.CheckRect(cx - dist, cy - dist, TRACK_ADJUSTMENT_SIZE, TRACK_ADJUSTMENT_SIZE);
 
-        ctx.fillStyle = _style_yellow;
+        if(bTextWarp === true)
+        {
+            ctx.fillStyle = _style_text_adj;
+        }
+        else
+        {
+            ctx.fillStyle = _style_yellow;
+        }
         ctx.strokeStyle = _style_blue;
 
         ctx.fill();
         ctx.stroke();
+        ctx.beginPath();
     },
 
     DrawEditWrapPointsPolygon : function(points, matrix)
