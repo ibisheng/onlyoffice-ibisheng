@@ -431,7 +431,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			if(c_DocInfo)
 				this.DocInfo = c_DocInfo;
 		};
-		spreadsheet_api.prototype.asc_getLocaleExample = function (number, date) {
+		spreadsheet_api.prototype.asc_getLocaleExample = function (val, number, date) {
 
 		};
 		spreadsheet_api.prototype.asc_setLocale = function (val) {
