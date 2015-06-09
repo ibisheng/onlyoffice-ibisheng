@@ -7512,7 +7512,7 @@ asc_docs_api.prototype.asc_showRevision = function (newObj) {
 	} else if (this.VersionHistory.currentChangeId < newObj.currentChangeId) {
 		// Нужно только добавить некоторые изменения
 		editor.VersionHistory.applyChanges(editor);
-		CollaborativeEditing.Apply_OtherChanges();
+		CollaborativeEditing.Apply_Changes();
 	}
 };
 asc_docs_api.prototype.asc_undoAllChanges = function ()
