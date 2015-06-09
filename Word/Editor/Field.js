@@ -214,9 +214,12 @@ ParaField.prototype.Get_FieldType = function()
 {
     return this.FieldType;
 };
-ParaField.prototype.Map_MailMerge = function(Value)
+ParaField.prototype.Map_MailMerge = function(_Value)
 {
     // Пока у нас в Value может быть только текст, в будущем планируется, чтобы могли быть картинки.
+    var Value = _Value;
+    if (undefined === Value || null === Value)
+        Value = "";
 
     History.TurnOff();
 
