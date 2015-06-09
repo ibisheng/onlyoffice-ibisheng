@@ -663,7 +663,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aContent.length === 0)
                             {
-                                oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.m_oTextPr.TextOutline, this.Width, this.Height, new Geometry(), this.m_oTransform, this));
+                                oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, this));
                             }
                             oLastObjectToDraw = oLastCommand.m_aContent[oLastCommand.m_aContent.length - 1];
 
@@ -671,11 +671,11 @@ CTextDrawer.prototype =
                             {
                                 if(oLastObjectToDraw.geometry.pathLst.length === 0 || (oLastObjectToDraw.geometry.pathLst.length === 1 && oLastObjectToDraw.geometry.pathLst[0].ArrPathCommandInfo.length === 0))
                                 {
-                                    oLastObjectToDraw.resetBrushPen(this.GetFillFromTextPr(this.m_oTextPr), this.m_oTextPr.TextOutline)
+                                    oLastObjectToDraw.resetBrushPen(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr))
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.m_oTextPr.TextOutline, this.Width, this.Height, new Geometry(), this.m_oTransform, this));
+                                    oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, this));
                                     oLastObjectToDraw = oLastCommand.m_aContent[oLastCommand.m_aContent.length - 1];
                                 }
                             }
@@ -1390,12 +1390,31 @@ CTextDrawer.prototype =
 
     GetFillFromTextPr: function(oTextPr)
     {
-        return oTextPr.TextFill ? oTextPr.TextFill : oTextPr.Unifill;
+        if(oTextPr)
+        {
+            return oTextPr.TextFill ? oTextPr.TextFill : oTextPr.Unifill;
+        }
+        else
+        {
+            if(this.m_oBrush.Color1.R !== -1)
+            {
+                var Color = this.m_oBrush.Color1;
+                return CreateUniFillByUniColor(CreateUniColorRGB(Color.R, Color.G, Color.B));
+            }
+            else
+            {
+                return CreateUniFillByUniColor(CreateUniColorRGB(0, 0, 0));
+            }
+        }
     },
 
     GetPenFromTextPr: function(oTextPr)
     {
-        return oTextPr.TextOutline;
+        if(oTextPr)
+        {
+            return oTextPr.TextOutline;
+        }
+        return null;
     },
 
 

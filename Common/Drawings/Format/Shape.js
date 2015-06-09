@@ -198,6 +198,14 @@ function CreateUniFillByUniColorCopy(uniColor)
     return ret;
 }
 
+function CreateUniFillByUniColor(uniColor)
+{
+    var ret = new CUniFill();
+    ret.setFill(new CSolidFill());
+    ret.fill.setColor(uniColor.createDuplicate());
+    return ret;
+}
+
 function CopyRunToPPTX(Run, Paragraph, bHyper)
 {
     var NewRun = new ParaRun(Paragraph, false);
@@ -2182,10 +2190,6 @@ CShape.prototype =
         this.cachedImage = null;
         this.recalculateLocalTransform(this.transform);
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
-        //if(this.drawingBase && !this.group)
-        //{
-        //    this.drawingBase.setGraphicObjectCoords();
-        //}
         this.localTransform = this.transform.CreateDublicate();
     },
 
@@ -2204,7 +2208,7 @@ CShape.prototype =
     },
 
     Check_AutoFit: function () {
-        return this.checkAutofit(true);
+        return this.checkAutofit(true) || this.checkContentWordArt(this.getDocContent());
     },
 
 
@@ -2509,7 +2513,6 @@ CShape.prototype =
                             else {
                                 this.extY = oContentMetrics.contentH + t_ins + b_ins;
                             }
-
                         }
                         else {
                             if (oGeometry) {
@@ -2550,7 +2553,7 @@ CShape.prototype =
                 }
             }
 
-            if(!this.bWordShape)//в презентациях и в таблицах изменям позицию: по горизонтали - в зависимости от выравнивания первого параграфа в контенте,
+            if(!this.bWordShape || this.group)//в презентациях и в таблицах изменям позицию: по горизонтали - в зависимости от выравнивания первого параграфа в контенте,
             // по вертикали - в зависимости от вертикального выравнивания контента.
             {
                 var dSin = Math.sin(this.rot), dCos = Math.cos(this.rot);
@@ -2599,52 +2602,6 @@ CShape.prototype =
                 this.x += dTrDeltaX;
                 this.y += dTrDeltaY;
             }
-
-
-            /*if(!this.bWordShape)
-            {
-                switch (oBodyPr.anchor) {
-                    case 0: //b
-                    {
-                        dDeltaY = dOldExtY - this.extY;
-                        break;
-                    }
-                    case 1:    //ctr
-                    case 2: //dist
-                    case 3: //just
-                    {// (Text Anchor Enum ( Center ))
-                        dDeltaY = (dOldExtY - this.extY) / 2;
-                        break;
-                    }
-                    case 4: //t
-                    {//Top
-                        break;
-                    }
-                }
-                if (oBodyPr.wrap === nTWTNone){
-                    oContent = this.getDocContent();
-                    oParaPr = oContent.Content[0].CompiledPr.ParaPr;
-                    switch (oParaPr.Jc) {
-                        case align_Right:
-                        {
-                            dDeltaX = dOldExtX - this.extX;
-                            break;
-                        }
-                        case align_Left:
-                        {
-
-                            break;
-                        }
-                        default:
-                            //case align_Center:
-                            //case align_Justify:
-                        {
-                            dDeltaX = (dOldExtX - this.extX) / 2;
-                            break;
-                        }
-                    }
-                }
-            }*/
         }
         this.localX = this.x;
         this.localY = this.y;
@@ -2780,9 +2737,9 @@ CShape.prototype =
         return oRet;
     },
 
-    checkExtentsByDocContent: function()
+    checkExtentsByDocContent: function(bForce)
     {
-        if(!this.bWordShape && this.checkAutofit(true))
+        if((!this.bWordShape || this.group || bForce) && this.checkAutofit(true))
         {
             var oMainGroup = this.getMainGroup();
             if(oMainGroup)
@@ -2802,7 +2759,7 @@ CShape.prototype =
             CheckSpPrXfrm(this, true);
             this.spPr.xfrm.setExtX(this.extX);
             this.spPr.xfrm.setExtY(this.extY);
-            if(!this.bWordShape)
+            if(!this.bWordShape || this.group)
             {
                 this.spPr.xfrm.setOffX(this.x);
                 this.spPr.xfrm.setOffY(this.y);
@@ -2814,12 +2771,22 @@ CShape.prototype =
             if(oMainGroup)
             {
                 oMainGroup.updateCoordinatesAfterInternalResize();
+                if(oMainGroup.parent && oMainGroup.parent.CheckWH)
+                {
+                    oMainGroup.parent.CheckWH();
+                    if(this.bWordShape)
+                    {
+                        editor.WordControl.m_oLogicDocument.Recalculate();
+                    }
+                }
             }
             else
             {
                 this.checkDrawingBaseCoords();
             }
+            return true;
         }
+        return false;
     },
 
 
@@ -3121,7 +3088,7 @@ CShape.prototype =
 
     hitInTextRect: function (x, y) {
         var oController = this.getDrawingObjectsController && this.getDrawingObjectsController();
-        if(!this.txWarpStruct ||
+        if(!this.txWarpStruct || !this.recalcInfo.warpGeometry ||
             this.recalcInfo.warpGeometry.preset === "textNoShape" ||
             oController && (getTargetTextObject(oController) === this || (oController.curState.startTargetTextObject === this)))
         {
@@ -4249,13 +4216,6 @@ CShape.prototype =
             this.recalcInfo.recalcTitle = this.getDocContent();
             this.recalcInfo.bRecalculatedTitle = true;
         }
-    },
-
-    handleContent: function(pageIndex/*для текста*/)
-    {
-        this.recalcContent();
-        this.recalcContent2 && this.recalcContent2();
-        this.recalcTransformText();
     },
 
     Undo: function (data)

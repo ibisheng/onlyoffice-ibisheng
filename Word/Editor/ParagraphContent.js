@@ -4421,7 +4421,7 @@ ParaDrawing.prototype =
             this.Height = 0;
             return;
         }
-        if(isRealNumber(this.Extent.W) && isRealNumber(this.Extent.H))
+        if(isRealNumber(this.Extent.W) && isRealNumber(this.Extent.H) && (!this.GraphicObj.checkAutofit || !this.GraphicObj.checkAutofit()))
         {
             this.Width        = this.Extent.W;
             this.Height       = this.Extent.H;

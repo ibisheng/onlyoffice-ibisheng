@@ -1975,6 +1975,13 @@ CGraphicObjects.prototype =
         var para_drawing = new ParaDrawing(common_bounds.maxX - common_bounds.minX, common_bounds.maxY - common_bounds.minY, null, this.drawingDocument, null, null);
         para_drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
         para_drawing.Set_DrawingType(drawing_Anchor);
+        for(i = 0; i < objects_for_grouping.length; ++i)
+        {
+            if(objects_for_grouping[i].checkExtentsByDocContent && objects_for_grouping[i].checkExtentsByDocContent(true))
+            {
+                objects_for_grouping[i].updatePosition(objects_for_grouping[i].posX, objects_for_grouping[i].posY)
+            }
+        }
         var group = this.getGroup(objects_for_grouping);
         group.spPr.xfrm.setOffX(0);
         group.spPr.xfrm.setOffY(0);
