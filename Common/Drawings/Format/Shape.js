@@ -3429,7 +3429,7 @@ CShape.prototype =
         }
 
         var oController = this.getDrawingObjectsController && this.getDrawingObjectsController();
-        if(!this.txWarpStruct || oController && (getTargetTextObject(oController) === this) || this.haveSelectedDrawingInContent())
+        if(!this.txWarpStruct || oController && (getTargetTextObject(oController) === this) /*|| this.haveSelectedDrawingInContent()*/)
         {
             if (this.txBody)
             {
@@ -3534,6 +3534,28 @@ CShape.prototype =
             }
             else
             {
+                var bNeedRestoreState = false;
+                if(this.bWordShape && this.clipRect)
+                {
+                    bNeedRestoreState = true;
+                    var clip_rect = this.clipRect;
+                    if(!this.bodyPr.upright)
+                    {
+                        graphics.SaveGrState();
+
+                        graphics.SetIntegerGrid(false);
+                        graphics.transform3(this.transform);
+                        graphics.AddClipRect(clip_rect.x, clip_rect.y, clip_rect.w, clip_rect.h);
+
+                    }
+                    else
+                    {
+                        graphics.SaveGrState();
+                        graphics.SetIntegerGrid(false);
+                        graphics.transform3(this.transformText, true);
+                        graphics.AddClipRect(clip_rect.x, clip_rect.y, clip_rect.w, clip_rect.h);
+                    }
+                }
                 var oTransform = this.transformTextWordArt;
                 if(editor && editor.ShowParaMarks)
                 {
@@ -3542,6 +3564,10 @@ CShape.prototype =
                 else
                 {
                     this.txWarpStruct.draw(graphics, oTransform);
+                }
+                if(bNeedRestoreState)
+                {
+                    graphics.RestoreGrState();
                 }
             }
         }

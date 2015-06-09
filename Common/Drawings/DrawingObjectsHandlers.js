@@ -142,7 +142,7 @@ function handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pag
     }
     else if(hit_in_text_rect)
     {
-        if(bWord && (!drawing.txWarpStruct || drawingObjectsController.curState.startTargetTextObject === drawing || drawing.haveSelectedDrawingInContent && drawing.haveSelectedDrawingInContent()))
+        if(bWord/* && (!drawing.txWarpStruct || drawingObjectsController.curState.startTargetTextObject === drawing || drawing.haveSelectedDrawingInContent && drawing.haveSelectedDrawingInContent())*/)
         {
             var all_drawings = drawing.getDocContent().Get_AllDrawingObjects();
             var drawings2 = [];
@@ -172,8 +172,8 @@ function handleShapeImageInGroup(drawingObjectsController, drawing, shape, e, x,
     }
     else if(hit_in_text_rect)
     {
-        if(bWord &&
-            (!shape.txWarpStruct || drawingObjectsController.curState.startTargetTextObject === shape || shape.haveSelectedDrawingInContent && shape.haveSelectedDrawingInContent())) {
+        if(bWord/* &&
+            (!shape.txWarpStruct || drawingObjectsController.curState.startTargetTextObject === shape || shape.haveSelectedDrawingInContent && shape.haveSelectedDrawingInContent())*/) {
             var all_drawings = shape.getDocContent().Get_AllDrawingObjects();
             var drawings2 = [];
             for (var i = 0; i < all_drawings.length; ++i) {
@@ -371,15 +371,18 @@ function handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, page
     }
     else if(b_hit_to_text)
     {
-        var all_drawings = drawing.getDocContent().Get_AllDrawingObjects();
-        var drawings2 = [];
-        for(var i = 0; i < all_drawings.length; ++i)
+        if(drawing.bWordShape /*&& (!drawing.txWarpStruct || drawingObjectsController.curState.startTargetTextObject === drawing || drawing.haveSelectedDrawingInContent && drawing.haveSelectedDrawingInContent())*/)
         {
-            drawings2.push(all_drawings[i].GraphicObj);
+            var all_drawings = drawing.getDocContent().Get_AllDrawingObjects();
+            var drawings2 = [];
+            for(var i = 0; i < all_drawings.length; ++i)
+            {
+                drawings2.push(all_drawings[i].GraphicObj);
+            }
+            var ret = handleInlineObjects(drawingObjectsController, drawings2, e, x, y, pageIndex, true);
+            if(ret)
+                return ret;
         }
-        var ret = handleInlineObjects(drawingObjectsController, drawings2, e, x, y, pageIndex, true);
-        if(ret)
-            return ret;
         return drawingObjectsController.handleTextHit(drawing, e, x, y, null, pageIndex, true);
     }
 }

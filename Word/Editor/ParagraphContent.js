@@ -4398,8 +4398,8 @@ ParaDrawing.prototype =
     {
         if(pGraphics.Start_Command)
         {
+            pGraphics.m_aDrawings.push(new ParaDrawingStruct(pageIndex, this));
             return;
-            pGraphics.Start_Command(DRAW_COMMAND_DRAWING);
         }
         if ( drawing_Inline === this.DrawingType )
         {

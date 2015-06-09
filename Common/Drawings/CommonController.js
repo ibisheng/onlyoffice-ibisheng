@@ -4744,6 +4744,7 @@ DrawingObjectsController.prototype =
         if(this.bNoCheckChartTextSelection === true)
             return;
         var chart_selection;
+        var nPageNum1, nPageNum2;
         if(this.selection.chartSelection)
         {
             chart_selection = this.selection.chartSelection;
@@ -4773,101 +4774,134 @@ DrawingObjectsController.prototype =
                 if(this.document)
                 {
                     chart_selection.recalculate();
-                    this.document.DrawingDocument.OnRecalculatePage( chart_selection.selectStartPage, this.document.Pages[chart_selection.selectStartPage] );
-                    this.document.DrawingDocument.OnEndRecalculate( false, true );
+                    nPageNum1  = chart_selection.selectStartPage;
                 }
                 else if(this.drawingObjects.cSld)
                 {
                     chart_selection.recalculate();
                     if(!(bNoRedraw === true))
                     {
-                        editor.WordControl.m_oDrawingDocument.OnRecalculatePage( this.drawingObjects.num, this.drawingObjects );
-                        editor.WordControl.m_oDrawingDocument.OnEndRecalculate( false, true );
+                        nPageNum1 = this.drawingObjects.num;
                     }
                 }
                 else
                 {
                     chart_selection.addToRecalculate();
-                    this.startRecalculate();
                 }
                 chart_selection.recalcInfo.bRecalculatedTitle = false;
             }
         }
-        else {
-            var oTargetTextObject = getTargetTextObject(this);
-            var nSelectStartPage = 0, bNoNeedRecalc = false;
-            if(oTargetTextObject)
+        var oTargetTextObject = getTargetTextObject(this);
+        var nSelectStartPage = 0, bNoNeedRecalc = false;
+        if(oTargetTextObject)
+        {
+            nSelectStartPage = oTargetTextObject.selectStartPage;
+        }
+        if((!(oTargetTextObject instanceof CShape)) && this.document)
+        {
+            if(this.selectedObjects.length === 1 && this.selectedObjects[0].parent)
             {
-                nSelectStartPage = oTargetTextObject.selectStartPage;
-            }
-            if(!oTargetTextObject && this.document)
-            {
-                if(this.selectedObjects.length === 1 && this.selectedObjects[0].parent)
+                var oShape =  this.selectedObjects[0].parent.isShapeChild(true);
+                if(oShape)
                 {
-                    var oShape =  this.selectedObjects[0].parent.isShapeChild(true);
-                    if(oShape)
-                    {
-                        oTargetTextObject = oShape;
-                        nSelectStartPage = this.selectedObjects[0].selectStartPage;
-                        bNoNeedRecalc = true;
-                    }
+                    oTargetTextObject = oShape;
+                    nSelectStartPage = this.selectedObjects[0].selectStartPage;
+                    bNoNeedRecalc = true;
                 }
             }
-            if (oTargetTextObject) {
+        }
+        if (oTargetTextObject) {
 
-                var oBodyPr = oTargetTextObject.getBodyPr && oTargetTextObject.getBodyPr();
-                if((oBodyPr && oBodyPr.prstTxWarp && oBodyPr.prstTxWarp.preset !== "textNoShape") || oTargetTextObject.checkContentWordArt && oTargetTextObject.checkContentWordArt(oTargetTextObject.getDocContent()))
+            var oBodyPr = oTargetTextObject.getBodyPr && oTargetTextObject.getBodyPr();
+            if((oBodyPr && oBodyPr.prstTxWarp && oBodyPr.prstTxWarp.preset !== "textNoShape") || oTargetTextObject.checkContentWordArt && oTargetTextObject.checkContentWordArt(oTargetTextObject.getDocContent()))
+            {
+                if (oTargetTextObject.recalcInfo.bRecalculatedTitle)
                 {
-                    if (oTargetTextObject.recalcInfo.bRecalculatedTitle)
+                    oTargetTextObject.recalcInfo.recalcTitle = null;
+                    oTargetTextObject.recalcInfo.bRecalculatedTitle = false;
+                    ExecuteNoHistory(function()
                     {
-                        oTargetTextObject.recalcInfo.recalcTitle = null;
-                        oTargetTextObject.recalcInfo.bRecalculatedTitle = false;
-                        ExecuteNoHistory(function()
+                        if(oTargetTextObject.bWordShape)
                         {
-                            if(oTargetTextObject.bWordShape)
+                            if(!bNoNeedRecalc)
                             {
-                                if(!bNoNeedRecalc)
+                                oTargetTextObject.recalcInfo.oContentMetrics = oTargetTextObject.recalculateTxBoxContent();
+                                oTargetTextObject.recalcInfo.recalculateTxBoxContent = false;
+                                oTargetTextObject.recalcInfo.AllDrawings = [];
+                                var oContent = oTargetTextObject.getDocContent();
+                                if(oContent)
                                 {
-                                    oTargetTextObject.recalcInfo.oContentMetrics = oTargetTextObject.recalculateTxBoxContent();
-                                    oTargetTextObject.recalcInfo.recalculateTxBoxContent = false;
-                                    oTargetTextObject.recalcInfo.AllDrawings = [];
-                                    var oContent = oTargetTextObject.getDocContent();
-                                    if(oContent)
-                                    {
-                                        oContent.Get_AllDrawingObjects(oTargetTextObject.recalcInfo.AllDrawings);
-                                    }
+                                    oContent.Get_AllDrawingObjects(oTargetTextObject.recalcInfo.AllDrawings);
                                 }
                             }
-                            else
-                            {
-                                oTargetTextObject.recalcInfo.oContentMetrics = oTargetTextObject.recalculateContent();
-                                oTargetTextObject.recalcInfo.recalculateContent = false;
-                            }
-                        }, this, []);
-
-                    }
-                    if (this.document)
-                    {
-                        this.document.DrawingDocument.OnRecalculatePage(nSelectStartPage, this.document.Pages[nSelectStartPage]);
-                        this.document.DrawingDocument.OnEndRecalculate(false, true);
-                    }
-                    else if (this.drawingObjects.cSld)
-                    {
-                        if (!(bNoRedraw === true))
-                        {
-                            editor.WordControl.m_oDrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
-                            editor.WordControl.m_oDrawingDocument.OnEndRecalculate(false, true);
                         }
-                    }
-                    else
+                        else
+                        {
+                            oTargetTextObject.recalcInfo.oContentMetrics = oTargetTextObject.recalculateContent();
+                            oTargetTextObject.recalcInfo.recalculateContent = false;
+                        }
+                    }, this, []);
+
+                }
+                if (this.document)
+                {
+                    nPageNum2 = nSelectStartPage;
+                }
+                else if (this.drawingObjects.cSld)
+                {
+                    if (!(bNoRedraw === true))
                     {
-                        oTargetTextObject.addToRecalculate();
-                        this.startRecalculate();
+                        nPageNum2 = this.drawingObjects.num;
                     }
                 }
-
+                else
+                {
+                    oTargetTextObject.addToRecalculate();
+                }
             }
 
+        }
+
+        if(isRealNumber(nPageNum1))
+        {
+            if(this.document)
+            {
+                this.document.DrawingDocument.OnRecalculatePage( nPageNum1, this.document.Pages[nPageNum1] );
+                this.document.DrawingDocument.OnEndRecalculate( false, true );
+            }
+            else if(this.drawingObjects.cSld)
+            {
+                if(!(bNoRedraw === true))
+                {
+                    editor.WordControl.m_oDrawingDocument.OnRecalculatePage( nPageNum1, this.drawingObjects );
+                    editor.WordControl.m_oDrawingDocument.OnEndRecalculate( false, true );
+                }
+            }
+            else
+            {
+                this.startRecalculate();
+            }
+        }
+        if(isRealNumber(nPageNum2) && nPageNum2 !== nPageNum1)
+        {
+
+            if(this.document)
+            {
+                this.document.DrawingDocument.OnRecalculatePage( nPageNum2, this.document.Pages[nPageNum2] );
+                this.document.DrawingDocument.OnEndRecalculate( false, true );
+            }
+            else if(this.drawingObjects.cSld)
+            {
+                if(!(bNoRedraw === true))
+                {
+                    editor.WordControl.m_oDrawingDocument.OnRecalculatePage( nPageNum2, this.drawingObjects );
+                    editor.WordControl.m_oDrawingDocument.OnEndRecalculate( false, true );
+                }
+            }
+            else
+            {
+                this.startRecalculate();
+            }
         }
 
     },

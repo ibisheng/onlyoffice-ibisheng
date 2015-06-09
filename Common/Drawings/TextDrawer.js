@@ -1,10 +1,26 @@
 var PATH_DIV_EPSILON = 0.1;
 
+
+
+function ParaDrawingStruct(nPageIndex, pDrawing)
+{
+    this.oDrawing = pDrawing;
+    this.nPageeIndex = nPageIndex;
+}
+ParaDrawingStruct.prototype.Draw = function(pGraphics)
+{
+    if(this.oDrawing)
+    {
+        this.oDrawing.Draw( 0, 0, pGraphics, this.nPageeIndex, 0)
+    }
+};
+
 function CDocContentStructure()
 {
     this.m_nType = DRAW_COMMAND_CONTENT;
     this.m_aContent = [];
     this.m_aByLines = null;
+    this.m_aDrawingsStruct = [];
  }
 
 CDocContentStructure.prototype.Recalculate = function(oTheme, oColorMap, dWidth, dHeight, oShape)
@@ -16,7 +32,12 @@ CDocContentStructure.prototype.Recalculate = function(oTheme, oColorMap, dWidth,
 };
 CDocContentStructure.prototype.draw = function(graphics, transform)
 {
-    for(var i = 0; i < this.m_aContent.length; ++i)
+    var i;
+    for(i = 0; i < this.m_aDrawingsStruct.length; ++i)
+    {
+        this.m_aDrawingsStruct[i].Draw(graphics);
+    }
+    for(i = 0; i < this.m_aContent.length; ++i)
     {
         this.m_aContent[i].draw(graphics, transform);
     }
@@ -368,6 +389,7 @@ function CTextDrawer(dWidth, dHeight, bDivByLInes)
     this.m_aStack = [];
     this.m_oDocContentStructure = null;
     this.m_aCommands = [];
+    this.m_aDrawings = [];
     // RFonts
     this.m_oTextPr      = null;
     this.m_oGrFonts     = new CGrRFonts();
@@ -606,8 +628,10 @@ CTextDrawer.prototype =
                     this.m_oDocContentStructure = oDocContentStructure;
                     this.m_oDocContentStructure.m_aByLines = this.m_aByLines;
                     this.m_oDocContentStructure.m_aByParagraphs = this.m_aByParagraphs;
+                    this.m_oDocContentStructure.m_aDrawingsStruct = this.m_aDrawings;
                     this.m_aByLines = [];
                     this.m_aByParagraphs = [];
+                    this.m_aDrawings = [];
                 }
                 if(this.m_bDivByLines)
                 {
@@ -1360,12 +1384,16 @@ CTextDrawer.prototype =
 
     SetTextPr : function(textPr, theme)
     {
-
+        var bNeedGetPath = false;
         if(!this.CheckCompareFillBrush(textPr, this.m_oTextPr))
+        {
+            bNeedGetPath = true;
+        }
+        this.m_oTextPr = textPr;
+        if(bNeedGetPath)
         {
             this.Get_PathToDraw(false, true);
         }
-        this.m_oTextPr = textPr;
         if (theme)
             this.m_oGrFonts.checkFromTheme(theme.themeElements.fontScheme, this.m_oTextPr.RFonts);
         else
@@ -1374,6 +1402,8 @@ CTextDrawer.prototype =
 
     CheckCompareFillBrush: function(oTextPr1, oTextPr2)
     {
+        if(!oTextPr1 && oTextPr2 || oTextPr1 && !oTextPr2)
+            return false;
         if(oTextPr1 && oTextPr2)
         {
             var oFill1 = this.GetFillFromTextPr(oTextPr1);
