@@ -321,3 +321,9 @@ var c_oAscFormulaRangeBorderColor = [
 
 var c_oAscLockNameFrozenPane	= "frozenPane";
 var c_oAscLockNameTabColor		= "tabColor";
+
+var c_oAscGetDefinedNamesList = {
+    Worksheet           :   0,
+    WorksheetWorkbook   :   1,
+    All                 :   2
+}

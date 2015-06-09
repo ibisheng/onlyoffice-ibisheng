@@ -2119,8 +2119,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			return this.wbModel.getWorksheet(index).getHidden();
 		};
 
-        spreadsheet_api.prototype.asc_getDefinedNames = function () {
-            return this.wb.getDefinedNames();
+        spreadsheet_api.prototype.asc_getDefinedNames = function (defNameListId) {
+            return this.wb.getDefinedNames(defNameListId);
         };
 
         spreadsheet_api.prototype.asc_setDefinedNames = function (defName) {

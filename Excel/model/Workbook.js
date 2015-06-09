@@ -874,7 +874,7 @@ DependencyGraph.prototype = {
             oRes = this.defNameList[nodeId],
             dfv, defNameSheetsList;
 
-        if ( null == oRes ) {
+        if ( null == oRes || null == oRes.Ref ) {
             dfv = new DefNameVertex( sheetId, defName, defRef, this.wb );
             oRes = (this.defNameList[dfv.nodeId] = dfv);
             defNameSheetsList = this.defNameSheets[dfv.sheetId];
@@ -933,6 +933,33 @@ DependencyGraph.prototype = {
         sheetNodeList[oldN.nodeId] = oldN;
 
         return oldN;
+    },
+    copyDefNameByWorksheet:function( oldSheetId, newSheetId ){
+
+        var obj = {}, oldS = this.defNameSheets[oldSheetId], defNamNode,
+            oldWS = this.wb.getWorksheetById(oldSheetId ),
+            newWS = this.wb.getWorksheetById(newSheetId);
+
+        for( var id in oldS ){
+            defNamNode = oldS[id].clone();
+            defNamNode.changeScope(newSheetId);
+
+            defNamNode.changeRefToNewSheet(oldWS.getName(),newWS.getName());
+
+            obj[defNamNode.nodeId] = defNamNode;
+            this.defNameList[defNamNode.nodeId] = defNamNode;
+        }
+
+        this.defNameSheets[newSheetId] = obj;
+
+    },
+    relinkDefNameByWorksheet:function (){
+
+        var oldS = this.defNameList;
+        for( var id in oldS ){
+            oldS[id].relinkRef();
+        }
+
     },
     saveDefName:function () {
         var list = [], defN;
@@ -1224,10 +1251,15 @@ function DefNameVertex( scope, defName, defRef, wb, isTable ) {
 //	this.sheetId = scope || "WB";
     this.cellId = defName.toLowerCase();
     this.Ref = defRef;
-    this.Name = defName
+    this.Name = defName;
     this.isTable = isTable;
     this.nodeId = getDefNameVertexId( this.sheetId, defName );
     this.wb = wb;
+
+    this.parsedRef = new parserFormula(this.Ref, "", this.wb.getWorksheet(0))
+    if( this.Ref ){
+        this.parsedRef.parse();
+    }
 
     //вершина которую мы прошли и поставили в очередь обхода
     this.isBlack = false;
@@ -1251,6 +1283,22 @@ function DefNameVertex( scope, defName, defRef, wb, isTable ) {
 DefNameVertex.prototype = {
 
     constructor:Vertex,
+
+    clone:function(){
+        return new DefNameVertex( this.sheetId, this.cellId, this.Ref , this.wb, this.isTable );
+    },
+
+    changeScope:function( newScope ){
+        this.sheetId = newScope === null || newScope === undefined ? "WB" : newScope;
+        this.nodeId = getDefNameVertexId( this.sheetId, this.Name );
+    },
+
+    changeRefToNewSheet:function( lastName, newName ){
+        if( this.parsedRef.isParsed ){
+            this.parsedRef = this.parsedRef.changeSheet( lastName, newName );
+            this.Ref = this.parsedRef.assemble();
+        }
+    },
 
     moveInner:function ( bboxTo ) {
         //удаляем старые ссылки slave и master
@@ -1440,6 +1488,12 @@ DefNameVertex.prototype = {
         this.Ref = newName.Ref;
         this.Name = newName.Name;
         this.nodeId = getDefNameVertexId( this.sheetId, newName.Name );
+    },
+
+    relinkRef:function(){
+        if( this.parsedRef.isParsed ){
+            this.Ref = this.parsedRef.assemble();
+        }
     }
 
 };
@@ -1829,6 +1883,9 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
 		this._updateWorksheetIndexes(wsActive);
 		History.TurnOn();
 		this._insertWorksheetFormula(insertBefore);
+
+        this.dependencyFormulas.copyDefNameByWorksheet( wsFrom.getId(), newSheet.getId() );
+
 		//для формул. создаем копию this.cwf[this.Id] для нового листа.
 		if ( this.cwf[wsFrom.getId()] ){
 			var cwf = { cells:{} };
@@ -1842,6 +1899,7 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
 			}
 			newSheet._BuildDependencies(cwf.cells);
 		}
+
 		sortDependency(this);
 		History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetAdd, null, null, new UndoRedoData_SheetAdd(insertBefore, newSheet.getName(), wsFrom.getId(), newSheet.getId()));
 		History.SetSheetUndo(wsActive.getId());
@@ -2181,14 +2239,45 @@ Workbook.prototype.isDefinedNamesExists = function ( name, sheetId ) {
     }
     return false;
 };
-Workbook.prototype.getDefinesNamesWB = function () {
-    var names = [], name;
+Workbook.prototype.getDefinesNamesWB = function (defNameListId) {
+    var names = [], name, thas = this;
 
-    for ( var id in this.dependencyFormulas.defNameList ) {
-        name = this.dependencyFormulas.defNameList[id].getAscCDefName()
-        if ( name.Ref ) {
-            names.push( name );
+    /*c_oAscGetDefinedNamesList.
+        Worksheet           :   0,
+        WorksheetWorkbook   :   1,
+        All*/
+
+    function getNames(id,arr){
+        var listDN = thas.dependencyFormulas.defNameSheets[id], name;
+        for ( var id in listDN ) {
+            name = listDN[id].getAscCDefName();
+            if ( name.Ref ) {
+                arr.push( name );
+            }
         }
+    }
+
+    var activeWS, listDN
+    switch(defNameListId){
+        case c_oAscGetDefinedNamesList.Worksheet:
+        case c_oAscGetDefinedNamesList.WorksheetWorkbook:
+            activeWS = this.getActiveWs();
+
+            getNames(activeWS.getId(),names);
+
+            if( c_oAscGetDefinedNamesList.WorksheetWorkbook ){
+                getNames("WB",names);
+            }
+            break;
+        case c_oAscGetDefinedNamesList.All:
+        default:
+            for ( var id in this.dependencyFormulas.defNameList ) {
+                name = this.dependencyFormulas.defNameList[id].getAscCDefName()
+                if ( name.Ref ) {
+                    names.push( name );
+                }
+            }
+            break;
     }
 
     return names;
@@ -2820,6 +2909,7 @@ Woorksheet.prototype.clone=function(sNewId){
 	}
 	if (this.sheetPr)
 		oNewWs.sheetPr = this.sheetPr.clone();
+
 	return oNewWs;
 };
 Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
@@ -2989,6 +3079,8 @@ Woorksheet.prototype.setName=function(name, bFromUndoRedo){
 		for(var id in this.workbook.cwf) {
 			this.workbook.getWorksheetById(id)._ReBuildFormulas(this.workbook.cwf[id].cells,lastName,this.sName);
 		}
+
+        this.workbook.dependencyFormulas.relinkDefNameByWorksheet(this.Id);
 
         if(!bFromUndoRedo)
         {
