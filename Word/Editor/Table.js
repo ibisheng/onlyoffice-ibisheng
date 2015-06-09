@@ -13534,7 +13534,7 @@ CTable.prototype =
                 // 5. Если в таблице сделать все ячейки нулевой ширины (для контента), и все равно она получается шире
                 //    максимальной допустимой ширины, тогда выставляем ширины всех колоно по минимальному значению
                 //    маргинов и оставляем так как есть
-                if ( MaxTableW < SumMinMargin )
+                if (MaxTableW - SumMinMargin < 0.001)
                 {
                     for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
                     {
@@ -13580,12 +13580,22 @@ CTable.prototype =
                     // 8. Если недостающего пространста больше, чем избыточного, тогда ищем разницу
                     //    (MaxTableW - SumMinMargin) и распределяем ее в отношении, как соотносятся
                     //    значения MinContent между собой.
-                    if ( SumN > SumI || SumI <= 0 )
+                    if (SumN > SumI || SumI < 0.001)
                     {
-                        var SumDiff = MaxTableW - SumMinMargin;
-                        for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
+                        if (SumMinContent > 0.001)
                         {
-                            this.TableGridCalc[CurCol] = MinMargin[CurCol] + SumDiff * MinContent[CurCol] / SumMinContent;
+                            var SumDiff = MaxTableW - SumMinMargin;
+                            for (var CurCol = 0; CurCol < GridCount; CurCol++)
+                            {
+                                this.TableGridCalc[CurCol] = MinMargin[CurCol] + SumDiff * MinContent[CurCol] / SumMinContent;
+                            }
+                        }
+                        else
+                        {
+                            for (var CurCol = 0; CurCol < GridCount; CurCol++)
+                            {
+                                this.TableGridCalc[CurCol] = MinMargin[CurCol];
+                            }
                         }
                     }
                     else
