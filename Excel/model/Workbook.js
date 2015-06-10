@@ -1835,11 +1835,8 @@ Workbook.prototype.createWorksheet=function(indexBefore, sName, sId){
 	History.TurnOff();
 	var wsActive = this.getActiveWs();
     var oNewWorksheet = new Woorksheet(this, this.aWorksheets.length, sId);
-	if(null != sName)
-	{
-		if(true == this.checkValidSheetName(sName))
-			oNewWorksheet.sName = sName;
-	}
+	if (this.checkValidSheetName(sName))
+		oNewWorksheet.sName = sName;
 	oNewWorksheet.initPostOpen();
 	if(null != indexBefore && indexBefore >= 0 && indexBefore < this.aWorksheets.length)
 		this.aWorksheets.splice(indexBefore, 0, oNewWorksheet);
@@ -1864,12 +1861,7 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
 		History.TurnOff();
 		var wsActive = this.getActiveWs();
 		var wsFrom = this.aWorksheets[index];
-		var newSheet = wsFrom.clone(sId);
-		if(null != sName)
-		{
-			if(true == this.checkValidSheetName(sName))
-				newSheet.sName = sName;
-		}
+		var newSheet = wsFrom.clone(sId, sName);
 		newSheet.initPostOpen();
 		if(null != insertBefore && insertBefore >= 0 && insertBefore < this.aWorksheets.length){
 			//помещаем новый sheet перед insertBefore
@@ -2025,7 +2017,7 @@ Workbook.prototype.findSheetNoHidden = function (nIndex) {
         }
     }
     return oRes;
-}
+};
 Workbook.prototype.removeWorksheet=function(nIndex, outputParams){
 	//проверяем останется ли хоть один нескрытый sheet
 	var bEmpty = true;
@@ -2110,7 +2102,7 @@ Workbook.prototype.checkUniqueSheetName=function(name){
 	return -1;
 };
 Workbook.prototype.checkValidSheetName=function(name){
-	return name.length < g_nSheetNameMaxLength;
+	return (name && name.length < g_nSheetNameMaxLength);
 };
 Workbook.prototype.getUniqueSheetNameFrom=function(name, bCopy){
 	var nIndex = 1;
@@ -2219,7 +2211,7 @@ Workbook.prototype.checkDefName = function ( checkName, scope ) {
 
     return defName ? defName.getAscCDefName() : true;
 
-}
+};
 Workbook.prototype.isDefinedNamesExists = function ( name, sheetId ) {
 
     var n = name.toLowerCase();
@@ -2281,7 +2273,7 @@ Workbook.prototype.getDefinesNamesWB = function (defNameListId) {
     }
 
     return names;
-}
+};
 Workbook.prototype.getDefinesNames = function ( name, sheetId ) {
 
     var res = this.dependencyFormulas.getDefNameNodeByName( name, sheetId );
@@ -2385,7 +2377,7 @@ Workbook.prototype.delDefinesNames = function ( defName ) {
 
     return retRes;
 
-}
+};
 Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
 
     var newN = newName.Name.toLowerCase(), retRes = null, rename = false;
@@ -2453,7 +2445,7 @@ Workbook.prototype.findDefinesNames = function ( ref, sheetId ) {
 
     return this.dependencyFormulas.getDefNameNodeByRef( ref, sheetId );
 
-}
+};
 Workbook.prototype.buildDependency = function(){
 	this.dependencyFormulas.clear();
 //	this.dependencyFormulas = null;
@@ -2716,12 +2708,7 @@ function Woorksheet(wb, _index, sId){
 	this.bHidden = false;
 	this.oSheetFormatPr = new SheetFormatPr();
 	this.index = _index;
-	this.Id = null;
-	if(null != sId)
-		this.Id = sId;
-	else
-		this.Id = g_oIdCounter.Get_NewId();
-
+	this.Id = null != sId ? sId : g_oIdCounter.Get_NewId();
 	this.nRowsCount = 0;
 	this.nColsCount = 0;
 	this.aGCells = {};// 0 based
@@ -2854,13 +2841,10 @@ Woorksheet.prototype.generateFontMap=function(oFontMap){
 		}
 	}
 };
-Woorksheet.prototype.clone=function(sNewId){
-	var oNewWs, i, elem, range;
-	if(null != sNewId)
-		oNewWs = new Woorksheet(this.workbook, this.workbook.aWorksheets.length, sNewId);
-	else
-		oNewWs = new Woorksheet(this.workbook, this.workbook.aWorksheets.length);
-	oNewWs.sName = this.workbook.getUniqueSheetNameFrom(this.sName, true);
+Woorksheet.prototype.clone=function(sNewId, sName){
+	var i, elem, range;
+	var oNewWs = new Woorksheet(this.workbook, this.workbook.aWorksheets.length, sNewId);
+	oNewWs.sName = this.workbook.checkValidSheetName(sName) ? sName : this.workbook.getUniqueSheetNameFrom(this.sName, true);
 	oNewWs.bHidden = this.bHidden;
 	oNewWs.oSheetFormatPr = this.oSheetFormatPr.clone();
 	oNewWs.index = this.index;
