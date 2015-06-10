@@ -14448,8 +14448,8 @@ CDocument.prototype.End_SilentMode = function(bUpdate)
     this.TurnOn_RecalculateCurPos(bUpdate);
     this.TurnOn_InterfaceEvents(bUpdate);
 };
-/*
- Начинаем селект с текущей точки. Если селект уже есть, тогда ничего не делаем.
+/**
+ * Начинаем селект с текущей точки. Если селект уже есть, тогда ничего не делаем.
  */
 CDocument.prototype.Start_SelectionFromCurPos = function()
 {
@@ -14478,7 +14478,7 @@ CDocument.prototype.Is_TrackingDrawingObjects = function()
 {
     return this.DrawingObjects.Check_TrackObjects();
 };
-/*
+/**
  * Получаем стиль по выделенному фрагменту.
  */
 CDocument.prototype.Get_StyleFromFormatting = function()
@@ -14506,7 +14506,7 @@ CDocument.prototype.Get_StyleFromFormatting = function()
         }
     }
 };
-/*
+/**
  * Добавляем новый стиль (или заменяем старый с таким же названием).
  */
 CDocument.prototype.Add_NewStyle = function(oStyle)
@@ -14540,6 +14540,14 @@ CDocument.prototype.Add_ChangedStyle = function(arrStylesId)
     {
         this.ChangedStyles[arrStylesId[nIndex]] = true;
     }
+};
+CDocument.prototype.Is_StyleDefault = function(sName)
+{
+    return this.Styles.Is_StyleDefault(sName);
+};
+CDocument.prototype.Is_DefaultStyleChanged = function(sName)
+{
+    return this.Styles.Is_DefaultStyleChanged(sName);
 };
 CDocument.prototype.Document_UpdateStylesPanel = function()
 {
@@ -14579,6 +14587,16 @@ CDocument.prototype.Get_AllParagraphsByNumbering = function(NumPr)
 CDocument.prototype.Get_AllParagraphsByStyle = function(StylesId)
 {
     return this.Get_AllParagraphs({Style : true, StylesId : StylesId});
+};
+CDocument.prototype.TurnOffHistory = function()
+{
+    this.History.TurnOff();
+    this.TableId.TurnOff();
+};
+CDocument.prototype.TurnOnHistory = function()
+{
+    this.TableId.TurnOn();
+    this.History.TurnOn();
 };
 //-----------------------------------------------------------------------------------
 //

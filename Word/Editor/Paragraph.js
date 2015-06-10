@@ -12849,8 +12849,23 @@ CParaDrawingRangeLines.prototype =
         {
             var PrevEl = this.Elements[Count - 1];
 
-            if ( Math.abs( PrevEl.y0 - Element.y0 ) < 0.001 && Math.abs( PrevEl.y1 - Element.y1 ) < 0.001 && Math.abs( PrevEl.x1 - Element.x0 ) < 0.001 && Math.abs( PrevEl.w - Element.w ) < 0.001 && PrevEl.r === Element.r && PrevEl.g === Element.g && PrevEl.b === Element.b
-                && ( (undefined === PrevEl.Additional && undefined === Element.Additional) || ( undefined !== PrevEl.Additional && undefined !== Element.Additional && ((undefined !== PrevEl.Additional.Active && PrevEl.Additional.Active === Element.Additional.Active) || (undefined !== PrevEl.Additional.RunPr && true === Element.Additional.RunPr.Is_Equal(PrevEl.Additional.RunPr))) ) ) )
+            if (Math.abs(PrevEl.y0 - Element.y0) < 0.001
+                && Math.abs(PrevEl.y1 - Element.y1) < 0.001
+                && Math.abs(PrevEl.x1 - Element.x0) < 0.001
+                && Math.abs(PrevEl.w - Element.w) < 0.001
+                && PrevEl.r === Element.r
+                && PrevEl.g === Element.g
+                && PrevEl.b === Element.b
+                && (false
+                    || (undefined === PrevEl.Additional
+                        && undefined === Element.Additional)
+                    || (undefined !== PrevEl.Additional
+                        && undefined !== Element.Additional
+                        && (false
+                            || (undefined !== PrevEl.Additional.Active
+                                && PrevEl.Additional.Active === Element.Additional.Active)
+                            || (undefined !== PrevEl.Additional.RunPr
+                                && true === Element.Additional.RunPr.Is_Equal(PrevEl.Additional.RunPr))))))
             {
                 Element.x0 = PrevEl.x0;
                 Count--;
