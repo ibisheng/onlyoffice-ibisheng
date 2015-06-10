@@ -1676,7 +1676,6 @@ var maxIndividualValues = 10000;
 						var diffRow = arnTo.r1 - arnFrom.r1;
 						var ref;
 						var range;
-						var newRange;
 						var oCurFilter;
 						//у найденных фильтров меняем Ref + скрытые строчки открываем
 						for(var i = 0; i < findFilters.length; i++)
@@ -1686,10 +1685,9 @@ var maxIndividualValues = 10000;
 							oCurFilter[i] = findFilters[i].clone(null);
 							ref = findFilters[i].Ref;
 							range = ref;
-							newRange = Asc.Range(range.c1 + diffCol, range.r1 + diffRow, range.c2 + diffCol, range.r2 + diffRow);
-							findFilters[i].Ref = newRange;
-							if(findFilters[i].AutoFilter)
-								findFilters[i].AutoFilter.Ref = newRange;
+							
+							//move ref
+							findFilters[i].moveRef(diffCol, diffRow);
 							
 							isUpdate = false;
 							if((findFilters[i].AutoFilter && findFilters[i].AutoFilter.FilterColumns && findFilters[i].AutoFilter.FilterColumns.length) || (findFilters[i].FilterColumns && findFilters[i].FilterColumns.length))
