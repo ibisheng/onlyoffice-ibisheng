@@ -432,7 +432,38 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.DocInfo = c_DocInfo;
 		};
 		spreadsheet_api.prototype.asc_getLocaleExample = function (val, number, date) {
+			var res = '';
+			var cultureInfo = g_aCultureInfos[val];
+			if(cultureInfo){
+				var prefixIndex = [0, 1, 2, 3, 9, 11, 12, 14];
+				var formatCurrency;
+				var formatCurrencyNumber = '#,##0.00';
+				var formatCurrencySymbol = '\"' + cultureInfo.CurrencySymbol + '\"';
+				if(-1 != prefixIndex.indexOf(cultureInfo.CurrencyNegativePattern))
+					formatCurrency = formatCurrencySymbol + formatCurrencyNumber;
+				else
+					formatCurrency = formatCurrencyNumber + formatCurrencySymbol;
+				var numFormatCurrency = oNumFormatCache.get(formatCurrency);
 
+				var dateElems = [];
+				for(var i = 0; i < cultureInfo.ShortDatePattern.length; ++i){
+					switch(cultureInfo.ShortDatePattern[i]){
+						case '0': dateElems.push('d'); break;
+						case '1': dateElems.push('m'); break;
+						case '2': dateElems.push('yyyy'); break;
+					}
+				}
+				var formatDate = dateElems.join('/');
+				formatDate += " h:mm";
+				if(cultureInfo.AMDesignator && cultureInfo.PMDesignator)
+					formatDate += " AM/PM";
+				var numFormatDate = oNumFormatCache.get(formatDate);
+				
+				res += numFormatCurrency.formatToChart(number);
+				res += '; ';
+				res += numFormatDate.formatToChart(date.getExcelDateWithTime());
+			}
+			return res;
 		};
 		spreadsheet_api.prototype.asc_setLocale = function (val) {
 			g_oDefaultCultureInfo = g_aCultureInfos[val];
