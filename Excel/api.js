@@ -3428,8 +3428,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					cFormulaFunctionToLocale[i] = localName;
 				}
 			}
-			if (this.wb)
-				this.wb.initFormulasList();
+			if (this.wb) this.wb.initFormulasList();
+			if (this.wbModel) this.wbModel.rebuildColors();
 		};
 
 		// offline mode
