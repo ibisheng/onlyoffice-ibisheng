@@ -1162,6 +1162,10 @@ $(document).ready(function(){
     contextGrad.fillRect(160, 0, 9, 128);
     colorSelecterClick = false;
 
+	function getURLParameter(name) {
+		return (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search) || [, null])[1];
+	}
+
     $("#colorSelectHolder").click(function(evnt,ui){
         if(colorSelecterClick){colorSelecterClick = false; return false;}
         $("#colorSelecter").offset({top:evnt.clientY-8,left:evnt.clientX-8});

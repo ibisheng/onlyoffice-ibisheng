@@ -150,6 +150,10 @@
 
 		document.addEventListener('DOMContentLoaded', function () 
 		{
+            function getURLParameter(name) {
+                return (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search) || [, null])[1];
+            }
+
 			setTimeout(function(){
             var sdkTop = 0, statusBarHeight = 0;
 			var html_element = document.getElementById("editor_sdk");

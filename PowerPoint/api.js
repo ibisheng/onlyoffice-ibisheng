@@ -5098,9 +5098,6 @@ asc_docs_api.prototype.sync_ContextMenuCallback = function(Data)
 
 var cCharDelimiter = String.fromCharCode(5);
 
-function getURLParameter(name) {
-    return (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1];
-}
 function sendCommand(editor, fCallback, rdata){
 	var sData;
 	var sRequestContentType = "application/json";

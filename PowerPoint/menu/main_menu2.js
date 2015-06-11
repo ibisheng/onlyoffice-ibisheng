@@ -9,6 +9,9 @@ var elem, contextGrad, gradient, gradSelectPosTop = 1, imgd, pix, colorSelecterC
 var IsVisibleMenu = false, specialHeaderForFirstPage = false,differentHeaderForOddAndEvenPages = false;
 var focusEditor = undefined, color123,bulletlistpressed=false,numberedlistpressed=false,cellsForTable={columns:0,rows:0},insttblpressed = false;
 var clearPropObj = false;
+function getURLParameter(name) {
+	return (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search) || [, null])[1];
+}
 function remIconPress(){
 	$("#td_BackgroundColor, #td_TextColor,#td_paragraph,#td_headertitle").removeClass("iconPressed");
 	if(insttblpressed==false && $("#td_instbl").hasClass("iconPressed")){

@@ -184,6 +184,9 @@ var Drag = {
     }
 };
 
+function getURLParameter(name) {
+	return (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search) || [, null])[1];
+}
 
 function remIconPress(){
 	$("#td_BackgroundColor, #td_TextColor,#td_paragraph,#td_headertitle").removeClass("iconPressed");

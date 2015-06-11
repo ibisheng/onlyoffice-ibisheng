@@ -6971,11 +6971,6 @@ asc_docs_api.prototype.asc_getAnchorPosition = function()
 };
 
 var cCharDelimiter = String.fromCharCode(5);
-
-function getURLParameter(name) {
-    return (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1];
-}
-
 function spellCheck (editor, rdata) {
 	//console.log("start - " + rdata);
 	// ToDo проверка на подключение
@@ -7001,12 +6996,6 @@ window["asc_nativeOnSpellCheck"] = function (response)
     if (editor.SpellCheckApi)
         editor.SpellCheckApi.onSpellCheck(response);
 };
-
-function _onSpellCheck_Callback2 (response)
-{
-	var incomeObject = JSON.parse(response);
-	SpellCheck_CallBack(incomeObject);
-}
 
 function sendCommand(editor, fCallback, rdata){
 	var sData;
