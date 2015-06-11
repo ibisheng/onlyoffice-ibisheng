@@ -131,6 +131,9 @@ function asc_docs_api(name)
     this.CoAuthoringApi.isPowerPoint = true;
 	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
+	this.CoAuthoringUrl = '';				// Ссылка сервиса для совместного редактирования
+	this.SpellCheckUrl = '';				// Ссылка сервиса для проверки орфографии
+
 	this.VersionHistory = null;				// Объект, который отвечает за точку в списке версий
     /**************************************/
 	// AutoSave
@@ -258,15 +261,9 @@ asc_docs_api.prototype._coAuthoringInit = function () {
         return; // Error
     }
 
-	if(undefined !== window['g_cAscCoAuthoringUrl'])
-		window.g_cAscCoAuthoringUrl = window['g_cAscCoAuthoringUrl'];
-	if (undefined !== window.g_cAscCoAuthoringUrl) {
-		//Turn off CoAuthoring feature if it disabled
-		if(!this.isCoAuthoringEnable)
-			window.g_cAscCoAuthoringUrl = "";
+	if (this.CoAuthoringUrl && this.isCoAuthoringEnable)
+		this._coAuthoringSetServerUrl(this.CoAuthoringUrl);
 
-		this._coAuthoringSetServerUrl(window.g_cAscCoAuthoringUrl);
-	}
 	if (null == this.User || null == this.User.asc_getId()) {
 		this.User = new Asc.asc_CUser();
 		this.User.asc_setId("Unknown");
@@ -742,7 +739,10 @@ asc_docs_api.prototype.asc_getEditorPermissions = function() {
 		sendCommand2(function (response) {t.asc_getEditorPermissionsCallback(response);}, _sendCommandCallback, rData);
 	} else {
 		var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
-		editor.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
+		this.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
+		// Фиктивно инициализируем
+		this.CoAuthoringUrl = window['g_cAscCoAuthoringUrl'] ? window['g_cAscCoAuthoringUrl'] : '';
+		this.SpellCheckUrl = window['g_cAscSpellCheckUrl'] ? window['g_cAscSpellCheckUrl'] : '';
 	}
 };
 
@@ -759,8 +759,8 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(response) {
 		var oSettings = JSON.parse(response["data"]);
 
 		//Set up coauthoring and spellcheker service
-		window.g_cAscCoAuthoringUrl = oSettings['g_cAscCoAuthoringUrl'];
-		window.g_cAscSpellCheckUrl = oSettings['g_cAscSpellCheckUrl'];
+		this.CoAuthoringUrl = oSettings['g_cAscCoAuthoringUrl'];
+		this.SpellCheckUrl = oSettings['g_cAscSpellCheckUrl'];
 
 		var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
 		var oEditorPermissions = new asc_CAscEditorPermissions(oSettings);
@@ -839,8 +839,6 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
     {
         window["AscDesktopEditor"]["SetDocumentName"](this.DocumentName);
     }
-	
-    var oThis = this;
 
     if (this.DocInfo.get_OfflineApp() === true)
     {
@@ -848,8 +846,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
         return;
     }
 
-    if (documentId)
-    {
+    if (documentId) {
         this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 		var rData = {
 			"id"			: documentId,
@@ -868,7 +865,8 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
     }
     else
     {
-        documentUrl =  "document/";
+		// ToDo убрать зависимость от this.FontLoader.fontFilesPath
+		documentUrl = this.FontLoader.fontFilesPath + "../PowerPoint/document/";
         this.DocInfo.put_OfflineApp(true);
 
         // For test create unique id
@@ -5277,8 +5275,8 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, ve
 {
 	this.DocumentUrl = "TeamlabNative";
 
-	window.g_cAscCoAuthoringUrl = "";
-	window.g_cAscSpellCheckUrl = "";
+	this.CoAuthoringUrl = '';
+	this.SpellCheckUrl = '';
 
 	this.User = new Asc.asc_CUser();
 	this.User.asc_setId("TM");

@@ -34,7 +34,6 @@
                 "../../Common/downloaderfiles.js",
                 "../../Common/docscoapicommon.js",
                 "../../Common/docscoapi.js",
-                "../../Common/docscoapisettings.js",
                 "../../Common/wordcopypaste.js",
                 "../../Common/editorscommon.js",
                 "../../PowerPoint/Drawing/ThemeLoader.js",

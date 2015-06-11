@@ -14,11 +14,9 @@
 			
                 "../../Common/Build/License.js",
                 "../../Common/browser.js",
-                "../../Common/docscoapisettings.js",
                 "../../Common/docscoapicommon.js",
                 "../../Common/docscoapi.js",
                 "../../Common/apiCommon.js",
-                "../../Common/spellcheckapisettings.js",
                 "../../Common/spellcheckapi.js",
                 "../../Common/wordcopypaste.js",
                 "../../Common/spellCheckLanguage.js",

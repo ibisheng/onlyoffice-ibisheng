@@ -100,6 +100,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.isCoAuthoringEnable = true;
 			this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
+			this.CoAuthoringUrl = '';				// Ссылка сервиса для совместного редактирования
+			this.SpellCheckUrl = '';				// Ссылка сервиса для проверки орфографии
+
 			this.VersionHistory = null;				// Объект, который отвечает за точку в списке версий
 
 			// AutoSave
@@ -600,6 +603,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				sendCommand2(function (response) {t._onGetEditorPermissions(response);}, this.fCallbackSendCommand, rdata);
 			} else {
 				this.handlers.trigger("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
+				// Фиктивно инициализируем
+				this.CoAuthoringUrl = window['g_cAscCoAuthoringUrl'] ? window['g_cAscCoAuthoringUrl'] : '';
+				this.SpellCheckUrl = window['g_cAscSpellCheckUrl'] ? window['g_cAscSpellCheckUrl'] : '';
 			}
 		};
 
@@ -1438,8 +1444,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				var oSettings = JSON.parse(response.data);
 
 				//Set up coauthoring and spellcheker service
-				window.g_cAscCoAuthoringUrl = oSettings['g_cAscCoAuthoringUrl'];
-				window.g_cAscSpellCheckUrl = oSettings['g_cAscSpellCheckUrl'];
+				this.CoAuthoringUrl = oSettings['g_cAscCoAuthoringUrl'];
+				this.SpellCheckUrl = oSettings['g_cAscSpellCheckUrl'];
 
 				var oEditorPermissions = new asc_CAscEditorPermissions(oSettings);
 
@@ -1511,23 +1517,17 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		spreadsheet_api.prototype._coAuthoringInit = function() {
 			var t = this;
 
-			if (undefined !== window['g_cAscCoAuthoringUrl'])
-				window.g_cAscCoAuthoringUrl = window['g_cAscCoAuthoringUrl'];
-			if (undefined !== window.g_cAscCoAuthoringUrl) {
-				//Turn off CoAuthoring feature if it disabled
-				if(!t.isCoAuthoringEnable)
-					window.g_cAscCoAuthoringUrl = "";
-
+			if (this.CoAuthoringUrl && this.isCoAuthoringEnable) {
 				// Если есть в настройках сервер, то выставляем его для соединения
-				t._coAuthoringSetServerUrl(window.g_cAscCoAuthoringUrl);
+				this._coAuthoringSetServerUrl(this.CoAuthoringUrl);
 			}
 
 			//Если User не задан, отключаем коавторинг.
-			if (null == t.User || null == t.User.asc_getId()) {
-				t.User = new asc.asc_CUser();
-				t.User.asc_setId("Unknown");
-				t.User.asc_setUserName("Unknown");
-				t._coAuthoringSetServerUrl("");
+			if (null == this.User || null == this.User.asc_getId()) {
+				this.User = new asc.asc_CUser();
+				this.User.asc_setId("Unknown");
+				this.User.asc_setUserName("Unknown");
+				this._coAuthoringSetServerUrl("");
 			}
 
 			this.collaborativeEditing = new asc_CCollaborativeEditing(/*handlers*/{
@@ -3593,8 +3593,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			asc["editor"] = this;
 
-			window.g_cAscCoAuthoringUrl = "";
-			window.g_cAscSpellCheckUrl = "";
+			this.CoAuthoringUrl = '';
+			this.SpellCheckUrl = '';
 
 			this.User = new asc.asc_CUser();
 			this.User.asc_setId("TM");

@@ -16,7 +16,6 @@
             "src": [
                 "../../Common/Build/License.js",
                 "../../Common/browser.js",
-                "../../Common/docscoapisettings.js",
                 "../../Common/docscoapicommon.js",
                 "../../Common/docscoapi.js",
                 "../../Common/downloaderfiles.js",

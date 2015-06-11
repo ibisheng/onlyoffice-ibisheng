@@ -424,6 +424,9 @@ function asc_docs_api(name)
 	// Spell Checking
 	this.SpellCheckApi = (window["AscDesktopEditor"] === undefined) ? new CSpellCheckApi() : new CSpellCheckApi_desktop();
 	this.isSpellCheckEnable = true;
+
+	this.CoAuthoringUrl = '';				// Ссылка сервиса для совместного редактирования
+	this.SpellCheckUrl = '';				// Ссылка сервиса для проверки орфографии
 	
 	// Chart
 	this.chartTranslate = new asc_CChartTranslate();
@@ -758,7 +761,10 @@ asc_docs_api.prototype.asc_getEditorPermissions = function() {
 			sendCommand2(function (response) {t.asc_getEditorPermissionsCallback(response);}, _sendCommandCallback, rData);
 		} else {
 			var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
-			editor.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
+			this.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
+			// Фиктивно инициализируем
+			this.CoAuthoringUrl = window['g_cAscCoAuthoringUrl'] ? window['g_cAscCoAuthoringUrl'] : '';
+			this.SpellCheckUrl = window['g_cAscSpellCheckUrl'] ? window['g_cAscSpellCheckUrl'] : '';
 		}
 	}
 };
@@ -784,8 +790,8 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(response) {
 		var oSettings = JSON.parse(response["data"]);
 
 		//Set up coauthoring and spellcheker service
-		window.g_cAscCoAuthoringUrl = oSettings['g_cAscCoAuthoringUrl'];
-		window.g_cAscSpellCheckUrl = oSettings['g_cAscSpellCheckUrl'];
+		this.CoAuthoringUrl = oSettings['g_cAscCoAuthoringUrl'];
+		this.SpellCheckUrl = oSettings['g_cAscSpellCheckUrl'];
 
 		var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
 		var oEditorPermissions = new asc_CAscEditorPermissions(oSettings);
@@ -881,8 +887,6 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
     {
         window["AscDesktopEditor"]["SetDocumentName"](this.DocumentName);
     }
-
-	var oThis = this;
 
     if (this.DocInfo.get_OfflineApp() === true)
     {
@@ -1346,15 +1350,9 @@ asc_docs_api.prototype._coAuthoringInit = function()
         return; // Error
 	}
 
-	if (undefined !== window['g_cAscCoAuthoringUrl'])
-		window.g_cAscCoAuthoringUrl = window['g_cAscCoAuthoringUrl'];
-	if (undefined !== window.g_cAscCoAuthoringUrl) {
-		//Turn off CoAuthoring feature if it disabled
-		if (!this.isCoAuthoringEnable)
-			window.g_cAscCoAuthoringUrl = "";
-			
-		this.CoAuthoringApi.set_url(window.g_cAscCoAuthoringUrl);
-	}
+	if (this.CoAuthoringUrl && this.isCoAuthoringEnable)
+		this.CoAuthoringApi.set_url(this.CoAuthoringUrl);
+
 	//Если User не задан, отключаем коавторинг.
 	if (null == this.User || null == this.User.asc_getId()) {
 		this.User = new Asc.asc_CUser();
@@ -1564,19 +1562,10 @@ asc_docs_api.prototype._coSpellCheckInit = function() {
 	if (!this.SpellCheckApi) {
 		return; // Error
 	}
-	
-	if(undefined !== window['g_cAscSpellCheckUrl'])
-		window.g_cAscSpellCheckUrl = window['g_cAscSpellCheckUrl'];
 
-    if (undefined === window["AscDesktopEditor"])
-    {
-        if(undefined !== window.g_cAscSpellCheckUrl) {
-            //Turn off SpellCheck feature if it disabled
-            if(!this.isSpellCheckEnable)
-                window.g_cAscSpellCheckUrl = "";
-
-            this.SpellCheckApi.set_url(window.g_cAscSpellCheckUrl);
-        }
+    if (!window["AscDesktopEditor"]) {
+        if (this.SpellCheckUrl && this.isSpellCheckEnable)
+            this.SpellCheckApi.set_url(this.SpellCheckUrl);
 
         this.SpellCheckApi.onSpellCheck	= function (e) {
             var incomeObject = JSON.parse(e);
@@ -1584,7 +1573,7 @@ asc_docs_api.prototype._coSpellCheckInit = function() {
         };
     }
 
-	this.SpellCheckApi.init (documentId);
+	this.SpellCheckApi.init(documentId);
 };
 
 asc_docs_api.prototype.asc_getSpellCheckLanguages = function() {
@@ -7512,8 +7501,8 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, ve
 {
 	this.DocumentUrl = "TeamlabNative";
 
-	window.g_cAscCoAuthoringUrl = "";
-	window.g_cAscSpellCheckUrl = "";
+	this.CoAuthoringUrl = '';
+	this.SpellCheckUrl = '';
 
 	this.User = new Asc.asc_CUser();
 	this.User.asc_setId("TM");

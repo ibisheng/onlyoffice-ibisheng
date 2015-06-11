@@ -22,11 +22,9 @@
             "src": [
                 "../../Common/Build/License.js",
                 "../../Common/browser.js",
-                "../../Common/docscoapisettings.js",
                 "../../Common/docscoapicommon.js",
                 "../../Common/docscoapi.js",
                 "../../Common/apiCommon.js",
-                "../../Common/spellcheckapisettings.js",
                 "../../Common/spellcheckapi.js",
                 "../../Common/wordcopypaste.js",
                 "../../Common/spellCheckLanguage.js",
@@ -216,12 +214,13 @@
                 "src": "document/**",
                 "dest": "<%= pkg.menu_path %>/Word/"
             },
-            "docscoapisettings": {
+            "apisettings": {
                 "expand": true,
                 "cwd": "../../Common/",
                 "src": [
                     "AllFonts.js",
                     "docscoapisettings.js",
+					"spellcheckapisettings.js",
                     "commonDefines.js",
                     "apiCommon.js",
                     "downloaderfiles.js",
