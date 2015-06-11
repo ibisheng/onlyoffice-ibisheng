@@ -1962,6 +1962,9 @@ function NumFormatCache()
 }
 NumFormatCache.prototype =
 {
+	cleanCache : function(){
+		this.oNumFormats = {};
+	},
     get : function(format)
     {
         var res = this.oNumFormats[format];
@@ -2565,6 +2568,9 @@ function GeneralEditFormatCache()
 }
 GeneralEditFormatCache.prototype =
 {
+	cleanCache : function(){
+		this.oCache = {};
+	},
     format: function (number, cultureInfo)
     {
         if (null == cultureInfo)
