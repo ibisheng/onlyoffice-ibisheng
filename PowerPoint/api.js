@@ -865,8 +865,6 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 		};
 			
         sendCommand( oThis, function(){}, rData );
-
-        this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, this.WordControl.m_nZoomType);
     }
     else
     {
@@ -876,9 +874,8 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
         // For test create unique id
         documentId = "test_presentation_id";
         this.OfflineAppDocumentStartLoad();
-
-        this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, this.WordControl.m_nZoomType);
     }
+	this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, this.WordControl.m_nZoomType);
 };
 
 asc_docs_api.prototype.SetFontsPath = function(path)

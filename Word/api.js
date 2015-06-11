@@ -925,7 +925,6 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 			sendCommand( oThis, function(){}, rData );
 		}
-		this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, 0);
 	}
 	else
     {
@@ -936,9 +935,9 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
         // For test create unique id
         documentId = "test_document_id";
         this.OfflineAppDocumentStartLoad();
-        this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, 0);
     }
 
+	this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, 0);
     this.asyncServerIdStartLoaded();
 };
 
