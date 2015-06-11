@@ -3361,16 +3361,9 @@ UndoRedoWoorksheet.prototype = {
 			{
 				worksheetView.autoFilters._cleanStyleTable(to);
 			}
-			if(g_oUndoRedoAutoFiltersMoveData)
-			{
-				worksheetView.autoFilters._moveAutoFilters(null, null, g_oUndoRedoAutoFiltersMoveData);
-				g_oUndoRedoAutoFiltersMoveData = null;
-			}
-			else
-			{
-				worksheetView.autoFilters.reDrawFilter(to);
-				worksheetView.autoFilters.reDrawFilter(from);
-			}
+
+			worksheetView.autoFilters.reDrawFilter(to);
+			worksheetView.autoFilters.reDrawFilter(from);
 		}
 		else if(historyitem_Worksheet_Merge == Type || historyitem_Worksheet_Unmerge == Type)
 		{
@@ -3712,7 +3705,6 @@ UndoRedoComment.prototype = {
 };
 
 var g_oUndoRedoAutoFilters = null;
-var g_oUndoRedoAutoFiltersMoveData = null;
 function UndoRedoAutoFilters(wb){
 	this.wb = wb;
 	this.nType = UndoRedoClassTypes.Add(function(){return g_oUndoRedoAutoFilters;});
@@ -3731,11 +3723,7 @@ UndoRedoAutoFilters.prototype = {
 		var api = window["Asc"]["editor"];
 		if (!api.wb)
 			return;
-		if(bUndo && Type == 6)
-		{
-			g_oUndoRedoAutoFiltersMoveData = Data;
-			return;
-		}
+		
 		var ws = api.wb.getWorksheetById(nSheetId);
 		Data.worksheet = ws;
 		var autoFilters = ws.autoFilters;

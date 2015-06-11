@@ -950,12 +950,12 @@ var maxIndividualValues = 10000;
 			// Undo
 			Undo: function (type, data) {
 				var aWs = this._getCurrentWS();
-				data = data.undo;
+				var undoData = data.undo;
 				var cloneData;
-				if(data.clone)
-					cloneData = data.clone(null);
+				if(undoData.clone)
+					cloneData = undoData.clone(null);
 				else
-					cloneData = data;
+					cloneData = undoData;
 					
 				if(!cloneData)
 					return;
@@ -978,8 +978,13 @@ var maxIndividualValues = 10000;
 						}
 					}
 				}
-
-				if(cloneData.FilterColumns || cloneData.AutoFilter || cloneData.TableColumns || (cloneData.Ref && (cloneData instanceof AutoFilter || cloneData instanceof TablePart)))
+				
+				//TODO переделать undo, по типам
+				if(type === historyitem_AutoFilter_Move)
+				{
+					this._moveAutoFilters(null, null, data);
+				}
+				else if(cloneData.FilterColumns || cloneData.AutoFilter || cloneData.TableColumns || (cloneData.Ref && (cloneData instanceof AutoFilter || cloneData instanceof TablePart)))
 				{
 					if(cloneData.Ref)
 					{
