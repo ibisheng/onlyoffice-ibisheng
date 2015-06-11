@@ -755,7 +755,7 @@ asc_docs_api.prototype.asc_getEditorPermissions = function() {
 			};
 
 			var t = this;
-			sendCommand(this, function (response) {t.asc_getEditorPermissionsCallback(response);}, rData);
+			sendCommand2(function (response) {t.asc_getEditorPermissionsCallback(response);}, _sendCommandCallback, rData);
 		} else {
 			var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
 			editor.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
@@ -775,7 +775,7 @@ asc_docs_api.prototype.asc_getLicense = function ()
 		var rdata = {
 			"c" 		: "getlicense"
 		};
-		sendCommand(this, function (response) {t._onGetLicense(response);}, rdata);
+		sendCommand2(function (response) {t._onGetLicense(response);}, _sendCommandCallback, rdata);
 	}
 };
 
@@ -910,7 +910,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 		{
 			rData['c'] = 'create';
 			rData['data'] = g_sEmpty_bin;
-			sendCommand( oThis, function(){}, rData );
+			sendCommand2(function(){}, _sendCommandCallback, rData);
 			editor.OpenDocument2(g_sResourceServiceLocalUrl + documentId + "/", g_sEmpty_bin);
 			if(this.InterfaceLocale)
 			{
@@ -923,7 +923,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 		{
 			rData['c'] = 'open';
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-			sendCommand( oThis, function(){}, rData );
+			sendCommand2(function(){}, _sendCommandCallback, rData);
 		}
 	}
 	else
@@ -2285,7 +2285,7 @@ asc_docs_api.prototype.asc_Print = function()
 				"format": documentFormat,
 				"c":"savefromorigin"};
 				
-			sendCommand(editor, function(incomeObject){
+			sendCommand2(function(incomeObject){
 				if(null != incomeObject && "save" == incomeObject["type"])
 					editor.processSavedFile(incomeObject["data"], false);
 				else{
@@ -2294,7 +2294,7 @@ asc_docs_api.prototype.asc_Print = function()
 					else
 						editor.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 				}
-				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);}, rData);
+				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);}, _sendCommandCallback, rData);
 		}
 		else
 			_downloadAs(this, "save", null, null, c_oAscFileType.PDF, function(incomeObject){
@@ -2518,7 +2518,7 @@ asc_docs_api.prototype.ClearCache = function(){
 		"format": documentFormat,
 		"c":"cc"};
 
-	sendCommand(editor, function(){}, rData);
+	sendCommand2(function(){}, _sendCommandCallback, rData);
 };
 
 asc_docs_api.prototype.SetFontRenderingMode = function(mode)
@@ -4842,11 +4842,11 @@ asc_docs_api.prototype.AddImageUrl = function(url, imgProp)
 
 			var oThis = this;
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-			sendCommand( oThis, function(incomeObject){
+			sendCommand2(function(incomeObject){
 				if(null != incomeObject && "imgurl" ==incomeObject["type"])
 					oThis.AddImageUrlAction(incomeObject["data"], imgProp);
 				oThis.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-				}, rData );
+				}, _sendCommandCallback, rData);
 		}
     }
 };
@@ -6970,7 +6970,6 @@ asc_docs_api.prototype.asc_getAnchorPosition = function()
     return new asc_CRect(AnchorPos.X0, AnchorPos.Y, AnchorPos.X1 - AnchorPos.X0, 0);
 };
 
-var cCharDelimiter = String.fromCharCode(5);
 function spellCheck (editor, rdata) {
 	//console.log("start - " + rdata);
 	// ToDo проверка на подключение
@@ -6997,117 +6996,100 @@ window["asc_nativeOnSpellCheck"] = function (response)
         editor.SpellCheckApi.onSpellCheck(response);
 };
 
-function sendCommand(editor, fCallback, rdata){
-	var sData;
-	var sRequestContentType = "application/json";
-	//json не должен превышать размера g_nMaxJsonLength, иначе при его чтении будет exception
-	if(null != rdata["data"] && "string" === typeof(rdata["data"]) && rdata["data"].length > g_nMaxJsonLengthChecked)
-	{
-		var sTemp = rdata["data"];
-		rdata["data"] = null;
-		sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(rdata) + cCharDelimiter + sTemp;
-		sRequestContentType = "application/octet-stream";
+function _sendCommandCallback (fCallback, error, result) {
+	if (error || !result) {
+		if("save" != rdata["c"] && "chsave" != rdata["c"])
+			editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
+		if(fCallback)
+			fCallback();
+		return;
 	}
-	else
-		sData = JSON.stringify(rdata);
-	asc_ajax({
-        type: 'POST',
-        url: g_sMainServiceLocalUrl,
-        data: sData,
-        contentType: sRequestContentType,
-        error: function(){
-				if("save" != rdata["c"] && "chsave" != rdata["c"])
-					editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
-				if(fCallback)
-					fCallback();
-            },
-        success: function(msg){
-			var incomeObject = JSON.parse(msg), rData;
-			switch (incomeObject["type"]) {
-			    case "updateversion":
-					if (editor.isViewMode)
-						_onOpenCommand(fCallback, incomeObject);
-					else
-						editor.asc_fireCallback("asc_onDocumentUpdateVersion", function () {
-							editor.SetViewMode(true);
-							_onOpenCommand(fCallback, incomeObject);
-						});
-					break;
-			    case "open":
-					_onOpenCommand(fCallback, incomeObject);
-                	break;
-				case "needparams":
-					//todo dialog
-					rData = {
-						"id":documentId,
-						"userid": documentUserId,
-						"format": documentFormat,
-						"vkey": documentVKey,
-						"editorid": c_oEditorId.Word,
-						"c":"reopen",
-						"url": documentUrl,
-						"title": documentTitle,
-						"codepage": documentFormatSaveTxtCodepage,
-						"embeddedfonts": editor.isUseEmbeddedCutFonts};
-						
-                    sendCommand(editor, fCallback,  rData);
-                break;
-                case "waitopen":
-                    if (incomeObject["data"])
-                    {
-                        editor._lastConvertProgress = incomeObject["data"] / 2;
-                        editor.sync_SendProgress(editor._lastConvertProgress);
-                    }
-					rData = {
-						"id": documentId,
-						"userid": documentUserId,
-						"format": documentFormat,
-						"vkey": documentVKey,
-						"editorid": c_oEditorId.Word,
-						"c": "chopen"};
-						
-                    setTimeout( function(){sendCommand(editor, fCallback,  rData)}, 3000);
-                break;
-                case "save":
-					if(fCallback)
-						fCallback(incomeObject);
-                break;
-                case "waitsave":
-				{
-					rData = {
-						"id":documentId,
-						"userid": documentUserId,
-						"vkey": documentVKey,
-						"title": documentTitleWithoutExtention,
-						"c": "chsave",
-						"data": incomeObject["data"]};
 
-                    setTimeout( function(){sendCommand(editor, fCallback, rData)}, 3000);
-				}
-                break;
-				case "getsettings":
-					if(fCallback)
-                        fCallback(incomeObject);
-				break;
-                case "err":
-					if("save" != rdata["c"] && "chsave" != rdata["c"]){
-						var nErrorLevel = c_oAscError.Level.NoCritical;
-						//todo передалеть работу с callback
-						if("getsettings" == rdata["c"] || "open" == rdata["c"] || "chopen" == rdata["c"] || "create" == rdata["c"])
-							nErrorLevel = c_oAscError.Level.Critical;
-						editor.asc_fireCallback("asc_onError", _mapAscServerErrorToAscError(parseInt(incomeObject["data"])), nErrorLevel);
-					}
-					if(fCallback)
-						fCallback(incomeObject);
-                break;
-				default:
-					if(fCallback)
-                        fCallback(incomeObject);
-				break;
-            }
+	var rData;
+	switch (result["type"]) {
+		case "updateversion":
+			if (editor.isViewMode)
+				_onOpenCommand(fCallback, result);
+			else
+				editor.asc_fireCallback("asc_onDocumentUpdateVersion", function () {
+					editor.SetViewMode(true);
+					_onOpenCommand(fCallback, result);
+				});
+			break;
+		case "open":
+			_onOpenCommand(fCallback, result);
+			break;
+		case "needparams":
+			//todo dialog
+			rData = {
+				"id":documentId,
+				"userid": documentUserId,
+				"format": documentFormat,
+				"vkey": documentVKey,
+				"editorid": c_oEditorId.Word,
+				"c":"reopen",
+				"url": documentUrl,
+				"title": documentTitle,
+				"codepage": documentFormatSaveTxtCodepage,
+				"embeddedfonts": editor.isUseEmbeddedCutFonts};
+
+			sendCommand2(fCallback, _sendCommandCallback, rData);
+			break;
+		case "waitopen":
+			if (result["data"])
+			{
+				editor._lastConvertProgress = result["data"] / 2;
+				editor.sync_SendProgress(editor._lastConvertProgress);
+			}
+			rData = {
+				"id": documentId,
+				"userid": documentUserId,
+				"format": documentFormat,
+				"vkey": documentVKey,
+				"editorid": c_oEditorId.Word,
+				"c": "chopen"};
+
+			setTimeout( function(){sendCommand2(fCallback, _sendCommandCallback, rData)}, 3000);
+			break;
+		case "save":
+			if(fCallback)
+				fCallback(result);
+			break;
+		case "waitsave":
+		{
+			rData = {
+				"id":documentId,
+				"userid": documentUserId,
+				"vkey": documentVKey,
+				"title": documentTitleWithoutExtention,
+				"c": "chsave",
+				"data": result["data"]};
+
+			setTimeout( function(){sendCommand2(fCallback, _sendCommandCallback, rData)}, 3000);
 		}
-	});
+			break;
+		case "getsettings":
+			if(fCallback)
+				fCallback(result);
+			break;
+		case "err":
+			if("save" != rdata["c"] && "chsave" != rdata["c"]){
+				var nErrorLevel = c_oAscError.Level.NoCritical;
+				//todo передалеть работу с callback
+				if("getsettings" == rdata["c"] || "open" == rdata["c"] || "chopen" == rdata["c"] || "create" == rdata["c"])
+					nErrorLevel = c_oAscError.Level.Critical;
+				editor.asc_fireCallback("asc_onError", _mapAscServerErrorToAscError(parseInt(result["data"])), nErrorLevel);
+			}
+			if(fCallback)
+				fCallback(result);
+			break;
+		default:
+			if(fCallback)
+				fCallback(result);
+			break;
+	}
 }
+
 function sendTrack(fCallback, url, rdata){
 	asc_ajax({
         type: 'POST',
@@ -7194,9 +7176,9 @@ function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, fi
 				aRowOut.push(oRow[j]);
 			aJsonOut.push(aRowOut);
 		}
-		oAdditionalData["data"] += cCharDelimiter + JSON.stringify(aJsonOut);
+		oAdditionalData["data"] += g_cCharDelimiter + JSON.stringify(aJsonOut);
 	}
-	g_fSaveWithParts(function(fCallback1, oAdditionalData1){sendCommand(editor, fCallback1, oAdditionalData1);}, fCallback, oAdditionalData);
+	g_fSaveWithParts(function(fCallback1, oAdditionalData1){sendCommand2(fCallback1, _sendCommandCallback, oAdditionalData1);}, fCallback, oAdditionalData);
 }
 
 function _addImageUrl2 (url)

@@ -8339,7 +8339,7 @@
 					api.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 					
 					var rData = {"id": api.documentId, "c":"imgurls", "vkey": api.documentVKey, "data": JSON.stringify(val._images)};
-					api._asc_sendCommand(function(incomeObject){
+					sendCommand2(function(incomeObject){
 						if(incomeObject && "imgurls" == incomeObject.type)
 						{
 							var oFromTo = JSON.parse(incomeObject.data);
@@ -8367,7 +8367,7 @@
 						if(val.onlyImages !== true)
 							t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
 						api.wb.clipboard._insertImagesFromBinaryWord(t, val, aImagesSync);
-					}, rData );
+					}, api.fCallbackSendCommand, rData);
 					
 				}
 				else if(val.onlyImages !== true)

@@ -10,7 +10,7 @@ var g_nAllColIndex = -1;
 var g_nAllRowIndex = -1;
 var aStandartNumFormats;
 var aStandartNumFormatsId;
-var start, end, cCharDelimiter = String.fromCharCode(5), arrRecalc = {}, lc = 0;
+var start, end, arrRecalc = {}, lc = 0;
 
 var c_oRangeType =
 {
@@ -1499,10 +1499,10 @@ DefNameVertex.prototype = {
 };
 
 function getVertexId(sheetId, cellId){
-	return sheetId + cCharDelimiter + cellId;
+	return sheetId + g_cCharDelimiter + cellId;
 }
 function getDefNameVertexId(scope, name){
-	return ( scope === null || scope === undefined ? "WB" : scope ) + cCharDelimiter + name.toLowerCase();
+	return ( scope === null || scope === undefined ? "WB" : scope ) + g_cCharDelimiter + name.toLowerCase();
 }
 function lockDraw(wb){
     lc++;

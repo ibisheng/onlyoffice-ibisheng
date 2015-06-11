@@ -2013,7 +2013,7 @@
 				{
 					var rData = {"id": api.documentId, "c":"imgurls", "vkey": api.documentVKey, "data": JSON.stringify(aImagesToDownload)};
 					
-					api._asc_sendCommand(function(incomeObject){
+					sendCommand2(function(incomeObject){
 							if(incomeObject && "imgurls" == incomeObject.type)
 							{
 								if(incomeObject && "imgurls" == incomeObject.type)
@@ -2041,7 +2041,7 @@
 							
 							callback();
 							
-						}, rData );
+						}, api.fCallbackSendCommand, rData);
 				}
 				else
 					callback();
@@ -2299,13 +2299,13 @@
 					//TODO не вставляется картинка из EXCEL  - стоит base64 грузить на сервер bug 22957
 					if(false == (/*0 == src.indexOf("data:") ||*/ 0 == src.indexOf(api.documentUrl) || 0 == src.indexOf(api.documentUrl)))
 						aImagesToDownload.push(src);
-				};
+				}
 				
 				if(aImagesToDownload.length > 0)
 				{
 					var rData = {"id": api.documentId, "c":"imgurls", "vkey": api.documentVKey, "data": JSON.stringify(aImagesToDownload)};
 					
-					api._asc_sendCommand(function(incomeObject){
+					sendCommand2(function(incomeObject){
 							if(incomeObject && "imgurls" == incomeObject.type)
 							{
 								var oFromTo = JSON.parse(incomeObject.data);
@@ -2334,7 +2334,7 @@
 							
 							t._pasteResult(aResult, worksheet);
 							
-						}, rData );
+						}, api.fCallbackSendCommand, rData);
 				}
 				else
 					t._pasteResult(aResult, worksheet);

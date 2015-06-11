@@ -7,6 +7,7 @@ var g_sTrackingServiceLocalUrl = "/TrackingService.ashx";
 var g_nMaxJsonLength = 2097152;
 var g_nMaxJsonLengthChecked = g_nMaxJsonLength / 1000;
 var g_nMaxRequestLength = 1048576;//<requestLimits maxAllowedContentLength="30000000" /> default 30mb
+var g_cCharDelimiter = String.fromCharCode(5);
 
 function OpenFileResult () {
 	this.bSerFormat = false;
@@ -96,6 +97,39 @@ function g_fOpenFileCommand (binUrl, changesUrl, Signature, callback) {
 		});
 	} else
 		bEndLoadChanges = true;
+}
+
+function sendCommand2 (fCallback, callback, rdata) {
+	var sData;
+	var sRequestContentType = "application/json";
+	//json не должен превышать размера g_nMaxJsonLength, иначе при его чтении будет exception
+	if (null != rdata["data"] && "string" === typeof(rdata["data"]) && rdata["data"].length > g_nMaxJsonLengthChecked) {
+		var sTemp = rdata["data"];
+		rdata["data"] = null;
+		sData = "mnuSaveAs" + g_cCharDelimiter + JSON.stringify(rdata) + g_cCharDelimiter + sTemp;
+		sRequestContentType = "application/octet-stream";
+	} else
+		sData = JSON.stringify(rdata);
+
+	asc_ajax({
+		type: 'POST',
+		url: g_sMainServiceLocalUrl,
+		data: sData,
+		contentType: sRequestContentType,
+		error: function () { callback(fCallback, true); },
+		success: function (msg) {
+			if (!msg || msg.length < 1) {
+				//result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
+				//oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
+				//if(callback)
+				//	callback(result);
+				callback(fCallback, true);
+			} else {
+				callback(fCallback, false, JSON.parse(msg));
+			}
+		},
+		dataType: 'text'
+	});
 }
 
 function fSortAscending( a, b ) {

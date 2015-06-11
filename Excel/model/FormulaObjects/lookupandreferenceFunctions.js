@@ -1202,7 +1202,7 @@ VHLOOKUPCache.prototype.get = function ( range, valueForSearching, isValueString
     var res = null;
     var _this = this;
     var wsId = range.getWorksheet().getId();
-    var sRangeName = wsId + cCharDelimiter + range.getName();
+    var sRangeName = wsId + g_cCharDelimiter + range.getName();
     var cacheElem = this.cacheId[sRangeName];
     if ( null == cacheElem ) {
         cacheElem = {id:sRangeName, foreachArray:[], results:{}};
@@ -1221,7 +1221,7 @@ VHLOOKUPCache.prototype.get = function ( range, valueForSearching, isValueString
         }
         cacheRange.add( range.getBBox0(), cacheElem );
     }
-    var sInputKey = valueForSearching + cCharDelimiter + isValueString + cCharDelimiter + arg3Value;
+    var sInputKey = valueForSearching + g_cCharDelimiter + isValueString + g_cCharDelimiter + arg3Value;
     res = cacheElem.results[sInputKey];
     if ( null == res ) {
         res = this._calculate( cacheElem.foreachArray, valueForSearching, isValueString, arg3Value );

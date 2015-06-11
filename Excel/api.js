@@ -157,6 +157,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			this.TrackFile = null;
 
+			this.fCallbackSendCommand = null;
+
 			this._init();
 			return this;
 		}
@@ -172,6 +174,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			}
 
 			this.formulasList = getFormulasInfo();
+
+			this.fCallbackSendCommand = function (fCallback, error, result) {
+				t._sendCommandCallback(fCallback, error, result);
+			};
 		};
 
 		spreadsheet_api.prototype._onDragOverImage = function(e) {
@@ -591,7 +597,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					"vkey"		: this.DocInfo["VKey"],
 					"editorid"	: c_oEditorId.Spreadsheet
 				};
-				this._asc_sendCommand(function (response) {t._onGetEditorPermissions(response);}, rdata);
+				sendCommand2(function (response) {t._onGetEditorPermissions(response);}, this.fCallbackSendCommand, rdata);
 			} else {
 				this.handlers.trigger("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
 			}
@@ -602,7 +608,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			var rdata = {
 				"c": "getlicense"
 			};
-			this._asc_sendCommand(function (response) {t._onGetLicense(response);}, rdata);
+			sendCommand2(function (response) {t._onGetLicense(response);}, this.fCallbackSendCommand, rdata);
 		};
 
 		spreadsheet_api.prototype.asc_DownloadAs = function(typeFile) {//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
@@ -852,7 +858,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							"delimiter": option.asc_getDelimiter(),
 							"codepage": option.asc_getCodePage()};
 
-						this._asc_sendCommand(function (response) {t._startOpenDocument(response);}, v);
+						sendCommand2(function (response) {t._startOpenDocument(response);}, this.fCallbackSendCommand, v);
 					} else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save) {
 						this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
 						this._asc_downloadAs(c_oAscFileType.CSV, function (incomeObject) {
@@ -886,148 +892,114 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			return this.wbModel.getWorksheet(sheetIndex).PagePrintOptions;
 		};
 
-		spreadsheet_api.prototype._asc_sendCommand = function (callback, rdata) {
-			var sData;
-			var sRequestContentType = "application/json";
-			//json не должен превышать размера g_nMaxJsonLength, иначе при его чтении будет exception
-			if(null != rdata["data"] && "string" === typeof(rdata["data"]) && rdata["data"].length > g_nMaxJsonLengthChecked)
-			{
-				var sTemp = rdata["data"];
-				rdata["data"] = null;
-				sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(rdata) + cCharDelimiter + sTemp;
-				sRequestContentType = "application/octet-stream";
+		spreadsheet_api.prototype._sendCommandCallback = function (fCallback, error, result) {
+			if (error || !result) {
+				this.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
+				if(fCallback)
+					fCallback({returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown});
+				return;
 			}
-			else
-				sData = JSON.stringify(rdata);
-			var oThis = this;
-			asc_ajax({
-				type: 'POST',
-				url: g_sMainServiceLocalUrl,
-				data: sData,
-				contentType: sRequestContentType,
-				error: function(){
-					var result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
-					oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
-					if(callback)
-						callback(result);
-				},
-				success: function(msg){
-					var result, rData, codePageCsv, delimiterCsv;
-					if(!msg || msg.length < 1){
-						result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
-						oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
-						if(callback)
-							callback(result);
-					} else{
-						var incomeObject = JSON.parse(msg);
-						switch( incomeObject["type"] ){
-							case "updateversion":
-								if (oThis.asc_getViewerMode())
-									oThis._onOpenCommand(callback, incomeObject["data"]);
-								else
-									oThis.handlers.trigger("asc_onDocumentUpdateVersion", function () {
-										oThis.asc_setViewerMode(true);
-										oThis._onOpenCommand(callback, incomeObject["data"]);
-									});
-								break;
-							case "open":
-								oThis._onOpenCommand(callback, incomeObject["data"]);
-								break;
-							case "needparams":
-								// Проверяем, возможно нам пришли опции для CSV
-								if (oThis.documentOpenOptions) {
-									codePageCsv = oThis.documentOpenOptions["codePage"];
-									delimiterCsv = oThis.documentOpenOptions["delimiter"];
-									if (null !== codePageCsv && undefined !== codePageCsv &&
-										null !== delimiterCsv && undefined !== delimiterCsv) {
-										oThis.asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV,
-											new asc.asc_CCSVAdvancedOptions(codePageCsv, delimiterCsv));
-										break;
-									}
-								}
-								asc_ajax({
-									url: incomeObject["data"],
-									dataType: "text",
-									success: function(result) {
-										var cp = JSON.parse(result);
-										oThis.handlers.trigger("asc_onAdvancedOptions",  new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV,cp), oThis.advancedOptionsAction);
-										//var value = {url: oThis.documentUrl, delimiter: c_oAscCsvDelimiter.Comma, codepage: 65001}; //65001 - utf8
-										//oThis._asc_sendCommand(callback, "opencsv", oThis.documentTitle, value);
-									},
-									error:function(){
-										result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
-										oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
-										if(callback)
-											callback(result);
-									}
-								});
-								break;
-							case "getcodepage":
-								// Проверяем, возможно нам пришли опции для CSV
-								if (oThis.documentOpenOptions) {
-									codePageCsv = oThis.documentOpenOptions["codePage"];
-									delimiterCsv = oThis.documentOpenOptions["delimiter"];
-									if (null !== codePageCsv && undefined !== codePageCsv &&
-										null !== delimiterCsv && undefined !== delimiterCsv) {
-										oThis.asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV,
-											new asc.asc_CCSVAdvancedOptions(codePageCsv, delimiterCsv));
-										break;
-									}
-								}
-								var cp = JSON.parse(incomeObject["data"]);
-								oThis.handlers.trigger("asc_onAdvancedOptions",  new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV,cp), oThis.advancedOptionsAction);
-								//var value = {url: oThis.documentUrl, delimiter: c_oAscCsvDelimiter.Comma, codepage: 65001}; //65001 - utf8
-								//oThis._asc_sendCommand(callback, "opencsv", oThis.documentTitle, value);
-								break;
-							case "save":
-								if(callback)
-									callback(incomeObject);
-								break;
-							case "waitopen":
-								rData = {
-									"id":oThis.documentId,
-									"userid": oThis.documentUserId,
-									"format": oThis.documentFormat,
-									"vkey": oThis.documentVKey,
-									"editorid": c_oEditorId.Spreadsheet,
-									"c":"chopen"};
 
-								setTimeout(function(){oThis._asc_sendCommand(callback, rData);}, 3000);
-								break;
-							case "waitsave":
-								rData = {
-									"id": oThis.documentId,
-									"userid": oThis.documentUserId,
-									"vkey": oThis.documentVKey,
-									"title": oThis.documentTitleWithoutExtention,
-									"c": "chsave",
-									"data": incomeObject["data"]};
-
-								setTimeout(function(){oThis._asc_sendCommand(callback, rData);}, 3000);
-								break;
-							case "getsettings":
-								if(callback)
-									callback(incomeObject);
-								break;
-							case "err":
-								var nErrorLevel = c_oAscError.Level.NoCritical;
-								var errorId = incomeObject["data"] >> 0;
-								//todo передалеть работу с callback
-								if("getsettings" == rdata["c"] || "open" == rdata["c"] || "chopen" == rdata["c"] || "create" == rdata["c"])
-									nErrorLevel = c_oAscError.Level.Critical;
-								result = {returnCode: nErrorLevel, val:errorId};
-								oThis.handlers.trigger("asc_onError", oThis.asc_mapAscServerErrorToAscError(errorId), nErrorLevel);
-								if(callback)
-									callback(result);
-								break;
-							default:
-								if(callback)
-									callback(incomeObject);
-								break;
+			var t = this, rData, codePageCsv, delimiterCsv;
+			switch (result["type"]) {
+				case "updateversion":
+					if (this.asc_getViewerMode())
+						this._onOpenCommand(fCallback, result["data"]);
+					else
+						this.handlers.trigger("asc_onDocumentUpdateVersion", function () {
+							t.asc_setViewerMode(true);
+							t._onOpenCommand(fCallback, result["data"]);
+						});
+					break;
+				case "open":
+					this._onOpenCommand(fCallback, result["data"]);
+					break;
+				case "needparams":
+					// Проверяем, возможно нам пришли опции для CSV
+					if (this.documentOpenOptions) {
+						codePageCsv = this.documentOpenOptions["codePage"];
+						delimiterCsv = this.documentOpenOptions["delimiter"];
+						if (null !== codePageCsv && undefined !== codePageCsv &&
+							null !== delimiterCsv && undefined !== delimiterCsv) {
+							this.asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV,
+								new asc.asc_CCSVAdvancedOptions(codePageCsv, delimiterCsv));
+							break;
 						}
 					}
-				},
-				dataType: "text"});
+					asc_ajax({
+						url: result["data"],
+						dataType: "text",
+						success: function(result) {
+							var cp = JSON.parse(result);
+							t.handlers.trigger("asc_onAdvancedOptions",  new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV,cp), t.advancedOptionsAction);
+						},
+						error:function(){
+							t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
+							if(fCallback)
+								fCallback({returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown});
+						}
+					});
+					break;
+				case "getcodepage":
+					// Проверяем, возможно нам пришли опции для CSV
+					if (this.documentOpenOptions) {
+						codePageCsv = this.documentOpenOptions["codePage"];
+						delimiterCsv = this.documentOpenOptions["delimiter"];
+						if (null !== codePageCsv && undefined !== codePageCsv &&
+							null !== delimiterCsv && undefined !== delimiterCsv) {
+							this.asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV,
+								new asc.asc_CCSVAdvancedOptions(codePageCsv, delimiterCsv));
+							break;
+						}
+					}
+					var cp = JSON.parse(result["data"]);
+					this.handlers.trigger("asc_onAdvancedOptions",  new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV,cp), this.advancedOptionsAction);
+					break;
+				case "save":
+					if(fCallback)
+						fCallback(result);
+					break;
+				case "waitopen":
+					rData = {
+						"id":this.documentId,
+						"userid": this.documentUserId,
+						"format": this.documentFormat,
+						"vkey": this.documentVKey,
+						"editorid": c_oEditorId.Spreadsheet,
+						"c":"chopen"};
+
+					setTimeout(function(){sendCommand2(fCallback, t.fCallbackSendCommand, rData);}, 3000);
+					break;
+				case "waitsave":
+					rData = {
+						"id": this.documentId,
+						"userid": this.documentUserId,
+						"vkey": this.documentVKey,
+						"title": this.documentTitleWithoutExtention,
+						"c": "chsave",
+						"data": result["data"]};
+
+					setTimeout(function(){sendCommand2(fCallback, t.fCallbackSendCommand, rData);}, 3000);
+					break;
+				case "getsettings":
+					if(fCallback)
+						fCallback(result);
+					break;
+				case "err":
+					var nErrorLevel = c_oAscError.Level.NoCritical;
+					var errorId = result["data"] >> 0;
+					//todo передалеть работу с callback
+					if("getsettings" == rdata["c"] || "open" == rdata["c"] || "chopen" == rdata["c"] || "create" == rdata["c"])
+						nErrorLevel = c_oAscError.Level.Critical;
+					this.handlers.trigger("asc_onError", this.asc_mapAscServerErrorToAscError(errorId), nErrorLevel);
+					if(fCallback)
+						fCallback({returnCode: nErrorLevel, val:errorId});
+					break;
+				default:
+					if(fCallback)
+						fCallback(result);
+					break;
+			}
 		};
 
 		spreadsheet_api.prototype._asc_sendTrack = function (callback, url, rdata) {
@@ -1113,14 +1085,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					var sEmptyWorkbook = getEmptyWorkbook();
 					v["c"] = "create";
 					v["data"] = sEmptyWorkbook;
-					this._asc_sendCommand (fCallback, v);
+					sendCommand2(fCallback, this.fCallbackSendCommand, v);
 					var wb = this.asc_OpenDocument(g_sResourceServiceLocalUrl + this.documentId + "/", sEmptyWorkbook);
 					fCallback({returnCode: 0, val:wb});
 				} else {
 					// Меняем тип состояния (на открытие)
 					this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
 					v["c"] = "open";
-					this._asc_sendCommand(fCallback, v);
+					sendCommand2(fCallback, this.fCallbackSendCommand, v);
 				}
 			}
 		};
@@ -1137,10 +1109,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 			oAdditionalData["data"] = oBinaryFileWriter.Write();
 			var t = this;
-			g_fSaveWithParts(function(fCallback1, oAdditionalData1){t._asc_sendCommand(fCallback1, oAdditionalData1);}, function (incomeObject) {
-				if(null != incomeObject && "save" == incomeObject["type"])
-					t.asc_processSavedFile(incomeObject["data"], false);
-			}, oAdditionalData);
+			g_fSaveWithParts(function(fCallback1, oAdditionalData1){sendCommand2(fCallback1,  this.fCallbackSendCommand, oAdditionalData1);},
+				function (incomeObject) {
+					if(null != incomeObject && "save" == incomeObject["type"])
+						t.asc_processSavedFile(incomeObject["data"], false);
+				}, oAdditionalData
+			);
 		};
 
 		spreadsheet_api.prototype._asc_save = function () {
@@ -1162,7 +1136,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			oAdditionalData["innersave"] = true;
 			oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 			oAdditionalData["data"] = data;
-			g_fSaveWithParts(function(fCallback1, oAdditionalData1){that._asc_sendCommand(fCallback1, oAdditionalData1);}, /*callback*/ function(incomeObject){
+			g_fSaveWithParts(function(fCallback1, oAdditionalData1){sendCommand2(fCallback1, this.fCallbackSendCommand, oAdditionalData1);}, /*callback*/ function(incomeObject){
 				if(null != incomeObject && "save" == incomeObject["type"])
 					that.asc_processSavedFile(incomeObject["data"], true);
 			}, oAdditionalData);
@@ -1193,7 +1167,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					"vkey": this.documentVKey,
 					"c":"getcodepage"};
 
-				return this._asc_sendCommand (fCallback, v);
+				return sendCommand2(fCallback, this.fCallbackSendCommand, v);
 			} else {
 				this.wb._initCommentsToSave();
 				var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
@@ -1212,7 +1186,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				}
 			}
 			var t = this;
-			g_fSaveWithParts(function(fCallback1, oAdditionalData1){t._asc_sendCommand(fCallback1, oAdditionalData1);}, fCallback, oAdditionalData);
+			g_fSaveWithParts(function(fCallback1, oAdditionalData1){sendCommand2(fCallback1, this.fCallbackSendCommand, oAdditionalData1);}, fCallback, oAdditionalData);
 		};
 
 
@@ -2626,14 +2600,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			var oThis = this;
 			this.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-			this._asc_sendCommand( function(incomeObject){
+			sendCommand2(function(incomeObject){
 				if(null != incomeObject && "imgurl" == incomeObject["type"])
 				{
 					var ws = oThis.wb.getWorksheet();
 					return ws.objectRender.addImageDrawingObject(incomeObject["data"], null);
 				}
 				oThis.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-			}, rData );
+			}, this.fCallbackSendCommand, rData);
 		};
 
 		spreadsheet_api.prototype.asc_showImageFileDialog = function () {
