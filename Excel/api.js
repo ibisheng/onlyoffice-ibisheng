@@ -480,6 +480,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				oGeneralEditFormatCache.cleanCache();
 				oNumFormatCache.cleanCache();
 				this.wbModel.rebuildColors();
+				if (this.IsSendDocumentLoadCompleate)
+					this._onUpdateAfterApplyChanges();
 			}
 		};
 		spreadsheet_api.prototype.asc_LoadDocument = function (c_DocInfo) {
