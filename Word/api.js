@@ -6134,6 +6134,20 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
         return;
     }
 
+    // на методе OpenDocumentEndCallback может поменяться this.EndActionLoadImages
+    if (this.EndActionLoadImages == 1)
+    {
+        this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentImages);
+    }
+    else if (this.EndActionLoadImages == 2)
+    {
+        if (_bIsOldPaste)
+            this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+        else
+            this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+    }
+    this.EndActionLoadImages = 0;
+
 	// размораживаем меню... и начинаем считать документ
     if (false === this.isPasteFonts_Images && false === this.isSaveFonts_Images && false === this.isLoadImagesCustom)
     {
@@ -6176,19 +6190,6 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
                 this.SyncLoadImages_callback();
         }
     }
-
-    if (this.EndActionLoadImages == 1)
-    {
-        this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentImages);
-    }
-    else if (this.EndActionLoadImages == 2)
-    {
-        if (_bIsOldPaste)
-            this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-        else
-            this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
-    }
-    this.EndActionLoadImages = 0;
 };
 
 asc_docs_api.prototype.OpenDocumentEndCallback = function()
