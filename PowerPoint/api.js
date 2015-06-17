@@ -3809,8 +3809,22 @@ asc_docs_api.prototype.asyncImagesDocumentStartLoaded = function()
 asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
 {
     this.ImageLoader.bIsLoadDocumentFirst = false;
-
     var _bIsOldPaste = this.isPasteFonts_Images;
+	
+	if (this.EndActionLoadImages == 1)
+    {
+        this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentImages);
+    }
+    else if (this.EndActionLoadImages == 2)
+    {
+        if (_bIsOldPaste)
+            this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+        else
+            this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+    }
+
+    this.EndActionLoadImages = 0;
+	
     // размораживаем меню... и начинаем считать документ
     if (this.isPasteFonts_Images)
     {
@@ -3835,21 +3849,7 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
             this.OpenDocumentEndCallback();
 
         this.asyncServerIdStartLoaded();
-    }
-
-    if (this.EndActionLoadImages == 1)
-    {
-        this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentImages);
-    }
-    else if (this.EndActionLoadImages == 2)
-    {
-        if (_bIsOldPaste)
-            this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-        else
-            this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
-    }
-
-    this.EndActionLoadImages = 0;
+    }    
 };
 
 asc_docs_api.prototype.asc_getComments = function()
