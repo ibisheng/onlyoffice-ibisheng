@@ -3456,6 +3456,11 @@ CTable.prototype =
            if(!this.bPresentation)
            {
                 RGBA = TableShd.Get_Color2(Theme, ColorMap);
+               if(pGraphics.SetShd)
+               {
+                   pGraphics.SetShd(TableShd);
+
+               }
                 pGraphics.b_color1( RGBA.r, RGBA.g, RGBA.b, 255 );
                 pGraphics.TableRect(Math.min(X_left_new, X_right_new), Math.min(Y_top, Y_bottom), Math.abs(X_right_new - X_left_new), Math.abs(Y_bottom - Y_top));
            }
@@ -3481,6 +3486,10 @@ CTable.prototype =
             {
                 RGBA = TableBorders.Left.Get_Color2(Theme, ColorMap);
                 pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
+                if(pGraphics.SetBorder)
+                {
+                    pGraphics.SetBorder(TableBorders.Left);
+                }
                 if ( null === X_left_old || Math.abs( X_left_new - X_left_old ) < 0.001 )
                 {
                     pGraphics.drawVerLine( c_oAscLineDrawingRule.Center, X_left_new, Y_top, Y_bottom, TableBorders.Left.Size );
@@ -3517,7 +3526,10 @@ CTable.prototype =
             {
                 RGBA =  TableBorders.Right.Get_Color2(Theme, ColorMap);
                 pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-
+                if(pGraphics.SetBorder)
+                {
+                    pGraphics.SetBorder(TableBorders.Right);
+                }
                 if ( null === X_right_old || Math.abs( X_right_new - X_right_old ) < 0.001 )
                 {
                     pGraphics.drawVerLine( c_oAscLineDrawingRule.Center, X_right_new, Y_top, Y_bottom, TableBorders.Right.Size );
@@ -3556,7 +3568,10 @@ CTable.prototype =
                 {
                     RGBA =  TableBorders.Top.Get_Color2(Theme, ColorMap);
                     pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-
+                    if(pGraphics.SetBorder)
+                    {
+                        pGraphics.SetBorder(TableBorders.Top);
+                    }
                     // Добавочные значения толщины правой и левой границ
                     var LeftMW = 0;
                     if ( border_Single === TableBorders.Left.Value )
@@ -3581,7 +3596,10 @@ CTable.prototype =
                 {
                     RGBA =  TableBorders.Bottom.Get_Color2(Theme, ColorMap);
                     pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-
+                    if(pGraphics.SetBorder)
+                    {
+                        pGraphics.SetBorder(TableBorders.Bottom);
+                    }
                     // Добавочные значения толщины правой и левой границ
                     var LeftMW = 0;
                     if ( border_Single === TableBorders.Left.Value )
@@ -3649,6 +3667,11 @@ CTable.prototype =
                         if (true !== RGBA.Auto)
                         {
                             pGraphics.b_color1(RGBA.r, RGBA.g, RGBA.b, 255);
+                            if(pGraphics.SetShd)
+                            {
+                                pGraphics.SetShd(CellShd);
+
+                            }
                             pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
                         }
                     }
@@ -3752,6 +3775,11 @@ CTable.prototype =
                         if (true !== RGBA.Auto)
                         {
                             pGraphics.b_color1(RGBA.r, RGBA.g, RGBA.b, 255);
+                            if(pGraphics.SetShd)
+                            {
+                                pGraphics.SetShd(CellShd);
+
+                            }
                             pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
                         }
                     }
@@ -3936,6 +3964,10 @@ CTable.prototype =
                         {
                             RGBA = CellBorders.Left.Get_Color2(Theme, ColorMap);
                             pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
+                            if(pGraphics.SetBorder)
+                            {
+                                pGraphics.SetBorder(CellBorders.Left);
+                            }
                             pGraphics.drawVerLine( c_oAscLineDrawingRule.Left, X_cell_start, Y, Y + RealHeight, CellBorders.Left.Size );
                         }
                         else //if ( border_None === CellBorders.Left.Value )
@@ -3948,6 +3980,10 @@ CTable.prototype =
                         {
                             RGBA = CellBorders.Right.Get_Color2(Theme, ColorMap);
                             pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
+                            if(pGraphics.SetBorder)
+                            {
+                                pGraphics.SetBorder(CellBorders.Right);
+                            }
                             pGraphics.drawVerLine( c_oAscLineDrawingRule.Right, X_cell_end, Y, Y + RealHeight, CellBorders.Right.Size );
                         }
                         else //if ( border_None === CellBorders.Right.Value )
@@ -3960,6 +3996,10 @@ CTable.prototype =
                         {
                             RGBA = CellBorders.Top.Get_Color2(Theme, ColorMap);
                             pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
+                            if(pGraphics.SetBorder)
+                            {
+                                pGraphics.SetBorder(CellBorders.Top);
+                            }
                             pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y - CellBorders.Top.Size, X_cell_start, X_cell_end, CellBorders.Top.Size, 0, 0 );
                         }
                         else //if ( border_None === CellBorders.Top.Value )
@@ -3972,6 +4012,10 @@ CTable.prototype =
                         {
                             RGBA = CellBorders.Bottom.Get_Color2(Theme, ColorMap);
                             pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
+                            if(pGraphics.SetBorder)
+                            {
+                                pGraphics.SetBorder(CellBorders.Bottom);
+                            }
                             pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Bottom, Y + RealHeight + CellBorders.Bottom.Size, X_cell_start, X_cell_end, CellBorders.Bottom.Size, 0, 0 );
                         }
                         else //if ( border_None === CellBorders.Bottom.Value )
@@ -4001,6 +4045,10 @@ CTable.prototype =
                             {
                                 RGBA = CurBorderInfo.Get_Color2(Theme, ColorMap);
                                 pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
+                                if(pGraphics.SetBorder)
+                                {
+                                    pGraphics.SetBorder(CurBorderInfo);
+                                }
                                 pGraphics.drawVerLine( c_oAscLineDrawingRule.Center, X_cell_start, Y0, Y1, CurBorderInfo.Size );
                             }
                             else //if ( border_None === CurBorderInfo.Value )
@@ -4032,6 +4080,10 @@ CTable.prototype =
                                 {
                                     RGBA = CurBorderInfo.Get_Color2(Theme, ColorMap);
                                     pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
+                                    if(pGraphics.SetBorder)
+                                    {
+                                        pGraphics.SetBorder(CurBorderInfo);
+                                    }
                                     pGraphics.drawVerLine( c_oAscLineDrawingRule.Center, X_cell_end, Y0, Y1, CurBorderInfo.Size );
                                 }
                                 else //if ( border_None === CurBorderInfo.Value )
@@ -4199,6 +4251,10 @@ CTable.prototype =
                             {
                                 RGBA = CurBorderInfo.Get_Color2(Theme, ColorMap);
                                 pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
+                                if(pGraphics.SetBorder)
+                                {
+                                    pGraphics.SetBorder(CurBorderInfo);
+                                }
                                 pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y, X0, X1, CurBorderInfo.Size, LeftMW, RightMW );
                             }
                             else //if ( border_None === CurBorderInfo.Value )
@@ -4285,6 +4341,10 @@ CTable.prototype =
                     {
                         RGBA =  CellBorders.Left.Get_Color2(Theme, ColorMap);
                         pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
+                        if(pGraphics.SetBorder)
+                        {
+                            pGraphics.SetBorder(CellBorders.Left);
+                        }
                         pGraphics.drawVerLine( c_oAscLineDrawingRule.Left, X_cell_start, Y, Y + RealHeight, CellBorders.Left.Size );
                     }
                     else //if ( border_None === CellBorders.Left.Value )
@@ -4297,6 +4357,10 @@ CTable.prototype =
                     {
                         RGBA =  CellBorders.Right.Get_Color2(Theme, ColorMap);
                         pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
+                        if(pGraphics.SetBorder)
+                        {
+                            pGraphics.SetBorder(CellBorders.Right);
+                        }
                         pGraphics.drawVerLine( c_oAscLineDrawingRule.Right, X_cell_end, Y, Y + RealHeight, CellBorders.Right.Size );
                     }
                     else //if ( border_None === CellBorders.Right.Value )
@@ -4310,6 +4374,10 @@ CTable.prototype =
 
                         RGBA =  CellBorders.Top.Get_Color2(Theme, ColorMap);
                         pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
+                        if(pGraphics.SetBorder)
+                        {
+                            pGraphics.SetBorder(CellBorders.Top);
+                        }
                         pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y - CellBorders.Top.Size, X_cell_start, X_cell_end, CellBorders.Top.Size, 0, 0 );
                     }
                     else //if ( border_None === CellBorders.Top.Value )
@@ -4322,6 +4390,10 @@ CTable.prototype =
                     {
                         RGBA =  CellBorders.Bottom.Get_Color2(Theme, ColorMap);
                         pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
+                        if(pGraphics.SetBorder)
+                        {
+                            pGraphics.SetBorder(CellBorders.Bottom);
+                        }
                         pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Bottom, Y + RealHeight + CellBorders.Bottom.Size, X_cell_start, X_cell_end, CellBorders.Bottom.Size, 0, 0 );
                     }
                     else //if ( border_None === CellBorders.Bottom.Value )
@@ -4353,6 +4425,10 @@ CTable.prototype =
                             pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
                             //pGraphics.p_width( CurBorderInfo.Size * 1000 );
                             //pGraphics._s();
+                            if(pGraphics.SetBorder)
+                            {
+                                pGraphics.SetBorder(CurBorderInfo);
+                            }
 
                             pGraphics.drawVerLine( c_oAscLineDrawingRule.Center, X_cell_start, Y0, Y1, CurBorderInfo.Size );
                             //pGraphics._m( X_cell_start * 100, Y0 * 100 );
@@ -4393,6 +4469,10 @@ CTable.prototype =
                                 pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
                                 //pGraphics.p_width( CurBorderInfo.Size * 1000 );
                                 //pGraphics._s();
+                                if(pGraphics.SetBorder)
+                                {
+                                    pGraphics.SetBorder(CurBorderInfo);
+                                }
 
                                 pGraphics.drawVerLine( c_oAscLineDrawingRule.Center, X_cell_end, Y0, Y1, CurBorderInfo.Size );
                                 //pGraphics._m( X_cell_end * 100, Y0 * 100 );
@@ -4578,6 +4658,10 @@ CTable.prototype =
                             pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
                             //pGraphics.p_width( CurBorderInfo.Size * 1000 );
                             //pGraphics._s();
+                            if(pGraphics.SetBorder)
+                            {
+                                pGraphics.SetBorder(CurBorderInfo);
+                            }
 
                             pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y, X0, X1, CurBorderInfo.Size, LeftMW, RightMW );
                             //pGraphics._m( X0 * 100, ( Y + CurBorderInfo.Size / 2 ) * 100 );
@@ -4608,6 +4692,10 @@ CTable.prototype =
                             pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
                             //pGraphics.p_width( BottomBorder.Size * 1000 );
                             //pGraphics._s();
+                            if(pGraphics.SetBorder)
+                            {
+                                pGraphics.SetBorder(BottomBorder);
+                            }
 
                             var X0 = X_cell_start;
                             var X1 = X_cell_end;
@@ -4660,6 +4748,10 @@ CTable.prototype =
                                     pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
                                     //pGraphics.p_width( BottomBorder.Size * 1000 );
                                     //pGraphics._s();
+                                    if(pGraphics.SetBorder)
+                                    {
+                                        pGraphics.SetBorder(BottomBorder);
+                                    }
 
                                     var X0 = X_cell_start;
                                     var X1 = X_cell_end;
@@ -4704,6 +4796,11 @@ CTable.prototype =
 
                                         RGBA =  BottomBorder.Get_Color2(Theme, ColorMap);
                                         pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
+                                        if(pGraphics.SetBorder)
+                                        {
+                                            pGraphics.SetBorder(BottomBorder);
+                                        }
+
                                         pGraphics.p_width( BottomBorder.Size * 1000 );
                                         pGraphics._s();
 
@@ -4741,6 +4838,11 @@ CTable.prototype =
                                     {
                                         RGBA =  BottomBorder.Get_Color2(Theme, ColorMap);
                                         pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
+                                        if(pGraphics.SetBorder)
+                                        {
+                                            pGraphics.SetBorder(BottomBorder);
+                                        }
+
                                         pGraphics.p_width( BottomBorder.Size * 1000 );
                                         pGraphics._s();
 

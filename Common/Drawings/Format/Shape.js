@@ -3521,15 +3521,17 @@ CShape.prototype =
         }
         else
         {
+            var oTheme = this.getParentObjects().theme;
+            var oColorMap = this.Get_ColorMap();
             if(!this.bWordShape && (!this.txBody.content || this.txBody.content.Is_Empty()) && this.txBody.content2 != null && !this.addTextFlag && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false))
             {
                 if(editor && editor.ShowParaMarks)
                 {
-                    this.txWarpStructParamarks2.draw(graphics, this.transformTextWordArt2);
+                    this.txWarpStructParamarks2.draw(graphics, this.transformTextWordArt2, oTheme, oColorMap);
                 }
                 else
                 {
-                    this.txWarpStruct2.draw(graphics, this.transformTextWordArt2);
+                    this.txWarpStruct2.draw(graphics, this.transformTextWordArt2, oTheme, oColorMap);
                 }
             }
             else
@@ -3559,11 +3561,11 @@ CShape.prototype =
                 var oTransform = this.transformTextWordArt;
                 if(editor && editor.ShowParaMarks)
                 {
-                    this.txWarpStructParamarks.draw(graphics, oTransform);
+                    this.txWarpStructParamarks.draw(graphics, oTransform, oTheme, oColorMap);
                 }
                 else
                 {
-                    this.txWarpStruct.draw(graphics, oTransform);
+                    this.txWarpStruct.draw(graphics, oTransform, oTheme, oColorMap);
                 }
                 if(bNeedRestoreState)
                 {
@@ -4740,7 +4742,7 @@ CShape.prototype =
         var oRet = {oTxWarpStruct: null, oTxWarpStructParamarks: null};
         if((oBodyPr.prstTxWarp && oBodyPr.prstTxWarp.preset !== "textNoShape") || this.checkContentWordArt(oContent))
         {
-            var oTextDrawer = new CTextDrawer(dWidth, dHeight, true);
+            var oTextDrawer = new CTextDrawer(dWidth, dHeight, true, this.Get_Theme());
             var warpGeometry = oBodyPr.prstTxWarp;
             warpGeometry && warpGeometry.Recalculate(dWidth, dHeight);
             var OldShowParaMarks;

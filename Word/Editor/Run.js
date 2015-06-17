@@ -3806,7 +3806,8 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
     var bDrawFind = PDSH.DrawFind;
     var bDrawColl = PDSH.DrawColl;
 
-    var oShd = this.Get_CompiledPr(false).Shd;
+    var oCompiledPr = this.Get_CompiledPr(false);
+    var oShd = oCompiledPr.Shd;
     var bDrawShd  = ( oShd === undefined || shd_Nil === oShd.Value ? false : true );
     var ShdColor  = ( true === bDrawShd ? oShd.Get_Color( PDSH.Paragraph ) : null );
 
@@ -3821,7 +3822,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
     var CommentId     = ( CommentsCount > 0 ? PDSH.Comments[CommentsCount - 1] : null );
     var CommentsFlag  = PDSH.CommentsFlag;
 
-    var HighLight = this.Get_CompiledPr(false).HighLight;
+    var HighLight = oCompiledPr.HighLight;
 
     var SearchMarksCount = this.SearchMarks.length;
 
@@ -3850,7 +3851,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
         var DrawColl = this.CollaborativeMarks.Check( Pos );
 
         if ( true === bDrawShd )
-            aShd.Add( Y0, Y1, X, X + ItemWidthVisible, 0, ShdColor.r, ShdColor.g, ShdColor.b );
+            aShd.Add( Y0, Y1, X, X + ItemWidthVisible, 0, ShdColor.r, ShdColor.g, ShdColor.b, undefined, oShd );
 
         switch( ItemType )
         {
@@ -3870,7 +3871,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
                 if ( CommentsFlag != comments_NoComment )
                     aComm.Add( Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false, CommentId : CommentId } );
                 else if ( highlight_None != HighLight )
-                    aHigh.Add( Y0, Y1, X, X + ItemWidthVisible, 0, HighLight.r, HighLight.g, HighLight.b );
+                    aHigh.Add( Y0, Y1, X, X + ItemWidthVisible, 0, HighLight.r, HighLight.g, HighLight.b, undefined, HighLight );
 
                 if ( true === DrawSearch )
                     aFind.Add( Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0  );
@@ -3890,7 +3891,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
                     if ( CommentsFlag != comments_NoComment )
                         aComm.Add( Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false, CommentId : CommentId } );
                     else if ( highlight_None != HighLight )
-                        aHigh.Add( Y0, Y1, X, X + ItemWidthVisible, 0, HighLight.r, HighLight.g, HighLight.b );
+                        aHigh.Add( Y0, Y1, X, X + ItemWidthVisible, 0, HighLight.r, HighLight.g, HighLight.b, undefined, HighLight );
 
                     PDSH.Spaces--;
                 }
@@ -4291,14 +4292,14 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
                     if (true === bRemReview)
                         aStrikeout.Add(StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, 255, 0, 0);
                     else if (true === CurTextPr.DStrikeout)
-                        aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+                        aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
                     else if ( true === CurTextPr.Strikeout )
-                        aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+                        aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
 
                     if (true === bAddReview)
                         aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, 255, 0, 0);
                     else if (true === CurTextPr.Underline)
-                        aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b);
+                        aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
 
                     if ( PDSL.SpellingCounter > 0 )
                         aSpelling.Add( UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, 0, 0, 0 );
@@ -4316,14 +4317,14 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
                     if (true === bRemReview)
                         aStrikeout.Add(StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, 255, 0, 0);
                     else if (true === CurTextPr.DStrikeout)
-                        aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+                        aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr  );
                     else if ( true === CurTextPr.Strikeout )
-                        aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+                        aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr  );
 
                     if (true === bAddReview)
                         aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, 255, 0, 0);
                     else if (true === CurTextPr.Underline)
-                        aUnderline.Add( UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+                        aUnderline.Add( UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
 
                     PDSL.Spaces--;
                 }
@@ -4337,9 +4338,9 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             case para_Math_Ampersand:
             {
                 if ( true === CurTextPr.DStrikeout )
-                    aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+                    aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
                 else if ( true === CurTextPr.Strikeout )
-                    aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+                    aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
 
 
                 X += ItemWidthVisible;
@@ -4349,9 +4350,9 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             {
                 var ctrPrp = this.Parent.GetCtrPrp();
                 if(true === ctrPrp.DStrikeout)
-                    aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+                    aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
                 else if(true === ctrPrp.Strikeout)
-                    aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+                    aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
 
                 X += ItemWidthVisible;
                 break;

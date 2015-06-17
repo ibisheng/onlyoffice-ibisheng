@@ -1578,7 +1578,7 @@ Paragraph.prototype =
 
                             // Если есть выделение текста, рисуем его сначала
                             if ( highlight_None != NumTextPr.HighLight )
-                                PDSH.High.Add( Y0, Y1, X_start, X_start + NumberingItem.WidthNum + NumberingItem.WidthSuff, 0, NumTextPr.HighLight.r, NumTextPr.HighLight.g, NumTextPr.HighLight.b );
+                                PDSH.High.Add( Y0, Y1, X_start, X_start + NumberingItem.WidthNum + NumberingItem.WidthSuff, 0, NumTextPr.HighLight.r, NumTextPr.HighLight.g, NumTextPr.HighLight.b, undefined, NumTextPr );
                         }
                     }
 
@@ -1703,6 +1703,10 @@ Paragraph.prototype =
                     {
                         pGraphics.b_color1( Pr.ParaPr.Shd.Color.r, Pr.ParaPr.Shd.Color.g, Pr.ParaPr.Shd.Color.b, 255 );
                     }
+                    if(pGraphics.SetShd)
+                    {
+                        pGraphics.SetShd(Pr.ParaPr.Shd);
+                    }
                     pGraphics.rect(TempX0, this.Pages[CurPage].Y + TempTop, TempX1 - TempX0, TempBottom - TempTop);
                     pGraphics.df();
 
@@ -1718,14 +1722,18 @@ Paragraph.prototype =
 
                 if(pGraphics.Start_Command)
                 {
-                    pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[CurLine], CurLine, 2)
+                    pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[CurLine], CurLine, 2);
                 }
                 var aShd = PDSH.Shd;
                 var Element = aShd.Get_Next();
                 while ( null != Element )
                 {
                     pGraphics.b_color1( Element.r, Element.g, Element.b, 255 );
-                    pGraphics.rect( Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0 );
+                    if(pGraphics.SetShd)
+                    {
+                        pGraphics.SetShd(Element.Additional2);
+                    }
+                    pGraphics.rect( Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0);
                     pGraphics.df();
                     Element = aShd.Get_Next();
                 }
@@ -1738,7 +1746,7 @@ Paragraph.prototype =
                 while ( null != Element )
                 {
                     pGraphics.b_color1( Element.r, Element.g, Element.b, 255 );
-                    pGraphics.rect( Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0 );
+                    pGraphics.rect( Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0, Element.Additional2 );
                     pGraphics.df();
                     Element = aHigh.Get_Next();
                 }
@@ -1858,6 +1866,10 @@ Paragraph.prototype =
                 {
                     var RGBA = Pr.ParaPr.Brd.Right.Get_Color(this);
                     pGraphics.p_color(RGBA.r, RGBA.g, RGBA.b, 255 );
+                    if(pGraphics.SetBorder)
+                    {
+                        pGraphics.SetBorder(Pr.ParaPr.Brd.Right);
+                    }
                     pGraphics.drawVerLine( c_oAscLineDrawingRule.Right, TempX1 + 1 + Pr.ParaPr.Brd.Right.Size + Pr.ParaPr.Brd.Right.Space, this.Pages[CurPage].Y + TempTop, this.Pages[CurPage].Y + TempBottom, Pr.ParaPr.Brd.Right.Size );
                 }
 
@@ -1865,6 +1877,10 @@ Paragraph.prototype =
                 {
                     var RGBA = Pr.ParaPr.Brd.Left.Get_Color(this);
                     pGraphics.p_color(RGBA.r, RGBA.g, RGBA.b, 255 );
+                    if(pGraphics.SetBorder)
+                    {
+                        pGraphics.SetBorder(Pr.ParaPr.Brd.Left);
+                    }
                     pGraphics.drawVerLine( c_oAscLineDrawingRule.Left, TempX0 - 1 - Pr.ParaPr.Brd.Left.Size - Pr.ParaPr.Brd.Left.Space, this.Pages[CurPage].Y + TempTop, this.Pages[CurPage].Y + TempBottom, Pr.ParaPr.Brd.Left.Size );
                 }
             }
@@ -2125,7 +2141,11 @@ Paragraph.prototype =
             while ( null != Element )
             {
                 pGraphics.p_color( Element.r, Element.g, Element.b, 255 );
-                pGraphics.drawHorLine(c_oAscLineDrawingRule.Top, Element.y0, Element.x0, Element.x1, Element.w );
+                if(pGraphics.SetAdditionalProps)
+                {
+                    pGraphics.SetAdditionalProps(Element.Additional2);
+                }
+                pGraphics.drawHorLine(c_oAscLineDrawingRule.Top, Element.y0, Element.x0, Element.x1, Element.w);
                 Element = aStrikeout.Get_Next();
             }
 
@@ -2134,7 +2154,12 @@ Paragraph.prototype =
             while ( null != Element )
             {
                 pGraphics.p_color( Element.r, Element.g, Element.b, 255 );
-                pGraphics.drawHorLine2(c_oAscLineDrawingRule.Top, Element.y0, Element.x0, Element.x1, Element.w );
+                if(pGraphics.SetAdditionalProps)
+                {
+                    pGraphics.SetAdditionalProps(Element.Additional2);
+                }
+                pGraphics.drawHorLine2(c_oAscLineDrawingRule.Top, Element.y0, Element.x0, Element.x1, Element.w);
+
                 Element = aDStrikeout.Get_Next();
             }
 
@@ -2144,7 +2169,11 @@ Paragraph.prototype =
             while ( null != Element )
             {
                 pGraphics.p_color( Element.r, Element.g, Element.b, 255 );
-                pGraphics.drawHorLine(0, Element.y0, Element.x0, Element.x1, Element.w );
+                if(pGraphics.SetAdditionalProps)
+                {
+                    pGraphics.SetAdditionalProps(Element.Additional2);
+                }
+                pGraphics.drawHorLine(0, Element.y0, Element.x0, Element.x1, Element.w);
                 Element = aUnderline.Get_Next();
             }
 
@@ -2221,6 +2250,10 @@ Paragraph.prototype =
             RGBA = Pr.ParaPr.Brd.Top.Get_Color(this);
             pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
 
+            if(pGraphics.SetBorder)
+            {
+                pGraphics.SetBorder(Pr.ParaPr.Brd.Top);
+            }
             // Учтем разрывы из-за обтекания
             var StartLine = this.Pages[CurPage].StartLine;
 
@@ -2252,6 +2285,10 @@ Paragraph.prototype =
             {
                 RGBA = Pr.ParaPr.Brd.Top.Get_Color(this);
                 pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
+                if(pGraphics.SetBorder)
+                {
+                    pGraphics.SetBorder(Pr.ParaPr.Brd.Top);
+                }
                 Size  = Pr.ParaPr.Brd.Top.Size;
                 Y     = this.Pages[CurPage].Y + this.Lines[this.Pages[CurPage].FirstLine].Top + Pr.ParaPr.Spacing.Before;
                 bDraw = true;
@@ -2260,6 +2297,10 @@ Paragraph.prototype =
             {
                 RGBA = Pr.ParaPr.Brd.Between.Get_Color(this);
                 pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
+                if(pGraphics.SetBorder)
+                {
+                    pGraphics.SetBorder(Pr.ParaPr.Brd.Between);
+                }
                 Size  = Pr.ParaPr.Brd.Between.Size;
                 Y     = this.Pages[CurPage].Y + Pr.ParaPr.Spacing.Before;
                 bDraw = true;
@@ -2311,7 +2352,10 @@ Paragraph.prototype =
 
             RGBA = Pr.ParaPr.Brd.Bottom.Get_Color(this);
             pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-
+            if(pGraphics.SetBorder)
+            {
+                pGraphics.SetBorder(Pr.ParaPr.Brd.Bottom);
+            }
             // Учтем разрывы из-за обтекания
             var EndLine = this.Pages[CurPage].EndLine;
             var RangesCount = this.Lines[EndLine].Ranges.length;
@@ -2339,7 +2383,10 @@ Paragraph.prototype =
             {
                 RGBA = Pr.ParaPr.Brd.Bottom.Get_Color(this);
                 pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-
+                if(pGraphics.SetBorder)
+                {
+                    pGraphics.SetBorder(Pr.ParaPr.Brd.Bottom);
+                }
                 // Учтем разрывы из-за обтекания
                 var EndLine = this.Pages[CurPage].EndLine;
                 var RangesCount = this.Lines[EndLine].Ranges.length;
@@ -12803,7 +12850,7 @@ function CParaPos(Range, Line, Page, Pos)
 
 
 // используется в Internal_Draw_3 и Internal_Draw_5
-function CParaDrawingRangeLinesElement(y0, y1, x0, x1, w, r, g, b, Additional)
+function CParaDrawingRangeLinesElement(y0, y1, x0, x1, w, r, g, b, Additional, Additional2)
 {
     this.y0 = y0;
     this.y1 = y1;
@@ -12815,6 +12862,7 @@ function CParaDrawingRangeLinesElement(y0, y1, x0, x1, w, r, g, b, Additional)
     this.b  = b;
 
     this.Additional = Additional;
+    this.Additional2 = Additional2;
 }
 
 
@@ -12830,9 +12878,9 @@ CParaDrawingRangeLines.prototype =
         this.Elements = [];
     },
 
-    Add : function (y0, y1, x0, x1, w, r, g, b, Additional)
+    Add : function (y0, y1, x0, x1, w, r, g, b, Additional, Additional2)
     {
-        this.Elements.push( new CParaDrawingRangeLinesElement(y0, y1, x0, x1, w, r, g, b, Additional) );
+        this.Elements.push( new CParaDrawingRangeLinesElement(y0, y1, x0, x1, w, r, g, b, Additional, Additional2) );
     },
 
     Get_Next : function()

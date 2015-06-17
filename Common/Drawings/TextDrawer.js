@@ -1,17 +1,17 @@
 var PATH_DIV_EPSILON = 0.1;
-
+var UNDERLINE_DIV_EPSILON = 3;
 
 
 function ParaDrawingStruct(nPageIndex, pDrawing)
 {
     this.oDrawing = pDrawing;
-    this.nPageeIndex = nPageIndex;
+    this.nPageIndex = nPageIndex;
 }
 ParaDrawingStruct.prototype.Draw = function(pGraphics)
 {
     if(this.oDrawing)
     {
-        this.oDrawing.Draw( 0, 0, pGraphics, this.nPageeIndex, 0)
+        this.oDrawing.Draw( 0, 0, pGraphics, this.nPageIndex, 0)
     }
 };
 
@@ -30,7 +30,7 @@ CDocContentStructure.prototype.Recalculate = function(oTheme, oColorMap, dWidth,
         this.m_aContent[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape);
     }
 };
-CDocContentStructure.prototype.draw = function(graphics, transform)
+CDocContentStructure.prototype.draw = function(graphics, transform, oTheme, oColorMap)
 {
     var i;
     for(i = 0; i < this.m_aDrawingsStruct.length; ++i)
@@ -39,7 +39,7 @@ CDocContentStructure.prototype.draw = function(graphics, transform)
     }
     for(i = 0; i < this.m_aContent.length; ++i)
     {
-        this.m_aContent[i].draw(graphics, transform);
+        this.m_aContent[i].draw(graphics, transform, oTheme, oColorMap);
     }
 };
 CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct)
@@ -157,12 +157,12 @@ CParagraphStructure.prototype.Recalculate = function(oTheme, oColorMap, dWidth, 
         this.m_aContent[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape);
     }
 };
-CParagraphStructure.prototype.draw = function(graphics, transform)
+CParagraphStructure.prototype.draw = function(graphics, transform, oTheme, oColorMap)
 {
     var i;
     for(i = 0; i < this.m_aContent.length; ++i)
     {
-        this.m_aContent[i].draw(graphics, transform);
+        this.m_aContent[i].draw(graphics, transform, oTheme, oColorMap);
     }
 };
 
@@ -187,17 +187,17 @@ CTableStructure.prototype.Recalculate = function(oTheme, oColorMap, dWidth, dHei
         this.m_aBorders[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape);
     }
 };
-CTableStructure.prototype.draw = function(graphics, transform)
+CTableStructure.prototype.draw = function(graphics, transform, oTheme, oColorMap)
 {
     var i;
     for(i = 0; i < this.m_aBorders.length; ++i)
     {
-        this.m_aBorders[i].draw(graphics);
+        this.m_aBorders[i].draw(graphics, undefined, undefined, oTheme, oColorMap);
     }
 
     for(i = 0; i < this.m_aContent.length; ++i)
     {
-        this.m_aContent[i].draw(graphics, transform);
+        this.m_aContent[i].draw(graphics, transform, oTheme, oColorMap);
     }
 };
 
@@ -210,7 +210,7 @@ function CLineStructure(oLine)
     this.m_aContent = [];//ObjectToDraw
     this.m_aBorders = [];
     this.m_aBackgrounds = [];
-    this.m_aUnderlinesStrileouts = [];
+    this.m_aUnderlinesStrikeouts = [];
     this.m_aParagraphBackgrounds = [];
     this.m_nDrawType = 0;// 0 - content, 1 - borders, 2 - backgrounds, 3 - underlinestrikeouts, 4 - paragraphbackrounds
 }
@@ -230,9 +230,9 @@ CLineStructure.prototype.Recalculate = function(oTheme, oColorMap, dWidth, dHeig
     {
         this.m_aBackgrounds[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape, this.m_oLine);
     }
-    for(i = 0; i < this.m_aUnderlinesStrileouts.length; ++i)
+    for(i = 0; i < this.m_aUnderlinesStrikeouts.length; ++i)
     {
-        this.m_aUnderlinesStrileouts[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape, this.m_oLine);
+        this.m_aUnderlinesStrikeouts[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape, this.m_oLine);
     }
     for(i = 0; i < this.m_aParagraphBackgrounds.length; ++i)
     {
@@ -250,9 +250,9 @@ CLineStructure.prototype.GetAllWarped = function(aWarpedObjects)
     {
         aWarpedObjects.push(this.m_aBackgrounds[i]);
     }
-    for(i = 0; i < this.m_aUnderlinesStrileouts.length; ++i)
+    for(i = 0; i < this.m_aUnderlinesStrikeouts.length; ++i)
     {
-        aWarpedObjects.push(this.m_aUnderlinesStrileouts[i]);
+        aWarpedObjects.push(this.m_aUnderlinesStrikeouts[i]);
     }
 };
 CLineStructure.prototype.CheckBoundsWarped = function(graphics)
@@ -266,17 +266,17 @@ CLineStructure.prototype.CheckBoundsWarped = function(graphics)
     {
         this.m_aBackgrounds[i].draw(graphics, true);
     }
-    for(i = 0; i < this.m_aUnderlinesStrileouts.length; ++i)
+    for(i = 0; i < this.m_aUnderlinesStrikeouts.length; ++i)
     {
-        this.m_aUnderlinesStrileouts[i].draw(graphics, true);
+        this.m_aUnderlinesStrikeouts[i].draw(graphics, true);
     }
 };
-CLineStructure.prototype.draw = function(graphics, transform)
+CLineStructure.prototype.draw = function(graphics, transform, oTheme, oColorMap)
 {
     var i;
     for(i = 0; i < this.m_aParagraphBackgrounds.length; ++i)
     {
-        this.m_aParagraphBackgrounds[i].draw(graphics, undefined, transform);
+        this.m_aParagraphBackgrounds[i].draw(graphics, undefined, transform, oTheme, oColorMap);
     }
     for(i = 0; i < this.m_aBorders.length; ++i)
     {
@@ -284,15 +284,15 @@ CLineStructure.prototype.draw = function(graphics, transform)
     }
     for(i = 0; i < this.m_aBackgrounds.length; ++i)
     {
-        this.m_aBackgrounds[i].draw(graphics, undefined, transform);
+        this.m_aBackgrounds[i].draw(graphics, undefined, transform, oTheme, oColorMap);
     }
     for(i = 0; i < this.m_aContent.length; ++i)
     {
-        this.m_aContent[i].draw(graphics, undefined, transform);
+        this.m_aContent[i].draw(graphics, undefined, transform, oTheme, oColorMap);
     }
-    for(i = 0; i < this.m_aUnderlinesStrileouts.length; ++i)
+    for(i = 0; i < this.m_aUnderlinesStrikeouts.length; ++i)
     {
-        this.m_aUnderlinesStrileouts[i].draw(graphics, undefined, transform);
+        this.m_aUnderlinesStrikeouts[i].draw(graphics, undefined, transform, oTheme, oColorMap);
     }
 };
 
@@ -368,7 +368,7 @@ function CreatePenFromParams(oUnifill, nStyle, nLineCap, nLineJoin, dLineWidth, 
     return oLine;
 }
 
-function CTextDrawer(dWidth, dHeight, bDivByLInes)
+function CTextDrawer(dWidth, dHeight, bDivByLInes, oTheme)
 {
     this.m_oFont =
     {
@@ -377,6 +377,7 @@ function CTextDrawer(dWidth, dHeight, bDivByLInes)
         Style    : -1
     };
 
+    this.m_oTheme = oTheme;
     this.Width = dWidth;
     this.Height = dHeight;
     this.m_oTransform = new CMatrix();
@@ -397,7 +398,9 @@ function CTextDrawer(dWidth, dHeight, bDivByLInes)
     this.m_oPen     = new CPen();
     this.m_oBrush   = new CBrush();
 
-    this.BrushType = MetaBrushType.Solid;
+    this.m_oLine = null;
+    this.m_oFill = null;
+
 
     // чтобы выставилось в первый раз
     this.m_oPen.Color.R     = -1;
@@ -497,6 +500,59 @@ CTextDrawer.prototype =
         this.m_oBrush.Color1.B = -1;
         this.m_oBrush.Color1.A = -1;
         this.Get_PathToDraw(false, true);
+    },
+
+    SetShd: function(oShd)
+    {
+        if(oShd)
+        {
+            if (oShd.Value !== shd_Nil)
+            {
+                if(oShd.Unifill)
+                {
+                    this.m_oFill = oShd.Unifill;
+                }
+                else
+                {
+                    if(oShd.Color)
+                    {
+                        this.m_oFill = CreateUnfilFromRGB(oShd.Color.r, oShd.Color.g, oShd.Color.b);
+                    }
+                    else
+                    {
+                        this.m_oFill = null;
+                    }
+                }
+            }
+            else
+            {
+                this.m_oFill = null;
+            }
+        }
+        else
+        {
+            this.m_oFill = null;
+        }
+        this.Get_PathToDraw(false, true);
+    },
+
+
+    SetBorder: function(oBorder)
+    {
+        if(oBorder && oBorder.Value !== border_None)
+        {
+            this.m_oLine = CreatePenFromParams(oBorder.Unifill ? oBorder.Unifill : CreateUnfilFromRGB(oBorder.Color.r, oBorder.Color.g, oBorder.Color.b), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size);
+        }
+        else
+        {
+            this.m_oLine = null;
+        }
+        //TODO
+    },
+
+    SetAdditionalProps: function(oProps)
+    {
+        oProps && this.SetTextPr(oProps, this.m_oTheme);
     },
 
     put_BrushTextureAlpha : function(alpha)
@@ -709,7 +765,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aBorders.length === 0)
                             {
-                                oLastCommand.m_aBorders.push(new ObjectToDraw(CreateUnfilFromRGB(oBrushColor.R, oBrushColor.G, oBrushColor.B), CreatePenFromParams(CreateUnfilFromRGB(oPenColor.R, oPenColor.G, oPenColor.B), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size), this.Width, this.Height, new Geometry(), this.m_oTransform, this))
+                                oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, this))
                             }
                             oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
 
@@ -717,11 +773,11 @@ CTextDrawer.prototype =
                             {
                                 if(oLastObjectToDraw.geometry.pathLst.length === 0 || (oLastObjectToDraw.geometry.pathLst.length === 1 && oLastObjectToDraw.geometry.pathLst[0].ArrPathCommandInfo.length === 0))
                                 {
-                                    oLastObjectToDraw.resetBrushPen(CreateUnfilFromRGB(oBrushColor.R, oBrushColor.G, oBrushColor.B), CreatePenFromParams(CreateUnfilFromRGB(oPenColor.R, oPenColor.G, oPenColor.B), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size));
+                                    oLastObjectToDraw.resetBrushPen(this.m_oFill, this.m_oLine);
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aBorders.push(new ObjectToDraw(CreateUnfilFromRGB(oBrushColor.R, oBrushColor.G, oBrushColor.B), CreatePenFromParams(CreateUnfilFromRGB(oPenColor.R, oPenColor.G, oPenColor.B), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size), this.Width, this.Height, new Geometry(), this.m_oTransform, this));
+                                    oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, this));
                                     oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
                                 }
                             }
@@ -731,7 +787,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aBackgrounds.length === 0)
                             {
-                                oLastCommand.m_aBackgrounds.push(new ObjectToDraw(CreateUnfilFromRGB(oBrushColor.R, oBrushColor.G, oBrushColor.B), CreatePenFromParams(CreateUnfilFromRGB(oPenColor.R, oPenColor.G, oPenColor.B), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size), this.Width, this.Height, new Geometry(), this.m_oTransform, this))
+                                oLastCommand.m_aBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, this))
                             }
                             oLastObjectToDraw = oLastCommand.m_aBackgrounds[oLastCommand.m_aBackgrounds.length - 1];
 
@@ -739,36 +795,36 @@ CTextDrawer.prototype =
                             {
                                 if(oLastObjectToDraw.geometry.pathLst.length === 0 || (oLastObjectToDraw.geometry.pathLst.length === 1 && oLastObjectToDraw.geometry.pathLst[0].ArrPathCommandInfo.length === 0))
                                 {
-                                    oLastObjectToDraw.resetBrushPen(CreateUnfilFromRGB(oBrushColor.R, oBrushColor.G, oBrushColor.B), CreatePenFromParams(CreateUnfilFromRGB(oPenColor.R, oPenColor.G, oPenColor.B), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size));
+                                    oLastObjectToDraw.resetBrushPen(this.m_oFill, this.m_oLine);
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aBackgrounds.push(new ObjectToDraw(CreateUnfilFromRGB(oBrushColor.R, oBrushColor.G, oBrushColor.B), CreatePenFromParams(CreateUnfilFromRGB(oPenColor.R, oPenColor.G, oPenColor.B), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size), this.Width, this.Height, new Geometry(), this.m_oTransform, this));
+                                    oLastCommand.m_aBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, this));
                                     oLastObjectToDraw = oLastCommand.m_aBackgrounds[oLastCommand.m_aBackgrounds.length - 1];
                                 }
                             }
                             break;
                         }
-                        case 3:
+                        case 3://Underliens & Strikeouts
                         {
-                            if(oLastCommand.m_aUnderlinesStrileouts.length === 0)
+                            if(oLastCommand.m_aUnderlinesStrikeouts.length === 0)
                             {
                                 oBrushColor = this.m_oBrush.Color1;
                                 oPenColor = this.m_oPen.Color;
-                                oLastCommand.m_aUnderlinesStrileouts.push(new ObjectToDraw(CreateUnfilFromRGB(oBrushColor.R, oBrushColor.G, oBrushColor.B), CreatePenFromParams(CreateUnfilFromRGB(oPenColor.R, oPenColor.G, oPenColor.B), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size), this.Width, this.Height, new Geometry(), this.m_oTransform, this))
+                                oLastCommand.m_aUnderlinesStrikeouts.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, this))
                             }
-                            oLastObjectToDraw = oLastCommand.m_aUnderlinesStrileouts[oLastCommand.m_aUnderlinesStrileouts.length - 1];
+                            oLastObjectToDraw = oLastCommand.m_aUnderlinesStrikeouts[oLastCommand.m_aUnderlinesStrikeouts.length - 1];
 
                             if(bStart2)
                             {
                                 if(oLastObjectToDraw.geometry.pathLst.length === 0 || (oLastObjectToDraw.geometry.pathLst.length === 1 && oLastObjectToDraw.geometry.pathLst[0].ArrPathCommandInfo.length === 0))
                                 {
-                                    oLastObjectToDraw.resetBrushPen(CreateUnfilFromRGB(oBrushColor.R, oBrushColor.G, oBrushColor.B), CreatePenFromParams(CreateUnfilFromRGB(oPenColor.R, oPenColor.G, oPenColor.B), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size));
+                                    oLastObjectToDraw.resetBrushPen(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr));
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aUnderlinesStrileouts.push(new ObjectToDraw(CreateUnfilFromRGB(oBrushColor.R, oBrushColor.G, oBrushColor.B), CreatePenFromParams(CreateUnfilFromRGB(oPenColor.R, oPenColor.G, oPenColor.B), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size), this.Width, this.Height, new Geometry(), this.m_oTransform, this));
-                                    oLastObjectToDraw = oLastCommand.m_aUnderlinesStrileouts[oLastCommand.m_aUnderlinesStrileouts.length - 1];
+                                    oLastCommand.m_aUnderlinesStrikeouts.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, this));
+                                    oLastObjectToDraw = oLastCommand.m_aUnderlinesStrikeouts[oLastCommand.m_aUnderlinesStrikeouts.length - 1];
                                 }
                             }
                             break;
@@ -778,7 +834,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aParagraphBackgrounds.length === 0)
                             {
-                                oLastCommand.m_aParagraphBackgrounds.push(new ObjectToDraw(CreateUnfilFromRGB(oBrushColor.R, oBrushColor.G, oBrushColor.B), CreatePenFromParams(CreateUnfilFromRGB(oPenColor.R, oPenColor.G, oPenColor.B), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size), this.Width, this.Height, new Geometry(), this.m_oTransform, this))
+                                oLastCommand.m_aParagraphBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, this))
                             }
                             oLastObjectToDraw = oLastCommand.m_aParagraphBackgrounds[oLastCommand.m_aParagraphBackgrounds.length - 1];
 
@@ -786,11 +842,11 @@ CTextDrawer.prototype =
                             {
                                 if(oLastObjectToDraw.geometry.pathLst.length === 0 || (oLastObjectToDraw.geometry.pathLst.length === 1 && oLastObjectToDraw.geometry.pathLst[0].ArrPathCommandInfo.length === 0))
                                 {
-                                    oLastObjectToDraw.resetBrushPen(CreateUnfilFromRGB(oBrushColor.R, oBrushColor.G, oBrushColor.B), CreatePenFromParams(CreateUnfilFromRGB(oPenColor.R, oPenColor.G, oPenColor.B), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size));
+                                    oLastObjectToDraw.resetBrushPen(this.m_oFill, this.m_oLine);
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aParagraphBackgrounds.push(new ObjectToDraw(CreateUnfilFromRGB(oBrushColor.R, oBrushColor.G, oBrushColor.B), CreatePenFromParams(CreateUnfilFromRGB(oPenColor.R, oPenColor.G, oPenColor.B), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size), this.Width, this.Height, new Geometry(), this.m_oTransform, this));
+                                    oLastCommand.m_aParagraphBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, this));
                                     oLastObjectToDraw = oLastCommand.m_aParagraphBackgrounds[oLastCommand.m_aParagraphBackgrounds.length - 1];
                                 }
                             }
@@ -805,7 +861,7 @@ CTextDrawer.prototype =
                     {
                         oBrushColor = this.m_oBrush.Color1;
                         oPenColor = this.m_oPen.Color;
-                        oLastCommand.m_aBorders.push(new ObjectToDraw(CreateUnfilFromRGB(oBrushColor.R, oBrushColor.G, oBrushColor.B), CreatePenFromParams(CreateUnfilFromRGB(oPenColor.R, oPenColor.G, oPenColor.B), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size), this.Width, this.Height, new Geometry(), this.m_oTransform, this))
+                        oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, this))
                     }
                     oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
 
@@ -813,11 +869,11 @@ CTextDrawer.prototype =
                     {
                         if(oLastObjectToDraw.geometry.pathLst.length === 0 || (oLastObjectToDraw.geometry.pathLst.length === 1 && oLastObjectToDraw.geometry.pathLst[0].ArrPathCommandInfo.length === 0))
                         {
-                            oLastObjectToDraw.resetBrushPen(CreateUnfilFromRGB(oBrushColor.R, oBrushColor.G, oBrushColor.B), CreatePenFromParams(CreateUnfilFromRGB(oPenColor.R, oPenColor.G, oPenColor.B), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size));
+                            oLastObjectToDraw.resetBrushPen(this.m_oFill, this.m_oLine);
                         }
                         else
                         {
-                            oLastCommand.m_aBorders.push(new ObjectToDraw(CreateUnfilFromRGB(oBrushColor.R, oBrushColor.G, oBrushColor.B), CreatePenFromParams(CreateUnfilFromRGB(oPenColor.R, oPenColor.G, oPenColor.B), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size), this.Width, this.Height, new Geometry(), this.m_oTransform, this));
+                            oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, this));
                             oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
                         }
                     }
@@ -1160,40 +1216,45 @@ CTextDrawer.prototype =
     {
     },
 
-    // smart methods for horizontal / vertical lines
-    drawHorLine : function(align, y, x, r, penW)
+    checkCurveBezier: function(x0, y0, x1, y1, x2, y2, x3, y3)
     {
-        this.p_width(1000 * penW);
-        this._s();
-
-        var _y = y;
-        switch (align)
+        var arr_point = partition_bezier4(x0, y0, x1, y1, x2, y2, x3, y3, UNDERLINE_DIV_EPSILON), i, count = arr_point.length >> 2;
+        for(i = 0; i < count; ++i)
         {
-            case 0:
-            {
-                _y = y + penW / 2;
-                break;
-            }
-            case 1:
-            {
-                break;
-            }
-            case 2:
-            {
-                _y = y - penW / 2;
-            }
+            var k = 4*i;
+            this._c(arr_point[k + 1].x, arr_point[k + 1].y, arr_point[k + 2].x, arr_point[k + 2].y, arr_point[k + 3].x, arr_point[k + 3].y);
         }
-        this._m(x, y);
-        this._l(r, y);
+    },
+    // smart methods for horizontal / vertical lines
+    drawHorLine : function(align, y, x, r, penW, AdditionalData)
+    {
+      // if(!AdditionalData)
+      // {
+      //     this.p_width(1000 * penW);
+      //     this._s();
 
-        this.ds();
+      //     this._m(x, y);
+      //     this._l(r, y);
 
-        this._e();
+      //     this.ds();
+
+      //     this._e();
+      // }
+       // else
+        {
+            this._s();
+            this._m(x, y);
+
+            this.checkCurveBezier(x, y, x + ((r-x)/3), y, x + (2/3) * (r - x), y, r, y);// this._l(r, y);
+            this._l(r, y + penW);
+            this.checkCurveBezier(r, y + penW, x + (2/3) * (r - x), y + penW, x + ((r-x)/3), y + penW, x, y + penW);//this._l(x, y + penW);
+            this._z();
+            this.ds();
+        }
     },
 
     drawHorLine2 : function(align, y, x, r, penW)
     {
-        this.p_width(1000 * penW);
 
         var _y = y;
         switch (align)
@@ -1213,18 +1274,46 @@ CTextDrawer.prototype =
                 break;
             }
         }
+       // if(!AdditionalData)
+       // {
+       //     this.p_width(1000 * penW);
+//
+//
+       //     this._s();
+       //     this._m(x, (_y - penW));
+       //     this._l(r, (_y - penW));
+       //     this.ds();
+//
+       //     this._s();
+       //     this._m(x, (_y + penW));
+       //     this._l(r, (_y + penW));
+       //     this.ds();
+//
+       //     this._e();
+       // }
+       // else
+        {
 
-        this._s();
-        this._m(x, (_y - penW));
-        this._l(r, (_y - penW));
-        this.ds();
+            this._s();
+            this._m(x, (_y - penW ));
 
-        this._s();
-        this._m(x, (_y + penW));
-        this._l(r, (_y + penW));
-        this.ds();
+            this.checkCurveBezier(x, _y - penW, x + ((r-x)/3), _y - penW, x + (2/3) * (r - x), _y - penW, r, _y - penW);//this._l(r, (_y - penW ));
+            this._l(r, _y);
+            this.checkCurveBezier(r, _y, x + (2/3) * (r - x), _y, x + ((r-x)/3), _y, x, _y);//this._l(x, (_y - penW + penW));
+            this._z();
+            this.ds();
+            this.df();
 
-        this._e();
+            this._s();
+            this._m(x, (_y + penW ));
+            this.checkCurveBezier(x, _y + penW, x + ((r-x)/3), _y + penW, x + (2/3) * (r - x), _y + penW, r, _y + penW);//this._l(r, (_y + penW ));
+            this._l(r, (_y + penW + penW));
+            this.checkCurveBezier(r, (_y + penW + penW), x + (2/3) * (r - x), _y + penW + penW, x + ((r-x)/3), _y + penW + penW,  x, _y + penW + penW);//this._l(x, (_y + penW + penW));
+            this._z();
+            this.ds();
+
+            this._e();
+        }
     },
 
     drawVerLine : function(align, x, y, b, penW)
@@ -1263,17 +1352,32 @@ CTextDrawer.prototype =
 
     rect : function(x,y,w,h)
     {
-        var _x = x;
-        var _y = y;
-        var _r = (x + w);
-        var _b = (y + h);
+        var oLastCommand = this.m_aStack[this.m_aStack.length - 1];
+        if(oLastCommand && (oLastCommand.m_nDrawType === 2 || oLastCommand.m_nDrawType === 4))
+        {
+            this._s();
+            this._m(x, y);
 
-        this._s();
-        this._m(_x, _y);
-        this._l(_r, _y);
-        this._l(_r, _b);
-        this._l(_x, _b);
-        this._l(_x, _y);
+            this.checkCurveBezier(x, y, x + (w/3), y, x + (2/3) *w, y, x+w, y);// this._l(r, y);
+            this._l(x+w, y + h);
+            this.checkCurveBezier(x + w, y + h, x + (2/3) * (w), y + h, x + (w/3), y + h, x, y + h);//this._l(x, y + penW);
+            this._z();
+            this.ds();
+        }
+        else
+        {
+            var _x = x;
+            var _y = y;
+            var _r = (x + w);
+            var _b = (y + h);
+
+            this._s();
+            this._m(_x, _y);
+            this._l(_r, _y);
+            this._l(_r, _b);
+            this._l(_x, _b);
+            this._l(_x, _y);
+        }
     },
 
     TableRect : function(x,y,w,h)
@@ -1422,7 +1526,19 @@ CTextDrawer.prototype =
     {
         if(oTextPr)
         {
-            return oTextPr.TextFill ? oTextPr.TextFill : oTextPr.Unifill;
+            if(oTextPr.TextFill)
+            {
+                return oTextPr.TextFill;
+            }
+            if(oTextPr.Unifill)
+            {
+                return oTextPr.Unifill;
+            }
+            if(oTextPr.Color)
+            {
+                return CreateUnfilFromRGB(oTextPr.Color.r, oTextPr.Color.g, oTextPr.Color.b)
+            }
+            return null;
         }
         else
         {

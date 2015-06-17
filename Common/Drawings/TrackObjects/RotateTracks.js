@@ -202,7 +202,7 @@ ObjectToDraw.prototype =
         this.oParaLine = oParaLine;
     },
 
-    draw: function(graphics, bNoParentShapeTransform, oTransformMatrix)
+    draw: function(graphics, bNoParentShapeTransform, oTransformMatrix, oTheme, oColorMap)
     {
         var oTransform;
         if(oTransformMatrix)
@@ -218,6 +218,17 @@ ObjectToDraw.prototype =
             else
             {
                 oTransform = this.TransformMatrix;
+            }
+        }
+        if(oTheme && oColorMap)
+        {
+            if(this.brush)
+            {
+                this.brush.check(oTheme, oColorMap);
+            }
+            if(this.pen && this.pen.Fill)
+            {
+                this.pen.Fill.check(oTheme, oColorMap);
             }
         }
         graphics.SaveGrState();
