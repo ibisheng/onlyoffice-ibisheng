@@ -7477,6 +7477,7 @@ asc_docs_api.prototype.asc_showRevision = function (newObj) {
 		this.LoadDocument();
 	} else if (this.VersionHistory.currentChangeId < newObj.currentChangeId) {
 		// Нужно только добавить некоторые изменения
+		CollaborativeEditing.Clear_CollaborativeMarks();
 		editor.VersionHistory.applyChanges(editor);
 		CollaborativeEditing.Apply_Changes();
 	}
