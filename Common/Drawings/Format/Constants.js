@@ -943,6 +943,8 @@ var historyitem_ParaRun_MathStyle       = 32; // Меняем свойство s
 var historyitem_ParaRun_MathPrp         = 33; // Меняем MathPr
 var historyitem_ParaRun_ReviewType      = 34; // Тип для рецензирования
 var historyitem_ParaRun_PrChange        = 35; // Добавляем элемент PrChange в Run.Pr
+var historyitem_ParaRun_TextFill        = 36; // Заливка Текста в WordArt'ах
+var historyitem_ParaRun_TextOutline     = 37; // Обводка текста в WordArt'ах
 
 
 // Типы изменений в классе ParaTextPr

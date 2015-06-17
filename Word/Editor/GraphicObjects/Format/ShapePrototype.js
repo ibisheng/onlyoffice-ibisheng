@@ -385,6 +385,12 @@ CShape.prototype.checkShapeChild = function()
 CShape.prototype.checkShapeChildTransform = function()
 {
 };
+CShape.prototype.Get_AllParagraphs = function(Props, ParaArray)
+{
+    var oContent = this.getDocContent();
+    oContent && oContent.Get_AllParagraphs(Props, ParaArray);
+};
+
 
 
 CShape.prototype.getArrayWrapIntervals = function(x0,y0, x1, y1, Y0Sp, Y1Sp, LeftField, RightField, arr_intervals)

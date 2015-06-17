@@ -5312,6 +5312,8 @@ ParaRun.prototype.Clear_TextFormatting = function( DefHyper )
     this.Set_RFonts2( undefined );
     this.Set_RStyle( undefined );
     this.Set_Shd( undefined );
+    this.Set_TextFill( undefined );
+    this.Set_TextOutline( undefined );
 
     // Насильно заставим пересчитать стиль, т.к. как данная функция вызывается у параграфа, у которого мог смениться стиль
     this.Recalc_CompiledPr(true);
@@ -5872,6 +5874,18 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
         this.Set_Color(undefined);
     }
 
+    if(undefined !== TextPr.TextOutline)
+    {
+        this.Set_TextOutline(null === TextPr.TextOutline ? undefined : TextPr.TextOutline);
+    }
+
+    if(undefined !== TextPr.TextFill)
+    {
+        this.Set_Unifill(undefined);
+        this.Set_Color(undefined);
+        this.Set_TextFill(null === TextPr.TextFill ? undefined : TextPr.TextFill);
+    }
+
     if ( undefined != TextPr.VertAlign )
         this.Set_VertAlign( null === TextPr.VertAlign ? undefined : TextPr.VertAlign );
 
@@ -6060,7 +6074,31 @@ ParaRun.prototype.Set_Unifill = function(Value)
         this.Recalc_CompiledPr( false );
     }
 };
+ParaRun.prototype.Set_TextFill = function(Value)
+{
+    if ( ( undefined === Value && undefined !== this.Pr.TextFill ) || ( Value instanceof CUniFill && ( undefined === this.Pr.TextFill || false === CompareUnifillBool(this.Pr.TextFill.IsIdentical, Value) ) ) )
+    {
+        var OldValue = this.Pr.TextFill;
+        this.Pr.TextFill = Value;
 
+        History.Add( this, { Type : historyitem_ParaRun_TextFill, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+
+        this.Recalc_CompiledPr( false );
+    }
+};
+
+ParaRun.prototype.Set_TextOutline = function(Value)
+{
+    if ( ( undefined === Value && undefined !== this.Pr.TextOutline ) || ( Value instanceof CLn && ( undefined === this.Pr.TextOutline || false === this.Pr.TextOutline.IsIdentical(Value) ) ) )
+    {
+        var OldValue = this.Pr.TextOutline;
+        this.Pr.TextOutline = Value;
+
+        History.Add( this, { Type : historyitem_ParaRun_TextOutline, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
+
+        this.Recalc_CompiledPr( false );
+    }
+};
 
 ParaRun.prototype.Get_Color = function()
 {
@@ -6526,6 +6564,27 @@ ParaRun.prototype.Undo = function(Data)
             break;
         }
 
+        case historyitem_ParaRun_TextFill:
+        {
+            if ( undefined != Data.Old )
+                this.Pr.TextFill = Data.Old;
+            else
+                this.Pr.TextFill = undefined;
+
+            this.Recalc_CompiledPr(false);
+            break;
+        }
+        case historyitem_ParaRun_TextOutline:
+        {
+            if ( undefined != Data.Old )
+                this.Pr.TextOutline = Data.Old;
+            else
+                this.Pr.TextOutline = undefined;
+
+            this.Recalc_CompiledPr(false);
+            break;
+        }
+
         case historyitem_ParaRun_VertAlign:
         {
             if ( undefined != Data.Old )
@@ -6906,6 +6965,28 @@ ParaRun.prototype.Redo = function(Data)
             this.Recalc_CompiledPr(false);
             break;
         }
+
+        case historyitem_ParaRun_TextFill:
+        {
+            if ( undefined != Data.New )
+                this.Pr.TextFill = Data.New;
+            else
+                this.Pr.TextFill = undefined;
+
+            this.Recalc_CompiledPr(false);
+            break;
+        }
+        case historyitem_ParaRun_TextOutline:
+        {
+            if ( undefined != Data.New )
+                this.Pr.TextOutline = Data.New;
+            else
+                this.Pr.TextOutline = undefined;
+
+            this.Recalc_CompiledPr(false);
+            break;
+        }
+
 
         case historyitem_ParaRun_VertAlign:
         {
@@ -7343,6 +7424,8 @@ ParaRun.prototype.Save_Changes = function(Data, Writer)
         }
 
         case historyitem_ParaRun_Unifill:
+        case historyitem_ParaRun_TextFill:
+        case historyitem_ParaRun_TextOutline:
         {
             if (false === Data.Color)
                 Writer.WriteBool(false);
@@ -7894,6 +7977,38 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             break;
         }
 
+
+
+        case historyitem_ParaRun_TextFill:
+        {
+            bColorPrChange = Reader.GetBool();
+            if ( true != Reader.GetBool() )
+            {
+                var unifill = new CUniFill();
+                unifill.Read_FromBinary(Reader);
+                this.Pr.TextFill = unifill;
+            }
+            else
+                this.Pr.TextFill = undefined;
+
+            this.Recalc_CompiledPr(false);
+            break;
+        }
+        case historyitem_ParaRun_TextOutline:
+        {
+            bColorPrChange = Reader.GetBool();
+            if ( true != Reader.GetBool() )
+            {
+                var ln = new CLn();
+                ln.Read_FromBinary(Reader);
+                this.Pr.TextOutline = ln;
+            }
+            else
+                this.Pr.TextOutline = undefined;
+
+            this.Recalc_CompiledPr(false);
+            break;
+        }
         case historyitem_ParaRun_VertAlign:
         {
             // Bool  : IsUndefined
