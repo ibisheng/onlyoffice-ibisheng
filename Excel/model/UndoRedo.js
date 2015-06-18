@@ -2893,16 +2893,17 @@ UndoRedoWorkbook.prototype = {
                     var n;
                     for(var i = 0; i < Data.slaveEdge.length; i++){
                         n = this.wb.dependencyFormulas.getNode3(Data.slaveEdge[i]);
+                        if( n ){
+                            this.wb.needRecalc.nodes[n.nodeId] = [n.sheetId, n.cellId ];
+                            this.wb.needRecalc.length++;
 
-                        this.wb.needRecalc.nodes[n.nodeId] = [n.sheetId, n.cellId ];
-                        this.wb.needRecalc.length++;
-
-                        n = n.returnCell();
-                        n ? function(){
-                            n.formulaParsed = new parserFormula( n.formulaParsed.Formula, n.formulaParsed.cellId, n.formulaParsed.ws )
-                            n.formulaParsed.parse();
-                            n.formulaParsed.buildDependencies();
-                        }() : null;
+                            n = n.returnCell();
+                            n ? function(){
+                                n.formulaParsed = new parserFormula( n.formulaParsed.Formula, n.formulaParsed.cellId, n.formulaParsed.ws )
+                                n.formulaParsed.parse();
+                                n.formulaParsed.buildDependencies();
+                            }() : null;
+                        }
                     }
                     sortDependency(this.wb);
                 }

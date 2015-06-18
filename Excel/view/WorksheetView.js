@@ -6506,7 +6506,7 @@
                 defName = this.model.getName() + "!" + dN.getAbsName();
             }*/
 
-            defName = this.model.getName() + "!" + dN.getAbsName();
+            defName = parserHelp.getEscapeSheetName(this.model.getName()) + "!" + dN.getAbsName();
 
             defName = defName ? this.model.workbook.findDefinesNames(defName,this.model.getId()) : null;
 
@@ -6516,8 +6516,8 @@
 		WorksheetView.prototype.getSelectionRangeValue = function () {
 			// ToDo проблема с выбором целого столбца/строки
 			var ar = this.activeRange.clone(true);
-			ar.r1Abs = ar.c1Abs = ar.r2Abs = ar.c2Abs = true;
-			var sName = ar.getName();
+//			ar.r1Abs = ar.c1Abs = ar.r2Abs = ar.c2Abs = true;
+			var sName = ar.getAbsName();
 			return (c_oAscSelectionDialogType.FormatTable === this.selectionDialogType) ? sName :
 				parserHelp.get3DRef(this.model.getName(), sName);
 		};
@@ -10205,16 +10205,30 @@
                 ascRange = new asc_Range(c1, r1, c2, r2 );
                 /*TODO: сделать поиск по названиям автофигур, должен искать до того как вызвать поиск по именованным диапазонам*/
                 var defName = new Asc.asc_CDefName( reference, this.model.getName()+"!"+ascRange.getAbsName(), null ),
-                    _C2H50H_ = this.model.workbook.editDefinesNames( null, defName ), sheetName = "", ref = "";
+                    _C2H50H_, sheetName = "", ref = "";
+
+                _C2H50H_ = this.model.workbook.getDefinesNames( reference, this.model.workbook.getActiveWs().getId() );
+
+                if( !_C2H50H_ ){
+                    _C2H50H_  = this.model.workbook.editDefinesNames( null, defName );
+                }
+
                 if(_C2H50H_){
 
                     sheetName = _C2H50H_.Ref.split("!");
                     ref = sheetName[1];
                     sheetName = sheetName[0];
                     range = {range:asc.g_oRangeCache.getAscRange(ref), sheet:sheetName};
+                    if( sheetName[0] == "'" && sheetName[sheetName.length-1] == "'" ){
+                        range.sheet = range.sheet.substring(1,range.sheet.length-1);
+                    }
                     this.model.workbook.handlers.trigger("asc_onDefName", defName);
 
                 }
+            }
+            else{
+                range = {range:range, sheet:this.model.getName()};
+
             }
 			return range;// ? this.setSelection(range, true) : null;
 		};

@@ -1553,16 +1553,15 @@
 		};
 
 		// Вставка формулы в редактор
-		WorkbookView.prototype.insertFormulaInEditor = function (functionName, autoComplete) {
-			var t = this;
-			var ws = this.getWorksheet();
+		WorkbookView.prototype.insertFormulaInEditor = function (functionName, autoComplete, isDefName) {
+			var t = this, ws = this.getWorksheet(), cursorPos
 
 			// Проверяем, открыт ли редактор
 			if (ws.getCellEditMode()) {
 				// При autoComplete заканчиваем ввод
 				if (autoComplete)
 					this.cellEditor.close(true);
-				else if (false === this.cellEditor.insertFormula (functionName)) {
+				else if (false === this.cellEditor.insertFormula (functionName,isDefName)) {
 					// Не смогли вставить формулу, закроем редактор, с сохранением текста
 					this.cellEditor.close(true);
 				}
@@ -1573,20 +1572,24 @@
 				if (autoComplete) {
 					cellRange = ws.autoCompleteFormula(functionName);
 				}
-				if (cellRange) {
-					if (cellRange.notEditCell) {
-						// Мы уже ввели все что нужно, редактор открывать не нужно
-						return;
-					}
-					// Меняем значение ячейки
-					functionName = "=" + functionName + "(" + cellRange.text + ")";
-				} else {
-					// Меняем значение ячейки
-				functionName = "=" + functionName + "()";
-				}
-
-				// Вычисляем позицию курсора (он должен быть в функции)
-				var cursorPos = functionName.length - 1;
+                if(isDefName){
+                    functionName = "=" + functionName
+                }
+                else{
+                    if (cellRange) {
+                        if (cellRange.notEditCell) {
+                            // Мы уже ввели все что нужно, редактор открывать не нужно
+                            return;
+                        }
+                        // Меняем значение ячейки
+                        functionName = "=" + functionName + "(" + cellRange.text + ")";
+                    } else {
+                        // Меняем значение ячейки
+                        functionName = "=" + functionName + "()";
+                    }
+                    // Вычисляем позицию курсора (он должен быть в функции)
+                    cursorPos = functionName.length - 1;
+                }
 
 				// Проверка глобального лока
 				if (this.collaborativeEditing.getGlobalLock())
@@ -1938,8 +1941,8 @@
             return ws.findCell(reference);
         };
 
-        WorkbookView.prototype.getDefinedNames = function () {
-            return this.model.getDefinesNamesWB();
+        WorkbookView.prototype.getDefinedNames = function (defNameListId) {
+            return this.model.getDefinesNamesWB(defNameListId);
         };
 
         WorkbookView.prototype.setDefinedNames = function (defName) {

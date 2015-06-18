@@ -4348,11 +4348,14 @@ TablePart.prototype.clone = function(ws) {
 TablePart.prototype.recalc = function(ws) {
 	this.DisplayName = ws.workbook.dependencyFormulas.getNextTableName(ws, this.Ref);
 };
-TablePart.prototype.moveRef = function(col, row) {
+TablePart.prototype.moveRef = function(col, row, ws) {
 	var ref = this.Ref.clone();
 	ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
-	
+    var worksheet = ws.model;
+
 	this.Ref = ref;
+    worksheet.workbook.dependencyFormulas.changeTableName( this.DisplayName, worksheet, this.Ref );
+
 	if(this.AutoFilter)
 		this.AutoFilter.moveRef(col, row);
 };

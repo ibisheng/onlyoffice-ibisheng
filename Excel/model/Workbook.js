@@ -813,14 +813,16 @@ DependencyGraph.prototype = {
 
     /*Defined Names section*/
     getDefNameNode:function ( node ) {
-        return this.defNameList[node];
+        var ret = this.defNameList[node];
+        ret.Ref == null ? ret = null : false;
+        return ret;
     },
     getDefNameNodeByName:function ( name, sheetId ) {
 
         name = name.toLowerCase();
 
         var sheetNodeList,
-            nodeId = getDefNameVertexId( sheetId, name ),
+            nodeId,
             oRes = false;
 
         if ( !rx_defName.test( name ) ) {
@@ -869,10 +871,8 @@ DependencyGraph.prototype = {
         var ws = this.wb.getWorksheet( sheetId )
         ws ? sheetId = ws.getId() : null;
 
-        var _this = this,
-            nodeId = getDefNameVertexId( sheetId, defName ),
-            oRes = this.defNameList[nodeId],
-            dfv, defNameSheetsList;
+        var nodeId = getDefNameVertexId( sheetId, defName ),
+            oRes = this.defNameList[nodeId], dfv, defNameSheetsList;
 
         if ( null == oRes || null == oRes.Ref ) {
             dfv = new DefNameVertex( sheetId, defName, defRef, this.wb );
@@ -892,14 +892,13 @@ DependencyGraph.prototype = {
         return oRes;
 
     },
-    remoteDefName:function ( sheetId, name ) {
+    removeDefName:function ( sheetId, name ) {
 
-        var ws = this.wb.getWorksheet( sheetId )
+        var ws = this.wb.getWorksheet( sheetId );
         ws ? sheetId = ws.getId() : null;
 
         var nodeId = getDefNameVertexId( sheetId, name ),
-            oRes = this.defNameList[nodeId],
-            ret = null;
+            oRes = this.defNameList[nodeId], ret = null;
 
         if ( oRes ) {
             this.defNameList[nodeId].Ref = null;
@@ -907,6 +906,47 @@ DependencyGraph.prototype = {
         }
 
         return ret;
+
+    },
+    removeDefNameBySheet:function ( sheetId ) {
+
+        /*var ws = this.wb.getWorksheet( sheetId );
+        ws ? sheetId = ws.getId() : null;*/
+
+        var nodesList = this.defNameList, retRes = {}, defN, seUndoRedo = [], nSE;
+
+        for( var id in nodesList ){
+
+            if( nodesList[id].parsedRef.removeSheet(sheetId) ){
+                seUndoRedo = [];
+                defN = nodesList[id];
+                nSE = defN.getSlaveEdges();
+                for( var nseID in nSE ){
+                    seUndoRedo.push(nseID);
+                }
+
+                History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null,
+                    new UndoRedoData_DefinedNames( defN.Name, defN.Ref, defN.Scope, seUndoRedo ) );
+
+                if( defN.sheetId == sheetId ){
+
+                    defN.Ref = null;
+                    defN.parsedRef = null;
+                    retRes[id] = defN;
+
+                }
+                else{
+
+                    defN.Ref = defN.parsedRef.Formula  = defN.parsedRef.assemble(true);
+                    retRes[id] = defN;
+
+                }
+
+            }
+
+        }
+
+        return retRes;
 
     },
     changeDefName:function ( oldDefName, newDefName ) {
@@ -996,6 +1036,10 @@ DependencyGraph.prototype = {
             this.defNameSheets[dfv.sheetId] = defNameSheetsList;
         }
         defNameSheetsList[dfv.nodeId] = dfv;
+    },
+    changeTableName:function(tableName, ws, newRef){
+        var table = this.getDefNameNodeByName( tableName, ws );
+        table.Ref = parserHelp.getEscapeSheetName(ws.getName())+"!"+newRef.getAbsName();
     }
 };
 
@@ -1480,7 +1524,11 @@ DefNameVertex.prototype = {
     },
 
     getAscCDefName:function () {
-        return new Asc.asc_CDefName( this.Name, this.Ref, this.sheetId == "WB" ? null : this.wb.getWorksheetById( this.sheetId ).getIndex(), this.isTable );
+        var a = this.wb.getWorksheetById( this.sheetId );
+        return new Asc.asc_CDefName( this.Name,
+            this.Ref,
+            this.sheetId == "WB" ? null : a ? a.getIndex() : null,
+            this.isTable );
     },
 
     changeDefName:function ( newName ) {
@@ -2051,7 +2099,7 @@ Workbook.prototype.removeWorksheet=function(nIndex, outputParams){
 					if( cell && cell.formulaParsed && cell.formulaParsed.is3D )
 					{
 						if(cell.formulaParsed.removeSheet(removedSheetId))
-							slave.setFormula(cell.formulaParsed.assemble(), true, true);
+							slave.setFormula(cell.formulaParsed.assemble(true), true, true);
 					}
 				}
 			}
@@ -2060,7 +2108,45 @@ Workbook.prototype.removeWorksheet=function(nIndex, outputParams){
 		this.dependencyFormulas.removeNodeBySheetId(removedSheetId);
 		var _cwf = this.cwf[removedSheetId];
 		delete this.cwf[removedSheetId];
-		
+
+
+        var retRes = this.dependencyFormulas.removeDefNameBySheet( removedSheetId ), nSE, se, seUndoRedo = [];
+
+        if ( retRes ) {
+            /*
+             * #1. поменяли название - перестроили формулу. нужно вызвать пересборку формул в ячейках, в которыйх есть эта именованная ссылка.
+             *  для этого пробегаемся по всем slave, и вызываем пересборку. в результате должна получиться новая формула, где используется новый диапазон.
+             * #2. поменяли диапазон. нужно перестроить граф зависимосте и пересчитать формулу. находим диапазон; меняем в нем ссылку; разбираем ссылку;
+             *  удаляем старые master и добавляем новые, которые получились в результате разбора новой ссылки; пересчитываем формулу.
+             * */
+
+            for( var defNameID in retRes ){
+                nSE = retRes[defNameID].getSlaveEdges();
+                retRes[defNameID].deleteAllMasterEdges();
+
+                for ( var id in nSE ) {
+//                    seUndoRedo.push( id );
+                    se = nSE[id];
+                    se.deleteMasterEdge( retRes[defNameID] );
+
+                    this.needRecalc.nodes[se.nodeId] = [se.sheetId, se.cellId ];
+                    this.needRecalc.length++;
+
+                    se = se.returnCell();
+                    se ? function () {
+                        se.setFormula( se.formulaParsed.assemble() );
+                        se.formulaParsed.isParsed = false;
+                        se.formulaParsed.parse();
+                        se.formulaParsed.buildDependencies();
+                    }() : null;
+
+                }
+//                History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames( nodesList[id].Name, nodesList[id].Ref, nodesList[id].Scope, seUndoRedo ) );
+            }
+//            History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames( defName.Name, defName.Ref, defName.Scope, null/*seUndoRedo*/ ) );
+//            sortDependency( this );
+        }
+
 		var wsActive = this.getActiveWs();
 		var oVisibleWs = null;
 		this.aWorksheets.splice(nIndex, 1);
@@ -2070,6 +2156,7 @@ Workbook.prototype.removeWorksheet=function(nIndex, outputParams){
 		    if (null != oVisibleWs)
 		        wsActive = oVisibleWs;
 		}
+
 		History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetRemove, null, null, new UndoRedoData_SheetRemove(nIndex, removedSheetId, removedSheet, _cwf));
 		if (null != oVisibleWs) {
 		    History.SetSheetUndo(removedSheetId);
@@ -2232,7 +2319,7 @@ Workbook.prototype.isDefinedNamesExists = function ( name, sheetId ) {
     return false;
 };
 Workbook.prototype.getDefinesNamesWB = function (defNameListId) {
-    var names = [], name, thas = this;
+    var names = [], name, thas = this, activeWS;
 
     /*c_oAscGetDefinedNamesList.
         Worksheet           :   0,
@@ -2249,7 +2336,11 @@ Workbook.prototype.getDefinesNamesWB = function (defNameListId) {
         }
     }
 
-    var activeWS, listDN
+    function sort(a,b){
+        if (a.Name > b.Name) return 1;
+        if (a.Name < b.Name) return -1;
+    }
+
     switch(defNameListId){
         case c_oAscGetDefinedNamesList.Worksheet:
         case c_oAscGetDefinedNamesList.WorksheetWorkbook:
@@ -2272,72 +2363,18 @@ Workbook.prototype.getDefinesNamesWB = function (defNameListId) {
             break;
     }
 
-    return names;
+    return names.sort(sort);
 };
 Workbook.prototype.getDefinesNames = function ( name, sheetId ) {
 
     var res = this.dependencyFormulas.getDefNameNodeByName( name, sheetId );
     return res;
 };
-/*Workbook.prototype.setDefinesNames = function ( defName ) {
- var n = defName.Name.toLowerCase(),
- retRes = null;
-
- var rxTest = rx_defName.test( n );
- if ( !rxTest ) {
- return null;
- }
-
- var dN = this.DefinedNames || {};
- if ( null != defName.Scope ) {
- var ws = this.getWorksheetById( defName.Scope );
- if ( ws ) {
- if ( ws.DefinedNames ) {
- if ( ws.DefinedNames[n] ) {
- retRes = new Asc.asc_CDefName( ws.DefinedNames[n].Name, ws.DefinedNames[n].Ref, ws.getIndex() );
- }
- else {
- if ( dN[n] ) {
- return new Asc.asc_CDefName( dN[n].Name, dN[n].Ref, null );
- }
- ws.DefinedNames[n] = { LocalSheetId:defName.Scope, Name:defName.Name, Ref:defName.Ref, bTable:false };
- retRes = new Asc.asc_CDefName( ws.DefinedNames[n].Name, ws.DefinedNames[n].Ref, ws.getIndex() );
- }
- }
- }
- return null;
- }
-
- if ( dN[n] ) {
- return new Asc.asc_CDefName( dN[n].Name, dN[n].Ref, null );
- }
- else {
- dN[n] = { LocalSheetId:null, Name:defName.Name, Ref:defName.Ref, bTable:false };
- retRes = new Asc.asc_CDefName( dN[n].Name, dN[n].Ref, null );
- }
- if( retRes ){
- History.Create_NewPoint();
- History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesAdd, null, null, new UndoRedoData_DefinedNames(retRes.Name, retRes.Ref, retRes.Scope));
-
- //
- //          TODO
- //          добавить в граф зависимостей ноду с новым именованным диапазоном.
- //          если функция содержит именованный диапазон с область видимости книга, а вводится диапазон с таким же именем,
- //          но с областью видимости лист, то функция пересчитывается на диапазон с областью видимости лист
- //
-
-
-
- }
-
- return retRes;
-
- };*/
 Workbook.prototype.delDefinesNames = function ( defName ) {
     History.Create_NewPoint();
     var retRes = false, res = null;
 
-    retRes = this.dependencyFormulas.remoteDefName( defName.LocalSheetId, defName.Name );
+    retRes = this.dependencyFormulas.removeDefName( defName.LocalSheetId, defName.Name );
 
     if ( retRes ) {
         /*
@@ -3984,9 +4021,7 @@ Woorksheet.prototype._moveCellHor=function(nRow, nCol, dif){
 	var cell = this._getCellNoEmpty(nRow, nCol);
 	if(cell)
 	{
-		var lastName = cell.getName();//старое имя
 		cell.moveHor(dif);
-		var newName = cell.getName();
 		var row = this._getRow(nRow);
 		row.c[nCol + dif] = cell;
 		delete row.c[nCol];
@@ -3996,7 +4031,6 @@ Woorksheet.prototype._moveCellVer=function(nRow, nCol, dif){
 	var cell = this._getCellNoEmpty(nRow, nCol);
 	if(cell)
 	{
-		var lastName = cell.getName();//старое имя
 		cell.moveVer(dif);
 		var oCurRow = this._getRow(nRow);
 		var oTargetRow = this._getRow(nRow + dif);

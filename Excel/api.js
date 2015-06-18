@@ -3138,8 +3138,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.wb.removeHyperlink();
 		};
 
-		spreadsheet_api.prototype.asc_insertFormula = function (functionName, autoComplet) {
-			this.wb.insertFormulaInEditor(functionName, autoComplet);
+		spreadsheet_api.prototype.asc_insertFormula = function (functionName, autoComplet, isDefName) {
+			this.wb.insertFormulaInEditor(functionName, autoComplet, isDefName);
 			this.wb.restoreFocus();
 		};
 
