@@ -729,7 +729,7 @@ parserHelper.prototype.isName = function ( formula, start_pos, wb, ws ) {
 
 	if (match != null) {
 		var name = match["name"];
-		if ( name && name.length != 0 && wb.DefinedNames && wb.isDefinedNamesExists( name, ws ? ws.getId() : null ) ) {
+		if ( name && name.length != 0 /*&& wb.DefinedNames && wb.isDefinedNamesExists( name, ws ? ws.getId() : null )*/ ) {
 			this.pCurrPos += name.length;
 			this.operand_str = name;
 			return [ true, name ];

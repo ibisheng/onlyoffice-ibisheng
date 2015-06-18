@@ -595,7 +595,7 @@
 			return fragments.length > 0 && fragments[0].text.length > 0 && fragments[0].text.charAt(0) === "=";
 		};
 
-		CellEditor.prototype.insertFormula = function (functionName) {
+		CellEditor.prototype.insertFormula = function (functionName,isDefName) {
 			// Проверим форула ли это
 			if (false === this.isFormula()) {
 				// Может это просто текста нет
@@ -610,15 +610,17 @@
 				}
 			}
 			else {
-				// Это уже форула, добавляем без '='
-				functionName = functionName + "()";
+                if( !isDefName )
+                    // Это уже форула, добавляем без '='
+                    functionName = functionName + "()";
 			}
 
 			this.skipTLUpdate = false;
 			// Вставим форумулу в текущую позицию
 			this._addChars(functionName);
 			// Меняем позицию курсора внутрь скобок
-			this._moveCursor(kPosition, this.cursorPos - 1);
+            if( !isDefName )
+			    this._moveCursor(kPosition, this.cursorPos - 1);
 		};
 
 		CellEditor.prototype.replaceText = function (pos, len, newText) {
