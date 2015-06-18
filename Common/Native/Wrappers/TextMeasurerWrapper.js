@@ -43,12 +43,17 @@ CTextMeasurerWrapper.prototype =
         else if ( bItalic && bBold )
             oFontStyle = FontStyle.FontStyleBoldItalic;
 
+        this.SetFontInternal(font.FontFamily.Name, font.FontSize, oFontStyle);
+    },
+
+    SetFontInternal : function(_name, _size, _style)
+    {
         var _lastSetUp = this.m_oLastFont;
-        if (_lastSetUp.SetUpName != font.FontFamily.Name || _lastSetUp.SetUpSize != font.FontSize || _lastSetUp.SetUpStyle != oFontStyle)
+        if (_lastSetUp.SetUpName != _name || _lastSetUp.SetUpSize != _size || _lastSetUp.SetUpStyle != _style)
         {
-            _lastSetUp.SetUpName = font.FontFamily.Name;
-            _lastSetUp.SetUpSize = font.FontSize;
-            _lastSetUp.SetUpStyle = oFontStyle;
+            _lastSetUp.SetUpName = _name;
+            _lastSetUp.SetUpSize = _size;
+            _lastSetUp.SetUpStyle = _style;
 
             var _fontinfo = g_fontApplication.GetFontInfo(_lastSetUp.SetUpName, _lastSetUp.SetUpStyle, this.LastFontOriginInfo);
             var _info = GetLoadInfoForMeasurer(_fontinfo, _lastSetUp.SetUpStyle);
@@ -135,29 +140,7 @@ CTextMeasurerWrapper.prototype =
         if (_lastFont.Bold)
             _style += 1;
 
-        if (_lastFont.Name != _lastFont.SetUpName || _lastFont.Size != _lastFont.SetUpSize || _style != _lastFont.SetUpStyle)
-        {
-            _lastFont.SetUpName = _lastFont.Name;
-            _lastFont.SetUpSize = _lastFont.Size;
-            _lastFont.SetUpStyle = _style;
-
-            var _fontinfo = g_fontApplication.GetFontInfo(_lastFont.SetUpName, _lastFont.SetUpStyle, this.LastFontOriginInfo);
-            var _info = GetLoadInfoForMeasurer(_fontinfo, _lastFont.SetUpStyle);
-
-            var flag = 0;
-            if (_info.NeedBold)     flag |= 0x01;
-            if (_info.NeedItalic)   flag |= 0x02;
-            if (_info.SrcBold)      flag |= 0x04;
-            if (_info.SrcItalic)    flag |= 0x08;
-
-            var _bounds = this.Measurer["LoadFont"](_info.Path, _info.FaceIndex, _lastFont.SetUpSize, flag);
-
-            this.UnitsPerEm = _bounds[3];
-            var dKoef = g_dKoef_pt_to_mm * _lastFont.SetUpSize / this.UnitsPerEm;
-            this.Ascender   = _bounds[0] * dKoef;
-            this.Descender  = _bounds[1] * dKoef;
-            this.Height     = _bounds[2] * dKoef;
-        }
+        this.SetFontInternal(_lastFont.Name, _lastFont.Size, _style);
     },
 
     GetTextPr : function()

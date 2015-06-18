@@ -310,7 +310,7 @@ function CTextMeasurer()
     this.Init = function()
     {
         this.m_oManager.Initialize();
-    }
+    };
 
     this.SetFont = function(font)
     {
@@ -339,7 +339,20 @@ function CTextMeasurer()
 
             g_fontApplication.LoadFont(_lastSetUp.SetUpName, window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
         }
-    }
+    };
+
+    this.SetFontInternal = function(_name, _size, _style)
+    {
+        var _lastSetUp = this.m_oLastFont;
+        if (_lastSetUp.SetUpName != _name || _lastSetUp.SetUpSize != _size || _lastSetUp.SetUpStyle != _style)
+        {
+            _lastSetUp.SetUpName = _name;
+            _lastSetUp.SetUpSize = _size;
+            _lastSetUp.SetUpStyle = _style;
+
+            g_fontApplication.LoadFont(_lastSetUp.SetUpName, window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
+        }
+    };
 
     this.SetTextPr = function(textPr, theme)
     {

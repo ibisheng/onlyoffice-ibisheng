@@ -154,7 +154,7 @@ function CTextMeasurer()
     this.Init = function()
     {
         this.m_oManager.Initialize();
-    }
+    };
 
     this.SetFont = function(font)
     {
@@ -183,7 +183,20 @@ function CTextMeasurer()
 
             g_fontApplication.LoadFont(_lastSetUp.SetUpName, window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
         }
-    }
+    };
+
+    this.SetFontInternal = function(_name, _size, _style)
+    {
+        var _lastSetUp = this.m_oLastFont;
+        if (_lastSetUp.SetUpName != _name || _lastSetUp.SetUpSize != _size || _lastSetUp.SetUpStyle != _style)
+        {
+            _lastSetUp.SetUpName = _name;
+            _lastSetUp.SetUpSize = _size;
+            _lastSetUp.SetUpStyle = _style;
+
+            g_fontApplication.LoadFont(_lastSetUp.SetUpName, window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
+        }
+    };
 
     this.SetTextPr = function(textPr, theme)
     {
@@ -194,7 +207,7 @@ function CTextMeasurer()
         this.m_oTextPr.RFonts.EastAsia = {Name: FontScheme.checkFont(this.m_oTextPr.RFonts.EastAsia.Name), Index: -1};
         this.m_oTextPr.RFonts.HAnsi    = {Name: FontScheme.checkFont(this.m_oTextPr.RFonts.HAnsi.Name), Index: -1};
         this.m_oTextPr.RFonts.CS       = {Name: FontScheme.checkFont(this.m_oTextPr.RFonts.CS.Name), Index: -1};
-    }
+    };
 
     this.SetFontSlot = function(slot, fontSizeKoef)
     {
@@ -267,17 +280,17 @@ function CTextMeasurer()
 
             g_fontApplication.LoadFont(_lastFont.SetUpName, window.g_font_loader, this.m_oManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
         }
-    }
+    };
 
     this.GetTextPr = function()
     {
         return this.m_oTextPr;
-    }
+    };
 
     this.GetFont = function()
     {
         return this.m_oFont;
-    }
+    };
 
     this.Measure = function(text)
     {
@@ -294,7 +307,7 @@ function CTextMeasurer()
         Height = 0;//Temp.fHeight;
 
         return { Width : Width, Height : Height };
-    }
+    };
     this.Measure2 = function(text)
     {
         var Width  = 0;
@@ -309,7 +322,7 @@ function CTextMeasurer()
 
         return { Width : Width, Ascent : (Temp.oBBox.fMaxY * 25.4 / 72), Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
             WidthG: ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72)};
-    }
+    };
 
     this.MeasureCode = function(lUnicode)
     {
@@ -325,7 +338,7 @@ function CTextMeasurer()
         Height = 0;//Temp.fHeight;
 
         return { Width : Width, Height : Height };
-    }
+    };
     this.Measure2Code = function(lUnicode)
     {
         var Width  = 0;
@@ -339,7 +352,7 @@ function CTextMeasurer()
 
         return { Width : Width, Ascent : (Temp.oBBox.fMaxY * 25.4 / 72), Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
             WidthG: ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72)};
-    }
+    };
 
     this.GetAscender = function()
     {
@@ -347,21 +360,21 @@ function CTextMeasurer()
         var Ascender   = this.m_oManager.m_lAscender;
 
         return Ascender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
-    }
+    };
     this.GetDescender = function()
     {
         var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
         var Descender  = this.m_oManager.m_lDescender;
 
         return Descender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
-    }
+    };
     this.GetHeight = function()
     {
         var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
         var Height     = this.m_oManager.m_lLineHeight;
 
         return Height * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
-    }
+    };
 }
 
 var g_oTextMeasurer = new CTextMeasurer();
