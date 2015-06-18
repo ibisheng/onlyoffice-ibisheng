@@ -7494,8 +7494,10 @@ asc_docs_api.prototype.asc_CloseFile = function()
     g_oTableId.Clear();
 	this.isApplyChangesOnOpenEnabled = true;
 
-    this.WordControl.m_oLogicDocument.Stop_Recalculate();
-    this.WordControl.m_oLogicDocument.Stop_CheckSpelling();
+	var oLogicDocument = this.WordControl.m_oLogicDocument;
+	oLogicDocument.Stop_Recalculate();
+	oLogicDocument.Stop_CheckSpelling();
+	window.global_pptx_content_loader.ImageMapChecker = {};
 };
 
 window["asc_docs_api"] = asc_docs_api;
