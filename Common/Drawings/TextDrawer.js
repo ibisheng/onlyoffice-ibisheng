@@ -1031,13 +1031,12 @@ CTextDrawer.prototype =
     },
     FillTextCode : function(x,y,code)
     {
-        var _font_info = window.g_font_infos[window.g_map_font_index[this.m_oFont.Name]];
         //var _is_face_index_no_0 = (_font_info.faceIndexR <= 0 && _font_info.faceIndexI <= 0 && _font_info.faceIndexB <= 0 && _font_info.faceIndexBI <= 0);
 //
         //if (code < 0xFFFF && (_is_face_index_no_0 || window["native"] !== undefined))
         //    return;
 
-        g_fontApplication.LoadFont(_font_info.Name, window.g_font_loader, g_oTextMeasurer.m_oManager, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0), 72, 72);
+        g_oTextMeasurer.SetFontInternal(this.m_oFont.Name, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0));
 
         if (null != this.LastFontOriginInfo.Replace)
         {
@@ -1048,7 +1047,7 @@ CTextDrawer.prototype =
     },
     tg : function(gid,x,y)
     {
-        g_fontApplication.LoadFont(this.m_oFont.Name, window.g_font_loader, g_oTextMeasurer.m_oManager, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0), 72, 72);
+        g_oTextMeasurer.SetFontInternal(this.m_oFont.Name, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0));
         g_oTextMeasurer.m_oManager.LoadStringPathCode(gid, true, x, y, this);
     },
     charspace : function(space)

@@ -5866,12 +5866,14 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
     {
         this.Set_Color( null === TextPr.Color ? undefined : TextPr.Color );
         this.Set_Unifill( undefined );
+        this.Set_TextFill(undefined);
     }
 
     if ( undefined !== TextPr.Unifill )
     {
         this.Set_Unifill(null === TextPr.Unifill ? undefined : TextPr.Unifill);
         this.Set_Color(undefined);
+        this.Set_TextFill(undefined);
     }
 
     if(undefined !== TextPr.TextOutline)
