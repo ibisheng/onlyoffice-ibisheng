@@ -5094,7 +5094,7 @@ asc_docs_api.prototype.sync_ContextMenuCallback = function(Data)
     this.asc_fireCallback("asc_onContextMenu", Data);
 };
 
-function _sendCommandCallback (fCallback, error, result) {
+function _sendCommandCallback (fCallback, error, result, rdata) {
 	if (error || !result) {
 		editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
 		if(fCallback)

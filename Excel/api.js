@@ -900,7 +900,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			return this.wbModel.getWorksheet(sheetIndex).PagePrintOptions;
 		};
 
-		spreadsheet_api.prototype._sendCommandCallback = function (fCallback, error, result) {
+		spreadsheet_api.prototype._sendCommandCallback = function (fCallback, error, result, rdata) {
 			if (error || !result) {
 				this.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
 				if(fCallback)

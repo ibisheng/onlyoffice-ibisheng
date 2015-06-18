@@ -6986,7 +6986,7 @@ window["asc_nativeOnSpellCheck"] = function (response)
         editor.SpellCheckApi.onSpellCheck(response);
 };
 
-function _sendCommandCallback (fCallback, error, result) {
+function _sendCommandCallback (fCallback, error, result, rdata) {
 	if (error || !result) {
 		if("save" != rdata["c"] && "chsave" != rdata["c"])
 			editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
