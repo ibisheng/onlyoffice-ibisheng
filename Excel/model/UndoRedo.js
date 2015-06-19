@@ -1581,14 +1581,14 @@ UndoRedoData_SheetPositions.prototype = {
 var g_oUndoRedoData_DefinedNamesProperties = {
     Name: 0,
     Ref:1,
-    Scope:2,
+    LocalSheetId:2,
     slaveEdge:3
 };
 function UndoRedoData_DefinedNames(name, ref, scope, slaveEdge){
     this.Properties = g_oUndoRedoData_DefinedNamesProperties;
     this.Name = name;
     this.Ref = ref;
-    this.Scope = scope;
+    this.LocalSheetId = scope;
     this.slaveEdge = slaveEdge;
 }
 UndoRedoData_DefinedNames.prototype = {
@@ -1606,7 +1606,7 @@ UndoRedoData_DefinedNames.prototype = {
         {
             case this.Properties.Name: return this.Name;break;
             case this.Properties.Ref: return this.Ref;break;
-            case this.Properties.Scope: return this.Scope;break;
+            case this.Properties.LocalSheetId: return this.LocalSheetId;break;
             case this.Properties.slaveEdge: return this.slaveEdge;break;
         }
         return null;
@@ -1617,7 +1617,7 @@ UndoRedoData_DefinedNames.prototype = {
         {
             case this.Properties.Name: this.Name = value;break;
             case this.Properties.Ref: this.Ref = value;break;
-            case this.Properties.Scope: this.Scope = value;break;
+            case this.Properties.LocalSheetId: this.LocalSheetId = value;break;
             case this.Properties.slaveEdge: this.slaveEdge = value;break;
         }
     }

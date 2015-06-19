@@ -814,7 +814,7 @@ DependencyGraph.prototype = {
     /*Defined Names section*/
     getDefNameNode:function ( node ) {
         var ret = this.defNameList[node];
-        ret.Ref == null ? ret = null : false;
+        ret && ret.Ref == null ? ret = null : false;
         return ret;
     },
     getDefNameNodeByName:function ( name, sheetId ) {
@@ -913,7 +913,7 @@ DependencyGraph.prototype = {
         /*var ws = this.wb.getWorksheet( sheetId );
         ws ? sheetId = ws.getId() : null;*/
 
-        var nodesList = this.defNameList, retRes = {}, defN, seUndoRedo = [], nSE;
+        var nodesList = this.defNameList, retRes = {}, defN, seUndoRedo = [], nSE, wsIndex;
 
         for( var id in nodesList ){
 
@@ -925,8 +925,10 @@ DependencyGraph.prototype = {
                     seUndoRedo.push(nseID);
                 }
 
+                wsIndex = this.wb.getWorksheetById(defN.sheetId);
+
                 History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null,
-                    new UndoRedoData_DefinedNames( defN.Name, defN.Ref, defN.Scope, seUndoRedo ) );
+                    new UndoRedoData_DefinedNames( defN.Name, defN.Ref, wsIndex ? wsIndex.getIndex() : undefined, seUndoRedo ) );
 
                 if( defN.sheetId == sheetId ){
 
@@ -2398,17 +2400,16 @@ Workbook.prototype.delDefinesNames = function ( defName ) {
             this.needRecalc.length++;
 
             se = se.returnCell();
-            se ? function () {
+            if( se ){
                 se.setFormula( se.formulaParsed.assemble() );
                 se.formulaParsed.isParsed = false;
                 se.formulaParsed.parse();
                 se.formulaParsed.buildDependencies();
-            }() : null;
+            }
 
         }
 
         sortDependency( this );
-
         History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames( defName.Name, defName.Ref, defName.Scope, seUndoRedo ) );
     }
 
