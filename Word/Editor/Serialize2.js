@@ -8743,7 +8743,12 @@ function Binary_oMathReader(stream)
 			var arrContent = [];
             res = this.bcr.Read1(length, function(t, l){				
                 return oThis.ReadMathEqArr(t,l,props,oElem,arrContent);
-            });			
+            });
+			if (props.mcJc)
+			{
+				var oEqArr = oElem.Content[oElem.Content.length-1];
+				oEqArr.setJustification(props.mcJc);
+			}		
         }
 		else if (c_oSer_OMathContentType.Fraction === type)
         {
@@ -9339,7 +9344,7 @@ function Binary_oMathReader(stream)
 			if (!props.ctrPrp)
 				props.ctrPrp = new CTextPr();
 			props.counter = 0;
-			var oEqArr = new CEqArray(props);
+			var oEqArr = new CEqArray(props);			
 			oElem.addElementToContent(oEqArr);			
 			for (var i=0; i<props.row; i++)
 				arrContent[i] = oEqArr.getElement(i);
@@ -9382,6 +9387,12 @@ function Binary_oMathReader(stream)
         {
             res = this.bcr.Read2(length, function(t, l){
                 return oThis.ReadMathMaxDist(t,l,props);
+            });			
+        }
+		else if (c_oSer_OMathBottomNodesType.McJc === type)
+        {
+            res = this.bcr.Read2(length, function(t, l){
+                return oThis.ReadMathMcJc(t,l,props);
             });			
         }
 		else if (c_oSer_OMathBottomNodesType.ObjDist === type)
