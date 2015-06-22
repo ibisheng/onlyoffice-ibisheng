@@ -1126,7 +1126,7 @@ function DrawingObjects() {
                                 worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
                         }
                         else {
-                            worksheet.model.workbook.handlers.trigger("asc_onError", api.asc_mapAscServerErrorToAscError(data["error"]), c_oAscError.Level.NoCritical);
+                            worksheet.model.workbook.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(data["error"]), c_oAscError.Level.NoCritical);
                             worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
                         }
                     }
@@ -3031,7 +3031,7 @@ function DrawingObjects() {
                 if(c_oAscServerError.NoError != nError)
                 {
                     bNeedSubmit = false;
-                    worksheet.model.workbook.handlers.trigger("asc_onError", api.asc_mapAscServerErrorToAscError(nError), c_oAscError.Level.NoCritical);
+                    worksheet.model.workbook.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(nError), c_oAscError.Level.NoCritical);
                 }
             }
             if(bNeedSubmit)

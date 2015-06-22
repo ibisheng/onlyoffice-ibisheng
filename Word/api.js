@@ -564,7 +564,7 @@ function asc_docs_api(name)
 					xhr.send(fd);
 				}
 				else
-					oThis.asc_fireCallback("asc_onError",_mapAscServerErrorToAscError(nError),c_oAscError.Level.NoCritical);
+					oThis.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(nError), c_oAscError.Level.NoCritical);
 			};
 		}
 	}
@@ -2279,7 +2279,7 @@ asc_docs_api.prototype.asc_Print = function()
 					editor.processSavedFile(incomeObject["data"], false);
 				else{
 					if(null != incomeObject && "err" == incomeObject["type"])
-						editor.asc_fireCallback("asc_onError", _mapAscServerErrorToAscError(parseInt(incomeObject["data"])), c_oAscError.Level.NoCritical);
+						editor.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(incomeObject["data"])), c_oAscError.Level.NoCritical);
 					else
 						editor.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 				}
@@ -2291,7 +2291,7 @@ asc_docs_api.prototype.asc_Print = function()
 					editor.processSavedFile(incomeObject["data"], false);
 				else{
 					if(null != incomeObject && "err" == incomeObject["type"])
-						editor.asc_fireCallback("asc_onError", _mapAscServerErrorToAscError(parseInt(incomeObject["data"])), c_oAscError.Level.NoCritical);
+						editor.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(incomeObject["data"])), c_oAscError.Level.NoCritical);
 					else
 						editor.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 				}
@@ -2456,7 +2456,7 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile) {//передаем �
 			t.processSavedFile(incomeObject["data"], false);
 		else{
 			if(null != incomeObject && "err" == incomeObject["type"])
-				t.asc_fireCallback("asc_onError", _mapAscServerErrorToAscError(parseInt(incomeObject["data"])), c_oAscError.Level.NoCritical);
+				t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(incomeObject["data"])), c_oAscError.Level.NoCritical);
 			else
 				t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 		}
@@ -4790,7 +4790,7 @@ asc_docs_api.prototype.AddImage = function(){
 				if(c_oAscServerError.NoError != nError)
 				{
 					bNeedSubmit = false;
-					oThis.asc_fireCallback("asc_onError",_mapAscServerErrorToAscError(nError),c_oAscError.Level.NoCritical);
+					oThis.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(nError), c_oAscError.Level.NoCritical);
 				}
 			}
 			if(bNeedSubmit)
@@ -6875,7 +6875,7 @@ asc_docs_api.prototype.OnHandleMessage = function(event)
 							this.AddImageUrl(urls[0]);
 					}
                     else
-                        this.sync_ErrorCallback(_mapAscServerErrorToAscError(data["error"]), c_oAscError.Level.NoCritical);
+                        this.sync_ErrorCallback(g_fMapAscServerErrorToAscError(data["error"]), c_oAscError.Level.NoCritical);
 
                     editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
                 }
@@ -7068,7 +7068,7 @@ function _sendCommandCallback (fCallback, error, result, rdata) {
 				//todo передалеть работу с callback
 				if("getsettings" == rdata["c"] || "open" == rdata["c"] || "chopen" == rdata["c"] || "create" == rdata["c"])
 					nErrorLevel = c_oAscError.Level.Critical;
-				editor.asc_fireCallback("asc_onError", _mapAscServerErrorToAscError(parseInt(result["data"])), nErrorLevel);
+				editor.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(result["data"])), nErrorLevel);
 			}
 			if(fCallback)
 				fCallback(result);
@@ -7198,40 +7198,6 @@ function _getFullImageSrc(src)
     }
 	else
 		return src;
-}
-function _mapAscServerErrorToAscError(nServerError)
-{
-	var nRes = c_oAscError.ID.Unknown;
-	switch(nServerError)
-	{
-		case c_oAscServerError.NoError : nRes = c_oAscError.ID.No;break;
-		case c_oAscServerError.TaskQueue :
-		case c_oAscServerError.TaskResult : nRes = c_oAscError.ID.Database;break;
-		case c_oAscServerError.ConvertDownload : nRes = c_oAscError.ID.DownloadError;break;
-		case c_oAscServerError.ConvertTimeout : nRes = c_oAscError.ID.ConvertationTimeout;break;
-		case c_oAscServerError.ConvertMS_OFFCRYPTO : nRes = c_oAscError.ID.ConvertationPassword;break;
-		case c_oAscServerError.ConvertUnknownFormat :
-		case c_oAscServerError.ConvertReadFile :
-		case c_oAscServerError.Convert : nRes = c_oAscError.ID.ConvertationError;break;
-		case c_oAscServerError.UploadContentLength : nRes = c_oAscError.ID.UplImageSize;break;
-		case c_oAscServerError.UploadExtension : nRes = c_oAscError.ID.UplImageExt;break;
-		case c_oAscServerError.UploadCountFiles : nRes = c_oAscError.ID.UplImageFileCount;break;
-		case c_oAscServerError.VKey : nRes = c_oAscError.ID.FileVKey;break;
-		case c_oAscServerError.VKeyEncrypt : nRes = c_oAscError.ID.VKeyEncrypt;break;
-		case c_oAscServerError.VKeyKeyExpire : nRes = c_oAscError.ID.KeyExpire;break;
-		case c_oAscServerError.VKeyUserCountExceed : nRes = c_oAscError.ID.UserCountExceed;break;
-		case c_oAscServerError.Storage :
-		case c_oAscServerError.StorageFileNoFound :
-		case c_oAscServerError.StorageRead :
-		case c_oAscServerError.StorageWrite :
-		case c_oAscServerError.StorageRemoveDir :
-		case c_oAscServerError.StorageCreateDir :
-		case c_oAscServerError.StorageGetInfo :
-		case c_oAscServerError.Upload :
-		case c_oAscServerError.ReadRequestStream :
-		case c_oAscServerError.Unknown : nRes = c_oAscError.ID.Unknown;break;
-	}
-	return nRes;
 }
 
 function CErrorData()

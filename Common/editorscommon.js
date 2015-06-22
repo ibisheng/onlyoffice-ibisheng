@@ -132,6 +132,39 @@ function sendCommand2 (fCallback, callback, rdata) {
 	});
 }
 
+function g_fMapAscServerErrorToAscError (nServerError) {
+	var nRes = c_oAscError.ID.Unknown;
+	switch (nServerError) {
+		case c_oAscServerError.NoError : nRes = c_oAscError.ID.No; break;
+		case c_oAscServerError.TaskQueue :
+		case c_oAscServerError.TaskResult : nRes = c_oAscError.ID.Database; break;
+		case c_oAscServerError.ConvertDownload : nRes = c_oAscError.ID.DownloadError; break;
+		case c_oAscServerError.ConvertTimeout : nRes = c_oAscError.ID.ConvertationTimeout; break;
+		case c_oAscServerError.ConvertMS_OFFCRYPTO : nRes = c_oAscError.ID.ConvertationPassword; break;
+		case c_oAscServerError.ConvertUnknownFormat :
+		case c_oAscServerError.ConvertReadFile :
+		case c_oAscServerError.Convert : nRes = c_oAscError.ID.ConvertationError; break;
+		case c_oAscServerError.UploadContentLength : nRes = c_oAscError.ID.UplImageSize; break;
+		case c_oAscServerError.UploadExtension : nRes = c_oAscError.ID.UplImageExt; break;
+		case c_oAscServerError.UploadCountFiles : nRes = c_oAscError.ID.UplImageFileCount; break;
+		case c_oAscServerError.VKey : nRes = c_oAscError.ID.FileVKey; break;
+		case c_oAscServerError.VKeyEncrypt : nRes = c_oAscError.ID.VKeyEncrypt; break;
+		case c_oAscServerError.VKeyKeyExpire : nRes = c_oAscError.ID.KeyExpire; break;
+		case c_oAscServerError.VKeyUserCountExceed : nRes = c_oAscError.ID.UserCountExceed; break;
+		case c_oAscServerError.Storage :
+		case c_oAscServerError.StorageFileNoFound :
+		case c_oAscServerError.StorageRead :
+		case c_oAscServerError.StorageWrite :
+		case c_oAscServerError.StorageRemoveDir :
+		case c_oAscServerError.StorageCreateDir :
+		case c_oAscServerError.StorageGetInfo :
+		case c_oAscServerError.Upload :
+		case c_oAscServerError.ReadRequestStream :
+		case c_oAscServerError.Unknown : nRes = c_oAscError.ID.Unknown; break;
+	}
+	return nRes;
+}
+
 function fSortAscending( a, b ) {
     return a - b;
 }

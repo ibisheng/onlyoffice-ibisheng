@@ -224,7 +224,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					xhr.send(fd);
 				}
 			} else
-				this.handlers.trigger("asc_onError", this.asc_mapAscServerErrorToAscError(nError), c_oAscError.Level.NoCritical);
+				this.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(nError), c_oAscError.Level.NoCritical);
 		};
 
 		spreadsheet_api.prototype.asc_CheckGuiControlColors = function() {
@@ -999,7 +999,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					//todo передалеть работу с callback
 					if("getsettings" == rdata["c"] || "open" == rdata["c"] || "chopen" == rdata["c"] || "create" == rdata["c"])
 						nErrorLevel = c_oAscError.Level.Critical;
-					this.handlers.trigger("asc_onError", this.asc_mapAscServerErrorToAscError(errorId), nErrorLevel);
+					this.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(errorId), nErrorLevel);
 					if(fCallback)
 						fCallback({returnCode: nErrorLevel, val:errorId});
 					break;
@@ -3554,40 +3554,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				window['appBridge']['dummyCommandLoadDocumentFromDisk'] ();
 			}
 		};
-		spreadsheet_api.prototype.asc_mapAscServerErrorToAscError = function(nServerError)
-		{
-			var nRes = c_oAscError.ID.Unknown;
-			switch(nServerError)
-			{
-				case c_oAscServerError.NoError : nRes = c_oAscError.ID.No;break;
-				case c_oAscServerError.TaskQueue :
-				case c_oAscServerError.TaskResult : nRes = c_oAscError.ID.Database;break;
-				case c_oAscServerError.ConvertDownload : nRes = c_oAscError.ID.DownloadError;break;
-				case c_oAscServerError.ConvertTimeout : nRes = c_oAscError.ID.ConvertationTimeout;break;
-				case c_oAscServerError.ConvertMS_OFFCRYPTO : nRes = c_oAscError.ID.ConvertationPassword;break;
-				case c_oAscServerError.ConvertUnknownFormat :
-				case c_oAscServerError.ConvertReadFile :
-				case c_oAscServerError.Convert : nRes = c_oAscError.ID.ConvertationError;break;
-				case c_oAscServerError.UploadContentLength : nRes = c_oAscError.ID.UplImageSize;break;
-				case c_oAscServerError.UploadExtension : nRes = c_oAscError.ID.UplImageExt;break;
-				case c_oAscServerError.UploadCountFiles : nRes = c_oAscError.ID.UplImageFileCount;break;
-				case c_oAscServerError.VKey : nRes = c_oAscError.ID.FileVKey;break;
-				case c_oAscServerError.VKeyEncrypt : nRes = c_oAscError.ID.VKeyEncrypt;break;
-				case c_oAscServerError.VKeyKeyExpire : nRes = c_oAscError.ID.KeyExpire;break;
-				case c_oAscServerError.VKeyUserCountExceed : nRes = c_oAscError.ID.UserCountExceed;break;
-				case c_oAscServerError.Storage :
-				case c_oAscServerError.StorageFileNoFound :
-				case c_oAscServerError.StorageRead :
-				case c_oAscServerError.StorageWrite :
-				case c_oAscServerError.StorageRemoveDir :
-				case c_oAscServerError.StorageCreateDir :
-				case c_oAscServerError.StorageGetInfo :
-				case c_oAscServerError.Upload :
-				case c_oAscServerError.ReadRequestStream :
-				case c_oAscServerError.Unknown : nRes = c_oAscError.ID.Unknown;break;
-			}
-			return nRes;
-		};
 
 		spreadsheet_api.prototype.asc_nativeOpenFile = function(base64File, version)
 		{
@@ -3977,7 +3943,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_formatPainter"] = prot.asc_formatPainter;
 
 		prot["asc_onMouseUp"] = prot.asc_onMouseUp;
-		prot["asc_mapAscServerErrorToAscError"] = prot.asc_mapAscServerErrorToAscError;
 
 		prot["asc_selectFunction"] = prot.asc_selectFunction;
 		prot["asc_insertHyperlink"] = prot.asc_insertHyperlink;
