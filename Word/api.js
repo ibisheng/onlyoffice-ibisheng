@@ -2283,7 +2283,9 @@ asc_docs_api.prototype.asc_Print = function()
 				"vkey": documentVKey,
 				"format": documentFormat,
 				"c":"savefromorigin"};
-				
+
+			// Меняем тип состояния (на сохранение)
+			this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
 			sendCommand2(function(incomeObject){
 				if(null != incomeObject && "save" == incomeObject["type"])
 					editor.processSavedFile(incomeObject["data"], false);
@@ -2293,19 +2295,25 @@ asc_docs_api.prototype.asc_Print = function()
 					else
 						editor.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 				}
+				// Меняем тип состояния (на никакое)
+				editor.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);}, _sendCommandCallback, rData);
 		}
-		else
-			_downloadAs(this, "save", null, null, c_oAscFileType.PDF, function(incomeObject){
-				if(null != incomeObject && "save" == incomeObject["type"])
-					editor.processSavedFile(incomeObject["data"], false);
-				else{
-					if(null != incomeObject && "err" == incomeObject["type"])
-						editor.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(incomeObject["data"])), c_oAscError.Level.NoCritical);
-					else
+		else {
+			// Меняем тип состояния (на сохранение)
+			this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
+			_downloadAs(this, "save", null, null, c_oAscFileType.PDF, function (incomeObject) {
+				if (null != incomeObject && "save" == incomeObject["type"])
+					editor.processSavedFile(incomeObject["data"], false); else {
+					if (null != incomeObject && "err" == incomeObject["type"])
+						editor.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(incomeObject["data"])), c_oAscError.Level.NoCritical); else
 						editor.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 				}
-				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);});
+				// Меняем тип состояния (на никакое)
+				editor.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);
+			});
+		}
 	}
 };
 asc_docs_api.prototype.Undo = function()
@@ -2461,6 +2469,8 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile) {//передаем �
 	var actionType = this.mailMergeFileData ? c_oAscAsyncAction.MailMergeLoadFile : c_oAscAsyncAction.DownloadAs;
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 	var t = this;
+	// Меняем тип состояния (на сохранение)
+	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
 	_downloadAs(this, "save", null, null, typeFile, function (incomeObject) {
 		if (null != incomeObject && "save" == incomeObject["type"])
 			t.processSavedFile(incomeObject["data"], false);
@@ -2470,6 +2480,8 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile) {//передаем �
 			else
 				t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 		}
+		// Меняем тип состояния (на никакое)
+		t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 		t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 	});
 };
@@ -2480,6 +2492,8 @@ asc_docs_api.prototype.asc_DownloadAsMailMerge = function(typeFile, StartIndex, 
 		if(bIsDownload)
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 		var t = this;
+		// Меняем тип состояния (на сохранение)
+		this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
 		_downloadAs(this, "save", oDocumentMailMerge, null, typeFile, function (incomeObject) {
 			if(bIsDownload){
 				if (null != incomeObject && "save" == incomeObject["type"])
@@ -2494,6 +2508,8 @@ asc_docs_api.prototype.asc_DownloadAsMailMerge = function(typeFile, StartIndex, 
 				else
 					t.asc_fireCallback("asc_onError", c_oAscError.ID.MailMergeSaveFile, c_oAscError.Level.NoCritical);
 			}
+			// Меняем тип состояния (на никакое)
+			t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 		});
 	}
 	return null != oDocumentMailMerge ? true : false;
