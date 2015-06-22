@@ -900,7 +900,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			return this.wbModel.getWorksheet(sheetIndex).PagePrintOptions;
 		};
 
-		spreadsheet_api.prototype._sendCommandCallback = function (fCallback, error, result, rdata) {
+		spreadsheet_api.prototype._sendCommandCallback = function (fCallback, error, result) {
 			if (error || !result) {
 				this.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
 				if(fCallback)
@@ -964,8 +964,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.handlers.trigger("asc_onAdvancedOptions",  new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV,cp), this.advancedOptionsAction);
 					break;
 				case "save":
-					if(fCallback)
-						fCallback(result);
+					if(fCallback) fCallback(result);
 					break;
 				case "waitopen":
 					rData = {
@@ -990,22 +989,19 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					setTimeout(function(){sendCommand2(fCallback, t.fCallbackSendCommand, rData);}, 3000);
 					break;
 				case "getsettings":
-					if(fCallback)
-						fCallback(result);
+					if(fCallback) fCallback(result);
 					break;
 				case "err":
 					var nErrorLevel = c_oAscError.Level.NoCritical;
 					var errorId = result["data"] >> 0;
 					//todo передалеть работу с callback
-					if("getsettings" == rdata["c"] || "open" == rdata["c"] || "chopen" == rdata["c"] || "create" == rdata["c"])
+					if (c_oAscAdvancedOptionsAction.Open === this.advancedOptionsAction)
 						nErrorLevel = c_oAscError.Level.Critical;
 					this.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(errorId), nErrorLevel);
-					if(fCallback)
-						fCallback({returnCode: nErrorLevel, val:errorId});
+					if (fCallback) fCallback({returnCode: nErrorLevel, val:errorId});
 					break;
 				default:
-					if(fCallback)
-						fCallback(result);
+					if(fCallback) fCallback(result);
 					break;
 			}
 		};
@@ -1070,37 +1066,39 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 
 		spreadsheet_api.prototype._asc_open = function (fCallback) { //fCallback({returnCode:"", val:obj, ...})
-			if (this.chartEditor) {
-			} else if (!this.documentId || !this.documentUrl) {
-				// Назначим id-сами, если он не пришел (для открытия тестового документа)
-				if (!this.documentId)
-					this.documentId = '9876543210';
-				this._OfflineAppDocumentStartLoad(fCallback);
-			} else {
-				var v = {
-					"c"				: '',
-					"id"            : this.documentId,
-					"userid"		: this.documentUserId,
-					"format"        : this.documentFormat,
-					"vkey"          : this.documentVKey,
-					"editorid"      : c_oEditorId.Spreadsheet,
-					"url"           : this.documentUrl,
-					"title"         : this.documentTitle,
-					"embeddedfonts" : this.isUseEmbeddedCutFonts,
-					"viewmode"		: this.asc_getViewerMode()
-				};
-				if (false && this.documentOpenOptions && this.documentOpenOptions["isEmpty"]) {
-					var sEmptyWorkbook = getEmptyWorkbook();
-					v["c"] = "create";
-					v["data"] = sEmptyWorkbook;
-					sendCommand2(fCallback, this.fCallbackSendCommand, v);
-					var wb = this.asc_OpenDocument(g_sResourceServiceLocalUrl + this.documentId + "/", sEmptyWorkbook);
-					fCallback({returnCode: 0, val:wb});
+			if (!this.chartEditor) {
+				// Меняем тип состояния (на открытие)
+				this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
+
+				if (!this.documentId || !this.documentUrl) {
+					// Назначим id-сами, если он не пришел (для открытия тестового документа)
+					if (!this.documentId)
+						this.documentId = '9876543210';
+					this._OfflineAppDocumentStartLoad(fCallback);
 				} else {
-					// Меняем тип состояния (на открытие)
-					this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
-					v["c"] = "open";
-					sendCommand2(fCallback, this.fCallbackSendCommand, v);
+					var v = {
+						"c"				: '',
+						"id"            : this.documentId,
+						"userid"		: this.documentUserId,
+						"format"        : this.documentFormat,
+						"vkey"          : this.documentVKey,
+						"editorid"      : c_oEditorId.Spreadsheet,
+						"url"           : this.documentUrl,
+						"title"         : this.documentTitle,
+						"embeddedfonts" : this.isUseEmbeddedCutFonts,
+						"viewmode"		: this.asc_getViewerMode()
+					};
+					if (false && this.documentOpenOptions && this.documentOpenOptions["isEmpty"]) {
+						var sEmptyWorkbook = getEmptyWorkbook();
+						v["c"] = "create";
+						v["data"] = sEmptyWorkbook;
+						sendCommand2(fCallback, this.fCallbackSendCommand, v);
+						var wb = this.asc_OpenDocument(g_sResourceServiceLocalUrl + this.documentId + "/", sEmptyWorkbook);
+						fCallback({returnCode: 0, val:wb});
+					} else {
+						v["c"] = "open";
+						sendCommand2(fCallback, this.fCallbackSendCommand, v);
+					}
 				}
 			}
 		};
