@@ -411,6 +411,9 @@ function asc_docs_api(name)
     this.isApplyChangesOnOpenEnabled = true;
 
 	this.mailMergeFileData = null;
+
+	// Тип состояния на данный момент (сохранение, открытие или никакое)
+	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 	
     // CoAuthoring and Chat
     this.User = undefined;
@@ -758,7 +761,11 @@ asc_docs_api.prototype.asc_getEditorPermissions = function() {
 			};
 
 			var t = this;
-			sendCommand2(function (response) {t.asc_getEditorPermissionsCallback(response);}, _sendCommandCallback, rData);
+			this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Perm;
+			sendCommand2(function (response) {
+				t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+				t.asc_getEditorPermissionsCallback(response);
+			}, _sendCommandCallback, rData);
 		} else {
 			var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
 			this.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
@@ -887,6 +894,9 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
     {
         window["AscDesktopEditor"]["SetDocumentName"](this.DocumentName);
     }
+
+	// Меняем тип состояния (на открытие)
+	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
 
     if (this.DocInfo.get_OfflineApp() === true)
     {
@@ -6284,6 +6294,9 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
     {
         window['qtDocBridge']['documentContentReady'] ();
 	}
+
+	// Меняем тип состояния (на никакое)
+	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 };
 
 asc_docs_api.prototype.UpdateInterfaceState = function()
@@ -6986,12 +6999,11 @@ window["asc_nativeOnSpellCheck"] = function (response)
         editor.SpellCheckApi.onSpellCheck(response);
 };
 
-function _sendCommandCallback (fCallback, error, result, rdata) {
+function _sendCommandCallback (fCallback, error, result) {
 	if (error || !result) {
-		if("save" != rdata["c"] && "chsave" != rdata["c"])
+		if (c_oAscAdvancedOptionsAction.Save !== editor.advancedOptionsAction)
 			editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
-		if(fCallback)
-			fCallback();
+		if (fCallback) fCallback();
 		return;
 	}
 
@@ -7042,8 +7054,7 @@ function _sendCommandCallback (fCallback, error, result, rdata) {
 			setTimeout( function(){sendCommand2(fCallback, _sendCommandCallback, rData)}, 3000);
 			break;
 		case "save":
-			if(fCallback)
-				fCallback(result);
+			if (fCallback) fCallback(result);
 			break;
 		case "waitsave":
 		{
@@ -7059,23 +7070,21 @@ function _sendCommandCallback (fCallback, error, result, rdata) {
 		}
 			break;
 		case "getsettings":
-			if(fCallback)
-				fCallback(result);
+			if (fCallback) fCallback(result);
 			break;
 		case "err":
-			if("save" != rdata["c"] && "chsave" != rdata["c"]){
+			if (c_oAscAdvancedOptionsAction.Save !== editor.advancedOptionsAction) {
 				var nErrorLevel = c_oAscError.Level.NoCritical;
 				//todo передалеть работу с callback
-				if("getsettings" == rdata["c"] || "open" == rdata["c"] || "chopen" == rdata["c"] || "create" == rdata["c"])
+				if (c_oAscAdvancedOptionsAction.Perm === editor.advancedOptionsAction ||
+					c_oAscAdvancedOptionsAction.Open === editor.advancedOptionsAction)
 					nErrorLevel = c_oAscError.Level.Critical;
-				editor.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(result["data"])), nErrorLevel);
+				editor.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(result["data"] >> 0), nErrorLevel);
 			}
-			if(fCallback)
-				fCallback(result);
+			if (fCallback) fCallback(result);
 			break;
 		default:
-			if(fCallback)
-				fCallback(result);
+			if (fCallback) fCallback(result);
 			break;
 	}
 }

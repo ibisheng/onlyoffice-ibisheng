@@ -116,16 +116,16 @@ function sendCommand2 (fCallback, callback, rdata) {
 		url: g_sMainServiceLocalUrl,
 		data: sData,
 		contentType: sRequestContentType,
-		error: function () { callback(fCallback, true, undefined, rdata); },
+		error: function () { callback(fCallback, true); },
 		success: function (msg) {
 			if (!msg || msg.length < 1) {
 				//result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
 				//oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
 				//if(callback)
 				//	callback(result);
-				callback(fCallback, true, undefined, rdata);
+				callback(fCallback, true);
 			} else {
-				callback(fCallback, false, JSON.parse(msg), rdata);
+				callback(fCallback, false, JSON.parse(msg));
 			}
 		},
 		dataType: 'text'
