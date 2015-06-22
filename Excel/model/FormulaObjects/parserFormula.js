@@ -1298,7 +1298,7 @@ cName.prototype.getRef = function () {
 cName.prototype.reParse = function () {
     var dN = this.wb.getDefinesNames( this.defName.Name, this.ws.getId() );
     if ( dN ) {
-        this.ref = new parserFormula( dN, "", this.ws );
+        this.ref = new parserFormula( dN.Ref, "", this.ws );
         this.ref.parse();
     }
     else {
@@ -3179,11 +3179,12 @@ parserFormula.prototype = {
         this.Formula = formula;
         this.value = null;
         this.pCurrPos = 0;
+        this.pCurrPos = 0;
         this.elemArr = [];
         this.outStack = [];
         this.RefPos = [];
         this.operand_str = null;
-
+        this.isParsed = false;
     },
 
     setCellId:function ( cellId ) {
@@ -3482,8 +3483,11 @@ parserFormula.prototype = {
 
                     this.is3D = true;
                     var _wsFrom = _3DRefTmp[1],
-                        _wsTo = ( (_3DRefTmp[2] !== null) && (_3DRefTmp[2] !== undefined) ) ? _3DRefTmp[2] : _wsFrom;
-                    if ( !(this.wb.getWorksheetByName( _wsFrom ) && this.wb.getWorksheetByName( _wsTo )) ) {
+                        _wsTo = ( (_3DRefTmp[2] !== null) && (_3DRefTmp[2] !== undefined) ) ? _3DRefTmp[2] : _wsFrom,
+                        wsF = this.wb.getWorksheetByName( _wsFrom ),
+                        wsT = this.wb.getWorksheetByName( _wsTo );
+
+                    if ( !(wsF && wsT) ) {
                         this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
                         this.outStack = [];
                         this.elemArr = [];
@@ -3508,6 +3512,9 @@ parserFormula.prototype = {
                             found_operand.isAbsolute = true;
                         }
                     }
+                    /*else if ( parserHelp.isName.call( this, this.Formula, this.pCurrPos ) ) {
+                        found_operand = new cName3D( this.operand_str, this.wb, wsF );
+                    }*/
                     this.countRef++;
                 }
 

@@ -834,14 +834,14 @@ DependencyGraph.prototype = {
             if ( sheetNodeList ) {
                 nodeId = getDefNameVertexId( sheetId, name );
                 oRes = sheetNodeList[nodeId];
-                if ( oRes ) return oRes;
+                if ( oRes && oRes.Ref ) return oRes;
             }
         }
 
         sheetNodeList = this.defNameSheets["WB"];
         nodeId = getDefNameVertexId( null, name );
         oRes = sheetNodeList[nodeId];
-        if ( oRes ) return oRes;
+        if ( oRes && !oRes.Ref ) oRes = false;
 
         return oRes;
     },
@@ -2374,7 +2374,7 @@ Workbook.prototype.getDefinesNames = function ( name, sheetId ) {
 };
 Workbook.prototype.delDefinesNames = function ( defName ) {
     History.Create_NewPoint();
-    var retRes = false, res = null;
+    var retRes = false;
 
     retRes = this.dependencyFormulas.removeDefName( defName.LocalSheetId, defName.Name );
 
@@ -2401,7 +2401,7 @@ Workbook.prototype.delDefinesNames = function ( defName ) {
 
             se = se.returnCell();
             if( se ){
-                se.setFormula( se.formulaParsed.assemble() );
+//                se.setFormula( se.formulaParsed.assemble() );
                 se.formulaParsed.isParsed = false;
                 se.formulaParsed.parse();
                 se.formulaParsed.buildDependencies();
@@ -2418,7 +2418,7 @@ Workbook.prototype.delDefinesNames = function ( defName ) {
 };
 Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
 
-    var newN = newName.Name.toLowerCase(), retRes = null, rename = false;
+    var newN = newName.Name.toLowerCase(), retRes = null, rename = false, nSE, se;
 
     if ( !rx_defName.test( newN ) ) {
         return retRes;
@@ -2450,30 +2450,45 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
          *  удаляем старые master и добавляем новые, которые получились в результате разбора новой ссылки; пересчитываем формулу.
          * */
 
-        if ( rename ) {
-            var nSE = retRes.getSlaveEdges(), se;
+        if( !rename ){
 
-            retRes.deleteAllMasterEdges();
+            retRes = this.dependencyFormulas.getDefNameNodeByName(newName.Name)
 
-            for ( var id in nSE ) {
-                se = nSE[id];
-                se.deleteMasterEdge( retRes );
-
-                this.needRecalc.nodes[se.nodeId] = [se.sheetId, se.cellId ];
-                this.needRecalc.length++;
-
-                se = se.returnCell();
-                se ? function () {
-                    se.setFormula( se.formulaParsed.assemble() );
-                    se.formulaParsed.buildDependencies( true );
-                }() : null;
-
-            }
-
-            sortDependency( this );
         }
 
-        retRes = retRes.getAscCDefName();
+        if(retRes){
+            nSE = retRes.getSlaveEdges();
+        }
+
+        for ( var id in nSE ) {
+            se = nSE[id];
+            se.deleteMasterEdge( retRes );
+
+            this.needRecalc.nodes[se.nodeId] = [se.sheetId, se.cellId ];
+            this.needRecalc.length++;
+
+            se = se.returnCell();
+            if ( se ) {
+
+                se.setFormula( se.formulaParsed.assemble() );
+
+                if ( !rename ) {
+                    se.formulaParsed.setFormula(se.sFormula)
+                    se.formulaParsed.parse();
+                }
+
+                se.formulaParsed.buildDependencies( true );
+            }
+
+        }
+
+        if(retRes){
+            retRes.deleteAllSlaveEdges();
+            retRes = retRes.getAscCDefName();
+        }
+
+        sortDependency( this );
+
     }
 
     return retRes;
