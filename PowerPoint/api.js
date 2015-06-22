@@ -124,6 +124,9 @@ function asc_docs_api(name)
     this.OpenDocumentProgress = new CDocOpenProgress();
     this._lastConvertProgress = 0;
 
+	// Тип состояния на данный момент (сохранение, открытие или никакое)
+	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+
     // CoAuthoring and Chat
     this.User = undefined;
     this.CoAuthoringApi = new CDocsCoApi();
@@ -839,6 +842,9 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
     {
         window["AscDesktopEditor"]["SetDocumentName"](this.DocumentName);
     }
+
+	// Меняем тип состояния (на открытие)
+	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
 
     if (this.DocInfo.get_OfflineApp() === true)
     {
@@ -4007,6 +4013,9 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
 
     if (this.isViewMode)
         this.SetViewMode(true);
+
+	// Меняем тип состояния (на никакое)
+	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 };
 
 asc_docs_api.prototype.asyncFontStartLoaded = function()
@@ -5094,7 +5103,7 @@ asc_docs_api.prototype.sync_ContextMenuCallback = function(Data)
     this.asc_fireCallback("asc_onContextMenu", Data);
 };
 
-function _sendCommandCallback (fCallback, error, result, rdata) {
+function _sendCommandCallback (fCallback, error, result) {
 	if (error || !result) {
 		editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
 		if(fCallback)
@@ -5133,8 +5142,7 @@ function _sendCommandCallback (fCallback, error, result, rdata) {
 			setTimeout( function(){sendCommand2(fCallback, _sendCommandCallback, rData)}, 3000);
 			break;
 		case "save":
-			if(fCallback)
-				fCallback(result);
+			if(fCallback) fCallback(result);
 			break;
 		case "waitsave":
 			rData = {
@@ -5148,21 +5156,18 @@ function _sendCommandCallback (fCallback, error, result, rdata) {
 			setTimeout( function(){sendCommand2(fCallback, _sendCommandCallback, rData)}, 3000);
 			break;
 		case "getsettings":
-			if(fCallback)
-				fCallback(result);
+			if(fCallback) fCallback(result);
 			break;
 		case "err":
 			var nErrorLevel = c_oAscError.Level.NoCritical;
 			//todo передалеть работу с callback
-			if("getsettings" == rdata["c"] || "open" == rdata["c"] || "chopen" == rdata["c"] || "create" == rdata["c"])
+			if (c_oAscAdvancedOptionsAction.Open === editor.advancedOptionsAction)
 				nErrorLevel = c_oAscError.Level.Critical;
-			editor.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(result["data"])), nErrorLevel);
-			if(fCallback)
-				fCallback(result);
+			editor.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(result["data"] >> 0), nErrorLevel);
+			if (fCallback) fCallback(result);
 			break;
 		default:
-			if(fCallback)
-				fCallback(result);
+			if(fCallback) fCallback(result);
 			break;
 	}
 }

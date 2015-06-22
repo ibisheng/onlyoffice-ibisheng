@@ -935,7 +935,7 @@ parserHelper.prototype.setDigitSeparator = function( sep ){
         rx_array = new RegExp("^\\{(([+-]?\\d*(\\d|"+digitSeparatorDef+")\\d*([eE][+-]?\\d+)?)?(\"((\"\"|[^\"])*)\")?(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|FALSE|TRUE)?["+arrayRowSeparatorDef+"\\"+arrayColSeparatorDef +"]?)*\\}","i");
         rx_arraySeparators = new RegExp("^ *["+arrayRowSeparatorDef+"\\"+arrayColSeparatorDef+"] *");
     }*/
-}
+};
 
 var parserHelp = new parserHelper();
 
