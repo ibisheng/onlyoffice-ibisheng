@@ -602,7 +602,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					"vkey"		: this.DocInfo["VKey"],
 					"editorid"	: c_oEditorId.Spreadsheet
 				};
-				sendCommand2(function (response) {t._onGetEditorPermissions(response);}, this.fCallbackSendCommand, rdata);
+				this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Perm;
+				sendCommand2(function (response) {
+					t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+					t._onGetEditorPermissions(response);
+				}, this.fCallbackSendCommand, rdata);
 			} else {
 				this.handlers.trigger("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
 				// Фиктивно инициализируем
@@ -995,7 +999,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					var nErrorLevel = c_oAscError.Level.NoCritical;
 					var errorId = result["data"] >> 0;
 					//todo передалеть работу с callback
-					if (c_oAscAdvancedOptionsAction.Open === this.advancedOptionsAction)
+					if (c_oAscAdvancedOptionsAction.Perm === editor.advancedOptionsAction ||
+						c_oAscAdvancedOptionsAction.Open === editor.advancedOptionsAction)
 						nErrorLevel = c_oAscError.Level.Critical;
 					this.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(errorId), nErrorLevel);
 					if (fCallback) fCallback({returnCode: nErrorLevel, val:errorId});

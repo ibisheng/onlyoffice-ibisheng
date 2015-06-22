@@ -739,7 +739,11 @@ asc_docs_api.prototype.asc_getEditorPermissions = function() {
 		};
 
 		var t = this;
-		sendCommand2(function (response) {t.asc_getEditorPermissionsCallback(response);}, _sendCommandCallback, rData);
+		this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Perm;
+		sendCommand2(function (response) {
+			t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+			t.asc_getEditorPermissionsCallback(response);
+		}, _sendCommandCallback, rData);
 	} else {
 		var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
 		this.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
@@ -5161,7 +5165,8 @@ function _sendCommandCallback (fCallback, error, result) {
 		case "err":
 			var nErrorLevel = c_oAscError.Level.NoCritical;
 			//todo передалеть работу с callback
-			if (c_oAscAdvancedOptionsAction.Open === editor.advancedOptionsAction)
+			if (c_oAscAdvancedOptionsAction.Perm === editor.advancedOptionsAction ||
+				c_oAscAdvancedOptionsAction.Open === editor.advancedOptionsAction)
 				nErrorLevel = c_oAscError.Level.Critical;
 			editor.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(result["data"] >> 0), nErrorLevel);
 			if (fCallback) fCallback(result);

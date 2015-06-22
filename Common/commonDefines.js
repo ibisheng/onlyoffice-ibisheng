@@ -60,7 +60,8 @@ var c_oAscAsyncAction = {
 var c_oAscAdvancedOptionsAction = {
 	None: 0,
 	Open: 1,
-	Save: 2
+	Save: 2,
+	Perm: 3
 };
 
 // Режимы отрисовки
