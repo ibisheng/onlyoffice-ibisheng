@@ -87,12 +87,6 @@ var c_oAscAdvancedOptionsID = {
 	CSV	: 0
 };
 
-var c_oAscAdvancedOptionsAction = {
-	None: 0,
-	Open: 1,
-	Save: 2
-};
-
 var c_oAscMergeOptions = {
 	Unmerge		: 0,
 	Merge		: 1,

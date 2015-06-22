@@ -57,6 +57,12 @@ var c_oAscAsyncAction = {
 	SendMailMerge		: 15  // рассылка mail merge по почте
 };
 
+var c_oAscAdvancedOptionsAction = {
+	None: 0,
+	Open: 1,
+	Save: 2
+};
+
 // Режимы отрисовки
 var c_oAscFontRenderingModeType = {
 	noHinting				: 1,
