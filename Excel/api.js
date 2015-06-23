@@ -1011,29 +1011,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			}
 		};
 
-		spreadsheet_api.prototype._asc_sendTrack = function (callback, url, rdata) {
-			asc_ajax({
-				type: 'POST',
-				url: url,
-				data: rdata,
-				contentType: "application/json",
-				error: function() {
-					if (callback)
-						callback({returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown});
-				},
-				success: function(msg){
-					if (!msg || msg.length < 1) {
-						if (callback)
-							callback({returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown});
-					} else {
-						var incomeObject = JSON.parse(msg);
-						if (callback)
-							callback(incomeObject);
-					}
-				},
-				dataType: "text"});
-		};
-
 		spreadsheet_api.prototype._onOpenCommand = function (callback, data) {
 			var t = this;
 			g_fOpenFileCommand(data, this.documentUrlChanges, Asc.c_oSerFormat.Signature, function (error, result) {
@@ -1456,19 +1433,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 				this.handlers.trigger("asc_onGetEditorPermissions", oEditorPermissions);
 
-				if (undefined != oSettings['trackingInfo'] && null != oSettings['trackingInfo'] && oEditorPermissions.asc_getCanEdit()) {
+				if (null != oSettings['trackingInfo'] && oEditorPermissions.asc_getCanEdit()) {
 					this.TrackFile = new asc_CTrackFile(oSettings['trackingInfo']);
 
 					this.TrackFile.setDocId(this.DocInfo["Id"]);
 					this.TrackFile.setUserId(this.DocInfo["UserId"]);
+					this.TrackFile.setTrackFunc(sendTrack);
 
-					var oThis = this;
-					var _sendTrack = function (callback, url, data) {
-						return oThis._asc_sendTrack(callback, url, data);
-					};
-					this.TrackFile.setTrackFunc(_sendTrack);
-
-					if (undefined != oSettings['TrackingInterval'] && null != oSettings['TrackingInterval'])
+					if (null != oSettings['TrackingInterval'])
 						this.TrackFile.setInterval(oSettings['TrackingInterval']);
 
 					this.TrackFile.Start();

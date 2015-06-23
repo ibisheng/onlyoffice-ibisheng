@@ -804,7 +804,7 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(response) {
 		var oEditorPermissions = new asc_CAscEditorPermissions(oSettings);
 		this.asc_fireCallback("asc_onGetEditorPermissions", oEditorPermissions);
 
-		if (undefined != oSettings['trackingInfo'] && null != oSettings['trackingInfo'] && oEditorPermissions.asc_getCanEdit()) {
+		if (null != oSettings['trackingInfo'] && oEditorPermissions.asc_getCanEdit()) {
 			var asc_CTrackFile = window["Asc"].CTrackFile;
 			this.TrackFile = new asc_CTrackFile(oSettings['trackingInfo']);
 
@@ -812,7 +812,7 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(response) {
 			this.TrackFile.setUserId(this.DocInfo.get_UserId());
 			this.TrackFile.setTrackFunc(sendTrack);
 
-			if (undefined != oSettings['TrackingInterval'] && null != oSettings['TrackingInterval'])
+			if (null != oSettings['TrackingInterval'])
 				this.TrackFile.setInterval(oSettings['TrackingInterval']);
 
 			this.TrackFile.Start();
@@ -7105,23 +7105,6 @@ function _sendCommandCallback (fCallback, error, result) {
 	}
 }
 
-function sendTrack(fCallback, url, rdata){
-	asc_ajax({
-        type: 'POST',
-        url: url,
-        data: rdata,
-        contentType: "application/json",
-        error: function(){
-				if(fCallback)
-					fCallback();
-            },
-        success: function(msg){
-			var incomeObject = JSON.parse(msg);
-			if(fCallback)
-				fCallback(incomeObject);
-		}
-	})
-}
 function _onOpenCommand(fCallback, incomeObject) {
 	g_fOpenFileCommand(incomeObject["data"], documentUrlChanges, c_oSerFormat.Signature, function (error, result) {
 		if (error) {

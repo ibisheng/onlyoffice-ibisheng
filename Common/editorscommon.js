@@ -131,6 +131,20 @@ function sendCommand2 (fCallback, callback, rdata) {
 		dataType: 'text'
 	});
 }
+function sendTrack (fCallback, url, rdata) {
+	asc_ajax({
+		type: 'POST',
+		url: url,
+		data: rdata,
+		contentType: "application/json",
+		error: function() {
+			if (fCallback) fCallback();
+		},
+		success: function(msg){
+			if (fCallback) fCallback((!msg || msg.length < 1) ? null : JSON.parse(msg));
+		},
+		dataType: "text"});
+}
 
 function g_fMapAscServerErrorToAscError (nServerError) {
 	var nRes = c_oAscError.ID.Unknown;
