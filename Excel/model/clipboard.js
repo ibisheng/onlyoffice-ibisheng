@@ -3135,14 +3135,12 @@
 						table.appendChild(curImage);
 						
 						//add image or chart in local buffer
-							t.lStorage[nLoc] = {};
-							t.lStorage[nLoc].image = curImage;
-							t.lStorage[nLoc].fromCol = cloneImg.from.col;
-							t.lStorage[nLoc].fromRow = cloneImg.from.row;
-							nLoc++;
-							isImage = true;
-						
-						t._addLocalStorage(isImage,isChart,range.worksheet.getCell3(row, col),bbox, image.from.row, image.from.col, worksheet, isCut);
+						t.lStorage[nLoc] = {};
+						t.lStorage[nLoc].image = curImage;
+						t.lStorage[nLoc].fromCol = cloneImg.from.col;
+						t.lStorage[nLoc].fromRow = cloneImg.from.row;
+						nLoc++;
+						isImage = true;
 					}
 
 				}
@@ -3165,9 +3163,6 @@
 									localStText += '\t';
 								else
 									localStText += textRange;
-								//добавляем ноды
-								if(!copyPasteUseBinary)
-									t._addLocalStorage(false,false,currentRange,bbox,row,col, worksheet, isCut);
 							}
 						}
 						t.lStorageText = localStText;
@@ -3266,86 +3261,6 @@
 				return text;
 			},
 			
-			_addLocalStorage : function (isImage,isChart,cell,activeRange,trueRow,trueCol, worksheet, isCut, htmlInShape) {
-				var t = this;
-				var numRow = activeRange.r1;
-				var numCol = activeRange.c1;
-				if(htmlInShape)
-				{
-					t.lStorage = {};
-					t.lStorage.htmlInShape = htmlInShape;
-				}
-				else if(isChart)
-				{
-					t.lStorage = [];
-					t.lStorage[0] = {};
-					t.lStorage[0].isChart = isChart;
-				}
-				else if(!isImage)
-				{
-					var row = trueRow - numRow;
-					var col = trueCol - numCol;
-					if(row == 0 && col == 0)
-					{
-						t.lStorage = [];
-						t.lStorage.fromRow = numRow;
-						t.lStorage.fromCol = numCol;
-					}
-					if(t.lStorage[row] == undefined)
-						t.lStorage[row] = [];
-					var arrFragmentsTmp = cell.getValue2();
-					var arrFragments = [];
-					for (var i = 0; i < arrFragmentsTmp.length; ++i) {
-						arrFragments.push(arrFragmentsTmp[i].clone());
-					}
-					t.lStorage[row][col] = 
-					{
-						value2: arrFragments,
-						borders: cell.getBorderFull(),
-						merge: cell.hasMerged(),
-						format: cell.getNumFormat(),
-						verAlign: cell.getAlignVertical(),
-						horAlign: cell.getAlignHorizontal(),
-						wrap: cell.getWrap(),
-						fill: cell.getFill(),
-						hyperlink: cell.getHyperlink(),
-						valWithoutFormat: cell.getValueWithoutFormat(),
-						angle: cell.getAngle()
-					};
-					if(cell.getQuotePrefix() && t.lStorage[row][col] && t.lStorage[row][col].value2 && t.lStorage[row][col].value2[0])
-						t.lStorage[row][col].value2[0].text = "'" + t.lStorage[row][col].value2[0].text;
-					//проверка на наличие автофильтров
-					if(!t.lStorage.autoFilters)
-					{
-						var autoFiltersObj = worksheet.autoFilters;
-						var findFilter = autoFiltersObj._searchFiltersInRange(activeRange, worksheet.model);
-						if(findFilter && !findFilter[0].TableStyleInfo)
-						{
-							findFilter.splice(0, 1);
-						}
-						if(findFilter)
-						{
-							var ref;
-							var style;
-							var range;
-							t.lStorage.autoFilters = [];
-							for(var i = 0; i < findFilter.length; i++)
-							{
-								ref = findFilter[i].Ref;
-								range = {r1: ref.r1 - activeRange.r1, c1: ref.c1 -  activeRange.c1, r2: ref.r2 - activeRange.r1, c2: ref.c2 -  activeRange.c1};
-								style = findFilter[i].TableStyleInfo ? findFilter[i].TableStyleInfo.Name : null;
-								t.lStorage.autoFilters[i] = 
-								{
-									style: style,
-									range: range,
-									autoFilter: findFilter[i].AutoFilter ? true : false
-								}
-							}
-						}
-					}
-				}
-			},
-
 			_makeCellValuesHtml: function (node,isText) {
 				//if (!callback || !callback.call) {return;}
 
