@@ -283,8 +283,7 @@ var native = CreateNativeEngine();
 window.native = native;
 window["native"] = native;
 
-function GetNativeEngine()
-{
+function GetNativeEngine() {
     return window.native;
 }
 
@@ -353,18 +352,6 @@ function NativeOpenFile2(_params)
         _api = new window["Asc"]["spreadsheet_api"]();
         _api.asc_nativeOpenFile(doc_bin);
     }
-}
-
-// open file
-function SEOpenFile()
-{
-    window["CreateMainTextMeasurerWrapper"]();
-
-    window.g_file_path = "native_open_file";
-    window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
-
-    _api = new window["Asc"]["spreadsheet_api"]();
-    _api.asc_nativeOpenFile(window.native["GetFileString"]());
 }
 
 function NativeCalculateFile()
@@ -777,31 +764,25 @@ var EGlyphState =
     glyphstateMiss:     2
 };
 
-function CPoint1()
-{
+function CPoint1() {
     this.fX = 0;
     this.fY = 0;
     this.fWidth = 0;
     this.fHeight = 0;
-};
-
-function CPoint2()
-{
+}
+function CPoint2() {
     this.fLeft = 0;
     this.fTop = 0;
     this.fRight = 0;
     this.fBottom = 0;
-};
-
-function CFontManager()
-{
+}
+function CFontManager() {
     this.m_oLibrary = {};
     this.Initialize = function(){};
     this.ClearFontsRasterCache = function(){};
-};
+}
 
-function CStylesPainter()
-{
+function CStylesPainter() {
     this.STYLE_THUMBNAIL_WIDTH  = GlobalSkin.STYLE_THUMBNAIL_WIDTH;
     this.STYLE_THUMBNAIL_HEIGHT = GlobalSkin.STYLE_THUMBNAIL_HEIGHT;
 
@@ -812,8 +793,7 @@ function CStylesPainter()
     this.docStyles = [];
     this.mergedStyles = [];
 }
-CStylesPainter.prototype =
-{
+CStylesPainter.prototype = {
     GenerateStyles: function(_api, ds)
     {
         if (_api.WordControl.bIsRetinaSupport)
@@ -1103,7 +1083,7 @@ CStylesPainter.prototype =
         _api.WordControl.m_oDrawingDocument.Native["DD_EndNativeDraw"](_stream);
         graphics.ClearParams();
     }
-};
+}
 
 window["use_native_fonts_only"] = true;
 
@@ -1113,8 +1093,7 @@ window["use_native_fonts_only"] = true;
 window["ftm"] = FT_Memory;
 
 // FT_Common
-function _FT_Common()
-{
+function _FT_Common() {
     this.UintToInt = function(v)
     {
         return (v>2147483647)?v-4294967296:v;
@@ -1219,66 +1198,8 @@ function _FT_Common()
 }
 var FT_Common = new _FT_Common();
 
-//========================================================================================
-
-function drawColumnHeaders (sheet, drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
-    if (undefined === drawingCtx && false === sheet.model.sheetViews[0].asc_getShowRowColHeaders())
-        return;
-    var vr  = sheet.visibleRange;
-    var c = sheet.cols;
-    var offsetX = (undefined !== offsetXForDraw) ? offsetXForDraw : c[vr.c1].left - sheet.cellsLeft;
-    var offsetY = (undefined !== offsetYForDraw) ? offsetYForDraw : sheet.headersTop;
-    if (undefined === drawingCtx && sheet.topLeftFrozenCell && undefined === offsetXForDraw) {
-        var cFrozen = sheet.topLeftFrozenCell.getCol0();
-        if (start < vr.c1)
-            offsetX = c[0].left - sheet.cellsLeft;
-        else
-            offsetX -= c[cFrozen].left - c[0].left;
-    }
-
-    if (asc_typeof(start) !== "number") {start = vr.c1;}
-    if (asc_typeof(end) !== "number") {end = vr.c2;}
-    if (style === undefined) {style = kHeaderDefault;}
-
-    sheet._setFont(drawingCtx, sheet.model.getDefaultFontName(), sheet.model.getDefaultFontSize());
-
-    // draw column headers
-    for (var i = start; i <= end; ++i) {
-        sheet._drawHeader(drawingCtx, c[i].left - c[start].left, offsetY,
-            c[i].width, sheet.headersHeight, style, true, i);
-    }
-}
-
 //--------------------------------------------------------------------------------
-// internal invoke
-//--------------------------------------------------------------------------------
-
-function internal_drawWorksheet(sheet, corner, frozenPaneLines, selection) {
-    //sheet._clean();
-
-    // if (corner)  sheet._drawCorner();
-    //sheet._drawColumnHeaders();
-    //sheet._drawRowHeaders();
-
-    sheet._drawGrid();
-    sheet._drawCellsAndBorders();
-
-    //sheet._drawFrozenPane();
-    //if (frozenPaneLines) sheet._drawFrozenPaneLines();
-
-    //sheet._fixSelectionOfMergedCells();
-    //sheet._drawAutoF();
-    // sheet.cellCommentator.drawCommentCells();
-
-    // sheet.objectRender.showDrawingObjectsEx(true);
-
-    //if (selection && sheet.overlayCtx) {
-    //    sheet._drawSelection();
-    //}
-}
-
-//--------------------------------------------------------------------------------
-// native invoke
+// defines
 //--------------------------------------------------------------------------------
 
 var PageType = {
@@ -1287,53 +1208,77 @@ var PageType = {
     PageLeftType: 2,
     PageCornerType: 3
 };
-var scrollIndX = 0;
-var scrollIndY = 0;
+
 var deviceScale = 1;
 
-var cellsLeft = undefined;
-var cellsTop  = undefined;
+//--------------------------------------------------------------------------------
+// OfflineEditor
+//--------------------------------------------------------------------------------
 
-function napi_openFile() {
-    window["CreateMainTextMeasurerWrapper"]();
+function OfflineEditor () {
 
-    deviceScale = window.native["GetDeviceScale"]();
+    this.contentX = 16384;
+    this.contextY = 1048576;
+    this.zoom = 1.0;
 
-    window.g_file_path = "native_open_file";
-    window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
-    _api = new window["Asc"]["spreadsheet_api"]();
-    _api.asc_nativeOpenFile(window.native["GetFileString"]());
-}
+    // main
 
-function napi_drawWorksheet(x, y, width, height, xind, yind) {
+    this.openFile = function () {
+        window["CreateMainTextMeasurerWrapper"]();
 
-    if (_api) {
-        _null_object.width = width  * 1.5;
-        _null_object.height = height  * 1.5;
+        deviceScale = window.native["GetDeviceScale"]();
+
+        window.g_file_path = "native_open_file";
+        window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
+        _api = new window["Asc"]["spreadsheet_api"]();
+        _api.asc_nativeOpenFile(window.native["GetFileString"]());
+    };
+
+    // prop
+
+    this.getMaxSizeX = function () {
+        return this.contentX;
+    };
+    this.getMaxSizeY = function () {
+        return this.contextY;
+    };
+    this.getSelection = function(x, y, width, height) {
+        _null_object.width = width;
+        _null_object.height = height;
 
         var worksheet = _api.wb.getWorksheet(0);
-        var region = updateRegion(worksheet, x, y, width * 1.5, height * 1.5);
+        var region = this._updateRegion(worksheet, x, y, width, height);
+
+        return _api.wb.getWorksheet(0)._getDrawSelection_Local(region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd);
+    };
+
+    // render
+
+    this.drawSheet = function (x, y, width, height, ratio) {
+        _null_object.width = width * ratio;
+        _null_object.height = height * ratio;
+
+        var worksheet = _api.wb.getWorksheet(0);
+        var region = this._updateRegion(worksheet, x, y, width * ratio, height * ratio);
 
         worksheet._drawGrid_Local(undefined,
-            region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd ,
+            region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd,
             worksheet.cols[region.columnBeg].left + region.columnOff, worksheet.rows[region.rowBeg].top + region.rowOff,
             width + region.columnOff, height + region.rowOff);
 
         worksheet._drawCellsAndBorders_Local(undefined,
-            region.columnBeg, region.rowBeg, region.columnEnd + 1, region.rowEnd + 1,
+            region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd,
             worksheet.cols[region.columnBeg].left + region.columnOff, worksheet.rows[region.rowBeg].top + region.rowOff);
-    }
-}
-function napi_drawWorksheetHeader(x, y, width, height, xind, yind, type) {
+    };
+    this.drawHeader = function (x, y, width, height, type, ratio) {
 
-    if (_api) {
-        _null_object.width = width * 1.5;
-        _null_object.height = height * 1.5;
+        _null_object.width = width * ratio;
+        _null_object.height = height * ratio;
 
         var worksheet = _api.wb.getWorksheet(0);
-        var region = updateRegion(worksheet, x, y, width * 1.5, height * 1.5);
+        var region = this._updateRegion(worksheet, x, y, width * ratio, height * ratio);
 
-        var isColumn = type == PageType.PageTopType  || type == PageType.PageCornerType;
+        var isColumn = type == PageType.PageTopType || type == PageType.PageCornerType;
         var isRow = type == PageType.PageLeftType || type == PageType.PageCornerType;
 
         if (!isColumn && isRow)
@@ -1342,124 +1287,137 @@ function napi_drawWorksheetHeader(x, y, width, height, xind, yind, type) {
             worksheet._drawColumnHeaders_Local(undefined, region.columnBeg, region.columnEnd, undefined, region.columnOff, 0);
         else if (isColumn && isRow)
             worksheet._drawCorner();
-    }
-}
-
-
-function napi_getContentMaxSizeX() {
-
-    // ширина таблицы с учетом размеров ячеек
-
-    // var gc_nMaxRow = 1048576;
-    // var gc_nMaxCol = 16384;
-
-    return 50000;
-}
-function napi_getContentMaxSizeY() {
-
-    // высота таблицы с учетом размеров ячеек
-
-    //var gc_nMaxRow = 1048576;
-    //var gc_nMaxCol = 16384;
-
-    return 50000;
-}
-
-function napi_setZoom(zoom) {
-    _api.asc_setZoom(zoom);
-}
-
-/////////////////
-
-function updateRegion(worksheet, x, y, width, height) {
-
-    var  indX = 0, indY = 0, offX = 0, offY = 0, i = 0;
-
-    var nativeToEditor = 1.0 / deviceScale * (72.0 / 96.0);
-
-    // координаты в СО редактора
-
-    var logicX = x * nativeToEditor + worksheet.headersWidth;
-    var logicY = y  * nativeToEditor + worksheet.headersHeight;
-    var logicToX = ( x + width ) * nativeToEditor + worksheet.headersWidth;
-    var logicToY = ( y + height ) * nativeToEditor + worksheet.headersHeight;
-
-    var columnBeg = -1;
-    var columnEnd = -1;
-    var columnOff = 0;
-    var rowBeg = -1;
-    var rowEnd = -1;
-    var rowOff = 0;
-
-    // добавляем отсутствующие колонки
-
-    if (logicToX >= worksheet.cols[worksheet.cols.length - 1].left) {
-
-        do {
-            worksheet.nColsCount = worksheet.cols.length + 1;
-            worksheet._calcWidthColumns(2); // fullRecalc
-
-            if (logicToX < worksheet.cols[worksheet.cols.length - 1].left) {
-                break
-            }
-        } while (1);
-    }
-
-
-    if (logicX < worksheet.cols[worksheet.cols.length - 1].left) {
-        for (i = 0; i < worksheet.cols.length; ++i) {
-            if (-1 === columnBeg) {
-                if (worksheet.cols[i].left <= logicX && logicX < worksheet.cols[i].left + worksheet.cols[i].width) {
-                    columnBeg = i;
-                    columnOff = logicX - worksheet.cols[i].left;
-                }
-            }
-
-            if (worksheet.cols[i].left <= logicToX && logicToX < worksheet.cols[i].left + worksheet.cols[i].width) {
-                columnEnd = i;
-                break;
-            }
-        }
-    }
-
-    // добавляем отсутствующие строки
-
-    if (logicToY >= worksheet.rows[worksheet.rows.length - 1].top) {
-
-        do {
-            worksheet.nRowsCount = worksheet.rows.length + 1;
-            worksheet._calcHeightRows(2); // fullRecalc
-
-            if (logicToY < worksheet.rows[worksheet.rows.length - 1].top) {
-                break
-            }
-        } while (1);
-    }
-
-
-    if (logicY < worksheet.rows[worksheet.rows.length - 1].top) {
-        for (i = 0; i < worksheet.rows.length; ++i) {
-            if (-1 === rowBeg) {
-                if (worksheet.rows[i].top <= logicY && logicY < worksheet.rows[i].top + worksheet.rows[i].height) {
-                    rowBeg = i;
-                    rowOff = logicY - worksheet.rows[i].top;
-                }
-            }
-
-            if (worksheet.rows[i].top <= logicToY && logicToY < worksheet.rows[i].top + worksheet.rows[i].height) {
-                rowEnd = i;
-                break;
-            }
-        }
-    }
-
-    return {
-        columnBeg: columnBeg,
-        columnEnd: columnEnd,
-        columnOff: columnOff,
-        rowBeg: rowBeg,
-        rowEnd: rowEnd,
-        rowOff: rowOff
     };
-}
 
+    // internal
+
+    this._updateRegion = function (worksheet, x, y, width, height) {
+
+        var i = 0;
+        var nativeToEditor = 1.0 / deviceScale * (72.0 / 96.0);
+
+        // координаты в СО редактора
+
+        var logicX = x * nativeToEditor + worksheet.headersWidth;
+        var logicY = y * nativeToEditor + worksheet.headersHeight;
+        var logicToX = ( x + width ) * nativeToEditor + worksheet.headersWidth;
+        var logicToY = ( y + height ) * nativeToEditor + worksheet.headersHeight;
+
+        var columnBeg = -1;
+        var columnEnd = -1;
+        var columnOff = 0;
+        var rowBeg = -1;
+        var rowEnd = -1;
+        var rowOff = 0;
+        var count = 0;
+
+        // добавляем отсутствующие колонки ( с небольшим зазором )
+
+        var logicToXMAX = 10000 * (1 + Math.floor(logicToX / 10000));
+
+        if (logicToXMAX >= worksheet.cols[worksheet.cols.length - 1].left) {
+
+            do {
+                worksheet.nColsCount = worksheet.cols.length + 1;
+                worksheet._calcWidthColumns(2); // fullRecalc
+
+                if (logicToXMAX < worksheet.cols[worksheet.cols.length - 1].left) {
+                    break
+                }
+            } while (1);
+        }
+
+
+        if (logicX < worksheet.cols[worksheet.cols.length - 1].left) {
+            count = worksheet.cols.length;
+            for (i = 0; i < count; ++i) {
+                if (-1 === columnBeg) {
+                    if (worksheet.cols[i].left <= logicX && logicX < worksheet.cols[i].left + worksheet.cols[i].width) {
+                        columnBeg = i;
+                        columnOff = logicX - worksheet.cols[i].left;
+                    }
+                }
+
+                if (worksheet.cols[i].left <= logicToX && logicToX < worksheet.cols[i].left + worksheet.cols[i].width) {
+                    columnEnd = i;
+                    break;
+                }
+            }
+        }
+
+        // добавляем отсутствующие строки ( с небольшим зазором )
+
+        var logicToYMAX = 10000 * (1 + Math.floor(logicToY / 10000));
+
+        if (logicToYMAX >= worksheet.rows[worksheet.rows.length - 1].top) {
+
+            do {
+                worksheet.nRowsCount = worksheet.rows.length + 1;
+                worksheet._calcHeightRows(2); // fullRecalc
+
+                if (logicToYMAX < worksheet.rows[worksheet.rows.length - 1].top) {
+                    break
+                }
+            } while (1);
+        }
+
+
+        if (logicY < worksheet.rows[worksheet.rows.length - 1].top) {
+            count = worksheet.rows.length;
+            for (i = 0; i < count; ++i) {
+                if (-1 === rowBeg) {
+                    if (worksheet.rows[i].top <= logicY && logicY < worksheet.rows[i].top + worksheet.rows[i].height) {
+                        rowBeg = i;
+                        rowOff = logicY - worksheet.rows[i].top;
+                    }
+                }
+
+                if (worksheet.rows[i].top <= logicToY && logicToY < worksheet.rows[i].top + worksheet.rows[i].height) {
+                    rowEnd = i;
+                    break;
+                }
+            }
+        }
+
+        return {
+            columnBeg: columnBeg,
+            columnEnd: columnEnd,
+            columnOff: columnOff,
+            rowBeg: rowBeg,
+            rowEnd: rowEnd,
+            rowOff: rowOff
+        };
+    };
+
+    this._updateContentSize = function (isColumnRecalc, isRowRecalc) {
+
+        // сделать пересчет по надобности
+
+        //var gc_nMaxRow = 1048576;
+        //var gc_nMaxCol = 16384;
+    }
+}
+var _s = new OfflineEditor();
+
+//--------------------------------------------------------------------------------
+// ios
+//--------------------------------------------------------------------------------
+
+function offline_of() {_s.openFile();}
+function offline_sx() {_s.getMaxSizeX();}
+function offline_sy() {_s.getMaxSizeY();}
+function offline_stz(v) {_s.zoom = v; _api.asc_setZoom(v);}
+function offline_ds(x, y, width, height, ratio) {_s.drawSheet(x, y, width, height, ratio);}
+function offline_dh(x, y, width, height, type, ratio) {_s.drawHeader(x, y, width, height, type, ratio);}
+function offline_mouse_down(x, y) {
+    _api.wb.getWorksheet(0).changeSelectionStartPoint(x, y, true, true);
+}
+function offline_mouse_move(x, y) {
+    _api.wb.getWorksheet(0).changeSelectionEndPoint(x, y, true, true);
+}
+function offline_mouse_up(x, y) {
+    _api.wb.getWorksheet(0).changeSelectionDone();
+}
+function offline_get_selection(x, y, width, height) {
+    return _s.getSelection(x, y, width, height);
+}
