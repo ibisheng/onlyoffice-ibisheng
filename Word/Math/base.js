@@ -1305,76 +1305,8 @@ CMathBase.prototype.Recalculate_CurPos = function(_X, Y, CurrentRun, _CurRange, 
 {
     return this.Content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
 };
-CMathBase.prototype.old_Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
-{
-    var nCount = this.Content.length;
-    if (nCount <= 0)
-        return false;
-
-    var aBounds = [];
-    for (var nIndex = 0; nIndex < nCount; nIndex++)
-    {
-        var oBounds = this.Content[nIndex].Get_Bounds();
-        if (oBounds.W > 0.001 && oBounds.H > 0.001)
-            aBounds.push(oBounds);
-        else
-            aBounds.push(null);
-    }
-
-    var X = SearchPos.X;
-    var Y = SearchPos.Y;
-
-    var dDiff = null;
-
-    var nCurIndex = 0;
-    var nFindIndex = 0;
-
-    while (nCurIndex < nCount)
-    {
-        var oBounds = aBounds[nCurIndex];
-
-        if (null !== oBounds)
-        {
-            if (oBounds.X <= X && X <= oBounds.X + oBounds.W && oBounds.Y <= Y && Y <= oBounds.Y + oBounds.H)
-            {
-                nFindIndex = nCurIndex;
-                break;
-            }
-            else
-            {
-                var dCurDiffX = X - (oBounds.X + oBounds.W / 2);
-                var dCurDiffY = Y - (oBounds.Y + oBounds.H / 2);
-                var dCurDiff = dCurDiffX * dCurDiffX + dCurDiffY * dCurDiffY;
-
-                if (null === dDiff || dDiff > dCurDiff)
-                {
-                    dDiff = dCurDiff;
-                    nFindIndex = nCurIndex;
-                }
-            }
-        }
-
-        nCurIndex++;
-    }
-
-    if (null === aBounds[nFindIndex])
-        return false;
-
-    SearchPos.CurX = aBounds[nFindIndex].X;
-    SearchPos.CurY = aBounds[nFindIndex].Y;
-
-    var bResult = this.Content[nFindIndex].Get_ParaContentPosByXY(SearchPos, Depth + 1, _CurLine, _CurRange, StepEnd);
-    if(true === bResult)
-    {
-        SearchPos.Pos.Update2(nFindIndex, Depth);
-    }
-
-    return bResult;
-};
 CMathBase.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
 {
-    var bResult = false;
-
     var nCount = this.Content.length;
     if (nCount <= 0)
         return false;
@@ -1438,7 +1370,8 @@ CMathBase.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine
     SearchPos.CurX = aBounds[nFindIndex].X;
     SearchPos.CurY = aBounds[nFindIndex].Y;
 
-    bResult = this.Content[nFindIndex].Get_ParaContentPosByXY(SearchPos, Depth + 1, _CurLine, _CurRange, StepEnd);
+    var bResult = this.Content[nFindIndex].Get_ParaContentPosByXY(SearchPos, Depth + 1, _CurLine, _CurRange, StepEnd);
+
     if(true === bResult)
     {
         SearchPos.Pos.Update2(nFindIndex, Depth);
@@ -1831,8 +1764,6 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         var RangeStartPos = this.protected_AddRange(CurLine, CurRange),
             RangeEndPos = Len - 1;
 
-        //this.VerifyWordLen(PRS);
-
         if(CurLine == 0 && CurRange == 0)
         {
             PRS.WordLen += this.BrGapLeft;
@@ -1907,11 +1838,6 @@ CMathBase.prototype.MeasureJustDraw = function(Item)
 CMathBase.prototype.Math_GetWidth = function(_CurLine, _CurRange)
 {
     return this.size.width;
-};
-CMathBase.prototype.VerifyWordLen = function(PRS)
-{
-    if(true !== PRS.Word)
-        PRS.WordLen = 0;
 };
 CMathBase.prototype.Update_WordLen = function(PRS, WordLen)
 {
@@ -2082,6 +2008,26 @@ CMathBase.prototype.IsShade = function()
 {
     var oShd = this.Get_CompiledCtrPrp().Shd;
     return !(oShd === undefined || shd_Nil === oShd.Value);
+};
+CMathBase.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRange)
+{
+    if(this.bOneLine)
+    {
+        RangeW.W += this.size.width;
+    }
+    else
+    {
+        var CurLine  = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+        var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+        for (var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+        {
+            this.Content[CurPos].Get_Range_VisibleWidth(RangeW, _CurLine, _CurRange);
+        }
+    }
 };
 CMathBase.prototype.Get_CurrentParaPos          = CMathContent.prototype.Get_CurrentParaPos;
 CMathBase.prototype.private_UpdatePosOnAdd      = CMathContent.prototype.private_UpdatePosOnAdd;

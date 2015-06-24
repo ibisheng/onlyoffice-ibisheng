@@ -1013,7 +1013,9 @@ CMathContent.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
         this.pos.x = pos.x;
     }
 
-    this.Bounds.SetPos(CurLine, this.pos, PRSA);
+    if(this.IsStartRange(Line, Range))
+        this.Bounds.SetPos(CurLine, this.pos, PRSA);
+
     this.Bounds.SetPage(CurLine, Page);
 
     for(var i = StartPos; i <= EndPos; i++)
@@ -3116,29 +3118,6 @@ CMathContent.prototype.Get_CurrentParaPos = function()
 
     return new CParaPos( this.StartRange, this.StartLine, 0, 0 );
 };
-CMathContent.prototype.old_Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
-{
-    var nLength = this.Content.length;
-
-    if (nLength <= 0)
-        return false;
-
-    var bResult = false;
-    for (var nPos = 0; nPos < nLength; nPos++)
-    {
-        var CurX = SearchPos.CurX;
-
-        if(true === this.Content[nPos].Get_ParaContentPosByXY(SearchPos, Depth + 1, _CurLine, _CurRange, StepEnd))
-        {
-            SearchPos.Pos.Update2(nPos, Depth);
-            bResult = true;
-        }
-
-        SearchPos.CurX = CurX + this.Content[nPos].size.width;
-    }
-
-    return bResult;
-};
 CMathContent.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos)
 {
     var nPos = (true !== bSelection ? this.CurPos : (false !== bStart ? this.Selection.Start : this.Selection.End));
@@ -4315,16 +4294,18 @@ CMathContent.prototype.Math_Is_End = function(_CurLine, _CurRange)
 
     return result;
 };
+CMathContent.prototype.IsStartRange = function(Line, Range)
+{
+    var bFirstLine = Line - this.StartLine == 0;
+    return bFirstLine ? Range - this.StartRange == 0 : Range == 0;
+};
 CMathContent.prototype.IsStartLine = function(Line)
 {
-    return Line - this.StartLine == 0;
+    return Line == this.StartLine;
 };
 CMathContent.prototype.IsFirstRange = function(Line, Range)
 {
-    var CurLine  = Line - this.StartLine,
-        CurRange = Range - this.StartRange;
-
-    return CurLine == 0 && CurRange == 0;
+    return Line - this.StartLine == 0 && Range - this.StartRange == 0;
 };
 CMathContent.prototype.IsEndLine = function(Line)
 {

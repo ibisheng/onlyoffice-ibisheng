@@ -1011,7 +1011,7 @@ ParaRun.prototype.Get_ParaPosByContentPos = function(ContentPos, Depth)
 
 };
 
-ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _CurLine, CurPage, UpdateCurPos, UpdateTarget, ReturnTarget, PointsInfo)
+ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _CurLine, CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
 {
     var Para = this.Paragraph;
 
@@ -1030,9 +1030,11 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
 
         Pos = _EndPos;
 
-        var loc;
-        var MATH_X = X;
+        var LocParaMath = this.ParaMath.GetLinePosition(_CurLine);
+        X = LocParaMath.x;
+
         var MATH_Y = Y;
+        var loc;
 
         if(Lng == 0)
         {
@@ -2071,6 +2073,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var ContentLen = this.Content.length;
     var XRange    = PRS.XRange;
 
+    var bAbsent_Internal_Ranges;
+
     if (false === StartWord && true === FirstItemOnLine && XEnd - X < 0.001 && RangesCount > 0)
     {
         NewRange = true;
@@ -2198,7 +2202,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.
                     var LetterLen = Item.Get_Width2() / TEXTWIDTH_DIVIDER;//var LetterLen = Item.Get_Width();
 
-
                     if (true !== Word)
                     {
                         // Слово только началось. Делаем следующее:
@@ -2228,7 +2231,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     {
                         if(X + SpaceLen + WordLen + LetterLen > XEnd)
                         {
-                            if(true === FirstItemOnLine)
+                            if(true === FirstItemOnLine && true === Para.Internal_Check_Ranges(ParaLine, ParaRange))
                             {
                                 // Слово оказалось единственным элементом в промежутке, и, все равно,
                                 // не умещается целиком. Делаем следующее:
@@ -2288,11 +2291,13 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     bNoOneBreakOperator = false;
 
+                    var bFirstItem = true === FirstItemOnLine && true === Para.Internal_Check_Ranges(ParaLine, ParaRange);
+
                     if(bOperInEndContent || bLowPriority)
                     {
                         if(X + SpaceLen + WordLen + BrkLen > XEnd)
                         {
-                            if(true === FirstItemOnLine)
+                            if(bFirstItem == true)
                             {
                                 bMathWordLarge = true;
                             }
@@ -2318,7 +2323,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                         var bOverXEnd;
 
-                        if(bCompareOper && bFirstCompareOper == true && PRS.bCompareWrapIndent == true && WorLenCompareOper > PRS.WrapIndent && !(Word == false && FirstItemOnLine == true)) // (Word == true && FirstItemOnLine == true) - не первый элемент в строке
+                        if(bCompareOper && bFirstCompareOper == true && PRS.bCompareWrapIndent == true && WorLenCompareOper > PRS.WrapIndent && !(Word == false && bFirstItem == true)) // (Word == true && FirstItemOnLine == true) - не первый элемент в строке
                             bFirstCompareOper = false;
 
                         if(bOperBefore)  // оператор "до"
@@ -2326,7 +2331,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             bOverXEnd = X + WordLen + SpaceLen > XEnd;
 
 
-                            if(bOverXEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                            if(bOverXEnd && bFirstItem == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                             {
                                 MoveToLBP = true;
                                 NewRange = true;
@@ -2351,15 +2356,15 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                     if(SpaceLen !== 0)
                                         FirstItemOnLine = false;
 
-                                    if(FirstItemOnLine == false)
+                                    if(bFirstItem == false)
+                                    {
                                         PRS.Set_LineBreakPos(Pos);
-
-                                    // FirstItemOnLine == true && Word == false
-                                    // первое слово в строке
-                                    if(FirstItemOnLine == true)
+                                    }
+                                    else
                                     {
                                         SpaceLen += BrkLen - Item.GapLeft;
                                     }
+
                                 }
                             }
                         }
@@ -2367,7 +2372,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         {
                             bOverXEnd = X + WordLen + BrkLen - Item.GapRight > XEnd;
 
-                            if(bOverXEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                            if(bOverXEnd && bFirstItem == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                             {
                                 MoveToLBP = true;
                                 NewRange = true;
@@ -3729,12 +3734,14 @@ ParaRun.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRange)
             case para_Sym:
             case para_Text:
             case para_Space:
+            case para_Math_Text:
+            case para_Math_Ampersand:
+            case para_Math_Placeholder:
+            case para_Math_BreakOperator:
             {
                 RangeW.W += Item.Get_WidthVisible();
-
                 break;
             }
-
             case para_Drawing:
             {
                 if ( true === Item.Is_Inline() )

@@ -347,10 +347,6 @@ function CMathInfo()
     this.bWordLarge       = false;
     this.NeedUpdateWrap   = true;
 }
-CMathInfo.prototype.GetFirstLineOnPage = function()
-{
-    return this.FirstLineOnPage;
-};
 CMathInfo.prototype.GetCountLines = function()
 {
     return this.LineWidths.GetCountLines();
@@ -448,12 +444,11 @@ CMathPageInfo.prototype.IsFirstPage = function(_Page)
 };
 CMathPageInfo.prototype.GetStarLinetWidth = function()
 {
-    return this.Info[0].LineWidths.Get(0);
+    return this.Info[0].LineWidths.GetFirst();
 };
 CMathPageInfo.prototype.UpdateCurrentWidth = function(_Line, Width)
 {
     var Line = this.Info[this.CurPage].GetNumberLine(_Line - this.StartLine);
-    //var Line = _Line - this.StartLine - this.Info[this.CurPage].FirstLineOnPage;
 
     return this.Info[this.CurPage].LineWidths.UpdateWidth(Line, Width);
 };
@@ -509,7 +504,7 @@ CMathPageInfo.prototype.GetFirstLineOnPage = function(_Page)
 {
     var Page = _Page - this.StartPage;
 
-    var FirstLineOnPage = this.Info[Page].GetFirstLineOnPage();
+    var FirstLineOnPage = this.Info[Page].FirstLineOnPage;
 
     return this.StartLine + FirstLineOnPage;
 };
@@ -773,7 +768,7 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
         W = MaxW;
     }
 
-    if(this.Root.IsStartLine(_CurLine)) // первая строка первой страницы
+    if(this.Root.IsFirstRange(_CurLine, _CurRange)) // первая строка первой страницы, если строка разбивается на несколько отрезко, то это уже будет inline-формула
     {
         switch(Jc)
         {
@@ -1146,7 +1141,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var Page      = AbsolutePage + PRS.Page;
 
     var PrevLineObject = PRS.RestartPageRecalcInfo.Object;
-    var bStartLine = this.Root.IsStartLine(ParaLine);
+    var bFirstRange = this.Root.IsFirstRange(ParaLine, ParaRange);
 
     var MathSettings = Get_WordDocumentDefaultMathSettings();
 
@@ -1156,7 +1151,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var ArgSize = new CMathArgSize();
 
     // первый пересчет
-    if(PrevLineObject == null && true == bStartLine && PRS.bFastRecalculate == false)
+    if(PrevLineObject == null && true == bFirstRange && PRS.bFastRecalculate == false)
     {
         this.PageInfo.Reset();
         this.PageInfo.SetStartPos(Page, ParaLine);
@@ -1189,7 +1184,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     PRS.WrapIndent = WrapIndent;
 
-    if(bStartLine == false)
+    if(this.Root.IsStartLine() == false)
     {
         PRS.X += WrapIndent;
         PRS.bCompareWrapIndent = false;
@@ -1328,6 +1323,13 @@ ParaMath.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange
         Page = this.Paragraph.Get_StartPage_Absolute();
 
     var pos = new CMathPosition();
+
+    if(false == this.Root.IsStartRange(_CurLine, _CurRange))
+    {
+        var LinePos = this.Root.GetPos(_CurLine);
+        pos.x += PRSA.X - LinePos.x;
+    }
+
     this.Root.setPosition(pos, PRSA, _CurLine, _CurRange, Page + _CurPage);
 
     this.Root.Recalculate_Range_Spaces(PRSA, _CurLine, _CurRange, Page + _CurPage);
@@ -1436,18 +1438,8 @@ ParaMath.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
 
 ParaMath.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRange)
 {
-    var CurLine = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-    if ( EndPos >= 1 )
-    {
-        RangeW.W += this.Width;
-    }
+    this.Root.Get_Range_VisibleWidth(RangeW, _CurLine, _CurRange);
 };
-
 ParaMath.prototype.Is_BrkBinBefore = function()
 {
     var MathSettings = Get_WordDocumentDefaultMathSettings();
@@ -1921,39 +1913,6 @@ ParaMath.prototype.Cursor_MoveToEndPos = function(SelectFromEnd)
     this.Root.Cursor_MoveToEndPos(SelectFromEnd);
 };
 
-ParaMath.prototype.old_Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd, Flag) // получить логическую позицию по XY
-{
-    var Result = false;
-
-    var CurLine  = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange ); // если находимся в нулевой строке (для текущей позиции), то CurRange мб ненулевой
-
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-    // Проверяем, попали ли мы в формулу
-
-    if ( EndPos >= 1 )
-    {
-        var Dx = this.Root.size.width;
-        var D = SearchPos.X - SearchPos.CurX;
-
-        var CurX = SearchPos.CurX;
-
-        Result = this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
-
-        if ( D >= - 0.001 && D <= Dx + 0.001 )
-        {
-            SearchPos.InText = true;
-            SearchPos.DiffX  = 0.001;
-
-            SearchPos.InTextPos.Copy_FromDepth(SearchPos.Pos, Depth);
-        }
-
-        SearchPos.CurX = CurX + Dx;
-    }
-
-    return Result;
-};
 ParaMath.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd, Flag) // получить логическую позицию по XY
 {
     var Result = this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
