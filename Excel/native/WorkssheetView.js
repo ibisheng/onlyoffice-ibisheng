@@ -77,6 +77,8 @@ WorksheetView.prototype._drawCellsAndBorders_Local = function (drawingCtx,  c1, 
 
 WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFrozen) {
 
+    var native_selection = [];
+
     var range = undefined;
 
     this.visibleRange = new asc_Range(c1, r1, c2, r2);
@@ -284,60 +286,66 @@ WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFr
         //	//ctx.lineVer(x2, y1 + t, y2 + b - fillHandleHeight);
         //}
 
-        return [x1, y1, x2, y2, this.activeRange.type];
+        native_selection = [x1, y1, x2, y2, this.activeRange.type];
+        //return [x1, y1, x2, y2, this.activeRange.type ];
     }
-
-    return null;
 
     //ctx.stroke();
 
     // draw cells overlay
     if (range) {
-        //var lRect = x1 + (drawLeftSide ? this.width_3px : this.width_1px),
-        //	rRect = x2 - (drawRightSide ? this.width_2px : 0),
-        //	tRect = y1 + (drawTopSide ? this.height_2px : 0),
-        //	bRect = y2 - (drawBottomSide ? this.width_2px : 0);
+        var lRect = x1 + (drawLeftSide ? this.width_3px : this.width_1px),
+            rRect = x2 - (drawRightSide ? this.width_2px : 0),
+            tRect = y1 + (drawTopSide ? this.height_2px : 0),
+            bRect = y2 - (drawBottomSide ? this.width_2px : 0);
         //ctx.setFillStyle( opt.activeCellBackground )
         //	.fillRect(lRect, tRect, rRect - lRect, bRect - tRect);
-        //
-        //var lRect2 = x1 + (drawLeftSide ? this.width_2px : this.width_1px),
-        //	rRect2 = x2 - (drawRightSide ? this.width_2px : 0),
-        //	tRect2 = y1 + (drawTopSide ? this.height_1px : 0),
-        //	bRect2 = y2 - (drawBottomSide ? this.width_2px : 0);
+
+        var lRect2 = x1 + (drawLeftSide ? this.width_2px : this.width_1px),
+            rRect2 = x2 - (drawRightSide ? this.width_2px : 0),
+            tRect2 = y1 + (drawTopSide ? this.height_1px : 0),
+            bRect2 = y2 - (drawBottomSide ? this.width_2px : 0);
         //ctx.setStrokeStyle(opt.activeCellBorderColor2).setLineWidth(1).beginPath()
         //	.strokeRect(lRect2, tRect2, rRect2 - lRect2, bRect2 - tRect2);
-        //
-        //var firstCell = (!this.isSelectionDialogMode) ? this.activeRange : this.copyActiveRange;
-        //cr = this.model.getMergedByCell(firstCell.startRow, firstCell.startCol);
-        //// Получаем активную ячейку в выделении
-        //cr = range.intersection(null !== cr ? cr : new asc_Range(firstCell.startCol, firstCell.startRow, firstCell.startCol, firstCell.startRow));
-        //if (cr !== null) {
-        //	ctx.save().beginPath().rect(lRect, tRect, rRect - lRect, bRect - tRect).clip();
-        //	var _l = this.cols[cr.c1].left - offsetX - this.width_1px,
-        //		_r = this.cols[cr.c2].left + this.cols[cr.c2].width - offsetX,
-        //		_t = this.rows[cr.r1].top - offsetY - this.height_1px,
-        //		_b = this.rows[cr.r2].top + this.rows[cr.r2].height - offsetY;
-        //	ctx.clearRect(_l, _t, _r - _l, _b - _t).restore();
-        //}
-        //
-        //if (!(isFrozen && (!drawRightSide || !drawBottomSide))) {
-        //	// Рисуем "квадрат" для автозаполнения (располагается "квадрат" в правом нижнем углу последней ячейки выделения)
-        //	cr = range.intersection(new asc_Range(range.c2, range.r2, range.c2, range.r2));
-        //	if (cr !== null) {
-        //		this.fillHandleL = this.cols[cr.c1].left - offsetX + this.cols[cr.c1].width - this.width_1px - this.width_2px;
-        //		this.fillHandleR = this.fillHandleL + fillHandleWidth;
-        //		this.fillHandleT = this.rows[cr.r1].top - offsetY + this.rows[cr.r1].height - this.height_1px - this.height_2px;
-        //		this.fillHandleB = this.fillHandleT + fillHandleHeight;
-        //
-        //		ctx.setFillStyle(opt.activeCellBorderColor).fillRect(this.fillHandleL, this.fillHandleT, this.fillHandleR - this.fillHandleL, this.fillHandleB - this.fillHandleT);
-        //
-        //		ctx.setStrokeStyle(opt.activeCellBorderColor2).setLineWidth(1).beginPath();
-        //		ctx.lineHorPrevPx(this.fillHandleL, this.fillHandleT, this.fillHandleR);
-        //		ctx.lineVerPrevPx(this.fillHandleL, this.fillHandleT, this.fillHandleB);
-        //		ctx.stroke();
-        //	}
-        //}
+
+        var firstCell = (!this.isSelectionDialogMode) ? this.activeRange : this.copyActiveRange;
+        cr = this.model.getMergedByCell(firstCell.startRow, firstCell.startCol);
+        // Получаем активную ячейку в выделении
+        cr = range.intersection(null !== cr ? cr : new asc_Range(firstCell.startCol, firstCell.startRow, firstCell.startCol, firstCell.startRow));
+        if (cr !== null) {
+            //ctx.save().beginPath().rect(lRect, tRect, rRect - lRect, bRect - tRect).clip();
+            var _l = this.cols[cr.c1].left - offsetX - this.width_1px,
+                _r = this.cols[cr.c2].left + this.cols[cr.c2].width - offsetX,
+                _t = this.rows[cr.r1].top - offsetY - this.height_1px,
+                _b = this.rows[cr.r2].top + this.rows[cr.r2].height - offsetY;
+            //ctx.clearRect(_l, _t, _r - _l, _b - _t).restore();
+
+            native_selection.push(_l);
+            native_selection.push(_t);
+            native_selection.push(_r);
+            native_selection.push(_b);
+        }
+
+        if (!(isFrozen && (!drawRightSide || !drawBottomSide))) {
+            // Рисуем "квадрат" для автозаполнения (располагается "квадрат" в правом нижнем углу последней ячейки выделения)
+            //cr = range.intersection(new asc_Range(range.c2, range.r2, range.c2, range.r2));
+            //if (cr !== null) {
+            //	this.fillHandleL = this.cols[cr.c1].left - offsetX + this.cols[cr.c1].width - this.width_1px - this.width_2px;
+            //	this.fillHandleR = this.fillHandleL + fillHandleWidth;
+            //	this.fillHandleT = this.rows[cr.r1].top - offsetY + this.rows[cr.r1].height - this.height_1px - this.height_2px;
+            //	this.fillHandleB = this.fillHandleT + fillHandleHeight;
+            //
+            //	ctx.setFillStyle(opt.activeCellBorderColor).fillRect(this.fillHandleL, this.fillHandleT, this.fillHandleR - this.fillHandleL, this.fillHandleB - this.fillHandleT);
+            //
+            //	ctx.setStrokeStyle(opt.activeCellBorderColor2).setLineWidth(1).beginPath();
+            //	ctx.lineHorPrevPx(this.fillHandleL, this.fillHandleT, this.fillHandleR);
+            //	ctx.lineVerPrevPx(this.fillHandleL, this.fillHandleT, this.fillHandleB);
+            //	ctx.stroke();
+            //}
+        }
     }
+
+    return native_selection;
 
     // draw fill handle select
     if (this.activeFillHandle !== null) {
@@ -417,4 +425,6 @@ WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFr
     //	this._drawActiveHeaders();
     //}
 };
+
+
 
