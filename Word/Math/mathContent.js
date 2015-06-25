@@ -28,7 +28,7 @@ CRPI.prototype.Copy = function()
 };
 CRPI.prototype.MergeMathInfo = function(MathInfo)
 {
-    this.bInline           = MathInfo.bInline;
+    this.bInline           = MathInfo.bInline || (MathInfo.bInternalRanges == true && MathInfo.bStartRanges == false);
     this.bRecalcCtrPrp     = MathInfo.bRecalcCtrPrp;
     this.bChangeInline     = MathInfo.bChangeInline;
     this.bCorrect_FontSize = MathInfo.bCorrect_FontSize;
