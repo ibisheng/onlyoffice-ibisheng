@@ -874,7 +874,7 @@ DependencyGraph.prototype = {
         var nodeId = getDefNameVertexId( sheetId, defName ),
             oRes = this.defNameList[nodeId], dfv, defNameSheetsList;
 
-        if ( null == oRes || null == oRes.Ref ) {
+        if ( null == oRes || ( null == oRes.Ref && null == defRef ) ) {
             dfv = new DefNameVertex( sheetId, defName, defRef, this.wb );
             oRes = (this.defNameList[dfv.nodeId] = dfv);
             defNameSheetsList = this.defNameSheets[dfv.sheetId];
@@ -883,6 +883,14 @@ DependencyGraph.prototype = {
                 this.defNameSheets[dfv.sheetId] = defNameSheetsList;
             }
             defNameSheetsList[dfv.nodeId] = dfv;
+        }
+        else if( null == oRes.Ref && null != defRef ){
+
+            oRes.Ref = defRef;
+            oRes.parsedRef = new parserFormula(oRes.Ref, "", oRes.wb.getWorksheet(0));
+            oRes.parsedRef.parse();
+//            oRes.sheetId = sheetId;
+
         }
 
         if ( bUndo ) {
@@ -2394,7 +2402,7 @@ Workbook.prototype.delDefinesNames = function ( defName ) {
         for ( var id in nSE ) {
             seUndoRedo.push( id );
             se = nSE[id];
-            se.deleteMasterEdge( retRes );
+//            se.deleteMasterEdge( retRes );
 
             this.needRecalc.nodes[se.nodeId] = [se.sheetId, se.cellId ];
             this.needRecalc.length++;
@@ -2473,7 +2481,7 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
                 se.setFormula( se.formulaParsed.assemble() );
 
                 if ( !rename ) {
-                    se.formulaParsed.setFormula(se.sFormula)
+                    se.formulaParsed.setFormula(se.sFormula);
                     se.formulaParsed.parse();
                 }
 
@@ -2483,7 +2491,7 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
         }
 
         if(retRes){
-            retRes.deleteAllSlaveEdges();
+//            retRes.deleteAllSlaveEdges();
             retRes = retRes.getAscCDefName();
         }
 
