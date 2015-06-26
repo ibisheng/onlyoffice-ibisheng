@@ -2418,7 +2418,7 @@ Workbook.prototype.delDefinesNames = function ( defName ) {
         }
 
         sortDependency( this );
-        History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames( defName.Name, defName.Ref, defName.Scope, seUndoRedo ) );
+        History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames( defName.Name, defName.Ref, defName.LocalSheetId, seUndoRedo ) );
     }
 
     return retRes;
