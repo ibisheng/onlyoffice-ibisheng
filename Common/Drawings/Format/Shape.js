@@ -4742,37 +4742,74 @@ CShape.prototype =
         var oRet = {oTxWarpStruct: null, oTxWarpStructParamarks: null};
         if((oBodyPr.prstTxWarp && oBodyPr.prstTxWarp.preset !== "textNoShape") || this.checkContentWordArt(oContent))
         {
-            var oTextDrawer = new CTextDrawer(dWidth, dHeight, true, this.Get_Theme());
+            var bNeedRecalc = oBodyPr.prstTxWarp.pathLst.length / 2 - ((oBodyPr.prstTxWarp.pathLst.length / 2) >> 0) > 0 , dOldXLimit = oContent.XLimit, dOldYLimit = oContent.YLimit, dOneLineWidth, dMinPolygonLength = 0, dKoeff = 1;
+            var oTheme = this.Get_Theme(), oColorMap = this.Get_ColorMap();
+            var oTextDrawer = new CTextDrawer(dWidth, dHeight, true, oTheme, bNeedRecalc);
             var warpGeometry = oBodyPr.prstTxWarp;
             warpGeometry && warpGeometry.Recalculate(dWidth, dHeight);
+            var oContentToDraw = oContent;
+            if(bNeedRecalc)
+            {
+                oContentToDraw = oContent.Copy(oContent.Parent, oContent.DrawingDocument);
+                var bNeedTurnOn = false;
+                if(this.bWordShape && editor && editor.WordControl.m_oLogicDocument)
+                {
+                    if(!editor.WordControl.m_oLogicDocument.TurnOffRecalc)
+                    {
+                        bNeedTurnOn = true;
+                        editor.WordControl.m_oLogicDocument.TurnOff_Recalculate();
+                    }
+                }
+                oContentToDraw.Set_ApplyToAll(true);
+                oContentToDraw.Set_ParagraphSpacing({Before: 0, After: 0});
+                oContentToDraw.Set_ApplyToAll(false);
+                if(bNeedTurnOn)
+                {
+                    editor.WordControl.m_oLogicDocument.TurnOn_Recalculate();
+                }
+                dMinPolygonLength = warpGeometry.getMinPathPolygonLength();
+                dOneLineWidth = GetRectContentWidth(oContentToDraw);
+                if(dOneLineWidth > dMinPolygonLength)
+                {
+                    dKoeff = dMinPolygonLength/dOneLineWidth;
+                    oContentToDraw.Reset(0, 0, dOneLineWidth, 20000);
+                }
+                else
+                {
+                    oContentToDraw.Reset(0, 0, dMinPolygonLength, 20000);
+                }
+                oContentToDraw.Recalculate_Page(0, true);
+            }
+            var dContentHeight = oContentToDraw.Get_SummaryHeight();
             var OldShowParaMarks;
             if(isRealObject(editor))
             {
                 OldShowParaMarks = editor.ShowParaMarks;
                 editor.ShowParaMarks = true;
             }
-            oContent.Draw(oContent.StartPage, oTextDrawer);
+            oContentToDraw.Draw(oContentToDraw.StartPage, oTextDrawer);
             if(isRealObject(editor))
             {
                 editor.ShowParaMarks = OldShowParaMarks;
             }
             oRet.oTxWarpStructParamarks = oTextDrawer.m_oDocContentStructure;
-            oRet.oTxWarpStructParamarks.Recalculate(this.Get_Theme(), this.Get_ColorMap(), dWidth, dHeight, this);
-            warpGeometry && oRet.oTxWarpStructParamarks.checkByWarpStruct(warpGeometry);
+            oRet.oTxWarpStructParamarks.Recalculate(oTheme, oColorMap, dWidth*dKoeff, dHeight*dKoeff, this);
+            warpGeometry && oRet.oTxWarpStructParamarks.checkByWarpStruct(warpGeometry, dWidth, dHeight, oTheme, oColorMap, this, dOneLineWidth, oContentToDraw.XLimit, dContentHeight, dKoeff);
 
             if(isRealObject(editor))
             {
                 OldShowParaMarks = editor.ShowParaMarks;
                 editor.ShowParaMarks = false;
             }
-            oContent.Draw(oContent.StartPage, oTextDrawer);
+            oContentToDraw.Draw(oContentToDraw.StartPage, oTextDrawer);
             if(isRealObject(editor))
             {
                 editor.ShowParaMarks = OldShowParaMarks;
             }
             oRet.oTxWarpStruct = oTextDrawer.m_oDocContentStructure;
-            oRet.oTxWarpStruct.Recalculate(this.Get_Theme(), this.Get_ColorMap(), dWidth, dHeight, this);
-            warpGeometry && oRet.oTxWarpStruct.checkByWarpStruct(warpGeometry);
+            oRet.oTxWarpStruct.Recalculate(oTheme, oColorMap, dWidth*dKoeff, dHeight*dKoeff, this);
+
+            warpGeometry && oRet.oTxWarpStruct.checkByWarpStruct(warpGeometry, dWidth, dHeight, oTheme, oColorMap, this, dOneLineWidth, oContentToDraw.XLimit, dContentHeight, dKoeff);
             this.recalcInfo.warpGeometry = warpGeometry;
         }
         else

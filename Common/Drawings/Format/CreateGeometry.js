@@ -9238,7 +9238,7 @@ function CreatePrstTxWarpGeometry(prst)
             f.AddHandlePolar('adj', '0', '21599999', undefined, '0', '0', 'x1', 'y1');
             f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
             f.AddPathCommand(1, 'x2', 'y2');
-            f.AddPathCommand(3, 'wd2', 'wd2', 'stAng', 'swAng');
+            f.AddPathCommand(3, 'wd2', 'hd2', 'stAng', 'swAng');
             break;
         }
         case 'textArchDownPour':{
@@ -9311,7 +9311,7 @@ function CreatePrstTxWarpGeometry(prst)
             f.AddHandlePolar('adj', '0', '21599999', undefined, '0', '0', 'x1', 'y1');
             f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
             f.AddPathCommand(1, 'x1', 'y1');
-            f.AddPathCommand(3, 'wd2', 'wd2', 'adval', 'swAng');
+            f.AddPathCommand(3, 'wd2', 'hd2', 'adval', 'swAng');
             break;
         }
         case 'textArchUpPour':{
@@ -9400,13 +9400,13 @@ function CreatePrstTxWarpGeometry(prst)
             f.AddHandlePolar('adj', '0', '21599999', undefined, '0', '0', 'x3', 'y3');
             f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
             f.AddPathCommand(1, 'x1', 'y1');
-            f.AddPathCommand(3, 'wd2', 'wd2', 'stT', 'swT');
+            f.AddPathCommand(3, 'wd2', 'hd2', 'stT', 'swT');
             f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
             f.AddPathCommand(1, 'l', 'vc');
             f.AddPathCommand(2, 'r', 'vc');
             f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
             f.AddPathCommand(1, 'x2', 'y2');
-            f.AddPathCommand(3, 'wd2', 'wd2', 'stB', 'swB');
+            f.AddPathCommand(3, 'wd2', 'hd2', 'stB', 'swB');
             break;
         }
         case 'textButtonPour':{
@@ -9620,7 +9620,7 @@ function CreatePrstTxWarpGeometry(prst)
             f.AddHandlePolar('adj', '0', '21599999', undefined, '0', '0', 'x1', 'y1');
             f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
             f.AddPathCommand(1, 'x1', 'y1');
-            f.AddPathCommand(3, 'wd2', 'wd2', 'adval', 'swAng');
+            f.AddPathCommand(3, 'wd2', 'hd2', 'adval', 'swAng');
             break;
         }
         case 'textCirclePour':{

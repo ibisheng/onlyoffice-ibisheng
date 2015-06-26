@@ -147,7 +147,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
     }
 }
 
-function ObjectToDraw(brush, pen, extX, extY, geometry, transform, oTextDrawer)
+function ObjectToDraw(brush, pen, extX, extY, geometry, transform, x, y)
 {
     this.brush = brush;
     this.pen = pen;
@@ -157,6 +157,9 @@ function ObjectToDraw(brush, pen, extX, extY, geometry, transform, oTextDrawer)
     this.TransformMatrix = transform;
     this.geometry = geometry;
     this.parentShape = null;
+    /*позиция символа*/
+    this.x = x;
+    this.y = y;
 }
 ObjectToDraw.prototype =
 {
@@ -178,14 +181,28 @@ ObjectToDraw.prototype =
         }
     },
 
-    resetBrushPen: function(brush, pen)
+    resetBrushPen: function(brush, pen, x, y)
     {
         this.brush = brush;
         this.pen = pen;
+
+        if(isRealNumber(x) && isRealNumber(y))
+        {
+            this.x = x;
+            this.y = y;
+        }
     },
 
-    Recalculate: function(oTheme, oColorMap, dWidth, dHeight, oShape, oParaLine)
+    Recalculate: function(oTheme, oColorMap, dWidth, dHeight, oShape)
     {
+       // if(isRealNumber(this.x) && isRealNumber(this.y))
+       // {
+       //     if(Math.abs(dWidth - this.extX) > MOVE_DELTA || Math.abs(dHeight - this.extY))
+       //     {
+       //         this.x*=dWidth/this.extX;
+       //         this.y*=dHeight/this.extY;
+       //     }
+       // }
         if(this.brush)
         {
             this.brush.check(oTheme, oColorMap);
@@ -199,7 +216,6 @@ ObjectToDraw.prototype =
             this.geometry.Recalculate(dWidth, dHeight);
         }
         this.parentShape = oShape;
-        this.oParaLine = oParaLine;
     },
 
     draw: function(graphics, bNoParentShapeTransform, oTransformMatrix, oTheme, oColorMap)
@@ -240,9 +256,8 @@ ObjectToDraw.prototype =
         graphics.RestoreGrState();
     },
 
-    createDuplicate: function(bNoCopyHiddeen)
+    createDuplicate: function()
     {
-        var oCopy = new ObjectToDraw()
     }
 };
 function RotateTrackShapeImage(originalObject)

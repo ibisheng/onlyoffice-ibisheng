@@ -25,7 +25,6 @@ function Path()
     this.ArrPathCommandInfo = [];
     this.ArrPathCommand = [];
 
-    this.IsHidden = false;//For WordArt
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -176,6 +175,7 @@ Path.prototype = {
     {
         this.addPathCommand({id:bezier4, X0:x0, Y0:y0, X1:x1, Y1:y1, X2:x2, Y2:y2});
     },
+
 
     close: function()
     {

@@ -997,7 +997,6 @@ Geometry.prototype=
         }
     },
 
-
     Recalculate: function(w, h)
     {
         this.gdLst["_3cd4"]= 16200000;
@@ -1077,6 +1076,37 @@ Geometry.prototype=
 
         }
 
+    },
+
+    getMaxPathPolygonLength: function()
+    {
+        var aByPaths = this.getArrayPolygonsByPaths(PATH_DIV_EPSILON);
+
+        var dLength = 0;
+        for(var i = 0; i < aByPaths.length; ++i)
+        {
+            var oWarpPathPolygon = new PolygonWrapper(aByPaths[i]);
+            if(dLength < oWarpPathPolygon.dLen)
+            {
+                dLength = oWarpPathPolygon.dLen;
+            }
+        }
+        return dLength;
+    },
+    getMinPathPolygonLength: function()
+    {
+        var aByPaths = this.getArrayPolygonsByPaths(PATH_DIV_EPSILON);
+
+        var dLength = 10000000;
+        for(var i = 0; i < aByPaths.length; ++i)
+        {
+            var oWarpPathPolygon = new PolygonWrapper(aByPaths[i]);
+            if(dLength > oWarpPathPolygon.dLen)
+            {
+                dLength = oWarpPathPolygon.dLen;
+            }
+        }
+        return dLength;
     },
 
     draw: function(shape_drawer)

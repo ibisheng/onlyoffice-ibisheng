@@ -1,3 +1,5 @@
+"use strict";
+
 var PATH_DIV_EPSILON = 0.1;
 var UNDERLINE_DIV_EPSILON = 3;
 
@@ -30,6 +32,13 @@ CDocContentStructure.prototype.Recalculate = function(oTheme, oColorMap, dWidth,
         this.m_aContent[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape);
     }
 };
+CDocContentStructure.prototype.CheckContentStructs = function(aContentStructs)
+{
+    for(var i = 0; i < this.m_aContent.length; ++i)
+    {
+        this.m_aContent[i].CheckContentStructs(aContentStructs);
+    }
+};
 CDocContentStructure.prototype.draw = function(graphics, transform, oTheme, oColorMap)
 {
     var i;
@@ -42,43 +51,162 @@ CDocContentStructure.prototype.draw = function(graphics, transform, oTheme, oCol
         this.m_aContent[i].draw(graphics, transform, oTheme, oColorMap);
     }
 };
-CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct)
+CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct, dWidth, dHeight, oTheme, oColorMap, oShape, dOneLineWidth, XLimit, dContentHeight, dKoeff)
 {
-    var i, j, t;
+    var i, j, t, aByPaths,  aWarpedObjects = [];
     switch(oWarpStruct.pathLst.length)
     {
+       // case 1:
+       // {
+       //     aByPaths = oWarpStruct.getArrayPolygonsByPaths(PATH_DIV_EPSILON);
+       //     var oWarpPathPolygon = new PolygonWrapper(aByPaths[0]);
+       //     var dLength = oWarpPathPolygon.dLen;
+       //     if(dLength === 0)
+       //     {
+       //         return;
+       //     }
+       //   //  var oContentToDraw = [];
+       //   //  this.CheckContentStructs(oContentToDraw);
+       //    // var x0, y0, x0t, y0t, x1, y1, x1t, y1t, oObjectToDraw,  cX, oPointOnPolygon, dX, dY, dNorm, oMatrix = new CMatrix(), cX2, dX2, dY2;
+       //    // var oNextPointOnPolygon = null;
+//
+       //     switch(oWarpStruct.preset)
+       //     {
+       //         //case "textArchDown":
+       //         default:
+       //         {
+       //             /*for(i = 0; i < oContentToDraw.length; ++i)
+       //             {
+       //                 oObjectToDraw = oContentToDraw[i];
+       //                 var oObjectToDrawNext = oContentToDraw[i+1];
+       //                 if(isRealNumber(oObjectToDraw.x) && isRealNumber(oObjectToDraw.y))
+       //                 {
+       //                     x0 = oObjectToDraw.x*dKoeff;
+       //                     y0 = oObjectToDraw.y*dKoeff;
+       //                     x1 = x0;
+       //                     if("textArchDown" !== oWarpStruct.preset)
+       //                     {
+       //                         y1 = 0;
+       //                     }
+       //                     else
+       //                     {
+       //                         y1 = dContentHeight*dKoeff;
+       //                     }
+       //                     cX = oObjectToDraw.x/XLimit;
+       //                     if(oNextPointOnPolygon)
+       //                     {
+       //                         oPointOnPolygon = oNextPointOnPolygon;
+       //                     }
+       //                     else
+       //                     {
+       //                         oPointOnPolygon = oWarpPathPolygon.getPointOnPolygon(cX, true);
+       //                     }
+       //                     x1t = oPointOnPolygon.x;
+       //                     y1t = oPointOnPolygon.y;
+       //                     dX = oPointOnPolygon.oP2.x - oPointOnPolygon.oP1.x;
+       //                     dY = oPointOnPolygon.oP2.y - oPointOnPolygon.oP1.y;
+//
+       //                     if("textArchDown" !== oWarpStruct.preset)
+       //                     {
+       //                         dX = -dX;
+       //                         dY = -dY;
+       //                     }
+       //                     if(oObjectToDrawNext && isRealNumber(oObjectToDrawNext.x) && isRealNumber(oObjectToDrawNext.y) && oObjectToDrawNext.x > oObjectToDraw.x)
+       //                     {
+       //                         cX2 = (oObjectToDrawNext.x)/XLimit;
+       //                         oNextPointOnPolygon = oWarpPathPolygon.getPointOnPolygon(cX2, true);
+       //                         dX2 = oNextPointOnPolygon.oP2.x - oNextPointOnPolygon.oP1.x;
+       //                         dY2 = oNextPointOnPolygon.oP2.y - oNextPointOnPolygon.oP1.y;
+       //                         if("textArchDown" !== oWarpStruct.preset)
+       //                         {
+       //                             dX2 = -dX2;
+       //                             dY2 = -dY2;
+       //                         }
+       //                         dX = dX + dX2;
+       //                         dY = dY + dY2;
+       //                     }
+       //                     else
+       //                     {
+       //                         oNextPointOnPolygon = null;
+       //                     }
+       //                     dNorm = Math.sqrt(dX*dX + dY*dY);
+//
+       //                     if("textArchDown" !== oWarpStruct.preset)
+       //                     {
+       //                         x0t = x1t + (dY/dNorm)*(y0);
+       //                         y0t = y1t - (dX/dNorm)*(y0);
+       //                     }
+       //                     else
+       //                     {
+//
+       //                         x0t = x1t + (dY/dNorm)*(dContentHeight*dKoeff - y0);
+       //                         y0t = y1t - (dX/dNorm)*(dContentHeight*dKoeff - y0);
+       //                     }
+       //                     oMatrix.shx = (x1t - x0t)/(y1 - y0);
+       //                     oMatrix.sy = (y1t - y0t)/(y1 - y0);
+       //                     oMatrix.sx = oMatrix.sy;
+       //                     oMatrix.shy = -oMatrix.shx;
+       //                     oMatrix.tx = x0t - x0*oMatrix.sx - y0*oMatrix.shx;
+       //                     oMatrix.ty = y0t - x0*oMatrix.shy - y0*oMatrix.sy;
+       //                     TransformGeometry(oObjectToDraw, oMatrix);
+       //                 }
+       //                 else
+       //                 {
+       //                     oNextPointOnPolygon = null;
+       //                 }
+       //             }*/
+       //             for(j = 0; j < this.m_aByLines.length; ++j)
+       //             {
+       //                 oTemp = this.m_aByLines[j];
+       //                 for(t = 0; t < oTemp.length; ++t)
+       //                 {
+       //                     oTemp[t].GetAllWarped(aWarpedObjects);
+       //                 }
+       //             }
+       //             for(i = 0; i < aWarpedObjects.length; ++i)
+       //             {
+       //                 var oWarpedObject = aWarpedObjects[i];
+       //               //  if(!isRealNumber(oWarpedObject.x) || !isRealNumber(oWarpedObject.y))
+       //                 {
+       //                     CheckGeometryByPolygon(oWarpedObject, oWarpPathPolygon, "textArchDown" !== oWarpStruct.preset, XLimit*dKoeff, dContentHeight, dKoeff);
+       //                 }
+       //             }
+       //             break;
+       //         }
+       //     }
+       //     break;
+       // }
+       // case 3:
+       // {
+//
+       //     break;
+       // }
         case 1:
-        {
-            break;
-        }
+        case 3:
         case 2:
         case 4:
         case 6:
         {
-            var nDivCount = oWarpStruct.pathLst.length >> 1;
-            var aByPaths = oWarpStruct.getArrayPolygonsByPaths(PATH_DIV_EPSILON);
-            var nLastIndex = 0, aIndex = [],  aWarpedObjects = [], dTmp, oBoundsChecker, oTemp, nIndex, aWarpedObjects2 = [];
+
+
+            var bOddPaths = oWarpStruct.pathLst.length / 2 - ((oWarpStruct.pathLst.length / 2) >> 0) > 0;
+            var nDivCount = bOddPaths ? oWarpStruct.pathLst.length : oWarpStruct.pathLst.length >> 1;
+            aByPaths = oWarpStruct.getArrayPolygonsByPaths(PATH_DIV_EPSILON);
+            var nLastIndex = 0, dTmp, oBoundsChecker, oTemp, nIndex, aWarpedObjects2 = [];
             oBoundsChecker = new CSlideBoundsChecker();
             oBoundsChecker.init(100, 100, 100, 100);
-            var bCheckBounds = false, dMinX, dMaxX;
-            //if(oWarpStruct.pathLst.length > 2)
+            var dMinX, dMaxX;
+            for(j = 0; j < this.m_aByLines.length; ++j)
             {
-                bCheckBounds = true;
-                for(j = 0; j < this.m_aByLines.length; ++j)
+                oTemp = this.m_aByLines[j];
+                for(t = 0; t < oTemp.length; ++t)
                 {
-                    oTemp = this.m_aByLines[j];
-                    for(t = 0; t < oTemp.length; ++t)
-                    {
-                        oTemp[t].GetAllWarped(aWarpedObjects2);
-                        oTemp[t].CheckBoundsWarped(oBoundsChecker);
-                    }
+                    oTemp[t].GetAllWarped(aWarpedObjects2);
+                    oTemp[t].CheckBoundsWarped(oBoundsChecker);
                 }
-                dMinX = oBoundsChecker.Bounds.min_x;
-                dMaxX = oBoundsChecker.Bounds.max_x;
             }
-
-
-
+            dMinX = oBoundsChecker.Bounds.min_x;
+            dMaxX = oBoundsChecker.Bounds.max_x;
             for( i = 0; i < nDivCount; ++i)
             {
                 dTmp = (this.m_aByLines.length - nLastIndex)/(nDivCount - i);
@@ -94,18 +222,26 @@ CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct)
                         oTemp[t].CheckBoundsWarped(oBoundsChecker);
                     }
                 }
-                if(bCheckBounds)
+                if(oBoundsChecker.Bounds.min_x > dMinX)
                 {
-                    if(oBoundsChecker.Bounds.min_x > dMinX)
+                    oBoundsChecker.Bounds.min_x = dMinX;
+                }
+                if(oBoundsChecker.Bounds.max_x < dMaxX)
+                {
+                    oBoundsChecker.Bounds.max_x = dMaxX;
+                }
+                if(!bOddPaths)
+                {
+                    ObjectsToDrawBetweenTwoPolygons(aWarpedObjects, oBoundsChecker.Bounds, new PolygonWrapper(aByPaths[i << 1]), new PolygonWrapper(aByPaths[(i << 1) + 1]));
+                }
+                else
+                {
+                    var oPolygon = new PolygonWrapper(aByPaths[i]);
+                    for(t = 0; t < aWarpedObjects.length; ++t)
                     {
-                        oBoundsChecker.Bounds.min_x = dMinX;
-                    }
-                    if(oBoundsChecker.Bounds.max_x < dMaxX)
-                    {
-                        oBoundsChecker.Bounds.max_x = dMaxX;
+                        CheckGeometryByPolygon(aWarpedObjects[t], oPolygon, "textArchDown" !== oWarpStruct.preset && i < 1, XLimit*dKoeff, dContentHeight, dKoeff, nDivCount > 1 ? oBoundsChecker.Bounds : null);
                     }
                 }
-                ObjectsToDrawBetweenTwoPolygons(aWarpedObjects, oBoundsChecker.Bounds, new PolygonWrapper(aByPaths[i << 1]), new PolygonWrapper(aByPaths[(i << 1) + 1]));
                 nLastIndex = nIndex;
             }
 
@@ -130,10 +266,6 @@ CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct)
             }
             break;
         }
-        case 3:
-        {
-            break;
-        }
         default://без формы
         {
 
@@ -155,6 +287,15 @@ CParagraphStructure.prototype.Recalculate = function(oTheme, oColorMap, dWidth, 
     for(i = 0; i < this.m_aContent.length; ++i)
     {
         this.m_aContent[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape);
+    }
+};
+
+CParagraphStructure.prototype.CheckContentStructs = function(aContentStructs)
+{
+    var i;
+    for(i = 0; i < this.m_aContent.length; ++i)
+    {
+        this.m_aContent[i].CheckContentStructs(aContentStructs);
     }
 };
 CParagraphStructure.prototype.draw = function(graphics, transform, oTheme, oColorMap)
@@ -185,6 +326,14 @@ CTableStructure.prototype.Recalculate = function(oTheme, oColorMap, dWidth, dHei
     for(i = 0; i < this.m_aBorders.length; ++i)
     {
         this.m_aBorders[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape);
+    }
+};
+CTableStructure.prototype.CheckContentStructs = function(aContentStructs)
+{
+    var i;
+    for(i = 0; i < this.m_aContent.length; ++i)
+    {
+        this.m_aContent[i].CheckContentStructs(aContentStructs);
     }
 };
 CTableStructure.prototype.draw = function(graphics, transform, oTheme, oColorMap)
@@ -220,23 +369,32 @@ CLineStructure.prototype.Recalculate = function(oTheme, oColorMap, dWidth, dHeig
     var i;
     for(i = 0; i < this.m_aContent.length; ++i)
     {
-        this.m_aContent[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape, this.m_oLine);
+        this.m_aContent[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape);
     }
     for(i = 0; i < this.m_aBorders.length; ++i)
     {
-        this.m_aBorders[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape, this.m_oLine);
+        this.m_aBorders[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape);
     }
     for(i = 0; i < this.m_aBackgrounds.length; ++i)
     {
-        this.m_aBackgrounds[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape, this.m_oLine);
+        this.m_aBackgrounds[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape);
     }
     for(i = 0; i < this.m_aUnderlinesStrikeouts.length; ++i)
     {
-        this.m_aUnderlinesStrikeouts[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape, this.m_oLine);
+        this.m_aUnderlinesStrikeouts[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape);
     }
     for(i = 0; i < this.m_aParagraphBackgrounds.length; ++i)
     {
-        this.m_aParagraphBackgrounds[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape, this.m_oLine);
+        this.m_aParagraphBackgrounds[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape);
+    }
+};
+
+CLineStructure.prototype.CheckContentStructs = function(aContentStructs)
+{
+    var i;
+    for(i = 0; i < this.m_aContent.length; ++i)
+    {
+        aContentStructs.push(this.m_aContent[i]);
     }
 };
 CLineStructure.prototype.GetAllWarped = function(aWarpedObjects)
@@ -368,7 +526,7 @@ function CreatePenFromParams(oUnifill, nStyle, nLineCap, nLineJoin, dLineWidth, 
     return oLine;
 }
 
-function CTextDrawer(dWidth, dHeight, bDivByLInes, oTheme)
+function CTextDrawer(dWidth, dHeight, bDivByLInes, oTheme, bDivGlyphs)
 {
     this.m_oFont =
     {
@@ -415,6 +573,7 @@ function CTextDrawer(dWidth, dHeight, bDivByLInes, oTheme)
     this.GrState.Parent = this;
 
     this.m_bDivByLines = bDivByLInes === true;
+    this.m_bDivGlyphs  = bDivGlyphs === true;
     this.m_aByLines = null;
     this.m_nCurLineIndex = -1;
     this.m_aStackLineIndex = null;
@@ -575,10 +734,6 @@ CTextDrawer.prototype =
 
     Start_Command : function(commandId, param, index, nType)
     {
-        //console.log(GetConstDescription(commandId) +  " Start ");
-        //console.log("--------Start------");
-        //console.log("CurLineIndex " + this.m_nCurLineIndex);
-        //console.log("--------Start------");
         this.m_aCommands.push(commandId);
         var oNewStructure = null;
         switch(commandId)
@@ -653,9 +808,6 @@ CTextDrawer.prototype =
                 break;
             }
         }
-        //console.log("--------End------");
-        //console.log("CurLineIndex " + this.m_nCurLineIndex);
-        //console.log("--------End------");
         if(oNewStructure)
         {
             if(this.m_aStack[this.m_aStack.length - 1])
@@ -669,7 +821,6 @@ CTextDrawer.prototype =
     End_Command : function()
     {
         var nCommandId = this.m_aCommands.pop();
-        //console.log(GetConstDescription(nCommandId) + " End");
         switch(nCommandId)
         {
             case DRAW_COMMAND_NO_CREATE_GEOM:
@@ -726,7 +877,7 @@ CTextDrawer.prototype =
         }
     },
 
-    Get_PathToDraw : function(bStart, bStart2)
+    Get_PathToDraw : function(bStart, bStart2, x, y)
     {
         var oPath = null;
         var oLastCommand = this.m_aStack[this.m_aStack.length - 1];
@@ -743,7 +894,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aContent.length === 0)
                             {
-                                oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, this));
+                                oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
                             }
                             oLastObjectToDraw = oLastCommand.m_aContent[oLastCommand.m_aContent.length - 1];
 
@@ -751,11 +902,11 @@ CTextDrawer.prototype =
                             {
                                 if(oLastObjectToDraw.geometry.pathLst.length === 0 || (oLastObjectToDraw.geometry.pathLst.length === 1 && oLastObjectToDraw.geometry.pathLst[0].ArrPathCommandInfo.length === 0))
                                 {
-                                    oLastObjectToDraw.resetBrushPen(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr))
+                                    oLastObjectToDraw.resetBrushPen(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), x, y)
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, this));
+                                    oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aContent[oLastCommand.m_aContent.length - 1];
                                 }
                             }
@@ -765,7 +916,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aBorders.length === 0)
                             {
-                                oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, this))
+                                oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y))
                             }
                             oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
 
@@ -773,11 +924,11 @@ CTextDrawer.prototype =
                             {
                                 if(oLastObjectToDraw.geometry.pathLst.length === 0 || (oLastObjectToDraw.geometry.pathLst.length === 1 && oLastObjectToDraw.geometry.pathLst[0].ArrPathCommandInfo.length === 0))
                                 {
-                                    oLastObjectToDraw.resetBrushPen(this.m_oFill, this.m_oLine);
+                                    oLastObjectToDraw.resetBrushPen(this.m_oFill, this.m_oLine, x, y);
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, this));
+                                    oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
                                 }
                             }
@@ -787,7 +938,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aBackgrounds.length === 0)
                             {
-                                oLastCommand.m_aBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, this))
+                                oLastCommand.m_aBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y))
                             }
                             oLastObjectToDraw = oLastCommand.m_aBackgrounds[oLastCommand.m_aBackgrounds.length - 1];
 
@@ -795,11 +946,11 @@ CTextDrawer.prototype =
                             {
                                 if(oLastObjectToDraw.geometry.pathLst.length === 0 || (oLastObjectToDraw.geometry.pathLst.length === 1 && oLastObjectToDraw.geometry.pathLst[0].ArrPathCommandInfo.length === 0))
                                 {
-                                    oLastObjectToDraw.resetBrushPen(this.m_oFill, this.m_oLine);
+                                    oLastObjectToDraw.resetBrushPen(this.m_oFill, this.m_oLine, x, y);
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, this));
+                                    oLastCommand.m_aBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aBackgrounds[oLastCommand.m_aBackgrounds.length - 1];
                                 }
                             }
@@ -811,7 +962,7 @@ CTextDrawer.prototype =
                             {
                                 oBrushColor = this.m_oBrush.Color1;
                                 oPenColor = this.m_oPen.Color;
-                                oLastCommand.m_aUnderlinesStrikeouts.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, this))
+                                oLastCommand.m_aUnderlinesStrikeouts.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, x, y))
                             }
                             oLastObjectToDraw = oLastCommand.m_aUnderlinesStrikeouts[oLastCommand.m_aUnderlinesStrikeouts.length - 1];
 
@@ -819,11 +970,11 @@ CTextDrawer.prototype =
                             {
                                 if(oLastObjectToDraw.geometry.pathLst.length === 0 || (oLastObjectToDraw.geometry.pathLst.length === 1 && oLastObjectToDraw.geometry.pathLst[0].ArrPathCommandInfo.length === 0))
                                 {
-                                    oLastObjectToDraw.resetBrushPen(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr));
+                                    oLastObjectToDraw.resetBrushPen(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), x, y);
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aUnderlinesStrikeouts.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, this));
+                                    oLastCommand.m_aUnderlinesStrikeouts.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aUnderlinesStrikeouts[oLastCommand.m_aUnderlinesStrikeouts.length - 1];
                                 }
                             }
@@ -834,7 +985,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aParagraphBackgrounds.length === 0)
                             {
-                                oLastCommand.m_aParagraphBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, this))
+                                oLastCommand.m_aParagraphBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y))
                             }
                             oLastObjectToDraw = oLastCommand.m_aParagraphBackgrounds[oLastCommand.m_aParagraphBackgrounds.length - 1];
 
@@ -842,11 +993,11 @@ CTextDrawer.prototype =
                             {
                                 if(oLastObjectToDraw.geometry.pathLst.length === 0 || (oLastObjectToDraw.geometry.pathLst.length === 1 && oLastObjectToDraw.geometry.pathLst[0].ArrPathCommandInfo.length === 0))
                                 {
-                                    oLastObjectToDraw.resetBrushPen(this.m_oFill, this.m_oLine);
+                                    oLastObjectToDraw.resetBrushPen(this.m_oFill, this.m_oLine, x, y);
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aParagraphBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, this));
+                                    oLastCommand.m_aParagraphBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aParagraphBackgrounds[oLastCommand.m_aParagraphBackgrounds.length - 1];
                                 }
                             }
@@ -861,7 +1012,7 @@ CTextDrawer.prototype =
                     {
                         oBrushColor = this.m_oBrush.Color1;
                         oPenColor = this.m_oPen.Color;
-                        oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, this))
+                        oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y))
                     }
                     oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
 
@@ -869,11 +1020,11 @@ CTextDrawer.prototype =
                     {
                         if(oLastObjectToDraw.geometry.pathLst.length === 0 || (oLastObjectToDraw.geometry.pathLst.length === 1 && oLastObjectToDraw.geometry.pathLst[0].ArrPathCommandInfo.length === 0))
                         {
-                            oLastObjectToDraw.resetBrushPen(this.m_oFill, this.m_oLine);
+                            oLastObjectToDraw.resetBrushPen(this.m_oFill, this.m_oLine, x, y);
                         }
                         else
                         {
-                            oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, this));
+                            oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
                             oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
                         }
                     }
@@ -1036,6 +1187,10 @@ CTextDrawer.prototype =
         //if (code < 0xFFFF && (_is_face_index_no_0 || window["native"] !== undefined))
         //    return;
 
+        if(this.m_bDivGlyphs === true)
+        {
+            this.Get_PathToDraw(false, true, x, y);
+        }
         g_oTextMeasurer.SetFontInternal(this.m_oFont.Name, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0));
 
         if (null != this.LastFontOriginInfo.Replace)
@@ -1603,7 +1758,7 @@ function PolygonWrapper(oPolygon)
     this.nPointsCount = this.aLength.length;
 }
 
-PolygonWrapper.prototype.getPointOnPolygon = function(dCT)
+PolygonWrapper.prototype.getPointOnPolygon = function(dCT, bNeedPoints)
 {
     var dFindLen = this.dLen * dCT;
     var nIndex = this.nPointsCount >> 1;
@@ -1636,8 +1791,38 @@ PolygonWrapper.prototype.getPointOnPolygon = function(dCT)
     {
         t = 0;
     }
+
     var oPoint1 = this.oPolygon[nIndex], oPoint2 = this.oPolygon[nTempIndex];
-    return {x: oPoint1.x + t*(oPoint2.x - oPoint1.x ), y: oPoint1.y + t*(oPoint2.y - oPoint1.y )};
+    var oRetPoint1 = oPoint1, oRetPoint2 = oPoint2;
+    if(bNeedPoints)
+    {
+        var nRightIndex = nTempIndex, nLeftIndex = nIndex;
+        var oLeftPoint = oPoint1, oRightPoint = oPoint2;
+        var dx = oPoint1.x - oPoint2.x, dy = oPoint1.y - oPoint2.y;
+        while(nRightIndex < this.oPolygon.length && Math.abs(dx) < EPSILON_TEXT_AUTOFIT && Math.abs(dy) < EPSILON_TEXT_AUTOFIT)
+        {
+
+            dx =  oRightPoint.x - oLeftPoint.x;
+            dy =  oRightPoint.y - oLeftPoint.y;
+            oRightPoint = this.oPolygon[++nRightIndex]
+        }
+        while(nLeftIndex > -1 && Math.abs(dx) < EPSILON_TEXT_AUTOFIT && Math.abs(dy) < EPSILON_TEXT_AUTOFIT)
+        {
+            dx =  oRightPoint.x - oLeftPoint.x;
+            dy =  oRightPoint.y - oLeftPoint.y;
+            oLeftPoint = this.oPolygon[--nLeftIndex];
+        }
+        if(Math.abs(dx) < EPSILON_TEXT_AUTOFIT && Math.abs(dy) < EPSILON_TEXT_AUTOFIT)
+        {
+            oRetPoint1 = {x: oRetPoint1.x + EPSILON_TEXT_AUTOFIT, y: oRetPoint1.y};
+        }
+        else
+        {
+            oRetPoint1 = oLeftPoint;
+            oRetPoint2 = oRightPoint;
+        }
+    }
+    return {x: oPoint1.x + t*(oPoint2.x - oPoint1.x ), y: oPoint1.y + t*(oPoint2.y - oPoint1.y ), oP1: oRetPoint1, oP2: oRetPoint2};
 };
 
 function CheckPointByPaths(dX, dY, dWidth, dHeight, dMinX, dMinY, oPolygonWrapper1, oPolygonWrapper2)
@@ -1724,6 +1909,183 @@ function ObjectsToDrawBetweenTwoPolygons(aObjectsToDraw, oBoundsController, oPol
     }
 }
 
+function TransformPointGeometry(x, y, oTransform)
+{
+    var oRet = {x: 0, y: 0};
+    oRet.x = oTransform.TransformPointX(x,y);
+    oRet.y = oTransform.TransformPointY(x,y);
+    return oRet;
+}
+function TransformPointPolygon(x, y, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds)
+{
+    var oRet = {x: 0, y: 0}, x0, y0, x1, y1, cX, oPointOnPolygon, x1t, y1t, dX, dY, x0t, y0t;
+    x0 = x;//dKoeff;
+    y0 = y;//dKoeff;
+    if(oBounds)
+    {
+        y0 -= oBounds.min_y;
+    }
+    x1 = x0;
+    if(bFlag)
+    {
+        y1 = 0;
+        if(oBounds)
+        {
+            y1 = oBounds.min_y*dKoeff;
+        }
+    }
+    else
+    {
+        y1 = ContentHeight*dKoeff;
+        if(oBounds)
+        {
+            y1 = oBounds.max_y*dKoeff;
+        }
+    }
+    cX = x/XLimit;
+    oPointOnPolygon = oPolygon.getPointOnPolygon(cX, true);
+    x1t = oPointOnPolygon.x;
+    y1t = oPointOnPolygon.y;
+    dX = oPointOnPolygon.oP2.x - oPointOnPolygon.oP1.x;
+    dY = oPointOnPolygon.oP2.y - oPointOnPolygon.oP1.y;
+
+    if(/*"textArchDown" !== oWarpStruct.preset*/bFlag)
+    {
+        dX = -dX;
+        dY = -dY;
+    }
+    var dNorm = Math.sqrt(dX*dX + dY*dY);
+
+    if(bFlag)
+    {
+        x0t = x1t + (dY/dNorm)*(y0);
+        y0t = y1t - (dX/dNorm)*(y0);
+    }
+    else
+    {
+
+        x0t = x1t + (dY/dNorm)*(y1 - y0);
+        y0t = y1t - (dX/dNorm)*(y1 - y0);
+    }
+    oRet.x = x0t;
+    oRet.y = y0t;
+    return oRet;
+}
+function TransformGeometry(oObjectToDraw, oTransform)
+{
+    var oCommand, oPoint, oPath, t, j, aPathLst;
+    aPathLst = oObjectToDraw.geometry.pathLst;
+    for(t = 0; t < aPathLst.length; ++t)
+    {
+        oPath = aPathLst[t];
+        for(j = 0; j < oPath.ArrPathCommand.length; ++j)
+        {
+            oCommand = oPath.ArrPathCommand[j];
+            switch(oCommand.id)
+            {
+                case moveTo:
+                case lineTo:
+                {
+                    oPoint = TransformPointGeometry(oCommand.X, oCommand.Y, oTransform);
+                    oCommand.X = oPoint.x;
+                    oCommand.Y = oPoint.y;
+                    break;
+                }
+
+                case bezier3:
+                {
+                    oPoint = TransformPointGeometry(oCommand.X0, oCommand.Y0, oTransform);
+                    oCommand.X0 = oPoint.x;
+                    oCommand.Y0 = oPoint.y;
+                    oPoint = TransformPointGeometry(oCommand.X1, oCommand.Y1, oTransform);
+                    oCommand.X1 = oPoint.x;
+                    oCommand.Y1 = oPoint.y;
+                    break;
+                }
+                case bezier4:
+                {
+                    oPoint = TransformPointGeometry(oCommand.X0, oCommand.Y0, oTransform);
+                    oCommand.X0 = oPoint.x;
+                    oCommand.Y0 = oPoint.y;
+                    oPoint = TransformPointGeometry(oCommand.X1, oCommand.Y1, oTransform);
+                    oCommand.X1 = oPoint.x;
+                    oCommand.Y1 = oPoint.y;
+                    oPoint = TransformPointGeometry(oCommand.X2, oCommand.Y2, oTransform);
+                    oCommand.X2 = oPoint.x;
+                    oCommand.Y2 = oPoint.y;
+                    break;
+                }
+                case arcTo:
+                {
+                    break;
+                }
+                case close:
+                {
+                    break;
+                }
+            }
+        }
+
+    }
+}
+function CheckGeometryByPolygon(oObjectToDraw, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds)
+{
+    var oCommand, oPoint, oPath, t, j, aPathLst;
+    aPathLst = oObjectToDraw.geometry.pathLst;
+    for(t = 0; t < aPathLst.length; ++t)
+    {
+        oPath = aPathLst[t];
+        for(j = 0; j < oPath.ArrPathCommand.length; ++j)
+        {
+            oCommand = oPath.ArrPathCommand[j];
+            switch(oCommand.id)
+            {
+                case moveTo:
+                case lineTo:
+                {
+                    oPoint = TransformPointPolygon(oCommand.X, oCommand.Y, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds);
+                    oCommand.X = oPoint.x;
+                    oCommand.Y = oPoint.y;
+                    break;
+                }
+
+                case bezier3:
+                {
+                    oPoint = TransformPointPolygon(oCommand.X0, oCommand.Y0, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds);
+                    oCommand.X0 = oPoint.x;
+                    oCommand.Y0 = oPoint.y;
+                    oPoint = TransformPointPolygon(oCommand.X1, oCommand.Y1, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds);
+                    oCommand.X1 = oPoint.x;
+                    oCommand.Y1 = oPoint.y;
+                    break;
+                }
+                case bezier4:
+                {
+                    oPoint = TransformPointPolygon(oCommand.X0, oCommand.Y0, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds);
+                    oCommand.X0 = oPoint.x;
+                    oCommand.Y0 = oPoint.y;
+                    oPoint = TransformPointPolygon(oCommand.X1, oCommand.Y1, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds);
+                    oCommand.X1 = oPoint.x;
+                    oCommand.Y1 = oPoint.y;
+                    oPoint = TransformPointPolygon(oCommand.X2, oCommand.Y2, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds);
+                    oCommand.X2 = oPoint.x;
+                    oCommand.Y2 = oPoint.y;
+                    break;
+                }
+                case arcTo:
+                {
+                    break;
+                }
+                case close:
+                {
+                    break;
+                }
+            }
+        }
+
+    }
+}
+
 function CompareBrushes(oFill1, oFill2)
 {
     if(oFill1 && !oFill2 || !oFill1 && oFill2 || (oFill1 && oFill2 && !oFill1.IsIdentical(oFill2)))
@@ -1735,4 +2097,30 @@ function ComparePens(oPen1, oPen2)
     if(oPen1 && !oPen2 || !oPen1 && oPen2 || (oPen1 && oPen2 && !oPen1.IsIdentical(oPen2)))
         return false;
     return true;
+}
+
+
+function GetRectContentWidth(oContent, dMaxWidth)
+{
+    var _maxWidth = isRealNumber(dMaxWidth) ? dMaxWidth : 100000;
+
+    oContent.Reset(0, 0, _maxWidth, 100000);
+    oContent.Recalculate_Page(0, true);
+    var max_width = 0;
+    for(var i = 0; i < oContent.Content.length; ++i)
+    {
+        var par = oContent.Content[i];
+
+        if(par instanceof Paragraph)
+        {
+            for(var j = 0; j < par.Lines.length; ++j)
+            {
+                if(par.Lines[j].Ranges[0].W  > max_width)
+                {
+                    max_width = par.Lines[j].Ranges[0].W;
+                }
+            }
+        }
+    }
+    return max_width + 2;
 }
