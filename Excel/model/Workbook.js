@@ -8636,8 +8636,14 @@ Range.prototype._promoteFromTo=function(from, to, bIsPromote, oCanPromote, bCtrl
 		            for (var k = 0, length3 = oMergedFrom.all.length; k < length3; k++) {
 		                var oMergedBBox = oMergedFrom.all[k].bbox;
 		                var oNewMerged = Asc.Range(i + oMergedBBox.c1 - from.c1, j + oMergedBBox.r1 - from.r1, i + oMergedBBox.c2 - from.c1, j + oMergedBBox.r2 - from.r1);
-		                if (to.containsRange(oNewMerged))
-		                    this.worksheet.mergeManager.add(oNewMerged, 1);
+						if(to.contains(oNewMerged.c1, oNewMerged.r1)) {
+							if(to.c2 < oNewMerged.c2)
+								oNewMerged.c2 = to.c2;
+							if(to.r2 < oNewMerged.r2)
+								oNewMerged.r2 = to.r2;
+							if(!oNewMerged.isOneCell())
+								this.worksheet.mergeManager.add(oNewMerged, 1);	
+						}
 		            }
 		        }
 		    }
