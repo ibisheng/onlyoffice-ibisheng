@@ -320,4 +320,4 @@ var c_oAscGetDefinedNamesList = {
     Worksheet           :   0,
     WorksheetWorkbook   :   1,
     All                 :   2
-}
+};
