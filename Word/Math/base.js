@@ -1156,12 +1156,10 @@ CMathBase.prototype.Load_RecalculateObject = function(RecalcObj)
         CMathBase.superclass.Load_RecalculateObject.call(this, RecalcObj);
 
 };
-CMathBase.prototype.Set_Paragraph           = CParagraphContentWithParagraphLikeContent.prototype.Set_Paragraph;
-CMathBase.prototype.Get_ElementByPos        = CParagraphContentWithParagraphLikeContent.prototype.Get_ElementByPos;
-CMathBase.prototype.Get_ParaPosByContentPos = CParagraphContentWithParagraphLikeContent.prototype.Get_ParaPosByContentPos;
 
-CMathBase.prototype.Set_ParaMath      = CMathContent.prototype.Set_ParaMath;
-CMathBase.prototype.Recalculate_Reset = CMathContent.prototype.Recalculate_Reset;
+CMathBase.prototype.Math_Set_EmptyRange = CMathContent.prototype.Math_Set_EmptyRange;
+CMathBase.prototype.Set_ParaMath        = CMathContent.prototype.Set_ParaMath;
+CMathBase.prototype.Recalculate_Reset   = CMathContent.prototype.Recalculate_Reset;
 CMathBase.prototype.Fill_LogicalContent = function(nCount)
 {
     for (var nIndex = 0; nIndex < nCount; nIndex++)

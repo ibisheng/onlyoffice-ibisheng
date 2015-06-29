@@ -2073,8 +2073,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var ContentLen = this.Content.length;
     var XRange    = PRS.XRange;
 
-    var bAbsent_Internal_Ranges;
-
     if (false === StartWord && true === FirstItemOnLine && XEnd - X < 0.001 && RangesCount > 0)
     {
         NewRange = true;
@@ -8873,6 +8871,7 @@ function CRunCollaborativeRange(PosS, PosE, Color)
     this.PosE  = PosE;
     this.Color = Color;
 }
+
 ParaRun.prototype.Math_SetPosition = function(pos, PRSA, Line, Range, Page)
 {
     var CurLine  = Line - this.StartLine;
@@ -8961,7 +8960,6 @@ ParaRun.prototype.Math_Is_End = function(_CurLine, _CurRange)
 
     return EndPos == this.Content.length;
 };
-
 ParaRun.prototype.IsEmptyLine = function(_CurLine, _CurRange)
 {
     var CurLine  = _CurLine - this.StartLine;
@@ -9032,6 +9030,16 @@ ParaRun.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
     this.size.width  = width;
     this.size.ascent = ascent;
     this.size.height = ascent + descent;
+
+    this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
+};
+ParaRun.prototype.Math_Set_EmptyRange = function(PRS)
+{
+    var CurLine  = PRS.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
+
+    var RangeStartPos = this.protected_AddRange(CurLine, CurRange);
+    var RangeEndPos   = RangeStartPos;
 
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 };

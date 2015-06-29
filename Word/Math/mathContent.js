@@ -4069,6 +4069,18 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 
 };
+CMathContent.prototype.Math_Set_EmptyRange = function(PRS)
+{
+    var CurLine  = PRS.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
+
+    var RangeStartPos = this.protected_AddRange(CurLine, CurRange);
+    var RangeEndPos   = RangeStartPos;
+
+    this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
+
+    this.Content[RangeStartPos].Math_Set_EmptyRange(PRS);
+};
 CMathContent.prototype.Recalculate_Reset = function(StartRange, StartLine, PRS)
 {
     var bNotUpdate = PRS !== null && PRS!== undefined && PRS.bFastRecalculate == true;
