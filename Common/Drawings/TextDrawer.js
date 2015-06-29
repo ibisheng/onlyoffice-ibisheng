@@ -1657,14 +1657,14 @@ PolygonWrapper.prototype.getPointOnPolygon = function(dCT, bNeedPoints)
         var nRightIndex = nTempIndex, nLeftIndex = nIndex;
         var oLeftPoint = oPoint1, oRightPoint = oPoint2;
         var dx = oPoint1.x - oPoint2.x, dy = oPoint1.y - oPoint2.y;
-        while(nRightIndex < this.oPolygon.length && Math.abs(dx) < EPSILON_TEXT_AUTOFIT && Math.abs(dy) < EPSILON_TEXT_AUTOFIT)
+        while(nRightIndex + 1 < this.oPolygon.length && Math.abs(dx) < EPSILON_TEXT_AUTOFIT && Math.abs(dy) < EPSILON_TEXT_AUTOFIT)
         {
 
             dx =  oRightPoint.x - oLeftPoint.x;
             dy =  oRightPoint.y - oLeftPoint.y;
             oRightPoint = this.oPolygon[++nRightIndex]
         }
-        while(nLeftIndex > -1 && Math.abs(dx) < EPSILON_TEXT_AUTOFIT && Math.abs(dy) < EPSILON_TEXT_AUTOFIT)
+        while(nLeftIndex > 0 && Math.abs(dx) < EPSILON_TEXT_AUTOFIT && Math.abs(dy) < EPSILON_TEXT_AUTOFIT)
         {
             dx =  oRightPoint.x - oLeftPoint.x;
             dy =  oRightPoint.y - oLeftPoint.y;
@@ -1783,18 +1783,20 @@ function TransformPointPolygon(x, y, oPolygon, bFlag, XLimit, ContentHeight, dKo
     if(bFlag)
     {
         y1 = 0;
-        if(oBounds)
+        if(/*oBounds*/false)
         {
-            y1 = oBounds.min_y*dKoeff;
+            y1 = oBounds.min_y;
         }
+		y0 -= oBounds.min_y;
     }
     else
     {
         y1 = ContentHeight*dKoeff;
         if(oBounds)
         {
-            y1 = oBounds.max_y*dKoeff;
+            y1 = (oBounds.max_y - oBounds.min_y);
         }
+		y0 -= oBounds.min_y;
     }
     cX = x/XLimit;
     oPointOnPolygon = oPolygon.getPointOnPolygon(cX, true);
