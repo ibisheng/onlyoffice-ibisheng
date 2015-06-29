@@ -54,222 +54,80 @@ CDocContentStructure.prototype.draw = function(graphics, transform, oTheme, oCol
 CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct, dWidth, dHeight, oTheme, oColorMap, oShape, dOneLineWidth, XLimit, dContentHeight, dKoeff)
 {
     var i, j, t, aByPaths,  aWarpedObjects = [];
-    switch(oWarpStruct.pathLst.length)
+
+    var bOddPaths = oWarpStruct.pathLst.length / 2 - ((oWarpStruct.pathLst.length / 2) >> 0) > 0;
+    var nDivCount = bOddPaths ? oWarpStruct.pathLst.length : oWarpStruct.pathLst.length >> 1;
+    aByPaths = oWarpStruct.getArrayPolygonsByPaths(PATH_DIV_EPSILON);
+    var nLastIndex = 0, dTmp, oBoundsChecker, oTemp, nIndex, aWarpedObjects2 = [];
+    oBoundsChecker = new CSlideBoundsChecker();
+    oBoundsChecker.init(100, 100, 100, 100);
+    var dMinX, dMaxX;
+    for(j = 0; j < this.m_aByLines.length; ++j)
     {
-       // case 1:
-       // {
-       //     aByPaths = oWarpStruct.getArrayPolygonsByPaths(PATH_DIV_EPSILON);
-       //     var oWarpPathPolygon = new PolygonWrapper(aByPaths[0]);
-       //     var dLength = oWarpPathPolygon.dLen;
-       //     if(dLength === 0)
-       //     {
-       //         return;
-       //     }
-       //   //  var oContentToDraw = [];
-       //   //  this.CheckContentStructs(oContentToDraw);
-       //    // var x0, y0, x0t, y0t, x1, y1, x1t, y1t, oObjectToDraw,  cX, oPointOnPolygon, dX, dY, dNorm, oMatrix = new CMatrix(), cX2, dX2, dY2;
-       //    // var oNextPointOnPolygon = null;
-//
-       //     switch(oWarpStruct.preset)
-       //     {
-       //         //case "textArchDown":
-       //         default:
-       //         {
-       //             /*for(i = 0; i < oContentToDraw.length; ++i)
-       //             {
-       //                 oObjectToDraw = oContentToDraw[i];
-       //                 var oObjectToDrawNext = oContentToDraw[i+1];
-       //                 if(isRealNumber(oObjectToDraw.x) && isRealNumber(oObjectToDraw.y))
-       //                 {
-       //                     x0 = oObjectToDraw.x*dKoeff;
-       //                     y0 = oObjectToDraw.y*dKoeff;
-       //                     x1 = x0;
-       //                     if("textArchDown" !== oWarpStruct.preset)
-       //                     {
-       //                         y1 = 0;
-       //                     }
-       //                     else
-       //                     {
-       //                         y1 = dContentHeight*dKoeff;
-       //                     }
-       //                     cX = oObjectToDraw.x/XLimit;
-       //                     if(oNextPointOnPolygon)
-       //                     {
-       //                         oPointOnPolygon = oNextPointOnPolygon;
-       //                     }
-       //                     else
-       //                     {
-       //                         oPointOnPolygon = oWarpPathPolygon.getPointOnPolygon(cX, true);
-       //                     }
-       //                     x1t = oPointOnPolygon.x;
-       //                     y1t = oPointOnPolygon.y;
-       //                     dX = oPointOnPolygon.oP2.x - oPointOnPolygon.oP1.x;
-       //                     dY = oPointOnPolygon.oP2.y - oPointOnPolygon.oP1.y;
-//
-       //                     if("textArchDown" !== oWarpStruct.preset)
-       //                     {
-       //                         dX = -dX;
-       //                         dY = -dY;
-       //                     }
-       //                     if(oObjectToDrawNext && isRealNumber(oObjectToDrawNext.x) && isRealNumber(oObjectToDrawNext.y) && oObjectToDrawNext.x > oObjectToDraw.x)
-       //                     {
-       //                         cX2 = (oObjectToDrawNext.x)/XLimit;
-       //                         oNextPointOnPolygon = oWarpPathPolygon.getPointOnPolygon(cX2, true);
-       //                         dX2 = oNextPointOnPolygon.oP2.x - oNextPointOnPolygon.oP1.x;
-       //                         dY2 = oNextPointOnPolygon.oP2.y - oNextPointOnPolygon.oP1.y;
-       //                         if("textArchDown" !== oWarpStruct.preset)
-       //                         {
-       //                             dX2 = -dX2;
-       //                             dY2 = -dY2;
-       //                         }
-       //                         dX = dX + dX2;
-       //                         dY = dY + dY2;
-       //                     }
-       //                     else
-       //                     {
-       //                         oNextPointOnPolygon = null;
-       //                     }
-       //                     dNorm = Math.sqrt(dX*dX + dY*dY);
-//
-       //                     if("textArchDown" !== oWarpStruct.preset)
-       //                     {
-       //                         x0t = x1t + (dY/dNorm)*(y0);
-       //                         y0t = y1t - (dX/dNorm)*(y0);
-       //                     }
-       //                     else
-       //                     {
-//
-       //                         x0t = x1t + (dY/dNorm)*(dContentHeight*dKoeff - y0);
-       //                         y0t = y1t - (dX/dNorm)*(dContentHeight*dKoeff - y0);
-       //                     }
-       //                     oMatrix.shx = (x1t - x0t)/(y1 - y0);
-       //                     oMatrix.sy = (y1t - y0t)/(y1 - y0);
-       //                     oMatrix.sx = oMatrix.sy;
-       //                     oMatrix.shy = -oMatrix.shx;
-       //                     oMatrix.tx = x0t - x0*oMatrix.sx - y0*oMatrix.shx;
-       //                     oMatrix.ty = y0t - x0*oMatrix.shy - y0*oMatrix.sy;
-       //                     TransformGeometry(oObjectToDraw, oMatrix);
-       //                 }
-       //                 else
-       //                 {
-       //                     oNextPointOnPolygon = null;
-       //                 }
-       //             }*/
-       //             for(j = 0; j < this.m_aByLines.length; ++j)
-       //             {
-       //                 oTemp = this.m_aByLines[j];
-       //                 for(t = 0; t < oTemp.length; ++t)
-       //                 {
-       //                     oTemp[t].GetAllWarped(aWarpedObjects);
-       //                 }
-       //             }
-       //             for(i = 0; i < aWarpedObjects.length; ++i)
-       //             {
-       //                 var oWarpedObject = aWarpedObjects[i];
-       //               //  if(!isRealNumber(oWarpedObject.x) || !isRealNumber(oWarpedObject.y))
-       //                 {
-       //                     CheckGeometryByPolygon(oWarpedObject, oWarpPathPolygon, "textArchDown" !== oWarpStruct.preset, XLimit*dKoeff, dContentHeight, dKoeff);
-       //                 }
-       //             }
-       //             break;
-       //         }
-       //     }
-       //     break;
-       // }
-       // case 3:
-       // {
-//
-       //     break;
-       // }
-        case 1:
-        case 3:
-        case 2:
-        case 4:
-        case 6:
+        oTemp = this.m_aByLines[j];
+        for(t = 0; t < oTemp.length; ++t)
         {
-
-
-            var bOddPaths = oWarpStruct.pathLst.length / 2 - ((oWarpStruct.pathLst.length / 2) >> 0) > 0;
-            var nDivCount = bOddPaths ? oWarpStruct.pathLst.length : oWarpStruct.pathLst.length >> 1;
-            aByPaths = oWarpStruct.getArrayPolygonsByPaths(PATH_DIV_EPSILON);
-            var nLastIndex = 0, dTmp, oBoundsChecker, oTemp, nIndex, aWarpedObjects2 = [];
-            oBoundsChecker = new CSlideBoundsChecker();
-            oBoundsChecker.init(100, 100, 100, 100);
-            var dMinX, dMaxX;
-            for(j = 0; j < this.m_aByLines.length; ++j)
-            {
-                oTemp = this.m_aByLines[j];
-                for(t = 0; t < oTemp.length; ++t)
-                {
-                    oTemp[t].GetAllWarped(aWarpedObjects2);
-                    oTemp[t].CheckBoundsWarped(oBoundsChecker);
-                }
-            }
-            dMinX = oBoundsChecker.Bounds.min_x;
-            dMaxX = oBoundsChecker.Bounds.max_x;
-            for( i = 0; i < nDivCount; ++i)
-            {
-                dTmp = (this.m_aByLines.length - nLastIndex)/(nDivCount - i);
-                nIndex = nLastIndex + (dTmp >> 0) + ((dTmp - (dTmp >> 0)) > 0 ? 1 : 0);
-                aWarpedObjects.length = 0;
-                oBoundsChecker.Bounds.ClearNoAttack();
-                for(j = nLastIndex; j < nIndex; ++j)
-                {
-                    oTemp = this.m_aByLines[j];
-                    for(t = 0; t < oTemp.length; ++t)
-                    {
-                        oTemp[t].GetAllWarped(aWarpedObjects);
-                        oTemp[t].CheckBoundsWarped(oBoundsChecker);
-                    }
-                }
-                if(oBoundsChecker.Bounds.min_x > dMinX)
-                {
-                    oBoundsChecker.Bounds.min_x = dMinX;
-                }
-                if(oBoundsChecker.Bounds.max_x < dMaxX)
-                {
-                    oBoundsChecker.Bounds.max_x = dMaxX;
-                }
-                if(!bOddPaths)
-                {
-                    ObjectsToDrawBetweenTwoPolygons(aWarpedObjects, oBoundsChecker.Bounds, new PolygonWrapper(aByPaths[i << 1]), new PolygonWrapper(aByPaths[(i << 1) + 1]));
-                }
-                else
-                {
-                    var oPolygon = new PolygonWrapper(aByPaths[i]);
-                    for(t = 0; t < aWarpedObjects.length; ++t)
-                    {
-                        CheckGeometryByPolygon(aWarpedObjects[t], oPolygon, "textArchDown" !== oWarpStruct.preset && i < 1, XLimit*dKoeff, dContentHeight, dKoeff, nDivCount > 1 ? oBoundsChecker.Bounds : null);
-                    }
-                }
-                nLastIndex = nIndex;
-            }
-
-            var oLastObjectToDraw = null, oCurObjectToDraw;
-            for(i = 0; i < aWarpedObjects2.length; ++i)
-            {
-                if(oLastObjectToDraw === null)
-                {
-                    oLastObjectToDraw = aWarpedObjects2[i];
-                    continue;
-                }
-                oCurObjectToDraw = aWarpedObjects2[i];
-                if(oLastObjectToDraw  && CompareBrushes(oLastObjectToDraw.brush, oCurObjectToDraw.brush) && ComparePens(oLastObjectToDraw.pen, oCurObjectToDraw.pen))
-                {
-                    oLastObjectToDraw.geometry.pathLst = oLastObjectToDraw.geometry.pathLst.concat(oCurObjectToDraw.geometry.pathLst);
-                    oCurObjectToDraw.geometry.pathLst.length = 0;
-                }
-                else
-                {
-                    oLastObjectToDraw = oCurObjectToDraw;
-                }
-            }
-            break;
+            oTemp[t].GetAllWarped(aWarpedObjects2);
+            oTemp[t].CheckBoundsWarped(oBoundsChecker);
         }
-        default://без формы
+    }
+    dMinX = oBoundsChecker.Bounds.min_x;
+    dMaxX = oBoundsChecker.Bounds.max_x;
+    for( i = 0; i < nDivCount; ++i)
+    {
+        dTmp = (this.m_aByLines.length - nLastIndex)/(nDivCount - i);
+        nIndex = nLastIndex + (dTmp >> 0) + ((dTmp - (dTmp >> 0)) > 0 ? 1 : 0);
+        aWarpedObjects.length = 0;
+        oBoundsChecker.Bounds.ClearNoAttack();
+        for(j = nLastIndex; j < nIndex; ++j)
         {
+            oTemp = this.m_aByLines[j];
+            for(t = 0; t < oTemp.length; ++t)
+            {
+                oTemp[t].GetAllWarped(aWarpedObjects);
+                oTemp[t].CheckBoundsWarped(oBoundsChecker);
+            }
+        }
+        if(oBoundsChecker.Bounds.min_x > dMinX)
+        {
+            oBoundsChecker.Bounds.min_x = dMinX;
+        }
+        if(oBoundsChecker.Bounds.max_x < dMaxX)
+        {
+            oBoundsChecker.Bounds.max_x = dMaxX;
+        }
+        if(!bOddPaths)
+        {
+            ObjectsToDrawBetweenTwoPolygons(aWarpedObjects, oBoundsChecker.Bounds, new PolygonWrapper(aByPaths[i << 1]), new PolygonWrapper(aByPaths[(i << 1) + 1]));
+        }
+        else
+        {
+            var oPolygon = new PolygonWrapper(aByPaths[i]);
+            for(t = 0; t < aWarpedObjects.length; ++t)
+            {
+                CheckGeometryByPolygon(aWarpedObjects[t], oPolygon, "textArchDown" !== oWarpStruct.preset && i < 1, XLimit*dKoeff, dContentHeight, dKoeff, nDivCount > 1 ? oBoundsChecker.Bounds : null);
+            }
+        }
+        nLastIndex = nIndex;
+    }
 
-            break;
+    var oLastObjectToDraw = null, oCurObjectToDraw;
+    for(i = 0; i < aWarpedObjects2.length; ++i)
+    {
+        if(oLastObjectToDraw === null)
+        {
+            oLastObjectToDraw = aWarpedObjects2[i];
+            continue;
+        }
+        oCurObjectToDraw = aWarpedObjects2[i];
+        if(oLastObjectToDraw  && CompareBrushes(oLastObjectToDraw.brush, oCurObjectToDraw.brush) && ComparePens(oLastObjectToDraw.pen, oCurObjectToDraw.pen))
+        {
+            oLastObjectToDraw.geometry.pathLst = oLastObjectToDraw.geometry.pathLst.concat(oCurObjectToDraw.geometry.pathLst);
+            oCurObjectToDraw.geometry.pathLst.length = 0;
+        }
+        else
+        {
+            oLastObjectToDraw = oCurObjectToDraw;
         }
     }
 
@@ -1921,10 +1779,6 @@ function TransformPointPolygon(x, y, oPolygon, bFlag, XLimit, ContentHeight, dKo
     var oRet = {x: 0, y: 0}, x0, y0, x1, y1, cX, oPointOnPolygon, x1t, y1t, dX, dY, x0t, y0t;
     x0 = x;//dKoeff;
     y0 = y;//dKoeff;
-    if(oBounds)
-    {
-        y0 -= oBounds.min_y;
-    }
     x1 = x0;
     if(bFlag)
     {

@@ -4742,7 +4742,7 @@ CShape.prototype =
         var oRet = {oTxWarpStruct: null, oTxWarpStructParamarks: null};
         if((oBodyPr.prstTxWarp && oBodyPr.prstTxWarp.preset !== "textNoShape") || this.checkContentWordArt(oContent))
         {
-            var bNeedRecalc = oBodyPr.prstTxWarp.pathLst.length / 2 - ((oBodyPr.prstTxWarp.pathLst.length / 2) >> 0) > 0 , dOldXLimit = oContent.XLimit, dOldYLimit = oContent.YLimit, dOneLineWidth, dMinPolygonLength = 0, dKoeff = 1;
+            var bNeedRecalc = oBodyPr.prstTxWarp.pathLst.length / 2 - ((oBodyPr.prstTxWarp.pathLst.length / 2) >> 0) > 0 , dOneLineWidth, dMinPolygonLength = 0, dKoeff = 1;
             var oTheme = this.Get_Theme(), oColorMap = this.Get_ColorMap();
             var oTextDrawer = new CTextDrawer(dWidth, dHeight, true, oTheme, bNeedRecalc);
             var warpGeometry = oBodyPr.prstTxWarp;
