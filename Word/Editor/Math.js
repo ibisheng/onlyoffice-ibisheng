@@ -385,7 +385,6 @@ CMathPageInfo.prototype.UpdateCurrentPage = function(Page, ParaLine)
     var Lng = this.Info.length;
     if(this.CurPage >= Lng)
     {
-        var PrevInfo = this.Info[Lng - 1];
         //var FirstLineOnPage = Lng == 0 ? 0 : PrevInfo.FirstLineOnPage + PrevInfo.GetCountLines();
         var FirstLineOnPage = ParaLine - this.StartLine;
 
@@ -1285,13 +1284,9 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
     {
         PRS.NewRange = true;
     }
-    else if(PRS.Ranges.length > 0 && bNextLine)
+    else if(PRS.Ranges.length > 0 && (bNextLine || this.ParaMathRPI.Wrap ==  WRAP_MATH_TOPBOTTOM))
     {
-        /*PRS.Update_CurPos(0, Depth);
-         PRS.Update_CurPos(0, Depth+1); // нулевой элемент всегда Run
-
-         PRS.Set_LineBreakPos(0);*/
-
+        // перенос на следующий строку
         this.Root.Math_Set_EmptyRange(PRS);
 
         PRS.RecalcResult = recalcresult_NextLine;
@@ -1310,22 +1305,7 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
 
         var ParaLine  = PRS.Line;
 
-        if(this.ParaMathRPI.Wrap ==  WRAP_MATH_TOPBOTTOM)
-        {
-            // перенос на следующий строку, если есть разбивка формулы
-
-            if(PRS.Ranges.length > 0)
-            {
-                this.Root.Math_Set_EmptyRange(PRS);
-
-                PRS.RecalcResult = recalcresult_NextLine;
-                PRS.NewRange = true;
-                return;
-            }
-        }
-
         this.private_RecalculateRoot(PRS, ParaPr, Depth);
-
 
         if(PRS.bMathWordLarge == true)
         {
