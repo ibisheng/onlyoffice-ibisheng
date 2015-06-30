@@ -6480,24 +6480,23 @@
 			var c1 = mc ? mc.c1 : ar.startCol,
                 r1 = mc ? mc.r1 : ar.startRow,
                 ar_norm = ar.normalize(),
-                mc_norm = mc ? mc.normalize() : null;
-
-            var c2 = mc_norm ? mc_norm.isEqual(ar_norm)? mc_norm.c1 : ar_norm.c2 : ar_norm.c2,
-			    r2 = mc_norm ? mc_norm.isEqual(ar_norm)? mc_norm.r1 : ar_norm.r2 : ar_norm.r2;
-
-			var selectionSize = !bRangeText ? "" : (function (r) {
-				var rc = Math.abs(r.r2 - r.r1) + 1;
-				var cc = Math.abs(r.c2 - r.c1) + 1;
-				switch (r.type) {
-					case c_oAscSelectionType.RangeCells: return rc + "R x " + cc + "C";
-					case c_oAscSelectionType.RangeCol: return cc + "C";
-					case c_oAscSelectionType.RangeRow: return rc + "R";
-					case c_oAscSelectionType.RangeMax: return gc_nMaxRow + "R x " + gc_nMaxCol + "C";
-				}
-				return "";
-			})(ar);
-
-			var cellName =  this._getColumnTitle( c1 ) + this._getRowTitle( r1 ), defName = null, dN = new Asc.Range(c1, r1, c2 ,r2, true);
+                mc_norm = mc ? mc.normalize() : null,
+                c2 = mc_norm ? mc_norm.isEqual(ar_norm)? mc_norm.c1 : ar_norm.c2 : ar_norm.c2,
+			    r2 = mc_norm ? mc_norm.isEqual(ar_norm)? mc_norm.r1 : ar_norm.r2 : ar_norm.r2,
+                selectionSize = !bRangeText ? "" : (function (r) {
+                    var rc = Math.abs(r.r2 - r.r1) + 1;
+                    var cc = Math.abs(r.c2 - r.c1) + 1;
+                    switch (r.type) {
+                        case c_oAscSelectionType.RangeCells: return rc + "R x " + cc + "C";
+                        case c_oAscSelectionType.RangeCol: return cc + "C";
+                        case c_oAscSelectionType.RangeRow: return rc + "R";
+                        case c_oAscSelectionType.RangeMax: return gc_nMaxRow + "R x " + gc_nMaxCol + "C";
+                    }
+                    return "";
+                })(ar ),
+                cellName =  this._getColumnTitle( c1 ) + this._getRowTitle( r1 ),
+                defName = null,
+                dN = new Asc.Range(ar_norm.c1, ar_norm.r1, c2 ,r2, true ).normalize();
 
             /*if( c1==c2 && r1==r2 ){
                 defName = this.model.getName() + "!" + dN.getAbsName();
