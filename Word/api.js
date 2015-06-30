@@ -592,7 +592,7 @@ asc_docs_api.prototype.LoadFontsFromServer = function(_fonts)
 
 asc_docs_api.prototype.SetCollaborativeMarksShowType = function(Type)
 {
-    if (c_oAscCollaborativeMarksShowType.None !== this.CollaborativeMarksShowType && c_oAscCollaborativeMarksShowType.None === Type)
+    if (c_oAscCollaborativeMarksShowType.None !== this.CollaborativeMarksShowType && c_oAscCollaborativeMarksShowType.None === Type && this.WordControl && this.WordControl.m_oLogicDocument)
     {
         this.CollaborativeMarksShowType = Type;
         CollaborativeEditing.Clear_CollaborativeMarks(true);
@@ -7136,6 +7136,7 @@ function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, fi
 	if (null == oDocumentMailMerge &&  c_oAscFileType.PDF === filetype) {
 		var dd = editor.WordControl.m_oDrawingDocument;
 		oAdditionalData["data"] = dd.ToRendererPart();
+        //console.log(oAdditionalData["data"]);
 	} else if (c_oAscFileType.JSON === filetype) {
 		oAdditionalData['url'] = editor.mailMergeFileData['url'];
 		oAdditionalData['format'] = editor.mailMergeFileData['fileType'];
