@@ -748,18 +748,14 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
 
     var wrapIndent = MathSettings.Get_WrapIndent(WrapState);
 
-    var XStart, XEnd;
+    var XLimits = {X: _X, XEnd: _XLimit};
+    this.private_UpdateXLimits(XLimits, false);
 
-    XStart = this.ParaMathRPI.Wrap == WRAP_MATH_RIGHT ? this.ParaMathRPI.RangesX1 : _X;
-    XEnd   = this.ParaMathRPI.Wrap == WRAP_MATH_LEFT ? this.ParaMathRPI.RangesX0 : _XLimit;
-
-    XStart +=  MathSettings.Get_LeftMargin(WrapState);
-    XEnd   -=  MathSettings.Get_RightMargin(WrapState);
+    var XStart = XLimits.X, XEnd = XLimits.XEnd;
 
     var Jc = this.Get_Align();
 
     var LinesCount = this.Root.protected_GetLinesCount();
-
 
     var StartLineWidth = LinesCount > 0 ? this.PageInfo.GetStarLinetWidth() : 0; // если страница не первая, то ширину первой строки формулы не учитываем
 
@@ -779,7 +775,7 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
         W = MaxW;
     }
 
-    if(this.Root.IsFirstRange(_CurLine, _CurRange)) // первая строка первой страницы, если строка разбивается на несколько отрезко, то это уже будет inline-формула
+    if(this.Root.IsStartLine(_CurLine)) // первая строка первой страницы, если строка разбивается на несколько отрезко, то это уже будет inline-формула
     {
         switch(Jc)
         {
@@ -1213,6 +1209,9 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     //здесь обновляем WrapState, исходя из этого параметра будем считать WrapIndent
     this.PageInfo.UpdateCurrentWrap(DispDef, bInline);
 
+    var X    = PRS.X,
+        XEnd = PRS.XEnd;
+
     if(bInline == false)
         this.private_UpdateXLimits(PRS, true);
 
@@ -1242,6 +1241,9 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             this.PageInfo.SetNextWrapState();
         }
     }
+
+    PRS.X = X;
+    PRS.XEnd = XEnd;
 
     this.ParaMathRPI.ClearRecalculate();
 };
@@ -1382,38 +1384,38 @@ ParaMath.prototype.private_RecalculateRoot = function(PRS, ParaPr, Depth)
         this.UpdateWidthLine(PRS, WidthLine);
     }
 };
-ParaMath.prototype.private_UpdateXLimits = function(PRS, bRecalculate)
+ParaMath.prototype.private_UpdateXLimits = function(Struct, bRecalculate)
 {
     var MathSettings = Get_WordDocumentDefaultMathSettings();
 
     if(this.ParaMathRPI.Wrap == WRAP_MATH_LEFT)
     {
-        PRS.XEnd = this.ParaMathRPI.RangesX0;
+        Struct.XEnd = this.ParaMathRPI.RangesX0;
     }
     else if(this.ParaMathRPI.Wrap == WRAP_MATH_RIGHT)
     {
-        PRS.X = this.ParaMathRPI.RangesX1;
+        Struct.X = this.ParaMathRPI.RangesX1;
     }
 
     var WrapState = this.PageInfo.GetCurrentWrapState();
 
-    PRS.X    += MathSettings.Get_LeftMargin(WrapState);
-    PRS.XEnd -= MathSettings.Get_RightMargin(WrapState);
+    Struct.X    += MathSettings.Get_LeftMargin(WrapState);
+    Struct.XEnd -= MathSettings.Get_RightMargin(WrapState);
 
     if(bRecalculate == true)
     {
         var WrapIndent = MathSettings.Get_WrapIndent(WrapState);
 
-        PRS.WrapIndent = WrapIndent;
+        Struct.WrapIndent = WrapIndent;
 
-        if(this.Root.IsStartLine() == false)
+        if(this.Root.IsStartLine(Struct.Line) == false)
         {
-            PRS.X += WrapIndent;
-            PRS.bCompareWrapIndent = false;
+            Struct.X += WrapIndent;
+            Struct.bCompareWrapIndent = false;
         }
         else
         {
-            PRS.bCompareWrapIndent = true;
+            Struct.bCompareWrapIndent = true;
         }
     }
 };
