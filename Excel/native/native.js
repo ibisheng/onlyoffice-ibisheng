@@ -1198,6 +1198,194 @@ function _FT_Common() {
 }
 var FT_Common = new _FT_Common();
 
+//-------------------------------------------------------------------------------
+// ASCCOLOR
+function asc_menu_ReadColor(_params, _cursor)
+{
+    var _color = new asc_CColor();
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _color.type = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                _color.r = _params[_cursor.pos++];
+                break;
+            }
+            case 2:
+            {
+                _color.g = _params[_cursor.pos++];
+                break;
+            }
+            case 3:
+            {
+                _color.b = _params[_cursor.pos++];
+                break;
+            }
+            case 4:
+            {
+                _color.a = _params[_cursor.pos++];
+                break;
+            }
+            case 5:
+            {
+                _color.Auto = _params[_cursor.pos++];
+                break;
+            }
+            case 6:
+            {
+                _color.value = _params[_cursor.pos++];
+                break;
+            }
+            case 7:
+            {
+                _color.ColorSchemeId = _params[_cursor.pos++];
+                break;
+            }
+            case 8:
+            {
+                var _count = _params[_cursor.pos++];
+                for (var i = 0; i < _count; i++)
+                {
+                    var _mod = new CColorMod();
+                    _mod.name = _params[_cursor.pos++];
+                    _mod.val = _params[_cursor.pos++];
+                    _color.Mods.push(_mod);
+                }
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+    return _color;
+}
+function asc_menu_WriteColor(_type, _color, _stream)
+{
+    if (!_color)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_color.type !== undefined && _color.type !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteLong"](_color.type);
+    }
+    if (_color.r !== undefined && _color.r !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteByte"](_color.r);
+    }
+    if (_color.g !== undefined && _color.g !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteByte"](_color.g);
+    }
+    if (_color.b !== undefined && _color.b !== null)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteByte"](_color.b);
+    }
+    if (_color.a !== undefined && _color.a !== null)
+    {
+        _stream["WriteByte"](4);
+        _stream["WriteByte"](_color.a);
+    }
+    if (_color.Auto !== undefined && _color.Auto !== null)
+    {
+        _stream["WriteByte"](5);
+        _stream["WriteBool"](_color.Auto);
+    }
+    if (_color.value !== undefined && _color.value !== null)
+    {
+        _stream["WriteByte"](6);
+        _stream["WriteLong"](_color.value);
+    }
+    if (_color.ColorSchemeId !== undefined && _color.ColorSchemeId !== null)
+    {
+        _stream["WriteByte"](7);
+        _stream["WriteLong"](_color.ColorSchemeId);
+    }
+    if (_color.Mods !== undefined && _color.Mods !== null)
+    {
+        _stream["WriteByte"](8);
+
+        var _len = _color.Mods.length;
+        _stream["WriteLong"](_len);
+
+        for (var i = 0; i < _len; i++)
+        {
+            _stream["WriteString1"](_color.Mods[i].name);
+            _stream["WriteLong"](_color.Mods[i].val);
+        }
+    }
+
+    _stream["WriteByte"](255);
+}
+// TEXTFONTFAMILY
+function asc_menu_ReadFontFamily(_params, _cursor)
+{
+    var _fontfamily = { Name : undefined, Index : -1 };
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _fontfamily.Name = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                _fontfamily.Index = _params[_cursor.pos++];
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+    return _fontfamily;
+}
+function asc_menu_WriteFontFamily(_type, _family, _stream)
+{
+    if (!_family)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_family.Name !== undefined && _family.Name !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteString2"](_family.Name);
+    }
+    if (_family.Index !== undefined && _family.Index !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteLong"](_family.Index);
+    }
+
+    _stream["WriteByte"](255);
+}
+
+
 //--------------------------------------------------------------------------------
 // defines
 //--------------------------------------------------------------------------------
@@ -1232,6 +1420,8 @@ function OfflineEditor () {
         window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
         _api = new window["Asc"]["spreadsheet_api"]();
         _api.asc_nativeOpenFile(window.native["GetFileString"]());
+
+        //var worksheet = _api.wb.showWorksheet(0);
     };
 
     // prop
@@ -1246,10 +1436,10 @@ function OfflineEditor () {
         _null_object.width = width;
         _null_object.height = height;
 
-        var worksheet = _api.wb.getWorksheet(0);
+        var worksheet = _api.wb.getWorksheet();
         var region = this._updateRegion(worksheet, x, y, width, height);
 
-        return _api.wb.getWorksheet(0)._getDrawSelection_Local(region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd);
+        return _api.wb.getWorksheet()._getDrawSelection_Local(region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd);
     };
 
     // render
@@ -1258,7 +1448,7 @@ function OfflineEditor () {
         _null_object.width = width * ratio;
         _null_object.height = height * ratio;
 
-        var worksheet = _api.wb.getWorksheet(0);
+        var worksheet = _api.wb.getWorksheet();
         var region = this._updateRegion(worksheet, x, y, width * ratio, height * ratio);
 
         worksheet._drawGrid_Local(undefined,
@@ -1275,7 +1465,7 @@ function OfflineEditor () {
         _null_object.width = width * ratio;
         _null_object.height = height * ratio;
 
-        var worksheet = _api.wb.getWorksheet(0);
+        var worksheet = _api.wb.getWorksheet();
         var region = this._updateRegion(worksheet, x, y, width * ratio, height * ratio);
 
         var isColumn = type == PageType.PageTopType || type == PageType.PageCornerType;
@@ -1313,7 +1503,7 @@ function OfflineEditor () {
 
         // добавляем отсутствующие колонки ( с небольшим зазором )
 
-        var logicToXMAX = 10000 * (1 + Math.floor(logicToX / 10000));
+        var logicToXMAX = logicToX;//10000 * (1 + Math.floor(logicToX / 10000));
 
         if (logicToXMAX >= worksheet.cols[worksheet.cols.length - 1].left) {
 
@@ -1347,7 +1537,7 @@ function OfflineEditor () {
 
         // добавляем отсутствующие строки ( с небольшим зазором )
 
-        var logicToYMAX = 10000 * (1 + Math.floor(logicToY / 10000));
+        var logicToYMAX = logicToY;//10000 * (1 + Math.floor(logicToY / 10000));
 
         if (logicToYMAX >= worksheet.rows[worksheet.rows.length - 1].top) {
 
@@ -1410,14 +1600,125 @@ function offline_stz(v) {_s.zoom = v; _api.asc_setZoom(v);}
 function offline_ds(x, y, width, height, ratio) {_s.drawSheet(x, y, width, height, ratio);}
 function offline_dh(x, y, width, height, type, ratio) {_s.drawHeader(x, y, width, height, type, ratio);}
 function offline_mouse_down(x, y) {
-    _api.wb.getWorksheet(0).changeSelectionStartPoint(x, y, true, true);
+    _api.wb.getWorksheet().changeSelectionStartPoint(x, y, true, true);
 }
 function offline_mouse_move(x, y) {
-    _api.wb.getWorksheet(0).changeSelectionEndPoint(x, y, true, true);
+    _api.wb.getWorksheet().changeSelectionEndPoint(x, y, true, true);
 }
 function offline_mouse_up(x, y) {
-    _api.wb.getWorksheet(0).changeSelectionDone();
+    _api.wb.getWorksheet().changeSelectionDone();
 }
 function offline_get_selection(x, y, width, height) {
     return _s.getSelection(x, y, width, height);
 }
+function offline_apply_event(type,params) {
+    var _return = undefined;
+    var _current = {pos: 0};
+    var _continue = true;
+    switch (type) {
+
+        case 2000: // ASC_SPREADSHEETS_EVENT_TYPE_CELL_PR
+        {
+            while (_continue) {
+                var _attr = params[_current.pos++];
+                switch (_attr) {
+                    case 0:
+                    {
+                        _api.asc_setCellBold(params[_current.pos++]);
+                        break;
+                    }
+                    case 1:
+                    {
+                        _api.asc_setCellItalic(params[_current.pos++]);
+                        break;
+                    }
+                    case 2:
+                    {
+                        _api.asc_setCellUnderline(params[_current.pos++]);
+                        break;
+                    }
+                    case 3:
+                    {
+                        _api.asc_setCellStrikeout(params[_current.pos++]);
+                        break;
+                    }
+                    case 4:
+                    {
+                        _api.asc_setCellFontName(asc_menu_ReadFontFamily(params, _current).Name);
+                        break;
+                    }
+                    case 5:
+                    {
+                        _api.asc_setCellFontSize(params[_current.pos++]);
+                        break;
+                    }
+                    case 6:
+                    {
+                        var color = asc_menu_ReadColor(params, _current);
+                        _api.asc_setCellTextColor(color);
+
+                        //  var Unifill = new CUniFill();
+                        // Unifill.fill = new CSolidFill();
+
+                        //  Unifill.fill.color = CorrectUniColor(color, Unifill.fill.color, 1);
+                        // _textPr.Unifill = Unifill;
+                        break;
+                    }
+                    case 7:
+                    {
+                        var color = asc_menu_ReadColor(params, _current);
+                        _api.asc_setCellBackgroundColor(color);
+
+                        // var color = asc_menu_ReadColor(params, _current);
+                        // _textPr.VertAlign = _params[_current.pos++];
+                        break;
+                    }
+                    case 8:
+                    {
+                        _api.asc_setCellSuperscript(params[_current.pos++]);
+                        break;
+                    }
+                    case 9:
+                    {
+                        // _textPr.DStrikeout = _params[_current.pos++];
+                        break;
+                    }
+                    case 10:
+                    {
+                        // _textPr.Caps = _params[_current.pos++];
+                        break;
+                    }
+                    case 11:
+                    {
+                        // _textPr.SmallCaps = _params[_current.pos++];
+                        break;
+                    }
+                    case 12:
+                    {
+                        // _textPr.HighLight = highlight_None;
+                        break;
+                    }
+                    case 13:
+                    {
+                        // _textPr.Spacing = _params[_current.pos++];
+                        break;
+                    }
+                    case 255:
+                    default:
+                    {
+                        _continue = false;
+                        break;
+                    }
+                }
+            }
+            break;
+        }
+
+        default:
+            break;
+    }
+
+    return _return;
+}
+
+
