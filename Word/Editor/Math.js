@@ -8,9 +8,8 @@ var g_dMathArgSizeKoeff_1 = 0.76;
 var g_dMathArgSizeKoeff_2 = 0.6498; // 0.76 * 0.855
 
 var WRAP_MATH_EMPTY     = 0;
-var WRAP_MATH_LEFT      = 1;
-var WRAP_MATH_RIGHT     = 2;
-var WRAP_MATH_TOPBOTTOM = 3;
+var WRAP_MATH_INSIDE    = 1;
+var WRAP_MATH_TOPBOTTOM = 2;
 
 function CMathPropertiesSettings()
 {
@@ -630,7 +629,6 @@ ParaMath.prototype.Get_TextPr = function(_ContentPos, Depth)
     var mTextPr = this.Root.Get_TextPr(_ContentPos, Depth);
     TextPr.Merge( mTextPr );
 
-
     return TextPr;
 };
 
@@ -1148,33 +1146,31 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var ParaRange = PRS.Range;
     var Page      = AbsolutePage + PRS.Page;
 
+    if(this.ParaMathRPI.CheckPrevLine(ParaLine, ParaRange))
+    {
+        this.UpdateInfoForBreak(PRS, ParaLine);
+        return;
+    }
+
     var PrevLineObject = PRS.RestartPageRecalcInfo.Object;
     var bFirstRange = this.Root.IsFirstRange(ParaLine, ParaRange);
 
     var bUpdateWrapMath = PRS.Ranges.length > 0 && this.ParaMathRPI.bInline == false;
 
-    if(PrevLineObject == null && true == bFirstRange && PRS.bFastRecalculate == false)
+    // первый пересчет
+    if(PrevLineObject == null && true == bFirstRange && PRS.bFastRecalculate == false && PRS.RecalcResult == recalcresult_NextLine)
     {
-        // первый пересчет
-        if(PRS.RecalcResult == recalcresult_NextLine)
-        {
-            // информация о пересчете
-            var RPI = new CRPI();
-            RPI.MergeMathInfo(this.ParaMathRPI);
-            var ArgSize = new CMathArgSize();
+        // информация о пересчете
+        var RPI = new CRPI();
+        RPI.MergeMathInfo(this.ParaMathRPI);
+        var ArgSize = new CMathArgSize();
 
-            this.PageInfo.Reset();
-            this.PageInfo.SetStartPos(Page, ParaLine);
+        this.PageInfo.Reset();
+        this.PageInfo.SetStartPos(Page, ParaLine);
 
-            this.Root.PreRecalc(null, this, ArgSize, RPI);
-            this.ParaMathRPI.ResetInfoRanges();
-        }
-
-        if(bUpdateWrapMath == true && this.ParaMathRPI.bInternalRanges == false)
-        {
-            this.ParaMathRPI.bStartRanges = true;
-            this.private_InitWrapSettings(PRS);
-        }
+        this.Root.PreRecalc(null, this, ArgSize, RPI);
+        this.ParaMathRPI.ResetInfoRanges();
+        this.private_InitWrapSettings(PRS);
     }
 
     if(bUpdateWrapMath == true && this.ParaMathRPI.bInternalRanges == false)
@@ -1188,7 +1184,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         }
         else
         {
-            this.UpdateInfoForBreak(PRS, ParaLine);
+            this.private_SetBreakRecalculate(PRS);
             PRS.RestartPageRecalcInfo.Object = null;
             return;
         }
@@ -1249,53 +1245,72 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 };
 ParaMath.prototype.private_InitWrapSettings = function(PRS)
 {
-    var ParaLine  = PRS.Line;
-    var ParaRange = PRS.Range;
+    //var ParaLine  = PRS.Line;
+    //var ParaRange = PRS.Range;
 
-    var bFirstRange = this.Root.IsFirstRange(ParaLine, ParaRange);
-    var PrevLineObject = PRS.RestartPageRecalcInfo.Object;
+    //var bFirstRange = this.Root.IsFirstRange(ParaLine, ParaRange);
+    //var PrevLineObject = PRS.RestartPageRecalcInfo.Object;
+    //if(PrevLineObject == null && true == bFirstRange && PRS.bFastRecalculate == false && this.ParaMathRPI.bInternalRanges == false)
 
-    if(PrevLineObject == null && true == bFirstRange && PRS.bFastRecalculate == false && this.ParaMathRPI.bInternalRanges == false)
+    var XStart, XEnd, IndexRange;
+
+    if(this.ParaMathRPI.bStartRanges == true)
     {
-        this.ParaMathRPI.bStartRanges = true;
-
         var WrapType = PRS.Ranges[0].typeLeft;
 
         if(WrapType == WRAPPING_TYPE_TOP_AND_BOTTOM)
         {
             this.ParaMathRPI.Wrap = WRAP_MATH_TOPBOTTOM;
+            XStart      = PRS.XStart;
+            XEnd        = PRS.XLimit;
+            IndexRange  = 0;
         }
         else if(WrapType == WRAPPING_TYPE_SQUARE || WrapType == WRAPPING_TYPE_THROUGH || WrapType == WRAPPING_TYPE_TIGHT)
         {
-            var X0 = PRS.Ranges[0].X0 - PRS.XStart,
-                X1 = PRS.XLimit - PRS.Ranges[0].X1;
+            var Len = PRS.Ranges.length;
 
-            if(X0 > X1)
-                this.ParaMathRPI.Wrap = WRAP_MATH_LEFT;
-            else
-                this.ParaMathRPI.Wrap = WRAP_MATH_RIGHT;
+            XStart = PRS.XStart;
+            XEnd   = PRS.Ranges[0].X0;
+            IndexRange  = 0;
 
-            this.ParaMathRPI.RangesX0 = PRS.Ranges[0].X0;
-            this.ParaMathRPI.RangesX1 = PRS.Ranges[0].X1;
+            for(var Pos = 0; Pos < Len; Pos++)
+            {
+                var _XStart = PRS.Ranges[Pos].X1,
+                    _XEnd   = Pos < Len - 1 ? PRS.Ranges[Pos+1].X0 : PRS.XLimit;
+
+                if(XEnd - XStart < _XEnd - _XStart)
+                {
+                    XStart = _XStart;
+                    XEnd = _XEnd;
+                    IndexRange  = Pos+1;
+
+                }
+            }
+
+            this.ParaMathRPI.Wrap = WRAP_MATH_INSIDE;
         }
     }
+    else
+    {
+        XStart      = PRS.XStart;
+        XEnd        = PRS.XLimit;
+        IndexRange  = 0;
+    }
+
+    this.ParaMathRPI.IndexRange = IndexRange;
+    this.ParaMathRPI.XStart     = XStart;
+    this.ParaMathRPI.XEnd       = XEnd;
 };
 ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
 {
-    var bNextLine = (PRS.Range > 0 && this.ParaMathRPI.Wrap ==  WRAP_MATH_LEFT) || (PRS.Range == 0 && this.ParaMathRPI.Wrap == WRAP_MATH_RIGHT);
-    var ParaLine  = PRS.Line;
-
     if(this.ParaMathRPI.CheckRangesInLine(PRS))
     {
-        this.PageInfo.ReverseCurrentMaxW(ParaLine);
+        this.PageInfo.ReverseCurrentMaxW(PRS.Line);
     }
 
-    if(this.ParaMathRPI.bRecalcResultPrevLine == true)
-    {
-        this.ParaMathRPI.bRecalcResultPrevLine = PRS.Range < PRS.Ranges.length;
-        this.UpdateInfoForBreak(PRS, ParaLine);
-    }
-    else if(PRS.Ranges.length > 0 && (bNextLine || this.ParaMathRPI.Wrap ==  WRAP_MATH_TOPBOTTOM))
+    var bNextLine = this.ParaMathRPI.Wrap == WRAP_MATH_INSIDE && PRS.Range !== this.ParaMathRPI.IndexRange;
+
+    if(PRS.Ranges.length > 0 && (bNextLine || this.ParaMathRPI.Wrap ==  WRAP_MATH_TOPBOTTOM))
     {
         // перенос на следующий строку
         this.Root.Math_Set_EmptyRange(PRS);
@@ -1306,27 +1321,37 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
     }
     else
     {
-        if(PRS.Ranges.length > 0 && this.ParaMathRPI.Wrap == WRAP_MATH_RIGHT)
+        if(PRS.Ranges.length > 0 && this.ParaMathRPI.Wrap == WRAP_MATH_INSIDE)
         {
-            var _Range = PRS.Range;
-            PRS.Range = 0;
-            this.Root.Math_Set_EmptyRange(PRS);
-            PRS.Range = _Range;
+            var CurrRange = PRS.Range;
+
+            for(var range = this.Root.StartRange; range < CurrRange; range++)
+            {
+                PRS.Range = range;
+                this.Root.Math_Set_EmptyRange(PRS);
+            }
+
+            PRS.Range = CurrRange;
         }
 
         this.private_RecalculateRoot(PRS, ParaPr, Depth);
 
         if(PRS.RecalcResult == recalcresult_PrevLine && PRS.Range < PRS.Ranges.length)
         {
-            this.ParaMathRPI.bRecalcResultPrevLine = true;
+            this.private_SetBreakRecalculate(PRS);
         }
 
         if(PRS.bMathWordLarge == true)
         {
-            if(this.ParaMathRPI.Wrap == WRAP_MATH_LEFT || this.ParaMathRPI.Wrap == WRAP_MATH_RIGHT)
+            if(this.ParaMathRPI.Wrap == WRAP_MATH_INSIDE)
             {
                 this.ParaMathRPI.Wrap = WRAP_MATH_TOPBOTTOM;
-                this.UpdateInfoForBreak(PRS, ParaLine);
+                this.private_SetBreakRecalculate(PRS);
+
+                this.ParaMathRPI.XStart     = PRS.XStart;
+                this.ParaMathRPI.XEnd       = PRS.XLimit;
+                this.ParaMathRPI.IndexRange = 0;
+
             }
             else if(this.ParaMathRPI.Wrap == WRAP_MATH_TOPBOTTOM)
             {
@@ -1336,14 +1361,14 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
 
                 if(WrapState !== ALIGN_EMPTY)
                 {
-                    this.UpdateInfoForBreak(PRS, ParaLine);
+                    this.private_SetBreakRecalculate(PRS);
                     this.PageInfo.SetNextWrapState();
                 }
                 else
                 {
                     this.ParaMathRPI.Wrap = WRAP_MATH_EMPTY;
                     this.ParaMathRPI.bStartRanges = false;
-                    this.UpdateInfoForBreak(PRS, ParaLine);
+                    this.private_SetBreakRecalculate(PRS);
                 }
             }
         }
@@ -1352,6 +1377,11 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
     }
 
     this.ParaMathRPI.UpdateInfoLine(PRS);
+};
+ParaMath.prototype.private_SetBreakRecalculate = function(PRS)
+{
+    this.ParaMathRPI.NeedStartRecalc(this.Root.StartLine, this.Root.StartRange);
+    this.UpdateInfoForBreak(PRS, PRS.Line);
 };
 ParaMath.prototype.private_RecalculateRoot = function(PRS, ParaPr, Depth)
 {
@@ -1388,14 +1418,8 @@ ParaMath.prototype.private_UpdateXLimits = function(Struct, bRecalculate)
 {
     var MathSettings = Get_WordDocumentDefaultMathSettings();
 
-    if(this.ParaMathRPI.Wrap == WRAP_MATH_LEFT)
-    {
-        Struct.XEnd = this.ParaMathRPI.RangesX0;
-    }
-    else if(this.ParaMathRPI.Wrap == WRAP_MATH_RIGHT)
-    {
-        Struct.X = this.ParaMathRPI.RangesX1;
-    }
+    Struct.X = this.ParaMathRPI.XStart;
+    Struct.XEnd = this.ParaMathRPI.XEnd;
 
     var WrapState = this.PageInfo.GetCurrentWrapState();
 
@@ -3404,20 +3428,32 @@ function CMathRecalculateInfo()
     this.bRecalcCtrPrp          = false; // необходимо для пересчета CtrPrp (когда изменились текстовые настройки у первого элемнента, ctrPrp нужно пересчитать заново для всей формулы)
     this.bCorrect_FontSize      = false;
 
-    this.RangesX0               = 0;
-    this.RangesX1               = 0;
+    //this.RangesX0               = 0;
+    //this.RangesX1               = 0;
+
     this.Wrap                   = WRAP_MATH_EMPTY;
+    this.XStart                 = 0;
+    this.XEnd                   = 0;
+    this.IndexRange             = 0;
+
     this.bInternalRanges        = false;
     this.bStartRanges           = false;
     this.bRecalcResultPrevLine  = false;
+    this.StartLine              = -1;
+    this.StartRange             = -1;
 
     this.InfoLine = new CMathInfoLines();
 }
 CMathRecalculateInfo.prototype.ResetInfoRanges = function()
 {
-    this.RangesX0               = 0;
-    this.RangesX1               = 0;
+    /*this.RangesX0               = 0;
+    this.RangesX1               = 0;*/
+
     this.Wrap                   = WRAP_MATH_EMPTY;
+    this.XStart                 = 0;
+    this.XEnd                   = 0;
+    this.IndexRange             = 0;
+
     this.bInternalRanges        = false;
     this.bStartRanges           = false;
 };
@@ -3437,6 +3473,25 @@ CMathRecalculateInfo.prototype.CheckRangesInLine = function(PRS)
 {
     var bSameLine = this.InfoLine.Line == PRS.Line && this.InfoLine.Range == PRS.Range;
     return bSameLine && (this.InfoLine.CountRanges !== PRS.Ranges.length);
+};
+CMathRecalculateInfo.prototype.NeedStartRecalc = function(StartLine, StartRange)
+{
+    this.bRecalcResultPrevLine = true;
+
+    this.StartLine = StartLine;
+    this.StartRange = StartRange;
+
+};
+CMathRecalculateInfo.prototype.CheckPrevLine = function(CurLine, CurRange)
+{
+    if(this.bRecalcResultPrevLine == true && CurLine == this.StartLine && CurRange == this.StartRange)
+    {
+        this.bRecalcResultPrevLine = false;
+        this.StartLine              = -1;
+        this.StartRange             = -1;
+    }
+
+    return this.bRecalcResultPrevLine == true;
 };
 
 function CMathInfoLines()
