@@ -7,10 +7,6 @@
 var g_dMathArgSizeKoeff_1 = 0.76;
 var g_dMathArgSizeKoeff_2 = 0.6498; // 0.76 * 0.855
 
-var WRAP_MATH_EMPTY     = 0;
-var WRAP_MATH_INSIDE    = 1;
-var WRAP_MATH_TOPBOTTOM = 2;
-
 function CMathPropertiesSettings()
 {
     this.brkBin     = null;
@@ -746,10 +742,8 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
 
     var wrapIndent = MathSettings.Get_WrapIndent(WrapState);
 
-    var XLimits = {X: _X, XEnd: _XLimit};
-    this.private_UpdateXLimits(XLimits, false);
-
-    var XStart = XLimits.X, XEnd = XLimits.XEnd;
+    var XStart = this.ParaMathRPI.XStart + MathSettings.Get_LeftMargin(WrapState);
+    var XEnd   = this.ParaMathRPI.XEnd - MathSettings.Get_RightMargin(WrapState);
 
     var Jc = this.Get_Align();
 
@@ -1205,13 +1199,6 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     //здесь обновляем WrapState, исходя из этого параметра будем считать WrapIndent
     this.PageInfo.UpdateCurrentWrap(DispDef, bInline);
 
-    var X    = PRS.X,
-        XEnd = PRS.XEnd;
-
-    if(bInline == false)
-        this.private_UpdateXLimits(PRS, true);
-
-    PRS.XRange = PRS.X;
 
     if(this.ParaMathRPI.Wrap !== WRAP_MATH_EMPTY && this.ParaMathRPI.bStartRanges == true)
     {
@@ -1219,10 +1206,13 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     }
     else
     {
+        this.private_UpdateXLimits(PRS);
+
         if(PrevLineObject == null ||  PrevLineObject == this)
         {
             PRS.RecalcResult = recalcresult_NextLine;
-            PRS.Reset_RestartPageRecalcInfo();
+            if(this.ParaMathRPI.bInline == true) // сделана проверка для случая с обтеканием картинки
+                PRS.Reset_RestartPageRecalcInfo();
         }
 
         this.private_RecalculateRoot(PRS, ParaPr, Depth);
@@ -1237,9 +1227,6 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             this.PageInfo.SetNextWrapState();
         }
     }
-
-    PRS.X = X;
-    PRS.XEnd = XEnd;
 
     this.ParaMathRPI.ClearRecalculate();
 };
@@ -1256,16 +1243,31 @@ ParaMath.prototype.private_InitWrapSettings = function(PRS)
 
     if(this.ParaMathRPI.bStartRanges == true)
     {
-        var WrapType = PRS.Ranges[0].typeLeft;
+        this.ParaMathRPI.Wrap = WRAP_MATH_ON_SIDE;
 
-        if(WrapType == WRAPPING_TYPE_TOP_AND_BOTTOM)
+        for(var Pos = 0; Pos < PRS.Ranges.length; Pos++)
         {
-            this.ParaMathRPI.Wrap = WRAP_MATH_TOPBOTTOM;
+            var WrapType = PRS.Ranges[Pos].typeLeft;
+
+            if(WrapType == WRAPPING_TYPE_TOP_AND_BOTTOM)
+            {
+                this.ParaMathRPI.Wrap = WRAP_MATH_TOPBOTTOM;
+                break;
+            }
+            else if(WrapType !== WRAPPING_TYPE_SQUARE && WrapType !== WRAPPING_TYPE_THROUGH && WrapType !== WRAPPING_TYPE_TIGHT)
+            {
+                this.ParaMathRPI.Wrap = WRAP_MATH_EMPTY;
+                break;
+            }
+        }
+
+        if(this.ParaMathRPI.Wrap == WRAP_MATH_TOPBOTTOM)
+        {
             XStart      = PRS.XStart;
             XEnd        = PRS.XLimit;
             IndexRange  = 0;
         }
-        else if(WrapType == WRAPPING_TYPE_SQUARE || WrapType == WRAPPING_TYPE_THROUGH || WrapType == WRAPPING_TYPE_TIGHT)
+        else if(this.ParaMathRPI.Wrap == WRAP_MATH_ON_SIDE) // WrapType == WRAPPING_TYPE_SQUARE || WrapType == WRAPPING_TYPE_THROUGH || WrapType == WRAPPING_TYPE_TIGHT
         {
             var Len = PRS.Ranges.length;
 
@@ -1286,8 +1288,6 @@ ParaMath.prototype.private_InitWrapSettings = function(PRS)
 
                 }
             }
-
-            this.ParaMathRPI.Wrap = WRAP_MATH_INSIDE;
         }
     }
     else
@@ -1308,7 +1308,7 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
         this.PageInfo.ReverseCurrentMaxW(PRS.Line);
     }
 
-    var bNextLine = this.ParaMathRPI.Wrap == WRAP_MATH_INSIDE && PRS.Range !== this.ParaMathRPI.IndexRange;
+    var bNextLine = this.ParaMathRPI.Wrap == WRAP_MATH_ON_SIDE && PRS.Range !== this.ParaMathRPI.IndexRange;
 
     if(PRS.Ranges.length > 0 && (bNextLine || this.ParaMathRPI.Wrap ==  WRAP_MATH_TOPBOTTOM))
     {
@@ -1321,7 +1321,7 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
     }
     else
     {
-        if(PRS.Ranges.length > 0 && this.ParaMathRPI.Wrap == WRAP_MATH_INSIDE)
+        if(PRS.Ranges.length > 0 && this.ParaMathRPI.Wrap == WRAP_MATH_ON_SIDE)
         {
             var CurrRange = PRS.Range;
 
@@ -1334,6 +1334,11 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
             PRS.Range = CurrRange;
         }
 
+        PRS.X = this.ParaMathRPI.XStart;
+        PRS.XEnd = this.ParaMathRPI.XEnd;
+
+        this.private_UpdateXLimits(PRS);
+
         this.private_RecalculateRoot(PRS, ParaPr, Depth);
 
         if(PRS.RecalcResult == recalcresult_PrevLine && PRS.Range < PRS.Ranges.length)
@@ -1343,7 +1348,7 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
 
         if(PRS.bMathWordLarge == true)
         {
-            if(this.ParaMathRPI.Wrap == WRAP_MATH_INSIDE)
+            if(this.ParaMathRPI.Wrap == WRAP_MATH_ON_SIDE)
             {
                 this.ParaMathRPI.Wrap = WRAP_MATH_TOPBOTTOM;
                 this.private_SetBreakRecalculate(PRS);
@@ -1414,34 +1419,31 @@ ParaMath.prototype.private_RecalculateRoot = function(PRS, ParaPr, Depth)
         this.UpdateWidthLine(PRS, WidthLine);
     }
 };
-ParaMath.prototype.private_UpdateXLimits = function(Struct, bRecalculate)
+ParaMath.prototype.private_UpdateXLimits = function(PRS)
 {
     var MathSettings = Get_WordDocumentDefaultMathSettings();
 
-    Struct.X = this.ParaMathRPI.XStart;
-    Struct.XEnd = this.ParaMathRPI.XEnd;
-
     var WrapState = this.PageInfo.GetCurrentWrapState();
 
-    Struct.X    += MathSettings.Get_LeftMargin(WrapState);
-    Struct.XEnd -= MathSettings.Get_RightMargin(WrapState);
+    PRS.X    += MathSettings.Get_LeftMargin(WrapState);
+    PRS.XEnd -= MathSettings.Get_RightMargin(WrapState);
 
-    if(bRecalculate == true)
+    var WrapIndent = MathSettings.Get_WrapIndent(WrapState);
+
+    PRS.WrapIndent = WrapIndent;
+
+    if(this.Root.IsStartLine(PRS.Line) == false)
     {
-        var WrapIndent = MathSettings.Get_WrapIndent(WrapState);
-
-        Struct.WrapIndent = WrapIndent;
-
-        if(this.Root.IsStartLine(Struct.Line) == false)
-        {
-            Struct.X += WrapIndent;
-            Struct.bCompareWrapIndent = false;
-        }
-        else
-        {
-            Struct.bCompareWrapIndent = true;
-        }
+        PRS.X += WrapIndent;
+        PRS.bCompareWrapIndent = false;
     }
+    else
+    {
+        PRS.bCompareWrapIndent = true;
+    }
+
+    PRS.XRange = PRS.X;
+
 };
 ParaMath.prototype.UpdateInfoForBreak = function(PRS, Line)
 {
@@ -3428,9 +3430,6 @@ function CMathRecalculateInfo()
     this.bRecalcCtrPrp          = false; // необходимо для пересчета CtrPrp (когда изменились текстовые настройки у первого элемнента, ctrPrp нужно пересчитать заново для всей формулы)
     this.bCorrect_FontSize      = false;
 
-    //this.RangesX0               = 0;
-    //this.RangesX1               = 0;
-
     this.Wrap                   = WRAP_MATH_EMPTY;
     this.XStart                 = 0;
     this.XEnd                   = 0;
@@ -3446,9 +3445,6 @@ function CMathRecalculateInfo()
 }
 CMathRecalculateInfo.prototype.ResetInfoRanges = function()
 {
-    /*this.RangesX0               = 0;
-    this.RangesX1               = 0;*/
-
     this.Wrap                   = WRAP_MATH_EMPTY;
     this.XStart                 = 0;
     this.XEnd                   = 0;

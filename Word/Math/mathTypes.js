@@ -202,9 +202,9 @@ var ALIGN_MARGIN      = 1;
 var ALIGN_WRAP        = 2;
 var ALIGN_EMPTY       = 3;
 
-var MATH_LEFT_MARGIN   = 0;
-var MATH_RIGHT_MARGIN  = 1;
-var MATH_WRAP_INDENT   = 2;
+var WRAP_MATH_EMPTY     = 0;
+var WRAP_MATH_ON_SIDE   = 1;
+var WRAP_MATH_TOPBOTTOM = 2;
 
 var MATH_SIZE            = 0;
 var MATH_BOUNDS_MEASURES = 1;
