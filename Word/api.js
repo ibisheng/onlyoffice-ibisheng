@@ -7467,6 +7467,7 @@ asc_docs_api.prototype.asc_CloseFile = function()
     History.Clear();
 	g_oIdCounter.Clear();
     g_oTableId.Clear();
+    CollaborativeEditing.Clear();
 	this.isApplyChangesOnOpenEnabled = true;
 
 	var oLogicDocument = this.WordControl.m_oLogicDocument;

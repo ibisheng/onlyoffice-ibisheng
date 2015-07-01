@@ -234,6 +234,22 @@ function CCollaborativeEditing()
 
     var oThis = this;
 
+    this.Clear = function()
+    {
+        this.m_nUseType     = 1;
+
+        this.m_aUsers       = [];
+        this.m_aChanges     = [];
+        this.m_aNeedUnlock  = [];
+        this.m_aNeedUnlock2 = [];
+        this.m_aNeedLock    = [];
+        this.m_aLinkData    = [];
+        this.m_aEndActions  = [];
+        this.m_aCheckLocks  = [];
+        this.m_aNewObjects  = [];
+        this.m_aNewImages   = [];
+    };
+
     this.Is_SingleUser = function()
     {
         if (1 === this.m_nUseType)
