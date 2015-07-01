@@ -999,8 +999,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					var nErrorLevel = c_oAscError.Level.NoCritical;
 					var errorId = result["data"] >> 0;
 					//todo передалеть работу с callback
-					if (c_oAscAdvancedOptionsAction.Perm === editor.advancedOptionsAction ||
-						c_oAscAdvancedOptionsAction.Open === editor.advancedOptionsAction)
+					if (c_oAscAdvancedOptionsAction.Perm === this.advancedOptionsAction ||
+						c_oAscAdvancedOptionsAction.Open === this.advancedOptionsAction)
 						nErrorLevel = c_oAscError.Level.Critical;
 					this.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(errorId), nErrorLevel);
 					if (fCallback) fCallback({returnCode: nErrorLevel, val:errorId});
