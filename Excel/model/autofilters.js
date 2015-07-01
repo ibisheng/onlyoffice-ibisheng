@@ -1025,7 +1025,7 @@ var maxIndividualValues = 10000;
 								if(!aWs.TableParts)
 									aWs.TableParts = [];
 								aWs.TableParts[aWs.TableParts.length] = cloneData;
-
+                                aWs.workbook.dependencyFormulas.addTableName(cloneData.DisplayName, aWs, cloneData.Ref);
 								this._setColorStyleTable(cloneData.Ref, cloneData, null, true);
 							}
 							else
@@ -1176,10 +1176,13 @@ var maxIndividualValues = 10000;
 						aWs.setRowHidden(false, bbox.r1, bbox.r2);
 
 						//заносим в историю
-						if(isTablePart)
+						if(isTablePart){
 							t._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, deleteFilterAfterDeleteColRow, bbox);
+                        }
 						else
 							t._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, oldFilter.Ref);
+
+                        aWs.workbook.dependencyFormulas.delTableName(oldFilter.DisplayName,aWs.getName())
 					}
 					else
 						return oldFilter;

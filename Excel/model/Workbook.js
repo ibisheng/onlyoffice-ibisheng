@@ -1050,6 +1050,10 @@ DependencyGraph.prototype = {
     changeTableName:function(tableName, ws, newRef){
         var table = this.getDefNameNodeByName( tableName, ws );
         table.Ref = parserHelp.getEscapeSheetName(ws.getName())+"!"+newRef.getAbsName();
+    },
+    delTableName:function(name,ws){
+        var table = this.getDefNameNodeByName( name, ws );
+        table.Ref = null;
     }
 };
 
