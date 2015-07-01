@@ -1783,11 +1783,10 @@ function TransformPointPolygon(x, y, oPolygon, bFlag, XLimit, ContentHeight, dKo
     if(bFlag)
     {
         y1 = 0;
-        if(/*oBounds*/false)
-        {
-            y1 = oBounds.min_y;
-        }
-		y0 -= oBounds.min_y;
+		if(oBounds)
+		{
+			y0 -= oBounds.min_y;
+		}
     }
     else
     {
@@ -1795,8 +1794,8 @@ function TransformPointPolygon(x, y, oPolygon, bFlag, XLimit, ContentHeight, dKo
         if(oBounds)
         {
             y1 = (oBounds.max_y - oBounds.min_y);
+			y0 -= oBounds.min_y;
         }
-		y0 -= oBounds.min_y;
     }
     cX = x/XLimit;
     oPointOnPolygon = oPolygon.getPointOnPolygon(cX, true);
