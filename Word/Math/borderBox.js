@@ -214,7 +214,7 @@ CBorderBox.prototype.Draw_Elements = function(PDSE)
     var Width  = this.size.width - this.GapLeft - this.GapRight,
         Height = this.size.height;
 
-    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line, PDSE.Range);
 
     var X = this.pos.x + PosLine.x + this.GapLeft,
         Y = this.pos.y + PosLine.y;

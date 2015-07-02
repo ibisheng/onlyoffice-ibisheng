@@ -92,7 +92,7 @@ CFraction.prototype.drawBarFraction = function(PDSE)
 
     var width = this.size.width - this.GapLeft - this.GapRight;
 
-    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line, PDSE.Range);
 
     var x1 = this.pos.x + PosLine.x + this.GapLeft,
         x2 = this.pos.x + PosLine.x + this.GapLeft + width,
@@ -125,7 +125,7 @@ CFraction.prototype.drawSkewedFraction = function(PDSE)
     var tg1 = -2.22,
         tg2 = -3.7;
 
-    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line, PDSE.Range);
 
     var X = this.pos.x + PosLine.x + this.GapLeft,
         Y = this.pos.y + PosLine.y;
@@ -208,7 +208,7 @@ CFraction.prototype.drawLinearFraction = function(PDSE)
 {
     var shift = 0.1*this.dW;
 
-    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line, PDSE.Range);
 
     var X = this.pos.x + PosLine.x + this.GapLeft,
         Y = this.pos.y + PosLine.y;

@@ -1030,8 +1030,9 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
 
         Pos = _EndPos;
 
-        var LocParaMath = this.ParaMath.GetLinePosition(_CurLine);
+        var LocParaMath = this.ParaMath.GetLinePosition(_CurLine, _CurRange);
         X = LocParaMath.x;
+        Y = LocParaMath.y;
 
         var MATH_Y = Y;
         var loc;
@@ -4155,7 +4156,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
             case para_Math_BreakOperator:
             case para_Math_Placeholder:
             {
-                var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+                var PosLine = this.ParaMath.GetLinePosition(PDSE.Line, PDSE.Range);
                 Item.Draw(PosLine.x, PosLine.y, pGraphics, InfoMathText);
                 X += Item.Get_WidthVisible();
                 break;
@@ -4505,7 +4506,7 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
 
         if(this.Type == para_Math_Run)
         {
-            var PosLine = this.ParaMath.GetLinePosition(_CurLine);
+            var PosLine = this.ParaMath.GetLinePosition(_CurLine, _CurRange);
             var loc = this.Content[CurPos].GetLocationOfLetter();
             SearchPos.CurX = PosLine.x + loc.x; // позиция формулы в строке + смещение буквы в контенте
         }
@@ -4565,7 +4566,7 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
         //для пустых Run искомая позиция - позиция самого Run
         var bEmpty = this.Is_Empty();
 
-        var PosLine = this.ParaMath.GetLinePosition(_CurLine);
+        var PosLine = this.ParaMath.GetLinePosition(_CurLine, _CurRange);
 
         if(bEmpty)
             SearchPos.CurX = PosLine.x + this.pos.x;

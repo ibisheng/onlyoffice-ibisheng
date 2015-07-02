@@ -102,7 +102,7 @@ CDegreeBase.prototype.recalculateSize = function(oMeasure)
 {
     var Metric = new CMathBoundsMeasures();
     Metric.UpdateMetrics(this.baseContent.size);
-    Metric.UpdateWidth(this.baseContent.size.width);
+    Metric.SetWidth(this.baseContent.size.width);
 
     this.setDistance();
 
@@ -437,7 +437,7 @@ CDegree.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
         this.iterContent.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
         this.baseContent.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
 
-        var BoundBase = this.baseContent.Get_LineBound(_CurLine);
+        var BoundBase = this.baseContent.Get_LineBound(_CurLine, _CurRange);
         var Bound;
 
         if(this.Pr.type === DEGREE_SUPERSCRIPT)
@@ -449,7 +449,7 @@ CDegree.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
             Bound = this.GetSizeSubScript(g_oTextMeasurer, BoundBase);
         }
 
-        this.Bounds.UpdateMetrics(CurLine, Bound);
+        this.Bounds.UpdateMetrics(CurLine, CurRange, Bound);
         ContentMetrics.UpdateMetrics(Bound);
 
         this.UpdatePRS(PRS, Bound);
@@ -646,7 +646,7 @@ CDegreeSubSupBase.prototype.recalculateSize = function(oMeasure)
 {
     var Metric = new CMathBoundsMeasures();
     Metric.UpdateMetrics(this.baseContent.size);
-    Metric.UpdateWidth(this.baseContent.size.width);
+    Metric.SetWidth(this.baseContent.size.width);
 
     var ResultSize = this.GetSize(oMeasure, Metric);
 
@@ -845,14 +845,14 @@ CDegreeSubSup.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine
         // основание, baseContent
         this.Content[0].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
 
-        var BoundBase = this.baseContent.Get_LineBound(_CurLine);
+        var BoundBase = this.baseContent.Get_LineBound(_CurLine, _CurRange);
 
         var Bound = this.GetSize(g_oTextMeasurer, BoundBase);
-        this.Bounds.UpdateMetrics(CurLine, Bound);
+        this.Bounds.UpdateMetrics(CurLine, CurRange, Bound);
         ContentMetrics.UpdateMetrics(Bound);
 
         this.iters.Bounds.Reset();
-        this.iters.Bounds.UpdateMetrics(0, this.iters.size);
+        this.iters.Bounds.UpdateMetrics(0, 0, this.iters.size);
 
         this.UpdatePRS(PRS, Bound);
     }
@@ -930,7 +930,6 @@ CDegreeSubSup.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
 
         this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
-
     }
 };
 CDegreeSubSup.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
@@ -961,7 +960,7 @@ CDegreeSubSup.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurR
             this.iters.iterUp.Recalculate_Range_Width(PRSC, _CurLine, _CurRange);
             this.iters.iterDn.Recalculate_Range_Width(PRSC, _CurLine, _CurRange);
 
-            this.iters.Bounds.SetWidth(0, this.iters.size.width);
+            this.iters.Bounds.SetWidth(0, 0, this.iters.size.width);
 
             PRSC.Range.W = RangeW2 + this.iters.size.width + this.dW;
         }
@@ -974,7 +973,7 @@ CDegreeSubSup.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurR
             PRSC.Range.W += this.BrGapRight;
         }
 
-        this.Bounds.SetWidth(CurLine, PRSC.Range.W - RangeW);
+        this.Bounds.SetWidth(CurLine, CurRange, PRSC.Range.W - RangeW);
     }
 };
 CDegreeSubSup.prototype.setPosition = function(pos, PRSA, Line, Range, Page)

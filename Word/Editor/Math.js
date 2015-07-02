@@ -1285,7 +1285,6 @@ ParaMath.prototype.private_InitWrapSettings = function(PRS)
                     XStart = _XStart;
                     XEnd = _XEnd;
                     IndexRange  = Pos+1;
-
                 }
             }
         }
@@ -1535,12 +1534,6 @@ ParaMath.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange
         Page = this.Paragraph.Get_StartPage_Absolute();
 
     var pos = new CMathPosition();
-
-    if(false == this.Root.IsStartRange(_CurLine, _CurRange))
-    {
-        var LinePos = this.Root.GetPos(_CurLine);
-        pos.x += PRSA.X - LinePos.x;
-    }
 
     this.Root.setPosition(pos, PRSA, _CurLine, _CurRange, Page + _CurPage);
 
@@ -1996,13 +1989,13 @@ ParaMath.prototype.Draw_HighLights = function(PDSH)
             var CommentId     = ( CommentsCount > 0 ? PDSH.Comments[CommentsCount - 1] : null );
             var CommentsFlag  = PDSH.CommentsFlag;
 
-            var Bounds = this.Root.Get_LineBound(PDSH.Line);
+            var Bounds = this.Root.Get_LineBound(PDSH.Line, PDSH.Range);
             Comm.Add(Bounds.Y, Bounds.Y + Bounds.H, Bounds.X, Bounds.X + Bounds.W, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false, CommentId : CommentId } );
         }
 
         if (null !== CollFirst)
         {
-            var Bounds = this.Root.Get_LineBound(PDSH.Line);
+            var Bounds = this.Root.Get_LineBound(PDSH.Line, PDSH.Range);
             Coll.Add(Bounds.Y, Bounds.Y + Bounds.H, Bounds.X, Bounds.X + Bounds.W, 0, CollFirst.r, CollFirst.g, CollFirst.b);
         }
 
@@ -2020,14 +2013,14 @@ ParaMath.prototype.Draw_Elements = function(PDSE)
 
     this.Root.Draw_Elements(PDSE);
 
-    PDSE.X = X + this.Root.Get_LineBound(PDSE.Line).W;
+    PDSE.X = X + this.Root.GetWidth(PDSE.Line, PDSE.Range);
 
     /*PDSE.Graphics.p_color(255,0,0, 255);
      PDSE.Graphics.drawHorLine(0, PDSE.Y - this.Ascent + this.Height, PDSE.X - 30, PDSE.X + this.Width + 30 , 1);*/
 };
-ParaMath.prototype.GetLinePosition = function(Line)
+ParaMath.prototype.GetLinePosition = function(Line, Range)
 {
-    return this.Root.GetPos(Line);
+    return this.Root.GetPos(Line, Range);
 };
 ParaMath.prototype.Draw_Lines = function(PDSL)
 {
@@ -2072,7 +2065,7 @@ ParaMath.prototype.Draw_Lines = function(PDSL)
             }
         }
 
-        var Bound = this.Root.Get_LineBound(PDSL.Line),
+        var Bound = this.Root.Get_LineBound(PDSL.Line, PDSL.Range),
             Width = Bound.W;
 
         if ( true === FirstRPrp.Underline )
@@ -2128,6 +2121,7 @@ ParaMath.prototype.Cursor_MoveToEndPos = function(SelectFromEnd)
 
 ParaMath.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd, Flag) // получить логическую позицию по XY
 {
+
     var Result = this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
 
     if(SearchPos.InText)
@@ -2350,8 +2344,21 @@ ParaMath.prototype.Get_ContentSelection = function()
     if (oContent.bRoot)
         return null;
 
-    var Bounds = oContent.Get_Bounds();
-    return Bounds;
+    //
+
+    //var Bounds = oContent.Get_Bounds();
+    //return Bounds;
+
+    var ContentBounds = oContent.Get_Bounds();
+    var ParaMathBounds = [];
+
+    for(var i = 0; i < ContentBounds.length; i++)
+    {
+        ParaMathBounds[i] = ContentBounds[i][0];
+    }
+
+    return ParaMathBounds;
+
 };
 
 ParaMath.prototype.Recalc_RunsCompiledPr = function()
@@ -2493,7 +2500,20 @@ ParaMath.prototype.Get_Bounds = function()
     if (undefined === this.Paragraph || null === this.Paragraph)
         return [{X : 0, Y : 0, W : 0, H : 0, Page : 0}];
     else
-        return this.Root.Get_Bounds();
+    {
+        //return this.Root.Get_Bounds();
+
+        var RootBounds = this.Root.Get_Bounds();
+        var ParaMathBounds = [];
+
+        for(var i = 0; i < RootBounds.length; i++)
+        {
+            ParaMathBounds[i] =/* RootBounds[i].length == 1 ? */RootBounds[i][0] /*: RootBounds[i][1]*/;
+        }
+
+        return ParaMathBounds;
+
+    }
 };
 
 ParaMath.prototype.getPropsForWrite = function()

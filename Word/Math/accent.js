@@ -604,7 +604,7 @@ CAccent.prototype.Draw_Elements = function(PDSE)
     var oBase = this.Content[0];
     oBase.Draw_Elements(PDSE);
 
-    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line, PDSE.Range);
 
     var x = PosLine.x,
         y = PosLine.y;

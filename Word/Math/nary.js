@@ -550,7 +550,7 @@ CNary.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
                 this.LowerIterator.Recalculate_Range_Width(PRSC, _CurLine, _CurRange);
                 this.UpperIterator.Recalculate_Range_Width(PRSC, _CurLine, _CurRange);
 
-                this.Base.Bounds.SetWidth(CurLine, this.Base.size.width);
+                this.Base.Bounds.SetWidth(CurLine, CurRange, this.Base.size.width);
             }
 
             PRSC.Range.W = RangeW2 + this.Base.size.width + this.dW;
@@ -564,7 +564,7 @@ CNary.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
             PRSC.Range.W += this.BrGapRight;
         }
 
-        this.Bounds.SetWidth(CurLine, PRSC.Range.W - RangeW);
+        this.Bounds.SetWidth(CurLine, CurRange, PRSC.Range.W - RangeW);
     }
 };
 CNary.prototype.Draw_Elements = function(PDSE)
@@ -609,9 +609,9 @@ CNary.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRa
 
         this.Arg.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
 
-        var BoundArg = this.Arg.Get_LineBound(_CurLine);
+        var BoundArg = this.Arg.Get_LineBound(_CurLine, _CurRange);
 
-        this.Bounds.UpdateMetrics(CurLine, BoundArg);
+        this.Bounds.UpdateMetrics(CurLine, CurRange, BoundArg);
 
         this.UpdatePRS(PRS, BoundArg);
 
@@ -622,7 +622,7 @@ CNary.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRa
 
             if(this.Base.IsJustDraw())
             {
-                this.Bounds.UpdateMetrics(CurLine, this.Base.size);
+                this.Bounds.UpdateMetrics(CurLine, CurRange, this.Base.size);
                 ContentMetrics.UpdateMetrics(this.Base.size);
                 this.UpdatePRS(PRS, this.Base.size);
             }
@@ -637,7 +637,7 @@ CNary.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRa
 
                 this.Base.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
 
-                this.Bounds.UpdateMetrics(CurLine, this.Base.size);
+                this.Bounds.UpdateMetrics(CurLine, CurRange, this.Base.size);
                 this.UpdatePRS(PRS, this.Base.size);
             }
 
@@ -904,7 +904,7 @@ CNaryOperator.prototype.Draw_Elements = function(PDSE)
 {
     this.Parent.Make_ShdColor(PDSE, this.Parent.Get_CompiledCtrPrp());
 
-    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line, PDSE.Range);
 
     if(this.Type == para_Math_Text)
         this.drawTextElem(PosLine.x, PosLine.y, PDSE.Graphics);

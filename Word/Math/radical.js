@@ -644,7 +644,7 @@ CRadical.prototype.Draw_Elements = function(PDSE)
 {
     var X = PDSE.X;
 
-    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line, PDSE.Range);
 
     this.signRadical.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
     CRadical.superclass.Draw_Elements.call(this, PDSE);

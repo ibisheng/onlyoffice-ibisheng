@@ -3749,7 +3749,7 @@ CDelimiter.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 };
 CDelimiter.prototype.Draw_Elements = function(PDSE)
 {
-    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line, PDSE.Range);
 
     if(this.bOneLine == false)
     {
@@ -3958,7 +3958,7 @@ CCharacter.prototype.Draw_Elements = function(PDSE)
 
     PDSE.Graphics.SetFont(Font);
 
-    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line, PDSE.Range);
 
     this.operator.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
 
