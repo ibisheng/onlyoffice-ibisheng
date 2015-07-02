@@ -1198,6 +1198,8 @@ function _FT_Common() {
 }
 var FT_Common = new _FT_Common();
 
+var global_memory_stream_menu = CreateNativeMemoryStream();
+
 //-------------------------------------------------------------------------------
 // ASCCOLOR
 function asc_menu_ReadColor(_params, _cursor)
@@ -1654,23 +1656,14 @@ function offline_apply_event(type,params) {
                     }
                     case 6:
                     {
-                        var color = asc_menu_ReadColor(params, _current);
-                        _api.asc_setCellTextColor(color);
-
-                        //  var Unifill = new CUniFill();
-                        // Unifill.fill = new CSolidFill();
-
-                        //  Unifill.fill.color = CorrectUniColor(color, Unifill.fill.color, 1);
-                        // _textPr.Unifill = Unifill;
+                        var textColor = asc_menu_ReadColor(params, _current);
+                        _api.asc_setCellTextColor(textColor);
                         break;
                     }
                     case 7:
                     {
-                        var color = asc_menu_ReadColor(params, _current);
-                        _api.asc_setCellBackgroundColor(color);
-
-                        // var color = asc_menu_ReadColor(params, _current);
-                        // _textPr.VertAlign = _params[_current.pos++];
+                        var backgroundColor = asc_menu_ReadColor(params, _current);
+                        _api.asc_setCellBackgroundColor(backgroundColor);
                         break;
                     }
                     case 8:
@@ -1680,27 +1673,43 @@ function offline_apply_event(type,params) {
                     }
                     case 9:
                     {
-                        // _textPr.DStrikeout = _params[_current.pos++];
+                        var horizAlign = params[_current.pos++], ha = '';
+
+                        if (horizAlign === c_oAscAlignType.NONE) ha = 'none';
+                        else if (horizAlign === c_oAscAlignType.LEFT) ha = 'left';
+                        else if (horizAlign === c_oAscAlignType.CENTER) ha = 'center';
+                        else if (horizAlign === c_oAscAlignType.RIGHT) ha = 'right';
+                        else if (horizAlign === c_oAscAlignType.JUSTIFY) ha = 'justify';
+                        else if (horizAlign === c_oAscAlignType.TOP) ha = 'top';
+                        else if (horizAlign === c_oAscAlignType.MIDDLE) ha = 'center';
+                        else if (horizAlign === c_oAscAlignType.BOTTOM) ha = 'bottom';
+
+                        _api.asc_setCellAlign(ha);
+
                         break;
                     }
                     case 10:
                     {
-                        // _textPr.Caps = _params[_current.pos++];
+                        var vertAlign = params[_current.pos++], va = '';
+
+                        if (vertAlign === c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM) va = 'bottom';
+                        else if (vertAlign === c_oAscVerticalTextAlign.TEXT_ALIGN_CTR) va = 'center';
+                        else if (vertAlign === c_oAscVerticalTextAlign.TEXT_ALIGN_DIST) va = 'distributed';
+                        else if (vertAlign === c_oAscVerticalTextAlign.TEXT_ALIGN_JUST) va = 'justify';
+                        else if (vertAlign === c_oAscVerticalTextAlign.TEXT_ALIGN_TOP) va = 'top';
+
+                        _api.asc_setCellVertAlign(va);
+
                         break;
                     }
                     case 11:
                     {
-                        // _textPr.SmallCaps = _params[_current.pos++];
+                        _api.asc_setCellTextWrap(params[_current.pos++]);
                         break;
                     }
                     case 12:
                     {
-                        // _textPr.HighLight = highlight_None;
-                        break;
-                    }
-                    case 13:
-                    {
-                        // _textPr.Spacing = _params[_current.pos++];
+                        _api.asc_setCellTextShrink(params[_current.pos++]);
                         break;
                     }
                     case 255:
@@ -1711,6 +1720,29 @@ function offline_apply_event(type,params) {
                     }
                 }
             }
+            break;
+        }
+
+        case 2010:
+        {
+            var _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+
+            var merged = _api.asc_getCellInfo().asc_getFlags().asc_getMerge();
+
+            if (!merged && _api.asc_mergeCellsDataLost(params)) {
+                _stream["WriteBool"](true);
+            } else {
+                _stream["WriteBool"](false);
+            }
+
+            _return = _stream;
+            break;
+        }
+
+        case 2020:
+        {
+            _api.asc_mergeCells(params);
             break;
         }
 
