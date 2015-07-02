@@ -8963,7 +8963,6 @@
 			var isMultiple = false;
 			var firstCell = t.model.getRange3(arn.r1, arn.c1, arn.r1, arn.c1);
 			var isMergedFirstCell = firstCell.hasMerged();
-			var rangeUnMerge = t.model.getRange3(arn.r1, arn.c1, rMax - 1, cMax - 1);
 			var isOneMerge = false;
 
 
@@ -8983,12 +8982,15 @@
 				firstValuesRow = 0;
 			}
 
-			//если вставляем в мерженную ячейку, диапазон которой больше или равен
-			if (arn.c2 >= cMax -1 && arn.r2 >= rMax - 1 &&
-				isMergedFirstCell && isMergedFirstCell.c1 === arn.c1 && isMergedFirstCell.c2 === arn.c2 && isMergedFirstCell.r1 === arn.r1 && isMergedFirstCell.r2 === arn.r2 &&
-				cMax - arn.c1 === (firstValuesCol + 1) && rMax - arn.r1  === (firstValuesRow + 1))
+			var rowDiff = arn.r1 - activeCellsPasteFragment.r1;
+			var colDiff = arn.c1 - activeCellsPasteFragment.c1;
+			var newPasteRange = new Asc.Range(arn.c1 - colDiff, arn.r1 - rowDiff, arn.c2 - colDiff, arn.r2 - rowDiff);
+			//если вставляем в мерженную ячейку, диапазон которой больше или меньше, но не равен выделенной области
+			if (isMergedFirstCell && isMergedFirstCell.isEqual(arn) && cMax - arn.c1 === (firstValuesCol + 1) && rMax - arn.r1  === (firstValuesRow + 1) && !newPasteRange.isEqual(activeCellsPasteFragment))
 			{
 				isOneMerge = true;
+				rMax = arn.r2 + 1;
+				cMax = arn.c2 + 1;
 			}
 			else if(arn.c2 >= cMax -1 && arn.r2 >= rMax - 1)
 			{
@@ -9041,6 +9043,9 @@
 					}
 				}
 			}
+			
+			var rangeUnMerge = t.model.getRange3(arn.r1, arn.c1, rMax - 1, cMax - 1);
+			
 			var rMax2 = rMax;
 			var cMax2 = cMax;
 			//var rMax = values.length;
@@ -9180,7 +9185,7 @@
 								
 								//set style
 								var cellStyle = newVal.getStyleName();
-								if(cellStyle)
+								if(cellStyle && !isOneMerge)
 									range.setCellStyle(cellStyle);
 								
 								//add formula
