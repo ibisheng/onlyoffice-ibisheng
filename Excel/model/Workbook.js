@@ -887,6 +887,7 @@ DependencyGraph.prototype = {
         else if( null == oRes.Ref && null != defRef ){
 
             oRes.Ref = defRef;
+            oRes.isTable = undefined;
             oRes.parsedRef = new parserFormula(oRes.Ref, "", oRes.wb.getWorksheet(0));
             oRes.parsedRef.parse();
 //            oRes.sheetId = sheetId;
@@ -1314,9 +1315,11 @@ function DefNameVertex( scope, defName, defRef, wb, isTable ) {
     this.nodeId = getDefNameVertexId( this.sheetId, defName );
     this.wb = wb;
 
-    this.parsedRef = new parserFormula(this.Ref, "", this.wb.getWorksheet(0))
-    if( this.Ref ){
-        this.parsedRef.parse();
+    if(!isTable){
+        this.parsedRef = new parserFormula(this.Ref, "", this.wb.getWorksheet(0))
+        if( this.Ref ){
+            this.parsedRef.parse();
+        }
     }
 
     //вершина которую мы прошли и поставили в очередь обхода
