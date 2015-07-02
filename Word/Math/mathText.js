@@ -45,6 +45,7 @@ function CMathBaseText()
     this.Type           = null;
     this.bJDraw         = false;
     this.value          = null;
+    this.bUpdateGaps    = true;
 
     this.bEmptyGapLeft  = false;
     this.bEmptyGapRight = false;
@@ -135,6 +136,14 @@ CMathBaseText.prototype.Draw_Elements = function(PDSE)  // эта функция
     var PosLine = this.ParaMath.GetLinePosition(PDSE.Line, PDSE.Range);
     this.Draw(PosLine.x, PosLine.y, PDSE.Graphics);
 };
+CMathBaseText.prototype.SetUpdateGaps = function(bUpd)
+{
+    this.bUpdateGaps = bUpd;
+};
+CMathBaseText.prototype.IsNeedUpdateGaps = function()
+{
+    return this.bUpdateGaps;
+};
 
 function CMathText(bJDraw)
 {
@@ -142,7 +151,6 @@ function CMathText(bJDraw)
 
     this.Type           = para_Math_Text;
     this.bJDraw         = (undefined === bJDraw ? false : bJDraw);
-    this.bUpdateGaps    = true;
 
     this.RecalcInfo =
     {
@@ -740,14 +748,7 @@ CMathText.prototype.PreRecalc = function(Parent, ParaMath)
 
     this.bUpdateGaps = false;
 };
-CMathText.prototype.SetUpdateGaps = function(bUpd)
-{
-    this.bUpdateGaps = bUpd;
-};
-CMathText.prototype.IsNeedUpdateGaps = function()
-{
-    return this.bUpdateGaps;
-};
+
 CMathText.prototype.Draw = function(x, y, pGraphics, InfoTextPr)
 {
     var X = this.pos.x + x,
@@ -965,6 +966,8 @@ CMathAmp.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
 {
     this.Parent = Parent;
     this.AmpText.PreRecalc(Parent, ParaMath, ArgSize, RPI);
+
+    this.bUpdateGaps = false;
 };
 CMathAmp.prototype.getCodeChr = function()
 {
