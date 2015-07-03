@@ -1619,6 +1619,16 @@ function offline_apply_event(type,params) {
     var _continue = true;
     switch (type) {
 
+        case 3: // ASC_MENU_EVENT_TYPE_UNDO
+        {
+            _api.asc_Undo();
+            break;
+        }
+        case 4: // ASC_MENU_EVENT_TYPE_REDO
+        {
+            _api.asc_Redo();
+            break;
+        }
         case 2000: // ASC_SPREADSHEETS_EVENT_TYPE_CELL_PR
         {
             while (_continue) {
@@ -1722,7 +1732,6 @@ function offline_apply_event(type,params) {
             }
             break;
         }
-
         case 2010:
         {
             var _stream = global_memory_stream_menu;
@@ -1739,13 +1748,36 @@ function offline_apply_event(type,params) {
             _return = _stream;
             break;
         }
-
         case 2020:
         {
             _api.asc_mergeCells(params);
             break;
         }
-
+        case 2030:
+        {
+            _api.asc_setCellFormat(params);
+            break;
+        }
+        case 2031:
+        {
+            _api.asc_decreaseCellDigitNumbers();
+            break;
+        }
+        case 2032:
+        {
+            _api.asc_increaseCellDigitNumbers();
+            break;
+        }
+        case 2040:
+        {
+            if (params.length) {
+                var typeF = params[0], cellId ='';
+                if (2===params.length)
+                    cellId = params[1];
+                _api.asc_sortColFilter(typeF, cellId);
+            }
+            break;
+        }
         default:
             break;
     }
