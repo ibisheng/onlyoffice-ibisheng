@@ -1823,7 +1823,7 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	this.bRedoChanges = false;
 	this.aCollaborativeChangeElements = [];
 }
-Workbook.prototype.init=function(){
+Workbook.prototype.init=function(bNoBuildDep){
 	if(this.nActive < 0)
 		this.nActive = 0;
 	if(this.nActive >= this.aWorksheets.length)
@@ -1835,14 +1835,15 @@ Workbook.prototype.init=function(){
         var ws = this.aWorksheets[i];
         ws.initPostOpen();
     }
-
-	/*
-		buildDependency необходимо запускать для построения графа зависимостей между ячейками.
-		Сортировка графа производится при необходимости пересчета формул: 
-			при открытии документа если есть ячейки помеченные как пересчитываемые или есть ячейки без значения.
-	*/
-    this.buildDependency();
-	sortDependency(this);
+	if(!bNoBuildDep){
+		/*
+			buildDependency необходимо запускать для построения графа зависимостей между ячейками.
+			Сортировка графа производится при необходимости пересчета формул: 
+				при открытии документа если есть ячейки помеченные как пересчитываемые или есть ячейки без значения.
+		*/
+		this.buildDependency();
+		sortDependency(this);
+	}
 };
 Workbook.prototype.rebuildColors=function(){
 	g_oColorManager.rebuildColors();

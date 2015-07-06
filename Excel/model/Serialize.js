@@ -6856,6 +6856,8 @@
                         break;
                 }
             }
+            //todo инициализация формул из-за именованных диапазонов перенесена в wb.init ее надо вызывать в любом случае(Rev: 61959)
+            //надо вернуть чтение Binary_WorkbookTableReader, когда будем реализовывать копирования именованных диапазонов
             if(!this.copyPasteObj.isCopyPaste)
             {
                 if(null != nWorkbookTableOffset)
@@ -6865,6 +6867,8 @@
                         res = (new Binary_WorkbookTableReader(this.stream, wb)).Read();
                 }
                 wb.init();
+            } else {
+                wb.init(true);
             }
             return res;
         };
