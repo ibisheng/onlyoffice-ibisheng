@@ -2918,8 +2918,12 @@ function CorrectUniFill(asc_fill, unifill)
                 }
                 else if (undefined != _positions)
                 {
-                    if (_positions.length == ret.fill.colors.length)
+                    if (_positions.length <= ret.fill.colors.length)
                     {
+						if(_positions.length < ret.fill.colors.length)
+						{
+							ret.fill.colors.splice(_positions.length, ret.fill.colors.length - _positions.length);
+						}
                         for (var i = 0; i < _positions.length; i++)
                         {
                             ret.fill.colors[i].pos = _positions[i];
