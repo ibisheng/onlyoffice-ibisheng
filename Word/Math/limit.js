@@ -237,7 +237,7 @@ CMathFunc.prototype.GetFirstElement = function()
 };
 CMathFunc.prototype.setDistance = function()
 {
-    this.dW = this.Get_TxtPrControlLetter().FontSize/6*g_dKoef_pt_to_mm;
+    this.dW = this.Get_TxtPrControlLetter().FontSize*0.044;
 };
 CMathFunc.prototype.getFName = function()
 {

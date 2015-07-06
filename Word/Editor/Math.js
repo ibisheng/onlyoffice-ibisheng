@@ -219,8 +219,6 @@ CParaMathLineWidths.prototype.UpdateWidth = function(Line, W)
 {
     var bFastUpdate = false;
 
-    this.PrevMaxW = this.MaxW;
-
     if(Line >= this.Widths.length)
     {
         bFastUpdate = true;
@@ -259,6 +257,10 @@ CParaMathLineWidths.prototype.UpdateWidth = function(Line, W)
     }
 
     return bUpdMaxWidth;
+};
+CParaMathLineWidths.prototype.UpdatePrevMaxWidth = function()
+{
+    this.PrevMaxW = this.MaxW;
 };
 CParaMathLineWidths.prototype.SetWordLarge = function(Line, bWordLarge)
 {
@@ -441,6 +443,10 @@ CMathPageInfo.prototype.IsFirstPage = function(_Page)
 CMathPageInfo.prototype.GetStarLinetWidth = function()
 {
     return this.Info[0].LineWidths.GetFirst();
+};
+CMathPageInfo.prototype.UpdatePrevMaxWidth = function()
+{
+    this.Info[this.CurPage].LineWidths.UpdatePrevMaxWidth();
 };
 CMathPageInfo.prototype.UpdateCurrentWidth = function(_Line, Width)
 {
@@ -1232,13 +1238,6 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 };
 ParaMath.prototype.private_InitWrapSettings = function(PRS)
 {
-    //var ParaLine  = PRS.Line;
-    //var ParaRange = PRS.Range;
-
-    //var bFirstRange = this.Root.IsFirstRange(ParaLine, ParaRange);
-    //var PrevLineObject = PRS.RestartPageRecalcInfo.Object;
-    //if(PrevLineObject == null && true == bFirstRange && PRS.bFastRecalculate == false && this.ParaMathRPI.bInternalRanges == false)
-
     var XStart, XEnd, IndexRange;
 
     if(this.ParaMathRPI.bStartRanges == true)
@@ -1338,6 +1337,7 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
 
         this.private_UpdateXLimits(PRS);
 
+        this.PageInfo.UpdatePrevMaxWidth();
         this.private_RecalculateRoot(PRS, ParaPr, Depth);
 
         if(PRS.RecalcResult == recalcresult_PrevLine && PRS.Range < PRS.Ranges.length)
@@ -1610,35 +1610,12 @@ ParaMath.prototype.Refresh_RecalcData2 = function(Data)
 
 ParaMath.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
 {
-    // TODO переделать
-    if (true === this.NeedResize)
-    {
-        var RPI = new CRPI();
-        RPI.MergeMathInfo(this.ParaMathRPI);
+    var RPI = new CRPI();
+    RPI.MergeMathInfo(this.ParaMathRPI);
+    var ArgSize = new CMathArgSize();
 
-        this.Root.PreRecalc(null, this,  new CMathArgSize(), RPI);
-        this.Root.Resize(g_oTextMeasurer, RPI);
-
-        this.Width        = this.Root.size.width;
-    }
-
-    if ( false === MinMax.bWord )
-    {
-        MinMax.bWord    = true;
-        MinMax.nWordLen = this.Width;
-    }
-    else
-    {
-        MinMax.nWordLen += this.Width;
-    }
-
-    if ( MinMax.nSpaceLen > 0 )
-    {
-        MinMax.nCurMaxWidth += MinMax.nSpaceLen;
-        MinMax.nSpaceLen     = 0;
-    }
-
-    MinMax.nCurMaxWidth += this.Width;
+    this.Root.PreRecalc(null, this, ArgSize, RPI);
+    this.Root.Recalculate_MinMaxContentWidth(MinMax);
 };
 
 ParaMath.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRange)

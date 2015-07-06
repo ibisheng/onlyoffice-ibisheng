@@ -2230,15 +2230,21 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     {
                         if(X + SpaceLen + WordLen + LetterLen > XEnd)
                         {
-                            if(true === FirstItemOnLine && true === Para.Internal_Check_Ranges(ParaLine, ParaRange))
+                            if(true === FirstItemOnLine)
                             {
                                 // Слово оказалось единственным элементом в промежутке, и, все равно,
                                 // не умещается целиком. Делаем следующее:
                                 //
                                 // Для Формулы слово не разбиваем, перенос не делаем, пишем в одну строку (слово выйдет за границу как в Ворде)
 
-                                bMathWordLarge = true;
-
+                                if(false === Para.Internal_Check_Ranges(ParaLine, ParaRange)) // для случая, когда есть обтекание картинки
+                                {
+                                    NewRange = true;
+                                }
+                                else
+                                {
+                                    bMathWordLarge = true;
+                                }
                             }
                             else
                             {
@@ -2290,15 +2296,20 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     bNoOneBreakOperator = false;
 
-                    var bFirstItem = true === FirstItemOnLine && true === Para.Internal_Check_Ranges(ParaLine, ParaRange);
-
                     if(bOperInEndContent || bLowPriority)
                     {
                         if(X + SpaceLen + WordLen + BrkLen > XEnd)
                         {
-                            if(bFirstItem == true)
+                            if(true === FirstItemOnLine)
                             {
-                                bMathWordLarge = true;
+                                if(false === Para.Internal_Check_Ranges(ParaLine, ParaRange)) // для случая, когда есть обтекание картинки
+                                {
+                                    NewRange = true;
+                                }
+                                else
+                                {
+                                    bMathWordLarge = true;
+                                }
                             }
                             else
                             {
@@ -2314,33 +2325,47 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     }
                     else
                     {
-
                         bInsideOper = true;
 
                         var bOperBefore = this.ParaMath.Is_BrkBinBefore() == true;
                         var WorLenCompareOper = WordLen + X - XRange + (bOperBefore  ? SpaceLen : BrkLen);
 
-                        var bOverXEnd;
 
-                        if(bCompareOper && bFirstCompareOper == true && PRS.bCompareWrapIndent == true && WorLenCompareOper > PRS.WrapIndent && !(Word == false && bFirstItem == true)) // (Word == true && FirstItemOnLine == true) - не первый элемент в строке
+                        if(bCompareOper && bFirstCompareOper == true && PRS.bCompareWrapIndent == true && WorLenCompareOper > PRS.WrapIndent && !(Word == false && true === FirstItemOnLine)) // (Word == true && FirstItemOnLine == true) - не первый элемент в строке
                             bFirstCompareOper = false;
 
                         if(bOperBefore)  // оператор "до"
                         {
-                            bOverXEnd = X + WordLen + SpaceLen > XEnd;
-
-
-                            if(bOverXEnd && bFirstItem == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                            if(X + WordLen + SpaceLen > XEnd/*&& bFirstItem == false*/) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                             {
-                                MoveToLBP = true;
-                                NewRange = true;
+                                if(true === FirstItemOnLine)
+                                {
+                                    if(false === Para.Internal_Check_Ranges(ParaLine, ParaRange))
+                                    {
+                                        NewRange = true;
+                                    }
+                                    else if(Word == true)
+                                    {
+                                        bMathWordLarge = true;
+                                    }
+                                    else
+                                    {
+                                        SpaceLen += BrkLen - Item.GapLeft;
+                                    }
+                                }
+                                else
+                                {
+                                    MoveToLBP = true;
+                                    NewRange = true;
+                                }
+
                             }
                             else
                             {
                                 if(Word == true)
                                 {
-                                    if(bOverXEnd) // FirstItemOnLine == true
-                                        bMathWordLarge = true;
+                                    /*if(bOverXEnd) // FirstItemOnLine == true
+                                        bMathWordLarge = true;*/
 
                                     X += SpaceLen + WordLen;
                                     PRS.Set_LineBreakPos(Pos);
@@ -2355,7 +2380,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                     if(SpaceLen !== 0)
                                         FirstItemOnLine = false;
 
-                                    if(bFirstItem == false)
+                                    if(FirstItemOnLine == false)
                                     {
                                         PRS.Set_LineBreakPos(Pos);
                                     }
@@ -2369,25 +2394,39 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         }
                         else   // оператор "после"
                         {
-                            bOverXEnd = X + WordLen + BrkLen - Item.GapRight > XEnd;
+                            /*bOverXEnd = X + WordLen + BrkLen - Item.GapRight > XEnd;*/
 
-                            if(bOverXEnd && bFirstItem == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                            if(X + WordLen + BrkLen - Item.GapRight > XEnd/* && bFirstItem == false*/) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                             {
-                                MoveToLBP = true;
-                                NewRange = true;
+                                if(true === FirstItemOnLine)
+                                {
+                                    if(false === Para.Internal_Check_Ranges(ParaLine, ParaRange))
+                                    {
+                                        NewRange = true;
+                                    }
+                                    else
+                                    {
+                                        bMathWordLarge = true;
+                                    }
+                                }
+                                else
+                                {
+                                    MoveToLBP = true;
+                                    NewRange = true;
 
-                                if(Word == false)
-                                    PRS.Set_LineBreakPos(Pos);
+                                    if(Word == false)
+                                        PRS.Set_LineBreakPos(Pos);
+                                }
                             }
                             else
                             {
                                 // осуществляем здесь, чтобы не изменить GapRight в случае, когда новое слово не убирается на break_Operator
                                 OperGapRight = Item.GapRight;
 
-                                if(bOverXEnd) // FirstItemOnLine == true
+                                /*if(bOverXEnd) // FirstItemOnLine == true
                                 {
                                     bMathWordLarge = true;
-                                }
+                                }*/
 
                                 X += BrkLen + WordLen;
 
@@ -3584,7 +3623,25 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
 
                 break;
             }
+            case para_Math_Text:
+            case para_Math_Ampersand:
+            case para_Math_Placeholder:
+            {
+                var ItemWidth = Item.Get_Width() / TEXTWIDTH_DIVIDER;
+                if ( false === bWord )
+                {
+                    bWord    = true;
+                    nWordLen = ItemWidth;
+                }
+                else
+                {
+                    nWordLen += ItemWidth;
+                }
 
+                nCurMaxWidth += ItemWidth;
+
+                break;
+            }
             case para_Space:
             {
                 if ( true === bWord )
@@ -3600,6 +3657,21 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
                 // пробелы, идущие в конце параграфа или перед переносом строки(явным), не
                 // должны учитываться.
                 nSpaceLen += Item.Width / TEXTWIDTH_DIVIDER;//nSpaceLen += Item.Get_Width();
+
+                break;
+            }
+            case para_Math_BreakOperator:
+            {
+                if ( true === bWord )
+                {
+                    if ( nMinWidth < nWordLen )
+                        nMinWidth = nWordLen;
+
+                    bWord    = false;
+                    nWordLen = 0;
+                }
+
+                nCurMaxWidth += Item.Get_Width() / TEXTWIDTH_DIVIDER;
 
                 break;
             }

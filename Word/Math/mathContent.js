@@ -3661,48 +3661,6 @@ CMathContent.prototype.Select_All = function(Direction)
         this.Content[nPos].Select_All(Direction);
     }
 };
-CMathContent.prototype.old_Selection_DrawRange = function(_CurLine, _CurRange, SelectionDraw)
-{
-    var Start = this.Selection.Start;
-    var End   = this.Selection.End;
-
-    if(Start > End)
-    {
-        Start = this.Selection.End;
-        End   = this.Selection.Start;
-    }
-
-    SelectionDraw.StartX += this.pos.x;
-
-    var PointsInfo = new CMathPointInfo();
-    PointsInfo.SetInfoPoints(this.InfoPoints);
-
-    var bDrawSelection = false;
-    for(var nPos = 0, nCount = this.Content.length; nPos < nCount; nPos++)
-    {
-        bDrawSelection = nPos >= Start && nPos <= End ? true : false;
-
-        if(para_Math_Run === this.Content[nPos].Type)
-            this.Content[nPos].Selection_DrawRange(_CurLine, _CurRange, SelectionDraw, PointsInfo);
-        else
-        {
-            if(true === bDrawSelection)
-            {
-                SelectionDraw.W += this.Content[nPos].size.width;
-                SelectionDraw.FindStart = false;
-            }
-            else if(true === SelectionDraw.FindStart)
-                SelectionDraw.StartX += this.Content[nPos].size.width;
-        }
-    }
-
-    // Выставляем высоту селекта. В верхнем контенте высота задается параграфом
-    if(true !== this.bRoot)
-    {
-        SelectionDraw.StartY = this.ParaMath.Y + this.pos.y;
-        SelectionDraw.H      = this.size.height;
-    }
-};
 CMathContent.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionDraw)
 {
     var SelectionStartPos = this.Selection.Start;
@@ -3885,7 +3843,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var Brk_Before = this.ParaMath.Is_BrkBinBefore();
 
     // для внутристроковой формулы : начало формулы - начало нового слова
-    if(this.bRoot && bInline && RangeStartPos == 0)
+    if(this.bRoot && bInline && true == this.IsFirstRange(PRS.Line, PRS.Range))
     {
         PRS.Update_CurPos(0, Depth);
         PRS.Update_CurPos(0, Depth+1); // нулевой элемент всегда Run
@@ -3945,6 +3903,8 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             var _Depth = PRS.PosEndRun.Depth;
             var PrevLastPos = PRS.PosEndRun.Get(_Depth-1),
                 LastPos     = PRS.PosEndRun.Get(_Depth);
+
+            var PrevWord = PRS.Word;
 
             Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
 
@@ -4018,7 +3978,8 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     var bInsideOperator = Item.bOneLine == false && PRS.bInsideOper == true;
 
                     // обновляем BreakPos на конец Run, т.к. внутри мат объекта BreakPos  может измениться на  if(true !== Word)
-                    if(Brk_Before == false && bNoOneBreakOperator == false && bInsideOperator == false)
+                    // обновляем только в том случае, если Word = false, иначе можем здесь перебить корректный LineBreakPos
+                    if(PrevWord == false && Brk_Before == false && bNoOneBreakOperator == false && bInsideOperator == false)
                     {
                         // обновим : начало нового слова - конец предыдущего Run
 

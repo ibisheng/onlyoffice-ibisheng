@@ -477,7 +477,6 @@ CNary.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         var RangeStartPos = this.protected_AddRange(CurLine, CurRange),
             RangeEndPos = 2;
 
-        //this.VerifyWordLen(PRS);
 
         if(CurLine == 0 && CurRange == 0)
         {
@@ -508,6 +507,19 @@ CNary.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             }
 
             PRS.WordLen += this.dW;
+
+            if(PRS.X + PRS.SpaceLen + PRS.WordLen > PRS.XEnd)
+            {
+                var _Depth = PRS.PosEndRun.Depth;
+                var PrevLastPos = PRS.PosEndRun.Get(_Depth-1),
+                    LastPos     = PRS.PosEndRun.Get(_Depth);
+
+                PRS.Update_CurPos(PrevLastPos, _Depth-1);
+                PRS.Set_LineBreakPos(LastPos);
+                PRS.MoveToLBP = true;
+                PRS.NewRange = true;
+                return;
+            }
 
             this.Arg.Recalculate_Reset(PRS.Range, PRS.Line, PRS); // обновим StartLine и StartRange
         }

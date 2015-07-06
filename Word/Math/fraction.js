@@ -112,7 +112,7 @@ CFraction.prototype.drawSkewedFraction = function(PDSE)
 {
     var mgCtrPrp = this.Get_TxtPrControlLetter();
 
-    var penW = mgCtrPrp.FontSize/12.5*g_dKoef_pix_to_mm;
+    var penW = mgCtrPrp.FontSize*0.0211;
 
     var gap = this.dW/2 - penW/7.5;
     var plh = 9.877777777777776 * mgCtrPrp.FontSize / 36;
@@ -219,7 +219,7 @@ CFraction.prototype.drawLinearFraction = function(PDSE)
         y2 = Y + this.size.height;
 
     var mgCtrPrp = this.Get_TxtPrControlLetter();
-    var penW = mgCtrPrp.FontSize/12.5*g_dKoef_pix_to_mm;
+    var penW = mgCtrPrp.FontSize*0.0211;
 
     PDSE.Graphics.SetFont(mgCtrPrp);
     PDSE.Graphics.p_width(penW*1000);
