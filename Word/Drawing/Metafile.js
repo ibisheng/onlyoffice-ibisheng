@@ -548,6 +548,13 @@ function CMemory(bIsNoInit)
         this.CheckSize(1);
         this.data[this.pos++] = val;
     }
+    this.WriteSByte = function(val)
+    {
+        this.CheckSize(1);
+        if (val < 0)
+            val += 256;
+        this.data[this.pos++] = val;
+    }
     this.WriteLong = function(val)
     {
         this.CheckSize(4);

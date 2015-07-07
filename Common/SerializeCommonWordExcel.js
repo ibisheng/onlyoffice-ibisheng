@@ -548,6 +548,14 @@ FT_Stream2.prototype.GetUChar = function() {
 		return 0;
 	return this.data[this.cur++];
 };
+FT_Stream2.prototype.GetChar = function() {
+	if (this.cur >= this.size)
+        return 0;
+    var m = this.data[this.cur++];
+    if (m > 127)
+        m -= 256;
+    return m;
+};
 FT_Stream2.prototype.GetByte = function() {
 	return this.GetUChar();
 };

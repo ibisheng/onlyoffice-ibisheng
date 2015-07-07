@@ -1097,7 +1097,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 			oAdditionalData["data"] = oBinaryFileWriter.Write();
 			var t = this;
-			g_fSaveWithParts(function(fCallback1, oAdditionalData1){sendCommand2(fCallback1,  this.fCallbackSendCommand, oAdditionalData1);},
+			g_fSaveWithParts(function(fCallback1, oAdditionalData1){sendCommand2(fCallback1,  t.fCallbackSendCommand, oAdditionalData1);},
 				function (incomeObject) {
 					if(null != incomeObject && "save" == incomeObject["type"])
 						t.asc_processSavedFile(incomeObject["data"], false);
@@ -1124,7 +1124,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			oAdditionalData["innersave"] = true;
 			oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 			oAdditionalData["data"] = data;
-			g_fSaveWithParts(function(fCallback1, oAdditionalData1){sendCommand2(fCallback1, this.fCallbackSendCommand, oAdditionalData1);}, /*callback*/ function(incomeObject){
+			g_fSaveWithParts(function(fCallback1, oAdditionalData1){sendCommand2(fCallback1, that.fCallbackSendCommand, oAdditionalData1);}, /*callback*/ function(incomeObject){
 				if(null != incomeObject && "save" == incomeObject["type"])
 					that.asc_processSavedFile(incomeObject["data"], true);
 			}, oAdditionalData);
@@ -1174,7 +1174,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				}
 			}
 			var t = this;
-			g_fSaveWithParts(function(fCallback1, oAdditionalData1){sendCommand2(fCallback1, this.fCallbackSendCommand, oAdditionalData1);}, fCallback, oAdditionalData);
+			g_fSaveWithParts(function(fCallback1, oAdditionalData1){sendCommand2(fCallback1, t.fCallbackSendCommand, oAdditionalData1);}, fCallback, oAdditionalData);
 		};
 
 

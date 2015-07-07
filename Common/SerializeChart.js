@@ -4927,7 +4927,7 @@ BinaryChartWriter.prototype.WriteCT_RotX = function (oVal) {
     var oThis = this;
     if (null != oVal) {
         this.bs.WriteItem(c_oserct_rotxVAL, function () {
-            oThis.memory.WriteByte(oVal);
+            oThis.memory.WriteSByte(oVal);
         });
     }
 }
@@ -10569,7 +10569,7 @@ BinaryChartReader.prototype.ReadCT_RotX = function (type, length, val) {
     var oThis = this;
     if (c_oserct_rotxVAL === type) {
         var oNewVal;
-        oNewVal = this.stream.GetUChar();
+        oNewVal = this.stream.GetChar();
         val.m_val = oNewVal;
     }
     else
