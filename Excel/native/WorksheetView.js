@@ -172,18 +172,26 @@ WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFr
     //console.log('range c1: ' + range.c1 + ' r1: ' + range.r1 + ' c2: ' + range.c2 + ' r2: ' + range.r2);
 
     var arn = (!this.isSelectionDialogMode) ? this.activeRange.clone(true) : this.copyActiveRange.clone(true);
-    var x1 = (range) ? (this.cols[range.c1].left - offsetX - this.width_1px) : 0;
-    var x2 = (range) ? (this.cols[range.c2].left + this.cols[range.c2].width - offsetX - this.width_1px) : 0;
+    var x1 = (range) ? (this.cols[range.c1].left - offsetX - this.width_1px* 0) : 0;
+    var x2 = (range) ? (this.cols[range.c2].left + this.cols[range.c2].width - offsetX - this.width_1px * 0) : 0;
     var y1 = (range) ? (this.rows[range.r1].top - offsetY) : 0;
-    var y2 = (range) ? (this.rows[range.r2].top + this.rows[range.r2].height - offsetY - this.height_1px) : 0;
+    var y2 = (range) ? (this.rows[range.r2].top + this.rows[range.r2].height - offsetY - this.height_1px * 0) : 0;
     var drawLeftSide   = (range) ? (range.c1 === arn.c1) : false;
     var drawRightSide  = (range) ? (range.c2 === arn.c2) : false;
     var drawTopSide    = (range) ? (range.r1 === arn.r1) : false;
     var drawBottomSide = (range) ? (range.r2 === arn.r2) : false;
     var l, t, r, b, cr;
     // Размеры "квадрата" автозаполнения
-    var fillHandleWidth = 2 * this.width_2px + this.width_1px;
-    var fillHandleHeight = 2 * this.height_2px + this.height_1px;
+    //var fillHandleWidth = 2 * this.width_2px + this.width_1px;
+    //var fillHandleHeight = 2 * this.height_2px + this.height_1px;
+
+    native_selection = [
+        this.cols[range.c1].left - offsetX,
+        this.rows[range.r1].top - offsetY,
+        this.cols[range.c2].left + this.cols[range.c2].width - offsetX,
+        this.rows[range.r2].top + this.rows[range.r2].height - offsetY,
+        this.activeRange.type
+    ];
 
     // Координаты выделения для автозаполнения
     var xFH1 = 0;
@@ -203,10 +211,10 @@ WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFr
     //	.clip();
 
     // draw frame around cells range
-    l = drawLeftSide ? -this.width_1px : 0;
-    r = drawRightSide ? this.width_1px : 0;
-    t = drawTopSide ? -this.height_1px : 0;
-    b = drawBottomSide ? this.height_2px : 0;
+    l = drawLeftSide ? -this.width_1px* 0 : 0;
+    r = drawRightSide ? this.width_1px* 0 : 0;
+    t = drawTopSide ? -this.height_1px* 0 : 0;
+    b = drawBottomSide ? this.height_2px* 0 : 0;
 
     //ctx.setStrokeStyle(opt.activeCellBorderColor)
     //	.setLineWidth(3)
@@ -269,7 +277,6 @@ WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFr
         //		}
         //		break;
         //}
-
         //ctx.stroke();
     } else {
         // Автозаполнения нет, просто рисуем обводку
@@ -286,7 +293,8 @@ WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFr
         //	//ctx.lineVer(x2, y1 + t, y2 + b - fillHandleHeight);
         //}
 
-        native_selection = [x1, y1, x2, y2, this.activeRange.type];
+       // native_selection = [x1, y1, x2, y2, this.activeRange.type];
+
         //return [x1, y1, x2, y2, this.activeRange.type ];
     }
 
@@ -294,17 +302,17 @@ WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFr
 
     // draw cells overlay
     if (range) {
-        var lRect = x1 + (drawLeftSide ? this.width_3px : this.width_1px),
-            rRect = x2 - (drawRightSide ? this.width_2px : 0),
-            tRect = y1 + (drawTopSide ? this.height_2px : 0),
-            bRect = y2 - (drawBottomSide ? this.width_2px : 0);
+        var lRect = x1 + (drawLeftSide ? this.width_3px* 0 : this.width_1px* 0),
+            rRect = x2 - (drawRightSide ? this.width_2px* 0 : 0),
+            tRect = y1 + (drawTopSide ? this.height_2px* 0 : 0),
+            bRect = y2 - (drawBottomSide ? this.width_2px* 0 : 0);
         //ctx.setFillStyle( opt.activeCellBackground )
         //	.fillRect(lRect, tRect, rRect - lRect, bRect - tRect);
 
-        var lRect2 = x1 + (drawLeftSide ? this.width_2px : this.width_1px),
-            rRect2 = x2 - (drawRightSide ? this.width_2px : 0),
-            tRect2 = y1 + (drawTopSide ? this.height_1px : 0),
-            bRect2 = y2 - (drawBottomSide ? this.width_2px : 0);
+        var lRect2 = x1 + (drawLeftSide ? this.width_2px* 0 : this.width_1px* 0),
+            rRect2 = x2 - (drawRightSide ? this.width_2px* 0 : 0),
+            tRect2 = y1 + (drawTopSide ? this.height_1px* 0 : 0),
+            bRect2 = y2 - (drawBottomSide ? this.width_2px* 0 : 0);
         //ctx.setStrokeStyle(opt.activeCellBorderColor2).setLineWidth(1).beginPath()
         //	.strokeRect(lRect2, tRect2, rRect2 - lRect2, bRect2 - tRect2);
 
@@ -314,9 +322,9 @@ WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFr
         cr = range.intersection(null !== cr ? cr : new asc_Range(firstCell.startCol, firstCell.startRow, firstCell.startCol, firstCell.startRow));
         if (cr !== null) {
             //ctx.save().beginPath().rect(lRect, tRect, rRect - lRect, bRect - tRect).clip();
-            var _l = this.cols[cr.c1].left - offsetX - this.width_1px,
+            var _l = this.cols[cr.c1].left - offsetX - this.width_1px* 0,
                 _r = this.cols[cr.c2].left + this.cols[cr.c2].width - offsetX,
-                _t = this.rows[cr.r1].top - offsetY - this.height_1px,
+                _t = this.rows[cr.r1].top - offsetY - this.height_1px* 0,
                 _b = this.rows[cr.r2].top + this.rows[cr.r2].height - offsetY;
             //ctx.clearRect(_l, _t, _r - _l, _b - _t).restore();
 
@@ -326,7 +334,7 @@ WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFr
             native_selection.push(_b);
         }
 
-        if (!(isFrozen && (!drawRightSide || !drawBottomSide))) {
+        //if (!(isFrozen && (!drawRightSide || !drawBottomSide))) {
             // Рисуем "квадрат" для автозаполнения (располагается "квадрат" в правом нижнем углу последней ячейки выделения)
             //cr = range.intersection(new asc_Range(range.c2, range.r2, range.c2, range.r2));
             //if (cr !== null) {
@@ -342,7 +350,7 @@ WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFr
             //	ctx.lineVerPrevPx(this.fillHandleL, this.fillHandleT, this.fillHandleB);
             //	ctx.stroke();
             //}
-        }
+        //}
     }
 
     return native_selection;

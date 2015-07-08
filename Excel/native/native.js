@@ -1778,6 +1778,11 @@ function offline_apply_event(type,params) {
             }
             break;
         }
+        case 3010:
+        {
+            _api.asc_emptyCells(params);
+            break;
+        }
         default:
             break;
     }
