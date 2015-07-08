@@ -3715,7 +3715,7 @@ parserFormula.prototype = {
             else if ( ref instanceof cArea3D ) {
                 var wsR = ref.wsRange();
                 for ( var j = 0; j < wsR.length; j++ )
-                    aOutRef.push( {wsId:wsR[a].Id, cell:ref._cells} );
+                    aOutRef.push( {wsId:wsR[j].Id, cell:ref._cells} );
             }
         }
         return aOutRef;
