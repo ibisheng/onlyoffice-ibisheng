@@ -142,7 +142,6 @@
                 "../../Word/Math/borderBox.js",
                 "../../Excel/utils/utils.js",
                 "../../Excel/model/CellComment.js",
-				"../../Excel/model/Private/CellComment.js",
                 "../../Excel/model/Serialize.js",
                 "../../Excel/model/WorkbookElems.js",
                 "../../Excel/model/Workbook.js",

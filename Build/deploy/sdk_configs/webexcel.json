@@ -66,7 +66,6 @@
                 "../../Excel/model/History.js",
                 "../../Excel/model/UndoRedo.js",
                 "../../Excel/model/CellComment.js",
-				"../../Excel/model/Private/CellComment.js",
                 "../../Excel/view/mobileTouch.js",
                 "../../Excel/view/iscroll.js",
                 "../../Excel/view/PopUpSelector.js",
@@ -74,7 +73,6 @@
                 "../../Excel/view/CellTextRender.js",
                 "../../Excel/view/CellEditorView.js",
                 "../../Excel/view/WorksheetView.js",
-				"../../Excel/view/Private/WorksheetView.js",
                 "../../Excel/view/HandlerList.js",
                 "../../Excel/view/EventsController.js",
                 "../../Excel/view/WorkbookView.js",
@@ -207,7 +205,6 @@
                     "model/AdvancedOptions.js",
                     "model/CellInfo.js",
                     "model/CellComment.js",
-					"model/Private/CellComment.js",
                     "utils/utils.js",
                     "css/*.css"
                 ],
