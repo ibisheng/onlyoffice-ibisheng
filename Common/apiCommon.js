@@ -24,6 +24,8 @@
 				return new asc_CAscEditorPermissions();
 			}
 			if(settings) {
+				this.canLicense = settings["canLicense"];
+
 				this.canEdit = settings["canEdit"];
 				this.canDownload = settings["canDownload"];
 				this.canCoAuthoring = settings["canCoAuthoring"];
@@ -47,6 +49,8 @@
 
 		asc_CAscEditorPermissions.prototype = {
 			constructor: asc_CAscEditorPermissions,
+			asc_getCanLicense: function(){ return this.canLicense; },
+
 			asc_getCanEdit: function(){ return this.canEdit; },
 			asc_getCanDownload: function(){ return this.canDownload; },
 			asc_getCanCoAuthoring: function(){ return this.canCoAuthoring; },
@@ -55,6 +59,8 @@
 			asc_getIsAutosaveEnable: function(){ return this.isAutosaveEnable; },
 			asc_getAutosaveMinInterval: function(){ return this.AutosaveMinInterval; },
 			asc_getIsAnalyticsEnable: function(){ return this.isAnalyticsEnable; },
+
+			asc_setCanLicense: function(v){ this.canLicense = v; },
 
 			asc_setCanEdit: function(v){ this.canEdit = v; },
 			asc_setCanDownload: function(v){ this.canDownload = v; },
@@ -74,6 +80,8 @@
 		window["Asc"].asc_CAscEditorPermissions = asc_CAscEditorPermissions;
 		
 		prot = asc_CAscEditorPermissions.prototype;
+		prot["asc_getCanLicense"]			= prot.asc_getCanLicense;
+
 		prot["asc_getCanEdit"]				= prot.asc_getCanEdit;
 		prot["asc_getCanDownload"]			= prot.asc_getCanDownload;
 		prot["asc_getCanCoAuthoring"]		= prot.asc_getCanCoAuthoring;
