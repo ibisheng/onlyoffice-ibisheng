@@ -10,6 +10,7 @@
     "concat_api": {
         "../../Word/api-all.js": [
             "../../Word/api.js",
+			"../../Word/Private/api.js",
             "../../Word/apiCommon.js"
         ]
     },
@@ -186,6 +187,7 @@
                 "cwd": "../../Word/",
                 "src": [
                     "api.js",
+					"Private/api.js",
                     "apiCommon.js",
                     "apiDefines.js"
                 ],
