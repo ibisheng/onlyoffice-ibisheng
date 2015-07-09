@@ -2641,12 +2641,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		// Cell comment interface
 		spreadsheet_api.prototype.asc_addComment = function(oComment) {
-			if (oComment.bDocument)
-				this.wb.cellCommentator.asc_addComment(oComment);
-			else {
-				var ws = this.wb.getWorksheet();
-				ws.cellCommentator.asc_addComment(oComment);
-			}
 		};
 
 		spreadsheet_api.prototype.asc_changeComment = function(id, oComment) {

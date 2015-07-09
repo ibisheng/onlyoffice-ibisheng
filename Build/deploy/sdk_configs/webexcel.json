@@ -157,7 +157,8 @@
                 "../../Excel/model/DrawingObjects/GlobalCounters.js",
                 "../../Word/apiCommon.js",
                 "../../Excel/Build/Log/apiCommonExport.js",
-                "../../Excel/api.js"
+                "../../Excel/api.js",
+				"../../Excel/Private/api.js"
             ],
             "dst": "../../Excel/sdk-all.js",
             "externs": [
@@ -199,6 +200,7 @@
                 "cwd": "../../Excel/",
                 "src": [
                     "api.js",
+					"Private/api.js",
                     "apiDefines.js",
                     "view/EventsController.js",
                     "view/HandlerList.js",
