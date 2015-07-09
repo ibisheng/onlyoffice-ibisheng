@@ -10,6 +10,7 @@
     "concat_api": {
         "../../PowerPoint/api-all.js": [
             "../../PowerPoint/api.js",
+			"../../PowerPoint/Private/api.js",
             "../../PowerPoint/apiCommon.js",
             "../../Word/apiCommon.js"
         ]
@@ -200,6 +201,7 @@
                 "cwd": "../../PowerPoint/",
                 "src": [
                     "api.js",
+					"Private/api.js",
                     "apiCommon.js",
                     "apiDefines.js"
                 ],
