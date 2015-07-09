@@ -2209,14 +2209,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         // 2) В противном случае, проверяем убирается ли слово в промежутке.
 
                         // Если слово только началось, и до него на строке ничего не было, и в строке нет разрывов, тогда не надо проверять убирается ли оно на строке.
-                        /*if (true !== FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange))
-                        {
-                            if (X + SpaceLen + LetterLen > XEnd)
-                            {
-                                NewRange = true;
-                                RangeEndPos = Pos;
-                            }
-                        }*/
 
                         if(X + SpaceLen + LetterLen > XEnd)
                         {
@@ -2233,7 +2225,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                         if(true !== NewRange)
                         {
-                            PRS.Set_LineBreakPos(Pos);
+                            if(this.Parent.bRoot == true)
+                                PRS.Set_LineBreakPos(Pos);
+                            
                             WordLen += LetterLen;
                             Word = true;
                         }
@@ -2386,8 +2380,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         }
                         else   // оператор "после"
                         {
-                            /*bOverXEnd = X + WordLen + BrkLen - Item.GapRight > XEnd;*/
-
                             if(X + WordLen + BrkLen - Item.GapRight > XEnd/* && bFirstItem == false*/) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                             {
                                 if(true === FirstItemOnLine)
