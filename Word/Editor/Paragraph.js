@@ -13685,6 +13685,7 @@ function CParagraphMinMaxContentWidth()
     this.nMinWidth    = 0;
     this.nMaxWidth    = 0;
     this.nCurMaxWidth = 0;
+    this.bMath_OneLine = false; // for ParaMath
 }
 
 function CParagraphRangeVisibleWidth()

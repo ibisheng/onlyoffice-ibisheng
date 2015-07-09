@@ -1173,7 +1173,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.private_InitWrapSettings(PRS);
     }
 
-    if(bUpdateWrapMath == true && this.ParaMathRPI.bInternalRanges == false)
+    if(bUpdateWrapMath == true && this.ParaMathRPI.bInternalRanges == false &&  PRS.bFastRecalculate == false)
     {
         this.ParaMathRPI.bInternalRanges = true;
 
@@ -1222,6 +1222,13 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         }
 
         this.private_RecalculateRoot(PRS, ParaPr, Depth);
+
+        if(PRS.bMathWordLarge && this.ParaMathRPI.bInline == true && PRS.Ranges.length > 0)
+        {
+            this.Root.Math_Set_EmptyRange(PRS);
+            PRS.bMathWordLarge = false;
+            PRS.NewRange = true;
+        }
 
         var WrapState = this.PageInfo.GetCurrentWrapState();
         var bWordLarge =  PRS.bMathWordLarge == true && WrapState == ALIGN_EMPTY;
@@ -1382,6 +1389,10 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
 
     this.ParaMathRPI.UpdateInfoLine(PRS);
 };
+ParaMath.prototype.Set_EmptyRange = function(PRS)
+{
+    this.Root.Math_Set_EmptyRange(PRS);
+};
 ParaMath.prototype.private_SetBreakRecalculate = function(PRS)
 {
     this.ParaMathRPI.NeedStartRecalc(this.Root.StartLine, this.Root.StartRange);
@@ -1541,6 +1552,7 @@ ParaMath.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange
 };
 ParaMath.prototype.Recalculate_PageEndInfo = function(PRSI, _CurLine, _CurRange)
 {
+
 };
 ParaMath.prototype.Save_RecalculateObject = function(Copy)
 {

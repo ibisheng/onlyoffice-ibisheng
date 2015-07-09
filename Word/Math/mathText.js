@@ -748,7 +748,6 @@ CMathText.prototype.PreRecalc = function(Parent, ParaMath)
 
     this.bUpdateGaps = false;
 };
-
 CMathText.prototype.Draw = function(x, y, pGraphics, InfoTextPr)
 {
     var X = this.pos.x + x,

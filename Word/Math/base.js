@@ -1779,7 +1779,6 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         var CurLine  = PRS.Line - this.StartLine;
         var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
 
-
         this.setDistance();
 
         var Numb = this.NumBreakContent;
@@ -1792,7 +1791,6 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         {
             PRS.WordLen += this.BrGapLeft;
         }
-
 
         for(var Pos = RangeStartPos; Pos < Len; Pos++)
         {
@@ -1829,7 +1827,7 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             }
 
             if(PRS.NewRange == false && Pos < Len - 1)
-                PRS.WordLen += this.dW
+                PRS.WordLen += this.dW;
         }
 
 
@@ -1842,6 +1840,100 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     }
 
     PRS.bMath_OneLine = bOneLine;
+};
+CMathBase.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
+{
+    var bOneLine = MinMax.bMath_OneLine;
+
+    if(this.kind !== MATH_DELIMITER)
+    {
+        this.BrGapLeft  = this.GapLeft;
+        this.BrGapRight = this.GapRight;
+    }
+
+    if(this.bCanBreak == false || MinMax.bMath_OneLine == true)
+    {
+        MinMax.bMath_OneLine = true;
+
+        for(var i=0; i < this.nRow; i++)
+        {
+            for(var j = 0; j < this.nCol; j++)
+            {
+                var Item = this.elements[i][j];
+
+                if(Item.IsJustDraw()) // для Just-Draw элементов надо выставить Font
+                {
+                    this.MeasureJustDraw(Item);
+                }
+                else
+                {
+                    Item.Recalculate_MinMaxContentWidth(MinMax);
+                }
+            }
+        }
+
+        this.recalculateSize(g_oTextMeasurer);
+
+        var width = this.size.width;
+
+        if(false === MinMax.bWord)
+        {
+            MinMax.bWord    = true;
+            MinMax.nWordLen = width;
+        }
+        else
+        {
+            MinMax.nWordLen += width;
+        }
+
+        MinMax.nCurMaxWidth += width;
+    }
+    else
+    {
+        this.setDistance();
+
+        var Numb = this.NumBreakContent;
+        var Len = this.Content.length;
+
+        if(false === MinMax.bWord)
+        {
+            MinMax.bWord    = true;
+            MinMax.nWordLen = this.BrGapLeft;
+        }
+        else
+        {
+            MinMax.nWordLen += this.BrGapLeft;
+        }
+
+        MinMax.nCurMaxWidth += this.BrGapLeft;
+
+
+        for(var Pos = 0; Pos < Len; Pos++)
+        {
+            var Item = this.Content[Pos];
+
+            MinMax.bMath_OneLine = Pos !== Numb;
+            Item.Recalculate_MinMaxContentWidth(MinMax);
+
+            if(Pos !== Numb)
+            {
+                MinMax.nWordLen += Item.size.width;
+                MinMax.nCurMaxWidth += Item.size.width;
+            }
+
+            if(Pos < Len - 1)
+            {
+                MinMax.nWordLen += this.dW;
+                MinMax.nCurMaxWidth += this.dW;
+            }
+        }
+
+        MinMax.nWordLen += this.BrGapRight;
+        MinMax.nCurMaxWidth += this.BrGapRight;
+
+    }
+
+    MinMax.bMath_OneLine = bOneLine;
 };
 CMathBase.prototype.MeasureJustDraw = function(Item)
 {

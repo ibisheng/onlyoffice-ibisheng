@@ -437,16 +437,11 @@ CRadical.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo
 
     this.ApplyProperties(RPI);
 
-    if(this.Pr.type == SQUARE_RADICAL)
-        this.RealBase.PreRecalc(this, ParaMath, ArgSize, RPI);
-    else
-    {
-        var ArgSzIter = new CMathArgSize();
-        ArgSzIter.SetValue(-2);
+    var ArgSzIter = new CMathArgSize();
+    ArgSzIter.SetValue(-2);
 
-        this.Iterator.PreRecalc(this, ParaMath, ArgSzIter, RPI);
-        this.RealBase.PreRecalc(this, ParaMath, ArgSize, RPI);
-    }
+    this.Iterator.PreRecalc(this, ParaMath, ArgSzIter, RPI);
+    this.RealBase.PreRecalc(this, ParaMath, ArgSize, RPI);
 
     if(this.bInside == false)
         GapsInfo.setGaps(this, this.TextPrControlLetter.FontSize);

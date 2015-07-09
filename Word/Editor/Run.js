@@ -2209,9 +2209,22 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         // 2) В противном случае, проверяем убирается ли слово в промежутке.
 
                         // Если слово только началось, и до него на строке ничего не было, и в строке нет разрывов, тогда не надо проверять убирается ли оно на строке.
-                        if (true !== FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange))
+                        /*if (true !== FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange))
                         {
                             if (X + SpaceLen + LetterLen > XEnd)
+                            {
+                                NewRange = true;
+                                RangeEndPos = Pos;
+                            }
+                        }*/
+
+                        if(X + SpaceLen + LetterLen > XEnd)
+                        {
+                            if(true == FirstItemOnLine)
+                            {
+                                NewRange = true;
+                            }
+                            else if(FirstItemOnLine == false)
                             {
                                 NewRange = true;
                                 RangeEndPos = Pos;
@@ -2237,14 +2250,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 //
                                 // Для Формулы слово не разбиваем, перенос не делаем, пишем в одну строку (слово выйдет за границу как в Ворде)
 
-                                if(false === Para.Internal_Check_Ranges(ParaLine, ParaRange)) // для случая, когда есть обтекание картинки
-                                {
-                                    NewRange = true;
-                                }
-                                else
-                                {
-                                    bMathWordLarge = true;
-                                }
+                                bMathWordLarge = true;
                             }
                             else
                             {
@@ -2302,14 +2308,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         {
                             if(true === FirstItemOnLine)
                             {
-                                if(false === Para.Internal_Check_Ranges(ParaLine, ParaRange)) // для случая, когда есть обтекание картинки
-                                {
-                                    NewRange = true;
-                                }
-                                else
-                                {
-                                    bMathWordLarge = true;
-                                }
+                                bMathWordLarge = true;
                             }
                             else
                             {
@@ -2340,11 +2339,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             {
                                 if(true === FirstItemOnLine)
                                 {
-                                    if(false === Para.Internal_Check_Ranges(ParaLine, ParaRange))
-                                    {
-                                        NewRange = true;
-                                    }
-                                    else if(Word == true)
+                                    if(Word == true)
                                     {
                                         bMathWordLarge = true;
                                     }
@@ -2364,9 +2359,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             {
                                 if(Word == true)
                                 {
-                                    /*if(bOverXEnd) // FirstItemOnLine == true
-                                        bMathWordLarge = true;*/
-
                                     X += SpaceLen + WordLen;
                                     PRS.Set_LineBreakPos(Pos);
                                     EmptyLine = false;
@@ -2400,14 +2392,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             {
                                 if(true === FirstItemOnLine)
                                 {
-                                    if(false === Para.Internal_Check_Ranges(ParaLine, ParaRange))
-                                    {
-                                        NewRange = true;
-                                    }
-                                    else
-                                    {
-                                        bMathWordLarge = true;
-                                    }
+                                    bMathWordLarge = true;
                                 }
                                 else
                                 {
@@ -2422,11 +2407,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             {
                                 // осуществляем здесь, чтобы не изменить GapRight в случае, когда новое слово не убирается на break_Operator
                                 OperGapRight = Item.GapRight;
-
-                                /*if(bOverXEnd) // FirstItemOnLine == true
-                                {
-                                    bMathWordLarge = true;
-                                }*/
 
                                 X += BrkLen + WordLen;
 
@@ -9067,12 +9047,19 @@ ParaRun.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
 
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 
+    this.Math_RecalculateContent();
+
+    this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
+};
+ParaRun.prototype.Math_RecalculateContent = function()
+{
     var WidthPoints = this.Parent.Get_WidthPoints();
     this.bEqArray = this.Parent.IsEqArray();
 
     var ascent = 0, descent = 0, width = 0;
 
     this.Recalculate_MeasureContent();
+    var Lng = this.Content.length;
 
     for(var i = 0 ; i < Lng; i++)
     {
@@ -9103,8 +9090,6 @@ ParaRun.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
     this.size.width  = width;
     this.size.ascent = ascent;
     this.size.height = ascent + descent;
-
-    this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 };
 ParaRun.prototype.Math_Set_EmptyRange = function(PRS)
 {
