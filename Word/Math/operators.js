@@ -3454,8 +3454,6 @@ CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
         var Content = this.Content[0];
 
-        //this.VerifyWordLen(PRS);
-
         if(CurLine == 0 && CurRange == 0)
         {
             // посчитаем контент как одностроковый для вычисления размера скобок
@@ -3465,15 +3463,15 @@ CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             var WordLen  = PRS.WordLen,
                 SpaceLen = PRS.SpaceLen;
 
+            //
+            Content.Recalculate_Reset(PRS.Range, PRS.Line, PRS);
+
             Content.Recalculate_Range(PRS, ParaPr, Depth + 1);
             this.RecalculateGeneralSize(g_oTextMeasurer, Content.size.height, Content.size.ascent);
 
             // вычисляем до изменения PRS.WordLen
             this.BrGapLeft  = this.GapLeft  + this.begOper.size.width;
             this.BrGapRight = this.GapRight + this.endOper.size.width;
-
-            //
-            Content.Recalculate_Reset(PRS.Range, PRS.Line, PRS);
 
             PRS.WordLen  = WordLen + this.BrGapLeft;
             PRS.SpaceLen = SpaceLen;

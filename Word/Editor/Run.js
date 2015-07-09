@@ -2324,8 +2324,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     }
                     else
                     {
-                        bInsideOper = true;
-
                         var bOperBefore = this.ParaMath.Is_BrkBinBefore() == true;
                         var WorLenCompareOper = WordLen + X - XRange + (bOperBefore  ? SpaceLen : BrkLen);
 
@@ -2357,6 +2355,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             }
                             else
                             {
+                                bInsideOper = true;
+
                                 if(Word == true)
                                 {
                                     X += SpaceLen + WordLen;
@@ -2405,6 +2405,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             }
                             else
                             {
+                                bInsideOper = true;
+
                                 // осуществляем здесь, чтобы не изменить GapRight в случае, когда новое слово не убирается на break_Operator
                                 OperGapRight = Item.GapRight;
 
