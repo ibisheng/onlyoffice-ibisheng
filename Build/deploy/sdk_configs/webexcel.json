@@ -113,7 +113,6 @@
                 "../../Common/wordcopypaste.js",
                 "../../Excel/view/DrawingObjectsController.js",
                 "../../Excel/model/DrawingObjects/Graphics.js",
-				"../../Excel/model/DrawingObjects/Private/Graphics.js",
                 "../../Excel/model/DrawingObjects/Overlay.js",
                 "../../Common/Controls.js",
                 "../../Excel/model/DrawingObjects/ShapeDrawer.js",

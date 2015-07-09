@@ -75,7 +75,6 @@
 
                 "../../Word/Drawing/HatchPattern.js",
                 "../../Word/Drawing/Graphics.js",
-				"../../Word/Drawing/Private/Graphics.js",
                 "../../Word/Drawing/Overlay.js",
                 "../../Word/Drawing/ShapeDrawer.js",
                 "../../PowerPoint/Drawing/Transitions.js",
