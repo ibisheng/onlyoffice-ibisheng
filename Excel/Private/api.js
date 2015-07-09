@@ -14,6 +14,7 @@
 		function ($, window, undefined) {
 
 		var asc = window["Asc"];
+		var prot;
 
 		asc['spreadsheet_api'].prototype.asc_addComment = function (oComment) {
 			if (oComment.bDocument)
@@ -23,5 +24,8 @@
 				ws.cellCommentator.asc_addComment(oComment);
 			}
 		};
+
+		prot = asc['spreadsheet_api'].prototype;
+		prot['asc_addComment'] = prot.asc_addComment;
 	}
 	)(jQuery, window);
