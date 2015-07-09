@@ -3496,10 +3496,10 @@ CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         PRS.bMath_OneLine = true;
         this.NumBreakContent = -1;
 
+        CDelimiter.superclass.Recalculate_Range.call(this, PRS, ParaPr, Depth);
+
         this.BrGapLeft  = this.GapLeft  + this.begOper.size.width;
         this.BrGapRight = this.GapRight + this.endOper.size.width;
-
-        CDelimiter.superclass.Recalculate_Range.call(this, PRS, ParaPr, Depth);
     }
 };
 CDelimiter.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
