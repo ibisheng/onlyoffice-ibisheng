@@ -4632,6 +4632,7 @@ function BinaryFileReader(doc, openParams)
 		numToNumClass: null,
 		paraNumPrs: null,
 		styles: null,
+		runStyles: null,
 		paraStyles: null,
 		tableStyles: null,
 		lvlStyles: null,
@@ -4806,6 +4807,7 @@ function BinaryFileReader(doc, openParams)
 		this.oReadResult.numToNumClass = {};
 		this.oReadResult.paraNumPrs = [];
 		this.oReadResult.styles = [];
+		this.oReadResult.runStyles = [];
 		this.oReadResult.paraStyles = [];
 		this.oReadResult.tableStyles = [];
 		this.oReadResult.lvlStyles = [];
@@ -5105,7 +5107,7 @@ function BinaryFileReader(doc, openParams)
                 stDefault.TableGrid = sNewStyleId;
 			oDocStyle.Add(oNewStyle);
 		}
-		var oStyleTypes = {par: 1, table: 2, lvl: 3};
+		var oStyleTypes = {par: 1, table: 2, lvl: 3, run: 4};
 		var fParseStyle = function(aStyles, oDocumentStyles, nStyleType)
 		{
 			for(var i = 0, length = aStyles.length; i < length; ++i)
@@ -5114,7 +5116,9 @@ function BinaryFileReader(doc, openParams)
 				var sStyleId = oIdMap[elem.style];
 				if(null != sStyleId && null != oDocumentStyles[sStyleId])
 				{
-					if(oStyleTypes.par == nStyleType)
+					if(oStyleTypes.run == nStyleType)
+						elem.pPr.RStyle = sStyleId;
+					else if(oStyleTypes.par == nStyleType)
 						elem.pPr.PStyle = sStyleId;
 					else if(oStyleTypes.table == nStyleType)
 						elem.pPr.TableStyle = sStyleId;
@@ -5123,6 +5127,7 @@ function BinaryFileReader(doc, openParams)
 				}
 			}
 		}
+		fParseStyle(this.oReadResult.runStyles, styles, oStyleTypes.run);
 		fParseStyle(this.oReadResult.paraStyles, styles, oStyleTypes.par);
 		fParseStyle(this.oReadResult.tableStyles, styles, oStyleTypes.table);
 		fParseStyle(this.oReadResult.lvlStyles, styles, oStyleTypes.lvl);
@@ -5494,7 +5499,7 @@ function BinaryStyleTableReader(doc, oReadResult, stream)
 	this.oReadResult = oReadResult;
     this.stream = stream;
     this.bcr = new Binary_CommonReader(this.stream);
-    this.brPrr = new Binary_rPrReader(this.Document, this.stream);
+    this.brPrr = new Binary_rPrReader(this.Document, this.oReadResult, this.stream);
     this.bpPrr = new Binary_pPrReader(this.Document, this.oReadResult, this.stream);
 	this.btblPrr = new Binary_tblPrReader(this.Document, this.oReadResult, this.stream);
     this.Read = function()
@@ -5738,7 +5743,7 @@ function Binary_pPrReader(doc, oReadResult, stream)
     this.pPr;
     this.paragraph;
     this.bcr = new Binary_CommonReader(this.stream);
-    this.brPrr = new Binary_rPrReader(this.Document, this.stream);
+    this.brPrr = new Binary_rPrReader(this.Document, this.oReadResult, this.stream);
     this.Read = function(stLen, pPr, par)
     {
         this.pPr = pPr;
@@ -6286,9 +6291,10 @@ function Binary_pPrReader(doc, oReadResult, stream)
         return res;
     }
 };
-function Binary_rPrReader(doc, stream)
+function Binary_rPrReader(doc, oReadResult, stream)
 {
     this.Document = doc;
+	this.oReadResult = oReadResult;
     this.stream = stream;
     this.rPr;
     this.bcr = new Binary_CommonReader(this.stream);
@@ -6359,7 +6365,8 @@ function Binary_rPrReader(doc, stream)
                     rPr.HighLight = highlight_None;
                 break;
 			case c_oSerProp_rPrType.RStyle:
-				rPr.RStyle = this.stream.GetString2LE(length);
+				var RunStyle = this.stream.GetString2LE(length);
+				this.oReadResult.runStyles.push({pPr: rPr, style: RunStyle});
                 break;
 			case c_oSerProp_rPrType.Spacing:
 				rPr.Spacing = this.bcr.ReadDouble();
@@ -6982,7 +6989,7 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
 	this.m_oNumToANum = {};
 	this.m_oANumToNumClass = {};
     this.bcr = new Binary_CommonReader(this.stream);
-    this.brPrr = new Binary_rPrReader(this.Document, this.stream);
+    this.brPrr = new Binary_rPrReader(this.Document, this.oReadResult, this.stream);
     this.bpPrr = new Binary_pPrReader(this.Document, this.oReadResult, this.stream);
     this.Read = function()
     {
@@ -7294,8 +7301,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 	this.openParams = openParams;
     this.stream = stream;
     this.bcr = new Binary_CommonReader(this.stream);
-	this.boMathr = new Binary_oMathReader(this.stream);
-    this.brPrr = new Binary_rPrReader(this.Document, this.stream);
+	this.boMathr = new Binary_oMathReader(this.stream, this.oReadResult);
+    this.brPrr = new Binary_rPrReader(this.Document, this.oReadResult, this.stream);
     this.bpPrr = new Binary_pPrReader(this.Document, this.oReadResult, this.stream);
 	this.btblPrr = new Binary_tblPrReader(this.Document, this.oReadResult, this.stream);
     this.bAllowFlow = bAllowFlow;
@@ -8522,11 +8529,11 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         return res;
     };
 };
-function Binary_oMathReader(stream)
+function Binary_oMathReader(stream, oReadResult)
 {	
     this.stream = stream;
 	this.bcr = new Binary_CommonReader(this.stream);
-	this.brPrr = new Binary_rPrReader(null, this.stream);
+	this.brPrr = new Binary_rPrReader(null, oReadResult, this.stream);
 	
 	this.ReadRun = function (type, length, oRunObject, oParStruct, oRes)
     {
