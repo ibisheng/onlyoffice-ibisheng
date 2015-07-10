@@ -1232,6 +1232,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             this.Root.Math_Set_EmptyRange(PRS);
             PRS.bMathWordLarge = false;
             PRS.NewRange = true;
+            PRS.MoveToLBP = false;
         }
 
         var WrapState = this.PageInfo.GetCurrentWrapState();

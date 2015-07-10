@@ -2072,6 +2072,10 @@ CMathBase.prototype.IsEmptyLine = function(_CurLine, _CurRange)
 
     return bEmpty;
 };
+CMathBase.prototype.Is_EmptyRange = function(_CurLine, _CurRange)
+{
+    return this.Content[this.NumBreakContent].Is_EmptyRange(_CurLine, _CurRange);
+};
 CMathBase.prototype.Get_LineBound = function(_CurLine, _CurRange)
 {
     var CurLine  = _CurLine - this.StartLine;
@@ -2159,10 +2163,11 @@ CMathBase.prototype.UpdateOperators = function(_CurLine, _CurRange, bEmptyGapLef
     }
 
 };
-CMathBase.prototype.Is_EmptyRange = function()
+/*CMathBase.prototype.Is_EmptyRange = function()
 {
+
     return false;
-};
+};*/
 CMathBase.prototype.IsShade = function()
 {
     var oShd = this.Get_CompiledCtrPrp().Shd;
