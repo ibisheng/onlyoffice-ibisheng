@@ -5177,11 +5177,32 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
         _result_shape_prop.bFromChart = false;
     }
 
-    if(shapeProp1.locked || shapeProp1.locked)
+    if(shapeProp1.locked || shapeProp2.locked)
     {
         _result_shape_prop.locked = true;
     }
+    _result_shape_prop.textArtProperties = CompareTextArtProperties(shapeProp1.textArtProperties, shapeProp2.textArtProperties)
     return _result_shape_prop;
+}
+
+function CompareTextArtProperties(oProps1, oProps2)
+{
+    if(!oProps1 || !oProps2)
+        return null;
+    var oRet = {Fill: undefined, Line: undefined, Form: undefined};
+    if(oProps1.Form === oProps2.Form)
+    {
+        oRet.From = oProps1.Form;
+    }
+    if(oProps1.Fill && oProps2.Fill)
+    {
+        oRet.Fill = CompareUniFill(oProps1.Fill, oProps2.Fill);
+    }
+    if(oProps1.Line && oProps2.Line)
+    {
+        oRet.Line = oProps1.Line.compare(oProps2.Line);
+    }
+    return oRet;
 }
 
 // LN --------------------------
@@ -12676,10 +12697,11 @@ TextListStyle.prototype =
     }
 };
 
-var PARRUN_TYPE_NONE    = 0;
-var PARRUN_TYPE_RUN		= 1;
-var PARRUN_TYPE_FLD		= 2;
-var PARRUN_TYPE_BR		= 3;
+var PARRUN_TYPE_NONE      = 0;
+var PARRUN_TYPE_RUN		  = 1;
+var PARRUN_TYPE_FLD		  = 2;
+var PARRUN_TYPE_BR		  = 3;
+var PARRUN_TYPE_TEXT_MATH = 4;
 
 
 // DEFAULT OBJECTS

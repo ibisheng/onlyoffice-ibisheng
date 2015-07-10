@@ -4786,6 +4786,7 @@ DrawingObjectsController.prototype =
                 }
                 else
                 {
+                    nPageNum1 = 0;
                     chart_selection.addToRecalculate();
                 }
                 chart_selection.recalcInfo.bRecalculatedTitle = false;
@@ -4856,6 +4857,7 @@ DrawingObjectsController.prototype =
                 }
                 else
                 {
+                    nPageNum2 = 0;
                     oTargetTextObject.addToRecalculate();
                 }
             }
@@ -5448,7 +5450,8 @@ DrawingObjectsController.prototype =
                         h: drawing.extY ,
                         canChangeArrows: drawing.canChangeArrows(),
                         bFromChart: false,
-                        locked: locked
+                        locked: locked,
+                        textArtProperties: drawing.getTextArtProperties()
                     };
                     if(!shape_props)
                         shape_props = new_shape_props;
@@ -5544,7 +5547,8 @@ DrawingObjectsController.prototype =
                         h: drawing.extY ,
                         canChangeArrows: false,
                         bFromChart: true,
-                        locked: locked
+                        locked: locked,
+                        textArtProperties: null
                     };
                     if(!shape_props)
                         shape_props = new_shape_props;

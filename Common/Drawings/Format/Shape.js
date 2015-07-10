@@ -3754,6 +3754,42 @@ CShape.prototype =
         return false;
     },
 
+    getTextArtProperties: function()
+    {
+        var oContent = this.getDocContent(), oTextPr, oRet = null;
+        if(oContent)
+        {
+            oRet = {Fill: undefined, Line: undefined, Form: undefined};
+            var oController = this.getDrawingObjectsController();
+            if(oController)
+            {
+                var oTargetDocContent = oController.getTargetDocContent();
+                if(oTargetDocContent === oContent)
+                {
+                    oTextPr = oContent.Get_Paragraph_TextPr();
+                }
+                else
+                {
+                    oContent.Set_ApplyToAll(true);
+                    oTextPr = oContent.Get_Paragraph_TextPr();
+                    oContent.Set_ApplyToAll(false);
+                }
+                oRet.Fill = oTextPr.TextFill;
+                oRet.Line = oTextPr.TextOutline;
+                var oBodyPr = this.getBodyPr();
+                if(oBodyPr && oBodyPr.prstTxWarp)
+                {
+                    oRet.Form = oBodyPr.prstTxWarp.preset;
+                }
+                else
+                {
+                    oRet.Form = "textNoShape";
+                }
+            }
+        }
+        return oRet;
+    },
+
     getParagraphParaPr: function () {
         if (this.txBody && this.txBody.content) {
             var _result;

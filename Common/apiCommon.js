@@ -1792,7 +1792,8 @@
         this.w = null;
         this.h = null;
         this.vert = null;
-        this.verticalTextAlign = null
+        this.verticalTextAlign = null;
+        this.textArtProperties = null;
     }
 
     asc_CShapeProperty.prototype = {
@@ -1821,7 +1822,9 @@
         asc_getVerticalTextAlign: function(){return this.verticalTextAlign},
         asc_putVerticalTextAlign: function(v){this.verticalTextAlign = v;},
         asc_getVert: function(){return this.vert},
-        asc_putVert: function(v){this.vert = v;}
+        asc_putVert: function(v){this.vert = v;},
+        asc_getTextArtProperties: function(){return this.textArtProperties},
+        asc_putTextArtProperties: function(v){this.textArtProperties = v;}
     };
 
 //{ asc_CShapeProperty export
@@ -1852,9 +1855,60 @@
     prot["put_VerticalTextAlign"] = prot["asc_putVerticalTextAlign"] = prot.asc_putVerticalTextAlign;
     prot["get_Vert"] = prot["asc_getVert"] = prot.asc_getVert;
     prot["put_Vert"] = prot["asc_putVert"] = prot.asc_putVert;
+    prot["get_TextArtProperties"] = prot["asc_getTextArtProperties"] = prot.asc_getTextArtProperties;
+    prot["put_TextArtProperties"] = prot["asc_putTextArtProperties"] = prot.asc_putTextArtProperties;
 
 // ---------------------------------------------------------------
 
+
+
+    function asc_TextArtProperties(obj)
+    {
+        if(obj)
+        {
+            this.Fill = obj.Fill;//asc_Fill
+            this.Line  = obj.Line;//asc_Stroke
+            this.Form  = obj.Form;//srting
+        }
+        else
+        {
+            this.Fill = undefined;
+            this.Line  = undefined;
+            this.Form  = undefined;
+        }
+    }
+
+    asc_TextArtProperties.prototype["asc_putFill"] = asc_TextArtProperties.prototype.asc_putFill = function(oAscFill)
+    {
+        this.Fill = oAscFill;
+    };
+    asc_TextArtProperties.prototype["asc_getFill"] = asc_TextArtProperties.prototype.asc_getFill = function()
+    {
+        return this.Fill;
+    };
+
+
+    asc_TextArtProperties.prototype["asc_putLine"] = asc_TextArtProperties.prototype.asc_putLine = function(oAscStroke)
+    {
+        this.Line = oAscStroke;
+    };
+    asc_TextArtProperties.prototype["asc_getLine"] = asc_TextArtProperties.prototype.asc_getLine = function()
+    {
+        return this.Line;
+    };
+
+
+    asc_TextArtProperties.prototype["asc_putForm"] = asc_TextArtProperties.prototype.asc_putForm = function(sForm)
+    {
+        this.Form = sForm;
+    };
+    asc_TextArtProperties.prototype["asc_getForm"] = asc_TextArtProperties.prototype.asc_getForm = function()
+    {
+        return this.Form;
+    };
+	
+	
+    window["asc_TextArtProperties"] = window["Asc"]["asc_TextArtProperties"] = window["asc_TextArtProperties"] = asc_TextArtProperties;
 
     // CImgProperty
 //-----------------------------------------------------------------------------------
@@ -3225,6 +3279,10 @@ function CreateAscShapePropFromProp(shapeProp)
     obj.h = shapeProp.h;
     obj.vert = shapeProp.vert;
     obj.verticalTextAlign = shapeProp.verticalTextAlign;
+    if(shapeProp.textArtProperties)
+    {
+        obj.textArtProperties = CreateAscTextArtProps(shapeProp.textArtProperties);
+    }
     return obj;
 }
 
@@ -3237,6 +3295,25 @@ function CorrectShapeProp(asc_shape_prop, shape)
     shape.spPr.ln = CorrectUniFill(asc_shape_prop.asc_getStroke(), shape.spPr.ln);
 }
 
+
+function CreateAscTextArtProps(oTextArtProps)
+{
+    if(!oTextArtProps)
+    {
+        return undefined;
+    }
+    var oRet = new asc_TextArtProperties();
+    if(oTextArtProps.Fill)
+    {
+        oRet.asc_putFill(CreateAscFill(oTextArtProps.Fill));
+    }
+    if(oTextArtProps.Line)
+    {
+        oRet.asc_putLine(CreateAscStroke(oTextArtProps.Line, false));
+    }
+    oRet.asc_putForm(oTextArtProps.Form);
+    return oRet;
+}
 // эта функция ДОЛЖНА минимизироваться
 
 function CreateAscColorCustom(r, g, b, auto)
