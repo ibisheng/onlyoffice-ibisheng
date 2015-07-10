@@ -542,6 +542,8 @@ function ParaMath()
     this.Paragraph          = null;
     this.bFastRecalculate   = true;
 
+    this.AbsolutePage       = 0;
+
     this.NearPosArray       = [];
 
     this.Width              = 0;
@@ -1146,6 +1148,8 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var ParaRange = PRS.Range;
     var Page      = AbsolutePage + PRS.Page;
 
+    this.AbsolutePage = AbsolutePage;
+
     if(this.ParaMathRPI.CheckPrevLine(ParaLine, ParaRange))
     {
         this.UpdateInfoForBreak(PRS, ParaLine);
@@ -1158,7 +1162,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var bUpdateWrapMath = PRS.Ranges.length > 0 && this.ParaMathRPI.bInline == false;
 
     // первый пересчет
-    if(PrevLineObject == null && true == bFirstRange && PRS.bFastRecalculate == false && PRS.RecalcResult == recalcresult_NextLine)
+    if(PrevLineObject == null && true == bFirstRange && PRS.bFastRecalculate == false/*&& PRS.RecalcResult == recalcresult_NextLine*/)
     {
         // информация о пересчете
         var RPI = new CRPI();
@@ -1643,6 +1647,13 @@ ParaMath.prototype.Is_BrkBinBefore = function()
 ParaMath.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 {
     this.Root.Shift_Range(Dx, Dy, _CurLine, _CurRange);
+    var CurrentAbsolutePage = this.Paragraph.Get_StartPage_Absolute();
+
+    if(this.Paragraph !== null && this.AbsolutePage !== CurrentAbsolutePage)
+    {
+        this.Root.ChangePage(CurrentAbsolutePage - this.AbsolutePage);
+        this.AbsolutePage = CurrentAbsolutePage;
+    }
 };
 //-----------------------------------------------------------------------------------
 // Функция для работы с формулой
@@ -3517,8 +3528,8 @@ function CMathRecalculateObject()
     this.WrapState        = ALIGN_EMPTY;
     this.MaxW             = 0;              // для рассчета выравнивания формулы нужно учитывать изменилась ли максимальная ширина или нет
     this.bWordLarge       = false;          // если формула выходит за границы докумена, то не нужно учитывать выравнивание, а значит можно сделать быстрый пересчет
-    this.bFastRecalculate = true;   /*если добавляем буквы во внутренний контент, который не бьется на строки, то отменяем быстрый пересчет,
-                                      т.к. высота контента может поменяться (она рассчитывается точно исходя из размеров внутр элементов)*/
+    this.bFastRecalculate = true;           /*если добавляем буквы во внутренний контент, который не бьется на строки, то отменяем быстрый пересчет,
+                                            т.к. высота контента может поменяться (она рассчитывается точно исходя из размеров внутр элементов)*/
 
     this.bInline          = false;
     this.Align            = align_Justify;
@@ -3546,7 +3557,6 @@ CMathRecalculateObject.prototype.Load_MathInfo = function(PageInfo)
 CMathRecalculateObject.prototype.Compare = function(PageInfo)
 {
     var result = true;
-
 
     if(this.bFastRecalculate == false)
         result = false;

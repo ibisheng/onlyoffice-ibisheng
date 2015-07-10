@@ -835,6 +835,16 @@ CMathContent.prototype.GetWidthLine = function(_CurLine, _CurRange)
 
     return W;
 };
+CMathContent.prototype.ChangePage = function(Dx)
+{
+    this.Bounds.ChangePage(Dx);
+
+    for(var Pos = 0; Pos < this.Content.length; Pos++)
+    {
+        if(this.Content[Pos].Type === para_Math_Composition)
+            this.Content[Pos].ChangePage(Dx);
+    }
+};
 CMathContent.prototype.Get_CompiledArgSize = function()
 {
     return this.Compiled_ArgSz;

@@ -359,6 +359,46 @@ CMathBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 
     }
 };
+CMathBase.prototype.ChangePage = function(Dx)
+{
+    this.Bounds.ChangePage(Dx);
+
+    for(var i=0; i < this.nRow; i++)
+    {
+        for(var j = 0; j < this.nCol; j++)
+        {
+            var Item = this.elements[i][j];
+            if(false == Item.IsJustDraw())
+                Item.ChangePage(Dx);
+        }
+    }
+};
+CMathBase.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    if(this.bOneLine)
+    {
+        this.Bounds.ShiftPos(CurLine, CurRange, Dx, Dy);
+
+        for(var i=0; i < this.nRow; i++)
+        {
+            for(var j = 0; j < this.nCol; j++)
+            {
+                var Item = this.elements[i][j];
+                if(false == Item.IsJustDraw())
+                    Item.Shift_Range(Dx, Dy, _CurLine, _CurRange);
+            }
+        }
+    }
+    else
+    {
+        this.Bounds.ShiftPos(CurLine, CurRange, Dx, Dy);
+
+        CMathBase.superclass.Shift_Range.call(this, Dx, Dy, _CurLine, _CurRange);
+    }
+};
 CMathBase.prototype.UpdatePosBound = function(pos, PRSA, Line, Range, Page)
 {
     var CurLine  = Line - this.StartLine;
@@ -2153,7 +2193,6 @@ CMathBase.prototype.private_UpdatePosOnAdd      = CMathContent.prototype.private
 CMathBase.prototype.private_UpdatePosOnRemove   = CMathContent.prototype.private_UpdateOnRemove;
 CMathBase.prototype.private_CorrectSelectionPos = CMathContent.prototype.private_CorrectSelectionPos;
 CMathBase.prototype.private_CorrectSelectionPos = CMathContent.prototype.private_CorrectSelectionPos;
-CMathBase.prototype.Shift_Range                 = CMathContent.prototype.Shift_Range;
 CMathBase.prototype.private_CorrectCurPos = function()
 {
     if (this.CurPos > this.Content.length - 1)
@@ -2290,8 +2329,6 @@ CMathBounds.prototype.GetPos = function(Line, Range)
 
     return Pos;
 };
-
-
 function CMathBoundsMeasures()
 {
     this.Type = MATH_BOUNDS_MEASURES;
