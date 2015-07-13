@@ -4147,7 +4147,7 @@ CMathContent.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
     }
 
 };
-CMathContent.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
+CMathContent.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics, bEmptyRange)
 {
     var CurLine = _CurLine - this.StartLine;
     var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
@@ -4165,7 +4165,7 @@ CMathContent.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine,
     for(var Pos = StartPos; Pos <= EndPos; Pos++)
     {
         var Item = this.Content[Pos];
-        Item.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
+        Item.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics, bEmptyRange);
     }
 
     this.Bounds.UpdateMetrics(CurLine, CurRange, NewContentMetrics);

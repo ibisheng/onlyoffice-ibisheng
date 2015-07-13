@@ -2789,7 +2789,7 @@ ParaRun.prototype.Recalculate_Set_RangeEndPos = function(PRS, PRP, Depth)
     this.protected_FillRangeEndPos(CurLine, CurRange, CurPos);
 };
 
-ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
+ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics, bEmptyRange)
 {
     var Para = PRS.Paragraph;
 
@@ -2867,7 +2867,7 @@ ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
         }
     }
 
-    if ( true === UpdateLineMetricsText )
+    if ( true === UpdateLineMetricsText || true === bEmptyRange)
     {
         // Пересчитаем метрику строки относительно размера данного текста
         if ( PRS.LineTextAscent < this.TextAscent )
