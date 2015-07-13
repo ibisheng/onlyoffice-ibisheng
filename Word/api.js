@@ -2727,7 +2727,7 @@ asc_docs_api.prototype.sync_StartAction = function(type, id){
 	//console.log("asc_onStartAction: type = " + type + " id = " + id);
 
     if (c_oAscAsyncActionType.BlockInteraction == type)
-        this.asc_IncrementCounterLongAction(this.IsLongActionCurrent);
+        this.asc_IncrementCounterLongAction();
 };
 asc_docs_api.prototype.sync_EndAction = function(type, id){
 	//this.AsyncAction
@@ -7794,6 +7794,11 @@ function CSpellCheckApi_desktop()
     this.onSpellCheck = function(spellData)
     {
         SpellCheck_CallBack(spellData);
+    };
+
+    this.disconnect = function()
+    {
+        // none
     };
 }
 
