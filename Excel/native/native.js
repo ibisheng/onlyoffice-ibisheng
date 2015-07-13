@@ -1424,6 +1424,8 @@ function OfflineEditor () {
         _api.asc_nativeOpenFile(window.native["GetFileString"]());
 
         //var worksheet = _api.wb.showWorksheet(0);
+
+        this.getWorksheetsInfo();
     };
 
     // prop
@@ -1442,6 +1444,32 @@ function OfflineEditor () {
         var region = this._updateRegion(worksheet, x, y, width, height);
 
         return _api.wb.getWorksheet()._getDrawSelection_Local(region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd);
+    };
+    this.getWorksheetsInfo = function () {
+
+        var _stream = global_memory_stream_menu;
+        _stream["ClearNoAttack"]();
+
+        _stream["WriteByte"](0);
+        _stream['WriteLong'](_api.asc_getActiveWorksheetId(i));
+
+        for (var i = 0; i < _api.asc_getWorksheetsCount(); ++i) {
+
+            if (_api.asc_getWorksheetTabColor(i)) {
+                _stream["WriteByte"](1);
+                _stream['WriteLong'](_api.asc_getWorksheetId(i));
+                _stream["WriteString2"](_api.asc_getWorksheetName(i));
+                asc_menu_WriteColor(0, _api.asc_getWorksheetTabColor(i), _stream);
+            } else {
+                _stream["WriteByte"](2);
+                _stream['WriteLong'](_api.asc_getWorksheetId(i));
+                _stream["WriteString2"](_api.asc_getWorksheetName(i));
+            }
+        }
+
+        _stream["WriteByte"](255);
+
+        window["native"]["OnCallMenuEvent"](4100, global_memory_stream_menu);
     };
 
     // render
@@ -1587,7 +1615,31 @@ function OfflineEditor () {
 
         //var gc_nMaxRow = 1048576;
         //var gc_nMaxCol = 16384;
-    }
+    };
+
+    this.offline_showWorksheet = function(index) {
+
+        var t = _api;
+        var ws = _api.wbModel.getWorksheet(index);
+        var isHidden = ws.getHidden();
+        var showWorksheetCallback = function (res) {
+            if (res) {
+                t.wbModel.getWorksheet(index).setHidden(false);
+                t.wb.showWorksheet(index);
+                if (isHidden) {
+                    // Посылаем callback об изменении списка листов
+                    t.sheetsChanged();
+                }
+            }
+        };
+        if (_api.isHidden) {
+            var sheetId = _api.wbModel.getWorksheet(index).getId();
+            var lockInfo = _api.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
+            this._getIsLockObjectSheet(lockInfo, showWorksheetCallback);
+        }
+        else
+            showWorksheetCallback(true);
+    };
 }
 var _s = new OfflineEditor();
 
@@ -1614,6 +1666,7 @@ function offline_get_selection(x, y, width, height) {
     return _s.getSelection(x, y, width, height);
 }
 function offline_apply_event(type,params) {
+    var _stream = null;
     var _return = undefined;
     var _current = {pos: 0};
     var _continue = true;
@@ -1734,7 +1787,7 @@ function offline_apply_event(type,params) {
         }
         case 2010:
         {
-            var _stream = global_memory_stream_menu;
+            _stream = global_memory_stream_menu;
             _stream["ClearNoAttack"]();
 
             var merged = _api.asc_getCellInfo().asc_getFlags().asc_getMerge();
@@ -1783,6 +1836,74 @@ function offline_apply_event(type,params) {
             _api.asc_emptyCells(params);
             break;
         }
+        case 4001:
+        {
+            var gridLines = _api.asc_getSheetViewSettings();
+            gridLines.asc_setShowGridLines(params);
+            _api.asc_setSheetViewSettings(gridLines);
+            break;
+        }
+        case 4002:
+        {
+            var colRowHeaders = _api.asc_getSheetViewSettings();
+            colRowHeaders.asc_setShowRowColHeaders(params);
+            _api.asc_setSheetViewSettings(colRowHeaders);
+            break;
+        }
+        case 4003:
+        {
+            _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteLong"](_api.asc_getWorksheetsCount());
+            _return = _stream;
+            break;
+        }
+        case 4004:
+        {
+            _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteStringA"](_api.asc_getWorksheetName());
+            _return = _stream;
+            break
+        }
+        case 4007:
+        {
+            _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteLong"](_api.asc_getActiveWorksheetIndex());
+            _return = _stream;
+            break;
+        }
+        case 4014:
+        {
+             _s.offline_showWorksheet(params);
+            break;
+        }
+
+        /*
+         prot["asc_getWorksheetsCount"] = prot.asc_getWorksheetsCount; 4003
+         prot["asc_getWorksheetName"] = prot.asc_getWorksheetName; 4004
+         prot["asc_getWorksheetTabColor"] = prot.asc_getWorksheetTabColor; 4005
+         prot["asc_setWorksheetTabColor"] = prot.asc_setWorksheetTabColor; 4006
+         prot["asc_getActiveWorksheetIndex"] = prot.asc_getActiveWorksheetIndex; 4007
+         prot["asc_getActiveWorksheetId"] = prot.asc_getActiveWorksheetId; 4008
+         prot["asc_getWorksheetId"] = prot.asc_getWorksheetId; 4009
+         prot["asc_isWorksheetHidden"] = prot.asc_isWorksheetHidden; 4010
+         prot["asc_isWorksheetLockedOrDeleted"] = prot.asc_isWorksheetLockedOrDeleted; 4011
+         prot["asc_isWorkbookLocked"] = prot.asc_isWorkbookLocked; 4012
+         prot["asc_getHiddenWorksheets"] = prot.asc_getHiddenWorksheets; 4013
+         prot["asc_showWorksheet"] = prot.asc_showWorksheet; 4014
+         prot["asc_showActiveWorksheet"] = prot.asc_showActiveWorksheet; 4015
+         prot["asc_hideWorksheet"] = prot.asc_hideWorksheet; 4016
+         prot["asc_renameWorksheet"] = prot.asc_renameWorksheet;
+         prot["asc_addWorksheet"] = prot.asc_addWorksheet;
+         prot["asc_insertWorksheet"] = prot.asc_insertWorksheet;
+         prot["asc_deleteWorksheet"] = prot.asc_deleteWorksheet;
+         prot["asc_moveWorksheet"] = prot.asc_moveWorksheet;
+         prot["asc_copyWorksheet"] = prot.asc_copyWorksheet;
+         */
+
+
         default:
             break;
     }
