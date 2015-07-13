@@ -419,7 +419,7 @@ CDegree.prototype.Document_UpdateInterfaceState = function(MathProps)
     MathProps.Type = c_oAscMathInterfaceType.Script;
     MathProps.Pr   = null;
 };
-CDegree.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics, bEmptyRange)
+CDegree.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
 {
     var CurLine  = PRS.Line - this.StartLine;
     var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
@@ -434,8 +434,8 @@ CDegree.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
         // чтобы при вычислении метрик итератора не были перебили метрики (например, у внутр мат объекта Asc может быть больше Asc текущего объекта)
 
         var NewContentMetrics = new CMathBoundsMeasures();
-        this.iterContent.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics, bEmptyRange);
-        this.baseContent.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics, bEmptyRange);
+        this.iterContent.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
+        this.baseContent.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
 
         var BoundBase = this.baseContent.Get_LineBound(_CurLine, _CurRange);
         var Bound;
@@ -456,7 +456,7 @@ CDegree.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
     }
     else
     {
-        CDegreeBase.prototype.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange, ContentMetrics, bEmptyRange);
+        CDegreeBase.prototype.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
     }
 
 };
@@ -824,7 +824,7 @@ CDegreeSubSup.prototype.fillContent = function()
 
     CDegreeSubSup.superclass.fillContent.call(this);
 };
-CDegreeSubSup.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics, bEmptyRange)
+CDegreeSubSup.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
 {
     var CurLine  = PRS.Line - this.StartLine;
     var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
@@ -840,10 +840,10 @@ CDegreeSubSup.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine
 
         var NewContentMetrics = new CMathBoundsMeasures();
 
-        this.Content[1].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics, bEmptyRange);
-        this.Content[2].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics, bEmptyRange);
+        this.Content[1].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
+        this.Content[2].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
         // основание, baseContent
-        this.Content[0].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics, bEmptyRange);
+        this.Content[0].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
 
         var BoundBase = this.baseContent.Get_LineBound(_CurLine, _CurRange);
 
@@ -858,7 +858,7 @@ CDegreeSubSup.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine
     }
     else
     {
-        CDegreeBase.prototype.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange, ContentMetrics, bEmptyRange);
+        CDegreeBase.prototype.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
     }
 
 };

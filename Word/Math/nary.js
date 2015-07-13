@@ -592,11 +592,11 @@ CNary.prototype.Draw_Elements = function(PDSE)
 
     this.Arg.Draw_Elements(PDSE);
 };
-CNary.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics, bEmptyRange)
+CNary.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
 {
     if(this.bOneLine)
     {
-        CNary.superclass.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange, ContentMetrics, bEmptyRange);
+        CNary.superclass.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
     }
     else
     {
@@ -606,7 +606,7 @@ CNary.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRa
         // т.к. ParaNumbering привязывается к первому текстовому элементы, он может находится в аргументе
         // обновляем LineMetrics для Base после того, как обновим метрики для аргумента
 
-        this.Arg.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics, bEmptyRange);
+        this.Arg.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
 
         var BoundArg = this.Arg.Get_LineBound(_CurLine, _CurRange);
 
@@ -631,10 +631,10 @@ CNary.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRa
 
                 var NewContentMetrics = new CMathBoundsMeasures();
 
-                this.LowerIterator.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics, bEmptyRange);
-                this.UpperIterator.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics, bEmptyRange);
+                this.LowerIterator.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
+                this.UpperIterator.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
 
-                this.Base.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics, bEmptyRange);
+                this.Base.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
 
                 this.Bounds.UpdateMetrics(CurLine, CurRange, this.Base.size);
                 this.UpdatePRS(PRS, this.Base.size);

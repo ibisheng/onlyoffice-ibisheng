@@ -2867,7 +2867,7 @@ ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
         }
     }
 
-    if ( true === UpdateLineMetricsText || true === bEmptyRange)
+    if ( true === UpdateLineMetricsText)
     {
         // Пересчитаем метрику строки относительно размера данного текста
         if ( PRS.LineTextAscent < this.TextAscent )

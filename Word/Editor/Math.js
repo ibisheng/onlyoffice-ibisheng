@@ -1150,9 +1150,10 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     this.AbsolutePage = AbsolutePage;
 
-    if(this.ParaMathRPI.CheckPrevLine(ParaLine, ParaRange))
+    if(this.ParaMathRPI.CheckPrevLine(ParaLine, ParaRange)) // пропускаем все Range в текущей строке, пока не прийдет пересчет для стартового отрезка
     {
         this.UpdateInfoForBreak(PRS, ParaLine);
+        PRS.EmptyLine = false;
         return;
     }
 
@@ -1180,6 +1181,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     if(bUpdateWrapMath == true && this.ParaMathRPI.bInternalRanges == false &&  PRS.bFastRecalculate == false)
     {
         this.ParaMathRPI.bInternalRanges = true;
+        this.ParaMathRPI.UpdateWrapStartPos(ParaLine, ParaRange);
 
         if(bFirstRange) // т.к. если просто выйдем, то прийдет пересчет для следующего Range 0-ой строки, а не для стартового Range 0-ой строки
         {
@@ -1318,11 +1320,12 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
         this.PageInfo.ReverseCurrentMaxW(PRS.Line);
     }
 
-    var bNextLine = this.ParaMathRPI.Wrap == WRAP_MATH_ON_SIDE && PRS.Range !== this.ParaMathRPI.IndexRange;
+    var bNextRangeSide   = this.ParaMathRPI.Wrap == WRAP_MATH_ON_SIDE && PRS.Ranges.length > 0 && PRS.Range !== this.ParaMathRPI.IndexRange, // пересчитываем только в том отрезке, в котором находится формула
+        bNextRangeTopBot = this.ParaMathRPI.Wrap ==  WRAP_MATH_TOPBOTTOM && (this.ParaMathRPI.CheckWrapPos(PRS.Line, PRS.Range) == true || PRS.Ranges.length > 0);
 
-    if(PRS.Ranges.length > 0 && (bNextLine || this.ParaMathRPI.Wrap ==  WRAP_MATH_TOPBOTTOM))
+    if(bNextRangeSide || bNextRangeTopBot)
     {
-        // перенос на следующий строку
+    // перенос на следующий строку
         this.Root.Math_Set_EmptyRange(PRS);
 
         PRS.RecalcResult = recalcresult_NextLine;
@@ -1372,7 +1375,7 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
             else if(this.ParaMathRPI.Wrap == WRAP_MATH_TOPBOTTOM)
             {
                 var WrapState = this.PageInfo.GetCurrentWrapState();
-                var bWordLarge =  PRS.bMathWordLarge == true && WrapState == ALIGN_EMPTY;
+                var bWordLarge =  PRS.bMathWordLarge == true && WrapState !== ALIGN_EMPTY;
                 this.PageInfo.SetStateWordLarge(PRS.Line, bWordLarge);
 
                 if(WrapState !== ALIGN_EMPTY)
@@ -1507,8 +1510,11 @@ ParaMath.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cu
     // далее при вычилении отрезков (PRS.Ranges) для следующей строки  учитываются PRS.Ascent и PRS.Descent предыдщей строки, а они будут равны 0 , соответственно получим те же самые отрезки обтекания, что и в предыдущей строке
     // произойдет зацикливание
 
-    var bEmptyRange = PRS.Ranges.length > 0 && this.Root.Is_EmptyRange(_CurLine, _CurRange);
-    this.Root.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics, bEmptyRange);
+
+    //var bEmptyRange = PRS.Ranges.length > 0 && this.Root.Is_EmptyRange(_CurLine, _CurRange);
+    this.Root.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
+    //PRS.EmptyLine = PRS.Ranges.length > 0 && this.Root.Is_EmptyRange(_CurLine, _CurRange);
+
 };
 ParaMath.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 {
@@ -2175,7 +2181,7 @@ ParaMath.prototype.Get_RunElementByPos = function(ContentPos, Depth)
 
 ParaMath.prototype.Get_LastRunInRange = function(_CurLine, _CurRange)
 {
-    return null;
+    return this.Root.Get_LastRunInRange(_CurLine, _CurRange);
 };
 
 ParaMath.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseContentPos)
@@ -3466,8 +3472,11 @@ function CMathRecalculateInfo()
     this.bInternalRanges        = false;
     this.bStartRanges           = false;
     this.bRecalcResultPrevLine  = false;
-    this.StartLine              = -1;
-    this.StartRange             = -1;
+    this.StartLineRecalc        = -1;
+    this.StartRangeRecalc       = -1;
+
+    this.StartLineWrap          = -1;
+    this.StartRangeWrap         = -1;
 
     this.InfoLine = new CMathInfoLines();
 }
@@ -3502,20 +3511,29 @@ CMathRecalculateInfo.prototype.NeedStartRecalc = function(StartLine, StartRange)
 {
     this.bRecalcResultPrevLine = true;
 
-    this.StartLine = StartLine;
-    this.StartRange = StartRange;
+    this.StartLineRecalc  = StartLine;
+    this.StartRangeRecalc = StartRange;
 
 };
 CMathRecalculateInfo.prototype.CheckPrevLine = function(CurLine, CurRange)
 {
-    if(this.bRecalcResultPrevLine == true && CurLine == this.StartLine && CurRange == this.StartRange)
+    if(this.bRecalcResultPrevLine == true && CurLine == this.StartLineRecalc && CurRange == this.StartRangeRecalc)
     {
         this.bRecalcResultPrevLine = false;
-        this.StartLine              = -1;
-        this.StartRange             = -1;
+        //this.StartLine              = -1;
+        //this.StartRange             = -1;
     }
 
     return this.bRecalcResultPrevLine == true;
+};
+CMathRecalculateInfo.prototype.UpdateWrapStartPos = function(StartLine, StartRange)
+{
+    this.StartLineWrap          = StartLine;
+    this.StartRangeWrap         = StartRange;
+};
+CMathRecalculateInfo.prototype.CheckWrapPos = function(CurLine, CurRange)
+{
+    return CurLine < this.StartLineWrap || (this.StartLineWrap == CurLine && CurRange < this.StartRangeWrap);
 };
 
 function CMathInfoLines()

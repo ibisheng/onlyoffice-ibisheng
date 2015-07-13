@@ -2007,7 +2007,7 @@ CMathBase.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
 {
     this.Recalculate_Range(PRS, ParaPr, Depth);
 };
-CMathBase.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics, bEmptyRange)
+CMathBase.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
 {
     var CurLine = _CurLine - this.StartLine;
     var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
@@ -2026,7 +2026,7 @@ CMathBase.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _C
         for (var CurPos = 0; CurPos <= this.Content.length - 1; CurPos++)
         {
             var Item = this.Content[CurPos];
-            Item.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics, bEmptyRange);
+            Item.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
         }
 
         //this.Bounds.UpdateMetrics(CurLine, CurRange, this.size);
@@ -2049,7 +2049,7 @@ CMathBase.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _C
         for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
         {
             var Item = this.Content[CurPos];
-            Item.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics, bEmptyRange);
+            Item.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
 
             var BoundItem = Item.Get_LineBound(_CurLine, _CurRange);
 
