@@ -2848,6 +2848,7 @@ CPresentation.prototype =
             {
                 text_pr = new CTextPr();
             }
+            editor.textArtPreviewManager.clear();
             var theme = graphic_objects.getTheme();
             if(text_pr.RFonts)
             {

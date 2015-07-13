@@ -442,3 +442,421 @@ function arrReverse(arr) {
 	}
 	return newarr;
 }
+
+function CreateAscColorByIndex(nIndex)
+{
+	var oColor = new asc_CColor();
+	oColor.type = c_oAscColor.COLOR_TYPE_SCHEME;
+	oColor.value = nIndex;
+	return oColor;
+}
+
+function CreateAscFillByIndex(nIndex)
+{
+	var oAscFill = new CAscFill();
+	oAscFill.type = c_oAscFill.FILL_TYPE_SOLID;
+	oAscFill.fill = new asc_CFillSolid();
+	oAscFill.fill.color = CreateAscColorByIndex(nIndex);
+	return oAscFill;
+}
+
+function CreateAscGradFillByIndex(nIndex1, nIndex2, nAngle)
+{
+	var oAscFill = new CAscFill();
+	oAscFill.type = c_oAscFill.FILL_TYPE_GRAD;
+	oAscFill.fill = new asc_CFillGrad();
+	oAscFill.fill.GradType = c_oAscFillGradType.GRAD_LINEAR;
+	oAscFill.fill.LinearAngle = nAngle;
+	oAscFill.fill.LinearScale = true;
+	oAscFill.fill.Colors = [CreateAscColorByIndex(nIndex1), CreateAscColorByIndex(nIndex2)];
+	oAscFill.fill.Positions = [0, 100000];
+	oAscFill.fill.LinearAngle = nAngle;
+	oAscFill.fill.LinearScale = true;
+	return oAscFill;
+}
+function TextArtPreviewManager()
+{
+	this.canvas = null;
+	this.canvasWidth = 50;
+	this.canvasHeight = 50;
+	this.shapeWidth = 50;
+	this.shapeHeight = 50;
+	this.TAShape = null;
+	this.TextArtStyles = [];
+
+	this.aStylesByIndex = [];
+	this.aStylesByIndexToApply = [];
+
+	this.dKoeff = 4;
+	//if (AscBrowser.isRetina) {
+	//	this.dKoeff <<= 1;
+	//}
+}
+TextArtPreviewManager.prototype.initStyles = function()
+{
+
+	var oTextPr = new CTextPr();
+	oTextPr.Bold = true;
+	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(24), new CUniFill());
+	oTextPr.TextOutline = CreateNoFillLine();
+	this.aStylesByIndex[0] = oTextPr;
+	this.aStylesByIndexToApply[0] = oTextPr;
+
+	oTextPr = new CTextPr();
+	oTextPr.Bold = true;
+	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(52, 24, 5400000), new CUniFill());
+	oTextPr.TextOutline = CreateNoFillLine();
+	this.aStylesByIndex[1] = oTextPr;
+	this.aStylesByIndexToApply[1] = oTextPr;
+
+	oTextPr = new CTextPr();
+	oTextPr.Bold = true;
+	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(44, 42, 5400000), new CUniFill());
+	oTextPr.TextOutline = CreateNoFillLine();
+	this.aStylesByIndex[2] = oTextPr;
+	this.aStylesByIndexToApply[2] = oTextPr;
+
+	oTextPr = new CTextPr();
+	oTextPr.Bold = true;
+	oTextPr.TextFill = CreateNoFillUniFill();
+	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(34)), undefined, undefined, undefined, undefined, (15773/36000)*this.dKoeff);
+	this.aStylesByIndex[3] = oTextPr;
+	oTextPr = new CTextPr();
+	oTextPr.Bold = true;
+	oTextPr.TextFill = CreateNoFillUniFill();
+	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(34)), undefined, undefined, undefined, undefined, (15773/36000));
+	this.aStylesByIndexToApply[3] = oTextPr;
+
+	oTextPr = new CTextPr();
+	oTextPr.Bold = true;
+	oTextPr.TextFill = CreateNoFillUniFill();
+	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(59)), undefined, undefined, undefined, undefined, (15773/36000)*this.dKoeff);
+	this.aStylesByIndex[4] = oTextPr;
+	oTextPr = new CTextPr();
+	oTextPr.Bold = true;
+	oTextPr.TextFill = CreateNoFillUniFill();
+	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(59)), undefined, undefined, undefined, undefined, (15773/36000));
+	this.aStylesByIndexToApply[4] = oTextPr;
+
+	oTextPr = new CTextPr();
+	oTextPr.Bold = true;
+	oTextPr.TextFill = CreateNoFillUniFill();
+	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(52)), undefined, undefined, undefined, undefined, (15773/36000)*this.dKoeff);
+	this.aStylesByIndex[5] = oTextPr;
+	oTextPr = new CTextPr();
+	oTextPr.Bold = true;
+	oTextPr.TextFill = CreateNoFillUniFill();
+	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(52)), undefined, undefined, undefined, undefined, (15773/36000));
+	this.aStylesByIndexToApply[5] = oTextPr;
+
+	oTextPr = new CTextPr();
+	oTextPr.Bold = true;
+	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(27), new CUniFill());
+	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(52)), undefined, undefined, undefined, undefined, (12700/36000)*this.dKoeff);
+	this.aStylesByIndex[6] = oTextPr;
+	oTextPr = new CTextPr();
+	oTextPr.Bold = true;
+	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(27), new CUniFill());
+	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(52)), undefined, undefined, undefined, undefined, (12700/36000));
+	this.aStylesByIndexToApply[6] = oTextPr;
+
+	oTextPr = new CTextPr();
+	oTextPr.Bold = true;
+	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(42), new CUniFill());
+	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(46)), undefined, undefined, undefined, undefined, (12700/36000)*this.dKoeff);
+	this.aStylesByIndex[7] = oTextPr;
+	oTextPr = new CTextPr();
+	oTextPr.Bold = true;
+	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(42), new CUniFill());
+	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(46)), undefined, undefined, undefined, undefined, (12700/36000));
+	this.aStylesByIndexToApply[7] = oTextPr;
+
+	oTextPr = new CTextPr();
+	oTextPr.Bold = true;
+	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(57), new CUniFill());
+	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(54)), undefined, undefined, undefined, undefined, (12700/36000)*this.dKoeff);
+	this.aStylesByIndex[8] = oTextPr;
+	oTextPr = new CTextPr();
+	oTextPr.Bold = true;
+	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(57), new CUniFill());
+	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(54)), undefined, undefined, undefined, undefined, (12700/36000));
+	this.aStylesByIndexToApply[8] = oTextPr;
+
+	oTextPr = new CTextPr();
+	oTextPr.Bold = true;
+	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(45, 57, 0), new CUniFill());
+	oTextPr.TextOutline = CreateNoFillLine();
+	this.aStylesByIndex[9] = oTextPr;
+
+	oTextPr = new CTextPr();
+	oTextPr.Bold = true;
+	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(52, 33, 0), new CUniFill());
+	oTextPr.TextOutline = CreateNoFillLine();
+	this.aStylesByIndex[10] = oTextPr;
+
+	oTextPr = new CTextPr();
+	oTextPr.Bold = true;
+	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(27, 45, 5400000), new CUniFill());
+	oTextPr.TextOutline = CreateNoFillLine();
+	this.aStylesByIndex[11] = oTextPr;
+}
+TextArtPreviewManager.prototype.clear = function()
+{
+	this.TextArtStyles.length = 0;
+};
+
+TextArtPreviewManager.prototype.getWordArtStyles = function()
+{
+	if(this.TextArtStyles.length === 0)
+	{
+		this.generateTextArtStyles();
+	}
+	return this.TextArtStyles;
+};
+
+TextArtPreviewManager.prototype.getCanvas = function()
+{
+	if (null === this.canvas)
+	{
+		this.canvas = document.createElement('canvas');
+		this.canvas.width = this.canvasWidth;
+		this.canvas.height = this.canvasHeight;
+
+		if (AscBrowser.isRetina) {
+			this.canvas.width <<= 1;
+			this.canvas.height <<= 1;
+		}
+	}
+	return this.canvas;
+};
+
+TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
+{
+	var oShape = this.getShape();
+	var oContent = oShape.getDocContent();
+
+	var textStr = "abcde";
+	var TextSpacing = undefined;
+	switch(prst)
+	{
+		case "textButton":
+		{
+			TextSpacing = 4;
+			textStr = "abcde";
+			for(var i = 0; i < textStr.length; ++i)
+			{
+				oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+			}
+
+			textStr = "Fghi";
+			oContent.Add_NewParagraph();
+			for(var i = 0; i < textStr.length; ++i)
+			{
+				oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+			}
+
+			textStr = "Jklmn";
+			oContent.Add_NewParagraph();
+			for(var i = 0; i < textStr.length; ++i)
+			{
+				oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+			}
+			break;
+		}
+		case "textArchUp":
+		case "textArchDown":
+		{
+			TextSpacing = 4;
+			textStr = "abcdefg";
+			for(var i = 0; i < textStr.length; ++i)
+			{
+				oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+			}
+			break;
+		}
+
+		case "textCircle":
+		{
+			TextSpacing = 4;
+			textStr = "abcdefghijklmnop";
+			for(var i = 0; i < textStr.length; ++i)
+			{
+				oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+			}
+			break;
+		}
+		default:
+		{
+			var textStr = "abcde";
+			for(var i = 0; i < textStr.length; ++i)
+			{
+				oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+			}
+			/*oContent.Add_NewParagraph();
+			 for(var i = 0; i < textStr.length; ++i)
+			 {
+			 oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+			 }
+			 oContent.Add_NewParagraph();
+			 for(var i = 0; i < textStr.length; ++i)
+			 {
+			 oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+			 }*/
+		}
+	}
+	oContent.Set_ApplyToAll(true);
+	oContent.Set_ParagraphAlign(align_Center);
+	oContent.Paragraph_Add(new ParaTextPr({FontSize: 36, Spacing: TextSpacing}));
+	//oContent.Set_ParagraphAlign(new ParaTextPr({FontSize: 16}));
+	oContent.Set_ApplyToAll(false);
+
+	var oBodypr = oShape.getBodyPr().createDuplicate();
+	oBodypr.prstTxWarp = ExecuteNoHistory(
+		function()
+		{
+			return  CreatePrstTxWarpGeometry(prst)
+		}, []);
+	if(!oShape.bWordShape)
+	{
+		oShape.txBody.setBodyPr(oBodypr);
+	}
+	else
+	{
+		oShape.setBodyPr(oBodypr);
+	}
+	oShape.setBDeleted(false);
+	oShape.recalculate();
+	return oShape;
+};
+TextArtPreviewManager.prototype.getShape =  function()
+{
+	var oShape = new CShape();
+	var oParent = null, oWorkSheet = null;
+	var bWord = true;
+	if(window["Asc"]["editor"])
+	{
+		var api_sheet = window["Asc"]["editor"];
+		oShape.setWorksheet(api_sheet.wb.getWorksheet().model);
+		oWorkSheet = api_sheet.wb.getWorksheet().model;
+		bWord = false;
+	}
+	else
+	{
+		if(editor && editor.WordControl && editor.WordControl.m_oLogicDocument.Slides && editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage])
+		{
+			oShape.setParent(editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage]);
+			oParent = editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage];
+			bWord = false;
+		}
+	}
+	var oParentObjects = oShape.getParentObjects();
+	var oTrack = new NewShapeTrack("textRect", 0, 0, oParentObjects.theme, oParentObjects.master, oParentObjects.layout, oParentObjects.slide, 0);
+	oTrack.track({}, oShape.convertPixToMM(this.canvasWidth), oShape.convertPixToMM(this.canvasHeight));
+	oShape = oTrack.getShape(bWord, oShape.getDrawingDocument(), oShape.drawingObjects);
+	var oBodypr = oShape.getBodyPr().createDuplicate();
+	oBodypr.lIns = 0;
+	oBodypr.tIns = 0;
+	oBodypr.rIns = 0;
+	oBodypr.bIns = 0;
+	oBodypr.anchor = 1;
+	if(!bWord)
+	{
+		oShape.txBody.setBodyPr(oBodypr);
+	}
+	else
+	{
+		oShape.setBodyPr(oBodypr);
+	}
+	oShape.spPr.setLn(CreatePenFromParams(CreateNoFillUniFill(), null, null, null, 2, null));
+	if(oWorkSheet)
+	{
+		oShape.setWorksheet(oWorkSheet);
+	}
+	if(oParent)
+	{
+		oShape.setParent(oParent);
+	}
+	oShape.spPr.xfrm.setOffX(0);
+	oShape.spPr.xfrm.setOffY(0);
+	oShape.spPr.xfrm.setExtX(this.shapeWidth);
+	oShape.spPr.xfrm.setExtY(this.shapeHeight);
+	return oShape;
+};
+
+TextArtPreviewManager.prototype.getTAShape = function()
+{
+	if(!this.TAShape)
+	{
+		var oShape = this.getShape();
+		var oContent = oShape.getDocContent();
+		var sText = "Ta";
+		for(var i = 0; i < sText.length; ++i)
+		{
+			oContent.Paragraph_Add(new ParaText(sText[i]), false);
+		}
+		oContent.Set_ApplyToAll(true);
+		oContent.Paragraph_Add(new ParaTextPr({FontSize: 109, RFonts: {Ascii : {Name: "Arial", Index: -1}}}));
+		oContent.Set_ParagraphAlign(align_Center);
+		oContent.Set_ParagraphIndent({FirstLine: 0, Left: 0, Right: 0});
+		oContent.Set_ApplyToAll(false);
+		this.TAShape = oShape;
+	}
+	return this.TAShape;
+};
+
+TextArtPreviewManager.prototype.getWordArtPreview = function(prst)
+{
+	var _canvas = this.getCanvas();
+	var ctx = _canvas.getContext('2d');
+	var graphics = new CGraphics();
+	var oShape = this.getShapeByPrst(prst);
+	graphics.init(ctx, _canvas.width, _canvas.height, oShape.extX, oShape.extY);
+	graphics.m_oFontManager = g_fontManager;
+	graphics.transform(1,0,0,1,0,0);
+	oShape.draw(graphics);
+	return _canvas.toDataURL("image/png");
+};
+
+TextArtPreviewManager.prototype.generateTextArtStyles = function()
+{
+	if(this.aStylesByIndex.length === 0)
+	{
+		this.initStyles();
+	}
+	var _canvas = this.getCanvas();
+	var ctx = _canvas.getContext('2d');
+	var graphics = new CGraphics();
+	var oShape = this.getTAShape();
+	oShape.recalculate();
+
+	graphics.m_oFontManager = g_fontManager;
+
+	var oContent = oShape.getDocContent();
+	oContent.Set_ApplyToAll(true);
+	for(var i = 0; i < this.aStylesByIndex.length; ++i)
+	{
+		oContent.Paragraph_Add(new ParaTextPr(this.aStylesByIndex[i]));
+		graphics.init(ctx, _canvas.width, _canvas.height, oShape.extX, oShape.extY);
+		graphics.transform(1,0,0,1,0,0);
+		oShape.recalcText();
+		if(!oShape.bWordShape)
+		{
+			oShape.recalculate();
+		}
+		else
+		{
+			oShape.recalculateText();
+		}
+		oShape.draw(graphics);
+		this.TextArtStyles[i] = _canvas.toDataURL("image/png");
+	}
+	oContent.Set_ApplyToAll(false);
+};
+
+
+
+
+function GenerateWordArtPrewiewJson()
+{
+	var oWordArtPreview = new TextArtPreviewManager(); for(var i = 0; i < 49; ++i){   console.log({Type: getPrstByNumber(i), Image: oWordArtPreview.getWordArtPreview(getPrstByNumber(i))}); }
+}

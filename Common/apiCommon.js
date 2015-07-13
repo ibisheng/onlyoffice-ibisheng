@@ -1866,15 +1866,17 @@
     {
         if(obj)
         {
-            this.Fill = obj.Fill;//asc_Fill
+            this.Fill  = obj.Fill;//asc_Fill
             this.Line  = obj.Line;//asc_Stroke
             this.Form  = obj.Form;//srting
+            this.Style = obj.Style;//
         }
         else
         {
-            this.Fill = undefined;
+            this.Fill  = undefined;
             this.Line  = undefined;
             this.Form  = undefined;
+            this.Style = undefined;
         }
     }
 
@@ -1905,6 +1907,15 @@
     asc_TextArtProperties.prototype["asc_getForm"] = asc_TextArtProperties.prototype.asc_getForm = function()
     {
         return this.Form;
+    };
+
+    asc_TextArtProperties.prototype["asc_putStyle"] = asc_TextArtProperties.prototype.asc_putStyle = function(Style)
+    {
+        this.Style = Style;
+    };
+    asc_TextArtProperties.prototype["asc_getStyle"] = asc_TextArtProperties.prototype.asc_getStyle = function()
+    {
+        return this.Style;
     };
 	
 	
@@ -2697,6 +2708,7 @@ var asc_CStroke = window["asc_CStroke"];
 var CParagraphFrame = window["CParagraphFrame"];
 var asc_CParagraphFrame = window["asc_CParagraphFrame"];
 var CMouseMoveData = window["CMouseMoveData"];
+var asc_TextArtProperties = window["asc_TextArtProperties"];
 
 
 

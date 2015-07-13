@@ -120,6 +120,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.isChartEditor = false;
 			if(typeof ChartPreviewManager !== "undefined")
 				this.chartPreviewManager = new ChartPreviewManager();
+
+			if(typeof TextArtPreviewManager !== "undefined")
+				this.textArtPreviewManager = new TextArtPreviewManager();
 			
 			// Chart
 			this.chartTranslate = new asc_CChartTranslate();
@@ -2606,6 +2609,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			return this.chartPreviewManager.getChartPreviews(chartType);
 		};
 
+		spreadsheet_api.prototype.asc_getTextArtPreviews = function() {
+			return this.textArtPreviewManager.getWordArtStyles();
+		};
+
 		spreadsheet_api.prototype.asc_checkDataRange = function(dialogType, dataRange, fullCheck, isRows, chartType) {
 			return parserHelp.checkDataRange(this.wbModel, this.wb, dialogType, dataRange, fullCheck, isRows, chartType);
 		};
@@ -3240,6 +3247,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                     }
                 }
                 this.chartPreviewManager.clearPreviews();
+				this.textArtPreviewManager.clear();
             }
 
 			// На view-режиме не нужно отправлять стили

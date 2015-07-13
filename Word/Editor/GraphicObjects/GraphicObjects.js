@@ -2767,6 +2767,7 @@ CGraphicObjects.prototype =
                 this.drawingDocument.CheckGuiControlColors();
 
                 editor.chartPreviewManager.clearPreviews();
+                editor.textArtPreviewManager.clear();
                 break;
             }
         }
@@ -2781,6 +2782,7 @@ CGraphicObjects.prototype =
                 this.document.theme.themeElements.clrScheme = data.newScheme;
                 this.drawingDocument.CheckGuiControlColors();
                 editor.chartPreviewManager.clearPreviews();
+                editor.textArtPreviewManager.clear();
                 break;
             }
         }
@@ -2825,6 +2827,7 @@ CGraphicObjects.prototype =
                     }
                 }
                 editor.chartPreviewManager.clearPreviews();
+                editor.textArtPreviewManager.clear();
                 break;
             }
         }
@@ -2843,6 +2846,7 @@ CGraphicObjects.prototype =
             }
         }
         editor.chartPreviewManager.clearPreviews();
+        editor.textArtPreviewManager.clear();
     }
 };
 

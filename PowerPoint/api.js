@@ -153,6 +153,11 @@ function asc_docs_api(name)
 	else
 		this.chartTranslate = null;
 
+    if(typeof TextArtPreviewManager !== "undefined")
+        this.textArtPreviewManager = new TextArtPreviewManager();
+    else
+        this.textArtPreviewManager = null;
+
     // объекты, нужные для отправки в тулбар (шрифты, стили)
     this._gui_fonts = null;
     this._gui_editor_themes = null;
@@ -5030,6 +5035,10 @@ asc_docs_api.prototype.asc_editChartDrawingObject = function(chartBinary)
 asc_docs_api.prototype.asc_getChartPreviews = function(chartType)
 {
 	return this.chartPreviewManager.getChartPreviews(chartType);
+};
+asc_docs_api.prototype.asc_getTextArtPreviews = function()
+{
+	return this.textArtPreviewManager.getWordArtStyles();
 };
 
 asc_docs_api.prototype.sync_closeChartEditor = function()

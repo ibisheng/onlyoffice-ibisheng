@@ -508,6 +508,11 @@ function asc_docs_api(name)
 	else
 		this.chartPreviewManager = null;
 
+	if(typeof TextArtPreviewManager != "undefined")
+		this.textArtPreviewManager = new TextArtPreviewManager();
+	else
+		this.textArtPreviewManager = null;
+
     this.IsLongActionCurrent = 0;
     this.LongActionCallbacks = [];
     this.LongActionCallbacksParams = [];
@@ -6084,6 +6089,7 @@ asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
         History.Add(this.WordControl.m_oLogicDocument.DrawingObjects, data);
         this.WordControl.m_oDrawingDocument.CheckGuiControlColors();
         this.chartPreviewManager.clearPreviews();
+        this.textArtPreviewManager.clear();
         this.asc_fireCallback("asc_onUpdateChartStyles");
         this.WordControl.m_oLogicDocument.Recalculate();
 
@@ -7241,6 +7247,10 @@ asc_docs_api.prototype.asc_editChartDrawingObject = function(chartBinary)
 asc_docs_api.prototype.asc_getChartPreviews = function(chartType)
 {
 	return this.chartPreviewManager.getChartPreviews(chartType);
+};
+asc_docs_api.prototype.asc_getTextArtPreviews = function()
+{
+	return this.textArtPreviewManager.getWordArtStyles();
 };
 
 asc_docs_api.prototype.sync_closeChartEditor = function()
