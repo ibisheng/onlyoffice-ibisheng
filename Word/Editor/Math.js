@@ -1321,11 +1321,11 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
     }
 
     var bNextRangeSide   = this.ParaMathRPI.Wrap == WRAP_MATH_ON_SIDE && PRS.Ranges.length > 0 && PRS.Range !== this.ParaMathRPI.IndexRange, // пересчитываем только в том отрезке, в котором находится формула
-        bNextRangeTopBot = this.ParaMathRPI.Wrap ==  WRAP_MATH_TOPBOTTOM && (this.ParaMathRPI.CheckWrapPos(PRS.Line, PRS.Range) == true || PRS.Ranges.length > 0);
+        bNextRangeTopBot = this.ParaMathRPI.Wrap ==  WRAP_MATH_TOPBOTTOM && (PRS.Ranges.length > 0);
 
     if(bNextRangeSide || bNextRangeTopBot)
     {
-    // перенос на следующий строку
+        // перенос на следующий строку
         this.Root.Math_Set_EmptyRange(PRS);
 
         PRS.RecalcResult = recalcresult_NextLine;
@@ -1334,19 +1334,6 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
     }
     else
     {
-        if(PRS.Ranges.length > 0 && this.ParaMathRPI.Wrap == WRAP_MATH_ON_SIDE)
-        {
-            var CurrRange = PRS.Range;
-
-            for(var range = this.Root.StartRange; range < CurrRange; range++)
-            {
-                PRS.Range = range;
-                this.Root.Math_Set_EmptyRange(PRS);
-            }
-
-            PRS.Range = CurrRange;
-        }
-
         PRS.X = this.ParaMathRPI.XStart;
         PRS.XEnd = this.ParaMathRPI.XEnd;
 
