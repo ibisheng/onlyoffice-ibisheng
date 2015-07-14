@@ -1365,8 +1365,8 @@ asc_docs_api.prototype._coAuthoringInit = function()
         return; // Error
 	}
 
-	if (this.CoAuthoringUrl && this.isCoAuthoringEnable)
-		this.CoAuthoringApi.set_url(this.CoAuthoringUrl);
+	if (!this.isCoAuthoringEnable)
+		this.CoAuthoringUrl = '';
 
 	//Если User не задан, отключаем коавторинг.
 	if (null == this.User || null == this.User.asc_getId()) {
@@ -1374,7 +1374,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
 		this.User.asc_setId("Unknown");
 		this.User.asc_setUserName("Unknown");
 
-		this.CoAuthoringApi.set_url("");
+		this.CoAuthoringUrl = '';
 	}
 
     var t = this;
@@ -1531,6 +1531,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
 		}
 	};
 
+	this.CoAuthoringApi.set_url(this.CoAuthoringUrl);
     this.CoAuthoringApi.init(this.User, documentId, documentCallbackUrl, 'fghhfgsjdgfjs', function(){},
         c_oEditorId.Word, documentFormatSave, this.isViewMode);
 

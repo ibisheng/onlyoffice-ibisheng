@@ -1497,17 +1497,15 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		spreadsheet_api.prototype._coAuthoringInit = function() {
 			var t = this;
 
-			if (this.CoAuthoringUrl && this.isCoAuthoringEnable) {
-				// Если есть в настройках сервер, то выставляем его для соединения
-				this._coAuthoringSetServerUrl(this.CoAuthoringUrl);
-			}
+			if (!this.isCoAuthoringEnable)
+				this.CoAuthoringUrl = '';
 
 			//Если User не задан, отключаем коавторинг.
 			if (null == this.User || null == this.User.asc_getId()) {
 				this.User = new asc.asc_CUser();
 				this.User.asc_setId("Unknown");
 				this.User.asc_setUserName("Unknown");
-				this._coAuthoringSetServerUrl("");
+				this.CoAuthoringUrl = '';
 			}
 
 			this.collaborativeEditing = new asc_CCollaborativeEditing(/*handlers*/{
@@ -1711,6 +1709,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				}
 			};
 
+			this._coAuthoringSetServerUrl(this.CoAuthoringUrl);
 			this.CoAuthoringApi.init(t.User, t.documentId, t.documentCallbackUrl, 'fghhfgsjdgfjs',
 				function(){}, c_oEditorId.Spreadsheet, t.documentFormatSave, t.asc_getViewerMode());
 		};

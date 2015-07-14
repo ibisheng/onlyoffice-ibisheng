@@ -269,15 +269,15 @@ asc_docs_api.prototype._coAuthoringInit = function () {
         return; // Error
     }
 
-	if (this.CoAuthoringUrl && this.isCoAuthoringEnable)
-		this._coAuthoringSetServerUrl(this.CoAuthoringUrl);
+	if (!this.isCoAuthoringEnable)
+		this.CoAuthoringUrl = '';
 
 	if (null == this.User || null == this.User.asc_getId()) {
 		this.User = new Asc.asc_CUser();
 		this.User.asc_setId("Unknown");
 		this.User.asc_setUserName("Unknown");
 
-		this._coAuthoringSetServerUrl("");
+		this.CoAuthoringUrl = '';
 	}
 
     var t = this;
@@ -541,6 +541,7 @@ asc_docs_api.prototype._coAuthoringInit = function () {
         }
 	};
 
+	this.CoAuthoringApi.set_url(this.CoAuthoringUrl);
     this.CoAuthoringApi.init(this.User, documentId, documentCallbackUrl, 'fghhfgsjdgfjs', function(){}, c_oEditorId.Presentation,
 		documentFormatSave, this.isViewMode);
 
