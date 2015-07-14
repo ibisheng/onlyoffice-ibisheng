@@ -1524,7 +1524,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
 			t.asyncServerIdEndLoaded();
 		if (isDisconnectAtAll) {
 			// Посылаем наверх эвент об отключении от сервера
-			t.asc_fireCallback("asc_onСoAuthoringDisconnect");
+			t.asc_fireCallback("asc_onCoAuthoringDisconnect");
 			t.SetViewMode(true);
             t.sync_ErrorCallback(isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect,
                 c_oAscError.Level.NoCritical);

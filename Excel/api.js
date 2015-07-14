@@ -1237,7 +1237,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		 * asc_onDocumentModifiedChanged(bIsModified)										- эвент на обновление статуса "изменен ли файл"
 		 * asc_onMouseMove				(asc_CMouseMoveData)								- эвент на наведение мышкой на гиперлинк или комментарий
 		 * asc_onHyperlinkClick			(sUrl)												- эвент на нажатие гиперлинка
-		 * asc_onСoAuthoringDisconnect	()													- эвент об отключении от сервера без попытки reconnect
+		 * asc_onCoAuthoringDisconnect	()													- эвент об отключении от сервера без попытки reconnect
 		 * asc_onSelectionRangeChanged	(selectRange)										- эвент о выборе диапазона для диаграммы (после нажатия кнопки выбора)
 		 * asc_onRenameCellTextEnd		(countCellsFind, countCellsReplace)					- эвент об окончании замены текста в ячейках (мы не можем сразу прислать ответ)
 		 * asc_onWorkbookLocked			(result)											- эвент залочена ли работа с листами или нет
@@ -1703,7 +1703,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					t.asyncServerIdEndLoaded();
 				if (isDisconnectAtAll) {
 					// Посылаем наверх эвент об отключении от сервера
-					t.handlers.trigger("asc_onСoAuthoringDisconnect");
+					t.handlers.trigger("asc_onCoAuthoringDisconnect");
 					// И переходим в режим просмотра т.к. мы не можем сохранить таблицу
 					t.asc_setViewerMode(true);
 					t.handlers.trigger("asc_onError", isCloseCoAuthoring ? c_oAscError.ID.UserDrop :
