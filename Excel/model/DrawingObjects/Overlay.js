@@ -2472,6 +2472,8 @@ CSlideBoundsChecker.prototype =
     drawHorLine2 : function(preset)
     {
     },
+    AddSmartRect: function()
+    {},
 
     init : function(width_px, height_px, width_mm, height_mm)
     {

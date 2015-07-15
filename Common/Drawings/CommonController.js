@@ -1805,6 +1805,20 @@ DrawingObjectsController.prototype =
         }
     },
 
+    getTextArtPreviewManager: function()
+    {
+        var api;
+        if(window["Asc"] && window["Asc"]["editor"])
+        {
+            api = window["Asc"]["editor"];
+        }
+        else
+        {
+            api = editor;
+        }
+        return api.textArtPreviewManager;
+    },
+
     applyDrawingProps: function(props)
     {
         var objects_by_type = this.getSelectedObjectsByTypes(true);
@@ -1897,6 +1911,7 @@ DrawingObjectsController.prototype =
                 this.applyPropsToChartSpace(props.ChartProperties, objects_by_type.charts[i]);
             }
         }
+
         var aGroups = [];
         if(isRealNumber(props.Width) && isRealNumber(props.Height))
         {
@@ -1976,12 +1991,29 @@ DrawingObjectsController.prototype =
         {
             aGroups[i].updateCoordinatesAfterInternalResize();
         }
+
+        if(props.textArtProperties)
+        {
+            var  oAscTextArtProperties = props.textArtProperties;
+            var oParaTextPr;
+            var nStyle = oAscTextArtProperties.asc_getStyle();
+            if(isRealNumber(nStyle))
+            {
+                var oPreviewManager = this.getTextArtPreviewManager();
+                var oStyleTextPr = oPreviewManager.getStylesToApply()[nStyle].Copy();
+                oParaTextPr = new ParaTextPr({TextFill: oStyleTextPr.TextFill, TextOutline: oStyleTextPr.TextOutline});
+            }
+            else
+            {
+                oParaTextPr = new ParaTextPr({TextFill: CorrectUniFill(oAscTextArtProperties.asc_getFill(), new CUniFill()), TextOutline: CorrectUniStroke(oAscTextArtProperties.asc_getLine(), new CLn())});
+            }
+            this.paragraphAdd(oParaTextPr);
+        }
         return objects_by_type;
     },
 
     getSelectedObjectsByTypes: function(bGroupedObjects)
     {
-        var ret = {shapes: [], images: [], groups: [], charts: []};
         var selected_objects = this.selection.groupSelection ? this.selection.groupSelection.selectedObjects : this.selectedObjects;
         return getObjectsByTypesFromArr(selected_objects, bGroupedObjects);
     },
@@ -5791,6 +5823,7 @@ DrawingObjectsController.prototype =
             shape_props.ShapeProperties.stroke = props.shapeProps.stroke;
             shape_props.ShapeProperties.canChangeArrows = props.shapeProps.canChangeArrows;
             shape_props.ShapeProperties.bFromChart = props.shapeProps.bFromChart;
+            shape_props.ShapeProperties.textArtProperties = CreateAscTextArtProps(props.shapeProps.textArtProperties);
 
             if(props.shapeProps.paddings)
             {
@@ -5946,11 +5979,13 @@ DrawingObjectsController.prototype =
         return image;
     },
 
-    createTextArt: function(nStyle, bWord)
+    createTextArt: function(nStyle, bWord, wsModel)
     {
         var oShape = new CShape();
         oShape.setWordShape(bWord === true);
         oShape.setBDeleted(false);
+        if(wsModel)
+            oShape.setWorksheet(wsModel);
         var nFontSize;
         if(bWord)
         {

@@ -2636,6 +2636,8 @@ CSlideBoundsChecker.prototype =
         return false;
     },
 
+    AddSmartRect: function()
+    {},
 
     drawCollaborativeChanges: function()
     {},

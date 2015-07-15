@@ -4525,6 +4525,25 @@ CPresentation.prototype =
         }
     },
 
+
+    Add_TextArt: function(nStyle)
+    {
+        if(this.Slides[this.CurPage])
+        {
+            History.Create_NewPoint(historydescription_Document_AddTextArt);
+            var oTextArt = this.Slides[this.CurPage].graphicObjects.createTextArt(nStyle, false);
+            oTextArt.setParent(this.Slides[this.CurPage]);
+            oTextArt.addToDrawingObjects();
+            oTextArt.checkExtentsByDocContent();
+            oTextArt.spPr.xfrm.setOffX((this.Slides[this.CurPage].Width - oTextArt.spPr.xfrm.extX)/2);
+            oTextArt.spPr.xfrm.setOffY((this.Slides[this.CurPage].Height - oTextArt.spPr.xfrm.extY)/2);
+            this.Slides[this.CurPage].graphicObjects.resetSelection();
+            this.Slides[this.CurPage].graphicObjects.selectObject(oTextArt, 0);
+            this.Recalculate();
+            this.Document_UpdateInterfaceState();
+        }
+    },
+
     CalculateComments : function()
     {
         this.CommentAuthors = {};

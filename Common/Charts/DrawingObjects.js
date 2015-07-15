@@ -1564,6 +1564,29 @@ function DrawingObjects() {
         }
     };
 
+    _this.addTextArt = function(nStyle)
+    {
+        if (!_this.isViewerMode()) {
+
+            var oVisibleRange = worksheet.getVisibleRange();
+
+            _this.objectLocker.reset();
+            _this.objectLocker.addObjectId(g_oIdCounter.Get_NewId());
+            _this.objectLocker.checkObjects(function (bLock) {
+                if (bLock !== true)
+                    return;
+                _this.controller.resetSelection();
+                var dLeft = worksheet.getCellLeft(oVisibleRange.c1, 3);
+                var dTop = worksheet.getCellTop(oVisibleRange.r1, 3);
+                var dRight = worksheet.getCellLeft(oVisibleRange.c2, 3) + worksheet.getColumnWidth(oVisibleRange.c2, 3);
+                var dBottom = worksheet.getCellTop(oVisibleRange.r2, 3) + worksheet.getRowHeight(oVisibleRange.r2, 3);
+                _this.controller.addTextArtFromParams(nStyle, dLeft, dTop, dRight - dLeft, dBottom - dTop, worksheet.model);
+                worksheet.setSelectionShape(true);
+            });
+        }
+
+    };
+
     _this.editImageDrawingObject = function(imageUrl) {
 
         if ( imageUrl ) {

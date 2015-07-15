@@ -126,6 +126,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			// Chart
 			this.chartTranslate = new asc_CChartTranslate();
+			this.textArtTranslate = new asc_TextArtTranslate();
 			
 			// Shapes
 			this.isStartAddShape = false;
@@ -2549,7 +2550,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 		spreadsheet_api.prototype.asc_setTextArtTranslate = function(translate) {
 
-			this.textArtTranslate = new asc_TextArtTranslate();
+			this.textArtTranslate = translate;
 		};
 
 		spreadsheet_api.prototype.asc_drawingObjectsExist = function() {
@@ -2608,6 +2609,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		spreadsheet_api.prototype.asc_setSelectedDrawingObjectLayer = function(layerType) {
 			var ws = this.wb.getWorksheet();
 			return ws.objectRender.setGraphicObjectLayer(layerType);
+		};
+		spreadsheet_api.prototype.asc_addTextArt = function(nStyle) {
+			var ws = this.wb.getWorksheet();
+			return ws.objectRender.addTextArt(nStyle);
 		};
 
 		spreadsheet_api.prototype.asc_getChartPreviews = function(chartType) {

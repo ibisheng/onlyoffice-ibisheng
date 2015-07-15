@@ -360,6 +360,31 @@ DrawingObjectsController.prototype.addImageFromParams = function(rasterImageId, 
     this.startRecalculate();
 };
 
+
+DrawingObjectsController.prototype.addTextArtFromParams = function(nStyle, dRectX, dRectY, dRectW, dRectH, wsmodel)
+{
+    History.Create_NewPoint();
+    var oTextArt = this.createTextArt(nStyle, false, wsmodel);
+    this.resetSelection();
+    oTextArt.setWorksheet(this.drawingObjects.getWorksheetModel());
+    oTextArt.setDrawingObjects(this.drawingObjects);
+    oTextArt.addToDrawingObjects();
+    oTextArt.checkExtentsByDocContent();
+    var dNewPoX = dRectX + (dRectW - oTextArt.spPr.xfrm.extX) / 2;
+    if(dNewPoX < 0)
+        dNewPoX = 0;
+    var dNewPoY = dRectY + (dRectH - oTextArt.spPr.xfrm.extY) / 2;
+    if(dNewPoY < 0)
+        dNewPoY = 0;
+    oTextArt.spPr.xfrm.setOffX(dNewPoX);
+    oTextArt.spPr.xfrm.setOffY(dNewPoY);
+
+    oTextArt.checkDrawingBaseCoords();
+    this.selectObject(oTextArt, 0);
+    oTextArt.addToRecalculate();
+    this.startRecalculate();
+};
+
 DrawingObjectsController.prototype.isViewMode= function()
 {
     return this.drawingObjects.isViewerMode();

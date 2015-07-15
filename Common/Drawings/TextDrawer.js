@@ -468,6 +468,8 @@ CTextDrawer.prototype =
 
         this.Get_PathToDraw(false, true);
     },
+    AddSmartRect: function()
+    {},
     p_width : function(w)
     {
         var val = w / 1000;

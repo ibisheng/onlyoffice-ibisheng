@@ -506,99 +506,102 @@ TextArtPreviewManager.prototype.initStyles = function()
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(52, 24, 5400000), new CUniFill());
 	oTextPr.TextOutline = CreateNoFillLine();
-	this.aStylesByIndex[1] = oTextPr;
-	this.aStylesByIndexToApply[1] = oTextPr;
+	this.aStylesByIndex[4] = oTextPr;
+	this.aStylesByIndexToApply[4] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(44, 42, 5400000), new CUniFill());
 	oTextPr.TextOutline = CreateNoFillLine();
-	this.aStylesByIndex[2] = oTextPr;
-	this.aStylesByIndexToApply[2] = oTextPr;
+	this.aStylesByIndex[8] = oTextPr;
+	this.aStylesByIndexToApply[8] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CreateNoFillUniFill();
 	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(34)), undefined, undefined, undefined, undefined, (15773/36000)*this.dKoeff);
-	this.aStylesByIndex[3] = oTextPr;
+	this.aStylesByIndex[1] = oTextPr;
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CreateNoFillUniFill();
 	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(34)), undefined, undefined, undefined, undefined, (15773/36000));
-	this.aStylesByIndexToApply[3] = oTextPr;
+	this.aStylesByIndexToApply[1] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CreateNoFillUniFill();
 	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(59)), undefined, undefined, undefined, undefined, (15773/36000)*this.dKoeff);
-	this.aStylesByIndex[4] = oTextPr;
+	this.aStylesByIndex[5] = oTextPr;
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CreateNoFillUniFill();
 	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(59)), undefined, undefined, undefined, undefined, (15773/36000));
-	this.aStylesByIndexToApply[4] = oTextPr;
+	this.aStylesByIndexToApply[5] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CreateNoFillUniFill();
 	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(52)), undefined, undefined, undefined, undefined, (15773/36000)*this.dKoeff);
-	this.aStylesByIndex[5] = oTextPr;
+	this.aStylesByIndex[9] = oTextPr;
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CreateNoFillUniFill();
 	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(52)), undefined, undefined, undefined, undefined, (15773/36000));
-	this.aStylesByIndexToApply[5] = oTextPr;
+	this.aStylesByIndexToApply[9] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(27), new CUniFill());
 	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(52)), undefined, undefined, undefined, undefined, (12700/36000)*this.dKoeff);
-	this.aStylesByIndex[6] = oTextPr;
+	this.aStylesByIndex[2] = oTextPr;
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(27), new CUniFill());
 	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(52)), undefined, undefined, undefined, undefined, (12700/36000));
-	this.aStylesByIndexToApply[6] = oTextPr;
+	this.aStylesByIndexToApply[2] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(42), new CUniFill());
 	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(46)), undefined, undefined, undefined, undefined, (12700/36000)*this.dKoeff);
-	this.aStylesByIndex[7] = oTextPr;
+	this.aStylesByIndex[6] = oTextPr;
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(42), new CUniFill());
 	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(46)), undefined, undefined, undefined, undefined, (12700/36000));
-	this.aStylesByIndexToApply[7] = oTextPr;
+	this.aStylesByIndexToApply[6] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(57), new CUniFill());
 	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(54)), undefined, undefined, undefined, undefined, (12700/36000)*this.dKoeff);
-	this.aStylesByIndex[8] = oTextPr;
+	this.aStylesByIndex[10] = oTextPr;
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(57), new CUniFill());
 	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(54)), undefined, undefined, undefined, undefined, (12700/36000));
-	this.aStylesByIndexToApply[8] = oTextPr;
+	this.aStylesByIndexToApply[10] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(45, 57, 0), new CUniFill());
 	oTextPr.TextOutline = CreateNoFillLine();
-	this.aStylesByIndex[9] = oTextPr;
+	this.aStylesByIndex[3] = oTextPr;
+	this.aStylesByIndexToApply[3] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(52, 33, 0), new CUniFill());
 	oTextPr.TextOutline = CreateNoFillLine();
-	this.aStylesByIndex[10] = oTextPr;
+	this.aStylesByIndex[7] = oTextPr;
+	this.aStylesByIndexToApply[7] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(27, 45, 5400000), new CUniFill());
 	oTextPr.TextOutline = CreateNoFillLine();
 	this.aStylesByIndex[11] = oTextPr;
+	this.aStylesByIndexToApply[11] = oTextPr;
 }
 
 TextArtPreviewManager.prototype.getStylesToApply = function()
@@ -793,7 +796,7 @@ TextArtPreviewManager.prototype.getTAShape = function()
 		var oParagraph = oContent.Content[0];
 		for(var i = 0; i < sText.length; ++i)
 		{
-			oParagraph.Add(new ParaText(sText[i]));
+			oContent.Paragraph_Add(new ParaText(sText[i]), false);
 		}
 		oContent.Set_ApplyToAll(true);
 		oContent.Paragraph_Add(new ParaTextPr({FontSize: 109, RFonts: {Ascii : {Name: "Arial", Index: -1}}}));

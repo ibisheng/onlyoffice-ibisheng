@@ -3085,6 +3085,13 @@ asc_docs_api.prototype.StartAddShape = function(prst, is_apply)
     }
 };
 
+asc_docs_api.prototype.AddTextArt = function(nStyle)
+{
+    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+        this.WordControl.m_oLogicDocument.Add_TextArt(nStyle);
+    }
+}
+
 
 asc_docs_api.prototype.canGroup = function()
 {

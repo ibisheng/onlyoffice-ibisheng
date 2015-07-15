@@ -1447,8 +1447,6 @@ var historydescription_Document_AddMailMergeField                  = 0x00ac;
 var historydescription_Document_MoveInlineTable                    = 0x00ad;
 var historydescription_Document_MoveFlowTable                      = 0x00ae;
 var historydescription_Document_RestoreFieldTemplateText           = 0x00af;
-var historydescription_Document_AddTextArt                         = 0x00b0;
-
 var historydescription_Spreadsheet_SetCellFontName                 = 0x00b0;
 var historydescription_Spreadsheet_SetCellFontSize                 = 0x00b1;
 var historydescription_Spreadsheet_SetCellBold                     = 0x00b2;
@@ -1570,6 +1568,8 @@ var historydescription_Document_ConvertOldEquation                 = 0x0121;
 var historydescription_Presentation_SetVert                        = 0x0122;
 var historydescription_Document_AddNewStyle                        = 0x0123;
 var historydescription_Document_RemoveStyle                        = 0x0124;
+var historydescription_Document_AddTextArt                         = 0x0125;
+
 
 
 function Get_HistoryPointStringDescription(nDescription)
@@ -1873,6 +1873,7 @@ function Get_HistoryPointStringDescription(nDescription)
         case historydescription_Document_ConvertOldEquation                 : sString = "Document_ConvertOldEquation                "; break;
         case historydescription_Document_AddNewStyle                        : sString = "Document_AddNewStyle                       "; break;
         case historydescription_Document_RemoveStyle                        : sString = "Document_RemoveStyle                       "; break;
+        case historydescription_Document_AddTextArt                         : sString = "Document_AddTextArt                        "; break;
     }
     return sString;
 }
