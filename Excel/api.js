@@ -3849,6 +3849,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_addImageDrawingObject"] = prot.asc_addImageDrawingObject;
 		prot["asc_setSelectedDrawingObjectLayer"] = prot.asc_setSelectedDrawingObjectLayer;
 		prot["asc_getChartPreviews"] = prot.asc_getChartPreviews;
+		prot["asc_getTextArtPreviews"] = prot.asc_getTextArtPreviews;
 		prot["asc_checkDataRange"] = prot.asc_checkDataRange;
 		prot["asc_getBinaryFileWriter"] = prot.asc_getBinaryFileWriter;
 		prot["asc_getWordChartObject"] = prot.asc_getWordChartObject;
