@@ -600,6 +600,16 @@ TextArtPreviewManager.prototype.initStyles = function()
 	oTextPr.TextOutline = CreateNoFillLine();
 	this.aStylesByIndex[11] = oTextPr;
 }
+
+TextArtPreviewManager.prototype.getStylesToApply = function()
+{
+	if(this.aStylesByIndex.length === 0)
+	{
+		this.initStyles();
+	}
+	return this.aStylesByIndexToApply;
+};
+
 TextArtPreviewManager.prototype.clear = function()
 {
 	this.TextArtStyles.length = 0;
@@ -692,16 +702,6 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
 			{
 				oContent.Paragraph_Add(new ParaText(textStr[i]), false);
 			}
-			/*oContent.Add_NewParagraph();
-			 for(var i = 0; i < textStr.length; ++i)
-			 {
-			 oContent.Paragraph_Add(new ParaText(textStr[i]), false);
-			 }
-			 oContent.Add_NewParagraph();
-			 for(var i = 0; i < textStr.length; ++i)
-			 {
-			 oContent.Paragraph_Add(new ParaText(textStr[i]), false);
-			 }*/
 		}
 	}
 	oContent.Set_ApplyToAll(true);
@@ -790,9 +790,10 @@ TextArtPreviewManager.prototype.getTAShape = function()
 		var oShape = this.getShape();
 		var oContent = oShape.getDocContent();
 		var sText = "Ta";
+		var oParagraph = oContent.Content[0];
 		for(var i = 0; i < sText.length; ++i)
 		{
-			oContent.Paragraph_Add(new ParaText(sText[i]), false);
+			oParagraph.Add(new ParaText(sText[i]));
 		}
 		oContent.Set_ApplyToAll(true);
 		oContent.Paragraph_Add(new ParaTextPr({FontSize: 109, RFonts: {Ascii : {Name: "Arial", Index: -1}}}));
@@ -813,7 +814,19 @@ TextArtPreviewManager.prototype.getWordArtPreview = function(prst)
 	graphics.init(ctx, _canvas.width, _canvas.height, oShape.extX, oShape.extY);
 	graphics.m_oFontManager = g_fontManager;
 	graphics.transform(1,0,0,1,0,0);
+
+	var oldShowParaMarks;
+	if(editor)
+	{
+		oldShowParaMarks = editor.ShowParaMarks;
+		editor.ShowParaMarks = false;
+	}
 	oShape.draw(graphics);
+
+	if(editor)
+	{
+		editor.ShowParaMarks = oldShowParaMarks;
+	}
 	return _canvas.toDataURL("image/png");
 };
 
@@ -831,6 +844,12 @@ TextArtPreviewManager.prototype.generateTextArtStyles = function()
 
 	graphics.m_oFontManager = g_fontManager;
 
+	var oldShowParaMarks;
+	if(editor)
+	{
+		oldShowParaMarks = editor.ShowParaMarks;
+		editor.ShowParaMarks = false;
+	}
 	var oContent = oShape.getDocContent();
 	oContent.Set_ApplyToAll(true);
 	for(var i = 0; i < this.aStylesByIndex.length; ++i)
@@ -851,12 +870,31 @@ TextArtPreviewManager.prototype.generateTextArtStyles = function()
 		this.TextArtStyles[i] = _canvas.toDataURL("image/png");
 	}
 	oContent.Set_ApplyToAll(false);
+
+	if(editor)
+	{
+		editor.ShowParaMarks = oldShowParaMarks;
+	}
 };
 
 
 
-
-function GenerateWordArtPrewiewJson()
+function GenerateWordArtPrewiewCode()
 {
-	var oWordArtPreview = new TextArtPreviewManager(); for(var i = 0; i < 49; ++i){   console.log({Type: getPrstByNumber(i), Image: oWordArtPreview.getWordArtPreview(getPrstByNumber(i))}); }
+	var oWordArtPreview = new TextArtPreviewManager();
+	var i, j;
+	var oRetString =  "g_PresetTxWarpTypes = \n ["
+	for(i = 0; i < g_PresetTxWarpTypes.length; ++i)
+	{
+		var aByTypes = g_PresetTxWarpTypes[i];
+		oRetString += "\n\t[";
+		for(j = 0; j < aByTypes.length; ++j)
+		{
+			oRetString += "\n\t\t{Type: \"" + aByTypes[j].Type + "\", Image: \"" + oWordArtPreview.getWordArtPreview(aByTypes[j].Type) + "\"}" + ((j === aByTypes.length - 1) ? "" : ",");
+		}
+		oRetString += "\n\t]" + (i < (g_PresetTxWarpTypes.length - 1) ? "," : "");
+	}
+	oRetString += "\n];";
+	return oRetString;
 }
+

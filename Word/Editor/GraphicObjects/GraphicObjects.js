@@ -154,6 +154,7 @@ CGraphicObjects.prototype =
     },
 
     createImage: DrawingObjectsController.prototype.createImage,
+    createTextArt: DrawingObjectsController.prototype.createTextArt,
     getChartObject: DrawingObjectsController.prototype.getChartObject,
     getChartSpace2: DrawingObjectsController.prototype.getChartSpace2,
 

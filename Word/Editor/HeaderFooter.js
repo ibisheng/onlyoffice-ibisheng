@@ -611,6 +611,11 @@ CHeaderFooter.prototype =
         this.Content.Add_InlineImage(W,H,Img, Chart, bFlow);
     },
 
+    Add_TextArt : function(nStyle)
+    {
+        this.Content.Add_TextArt(nStyle);
+    },
+
     Edit_Chart : function(Chart)
     {
         this.Content.Edit_Chart( Chart );
@@ -1649,6 +1654,12 @@ CHeaderFooterController.prototype =
     {
         if ( null != this.CurHdrFtr )
             return this.CurHdrFtr.Add_InlineImage(W,H,Img, Chart, bFlow);
+    },
+
+    Add_TextArt : function(nStyle)
+    {
+        if ( null != this.CurHdrFtr )
+            return this.CurHdrFtr.Add_TextArt(nStyle);
     },
 
     Edit_Chart : function(Chart)

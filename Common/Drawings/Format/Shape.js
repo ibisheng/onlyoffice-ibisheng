@@ -3774,7 +3774,18 @@ CShape.prototype =
                     oTextPr = oContent.Get_Paragraph_TextPr();
                     oContent.Set_ApplyToAll(false);
                 }
-                oRet.Fill = oTextPr.TextFill;
+                if(oTextPr.TextFill)
+                {
+                    oRet.Fill = oTextPr.TextFill;
+                }
+                else if(oTextPr.Unifill)
+                {
+                    oRet.Fill = oTextPr.Unifill;
+                }
+                else if(oTextPr.Color)
+                {
+                    oRet.Fill = CreateUnfilFromRGB(oTextPr.Color.r, oTextPr.Color.g, oTextPr.Color.b);
+                }
                 oRet.Line = oTextPr.TextOutline;
                 var oBodyPr = this.getBodyPr();
                 if(oBodyPr && oBodyPr.prstTxWarp)

@@ -199,6 +199,15 @@ CShape.prototype.getDrawingDocument = function()
     return editor.WordControl.m_oLogicDocument.DrawingDocument;
 };
 
+CShape.prototype.getTextArtTranslate = function()
+{
+    return editor.textArtTranslate;
+};
+CShape.prototype.getTextArtPreviewManager = function()
+{
+    return editor.textArtPreviewManager;
+};
+
 CShape.prototype.recalcBrush = function()
 {
     this.recalcInfo.recalculateBrush = true;

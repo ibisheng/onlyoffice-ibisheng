@@ -29,6 +29,15 @@ CShape.prototype.setDrawingBase = function(drawingBase)
     }
 };
 
+CShape.prototype.getTextArtTranslate = function()
+{
+    return Asc["editor"].textArtTranslate;
+};
+CShape.prototype.getTextArtPreviewManager = function()
+{
+    return Asc["editor"].textArtPreviewManager;
+};
+
 CShape.prototype.getDrawingObjectsController = function()
 {
     var wsViews = Asc["editor"] && Asc["editor"].wb && Asc["editor"].wb.wsViews;

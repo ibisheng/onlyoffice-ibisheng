@@ -153,6 +153,9 @@ function asc_docs_api(name)
 	else
 		this.chartTranslate = null;
 
+
+    this.textArtTranslate = new asc_TextArtTranslate();
+
     if(typeof TextArtPreviewManager !== "undefined")
         this.textArtPreviewManager = new TextArtPreviewManager();
     else
@@ -1181,6 +1184,11 @@ asc_docs_api.prototype.get_TextProps = function()
 asc_docs_api.prototype.get_PropertyEditorShapes = function()
 {
     var ret = [g_oAutoShapesGroups, g_oAutoShapesTypes];
+    return ret;
+};
+asc_docs_api.prototype.get_PropertyEditorTextArts = function()
+{
+    var ret = [g_oPresetTxWarpGroups, g_PresetTxWarpTypes];
     return ret;
 };
 asc_docs_api.prototype.get_PropertyEditorFonts = function()
@@ -3289,6 +3297,10 @@ asc_docs_api.prototype.ImgApply = function(obj){
 
 asc_docs_api.prototype.asc_setChartTranslate = function(translate) {
     this.chartTranslate = translate;
+};
+asc_docs_api.prototype.asc_setTextArtTranslate = function(translate) {
+
+    this.textArtTranslate = new asc_TextArtTranslate();
 };
 
 

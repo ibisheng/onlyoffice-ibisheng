@@ -433,6 +433,7 @@ function asc_docs_api(name)
 	
 	// Chart
 	this.chartTranslate = new asc_CChartTranslate();
+    this.textArtTranslate = new asc_TextArtTranslate();
 
     // это чтобы сразу показать ридер, без возможности вернуться в редактор/вьюер
     this.isOnlyReaderMode = false;
@@ -1291,6 +1292,11 @@ asc_docs_api.prototype.asc_checkNeedCallback = function(name) {
 asc_docs_api.prototype.get_PropertyEditorShapes = function()
 {
     var ret = [g_oAutoShapesGroups, g_oAutoShapesTypes];
+    return ret;
+};
+asc_docs_api.prototype.get_PropertyEditorTextArts = function()
+{
+    var ret = [g_oPresetTxWarpGroups, g_PresetTxWarpTypes];
     return ret;
 };
 asc_docs_api.prototype.get_PropertyEditorFonts = function()
@@ -5325,6 +5331,9 @@ asc_docs_api.prototype.sync_MouseMoveCallback = function(Data)
 asc_docs_api.prototype.asc_setChartTranslate = function(translate) {
     this.chartTranslate = translate;
 };
+asc_docs_api.prototype.asc_setTextArtTranslate = function(translate) {
+    this.textArtTranslate = new asc_TextArtTranslate();
+};
 
 //-----------------------------------------------------------------
 // Функции для работы с гиперссылками
@@ -6014,7 +6023,6 @@ asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
     var theme = this.WordControl.m_oLogicDocument.theme;
 
     var _count_defaults = g_oUserColorScheme.length;
-    this.WordControl.m_oLogicDocument.DrawingObjects.Document_Is_SelectionLocked(changestype_ColorScheme);
 
     if(this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_ColorScheme) === false)
     {
@@ -6733,6 +6741,16 @@ asc_docs_api.prototype.StartAddShape = function(sPreset, is_apply)
         editor.sync_StartAddShapeCallback(false);
     }
 };
+
+asc_docs_api.prototype.AddTextArt = function(nStyle)
+{
+    if(false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+    {
+        History.Create_NewPoint(historydescription_Document_AddTextArt);
+        this.WordControl.m_oLogicDocument.Add_TextArt(nStyle);
+    }
+}
+
 
 asc_docs_api.prototype.sync_StartAddShapeCallback = function(value)
 {

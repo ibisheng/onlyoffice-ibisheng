@@ -2945,6 +2945,41 @@ CDocument.prototype =
         }
     },
 
+    Add_TextArt : function(nStyle)
+    {
+        // Работаем с колонтитулом
+        if ( docpostype_HdrFtr === this.CurPos.Type )
+        {
+            return this.HdrFtr.Add_TextArt(nStyle);
+        }
+        else if ( docpostype_DrawingObjects !== this.CurPos.Type )
+        {
+            if ( true == this.Selection.Use )
+                this.Remove( 1, true );
+
+            var Item = this.Content[this.CurPos.ContentPos];
+            if ( type_Paragraph == Item.GetType() )
+            {
+                var  Drawing = new ParaDrawing( 1828800/36000, 1828800/36000, null, this.DrawingDocument, this, null);
+                var TextArt = this.DrawingObjects.createTextArt(nStyle, true);
+                TextArt.setParent(Drawing);
+                Drawing.Set_GraphicObject(TextArt);
+                Drawing.Set_DrawingType( drawing_Anchor );
+                Drawing.Set_WrappingType( WRAPPING_TYPE_SQUARE );
+                Drawing.Set_BehindDoc( false );
+                Drawing.Set_Distance( 3.2, 0, 3.2, 0 );
+                Drawing.Set_PositionH(c_oAscRelativeFromH.Column, false, 0);
+                Drawing.Set_PositionV(c_oAscRelativeFromV.Paragraph, false, 0);
+                this.Paragraph_Add( Drawing );
+                this.Select_DrawingObject( Drawing.Get_Id() );
+            }
+            else if ( type_Table == Item.GetType() )
+            {
+                Item.Add_TextArt(nStyle);
+            }
+        }
+    },
+
     Edit_Chart : function(Chart)
     {
         if ( docpostype_HdrFtr === this.CurPos.Type )
@@ -7217,6 +7252,7 @@ CDocument.prototype =
     {
         this.DrawingObjects.shapeApply(shapeProps);
     },
+
 
     Select_Drawings : function(DrawingArray, TargetContent)
     {

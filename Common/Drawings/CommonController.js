@@ -5946,6 +5946,81 @@ DrawingObjectsController.prototype =
         return image;
     },
 
+    createTextArt: function(nStyle, bWord)
+    {
+        var oShape = new CShape();
+        oShape.setWordShape(bWord === true);
+        oShape.setBDeleted(false);
+        var nFontSize;
+        if(bWord)
+        {
+            nFontSize = 36;
+            oShape.createTextBoxContent();
+        }
+        else
+        {
+            nFontSize = 54;
+            oShape.createTextBody();
+        }
+        var oSpPr = new CSpPr();
+        var oXfrm = new CXfrm();
+        oXfrm.setOffX(0);
+        oXfrm.setOffY(0);
+        oXfrm.setExtX(1828800/36000);
+        oXfrm.setExtY(1828800/36000);
+        oSpPr.setXfrm(oXfrm);
+        oXfrm.setParent(oSpPr);
+        oSpPr.setFill(CreateNoFillUniFill());
+        oSpPr.setLn(CreateNoFillLine());
+        oShape.setSpPr(oSpPr);
+        oSpPr.setParent(oShape);
+        var oContent = oShape.getDocContent();
+        var sText = oShape.getTextArtTranslate().DefaultText;
+        var oParagraph = oContent.Content[0];
+        for(var i = 0; i < sText.length; ++i)
+        {
+            oParagraph.Add(new ParaText(sText[i]));
+        }
+        var oTextPr = oShape.getTextArtPreviewManager().getStylesToApply()[nStyle].Copy();
+        oTextPr.FontSize = nFontSize;
+        oTextPr.RFonts.Ascii = undefined;
+        oContent.Set_ApplyToAll(true);
+        oContent.Paragraph_Add(new ParaTextPr(oTextPr));
+        oContent.Set_ParagraphAlign(align_Center);
+        oContent.Set_ApplyToAll(false);
+        var oBodyPr = oShape.getBodyPr().createDuplicate();
+        oBodyPr.rot = 0;
+        oBodyPr.spcFirstLastPara = false;
+        oBodyPr.vertOverflow = nOTOwerflow;
+        oBodyPr.horzOverflow = nOTOwerflow;
+        oBodyPr.vert = nVertTThorz;
+        oBodyPr.wrap = nTWTNone;
+        oBodyPr.lIns = 2.54;
+        oBodyPr.tIns = 1.27;
+        oBodyPr.rIns = 2.54;
+        oBodyPr.bIns = 1.27;
+        oBodyPr.numCol = 1;
+        oBodyPr.spcCol = 0;
+        oBodyPr.rtlCol = 0;
+        oBodyPr.fromWordArt = false;
+        oBodyPr.anchor = 4;
+        oBodyPr.anchorCtr = false;
+        oBodyPr.forceAA = false;
+        oBodyPr.compatLnSpc = true;
+        oBodyPr.prstTxWarp = ExecuteNoHistory(function(){return CreatePrstTxWarpGeometry("textNoShape");}, this, []);
+        oBodyPr.textFit = new CTextFit();
+        oBodyPr.textFit.type = text_fit_Auto;
+        if(bWord)
+        {
+            oShape.setBodyPr(oBodyPr);
+        }
+        else
+        {
+            oShape.txBody.setBodyPr(oBodyPr);
+        }
+        return oShape;
+    },
+
     Get_SelectedText: function(bCleartText)
     {
         var content = this.getTargetDocContent();

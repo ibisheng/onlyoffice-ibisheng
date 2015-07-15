@@ -1287,6 +1287,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this._gui_color_schemes = null;
 			} else if ("asc_onInitEditorShapes" === name) {
 				this.handlers.trigger("asc_onInitEditorShapes", g_oAutoShapesGroups, g_oAutoShapesTypes);
+			} else if ("asc_onInitEditorTextArts" === name) {
+				this.handlers.trigger("asc_onInitEditorTextArts", g_oPresetTxWarpGroups, g_PresetTxWarpTypes);
 			} else if ("asc_onInitStandartTextures" === name) {
 				var _count = g_oUserTexturePresets.length;
 				var arr = new Array(_count);
@@ -2544,6 +2546,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		spreadsheet_api.prototype.asc_setChartTranslate = function(translate) {
 			this.chartTranslate = translate;
+		};
+		spreadsheet_api.prototype.asc_setTextArtTranslate = function(translate) {
+
+			this.textArtTranslate = new asc_TextArtTranslate();
 		};
 
 		spreadsheet_api.prototype.asc_drawingObjectsExist = function() {
@@ -3835,6 +3841,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		prot["asc_showDrawingObjects"] = prot.asc_showDrawingObjects;
 		prot["asc_setChartTranslate"] = prot.asc_setChartTranslate;
+		prot["asc_setTextArtTranslate"] = prot.asc_setTextArtTranslate;
 		prot["asc_drawingObjectsExist"] = prot.asc_drawingObjectsExist;
 		prot["asc_getChartObject"] = prot.asc_getChartObject;
 		prot["asc_addChartDrawingObject"] = prot.asc_addChartDrawingObject;

@@ -1921,6 +1921,18 @@
 	
     window["asc_TextArtProperties"] = window["Asc"]["asc_TextArtProperties"] = window["asc_TextArtProperties"] = asc_TextArtProperties;
 
+
+
+    function asc_TextArtTranslate()
+    {
+        this.DefaultText = "Your text here";
+    }
+
+    asc_TextArtTranslate.prototype["asc_setDefaultText"] = asc_TextArtTranslate.prototype.asc_setDefaultText = function(sText)
+    {
+        this.DefaultText = sText;
+    };
+    window["asc_TextArtTranslate"] = window["Asc"]["asc_TextArtTranslate"] = window["asc_TextArtTranslate"] = asc_TextArtTranslate;
     // CImgProperty
 //-----------------------------------------------------------------------------------
     /** @constructor */
@@ -2709,6 +2721,7 @@ var CParagraphFrame = window["CParagraphFrame"];
 var asc_CParagraphFrame = window["asc_CParagraphFrame"];
 var CMouseMoveData = window["CMouseMoveData"];
 var asc_TextArtProperties = window["asc_TextArtProperties"];
+var asc_TextArtTranslate = window["asc_TextArtTranslate"];
 
 
 

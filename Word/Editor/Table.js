@@ -8683,6 +8683,13 @@ CTable.prototype =
         this.CurCell.Content.Add_InlineImage(W,H,Img, Chart, bFlow);
     },
 
+    Add_TextArt : function(nStyle)
+    {
+        this.Selection.Use  = true;
+        this.Selection.Type = table_Selection_Text;
+        this.CurCell.Content.Add_TextArt(nStyle);
+    },
+
     Add_InlineTable : function(Cols, Rows)
     {
         if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
