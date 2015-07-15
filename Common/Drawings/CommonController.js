@@ -1997,15 +1997,31 @@ DrawingObjectsController.prototype =
             var  oAscTextArtProperties = props.textArtProperties;
             var oParaTextPr;
             var nStyle = oAscTextArtProperties.asc_getStyle();
+            var bWord = (typeof CGraphicObjects !== "undefined" &&  (this instanceof CGraphicObjects));
             if(isRealNumber(nStyle))
             {
                 var oPreviewManager = this.getTextArtPreviewManager();
                 var oStyleTextPr = oPreviewManager.getStylesToApply()[nStyle].Copy();
-                oParaTextPr = new ParaTextPr({TextFill: oStyleTextPr.TextFill, TextOutline: oStyleTextPr.TextOutline});
+                if(bWord)
+                {
+                    oParaTextPr = new ParaTextPr({TextFill: oStyleTextPr.TextFill, TextOutline: oStyleTextPr.TextOutline});
+                }
+                else
+                {
+                    oParaTextPr = new ParaTextPr({Unifill: oStyleTextPr.TextFill, TextOutline: oStyleTextPr.TextOutline});
+                }
             }
             else
             {
-                oParaTextPr = new ParaTextPr({TextFill: CorrectUniFill(oAscTextArtProperties.asc_getFill(), new CUniFill()), TextOutline: CorrectUniStroke(oAscTextArtProperties.asc_getLine(), new CLn())});
+                if(bWord)
+                {
+                    oParaTextPr = new ParaTextPr({TextFill: CorrectUniFill(oAscTextArtProperties.asc_getFill(), new CUniFill()), TextOutline: CorrectUniStroke(oAscTextArtProperties.asc_getLine(), new CLn())});
+                }
+                else
+                {
+                    oParaTextPr = new ParaTextPr({Unifill: CorrectUniFill(oAscTextArtProperties.asc_getFill(), new CUniFill()), TextOutline: CorrectUniStroke(oAscTextArtProperties.asc_getLine(), new CLn())});
+
+                }
             }
             this.paragraphAdd(oParaTextPr);
         }
@@ -6019,6 +6035,11 @@ DrawingObjectsController.prototype =
         var oTextPr = oShape.getTextArtPreviewManager().getStylesToApply()[nStyle].Copy();
         oTextPr.FontSize = nFontSize;
         oTextPr.RFonts.Ascii = undefined;
+        if(!((typeof CGraphicObjects !== "undefined") && (this instanceof CGraphicObjects)))
+        {
+            oTextPr.Unifill = oTextPr.TextFill;
+            oTextPr.TextFill = undefined;
+        }
         oContent.Set_ApplyToAll(true);
         oContent.Paragraph_Add(new ParaTextPr(oTextPr));
         oContent.Set_ParagraphAlign(align_Center);
