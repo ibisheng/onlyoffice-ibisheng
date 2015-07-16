@@ -2013,17 +2013,35 @@ DrawingObjectsController.prototype =
             }
             else
             {
-                if(bWord)
+                var oAscFill = oAscTextArtProperties.asc_getFill(), oAscStroke = oAscTextArtProperties.asc_getLine();
+                if(oAscFill || oAscStroke)
                 {
-                    oParaTextPr = new ParaTextPr({TextFill: CorrectUniFill(oAscTextArtProperties.asc_getFill(), new CUniFill()), TextOutline: CorrectUniStroke(oAscTextArtProperties.asc_getLine(), new CLn())});
-                }
-                else
-                {
-                    oParaTextPr = new ParaTextPr({Unifill: CorrectUniFill(oAscTextArtProperties.asc_getFill(), new CUniFill()), TextOutline: CorrectUniStroke(oAscTextArtProperties.asc_getLine(), new CLn())});
-
+                    if(bWord)
+                    {
+                        oParaTextPr = new ParaTextPr({TextFill: oAscFill ? CorrectUniFill(oAscFill, new CUniFill()) : undefined, TextOutline: oAscStroke ?  CorrectUniStroke(oAscStroke, new CLn()) : undefined});
+                    }
+                    else
+                    {
+                        oParaTextPr = new ParaTextPr({Unifill: oAscFill ? CorrectUniFill(oAscFill, new CUniFill()) : undefined, TextOutline: oAscStroke ?  CorrectUniStroke(oAscStroke, new CLn()) : undefined});
+                    }
                 }
             }
-            this.paragraphAdd(oParaTextPr);
+            if(oParaTextPr)
+            {
+                this.paragraphAdd(oParaTextPr);
+            }
+            var oPreset = oAscTextArtProperties.asc_getForm();
+            if(typeof oPreset === "string")
+            {
+                for(i = 0; i < objects_by_type.shapes.length; ++i)
+                {
+                    objects_by_type.shapes[i].applyTextArtForm(oPreset);
+                }
+                for(i = 0; i < objects_by_type.groups.length; ++i)
+                {
+                    objects_by_type.groups[i].applyTextArtForm(oPreset);
+                }
+            }
         }
         return objects_by_type;
     },

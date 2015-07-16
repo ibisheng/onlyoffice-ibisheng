@@ -3896,6 +3896,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_setInterfaceDrawImagePlaceShape"] = prot.asc_setInterfaceDrawImagePlaceShape;
 		prot["asc_changeImageFromFile"] = prot.asc_changeImageFromFile;
 		prot["asc_putPrLineSpacing"] = prot.asc_putPrLineSpacing;
+		prot["asc_addTextArt"] = prot.asc_addTextArt;
 		prot["asc_putLineSpacingBeforeAfter"] = prot.asc_putLineSpacingBeforeAfter;
 		prot["asc_setDrawImagePlaceParagraph"] = prot.asc_setDrawImagePlaceParagraph;
 		prot["asc_changeShapeImageFromFile"] = prot.asc_changeShapeImageFromFile;

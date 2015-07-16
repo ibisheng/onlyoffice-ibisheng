@@ -1034,6 +1034,7 @@ CGraphicObjects.prototype =
     },
 
     getTargetDocContent: DrawingObjectsController.prototype.getTargetDocContent,
+    getTextArtPreviewManager: DrawingObjectsController.prototype.getTextArtPreviewManager,
 
     handleChartDoubleClick: function(drawing, chart, e, x, y, pageIndex)
     {

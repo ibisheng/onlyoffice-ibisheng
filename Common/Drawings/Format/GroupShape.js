@@ -1335,6 +1335,17 @@ CGroupShape.prototype =
         return (CARD_DIRECTION_N - (num - num_north)+ 8)%8;
     },
 
+    applyTextArtForm: function(sPreset)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].applyTextArtForm)
+            {
+                this.spTree[i].applyTextArtForm(sPreset);
+            }
+        }
+    },
+
     getNumByCardDirection: function(cardDirection)
     {
         var hc = this.extX*0.5;
