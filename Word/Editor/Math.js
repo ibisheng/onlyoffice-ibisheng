@@ -750,8 +750,21 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
 
     var wrapIndent = MathSettings.Get_WrapIndent(WrapState);
 
-    var XStart = this.ParaMathRPI.XStart + MathSettings.Get_LeftMargin(WrapState);
-    var XEnd   = this.ParaMathRPI.XEnd - MathSettings.Get_RightMargin(WrapState);
+    var XStart, XEnd;
+
+    if(this.ParaMathRPI.bStartRanges == true && this.ParaMathRPI.Wrap == WRAP_MATH_ON_SIDE)
+    {
+        XStart = this.ParaMathRPI.XStart;
+        XEnd   = this.ParaMathRPI.XEnd;
+    }
+    else
+    {
+        XStart = _X;
+        XEnd   = _XLimit;
+    }
+
+    XStart += MathSettings.Get_LeftMargin(WrapState);
+    XEnd   -= MathSettings.Get_RightMargin(WrapState);
 
     var Jc = this.Get_Align();
 
@@ -1175,18 +1188,17 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
         this.Root.PreRecalc(null, this, ArgSize, RPI);
         this.ParaMathRPI.ResetInfoRanges();
-        this.private_InitWrapSettings(PRS);
+        //this.private_InitWrapSettings(PRS);
     }
 
     if(bUpdateWrapMath == true && this.ParaMathRPI.bInternalRanges == false &&  PRS.bFastRecalculate == false)
     {
         this.ParaMathRPI.bInternalRanges = true;
-        this.ParaMathRPI.UpdateWrapStartPos(ParaLine, ParaRange);
 
         if(bFirstRange) // т.к. если просто выйдем, то прийдет пересчет для следующего Range 0-ой строки, а не для стартового Range 0-ой строки
         {
             this.ParaMathRPI.bStartRanges = true;
-            this.private_InitWrapSettings(PRS);
+            this.private_InitWrapSettings(PRS, ParaPr);
         }
         else
         {
@@ -1250,8 +1262,11 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     this.ParaMathRPI.ClearRecalculate();
 };
-ParaMath.prototype.private_InitWrapSettings = function(PRS)
+ParaMath.prototype.private_InitWrapSettings = function(PRS, ParaPr)
 {
+    var XRange = PRS.XStart + ParaPr.Ind.Left,
+        XLimit = PRS.XLimit;
+
     var XStart, XEnd, IndexRange;
 
     if(this.ParaMathRPI.bStartRanges == true)
@@ -1276,22 +1291,22 @@ ParaMath.prototype.private_InitWrapSettings = function(PRS)
 
         if(this.ParaMathRPI.Wrap == WRAP_MATH_TOPBOTTOM)
         {
-            XStart      = PRS.XStart;
-            XEnd        = PRS.XLimit;
+            XStart      = XRange;
+            XEnd        = XLimit;
             IndexRange  = 0;
         }
         else if(this.ParaMathRPI.Wrap == WRAP_MATH_ON_SIDE) // WrapType == WRAPPING_TYPE_SQUARE || WrapType == WRAPPING_TYPE_THROUGH || WrapType == WRAPPING_TYPE_TIGHT
         {
             var Len = PRS.Ranges.length;
 
-            XStart = PRS.XStart;
+            XStart = XRange;
             XEnd   = PRS.Ranges[0].X0;
             IndexRange  = 0;
 
             for(var Pos = 0; Pos < Len; Pos++)
             {
                 var _XStart = PRS.Ranges[Pos].X1,
-                    _XEnd   = Pos < Len - 1 ? PRS.Ranges[Pos+1].X0 : PRS.XLimit;
+                    _XEnd   = Pos < Len - 1 ? PRS.Ranges[Pos+1].X0 : XLimit;
 
                 if(XEnd - XStart < _XEnd - _XStart)
                 {
@@ -1304,8 +1319,8 @@ ParaMath.prototype.private_InitWrapSettings = function(PRS)
     }
     else
     {
-        XStart      = PRS.XStart;
-        XEnd        = PRS.XLimit;
+        XStart      = XRange;
+        XEnd        = XLimit;
         IndexRange  = 0;
     }
 
@@ -1321,21 +1336,28 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
     }
 
     var bNextRangeSide   = this.ParaMathRPI.Wrap == WRAP_MATH_ON_SIDE && PRS.Ranges.length > 0 && PRS.Range !== this.ParaMathRPI.IndexRange, // пересчитываем только в том отрезке, в котором находится формула
-        bNextRangeTopBot = this.ParaMathRPI.Wrap ==  WRAP_MATH_TOPBOTTOM && (PRS.Ranges.length > 0);
+        bNextRangeTopBot = this.ParaMathRPI.Wrap ==  WRAP_MATH_TOPBOTTOM && PRS.Ranges.length > 0;
 
     if(bNextRangeSide || bNextRangeTopBot)
     {
         // перенос на следующий строку
+
         this.Root.Math_Set_EmptyRange(PRS);
 
         PRS.RecalcResult = recalcresult_NextLine;
         PRS.RestartPageRecalcInfo.Object = this;
+
         PRS.NewRange = true;
+
     }
     else
     {
-        PRS.X = this.ParaMathRPI.XStart;
-        PRS.XEnd = this.ParaMathRPI.XEnd;
+        if(this.ParaMathRPI.Wrap == WRAP_MATH_ON_SIDE)
+        {
+            PRS.X = this.ParaMathRPI.XStart;
+            PRS.XEnd = this.ParaMathRPI.XEnd;
+
+        }
 
         this.private_UpdateXLimits(PRS);
 
@@ -1354,8 +1376,8 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
                 this.ParaMathRPI.Wrap = WRAP_MATH_TOPBOTTOM;
                 this.private_SetBreakRecalculate(PRS);
 
-                this.ParaMathRPI.XStart     = PRS.XStart;
-                this.ParaMathRPI.XEnd       = PRS.XLimit;
+                //this.ParaMathRPI.XStart     = PRS.XStart;
+                //this.ParaMathRPI.XEnd       = PRS.XLimit;
                 this.ParaMathRPI.IndexRange = 0;
 
             }
@@ -3452,18 +3474,15 @@ function CMathRecalculateInfo()
     this.bCorrect_FontSize      = false;
 
     this.Wrap                   = WRAP_MATH_EMPTY;
-    this.XStart                 = 0;
-    this.XEnd                   = 0;
+    this.XStart               = 0;
+    this.XEnd                 = 0;
     this.IndexRange             = 0;
 
     this.bInternalRanges        = false;
     this.bStartRanges           = false;
     this.bRecalcResultPrevLine  = false;
-    this.StartLineRecalc        = -1;
-    this.StartRangeRecalc       = -1;
-
-    this.StartLineWrap          = -1;
-    this.StartRangeWrap         = -1;
+    this.StartLine              = -1;
+    this.StartRange             = -1;
 
     this.InfoLine = new CMathInfoLines();
 }
@@ -3498,29 +3517,18 @@ CMathRecalculateInfo.prototype.NeedStartRecalc = function(StartLine, StartRange)
 {
     this.bRecalcResultPrevLine = true;
 
-    this.StartLineRecalc  = StartLine;
-    this.StartRangeRecalc = StartRange;
+    this.StartLine  = StartLine;
+    this.StartRange = StartRange;
 
 };
 CMathRecalculateInfo.prototype.CheckPrevLine = function(CurLine, CurRange)
 {
-    if(this.bRecalcResultPrevLine == true && CurLine == this.StartLineRecalc && CurRange == this.StartRangeRecalc)
+    if(this.bRecalcResultPrevLine == true && CurLine == this.StartLine && CurRange == this.StartRange)
     {
         this.bRecalcResultPrevLine = false;
-        //this.StartLine              = -1;
-        //this.StartRange             = -1;
     }
 
     return this.bRecalcResultPrevLine == true;
-};
-CMathRecalculateInfo.prototype.UpdateWrapStartPos = function(StartLine, StartRange)
-{
-    this.StartLineWrap          = StartLine;
-    this.StartRangeWrap         = StartRange;
-};
-CMathRecalculateInfo.prototype.CheckWrapPos = function(CurLine, CurRange)
-{
-    return CurLine < this.StartLineWrap || (this.StartLineWrap == CurLine && CurRange < this.StartRangeWrap);
 };
 
 function CMathInfoLines()

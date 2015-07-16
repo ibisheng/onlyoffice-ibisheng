@@ -2789,7 +2789,7 @@ ParaRun.prototype.Recalculate_Set_RangeEndPos = function(PRS, PRP, Depth)
     this.protected_FillRangeEndPos(CurLine, CurRange, CurPos);
 };
 
-ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics, bEmptyRange)
+ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
 {
     var Para = PRS.Paragraph;
 

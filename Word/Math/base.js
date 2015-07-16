@@ -2074,7 +2074,7 @@ CMathBase.prototype.IsEmptyLine = function(_CurLine, _CurRange)
 };
 CMathBase.prototype.Is_EmptyRange = function(_CurLine, _CurRange)
 {
-    return this.Content[this.NumBreakContent].Is_EmptyRange(_CurLine, _CurRange);
+    return this.bOneLine == true ? false : this.Content[this.NumBreakContent].Is_EmptyRange(_CurLine, _CurRange);
 };
 CMathBase.prototype.Get_LineBound = function(_CurLine, _CurRange)
 {
