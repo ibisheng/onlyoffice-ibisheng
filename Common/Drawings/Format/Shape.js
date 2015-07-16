@@ -3537,7 +3537,7 @@ CShape.prototype =
             else
             {
                 var bNeedRestoreState = false;
-                if(this.bWordShape && this.clipRect)
+                if(this.bWordShape && this.clipRect && (!this.bodyPr.prstTxWarp || this.bodyPr.prstTxWarp.preset === "textNoShape"))
                 {
                     bNeedRestoreState = true;
                     var clip_rect = this.clipRect;
@@ -3799,6 +3799,23 @@ CShape.prototype =
             }
         }
         return oRet;
+    },
+
+    applyTextArtForm: function(sPreset)
+    {
+        var oBodyPr = this.getBodyPr().createDuplicate();
+        oBodyPr.prstTxWarp = ExecuteNoHistory(function(){return CreatePrstTxWarpGeometry(sPreset)}, this, []);
+        if(this.bWordShape)
+        {
+            this.setBodyPr(oBodyPr);
+        }
+        else
+        {
+            if(this.txBody)
+            {
+                this.txBody.setBodyPr(oBodyPr);
+            }
+        }
     },
 
     getParagraphParaPr: function () {
