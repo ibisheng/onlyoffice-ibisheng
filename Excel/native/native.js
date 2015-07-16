@@ -1423,9 +1423,32 @@ function OfflineEditor () {
         _api = new window["Asc"]["spreadsheet_api"]();
         _api.asc_nativeOpenFile(window.native["GetFileString"]());
 
-        //var worksheet = _api.wb.showWorksheet(0);
+        this.registerEventsHandlers();
 
-        this.getWorksheetsInfo();
+        this.asc_WriteAllWorksheets(true);
+    };
+    this.registerEventsHandlers = function () {
+
+        _api.asc_registerCallback('asc_onCanUndoChanged', function (bCanUndo) {
+            var _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteBool"](bCanUndo);
+            window["native"]["OnCallMenuEvent"](60, _stream); // ASC_MENU_EVENT_TYPE_CAN_UNDO
+        });
+
+        _api.asc_registerCallback('asc_onCanRedoChanged', function (bCanRedo) {
+            var _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteBool"](bCanRedo);
+            window["native"]["OnCallMenuEvent"](61, _stream); // ASC_MENU_EVENT_TYPE_CAN_REDO
+        });
+
+        _api.asc_registerCallback('asc_onDocumentModifiedChanged', function(change) {
+            var _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteBool"](change);
+            window["native"]["OnCallMenuEvent"](66, _stream); // ASC_MENU_EVENT_TYPE_DOCUMETN_MODIFITY
+        });
     };
 
     // prop
@@ -1445,7 +1468,7 @@ function OfflineEditor () {
 
         return _api.wb.getWorksheet()._getDrawSelection_Local(region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd);
     };
-    this.getWorksheetsInfo = function () {
+    this.asc_WriteAllWorksheets = function (callEvent) {
 
         var _stream = global_memory_stream_menu;
         _stream["ClearNoAttack"]();
@@ -1457,19 +1480,48 @@ function OfflineEditor () {
 
             if (_api.asc_getWorksheetTabColor(i)) {
                 _stream["WriteByte"](1);
-                _stream['WriteLong'](_api.asc_getWorksheetId(i));
-                _stream["WriteString2"](_api.asc_getWorksheetName(i));
-                asc_menu_WriteColor(0, _api.asc_getWorksheetTabColor(i), _stream);
             } else {
                 _stream["WriteByte"](2);
-                _stream['WriteLong'](_api.asc_getWorksheetId(i));
-                _stream["WriteString2"](_api.asc_getWorksheetName(i));
             }
+            _stream["WriteLong"](i);
+            _stream['WriteLong'](_api.asc_getWorksheetId(i));
+            _stream["WriteString2"](_api.asc_getWorksheetName(i));
+            _stream['WriteBool'](_api.asc_isWorksheetHidden(i));
+            _stream['WriteBool'](_api.asc_isWorkbookLocked(i));
+            _stream['WriteBool'](_api.asc_isWorksheetLockedOrDeleted(i));
+
+            if (_api.asc_getWorksheetTabColor(i))
+                asc_menu_WriteColor(0, _api.asc_getWorksheetTabColor(i), _stream);
         }
 
         _stream["WriteByte"](255);
 
-        window["native"]["OnCallMenuEvent"](4100, global_memory_stream_menu);
+        if (callEvent) {
+            window["native"]["OnCallMenuEvent"](2130, global_memory_stream_menu); // ASC_SPREADSHEETS_EVENT_TYPE_WORKSHEETS
+        }
+    };
+
+    this.asc_writeWorksheet = function(i) {
+        var _stream = global_memory_stream_menu;
+        _stream["ClearNoAttack"]();
+
+        if (_api.asc_getWorksheetTabColor(i)) {
+            _stream["WriteByte"](1);
+        } else {
+            _stream["WriteByte"](2);
+        }
+        _stream["WriteLong"](i);
+        _stream['WriteLong'](_api.asc_getWorksheetId(i));
+        _stream["WriteString2"](_api.asc_getWorksheetName(i));
+        _stream['WriteBool'](_api.asc_isWorksheetHidden(i));
+        _stream['WriteBool'](_api.asc_isWorkbookLocked(i));
+        _stream['WriteBool'](_api.asc_isWorksheetLockedOrDeleted(i));
+
+        if (_api.asc_getWorksheetTabColor(i)) {
+            asc_menu_WriteColor(0, _api.asc_getWorksheetTabColor(i), _stream);
+        }
+
+        _stream["WriteByte"](255);
     };
 
     // render
@@ -1480,11 +1532,14 @@ function OfflineEditor () {
 
         var worksheet = _api.wb.getWorksheet();
         var region = this._updateRegion(worksheet, x, y, width * ratio, height * ratio);
+        var colRowHeaders = _api.asc_getSheetViewSettings();
 
-        worksheet._drawGrid_Local(undefined,
-            region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd,
-            worksheet.cols[region.columnBeg].left + region.columnOff, worksheet.rows[region.rowBeg].top + region.rowOff,
-            width + region.columnOff, height + region.rowOff);
+        if (colRowHeaders.asc_getShowGridLines()) {
+            worksheet._drawGrid_Local(undefined,
+                region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd,
+                worksheet.cols[region.columnBeg].left + region.columnOff, worksheet.rows[region.rowBeg].top + region.rowOff,
+                width + region.columnOff, height + region.rowOff);
+        }
 
         worksheet._drawCellsAndBorders_Local(undefined,
             region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd,
@@ -1608,7 +1663,6 @@ function OfflineEditor () {
             rowOff: rowOff
         };
     };
-
     this._updateContentSize = function (isColumnRecalc, isRowRecalc) {
 
         // сделать пересчет по надобности
@@ -1635,10 +1689,17 @@ function OfflineEditor () {
         if (_api.isHidden) {
             var sheetId = _api.wbModel.getWorksheet(index).getId();
             var lockInfo = _api.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
-            this._getIsLockObjectSheet(lockInfo, showWorksheetCallback);
+            _api._getIsLockObjectSheet(lockInfo, showWorksheetCallback);
         }
         else
             showWorksheetCallback(true);
+    };
+    this.offline_print = function() {
+        var _adjustPrint = new asc_CAdjustPrint();
+        var _printPagesData = _api.wb.calcPagesPrint(_adjustPrint);
+        var pdf_writer = new CPdfPrinter(_api.wbModel.sUrlPath);
+        var isEndPrint = _api.wb.printSheet(pdf_writer, _printPagesData);
+        return pdf_writer.DocumentRenderer.Memory.GetBase64Memory();
     };
 }
 var _s = new OfflineEditor();
@@ -1670,7 +1731,11 @@ function offline_apply_event(type,params) {
     var _return = undefined;
     var _current = {pos: 0};
     var _continue = true;
+    var _attr;
+
     switch (type) {
+
+        // document interface
 
         case 3: // ASC_MENU_EVENT_TYPE_UNDO
         {
@@ -1682,10 +1747,30 @@ function offline_apply_event(type,params) {
             _api.asc_Redo();
             break;
         }
+
+        case 200: // ASC_MENU_EVENT_TYPE_DOCUMENT_BASE64
+        {
+            _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteStringA"](_api.asc_nativeGetFile());
+            _return = _stream;
+            break;
+        }
+        case 202: // ASC_MENU_EVENT_TYPE_DOCUMENT_PDFBASE64
+        {
+            _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteStringA"](_s.offline_print());
+            _return = _stream;
+            break;
+        }
+
+        // Cell interface
+
         case 2000: // ASC_SPREADSHEETS_EVENT_TYPE_CELL_PR
         {
             while (_continue) {
-                var _attr = params[_current.pos++];
+                _attr = params[_current.pos++];
                 switch (_attr) {
                     case 0:
                     {
@@ -1785,7 +1870,7 @@ function offline_apply_event(type,params) {
             }
             break;
         }
-        case 2010:
+        case 2010: // ASC_SPREADSHEETS_EVENT_TYPE_CELLS_MERGE_TEST
         {
             _stream = global_memory_stream_menu;
             _stream["ClearNoAttack"]();
@@ -1801,27 +1886,27 @@ function offline_apply_event(type,params) {
             _return = _stream;
             break;
         }
-        case 2020:
+        case 2020: // ASC_SPREADSHEETS_EVENT_TYPE_CELLS_MERGE
         {
             _api.asc_mergeCells(params);
             break;
         }
-        case 2030:
+        case 2030: // ASC_SPREADSHEETS_EVENT_TYPE_CELLS_FORMAT
         {
             _api.asc_setCellFormat(params);
             break;
         }
-        case 2031:
+        case 2031: // ASC_SPREADSHEETS_EVENT_TYPE_CELLS_DECREASE_DIGIT_NUMBERS
         {
             _api.asc_decreaseCellDigitNumbers();
             break;
         }
-        case 2032:
+        case 2032: // ASC_SPREADSHEETS_EVENT_TYPE_CELLS_ICREASE_DIGIT_NUMBERS
         {
             _api.asc_increaseCellDigitNumbers();
             break;
         }
-        case 2040:
+        case 2040: // ASC_SPREADSHEETS_EVENT_TYPE_COLUMN_SORT_FILTER
         {
             if (params.length) {
                 var typeF = params[0], cellId ='';
@@ -1831,26 +1916,15 @@ function offline_apply_event(type,params) {
             }
             break;
         }
-        case 3010:
+        case 2050: // ASC_SPREADSHEETS_EVENT_TYPE_CLEAR_STYLE
         {
             _api.asc_emptyCells(params);
             break;
         }
-        case 4001:
-        {
-            var gridLines = _api.asc_getSheetViewSettings();
-            gridLines.asc_setShowGridLines(params);
-            _api.asc_setSheetViewSettings(gridLines);
-            break;
-        }
-        case 4002:
-        {
-            var colRowHeaders = _api.asc_getSheetViewSettings();
-            colRowHeaders.asc_setShowRowColHeaders(params);
-            _api.asc_setSheetViewSettings(colRowHeaders);
-            break;
-        }
-        case 4003:
+
+        // Workbook interface
+
+        case 2100: // ASC_SPREADSHEETS_EVENT_TYPE_WORKSHEETS_COUNT
         {
             _stream = global_memory_stream_menu;
             _stream["ClearNoAttack"]();
@@ -1858,51 +1932,111 @@ function offline_apply_event(type,params) {
             _return = _stream;
             break;
         }
-        case 4004:
+        case 2110: // ASC_SPREADSHEETS_EVENT_TYPE_GET_WORKSHEET
         {
             _stream = global_memory_stream_menu;
-            _stream["ClearNoAttack"]();
-            _stream["WriteStringA"](_api.asc_getWorksheetName());
+            _s.asc_writeWorksheet(params);
             _return = _stream;
             break
         }
-        case 4007:
+        case 2120: // ASC_SPREADSHEETS_EVENT_TYPE_SET_WORKSHEET
+        {
+            var index = -1;
+            while (_continue) {
+                _attr = params[_current.pos++];
+                switch (_attr) {
+                    case 0: // index
+                    {
+                        index = (params[_current.pos++]);
+                        break;
+                    }
+                    case 1: // name
+                    {
+                        var name = (params[_current.pos++]);
+                        _api.asc_renameWorksheet(name);
+                        break;
+                    }
+                    case 2: // color
+                    {
+                        var tabColor = asc_menu_ReadColor(params, _current);
+                        _api.asc_setWorksheetTabColor(tabColor);
+                        break;
+                    }
+                    case 4: // hidden
+                    {
+                        _api.asc_hideWorksheet();
+                        break;
+                    }
+
+                    case 255:
+                    default:
+                    {
+                        _continue = false;
+                        break;
+                    }
+                }
+            }
+            break;
+        }
+        case 2130: // ASC_SPREADSHEETS_EVENT_TYPE_WORKSHEETS
         {
             _stream = global_memory_stream_menu;
-            _stream["ClearNoAttack"]();
-            _stream["WriteLong"](_api.asc_getActiveWorksheetIndex());
+            _s.asc_WriteAllWorksheets();
             _return = _stream;
             break;
         }
-        case 4014:
+        case 2140: // ASC_SPREADSHEETS_EVENT_TYPE_ADD_WORKSHEET
         {
-             _s.offline_showWorksheet(params);
+            _api.asc_addWorksheet(params);
+            _s.asc_WriteAllWorksheets(true);
             break;
         }
+        case 2150: // ASC_SPREADSHEETS_EVENT_TYPE_INSERT_WORKSHEET
+        {
+            _api.asc_insertWorksheet(params);
+            _s.asc_WriteAllWorksheets(true);
+            break;
+        }
+        case 2160: // ASC_SPREADSHEETS_EVENT_TYPE_DELETE_WORKSHEET
+        {
+            _api.asc_deleteWorksheet(params);
+            _s.asc_WriteAllWorksheets(true);
+            break;
+        }
+        case 2170: // ASC_SPREADSHEETS_EVENT_TYPE_COPY_WORKSHEET
+        {
+            if (params.length) {
+                _api.asc_copyWorksheet(params[0], params[1]);  // where, newName
+                _s.asc_WriteAllWorksheets(true);
+            }
 
-        /*
-         prot["asc_getWorksheetsCount"] = prot.asc_getWorksheetsCount; 4003
-         prot["asc_getWorksheetName"] = prot.asc_getWorksheetName; 4004
-         prot["asc_getWorksheetTabColor"] = prot.asc_getWorksheetTabColor; 4005
-         prot["asc_setWorksheetTabColor"] = prot.asc_setWorksheetTabColor; 4006
-         prot["asc_getActiveWorksheetIndex"] = prot.asc_getActiveWorksheetIndex; 4007
-         prot["asc_getActiveWorksheetId"] = prot.asc_getActiveWorksheetId; 4008
-         prot["asc_getWorksheetId"] = prot.asc_getWorksheetId; 4009
-         prot["asc_isWorksheetHidden"] = prot.asc_isWorksheetHidden; 4010
-         prot["asc_isWorksheetLockedOrDeleted"] = prot.asc_isWorksheetLockedOrDeleted; 4011
-         prot["asc_isWorkbookLocked"] = prot.asc_isWorkbookLocked; 4012
-         prot["asc_getHiddenWorksheets"] = prot.asc_getHiddenWorksheets; 4013
-         prot["asc_showWorksheet"] = prot.asc_showWorksheet; 4014
-         prot["asc_showActiveWorksheet"] = prot.asc_showActiveWorksheet; 4015
-         prot["asc_hideWorksheet"] = prot.asc_hideWorksheet; 4016
-         prot["asc_renameWorksheet"] = prot.asc_renameWorksheet;
-         prot["asc_addWorksheet"] = prot.asc_addWorksheet;
-         prot["asc_insertWorksheet"] = prot.asc_insertWorksheet;
-         prot["asc_deleteWorksheet"] = prot.asc_deleteWorksheet;
-         prot["asc_moveWorksheet"] = prot.asc_moveWorksheet;
-         prot["asc_copyWorksheet"] = prot.asc_copyWorksheet;
-         */
-
+            break;
+        }
+        case 2180: // ASC_SPREADSHEETS_EVENT_TYPE_MOVE_WORKSHEET
+        {
+            _api.asc_moveWorksheet(params);
+            _s.asc_WriteAllWorksheets(true);
+            break;
+        }
+        case 2200: // ASC_SPREADSHEETS_EVENT_TYPE_SHOW_WORKSHEET
+        {
+            _s.offline_showWorksheet(params);
+            break;
+        }
+        case 2205: // ASC_SPREADSHEETS_EVENT_TYPE_WORKSHEET_SHOW_LINES
+        {
+            var gridLines = _api.asc_getSheetViewSettings();
+            gridLines.asc_setShowGridLines(params > 0);
+            _api.asc_setSheetViewSettings(gridLines);
+            break;
+        }
+        case 2210: // ASC_SPREADSHEETS_EVENT_TYPE_WORKSHEET_SHOW_HEADINGS
+        {
+            var colRowHeaders = _api.asc_getSheetViewSettings();
+            colRowHeaders.asc_setShowRowColHeaders(params > 0);
+            _api.asc_setSheetViewSettings(colRowHeaders);
+            break;
+        }
 
         default:
             break;
@@ -1910,5 +2044,3 @@ function offline_apply_event(type,params) {
 
     return _return;
 }
-
-

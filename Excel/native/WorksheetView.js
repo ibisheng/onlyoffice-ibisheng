@@ -68,7 +68,9 @@ WorksheetView.prototype._drawRowHeaders_Local = function (drawingCtx, start, end
 };
 
 WorksheetView.prototype._drawGrid_Local = function (drawingCtx, c1, r1, c2, r2, leftFieldInPt, topFieldInPt, width, height) {
-    this._drawGrid(drawingCtx,  new asc_Range(c1, r1, c2, r2), leftFieldInPt, topFieldInPt, width, height);
+    var range = new asc_Range(c1, r1, c2, r2);
+    this._prepareCellTextMetricsCache(range);
+    this._drawGrid(drawingCtx, range, leftFieldInPt, topFieldInPt, width, height);
 };
 
 WorksheetView.prototype._drawCellsAndBorders_Local = function (drawingCtx,  c1, r1, c2, r2, offsetXForDraw, offsetYForDraw) {
