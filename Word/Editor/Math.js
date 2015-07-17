@@ -1356,7 +1356,6 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
         {
             PRS.X = this.ParaMathRPI.XStart;
             PRS.XEnd = this.ParaMathRPI.XEnd;
-
         }
 
         this.private_UpdateXLimits(PRS);
@@ -1674,7 +1673,7 @@ ParaMath.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 
     if(this.Paragraph !== null && this.AbsolutePage !== CurrentAbsolutePage)
     {
-        this.Root.ChangePage(CurrentAbsolutePage - this.AbsolutePage);
+        this.Root.ShiftPage(CurrentAbsolutePage - this.AbsolutePage);
         this.AbsolutePage = CurrentAbsolutePage;
     }
 };

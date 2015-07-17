@@ -359,9 +359,9 @@ CMathBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 
     }
 };
-CMathBase.prototype.ChangePage = function(Dx)
+CMathBase.prototype.ShiftPage = function(Dx)
 {
-    this.Bounds.ChangePage(Dx);
+    this.Bounds.ShiftPage(Dx);
 
     for(var i=0; i < this.nRow; i++)
     {
@@ -369,7 +369,7 @@ CMathBase.prototype.ChangePage = function(Dx)
         {
             var Item = this.elements[i][j];
             if(false == Item.IsJustDraw())
-                Item.ChangePage(Dx);
+                Item.ShiftPage(Dx);
         }
     }
 };
@@ -2163,11 +2163,6 @@ CMathBase.prototype.UpdateOperators = function(_CurLine, _CurRange, bEmptyGapLef
     }
 
 };
-/*CMathBase.prototype.Is_EmptyRange = function()
-{
-
-    return false;
-};*/
 CMathBase.prototype.IsShade = function()
 {
     var oShd = this.Get_CompiledCtrPrp().Shd;
@@ -2289,14 +2284,21 @@ CMathBounds.prototype.GetWidth = function(Line, Range)
 {
     return this.Bounds[Line][Range].W;
 };
-/*CMathBounds.prototype.GetAscent = function(Line, Range)
+CMathBounds.prototype.ShiftPage = function(Dx)
 {
-    return this.Bounds[Line][Range].Asc;
+    var CountLines = this.Bounds.length;
+
+    for(var CurLine = 0; CurLine < CountLines; CurLine++)
+    {
+        var CountRanges = this.Bounds[CurLine].length;
+
+        for(var CurRange = 0; CurRange < CountRanges; CurRange++)
+        {
+            this.Bounds[CurLine][CurRange].ShiftPage(Dx);
+        }
+    }
+
 };
-CMathBounds.prototype.GetHeight = function(Line, Range)
-{
-    return this.Bounds[Line][Range].H;
-};*/
 CMathBounds.prototype.Get_Bounds = function()
 {
     return this.Bounds;
@@ -2368,10 +2370,6 @@ CMathBoundsMeasures.prototype.SetWidth = function(Width)
 {
     this.W = Width;
 };
-CMathBoundsMeasures.prototype.SetPage = function(Page)
-{
-    this.Page = Page;
-};
 CMathBoundsMeasures.prototype.SetPos = function(Pos, PRSA)
 {
     this.X = PRSA.X + Pos.x;
@@ -2389,6 +2387,14 @@ CMathBoundsMeasures.prototype.GetX = function()
 CMathBoundsMeasures.prototype.GetY = function()
 {
     return this.Y + this.Asc;
+};
+CMathBoundsMeasures.prototype.SetPage = function(Page)
+{
+    this.Page = Page;
+};
+CMathBoundsMeasures.prototype.ShiftPage = function(Dx)
+{
+    this.Page +=Dx;
 };
 
 

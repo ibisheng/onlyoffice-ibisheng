@@ -835,14 +835,14 @@ CMathContent.prototype.GetWidthLine = function(_CurLine, _CurRange)
 
     return W;
 };
-CMathContent.prototype.ChangePage = function(Dx)
+CMathContent.prototype.ShiftPage = function(Dx)
 {
-    this.Bounds.ChangePage(Dx);
+    this.Bounds.ShiftPage(Dx);
 
     for(var Pos = 0; Pos < this.Content.length; Pos++)
     {
         if(this.Content[Pos].Type === para_Math_Composition)
-            this.Content[Pos].ChangePage(Dx);
+            this.Content[Pos].ShiftPage(Dx);
     }
 };
 CMathContent.prototype.Get_CompiledArgSize = function()
