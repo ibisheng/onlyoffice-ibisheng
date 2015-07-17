@@ -1458,7 +1458,7 @@ ParaMath.prototype.private_UpdateXLimits = function(PRS)
 
     PRS.WrapIndent = WrapIndent;
 
-    if(this.Root.IsStartLine(PRS.Line) == false)
+    if(this.ParaMathRPI.bInline == true || this.Root.IsStartLine(PRS.Line) == false)
     {
         PRS.X += WrapIndent;
         PRS.bCompareWrapIndent = false;
