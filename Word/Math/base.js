@@ -1784,8 +1784,6 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.BrGapRight = this.GapRight;
     }
 
-    PRS.bInsideOper   = false;
-
     if(this.bOneLine == true)
     {
         PRS.bMath_OneLine = this.bOneLine;

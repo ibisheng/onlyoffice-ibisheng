@@ -547,7 +547,6 @@ CAccent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var WordLen = PRS.WordLen; // запоминаем, чтобы внутр мат объекты не увеличили WordLen
 
     PRS.bMath_OneLine = true;
-    PRS.bInsideOper   = false;
 
     var oBase = this.getBase();
     oBase.Recalculate_Reset(PRS.Range, PRS.Line, PRS ); // обновим StartLine и StartRange

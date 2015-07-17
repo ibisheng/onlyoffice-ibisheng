@@ -3870,6 +3870,9 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         }
     }
 
+    var bParentInsideOper = PRS.bInsideOper,
+        bCurInsideOper    = false;
+
     for(var Pos = RangeStartPos; Pos < ContentLen; Pos++)
     {
         var Item = this.Content[Pos],
@@ -3912,7 +3915,11 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
             var PrevWord = PRS.Word;
 
+            PRS.bInsideOper = false;
+
             Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
+
+            bParentInsideOper = bParentInsideOper || PRS.bInsideOper;
 
             PRS.bBoxOperator = Type == para_Math_Composition && Item.kind == MATH_BOX;
 
@@ -3970,6 +3977,8 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 }
                 else
                 {
+                    bCurInsideOper = bCurInsideOper || PRS.bInsideOper;
+
                     // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                     // FirstItemOnLine == false - слово оказалось не единственным элементом в промежутке, делаем перенос
 
@@ -3981,11 +3990,9 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         this.ParaMath.UpdateWidthLine(PRS, PRS.X - PRS.XRange);
                     }
 
-                    var bInsideOperator = Item.bOneLine == false && PRS.bInsideOper == true;
-
                     // обновляем BreakPos на конец Run, т.к. внутри мат объекта BreakPos  может измениться на  if(true !== Word)
                     // обновляем только в том случае, если Word = false, иначе можем здесь перебить корректный LineBreakPos
-                    if(PrevWord == false && Brk_Before == false && bNoOneBreakOperator == false && bInsideOperator == false)
+                    if(PrevWord == false && Brk_Before == false && bNoOneBreakOperator == false && bCurInsideOper == false)
                     {
                         // обновим : начало нового слова - конец предыдущего Run
 
@@ -4025,6 +4032,8 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             }
         }
     }
+
+    PRS.bInsideOper = bParentInsideOper;
 
     if ( Pos >= ContentLen )
     {

@@ -3441,8 +3441,6 @@ CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 {
     this.bOneLine = PRS.bMath_OneLine == true || this.Content.length > 1; // this.Content.length > 1 - несколько контентов, разделенные сепараторами
 
-    PRS.bInsideOper   = false;
-
     if(this.bOneLine == false)
     {
         var CurLine  = PRS.Line - this.StartLine;

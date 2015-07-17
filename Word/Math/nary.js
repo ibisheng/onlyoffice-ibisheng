@@ -461,8 +461,6 @@ CNary.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 {
     this.bOneLine = PRS.bMath_OneLine;
 
-    PRS.bInsideOper   = false;
-
     if(this.bOneLine === true)
     {
         CNary.superclass.Recalculate_Range.call(this, PRS, ParaPr, Depth);
