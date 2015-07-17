@@ -3870,8 +3870,8 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         }
     }
 
-    var bParentInsideOper = PRS.bInsideOper,
-        bCurInsideOper    = false;
+    var bInternalOper    = false,
+        bCurInsideOper   = false;
 
     for(var Pos = RangeStartPos; Pos < ContentLen; Pos++)
     {
@@ -3919,7 +3919,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
             Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
 
-            bParentInsideOper = bParentInsideOper || PRS.bInsideOper;
+            bCurInsideOper = bCurInsideOper || PRS.bInsideOper;
 
             PRS.bBoxOperator = Type == para_Math_Composition && Item.kind == MATH_BOX;
 
@@ -3977,7 +3977,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 }
                 else
                 {
-                    bCurInsideOper = bCurInsideOper || PRS.bInsideOper;
+                    bInternalOper = bInternalOper || PRS.bInsideOper;
 
                     // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                     // FirstItemOnLine == false - слово оказалось не единственным элементом в промежутке, делаем перенос
@@ -3992,7 +3992,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     // обновляем BreakPos на конец Run, т.к. внутри мат объекта BreakPos  может измениться на  if(true !== Word)
                     // обновляем только в том случае, если Word = false, иначе можем здесь перебить корректный LineBreakPos
-                    if(PrevWord == false && Brk_Before == false && bNoOneBreakOperator == false && bCurInsideOper == false)
+                    if(bCurInsideOper == true && PrevWord == false && Brk_Before == false && bNoOneBreakOperator == false && bInternalOper == false)
                     {
                         // обновим : начало нового слова - конец предыдущего Run
 
@@ -4033,7 +4033,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         }
     }
 
-    PRS.bInsideOper = bParentInsideOper;
+    PRS.bInsideOper = PRS.bInsideOper || bCurInsideOper;
 
     if ( Pos >= ContentLen )
     {
