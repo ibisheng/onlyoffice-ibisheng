@@ -1407,10 +1407,8 @@ var deviceScale = 1;
 
 function OfflineEditor () {
 
-    this.contentX = 16384;
-    this.contextY = 1048576;
     this.zoom = 1.0;
-
+ 
     // main
 
     this.openFile = function () {
@@ -1424,7 +1422,6 @@ function OfflineEditor () {
         _api.asc_nativeOpenFile(window.native["GetFileString"]());
 
         this.registerEventsHandlers();
-
         this.asc_WriteAllWorksheets(true);
     };
     this.registerEventsHandlers = function () {
@@ -1458,6 +1455,16 @@ function OfflineEditor () {
     };
     this.getMaxSizeY = function () {
         return this.contextY;
+    };
+    this.getMaxBounds = function () {
+        var worksheet = _api.wb.getWorksheet();
+        var left = worksheet.cols[worksheet.cols.length - 1].left;
+        var top =  worksheet.rows[worksheet.rows.length - 1].top;
+
+        left += (gc_nMaxCol - worksheet.cols.length) * worksheet.defaultColWidth;
+        top += (gc_nMaxRow - worksheet.rows.length) * worksheet.defaultRowHeight;
+
+        return [left, top];
     };
     this.getSelection = function(x, y, width, height) {
         _null_object.width = width;
@@ -1725,6 +1732,9 @@ function offline_mouse_up(x, y) {
 }
 function offline_get_selection(x, y, width, height) {
     return _s.getSelection(x, y, width, height);
+}
+function offline_get_worksheet_bounds() {
+    return _s.getMaxBounds();
 }
 function offline_apply_event(type,params) {
     var _stream = null;
