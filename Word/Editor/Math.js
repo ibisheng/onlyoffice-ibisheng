@@ -1484,7 +1484,8 @@ ParaMath.prototype.Save_MathInfo = function(Copy)
         bFastRecalculate:   this.bFastRecalculate,
         PageInfo:           this.PageInfo,
         bInline:            this.ParaMathRPI.bInline,
-        Align:              this.Get_Align()
+        Align:              this.Get_Align(),
+        bEmptyFirstRange:   this.Root.Is_EmptyRange(this.Root.StartLine, this.Root.StartRange)
     };
 
     RecalculateObject.Fill(StructRecalc);
@@ -3551,6 +3552,7 @@ function CMathRecalculateObject()
 
     this.bInline          = false;
     this.Align            = align_Justify;
+    this.bEmptyFirstRange = false;
 }
 CMathRecalculateObject.prototype.Fill = function(StructRecalc)
 {
@@ -3564,6 +3566,7 @@ CMathRecalculateObject.prototype.Fill = function(StructRecalc)
     this.MaxW             = PageInfo.GetCurrentMaxWidthAllLines();
     this.bWordLarge       = PageInfo.GetCurrentStateWordLarge();
 
+    this.bEmptyFirstRange = StructRecalc.bEmptyFirstRange;
 };
 CMathRecalculateObject.prototype.Load_MathInfo = function(PageInfo)
 {
@@ -3580,6 +3583,9 @@ CMathRecalculateObject.prototype.Compare = function(PageInfo)
         result = false;
 
     if(this.WrapState !== PageInfo.GetCurrentWrapState())
+        result = false;
+
+    if(this.bEmptyFirstRange !== PageInfo.bEmptyFirstRange)
         result = false;
 
     var DiffMaxW = this.MaxW - PageInfo.GetCurrentMaxWidthAllLines();
