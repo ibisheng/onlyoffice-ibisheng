@@ -1457,19 +1457,17 @@ ParaMath.prototype.private_UpdateXLimits = function(PRS)
     var WrapIndent = MathSettings.Get_WrapIndent(WrapState);
 
     PRS.WrapIndent = WrapIndent;
+    PRS.bPriorityOper = this.ParaMathRPI.bInline == false;
 
-    if(this.ParaMathRPI.bInline == true || this.Root.IsStartLine(PRS.Line) == false)
+    var bFirstLine = this.Root.IsStartLine(PRS.Line);
+    PRS.bFirstLine = bFirstLine;
+
+    if(bFirstLine == false)
     {
         PRS.X += WrapIndent;
-        PRS.bCompareWrapIndent = false;
-    }
-    else
-    {
-        PRS.bCompareWrapIndent = true;
     }
 
     PRS.XRange = PRS.X;
-
 };
 ParaMath.prototype.UpdateInfoForBreak = function(PRS, Line)
 {

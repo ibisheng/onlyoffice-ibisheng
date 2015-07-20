@@ -2314,7 +2314,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                         var bOverXEnd;
 
-                        if(bCompareOper && bFirstCompareOper == true && PRS.bCompareWrapIndent == true && WorLenCompareOper > PRS.WrapIndent && !(Word == false && bFirstItem == true)) // (Word == true && FirstItemOnLine == true) - не первый элемент в строке
+                        var bCompareWrapIndent = PRS.bFirstLine == true ? WorLenCompareOper > PRS.WrapIndent : true;
+
+                        if(PRS.bPriorityOper == true && bCompareOper == true && bFirstCompareOper == true && bCompareWrapIndent == true && !(Word == false && bFirstItem == true)) // (Word == true && FirstItemOnLine == true) - не первый элемент в строке
                             bFirstCompareOper = false;
 
                         if(bOperBefore)  // оператор "до"

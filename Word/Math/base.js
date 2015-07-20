@@ -1868,7 +1868,6 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 PRS.WordLen += this.dW;
         }
 
-
         if(PRS.NewRange == false)
         {
             PRS.WordLen += this.BrGapRight;
