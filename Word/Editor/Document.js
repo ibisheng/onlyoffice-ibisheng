@@ -14133,6 +14133,10 @@ CDocument.prototype.Get_MailMergedDocument = function(_nStartIndex, _nEndIndex)
     // Нумерацию придется повторить для каждого отдельного файла
     LogicDocument.Numbering.Clear();
 
+
+    LogicDocument.theme = this.theme.createDuplicate();
+    LogicDocument.clrSchemeMap   = this.clrSchemeMap.createDuplicate();
+
     var FieldsManager = this.FieldsManager;
 
     var ContentCount = this.Content.length;

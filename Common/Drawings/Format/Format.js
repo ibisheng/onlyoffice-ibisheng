@@ -9587,6 +9587,19 @@ FontScheme.prototype =
         return this.Id;
     },
 
+    createDuplicate: function()
+    {
+        var oCopy = new FontScheme();
+        oCopy.majorFont.latin = this.majorFont.latin;
+        oCopy.majorFont.ea = this.majorFont.ea;
+        oCopy.majorFont.cs = this.majorFont.cs;
+
+        oCopy.minorFont.latin = this.minorFont.latin;
+        oCopy.minorFont.ea = this.minorFont.ea;
+        oCopy.minorFont.cs = this.minorFont.cs;
+        return oCopy;
+    },
+
     Refresh_RecalcData: function()
     {},
     Write_ToBinary2: function (w)
@@ -9897,6 +9910,26 @@ FmtScheme.prototype =
         }
     },
 
+    createDuplicate: function()
+    {
+        var oCopy = new FmtScheme();
+        oCopy.name = this.name;
+        for(i = 0; i < this.fillStyleLst.length; ++i)
+        {
+            oCopy.fillStyleLst[i] = this.fillStyleLst[i].createDuplicate();
+        }
+        for(i = 0; i < this.lnStyleLst.length; ++i)
+        {
+            oCopy.lnStyleLst[i] = this.lnStyleLst[i].createDuplicate();
+        }
+
+        for(i = 0; i < this.bgFillStyleLst.length; ++i)
+        {
+            oCopy.bgFillStyleLst[i] = this.bgFillStyleLst[i].createDuplicate();
+        }
+        return oCopy;
+    },
+
     setName: function(pr)
     {
        // History.Add(this, {Type:historyitem_FormatScheme_SetName, oldPr: this.name, newPr: pr});
@@ -10119,6 +10152,15 @@ CTheme.prototype =
     Get_Id: function()
     {
         return this.Id;
+    },
+
+    createDuplicate: function()
+    {
+        var oTheme = new CTheme();
+        oTheme.changeColorScheme(this.themeElements.clrScheme.createDuplicate());
+        oTheme.setFontScheme(this.themeElements.fontScheme.createDuplicate());
+        oTheme.setFontScheme(this.themeElements.fmtScheme.createDuplicate());
+        return oTheme;
     },
 
     Document_Get_AllFontNames: function(AllFonts)
