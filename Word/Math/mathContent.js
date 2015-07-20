@@ -3959,7 +3959,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                         // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                         // FirstItemOnLine == false - слово оказалось не единственным элементом в промежутке, делаем перенос
-                        if (PRS.FirstItemOnLine == false && bOverXEnd)
+                        if(PRS.FirstItemOnLine == false && bOverXEnd)
                         {
                             PRS.MoveToLBP = true;
                             PRS.NewRange = true;
@@ -3992,12 +3992,15 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     // обновляем BreakPos на конец Run, т.к. внутри мат объекта BreakPos  может измениться на  if(true !== Word)
                     // обновляем только в том случае, если Word = false, иначе можем здесь перебить корректный LineBreakPos
-                    if(bCurInsideOper == true && PrevWord == false && Brk_Before == false && bNoOneBreakOperator == false && bInternalOper == false)
+                    if(bCurInsideOper == true && PrevWord == false && Brk_Before == false && bNoOneBreakOperator == false && PRS.bInsideOper == false)
                     {
                         // обновим : начало нового слова - конец предыдущего Run
 
                         PRS.Update_CurPos(PrevLastPos, _Depth-1);
                         PRS.Set_LineBreakPos(LastPos);
+
+                        if(PRS.NewRange == true) // делаем возврат к предыдущему оператору
+                            PRS.MoveToLBP = true;
                     }
 
                     PRS.Word = true;
