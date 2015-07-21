@@ -717,8 +717,17 @@
 				else if(activateLocalStorage || copyPasteUseBinary)
 				{
 					var t = this;
-					var onlyFromLocalStorage = true;
-					t._editorPasteExec(worksheet,t.lStorage,false,onlyFromLocalStorage);
+					
+					if(t.element && t.element.innerHTML !== "&nbsp;" && t.element.innerHTML !== "")
+					{
+						t._editorPasteExec(worksheet, t.lStorage, false, true);
+					}
+					else
+					{
+						window.GlobalPasteFlagCounter = 0;
+						window.GlobalPasteFlag = false;
+					}
+					
 					return true;
 				}
 				return false;
