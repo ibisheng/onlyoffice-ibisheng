@@ -5621,6 +5621,18 @@ LineJoin.prototype =
         }
     },
 
+    Write_ToBinary: function(w)
+    {
+        writeLong(w, this.type);
+        writeBool(w, this.limit);
+    },
+
+    Read_FromBinary: function(r)
+    {
+        this.type = readLong(r);
+        this.limit = readBool(r);
+    },
+
     Load_Changes: function(r)
     {
         if(this.getObjectType() !== r.GetLong())
@@ -5987,7 +5999,13 @@ CLn.prototype =
             this.Fill.Write_ToBinary(w);
         }
         writeLong(w, this.prstDash);
-        writeLong(w, this.Join);
+
+        w.WriteBool(isRealObject(this.Join));
+        if(isRealObject(this.Join))
+        {
+            this.Join.Write_ToBinary(w);
+        }
+
         w.WriteBool(isRealObject(this.headEnd));
         if(isRealObject(this.headEnd))
         {
@@ -6016,7 +6034,13 @@ CLn.prototype =
             this.Fill = null;
         }
         this.prstDash = readLong(r);
-        this.Join = readLong(r);
+
+        if(r.GetBool())
+        {
+            this.Join = new LineJoin();
+            this.Join.Read_FromBinary(r);
+        }
+
         if(r.GetBool())
         {
             this.headEnd = new EndArrow();
