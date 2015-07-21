@@ -866,18 +866,13 @@ CMathText.prototype.Is_CompareOperator = function()
 {
     return this.value == 0x3C || this.value  == 0x3D || this.value  == 0x3E;
 };
-CMathText.prototype.Is_SpecilalOperator = function()
+CMathText.prototype.Is_LeftBracket = function()
 {
-    var val = this.value,
-        bSpecialOperator = val == 0x21 || val == 0x23 || (val >= 0x28 && val <= 0x2F) || (val >= 0x3A && val <= 0x3F) || (val >=0x5B && val <= 0x5F) || (val >= 0x7B && val <= 0xA1) || val == 0xAC || val == 0xB1 || val == 0xB7 || val == 0xBF || val == 0xD7 || val == 0xF7 || (val >= 0x2010 && val <= 0x2014) || val == 0x2016 || (val >= 0x2020 && val <= 0x2022) || val == 0x2026,
-        bSpecialArrow    = val >= 0x2190 && val <= 0x21FF,
-        bSpecialSymbols  = val == 0x2200 || val == 0x2201 || val == 0x2203 || val == 0x2204 || val == 0x2206|| (val >= 0x2208 && val <= 0x220D) || (val >= 0x220F && val <= 0x221E) || (val >= 0x2223 && val <= 0x223E) || (val >= 0x223F && val <= 0x22BD) || (val >= 0x22C0 && val <= 0x22FF) || val == 0x2305 || val == 0x2306 || (val >= 0x2308 && val <= 0x230B) || (val >= 0x231C && val <= 0x231F) || val == 0x2322 || val == 0x2323 || val == 0x2329 || val == 0x232A ||val == 0x233F || val == 0x23B0 || val == 0x23B1,
-        bOtherArrows     = (val >= 0x27D1 && val <= 0x2980) || (val >= 0x2982 && val <= 0x299A) || (val >= 0x29B6 &&  val <= 0x29B9) || val == 0x29C0 || val == 0x29C1 || (val >= 0x29C4 && val <= 0x29C8) || (val >= 0x29CE && val <= 0x29DB) || val == 0x29DF || (val >= 0x29E1 && val <= 0x29E6) || val == 0x29EB || (val >= 0x29F4 && val <= 0x2AFF && val !== 0x2AE1 && val !== 0x2AF1) || (val >= 0x3014 && val <= 0x3017);
-
-    // apostrophe
-    // отдельно Cambria Math 0x27
-
-    return bSpecialOperator || bSpecialArrow || bSpecialSymbols || bOtherArrows;
+    return this.value == 0x28 || this.value == 0x7B || this.value == 0x5B || this.value == 0x27E8 || this.value == 0x230A || this.value == 0x2308 || this.value == 0x27E6 || this.value == 0x2329;
+};
+CMathText.prototype.Is_RightBracket = function()
+{
+    return this.value == 0x29 || this.value == 0x7D || this.value == 0x5D || this.value == 0x27E9 || this.value == 0x230B || this.value == 0x2309 || this.value == 0x27E7 || this.value == 0x232A;
 };
 ////
 CMathText.prototype.setCoeffTransform = function(sx, shx, shy, sy)

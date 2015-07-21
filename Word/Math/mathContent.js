@@ -835,6 +835,7 @@ CMathContent.prototype.GetWidthLine = function(_CurLine, _CurRange)
 
     return W;
 };
+
 CMathContent.prototype.ShiftPage = function(Dx)
 {
     this.Bounds.ShiftPage(Dx);
@@ -4229,6 +4230,20 @@ CMathContent.prototype.GetWidth = function(_CurLine, _CurRange)
         CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
 
     return this.Bounds.GetWidth(CurLine, CurRange);
+};
+CMathContent.prototype.GetAscent = function(_CurLine, _CurRange)
+{
+    var CurLine  = _CurLine - this.StartLine,
+        CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    return this.Bounds.GetAscent(CurLine, CurRange);
+};
+CMathContent.prototype.GetDescent = function(_CurLine, _CurRange)
+{
+    var CurLine  = _CurLine - this.StartLine,
+        CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    return this.Bounds.GetDescent(CurLine, CurRange);
 };
 CMathContent.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchPos, Depth)
 {

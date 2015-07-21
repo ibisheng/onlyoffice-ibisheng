@@ -1518,9 +1518,17 @@ ParaMath.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cu
     // произойдет зацикливание
 
 
-    //var bEmptyRange = PRS.Ranges.length > 0 && this.Root.Is_EmptyRange(_CurLine, _CurRange);
     this.Root.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
-    //PRS.EmptyLine = PRS.Ranges.length > 0 && this.Root.Is_EmptyRange(_CurLine, _CurRange);
+
+    var RootAscent  = this.Root.GetAscent(_CurLine, _CurRange),
+        RootDescent = this.Root.GetDescent(_CurLine, _CurRange);
+
+    if(PRS.LineAscent < RootAscent)
+        PRS.LineAscent = RootAscent;
+
+    if(PRS.LineDescent < RootDescent)
+        PRS.LineDescent = RootDescent;
+
 
 };
 ParaMath.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)

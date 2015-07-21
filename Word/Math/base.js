@@ -2279,7 +2279,18 @@ CMathBounds.prototype.SetPage = function(Line, Range, Page)
 };
 CMathBounds.prototype.GetWidth = function(Line, Range)
 {
+    this.CheckLineBound(Line);
     return this.Bounds[Line][Range].W;
+};
+CMathBounds.prototype.GetAscent = function(Line, Range)
+{
+    this.CheckLineBound(Line);
+    return this.Bounds[Line][Range].Asc;
+};
+CMathBounds.prototype.GetDescent = function(Line, Range)
+{
+    this.CheckLineBound(Line);
+    return this.Bounds[Line][Range].H - this.Bounds[Line][Range].Asc;
 };
 CMathBounds.prototype.ShiftPage = function(Dx)
 {
@@ -2294,7 +2305,6 @@ CMathBounds.prototype.ShiftPage = function(Dx)
             this.Bounds[CurLine][CurRange].ShiftPage(Dx);
         }
     }
-
 };
 CMathBounds.prototype.Get_Bounds = function()
 {
@@ -2326,6 +2336,8 @@ CMathBounds.prototype.ShiftPos = function(Line, Range, Dx, Dy)
 };
 CMathBounds.prototype.GetPos = function(Line, Range)
 {
+    this.CheckLineBound(Line);
+
     var Pos = new CMathPosition();
 
     Pos.x = this.Bounds[Line][Range].GetX();
