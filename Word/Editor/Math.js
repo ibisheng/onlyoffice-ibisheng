@@ -1176,7 +1176,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var bUpdateWrapMath = PRS.Ranges.length > 0 && this.ParaMathRPI.bInline == false;
 
     // первый пересчет
-    if(PrevLineObject == null && true == bFirstRange && PRS.bFastRecalculate == false/*&& PRS.RecalcResult == recalcresult_NextLine*/)
+    if(PrevLineObject == null && true == bFirstRange && PRS.bFastRecalculate == false)
     {
         // информация о пересчете
         var RPI = new CRPI();
@@ -1188,7 +1188,6 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
         this.Root.PreRecalc(null, this, ArgSize, RPI);
         this.ParaMathRPI.ResetInfoRanges();
-        //this.private_InitWrapSettings(PRS);
     }
 
     if(bUpdateWrapMath == true && this.ParaMathRPI.bInternalRanges == false &&  PRS.bFastRecalculate == false)

@@ -3874,6 +3874,10 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var bInternalOper    = false,
         bCurInsideOper   = false;
 
+    // для неинлайн формул :
+    // у операторов, находяхщихся на этом уровне (в Run) приоритет выше, чем у внутренних операторов (внутри мат объектов)
+    var bNoBreakMObj = false;
+
     for(var Pos = RangeStartPos; Pos < ContentLen; Pos++)
     {
         var Item = this.Content[Pos],
@@ -3917,6 +3921,8 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             var PrevWord = PRS.Word;
 
             PRS.bInsideOper = false;
+
+            PRS.bMath_OneLine = Type == para_Math_Composition && bNoBreakMObj == true;
 
             Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
 
@@ -4025,6 +4031,13 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         PRS.RunRecalcInfoLast.NumberingUse = true;
                         PRS.RunRecalcInfoLast.NumberingItem = PRS.Paragraph.Numbering;
                     }
+                }
+            }
+            else
+            {
+                if(PRS.bPriorityOper == true && PRS.bInsideOper == true && PRS.X - PRS.XRange > PRS.WrapIndent)
+                {
+                    bNoBreakMObj = true;
                 }
             }
 
