@@ -4343,6 +4343,9 @@
 					aResult._images = [];
 				
 				var oGraphicObj = paraDrawing.GraphicObj;
+				if(!oGraphicObj || (oGraphicObj && !oGraphicObj.blipFill) || (oGraphicObj && oGraphicObj.blipFill && !oGraphicObj.blipFill.RasterImageId))
+					return;
+				
 				var sImageUrl = oGraphicObj.blipFill.RasterImageId;
 				aResult._aPastedImages[aResult._aPastedImages.length] = new CBuilderImages(oGraphicObj.blipFill, sImageUrl, null, oGraphicObj.spPr, null);
 				aResult._images[aResult._images.length] = sImageUrl;
