@@ -7505,6 +7505,9 @@ CTextPr.prototype =
         this.Vanish     = undefined;
         this.TextOutline = undefined;
         this.TextFill    = undefined;
+        this.AscFill    = undefined;
+        this.AscUnifill = undefined;
+        this.AscLine    = undefined;
     },
 
     Copy : function(bCopyPrChange)
@@ -7797,6 +7800,18 @@ CTextPr.prototype =
         if(undefined != TextPr.TextOutline)
         {
             this.TextOutline = TextPr.TextOutline;
+        }
+        if(undefined != TextPr.AscFill)
+        {
+            this.AscFill = TextPr.AscFill;
+        }
+        if(undefined != TextPr.AscUnifill)
+        {
+            this.AscUnifill = TextPr.AscUnifill;
+        }
+        if(undefined != TextPr.AscLine)
+        {
+            this.AscLine = TextPr.AscLine;
         }
     },
 

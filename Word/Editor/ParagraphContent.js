@@ -690,14 +690,27 @@ ParaTextPr.prototype =
             this.Set_Unifill(TextPr.Unifill.createDuplicate());
             this.Set_Color(undefined);
         }
+        else if(undefined != TextPr.AscUnifill)
+        {
+            this.Set_Unifill(CorrectUniFill(TextPr.AscUnifill, this.Value.Unifill, 0));
+            this.Set_Color(undefined);
+        }
         if(undefined != TextPr.TextOutline)
         {
             this.Set_TextOutline(TextPr.TextOutline);
         }
+       // else if(undefined != TextPr.AscLine)
+       // {
+       //     this.Set_TextOutline(CorrectUniStroke(TextPr.AscLine, this.Value.TextOutline, 0));
+       // }
         if(undefined != TextPr.TextFill)
         {
             this.Set_TextFill(TextPr.TextFill);
         }
+       // else if(undefined != TextPr.AscFill)
+       // {
+       //     this.Set_TextFill(CorrectUniFill(TextPr.AscFill, this.Value.TextFill, 0));
+       // }
     },
 
     Clear_Style : function()

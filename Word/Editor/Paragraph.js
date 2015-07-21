@@ -5306,7 +5306,29 @@ Paragraph.prototype =
             if ( true === this.Cursor_IsEnd() )
             {
                 if ( undefined === IncFontSize )
-                    this.TextPr.Apply_TextPr( TextPr );
+                {
+                    if(!TextPr.AscFill && !TextPr.AscLine && !TextPr.AscUnifill)
+                    {
+                        this.TextPr.Apply_TextPr( TextPr );
+                    }
+                    else
+                    {
+                        var EndTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+                        EndTextPr.Merge( this.TextPr.Value );
+                        if(TextPr.AscFill)
+                        {
+                            this.TextPr.Set_TextFill(CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 0));
+                        }
+                        if(TextPr.AscUnifill)
+                        {
+                            this.TextPr.Set_Unifill(CorrectUniFill(TextPr.AscUnifill, EndTextPr.Unifill, 0));
+                        }
+                        if(TextPr.AscLine)
+                        {
+                            this.TextPr.Set_TextOutline(CorrectUniStroke(TextPr.AscLine, EndTextPr.TextOutline, 0));
+                        }
+                    }
+                }
                 else
                 {
                     // Выставляем настройки для символа параграфа

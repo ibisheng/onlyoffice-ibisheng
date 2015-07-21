@@ -1762,7 +1762,7 @@ DrawingObjectsController.prototype =
 
     getColorMap: function()
     {
-        return this.defaultColorMap;
+        return G_O_DEFAULT_COLOR_MAP;
     },
 
     getAscChartObject: function()
@@ -1807,15 +1807,7 @@ DrawingObjectsController.prototype =
 
     getTextArtPreviewManager: function()
     {
-        var api;
-        if(window["Asc"] && window["Asc"]["editor"])
-        {
-            api = window["Asc"]["editor"];
-        }
-        else
-        {
-            api = editor;
-        }
+        var api = this.getEditorApi();
         return api.textArtPreviewManager;
     },
 
@@ -1992,6 +1984,7 @@ DrawingObjectsController.prototype =
             aGroups[i].updateCoordinatesAfterInternalResize();
         }
 
+        var bRecalcText = false;
         if(props.textArtProperties)
         {
             var  oAscTextArtProperties = props.textArtProperties;
@@ -2018,16 +2011,17 @@ DrawingObjectsController.prototype =
                 {
                     if(bWord)
                     {
-                        oParaTextPr = new ParaTextPr({TextFill: oAscFill ? CorrectUniFill(oAscFill, new CUniFill()) : undefined, TextOutline: oAscStroke ?  CorrectUniStroke(oAscStroke, new CLn()) : undefined});
+                        oParaTextPr = new ParaTextPr({AscFill: oAscFill, AscLine: oAscStroke});
                     }
                     else
                     {
-                        oParaTextPr = new ParaTextPr({Unifill: oAscFill ? CorrectUniFill(oAscFill, new CUniFill()) : undefined, TextOutline: oAscStroke ?  CorrectUniStroke(oAscStroke, new CLn()) : undefined});
+                        oParaTextPr = new ParaTextPr({AscUnifill: oAscFill, AscLine: oAscStroke});
                     }
                 }
             }
             if(oParaTextPr)
             {
+                bRecalcText = true;
                 this.paragraphAdd(oParaTextPr);
             }
             var oPreset = oAscTextArtProperties.asc_getForm();
@@ -2041,6 +2035,34 @@ DrawingObjectsController.prototype =
                 {
                     objects_by_type.groups[i].applyTextArtForm(oPreset);
                 }
+            }
+        }
+        var oApi = this.getEditorApi();
+        if(oApi && oApi.noCreatePoint && !oApi.exucuteHistory)
+        {
+            for(i = 0; i < objects_by_type.shapes.length; ++i)
+            {
+                if(bRecalcText)
+                {
+                    objects_by_type.shapes[i].recalcText();
+                    if(bWord)
+                    {
+                        objects_by_type.shapes[i].recalculateText();
+                    }
+                }
+                objects_by_type.shapes[i].recalculate();
+            }
+            for(i = 0; i < objects_by_type.groups.length; ++i)
+            {
+                if(bRecalcText)
+                {
+                    objects_by_type.groups[i].recalcText();
+                    if(bWord)
+                    {
+                        objects_by_type.shapes[i].recalculateText();
+                    }
+                }
+                objects_by_type.groups[i].recalculate();
             }
         }
         return objects_by_type;
@@ -5774,6 +5796,35 @@ DrawingObjectsController.prototype =
                 }
             }
         }
+        if(shape_props && shape_props.textArtProperties)
+        {
+            var oTextArtProperties = shape_props.textArtProperties;
+            var oTextPr = this.getParagraphTextPr();
+            if(oTextPr)
+            {
+                if(oTextPr.TextFill)
+                {
+                    oTextArtProperties.Fill = oTextPr.TextFill;
+                }
+                else if(oTextPr.Unifill)
+                {
+                    oTextArtProperties.Fill = oTextPr.Unifill;
+                }
+               // else if(oTextPr.Color)
+               // {
+               //     oTextArtProperties.Fill = CreateUnfilFromRGB(oTextPr.Color.r, oTextPr.Color.g, oTextPr.Color.b);
+               // }
+                oTextArtProperties.Line = oTextPr.TextOutline;
+                if(oTextArtProperties.Fill)
+                {
+                    oTextArtProperties.Fill.check(this.getTheme(), this.getColorMap());
+                }
+                if(oTextArtProperties.Line && oTextArtProperties.Line.Fill)
+                {
+                    oTextArtProperties.Line.Fill.check(this.getTheme(), this.getColorMap());
+                }
+            }
+        }
         return {imageProps: image_props, shapeProps: shape_props, chartProps: chart_props, tableProps: table_props, shapeChartProps: shape_chart_props};
     },
 
@@ -5786,19 +5837,23 @@ DrawingObjectsController.prototype =
         return this.getDrawingPropsFromArray(this.selectedObjects);
     },
 
+    getEditorApi: function()
+    {
+        if(window["Asc"] && window["Asc"]["editor"])
+        {
+            return window["Asc"]["editor"];
+        }
+        else
+        {
+            return editor;
+        }
+    },
+
     getGraphicObjectProps: function()
     {
         var  props = this.getDrawingProps();
 
-        var api;
-        if(window["Asc"] && window["Asc"]["editor"])
-        {
-            api = window["Asc"]["editor"];
-        }
-        else
-        {
-            api = editor;
-        }
+        var api = this.getEditorApi();
         var shape_props, image_props, chart_props;
         var ascSelectedObjects = [];
 
@@ -6048,7 +6103,14 @@ DrawingObjectsController.prototype =
         var oParagraph = oContent.Content[0];
         for(var i = 0; i < sText.length; ++i)
         {
-            oParagraph.Add(new ParaText(sText[i]));
+            if (sText[i] != ' ')
+            {
+                oParagraph.Add(new ParaText(sText[i]));
+            }
+            else
+            {
+                oParagraph.Add(new ParaSpace());
+            }
         }
         var oTextPr = oShape.getTextArtPreviewManager().getStylesToApply()[nStyle].Copy();
         oTextPr.FontSize = nFontSize;

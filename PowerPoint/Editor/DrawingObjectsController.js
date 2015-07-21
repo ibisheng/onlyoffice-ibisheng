@@ -11,6 +11,34 @@ DrawingObjectsController.prototype.getDrawingArray = function()
     return this.drawingObjects.cSld.spTree;
 };
 
+
+DrawingObjectsController.prototype.getColorMap = function()
+{
+
+    if(this.drawingObjects )
+    {
+        if(this.drawingObjects.clrMap)
+        {
+            return this.drawingObjects.clrMap;
+        }
+        else if(this.drawingObjects.Layout )
+        {
+            if(this.drawingObjects.Layout.clrMap)
+            {
+                return this.drawingObjects.Layout.clrMap;
+            }
+            else if(this.drawingObjects.Layout.Master)
+            {
+                if(this.drawingObjects.Layout.Master.clrMap)
+                {
+                    return this.drawingObjects.Layout.Master.clrMap;
+                }
+            }
+        }
+    }
+    return G_O_DEFAULT_COLOR_MAP;
+};
+
 DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(callback, args, bNoSendProps, nHistoryPointType)
 {
     var check_type = changestype_Drawing_Props, comment;

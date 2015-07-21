@@ -1876,7 +1876,7 @@ CSchemeColor.prototype =
             }
             else
             {
-                var clrMap
+                var clrMap;
                 if(slide!=null && slide.clrMap!=null)
                 {
                     clrMap = slide.clrMap.color_map;
@@ -2234,8 +2234,8 @@ CUniColor.prototype =
         {
             return false;
         }
-        if(!isRealObject(unicolor.Mods) && isRealObject(this.Mods)
-            || !isRealObject(this.Mods) && isRealObject(unicolor.Mods)
+        if(!isRealObject(unicolor.Mods) && isRealObject(this.Mods) && this.Mods.Mods.length > 0
+            || !isRealObject(this.Mods) && isRealObject(unicolor.Mods) && unicolor.Mods.Mods.length > 0
             || isRealObject(this.Mods) && !this.Mods.IsIdentical(unicolor.Mods))
         {
             return false;
@@ -4480,7 +4480,7 @@ CNoFill.prototype =
         {
             return false;
         }
-        return fill.type !=  FILL_TYPE_NOFILL;
+        return fill.type ===  FILL_TYPE_NOFILL;
     },
     compare : function(nofill)
     {

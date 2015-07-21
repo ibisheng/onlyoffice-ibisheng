@@ -1035,6 +1035,7 @@ CGraphicObjects.prototype =
 
     getTargetDocContent: DrawingObjectsController.prototype.getTargetDocContent,
     getTextArtPreviewManager: DrawingObjectsController.prototype.getTextArtPreviewManager,
+    getEditorApi: DrawingObjectsController.prototype.getEditorApi,
 
     handleChartDoubleClick: function(drawing, chart, e, x, y, pageIndex)
     {
@@ -1690,6 +1691,10 @@ CGraphicObjects.prototype =
         return ret ? ret : new CParaPr();
     },
 
+    getColorMap: function()
+    {
+        return this.document.Get_ColorMap();
+    },
 
     getParagraphTextPr: function()
     {

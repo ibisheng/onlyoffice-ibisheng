@@ -3444,7 +3444,7 @@ CShape.prototype =
                 }
                 var clip_rect = this.clipRect;
                 var bodyPr = this.txBody.bodyPr;
-                if(clip_rect)
+                if(/*clip_rect*/ false)
                 {
                     if(!bodyPr || !bodyPr.upright)
                     {
@@ -3761,32 +3761,32 @@ CShape.prototype =
         {
             oRet = {Fill: undefined, Line: undefined, Form: undefined};
             var oController = this.getDrawingObjectsController();
-            if(oController)
+           // if(oController)
             {
-                var oTargetDocContent = oController.getTargetDocContent();
-                if(oTargetDocContent === oContent)
-                {
-                    oTextPr = oContent.Get_Paragraph_TextPr();
-                }
-                else
-                {
-                    oContent.Set_ApplyToAll(true);
-                    oTextPr = oContent.Get_Paragraph_TextPr();
-                    oContent.Set_ApplyToAll(false);
-                }
-                if(oTextPr.TextFill)
-                {
-                    oRet.Fill = oTextPr.TextFill;
-                }
-                else if(oTextPr.Unifill)
-                {
-                    oRet.Fill = oTextPr.Unifill;
-                }
-                else if(oTextPr.Color)
-                {
-                    oRet.Fill = CreateUnfilFromRGB(oTextPr.Color.r, oTextPr.Color.g, oTextPr.Color.b);
-                }
-                oRet.Line = oTextPr.TextOutline;
+                //var oTargetDocContent = oController.getTargetDocContent();
+                //if(oTargetDocContent === oContent)
+                //{
+                //    oTextPr = oContent.Get_Paragraph_TextPr();
+                //}
+                //else
+                //{
+                //    oContent.Set_ApplyToAll(true);
+                //    oTextPr = oContent.Get_Paragraph_TextPr();
+                //    oContent.Set_ApplyToAll(false);
+                //}
+                //if(oTextPr.TextFill)
+                //{
+                //    oRet.Fill = oTextPr.TextFill;
+                //}
+                //else if(oTextPr.Unifill)
+                //{
+                //    oRet.Fill = oTextPr.Unifill;
+                //}
+                //else if(oTextPr.Color)
+                //{
+                //    oRet.Fill = CreateUnfilFromRGB(oTextPr.Color.r, oTextPr.Color.g, oTextPr.Color.b);
+                //}
+                //oRet.Line = oTextPr.TextOutline;
                 var oBodyPr = this.getBodyPr();
                 if(oBodyPr && oBodyPr.prstTxWarp)
                 {

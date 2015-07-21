@@ -1289,7 +1289,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			} else if ("asc_onInitEditorShapes" === name) {
 				this.handlers.trigger("asc_onInitEditorShapes", g_oAutoShapesGroups, g_oAutoShapesTypes);
 			} else if ("asc_onInitEditorTextArts" === name) {
-				this.handlers.trigger("asc_onInitEditorTextArts", g_oPresetTxWarpGroups, g_PresetTxWarpTypes);
+				this.handlers.trigger("asc_onInitEditorTextArts", [g_oPresetTxWarpGroups, g_PresetTxWarpTypes]);
 			} else if ("asc_onInitStandartTextures" === name) {
 				var _count = g_oUserTexturePresets.length;
 				var arr = new Array(_count);

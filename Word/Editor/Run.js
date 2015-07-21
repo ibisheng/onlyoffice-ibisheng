@@ -5570,7 +5570,29 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
         if ( true === bEnd )
         {
             if ( undefined === IncFontSize )
-                this.Paragraph.TextPr.Apply_TextPr( TextPr );
+            {
+                if(!TextPr.AscFill && !TextPr.AscLine && !TextPr.AscUnifill)
+                {
+                    this.Paragraph.TextPr.Apply_TextPr( TextPr );
+                }
+                else
+                {
+                    var EndTextPr = this.Paragraph.Get_CompiledPr2(false).TextPr.Copy();
+                    EndTextPr.Merge( this.Paragraph.TextPr.Value );
+                    if(TextPr.AscFill)
+                    {
+                        this.Paragraph.TextPr.Set_TextFill(CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 0));
+                    }
+                    if(TextPr.AscUnifill)
+                    {
+                        this.Paragraph.TextPr.Set_Unifill(CorrectUniFill(TextPr.AscUnifill, EndTextPr.Unifill, 0));
+                    }
+                    if(TextPr.AscLine)
+                    {
+                        this.Paragraph.TextPr.Set_TextOutline(CorrectUniStroke(TextPr.AscLine, EndTextPr.TextOutline, 0));
+                    }
+                }
+            }
             else
             {
                 var Para = this.Paragraph;
@@ -5912,10 +5934,14 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
         this.Set_Color(undefined);
         this.Set_TextFill(undefined);
     }
-
-    if(undefined !== TextPr.TextOutline)
+    else if(undefined !== TextPr.AscUnifill && this.Paragraph)
     {
-        this.Set_TextOutline(null === TextPr.TextOutline ? undefined : TextPr.TextOutline);
+        if(this.Paragraph && !this.Paragraph.bFromDocument)
+        {
+            this.Set_Unifill(CorrectUniFill(TextPr.AscUnifill, this.CompiledPr.Unifill, 0));
+            this.Set_Color(undefined);
+            this.Set_TextFill(undefined);
+        }
     }
 
     if(undefined !== TextPr.TextFill)
@@ -5923,6 +5949,38 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
         this.Set_Unifill(undefined);
         this.Set_Color(undefined);
         this.Set_TextFill(null === TextPr.TextFill ? undefined : TextPr.TextFill);
+    }
+    else if(undefined !== TextPr.AscFill && this.Paragraph)
+    {
+        var oMergeUnifill, oColor;
+        if(this.Paragraph.bFromDocument)
+        {
+            if(this.CompiledPr.TextFill)
+            {
+                oMergeUnifill = this.CompiledPr.TextFill;
+            }
+            else if(this.CompiledPr.Unifill)
+            {
+                oMergeUnifill = this.CompiledPr.Unifill;
+            }
+            else if(this.CompiledPr.Color)
+            {
+                oColor = this.CompiledPr.Color;
+                oMergeUnifill = CreateUnfilFromRGB(oColor.r, oColor.g, oColor.b);
+            }
+            this.Set_Unifill(undefined);
+            this.Set_Color(undefined);
+            this.Set_TextFill(CorrectUniFill(TextPr.AscFill, oMergeUnifill, 0));
+        }
+    }
+
+    if(undefined !== TextPr.TextOutline)
+    {
+        this.Set_TextOutline(null === TextPr.TextOutline ? undefined : TextPr.TextOutline);
+    }
+    else if(undefined !== TextPr.AscLine && this.Paragraph)
+    {
+        this.Set_TextOutline(CorrectUniStroke(TextPr.AscLine, TextPr.TextOutline, 0));
     }
 
     if ( undefined != TextPr.VertAlign )

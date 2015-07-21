@@ -2897,7 +2897,7 @@ function CreateAscFill(unifill)
     }
     return ret;
 }
-function CorrectUniFill(asc_fill, unifill)
+function CorrectUniFill(asc_fill, unifill, editorId)
 {
     if (null == asc_fill)
         return unifill;
@@ -2959,11 +2959,11 @@ function CorrectUniFill(asc_fill, unifill)
                 }
                 if (undefined != _fill.fgClr)
                 {
-                    ret.fill.fgClr = CorrectUniColor(_fill.fgClr, ret.fill.fgClr);
+                    ret.fill.fgClr = CorrectUniColor(_fill.fgClr, ret.fill.fgClr, editorId);
                 }
                 if (undefined != _fill.bgClr)
                 {
-                    ret.fill.bgClr = CorrectUniColor(_fill.bgClr, ret.fill.bgClr);
+                    ret.fill.bgClr = CorrectUniColor(_fill.bgClr, ret.fill.bgClr, editorId);
                 }
 
                 break;
@@ -2986,7 +2986,7 @@ function CorrectUniFill(asc_fill, unifill)
                         for (var i = 0; i < _colors.length; i++)
                         {
                             var _gs = new CGs();
-                            _gs.color = CorrectUniColor(_colors[i], _gs.color);
+                            _gs.color = CorrectUniColor(_colors[i], _gs.color, editorId);
                             _gs.pos = _positions[i];
 
                             ret.fill.colors.push(_gs);
@@ -2999,7 +2999,7 @@ function CorrectUniFill(asc_fill, unifill)
                     {
                         for (var i = 0; i < _colors.length; i++)
                         {
-                            ret.fill.colors[i].color = CorrectUniColor(_colors[i], ret.fill.colors[i].color);
+                            ret.fill.colors[i].color = CorrectUniColor(_colors[i], ret.fill.colors[i].color, editorId);
                         }
                     }
                 }
@@ -3046,7 +3046,7 @@ function CorrectUniFill(asc_fill, unifill)
                 {
                     ret.fill = new CSolidFill();
                 }
-                ret.fill.color = CorrectUniColor(_fill.color, ret.fill.color);
+                ret.fill.color = CorrectUniColor(_fill.color, ret.fill.color, editorId);
             }
         }
     }
@@ -3154,7 +3154,7 @@ function CreateAscStroke(ln, _canChangeArrows)
     return ret;
 }
 
-function CorrectUniStroke(asc_stroke, unistroke)
+function CorrectUniStroke(asc_stroke, unistroke, flag)
 {
     if (null == asc_stroke)
         return unistroke;
@@ -3182,7 +3182,7 @@ function CorrectUniStroke(asc_stroke, unistroke)
             ret.Fill = new CUniFill();
             ret.Fill.type = FILL_TYPE_SOLID;
             ret.Fill.fill = new CSolidFill();
-            ret.Fill.fill.color = CorrectUniColor(_color, ret.Fill.fill.color);
+            ret.Fill.fill.color = CorrectUniColor(_color, ret.Fill.fill.color, flag);
         }
     }
 
