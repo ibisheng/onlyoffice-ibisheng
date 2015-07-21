@@ -5936,9 +5936,10 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
     }
     else if(undefined !== TextPr.AscUnifill && this.Paragraph)
     {
-        if(this.Paragraph && !this.Paragraph.bFromDocument)
+        if(!this.Paragraph.bFromDocument)
         {
-            this.Set_Unifill(CorrectUniFill(TextPr.AscUnifill, this.CompiledPr.Unifill, 0));
+            var oCompiledPr = this.Get_CompiledPr(true);
+            this.Set_Unifill(CorrectUniFill(TextPr.AscUnifill, oCompiledPr.Unifill, 0));
             this.Set_Color(undefined);
             this.Set_TextFill(undefined);
         }
@@ -5955,17 +5956,18 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
         var oMergeUnifill, oColor;
         if(this.Paragraph.bFromDocument)
         {
-            if(this.CompiledPr.TextFill)
+            var oCompiledPr = this.Get_CompiledPr(true);
+            if(oCompiledPr.TextFill)
             {
-                oMergeUnifill = this.CompiledPr.TextFill;
+                oMergeUnifill = oCompiledPr.TextFill;
             }
-            else if(this.CompiledPr.Unifill)
+            else if(oCompiledPr.Unifill)
             {
-                oMergeUnifill = this.CompiledPr.Unifill;
+                oMergeUnifill = oCompiledPr.Unifill;
             }
-            else if(this.CompiledPr.Color)
+            else if(oCompiledPr.Color)
             {
-                oColor = this.CompiledPr.Color;
+                oColor = oCompiledPr.Color;
                 oMergeUnifill = CreateUnfilFromRGB(oColor.r, oColor.g, oColor.b);
             }
             this.Set_Unifill(undefined);

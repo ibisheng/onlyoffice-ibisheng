@@ -5015,7 +5015,7 @@ function CompareUnifillBool(u1, u2)
                 return false;
             for(var i = 0; i < u1.fill.colors.length; ++i)
             {
-                if(u1.fill.colors[i].pos !== u1.fill.colors[i].pos
+                if(u1.fill.colors[i].pos !== u2.fill.colors[i].pos
                     || ! CompareUniColor(u1.fill.colors[i].color, u2.fill.colors[i].color))
                     return false;
             }
