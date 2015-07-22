@@ -259,7 +259,7 @@ document.createElement = function(type)
     }
 
     return _null_object;
-}
+};
 
 function _return_empty_html_element() { return _null_object; };
 
@@ -1450,12 +1450,6 @@ function OfflineEditor () {
 
     // prop
 
-    this.getMaxSizeX = function () {
-        return this.contentX;
-    };
-    this.getMaxSizeY = function () {
-        return this.contextY;
-    };
     this.getMaxBounds = function () {
         var worksheet = _api.wb.getWorksheet();
         var left = worksheet.cols[worksheet.cols.length - 1].left;
@@ -1475,6 +1469,9 @@ function OfflineEditor () {
 
         return _api.wb.getWorksheet()._getDrawSelection_Local(region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd);
     };
+
+    // serialize
+
     this.asc_WriteAllWorksheets = function (callEvent) {
 
         var _stream = global_memory_stream_menu;
@@ -1507,7 +1504,6 @@ function OfflineEditor () {
             window["native"]["OnCallMenuEvent"](2130, global_memory_stream_menu); // ASC_SPREADSHEETS_EVENT_TYPE_WORKSHEETS
         }
     };
-
     this.asc_writeWorksheet = function(i) {
         var _stream = global_memory_stream_menu;
         _stream["ClearNoAttack"]();
@@ -1670,13 +1666,6 @@ function OfflineEditor () {
             rowOff: rowOff
         };
     };
-    this._updateContentSize = function (isColumnRecalc, isRowRecalc) {
-
-        // сделать пересчет по надобности
-
-        //var gc_nMaxRow = 1048576;
-        //var gc_nMaxCol = 16384;
-    };
 
     this.offline_showWorksheet = function(index) {
 
@@ -1716,8 +1705,6 @@ var _s = new OfflineEditor();
 //--------------------------------------------------------------------------------
 
 function offline_of() {_s.openFile();}
-function offline_sx() {_s.getMaxSizeX();}
-function offline_sy() {_s.getMaxSizeY();}
 function offline_stz(v) {_s.zoom = v; _api.asc_setZoom(v);}
 function offline_ds(x, y, width, height, ratio) {_s.drawSheet(x, y, width, height, ratio);}
 function offline_dh(x, y, width, height, type, ratio) {_s.drawHeader(x, y, width, height, type, ratio);}
@@ -1750,11 +1737,13 @@ function offline_apply_event(type,params) {
         case 3: // ASC_MENU_EVENT_TYPE_UNDO
         {
             _api.asc_Undo();
+            _s.asc_WriteAllWorksheets(true);
             break;
         }
         case 4: // ASC_MENU_EVENT_TYPE_REDO
         {
             _api.asc_Redo();
+            _s.asc_WriteAllWorksheets(true);
             break;
         }
 
@@ -1964,17 +1953,20 @@ function offline_apply_event(type,params) {
                     {
                         var name = (params[_current.pos++]);
                         _api.asc_renameWorksheet(name);
+                        _s.asc_WriteAllWorksheets(true);
                         break;
                     }
                     case 2: // color
                     {
                         var tabColor = asc_menu_ReadColor(params, _current);
                         _api.asc_setWorksheetTabColor(tabColor);
+                        _s.asc_WriteAllWorksheets(true);
                         break;
                     }
                     case 4: // hidden
                     {
                         _api.asc_hideWorksheet();
+                        _s.asc_WriteAllWorksheets(true);
                         break;
                     }
 

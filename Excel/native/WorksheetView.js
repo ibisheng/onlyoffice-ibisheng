@@ -180,7 +180,29 @@ WorksheetView.prototype._drawGrid_Local = function (drawingCtx, c1, r1, c2, r2, 
 };
 
 WorksheetView.prototype._drawCellsAndBorders_Local = function (drawingCtx,  c1, r1, c2, r2, offsetXForDraw, offsetYForDraw) {
-    this._drawCellsAndBorders(drawingCtx, new asc_Range(c1, r1, c2, r2), offsetXForDraw, offsetYForDraw);
+    var range = new asc_Range(c1, r1, c2, r2);
+
+    this._drawCellsAndBorders(drawingCtx, range, offsetXForDraw, offsetYForDraw);
+
+    var oldrange = this.visibleRange;
+    this.visibleRange = range;
+
+    var cellsLeft_Local = this.cellsLeft;
+    var cellsTop_Local  = this.cellsTop;
+
+    this.cellsLeft = -(offsetXForDraw - this.cols[c1].left);
+    this.cellsTop = -(offsetYForDraw - this.rows[r1].top);
+
+    // TODO: frozen places implementation native only
+    if (this.drawingArea.frozenPlaces.length) {
+        this.drawingArea.frozenPlaces[0].range = range;
+    }
+
+    this.objectRender.showDrawingObjectsEx(false);
+
+    this.cellsLeft = cellsLeft_Local;
+    this.cellsTop = cellsTop_Local;
+    this.visibleRange = oldrange;
 };
 
 WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFrozen) {
