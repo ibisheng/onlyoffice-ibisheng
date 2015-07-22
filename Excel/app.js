@@ -128,6 +128,7 @@ require([
         'spreadsheeteditor/main/app/view/ImageSettings',
         'spreadsheeteditor/main/app/view/ChartSettings',
         'spreadsheeteditor/main/app/view/ShapeSettings',
+        'spreadsheeteditor/main/app/view/TextArtSettings',
         'common/main/lib/util/utils',
         'common/main/lib/controller/Fonts',
         'common/main/lib/controller/Comments',

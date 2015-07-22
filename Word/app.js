@@ -147,6 +147,7 @@ require([
         'documenteditor/main/app/view/ImageSettings',
         'documenteditor/main/app/view/TableSettings',
         'documenteditor/main/app/view/ShapeSettings',
+        'documenteditor/main/app/view/TextArtSettings',
         'common/main/lib/util/utils',
         'common/main/lib/controller/Fonts',
         'common/main/lib/controller/History'

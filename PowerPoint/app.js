@@ -129,6 +129,7 @@ require([
         'presentationeditor/main/app/view/ShapeSettings',
         'presentationeditor/main/app/view/SlideSettings',
         'presentationeditor/main/app/view/TableSettings',
+        'presentationeditor/main/app/view/TextArtSettings',
         'common/main/lib/util/utils',
         'common/main/lib/controller/Fonts'
         /** coauthoring begin **/
