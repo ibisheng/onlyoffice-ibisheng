@@ -4,7 +4,8 @@ var maxValCol = 20000;
 var maxValRow = 100000;
 
 var maxIndividualValues = 10000;
-(	/**
+(
+	/**
 	 * @param {jQuery} $
 	 * @param {Window} window
 	 * @param {undefined} undefined
@@ -4457,6 +4458,7 @@ var maxIndividualValues = 10000;
 		window["Asc"]["AutoFilterObj"]		    = window["Asc"].AutoFilterObj = AutoFilterObj;
 		prot									= AutoFilterObj.prototype;
 		prot["asc_getType"]						= prot.asc_getType;
+		prot["asc_setFilter"]					= prot.asc_setFilter;
 		prot["asc_setType"]						= prot.asc_setType;
 		prot["asc_getFilter"]					= prot.asc_getFilter;
 		
