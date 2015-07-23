@@ -111,6 +111,28 @@ CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct, dWidth,
         nLastIndex = nIndex;
     }
 
+    this.checkUnionPaths(aWarpedObjects2);
+};
+
+CDocContentStructure.prototype.checkUnionPaths = function(aWarpedObjects)
+{
+    var aWarpedObjects2;
+    if(Array.isArray(aWarpedObjects))
+    {
+        aWarpedObjects2 = aWarpedObjects;
+    }
+    else
+    {
+        aWarpedObjects2 = [];
+		for(var j = 0; j < this.m_aByLines.length; ++j)
+		{
+			var oTemp = this.m_aByLines[j];
+			for(var t = 0; t < oTemp.length; ++t)
+			{
+				oTemp[t].GetAllWarped(aWarpedObjects2);
+			}
+		}
+    }
     var oLastObjectToDraw = null, oCurObjectToDraw;
     for(i = 0; i < aWarpedObjects2.length; ++i)
     {
@@ -130,7 +152,6 @@ CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct, dWidth,
             oLastObjectToDraw = oCurObjectToDraw;
         }
     }
-
 };
 
 function CParagraphStructure()

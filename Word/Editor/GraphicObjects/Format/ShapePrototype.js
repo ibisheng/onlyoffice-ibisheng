@@ -224,21 +224,22 @@ CShape.prototype.recalculateTxBoxContent = function()
     {
         this.recalcInfo.bRecalculatedTitle = true;
         this.recalcInfo.recalcTitle = null;
-        if(oBodyPr.prstTxWarp && oBodyPr.prstTxWarp.preset !== "textNoShape")
-        {
-            oBodyPr.prstTxWarp.Recalculate(oRecalcObj.w, oRecalcObj.h);
-            this.recalcInfo.warpGeometry = oBodyPr.prstTxWarp;
-        }
-        else
-        {
-            this.recalcInfo.warpGeometry = null;
-        }
+
+        var oTextWarpContent = this.checkTextWarp(this.textBoxContent, oBodyPr, oRecalcObj.w, oRecalcObj.h, true, false);
+        this.txWarpStructParamarks = oTextWarpContent.oTxWarpStructParamarks;
+        this.txWarpStruct = oTextWarpContent.oTxWarpStruct;
+
+        this.txWarpStructParamarksNoTransform = oTextWarpContent.oTxWarpStructParamarksNoTransform;
+        this.txWarpStructNoTransform = oTextWarpContent.oTxWarpStructNoTransform;
     }
     else
     {
-       var oTextWarpContent = this.checkTextWarp(this.textBoxContent, oBodyPr, oRecalcObj.w, oRecalcObj.h);
-       this.txWarpStructParamarks = oTextWarpContent.oTxWarpStructParamarks;
-       this.txWarpStruct = oTextWarpContent.oTxWarpStruct;
+        var oTextWarpContent = this.checkTextWarp(this.textBoxContent, oBodyPr, oRecalcObj.w, oRecalcObj.h, true, true);
+        this.txWarpStructParamarks = oTextWarpContent.oTxWarpStructParamarks;
+        this.txWarpStruct = oTextWarpContent.oTxWarpStruct;
+
+        this.txWarpStructParamarksNoTransform = oTextWarpContent.oTxWarpStructParamarksNoTransform;
+        this.txWarpStructNoTransform = oTextWarpContent.oTxWarpStructNoTransform;
     }
     return oRecalcObj;
 };

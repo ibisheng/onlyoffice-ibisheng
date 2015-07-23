@@ -500,21 +500,22 @@ CShape.prototype.recalculateContent = function()
             this.recalcInfo.bRecalculatedTitle = true;
             this.recalcInfo.recalcTitle = null;
 
-            if(body_pr.prstTxWarp && body_pr.prstTxWarp.preset !== "textNoShape")
-            {
-                body_pr.prstTxWarp.Recalculate(oRecalcObject.w + oRecalcObject.correctW, oRecalcObject.h + oRecalcObject.correctH);
-                this.recalcInfo.warpGeometry = body_pr.prstTxWarp;
-            }
-            else
-            {
-                this.recalcInfo.warpGeometry = null;
-            }
+
+            var oTextWarpContent = this.checkTextWarp(content, body_pr, oRecalcObject.w + oRecalcObject.correctW, oRecalcObject.h + oRecalcObject.correctH, true, false);
+            this.txWarpStructParamarks = oTextWarpContent.oTxWarpStructParamarks;
+            this.txWarpStruct = oTextWarpContent.oTxWarpStruct;
+
+            this.txWarpStructParamarksNoTransform = oTextWarpContent.oTxWarpStructParamarksNoTransform;
+            this.txWarpStructNoTransform = oTextWarpContent.oTxWarpStructNoTransform;
         }
         else
         {
-            var oTextWarpContent = this.checkTextWarp(content, body_pr, oRecalcObject.w + oRecalcObject.correctW, oRecalcObject.h + oRecalcObject.correctH);
+            var oTextWarpContent = this.checkTextWarp(content, body_pr, oRecalcObject.w + oRecalcObject.correctW, oRecalcObject.h + oRecalcObject.correctH, true, true);
             this.txWarpStructParamarks = oTextWarpContent.oTxWarpStructParamarks;
             this.txWarpStruct = oTextWarpContent.oTxWarpStruct;
+
+            this.txWarpStructParamarksNoTransform = oTextWarpContent.oTxWarpStructParamarksNoTransform;
+            this.txWarpStructNoTransform = oTextWarpContent.oTxWarpStructNoTransform;
         }
         return oRecalcObject;
     }
@@ -638,7 +639,7 @@ CShape.prototype.recalculateContent2 = function()
             content.Reset(0, 0, w, 20000);
             content.Recalculate_Page(content.StartPage, true);
 
-            var oTextWarpContent = this.checkTextWarp(content, body_pr, this.txBody.contentWidth2, this.txBody.contentHeight2);
+            var oTextWarpContent = this.checkTextWarp(content, body_pr, this.txBody.contentWidth2, this.txBody.contentHeight2, false, true);
             this.txWarpStructParamarks2 = oTextWarpContent.oTxWarpStructParamarks;
             this.txWarpStruct2 = oTextWarpContent.oTxWarpStruct;
 

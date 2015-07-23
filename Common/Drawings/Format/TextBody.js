@@ -501,7 +501,7 @@ CTextBody.prototype =
 
     Check_AutoFit: function()
     {
-        return this.parent && this.parent.checkAutofit && this.parent.checkAutofit(true) || false;
+        return this.parent && this.parent.Check_AutoFit && this.parent.Check_AutoFit(true) || false;
     },
 
     Refresh_RecalcData: function()
