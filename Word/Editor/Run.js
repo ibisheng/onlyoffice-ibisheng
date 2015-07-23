@@ -5982,7 +5982,8 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
     }
     else if(undefined !== TextPr.AscLine && this.Paragraph)
     {
-        this.Set_TextOutline(CorrectUniStroke(TextPr.AscLine, TextPr.TextOutline, 0));
+		var oCompiledPr = this.Get_CompiledPr(true);
+		this.Set_TextOutline(CorrectUniStroke(TextPr.AscLine, oCompiledPr.TextOutline, 0));
     }
 
     if ( undefined != TextPr.VertAlign )
