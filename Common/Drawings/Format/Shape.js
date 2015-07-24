@@ -1153,8 +1153,8 @@ CShape.prototype =
             this.clipRect2 = this.checkTransformTextMatrix(this.transformText2, this.txBody.content2, oBodyPr, false);
             this.invertTransformText2 = global_MatrixTransformer.Invert(this.transformText);
         }
-        if (oBodyPr.prstTxWarp) {
-            var bNoTextNoShape = oBodyPr.prstTxWarp.preset !== "textNoShape";
+        //if (oBodyPr.prstTxWarp) {
+            var bNoTextNoShape = oBodyPr.prstTxWarp && oBodyPr.prstTxWarp.preset !== "textNoShape";
             /*if (this.bWordShape) {
                 this.transformTextWordArt = this.transformText;
                 this.invertTransformTextWordArt = this.invertTransformText;
@@ -1170,7 +1170,7 @@ CShape.prototype =
                 this.transformTextWordArt2 = new CMatrix();
                 this.checkTransformTextMatrix(this.transformTextWordArt2, this.txBody.content2, oBodyPr, bNoTextNoShape, !this.bWordShape && bNoTextNoShape);
             }
-        }
+       // }
 
         if (this.checkPosTransformText) {
             this.checkPosTransformText();
