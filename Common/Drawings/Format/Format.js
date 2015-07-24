@@ -4899,6 +4899,13 @@ CUniFill.prototype =
         {
             return false;
         }
+		
+		if(isRealNumber(this.transparent) !== isRealNumber(unifill.transparent)
+		|| isRealNumber(this.transparent) && this.transparent !== unifill.transparent)
+		{
+			return false;
+		}
+		
         if(this.fill == null && unifill.fill == null)
         {
             return true;
@@ -4964,6 +4971,11 @@ function CompareUnifillBool(u1, u2)
     if(!u1 && u2 || u1 && !u2)
         return false;
 
+	if(isRealNumber(u1.transparent) !== isRealNumber(u2.transparent)
+		|| isRealNumber(u1.transparent) && u1.transparent !== u2.transparent)
+		{
+			return false;
+		}
     if(!u1.fill && !u2.fill)
         return true;
     if(!u1.fill && u2.fill || u1.fill && !u2.fill)

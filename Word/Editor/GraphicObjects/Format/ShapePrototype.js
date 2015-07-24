@@ -187,6 +187,8 @@ CShape.prototype.handleUpdateGeometry = function()
     this.recalcGeometry();
     this.recalcBounds();
     this.recalcWrapPolygon();
+    this.recalcContent();
+    this.recalcTransformText();
     this.addToRecalculate();
 };
 CShape.prototype.convertPixToMM = function(pix)
