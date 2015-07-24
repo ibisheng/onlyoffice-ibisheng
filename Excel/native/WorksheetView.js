@@ -198,6 +198,8 @@ WorksheetView.prototype._drawCellsAndBorders_Local = function (drawingCtx,  c1, 
         this.drawingArea.frozenPlaces[0].range = range;
     }
 
+    window.native["SwitchMemoryLayer"]();
+
     this.objectRender.showDrawingObjectsEx(false);
 
     this.cellsLeft = cellsLeft_Local;
