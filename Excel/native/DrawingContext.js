@@ -399,21 +399,8 @@
 
         this.setCanvas(settings.canvas);
 
-		var ppiTest =
-				$('<div style="position: absolute; width: 10in; height:10in; visibility:hidden; padding:0;"/>')
-				.appendTo("body");
-		this.ppiX = asc_round(ppiTest[0] ? (ppiTest[0].offsetWidth * 0.1) : 96);
-		this.ppiY = asc_round(ppiTest[0] ? (ppiTest[0].offsetHeight * 0.1) : 96);
-
-        if (AscBrowser.isRetina) {
-			this.ppiX <<= 1;
-			this.ppiY <<= 1;
-		}
-
-        this.ppiX = parseInt(this.ppiX * this.deviceScale, 10);
-        this.ppiY = parseInt(this.ppiY * this.deviceScale, 10);
-
-        ppiTest.remove();
+        this.ppiX = 96.0 * this.deviceScale * (96.0 / (this.deviceDPI * this.deviceScale));
+        this.ppiY = 96.0 * this.deviceScale * (96.0 / (this.deviceDPI * this.deviceScale));
 
 		this._mct  = new Matrix();  // units transform
 		this._mt   = new Matrix();  // user transform
@@ -421,8 +408,6 @@
 		this._mft  = new Matrix();  // full transform
 		this._mift = new Matrix();  // inverted full transform
 		this._im   = new Matrix();
-
-		this.nppiX = parseInt(this.ppiX * this.deviceScale, 10);
 
 		this.scaleFactor = 1;
 
@@ -824,8 +809,7 @@
 	 * @return {FontMetrics}
 	 */
 	DrawingContext.prototype.getFontMetrics = function (units) {
-		var fm =  this.napi_fmt[3];//this.fmgrGraphics[3];
-
+		var fm = this.napi_fmt[3];
 		var d  = Math.abs(fm.m_lDescender);
 		var r  = getCvtRatio(0/*px*/, units >= 0 && units <=3 ? units : this.units, this.ppiX);
 		var factor = this.getFontSize() * r / fm.m_lUnits_Per_Em;
@@ -835,20 +819,12 @@
 		res.descender = factor * d;
 		res.lineGap	= factor * (fm.m_lLineHeight - fm.m_lAscender - d);
 
-		//var face = fm.m_pFont.m_pFace;
-		res.nat_scale = 2048;//face.header.Units_Per_EM;
+        var face = g_oTextMeasurer.Measurer['GetFace']();
+        res.nat_scale = face[0];
+        res.nat_y1 = face[1];
+        res.nat_y2 = face[2];
 
-        res.nat_y1 = 2000;
-        res.nat_y2 = -500;
-
-//		if (face.os2) {
-//			res.nat_y1 = face.os2.usWinAscent;
-//			res.nat_y2 = -face.os2.usWinDescent;
-//		} else {
-//			res.nat_y1 = face.header.yMax;
-//			res.nat_y2 = face.header.yMin;
-//		}
-		return res;
+        return res;
 	};
 
 	/**
@@ -863,10 +839,8 @@
 
 		this.font.copyFrom(font);
 
-        // sample: 132 (ipad) * device_scale(is_retina=2) / 96 (default) * 2.54
-
-		///var rel = this.ppiX / this.nppiX
-        this.font.FontSize = this.font.FontSize * this.deviceDPI * this.deviceScale / this.nppiX * 2.54 * this.scaleFactor * this.deviceScale;// * rel;
+        this.font.FontSize = this.font.FontSize * 2.54 * this.scaleFactor *
+            this.deviceScale * this.deviceDPI / 96.0 * (96.0 / (this.deviceDPI * this.deviceScale));
 
         italic = true === font.Italic;
 		bold   = true === font.Bold;
@@ -882,10 +856,6 @@
         var _fontinfo, _info, flag, napi_fontInfo;
 
 		if (angle && 0 != angle) {
-			//r = g_fontApplication.LoadFont(font.FontFamily.Name, window.g_font_loader, this.fmgrGraphics[1], font.FontSize, fontStyle, this.ppiX, this.ppiY);
-
-            //===================================================================
-
             _fontinfo = g_fontApplication.GetFontInfo(this.font.FontFamily.Name, fontStyle, this.LastFontOriginInfo);
             _info = GetLoadInfoForMeasurer(_fontinfo, fontStyle);
 
@@ -903,17 +873,10 @@
             this.napi_fmt[1].m_lLineHeight      = napi_fontInfo[2];
 
             r = true;
-            //===================================================================
-
 
 			this.fmgrGraphics[1].SetTextMatrix(
 				this._mt.sx, this._mt.shy, this._mt.shx, this._mt.sy, this._mt.tx, this._mt.ty);
 		} else {
-
-		  //  r = g_fontApplication.LoadFont(font.FontFamily.Name, window.g_font_loader, this.fmgrGraphics[0], font.FontSize, fontStyle, this.ppiX, this.ppiY);
-		  //  g_fontApplication.LoadFont(font.FontFamily.Name, window.g_font_loader, this.fmgrGraphics[3], font.FontSize, fontStyle, this.ppiX, this.ppiY);
-
-            //===================================================================
 
             _fontinfo = g_fontApplication.GetFontInfo(this.font.FontFamily.Name, fontStyle, this.LastFontOriginInfo);
             _info = GetLoadInfoForMeasurer(_fontinfo, fontStyle);
@@ -927,6 +890,16 @@
             napi_fontInfo = g_oTextMeasurer.Measurer["LoadFont"](_info.Path, _info.FaceIndex, this.font.FontSize, flag);
 
             this.nctx["PD_LoadFont"](_info.Path, _info.FaceIndex, this.font.FontSize, flag);
+
+            this.napi_fmt[0].m_lUnits_Per_Em  = napi_fontInfo[3];
+            this.napi_fmt[0].m_lAscender      = napi_fontInfo[0];
+            this.napi_fmt[0].m_lDescender     = napi_fontInfo[2];
+            this.napi_fmt[0].m_lLineHeight    = napi_fontInfo[2];
+
+            this.napi_fmt[3].m_lUnits_Per_Em  = napi_fontInfo[3];
+            this.napi_fmt[3].m_lAscender      = napi_fontInfo[0];
+            this.napi_fmt[3].m_lDescender     = napi_fontInfo[2];
+            this.napi_fmt[3].m_lLineHeight    = napi_fontInfo[2];
 
             //var dKoef = g_dKoef_pt_to_mm * font.FontSize / napi_fontInfo[3];
             //
