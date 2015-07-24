@@ -196,6 +196,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('concat_js_api', ['concat_js_api_init', 'concat']);
 	
 	grunt.registerTask('extract_js_api_init', 'Extract JS API', function(){
+		grunt.file.mkdir( packageFile['compile']['sdk']['log'] );
 		grunt.initConfig({
 			exec: {
 				api: {
