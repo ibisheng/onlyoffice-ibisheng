@@ -2197,7 +2197,7 @@ function CParagraphRecalculateStateWrap(Para)
     // у "крайних" в строке операторов/мат объектов сооответствующий Gap равен нулю
     this.OperGapRight        = 0;
     this.OperGapLeft         = 0;
-    //this.bNoOneBreakOperator = true; // прежде чем обновлять позицию в контент Run, учтем были ли до этого операторы (проверки на Word == false не достаточно, т.к. формула мб инлайновая и тогда не нужно обновлять позицию)
+    this.bNoOneBreakOperator = true; // прежде чем обновлять позицию в контент Run, учтем были ли до этого операторы (проверки на Word == false не достаточно, т.к. формула мб инлайновая и тогда не нужно обновлять позицию)
     this.bInsideOper         = false; // учитываем есть ли разбивка внутри мат объекта, чтобы случайно не вставить в конец пред оператора (при Brk_Before == false)
     this.bFastRecalculate    = false;
     this.bBoxOperator        = false;

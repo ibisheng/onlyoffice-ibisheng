@@ -1200,9 +1200,7 @@ CMathBase.prototype.Load_RecalculateObject = function(RecalcObj)
 
 };
 
-CMathBase.prototype.Math_Set_EmptyRange = CMathContent.prototype.Math_Set_EmptyRange;
-CMathBase.prototype.Set_ParaMath        = CMathContent.prototype.Set_ParaMath;
-CMathBase.prototype.Recalculate_Reset   = CMathContent.prototype.Recalculate_Reset;
+
 CMathBase.prototype.Fill_LogicalContent = function(nCount)
 {
     for (var nIndex = 0; nIndex < nCount; nIndex++)
@@ -1443,34 +1441,6 @@ CMathBase.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine
 
 
     return bResult;
-};
-CMathBase.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos)
-{
-    var nPos = (true !== bSelection ? this.CurPos : (false !== bStart ? this.Selection.StartPos : this.Selection.EndPos));
-    ContentPos.Add(nPos);
-
-    if (undefined !== this.Content[nPos])
-        this.Content[nPos].Get_ParaContentPos(bSelection, bStart, ContentPos);
-};
-CMathBase.prototype.Set_ParaContentPos = function(ContentPos, Depth)
-{
-    var CurPos = ContentPos.Get(Depth);
-
-    if (undefined === CurPos || this.CurPos < 0)
-    {
-        this.CurPos = 0;
-        this.Content[this.CurPos].Cursor_MoveToStartPos();
-    }
-    else if (CurPos > this.Content.length - 1)
-    {
-        this.CurPos = this.Content.length - 1;
-        this.Content[this.CurPos].Cursor_MoveToEndPos(false);
-    }
-    else
-    {
-        this.CurPos = CurPos;
-        this.Content[this.CurPos].Set_ParaContentPos(ContentPos, Depth + 1);
-    }
 };
 CMathBase.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionDraw)
 {
@@ -2185,10 +2155,14 @@ CMathBase.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRang
         }
     }
 };
+
+CMathBase.prototype.Math_Set_EmptyRange         = CMathContent.prototype.Math_Set_EmptyRange;
+CMathBase.prototype.Set_ParaMath                = CMathContent.prototype.Set_ParaMath;
+CMathBase.prototype.Recalculate_Reset           = CMathContent.prototype.Recalculate_Reset;
+CMathBase.prototype.Set_ParaContentPos          = CMathContent.prototype.Set_ParaContentPos;
+CMathBase.prototype.Get_ParaContentPos          = CMathContent.prototype.Get_ParaContentPos;
 CMathBase.prototype.Get_CurrentParaPos          = CMathContent.prototype.Get_CurrentParaPos;
 CMathBase.prototype.private_UpdatePosOnAdd      = CMathContent.prototype.private_UpdatePosOnAdd;
-CMathBase.prototype.private_UpdatePosOnRemove   = CMathContent.prototype.private_UpdateOnRemove;
-CMathBase.prototype.private_CorrectSelectionPos = CMathContent.prototype.private_CorrectSelectionPos;
 CMathBase.prototype.private_CorrectSelectionPos = CMathContent.prototype.private_CorrectSelectionPos;
 CMathBase.prototype.private_CorrectCurPos = function()
 {

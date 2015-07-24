@@ -3150,7 +3150,7 @@ CMathContent.prototype.Set_ParaContentPos = function(ContentPos, Depth)
     }
     else
     {
-        this.CurPos = ContentPos.Get(Depth);
+        this.CurPos = CurPos;
         this.Content[this.CurPos].Set_ParaContentPos(ContentPos, Depth + 1);
     }
 };
@@ -4277,7 +4277,7 @@ CMathContent.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchP
         }
         else if(this.bRoot)
         {
-            if(this.Content[StartPos].Type == para_Math_Composition) /// убрать
+            if(this.Content[StartPos].Type == para_Math_Composition)
                 Result = this.Content[StartPos].Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth + 1);
             else
                 Result = this.Content[StartPos].Math_Get_StartRangePos(true, _CurLine, _CurRange, SearchPos, Depth + 1);
