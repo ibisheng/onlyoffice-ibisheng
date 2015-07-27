@@ -162,7 +162,10 @@ CLimit.prototype.getBase = function()
 };
 CLimit.prototype.ApplyProperties = function(RPI)
 {
-    if(this.RecalcInfo.bProps == true || RPI.bChangeInline == true)
+    // реализовано также как и для Word 2010
+    // в 2007 реализовано limit для inline формул как степень (закомментированный код)
+
+    /*if(this.RecalcInfo.bProps == true || RPI.bChangeInline == true)
     {
         this.setDimension(1, 1);
 
@@ -185,6 +188,13 @@ CLimit.prototype.ApplyProperties = function(RPI)
             this.elements[0][0] = new CLimitPrimary(true, this.Pr.type, this.getFName(), this.getIterator());
         }
 
+        this.RecalcInfo.bProps = false;
+    }*/
+
+    if(this.RecalcInfo.bProps == true || RPI.bChangeInline == true)
+    {
+        this.setDimension(1, 1);
+        this.elements[0][0] = new CLimitPrimary(true, this.Pr.type, this.getFName(), this.getIterator());
         this.RecalcInfo.bProps = false;
     }
 

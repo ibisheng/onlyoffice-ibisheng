@@ -2755,8 +2755,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             if(this.Content.length == 0 && this.ParaMath.Is_BrkBinBefore() == false && Word == false && PRS.bBoxOperator == true)
             {
                 PRS.Set_LineBreakPos(Pos);
-                X += SpaceLen;
-                SpaceLen = 0;
+                PRS.X += SpaceLen;
+                PRS.SpaceLen = 0;
             }
 
             // запоминаем конец Run
@@ -4186,11 +4186,20 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
             case para_Math_Ampersand:
             case para_Math_Text:
             case para_Math_BreakOperator:
-            case para_Math_Placeholder:
             {
                 var PosLine = this.ParaMath.GetLinePosition(PDSE.Line, PDSE.Range);
                 Item.Draw(PosLine.x, PosLine.y, pGraphics, InfoMathText);
                 X += Item.Get_WidthVisible();
+                break;
+            }
+            case para_Math_Placeholder:
+            {
+                if(pGraphics.RENDERER_PDF_FLAG !== true) // если идет печать/ конвертация в PDF плейсхолдер не отрисовываем
+                {
+                    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line, PDSE.Range);
+                    Item.Draw(PosLine.x, PosLine.y, pGraphics, InfoMathText);
+                    X += Item.Get_WidthVisible();
+                }
                 break;
             }
         }
