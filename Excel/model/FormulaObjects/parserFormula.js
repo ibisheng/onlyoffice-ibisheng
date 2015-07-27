@@ -3595,6 +3595,7 @@ parserFormula.prototype = {
                      return false;*/
                     if ( this.operand_str == null ) {
                         this.outStack.push( new cError( cErrorType.wrong_name ) );
+                        this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
                         return this.isParsed = false;
                     }
                     this.outStack.push( new cName( this.operand_str, this.wb ) );
@@ -3710,7 +3711,7 @@ parserFormula.prototype = {
             }
 
             if ( ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea ) {
-                aOutRef.push( {wsId:ref.ws.getWsId(), cell:ref._cells} );
+                aOutRef.push( {wsId:ref.getWsId(), cell:ref._cells} );
             }
             else if ( ref instanceof cArea3D ) {
                 var wsR = ref.wsRange();
