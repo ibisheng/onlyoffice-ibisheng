@@ -4225,11 +4225,6 @@ CMathContent.prototype.Get_LineBound = function(_CurLine, _CurRange)
 
     return this.Bounds.Get_LineBound(CurLine, CurRange);
 };
-/*CMathContent.prototype.SetPage = function(Line, Page)
-{
-    var CurLine = Line - this.StartLine;
-    this.Bounds.SetPage(CurLine, Page);
-};*/
 CMathContent.prototype.GetPos = function(_CurLine, _CurRange)
 {
     var CurLine  = _CurLine - this.StartLine,
@@ -4331,7 +4326,7 @@ CMathContent.prototype.Get_EndRangePos = function(_CurLine, _CurRange, SearchPos
         else if(this.bRoot && CurPos !== EndPos)
         {
             if(this.Content[EndPos].Type == para_Math_Composition)
-                Result = this.Content[EndPos].Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth + 1, true);
+                Result = this.Content[EndPos].Get_EndRangePos(_CurLine, _CurRange, SearchPos, Depth + 1, true);
             else
                 Result = this.Content[EndPos].Math_Get_EndRangePos(_CurLine, _CurRange, SearchPos, Depth + 1, true);
 

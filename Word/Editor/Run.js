@@ -2710,33 +2710,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         }
     }
 
-    if(this.Type == para_Math_Run)
-    {
-        if(true === NewRange)
-        {
-            var WidthLine = X - XRange;
-
-            if(this.ParaMath.Is_BrkBinBefore() == false)
-                WidthLine += SpaceLen;
-
-            this.ParaMath.UpdateWidthLine(PRS, WidthLine);
-        }
-        else
-        {
-            // для пустого Run, обновляем LineBreakPos на случай, если пустой Run находится между break_operator (мат. объект) и мат объектом
-            if(this.Content.length == 0 && this.ParaMath.Is_BrkBinBefore() == false && Word == false && PRS.bBoxOperator == true)
-            {
-                PRS.Set_LineBreakPos(Pos);
-                X += SpaceLen;
-                SpaceLen = 0;
-            }
-
-            // запоминаем конец Run
-            PRS.PosEndRun = PRS.CurPos.Copy();
-            PRS.PosEndRun.Update2(this.Content.length, Depth);
-
-        }
-    }
 
     PRS.MoveToLBP       = MoveToLBP;
     PRS.NewRange        = NewRange;
@@ -2764,6 +2737,34 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     PRS.bEndRunToContent    = bEndRunToContent;
     PRS.bNoOneBreakOperator = bNoOneBreakOperator;
 
+
+    if(this.Type == para_Math_Run)
+    {
+        if(true === NewRange)
+        {
+            var WidthLine = X - XRange;
+
+            if(this.ParaMath.Is_BrkBinBefore() == false)
+                WidthLine += SpaceLen;
+
+            this.ParaMath.UpdateWidthLine(PRS, WidthLine);
+        }
+        else
+        {
+            // для пустого Run, обновляем LineBreakPos на случай, если пустой Run находится между break_operator (мат. объект) и мат объектом
+            if(this.Content.length == 0 && this.ParaMath.Is_BrkBinBefore() == false && Word == false && PRS.bBoxOperator == true)
+            {
+                PRS.Set_LineBreakPos(Pos);
+                X += SpaceLen;
+                SpaceLen = 0;
+            }
+
+            // запоминаем конец Run
+            PRS.PosEndRun = PRS.CurPos.Copy();
+            PRS.PosEndRun.Update2(this.Content.length, Depth);
+
+        }
+    }
 
     if ( Pos >= ContentLen )
     {
