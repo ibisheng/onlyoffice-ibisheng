@@ -899,7 +899,7 @@ CGraphicObjects.prototype =
 
     draw: function(pageIndex, graphics)
     {
-        this.graphicPages[pageIndex].draw(graphics);
+        this.graphicPages[pageIndex] && this.graphicPages[pageIndex].draw(graphics);
     },
 
     selectionDraw: function()
@@ -1260,7 +1260,10 @@ CGraphicObjects.prototype =
 
     documentStatistics: function( CurPage, Statistics )
     {
-        this.graphicPages[CurPage].documentStatistics(Statistics);
+        if(this.graphicPages[CurPage])
+        {
+            this.graphicPages[CurPage].documentStatistics(Statistics);
+        }
     },
 
     setSelectionState: DrawingObjectsController.prototype.setSelectionState,
@@ -1481,8 +1484,11 @@ CGraphicObjects.prototype =
 
     documentSearch: function( CurPage, String, search_Common )
     {
-        this.graphicPages[CurPage].documentSearch(String, search_Common);
-        CGraphicPage.prototype.documentSearch.call(this.getHdrFtrObjectsByPageIndex(CurPage), String, search_Common);
+        if(this.graphicPages[CurPage])
+        {
+            this.graphicPages[CurPage].documentSearch(String, search_Common);
+            CGraphicPage.prototype.documentSearch.call(this.getHdrFtrObjectsByPageIndex(CurPage), String, search_Common);
+        }
     },
 
     getSelectedElementsInfo: function( Info )
@@ -1515,7 +1521,7 @@ CGraphicObjects.prototype =
         {
             graphic_page = this.graphicPages[pageIndex];
         }
-        return graphic_page.behindDocObjects.concat(graphic_page.wrappingObjects.concat(graphic_page.inlineObjects.concat(graphic_page.beforeTextObjects)));
+        return graphic_page? graphic_page.behindDocObjects.concat(graphic_page.wrappingObjects.concat(graphic_page.inlineObjects.concat(graphic_page.beforeTextObjects))) : [];
     },
 
     selectNextObject: DrawingObjectsController.prototype.selectNextObject,
@@ -1758,16 +1764,22 @@ CGraphicObjects.prototype =
 
     drawBehindDoc: function(pageIndex, graphics)
     {
-        graphics.shapePageIndex = pageIndex;
-        this.graphicPages[pageIndex].drawBehindDoc(graphics);
-        graphics.shapePageIndex = null;
+        if(this.graphicPages[pageIndex])
+        {
+            graphics.shapePageIndex = pageIndex;
+            this.graphicPages[pageIndex].drawBehindDoc(graphics);
+            graphics.shapePageIndex = null;
+        }
     },
 
     drawWrappingObjects: function(pageIndex, graphics)
     {
-        graphics.shapePageIndex = pageIndex;
-        this.graphicPages[pageIndex].drawWrappingObjects(graphics);
-        graphics.shapePageIndex = null;
+        if(this.graphicPages[pageIndex])
+        {
+            graphics.shapePageIndex = pageIndex;
+            this.graphicPages[pageIndex].drawWrappingObjects(graphics);
+            graphics.shapePageIndex = null;
+        }
     },
 
     drawWrappingObjectsInContent: function(pageIndex, graphics, content)
@@ -1792,9 +1804,12 @@ CGraphicObjects.prototype =
 
     drawBeforeObjects: function(pageIndex, graphics)
     {
-        graphics.shapePageIndex = pageIndex;
-        this.graphicPages[pageIndex].drawBeforeObjects(graphics);
-        graphics.shapePageIndex = null;
+        if(this.graphicPages[pageIndex])
+        {
+            graphics.shapePageIndex = pageIndex;
+            this.graphicPages[pageIndex].drawBeforeObjects(graphics);
+            graphics.shapePageIndex = null;
+        }
     },
 
     drawBehindDocHdrFtr: function(pageIndex, graphics)
@@ -2591,15 +2606,18 @@ CGraphicObjects.prototype =
     getAllRasterImagesOnPage: function(pageIndex)
     {
         var ret = [];
-        var graphic_page = this.graphicPages[pageIndex];
-        var hdr_ftr_page = this.getHdrFtrObjectsByPageIndex(pageIndex);
-
-        var graphic_array = graphic_page.beforeTextObjects.concat(graphic_page.wrappingObjects).concat(graphic_page.inlineObjects).concat(graphic_page.behindDocObjects);
-        graphic_array = graphic_array.concat(hdr_ftr_page.beforeTextObjects).concat(hdr_ftr_page.wrappingObjects).concat(hdr_ftr_page.inlineObjects).concat(hdr_ftr_page.behindDocObjects);
-        for(var i = 0; i < graphic_array.length; ++i)
+        if(this.graphicPages[pageIndex])
         {
-            if(graphic_array[i].getAllRasterImages)
-                graphic_array[i].getAllRasterImages(ret);
+            var graphic_page = this.graphicPages[pageIndex];
+            var hdr_ftr_page = this.getHdrFtrObjectsByPageIndex(pageIndex);
+
+            var graphic_array = graphic_page.beforeTextObjects.concat(graphic_page.wrappingObjects).concat(graphic_page.inlineObjects).concat(graphic_page.behindDocObjects);
+            graphic_array = graphic_array.concat(hdr_ftr_page.beforeTextObjects).concat(hdr_ftr_page.wrappingObjects).concat(hdr_ftr_page.inlineObjects).concat(hdr_ftr_page.behindDocObjects);
+            for(var i = 0; i < graphic_array.length; ++i)
+            {
+                if(graphic_array[i].getAllRasterImages)
+                    graphic_array[i].getAllRasterImages(ret);
+            }
         }
         return ret;
     },

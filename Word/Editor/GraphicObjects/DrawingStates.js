@@ -278,39 +278,9 @@ NullState.prototype =
         {
             drawing_page = this.drawingObjects.getHdrFtrObjectsByPageIndex(pageIndex);
         }
-        ret = handleFloatObjects(this.drawingObjects, drawing_page.beforeTextObjects, e, x, y, null, pageIndex, true);
-        if(ret)
+        if(drawing_page)
         {
-            end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
-            if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
-            {
-                this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
-                this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
-            }
-            return ret;
-        }
-
-        var no_shape_child_array = [];
-        for(var i = 0; i < drawing_page.inlineObjects.length; ++i)
-        {
-            if(!drawing_page.inlineObjects[i].parent.isShapeChild())
-                no_shape_child_array.push(drawing_page.inlineObjects[i]);
-        }
-        ret = handleInlineObjects(this.drawingObjects, no_shape_child_array, e, x, y, pageIndex, true);
-        if(ret)
-        {
-            end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
-            if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
-            {
-                this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
-                this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
-            }
-            return ret;
-        }
-
-        if(!bTextFlag)
-        {
-            ret = handleFloatObjects(this.drawingObjects, drawing_page.wrappingObjects, e, x, y, null, pageIndex, true);
+            ret = handleFloatObjects(this.drawingObjects, drawing_page.beforeTextObjects, e, x, y, null, pageIndex, true);
             if(ret)
             {
                 end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
@@ -322,7 +292,13 @@ NullState.prototype =
                 return ret;
             }
 
-            ret = handleFloatObjects(this.drawingObjects, drawing_page.behindDocObjects, e, x, y, null, pageIndex, true);
+            var no_shape_child_array = [];
+            for(var i = 0; i < drawing_page.inlineObjects.length; ++i)
+            {
+                if(!drawing_page.inlineObjects[i].parent.isShapeChild())
+                    no_shape_child_array.push(drawing_page.inlineObjects[i]);
+            }
+            ret = handleInlineObjects(this.drawingObjects, no_shape_child_array, e, x, y, pageIndex, true);
             if(ret)
             {
                 end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
@@ -333,8 +309,34 @@ NullState.prototype =
                 }
                 return ret;
             }
-        }
 
+            if(!bTextFlag)
+            {
+                ret = handleFloatObjects(this.drawingObjects, drawing_page.wrappingObjects, e, x, y, null, pageIndex, true);
+                if(ret)
+                {
+                    end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+                    if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
+                    {
+                        this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
+                        this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
+                    }
+                    return ret;
+                }
+
+                ret = handleFloatObjects(this.drawingObjects, drawing_page.behindDocObjects, e, x, y, null, pageIndex, true);
+                if(ret)
+                {
+                    end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+                    if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
+                    {
+                        this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
+                        this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
+                    }
+                    return ret;
+                }
+            }
+        }
         if(start_target_doc_content)
         {
             this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
