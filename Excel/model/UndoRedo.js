@@ -466,9 +466,8 @@ var UndoRedoDataTypes = new function() {
             case this.ParagraphAddParaItem: return new UndoRedoDataAddParaItem();
             case this.ParagraphParaItemAdd: return new UndoRedoData_historyitem_Paragraph_AddItem();
 
-
             case this.DefinedName: return new UndoRedoData_DefinedNames();
-
+            case this.DefinedNamesChange: return new UndoRedoData_DefinedNamesChange();
 
         }
 		return null;
