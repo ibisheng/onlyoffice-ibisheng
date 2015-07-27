@@ -4258,7 +4258,7 @@ CMathContent.prototype.GetDescent = function(_CurLine, _CurRange)
 
     return this.Bounds.GetDescent(CurLine, CurRange);
 };
-CMathContent.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchPos, Depth)
+CMathContent.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchPos, Depth, bStartPos)
 {
     var CurLine  = _CurLine - this.StartLine;
     var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
@@ -4267,20 +4267,23 @@ CMathContent.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchP
     var CurPos = this.CurPos;
     var Result;
 
-    if(this.Content[CurPos].Type == para_Math_Composition)
+    var bStart = this.bRoot ? CurRange == 0 : bStartPos;
+
+    if(this.Content[CurPos].Type == para_Math_Composition && bStartPos !== true)
     {
-        Result = this.Content[CurPos].Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth + 1); // пытаемся встать в начало внутреннего контента
+        bStart = bStart && CurPos == StartPos;
+        Result = this.Content[CurPos].Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth + 1, bStart); // пытаемся встать в начало внутреннего контента
 
         if ( true === Result )
         {
             SearchPos.Pos.Update( CurPos, Depth );
         }
-        else if(this.bRoot)
+        else if(this.bRoot && CurPos !== StartPos)
         {
             if(this.Content[StartPos].Type == para_Math_Composition)
-                Result = this.Content[StartPos].Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth + 1);
+                Result = this.Content[StartPos].Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth + 1, true);
             else
-                Result = this.Content[StartPos].Math_Get_StartRangePos(true, _CurLine, _CurRange, SearchPos, Depth + 1);
+                Result = this.Content[StartPos].Math_Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth + 1, true);
 
             if ( true === Result )
                 SearchPos.Pos.Update(StartPos, Depth);
@@ -4288,11 +4291,15 @@ CMathContent.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchP
     }
     else
     {
-        // в начале контента может стоять пустой Run перед мат объектом, поэтому здесь важно различать две ситуации: мы стоим в начале контента или нет(когда нажата клавиша Home). В последнем случае нужно встать в пустой Run в начале контента, если в начале стоит мат объект.
-        var bUpdStartLine = StartPos < CurPos;
-        var bUpdNotFirstLine = this.bRoot && CurLine !== 0;
+        if(this.bRoot && CurLine == 0)
+        {
+            bStart = bStart && StartPos < CurPos;
+        }
 
-        Result = this.Content[StartPos].Math_Get_StartRangePos(bUpdStartLine || bUpdNotFirstLine, _CurLine, _CurRange, SearchPos, Depth + 1);
+        if(this.Content[StartPos].Type == para_Math_Composition)
+            Result = this.Content[StartPos].Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth + 1, bStart); // может произойти, если мат объект разбивается на строки
+        else
+            Result = this.Content[StartPos].Math_Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth + 1, bStart);
 
         if ( true === Result )
             SearchPos.Pos.Update(StartPos, Depth );
@@ -4300,7 +4307,7 @@ CMathContent.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchP
 
     return Result;
 };
-CMathContent.prototype.Get_EndRangePos = function(_CurLine, _CurRange, SearchPos, Depth)
+CMathContent.prototype.Get_EndRangePos = function(_CurLine, _CurRange, SearchPos, Depth, bEndPos)
 {
     var CurLine  = _CurLine - this.StartLine;
     var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
@@ -4309,7 +4316,11 @@ CMathContent.prototype.Get_EndRangePos = function(_CurLine, _CurRange, SearchPos
     var CurPos = this.CurPos;
     var Result;
 
-    if(this.Content[CurPos].Type == para_Math_Composition)
+    var bLastRange = CurRange == this.protected_GetRangesCount(CurLine) - 1;
+
+    var bEnd = this.bRoot ? bLastRange : bEndPos;
+
+    if(this.Content[CurPos].Type == para_Math_Composition && bEndPos !== true)
     {
         Result = this.Content[CurPos].Get_EndRangePos(_CurLine, _CurRange, SearchPos, Depth + 1); // пытаемся встать в конец внутреннего контента
 
@@ -4317,12 +4328,12 @@ CMathContent.prototype.Get_EndRangePos = function(_CurLine, _CurRange, SearchPos
         {
             SearchPos.Pos.Update( CurPos, Depth );
         }
-        else if(this.bRoot)
+        else if(this.bRoot && CurPos !== EndPos)
         {
-            if(this.Content[EndPos].Type == para_Math_Composition) /// убрать
-                Result = this.Content[EndPos].Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth + 1);
+            if(this.Content[EndPos].Type == para_Math_Composition)
+                Result = this.Content[EndPos].Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth + 1, true);
             else
-                Result = this.Content[EndPos].Math_Get_EndRangePos(true, _CurLine, _CurRange, SearchPos, Depth + 1);
+                Result = this.Content[EndPos].Math_Get_EndRangePos(_CurLine, _CurRange, SearchPos, Depth + 1, true);
 
             if ( true === Result )
                 SearchPos.Pos.Update(EndPos, Depth );
@@ -4330,10 +4341,12 @@ CMathContent.prototype.Get_EndRangePos = function(_CurLine, _CurRange, SearchPos
     }
     else
     {
-        var bUpdEndLine = CurPos < EndPos;
-        var bUpdNotLastLine = this.bRoot && CurLine !== this.protected_GetLinesCount() - 1;
+        bEnd = this.bRoot && bLastRange ? true /*иначе после того как встанем после формулы перед знаком параграфа, на следующем End встанем перед формулой*/ : bEnd || CurPos < EndPos;
 
-        Result = this.Content[EndPos].Math_Get_EndRangePos(bUpdEndLine || bUpdNotLastLine, _CurLine, _CurRange, SearchPos, Depth + 1);
+        if(this.Content[EndPos].Type == para_Math_Composition)
+            Result = this.Content[EndPos].Get_EndRangePos(_CurLine, _CurRange, SearchPos, Depth + 1, bEnd); // может произойти, если мат объект разбивается на строки
+        else
+            Result = this.Content[EndPos].Math_Get_EndRangePos(_CurLine, _CurRange, SearchPos, Depth + 1, bEnd);
 
         if ( true === Result )
             SearchPos.Pos.Update(EndPos, Depth );

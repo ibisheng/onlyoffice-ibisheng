@@ -1118,22 +1118,26 @@ CMathBase.prototype.SelectToParent = function(bCorrect)
     this.bSelectionUse = true;
     this.Parent.SelectToParent(bCorrect);
 };
-CMathBase.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchPos, Depth)
+CMathBase.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchPos, Depth, bStartPos)
 {
-    var Result = this.Content[this.CurPos].Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth+1);
+    var Pos = bStartPos == true ? this.NumBreakContent : this.CurPos;
+
+    var Result = this.Content[Pos].Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth+1, bStartPos);
 
     if ( true === Result )
-        SearchPos.Pos.Update( this.CurPos, Depth );
+        SearchPos.Pos.Update(Pos, Depth );
 
     return Result;
 
 };
-CMathBase.prototype.Get_EndRangePos = function(_CurLine, _CurRange, SearchPos, Depth)
+CMathBase.prototype.Get_EndRangePos = function(_CurLine, _CurRange, SearchPos, Depth, bEndPos)
 {
-    var Result = this.Content[this.CurPos].Get_EndRangePos(_CurLine, _CurRange, SearchPos, Depth+1);
+    var Pos = bEndPos == true ? this.NumBreakContent : this.CurPos;
+
+    var Result = this.Content[Pos].Get_EndRangePos(_CurLine, _CurRange, SearchPos, Depth+1, bEndPos);
 
     if ( true === Result )
-        SearchPos.Pos.Update( this.CurPos, Depth );
+        SearchPos.Pos.Update( Pos, Depth );
 
     return Result;
 

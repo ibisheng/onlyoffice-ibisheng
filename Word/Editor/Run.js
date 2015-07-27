@@ -9002,7 +9002,7 @@ ParaRun.prototype.Math_GetWidth = function(_CurLine, _CurRange)
     return W;
 
 };
-ParaRun.prototype.Math_Get_StartRangePos = function(bStartLine, _CurLine, _CurRange, SearchPos, Depth)
+ParaRun.prototype.Math_Get_StartRangePos = function(_CurLine, _CurRange, SearchPos, Depth, bStartLine)
 {
     var CurLine  = _CurLine - this.StartLine;
     var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
@@ -9023,7 +9023,7 @@ ParaRun.prototype.Math_Get_StartRangePos = function(bStartLine, _CurLine, _CurRa
 
     return Result;
 };
-ParaRun.prototype.Math_Get_EndRangePos = function(bEndLine, _CurLine, _CurRange, SearchPos, Depth)
+ParaRun.prototype.Math_Get_EndRangePos = function(_CurLine, _CurRange, SearchPos, Depth, bEndLine)
 {
     var CurLine  = _CurLine - this.StartLine;
     var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
@@ -9087,11 +9087,11 @@ ParaRun.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
 
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 
-    this.Math_RecalculateContent();
+    this.Math_RecalculateContent(PRS);
 
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 };
-ParaRun.prototype.Math_RecalculateContent = function()
+ParaRun.prototype.Math_RecalculateContent = function(PRS)
 {
     var WidthPoints = this.Parent.Get_WidthPoints();
     this.bEqArray = this.Parent.IsEqArray();
@@ -9103,10 +9103,11 @@ ParaRun.prototype.Math_RecalculateContent = function()
 
     for(var i = 0 ; i < Lng; i++)
     {
-        var size = this.Content[i].size,
-            Type = this.Content[i].Type;
+        var Item = this.Content[i];
+        var size = Item.size,
+            Type = Item.Type;
 
-        var WidthItem = this.Content[i].Get_WidthVisible(); // Get_Width => Get_WidthVisible
+        var WidthItem = Item.Get_WidthVisible(); // Get_Width => Get_WidthVisible
                                                             // Get_WidthVisible - Width + Gaps с учетом настроек состояния
 
         width += WidthItem;

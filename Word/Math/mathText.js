@@ -921,7 +921,25 @@ CMathText.prototype.Read_FromBinary = function(Reader)
     this.Type  = Reader.GetLong();
     this.value = Reader.GetLong();
 };
+/*CMathText.prototype.Recalculate_Reset = function(StartRange, StartLine, PRS)
+{
+    var bNotUpdate = PRS !== null && PRS!== undefined && PRS.bFastRecalculate == true;
+    if(bNotUpdate == false)
+    {
+        this.StartLine   = StartLine;
+        this.StartRange  = StartRange;
 
+        this.protected_ClearLines();
+    }
+};
+CMathText.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
+{
+    var CurLine  = PRS.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
+
+    var RangeStartPos = this.protected_AddRange(CurLine, CurRange);
+    this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
+};*/
 
 function CMathAmp()
 {
