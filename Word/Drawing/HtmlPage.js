@@ -2165,6 +2165,20 @@ function CEditorPage(api)
         this.ReaderTouchManager.ChangeFontSize();
     }
 
+    this.IsReaderMode = function()
+    {
+        return (this.ReaderModeCurrent == 1);
+    }
+    this.UpdateReaderContent = function()
+    {
+        if (this.ReaderModeCurrent == 1 && this.ReaderModeDivWrapper != null)
+        {
+            this.ReaderModeDivWrapper.innerHTML = "<div id=\"reader_id\" style=\"width:100%;display:block;z-index:9;font-family:arial;font-size:" +
+                this.ReaderFontSizes[this.ReaderFontSizeCur] + "pt;position:absolute;resize:none;-webkit-box-sizing:border-box;box-sizing:border-box;padding-left:5%;padding-right:5%;padding-top:10%;padding-bottom:10%;background-color:#FFFFFF;\">" +
+                this.m_oApi.ContentToHTML(true) + "</div>";
+        }
+    }
+
     this.EnableReaderMode = function()
     {
         this.ReaderModeCurrent = 1;

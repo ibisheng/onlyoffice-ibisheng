@@ -6277,7 +6277,11 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                     var data = {All:true};
                     Document.DrawingObjects.recalculate_(data);
                     Document.DrawingObjects.recalculateText_(data);
-                    this.ChangeReaderMode();
+
+                    if (!this.WordControl.IsReaderMode())
+                        this.ChangeReaderMode();
+                    else
+                        this.WordControl.UpdateReaderContent();
                 }
             }
         }
@@ -7484,6 +7488,8 @@ asc_docs_api.prototype.asc_CloseFile = function()
 	oLogicDocument.Stop_Recalculate();
 	oLogicDocument.Stop_CheckSpelling();
 	window.global_pptx_content_loader.ImageMapChecker = {};
+
+    this.WordControl.m_oDrawingDocument.CloseFile();
 };
 
 window["asc_docs_api"] = asc_docs_api;
