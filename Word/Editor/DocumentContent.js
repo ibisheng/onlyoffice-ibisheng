@@ -9272,13 +9272,13 @@ CDocumentContent.prototype.Get_StyleFromFormatting = function()
         if (true == this.Selection.Use)
         {
             if (this.Selection.StartPos > this.Selection.EndPos)
-                return this.Content[this.Selection.EndPos].Get_StyleFromFormatting(oStyle);
+                return this.Content[this.Selection.EndPos].Get_StyleFromFormatting();
             else
-                return this.Content[this.Selection.StartPos].Get_StyleFromFormatting(oStyle);
+                return this.Content[this.Selection.StartPos].Get_StyleFromFormatting();
         }
         else
         {
-            return this.Content[this.CurPos.ContentPos].Get_StyleFromFormatting(oStyle);
+            return this.Content[this.CurPos.ContentPos].Get_StyleFromFormatting();
         }
     }
 };

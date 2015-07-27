@@ -1696,6 +1696,27 @@ CGraphicObjects.prototype =
         return this.document.Get_ColorMap();
     },
 
+
+    Get_StyleFromFormatting: function()
+    {
+        var oContent = this.getTargetDocContent();
+        if(oContent)
+        {
+            var oStyleFormatting = oContent.Get_StyleFromFormatting();
+            var oTextPr = oStyleFormatting.TextPr;
+            if(oTextPr.TextFill)
+            {
+                oTextPr.TextFill = undefined;
+            }
+            if(oTextPr.TextOutline)
+            {
+                oTextPr.TextOutline = undefined;
+            }
+            return oStyleFormatting;
+        }
+        return null;
+    },
+
     getParagraphTextPr: function()
     {
         var ret =  DrawingObjectsController.prototype.getParagraphTextPr.call(this);
