@@ -839,8 +839,10 @@ DependencyGraph.prototype = {
         }
 
         sheetNodeList = this.defNameSheets["WB"];
-        nodeId = getDefNameVertexId( null, name );
-        oRes = sheetNodeList[nodeId];
+        if( sheetNodeList ){
+            nodeId = getDefNameVertexId( null, name );
+            oRes = sheetNodeList[nodeId];
+        }
         if ( oRes && !oRes.Ref ) oRes = false;
 
         return oRes;
@@ -1305,7 +1307,7 @@ Vertex.prototype = {
 
 function DefNameVertex( scope, defName, defRef, wb, isTable ) {
 
-    this.sheetId = scope === null || scope === undefined ? "WB" : scope
+    this.sheetId = scope === null || scope === undefined ? "WB" : scope;
 
 //	this.sheetId = scope || "WB";
     this.cellId = defName.toLowerCase();
@@ -1316,7 +1318,7 @@ function DefNameVertex( scope, defName, defRef, wb, isTable ) {
     this.wb = wb;
 
     if(!isTable){
-        this.parsedRef = new parserFormula(this.Ref, "", this.wb.getWorksheet(0))
+        this.parsedRef = new parserFormula(this.Ref, "", this.wb.getWorksheet(0));
         if( this.Ref ){
             this.parsedRef.parse();
         }
