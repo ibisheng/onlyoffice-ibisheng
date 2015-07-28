@@ -361,6 +361,8 @@ CGraphicObjects.prototype =
         return ret;
     },
 
+    resetTextSelection: DrawingObjectsController.prototype.resetTextSelection,
+
     setProps: function(oProps)
     {
         var oApplyProps, i;
@@ -388,6 +390,10 @@ CGraphicObjects.prototype =
             }
         }
         this.document.Recalculate();
+        if(oApplyProps.textArtProperties && typeof oApplyProps.textArtProperties.asc_getForm() === "string")
+        {
+            this.document.Document_UpdateSelectionState();
+        }
         oApplyProps && (isRealNumber(oApplyProps.verticalTextAlign) || isRealNumber(oApplyProps.vert)) && this.document.Document_UpdateSelectionState();
     },
 

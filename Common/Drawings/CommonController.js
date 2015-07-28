@@ -2035,6 +2035,7 @@ DrawingObjectsController.prototype =
                 {
                     objects_by_type.groups[i].applyTextArtForm(oPreset);
                 }
+                this.resetTextSelection();
             }
         }
         var oApi = this.getEditorApi();
@@ -4224,6 +4225,27 @@ DrawingObjectsController.prototype =
         }
     },
 
+    resetTextSelection: function()
+    {
+        var oContent = this.getTargetDocContent();
+        if(oContent)
+        {
+            oContent.Selection_Remove();
+            if(this.selection.groupSelection)
+            {
+                this.selection.groupSelection.selection.textSelection = null;
+            }
+            if(this.selection.textSelection)
+            {
+                this.selection.textSelection = null;
+            }
+            if(this.selection.chartSelection)
+            {
+                this.selection.chartSelection.selection.textSelection = null
+            }
+        }
+    },
+
     selectAll: function()
     {
         var i;
@@ -6214,6 +6236,22 @@ DrawingObjectsController.prototype =
                 }
             }
             this.checkSelectedObjectsAndCallback(this.setGraphicObjectPropsCallBack, [props], true, historydescription_Spreadsheet_SetGraphicObjectsProps);
+            var oApplyProps = null;
+            if(props)
+            {
+                if(props.ShapeProperties)
+                {
+                    oApplyProps = props.ShapeProperties;
+                }
+                else
+                {
+                    oApplyProps = props;
+                }
+            }
+            if(oApplyProps &&  oApplyProps.textArtProperties && typeof oApplyProps.textArtProperties.asc_getForm() === "string")
+            {
+                this.updateSelectionState();
+            }
         }
         else
         {
