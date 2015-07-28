@@ -87,6 +87,7 @@ var c_oAscError = {
 		UplImageExt: 			-10,
 		UplImageFileCount: 		-11,
 		NoSupportClipdoard:		-12,
+        StockChartError:        -16,
 		CoAuthoringDisconnect:	-18,
 		ConvertationPassword:	-19,
 		VKeyEncrypt: 			-20,
