@@ -296,9 +296,6 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 	}
 
 	if (null != Point) {
-		if (bUndo) {
-			gUndoInsDelCellsFlag = true;
-		}
 		//синхронизация index и id worksheet
 		if (oRedoObjectParam.bUpdateWorksheetByModel)
 			this.workbook.handlers.trigger("updateWorksheetByModel");
