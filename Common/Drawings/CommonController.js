@@ -6100,18 +6100,7 @@ DrawingObjectsController.prototype =
         oSpPr.setParent(oShape);
         var oContent = oShape.getDocContent();
         var sText = oShape.getTextArtTranslate().DefaultText;
-        var oParagraph = oContent.Content[0];
-        for(var i = 0; i < sText.length; ++i)
-        {
-            if (sText[i] != ' ')
-            {
-                oParagraph.Add(new ParaText(sText[i]));
-            }
-            else
-            {
-                oParagraph.Add(new ParaSpace());
-            }
-        }
+        AddToContentFromString(oContent, sText);
         var oTextPr = oShape.getTextArtPreviewManager().getStylesToApply()[nStyle].Copy();
         oTextPr.FontSize = nFontSize;
         oTextPr.RFonts.Ascii = undefined;

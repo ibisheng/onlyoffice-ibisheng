@@ -252,6 +252,10 @@ ObjectToDraw.prototype =
         graphics.transform3(oTransform, false);
         var shape_drawer = new CShapeDrawer();
         shape_drawer.fromShape2(this, graphics, this.geometry);
+        if(graphics.IsSlideBoundsCheckerType)
+        {
+            shape_drawer.bIsNoStrokeAttack = false;
+        }
         shape_drawer.draw(this.geometry);
         graphics.RestoreGrState();
     },
