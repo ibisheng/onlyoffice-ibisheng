@@ -2184,7 +2184,6 @@ CShape.prototype =
             xfrm.setOffY(xfrm.offY * kh);
             xfrm.setExtX(xfrm.extX * kw);
             xfrm.setExtY(xfrm.extY * kh);
-            CheckShapeBodyAutoFitReset(this);
         }
         this.recalcTransform && this.recalcTransform();
     },
