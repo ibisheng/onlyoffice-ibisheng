@@ -1,5 +1,4 @@
 ﻿"use strict";
-var gUndoInsDelCellsFlag = true;
 var maxValCol = 20000;
 var maxValRow = 100000;
 
@@ -293,7 +292,8 @@ var maxIndividualValues = 10000;
 					filterRange = this._getAdjacentCellsAF(tempRange, aWs);
 				else
 					filterRange = tempRange;
-					
+				
+				var rangeWithoutDiff = filterRange.clone();
 				if(addNameColumn)
 					filterRange.r2 = filterRange.r2 + 1;	
 				
@@ -317,8 +317,19 @@ var maxIndividualValues = 10000;
 					else
 					{
 						if(addNameColumn && !isTurnOffHistory)
-							aWs._moveRange(filterRange,  new Asc.Range(filterRange.c1, filterRange.r1 + 1, filterRange.c2, filterRange.r2));
-						
+						{
+							if(t._isEmptyCellsUnderRange(rangeWithoutDiff))
+								aWs._moveRange(filterRange,  new Asc.Range(filterRange.c1, filterRange.r1 + 1, filterRange.c2, filterRange.r2));
+							else
+							{
+								//shift down not empty range and move 
+								aWs.getRange3(filterRange.r2, filterRange.c1, filterRange.r2, filterRange.c2).addCellsShiftBottom();
+								aWs._moveRange(filterRange,  new Asc.Range(filterRange.c1, filterRange.r1 + 1, filterRange.c2, filterRange.r2));
+								//if down tablePart
+								t.insertRows("insCell", new Asc.Range(filterRange.c1, filterRange.r2, filterRange.c2, filterRange.r2), c_oAscInsertOptions.InsertCellsAndShiftDown);
+							}	
+						}
+							
 						if(styleName)
 							aWs.getRange3(filterRange.r1, filterRange.c1, filterRange.r2, filterRange.c2).unmerge();
 
@@ -334,7 +345,7 @@ var maxIndividualValues = 10000;
 					}
 					
 					//updates
-					ws._onUpdateFormatTable(filterRange, !!(styleName), true);
+					ws._onUpdateFormatTable(filterRange, !(styleName), true);
 					
 					History.EndTransaction();
 				};
@@ -962,9 +973,7 @@ var maxIndividualValues = 10000;
 					return;
 				if(cloneData.insCells)
 					delete cloneData.insCells;
-				
-				gUndoInsDelCellsFlag = false;
-				
+
 				if(cloneData.refTable)
 				{
 					if(aWs.TableParts)
@@ -1446,7 +1455,7 @@ var maxIndividualValues = 10000;
 						{
 							oldFilter = filter.clone(null);
 							
-							filter.moveRef(null, diff);
+							filter.moveRef(null, diff, t.worksheet);
 						}
 						else if(activeRange.r1 > ref.r1 && activeRange.r1 <= ref.r2)//inside
 						{
@@ -3539,8 +3548,6 @@ var maxIndividualValues = 10000;
 			
 			_getOpenAndClosedValues: function(filter, cellId, isOpenHiddenRows)
 			{
-				console.time("new");
-
 				var ref = filter.Ref;
 				var filterColumns = filter.FilterColumns;
 				var aWs = this._getCurrentWS(), temp = {}, isDateTimeFormat, /*dataValue,*/ values = [];
@@ -3650,7 +3657,6 @@ var maxIndividualValues = 10000;
 					}
 				}
 
-				console.timeEnd("new");
 				return this._sortArrayMinMax(values);
 			},
 			
@@ -4436,6 +4442,63 @@ var maxIndividualValues = 10000;
 					}
 				}
 				return currentElemArray;
+			},
+			
+			_isEmptyCellsUnderRange: function(range)
+			{
+				//если есть ячейки с непустыми значениями под активной областью, то возвращаем false
+				var cell, isEmptyCell, result = true;
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
+				
+				for(var i = range.c1; i <= range.c2; i++)
+				{
+					cell = ws.model.getRange3(range.r2 + 1, i, range.r2 + 1, i);
+					isEmptyCell = cell.isEmptyText();
+					if(!isEmptyCell)
+					{
+						result = false;
+						break;
+					}
+				}
+				
+				return result;
+			},
+			
+			_isPartTablePartsUnderRange(range)
+			{
+				var aWs = this._getCurrentWS();
+				var result = false;
+				
+				if(aWs.TableParts && aWs.TableParts.length)
+				{
+					for(var i = 0; i < aWs.TableParts.length; i++)
+					{
+						if((aWs.TableParts[i].Ref.c1 < range.c1 || aWs.TableParts[i].Ref.c2 > range.c2) && aWs.TableParts[i].Ref.r1 >= range.r2)
+						{
+							result = true;
+							break;
+						}
+					}
+				}
+				
+				return result;
+			},
+			
+			_isPartAutoFilterUnderRange(range)
+			{
+				var aWs = this._getCurrentWS();
+				var result = false;
+				
+				if(aWs.AutoFilter)
+				{
+					if((aWs.AutoFilter.Ref.c1 < range.c1 || aWs.AutoFilter.Ref.c2 > range.c2) && aWs.AutoFilter.Ref.r1 >= range.r2)
+					{
+						result = true;
+					}
+				}
+				
+				return result;
 			}
 			
 		};
