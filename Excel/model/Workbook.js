@@ -985,6 +985,15 @@ DependencyGraph.prototype = {
         this.defNameList[oldN.nodeId] = oldN;
         sheetNodeList[oldN.nodeId] = oldN;
 
+        if(oldDefName.isTable){
+            var tableParts = this.wb.getActiveWs().TableParts;
+            for(var i = 0; i < tableParts.length; i++){
+                if( tableParts[i].DisplayName == name ){
+                    tableParts[i].DisplayName = oldN.Name;
+                }
+            }
+        }
+
         return oldN;
     },
     copyDefNameByWorksheet:function( oldSheetId, newSheetId ){
