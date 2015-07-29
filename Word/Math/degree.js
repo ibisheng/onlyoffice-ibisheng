@@ -301,6 +301,7 @@ CDegreeBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
     var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
 
     var X, Y;
+
     if(this.bOneLine)
     {
         this.pos.x = pos.x;

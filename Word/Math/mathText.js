@@ -166,6 +166,7 @@ function CMathText(bJDraw)
 
     this.FontSlot       = fontslot_ASCII;
 
+
     // TO DO
     // убрать
 
@@ -224,7 +225,8 @@ CMathText.prototype.private_getCode = function()
         code = 0x2217;
     else if(code == 0x2D) // "-"
         code = 0x2212;
-
+    else if(!bNormal && code == 0x27) // " ' "
+        code = 0x2032;
     else if(Scr == TXT_ROMAN)
     {
         if(Sty == STY_ITALIC)
@@ -662,6 +664,7 @@ CMathText.prototype.Measure = function(oMeasure, TextPr, InfoMathText)
     */
 
     var metricsTxt;
+    var letter;
 
     // measure
     if(this.bJDraw)
@@ -677,18 +680,20 @@ CMathText.prototype.Measure = function(oMeasure, TextPr, InfoMathText)
 
         this.FontSlot = InfoMathText.GetFontSlot(this.value); // возвращает fontslot_ASCII || fontslot_EastAsia || fontslot_CS || fontslot_HAnsi
 
-        var letter = this.private_getCode();
+        letter = this.private_getCode();
 
         // в не математическом тексте i и j не подменяются на i и j без точек
         var bAccentIJ = !InfoMathText.bNormalText && this.Parent.IsAccent() && (this.value == 0x69 || this.value == 0x6A);
 
-        this.RecalcInfo.StyleCode = letter;
-        this.RecalcInfo.bAccentIJ = bAccentIJ;
+        this.RecalcInfo.StyleCode   = letter;
+        this.RecalcInfo.bAccentIJ   = bAccentIJ;
 
-        if(bAccentIJ || this.RecalcInfo.bApostrophe)
+        var bApostrophe = (letter == 0x2032 || letter == 0x2033  || letter == 0x2034 || letter == 0x2057) && this.bJDraw == false;
+
+        if(bAccentIJ)
             oMeasure.SetStringGid(true);
 
-        if( InfoMathText.NeedUpdateFont(this.value, this.FontSlot, this.IsPlaceholder()) )
+        if( InfoMathText.NeedUpdateFont(this.value, this.FontSlot, this.IsPlaceholder(), bApostrophe) )
         {
             g_oTextMeasurer.SetFont(InfoMathText.Font);
             //g_oTextMeasurer.SetTextPr(InfoTextPr.CurrentTextPr, InfoTextPr.Theme);
@@ -700,19 +705,33 @@ CMathText.prototype.Measure = function(oMeasure, TextPr, InfoMathText)
             g_oTextMeasurer.SetFontSlot(this.FontSlot, FontKoef);
         }
 
+        this.RecalcInfo.bApostrophe   = InfoMathText.bApostrophe;
+        this.RecalcInfo.bSpaceSpecial = letter == 0x2061;
+
         metricsTxt = oMeasure.MeasureCode(letter);
 
-        if(bAccentIJ || this.RecalcInfo.bApostrophe)
+        if(bAccentIJ)
             oMeasure.SetStringGid(false);
     }
 
-    if(letter == 0x2061)
+    if(this.RecalcInfo.bApostrophe)
+    {
+        width   =  metricsTxt.Width;
+        height  = metricsTxt.Height;
+
+        InfoMathText.NeedUpdateFont(0x1D44E, this.FontSlot, false, false);
+        g_oTextMeasurer.SetFont(InfoMathText.Font);
+
+        var metricsA = oMeasure.MeasureCode(0x1D44E);
+        this.rasterOffsetY = metricsA.Height - metricsTxt.Ascent; // смещение для позиции
+
+        ascent  =  metricsA.Height;
+    }
+    else if(this.RecalcInfo.bSpaceSpecial)
     {
         width = 0;
         height = 0;
         ascent = 0;
-
-        this.RecalcInfo.bSpaceSpecial = true;
     }
     else
     {
@@ -786,7 +805,7 @@ CMathText.prototype.Draw = function(x, y, pGraphics, InfoTextPr)
     }
     else if(this.RecalcInfo.bSpaceSpecial == false)
     {
-        if( InfoTextPr.NeedUpdateFont(this.value, this.FontSlot, this.IsPlaceholder()) )
+        if( InfoTextPr.NeedUpdateFont(this.value, this.FontSlot, this.IsPlaceholder(), this.RecalcInfo.bApostrophe) )
         {
             pGraphics.SetFont(InfoTextPr.Font);
             //pGraphics.SetTextPr(InfoTextPr.CurrentTextPr, InfoTextPr.Theme);
@@ -797,17 +816,20 @@ CMathText.prototype.Draw = function(x, y, pGraphics, InfoTextPr)
             pGraphics.SetFontSlot(this.FontSlot, FontKoef);
         }
 
-
-        if(this.RecalcInfo.bAccentIJ ||  this.RecalcInfo.bApostrophe)
+        if(this.RecalcInfo.bAccentIJ)
             pGraphics.tg(this.RecalcInfo.StyleCode, X, Y);
         else
             pGraphics.FillTextCode(X, Y, this.RecalcInfo.StyleCode);    //на отрисовку символа отправляем положение baseLine
-
     }
 };
 CMathText.prototype.setPosition = function(pos)
 {
-    if (!this.bJDraw)                      // for text
+    if(this.RecalcInfo.bApostrophe == true)
+    {
+        this.pos.x = pos.x;
+        this.pos.y = pos.y - this.rasterOffsetY;
+    }
+    else if (this.bJDraw == false)                      // for text
     {
         this.pos.x = pos.x;
         this.pos.y = pos.y;
@@ -817,6 +839,23 @@ CMathText.prototype.setPosition = function(pos)
         this.pos.x = pos.x - this.rasterOffsetX;
         this.pos.y = pos.y - this.rasterOffsetY + this.size.ascent;
     }
+};
+CMathText.prototype.GetLocationOfLetter = function()
+{
+    var pos = new CMathPosition();
+
+    if(this.RecalcInfo.bApostrophe)
+    {
+        pos.x = this.pos.x;
+        pos.y = this.pos.y - this.size.ascent;
+    }
+    else
+    {
+        pos.x = this.pos.x;
+        pos.y = this.pos.y;
+    }
+
+    return pos;
 };
 CMathText.prototype.Is_InclineLetter = function()
 {
@@ -1043,8 +1082,10 @@ CMathAmp.prototype.Read_FromBinary = function(Reader)
 function CMathInfoTextPr(InfoTextPr)
 {
     this.CurrType         = -1; // в первый раз Font всегда выставляем
+
     this.TextPr           = InfoTextPr.TextPr;
     this.ArgSize          = InfoTextPr.ArgSize;
+    this.bApostrophe      = false;
     this.Font =
     {
         FontFamily:     {Name:  "Cambria Math", Index : -1},
@@ -1065,9 +1106,8 @@ function CMathInfoTextPr(InfoTextPr)
     this.RFontsCompare[fontslot_HAnsi]    = undefined !== this.TextPr.RFonts.HAnsi && this.TextPr.RFonts.HAnsi.Name == "Cambria Math";
     this.RFontsCompare[fontslot_CS]       = undefined !== this.TextPr.RFonts.CS && this.TextPr.RFonts.CS.Name == "Cambria Math";
     this.RFontsCompare[fontslot_EastAsia] = undefined !== this.TextPr.RFonts.EastAsia && this.TextPr.RFonts.EastAsia.Name == "Cambria Math";
-
 }
-CMathInfoTextPr.prototype.NeedUpdateFont = function(code, fontSlot, IsPlaceholder)
+CMathInfoTextPr.prototype.NeedUpdateFont = function(code, fontSlot, IsPlaceholder, IsApostrophe)
 {
     var NeedUpdateFont = false;
     var bMathText = this.bNormalText == false || IsPlaceholder;
@@ -1082,22 +1122,39 @@ CMathInfoTextPr.prototype.NeedUpdateFont = function(code, fontSlot, IsPlaceholde
 
     var bChangeType = this.CurrType !== MathTextInfo_MathText && this.CurrType !== MathTextInfo_SpecialOperator; // -1 or MathTextInfo_NormalText
 
+    var ArgSize = this.ArgSize;
     if(bChangeType && Type !== MathTextInfo_NormalText)
     {
-        this.Font.FontSize = fontSlot !== fontslot_CS ? this.TextPr.FontSize : this.TextPr.FontSizeCS;
-        this.Font.FontSize *= this.GetFontKoef(fontSlot);
-
         NeedUpdateFont = true;
     }
 
     this.CurrType = Type;
 
+    if(this.bApostrophe !== IsApostrophe && this.ArgSize < 0 && Type !== MathTextInfo_NormalText)
+    {
+        ArgSize = IsApostrophe == true ? 1 : this.ArgSize;
+        this.bApostrophe = IsApostrophe;
+
+        NeedUpdateFont = true;
+    }
+
+    if(NeedUpdateFont == true)
+    {
+        var FontSize = this.private_GetFontSize(fontSlot);
+        var coeff = MatGetKoeffArgSize(FontSize, ArgSize);
+
+        this.Font.FontSize = FontSize*coeff;
+    }
+
     return NeedUpdateFont;
+};
+CMathInfoTextPr.prototype.private_GetFontSize = function(fontSlot)
+{
+    return fontSlot == fontslot_CS ? this.TextPr.FontSizeCS : this.TextPr.FontSize;
 };
 CMathInfoTextPr.prototype.GetFontKoef = function(fontSlot)
 {
-    var FontSize = fontSlot == fontslot_CS ? this.TextPr.FontSizeCS : this.TextPr.FontSize;
-
+    var FontSize = this.private_GetFontSize(fontSlot);
     return MatGetKoeffArgSize(FontSize, this.ArgSize);
 };
 CMathInfoTextPr.prototype.GetFontSlot = function(code)

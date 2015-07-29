@@ -1203,8 +1203,6 @@ CMathBase.prototype.Load_RecalculateObject = function(RecalcObj)
         CMathBase.superclass.Load_RecalculateObject.call(this, RecalcObj);
 
 };
-
-
 CMathBase.prototype.Fill_LogicalContent = function(nCount)
 {
     for (var nIndex = 0; nIndex < nCount; nIndex++)
