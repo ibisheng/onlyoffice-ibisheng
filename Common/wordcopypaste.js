@@ -4892,7 +4892,11 @@ PasteProcessor.prototype =
 			for(var image in this.oImages)
             {
 				var src = this.oImages[image];
-				if(0 == src.indexOf("file:"))
+				if (undefined !== window["Native"] && undefined !== window["Native"]["GetImageUrl"])
+				{
+					this.oImages[image] = window["Native"]["GetImageUrl"](this.oImages[image]);
+				}
+				else if(0 == src.indexOf("file:"))
 				{
 					if (window["AscDesktopEditor"] !== undefined)
 					{

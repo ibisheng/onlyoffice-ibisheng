@@ -6415,6 +6415,14 @@ asc_docs_api.prototype.sync_SendProgress = function(Percents)
 
 asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
 {
+	if (undefined !== window["Native"] && undefined !== window["Native"]["GetImageUrl"])
+	{
+		callback();
+		window.GlobalPasteFlag = false;
+		window.GlobalPasteFlagCounter = 0;
+		return;
+	}
+
     this.pasteCallback = callback;
     this.pasteImageMap = _images;
 
@@ -7541,6 +7549,9 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, ve
         else
             this.asc_fireCallback("asc_onError",c_oAscError.ID.MobileUnexpectedCharCount,c_oAscError.Level.Critical);
     }
+
+    if (undefined != window["Native"])
+        return;
 		
 	//callback
 	this.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
@@ -7704,6 +7715,24 @@ window["asc_docs_api"].prototype["asc_nativeGetHtml"] = function()
     this.WordControl.m_oLogicDocument.Selection_Remove();
     copyPasteUseBinary = _old;
     return _ret;
+};
+
+window["asc_docs_api"].prototype["asc_AddHtml"] = function(_iframeId)
+{
+    var ifr = document.getElementById(_iframeId);
+
+    var frameWindow = window.frames[_iframeId];
+    if (frameWindow)
+    {
+        if(null != frameWindow.document && null != frameWindow.document.body)
+        {
+            ifr.style.display  = "block";
+            Editor_Paste_Exec(this, frameWindow.document.body, ifr);
+        }
+    }
+
+    if (ifr)
+        document.body.removeChild(ifr);
 };
 
 window["asc_docs_api"].prototype["asc_nativeCheckPdfRenderer"] = function(_memory1, _memory2)
