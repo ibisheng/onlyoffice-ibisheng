@@ -3320,6 +3320,7 @@ CPresentation.prototype =
                         this.Check_GraphicFrameRowHeight(Content.Drawings[i].Drawing);
                     }
                     Content.Drawings[i].Drawing.addToDrawingObjects();
+                    Content.Drawings[i].Drawing.checkExtentsByDocContent && Content.Drawings[i].Drawing.checkExtentsByDocContent();
                     this.Slides[this.CurPage].graphicObjects.selectObject(Content.Drawings[i].Drawing, 0);
                 }
             }

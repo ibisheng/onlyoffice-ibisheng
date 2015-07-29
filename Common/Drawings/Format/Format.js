@@ -4612,11 +4612,6 @@ CUniFill.prototype =
         this.fill && this.fill.convertToWordMods();
     },
 
-    getCalcFill: function()
-    {
-
-        return this;
-    },
 
     getObjectType: function()
     {
@@ -10780,6 +10775,11 @@ CBg.prototype =
         {
             this.bgPr.Write_ToBinary(w);
         }
+        w.WriteBool(isRealObject(this.bgRef));
+        if(isRealObject(this.bgRef))
+        {
+            this.bgRef.Write_ToBinary(w);
+        }
     },
 
     Read_FromBinary: function(r)
@@ -10788,6 +10788,11 @@ CBg.prototype =
         {
             this.bgPr = new CBgPr();
             this.bgPr.Read_FromBinary(r);
+        }
+        if(r.GetBool())
+        {
+            this.bgRef = new StyleRef();
+            this.bgRef.Read_FromBinary(r);
         }
     },
 

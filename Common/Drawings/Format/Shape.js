@@ -223,6 +223,11 @@ function CopyRunToPPTX(Run, Paragraph, bHyper)
         }
         RunPr.Underline = true;
     }
+    if(RunPr.TextFill)
+    {
+        RunPr.Unifill = RunPr.TextFill;
+        RunPr.TextFill = undefined;
+    }
 
     NewRun.Set_Pr( RunPr );
 
@@ -269,6 +274,12 @@ function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent)
 
 
     new_paragraph.Set_Pr(oCopyPr);
+    var oNewEndPr = paragraph.TextPr.Value.Copy();
+    if(oNewEndPr.TextFill)
+    {
+        oNewEndPr.Unifill = oNewEndPr.TextFill;
+        oNewEndPr.TextFill = undefined;
+    }
     new_paragraph.TextPr.Set_Value( paragraph.TextPr.Value );
     new_paragraph.Internal_Content_Remove2(0, new_paragraph.Content.length);
     var Count = paragraph.Content.length;
@@ -316,10 +327,111 @@ function ConvertParagraphToWord(paragraph, docContent)
     var oldFlag = paragraph.bFromDocument;
     paragraph.bFromDocument = true;
     var new_paragraph = paragraph.Copy(_docContent);
+    CheckWordParagraphContent(new_paragraph.Content);
+    var NewRPr = CheckWordRunPr(new_paragraph.TextPr.Value);
+    if(NewRPr)
+    {
+        new_paragraph.TextPr.Apply_TextPr(NewRPr);
+    }
     paragraph.bFromDocument = oldFlag;
     return new_paragraph;
 }
 
+function CheckWordRunPr(Pr)
+{
+    var NewRPr = null;
+    if(Pr.Unifill && Pr.Unifill.fill )
+    {
+        switch(Pr.Unifill.fill.type)
+        {
+            case FILL_TYPE_SOLID:
+            {
+                if(Pr.Unifill.fill.color && Pr.Unifill.fill.color.color)
+                {
+                    switch(Pr.Unifill.fill.color.color.type)
+                    {
+                        case c_oAscColor.COLOR_TYPE_SCHEME:
+                        {
+                            if(Pr.Unifill.fill.color.Mods && Pr.Unifill.fill.color.Mods.Mods.length !== 0)
+                            {
+                                if(!Pr.Unifill.fill.color.canConvertPPTXModsToWord())
+                                {
+                                    NewRPr = Pr.Copy();
+                                    NewRPr.TextFill = NewRPr.Unifill;
+                                    NewRPr.Unifill = undefined;
+                                }
+                                else
+                                {
+                                    NewRPr = Pr.Copy();
+                                    NewRPr.Unifill.convertToWordMods();
+                                }
+                            }
+                            break;
+                        }
+                        case c_oAscColor.COLOR_TYPE_SRGB:
+                        {
+
+                            NewRPr = Pr.Copy();
+                            var RGBA = Pr.Unifill.fill.color.color.RGBA;
+                            NewRPr.Color = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B);
+                            NewRPr.Unifill = undefined;
+                            break;
+                        }
+                        default:
+                        {
+                            NewRPr = Pr.Copy();
+                            NewRPr.TextFill = NewRPr.Unifill;
+                            NewRPr.Unifill = undefined;
+                        }
+                    }
+                }
+                break;
+            }
+            case FILL_TYPE_PATT:
+            case FILL_TYPE_BLIP:
+            {
+                NewRPr = Pr.Copy();
+                NewRPr.TextFill = CreateUnfilFromRGB(0, 0, 0);
+                NewRPr.Unifill = undefined;
+                break;
+            }
+            default :
+            {
+                NewRPr = Pr.Copy();
+                NewRPr.TextFill = NewRPr.Unifill;
+                NewRPr.Unifill = undefined;
+                break;
+            }
+        }
+    }
+    return NewRPr;
+}
+
+function CheckWordParagraphContent(aContent)
+{
+    for(var i = 0; i < aContent.length; ++i)
+    {
+        var oItem = aContent[i];
+        switch(oItem.Type)
+        {
+            case para_Run:
+            {
+                var NewRPr = CheckWordRunPr(oItem.Pr);
+                if(NewRPr)
+                {
+                    oItem.Set_Pr(NewRPr);
+                }
+                break;
+            }
+            case para_Hyperlink:
+            {
+                CheckWordParagraphContent(oItem.Content);
+                break;
+            }
+        }
+
+    }
+}
 function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDrawings)
 {
 
@@ -2211,6 +2323,11 @@ CShape.prototype =
 
     Check_AutoFit: function () {
         return this.checkAutofit(true) || this.checkContentWordArt(this.getDocContent()) || this.getBodyPr().prstTxWarp != null;
+    },
+
+    checkExtentsByAutofit: function(oShape)
+    {
+
     },
 
 
