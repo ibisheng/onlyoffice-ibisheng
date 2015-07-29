@@ -214,7 +214,9 @@ module.exports = function(grunt) {
 						define: packageFile['compile']['sdk']['define'],
 						warning_level: 'QUIET',
 						variable_renaming_report: packageFile['compile']['sdk']['log'] + '/variable.map',
-						property_renaming_report: packageFile['compile']['sdk']['log'] + '/property.map'/*,
+						property_renaming_report: packageFile['compile']['sdk']['log'] + '/property.map',
+						language_in: "ECMASCRIPT6",
+						language_out: "ES5"/*,
 						create_source_map: map_file_path,
 						source_map_format: "V3"*/
 					},
