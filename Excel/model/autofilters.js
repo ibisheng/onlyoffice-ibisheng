@@ -413,7 +413,7 @@ var maxIndividualValues = 10000;
 				
 			},
 			
-			changeTableStyleInfo: function(styleName, activeRange)
+			changeTableStyleInfo: function(styleName, activeRange, tableName)
 			{
 				var aWs = this._getCurrentWS(), filterRange, t = this, ws = this.worksheet, cloneFilter;
 				var isTurnOffHistory = aWs.workbook.bUndoChanges || aWs.workbook.bRedoChanges;
@@ -1644,6 +1644,18 @@ var maxIndividualValues = 10000;
 
 				var activeRange = Asc.g_oRangeCache.getAscRange(addFormatTableOptionsObj.asc_getRange());
 				if(activeRange && aWs.AutoFilter && aWs.AutoFilter.Ref.intersection(activeRange))
+					res = true;
+					
+				return res;
+			},
+			
+			iaChangeAutoFilterToTablePart: function(addFormatTableOptionsObj)
+			{
+				var res = false;
+				var aWs = this._getCurrentWS();
+
+				var activeRange = Asc.g_oRangeCache.getAscRange(addFormatTableOptionsObj.asc_getRange());
+				if(activeRange && aWs.AutoFilter && activeRange.containsRange(aWs.AutoFilter.Ref) && activeRange.r1 === aWs.AutoFilter.Ref.r1)
 					res = true;
 					
 				return res;
@@ -4465,7 +4477,7 @@ var maxIndividualValues = 10000;
 				return result;
 			},
 			
-			_isPartTablePartsUnderRange(range)
+			_isPartTablePartsUnderRange: function(range)
 			{
 				var aWs = this._getCurrentWS();
 				var result = false;
@@ -4485,7 +4497,7 @@ var maxIndividualValues = 10000;
 				return result;
 			},
 			
-			_isPartAutoFilterUnderRange(range)
+			_isPartAutoFilterUnderRange: function(range)
 			{
 				var aWs = this._getCurrentWS();
 				var result = false;
