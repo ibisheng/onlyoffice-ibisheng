@@ -770,9 +770,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.wb.resize();
 		};
 
-		spreadsheet_api.prototype.asc_addAutoFilter = function(lTable, addFormatTableOptionsObj){
+		spreadsheet_api.prototype.asc_addAutoFilter = function(styleName, addFormatTableOptionsObj){
 			var ws = this.wb.getWorksheet();
-			return ws.addAutoFilter(lTable, addFormatTableOptionsObj);
+			return ws.addAutoFilter(styleName, addFormatTableOptionsObj);
+		};
+		
+		spreadsheet_api.prototype.asc_changeAutoFilter = function(tableName, optionType, val){
+			var ws = this.wb.getWorksheet();
+			return ws.changeAutoFilter(tableName, optionType, val);
 		};
 
 		spreadsheet_api.prototype.asc_applyAutoFilter = function(type,autoFilterObject){
@@ -3837,6 +3842,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		// Auto filters interface
 		prot["asc_addAutoFilter"] = prot.asc_addAutoFilter;
+		prot["asc_changeAutoFilter"] = prot.asc_changeAutoFilter;
 		prot["asc_applyAutoFilter"] = prot.asc_applyAutoFilter;
 		prot["asc_sortColFilter"] = prot.asc_sortColFilter;
 		prot["asc_getAddFormatTableOptions"] = prot.asc_getAddFormatTableOptions;

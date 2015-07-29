@@ -144,7 +144,33 @@
 		prot["asc_getBottom"]	= prot.asc_getBottom;
 		prot["asc_getDiagDown"]	= prot.asc_getDiagDown;
 		prot["asc_getDiagUp"]	= prot.asc_getDiagUp;
+		
+		/** @constructor */
+		function asc_CAutoFilterInfo() {
+			this.tableStyleName = null;
+			this.tableName = null;
+			this.isApplyAutoFilter = false;   // Кнопка очистить фильтр: false - disable, true - pressed button
+			this.isAutoFilter = false;  // Кнопка автофильтр (также влияет на formatTable и Sort). Возможные состояния:
+										// - null - мы в пересечении с таблицой (но не полностью в ней)
+										// - true/false - когда мы полностью в таблице или вне ее (true/false в зависимости от того применен фильтр или нет)
+		}
 
+		asc_CAutoFilterInfo.prototype = {
+			asc_getTableStyleName: function () { return this.tableStyleName; },
+			asc_getTableName: function () { return this.tableName; },
+			asc_getIsAutoFilter: function () { return this.isAutoFilter; },
+			asc_getIsApplyAutoFilter: function () { return this.isApplyAutoFilter; }
+		};
+
+		window["Asc"].asc_CAutoFilterInfo = window["Asc"]["asc_CAutoFilterInfo"] = asc_CAutoFilterInfo;
+		prot = asc_CAutoFilterInfo.prototype;
+
+		prot["asc_getTableStyleName"] = prot.asc_getTableStyleName;
+		prot["asc_getTableName"]	  = prot.asc_getTableName;
+		prot["asc_getIsAutoFilter"]	  = prot.asc_getIsAutoFilter;
+		prot["asc_getIsApplyAutoFilter"] = prot.asc_getIsApplyAutoFilter;
+		
+		
 		/** @constructor */
 		function asc_CCellInfo() {
 			this.name = null;
@@ -161,15 +187,10 @@
 			this.hyperlink = null;
 			this.comments = [];
 			this.isLocked = false;
-			this.isFormatTable = false;	// Нужен для disable возможности делать merge
-			this.tableStyleName = null;
 			this.styleName = null;
 			this.numFormatType = null;
 			this.angle = null;
-			this.clearFilter = false;	// Кнопка очистить фильтр: false - disable, true - pressed button
-			this.isAutoFilter = false;	// Кнопка автофильтр (также влияет на formatTable и Sort). Возможные состояния:
-										// - null - мы в пересечении с таблицой (но не полностью в ней)
-										// - true/false - когда мы полностью в таблице или вне ее (true/false в зависимости от того применен фильтр или нет)
+			this.autoFilterInfo = null;
 		}
 
 		asc_CCellInfo.prototype = {
@@ -187,13 +208,14 @@
 			asc_getHyperlink: function(){ return this.hyperlink; },
 			asc_getComments: function(){ return this.comments; },
 			asc_getLocked: function(){ return this.isLocked; },
-			asc_getIsFormatTable: function () { return this.isFormatTable; },
-			asc_getTableStyleName: function () { return this.tableStyleName; },
 			asc_getStyleName: function () { return this.styleName; },
 			asc_getNumFormatType: function(){ return this.numFormatType; },
 			asc_getAngle: function () { return this.angle; },
-			asc_getClearFilter: function () { return this.clearFilter; },
-			asc_getIsAutoFilter: function () { return this.isAutoFilter; }
+			asc_getAutoFilterInfo: function () { return this.autoFilterInfo; },
+			asc_getIsFormatTable: function() {return null},//TODO DELETE
+			asc_getIsAutoFilter: function() {return null},//TODO DELETE
+			asc_getTableStyleName:  function() {return null},//TODO DELETE
+			asc_getClearFilter:  function() {return null}//TODO DELETE
 		};
 
 		window["Asc"].asc_CCellInfo = window["Asc"]["asc_CCellInfo"] = asc_CCellInfo;
@@ -213,13 +235,14 @@
 		prot["asc_getHyperlink"]		= prot.asc_getHyperlink;
 		prot["asc_getComments"]			= prot.asc_getComments;
 		prot["asc_getLocked"]			= prot.asc_getLocked;
-		prot["asc_getIsFormatTable"]	= prot.asc_getIsFormatTable;
-		prot["asc_getTableStyleName"]	= prot.asc_getTableStyleName;
 		prot["asc_getStyleName"]		= prot.asc_getStyleName;
 		prot["asc_getNumFormatType"]	= prot.asc_getNumFormatType;
 		prot["asc_getAngle"]			= prot.asc_getAngle;
-		prot["asc_getClearFilter"]	    = prot.asc_getClearFilter;
-		prot["asc_getIsAutoFilter"]	    = prot.asc_getIsAutoFilter;
+		prot["asc_getAutoFilterInfo"]	= prot.asc_getAutoFilterInfo;
+		prot["asc_getIsFormatTable"]	= prot.asc_getIsFormatTable;//TODO DELETE
+		prot["asc_getIsAutoFilter"]  	= prot.asc_getIsAutoFilter;//TODO DELETE
+		prot["asc_getTableStyleName"]  	= prot.asc_getTableStyleName;//TODO DELETE
+		prot["asc_getClearFilter"]  	= prot.asc_getClearFilter;//TODO DELETE
 
 		/** @constructor */
         function asc_CDefName(n, r, s, t) {

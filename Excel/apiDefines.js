@@ -249,6 +249,11 @@ var c_oAscCustomAutoFilter = {
 	doesNotContain: 12
 };
 
+var c_oAscChangeFilterOptions = {
+	filter: 1,
+	style: 2
+};
+
 // Состояние редактора ячейки
 var c_oAscCellEditorState = {
 	editEnd:		0,				// Окончание редактирования

@@ -43,6 +43,7 @@
 		var asc_CPageMargins	= asc.asc_CPageMargins;
 		var asc_CPagePrint		= asc.CPagePrint;
 		var asc_CSelectionMathInfo = asc.asc_CSelectionMathInfo;
+		var asc_CAutoFilterInfo	   = asc.asc_CAutoFilterInfo;
 
 		/*
 		* Constants
@@ -6553,18 +6554,20 @@
 
 			cell_info.halign = c.getAlignHorizontalByValue().toLowerCase();
 			cell_info.valign = c.getAlignVertical().toLowerCase();
-
-			var checkApplyFilterOrSort;
+			
 			var tablePartsOptions = this.autoFilters.searchRangeInTableParts(activeCell);
-			cell_info.tableStyleName = tablePartsOptions !== -1 && tablePartsOptions !== -2 && this.model.TableParts && this.model.TableParts[tablePartsOptions].TableStyleInfo ? this.model.TableParts[tablePartsOptions].TableStyleInfo.Name : null;
-			cell_info.isFormatTable = (-1 !== tablePartsOptions);
+			var curTablePart = tablePartsOptions !== -1 && tablePartsOptions !== -2 && this.model.TableParts && this.model.TableParts[tablePartsOptions].TableStyleInfo ? this.model.TableParts[tablePartsOptions] : null;
+			
+			cell_info.autoFilterInfo = new asc_CAutoFilterInfo();
+			cell_info.autoFilterInfo.tableStyleName = curTablePart ? curTablePart.TableStyleInfo.Name : null;
+			cell_info.autoFilterInfo.tableName = curTablePart ? curTablePart.Name : null;
 			if (-2 === tablePartsOptions) {
-				cell_info.isAutoFilter = null;
-				cell_info.clearFilter = false;
+				cell_info.autoFilterInfo.isAutoFilter = null;
+				cell_info.autoFilterInfo.isApplyAutoFilter = false;
 			} else {
-				checkApplyFilterOrSort = this.autoFilters.checkApplyFilterOrSort(tablePartsOptions);
-				cell_info.isAutoFilter = checkApplyFilterOrSort.isAutoFilter;
-				cell_info.clearFilter = checkApplyFilterOrSort.isFilterColumns;
+				var checkApplyFilterOrSort = this.autoFilters.checkApplyFilterOrSort(tablePartsOptions);
+				cell_info.autoFilterInfo.isAutoFilter = checkApplyFilterOrSort.isAutoFilter;
+				cell_info.autoFilterInfo.isApplyAutoFilter = checkApplyFilterOrSort.isFilterColumns;
 			}
 			
 			cell_info.styleName = c.getStyleName();
@@ -10984,13 +10987,14 @@
 			this.arrActiveFormulaRanges = [];
 		};
 
-		WorksheetView.prototype.addAutoFilter = function (lTable, addFormatTableOptionsObj, isApplyAutoFilter, isApplyFormatTable) {
+		WorksheetView.prototype.addAutoFilter = function (styleName, addFormatTableOptionsObj) {
 			// Проверка глобального лока
 			if (this.collaborativeEditing.getGlobalLock())
 				return;
 			
 			var t = this;
 			var ar = t.activeRange.clone(true);
+			
 			var onChangeAutoFilterCallback = function (isSuccess) {
 				if (false === isSuccess)
 				{
@@ -10998,30 +11002,46 @@
 					return;
 				}
 				
-				//TODO брать info из меню
-				var info = t._getSelectionInfoCell();
-				isApplyAutoFilter = info.isAutoFilter;
-				isApplyFormatTable = info.tableStyleName;
-				
-				var isActiveRangeIntersectionAutoFilter = null;
-				if(lTable && addFormatTableOptionsObj && isApplyAutoFilter)
-					isActiveRangeIntersectionAutoFilter = t.autoFilters.isActiveRangeIntersectionAutoFilter(addFormatTableOptionsObj);
-					
-				if(!lTable && isApplyAutoFilter)//delete filter in AutoFilter or TablePart
-					t.autoFilters.deleteAutoFilter(ar);
-				else if(!lTable && !isApplyAutoFilter)//add autoFilter
-					t.autoFilters.addAutoFilter(lTable, ar);
-				else if(lTable && !isApplyFormatTable && (!isApplyAutoFilter || (isApplyAutoFilter && !isActiveRangeIntersectionAutoFilter)))//add TablePart
-					t.autoFilters.addAutoFilter(lTable, ar, addFormatTableOptionsObj);
-				else if(lTable && isApplyFormatTable)//change TablePart
-					t.autoFilters.changeTableStyleInfo(lTable, ar);
-				else if(lTable && !isApplyFormatTable && isApplyAutoFilter)//change AutoFilter to TablePart
-					t.autoFilters.changeAutoFilterToTablePart(lTable, ar, addFormatTableOptionsObj);
-	
+				if(t.autoFilters.iaChangeAutoFilterToTablePart(addFormatTableOptionsObj) === true)
+					t.autoFilters.changeAutoFilterToTablePart(styleName, ar, addFormatTableOptionsObj);
+				else
+					t.autoFilters.addAutoFilter(styleName, ar, addFormatTableOptionsObj);
 			};
 			
-			if(t.autoFilters.checkAddAutoFilter(ar, lTable) === true)
+			if(t.autoFilters.checkAddAutoFilter(ar, styleName, addFormatTableOptionsObj) === true)
 				this._isLockedAll (onChangeAutoFilterCallback);
+		};
+		
+		WorksheetView.prototype.changeAutoFilter = function (tableName, optionType, val) {
+			// Проверка глобального лока
+			if (this.collaborativeEditing.getGlobalLock())
+				return;
+			
+			var t = this;
+			var ar = t.activeRange.clone(true);
+			
+			var onChangeAutoFilterCallback = function (isSuccess) {
+				if (false === isSuccess)
+				{
+					t.handlers.trigger("selectionChanged", t.getSelectionInfo());
+					return;
+				}
+				
+				switch (optionType) {
+					case c_oAscChangeFilterOptions.filter:
+					{
+						t.autoFilters.deleteAutoFilter(ar, tableName);
+						break;
+					}
+					case c_oAscChangeFilterOptions.style:
+					{
+						t.autoFilters.changeTableStyleInfo(val, ar, tableName);
+						break;
+					}
+				}
+			};
+			
+			this._isLockedAll (onChangeAutoFilterCallback);
 		};
 
 		WorksheetView.prototype.applyAutoFilter = function (type, autoFilterObject) {
