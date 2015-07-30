@@ -7727,7 +7727,9 @@ window["asc_docs_api"].prototype["asc_AddHtml"] = function(_iframeId)
         if(null != frameWindow.document && null != frameWindow.document.body)
         {
             ifr.style.display  = "block";
+            this.WordControl.m_oLogicDocument.TurnOffHistory();
             Editor_Paste_Exec(this, frameWindow.document.body, ifr);
+            this.WordControl.m_oLogicDocument.TurnOnHistory();
         }
     }
 
