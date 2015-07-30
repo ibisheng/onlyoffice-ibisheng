@@ -1649,7 +1649,7 @@ var maxIndividualValues = 10000;
 				return res;
 			},
 			
-			iaChangeAutoFilterToTablePart: function(addFormatTableOptionsObj)
+			isChangeAutoFilterToTablePart: function(addFormatTableOptionsObj)
 			{
 				var res = false;
 				var aWs = this._getCurrentWS();

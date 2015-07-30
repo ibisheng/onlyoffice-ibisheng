@@ -6560,7 +6560,7 @@
 			
 			cell_info.autoFilterInfo = new asc_CAutoFilterInfo();
 			cell_info.autoFilterInfo.tableStyleName = curTablePart ? curTablePart.TableStyleInfo.Name : null;
-			cell_info.autoFilterInfo.tableName = curTablePart ? curTablePart.Name : null;
+			cell_info.autoFilterInfo.tableName = curTablePart ? curTablePart.DisplayName : null;
 			if (-2 === tablePartsOptions) {
 				cell_info.autoFilterInfo.isAutoFilter = null;
 				cell_info.autoFilterInfo.isApplyAutoFilter = false;
@@ -11002,7 +11002,7 @@
 					return;
 				}
 				
-				if(t.autoFilters.iaChangeAutoFilterToTablePart(addFormatTableOptionsObj) === true)
+				if(addFormatTableOptionsObj && t.autoFilters.isChangeAutoFilterToTablePart(addFormatTableOptionsObj) === true)
 					t.autoFilters.changeAutoFilterToTablePart(styleName, ar, addFormatTableOptionsObj);
 				else
 					t.autoFilters.addAutoFilter(styleName, ar, addFormatTableOptionsObj);
@@ -11030,7 +11030,11 @@
 				switch (optionType) {
 					case c_oAscChangeFilterOptions.filter:
 					{
-						t.autoFilters.deleteAutoFilter(ar, tableName);
+						if(!val)
+							t.autoFilters.deleteAutoFilter(ar, tableName);
+						else
+							t.autoFilters.addAutoFilter(null, ar);
+						
 						break;
 					}
 					case c_oAscChangeFilterOptions.style:
