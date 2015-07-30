@@ -3001,8 +3001,10 @@ function CEditorPage(api)
 
         overlay.Clear();
         var ctx = overlay.m_oContext;
-        
+
         var drDoc = this.m_oDrawingDocument;
+        if (drDoc.m_lDrawingFirst < 0 || drDoc.m_lDrawingEnd < 0)
+            return true;
 
         if (drDoc.m_bIsSearching)
         {
@@ -3323,6 +3325,9 @@ function CEditorPage(api)
 
         var context = canvas.getContext("2d");
         context.fillStyle = GlobalSkin.BackgroundColor;
+
+        if (this.m_oDrawingDocument.m_lDrawingFirst < 0 || this.m_oDrawingDocument.m_lDrawingEnd < 0)
+            return;
 
         //this.m_oBoundsController.Clear(context);
         // сначала посморим, изменились ли ректы страниц
