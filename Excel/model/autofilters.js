@@ -554,7 +554,7 @@ var maxIndividualValues = 10000;
 					ws._onUpdateFormatTable(oldFilter.Ref, false, true);
 			},
 			
-			checkAddAutoFilter: function(activeRange, styleName)
+			checkAddAutoFilter: function(activeRange, styleName, addFormatTableOptionsObj)
 			{
 				//write error, if not add autoFilter and return false
 				var result = true;
@@ -564,6 +564,16 @@ var maxIndividualValues = 10000;
 				if(filter && styleName && filter.Ref.isIntersect(activeRange) && !(filter.Ref.containsRange(activeRange) && (activeRange.isOneCell() || (filter.Ref.isEqual(activeRange)))))
 				{
 					aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
+					result = false;
+				}
+				else if(!styleName && this._isEmptyRange(activeRange))//add filter to empty range
+				{
+					aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
+					result = false;
+				}
+				else if(styleName && addFormatTableOptionsObj.isTitle === false && this._isEmptyCellsUnderRange(activeRange) == false && this._isPartTablePartsUnderRange(activeRange))//add format table without title if down another format table
+				{
+					aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 					result = false;
 				}
 					
@@ -4511,6 +4521,28 @@ var maxIndividualValues = 10000;
 				}
 				
 				return result;
+			},
+			
+			_isEmptyRange: function(activeCells)
+			{
+				var aWs = this._getCurrentWS();
+				var cell;
+				for(var n = activeCells.r1 - 1; n <= activeCells.r2 + 1; n++)
+				{
+					if(n < 0)
+						n = 0;
+					
+					for(var k = activeCells.c1 - 1; k <= activeCells.c2 + 1; k++)
+					{
+						if(k < 0)
+							k = 0;
+						cell = aWs.getCell3(n, k, n, k);
+						
+						if(cell.getValueWithoutFormat() != '')
+							return false;
+					}
+				}
+				return true;
 			}
 			
 		};
