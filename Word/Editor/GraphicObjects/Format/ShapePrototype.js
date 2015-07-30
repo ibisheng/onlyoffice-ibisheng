@@ -228,8 +228,8 @@ CShape.prototype.recalculateTxBoxContent = function()
         this.recalcInfo.recalcTitle = null;
 
         var oTextWarpContent = this.checkTextWarp(this.textBoxContent, oBodyPr, oRecalcObj.w, oRecalcObj.h, true, false);
-        this.txWarpStructParamarks = oTextWarpContent.oTxWarpStructParamarks;
-        this.txWarpStruct = oTextWarpContent.oTxWarpStruct;
+        this.txWarpStructParamarks = oTextWarpContent.oTxWarpStructParamarksNoTransform;
+        this.txWarpStruct = oTextWarpContent.oTxWarpStructNoTransform;
 
         this.txWarpStructParamarksNoTransform = oTextWarpContent.oTxWarpStructParamarksNoTransform;
         this.txWarpStructNoTransform = oTextWarpContent.oTxWarpStructNoTransform;

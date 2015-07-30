@@ -421,8 +421,8 @@ CShape.prototype.recalculateContent = function()
 
 
             var oTextWarpContent = this.checkTextWarp(content, body_pr, oRecalcObj.w + oRecalcObj.correctW, oRecalcObj.h + oRecalcObj.correctH, true, false);
-            this.txWarpStructParamarks = oTextWarpContent.oTxWarpStructParamarks;
-            this.txWarpStruct = oTextWarpContent.oTxWarpStruct;
+            this.txWarpStructParamarks = oTextWarpContent.oTxWarpStructParamarksNoTransform;
+            this.txWarpStruct = oTextWarpContent.oTxWarpStructNoTransform;
 
             this.txWarpStructParamarksNoTransform = oTextWarpContent.oTxWarpStructParamarksNoTransform;
             this.txWarpStructNoTransform = oTextWarpContent.oTxWarpStructNoTransform;

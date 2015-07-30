@@ -3454,7 +3454,7 @@ CShape.prototype =
                 graphics.SetIntegerGrid(false);
 
                 var transform_text;
-                if ((!this.txBody.content || this.txBody.content.Is_Empty()) && this.txBody.content2 != null && !this.addTextFlag && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false) && this.transformText2) {
+                if ((!this.txBody.content || this.txBody.content.Is_Empty()) && this.txBody.content2 != null && !this.txBody.checkCurrentPlaceholder() && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false) && this.transformText2) {
                     transform_text = this.transformText2;
                 }
                 else if (this.txBody.content) {
@@ -3483,9 +3483,13 @@ CShape.prototype =
             shape_drawer.fromShape2(this, graphics, this.spPr.geometry);
             shape_drawer.draw(this.spPr.geometry);
         }
-        if (this.isEmptyPlaceholder() && graphics.IsNoDrawingEmptyPlaceholder !== true) {
-            if (graphics.m_oContext !== undefined && graphics.IsTrack === undefined && !this.addTextFlag) {
-                if (global_MatrixTransformer.IsIdentity2(_transform)) {
+        if (this.isEmptyPlaceholder() && graphics.IsNoDrawingEmptyPlaceholder !== true)
+        {
+            var drawingObjects = this.getDrawingObjectsController();
+            if (graphics.m_oContext !== undefined && graphics.IsTrack === undefined && (!drawingObjects || getTargetTextObject(drawingObjects) !== this ))
+            {
+                if (global_MatrixTransformer.IsIdentity2(_transform))
+                {
                     graphics.transform3(_transform, false);
                     var tr = graphics.m_oFullTransform;
                     graphics.SetIntegerGrid(true);
@@ -3530,7 +3534,8 @@ CShape.prototype =
                     graphics._s();
                 }
             }
-            else {
+            else
+            {
                 graphics.SetIntegerGrid(false);
                 graphics.p_width(70);
                 graphics.transform3(_transform, false);
@@ -3555,7 +3560,7 @@ CShape.prototype =
                 graphics.SaveGrState();
                 graphics.SetIntegerGrid(false);
                 var transform_text;
-                if ((!this.txBody.content || this.txBody.content.Is_Empty()) && this.txBody.content2 != null && !this.addTextFlag && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false) && this.transformText2) {
+                if ((!this.txBody.content || this.txBody.content.Is_Empty()) && this.txBody.content2 != null && !this.txBody.checkCurrentPlaceholder() && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false) && this.transformText2) {
                     transform_text = this.transformText2;
                 }
                 else if (this.txBody.content) {
@@ -3634,7 +3639,6 @@ CShape.prototype =
                     graphics.UncheckUseFonts2();
 
                 this.textBoxContent.Set_StartPage(old_start_page);
-
                 graphics.RestoreGrState();
             }
         }
@@ -3642,7 +3646,7 @@ CShape.prototype =
         {
             var oTheme = this.getParentObjects().theme;
             var oColorMap = this.Get_ColorMap();
-            if(!this.bWordShape && (!this.txBody.content || this.txBody.content.Is_Empty()) && this.txBody.content2 != null && !this.addTextFlag && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false))
+            if(!this.bWordShape && (!this.txBody.content || this.txBody.content.Is_Empty()) && this.txBody.content2 != null && !this.txBody.checkCurrentPlaceholder() && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false))
             {
                 if(editor && editor.ShowParaMarks)
                 {
@@ -3663,11 +3667,9 @@ CShape.prototype =
                     if(!this.bodyPr.upright)
                     {
                         graphics.SaveGrState();
-
                         graphics.SetIntegerGrid(false);
                         graphics.transform3(this.transform);
                         graphics.AddClipRect(clip_rect.x, clip_rect.y, clip_rect.w, clip_rect.h);
-
                     }
                     else
                     {
@@ -5064,9 +5066,6 @@ CShape.prototype =
                     oRet.oTxWarpStructNoTransform.checkUnionPaths();
                 }
             }
-
-
-            this.recalcInfo.warpGeometry = warpGeometry;
 
             if(isRealObject(editor))
             {

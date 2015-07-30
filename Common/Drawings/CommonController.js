@@ -368,7 +368,7 @@ DrawingObjectsController.prototype =
 
     handleSlideComments: function(e, x, y, pageIndex)
     {
-        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
             return {result: null, selectedIndex: -1};
         }
@@ -4923,8 +4923,8 @@ DrawingObjectsController.prototype =
         }
         if (oTargetTextObject) {
 
-            var oBodyPr = oTargetTextObject.getBodyPr && oTargetTextObject.getBodyPr();
-            if((oBodyPr && oBodyPr.prstTxWarp && oBodyPr.prstTxWarp.preset !== "textNoShape") || oTargetTextObject.checkContentWordArt && oTargetTextObject.checkContentWordArt(oTargetTextObject.getDocContent()))
+            var warpGeometry = oTargetTextObject.recalcInfo && oTargetTextObject.recalcInfo.warpGeometry;
+            if(warpGeometry && warpGeometry.preset !== "textNoShape")
             {
                 if (oTargetTextObject.recalcInfo.bRecalculatedTitle)
                 {
@@ -4968,7 +4968,6 @@ DrawingObjectsController.prototype =
                 else
                 {
                     nPageNum2 = 0;
-                    oTargetTextObject.addToRecalculate();
                 }
             }
 
@@ -4991,7 +4990,7 @@ DrawingObjectsController.prototype =
             }
             else
             {
-                this.startRecalculate();
+                this.drawingObjects.showDrawingObjects(true);
             }
         }
         if(isRealNumber(nPageNum2) && nPageNum2 !== nPageNum1)
@@ -5012,7 +5011,7 @@ DrawingObjectsController.prototype =
             }
             else
             {
-                this.startRecalculate();
+                this.drawingObjects.showDrawingObjects(true);
             }
         }
 
