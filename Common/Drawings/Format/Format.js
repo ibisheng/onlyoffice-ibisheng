@@ -5020,6 +5020,17 @@ function CompareUnifillBool(u1, u2)
         {
             if(u1.fill.colors.length !== u2.fill.colors.length)
                 return false;
+            if(isRealObject(u1.fill.path) !== isRealObject(u2.fill.path))
+                return false;
+            if(u1.fill.path && !u1.fill.path.IsIdentical(u2.fill.path))
+                return false;
+
+            if(isRealObject(u1.fill.lin) !== isRealObject(u2.fill.lin))
+                return false;
+
+            if(u1.fill.lin && !u1.fill.lin.IsIdentical(u2.fill.lin))
+                return false;
+
             for(var i = 0; i < u1.fill.colors.length; ++i)
             {
                 if(u1.fill.colors[i].pos !== u2.fill.colors[i].pos

@@ -111,45 +111,52 @@ CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct, dWidth,
         nLastIndex = nIndex;
     }
 
-    this.checkUnionPaths(aWarpedObjects2);
+    this.checkUnionPaths(aWarpedObjects2, typeof oWarpStruct.preset.length === "string" && oWarpStruct.preset.length.length > 0 && oWarpStruct.preset.length.length !== "textNoShape");
 };
 
 CDocContentStructure.prototype.checkUnionPaths = function(aWarpedObjects)
 {
-    var aWarpedObjects2;
+    var aToCheck = [];
+    var aWarpedObjects2, i, j, k;
     if(Array.isArray(aWarpedObjects))
     {
-        aWarpedObjects2 = aWarpedObjects;
+        aToCheck.push(aWarpedObjects);
     }
     else
     {
-        aWarpedObjects2 = [];
-		for(var j = 0; j < this.m_aByLines.length; ++j)
+		for(j = 0; j < this.m_aByLines.length; ++j)
 		{
+            aWarpedObjects2 = [];
 			var oTemp = this.m_aByLines[j];
 			for(var t = 0; t < oTemp.length; ++t)
 			{
 				oTemp[t].GetAllWarped(aWarpedObjects2);
 			}
+            aToCheck.push(aWarpedObjects2);
 		}
     }
-    var oLastObjectToDraw = null, oCurObjectToDraw;
-    for(i = 0; i < aWarpedObjects2.length; ++i)
+    for(j = 0; j < aToCheck.length; ++j)
     {
-        if(oLastObjectToDraw === null)
+        var aByProps = [], oCurObjectToDraw;
+        aWarpedObjects2 = aToCheck[j];
+        for(i = 0; i < aWarpedObjects2.length; ++i)
         {
-            oLastObjectToDraw = aWarpedObjects2[i];
-            continue;
-        }
-        oCurObjectToDraw = aWarpedObjects2[i];
-        if(oLastObjectToDraw  && CompareBrushes(oLastObjectToDraw.brush, oCurObjectToDraw.brush) && ComparePens(oLastObjectToDraw.pen, oCurObjectToDraw.pen))
-        {
-            oLastObjectToDraw.geometry.pathLst = oLastObjectToDraw.geometry.pathLst.concat(oCurObjectToDraw.geometry.pathLst);
-            oCurObjectToDraw.geometry.pathLst.length = 0;
-        }
-        else
-        {
-            oLastObjectToDraw = oCurObjectToDraw;
+
+            oCurObjectToDraw = aWarpedObjects2[i];
+            for(k = 0; k < aByProps.length; ++k)
+            {
+                var oObjToDraw = aByProps[k];
+                if(CompareBrushes(oObjToDraw.brush, oCurObjectToDraw.brush) && ComparePens(oObjToDraw.pen, oCurObjectToDraw.pen))
+                {
+                    oObjToDraw.geometry.pathLst = oObjToDraw.geometry.pathLst.concat(oCurObjectToDraw.geometry.pathLst);
+                    oCurObjectToDraw.geometry.pathLst.length = 0;
+                    break;
+                }
+            }
+            if(k === aByProps.length)
+            {
+                aByProps.push(oCurObjectToDraw);
+            }
         }
     }
 };
