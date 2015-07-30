@@ -342,9 +342,12 @@ var maxIndividualValues = 10000;
 						//history
 						t._addHistoryObj({Ref: filterRange}, historyitem_AutoFilter_Add,
 							{activeCells: filterRange, styleName: styleName, addFormatTableOptionsObj: addFormatTableOptionsObj}, null, filterRange, bWithoutFilter);
+						History.SetSelectionRedo(filterRange);
 					}
 					
 					//updates
+					if(styleName && addNameColumn)
+						ws.setSelection(filterRange);
 					ws._onUpdateFormatTable(filterRange, !(styleName), true);
 					
 					History.EndTransaction();
@@ -397,7 +400,6 @@ var maxIndividualValues = 10000;
 						{activeCells: activeRange}, null, cloneFilter.Ref);
 
 					//updates
-					
 					t.drawAutoF(filterRange);
 					t._setStyleTablePartsAfterOpenRows(filterRange);
 					ws._onUpdateFormatTable(filterRange, false, true);
@@ -4496,10 +4498,24 @@ var maxIndividualValues = 10000;
 				{
 					for(var i = 0; i < aWs.TableParts.length; i++)
 					{
-						if((aWs.TableParts[i].Ref.c1 < range.c1 || aWs.TableParts[i].Ref.c2 > range.c2) && aWs.TableParts[i].Ref.r1 >= range.r2)
+						var tableRef = aWs.TableParts[i].Ref;
+						if(tableRef.r1 >= range.r2)
 						{
-							result = true;
-							break;
+							if(range.c1 < tableRef.c1 && range.c2 < tableRef.c2 && range.c2 >= tableRef.c1)
+							{
+								result = true;
+								break;
+							}
+							else if(range.c1 > tableRef.c1 && range.c2 > tableRef.c2 && range.c1 >= tableRef.c1)
+							{
+								result = true;
+								break;
+							}
+							else if((range.c1 > tableRef.c1 && range.c2 <= tableRef.c2) || (range.c1 >= tableRef.c1 && range.c2 < tableRef.c2))
+							{
+								result = true;
+								break;
+							}
 						}
 					}
 				}
