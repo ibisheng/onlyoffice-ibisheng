@@ -560,7 +560,7 @@ CAccent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     PRS.bMath_OneLine = bMath_OneLine;
 
-    this.Update_WordLen(PRS, WordLen);
+    this.UpdatePRS_OneLine(PRS, WordLen);
 };
 CAccent.prototype.draw = function(x, y, pGraphics, PDSE)
 {
