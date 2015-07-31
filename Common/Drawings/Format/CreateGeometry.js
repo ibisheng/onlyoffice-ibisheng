@@ -9347,7 +9347,7 @@ function CreatePrstTxWarpGeometry(prst)
             f.AddHandlePolar('adj1', '0', '21599999', 'adj2', '0', '100000', 'x2', 'y2');
             f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
             f.AddPathCommand(1, 'x1', 'y1');
-            f.AddPathCommand(3, 'wd2', 'y1', 'adval', 'swAng');
+            f.AddPathCommand(3, 'wd2', 'hd2', 'adval', 'swAng');
             f.AddPathCommand(0, false, 'none', undefined, undefined, undefined);
             f.AddPathCommand(1, 'x2', 'y2');
             f.AddPathCommand(3, 'iwd2', 'ihd2', 'adval', 'swAng');

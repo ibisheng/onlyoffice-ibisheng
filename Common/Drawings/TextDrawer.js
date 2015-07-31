@@ -466,6 +466,9 @@ function CTextDrawer(dWidth, dHeight, bDivByLInes, oTheme, bDivGlyphs)
     this.m_aStackCurRowMaxIndex = null;
     this.m_aByParagraphs = null;
 
+    this.bCheckLines = false;
+    this.lastX = null;
+    this.lastY = null;
     if(this.m_bDivByLines)
     {
         this.m_aByLines = [];
@@ -981,14 +984,35 @@ CTextDrawer.prototype =
         {
             oPathToDraw.moveTo(this.xKoeff*x, this.yKoeff*y);
         }
+        this.lastX = x;
+        this.lastY = y;
     },
     _l : function(x,y)
     {
+        if(this.bCheckLines)
+        {
+            if(Math.abs(x - this.lastX) < EPSILON_TEXT_AUTOFIT && Math.abs(x - this.lastX) < Math.abs(y - this.lastY))
+            {
+                this.checkCurveBezier(this.lastX, this.lastY, this.lastX, this.lastY  + (y - this.lastY)/3, this.lastX, this.lastY + 2*(y - this.lastY)/3, x, y, PATH_DIV_EPSILON);
+                this.lastX = x;
+                this.lastY = y;
+                return;
+            }
+            else if(Math.abs(y - this.lastY) < EPSILON_TEXT_AUTOFIT && Math.abs(y - this.lastY) < Math.abs(x - this.lastX))
+            {
+                this.checkCurveBezier(this.lastX, this.lastY, this.lastX + (x - this.lastX)/3, this.lastY, this.lastX + 2*(x - this.lastX)/3, this.lastY, x, y, PATH_DIV_EPSILON);
+                this.lastX = x;
+                this.lastY = y;
+                return;
+            }
+        }
         var oPathToDraw = this.Get_PathToDraw();
         if(oPathToDraw)
         {
             oPathToDraw.lnTo(this.xKoeff*x, this.yKoeff*y);
         }
+        this.lastX = x;
+        this.lastY = y;
     },
     _c : function(x1,y1,x2,y2,x3,y3)
     {
@@ -997,6 +1021,8 @@ CTextDrawer.prototype =
         {
             oPathToDraw.cubicBezTo(this.xKoeff*x1, this.yKoeff*y1, this.xKoeff*x2, this.yKoeff*y2, this.xKoeff*x3, this.yKoeff*y3);
         }
+        this.lastX = x3;
+        this.lastY = y3;
     },
     _c2 : function(x1,y1,x2,y2)
     {
@@ -1005,6 +1031,8 @@ CTextDrawer.prototype =
         {
             oPathToDraw.quadBezTo(this.xKoeff*x1, this.yKoeff*y1, this.xKoeff*x2, this.yKoeff*y2);
         }
+        this.lastX = x2;
+        this.lastY = y2;
     },
     ds : function()
     {
@@ -1258,9 +1286,10 @@ CTextDrawer.prototype =
     {
     },
 
-    checkCurveBezier: function(x0, y0, x1, y1, x2, y2, x3, y3)
+    checkCurveBezier: function(x0, y0, x1, y1, x2, y2, x3, y3, dEpsilon)
     {
-        var arr_point = partition_bezier4(x0, y0, x1, y1, x2, y2, x3, y3, UNDERLINE_DIV_EPSILON), i, count = arr_point.length >> 2;
+        var _epsilon = dEpsilon ? dEpsilon : UNDERLINE_DIV_EPSILON;
+        var arr_point = partition_bezier4(x0, y0, x1, y1, x2, y2, x3, y3, _epsilon), i, count = arr_point.length >> 2;
         for(i = 0; i < count; ++i)
         {
             var k = 4*i;
@@ -1268,31 +1297,16 @@ CTextDrawer.prototype =
         }
     },
     // smart methods for horizontal / vertical lines
-    drawHorLine : function(align, y, x, r, penW, AdditionalData)
+    drawHorLine : function(align, y, x, r, penW)
     {
-      // if(!AdditionalData)
-      // {
-      //     this.p_width(1000 * penW);
-      //     this._s();
+        this._s();
+        this._m(x, y);
 
-      //     this._m(x, y);
-      //     this._l(r, y);
-
-      //     this.ds();
-
-      //     this._e();
-      // }
-       // else
-        {
-            this._s();
-            this._m(x, y);
-
-            this.checkCurveBezier(x, y, x + ((r-x)/3), y, x + (2/3) * (r - x), y, r, y);// this._l(r, y);
-            this._l(r, y + penW);
-            this.checkCurveBezier(r, y + penW, x + (2/3) * (r - x), y + penW, x + ((r-x)/3), y + penW, x, y + penW);//this._l(x, y + penW);
-            this._z();
-            this.ds();
-        }
+        this.checkCurveBezier(x, y, x + ((r-x)/3), y, x + (2/3) * (r - x), y, r, y);// this._l(r, y);
+        this._l(r, y + penW);
+        this.checkCurveBezier(r, y + penW, x + (2/3) * (r - x), y + penW, x + ((r-x)/3), y + penW, x, y + penW);//this._l(x, y + penW);
+        this._z();
+        this.ds();
     },
 
     drawHorLine2 : function(align, y, x, r, penW)

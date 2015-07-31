@@ -542,10 +542,6 @@ CShape.prototype.Refresh_RecalcData2 = function()
         HdrFtr.Refresh_RecalcData2();
 };
 
-CShape.prototype.getStartPageAbsolute = function()
-{
-    return 0;
-};
 CShape.prototype.Get_StartPage_Absolute = function()
 {
     return 0;

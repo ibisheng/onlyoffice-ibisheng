@@ -280,7 +280,7 @@ function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent)
         oNewEndPr.Unifill = oNewEndPr.TextFill;
         oNewEndPr.TextFill = undefined;
     }
-    new_paragraph.TextPr.Set_Value( paragraph.TextPr.Value );
+    new_paragraph.TextPr.Set_Value( oNewEndPr );
     new_paragraph.Internal_Content_Remove2(0, new_paragraph.Content.length);
     var Count = paragraph.Content.length;
     for ( var Index = 0; Index < Count; Index++ )
@@ -3660,7 +3660,8 @@ CShape.prototype =
             else
             {
                 var bNeedRestoreState = false;
-                if(this.bWordShape && this.clipRect && (!this.bodyPr.prstTxWarp || this.bodyPr.prstTxWarp.preset === "textNoShape"))
+                var bEditTextArt = isRealObject(oController) && (getTargetTextObject(oController) === this);
+                if(this.bWordShape && this.clipRect && (!this.bodyPr.prstTxWarp || this.bodyPr.prstTxWarp.preset === "textNoShape" || bEditTextArt))
                 {
                     bNeedRestoreState = true;
                     var clip_rect = this.clipRect;
@@ -3680,7 +3681,6 @@ CShape.prototype =
                     }
                 }
 
-                var bEditTextArt = isRealObject(oController) && (getTargetTextObject(oController) === this);
                 var oTransform = this.transformTextWordArt;
                 if(editor && editor.ShowParaMarks)
                 {
@@ -4951,8 +4951,9 @@ CShape.prototype =
             var bNeedRecalc = oBodyPr.prstTxWarp && (oBodyPr.prstTxWarp.pathLst.length / 2 - ((oBodyPr.prstTxWarp.pathLst.length / 2) >> 0) > 0) , dOneLineWidth, dMinPolygonLength = 0, dKoeff = 1;
             var oTheme = this.Get_Theme(), oColorMap = this.Get_ColorMap();
             var oTextDrawer = new CTextDrawer(dWidth, dHeight, true, oTheme, bNeedRecalc);
+            oTextDrawer.bCheckLines = bTransform && bNeedWarp;
             var oContentToDraw = oContent;
-            if(bNeedRecalc)
+            if(bNeedRecalc && bNeedWarp)
             {
                 oContentToDraw = oContent.Copy(oContent.Parent, oContent.DrawingDocument);
                 var bNeedTurnOn = false;
@@ -5001,9 +5002,9 @@ CShape.prototype =
                     oRet.oTxWarpStructParamarks.checkByWarpStruct(warpGeometry, dWidth, dHeight, oTheme, oColorMap, this, dOneLineWidth, oContentToDraw.XLimit, dContentHeight, dKoeff);
                     if(bNeedNoTransform && bCheckWordArtContent)
                     {
-                        oContentToDraw.Draw(oContentToDraw.StartPage, oTextDrawer);
+                        oContent.Draw(oContent.StartPage, oTextDrawer);
                         oRet.oTxWarpStructParamarksNoTransform = oTextDrawer.m_oDocContentStructure;
-                        oRet.oTxWarpStructParamarksNoTransform.Recalculate(oTheme, oColorMap, width_, height_, this);
+                        oRet.oTxWarpStructParamarksNoTransform.Recalculate(oTheme, oColorMap, dWidth, dHeight, this);
                         oRet.oTxWarpStructParamarksNoTransform.checkUnionPaths();
                     }
                 }
@@ -5020,9 +5021,9 @@ CShape.prototype =
             {
                 if(bNeedNoTransform && bCheckWordArtContent)
                 {
-                    oContentToDraw.Draw(oContentToDraw.StartPage, oTextDrawer);
+                    oContent.Draw(oContent.StartPage, oTextDrawer);
                     oRet.oTxWarpStructParamarksNoTransform = oTextDrawer.m_oDocContentStructure;
-                    oRet.oTxWarpStructParamarksNoTransform.Recalculate(oTheme, oColorMap, width_, height_, this);
+                    oRet.oTxWarpStructParamarksNoTransform.Recalculate(oTheme, oColorMap, dWidth, dHeight, this);
                     oRet.oTxWarpStructParamarksNoTransform.checkUnionPaths();
                 }
             }
@@ -5041,9 +5042,9 @@ CShape.prototype =
                     oRet.oTxWarpStruct.checkByWarpStruct(warpGeometry, dWidth, dHeight, oTheme, oColorMap, this, dOneLineWidth, oContentToDraw.XLimit, dContentHeight, dKoeff);
                     if(bNeedNoTransform && bCheckWordArtContent)
                     {
-                        oContentToDraw.Draw(oContentToDraw.StartPage, oTextDrawer);
+                        oContent.Draw(oContent.StartPage, oTextDrawer);
                         oRet.oTxWarpStructNoTransform = oTextDrawer.m_oDocContentStructure;
-                        oRet.oTxWarpStructNoTransform.Recalculate(oTheme, oColorMap, width_, height_, this);
+                        oRet.oTxWarpStructNoTransform.Recalculate(oTheme, oColorMap, dWidth, dHeight, this);
                         oRet.oTxWarpStructNoTransform.checkUnionPaths();
                     }
                 }
@@ -5060,9 +5061,9 @@ CShape.prototype =
             {
                 if(bNeedNoTransform && bCheckWordArtContent)
                 {
-                    oContentToDraw.Draw(oContentToDraw.StartPage, oTextDrawer);
+                    oContent.Draw(oContent.StartPage, oTextDrawer);
                     oRet.oTxWarpStructNoTransform = oTextDrawer.m_oDocContentStructure;
-                    oRet.oTxWarpStructNoTransform.Recalculate(oTheme, oColorMap, width_, height_, this);
+                    oRet.oTxWarpStructNoTransform.Recalculate(oTheme, oColorMap, dWidth, dHeight, this);
                     oRet.oTxWarpStructNoTransform.checkUnionPaths();
                 }
             }
