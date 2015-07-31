@@ -1051,7 +1051,7 @@ CMathAmp.prototype.Draw = function(x, y, pGraphics, InfoTextPr)
         this.AmpText.Draw(x + this.GapLeft, y, pGraphics, InfoTextPr);
     else if(editor.ShowParaMarks) // показать метки выравнивания, если включена отметка о знаках параграфа
     {
-        var X  = x + this.pos.x + this.Get_Width(),
+        var X  = x + this.pos.x + this.Get_WidthVisible(),
             Y  = y + this.pos.y,
             Y2 = y + this.pos.y - this.AmpText.size.height;
 
