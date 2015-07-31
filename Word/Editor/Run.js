@@ -3445,6 +3445,7 @@ ParaRun.prototype.Is_EmptyRange = function(_CurLine, _CurRange)
 
     return false;
 };
+
 ParaRun.prototype.Check_Range_OnlyMath = function(Checker, _CurRange, _CurLine)
 {
     var CurLine  = _CurLine - this.StartLine;
@@ -9249,6 +9250,21 @@ ParaRun.prototype.Math_PreRecalc = function(Parent, ParaMath, ArgSize, RPI, Gaps
         this.Content[Pos].SetUpdateGaps(false);
     }
 
+};
+ParaRun.prototype.Math_EmptyRange = function(_CurLine, _CurRange) // до пересчета нужно узнать будет ли данный Run пустым или нет в данном Range, необходимо для того, чтобы выставить wrapIndent
+{
+    var bEmptyRange = true;
+    var Lng = this.Content.length;
+
+    if(Lng > 0)
+    {
+        var CurLine  = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        bEmptyRange = this.protected_GetPrevRangeEndPos(CurLine, CurRange) >= Lng;
+    }
+
+    return bEmptyRange;
 };
 ParaRun.prototype.Math_UpdateGaps = function(_CurLine, _CurRange, GapsInfo)
 {

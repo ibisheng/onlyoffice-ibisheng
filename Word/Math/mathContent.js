@@ -2254,7 +2254,7 @@ CMathContent.prototype.private_LoadFromMenuFraction = function(Type, Pr)
         case c_oAscMathType.FractionHorizontal : this.Add_Fraction({ctrPrp : Pr.ctrPrp, type : LINEAR_FRACTION}, null, null); break;
         case c_oAscMathType.FractionSmall:
             var oBox = new CBox(Pr);
-            this.Add_Element(oBox)
+            this.Add_Element(oBox);
             var BoxMathContent = oBox.getBase();
             BoxMathContent.Add_Fraction(Pr, null, null);
             break;
@@ -3926,8 +3926,6 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
             Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
 
-            bCurInsideOper = bCurInsideOper || PRS.bInsideOper;
-
             PRS.bBoxOperator = Type == para_Math_Composition && Item.kind == MATH_BOX;
 
             if(Type == para_Math_Composition)
@@ -3939,48 +3937,87 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         BoxGapLeft  = Item.GapLeft,
                         BoxGapRight = Item.GapRight;
 
-                    if(Brk_Before == true) // break_operator должен идти в начале слова
+                    if(true == Item.IsBreak())
                     {
-                        PRS.X += PRS.SpaceLen + PRS.WordLen;
-
-                        if(PRS.Word == true)
+                        if(true == PRS.MathFirstItem)
                         {
-                            // обновим : начало нового слова - конец предыдущего Run
-                            PRS.FirstItemOnLine = false;
-
+                            PRS.WordLen += BoxLen;
+                        }
+                        else
+                        {
+                            PRS.bInsideOper = true;
+                            PRS.X += PRS.SpaceLen + PRS.WordLen;
                             PRS.Update_CurPos(PrevLastPos, _Depth-1);
                             PRS.Set_LineBreakPos(LastPos);
 
-                            PRS.SpaceLen = BoxLen;
+                            this.ParaMath.UpdateWidthLine(PRS, PRS.X - PRS.XRange);
+
+                            PRS.MoveToLBP = true;
+                            PRS.NewRange = true;
+                        }
+                    }
+                    else if(true == Item.IsOperatorEmulator())
+                    {
+                        if(Brk_Before == true) // break_operator должен идти в начале слова
+                        {
+                            PRS.X += PRS.SpaceLen + PRS.WordLen;
+
+                            if(true == PRS.MathFirstItem/*PRS.FirstItemOnLine == true && PRS.Word == false*/)
+                            {
+                                PRS.WordLen += BoxLen;
+                            }
+                            else/* if(PRS.Word == true)*/
+                            {
+                                // обновим : начало нового слова - конец предыдущего Run
+                                PRS.bInsideOper = true;
+                                PRS.FirstItemOnLine = false;
+
+                                PRS.Update_CurPos(PrevLastPos, _Depth-1);
+                                PRS.Set_LineBreakPos(LastPos);
+
+                                PRS.SpaceLen = BoxLen;
+
+                                PRS.WordLen = 0;
+                                PRS.Word = true;
+                            }
+
+                        }
+                        else
+                        {
+                            var bOverXEnd = PRS.X + PRS.SpaceLen + PRS.WordLen + BoxLen - BoxGapRight > PRS.XEnd;
+
+                            PRS.OperGapRight = BoxGapRight;
+
+                            // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                            // FirstItemOnLine == false - слово оказалось не единственным элементом в промежутке, делаем перенос
+                            if(PRS.FirstItemOnLine == false && bOverXEnd)
+                            {
+                                PRS.MoveToLBP = true;
+                                PRS.NewRange = true;
+
+                                this.ParaMath.UpdateWidthLine(PRS, PRS.X - PRS.XRange);
+                            }
+                            else
+                            {
+                                PRS.bInsideOper = true;
+                            }
+
+                            PRS.X += PRS.SpaceLen + PRS.WordLen + BoxLen;
+                            PRS.SpaceLen = 0;
+                            PRS.WordLen = 0;
+
+                            PRS.Word = false;
+                            PRS.FirstItemOnLine = false;
                         }
 
-                        PRS.WordLen = 0;
-
-                        PRS.Word = true;
                     }
                     else
                     {
-                        var bOverXEnd = PRS.X + PRS.SpaceLen + PRS.WordLen + BoxLen - BoxGapRight > PRS.XEnd;
-
-                        PRS.OperGapRight = BoxGapRight;
-
-                        // Слово не убирается в отрезке. Переносим слово в следующий отрезок
-                        // FirstItemOnLine == false - слово оказалось не единственным элементом в промежутке, делаем перенос
-                        if(PRS.FirstItemOnLine == false && bOverXEnd)
-                        {
-                            PRS.MoveToLBP = true;
-                            PRS.NewRange = true;
-
-                            this.ParaMath.UpdateWidthLine(PRS, PRS.X - PRS.XRange);
-                        }
-
-                        PRS.X += PRS.SpaceLen + PRS.WordLen + BoxLen;
-                        PRS.SpaceLen = 0;
-                        PRS.WordLen = 0;
-
-                        PRS.Word = false;
-                        PRS.FirstItemOnLine = false;
+                        PRS.WordLen += BoxLen;
                     }
+
+                    PRS.MathFirstItem = false;
+
                 }
                 else
                 {
@@ -4035,11 +4072,18 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             }
             else
             {
+                if(PRS.MathFirstItem == true && false == Item.Is_EmptyRange(PRS.Line, PRS.Range))
+                {
+                    PRS.MathFirstItem = false;
+                }
+
                 if(PRS.bPriorityOper == true && PRS.bInsideOper == true && PRS.X - PRS.XRange > PRS.WrapIndent)
                 {
                     bNoBreakMObj = true;
                 }
             }
+
+            bCurInsideOper = bCurInsideOper || PRS.bInsideOper;
 
 
             if ( true === PRS.NewRange )
@@ -4059,6 +4103,45 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 
+};
+CMathContent.prototype.Get_WrapToLine = function(_CurLine, _CurRange, WrapIndent)
+{
+    var Pos = this.protected_GetPrevRangeEndPos(_CurLine, _CurRange);
+    var ContentLen = this.Content.length;
+    var Wrap = 0;
+
+    if(false == this.IsStartLine(_CurLine, _CurRange))
+    {
+        while(Pos < ContentLen)
+        {
+            var Item = this.Content[Pos];
+            var bEmptyRun = Item.Type == para_Math_Run && true == Item.Math_EmptyRange(_CurLine, _CurRange); // Get_WrapToLine может прийти до Recalculate_Range
+            var bBoxBreak = Item.Type == para_Math_Composition && Item.kind == MATH_BOX && true == Item.IsBreak();
+
+            if(Item.Type == para_Math_Composition)
+            {
+                if(bBoxBreak == true)
+                {
+                    Wrap = 0;
+                }
+                else
+                {
+                    Wrap = Item.Get_WrapToLine(_CurLine, _CurRange, WrapIndent);
+                }
+
+                break;
+            }
+            else if(bEmptyRun == false)
+            {
+                Wrap = WrapIndent;
+                break;
+            }
+
+            Pos++;
+        }
+    }
+
+    return Wrap;
 };
 CMathContent.prototype.Math_Set_EmptyRange = function(PRS)
 {

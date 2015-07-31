@@ -1808,7 +1808,7 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
         this.recalculateSize(g_oTextMeasurer);
 
-        this.Update_WordLen(PRS, WordLen);
+        this.UpdatePRS_OneLine(PRS, WordLen);
         this.Bounds.SetWidth(0, 0, this.size.width);
         this.Bounds.UpdateMetrics(0, 0, this.size);
     }
@@ -1877,6 +1877,22 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     }
 
     PRS.bMath_OneLine = bOneLine;
+};
+CMathBase.prototype.Get_WrapToLine = function(_CurLine, _CurRange, WrapIndent)
+{
+    var Wrap = 0;
+
+    if(this.bOneLine)
+    {
+        Wrap = WrapIndent;
+    }
+    else
+    {
+        var Pos = this.NumBreakContent;
+        Wrap = this.Content[Pos].Get_WrapToLine(_CurLine, _CurRange, WrapIndent);
+    }
+
+    return Wrap;
 };
 CMathBase.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
 {
@@ -1992,12 +2008,12 @@ CMathBase.prototype.Math_GetWidth = function(_CurLine, _CurRange)
 {
     return this.size.width;
 };
-CMathBase.prototype.Update_WordLen = function(PRS, WordLen)
+CMathBase.prototype.UpdatePRS_OneLine = function(PRS, WordLen)
 {
     if(this.bInside == false)
     {
         PRS.WordLen = WordLen + this.size.width;
-
+        PRS.MathFirstItem = false;
     }
 };
 CMathBase.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)

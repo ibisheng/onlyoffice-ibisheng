@@ -134,6 +134,10 @@ CMathSettings.prototype.Get_WrapIndent = function(WrapState)
 
     return wrapIndent;
 };
+CMathSettings.prototype.IsWrap = function(WrapState)
+{
+    return WrapState == ALIGN_MARGIN_WRAP || WrapState == ALIGN_WRAP;
+};
 CMathSettings.prototype.Get_LeftMargin = function(WrapState)
 {
     this.SetCompiledPr();
@@ -748,7 +752,15 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
 
     var WrapState = this.PageInfo.GetWrap(Page);
 
-    var wrapIndent = MathSettings.Get_WrapIndent(WrapState);
+    var wrap = 0;
+    var bFirstLine = this.Root.IsStartLine(_CurLine);
+
+    if(bFirstLine == false && true == MathSettings.IsWrap(WrapState))
+    {
+        var wrapIndent = MathSettings.Get_WrapIndent(WrapState);
+        wrap = this.Root.Get_WrapToLine(_CurLine, _CurRange, wrapIndent);
+    }
+
 
     var XStart, XEnd;
 
@@ -781,14 +793,14 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
         if(bSingleLine)  // чтобы не сравнивать с wrapIndent, когда формула занимает одну строку
             W = StartLineWidth;
         else
-            W = Math.max(MaxW + wrapIndent, StartLineWidth);
+            W = Math.max(MaxW + wrap, StartLineWidth);
     }
     else
     {
         W = MaxW;
     }
 
-    if(this.Root.IsStartLine(_CurLine)) // первая строка первой страницы, если строка разбивается на несколько отрезко, то это уже будет inline-формула
+    if(bFirstLine == true) // первая строка первой страницы, если строка разбивается на несколько отрезко, то это уже будет inline-формула
     {
         switch(Jc)
         {
@@ -806,11 +818,11 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
     {
         if(Jc == align_Justify)
         {
-            X = XEnd - XStart > W ? XStart + (XEnd - XStart - W)/2 + wrapIndent : XStart;
+            X = XEnd - XStart > W ? XStart + (XEnd - XStart - W)/2 + wrap : XStart;
         }
         else
         {
-            X = XEnd - XStart > W ? XStart + wrapIndent : XStart;
+            X = XEnd - XStart > W ? XStart + wrap : XStart;
         }
     }
 
@@ -1453,17 +1465,16 @@ ParaMath.prototype.private_UpdateXLimits = function(PRS)
     PRS.X    += MathSettings.Get_LeftMargin(WrapState);
     PRS.XEnd -= MathSettings.Get_RightMargin(WrapState);
 
-    var WrapIndent = MathSettings.Get_WrapIndent(WrapState);
 
-    PRS.WrapIndent = WrapIndent;
+    PRS.WrapIndent = MathSettings.Get_WrapIndent(WrapState);
     PRS.bPriorityOper = this.ParaMathRPI.bInline == false;
 
     var bFirstLine = this.Root.IsStartLine(PRS.Line);
     PRS.bFirstLine = bFirstLine;
 
-    if(bFirstLine == false)
+    if(bFirstLine == false && true == MathSettings.IsWrap(WrapState))
     {
-        PRS.X += WrapIndent;
+        PRS.X += this.Root.Get_WrapToLine(PRS.Line, PRS.Range, PRS.WrapIndent);
     }
 
     PRS.XRange = PRS.X;

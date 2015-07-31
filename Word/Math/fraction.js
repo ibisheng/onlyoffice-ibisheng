@@ -202,6 +202,8 @@ CFraction.prototype.drawSkewedFraction = function(PDSE)
     PDSE.Graphics._l(xx2, yy2);
     PDSE.Graphics.ds();
 
+    PDSE.Graphics._s();
+
     CFraction.superclass.Draw_Elements.call(this, PDSE);
 };
 CFraction.prototype.drawLinearFraction = function(PDSE)
@@ -230,6 +232,8 @@ CFraction.prototype.drawLinearFraction = function(PDSE)
     PDSE.Graphics._m(x1, y1);
     PDSE.Graphics._l(x2, y2);
     PDSE.Graphics.ds();
+
+    PDSE.Graphics._s();
 
     CFraction.superclass.Draw_Elements.call(this, PDSE);
 };

@@ -54,7 +54,6 @@ function CMathBorderBoxPr()
     this.strikeTLBR = false;
     this.strikeV    = false;
 }
-
 CMathBorderBoxPr.prototype.Set_FromObject = function(Obj)
 {
     if (undefined !== Obj.hideBot && null !== Obj.hideBot)
@@ -81,7 +80,6 @@ CMathBorderBoxPr.prototype.Set_FromObject = function(Obj)
     if (undefined !== Obj.strikeV && null !== Obj.strikeV)
         this.strikeV = Obj.strikeV;
 };
-
 CMathBorderBoxPr.prototype.Copy = function()
 {
     var NewPr = new CMathBorderBoxPr();
@@ -96,7 +94,6 @@ CMathBorderBoxPr.prototype.Copy = function()
 
     return NewPr;
 };
-
 CMathBorderBoxPr.prototype.Write_ToBinary = function(Writer)
 {
     // Bool : hideBot
@@ -117,7 +114,6 @@ CMathBorderBoxPr.prototype.Write_ToBinary = function(Writer)
     Writer.WriteBool(this.strikeTLBR);
     Writer.WriteBool(this.strikeV);
 };
-
 CMathBorderBoxPr.prototype.Read_FromBinary = function(Reader)
 {
     // Bool : hideBot
@@ -155,7 +151,6 @@ function CBorderBox(props)
 	g_oTableId.Add(this, this.Id);
 }
 Asc.extendClass(CBorderBox, CMathBase);
-
 CBorderBox.prototype.ClassType = historyitem_type_borderBox;
 CBorderBox.prototype.kind      = MATH_BORDER_BOX;
 CBorderBox.prototype.init = function(props)
@@ -396,7 +391,6 @@ function CMathBoxPr()
     this.noBreak = false;
     this.opEmu   = false;
 }
-
 CMathBoxPr.prototype.Set_FromObject = function(Obj)
 {
     if(true === Obj.aln || 1 === Obj.aln)
@@ -420,12 +414,15 @@ CMathBoxPr.prototype.Set_FromObject = function(Obj)
     else
         this.noBreak = false;
 
-    if(true === Obj.opEmu || 1 === Obj.opEmu)
+    if(true === Obj.opEmu || 1 === Obj.opEmu || Obj.opEmu == null) // null - val attribute is absent
         this.opEmu = true;
     else
         this.opEmu = false;
 };
-
+/*CMathBoxPr.prototype.IsBreak = function()
+{
+    return this.brk ! == undefined;
+};*/
 CMathBoxPr.prototype.Copy = function()
 {
     var NewPr = new CMathBoxPr();
@@ -440,7 +437,6 @@ CMathBoxPr.prototype.Copy = function()
 
     return NewPr;
 };
-
 CMathBoxPr.prototype.Write_ToBinary = function(Writer)
 {
     // Bool : aln
@@ -504,10 +500,8 @@ function CBox(props)
 	g_oTableId.Add( this, this.Id );
 }
 Asc.extendClass(CBox, CMathBase);
-
 CBox.prototype.ClassType = historyitem_type_box;
 CBox.prototype.kind      = MATH_BOX;
-
 CBox.prototype.init = function(props)
 {
     this.Fill_LogicalContent(1);
@@ -517,6 +511,15 @@ CBox.prototype.init = function(props)
 };
 CBox.prototype.fillContent = function()
 {
+    if(this.Pr.opEmu == false && this.Pr.noBreak == false)
+    {
+        this.NeedBreakContent(0);
+    }
+    else
+    {
+        this.bCanBreak == false;
+    }
+
     this.setDimension(1, 1);
     this.elements[0][0] = this.getBase();
 };
@@ -524,25 +527,17 @@ CBox.prototype.getBase = function()
 {
     return this.Content[0];
 };
-CBox.prototype.Update_WordLen = function(PRS, WordLen)
+CBox.prototype.UpdatePRS_OneLine = function(PRS, WordLen)
 {
     PRS.WordLen   = WordLen;
 };
-
-// TO DO передела в base.js
-CBox.prototype.UpdateOperators____2 = function(_CurLine, _CurRange)
+CBox.prototype.IsOperatorEmulator = function()
 {
-    if(true == this.ParaMath.Is_BrkBinBefore())
-    {
-        this.GapLeft = 0;
-    }
-    else
-    {
-        this.GapRight = 0;
-    }
-
-    this.size.width = this.Content[0].size.width + this.GapLeft + this.GapRight;
-
+    return this.Pr.opEmu == true;
+};
+CBox.prototype.IsBreak = function()
+{
+    return this.Pr.opEmu == true && this.Pr.brk !== undefined;
 };
 
 
@@ -555,20 +550,17 @@ CMathBarPr.prototype.Set_FromObject = function(Obj)
     if(LOCATION_TOP === Obj.pos || LOCATION_BOT === Obj.pos)
         this.pos = Obj.pos;
 };
-
 CMathBarPr.prototype.Copy = function()
 {
     var NewPr = new CMathBarPr();
     NewPr.pos = this.pos;
     return NewPr;
 };
-
 CMathBarPr.prototype.Write_ToBinary = function(Writer)
 {
     // Long : pos
     Writer.WriteLong(this.pos);
 };
-
 CMathBarPr.prototype.Read_FromBinary = function(Reader)
 {
     // Long : pos
@@ -591,10 +583,8 @@ function CBar(props)
 	g_oTableId.Add( this, this.Id );
 }
 Asc.extendClass(CBar, CCharacter);
-
 CBar.prototype.ClassType = historyitem_type_bar;
 CBar.prototype.kind      = MATH_BAR;
-
 CBar.prototype.init = function(props)
 {
     this.Fill_LogicalContent(1);
@@ -650,7 +640,6 @@ function CMathPhantomPr()
     this.zeroDesc = false;
     this.zeroWid  = false;
 }
-
 CMathPhantomPr.prototype.Set_FromObject = function(Obj)
 {
     if (true === Obj.show || 1 === Obj.show)
@@ -678,7 +667,6 @@ CMathPhantomPr.prototype.Set_FromObject = function(Obj)
     else
         this.zeroWid = false;
 };
-
 CMathPhantomPr.prototype.Copy = function()
 {
     var NewPr = new CMathPhantomPr();
@@ -691,7 +679,6 @@ CMathPhantomPr.prototype.Copy = function()
 
     return NewPr;
 };
-
 CMathPhantomPr.prototype.Write_ToBinary = function(Writer)
 {
     // Bool : show
@@ -706,7 +693,6 @@ CMathPhantomPr.prototype.Write_ToBinary = function(Writer)
     Writer.WriteBool(this.zeroDesc);
     Writer.WriteBool(this.zeroWid);
 };
-
 CMathPhantomPr.prototype.Read_FromBinary = function(Reader)
 {
     // Bool : show
@@ -736,10 +722,8 @@ function CPhantom(props)
 	g_oTableId.Add( this, this.Id );
 }
 Asc.extendClass(CPhantom, CMathBase);
-
 CPhantom.prototype.ClassType = historyitem_type_phant;
 CPhantom.prototype.kind      = MATH_PHANTOM;
-
 CPhantom.prototype.init = function(props)
 {
     this.Fill_LogicalContent(1);

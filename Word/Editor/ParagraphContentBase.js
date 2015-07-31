@@ -157,6 +157,14 @@ CParagraphContentWithContentBase.prototype.Is_UseInDocument = function(Id)
     return false;
 };
 
+CParagraphContentWithContentBase.prototype.protected_GetPrevRangeEndPos = function(LineIndex, RangeIndex)
+{
+    var RangeCount  = this.protected_GetRangesCount(LineIndex - 1);
+    var RangeOffset = this.protected_GetRangeOffset(LineIndex - 1, RangeCount - 1);
+
+    return LineIndex == 0 && RangeIndex == 0 ? 0 : this.Lines[RangeOffset + 1];
+};
+
 //----------------------------------------------------------------------------------------------------------------------
 // Класс CParagraphContentWithContentBase
 //   Это базовый класс для элементов параграфа, которые сами по себе могут содержать элементы параграфа.
