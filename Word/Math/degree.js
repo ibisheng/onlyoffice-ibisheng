@@ -422,8 +422,8 @@ CDegree.prototype.Document_UpdateInterfaceState = function(MathProps)
 };
 CDegree.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
 {
-    var CurLine  = PRS.Line - this.StartLine;
-    var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
 
     if(CurLine == 0 && CurRange == 0)
     {
@@ -827,8 +827,8 @@ CDegreeSubSup.prototype.fillContent = function()
 };
 CDegreeSubSup.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
 {
-    var CurLine  = PRS.Line - this.StartLine;
-    var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
 
     if(CurLine == 0 && CurRange == 0)
     {
