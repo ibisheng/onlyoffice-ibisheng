@@ -5149,6 +5149,7 @@ prot									= CustomFilters.prototype;
 prot["asc_getAnd"]						= prot.asc_getAnd;
 prot["asc_getCustomFilters"]			= prot.asc_getCustomFilters;
 prot["asc_setAnd"]						= prot.asc_setAnd;
+prot["asc_setCustomFilters"]			= prot.asc_setCustomFilters;
 
 window["Asc"]["CustomFilter"]			= window["Asc"].CustomFilter = CustomFilter;
 prot									= CustomFilter.prototype;
