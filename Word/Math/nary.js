@@ -138,7 +138,7 @@ function CNary(props)
     this.UpperIterator = null;
     this.Arg           = null;
 
-    if(props !== null && typeof(props) !== "undefined")
+    if(props !== null && props !== undefined)
         this.init(props);
 
 	g_oTableId.Add( this, this.Id );
@@ -257,7 +257,7 @@ CNary.prototype.ApplyProperties = function(RPI)
             this.Sign.add(oSign.chrCode);
         }
 
-        if(limLoc == null || typeof(limLoc) == "undefined")
+        if(limLoc === null || limLoc === undefined)
         {
             var bIntegral = oSign.chrCode > 0x222A && oSign.chrCode < 0x2231;
 

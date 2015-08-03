@@ -2198,8 +2198,9 @@ function CParagraphRecalculateStateWrap(Para)
     // у "крайних" в строке операторов/мат объектов сооответствующий Gap равен нулю
     this.OperGapRight        = 0;
     this.OperGapLeft         = 0;
-    this.bNoOneBreakOperator = true; // прежде чем обновлять позицию в контент Run, учтем были ли до этого операторы (проверки на Word == false не достаточно, т.к. формула мб инлайновая и тогда не нужно обновлять позицию)
+    this.bNoOneBreakOperator = true;  // прежде чем обновлять позицию в контент Run, учтем были ли до этого операторы (проверки на Word == false не достаточно, т.к. формула мб инлайновая и тогда не нужно обновлять позицию)
     this.bInsideOper         = false; // учитываем есть ли разбивка внутри мат объекта, чтобы случайно не вставить в конец пред оператора (при Brk_Before == false)
+    this.bOnlyForcedBreak    = false; // учитывается, если возможна разбивка только по операторам выше уровням => в этом случае можно сделать принуительный разрыв во внутреннем контенте
     this.bFastRecalculate    = false;
     this.bBoxOperator        = false;
 }
@@ -2236,6 +2237,7 @@ CParagraphRecalculateStateWrap.prototype =
         this.MathFirstItem       = true;
         this.bFirstCompareOper   = true;
         this.bInsideOper         = false;
+        this.bOnlyForcedBreak    = false;
         this.bNoOneBreakOperator = true;
         this.bFastRecalculate    = false;
         this.bBoxOperator        = false;
@@ -2271,9 +2273,10 @@ CParagraphRecalculateStateWrap.prototype =
         this.WrapIndent         = 0;
         this.bFirstCompareOper  = true;
         this.bInsideOper        = false;
+        this.bOnlyForcedBreak   = false;
         this.bNoOneBreakOperator = true;
         this.bFastRecalculate   = false;
-        this.bBoxOperator        = false;
+        this.bBoxOperator       = false;
     },
 
     Reset_RestartPageRecalcInfo : function()

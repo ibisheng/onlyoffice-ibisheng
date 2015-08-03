@@ -406,7 +406,7 @@ function CRadical(props)
     this.gapDegree = 0;
     this.gapWidth = 0; //  в случае со степенью, если ширина степени не нулевая, добавляется расстояние для ширины
 
-    if(props !== null && typeof(props)!== "undefined")
+    if(props !== null && props !== undefined)
         this.init(props);
 
 	g_oTableId.Add( this, this.Id );

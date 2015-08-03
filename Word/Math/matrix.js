@@ -442,7 +442,7 @@ function CMathMatrix(props)
 
     this.setDefaultSpace();
 
-    if(props !== null && typeof(props) !== "undefined")
+    if(props !== null && props !== undefined)
         this.init(props);
 
 	g_oTableId.Add( this, this.Id );
@@ -532,7 +532,7 @@ CMathMatrix.prototype.setColumnGapRule = function(rule, gap, minGap)
 {
     this.spaceColumn.rule = rule;
     this.spaceColumn.gap = gap;
-    if(minGap !== null && typeof(minGap) !== "undefined")
+    if(minGap !== null && minGap !== undefined)
         this.spaceColumn.minGap = minGap;
 };
 CMathMatrix.prototype.getContentElement = function(nRowIndex, nColIndex)
@@ -678,7 +678,7 @@ function CEqArray(props)
     this.MaxDimWidths = [];
     //
 
-    if(props !== null && typeof(props) !== "undefined")
+    if(props !== null && props !== undefined)
         this.init(props);
 
 	g_oTableId.Add( this, this.Id );

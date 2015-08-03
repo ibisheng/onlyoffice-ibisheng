@@ -600,6 +600,8 @@ ParaMath.prototype.Copy = function(Selected)
 ParaMath.prototype.Set_Paragraph = function(Paragraph)
 {
     this.Paragraph = Paragraph;
+    this.Root.Set_Paragraph(Paragraph);
+    this.Root.Set_ParaMath(this, null);
 };
 
 ParaMath.prototype.Get_Text = function(Text)

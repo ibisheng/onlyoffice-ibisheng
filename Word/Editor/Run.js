@@ -2280,7 +2280,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     var bCompareOper = Item.Is_CompareOperator();
 
-                    var bOperInEndContent = bEndRunToContent == true && Pos == ContentLen - 1 && Word == true, // необходимо для того, чтобы у контентов мат объектов (к-ые могут разбиваться на строки) не было отметки Set_LineBreakPos, иначе скобка (или GapLeft), перед которой стоит break_Operator, перенесется на следующую строку (без текста !)
+                    var bOperInEndContent = bOperBefore === false && bEndRunToContent === true && Pos == ContentLen - 1 && Word == true, // необходимо для того, чтобы у контентов мат объектов (к-ые могут разбиваться на строки) не было отметки Set_LineBreakPos, иначе скобка (или GapLeft), перед которой стоит break_Operator, перенесется на следующую строку (без текста !)
                         bLowPriority      = bCompareOper == false  && bFirstCompareOper == false;
 
                     bNoOneBreakOperator = false;
@@ -2319,7 +2319,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         if(PRS.bPriorityOper == true && bCompareOper == true && bFirstCompareOper == true && bCompareWrapIndent == true && !(Word == false && bFirstItem == true)) // (Word == true && FirstItemOnLine == true) - не первый элемент в строке
                             bFirstCompareOper = false;
 
-                        if(bOperBefore)  // оператор "до"
+                        if(bOperBefore)  // оператор "до" => оператор находится в начале строки
                         {
                             bOverXEnd = X + WordLen + SpaceLen > XEnd;
 
@@ -2331,7 +2331,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             }
                             else
                             {
-                                bInsideOper = true;
+                                if(bFirstItem == false)
+                                    bInsideOper = true;
 
                                 if(Word == true)
                                 {
@@ -2363,7 +2364,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 }
                             }
                         }
-                        else   // оператор "после"
+                        else   // оператор "после" => оператор находится в конце строки
                         {
                             bOverXEnd = X + WordLen + BrkLen - Item.GapRight > XEnd;
 
@@ -2760,7 +2761,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             }
 
             // запоминаем конец Run
-            PRS.PosEndRun = PRS.CurPos.Copy();
+            PRS.PosEndRun.Set(PRS.CurPos);
             PRS.PosEndRun.Update2(this.Content.length, Depth);
 
         }
@@ -9117,8 +9118,6 @@ ParaRun.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
     //this.Lines[0].Add_Range(0, RangeStartPos, RangeEndPos);
     var RangeStartPos = this.protected_AddRange(CurLine, CurRange);
     var RangeEndPos = Lng;
-
-    this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 
     this.Math_RecalculateContent(PRS);
 

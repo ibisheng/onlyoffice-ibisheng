@@ -2782,8 +2782,8 @@ COperator.prototype.getProps = function(props, defaultProps)
     this.defaultType = defaultProps.type;
 
     var bDelimiter = this.type == OPER_DELIMITER || this.type == OPER_SEPARATOR,
-        bNotType   = typeof(props.type) == "undefined" ||  props.type == null,
-        bUnicodeChr    = props.chr !== null && props.chr+0 == props.chr;
+        bNotType   = props.type === undefined ||  props.type === null,
+        bUnicodeChr    = props.chr !== null && props.chr+0 === props.chr;
 
 
     if(bDelimiter && props.chr == -1) // empty operator
@@ -2795,8 +2795,8 @@ COperator.prototype.getProps = function(props, defaultProps)
         type = defaultProps.type;
     }
 
-    var bLoc        = props.loc !== null && typeof(props.loc)!== "undefined";
-    var bDefaultLoc = defaultProps.loc !== null && typeof(defaultProps.loc)!== "undefined";
+    var bLoc        = props.loc !== null && props.loc !== undefined;
+    var bDefaultLoc = defaultProps.loc !== null && defaultProps.loc !==  undefined;
 
 
     if(!bLoc && bDefaultLoc)
@@ -3010,7 +3010,7 @@ COperator.prototype.getChr = function()
     var chr = null; //если operator не определен, то this.code = null
 
     if(this.code !== null)
-        chr = this.typeOper == this.defaultType ? null : String.fromCharCode(this.code);
+        chr = this.typeOper === this.defaultType ? null : String.fromCharCode(this.code);
 	if (this.operator == OPERATOR_EMPTY)
 		chr = "";
 
@@ -3211,7 +3211,7 @@ function CDelimiter(props)
     this.Pr = new CMathDelimiterPr();
     this.TextInContent = true;
 
-    if(props !== null && typeof(props) !== "undefined")
+    if(props !== null && props !== undefined)
         this.init(props);
 
 	g_oTableId.Add( this, this.Id );
@@ -3941,7 +3941,7 @@ function CGroupCharacter(props)
 
     this.Pr = new CMathGroupChrPr();
 
-    if(props !== null && typeof(props)!== "undefined")
+    if(props !== null && props !== undefined)
         this.init(props);
 
     /// вызов этой функции обязательно в конце

@@ -419,7 +419,7 @@ CMathGapsInfo.prototype =
             {
                 leftCoeff = this.getGapsMComp(this.Current, -1);
 
-                if(this.Left != null)
+                if(this.Left !== null)
                 {
                     if(this.Left.Type == para_Math_Composition)
                     {
@@ -450,7 +450,7 @@ CMathGapsInfo.prototype =
             var LGapSign = 0.1513*this.CurrentFontSize;
             this.Current.GapLeft = (leftCoeff*LGapSign*100 | 0)/100; // если ни один случай не выполнился, выставляем "нулевые" gaps (default): необходимо, если что-то удалили и объект стал первый или последним в контенте
 
-            if(this.Left != null)
+            if(this.Left !== null)
             {
                 var RGapSign = 0.1513*this.LeftFontSize;
                 this.Left.GapRight = (rightCoeff*RGapSign*100 | 0)/100;
@@ -835,7 +835,6 @@ CMathContent.prototype.GetWidthLine = function(_CurLine, _CurRange)
 
     return W;
 };
-
 CMathContent.prototype.ShiftPage = function(Dx)
 {
     this.Bounds.ShiftPage(Dx);
@@ -3827,19 +3826,25 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 {
     this.bOneLine = PRS.bMath_OneLine;
 
+    // для неинлайн формул :
+    // у операторов, находяхщихся на этом уровне (в Run) приоритет выше, чем у внутренних операторов (внутри мат объектов)
+    // возможен только принудительный разрыв
+    var bOnlyForcedBreak = PRS.bOnlyForcedBreak;
+    var bNoOneBreakOperator = PRS.bNoOneBreakOperator;
+
     var CurLine  = PRS.Line - this.StartLine;
     var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
 
     var ContentLen = this.Content.length;
 
     var RangeStartPos = this.protected_AddRange(CurLine, CurRange);
-    var RangeEndPos   = 0;
+    var RangeEndPos   = ContentLen - 1;
 
-    if(this.bOneLine)
+    /*if(this.bOneLine)
     {
         RangeStartPos = 0;
         RangeEndPos   = ContentLen - 1;
-    }
+    }*/
 
     if(this.RecalcInfo.bEqArray)
         this.InfoPoints.SetDefault();
@@ -3874,9 +3879,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var bInternalOper    = false,
         bCurInsideOper   = false;
 
-    // для неинлайн формул :
-    // у операторов, находяхщихся на этом уровне (в Run) приоритет выше, чем у внутренних операторов (внутри мат объектов)
-    var bNoBreakMObj = false;
+    var BoxLen, BoxGapLeft, BoxGapRight;
 
     for(var Pos = RangeStartPos; Pos < ContentLen; Pos++)
     {
@@ -3891,7 +3894,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
         PRS.Update_CurPos( Pos, Depth );
 
-        if(this.bOneLine) // контент занимает всегда(!) одну строку
+        if(this.bOneLine == true) // контент занимает всегда(!) одну строку
         {
             Item.Recalculate_Range_OneLine(PRS, ParaPr, Depth + 1);
 
@@ -3909,12 +3912,46 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             this.size.ascent = ascent;
             this.size.height = ascent + descent;
         }
+        else if(bOnlyForcedBreak == true)
+        {
+            if(Type == para_Math_Run)
+            {
+                Item.Recalculate_Range_OneLine(PRS, ParaPr, Depth + 1);
+                PRS.WordLen += Item.size.width;
+            }
+            else
+            {
+                BoxLen      = Item.size.width;
+                BoxGapRight = Item.GapRight;
+
+                var WWordLen = Brk_Before == true ?  PRS.X + PRS.WordLen + PRS.SpaceLen : PRS.X + PRS.SpaceLen + PRS.WordLen + BoxLen - BoxGapRight;
+
+                if(WWordLen > PRS.XEnd)
+                {
+                    PRS.NewRange = true;
+                    PRS.MoveToLBP = true;
+                }
+                else if(Item.kind == MATH_BOX)
+                {
+                    if(true == Item.IsBreak())
+                    {
+                        this.private_ForceBreakBox(PRS, Item.size.width);
+                    }
+                    else
+                    {
+                        PRS.WordLen += BoxLen;
+                    }
+                }
+                else
+                {
+                    Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
+                }
+            }
+        }
         else // контент может занимать несколько строк
         {
-            var bNoOneBreakOperator = PRS.bNoOneBreakOperator;
-
             // запомним позицию конца Run перед тем как зайдем во внутр мат объект (конечная позиция Run может измениться при пересчете внутр мат объекта)
-            var _Depth = PRS.PosEndRun.Depth;
+            var _Depth      = PRS.PosEndRun.Depth;
             var PrevLastPos = PRS.PosEndRun.Get(_Depth-1),
                 LastPos     = PRS.PosEndRun.Get(_Depth);
 
@@ -3922,7 +3959,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
             PRS.bInsideOper = false;
 
-            PRS.bMath_OneLine = Type == para_Math_Composition && bNoBreakMObj == true;
+            //PRS.bMath_OneLine = Type == para_Math_Composition && bOnlyForcedBreak == true;
 
             Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
 
@@ -3933,13 +3970,15 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 // перед мат объектом идет box break_operator и он не является первым элементом в строке
                 if(Item.kind == MATH_BOX)
                 {
-                    var BoxLen      = Item.size.width,
-                        BoxGapLeft  = Item.GapLeft,
-                        BoxGapRight = Item.GapRight;
+                    BoxLen      = Item.size.width;
+                    BoxGapLeft  = Item.GapLeft;
+                    BoxGapRight = Item.GapRight;
 
                     if(true == Item.IsBreak())
                     {
-                        if(true == PRS.MathFirstItem)
+                        this.private_ForceBreakBox(PRS, BoxLen);
+
+                        /*if(true == PRS.MathFirstItem)
                         {
                             PRS.WordLen += BoxLen;
                         }
@@ -3954,7 +3993,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                             PRS.MoveToLBP = true;
                             PRS.NewRange = true;
-                        }
+                        }*/
                     }
                     else if(true == Item.IsOperatorEmulator())
                     {
@@ -4076,10 +4115,11 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 {
                     PRS.MathFirstItem = false;
                 }
+                var CheckWrapIndent = PRS.bFirstLine == true ? PRS.X - PRS.XRange > PRS.WrapIndent : true;
 
-                if(PRS.bPriorityOper == true && PRS.bInsideOper == true && PRS.X - PRS.XRange > PRS.WrapIndent)
+                if(PRS.bPriorityOper == true && PRS.bInsideOper == true && CheckWrapIndent == true)
                 {
-                    bNoBreakMObj = true;
+                    PRS.bOnlyForcedBreak = true;
                 }
             }
 
@@ -4095,6 +4135,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     }
 
     PRS.bInsideOper = PRS.bInsideOper || bCurInsideOper;
+    PRS.bOnlyForcedBreak = bOnlyForcedBreak;
 
     if ( Pos >= ContentLen )
     {
@@ -4106,7 +4147,10 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 };
 CMathContent.prototype.Get_WrapToLine = function(_CurLine, _CurRange, WrapIndent)
 {
-    var Pos = this.protected_GetPrevRangeEndPos(_CurLine, _CurRange);
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var Pos = this.protected_GetPrevRangeEndPos(CurLine, CurRange);
     var ContentLen = this.Content.length;
     var Wrap = 0;
 
@@ -4142,6 +4186,29 @@ CMathContent.prototype.Get_WrapToLine = function(_CurLine, _CurRange, WrapIndent
     }
 
     return Wrap;
+};
+CMathContent.prototype.private_ForceBreakBox = function(PRS, BoxLen)
+{
+    var _Depth      = PRS.PosEndRun.Depth;
+    var PrevLastPos = PRS.PosEndRun.Get(_Depth-1),
+        LastPos     = PRS.PosEndRun.Get(_Depth);
+
+    if(true == PRS.MathFirstItem)
+    {
+        PRS.WordLen += BoxLen;
+    }
+    else
+    {
+        //PRS.bInsideOper = true;
+        PRS.X += PRS.SpaceLen + PRS.WordLen;
+        PRS.Update_CurPos(PrevLastPos, _Depth-1);
+        PRS.Set_LineBreakPos(LastPos);
+
+        this.ParaMath.UpdateWidthLine(PRS, PRS.X - PRS.XRange);
+
+        PRS.MoveToLBP = true;
+        PRS.NewRange = true;
+    }
 };
 CMathContent.prototype.Math_Set_EmptyRange = function(PRS)
 {

@@ -414,7 +414,7 @@ CMathBoxPr.prototype.Set_FromObject = function(Obj)
     else
         this.noBreak = false;
 
-    if(true === Obj.opEmu || 1 === Obj.opEmu || Obj.opEmu == null) // null - val attribute is absent
+    if(true === Obj.opEmu || 1 === Obj.opEmu || Obj.opEmu === null) // null - val attribute is absent
         this.opEmu = true;
     else
         this.opEmu = false;
