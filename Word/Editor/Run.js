@@ -2279,6 +2279,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     var BrkLen = Item.Get_Width2()/TEXTWIDTH_DIVIDER;
 
                     var bCompareOper = Item.Is_CompareOperator();
+                    var bOperBefore = this.ParaMath.Is_BrkBinBefore() == true;
 
                     var bOperInEndContent = bOperBefore === false && bEndRunToContent === true && Pos == ContentLen - 1 && Word == true, // необходимо для того, чтобы у контентов мат объектов (к-ые могут разбиваться на строки) не было отметки Set_LineBreakPos, иначе скобка (или GapLeft), перед которой стоит break_Operator, перенесется на следующую строку (без текста !)
                         bLowPriority      = bCompareOper == false  && bFirstCompareOper == false;
@@ -2309,7 +2310,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     }
                     else
                     {
-                        var bOperBefore = this.ParaMath.Is_BrkBinBefore() == true;
                         var WorLenCompareOper = WordLen + X - XRange + (bOperBefore  ? SpaceLen : BrkLen);
 
                         var bOverXEnd;
