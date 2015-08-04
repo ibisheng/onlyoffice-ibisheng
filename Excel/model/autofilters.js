@@ -877,16 +877,16 @@ var maxIndividualValues = 10000;
 				return result;
 			},
 			
-			getSizeButton: function(range)
+			getSizeButton: function(c, r)
 			{
 				var ws = this.worksheet;
 				var result = null;
 				
-				if(this.isCellContainsAutoFilterButton(range.c1, range.r1))
+				if(this.isCellContainsAutoFilterButton(c, r))
 				{
 					var height = 11;
 					var width = 11;
-					var rowHeight = ws.rows[range.r1].height;
+					var rowHeight = ws.rows[r].height;
 					var index = 1;
 					if(rowHeight < height)
 					{

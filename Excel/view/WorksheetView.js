@@ -10007,7 +10007,7 @@
 					}
 					width = Math.max(width, tm.width);
 				} else {
-					filterButton = this.autoFilters.getSizeButton({c1: col, r1: row});
+					filterButton = this.autoFilters.getSizeButton(col, row);
 					if (null !== filterButton && CellValueType.String === ct.cellType)
 						width = Math.max(width, ct.metrics.width + filterButton.width);
 					else
