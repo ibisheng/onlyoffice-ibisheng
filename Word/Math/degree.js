@@ -338,20 +338,26 @@ CDegreeBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
     }
     else
     {
-        if(this.bOneLine || CurLine == 0 && CurRange == 0)
+        if(CurLine == 0 && CurRange == 0)
             pos.x += this.BrGapLeft;
 
         Y = pos.y;
 
         this.baseContent.setPosition(pos, PRSA, Line, Range, Page);
 
-        pos.x += this.dW;
+        var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+        var Lng = this.Content.length;
 
-        pos.y += this.upIter + this.iterContent.size.ascent;
+        if(EndPos == Lng - 1)
+        {
+            pos.x += this.dW;
 
-        this.iterContent.setPosition(pos, PRSA, Line, Range, Page);
+            pos.y += this.upIter + this.iterContent.size.ascent;
 
-        pos.x += this.BrGapRight;
+            this.iterContent.setPosition(pos, PRSA, Line, Range, Page);
+
+            pos.x += this.BrGapRight;
+        }
 
         pos.y = Y;
     }
@@ -469,7 +475,9 @@ CDegree.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
     var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
     var Len = this.Content.length;
 
-    if(this.bOneLine || (EndPos == Len - 1 && this.Content[EndPos].Math_Is_End( Line, Range)))
+    // у степени всегда итератор идет в конце, поэтому сделать проверку на то, что текущий контент tпоследний (т.е. это и будет итератор)
+
+    if(this.bOneLine || EndPos == Len - 1)
     {
         CDegree.superclass.setPosition.call(this, pos, PRSA, Line, Range, Page);
     }
@@ -835,7 +843,7 @@ CDegreeSubSup.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine
         this.Bounds.Reset();
     }
 
-    if(this.bOneLine == false && this.Need_Iters(_CurLine, _CurRange))
+    if(this.bOneLine === false && true === this.Need_Iters(_CurLine, _CurRange))
     {
         // чтобы при вычислении метрик итератора не были перебили метрики (например, у внутр мат объекта Asc может быть больше Asc текущего объекта)
 

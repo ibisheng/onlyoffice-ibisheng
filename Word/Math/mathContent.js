@@ -4518,11 +4518,6 @@ CMathContent.prototype.Math_Is_End = function(_CurLine, _CurRange)
 
     return result;
 };
-CMathContent.prototype.IsStartRange = function(Line, Range)
-{
-    var bFirstLine = Line - this.StartLine == 0;
-    return bFirstLine ? Range - this.StartRange == 0 : Range == 0;
-};
 CMathContent.prototype.IsStartLine = function(Line)
 {
     return Line == this.StartLine;
@@ -4530,13 +4525,6 @@ CMathContent.prototype.IsStartLine = function(Line)
 CMathContent.prototype.IsFirstRange = function(Line, Range)
 {
     return Line - this.StartLine == 0 && Range - this.StartRange == 0;
-};
-CMathContent.prototype.IsEndLine = function(Line)
-{
-    var CurLine  = Line - this.StartLine;
-    var LinesCount = this.protected_GetLinesCount();
-
-    return CurLine == LinesCount - 1;
 };
 CMathContent.prototype.IsFirstMCompInContent = function(Class)
 {

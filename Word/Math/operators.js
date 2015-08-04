@@ -3560,17 +3560,13 @@ CDelimiter.prototype.GetAscentOperator = function(operator) // в качеств
 };
 CDelimiter.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 {
-    var CurLine  = Line - this.StartLine;
-    var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
-
     this.UpdatePosBound(pos, PRSA, Line, Range, Page);
 
     if(this.bOneLine == false)
     {
-        var LinesCount = this.protected_GetLinesCount();
         var PosOper = new CMathPosition();
 
-        if(CurLine == 0 && CurRange == 0)
+        if(true === this.IsFirstRange(Line, Range))
         {
             PosOper.x = pos.x;
             PosOper.y = pos.y - this.begOper.size.ascent;
@@ -3580,7 +3576,8 @@ CDelimiter.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 
         this.Content[0].setPosition(pos, PRSA, Line, Range, Page);
 
-        if(LinesCount - 1 == CurLine)
+        // пересчет еще не закончился, поэтому на LastRange не можем проверить
+        if(true === this.Content[0].Math_Is_End(Line, Range))
         {
             PosOper.x = pos.x;
             PosOper.y = pos.y - this.endOper.size.ascent;
@@ -3627,10 +3624,7 @@ CDelimiter.prototype.Draw_Elements = function(PDSE)
 
     if(this.bOneLine == false)
     {
-        var CurLine  = PDSE.Line - this.StartLine;
-        var CurRange = ( 0 === CurLine ? PDSE.Range - this.StartRange : PDSE.Range );
-
-        if(CurLine == 0 && CurRange == 0)
+        if(true === this.IsFirstRange(PDSE.Line, PDSE.Range))
         {
             this.begOper.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
             PDSE.X += this.BrGapLeft;
@@ -3638,9 +3632,7 @@ CDelimiter.prototype.Draw_Elements = function(PDSE)
 
         this.Content[0].Draw_Elements(PDSE);
 
-        var LinesCount = this.protected_GetLinesCount();
-
-        if(LinesCount - 1 == CurLine)
+        if(true === this.IsLastRange(PDSE.Line, PDSE.Range))
         {
             this.endOper.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
             PDSE.X += this.BrGapRight;

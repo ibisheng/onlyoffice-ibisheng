@@ -354,7 +354,14 @@ CMathBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 
         var Len = this.Content.length;
 
-        if(EndPos == Len - 1 && this.Content[EndPos].Math_Is_End( Line, Range))
+        // Здесь проверяем не на то, что это последний Range (т.к. на данном этапе еще идет вычисление строк) а на конец контента !
+
+        var EndBrContentEnd = this.NumBreakContent == EndPos && this.Content[EndPos].Math_Is_End(Line, Range),
+            NotBrContent = this.NumBreakContent !== EndPos;
+
+        var bEnd = EndBrContentEnd || NotBrContent;
+
+        if(EndPos == Len - 1 && true === bEnd)
             pos.x += this.BrGapRight;
 
     }
@@ -398,6 +405,24 @@ CMathBase.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 
         CMathBase.superclass.Shift_Range.call(this, Dx, Dy, _CurLine, _CurRange);
     }
+};
+CMathBase.prototype.IsFirstRange = function(_CurLine, _CurRange)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    return CurLine == 0 && CurRange == 0;
+};
+CMathBase.prototype.IsLastRange = function(_CurLine, _CurRange)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var LinesCount = this.protected_GetLinesCount(),
+        RangesCount = this.protected_GetRangesCount(CurLine);
+
+
+    return CurLine == LinesCount - 1 && CurRange == RangesCount - 1;
 };
 CMathBase.prototype.UpdatePosBound = function(pos, PRSA, Line, Range, Page)
 {
@@ -1155,7 +1180,9 @@ CMathBase.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRang
         PRSA.LettersSkip--;
     }
     else
+    {
         WidthVisible = this.Bounds.GetWidth(CurLine, CurRange) + PRSA.JustifyWord;
+    }
 
     PRSA.X    += WidthVisible;
     PRSA.LastW = WidthVisible;
@@ -2151,17 +2178,17 @@ CMathBase.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange
         PRSC.Range.W += this.dW*(EndPos - StartPos);
 
 
-        // Здесь проверяем не на кол-во строк, т.к. на данном этапе еще идет вычисление строк, а на конец контента !
+        // Здесь проверяем не на то, что это последний Range (т.к. на данном этапе еще идет вычисление строк) а на конец контента !
 
         var Len = this.Content.length;
+        var EndBrContentEnd = this.NumBreakContent == EndPos && this.Content[EndPos].Math_Is_End( _CurLine, _CurRange),
+            NotBrContent = this.NumBreakContent !== EndPos;
 
-        if(EndPos == Len - 1)
+        var bEnd = EndBrContentEnd || NotBrContent;
+
+        if(EndPos == Len - 1 && true === bEnd)
         {
-            var EndBrContentEnd = this.NumBreakContent == EndPos && this.Content[EndPos].Math_Is_End( _CurLine, _CurRange),
-                NotBrContent = this.NumBreakContent !== EndPos;
-
-            if(EndBrContentEnd || NotBrContent)
-                PRSC.Range.W += this.BrGapRight;
+            PRSC.Range.W += this.BrGapRight;
         }
     }
 
