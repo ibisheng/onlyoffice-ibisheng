@@ -366,7 +366,6 @@ function Geometry()
     this.bW = null;
     this.kH = null;
     this.bH = null;
-    this.bNeedRecalcCoeff = true;
 
 
     this.Id = g_oIdCounter.Get_NewId();
@@ -398,7 +397,6 @@ Geometry.prototype=
 
     Refresh_RecalcData: function(data)
     {
-        this.bNeedRecalcCoeff = true;
         if(this.parent && this.parent.handleUpdateGeometry)
         {
             this.parent.handleUpdateGeometry();
@@ -489,7 +487,6 @@ Geometry.prototype=
     setAdjValue: function(name, val)
     {
         this.AddAdj(name, 15, val + "", undefined, undefined);
-        this.bNeedRecalcCoeff = true;
         if(this.parent && this.parent.handleUpdateGeometry)
         {
             this.parent.handleUpdateGeometry();
@@ -636,7 +633,6 @@ Geometry.prototype=
                 this.gdLst[data.name] = data.oldVal;
                 this.avLst[data.name] = data.oldAvVal;
 
-                this.bNeedRecalcCoeff = true;
                 if(this.parent && this.parent.handleUpdateGeometry)
                 {
                     this.parent.handleUpdateGeometry();
@@ -749,7 +745,6 @@ Geometry.prototype=
             {
                 this.gdLst[data.name] = parseInt(data.newVal);
                 this.avLst[data.name] = true;
-                this.bNeedRecalcCoeff = true;
                 if(this.parent && this.parent.handleUpdateGeometry)
                 {
                     this.parent.handleUpdateGeometry();
@@ -913,7 +908,6 @@ Geometry.prototype=
                 }
                 if(oldAvVal)
                 {
-                    this.bNeedRecalcCoeff = true;
                     if(this.parent && this.parent.handleUpdateGeometry)
                     {
                         this.parent.handleUpdateGeometry();

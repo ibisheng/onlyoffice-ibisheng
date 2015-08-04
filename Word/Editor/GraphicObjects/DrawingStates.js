@@ -203,18 +203,6 @@ NullState.prototype =
         }
         else if(selection.groupSelection)
         {
-            if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
-            {
-                if(this.drawingObjects.checkNeedResetChartSelection(e, x, y, pageIndex, bTextFlag))
-                {
-                    this.drawingObjects.checkChartTextSelection();
-                }
-                selection.groupSelection.resetInternalSelection();
-                if(e.ClickCount < 2)
-                {
-                    this.drawingObjects.updateOverlay();
-                }
-            }
             ret = handleSelectedObjects(this.drawingObjects, e, x, y, selection.groupSelection, pageIndex, true);
             if(ret)
             {
@@ -223,6 +211,8 @@ NullState.prototype =
                     end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
                     if((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
                     {
+
+                        this.drawingObjects.checkChartTextSelection(true);
                         this.drawingObjects.drawingDocument.OnRecalculatePage( pageIndex, this.drawingObjects.document.Pages[pageIndex] );
                         this.drawingObjects.drawingDocument.OnEndRecalculate( false, true );
                     }
@@ -235,7 +225,10 @@ NullState.prototype =
                 if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
                 {
                     end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
-                    if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content)) {
+                    if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
+                    {
+
+                        this.drawingObjects.checkChartTextSelection(true);
                         this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
                         this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
                     }
@@ -247,18 +240,6 @@ NullState.prototype =
         {}
 
 
-        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
-        {
-            if(this.drawingObjects.checkNeedResetChartSelection(e, x, y, pageIndex, bTextFlag))
-            {
-                this.drawingObjects.checkChartTextSelection();
-            }
-            this.drawingObjects.resetInternalSelection();
-            if(e.ClickCount < 2)
-            {
-                this.drawingObjects.updateOverlay();
-            }
-        }
         if(!b_no_handle_selected)
         {
             ret = handleSelectedObjects(this.drawingObjects, e, x, y, null, pageIndex, true);
@@ -269,6 +250,8 @@ NullState.prototype =
                     end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
                     if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
                     {
+
+                        this.drawingObjects.checkChartTextSelection(true);
                         this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
                         this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
                     }
@@ -296,6 +279,7 @@ NullState.prototype =
                     end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
                     if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
                     {
+                        this.drawingObjects.checkChartTextSelection(true);
                         this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
                         this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
                     }
@@ -317,6 +301,7 @@ NullState.prototype =
                     end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
                     if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
                     {
+                        this.drawingObjects.checkChartTextSelection(true);
                         this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
                         this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
                     }
@@ -334,6 +319,7 @@ NullState.prototype =
                         end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
                         if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
                         {
+                            this.drawingObjects.checkChartTextSelection(true);
                             this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
                             this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
                         }
@@ -348,6 +334,8 @@ NullState.prototype =
                     {
                         end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
                         if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content)) {
+
+                            this.drawingObjects.checkChartTextSelection(true);
                             this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
                             this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
                         }
@@ -358,6 +346,7 @@ NullState.prototype =
         }
         if(start_target_doc_content)
         {
+            this.drawingObjects.checkChartTextSelection(true);
             this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
             this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
         }

@@ -319,7 +319,11 @@ function handleChart(drawing, drawingObjectsController, e, x, y, group, pageInde
             {
                 if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
                 {
-                    drawingObjectsController.checkChartTextSelection();
+                    var oTargetTextObject = getTargetTextObject(drawingObjectsController);
+                    if(title !== oTargetTextObject)
+                    {
+                        drawingObjectsController.checkChartTextSelection();
+                    }
                     selector.resetSelection();
                     selector.selectObject(drawing, pageIndex);
                     selector.selection.chartSelection = drawing;

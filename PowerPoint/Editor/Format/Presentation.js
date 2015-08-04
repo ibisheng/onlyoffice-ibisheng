@@ -2522,10 +2522,6 @@ CPresentation.prototype =
             var ret = this.Slides[this.CurPage].graphicObjects.onMouseDown(e, X, Y);
             if(!ret)
             {
-                if(e.ClickCount < 2)
-                {
-                    this.Slides[this.CurPage].graphicObjects.resetSelection();
-                }
                 this.Document_UpdateSelectionState();
             }
         }

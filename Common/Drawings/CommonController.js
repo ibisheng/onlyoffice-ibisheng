@@ -349,10 +349,13 @@ DrawingObjectsController.prototype =
             }
             if(!isRealObject(group))
             {
+
+                this.resetInternalSelection();
                 this.changeCurrentState(new PreChangeAdjState(this, selectedObject));
             }
             else
             {
+                group.resetInternalSelection();
                 this.changeCurrentState(new PreChangeAdjInGroupState(this, group));
             }
             return true;
@@ -533,7 +536,6 @@ DrawingObjectsController.prototype =
                     {
                         this.changeCurrentState(new PreMoveInlineObject(this, object, is_selected, true, pageIndex, x, y));
                     }
-
                 }
                 else
                 {
@@ -624,22 +626,31 @@ DrawingObjectsController.prototype =
                     return this.handleMoveHit(object, e, x, y, group, false, pageIndex, bWord);
                 }
             }
-            this.resetSelection(true);
-            (group ? group : this).selectObject(object,pageIndex);
-            object.selectionSetStart(e, x, y, pageIndex);
             if(!group)
             {
-                this.selection.textSelection = object;
+                if(this.selection.textSelection !== object)
+                {
+                    this.resetSelection(true);
+                    this.selectObject(object,pageIndex)
+                    this.selection.textSelection = object;
+                }
             }
             else
             {
-                this.selectObject(group, pageIndex);
-                this.selection.groupSelection = group;
-                group.selection.textSelection = object;
+                if(this.selection.groupSelection !== group || group.selection.textSelection !== object)
+                {
+                    this.resetSelection(true);
+                    group.selectObject(object,pageIndex);
+                    this.selectObject(group, pageIndex);
+                    this.selection.groupSelection = group;
+                    group.selection.textSelection = object;
+                }
             }
+
+
+            object.selectionSetStart(e, x, y, pageIndex);
+
             this.changeCurrentState(new TextAddState(this, object));
-            if(e.ClickCount < 2)
-                this.updateSelectionState();
             return true;
         }
         else
@@ -3726,7 +3737,6 @@ DrawingObjectsController.prototype =
             drawingDocument.UpdateTargetTransform(null);
             drawingDocument.TargetEnd();
             drawingDocument.SelectEnabled(false);
-            drawingDocument.SelectClear();
             drawingDocument.SelectShow();
         }
     },
@@ -4852,8 +4862,8 @@ DrawingObjectsController.prototype =
     checkChartTextSelection: function(bNoRedraw)
     {
         if(this.bNoCheckChartTextSelection === true)
-            return;
-        var chart_selection;
+            return false;
+        var chart_selection, bRet = false;
         var nPageNum1, nPageNum2;
         if(this.selection.chartSelection)
         {
@@ -4975,6 +4985,7 @@ DrawingObjectsController.prototype =
 
         if(isRealNumber(nPageNum1))
         {
+            bRet = true;
             if(this.document)
             {
                 this.document.DrawingDocument.OnRecalculatePage( nPageNum1, this.document.Pages[nPageNum1] );
@@ -4996,6 +5007,7 @@ DrawingObjectsController.prototype =
         if(isRealNumber(nPageNum2) && nPageNum2 !== nPageNum1)
         {
 
+            bRet = true;
             if(this.document)
             {
                 this.document.DrawingDocument.OnRecalculatePage( nPageNum2, this.document.Pages[nPageNum2] );
@@ -5014,7 +5026,7 @@ DrawingObjectsController.prototype =
                 this.drawingObjects.showDrawingObjects(true);
             }
         }
-
+        return bRet;
     },
 
     resetSelection: function(noResetContentSelect)
