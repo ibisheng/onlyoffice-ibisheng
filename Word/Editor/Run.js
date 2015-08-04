@@ -43,7 +43,7 @@ function ParaRun(Paragraph, bMathRun)
     this.SpellingMarks = [];
 
     this.ReviewType    = paragraphcontent_Reviewtype_Common;
-    if (editor && !editor.isPresentationEditor && editor.WordControl && editor.WordControl.m_oLogicDocument && true === editor.WordControl.m_oLogicDocument.Is_TrackResivisions())
+    if (editor && !editor.isPresentationEditor && editor.WordControl && editor.WordControl.m_oLogicDocument && true === editor.WordControl.m_oLogicDocument.Is_TrackRevisions())
         this.ReviewType = paragraphcontent_Reviewtype_Added;
 
     if(bMathRun)
@@ -124,7 +124,7 @@ ParaRun.prototype.Copy = function(Selected)
 
     NewRun.Set_Pr( this.Pr.Copy() );
 
-    if (this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackResivisions())
+    if (this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
         NewRun.Set_ReviewType(paragraphcontent_Reviewtype_Added);
 
     if(true === bMath)
@@ -338,7 +338,7 @@ ParaRun.prototype.Add = function(Item, bMath)
 
     var TrackRevisions = false;
     if (this.Paragraph && this.Paragraph.LogicDocument)
-        TrackRevisions = this.Paragraph.LogicDocument.Is_TrackResivisions();
+        TrackRevisions = this.Paragraph.LogicDocument.Is_TrackRevisions();
 
     var ReviewType = this.Get_ReviewType();
     if ((true === TrackRevisions && paragraphcontent_Reviewtype_Added !== ReviewType) || (false === TrackRevisions && paragraphcontent_Reviewtype_Common !== ReviewType))
@@ -411,7 +411,7 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
 {
     var TrackRevisions = null;
     if (this.Paragraph && this.Paragraph.LogicDocument)
-        TrackRevisions = this.Paragraph.LogicDocument.Is_TrackResivisions();
+        TrackRevisions = this.Paragraph.LogicDocument.Is_TrackRevisions();
 
     var Selection = this.State.Selection;
 
@@ -5539,7 +5539,7 @@ ParaRun.prototype.Set_Pr = function(TextPr)
 ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 {
     var bReview = false;
-    if (this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackResivisions())
+    if (this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
         bReview = true;
 
     var ReviewType = this.Get_ReviewType();

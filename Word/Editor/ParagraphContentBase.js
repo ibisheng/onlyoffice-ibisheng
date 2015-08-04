@@ -615,7 +615,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove = function(Direction,
                 this.Remove_FromContent(EndPos, 1, true);
             }
 
-            if (this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackResivisions())
+            if (this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
             {
                 for (var CurPos = EndPos - 1; CurPos > StartPos; CurPos--)
                 {

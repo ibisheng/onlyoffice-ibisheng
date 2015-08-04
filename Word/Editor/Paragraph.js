@@ -2541,7 +2541,7 @@ Paragraph.prototype =
                     this.Content[EndPos].Cursor_MoveToStartPos();
                 }
 
-                if (this.LogicDocument && true === this.LogicDocument.Is_TrackResivisions())
+                if (this.LogicDocument && true === this.LogicDocument.Is_TrackRevisions())
                 {
                     for (var Pos = StartPos + 1; Pos <= EndPos - 1; Pos++)
                     {
@@ -2562,7 +2562,7 @@ Paragraph.prototype =
                     this.Internal_Content_Remove( StartPos );
                 }
 
-                if (this.LogicDocument && true === this.LogicDocument.Is_TrackResivisions())
+                if (this.LogicDocument && true === this.LogicDocument.Is_TrackRevisions())
                 {
                     for (var Pos = StartPos; Pos <= EndPos; Pos++)
                     {
@@ -2654,7 +2654,7 @@ Paragraph.prototype =
                 else
                 {
                     // TODO: В режиме рецензии элементы не удаляются, а позиция меняется прямо в ранах
-                    if (!this.LogicDocument || true !== this.LogicDocument.Is_TrackResivisions())
+                    if (!this.LogicDocument || true !== this.LogicDocument.Is_TrackRevisions())
                         this.CurPos.ContentPos = ContentPos;
                 }
             }
@@ -5492,7 +5492,7 @@ Paragraph.prototype =
 
             // Если мы находимся в режиме рецензирования, то пробегаемся по всему содержимому гиперссылки и
             // проставляем, что все раны новые.
-            if (this.LogicDocument && true === this.LogicDocument.Is_TrackResivisions())
+            if (this.LogicDocument && true === this.LogicDocument.Is_TrackRevisions())
                 Hyperlink.Set_ReviewType(paragraphcontent_Reviewtype_Added, true);
         }
         else if ( null !== HyperProps.Text && "" !== HyperProps.Text )
