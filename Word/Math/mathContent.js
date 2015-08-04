@@ -4065,13 +4065,21 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                     // FirstItemOnLine == false - слово оказалось не единственным элементом в промежутке, делаем перенос
 
-                    if (PRS.FirstItemOnLine == false && PRS.X + PRS.SpaceLen + PRS.WordLen > PRS.XEnd)
+                    if(PRS.X + PRS.SpaceLen + PRS.WordLen > PRS.XEnd)
                     {
-                        PRS.MoveToLBP = true;
-                        PRS.NewRange = true;
+                        if (PRS.FirstItemOnLine == false)
+                        {
+                            PRS.MoveToLBP = true;
+                            PRS.NewRange = true;
 
-                        this.ParaMath.UpdateWidthLine(PRS, PRS.X - PRS.XRange);
+                            this.ParaMath.UpdateWidthLine(PRS, PRS.X - PRS.XRange);
+                        }
+                        else
+                        {
+                            PRS.bMathWordLarge = true;
+                        }
                     }
+
 
                     // обновляем BreakPos на конец Run, т.к. внутри мат объекта BreakPos  может измениться на  if(true !== Word)
                     // обновляем только в том случае, если Word = false, иначе можем здесь перебить корректный LineBreakPos
