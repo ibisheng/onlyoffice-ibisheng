@@ -4304,7 +4304,7 @@ CellArea.prototype = {
 
 // For Auto Filters
 /** @constructor */
-function TablePart() {
+function TablePart(handlers) {
 	this.Ref = null;
 	this.HeaderRowCount = null;
 	this.TotalsRowCount = null;
@@ -4315,9 +4315,10 @@ function TablePart() {
 	this.TableStyleInfo = null;
 	
 	this.result = null;
+	this.handlers = handlers;
 }
 TablePart.prototype.clone = function(ws) {
-	var i, res = new TablePart();
+	var i, res = new TablePart(this.handlers);
 	res.Ref = this.Ref ? this.Ref.clone() : null;
 	res.HeaderRowCount = this.HeaderRowCount;
 	res.TotalsRowCount = this.TotalsRowCount;
@@ -4354,7 +4355,8 @@ TablePart.prototype.moveRef = function(col, row, ws) {
     var worksheet = ws.model;
 
 	this.Ref = ref;
-    worksheet.workbook.dependencyFormulas.changeTableName( this.DisplayName, worksheet, this.Ref );
+	//event
+	this.handlers.trigger("changeRefTablePart", this.DisplayName, this.Ref);
 
 	if(this.AutoFilter)
 		this.AutoFilter.moveRef(col, row);

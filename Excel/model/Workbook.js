@@ -2856,6 +2856,9 @@ function Woorksheet(wb, _index, sId){
 
     this.oDrawingOjectsManager = new DrawingObjectsManager(this);
     this.contentChanges = new CContentChanges();
+	
+	/*handlers*/
+	this.handlers = null;
 }
 
 Woorksheet.prototype.addContentChanges = function(changes)
@@ -3108,6 +3111,11 @@ Woorksheet.prototype.initPostOpen = function(){
 		// Даже если не было, создадим
 		this.sheetViews.push(new asc.asc_CSheetViewSettings());
 	}
+	
+	this.handlers = new asc.asc_CHandlersList(/*handlers*/{
+		"changeRefTablePart"		: function (displayName, ref) {self.handlers.trigger("asc_onChangeRefTablePart", displayName, ref);}
+	});
+	
 };
 Woorksheet.prototype._forEachCell=function(fAction){
 	for(var rowInd in this.aGCells){
@@ -4833,6 +4841,10 @@ Woorksheet.prototype.expandRangeByMerged = function(range){
 		}
 	}
 	return range;
+};
+Woorksheet.prototype.createTablePart = function(){
+	
+	return new TablePart(this.handlers);
 };
 //-------------------------------------------------------------------------------------------------
 /**

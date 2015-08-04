@@ -3137,7 +3137,7 @@ var maxIndividualValues = 10000;
 						aWs.TableParts = [];
 					//ref = Asc.g_oRangeCache.getAscRange(val[0].id + ':' + val[val.length - 1].idNext).clone();
 					
-					newFilter = new TablePart();
+					newFilter = aWs.createTablePart();
 					newFilter.Ref = ref;
 					
 					if(!bWithoutFilter)

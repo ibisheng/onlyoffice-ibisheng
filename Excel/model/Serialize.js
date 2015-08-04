@@ -3635,7 +3635,7 @@
             var oThis = this;
             if ( c_oSer_TablePart.Table == type )
             {
-                var oNewTable = new TablePart();
+                var oNewTable = this.ws.createTablePart();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadTable(t,l, oNewTable);
                 });
