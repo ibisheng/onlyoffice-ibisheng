@@ -818,8 +818,8 @@ function CDocument(DrawingDocument)
     // Класс, управляющий полями
     this.FieldsManager = new CDocumentFieldsManager();
 
-    // Проверяем режим редактирования
-    this.EditingType = document_EditingType_Common;
+    // Режим рецензирования
+    this.TrackRevisions = false;
 
     // Контролируем изменения интерфейса
     this.ChangedStyles = []; // Объект с Id стилями, которые были изменены/удалены/добавлены
@@ -14475,6 +14475,14 @@ CDocument.prototype.Get_EditingType = function()
 CDocument.prototype.Set_EditingType = function(EditingType)
 {
     this.EditingType = EditingType;
+};
+CDocument.prototype.Set_TrackRevisions = function(bTrack)
+{
+    this.TrackRevisions = bTrack;
+};
+CDocument.prototype.Is_TrackRevisions = function()
+{
+    return this.TrackRevisions;
 };
 CDocument.prototype.Start_SilentMode = function()
 {

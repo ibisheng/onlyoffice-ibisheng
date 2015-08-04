@@ -573,10 +573,4 @@ var c_oAscMathInterfaceType =
     Phantom       : 0x0f
 };
 
-var c_oAscEditingTypes =
-{
-    Common : 0x00,
-    Review : 0x01
-};
-
 window["flat_desine"] = false;

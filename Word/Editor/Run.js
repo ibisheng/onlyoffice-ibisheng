@@ -43,7 +43,7 @@ function ParaRun(Paragraph, bMathRun)
     this.SpellingMarks = [];
 
     this.ReviewType    = paragraphcontent_Reviewtype_Common;
-    if (editor && !editor.isPresentationEditor && editor.WordControl && editor.WordControl.m_oLogicDocument && document_EditingType_Review === editor.WordControl.m_oLogicDocument.Get_EditingType())
+    if (editor && !editor.isPresentationEditor && editor.WordControl && editor.WordControl.m_oLogicDocument && true === editor.WordControl.m_oLogicDocument.Is_TrackResivisions())
         this.ReviewType = paragraphcontent_Reviewtype_Added;
 
     if(bMathRun)
@@ -124,7 +124,7 @@ ParaRun.prototype.Copy = function(Selected)
 
     NewRun.Set_Pr( this.Pr.Copy() );
 
-    if (this.Paragraph && this.Paragraph.LogicDocument && document_EditingType_Review === this.Paragraph.LogicDocument.Get_EditingType())
+    if (this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackResivisions())
         NewRun.Set_ReviewType(paragraphcontent_Reviewtype_Added);
 
     if(true === bMath)
@@ -336,14 +336,14 @@ ParaRun.prototype.Add = function(Item, bMath)
         }
     }
 
-    var EditType = null;
+    var TrackRevisions = false;
     if (this.Paragraph && this.Paragraph.LogicDocument)
-        EditType = this.Paragraph.LogicDocument.Get_EditingType();
+        TrackRevisions = this.Paragraph.LogicDocument.Is_TrackResivisions();
 
     var ReviewType = this.Get_ReviewType();
-    if ((document_EditingType_Review === EditType && paragraphcontent_Reviewtype_Added !== ReviewType) || (document_EditingType_Common === EditType && paragraphcontent_Reviewtype_Common !== ReviewType))
+    if ((true === TrackRevisions && paragraphcontent_Reviewtype_Added !== ReviewType) || (false === TrackRevisions && paragraphcontent_Reviewtype_Common !== ReviewType))
     {
-        var DstReviewType = document_EditingType_Review === EditType ? paragraphcontent_Reviewtype_Added : paragraphcontent_Reviewtype_Common;
+        var DstReviewType = true === TrackRevisions ? paragraphcontent_Reviewtype_Added : paragraphcontent_Reviewtype_Common;
 
         // Если мы стоим в конце рана, тогда проверяем следующий элемент родительского класса, аналогично если мы стоим
         // в начале рана, проверяем предыдущий элемент родительского класса.
@@ -409,14 +409,14 @@ ParaRun.prototype.Add = function(Item, bMath)
 
 ParaRun.prototype.Remove = function(Direction, bOnAddText)
 {
-    var EditType = null;
+    var TrackRevisions = null;
     if (this.Paragraph && this.Paragraph.LogicDocument)
-        EditType = this.Paragraph.LogicDocument.Get_EditingType();
+        TrackRevisions = this.Paragraph.LogicDocument.Is_TrackResivisions();
 
     var Selection = this.State.Selection;
 
     var ReviewType = this.Get_ReviewType();
-    if (document_EditingType_Review === EditType && paragraphcontent_Reviewtype_Added !== ReviewType)
+    if (true === TrackRevisions && paragraphcontent_Reviewtype_Added !== ReviewType)
     {
         if (paragraphcontent_Reviewtype_Deleted === ReviewType)
         {
@@ -5539,7 +5539,7 @@ ParaRun.prototype.Set_Pr = function(TextPr)
 ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 {
     var bReview = false;
-    if (this.Paragraph && this.Paragraph.LogicDocument && document_EditingType_Review === this.Paragraph.LogicDocument.Get_EditingType())
+    if (this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackResivisions())
         bReview = true;
 
     var ReviewType = this.Get_ReviewType();

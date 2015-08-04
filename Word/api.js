@@ -7449,13 +7449,13 @@ asc_docs_api.prototype.asc_IsDefaultStyleChanged = function(sName)
 //----------------------------------------------------------------------------------------------------------------------
 // Работаем с рецензированием
 //----------------------------------------------------------------------------------------------------------------------
-asc_docs_api.prototype.asc_SetEditingType = function(Type)
+asc_docs_api.prototype.asc_SetTrackRevisions = function(bTrack)
 {
-    return this.WordControl.m_oLogicDocument.Set_EditingType(Type);
+    return this.WordControl.m_oLogicDocument.Set_TrackRevisions(bTrack);
 };
-asc_docs_api.prototype.asc_GetEditingType = function(Type)
+asc_docs_api.prototype.asc_IsTrackResivisions = function()
 {
-    return this.WordControl.m_oLogicDocument.Get_EditingType();
+    return this.WordControl.m_oLogicDocument.Is_TrackRevisions();
 };
 
 
