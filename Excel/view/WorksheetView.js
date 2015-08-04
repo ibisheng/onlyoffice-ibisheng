@@ -11124,8 +11124,18 @@
 				this._updateVisibleColsCount();
 				this.changeWorksheet("update");
 			} else if (changeRowsOrMerge) {
-				// Был merge, нужно обновить
-				this._updateCellsRange(range);
+				// Был merge, нужно обновить (ToDo)
+				this._initCellsArea(true);
+				this.cache.reset();
+				this._cleanCellsTextMetricsCache();
+				this._prepareCellTextMetricsCache();
+				if (this.objectRender && this.objectRender.drawingArea)
+					this.objectRender.drawingArea.reinitRanges();
+				var oChangeData = new CChangeTableData(null, null, null, null); // Обновление для диаграмм
+				oChangeData.change = new asc_Range(range.c1, 0, range.c2, gc_nMaxRow0);
+				this.objectRender.rebuildChartGraphicObjects(oChangeData);
+				this.draw();
+				this.handlers.trigger("reinitializeScroll");
 			} else {
 				// Просто отрисуем
 				this.draw();
