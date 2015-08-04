@@ -348,7 +348,7 @@ var maxIndividualValues = 10000;
 					//updates
 					if(styleName && addNameColumn)
 						ws.setSelection(filterRange);
-					ws._onUpdateFormatTable(filterRange, !(styleName), true);
+					ws._onUpdateFormatTable(filterRange, !!(styleName), true);
 					
 					History.EndTransaction();
 				};
@@ -882,8 +882,7 @@ var maxIndividualValues = 10000;
 				var ws = this.worksheet;
 				var result = null;
 				
-				var ascRange = new Asc.Range(range.c1, range.r1, range.c1, range.r1);
-				if(this.isApplyAutoFilterInCell(ascRange))
+				if(this.isCellContainsAutoFilterButton(range.c1, range.r1))
 				{
 					var height = 11;
 					var width = 11;
@@ -4559,6 +4558,28 @@ var maxIndividualValues = 10000;
 					}
 				}
 				return true;
+			},
+			
+			isCellContainsAutoFilterButton: function(col, row)
+			{
+				var aWs = this._getCurrentWS();
+				if(aWs.TableParts)
+				{
+					var tablePart;
+					for(var i = 0; i < aWs.TableParts.length; i++)
+					{
+						tablePart = aWs.TableParts[i];
+						//TODO добавить проверку на isHidden у кнопки
+						if(tablePart.Ref.contains(col, row) && tablePart.Ref.r1 === row)
+							return true;
+					}
+				}
+				
+				//TODO добавить проверку на isHidden у кнопки
+				if(aWs.AutoFilter && aWs.AutoFilter.Ref.contains(col, row) && aWs.AutoFilter.Ref.r1 === row)
+					return true;
+				
+				return false;
 			}
 			
 		};
