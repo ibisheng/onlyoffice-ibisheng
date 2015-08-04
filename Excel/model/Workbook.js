@@ -3112,6 +3112,7 @@ Woorksheet.prototype.initPostOpen = function(){
 		this.sheetViews.push(new asc.asc_CSheetViewSettings());
 	}
 	
+	var self = this;
 	this.handlers = new asc.asc_CHandlersList(/*handlers*/{
 		"changeRefTablePart"		: function (displayName, ref) {self.handlers.trigger("asc_onChangeRefTablePart", displayName, ref);}
 	});
