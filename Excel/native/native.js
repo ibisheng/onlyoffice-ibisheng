@@ -464,16 +464,14 @@ function GetNativeId()
 window.NativeSupportTimeouts = false;
 window.NativeTimeoutObject = {};
 
-function clearTimeout(_id)
-{
+function clearTimeout(_id) {
     if (!window.NativeSupportTimeouts)
         return;
 
     window.NativeTimeoutObject["" + _id] = undefined;
     window.native["ClearTimeout"](_id);
 }
-function setTimeout(func, interval)
-{
+function setTimeout(func, interval) {
     if (!window.NativeSupportTimeouts)
         return;
 
@@ -481,9 +479,7 @@ function setTimeout(func, interval)
     window.NativeTimeoutObject["" + _id] = func;
     return _id;
 }
-
-window.native.Call_TimeoutFire = function(_id)
-{
+function offline_timeoutFire(_id) {
     if (!window.NativeSupportTimeouts)
         return;
 
@@ -496,18 +492,15 @@ window.native.Call_TimeoutFire = function(_id)
 
     _func.call(null);
     _func = null;
-};
-
-function clearInterval(_id)
-{
+}
+function clearInterval(_id) {
     if (!window.NativeSupportTimeouts)
         return;
 
     window.NativeTimeoutObject["" + _id] = undefined;
     window.native["ClearTimeout"](_id);
 }
-function setInterval(func, interval)
-{
+function setInterval(func, interval) {
     if (!window.NativeSupportTimeouts)
         return;
 
@@ -1423,28 +1416,43 @@ function OfflineEditor () {
 
         this.registerEventsHandlers();
         this.asc_WriteAllWorksheets(true);
+
+        window["NativeSupportTimeouts"] = true;
     };
     this.registerEventsHandlers = function () {
 
+        var t = this;
+
         _api.asc_registerCallback('asc_onCanUndoChanged', function (bCanUndo) {
-            var _stream = global_memory_stream_menu;
-            _stream["ClearNoAttack"]();
-            _stream["WriteBool"](bCanUndo);
-            window["native"]["OnCallMenuEvent"](60, _stream); // ASC_MENU_EVENT_TYPE_CAN_UNDO
+            var stream = global_memory_stream_menu;
+            stream["ClearNoAttack"]();
+            stream["WriteBool"](bCanUndo);
+            window["native"]["OnCallMenuEvent"](60, stream); // ASC_MENU_EVENT_TYPE_CAN_UNDO
         });
 
         _api.asc_registerCallback('asc_onCanRedoChanged', function (bCanRedo) {
-            var _stream = global_memory_stream_menu;
-            _stream["ClearNoAttack"]();
-            _stream["WriteBool"](bCanRedo);
-            window["native"]["OnCallMenuEvent"](61, _stream); // ASC_MENU_EVENT_TYPE_CAN_REDO
+            var stream = global_memory_stream_menu;
+            stream["ClearNoAttack"]();
+            stream["WriteBool"](bCanRedo);
+            window["native"]["OnCallMenuEvent"](61, stream); // ASC_MENU_EVENT_TYPE_CAN_REDO
         });
 
         _api.asc_registerCallback('asc_onDocumentModifiedChanged', function(change) {
-            var _stream = global_memory_stream_menu;
-            _stream["ClearNoAttack"]();
-            _stream["WriteBool"](change);
-            window["native"]["OnCallMenuEvent"](66, _stream); // ASC_MENU_EVENT_TYPE_DOCUMETN_MODIFITY
+            var stream = global_memory_stream_menu;
+            stream["ClearNoAttack"]();
+            stream["WriteBool"](change);
+            window["native"]["OnCallMenuEvent"](66, stream); // ASC_MENU_EVENT_TYPE_DOCUMETN_MODIFITY
+        });
+        _api.asc_registerCallback("asc_onActiveSheetChanged", function(index) {
+            t.asc_WriteAllWorksheets(true, true);
+        });
+
+        _api.asc_registerCallback('asc_onRenameCellTextEnd', function(found, replaced) {
+            var stream = global_memory_stream_menu;
+            stream["ClearNoAttack"]();
+            stream["WriteLong"](found);
+            stream["WriteLong"](replaced);
+            window["native"]["OnCallMenuEvent"](63, stream); // ASC_MENU_EVENT_TYPE_SEARCH_REPLACETEXT
         });
     };
 
@@ -1469,16 +1477,68 @@ function OfflineEditor () {
 
         return _api.wb.getWorksheet()._getDrawSelection_Local(region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd);
     };
+    this.cellAtCoord = function(x, y) {
+        var cell = [];
+
+        var worksheet = _api.wb.getWorksheet();
+        var count = 0;
+        var i = 0;
+
+        //TODO: доделать
+       //// cell.push(worksheet.cols[2].left - worksheet.cols[0].left);
+       //// cell.push(worksheet.rows[2].top - worksheet.rows[0].top);
+
+        count = worksheet.cols.length;
+        if (count) {
+            if (worksheet.cols[0].left > x)
+                cell.push(0);
+            else
+                for (i = 0; i < count; ++i) {
+                    if (worksheet.cols[i].left- worksheet.cols[0].left <= x &&
+                        x < worksheet.cols[i].left + worksheet.cols[i].width - worksheet.cols[0].left) {
+
+                        cell.push(worksheet.cols[i].left - worksheet.cols[0].left);
+                        //if (x -  worksheet.cols[i].left - worksheet.cols[0].left > worksheet.cols[i].width * 0.5) {
+                        cell.push(worksheet.cols[i + 1].left - worksheet.cols[0].left);
+                        //}
+                        //else {
+                        //     cell.push(worksheet.cols[i].left - worksheet.cols[0].left);
+                        //}
+
+                        break;
+                    }
+                }
+        }
+
+        count = worksheet.rows.length;
+        if (count) {
+            if (worksheet.rows[0].top > y)
+                cell.push(0);
+            else
+                for (i = 0; i < count; ++i) {
+                    if (worksheet.rows[i].top <= y && y < worksheet.rows[i].top + worksheet.rows[i].height) {
+                        if (y -  worksheet.rows[i].top > worksheet.rows[i].height * 0.5)
+                            cell.push(worksheet.rows[i + 1].top - worksheet.rows[0].top);
+                        else
+                            cell.push(worksheet.rows[i].top - worksheet.rows[0].top);
+
+                        break;
+                    }
+                }
+        }
+
+        return cell;
+    };
 
     // serialize
 
-    this.asc_WriteAllWorksheets = function (callEvent) {
+    this.asc_WriteAllWorksheets = function (callEvent, isSheetChange) {
 
         var _stream = global_memory_stream_menu;
         _stream["ClearNoAttack"]();
 
         _stream["WriteByte"](0);
-        _stream['WriteLong'](_api.asc_getActiveWorksheetId(i));
+        _stream['WriteString2'](_api.asc_getActiveWorksheetId(i));
 
         for (var i = 0; i < _api.asc_getWorksheetsCount(); ++i) {
 
@@ -1488,7 +1548,7 @@ function OfflineEditor () {
                 _stream["WriteByte"](2);
             }
             _stream["WriteLong"](i);
-            _stream['WriteLong'](_api.asc_getWorksheetId(i));
+            _stream['WriteString2'](_api.asc_getWorksheetId(i));
             _stream["WriteString2"](_api.asc_getWorksheetName(i));
             _stream['WriteBool'](_api.asc_isWorksheetHidden(i));
             _stream['WriteBool'](_api.asc_isWorkbookLocked(i));
@@ -1501,7 +1561,7 @@ function OfflineEditor () {
         _stream["WriteByte"](255);
 
         if (callEvent) {
-            window["native"]["OnCallMenuEvent"](2130, global_memory_stream_menu); // ASC_SPREADSHEETS_EVENT_TYPE_WORKSHEETS
+            window["native"]["OnCallMenuEvent"](isSheetChange ? 2300 : 2130, global_memory_stream_menu); // ASC_SPREADSHEETS_EVENT_TYPE_WORKSHEETS
         }
     };
     this.asc_writeWorksheet = function(i) {
@@ -1514,7 +1574,7 @@ function OfflineEditor () {
             _stream["WriteByte"](2);
         }
         _stream["WriteLong"](i);
-        _stream['WriteLong'](_api.asc_getWorksheetId(i));
+        _stream['WriteString2'](_api.asc_getWorksheetId(i));
         _stream["WriteString2"](_api.asc_getWorksheetName(i));
         _stream['WriteBool'](_api.asc_isWorksheetHidden(i));
         _stream['WriteBool'](_api.asc_isWorkbookLocked(i));
@@ -1565,6 +1625,11 @@ function OfflineEditor () {
             worksheet._drawColumnHeaders_Local(undefined, region.columnBeg, region.columnEnd, undefined, region.columnOff, 0);
         else if (isColumn && isRow)
             worksheet._drawCorner();
+    };
+
+    // add
+    this.addShape = function (x, y, width, height) {
+
     };
 
     // internal
@@ -1723,12 +1788,75 @@ function offline_get_selection(x, y, width, height) {
 function offline_get_worksheet_bounds() {
     return _s.getMaxBounds();
 }
+function offline_complete_cell(x, y){ return _s.cellAtCoord(x, y); }
+
+function offline_cell_editor_open(x, y, width, height, ratio) {
+    _null_object.width = width * ratio;
+    _null_object.height = height * ratio;
+
+    var wb = _api.wb;
+
+    wb._onEditCell (x, y, /*isCoord*/true, /*isFocus*/undefined, /*isClearCell*/undefined,
+        /*isHideCursor*/true, /*isQuickInput*/false);
+
+    return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom];
+}
+function offline_cell_editor_key_event(keys, width, height, ratio) {
+    _null_object.width = width * ratio;
+    _null_object.height = height * ratio;
+
+    var wb = _api.wb;
+
+    for (var i = 0; i < keys.length; ++i) {
+        var event = {
+            which:keys[i][1],
+            metaKey: undefined,
+            ctrlKey: undefined
+        };
+
+        if (1 === keys[i][0]) {
+            wb.cellEditor._onWindowKeyPress(event);
+        }
+        else if (0 === keys[i][0]) {
+            wb.cellEditor._onWindowKeyDown(event);
+        }
+    }
+
+    wb.cellEditor._draw();
+
+    return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom];
+}
+function offline_cell_editor_close(key, width, height, ratio) {
+    _api.wb.cellEditor.close(true);
+}
+
+function offline_add_shape(x, y) {
+
+//    var e = {
+//        ShiftKey: false,
+//        shiftKey: false,
+//        CtrlKey: false,
+//        metaKey: false,
+//        ctrlKey: false,
+//        Button: false,
+//        button: false,
+//        ClickCount: 1
+//    };
+//
+//    var ws = _api.wb.getWorksheet();
+//    _api.asc_startAddShape('leftRightArrow');
+//
+//    ws.objectRender.graphicObjectMouseDown(e, 0, 0);
+//    ws.objectRender.graphicObjectMouseUp(e, 200, 200);
+//
+//    _api.asc_endAddShape();
+}
 function offline_apply_event(type,params) {
     var _stream = null;
     var _return = undefined;
     var _current = {pos: 0};
     var _continue = true;
-    var _attr;
+    var _attr, _ret;
 
     switch (type) {
 
@@ -1747,6 +1875,52 @@ function offline_apply_event(type,params) {
             break;
         }
 
+        case 62: // ASC_MENU_EVENT_TYPE_SEARCH_FINDTEXT
+        {
+            var findOptions = new Asc.asc_CFindOptions();
+
+            findOptions.asc_setFindWhat(params[0]);
+            findOptions.asc_setScanForward(params[1]);
+            findOptions.asc_setIsMatchCase(params[2]);
+            findOptions.asc_setIsWholeCell(params[3]);
+            findOptions.asc_setScanOnOnlySheet(params[4]);
+            findOptions.asc_setScanByRows(params[5]);
+            findOptions.asc_setLookIn(params[6]);
+
+            _ret = _api.asc_findText(findOptions);
+            _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            if (_ret) {
+                _stream["WriteBool"](true);
+                _stream["WriteDouble2"](_ret[0]);
+                _stream["WriteDouble2"](_ret[1]);
+            } else {
+                _stream["WriteBool"](false);
+                _stream["WriteDouble2"](0);
+                _stream["WriteDouble2"](0);
+            }
+
+            _return = _stream;
+
+            break;
+        }
+        case 63: // ASC_MENU_EVENT_TYPE_SEARCH_REPLACETEXT
+        {
+            var replaceOptions = new Asc.asc_CFindOptions();
+
+            replaceOptions.asc_setFindWhat(params[0]);
+            replaceOptions.asc_setReplaceWith(params[1]);
+            replaceOptions.asc_setIsMatchCase(params[2]);
+            replaceOptions.asc_setIsWholeCell(params[3]);
+            replaceOptions.asc_setScanOnOnlySheet(params[4]);
+            replaceOptions.asc_setScanByRows(params[5]);
+            replaceOptions.asc_setLookIn(params[6]);
+            replaceOptions.asc_setIsReplaceAll(params[7]);
+
+            _api.asc_replaceText(replaceOptions);
+            break;
+        }
+
         case 200: // ASC_MENU_EVENT_TYPE_DOCUMENT_BASE64
         {
             _stream = global_memory_stream_menu;
@@ -1761,6 +1935,14 @@ function offline_apply_event(type,params) {
             _stream["ClearNoAttack"]();
             _stream["WriteStringA"](_s.offline_print());
             _return = _stream;
+            break;
+        }
+
+        // add objects
+
+        case 53: //ASC_MENU_EVENT_TYPE_INSERT_SHAPE
+        {
+            offline_add_shape(0, 0);
             break;
         }
 
@@ -2025,6 +2207,12 @@ function offline_apply_event(type,params) {
             _s.offline_showWorksheet(params);
             break;
         }
+        case 2201: // ASC_SPREADSHEETS_EVENT_TYPE_UNHIDE_WORKSHEET
+        {
+            _s.offline_showWorksheet(params);
+            _s.asc_WriteAllWorksheets(true);
+            break;
+        }
         case 2205: // ASC_SPREADSHEETS_EVENT_TYPE_WORKSHEET_SHOW_LINES
         {
             var gridLines = _api.asc_getSheetViewSettings();
@@ -2037,6 +2225,12 @@ function offline_apply_event(type,params) {
             var colRowHeaders = _api.asc_getSheetViewSettings();
             colRowHeaders.asc_setShowRowColHeaders(params > 0);
             _api.asc_setSheetViewSettings(colRowHeaders);
+            break;
+        }
+
+        case 2400: // ASC_SPREADSHEETS_EVENT_TYPE_COMPLETE_SEARCH
+        {
+            _api.asc_endFindText();
             break;
         }
 
