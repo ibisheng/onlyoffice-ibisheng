@@ -4370,6 +4370,22 @@ TablePart.prototype.changeRef = function(col, row, bIsFirst) {
 	if(this.AutoFilter)
 		this.AutoFilter.changeRef(col, row, bIsFirst);
 };
+TablePart.prototype.isApplyAutoFilter = function() {
+	var res = false;
+	
+	if(this.AutoFilter)
+		res = this.AutoFilter.isApplyAutoFilter();
+		
+	return res;
+};
+TablePart.prototype.isApplySortConditions = function() {
+	var res = false;
+	
+	if(this.SortState && this.SortState.SortConditions && this.SortState.SortConditions[0])
+		res = true;
+		
+	return res;
+};
 
 
 /** @constructor */
@@ -4425,6 +4441,23 @@ AutoFilter.prototype.changeRef = function(col, row, bIsFirst) {
 		ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
 	
 	this.Ref = ref;
+};
+AutoFilter.prototype.isApplyAutoFilter = function() {
+	var res = false;
+	
+	if(this.FilterColumns && this.FilterColumns.length)
+		res = true;
+		
+	return res;
+};
+
+AutoFilter.prototype.isApplySortConditions = function() {
+	var res = false;
+	
+	if(this.SortState && this.SortState.SortConditions && this.SortState.SortConditions[0])
+		res = true;
+		
+	return res;
 };
 
 function FilterColumns() {

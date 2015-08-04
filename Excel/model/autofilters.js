@@ -1621,7 +1621,7 @@ var maxIndividualValues = 10000;
 						tablePart = aWs.TableParts[i];
 						
 						//если применен фильтр или сортировка
-						if(tablePart.Ref && ((tablePart.AutoFilter && tablePart.AutoFilter.FilterColumns && tablePart.AutoFilter.FilterColumns.length) || (tablePart && tablePart.SortState && tablePart.SortState.SortConditions && tablePart.SortState.SortConditions[0])))
+						if(tablePart.isApplyAutoFilter() || tablePart.isApplySortConditions())
 						{
 							if(tablePart.Ref.containsRange(activeCell))
 							{
@@ -1639,7 +1639,7 @@ var maxIndividualValues = 10000;
 					}
 				}
 				
-				if(aWs.AutoFilter && ((aWs.AutoFilter.FilterColumns && aWs.AutoFilter.FilterColumns.length) || (aWs.AutoFilter.SortState && aWs.AutoFilter.SortState.SortConditions && aWs.AutoFilter.SortState.SortConditions[0])))
+				if(aWs.AutoFilter && (aWs.AutoFilter.isApplyAutoFilter() || aWs.AutoFilter.isApplySortConditions()))
 				{
 					if(clean)
 						this._cleanFilterColumnsAndSortState(aWs.AutoFilter, activeCell);
