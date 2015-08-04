@@ -4352,7 +4352,6 @@ TablePart.prototype.recalc = function(ws) {
 TablePart.prototype.moveRef = function(col, row, ws) {
 	var ref = this.Ref.clone();
 	ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
-    var worksheet = ws.model;
 
 	this.Ref = ref;
 	//event
