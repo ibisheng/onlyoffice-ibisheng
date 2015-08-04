@@ -7446,6 +7446,19 @@ asc_docs_api.prototype.asc_IsDefaultStyleChanged = function(sName)
 {
     return this.WordControl.m_oLogicDocument.Is_DefaultStyleChanged(sName);
 };
+//----------------------------------------------------------------------------------------------------------------------
+// Работаем с рецензированием
+//----------------------------------------------------------------------------------------------------------------------
+asc_docs_api.prototype.asc_SetEditingType = function(Type)
+{
+    return this.WordControl.m_oLogicDocument.Set_EditingType(Type);
+};
+asc_docs_api.prototype.asc_GetEditingType = function(Type)
+{
+    return this.WordControl.m_oLogicDocument.Get_EditingType();
+};
+
+
 asc_docs_api.prototype.asc_stopSaving = function () {
 	this.asc_IncrementCounterLongAction();
 };

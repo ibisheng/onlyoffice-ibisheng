@@ -207,7 +207,13 @@ CDocumentSpelling.prototype =
 
     private_CompareWordsAndLangs : function(Words1, Words2, Langs1, Langs2)
     {
-        if (undefined === Words1 || undefined === Words2 || undefined === Langs1 || undefined === Langs2 || Words1.length !== Words2.length || Words1.length !== Langs1.length || Words1.length !== Langs2.length)
+        if (undefined === Words1
+            || undefined === Words2
+            || undefined === Langs1
+            || undefined === Langs2
+            || Words1.length !== Words2.length
+            || Words1.length !== Langs1.length
+            || Words1.length !== Langs2.length)
             return false;
 
         for (var nIndex = 0, nCount = Words1.length; nIndex < nCount; nIndex++)
