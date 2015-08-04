@@ -4388,6 +4388,11 @@ TablePart.prototype.isApplySortConditions = function() {
 	return res;
 };
 
+TablePart.prototype.setHandlers = function(handlers) {
+	if(this.handlers === null)
+		this.handlers = handlers;
+};
+
 
 /** @constructor */
 function AutoFilter() {

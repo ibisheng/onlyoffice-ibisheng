@@ -1833,18 +1833,25 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	this.bUndoChanges = false;
 	this.bRedoChanges = false;
 	this.aCollaborativeChangeElements = [];
+	
+	this.wsHandlers = null;
 }
 Workbook.prototype.init=function(bNoBuildDep){
 	if(this.nActive < 0)
 		this.nActive = 0;
 	if(this.nActive >= this.aWorksheets.length)
 		this.nActive = this.aWorksheets.length - 1;
-
+	
+	var self = this;
+	this.wsHandlers = new asc.asc_CHandlersList(/*handlers*/{
+		"changeRefTablePart"		: function (displayName, ref) {self.wsHandlers.trigger("asc_onChangeRefTablePart", displayName, ref);}
+	});
+	
     //charts
     for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
     {
         var ws = this.aWorksheets[i];
-        ws.initPostOpen();
+        ws.initPostOpen(this.wsHandlers);
     }
 	if(!bNoBuildDep){
 		/*
@@ -1914,7 +1921,7 @@ Workbook.prototype.createWorksheet=function(indexBefore, sName, sId){
     var oNewWorksheet = new Woorksheet(this, this.aWorksheets.length, sId);
 	if (this.checkValidSheetName(sName))
 		oNewWorksheet.sName = sName;
-	oNewWorksheet.initPostOpen();
+	oNewWorksheet.initPostOpen(this.wsHandlers);
 	if(null != indexBefore && indexBefore >= 0 && indexBefore < this.aWorksheets.length)
 		this.aWorksheets.splice(indexBefore, 0, oNewWorksheet);
 	else
@@ -1939,7 +1946,7 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
 		var wsActive = this.getActiveWs();
 		var wsFrom = this.aWorksheets[index];
 		var newSheet = wsFrom.clone(sId, sName);
-		newSheet.initPostOpen();
+		newSheet.initPostOpen(this.wsHandlers);
 		if(null != insertBefore && insertBefore >= 0 && insertBefore < this.aWorksheets.length){
 			//помещаем новый sheet перед insertBefore
 			this.aWorksheets.splice(insertBefore, 0, newSheet);
@@ -3001,7 +3008,7 @@ Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
         drawingObjects.updateChartReferences2(parserHelp.getEscapeSheetName(wsFrom.sName), parserHelp.getEscapeSheetName(oNewWs.sName));
     }
 };
-Woorksheet.prototype.initPostOpen = function(){
+Woorksheet.prototype.initPostOpen = function(handlers){
 	this.workbook.cwf[this.Id]={ cells:{} };
 	if(this.aFormulaExt){
 		var formulaShared = {};
@@ -3112,11 +3119,8 @@ Woorksheet.prototype.initPostOpen = function(){
 		this.sheetViews.push(new asc.asc_CSheetViewSettings());
 	}
 	
-	var self = this;
-	this.handlers = new asc.asc_CHandlersList(/*handlers*/{
-		"changeRefTablePart"		: function (displayName, ref) {self.handlers.trigger("asc_onChangeRefTablePart", displayName, ref);}
-	});
-	
+	this.handlers = handlers;
+	this._setHandlersTablePart();
 };
 Woorksheet.prototype._forEachCell=function(fAction){
 	for(var rowInd in this.aGCells){
@@ -4610,6 +4614,16 @@ Woorksheet.prototype._BuildDependencies=function(cellRange){
 		}
 	}
 };
+Woorksheet.prototype._setHandlersTablePart = function(){
+	if(!this.tableParts)
+		return;
+	
+	for(var i = 0; i < this.tableParts.length; i++)
+	{
+		this.tableParts[i].setHandlers(this.handlers);
+	}
+};
+
 function inCache(aCache, sFormula, aRefs)
 {
 	var oRes = null;
