@@ -1280,7 +1280,6 @@ var maxIndividualValues = 10000;
 					var ref = filter.Ref;
 					var oldFilter = null;
 					var diffColId = null;
-					var changeTableColumns = null;
 					
 					if(activeRange.r1 <= ref.r1 && activeRange.r2 >= ref.r2)
 					{
@@ -1296,6 +1295,10 @@ var maxIndividualValues = 10000;
 							if(diff < 0)
 							{
 								diffColId = ref.c1 - activeRange.c2 - 1;
+								
+								if(bTablePart)
+									filter.deleteTableColumns(activeRange);
+								
 								filter.changeRef(-diffColId, null, true);
 							}
 								
@@ -1305,15 +1308,26 @@ var maxIndividualValues = 10000;
 						{
 							oldFilter = filter.clone(null);
 							diffColId = activeRange.c1 - ref.c2 - 1;
-							filter.changeRef(diffColId);								
+							
+							if(diff < 0 && bTablePart)
+								filter.deleteTableColumns(activeRange);
+							else if(bTablePart)
+								filter.addTableColumns(activeRange, t);
+							
+							filter.changeRef(diffColId);						
 						}
 						else if((activeRange.c1 >= ref.c1 && activeRange.c1 <= ref.c2 && activeRange.c2 <= ref.c2) || (activeRange.c1 > ref.c1 && activeRange.c2 >= ref.c2 && activeRange.c1 < ref.c2 && diff > 0))//inside
 						{
 							oldFilter = filter.clone(null);
+							
+							if(diff < 0 && bTablePart)
+								filter.deleteTableColumns(activeRange);
+							else if(bTablePart)
+								filter.addTableColumns(activeRange, t);	
+							
 							filter.changeRef(diff);
 							
 							diffColId = diff;
-							changeTableColumns = true;
 						}
 						
 						//change filterColumns
@@ -1338,41 +1352,6 @@ var maxIndividualValues = 10000;
 											autoFilter.FilterColumns[j].ColId = newColId;
 									}
 								}
-							}
-						}
-						
-						//change TableColumns
-						if(oldFilter && bTablePart && changeTableColumns)
-						{
-							//add TableColumns
-							if(diff > 0)
-							{
-								var newTableColumns = [];
-								var num = 0;
-								for(var j = 0; j < filter.TableColumns.length;)
-								{
-									var curCol = num + filter.Ref.c1;
-									if(activeRange.c1 <= curCol && activeRange.c2 >= curCol)
-									{
-										var newNameColumn = t._generateColumnName(newTableColumns.concat(filter.TableColumns), curCol - 1);
-										var newTableColumn = new TableColumn();
-										newTableColumn.Name = newNameColumn;
-										
-										newTableColumns[newTableColumns.length] = newTableColumn;
-									}
-									else
-									{
-										newTableColumns[newTableColumns.length] = filter.TableColumns[j];
-										j++
-									}
-									
-									num++;
-								}
-								filter.TableColumns = newTableColumns;
-							}
-							else//delete TableColumns
-							{
-								filter.TableColumns.splice(activeRange.c1 - filter.Ref.c1, Math.abs(diff));
 							}
 						}
 						

@@ -4396,6 +4396,59 @@ TablePart.prototype.setHandlers = function(handlers) {
 		this.handlers = handlers;
 };
 
+TablePart.prototype.deleteTableColumns = function(activeRange)
+{
+	if(!activeRange)
+		return;
+	
+	var diff = null, startCol;
+	if(activeRange.c1 < this.Ref.c1 && activeRange.c2 > this.Ref.c1 && activeRange.c2 < this.Ref.c2)//until
+	{
+		diff = activeRange.c2 - this.Ref.c1 + 1;
+		startCol = 0;
+	}
+	else if(activeRange.c1 < this.Ref.c2 && activeRange.c2 > this.Ref.c2 && activeRange.c1 > this.Ref.c1)//after
+	{
+		diff = this.Ref.c2 - activeRange.c1 + 1;
+		startCol = activeRange.c1 - this.Ref.c1;
+	}
+	else if(activeRange.c1 >= this.Ref.c1 && activeRange.c2 <= this.Ref.c2)//inside
+	{
+		diff = activeRange.c2 - activeRange.c1 + 1;
+		startCol = activeRange.c1 - this.Ref.c1;
+	}
+	
+	if(diff !== null)
+		this.TableColumns.splice(startCol, diff);
+};
+
+TablePart.prototype.addTableColumns = function(activeRange, aF)
+{
+	var newTableColumns = [], num = 0;
+
+	for(var j = 0; j < this.TableColumns.length;)
+	{
+		var curCol = num + this.Ref.c1;
+		if(activeRange.c1 <= curCol && activeRange.c2 >= curCol)
+		{
+			var newNameColumn = aF._generateColumnName(newTableColumns.concat(this.TableColumns), curCol - 1);
+			var newTableColumn = new TableColumn();
+			newTableColumn.Name = newNameColumn;
+			
+			newTableColumns[newTableColumns.length] = newTableColumn;
+		}
+		else
+		{
+			newTableColumns[newTableColumns.length] = this.TableColumns[j];
+			j++
+		}
+		
+		num++;
+	}
+	
+	this.TableColumns = newTableColumns;
+};
+
 
 /** @constructor */
 function AutoFilter() {
