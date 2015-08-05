@@ -1418,7 +1418,6 @@ var maxIndividualValues = 10000;
 				var DeleteRows = ((insertType == c_oAscDeleteOptions.DeleteRows && type == 'delCell') || insertType == c_oAscInsertOptions.InsertRows) ? true : false;
 				activeRange = activeRange.clone();
 				var diff = activeRange.r2 - activeRange.r1 + 1;
-				var oldFilter;
 				
 				if(type === "delCell")
 					diff = - diff;
@@ -1435,6 +1434,7 @@ var maxIndividualValues = 10000;
 				var changeFilter = function(filter, bTablePart)
 				{
 					var ref = filter.Ref;
+					var oldFilter = null;
 					if(activeRange.c1 <= ref.c1 && activeRange.c2 >= ref.c2)
 					{
 						if(activeRange.r1 <= ref.r1)//until
