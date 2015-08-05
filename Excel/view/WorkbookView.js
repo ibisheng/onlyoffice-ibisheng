@@ -148,9 +148,10 @@
 			this.fontRenderingMode = null;
 
 			this.popUpSelector = null;
-			this.formulasList = null;	// Список всех формул
-			this.lastFormulaPos = -1; 	// Последняя позиция формулы
-			this.lastFormulaName = "";	// Последний кусок формулы
+			this.formulasList = null;		// Список всех формул
+			this.lastFormulaPos = -1; 		// Последняя позиция формулы
+			this.lastFormulaName = "";		// Последний кусок формулы
+			this.skipHelpSelector = false;	// Пока true - не показываем окно подсказки
 
 			this.lastFindOptions = null;	// Последний поиск (параметры)
 			this.lastFindResults = {};		// Результаты поиска (для поиска по всей книге, чтобы перейти на другой лист)
@@ -1519,6 +1520,8 @@
 		};
 
 		WorkbookView.prototype._onUpdateCellEditor = function (text, cursorPosition, isFormula, formulaPos, formulaName) {
+			if (this.skipHelpSelector)
+				return;
 			// ToDo для ускорения можно завести объект, куда класть результаты поиска по формулам и второй раз не искать.
 			var arrResult = [];
 			if (isFormula && formulaName) {
@@ -1554,28 +1557,35 @@
 
 		// Вставка формулы в редактор
 		WorkbookView.prototype.insertFormulaInEditor = function (functionName, autoComplete, isDefName) {
-			var t = this, ws = this.getWorksheet(), cursorPos
+			var t = this, ws = this.getWorksheet(), cursorPos;
 
 			// Проверяем, открыт ли редактор
 			if (ws.getCellEditMode()) {
+				if (isDefName)
+					this.skipHelpSelector = true;
 				// При autoComplete заканчиваем ввод
 				if (autoComplete)
 					this.cellEditor.close(true);
-				else if (false === this.cellEditor.insertFormula (functionName,isDefName)) {
+				else if (false === this.cellEditor.insertFormula(functionName, isDefName)) {
 					// Не смогли вставить формулу, закроем редактор, с сохранением текста
 					this.cellEditor.close(true);
 				}
+				if (isDefName)
+					this.skipHelpSelector = false;
 			} else {
-				// Он закрыт
+				// Проверка глобального лока
+				if (this.collaborativeEditing.getGlobalLock())
+					return false;
+
+				// Редактор закрыт
 				var cellRange = null;
 				// Если нужно сделать автозаполнение формулы, то ищем ячейки)
 				if (autoComplete) {
 					cellRange = ws.autoCompleteFormula(functionName);
 				}
-                if(isDefName){
-                    functionName = "=" + functionName
-                }
-                else{
+                if (isDefName) {
+                    functionName = "=" + functionName;
+                } else{
                     if (cellRange) {
                         if (cellRange.notEditCell) {
                             // Мы уже ввели все что нужно, редактор открывать не нужно
@@ -1591,10 +1601,6 @@
                     cursorPos = functionName.length - 1;
                 }
 
-				// Проверка глобального лока
-				if (this.collaborativeEditing.getGlobalLock())
-					return false;
-
 				var arn = ws.activeRange.clone(true);
 
 				var openEditor = function (res) {
@@ -1604,6 +1610,8 @@
 						ws.setCellEditMode(true);
 
 						t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
+						if (isDefName)
+							t.skipHelpSelector = true;
 						// Открываем, с выставлением позиции курсора
 						if (!ws.openCellEditorWithText(t.cellEditor, functionName, cursorPos, /*isFocus*/false,
 							/*activeRange*/arn)) {
@@ -1614,6 +1622,8 @@
 							ws.setCellEditMode(false);
 							ws.setFormulaEditMode(false);
 						}
+						if (isDefName)
+							t.skipHelpSelector = false;
 					} else {
 						t.controller.setCellEditMode(false);
 						t.controller.setStrictClose(false);

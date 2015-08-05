@@ -608,9 +608,8 @@
 					// Не смогли добавить...
 					return false;
 				}
-			}
-			else {
-                if( !isDefName )
+			} else {
+                if (!isDefName)
                     // Это уже форула, добавляем без '='
                     functionName = functionName + "()";
 			}
@@ -619,7 +618,7 @@
 			// Вставим форумулу в текущую позицию
 			this._addChars(functionName);
 			// Меняем позицию курсора внутрь скобок
-            if( !isDefName )
+            if (!isDefName)
 			    this._moveCursor(kPosition, this.cursorPos - 1);
 		};
 
