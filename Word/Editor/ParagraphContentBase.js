@@ -619,7 +619,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove = function(Direction,
             {
                 for (var CurPos = EndPos - 1; CurPos > StartPos; CurPos--)
                 {
-                    this.Content[CurPos].Set_ReviewType(paragraphcontent_Reviewtype_Deleted, false);
+                    this.Content[CurPos].Set_ReviewType(reviewtype_Remove, false);
                 }
             }
             else

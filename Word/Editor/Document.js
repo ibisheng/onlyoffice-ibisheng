@@ -2719,7 +2719,9 @@ CDocument.prototype =
                         }
                     }
                     else
-                        Item.Split( NewParagraph );
+                    {
+                        Item.Split(NewParagraph);
+                    }
 
                     this.Internal_Content_Add( this.CurPos.ContentPos + 1, NewParagraph );
 
@@ -2728,6 +2730,17 @@ CDocument.prototype =
                     // Отмечаем, что последний измененный элемент - предыдущий параграф
                     this.ContentLastChangePos = this.CurPos.ContentPos - 1;
 
+                    if (true === this.Is_TrackRevisions())
+                    {
+                        NewParagraph.Remove_PrChange();
+                        NewParagraph.Set_ReviewType(reviewtype_Common);
+                        Item.Set_ReviewType(reviewtype_Add);
+                    }
+                    else if (reviewtype_Common !== Item.Get_ReviewType())
+                    {
+                        NewParagraph.Set_ReviewType(Item.Get_ReviewType());
+                        Item.Set_ReviewType(reviewtype_Common);
+                    }
                 }
 
                 if ( false != bRecalculate )
@@ -2759,6 +2772,12 @@ CDocument.prototype =
                         this.Document_UpdateInterfaceState();
                         //this.Document_UpdateRulersState()
                         this.Document_UpdateSelectionState();
+                    }
+
+                    if (true === this.Is_TrackRevisions())
+                    {
+                        NewParagraph.Remove_PrChange();
+                        NewParagraph.Set_ReviewType(reviewtype_Add);
                     }
                 }
                 else

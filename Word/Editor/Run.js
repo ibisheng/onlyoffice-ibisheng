@@ -5,9 +5,9 @@
  * Time: 18:28
  */
 
-var paragraphcontent_Reviewtype_Common  = 0x00;
-var paragraphcontent_Reviewtype_Deleted = 0x01;
-var paragraphcontent_Reviewtype_Added   = 0x02;
+var reviewtype_Common = 0x00;
+var reviewtype_Remove = 0x01;
+var reviewtype_Add    = 0x02;
 
 function ParaRun(Paragraph, bMathRun)
 {
@@ -42,9 +42,9 @@ function ParaRun(Paragraph, bMathRun)
     this.SearchMarks   = [];
     this.SpellingMarks = [];
 
-    this.ReviewType    = paragraphcontent_Reviewtype_Common;
+    this.ReviewType    = reviewtype_Common;
     if (editor && !editor.isPresentationEditor && editor.WordControl && editor.WordControl.m_oLogicDocument && true === editor.WordControl.m_oLogicDocument.Is_TrackRevisions())
-        this.ReviewType = paragraphcontent_Reviewtype_Added;
+        this.ReviewType = reviewtype_Add;
 
     if(bMathRun)
     {
@@ -125,7 +125,7 @@ ParaRun.prototype.Copy = function(Selected)
     NewRun.Set_Pr( this.Pr.Copy() );
 
     if (this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
-        NewRun.Set_ReviewType(paragraphcontent_Reviewtype_Added);
+        NewRun.Set_ReviewType(reviewtype_Add);
 
     if(true === bMath)
         NewRun.MathPrp = this.MathPrp.Copy();
@@ -341,9 +341,9 @@ ParaRun.prototype.Add = function(Item, bMath)
         TrackRevisions = this.Paragraph.LogicDocument.Is_TrackRevisions();
 
     var ReviewType = this.Get_ReviewType();
-    if ((true === TrackRevisions && paragraphcontent_Reviewtype_Added !== ReviewType) || (false === TrackRevisions && paragraphcontent_Reviewtype_Common !== ReviewType))
+    if ((true === TrackRevisions && reviewtype_Add !== ReviewType) || (false === TrackRevisions && reviewtype_Common !== ReviewType))
     {
-        var DstReviewType = true === TrackRevisions ? paragraphcontent_Reviewtype_Added : paragraphcontent_Reviewtype_Common;
+        var DstReviewType = true === TrackRevisions ? reviewtype_Add : reviewtype_Common;
 
         // Если мы стоим в конце рана, тогда проверяем следующий элемент родительского класса, аналогично если мы стоим
         // в начале рана, проверяем предыдущий элемент родительского класса.
@@ -416,9 +416,9 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
     var Selection = this.State.Selection;
 
     var ReviewType = this.Get_ReviewType();
-    if (true === TrackRevisions && paragraphcontent_Reviewtype_Added !== ReviewType)
+    if (true === TrackRevisions && reviewtype_Add !== ReviewType)
     {
-        if (paragraphcontent_Reviewtype_Deleted === ReviewType)
+        if (reviewtype_Remove === ReviewType)
         {
             // Тут мы ничего не делаем, просто перешагиваем через удаленный текст
             if (true !== Selection.Use)
@@ -491,7 +491,7 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
                         DeletedRun = this.Split2(StartPos, Parent, RunPos);
                     }
 
-                    DeletedRun.Set_ReviewType(paragraphcontent_Reviewtype_Deleted);
+                    DeletedRun.Set_ReviewType(reviewtype_Remove);
                 }
             }
             else
@@ -517,7 +517,7 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
 
                     if (1 === CurPos && 1 === this.Content.length)
                     {
-                        this.Set_ReviewType(paragraphcontent_Reviewtype_Deleted);
+                        this.Set_ReviewType(reviewtype_Remove);
                         this.State.ContentPos = CurPos - 1;
                         this.Make_ThisElementCurrent();
                         return true;
@@ -525,7 +525,7 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
                     else if (1 === CurPos && Parent && RunPos > 0)
                     {
                         var PrevElement = Parent.Content[RunPos - 1];
-                        if (para_Run === PrevElement.Type && paragraphcontent_Reviewtype_Deleted === PrevElement.Get_ReviewType() && true === this.Pr.Is_Equal(PrevElement.Pr))
+                        if (para_Run === PrevElement.Type && reviewtype_Remove === PrevElement.Get_ReviewType() && true === this.Pr.Is_Equal(PrevElement.Pr))
                         {
                             var Item = this.Content[CurPos - 1];
                             this.Remove_FromContent(CurPos - 1, 1, true);
@@ -538,7 +538,7 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
                     else if (CurPos === this.Content.length && Parent && RunPos < Parent.Content.length - 1)
                     {
                         var NextElement = Parent.Content[RunPos + 1];
-                        if (para_Run === NextElement.Type && paragraphcontent_Reviewtype_Deleted === NextElement.Get_ReviewType() && true === this.Pr.Is_Equal(NextElement.Pr))
+                        if (para_Run === NextElement.Type && reviewtype_Remove === NextElement.Get_ReviewType() && true === this.Pr.Is_Equal(NextElement.Pr))
                         {
                             var Item = this.Content[CurPos - 1];
                             this.Remove_FromContent(CurPos - 1, 1, true);
@@ -553,7 +553,7 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
                     var RRun = this.Split2(CurPos, Parent, RunPos);
                     var CRun = this.Split2(CurPos - 1, Parent, RunPos);
 
-                    CRun.Set_ReviewType(paragraphcontent_Reviewtype_Deleted);
+                    CRun.Set_ReviewType(reviewtype_Remove);
                     this.State.ContentPos = CurPos - 1;
                     this.Make_ThisElementCurrent();
                 }
@@ -570,7 +570,7 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
 
                     if (CurPos === this.Content.length - 1 && 0 === CurPos)
                     {
-                        this.Set_ReviewType(paragraphcontent_Reviewtype_Deleted);
+                        this.Set_ReviewType(reviewtype_Remove);
                         this.State.ContentPos = 1;
                         this.Make_ThisElementCurrent();
                         return true;
@@ -578,7 +578,7 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
                     else if (0 === CurPos && Parent && RunPos > 0)
                     {
                         var PrevElement = Parent.Content[RunPos - 1];
-                        if (para_Run === PrevElement.Type && paragraphcontent_Reviewtype_Deleted === PrevElement.Get_ReviewType() && true === this.Pr.Is_Equal(PrevElement.Pr))
+                        if (para_Run === PrevElement.Type && reviewtype_Remove === PrevElement.Get_ReviewType() && true === this.Pr.Is_Equal(PrevElement.Pr))
                         {
                             var Item = this.Content[CurPos];
                             this.Remove_FromContent(CurPos, 1, true);
@@ -591,7 +591,7 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
                     else if (CurPos === this.Content.length - 1 && Parent && RunPos < Parent.Content.length - 1)
                     {
                         var NextElement = Parent.Content[RunPos + 1];
-                        if (para_Run === NextElement.Type && paragraphcontent_Reviewtype_Deleted === NextElement.Get_ReviewType() && true === this.Pr.Is_Equal(NextElement.Pr))
+                        if (para_Run === NextElement.Type && reviewtype_Remove === NextElement.Get_ReviewType() && true === this.Pr.Is_Equal(NextElement.Pr))
                         {
                             var Item = this.Content[CurPos];
                             this.Remove_FromContent(CurPos, 1, true);
@@ -606,7 +606,7 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
                     var RRun = this.Split2(CurPos + 1, Parent, RunPos);
                     var CRun = this.Split2(CurPos, Parent, RunPos);
 
-                    CRun.Set_ReviewType(paragraphcontent_Reviewtype_Deleted);
+                    CRun.Set_ReviewType(reviewtype_Remove);
 
                     RRun.State.ContentPos = 0;
                     RRun.Make_ThisElementCurrent();
@@ -4019,7 +4019,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
 
     var RGBA;
     var ReviewType = this.Get_ReviewType();
-    if (paragraphcontent_Reviewtype_Added === ReviewType || paragraphcontent_Reviewtype_Deleted === ReviewType)
+    if (reviewtype_Add === ReviewType || reviewtype_Remove === ReviewType)
     {
         pGraphics.b_color1(255, 0, 0, 255);
     }
@@ -4104,7 +4104,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
                 {
                     pGraphics.SetTextPr( CurTextPr, Theme );
 
-                    if (paragraphcontent_Reviewtype_Added === ReviewType || paragraphcontent_Reviewtype_Deleted === ReviewType)
+                    if (reviewtype_Add === ReviewType || reviewtype_Remove === ReviewType)
                     {
                         pGraphics.b_color1(255, 0, 0, 255);
                     }
@@ -4148,7 +4148,12 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
                     var EndTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
                     EndTextPr.Merge(Para.TextPr.Value);
 
-                    if(EndTextPr.Unifill)
+                    if (reviewtype_Common !== ReviewType)
+                    {
+                        pGraphics.SetTextPr(EndTextPr, PDSE.Theme);
+                        pGraphics.b_color1(255, 0, 0, 255);
+                    }
+                    else if (EndTextPr.Unifill)
                     {
                         EndTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
                         var RGBAEnd = EndTextPr.Unifill.getRGBAColor();
@@ -4261,8 +4266,8 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
     var CurColor, RGBA, Theme = this.Paragraph.Get_Theme(), ColorMap = this.Paragraph.Get_ColorMap();
 
     var ReviewType = this.Get_ReviewType();
-    var bAddReview = paragraphcontent_Reviewtype_Added === ReviewType ? true : false;
-    var bRemReview = paragraphcontent_Reviewtype_Deleted === ReviewType ? true : false;
+    var bAddReview = reviewtype_Add === ReviewType ? true : false;
+    var bRemReview = reviewtype_Remove === ReviewType ? true : false;
 
     // Выставляем цвет обводки
     if ( true === PDSL.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill ) )
@@ -4324,6 +4329,19 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
         switch( ItemType )
         {
             case para_End:
+            {
+                if (this.Paragraph)
+                {
+                    if (bAddReview)
+                        aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, 255, 0, 0);
+                    else if (bRemReview)
+                        aStrikeout.Add(StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, 255, 0, 0);
+                }
+
+                X += ItemWidthVisible;
+
+                break;
+            }
             case para_NewLine:
             {
                 X += ItemWidthVisible;

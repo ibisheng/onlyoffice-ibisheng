@@ -2560,7 +2560,7 @@ Paragraph.prototype =
                 {
                     for (var Pos = StartPos + 1; Pos <= EndPos - 1; Pos++)
                     {
-                        this.Content[Pos].Set_ReviewType(paragraphcontent_Reviewtype_Deleted, false);
+                        this.Content[Pos].Set_ReviewType(reviewtype_Remove, false);
                     }
                 }
                 else
@@ -5509,7 +5509,7 @@ Paragraph.prototype =
             // Если мы находимся в режиме рецензирования, то пробегаемся по всему содержимому гиперссылки и
             // проставляем, что все раны новые.
             if (this.LogicDocument && true === this.LogicDocument.Is_TrackRevisions())
-                Hyperlink.Set_ReviewType(paragraphcontent_Reviewtype_Added, true);
+                Hyperlink.Set_ReviewType(reviewtype_Add, true);
         }
         else if ( null !== HyperProps.Text && "" !== HyperProps.Text )
         {
@@ -12842,6 +12842,20 @@ Paragraph.prototype.private_AddPrChange = function()
 {
     if (this.LogicDocument && true === this.LogicDocument.Is_TrackRevisions() && true !== this.Have_PrChange())
         this.Add_PrChange();
+};
+Paragraph.prototype.Set_ReviewType = function(ReviewType)
+{
+    var EndRun = this.Get_ParaEndRun();
+    EndRun.Set_ReviewType(ReviewType);
+};
+Paragraph.prototype.Get_ReviewType = function()
+{
+    var EndRun = this.Get_ParaEndRun();
+    return EndRun.Get_ReviewType();
+};
+Paragraph.prototype.Get_ParaEndRun = function()
+{
+    return this.Content[this.Content.length - 1];
 };
 
 
