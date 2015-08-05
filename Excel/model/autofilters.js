@@ -1001,11 +1001,37 @@ var maxIndividualValues = 10000;
 				}
 				
 				//TODO переделать undo, по типам
-				if(type === historyitem_AutoFilter_Move)
+				if(type === historyitem_AutoFilter_Move)//перемещение
 				{
 					this._moveAutoFilters(null, null, data);
 				}
-				else if(cloneData.FilterColumns || cloneData.AutoFilter || cloneData.TableColumns || (cloneData.Ref && (cloneData instanceof AutoFilter || cloneData instanceof TablePart)))
+				else if(type === historyitem_AutoFilter_Change/* && cloneData.oldFilter && cloneData.newFilterRef*/)//добавление/удаление строк/столбцов 
+				{
+					if(aWs.AutoFilter && cloneData.newFilterRef.isEqual(aWs.AutoFilter.Ref))
+						aWs.AutoFilter = cloneData.oldFilter.clone(null);
+					else if(aWs.TableParts)
+					{
+						for(var l = 0; l < aWs.TableParts.length; l++)
+						{
+							if(cloneData.newFilterRef && cloneData.newFilterRef.isEqual(aWs.TableParts[l].Ref))
+							{
+								aWs.TableParts[l] = cloneData.oldFilter.clone(null);
+
+								//чистим стиль от старой таблицы
+								var clearRange = new Range(aWs, cloneData.newFilterRef.r1, cloneData.newFilterRef.c1, cloneData.newFilterRef.r2, cloneData.newFilterRef.c2);
+								clearRange.setTableStyle(null);
+								
+								this._setColorStyleTable(cloneData.oldFilter.Ref, cloneData.oldFilter, null, true);
+								
+								//event
+								aWs.handlers.trigger("changeRefTablePart", cloneData.oldFilter.DisplayName, cloneData.oldFilter.Ref);
+								
+								break;
+							}	
+						}
+					}
+				}
+				else if(cloneData.FilterColumns || cloneData.AutoFilter || cloneData.TableColumns || (cloneData.Ref && (cloneData instanceof AutoFilter || cloneData instanceof TablePart)))//add
 				{
 					if(cloneData.Ref)
 					{
@@ -1056,70 +1082,19 @@ var maxIndividualValues = 10000;
 						}
 					}
 				}
-				else if(cloneData.oldFilter && cloneData.newFilterRef)//при наличии newFilterRef
+				else if(cloneData.Ref) //удаление таблиц / автофильтров
 				{
-					if(aWs.AutoFilter && cloneData.newFilterRef && cloneData.newFilterRef.isEqual(aWs.AutoFilter.Ref))
-					{
-						aWs.AutoFilter = cloneData.oldFilter.clone(null);
-					}
+					if(aWs.AutoFilter && aWs.AutoFilter.Ref.isEqual(cloneData.Ref))
+						aWs.AutoFilter = null;
 					else if(aWs.TableParts)
 					{
 						for(var l = 0; l < aWs.TableParts.length; l++)
 						{
-							if(cloneData.newFilterRef && cloneData.newFilterRef.isEqual(aWs.TableParts[l].Ref))
+							if(cloneData.Ref.isEqual(aWs.TableParts[l].Ref))
 							{
-								aWs.TableParts[l] = cloneData.oldFilter.clone(null);
-
-								//чистим стиль от старой таблицы
-								var clearRange = new Range(aWs, cloneData.newFilterRef.r1, cloneData.newFilterRef.c1, cloneData.newFilterRef.r2, cloneData.newFilterRef.c2);
-								clearRange.setTableStyle(null);
-								
-								this._setColorStyleTable(cloneData.oldFilter.Ref, cloneData.oldFilter, null, true);
-								
-								break;
+								this._cleanStyleTable(cloneData.Ref);
+								aWs.TableParts.splice(l,1);
 							}	
-						}
-					}
-				}
-				else if(cloneData.oldFilter)//в случае удаления/добавления строк 
-				{
-					if(aWs.AutoFilter && cloneData.oldFilter.Ref.isIntersect(aWs.AutoFilter.Ref))
-					{
-						aWs.AutoFilter = cloneData.oldFilter.clone(null);
-					}
-					else if(aWs.TableParts)
-					{
-						for(var l = 0; l < aWs.TableParts.length; l++)
-						{
-							if(cloneData.oldFilter.Ref.isIntersect(aWs.TableParts[l].Ref))
-							{
-								aWs.TableParts[l] = cloneData.oldFilter.clone(null);
-								
-								this._setColorStyleTable(cloneData.oldFilter.Ref, cloneData.oldFilter, null, true);
-								
-								break;
-							}	
-						}
-					}
-				}
-				else
-				{
-					if(cloneData.Ref)
-					{
-						if(aWs.AutoFilter && aWs.AutoFilter.Ref.isEqual(cloneData.Ref))
-						{
-							aWs.AutoFilter = null;
-						}
-						else if(aWs.TableParts)
-						{
-							for(var l = 0; l < aWs.TableParts.length; l++)
-							{
-								if(cloneData.Ref.isEqual(aWs.TableParts[l].Ref))
-								{
-									this._cleanStyleTable(cloneData.Ref);
-									aWs.TableParts.splice(l,1);
-								}	
-							}
 						}
 					}
 				}
@@ -1409,7 +1384,7 @@ var maxIndividualValues = 10000;
 								oldFilter: oldFilter,
 								newFilterRef: filter.Ref.clone()
 							};
-							t._addHistoryObj(changeElement, null, null, true, oldFilter.Ref, null, true);
+							t._addHistoryObj(changeElement, historyitem_AutoFilter_Change, null, true, oldFilter.Ref, null, true);
 						}
 						
 						//set style
@@ -1483,7 +1458,7 @@ var maxIndividualValues = 10000;
 							oldFilter: oldFilter,
 							newFilterRef: filter.Ref.clone()
 						};
-						t._addHistoryObj(changeElement, null, null, true, oldFilter.Ref, null, true);
+						t._addHistoryObj(changeElement, historyitem_AutoFilter_Change, null, true, oldFilter.Ref, null, true);
 					}
 					
 					if(oldFilter && bTablePart)
@@ -2113,7 +2088,8 @@ var maxIndividualValues = 10000;
 				else
 				{
 					oHistoryObject.activeCells			= ws.activeRange.clone();
-					type = null;
+					if(type !== historyitem_AutoFilter_Change)
+						type = null;
 				}
 				
 				if(!activeHistoryRange)

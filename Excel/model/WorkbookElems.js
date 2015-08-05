@@ -4368,6 +4368,9 @@ TablePart.prototype.changeRef = function(col, row, bIsFirst) {
 		ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
 	
 	this.Ref = ref;
+	//event
+	this.handlers.trigger("changeRefTablePart", this.DisplayName, this.Ref);
+	
 	if(this.AutoFilter)
 		this.AutoFilter.changeRef(col, row, bIsFirst);
 };

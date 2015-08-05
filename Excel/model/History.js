@@ -100,6 +100,7 @@ var historyitem_AutoFilter_Move     = 6;
 var historyitem_AutoFilter_CleanAutoFilter  = 7;
 var historyitem_AutoFilter_Delete   = 8;
 var historyitem_AutoFilter_ChangeTableStyle = 9;
+var historyitem_AutoFilter_Change = 10;
 
 
 function CHistory(workbook)
