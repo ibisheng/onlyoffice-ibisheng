@@ -316,6 +316,12 @@ var maxIndividualValues = 10000;
 					}
 					else
 					{
+						if(addNameColumn && filterRange.r2 >= gc_nMaxRow)
+							filterRange.r2 = gc_nMaxRow - 1;
+						
+						if(styleName)
+							aWs.getRange3(filterRange.r1, filterRange.c1, filterRange.r2, filterRange.c2).unmerge();
+						
 						if(addNameColumn && !isTurnOffHistory)
 						{
 							if(t._isEmptyCellsUnderRange(rangeWithoutDiff))
@@ -329,9 +335,6 @@ var maxIndividualValues = 10000;
 								t.insertRows("insCell", new Asc.Range(filterRange.c1, filterRange.r2, filterRange.c2, filterRange.r2), c_oAscInsertOptions.InsertCellsAndShiftDown);
 							}	
 						}
-							
-						if(styleName)
-							aWs.getRange3(filterRange.r1, filterRange.c1, filterRange.r2, filterRange.c2).unmerge();
 
 						//add to model
 						t._addNewFilter(filterRange, styleName, bWithoutFilter);
