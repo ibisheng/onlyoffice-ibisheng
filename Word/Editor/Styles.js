@@ -9413,11 +9413,13 @@ function CParaPr()
     this.DefaultRunPr      = undefined;
     this.Bullet            = undefined;
     this.Lvl               = undefined;
+
+    this.PrChange          = undefined;
 }
 
 CParaPr.prototype =
 {
-    Copy : function()
+    Copy : function(bCopyPrChange)
     {
         var ParaPr = new CParaPr();
 
@@ -9479,6 +9481,10 @@ CParaPr.prototype =
 
         if(undefined != this.Lvl)
             ParaPr.Lvl = this.Lvl;
+
+        if (true === bCopyPrChange && undefined !== this.PrChange)
+            ParaPr.PrChange = this.PrChange.Copy();
+
         return ParaPr;
     },
 
@@ -10191,6 +10197,24 @@ CParaPr.prototype =
             }
         }
         return Bullet;
+    },
+
+    Have_PrChange : function()
+    {
+        if (undefined === this.PrChange || null === this.PrChange)
+            return false;
+
+        return true;
+    },
+
+    Add_PrChange : function()
+    {
+        this.PrChange = this.Copy();
+    },
+
+    Remove_PrChange : function()
+    {
+        delete this.PrChange;
     }
 }
 
