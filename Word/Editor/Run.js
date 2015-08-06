@@ -5911,7 +5911,7 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
 {
     this.private_AddCollPrChangeMine();
 
-    if(this.Type == para_Math_Run && !this.IsNormalText())
+    if(this.Type == para_Math_Run && false === this.IsNormalText())
     {
         if(null === TextPr.Bold && null === TextPr.Italic)
             this.Math_Apply_Style(undefined);
@@ -9226,13 +9226,6 @@ ParaRun.prototype.IsNormalText = function()
 {
     var comp_MPrp = this.MathPrp.GetCompiled_ScrStyles();
     return comp_MPrp.nor === true;
-};
-ParaRun.prototype.IsMathematicalText = function()
-{
-    var MathText = !this.IsNormalText();
-    var bMFont = this.Get_CompiledPr(false).FontFamily.Name == "Cambria Math";
-
-    return MathText && bMFont;
 };
 ParaRun.prototype.getPropsForWrite = function()
 {

@@ -419,10 +419,6 @@ CMathBoxPr.prototype.Set_FromObject = function(Obj)
     else
         this.opEmu = false;
 };
-/*CMathBoxPr.prototype.IsBreak = function()
-{
-    return this.brk ! == undefined;
-};*/
 CMathBoxPr.prototype.Copy = function()
 {
     var NewPr = new CMathBoxPr();
