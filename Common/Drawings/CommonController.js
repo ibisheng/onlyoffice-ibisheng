@@ -2909,43 +2909,34 @@ DrawingObjectsController.prototype =
             {
                 chartSettings.bLine = true;
             }
+               
             if(chartSettings.showMarker)
             {
-                //for(var j = 0; j < chart_type.series.length; ++j)
-                //{
-                //    chart_type.series[j].setMarker(null);
-                //}
-                if(chartSettings.showMarker === true)
+                if(!chart_type.marker)
                 {
-                    if(!chart_type.marker)
+                    chart_type.setMarker(true);
+                }
+                for(var j = 0; j < chart_type.series.length; ++j)
+                {
+                    if(chart_type.series[j].marker)
                     {
-                        chart_type.setMarker(true);
+                        chart_type.series[j].setMarker(null);
                     }
                 }
-                if(chartSettings.showMarker)
+            }
+            else
+            {
+                for(var j = 0; j < chart_type.series.length; ++j)
                 {
-                    for(var j = 0; j < chart_type.series.length; ++j)
-                    {
-                        if(chart_type.series[j].marker)
-                        {
-                            chart_type.series[j].setMarker(null);
-                        }
-                    }
-                }
-                else
-                {
-                    for(var j = 0; j < chart_type.series.length; ++j)
+                    if(!chart_type.series[j].marker)
                     {
                         if(!chart_type.series[j].marker)
                         {
-                            if(!chart_type.series[j].marker)
-                            {
-                                chart_type.series[j].setMarker(new CMarker());
-                            }
-                            if(chart_type.series[j].marker.symbol !== SYMBOL_NONE)
-                            {
-                                chart_type.series[j].marker.setSymbol(SYMBOL_NONE);
-                            }
+                            chart_type.series[j].setMarker(new CMarker());
+                        }
+                        if(chart_type.series[j].marker.symbol !== SYMBOL_NONE)
+                        {
+                            chart_type.series[j].marker.setSymbol(SYMBOL_NONE);
                         }
                     }
                 }
