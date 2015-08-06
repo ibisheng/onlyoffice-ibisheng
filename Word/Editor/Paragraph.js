@@ -2558,9 +2558,12 @@ Paragraph.prototype =
 
                 if (this.LogicDocument && true === this.LogicDocument.Is_TrackRevisions())
                 {
-                    for (var Pos = StartPos + 1; Pos <= EndPos - 1; Pos++)
+                    for (var Pos = EndPos - 1; Pos >= StartPos + 1; Pos--)
                     {
-                        this.Content[Pos].Set_ReviewType(reviewtype_Remove, false);
+                        if (para_Run == this.Content[Pos].Type && reviewtype_Add === this.Content[Pos].Get_ReviewType())
+                            this.Internal_Content_Remove2(Pos, 1);
+                        else
+                            this.Content[Pos].Set_ReviewType(reviewtype_Remove, false);
                     }
                 }
                 else

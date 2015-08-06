@@ -19691,6 +19691,14 @@ CTable.prototype.Get_StyleFromFormatting = function()
     }
     return null;
 };
+CTable.prototype.Set_ReviewType = function(ReviewType)
+{
+
+};
+CTable.prototype.Get_ReviewType = function()
+{
+    return reviewtype_Common;
+};
 
 // Класс CTableRow
 function CTableRow(Table, Cols, TableGrid)
