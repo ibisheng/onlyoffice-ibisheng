@@ -10804,7 +10804,8 @@
 				this._recalculateAfterUpdate(arrRanges, lockDraw);
 			}
 		};
-		WorksheetView.prototype.updateRange = function (range, canChangeColWidth, lockDraw) {
+		// ToDo избавиться от этой функции!!!!Заглушка для принятия изменений
+		WorksheetView.prototype._checkUpdateRange = function (range) {
 			// Для принятия изменения нужно делать расширение диапазона
 			if (this.model.workbook.bCollaborativeChanges) {
 				var bIsUpdateX = false, bIsUpdateY = false;
@@ -10836,6 +10837,9 @@
 				else if (bIsUpdateY)
 					this.handlers.trigger("reinitializeScrollY");
 			}
+		};
+		WorksheetView.prototype.updateRange = function (range, canChangeColWidth, lockDraw) {
+			this._checkUpdateRange(range);
 			this._updateCellsRange(range, canChangeColWidth, lockDraw);
 		};
 
@@ -11105,6 +11109,9 @@
 				this._updateCellsRange(range);
 				return;
 			}
+
+			//ToDo заглушка, чтобы не падало. Нужно полностью переделывать этот код!
+			this._checkUpdateRange(range);
 
 			if (!this.activeRange.isEqual(range))
 				this.setSelection(range);
