@@ -906,6 +906,7 @@ var historyitem_Paragraph_PresentationPr_Level      = 34; // Изменяем у
 var historyitem_Paragraph_FramePr                   = 35; // Изменяем настройки рамки
 var historyitem_Paragraph_Shd                       = 36; // Изменяем настройки заливки целиком
 var historyitem_Paragraph_SectionPr                 = 37; // Изменяем настройки секции
+var historyitem_Paragraph_PrChange                  = 38; // Добавляем элемент PrChange в Paragraph.Pr
 
 // Типы изменений в классе ParaRun
 var historyitem_ParaRun_AddItem         =  1;

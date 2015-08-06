@@ -4915,6 +4915,11 @@ CUniFill.prototype =
         }
     },
 
+    Is_Equal : function(unfill)
+    {
+        return this.IsIdentical(unfill);
+    },
+
     compare : function(unifill)
     {
         if(unifill == null)
