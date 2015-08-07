@@ -1581,13 +1581,15 @@ var g_oUndoRedoData_DefinedNamesProperties = {
     Name: 0,
     Ref:1,
     LocalSheetId:2,
-    slaveEdge:3
+    slaveEdge:3,
+    isTable:4
 };
-function UndoRedoData_DefinedNames(name, ref, scope, slaveEdge){
+function UndoRedoData_DefinedNames(name, ref, scope, isTable, slaveEdge){
     this.Properties = g_oUndoRedoData_DefinedNamesProperties;
     this.Name = name;
     this.Ref = ref;
     this.LocalSheetId = scope;
+    this.isTable = isTable;
     this.slaveEdge = slaveEdge;
 }
 UndoRedoData_DefinedNames.prototype = {
@@ -1606,6 +1608,7 @@ UndoRedoData_DefinedNames.prototype = {
             case this.Properties.Name: return this.Name;break;
             case this.Properties.Ref: return this.Ref;break;
             case this.Properties.LocalSheetId: return this.LocalSheetId;break;
+            case this.Properties.isTable: return this.isTable;break;
             case this.Properties.slaveEdge: return this.slaveEdge;break;
         }
         return null;
@@ -1617,6 +1620,7 @@ UndoRedoData_DefinedNames.prototype = {
             case this.Properties.Name: this.Name = value;break;
             case this.Properties.Ref: this.Ref = value;break;
             case this.Properties.LocalSheetId: this.LocalSheetId = value;break;
+            case this.Properties.isTable: this.isTable = value;break;
             case this.Properties.slaveEdge: this.slaveEdge = value;break;
         }
     }
@@ -1628,8 +1632,8 @@ var g_oUndoRedoData_DefinedNamesChangeProperties = {
 };
 function UndoRedoData_DefinedNamesChange(oldName, newName){
     this.Properties = g_oUndoRedoData_DefinedNamesChangeProperties;
-    this.oldName = oldName;
-    this.newName = newName;
+    this.oldName = oldName?new UndoRedoData_DefinedNames(oldName.Name, oldName.Ref, oldName.LocalSheetId, oldName.isTable, null):undefined;
+    this.newName = newName?new UndoRedoData_DefinedNames(newName.Name, newName.Ref, newName.LocalSheetId, newName.isTable, null):undefined;
 }
 UndoRedoData_DefinedNamesChange.prototype = {
     getType : function()

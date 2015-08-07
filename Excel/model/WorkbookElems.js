@@ -4349,7 +4349,7 @@ TablePart.prototype.clone = function(ws) {
 TablePart.prototype.recalc = function(ws) {
 	this.DisplayName = ws.workbook.dependencyFormulas.getNextTableName(ws, this.Ref);
 };
-TablePart.prototype.moveRef = function(col, row, ws) {
+TablePart.prototype.moveRef = function(col, row) {
 	var ref = this.Ref.clone();
 	ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
 

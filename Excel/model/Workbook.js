@@ -263,13 +263,17 @@ DependencyGraph.prototype = {
     },
     changeNodeProcessDelete: function (node, oFormulas, toDelete) {
         //todo deleteAllSlaveEdges deleteMasterNodes
-        var oSlaves = node.deleteAllSlaveEdges();
+        var oSlaves = node.deleteAllSlaveEdges(), slave, formula;
         if (this.bSetRefError) {
             //выставляем #REF!
             for (var i in oSlaves) {
-                var slave = oSlaves[i];
+                slave = oSlaves[i];
+                if( slave instanceof DefNameVertex ){
+                    this.wb.delDefinesNames(slave.getAscCDefName())
+                    continue;
+                }
                 if (null == toDelete || slave != toDelete[slave.nodeId]) {
-                    var formula = slave.setRefError(node);
+                    formula = slave.setRefError(node);
                     if (null != formula) {
                         if (oFormulas)
                             oFormulas[slave.nodeId] = { node: slave, formula: formula };
@@ -896,9 +900,31 @@ DependencyGraph.prototype = {
 
         }
 
+//        if ( oRes.isArea ) {
+//            var nodesSheetArea = this.nodesArea[node.sheetId];
+//            if ( null == nodesSheetArea ) {
+//                nodesSheetArea = new RangeDataManager(function(data, from, to){_this._changeNode(data, from, to);});
+//                this.nodesArea[oRes.sheetId] = nodesSheetArea;
+//            }
+//            nodesSheetArea.add( oBBoxNode, node );
+//        }
+//        else {
+//            var nodesSheetCell = this.nodesCell[node.sheetId];
+//            if ( null == nodesSheetCell ) {
+//                nodesSheetCell = new CellArea(function(data, from, to){_this._changeNode(data, from, to);});
+//                this.nodesCell[node.sheetId] = nodesSheetCell;
+//            }
+//            nodesSheetCell.add( oBBoxNode.r1, oBBoxNode.c1, node );
+//        }
+
+
+        /*поставить зависимость между ячейками и текущим ИД*/
+
         if ( bUndo ) {
             oRes.Ref = defRef;
         }
+
+        oRes.parsedRef.buildDependencies(null,oRes);
 
         return oRes;
 
@@ -928,7 +954,7 @@ DependencyGraph.prototype = {
 
         for( var id in nodesList ){
 
-            if( nodesList[id].parsedRef.removeSheet(sheetId) ){
+            if( !nodesList[id].isTable && nodesList[id].parsedRef.removeSheet(sheetId) ){
                 seUndoRedo = [];
                 defN = nodesList[id];
                 nSE = defN.getSlaveEdges();
@@ -939,7 +965,7 @@ DependencyGraph.prototype = {
                 wsIndex = this.wb.getWorksheetById(defN.sheetId);
 
                 History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null,
-                    new UndoRedoData_DefinedNames( defN.Name, defN.Ref, wsIndex ? wsIndex.getIndex() : undefined, seUndoRedo ) );
+                    new UndoRedoData_DefinedNames( defN.Name, defN.Ref, wsIndex ? wsIndex.getIndex() : undefined, defN.isTable, seUndoRedo ) );
 
                 if( defN.sheetId == sheetId ){
 
@@ -1049,8 +1075,9 @@ DependencyGraph.prototype = {
         return sNewName;
     },
     addTableName:function ( sName, ws, Ref ) {
-
-        var dfv = new DefNameVertex( null, sName, parserHelp.get3DRef( ws.getName(), Ref.getAbsName() ), this.wb, true ),
+        var refClone = Ref.clone(true);
+        refClone.r1++;
+        var dfv = new DefNameVertex( null, sName, parserHelp.get3DRef( ws.getName(), refClone.getAbsName() ), this.wb, true ),
             defNameSheetsList = this.defNameSheets[dfv.sheetId];
         this.defNameList[dfv.nodeId] = dfv;
         if ( defNameSheetsList == null ) {
@@ -1060,8 +1087,11 @@ DependencyGraph.prototype = {
         defNameSheetsList[dfv.nodeId] = dfv;
     },
     changeTableName:function(tableName, ws, newRef){
-        var table = this.getDefNameNodeByName( tableName, ws );
-        table.Ref = parserHelp.getEscapeSheetName(ws.getName())+"!"+newRef.getAbsName();
+        var table = this.getDefNameNodeByName( tableName, ws ),
+            newRefClone = newRef.clone(true);
+        newRefClone.r1++;
+        table.Ref = table.Ref.split("!")[0]+"!"+newRefClone.getAbsName();
+//        table.Ref = parserHelp.getEscapeSheetName(ws.getName())+"!"+newRef.getAbsName();
     },
     delTableName:function(name,ws){
         var table = this.getDefNameNodeByName( name, ws );
@@ -1091,10 +1121,10 @@ function Vertex(sheetId, cellId, wb){
 	this.isBad = false;
 	
 	//masterEdges содержит ячейки, от которых зависит текущая ячейка
-	this.masterEdges = null;
+	this.masterEdges = {};
 	
 	//slaveEdges содержит ячейки, которые зависят от данной ячейки
-	this.slaveEdges = null;
+	this.slaveEdges = {};
 	
 	this.refCount = 0;
 	
@@ -1160,10 +1190,22 @@ Vertex.prototype = {
 	},
 	moveOuter: function (from, to, oFormulas) {
 	    if ((from.r1 == to.r1 && from.c1 == to.c1) || (from.r2 == to.r2 && from.c2 == to.c2)) {
-	        var _sn = this.getSlaveEdges();
+	        var _sn = this.getSlaveEdges(), slave, cell;
 	        for (var _id in _sn) {
-	            var slave = _sn[_id];
-	            var cell = slave.returnCell();
+	            slave = _sn[_id];
+                if( slave instanceof DefNameVertex ){
+                    if ( false == this.wb.bUndoChanges && (false == this.wb.bRedoChanges || true == this.wb.bCollaborativeChanges )){
+                        History.LocalChange = true;
+                        var oN = slave.getAscCDefName(), nN;
+                        slave.parsedRef.stretchArea(this, from, to);
+                        nN = slave.getAscCDefName();
+                        nN.Ref = slave.parsedRef.assemble();
+                        this.wb.editDefinesNames( oN, nN );
+                        History.LocalChange = false;
+                    }
+                    continue;
+                }
+	            cell = slave.returnCell();
 	            if (cell && cell.formulaParsed) {
 	                cell.formulaParsed.stretchArea(this, from, to);
 	                var formula = cell.formulaParsed.assemble();
@@ -1188,10 +1230,27 @@ Vertex.prototype = {
 	                addToArrRecalc(this.sheetId, cell);
 	            }
 	        }
-	        var _sn = this.getSlaveEdges();
+	        var _sn = this.getSlaveEdges(), slave, cell;
 	        for (var _id in _sn) {
-	            var slave = _sn[_id]
-	            var cell = slave.returnCell();
+	            slave = _sn[_id]
+                if( slave instanceof DefNameVertex ){
+                    /*slave.parsedRef.shiftCells(this, from, to);
+                    slave.relinkRef();*/
+
+
+                    if ( false == this.wb.bUndoChanges && (false == this.wb.bRedoChanges || true == this.wb.bCollaborativeChanges )){
+                        History.LocalChange = true;
+                        var oN = slave.getAscCDefName(), nN;
+                        slave.parsedRef.shiftCells(this, from, to);
+                        nN = slave.getAscCDefName();
+                        nN.Ref = slave.parsedRef.assemble();
+                        this.wb.editDefinesNames( oN, nN );
+                        History.LocalChange = false;
+                    }
+
+                    continue;
+                }
+                cell = slave.returnCell();
 	            if (cell && cell.formulaParsed) {
 	                cell.formulaParsed.shiftCells(this, from, to);
 	                var formula = cell.formulaParsed.assemble();
@@ -1250,24 +1309,16 @@ Vertex.prototype = {
 	//удаляем ребро между конкретной ведущей ячейки.
 	deleteMasterEdge: function (node) {
 	    if (this.masterEdges) {
-            if(this.masterEdges[node.nodeId]){
-                this.masterEdges[node.nodeId] = null;
-                delete this.masterEdges[node.nodeId];
-                node.deleteSlaveEdge(this);
-                this.refCount--;
-            }
+            delete this.masterEdges[node.nodeId];
+            this.refCount--;
 	    }
 	},
 
 	//удаляем ребро между конкретной зависимой(ведомой) ячейки.
 	deleteSlaveEdge: function (node) {
 	    if (this.slaveEdges) {
-            if(this.slaveEdges[node.nodeId]){
-                this.slaveEdges[node.nodeId] = null;
-                delete this.slaveEdges[node.nodeId];
-                node.deleteMasterEdge(this);
-                this.refCount--;
-            }
+            delete this.slaveEdges[node.nodeId];
+            this.refCount--;
 	    }
 	},
 
@@ -1277,7 +1328,6 @@ Vertex.prototype = {
 		for( var id in this.masterEdges ){
 			var masterEdge = this.masterEdges[id];
 			masterEdge.deleteSlaveEdge(this);
-			this.masterEdges[id] = null;
 			delete this.masterEdges[id];
 			this.refCount--;
 			ret[id] = masterEdge;
@@ -1292,7 +1342,6 @@ Vertex.prototype = {
 		for( var id in this.slaveEdges ){
 			var slaveEdge = this.slaveEdges[id];
 			slaveEdge.deleteMasterEdge(this);
-			this.slaveEdges[id] = null;
 			delete this.slaveEdges[id];
 			this.refCount--;
 			ret[id] = slaveEdge;
@@ -1330,7 +1379,11 @@ function DefNameVertex( scope, defName, defRef, wb, isTable ) {
         this.parsedRef = new parserFormula(this.Ref, "", this.wb.getWorksheet(0));
         if( this.Ref ){
             this.parsedRef.parse();
+//            this.parsedRef.buildDependencies();
         }
+    }
+    else{
+        this.sheetTableId = wb.getActiveWs().getId();
     }
 
     //вершина которую мы прошли и поставили в очередь обхода
@@ -1343,10 +1396,10 @@ function DefNameVertex( scope, defName, defRef, wb, isTable ) {
     this.isBad = false;
 
     //masterEdges содержит ячейки, от которых зависит текущая ячейка
-    this.masterEdges = null;
+    this.masterEdges = {};
 
     //slaveEdges содержит ячейки, которые зависят от данной ячейки
-    this.slaveEdges = null;
+    this.slaveEdges = {};
 
     this.refCount = 0;
 
@@ -1490,24 +1543,24 @@ DefNameVertex.prototype = {
     //удаляем ребро между конкретной ведущей ячейки.
     deleteMasterEdge:function ( node ) {
         if ( this.masterEdges ) {
-            if ( this.masterEdges[node.nodeId] ) {
-                this.masterEdges[node.nodeId] = null;
+//            if ( this.masterEdges[node.nodeId] ) {
+//                this.masterEdges[node.nodeId] = null;
                 delete this.masterEdges[node.nodeId];
-                node.deleteSlaveEdge( this );
+//                node.deleteSlaveEdge( this );
                 this.refCount--;
-            }
+//            }
         }
     },
 
     //удаляем ребро между конкретной зависимой(ведомой) ячейки.
     deleteSlaveEdge:function ( node ) {
         if ( this.slaveEdges ) {
-            if ( this.slaveEdges[node.nodeId] ) {
-                this.slaveEdges[node.nodeId] = null;
+//            if ( this.slaveEdges[node.nodeId] ) {
+//                this.slaveEdges[node.nodeId] = null;
                 delete this.slaveEdges[node.nodeId];
-                node.deleteMasterEdge( this );
+//                node.deleteMasterEdge( this );
                 this.refCount--;
-            }
+//            }
         }
     },
 
@@ -1708,7 +1761,6 @@ function _sortDependency(wb, node, oNodeDependence, oNewMasterAreaNodes, bBad, o
 //                    var ws = wb.getWorksheetById( node.sheetId );
 //                    ws._ReBuildFormulas
 //                    ws._RecalculatedFunctions(node.cellId, bCurBad, setCellFormat);
-//                    alert("node.isDefinedName")
 				}
 				else{
 					//пересчитываем функцию
@@ -1844,7 +1896,9 @@ Workbook.prototype.init=function(bNoBuildDep){
 	
 	var self = this;
 	this.wsHandlers = new asc.asc_CHandlersList(/*handlers*/{
-		"changeRefTablePart"		: function (displayName, ref) {self.wsHandlers.trigger("asc_onChangeRefTablePart", displayName, ref);}
+        "changeRefTablePart"    : function (displayName, ref) {
+            self.dependencyFormulas.changeTableName( displayName, null, ref );
+        }
 	});
 	
     //charts
@@ -1862,6 +1916,7 @@ Workbook.prototype.init=function(bNoBuildDep){
 		this.buildDependency();
 		sortDependency(this);
 	}
+
 };
 Workbook.prototype.rebuildColors=function(){
 	g_oColorManager.rebuildColors();
@@ -2444,7 +2499,7 @@ Workbook.prototype.delDefinesNames = function ( defName ) {
         }
 
         sortDependency( this );
-        History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames( defName.Name, defName.Ref, defName.LocalSheetId, seUndoRedo ) );
+        History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames( defName.Name, defName.Ref, defName.LocalSheetId, defName.isTable, seUndoRedo ) );
     }
 
     return retRes;
@@ -2485,9 +2540,7 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
          * */
 
         if( !rename ){
-
             retRes = this.dependencyFormulas.getDefNameNodeByName(newName.Name)
-
         }
 
         if(retRes){
@@ -2503,7 +2556,6 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
 
             se = se.returnCell();
             if ( se ) {
-
                 se.setFormula( se.formulaParsed.assemble() );
 
                 if ( !rename ) {

@@ -380,6 +380,44 @@
 			    return sRes;
 			},
 
+            getAbsName2 : function(absCol1,absRow1,absCol2,absRow2) {
+                var sRes = "";
+                if (0 == this.c1 && gc_nMaxCol0 == this.c2 && false == this.c1Abs && false == this.c2Abs) {
+                    if (absRow1)
+                        sRes += "$";
+                    sRes += (this.r1 + 1) + ":";
+                    if (absRow2)
+                        sRes += "$";
+                    sRes += (this.r2 + 1);
+                }
+                else if (0 == this.r1 && gc_nMaxRow0 == this.r2 && false == this.r1Abs && false == this.r2Abs) {
+                    if (absCol1)
+                        sRes += "$";
+                    sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1) + ":";
+                    if (absCol2)
+                        sRes += "$";
+                    sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
+                }
+                else {
+                    if (absCol1)
+                        sRes += "$";
+                    sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1);
+                    if (absRow1)
+                        sRes += "$";
+                    sRes += (this.r1 + 1);
+                    if (!this.isOneCell()) {
+                        sRes += ":";
+                        if (absCol2)
+                            sRes += "$";
+                        sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
+                        if (absRow2)
+                            sRes += "$";
+                        sRes += (this.r2 + 1);
+                    }
+                }
+                return sRes;
+            },
+
 			getAllRange: function () {
 				var result;
 				if (c_oAscSelectionType.RangeMax === this.type)

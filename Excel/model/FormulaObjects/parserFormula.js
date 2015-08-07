@@ -479,6 +479,10 @@ function cArea( val, ws ) {/*Area means "A1:E5" for example*/
     this.wb = ws.workbook;
     this._cells = val;
     this.isAbsolute = false;
+    this.isAbsoluteCol1 = false;
+    this.isAbsoluteRow1 = false;
+    this.isAbsoluteCol2 = false;
+    this.isAbsoluteRow2 = false;
     this.range = null;
 //    this._valid = this.range ? true : false;
 }
@@ -489,6 +493,10 @@ cArea.prototype.clone = function () {
 //	cBaseType.prototype.cloneTo.call( this, oRes );
     this.constructor.prototype.cloneTo.call( this, oRes );
     oRes.isAbsolute = this.isAbsolute;
+    oRes.isAbsoluteCol1 = this.isAbsoluteCol1;
+    oRes.isAbsoluteRow1 = this.isAbsoluteRow1;
+    oRes.isAbsoluteCol2 = this.isAbsoluteCol2;
+    oRes.isAbsoluteRow2 = this.isAbsoluteRow2;
     return oRes;
 };
 cArea.prototype.getWsId = function () {
@@ -684,6 +692,10 @@ function cArea3D( val, wsFrom, wsTo, wb ) {/*Area3D means "Sheat1!A1:E5" for exa
     this._wb = wb;
     this._cells = val;
     this.isAbsolute = false;
+    this.isAbsoluteCol1 = false;
+    this.isAbsoluteRow1 = false;
+    this.isAbsoluteCol2 = false;
+    this.isAbsoluteRow2 = false;
     this.wsFrom = this._wb.getWorksheetByName( wsFrom ).getId();
     this.wsTo = this._wb.getWorksheetByName( wsTo ).getId();
 }
@@ -696,6 +708,10 @@ cArea3D.prototype.clone = function () {
 //	cBaseType.prototype.cloneTo.call( this, oRes );
     this.constructor.prototype.cloneTo.call( this, oRes );
     oRes.isAbsolute = this.isAbsolute;
+    oRes.isAbsoluteCol1 = this.isAbsoluteCol1;
+    oRes.isAbsoluteRow1 = this.isAbsoluteRow1;
+    oRes.isAbsoluteCol2 = this.isAbsoluteCol2;
+    oRes.isAbsoluteRow2 = this.isAbsoluteRow2;
     return oRes;
 };
 cArea3D.prototype.wsRange = function () {
@@ -1046,6 +1062,8 @@ function cRef( val, ws ) {/*Ref means A1 for example*/
     this.ws = ws;
     this.wb = this._wb = ws.workbook;
     this.isAbsolute = false;
+    this.isAbsoluteCol1 = false;
+    this.isAbsoluteRow1 = false;
     var ca = g_oCellAddressUtils.getCellAddress( val.replace( rx_space_g, "" ) );
     this.range = null;
     this._valid = ca.isValid();
@@ -1063,6 +1081,8 @@ cRef.prototype.clone = function () {
 //	cBaseType.prototype.cloneTo.call( this, oRes );
     this.constructor.prototype.cloneTo.call( this, oRes );
     oRes.isAbsolute = this.isAbsolute;
+    oRes.isAbsoluteCol1 = this.isAbsoluteCol1;
+    oRes.isAbsoluteRow1 = this.isAbsoluteRow1;
     return oRes;
 };
 cRef.prototype.getWsId = function () {
@@ -1131,6 +1151,8 @@ function cRef3D( val, _wsFrom, wb ) {/*Ref means Sheat1!A1 for example*/
     this.wb = this._wb = wb;
     this._cells = val;
     this.isAbsolute = false;
+    this.isAbsoluteCol1 = false;
+    this.isAbsoluteRow1 = false;
     this.ws = this._wb.getWorksheetByName( _wsFrom );
     this.range = null;
 }
@@ -1141,6 +1163,8 @@ cRef3D.prototype.clone = function () {
 //	cBaseType.prototype.cloneTo.call( this, oRes );
     this.constructor.prototype.cloneTo.call( this, oRes );
     oRes.isAbsolute = this.isAbsolute;
+    oRes.isAbsoluteCol1 = this.isAbsoluteCol1;
+    oRes.isAbsoluteRow1 = this.isAbsoluteRow1;
     return oRes;
 };
 cRef3D.prototype.getWsId = function () {
@@ -1256,9 +1280,8 @@ cName.prototype.toRef = function () {
         return new cError( "#NAME?" );
     }
 
-    var _3DRefTmp,
-        ref = this.defName.Ref,
-        _wsFrom, _wsTo;
+    var _3DRefTmp, ref = this.defName.Ref, _wsFrom, _wsTo;
+
     if ( ref && (_3DRefTmp = parserHelp.is3DRef( ref, 0 ))[0] ) {
         _wsFrom = _3DRefTmp[1];
         _wsTo = ( (_3DRefTmp[2] !== null) && (_3DRefTmp[2] !== undefined) ) ? _3DRefTmp[2] : _wsFrom;
@@ -1324,7 +1347,6 @@ cName.prototype.addDefinedNameNode = function ( nameReParse ) {
 
         if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid() ) {
             nTo = this.wb.dependencyFormulas.addNode( ref.getWsId(), ref._cells.replace( this.regSpace, "" ) );
-
             this.wb.dependencyFormulas.addEdge2( node, nTo );
         }
         else if ( ref instanceof cArea3D && ref.isValid() ) {
@@ -3194,6 +3216,63 @@ parserFormula.prototype = {
 
     parse:function ( local, digitDelim ) {
 
+        function checkAbsRef(operand_str,found_operand){
+
+            var splitOpStr0 = operand_str.match(/\$/g) || [];
+
+            switch(splitOpStr0.length){
+                case 1:
+                    if( operand_str.indexOf("$") > 0 ){
+                        found_operand.isAbsoluteRow1 = true;
+                    }
+                    else{
+                        found_operand.isAbsoluteCol1 = true;
+                    }
+                    break;
+                case 2:
+                    found_operand.isAbsoluteCol1 = true;
+                    found_operand.isAbsoluteRow1 = true;
+                    break;
+            }
+
+        }
+
+        function checkAbsArea(operand_str,found_operand){
+            var splitOpStr = operand_str.split(":" ),
+                splitOpStr0 = splitOpStr[0].match(/\$/g) || [],
+                splitOpStr1 = splitOpStr[1].match(/\$/g) || [];
+
+            switch(splitOpStr0.length){
+                case 1:
+                    if( splitOpStr[0].indexOf("$") > 0 ){
+                        found_operand.isAbsoluteRow1 = true;
+                    }
+                    else{
+                        found_operand.isAbsoluteCol1 = true;
+                    }
+                    break;
+                case 2:
+                    found_operand.isAbsoluteCol1 = true;
+                    found_operand.isAbsoluteRow1 = true;
+                    break;
+            }
+
+            switch(splitOpStr1.length){
+                case 1:
+                    if( splitOpStr[1].indexOf("$") > 0 ){
+                        found_operand.isAbsoluteRow2 = true;
+                    }
+                    else{
+                        found_operand.isAbsoluteCol2 = true;
+                    }
+                    break;
+                case 2:
+                    found_operand.isAbsoluteCol2 = true;
+                    found_operand.isAbsoluteRow2 = true;
+                    break;
+            }
+        }
+
         this.pCurrPos = 0;
 
         if ( this.isParsed )
@@ -3496,9 +3575,18 @@ parserFormula.prototype = {
                     if ( parserHelp.isArea.call( this, this.Formula, this.pCurrPos ) ) {
                         this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length} );
                         found_operand = new cArea3D( this.operand_str.toUpperCase(), _wsFrom, _wsTo, this.wb );
-                        if ( this.operand_str.indexOf( "$" ) > -1 ) {
+
+                        checkAbsArea(this.operand_str,found_operand);
+
+                        /*if ( this.operand_str.indexOf( "$" ) > -1 ) {
                             found_operand.isAbsolute = true;
-                        }
+                            if( this.operand_str.indexOf( "$" ) == 0 ){
+                                found_operand.isAbsoluteCol = true;
+                            }
+                            if( this.operand_str.lastIndexOf( "$" ) > 0 ){
+                                found_operand.isAbsoluteRow = true;
+                            }
+                        }*/
                     }
                     else if ( parserHelp.isRef.call( this, this.Formula, this.pCurrPos ) ) {
                         this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length} );
@@ -3509,7 +3597,16 @@ parserFormula.prototype = {
                             found_operand = new cRef3D( this.operand_str.toUpperCase(), _wsFrom, this.wb );
                         }
                         if ( this.operand_str.indexOf( "$" ) > -1 ) {
-                            found_operand.isAbsolute = true;
+
+                            checkAbsRef(this.operand_str,found_operand)
+
+                            /*found_operand.isAbsolute = true;
+                            if( this.operand_str.indexOf( "$" ) == 0 ){
+                                found_operand.isAbsoluteCol = true;
+                            }
+                            if( this.operand_str.lastIndexOf( "$" ) > 0 ){
+                                found_operand.isAbsoluteRow = true;
+                            }*/
                         }
                     }
                     /*else if ( parserHelp.isName.call( this, this.Formula, this.pCurrPos ) ) {
@@ -3523,7 +3620,18 @@ parserFormula.prototype = {
                     this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length} );
                     found_operand = new cArea( this.operand_str.toUpperCase(), this.ws );
                     if ( this.operand_str.indexOf( "$" ) > -1 ) {
-                        found_operand.isAbsolute = true;
+
+                        checkAbsArea(this.operand_str,found_operand);
+
+
+                     /*   found_operand.isAbsolute = true;
+                        if( this.operand_str.indexOf( "$" ) == 0 ){
+                            found_operand.isAbsoluteCol = true;
+                        }
+                        if( this.operand_str.lastIndexOf( "$" ) > 0 ){
+                            found_operand.isAbsoluteRow = true;
+                        }*/
+
                     }
                     this.countRef++;
                 }
@@ -3532,7 +3640,16 @@ parserFormula.prototype = {
                     this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length} );
                     found_operand = new cRef( this.operand_str.toUpperCase(), this.ws );
                     if ( this.operand_str.indexOf( "$" ) > -1 ) {
-                        found_operand.isAbsolute = true;
+
+                        checkAbsRef(this.operand_str,found_operand)
+
+                        /*found_operand.isAbsolute = true;
+                        if( this.operand_str.indexOf( "$" ) == 0 ){
+                            found_operand.isAbsoluteCol = true;
+                        }
+                        if( this.operand_str.lastIndexOf( "$" ) > 0 ){
+                            found_operand.isAbsoluteRow = true;
+                        }*/
                     }
                     this.countRef++;
                 }
@@ -3803,23 +3920,30 @@ parserFormula.prototype = {
      */
     shiftCells:function ( node, from, to ) {
         //node.cellId содержит уже сдвинутое значение
-        var sFromName = from.getName();
+        var sFromName = from.getName(), elem;
         for ( var i = 0; i < this.outStack.length; i++ ) {
-            var elem = this.outStack[i];
+            elem = this.outStack[i];
             if ( elem instanceof cRef || elem instanceof cArea ) {
+                sFromName = from.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
+
                 if ( node.sheetId == elem.ws.getId() && sFromName == elem._cells ) {
-                    elem.value = elem._cells = node.cellId;
+                    elem.value = elem._cells = node.bbox.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
                     elem.range = elem.ws.getRange3( to.r1, to.c1, to.r2, to.c2 );
                 }
             }
             else if ( elem instanceof cRef3D ) {
+                sFromName = from.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
+
                 if ( node.sheetId == elem.ws.getId() && sFromName == elem._cells ) {
-                    elem.value = elem._cells = node.cellId;
+                    elem.value = elem._cells = node.bbox.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
                 }
             }
             else if ( elem instanceof cArea3D ) {
+
+                sFromName = from.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
+
                 if ( elem.wsFrom == elem.wsTo && node.sheetId == elem.wsFrom && sFromName == elem._cells ) {
-                    elem.value = elem._cells = node.cellId;
+                    elem.value = elem._cells = node.bbox.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
                 }
             }
         }
@@ -3827,19 +3951,26 @@ parserFormula.prototype = {
 
     stretchArea:function ( node, from, to ) {
         //node.cellId содержит уже сдвинутое значение
-        var sFromName = from.getName();
+        var sFromName = from.getName(), elem;
         for ( var i = 0; i < this.outStack.length; i++ ) {
-            var elem = this.outStack[i];
+            elem = this.outStack[i];
             if ( elem instanceof cArea ) {
+
+                sFromName = from.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
+
                 if ( node.sheetId == elem.ws.getId() && sFromName == elem._cells ) {
-                    elem.value = elem._cells = node.cellId;
+                    elem.value = elem._cells = node.bbox.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
                     elem.range = elem.ws.getRange3( to.r1, to.c1, to.r2, to.c2 );
                 }
             }
             else if ( elem instanceof cArea3D ) {
+
+                sFromName = from.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
+
                 //node.cellId содержит уже сдвинутое значение
-                if ( elem.wsFrom == elem.wsTo && node.sheetId == elem.wsFrom && sFromName == elem._cells )
-                    elem.value = elem._cells = node.cellId;
+                if ( elem.wsFrom == elem.wsTo && node.sheetId == elem.wsFrom && sFromName == elem._cells ){
+                    elem.value = elem._cells = node.bbox.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
+                }
             }
         }
     },
@@ -4121,10 +4252,16 @@ parserFormula.prototype = {
         return bRes;
     },
 
-    buildDependencies:function ( nameReParse ) {
+    buildDependencies:function ( nameReParse, defName ) {
 
-        var node = this.wb.dependencyFormulas.addNode( this.ws.Id, this.cellId ),
-            ref, nTo, wsR;
+        var node, ref, nTo, wsR;
+
+        if( !defName ){
+            node = this.wb.dependencyFormulas.addNode( this.ws.Id, this.cellId )
+        }
+        else{
+            node = defName;
+        }
 
         for ( var i = 0; i < this.outStack.length; i++ ) {
             ref = this.outStack[i];
@@ -4155,7 +4292,7 @@ parserFormula.prototype = {
             else if ( ref instanceof cArea3D && ref.isValid() ) {
                 wsR = ref.wsRange();
                 for ( var j = 0; j < wsR.length; j++ ) {
-                    this.wb.dependencyFormulas.addEdge( this.ws.Id, this.cellId.replace( this.regSpace, "" ), wsR[j].Id, ref._cells.replace( this.regSpace, "" ) );
+                    this.wb.dependencyFormulas.addEdge2( node, this.wb.dependencyFormulas.addNode( wsR[j].Id, ref._cells.replace( this.regSpace, "" )) );
                 }
             }
         }

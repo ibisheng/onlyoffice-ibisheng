@@ -1686,7 +1686,7 @@ var maxIndividualValues = 10000;
 							range = ref;
 							
 							//move ref
-							findFilters[i].moveRef(diffCol, diffRow, ws);
+							findFilters[i].moveRef(diffCol, diffRow);
 							
 							isUpdate = false;
 							if((findFilters[i].AutoFilter && findFilters[i].AutoFilter.FilterColumns && findFilters[i].AutoFilter.FilterColumns.length) || (findFilters[i].FilterColumns && findFilters[i].FilterColumns.length))
