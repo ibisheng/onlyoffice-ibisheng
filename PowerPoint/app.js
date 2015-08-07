@@ -27,6 +27,7 @@ require.config({
         notification    : 'common/main/lib/core/NotificationCenter',
         keymaster       : 'common/main/lib/core/keymaster',
         tip             : 'common/main/lib/util/Tip',
+        localstorage    : 'common/main/lib/util/LocalStorage',
         analytics       : 'common/Analytics',
         gateway         : 'common/Gateway',
         locale          : 'common/locale',
@@ -131,6 +132,7 @@ require([
         'presentationeditor/main/app/view/TableSettings',
         'presentationeditor/main/app/view/TextArtSettings',
         'common/main/lib/util/utils',
+        'common/main/lib/util/LocalStorage',
         'common/main/lib/controller/Fonts'
         /** coauthoring begin **/
         ,'common/main/lib/controller/Comments',

@@ -27,6 +27,7 @@ require.config({
         notification    : 'common/main/lib/core/NotificationCenter',
         keymaster       : 'common/main/lib/core/keymaster',
         tip             : 'common/main/lib/util/Tip',
+        localstorage    : 'common/main/lib/util/LocalStorage',
         analytics       : 'common/Analytics',
         gateway         : 'common/Gateway',
         locale          : 'common/locale',
@@ -130,6 +131,7 @@ require([
         'spreadsheeteditor/main/app/view/ShapeSettings',
         'spreadsheeteditor/main/app/view/TextArtSettings',
         'common/main/lib/util/utils',
+        'common/main/lib/util/LocalStorage',
         'common/main/lib/controller/Fonts',
         'common/main/lib/controller/Comments',
         'common/main/lib/controller/Chat'
