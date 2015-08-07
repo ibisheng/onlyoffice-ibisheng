@@ -7442,7 +7442,31 @@ asc_docs_api.prototype.asc_IsTrackResivisions = function()
 {
     return this.WordControl.m_oLogicDocument.Is_TrackRevisions();
 };
+asc_docs_api.prototype.sync_ShowRevisionsChange = function(Change)
+{
+//    var document.
+//    alert(Change.get_Value());
+    this.asc_fireCallback("asc_onShowRevisionsChange", Change);
+};
+asc_docs_api.prototype.sync_HideAllRevisionsChanges = function()
+{
+    this.asc_fireCallback("asc_onHideAllRevisionsChanges");
+};
 
+function CRevisionsChange()
+{
+    this.Type  = c_oAscRevisionsChangeType.Unknown;
+    this.X     = 0;
+    this.Y     = 0;
+    this.Value = "";
+}
+CRevisionsChange.prototype.get_Type  = function(){return this.Type;};
+CRevisionsChange.prototype.get_X     = function(){return this.X;};
+CRevisionsChange.prototype.get_Y     = function(){return this.Y;};
+CRevisionsChange.prototype.get_Value = function(){return this.Value;};
+CRevisionsChange.prototype.put_Type  = function(Type){this.Type = Type;};
+CRevisionsChange.prototype.put_XY    = function(X, Y){this.X = X; this.Y = Y;};
+CRevisionsChange.prototype.put_Value = function(Value){this.Value = Value;};
 
 asc_docs_api.prototype.asc_stopSaving = function () {
 	this.asc_IncrementCounterLongAction();

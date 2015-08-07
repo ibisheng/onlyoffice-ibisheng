@@ -11911,6 +11911,7 @@ CDocument.prototype =
 
         // Уберем из интерфейса записи о том где мы находимся (параграф, таблица, картинка или колонтитул)
         editor.ClearPropObjCallback();
+        editor.sync_HideAllRevisionsChanges();
 
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )

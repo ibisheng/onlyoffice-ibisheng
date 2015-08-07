@@ -2585,6 +2585,7 @@ Paragraph.prototype =
                     for (var Pos = StartPos; Pos <= EndPos; Pos++)
                     {
                         this.Content[Pos].Selection_Remove();
+                        this.Content[Pos].Selection_Remove();
                     }
                     this.CurPos.ContentPos = StartPos;
                 }
@@ -9194,6 +9195,81 @@ Paragraph.prototype =
             if (para_Hyperlink === CurType || para_Math === CurType)
                 this.Content[this.CurPos.ContentPos].Document_UpdateInterfaceState();
         }
+
+        if (this.Is_TrackRevisions() && editor && this.bFromDocument)
+        {
+            // Обновляем рецензирование
+            if (false === this.Selection.Use)
+            {
+                var TextTransform = this.Get_ParentTextTransform();
+                var PageIndex = 0;
+                var _X = this.Pages[PageIndex].XLimit;
+                var _Y = this.Pages[PageIndex].Y;
+                var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( _X, _Y, this.Get_StartPage_Absolute() + (PageIndex - this.PageNum), TextTransform);
+
+                var X = Coords.X + 20;
+                var Y = Coords.Y;
+
+                if (true === this.Have_PrChange())
+                {
+                    var Change = new CRevisionsChange();
+                    Change.put_Type(c_oAscRevisionsChangeType.ParaPr);
+                    Change.put_Value("Change paragraph properties.");
+                    Change.put_XY(X, Y);
+                    editor.sync_ShowRevisionsChange(Change);
+                }
+
+                var ReviewType = this.Get_ReviewType();
+                if (reviewtype_Add == ReviewType)
+                {
+                    var Change = new CRevisionsChange();
+                    Change.put_Type(c_oAscRevisionsChangeType.ParaAdd);
+                    Change.put_Value("Add paragraph.");
+                    Change.put_XY(X, Y);
+                    editor.sync_ShowRevisionsChange(Change);
+                }
+                else if (reviewtype_Remove == ReviewType)
+                {
+                    var Change = new CRevisionsChange();
+                    Change.put_Type(c_oAscRevisionsChangeType.ParaRem);
+                    Change.put_Value("Delete paragraph.");
+                    Change.put_XY(X, Y);
+                    editor.sync_ShowRevisionsChange(Change);
+                }
+
+                var CurPos = this.Get_ParaContentPos(false, false);
+                var Run = this.Get_ElementByPos(CurPos);
+                if (para_Run === Run.Type)
+                {
+                    if (true === Run.Have_PrChange())
+                    {
+                        var Change = new CRevisionsChange();
+                        Change.put_Type(c_oAscRevisionsChangeType.TextPr);
+                        Change.put_Value("Change text properties.");
+                        Change.put_XY(X, Y);
+                        editor.sync_ShowRevisionsChange(Change);
+                    }
+
+                    var RunReviewType = Run.Get_ReviewType();
+                    if (reviewtype_Add == RunReviewType)
+                    {
+                        var Change = new CRevisionsChange();
+                        Change.put_Type(c_oAscRevisionsChangeType.TextAdd);
+                        Change.put_Value("Add text.");
+                        Change.put_XY(X, Y);
+                        editor.sync_ShowRevisionsChange(Change);
+                    }
+                    else if (reviewtype_Remove == RunReviewType)
+                    {
+                        var Change = new CRevisionsChange();
+                        Change.put_Type(c_oAscRevisionsChangeType.TextRem);
+                        Change.put_Value("Delete text.");
+                        Change.put_XY(X, Y);
+                        editor.sync_ShowRevisionsChange(Change);
+                    }
+                }
+            }
+        }
     },
 
     // Функция, которую нужно вызвать перед удалением данного элемента
@@ -12859,6 +12935,13 @@ Paragraph.prototype.Get_ReviewType = function()
 Paragraph.prototype.Get_ParaEndRun = function()
 {
     return this.Content[this.Content.length - 1];
+};
+Paragraph.prototype.Is_TrackRevisions = function()
+{
+    if (this.LogicDocument)
+        return this.LogicDocument.Is_TrackRevisions();
+
+    return false;
 };
 
 

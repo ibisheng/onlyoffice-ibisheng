@@ -573,4 +573,15 @@ var c_oAscMathInterfaceType =
     Phantom       : 0x0f
 };
 
+var c_oAscRevisionsChangeType =
+{
+    Unknown : 0x00,
+    TextAdd : 0x01,
+    TextRem : 0x02,
+    ParaAdd : 0x03,
+    ParaRem : 0x04,
+    TextPr  : 0x05,
+    ParaPr  : 0x06
+};
+
 window["flat_desine"] = false;
