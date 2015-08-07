@@ -179,6 +179,30 @@ function g_fMapAscServerErrorToAscError (nServerError) {
 	return nRes;
 }
 
+function getFullImageSrc2 (src) {
+	if (window["NATIVE_EDITOR_ENJINE"])
+		return src;
+
+	// ToDo это временное решение. В дальнейшем стоит заделать класс Common, в котором будут храниться эти данные для любого редактора
+	var documentUrl, themesUrl;
+	if (!editor || !editor.isDocumentEditor && !editor.isPresentationEditor) {
+		documentUrl = g_sResourceServiceLocalUrl + window["Asc"]["editor"].documentId + '/';
+	} else {
+		documentUrl = editor.DocumentUrl;
+		themesUrl = editor.ThemeLoader ? editor.ThemeLoader.ThemesUrl : undefined;
+	}
+
+	var start = src.slice(0, 6);
+	if (0 === start.indexOf('theme'))
+		return themesUrl + src;
+
+	if (0 !== start.indexOf('http:') && 0 !== start.indexOf('data:') && 0 !== start.indexOf('https:') &&
+		0 !== start.indexOf('file:') && 0 !== start.indexOf('ftp:') && 0 !== start.indexOf(documentUrl) &&
+		0 !== start.indexOf(themesUrl))
+		return documentUrl + 'media/' + src;
+	return src;
+}
+
 function fSortAscending( a, b ) {
     return a - b;
 }

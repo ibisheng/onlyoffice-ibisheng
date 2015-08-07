@@ -268,15 +268,7 @@ SlideLayout.prototype =
                 {
                     if(Fill && Fill.fill && Fill.fill.type === FILL_TYPE_BLIP && typeof Fill.fill.RasterImageId === "string" && Fill.fill.RasterImageId.length > 0)
                     {
-                        var full_image_src_func;
-                        if(typeof _getFullImageSrc === "function")
-                        {
-                            full_image_src_func = _getFullImageSrc;
-                        }
-                        if(full_image_src_func)
-                        {
-                            CollaborativeEditing.Add_NewImage(full_image_src_func(Fill.fill.RasterImageId));
-                        }
+						CollaborativeEditing.Add_NewImage(getFullImageSrc2(Fill.fill.RasterImageId));
                     }
                 }
                 break;
@@ -656,7 +648,7 @@ SlideLayout.prototype =
     {
         if(this.cSld.Bg && this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill && this.cSld.Bg.bgPr.Fill.fill instanceof  CBlipFill && typeof this.cSld.Bg.bgPr.Fill.fill.RasterImageId === "string" )
         {
-            images[_getFullImageSrc(this.cSld.Bg.bgPr.Fill.fill.RasterImageId)] = true;
+            images[getFullImageSrc2(this.cSld.Bg.bgPr.Fill.fill.RasterImageId)] = true;
         }
         for(var i = 0; i < this.cSld.spTree.length; ++i)
         {

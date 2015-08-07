@@ -26,7 +26,6 @@ function CThemeLoader()
     this.CurrentLoadThemeIndex = -1;
     this.ThemesUrl = "";
 
-    this.IsReloadBinaryThemeEditor = false;
     this.IsReloadBinaryThemeEditorNow = false;
 
     var oThis = this;
@@ -77,7 +76,7 @@ function CThemeLoader()
         this.LoadThemeJSAsync(theme_src);
 
         this.Api.StartLoadTheme();
-    }
+    };
 
     this.LoadThemeJSAsync = function(theme_src)
     {
@@ -98,7 +97,7 @@ function CThemeLoader()
         scriptElem.setAttribute('src',theme_src);
         scriptElem.setAttribute('type','text/javascript');
         document.getElementsByTagName('head')[0].appendChild(scriptElem);
-    }
+    };
 
     this._callback_theme_load = function()
     {
@@ -136,12 +135,12 @@ function CThemeLoader()
             return;
         }
         // ошибка!!!
-    }
+    };
 
     this.asyncFontsStartLoaded = function()
     {
         // началась загрузка шрифтов
-    }
+    };
 
     this.asyncFontsEndLoaded = function()
     {
@@ -150,12 +149,12 @@ function CThemeLoader()
         this.Api.ImageLoader.ThemeLoader = this;
 
         this.Api.ImageLoader.LoadDocumentImages(this.themes_info_editor[this.CurrentLoadThemeIndex].ImageMap);
-    }
+    };
 
     this.asyncImagesStartLoaded = function()
     {
         // началась загрузка картинок
-    }
+    };
 
     this.asyncImagesEndLoaded = function()
     {
@@ -163,15 +162,5 @@ function CThemeLoader()
 
         this.Api.EndLoadTheme(this.themes_info_editor[this.CurrentLoadThemeIndex]);
         this.CurrentLoadThemeIndex = -1;
-    }
-
-    this._getFullImageSrc = function(src)
-    {
-        var start = src.substring(0, 6);
-        if(0 != src.indexOf("http:") && 0 != src.indexOf("data:") && 0 != src.indexOf("https:") && 0 != src.indexOf("ftp:") && 0 != src.indexOf("file:"))
-            return this.ThemesUrl + "theme" + this.CurrentLoadThemeIndex + "/media/" + src;
-        else
-            return src;
-    }
-
+    };
 }

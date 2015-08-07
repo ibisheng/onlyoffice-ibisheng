@@ -931,7 +931,7 @@ CShape.prototype =
 
     getAllImages: function (images) {
         if (this.spPr && this.spPr.Fill && this.spPr.Fill.fill instanceof CBlipFill && typeof this.spPr.Fill.fill.RasterImageId === "string") {
-            images[_getFullImageSrc(this.spPr.Fill.fill.RasterImageId)] = true;
+            images[getFullImageSrc2(this.spPr.Fill.fill.RasterImageId)] = true;
         }
     },
 

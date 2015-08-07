@@ -5227,24 +5227,6 @@ function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)
 	g_fSaveWithParts(function(fCallback1, oAdditionalData1){sendCommand2(fCallback1, _sendCommandCallback, oAdditionalData1);}, fCallback, oAdditionalData);
 }
 
-function _getFullImageSrc(src)
-{
-    if (window["NATIVE_EDITOR_ENJINE"])
-        return src;
-    if (0 == src.indexOf("theme"))
-        return editor.ThemeLoader.ThemesUrl + src;
-    if(0 != src.indexOf("http:") && 0 != src.indexOf("data:") && 0 != src.indexOf("https:") && 0 != src.indexOf("ftp:") && 0 != src.indexOf("file:"))
-    {
-        if (0 == src.indexOf(editor.DocumentUrl))
-            return src;
-        if (0 == src.indexOf(editor.ThemeLoader.ThemesUrl))
-            return src;
-        return editor.DocumentUrl + "media/" + src;
-    }
-	else
-		return src;
-}
-
 //test
 window["asc_docs_api"] = asc_docs_api;
 window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, version)

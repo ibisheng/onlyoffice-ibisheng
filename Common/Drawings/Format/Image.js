@@ -658,7 +658,7 @@ CImageShape.prototype =
     {
         if(this.blipFill instanceof  CBlipFill && typeof this.blipFill.RasterImageId === "string")
         {
-            images[_getFullImageSrc(this.blipFill.RasterImageId)] = true;
+            images[getFullImageSrc2(this.blipFill.RasterImageId)] = true;
         }
     },
 
@@ -918,19 +918,7 @@ CImageShape.prototype =
                     {
                         if(typeof this.blipFill.RasterImageId === "string" && this.blipFill.RasterImageId.length > 0)
                         {
-                            var full_image_src_func;
-                            if((!editor || !editor.isDocumentEditor && !editor.isPresentationEditor) && typeof getFullImageSrc === "function")
-                            {
-                                full_image_src_func = getFullImageSrc;
-                            }
-                            else if(typeof _getFullImageSrc === "function")
-                            {
-                                full_image_src_func = _getFullImageSrc;
-                            }
-                            if(full_image_src_func)
-                            {
-                                CollaborativeEditing.Add_NewImage(full_image_src_func(this.blipFill.RasterImageId));
-                            }
+							CollaborativeEditing.Add_NewImage(getFullImageSrc2(this.blipFill.RasterImageId));
                         }
                     }
                 }

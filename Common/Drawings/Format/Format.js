@@ -4991,7 +4991,7 @@ function CompareUnifillBool(u1, u2)
                 return false;
 
             if(typeof u1.fill.RasterImageId === "string" && typeof u2.fill.RasterImageId === "string"
-                && _getFullImageSrc(u1.fill.RasterImageId) !== _getFullImageSrc(u2.fill.RasterImageId))
+                && getFullImageSrc2(u1.fill.RasterImageId) !== getFullImageSrc2(u2.fill.RasterImageId))
                 return false;
 
             if(u1.fill.VectorImageBin !== u2.fill.VectorImageBin)
@@ -8872,19 +8872,7 @@ CSpPr.prototype =
                     {
                         if(this.Fill.fill && this.Fill.fill.type === FILL_TYPE_BLIP && typeof this.Fill.fill.RasterImageId === "string" && this.Fill.fill.RasterImageId.length > 0)
                         {
-                            var full_image_src_func;
-                            if((!editor || !editor.isDocumentEditor && !editor.isPresentationEditor) && typeof getFullImageSrc === "function")
-                            {
-                                full_image_src_func = getFullImageSrc;
-                            }
-                            else if(typeof _getFullImageSrc === "function")
-                            {
-                                full_image_src_func = _getFullImageSrc;
-                            }
-                            if(full_image_src_func)
-                            {
-                                CollaborativeEditing.Add_NewImage(full_image_src_func(this.Fill.fill.RasterImageId));
-                            }
+							CollaborativeEditing.Add_NewImage(getFullImageSrc2(this.Fill.fill.RasterImageId));
                         }
                     }
                 }

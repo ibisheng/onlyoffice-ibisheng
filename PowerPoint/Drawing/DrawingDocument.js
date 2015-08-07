@@ -2859,7 +2859,7 @@ function CDrawingDocument()
         if (null == this.LastDrawingUrl)
             return;
 
-        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[_getFullImageSrc(this.LastDrawingUrl)];
+        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[getFullImageSrc2(this.LastDrawingUrl)];
         if (_img != undefined && _img.Image != null && _img.Status != ImageLoadStatus.Loading)
         {
             var _x = 0;
@@ -2929,7 +2929,7 @@ function CDrawingDocument()
         if (null == this.LastDrawingUrlSlide)
             return;
 
-        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[_getFullImageSrc(this.LastDrawingUrlSlide)];
+        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[getFullImageSrc2(this.LastDrawingUrlSlide)];
         if (_img != undefined && _img.Image != null && _img.Status != ImageLoadStatus.Loading)
         {
             var _x = 0;

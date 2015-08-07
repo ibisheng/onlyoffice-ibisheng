@@ -4847,7 +4847,7 @@ asc_docs_api.prototype.AddImage = function(){
 
 asc_docs_api.prototype.AddImageUrl2 = function(url)
 {
-    this.AddImageUrl(_getFullImageSrc(url));
+    this.AddImageUrl(getFullImageSrc2(url));
 };
 
 asc_docs_api.prototype.AddImageUrl = function(url, imgProp)
@@ -7210,21 +7210,6 @@ function  _asc_scrollTo (x,y)
 {
 	editor.WordControl.m_oScrollHorApi.scrollToX(x);
 	editor.WordControl.m_oScrollVerApi.scrollToY(y);
-}
-function _getFullImageSrc(src)
-{
-    if (window["NATIVE_EDITOR_ENJINE"])
-        return src;
-    
-  	var start = src.substring(0, 6);
-    if(0 != src.indexOf("http:") && 0 != src.indexOf("data:") && 0 != src.indexOf("https:") && 0 != src.indexOf("ftp:") && 0 != src.indexOf("file:"))
-    {
-        if (0 == src.indexOf(editor.DocumentUrl))
-            return src;
-        return editor.DocumentUrl + "media/" + src;
-    }
-	else
-		return src;
 }
 
 function CErrorData()
