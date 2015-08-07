@@ -777,7 +777,7 @@ CGraphicFrame.prototype =
     {
         if(this.parent && this.parent.graphicObjects)
         {
-            this.parent.graphicObjects.resetSelection();
+            this.parent.graphicObjects.resetSelection(true);
             if(this.group)
             {
                 var main_group = this.group.getMainGroup();

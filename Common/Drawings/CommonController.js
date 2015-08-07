@@ -2909,7 +2909,7 @@ DrawingObjectsController.prototype =
             {
                 chartSettings.bLine = true;
             }
-               
+
             if(chartSettings.showMarker)
             {
                 if(!chart_type.marker)
@@ -4104,21 +4104,21 @@ DrawingObjectsController.prototype =
         }
     },
 
-    cursorMoveRight: function(AddToSelect, Word)
+    cursorMoveRight: function(AddToSelect, Word, bFromPaste)
     {
         var target_text_object = getTargetTextObject(this);
         if(target_text_object)
         {
             if(target_text_object.getObjectType() === historyitem_type_GraphicFrame)
             {
-                target_text_object.graphicObject.Cursor_MoveRight(1, AddToSelect, Word);
+                target_text_object.graphicObject.Cursor_MoveRight(1, AddToSelect, Word, bFromPaste);
             }
             else
             {
                 var content = this.getTargetDocContent(undefined, true);
                 if(content)
                 {
-                    content.Cursor_MoveRight(AddToSelect, Word);
+                    content.Cursor_MoveRight(AddToSelect, Word, bFromPaste);
                 }
             }
             this.updateSelectionState();

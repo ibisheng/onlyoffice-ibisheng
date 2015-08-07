@@ -3372,7 +3372,7 @@ CPresentation.prototype =
         {
             if(this.Slides[this.CurPage].graphicObjects.getTargetDocContent(false, false))
             {
-                this.Slides[this.CurPage].graphicObjects.cursorMoveRight(false, false);
+                this.Slides[this.CurPage].graphicObjects.cursorMoveRight(false, false, true);
             }
         }
     },

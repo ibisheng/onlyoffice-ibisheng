@@ -762,6 +762,12 @@ ParaTextPr.prototype =
 
         if ( undefined != this.Value.RFonts.Hint )
             this.Set_RFonts_Hint( undefined );
+
+        if(undefined != this.Value.TextFill)
+            this.Set_TextFill( undefined );
+
+        if(undefined != this.Value.TextOutline)
+            this.Set_TextOutline( undefined );
     },
 
     Set_Prop : function(Prop, Value)
