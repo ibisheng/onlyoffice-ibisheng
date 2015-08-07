@@ -3606,7 +3606,8 @@ var maxIndividualValues = 10000;
 								tempResult.isDateFormat = cell.getNumFormat().isDateTimeFormat();
 								
 								//filter current button
-								if(!filterColumns[currentElemArray].Top10 && !isCustomFilters && !filterColumns[currentElemArray].isHideValue(val, isDateTimeFormat))
+								var checkValue = isDateTimeFormat ? val : text;
+								if(!filterColumns[currentElemArray].Top10 && !isCustomFilters && !filterColumns[currentElemArray].isHideValue(checkValue, isDateTimeFormat))
 									tempResult.visible = true;
 								else
 								{
