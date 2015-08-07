@@ -4150,7 +4150,7 @@ var maxIndividualValues = 10000;
 							var ref = findFiltersTo[i].Ref;
 							
 							//если переносим просто данные, причём шапки совпадают, то фильтр не очищаем
-							if(!(arnTo.r1 === ref.r1 && arnTo.c1 === ref.c1))
+							if(!(arnTo.r1 === ref.r1 && arnTo.c1 === ref.c1) && !arnFrom.containsRange(ref))
 								this.isEmptyAutoFilters(ref, null, null, null, findFilters);
 						}
 						applyStyleByCells = false;
