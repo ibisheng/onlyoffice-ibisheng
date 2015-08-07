@@ -1180,8 +1180,9 @@ var maxIndividualValues = 10000;
                         }
 						else
 							t._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, oldFilter.Ref);
-
-                        aWs.workbook.dependencyFormulas.delTableName(oldFilter.DisplayName,aWs.getName())
+						
+						if(isTablePart)
+							aWs.workbook.dependencyFormulas.delTableName(oldFilter.DisplayName,aWs.getName())
 					}
 					else
 						return oldFilter;
