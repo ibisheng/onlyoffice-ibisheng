@@ -29,32 +29,6 @@ function DrawingBounds(minX, maxX, minY, maxY)
     this.minY = minY;
     this.maxY = maxY;
 }
-function getFullImageSrc(src) {
-    if ( 0 != src.indexOf("http:") && 0 != src.indexOf("data:") && 0 != src.indexOf("https:") && 0 != src.indexOf("ftp:") && 0 != src.indexOf("file:") ) {
-        var api = window["Asc"]["editor"];
-        if(api)
-        {
-            if ( 0 == src.indexOf(g_sResourceServiceLocalUrl + api.documentId) )
-                return src;
-            return g_sResourceServiceLocalUrl + api.documentId + "/media/" + src;
-        }
-        else
-        {
-            if(editor)
-            {
-                if (0 == src.indexOf(editor.DocumentUrl))
-                    return src;
-                return editor.DocumentUrl + "media/" + src;
-            }
-            else
-            {
-                return src;
-            }
-        }
-    }
-    else
-        return src;
-}
 
 function getCurrentTime() {
     var currDate = new Date();
@@ -956,7 +930,7 @@ function DrawingObjects() {
 
         for(i = 0; i < aImagesSync.length; ++i)
         {
-            aImagesSync[i] = getFullImageSrc(aImagesSync[i]);
+            aImagesSync[i] = getFullImageSrc2(aImagesSync[i]);
         }
 
         // Загружаем все картинки листа
@@ -2620,7 +2594,7 @@ function DrawingObjects() {
 
             var imageUrl = selectedObjects[0].getImageUrl();
 
-            var _image = api.ImageLoader.map_image_index[getFullImageSrc(imageUrl)];
+            var _image = api.ImageLoader.map_image_index[getFullImageSrc2(imageUrl)];
             if (_image != undefined && _image.Image != null && _image.Status == ImageLoadStatus.Complete) {
 
                 var _w = 1, _h = 1;

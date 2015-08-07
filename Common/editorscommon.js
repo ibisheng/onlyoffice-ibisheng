@@ -197,8 +197,8 @@ function getFullImageSrc2 (src) {
 		return themesUrl + src;
 
 	if (0 !== start.indexOf('http:') && 0 !== start.indexOf('data:') && 0 !== start.indexOf('https:') &&
-		0 !== start.indexOf('file:') && 0 !== start.indexOf('ftp:') && 0 !== start.indexOf(documentUrl) &&
-		0 !== start.indexOf(themesUrl))
+		0 !== start.indexOf('file:') && 0 !== start.indexOf('ftp:') && 0 !== src.indexOf(documentUrl) &&
+		0 !== src.indexOf(themesUrl))
 		return documentUrl + 'media/' + src;
 	return src;
 }

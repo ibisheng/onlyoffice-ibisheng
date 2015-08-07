@@ -91,7 +91,7 @@ function CBinaryFileWriter()
     this.Start_UseDocumentOrigin = function(origin)
     {
         this.PresentationThemesOrigin = origin + "/presentationthemes/";
-    }
+    };
 
     this.End_UseFullUrl = function()
     {

@@ -828,11 +828,11 @@ CShapeDrawer.prototype =
             {
                 if (null == this.UniFill.fill.tile || this.Graphics.m_oContext === undefined)
                 {
-                    this.Graphics.put_brushTexture(getFullImageSrc(this.UniFill.fill.RasterImageId), 0);
+                    this.Graphics.put_brushTexture(getFullImageSrc2(this.UniFill.fill.RasterImageId), 0);
                 }
                 else
                 {
-                    this.Graphics.put_brushTexture(getFullImageSrc(this.UniFill.fill.RasterImageId), 1);
+                    this.Graphics.put_brushTexture(getFullImageSrc2(this.UniFill.fill.RasterImageId), 1);
                 }
 
                 if (bIsIntegerGridTRUE)
@@ -861,13 +861,13 @@ CShapeDrawer.prototype =
 
                     if ((null == this.UniFill.transparent) || (this.UniFill.transparent == 255))
                     {
-                        this.Graphics.drawImage(getFullImageSrc(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect, this.UniFill.fill.canvas);
+                        this.Graphics.drawImage(getFullImageSrc2(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect, this.UniFill.fill.canvas);
                     }
                     else
                     {
                         var _old_global_alpha = this.Graphics.m_oContext.globalAlpha;
                         this.Graphics.m_oContext.globalAlpha = this.UniFill.transparent / 255;
-                        this.Graphics.drawImage(getFullImageSrc(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect, this.UniFill.fill.canvas);
+                        this.Graphics.drawImage(getFullImageSrc2(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect, this.UniFill.fill.canvas);
                         this.Graphics.m_oContext.globalAlpha = _old_global_alpha;
                     }
                 }
@@ -878,13 +878,13 @@ CShapeDrawer.prototype =
 
                     if (this.Graphics.IsNoSupportTextDraw == true || true == this.Graphics.IsTrack || (null == this.UniFill.transparent) || (this.UniFill.transparent == 255))
                     {
-                        this.Graphics.drawImage(getFullImageSrc(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect, this.UniFill.fill.canvas);
+                        this.Graphics.drawImage(getFullImageSrc2(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect, this.UniFill.fill.canvas);
                     }
                     else
                     {
                         var _old_global_alpha = this.Graphics.m_oContext.globalAlpha;
                         this.Graphics.m_oContext.globalAlpha = this.UniFill.transparent / 255;
-                        this.Graphics.drawImage(getFullImageSrc(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect, this.UniFill.fill.canvas);
+                        this.Graphics.drawImage(getFullImageSrc2(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect, this.UniFill.fill.canvas);
                         this.Graphics.m_oContext.globalAlpha = _old_global_alpha;
                     }
 
@@ -894,7 +894,7 @@ CShapeDrawer.prototype =
             else
             {
                 var editor = window["Asc"]["editor"];
-                var _img = editor.ImageLoader.map_image_index[getFullImageSrc(this.UniFill.fill.RasterImageId)];
+                var _img = editor.ImageLoader.map_image_index[getFullImageSrc2(this.UniFill.fill.RasterImageId)];
                 var _img_native = this.UniFill.fill.canvas;
                 if ((!_img_native) && (_img == undefined || _img.Image == null || _img.Status == ImageLoadStatus.Loading))
                 {
@@ -903,13 +903,13 @@ CShapeDrawer.prototype =
 
                     if (this.Graphics.IsNoSupportTextDraw === true || true == this.Graphics.IsTrack || (null == this.UniFill.transparent) || (this.UniFill.transparent == 255))
                     {
-                        this.Graphics.drawImage(getFullImageSrc(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y));
+                        this.Graphics.drawImage(getFullImageSrc2(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y));
                     }
                     else
                     {
                         var _old_global_alpha = this.Graphics.m_oContext.globalAlpha;
                         this.Graphics.m_oContext.globalAlpha = this.UniFill.transparent / 255;
-                        this.Graphics.drawImage(getFullImageSrc(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y));
+                        this.Graphics.drawImage(getFullImageSrc2(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y));
                         this.Graphics.m_oContext.globalAlpha = _old_global_alpha;
                     }
 
@@ -1342,21 +1342,7 @@ CShapeDrawer.prototype =
                         {
                             if (this.UniFill.fill.RasterImageId && this.UniFill.fill.RasterImageId.indexOf(".svg") != 0)
                             {
-                                /*
-                                this.Graphics.SaveGrState();
-                                this.Graphics.StartClipPath();
-                                this.Graphics.EndClipPath();
-
-                                this.Graphics.drawImage(getFullImageSrc(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, undefined);
-                                bIsFill = false;
-
-                                // это чтобы слипы были не пустые - и отменились при восстановлении
-                                var _histClip = new CHist_Clip();
-                                this.Graphics.GrState.Clips.push(_histClip);
-
-                                this.Graphics.RestoreGrState();
-                                */
-                                this.Graphics.put_brushTexture(getFullImageSrc(this.UniFill.fill.RasterImageId), 0);
+                                this.Graphics.put_brushTexture(getFullImageSrc2(this.UniFill.fill.RasterImageId), 0);
                             }
                             else
                             {
@@ -1366,28 +1352,13 @@ CShapeDrawer.prototype =
                                 }
                                 else
                                 {
-                                    this.Graphics.put_brushTexture(getFullImageSrc(this.UniFill.fill.RasterImageId), 0);
+                                    this.Graphics.put_brushTexture(getFullImageSrc2(this.UniFill.fill.RasterImageId), 0);
                                 }
                             }
                         }
                         else
                         {
-                            /*
-                            this.Graphics.SaveGrState();
-                            this.Graphics.StartClipPath();
-                            this.Graphics.EndClipPath();
-
-                            this.Graphics.drawImage(getFullImageSrc(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect);
-                            bIsFill = false;
-
-                            // это чтобы слипы были не пустые - и отменились при восстановлении
-                            var _histClip = new CHist_Clip();
-                            this.Graphics.GrState.Clips.push(_histClip);
-
-                            this.Graphics.RestoreGrState();
-                            */
-
-                            this.Graphics.drawImage(getFullImageSrc(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect);
+                            this.Graphics.drawImage(getFullImageSrc2(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect);
                             bIsFill = false;
                         }
                     }
@@ -1399,7 +1370,7 @@ CShapeDrawer.prototype =
                         }
                         else
                         {
-                            this.Graphics.put_brushTexture(getFullImageSrc(this.UniFill.fill.RasterImageId), 1);
+                            this.Graphics.put_brushTexture(getFullImageSrc2(this.UniFill.fill.RasterImageId), 1);
                         }
                     }
                     this.Graphics.put_BrushTextureAlpha(this.UniFill.transparent);
@@ -1905,7 +1876,7 @@ function ShapeToImageConverter(shape, pageIndex)
     catch (err)
     {
         if (shape.brush != null && shape.brush.fill && shape.brush.fill.RasterImageId)
-            _ret.ImageUrl = getFullImageSrc(shape.brush.fill.RasterImageId);
+            _ret.ImageUrl = getFullImageSrc2(shape.brush.fill.RasterImageId);
         else
             _ret.ImageUrl = "";
     }

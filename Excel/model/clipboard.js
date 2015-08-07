@@ -3127,7 +3127,7 @@
 							if(isImage)
 								imageUrl = cloneImg.graphicObject.getImageUrl();
 							if(isImage && imageUrl)
-								url = getFullImageSrc(imageUrl);
+								url = getFullImageSrc2(imageUrl);
 							else
 								url = cloneImg.graphicObject.getBase64Img();
 							curImage.alt = altAttr;

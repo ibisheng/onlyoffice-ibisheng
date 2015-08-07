@@ -2254,7 +2254,7 @@ function CDrawingDocument(drawingObjects)
             var _len = _imgs.length;
             for (var j = 0; j < _len; j++)
             {
-                if (getFullImageSrc(_imgs[j]) == src)
+                if (getFullImageSrc2(_imgs[j]) == src)
                 {
                     this.StopRenderingPage(i);
                     bIsRaster = true;
@@ -4317,7 +4317,7 @@ function CDrawingDocument(drawingObjects)
             return;
 
 		var api = window["Asc"]["editor"];
-        var _img = api.ImageLoader.map_image_index[getFullImageSrc(this.LastDrawingUrl)];
+        var _img = api.ImageLoader.map_image_index[getFullImageSrc2(this.LastDrawingUrl)];
         if (_img != undefined && _img.Image != null && _img.Status != ImageLoadStatus.Loading)
         {
             var _x = 0;

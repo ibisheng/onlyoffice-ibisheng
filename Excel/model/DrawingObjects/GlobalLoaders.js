@@ -51,13 +51,7 @@
 
             for (var id in _images)
             {
-                /*
-                if (isUrl === false)
-                    this.images_loading[this.images_loading.length] = _images[id];
-                else
-                    this.images_loading[this.images_loading.length] = getFullImageSrc(_images[id]);
-                */
-                this.images_loading[this.images_loading.length] = getFullImageSrc(_images[id]);
+                this.images_loading[this.images_loading.length] = getFullImageSrc2(_images[id]);
             }
 
             if (!this.bIsAsyncLoadDocumentImages)
