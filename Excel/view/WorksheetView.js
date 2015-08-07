@@ -6556,7 +6556,7 @@
 			cell_info.valign = c.getAlignVertical().toLowerCase();
 			
 			var tablePartsOptions = this.autoFilters.searchRangeInTableParts(activeCell);
-			var curTablePart = tablePartsOptions !== -1 && tablePartsOptions !== -2 && this.model.TableParts && this.model.TableParts[tablePartsOptions].TableStyleInfo ? this.model.TableParts[tablePartsOptions] : null;
+			var curTablePart = tablePartsOptions >= 0 ? this.model.TableParts[tablePartsOptions] : null;
 			
 			cell_info.autoFilterInfo = new asc_CAutoFilterInfo();
 			cell_info.autoFilterInfo.tableStyleName = curTablePart ? curTablePart.TableStyleInfo.Name : null;
