@@ -235,30 +235,28 @@ CParaMathLineWidths.prototype.UpdateWidth = function(Line, W)
 
     this.Widths[Line].Measure = W; // присваиваем до RecalcMaxMin
 
-    if(Line !== 0)
+    if(bFastUpdate)
     {
-        if(bFastUpdate)
-        {
-            bUpdMaxWidth = this.UpdateMinMax(Line);
-        }
-        else if(bNeedUpdate)
-        {
-            var lng = this.Widths.length;
-            var Max = this.MaxW;
-
-            if(lng > 1)
-            {
-                this.MaxW = this.Widths[1].Measure;
-
-                for(var i = 2; i < lng; i++)
-                {
-                    this.UpdateMinMax(i);
-                }
-            }
-
-            bUpdMaxWidth = Math.abs(Max - this.MaxW) > 0.0001;
-        }
+        bUpdMaxWidth = this.UpdateMinMax(Line);
     }
+    else if(bNeedUpdate)
+    {
+        var lng = this.Widths.length;
+        var Max = this.MaxW;
+
+        if(lng > 0)
+        {
+            this.MaxW = this.Widths[0].Measure;
+
+            for(var i = 1; i < lng; i++)
+            {
+                this.UpdateMinMax(i);
+            }
+        }
+
+        bUpdMaxWidth = Math.abs(Max - this.MaxW) > 0.0001;
+    }
+
 
     return bUpdMaxWidth;
 };
@@ -358,6 +356,10 @@ CMathInfo.prototype.GetNumberLine = function(Line)
 {
     return Line - this.FirstLineOnPage;
 };
+CMathInfo.prototype.GetMax = function()
+{
+    return this.LineWidths.MaxW;
+};
 
 function CMathPageInfo()
 {
@@ -383,7 +385,6 @@ CMathPageInfo.prototype.UpdateCurrentPage = function(Page, ParaLine)
     var Lng = this.Info.length;
     if(this.CurPage >= Lng)
     {
-        //var FirstLineOnPage = Lng == 0 ? 0 : PrevInfo.FirstLineOnPage + PrevInfo.GetCountLines();
         var FirstLineOnPage = ParaLine - this.StartLine;
 
         this.Info[this.CurPage] = new CMathInfo();
@@ -425,10 +426,7 @@ CMathPageInfo.prototype.SetNextWrapState = function()
 CMathPageInfo.prototype.SetStateWordLarge = function(_Line, bWordLarge)
 {
     var Line = this.Info[this.CurPage].GetNumberLine(_Line - this.StartLine);
-
     this.Info[this.CurPage].LineWidths.SetWordLarge(Line, bWordLarge);
-
-    //var Line = _Line - this.StartLine - this.Info[this.CurPage].FirstLineOnPage;
 };
 CMathPageInfo.prototype.GetWrap = function(_Page)
 {
@@ -465,7 +463,7 @@ CMathPageInfo.prototype.ReverseCurrentMaxW = function(_Line)
 };
 CMathPageInfo.prototype.GetCurrentMaxWidth = function()
 {
-    return this.Info[this.CurPage].LineWidths.GetMax();
+    return this.Info[this.CurPage].GetMax();
 };
 CMathPageInfo.prototype.GetCurrentMaxWidthAllLines = function()
 {
@@ -489,11 +487,11 @@ CMathPageInfo.prototype.GetCurrentMaxWidthAllLines = function()
 
     return MaxW;
 };
-CMathPageInfo.prototype.GetMaxWidthOnPage = function(_Page) // without first page
+CMathPageInfo.prototype.GetMaxW = function(_Page) // without first page
 {
     var Page = _Page - this.StartPage;
 
-    return this.Info[Page].LineWidths.GetMax();
+    return this.Info[Page].GetMax();
 };
 CMathPageInfo.prototype.SetCurrentMaxWidth = function(MaxW)
 {
@@ -743,6 +741,7 @@ ParaMath.prototype.Add = function(Item)
     // Корректируем данный контент
     oContent.Correct_Content(true);
 };
+
 ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _XLimit)
 {
     var X = _X;
@@ -756,10 +755,10 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
 
     var wrap = 0;
     var bFirstLine = this.Root.IsStartLine(_CurLine);
+    var wrapIndent = MathSettings.Get_WrapIndent(WrapState);
 
     if(bFirstLine == false && true == MathSettings.IsWrap(WrapState))
     {
-        var wrapIndent = MathSettings.Get_WrapIndent(WrapState);
         wrap = this.Root.Get_WrapToLine(_CurLine, _CurRange, wrapIndent);
     }
 
@@ -782,28 +781,12 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
 
     var Jc = this.Get_Align();
 
-    var LinesCount = this.Root.protected_GetLinesCount();
-
-    var StartLineWidth = LinesCount > 0 ? this.PageInfo.GetStarLinetWidth() : 0; // если страница не первая, то ширину первой строки формулы не учитываем
-
-    var W = 0;
-    var MaxW = this.PageInfo.GetMaxWidthOnPage(Page);
-
-    if( this.PageInfo.IsFirstPage(Page) ) // CurrentPage == 0
-    {
-        var bSingleLine = LinesCount == 1 && this.Root.Math_Is_End(_CurLine, _CurRange);
-        if(bSingleLine)  // чтобы не сравнивать с wrapIndent, когда формула занимает одну строку
-            W = StartLineWidth;
-        else
-            W = Math.max(MaxW + wrap, StartLineWidth);
-    }
-    else
-    {
-        W = MaxW;
-    }
+    var W = this.PageInfo.GetMaxW(Page);
 
     if(bFirstLine == true) // первая строка первой страницы, если строка разбивается на несколько отрезко, то это уже будет inline-формула
     {
+        var StartLineWidth = this.PageInfo.GetStarLinetWidth(); // если страница не первая, то ширину первой строки формулы не учитываем
+
         switch(Jc)
         {
             case align_Left:    X = XStart; break;
@@ -831,6 +814,7 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
 
     return X;
 };
+
 ParaMath.prototype.Remove = function(Direction, bOnAddText)
 {
     var oSelectedContent = this.GetSelectContent();
@@ -1168,14 +1152,12 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.protected_UpdateSpellChecking();
     }
 
-    var AbsolutePage = this.Paragraph == null ? 0 : this.Paragraph.Get_StartPage_Absolute();
+    this.AbsolutePage = this.Paragraph == null ? 0 : this.Paragraph.Get_StartPage_Absolute();
 
     var Para      = PRS.Paragraph;
     var ParaLine  = PRS.Line;
     var ParaRange = PRS.Range;
-    var Page      = AbsolutePage + PRS.Page;
-
-    this.AbsolutePage = AbsolutePage;
+    var Page      = this.AbsolutePage + PRS.Page;
 
     if(this.ParaMathRPI.CheckPrevLine(ParaLine, ParaRange)) // пропускаем все Range в текущей строке, пока не прийдет пересчет для стартового отрезка
     {
@@ -1248,8 +1230,13 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         if(PrevLineObject == null ||  PrevLineObject == this)
         {
             PRS.RecalcResult = recalcresult_NextLine;
-            if(this.ParaMathRPI.bInline == true) // сделана проверка для случая с обтеканием картинки
-                PRS.Reset_RestartPageRecalcInfo();
+            //if(this.ParaMathRPI.bInline == true) // сделана проверка для случая с обтеканием картинки
+            //if(this.ParaMathRPI.bInternalRanges == false) // сделана проверка для случая с обтеканием картинки
+            //  PRS.Reset_RestartPageRecalcInfo();
+
+            // попадем сюда только, когда  либо нет плавающих объектов, привязанных к предыдущему параграфу,
+            // либо когда не получилось расположить формулу в одном Range и формула пересчитывается обычным образом
+            PRS.Reset_RestartPageRecalcInfo();
         }
 
         this.private_RecalculateRoot(PRS, ParaPr, Depth);
@@ -1567,16 +1554,20 @@ ParaMath.prototype.UpdateWidthLine = function(PRS, Width)
 
     if(PrevRecalcObject == null || PrevRecalcObject == this)
     {
-        var W = Width - PRS.OperGapRight - PRS.OperGapLeft;
+        var MathSettings = Get_WordDocumentDefaultMathSettings(),
+            Page = this.AbsolutePage + PRS.Page;
+
+        var WrapState = this.PageInfo.GetWrap(Page), // если впоследствии State будет изменен, то пересчитаем с первой строки текущей страницы
+            WrapIndent = MathSettings.Get_WrapIndent(WrapState);
+
+        var wrap = PRS.Page == 0 ? this.Root.Get_WrapToLine(PRS.Line, PRS.Range, WrapIndent) : 0;
+        var W = Width - PRS.OperGapRight - PRS.OperGapLeft + wrap;
+
         var bChangeMaxW = this.PageInfo.UpdateCurrentWidth(PRS.Line, W);
 
         if(bChangeMaxW == true && this.Is_Inline() == false && align_Justify == this.Get_Align())
         {
-            var AbsolutePage = this.Paragraph == null ? 0 : this.Paragraph.Get_StartPage_Absolute();
-            var Page      = AbsolutePage + PRS.Page;
-
             var Line = this.PageInfo.GetFirstLineOnPage(Page);
-
             this.UpdateInfoForBreak(PRS, Line);
         }
     }

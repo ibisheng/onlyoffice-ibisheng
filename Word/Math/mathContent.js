@@ -3840,12 +3840,6 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var RangeStartPos = this.protected_AddRange(CurLine, CurRange);
     var RangeEndPos   = ContentLen - 1;
 
-    /*if(this.bOneLine)
-    {
-        RangeStartPos = 0;
-        RangeEndPos   = ContentLen - 1;
-    }*/
-
     if(this.RecalcInfo.bEqArray)
         this.InfoPoints.SetDefault();
 
@@ -3959,8 +3953,6 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
             PRS.bInsideOper = false;
 
-            //PRS.bMath_OneLine = Type == para_Math_Composition && bOnlyForcedBreak == true;
-
             Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
 
             PRS.bBoxOperator = Type == para_Math_Composition && Item.kind == MATH_BOX;
@@ -3978,22 +3970,6 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     {
                         this.private_ForceBreakBox(PRS, BoxLen);
 
-                        /*if(true == PRS.MathFirstItem)
-                        {
-                            PRS.WordLen += BoxLen;
-                        }
-                        else
-                        {
-                            PRS.bInsideOper = true;
-                            PRS.X += PRS.SpaceLen + PRS.WordLen;
-                            PRS.Update_CurPos(PrevLastPos, _Depth-1);
-                            PRS.Set_LineBreakPos(LastPos);
-
-                            this.ParaMath.UpdateWidthLine(PRS, PRS.X - PRS.XRange);
-
-                            PRS.MoveToLBP = true;
-                            PRS.NewRange = true;
-                        }*/
                     }
                     else if(true == Item.IsOperatorEmulator())
                     {
@@ -4001,11 +3977,11 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         {
                             PRS.X += PRS.SpaceLen + PRS.WordLen;
 
-                            if(true == PRS.MathFirstItem/*PRS.FirstItemOnLine == true && PRS.Word == false*/)
+                            if(true == PRS.MathFirstItem)
                             {
                                 PRS.WordLen += BoxLen;
                             }
-                            else/* if(PRS.Word == true)*/
+                            else
                             {
                                 // обновим : начало нового слова - конец предыдущего Run
                                 PRS.bInsideOper = true;

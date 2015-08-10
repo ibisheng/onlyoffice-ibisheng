@@ -2286,13 +2286,11 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     bNoOneBreakOperator = false;
 
-                    var bFirstItem = true === FirstItemOnLine /*&& true === Para.Internal_Check_Ranges(ParaLine, ParaRange)*/;
-
                     if(bOperInEndContent || bLowPriority)
                     {
                         if(X + SpaceLen + WordLen + BrkLen > XEnd)
                         {
-                            if(bFirstItem == true)
+                            if(FirstItemOnLine == true)
                             {
                                 bMathWordLarge = true;
                             }
@@ -2316,22 +2314,22 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                         var bCompareWrapIndent = PRS.bFirstLine == true ? WorLenCompareOper > PRS.WrapIndent : true;
 
-                        if(PRS.bPriorityOper == true && bCompareOper == true && bFirstCompareOper == true && bCompareWrapIndent == true && !(Word == false && bFirstItem == true)) // (Word == true && FirstItemOnLine == true) - не первый элемент в строке
+                        if(PRS.bPriorityOper == true && bCompareOper == true && bFirstCompareOper == true && bCompareWrapIndent == true && !(Word == false && FirstItemOnLine === true)) // (Word == true && FirstItemOnLine == true) - не первый элемент в строке
                             bFirstCompareOper = false;
 
                         if(bOperBefore)  // оператор "до" => оператор находится в начале строки
                         {
-                            bOverXEnd = X + WordLen + SpaceLen > XEnd;
+                            bOverXEnd = X + WordLen + SpaceLen + BrkLen > XEnd; // BrkLen прибавляем дла случая, если идут подряд Brk Operators в конце
 
 
-                            if(bOverXEnd && bFirstItem == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                            if(bOverXEnd && FirstItemOnLine === false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                             {
                                 MoveToLBP = true;
                                 NewRange = true;
                             }
                             else
                             {
-                                if(bFirstItem == false)
+                                if(FirstItemOnLine === false)
                                     bInsideOper = true;
 
                                 if(Word == true)
@@ -2355,10 +2353,13 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                     if(FirstItemOnLine == false)
                                     {
                                         PRS.Set_LineBreakPos(Pos);
+                                        X += SpaceLen + WordLen;
+                                        SpaceLen = BrkLen;
+                                        WordLen = 0;
                                     }
                                     else
                                     {
-                                        SpaceLen += BrkLen - Item.GapLeft;
+                                        SpaceLen += BrkLen;
                                     }
 
                                 }
@@ -2368,7 +2369,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         {
                             bOverXEnd = X + WordLen + BrkLen - Item.GapRight > XEnd;
 
-                            if(bOverXEnd && bFirstItem == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                            if(bOverXEnd && FirstItemOnLine === false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                             {
                                 MoveToLBP = true;
                                 NewRange = true;
