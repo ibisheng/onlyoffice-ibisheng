@@ -1380,6 +1380,184 @@ function asc_menu_WriteFontFamily(_type, _family, _stream)
     _stream["WriteByte"](255);
 }
 
+function asc_WriteCBorder(i, c, s) {
+    if (!c) return;
+
+    s['WriteByte'](i);
+
+    if (c.asc_getStyle()) {
+        s['WriteByte'](0);
+        s['WriteLong'](c.asc_getStyle());
+    }
+
+    if (c.asc_getColor()) {
+        s['WriteByte'](1);
+        s['WriteLong'](c.asc_getColor());
+    }
+
+    s['WriteByte'](255);
+}
+function asc_WriteCHyperLink(i, c, s) {
+    if (!c) return;
+
+    s['WriteByte'](i);
+
+    s['WriteByte'](0);
+    s['WriteLong'](c.asc_getType());
+
+    if (c.asc_getHyperlinkUrl()) {
+        s['WriteByte'](1);
+        s['WriteString2'](c.asc_getHyperlinkUrl());
+    }
+
+    if (c.asc_getTooltip()) {
+        s['WriteByte'](2);
+        s['WriteString2'](c.asc_getTooltip());
+    }
+
+    if (c.asc_getLocation()) {
+        s['WriteByte'](3);
+        s['WriteString2'](c.asc_getLocation());
+    }
+
+    if (c.asc_getSheet()) {
+        s['WriteByte'](4);
+        s['WriteString2'](c.asc_getSheet());
+    }
+
+    if (c.asc_getRange()) {
+        s['WriteByte'](5);
+        s['WriteString2'](c.asc_getRange());
+    }
+
+    if (c.asc_getText()) {
+        s['WriteByte'](6);
+        s['WriteString2'](c.asc_getText());
+    }
+
+    s['WriteByte'](255);
+}
+function asc_WriteCFont(i, c, s) {
+    if (!c) return;
+
+    if (i !== -1) s['WriteByte'](i);
+
+    s['WriteByte'](0);
+    s['WriteString2'](c.asc_getName());
+    s['WriteDouble2'](c.asc_getSize());
+    s['WriteBool'](c.asc_getBold());
+    s['WriteBool'](c.asc_getItalic());
+    s['WriteBool'](c.asc_getUnderline());
+    s['WriteBool'](c.asc_getStrikeout());
+    s['WriteBool'](c.asc_getSubscript());
+    s['WriteBool'](c.asc_getSuperscript());
+
+    if (c.asc_getColor()) {
+        asc_menu_WriteColor(1, c.asc_getColor(), s);
+    }
+
+    s['WriteByte'](255);
+}
+function asc_WriteCBorders(i, c, s) {
+    if (!c) return;
+
+    s['WriteByte'](i);
+
+    if (c.asc_getLeft()) asc_WriteCBorder(0, c.asc_getLeft(), s);
+    if (c.asc_getTop()) asc_WriteCBorder(0, c.asc_getTop(), s);
+    if (c.asc_getRight()) asc_WriteCBorder(0, c.asc_getRight(), s);
+    if (c.asc_getBottom()) asc_WriteCBorder(0, c.asc_getBottom(), s);
+    if (c.asc_getDiagDown()) asc_WriteCBorder(0, c.asc_getDiagDown(), s);
+    if (c.asc_getDiagUp()) asc_WriteCBorder(0, c.asc_getDiagUp(), s);
+
+    s['WriteByte'](255);
+}
+function asc_WriteCCelInfo(c, s) {
+    if (!c) return;
+
+    if (null !== c.asc_getName()) {
+        s['WriteByte'](0);
+        s['WriteString2'](c.asc_getName());
+    }
+
+    if (null != c.asc_getFormula()) {
+        s['WriteByte'](1);
+        s['WriteString2'](c.asc_getFormula());
+    }
+
+    if (null !== c.asc_getText()) {
+        s['WriteByte'](2);
+        s['WriteString2'](c.asc_getText());
+    }
+
+    if (null !== c.asc_getHorAlign()) {
+        s['WriteByte'](3);
+        s['WriteString2'](c.asc_getHorAlign());
+    }
+
+    if (null !== c.asc_getVertAlign()) {
+        s['WriteByte'](4);
+        s['WriteString2'](c.asc_getVertAlign());
+    }
+
+    if (null !== c.asc_getFlags()) {
+        s['WriteByte'](5);
+        s['WriteBool'](c.asc_getFlags().asc_getMerge());
+        s['WriteBool'](c.asc_getFlags().asc_getShrinkToFit());
+        s['WriteBool'](c.asc_getFlags().asc_getWrapText());
+        s['WriteLong'](c.asc_getFlags().asc_getSelectionType());
+        s['WriteBool'](c.asc_getFlags().asc_getLockText());
+    }
+
+    asc_WriteCFont(6, c.asc_getFont(), s);
+    asc_menu_WriteColor(8, c.asc_getFill().asc_getColor(), s);
+    asc_WriteCBorders(9, c.asc_getBorders(), s);
+
+    if (null !== c.asc_getInnerText()) {
+        s['WriteByte'](15);
+        s['WriteString2'](c.asc_getInnerText());
+    }
+
+    if (null !== c.asc_getNumFormat()) {
+        s['WriteByte'](16);
+        s['WriteString2'](c.asc_getNumFormat());
+    }
+
+    asc_WriteCHyperLink(17, c.asc_getHyperlink(), s);
+
+    s['WriteByte'](18);
+    s['WriteBool'](c.asc_getLocked());
+
+    s['WriteByte'](19);
+    s['WriteBool'](c.asc_getIsFormatTable());
+
+    if (null != c.asc_getTableStyleName()) {
+        s['WriteByte'](20);
+        s['WriteString2'](c.asc_getTableStyleName());
+    }
+
+    if (null != c.asc_getStyleName()) {
+        s['WriteByte'](21);
+        s['WriteString2'](c.asc_getStyleName());
+    }
+
+    if (null != c.asc_getNumFormatType()) {
+        s['WriteByte'](22);
+        s['WriteLong'](c.asc_getNumFormatType());
+    }
+    if (null != c.asc_getAngle()) {
+        s['WriteByte'](23);
+        s['WriteDouble2'](c.asc_getAngle());
+    }
+
+    s['WriteByte'](24);
+    s['WriteBool'](c.asc_getClearFilter());
+
+    s['WriteByte'](25);
+    s['WriteBool'](c.asc_getIsAutoFilter());
+
+    s['WriteByte'](255);
+}
 
 //--------------------------------------------------------------------------------
 // defines
@@ -1429,14 +1607,12 @@ function OfflineEditor () {
             stream["WriteBool"](bCanUndo);
             window["native"]["OnCallMenuEvent"](60, stream); // ASC_MENU_EVENT_TYPE_CAN_UNDO
         });
-
         _api.asc_registerCallback('asc_onCanRedoChanged', function (bCanRedo) {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
             stream["WriteBool"](bCanRedo);
             window["native"]["OnCallMenuEvent"](61, stream); // ASC_MENU_EVENT_TYPE_CAN_REDO
         });
-
         _api.asc_registerCallback('asc_onDocumentModifiedChanged', function(change) {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
@@ -1446,13 +1622,24 @@ function OfflineEditor () {
         _api.asc_registerCallback("asc_onActiveSheetChanged", function(index) {
             t.asc_WriteAllWorksheets(true, true);
         });
-
         _api.asc_registerCallback('asc_onRenameCellTextEnd', function(found, replaced) {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
             stream["WriteLong"](found);
             stream["WriteLong"](replaced);
             window["native"]["OnCallMenuEvent"](63, stream); // ASC_MENU_EVENT_TYPE_SEARCH_REPLACETEXT
+        });
+        _api.asc_registerCallback('asc_onSelectionChanged', function(cellInfo) {
+            var stream = global_memory_stream_menu;
+            stream["ClearNoAttack"]();
+            asc_WriteCCelInfo(cellInfo, stream);
+            window["native"]["OnCallMenuEvent"](2402, stream); // ASC_SPREADSHEETS_EVENT_TYPE_SELECTION_CHANGED
+        });
+        _api.asc_registerCallback('asc_onEditorSelectionChanged', function(font) {
+            var stream = global_memory_stream_menu;
+            stream["ClearNoAttack"]();
+            asc_WriteCFont(-1, font, stream);
+            window["native"]["OnCallMenuEvent"](2403, stream); // ASC_SPREADSHEETS_EVENT_TYPE_EDITOR_SELECTION_CHANGED
         });
     };
 
@@ -1477,47 +1664,46 @@ function OfflineEditor () {
 
         return _api.wb.getWorksheet()._getDrawSelection_Local(region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd);
     };
-    this.cellAtCoord = function(x, y) {
-        var cell = [];
+    this.getNearCellCoord = function(x, y) {
 
-        var worksheet = _api.wb.getWorksheet();
-        var count = 0;
-        var i = 0;
+        //TODO: оптимизировать поиск ячейки по координатам ( bin2_search )
 
-        //TODO: доделать
-       //// cell.push(worksheet.cols[2].left - worksheet.cols[0].left);
-       //// cell.push(worksheet.rows[2].top - worksheet.rows[0].top);
+        var cell = [],
+            worksheet = _api.wb.getWorksheet(),
+            count = 0,
+            i = 0;
 
         count = worksheet.cols.length;
         if (count) {
-            if (worksheet.cols[0].left > x)
+            if (worksheet.cols[0].left > x) {
                 cell.push(0);
-            else
+            } else {
                 for (i = 0; i < count; ++i) {
-                    if (worksheet.cols[i].left- worksheet.cols[0].left <= x &&
+                    if (worksheet.cols[i].left - worksheet.cols[0].left <= x &&
                         x < worksheet.cols[i].left + worksheet.cols[i].width - worksheet.cols[0].left) {
 
-                        cell.push(worksheet.cols[i].left - worksheet.cols[0].left);
-                        //if (x -  worksheet.cols[i].left - worksheet.cols[0].left > worksheet.cols[i].width * 0.5) {
-                        cell.push(worksheet.cols[i + 1].left - worksheet.cols[0].left);
-                        //}
-                        //else {
-                        //     cell.push(worksheet.cols[i].left - worksheet.cols[0].left);
-                        //}
+                        if (x - worksheet.cols[i].left - worksheet.cols[0].left > worksheet.cols[i].width * 0.5) {
+                            cell.push(worksheet.cols[i + 1].left- worksheet.cols[0].left);
+                        }
+                        else {
+                            cell.push(worksheet.cols[i].left - worksheet.cols[0].left);
+                        }
 
                         break;
                     }
                 }
+            }
         }
 
         count = worksheet.rows.length;
         if (count) {
-            if (worksheet.rows[0].top > y)
+            if (worksheet.rows[0].top > y) {
                 cell.push(0);
-            else
+            } else {
                 for (i = 0; i < count; ++i) {
-                    if (worksheet.rows[i].top <= y && y < worksheet.rows[i].top + worksheet.rows[i].height) {
-                        if (y -  worksheet.rows[i].top > worksheet.rows[i].height * 0.5)
+                    if (worksheet.rows[i].top - worksheet.rows[0].top <= y &&
+                        y < worksheet.rows[i].top + worksheet.rows[i].height - worksheet.rows[0].top) {
+                        if (y - worksheet.rows[i].top - worksheet.rows[0].top > worksheet.rows[i].height * 0.5)
                             cell.push(worksheet.rows[i + 1].top - worksheet.rows[0].top);
                         else
                             cell.push(worksheet.rows[i].top - worksheet.rows[0].top);
@@ -1525,6 +1711,7 @@ function OfflineEditor () {
                         break;
                     }
                 }
+            }
         }
 
         return cell;
@@ -1780,7 +1967,8 @@ function offline_mouse_move(x, y) {
     _api.wb.getWorksheet().changeSelectionEndPoint(x, y, true, true);
 }
 function offline_mouse_up(x, y) {
-    _api.wb.getWorksheet().changeSelectionDone();
+    //_api.wb.getWorksheet().changeSelectionDone();
+    _api.wb._onChangeSelectionDone(-1, -1);
 }
 function offline_get_selection(x, y, width, height) {
     return _s.getSelection(x, y, width, height);
@@ -1788,8 +1976,9 @@ function offline_get_selection(x, y, width, height) {
 function offline_get_worksheet_bounds() {
     return _s.getMaxBounds();
 }
-function offline_complete_cell(x, y){ return _s.cellAtCoord(x, y); }
-
+function offline_complete_cell(x, y){
+    return _s.getNearCellCoord(x, y);
+}
 function offline_cell_editor_open(x, y, width, height, ratio) {
     _null_object.width = width * ratio;
     _null_object.height = height * ratio;
@@ -1799,7 +1988,8 @@ function offline_cell_editor_open(x, y, width, height, ratio) {
     wb._onEditCell (x, y, /*isCoord*/true, /*isFocus*/undefined, /*isClearCell*/undefined,
         /*isHideCursor*/true, /*isQuickInput*/false);
 
-    return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom];
+    return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom,
+        wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
 }
 function offline_cell_editor_key_event(keys, width, height, ratio) {
     _null_object.width = width * ratio;
@@ -1824,7 +2014,8 @@ function offline_cell_editor_key_event(keys, width, height, ratio) {
 
     wb.cellEditor._draw();
 
-    return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom];
+    return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom,
+    wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
 }
 function offline_cell_editor_close(key, width, height, ratio) {
     _api.wb.cellEditor.close(true);
@@ -1879,45 +2070,48 @@ function offline_apply_event(type,params) {
         {
             var findOptions = new Asc.asc_CFindOptions();
 
-            findOptions.asc_setFindWhat(params[0]);
-            findOptions.asc_setScanForward(params[1]);
-            findOptions.asc_setIsMatchCase(params[2]);
-            findOptions.asc_setIsWholeCell(params[3]);
-            findOptions.asc_setScanOnOnlySheet(params[4]);
-            findOptions.asc_setScanByRows(params[5]);
-            findOptions.asc_setLookIn(params[6]);
+            if (7 ===params.length) {
+                findOptions.asc_setFindWhat(params[0]);
+                findOptions.asc_setScanForward(params[1]);
+                findOptions.asc_setIsMatchCase(params[2]);
+                findOptions.asc_setIsWholeCell(params[3]);
+                findOptions.asc_setScanOnOnlySheet(params[4]);
+                findOptions.asc_setScanByRows(params[5]);
+                findOptions.asc_setLookIn(params[6]);
 
-            _ret = _api.asc_findText(findOptions);
-            _stream = global_memory_stream_menu;
-            _stream["ClearNoAttack"]();
-            if (_ret) {
-                _stream["WriteBool"](true);
-                _stream["WriteDouble2"](_ret[0]);
-                _stream["WriteDouble2"](_ret[1]);
-            } else {
-                _stream["WriteBool"](false);
-                _stream["WriteDouble2"](0);
-                _stream["WriteDouble2"](0);
+                _ret = _api.asc_findText(findOptions);
+                _stream = global_memory_stream_menu;
+                _stream["ClearNoAttack"]();
+                if (_ret) {
+                    _stream["WriteBool"](true);
+                    _stream["WriteDouble2"](_ret[0]);
+                    _stream["WriteDouble2"](_ret[1]);
+                } else {
+                    _stream["WriteBool"](false);
+                    _stream["WriteDouble2"](0);
+                    _stream["WriteDouble2"](0);
+                }
+
+                _return = _stream;
             }
-
-            _return = _stream;
 
             break;
         }
         case 63: // ASC_MENU_EVENT_TYPE_SEARCH_REPLACETEXT
         {
             var replaceOptions = new Asc.asc_CFindOptions();
+            if (8 === params.length) {
+                replaceOptions.asc_setFindWhat(params[0]);
+                replaceOptions.asc_setReplaceWith(params[1]);
+                replaceOptions.asc_setIsMatchCase(params[2]);
+                replaceOptions.asc_setIsWholeCell(params[3]);
+                replaceOptions.asc_setScanOnOnlySheet(params[4]);
+                replaceOptions.asc_setScanByRows(params[5]);
+                replaceOptions.asc_setLookIn(params[6]);
+                replaceOptions.asc_setIsReplaceAll(params[7]);
 
-            replaceOptions.asc_setFindWhat(params[0]);
-            replaceOptions.asc_setReplaceWith(params[1]);
-            replaceOptions.asc_setIsMatchCase(params[2]);
-            replaceOptions.asc_setIsWholeCell(params[3]);
-            replaceOptions.asc_setScanOnOnlySheet(params[4]);
-            replaceOptions.asc_setScanByRows(params[5]);
-            replaceOptions.asc_setLookIn(params[6]);
-            replaceOptions.asc_setIsReplaceAll(params[7]);
-
-            _api.asc_replaceText(replaceOptions);
+                _api.asc_replaceText(replaceOptions);
+            }
             break;
         }
 
@@ -1940,7 +2134,7 @@ function offline_apply_event(type,params) {
 
         // add objects
 
-        case 53: //ASC_MENU_EVENT_TYPE_INSERT_SHAPE
+        case 53:  // ASC_MENU_EVENT_TYPE_INSERT_SHAPE
         {
             offline_add_shape(0, 0);
             break;
