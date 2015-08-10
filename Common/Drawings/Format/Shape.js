@@ -1941,9 +1941,9 @@ CShape.prototype =
 
             oClipRect = {
                 x: -1,
-                y: -_vertical_shift - t_ins,
+                y: - 1,
                 w: Math.max(this.extX, this.extY) + 2,
-                h: this.contentHeight + (b_ins + t_ins)
+                h: this.contentHeight + (b_ins + t_ins) + 2
             };
         }
         return oClipRect;
