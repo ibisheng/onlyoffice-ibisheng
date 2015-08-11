@@ -3157,8 +3157,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		 */
 		spreadsheet_api.prototype.asc_setSelectionDialogMode = function (selectionDialogType, selectRange) {
 			this.controller.setSelectionDialogMode(c_oAscSelectionDialogType.None !== selectionDialogType);
-			if (this.wb)
+			if (this.wb) {
+				this.wb._onStopFormatPainter();
 				this.wb.setSelectionDialogMode(selectionDialogType, selectRange);
+			}
 		};
 
 		spreadsheet_api.prototype.asc_SendThemeColors = function (colors, standart_colors) {
