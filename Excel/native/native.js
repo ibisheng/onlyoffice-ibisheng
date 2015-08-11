@@ -1387,7 +1387,7 @@ function asc_WriteCBorder(i, c, s) {
 
     if (c.asc_getStyle()) {
         s['WriteByte'](0);
-        s['WriteLong'](c.asc_getStyle());
+        s['WriteString2'](c.asc_getStyle());
     }
 
     if (c.asc_getColor()) {
@@ -1397,6 +1397,42 @@ function asc_WriteCBorder(i, c, s) {
 
     s['WriteByte'](255);
 }
+function asc_ReadCBorder(s, p)
+{
+    var color = null;
+    var style = null;
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = s[p.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                style = s[p.pos++];
+                break;
+            }
+            case 1:
+            {
+                color = asc_menu_ReadColor(s, p);
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+
+    if (color && style) {
+        return new Asc.asc_CBorder(style, color);
+    }
+
+    return null;
+}
+
 function asc_WriteCHyperLink(i, c, s) {
     if (!c) return;
 
@@ -2017,8 +2053,34 @@ function offline_cell_editor_key_event(keys, width, height, ratio) {
     return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom,
     wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
 }
+function offline_cell_editor_mouse_event(events, width, height, ratio) {
+    _null_object.width = width * ratio;
+    _null_object.height = height * ratio;
+
+    var wb = _api.wb;
+
+    for (var i = 0; i < events.length; ++i) {
+        var event = {
+            pageX:events[i][1],
+            pageY:events[i][2],
+            which: 1,
+            shiftKey: false
+        };
+
+        if (0 === events[i][0]) {
+            wb.cellEditor._onMouseDown(event);
+        } else if (1 === events[i][0]) {
+            wb.cellEditor._onMouseUp(event);
+        } else if (2 == events[i][0]) {
+            wb.cellEditor._onMouseMove(event);
+        }
+    }
+
+    return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom,
+        wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
+}
 function offline_cell_editor_close(key, width, height, ratio) {
-    _api.wb.cellEditor.close(true);
+    _api.wb.cellEditor._tryCloseEditor();
 }
 
 function offline_add_shape(x, y) {
@@ -2142,87 +2204,67 @@ function offline_apply_event(type,params) {
 
         // Cell interface
 
-        case 2000: // ASC_SPREADSHEETS_EVENT_TYPE_CELL_PR
+        case 2000: // ASC_SPREADSHEETS_EVENT_TYPE_SET_CELL_INFO
         {
+            var borders = null;
+            var border = null;
+
             while (_continue) {
                 _attr = params[_current.pos++];
                 switch (_attr) {
                     case 0:
                     {
-                        _api.asc_setCellBold(params[_current.pos++]);
+                        _api.asc_setCellAlign(params[_current.pos++]);
                         break;
                     }
                     case 1:
                     {
-                        _api.asc_setCellItalic(params[_current.pos++]);
+                        _api.asc_setCellVertAlign(params[_current.pos++]);
                         break;
                     }
                     case 2:
                     {
-                        _api.asc_setCellUnderline(params[_current.pos++]);
+                        _api.asc_setCellFontName(params[_current.pos++]);
                         break;
                     }
                     case 3:
                     {
-                        _api.asc_setCellStrikeout(params[_current.pos++]);
+                        _api.asc_setCellFontSize(params[_current.pos++]);
                         break;
                     }
                     case 4:
                     {
-                        _api.asc_setCellFontName(asc_menu_ReadFontFamily(params, _current).Name);
+                        _api.asc_setCellBold(params[_current.pos++]);
                         break;
                     }
                     case 5:
                     {
-                        _api.asc_setCellFontSize(params[_current.pos++]);
+                        _api.asc_setCellItalic(params[_current.pos++]);
                         break;
                     }
                     case 6:
                     {
-                        var textColor = asc_menu_ReadColor(params, _current);
-                        _api.asc_setCellTextColor(textColor);
+                        _api.asc_setCellUnderline(params[_current.pos++]);
                         break;
                     }
                     case 7:
                     {
-                        var backgroundColor = asc_menu_ReadColor(params, _current);
-                        _api.asc_setCellBackgroundColor(backgroundColor);
+                        _api.asc_setCellStrikeout(params[_current.pos++]);
                         break;
                     }
                     case 8:
                     {
-                        _api.asc_setCellSuperscript(params[_current.pos++]);
+                        _api.asc_setCellSubscript(params[_current.pos++]);
                         break;
                     }
                     case 9:
                     {
-                        var horizAlign = params[_current.pos++], ha = '';
-
-                        if (horizAlign === c_oAscAlignType.NONE) ha = 'none';
-                        else if (horizAlign === c_oAscAlignType.LEFT) ha = 'left';
-                        else if (horizAlign === c_oAscAlignType.CENTER) ha = 'center';
-                        else if (horizAlign === c_oAscAlignType.RIGHT) ha = 'right';
-                        else if (horizAlign === c_oAscAlignType.JUSTIFY) ha = 'justify';
-                        else if (horizAlign === c_oAscAlignType.TOP) ha = 'top';
-                        else if (horizAlign === c_oAscAlignType.MIDDLE) ha = 'center';
-                        else if (horizAlign === c_oAscAlignType.BOTTOM) ha = 'bottom';
-
-                        _api.asc_setCellAlign(ha);
-
+                        _api.asc_setCellSuperscript(params[_current.pos++]);
                         break;
                     }
                     case 10:
                     {
-                        var vertAlign = params[_current.pos++], va = '';
-
-                        if (vertAlign === c_oAscVerticalTextAlign.TEXT_ALIGN_BOTTOM) va = 'bottom';
-                        else if (vertAlign === c_oAscVerticalTextAlign.TEXT_ALIGN_CTR) va = 'center';
-                        else if (vertAlign === c_oAscVerticalTextAlign.TEXT_ALIGN_DIST) va = 'distributed';
-                        else if (vertAlign === c_oAscVerticalTextAlign.TEXT_ALIGN_JUST) va = 'justify';
-                        else if (vertAlign === c_oAscVerticalTextAlign.TEXT_ALIGN_TOP) va = 'top';
-
-                        _api.asc_setCellVertAlign(va);
-
+                        _api.asc_setCellTextColor(asc_menu_ReadColor(params, _current));
                         break;
                     }
                     case 11:
@@ -2235,6 +2277,106 @@ function offline_apply_event(type,params) {
                         _api.asc_setCellTextShrink(params[_current.pos++]);
                         break;
                     }
+                    case 13:
+                    {
+                        _api.asc_setCellBackgroundColor(asc_menu_ReadColor(params, _current));
+                        break;
+                    }
+                    case 14:
+                    {
+                        _api.asc_setCellFormat(params[_current.pos++]);
+                        break;
+                    }
+                    case 15:
+                    {
+                        _api.asc_setCellAngle(parseFloat(params[_current.pos++]));
+                        break;
+                    }
+                    case 16:
+                    {
+                        _api.asc_setCellStyle(params[_current.pos++]);
+                        break;
+                    }
+
+                    case 20:
+                    {
+                        border = asc_ReadCBorder(params, _current);
+                        if (border) {
+                            borders[c_oAscBorderOptions.Left] = border;
+                        }
+                        break;
+                    }
+
+                    case 21:
+                    {
+                        if (!borders) borders = [];
+                        border = asc_ReadCBorder(params, _current);
+                        if (border) {
+                            borders[c_oAscBorderOptions.Top] = border;
+                        }
+                        break;
+                    }
+
+                    case 22:
+                    {
+                        if (!borders) borders = [];
+                        border = asc_ReadCBorder(params, _current);
+                        if (border) {
+                            borders[c_oAscBorderOptions.Right] = border;
+                        }
+                        break;
+                    }
+
+                    case 23:
+                    {
+                        if (!borders) borders = [];
+                        border = asc_ReadCBorder(params, _current);
+                        if (border) {
+                            borders[c_oAscBorderOptions.Bottom] = border;
+                        }
+                        break;
+                    }
+
+                    case 24:
+                    {
+                        if (!borders) borders = [];
+                        border = asc_ReadCBorder(params, _current);
+                        if (border) {
+                            borders[c_oAscBorderOptions.DiagD] = border;
+                        }
+                        break;
+                    }
+
+                    case 25:
+                    {
+                        if (!borders) borders = [];
+                        border = asc_ReadCBorder(params, _current);
+                        if (border) {
+                            borders[c_oAscBorderOptions.DiagU] = border;
+                        }
+                        break;
+                    }
+
+                    case 26:
+                    {
+                        if (!borders) borders = [];
+                        border = asc_ReadCBorder(params, _current);
+                        if (border) {
+                            borders[c_oAscBorderOptions.InnerV] = border;
+                        }
+                        break;
+                    }
+
+                    case 27:
+                    {
+                        if (!borders) borders = [];
+                        border = asc_ReadCBorder(params, _current);
+                        if (border) {
+                            borders[c_oAscBorderOptions.InnerH] = border;
+                        }
+                        break;
+                    }
+
                     case 255:
                     default:
                     {
@@ -2243,6 +2385,11 @@ function offline_apply_event(type,params) {
                     }
                 }
             }
+
+            if (borders){
+                _api.asc_setCellBorders(borders);
+            }
+
             break;
         }
         case 2010: // ASC_SPREADSHEETS_EVENT_TYPE_CELLS_MERGE_TEST
