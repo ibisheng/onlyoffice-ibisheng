@@ -2583,7 +2583,7 @@ var maxIndividualValues = 10000;
 				return result;
 			},
 			
-			_getAdjacentCellsAF: function(ar, aWs) 
+			_getAdjacentCellsAF2: function(ar, aWs) 
 			{
 				var ws = this.worksheet;
 				var cloneActiveRange = ar.clone(true); // ToDo слишком много клонирования
@@ -2820,7 +2820,8 @@ var maxIndividualValues = 10000;
 
 			},
 			
-			_getAdjacentCellsAF2: function(ar, aWs) 
+			//TODO пока включаю протестированную функцию. позже доработать функцию _getAdjacentCellsAF2, она работает быстрее!
+			_getAdjacentCellsAF: function(ar, aWs) 
 			{
 				var ws = this.worksheet;
 				var cloneActiveRange = ar.clone(true); // ToDo слишком много клонирования
