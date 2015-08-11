@@ -1294,7 +1294,7 @@ var maxIndividualValues = 10000;
 							oldFilter = filter.clone(null);
 							filter.moveRef(diff);
 						}
-						else if(activeRange.c1 < ref.c1 && activeRange.c2 >= ref.c1)//parts of until filter
+						else if(activeRange.c1 <= ref.c1 && activeRange.c2 >= ref.c1)//parts of until filter
 						{
 							oldFilter = filter.clone(null);
 
