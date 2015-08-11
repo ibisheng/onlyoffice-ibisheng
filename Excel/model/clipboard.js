@@ -4347,7 +4347,7 @@
 					return;
 				
 				var sImageUrl = oGraphicObj.blipFill.RasterImageId;
-				aResult._aPastedImages[aResult._aPastedImages.length] = new CBuilderImages(oGraphicObj.blipFill, sImageUrl, null, oGraphicObj.spPr, null);
+				aResult._aPastedImages[aResult._aPastedImages.length] = new CBuilderImages(oGraphicObj.blipFill, sImageUrl, oGraphicObj, oGraphicObj.spPr, null);
 				aResult._images[aResult._images.length] = sImageUrl;
 			},
 			
