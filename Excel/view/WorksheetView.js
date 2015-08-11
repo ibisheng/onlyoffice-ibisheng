@@ -11014,6 +11014,8 @@
 			
 			if(t.autoFilters.checkAddAutoFilter(ar, styleName, addFormatTableOptionsObj) === true)
 				this._isLockedAll (onChangeAutoFilterCallback);
+			else//для того, чтобы в случае ошибки кнопка отжималась!
+				t.handlers.trigger("selectionChanged", t.getSelectionInfo());
 		};
 		
 		WorksheetView.prototype.changeAutoFilter = function (tableName, optionType, val) {
