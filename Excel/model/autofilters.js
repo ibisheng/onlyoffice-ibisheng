@@ -1206,6 +1206,8 @@ var maxIndividualValues = 10000;
 					aWs.TableParts = newTableParts;
 				}
 				
+				this._setStyleTables(activeCells);
+				
 				History.EndTransaction();
 			},
 			
@@ -4518,6 +4520,20 @@ var maxIndividualValues = 10000;
 					}
 				}
 				return true;
+			},
+			
+			_setStyleTables: function(range)
+			{
+				var aWs = this._getCurrentWS();
+				if(aWs.TableParts && aWs.TableParts.length > 0)
+				{
+					for(var i = 0; i < aWs.TableParts.length; i++)
+					{
+						var ref = aWs.TableParts[i].Ref;
+						if(ref.r1 >= range.r1 && ref.r2 <= range.r2)
+							this._setColorStyleTable(ref, aWs.TableParts[i]);
+					}
+				}
 			},
 			
 			isCellContainsAutoFilterButton: function(col, row)
