@@ -532,8 +532,8 @@ var maxIndividualValues = 10000;
 					for(var i = currentFilter.Ref.r1 + 1; i <= currentFilter.Ref.r2; i++)
 					{	
 						var isHidden = false;
-						if(currentFilter.FilterColumns && currentFilter.FilterColumns.length)
-							isHidden = this._hiddenAnotherFilter(currentFilter.FilterColumns, filterObj.ColId, i, currentFilter.Ref.c1);
+						if(autoFilter.FilterColumns && autoFilter.FilterColumns.length)
+							isHidden = this._hiddenAnotherFilter(autoFilter.FilterColumns, filterObj.ColId, i, autoFilter.Ref.c1);
 						
 						if(!isHidden)
 						{	
