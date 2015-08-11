@@ -1382,9 +1382,9 @@ function DefNameVertex( scope, defName, defRef, wb, isTable ) {
 //            this.parsedRef.buildDependencies();
         }
     }
-    else{
+    /*else{
         this.sheetTableId = wb.getActiveWs().getId();
-    }
+    }*/
 
     //вершина которую мы прошли и поставили в очередь обхода
     this.isBlack = false;
