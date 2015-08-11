@@ -8005,11 +8005,11 @@ CDocument.prototype =
     },
 
     // Убираем селект
-    Selection_Remove : function()
+    Selection_Remove : function(bNoCheckDrawing)
     {
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
-            return this.HdrFtr.Selection_Remove();
+            return this.HdrFtr.Selection_Remove(bNoCheckDrawing);
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
@@ -8018,7 +8018,7 @@ CDocument.prototype =
             {
                 ParaDrawing.GoTo_Text(undefined, false);
             }
-            return this.DrawingObjects.resetSelection();
+            return this.DrawingObjects.resetSelection(undefined, bNoCheckDrawing);
         }
         else if ( docpostype_Content === this.CurPos.Type )
         {
@@ -8894,7 +8894,7 @@ CDocument.prototype =
                     }
                 }
 
-                this.Selection_Remove();
+                this.Selection_Remove(true);
 
                 // Выделение выставляется внутри функции Insert_Content
                 Para.Parent.Insert_Content( DocContent, NearPos );

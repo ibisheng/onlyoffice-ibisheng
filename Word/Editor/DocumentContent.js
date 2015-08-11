@@ -7147,11 +7147,11 @@ CDocumentContent.prototype =
 // Функции для работы с селектом
 //-----------------------------------------------------------------------------------
     // Убираем селект
-    Selection_Remove : function()
+    Selection_Remove : function(bNoCheckDrawing)
     {
         if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
-            return this.LogicDocument.DrawingObjects.resetSelection();
+            return this.LogicDocument.DrawingObjects.resetSelection(undefined, bNoCheckDrawing);
         }
         else //if ( docpostype_Content === this.CurPos.Type )
         {

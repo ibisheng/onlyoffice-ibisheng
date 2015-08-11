@@ -858,9 +858,9 @@ CHeaderFooter.prototype =
     },
 
     // Убираем селект
-    Selection_Remove : function()
+    Selection_Remove : function(bNoCheckDrawing)
     {
-        return this.Content.Selection_Remove();
+        return this.Content.Selection_Remove(bNoCheckDrawing);
     },
 
     // Рисуем селект
@@ -1899,10 +1899,10 @@ CHeaderFooterController.prototype =
     },    
 
     // Убираем селект
-    Selection_Remove : function()
+    Selection_Remove : function(bNoCheckDrawing)
     {
         if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Selection_Remove();
+            return this.CurHdrFtr.Selection_Remove(bNoCheckDrawing);
     },
 
     // Рисуем селект

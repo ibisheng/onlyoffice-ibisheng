@@ -5020,9 +5020,9 @@ DrawingObjectsController.prototype =
         return bRet;
     },
 
-    resetSelection: function(noResetContentSelect)
+    resetSelection: function(noResetContentSelect, bNoCheckChart)
     {
-        if(this.document)
+        if(this.document && bNoCheckChart !== true)
         {
             this.checkChartTextSelection();
         }
