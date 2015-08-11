@@ -4667,12 +4667,12 @@ Woorksheet.prototype._BuildDependencies=function(cellRange){
 	}
 };
 Woorksheet.prototype._setHandlersTablePart = function(){
-	if(!this.tableParts)
+	if(!this.TableParts)
 		return;
 	
-	for(var i = 0; i < this.tableParts.length; i++)
+	for(var i = 0; i < this.TableParts.length; i++)
 	{
-		this.tableParts[i].setHandlers(this.handlers);
+		this.TableParts[i].setHandlers(this.handlers);
 	}
 };
 
