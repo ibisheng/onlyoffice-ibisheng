@@ -3142,8 +3142,8 @@ UndoRedoWoorksheet.prototype = {
 				row.setHeightProp(Data.oNewVal);
 			
 			//TODO проверить без этой перерисовки и убрать!!!
-			var workSheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);	
-			workSheetView.autoFilters.reDrawFilter(null, index);
+			//var workSheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);	
+			//workSheetView.autoFilters.reDrawFilter(null, index);
 		}
 		else if(historyitem_Worksheet_AddRows == Type || historyitem_Worksheet_RemoveRows == Type)
 		{
