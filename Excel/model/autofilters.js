@@ -3702,7 +3702,10 @@ var maxIndividualValues = 10000;
 			_openHiddenRows: function(filter)
 			{
 				var aWs = this._getCurrentWS();
-				if(filter && filter.Ref)
+				var autoFilter = filter.AutoFilter !== undefined ? filter.AutoFilter : filter;
+				var isApplyFilter = autoFilter.FilterColumns && autoFilter.FilterColumns.length ? true : false;
+				
+				if(filter && filter.Ref && isApplyFilter)
 				{
 					aWs.setRowHidden(false, filter.Ref.r1, filter.Ref.r2);
 				}
