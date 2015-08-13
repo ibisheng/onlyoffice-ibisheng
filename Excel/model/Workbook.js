@@ -2873,9 +2873,9 @@ function Woorksheet(wb, _index, sId){
 		}
 		//расширяем границы
 		if(null != to){
-			if(to.r2 > oThis.nRowsCount)
+			if(to.r2 >= oThis.nRowsCount)
 				oThis.nRowsCount = to.r2 + 1;
-			if(to.c2 > oThis.nColsCount)
+			if(to.c2 >= oThis.nColsCount)
 				oThis.nColsCount = to.c2 + 1;
 		}
 	});
@@ -2900,9 +2900,9 @@ function Woorksheet(wb, _index, sId){
 		    data.Ref.cleanFormat();
 		//расширяем границы
 		if(null != to){
-			if(to.r2 > oThis.nRowsCount)
+			if(to.r2 >= oThis.nRowsCount)
 				oThis.nRowsCount = to.r2 + 1;
-			if(to.c2 > oThis.nColsCount)
+			if(to.c2 >= oThis.nColsCount)
 				oThis.nColsCount = to.c2 + 1;
 		}
 	});
@@ -4030,9 +4030,9 @@ Woorksheet.prototype._getCell=function(row, col){
 			xfs = oCol.xfs.clone();
 		oCurCell.create(xfs, row, col);
 		oCurRow.c[col] = oCurCell;
-		if(row + 1 > this.nRowsCount)
+		if(row >= this.nRowsCount)
 			this.nRowsCount = row + 1;
-		if(col + 1 > this.nColsCount)
+		if(col >= this.nColsCount)
 			this.nColsCount = col + 1;
 		//History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_CreateCell, this.getId(), null, new UndoRedoData_CellSimpleData(row, col, null, null));
 	}
@@ -4088,7 +4088,7 @@ Woorksheet.prototype._getRow=function(row){
                 oCurRow = new Row(this);
             oCurRow.create(row + 1);
             this.aGCells[row] = oCurRow;
-            this.nRowsCount = row > this.nRowsCount ? row : this.nRowsCount;
+            this.nRowsCount = row >= this.nRowsCount ? row + 1 : this.nRowsCount;
             //History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_CreateRow, this.getId(), null, new UndoRedoData_SingleProperty(row));
         }
     }
@@ -4115,7 +4115,7 @@ Woorksheet.prototype._getCol=function(index){
 			else
 				oCurCol = new Col(this, index);
 			this.aCols[index] = oCurCol;
-			this.nColsCount = index > this.nColsCount ? index : this.nColsCount;
+			this.nColsCount = index >= this.nColsCount ? index + 1 : this.nColsCount;
 			//History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_CreateCol, this.getId(), null, new UndoRedoData_SingleProperty(index));
 		}
 	}
@@ -4380,13 +4380,13 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 		History.LocalChange = false;
 	}
 	//расширяем границы
-	if(oBBoxFrom.r2 > this.nRowsCount)
+	if(oBBoxFrom.r2 >= this.nRowsCount)
 		this.nRowsCount = oBBoxFrom.r2 + 1;
-	if(oBBoxFrom.c2 > this.nColsCount)
+	if(oBBoxFrom.c2 >= this.nColsCount)
 		this.nColsCount = oBBoxFrom.c2 + 1;
-	if(oBBoxTo.r2 > this.nRowsCount)
+	if(oBBoxTo.r2 >= this.nRowsCount)
 		this.nRowsCount = oBBoxTo.r2 + 1;
-	if(oBBoxTo.c2 > this.nColsCount)
+	if(oBBoxTo.c2 >= this.nColsCount)
 		this.nColsCount = oBBoxTo.c2 + 1;
 
 	if(!copyRange){

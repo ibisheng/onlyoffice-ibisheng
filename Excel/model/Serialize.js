@@ -5248,7 +5248,7 @@
                         oTo.width = oFrom.width;
                     if(null != oFrom.CustomWidth)
                         oTo.CustomWidth = oFrom.CustomWidth;
-                    if(oTo.index + 1 > oWorksheet.nColsCount)
+                    if(oTo.index >= oWorksheet.nColsCount)
                         oWorksheet.nColsCount = oTo.index + 1;
                 };
                 //если есть стиль последней колонки, назначаем его стилем всей таблицы и убираем из колонок
@@ -5596,7 +5596,7 @@
             if ( c_oSerRowTypes.Row == type )
             {
                 oRow.index = this.stream.GetULongLE() - 1;
-                if(oRow.index + 1 > ws.nRowsCount)
+                if(oRow.index >= ws.nRowsCount)
                     ws.nRowsCount = oRow.index + 1;
             }
             else if ( c_oSerRowTypes.Style == type )
@@ -5648,7 +5648,7 @@
                 {
                     //вычисляем nColsCount
                     var nCellCol = oNewCell.nCol;
-                    if(nCellCol + 1 > ws.nColsCount)
+                    if(nCellCol >= ws.nColsCount)
                         ws.nColsCount = nCellCol + 1;
                     if(null != oNewCell.oValue.number && (CellValueType.String == oNewCell.oValue.type || CellValueType.Error == oNewCell.oValue.type))
                     {
