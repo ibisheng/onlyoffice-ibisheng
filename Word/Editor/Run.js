@@ -2068,6 +2068,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var bFirstCompareOper   = PRS.bFirstCompareOper;
     var bEndRunToContent    = PRS.bEndRunToContent;
     var bNoOneBreakOperator = PRS.bNoOneBreakOperator;
+    var BreakBox            = PRS.BreakBox;
 
     var Pos = RangeStartPos;
 
@@ -2211,6 +2212,12 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 NewRange = true;
                                 RangeEndPos = Pos;
                             }
+                            else if(BreakBox == true)
+                            {
+                                MoveToLBP = true;
+                                NewRange = true;
+                                PRS.Set_LineBreakPos(Pos);
+                            }
                         }
 
                         if(true !== NewRange)
@@ -2286,7 +2293,29 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     bNoOneBreakOperator = false;
 
-                    if(bOperInEndContent || bLowPriority)
+                    if(Pos == 0 && true === this.MathPrp.IsBreak())
+                    {
+                        if(FirstItemOnLine === true)
+                        {
+                            WordLen += BrkLen;
+
+                        }
+                        else
+                        {
+                            if(bOperBefore)
+                            {
+                                X += SpaceLen + WordLen;
+                                NewRange = true;
+                                RangeEndPos = Pos;
+                            }
+                            else
+                            {
+                                Word = false;
+                                BreakBox = true;
+                            }
+                        }
+                    }
+                    else if(bOperInEndContent || bLowPriority)
                     {
                         if(X + SpaceLen + WordLen + BrkLen > XEnd)
                         {
@@ -2320,7 +2349,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         if(bOperBefore)  // оператор "до" => оператор находится в начале строки
                         {
                             bOverXEnd = X + WordLen + SpaceLen + BrkLen > XEnd; // BrkLen прибавляем дла случая, если идут подряд Brk Operators в конце
-
 
                             if(bOverXEnd && FirstItemOnLine === false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                             {
@@ -2400,9 +2428,19 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 FirstItemOnLine = false;
 
                                 Word = false;
+
                             }
                         }
+                    }
 
+                    if(PRS.NewRange == false && true === this.ParaMath.NeedDispOperators(PRS))
+                    {
+                        var W = X - XRange + Item.GapLeft;
+
+                        if(bOperBefore == false)
+                            W -= BrkLen
+
+                        PRS.DispositionOpers.push(W);
                     }
 
                     break;
@@ -2738,6 +2776,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     PRS.bFirstCompareOper   = bFirstCompareOper;
     PRS.bEndRunToContent    = bEndRunToContent;
     PRS.bNoOneBreakOperator = bNoOneBreakOperator;
+    PRS.BreakBox            = BreakBox;
 
 
     if(this.Type == para_Math_Run)
@@ -9169,7 +9208,6 @@ ParaRun.prototype.Math_RecalculateContent = function(PRS)
         if (descent < size.height - size.ascent)
             descent = size.height - size.ascent;
 
-
         if(this.bEqArray)
         {
             if(Type !== para_Math_Ampersand)
@@ -9231,7 +9269,7 @@ ParaRun.prototype.IsNormalText = function()
 ParaRun.prototype.getPropsForWrite = function()
 {
     var wRPrp = this.Pr.Copy(),
-        mathRPrp = this.MathPrp.getPropsForWrite();
+        mathRPrp = this.MathPrp.Copy();
 
     return {wRPrp: wRPrp, mathRPrp: mathRPrp};
 };
@@ -9365,9 +9403,9 @@ ParaRun.prototype.OnlyOnePlaceholder = function()
 ParaRun.prototype.Set_MathPr = function(MPrp)
 {
     var OldValue = this.MathPrp;
-    this.MathPrp = MPrp;
+    this.MathPrp.Set_Pr(MPrp);
 
-    History.Add( this, { Type : historyitem_ParaRun_MathPrp, New : MPrp, Old : OldValue } );
+    History.Add( this, { Type : historyitem_ParaRun_MathPrp, New : this.MathPrp, Old : OldValue } );
     this.Recalc_CompiledPr(true);
 
 };
@@ -9387,6 +9425,14 @@ ParaRun.prototype.GetCompiled_ScrStyles = function()
 ParaRun.prototype.IsEqArray = function()
 {
     return this.Parent.IsEqArray();
+};
+ParaRun.prototype.IsBreak = function()
+{
+    return this.MathPrp.IsBreak();
+};
+ParaRun.prototype.Get_AlignBrk = function()
+{
+    return this.MathPrp.Get_AlignBrk();
 };
 ParaRun.prototype.Math_Is_InclineLetter = function()
 {

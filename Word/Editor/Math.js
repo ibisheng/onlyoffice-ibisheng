@@ -554,6 +554,8 @@ function ParaMath()
     this.Ascent             = 0;
     this.Descent            = 0;
 
+    this.DispositionOpers   = [];
+
     this.DefaultTextPr     = new CTextPr();
 
     this.DefaultTextPr.FontFamily = {Name  : "Cambria Math", Index : -1 };
@@ -752,16 +754,15 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
     var Page = AbsolutePage + _Page;
 
     var WrapState = this.PageInfo.GetWrap(Page);
-
-    var wrap = 0;
     var bFirstLine = this.Root.IsStartLine(_CurLine);
+
+    /*var wrap = 0;
     var wrapIndent = MathSettings.Get_WrapIndent(WrapState);
 
     if(bFirstLine == false && true == MathSettings.IsWrap(WrapState))
     {
         wrap = this.Root.Get_WrapToLine(_CurLine, _CurRange, wrapIndent);
-    }
-
+    }*/
 
     var XStart, XEnd;
 
@@ -783,8 +784,13 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
 
     var W = this.PageInfo.GetMaxW(Page);
 
-    if(bFirstLine == true) // первая строка первой страницы, если строка разбивается на несколько отрезко, то это уже будет inline-формула
-    {
+    var alignBrk = this.Root.GetAlignBrk(_CurLine, _CurRange);
+    var DispLng = this.DispositionOpers.length;
+
+    var bAlignAt = WrapState === ALIGN_MARGIN_WRAP && DispLng > 0 && bFirstLine === false && alignBrk > 0;
+
+    if(bFirstLine == true || bAlignAt == true) // первая строка первой страницы, если строка разбивается на несколько отрезков, то это уже будет inline-формула => ф-ия Get_AlignToLine не будет вызвана
+    {                                          // bAlignAt == true - учтем выравниевание первой строки + прибавим смещение для alnAt
         var StartLineWidth = this.PageInfo.GetStarLinetWidth(); // если страница не первая, то ширину первой строки формулы не учитываем
 
         switch(Jc)
@@ -798,9 +804,23 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
                 break;
             }
         }
+
+        if(bAlignAt == true)
+        {
+            var PosAln  = alignBrk < DispLng ?  alignBrk -1 : DispLng - 1;
+            X += this.DispositionOpers[PosAln];
+        }
     }
     else
     {
+        var wrap = 0;
+        var wrapIndent = MathSettings.Get_WrapIndent(WrapState);
+
+        if(true == MathSettings.IsWrap(WrapState))
+        {
+            wrap = this.Root.Get_WrapToLine(_CurLine, _CurRange, wrapIndent);
+        }
+
         if(Jc == align_Justify)
         {
             X = XEnd - XStart > W ? XStart + (XEnd - XStart - W)/2 + wrap : XStart;
@@ -1186,6 +1206,12 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.ParaMathRPI.ResetInfoRanges();
     }
 
+    if(true == this.NeedDispOperators(PRS))
+    {
+        this.DispositionOpers.length = 0;
+        PRS.DispositionOpers = this.DispositionOpers;
+    }
+
     if(bUpdateWrapMath == true && this.ParaMathRPI.bInternalRanges == false &&  PRS.bFastRecalculate == false)
     {
         this.ParaMathRPI.bInternalRanges = true;
@@ -1218,8 +1244,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     //здесь обновляем WrapState, исходя из этого параметра будем считать WrapIndent
     this.PageInfo.UpdateCurrentWrap(DispDef, bInline);
 
-
-    if(this.ParaMathRPI.Wrap !== WRAP_MATH_EMPTY && this.ParaMathRPI.bStartRanges == true)
+    if(this.ParaMathRPI.Wrap !== WRAP_MATH_EMPTY && this.ParaMathRPI.bStartRanges == true) // картинка в параграфе перед формулой
     {
         this.private_RecalculateRangeWrap(PRS, ParaPr, Depth);
     }
@@ -1241,7 +1266,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
         this.private_RecalculateRoot(PRS, ParaPr, Depth);
 
-        if(PRS.bMathWordLarge && this.ParaMathRPI.bInline == true && PRS.Ranges.length > 0)
+        if(PRS.bMathWordLarge == true && this.ParaMathRPI.bInline == true && PRS.Ranges.length > 0)
         {
             this.Root.Math_Set_EmptyRange(PRS);
             PRS.bMathWordLarge = false;
@@ -1708,6 +1733,10 @@ ParaMath.prototype.Is_Inline = function()
 {
     //return this.ParaMathRPI.bInline;
     return this.ParaMathRPI.bInline == true || (this.ParaMathRPI.bInternalRanges == true && this.ParaMathRPI.bStartRanges == false);
+};
+ParaMath.prototype.NeedDispOperators = function(PRS)
+{
+    return false === this.Is_Inline() &&  true == this.Root.IsStartLine(PRS.Line);
 };
 ParaMath.prototype.Get_Align = function()
 {

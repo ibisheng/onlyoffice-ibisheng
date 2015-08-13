@@ -2192,15 +2192,17 @@ function CParagraphRecalculateStateWrap(Para)
     this.WrapIndent          = 0; // WrapIndent нужен для сравнения с длиной слова (когда слово разбивается по Compare Oper): ширина первой строки формулы не должна быть меньше WrapIndent
     this.bFirstCompareOper   = true;
     this.bFirstLine          = false;
-    this.MathFirstItem       = true;
+    this.MathFirstItem       = true; // параметр необходим для принудительного переноса
     this.bPriorityOper       = true;
 
     // у "крайних" в строке операторов/мат объектов сооответствующий Gap равен нулю
     this.OperGapRight        = 0;
     this.OperGapLeft         = 0;
-    this.bNoOneBreakOperator = true;  // прежде чем обновлять позицию в контент Run, учтем были ли до этого операторы (проверки на Word == false не достаточно, т.к. формула мб инлайновая и тогда не нужно обновлять позицию)
+    this.bNoOneBreakOperator = true;  // прежде чем обновлять позицию в контент Run, учтем были ли до этого break-операторы (проверки на Word == false не достаточно, т.к. формула мб инлайновая и тогда не нужно обновлять позицию)
+    this.DispositionOpers    = [];
+    this.BreakBox            = false;
     this.bInsideOper         = false; // учитываем есть ли разбивка внутри мат объекта, чтобы случайно не вставить в конец пред оператора (при Brk_Before == false)
-    this.bOnlyForcedBreak    = false; // учитывается, если возможна разбивка только по операторам выше уровням => в этом случае можно сделать принуительный разрыв во внутреннем контенте
+    this.bOnlyForcedBreak    = false; // учитывается, если возможна разбивка только по операторам выше уровням => в этом случае можно сделать принудительный разрыв во внутреннем контенте
     this.bFastRecalculate    = false;
     this.bBoxOperator        = false;
 }
@@ -2241,6 +2243,8 @@ CParagraphRecalculateStateWrap.prototype =
         this.bNoOneBreakOperator = true;
         this.bFastRecalculate    = false;
         this.bBoxOperator        = false;
+        this.BreakBox            = false;
+        this.DispositionOpers    = []; // выставляем ссылку на новый массив ! length нельзя обнулять, т.к. при пересчете передаем ссылку на массив из ParaMath, чтобы после не пришлось копировать элементы массива
     },
 
     // Обнуляем некоторые параметры перед новым отрезком
@@ -2275,6 +2279,7 @@ CParagraphRecalculateStateWrap.prototype =
         this.bInsideOper        = false;
         this.bOnlyForcedBreak   = false;
         this.bNoOneBreakOperator = true;
+        this.BreakBox           = false;
         this.bFastRecalculate   = false;
         this.bBoxOperator       = false;
     },

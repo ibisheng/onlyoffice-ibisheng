@@ -2031,10 +2031,6 @@ CMathBase.prototype.MeasureJustDraw = function(Item)
 
     Item.Measure(g_oTextMeasurer);
 };
-CMathBase.prototype.Math_GetWidth = function(_CurLine, _CurRange)
-{
-    return this.size.width;
-};
 CMathBase.prototype.UpdatePRS_OneLine = function(PRS, WordLen)
 {
     if(this.bInside == false)

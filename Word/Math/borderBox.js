@@ -2,29 +2,33 @@
 
 function CMathBreak()
 {
-    this.AlnAt = undefined;
+    this.alnAt = undefined;
 }
 CMathBreak.prototype.Set_FromObject = function(Obj)
 {
-    if(Obj.AlnAt !== undefined && Obj.AlnAt !== null && Obj.AlnAt - 0 == Obj.AlnAt)
+    if(Obj.alnAt !== undefined && Obj.alnAt !== null && Obj.alnAt - 0 == Obj.alnAt)
     {
-        if(Obj.AlnAt >= 1 && Obj.AlnAt <= 255)
-            this.AlnAt = Obj.AlnAt;
+        if(Obj.alnAt >= 1 && Obj.alnAt <= 255)
+            this.alnAt = Obj.alnAt;
     }
 };
 CMathBreak.prototype.Copy = function()
 {
     var NewMBreak = new CMathBreak();
-    NewMBreak.AlnAt = this.AlnAt;
+    NewMBreak.alnAt = this.alnAt;
 
     return NewMBreak;
 };
+CMathBreak.prototype.Get_AlignBrk = function()
+{
+    return this.alnAt !== undefined ? this.alnAt : 0;
+};
 CMathBreak.prototype.Write_ToBinary = function(Writer)
 {
-    if(this.AlnAt !== undefined)
+    if(this.alnAt !== undefined)
     {
         Writer.WriteBool(false);
-        Writer.WriteLong(this.AlnAt);
+        Writer.WriteLong(this.alnAt);
     }
     else
     {
@@ -35,13 +39,14 @@ CMathBreak.prototype.Read_FromBinary = function(Reader)
 {
     if(Reader.GetBool() == false)
     {
-        this.AlnAt = Reader.GetLong();
+        this.alnAt = Reader.GetLong();
     }
     else
     {
-        this.AlnAt = undefined;
+        this.alnAt = undefined;
     }
 };
+
 
 function CMathBorderBoxPr()
 {
@@ -419,6 +424,10 @@ CMathBoxPr.prototype.Set_FromObject = function(Obj)
     else
         this.opEmu = false;
 };
+CMathBoxPr.prototype.Get_AlignBrk = function()
+{
+    return this.brk !== undefined ? this.brk.Get_AlignBrk() : 0;
+};
 CMathBoxPr.prototype.Copy = function()
 {
     var NewPr = new CMathBoxPr();
@@ -531,9 +540,13 @@ CBox.prototype.IsOperatorEmulator = function()
 {
     return this.Pr.opEmu == true;
 };
-CBox.prototype.IsBreak = function()
+CBox.prototype.IsBreak = function(bInline)
 {
-    return this.Pr.opEmu == true && this.Pr.brk !== undefined;
+    return bInline == false && this.Pr.opEmu == true && this.Pr.brk !== undefined;
+};
+CBox.prototype.Get_AlignBrk = function()
+{
+    return this.Pr.Get_AlignBrk();
 };
 
 
