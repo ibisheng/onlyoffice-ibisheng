@@ -576,5 +576,8 @@ WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFr
     //}
 };
 
-
+WorksheetView.prototype._updateCache = function(c1, r1, c2, r2) {
+    var range = new asc_Range(c1, r1, c2, r2);
+    this._prepareCellTextMetricsCache(range);
+};
 

@@ -1193,10 +1193,7 @@ var FT_Common = new _FT_Common();
 
 var global_memory_stream_menu = CreateNativeMemoryStream();
 
-//-------------------------------------------------------------------------------
-// ASCCOLOR
-function asc_menu_ReadColor(_params, _cursor)
-{
+function asc_menu_ReadColor(_params, _cursor) {
     var _color = new asc_CColor();
     var _continue = true;
     while (_continue)
@@ -1266,8 +1263,7 @@ function asc_menu_ReadColor(_params, _cursor)
     }
     return _color;
 }
-function asc_menu_WriteColor(_type, _color, _stream)
-{
+function asc_menu_WriteColor(_type, _color, _stream) {
     if (!_color)
         return;
 
@@ -1329,9 +1325,7 @@ function asc_menu_WriteColor(_type, _color, _stream)
 
     _stream["WriteByte"](255);
 }
-// TEXTFONTFAMILY
-function asc_menu_ReadFontFamily(_params, _cursor)
-{
+function asc_menu_ReadFontFamily(_params, _cursor){
     var _fontfamily = { Name : undefined, Index : -1 };
     var _continue = true;
     while (_continue)
@@ -1359,8 +1353,7 @@ function asc_menu_ReadFontFamily(_params, _cursor)
     }
     return _fontfamily;
 }
-function asc_menu_WriteFontFamily(_type, _family, _stream)
-{
+function asc_menu_WriteFontFamily(_type, _family, _stream) {
     if (!_family)
         return;
 
@@ -1379,26 +1372,7 @@ function asc_menu_WriteFontFamily(_type, _family, _stream)
 
     _stream["WriteByte"](255);
 }
-
-function asc_WriteCBorder(i, c, s) {
-    if (!c) return;
-
-    s['WriteByte'](i);
-
-    if (c.asc_getStyle()) {
-        s['WriteByte'](0);
-        s['WriteString2'](c.asc_getStyle());
-    }
-
-    if (c.asc_getColor()) {
-        s['WriteByte'](1);
-        s['WriteLong'](c.asc_getColor());
-    }
-
-    s['WriteByte'](255);
-}
-function asc_ReadCBorder(s, p)
-{
+function asc_ReadCBorder(s, p) {
     var color = null;
     var style = null;
     var _continue = true;
@@ -1432,7 +1406,23 @@ function asc_ReadCBorder(s, p)
 
     return null;
 }
+function asc_WriteCBorder(i, c, s) {
+    if (!c) return;
 
+    s['WriteByte'](i);
+
+    if (c.asc_getStyle()) {
+        s['WriteByte'](0);
+        s['WriteString2'](c.asc_getStyle());
+    }
+
+    if (c.asc_getColor()) {
+        s['WriteByte'](1);
+        s['WriteLong'](c.asc_getColor());
+    }
+
+    s['WriteByte'](255);
+}
 function asc_WriteCHyperLink(i, c, s) {
     if (!c) return;
 
@@ -1988,10 +1978,6 @@ function OfflineEditor () {
 }
 var _s = new OfflineEditor();
 
-//--------------------------------------------------------------------------------
-// ios
-//--------------------------------------------------------------------------------
-
 function offline_of() {_s.openFile();}
 function offline_stz(v) {_s.zoom = v; _api.asc_setZoom(v);}
 function offline_ds(x, y, width, height, ratio) {_s.drawSheet(x, y, width, height, ratio);}
@@ -2054,8 +2040,11 @@ function offline_cell_editor_key_event(keys, width, height, ratio) {
     wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
 }
 function offline_cell_editor_mouse_event(events, width, height, ratio) {
-    _null_object.width = width * ratio;
-    _null_object.height = height * ratio;
+
+    if (events.length) {
+        _null_object.width = width * ratio;
+        _null_object.height = height * ratio;
+    }
 
     var wb = _api.wb;
 
@@ -2079,8 +2068,28 @@ function offline_cell_editor_mouse_event(events, width, height, ratio) {
     return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom,
         wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
 }
-function offline_cell_editor_close(key, width, height, ratio) {
+function offline_cell_editor_close(x, y, width, height, ratio) {
+    var worksheet = _api.wb.getWorksheet();
+    var region = _s._updateRegion(worksheet, 0, 0, 5000, 5000);
+//
+//    console.log('========================');
+//    for (var i = 0; i < 10; ++i) {
+//        console.log('top['+ i+']: ' + worksheet.rows[i].top)
+//    }
+//    console.log('-------------');
+
     _api.wb.cellEditor._tryCloseEditor();
+
+//    for (var i = 0; i < 10; ++i) {
+//        console.log('top['+ i+']: ' + worksheet.rows[i].top)
+//    }
+//    console.log('-------------');
+//    worksheet._updateCache(region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd);
+
+//    for (var i = 0; i < 10; ++i) {
+//        console.log('top['+ i+']: ' + worksheet.rows[i].top)
+//    }
+//    console.log('========================');
 }
 
 function offline_add_shape(x, y) {
@@ -2104,6 +2113,28 @@ function offline_add_shape(x, y) {
 //
 //    _api.asc_endAddShape();
 }
+
+function offline_get_cell_in_coord (x, y) {
+    var worksheet = _api.wb.getWorksheet(),
+        activeCell = worksheet.getActiveCell(x, y, true);
+
+    return [
+        activeCell.c1,
+        activeCell.r1,
+        worksheet.cols[activeCell.c1].left,
+        worksheet.rows[activeCell.r1].top,
+        worksheet.cols[activeCell.c1].width,
+        worksheet.rows[activeCell.r1].height];
+}
+function offline_get_cell_coord (c, r) {
+    var worksheet = _api.wb.getWorksheet();
+
+    return [worksheet.cols[c].left,
+        worksheet.rows[r].top,
+        worksheet.cols[c].width,
+        worksheet.rows[r].height];
+}
+
 function offline_apply_event(type,params) {
     var _stream = null;
     var _return = undefined;
@@ -2300,6 +2331,7 @@ function offline_apply_event(type,params) {
 
                     case 20:
                     {
+                        if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
                         if (border) {
                             borders[c_oAscBorderOptions.Left] = border;
@@ -2311,7 +2343,7 @@ function offline_apply_event(type,params) {
                     {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
-                        if (border) {
+                        if (border && borders) {
                             borders[c_oAscBorderOptions.Top] = border;
                         }
                         break;
@@ -2321,7 +2353,7 @@ function offline_apply_event(type,params) {
                     {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
-                        if (border) {
+                        if (border && borders) {
                             borders[c_oAscBorderOptions.Right] = border;
                         }
                         break;
@@ -2331,7 +2363,7 @@ function offline_apply_event(type,params) {
                     {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
-                        if (border) {
+                        if (border && borders) {
                             borders[c_oAscBorderOptions.Bottom] = border;
                         }
                         break;
@@ -2341,7 +2373,7 @@ function offline_apply_event(type,params) {
                     {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
-                        if (border) {
+                        if (border && borders) {
                             borders[c_oAscBorderOptions.DiagD] = border;
                         }
                         break;
@@ -2351,7 +2383,7 @@ function offline_apply_event(type,params) {
                     {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
-                        if (border) {
+                        if (border && borders) {
                             borders[c_oAscBorderOptions.DiagU] = border;
                         }
                         break;
@@ -2361,7 +2393,7 @@ function offline_apply_event(type,params) {
                     {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
-                        if (border) {
+                        if (border && borders) {
                             borders[c_oAscBorderOptions.InnerV] = border;
                         }
                         break;
@@ -2371,9 +2403,15 @@ function offline_apply_event(type,params) {
                     {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
-                        if (border) {
+                        if (border && borders) {
                             borders[c_oAscBorderOptions.InnerH] = border;
                         }
+                        break;
+                    }
+
+                    case 28:
+                    {
+                        _api.asc_setCellBorders([]);
                         break;
                     }
 
@@ -2386,7 +2424,7 @@ function offline_apply_event(type,params) {
                 }
             }
 
-            if (borders){
+            if (borders) {
                 _api.asc_setCellBorders(borders);
             }
 
