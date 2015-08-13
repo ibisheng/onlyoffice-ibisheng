@@ -611,22 +611,6 @@
 			case "mnuOpen":{
 				break;
 			}
-			case "mnuAddRowBelow":{
-				api.asc_insertRowsAfter(1)
-				break;
-			}
-			case "mnuAddRowAbove":{
-				api.asc_insertRowsBefore(1)
-				break;
-			}
-			case "mnuAddColumnLeft":{
-				api.asc_insertColumnsBefore(1)
-				break;
-			}
-			case "mnuAddColumnRight":{
-				api.asc_insertColumnsAfter(1)
-				break;
-			}
 			case "mnuSheetRename":{
 				$("#dialogRenameWS").dialog("open");
 				break;

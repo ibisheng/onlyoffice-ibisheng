@@ -652,16 +652,16 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 
 	function updateCommentsList(aComments) {
 		if (aComments.length) {
-
-			t.bSaveHistory = false;
 			var changeArray = [];
 			var removeArray = [];
 
 			for (var i = 0; i < aComments.length; i++) {
 				if (aComments[i].bChange) {
+					t.bSaveHistory = false;
 					t.asc_changeComment(aComments[i].comment.asc_getId(), aComments[i].comment,
 						/*bChangeCoords*/true, /*bNoEvent*/true, /*bNoAscLock*/true, /*bNoDraw*/false);
 					changeArray.push({"Id": aComments[i].comment.asc_getId(), "Comment": aComments[i].comment});
+					t.bSaveHistory = true;
 				} else {
 					t.asc_removeComment(aComments[i].comment.asc_getId(), /*bNoEvent*/true,
 						/*bNoAscLock*/true, /*bNoDraw*/false);
@@ -673,8 +673,6 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 				t.worksheet.model.workbook.handlers.trigger("asc_onChangeComments", changeArray);
 			if (removeArray.length)
 				t.worksheet.model.workbook.handlers.trigger("asc_onRemoveComments", removeArray);
-
-			t.bSaveHistory = true;
 		}
 	}
 

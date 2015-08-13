@@ -9590,35 +9590,6 @@
 					};
 					this._isLockedAll(onChangeWorksheetCallback);
 					break;
-				case "insColBefore":
-					functionModelAction = function () {
-						fullRecalc = true;
-						t.autoFilters.insertColumn(prop, val);
-						t.model.insertColsBefore(arn.c1, val);
-					};
-					oChangeData.added = new asc_Range(arn.c1, 0, arn.c1 + val - 1, gc_nMaxRow0);
-					this._isLockedCells(oChangeData.added, c_oAscLockTypeElemSubType.InsertColumns,
-						onChangeWorksheetCallback);
-					break;
-				case "insColAfter":
-					functionModelAction = function () {
-						fullRecalc = true;
-						t.autoFilters.insertColumn(prop, val);
-						t.model.insertColsAfter(arn.c2, val);
-					};
-					oChangeData.added = new asc_Range(arn.c2, 0, arn.c2 + val - 1, gc_nMaxRow0);
-					this._isLockedCells(oChangeData.added, c_oAscLockTypeElemSubType.InsertColumns,
-						onChangeWorksheetCallback);
-					break;
-				case "delCol":
-					functionModelAction = function () {
-						fullRecalc = true;
-						t.model.removeCols(arn.c1, arn.c2);
-					};
-					oChangeData.removed = new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0);
-					this._isLockedCells(oChangeData.removed, c_oAscLockTypeElemSubType.DeleteColumns,
-						onChangeWorksheetCallback);
-					break;
 				case "showCols":
 					functionModelAction = function () {
 						t.model.setColHidden(/*bHidden*/false, arn.c1, arn.c2);
@@ -9645,33 +9616,6 @@
 						reinitRanges = true;
 					};
 					return this._isLockedAll(onChangeWorksheetCallback);
-				case "insRowBefore":
-					functionModelAction = function () {
-						fullRecalc = true;
-						t.model.insertRowsBefore(arn.r1, val);
-					};
-					oChangeData.added = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r1 + val - 1);
-					this._isLockedCells(oChangeData.added, c_oAscLockTypeElemSubType.InsertRows,
-						onChangeWorksheetCallback);
-					break;
-				case "insRowAfter":
-					functionModelAction = function () {
-						fullRecalc = true;
-						t.model.insertRowsAfter(arn.r2, val);
-					};
-					oChangeData.added = new asc_Range(0, arn.r2, gc_nMaxCol0, arn.r2 + val - 1);
-					this._isLockedCells(oChangeData.added, c_oAscLockTypeElemSubType.InsertRows,
-						onChangeWorksheetCallback);
-					break;
-				case "delRow":
-					functionModelAction = function () {
-						fullRecalc = true;
-						t.model.removeRows(arn.r1, arn.r2);
-					};
-					oChangeData.removed = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r1);
-					this._isLockedCells(oChangeData.removed, c_oAscLockTypeElemSubType.DeleteRows,
-						onChangeWorksheetCallback);
-					break;
 				case "showRows":
 					functionModelAction = function () {
 						t.model.setRowHidden(/*bHidden*/false, arn.r1, arn.r2);
@@ -9779,11 +9723,13 @@
 								History.StartTransaction();
 								if(isCheckChangeAutoFilter === true)
 									t.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteCellsAndShiftLeft);
-								if (range.deleteCellsShiftLeft()) {
+								if (range.deleteCellsShiftLeft(function () {
 									t._cleanCache(oChangeData.changedRange);
+									t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
+								})) {
+									// ToDo проверить, может перенести в функцию prechange
 									if(isCheckChangeAutoFilter === true)
 										t.autoFilters.insertColumn(prop, checkRange, c_oAscDeleteOptions.DeleteCellsAndShiftLeft);
-									t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
 									t.objectRender.updateDrawingObject(false, val, checkRange);
 								}
 								History.EndTransaction();
@@ -9802,11 +9748,13 @@
 									History.StartTransaction();
 									if(isCheckChangeAutoFilter === true)
 										t.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteCellsAndShiftTop);
-									if (range.deleteCellsShiftUp()) {
+									if (range.deleteCellsShiftUp(function () {
 										t._cleanCache(oChangeData.changedRange);
+										t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
+									})) {
+										// ToDo проверить, может перенести в функцию prechange
 										if(isCheckChangeAutoFilter === true)
 											t.autoFilters.insertRows(prop, checkRange, c_oAscDeleteOptions.DeleteCellsAndShiftTop);
-										t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
 										t.objectRender.updateDrawingObject(false, val, checkRange);
 									}
 									History.EndTransaction();
@@ -9824,11 +9772,11 @@
 								fullRecalc = true;
 								History.Create_NewPoint();
 								History.StartTransaction();
+								t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
 								t.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteColumns);
 								t.model.removeCols(checkRange.c1, checkRange.c2);
 								t.autoFilters.insertColumn(prop, arn, c_oAscDeleteOptions.DeleteColumns);
 								t.objectRender.updateDrawingObject(false, val, checkRange);
-								t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
 								History.EndTransaction();
 							};
 
@@ -9845,11 +9793,11 @@
 								fullRecalc = true;
 								History.Create_NewPoint();
 								History.StartTransaction();
+								t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
 								t.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteRows);
 								t.model.removeRows(checkRange.r1, checkRange.r2);
 								t.autoFilters.insertRows(prop, checkRange, c_oAscDeleteOptions.DeleteRows);
 								t.objectRender.updateDrawingObject(false, val, checkRange);
-								t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
 								History.EndTransaction();
 							};
 

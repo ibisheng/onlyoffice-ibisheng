@@ -2458,18 +2458,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.wb.getWorksheet().changeWorksheet("colWidth", width);
 		};
 
-		spreadsheet_api.prototype.asc_insertColumnsBefore = function (count) {
-			this.wb.getWorksheet().changeWorksheet("insColBefore", count);
-		};
-
-		spreadsheet_api.prototype.asc_insertColumnsAfter = function (count){
-			this.wb.getWorksheet().changeWorksheet("insColAfter", count);
-		};
-
-		spreadsheet_api.prototype.asc_deleteColumns = function() {
-			this.wb.getWorksheet().changeWorksheet("delCol");
-		};
-
 		spreadsheet_api.prototype.asc_showColumns = function () {
 			this.wb.getWorksheet().changeWorksheet("showCols");
 		};
@@ -2485,18 +2473,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		spreadsheet_api.prototype.asc_setRowHeight = function (height) {
 			this.wb.getWorksheet().changeWorksheet("rowHeight", height);
-		};
-
-		spreadsheet_api.prototype.asc_insertRowsBefore = function(count) {
-			this.wb.getWorksheet().changeWorksheet("insRowBefore", count);
-		};
-
-		spreadsheet_api.prototype.asc_insertRowsAfter = function (count) {
-			this.wb.getWorksheet().changeWorksheet("insRowAfter", count);
-		};
-
-		spreadsheet_api.prototype.asc_deleteRows = function () {
-			this.wb.getWorksheet().changeWorksheet("delRow");
 		};
 
 		spreadsheet_api.prototype.asc_showRows = function () {
@@ -3813,16 +3789,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		prot["asc_getColumnWidth"] = prot.asc_getColumnWidth;
 		prot["asc_setColumnWidth"] = prot.asc_setColumnWidth;
-		prot["asc_insertColumnsBefore"] = prot.asc_insertColumnsBefore;
-		prot["asc_insertColumnsAfter"] = prot.asc_insertColumnsAfter;
-		prot["asc_deleteColumns"] = prot.asc_deleteColumns;
 		prot["asc_showColumns"] = prot.asc_showColumns;
 		prot["asc_hideColumns"] = prot.asc_hideColumns;
 		prot["asc_getRowHeight"] = prot.asc_getRowHeight;
 		prot["asc_setRowHeight"] = prot.asc_setRowHeight;
-		prot["asc_insertRowsBefore"] = prot.asc_insertRowsBefore;
-		prot["asc_insertRowsAfter"] = prot.asc_insertRowsAfter;
-		prot["asc_deleteRows"] = prot.asc_deleteRows;
 		prot["asc_showRows"] = prot.asc_showRows;
 		prot["asc_hideRows"] = prot.asc_hideRows;
 		prot["asc_insertCells"] = prot.asc_insertCells;

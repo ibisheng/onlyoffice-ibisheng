@@ -7552,8 +7552,8 @@ Range.prototype.removeHyperlink = function (val, removeStyle) {
 		History.EndTransaction();
 	}
 };
-Range.prototype.deleteCellsShiftUp=function(){
-	return this._shiftUpDown(true);
+Range.prototype.deleteCellsShiftUp=function(preDeleteAction){
+	return this._shiftUpDown(true, preDeleteAction);
 };
 Range.prototype.addCellsShiftBottom=function(){
 	return this._shiftUpDown(false);
@@ -7561,19 +7561,26 @@ Range.prototype.addCellsShiftBottom=function(){
 Range.prototype.addCellsShiftRight=function(){
 	return this._shiftLeftRight(false);
 };
-Range.prototype.deleteCellsShiftLeft=function(){
-	return this._shiftLeftRight(true);
+Range.prototype.deleteCellsShiftLeft=function(preDeleteAction){
+	return this._shiftLeftRight(true, preDeleteAction);
 };
 Range.prototype._canShiftLeftRight=function(bLeft){
+	var aColsToDelete = [], aCellsToDelete = [];
 	var oBBox = this.bbox;
-	var nWidth = oBBox.c2 - oBBox.c1 + 1;
 	var nRangeType = this._getRangeType(oBBox);
 	if(c_oRangeType.Range != nRangeType && c_oRangeType.Col != nRangeType)
-		return false;
+		return null;
+
+	var nWidth = oBBox.c2 - oBBox.c1 + 1;
 	if(!bLeft && !this.worksheet.workbook.bUndoChanges && !this.worksheet.workbook.bRedoChanges){
 		var rangeEdge = this.worksheet.getRange3(oBBox.r1, gc_nMaxCol0 - nWidth + 1, oBBox.r2, gc_nMaxCol0);
-		var aColsToDelete = [];
-		var aCellsToDelete = [];
+		var aMerged = this.worksheet.mergeManager.get(rangeEdge.bbox);
+		if(aMerged.all.length > 0)
+			return null;
+		var aHyperlink = this.worksheet.hyperlinkManager.get(rangeEdge.bbox);
+		if(aHyperlink.all.length > 0)
+			return null;
+
 		var bError = rangeEdge._setPropertyNoEmpty(null, function(col){
 			if(null != col){
 				if(null != col && null != col.xfs && null != col.xfs.fill && null != col.xfs.fill.getRgbOrNull())
@@ -7590,31 +7597,30 @@ Range.prototype._canShiftLeftRight=function(bLeft){
 			}
 		});
 		if(bError)
-			return false;
-		var aMerged = this.worksheet.mergeManager.get(rangeEdge.bbox);
-		if(aMerged.all.length > 0)
-			return false;
-		var aHyperlink = this.worksheet.hyperlinkManager.get(rangeEdge.bbox);
-		if(aHyperlink.all.length > 0)
-			return false;
-		//удаляем крайние колонки и ячейки
-		for(var i = 0; i < aColsToDelete.length; ++i){
-			var col = aColsToDelete[i];
-			this.worksheet._removeCols(col.index, col.index);
-		}
-		for(var i = 0; i < aCellsToDelete.length; ++i){
-			var cell = aCellsToDelete[i];
-			this.worksheet._removeCell(null, null, cell);
-		}
+			return null;
 	}
-	return true;
+	return {aColsToDelete: aColsToDelete, aCellsToDelete: aCellsToDelete};
 };
-Range.prototype._shiftLeftRight=function(bLeft){
+Range.prototype._shiftLeftRight=function(bLeft, preDeleteAction){
+	var canShiftRes = this._canShiftLeftRight(bLeft);
+	if(null === canShiftRes)
+		return false;
+
+	if (preDeleteAction)
+		preDeleteAction();
+
+	//удаляем крайние колонки и ячейки
+	var i, length, colIndex;
+	for(i = 0, length = canShiftRes.aColsToDelete.length; i < length; ++i){
+		colIndex = canShiftRes.aColsToDelete[i].index;
+		this.worksheet._removeCols(colIndex, colIndex);
+	}
+	for(i = 0, length = canShiftRes.aCellsToDelete.length; i < length; ++i)
+		this.worksheet._removeCell(null, null, canShiftRes.aCellsToDelete[i]);
+
 	var oBBox = this.bbox;
 	var nWidth = oBBox.c2 - oBBox.c1 + 1;
 	var nRangeType = this._getRangeType(oBBox);
-	if(!this._canShiftLeftRight(bLeft))
-		return false;
 	var mergeManager = this.worksheet.mergeManager;
 	lockDraw(this.worksheet.workbook);
 	//todo вставить предупреждение, что будет unmerge
@@ -7629,7 +7635,7 @@ Range.prototype._shiftLeftRight=function(bLeft){
 		if(null != aMerged.outer && aMerged.outer.length > 0)
 		{
 			var bChanged = false;
-			for(var i = 0, length = aMerged.outer.length; i < length; i++)
+			for(i = 0, length = aMerged.outer.length; i < length; i++)
 			{
 				var elem = aMerged.outer[i];
 				if(!(elem.bbox.c1 < oShiftGet.bbox.c1 && oShiftGet.bbox.r1 <= elem.bbox.r1 && elem.bbox.r2 <= oShiftGet.bbox.r2))
@@ -7671,18 +7677,25 @@ Range.prototype._shiftLeftRight=function(bLeft){
 	return true;
 };
 Range.prototype._canShiftUpDown=function(bUp){
+	var aRowsToDelete = [], aCellsToDelete = [];
 	var oBBox = this.bbox;
-	var nHeight = oBBox.r2 - oBBox.r1 + 1;
 	var nRangeType = this._getRangeType(oBBox);
 	if(c_oRangeType.Range != nRangeType && c_oRangeType.Row != nRangeType)
-		return false;
+		return null;
+
+	var nHeight = oBBox.r2 - oBBox.r1 + 1;
 	if(!bUp && !this.worksheet.workbook.bUndoChanges && !this.worksheet.workbook.bRedoChanges){
 		var rangeEdge = this.worksheet.getRange3(gc_nMaxRow0 - nHeight + 1, oBBox.c1, gc_nMaxRow0, oBBox.c2);
-		var aRowsToDelete = [];
-		var aCellsToDelete = [];
+		var aMerged = this.worksheet.mergeManager.get(rangeEdge.bbox);
+		if(aMerged.all.length > 0)
+			return null;
+		var aHyperlink = this.worksheet.hyperlinkManager.get(rangeEdge.bbox);
+		if(aHyperlink.all.length > 0)
+			return null;
+
 		var bError = rangeEdge._setPropertyNoEmpty(function(row){
 			if(null != row){
-				if(null != row && null != row.xfs && null != row.xfs.fill && null != row.xfs.fill.getRgbOrNull())
+				if(null != row.xfs && null != row.xfs.fill && null != row.xfs.fill.getRgbOrNull())
 					return true;
 				aRowsToDelete.push(row);
 			}
@@ -7696,31 +7709,30 @@ Range.prototype._canShiftUpDown=function(bUp){
 			}
 		});
 		if(bError)
-			return false;
-		var aMerged = this.worksheet.mergeManager.get(rangeEdge.bbox);
-		if(aMerged.all.length > 0)
-			return false;
-		var aHyperlink = this.worksheet.hyperlinkManager.get(rangeEdge.bbox);
-		if(aHyperlink.all.length > 0)
-			return false;
-		//удаляем крайние колонки и ячейки
-		for(var i = 0; i < aRowsToDelete.length; ++i){
-			var row = aRowsToDelete[i];
-			this.worksheet._removeRows(row.index, row.index);
-		}
-		for(var i = 0; i < aCellsToDelete.length; ++i){
-			var cell = aCellsToDelete[i];
-			this.worksheet._removeCell(null, null, cell);
-		}
+			return null;
 	}
-	return true;
+	return {aRowsToDelete: aRowsToDelete, aCellsToDelete: aCellsToDelete};
 };
-Range.prototype._shiftUpDown = function (bUp) {
+Range.prototype._shiftUpDown = function (bUp, preDeleteAction) {
+	var canShiftRes = this._canShiftUpDown(bUp);
+	if(null === canShiftRes)
+		return false;
+
+	if (preDeleteAction)
+		preDeleteAction();
+
+	//удаляем крайние колонки и ячейки
+	var i, length, rowIndex;
+	for(i = 0, length = canShiftRes.aRowsToDelete.length; i < length; ++i){
+		rowIndex = canShiftRes.aRowsToDelete[i].index;
+		this.worksheet._removeRows(rowIndex, rowIndex);
+	}
+	for(i = 0, length = canShiftRes.aCellsToDelete.length; i < length; ++i)
+		this.worksheet._removeCell(null, null, canShiftRes.aCellsToDelete[i]);
+
 	var oBBox = this.bbox;
 	var nHeight = oBBox.r2 - oBBox.r1 + 1;
 	var nRangeType = this._getRangeType(oBBox);
-	if(!this._canShiftUpDown(bUp))
-		return false;
 	var mergeManager = this.worksheet.mergeManager;
 	lockDraw(this.worksheet.workbook);
 	//todo вставить предупреждение, что будет unmerge
@@ -7735,7 +7747,7 @@ Range.prototype._shiftUpDown = function (bUp) {
 		if(null != aMerged.outer && aMerged.outer.length > 0)
 		{	
 			var bChanged = false;
-			for(var i = 0, length = aMerged.outer.length; i < length; i++)
+			for(i = 0, length = aMerged.outer.length; i < length; i++)
 			{
 				var elem = aMerged.outer[i];
 				if(!(elem.bbox.r1 < oShiftGet.bbox.r1 && oShiftGet.bbox.c1 <= elem.bbox.c1 && elem.bbox.c2 <= oShiftGet.bbox.c2))
