@@ -555,9 +555,6 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
                     found_operand.isAbsolute = true;
             }
         }
-        else if ( parserHelp.isName.call( o, o.Formula, o.pCurrPos, wb )[0] ) {
-            found_operand = new cName( o.operand_str, wb );
-        }
         else if ( parserHelp.isArea.call( o, o.Formula, o.pCurrPos ) ) {
             found_operand = new cArea( o.operand_str.toUpperCase(), r.worksheet );
             if ( o.operand_str.indexOf( "$" ) > -1 )
@@ -567,6 +564,9 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
             found_operand = new cRef( o.operand_str.toUpperCase(), r.worksheet );
             if ( o.operand_str.indexOf( "$" ) > -1 )
                 found_operand.isAbsolute = true;
+        }
+        else if ( parserHelp.isName.call( o, o.Formula, o.pCurrPos, wb )[0] ) {
+            found_operand = new cName( o.operand_str, wb, r.worksheet );
         }
     }
 
