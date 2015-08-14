@@ -2272,7 +2272,7 @@ cIMPOWER.prototype.getInfo = function () {
 }
 
 function cIMPRODUCT() {
-    cBaseFunction.call( this, "IMPRODUCT", 1, 1 );
+    cBaseFunction.call( this, "IMPRODUCT", 1 );
 }
 
 cIMPRODUCT.prototype = Object.create( cBaseFunction.prototype );
@@ -2527,7 +2527,7 @@ cIMSUB.prototype.getInfo = function () {
 }
 
 function cIMSUM() {
-    cBaseFunction.call( this, "IMSUM", 1, 1 );
+    cBaseFunction.call( this, "IMSUM", 1 );
 }
 
 cIMSUM.prototype = Object.create( cBaseFunction.prototype );
