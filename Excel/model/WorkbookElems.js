@@ -18,6 +18,11 @@ var g_nColorTextDefault = 1;
 var g_nColorHyperlink = 10;
 var g_nColorHyperlinkVisited = 11;
 
+var g_nFiltersType = {
+	autoFilter: 1, 
+	tablePart: 2
+};
+
 var g_oThemeColorsDefaultModsSpreadsheet = [
     [0, -4.9989318521683403E-2, -0.14999847407452621, -0.249977111117893, -0.34998626667073579, -0.499984740745262],
     [0, -9.9978637043366805E-2, -0.249977111117893, -0.499984740745262, -0.749992370372631, -0.89999084444715716],
@@ -4449,6 +4454,10 @@ TablePart.prototype.addTableColumns = function(activeRange, aF)
 	this.TableColumns = newTableColumns;
 };
 
+TablePart.prototype.getType = function(F)
+{
+	return g_nFiltersType.tablePart;
+};
 
 /** @constructor */
 function AutoFilter() {
@@ -4520,6 +4529,11 @@ AutoFilter.prototype.isApplySortConditions = function() {
 		res = true;
 		
 	return res;
+};
+
+AutoFilter.prototype.getType = function(F)
+{
+	return g_nFiltersType.autoFilter;
 };
 
 function FilterColumns() {
