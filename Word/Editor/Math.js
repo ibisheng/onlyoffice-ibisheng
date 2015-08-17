@@ -771,7 +771,6 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
     }
 
     var pos   = new CMathPosition();
-
     this.Root.setPosition(pos, PosInfo);
 
     var XStart, XEnd;
@@ -1608,6 +1607,17 @@ ParaMath.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange
     var Page = 0;
     if ( this.Paragraph !== null)
         Page = this.Paragraph.Get_StartPage_Absolute();
+
+    if(this.ParaMathRPI.bInline === true) // setPosition в этом случае на Get_AlignToLine не была вызвана, поэтому необходимо вызвать здесь
+    {
+        var PosInfo = new CMathPosInfo();
+
+        PosInfo.CurLine  = _CurLine;
+        PosInfo.CurRange = _CurRange;
+
+        var pos   = new CMathPosition();
+        this.Root.setPosition(pos, PosInfo);
+    }
 
     this.Root.UpdateBoundsPosInfo(PRSA, _CurLine, _CurRange, Page + _CurPage);
 

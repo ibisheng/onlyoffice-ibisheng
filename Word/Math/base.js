@@ -2167,10 +2167,9 @@ CMathBase.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange
 
     if(this.bOneLine)
     {
-        for ( var CurPos = 0; CurPos <= this.Content.length - 1; CurPos++ )
+        for (var Pos = 0; Pos <= this.Content.length - 1; Pos++)
         {
-            var Item = this.Content[CurPos];
-            Item.Recalculate_Range_Width( PRSC, _CurLine, _CurRange );
+            this.Content[Pos].Recalculate_Range_Width( PRSC, _CurLine, _CurRange );
         }
 
         PRSC.Range.W = RangeW + this.size.width;
@@ -2183,14 +2182,12 @@ CMathBase.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange
         if(CurLine == 0 && CurRange == 0)
             PRSC.Range.W += this.BrGapLeft;
 
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+        for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
         {
-            var Item = this.Content[CurPos];
-            Item.Recalculate_Range_Width( PRSC, _CurLine, _CurRange );
+            this.Content[CurPos].Recalculate_Range_Width( PRSC, _CurLine, _CurRange );
         }
 
         PRSC.Range.W += this.dW*(EndPos - StartPos);
-
 
         // Здесь проверяем не на то, что это последний Range (т.к. на данном этапе еще идет вычисление строк) а на конец контента !
 

@@ -462,7 +462,9 @@ CMathBoxPr.prototype.Write_ToBinary = function(Writer)
         this.brk.Write_ToBinary(Writer);
     }
     else
+    {
         Writer.WriteBool(true);
+    }
 };
 CMathBoxPr.prototype.Read_FromBinary = function(Reader)
 {
