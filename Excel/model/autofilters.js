@@ -499,6 +499,9 @@ var maxIndividualValues = 10000;
 				var filterObj = this._getPressedFilter(ar, autoFiltersObject.cellId);
 				var currentFilter = filterObj.filter;
 				
+				if(filterObj.filter === null)
+					return;
+				
 				//for history				
 				var oldFilter = filterObj.filter.clone(null);
 				History.Create_NewPoint();
@@ -1350,6 +1353,7 @@ var maxIndividualValues = 10000;
 										var newColId = autoFilter.FilterColumns[j].ColId + diffColId;
 										if(newColId < 0 || (diff < 0 && col >= activeRange.c1 && col <= activeRange.c2))
 										{
+											autoFilter.FilterColumns[j].Filters.clean();
 											t._openHiddenRowsFilterColumn(autoFilter, autoFilter.FilterColumns[j].ColId);
 											autoFilter.FilterColumns.splice(j, 1);
 											j--;
@@ -3611,7 +3615,11 @@ var maxIndividualValues = 10000;
 								//filter current button
 								var checkValue = isDateTimeFormat ? val : text;
 								if(!filterColumns[currentElemArray].Top10 && !isCustomFilters && !filterColumns[currentElemArray].isHideValue(checkValue, isDateTimeFormat))
+								{
+									if(isOpenHiddenRows)
+										aWs.setRowHidden(false, i, i);
 									tempResult.visible = true;
+								}
 								else
 								{
 									if(isOpenHiddenRows)
@@ -3633,6 +3641,9 @@ var maxIndividualValues = 10000;
 							tempResult.val = val;
 							tempResult.text = text;
 							tempResult.isDateFormat = cell.getNumFormat().isDateTimeFormat();
+							
+							if(isOpenHiddenRows)
+								aWs.setRowHidden(false, i, i);
 							
 							addValueToMenuObj(tempResult, count);
 							temp[text] = 1;
