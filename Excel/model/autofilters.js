@@ -1134,7 +1134,7 @@ var maxIndividualValues = 10000;
 				}
 			},
 			
-			isEmptyAutoFilters: function(ar, insertType, insCells, deleteFilterAfterDeleteColRow, exceptionArray)
+			isEmptyAutoFilters: function(ar, insertType, exceptionArray)
 			{
 				var aWs = this._getCurrentWS();
 				var activeCells = ar.clone();
@@ -1160,8 +1160,7 @@ var maxIndividualValues = 10000;
 				{
 					var oldFilter = filter.clone(null);
 					var oRange = Range.prototype.createFromBBox(aWs, oldFilter.Ref);
-					if(insCells)
-						oldFilter.insCells = true;
+
 					var bbox = oRange.getBBox0();
 
 					//смотрим находится ли фильтр(первая его строчка) внутри выделенного фрагмента
@@ -1177,7 +1176,7 @@ var maxIndividualValues = 10000;
 
 						//заносим в историю
 						if(isTablePart){
-							t._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, deleteFilterAfterDeleteColRow, bbox);
+							t._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, bbox);
                         }
 						else
 							t._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, oldFilter.Ref);
@@ -4179,7 +4178,7 @@ var maxIndividualValues = 10000;
 							
 							//если переносим просто данные, причём шапки совпадают, то фильтр не очищаем
 							if(!(arnTo.r1 === ref.r1 && arnTo.c1 === ref.c1) && !arnFrom.containsRange(ref))
-								this.isEmptyAutoFilters(ref, null, null, null, findFilters);
+								this.isEmptyAutoFilters(ref, null, findFilters);
 						}
 						applyStyleByCells = false;
 					}
