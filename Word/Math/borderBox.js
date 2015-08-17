@@ -361,12 +361,12 @@ CBorderBox.prototype.Draw_Elements = function(PDSE)
     PDSE.X = _X + this.size.width;
 
 };
-CBorderBox.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
+CBorderBox.prototype.setPosition = function(pos, PosInfo)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
 
-    this.UpdatePosBound(pos, PRSA, Line, Range, Page);
+    this.UpdatePosBound(pos, PosInfo);
 
     var NewPos = new CMathPosition();
 
@@ -383,7 +383,7 @@ CBorderBox.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
     else
         NewPos.y = this.pos.y + Base.size.ascent;
 
-    Base.setPosition(NewPos, PRSA, Line, Range, Page); // base
+    Base.setPosition(NewPos, PosInfo);
 
     pos.x += this.size.width;
 };

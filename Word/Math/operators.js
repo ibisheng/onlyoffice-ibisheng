@@ -3558,9 +3558,11 @@ CDelimiter.prototype.GetAscentOperator = function(operator) // в качеств
 
     return Ascent;
 };
-CDelimiter.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
+CDelimiter.prototype.setPosition = function(pos, PosInfo)
 {
-    this.UpdatePosBound(pos, PRSA, Line, Range, Page);
+    this.UpdatePosBound(pos, PosInfo);
+    var Line  = PosInfo.CurLine,
+        Range = PosInfo.CurRange;
 
     if(this.bOneLine == false)
     {
@@ -3574,7 +3576,7 @@ CDelimiter.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
             this.UpdatePosOperBeg(pos, Line);
         }
 
-        this.Content[0].setPosition(pos, PRSA, Line, Range, Page);
+        this.Content[0].setPosition(pos, PosInfo);
 
         // пересчет еще не закончился, поэтому на LastRange не можем проверить
         if(true === this.Content[0].Math_Is_End(Line, Range))
@@ -3596,7 +3598,7 @@ CDelimiter.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 
         this.UpdatePosOperBeg(CurrPos, Line);
 
-        this.Content[0].setPosition(CurrPos, PRSA, Line, Range, Page); // CMathContent
+        this.Content[0].setPosition(CurrPos, PosInfo); // CMathContent
 
         var PosSep = new CMathPosition();
         PosSep.x = CurrPos.x;
@@ -3609,7 +3611,7 @@ CDelimiter.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
         {
             CurrPos.x += this.sepOper.size.width;
 
-            this.Content[j].setPosition(CurrPos, PRSA, Line, Range, Page);
+            this.Content[j].setPosition(CurrPos, PosInfo);
             pos.x += this.Content[j].size.width;
         }
 
@@ -3761,12 +3763,12 @@ CCharacter.prototype.recalculateSize = function(oMeasure)
     this.size.width  = width;
     this.size.ascent = ascent;
 };
-CCharacter.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
+CCharacter.prototype.setPosition = function(pos, PosInfo)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
 
-    this.UpdatePosBound(pos, PRSA, Line, Range, Page);
+    this.UpdatePosBound(pos, PosInfo);
 
     var width = this.size.width - this.GapLeft - this.GapRight;
 
@@ -3788,14 +3790,14 @@ CCharacter.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
         PosBase.x = this.pos.x + this.GapLeft + alignCnt;
         PosBase.y = this.pos.y + this.operator.size.height + Base.size.ascent;
 
-        Base.setPosition(PosBase, PRSA, Line, Range, Page);
+        Base.setPosition(PosBase, PosInfo);
     }
     else if(this.Pr.pos === LOCATION_BOT)
     {
         PosBase.x = this.pos.x + this.GapLeft + alignCnt;
         PosBase.y = this.pos.y + Base.size.ascent;
 
-        Base.setPosition(PosBase, PRSA, Line, Range, Page);
+        Base.setPosition(PosBase, PosInfo);
 
         PosOper.x = this.pos.x + this.GapLeft + alignOp;
         PosOper.y = this.pos.y + Base.size.height;

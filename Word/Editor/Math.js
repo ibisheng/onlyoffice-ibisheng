@@ -756,13 +756,23 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
     var WrapState = this.PageInfo.GetWrap(Page);
     var bFirstLine = this.Root.IsStartLine(_CurLine);
 
-    /*var wrap = 0;
-    var wrapIndent = MathSettings.Get_WrapIndent(WrapState);
+    // выставим сначала Position до пересчета выравнивания для формулы
+    // для расчета смещений относительно операторов
 
-    if(bFirstLine == false && true == MathSettings.IsWrap(WrapState))
+    var PosInfo = new CMathPosInfo();
+
+    PosInfo.CurLine  = _CurLine;
+    PosInfo.CurRange = _CurRange;
+
+    if(true == this.NeedDispOperators(_CurLine))
     {
-        wrap = this.Root.Get_WrapToLine(_CurLine, _CurRange, wrapIndent);
-    }*/
+       this.DispositionOpers.length = 0;
+       PosInfo.DispositionOpers = this.DispositionOpers;
+    }
+
+    var pos   = new CMathPosition();
+
+    this.Root.setPosition(pos, PosInfo);
 
     var XStart, XEnd;
 
@@ -1206,12 +1216,6 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.ParaMathRPI.ResetInfoRanges();
     }
 
-    if(true == this.NeedDispOperators(PRS))
-    {
-        this.DispositionOpers.length = 0;
-        PRS.DispositionOpers = this.DispositionOpers;
-    }
-
     if(bUpdateWrapMath == true && this.ParaMathRPI.bInternalRanges == false &&  PRS.bFastRecalculate == false)
     {
         this.ParaMathRPI.bInternalRanges = true;
@@ -1605,9 +1609,7 @@ ParaMath.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange
     if ( this.Paragraph !== null)
         Page = this.Paragraph.Get_StartPage_Absolute();
 
-    var pos = new CMathPosition();
-
-    this.Root.setPosition(pos, PRSA, _CurLine, _CurRange, Page + _CurPage);
+    this.Root.UpdateBoundsPosInfo(PRSA, _CurLine, _CurRange, Page + _CurPage);
 
     this.Root.Recalculate_Range_Spaces(PRSA, _CurLine, _CurRange, Page + _CurPage);
 };
@@ -1731,12 +1733,11 @@ ParaMath.prototype.Get_Inline = function()
 };
 ParaMath.prototype.Is_Inline = function()
 {
-    //return this.ParaMathRPI.bInline;
     return this.ParaMathRPI.bInline == true || (this.ParaMathRPI.bInternalRanges == true && this.ParaMathRPI.bStartRanges == false);
 };
-ParaMath.prototype.NeedDispOperators = function(PRS)
+ParaMath.prototype.NeedDispOperators = function(Line)
 {
-    return false === this.Is_Inline() &&  true == this.Root.IsStartLine(PRS.Line);
+    return false === this.Is_Inline() &&  true == this.Root.IsStartLine(Line);
 };
 ParaMath.prototype.Get_Align = function()
 {
@@ -1897,7 +1898,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
 };
 ParaMath.prototype.GetFirstRPrp = function()
 {
-    return this.Root.getFirstRPrp(this);
+    return this.Root.getFirstRPrp();
 };
 ParaMath.prototype.GetShiftCenter = function(oMeasure, font)
 {

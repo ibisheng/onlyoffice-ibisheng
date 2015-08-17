@@ -293,10 +293,12 @@ CDegreeBase.prototype.setDistance = function()
     else
         this.dW = 0.056*PlH;
 };
-CDegreeBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
+CDegreeBase.prototype.setPosition = function(pos, PosInfo)
 {
-    this.UpdatePosBound(pos, PRSA, Line, Range, Page);
+    this.UpdatePosBound(pos, PosInfo);
 
+    var Line  = PosInfo.CurLine,
+        Range = PosInfo.CurRange;
     var CurLine = Line - this.StartLine;
     var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
 
@@ -326,13 +328,13 @@ CDegreeBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
         if(!this.baseContent.IsJustDraw())
             PosBase.y += this.baseContent.size.ascent;
 
-        this.baseContent.setPosition(PosBase, PRSA, Line, Range, Page);
+        this.baseContent.setPosition(PosBase, PosInfo);
 
         var PosIter = new CMathPosition();
         PosIter.x = X + this.baseContent.size.width + this.dW;
         PosIter.y = Y + this.size.ascent + this.upIter + this.iterContent.size.ascent;
 
-        this.iterContent.setPosition(PosIter, PRSA, Line, Range, Page);
+        this.iterContent.setPosition(PosIter, PosInfo);
 
         pos.x += this.size.width;
     }
@@ -343,7 +345,7 @@ CDegreeBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 
         Y = pos.y;
 
-        this.baseContent.setPosition(pos, PRSA, Line, Range, Page);
+        this.baseContent.setPosition(pos, PosInfo);
 
         var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
         var Lng = this.Content.length;
@@ -354,7 +356,7 @@ CDegreeBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 
             pos.y += this.upIter + this.iterContent.size.ascent;
 
-            this.iterContent.setPosition(pos, PRSA, Line, Range, Page);
+            this.iterContent.setPosition(pos, PosInfo);
 
             pos.x += this.BrGapRight;
         }
@@ -467,8 +469,10 @@ CDegree.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
     }
 
 };
-CDegree.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
+CDegree.prototype.setPosition = function(pos, PosInfo)
 {
+    var Line  = PosInfo.CurLine,
+        Range = PosInfo.CurRange;
     var CurLine = Line - this.StartLine;
     var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
 
@@ -479,11 +483,11 @@ CDegree.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
 
     if(this.bOneLine || EndPos == Len - 1)
     {
-        CDegree.superclass.setPosition.call(this, pos, PRSA, Line, Range, Page);
+        CDegree.superclass.setPosition.call(this, pos, PosInfo);
     }
     else
     {
-        CMathBase.prototype.setPosition.call(this, pos, PRSA, Line, Range, Page);
+        CMathBase.prototype.setPosition.call(this, pos, PosInfo);
     }
 };
 
@@ -980,18 +984,20 @@ CDegreeSubSup.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurR
         this.Bounds.SetWidth(CurLine, CurRange, PRSC.Range.W - RangeW);
     }
 };
-CDegreeSubSup.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
+CDegreeSubSup.prototype.setPosition = function(pos, PosInfo)
 {
     if(this.bOneLine)
     {
-        CDegreeSubSup.superclass.setPosition.call(this, pos, PRSA, Line, Range, Page);
+        CDegreeSubSup.superclass.setPosition.call(this, pos, PosInfo);
     }
     else
     {
+        var Line  = PosInfo.CurLine,
+            Range = PosInfo.CurRange;
         var CurLine  = Line - this.StartLine;
         var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
 
-        this.UpdatePosBound(pos, PRSA, Line, Range, Page);
+        this.UpdatePosBound(pos, PosInfo);
 
         if(CurLine == 0 && CurRange == 0)
         {
@@ -1001,14 +1007,14 @@ CDegreeSubSup.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
         var PosIters = new CMathPosition();
         if(this.Pr.type == DEGREE_SubSup)
         {
-            this.baseContent.setPosition(pos, PRSA, Line, Range, Page);
+            this.baseContent.setPosition(pos, PosInfo);
 
             if(this.baseContent.Math_Is_End(Line, Range))
             {
                 PosIters.x = pos.x;
                 PosIters.y = pos.y - this.iters.size.ascent;
 
-                this.iters.setPosition(PosIters, PRSA, Line, Range, Page);
+                this.iters.setPosition(PosIters, PosInfo);
 
                 pos.x += this.iters.size.width + this.dW + this.BrGapRight;
             }
@@ -1020,13 +1026,13 @@ CDegreeSubSup.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
                 PosIters.x = pos.x;
                 PosIters.y = pos.y - this.iters.size.ascent;
 
-                this.iters.setPosition(PosIters, PRSA, Line, Range, Page);
+                this.iters.setPosition(PosIters, PosInfo);
 
                 pos.x += this.iters.size.width + this.dW;
 
             }
 
-            this.baseContent.setPosition(pos, PRSA, Line, Range, Page);
+            this.baseContent.setPosition(pos, PosInfo);
 
             if(this.baseContent.Math_Is_End(Line, Range))
                 pos.x += this.BrGapRight;

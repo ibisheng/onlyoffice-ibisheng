@@ -2199,7 +2199,6 @@ function CParagraphRecalculateStateWrap(Para)
     this.OperGapRight        = 0;
     this.OperGapLeft         = 0;
     this.bNoOneBreakOperator = true;  // прежде чем обновлять позицию в контент Run, учтем были ли до этого break-операторы (проверки на Word == false не достаточно, т.к. формула мб инлайновая и тогда не нужно обновлять позицию)
-    this.DispositionOpers    = [];
     this.BreakBox            = false;
     this.bInsideOper         = false; // учитываем есть ли разбивка внутри мат объекта, чтобы случайно не вставить в конец пред оператора (при Brk_Before == false)
     this.bOnlyForcedBreak    = false; // учитывается, если возможна разбивка только по операторам выше уровням => в этом случае можно сделать принудительный разрыв во внутреннем контенте
@@ -2244,7 +2243,6 @@ CParagraphRecalculateStateWrap.prototype =
         this.bFastRecalculate    = false;
         this.bBoxOperator        = false;
         this.BreakBox            = false;
-        this.DispositionOpers    = []; // выставляем ссылку на новый массив ! length нельзя обнулять, т.к. при пересчете передаем ссылку на массив из ParaMath, чтобы после не пришлось копировать элементы массива
     },
 
     // Обнуляем некоторые параметры перед новым отрезком

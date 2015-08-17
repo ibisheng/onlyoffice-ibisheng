@@ -464,7 +464,7 @@ CMathMatrix.prototype.init = function(props)
 
     this.fillContent();
 };
-CMathMatrix.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
+CMathMatrix.prototype.setPosition = function(pos, PosInfo)
 {
     this.pos.x = pos.x;
 
@@ -473,7 +473,7 @@ CMathMatrix.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
     else
         this.pos.y = pos.y - this.size.ascent; ///!!!!
 
-    this.UpdatePosBound(pos, PRSA, Line, Range, Page);
+    this.UpdatePosBound(pos, PosInfo);
 
     var maxWH = this.getWidthsHeights();
     var Widths = maxWH.widths;
@@ -493,7 +493,7 @@ CMathMatrix.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
             NewPos.x = this.pos.x + this.GapLeft + al.x + w;
             NewPos.y = this.pos.y + al.y + h + Item.size.ascent;
 
-            Item.setPosition(NewPos, PRSA, Line, Range, Page);
+            Item.setPosition(NewPos, PosInfo);
             w += Widths[j] + this.gaps.column[j];
         }
         h += Heights[i] + this.gaps.row[i];
@@ -834,7 +834,7 @@ CEqArray.prototype.getMetrics = function()
 
     return {ascents: AscentsMetrics, descents: DescentsMetrics, widths: WidthsMetrics};
 };
-CEqArray.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
+CEqArray.prototype.setPosition = function(pos, PosInfo)
 {
     this.pos.x = pos.x;
 
@@ -843,7 +843,7 @@ CEqArray.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
     else
         this.pos.y = pos.y - this.size.ascent; ///!!!!
 
-    this.UpdatePosBound(pos, PRSA, Line, Range, Page);
+    this.UpdatePosBound(pos, PosInfo);
 
     var maxWH = this.getWidthsHeights();
     var Heights = maxWH.heights;
@@ -858,7 +858,7 @@ CEqArray.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
         NewPos.x = this.pos.x + this.GapLeft;
         NewPos.y = this.pos.y + h + Item.size.ascent;
 
-        Item.setPosition(NewPos, PRSA, Line, Range, Page);
+        Item.setPosition(NewPos, PosInfo);
 
         h += Heights[i] + this.gaps.row[i];
     }

@@ -388,11 +388,11 @@ CFraction.prototype.recalculateLinear = function()
     this.size.width  = width;
     this.size.ascent = ascent;
 };
-CFraction.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
+CFraction.prototype.setPosition = function(pos, PosInfo)
 {
     if(this.Pr.type == SKEWED_FRACTION)
     {
-        this.UpdatePosBound(pos, PRSA, Line, Range, Page);
+        this.UpdatePosBound(pos, PosInfo);
 
         var Numerator   = this.Content[0],
             Denominator = this.Content[1];
@@ -413,13 +413,15 @@ CFraction.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
         PosDen.x = X + Numerator.size.width + this.dW;
         PosDen.y = Y + Numerator.size.height + Denominator.size.ascent;
 
-        Numerator.setPosition(PosNum, PRSA, Line, Range, Page);
-        Denominator.setPosition(PosDen, PRSA, Line, Range, Page);
+        Numerator.setPosition(PosNum, PosInfo);
+        Denominator.setPosition(PosDen, PosInfo);
 
         pos.x += this.size.width;
     }
     else
-        CFraction.superclass.setPosition.call(this, pos, PRSA, Line, Range, Page);
+    {
+        CFraction.superclass.setPosition.call(this, pos, PosInfo);
+    }
 };
 CFraction.prototype.fillContent = function()
 {
@@ -545,7 +547,7 @@ CDenominator.prototype.recalculateSize = function()
 
     var mgCtrPrp = this.Get_TxtPrControlLetter();
 
-    var Ascent = arg.ascent -  4.938888888888888*mgCtrPrp.FontSize/36;
+    var Ascent = arg.ascent -  4.939*mgCtrPrp.FontSize/36;
 
     g_oTextMeasurer.SetFont(mgCtrPrp);
     var Height = g_oTextMeasurer.GetHeight();
@@ -575,10 +577,10 @@ CDenominator.prototype.recalculateSize = function()
     this.size.width  = width;
     this.size.ascent = ascent;
 };
-CDenominator.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
+CDenominator.prototype.setPosition = function(pos, PosInfo)
 {
     pos.y += this.gap;
 
-    CDenominator.superclass.setPosition.call(this, pos, PRSA, Line, Range, Page);
+    CDenominator.superclass.setPosition.call(this, pos, PosInfo);
 };
 //////////

@@ -292,9 +292,9 @@ CMathBase.prototype.align = function(pos_x, pos_y)
 
     return PosAlign;
 };
-CMathBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
+CMathBase.prototype.setPosition = function(pos, PosInfo)
 {
-    this.UpdatePosBound(pos, PRSA, Line, Range, Page);
+    this.UpdatePosBound(pos, PosInfo);
 
     if(this.bOneLine)
     {
@@ -325,7 +325,7 @@ CMathBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
                 if(this.elements[i][j].Type == para_Math_Content) // прибавим ascent только для контентов, для вложенных мат объектов не добавляем !
                     NewPos.y += this.elements[i][j].size.ascent;
 
-                this.elements[i][j].setPosition(NewPos, PRSA, Line, Range, Page);
+                this.elements[i][j].setPosition(NewPos, PosInfo);
                 w += Widths[j];
             }
             h += Heights[i];
@@ -335,6 +335,8 @@ CMathBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
     }
     else
     {
+        var Line  = PosInfo.CurLine,
+            Range = PosInfo.CurRange;
         var CurLine  = Line - this.StartLine;
         var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
 
@@ -344,12 +346,12 @@ CMathBase.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
         if(CurLine == 0 && CurRange == 0)
             pos.x += this.BrGapLeft;
 
-        this.Content[StartPos].setPosition(pos, PRSA, Line, Range, Page);
+        this.Content[StartPos].setPosition(pos, PosInfo);
 
         for(var Pos = StartPos + 1; Pos <= EndPos; Pos++)
         {
             pos.x += this.dW;
-            this.Content[Pos].setPosition(pos, PRSA, Line, Range, Page);
+            this.Content[Pos].setPosition(pos, PosInfo);
         }
 
         var Len = this.Content.length;
@@ -424,13 +426,29 @@ CMathBase.prototype.IsLastRange = function(_CurLine, _CurRange)
 
     return CurLine == LinesCount - 1 && CurRange == RangesCount - 1;
 };
-CMathBase.prototype.UpdatePosBound = function(pos, PRSA, Line, Range, Page)
+CMathBase.prototype.UpdatePosBound = function(pos, PosInfo)
 {
-    var CurLine  = Line - this.StartLine;
-    var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range);
+    var CurLine  = PosInfo.CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PosInfo.CurRange - this.StartRange : PosInfo.CurRange);
 
-    this.Bounds.SetPos(CurLine, CurRange, pos, PRSA);
-    this.Bounds.SetPage(CurLine, CurRange, Page);
+    this.Bounds.SetPos(CurLine, CurRange, pos);
+};
+CMathBase.prototype.UpdateBoundsPosInfo = function(PRSA, _CurLine, _CurRange, _CurPage)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange);
+
+    this.Bounds.SetGenPos(CurLine, CurRange, PRSA);
+    this.Bounds.SetPage(CurLine, CurRange, _CurPage);
+
+    for(var i=0; i < this.nRow; i++)
+    {
+        for(var j = 0; j < this.nCol; j++)
+        {
+            if(false == this.elements[i][j].IsJustDraw())
+                this.elements[i][j].UpdateBoundsPosInfo(PRSA, _CurLine, _CurRange, _CurPage);
+        }
+    }
 };
 CMathBase.prototype.draw = function(x, y, pGraphics, PDSE)
 {
@@ -2366,10 +2384,15 @@ CMathBounds.prototype.Get_LineBound = function(CurLine, CurRange)
 
     return Bound;
 };
-CMathBounds.prototype.SetPos = function(Line, Range, Pos, PRSA)
+CMathBounds.prototype.SetPos = function(Line, Range, Pos)
 {
     this.CheckLineBound(Line, Range);
-    this.Bounds[Line][Range].SetPos(Pos, PRSA);
+    this.Bounds[Line][Range].SetPos(Pos);
+};
+CMathBounds.prototype.SetGenPos = function(Line, Range, PRSA)
+{
+    this.CheckLineBound(Line, Range);
+    this.Bounds[Line][Range].SetGenPos(PRSA);
 };
 CMathBounds.prototype.ShiftPos = function(Line, Range, Dx, Dy)
 {
@@ -2390,8 +2413,14 @@ CMathBounds.prototype.GetPos = function(Line, Range)
 function CMathBoundsMeasures()
 {
     this.Type = MATH_BOUNDS_MEASURES;
+
+    // нужны ля расчета выравниваний относительно операторов
+    this._X   = 0;
+    this._Y   = 0;
+    // необходимы для отрисовки рамки, подсветки
     this.X    = 0;
     this.Y    = 0;
+
     this.W    = 0;
     this.H    = 0;
     this.Asc  = 0;
@@ -2421,10 +2450,15 @@ CMathBoundsMeasures.prototype.SetWidth = function(Width)
 {
     this.W = Width;
 };
-CMathBoundsMeasures.prototype.SetPos = function(Pos, PRSA)
+CMathBoundsMeasures.prototype.SetGenPos = function(PRSA)
 {
-    this.X = PRSA.X + Pos.x;
-    this.Y = PRSA.Y + Pos.y - this.Asc;
+    this.X = PRSA.X + this._X;
+    this.Y = PRSA.Y + this._Y;
+};
+CMathBoundsMeasures.prototype.SetPos = function(Pos)
+{
+    this._X = Pos.x;
+    this._Y = Pos.y - this.Asc;
 };
 CMathBoundsMeasures.prototype.ShiftPos = function(Dx, Dy)
 {
@@ -2445,7 +2479,7 @@ CMathBoundsMeasures.prototype.SetPage = function(Page)
 };
 CMathBoundsMeasures.prototype.ShiftPage = function(Dx)
 {
-    this.Page +=Dx;
+    this.Page += Dx;
 };
 
 

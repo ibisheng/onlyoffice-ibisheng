@@ -641,18 +641,20 @@ CNary.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRa
         }
     }
 };
-CNary.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
+CNary.prototype.setPosition = function(pos, PosInfo)
 {
     if(this.bOneLine)
     {
-        CNary.superclass.setPosition.call(this, pos, PRSA, Line, Range, Page);
+        CNary.superclass.setPosition.call(this, pos, PosInfo);
     }
     else
     {
+        var Line  = PosInfo.CurLine,
+            Range = PosInfo.CurRange;
         var CurLine  = Line - this.StartLine;
         var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
 
-        this.UpdatePosBound(pos, PRSA, Line, Range, Page);
+        this.UpdatePosBound(pos, PosInfo);
 
         if(CurLine == 0 && CurRange == 0)
         {
@@ -662,12 +664,12 @@ CNary.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
             PosBase.x = pos.x;
             PosBase.y = pos.y - this.Base.size.ascent;
 
-            this.Base.setPosition(PosBase, PRSA, Line, Range, Page);
+            this.Base.setPosition(PosBase, PosInfo);
 
             pos.x += this.Base.size.width + this.dW;
         }
 
-        this.Arg.setPosition(pos, PRSA, Line, Range, Page);
+        this.Arg.setPosition(pos, PosInfo);
 
         if(this.Arg.Math_Is_End(Line, Range))
         {
@@ -837,7 +839,7 @@ CNaryUndOvr.prototype.recalculateSize = function()
     this.size.width  = width;
     this.size.ascent = ascent;
 };
-CNaryUndOvr.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
+CNaryUndOvr.prototype.setPosition = function(pos, PosInfo)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y;
@@ -863,9 +865,9 @@ CNaryUndOvr.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
     PosLowIter.x = pos.x + this.GapLeft + this.align(2,0).x;
     PosLowIter.y = PosSign.y + Sign.size.height + this.gapBottom + LowIter.size.ascent;
 
-    UpIter.setPosition(PosUpIter, PRSA, Line, Range, Page);
-    Sign.setPosition(PosSign, PRSA, Line, Range, Page);
-    LowIter.setPosition(PosLowIter, PRSA, Line, Range, Page);
+    UpIter.setPosition(PosUpIter, PosInfo);
+    Sign.setPosition(PosSign, PosInfo);
+    LowIter.setPosition(PosLowIter, PosInfo);
 };
 CNaryUndOvr.prototype.setBase = function(base)
 {

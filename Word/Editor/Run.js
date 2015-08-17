@@ -2433,16 +2433,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         }
                     }
 
-                    if(PRS.NewRange == false && true === this.ParaMath.NeedDispOperators(PRS))
-                    {
-                        var W = X - XRange + Item.GapLeft;
-
-                        if(bOperBefore == false)
-                            W -= BrkLen
-
-                        PRS.DispositionOpers.push(W);
-                    }
-
                     break;
                 }
                 case para_Drawing:
@@ -9057,8 +9047,11 @@ function CRunCollaborativeRange(PosS, PosE, Color)
     this.Color = Color;
 }
 
-ParaRun.prototype.Math_SetPosition = function(pos, PRSA, Line, Range, Page)
+ParaRun.prototype.Math_SetPosition = function(pos, PosInfo)
 {
+    var Line  = PosInfo.CurLine,
+        Range = PosInfo.CurRange;
+
     var CurLine  = Line - this.StartLine;
     var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
 
@@ -9069,10 +9062,16 @@ ParaRun.prototype.Math_SetPosition = function(pos, PRSA, Line, Range, Page)
     this.pos.x = pos.x;
     this.pos.y = pos.y;
 
-    for(var i = StartPos; i < EndPos; i++)
+    for(var Pos = StartPos; Pos < EndPos; Pos++)
     {
-        this.Content[i].setPosition(pos);
-        pos.x += this.Content[i].Get_WidthVisible(); // Get_Width => Get_WidthVisible
+        var Item = this.Content[Pos];
+        if(PosInfo.DispositionOpers !== null && Item.Type == para_Math_BreakOperator)
+        {
+            PosInfo.DispositionOpers.push(pos.x + Item.GapLeft);
+        }
+
+        this.Content[Pos].setPosition(pos);
+        pos.x += this.Content[Pos].Get_WidthVisible(); // Get_Width => Get_WidthVisible
                                                      // Get_WidthVisible - Width + Gaps с учетом настроек состояния
     }
 };
@@ -9198,8 +9197,7 @@ ParaRun.prototype.Math_RecalculateContent = function(PRS)
             Type = Item.Type;
 
         var WidthItem = Item.Get_WidthVisible(); // Get_Width => Get_WidthVisible
-                                                            // Get_WidthVisible - Width + Gaps с учетом настроек состояния
-
+                                                 // Get_WidthVisible - Width + Gaps с учетом настроек состояния
         width += WidthItem;
 
         if(ascent < size.ascent)

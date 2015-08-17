@@ -121,6 +121,13 @@ CInfoPoints.prototype.SetDefault = function()
     this.ContentPoints.SetDefault();
 };
 
+function CMathPosInfo()
+{
+    this.CurRange = -1;
+    this.CurLine  = -1;
+
+    this.DispositionOpers = null;
+}
 
 function CMathPosition()
 {
@@ -999,10 +1006,28 @@ CMathContent.prototype.ApplyPoints = function(WidthsPoints, Points, MaxDimWidths
 
     this.Bounds.SetWidth(0, 0, this.size.width);
 };
-CMathContent.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
+CMathContent.prototype.UpdateBoundsPosInfo = function(PRSA, _CurLine, _CurRange, _CurPage)
 {
-    this.pos.x = pos.x;
-    this.pos.y = pos.y;
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    this.Bounds.SetGenPos(CurLine, CurRange, PRSA);
+    this.Bounds.SetPage(CurLine, CurRange, _CurPage);
+
+    for(var Pos = StartPos; Pos <= EndPos; Pos++)
+    {
+        if(this.Content[Pos].Type == para_Math_Composition)
+            this.Content[Pos].UpdateBoundsPosInfo(PRSA, _CurLine, _CurRange, _CurPage);
+    }
+
+};
+CMathContent.prototype.setPosition = function(pos, PosInfo)
+{
+    var Line  = PosInfo.CurLine,
+        Range = PosInfo.CurRange;
 
     var CurLine  = Line - this.StartLine;
     var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
@@ -1016,19 +1041,19 @@ CMathContent.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
         PosInfoEqq.SetInfoPoints(this.InfoPoints);
 
         pos.x += PosInfoEqq.GetAlign();
-        this.pos.x = pos.x;
     }
 
-    this.Bounds.SetPos(CurLine, CurRange, this.pos, PRSA);
+    this.pos.x = pos.x;
+    this.pos.y = pos.y;
 
-    this.Bounds.SetPage(CurLine, CurRange, Page);
+    this.Bounds.SetPos(CurLine, CurRange, this.pos);
 
-    for(var i = StartPos; i <= EndPos; i++)
+    for(var Pos = StartPos; Pos <= EndPos; Pos++)
     {
-        if(this.Content[i].Type == para_Math_Run)
-            this.Content[i].Math_SetPosition(pos, PRSA, Line, Range, Page);
+        if(this.Content[Pos].Type == para_Math_Run)
+            this.Content[Pos].Math_SetPosition(pos, PosInfo);
         else
-            this.Content[i].setPosition(pos, PRSA, Line, Range, Page);
+            this.Content[Pos].setPosition(pos, PosInfo);
     }
 };
 CMathContent.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
@@ -1051,7 +1076,7 @@ CMathContent.prototype.hidePlaceholder = function(flag)
     this.plhHide = flag;
 };
 ///////// RunPrp, CtrPrp
-CMathContent.prototype.getFirstRPrp  = function(ParaMath)
+CMathContent.prototype.getFirstRPrp  = function()
 {
     return this.Content[0].Get_CompiledPr(true);
 };
@@ -3873,8 +3898,6 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var bInternalOper    = false,
         bCurInsideOper   = false;
 
-    var BoxLen, BoxGapRight;
-
     for(var Pos = RangeStartPos; Pos < ContentLen; Pos++)
     {
         var Item = this.Content[Pos],
@@ -3915,17 +3938,12 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             }
             else
             {
-                BoxLen      = Item.size.width;
-                BoxGapRight = Item.GapRight;
+                Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
 
-                var WWordLen = bOperBefore == true ?  PRS.X + PRS.WordLen + PRS.SpaceLen : PRS.X + PRS.SpaceLen + PRS.WordLen + BoxLen - BoxGapRight;
+                var WidthItem = Item.size.width,
+                    GapRight  = Item.GapRight;
 
-                if(WWordLen > PRS.XEnd)
-                {
-                    PRS.NewRange = true;
-                    PRS.MoveToLBP = true;
-                }
-                else if(Item.kind == MATH_BOX)
+                if(Item.kind == MATH_BOX)
                 {
                     if(true == Item.IsBreak(bInline))
                     {
@@ -3933,13 +3951,22 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     }
                     else
                     {
-                        PRS.WordLen += BoxLen;
+                        PRS.WordLen += WidthItem;
                     }
                 }
-                else
+
+                var WWordLen = bOperBefore == true ?  PRS.X + PRS.WordLen + PRS.SpaceLen : PRS.X + PRS.SpaceLen + PRS.WordLen + WidthItem - GapRight;
+
+                if(PRS.NewRange == false && WWordLen > PRS.XEnd)
+                {
+                    PRS.NewRange = true;
+                    PRS.MoveToLBP = true;
+                }
+
+                /*else
                 {
                     Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
-                }
+                }*/
             }
         }
         else // контент может занимать несколько строк
@@ -3962,7 +3989,6 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 // перед мат объектом идет box break_operator и он не является первым элементом в строке
                 if(Item.kind == MATH_BOX)
                 {
-                    BoxLen      = Item.size.width;
 
                     if(true == Item.IsBreak(bInline))
                     {
@@ -3975,7 +4001,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     }
                     else
                     {
-                        PRS.WordLen += BoxLen;
+                        PRS.WordLen += Item.size.width;
                     }
 
                     PRS.MathFirstItem = false;

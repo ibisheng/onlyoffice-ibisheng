@@ -467,12 +467,12 @@ CAccent.prototype.IsAccent = function()
 {
     return true;
 };
-CAccent.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
+CAccent.prototype.setPosition = function(pos, PosInfo)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
 
-    this.UpdatePosBound(pos, PRSA, Line, Range, Page);
+    this.UpdatePosBound(pos, PosInfo);
 
     var width = this.size.width - this.GapLeft - this.GapRight;
     var oBase = this.Content[0];
@@ -492,7 +492,7 @@ CAccent.prototype.setPosition = function(pos, PRSA, Line, Range, Page)
     PosBase.x = this.pos.x + this.GapLeft + alignCnt;
     PosBase.y = this.pos.y + this.operator.size.height + oBase.size.ascent;
 
-    oBase.setPosition(PosBase, PRSA, Line, Range, Page);
+    oBase.setPosition(PosBase, PosInfo);
 
     pos.x += this.size.width;
 };
