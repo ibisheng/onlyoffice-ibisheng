@@ -8103,6 +8103,8 @@
 						// Если нужно удалить автофильтры - удаляем
 						if(val === c_oAscCleanOptions.All || val === c_oAscCleanOptions.Text)
 							t.autoFilters.isEmptyAutoFilters(arn);
+						else if(val === c_oAscCleanOptions.Format)
+							t.autoFilters.cleanFormat(arn);
 						
 						if (val === c_oAscCleanOptions.All) {
 							range.cleanAll();

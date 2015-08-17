@@ -1212,6 +1212,19 @@ var maxIndividualValues = 10000;
 				History.EndTransaction();
 			},
 			
+			cleanFormat: function(range)
+			{
+				var aWs = this._getCurrentWS();
+				
+				if(aWs.AutoFilter && aWs.AutoFilter.Ref)
+				{
+					//if first row AF in ActiveRange  - delete AF
+					var firstRowRange = new Asc.Range(aWs.AutoFilter.Ref.c1, aWs.AutoFilter.Ref.r1, aWs.AutoFilter.Ref.c2, aWs.AutoFilter.Ref.r1);
+					if(range.containsRange(firstRowRange))
+						this.isEmptyAutoFilters(aWs.AutoFilter.Ref);
+				}	
+			},
+			
 			isCheckMoveRange: function(arnFrom)
 			{	
 				var aWs = this._getCurrentWS();
