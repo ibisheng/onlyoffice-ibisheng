@@ -6120,6 +6120,8 @@ DrawingObjectsController.prototype =
         oXfrm.setParent(oSpPr);
         oSpPr.setFill(CreateNoFillUniFill());
         oSpPr.setLn(CreateNoFillLine());
+        oSpPr.setGeometry(CreateGeometry("rect"));
+        oSpPr.geometry.setParent(oSpPr);
         oShape.setSpPr(oSpPr);
         oSpPr.setParent(oShape);
         var oContent = oShape.getDocContent();

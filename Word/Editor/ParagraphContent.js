@@ -4775,6 +4775,10 @@ ParaDrawing.prototype =
     {
         History.Add( this, { Type : historyitem_Drawing_WrappingType, New : WrapType, Old : this.wrappingType } );
         this.wrappingType = WrapType;
+        if(WrapType === WRAPPING_TYPE_TIGHT || WrapType === WRAPPING_TYPE_THROUGH)
+        {
+            this.Check_WrapPolygon();
+        }
     },
 
     Set_BehindDoc : function(BehindDoc)
@@ -5056,6 +5060,13 @@ ParaDrawing.prototype =
             case historyitem_Drawing_DrawingType:
             {
                 this.DrawingType = Data.Old;
+                if(Data.Old === WRAPPING_TYPE_TIGHT || Data.Old === WRAPPING_TYPE_THROUGH)
+                {
+                    if(this.GraphicObj)
+                    {
+                        this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
+                    }
+                }
                 break;
             }
 
@@ -5185,6 +5196,13 @@ ParaDrawing.prototype =
             case historyitem_Drawing_WrappingType:
             {
                 this.wrappingType = Data.New;
+                if(Data.New === WRAPPING_TYPE_TIGHT || Data.New === WRAPPING_TYPE_THROUGH)
+                {
+                    if(this.GraphicObj)
+                    {
+                        this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
+                    }
+                }
                 break;
             }
 
@@ -5291,16 +5309,29 @@ ParaDrawing.prototype =
                 {
                     case historyitem_Drawing_Distance:
                     {
-                        this.GraphicObj && this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
-                        this.GraphicObj && this.GraphicObj.addToRecalculate();
+                        if( this.GraphicObj)
+                        {
+                            this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
+                            this.GraphicObj.addToRecalculate();
+                        }
                         break;
                     }
+
                     case historyitem_SetExtent:
                     {
                         var Run = this.Parent.Get_DrawingObjectRun( this.Id );
                         if(Run)
                         {
                             Run.RecalcInfo.Measure = true;
+                        }
+                        break;
+                    }
+                    case historyitem_Drawing_WrappingType:
+                    {
+                        if(this.GraphicObj)
+                        {
+                            this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
+                            this.GraphicObj.addToRecalculate()
                         }
                         break;
                     }
