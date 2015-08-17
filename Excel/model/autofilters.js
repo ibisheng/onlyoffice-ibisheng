@@ -993,21 +993,6 @@ var maxIndividualValues = 10000;
 				if(cloneData.insCells)
 					delete cloneData.insCells;
 
-				if(cloneData.refTable)
-				{
-					if(aWs.TableParts)
-					{
-						for(var l = 0; l < aWs.TableParts.length; l++)
-						{
-							if(cloneData.refTable.isEqual(aWs.TableParts[l].Ref))
-							{
-								this._cleanStyleTable(cloneData.refTable);
-								aWs.TableParts.splice(l,1);
-							}	
-						}
-					}
-				}
-				
 				//TODO переделать undo, по типам
 				if(type === historyitem_AutoFilter_Move)//перемещение
 				{
