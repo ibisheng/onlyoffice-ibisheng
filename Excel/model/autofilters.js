@@ -1013,7 +1013,20 @@ var maxIndividualValues = 10000;
 				{
 					this._moveAutoFilters(null, null, data);
 				}
-				else if(type === historyitem_AutoFilter_Change/* && cloneData.oldFilter && cloneData.newFilterRef*/)//добавление/удаление строк/столбцов 
+				else if(type === historyitem_AutoFilter_Empty)//было удаление, на undo добавляем
+				{
+					if(cloneData.TableStyleInfo)
+					{
+						if(!aWs.TableParts)
+							aWs.TableParts = [];
+						aWs.TableParts[aWs.TableParts.length] = cloneData;
+						aWs.workbook.dependencyFormulas.addTableName(cloneData.DisplayName, aWs, cloneData.Ref);
+						this._setColorStyleTable(cloneData.Ref, cloneData, null, true);
+					}
+					else
+						aWs.AutoFilter = cloneData;
+				}
+				else if(type === historyitem_AutoFilter_Change)//добавление/удаление строк/столбцов 
 				{
 					if(aWs.AutoFilter && cloneData.newFilterRef.isEqual(aWs.AutoFilter.Ref))
 						aWs.AutoFilter = cloneData.oldFilter.clone(null);
@@ -1021,7 +1034,7 @@ var maxIndividualValues = 10000;
 					{
 						for(var l = 0; l < aWs.TableParts.length; l++)
 						{
-							if(cloneData.newFilterRef && cloneData.newFilterRef.isEqual(aWs.TableParts[l].Ref))
+							if(cloneData.newFilterRef && cloneData.oldFilter && cloneData.oldFilter.DisplayName === aWs.TableParts[l].DisplayName)
 							{
 								aWs.TableParts[l] = cloneData.oldFilter.clone(null);
 
