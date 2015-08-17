@@ -917,14 +917,14 @@ CDegreeSubSup.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
             PRS.bMath_OneLine = true;
 
-            var WWordLen = PRS.WordLen;
+            var WordLen = PRS.WordLen;
 
             this.iters.Recalculate_Range(PRS, ParaPr, Depth);
 
             var itersW = iterUp.size.width > iterDn.size.width ? iterUp.size.width : iterDn.size.width;
 
             PRS.CurPos.Set(PRS_Pos);
-            PRS.WordLen = WWordLen + itersW + this.dW;
+            PRS.WordLen = WordLen + itersW + this.dW;
             PRS.Word = true;
         }
 

@@ -540,9 +540,6 @@ CAccent.prototype.Resize = function(oMeasure, RPI)
 };
 CAccent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 {
-    var CurLine  = PRS.Line - this.StartLine;
-    var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
-
     var bMath_OneLine = PRS.bMath_OneLine;
     var WordLen = PRS.WordLen; // запоминаем, чтобы внутр мат объекты не увеличили WordLen
 

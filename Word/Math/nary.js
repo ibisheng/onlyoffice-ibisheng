@@ -479,6 +479,7 @@ CNary.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         if(CurLine == 0 && CurRange == 0)
         {
             PRS.WordLen += this.BrGapLeft;
+            var WordLen = PRS.WordLen;
 
             if(this.Base.IsJustDraw())
             {
@@ -493,15 +494,11 @@ CNary.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 this.Base.Recalculate_Range(PRS, ParaPr, Depth);
             }
 
-            if(true !== PRS.Word)
+            PRS.WordLen = WordLen + this.Base.size.width;
+
+            if(false === PRS.Word && false === PRS.FirstItemOnLine)
             {
-                PRS.WordLen += this.Base.size.width;
-                if(false == PRS.FirstItemOnLine)
-                    PRS.Word    = true;
-            }
-            else
-            {
-                PRS.WordLen += this.Base.size.width;
+                PRS.Word = true;
             }
 
             PRS.WordLen += this.dW;
