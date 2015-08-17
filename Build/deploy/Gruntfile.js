@@ -1,5 +1,5 @@
 module.exports = function(grunt) {
-    var defaultConfig, packageFile, toolsConfig, toolsFile;
+    var revision, defaultConfig, packageFile, toolsConfig, toolsFile;
 
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
@@ -7,6 +7,21 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-exec');
 	grunt.loadNpmTasks('grunt-closure-tools');
 	grunt.loadNpmTasks('grunt-replace');
+	
+	grunt.registerTask('get_svn_info', 'Initialize svn information', function () {
+		// Instruct this task to wait until we call the done() method to continue
+		var done = this.async();
+		
+		grunt.util.spawn({
+			cmd: 'svnversion',
+			args: ['../../../../../'],
+			}, function (error, result, code) {
+				revision = null !== error ? undefined : result;
+				
+				// All done, continue to the next tasks
+				done();
+		});
+	});
 	
 	grunt.registerTask('setup_tools', 'Initialize tools.', function(){
         toolsConfig = 'tools.json';
@@ -158,7 +173,7 @@ module.exports = function(grunt) {
 			packageFile['info']['rev'] = process.env['SVN_REVISION'];
 		}
 		else{
-			packageFile['info']['rev'] = "unknown";
+			packageFile['info']['rev'] = revision;
 		}
 		grunt.file.write(defaultConfig, JSON.stringify(pkg, null, 4));
     });
@@ -269,5 +284,5 @@ module.exports = function(grunt) {
 	
 	grunt.registerTask('deploy_sdk', ['deploy_sdk_init', 'copy']);
 	 
-	grunt.registerTask('default', 'build_all_without_deploy');
+	grunt.registerTask('default', ['get_svn_info', 'build_all_without_deploy']);
 };
