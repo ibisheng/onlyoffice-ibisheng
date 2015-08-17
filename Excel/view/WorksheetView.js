@@ -8289,7 +8289,7 @@
 					if(!aFilters[aF].AutoFilter)
 						bWithoutFilter = true;
 						
-					t.autoFilters.addAutoFilter(aFilters[aF].TableStyleInfo.Name, range.bbox, true);
+					t.autoFilters.addAutoFilter(aFilters[aF].TableStyleInfo.Name, range.bbox, true, null, bWithoutFilter);
 				}
 			}
 			

@@ -260,14 +260,10 @@ var maxIndividualValues = 10000;
 
 			constructor: AutoFilters,
 			
-			addAutoFilter: function(styleName, activeRange, addFormatTableOptionsObj, offLock)
+			addAutoFilter: function(styleName, activeRange, addFormatTableOptionsObj, offLock, bWithoutFilter)
 			{
 				var aWs = this._getCurrentWS(), addNameColumn, filterRange, t = this, ws = this.worksheet, cloneFilter;
 				var isTurnOffHistory = aWs.workbook.bUndoChanges || aWs.workbook.bRedoChanges;
-				
-				
-				var bWithoutFilter = false;//TODO изменить переменную
-				
 				
 				var tempRange =  new Asc.Range(activeRange.c1, activeRange.r1, activeRange.c2, activeRange.r2);
 				if(addFormatTableOptionsObj === false)
@@ -949,7 +945,7 @@ var maxIndividualValues = 10000;
 				History.TurnOff();
 				switch (type) {
 					case historyitem_AutoFilter_Add:
-						this.addAutoFilter(data.styleName, data.activeCells, data.addFormatTableOptionsObj, data.bWithoutFilter);
+						this.addAutoFilter(data.styleName, data.activeCells, data.addFormatTableOptionsObj, null, data.bWithoutFilter);
 						break;
 					case historyitem_AutoFilter_Delete:
 						this.deleteAutoFilter(data.activeCells);
