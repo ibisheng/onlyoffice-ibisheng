@@ -4775,10 +4775,7 @@ ParaDrawing.prototype =
     {
         History.Add( this, { Type : historyitem_Drawing_WrappingType, New : WrapType, Old : this.wrappingType } );
         this.wrappingType = WrapType;
-        if(WrapType === WRAPPING_TYPE_TIGHT || WrapType === WRAPPING_TYPE_THROUGH)
-        {
-            this.Check_WrapPolygon();
-        }
+
     },
 
     Set_BehindDoc : function(BehindDoc)

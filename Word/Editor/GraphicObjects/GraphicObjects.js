@@ -2501,6 +2501,7 @@ CGraphicObjects.prototype =
                 {
                     History.Create_NewPoint(historydescription_Document_GrObjectsChangeWrapPolygon);
                     this.selectedObjects[0].parent.Set_WrappingType(WRAPPING_TYPE_TIGHT);
+                    this.selectedObjects[0].parent.Check_WrapPolygon();
                     this.document.Recalculate();
                     this.document.Document_UpdateInterfaceState();
                 }
