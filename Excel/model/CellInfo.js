@@ -245,18 +245,20 @@
 		prot["asc_getClearFilter"]  	= prot.asc_getClearFilter;//TODO DELETE
 
 		/** @constructor */
-        function asc_CDefName(n, r, s, t) {
+        function asc_CDefName(n, r, s, t, h) {
             this.Name = n;
             this.LocalSheetId = s;
             this.Ref = r;
             this.isTable = t;
+            this.Hidden = h;
         }
 
         asc_CDefName.prototype = {
             asc_getName: function(){return this.Name;},
             asc_getScope: function(){return this.LocalSheetId;},
             asc_getRef: function(){return this.Ref;},
-            asc_getIsTable: function(){return this.isTable;}
+            asc_getIsTable: function(){return this.isTable;},
+            asc_getIsHidden: function(){return this.Hidden;}
         };
 
         window["Asc"].asc_CDefName = window["Asc"]["asc_CDefName"] = asc_CDefName;
@@ -266,6 +268,7 @@
         prot["asc_getScope"]			= prot.asc_getScope;
         prot["asc_getRef"]				= prot.asc_getRef;
         prot["asc_getIsTable"]		    = prot.asc_getIsTable;
+        prot["asc_getIsHidden"]		    = prot.asc_getIsHidden;
 
 	}
 )(window);

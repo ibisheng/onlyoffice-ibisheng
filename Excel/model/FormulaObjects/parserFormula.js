@@ -1340,7 +1340,7 @@ cName.prototype.addDefinedNameNode = function ( nameReParse ) {
 
     var dN = this.wb.getDefinesNames( this.defName.Name, this.ws.getId() );
     dN = dN.getAscCDefName();
-    var node = this.wb.dependencyFormulas.addDefinedNameNode( dN.Name, dN.LocalSheetId, dN.Ref ),
+    var node = this.wb.dependencyFormulas.addDefinedNameNode( dN.Name, dN.LocalSheetId, dN.Ref, dN.Hidden ),
         wsR, ref, nTo;
     for ( var i = 0; i < this.ref.outStack.length; i++ ) {
         ref = this.ref.outStack[i];

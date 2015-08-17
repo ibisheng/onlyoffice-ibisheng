@@ -149,7 +149,8 @@
     {
         Name: 0,
         Ref: 1,
-        LocalSheetId: 2
+        LocalSheetId: 2,
+        Hidden: 3
     };
     /** @enum */
     var c_oSerWorksheetsTypes =
@@ -2184,6 +2185,12 @@
             }
             if (null !== oDefinedName.LocalSheetId){
                 this.bs.WriteItem(c_oSerDefinedNameTypes.LocalSheetId, function(){oThis.memory.WriteLong(oDefinedName.LocalSheetId);});
+            }
+            if (null != oDefinedName.Hidden)
+            {
+                this.memory.WriteByte(c_oSerDefinedNameTypes.Hidden);
+                this.memory.WriteByte(c_oSerPropLenType.Byte);
+                this.memory.WriteBool(oDefinedName.Hidden);
             }
         };
     }
@@ -5112,7 +5119,7 @@
                 if(null != oNewDefinedName.Name && null != oNewDefinedName.Ref)
                 {
 
-                    this.oWorkbook.dependencyFormulas.addDefinedNameNode(oNewDefinedName.Name, oNewDefinedName.LocalSheetId, oNewDefinedName.Ref);
+                    this.oWorkbook.dependencyFormulas.addDefinedNameNode(oNewDefinedName.Name, oNewDefinedName.LocalSheetId, oNewDefinedName.Ref, oNewDefinedName.Hidden);
 
                 }
             }
@@ -5129,6 +5136,8 @@
                 oDefinedName.Ref = this.stream.GetString2LE(length);
             else if ( c_oSerDefinedNameTypes.LocalSheetId == type )
                 oDefinedName.LocalSheetId = this.stream.GetULongLE();
+            else if ( c_oSerDefinedNameTypes.Hidden == type )
+                oDefinedName.Hidden = this.stream.GetBool();
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;

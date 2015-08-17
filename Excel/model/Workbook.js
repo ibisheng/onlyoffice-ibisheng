@@ -872,7 +872,7 @@ DependencyGraph.prototype = {
 
         return false;
     },
-    addDefinedNameNode:function ( defName, sheetId, defRef, bUndo ) {
+    addDefinedNameNode:function ( defName, sheetId, defRef, defHidden, bUndo ) {
 
         var ws = this.wb.getWorksheet( sheetId )
         ws ? sheetId = ws.getId() : null;
@@ -881,7 +881,7 @@ DependencyGraph.prototype = {
             oRes = this.defNameList[nodeId], dfv, defNameSheetsList;
 
         if ( null == oRes || ( null == oRes.Ref && null == defRef ) ) {
-            dfv = new DefNameVertex( sheetId, defName, defRef, this.wb );
+            dfv = new DefNameVertex( sheetId, defName, defRef, defHidden, this.wb );
             oRes = (this.defNameList[dfv.nodeId] = dfv);
             defNameSheetsList = this.defNameSheets[dfv.sheetId];
             if ( defNameSheetsList == null ) {
@@ -924,7 +924,9 @@ DependencyGraph.prototype = {
             oRes.Ref = defRef;
         }
 
-        oRes.parsedRef.buildDependencies(null,oRes);
+        if( !oRes.isTable ){
+            oRes.parsedRef.buildDependencies(null,oRes);
+        }
 
         return oRes;
 
@@ -1077,7 +1079,7 @@ DependencyGraph.prototype = {
     addTableName:function ( sName, ws, Ref ) {
         var refClone = Ref.clone(true);
         refClone.r1++;
-        var dfv = new DefNameVertex( null, sName, parserHelp.get3DRef( ws.getName(), refClone.getAbsName() ), this.wb, true ),
+        var dfv = new DefNameVertex( null, sName, parserHelp.get3DRef( ws.getName(), refClone.getAbsName() ), null, this.wb, true ),
             defNameSheetsList = this.defNameSheets[dfv.sheetId];
         this.defNameList[dfv.nodeId] = dfv;
         if ( defNameSheetsList == null ) {
@@ -1363,7 +1365,7 @@ Vertex.prototype = {
 	
 };
 
-function DefNameVertex( scope, defName, defRef, wb, isTable ) {
+function DefNameVertex( scope, defName, defRef, defHidden, wb, isTable ) {
 
     this.sheetId = scope === null || scope === undefined ? "WB" : scope;
 
@@ -1371,6 +1373,7 @@ function DefNameVertex( scope, defName, defRef, wb, isTable ) {
     this.cellId = defName.toLowerCase();
     this.Ref = defRef;
     this.Name = defName;
+    this.Hidden = defHidden;
     this.isTable = isTable;
     this.nodeId = getDefNameVertexId( this.sheetId, defName );
     this.wb = wb;
@@ -1410,7 +1413,7 @@ DefNameVertex.prototype = {
     constructor:Vertex,
 
     clone:function(){
-        return new DefNameVertex( this.sheetId, this.cellId, this.Ref , this.wb, this.isTable );
+        return new DefNameVertex( this.sheetId, this.cellId, this.Ref, this.Hidden, this.wb, this.isTable );
     },
 
     changeScope:function( newScope ){
@@ -1609,7 +1612,7 @@ DefNameVertex.prototype = {
         return new Asc.asc_CDefName( this.Name,
             this.Ref,
             this.sheetId == "WB" ? null : a ? a.getIndex() : null,
-            this.isTable );
+            this.isTable, this.Hidden );
     },
 
     changeDefName:function ( newName ) {
@@ -2421,7 +2424,8 @@ Workbook.prototype.getDefinesNamesWB = function (defNameListId) {
         var listDN = thas.dependencyFormulas.defNameSheets[id], name;
         for ( var id in listDN ) {
             name = listDN[id].getAscCDefName();
-            if ( name.Ref ) {
+            if ( name.Ref && !name.Hidden ) {
+
                 arr.push( name );
             }
         }
@@ -2447,7 +2451,7 @@ Workbook.prototype.getDefinesNamesWB = function (defNameListId) {
         default:
             for ( var id in this.dependencyFormulas.defNameList ) {
                 name = this.dependencyFormulas.defNameList[id].getAscCDefName()
-                if ( name.Ref ) {
+                if ( name.Ref && !name.Hidden ) {
                     names.push( name );
                 }
             }
@@ -2518,7 +2522,7 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
         rename = true;
     }
     else {
-        retRes = this.dependencyFormulas.addDefinedNameNode( newName.Name, newName.LocalSheetId, newName.Ref, bUndo );
+        retRes = this.dependencyFormulas.addDefinedNameNode( newName.Name, newName.LocalSheetId, newName.Ref, newName.Hidden, bUndo );
     }
 
     if ( retRes ) {
@@ -9177,6 +9181,7 @@ function DefinedName(){
 	this.Name = null;
 	this.Ref = null;
 	this.LocalSheetId = null;
+    this.Hidden = null;
 	this.bTable = false;
 }
 

@@ -10320,19 +10320,19 @@
                 if(_C2H50H_){
 
                     sheetName = _C2H50H_.Ref.split("!");
-                    ref = sheetName[1];
-                    sheetName = sheetName[0];
-                    range = {range:asc.g_oRangeCache.getAscRange(ref), sheet:sheetName};
-                    if( sheetName[0] == "'" && sheetName[sheetName.length-1] == "'" ){
-                        range.sheet = range.sheet.substring(1,range.sheet.length-1);
+                    if( _C2H50H_.parsedRef.RefPos.length == 1 ){
+                        ref = sheetName[1];
+                        sheetName = sheetName[0];
+                        range = {range:asc.g_oRangeCache.getAscRange(ref), sheet:sheetName};
+                        if( sheetName[0] == "'" && sheetName[sheetName.length-1] == "'" ){
+                            range.sheet = range.sheet.substring(1,range.sheet.length-1);
+                        }
+                        this.model.workbook.handlers.trigger("asc_onDefName", defName);
                     }
-                    this.model.workbook.handlers.trigger("asc_onDefName", defName);
-
                 }
             }
             else{
                 range = {range:range, sheet:this.model.getName()};
-
             }
 			return range;// ? this.setSelection(range, true) : null;
 		};
