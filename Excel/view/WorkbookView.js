@@ -1031,7 +1031,7 @@
 			var t = this;
 
 			// Проверка глобального лока
-			if (this.collaborativeEditing.getGlobalLock())
+			if (this.collaborativeEditing.getGlobalLock() || this.controller.isResizeMode)
 				return;
 
 			var ws = t.getWorksheet();
