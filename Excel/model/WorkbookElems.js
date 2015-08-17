@@ -4781,6 +4781,13 @@ Filters.prototype._sortDate = function()
 	}
 };
 
+Filters.prototype.clean = function()
+{
+	this.Values = {};
+	this.Dates = [];
+	this.Blank = null;
+};
+	
 /** @constructor */
 function Filter() {
 	this.Val = null;
