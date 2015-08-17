@@ -11051,6 +11051,9 @@
 		 * @private
 		 */
 		WorksheetView.prototype._onUpdateFormatTable = function (range, recalc, changeRowsOrMerge) {
+			//ToDo заглушка, чтобы не падало. Нужно полностью переделывать этот код!!!! (Перенес выше из-за бага http://bugzserver/show_bug.cgi?id=26705)
+			this._checkUpdateRange(range);
+
 			if (!recalc) {
 				// При скрытии/открытии строк стоит делать update всему
 				if (changeRowsOrMerge)
@@ -11059,9 +11062,6 @@
 				this._updateCellsRange(range);
 				return;
 			}
-
-			//ToDo заглушка, чтобы не падало. Нужно полностью переделывать этот код!
-			this._checkUpdateRange(range);
 
 			if (!this.activeRange.isEqual(range))
 				this.setSelection(range);

@@ -351,9 +351,7 @@ var maxIndividualValues = 10000;
 					//updates
 					if(styleName && addNameColumn)
 						ws.setSelection(filterRange);
-					
-					if(styleName)
-						ws._onUpdateFormatTable(filterRange, !!(styleName), true);
+					ws._onUpdateFormatTable(filterRange, !!(styleName), true);
 					
 					History.EndTransaction();
 				};
