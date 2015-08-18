@@ -1160,8 +1160,7 @@ var maxIndividualValues = 10000;
 					var bbox = oRange.getBBox0();
 
 					//смотрим находится ли фильтр(первая его строчка) внутри выделенного фрагмента
-					if(activeCells.r1 <= bbox.r1 && activeCells.r2 >= bbox.r1 && activeCells.c1 <= bbox.c1 && activeCells.c2 >= bbox.c2)
-					{
+					if (activeCells.containsFirstLineRange(bbox)) {
 						if(isTablePart)
 							oRange.setTableStyle(null);
 						else
@@ -1179,8 +1178,7 @@ var maxIndividualValues = 10000;
 						
 						if(isTablePart)
 							aWs.workbook.dependencyFormulas.delTableName(oldFilter.DisplayName,aWs.getName())
-					}
-					else
+					} else
 						return oldFilter;
 				};
 				
@@ -1210,14 +1208,9 @@ var maxIndividualValues = 10000;
 			cleanFormat: function(range)
 			{
 				var aWs = this._getCurrentWS();
-				
-				if(aWs.AutoFilter && aWs.AutoFilter.Ref)
-				{
-					//if first row AF in ActiveRange  - delete AF
-					var firstRowRange = new Asc.Range(aWs.AutoFilter.Ref.c1, aWs.AutoFilter.Ref.r1, aWs.AutoFilter.Ref.c2, aWs.AutoFilter.Ref.r1);
-					if(range.containsRange(firstRowRange))
-						this.isEmptyAutoFilters(aWs.AutoFilter.Ref);
-				}	
+				//if first row AF in ActiveRange  - delete AF
+				if(aWs.AutoFilter && aWs.AutoFilter.Ref && range.containsFirstLineRange(aWs.AutoFilter.Ref))
+					this.isEmptyAutoFilters(aWs.AutoFilter.Ref);
 			},
 			
 			isCheckMoveRange: function(arnFrom)
@@ -4210,7 +4203,7 @@ var maxIndividualValues = 10000;
 					rangeFilter = aWs.AutoFilter.Ref;
 					if(range.c1 <= rangeFilter.c1 && range.r1 <= rangeFilter.r1 && range.c2 >= rangeFilter.c2 && range.r2 >= rangeFilter.r2)
 					{
-						result[result.length] = aWs.AutoFilter
+						result[result.length] = aWs.AutoFilter;
 					}
 				}
 				if(aWs.TableParts)

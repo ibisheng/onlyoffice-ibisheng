@@ -234,6 +234,10 @@
 				return this.contains(range.c1, range.r1) && this.contains(range.c2, range.r2);
 			},
 
+			containsFirstLineRange: function (range) {
+				return this.contains(range.c1, range.r1) && this.contains(range.c2, range.r1);
+			},
+
 			intersection: function (range) {
 				var s1 = this.clone(true),
 				    s2 = range instanceof Range ? range.clone(true) :
@@ -491,6 +495,9 @@
 		};
 		ActiveRange.prototype.containsRange = function () {
 			return ActiveRange.superclass.containsRange.apply(this, arguments);
+		};
+		ActiveRange.prototype.containsFirstLine = function () {
+			return ActiveRange.superclass.containsFirstLineRange.apply(this, arguments);
 		};
 		ActiveRange.prototype.intersection = function () {
 			var oRes = ActiveRange.superclass.intersection.apply(this, arguments);
