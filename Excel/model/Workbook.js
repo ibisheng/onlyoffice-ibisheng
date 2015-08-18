@@ -1898,11 +1898,15 @@ Workbook.prototype.init=function(bNoBuildDep){
 		this.nActive = this.aWorksheets.length - 1;
 	
 	var self = this;
-	this.wsHandlers = new asc.asc_CHandlersList(/*handlers*/{
-        "changeRefTablePart"    : function (displayName, ref) {
-            self.dependencyFormulas.changeTableName( displayName, null, ref );
-        }
-	});
+	
+	if(!window["Asc"] || (window["Asc"] && window["Asc"]["editor"] === undefined))//если мы не в редакторе таблиц
+	{
+		this.wsHandlers = new asc.asc_CHandlersList(/*handlers*/{
+			"changeRefTablePart"    : function (displayName, ref) {
+				self.dependencyFormulas.changeTableName( displayName, null, ref );
+			}
+		});
+	}
 	
     //charts
     for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
