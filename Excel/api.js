@@ -136,6 +136,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
             this.textArtElementId = null;
 			this.isImageChangeUrl = false;
 			this.isShapeImageChangeUrl = false;
+			this.isTextArtChangeUrl = false;
 
             //Флаги для применения свойств через слайдеры
             this.noCreatePoint = false;
@@ -2797,6 +2798,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.asc_showImageFileDialog();
 		};
 
+		spreadsheet_api.prototype.asc_changeArtImageFromFile = function() {
+			this.isTextArtChangeUrl = true;
+			this.asc_showImageFileDialog();
+		};
+
 		spreadsheet_api.prototype.asc_putPrLineSpacing = function(type, value) {
 			var ws = this.wb.getWorksheet();
 			ws.objectRender.controller.putPrLineSpacing(type, value);
@@ -3747,6 +3753,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_unregisterCallback"] = prot.asc_unregisterCallback;
 
 		prot["asc_getController"] = prot.asc_getController;
+		prot["asc_changeArtImageFromFile"] = prot.asc_changeArtImageFromFile;
 
 		prot["asc_SetDocumentPlaceChangedEnabled"] = prot.asc_SetDocumentPlaceChangedEnabled;
 

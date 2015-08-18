@@ -1091,7 +1091,7 @@ function DrawingObjects() {
 
                             if (urls && urls.length > 0 && sheetId == worksheet.model.getId()) {
                                 var url = urls[0];
-                                if ( api.isImageChangeUrl || api.isShapeImageChangeUrl )
+                                if ( api.isImageChangeUrl || api.isShapeImageChangeUrl || api.isTextArtChangeUrl)
                                     _this.editImageDrawingObject(url);
                                 else
                                     _this.addImageDrawingObject(url, null);
@@ -1588,6 +1588,21 @@ function DrawingObjects() {
                         shapeProp.fill.fill.asc_putUrl(_image.src);
                         _this.setGraphicObjectProps(imgProps);
                         api.isShapeImageChangeUrl = false;
+                    }
+                    else if(api.isTextArtChangeUrl)
+                    {
+
+                        var imgProps = new asc_CImgProperty();
+                        var AscShapeProp = new asc_CShapeProperty();
+                        imgProps.ShapeProperties = AscShapeProp;
+                        var oFill = new asc_CShapeFill();
+                        oFill.type = c_oAscFill.FILL_TYPE_BLIP;
+                        oFill.fill = new asc_CFillBlip();
+                        oFill.fill.asc_putUrl(imageUrl);
+                        AscShapeProp.textArtProperties = new asc_TextArtProperties();
+                        AscShapeProp.textArtProperties.asc_putFill(oFill);
+                        _this.setGraphicObjectProps(imgProps);
+                        api.isTextArtChangeUrl = false;
                     }
 
                     _this.showDrawingObjects(true);
