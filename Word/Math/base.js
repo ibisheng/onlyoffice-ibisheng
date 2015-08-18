@@ -441,14 +441,28 @@ CMathBase.prototype.UpdateBoundsPosInfo = function(PRSA, _CurLine, _CurRange, _C
     this.Bounds.SetGenPos(CurLine, CurRange, PRSA);
     this.Bounds.SetPage(CurLine, CurRange, _CurPage);
 
-    for(var i=0; i < this.nRow; i++)
+    if(this.bOneLine == true)
     {
-        for(var j = 0; j < this.nCol; j++)
+        for(var i=0; i < this.nRow; i++)
         {
-            if(false == this.elements[i][j].IsJustDraw())
-                this.elements[i][j].UpdateBoundsPosInfo(PRSA, _CurLine, _CurRange, _CurPage);
+            for(var j = 0; j < this.nCol; j++)
+            {
+                if(false == this.elements[i][j].IsJustDraw())
+                    this.elements[i][j].UpdateBoundsPosInfo(PRSA, _CurLine, _CurRange, _CurPage);
+            }
         }
     }
+    else
+    {
+        var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+        var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+        for(var Pos = StartPos; Pos <= EndPos; Pos++)
+        {
+            this.Content[Pos].UpdateBoundsPosInfo(PRSA, _CurLine, _CurRange, _CurPage);
+        }
+    }
+
 };
 CMathBase.prototype.draw = function(x, y, pGraphics, PDSE)
 {
