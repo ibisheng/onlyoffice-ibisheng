@@ -1027,6 +1027,12 @@ asc_docs_api.prototype.SetInterfaceDrawImagePlaceSlide = function(div_id)
 {
     this.WordControl.m_oDrawingDocument.InitGuiCanvasSlide(div_id);
 };
+
+asc_docs_api.prototype.SetInterfaceDrawImagePlaceTextArt = function(div_id)
+{
+    this.WordControl.m_oDrawingDocument.InitGuiCanvasTextArt(div_id);
+};
+
 asc_docs_api.prototype.SetInterfaceDrawImagePlace = function()
 {};
 
@@ -2189,6 +2195,8 @@ asc_docs_api.prototype.ShapeApply = function(prop)
     var image_url = "";
     prop.Width = prop.w;
     prop.Height = prop.h;
+
+    var bShapeTexture = true;
     if (prop.fill != null)
     {
         if (prop.fill.fill != null && prop.fill.type == c_oAscFill.FILL_TYPE_BLIP)
@@ -2202,6 +2210,22 @@ asc_docs_api.prototype.ShapeApply = function(prop)
             }
         }
     }
+    var oFill;
+    if(prop.textArtProperties)
+    {
+        oFill = prop.textArtProperties.asc_getFill();
+        if (oFill.fill != null && oFill.type == c_oAscFill.FILL_TYPE_BLIP)
+        {
+            image_url = oFill.fill.asc_getUrl();
+
+            var _tx_id = oFill.fill.asc_getTextureId();
+            if (null != _tx_id && 0 <= _tx_id && _tx_id < g_oUserTexturePresets.length)
+            {
+                image_url = g_oUserTexturePresets[_tx_id];
+            }
+            bShapeTexture = false;
+        }
+    }
     if (image_url != "")
     {
         var _image = this.ImageLoader.LoadImage(image_url, 1);
@@ -2210,13 +2234,26 @@ asc_docs_api.prototype.ShapeApply = function(prop)
         if(0 == image_url.indexOf(sFindString))
         {
             image_url = image_url.substring(sFindString.length);
+        }
+        if(bShapeTexture)
+        {
             prop.fill.fill.asc_putUrl(image_url); // erase documentUrl
         }
-
+        else
+        {
+            oFill.fill.asc_putUrl(image_url);
+        }
         if (null != _image)
         {
             this.WordControl.m_oLogicDocument.ShapeApply(prop);
-            this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(image_url);
+            if(bShapeTexture)
+            {
+                this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(image_url);
+            }
+            else
+            {
+                this.WordControl.m_oDrawingDocument.DrawImageTextureFillTextArt(image_url);
+            }
         }
         else
         {
@@ -3029,6 +3066,11 @@ asc_docs_api.prototype.ChangeSlideImageFromFile = function()
     this.isSlideImageChangeUrl = true;
     this.AddImage();
 };
+asc_docs_api.prototype.ChangeArtImageFromFile = function()
+{
+    this.isTextArtChangeUrl = true;
+    this.AddImage();
+};
 
 asc_docs_api.prototype.AddImage = function(){
     var oImageUploader = document.getElementById("apiImageUpload");
@@ -3126,111 +3168,81 @@ asc_docs_api.prototype.AddImageUrl = function(url){
 		}, _sendCommandCallback, rData);
 	}
 };
+
+asc_docs_api.prototype.AddImageUrlActionCallback = function(_image)
+{
+    var _w = Page_Width - (X_Left_Margin + X_Right_Margin);
+    var _h = Page_Height - (Y_Top_Margin + Y_Bottom_Margin);
+    if (_image.Image != null)
+    {
+        var __w = Math.max((_image.Image.width * g_dKoef_pix_to_mm) >> 0, 1);
+        var __h = Math.max((_image.Image.height * g_dKoef_pix_to_mm) >> 0, 1);
+        _w = Math.max(5, Math.min(_w, __w));
+        _h = Math.max(5, Math.min((_w * __h / __w) >> 0));
+    }
+
+    var src = _image.src;
+    if (this.isShapeImageChangeUrl)
+    {
+        var AscShapeProp = new asc_CShapeProperty();
+        AscShapeProp.fill = new asc_CShapeFill();
+        AscShapeProp.fill.type = c_oAscFill.FILL_TYPE_BLIP;
+        AscShapeProp.fill.fill = new asc_CFillBlip();
+        AscShapeProp.fill.fill.asc_putUrl(src);
+        this.ShapeApply(AscShapeProp);
+        this.isShapeImageChangeUrl = false;
+    }
+    else if (this.isSlideImageChangeUrl)
+    {
+        var AscSlideProp = new CAscSlideProps();
+        AscSlideProp.Background = new asc_CShapeFill();
+        AscSlideProp.Background.type = c_oAscFill.FILL_TYPE_BLIP;
+        AscSlideProp.Background.fill = new asc_CFillBlip();
+        AscSlideProp.Background.fill.asc_putUrl(src);
+        this.SetSlideProps(AscSlideProp);
+        this.isSlideImageChangeUrl = false;
+    }
+    else if (this.isImageChangeUrl)
+    {
+        var AscImageProp = new asc_CImgProperty();
+        AscImageProp.ImageUrl = src;
+        this.ImgApply(AscImageProp);
+        this.isImageChangeUrl = false;
+    }
+    else if (this.isTextArtChangeUrl)
+    {
+        var AscShapeProp = new asc_CShapeProperty();
+        var oFill = new asc_CShapeFill();
+        oFill.type = c_oAscFill.FILL_TYPE_BLIP;
+        oFill.fill = new asc_CFillBlip();
+        oFill.fill.asc_putUrl(src);
+        AscShapeProp.textArtProperties = new asc_TextArtProperties();
+        AscShapeProp.textArtProperties.asc_putFill(oFill);
+        this.ShapeApply(AscShapeProp);
+        this.isTextArtChangeUrl = false;
+    }
+    else
+    {
+        var sFindString = editor.DocumentUrl + "media/";
+        if(0 == src.indexOf(sFindString))
+            src = src.substring(sFindString.length);
+
+        this.WordControl.m_oLogicDocument.Add_FlowImage(_w, _h, src);
+    }
+}
+
 asc_docs_api.prototype.AddImageUrlAction = function(url){
     var _image = this.ImageLoader.LoadImage(url, 1);
     if (null != _image)
     {
-        var _w = Page_Width - (X_Left_Margin + X_Right_Margin);
-        var _h = Page_Height - (Y_Top_Margin + Y_Bottom_Margin);
-        if (_image.Image != null)
-        {
-            var __w = Math.max((_image.Image.width * g_dKoef_pix_to_mm) >> 0, 1);
-            var __h = Math.max((_image.Image.height * g_dKoef_pix_to_mm) >> 0, 1);
-            _w = Math.max(5, Math.min(_w, __w));
-            _h = Math.max(5, Math.min((_w * __h / __w) >> 0));
-        }
-
-        var src = _image.src;
-        if (this.isShapeImageChangeUrl)
-        {
-            var AscShapeProp = new asc_CShapeProperty();
-            AscShapeProp.fill = new asc_CShapeFill();
-            AscShapeProp.fill.type = c_oAscFill.FILL_TYPE_BLIP;
-            AscShapeProp.fill.fill = new asc_CFillBlip();
-            AscShapeProp.fill.fill.asc_putUrl(src);
-            this.ShapeApply(AscShapeProp);
-			this.isShapeImageChangeUrl = false;
-        }
-        else if (this.isSlideImageChangeUrl)
-        {
-            var AscSlideProp = new CAscSlideProps();
-            AscSlideProp.Background = new asc_CShapeFill();
-            AscSlideProp.Background.type = c_oAscFill.FILL_TYPE_BLIP;
-            AscSlideProp.Background.fill = new asc_CFillBlip();
-            AscSlideProp.Background.fill.asc_putUrl(src);
-            this.SetSlideProps(AscSlideProp);
-            this.isSlideImageChangeUrl = false;
-        }
-        else if (this.isImageChangeUrl)
-        {
-            var AscImageProp = new asc_CImgProperty();
-            AscImageProp.ImageUrl = src;
-            this.ImgApply(AscImageProp);
-            this.isImageChangeUrl = false;
-        }
-        else
-        {
-            var sFindString = editor.DocumentUrl + "media/";
-            if(0 == src.indexOf(sFindString))
-                src = src.substring(sFindString.length);
-
-            this.WordControl.m_oLogicDocument.Add_FlowImage(_w, _h, src);
-        }
+        this.AddImageUrlActionCallback(_image);
     }
 	else
     {
         this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
 		this.asyncImageEndLoaded2 = function(_image)
         {
-            var _w = Page_Width - (X_Left_Margin + X_Right_Margin);
-            var _h = Page_Height - (Y_Top_Margin + Y_Bottom_Margin);
-            if (_image.Image != null)
-            {
-                var __w = Math.max((_image.Image.width * g_dKoef_pix_to_mm) >> 0, 1);
-                var __h = Math.max((_image.Image.height * g_dKoef_pix_to_mm) >> 0, 1);
-                _w = Math.max(5, Math.min(_w, __w));
-                _h = Math.max(5, Math.min((_w * __h / __w) >> 0));
-            }
-          //  this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-            var src = _image.src;
-
-            //this.WordControl.m_oLogicDocument.Add_FlowImage(_w, _h, src);
-            if (this.isShapeImageChangeUrl)
-            {
-                var AscShapeProp = new asc_CShapeProperty();
-                AscShapeProp.fill = new asc_CShapeFill();
-                AscShapeProp.fill.type = c_oAscFill.FILL_TYPE_BLIP;
-                AscShapeProp.fill.fill = new asc_CFillBlip();
-                AscShapeProp.fill.fill.asc_putUrl(src);
-                this.ShapeApply(AscShapeProp);
-                this.isShapeImageChangeUrl = false;
-            }
-            else if (this.isSlideImageChangeUrl)
-            {
-                var AscSlideProp = new CAscSlideProps();
-                AscSlideProp.Background = new asc_CShapeFill();
-                AscSlideProp.Background.type = c_oAscFill.FILL_TYPE_BLIP;
-                AscSlideProp.Background.fill = new asc_CFillBlip();
-                AscSlideProp.Background.fill.asc_putUrl(src);
-                this.SetSlideProps(AscSlideProp);
-                this.isSlideImageChangeUrl = false;
-            }
-            else if (this.isImageChangeUrl)
-            {
-                var AscImageProp = new asc_CImgProperty();
-                AscImageProp.ImageUrl = src;
-                this.ImgApply(AscImageProp);
-                this.isImageChangeUrl = false;
-            }
-            else
-            {
-                var sFindString = editor.DocumentUrl + "media/";
-                if(0 == src.indexOf(sFindString))
-                    src = src.substring(sFindString.length);
-
-                this.WordControl.m_oLogicDocument.Add_FlowImage(_w, _h, src);
-            }
-
+            this.AddImageUrlActionCallback(_image);
             this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
 
             this.asyncImageEndLoaded2 = null;
@@ -4484,6 +4496,17 @@ asc_docs_api.prototype.sync_shapePropCallback = function(pr)
     {
         this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(null);
     }
+
+    var oTextArtProperties = pr.textArtProperties;
+    if(oTextArtProperties && oTextArtProperties.Fill && oTextArtProperties.Fill.fill  && oTextArtProperties.Fill.fill.type == FILL_TYPE_BLIP)
+    {
+        this.WordControl.m_oDrawingDocument.DrawImageTextureFillTextArt(oTextArtProperties.Fill.fill.RasterImageId);
+    }
+    else
+    {
+        this.WordControl.m_oDrawingDocument.DrawImageTextureFillTextArt(null);
+    }
+
 
     var _len = this.SelectedObjectsStack.length;
     if (_len > 0)

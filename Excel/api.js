@@ -133,6 +133,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.ImageLoader = window.g_image_loader;
 			this.ImageLoader.put_Api(this);
 			this.shapeElementId = null;
+            this.textArtElementId = null;
 			this.isImageChangeUrl = false;
 			this.isShapeImageChangeUrl = false;
 
@@ -2782,6 +2783,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.shapeElementId = elementId;
 		};
 
+		spreadsheet_api.prototype.asc_setInterfaceDrawImagePlaceTextArt = function(elementId) {
+			this.textArtElementId = elementId;
+		};
+
 		spreadsheet_api.prototype.asc_changeImageFromFile = function() {
 			this.isImageChangeUrl = true;
 			this.asc_showImageFileDialog();
@@ -3872,6 +3877,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_getOriginalImageSize"] = prot.asc_getOriginalImageSize;
 		prot["asc_changeShapeType"] = prot.asc_changeShapeType;
 		prot["asc_setInterfaceDrawImagePlaceShape"] = prot.asc_setInterfaceDrawImagePlaceShape;
+		prot["asc_setInterfaceDrawImagePlaceTextArt"] = prot.asc_setInterfaceDrawImagePlaceTextArt;
 		prot["asc_changeImageFromFile"] = prot.asc_changeImageFromFile;
 		prot["asc_putPrLineSpacing"] = prot.asc_putPrLineSpacing;
 		prot["asc_addTextArt"] = prot.asc_addTextArt;

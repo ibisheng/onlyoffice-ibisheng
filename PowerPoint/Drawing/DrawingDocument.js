@@ -1040,6 +1040,11 @@ function CDrawingDocument()
     this.GuiCanvasFillTextureCtxSlide = null;
     this.LastDrawingUrlSlide = "";
 
+    this.GuiCanvasFillTextureParentIdTextArt = "";
+    this.GuiCanvasFillTextureTextArt = null;
+    this.GuiCanvasFillTextureCtxTextArt = null;
+    this.LastDrawingUrlTextArt = "";
+
     this.AutoShapesTrack = null;
     this.TransitionSlide = new CTransitionAnimation(null);
 
@@ -2980,6 +2985,78 @@ function CDrawingDocument()
         }
     }
 
+
+
+    this.DrawImageTextureFillTextArt = function(url)
+    {
+        if (this.GuiCanvasFillTextureTextArt == null)
+        {
+            this.InitGuiCanvasTextArt(this.GuiCanvasFillTextureParentIdTextArt);
+        }
+
+        if (this.GuiCanvasFillTextureTextArt == null || this.GuiCanvasFillTextureCtxTextArt == null || url == this.LastDrawingUrlTextArt)
+            return;
+
+        this.LastDrawingUrlTextArt = url;
+        var _width  = this.GuiCanvasFillTextureTextArt.width;
+        var _height = this.GuiCanvasFillTextureTextArt.height;
+
+        this.GuiCanvasFillTextureCtxTextArt.clearRect(0, 0, _width, _height);
+
+        if (null == this.LastDrawingUrlTextArt)
+            return;
+
+        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[getFullImageSrc2(this.LastDrawingUrlTextArt)];
+        if (_img != undefined && _img.Image != null && _img.Status != ImageLoadStatus.Loading)
+        {
+            var _x = 0;
+            var _y = 0;
+            var _w = Math.max(_img.Image.width, 1);
+            var _h = Math.max(_img.Image.height, 1);
+
+            var dAspect1 = _width / _height;
+            var dAspect2 = _w / _h;
+
+            _w = _width;
+            _h = _height;
+            if (dAspect1 >= dAspect2)
+            {
+                _w = dAspect2 * _height;
+                _x = (_width - _w) / 2;
+            }
+            else
+            {
+                _h = _w / dAspect2;
+                _y = (_height - _h) / 2;
+            }
+
+            this.GuiCanvasFillTextureCtxTextArt.drawImage(_img.Image, _x, _y, _w, _h);
+        }
+        else
+        {
+            this.GuiCanvasFillTextureCtxTextArt.lineWidth = 1;
+
+            this.GuiCanvasFillTextureCtxTextArt.beginPath();
+            this.GuiCanvasFillTextureCtxTextArt.moveTo(0, 0);
+            this.GuiCanvasFillTextureCtxTextArt.lineTo(_width, _height);
+            this.GuiCanvasFillTextureCtxTextArt.moveTo(_width, 0);
+            this.GuiCanvasFillTextureCtxTextArt.lineTo(0, _height);
+            this.GuiCanvasFillTextureCtxTextArt.strokeStyle = "#FF0000";
+            this.GuiCanvasFillTextureCtxTextArt.stroke();
+
+            this.GuiCanvasFillTextureCtxTextArt.beginPath();
+            this.GuiCanvasFillTextureCtxTextArt.moveTo(0, 0);
+            this.GuiCanvasFillTextureCtxTextArt.lineTo(_width, 0);
+            this.GuiCanvasFillTextureCtxTextArt.lineTo(_width, _height);
+            this.GuiCanvasFillTextureCtxTextArt.lineTo(0, _height);
+            this.GuiCanvasFillTextureCtxTextArt.closePath();
+
+            this.GuiCanvasFillTextureCtxTextArt.strokeStyle = "#000000";
+            this.GuiCanvasFillTextureCtxTextArt.stroke();
+            this.GuiCanvasFillTextureCtxTextArt.beginPath();
+        }
+    }
+
     this.InitGuiCanvasShape = function(div_id)
     {
         if (null != this.GuiCanvasFillTexture)
@@ -3032,6 +3109,33 @@ function CDrawingDocument()
         this.GuiCanvasFillTextureCtxSlide = this.GuiCanvasFillTextureSlide.getContext('2d');
 
         _div_elem.appendChild(this.GuiCanvasFillTextureSlide);
+    }
+
+    this.InitGuiCanvasTextArt = function(div_id)
+    {
+        if (null != this.GuiCanvasFillTextureTextArt)
+        {
+            var _div_elem = document.getElementById(this.GuiCanvasFillTextureParentIdTextArt);
+            if (!_div_elem)
+                _div_elem.removeChild(this.GuiCanvasFillTextureTextArt);
+
+            this.GuiCanvasFillTextureTextArt = null;
+            this.GuiCanvasFillTextureCtxTextArt = null;
+        }
+
+        this.GuiCanvasFillTextureParentIdTextArt = div_id;
+        var _div_elem = document.getElementById(this.GuiCanvasFillTextureParentIdTextArt);
+        if (!_div_elem)
+            return;
+
+        this.GuiCanvasFillTextureTextArt = document.createElement('canvas');
+        this.GuiCanvasFillTextureTextArt.width = parseInt(_div_elem.style.width);
+        this.GuiCanvasFillTextureTextArt.height = parseInt(_div_elem.style.height);
+
+        this.LastDrawingUrlTextArt = "";
+        this.GuiCanvasFillTextureCtxTextArt = this.GuiCanvasFillTextureTextArt.getContext('2d');
+
+        _div_elem.appendChild(this.GuiCanvasFillTextureTextArt);
     }
 
     this.CheckTableStyles = function()

@@ -5834,10 +5834,10 @@ DrawingObjectsController.prototype =
                 {
                     oTextArtProperties.Fill = oTextPr.Unifill;
                 }
-               // else if(oTextPr.Color)
-               // {
-               //     oTextArtProperties.Fill = CreateUnfilFromRGB(oTextPr.Color.r, oTextPr.Color.g, oTextPr.Color.b);
-               // }
+                else if(oTextPr.Color)
+                {
+                    oTextArtProperties.Fill = CreateUnfilFromRGB(oTextPr.Color.r, oTextPr.Color.g, oTextPr.Color.b);
+                }
                 oTextArtProperties.Line = oTextPr.TextOutline;
                 if(oTextArtProperties.Fill)
                 {
@@ -5903,6 +5903,7 @@ DrawingObjectsController.prototype =
             shape_props.Width = props.shapeChartProps.w;
             shape_props.Height = props.shapeChartProps.h;
             var pr = shape_props.ShapeProperties;
+            var oTextArtProperties;
             if (!isRealObject(props.shapeProps))
             {
                 if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == FILL_TYPE_BLIP)
@@ -5918,6 +5919,24 @@ DrawingObjectsController.prototype =
                         this.drawingObjects.drawingDocument.InitGuiCanvasShape(api.shapeElementId);
                     this.drawingObjects.drawingDocument.DrawImageTextureFillShape(null);
                 }
+
+
+                if(pr.textArtProperties)
+                {
+                    oTextArtProperties = pr.textArtProperties;
+                    if(oTextArtProperties && oTextArtProperties.Fill && oTextArtProperties.Fill.fill  && oTextArtProperties.Fill.fill.type == FILL_TYPE_BLIP)
+                    {
+                        if(api)
+                            this.drawingObjects.drawingDocument.InitGuiCanvasTextArt(api.textArtElementId);
+                        this.drawingObjects.drawingDocument.LastDrawingUrlTextArt = null;
+                        this.WordControl.m_oDrawingDocument.DrawImageTextureFillTextArt(oTextArtProperties.Fill.fill.RasterImageId);
+                    }
+                    else
+                    {
+                        this.WordControl.m_oDrawingDocument.DrawImageTextureFillTextArt(null);
+                    }
+                }
+
             }
             shape_props.ShapeProperties.fill = CreateAscFill(shape_props.ShapeProperties.fill);
             shape_props.ShapeProperties.stroke = CreateAscStroke(shape_props.ShapeProperties.stroke, shape_props.ShapeProperties.canChangeArrows === true);
@@ -5937,6 +5956,22 @@ DrawingObjectsController.prototype =
             shape_props.ShapeProperties.canChangeArrows = props.shapeProps.canChangeArrows;
             shape_props.ShapeProperties.bFromChart = props.shapeProps.bFromChart;
             shape_props.ShapeProperties.textArtProperties = CreateAscTextArtProps(props.shapeProps.textArtProperties);
+
+            if(props.shapeProps.textArtProperties)
+            {
+                oTextArtProperties = props.shapeProps.textArtProperties;
+                if(oTextArtProperties && oTextArtProperties.Fill && oTextArtProperties.Fill.fill  && oTextArtProperties.Fill.fill.type == FILL_TYPE_BLIP)
+                {
+                    if(api)
+                        this.drawingObjects.drawingDocument.InitGuiCanvasTextArt(api.textArtElementId);
+                    this.drawingObjects.drawingDocument.LastDrawingUrlTextArt = null;
+                    this.drawingObjects.drawingDocument.DrawImageTextureFillTextArt(oTextArtProperties.Fill.fill.RasterImageId);
+                }
+                else
+                {
+                    this.drawingObjects.drawingDocument.DrawImageTextureFillTextArt(null);
+                }
+            }
 
             if(props.shapeProps.paddings)
             {
