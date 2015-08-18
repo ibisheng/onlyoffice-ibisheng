@@ -325,6 +325,10 @@ CMathArgSize.prototype =
     {
         this.value = ArgSize.value;
     },
+    Get: function()
+    {
+        return this.value;
+    },
     SetValue: function(val)
     {
         if(val < - 2)
@@ -1840,6 +1844,7 @@ CMathContent.prototype.CopyTo = function(OtherContent, Selected)
     }
 
     OtherContent.plHid = this.plhHide;
+    OtherContent.SetArgSize(this.ArgSize.Get());
 
     for(var nPos = nStartPos; nPos <= nEndPos; nPos++)
     {
