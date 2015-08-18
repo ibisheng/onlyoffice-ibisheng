@@ -3683,6 +3683,9 @@ parserFormula.prototype = {
                     var found_operator = null, operandStr = this.operand_str.toUpperCase();
                     if ( operandStr in cFormulaList )
                         found_operator = new cFormulaList[operandStr]();
+                    else{
+                        found_operator = new cBaseFunction(operandStr);
+                    }
 
                     if ( found_operator != null ) {
                         this.elemArr.push( found_operator );
