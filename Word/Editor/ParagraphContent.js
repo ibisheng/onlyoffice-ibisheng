@@ -652,7 +652,14 @@ ParaTextPr.prototype =
         if ( undefined != TextPr.Color )
         {
             this.Set_Color(TextPr.Color);
-            this.Set_Unifill(undefined);
+            if(undefined != this.Value.Unifill)
+            {
+                this.Set_Unifill(undefined);
+            }
+            if(undefined != this.Value.TextFill)
+            {
+                this.Set_TextFill(undefined);
+            }
         }
 
         if ( undefined != TextPr.VertAlign )
@@ -688,7 +695,14 @@ ParaTextPr.prototype =
         if(undefined != TextPr.Unifill)
         {
             this.Set_Unifill(TextPr.Unifill.createDuplicate());
-            this.Set_Color(undefined);
+            if(undefined != this.Value.Color)
+            {
+                this.Set_Color(undefined);
+            }
+            if(undefined != this.Value.TextFill)
+            {
+                this.Set_TextFill(undefined);
+            }
         }
         if(undefined != TextPr.TextOutline)
         {
@@ -697,6 +711,14 @@ ParaTextPr.prototype =
         if(undefined != TextPr.TextFill)
         {
             this.Set_TextFill(TextPr.TextFill);
+            if(undefined != this.Value.Color)
+            {
+                this.Set_Color(undefined);
+            }
+            if(undefined != this.Value.Unifill)
+            {
+                this.Set_Unifill(undefined);
+            }
         }
     },
 
