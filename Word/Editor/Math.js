@@ -2660,6 +2660,7 @@ var historyitem_Math_RFontsCS                  =  17;
 var historyitem_Math_RFontsEastAsia            =  18;
 var historyitem_Math_RFontsHint                =  19;
 var historyitem_Math_CtrPrpHighLight           =  20;
+var historyitem_Math_ArgSize                   =  21;
 
 
 function ReadChanges_FromBinary(Reader, Class)
