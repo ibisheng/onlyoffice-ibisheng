@@ -2347,6 +2347,7 @@ CMathContent.prototype.private_LoadFromMenuFraction = function(Type, Pr)
             var oBox = new CBox(Pr);
             this.Add_Element(oBox);
             var BoxMathContent = oBox.getBase();
+            BoxMathContent.SetArgSize(-1);
             BoxMathContent.Add_Fraction(Pr, null, null);
             break;
 
