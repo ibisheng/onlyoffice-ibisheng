@@ -1978,7 +1978,7 @@ function CDrawingDocument(drawingObjects)
             {
                 this.m_arrPages.splice(this.m_lCountCalculatePages, this.m_lPagesCount - this.m_lCountCalculatePages);
             }
-            
+
             this.m_lPagesCount = this.m_lCountCalculatePages;
             this.m_oWordControl.CalculateDocumentSize();
 
@@ -2037,12 +2037,12 @@ function CDrawingDocument(drawingObjects)
 
         //console.log("end " + this.m_lCountCalculatePages + "," + isFull + "," + isBreak);
     }
-	
+
 	this.ChangePageAttack = function(pageIndex)
 	{
 		if (pageIndex < this.m_lDrawingFirst || pageIndex > this.m_lDrawingEnd)
 			return;
-			
+
 		this.StopRenderingPage(pageIndex);
 		this.m_oWordControl.OnScroll();
 	}
@@ -4395,7 +4395,8 @@ function CDrawingDocument(drawingObjects)
         if (null == this.LastDrawingUrlTextArt)
             return;
 
-        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[getFullImageSrc2(this.LastDrawingUrlTextArt)];
+        var api = window["Asc"]["editor"];
+        var _img = api.ImageLoader.map_image_index[getFullImageSrc2(this.LastDrawingUrlTextArt)];
         if (_img != undefined && _img.Image != null && _img.Status != ImageLoadStatus.Loading)
         {
             var _x = 0;
@@ -4554,14 +4555,27 @@ function CDrawingDocument(drawingObjects)
         if (!_div_elem)
             return;
 
-        this.GuiCanvasFillTextureTextArt = document.createElement('canvas');
+        var bIsAppend = true;
+        if (_div_elem.childNodes && _div_elem.childNodes.length == 1)
+        {
+            this.GuiCanvasFillTextureTextArt = _div_elem.childNodes[0];
+            bIsAppend = false;
+        }
+        else
+        {
+            this.GuiCanvasFillTextureTextArt = document.createElement('canvas');
+        }
+
         this.GuiCanvasFillTextureTextArt.width = parseInt(_div_elem.style.width);
         this.GuiCanvasFillTextureTextArt.height = parseInt(_div_elem.style.height);
 
         this.LastDrawingUrlTextArt = "";
         this.GuiCanvasFillTextureCtxTextArt = this.GuiCanvasFillTextureTextArt.getContext('2d');
 
-        _div_elem.appendChild(this.GuiCanvasFillTextureTextArt);
+        if (bIsAppend)
+        {
+            _div_elem.appendChild(this.GuiCanvasFillTextureTextArt);
+        }
     }
 
     this.DrawGuiCanvasTextProps = function(props)

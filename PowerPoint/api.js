@@ -2214,7 +2214,7 @@ asc_docs_api.prototype.ShapeApply = function(prop)
     if(prop.textArtProperties)
     {
         oFill = prop.textArtProperties.asc_getFill();
-        if (oFill.fill != null && oFill.type == c_oAscFill.FILL_TYPE_BLIP)
+        if (oFill && oFill.fill != null && oFill.type == c_oAscFill.FILL_TYPE_BLIP)
         {
             image_url = oFill.fill.asc_getUrl();
 
