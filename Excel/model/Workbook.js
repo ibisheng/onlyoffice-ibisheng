@@ -1899,7 +1899,7 @@ Workbook.prototype.init=function(bNoBuildDep){
 	
 	var self = this;
 	
-	if(!window["Asc"] || (window["Asc"] && window["Asc"]["editor"] === undefined))//если мы не в редакторе таблиц
+	if(window["Asc"] && window["Asc"]["editor"] !== undefined)//если мы в редакторе таблиц
 	{
 		this.wsHandlers = new asc.asc_CHandlersList(/*handlers*/{
 			"changeRefTablePart"    : function (displayName, ref) {
