@@ -6876,7 +6876,7 @@
                         res = (new Binary_WorkbookTableReader(this.stream, wb)).Read();
                 }
                 wb.init();
-            } else {
+            } else if(window["Asc"] && window["Asc"]["editor"] !== undefined){
                 wb.init(true);
             }
             return res;
