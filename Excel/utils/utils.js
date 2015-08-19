@@ -1013,16 +1013,24 @@
 
 			return this;
 		}
-		asc_CPageMargins.prototype = {
-			asc_getLeft: function () { return this.left; },
-			asc_getRight: function () { return this.right; },
-			asc_getTop: function () { return this.top; },
-			asc_getBottom: function () { return this.bottom; },
-			asc_setLeft: function (val) { this.left = val; },
-			asc_setRight: function (val) { this.right = val; },
-			asc_setTop: function (val) { this.top = val; },
-			asc_setBottom: function (val) { this.bottom = val; }
+		asc_CPageMargins.prototype.init = function () {
+			if (null == this.left)
+				this.left = c_oAscPrintDefaultSettings.PageLeftField;
+			if (null == this.top)
+				this.top = c_oAscPrintDefaultSettings.PageTopField;
+			if (null == this.right)
+				this.right = c_oAscPrintDefaultSettings.PageRightField;
+			if (null == this.bottom)
+				this.bottom = c_oAscPrintDefaultSettings.PageBottomField;
 		};
+		asc_CPageMargins.prototype.asc_getLeft = function () { return this.left; };
+		asc_CPageMargins.prototype.asc_getRight = function () { return this.right; };
+		asc_CPageMargins.prototype.asc_getTop = function () { return this.top; };
+		asc_CPageMargins.prototype.asc_getBottom = function () { return this.bottom; };
+		asc_CPageMargins.prototype.asc_setLeft = function (val) { this.left = val; };
+		asc_CPageMargins.prototype.asc_setRight = function (val) { this.right = val; };
+		asc_CPageMargins.prototype.asc_setTop = function (val) { this.top = val; };
+		asc_CPageMargins.prototype.asc_setBottom = function (val) { this.bottom = val; };
 		/** @constructor */
 		function asc_CPageSetup (obj) {
 			if ( !(this instanceof asc_CPageSetup) ) {
@@ -1037,14 +1045,21 @@
 
 			return this;
 		}
-		asc_CPageSetup.prototype = {
-			asc_getOrientation: function () { return this.orientation; },
-			asc_getWidth: function () { return this.width; },
-			asc_getHeight: function () { return this.height; },
-			asc_setOrientation: function (val) { this.orientation = val; },
-			asc_setWidth: function (val) { this.width = val; },
-			asc_setHeight: function (val) { this.height = val; }
+		asc_CPageSetup.prototype.init = function () {
+			if (null == this.orientation)
+				this.orientation = c_oAscPrintDefaultSettings.PageOrientation;
+			if (null == this.width)
+				this.width = c_oAscPrintDefaultSettings.PageWidth;
+			if (null == this.height)
+				this.height = c_oAscPrintDefaultSettings.PageHeight;
 		};
+		asc_CPageSetup.prototype.asc_getOrientation = function () { return this.orientation; };
+		asc_CPageSetup.prototype.asc_getWidth = function () { return this.width; };
+		asc_CPageSetup.prototype.asc_getHeight = function () { return this.height; };
+		asc_CPageSetup.prototype.asc_setOrientation = function (val) { this.orientation = val; };
+		asc_CPageSetup.prototype.asc_setWidth = function (val) { this.width = val; };
+		asc_CPageSetup.prototype.asc_setHeight = function (val) { this.height = val; };
+
 		/** @constructor */
 		function asc_CPageOptions (obj) {
 			if ( !(this instanceof asc_CPageOptions) ) {
@@ -1060,16 +1075,29 @@
 
 			return this;
 		}
-		asc_CPageOptions.prototype = {
-			asc_getPageMargins: function () { return this.pageMargins; },
-			asc_getPageSetup: function () { return this.pageSetup; },
-			asc_getGridLines: function () { return this.gridLines; },
-			asc_getHeadings: function () { return this.headings; },
-			asc_setPageMargins: function (val) { this.pageMargins = val; },
-			asc_setPageSetup: function (val) { this.pageSetup = val; },
-			asc_setGridLines: function (val) { this.gridLines = val; },
-			asc_setHeadings: function (val) { this.headings = val; }
+		asc_CPageOptions.prototype.init = function () {
+			if (!this.pageMargins)
+				this.pageMargins = new asc_CPageMargins();
+			this.pageMargins.init();
+
+			if (!this.pageSetup)
+				this.pageSetup = new asc_CPageSetup();
+			this.pageSetup.init();
+
+			if (null == this.gridLines)
+				this.gridLines = c_oAscPrintDefaultSettings.PageGridLines;
+			if (null == this.headings)
+				this.headings = c_oAscPrintDefaultSettings.PageHeadings;
 		};
+		asc_CPageOptions.prototype.asc_getPageMargins = function () { return this.pageMargins; };
+		asc_CPageOptions.prototype.asc_getPageSetup = function () { return this.pageSetup; };
+		asc_CPageOptions.prototype.asc_getGridLines = function () { return this.gridLines; };
+		asc_CPageOptions.prototype.asc_getHeadings = function () { return this.headings; };
+		asc_CPageOptions.prototype.asc_setPageMargins = function (val) { this.pageMargins = val; };
+		asc_CPageOptions.prototype.asc_setPageSetup = function (val) { this.pageSetup = val; };
+		asc_CPageOptions.prototype.asc_setGridLines = function (val) { this.gridLines = val; };
+		asc_CPageOptions.prototype.asc_setHeadings = function (val) { this.headings = val; };
+
 		function CPagePrint () {
 			if ( !(this instanceof CPagePrint) ) {
 				return new CPagePrint();
@@ -1106,7 +1134,6 @@
 			}
 			this.arrPages = null;
 			this.currentIndex = 0;
-			this.c_maxPagesCount = 10;
 
 			return this;
 		}
@@ -1122,13 +1149,10 @@
 
 			return this;
 		}
-		asc_CAdjustPrint.prototype = {
-			constructor: asc_CAdjustPrint,
-			asc_getPrintType: function () { return this.printType; },
-			asc_getLayoutPageType: function () { return this.layoutPageType; },
-			asc_setPrintType: function (val) { this.printType = val; },
-			asc_setLayoutPageType: function (val) { this.layoutPageType = val; }
-		};
+		asc_CAdjustPrint.prototype.asc_getPrintType = function () { return this.printType; };
+		asc_CAdjustPrint.prototype.asc_getLayoutPageType = function () { return this.layoutPageType; };
+		asc_CAdjustPrint.prototype.asc_setPrintType = function (val) { this.printType = val; };
+		asc_CAdjustPrint.prototype.asc_setLayoutPageType = function (val) { this.layoutPageType = val; };
 
 		/** @constructor */
 		function asc_CLockInfo () {

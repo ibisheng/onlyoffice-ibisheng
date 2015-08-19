@@ -3086,7 +3086,7 @@ Woorksheet.prototype.initPostOpen = function(handlers){
 																						first:r.first
 																					};
 																		}(this)
-																}
+																};
 							formulaShared[oFormulaExt.si].fVal.parse();
 					}
 					else{
@@ -3134,41 +3134,7 @@ Woorksheet.prototype.initPostOpen = function(handlers){
 		// Даже если не было, создадим
 		this.PagePrintOptions = new Asc.asc_CPageOptions();
 	}
-	if(null != this.PagePrintOptions)
-	{
-		var oPageMargins = this.PagePrintOptions.asc_getPageMargins();
-		if(null == oPageMargins)
-		{
-			oPageMargins = new Asc.asc_CPageMargins ();
-			this.PagePrintOptions.asc_setPageMargins(oPageMargins);
-		}
-		if(null == oPageMargins.asc_getLeft())
-			oPageMargins.asc_setLeft(c_oAscPrintDefaultSettings.PageLeftField);
-		if(null == oPageMargins.asc_getTop())
-			oPageMargins.asc_setTop(c_oAscPrintDefaultSettings.PageTopField);
-		if(null == oPageMargins.asc_getRight())
-			oPageMargins.asc_setRight(c_oAscPrintDefaultSettings.PageRightField);
-		if(null == oPageMargins.asc_getBottom())
-			oPageMargins.asc_setBottom(c_oAscPrintDefaultSettings.PageBottomField);
-		
-		var oPageSetup = this.PagePrintOptions.asc_getPageSetup();
-		if(null == oPageSetup)
-		{
-			oPageSetup = new Asc.asc_CPageSetup ();
-			this.PagePrintOptions.asc_setPageSetup(oPageSetup);
-		}
-		if(null == oPageSetup.asc_getOrientation())
-			oPageSetup.asc_setOrientation(c_oAscPrintDefaultSettings.PageOrientation);
-		if(null == oPageSetup.asc_getWidth())
-			oPageSetup.asc_setWidth(c_oAscPrintDefaultSettings.PageWidth);
-		if(null == oPageSetup.asc_getHeight())
-			oPageSetup.asc_setHeight(c_oAscPrintDefaultSettings.PageHeight);
-		
-		if(null == this.PagePrintOptions.asc_getGridLines())
-			this.PagePrintOptions.asc_setGridLines(c_oAscPrintDefaultSettings.PageGridLines);
-		if(null == this.PagePrintOptions.asc_getHeadings())
-			this.PagePrintOptions.asc_setHeadings(c_oAscPrintDefaultSettings.PageHeadings);
-	}
+	this.PagePrintOptions.init();
 
 	// Sheet Views
 	if (0 === this.sheetViews.length) {
