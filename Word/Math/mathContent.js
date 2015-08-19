@@ -1133,6 +1133,7 @@ CMathContent.prototype.GetParent = function()
 };
 CMathContent.prototype.SetArgSize = function(val)
 {
+    History.Add( this, { Type : historyitem_Math_ArgSize, New: val, Old: this.ArgSize.GetValue()});
     this.ArgSize.SetValue(val);
 };
 CMathContent.prototype.GetArgSize = function()
@@ -1689,11 +1690,6 @@ CMathContent.prototype.Internal_Content_Add = function(Pos, Item, bUpdatePositio
 
     this.private_UpdatePosOnAdd(Pos, bUpdatePosition);
 };
-CMathContent.prototype.Apply_ArgSize = function(ArgSize)
-{
-    History.Add( this, { Type : historyitem_Math_ArgSize, New: ArgSize, Old: this.ArgSize.GetValue()});
-    this.ArgSize.SetValue(ArgSize);
-};
 CMathContent.prototype.private_UpdatePosOnAdd = function(Pos, bUpdatePosition)
 {
     if(bUpdatePosition !== false)
@@ -1873,7 +1869,7 @@ CMathContent.prototype.CopyTo = function(OtherContent, Selected)
     }
 
     OtherContent.plHid = this.plhHide;
-    OtherContent.Apply_ArgSize(this.ArgSize.GetValue());
+    OtherContent.SetArgSize(this.ArgSize.GetValue());
 
     for(var nPos = nStartPos; nPos <= nEndPos; nPos++)
     {

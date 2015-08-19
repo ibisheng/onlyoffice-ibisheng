@@ -590,8 +590,6 @@ ParaMath.prototype.Copy = function(Selected)
         this.Root.CopyTo(NewMath.Root, Selected);
     }
 
-    /// argSize, bDot и bRoot выставить на объединении контентов
-
     NewMath.Root.Correct_Content(true);
 
     return NewMath;
