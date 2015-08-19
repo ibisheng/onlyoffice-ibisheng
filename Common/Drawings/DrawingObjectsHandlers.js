@@ -323,12 +323,12 @@ function handleChart(drawing, drawingObjectsController, e, x, y, group, pageInde
                     if(title !== oTargetTextObject)
                     {
                         drawingObjectsController.checkChartTextSelection();
+                        selector.resetSelection();
+                        selector.selectObject(drawing, pageIndex);
+                        selector.selection.chartSelection = drawing;
+                        drawing.selectTitle(title, pageIndex);
+                        drawing.selection.textSelection = title;
                     }
-                    selector.resetSelection();
-                    selector.selectObject(drawing, pageIndex);
-                    selector.selection.chartSelection = drawing;
-                    drawing.selectTitle(title, pageIndex);
-                    drawing.selection.textSelection = title;
                     title.selectionSetStart(e, x, y, pageIndex);
                     drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title));
                     if(e.ClickCount <= 1)

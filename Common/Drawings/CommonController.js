@@ -631,7 +631,7 @@ DrawingObjectsController.prototype =
                 if(this.selection.textSelection !== object)
                 {
                     this.resetSelection(true);
-                    this.selectObject(object,pageIndex)
+                    this.selectObject(object,pageIndex);
                     this.selection.textSelection = object;
                 }
             }
@@ -4898,7 +4898,7 @@ DrawingObjectsController.prototype =
                 else
                 {
                     nPageNum1 = 0;
-                    chart_selection.addToRecalculate();
+                    chart_selection.recalculate();
                 }
                 chart_selection.recalcInfo.bRecalculatedTitle = false;
             }
