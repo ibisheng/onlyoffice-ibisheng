@@ -495,6 +495,29 @@ CRadical.prototype.ApplyProperties = function(RPI)
         this.RecalcInfo.bProps = false;
     }
 };
+CRadical.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
+{
+    var bOneLine = PRS.bMath_OneLine;
+    var WordLen = PRS.WordLen; // запоминаем, чтобы внутр мат объекты не увеличили WordLen
+    this.BrGapLeft  = this.GapLeft;
+    this.BrGapRight = this.GapRight;
+
+    this.Iterator.Recalculate_Reset(PRS.Range, PRS.Line, PRS);
+    this.Base.Recalculate_Reset(PRS.Range, PRS.Line, PRS);
+
+    PRS.bMath_OneLine = true;
+
+    this.Iterator.Recalculate_Range(PRS, ParaPr, Depth);
+    this.Base.Recalculate_Range(PRS, ParaPr, Depth);
+
+    this.recalculateSize(g_oTextMeasurer);
+
+    this.UpdatePRS_OneLine(PRS, WordLen);
+    this.Bounds.SetWidth(0, 0, this.size.width);
+    this.Bounds.UpdateMetrics(0, 0, this.size);
+
+    PRS.bMath_OneLine = bOneLine;
+};
 CRadical.prototype.recalculateSize = function(oMeasure)
 {
     var shTop,

@@ -2091,10 +2091,9 @@ CMathBase.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _C
     {
         var NewContentMetrics = new CMathBoundsMeasures();
 
-        for (var CurPos = 0; CurPos <= this.Content.length - 1; CurPos++)
+        for (var CurPos = 0; CurPos < this.Content.length; CurPos++)
         {
-            var Item = this.Content[CurPos];
-            Item.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
+            this.Content[CurPos].Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange, NewContentMetrics);
         }
 
         //this.Bounds.UpdateMetrics(CurLine, CurRange, this.size);
