@@ -7901,7 +7901,7 @@ ParaRun.prototype.Save_Changes = function(Data, Writer)
             }
             if ( undefined != this.MathPrp.brk )
             {
-                Writer.WriteBool( this.MathPrp.brk );
+                this.MathPrp.brk.Write_ToBinary(Writer);
                 Flags |= 2;
             }
             if ( undefined != this.MathPrp.lit )
@@ -8547,8 +8547,13 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             var Flags = Reader.GetLong();
             if ( Flags & 1 )
                 this.MathPrp.aln = Reader.GetBool();
+
             if ( Flags & 2 )
-                this.MathPrp.brk = Reader.GetBool();
+            {
+                this.MathPrp.brk = new CMathBreak();
+                this.MathPrp.brk.Read_FromBinary(Reader);
+            }
+
             if ( Flags & 4 )
                 this.MathPrp.lit = Reader.GetBool();
             if ( Flags & 8 )
@@ -9074,24 +9079,6 @@ ParaRun.prototype.Math_SetPosition = function(pos, PosInfo)
         pos.x += this.Content[Pos].Get_WidthVisible(); // Get_Width => Get_WidthVisible
                                                      // Get_WidthVisible - Width + Gaps с учетом настроек состояния
     }
-};
-ParaRun.prototype.Math_GetWidth = function(_CurLine, _CurRange)
-{
-    var CurLine  = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-    var W = 0;
-    for(var i = StartPos; i < EndPos; i++)
-    {
-        W += this.Content[i].Get_WidthVisible(); // Get_Width => Get_WidthVisible
-                                                 // Get_WidthVisible - Width + Gaps с учетом настроек состояния
-    }
-
-    return W;
-
 };
 ParaRun.prototype.Math_Get_StartRangePos = function(_CurLine, _CurRange, SearchPos, Depth, bStartLine)
 {

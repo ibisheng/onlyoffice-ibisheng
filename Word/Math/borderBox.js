@@ -28,7 +28,7 @@ CMathBreak.prototype.Write_ToBinary = function(Writer)
     if(this.alnAt !== undefined)
     {
         Writer.WriteBool(false);
-        Writer.WriteLong(this.alnAt);
+        Writer.WriteByte(this.alnAt);
     }
     else
     {
@@ -39,7 +39,7 @@ CMathBreak.prototype.Read_FromBinary = function(Reader)
 {
     if(Reader.GetBool() == false)
     {
-        this.alnAt = Reader.GetLong();
+        this.alnAt = Reader.GetByte();
     }
     else
     {

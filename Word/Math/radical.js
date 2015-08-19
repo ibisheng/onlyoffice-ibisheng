@@ -486,8 +486,6 @@ CRadical.prototype.ApplyProperties = function(RPI)
             this.elements[0][0] = this.Iterator;
             this.elements[0][1] = this.Base;
 
-            //this.Iterator.setArgSize(-2);
-
             this.RealBase       = this.Base;
 
         }
