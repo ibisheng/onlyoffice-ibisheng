@@ -2880,6 +2880,7 @@ PasteProcessor.prototype =
 						}
 						
 						var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+                        oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 						sendCommand2(function(incomeObject){
 							if(incomeObject && "imgurls" == incomeObject.type)
 							{
@@ -2917,6 +2918,7 @@ PasteProcessor.prototype =
 							
 							var aContent = oThis._convertExcelBinary(aContentExcel);
 							oThis.aContent = aContent.content;
+                            oThis.api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 							oThis.api.pre_Paste(aContent.fonts, image_map, fPrepasteCallback);
 							
 						}, _sendCommandCallback, rData);
@@ -2986,6 +2988,7 @@ PasteProcessor.prototype =
 						else
 						{
 							var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+                            oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 							sendCommand2(function(incomeObject){
 								if(incomeObject && "imgurls" == incomeObject.type)
 								{
@@ -3008,6 +3011,7 @@ PasteProcessor.prototype =
 										}
 									}
 								}
+                                oThis.api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 								oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
 							}, _sendCommandCallback, rData);
 						}
@@ -3102,7 +3106,9 @@ PasteProcessor.prototype =
 							}
 							
 							var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+                            oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 							sendCommand2(function(incomeObject){
+
 								if(incomeObject && "imgurls" == incomeObject.type)
 								{
 									var oFromTo = JSON.parse(incomeObject.data);
@@ -3155,6 +3161,7 @@ PasteProcessor.prototype =
 								
 								aContent = oThis._convertExcelBinary(null, arr_shapes);
 								oThis.aContent = aContent.content;
+                                oThis.api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 								oThis.api.pre_Paste(aContent.fonts, image_map, fPrepasteCallback);
 								
 							}, _sendCommandCallback, rData);
@@ -3362,6 +3369,7 @@ PasteProcessor.prototype =
                             if(aImagesToDownload.length > 0)
                             {
                                 var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+                                oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
                                 sendCommand2(function(incomeObject){
                                     if(incomeObject && "imgurls" == incomeObject.type)
                                     {
@@ -3394,6 +3402,7 @@ PasteProcessor.prototype =
                                             }
                                         }
                                     }
+                                    oThis.api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
                                     oThis.api.pre_Paste(fonts, image_map, paste_callback);
                                 }, _sendCommandCallback, rData);
                             }
@@ -3666,6 +3675,7 @@ PasteProcessor.prototype =
                             if(aImagesToDownload.length > 0)
                             {
                                 var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+                                oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
                                 sendCommand2(function(incomeObject){
                                     if(incomeObject && "imgurls" == incomeObject.type)
                                     {
@@ -3695,6 +3705,8 @@ PasteProcessor.prototype =
                                             }
                                         }
                                     }
+
+                                    oThis.api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
                                     oThis.api.pre_Paste(fonts, image_map, paste_callback);
                                 }, _sendCommandCallback, rData);
                             }
@@ -3767,6 +3779,7 @@ PasteProcessor.prototype =
                             if(aImagesToDownload.length > 0)
                             {
                                 var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+                                oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
                                 sendCommand2(function(incomeObject){
                                     if(incomeObject && "imgurls" == incomeObject.type)
                                     {
@@ -3778,6 +3791,7 @@ PasteProcessor.prototype =
                                             if(sTo)
                                             {									oThis.oImages[sFrom] = sTo;									oPrepeareImages[i] = sTo;								}							}
                                     }
+                                    oThis.api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
                                     oThis.api.pre_Paste(fonts, oPrepeareImages, paste_callback);
                                 }, _sendCommandCallback, rData);
                             }
@@ -3911,6 +3925,7 @@ PasteProcessor.prototype =
 					if(aImagesToDownload.length > 0)
 					{	
 						var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+                        oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 						sendCommand2(function(incomeObject){
 							if(incomeObject && "imgurls" == incomeObject.type)
 							{
@@ -3961,7 +3976,8 @@ PasteProcessor.prototype =
                                     checkBlipFillRasterImages(presentationSelectedContent.Drawings[i].Drawing);
                                 }
 							}
-							
+
+                            oThis.api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 							oThis.api.pre_Paste(fonts, image_map, paste_callback);
 						}, _sendCommandCallback, rData);
 					}
@@ -4046,6 +4062,7 @@ PasteProcessor.prototype =
 						if(images.length > 0)
 						{
 							var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(images)};
+                            oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 							sendCommand2(function(incomeObject){
 								if(incomeObject && "imgurls" == incomeObject.type)
 								{
@@ -4078,6 +4095,7 @@ PasteProcessor.prototype =
 										}
 									}
 								}
+                                oThis.api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 								oThis.api.pre_Paste(fonts, image_map, paste_callback);
 							}, _sendCommandCallback, rData);
 						}
@@ -4227,6 +4245,7 @@ PasteProcessor.prototype =
 					if(aImagesToDownload.length > 0)
 					{	
 						var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+                        oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 						sendCommand2(function(incomeObject){
 							if(incomeObject && "imgurls" == incomeObject.type)
 							{
@@ -4259,6 +4278,7 @@ PasteProcessor.prototype =
 									}
 								}
 							}
+                            oThis.api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 							oThis.api.pre_Paste(fonts, image_map, paste_callback);
 						}, _sendCommandCallback, rData);
 					}
