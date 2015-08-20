@@ -10194,7 +10194,7 @@ CTheme.prototype =
         var oTheme = new CTheme();
         oTheme.changeColorScheme(this.themeElements.clrScheme.createDuplicate());
         oTheme.setFontScheme(this.themeElements.fontScheme.createDuplicate());
-        oTheme.setFontScheme(this.themeElements.fmtScheme.createDuplicate());
+        oTheme.setFormatScheme(this.themeElements.fmtScheme.createDuplicate());
         return oTheme;
     },
 
