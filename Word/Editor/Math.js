@@ -461,10 +461,6 @@ CMathPageInfo.prototype.ReverseCurrentMaxW = function(_Line)
     var Line = this.Info[this.CurPage].GetNumberLine(_Line - this.StartLine);
     this.Info[this.CurPage].LineWidths.ReverseMaxW(Line);
 };
-CMathPageInfo.prototype.GetCurrentMaxWidth = function()
-{
-    return this.Info[this.CurPage].GetMax();
-};
 CMathPageInfo.prototype.GetCurrentMaxWidthAllLines = function()
 {
     var MaxW = 0;
@@ -492,22 +488,6 @@ CMathPageInfo.prototype.GetMaxW = function(_Page) // without first page
     var Page = _Page - this.StartPage;
 
     return this.Info[Page].GetMax();
-};
-CMathPageInfo.prototype.SetCurrentMaxWidth = function(MaxW)
-{
-    this.Info[this.CurPage].MaxW = MaxW;
-};
-CMathPageInfo.prototype.private_CheckInfo = function(_CurrentPage)
-{
-    var Lng = this.Info.length;
-    if(_CurrentPage >= Lng)
-    {
-        var PrevInfo = this.Info[Lng - 1];
-        var FirstLineOnPage = Lng == 0 ? 0 : PrevInfo.FirstLineOnPage + PrevInfo.GetCountLines();
-
-        this.Info[_CurrentPage] = new CMathInfo();
-        this.Info[_CurrentPage].FirstLineOnPage = FirstLineOnPage;
-    }
 };
 CMathPageInfo.prototype.GetFirstLineOnPage = function(_Page)
 {
@@ -1903,6 +1883,10 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
         return _ret;
     }
     return null;
+};
+ParaMath.prototype.Get_FirstTextPr = function()
+{
+    return this.Root.Get_FirstTextPr();
 };
 ParaMath.prototype.GetFirstRPrp = function()
 {

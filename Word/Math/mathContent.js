@@ -1104,6 +1104,11 @@ CMathContent.prototype.hidePlaceholder = function(flag)
     this.plhHide = flag;
 };
 ///////// RunPrp, CtrPrp
+
+CMathContent.prototype.Get_FirstTextPr = function()
+{
+    return this.Content[0].Get_FirstTextPr();
+};
 CMathContent.prototype.getFirstRPrp  = function()
 {
     return this.Content[0].Get_CompiledPr(true);
