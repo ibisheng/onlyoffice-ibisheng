@@ -1624,17 +1624,17 @@
 				pageBottomField = pageMargins.asc_getBottom();
 			}
 
-			if (null === pageGridLines || undefined === pageGridLines) { pageGridLines = c_oAscPrintDefaultSettings.PageGridLines; }
-			if (null === pageHeadings || undefined === pageHeadings) { pageHeadings = c_oAscPrintDefaultSettings.PageHeadings; }
+			if (null == pageGridLines) { pageGridLines = c_oAscPrintDefaultSettings.PageGridLines; }
+			if (null == pageHeadings) { pageHeadings = c_oAscPrintDefaultSettings.PageHeadings; }
 
-			if (null === pageWidth || undefined === pageWidth) { pageWidth = c_oAscPrintDefaultSettings.PageWidth; }
-			if (null === pageHeight || undefined === pageHeight) { pageHeight = c_oAscPrintDefaultSettings.PageHeight; }
-			if (null === pageOrientation || undefined === pageOrientation) { pageOrientation = c_oAscPrintDefaultSettings.PageOrientation; }
+			if (null == pageWidth) { pageWidth = c_oAscPrintDefaultSettings.PageWidth; }
+			if (null == pageHeight) { pageHeight = c_oAscPrintDefaultSettings.PageHeight; }
+			if (null == pageOrientation) { pageOrientation = c_oAscPrintDefaultSettings.PageOrientation; }
 
-			if (null === pageLeftField || undefined === pageLeftField) { pageLeftField = c_oAscPrintDefaultSettings.PageLeftField; }
-			if (null === pageRightField || undefined === pageRightField) { pageRightField = c_oAscPrintDefaultSettings.PageRightField; }
-			if (null === pageTopField || undefined === pageTopField) { pageTopField = c_oAscPrintDefaultSettings.PageTopField; }
-			if (null === pageBottomField || undefined === pageBottomField) { pageBottomField = c_oAscPrintDefaultSettings.PageBottomField; }
+			if (null == pageLeftField) { pageLeftField = c_oAscPrintDefaultSettings.PageLeftField; }
+			if (null == pageRightField) { pageRightField = c_oAscPrintDefaultSettings.PageRightField; }
+			if (null == pageTopField) { pageTopField = c_oAscPrintDefaultSettings.PageTopField; }
+			if (null == pageBottomField) { pageBottomField = c_oAscPrintDefaultSettings.PageBottomField; }
 
 			if (c_oAscPageOrientation.PageLandscape === pageOrientation) {
 				var tmp = pageWidth;
