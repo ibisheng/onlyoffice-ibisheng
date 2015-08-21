@@ -3947,7 +3947,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var bOperBefore = this.ParaMath.Is_BrkBinBefore(); // true - оператор находится в начале строки, false - оператор находится в конце строки
 
     // для внутристроковой формулы : начало формулы - начало нового слова
-    if(this.bRoot && bInline && true == this.IsFirstRange(PRS.Line, PRS.Range))
+    if(this.bRoot && bInline && true == this.IsFirstRange(PRS.Line, PRS.Range) && PRS.Ranges.length == 0)
     {
         PRS.Update_CurPos(0, Depth);
         PRS.Update_CurPos(0, Depth+1); // нулевой элемент всегда Run
