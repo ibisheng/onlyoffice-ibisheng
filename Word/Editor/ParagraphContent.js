@@ -6650,6 +6650,10 @@ ParaDrawing.prototype =
             // Сначала удаляем Drawing из рана
             Run.Remove_FromContent(BotElementPos, 1);
 
+            // TODO: Тут возможно лучше взять настройки предыдущего элемента, но пока просто удалим самое неприятное свойство.
+            if (true === Run.Is_Empty())
+                Run.Set_Position(undefined);
+
             // Теперь разделяем параграф по заданной позиции и добавляем туда новую формулу.
             var RightElement = TopElement.Split(ParaContentPos, 1);
             Para.Add_ToContent(TopElementPos + 1, RightElement);
