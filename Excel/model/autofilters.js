@@ -1023,6 +1023,9 @@ var maxIndividualValues = 10000;
 								
 								this._setColorStyleTable(cloneData.oldFilter.Ref, cloneData.oldFilter, null, true);
 								
+								//если на месте того, где находилась Ф/т находится другая, то применяем к ней стили
+								this._setStyleTables(cloneData.newFilterRef);
+								
 								//event
 								aWs.handlers.trigger("changeRefTablePart", cloneData.oldFilter.DisplayName, cloneData.oldFilter.Ref);
 								
