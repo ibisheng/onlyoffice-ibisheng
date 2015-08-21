@@ -525,10 +525,20 @@ CStyle.prototype =
         this.qFormat = Value;
     },
 
+    Get_QFormat : function()
+    {
+        return this.qFormat;
+    },
+
     Set_UiPriority : function(Value)
     {
         History.Add( this, { Type : historyitem_Style_UiPriority, Old : this.uiPriority, New : Value } );
         this.uiPriority = Value;
+    },
+
+    Get_UiPriority : function()
+    {
+        return this.uiPriority;
     },
 
     Set_Hidden : function(Value)
@@ -537,16 +547,31 @@ CStyle.prototype =
         this.hidden = Value;
     },
 
+    Get_Hidden : function()
+    {
+        return this.hidden;
+    },
+
     Set_SemiHidden : function(Value)
     {
         History.Add( this, { Type : historyitem_Style_SemiHidden, Old : this.semiHidden, New : Value } );
         this.semiHidden = Value;
     },
 
+    Get_SemiHidden : function()
+    {
+        return this.semiHidden;
+    },
+
     Set_UnhideWhenUsed : function(Value)
     {
         History.Add( this, { Type : historyitem_Style_UnhideWhenUsed, Old : this.unhideWhenUsed, New : Value } );
         this.unhideWhenUsed = Value;
+    },
+
+    Get_UnhideWhenUsed : function()
+    {
+        return this.unhideWhenUsed;
     },
 
     Clear : function(Name, BasedOnId, NextId, Type)
@@ -4795,6 +4820,12 @@ CStyles.prototype =
         if (null != OldId)
         {
             var oOldStyle = this.Style[OldId];
+
+            oStyle.Set_QFormat(oOldStyle.Get_QFormat());
+            oStyle.Set_UiPriority(oOldStyle.Get_UiPriority());
+            oStyle.Set_Hidden(oOldStyle.Get_Hidden());
+            oStyle.Set_SemiHidden(oOldStyle.Get_SemiHidden());
+            oStyle.Set_UnhideWhenUsed(oOldStyle.Get_UnhideWhenUsed());
 
             // Если удаляемый стиль - стиль, который стоит в BasedOn, тогда мы должны смержить BasedOn стиль с заданным
             if (BasedOnId === OldId)
