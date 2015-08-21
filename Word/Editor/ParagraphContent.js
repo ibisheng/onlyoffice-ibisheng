@@ -4287,6 +4287,11 @@ ParaDrawing.prototype =
         return 0;
     },
 
+    Get_Bounds : function()
+    {
+        return {Left : this.X, Top : this.Y, Bottom : this.Y + this.getXfrmExtY(), Right : this.X + this.getXfrmExtX()};
+    },
+
     Search : function(Str, Props, SearchEngine, Type)
     {
         if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.Search === "function")

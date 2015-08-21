@@ -70,8 +70,8 @@ function CFlowTable(Table, PageIndex)
     
     this.Table          = Table;
     this.Id             = Table.Get_Id();
-    this.PageNum        = Table.PageNum;
-    this.PageController = PageIndex - this.PageNum;
+    this.PageNum        = Table.Get_StartPage_Absolute();
+    this.PageController = PageIndex - Table.PageNum;
     this.Distance       = Table.Distance;
 
     var Bounds = Table.Get_PageBounds(this.PageController);
@@ -81,7 +81,7 @@ function CFlowTable(Table, PageIndex)
     this.H = Bounds.Bottom - Bounds.Top;
 
     this.WrappingType = WRAPPING_TYPE_SQUARE;
-};
+}
 
 CFlowTable.prototype =
 {

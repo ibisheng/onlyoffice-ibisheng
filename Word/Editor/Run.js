@@ -3304,7 +3304,9 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                     else
                     {
                         // Картинка ложится на или под текст, в данном случае пересчет можно спокойно продолжать
-                        Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y , Para.Get_StartPage_Absolute() + CurPage, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
+                        // Здесь под верхом параграфа понимаем верх первой строки, а не значение, с которого начинается пересчет.
+                        var ParagraphTop = Para.Lines[Para.Pages[CurPage].StartLine].Top + Para.Pages[CurPage].Y;
+                        Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y , Para.Get_StartPage_Absolute() + CurPage, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, ParagraphTop), PageLimits, PageLimitsOrigin, _CurLine);
                         Item.Reset_SavedPosition();
                     }
                 }
@@ -3679,8 +3681,17 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
                     nWordLen = 0;
                 }
 
-                if ( ( true === Item.Is_Inline() || true === this.Paragraph.Parent.Is_DrawingShape() ) && Item.Width > nMinWidth )
+                if ((true === Item.Is_Inline() || true === this.Paragraph.Parent.Is_DrawingShape()) && Item.Width > nMinWidth)
+                {
                     nMinWidth = Item.Width;
+                }
+                else if (true === Item.Use_TextWrap())
+                {
+                    var DrawingW = Item.getXfrmExtX();
+                    if (DrawingW > nMinWidth)
+                        nMinWidth = DrawingW;
+                }
+
 
                 if ( nSpaceLen > 0 )
                 {

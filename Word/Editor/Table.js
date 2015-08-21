@@ -49,6 +49,9 @@ function CTableAnchorPosition()
     this.Page_W        = 0;
     this.Page_H        = 0;
 
+    this.Page_Top      = 0;
+    this.Page_Bottom   = 0;
+
     this.X_min         = 0;
     this.Y_min         = 0;
     this.X_max         = 0;
@@ -68,7 +71,7 @@ CTableAnchorPosition.prototype =
         this.X_max         = X_max;
     },
 
-    Set_Y : function(H, Y, Top_Margin, Bottom_Margin, Page_H, Y_min, Y_max)
+    Set_Y : function(H, Y, Top_Margin, Bottom_Margin, Page_H, Y_min, Y_max, Page_Top, Page_Bottom)
     {
         this.H             = H;
         this.Y             = Y;
@@ -77,6 +80,8 @@ CTableAnchorPosition.prototype =
         this.Page_H        = Page_H;
         this.Y_min         = Y_min;
         this.Y_max         = Y_max;
+        this.Page_Top      = Page_Top;
+        this.Page_Bottom   = Page_Bottom;
     },
 
     Calculate_X : function(RelativeFrom, bAlign, Value)
@@ -236,12 +241,12 @@ CTableAnchorPosition.prototype =
                     {
                         case c_oAscYAlign.Bottom:
                         {
-                            this.CalcY = this.Page_H - this.H;
+                            this.CalcY = this.Page_Bottom - this.H;
                             break;
                         }
                         case c_oAscYAlign.Center:
                         {
-                            this.CalcY = (this.Page_H - this.H) / 2;
+                            this.CalcY = (this.Page_Bottom - this.H) / 2;
                             break;
                         }
                         case c_oAscYAlign.Inline:
@@ -249,13 +254,13 @@ CTableAnchorPosition.prototype =
                         case c_oAscYAlign.Outside:
                         case c_oAscYAlign.Top:
                         {
-                            this.CalcY = 0;
+                            this.CalcY = this.Page_Top;
                             break;
                         }
                     }
                 }
                 else
-                    this.CalcY = Value;
+                    this.CalcY = this.Page_Top + Value;
 
                 break;
             }
@@ -383,7 +388,7 @@ CTableAnchorPosition.prototype =
 
             case c_oAscVAnchor.Page:
             {
-                Value = this.CalcY;
+                Value = this.CalcY - this.Page_Top;
 
                 break;
             }
@@ -15604,6 +15609,7 @@ CTable.prototype =
     {
         var TablePr = this.Get_CompiledPr(false).TablePr;
         var PageLimits = this.Parent.Get_PageLimits(this.PageNum);
+        var PageFields = this.Parent.Get_PageFields(this.PageNum);
         
         var LD_PageLimits = this.LogicDocument.Get_PageLimits( this.Get_StartPage_Absolute() );
         var LD_PageFields = this.LogicDocument.Get_PageFields( this.Get_StartPage_Absolute() );
@@ -15656,7 +15662,7 @@ CTable.prototype =
             }
 
             this.X = this.X_origin + this.Get_TableOffsetCorrection();
-            this.AnchorPosition.Set_X( this.TableSumGrid[this.TableSumGrid.length - 1], this.X_origin, LD_PageFields.X - OffsetCorrection_Left, LD_PageFields.XLimit + OffsetCorrection_Right, LD_PageLimits.XLimit, PageLimits.X - OffsetCorrection_Left, PageLimits.XLimit + OffsetCorrection_Right );
+            this.AnchorPosition.Set_X( this.TableSumGrid[this.TableSumGrid.length - 1], this.X_origin, PageFields.X - OffsetCorrection_Left, PageFields.XLimit + OffsetCorrection_Right, LD_PageLimits.XLimit, PageLimits.X - OffsetCorrection_Left, PageLimits.XLimit + OffsetCorrection_Right );
 
             this.X = this.AnchorPosition.Calculate_X(this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
             this.X_origin = this.X - this.Get_TableOffsetCorrection();
@@ -15682,9 +15688,10 @@ CTable.prototype =
 
     Internal_Recalculate_Position_2 : function(CurPage)
     {
-        var PageLimits = this.Parent.Get_PageLimits(this.PageNum);
-        var LD_PageFields = this.LogicDocument.Get_PageFields( this.Get_StartPage_Absolute() );
-        var LD_PageLimits = this.LogicDocument.Get_PageLimits( this.Get_StartPage_Absolute() );
+        var PageLimits = this.Parent.Get_PageLimits(this.PageNum + CurPage);
+        var PageFields = this.Parent.Get_PageFields(this.PageNum + CurPage);
+        var LD_PageFields = this.LogicDocument.Get_PageFields(this.Get_StartPage_Absolute() + CurPage);
+        var LD_PageLimits = this.LogicDocument.Get_PageLimits(this.Get_StartPage_Absolute() + CurPage);
         
         if ( true === this.Is_Inline() && 0 === CurPage )
         {
@@ -15693,7 +15700,7 @@ CTable.prototype =
         }
         else if ( true != this.Is_Inline() && ( 0 === CurPage || ( 1 === CurPage && false === this.RowsInfo[0].FirstPage ) ) )
         {
-            this.AnchorPosition.Set_Y( this.Pages[CurPage].Height, this.Pages[CurPage].Y, LD_PageFields.Y, LD_PageFields.YLimit, LD_PageLimits.YLimit, PageLimits.Y, PageLimits.YLimit );
+            this.AnchorPosition.Set_Y(this.Pages[CurPage].Height, this.Pages[CurPage].Y, PageFields.Y, PageFields.YLimit, LD_PageLimits.YLimit, PageLimits.Y, PageLimits.YLimit, PageLimits.Y, PageLimits.YLimit);
 
             var OtherFlowTables = !this.bPresentation ? editor.WordControl.m_oLogicDocument.DrawingObjects.getAllFloatTablesOnPage( this.Get_StartPage_Absolute() ) : [];
             this.AnchorPosition.Calculate_Y(this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
@@ -15770,6 +15777,10 @@ CTable.prototype =
         else
         {
             StartPos = this.Parent.Get_PageContentStartPos( this.PageNum + CurPage );
+
+            // Правая и левая границы переходят с первой страницы
+            StartPos.X      = this.X;
+            StartPos.XLimit = this.XLimit;
         }
 
         this.Pages[CurPage] = new CTablePage( StartPos.X, StartPos.Y, StartPos.XLimit, StartPos.YLimit, FirstRow, TempMaxTopBorder );
@@ -23160,6 +23171,13 @@ CTableCell.prototype.Get_TopElement = function()
         return this.Row.Table.Get_TopElement();
 
     return null;
+};
+CTableCell.prototype.Is_EmptyFirstPage = function()
+{
+    if (!this.Row || !this.Row.Table || !this.Row.Table.RowsInfo[this.Row.Index] || true === this.Row.Table.RowsInfo[this.Row.Index].FirstPage)
+        return true;
+
+    return false;
 };
 
 

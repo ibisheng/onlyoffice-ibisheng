@@ -676,7 +676,7 @@ CDocumentContent.prototype =
                 bFlow = true;
                 if ( true === this.RecalcInfo.Can_RecalcObject() )
                 {
-                    if ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex )
+                    if ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex || (1 == PageIndex && true === this.Is_TableCellContent() && false === this.Parent.Is_EmptyFirstPage()) )
                     {
                         Element.Set_DocumentIndex( Index );
                         Element.Reset( X, Y, XLimit, YLimit, PageIndex );
@@ -685,8 +685,10 @@ CDocumentContent.prototype =
                     this.RecalcInfo.FlowObjectPage = 0;
                     this.RecalcInfo.FlowObject   = Element;
                     this.RecalcInfo.RecalcResult = Element.Recalculate_Page( PageIndex );
-					if(this.DrawingObjects)
-						this.DrawingObjects.addFloatTable( new CFlowTable( Element, PageIndex ) );
+
+                    if(this.DrawingObjects)
+						this.DrawingObjects.addFloatTable(new CFlowTable(Element, PageIndex));
+
                     RecalcResult = recalcresult_CurPage;
                 }
                 else if ( true === this.RecalcInfo.Check_FlowObject(Element) )
@@ -737,8 +739,9 @@ CDocumentContent.prototype =
                     else
                     {
                         RecalcResult = Element.Recalculate_Page( PageIndex );
-						if(this.DrawingObjects)
-							this.DrawingObjects.addFloatTable( new CFlowTable( Element, PageIndex ) );
+
+                        if(this.DrawingObjects)
+                            this.DrawingObjects.addFloatTable(new CFlowTable(Element, PageIndex));
 
                         if ( recalcresult_NextElement === RecalcResult )
                         {
@@ -1185,7 +1188,6 @@ CDocumentContent.prototype =
         {
             pGraphics.Start_Command(DRAW_COMMAND_CONTENT);
         }
-        var Bounds = this.Pages[PageNum].Bounds;
 
         var bClip = false;
         if ( null != this.ClipInfo.X0 && null != this.ClipInfo.X1 )
@@ -1194,7 +1196,8 @@ CDocumentContent.prototype =
             var Correction = 0;
             if ( null !== this.DrawingDocument )
                 Correction = this.DrawingDocument.GetMMPerDot(1);
-            
+
+            var Bounds = this.Pages[PageNum].Bounds;
             pGraphics.SaveGrState();
             pGraphics.AddClipRect( this.ClipInfo.X0, Bounds.Top - Correction, Math.abs(this.ClipInfo.X1 - this.ClipInfo.X0), Bounds.Bottom - Bounds.Top + Correction);
             bClip = true;
@@ -1355,7 +1358,6 @@ CDocumentContent.prototype =
         // В колонтитуле не учитывается.
         if ( true != this.Is_HdrFtr(false) || true === bForceCheckDrawings )
         {
-            
             // Учитываем все Drawing-объекты с обтеканием. Объекты без обтекания (над и под текстом) учитываем только в 
             // случае, когда начальная точка (левый верхний угол) попадает в this.Y + Height
                         
@@ -1364,18 +1366,18 @@ CDocumentContent.prototype =
             for ( var Index = 0; Index < Count; Index++ )
             {
                 var Obj = AllDrawingObjects[Index];
-                
-                if ( true === Obj.Use_TextWrap() )
+                var ObjBounds = Obj.Get_Bounds();
+                if (true === Obj.Use_TextWrap())
                 {
-                    if ( Obj.Y + Obj.H > Bounds.Bottom )
-                        Bounds.Bottom = Obj.Y + Obj.H;
+                    if (ObjBounds.Bottom > Bounds.Bottom)
+                        Bounds.Bottom = ObjBounds.Bottom;
                 }
-                else if ( undefined !== Height && Obj.Y < this.Y + Height )
+                else if (undefined !== Height && ObjBounds.Top < this.Y + Height)
                 {
-                    if ( Obj.Y + Obj.H >= this.Y + Height )
+                    if (ObjBounds.Bottom >= this.Y + Height)
                         Bounds.Bottom = this.Y + Height;
-                    else if ( Obj.Y + Obj.H > Bounds.Bottom )
-                        Bounds.Bottom = Obj.Y + Obj.H;                        
+                    else if (ObjBounds.Bottom > Bounds.Bottom)
+                        Bounds.Bottom = ObjBounds.Bottom;
                 }
             }
 
