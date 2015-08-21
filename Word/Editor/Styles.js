@@ -4780,9 +4780,13 @@ CStyles.prototype =
     {
         var oStyle = new CStyle();
 
-        oStyle.Set_BasedOn(this.Get_StyleIdByName(oAscStyle.get_BasedOn(), false));
+        var BasedOnId = this.Get_StyleIdByName(oAscStyle.get_BasedOn(), false);
+        oStyle.Set_BasedOn(BasedOnId);
         oStyle.Set_Next(this.Get_StyleIdByName(oAscStyle.get_Next(), false));
         oStyle.Set_Type(oAscStyle.get_Type());
+
+        var NewStyleParaPr = oAscStyle.get_ParaPr();
+        var NewStyleTextPr = oAscStyle.get_TextPr();
 
         // Если у нас есть стиль с данным именем, тогда мы старый стиль удаляем, а новый добавляем со старым Id,
         // чтобы если были ссылки на старый стиль - теперь они стали на новый.
@@ -4791,10 +4795,24 @@ CStyles.prototype =
         if (null != OldId)
         {
             var oOldStyle = this.Style[OldId];
-            if (null != oOldStyle.Get_Next() && null == oStyle.Get_Next())
+
+            // Если удаляемый стиль - стиль, который стоит в BasedOn, тогда мы должны смержить BasedOn стиль с заданным
+            if (BasedOnId === OldId)
             {
-                oStyle.Set_Next(oOldStyle.Get_Next());
+                oStyle.Set_BasedOn(null);
+                var OldStyleParaPr = oOldStyle.ParaPr.Copy();
+                var OldStyleTextPr = oOldStyle.TextPr.Copy();
+                OldStyleParaPr.Merge(NewStyleParaPr);
+                OldStyleTextPr.Merge(NewStyleTextPr);
+                NewStyleParaPr = OldStyleParaPr;
+                NewStyleTextPr = OldStyleTextPr;
             }
+
+            if (oStyle.Get_Next() === OldId)
+                oStyle.Set_Next(null);
+
+            if (null != oOldStyle.Get_Next() && null == oStyle.Get_Next())
+                oStyle.Set_Next(oOldStyle.Get_Next());
 
             this.Remove(OldId);
             oStyle.Set_Id(OldId);
@@ -4813,8 +4831,8 @@ CStyles.prototype =
             oLinkedStyle.Set_Link(oStyle.Get_Id());
         }
 
-        oStyle.Set_TextPr(oAscStyle.get_TextPr());
-        oStyle.Set_ParaPr(oAscStyle.get_ParaPr());
+        oStyle.Set_TextPr(NewStyleTextPr);
+        oStyle.Set_ParaPr(NewStyleParaPr);
 
         this.Add(oStyle);
         return oStyle;

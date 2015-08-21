@@ -8280,8 +8280,11 @@ Paragraph.prototype =
             var Shd = new CDocumentShd();
             Shd.Set_FromObject( _Shd );
 
-            if ( undefined === this.Pr.Shd )
+            if (undefined === this.Pr.Shd)
+            {
                 this.Pr.Shd = new CDocumentShd();
+                History.Add( this, { Type : historyitem_Paragraph_Shd, Old : undefined, New : this.Pr.Shd } );
+            }
 
             if ( ( undefined != Shd.Value || true === bDeleteUndefined ) && this.Pr.Shd.Value !== Shd.Value )
             {
