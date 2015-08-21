@@ -3073,15 +3073,6 @@ asc_docs_api.prototype.ChangeArtImageFromFile = function()
 };
 
 asc_docs_api.prototype.AddImage = function(){
-    var oImageUploader = document.getElementById("apiImageUpload");
-    if(!oImageUploader)
-    {
-        var frame = document.createElement("iframe");
-        frame.name = "apiImageUpload";
-        frame.id = "apiImageUpload";
-        frame.setAttribute("style", "position:absolute;left:-2px;top:-2px;width:1px;height:1px;z-index:-1000;");
-        document.body.appendChild(frame);
-    }
     var frameWindow = GetUploadIFrame();
     var content = '<html><head></head><body><form action="'+g_sUploadServiceLocalUrl+'?key='+documentId+'" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" accept="image/*" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
     frameWindow.document.open();
