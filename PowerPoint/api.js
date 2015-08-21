@@ -3087,7 +3087,6 @@ asc_docs_api.prototype.AddImage = function(){
 		var bNeedSubmit = true;
         if(e && e.target && e.target.files)
         {
-            var file = e.target.files[0];
 			var nError = ValidateUploadImage(e.target.files);
 			if(c_oAscServerError.NoError != nError)
 			{
