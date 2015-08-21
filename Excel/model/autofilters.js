@@ -1704,9 +1704,9 @@ var maxIndividualValues = 10000;
 							}
 
 							if(!data && findFilters[i].AutoFilter && findFilters[i].AutoFilter.FilterColumns)
-								findFilters[i].AutoFilter.FilterColumns = null;
+								findFilters[i].AutoFilter.cleanFilters();
 							else if(!data && findFilters[i] && findFilters[i].FilterColumns)
-								findFilters[i].FilterColumns = null;
+								findFilters[i].cleanFilters();
 							else if(data && data[i] && data[i].AutoFilter && data[i].AutoFilter.FilterColumns)
 								findFilters[i].AutoFilter.FilterColumns = data[i].AutoFilter.FilterColumns;
 							else if(data && data[i] && data[i].FilterColumns)

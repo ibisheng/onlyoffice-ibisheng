@@ -4536,6 +4536,16 @@ AutoFilter.prototype.getType = function(F)
 	return g_nFiltersType.autoFilter;
 };
 
+AutoFilter.prototype.cleanFilters = function() {
+	if(!this.FilterColumns)
+		return;
+	
+	for(var i = 0; i < this.FilterColumns.length; i++)
+	{
+		this.FilterColumns[i].clean();
+	}
+};
+
 function FilterColumns() {
 	this.ColId = null;
 	this.CustomFiltersObj = null;
@@ -4644,7 +4654,7 @@ FilterColumn.prototype.isHideValue = function(val, isDateTimeFormat, top10Length
 		res = this.Top10.isHideValue(val, top10Length);
 	return res;
 };
-FilterColumn.prototype.clean = function(val) {
+FilterColumn.prototype.clean = function() {
 	this.Filters = null;
 	this.CustomFiltersObj = null;
 	this.DynamicFilter = null;
