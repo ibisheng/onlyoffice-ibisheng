@@ -594,17 +594,16 @@ CTable.prototype.Selection_Draw_Page = function(Page_abs)
                     continue;
 
                 var Bounds = Cell.Content_Get_PageBounds( Cell_PageRel );
-                var Y_offset = Cell.Temp.Y_VAlign_offset[Cell_PageRel];
 
                 if ( 0 != Cell_PageRel )
                 {
                     // мы должны определить ряд, на котором случился перенос на новую страницу
                     var TempRowIndex = this.Pages[CurPage].FirstRow;
-                    this.DrawingDocument.AddPageSelection( Page_abs, X_start, this.RowsInfo[TempRowIndex].Y[CurPage] + this.RowsInfo[TempRowIndex].TopDy[CurPage] +  Y_offset, X_end - X_start, this.RowsInfo[TempRowIndex].H[CurPage] );
+                    this.DrawingDocument.AddPageSelection( Page_abs, X_start, this.RowsInfo[TempRowIndex].Y[CurPage] + this.RowsInfo[TempRowIndex].TopDy[CurPage], X_end - X_start, this.RowsInfo[TempRowIndex].H[CurPage] );
                 }
                 else
                 {
-                    this.DrawingDocument.AddPageSelection( Page_abs, X_start, this.RowsInfo[Pos.Row].Y[CurPage] + this.RowsInfo[Pos.Row].TopDy[CurPage] +  Y_offset, X_end - X_start, this.RowsInfo[Pos.Row].H[CurPage] );
+                    this.DrawingDocument.AddPageSelection( Page_abs, X_start, this.RowsInfo[Pos.Row].Y[CurPage] + this.RowsInfo[Pos.Row].TopDy[CurPage], X_end - X_start, this.RowsInfo[Pos.Row].H[CurPage] );
                 }
             }
             break;

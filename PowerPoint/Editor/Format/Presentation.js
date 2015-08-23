@@ -2905,11 +2905,25 @@ CPresentation.prototype =
                 editor.sync_ImgPropCallback(drawing_props.chartProps);
             }
 
-
             if(drawing_props.tableProps)
             {
                 this.CheckTableStyles(this.Slides[this.CurPage], drawing_props.tableProps.TableLook);
                 editor.sync_TblPropCallback(drawing_props.tableProps);
+                if(!drawing_props.shapeProps)
+                {
+                    if(drawing_props.tableProps.CellsVAlign === vertalignjc_Bottom)
+                    {
+                        editor.sync_VerticalTextAlign(VERTICAL_ANCHOR_TYPE_BOTTOM);
+                    }
+                    else if(drawing_props.tableProps.CellsVAlign === vertalignjc_Center)
+                    {
+                        editor.sync_VerticalTextAlign(VERTICAL_ANCHOR_TYPE_CENTER);
+                    }
+                    else
+                    {
+                        editor.sync_VerticalTextAlign(VERTICAL_ANCHOR_TYPE_TOP);
+                    }
+                }
             }
             if(target_content)
             {

@@ -1836,6 +1836,34 @@ DrawingObjectsController.prototype =
             {
                 objects_by_type.groups[i].setVerticalAlign(props.verticalTextAlign);
             }
+            if(objects_by_type.tables.length == 1)
+            {
+                var props2 = new CTableProp();
+                if(props.verticalTextAlign === VERTICAL_ANCHOR_TYPE_BOTTOM)
+                {
+                    props2.put_CellsVAlign(vertalignjc_Bottom);
+                }
+                else if(props.verticalTextAlign === VERTICAL_ANCHOR_TYPE_CENTER)
+                {
+                    props2.put_CellsVAlign(vertalignjc_Center);
+                }
+                else
+                {
+                    props2.put_CellsVAlign(vertalignjc_Top);
+                }
+                var target_text_object = getTargetTextObject(this);
+                if(target_text_object === objects_by_type.tables[0])
+                {
+                    objects_by_type.tables[0].graphicObject.Set_Props(props2);
+                }
+                else
+                {
+                    objects_by_type.tables[0].graphicObject.Select_All();
+                    objects_by_type.tables[0].graphicObject.Set_Props(props2);
+                    objects_by_type.tables[0].graphicObject.Selection_Remove();
+                }
+                editor.WordControl.m_oLogicDocument.Check_GraphicFrameRowHeight(objects_by_type.tables[0]);
+            }
         }
         if(isRealNumber(props.vert))
         {
