@@ -1280,8 +1280,11 @@ CGroupShape.prototype =
         pos_y = new_yc - new_vc;
 
         var xfrm = this.spPr.xfrm;
-        xfrm.setOffX(pos_x);
-        xfrm.setOffY(pos_y);
+        if(this.group || !(editor && editor.isDocumentEditor))
+        {
+            xfrm.setOffX(pos_x);
+            xfrm.setOffY(pos_y);
+        }
         xfrm.setExtX(Math.abs(max_x - min_x));
         xfrm.setExtY(Math.abs(max_y - min_y));
         xfrm.setChExtX(Math.abs(max_x - min_x));

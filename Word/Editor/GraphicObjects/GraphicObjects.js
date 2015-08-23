@@ -2093,6 +2093,11 @@ CGraphicObjects.prototype =
                 {
                     sp = sp_tree[j];
                     var drawing = new ParaDrawing(0, 0, sp_tree[j], this.drawingDocument, null, null);
+
+                    var xc, yc, hc = sp.extX/2, vc = sp.extY/2;
+                    xc = sp.transform.TransformPointX(hc, vc);
+                    yc = sp.transform.TransformPointY(hc, vc);
+
                     drawing.Set_GraphicObject(sp);
                     sp.setParent(drawing);
                     drawing.Set_DrawingType(drawing_Anchor);
@@ -2107,9 +2112,6 @@ CGraphicObjects.prototype =
                     nearest_pos = this.document.Get_NearestPos(page_num, sp.bounds.x + sp.posX, sp.bounds.y + sp.posY, true, drawing);
                     nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
 
-                    var xc, yc, hc = sp.extX/2, vc = sp.extY/2;
-                    xc = sp.transform.TransformPointX(hc, vc);
-                    yc = sp.transform.TransformPointY(hc, vc);
                     drawing.Set_XYForAdd(xc - hc, yc - vc, nearest_pos, page_num);
                     a_objects.push({drawing: drawing, par: parent_paragraph, posX: xc - hc, posY: yc - vc});
                     this.selectObject(sp, page_num);
@@ -2138,7 +2140,7 @@ CGraphicObjects.prototype =
                     }));
                 a_objects[i].drawing.Add_ToDocument2(a_objects[i].par);
             }
-
+            this.document.Recalculate();
         }
     },
 
