@@ -3659,6 +3659,10 @@ CShape.prototype =
             }
             else
             {
+
+                var oContent = this.getDocContent();
+                var result_page_index = isRealNumber(graphics.shapePageIndex) ? graphics.shapePageIndex : (oContent ? oContent.Get_StartPage_Relative() : 0);
+                graphics.PageNum = result_page_index;
                 var bNeedRestoreState = false;
                 var bEditTextArt = isRealObject(oController) && (getTargetTextObject(oController) === this);
                 if(this.bWordShape && this.clipRect && (!this.bodyPr.prstTxWarp || this.bodyPr.prstTxWarp.preset === "textNoShape" || bEditTextArt))
@@ -3704,6 +3708,7 @@ CShape.prototype =
                         this.txWarpStruct.draw(graphics, oTransform, oTheme, oColorMap);
                     }
                 }
+                delete graphics.PageNum;
                 if(bNeedRestoreState)
                 {
                     graphics.RestoreGrState();

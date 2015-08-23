@@ -710,7 +710,6 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
 	oContent.Set_ApplyToAll(true);
 	oContent.Set_ParagraphAlign(align_Center);
 	oContent.Paragraph_Add(new ParaTextPr({FontSize: 36, Spacing: TextSpacing}));
-	//oContent.Set_ParagraphAlign(new ParaTextPr({FontSize: 16}));
 	oContent.Set_ApplyToAll(false);
 
 	var oBodypr = oShape.getBodyPr().createDuplicate();

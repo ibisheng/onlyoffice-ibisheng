@@ -23,7 +23,12 @@ function CDocContentStructure()
     this.m_aContent = [];
     this.m_aByLines = null;
     this.m_aDrawingsStruct = [];
- }
+    this.m_aBackgrounds = [];
+    this.m_aBorders = [];
+    this.m_aParagraphBackgrounds = [];
+    this.m_oBoundsRect1 = null;
+    this.m_oBoundsRect2 = null;
+}
 
 CDocContentStructure.prototype.Recalculate = function(oTheme, oColorMap, dWidth, dHeight, oShape)
 {
@@ -46,6 +51,19 @@ CDocContentStructure.prototype.draw = function(graphics, transform, oTheme, oCol
     {
         this.m_aDrawingsStruct[i].Draw(graphics);
     }
+
+    for(i = 0; i < this.m_aParagraphBackgrounds.length; ++i)
+    {
+        this.m_aParagraphBackgrounds[i].draw(graphics, undefined, transform, oTheme, oColorMap);
+    }
+    for(i = 0; i < this.m_aBorders.length; ++i)
+    {
+        this.m_aBorders[i].draw(graphics);
+    }
+    for(i = 0; i < this.m_aBackgrounds.length; ++i)
+    {
+        this.m_aBackgrounds[i].draw(graphics, undefined, transform, oTheme, oColorMap);
+    }
     for(i = 0; i < this.m_aContent.length; ++i)
     {
         this.m_aContent[i].draw(graphics, transform, oTheme, oColorMap);
@@ -54,9 +72,8 @@ CDocContentStructure.prototype.draw = function(graphics, transform, oTheme, oCol
 CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct, dWidth, dHeight, oTheme, oColorMap, oShape, dOneLineWidth, XLimit, dContentHeight, dKoeff)
 {
     var i, j, t, aByPaths,  aWarpedObjects = [];
-
     var bOddPaths = oWarpStruct.pathLst.length / 2 - ((oWarpStruct.pathLst.length / 2) >> 0) > 0;
-    var nDivCount = bOddPaths ? oWarpStruct.pathLst.length : oWarpStruct.pathLst.length >> 1;
+    var nDivCount = bOddPaths ? oWarpStruct.pathLst.length : oWarpStruct.pathLst.length >> 1, oNextPointOnPolygon, oObjectToDrawNext, oMatrix = new CMatrix();
     aByPaths = oWarpStruct.getArrayPolygonsByPaths(PATH_DIV_EPSILON);
     var nLastIndex = 0, dTmp, oBoundsChecker, oTemp, nIndex, aWarpedObjects2 = [];
     oBoundsChecker = new CSlideBoundsChecker();
@@ -102,16 +119,349 @@ CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct, dWidth,
         }
         else
         {
+            oNextPointOnPolygon = null;
+            oObjectToDrawNext = null;
             var oPolygon = new PolygonWrapper(aByPaths[i]);
             for(t = 0; t < aWarpedObjects.length; ++t)
             {
-                CheckGeometryByPolygon(aWarpedObjects[t], oPolygon, "textArchDown" !== oWarpStruct.preset && i < 1, XLimit*dKoeff, dContentHeight, dKoeff, nDivCount > 1 ? oBoundsChecker.Bounds : null);
+                var oWarpedObject = aWarpedObjects[t];
+                var bArcDown = "textArchDown" !== oWarpStruct.preset && i < 1;
+                if(!isRealNumber(oWarpedObject.x) || !isRealNumber(oWarpedObject.y) )
+                {
+                    CheckGeometryByPolygon(oWarpedObject, oPolygon, bArcDown, XLimit*dKoeff, dContentHeight, dKoeff, nDivCount > 1 ? oBoundsChecker.Bounds : null);
+                }
+                else
+                {
+                    oNextPointOnPolygon = this.checkTransformByOddPath(oMatrix, oWarpedObject, aWarpedObjects[t+1], oNextPointOnPolygon, dContentHeight, dKoeff, bArcDown, oPolygon, XLimit);
+                    TransformGeometry(oWarpedObject, oMatrix);
+                }
             }
         }
         nLastIndex = nIndex;
     }
+    this.checkUnionPaths(aWarpedObjects2);
+};
 
-    this.checkUnionPaths(aWarpedObjects2, typeof oWarpStruct.preset.length === "string" && oWarpStruct.preset.length.length > 0 && oWarpStruct.preset.length.length !== "textNoShape");
+
+
+CDocContentStructure.prototype.checkContentReduct = function(oWarpStruct, dWidth, dHeight, oTheme, oColorMap, oShape, dOneLineWidth, XLimit, dContentHeight, dKoeff)
+{
+    var i, j, t, aByPaths,  aWarpedObjects = [];
+    var bOddPaths = oWarpStruct.pathLst.length / 2 - ((oWarpStruct.pathLst.length / 2) >> 0) > 0;
+    var nDivCount = bOddPaths ? oWarpStruct.pathLst.length : oWarpStruct.pathLst.length >> 1, oNextPointOnPolygon, oObjectToDrawNext, oMatrix;
+    aByPaths = oWarpStruct.getArrayPolygonsByPaths(PATH_DIV_EPSILON);
+    var nLastIndex = 0, dTmp, oBoundsChecker, oTemp, nIndex, aWarpedObjects2 = [];
+    oBoundsChecker = new CSlideBoundsChecker();
+    oBoundsChecker.init(100, 100, 100, 100);
+    for(j = 0; j < this.m_aByLines.length; ++j)
+    {
+        oTemp = this.m_aByLines[j];
+        for(t = 0; t < oTemp.length; ++t)
+        {
+            oTemp[t].GetAllWarped(aWarpedObjects2);
+            oTemp[t].CheckBoundsWarped(oBoundsChecker);
+        }
+    }
+    var aBounds = [];
+    var oRet = {maxDx: 0, maxDy: 0};
+    for( i = 0; i < nDivCount; ++i)
+    {
+        dTmp = (this.m_aByLines.length - nLastIndex)/(nDivCount - i);
+        nIndex = nLastIndex + (dTmp >> 0) + ((dTmp - (dTmp >> 0)) > 0 ? 1 : 0);
+        aWarpedObjects.length = 0;
+        for(j = nLastIndex; j < nIndex; ++j)
+        {
+            oTemp = this.m_aByLines[j];
+            for(t = 0; t < oTemp.length; ++t)
+            {
+                oTemp[t].GetAllWarped(aWarpedObjects);
+            }
+        }
+        var bArcDown = "textArchDown" !== oWarpStruct.preset && i < 1;
+        if(bOddPaths)
+        {
+            oNextPointOnPolygon = null;
+            oObjectToDrawNext = null;
+            var oPolygon = new PolygonWrapper(aByPaths[i]);
+            for(t = 0; t < aWarpedObjects.length; ++t)
+            {
+                var oWarpedObject = aWarpedObjects[t];
+                if(isRealNumber(oWarpedObject.x) && isRealNumber(oWarpedObject.y) )
+                {
+                    oMatrix = new CMatrix();
+                    oBoundsChecker.Bounds.ClearNoAttack();
+                    oNextPointOnPolygon = this.checkTransformByOddPath(oMatrix, oWarpedObject, aWarpedObjects[t+1], oNextPointOnPolygon, dContentHeight, dKoeff, bArcDown, oPolygon, XLimit);
+                    oWarpedObject.draw(oBoundsChecker);
+
+                    var oBounds = new CBoundsController();
+//                    oBounds.fromBounds(oBoundsChecker.Bounds);
+                    for(var k = 0; k < aBounds.length; ++k)
+                    {
+                        var oIntersection = this.checkIntersectionBounds( aBounds[k].Bounds, aBounds[k].Transform, oBounds, oMatrix, aBounds.length - k);
+                        if(oIntersection.DX > oRet.maxDx)
+                        {
+                            oRet.maxDx = oIntersection.DX;
+                        }
+                        if(oIntersection.DY < oRet.maxDy)
+                        {
+                            oRet.maxDy = oIntersection.DY;
+                        }
+                    }
+                    aBounds.push({Bounds: oBounds, Transform: oMatrix});
+                }
+            }
+        }
+        nLastIndex = nIndex;
+    }
+    return oRet;
+};
+
+CDocContentStructure.prototype.getAllBackgroundsBorders = function(aParaBackgrounds, aBackgrounds, aBorders)
+{
+    for(var i = 0; i < this.m_aContent.length; ++i)
+    {
+        this.m_aContent[i].getAllBackgroundsBorders(aParaBackgrounds, aBackgrounds, aBorders);
+    }
+}
+
+function CheckIntervalIntersection(X1, Y1, X2, Y2, X3, Y3, X4, Y4)
+{
+    return  (((X3-X1)*(Y2-Y1) - (Y3-Y1)*(X2-X1)) *
+        ((X4-X1)*(Y2-Y1) - (Y4-Y1)*(X2-X1)) >= 0)&&
+        (((X1-X3)*(Y4-Y3) - (Y1-Y3)*(X4-X3)) *
+            ((X2-X3)*(Y4-Y3) - (Y2-Y3)*(X4-X3)) >= 0);
+}
+
+function BoundsRect()
+{
+    this.arrBounds = [
+        {X0:0, Y0: 0, X1: 0, Y1:0},
+        {X0:0, Y0: 0, X1: 0, Y1:0},
+        {X0:0, Y0: 0, X1: 0, Y1:0},
+        {X0:0, Y0: 0, X1: 0, Y1:0}
+    ]
+}
+
+BoundsRect.prototype.fromBoundsAndTransform = function(oBounds, oTransform)
+{
+    this.arrBounds[0].X0 = oTransform.TransformPointX(oBounds.min_x, oBounds.min_y);
+    this.arrBounds[0].Y0 = oTransform.TransformPointY(oBounds.min_x, oBounds.min_y);
+    this.arrBounds[0].X1 = oTransform.TransformPointX(oBounds.max_x, oBounds.min_y);
+    this.arrBounds[0].Y1 = oTransform.TransformPointY(oBounds.max_x, oBounds.min_y);
+
+    this.arrBounds[1].X0 = oTransform.TransformPointX(oBounds.max_x, oBounds.max_y);
+    this.arrBounds[1].Y0 = oTransform.TransformPointY(oBounds.max_x, oBounds.max_y);
+    this.arrBounds[1].X1 = oTransform.TransformPointX(oBounds.max_x, oBounds.min_y);
+    this.arrBounds[1].Y1 = oTransform.TransformPointY(oBounds.max_x, oBounds.min_y);
+
+    this.arrBounds[2].X0 = oTransform.TransformPointX(oBounds.max_x, oBounds.max_y);
+    this.arrBounds[2].Y0 = oTransform.TransformPointY(oBounds.max_x, oBounds.max_y);
+    this.arrBounds[2].X1 = oTransform.TransformPointX(oBounds.min_x, oBounds.max_y);
+    this.arrBounds[2].Y1 = oTransform.TransformPointY(oBounds.min_x, oBounds.max_y);
+
+    this.arrBounds[3].X0 = oTransform.TransformPointX(oBounds.min_x, oBounds.max_y);
+    this.arrBounds[3].Y0 = oTransform.TransformPointY(oBounds.min_x, oBounds.max_y);
+    this.arrBounds[3].X1 = oTransform.TransformPointX(oBounds.min_x, oBounds.min_y);
+    this.arrBounds[3].Y1 = oTransform.TransformPointY(oBounds.min_x, oBounds.min_y);
+};
+
+
+
+BoundsRect.prototype.checkIntersection = function(oBoundsRect)
+{
+    var i, j, oCurBound1, oCurBound2;
+    for(i = 0; i < 4; ++i)
+    {
+        oCurBound1 = this.arrBounds[i];
+        for(j = 0; j < 4; ++j)
+        {
+            oCurBound2 = oBoundsRect[j];
+            if(CheckIntervalIntersection(oCurBound1.X0, oCurBound1.Y0, oCurBound1.X1, oCurBound1.Y1, oCurBound2.X0, oCurBound2.Y0, oCurBound2.X1, oCurBound2.Y1))
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+};
+
+BoundsRect.prototype.getParamValueProjection = function(x0, y0, x1, y1, x, y)
+{
+    var dX = (x1-x0), dY = (y1 - y0);
+
+    if(Math.abs(dX) > 0 )
+    {
+        var dXSq = dX*dX;
+        var xi = (x*dXSq + dX*dY*y - dY*(x1*y0-x0*y1))/(dXSq + dY*dY);
+        return (xi - x1)/dX;
+    }
+    else if(Math.abs(dY) > 0)
+    {
+        var dYSq = dY*dY;
+        var yi = (y*dYSq + dX*dY*x + dX*(x1*y0 - x0*y1))/(dX*dX + dYSq);
+        return (yi - y1)/dY;
+    }
+    return -1;
+};
+
+BoundsRect.prototype.checkIntervalProjection = function(oInterval1, oInterval2)
+{
+    var param0  = this.getParamValueProjection(oInterval1.X0, oInterval1.Y0, oInterval1.X1, oInterval1.Y1, oInterval2.X0, oInterval2.Y0);
+    var param1  = this.getParamValueProjection(oInterval1.X0, oInterval1.Y0, oInterval1.X1, oInterval1.Y1, oInterval2.X1, oInterval2.Y1);
+    if(Math.abs(param0 - 0.5) <= 0.5 || Math.abs(param1 - 0.5) <= 0.5)
+    {
+        var dX = (oInterval1.X0 - oInterval1.X1), dY = (oInterval1.Y0 - oInterval1.Y1);
+        var dLen = Math.sqrt(dX*dX + dY*dY);
+        return ((param1 > 1  ? 1 : (param1 < 0 ? 0 : param1)) - (param0 > 1  ? 1 : (param0 < 0 ? 0 : param0)))*dLen;
+    }
+    else
+    {
+        return 0;
+    }
+};
+
+
+BoundsRect.prototype.checkBoundsRectProjection = function(oBoundsRect)
+{
+    var dX = 0, dY = 0, dLTemp;
+
+    dLTemp = this.checkIntervalProjection(this.arrBounds[1], oBoundsRect.arrBounds[1]);
+    if(dLTemp < dY)
+    {
+        dY = dLTemp;
+    }
+    dLTemp = this.checkIntervalProjection(this.arrBounds[1], oBoundsRect.arrBounds[3]);
+    if(dLTemp < dY)
+    {
+        dY = dLTemp;
+    }
+    dLTemp = this.checkIntervalProjection(this.arrBounds[3], oBoundsRect.arrBounds[1]);
+    if(dLTemp < dY)
+    {
+        dY = dLTemp;
+    }
+    dLTemp = this.checkIntervalProjection(this.arrBounds[3], oBoundsRect.arrBounds[3]);
+    if(dLTemp < dY)
+    {
+        dY = dLTemp;
+    }
+
+    dLTemp = this.checkIntervalProjection(this.arrBounds[2], oBoundsRect.arrBounds[1]);
+    if(Math.abs(dLTemp) > dX)
+    {
+        dX = Math.abs(dLTemp);
+    }
+
+    dLTemp = this.checkIntervalProjection(this.arrBounds[2], oBoundsRect.arrBounds[3]);
+    if(Math.abs(dLTemp) > dX)
+    {
+        dX = Math.abs(dLTemp);
+    }
+
+    dLTemp = this.checkIntervalProjection(this.arrBounds[0], oBoundsRect.arrBounds[1]);
+    if(Math.abs(dLTemp) > dX)
+    {
+        dX = Math.abs(dLTemp);
+    }
+
+    dLTemp = this.checkIntervalProjection(this.arrBounds[0], oBoundsRect.arrBounds[3]);
+    if(Math.abs(dLTemp) > dX)
+    {
+        dX = Math.abs(dLTemp);
+    }
+
+    return {DX: dX, DY: dY};
+};
+
+CDocContentStructure.prototype.checkIntersectionBounds = function(oBounds1, oTransform1, oBounds2, oTransform2, nDist)
+{
+    if(!this.m_oBoundsRect1)
+    {
+        this.m_oBoundsRect1 = new BoundsRect();
+        this.m_oBoundsRect2 = new BoundsRect();
+    }
+    this.m_oBoundsRect1.fromBoundsAndTransform(oBounds1, oTransform1);
+    this.m_oBoundsRect2.fromBoundsAndTransform(oBounds2, oTransform2);
+    if(this.m_oBoundsRect1.checkIntersection(this.m_oBoundsRect2.arrBounds))
+    {
+        var oBounds = this.m_oBoundsRect1.checkBoundsRectProjection(this.m_oBoundsRect2);
+        oBounds.DX/=nDist;
+        return oBounds;
+    }
+    return {DX: 0, DY: 0};
+};
+
+CDocContentStructure.prototype.checkTransformByOddPath = function(oMatrix, oWarpedObject, oObjectToDrawNext, oNextPointOnPolygon, dContentHeight, dKoeff, bArcDown, oPolygon, XLimit)
+{
+    var x0, y0, x1, y1, x0t, y0t, x1t, y1t, cX, cX2, dX, dY, dX2, dY2, dNorm, oPointOnPolygon;
+    x0 = oWarpedObject.x*dKoeff;
+    y0 = oWarpedObject.y*dKoeff;
+    x1 = x0;
+    if(bArcDown)
+    {
+        y1 = 0;
+    }
+    else
+    {
+        y1 = dContentHeight*dKoeff;
+    }
+    cX = oWarpedObject.x/XLimit;
+    var oRet = null;
+    if(oNextPointOnPolygon)
+    {
+        oPointOnPolygon = oNextPointOnPolygon;
+    }
+    else
+    {
+        oPointOnPolygon = oPolygon.getPointOnPolygon(cX, true);
+    }
+    x1t = oPointOnPolygon.x;
+    y1t = oPointOnPolygon.y;
+    dX = oPointOnPolygon.oP2.x - oPointOnPolygon.oP1.x;
+    dY = oPointOnPolygon.oP2.y - oPointOnPolygon.oP1.y;
+
+    if(bArcDown)
+    {
+        dX = -dX;
+        dY = -dY;
+    }
+    if(oObjectToDrawNext && isRealNumber(oObjectToDrawNext.x) && isRealNumber(oObjectToDrawNext.y) && oObjectToDrawNext.x > oWarpedObject.x)
+    {
+        cX2 = (oObjectToDrawNext.x)/XLimit;
+        oRet = oPolygon.getPointOnPolygon(cX2, true);
+        dX2 = oRet.oP2.x - oRet.oP1.x;
+        dY2 = oRet.oP2.y - oRet.oP1.y;
+        if(bArcDown)
+        {
+            dX2 = -dX2;
+            dY2 = -dY2;
+        }
+        dX = dX + dX2;
+        dY = dY + dY2;
+    }
+    else
+    {
+        oRet = null;
+    }
+    dNorm = Math.sqrt(dX*dX + dY*dY);
+
+    if(bArcDown)
+    {
+        x0t = x1t + (dY/dNorm)*(y0);
+        y0t = y1t - (dX/dNorm)*(y0);
+    }
+    else
+    {
+        x0t = x1t + (dY/dNorm)*(dContentHeight*dKoeff - y0);
+        y0t = y1t - (dX/dNorm)*(dContentHeight*dKoeff - y0);
+    }
+    oMatrix.shx = (x1t - x0t)/(y1 - y0);
+    oMatrix.sy = (y1t - y0t)/(y1 - y0);
+    oMatrix.sx = oMatrix.sy;
+    oMatrix.shy = -oMatrix.shx;
+    oMatrix.tx = x0t - x0*oMatrix.sx - y0*oMatrix.shx;
+    oMatrix.ty = y0t - x0*oMatrix.shy - y0*oMatrix.sy;
+    return oRet;
 };
 
 CDocContentStructure.prototype.checkUnionPaths = function(aWarpedObjects)
@@ -141,12 +491,11 @@ CDocContentStructure.prototype.checkUnionPaths = function(aWarpedObjects)
         aWarpedObjects2 = aToCheck[j];
         for(i = 0; i < aWarpedObjects2.length; ++i)
         {
-
             oCurObjectToDraw = aWarpedObjects2[i];
             for(k = 0; k < aByProps.length; ++k)
             {
                 var oObjToDraw = aByProps[k];
-                if(CompareBrushes(oObjToDraw.brush, oCurObjectToDraw.brush) && ComparePens(oObjToDraw.pen, oCurObjectToDraw.pen))
+                if(CompareBrushes(oObjToDraw.brush, oCurObjectToDraw.brush) && ComparePens(oObjToDraw.pen, oCurObjectToDraw.pen) && !oCurObjectToDraw.Comment && !oObjToDraw.Comment)
                 {
                     oObjToDraw.geometry.pathLst = oObjToDraw.geometry.pathLst.concat(oCurObjectToDraw.geometry.pathLst);
                     oCurObjectToDraw.geometry.pathLst.length = 0;
@@ -159,7 +508,16 @@ CDocContentStructure.prototype.checkUnionPaths = function(aWarpedObjects)
             }
         }
     }
+
+
+    this.m_aBackgrounds.length = 0;
+    this.m_aBorders.length = 0;
+    this.getAllBackgroundsBorders(this.m_aParagraphBackgrounds, this.m_aBackgrounds, this.m_aBorders);
+
 };
+
+
+
 
 function CParagraphStructure()
 {
@@ -190,6 +548,15 @@ CParagraphStructure.prototype.draw = function(graphics, transform, oTheme, oColo
     for(i = 0; i < this.m_aContent.length; ++i)
     {
         this.m_aContent[i].draw(graphics, transform, oTheme, oColorMap);
+    }
+};
+
+CParagraphStructure.prototype.getAllBackgroundsBorders = function(aParaBackgrounds, aBackgrounds, aBorders)
+{
+    var i;
+    for(i = 0; i < this.m_aContent.length; ++i)
+    {
+        this.m_aContent[i].getAllBackgroundsBorders(aParaBackgrounds, aBackgrounds, aBorders);
     }
 };
 
@@ -233,6 +600,15 @@ CTableStructure.prototype.draw = function(graphics, transform, oTheme, oColorMap
     for(i = 0; i < this.m_aContent.length; ++i)
     {
         this.m_aContent[i].draw(graphics, transform, oTheme, oColorMap);
+    }
+};
+
+CTableStructure.prototype.getAllBackgroundsBorders = function(aParaBackgrounds, aBackgrounds, aBorders)
+{
+    var i;
+    for(i = 0; i < this.m_aContent.length; ++i)
+    {
+        this.m_aContent[i].getAllBackgroundsBorders(aParaBackgrounds, aBackgrounds, aBorders);
     }
 };
 
@@ -318,18 +694,18 @@ CLineStructure.prototype.CheckBoundsWarped = function(graphics)
 CLineStructure.prototype.draw = function(graphics, transform, oTheme, oColorMap)
 {
     var i;
-    for(i = 0; i < this.m_aParagraphBackgrounds.length; ++i)
-    {
-        this.m_aParagraphBackgrounds[i].draw(graphics, undefined, transform, oTheme, oColorMap);
-    }
-    for(i = 0; i < this.m_aBorders.length; ++i)
-    {
-        this.m_aBorders[i].draw(graphics);
-    }
-    for(i = 0; i < this.m_aBackgrounds.length; ++i)
-    {
-        this.m_aBackgrounds[i].draw(graphics, undefined, transform, oTheme, oColorMap);
-    }
+  // for(i = 0; i < this.m_aParagraphBackgrounds.length; ++i)
+  // {
+  //     this.m_aParagraphBackgrounds[i].draw(graphics, undefined, transform, oTheme, oColorMap);
+  // }
+  //  for(i = 0; i < this.m_aBorders.length; ++i)
+  //  {
+  //      this.m_aBorders[i].draw(graphics);
+  //  }
+ //   for(i = 0; i < this.m_aBackgrounds.length; ++i)
+ //   {
+ //       this.m_aBackgrounds[i].draw(graphics, undefined, transform, oTheme, oColorMap);
+ //   }
     for(i = 0; i < this.m_aContent.length; ++i)
     {
         this.m_aContent[i].draw(graphics, undefined, transform, oTheme, oColorMap);
@@ -340,6 +716,22 @@ CLineStructure.prototype.draw = function(graphics, transform, oTheme, oColorMap)
     }
 };
 
+CLineStructure.prototype.getAllBackgroundsBorders = function(aParaBackgrounds, aBackgrounds, aBorders)
+{
+    var i;
+    for(i = 0; i < this.m_aParagraphBackgrounds.length; ++i)
+    {
+        aParaBackgrounds.push(this.m_aParagraphBackgrounds[i]);
+    }
+    for(i = 0; i < this.m_aBackgrounds.length; ++i)
+    {
+        aBackgrounds.push(this.m_aBackgrounds[i]);
+    }
+    for(i = 0; i < this.m_aBorders.length; ++i)
+    {
+        aBorders.push(this.m_aBorders[i]);
+    }
+};
 
 
 var DRAW_COMMAND_TABLE = 0x01;
@@ -438,6 +830,7 @@ function CTextDrawer(dWidth, dHeight, bDivByLInes, oTheme, bDivGlyphs)
     // RFonts
     this.m_oTextPr      = null;
     this.m_oGrFonts     = new CGrRFonts();
+    this.m_oCurComment     = null;
 
     this.m_oPen     = new CPen();
     this.m_oBrush   = new CBrush();
@@ -496,7 +889,6 @@ CTextDrawer.prototype =
         {
             this.m_oPen.Color.A = a;
         }
-
         this.Get_PathToDraw(false, true);
     },
     AddSmartRect: function()
@@ -508,7 +900,6 @@ CTextDrawer.prototype =
         {
             this.m_oPen.Size = val;
         }
-
         this.Get_PathToDraw(false, true);
     },
     // brush methods
@@ -524,9 +915,15 @@ CTextDrawer.prototype =
         {
             this.m_oBrush.Color1.A = a;
         }
-
         this.Get_PathToDraw(false, true);
     },
+
+    set_fillColor: function(R, G, B)
+    {
+        this.m_oFill = CreateUniFillByUniColor(CreateUniColorRGB(R, G, B));
+        this.Get_PathToDraw(false, true);
+    },
+
     b_color2 : function(r,g,b,a)
     {
         if (this.m_oBrush.Color2.R != r || this.m_oBrush.Color2.G != g || this.m_oBrush.Color2.B != b)
@@ -539,7 +936,6 @@ CTextDrawer.prototype =
         {
             this.m_oBrush.Color2.A = a;
         }
-
         this.Get_PathToDraw(false, true);
     },
 
@@ -785,7 +1181,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aContent.length === 0)
                             {
-                                oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
+                                oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, x, y, this.m_oCurComment));
                             }
                             oLastObjectToDraw = oLastCommand.m_aContent[oLastCommand.m_aContent.length - 1];
 
@@ -871,7 +1267,6 @@ CTextDrawer.prototype =
                             }
                             break;
                         }
-
                         case 4:
                         {
                             if(oLastCommand.m_aParagraphBackgrounds.length === 0)
@@ -929,6 +1324,7 @@ CTextDrawer.prototype =
         }
         if(oLastObjectToDraw && oLastObjectToDraw.geometry)
         {
+            oLastObjectToDraw.Comment = this.m_oCurComment;
             if(oLastObjectToDraw.geometry.pathLst.length === 0 || bStart)
             {
                 oPath = new Path();
@@ -1406,12 +1802,20 @@ CTextDrawer.prototype =
         this.drawHorLine(align, y, x + leftMW, r + rightMW, penW);
     },
 
+    DrawTextArtComment : function(Element)
+    {
+        this.m_oCurComment = Element;
+        this.rect(Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0);
+        this.df();
+        this.m_oCurComment = null;
+    },
+
     rect : function(x,y,w,h)
     {
         var oLastCommand = this.m_aStack[this.m_aStack.length - 1];
         if(oLastCommand && (oLastCommand.m_nDrawType === 2 || oLastCommand.m_nDrawType === 4))
         {
-            this._s();
+            this.Get_PathToDraw(true, true);
             this._m(x, y);
 
             this.checkCurveBezier(x, y, x + (w/3), y, x + (2/3) *w, y, x+w, y);// this._l(r, y);
@@ -1427,7 +1831,7 @@ CTextDrawer.prototype =
             var _r = (x + w);
             var _b = (y + h);
 
-            this._s();
+            this.Get_PathToDraw(true, true);
             this._m(_x, _y);
             this._l(_r, _y);
             this._l(_r, _b);
@@ -1619,8 +2023,6 @@ CTextDrawer.prototype =
         return null;
     },
 
-
-
     GetTextPr : function()
     {
         return this.m_oTextPr;
@@ -1754,7 +2156,6 @@ function ObjectsToDrawBetweenTwoPolygons(aObjectsToDraw, oBoundsController, oPol
     var oCommand, oPoint, oPath;
     for(i = 0; i < aObjectsToDraw.length; ++i)
     {
-
         aPathLst = aObjectsToDraw[i].geometry.pathLst;
         for(t = 0; t < aPathLst.length; ++t)
         {
@@ -1806,7 +2207,6 @@ function ObjectsToDrawBetweenTwoPolygons(aObjectsToDraw, oBoundsController, oPol
                     }
                 }
             }
-
         }
     }
 }
@@ -1818,58 +2218,8 @@ function TransformPointGeometry(x, y, oTransform)
     oRet.y = oTransform.TransformPointY(x,y);
     return oRet;
 }
-function TransformPointPolygon(x, y, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds)
-{
-    var oRet = {x: 0, y: 0}, x0, y0, x1, y1, cX, oPointOnPolygon, x1t, y1t, dX, dY, x0t, y0t;
-    x0 = x;//dKoeff;
-    y0 = y;//dKoeff;
-    x1 = x0;
-    if(bFlag)
-    {
-        y1 = 0;
-		if(oBounds)
-		{
-			y0 -= oBounds.min_y;
-		}
-    }
-    else
-    {
-        y1 = ContentHeight*dKoeff;
-        if(oBounds)
-        {
-            y1 = (oBounds.max_y - oBounds.min_y);
-			y0 -= oBounds.min_y;
-        }
-    }
-    cX = x/XLimit;
-    oPointOnPolygon = oPolygon.getPointOnPolygon(cX, true);
-    x1t = oPointOnPolygon.x;
-    y1t = oPointOnPolygon.y;
-    dX = oPointOnPolygon.oP2.x - oPointOnPolygon.oP1.x;
-    dY = oPointOnPolygon.oP2.y - oPointOnPolygon.oP1.y;
 
-    if(/*"textArchDown" !== oWarpStruct.preset*/bFlag)
-    {
-        dX = -dX;
-        dY = -dY;
-    }
-    var dNorm = Math.sqrt(dX*dX + dY*dY);
 
-    if(bFlag)
-    {
-        x0t = x1t + (dY/dNorm)*(y0);
-        y0t = y1t - (dX/dNorm)*(y0);
-    }
-    else
-    {
-
-        x0t = x1t + (dY/dNorm)*(y1 - y0);
-        y0t = y1t - (dX/dNorm)*(y1 - y0);
-    }
-    oRet.x = x0t;
-    oRet.y = y0t;
-    return oRet;
-}
 function TransformGeometry(oObjectToDraw, oTransform)
 {
     var oCommand, oPoint, oPath, t, j, aPathLst;
@@ -1927,6 +2277,58 @@ function TransformGeometry(oObjectToDraw, oTransform)
 
     }
 }
+
+function TransformPointPolygon(x, y, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds)
+{
+    var oRet = {x: 0, y: 0}, y0, y1, cX, oPointOnPolygon, x1t, y1t, dX, dY, x0t, y0t;
+    y0 = y;//dKoeff;
+    if(bFlag)
+    {
+        y1 = 0;
+		if(oBounds)
+		{
+			y0 -= oBounds.min_y;
+		}
+    }
+    else
+    {
+        y1 = ContentHeight*dKoeff;
+        if(oBounds)
+        {
+            y1 = (oBounds.max_y - oBounds.min_y);
+			y0 -= oBounds.min_y;
+        }
+    }
+    cX = x/XLimit;
+    oPointOnPolygon = oPolygon.getPointOnPolygon(cX, true);
+    x1t = oPointOnPolygon.x;
+    y1t = oPointOnPolygon.y;
+    dX = oPointOnPolygon.oP2.x - oPointOnPolygon.oP1.x;
+    dY = oPointOnPolygon.oP2.y - oPointOnPolygon.oP1.y;
+
+    if(bFlag)
+    {
+        dX = -dX;
+        dY = -dY;
+    }
+    var dNorm = Math.sqrt(dX*dX + dY*dY);
+
+    if(bFlag)
+    {
+        x0t = x1t + (dY/dNorm)*(y0);
+        y0t = y1t - (dX/dNorm)*(y0);
+    }
+    else
+    {
+
+        x0t = x1t + (dY/dNorm)*(y1 - y0);
+        y0t = y1t - (dX/dNorm)*(y1 - y0);
+    }
+    oRet.x = x0t;
+    oRet.y = y0t;
+    return oRet;
+}
+
 function CheckGeometryByPolygon(oObjectToDraw, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds)
 {
     var oCommand, oPoint, oPath, t, j, aPathLst;

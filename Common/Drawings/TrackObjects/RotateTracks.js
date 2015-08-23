@@ -1,5 +1,7 @@
 "use strict";
 
+
+
 function OverlayObject(geometry, extX, extY, brush, pen, transform )
     //({check_bounds: function(){},brush: this.originalShape.brush, pen: this.originalShape.pen, ext:{cx:this.originalShape.absExtX, cy:this.originalShape.absExtY}, geometry: this.geometry, TransformMatrix: this.originalShape.transform})
 {
@@ -147,17 +149,19 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
     }
 }
 
-function ObjectToDraw(brush, pen, extX, extY, geometry, transform, x, y)
+function ObjectToDraw(brush, pen, extX, extY, geometry, transform, x, y, oComment)
 {
-    this.brush = brush;
-    this.pen = pen;
     this.extX = extX;
     this.extY = extY;
     this.transform = transform;
     this.TransformMatrix = transform;
     this.geometry = geometry;
     this.parentShape = null;
-    /*позиция символа*/
+    this.Comment = oComment;
+    this.pen = pen;
+    this.brush = brush;
+
+    /*пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ*/
     this.x = x;
     this.y = y;
 }
@@ -234,6 +238,26 @@ ObjectToDraw.prototype =
             else
             {
                 oTransform = this.TransformMatrix;
+            }
+        }
+        if(this.Comment)
+        {
+            if(editor && editor.WordControl && editor.WordControl.m_oLogicDocument && editor.WordControl.m_oLogicDocument.Comments &&
+                (graphics instanceof CGraphics) && ( editor.WordControl.m_oLogicDocument.Comments.Is_Use() && true != editor.isViewMode))
+            {
+                if(this.Comment.Additional.CommentId === editor.WordControl.m_oLogicDocument.Comments.Get_CurrentId())
+                {
+                    this.brush = G_O_ACTIVE_COMMENT_BRUSH;
+                }
+                else
+                {
+                    this.brush = G_O_NO_ACTIVE_COMMENT_BRUSH;
+                }
+                var _x0 = oTransform.TransformPointX( this.Comment.x0, this.Comment.y0 );
+                var _y0 = oTransform.TransformPointY( this.Comment.x0, this.Comment.y0 );
+                var _x1 = oTransform.TransformPointX( this.Comment.x1, this.Comment.y1 );
+                var _y1 = oTransform.TransformPointY( this.Comment.x1, this.Comment.y1 );
+                editor.WordControl.m_oLogicDocument.Comments.Add_DrawingRect(_x0, _y0, _x1 - _x0, _y1 - _y0, graphics.PageNum, this.Comment.Additional.CommentId);
             }
         }
         if(oTheme && oColorMap)

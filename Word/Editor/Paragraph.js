@@ -1784,26 +1784,32 @@ Paragraph.prototype =
                 Element = ( pGraphics.RENDERER_PDF_FLAG === true ? null : aComm.Get_Next() );
                 while ( null != Element )
                 {
-                    if ( Element.Additional.Active === true )
-                        pGraphics.b_color1( 240, 200, 120, 255 );
-                    else
-                        pGraphics.b_color1( 248, 231, 195, 255 );
-
-                    pGraphics.rect( Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0 );
-                    pGraphics.df();
-
-                    var TextTransform = this.Get_ParentTextTransform();
-                    if (TextTransform)
+                    if(!pGraphics.DrawTextArtComment)
                     {
-                        var _x0 = TextTransform.TransformPointX( Element.x0, Element.y0 );
-                        var _y0 = TextTransform.TransformPointY( Element.x0, Element.y0 );
-                        var _x1 = TextTransform.TransformPointX( Element.x1, Element.y1 );
-                        var _y1 = TextTransform.TransformPointY( Element.x1, Element.y1 );
-                        DocumentComments.Add_DrawingRect(_x0, _y0, _x1 - _x0, _y1 - _y0, Page_abs, Element.Additional.CommentId);
+                        if ( Element.Additional.Active === true )
+                            pGraphics.b_color1( 240, 200, 120, 255 );
+                        else
+                            pGraphics.b_color1( 248, 231, 195, 255 );
+
+                        pGraphics.rect( Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0 );
+                        pGraphics.df();
+
+                        var TextTransform = this.Get_ParentTextTransform();
+                        if (TextTransform)
+                        {
+                            var _x0 = TextTransform.TransformPointX( Element.x0, Element.y0 );
+                            var _y0 = TextTransform.TransformPointY( Element.x0, Element.y0 );
+                            var _x1 = TextTransform.TransformPointX( Element.x1, Element.y1 );
+                            var _y1 = TextTransform.TransformPointY( Element.x1, Element.y1 );
+                            DocumentComments.Add_DrawingRect(_x0, _y0, _x1 - _x0, _y1 - _y0, Page_abs, Element.Additional.CommentId);
+                        }
+                        else
+                            DocumentComments.Add_DrawingRect(Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0, Page_abs, Element.Additional.CommentId);
                     }
                     else
-                        DocumentComments.Add_DrawingRect(Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0, Page_abs, Element.Additional.CommentId);
-
+                    {
+                        pGraphics.DrawTextArtComment(Element);
+                    }
                     Element = aComm.Get_Next();
                 }
 

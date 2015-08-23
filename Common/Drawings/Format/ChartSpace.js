@@ -258,7 +258,8 @@ function checkFiniteNumber(num)
 }
 
 var G_O_VISITED_HLINK_COLOR = CreateUniFillSolidFillWidthTintOrShade(CreateUnifillSolidFillSchemeColorByIndex(10), 0);
-
+var G_O_NO_ACTIVE_COMMENT_BRUSH = CreateUniFillByUniColor(CreateUniColorRGB(248, 231, 195));
+var G_O_ACTIVE_COMMENT_BRUSH = CreateUniFillByUniColor(CreateUniColorRGB(240, 200, 120));
 /*function addPointToMap(map, worksheet, row, col, pt)
 {
     if(!Array.isArray(map[worksheet.getId()+""]))
