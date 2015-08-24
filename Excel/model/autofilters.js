@@ -1203,7 +1203,7 @@ var maxIndividualValues = 10000;
 					aWs.TableParts = newTableParts;
 				}
 				
-				this._setStyleTables(activeCells);
+				t._setStyleTablePartsAfterOpenRows(activeCells);
 				
 				History.EndTransaction();
 			},
