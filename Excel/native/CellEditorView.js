@@ -1050,16 +1050,20 @@
 			var ctx = this.overlayCtx, ppix = ctx.getPPIX(), ppiy = ctx.getPPIY();
 			var begPos, endPos, top, top1, top2, begInfo, endInfo, line1, line2, i;
 
+            var selection = [];
+
 			function drawRect(x, y, w, h) {
-				ctx.fillRect(
-					asc_calcnpt(x, ppix), asc_calcnpt(y, ppiy),
-					asc_calcnpt(w, ppix), asc_calcnpt(h, ppiy));
+                selection.push([asc_calcnpt(x, ppix), asc_calcnpt(y, ppiy),	asc_calcnpt(w, ppix), asc_calcnpt(h, ppiy)]);
+
+				//ctx.fillRect(
+				//	asc_calcnpt(x, ppix), asc_calcnpt(y, ppiy),
+				//	asc_calcnpt(w, ppix), asc_calcnpt(h, ppiy));
 			}
 
 			begPos = this.selectionBegin;
 			endPos = this.selectionEnd;
 
-			ctx.setFillStyle(this.defaults.selectColor).clear();
+			//ctx.setFillStyle(this.defaults.selectColor).clear();
 
 			if (begPos !== endPos && !this.isTopLineActive) {
 				top = this.textRender.calcLineOffset(this.topLineIndex);
@@ -1081,6 +1085,8 @@
 					}
 				}
 			}
+
+            return selection;
 		};
 
 		// Cursor
@@ -1407,28 +1413,28 @@
 
 			t.selectionBegin = begPos;
 			t.selectionEnd = endPos;
-			t._drawSelection();
+			//t._drawSelection();
 			if (t.isTopLineActive && !t.skipTLUpdate) {t._updateTopLineCurPos();}
 		};
 
 		CellEditor.prototype._changeSelection = function (coord) {
-			var t = this;
+            var t = this;
 
-			function doChangeSelection(coord) {
-				var pos = t._findCursorPosition(coord);
-				if (pos !== undefined) {pos >= 0 ? t._selectChars(kPosition, pos) : t._selectChars(pos);}
-				if (t.isSelectMode) {
-					t.selectionTimer = window.setTimeout(
-							function () {doChangeSelection(coord);},
-							t.defaults.selectionTimeout);
-				}
-			}
+            function doChangeSelection(coord) {
+                var pos = t._findCursorPosition(coord);
+                if (pos !== undefined) {pos >= 0 ? t._selectChars(kPosition, pos) : t._selectChars(pos);}
+//				if (t.isSelectMode) {
+//					t.selectionTimer = window.setTimeout(
+//							function () {doChangeSelection(coord);},
+//							t.defaults.selectionTimeout);
+//				}
+            }
 
             doChangeSelection(coord);
 
-			//window.clearTimeout(t.selectionTimer);
-			//t.selectionTimer = window.setTimeout(function () {doChangeSelection(coord);}, 0);
-		};
+            //window.clearTimeout(t.selectionTimer);
+            //t.selectionTimer = window.setTimeout(function () {doChangeSelection(coord);}, 0);
+        };
 
 		CellEditor.prototype._findFragment = function (pos, fragments) {
 			var i, begin, end;

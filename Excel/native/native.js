@@ -1372,6 +1372,7 @@ function asc_menu_WriteFontFamily(_type, _family, _stream) {
 
     _stream["WriteByte"](255);
 }
+
 function asc_ReadCBorder(s, p) {
     var color = null;
     var style = null;
@@ -1406,6 +1407,159 @@ function asc_ReadCBorder(s, p) {
 
     return null;
 }
+function asc_ReadAdjustPrint(s, p) {
+    var adjustPrint = new asc_CAdjustPrint();
+
+    var next = true;
+    while (next)
+    {
+        var _attr = s[p.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                adjustPrint.asc_setPrintType(s[p.pos++]);
+                break;
+            }
+            case 1:
+            {
+                adjustPrint.asc_setLayoutPageType(s[p.pos++]);
+                break;
+            }
+            case 255:
+            default:
+            {
+                next = false;
+                break;
+            }
+        }
+    }
+
+    return adjustPrint;
+}
+function asc_ReadCPageMargins(s, p) {
+    var pageMargins = new asc_CPageMargins();
+
+    var next = true;
+    while (next)
+    {
+        var _attr = s[p.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                pageMargins.asc_setLeft(s[p.pos++]);
+                break;
+            }
+            case 1:
+            {
+                pageMargins.asc_setRight(s[p.pos++]);
+                break;
+            }
+            case 2:
+            {
+                pageMargins.asc_setTop(s[p.pos++]);
+                break;
+            }
+            case 3:
+            {
+                pageMargins.asc_setBottom(s[p.pos++]);
+                break;
+            }
+
+            case 255:
+            default:
+            {
+                next = false;
+                break;
+            }
+        }
+    }
+
+    return pageMargins;
+}
+function asc_ReadCPageSetup(s, p) {
+    var pageSetup = new asc_CPageSetup();
+
+    var next = true;
+    while (next)
+    {
+        var _attr = s[p.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                pageSetup.asc_setOrientation(s[p.pos++]);
+                break;
+            }
+            case 1:
+            {
+                pageSetup.asc_setWidth(s[p.pos++]);
+                break;
+            }
+            case 2:
+            {
+                pageSetup.asc_setHeight(s[p.pos++]);
+                break;
+            }
+
+            case 255:
+            default:
+            {
+                next = false;
+                break;
+            }
+        }
+    }
+
+    return pageSetup;
+}
+function asc_ReadPageOptions(s, p) {
+    var pageOptions = new asc_CPageOptions();
+
+    var next = true;
+    while (next)
+    {
+        var _attr = s[p.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                pageOptions.pageIndex = s[p.pos++];
+                break;
+            }
+            case 1:
+            {
+                pageOptions.asc_setPageMargins(asc_ReadCPageMargins(s,p));
+                break;
+            }
+            case 2:
+            {
+                pageOptions.asc_setPageSetup(asc_ReadCPageSetup(s,p));
+                break;
+            }
+            case 3:
+            {
+                pageOptions.asc_setGridLines(s[p.pos++]);
+                break;
+            }
+            case 4:
+            {
+                pageOptions.asc_setHeadings(s[p.pos++]);
+                break;
+            }
+            case 255:
+            default:
+            {
+                next = false;
+                break;
+            }
+        }
+    }
+
+    return pageOptions;
+}
+
 function asc_WriteCBorder(i, c, s) {
     if (!c) return;
 
@@ -1605,6 +1759,7 @@ var deviceScale = 1;
 function OfflineEditor () {
 
     this.zoom = 1.0;
+    this.textSelection = 0;
  
     // main
 
@@ -1968,12 +2123,13 @@ function OfflineEditor () {
         else
             showWorksheetCallback(true);
     };
-    this.offline_print = function() {
-        var _adjustPrint = new asc_CAdjustPrint();
-        var _printPagesData = _api.wb.calcPagesPrint(_adjustPrint);
-        var pdf_writer = new CPdfPrinter(_api.wbModel.sUrlPath);
-        var isEndPrint = _api.wb.printSheet(pdf_writer, _printPagesData);
-        return pdf_writer.DocumentRenderer.Memory.GetBase64Memory();
+    this.offline_print = function(s, p) {
+        var adjustPrint = asc_ReadAdjustPrint(s, p);
+        var pagesData   = _api.wb.calcPagesPrint(adjustPrint);
+        var pdfWriter   = new CPdfPrinter(_api.wbModel.sUrlPath);
+        var isEndPrint  = _api.wb.printSheet(pdfWriter, pagesData);
+
+        return pdfWriter.DocumentRenderer.Memory.GetBase64Memory();
     };
 }
 var _s = new OfflineEditor();
@@ -1998,17 +2154,17 @@ function offline_get_selection(x, y, width, height) {
 function offline_get_worksheet_bounds() {
     return _s.getMaxBounds();
 }
-function offline_complete_cell(x, y){
+function offline_complete_cell(x, y) {
     return _s.getNearCellCoord(x, y);
 }
+
 function offline_cell_editor_open(x, y, width, height, ratio) {
     _null_object.width = width * ratio;
     _null_object.height = height * ratio;
 
     var wb = _api.wb;
 
-    wb._onEditCell (x, y, /*isCoord*/true, /*isFocus*/undefined, /*isClearCell*/undefined,
-        /*isHideCursor*/true, /*isQuickInput*/false);
+    wb._onEditCell (x, y, true,undefined, undefined, true, false);
 
     return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom,
         wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
@@ -2046,50 +2202,76 @@ function offline_cell_editor_mouse_event(events, width, height, ratio) {
         _null_object.height = height * ratio;
     }
 
-    var wb = _api.wb;
+    var left, right;
+    var cellEditor =  _api.wb.cellEditor;
 
     for (var i = 0; i < events.length; ++i) {
         var event = {
             pageX:events[i][1],
             pageY:events[i][2],
             which: 1,
-            shiftKey: false
+            shiftKey:events[i][3]
         };
 
+        if (events[i][3]) {
+            if (-1 == events[i][4]) {
+                left = Math.min(cellEditor.selectionBegin, cellEditor.selectionEnd);
+                right = Math.max(cellEditor.selectionBegin, cellEditor.selectionEnd);
+                cellEditor.cursorPos = left;
+                cellEditor.selectionBegin = right;
+                cellEditor.selectionEnd = left;
+
+                _s.textSelection = -1;
+            }
+
+            if (1 == events[i][4]) {
+                left = Math.min(cellEditor.selectionBegin, cellEditor.selectionEnd);
+                right = Math.max(cellEditor.selectionBegin, cellEditor.selectionEnd);
+                cellEditor.cursorPos = right;
+                cellEditor.selectionBegin = left;
+                cellEditor.selectionEnd = right;
+
+                _s.textSelection = 1;
+            }
+        }
+
         if (0 === events[i][0]) {
-            wb.cellEditor._onMouseDown(event);
+            var pos = cellEditor.cursorPos;
+            left = cellEditor.selectionBegin;
+            right = cellEditor.selectionEnd;
+
+            cellEditor._onMouseDown(event);
+
+            if (-1 === _s.textSelection) {
+                cellEditor.cursorPos = Math.min(left - 1, cellEditor.cursorPos);
+                cellEditor.selectionBegin = left;
+                cellEditor.selectionEnd = Math.min(left - 1, cellEditor.selectionEnd);
+            }
+            else if (1 === _s.textSelection) {
+                cellEditor.cursorPos = Math.max(left + 1, cellEditor.cursorPos);
+                cellEditor.selectionBegin = left;
+                cellEditor.selectionEnd = Math.max(left + 1, cellEditor.selectionEnd);
+            }
+
         } else if (1 === events[i][0]) {
-            wb.cellEditor._onMouseUp(event);
+            cellEditor._onMouseUp(event);
+            _s.textSelection = 0;
         } else if (2 == events[i][0]) {
-            wb.cellEditor._onMouseMove(event);
+            cellEditor._onMouseMove(event);
+        } else if (3 == events[i][0]) {
+            cellEditor._onMouseDblClick(event);
+            _s.textSelection = 0;
         }
     }
 
-    return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom,
-        wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
+    return [cellEditor.left, cellEditor.top, cellEditor.right, cellEditor.bottom,
+        cellEditor.curLeft, cellEditor.curTop, cellEditor.curHeight];
 }
 function offline_cell_editor_close(x, y, width, height, ratio) {
-    var worksheet = _api.wb.getWorksheet();
-    var region = _s._updateRegion(worksheet, 0, 0, 5000, 5000);
-//
-//    console.log('========================');
-//    for (var i = 0; i < 10; ++i) {
-//        console.log('top['+ i+']: ' + worksheet.rows[i].top)
-//    }
-//    console.log('-------------');
-
     _api.wb.cellEditor._tryCloseEditor();
-
-//    for (var i = 0; i < 10; ++i) {
-//        console.log('top['+ i+']: ' + worksheet.rows[i].top)
-//    }
-//    console.log('-------------');
-//    worksheet._updateCache(region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd);
-
-//    for (var i = 0; i < 10; ++i) {
-//        console.log('top['+ i+']: ' + worksheet.rows[i].top)
-//    }
-//    console.log('========================');
+}
+function offline_cell_editor_selection() {
+    return _api.wb.cellEditor._drawSelection();
 }
 
 function offline_add_shape(x, y) {
@@ -2220,7 +2402,7 @@ function offline_apply_event(type,params) {
         {
             _stream = global_memory_stream_menu;
             _stream["ClearNoAttack"]();
-            _stream["WriteStringA"](_s.offline_print());
+            _stream["WriteStringA"](_s.offline_print(params,_current));
             _return = _stream;
             break;
         }
@@ -2604,6 +2786,12 @@ function offline_apply_event(type,params) {
             var colRowHeaders = _api.asc_getSheetViewSettings();
             colRowHeaders.asc_setShowRowColHeaders(params > 0);
             _api.asc_setSheetViewSettings(colRowHeaders);
+            break;
+        }
+        case 2215: // ASC_SPREADSHEETS_EVENT_TYPE_SET_PAGE_OPTIONS
+        {
+            var pageOptions = asc_ReadPageOptions(params, _current);
+            _api.asc_setPageOptions(pageOptions, pageOptions.pageIndex);
             break;
         }
 
