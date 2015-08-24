@@ -16281,10 +16281,9 @@ CTable.prototype =
 
                 if ( (0 === Cell.Row.Index && 0 === CurPage) || Cell.Row.Index > FirstRow  )
                 {
-                    Cell.PagesCount = 1;
                     Cell.Content.Set_StartPage( CurPage );
 
-                    if (  true === this.Is_Inline() && 1 === Cell.Content.Pages.length && true != this.RecalcInfo.Check_Cell( Cell ) )
+                    if (  true === this.Is_Inline() && 1 === Cell.PagesCount && 1 === Cell.Content.Pages.length && true != this.RecalcInfo.Check_Cell( Cell ) )
                     {
                         var X_content_start_old  = Cell.Content.Pages[0].X;
                         var X_content_end_old    = Cell.Content.Pages[0].XLimit;
@@ -16298,6 +16297,7 @@ CTable.prototype =
                         }
                     }
 
+                    Cell.PagesCount = 1;
                     Cell.Content.Reset( X_content_start, Y_content_start, X_content_end, Y_content_end );
                 }
 
