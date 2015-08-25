@@ -4941,9 +4941,9 @@ CustomFilters.prototype.isHideValue = function(val){
 	var filterRes1 = this.CustomFilters[0] ? this.CustomFilters[0].isHideValue(val) : null;
 	var filterRes2 = this.CustomFilters[1] ? this.CustomFilters[1].isHideValue(val) : null;
 	
-	if(this.And && ((filterRes1 === null && filterRes2 === true || filterRes1 === true && filterRes2 === null || filterRes1 === true && filterRes2 === true)))
+	if(!this.And && ((filterRes1 === null && filterRes2 === true || filterRes1 === true && filterRes2 === null || filterRes1 === true && filterRes2 === true)))
 		res = true;
-	if(!this.And && ((filterRes1 === true || filterRes2 === true)))
+	if(this.And && ((filterRes1 === true || filterRes2 === true)))
 		res = true;
 	
 	return res;
