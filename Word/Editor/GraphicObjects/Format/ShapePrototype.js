@@ -119,6 +119,10 @@ CShape.prototype.recalcTxBoxContent = function()
 {
     this.recalcInfo.recalculateTxBoxContent = true;
     this.recalcInfo.AllDrawings = [];
+    if(this.checkAutofit && this.checkAutofit())
+    {
+        this.recalcTransform();
+    }
 };
 
 CShape.prototype.recalcWrapPolygon = function()

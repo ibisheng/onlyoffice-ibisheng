@@ -388,6 +388,7 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
         if(wsView && wsView.objectRender && wsView.objectRender.controller)
         {
         	wsView.objectRender.controller.updateOverlay();
+            wsView.objectRender.controller.updateSelectionState();
         }
     }
 
