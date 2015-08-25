@@ -3088,8 +3088,10 @@ var maxIndividualValues = 10000;
 					{
 						cell = aWs.getCell3(row, col);
 						var isMerged = cell.hasMerged();
-						if(isMerged && isMerged.c2 != col)
-						{
+						var isMergedAllRow = (isMerged.c2 + 1 == gc_nMaxCol && isMerged.c1 === 0) ? true : false;//если замержена вся ячейка
+						
+						if((isMerged && isMerged.c2 != col && !isMergedAllRow) || (isMergedAllRow && col !== ref.c1))
+						{	
 							filterColumn = aWs.AutoFilter.addFilterColumn();
 							filterColumn.ColId = col - ref.c1;
 							filterColumn.ShowButton = false;
