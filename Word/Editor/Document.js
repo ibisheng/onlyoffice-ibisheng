@@ -11908,10 +11908,10 @@ CDocument.prototype =
         
         // Удаляем весь список
         editor.sync_BeginCatchSelectedElements();
+        editor.sync_BeginCatchRevisionsChanges();
 
         // Уберем из интерфейса записи о том где мы находимся (параграф, таблица, картинка или колонтитул)
         editor.ClearPropObjCallback();
-        editor.sync_HideAllRevisionsChanges();
 
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
@@ -11959,6 +11959,7 @@ CDocument.prototype =
         }
 
         // Сообщаем, что список составлен
+        editor.sync_EndCatchRevisionsChanges();
         editor.sync_EndCatchSelectedElements();
 
         this.Document_UpdateUndoRedoState();

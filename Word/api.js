@@ -587,6 +587,8 @@ function asc_docs_api(name)
             editor = window.editor;
     }
     CHART_STYLE_MANAGER = new CChartStyleManager();
+
+    this.RevisionChangesStack = [];
 }
 
 asc_docs_api.prototype.LoadFontsFromServer = function(_fonts)
@@ -6761,7 +6763,7 @@ asc_docs_api.prototype.AddTextArt = function(nStyle)
         History.Create_NewPoint(historydescription_Document_AddTextArt);
         this.WordControl.m_oLogicDocument.Add_TextArt(nStyle);
     }
-}
+};
 
 
 asc_docs_api.prototype.sync_StartAddShapeCallback = function(value)
@@ -7442,15 +7444,18 @@ asc_docs_api.prototype.asc_IsTrackResivisions = function()
 {
     return this.WordControl.m_oLogicDocument.Is_TrackRevisions();
 };
-asc_docs_api.prototype.sync_ShowRevisionsChange = function(Change)
+asc_docs_api.prototype.sync_BeginCatchRevisionsChanges = function()
 {
-//    var document.
-//    alert(Change.get_Value());
-    this.asc_fireCallback("asc_onShowRevisionsChange", Change);
+    this.RevisionChangesStack = [];
 };
-asc_docs_api.prototype.sync_HideAllRevisionsChanges = function()
+asc_docs_api.prototype.sync_EndCatchRevisionsChanges = function()
 {
-    this.asc_fireCallback("asc_onHideAllRevisionsChanges");
+    this.asc_fireCallback("asc_onShowRevisionsChange", this.RevisionChangesStack);
+};
+
+asc_docs_api.prototype.sync_AddRevisionsChange = function(Change)
+{
+    this.RevisionChangesStack.push(Change);
 };
 
 function CRevisionsChange()

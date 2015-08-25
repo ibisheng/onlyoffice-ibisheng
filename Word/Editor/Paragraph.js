@@ -9226,7 +9226,7 @@ Paragraph.prototype =
                     Change.put_Type(c_oAscRevisionsChangeType.ParaPr);
                     Change.put_Value("Change paragraph properties.");
                     Change.put_XY(X, Y);
-                    editor.sync_ShowRevisionsChange(Change);
+                    editor.sync_AddRevisionsChange(Change);
                 }
 
                 var ReviewType = this.Get_ReviewType();
@@ -9236,7 +9236,7 @@ Paragraph.prototype =
                     Change.put_Type(c_oAscRevisionsChangeType.ParaAdd);
                     Change.put_Value("Add paragraph.");
                     Change.put_XY(X, Y);
-                    editor.sync_ShowRevisionsChange(Change);
+                    editor.sync_AddRevisionsChange(Change);
                 }
                 else if (reviewtype_Remove == ReviewType)
                 {
@@ -9244,7 +9244,7 @@ Paragraph.prototype =
                     Change.put_Type(c_oAscRevisionsChangeType.ParaRem);
                     Change.put_Value("Delete paragraph.");
                     Change.put_XY(X, Y);
-                    editor.sync_ShowRevisionsChange(Change);
+                    editor.sync_AddRevisionsChange(Change);
                 }
 
                 var CurPos = this.Get_ParaContentPos(false, false);
@@ -9257,7 +9257,7 @@ Paragraph.prototype =
                         Change.put_Type(c_oAscRevisionsChangeType.TextPr);
                         Change.put_Value("Change text properties.");
                         Change.put_XY(X, Y);
-                        editor.sync_ShowRevisionsChange(Change);
+                        editor.sync_AddRevisionsChange(Change);
                     }
 
                     var RunReviewType = Run.Get_ReviewType();
@@ -9267,7 +9267,7 @@ Paragraph.prototype =
                         Change.put_Type(c_oAscRevisionsChangeType.TextAdd);
                         Change.put_Value("Add text.");
                         Change.put_XY(X, Y);
-                        editor.sync_ShowRevisionsChange(Change);
+                        editor.sync_AddRevisionsChange(Change);
                     }
                     else if (reviewtype_Remove == RunReviewType)
                     {
@@ -9275,7 +9275,7 @@ Paragraph.prototype =
                         Change.put_Type(c_oAscRevisionsChangeType.TextRem);
                         Change.put_Value("Delete text.");
                         Change.put_XY(X, Y);
-                        editor.sync_ShowRevisionsChange(Change);
+                        editor.sync_AddRevisionsChange(Change);
                     }
                 }
             }
