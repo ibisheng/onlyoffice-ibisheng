@@ -1,7 +1,7 @@
 {
     "info": {
         "version": "3.5.0",
-        "build": 165
+        "build": 167
     },
     "update_src": {
         "revision": "HEAD",
@@ -10,7 +10,7 @@
     "concat_api": {
         "../../Word/api-all.js": [
             "../../Word/api.js",
-			"../../Word/Private/api.js",
+            "../../Word/Private/api.js",
             "../../Word/apiCommon.js"
         ]
     },
@@ -148,7 +148,6 @@
                 "../../Excel/model/Workbook.js",
                 "../../Excel/model/CellInfo.js",
                 "../../Excel/model/AdvancedOptions.js",
-
                 "../../Common/Locks.js"
             ],
             "dst": "../../Word/sdk-all.js",
@@ -158,8 +157,8 @@
                 "../../Common/3rdparty/Underscore/underscore-min.js",
                 "../../Common/3rdparty/Sockjs/sockjs-0.3.min.js",
                 "../../Common/3rdparty/XRegExp/xregexp-all-min.js",
-				"../../Common/3rdparty/jszip/jszip.min.js",
-				"../../Common/3rdparty/jszip-utils/jszip-utils.min.js"
+                "../../Common/3rdparty/jszip/jszip.min.js",
+                "../../Common/3rdparty/jszip-utils/jszip-utils.min.js"
             ],
             "map": "sdk-all.js.map",
             "log": "../../Word/Build/Log",
@@ -187,7 +186,7 @@
                 "cwd": "../../Word/",
                 "src": [
                     "api.js",
-					"Private/api.js",
+                    "Private/api.js",
                     "apiCommon.js",
                     "apiDefines.js"
                 ],
@@ -220,7 +219,7 @@
                 "src": [
                     "AllFonts.js",
                     "docscoapisettings.js",
-					"spellcheckapisettings.js",
+                    "spellcheckapisettings.js",
                     "commonDefines.js",
                     "apiCommon.js",
                     "downloaderfiles.js",
