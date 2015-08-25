@@ -106,7 +106,8 @@ var maxIndividualValues = 10000;
 		var g_oAutoFiltersOptionsProperties = {
 			cellId		: 0,
 			values		: 1,
-			filter		: 2
+			filter		: 2, 
+			automaticRowCount : 3
 		};
 		function AutoFiltersOptions () {
 
@@ -118,6 +119,7 @@ var maxIndividualValues = 10000;
 			this.values  = null;
 			this.filter  = null;
 			this.sortVal = null;
+			this.automaticRowCount = null;
 			
 			return this;
 		}
@@ -135,6 +137,7 @@ var maxIndividualValues = 10000;
 					case this.Properties.cellId: return this.cellId; break;
 					case this.Properties.values: return this.values; break;
 					case this.Properties.filter: return this.filter; break;
+					case this.Properties.automaticRowCount: return this.automaticRowCount; break;
 				}
 
 				return null;
@@ -144,6 +147,7 @@ var maxIndividualValues = 10000;
 					case this.Properties.cellId: this.cellId = value;break;
 					case this.Properties.values: this.values = value;break;
 					case this.Properties.filter: this.filter = value;break;
+					case this.Properties.automaticRowCount: this.automaticRowCount = value;break;
 				}
 			},
 			
@@ -152,6 +156,7 @@ var maxIndividualValues = 10000;
 			asc_setFilterObj : function(filter) { this.filter = filter; },
 			
 			asc_setSortState : function(sortVal) { this.sortVal = sortVal; },
+			asc_setAutomaticRowCount : function(val) { this.automaticRowCount = val; },
 			
 			asc_getCellId : function() { return this.cellId; },
 			asc_getValues : function() { return this.values; },
@@ -524,6 +529,15 @@ var maxIndividualValues = 10000;
 				if(allFilterOpenElements)
 					autoFilter.FilterColumns.splice(filterObj.index, 1);//if all rows opened
 				
+				//автоматическое расширение диапазона а/ф
+				if(autoFiltersObject.automaticRowCount && filterObj.filter && filterObj.filter.Ref && filterObj.filter.getType() === g_nFiltersType.autoFilter)
+				{
+					var currentDiff = filterObj.filter.Ref.r2 - filterObj.filter.Ref.r1;
+					var newDiff = autoFiltersObject.automaticRowCount - filterObj.filter.Ref.r1;
+					
+					if(newDiff > currentDiff)
+						filterObj.filter.changeRef(null, newDiff - currentDiff);
+				}
 				
 				//open/close rows
 				if(!bUndoChanges && !bRedoChanges)
@@ -696,7 +710,7 @@ var maxIndividualValues = 10000;
 									{
 										if(filter.FilterColumns[i].ColId === col - range.c1)
 										{
-											if(filter.FilterColumns[i].ShowButton !== false)
+											if(filter.FilterColumns[i].isApplyAutoFilter())
 												isSetFilter = true;
 											else
 												isShowButton = false;
@@ -2828,7 +2842,7 @@ var maxIndividualValues = 10000;
 			},
 			
 			//TODO пока включаю протестированную функцию. позже доработать функцию _getAdjacentCellsAF2, она работает быстрее!
-			_getAdjacentCellsAF: function(ar, aWs) 
+			_getAdjacentCellsAF: function(ar, aWs, ignoreAutoFilter) 
 			{
 				var ws = this.worksheet;
 				var cloneActiveRange = ar.clone(true); // ToDo слишком много клонирования
@@ -2993,7 +3007,7 @@ var maxIndividualValues = 10000;
 					//var oldFilters = this.allAutoFilter;
 					var oldFilters =[];
 							
-					if(aWs.AutoFilter)
+					if(aWs.AutoFilter && !ignoreAutoFilter)
 					{
 						oldFilters[0] = aWs.AutoFilter
 					}
@@ -3279,7 +3293,9 @@ var maxIndividualValues = 10000;
 				
 				//get values
 				var colId = filterProp.colId;
-				var values = this._getOpenAndClosedValues(autoFilter, colId);
+				var openAndClosedValues = this._getOpenAndClosedValues(autoFilter, colId);
+				var values = openAndClosedValues.values;
+				var automaticRowCount = openAndClosedValues.automaticRowCount
 				var filters = this._getFilterColumn(autoFilter, colId);	
 				
 				var rangeButton = Asc.Range(autoFilter.Ref.c1 + colId, autoFilter.Ref.r1, autoFilter.Ref.c1 + colId, autoFilter.Ref.r1);
@@ -3330,6 +3346,7 @@ var maxIndividualValues = 10000;
 				autoFilterObject.asc_setCellId(cellId);
 				autoFilterObject.asc_setValues(values);
 				autoFilterObject.asc_setFilterObj(filterObj);
+				autoFilterObject.asc_setAutomaticRowCount(automaticRowCount);
 				
 				ws.handlers.trigger("setAutoFiltersDialog", autoFilterObject);
 			},
@@ -3574,14 +3591,24 @@ var maxIndividualValues = 10000;
 						values[count] = tempResult;
 				};
 				
-
+				var maxFilterRow = ref.r2;
+				var automaticRowCount = null;
+				if(filter.getType() === g_nFiltersType.autoFilter && filter.isApplyAutoFilter() === false)//нужно подхватить нижние ячейки в случае, если это не применен а/ф
+				{
+					var automaticRange = this._getAdjacentCellsAF(filter.Ref, aWs, true);
+					automaticRowCount = automaticRange.r2;
+					
+					if(automaticRowCount > maxFilterRow)
+						maxFilterRow = automaticRowCount;
+				}
+				
 				var individualCount, count, tempResult;
 				var isCustomFilters = currentElemArray !== null && filterColumns[currentElemArray] && filterColumns[currentElemArray].CustomFiltersObj;
 				if(currentElemArray === null || (filterColumns[currentElemArray] && (filterColumns[currentElemArray].Filters || filterColumns[currentElemArray].Top10) || isCustomFilters))
 				{
 					individualCount = 0;
 					count = 0;
-					for(var i = ref.r1 + 1; i <= ref.r2; i++)
+					for(var i = ref.r1 + 1; i <= maxFilterRow; i++)
 					{
 						//max strings
 						if(individualCount > maxIndividualValues)
@@ -3659,7 +3686,7 @@ var maxIndividualValues = 10000;
 					}
 				}
 
-				return this._sortArrayMinMax(values);
+				return {values: this._sortArrayMinMax(values), automaticRowCount: automaticRowCount};
 			},
 			
 			_sortArrayMinMax: function(elements)
