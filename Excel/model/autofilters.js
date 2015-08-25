@@ -601,6 +601,7 @@ var maxIndividualValues = 10000;
 				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				var result = false;
+				var t = this;
 				
 				var checkFrozenArea = this._checkClickFrozenArea(x, y, offsetX, offsetY, frozenObj);
 				if(checkFrozenArea)
@@ -612,7 +613,7 @@ var maxIndividualValues = 10000;
 				var checkCurrentFilter = function(filter, num)
 				{
 					var range = new Asc.Range(filter.Ref.c1, filter.Ref.r1, filter.Ref.c2, filter.Ref.r1);
-					if(range.contains(c.col, r.row))
+					if(range.contains(c.col, r.row) && t._isShowButtonInFilter(c.col, filter))
 					{
 						var row = range.r1;
 						for(var col = range.c1; col <= range.c2; col++)
@@ -4575,6 +4576,32 @@ var maxIndividualValues = 10000;
 					return true;
 				
 				return false;
+			},
+			
+			_isShowButtonInFilter: function(col, filter)
+			{
+				var result = true;
+				var typeFilter = filter ? filter.getType() : null;
+				var autoFilter = typeFilter !== null && typeFilter === g_nFiltersType.autoFilter ? filter : filter.AutoFilter;
+				
+				if(autoFilter && autoFilter.FilterColumns)//проверяем скрытые ячейки
+				{
+					var colId = col - autoFilter.Ref.c1;
+					for(var i = 0; i < autoFilter.FilterColumns.length; i++)
+					{
+						if(autoFilter.FilterColumns[i].ColId === colId)
+						{
+							if(autoFilter.FilterColumns[i].ShowButton === false)
+								result = false;
+								
+							break;
+						}
+					}
+				}
+				else if(typeFilter !== g_nFiltersType.autoFilter && autoFilter === null)//если форматированная таблица и отсутсвует а/ф
+					result = false;
+				
+				return result;
 			}
 			
 		};
