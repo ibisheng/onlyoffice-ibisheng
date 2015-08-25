@@ -4517,7 +4517,16 @@ AutoFilter.prototype.isApplyAutoFilter = function() {
 	var res = false;
 	
 	if(this.FilterColumns && this.FilterColumns.length)
-		res = true;
+	{
+		for(var i = 0; i < this.FilterColumns.length; i++)
+		{
+			if(this.FilterColumns[i].isApplyAutoFilter())
+			{
+				res = true;
+				break;
+			}
+		}
+	}
 		
 	return res;
 };
@@ -4531,7 +4540,7 @@ AutoFilter.prototype.isApplySortConditions = function() {
 	return res;
 };
 
-AutoFilter.prototype.getType = function(F)
+AutoFilter.prototype.getType = function()
 {
 	return g_nFiltersType.autoFilter;
 };
@@ -4696,6 +4705,15 @@ FilterColumn.prototype.createFilter = function(obj) {
 	
 	return allFilterOpenElements;
 };
+FilterColumn.prototype.isApplyAutoFilter = function() {
+	var res = false;
+	
+	if(this.Filters !== null || this.CustomFiltersObj !== null || this.DynamicFilter !== null || this.ColorFilter !== null || this.Top10 !== null)
+		res = true;
+		
+	return res;
+};
+
 /** @constructor */
 function Filters() {
 	this.Values = {};
