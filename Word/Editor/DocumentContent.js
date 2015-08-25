@@ -7067,9 +7067,9 @@ CDocumentContent.prototype =
                 if (docpostype_DrawingObjects === this.LogicDocument.CurPos.Type && true !== ParaPr.Locked)
                 {
                     var ParaDrawing = this.LogicDocument.DrawingObjects.getMajorParaDrawing();
-                    if (ParaDrawing.Parent instanceof Paragraph)
+                    if (ParaDrawing)
                     {
-                        ParaPr.Locked = ParaDrawing.Parent.Lock.Is_Locked();
+                        ParaPr.Locked = ParaDrawing.Lock.Is_Locked();
                     }
                 }
             }
