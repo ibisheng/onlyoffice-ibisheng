@@ -3088,7 +3088,7 @@ var maxIndividualValues = 10000;
 					{
 						cell = aWs.getCell3(row, col);
 						var isMerged = cell.hasMerged();
-						var isMergedAllRow = (isMerged.c2 + 1 == gc_nMaxCol && isMerged.c1 === 0) ? true : false;//если замержена вся ячейка
+						var isMergedAllRow = (isMerged && isMerged.c2 + 1 == gc_nMaxCol && isMerged.c1 === 0) ? true : false;//если замержена вся ячейка
 						
 						if((isMerged && isMerged.c2 != col && !isMergedAllRow) || (isMergedAllRow && col !== ref.c1))
 						{	
