@@ -1408,7 +1408,7 @@ function asc_ReadCBorder(s, p) {
     return null;
 }
 function asc_ReadAdjustPrint(s, p) {
-    var adjustPrint = new asc_CAdjustPrint();
+    var adjustPrint = new asc.asc_CAdjustPrint();
 
     var next = true;
     while (next)
@@ -1438,7 +1438,7 @@ function asc_ReadAdjustPrint(s, p) {
     return adjustPrint;
 }
 function asc_ReadCPageMargins(s, p) {
-    var pageMargins = new asc_CPageMargins();
+    var pageMargins = new Asc.asc_CPageMargins();
 
     var next = true;
     while (next)
@@ -1479,7 +1479,7 @@ function asc_ReadCPageMargins(s, p) {
     return pageMargins;
 }
 function asc_ReadCPageSetup(s, p) {
-    var pageSetup = new asc_CPageSetup();
+    var pageSetup = new Asc.asc_CPageSetup();
 
     var next = true;
     while (next)
@@ -1515,7 +1515,7 @@ function asc_ReadCPageSetup(s, p) {
     return pageSetup;
 }
 function asc_ReadPageOptions(s, p) {
-    var pageOptions = new asc_CPageOptions();
+    var pageOptions = new Asc.asc_CPageOptions();
 
     var next = true;
     while (next)
@@ -2128,8 +2128,8 @@ function OfflineEditor () {
         var pagesData   = _api.wb.calcPagesPrint(adjustPrint);
         var pdfWriter   = new CPdfPrinter(_api.wbModel.sUrlPath);
         var isEndPrint  = _api.wb.printSheet(pdfWriter, pagesData);
-
-        return pdfWriter.DocumentRenderer.Memory.GetBase64Memory();
+        var str =  pdfWriter.DocumentRenderer.Memory.GetBase64Memory();
+        return str;
     };
 }
 var _s = new OfflineEditor();
