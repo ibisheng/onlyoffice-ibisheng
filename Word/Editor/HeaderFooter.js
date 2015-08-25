@@ -1131,7 +1131,19 @@ CHeaderFooter.prototype =
     {
         return this.Content.CanAdd_Comment();
     }
-}
+};
+CHeaderFooter.prototype.Get_SectPr = function()
+{
+    if (this.LogicDocument)
+    {
+        var SectionsInfo = this.LogicDocument.SectionsInfo;
+        var Index = SectionsInfo.Find_ByHdrFtr(this);
+        if (-1 !== Index)
+            return SectionsInfo.Get_SectPr2(Index).SectPr;
+    }
+
+    return null;
+};
 
 //-----------------------------------------------------------------------------------
 // Класс для работы с колонтитулами

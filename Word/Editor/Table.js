@@ -19710,6 +19710,17 @@ CTable.prototype.Get_ReviewType = function()
 {
     return reviewtype_Common;
 };
+CTable.prototype.Get_SectPr = function()
+{
+    if (this.Parent && this.Parent.Get_SectPr)
+    {
+        this.Parent.Update_ContentIndexing();
+        return this.Parent.Get_SectPr(this.Index);
+    }
+
+    return null;
+};
+
 
 // Класс CTableRow
 function CTableRow(Table, Cols, TableGrid)
@@ -23178,6 +23189,13 @@ CTableCell.prototype.Is_EmptyFirstPage = function()
         return true;
 
     return false;
+};
+CTableCell.prototype.Get_SectPr = function()
+{
+    if (this.Row && this.Row.Table && this.Row.Table)
+        return this.Row.Table.Get_SectPr();
+
+    return null;
 };
 
 

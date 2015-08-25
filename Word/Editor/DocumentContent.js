@@ -9360,6 +9360,13 @@ CDocumentContent.prototype.Is_TrackRevisions = function()
 
     return false;
 };
+CDocumentContent.prototype.Get_SectPr = function()
+{
+    if (this.Parent && this.Parent.Get_SectPr)
+        return this.Parent.Get_SectPr();
+
+    return null;
+};
 
 function CDocumentContentStartState(DocContent)
 {

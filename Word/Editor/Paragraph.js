@@ -12952,7 +12952,20 @@ Paragraph.prototype.Is_TrackRevisions = function()
 
     return false;
 };
+/**
+ * Отличие данной функции от Get_SectionPr в том, что здесь возвращаются настройки секции, к которой
+ * принадлежит данный параграф, а там конкретно настройки секции, которыы лежат в данном параграфе.
+ */
+Paragraph.prototype.Get_SectPr = function()
+{
+    if (this.Parent && this.Parent.Get_SectPr)
+    {
+        this.Parent.Update_ContentIndexing();
+        return this.Parent.Get_SectPr(this.Index);
+    }
 
+    return null;
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;

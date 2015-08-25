@@ -14722,6 +14722,10 @@ CDocument.prototype.TurnOnHistory = function()
     this.TableId.TurnOn();
     this.History.TurnOn();
 };
+CDocument.prototype.Get_SectPr = function(Index)
+{
+    return this.SectionsInfo.Get_SectPr(Index).SectPr;
+};
 //-----------------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------------
