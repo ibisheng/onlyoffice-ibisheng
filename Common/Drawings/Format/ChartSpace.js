@@ -2197,7 +2197,7 @@ CChartSpace.prototype =
             this.recalcInfo.recalculateBBox = false;
         }
         var oRet = null;
-        if(this.bbox.seriesBBox && isRealBool(this.bbox.seriesBBox.bVert))
+        if(this.bbox && this.bbox.seriesBBox && isRealBool(this.bbox.seriesBBox.bVert))
         {
             oRet = {r1: this.bbox.seriesBBox.r1, r2: this.bbox.seriesBBox.r2, c1: this.bbox.seriesBBox.c1, c2: this.bbox.seriesBBox.c2};
             if(this.bbox.seriesBBox.bVert)
