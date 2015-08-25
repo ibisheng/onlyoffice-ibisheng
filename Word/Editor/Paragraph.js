@@ -8837,7 +8837,8 @@ Paragraph.prototype =
                     PageLimits = LD_PageLimits;
                 }
 
-                var Layout = new CParagraphLayout(DrawingLayout.X, DrawingLayout.Y , this.Get_StartPage_Absolute() + CurPage, DrawingLayout.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y);
+                var ParagraphTop = this.Lines[Para.Pages[CurPage].StartLine].Top + this.Pages[CurPage].Y;
+                var Layout = new CParagraphLayout(DrawingLayout.X, DrawingLayout.Y , this.Get_StartPage_Absolute() + CurPage, DrawingLayout.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, ParagraphTop);
                 return {ParagraphLayout : Layout, PageLimits : PageLimits};
             }
         }

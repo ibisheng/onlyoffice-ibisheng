@@ -4891,41 +4891,59 @@ ParaDrawing.prototype =
     {
         if ( null !== NearPos )
         {
-            var Layout = NearPos.Paragraph.Get_Layout( NearPos.ContentPos, this );
-
-            var _W = (this.PositionH.Align ? this.Extent.W : this.getXfrmExtX() );
-            var _H = (this.PositionV.Align ? this.Extent.H : this.getXfrmExtY() );
-
-            this.Internal_Position.Set(_W, _H, this.YOffset, Layout.ParagraphLayout, Layout.PageLimits);
-            this.Internal_Position.Calculate_X(false, c_oAscRelativeFromH.Page, false, X - Layout.PageLimits.X);
-            this.Internal_Position.Calculate_Y(false, c_oAscRelativeFromV.Page, false, Y - Layout.PageLimits.Y);
-            this.Internal_Position.Correct_Values(false, Layout.PageLimits, this.AllowOverlap, this.Use_TextWrap(), []);
-
-            this.PageNum = PageNum;
-            this.X       = this.Internal_Position.CalcX;
-            this.Y       = this.Internal_Position.CalcY;
-
-            // Рассчитаем сдвиг с учетом старой привязки
-            var ValueX = this.Internal_Position.Calculate_X_Value(this.PositionH.RelativeFrom);
-            this.Set_PositionH( this.PositionH.RelativeFrom, false, ValueX );
-
-            // На всякий случай пересчитаем заново координату
-            this.X = this.Internal_Position.Calculate_X(false, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
-
-            // Рассчитаем сдвиг с учетом старой привязки
-            var ValueY = this.Internal_Position.Calculate_Y_Value(this.PositionV.RelativeFrom);
-            this.Set_PositionV( this.PositionV.RelativeFrom, false, ValueY );
-
-            // На всякий случай пересчитаем заново координату
-            this.Y = this.Internal_Position.Calculate_Y(false, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
+            var Layout = NearPos.Paragraph.Get_Layout(NearPos.ContentPos, this);
+            this.private_SetXYByLayout(X, Y, PageNum, Layout, true, true);
         }
     },
 
     Set_XY : function(X, Y, Paragraph, PageNum, bResetAlign)
     {
-        //TODO: Реализовать
-        this.Set_PositionH( c_oAscRelativeFromH.Page, false, X );
-        this.Set_PositionV( c_oAscRelativeFromV.Page, false, Y );
+        if (Paragraph)
+        {
+            var ContentPos = Paragraph.Get_DrawingObjectContentPos(this.Get_Id());
+            if (null === ContentPos)
+                return;
+
+            var Layout = Paragraph.Get_Layout(ContentPos, this);
+            this.private_SetXYByLayout(X, Y, PageNum, Layout, (bResetAlign || true !== this.PositionH.Align ? true : false), (bResetAlign || true !== this.PositionV.Align ? true : false));
+        }
+    },
+
+    private_SetXYByLayout : function(X, Y, PageNum, Layout, bChangeX, bChangeY)
+    {
+        this.PageNum = PageNum;
+
+        var _W = (this.PositionH.Align ? this.Extent.W : this.getXfrmExtX() );
+        var _H = (this.PositionV.Align ? this.Extent.H : this.getXfrmExtY() );
+
+        this.Internal_Position.Set(_W, _H, this.YOffset, Layout.ParagraphLayout, Layout.PageLimits);
+        this.Internal_Position.Calculate_X(false, c_oAscRelativeFromH.Page, false, X - Layout.PageLimits.X);
+        this.Internal_Position.Calculate_Y(false, c_oAscRelativeFromV.Page, false, Y - Layout.PageLimits.Y);
+        this.Internal_Position.Correct_Values(false, Layout.PageLimits, this.AllowOverlap, this.Use_TextWrap(), []);
+
+        if (true === bChangeX)
+        {
+            this.X = this.Internal_Position.CalcX;
+
+            // Рассчитаем сдвиг с учетом старой привязки
+            var ValueX = this.Internal_Position.Calculate_X_Value(this.PositionH.RelativeFrom);
+            this.Set_PositionH(this.PositionH.RelativeFrom, false, ValueX);
+
+            // На всякий случай пересчитаем заново координату
+            this.X = this.Internal_Position.Calculate_X(false, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
+        }
+
+        if (true === bChangeY)
+        {
+            this.Y = this.Internal_Position.CalcY;
+
+            // Рассчитаем сдвиг с учетом старой привязки
+            var ValueY = this.Internal_Position.Calculate_Y_Value(this.PositionV.RelativeFrom);
+            this.Set_PositionV(this.PositionV.RelativeFrom, false, ValueY);
+
+            // На всякий случай пересчитаем заново координату
+            this.Y = this.Internal_Position.Calculate_Y(false, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
+        }
     },
 
     Get_DrawingType : function()
