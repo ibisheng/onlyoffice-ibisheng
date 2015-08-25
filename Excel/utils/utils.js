@@ -496,7 +496,7 @@
 		ActiveRange.prototype.containsRange = function () {
 			return ActiveRange.superclass.containsRange.apply(this, arguments);
 		};
-		ActiveRange.prototype.containsFirstLine = function () {
+		ActiveRange.prototype.containsFirstLineRange = function () {
 			return ActiveRange.superclass.containsFirstLineRange.apply(this, arguments);
 		};
 		ActiveRange.prototype.intersection = function () {
