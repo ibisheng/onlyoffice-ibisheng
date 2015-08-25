@@ -4999,7 +4999,7 @@ CustomFilter.prototype.init = function(operator, val) {
 CustomFilter.prototype.isHideValue = function(val) {
 
 	var result = false;
-
+	var isDigitValue = isNaN(val) ? false : true;
 	var checkComplexSymbols = null;
 	var filterVal, position;
 	if(checkComplexSymbols != null)
@@ -5054,14 +5054,14 @@ CustomFilter.prototype.isHideValue = function(val) {
 			switch (this.Operator)
 			{
 				case c_oAscCustomAutoFilter.beginsWith:
-					if(type == 1)
+					if(!isDigitValue)
 					{
 						if(val.search(filterVal) == 0)//beginsWith
 							result = true;
 					}
 					break;
 				case c_oAscCustomAutoFilter.doesNotBeginWith: 
-					if(type == 1)
+					if(!isDigitValue)
 					{
 						if(val.search(filterVal) != 0)//doesNotBeginWith
 							result = true;
@@ -5071,7 +5071,7 @@ CustomFilter.prototype.isHideValue = function(val) {
 					break;
 				case c_oAscCustomAutoFilter.endsWith: 
 					position = val.length - filterVal.length;
-					if(type == 1)
+					if(!isDigitValue)
 					{
 						if(val.lastIndexOf(filterVal) == position && position > 0)//endsWith
 							result = true;
@@ -5079,7 +5079,7 @@ CustomFilter.prototype.isHideValue = function(val) {
 					break;
 				case c_oAscCustomAutoFilter.doesNotEndWith: 
 					position = val.length - filterVal.length;
-					if(type == 1)
+					if(!isDigitValue)
 					{
 						if(val.lastIndexOf(filterVal) != position && position > 0)//doesNotEndWith
 							result = true;
@@ -5088,14 +5088,14 @@ CustomFilter.prototype.isHideValue = function(val) {
 						result = true;
 					break;
 				case c_oAscCustomAutoFilter.contains: 
-					if(type == 1)
+					if(!isDigitValue)
 					{
 						if(val.search(filterVal) != -1)//contains
 							result = true;
 					}
 					break;
 				case c_oAscCustomAutoFilter.doesNotContain: 
-					if(type == 1)
+					if(!isDigitValue)
 					{
 						if(val.search(filterVal) == -1)//doesNotContain
 							result = true;
