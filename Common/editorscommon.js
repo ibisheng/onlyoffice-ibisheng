@@ -1,5 +1,16 @@
 ﻿"use strict";
 
+if (typeof String.prototype.startsWith != 'function') {
+	String.prototype.startsWith = function (str){
+		return this.indexOf(str) === 0;
+	};
+}
+if (typeof String.prototype.endsWith !== 'function') {
+	String.prototype.endsWith = function(suffix) {
+		return this.indexOf(suffix, this.length - suffix.length) !== -1;
+	};
+}
+
 var g_sMainServiceLocalUrl = "/CanvasService.ashx";
 var g_sResourceServiceLocalUrl = "/ResourceService.ashx?path=";
 var g_sUploadServiceLocalUrl = "/UploadService.ashx";
