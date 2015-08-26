@@ -7920,48 +7920,62 @@
 		WorksheetView.prototype.moveRangeHandle = function (arnFrom, arnTo, copyRange){
 			var t = this;
 			var onApplyMoveRangeHandleCallback = function (isSuccess) {
-				if (false === isSuccess || false === t.autoFilters.isCheckMoveRange(arnFrom)) {
+				if (false === isSuccess) {
 					t._cleanSelectionMoveRange();
 					return;
 				}
-
-				// Очищаем выделение
-				t.cleanSelection();
-
-				//ToDo t.cleanDepCells();
-				History.Create_NewPoint();
-				History.SetSelection(arnFrom.clone());
-				History.SetSelectionRedo(arnTo.clone());
-				History.StartTransaction();
 				
-				t.autoFilters._preMoveAutoFilters(arnFrom, arnTo, copyRange);
+				var onApplyMoveAutoFiltersCallback = function(isSuccess)
+				{
+					if (false === isSuccess)
+						return;
+					
+					// Очищаем выделение
+					t.cleanSelection();
+
+					//ToDo t.cleanDepCells();
+					History.Create_NewPoint();
+					History.SetSelection(arnFrom.clone());
+					History.SetSelectionRedo(arnTo.clone());
+					History.StartTransaction();
+					
+					t.autoFilters._preMoveAutoFilters(arnFrom, arnTo, copyRange);
+					
+					t.model._moveRange(arnFrom, arnTo, copyRange);
+					t.cellCommentator.moveRangeComments(arnFrom, arnTo);
+					t.objectRender.moveRangeDrawingObject(arnFrom, arnTo);
+					
+					t.autoFilters._moveAutoFilters(arnTo, arnFrom, null, copyRange, true);
+					// Вызываем функцию пересчета для заголовков форматированной таблицы
+					t.autoFilters.renameTableColumn(arnFrom);
+					t.autoFilters.renameTableColumn(arnTo);
+					t.autoFilters.reDrawFilter(arnFrom);
+
+					History.EndTransaction();
+
+					t._updateCellsRange(arnTo, false, true);
+					t.activeRange = arnTo.clone(true);
+					// Сбрасываем параметры
+					t.activeMoveRange = null;
+					t.startCellMoveRange = null;
+					t._updateCellsRange(arnFrom, false, true);
+					// Тут будет отрисовка select-а
+					t._recalculateAfterUpdate([arnFrom, arnTo]);
+
+					// Вызовем на всякий случай, т.к. мы можем уже обновиться из-за формул ToDo возможно стоит убрать это в дальнейшем (но нужна переработка формул) - http://bugzserver/show_bug.cgi?id=24505
+					t._updateSelectionNameAndInfo();
+				}
 				
-				t.model._moveRange(arnFrom, arnTo, copyRange);
-				t.cellCommentator.moveRangeComments(arnFrom, arnTo);
-				t.objectRender.moveRangeDrawingObject(arnFrom, arnTo);
-
-				t.autoFilters._moveAutoFilters(arnTo, arnFrom, null, copyRange);
-				// Вызываем функцию пересчета для заголовков форматированной таблицы
-				t.autoFilters.renameTableColumn(arnFrom);
-				t.autoFilters.renameTableColumn(arnTo);
-				t.autoFilters.reDrawFilter(arnFrom);
-
-				History.EndTransaction();
-
-				t._updateCellsRange(arnTo, false, true);
-				t.activeRange = arnTo.clone(true);
-				// Сбрасываем параметры
-				t.activeMoveRange = null;
-				t.startCellMoveRange = null;
-				t._updateCellsRange(arnFrom, false, true);
-				// Тут будет отрисовка select-а
-				t._recalculateAfterUpdate([arnFrom, arnTo]);
-
-				// Вызовем на всякий случай, т.к. мы можем уже обновиться из-за формул ToDo возможно стоит убрать это в дальнейшем (но нужна переработка формул) - http://bugzserver/show_bug.cgi?id=24505
-				t._updateSelectionNameAndInfo();
+				if(t.autoFilters._searchFiltersInRange(arnFrom))
+					t._isLockedAll(onApplyMoveAutoFiltersCallback);
+				else
+					onApplyMoveAutoFiltersCallback();
 			};
-
-			this._isLockedCells([arnFrom, arnTo], null, onApplyMoveRangeHandleCallback);
+			
+			if(t.autoFilters.isCheckMoveRange(arnFrom))
+				this._isLockedCells([arnFrom, arnTo], null, onApplyMoveRangeHandleCallback);
+			else
+				this._cleanSelectionMoveRange();
 		};
 
 		WorksheetView.prototype.emptySelection = function (options) {

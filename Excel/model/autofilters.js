@@ -1667,7 +1667,7 @@ var maxIndividualValues = 10000;
 				}
 			},
 			
-			_moveAutoFilters: function(arnTo, arnFrom, data, copyRange)
+			_moveAutoFilters: function(arnTo, arnFrom, data, copyRange, offLock)
 			{
 				//проверяем покрывает ли диапазон хотя бы один автофильтр
 				var ws = this.worksheet;
@@ -1687,11 +1687,11 @@ var maxIndividualValues = 10000;
 				
 				if(copyRange)
 				{
-					this._cloneCtrlAutoFilters(arnTo, arnFrom);
+					this._cloneCtrlAutoFilters(arnTo, arnFrom, offLock);
 				}
 				else
 				{
-					var findFilters = this._searchFiltersInRange(arnFrom , aWs);
+					var findFilters = this._searchFiltersInRange(arnFrom);
 					if(findFilters)
 					{
 						var diffCol = arnTo.c1 - arnFrom.c1;
@@ -4163,7 +4163,7 @@ var maxIndividualValues = 10000;
 				
 				if(!copyRange)
 				{
-					var findFilters = this._searchFiltersInRange(arnFrom , aWs);
+					var findFilters = this._searchFiltersInRange(arnFrom);
 					if(findFilters)
 					{
 						for(var i = 0; i < findFilters.length; i++)
@@ -4191,7 +4191,7 @@ var maxIndividualValues = 10000;
 					}
 					
 					//TODO пока будем всегда чистить фильтры, которые будут в месте вставки. Позже сделать аналогично MS либо пересмотреть все возможные ситуации.
-					var findFiltersTo = this._searchFiltersInRange(arnTo , aWs);
+					var findFiltersTo = this._searchFiltersInRange(arnTo);
 					if(arnTo && findFiltersTo)
 					{
 						for(var i = 0; i < findFiltersTo.length; i++)
@@ -4226,35 +4226,33 @@ var maxIndividualValues = 10000;
 				}
 			},
 			
-			_searchFiltersInRange: function(range, aWs)//find filters in this range
+			_searchFiltersInRange: function(range, bFindOnlyTableParts)//find filters in this range
 			{
 				var result = [];
-				var rangeFilter;
-				//var range  = this._getAscRange(range);
-				if(aWs.AutoFilter)
+				var aWs = this._getCurrentWS();
+				range = Asc.Range(range.c1, range.r1, range.c2, range.r2);
+				
+				if(aWs.AutoFilter && !bFindOnlyTableParts)
 				{
-					rangeFilter = aWs.AutoFilter.Ref;
-					if(range.c1 <= rangeFilter.c1 && range.r1 <= rangeFilter.r1 && range.c2 >= rangeFilter.c2 && range.r2 >= rangeFilter.r2)
-					{
+					if(range.containsRange(aWs.AutoFilter.Ref))
 						result[result.length] = aWs.AutoFilter;
-					}
 				}
+				
 				if(aWs.TableParts)
 				{
-					for(var k = 0; k < aWs.TableParts.length; k++)
+					for(var i = 0; i < aWs.TableParts.length; i++)
 					{
-						if(aWs.TableParts[k])
+						if(aWs.TableParts[i])
 						{
-							rangeFilter = aWs.TableParts[k].Ref;
-							if(range.c1 <= rangeFilter.c1 && range.r1 <= rangeFilter.r1 && range.c2 >= rangeFilter.c2 && range.r2 >= rangeFilter.r2)
-							{
-								result[result.length] = aWs.TableParts[k];
-							}
+							if(range.containsRange(aWs.TableParts[i].Ref))
+								result[result.length] = aWs.TableParts[i];
 						}
 					}
 				}
+				
 				if(!result.length)
 					result = false;
+				
 				return result;
 			},
 			
@@ -4304,10 +4302,10 @@ var maxIndividualValues = 10000;
 				return result;
 			},
 			
-			_cloneCtrlAutoFilters: function(arnTo, arnFrom)
+			_cloneCtrlAutoFilters: function(arnTo, arnFrom, offLock)
 			{
 				var aWs = this._getCurrentWS();
-				var findFilters = this._searchFiltersInRange(arnFrom , aWs);
+				var findFilters = this._searchFiltersInRange(arnFrom);
 				
 				if(findFilters && findFilters.length)
 				{
@@ -4324,7 +4322,7 @@ var maxIndividualValues = 10000;
 							bWithoutFilter = findFilters[i].AutoFilter === null;
 							
 							if(!ref.intersection(newRange) && !this._intersectionRangeWithTableParts(newRange, aWs, arnFrom))
-								this.addAutoFilter(findFilters[i].TableStyleInfo.Name, newRange);
+								this.addAutoFilter(findFilters[i].TableStyleInfo.Name, newRange, null, offLock);
 						}
 					}
 				}
