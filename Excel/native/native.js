@@ -1910,6 +1910,8 @@ function OfflineEditor () {
 
         for (var i = 0; i < _api.asc_getWorksheetsCount(); ++i) {
 
+            var viewSettings = _api.wb.getWorksheet(i).getSheetViewSettings();
+
             if (_api.asc_getWorksheetTabColor(i)) {
                 _stream["WriteByte"](1);
             } else {
@@ -1921,6 +1923,9 @@ function OfflineEditor () {
             _stream['WriteBool'](_api.asc_isWorksheetHidden(i));
             _stream['WriteBool'](_api.asc_isWorkbookLocked(i));
             _stream['WriteBool'](_api.asc_isWorksheetLockedOrDeleted(i));
+            _stream['WriteBool'](viewSettings.asc_getShowGridLines());
+            _stream['WriteBool'](viewSettings.asc_getShowRowColHeaders());
+            _stream['WriteBool'](viewSettings.asc_getIsFreezePane());
 
             if (_api.asc_getWorksheetTabColor(i))
                 asc_menu_WriteColor(0, _api.asc_getWorksheetTabColor(i), _stream);
@@ -1933,6 +1938,9 @@ function OfflineEditor () {
         }
     };
     this.asc_writeWorksheet = function(i) {
+
+        var viewSettings = _api.wb.getWorksheet(i).getSheetViewSettings();
+
         var _stream = global_memory_stream_menu;
         _stream["ClearNoAttack"]();
 
@@ -1947,6 +1955,9 @@ function OfflineEditor () {
         _stream['WriteBool'](_api.asc_isWorksheetHidden(i));
         _stream['WriteBool'](_api.asc_isWorkbookLocked(i));
         _stream['WriteBool'](_api.asc_isWorksheetLockedOrDeleted(i));
+        _stream['WriteBool'](viewSettings.asc_getShowGridLines());
+        _stream['WriteBool'](viewSettings.asc_getShowRowColHeaders());
+        _stream['WriteBool'](viewSettings.asc_getIsFreezePane());
 
         if (_api.asc_getWorksheetTabColor(i)) {
             asc_menu_WriteColor(0, _api.asc_getWorksheetTabColor(i), _stream);
@@ -2709,6 +2720,24 @@ function offline_apply_event(type,params) {
                     case 4: // hidden
                     {
                         _api.asc_hideWorksheet();
+                        _s.asc_WriteAllWorksheets(true);
+                        break;
+                    }
+
+                    case 5: // show gridlines
+                    {
+                        var isLines = _api.asc_getSheetViewSettings();
+                        isLines.asc_setShowGridLines(params[_current.pos++]);
+                        _api.asc_setSheetViewSettings(isLines);
+                        _s.asc_WriteAllWorksheets(true);
+                        break;
+                    }
+
+                    case 6: // row col headers
+                    {
+                        var isHeaders = _api.asc_getSheetViewSettings();
+                        isHeaders.asc_setShowRowColHeaders(params[_current.pos++]);
+                        _api.asc_setSheetViewSettings(isHeaders);
                         _s.asc_WriteAllWorksheets(true);
                         break;
                     }

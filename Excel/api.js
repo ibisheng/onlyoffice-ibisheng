@@ -2388,7 +2388,17 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 
 		spreadsheet_api.prototype.asc_findText = function (options) {
-			var d = this.wb.findCellText(options);
+            if (window["NATIVE_EDITOR_ENJINE"]) {
+                if (this.wb.findCellText(options)) {
+                    var ws = this.wb.getWorksheet();
+                    return [ws.getCellLeftRelative(ws.activeRange.c1, 0),
+                        ws.getCellTopRelative(ws.activeRange.r1, 0)];
+                }
+
+                return null;
+            }
+
+            var d = this.wb.findCellText(options);
 			if (d) {
 				if (d.deltaX) {this.controller.scrollHorizontal(d.deltaX);}
 				if (d.deltaY) {this.controller.scrollVertical(d.deltaY);}
