@@ -15696,7 +15696,7 @@ CTable.prototype =
         if ( true === this.Is_Inline() && 0 === CurPage )
         {
             this.AnchorPosition.CalcY = this.Y;
-            this.AnchorPosition.Set_Y( this.Pages[CurPage].Height, this.Y, LD_PageFields.Y, LD_PageFields.YLimit, LD_PageLimits.YLimit, PageLimits.Y, PageLimits.YLimit );
+            this.AnchorPosition.Set_Y(this.Pages[CurPage].Height, this.Y, LD_PageFields.Y, LD_PageFields.YLimit, LD_PageLimits.YLimit, PageLimits.Y, PageLimits.YLimit, PageLimits.Y, PageLimits.YLimit);
         }
         else if ( true != this.Is_Inline() && ( 0 === CurPage || ( 1 === CurPage && false === this.RowsInfo[0].FirstPage ) ) )
         {
