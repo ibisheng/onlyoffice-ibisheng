@@ -1668,7 +1668,7 @@ Paragraph.prototype.private_RecalculateRange           = function(CurRange, CurL
 
         if ( ( 0 === Pos && 0 === CurLine && 0 === CurRange ) || Pos !== StartPos )
         {
-            Item.Recalculate_Reset( CurRange, CurLine );
+            Item.Recalculate_Reset( CurRange, CurLine, PRS.RecalcResult);
         }
 
         PRS.Update_CurPos( Pos, 0 );
