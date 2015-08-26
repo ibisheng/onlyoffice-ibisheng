@@ -1273,7 +1273,7 @@
 		 * @returns {Number}
 		 */
 		WorksheetView.prototype._calcRowDescender = function (fontSize) {
-			return asc_calcnpt(fontSize * (this.vspRatio - 1), this._getPPIY());
+			return asc_calcnpt(fontSize * (this.vspRatio - 1), this._getPPIY()); // ToDo возможно стоит тоже использовать 96
 		};
 
 		/** Вычисляет ширину колонки заголовков (в pt) */
@@ -4963,10 +4963,10 @@
 		 */
 		WorksheetView.prototype._roundTextMetrics = function (tm) {
 			tm.width    = asc_calcnpt( tm.width, this._getPPIX() );
-			tm.height   = asc_calcnpt( tm.height, this._getPPIY() );
-			tm.baseline = asc_calcnpt( tm.baseline, this._getPPIY() );
+			tm.height   = asc_calcnpt(tm.height, 96);
+			tm.baseline = asc_calcnpt(tm.baseline, 96);
 			if (tm.centerline !== undefined) {
-				tm.centerline = asc_calcnpt( tm.centerline, this._getPPIY() );
+				tm.centerline = asc_calcnpt(tm.centerline, 96);
 			}
 			return tm;
 		};
@@ -4986,7 +4986,7 @@
 		WorksheetView.prototype._calcTextVertPos = function (y1, y2, baseline, tm, valign) {
 			switch (valign) {
 				case kvaCenter:
-					return asc_calcnpt(0.5 * (y1 + y2 - tm.height), this._getPPIY()) - this.height_1px;
+					return asc_calcnpt(0.5 * (y1 + y2 - tm.height), this._getPPIY()) - this.height_1px; // ToDo возможно стоит тоже использовать 96
 				case kvaTop:
 					return y1 - this.height_1px;
 				default:
@@ -7927,8 +7927,10 @@
 				
 				var onApplyMoveAutoFiltersCallback = function(isSuccess)
 				{
-					if (false === isSuccess)
+					if (false === isSuccess) {
+						t._cleanSelectionMoveRange();
 						return;
+					}
 					
 					// Очищаем выделение
 					t.cleanSelection();
@@ -7964,7 +7966,7 @@
 
 					// Вызовем на всякий случай, т.к. мы можем уже обновиться из-за формул ToDo возможно стоит убрать это в дальнейшем (но нужна переработка формул) - http://bugzserver/show_bug.cgi?id=24505
 					t._updateSelectionNameAndInfo();
-				}
+				};
 				
 				if(t.autoFilters._searchFiltersInRange(arnFrom))
 					t._isLockedAll(onApplyMoveAutoFiltersCallback);
@@ -7972,7 +7974,7 @@
 					onApplyMoveAutoFiltersCallback();
 			};
 			
-			if(t.autoFilters.isCheckMoveRange(arnFrom))
+			if (this.autoFilters.isCheckMoveRange(arnFrom))
 				this._isLockedCells([arnFrom, arnTo], null, onApplyMoveRangeHandleCallback);
 			else
 				this._cleanSelectionMoveRange();
@@ -10480,7 +10482,7 @@
 		};
 
 		WorksheetView.prototype._isFormula = function (val) {
-			return val.length > 0 && val[0].text.length > 1 && val[0].text.charAt(0) === "=" ? true : false;
+			return (0 < val.length && 1 < val[0].text.length && '=' === val[0].text.charAt(0));
 		};
 
 		WorksheetView.prototype.getActiveCell = function (x, y, isCoord) {
