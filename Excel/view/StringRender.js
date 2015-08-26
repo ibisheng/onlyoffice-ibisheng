@@ -550,9 +550,10 @@
 			return tw * this.ratio;
 		};
 
-		StringRender.prototype._calcLineMetrics = function (f, va, fm, ppi) {
+		StringRender.prototype._calcLineMetrics = function (f, va, fm) {
 			var l = new lineMetrics();
 
+			var ppi = 96;
 			var hpt = f * 1.275;
 			var fpx = f * ppi / 72;
 			var topt = 72 / ppi;
@@ -618,7 +619,6 @@
 		StringRender.prototype._calcTextMetrics = function (dontCalcRepeatChars) {
 			var self = this, i = 0, p, p_, lm, beg = 0;
 			var l = new LineInfo(), TW = 0, TH = 0, BL = 0, CL = 0;
-			var ppi = this.drawingCtx.getPPIY();
 
 			function addLine(b, e) {
 				if (-1 !== b)
@@ -634,7 +634,7 @@
 			if (0 >= this.chars.length) {
 				p = this.charProps[0];
 				if (p && p.font) {
-					lm = this._calcLineMetrics(p.fsz !== undefined ? p.fsz : p.font.FontSize, p.va, p.fm, ppi);
+					lm = this._calcLineMetrics(p.fsz !== undefined ? p.fsz : p.font.FontSize, p.va, p.fm);
 					l.assign(0, lm.th, lm.bl, lm.a, lm.d);
 					addLine(-1, -1);
 					l.beg = l.end = 0;
@@ -645,7 +645,7 @@
 
 					// if font has been changed than calc and update line height and etc.
 					if (p && p.font) {
-						lm = this._calcLineMetrics(p.fsz !== undefined ? p.fsz : p.font.FontSize, p.va, p.fm, ppi);
+						lm = this._calcLineMetrics(p.fsz !== undefined ? p.fsz : p.font.FontSize, p.va, p.fm);
 						if (i === 0) {
 							l.assign(0, lm.th, lm.bl, lm.a, lm.d);
 						} else {
@@ -667,7 +667,7 @@
 					if (p && (p.nl || p.hp)) {
 						addLine(beg, i);
 						beg = i;
-						lm = this._calcLineMetrics(p_.fsz !== undefined ? p_.fsz : p_.font.FontSize, p_.va, p_.fm, ppi);
+						lm = this._calcLineMetrics(p_.fsz !== undefined ? p_.fsz : p_.font.FontSize, p_.va, p_.fm);
 						l = new LineInfo(0, lm.th, lm.bl, lm.a, lm.d);
 					}
 				}
