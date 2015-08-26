@@ -2673,6 +2673,7 @@ function DrawingObjects() {
                 {
                     _this.controller.setGraphicObjectPropsCallBack(props);
                     _this.controller.startRecalculate();
+                    _this.sendGraphicObjectProps();
                     api.exucuteHistoryEnd = false;
                 }
                 else
@@ -2689,13 +2690,13 @@ function DrawingObjects() {
                     ExecuteNoHistory(function(){
                         _this.controller.setGraphicObjectPropsCallBack(props);
                         _this.controller.startRecalculate();
+                        _this.sendGraphicObjectProps();
                     }, this, []);
             }
 
            // _this.controller.setGraphicObjectProps( objectProperties );
         }
 
-        _this.sendGraphicObjectProps();
     };
 
     _this.showChartSettings = function() {

@@ -6303,7 +6303,7 @@ DrawingObjectsController.prototype =
                     return;
                 }
             }
-            this.checkSelectedObjectsAndCallback(this.setGraphicObjectPropsCallBack, [props], true, historydescription_Spreadsheet_SetGraphicObjectsProps);
+            this.checkSelectedObjectsAndCallback(this.setGraphicObjectPropsCallBack, [props], false, historydescription_Spreadsheet_SetGraphicObjectsProps);
             var oApplyProps = null;
             if(props)
             {

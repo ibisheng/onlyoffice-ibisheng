@@ -2762,7 +2762,30 @@ CShape.prototype =
         }
         if(oBodyPr.wrap === nTWTNone)
         {
-            var dMaxWidth = this.bWordShape ? 1000/*TODO: to get size of the text area*/ : 100000;
+            var dMaxWidth = 100000;
+            if(this.bWordShape)
+            {
+                var oParaDrawing = getParaDrawing(this);
+                if(oParaDrawing)
+                {
+                    var oParentParagraph = oParaDrawing.Get_ParentParagraph();
+                    if(oParentParagraph)
+                    {
+                        var oSectPr = oParentParagraph.Get_SectPr();
+                        if(oSectPr)
+                        {
+                            if(!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270))
+                            {
+                                dMaxWidth = oSectPr.Get_PageWidth() - oSectPr.Get_PageMargin_Left() - oSectPr.Get_PageMargin_Right() - l_ins - r_ins;
+                            }
+                            else
+                            {
+                                dMaxWidth = oSectPr.Get_PageHeight() - oSectPr.Get_PageMargin_Top() - oSectPr.Get_PageMargin_Bottom();
+                            }
+                        }
+                    }
+                }
+            }
             var dMaxWidthRec = RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, this.bWordShape);
             oDocContent.Set_StartPage(0);
             oDocContent.Reset(0, 0, dMaxWidthRec, 20000);
@@ -5174,4 +5197,18 @@ function CreateBinaryReader(szSrc, offset, srcLen)
     }
 
     return stream;
+}
+
+function getParaDrawing(oDrawing)
+{
+    var oCurDrawing = oDrawing;
+    while(oCurDrawing.group)
+    {
+        oCurDrawing = oCurDrawing.group;
+    }
+    if(oCurDrawing.parent instanceof ParaDrawing)
+    {
+        return oCurDrawing.parent;
+    }
+    return null;
 }

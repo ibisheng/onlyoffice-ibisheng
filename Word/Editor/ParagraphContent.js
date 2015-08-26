@@ -2281,6 +2281,14 @@ ParaTextPr.prototype =
                     var unifill = new CUniFill();
                     unifill.Read_FromBinary(Reader);
                     this.Value.Unifill = unifill;
+
+                    if(typeof CollaborativeEditing !== "undefined")
+                    {
+                        if(unifill.fill && unifill.fill.type === FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
+                        {
+                            CollaborativeEditing.Add_NewImage(getFullImageSrc2(unifill.fill.RasterImageId));
+                        }
+                    }
                 }
                 else
                     this.Value.Unifill = undefined;
@@ -4613,6 +4621,12 @@ ParaDrawing.prototype =
         return false;
     },
 
+    Set_Parent : function(oParent)
+    {
+        History.Add(this, {Type: historyitem_Drawing_SetParent, oldPr: this.Parent, newPr: oParent});
+        this.Parent = oParent;
+    },
+
     Update_Position : function(Paragraph, ParaLayout, PageLimits, PageLimitsOrigin, LineNum)
     {
         if ( undefined != this.PositionH_Old )
@@ -4631,15 +4645,6 @@ ParaDrawing.prototype =
 
         this.Parent          = Paragraph;
         this.DocumentContent = this.Parent.Parent;
-        //this.GraphicObj.parent = this;
-        
-    //    if ( this.GraphicObj.arrGraphicObjects )
-    //    {
-    //        var Count = this.GraphicObj.arrGraphicObjects.length;
-    //        for ( var Index = 0; Index < Count; Index++ )
-    //            this.GraphicObj.arrGraphicObjects[Index].parent = this;
-    //    }
-    //
         var PageNum = ParaLayout.PageNum;
 
         var OtherFlowObjects = editor.WordControl.m_oLogicDocument.DrawingObjects.getAllFloatObjectsOnPage( PageNum, this.Parent.Parent );
@@ -5207,6 +5212,11 @@ ParaDrawing.prototype =
                 this.Locked = Data.OldPr;
                 break;
             }
+            case historyitem_Drawing_SetParent:
+            {
+                this.Parent = Data.oldPr;
+                break;
+            }
         }
     },
 
@@ -5331,6 +5341,11 @@ ParaDrawing.prototype =
             case historyitem_Drawing_SetLocked:
             {
                 this.Locked = Data.NewPr;
+                break;
+            }
+            case historyitem_Drawing_SetParent:
+            {
+                this.Parent = Data.newPr;
                 break;
             }
         }
@@ -5714,6 +5729,12 @@ ParaDrawing.prototype =
                 writeBool(Writer, Data.NewPr);
                 break;
             }
+
+            case historyitem_Drawing_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
         }
 
         return Writer;
@@ -5885,6 +5906,12 @@ ParaDrawing.prototype =
             case historyitem_Drawing_SetLocked:
             {
                 this.Locked = readBool(Reader);
+                break;
+            }
+
+            case historyitem_Drawing_SetParent:
+            {
+                this.Parent = readObject(Reader);
                 break;
             }
         }
