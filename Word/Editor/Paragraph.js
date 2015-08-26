@@ -8837,7 +8837,7 @@ Paragraph.prototype =
                     PageLimits = LD_PageLimits;
                 }
 
-                var ParagraphTop = this.Lines[Para.Pages[CurPage].StartLine].Top + this.Pages[CurPage].Y;
+                var ParagraphTop = (true != Drawing.Use_TextWrap() ? this.Lines[Para.Pages[CurPage].StartLine].Top + this.Pages[CurPage].Y : this.Pages[CurPage].Y);
                 var Layout = new CParagraphLayout(DrawingLayout.X, DrawingLayout.Y , this.Get_StartPage_Absolute() + CurPage, DrawingLayout.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, ParagraphTop);
                 return {ParagraphLayout : Layout, PageLimits : PageLimits};
             }
@@ -12966,6 +12966,96 @@ Paragraph.prototype.Get_SectPr = function()
     }
 
     return null;
+};
+Paragraph.prototype.Check_RevisionsChanges = function(RevisionsManager)
+{
+    var ParaId = this.Get_Id();
+
+    var Change, StartPos, EndPos;
+    if (this.Have_PrChange())
+    {
+        StartPos = this.Get_StartPos();
+        EndPos   = this.Get_EndPos(true);
+
+        Change = new CRevisionsChange();
+        Change.put_StartPos(StartPos);
+        Change.put_EndPos(EndPos);
+        Change.put_Type(c_oAscRevisionsChangeType.ParaPr);
+        Change.put_Value("Change paragraph properties.");
+        RevisionsManager.Add_Change(ParaId, Change);
+    }
+
+    var ReviewType = this.Get_ReviewType();
+    if (reviewtype_Add == ReviewType)
+    {
+        StartPos = this.Get_EndPos(false);
+        EndPos   = this.Get_EndPos(true);
+
+        Change = new CRevisionsChange();
+        Change.put_StartPos(StartPos);
+        Change.put_EndPos(EndPos);
+        Change.put_Type(c_oAscRevisionsChangeType.ParaAdd);
+        Change.put_Value("Add paragraph.");
+        RevisionsManager.Add_Change(ParaId, Change);
+    }
+    else if (reviewtype_Remove == ReviewType)
+    {
+        StartPos = this.Get_EndPos(false);
+        EndPos   = this.Get_EndPos(true);
+
+        Change = new CRevisionsChange();
+        Change.put_StartPos(StartPos);
+        Change.put_EndPos(EndPos);
+        Change.put_Type(c_oAscRevisionsChangeType.ParaRem);
+        Change.put_Value("Delete paragraph.");
+        RevisionsManager.Add_Change(ParaId, Change);
+    }
+
+//        // Обновляем рецензирование
+//        if (false === this.Selection.Use)
+//        {
+//            var TextTransform = this.Get_ParentTextTransform();
+//            var PageIndex = 0;
+//            var _X = this.Pages[PageIndex].XLimit;
+//            var _Y = this.Pages[PageIndex].Y;
+//            var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( _X, _Y, this.Get_StartPage_Absolute() + (PageIndex - this.PageNum), TextTransform);
+//
+//            var X = Coords.X + 20;
+//            var Y = Coords.Y;
+//
+//
+//            var CurPos = this.Get_ParaContentPos(false, false);
+//            var Run = this.Get_ElementByPos(CurPos);
+//            if (para_Run === Run.Type)
+//            {
+//                if (true === Run.Have_PrChange())
+//                {
+//                    var Change = new CRevisionsChange();
+//                    Change.put_Type(c_oAscRevisionsChangeType.TextPr);
+//                    Change.put_Value("Change text properties.");
+//                    Change.put_XY(X, Y);
+//                    editor.sync_AddRevisionsChange(Change);
+//                }
+//
+//                var RunReviewType = Run.Get_ReviewType();
+//                if (reviewtype_Add == RunReviewType)
+//                {
+//                    var Change = new CRevisionsChange();
+//                    Change.put_Type(c_oAscRevisionsChangeType.TextAdd);
+//                    Change.put_Value("Add text.");
+//                    Change.put_XY(X, Y);
+//                    editor.sync_AddRevisionsChange(Change);
+//                }
+//                else if (reviewtype_Remove == RunReviewType)
+//                {
+//                    var Change = new CRevisionsChange();
+//                    Change.put_Type(c_oAscRevisionsChangeType.TextRem);
+//                    Change.put_Value("Delete text.");
+//                    Change.put_XY(X, Y);
+//                    editor.sync_AddRevisionsChange(Change);
+//                }
+//            }
+//        }
 };
 
 var pararecalc_0_All  = 0;
