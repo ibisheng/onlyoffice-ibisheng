@@ -758,12 +758,6 @@ CMathContent.prototype.fillPlaceholders = function()
 //////////////////////////////////////
 CMathContent.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
 {
-    if(ArgSize !== null && ArgSize !== undefined)
-    {
-        this.Compiled_ArgSz.value = this.ArgSize.value;
-        this.Compiled_ArgSz.Merge(ArgSize);
-    }
-
     this.ParaMath = ParaMath;
     if(Parent !== null)
     {

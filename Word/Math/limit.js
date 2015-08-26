@@ -81,7 +81,6 @@ CLimitPrimary.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, Gap
     var NewRPI = RPI.Copy();
     NewRPI.bDecreasedComp = true;
 
-    this.Iterator.ArgSize.decrease();
     this.Iterator.PreRecalc(this, ParaMath, ArgSzIter, NewRPI);
 };
 CLimitPrimary.prototype.Resize = function(oMeasure, RPI)
