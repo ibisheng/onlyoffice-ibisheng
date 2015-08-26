@@ -2954,13 +2954,17 @@
                 if(!oThis.isCopyPaste || (oThis.isCopyPaste && cell))
                 {	
 					var nXfsId;
+					var cellXfs = cell.xfs;
 					if(oThis.isCopyPaste && bIsTablePartContainActiveRange)
+					{
 						nXfsId = this.prepareXfs(cell.compiledXfs);
+						cellXfs = cell.compiledXfs;
+					}
 					else
 						nXfsId  = this.prepareXfs(cell.xfs);
 					
                     //сохраняем как и Excel даже пустой стиль(нужно чтобы убрать стиль строки/колонки)
-                    if(null != cell.xfs || false == cell.isEmptyText())
+                    if(null != cellXfs || false == cell.isEmptyText())
                         this.bs.WriteItem(c_oSerRowTypes.Cell, function(){oThis.WriteCell(cell, nXfsId, row.index);});
                 }
             }
