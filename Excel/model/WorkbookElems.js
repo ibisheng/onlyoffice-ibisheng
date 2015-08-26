@@ -5071,32 +5071,30 @@ CustomFilter.prototype.isHideValue = function(val) {
 				case c_oAscCustomAutoFilter.beginsWith:
 					if(!isDigitValue)
 					{
-						if(val.indexOf(filterVal) == 0)//beginsWith
+						if(val.startsWith(filterVal))//beginsWith
 							result = true;
 					}
 					break;
 				case c_oAscCustomAutoFilter.doesNotBeginWith: 
 					if(!isDigitValue)
 					{
-						if(val.indexOf(filterVal) != 0)//doesNotBeginWith
+						if(!val.startsWith(filterVal))//doesNotBeginWith
 							result = true;
 					}
 					else
 						result = true;
 					break;
 				case c_oAscCustomAutoFilter.endsWith: 
-					position = val.length - filterVal.length;
 					if(!isDigitValue)
 					{
-						if(val.lastIndexOf(filterVal) == position && position > 0)//endsWith
+						if(val.endsWith(filterVal))//endsWith
 							result = true;
 					}
 					break;
 				case c_oAscCustomAutoFilter.doesNotEndWith: 
-					position = val.length - filterVal.length;
 					if(!isDigitValue)
 					{
-						if(val.lastIndexOf(filterVal) != position && position > 0)//doesNotEndWith
+						if(!val.endsWith(filterVal))//doesNotEndWith
 							result = true;
 					}
 					else
