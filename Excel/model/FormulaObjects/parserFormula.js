@@ -3564,7 +3564,8 @@ parserFormula.prototype = {
                     var _wsFrom = _3DRefTmp[1],
                         _wsTo = ( (_3DRefTmp[2] !== null) && (_3DRefTmp[2] !== undefined) ) ? _3DRefTmp[2] : _wsFrom,
                         wsF = this.wb.getWorksheetByName( _wsFrom ),
-                        wsT = this.wb.getWorksheetByName( _wsTo );
+                        wsT = this.wb.getWorksheetByName( _wsTo ),
+                        pos = {start:this.pCurrPos - this.operand_str.length - 1, end:this.pCurrPos, index:this.outStack.length};
 
                     if ( !(wsF && wsT) ) {
                         this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
@@ -3573,23 +3574,14 @@ parserFormula.prototype = {
                         return false;
                     }
                     if ( parserHelp.isArea.call( this, this.Formula, this.pCurrPos ) ) {
-                        this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length} );
+                        pos.end = this.pCurrPos;
+                        this.RefPos.push( pos );
                         found_operand = new cArea3D( this.operand_str.toUpperCase(), _wsFrom, _wsTo, this.wb );
-
                         checkAbsArea(this.operand_str,found_operand);
-
-                        /*if ( this.operand_str.indexOf( "$" ) > -1 ) {
-                            found_operand.isAbsolute = true;
-                            if( this.operand_str.indexOf( "$" ) == 0 ){
-                                found_operand.isAbsoluteCol = true;
-                            }
-                            if( this.operand_str.lastIndexOf( "$" ) > 0 ){
-                                found_operand.isAbsoluteRow = true;
-                            }
-                        }*/
                     }
                     else if ( parserHelp.isRef.call( this, this.Formula, this.pCurrPos ) ) {
-                        this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length} );
+                        pos.end = this.pCurrPos;
+                        this.RefPos.push( pos);
                         if ( _wsTo != _wsFrom ) {
                             found_operand = new cArea3D( this.operand_str.toUpperCase(), _wsFrom, _wsTo, this.wb );
                         }
@@ -3597,16 +3589,7 @@ parserFormula.prototype = {
                             found_operand = new cRef3D( this.operand_str.toUpperCase(), _wsFrom, this.wb );
                         }
                         if ( this.operand_str.indexOf( "$" ) > -1 ) {
-
                             checkAbsRef(this.operand_str,found_operand)
-
-                            /*found_operand.isAbsolute = true;
-                            if( this.operand_str.indexOf( "$" ) == 0 ){
-                                found_operand.isAbsoluteCol = true;
-                            }
-                            if( this.operand_str.lastIndexOf( "$" ) > 0 ){
-                                found_operand.isAbsoluteRow = true;
-                            }*/
                         }
                     }
                     /*else if ( parserHelp.isName.call( this, this.Formula, this.pCurrPos ) ) {
@@ -3620,18 +3603,7 @@ parserFormula.prototype = {
                     this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length} );
                     found_operand = new cArea( this.operand_str.toUpperCase(), this.ws );
                     if ( this.operand_str.indexOf( "$" ) > -1 ) {
-
                         checkAbsArea(this.operand_str,found_operand);
-
-
-                     /*   found_operand.isAbsolute = true;
-                        if( this.operand_str.indexOf( "$" ) == 0 ){
-                            found_operand.isAbsoluteCol = true;
-                        }
-                        if( this.operand_str.lastIndexOf( "$" ) > 0 ){
-                            found_operand.isAbsoluteRow = true;
-                        }*/
-
                     }
                     this.countRef++;
                 }
@@ -3640,16 +3612,7 @@ parserFormula.prototype = {
                     this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length} );
                     found_operand = new cRef( this.operand_str.toUpperCase(), this.ws );
                     if ( this.operand_str.indexOf( "$" ) > -1 ) {
-
                         checkAbsRef(this.operand_str,found_operand)
-
-                        /*found_operand.isAbsolute = true;
-                        if( this.operand_str.indexOf( "$" ) == 0 ){
-                            found_operand.isAbsoluteCol = true;
-                        }
-                        if( this.operand_str.lastIndexOf( "$" ) > 0 ){
-                            found_operand.isAbsoluteRow = true;
-                        }*/
                     }
                     this.countRef++;
                 }

@@ -10336,15 +10336,19 @@
                 }
 
                 if(_C2H50H_){
+                    _C2H50H_ = this.model.workbook.getDefinesNames( reference, this.model.workbook.getActiveWs().getId() );
 
                     sheetName = _C2H50H_.Ref.split("!");
-                    if( _C2H50H_.parsedRef.RefPos.length == 1 ){
-                        ref = sheetName[1];
-                        sheetName = sheetName[0];
+                    ref = sheetName[1];
+                    sheetName = sheetName[0];
+
+                    if(_C2H50H_.isTable || (_C2H50H_.parsedRef.RefPos.length == 1 && _C2H50H_.parsedRef.outStack.length == 1) ){
                         range = {range:asc.g_oRangeCache.getAscRange(ref), sheet:sheetName};
                         if( sheetName[0] == "'" && sheetName[sheetName.length-1] == "'" ){
                             range.sheet = range.sheet.substring(1,range.sheet.length-1);
                         }
+                    }
+                    if( !_C2H50H_.isTable && _C2H50H_.parsedRef.RefPos.length == 1  && _C2H50H_.parsedRef.outStack.length == 1 ){
                         this.model.workbook.handlers.trigger("asc_onDefName", defName);
                     }
                 }
