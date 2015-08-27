@@ -998,6 +998,7 @@ var historyitem_SetWrapPolygon            = 14;
 var historyitem_Drawing_SetLocked         = 15;// Устанавливаем привязку к конкретному параграфу]
 var historyitem_Drawing_SetRelativeHeight = 16;// Устанавливаем Z-Index
 var historyitem_Drawing_SetEffectExtent   = 17;// Устанавливаем EffectExtent
+var historyitem_Drawing_SetParent         = 18;// Устанавливаем Parent
 
 
 

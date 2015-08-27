@@ -834,49 +834,52 @@ TextArtPreviewManager.prototype.getWordArtPreview = function(prst)
 
 TextArtPreviewManager.prototype.generateTextArtStyles = function()
 {
-	if(this.aStylesByIndex.length === 0)
-	{
-		this.initStyles();
-	}
-	var _canvas = this.getCanvas();
-	var ctx = _canvas.getContext('2d');
-	var graphics = new CGraphics();
-	var oShape = this.getTAShape();
-	oShape.recalculate();
+    ExecuteNoHistory(function(){
 
-	graphics.m_oFontManager = g_fontManager;
+        if(this.aStylesByIndex.length === 0)
+        {
+            this.initStyles();
+        }
+        var _canvas = this.getCanvas();
+        var ctx = _canvas.getContext('2d');
+        var graphics = new CGraphics();
+        var oShape = this.getTAShape();
+        oShape.recalculate();
 
-	var oldShowParaMarks;
-	if(editor)
-	{
-		oldShowParaMarks = editor.ShowParaMarks;
-		editor.ShowParaMarks = false;
-	}
-	var oContent = oShape.getDocContent();
-	oContent.Set_ApplyToAll(true);
-	for(var i = 0; i < this.aStylesByIndex.length; ++i)
-	{
-		oContent.Paragraph_Add(new ParaTextPr(this.aStylesByIndex[i]));
-		graphics.init(ctx, _canvas.width, _canvas.height, oShape.extX, oShape.extY);
-		graphics.transform(1,0,0,1,0,0);
-		oShape.recalcText();
-		if(!oShape.bWordShape)
-		{
-			oShape.recalculate();
-		}
-		else
-		{
-			oShape.recalculateText();
-		}
-		oShape.draw(graphics);
-		this.TextArtStyles[i] = _canvas.toDataURL("image/png");
-	}
-	oContent.Set_ApplyToAll(false);
+        graphics.m_oFontManager = g_fontManager;
 
-	if(editor)
-	{
-		editor.ShowParaMarks = oldShowParaMarks;
-	}
+        var oldShowParaMarks;
+        if(editor)
+        {
+            oldShowParaMarks = editor.ShowParaMarks;
+            editor.ShowParaMarks = false;
+        }
+        var oContent = oShape.getDocContent();
+        oContent.Set_ApplyToAll(true);
+        for(var i = 0; i < this.aStylesByIndex.length; ++i)
+        {
+            oContent.Paragraph_Add(new ParaTextPr(this.aStylesByIndex[i]));
+            graphics.init(ctx, _canvas.width, _canvas.height, oShape.extX, oShape.extY);
+            graphics.transform(1,0,0,1,0,0);
+            oShape.recalcText();
+            if(!oShape.bWordShape)
+            {
+                oShape.recalculate();
+            }
+            else
+            {
+                oShape.recalculateText();
+            }
+            oShape.draw(graphics);
+            this.TextArtStyles[i] = _canvas.toDataURL("image/png");
+        }
+        oContent.Set_ApplyToAll(false);
+
+        if(editor)
+        {
+            editor.ShowParaMarks = oldShowParaMarks;
+        }
+    }, this, []);
 };
 
 

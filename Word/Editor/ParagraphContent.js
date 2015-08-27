@@ -5732,7 +5732,7 @@ ParaDrawing.prototype =
 
             case historyitem_Drawing_SetParent:
             {
-                writeObject(w, data.newPr);
+                writeObject(Writer, Data.newPr);
                 break;
             }
         }

@@ -119,7 +119,7 @@ CShape.prototype.recalcTxBoxContent = function()
 {
     this.recalcInfo.recalculateTxBoxContent = true;
     this.recalcInfo.AllDrawings = [];
-    if(this.checkAutofit && this.checkAutofit())
+    if(this.checkAutofit && this.checkAutofit() && (!editor || !editor.noCreatePoint || editor.exucuteHistory))
     {
         this.recalcTransform();
     }
