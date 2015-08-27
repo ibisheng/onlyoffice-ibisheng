@@ -893,7 +893,8 @@
 			r  = getCvtRatio(0/*px*/, units >= 0 && units <=3 ? units : this.units, this.ppiX);
 		for (var tmp, w = 0, w2 = 0, i = 0; i < text.length; ++i) {
 			tmp = fm.MeasureChar(text.charCodeAt(i));
-			w += asc_round(tmp.fAdvanceX);
+			//w += asc_round(tmp.fAdvanceX); скачет при wrap в ячейке и zoom
+			w += tmp.fAdvanceX;
 		}
 		w2 = w - tmp.fAdvanceX + tmp.oBBox.fMaxX - tmp.oBBox.fMinX + 1;
 		return this._calcTextMetrics(w * r, w2 * r, fm, r);
