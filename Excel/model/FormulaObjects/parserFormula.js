@@ -3220,6 +3220,8 @@ parserFormula.prototype = {
 
             var splitOpStr0 = operand_str.match(/\$/g) || [];
 
+            found_operand.isAbsolute = true;
+
             switch(splitOpStr0.length){
                 case 1:
                     if( operand_str.indexOf("$") > 0 ){
@@ -3241,6 +3243,8 @@ parserFormula.prototype = {
             var splitOpStr = operand_str.split(":" ),
                 splitOpStr0 = splitOpStr[0].match(/\$/g) || [],
                 splitOpStr1 = splitOpStr[1].match(/\$/g) || [];
+
+            found_operand.isAbsolute = true;
 
             switch(splitOpStr0.length){
                 case 1:
@@ -4034,8 +4038,8 @@ parserFormula.prototype = {
                 }
             }
             else {
-                var r = ref.getRange();
-                var c = ref._cells.split( ":" );// так как ссылка вида A1:A4, делим на первую и последнюю ячейку.
+                var r = ref.getRange(),
+                    c = ref._cells.split( ":" );// так как ссылка вида A1:A4, делим на первую и последнюю ячейку.
                 // проверяем в какой ячеейке находится абсолютная ссылка.
                 if ( c[0].indexOf( "$" ) > -1 ) {// если в первой ячейке
                     if ( c[0].indexOf( "$" ) == 0 ) {// абсолютна ли ссылка на столбец...
