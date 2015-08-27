@@ -400,6 +400,31 @@ function test_ws_name2() {
 
 }
 
+function test_defName(){
+    var self = this, nameRangeRE = new RegExp("(^(["+str_namedRanges+"_])(["+str_namedRanges+"_0-9]*)$)","i" );
+
+    this.test = function(str){
+        var res = null, match, m0, m1, m2;
+        if( !nameRangeRE.test(str) ){
+            return false;
+        }
+
+        match = str.match( rx_ref );
+        if (match != null) {
+            m0 = match[0];
+            m1 = match[1];
+            m2 = match[2];
+            if ( match.length >= 3 && g_oCellAddressUtils.colstrToColnum( m1.substr( 0, (m1.length - m2.length) ) ) <= gc_nMaxCol && parseInt( m2 ) <= gc_nMaxRow ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    return this;
+}
+
 var c_oEditorId = {
     Word:0,
     Spreadsheet:1,
@@ -580,7 +605,8 @@ var str_namedRanges = "A-Za-z\u005F\u0080-\u0081\u0083\u0085-\u0087\u0089-\u008A
     rg_validOCTNumber = /^[0-7]{1,10}$/,
     rg_complex_number = new XRegExp( "^(?<real>[-+]?(?:\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?))?(?<img>([-+]?(\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?)?[ij])?)", "g" ),
     rx_name = new XRegExp( "^(?<name>" + "[" + str_namedRanges + "]" + "[" + str_namedRanges + "\\d.]*)([-+*\\/^&%<=>: ;),]|$)" ),
-    rx_defName = new RegExp("(^(["+str_namedRanges+"_\\])(["+str_namedRanges+"_0-9]*)$)","i" ),
+//    rx_defName = new RegExp("(^(["+str_namedRanges+"_])(["+str_namedRanges+"_0-9]*)$)","i" ),
+    rx_defName = new test_defName(),
     rx_arraySeparatorsDef = /^ *[,;] */,
     rx_numberDef = /^ *[+-]?\d*(\d|\.)\d*([eE][+-]?\d+)?/,
     rx_CommaDef = /^ *[,;] */,
