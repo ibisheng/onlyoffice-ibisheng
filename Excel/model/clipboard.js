@@ -3971,7 +3971,7 @@
 				
 				var formatBorders = oldBorders ? oldBorders : new Border();
 				//top border for cell
-				if(top == cellTable.top && !formatBorders.t.s)
+				if(top == cellTable.top && !formatBorders.t.s && borders.Top.Value !== 0/*border_None*/)
 				{
 					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Top.Size,3,1));
 					if (null !== borderStyleName) {
@@ -3980,7 +3980,7 @@
 					}
 				}
 				//left border for cell
-				if(left == cellTable.left && !formatBorders.l.s)
+				if(left == cellTable.left && !formatBorders.l.s && borders.Left.Value !== 0/*border_None*/)
 				{
 					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Left.Size,3,1));
 					if (null !== borderStyleName) {
@@ -3989,7 +3989,7 @@
 					}
 				}
 				//bottom border for cell
-				if(top == cellTable.top + heigthCell - 1 && !formatBorders.b.s)
+				if(top == cellTable.top + heigthCell - 1 && !formatBorders.b.s && borders.Bottom.Value !== 0/*border_None*/)
 				{
 					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Bottom.Size,3,1));
 					if (null !== borderStyleName) {
@@ -3998,7 +3998,7 @@
 					}
 				}
 				//right border for cell
-				if(left == cellTable.left + widthCell - 1 && !formatBorders.r.s)
+				if(left == cellTable.left + widthCell - 1 && !formatBorders.r.s && borders.Right.Value !== 0/*border_None*/)
 				{
 					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Right.Size,3,1));
 					if (null !== borderStyleName) {
@@ -4207,7 +4207,7 @@
 				{
 					compiledPrCell = tableCell.elem.Get_CompiledPr();
 					
-					if(compiledPrCell)
+					if(compiledPrCell && compiledPrCell.Shd.Value !== 1/*shd_Nil*/)
 					{	
 						var color = compiledPrCell.Shd.Color;
 						backgroundColor = new RgbColor(this.clipboard._getBinaryColor("rgb(" + color.r + "," + color.g + "," + color.b + ")"));
