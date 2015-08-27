@@ -13,6 +13,7 @@ if (typeof String.prototype.endsWith !== 'function') {
 	String.prototype['endsWith'] = String.prototype.endsWith;
 }
 
+var g_oZipChanges = null;
 var g_sMainServiceLocalUrl = "/CanvasService.ashx";
 var g_sResourceServiceLocalUrl = "/ResourceService.ashx?path=";
 var g_sUploadServiceLocalUrl = "/UploadService.ashx";
@@ -62,6 +63,15 @@ function g_fSaveWithParts(fSendCommand, fCallback, oAdditionalData, aParts) {
 	}, oAdditionalData);
 }
 
+function g_fGetImageFromChanges (name) {
+	var file;
+	var ext = GetFileExtension(sName);
+	if (null !== ext && g_oZipChanges && (file = g_oZipChanges.files[name])) {
+		var oFileArray = file.asUint8Array();
+		return 'data:image/' + ext + ';base64,' + Base64Encode(oFileArray, oFileArray.length, 0);
+	}
+	return null;
+}
 function g_fOpenFileCommand (binUrl, changesUrl, Signature, callback) {
 	var bError = false, oResult = new OpenFileResult(), bEndLoadFile = false, bEndLoadChanges = false;
 	var onEndOpen = function () {
@@ -102,10 +112,10 @@ function g_fOpenFileCommand (binUrl, changesUrl, Signature, callback) {
 				return;
 			}
 
-			var oZipFile = new (require('jszip'))(data);
+			g_oZipChanges = new (require('jszip'))(data);
 			oResult.changes = [];
-			for(var i in oZipFile.files)
-				oResult.changes.push(JSON.parse(oZipFile.file(i).asText()))
+			for(var i in g_oZipChanges.files)
+				oResult.changes.push(JSON.parse(g_oZipChanges[i].asText()));
 			onEndOpen();
 		});
 	} else
@@ -396,7 +406,7 @@ function test_ws_name2() {
             }
             return true;
         }
-    }
+    };
 
     return this;
 
@@ -422,7 +432,7 @@ function test_defName(){
         }
 
         return true;
-    }
+    };
 
     return this;
 }
@@ -478,40 +488,45 @@ var c_oAscImageUploadProp = {//Не все браузеры позволяют �
     SupportedFormats:[ "jpg", "jpeg", "jpe", "png", "gif", "bmp", "ico"]
 };
 
+function GetFileExtension (sName) {
+	var nIndex = sName.lastIndexOf(".");
+	if (-1 != nIndex)
+		return sName.substring(nIndex + 1).toLowerCase();
+	return null;
+}
+
 function ValidateUploadImage( files ) {
-    var nRes = c_oAscServerError.NoError;
-    if ( files.length > 0 ) {
-        for ( var i = 0, length = files.length; i < length; i++ ) {
-            var file = files[i];
-            //проверяем расширение файла
-            var sName = file.fileName || file.name;
-            if ( sName ) {
-                var bSupported = false;
-                var nIndex = sName.lastIndexOf( "." );
-                if ( -1 != nIndex ) {
-                    var ext = sName.substring( nIndex + 1 ).toLowerCase();
-                    for ( var j = 0, length2 = c_oAscImageUploadProp.SupportedFormats.length; j < length2; j++ ) {
-                        if ( c_oAscImageUploadProp.SupportedFormats[j] == ext ) {
-                            bSupported = true;
-                            break;
-                        }
-                    }
-                }
-                if ( false == bSupported )
-                    nRes = c_oAscServerError.UploadExtension;
-            }
-            if ( c_oAscError.ID.No == nRes ) {
-                var nSize = file.fileSize || file.size;
-                if ( nSize && c_oAscImageUploadProp.MaxFileSize < nSize )
-                    nRes = c_oAscServerError.UploadContentLength;
-            }
-            if ( c_oAscServerError.NoError != nRes )
-                break;
-        }
-    }
-    else
-        nRes = c_oAscServerError.UploadCountFiles;
-    return nRes;
+	var nRes = c_oAscServerError.NoError;
+	if (files.length > 0) {
+		for (var i = 0, length = files.length; i < length; i++) {
+			var file = files[i];
+			//проверяем расширение файла
+			var sName = file.fileName || file.name;
+			if (sName) {
+				var bSupported = false;
+				var ext = GetFileExtension(sName);
+				if (null !== ext) {
+					for (var j = 0, length2 = c_oAscImageUploadProp.SupportedFormats.length; j < length2; j++) {
+						if (c_oAscImageUploadProp.SupportedFormats[j] == ext) {
+							bSupported = true;
+							break;
+						}
+					}
+				}
+				if (false == bSupported)
+					nRes = c_oAscServerError.UploadExtension;
+			}
+			if (c_oAscError.ID.No == nRes) {
+				var nSize = file.fileSize || file.size;
+				if (nSize && c_oAscImageUploadProp.MaxFileSize < nSize)
+					nRes = c_oAscServerError.UploadContentLength;
+			}
+			if (c_oAscServerError.NoError != nRes)
+				break;
+		}
+	} else
+		nRes = c_oAscServerError.UploadCountFiles;
+	return nRes;
 }
 function CanDropFiles( event ) {
     var bRes = false;
