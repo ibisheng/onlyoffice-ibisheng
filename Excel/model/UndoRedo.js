@@ -2886,7 +2886,7 @@ UndoRedoWorkbook.prototype = {
                 oldName = Data.oldName;
                 newName = Data.newName;
             }
-            res = this.wb.editDefinesNames( oldName, newName );
+            res = this.wb.editDefinesNames( oldName, newName, bUndo );
             this.wb.handlers.trigger("asc_onEditDefName", oldName, newName);
         }
         else if(historyitem_Workbook_DefinedNamesDelete === Type ){

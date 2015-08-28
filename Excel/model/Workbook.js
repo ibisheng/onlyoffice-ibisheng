@@ -242,10 +242,10 @@ DependencyGraph.prototype = {
         return this.nodeslength;
     },
     checkOffset:function ( BBox, offset, wsId, noDelete ) {
-        var _this = this;
-        var bHor = 0 != offset.offsetCol;
-        var toDelete = offset.offsetCol < 0 || offset.offsetRow < 0;
-		var bSetRefErrorOld = this.bSetRefError;
+        var _this = this,
+            bHor = 0 != offset.offsetCol,
+            toDelete = offset.offsetCol < 0 || offset.offsetRow < 0,
+            bSetRefErrorOld = this.bSetRefError;
 		this.bSetRefError = true;
 		var oShiftGetBBox = shiftGetBBox(BBox, bHor);
 		var sShiftGetBBoxName = oShiftGetBBox.getName();
@@ -269,7 +269,7 @@ DependencyGraph.prototype = {
             for (var i in oSlaves) {
                 slave = oSlaves[i];
                 if( slave instanceof DefNameVertex ){
-                    this.wb.delDefinesNames(slave.getAscCDefName())
+                    this.wb.delDefinesNames(slave.getAscCDefName());
                     continue;
                 }
                 if (null == toDelete || slave != toDelete[slave.nodeId]) {
@@ -317,8 +317,7 @@ DependencyGraph.prototype = {
                 elem.node.setFormula(elem.formula, true, false);
         }
     },
-	_changeNode : function(node, from, to)
-	{
+	_changeNode : function(node, from, to){
         var toDelete = null == to;
 		var toAdd = null == from;
 		var wsId = node.sheetId;
@@ -1021,6 +1020,12 @@ DependencyGraph.prototype = {
                 }
             }
         }
+        else{
+            oldN.deleteAllMasterEdges();
+            oldN.parsedRef = new parserFormula(oldN.Ref, "", oldN.wb.getWorksheet(0));
+            oldN.parsedRef.parse();
+            oldN.parsedRef.buildDependencies(null,oldN);
+        }
 
         return oldN;
     },
@@ -1077,10 +1082,10 @@ DependencyGraph.prototype = {
         return sNewName;
     },
     addTableName:function ( sName, ws, Ref ) {
-        var refClone = Ref.clone(true);
+        var refClone = Ref.clone(true ), dfv, defNameSheetsList;
         refClone.r1++;
-        var dfv = new DefNameVertex( null, sName, parserHelp.get3DRef( ws.getName(), refClone.getAbsName() ), null, this.wb, true ),
-            defNameSheetsList = this.defNameSheets[dfv.sheetId];
+        dfv = new DefNameVertex( null, sName, parserHelp.get3DRef( ws.getName(), refClone.getAbsName() ), null, this.wb, true );
+        defNameSheetsList = this.defNameSheets[dfv.sheetId];
         this.defNameList[dfv.nodeId] = dfv;
         if ( defNameSheetsList == null ) {
             defNameSheetsList = {};
@@ -1166,32 +1171,33 @@ Vertex.prototype = {
 	},
 	moveInner: function (bboxTo) {
 	    //удаляем старые ссылки slave и master
-	    for (var i in this.slaveEdges) {
-	        var slave = this.slaveEdges[i];
+        var slave, master;
+        for (var i in this.slaveEdges) {
+	        slave = this.slaveEdges[i];
 	        slave.deleteMasterEdge(this);
 	    }
 	    for (var i in this.masterEdges) {
-	        var master = this.masterEdges[i];
+	        master = this.masterEdges[i];
 	        master.deleteSlaveEdge(this);
 	    }
-	    var sOldNodeId = this.nodeId;
 	    this.bbox = bboxTo;
 	    this.cellId = bboxTo.getName();
 	    this.nodeId = getVertexId(this.sheetId, this.cellId);
-	    this.wb.needRecalc.nodes[this.nodeId] = [this.sheetId, this.cellId ];
+	    this.wb.needRecalc.nodes[this.nodeId] = [this.sheetId, this.cellId];
 	    this.wb.needRecalc.length++;
 	    //добавляем новые slave и master
 	    for (var i in this.slaveEdges) {
-	        var slave = this.slaveEdges[i];
+	        slave = this.slaveEdges[i];
 	        slave.addMasterEdge(this);
 	    }
 	    for (var i in this.masterEdges) {
-	        var master = this.masterEdges[i];
+	        master = this.masterEdges[i];
 	        master.addSlaveEdge(this);
 	    }
 	},
 	moveOuter: function (from, to, oFormulas) {
 	    if ((from.r1 == to.r1 && from.c1 == to.c1) || (from.r2 == to.r2 && from.c2 == to.c2)) {
+	        /*вставляем/удаляем по вертикали/горизонтали внутри диапазона*/
 	        var _sn = this.getSlaveEdges(), slave, cell;
 	        for (var _id in _sn) {
 	            slave = _sn[_id];
@@ -1221,6 +1227,7 @@ Vertex.prototype = {
 	        }
 	    }
 	    else {
+	        /*вставляем.удаляем левее/выше вне диапазона*/
 	        if (oFormulas) {
 	            if (null == oFormulas[this.nodeId])
 	                oFormulas[this.nodeId] = { node: this, formula: null };
@@ -1238,7 +1245,6 @@ Vertex.prototype = {
                 if( slave instanceof DefNameVertex ){
                     /*slave.parsedRef.shiftCells(this, from, to);
                     slave.relinkRef();*/
-
 
                     if ( false == this.wb.bUndoChanges && (false == this.wb.bRedoChanges || true == this.wb.bCollaborativeChanges )){
                         History.LocalChange = true;
@@ -1358,7 +1364,8 @@ Vertex.prototype = {
 		{
 			var ws = this.wb.getWorksheetById(this.sheetId);
 			if(ws)
-				this.cell = ws._getCellNoEmpty(this.bbox.r1, this.bbox.c1);
+				this.cell = ws._getCell(this.bbox.r1, this.bbox.c1);
+//				this.cell = ws._getCellNoEmpty(this.bbox.r1, this.bbox.c1);
 		}
 		return this.cell;
 	}
@@ -1546,24 +1553,16 @@ DefNameVertex.prototype = {
     //удаляем ребро между конкретной ведущей ячейки.
     deleteMasterEdge:function ( node ) {
         if ( this.masterEdges ) {
-//            if ( this.masterEdges[node.nodeId] ) {
-//                this.masterEdges[node.nodeId] = null;
-                delete this.masterEdges[node.nodeId];
-//                node.deleteSlaveEdge( this );
-                this.refCount--;
-//            }
+            delete this.masterEdges[node.nodeId];
+            this.refCount--;
         }
     },
 
     //удаляем ребро между конкретной зависимой(ведомой) ячейки.
     deleteSlaveEdge:function ( node ) {
         if ( this.slaveEdges ) {
-//            if ( this.slaveEdges[node.nodeId] ) {
-//                this.slaveEdges[node.nodeId] = null;
-                delete this.slaveEdges[node.nodeId];
-//                node.deleteMasterEdge( this );
-                this.refCount--;
-//            }
+            delete this.slaveEdges[node.nodeId];
+            this.refCount--;
         }
     },
 
@@ -2574,11 +2573,12 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
         }
 
         if(retRes){
-//            retRes.deleteAllSlaveEdges();
             retRes = retRes.getAscCDefName();
         }
 
-        sortDependency( this );
+        if(!bUndo){
+            sortDependency( this );
+        }
 
     }
 
@@ -3318,6 +3318,8 @@ Woorksheet.prototype._removeRows=function(start, stop){
 	History.Create_NewPoint();
 	//start, stop 0 based
 	var nDif = -(stop - start + 1);
+    var oActualRange = {r1: start, c1: 0, r2: stop, c2: gc_nMaxCol0};
+    this.renameDependencyNodes({offsetRow:nDif,offsetCol:0}, oActualRange);
 	var i, j, length, nIndex, aIndexes = [];
 	for(i in this.aGCells)
 	{
@@ -3357,10 +3359,9 @@ Woorksheet.prototype._removeRows=function(start, stop){
 		}
 		delete this.aGCells[nIndex];
 	}
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveRows, this.getId(), new Asc.Range(0, start, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, start, stop));
 
-	var oActualRange = {r1: start, c1: 0, r2: stop, c2: gc_nMaxCol0};
-	this.renameDependencyNodes({offsetRow:nDif,offsetCol:0}, oActualRange);
+
+	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveRows, this.getId(), new Asc.Range(0, start, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, start, stop));
 	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
 		
@@ -3378,6 +3379,7 @@ Woorksheet.prototype._insertRowsBefore=function(index, count){
 	lockDraw(this.workbook);
 	var oActualRange = {r1: index, c1: 0, r2: index + count - 1, c2: gc_nMaxCol0};
 	History.Create_NewPoint();
+    this.renameDependencyNodes({offsetRow:count,offsetCol:0},oActualRange);
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_AddRows, this.getId(), new Asc.Range(0, index, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, index, index + count - 1));
 	//index 0 based
 	var aIndexes = [];
@@ -3416,7 +3418,7 @@ Woorksheet.prototype._insertRowsBefore=function(index, count){
         }
         History.LocalChange = false;
     }
-	this.renameDependencyNodes({offsetRow:count,offsetCol:0},oActualRange);
+
 	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
 	
@@ -3448,6 +3450,8 @@ Woorksheet.prototype._removeCols=function(start, stop){
 	History.Create_NewPoint();
 	//start, stop 0 based
 	var nDif = -(stop - start + 1), i, j, length, nIndex;
+    var oActualRange = { r1: 0, c1: start, r2: gc_nMaxRow0, c2: stop };
+    this.renameDependencyNodes({ offsetRow: 0, offsetCol: nDif }, oActualRange);
 	for(i in this.aGCells)
 	{
 		var nRowIndex = i - 0;
@@ -3496,10 +3500,8 @@ Woorksheet.prototype._removeCols=function(start, stop){
 			elem.moveHor(nDif);
 	}
 
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCols, this.getId(), new Asc.Range(start, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, start, stop));
 
-	var oActualRange = { r1: 0, c1: start, r2: gc_nMaxRow0, c2: stop };
-	this.renameDependencyNodes({ offsetRow: 0, offsetCol: nDif }, oActualRange);
+	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCols, this.getId(), new Asc.Range(start, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, start, stop));
 	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
 
@@ -3517,7 +3519,8 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 	lockDraw(this.workbook);
 	var oActualRange = {r1: 0, c1: index, r2: gc_nMaxRow0, c2: index + count - 1};
 	History.Create_NewPoint();
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_AddCols, this.getId(), new Asc.Range(index, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, index, index + count - 1));
+    this.renameDependencyNodes({offsetRow:0,offsetCol:count},oActualRange);
+    History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_AddCols, this.getId(), new Asc.Range(index, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, index, index + count - 1));
 	//index 0 based
 	for(var i in this.aGCells)
 	{
@@ -3539,7 +3542,7 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 		}
 	}
 	
-	this.renameDependencyNodes({offsetRow:0,offsetCol:count},oActualRange);
+
 	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
 	
@@ -4415,9 +4418,9 @@ Woorksheet.prototype._shiftCellsLeft=function(oBBox){
 			}
 		}
 	}
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsLeft, this.getId(), new Asc.Range(nLeft, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
+    this.renameDependencyNodes( {offsetRow:0,offsetCol:dif}, oBBox );
 
-	this.renameDependencyNodes( {offsetRow:0,offsetCol:dif}, oBBox );
+	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsLeft, this.getId(), new Asc.Range(nLeft, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
 	//todo проверить не уменьшились ли границы таблицы
 };
 Woorksheet.prototype._shiftCellsUp=function(oBBox){
@@ -4458,9 +4461,9 @@ Woorksheet.prototype._shiftCellsUp=function(oBBox){
 		}
 	}
 
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsTop, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
+    this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox );
 
-	this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox );
+	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsTop, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
 	//todo проверить не уменьшились ли границы таблицы
 };
 Woorksheet.prototype._shiftCellsRight=function(oBBox){
@@ -4495,9 +4498,9 @@ Woorksheet.prototype._shiftCellsRight=function(oBBox){
 			}
 		}
 	}
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsRight, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
+    this.renameDependencyNodes({offsetRow:0,offsetCol:dif}, oBBox);
 
-	this.renameDependencyNodes({offsetRow:0,offsetCol:dif}, oBBox);
+	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsRight, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
 };
 Woorksheet.prototype._shiftCellsBottom=function(oBBox){
 	//до перемещения ячеек, перед функцией, в которой используются nodesSheetArea/nodesSheetCell move/shift нужно обязательно вызвать force buildRecalc
@@ -4529,9 +4532,9 @@ Woorksheet.prototype._shiftCellsBottom=function(oBBox){
 			}
 		}
 	}
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsBottom, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
+    this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox);
 
-	this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox);
+	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsBottom, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
 };
 Woorksheet.prototype._setIndex=function(ind){
 	this.index = ind;
@@ -4561,11 +4564,11 @@ Woorksheet.prototype._BuildDependencies=function(cellRange){
 		var aCache = [];
 		for(var j = 0, length2 = temp.length; j < length2; j++)
 		{
-			var c = temp[j];
-			var cellId = g_oCellAddressUtils.getCellId(c.nRow, c.nCol);
-			var aRefs = [];
-			var cache = inCache(aCache, c.sFormula, aRefs);
-			var bInCache = false;
+			var c = temp[j],
+			    cellId = g_oCellAddressUtils.getCellId(c.nRow, c.nCol ),
+                aRefs = [],
+                cache = inCache(aCache, c.sFormula, aRefs ),
+                bInCache = false;
 			if(cache)
 			{
 				bInCache = true;
