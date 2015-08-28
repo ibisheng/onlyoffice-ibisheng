@@ -20,7 +20,7 @@ function GetMathFont(GFont)
     var Fnt =
     {
         FontSize: GFont.FontSize,
-        FontFamily : Common_CopyObj(GFont.FontFamily),
+        FontFamily : {Name: GFont.FontFamily.Name, Index: GFont.FontFamily.Index },
         metrics: metrics
     };
 
