@@ -260,6 +260,8 @@
 			this.updateResize = false;
 			// Флаг, сигнализирует о том, что мы сменили zoom, но это не активный лист (поэтому как только будем показывать, нужно перерисовать и пересчитать кеш)
 			this.updateZoom = false;
+			// ToDo Флаг-заглушка, для того, чтобы на mobile не было изменения высоты строк при zoom (по правильному высота просто не должна меняться)
+			this.notUpdateRowHeight = false;
 
 			this.cache = new Cache();
 
@@ -560,6 +562,7 @@
 
 		WorksheetView.prototype.changeZoom = function (isUpdate) {
 			if (isUpdate) {
+				this.notUpdateRowHeight = true;
 				this.cleanSelection();
 				this._initCellsArea(false);
 				this._normalizeViewRange();
@@ -570,6 +573,7 @@
 				this.cellCommentator.updateCommentPosition();
 				this.handlers.trigger("onDocumentPlaceChanged");
 				this.updateZoom = false;
+				this.notUpdateRowHeight = false;
 			} else {
 				this.updateZoom = true;
 			}
@@ -1175,15 +1179,19 @@
 
 		WorksheetView.prototype._initCellsArea = function (fullRecalc) {
 			// calculate rows heights and visible rows
-			this._calcHeaderRowHeight();
-			this._calcHeightRows(fullRecalc ? 1 : 0);
+			if (!(window["NATIVE_EDITOR_ENJINE"] && this.notUpdateRowHeight)) {
+				this._calcHeaderRowHeight();
+				this._calcHeightRows(fullRecalc ? 1 : 0);
+			}
 			this.visibleRange.r2 = 0;
 			this._calcVisibleRows();
 			this._updateVisibleRowsCount(/*skipScrolReinit*/true);
 
 			// calculate columns widths and visible columns
-			this._calcHeaderColumnWidth();
-			this._calcWidthColumns(fullRecalc ? 1 : 0);
+			if (!(window["NATIVE_EDITOR_ENJINE"] && this.notUpdateRowHeight)) {
+				this._calcHeaderColumnWidth();
+				this._calcWidthColumns(fullRecalc ? 1 : 0);
+			}
 			this.visibleRange.c2 = 0;
 			this._calcVisibleColumns();
 			this._updateVisibleColsCount(/*skipScrolReinit*/true);
@@ -4432,7 +4440,7 @@
 			rowHeight = rowInfo.height;
 
 			// update row's height
-			if (!rowInfo.isCustomHeight) {
+			if (!rowInfo.isCustomHeight && !(window["NATIVE_EDITOR_ENJINE"] && this.notUpdateRowHeight)) {
 				// Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
 				if (!fMergedRows) {
 					var newHeight = tm.height;
