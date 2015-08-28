@@ -542,6 +542,8 @@ var maxIndividualValues = 10000;
 				//open/close rows
 				if(!bUndoChanges && !bRedoChanges)
 				{
+					var hiddenObj = {start: currentFilter.Ref.r1 + 1, h: null};
+					
 					for(var i = currentFilter.Ref.r1 + 1; i <= currentFilter.Ref.r2; i++)
 					{	
 						var isHidden = false;
@@ -555,8 +557,24 @@ var maxIndividualValues = 10000;
 							var isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
 							if(isDateTimeFormat)
 								currentValue = cell.getValueWithoutFormat();
-
-							aWs.setRowHidden(newFilterColumn.isHideValue(currentValue, isDateTimeFormat), i, i);
+							
+							var isSetHidden = newFilterColumn.isHideValue(currentValue, isDateTimeFormat);
+							
+							//скрываем строки
+							if(hiddenObj.h === null)
+								hiddenObj.h = isSetHidden;
+							else if(hiddenObj.h !== isSetHidden)
+							{
+								aWs.setRowHidden(hiddenObj.h, hiddenObj.start, i - 1);
+								
+								hiddenObj.h = isSetHidden;
+								hiddenObj.start = i;
+							}
+							
+							if(i === currentFilter.Ref.r2)
+							{
+								aWs.setRowHidden(hiddenObj.h, hiddenObj.start, i);
+							}
 						}
 					}
 				}

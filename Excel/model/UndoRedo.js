@@ -604,7 +604,8 @@ UndoRedoData_CellValueData.prototype = {
 };
 var g_oUndoRedoData_FromToRowColProperties = {
 		from: 0,
-		to: 1
+		to: 1,
+        bRow: 2
 	};
 function UndoRedoData_FromToRowCol(bRow, from, to){
 	this.Properties = g_oUndoRedoData_FromToRowColProperties;
@@ -615,7 +616,7 @@ function UndoRedoData_FromToRowCol(bRow, from, to){
 UndoRedoData_FromToRowCol.prototype = {
 	getType : function()
 	{
-		return UndoRedoDataTypes.FromTo;
+		return UndoRedoDataTypes.FromToRowCol;
 	},
 	getProperties : function()
 	{
@@ -627,6 +628,7 @@ UndoRedoData_FromToRowCol.prototype = {
 		{
 			case this.Properties.from: return this.from;break;
 			case this.Properties.to: return this.to;break;
+            case this.Properties.bRow: return this.bRow;break;
 		}
 		return null;
 	},
@@ -636,6 +638,7 @@ UndoRedoData_FromToRowCol.prototype = {
 		{
 			case this.Properties.from: this.from = value;break;
 			case this.Properties.to: this.to = value;break;
+            case this.Properties.bRow: this.bRow = value;break;
 		}
 	},
 	applyCollaborative : function(nSheetId, collaborativeEditing)
@@ -3144,6 +3147,30 @@ UndoRedoWoorksheet.prototype = {
 			//TODO проверить без этой перерисовки и убрать!!!
 			//var workSheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);	
 			//workSheetView.autoFilters.reDrawFilter(null, index);
+		}
+		else if(historyitem_Worksheet_RowHide == Type)
+		{
+			from = Data.from;
+			to = Data.to;
+			nRow = Data.bRow;
+			
+			if(false != this.wb.bCollaborativeChanges)
+			{
+				from = collaborativeEditing.getLockOtherRow2(nSheetId, from);
+				to = collaborativeEditing.getLockOtherRow2(nSheetId, to);
+				
+				oLockInfo = new Asc.asc_CLockInfo();
+				oLockInfo["sheetId"] = nSheetId;
+				oLockInfo["type"] = c_oAscLockTypeElem.Range;
+				oLockInfo["rangeOrObjectId"] = new Asc.Range(0, from, gc_nMaxCol0, to);
+				this.wb.aCollaborativeChangeElements.push(oLockInfo);
+			}
+			
+			if(bUndo)
+				nRow = !nRow;
+			
+			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
+			worksheetView.model.setRowHidden(nRow, Data.from, Data.to);
 		}
 		else if(historyitem_Worksheet_AddRows == Type || historyitem_Worksheet_RemoveRows == Type)
 		{

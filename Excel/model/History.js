@@ -41,6 +41,7 @@ var historyitem_Worksheet_RemoveCellFormula = 24;
 var historyitem_Worksheet_ChangeMerge = 25;
 var historyitem_Worksheet_ChangeHyperlink = 26;
 var historyitem_Worksheet_SetTabColor = 27;
+var historyitem_Worksheet_RowHide = 28;
 // Frozen cell
 var historyitem_Worksheet_ChangeFrozenCell = 30;
 
@@ -419,7 +420,7 @@ CHistory.prototype._addRedoObjectParam = function (oRedoObjectParam, Point) {
 		oRedoObjectParam.bIsReInit = true;
 		oRedoObjectParam.oOnUpdateSheetViewSettings[Point.SheetId] = Point.SheetId;
 	}
-	else if (g_oUndoRedoWorksheet === Point.Class && (historyitem_Worksheet_RowProp == Point.Type || historyitem_Worksheet_ColProp == Point.Type))
+	else if (g_oUndoRedoWorksheet === Point.Class && (historyitem_Worksheet_RowProp == Point.Type || historyitem_Worksheet_ColProp == Point.Type || historyitem_Worksheet_RowHide == Point.Type))
 		oRedoObjectParam.oChangeWorksheetUpdate[Point.SheetId] = Point.SheetId;
 	else if (g_oUndoRedoWorkbook === Point.Class && (historyitem_Workbook_SheetAdd === Point.Type || historyitem_Workbook_SheetRemove === Point.Type || historyitem_Workbook_SheetMove === Point.Type || historyitem_Workbook_SheetPositions === Point.Type)) {
 		oRedoObjectParam.bUpdateWorksheetByModel = true;

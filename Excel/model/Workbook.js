@@ -3848,17 +3848,41 @@ Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 		stop = start;
 	History.Create_NewPoint();
 	var oThis = this, i;
+	var historyStart = 0, prevStatus = null;
+	
 	var fProcessRow = function(row){
 		if(row && bHidden != (0 != (g_nRowFlag_hd & row.flags)))
 		{
-			var oOldProps = row.getHeightProp();
 			if(bHidden)
 				row.flags |= g_nRowFlag_hd;
 			else
 				row.flags &= ~g_nRowFlag_hd;
 			var oNewProps = row.getHeightProp();
-			if(false === oOldProps.isEqual(oNewProps))
-			    History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowProp, oThis.getId(), row._getUpdateRange(), new UndoRedoData_IndexSimpleProp(row.index, true, oOldProps, oNewProps));
+			
+			var isEqualProp = prevStatus !== null && prevStatus.isEqual(oNewProps) ? true : false;
+			if(isEqualProp)//если статус не изменяется
+			{
+				if(row.index === stop)
+					History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(), row._getUpdateRange(), new UndoRedoData_FromToRowCol(bHidden, historyStart, row.index));
+			}	
+			else
+			{
+				if(prevStatus !== null)//заносим в историю предыдущие строки
+					History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(), row._getUpdateRange(), new UndoRedoData_FromToRowCol(prevStatus.hd, historyStart, row.index - 1));
+				
+				if(row.index === stop)//если строка последняя, её необходимо добавить в историю
+					History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(), row._getUpdateRange(), new UndoRedoData_FromToRowCol(bHidden, row.index, row.index));
+					
+				//обнуляем индексы
+				historyStart = row.index;
+			}
+			prevStatus = oNewProps;
+		}
+		else
+		{
+			if(prevStatus !== null)//заносим предыдущие строки
+				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(), row._getUpdateRange(), new UndoRedoData_FromToRowCol(prevStatus.hd, historyStart, row.index - 1));
+			prevStatus = null;
 		}
 	};
 	if(0 == start && gc_nMaxRow0 == stop)
