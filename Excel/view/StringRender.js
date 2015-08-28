@@ -5,7 +5,8 @@
  * Author: Dmitry.Sokolov@avsmedia.net
  * Date:   Dec 12, 2011
  */
-(	/**
+(
+	/**
 	 * @param {Window} window
 	 * @param {undefined} undefined
 	 */
