@@ -8533,11 +8533,6 @@
 					var valFormat = '';
 					if(currentObj[0] !== undefined)
 						valFormat = currentObj[0].text;
-					if(currentObj.format !== null && currentObj.format !== '' && currentObj.format !== undefined)
-					{
-						var nameFormat = clipboard._decode(currentObj.format.split(';')[0]);
-						valFormat = clipboard._decode(currentObj.format.split(';')[1]);
-					}
 				}
 			}
 			for (var autoR = 0;autoR < maxARow; ++autoR) {
@@ -8554,11 +8549,6 @@
 									//{
 										var valFormat = currentObj[0].text;
 										var nameFormat = false;
-										if(currentObj.format !== null && currentObj.format !== '' && currentObj.format !== undefined)
-										{
-											nameFormat = clipboard._decode(currentObj.format.split(';')[0]);
-											valFormat = clipboard._decode(currentObj.format.split(';')[1]);
-										}
 									//}
 									if( currentObj[0].cellFrom ){
 										var offset = range.getCells()[0].getOffset2(currentObj[0].cellFrom),
