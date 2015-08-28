@@ -5594,7 +5594,7 @@ PasteProcessor.prototype =
 			}
 			
 			//���� ��������� ��������� ���������� ��������� �������
-			if(false == Common_CmpObj2(this.oCur_rPr, rPr))
+			if(!this.oCur_rPr.Is_Equal(rPr))
 			{
 			    this._Set_Run_Pr(rPr);
 				this.oCur_rPr = rPr;
