@@ -49,7 +49,6 @@ var PASTE_EMPTY_COUNTER     = 0;
 var PASTE_EMPTY_USE         = AscBrowser.isMozilla;
 
 var g_bIsDocumentCopyPaste = true;
-var isOnlyLocalBufferSafariWord = false;
 function Editor_Copy_GetElem(api)
 {
     var ElemToSelect = document.getElementById( COPY_ELEMENT_ID );
