@@ -1506,8 +1506,7 @@ ParaMath.prototype.CompareMathInfo = function(RecalculateObject)
 };
 ParaMath.prototype.Recalculate_Reset = function(CurRange, CurLine, RecalcResult)
 {
-    if(RecalcResult !== recalcresult_PrevLine)
-        this.Root.Recalculate_Reset(CurRange, CurLine); // обновим StartLine и StartRange только для Root (в CParagraphContentWithContentBase), для внутренних элементов обновится на Recalculate_Range
+    this.Root.Recalculate_Reset(CurRange, CurLine); // обновим StartLine и StartRange только для Root (в CParagraphContentWithContentBase), для внутренних элементов обновится на Recalculate_Range
 };
 ParaMath.prototype.Recalculate_Set_RangeEndPos = function(PRS, PRP, Depth)
 {

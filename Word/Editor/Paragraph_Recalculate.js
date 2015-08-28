@@ -894,6 +894,9 @@ Paragraph.prototype.private_RecalculateLineRanges      = function(CurLine, CurPa
         if (recalcresult_NextPage === PRS.RecalcResult)
             return false;
 
+        if (recalcresult_PrevLine === PRS.RecalcResult || recalcresult_CurPagePara === PRS.RecalcResult)
+            return true;
+
         CurRange++;
     }
 
@@ -1668,7 +1671,7 @@ Paragraph.prototype.private_RecalculateRange           = function(CurRange, CurL
 
         if ( ( 0 === Pos && 0 === CurLine && 0 === CurRange ) || Pos !== StartPos )
         {
-            Item.Recalculate_Reset( CurRange, CurLine, PRS.RecalcResult);
+            Item.Recalculate_Reset(CurRange, CurLine);
         }
 
         PRS.Update_CurPos( Pos, 0 );
