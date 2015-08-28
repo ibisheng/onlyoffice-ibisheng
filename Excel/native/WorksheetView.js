@@ -459,7 +459,8 @@ WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFr
                 _t = this.rows[cr.r1].top - offsetY - this.height_1px* 0,
                 _b = this.rows[cr.r2].top + this.rows[cr.r2].height - offsetY;
             //ctx.clearRect(_l, _t, _r - _l, _b - _t).restore();
-
+            //worksheet.headersWidth,
+            //    region.rowBeg - worksheet.headersHeight
             native_selection.push(_l);
             native_selection.push(_t);
             native_selection.push(_r);

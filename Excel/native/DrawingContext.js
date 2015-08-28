@@ -402,6 +402,9 @@
         this.ppiX = 96.0 * this.deviceScale * (96.0 / (this.deviceDPI * this.deviceScale));
         this.ppiY = 96.0 * this.deviceScale * (96.0 / (this.deviceDPI * this.deviceScale));
 
+        this.ppiX = this.deviceDPI; //96.0 * this.deviceScale * (96.0 / (this.deviceDPI * this.deviceScale));
+        this.ppiY = this.deviceDPI; //96.0 * this.deviceScale * (96.0 / (this.deviceDPI * this.deviceScale));
+
 		this._mct  = new Matrix();  // units transform
 		this._mt   = new Matrix();  // user transform
 		this._mbt  = new Matrix();  // bound transform
@@ -838,9 +841,11 @@
         var italic, bold, fontStyle, r;
 
 		this.font.copyFrom(font);
+        this.font.FontSize = this.font.FontSize * 2.54 * this.scaleFactor * 96.0 / 72.0;
+       // this.font.FontSize = this.font.FontSize * 2.54 * this.scaleFactor * this.deviceDPI / 72.0;
 
-        this.font.FontSize = this.font.FontSize * 2.54 * this.scaleFactor *
-            this.deviceScale * this.deviceDPI / 96.0 * (96.0 / (this.deviceDPI * this.deviceScale));
+       // this.font.FontSize = this.font.FontSize * 2.54 * this.scaleFactor *
+       //     this.deviceScale * this.deviceDPI / 96.0 * (96.0 / (this.deviceDPI * this.deviceScale));
 
         italic = true === font.Italic;
 		bold   = true === font.Bold;
@@ -947,8 +952,6 @@
 			r  = getCvtRatio(0/*px*/, units >= 0 && units <=3 ? units : this.units, this.ppiX);
         for (var tmp, w = 0, w2 = 0, i = 0; i < text.length; ++i) {
 
-            //tmp = fm.MeasureChar(text.charCodeAt(i));
-
             var bounds = g_oTextMeasurer.Measurer["GetDrawingBox"](text.charCodeAt(i));
             tmp = {
                 fAdvanceX: bounds[0],
@@ -960,7 +963,7 @@
                 }
             };
 
-            w += asc_round(tmp.fAdvanceX);
+            w += asc_round(tmp.fAdvanceX); // asc_round - убрали что бы текст не скакал
         }
 		w2 = w - tmp.fAdvanceX + tmp.oBBox.fMaxX - tmp.oBBox.fMinX + 1;
 		return this._calcTextMetrics(w * r, w2 * r, fm, r);
