@@ -4644,6 +4644,11 @@ CPresentation.prototype =
                 }
             }
         }
+    },
+
+    Is_TrackRevisions: function()
+    {
+        return false;
     }
 };
 
