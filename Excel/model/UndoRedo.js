@@ -3169,8 +3169,7 @@ UndoRedoWoorksheet.prototype = {
 			if(bUndo)
 				nRow = !nRow;
 			
-			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-			worksheetView.model.setRowHidden(nRow, Data.from, Data.to);
+			ws.setRowHidden(nRow, from, to);
 		}
 		else if(historyitem_Worksheet_AddRows == Type || historyitem_Worksheet_RemoveRows == Type)
 		{
