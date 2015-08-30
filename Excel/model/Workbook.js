@@ -3848,7 +3848,7 @@ Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 		stop = start;
 	History.Create_NewPoint();
 	var oThis = this, i;
-	var historyStart = 0, prevStatus = null;
+	var startIndex = start, isAddPrevBlock = false;
 	
 	var fProcessRow = function(row){
 		if(row && bHidden != (0 != (g_nRowFlag_hd & row.flags)))
@@ -3857,32 +3857,25 @@ Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 				row.flags |= g_nRowFlag_hd;
 			else
 				row.flags &= ~g_nRowFlag_hd;
-			var oNewProps = row.getHeightProp();
 			
-			var isEqualProp = prevStatus !== null && prevStatus.isEqual(oNewProps) ? true : false;
-			if(isEqualProp)//если статус не изменяется
+			if(row.index === stop)
 			{
-				if(row.index === stop)
-					History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(), row._getUpdateRange(), new UndoRedoData_FromToRowCol(bHidden, historyStart, row.index));
-			}	
-			else
-			{
-				if(prevStatus !== null)//заносим в историю предыдущие строки
-					History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(), row._getUpdateRange(), new UndoRedoData_FromToRowCol(prevStatus.hd, historyStart, row.index - 1));
-				
-				if(row.index === stop)//если строка последняя, её необходимо добавить в историю
+				if(isAddPrevBlock)
+					History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(), row._getUpdateRange(), new UndoRedoData_FromToRowCol(bHidden, startIndex, row.index));
+				else
+				{
 					History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(), row._getUpdateRange(), new UndoRedoData_FromToRowCol(bHidden, row.index, row.index));
-					
-				//обнуляем индексы
-				historyStart = row.index;
+					startIndex = row.index;
+				}		
 			}
-			prevStatus = oNewProps;
+			
+			isAddPrevBlock = true;
 		}
 		else
 		{
-			if(prevStatus !== null)//заносим предыдущие строки
-				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(), row._getUpdateRange(), new UndoRedoData_FromToRowCol(prevStatus.hd, historyStart, row.index - 1));
-			prevStatus = null;
+			if(isAddPrevBlock)//заносим предыдущие строки
+				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(), row._getUpdateRange(), new UndoRedoData_FromToRowCol(bHidden, startIndex, row.index - 1));
+			isAddPrevBlock = false;
 		}
 	};
 	if(0 == start && gc_nMaxRow0 == stop)
