@@ -3170,6 +3170,12 @@ UndoRedoWoorksheet.prototype = {
 				nRow = !nRow;
 			
 			ws.setRowHidden(nRow, from, to);
+			
+			if(bUndo)
+			{
+				var workSheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);	
+				workSheetView.autoFilters.reDrawFilter(new Asc.Range(0, from, ws.nColsCount - 1, to));
+			}
 		}
 		else if(historyitem_Worksheet_AddRows == Type || historyitem_Worksheet_RemoveRows == Type)
 		{
