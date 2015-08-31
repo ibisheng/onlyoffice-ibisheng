@@ -8282,9 +8282,9 @@
 					range = t.model.getRange3(aFilters[aF].range.r1 + selectionRange.r1, aFilters[aF].range.c1 + selectionRange.c1, aFilters[aF].range.r2 + selectionRange.r1, aFilters[aF].range.c2 + selectionRange.c1);
 					if(aFilters[aF].style)
 						range.cleanFormat();
-					t.autoFilters.addAutoFilter(aFilters[aF].style, range.bbox, true);
+					t.autoFilters.addAutoFilter(aFilters[aF].style, range.bbox, true, true);
 					if(!aFilters[aF].autoFilter)
-						t.autoFilters.addAutoFilter(null, range.bbox, true);
+						t.autoFilters.addAutoFilter(null, range.bbox, true, true);
 				}
 			}
 			else if(isLocal === 'binary' && val.TableParts && val.TableParts.length)
@@ -8309,7 +8309,7 @@
 					if(!aFilters[aF].AutoFilter)
 						bWithoutFilter = true;
 						
-					t.autoFilters.addAutoFilter(aFilters[aF].TableStyleInfo.Name, range.bbox, true, null, bWithoutFilter);
+					t.autoFilters.addAutoFilter(aFilters[aF].TableStyleInfo.Name, range.bbox, true, true, bWithoutFilter);
 				}
 			}
 			
