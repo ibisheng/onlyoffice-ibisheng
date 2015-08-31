@@ -3858,18 +3858,20 @@ Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 			else
 				row.flags &= ~g_nRowFlag_hd;
 			
-			if(row.index === stop)
+			if(row.index === stop || row.index === gc_nMaxRow0)
 			{
 				if(isAddPrevBlock)
 					History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(), row._getUpdateRange(), new UndoRedoData_FromToRowCol(bHidden, startIndex, row.index));
 				else
-				{
 					History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(), row._getUpdateRange(), new UndoRedoData_FromToRowCol(bHidden, row.index, row.index));
-					startIndex = row.index;
-				}		
+					
+				isAddPrevBlock = false;
 			}
-			
-			isAddPrevBlock = true;
+			else if(!isAddPrevBlock)
+			{
+				startIndex = row.index;
+				isAddPrevBlock = true;
+			}
 		}
 		else
 		{
