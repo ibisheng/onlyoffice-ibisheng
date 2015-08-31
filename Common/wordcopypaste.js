@@ -30,6 +30,7 @@ window.USER_AGENT_WEBKIT = AscBrowser.isWebkit;
 
 window.GlobalPasteFlagCounter = 0;
 window.GlobalPasteFlag = false;
+window.GlobalCopyFlag = false;
 
 window.PasteEndTimerId = -1;
 
@@ -311,8 +312,10 @@ function Editor_Copy(api, bCut)
     if (window.USER_AGENT_SAFARI_MACOS)
         time_interval = 200;
 
+    window.GlobalCopyFlag = true;
     window.setTimeout( function()
     {
+        window.GlobalCopyFlag = false;
         //�������� ����������� ���������
         ElemToSelect.style.display  = ELEMENT_DISPAY_STYLE;
         document.body.style.MozUserSelect = "none";
