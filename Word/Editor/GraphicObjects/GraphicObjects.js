@@ -2336,13 +2336,9 @@ CGraphicObjects.prototype =
                                 para_drawing.CheckWH();
                                 if(!para_drawing.Is_Inline())
                                 {
-                                    var new_x, new_y;
-                                    var deltaX, deltaY;
-                                    deltaX = 0;//sp.localTransform.tx - sp.bounds.x;
-                                    deltaY = 0;//sp.localTransform.ty - sp.bounds.y;
-                                    new_x = sp.transform.tx - deltaX;
-                                    new_y = sp.transform.ty - deltaY;
-                                    para_drawing.Set_XY(new_x, new_x, para_drawing.Get_ParentParagraph(), para_drawing.GraphicObj.selectStartPage, true);
+                                    new_x = sp.transform.tx;
+                                    new_y = sp.transform.ty;
+                                    para_drawing.Set_XY(sp.transform.tx, sp.transform.ty, para_drawing.Get_ParentParagraph(), para_drawing.GraphicObj.selectStartPage, true);
                                 }
                                 this.document.Recalculate();
                                 return;
