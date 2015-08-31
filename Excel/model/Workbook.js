@@ -3858,7 +3858,7 @@ Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 			else
 				row.flags &= ~g_nRowFlag_hd;
 			
-			if(row.index === stop || row.index === gc_nMaxRow0)
+			if(row.index === stop)
 			{
 				if(isAddPrevBlock)
 					History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(), row._getUpdateRange(), new UndoRedoData_FromToRowCol(bHidden, startIndex, row.index));
@@ -3882,10 +3882,7 @@ Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 	};
 	if(0 == start && gc_nMaxRow0 == stop)
 	{
-        fProcessRow(false == bHidden ? this.oSheetFormatPr.oAllRow : this.getAllRow());
-
-		for(i in this.aGCells)
-			fProcessRow(this.aGCells[i]);
+        // ToDo реализовать скрытие всех строк!
 	}
 	else
 	{
