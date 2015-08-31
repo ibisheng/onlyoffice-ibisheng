@@ -141,6 +141,7 @@
                 "../../Word/Editor/FontClassification.js",
                 "../../Word/Editor/Spelling.js",
                 "../../Word/Editor/GraphicObjects/WrapManager.js",
+				"../../Word/Editor/Common.js",
                 "../../Word/Math/mathTypes.js",
                 "../../Word/Math/mathText.js",
                 "../../Word/Math/mathContent.js",
