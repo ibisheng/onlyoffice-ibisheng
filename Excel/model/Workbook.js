@@ -3852,7 +3852,7 @@ Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 		stop = start;
 	History.Create_NewPoint();
 	var oThis = this, i;
-	var startIndex = start, isAddPrevBlock = false;
+	var startIndex = null, endIndex = null, updateRange;
 	
 	var fProcessRow = function(row){
 		if(row && bHidden != (0 != (g_nRowFlag_hd & row.flags)))
@@ -3862,26 +3862,20 @@ Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 			else
 				row.flags &= ~g_nRowFlag_hd;
 			
-			if(row.index === stop)
+			
+			if(row.index === endIndex + 1 && startIndex !== null)
+				endIndex++;
+			else
 			{
-				if(isAddPrevBlock)
-					History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(), row._getUpdateRange(), new UndoRedoData_FromToRowCol(bHidden, startIndex, row.index));
-				else
-					History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(), row._getUpdateRange(), new UndoRedoData_FromToRowCol(bHidden, row.index, row.index));
-					
-				isAddPrevBlock = false;
-			}
-			else if(!isAddPrevBlock)
-			{
+				if(startIndex !== null)
+				{
+					updateRange = new Asc.Range(0, startIndex, gc_nMaxCol0, endIndex);
+					History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(), updateRange, new UndoRedoData_FromToRowCol(bHidden, startIndex, endIndex));
+				}	
+				
 				startIndex = row.index;
-				isAddPrevBlock = true;
+				endIndex = row.index;
 			}
-		}
-		else
-		{
-			if(isAddPrevBlock)//заносим предыдущие строки
-				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(), row._getUpdateRange(), new UndoRedoData_FromToRowCol(bHidden, startIndex, row.index - 1));
-			isAddPrevBlock = false;
 		}
 	};
 	if(0 == start && gc_nMaxRow0 == stop)
@@ -3892,6 +3886,12 @@ Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 	{
 		for(i = start; i <= stop; ++i)
 			fProcessRow(false == bHidden ? this._getRowNoEmpty(i) : this._getRow(i));
+		
+		if(startIndex !== null)//заносим последние строки
+		{
+			updateRange = new Asc.Range(0, startIndex, gc_nMaxCol0, endIndex);
+			History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(),updateRange, new UndoRedoData_FromToRowCol(bHidden, startIndex, endIndex));
+		}
 	}
 };
 Woorksheet.prototype.setRowBestFit=function(bBestFit, height, start, stop){
