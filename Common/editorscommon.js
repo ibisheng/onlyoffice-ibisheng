@@ -115,7 +115,7 @@ function g_fOpenFileCommand (binUrl, changesUrl, Signature, callback) {
 			g_oZipChanges = new (require('jszip'))(data);
 			oResult.changes = [];
 			for(var i in g_oZipChanges.files)
-				oResult.changes.push(JSON.parse(g_oZipChanges[i].asText()));
+				oResult.changes.push(JSON.parse(g_oZipChanges.files[i].asText()));
 			onEndOpen();
 		});
 	} else
