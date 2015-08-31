@@ -949,35 +949,40 @@ DependencyGraph.prototype = {
     removeDefNameBySheet:function ( sheetId ) {
 
         /*var ws = this.wb.getWorksheet( sheetId );
-        ws ? sheetId = ws.getId() : null;*/
+         ws ? sheetId = ws.getId() : null;*/
 
         var nodesList = this.defNameList, retRes = {}, defN, seUndoRedo = [], nSE, wsIndex;
 
-        for( var id in nodesList ){
-
-            if( !nodesList[id].isTable && nodesList[id].parsedRef.removeSheet(sheetId) ){
+        for ( var id in nodesList ) {
+            /*if ( nodesList[id].isTable ) {
+                if ( nodesList[id].sheetTableId == sheetId ) {
+                    nodesList[id].Ref = null;
+                }
+                continue;
+            }*/
+            if ( !nodesList[id].isTable && nodesList[id].parsedRef && nodesList[id].parsedRef.removeSheet( sheetId ) ) {
                 seUndoRedo = [];
                 defN = nodesList[id];
                 nSE = defN.getSlaveEdges();
-                for( var nseID in nSE ){
-                    seUndoRedo.push(nseID);
+                for ( var nseID in nSE ) {
+                    seUndoRedo.push( nseID );
                 }
 
-                wsIndex = this.wb.getWorksheetById(defN.sheetId);
+                wsIndex = this.wb.getWorksheetById( defN.sheetId );
 
                 History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null,
                     new UndoRedoData_DefinedNames( defN.Name, defN.Ref, wsIndex ? wsIndex.getIndex() : undefined, defN.isTable, seUndoRedo ) );
 
-                if( defN.sheetId == sheetId ){
+                if ( defN.sheetId == sheetId ) {
 
                     defN.Ref = null;
                     defN.parsedRef = null;
                     retRes[id] = defN;
 
                 }
-                else{
+                else {
 
-                    defN.Ref = defN.parsedRef.Formula  = defN.parsedRef.assemble(true);
+                    defN.Ref = defN.parsedRef.Formula = defN.parsedRef.assemble( true );
                     retRes[id] = defN;
 
                 }
@@ -1598,7 +1603,7 @@ DefNameVertex.prototype = {
 
     returnCell:function () {
         //todo
-        if ( null == this.cell && this.wb && !this.isArea ) {
+        if ( null == this.cell && this.wb && !this.isArea && this.Ref !== null && this.Ref !== undefined ) {
             var ws = this.wb.getWorksheetById( this.sheetId );
             if ( ws )
                 this.cell = ws._getCellNoEmpty( this.bbox.r1, this.bbox.c1 );
@@ -2174,13 +2179,14 @@ Workbook.prototype.removeWorksheet=function(nIndex, outputParams){
 	}
 	if(bEmpty)
 		return -1;
-	
+
 	var removedSheet = this.getWorksheet(nIndex);
 	if(removedSheet)
 	{
 		History.Create_NewPoint();
 		var removedSheetId = removedSheet.getId();
 		lockDraw(this);
+        var retRes = this.dependencyFormulas.removeDefNameBySheet( removedSheetId ), nSE, se, seUndoRedo = [];
 		var a = this.dependencyFormulas.getNodeBySheetId(removedSheetId);
 		for(var i = 0; i < a.length; i++)
 		{
@@ -2198,13 +2204,11 @@ Workbook.prototype.removeWorksheet=function(nIndex, outputParams){
 				}
 			}
 		}
+
 	    //по всем удаленным листам пробегаемся и удаляем из workbook.cwf (cwf - cells with forluma) элементы с названием соответствующего листа.
 		this.dependencyFormulas.removeNodeBySheetId(removedSheetId);
 		var _cwf = this.cwf[removedSheetId];
 		delete this.cwf[removedSheetId];
-
-
-        var retRes = this.dependencyFormulas.removeDefNameBySheet( removedSheetId ), nSE, se, seUndoRedo = [];
 
         if ( retRes ) {
             /*
