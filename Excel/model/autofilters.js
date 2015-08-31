@@ -1307,6 +1307,7 @@ var maxIndividualValues = 10000;
 				var DeleteColumns = ((insertType == c_oAscDeleteOptions.DeleteColumns && type == 'delCell') || insertType == c_oAscInsertOptions.InsertColumns) ? true : false;
 				activeRange = activeRange.clone();
 				var diff = activeRange.c2 - activeRange.c1 + 1;
+				var redrawTablesArr = [];
 				
 				if(type === "delCell")
 					diff = - diff;
@@ -1318,6 +1319,22 @@ var maxIndividualValues = 10000;
 				
 				History.StartTransaction();
 				History.Create_NewPoint();
+				
+				var cleanStylesTables = function(redrawTablesArr)
+				{
+					for(var i = 0; i < redrawTablesArr.length; i++)
+					{
+						t._cleanStyleTable(redrawTablesArr[i].oldfilterRef);
+					}
+				};
+				
+				var setStylesTables = function(redrawTablesArr)
+				{
+					for(var i = 0; i < redrawTablesArr.length; i++)
+					{
+						t._setColorStyleTable(redrawTablesArr[i].newFilter.Ref, redrawTablesArr[i].newFilter, null, true);
+					}
+				};
 				
 				var changeFilter = function(filter, bTablePart)
 				{
@@ -1413,10 +1430,7 @@ var maxIndividualValues = 10000;
 						
 						//set style
 						if(oldFilter && bTablePart)
-						{
-							t._cleanStyleTable(oldFilter.Ref);
-							t._setColorStyleTable(filter.Ref, filter, null, true);
-						}
+							redrawTablesArr.push({oldfilterRef: oldFilter.Ref, newFilter: filter});
 					}
 				};
 				
@@ -1430,6 +1444,11 @@ var maxIndividualValues = 10000;
 				for(var i = 0; i < tableParts.length; i++)
 					changeFilter(tableParts[i], true);
 				
+				
+				//set styles for tables
+				cleanStylesTables(redrawTablesArr);
+				setStylesTables(redrawTablesArr);
+				
 				History.EndTransaction();
 			},
 			
@@ -1442,6 +1461,7 @@ var maxIndividualValues = 10000;
 				var DeleteRows = ((insertType == c_oAscDeleteOptions.DeleteRows && type == 'delCell') || insertType == c_oAscInsertOptions.InsertRows) ? true : false;
 				activeRange = activeRange.clone();
 				var diff = activeRange.r2 - activeRange.r1 + 1;
+				var redrawTablesArr = [];
 				
 				if(type === "delCell")
 					diff = - diff;
@@ -1454,7 +1474,23 @@ var maxIndividualValues = 10000;
 				
 				History.StartTransaction();
 				History.Create_NewPoint();
-
+				
+				var cleanStylesTables = function(redrawTablesArr)
+				{
+					for(var i = 0; i < redrawTablesArr.length; i++)
+					{
+						t._cleanStyleTable(redrawTablesArr[i].oldfilterRef);
+					}
+				};
+				
+				var setStylesTables = function(redrawTablesArr)
+				{
+					for(var i = 0; i < redrawTablesArr.length; i++)
+					{
+						t._setColorStyleTable(redrawTablesArr[i].newFilter.Ref, redrawTablesArr[i].newFilter, null, true);
+					}
+				};
+				
 				var changeFilter = function(filter, bTablePart)
 				{
 					var ref = filter.Ref;
@@ -1485,11 +1521,9 @@ var maxIndividualValues = 10000;
 						t._addHistoryObj(changeElement, historyitem_AutoFilter_Change, null, true, oldFilter.Ref, null, true);
 					}
 					
+					//set style
 					if(oldFilter && bTablePart)
-					{
-						t._cleanStyleTable(oldFilter.Ref);
-						t._setColorStyleTable(filter.Ref, filter, null, true);
-					}
+						redrawTablesArr.push({oldfilterRef: oldFilter.Ref, newFilter: filter});
 				};
 				
 				//change autoFilter
@@ -1500,6 +1534,10 @@ var maxIndividualValues = 10000;
 				var tableParts = aWs.TableParts;
 				for(var i = 0; i < tableParts.length; i++)
 					changeFilter(tableParts[i], true);
+				
+				//set styles for tables
+				cleanStylesTables(redrawTablesArr);
+				setStylesTables(redrawTablesArr);
 				
 				History.EndTransaction();
 			},
