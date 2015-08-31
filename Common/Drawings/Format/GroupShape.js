@@ -693,13 +693,18 @@ CGroupShape.prototype =
 
     checkExtentsByDocContent: function()
     {
+        var bRet = false;
         for(var i = 0; i < this.spTree.length; ++i)
         {
             if(typeof this.spTree[i].checkExtentsByDocContent === "function")
             {
-                this.spTree[i].checkExtentsByDocContent();
+                if(this.spTree[i].checkExtentsByDocContent())
+                {
+                    bRet = true;
+                }
             }
         }
+        return bRet;
     },
 
     Paragraph_IncDecFontSizeAll: function(val)
@@ -914,6 +919,51 @@ CGroupShape.prototype =
             if(this.spTree[i].rebuildSeries)
                 this.spTree[i].rebuildSeries(data);
         }
+    },
+
+    CheckNeedRecalcAutoFit: function(oSectPr)
+    {
+        var bRet = false;
+        for(var i = 0;  i< this.spTree.length; ++i)
+        {
+            if(this.spTree[i].CheckNeedRecalcAutoFit && this.spTree[i].CheckNeedRecalcAutoFit(oSectPr))
+            {
+                bRet = true;
+            }
+        }
+        if(bRet)
+        {
+            this.recalcWrapPolygon();
+        }
+        return bRet;
+    },
+
+
+    CheckGroupSizes: function()
+    {
+        var bRet = false;
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].checkExtentsByDocContent)
+            {
+                if(this.spTree[i].checkExtentsByDocContent(undefined, false))
+                {
+                    bRet = true;
+                }
+            }
+        }
+        if(bRet)
+        {
+            if(!this.group)
+            {
+                this.updateCoordinatesAfterInternalResize();
+            }
+            if(this.parent instanceof ParaDrawing)
+            {
+                this.parent.CheckWH();
+            }
+        }
+        return bRet;
     },
 
     Search : function(Str, Props, SearchEngine, Type)
@@ -1297,6 +1347,7 @@ CGroupShape.prototype =
             sp_tree[i].spPr.xfrm.setOffY(sp_tree[i].spPr.xfrm.offY - y_min_clear);
         }
         this.checkDrawingBaseCoords();
+        return {posX: pos_x, posY: pos_y};
     },
 
     select: CShape.prototype.select,

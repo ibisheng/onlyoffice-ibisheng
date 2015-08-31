@@ -1108,13 +1108,13 @@ MoveInGroupState.prototype =
                 this.drawingObjects.arrTrackObjects[i].trackEnd(true);
             }
         }
-        this.group.updateCoordinatesAfterInternalResize();
+        var oPosObject = this.group.updateCoordinatesAfterInternalResize();
         this.group.recalculate();
         var bounds = this.group.bounds;
         var check_paragraphs = [];
         check_paragraphs.push(this.group.parent.Get_ParentParagraph());
-        var posX = this.group.spPr.xfrm.offX;
-        var posY = this.group.spPr.xfrm.offY;
+        var posX = oPosObject.posX;
+        var posY = oPosObject.posY;
         this.group.spPr.xfrm.setOffX(0);
         this.group.spPr.xfrm.setOffY(0);
         if(this.group.parent.Is_Inline())
@@ -1123,7 +1123,7 @@ MoveInGroupState.prototype =
         }
         else
         {
-            var nearest_pos = this.drawingObjects.document.Get_NearestPos(this.group.parent.pageIndex, this.group.parent.X + (bounds.x - old_x), this.group.parent.Y + (bounds.y - old_y), true, this.group.parent);
+         //   var nearest_pos = this.drawingObjects.document.Get_NearestPos(this.group.parent.pageIndex, this.group.parent.X + (bounds.x - old_x), this.group.parent.Y + (bounds.y - old_y), true, this.group.parent);
            // if(nearest_pos.Paragraph !== check_paragraphs[0] && this.group.parent.Locked !== true )
            // {
            //     check_paragraphs.push(nearest_pos.Paragraph);
@@ -1134,9 +1134,9 @@ MoveInGroupState.prototype =
            // }
            // else
             {
-                check_paragraphs.length = 0;
                 this.group.parent.Set_XY(this.group.posX + posX, this.group.posY + posY, check_paragraphs[0], this.group.parent.pageIndex, false);
             }
+            check_paragraphs.length = 0;
          }
         if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : changestype_Paragraph_Content}))
         {

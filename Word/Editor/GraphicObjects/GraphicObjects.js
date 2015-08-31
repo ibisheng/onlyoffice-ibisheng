@@ -399,6 +399,14 @@ CGraphicObjects.prototype =
 
     applyDrawingProps: DrawingObjectsController.prototype.applyDrawingProps,
 
+    CheckAutoFit : function()
+    {
+        for(var i = this.drawingObjects.length - 1; i > -1; --i)
+        {
+                this.drawingObjects[i].CheckGroupSizes();
+        }
+    },
+
     checkUseDrawings: function(aDrawings)
     {
         for(var i = aDrawings.length - 1; i > -1; --i)
@@ -2066,6 +2074,7 @@ CGraphicObjects.prototype =
                 }
             }));
         para_drawing.Add_ToDocument2(first_paragraph);
+        para_drawing.Parent = first_paragraph;
         this.addGraphicObject(para_drawing);
         this.resetSelection();
         this.selectObject(group, page_index);

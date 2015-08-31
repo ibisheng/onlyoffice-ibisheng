@@ -44,6 +44,9 @@ CShape.prototype.recalcContent = function()
         this.recalcInfo.AllDrawings = [];
         if(this.checkAutofit && this.checkAutofit())
         {
+            this.recalcGeometry();
+            this.recalcWrapPolygon();
+            this.recalcBounds();
             this.recalcTransform();
         }
     }
@@ -121,6 +124,9 @@ CShape.prototype.recalcTxBoxContent = function()
     this.recalcInfo.AllDrawings = [];
     if(this.checkAutofit && this.checkAutofit() && (!editor || !editor.noCreatePoint || editor.exucuteHistory))
     {
+        this.recalcGeometry();
+        this.recalcWrapPolygon();
+        this.recalcBounds();
         this.recalcTransform();
     }
 };
@@ -833,6 +839,12 @@ CShape.prototype.recalcText = function()
     {
         this.recalcTxBoxContent();
         this.recalcTransformText();
+        if(this.checkAutofit && this.checkAutofit())
+        {
+            this.recalcGeometry();
+            this.recalcWrapPolygon();
+            this.recalcBounds();
+        }
     }
 };
 

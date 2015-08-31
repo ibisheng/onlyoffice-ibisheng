@@ -4278,6 +4278,15 @@ ParaDrawing.prototype =
         return false;
     },
 
+
+    CheckGroupSizes : function()
+    {
+        if(this.GraphicObj && this.GraphicObj.CheckGroupSizes)
+        {
+            this.GraphicObj.CheckGroupSizes();
+        }
+    },
+
     getXfrmExtX: function()
     {
         if(isRealObject(this.GraphicObj) && isRealObject(this.GraphicObj.spPr) && isRealObject(this.GraphicObj.spPr.xfrm))
@@ -4472,6 +4481,10 @@ ParaDrawing.prototype =
         else
         {
             this.GraphicObj.recalculate();
+            if(this.GraphicObj.recalculateText)
+            {
+                this.GraphicObj.recalculateText();
+            }
             if(this.PositionH.UseAlign || this.Is_Inline())
             {
                 this.Width = this.GraphicObj.bounds.w;
@@ -5082,6 +5095,22 @@ ParaDrawing.prototype =
     Get_AnchorPos : function()
     {
         return this.Parent.Get_AnchorPos(this);
+    },
+
+    CheckRecalcAutoFit : function(oSectPr)
+    {
+        if(this.GraphicObj && this.GraphicObj.CheckNeedRecalcAutoFit)
+        {
+            if(this.GraphicObj.CheckNeedRecalcAutoFit(oSectPr))
+            {
+                //this.GraphicObj.recalculate();
+                if(this.GraphicObj)
+                {
+                    this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
+                }
+                this.Measure();
+            }
+        }
     },
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции

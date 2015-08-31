@@ -2074,6 +2074,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     var ContentLen = this.Content.length;
     var XRange    = PRS.XRange;
+    var oSectionPr = undefined;
 
     if (false === StartWord && true === FirstItemOnLine && XEnd - X < 0.001 && RangesCount > 0)
     {
@@ -2437,6 +2438,11 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 }
                 case para_Drawing:
                 {
+                    if(oSectionPr === undefined)
+                    {
+                        oSectionPr = Para.Get_SectPr();
+                    }
+                    Item.CheckRecalcAutoFit(oSectionPr);
                     if (true === Item.Is_Inline() || true === Para.Parent.Is_DrawingShape())
                     {
                         if (true !== Item.Is_Inline())
@@ -4028,7 +4034,6 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
     var pGraphics = PDSE.Graphics;
     var BgColor   = PDSE.BgColor;
     var Theme     = PDSE.Theme;
-    var FontScheme = Theme.themeElements.fontScheme;
 
     var X = PDSE.X;
     var Y = PDSE.Y;
@@ -8161,6 +8166,13 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 var unifill = new CUniFill();
                 unifill.Read_FromBinary(Reader);
                 this.Pr.Unifill = unifill;
+                if(typeof CollaborativeEditing !== "undefined")
+                {
+                    if(unifill.fill && unifill.fill.type === FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
+                    {
+                        CollaborativeEditing.Add_NewImage(getFullImageSrc2(unifill.fill.RasterImageId));
+                    }
+                }
             }
             else
                 this.Pr.Unifill = undefined;

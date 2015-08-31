@@ -14,6 +14,16 @@ function CheckWordArtTextPr(oTextPr)
     return false;
 }
 
+
+function CopyPageSize(oPageSize)
+{
+    var oRet = new CSectionPageSize();
+    oRet.W      = oPageSize.W
+    oRet.H      = oPageSize.H
+    oRet.Orient = oPageSize.Orient;
+    return oRet;
+}
+
 function hitToHandles(x, y, object)
 {
     var invert_transform = object.getInvertTransform();
@@ -790,7 +800,10 @@ CShape.prototype =
         if (content_to_add) {
             docContentFunction.apply(content_to_add, args);
         }
-        this.checkExtentsByDocContent();
+        if(!editor || !editor.noCreatePoint || editor.exucuteHistory)
+        {
+            this.checkExtentsByDocContent();
+        }
     },
 
     clearContent: function () {
@@ -2456,13 +2469,8 @@ CShape.prototype =
         }
 
 
-        if(this.checkAutofit && this.checkAutofit()) {
+        if(this.checkAutofit && this.checkAutofit() && (!this.bWordShape || !this.group || this.bCheckAutoFitFlag)) {
             var oBodyPr = this.getBodyPr();
-            if(this.recalcInfo.recalculateGeometry)
-            {
-                this.recalculateGeometry();
-                this.recalcInfo.recalculateGeometry = true;
-            }
             if (this.bWordShape) {
                 if (this.recalcInfo.recalculateTxBoxContent) {
                     this.recalcInfo.oContentMetrics = this.recalculateTxBoxContent();
@@ -2741,6 +2749,53 @@ CShape.prototype =
         this.transform = transform;
     },
 
+    CheckNeedRecalcAutoFit : function(oSectPr)
+    {
+        var Width, Height, Width2, Height2;
+        var bRet = false;
+        if(this.checkAutofit())
+        {
+            if(oSectPr)
+            {
+                if(!this.m_oSectPr)
+                {
+                    this.recalcBounds();
+                    this.recalcText();
+                    this.recalcGeometry();
+                    bRet = true;
+                }
+                else
+                {
+
+                    Width = oSectPr.Get_PageWidth() - oSectPr.Get_PageMargin_Left() - oSectPr.Get_PageMargin_Right();
+                    Height = oSectPr.Get_PageHeight() - oSectPr.Get_PageMargin_Top() - oSectPr.Get_PageMargin_Bottom();
+
+                    Width2 = this.m_oSectPr.Get_PageWidth() - this.m_oSectPr.Get_PageMargin_Left() - this.m_oSectPr.Get_PageMargin_Right();
+                    Height2 = this.m_oSectPr.Get_PageHeight() - this.m_oSectPr.Get_PageMargin_Top() - this.m_oSectPr.Get_PageMargin_Bottom();
+                    bRet = (Math.abs(Width - Width2) > 0.001 || Math.abs(Height - Height2) > 0.001);
+                    if(bRet)
+                    {
+                        this.recalcBounds();
+                        this.recalcText();
+                        this.recalcGeometry();
+                    }
+                    return bRet;
+                }
+            }
+            else
+            {
+                if(this.m_oSectPr)
+                {
+                    this.recalcBounds();
+                    this.recalcText();
+                    this.recalcGeometry();
+                    bRet = true;
+                }
+            }
+        }
+        return bRet;
+    },
+
 
     recalculateDocContent: function(oDocContent, oBodyPr)
     {
@@ -2765,6 +2820,7 @@ CShape.prototype =
             var dMaxWidth = 100000;
             if(this.bWordShape)
             {
+                this.m_oSectPr = null;
                 var oParaDrawing = getParaDrawing(this);
                 if(oParaDrawing)
                 {
@@ -2782,6 +2838,8 @@ CShape.prototype =
                             {
                                 dMaxWidth = oSectPr.Get_PageHeight() - oSectPr.Get_PageMargin_Top() - oSectPr.Get_PageMargin_Bottom();
                             }
+                            this.m_oSectPr = new CSectionPr();
+                            this.m_oSectPr.Copy(oSectPr);
                         }
                     }
                 }
@@ -2879,12 +2937,12 @@ CShape.prototype =
         return oRet;
     },
 
-    checkExtentsByDocContent: function(bForce)
+    checkExtentsByDocContent: function(bForce, bNeedRecalc)
     {
         if((!this.bWordShape || this.group || bForce) && this.checkAutofit(true))
         {
             var oMainGroup = this.getMainGroup();
-            if(oMainGroup)
+            if(oMainGroup && !(bNeedRecalc === false))
             {
                 oMainGroup.normalize();
             }
@@ -2910,21 +2968,24 @@ CShape.prototype =
                     CheckExcelDrawingXfrm(this.spPr.xfrm);
                 }
             }
-            if(oMainGroup)
+            if(!(bNeedRecalc === false))
             {
-                oMainGroup.updateCoordinatesAfterInternalResize();
-                if(oMainGroup.parent && oMainGroup.parent.CheckWH)
+                if(oMainGroup)
                 {
-                    oMainGroup.parent.CheckWH();
-                    if(this.bWordShape)
+                    oMainGroup.updateCoordinatesAfterInternalResize();
+                    if(oMainGroup.parent && oMainGroup.parent.CheckWH)
                     {
-                        editor.WordControl.m_oLogicDocument.Recalculate();
+                        oMainGroup.parent.CheckWH();
+                        if(this.bWordShape)
+                        {
+                            editor.WordControl.m_oLogicDocument.Recalculate();
+                        }
                     }
                 }
-            }
-            else
-            {
-                this.checkDrawingBaseCoords();
+                else
+                {
+                    this.checkDrawingBaseCoords();
+                }
             }
             return true;
         }

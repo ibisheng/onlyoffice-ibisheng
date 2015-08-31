@@ -7686,6 +7686,7 @@ CDocument.prototype =
         var B = ( undefined === MarPr.Bottom ? undefined : SectPr.Get_PageHeight() - MarPr.Bottom );
 
         SectPr.Set_PageMargins( L, T, R, B );
+        this.DrawingObjects.CheckAutoFit();
 
         this.ContentLastChangePos = 0;
         this.Recalculate();
@@ -7704,6 +7705,7 @@ CDocument.prototype =
 
         SectPr.Set_PageSize( W, H );
 
+        this.DrawingObjects.CheckAutoFit();
         if( true != bNoRecalc )
         {
             this.ContentLastChangePos = 0;
@@ -7739,6 +7741,7 @@ CDocument.prototype =
 
         SectPr.Set_Orientation( Orientation, true );
 
+        this.DrawingObjects.CheckAutoFit();
         if( true != bNoRecalc )
         {
             this.Recalculate();

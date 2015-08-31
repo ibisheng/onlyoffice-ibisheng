@@ -118,11 +118,14 @@ CGroupShape.prototype.setRecalculateInfo = function()
 
 CGroupShape.prototype.recalcTransform = function()
 {
-    this.recalcInfo.recalculateScaleCoefficients = true;
-    this.recalcInfo.recalculateTransform = true;
-    for(var i = 0; i < this.spTree.length; ++i)
+    if(!editor || !editor.noCreatePoint || editor.exucuteHistory)
     {
-        this.spTree[i].recalcTransform();
+        this.recalcInfo.recalculateScaleCoefficients = true;
+        this.recalcInfo.recalculateTransform = true;
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            this.spTree[i].recalcTransform();
+        }
     }
 };
 
