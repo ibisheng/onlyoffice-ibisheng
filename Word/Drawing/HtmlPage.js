@@ -2539,6 +2539,8 @@ function CEditorPage(api)
     {
         if (oThis.m_oApi.asc_IsLongAction())
         {
+            if (window.USER_AGENT_SAFARI_MACOS && window.GlobalPasteFlag)
+                return;
             e.preventDefault();
             return;
         }
