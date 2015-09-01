@@ -2536,11 +2536,12 @@ function CEditorPage(api)
         global_keyboardEvent.ShiftKey   = false;
     }
     this.onKeyPress = function(e)
-    {
+    {	
+		if (window.GlobalPasteFlag || window.GlobalCopyFlag)
+			return;
+			
         if (oThis.m_oApi.asc_IsLongAction())
-        {
-            if (window.GlobalPasteFlag)
-                return;
+		{
             e.preventDefault();
             return;
         }

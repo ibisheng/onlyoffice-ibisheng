@@ -205,6 +205,7 @@ function Editor_Copy(api, bCut)
 	//document.body.style["color"] = "transparent";
 	
 	ElemToSelect.style.MozUserSelect = "all";
+	ElemToSelect.focus();
 	
     if (null != api.WordControl.m_oLogicDocument)
     {

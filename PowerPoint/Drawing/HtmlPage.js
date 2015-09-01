@@ -1990,6 +1990,9 @@ function CEditorPage(api)
 
     this.onKeyPress = function(e)
     {
+		if (window.GlobalPasteFlag || window.GlobalCopyFlag)
+			return;
+			
         if (oThis.Thumbnails.FocusObjType == FOCUS_OBJECT_THUMBNAILS)
         {
             return;
@@ -3001,6 +3004,13 @@ function CEditorPage(api)
     {
         var oWordControl = oThis;
         oWordControl.m_nTimeDrawingLast = new Date().getTime();
+		
+		if (oWordControl.IsFocus && oWordControl.TextBoxInputMode && oWordControl.TextBoxInput && !window.USER_AGENT_SAFARI_MACOS)
+        {
+            if (!oWordControl.m_oApi.asc_IsLongAction() && !window.GlobalCopyFlag)
+                oWordControl.TextBoxInput.focus();
+        }
+		
         if (oWordControl.m_bIsScroll)
         {
             oWordControl.m_bIsScroll = false;
