@@ -951,15 +951,15 @@ DependencyGraph.prototype = {
         /*var ws = this.wb.getWorksheet( sheetId );
          ws ? sheetId = ws.getId() : null;*/
 
-        var nodesList = this.defNameList, retRes = {}, defN, seUndoRedo = [], nSE, wsIndex;
+        var nodesList = this.defNameList, retRes = {}, defN, seUndoRedo = [], nSE, wsIndex, ws = this.wb.getWorksheetById(sheetId ), wsName = ws.getName();
 
         for ( var id in nodesList ) {
-            /*if ( nodesList[id].isTable ) {
-                if ( nodesList[id].sheetTableId == sheetId ) {
+            if ( nodesList[id].isTable ) {
+                if(nodesList[id].Ref.indexOf(wsName) > -1){
                     nodesList[id].Ref = null;
                 }
                 continue;
-            }*/
+            }
             if ( !nodesList[id].isTable && nodesList[id].parsedRef && nodesList[id].parsedRef.removeSheet( sheetId ) ) {
                 seUndoRedo = [];
                 defN = nodesList[id];
@@ -1053,11 +1053,16 @@ DependencyGraph.prototype = {
         this.defNameSheets[newSheetId] = obj;
 
     },
-    relinkDefNameByWorksheet:function (){
+    relinkDefNameByWorksheet:function (oName, nName){
 
         var oldS = this.defNameList;
         for( var id in oldS ){
-            oldS[id].relinkRef();
+            if(oldS[id].isTable){
+                oldS[id].Ref = oldS[id].Ref.replace(oName,nName);
+            }
+            else{
+                oldS[id].relinkRef();
+            }
         }
 
     },
@@ -2427,10 +2432,12 @@ Workbook.prototype.getDefinesNamesWB = function (defNameListId) {
     function getNames(id,arr){
         var listDN = thas.dependencyFormulas.defNameSheets[id], name;
         for ( var id in listDN ) {
-            name = listDN[id].getAscCDefName();
-            if ( name.Ref && !name.Hidden ) {
+            name = listDN[id]
 
-                arr.push( name );
+            if ( name.Ref && !name.Hidden ) {
+                if( name.parsedRef && name.parsedRef.isParsed && name.parsedRef.calculate().errorType !== cErrorType.bad_reference ){
+                    arr.push( name.getAscCDefName() );
+                }
             }
         }
     }
@@ -3184,7 +3191,7 @@ Woorksheet.prototype.setName=function(name, bFromUndoRedo){
 			this.workbook.getWorksheetById(id)._ReBuildFormulas(this.workbook.cwf[id].cells,lastName,this.sName);
 		}
 
-        this.workbook.dependencyFormulas.relinkDefNameByWorksheet(this.Id);
+        this.workbook.dependencyFormulas.relinkDefNameByWorksheet(lastName, name);
 
         if(!bFromUndoRedo)
         {
