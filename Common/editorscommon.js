@@ -125,7 +125,7 @@ function g_fSaveWithParts(fSendCommand, fCallback, fCallbackRequest, oAdditional
 
 function g_fGetImageFromChanges (name) {
 	var file;
-	var ext = GetFileExtension(sName);
+	var ext = GetFileExtension(name);
 	if (null !== ext && g_oZipChanges && (file = g_oZipChanges.files[name])) {
 		var oFileArray = file.asUint8Array();
 		return 'data:image/' + ext + ';base64,' + Base64Encode(oFileArray, oFileArray.length, 0);
@@ -174,8 +174,10 @@ function g_fOpenFileCommand (binUrl, changesUrl, Signature, callback) {
 
 			g_oZipChanges = new (require('jszip'))(data);
 			oResult.changes = [];
-			for(var i in g_oZipChanges.files)
-				oResult.changes.push(JSON.parse(g_oZipChanges.files[i].asText()));
+			for(var i in g_oZipChanges.files) {
+				if (i.endsWith('.json'))
+					oResult.changes.push(JSON.parse(g_oZipChanges.files[i].asText()));
+			}
 			onEndOpen();
 		});
 	} else
@@ -544,6 +546,12 @@ var c_oAscImageUploadProp = {//Не все браузеры позволяют �
     SupportedFormats:[ "jpg", "jpeg", "jpe", "png", "gif", "bmp", "ico"]
 };
 
+/**
+ *
+ * @param sName
+ * @returns {*}
+ * @constructor
+ */
 function GetFileExtension (sName) {
 	var nIndex = sName.lastIndexOf(".");
 	if (-1 != nIndex)
