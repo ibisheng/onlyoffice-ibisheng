@@ -953,24 +953,10 @@ CMetafile.prototype =
 
         var _src = src;
 
-        if (window.editor)
-        {
-            var _search = window.editor.DocumentUrl;
-            if (0 == _src.indexOf(_search))
-                _src = _src.substring(_search.length);
-        }
-        else
-        {
-            if (!window.editor)
-            {
-                var _api = window["Asc"]["editor"];
-                var _mask = g_sResourceServiceLocalUrl + _api.documentId + "/";
-                if (0 == src.indexOf(_mask))
-                {
-                    _src = src.substring(_mask.length);
-                }
-            }
-        }
+        var srcLocal = g_oDocumentUrls.getLocal(_src);
+		if (srcLocal){
+			_src = srcLocal;
+		}
 
         this.Memory.WriteString(_src);
         this.Memory.WriteByte(CommandType.ctBrushTextureMode);
@@ -1193,15 +1179,10 @@ CMetafile.prototype =
             // excel
             this.Memory.WriteByte(CommandType.ctDrawImageFromFile);
 
-            var _api = window["Asc"]["editor"];
-            var _mask = g_sResourceServiceLocalUrl + _api.documentId + "/";
-            if (0 == img.indexOf(_mask))
-            {
-                var _src = img.substring(_mask.length);
-                this.Memory.WriteString2(_src);
-            }
-            else
-            {
+			var imgLocal = g_oDocumentUrls.getLocal(img);
+            if (imgLocal){
+                this.Memory.WriteString2(imgLocal);
+            } else {
                 this.Memory.WriteString2(img);
             }
 
@@ -1225,12 +1206,11 @@ CMetafile.prototype =
         {
             _src = img;
         }
-
-        var _search = window.editor.DocumentUrl;
-        if (0 == _src.indexOf(_search))
-            _src = _src.substring(_search.length);
-        else
-        {
+		
+		var srcLocal = g_oDocumentUrls.getLocal(_src);
+        if (srcLocal){
+            _src = srcLocal;
+		} else {
             if (window.editor.ThemeLoader !== undefined && window.editor.ThemeLoader != null)
             {
                 if (0 == _src.indexOf(window.editor.ThemeLoader.ThemesUrl))

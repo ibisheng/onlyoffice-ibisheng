@@ -19,7 +19,6 @@
                 "../../Common/downloaderfiles.js",
                 "../../Common/docscoapicommon.js",
                 "../../Common/docscoapi.js",
-                "../../Common/docscoapisettings.js",
                 "../../Common/wordcopypaste.js",
                 "../../Common/editorscommon.js",
                 "../../PowerPoint/Drawing/ThemeLoader.js",
@@ -40,7 +39,7 @@
 
                 "../../Word/Drawing/GraphicsEvents.js",
                 "../../Word/Drawing/WorkEvents.js",
-                "../../Word/Drawing/Controls.js",
+                "../../Common/Controls.js",
                 "../../Word/Drawing/Rulers.js",
                 "../../Word/Editor/Table.js",
                 "../../Word/Editor/Common.js",
@@ -93,6 +92,7 @@
                 "../../Common/Drawings/Format/ChartSpace.js",
                 "../../Common/Drawings/Format/ChartFormat.js",
                 "../../Common/Drawings/Format/TextBody.js",
+                "../../Common/Drawings/TextDrawer.js",
                 "../../PowerPoint/Editor/Format/Slide.js",
                 "../../PowerPoint/Editor/Format/SlideMaster.js",
                 "../../PowerPoint/Editor/Format/Layout.js",
@@ -146,6 +146,7 @@
 				"../../Excel/model/Workbook.js",
 				"../../Excel/model/CellInfo.js",
 				"../../Excel/model/AdvancedOptions.js",
+                "../../Common/Locks.js",
                 "../../Common/Shapes/EditorSettings.js",
                 "../../PowerPoint/themes/Themes.js"
             ],

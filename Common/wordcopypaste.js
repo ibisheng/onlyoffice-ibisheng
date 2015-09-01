@@ -503,7 +503,7 @@ function CopyProcessor(api, onlyBinaryCopy)
 	
 	this.oBinaryFileWriter = new BinaryFileWriter(this.oDocument);
 	this.oPresentationWriter = new CBinaryFileWriter();
-    this.oPresentationWriter.Start_UseFullUrl(documentOrigin + editor.DocumentUrl);
+    this.oPresentationWriter.Start_UseFullUrl();
     this.oPresentationWriter.Start_UseDocumentOrigin(documentOrigin);
 	
 	this.oRoot = new CopyElement("root");
@@ -2882,7 +2882,7 @@ PasteProcessor.prototype =
 							aImagesToDownload.push(aContentExcel.arrImages[i].Url);
 						}
 						
-						var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+						var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "userid": documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": aImagesToDownload};
                         oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 						sendCommand2(function(incomeObject){
 							if(incomeObject && "imgurls" == incomeObject.type)
@@ -2958,7 +2958,7 @@ PasteProcessor.prototype =
                         {
                             var imageElem = aContent.aPastedImages[i];
                             var src = imageElem.Url;
-                            if(false == (0 == src.indexOf("data:") || 0 == src.indexOf(documentOrigin + this.api.DocumentUrl) || 0 == src.indexOf(this.api.DocumentUrl)))
+                            if(0 != src.indexOf("data:") && !g_oDocumentUrls.getImageLocal(src))
                                 oImagesToDownload[src] = 1;
                         }
                     }
@@ -2990,33 +2990,38 @@ PasteProcessor.prototype =
 						}
 						else
 						{
-							var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
-                            oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-							sendCommand2(function(incomeObject){
-								if(incomeObject && "imgurls" == incomeObject.type)
-								{
-									var oFromTo = JSON.parse(incomeObject.data);
-									for(var i = 0, length = aContent.images.length; i < length; ++i)
-									{
-										var sFrom = aContent.images[i];
-										var sTo = oFromTo[sFrom];
-										if(sTo)
-											aContent.images[i] = sTo;
-									}
-									for(var i = 0, length = aContent.aPastedImages.length; i < length; ++i)
-									{
-										var imageElem = aContent.aPastedImages[i];
-										if(null != imageElem)
+							var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "userid": documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": aImagesToDownload};
+							oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+							this.api.fCurCallback = function(input) {
+								if(null != input && "imgurls" == input["type"]){
+									if("ok" == input["status"]) {
+										var data = input["data"];
+										var urls = {};
+										for(var i = 0, length = data.length; i < length; ++i)
 										{
-											var sNewSrc = oFromTo[imageElem.Url];
-											if(null != sNewSrc)
-												imageElem.SetUrl(sNewSrc);
+											var elem = data[i];
+											if(elem.url)
+											{
+												urls[elem.path] = elem.url;
+												var name = g_oDocumentUrls.imagePath2Local(elem.path);
+												aContent.images[i] = name;
+												var imageElem = aContent.aPastedImages[i];
+												if(null != imageElem) {
+													imageElem.SetUrl(name);
+												}
+											}
 										}
+										g_oDocumentUrls.addUrls(urls);
+										oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
+									} else {
+										oThis.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
 									}
+								} else {
+									oThis.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
 								}
-                                oThis.api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-								oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
-							}, _sendCommandCallback, rData);
+								oThis.api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+							};
+							sendCommand2( this.api, null, rData );
 						}
 					}
 					else
@@ -3108,7 +3113,7 @@ PasteProcessor.prototype =
 								}
 							}
 							
-							var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+							var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "userid": documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": aImagesToDownload};
                             oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 							sendCommand2(function(incomeObject){
 
@@ -3371,7 +3376,7 @@ PasteProcessor.prototype =
                                 aImagesToDownload.push(i);
                             if(aImagesToDownload.length > 0)
                             {
-                                var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+                                var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "userid": documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": aImagesToDownload};
                                 oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
                                 sendCommand2(function(incomeObject){
                                     if(incomeObject && "imgurls" == incomeObject.type)
@@ -3666,7 +3671,7 @@ PasteProcessor.prototype =
                                 {
                                     var imageElem = objects.arrImages[i];
                                     var src = imageElem.Url;
-                                    if(false == (0 == src.indexOf("data:") || 0 == src.indexOf(documentOrigin + this.api.DocumentUrl) || 0 == src.indexOf(this.api.DocumentUrl)))
+                                    if(0 != src.indexOf("data:") && !g_oDocumentUrls.getImageLocal(src))
                                         oImagesToDownload[src] = 1;
                                 }
                             }
@@ -3677,7 +3682,7 @@ PasteProcessor.prototype =
                                 aImagesToDownload.push(i);
                             if(aImagesToDownload.length > 0)
                             {
-                                var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+                                var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "userid": documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": aImagesToDownload};
                                 oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
                                 sendCommand2(function(incomeObject){
                                     if(incomeObject && "imgurls" == incomeObject.type)
@@ -3781,7 +3786,7 @@ PasteProcessor.prototype =
                             var oPrepeareImages = {};
                             if(aImagesToDownload.length > 0)
                             {
-                                var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+                                var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "userid": documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": aImagesToDownload};
                                 oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
                                 sendCommand2(function(incomeObject){
                                     if(incomeObject && "imgurls" == incomeObject.type)
@@ -3916,7 +3921,7 @@ PasteProcessor.prototype =
                         {
                             var imageElem = aContent.aPastedImages[i];
                             var src = imageElem.Url;
-                            if(false == (0 == src.indexOf("data:") || 0 == src.indexOf(documentOrigin + this.api.DocumentUrl) || 0 == src.indexOf(this.api.DocumentUrl)))
+                            if(0 != src.indexOf("data:") && !g_oDocumentUrls.getImageLocal(src))
                                 oImagesToDownload[src] = 1;
                         }
                     }
@@ -3927,7 +3932,7 @@ PasteProcessor.prototype =
 						
 					if(aImagesToDownload.length > 0)
 					{	
-						var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+						var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "userid": documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": aImagesToDownload};
                         oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 						sendCommand2(function(incomeObject){
 							if(incomeObject && "imgurls" == incomeObject.type)
@@ -4064,7 +4069,7 @@ PasteProcessor.prototype =
 
 						if(images.length > 0)
 						{
-							var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(images)};
+							var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "userid": documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": images};
                             oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 							sendCommand2(function(incomeObject){
 								if(incomeObject && "imgurls" == incomeObject.type)
@@ -4247,7 +4252,7 @@ PasteProcessor.prototype =
 					var aContent = oThis.aContent;
 					if(aImagesToDownload.length > 0)
 					{	
-						var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+						var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "userid": documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": aImagesToDownload};
                         oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 						sendCommand2(function(incomeObject){
 							if(incomeObject && "imgurls" == incomeObject.type)
@@ -4937,37 +4942,45 @@ PasteProcessor.prototype =
 					else
 						this.oImages[image] = "local";
 				}
-				else if(false == (0 == src.indexOf(documentOrigin + this.api.DocumentUrl) || 0 == src.indexOf(this.api.DocumentUrl)))
+				else if(!g_oDocumentUrls.getImageLocal(src))
 					aImagesToDownload.push(src);
 			}
 			var oPrepeareImages = {};
 			if(aImagesToDownload.length > 0)
 			{
-				var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
-				
-				//плашка для отправки изображений на сервер
-				oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-				sendCommand2(function(incomeObject){
-						if(incomeObject && "imgurls" == incomeObject.type)
-						{
-							var oFromTo = JSON.parse(incomeObject.data);
+				var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "userid": documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": aImagesToDownload};
+				this.api.fCurCallback = function(input) {
+					if(null != input && "imgurls" == input["type"]){
+						if("ok" ==input["status"]) {
+							var data = input["data"];
+							var urls = {};
 							for(var i = 0, length = aImagesToDownload.length; i < length; ++i)
 							{
 								var sFrom = aImagesToDownload[i];
-								var sTo = oFromTo[sFrom];
-								if(sTo)
+								var elem = data[i];
+								if(elem.url)
 								{
+									urls[elem.path] = elem.url;
 									if (_mapLocal[sFrom] !== undefined)
 										sFrom = _mapLocal[sFrom];
-									
-									oThis.oImages[sFrom] = sTo;
-									oPrepeareImages[i] = sTo;
+									var name = g_oDocumentUrls.imagePath2Local(elem.path);
+									oThis.oImages[sFrom] = name;
+									oPrepeareImages[i] = name;
 								}
 							}
+							g_oDocumentUrls.addUrls(urls);
+							oThis.api.pre_Paste(aPrepeareFonts, oPrepeareImages, fCallback);
+						} else {
+							oThis.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
 						}
-						oThis.api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-						oThis.api.pre_Paste(aPrepeareFonts, oPrepeareImages, fCallback);
-					}, _sendCommandCallback, rData);
+					} else {
+						oThis.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+					}
+					oThis.api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+				};
+				//плашка для отправки изображений на сервер
+				oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+				sendCommand2( this.api, null, rData );
 			}
 			else
 				this.api.pre_Paste(aPrepeareFonts, this.oImages, fCallback);

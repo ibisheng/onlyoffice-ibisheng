@@ -8,11 +8,9 @@
         "sdk": {
             "src": [
                 "../../Common/browser.js",
-                "../../Common/docscoapisettings.js",
                 "../../Common/docscoapicommon.js",
                 "../../Common/docscoapi.js",
                 "../../Common/apiCommon.js",
-                "../../Common/spellcheckapisettings.js",
                 "../../Common/spellcheckapi.js",
                 "../../Common/wordcopypaste.js",
                 "../../Common/spellCheckLanguage.js",
@@ -70,7 +68,7 @@
                "../../Common/Drawings/Format/Geometry.js",
                "../../Common/Drawings/Format/Path.js",
                "../../Common/Drawings/Format/TextBody.js",
-
+                "../../Common/Drawings/TextDrawer.js",
                "../../Word/Editor/GraphicObjects/Format/ShapePrototype.js",
                "../../Word/Editor/GraphicObjects/Format/ImagePrototype.js",
                "../../Word/Editor/GraphicObjects/Format/GroupPrototype.js",
@@ -114,7 +112,7 @@
                 "../../Word/Drawing/GraphicsEvents.js",
                 "../../Common/Scrolls/iscroll.js",
                 "../../Word/Drawing/WorkEvents.js",
-                "../../Word/Drawing/Controls.js",
+                "../../Common/Controls.js",
                 "../../Word/Drawing/Rulers.js",
                 "../../Word/Drawing/HtmlPage.js",
                 "../../Word/Drawing/documentrenderer.js",
@@ -145,6 +143,7 @@
 				"../../Excel/model/Workbook.js",
 				"../../Excel/model/CellInfo.js",
 				"../../Excel/model/AdvancedOptions.js",
+				"../../Common/Locks.js",
 				"../../Common/Shapes/EditorSettings.js"
             ],
             "dst": "../../Word/sdk-all.js"

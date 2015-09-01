@@ -8,7 +8,6 @@
         "sdk": {
             "src": [
 				"../../Common/browser.js",
-                "../../Common/docscoapisettings.js",
                 "../../Common/docscoapicommon.js",
                 "../../Common/docscoapi.js",
                 "../../Common/downloaderfiles.js",
@@ -103,12 +102,13 @@
                 "../../Common/Drawings/Format/ChartSpace.js",
                 "../../Common/Drawings/Format/ChartFormat.js",
                 "../../Common/Drawings/Format/TextBody.js",
+                "../../Common/Drawings/TextDrawer.js",
 				"../../Common/wordcopypaste.js",
                 "../../Excel/view/DrawingObjectsController.js",
 
                 "../../Excel/model/DrawingObjects/Graphics.js",
                 "../../Excel/model/DrawingObjects/Overlay.js",
-                "../../Excel/model/DrawingObjects/Controls.js",
+                "../../Common/Controls.js",
 				"../../Excel/model/DrawingObjects/ShapeDrawer.js",
 
 

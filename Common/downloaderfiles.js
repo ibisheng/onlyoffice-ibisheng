@@ -9,9 +9,8 @@ function FileHandler() {
             window.focus();
         }
         else {
+			//делаем как docs.google.com, решение с form submit в схеме с socket вызывало ошибку 405 (Method Not Allowed)
             var frmWindow = getIFrameWindow( file );
-            var frm = frmWindow.document.getElementById( "frmFile" );
-            frm.submit();
 //            frmWindow.focus();
         }
     }
@@ -25,22 +24,16 @@ function FileHandler() {
     }
     var createFrame = function ( file ) {
         var frame = document.createElement( "iframe" );
+		frame.src = file;
         frame.name = "fileFrame";
         frame.id = "fileFrame";
 
-        document.body.appendChild( frame );
-        generateIFrameContent( file );
         frame.style.width = "0px";
         frame.style.height = "0px";
         frame.style.border = "0px";
         frame.style.display = "none";
-    }
-    var generateIFrameContent = function ( file ) {
-        var frameWindow = window.frames["fileFrame"];
-        var content = "<form id='frmFile' method='post' enctype='multipart/form-data' action='" + file + "'></form>";
-        frameWindow.document.open();
-        frameWindow.document.write( content );
-        frameWindow.document.close();
+		
+		document.body.appendChild( frame );
     }
 }
 function getFile( filePath ) {

@@ -347,7 +347,7 @@ function CFontFileLoader(id)
     }
 
 
-    this.LoadFontAsync = function(basePath, _callback)
+    this.LoadFontAsync = function(basePath, _callback, isEmbed)
     {
         if (window["AscDesktopEditor"] !== undefined && this.CanUseOriginalFormat)
         {
@@ -396,6 +396,7 @@ function CFontFileLoader(id)
         }
         scriptElem.onload = scriptElem.onerror = oThis._callback_font_load;
 
+		var src;
         if (this.IsNeedAddJSToFontPath)
         {
             if (!window.g_fontNamesEncoder)
@@ -403,10 +404,13 @@ function CFontFileLoader(id)
 
             //var _name = this.Id + ".js";
             var _name = window.g_fontNamesEncoder.Encode(this.Id + ".js") + ".js";
-            scriptElem.setAttribute('src', basePath + "js/" + _name);
+            src = basePath + "js/" + _name;
         }
         else
-            scriptElem.setAttribute('src', basePath + this.Id + ".js");
+            src = basePath + this.Id + ".js";
+		if(isEmbed)
+			src = g_oDocumentUrls.getUrl(src);
+		scriptElem.setAttribute('src', src);
         scriptElem.setAttribute('type','text/javascript');
         document.getElementsByTagName('head')[0].appendChild(scriptElem);
         return false;
@@ -831,27 +835,28 @@ CFontInfo.prototype =
             }
         }
 
-        var fonts = (FONT_TYPE_EMBEDDED == this.Type) ? global_loader.embeddedFontFiles : global_loader.fontFiles;
-        var basePath = (FONT_TYPE_EMBEDDED == this.Type) ? global_loader.embeddedFilesPath : global_loader.fontFilesPath;
+		var isEmbed = (FONT_TYPE_EMBEDDED == this.Type);
+        var fonts = isEmbed ? global_loader.embeddedFontFiles : global_loader.fontFiles;
+        var basePath = isEmbed ? global_loader.embeddedFilesPath : global_loader.fontFilesPath;
         var isNeed = false;
         if ((this.needR === true) && (-1 != this.indexR) && (fonts[this.indexR].CheckLoaded() === false))
         {
-            fonts[this.indexR].LoadFontAsync(basePath, null);
+            fonts[this.indexR].LoadFontAsync(basePath, null, isEmbed);
             isNeed = true;
         }
         if ((this.needI === true) && (-1 != this.indexI) && (fonts[this.indexI].CheckLoaded() === false))
         {
-            fonts[this.indexI].LoadFontAsync(basePath, null);
+            fonts[this.indexI].LoadFontAsync(basePath, null, isEmbed);
             isNeed = true;
         }
         if ((this.needB === true) && (-1 != this.indexB) && (fonts[this.indexB].CheckLoaded() === false))
         {
-            fonts[this.indexB].LoadFontAsync(basePath, null);
+            fonts[this.indexB].LoadFontAsync(basePath, null, isEmbed);
             isNeed = true;
         }
         if ((this.needBI === true) && (-1 != this.indexBI) && (fonts[this.indexBI].CheckLoaded() === false))
         {
-            fonts[this.indexBI].LoadFontAsync(basePath, null);
+            fonts[this.indexBI].LoadFontAsync(basePath, null, isEmbed);
             isNeed = true;
         }
 

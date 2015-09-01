@@ -77,15 +77,13 @@ function CBinaryFileWriter()
     this.UseContinueWriter = false;
 
     this.IsUseFullUrl = false;
-    this.DocumentOrigin = "";
     this.PresentationThemesOrigin = "";
 
     var oThis = this;
 
-    this.Start_UseFullUrl = function(origin)
+    this.Start_UseFullUrl = function()
     {
         this.IsUseFullUrl = true;
-        this.DocumentOrigin = origin;
     };
 
     this.Start_UseDocumentOrigin = function(origin)
@@ -2200,15 +2198,10 @@ function CBinaryFileWriter()
                 oThis.WriteUChar(g_nodeAttributeStart);
                 oThis.WriteUChar(g_nodeAttributeEnd);
 				
-				var api_sheet = window["Asc"]["editor"];
-                var sFindString;
-				if(api_sheet)
-					sFindString = api_sheet.wbModel.sUrlPath + "media/";
-				else
-					sFindString = window.editor.DocumentUrl + "media/";
                 var _src = fill.RasterImageId;
-                if(0 == _src.indexOf(sFindString))
-                    _src = _src.substring(sFindString.length);
+				var imageLocal = g_oDocumentUrls.getImageLocal(_src);
+                if(imageLocal)
+                    _src = imageLocal;
 
                 oThis.image_map[_src] = true;
 
@@ -2218,8 +2211,12 @@ function CBinaryFileWriter()
                     {
                         _src = oThis.PresentationThemesOrigin + _src;
                     }
-                    else if (0 != _src.indexOf("http:") && 0 != _src.indexOf("data:") && 0 != _src.indexOf("https:") && 0 != _src.indexOf("ftp:") && 0 != _src.indexOf("file:"))
-                        _src = oThis.DocumentOrigin + "media/" + _src;
+                    else if (0 != _src.indexOf("http:") && 0 != _src.indexOf("data:") && 0 != _src.indexOf("https:") && 0 != _src.indexOf("ftp:") && 0 != _src.indexOf("file:")){
+                        var imageUrl = g_oDocumentUrls.getImageUrl(_src);
+						if(imageUrl){
+							_src = imageUrl;
+						}
+					}
                 }
 
                 oThis.StartRecord(0);

@@ -174,6 +174,7 @@ function asc_docs_api(name)
 	this.LongActionCallbacksParams = [];
 	
 	this.TrackFile = null;
+	this.fCurCallback = null;
 	
 	var oThis = this;
 	if(window.addEventListener)
@@ -204,7 +205,7 @@ function asc_docs_api(name)
 					var fd = new FormData();
 					for(var i = 0, length = files.length; i < length; i++)
 						fd.append('file[' + i + ']', files[i]);
-					xhr.open('POST', g_sUploadServiceLocalUrl+'?key='+documentId);
+					xhr.open('POST', g_sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex());
 					xhr.onreadystatechange = function(){
 						if(4 == this.readyState)
 						{
@@ -543,8 +544,43 @@ asc_docs_api.prototype._coAuthoringInit = function () {
                 c_oAscError.Level.NoCritical);
         }
 	};
+	this.CoAuthoringApi.onDocumentOpen				= function (inputWrap) {
+        if (inputWrap["data"]) {
+			var input = inputWrap["data"];
+			switch(input["type"]){
+				case 'getsettings':{
+					t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+					t.asc_getEditorPermissionsCallback(input);
+				}
+				break;
+				case 'open': {
+					switch(input["status"]) {
+						case "ok":
+							var urls = input["data"];
+							g_oDocumentUrls.init(urls);
+							_onOpenCommand(function(){}, {'data': urls['Editor.bin']});
+						break;
+						case "needparams": break;
+						case "err":
+							t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
+						break;
+						case "updateversion": break;
+					}
+				}
+				break;
+				default:
+					if(t.fCurCallback) {
+						t.fCurCallback(input);
+						t.fCurCallback = null;
+					} else {
+						t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+					}
+				break;
+			}
+        }
+	};
 
-	this.CoAuthoringApi.set_url(this.CoAuthoringUrl);
+	this.CoAuthoringApi.set_url(null);
     this.CoAuthoringApi.init(this.User, documentId, documentCallbackUrl, 'fghhfgsjdgfjs', function(){}, c_oEditorId.Presentation,
 		documentFormatSave, this.isViewMode);
 
@@ -603,7 +639,7 @@ asc_docs_api.prototype.asc_coAuthoringGetUsers = function () {
 
 asc_docs_api.prototype.asyncServerIdStartLoaded = function () {
 	//Инициализируем контрол для совместного редактирования
-	this._coAuthoringInit();
+	//this._coAuthoringInit();
 };
 
 asc_docs_api.prototype.asyncServerIdEndLoaded = function () {
@@ -737,6 +773,7 @@ asc_docs_api.prototype.Init = function()
 	this.WordControl.Init();
 };
 asc_docs_api.prototype.asc_getEditorPermissions = function() {
+	this._coAuthoringInit();
 	if (this.DocInfo && this.DocInfo.get_Id()) {
 		var rData = {
 			"c": "getsettings",
@@ -749,10 +786,7 @@ asc_docs_api.prototype.asc_getEditorPermissions = function() {
 
 		var t = this;
 		this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Perm;
-		sendCommand2(function (response) {
-			t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
-			t.asc_getEditorPermissionsCallback(response);
-		}, _sendCommandCallback, rData);
+		sendCommand2(this, null, rData);
 	} else {
 		var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
 		this.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
@@ -767,12 +801,13 @@ asc_docs_api.prototype.asc_getLicense = function () {
 	var rdata = {
 		"c" : "getlicense"
 	};
+	//todo
 	sendCommand2(function (response) {t._onGetLicense(response);}, _sendCommandCallback, rdata);
 };
 
 asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(response) {
 	if (null != response && "getsettings" == response["type"]) {
-		var oSettings = JSON.parse(response["data"]);
+		var oSettings = response["data"];
 
 		//Set up coauthoring and spellcheker service
 		this.CoAuthoringUrl = oSettings['g_cAscCoAuthoringUrl'];
@@ -810,16 +845,7 @@ asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo)
 {
 	if(c_DocInfo)
 		this.DocInfo = c_DocInfo;
-};
-asc_docs_api.prototype.asc_setLocale = function(val)
-{
-};
-asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
-{
-	this.asc_setDocInfo(c_DocInfo);
 	
-    this.WordControl.m_oDrawingDocument.m_bIsOpeningDocument = true;
-
 	if(this.DocInfo){
 		documentId = this.DocInfo.get_Id();
 		documentUserId = this.DocInfo.get_UserId();
@@ -855,6 +881,16 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
     {
         window["AscDesktopEditor"]["SetDocumentName"](this.DocumentName);
     }
+};
+asc_docs_api.prototype.asc_setLocale = function(val)
+{
+};
+asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
+{
+	//this.asc_setDocInfo(c_DocInfo);
+	
+    this.WordControl.m_oDrawingDocument.m_bIsOpeningDocument = true;
+
 
 	// Меняем тип состояния (на открытие)
 	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
@@ -880,7 +916,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 			"viewmode"		: this.isViewMode
 		};
 			
-        sendCommand2(function(){}, _sendCommandCallback, rData);
+        sendCommand2(this, null, rData);
     }
     else
     {
@@ -1451,11 +1487,24 @@ asc_docs_api.prototype.asc_Print = function(){
     }
 
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);
-	var editor = this;
-	_downloadAs(this, c_oAscFileType.PDF, function(incomeObject){
-		if(null != incomeObject && "save" == incomeObject["type"])
-			editor.processSavedFile(incomeObject["data"], false);
-		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);}, true);
+	var t = this;
+	_downloadAs(this, c_oAscFileType.PDF, function(input){
+		if(null != input && "save" == input["type"]) {
+			if('ok' == input["status"]){
+				var url = g_fGetSaveUrl(input["data"]);
+				if(url) {
+					t.processSavedFile(url, false);
+				} else {
+					t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+				}
+			} else {
+				t.asc_fireCallback("asc_onError", c_oAscError.ID.MailMergeSaveFile, c_oAscError.Level.NoCritical);
+			}
+		} else {
+			t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+		}
+		t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);
+	}, true);
 };
 asc_docs_api.prototype.Undo = function(){
 	this.WordControl.m_oLogicDocument.Document_Undo();
@@ -1612,11 +1661,24 @@ asc_docs_api.prototype.processSavedFile = function(url, bInner){
 };
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile){//передаем число соответствующее своему формату.
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
-	var editor = this;
-	_downloadAs(this, typeFile, function(incomeObject){
-		if(null != incomeObject && "save" == incomeObject["type"])
-			editor.processSavedFile(incomeObject["data"], false);
-		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);}, true);
+	var t = this;
+	_downloadAs(this, typeFile, function(input){
+		if(null != input && ("save" == input["type"] || "sfct" == input["type"])) {
+			if('ok' == input["status"]){
+				var url = g_fGetSaveUrl(input["data"]);
+				if(url) {
+					t.processSavedFile(url, false);
+				} else {
+					t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+				}
+			} else {
+				t.asc_fireCallback("asc_onError", c_oAscError.ID.MailMergeSaveFile, c_oAscError.Level.NoCritical);
+			}
+		} else {
+			t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+		}
+		t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
+	}, true);
 };
 asc_docs_api.prototype.Resize = function(){
 	if (false === this.bInit_word_control)
@@ -1628,16 +1690,6 @@ asc_docs_api.prototype.AddURL = function(url){
 };
 asc_docs_api.prototype.Help = function(){
 
-};
-asc_docs_api.prototype.ClearCache = function(){
-	var rData = {
-		"id":documentId,
-		"userid": documentUserId,
-		"vkey": documentVKey,
-		"format": documentFormat,
-		"c":"cc"};
-		
-	sendCommand2(function(){}, _sendCommandCallback, rData);
 };
 asc_docs_api.prototype.startGetDocInfo = function(){
 	/*
@@ -3074,7 +3126,7 @@ asc_docs_api.prototype.ChangeArtImageFromFile = function()
 
 asc_docs_api.prototype.AddImage = function(){
     var frameWindow = GetUploadIFrame();
-    var content = '<html><head></head><body><form action="'+g_sUploadServiceLocalUrl+'?key='+documentId+'" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" accept="image/*" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
+    var content = '<html><head></head><body><form action="' + g_sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex() + '" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" accept="image/*" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
     frameWindow.document.open();
     frameWindow.document.write(content);
     frameWindow.document.close();
@@ -3149,13 +3201,38 @@ asc_docs_api.prototype.AddImageUrl = function(url){
 			"c":"imgurl",
 			"data": url};
 			
-		var oThis = this;
+		var t = this;
 		this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-		sendCommand2(function(incomeObject){
-			if(null != incomeObject && "imgurl" == incomeObject["type"])
-				oThis.AddImageUrlAction(incomeObject["data"]);
-			oThis.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-		}, _sendCommandCallback, rData);
+		this.fCurCallback = function(input) {
+			if(null != input && "imgurl" == input["type"]){
+				if("ok" ==input["status"]) {
+					var data = input["data"];
+					var urls = {};
+					var firstUrl;
+					for(var i = 0; i < data.length; ++i){
+						var elem = data[i];
+						if(elem.url){
+							if(!firstUrl){
+								firstUrl = elem.url;
+							}
+							urls[elem.path] = elem.url;
+						}
+					}
+					g_oDocumentUrls.addUrls(urls);
+					if(firstUrl) {
+						t.AddImageUrlAction(firstUrl);
+					} else {
+						t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+					}
+				} else {
+					t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+				}
+			} else {
+				t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+			}
+			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+		};
+		sendCommand2(this, null, rData );
 	}
 };
 
@@ -4763,8 +4840,19 @@ asc_docs_api.prototype.OnHandleMessage = function(event)
 				if(c_oAscServerError.NoError == data["error"])
 				{
 					var urls = data["urls"];
-					if(urls && urls.length > 0)
-						this.AddImageUrl(urls[0]);
+					if(urls){
+						g_oDocumentUrls.addUrls(urls);
+						var firstUrl;
+						for(var i in urls){
+							if(urls.hasOwnProperty(i)){
+								firstUrl = urls[i];
+								break;
+							}
+						}
+						if(firstUrl){
+							this.AddImageUrl(firstUrl);
+						}
+					}
 				}
 				else
 					this.sync_ErrorCallback(g_fMapAscServerErrorToAscError(data["error"]), c_oAscError.Level.NoCritical);
@@ -5156,54 +5244,6 @@ function _sendCommandCallback (fCallback, error, result) {
 					_onOpenCommand(fCallback, result);
 				});
 			break;
-		case "open":
-			_onOpenCommand(fCallback, result);
-			break;
-		case "waitopen":
-			if (result["data"])
-			{
-				editor._lastConvertProgress = result["data"] / 2;
-				editor.sync_SendProgress(editor._lastConvertProgress);
-			}
-			rData = {
-				"id":documentId,
-				"userid": documentUserId,
-				"format": documentFormat,
-				"vkey": documentVKey,
-				"editorid": c_oEditorId.Presentation,
-				"c":"chopen"};
-
-			setTimeout( function(){sendCommand2(fCallback, _sendCommandCallback, rData)}, 3000);
-			break;
-		case "save":
-			if(fCallback) fCallback(result);
-			break;
-		case "waitsave":
-			rData = {
-				"id":documentId,
-				"userid": documentUserId,
-				"vkey": documentVKey,
-				"title": documentTitleWithoutExtention,
-				"c":"chsave",
-				"data": result["data"]};
-
-			setTimeout( function(){sendCommand2(fCallback, _sendCommandCallback, rData)}, 3000);
-			break;
-		case "getsettings":
-			if(fCallback) fCallback(result);
-			break;
-		case "err":
-			var nErrorLevel = c_oAscError.Level.NoCritical;
-			//todo передалеть работу с callback
-			if (c_oAscAdvancedOptionsAction.Perm === editor.advancedOptionsAction ||
-				c_oAscAdvancedOptionsAction.Open === editor.advancedOptionsAction)
-				nErrorLevel = c_oAscError.Level.Critical;
-			editor.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(result["data"] >> 0), nErrorLevel);
-			if (fCallback) fCallback(result);
-			break;
-		default:
-			if(fCallback) fCallback(result);
-			break;
 	}
 }
 function _onOpenCommand(fCallback, incomeObject) {
@@ -5223,6 +5263,7 @@ function _onOpenCommand(fCallback, incomeObject) {
 }
 function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)
 {
+	var dataContainer = {data: null, part: null, index: 0, count: 0};
 	var oAdditionalData = {};
 	oAdditionalData["c"] = "save";
 	oAdditionalData["id"] = documentId;
@@ -5233,11 +5274,12 @@ function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)
 	if(c_oAscFileType.PDF == filetype)
 	{
 		var dd = editor.WordControl.m_oDrawingDocument;
-		oAdditionalData["data"] = dd.ToRendererPart();
+		dataContainer.data = dd.ToRendererPart();
 	}
 	else
-		oAdditionalData["data"] = editor.WordControl.SaveDocument();
-	g_fSaveWithParts(function(fCallback1, oAdditionalData1){sendCommand2(fCallback1, _sendCommandCallback, oAdditionalData1);}, fCallback, oAdditionalData);
+		dataContainer.data = editor.WordControl.SaveDocument();
+	editor.fCurCallback = fCallback;
+	g_fSaveWithParts(function(fCallback1, oAdditionalData1, dataContainer1){sendCommand2(editor, fCallback1, oAdditionalData1, dataContainer1);}, fCallback, null, oAdditionalData, dataContainer);
 }
 
 //test

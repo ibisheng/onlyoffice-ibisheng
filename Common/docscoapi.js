@@ -27,11 +27,14 @@
 			this.onEndCoAuthoring = options.onEndCoAuthoring;
 			this.onUnSaveLock = options.onUnSaveLock;
 			this.onRecalcLocks = options.onRecalcLocks;
+			this.onDocumentOpen = options.onDocumentOpen;
 		}
 	}
 
 	CDocsCoApi.prototype.init = function (user, docid, documentCallbackUrl, token, callback, editorType, documentFormatSave, isViewer) {
-		if (this._CoAuthoringApi && this._CoAuthoringApi.isRightURL()) {
+		//раньше isRightURL был true в редакторе, false в doctrenderer
+		//теперь никогда не приходит url, поэтому надо использовать NATIVE_EDITOR_ENJINE
+		if (this._CoAuthoringApi && this._CoAuthoringApi.isRightURL() && !window["NATIVE_EDITOR_ENJINE"]) {
 			var t = this;
 			this._CoAuthoringApi.onAuthParticipantsChanged = function (e, count) {t.callback_OnAuthParticipantsChanged(e, count);};
 			this._CoAuthoringApi.onParticipantsChanged = function (e, count) {t.callback_OnParticipantsChanged(e, count);};
@@ -49,6 +52,7 @@
 			this._CoAuthoringApi.onEndCoAuthoring = function (e) {t.callback_OnEndCoAuthoring(e);};
 			this._CoAuthoringApi.onUnSaveLock = function () {t.callback_OnUnSaveLock();};
 			this._CoAuthoringApi.onRecalcLocks = function (e) {t.callback_OnRecalcLocks(e);};
+			this._CoAuthoringApi.onDocumentOpen = function (data) {t.callback_OnDocumentOpen(data);};
 
 			this._CoAuthoringApi.init(user, docid, documentCallbackUrl, token, callback, editorType, documentFormatSave, isViewer);
 			this._onlineWork = true;
@@ -74,6 +78,16 @@
 			return this._CoAuthoringApi.get_state();
 
 		return 0;
+	};
+	
+	CDocsCoApi.prototype.openDocument = function (data) {
+		if (this._CoAuthoringApi && this._onlineWork)
+			this._CoAuthoringApi.openDocument(data);
+	};
+	
+	CDocsCoApi.prototype.sendRawData = function (data) {
+		if (this._CoAuthoringApi && this._onlineWork)
+			this._CoAuthoringApi.sendRawData(data);
 	};
 	
 	CDocsCoApi.prototype.getMessages = function () {
@@ -153,6 +167,12 @@
 	CDocsCoApi.prototype.getUser = function (userId) {
 		if (this._CoAuthoringApi && this._onlineWork)
 			return this._CoAuthoringApi.getUser(userId);
+		return null;
+	};
+
+	CDocsCoApi.prototype.getUserConnectionId = function () {
+		if (this._CoAuthoringApi && this._onlineWork)
+			return this._CoAuthoringApi.getUserConnectionId();
 		return null;
 	};
 
@@ -246,6 +266,10 @@
 		if (this.onRecalcLocks)
 			this.onRecalcLocks(e);
 	};
+	CDocsCoApi.prototype.callback_OnDocumentOpen = function (e) {
+		if (this.onDocumentOpen)
+			this.onDocumentOpen(e);
+	};
 
 	function LockBufferElement (arrayBlockId, callback) {
 		this._arrayBlockId = arrayBlockId;
@@ -268,6 +292,7 @@
 			this.onConnectionStateChanged = options.onConnectionStateChanged;
 			this.onUnSaveLock = options.onUnSaveLock;
 			this.onRecalcLocks = options.onRecalcLocks;
+			this.onDocumentOpen = options.onDocumentOpen;
 		}
         this._state = ConnectionState.None;
 		// Online-пользователи в документе
@@ -350,6 +375,10 @@
 
     DocsCoApi.prototype.getSessionId = function () {
         return this._id;
+    };
+
+    DocsCoApi.prototype.getUserConnectionId = function () {
+        return this._userId;
     };
 
     DocsCoApi.prototype.getUser = function () {
@@ -535,7 +564,15 @@
 		this.isCloseCoAuthoring = true;
         return this.sockjs.close();
     };
-
+	
+    DocsCoApi.prototype.openDocument = function (data) {
+        this._send({"type": "openDocument", "message": data});
+    };
+	
+	DocsCoApi.prototype.sendRawData = function (data) {
+        this._sendRaw(data);
+    };
+	
     DocsCoApi.prototype.getMessages = function () {
         this._send({"type": "getMessages"});
     };
@@ -545,10 +582,14 @@
             this._send({"type": "message", "message": message});
         }
     };
-
+	
+    DocsCoApi.prototype.ping = function () {
+        this._send({"type": "ping"});
+    };
+	
     DocsCoApi.prototype._sendPrebuffered = function () {
         for (var i = 0; i < this._msgBuffer.length; i++) {
-            this._send(this._msgBuffer[i]);
+            this._sendRaw(this._msgBuffer[i]);
         }
         this._msgBuffer = [];
     };
@@ -557,6 +598,15 @@
         if (data !== null && typeof data === "object") {
             if (this._state > 0)
                 this.sockjs.send(JSON.stringify(data));
+            else
+                this._msgBuffer.push(JSON.stringify(data));
+        }
+    };
+	
+	DocsCoApi.prototype._sendRaw = function (data) {
+        if (data !== null && typeof data === "string") {
+            if (this._state > 0)
+                this.sockjs.send(data);
             else
                 this._msgBuffer.push(data);
         }
@@ -629,6 +679,10 @@
 			if (bSendEnd && this.onLocksReleasedEnd)
 				this.onLocksReleasedEnd();
         }
+    };
+	
+	DocsCoApi.prototype._documentOpen = function (data) {
+		this.onDocumentOpen(data);
     };
 	
 	DocsCoApi.prototype._onSaveChanges = function (data) {
@@ -835,6 +889,7 @@
 	};
 
 	DocsCoApi.prototype._onAuth = function (data) {
+		var t = this;
 		if (true === this._isAuth) {
 			this._state = ConnectionState.Authorized;
 			// Мы уже авторизовывались, нужно обновить пользователей (т.к. пользователи могли входить и выходить пока у нас не было соединения)
@@ -847,7 +902,6 @@
 			this._onGetLock(data);
 
 			if (this._isReSaveAfterAuth) {
-				var t = this;
 				var callbackAskSaveChanges = function (e) {
 					if (false == e["saveLock"]) {
 						t._reSaveChanges();
@@ -899,6 +953,14 @@
 		if (this._initCallback) {
 			this._initCallback({result:data["result"]});
 		}
+		//ping
+		var fPing = function(){
+			setTimeout(function () {
+					t.ping();
+					fPing();
+				}, 60000);
+		};
+		fPing();
 	};
 
     DocsCoApi.prototype.init = function (user, docid, documentCallbackUrl, token, callback, editorType, documentFormatSave, isViewer) {
@@ -908,7 +970,7 @@
         this._token = token;
         this._initCallback = callback;
         this.ownedLockBlocks = [];
-		this.sockjs_url = this._url + '/doc/'+docid+'/c';
+		this.sockjs_url = '/doc/'+docid+'/c';
 		this.editorType = editorType;
 		this._isExcel = c_oEditorId.Spreadsheet === editorType;
 		this._isPresentation = c_oEditorId.Presentation === editorType;
@@ -960,7 +1022,7 @@
 					'lastOtherSaveTime' : t.lastOtherSaveTime,
 					'block'		: t.ownedLockBlocks,
 					'sessionId'	: t._id,
-					'server'	: window.location.protocol + '//' + window.location.host + g_sMainServiceLocalUrl,
+					//'server'	: window.location.protocol + '//' + window.location.host + g_sMainServiceLocalUrl,
 					'documentFormatSave'	: t._documentFormatSave,
 					'isViewer'	: t._isViewer,
 					'version'	: asc_coAuthV
@@ -985,6 +1047,7 @@
 				case 'drop'				: t._onDrop(dataObject); break;
 				case 'waitAuth'			: /*Ждем, когда придет auth, документ залочен*/break;
 				case 'error'			: /*Старая версия sdk*/t._onDrop(dataObject); break;
+				case 'documentOpen'		: t._documentOpen(dataObject); break;
 			}
 		};
 		sockjs.onclose = function (evt) {

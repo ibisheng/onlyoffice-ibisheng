@@ -75,25 +75,10 @@ function checkRasterImageId(rasterImageId)
     //return rasterImageId;
    // if ( 0 !== rasterImageId.indexOf("http:") && 0 !== rasterImageId.indexOf("data:") && 0 !== rasterImageId.indexOf("https:") && 0 !== rasterImageId.indexOf("ftp:") && 0 !== rasterImageId.indexOf("file:") )
    // {
-        var api_sheet = window["Asc"]["editor"];
-        var sFindString, sFindString2;
-        if(api_sheet)
+        var imageLocal = g_oDocumentUrls.getImageLocal(rasterImageId);
+		if(imageLocal)
         {
-            sFindString = api_sheet.wbModel.sUrlPath + "media/";
-            sFindString2 = api_sheet.documentOrigin + sFindString;
-        }
-        else
-        {
-            sFindString = window.editor.DocumentUrl + "media/";
-            sFindString2 = documentOrigin + sFindString;
-        }
-        if(0 === rasterImageId.indexOf(sFindString))
-        {
-            return rasterImageId.substring(sFindString.length);
-        }
-        else if(0 === rasterImageId.indexOf(sFindString2))
-        {
-            return rasterImageId.substring(sFindString2.length);
+            return imageLocal;
         }
         else
         {
@@ -2587,6 +2572,8 @@ CBlipFill.prototype =
     {
         w.WriteLong(this.type);
         writeString(w, this.RasterImageId);
+        var srcUrl = g_oDocumentUrls.getImageUrl(this.RasterImageId) || "";
+        writeString(w, srcUrl);
         writeString(w, this.VectorImageBin);
         if(this.srcRect)
         {
@@ -2608,6 +2595,10 @@ CBlipFill.prototype =
     Read_FromBinary: function(r)
     {
         this.RasterImageId = readString(r);
+        var srcUrl = readString(r);
+        if(srcUrl) {
+            g_oDocumentUrls.addImageUrl(this.RasterImageId, srcUrl);
+        }
         this.VectorImageBin = readString(r);
 
         if(readBool(r))

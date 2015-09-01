@@ -1084,25 +1084,28 @@ function DrawingObjects() {
                 {
                     if (PostMessageType.UploadImage == data["type"]) {
                         if (c_oAscServerError.NoError == data["error"]) {
-                            var sheetId = null;
-                            if (null != data["input"])
-                                sheetId = data["input"]["sheetId"];
-                            var urls = data["urls"];
-
-                            if (urls && urls.length > 0 && sheetId == worksheet.model.getId()) {
-                                var url = urls[0];
-                                if ( api.isImageChangeUrl || api.isShapeImageChangeUrl || api.isTextArtChangeUrl)
-                                    _this.editImageDrawingObject(url);
-                                else
-                                    _this.addImageDrawingObject(url, null);
-                            }
-                            else
-                                worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+							var urls = data["urls"];
+							if(urls){
+								g_oDocumentUrls.addUrls(urls);
+								var firstUrl;
+								for(var i in urls){
+									if(urls.hasOwnProperty(i)){
+										firstUrl = urls[i];
+										break;
+									}
+								}
+								if(firstUrl){
+									if ( api.isImageChangeUrl || api.isShapeImageChangeUrl || api.isTextArtChangeUrl)
+										_this.editImageDrawingObject(firstUrl);
+									else
+										_this.addImageDrawingObject(firstUrl, null);
+								}
+							}
                         }
                         else {
                             worksheet.model.workbook.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(data["error"]), c_oAscError.Level.NoCritical);
-                            worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
                         }
+						worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
                     }
                 }
             }
@@ -1523,7 +1526,6 @@ function DrawingObjects() {
                     });
                 }
 
-                worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
                 worksheet.setSelectionShape(true);
             };
 
@@ -1607,7 +1609,6 @@ function DrawingObjects() {
 
                     _this.showDrawingObjects(true);
                 }
-                worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
             };
 
             if (null != _image) {
@@ -3022,13 +3023,13 @@ function DrawingObjects() {
     // File Dialog
     //-----------------------------------------------------------------------------------
 
-    _this.showImageFileDialog = function(documentId, documentFormat) {
+    _this.showImageFileDialog = function(documentId, documentUserId) {
 
         if ( _this.isViewerMode() )
             return;
 
         var frameWindow = GetUploadIFrame();
-        var content = '<html><head></head><body><form action="' + g_sUploadServiceLocalUrl + '?sheetId=' + worksheet.model.getId() + '&key=' + documentId + '" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" accept="image/*" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
+        var content = '<html><head></head><body><form action="' + g_sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex() + '" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" accept="image/*" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
         frameWindow.document.open();
         frameWindow.document.write(content);
         frameWindow.document.close();

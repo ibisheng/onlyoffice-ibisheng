@@ -33,7 +33,6 @@
 			this.ppix = 96;
 			this.ppiy = 96;
 			this.Api = null;
-			this.fullUrl;
 			this.activeRange = null;
 			this.lStorage = {};
 
@@ -366,8 +365,7 @@
 			
 			_getBinaryForCopy: function(worksheet)
 			{
-				var fullUrl = this._getUseFullUrl();
-				window.global_pptx_content_writer.Start_UseFullUrl(fullUrl);
+				window.global_pptx_content_writer.Start_UseFullUrl();
 				
 				//TODO стоит убрать заглушку при правке бага с activeRange
 				var cloneActiveRange = worksheet.activeRange.clone();
@@ -416,8 +414,7 @@
 						}	
 						else
 						{
-							var fullUrl = this._getUseFullUrl();
-							window.global_pptx_content_writer.Start_UseFullUrl(fullUrl);
+							window.global_pptx_content_writer.Start_UseFullUrl();
 							
 							var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
 							var sBase64 = oBinaryFileWriter.Write();
@@ -496,8 +493,7 @@
 					}	
 					else
 					{
-						var fullUrl = this._getUseFullUrl();
-						window.global_pptx_content_writer.Start_UseFullUrl(fullUrl);
+						window.global_pptx_content_writer.Start_UseFullUrl();
 						
 						var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
 						var sBase64 = oBinaryFileWriter.Write();
@@ -840,26 +836,6 @@
 				this.element.style.MozUserSelect = "all";
 			},
 
-			 _getUseFullUrl: function(recalculate)
-			 {
-				if(this.fullUrl == undefined || recalculate === true)
-				{
-					var api = window["Asc"]["editor"];
-					var sProtocol = window.location.protocol;
-					var documentOrigin;
-					var sHost = window.location.host;
-					documentOrigin = "";
-					if(sProtocol && "" != sProtocol)
-						documentOrigin = sProtocol + "//" + sHost;
-					else
-						documentOrigin = sHost;
-					
-					this.fullUrl = documentOrigin + g_sResourceServiceLocalUrl + api.documentId + "/";
-				}
-	
-				return this.fullUrl;
-			 },
-			 
 			 _getStylesSelect: function (worksheet){
 				document.body.style.MozUserSelect = "";
 				delete document.body.style["-khtml-user-select"];
@@ -1886,37 +1862,38 @@
 				
 				if(aImagesToDownload.length > 0)
 				{
-					var rData = {"id": api.documentId, "c":"imgurls", "vkey": api.documentVKey, "data": JSON.stringify(aImagesToDownload)};
-					
-					sendCommand2(function(incomeObject){
-							if(incomeObject && "imgurls" == incomeObject.type)
-							{
-								if(incomeObject && "imgurls" == incomeObject.type)
+					var rData = {"id": api.documentId, "c":"imgurls", "vkey": api.documentVKey, "userid": api.documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": aImagesToDownload};
+					api.fCurCallback = function(input) {
+						if(null != input && "imgurls" == input["type"]){
+							if("ok" == input["status"]) {
+								var data = input["data"];
+								var urls = {};
+								var aImagesSync = [];
+								for(var i = 0, length = data.length; i < length; ++i)
 								{
-									var oFromTo = JSON.parse(incomeObject.data);
-									var aImagesSync = [];
-									
-									for(var i = 0, length = aPastedImages.length; i < length; ++i)
-									{	
-										var sTo = oFromTo[aPastedImages[i].Url];
-										if(sTo)
-										{									
-											var imageElem = aPastedImages[i];
-											if(null != imageElem)
-											{
-												var sNewSrc = oFromTo[imageElem.Url];
-												aImagesSync.push(sNewSrc);
-												if(null != sNewSrc)
-													imageElem.SetUrl(sNewSrc);	
-											}															
-										}						
+									var elem = data[i];
+									if(elem.url)
+									{
+										urls[elem.path] = elem.url;
+										var name = g_oDocumentUrls.imagePath2Local(elem.path);
+										var imageElem = aPastedImages[i];
+										if(null != imageElem)
+										{
+											aImagesSync.push(elem.url);
+											imageElem.SetUrl(elem.url);	
+										}
 									}
 								}
+								g_oDocumentUrls.addUrls(urls);
+							} else {
+								api.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
 							}
-							
-							callback();
-							
-						}, api.fCallbackSendCommand, rData);
+						} else {
+							api.handlers.trigger("asc_onError", c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+						}
+						callback();
+					};
+					sendCommand2( api, null, rData );
 				}
 				else
 					callback();
@@ -2178,20 +2155,19 @@
 				
 				if(aImagesToDownload.length > 0)
 				{
-					var rData = {"id": api.documentId, "c":"imgurls", "vkey": api.documentVKey, "data": JSON.stringify(aImagesToDownload)};
-					
-					sendCommand2(function(incomeObject){
-							if(incomeObject && "imgurls" == incomeObject.type)
-							{
-								var oFromTo = JSON.parse(incomeObject.data);
-								var nC, height, width;
-								
-								for(var i = 0, length = addImages.length; i < length; ++i)
-								{	
-									var sTo = oFromTo[aResult.addImages[i].tag.src];
-									
-									if(sTo)
-									{									
+					var rData = {"id": api.documentId, "c":"imgurls", "vkey": api.documentVKey, "userid": api.documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": aImagesToDownload};
+					api.fCurCallback = function(input) {
+						if(null != input && "imgurls" == input["type"]){
+							if("ok" == input["status"]) {
+								var data = input["data"];
+								var urls = {};
+								for(var i = 0, length = data.length; i < length; ++i)
+								{
+									var elem = data[i];
+									if(elem.url)
+									{
+										urls[elem.path] = elem.url;
+										var name = g_oDocumentUrls.imagePath2Local(elem.path);
 										if(aResult.addImages[i])
 										{
 											height = aResult.addImages[i].tag.height;
@@ -2200,16 +2176,21 @@
 											{
 												height: height,
 												width: width, 
-												src: sTo
-											};	
-										}																
-									};						
-								};
-							};
-							
-							t._pasteResult(aResult, worksheet);
-							
-						}, api.fCallbackSendCommand, rData);
+												src: elem.url
+											};
+										}
+									}
+								}
+								g_oDocumentUrls.addUrls(urls);
+							} else {
+								api.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+							}
+						} else {
+							api.handlers.trigger("asc_onError", c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+						}
+						t._pasteResult(aResult, worksheet);
+					};
+					sendCommand2( api, null, rData );
 				}
 				else
 					t._pasteResult(aResult, worksheet);

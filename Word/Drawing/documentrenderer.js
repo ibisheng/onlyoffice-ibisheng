@@ -349,7 +349,7 @@ function CDocMeta()
     this.LockObject = null;
     this.stream = null;
 
-    this.DocumentUrl = "";
+    //this.DocumentUrl = "";
 
     this.CountParagraphs = 0;
     this.CountWords = 0;
@@ -383,7 +383,7 @@ function CDocMeta()
 
     this.Load = function(url, doc_bin_base64)
     {
-        this.DocumentUrl = url;
+        //this.DocumentUrl = url;
         var stream = CreateDocumentData(doc_bin_base64);
 
         this.PagesCount = stream.GetLong();
@@ -432,7 +432,7 @@ function CDocMeta()
             this.Drawings.splice(0, this.Drawings.length);
         }
 
-        window.g_font_loader.LoadEmbeddedFonts(this.DocumentUrl + "fonts/", this.Fonts);
+        window.g_font_loader.LoadEmbeddedFonts("fonts/", this.Fonts);
     }
 
     this.InitDocument = function(drDoc)
@@ -679,7 +679,7 @@ function CDocMeta()
 
                     if (2 == _type)
                     {
-                        var _src = this.DocumentUrl + "media/image" + s.GetLong() + ".svg";
+                        var _src = g_oDocumentUrls.getImageUrl("image" + s.GetLong() + ".svg");
 
                         obj.StreamPos = s.pos;
 
@@ -723,7 +723,7 @@ function CDocMeta()
                         return;
                     }
 
-                    var _src = (0 == _type || 10 == _type) ? (this.DocumentUrl + "media/image" + s.GetLong() + ".jpg") : (this.DocumentUrl + "media/image" + s.GetLong() + ".png");
+                    var _src = (0 == _type || 10 == _type) ? g_oDocumentUrls.getImageUrl("image" + s.GetLong() + ".jpg") : g_oDocumentUrls.getImageUrl("image" + s.GetLong() + ".png");
 
                     var __x = s.GetDouble();
                     var __y = s.GetDouble();

@@ -851,7 +851,7 @@ function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml)
 	this.CopyStart = function()
     {
 		var api = this.Document.DrawingDocument.m_oWordControl.m_oApi;
-		window.global_pptx_content_writer.Start_UseFullUrl(documentOrigin + api.DocumentUrl);
+		window.global_pptx_content_writer.Start_UseFullUrl();
         window.global_pptx_content_writer.Start_UseDocumentOrigin(documentOrigin);
         window.global_pptx_content_writer._Start();
 		this.copyParams.bLockCopyElems = 0;
@@ -11022,7 +11022,7 @@ function Binary_OtherTableReader(doc, oReadResult, stream)
 			if(true == api.isUseEmbeddedCutFonts)
 			{
 				var font_cuts = api.FontLoader.embedded_cut_manager;
-				font_cuts.Url = api.DocumentUrl + "fonts/fonts.js";
+				font_cuts.Url = g_oDocumentUrls.getUrl('fonts/fonts.js');
 				font_cuts.init_cut_fonts(_embedded_fonts);
 				font_cuts.bIsCutFontsUse = true;
 			}

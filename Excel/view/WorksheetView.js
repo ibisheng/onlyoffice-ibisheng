@@ -8360,37 +8360,42 @@
 					//показываем плашку для отправки изображений на сервер
 					api.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 					
-					var rData = {"id": api.documentId, "c":"imgurls", "vkey": api.documentVKey, "data": JSON.stringify(val._images)};
-					sendCommand2(function(incomeObject){
-						if(incomeObject && "imgurls" == incomeObject.type)
-						{
-							var oFromTo = JSON.parse(incomeObject.data);
-							var aImagesSync = [];
-							
-							for(var i = 0, length = val._aPastedImages.length; i < length; ++i)
-							{	
-								var sTo = oFromTo[val._aPastedImages[i].Url];
-								if(sTo)
-								{									
-									var imageElem = val._aPastedImages[i];
-									if(null != imageElem)
+					var rData = {"id": api.documentId, "c":"imgurls", "vkey": api.documentVKey, "userid": api.documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": val._images};
+					api.fCurCallback = function(input) {
+						if(null != input && "imgurls" == input["type"]){
+							if("ok" == input["status"]) {
+								var data = input["data"];
+								var urls = {};
+								var aImagesSync = [];
+								for(var i = 0, length = data.length; i < length; ++i)
+								{
+									var elem = data[i];
+									if(elem.url)
 									{
-										var sNewSrc = oFromTo[imageElem.Url];
-										aImagesSync.push(sNewSrc);
-										if(null != sNewSrc)
-											imageElem.SetUrl(sNewSrc);
-											
-									}															
-								}						
+										urls[elem.path] = elem.url;
+										var name = g_oDocumentUrls.imagePath2Local(elem.path);
+										var imageElem = val._aPastedImages[i];
+										if(null != imageElem)
+										{
+											aImagesSync.push(elem.url);
+											imageElem.SetUrl(elem.url);
+										}
+									}
+								}
+								g_oDocumentUrls.addUrls(urls);
+
+								if(val.onlyImages !== true)
+									t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
+								api.wb.clipboard._insertImagesFromBinaryWord(t, val, aImagesSync);
+							} else {
+								api.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
 							}
+						} else {
+							api.handlers.trigger("asc_onError", c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
 						}
 						api.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-						
-						if(val.onlyImages !== true)
-							t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
-						api.wb.clipboard._insertImagesFromBinaryWord(t, val, aImagesSync);
-					}, api.fCallbackSendCommand, rData);
-					
+					};
+					sendCommand2( api, null, rData );
 				}
 				else if(val.onlyImages !== true)
 						t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);

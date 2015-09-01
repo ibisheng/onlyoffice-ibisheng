@@ -760,9 +760,9 @@ function CPPTXContentWriter()
 
     this.arrayStackStarts = [];
 
-    this.Start_UseFullUrl = function(origin)
+    this.Start_UseFullUrl = function()
     {
-        this.BinaryFileWriter.Start_UseFullUrl(origin);
+        this.BinaryFileWriter.Start_UseFullUrl();
     }
     this.Start_UseDocumentOrigin = function(origin)
     {

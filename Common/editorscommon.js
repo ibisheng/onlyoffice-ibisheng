@@ -14,14 +14,75 @@ if (typeof String.prototype.endsWith !== 'function') {
 }
 
 var g_oZipChanges = null;
-var g_sMainServiceLocalUrl = "/CanvasService.ashx";
-var g_sResourceServiceLocalUrl = "/ResourceService.ashx?path=";
-var g_sUploadServiceLocalUrl = "/UploadService.ashx";
+//var g_sMainServiceLocalUrl = "/CanvasService.ashx";
+//var g_sResourceServiceLocalUrl = "/ResourceService.ashx?path=";
+var g_sDownloadServiceLocalUrl = "/downloadas";
+var g_sUploadServiceLocalUrl = "/upload";
 var g_sTrackingServiceLocalUrl = "/TrackingService.ashx";
 var g_nMaxJsonLength = 2097152;
 var g_nMaxJsonLengthChecked = g_nMaxJsonLength / 1000;
-var g_nMaxRequestLength = 1048576;//<requestLimits maxAllowedContentLength="30000000" /> default 30mb
+var g_nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
 var g_cCharDelimiter = String.fromCharCode(5);
+
+function DocumentUrls(){
+	this.urls = null;
+	this.urlsReverse = null;
+	this.imageCount = 0;
+}
+DocumentUrls.prototype = {
+	mediaPrefix : 'media/',
+	init : function(urls){
+		this.urls = {};
+		this.urlsReverse = {};
+		this.addUrls(urls);
+	},
+	addUrls : function(urls){
+		for(var i in urls){
+			var url = urls[i];
+			this.urls[i] = url;
+			this.urlsReverse[url] = i;
+			this.imageCount++;
+		}
+	},
+	addImageUrl : function(strPath, url){
+		var urls = {};
+		urls[this.mediaPrefix + strPath] = url;
+		this.addUrls(urls);
+	},
+	getImageUrl : function(strPath){
+		return this.getUrl(this.mediaPrefix + strPath);
+	},
+	getImageLocal : function(url){
+		if(this.urlsReverse){
+			var imageLocal = this.urlsReverse[url];
+			if(imageLocal && this.mediaPrefix == imageLocal.substring(0, this.mediaPrefix.length))
+				imageLocal = imageLocal.substring(this.mediaPrefix.length);
+			return imageLocal;
+		}
+		return null;
+	},
+	imagePath2Local : function(imageLocal){
+		if(imageLocal && this.mediaPrefix == imageLocal.substring(0, this.mediaPrefix.length))
+			imageLocal = imageLocal.substring(this.mediaPrefix.length);
+		return imageLocal;
+	},
+	getUrl : function(strPath){
+		if(this.urls){
+			return this.urls[strPath];
+		}
+		return null;
+	},
+	getLocal : function(url){
+		if(this.urlsReverse){
+			return this.urlsReverse[url];
+		}
+		return null;
+	},
+	getMaxIndex : function(url){
+		return this.imageCount;
+	}
+};
+var g_oDocumentUrls = new DocumentUrls();
 
 function OpenFileResult () {
 	this.bSerFormat = false;
@@ -30,37 +91,36 @@ function OpenFileResult () {
 	this.changes = null;
 }
 
-function g_fSaveWithParts(fSendCommand, fCallback, oAdditionalData, aParts) {
-	if(null == aParts){
-		var nDataLength = 0;
-		if(null != oAdditionalData["data"])
-			nDataLength = oAdditionalData["data"].length;
-		aParts = [];
-		if(nDataLength > g_nMaxRequestLength){
-			for(var i = 0; i < Math.ceil(nDataLength / g_nMaxRequestLength); ++i)
-				aParts.push(oAdditionalData["data"].substring(i * g_nMaxRequestLength, (i + 1) * g_nMaxRequestLength));
-			oAdditionalData["data"] = aParts.shift();
-			oAdditionalData["savetype"] = c_oAscSaveTypes.PartStart;
-		}
-		else
-			oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
+function g_fSaveWithParts(fSendCommand, fCallback, fCallbackRequest, oAdditionalData, dataContainer) {
+	var index = dataContainer.index;
+	if(null == dataContainer.part && (!dataContainer.data || dataContainer.data.length <= g_nMaxRequestLength)){
+		oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 	}
 	else{
-		oAdditionalData["data"] = aParts.shift();
-		if(aParts.length > 0)
+		if(0 == index){
+			oAdditionalData["savetype"] = c_oAscSaveTypes.PartStart;
+			dataContainer.count = Math.ceil(dataContainer.data.length / g_nMaxRequestLength);
+		} else if(index != dataContainer.count - 1){
 			oAdditionalData["savetype"] = c_oAscSaveTypes.Part;
-		else
+		} else {
 			oAdditionalData["savetype"] = c_oAscSaveTypes.Complete;
-	}
-	fSendCommand(function (incomeObject) {
-		if(null != incomeObject && "savepart" == incomeObject["type"]){
-			var outputData = JSON.parse(incomeObject["data"]);
-			oAdditionalData["savekey"] = outputData["savekey"];
-			g_fSaveWithParts(fSendCommand, fCallback, oAdditionalData, aParts);
 		}
-		else
-			fCallback(incomeObject);
-	}, oAdditionalData);
+		dataContainer.part = dataContainer.data.substring(index * g_nMaxRequestLength, (index + 1) * g_nMaxRequestLength);
+	}
+	dataContainer.index++;
+	oAdditionalData["saveindex"] = dataContainer.index;
+	fSendCommand(function (incomeObject) {
+		if(null != incomeObject && "ok" == incomeObject["status"]){
+			if(dataContainer.index < dataContainer.count) {
+				oAdditionalData["savekey"] = incomeObject["data"];
+				g_fSaveWithParts(fSendCommand, fCallback, fCallbackRequest, oAdditionalData, dataContainer);
+			} else if(fCallbackRequest){
+				fCallbackRequest(incomeObject);
+			}
+		} else {
+			fCallbackRequest ? fCallbackRequest(incomeObject) : fCallback(incomeObject);
+		}
+	}, oAdditionalData, dataContainer);
 }
 
 function g_fGetImageFromChanges (name) {
@@ -78,7 +138,7 @@ function g_fOpenFileCommand (binUrl, changesUrl, Signature, callback) {
 		if (bEndLoadFile && bEndLoadChanges)
 			if (callback) callback(bError, oResult);
 	};
-	var sFileUrl = g_sResourceServiceLocalUrl + binUrl;
+	var sFileUrl = binUrl;
 	sFileUrl = sFileUrl.replace( /\\/g, "/" );
 	asc_ajax({
 		url: sFileUrl,
@@ -121,39 +181,39 @@ function g_fOpenFileCommand (binUrl, changesUrl, Signature, callback) {
 	} else
 		bEndLoadChanges = true;
 }
-
-function sendCommand2 (fCallback, callback, rdata) {
+function g_fGetSaveUrl(urls){
+	for(var i in urls) {
+		if(-1 != i.indexOf('output')) {
+			return urls[i];
+		}
+	}
+	return null;
+}
+function sendCommand2(editor, fCallback, rdata, dataContainer){
 	var sData;
-	var sRequestContentType = "application/json";
 	//json не должен превышать размера g_nMaxJsonLength, иначе при его чтении будет exception
-	if (null != rdata["data"] && "string" === typeof(rdata["data"]) && rdata["data"].length > g_nMaxJsonLengthChecked) {
-		var sTemp = rdata["data"];
-		rdata["data"] = null;
-		sData = "mnuSaveAs" + g_cCharDelimiter + JSON.stringify(rdata) + g_cCharDelimiter + sTemp;
-		sRequestContentType = "application/octet-stream";
-	} else
-		sData = JSON.stringify(rdata);
-
+	if(null == rdata["savetype"])
+	{
+		editor.CoAuthoringApi.openDocument(rdata);
+		return;
+	}
+	rdata["userconnectionid"] = editor.CoAuthoringApi.getUserConnectionId();
 	asc_ajax({
-		type: 'POST',
-		url: g_sMainServiceLocalUrl,
-		data: sData,
-		contentType: sRequestContentType,
-		error: function () { callback(fCallback, true); },
-		success: function (msg) {
-			if (!msg || msg.length < 1) {
-				//result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
-				//oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
-				//if(callback)
-				//	callback(result);
-				callback(fCallback, true);
-			} else {
-				callback(fCallback, false, JSON.parse(msg));
-			}
-		},
-		dataType: 'text'
+        type: 'POST',
+        url: g_sDownloadServiceLocalUrl + '/' + rdata["id"] + '?cmd=' + encodeURIComponent(JSON.stringify(rdata)),
+        data: dataContainer.part || dataContainer.data,
+        contentType: "application/octet-stream",
+        error: function(){
+			if(fCallback)
+				fCallback(null, true);
+        },
+        success: function(msg){
+			if(fCallback)
+				fCallback(JSON.parse(msg), true);
+		}
 	});
 }
+
 function sendTrack (fCallback, url, rdata) {
 	asc_ajax({
 		type: 'POST',
@@ -206,23 +266,19 @@ function getFullImageSrc2 (src) {
 	if (window["NATIVE_EDITOR_ENJINE"])
 		return src;
 
-	// ToDo это временное решение. В дальнейшем стоит заделать класс Common, в котором будут храниться эти данные для любого редактора
-	var documentUrl, themesUrl;
-	if (!editor || !editor.isDocumentEditor && !editor.isPresentationEditor) {
-		documentUrl = g_sResourceServiceLocalUrl + window["Asc"]["editor"].documentId + '/';
-	} else {
-		documentUrl = editor.DocumentUrl;
-		themesUrl = editor.ThemeLoader ? editor.ThemeLoader.ThemesUrl : undefined;
+	var start = src.slice(0, 6);
+	if (0 === start.indexOf('theme')){
+		var themesUrl = editor.ThemeLoader ? editor.ThemeLoader.ThemesUrl : undefined;
+		return themesUrl + src;
 	}
 
-	var start = src.slice(0, 6);
-	if (0 === start.indexOf('theme'))
-		return themesUrl + src;
-
 	if (0 !== start.indexOf('http:') && 0 !== start.indexOf('data:') && 0 !== start.indexOf('https:') &&
-		0 !== start.indexOf('file:') && 0 !== start.indexOf('ftp:') && 0 !== src.indexOf(documentUrl) &&
-		0 !== src.indexOf(themesUrl))
-		return documentUrl + 'media/' + src;
+		0 !== start.indexOf('file:') && 0 !== start.indexOf('ftp:')){
+			var srcFull = g_oDocumentUrls.getImageUrl(src);
+			if(srcFull){
+				return srcFull;
+			}
+		}
 	return src;
 }
 
