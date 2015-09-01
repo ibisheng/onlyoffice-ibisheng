@@ -222,6 +222,10 @@ Math.sign = function ( x ) {
     return x > 0 ? 1 : x < 0 ? -1 : 0;
 };
 
+RegExp.escape = function(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+}
+
 String.prototype.repeat = function ( s, n ) {
     var a = [];
     while ( a.length < n ) {
@@ -2393,7 +2397,7 @@ _func[cElementType.string][cElementType.string] = function ( arg0, arg1, what ) 
         return new cBool( arg0.getValue().toLowerCase() === arg1.getValue().toLowerCase() );
     }
     else if ( what === "<>" ) {
-        return new cBool( arg0.getValue() !== arg1.getValue() );
+        return new cBool( arg0.getValue().toLowerCase() !== arg1.getValue().toLowerCase() );
     }
     else if ( what === "-" ) {
         _arg0 = arg0.tocNumber();

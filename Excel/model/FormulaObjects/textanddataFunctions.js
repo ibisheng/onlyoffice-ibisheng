@@ -589,7 +589,7 @@ cFIND.prototype.Calculate = function ( arg ) {
     if ( arg1 instanceof cError )    return this.value = arg1;
 
     str = arg1.getValue();
-    searchStr = arg0.getValue();
+    searchStr = RegExp.escape(arg0.getValue());
 
     if ( arg2 ) {
 
@@ -1550,12 +1550,12 @@ cSUBSTITUTE.prototype.Calculate = function ( arg ) {
         return this.value = new cError( cErrorType.wrong_value_type );
     }
 
-    var string = arg0.getValue(), old_string = arg1.getValue(), new_string = arg2.getValue(), index = 0, res;
-    res = string.replace( new RegExp( old_string, "g" ), function ( equal, p1, source ) {
+    var string = arg0.getValue(), old_string = arg1.getValue(), new_string = arg2.getValue(), occurence = arg3.getValue(), index = 0, res;
+    res = string.replace( new RegExp( RegExp.escape(old_string), "g" ), function ( equal, p1, source ) {
         index++;
-        if ( arg3.getValue() == 0 || arg3.getValue() > source.length )
+        if ( occurence == 0 || occurence > source.length )
             return new_string;
-        else if ( arg3.getValue() == index ) {
+        else if ( occurence == index ) {
             return new_string;
         }
         return equal;
