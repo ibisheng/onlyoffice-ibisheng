@@ -1961,13 +1961,13 @@ function CEditorPage(api)
         oWordControl.StartUpdateOverlay();
 
         oWordControl.bIsUseKeyPress = (oWordControl.m_oLogicDocument.OnKeyDown(global_keyboardEvent) === true) ? false : true;
+
+        oWordControl.EndUpdateOverlay();
         if (false === oWordControl.bIsUseKeyPress || true === global_keyboardEvent.AltKey)
         {
             e.preventDefault();
             return false;
         }
-
-        oWordControl.EndUpdateOverlay();
     }
 
     this.DisableTextEATextboxAttack = function()
