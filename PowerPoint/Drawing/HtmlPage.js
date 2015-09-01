@@ -1885,8 +1885,9 @@ function CEditorPage(api)
 
         oWordControl.IsKeyDownButNoPress = true;
         oWordControl.bIsUseKeyPress = (oWordControl.m_oLogicDocument.OnKeyDown(global_keyboardEvent) === true) ? false : true;
-        if (false === oWordControl.bIsUseKeyPress || true === global_keyboardEvent.AltKey)
+        if (false === oWordControl.bIsUseKeyPress)// || true === global_keyboardEvent.AltKey)
         {
+            // убираем превент с альтом. Уж больно итальянцы недовольны.
             e.preventDefault();
         }
 

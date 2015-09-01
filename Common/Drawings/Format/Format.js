@@ -2595,6 +2595,11 @@ CBlipFill.prototype =
     Read_FromBinary: function(r)
     {
         this.RasterImageId = readString(r);
+
+        var _correct_id = g_fGetImageFromChanges(this.RasterImageId);
+        if (null != _correct_id)
+            this.RasterImageId = _correct_id;
+
         var srcUrl = readString(r);
         if(srcUrl) {
             g_oDocumentUrls.addImageUrl(this.RasterImageId, srcUrl);

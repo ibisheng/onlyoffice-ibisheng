@@ -2385,8 +2385,9 @@ function CEditorPage(api)
 
         oWordControl.EndUpdateOverlay();
 
-        if (false === oWordControl.bIsUseKeyPress || (true === global_keyboardEvent.AltKey && !AscBrowser.isMacOs))
+        if (false === oWordControl.bIsUseKeyPress)// || (true === global_keyboardEvent.AltKey && !AscBrowser.isMacOs))
         {
+            // убираем превент с альтом. Уж больно итальянцы недовольны.
             e.preventDefault();
         }
 
