@@ -562,7 +562,10 @@ var maxIndividualValues = 10000;
 							
 							//скрываем строки
 							if(hiddenObj.h === null)
+							{
 								hiddenObj.h = isSetHidden;
+								hiddenObj.start = i;
+							}
 							else if(hiddenObj.h !== isSetHidden)
 							{
 								aWs.setRowHidden(hiddenObj.h, hiddenObj.start, i - 1);
@@ -730,7 +733,7 @@ var maxIndividualValues = 10000;
 										{
 											if(filter.FilterColumns[i].isApplyAutoFilter())
 												isSetFilter = true;
-											else
+											else if(filter.FilterColumns[i].ShowButton === false)
 												isShowButton = false;
 											
 											break;
@@ -1739,6 +1742,19 @@ var maxIndividualValues = 10000;
 						return;
 				}
 				
+				var cloneFilterColumns = function(filterColumns)
+				{
+					var cloneFilterColumns = [];
+					if(filterColumns && filterColumns.length)
+					{
+						for(var i = 0; i < filterColumns.length; i++)
+						{
+							cloneFilterColumns[i] = filterColumns[i].clone();
+						}
+					}
+					return cloneFilterColumns;
+				};
+				
 				var addRedo = false;
 				
 				if(copyRange)
@@ -1779,9 +1795,9 @@ var maxIndividualValues = 10000;
 							else if(!data && findFilters[i] && findFilters[i].FilterColumns)
 								findFilters[i].cleanFilters();
 							else if(data && data[i] && data[i].AutoFilter && data[i].AutoFilter.FilterColumns)
-								findFilters[i].AutoFilter.FilterColumns = data[i].AutoFilter.FilterColumns;
+								findFilters[i].AutoFilter.FilterColumns = cloneFilterColumns(data[i].AutoFilter.FilterColumns);
 							else if(data && data[i] && data[i].FilterColumns)
-								findFilters[i].FilterColumns = data[i].FilterColumns;
+								findFilters[i].FilterColumns = cloneFilterColumns(data[i].FilterColumns);
 							
 							
 							if(oCurFilter[i].TableStyleInfo && oCurFilter[i] && findFilters[i])

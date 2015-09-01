@@ -4551,7 +4551,13 @@ AutoFilter.prototype.cleanFilters = function() {
 	
 	for(var i = 0; i < this.FilterColumns.length; i++)
 	{
-		this.FilterColumns[i].clean();
+		if(this.FilterColumns[i].ShowButton === false)
+			this.FilterColumns[i].clean();
+		else
+		{
+			this.FilterColumns.splice(i, 1);
+			i--;
+		}	
 	}
 };
 
