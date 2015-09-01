@@ -2818,37 +2818,35 @@
 				--row;
 			}
 
-			var mc = null, nextRow;
+			var mc = null, nextRow, isFirstRow = true;
 			var isPrevColExist = (0 <= prevCol);
 			for (row = range.r1; row <= range.r2 && row < t.nRowsCount; row = nextRow) {
 				nextRow = row + 1;
 				if (r[row].height < t.height_1px) {continue;}
-
-				var isFirstRow = row === range.r1;
-				var isLastRow  = row === range.r2;
 				// Нужно отсеять пустые снизу
 				for (; nextRow <= range.r2 && nextRow < t.nRowsCount; ++nextRow)
 					if (r[nextRow].height >= t.height_1px) {break;}
 
-				if (isFirstRow)
-					objMCRow = objectMergedCells[row];
-				else
-					objMCRow = objMCNextRow;
+				var isFirstRowTmp = isFirstRow, isLastRow = nextRow > range.r2 || nextRow >= t.nRowsCount;
+				isFirstRow = false; // Это уже не первая строка (определяем не по совпадению с range.r1, а по видимости)
 
+				objMCRow = isFirstRowTmp ? objectMergedCells[row] : objMCNextRow;
 				objMCNextRow = objectMergedCells[nextRow];
 
 				var rowCache = t._fetchRowCache(row);
 				var y1 = r[row].top - offsetY;
 				var y2 = y1 + r[row].height - t.height_1px;
 
-				var nextCol;
+				var nextCol, isFirstCol = true;
 				for (col = range.c1; col <= range.c2 && col < t.nColsCount; col = nextCol) {
+					nextCol = col + 1;
 					if (c[col].width < t.width_1px) {continue;}
-					var isFirstCol = col === range.c1;
-					var isLastCol = col === range.c2;
 					// Нужно отсеять пустые справа
-					for (nextCol = col + 1; nextCol <= range.c2 && nextCol < t.nColsCount; ++nextCol)
+					for (; nextCol <= range.c2 && nextCol < t.nColsCount; ++nextCol)
 						if (c[nextCol].width >= t.width_1px) {break;}
+
+					var isFirstColTmp = isFirstCol, isLastCol = nextCol > range.c2 || nextCol >= t.nColsCount;
+					isFirstCol = false; // Это уже не первая колонка (определяем не по совпадению с range.c1, а по видимости)
 
 					mc = objMCRow ? objMCRow[col] : null;
 
@@ -2858,7 +2856,7 @@
 					if (row === t.nRowsCount) {
 						bBotPrev = bBotCur = bBotNext = null;
 					} else {
-						if (isFirstCol) {
+						if (isFirstColTmp) {
 							bBotPrev = arrNextRow[prevCol] = new CellBorderObject(isPrevColExist ?
 								t._getVisibleCell(prevCol, nextRow).getBorder() : null,
 								objMCNextRow ? objMCNextRow[prevCol] : null, prevCol, nextRow);
@@ -2871,7 +2869,7 @@
 						}
 					}
 
-					if (isFirstCol) {
+					if (isFirstColTmp) {
 						bPrev = arrCurrRow[prevCol] = new CellBorderObject(isPrevColExist ?
 							t._getVisibleCell(prevCol, row).getBorder() : null,
 							objMCRow ? objMCRow[prevCol] : null, prevCol, row);
@@ -2938,7 +2936,7 @@
 					}
 
 					// draw left border
-					if (isFirstCol && !t._isLeftBorderErased(col, rowCache)) {
+					if (isFirstColTmp && !t._isLeftBorderErased(col, rowCache)) {
 						drawVerticalBorder(bPrev, bCur, x1 - t.width_1px, y1, y2);
 						// Если мы в печати и печатаем первый столбец, то нужно напечатать бордеры
 //						if (lb.w >= 1 && drawingCtx && 0 === col) {
@@ -2952,7 +2950,7 @@
 						drawVerticalBorder(bCur, bNext, x2, y1, y2);
 					}
 					// draw top border
-					if (isFirstRow) {
+					if (isFirstRowTmp) {
 						drawHorizontalBorder(bTopCur, bCur, x1, y1 - t.height_1px, x2);
 						// Если мы в печати и печатаем первую строку, то нужно напечатать бордеры
 //						if (tb.w > 0 && drawingCtx && 0 === row) {
