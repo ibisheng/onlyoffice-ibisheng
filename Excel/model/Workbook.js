@@ -4420,6 +4420,7 @@ Woorksheet.prototype._shiftCellsLeft=function(oBBox){
 	var nLeft = oBBox.c1;
 	var nRight = oBBox.c2;
 	var dif = nLeft - nRight - 1;
+    this.renameDependencyNodes( {offsetRow:0,offsetCol:dif}, oBBox );
 	for(var i = oBBox.r1; i <= oBBox.r2; i++){
 		var row = this.aGCells[i];
 		if(row){
@@ -4445,7 +4446,6 @@ Woorksheet.prototype._shiftCellsLeft=function(oBBox){
 			}
 		}
 	}
-    this.renameDependencyNodes( {offsetRow:0,offsetCol:dif}, oBBox );
 
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsLeft, this.getId(), new Asc.Range(nLeft, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
 	//todo проверить не уменьшились ли границы таблицы
@@ -4458,6 +4458,7 @@ Woorksheet.prototype._shiftCellsUp=function(oBBox){
 	var nTop = oBBox.r1;
 	var nBottom = oBBox.r2;
 	var dif = nTop - nBottom - 1;
+    this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox );
 	var aIndexes = [];
 	for(var i in this.aGCells)
 	{
@@ -4488,8 +4489,6 @@ Woorksheet.prototype._shiftCellsUp=function(oBBox){
 		}
 	}
 
-    this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox );
-
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsTop, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
 	//todo проверить не уменьшились ли границы таблицы
 };
@@ -4501,6 +4500,7 @@ Woorksheet.prototype._shiftCellsRight=function(oBBox){
 	var nLeft = oBBox.c1;
 	var nRight = oBBox.c2;
 	var dif = nRight - nLeft + 1;
+    this.renameDependencyNodes({offsetRow:0,offsetCol:dif}, oBBox);
 	for(var i = oBBox.r1; i <= oBBox.r2; i++){
 		var row = this.aGCells[i];
 		if(row){
@@ -4525,7 +4525,6 @@ Woorksheet.prototype._shiftCellsRight=function(oBBox){
 			}
 		}
 	}
-    this.renameDependencyNodes({offsetRow:0,offsetCol:dif}, oBBox);
 
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsRight, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
 };
@@ -4538,6 +4537,7 @@ Woorksheet.prototype._shiftCellsBottom=function(oBBox){
 	var nBottom = oBBox.r2;
 	var dif = nBottom - nTop + 1;
 	var aIndexes = [];
+    this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox);
 	for(var i in this.aGCells){
 		var rowInd = i - 0;
 		if(rowInd >= nTop)
@@ -4559,7 +4559,6 @@ Woorksheet.prototype._shiftCellsBottom=function(oBBox){
 			}
 		}
 	}
-    this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox);
 
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsBottom, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
 };
