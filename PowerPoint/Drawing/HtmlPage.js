@@ -3581,26 +3581,6 @@ function CEditorPage(api)
     }
 }
 
-var _message_update = "zero_delay_update";
-function handleMessage(event)
-{
-    if (event.source == window && event.data == _message_update)
-    {
-        var oWordControl = editor.WordControl;
-        event.stopPropagation();
-        oWordControl.OnPaint();
-        if (null != oWordControl.m_oLogicDocument)
-        {
-            oWordControl.m_oDrawingDocument.UpdateTargetFromPaint = true;
-            oWordControl.m_oLogicDocument.CheckTargetUpdate();
-            oWordControl.m_oDrawingDocument.UpdateTargetFromPaint = false;
-            //setTimeout("oWordControl.OnPaint();", 10);
-        }
-    }
-}
-//if(window.addEventListener)
-//    window.addEventListener("message", handleMessage, true);
-
 function sendStatus(Message)
 {
     editor.sync_StatusMessage(Message);
