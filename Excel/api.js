@@ -3190,6 +3190,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		spreadsheet_api.prototype.asc_getFormulasInfo = function () {
 			return this.formulasList;
 		};
+		spreadsheet_api.prototype.asc_getFormulaLocaleName = function (name) {
+			return cFormulaFunctionToLocale ? cFormulaFunctionToLocale[name] : name;
+		};
 
 		spreadsheet_api.prototype.asc_recalc = function(isRecalcWB){
 			this.wbModel.recalcWB(isRecalcWB);
@@ -3996,6 +3999,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_removeHyperlink"] = prot.asc_removeHyperlink;
 		prot["asc_insertFormula"] = prot.asc_insertFormula;
 		prot["asc_getFormulasInfo"] = prot.asc_getFormulasInfo;
+		prot["asc_getFormulaLocaleName"] = prot.asc_getFormulaLocaleName;
 		prot["asc_setFontRenderingMode"] = prot.asc_setFontRenderingMode;
 		prot["asc_setSelectionDialogMode"] = prot.asc_setSelectionDialogMode;
 		prot["asc_ChangeColorScheme"] = prot.asc_ChangeColorScheme;
