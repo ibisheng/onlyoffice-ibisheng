@@ -181,55 +181,21 @@ function asc_docs_api(name)
 		window.addEventListener("message", function(){
 			oThis.OnHandleMessage.apply(oThis, arguments);
 		}, false);
-	if ("undefined" != typeof(FileReader) && "undefined" != typeof(FormData)) {
-		//var element = document.body;
-		var element = document.getElementById(this.HtmlElementName);
-		if(null != element)
-		{
-			element["ondragover"] = function(e) {
-				e.preventDefault();
-				if(CanDropFiles(e))
-					e.dataTransfer.dropEffect = 'copy';
-				else
-					e.dataTransfer.dropEffect = 'none';
-				return false;
-			};
-			element["ondrop"] = function(e) {
-				e.preventDefault();
-				var files = e.dataTransfer.files;
-				var nError = ValidateUploadImage(files);
-				if(c_oAscServerError.NoError == nError)
-				{
-					oThis.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-					var xhr = new XMLHttpRequest();
-					var fd = new FormData();
-					for(var i = 0, length = files.length; i < length; i++)
-						fd.append('file[' + i + ']', files[i]);
-					xhr.open('POST', g_sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex());
-					xhr.onreadystatechange = function(){
-						if(4 == this.readyState)
-						{
-							if((this.status == 200 || this.status == 1223))
-							{
-								var frameWindow = GetUploadIFrame();
-								var content = this.responseText;
-								frameWindow.document.open();
-								frameWindow.document.write(content);
-								frameWindow.document.close();
-							}
-							else{
-								oThis.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
-								oThis.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-							}
-						}
-					};
-					xhr.send(fd);
-				}
-				else
-					oThis.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(nError), c_oAscError.Level.NoCritical);
-			};
+
+	// init drag&drop
+	InitDragAndDrop(document.getElementById(this.HtmlElementName), function (error, files) {
+		if (c_oAscServerError.NoError !== error) {
+			oThis.asc_fireCallback("asc_onError", error, c_oAscError.Level.NoCritical);
+			return;
 		}
-	}
+		oThis.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+		UploadImageFiles(files, documentId, documentUserId, function (error) {
+			if (c_oAscServerError.NoError !== error) {
+				oThis.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+				oThis.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+			}
+		});
+	});
 
     if (window.editor == undefined)
     {

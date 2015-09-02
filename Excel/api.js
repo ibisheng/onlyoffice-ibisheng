@@ -179,60 +179,25 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.HtmlElement = document.getElementById(this.HtmlElementName);
 			this.topLineEditorElement = document.getElementById(this.topLineEditorName);
 			// init drag&drop
-			if ("undefined" != typeof(FileReader) && "undefined" != typeof(FormData) && null != this.HtmlElement) {
-				this.HtmlElement["ondragover"] = function (e) {t._onDragOverImage(e);};
-				this.HtmlElement["ondrop"] = function (e) {t._onDropImage(e);};
-			}
+			InitDragAndDrop(this.HtmlElement, function (error, files) {
+				if (c_oAscServerError.NoError !== error) {
+					t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
+					return;
+				}
+				t.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+				UploadImageFiles(files, t.documentId, t.documentUserId, function (error) {
+					if (c_oAscServerError.NoError !== error) {
+						t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
+						t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+					}
+				});
+			});
 
 			this.formulasList = getFormulasInfo();
 
 			this.fCallbackSendCommand = function (fCallback, error, result) {
 				t._sendCommandCallback(fCallback, error, result);
 			};
-		};
-
-		spreadsheet_api.prototype._onDragOverImage = function(e) {
-			e.preventDefault();
-			if(CanDropFiles(e))
-				e.dataTransfer.dropEffect = 'copy';
-			else
-				e.dataTransfer.dropEffect = 'none';
-			return false;
-		};
-		spreadsheet_api.prototype._onDropImage = function(e) {
-			var t = this;
-			e.preventDefault();
-			var files = e.dataTransfer.files;
-			var nError = ValidateUploadImage(files);
-			if (c_oAscServerError.NoError == nError) {
-				var worksheet = null;
-				if (null != this.wbModel)
-					worksheet = this.wbModel.getWorksheet(this.wbModel.getActive());
-				if (null != worksheet) {
-					this.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-					var xhr = new XMLHttpRequest();
-					var fd = new FormData();
-					for(var i = 0, length = files.length; i < length; i++)
-						fd.append('file[' + i + ']', files[i]);
-					xhr.open('POST', g_sUploadServiceLocalUrl + '/' + this.documentId + '/' + this.documentUserId + '/' + g_oDocumentUrls.getMaxIndex());
-					xhr.onreadystatechange = function() {
-						if (4 == this.readyState) {
-							if((this.status == 200 || this.status == 1223)) {
-								var frameWindow = GetUploadIFrame();
-								var content = this.responseText;
-								frameWindow.document.open();
-								frameWindow.document.write(content);
-								frameWindow.document.close();
-							} else{
-								t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-								t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-							}
-						}
-					};
-					xhr.send(fd);
-				}
-			} else
-				this.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(nError), c_oAscError.Level.NoCritical);
 		};
 
 		spreadsheet_api.prototype.asc_CheckGuiControlColors = function() {
