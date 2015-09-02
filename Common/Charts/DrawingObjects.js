@@ -949,12 +949,6 @@ function DrawingObjects() {
 
 		_this.recalculate(true);
 
-
-        // Upload event
-        if (window.addEventListener) {
-            window.addEventListener("message", _this._uploadMessage, false);
-        }
-
         _this.shiftMap = {};
         worksheet.model.Drawings = aObjects;
     };
@@ -1074,44 +1068,6 @@ function DrawingObjects() {
 
     _this.getWorksheetModel = function() {
         return worksheet.model;
-    };
-
-    _this._uploadMessage = function(event) {
-        if ( null != event && null != event.data ) {
-            try {
-                var data = JSON.parse(event.data);
-                if ((null != data) && (null != data["type"]))
-                {
-                    if (PostMessageType.UploadImage == data["type"]) {
-                        if (c_oAscServerError.NoError == data["error"]) {
-							var urls = data["urls"];
-							if(urls){
-								g_oDocumentUrls.addUrls(urls);
-								var firstUrl;
-								for(var i in urls){
-									if(urls.hasOwnProperty(i)){
-										firstUrl = urls[i];
-										break;
-									}
-								}
-								if(firstUrl){
-									if ( api.isImageChangeUrl || api.isShapeImageChangeUrl || api.isTextArtChangeUrl)
-										_this.editImageDrawingObject(firstUrl);
-									else
-										_this.addImageDrawingObject(firstUrl, null);
-								}
-							}
-                        }
-                        else {
-                            worksheet.model.workbook.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(data["error"]), c_oAscError.Level.NoCritical);
-                        }
-						worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-                    }
-                }
-            }
-            catch(e) {
-            }
-        }
     };
 
     _this.callTrigger = function(triggerName, param) {

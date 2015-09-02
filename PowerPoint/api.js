@@ -165,7 +165,6 @@ function asc_docs_api(name)
     this._gui_fonts = null;
     this._gui_editor_themes = null;
     this._gui_document_themes = null;
-    this.tableStylesIdCounter = 0;
     //выставляем тип copypaste
     g_bIsDocumentCopyPaste = false;
 
@@ -177,11 +176,15 @@ function asc_docs_api(name)
 	this.fCurCallback = null;
 	
 	var oThis = this;
-	if(window.addEventListener)
-		window.addEventListener("message", function(){
-			oThis.OnHandleMessage.apply(oThis, arguments);
-		}, false);
+	// init OnMessage
+	InitOnMessage(function (error, url) {
+		if (c_oAscServerError.NoError !== error)
+			oThis.sync_ErrorCallback(error, c_oAscError.Level.NoCritical);
+		else
+			oThis.AddImageUrl(url);
 
+		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+	});
 	// init drag&drop
 	InitDragAndDrop(document.getElementById(this.HtmlElementName), function (error, files) {
 		if (c_oAscServerError.NoError !== error) {
@@ -4794,40 +4797,7 @@ asc_docs_api.prototype.OnMouseUp = function(x, y)
 
     //this.WordControl.onMouseUpExternal(x, y);
 };
-asc_docs_api.prototype.OnHandleMessage = function(event)
-{
-	if (null != event && null != event.data)
-    {
-		var data = JSON.parse(event.data);
-		if(null != data && null != data["type"])
-		{
-			if(PostMessageType.UploadImage == data["type"])
-			{
-				if(c_oAscServerError.NoError == data["error"])
-				{
-					var urls = data["urls"];
-					if(urls){
-						g_oDocumentUrls.addUrls(urls);
-						var firstUrl;
-						for(var i in urls){
-							if(urls.hasOwnProperty(i)){
-								firstUrl = urls[i];
-								break;
-							}
-						}
-						if(firstUrl){
-							this.AddImageUrl(firstUrl);
-						}
-					}
-				}
-				else
-					this.sync_ErrorCallback(g_fMapAscServerErrorToAscError(data["error"]), c_oAscError.Level.NoCritical);
 
-                editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-			}
-		}
-	}
-};
 asc_docs_api.prototype.asyncImageEndLoaded2 = null;
 
 asc_docs_api.prototype.ChangeTheme = function(indexTheme)

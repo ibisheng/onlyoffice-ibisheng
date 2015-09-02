@@ -554,6 +554,36 @@ function GetFileExtension (sName) {
 		return sName.substring(nIndex + 1).toLowerCase();
 	return null;
 }
+function InitOnMessage (callback) {
+	if (window.addEventListener) {
+		window.addEventListener("message", function (event) {
+			if (null != event && null != event.data) {
+				try {
+					var data = JSON.parse(event.data);
+					if (null != data && null != data["type"] && PostMessageType.UploadImage == data["type"]) {
+						if (c_oAscServerError.NoError == data["error"]) {
+							var urls = data["urls"];
+							if (urls) {
+								g_oDocumentUrls.addUrls(urls);
+								var firstUrl;
+								for (var i in urls) {
+									if (urls.hasOwnProperty(i)) {
+										firstUrl = urls[i];
+										break;
+									}
+								}
+								callback(c_oAscServerError.NoError, firstUrl);
+							}
+
+						} else
+							callback(g_fMapAscServerErrorToAscError(data["error"]));
+					}
+				} catch (err) {
+				}
+			}
+		}, false);
+	}
+}
 function InitDragAndDrop (oHtmlElement, callback) {
 	if ("undefined" != typeof(FileReader) && "undefined" != typeof(FormData) && null != oHtmlElement) {
 		oHtmlElement["ondragover"] = function (e) {

@@ -178,6 +178,22 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			var t = this;
 			this.HtmlElement = document.getElementById(this.HtmlElementName);
 			this.topLineEditorElement = document.getElementById(this.topLineEditorName);
+			// init OnMessage
+			InitOnMessage(function (error, url) {
+				if (c_oAscServerError.NoError !== error)
+					t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
+				else {
+					var ws = t.wb.getWorksheet();
+					if (ws) {
+						if (t.isImageChangeUrl || t.isShapeImageChangeUrl || t.isTextArtChangeUrl)
+							ws.objectRender.editImageDrawingObject(url);
+						else
+							ws.objectRender.addImageDrawingObject(url, null);
+					}
+				}
+
+				t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+			});
 			// init drag&drop
 			InitDragAndDrop(this.HtmlElement, function (error, files) {
 				if (c_oAscServerError.NoError !== error) {
