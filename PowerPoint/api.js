@@ -3094,38 +3094,12 @@ asc_docs_api.prototype.ChangeArtImageFromFile = function()
 };
 
 asc_docs_api.prototype.AddImage = function(){
-    var frameWindow = GetUploadIFrame();
-    var content = '<html><head></head><body><form action="' + g_sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex() + '" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" accept="image/*" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
-    frameWindow.document.open();
-    frameWindow.document.write(content);
-    frameWindow.document.close();
-
-    var fileName = frameWindow.document.getElementById("apiiuFile");
-    var fileSubmit = frameWindow.document.getElementById("apiiuSubmit");
-    var oThis = this;
-    fileName.onchange = function(e)
-    {
-		var bNeedSubmit = true;
-        if(e && e.target && e.target.files)
-        {
-			var nError = ValidateUploadImage(e.target.files);
-			if(c_oAscServerError.NoError != nError)
-			{
-				bNeedSubmit = false;
-				oThis.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(nError), c_oAscError.Level.NoCritical);
-			}
-        }
-		if(bNeedSubmit)
-		{
-			oThis.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-			fileSubmit.click();
-		}
-    };
-    //todo пересмотреть opera
-    if (window.opera != undefined)
-        setTimeout( function(){fileName.click();}, 0);
-    else
-        fileName.click();
+	var t = this;
+	ShowImageFileDialog(documentId, documentUserId, function (error) {
+		if (c_oAscServerError.NoError !== error)
+			t.asc_fireCallback("asc_onError", error, c_oAscError.Level.NoCritical);
+		t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+	});
 };
 
 asc_docs_api.prototype.StartAddShape = function(prst, is_apply)

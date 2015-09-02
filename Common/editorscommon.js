@@ -584,6 +584,34 @@ function InitOnMessage (callback) {
 		}, false);
 	}
 }
+function ShowImageFileDialog (documentId, documentUserId, callback) {
+	var frameWindow = GetUploadIFrame();
+	var content = '<html><head></head><body><form action="'+g_sUploadServiceLocalUrl+'/'+documentId+'/'+documentUserId+'/'+g_oDocumentUrls.getMaxIndex()+'" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" accept="image/*" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
+	frameWindow.document.open();
+	frameWindow.document.write(content);
+	frameWindow.document.close();
+
+	var fileName = frameWindow.document.getElementById("apiiuFile");
+	var fileSubmit = frameWindow.document.getElementById("apiiuSubmit");
+
+	fileName.onchange = function (e) {
+		if (e && e.target && e.target.files) {
+			var nError = ValidateUploadImage(e.target.files);
+			if (c_oAscServerError.NoError != nError) {
+				callback(g_fMapAscServerErrorToAscError(nError));
+				return;
+			}
+		}
+		callback(c_oAscServerError.NoError);
+		fileSubmit.click();
+	};
+
+	//todo пересмотреть opera
+	if (AscBrowser.isOpera)
+		setTimeout( function(){fileName.click();}, 0);
+	else
+		fileName.click();
+}
 function InitDragAndDrop (oHtmlElement, callback) {
 	if ("undefined" != typeof(FileReader) && "undefined" != typeof(FormData) && null != oHtmlElement) {
 		oHtmlElement["ondragover"] = function (e) {

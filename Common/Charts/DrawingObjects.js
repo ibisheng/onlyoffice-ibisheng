@@ -2976,63 +2976,11 @@ function DrawingObjects() {
     };
 
     //-----------------------------------------------------------------------------------
-    // File Dialog
-    //-----------------------------------------------------------------------------------
-
-    _this.showImageFileDialog = function(documentId, documentUserId) {
-
-        if ( _this.isViewerMode() )
-            return;
-
-        var frameWindow = GetUploadIFrame();
-        var content = '<html><head></head><body><form action="' + g_sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex() + '" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" accept="image/*" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
-        frameWindow.document.open();
-        frameWindow.document.write(content);
-        frameWindow.document.close();
-
-        var fileName = frameWindow.document.getElementById("apiiuFile");
-        var fileSubmit = frameWindow.document.getElementById("apiiuSubmit");
-
-        fileName.onchange = function(e) {
-            var bNeedSubmit = true;
-            if(e && e.target && e.target.files)
-            {
-                var nError = ValidateUploadImage(e.target.files);
-                if(c_oAscServerError.NoError != nError)
-                {
-                    bNeedSubmit = false;
-                    worksheet.model.workbook.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(nError), c_oAscError.Level.NoCritical);
-                }
-            }
-            if(bNeedSubmit)
-            {
-                worksheet.model.workbook.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-                fileSubmit.click();
-            }
-        };
-
-        if (AscBrowser.isOpera)
-            setTimeout(function() { fileName.click(); }, 0);
-        else
-            fileName.click();
-    };
-
-    //-----------------------------------------------------------------------------------
-    // Shapes controller
-    //-----------------------------------------------------------------------------------
-
-
-    //-----------------------------------------------------------------------------------
     // Private Misc Methods
     //-----------------------------------------------------------------------------------
 
     function ascCvtRatio(fromUnits, toUnits) {
         return asc.getCvtRatio( fromUnits, toUnits, drawingCtx.getPPIX() );
-    }
-
-    function setCanvasZIndex(canvas, value) {
-        if (canvas && (value >= 0) && (value <= 1))
-            canvas.globalAlpha = value;
     }
 
     function emuToPx(emu) {

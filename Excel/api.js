@@ -192,7 +192,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					}
 				}
 
-				t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+				t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 			});
 			// init drag&drop
 			InitDragAndDrop(this.HtmlElement, function (error, files) {
@@ -200,11 +200,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
 					return;
 				}
-				t.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+				t.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 				UploadImageFiles(files, t.documentId, t.documentUserId, function (error) {
 					if (c_oAscServerError.NoError !== error) {
 						t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
-						t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+						t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 					}
 				});
 			});
@@ -2592,7 +2592,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				"data": imageUrl};
 
 			var oThis = this;
-			this.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+			this.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 			this.fCurCallback = function(input) {
 				if(null != input && "imgurl" == input["type"]){
 					if("ok" ==input["status"]) {
@@ -2621,19 +2621,18 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				} else {
 					t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
 				}
-				oThis.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+				oThis.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 			};
 			sendCommand2(this, null, rData);
 		};
 
 		spreadsheet_api.prototype.asc_showImageFileDialog = function () {
-			if (undefined != window['appBridge']) {
-				window['appBridge']['dummyCommandAddImage'] ();
-				return;
-			}
-
-			var ws = this.wb.getWorksheet();
-			ws.objectRender.showImageFileDialog(this.documentId, this.documentUserId);
+			var t = this;
+			ShowImageFileDialog(this.documentId, this.documentUserId, function (error) {
+				if (c_oAscServerError.NoError !== error)
+					t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
+				t.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+			});
 		};
 
 		spreadsheet_api.prototype.asc_setSelectedDrawingObjectLayer = function(layerType) {
