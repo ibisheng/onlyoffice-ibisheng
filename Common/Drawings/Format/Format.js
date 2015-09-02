@@ -99,10 +99,6 @@ g_oThemeFontsName["+mj-lt"] = true;
 g_oThemeFontsName["+mn-cs"] = true;
 g_oThemeFontsName["+mn-ea"] = true;
 g_oThemeFontsName["+mn-lt"] = true;
-function isRealObject(o)
-{
-    return o !== null && typeof o === "object";
-}
 
 function isRealNumber(n)
 {
