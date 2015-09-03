@@ -325,7 +325,9 @@
 				var objectRender = worksheetView.objectRender;
 				var isIntoShape = objectRender.controller.getTargetDocContent();
 				
-				var text = this._makeTableNode(activeRange, worksheetView, isCut, isIntoShape);
+				var html = this._makeTableNode(activeRange, worksheetView, isCut, isIntoShape);
+				if(html)
+					html = html.innerHTML;
 				
 				History.TurnOff();
 				var sBase64 = null;
@@ -333,7 +335,7 @@
 					sBase64 = this._getBinaryForCopy(worksheetView);
 				History.TurnOn();
 				
-				return {sBase64: sBase64, text: text};
+				return {sBase64: sBase64, html: html, text: this.lStorageText};
 			},
 			
 			_getHtmlBase64: function(range, worksheet, isCut)
@@ -3023,7 +3025,7 @@
 								localStText += '\n';
 							for (col = bbox.c1; col <= bbox.c2; ++col) {
 								if(col != bbox.c1)
-									localStText += ' ';
+									localStText += '\t';
 								var currentRange = range.worksheet.getCell3(row, col);
 								//добавляем текст
 								var textRange = currentRange.getValue();
