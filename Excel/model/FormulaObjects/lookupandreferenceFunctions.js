@@ -106,22 +106,27 @@ cADDRESS.prototype.Calculate = function ( arg ) {
     if ( A1RefType instanceof cError ) return this.value = A1RefType;
     if ( sheetName instanceof cError ) return this.value = sheetName;
 
-    if ( refType.getValue() > 4 || refType.getValue() < 1 || rowNumber.getValue() < 1 || colNumber.getValue() < 1 ) {
+    rowNumber = rowNumber.getValue();
+    colNumber = colNumber.getValue();
+    refType = refType.getValue();
+    A1RefType = A1RefType.getValue();
+
+    if ( refType > 4 || refType < 1 || rowNumber < 1 || rowNumber > gc_nMaxRow || colNumber < 1 || colNumber > gc_nMaxCol ) {
         return this.value = new cError( cErrorType.wrong_value_type );
     }
     var strRef;
-    switch ( refType.getValue() ) {
+    switch ( refType ) {
         case 1:
-            strRef = "$" + g_oCellAddressUtils.colnumToColstrFromWsView( colNumber.getValue() ) + "$" + _getRowTitle( rowNumber.getValue() - 1 );
+            strRef = "$" + g_oCellAddressUtils.colnumToColstrFromWsView( colNumber ) + "$" + rowNumber;
             break;
         case 2:
-            strRef = g_oCellAddressUtils.colnumToColstrFromWsView( colNumber.getValue() ) + "$" + _getRowTitle( rowNumber.getValue() - 1 );
+            strRef = g_oCellAddressUtils.colnumToColstrFromWsView( colNumber ) + "$" + rowNumber;
             break;
         case 3:
-            strRef = "$" + g_oCellAddressUtils.colnumToColstrFromWsView( colNumber.getValue() ) + _getRowTitle( rowNumber.getValue() - 1 );
+            strRef = "$" + g_oCellAddressUtils.colnumToColstrFromWsView( colNumber ) + rowNumber;
             break;
         case 4:
-            strRef = g_oCellAddressUtils.colnumToColstrFromWsView( colNumber.getValue() ) + _getRowTitle( rowNumber.getValue() - 1 );
+            strRef = g_oCellAddressUtils.colnumToColstrFromWsView( colNumber ) + rowNumber;
             break;
     }
 

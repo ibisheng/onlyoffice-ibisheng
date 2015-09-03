@@ -817,8 +817,7 @@ DependencyGraph.prototype = {
     /*Defined Names section*/
     getDefNameNode:function ( node ) {
         var ret = this.defNameList[node];
-        ret && ret.Ref == null ? ret = null : false;
-        return ret;
+        return ret && ret.Ref == null ? null : ret;
     },
     getDefNameNodeByName:function ( name, sheetId ) {
 
@@ -1006,10 +1005,10 @@ DependencyGraph.prototype = {
         sheetNodeList = this.defNameSheets[sheetId || "WB"];
         nodeId = getDefNameVertexId( sheetId || "WB", name );
 
-        sheetNodeList[nodeId] = null;
+        //sheetNodeList[nodeId] = null;
         delete sheetNodeList[nodeId];
 
-        this.defNameList[nodeId] = null;
+        //this.defNameList[nodeId] = null;
         delete this.defNameList[nodeId];
 
         oldN.changeDefName( newDefName );
@@ -2434,8 +2433,8 @@ Workbook.prototype.getDefinesNamesWB = function (defNameListId) {
         for ( var id in listDN ) {
             name = listDN[id]
 
-            if ( name.Ref && !name.Hidden ) {
-                if( name.parsedRef && name.parsedRef.isParsed && name.parsedRef.calculate().errorType !== cErrorType.bad_reference ){
+            if ( name.Ref && !name.Hidden && name.Name.indexOf("_xlnm") < 0 ) {
+                if( name.parsedRef && name.parsedRef.isParsed && name.parsedRef.countRef == 1 && name.parsedRef.calculate().errorType !== cErrorType.bad_reference ){
                     arr.push( name.getAscCDefName() );
                 }
             }
@@ -2462,7 +2461,7 @@ Workbook.prototype.getDefinesNamesWB = function (defNameListId) {
         default:
             for ( var id in this.dependencyFormulas.defNameList ) {
                 name = this.dependencyFormulas.defNameList[id].getAscCDefName()
-                if ( name.Ref && !name.Hidden ) {
+                if ( name.Ref && !name.Hidden && name.Name.indexOf("_xlnm") < 0 ) {
                     names.push( name );
                 }
             }
@@ -2587,9 +2586,9 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
             retRes = retRes.getAscCDefName();
         }
 
-        if(!bUndo){
-            sortDependency( this );
-        }
+//        if(!bUndo){
+//            sortDependency( this );
+//        }
 
     }
 
