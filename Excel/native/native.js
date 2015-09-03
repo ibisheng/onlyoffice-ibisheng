@@ -2328,6 +2328,95 @@ function offline_get_cell_coord (c, r) {
         worksheet.rows[r].height];
 }
 
+function offline_copy() {
+
+    var worksheet = _api.wb.getWorksheet();
+    var sBase64 = _api.wb.clipboard.getSelectedBinary(false);
+
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+
+    // TODO: для картинок и текста
+    if (!sBase64)
+    {
+        _stream["WriteByte"](255);
+        return _stream;
+    }
+
+    // text format
+    _stream["WriteByte"](0);
+    _stream["WriteString2"](sBase64.text);
+
+    // image
+//    if (null != sBase64.drawingUrls && sBase64.drawingUrls.length > 0)
+//    {
+//        _stream["WriteByte"](1);
+//        _stream["WriteStringA"](sBase64.drawingUrls[0]);
+//    }
+
+    // owner format
+    _stream["WriteByte"](2);
+    _stream["WriteStringA"](sBase64.sBase64);
+
+    _stream["WriteByte"](3);
+    _stream["WriteString2"](sBase64.html);
+
+    _stream["WriteByte"](255);
+
+    return _stream;
+}
+function offline_paste(type, param) {
+    if (0 == type)
+    {
+        // TEXT
+    }
+    else if (1 == type)
+    {
+        // IMAGE
+    }
+    else if (2 == type)
+    {
+        var worksheet = _api.wb.getWorksheet();
+       _api.wb.clipboard._pasteFromBinaryExcel(worksheet, param);
+    }
+}
+function offline_cut() {
+    var worksheet = _api.wb.getWorksheet();
+    var sBase64 = _api.wb.clipboard.getSelectedBinary(true);
+
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+
+    // TODO: для картинок и текста
+    if (!sBase64)
+    {
+        _stream["WriteByte"](255);
+        return _stream;
+    }
+
+    // text format
+    _stream["WriteByte"](0);
+    _stream["WriteString2"](sBase64.text);
+
+//    // image
+//    if (null != sBase64.drawingUrls && sBase64.drawingUrls.length > 0)
+//    {
+//        _stream["WriteByte"](1);
+//        _stream["WriteStringA"](sBase64.drawingUrls[0]);
+//    }
+
+    // owner format
+    _stream["WriteByte"](2);
+    _stream["WriteStringA"](sBase64.sBase64);
+
+    _stream["WriteByte"](3);
+    _stream["WriteString2"](sBase64.html);
+
+    _stream["WriteByte"](255);
+
+    return _stream;
+}
+
 function offline_apply_event(type,params) {
     var _stream = null;
     var _return = undefined;
@@ -2415,6 +2504,32 @@ function offline_apply_event(type,params) {
             _stream["ClearNoAttack"]();
             _stream["WriteStringA"](_s.offline_print(params,_current));
             _return = _stream;
+            break;
+        }
+
+        case 110: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_COPY
+        {
+            _return = offline_copy();
+            break;
+        }
+        case 111 : // ASC_MENU_EVENT_TYPE_CONTEXTMENU_CUT
+        {
+            _return = this.offline_cut();
+            break;
+        }
+        case 112: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_PASTE
+        {
+            offline_paste(params[0], params[1]);
+            break;
+        }
+        case 113: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_DELETE
+        {
+            //this.Call_Menu_Context_Delete();
+            break;
+        }
+        case 114: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_SELECT
+        {
+            //this.Call_Menu_Context_Select();
             break;
         }
 
