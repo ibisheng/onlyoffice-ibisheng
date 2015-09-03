@@ -314,6 +314,28 @@
 				}
 			},
 			
+			getSelectedBinary: function () {
+				var api = window["Asc"]["editor"];
+				if(!api || !api.wb)
+					return false;
+				
+				var worksheetView = api.wb.getWorksheet();
+				var activeRange = worksheetView.getSelectedRange();
+				
+				var objectRender = worksheetView.objectRender;
+				var isIntoShape = objectRender.controller.getTargetDocContent();
+				
+				var text = this._makeTableNode(activeRange, worksheetView, isCut, isIntoShape);
+				
+				History.TurnOff();
+				var sBase64 = null;
+				if(!isIntoShape)
+					sBase64 = this._getBinaryForCopy(worksheetView);
+				History.TurnOn();
+				
+				return {sBase64: sBase64, text: text};
+			},
+			
 			_getHtmlBase64: function(range, worksheet, isCut)
 			{
 				var t = this;
