@@ -326,7 +326,7 @@
 				var isIntoShape = objectRender.controller.getTargetDocContent();
 				
 				var html = this._makeTableNode(activeRange, worksheetView, isCut, isIntoShape);
-				if(html)
+				if(html && !isIntoShape)
 					html = html.innerHTML;
 				
 				History.TurnOff();
