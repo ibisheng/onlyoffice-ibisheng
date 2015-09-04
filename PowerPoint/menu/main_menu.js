@@ -3057,7 +3057,9 @@ $(document).ready(function(){
         var isViewMode = "true" == getURLParameter("isViewMode");
         editor.SetViewMode(isViewMode);
 
-        editor.LoadDocument(c_DocInfo);
+        editor.asc_setDocInfo(c_DocInfo);
+        editor.asc_getEditorPermissions();
+        editor.LoadDocument();
 
 
 
