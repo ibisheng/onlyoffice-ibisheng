@@ -2434,7 +2434,7 @@ Workbook.prototype.getDefinesNamesWB = function (defNameListId) {
             name = listDN[id]
 
             if ( name.Ref && !name.Hidden && name.Name.indexOf("_xlnm") < 0 ) {
-                if( name.parsedRef && name.parsedRef.isParsed && name.parsedRef.countRef == 1 && name.parsedRef.calculate().errorType !== cErrorType.bad_reference ){
+                if( name.parsedRef && name.parsedRef.isParsed && name.parsedRef.countRef == 1 && name.parsedRef.outStack.length == 1 && name.parsedRef.calculate().errorType !== cErrorType.bad_reference ){
                     arr.push( name.getAscCDefName() );
                 }
             }
