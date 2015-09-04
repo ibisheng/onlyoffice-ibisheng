@@ -2097,6 +2097,7 @@ CGraphicObjects.prototype =
                 cur_group = ungroup_arr[i];
                 parent_paragraph = cur_group.parent.Get_ParentParagraph();
                 page_num = cur_group.selectStartPage;
+                cur_group.normalize();
                 sp_tree = cur_group.spTree;
                 for(j = 0; j < sp_tree.length; ++j)
                 {

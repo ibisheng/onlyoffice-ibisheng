@@ -28,6 +28,7 @@ function CDocContentStructure()
     this.m_aParagraphBackgrounds = [];
     this.m_oBoundsRect1 = null;
     this.m_oBoundsRect2 = null;
+    this.m_aComments = [];
 }
 
 CDocContentStructure.prototype.Recalculate = function(oTheme, oColorMap, dWidth, dHeight, oShape)
@@ -67,6 +68,14 @@ CDocContentStructure.prototype.draw = function(graphics, transform, oTheme, oCol
     for(i = 0; i < this.m_aContent.length; ++i)
     {
         this.m_aContent[i].draw(graphics, transform, oTheme, oColorMap);
+    }
+};
+CDocContentStructure.prototype.drawComments = function(graphics, transform)
+{
+    var i;
+    for(i = 0; i < this.m_aBackgrounds.length; ++i)
+    {
+        this.m_aComments[i].drawComment2(graphics, undefined, transform);
     }
 };
 CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct, dWidth, dHeight, oTheme, oColorMap, oShape, dOneLineWidth, XLimit, dContentHeight, dKoeff)
@@ -216,11 +225,11 @@ CDocContentStructure.prototype.checkContentReduct = function(oWarpStruct, dWidth
     return oRet;
 };
 
-CDocContentStructure.prototype.getAllBackgroundsBorders = function(aParaBackgrounds, aBackgrounds, aBorders)
+CDocContentStructure.prototype.getAllBackgroundsBorders = function(aParaBackgrounds, aBackgrounds, aBorders, aComments)
 {
     for(var i = 0; i < this.m_aContent.length; ++i)
     {
-        this.m_aContent[i].getAllBackgroundsBorders(aParaBackgrounds, aBackgrounds, aBorders);
+        this.m_aContent[i].getAllBackgroundsBorders(aParaBackgrounds, aBackgrounds, aBorders, aComments);
     }
 }
 
@@ -495,7 +504,8 @@ CDocContentStructure.prototype.checkUnionPaths = function(aWarpedObjects)
             for(k = 0; k < aByProps.length; ++k)
             {
                 var oObjToDraw = aByProps[k];
-                if(CompareBrushes(oObjToDraw.brush, oCurObjectToDraw.brush) && ComparePens(oObjToDraw.pen, oCurObjectToDraw.pen) && !oCurObjectToDraw.Comment && !oObjToDraw.Comment)
+                if(CompareBrushes(oObjToDraw.brush, oCurObjectToDraw.brush) && ComparePens(oObjToDraw.pen, oCurObjectToDraw.pen) && !oCurObjectToDraw.Comment && !oObjToDraw.Comment
+                    && !oCurObjectToDraw.geometry.bDrawSmart && !oObjToDraw.geometry.bDrawSmart)
                 {
                     oObjToDraw.geometry.pathLst = oObjToDraw.geometry.pathLst.concat(oCurObjectToDraw.geometry.pathLst);
                     oCurObjectToDraw.geometry.pathLst.length = 0;
@@ -508,12 +518,9 @@ CDocContentStructure.prototype.checkUnionPaths = function(aWarpedObjects)
             }
         }
     }
-
-
     this.m_aBackgrounds.length = 0;
     this.m_aBorders.length = 0;
-    this.getAllBackgroundsBorders(this.m_aParagraphBackgrounds, this.m_aBackgrounds, this.m_aBorders);
-
+    this.getAllBackgroundsBorders(this.m_aParagraphBackgrounds, this.m_aBackgrounds, this.m_aBorders, this.m_aComments);
 };
 
 
@@ -551,12 +558,12 @@ CParagraphStructure.prototype.draw = function(graphics, transform, oTheme, oColo
     }
 };
 
-CParagraphStructure.prototype.getAllBackgroundsBorders = function(aParaBackgrounds, aBackgrounds, aBorders)
+CParagraphStructure.prototype.getAllBackgroundsBorders = function(aParaBackgrounds, aBackgrounds, aBorders, aComments)
 {
     var i;
     for(i = 0; i < this.m_aContent.length; ++i)
     {
-        this.m_aContent[i].getAllBackgroundsBorders(aParaBackgrounds, aBackgrounds, aBorders);
+        this.m_aContent[i].getAllBackgroundsBorders(aParaBackgrounds, aBackgrounds, aBorders, aComments);
     }
 };
 
@@ -592,23 +599,22 @@ CTableStructure.prototype.CheckContentStructs = function(aContentStructs)
 CTableStructure.prototype.draw = function(graphics, transform, oTheme, oColorMap)
 {
     var i;
-    for(i = 0; i < this.m_aBorders.length; ++i)
-    {
-        this.m_aBorders[i].draw(graphics, undefined, undefined, oTheme, oColorMap);
-    }
-
     for(i = 0; i < this.m_aContent.length; ++i)
     {
         this.m_aContent[i].draw(graphics, transform, oTheme, oColorMap);
     }
 };
 
-CTableStructure.prototype.getAllBackgroundsBorders = function(aParaBackgrounds, aBackgrounds, aBorders)
+CTableStructure.prototype.getAllBackgroundsBorders = function(aParaBackgrounds, aBackgrounds, aBorders, aComments)
 {
     var i;
+    for(i = 0; i < this.m_aBorders.length; ++i)
+    {
+        aBorders.push(this.m_aBorders[i]);
+    }
     for(i = 0; i < this.m_aContent.length; ++i)
     {
-        this.m_aContent[i].getAllBackgroundsBorders(aParaBackgrounds, aBackgrounds, aBorders);
+        this.m_aContent[i].getAllBackgroundsBorders(aParaBackgrounds, aBackgrounds, aBorders, aComments);
     }
 };
 
@@ -716,7 +722,7 @@ CLineStructure.prototype.draw = function(graphics, transform, oTheme, oColorMap)
     }
 };
 
-CLineStructure.prototype.getAllBackgroundsBorders = function(aParaBackgrounds, aBackgrounds, aBorders)
+CLineStructure.prototype.getAllBackgroundsBorders = function(aParaBackgrounds, aBackgrounds, aBorders, aComments)
 {
     var i;
     for(i = 0; i < this.m_aParagraphBackgrounds.length; ++i)
@@ -726,6 +732,10 @@ CLineStructure.prototype.getAllBackgroundsBorders = function(aParaBackgrounds, a
     for(i = 0; i < this.m_aBackgrounds.length; ++i)
     {
         aBackgrounds.push(this.m_aBackgrounds[i]);
+        if(this.m_aBackgrounds[i].Comment)
+        {
+            aComments.push(this.m_aBackgrounds[i])
+        }
     }
     for(i = 0; i < this.m_aBorders.length; ++i)
     {
@@ -859,6 +869,8 @@ function CTextDrawer(dWidth, dHeight, bDivByLInes, oTheme, bDivGlyphs)
     this.m_aStackCurRowMaxIndex = null;
     this.m_aByParagraphs = null;
 
+    this.m_oObjectToDraw = null;
+
     this.bCheckLines = false;
     this.lastX = null;
     this.lastY = null;
@@ -876,6 +888,10 @@ function CTextDrawer(dWidth, dHeight, bDivByLInes, oTheme, bDivGlyphs)
 
 CTextDrawer.prototype =
 {
+    SetObjectToDraw: function(oObjectToDraw)
+    {
+        this.m_oObjectToDraw = oObjectToDraw;
+    },
     // pen methods
     p_color : function(r,g,b,a)
     {
@@ -1298,7 +1314,7 @@ CTextDrawer.prototype =
                     {
                         oBrushColor = this.m_oBrush.Color1;
                         oPenColor = this.m_oPen.Color;
-                        oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y))
+                        oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
                     }
                     oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
 
@@ -1314,6 +1330,7 @@ CTextDrawer.prototype =
                             oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
                         }
                     }
+                    oLastObjectToDraw.geometry.bDrawSmart = true;
                     break;
                 }
                 case DRAW_COMMAND_PARAGRAPH:
@@ -1322,6 +1339,14 @@ CTextDrawer.prototype =
                 }
             }
         }
+        else
+        {
+            if(this.m_oObjectToDraw)
+            {
+                oLastObjectToDraw = this.m_oObjectToDraw;
+            }
+        }
+
         if(oLastObjectToDraw && oLastObjectToDraw.geometry)
         {
             oLastObjectToDraw.Comment = this.m_oCurComment;
@@ -1695,6 +1720,7 @@ CTextDrawer.prototype =
     // smart methods for horizontal / vertical lines
     drawHorLine : function(align, y, x, r, penW)
     {
+
         this._s();
         this._m(x, y);
 
@@ -1704,6 +1730,8 @@ CTextDrawer.prototype =
         this._z();
         this.ds();
     },
+
+
 
     drawHorLine2 : function(align, y, x, r, penW)
     {
@@ -1770,6 +1798,12 @@ CTextDrawer.prototype =
 
     drawVerLine : function(align, x, y, b, penW)
     {
+        var nLastCommand = this.m_aCommands[this.m_aCommands.length -1], bOldVal;
+        if(nLastCommand === DRAW_COMMAND_TABLE)
+        {
+            bOldVal = this.bCheckLines;
+            this.bCheckLines = false;
+        }
         this.p_width(1000 * penW);
         this._s();
 
@@ -1794,12 +1828,30 @@ CTextDrawer.prototype =
         this._l(_x, b);
 
         this.ds();
+        if(nLastCommand === DRAW_COMMAND_TABLE)
+        {
+            this.bCheckLines = bOldVal;
+        }
     },
 
-    // мега крутые функции для таблиц
     drawHorLineExt : function(align, y, x, r, penW, leftMW, rightMW)
     {
-        this.drawHorLine(align, y, x + leftMW, r + rightMW, penW);
+        var nLastCommand = this.m_aCommands[this.m_aCommands.length -1];
+        if(nLastCommand === DRAW_COMMAND_TABLE)
+        {
+            var bOldVal = this.bCheckLines;
+            this.bCheckLines = false;
+            this.p_width(penW * 1000);
+            this._s();
+            this._m(x, y);
+            this._l(r, y);
+            this.ds();
+            this.bCheckLines = bOldVal;
+        }
+        else
+        {
+            this.drawHorLine(align, y, x + leftMW, r + rightMW, penW);
+        }
     },
 
     DrawTextArtComment : function(Element)

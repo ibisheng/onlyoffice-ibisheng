@@ -319,7 +319,10 @@ function checkTableCellPr(cellPr, slide, layout, master, theme)
     {
         color_map = master.clrMap;
     }
-    color_map = G_O_DEFAULT_COLOR_MAP;
+    else
+    {
+        color_map = G_O_DEFAULT_COLOR_MAP;
+    }
 
     checkObjectUnifill(cellPr.Shd, theme, color_map);
     if(cellPr.TableCellBorders)
@@ -550,8 +553,6 @@ function CColorMod()
 {
     this.name = "";
     this.val = 0;
-    //this.Id = g_oIdCounter.Get_NewId();
-    //g_oTableId.Add(this, this.Id);
 }
 
 function _create_mod(default_obj)
@@ -586,98 +587,12 @@ CColorMod.prototype =
 
     setName: function(name)
     {
-        //History.Add(this, {Type: historyitem_ColorMod_SetName, oldName: this.name, newName: name});
         this.name = name;
     },
 
     setVal: function(val)
     {
-        //History.Add(this, {Type: historyitem_ColorMod_SetVal, oldVal: this.val, newVal: val});
         this.val = val;
-    },
-
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_ColorMod_SetName:
-            {
-                this.name = data.oldName;
-                break;
-            }
-            case historyitem_ColorMod_SetVal:
-            {
-                this.val = data.oldVal;
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_ColorMod_SetName:
-            {
-                this.name = data.newName;
-                break;
-            }
-            case historyitem_ColorMod_SetVal:
-            {
-                this.val = data.newVal;
-                break;
-            }
-        }
-    },
-
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case historyitem_ColorMod_SetName:
-            {
-                w.WriteString2(data.newName);
-                break;
-            }
-            case historyitem_ColorMod_SetVal:
-            {
-                w.WriteLong(data.newVal);
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        if(r.GetLong() !== this.getObjectType())
-            return;
-        var type = r.GetLong();
-        switch(type)
-        {
-            case historyitem_ColorMod_SetName:
-            {
-                this.name = r.GetString2();
-                break;
-            }
-            case historyitem_ColorMod_SetVal:
-            {
-                this.val = r.GetLong();
-                break;
-            }
-        }
-    },
-
-
-    Write_ToBinary2: function (w) {
-        w.WriteLong(historyitem_type_ColorMod);
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r) {
-        this.Id = r.GetString2();
     },
 
     createDuplicate : function()
@@ -698,8 +613,6 @@ function CColorModifiers()
 {
     this.Mods = [];
 
-    //this.Id = g_oIdCounter.Get_NewId();
-    //g_oTableId.Add(this, this.Id);
 }
 
 CColorModifiers.prototype =
@@ -745,119 +658,15 @@ CColorModifiers.prototype =
         }
     },
 
-    Write_ToBinary2: function (w) {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r) {
-        this.Id = r.GetString2();
-    },
-
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_ColorModifiers_AddColorMod:
-            {
-                for(var i = this.Mods.length - 1; i > -1; --i)
-                {
-                    if(this.Mods[i] && this.Mods[i].Get_Id() === data.modId)
-                    {
-                        this.Mods.splice(i, 1);
-                        break;
-                    }
-                }
-                break;
-            }
-            case historyitem_ColorModifiers_RemoveColorMod:
-            {
-                this.Mods.splice(data.pos, 0, data.pr);
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_ColorModifiers_AddColorMod:
-            {
-                var mod = g_oTableId.Get_ById(data.modId);
-                if(mod)
-                {
-                    this.Mods.push(mod);
-                }
-                break;
-            }
-            case historyitem_ColorModifiers_RemoveColorMod:
-            {
-                this.Mods.splice(data.pos, 1);
-                break;
-            }
-        }
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case historyitem_ColorModifiers_AddColorMod:
-            {
-                w.WriteString2(data.modId);
-                break;
-            }
-            case historyitem_ColorModifiers_RemoveColorMod:
-            {
-                w.WriteLong(data.pos);
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        if(this.getObjectType() !== r.GetLong())
-        {
-            return;
-        }
-        var type = r.GetLong();
-        switch(type)
-        {
-            case historyitem_ColorModifiers_AddColorMod:
-            {
-                var mod = g_oTableId.Get_ById(r.GetString2());
-                if(mod)
-                {
-                    this.Mods.push(mod);
-                }
-                break;
-            }
-            case historyitem_ColorModifiers_RemoveColorMod:
-            {
-                var pos = r.GetLong();
-                this.Mods.splice(pos, 1);
-                break;
-            }
-        }
-    },
-
-
     addMod: function(mod)
     {
         this.Mods.push(mod);
-        //History.Add(this, {Type: historyitem_ColorModifiers_AddColorMod, modId: mod.Get_Id()});
     },
 
 
     removeMod: function(pos)
     {
-        var mod = this.Mods.splice(pos, 1)[0];
-        //History.Add(this, {Type: historyitem_ColorModifiers_RemoveColorMod, pos: pos, pr: mod});
-
+        this.Mods.splice(pos, 1)[0];
     },
 
 
@@ -1240,18 +1049,6 @@ CSysColor.prototype =
         return historyitem_type_SysColor;
     },
 
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
-    },
-
-
     Write_ToBinary: function (w)
     {
         w.WriteLong(this.type);
@@ -1269,117 +1066,9 @@ CSysColor.prototype =
         this.RGBA.B = RGB & 0xFF;
     },
 
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_SysColor_SetId:
-            {
-                this.id = data.oldId;
-                break;
-            }
-            case historyitem_SysColor_SetR:
-            {
-                this.RGBA.R = data.oldPr;
-                break;
-            }
-            case historyitem_SysColor_SetG:
-            {
-                this.RGBA.G = data.oldPr;
-                break;
-            }
-            case historyitem_SysColor_SetB:
-            {
-                this.RGBA.B = data.oldPr;
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_SysColor_SetId:
-            {
-                this.id = data.newId;
-                break;
-            }
-            case historyitem_SysColor_SetR:
-            {
-                this.RGBA.R = data.newPr;
-                break;
-            }
-            case historyitem_SysColor_SetG:
-            {
-                this.RGBA.G = data.newPr;
-                break;
-            }
-            case historyitem_SysColor_SetB:
-            {
-                this.RGBA.B = data.newPr;
-                break;
-            }
-        }
-    },
-
     setId: function(id)
     {
         this.id = id;
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case historyitem_SysColor_SetId:
-            {
-                w.WriteString2(data.newId);
-                break;
-            }
-            case historyitem_SysColor_SetR:
-            case historyitem_SysColor_SetG:
-            case historyitem_SysColor_SetB:
-            {
-                writeLong(w, data.newPr);
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        if(r.GetLong() !== this.getObjectType())
-        {
-            return;
-        }
-        var type = r.GetLong();
-        switch(type)
-        {
-            case historyitem_SysColor_SetId:
-            {
-                this.id = r.GetString2();
-                break;
-            }
-            case historyitem_SysColor_SetR:
-            {
-                this.RGBA.R = readLong(r);
-                break;
-            }
-            case historyitem_SysColor_SetG:
-            {
-                this.RGBA.G = readLong(r);
-                break;
-            }
-            case historyitem_SysColor_SetB:
-            {
-                this.RGBA.B = readLong(r);
-                break;
-            }
-        }
-
     },
 
     IsIdentical :  function(color)
@@ -1425,17 +1114,6 @@ CPrstColor.prototype =
         return historyitem_type_PrstColor;
     },
 
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
-    },
-
 
     Write_ToBinary: function (w)
     {
@@ -1451,30 +1129,6 @@ CPrstColor.prototype =
     setId: function(id)
     {
         this.id = id;
-    },
-
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_PrstColor_SetId:
-            {
-                this.id = data.oldId;
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_PrstColor_SetId:
-            {
-                this.id = data.newId;
-                break;
-            }
-        }
     },
 
     IsIdentical : function(color)
@@ -1595,76 +1249,6 @@ CRGBColor.prototype =
         this.RGBA.B = b;
     },
 
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_RGBColor_SetColor:
-            {
-                this.RGBA.R = data.oldColor.r;
-                this.RGBA.G = data.oldColor.g;
-                this.RGBA.B = data.oldColor.b;
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_RGBColor_SetColor:
-            {
-                this.RGBA.R = data.newColor.r;
-                this.RGBA.G = data.newColor.g;
-                this.RGBA.B = data.newColor.b;
-                break;
-            }
-        }
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case historyitem_RGBColor_SetColor:
-            {
-                w.WriteLong(((data.r << 16) & 0xFF0000) + ((data.g << 8) & 0xFF00) + data.b);
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        if(this.getObjectType() !== r.GetLong())
-            return;
-        var type = r.GetLong();
-        switch(type)
-        {
-            case historyitem_RGBColor_SetColor:
-            {
-                var color = r.GetLong();
-                this.RGBA.R = (color >> 16) & 0xFF;
-                this.RGBA.G = (color >> 8) & 0xFF;
-                this.RGBA.B = color & 0xFF;
-                break;
-            }
-        }
-    },
-
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
-    },
     IsIdentical : function(color)
     {
         return color && color.type == this.type && color.RGBA.R == this.RGBA.R && color.RGBA.G == this.RGBA.G && color.RGBA.B == this.RGBA.B && color.RGBA.A == this.RGBA.A;
@@ -1751,16 +1335,6 @@ CSchemeColor.prototype =
     {
         return historyitem_type_SchemeColor;
     },
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
-    },
 
 
     Write_ToBinary: function (w)
@@ -1779,58 +1353,6 @@ CSchemeColor.prototype =
         this.id = id;
     },
 
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_SchemeColor_SetId:
-            {
-                this.id = data.oldId;
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_SchemeColor_SetId:
-            {
-                this.id = data.newId;
-                break;
-            }
-        }
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case historyitem_SchemeColor_SetId:
-            {
-                w.WriteLong(data.newId);
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        if(this.getObjectType() !== r.GetLong())
-            return;
-        var type = r.GetLong();
-        switch(type)
-        {
-            case historyitem_SchemeColor_SetId:
-            {
-                this.id = r.GetLong();
-                break;
-            }
-        }
-    },
 
     IsIdentical : function(color)
     {
@@ -1995,125 +1517,15 @@ CUniColor.prototype =
         return historyitem_type_UniColor;
     },
 
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
-    },
-
 
     setColor: function(color)
     {
-        //History.Add(this, {Type: historyitem_UniColor_SetColor, oldColor: this.color, newColor: color});
         this.color = color;
     },
 
     setMods: function(mods)
     {
-        //History.Add(this, {Type: historyitem_UniColor_SetMods, oldMods: this.Mods, newMods: mods});
         this.Mods = mods;
-    },
-
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_UniColor_SetColor:
-            {
-                this.color = data.oldColor;
-                break;
-            }
-            case historyitem_UniColor_SetMods:
-            {
-                this.Mods = data.oldMods;
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_UniColor_SetColor:
-            {
-                this.color = data.oldColor;
-                break;
-            }
-            case historyitem_UniColor_SetMods:
-            {
-                this.Mods = data.oldMods;
-                break;
-            }
-        }
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case historyitem_UniColor_SetColor:
-            {
-                w.WriteBool(isRealObject(data.newColor));
-                if(isRealObject(data.newColor))
-                {
-                    w.WriteString2(data.newColor.Get_Id());
-                }
-                break;
-            }
-            case historyitem_UniColor_SetMods:
-            {
-                w.WriteBool(isRealObject(data.newMods));
-                if(isRealObject(data.newColor))
-                {
-                    w.WriteString2(data.newMods.Get_Id());
-                }
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        if(r.GetLong() !== this.getObjectType())
-        {
-            return;
-        }
-        var type = r.GetLong();
-        switch(type)
-        {
-            case historyitem_UniColor_SetColor:
-            {
-                if(r.GetBool())
-                {
-                    this.color = g_oTableId.Get_ById(r.GetString2());
-                }
-                else
-                {
-                    this.color = null;
-                }
-                break;
-            }
-            case historyitem_UniColor_SetMods:
-            {
-                if(r.GetBool())
-                {
-                    this.Mods = g_oTableId.Get_ById(r.GetString2());
-                }
-                else
-                {
-                    this.Mods = null;
-                }
-                break;
-            }
-        }
     },
 
     Write_ToBinary: function(w)
@@ -2393,8 +1805,6 @@ function CSrcRect()
     this.t = null;
     this.r = null;
     this.b = null;
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
 }
 
 CSrcRect.prototype =
@@ -2414,105 +1824,10 @@ CSrcRect.prototype =
 
     setLTRB: function(l, t, r, b)
     {
-        History.Add(this, {Type: historyitem_SrcRect_SetLTRB, oldLTRB:{l: this.l, t: this.t, r: this.r, b: this.b}, newLTRB:{l: l, t: t, r: r, b: b}});
         this.l = l;
         this.t = t;
         this.r = r;
         this.b = b;
-    },
-
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_SrcRect_SetLTRB:
-            {
-                var oldLTRB = data.oldLTRB;
-                this.l = oldLTRB.l;
-                this.t = oldLTRB.t;
-                this.r = oldLTRB.r;
-                this.b = oldLTRB.b;
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_SrcRect_SetLTRB:
-            {
-                var newLTRB = data.newLTRB;
-                this.l = newLTRB.l;
-                this.t = newLTRB.t;
-                this.r = newLTRB.r;
-                this.b = newLTRB.b;
-                break;
-            }
-        }
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case historyitem_SrcRect_SetLTRB:
-            {
-                var newLTRB = data.newLTRB;
-                var bWriteRect = isRealNumber(newLTRB.l) && isRealNumber(newLTRB.t) && isRealNumber(newLTRB.r) && isRealNumber(newLTRB.b);
-                w.WriteBool(bWriteRect);
-                if(bWriteRect)
-                {
-                    w.WriteDouble(newLTRB.l);
-                    w.WriteDouble(newLTRB.t);
-                    w.WriteDouble(newLTRB.r);
-                    w.WriteDouble(newLTRB.b);
-                }
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        if(r.GetLong() !== this.getObjectType())
-            return;
-        var type = r.GetLong();
-        switch(type)
-        {
-            case historyitem_SrcRect_SetLTRB:
-            {
-                if(r.GetBool())
-                {
-                    this.l = r.GetDouble();
-                    this.t = r.GetDouble();
-                    this.r = r.GetDouble();
-                    this.b = r.GetDouble();
-                }
-                else
-                {
-                    this.l = null;
-                    this.t = null;
-                    this.r = null;
-                    this.b = null;
-                }
-                break;
-            }
-        }
-    },
-
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
     },
 
 
@@ -2654,285 +1969,32 @@ CBlipFill.prototype =
 
     setRasterImageId: function(rasterImageId)
     {
-        //History.Add(this, {Type: historyitem_BlipFill_SetRasterImageId, oldRasterImageId: this.RasterImageId, newRasterImageId: rasterImageId});
         this.RasterImageId = checkRasterImageId(rasterImageId);
     },
 
     setVectorImageBin: function(vectorImageBin)
     {
-        //History.Add(this, {Type: historyitem_BlipFill_SetVectorImageBin, oldVectorImageBin: this.VectorImageBin, newVectorImageBin: vectorImageBin});
         this.VectorImageBin = vectorImageBin;
     },
 
     setSrcRect: function(srcRect)
     {
-        //History.Add(this, {Type: historyitem_BlipFill_SetSrcRect, oldSrcRect: this.srcRect, newSrcRect: srcRect});
         this.srcRect = srcRect;
     },
 
     setStretch: function(stretch)
     {
-        //History.Add(this, {Type: historyitem_BlipFill_SetStretch, oldStretch: this.stretch, newStretch: stretch});
         this.stretch = stretch;
     },
 
     setTile: function(tile)
     {
-        //History.Add(this, {Type: historyitem_BlipFill_SetTile, oldTile: this.tile, newTile: tile});
         this.tile = tile;
     },
 
     setRotWithShape: function(rotWithShape)
     {
-        //History.Add(this, {Type: historyitem_BlipFill_SetRotWithShape, oldRotWithShape: this.rotWithShape, newRotWidth: rotWithShape});
         this.rotWithShape = rotWithShape;
-    },
-
-
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_BlipFill_SetRasterImageId:
-            {
-                this.RasterImageId = data.oldRasterImageId;
-                break;
-            }
-            case historyitem_BlipFill_SetVectorImageBin:
-            {
-                this.VectorImageBin = data.oldVectorImageBin;
-                break;
-            }
-
-            case historyitem_BlipFill_SetSrcRect:
-            {
-                this.srcRect = data.oldSrcRect;
-                break;
-            }
-
-            case historyitem_BlipFill_SetStretch:
-            {
-                this.stretch = data.oldStretch;
-                break;
-            }
-
-            case historyitem_BlipFill_SetTile:
-            {
-                this.tile = data.oldTile;
-                break;
-            }
-
-            case historyitem_BlipFill_SetRotWithShape:
-            {
-                this.rotWithShape = data.oldRotWithShape;
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_BlipFill_SetRasterImageId:
-            {
-                this.RasterImageId = data.newRasterImageId;
-                break;
-            }
-            case historyitem_BlipFill_SetVectorImageBin:
-            {
-                this.VectorImageBin = data.newVectorImageBin;
-                break;
-            }
-
-            case historyitem_BlipFill_SetSrcRect:
-            {
-                this.srcRect = data.newSrcRect;
-                break;
-            }
-
-            case historyitem_BlipFill_SetStretch:
-            {
-                this.stretch = data.newStretch;
-                break;
-            }
-
-            case historyitem_BlipFill_SetTile:
-            {
-                this.tile = data.newTile;
-                break;
-            }
-
-            case historyitem_BlipFill_SetRotWithShape:
-            {
-                this.rotWithShape = data.newRotWithShape;
-                break;
-            }
-        }
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case historyitem_BlipFill_SetRasterImageId:
-            {
-                w.WriteBool(typeof data.newRasterImageId === "string");
-                if(typeof data.newRasterImageId === "string")
-                {
-                    w.WriteString2(data.newRasterImageId)
-                }
-                break;
-            }
-            case historyitem_BlipFill_SetVectorImageBin:
-            {
-                w.WriteBool(typeof this.VectorImageBin === "string");
-                if(typeof this.VectorImageBin === "string")
-                {
-                    w.WriteString2(this.VectorImageBin);
-                }
-                break;
-            }
-
-            case historyitem_BlipFill_SetSrcRect:
-            {
-                w.WriteBool(isRealObject(data.newSrcRect));
-                if(isRealObject(data.newSrcRect))
-                {
-                    w.WriteString2(data.newSrcRect.Get_Id());
-                }
-                break;
-            }
-
-            case historyitem_BlipFill_SetStretch:
-            {
-                w.WriteBool(isRealBool(data.newStretch));
-                if(isRealBool(data.newStretch))
-                {
-                    w.WriteBool(data.newStretch);
-                }
-                break;
-            }
-
-            case historyitem_BlipFill_SetTile:
-            {
-                w.WriteBool(isRealBool(data.newTile));
-                if(isRealBool(data.newTile))
-                {
-                    w.WriteBool(data.newTile);
-                }
-                break;
-            }
-
-            case historyitem_BlipFill_SetRotWithShape:
-            {
-                w.WriteBool(isRealBool(data.newRotWithShape));
-                if(isRealBool(data.newRotWithShape))
-                {
-                    w.WriteBool(data.newRotWithShape);
-                }
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        if(r.GetLong() !== this.getObjectType())
-            return;
-        var type = r.GetLong();
-        switch(type)
-        {
-            case historyitem_BlipFill_SetRasterImageId:
-            {
-                if(r.GetBool())
-                {
-                    this.RasterImageId = r.GetString2();
-                }
-                else
-                {
-                    this.RasterImageId = null;
-                }
-                break;
-            }
-            case historyitem_BlipFill_SetVectorImageBin:
-            {
-                if(r.GetBool())
-                {
-                    this.VectorImageBin = r.GetString2();
-                }
-                else
-                {
-                    this.VectorImageBin = null;
-                }
-                break;
-            }
-
-            case historyitem_BlipFill_SetSrcRect:
-            {
-                if(r.GetBool())
-                {
-                    this.srcRect = g_oTableId.Get_ById(r.GetString2());
-                }
-                else
-                {
-                    this.srcRect = null;
-                }
-                break;
-            }
-
-            case historyitem_BlipFill_SetStretch:
-            {
-                if(r.GetBool())
-                {
-                    this.srcRect = r.GetBool()
-                }
-                else
-                {
-                    this.srcRect = null;
-                }
-                break;
-            }
-
-            case historyitem_BlipFill_SetTile:
-            {
-                if(r.GetBool())
-                {
-                    this.tile = r.GetBool()
-                }
-                else
-                {
-                    this.tile = null;
-                }
-                break;
-            }
-
-            case historyitem_BlipFill_SetRotWithShape:
-            {
-                if(r.GetBool())
-                {
-                    this.rotWithShape = r.GetBool()
-                }
-                else
-                {
-                    this.rotWithShape = null;
-                }
-                break;
-            }
-        }
-    },
-
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
     },
 
 
@@ -3024,7 +2086,6 @@ function CSolidFill()
 {
     this.type = FILL_TYPE_SOLID;
     this.color = null;
-    //this.Id = g_oIdCounter.Get_NewId();
 }
 
 CSolidFill.prototype =
@@ -3053,7 +2114,6 @@ CSolidFill.prototype =
 
     setColor: function(color)
     {
-        //History.Add(this, {Type: historyitem_SolidFill_SetColor, oldColor: this.color, newColor: color});
         this.color = color;
     },
 
@@ -3099,83 +2159,6 @@ CSolidFill.prototype =
     convertToWordMods: function()
     {
         this.color && this.color.convertToWordMods();
-    },
-
-
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_SolidFill_SetColor:
-            {
-                this.color = data.oldColor;
-                break;
-            }
-        }
-    },
-
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_SolidFill_SetColor:
-            {
-                this.color = data.newColor;
-                break;
-            }
-        }
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteLong(data.Type);
-        switch (data.Type)
-        {
-            case historyitem_SolidFill_SetColor:
-            {
-                w.WriteBool(isRealObject(data.newColor));
-                if(isRealObject(data.newColor))
-                {
-                    w.WriteString2(data.newColor.Get_Id());
-                }
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        if(r.GetLong() !== this.getObjectType())
-            return;
-        var type = r.GetLong();
-        switch(type)
-        {
-            case historyitem_SolidFill_SetColor:
-            {
-                if(r.GetBool())
-                {
-                    this.color = g_oTableId.Get_ById(r.GetString2());
-                }
-                else
-                {
-                    this.color = null;
-                }
-                break;
-            }
-        }
-    },
-
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
     },
 
     IsIdentical : function(fill)
@@ -3228,11 +2211,6 @@ CGs.prototype =
 
     Refresh_RecalcData: function()
     {},
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
 
     getObjectType: function()
     {
@@ -3241,50 +2219,13 @@ CGs.prototype =
 
     setColor: function(color)
     {
-        //History.Add(this, {Type: historyitem_Gs_SetColor, oldColor: this.color, newColor: color});
         this.color = color;
     },
 
     setPos: function(pos)
     {
-        //History.Add(this, {Type: historyitem_Gs_SetPos, oldPos: this.pos, newPos: pos});
         this.pos = pos;
     },
-
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_Gs_SetColor:
-            {
-                this.color = data.oldColor;
-                break;
-            }
-            case historyitem_Gs_SetPos:
-            {
-                this.pos = data.oldPos;
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_Gs_SetColor:
-            {
-                this.color = data.newColor;
-                break;
-            }
-            case historyitem_Gs_SetPos:
-            {
-                this.pos = data.newPos;
-                break;
-            }
-        }
-    },
-
 
     Write_ToBinary: function(w)
     {
@@ -3308,72 +2249,6 @@ CGs.prototype =
             this.color = null;
         }
         this.pos = readLong(r);
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case historyitem_Gs_SetColor:
-            {
-                w.WriteBool(isRealObject(data.newColor));
-                if(isRealObject(data.newColor))
-                {
-                    w.WriteString2(data.newColor.Get_Id());
-                }
-                break;
-            }
-            case historyitem_Gs_SetPos:
-            {
-                w.WriteBool(isRealNumber(data.newPos));
-                if(isRealNumber(data.newPos))
-                {
-                    w.WriteLong(data.newPos);
-                }
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        if(r.GetLong() !== this.getObjectType())
-            return;
-        var type = r.GetLong();
-        switch(type)
-        {
-            case historyitem_Gs_SetColor:
-            {
-                if(r.GetBool())
-                {
-                    this.color = g_oTableId.Get_ById(r.GetString2());
-                }
-                else
-                {
-                    this.color = null;
-                }
-                break;
-            }
-            case historyitem_Gs_SetPos:
-            {
-                if(r.GetBool())
-                {
-                    this.pos = r.GetLong();
-                }
-                else
-                {
-                    this.pos = 0;
-                }
-                break;
-            }
-        }
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
     },
 
     IsIdentical : function(fill)
@@ -3452,112 +2327,6 @@ GradLin.prototype =
         this.scale = readBool(r);
     },
 
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_GradLin_SetAngle:
-            {
-                this.angle = data.oldAngle;
-                break;
-            }
-            case historyitem_GradLin_SetScale:
-            {
-                this.scale = data.oldScale;
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_GradLin_SetAngle:
-            {
-                this.angle = data.newAngle;
-                break;
-            }
-            case historyitem_GradLin_SetScale:
-            {
-                this.scale = data.newScale;
-                break;
-            }
-        }
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case historyitem_GradLin_SetAngle:
-            {
-                w.WriteBool(isRealNumber(data.newAngle));
-                if(isRealNumber(data.newAngle))
-                {
-                    w.WriteLong(data.newAngle);
-                }
-                break;
-            }
-            case historyitem_GradLin_SetScale:
-            {
-                w.WriteBool(isRealBool(data.newScale));
-                if(isRealBool(data.newScale))
-                {
-                    w.WriteBool(data.newScale);
-                }
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        if(r.GetLong() !== this.getObjectType())
-            return;
-        var type = r.GetLong();
-        switch(type)
-        {
-            case historyitem_GradLin_SetAngle:
-            {
-                if(r.GetBool())
-                {
-                    this.angle = r.GetLong();
-                }
-                else
-                {
-                    this.angle = null;
-                }
-                break;
-            }
-            case historyitem_GradLin_SetScale:
-            {
-                if(r.GetBool())
-                {
-                    this.scale = r.GetBool();
-                }
-                else
-                {
-                    this.scale = null;
-                }
-                break;
-            }
-        }
-    },
-
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
-    },
-
     IsIdentical : function(lin)
     {
         if (this.angle != lin.angle)
@@ -3633,111 +2402,6 @@ GradPath.prototype =
         }
     },
 
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_GradPath_SetPath:
-            {
-                this.path = data.oldPath;
-                break;
-            }
-            case historyitem_GradPath_SetRect:
-            {
-                this.rect = data.oldRect;
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_GradPath_SetPath:
-            {
-                this.path = data.newPath;
-                break;
-            }
-            case historyitem_GradPath_SetRect:
-            {
-                this.rect = data.newRect;
-                break;
-            }
-        }
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case historyitem_GradPath_SetPath:
-            {
-                w.WriteBool(isRealNumber(data.newPath));
-                if(isRealNumber(data.newPath))
-                {
-                    w.WriteLong(data.newPath);
-                }
-                break;
-            }
-            case historyitem_GradPath_SetRect:
-            {
-                w.WriteBool(isRealObject(data.newRect));
-                if(isRealObject(data.newRect))
-                {
-                    w.WriteString2(data.newRect.Get_Id());
-                }
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        if(r.GetLong() !== this.getObjectType())
-            return;
-        var type = r.GetLong();
-        switch(type)
-        {
-            case historyitem_GradPath_SetPath:
-            {
-                if(r.GetBool())
-                {
-                    this.path = r.GetLong();
-                }
-                else
-                {
-                    this.path = null;
-                }
-                break;
-            }
-            case historyitem_GradPath_SetRect:
-            {
-                if(r.GetBool())
-                {
-                    this.rect = g_oTableId.Get_ById(r.GetString2());
-                }
-                else
-                {
-                    this.rect = null;
-                }
-                break;
-            }
-        }
-    },
-
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
-    },
 
     IsIdentical : function(path)
     {
@@ -3839,127 +2503,17 @@ CGradFill.prototype =
 
     addColor: function(color)
     {
-        //History.Add(this, {Type: historyitem_GradFill_AddColor, color: color});
         this.colors.push(color);
     },
 
     setLin: function(lin)
     {
-        //History.Add(this, {Type: historyitem_GradFill_SetLin, oldLin: this.lin, newLin: lin});
         this.lin = lin;
     },
 
     setPath: function(path)
     {
-        //History.Add(this, {Type: historyitem_GradFill_SetPath, oldPath: this.path, newPath: path});
         this.path = path;
-    },
-
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_GradFill_AddColor:
-            {
-                if(isRealObject(data.color))
-                {
-                    for(var  i = this.colors.length - 1; i > -1; --i)
-                    {
-                        if(this.colors[i].Get_Id() === data.color.Get_Id())
-                        {
-                            this.colors.splice(i, 1);
-                            break;
-                        }
-                    }
-                }
-                break;
-            }
-            case historyitem_GradFill_SetLin:
-            {
-                this.lin = data.oldLin;
-                break;
-            }
-
-            case historyitem_GradFill_SetPath:
-            {
-                this.path = data.oldPath;
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_GradFill_AddColor:
-            {
-                if(isRealObject(data.color))
-                {
-                    this.colors.push(data.color);
-                }
-                break;
-            }
-            case historyitem_GradFill_SetLin:
-            {
-                this.lin = data.newLin;
-                break;
-            }
-
-            case historyitem_GradFill_SetPath:
-            {
-                this.path = data.newPath;
-                break;
-            }
-        }
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case historyitem_GradFill_AddColor:
-            {
-                // w.WriteBool(isRealObject(data.color));
-                // if(isRealObject(data.color))
-                // {
-                //     w.WriteString2(data.color.Get_Id());
-                // }
-                // break;
-            }
-            case historyitem_GradFill_SetLin:
-            {
-                //w.WriteBool(isRealObject(data.newLin));
-                //if(isRealObject(data.newLin))
-                //{
-                //    w.WriteString2(data.newLin.Get_Id());
-                //}
-                //break;
-            }
-
-            case historyitem_GradFill_SetPath:
-            {
-                // w.WriteBool(isRealObject(data.newPath));
-                // if(isRealObject(data.newPath))
-                // {
-                //     w.WriteString2(data.newPath.Get_Id());
-                // }
-                // break;
-            }
-        }
-    },
-
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
     },
 
     Write_ToBinary: function (w)
@@ -4155,67 +2709,19 @@ CPattFill.prototype =
 
     setFType: function(fType)
     {
-        //History.Add(this, {Type: historyitem_PathFill_SetFType, oldFType: this.ftype, newFType: fType});
         this.ftype = fType;
     },
 
     setFgColor: function(fgClr)
     {
-        //History.Add(this, {Type: historyitem_PathFill_SetFgClr, oldFgClr: this.fgClr, newFgClr: fgClr});
         this.fgClr = fgClr;
     },
 
     setBgColor: function(bgClr)
     {
-        //History.Add(this, {Type: historyitem_PathFill_SetBgClr, oldBgClr: this.bgClr, newBgClr: bgClr});
         this.bgClr = bgClr;
     },
 
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_PathFill_SetFType:
-            {
-                this.ftype = data.oldFType;
-                break;
-            }
-
-            case historyitem_PathFill_SetFgClr:
-            {
-                this.fgClr = data.oldFgClr;
-                break;
-            }
-            case historyitem_PathFill_SetBgClr:
-            {
-                this.bgClr = data.oldBgClr;
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_PathFill_SetFType:
-            {
-                this.ftype = data.newFType;
-                break;
-            }
-
-            case historyitem_PathFill_SetFgClr:
-            {
-                this.fgClr = data.newFgClr;
-                break;
-            }
-            case historyitem_PathFill_SetBgClr:
-            {
-                this.bgClr = data.newBgClr;
-                break;
-            }
-        }
-    },
 
     Write_ToBinary: function(w)
     {
@@ -4248,82 +2754,6 @@ CPattFill.prototype =
         }
     },
 
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case historyitem_PathFill_SetFType:
-            {
-                w.WriteBool(isRealNumber(data.newFType));
-                if(isRealNumber(data.newFType))
-                {
-                    w.WriteLong(data.newFType);
-                }
-                this.ftype = data.newFType;
-                break;
-            }
-
-            case historyitem_PathFill_SetFgClr:
-            {
-                this.fgClr = data.newFgClr;
-                break;
-            }
-            case historyitem_PathFill_SetBgClr:
-            {
-                this.bgClr = data.newBgClr;
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        if(this.getObjectType() !== r.GetLong())
-            return;
-        var type = r.GetLong();
-        switch(type)
-        {
-            case historyitem_PathFill_SetFType:
-            {
-                if(r.GetBool())
-                {
-                    this.ftype= r.GetLong();
-                }
-                else
-                {
-                    this.ftype = null
-                }
-                break;
-            }
-
-            case historyitem_PathFill_SetFgClr:
-            {
-                if(r.GetBool())
-                {
-                    this.fgClr = g_oTableId.Get_ById(r.GetString2());
-                }
-                else
-                {
-                    this.fgClr = null;
-                }
-                break;
-            }
-            case historyitem_PathFill_SetBgClr:
-            {
-                if(r.GetBool())
-                {
-                    this.bgClr = g_oTableId.Get_ById(r.GetString2());
-                }
-                else
-                {
-                    this.bgClr = null;
-                }
-                break;
-            }
-        }
-    },
 
     Get_Id: function()
     {
@@ -4332,16 +2762,6 @@ CPattFill.prototype =
 
     Refresh_RecalcData: function()
     {},
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
-    },
 
     IsIdentical : function(fill)
     {
@@ -4409,17 +2829,6 @@ CNoFill.prototype =
         return historyitem_type_NoFill;
     },
 
-    Undo: function()
-    {},
-
-    Redo: function()
-    {},
-
-    Save_Changes: function()
-    {},
-
-    Load_Changes: function()
-    {},
 
 
     Write_ToBinary: function(w)
@@ -4431,16 +2840,6 @@ CNoFill.prototype =
     {
     },
 
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
-    },
 
     checkWordMods: function()
     {
@@ -4511,7 +2910,6 @@ function CUniFill()
 {
     this.fill = null;
     this.transparent = null;
-    // this.Id = g_oIdCounter.Get_NewId();
 }
 
 CUniFill.prototype =
@@ -4612,13 +3010,11 @@ CUniFill.prototype =
 
     setFill: function(fill)
     {
-        //History.Add(this, {Type: historyitem_UniFill_SetFill, oldFill: this.fill, newFill: fill});
         this.fill = fill;
     },
 
     setTransparent: function(transparent)
     {
-        //History.Add(this, {Type: historyitem_UniFill_SetTransparent, oldTransparent: this.transparent, newTransparent: transparent});
         this.transparent = transparent;
     },
 
@@ -4627,112 +3023,6 @@ CUniFill.prototype =
         //TODO:
     },
 
-    Undo: function(data)
-    {
-        switch (data.Type)
-        {
-            case historyitem_UniFill_SetFill:
-            {
-                this.fill = data.oldFill;
-                break;
-            }
-            case historyitem_UniFill_SetTransparent:
-            {
-                this.transparent = data.oldTransparent;
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch (data.Type)
-        {
-            case historyitem_UniFill_SetFill:
-            {
-                this.fill = data.newFill;
-                break;
-            }
-            case historyitem_UniFill_SetTransparent:
-            {
-                this.transparent = data.newTransparent;
-                break;
-            }
-        }
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteLong(data.Type);
-        switch (data.Type)
-        {
-            case historyitem_UniFill_SetFill:
-            {
-                w.WriteBool(isRealObject(data.newFill));
-                if(isRealObject(data.newFill))
-                {
-                    w.WriteString2(data.newFill.Get_Id());
-                }
-                break;
-            }
-            case historyitem_UniFill_SetTransparent:
-            {
-                w.WriteBool(isRealNumber(data.newTransparent));
-                if(isRealNumber(data.newTransparent))
-                {
-                    w.WriteLong(data.newTransparent);
-                }
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        if(this.getObjectType() !== r.GetLong())
-            return;
-        var type = r.GetLong();
-        switch(type)
-        {
-            case historyitem_UniFill_SetFill:
-            {
-
-                if(r.GetBool())
-                {
-                    this.fill = g_oTableId.Get_ById(r.GetString2());
-                }
-                else
-                {
-                    this.fill = null;
-                }
-                break;
-            }
-            case historyitem_UniFill_SetTransparent:
-            {
-                if(r.GetBool())
-                {
-                    this.transparent = r.GetLong();
-                }
-                else
-                {
-                    this.transparent = null;
-                }
-                break;
-            }
-        }
-    },
-
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
-    },
 
     Write_ToBinary: function(w)
     {
@@ -5266,17 +3556,6 @@ EndArrow.prototype =
     },
     Refresh_RecalcData: function()
     {},
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
-    },
-
 
     compare: function(end_arrow)
     {
@@ -5366,49 +3645,6 @@ EndArrow.prototype =
         this.w = w;
     },
 
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_EndArrow_SetType:
-            {
-                this.type = data.oldType;
-                break;
-            }
-            case historyitem_EndArrow_SetLen:
-            {
-                this.len = data.oldLen;
-                break;
-            }
-            case historyitem_EndArrow_SetW:
-            {
-                this.len = data.oldW;
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_EndArrow_SetType:
-            {
-                this.type = data.newType;
-                break;
-            }
-            case historyitem_EndArrow_SetLen:
-            {
-                this.len = data.newLen;
-                break;
-            }
-            case historyitem_EndArrow_SetW:
-            {
-                this.w = data.newW;
-                break;
-            }
-        }
-    },
 
     Write_ToBinary: function (w)
     {
@@ -5422,89 +3658,8 @@ EndArrow.prototype =
         this.type = readLong(r);
         this.len = readLong(r);
         this.w = readLong(r);
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case historyitem_EndArrow_SetType:
-            {
-                w.WriteBool(isRealNumber(data.newType));
-                if(isRealNumber(data.newType))
-                {
-                    w.WriteLong(data.newType);
-                }
-                break;
-            }
-            case historyitem_EndArrow_SetLen:
-            {
-                w.WriteBool(isRealNumber(data.newLen));
-                if(isRealNumber(data.newLen))
-                {
-                    w.WriteLong(data.newLen);
-                }
-                break;
-            }
-            case historyitem_EndArrow_SetW:
-            {
-                w.WriteBool(isRealNumber(data.newW));
-                if(isRealNumber(data.newW))
-                {
-                    w.WriteLong(data.newW);
-                }
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        if(this.getObjectType() !== r.GetLong())
-            return;
-        var type = r.GetLong();
-        switch(type)
-        {
-            case historyitem_EndArrow_SetType:
-            {
-                if(r.GetBool())
-                {
-                    this.type = r.GetLong();
-                }
-                else
-                {
-                    this.type = null;
-                }
-                break;
-            }
-            case historyitem_EndArrow_SetLen:
-            {
-                if(r.GetBool())
-                {
-                    this.len = r.GetLong();
-                }
-                else
-                {
-                    this.len = null;
-                }
-                break;
-            }
-            case historyitem_EndArrow_SetW:
-            {
-                if(r.GetLong())
-                {
-                    this.w = r.GetLong();
-                }
-                else
-                {
-                    this.w = null;
-                }
-                break;
-            }
-        }
     }
+
 };
 
 function ConvertJoinAggType(_type)
@@ -5575,67 +3730,6 @@ LineJoin.prototype =
         this.limit = limit;
     },
 
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_LineJoin_SetType:
-            {
-                this.type = data.oldType;
-                break;
-            }
-            case historyitem_LineJoin_SetLimit:
-            {
-                this.limit = data.oldLimit;
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_LineJoin_SetType:
-            {
-                this.type = data.newType;
-                break;
-            }
-            case historyitem_LineJoin_SetLimit:
-            {
-                this.limit = data.newLimit;
-                break;
-            }
-        }
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case historyitem_LineJoin_SetType:
-            {
-                w.WriteBool(isRealNumber(data.newType));
-                if(isRealNumber(data.newType))
-                {
-                    w.WriteLong(data.newType);
-                }
-                break;
-            }
-            case historyitem_LineJoin_SetLimit:
-            {
-                w.WriteBool(isRealNumber(data.newLimit));
-                if(isRealNumber(data.newLimit))
-                {
-                    w.WriteLong(data.newLimit);
-                }
-                break;
-            }
-        }
-    },
-
     Write_ToBinary: function(w)
     {
         writeLong(w, this.type);
@@ -5646,52 +3740,8 @@ LineJoin.prototype =
     {
         this.type = readLong(r);
         this.limit = readBool(r);
-    },
-
-    Load_Changes: function(r)
-    {
-        if(this.getObjectType() !== r.GetLong())
-            return;
-        var type = r.GetLong();
-        switch(type)
-        {
-            case historyitem_LineJoin_SetType:
-            {
-                if(r.GetBool())
-                {
-                    this.type = r.GetLong();
-                }
-                else
-                {
-                    this.type = null;
-                }
-                break;
-            }
-            case historyitem_LineJoin_SetLimit:
-            {
-                if(r.GetBool())
-                {
-                    this.limit = r.GetLong();
-                }
-                else
-                {
-                    this.limit = null;
-                }
-                break;
-            }
-        }
-    },
-
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
     }
+
 };
 
 function CLn()
@@ -5902,108 +3952,6 @@ CLn.prototype =
     setW: function(w)
     {
         this.w = w;
-    },
-
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_Ln_SetFill:
-            {
-                this.Fill = data.oldFill;
-                break;
-            }
-            case historyitem_Ln_SetPrstDash:
-            {
-                this.prstDash = data.oldPrstDash;
-                break;
-            }
-            case historyitem_Ln_SetJoin:
-            {
-                this.Join = data.oldJoin;
-                break;
-            }
-            case historyitem_Ln_SetHeadEnd:
-            {
-                this.headEnd = data.oldHeadEnd;
-                break;
-            }
-            case historyitem_Ln_SetTailEnd:
-            {
-                this.tailEnd = data.oldTailEnd;
-                break;
-            }
-            case historyitem_Ln_SetAlgn:
-            {
-                this.algn = data.oldAlgn;
-                break;
-            }
-            case historyitem_Ln_SetCap:
-            {
-                this.cap = data.oldCap;
-                break;
-            }
-            case historyitem_Ln_SetCmpd:
-            {
-                this.cmpd = data.oldCmpd;
-                break;
-            }
-            case historyitem_Ln_SetW:
-            {
-                this.w = data.oldW;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_Ln_SetFill:
-            {
-                this.Fill = data.newFill;
-                break;
-            }
-            case historyitem_Ln_SetPrstDash:
-            {
-                this.prstDash = data.newPrstDash;
-                break;
-            }
-            case historyitem_Ln_SetJoin:
-            {
-                this.Join = data.newJoin;
-                break;
-            }
-            case historyitem_Ln_SetHeadEnd:
-            {
-                this.headEnd = data.newHeadEnd;
-                break;
-            }
-            case historyitem_Ln_SetTailEnd:
-            {
-                this.tailEnd = data.newTailEnd;
-                break;
-            }
-            case historyitem_Ln_SetAlgn:
-            {
-                this.algn = data.newAlgn;
-                break;
-            }
-            case historyitem_Ln_SetCap:
-            {
-                this.cap = data.newCap;
-                break;
-            }
-            case historyitem_Ln_SetCmpd:
-            {
-                this.cmpd = data.newCmpd;
-                break;
-            }
-            case historyitem_Ln_SetW:
-            {
-                this.w = data.newW;
-            }
-        }
     },
 
     Write_ToBinary: function(w)

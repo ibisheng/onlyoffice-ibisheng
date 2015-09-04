@@ -4550,7 +4550,6 @@ CPresentation.prototype =
         {
             History.Create_NewPoint(historydescription_Document_AddTextArt);
             var oTextArt = this.Slides[this.CurPage].graphicObjects.createTextArt(nStyle, false);
-            oTextArt.setParent(this.Slides[this.CurPage]);
             oTextArt.addToDrawingObjects();
             oTextArt.checkExtentsByDocContent();
             oTextArt.spPr.xfrm.setOffX((this.Slides[this.CurPage].Width - oTextArt.spPr.xfrm.extX)/2);

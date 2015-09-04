@@ -1859,7 +1859,15 @@ function Binary_rPrWriter(memory)
 		{
 			this.memory.WriteByte(c_oSerProp_rPrType.TextFill);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
+            if(null != rPr.TextFill.transparent)
+            {
+                rPr.TextFill.transparent = 255 - rPr.TextFill.transparent;
+            }
 			this.bs.WriteItemWithLength(function () { window.global_pptx_content_writer.WriteSpPr(_this.memory, rPr.TextFill, 1); });
+            if(null != rPr.TextFill.transparent)
+            {
+                rPr.TextFill.transparent = 255 - rPr.TextFill.transparent;
+            }
 		}
     };
 };

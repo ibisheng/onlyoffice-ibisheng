@@ -6189,8 +6189,61 @@ DrawingObjectsController.prototype =
         oShape.setSpPr(oSpPr);
         oSpPr.setParent(oShape);
         var oContent = oShape.getDocContent();
-        var sText = oShape.getTextArtTranslate().DefaultText;
-        AddToContentFromString(oContent, sText);
+        var sText, oSelectedContent, oNearestPos;
+        if(this.document)
+        {
+            oSelectedContent = this.document.Get_SelectedContent(true);
+            oContent.Recalculate_Page(0, true);
+            oNearestPos = oContent.Get_NearestPos(0, 0, 0, false, undefined);
+            oNearestPos.Paragraph.Check_NearestPos( oNearestPos );
+            if(oSelectedContent && this.document.Can_InsertContent(oSelectedContent, oNearestPos))
+            {
+
+                oSelectedContent.MoveDrawing = true;
+                oContent.Insert_Content(oSelectedContent, oNearestPos);
+            }
+            else
+            {
+                sText = oShape.getTextArtTranslate().DefaultText;
+                AddToContentFromString(oContent, sText);
+            }
+        }
+        else if(this.drawingObjects.cSld)
+        {
+            oShape.setParent(this.drawingObjects);
+            var oTargetDocContent = this.getTargetDocContent();
+            if(oTargetDocContent && oTargetDocContent.Selection.Use)
+            {
+                oSelectedContent = new CSelectedContent();
+                oTargetDocContent.Get_SelectedContent(oSelectedContent);
+                oSelectedContent.MoveDrawing = true;
+
+                oContent.Recalculate_Page(0, true);
+
+                var paragraph = oContent.Content[oContent.CurPos.ContentPos];
+                if (null != paragraph && type_Paragraph == paragraph.GetType())
+                {
+                    oNearestPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
+                    paragraph.Check_NearestPos(oNearestPos);
+                    oContent.Insert_Content(oSelectedContent, oNearestPos);
+                }
+                else
+                {
+                    sText = oShape.getTextArtTranslate().DefaultText;
+                    AddToContentFromString(oContent, sText);
+                }
+            }
+            else
+            {
+                sText = oShape.getTextArtTranslate().DefaultText;
+                AddToContentFromString(oContent, sText);
+            }
+        }
+        else
+        {
+            sText = oShape.getTextArtTranslate().DefaultText;
+            AddToContentFromString(oContent, sText);
+        }
         var oTextPr = oShape.getTextArtPreviewManager().getStylesToApply()[nStyle].Copy();
         oTextPr.FontSize = nFontSize;
         oTextPr.RFonts.Ascii = undefined;

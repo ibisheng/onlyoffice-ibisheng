@@ -222,8 +222,9 @@ ObjectToDraw.prototype =
         this.parentShape = oShape;
     },
 
-    draw: function(graphics, bNoParentShapeTransform, oTransformMatrix, oTheme, oColorMap)
+    getTransform: function(oTransformMatrix, bNoParentShapeTransform)
     {
+
         var oTransform;
         if(oTransformMatrix)
         {
@@ -240,26 +241,45 @@ ObjectToDraw.prototype =
                 oTransform = this.TransformMatrix;
             }
         }
+        return oTransform;
+    },
+
+    drawComment2: function(graphics, bNoParentShapeTransform, oTransformMatrix)
+    {
+        var oTransform = this.getTransform(oTransformMatrix, bNoParentShapeTransform);
+        this.DrawComment(graphics, oTransform);
+    },
+
+    DrawComment : function(graphics, oTransform)
+    {
         if(this.Comment)
         {
-            if(editor && editor.WordControl && editor.WordControl.m_oLogicDocument && editor.WordControl.m_oLogicDocument.Comments &&
-                (graphics instanceof CGraphics) && ( editor.WordControl.m_oLogicDocument.Comments.Is_Use() && true != editor.isViewMode))
+            var oComment = g_oTableId.Get_ById(this.Comment.Additional.CommentId);
+            if(oComment)
             {
-                if(this.Comment.Additional.CommentId === editor.WordControl.m_oLogicDocument.Comments.Get_CurrentId())
+                var Para = g_oTableId.Get_ById( oComment.StartId );
+                if( editor && editor.WordControl && editor.WordControl.m_oLogicDocument && editor.WordControl.m_oLogicDocument.Comments &&
+                    (graphics instanceof CGraphics) && ( editor.WordControl.m_oLogicDocument.Comments.Is_Use() && true != editor.isViewMode))
                 {
-                    this.brush = G_O_ACTIVE_COMMENT_BRUSH;
+                    if(this.Comment.Additional.CommentId === editor.WordControl.m_oLogicDocument.Comments.Get_CurrentId())
+                    {
+                        this.brush = G_O_ACTIVE_COMMENT_BRUSH;
+                    }
+                    else
+                    {
+                        this.brush = G_O_NO_ACTIVE_COMMENT_BRUSH;
+                    }
+                    var oComm = this.Comment;
+                    Para && editor.WordControl.m_oLogicDocument.Comments.Add_DrawingRect(oComm.x0, oComm.y0, oComm.x1 - oComm.x0, oComm.y1 - oComm.y0, graphics.PageNum, this.Comment.Additional.CommentId, global_MatrixTransformer.Invert(oTransform));
                 }
-                else
-                {
-                    this.brush = G_O_NO_ACTIVE_COMMENT_BRUSH;
-                }
-                var _x0 = oTransform.TransformPointX( this.Comment.x0, this.Comment.y0 );
-                var _y0 = oTransform.TransformPointY( this.Comment.x0, this.Comment.y0 );
-                var _x1 = oTransform.TransformPointX( this.Comment.x1, this.Comment.y1 );
-                var _y1 = oTransform.TransformPointY( this.Comment.x1, this.Comment.y1 );
-                editor.WordControl.m_oLogicDocument.Comments.Add_DrawingRect(_x0, _y0, _x1 - _x0, _y1 - _y0, graphics.PageNum, this.Comment.Additional.CommentId);
             }
         }
+    },
+
+    draw: function(graphics, bNoParentShapeTransform, oTransformMatrix, oTheme, oColorMap)
+    {
+        var oTransform = this.getTransform(oTransformMatrix, bNoParentShapeTransform);
+        this.DrawComment(graphics, oTransform);
         if(oTheme && oColorMap)
         {
             if(this.brush)

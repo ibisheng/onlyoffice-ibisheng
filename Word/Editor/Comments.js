@@ -181,13 +181,14 @@ function CCommentData()
     };
 }
 
-function CCommentDrawingRect(X, Y, W, H, CommentId)
+function CCommentDrawingRect(X, Y, W, H, CommentId, InvertTransform)
 {
     this.X = X;
     this.Y = Y;
     this.H = H;
     this.W = W;
     this.CommentId = CommentId;
+    this.InvertTransform = InvertTransform;
 }
 
 var comment_type_Common = 1; // Комментарий к обычному тексу
@@ -609,9 +610,9 @@ function CComments()
         this.Pages[PageNum] = [];
     };
 
-    this.Add_DrawingRect = function(X, Y, W, H, PageNum, CommentId)
+    this.Add_DrawingRect = function(X, Y, W, H, PageNum, CommentId, InvertTransform)
     {
-        this.Pages[PageNum].push( new CCommentDrawingRect(X, Y, W, H, CommentId) );        
+        this.Pages[PageNum].push( new CCommentDrawingRect(X, Y, W, H, CommentId, InvertTransform) );
     };
 
     this.Set_Current = function(Id)
@@ -621,23 +622,31 @@ function CComments()
 
     this.Get_ByXY = function(PageNum, X, Y, Type)
     {
-        var Page = this.Pages[PageNum];
+        var Page = this.Pages[PageNum], _X, _Y;
         if ( undefined !== Page )
         {
             var Count = Page.length;
             for ( var Pos = 0; Pos < Count; Pos++ )
             {
                 var DrawingRect = Page[Pos];
-                
-                if ( X >= DrawingRect.X && X <= DrawingRect.X + DrawingRect.W && Y >= DrawingRect.Y && Y <= DrawingRect.Y + DrawingRect.H )
+                if(!DrawingRect.InvertTransform)
+                {
+                    _X = X;
+                    _Y = Y;
+                }
+                else
+                {
+                    _X = DrawingRect.InvertTransform.TransformPointX(X, Y);
+                    _Y = DrawingRect.InvertTransform.TransformPointY(X, Y);
+                }
+                if ( _X >= DrawingRect.X && _X <= DrawingRect.X + DrawingRect.W && _Y >= DrawingRect.Y && _Y <= DrawingRect.Y + DrawingRect.H )
                 {
                     var Comment = this.Get_ById( DrawingRect.CommentId );
                     if ( null != Comment )
                         return Comment;
                 }
             }
-        }       
-
+        }
         return null;
     };
 

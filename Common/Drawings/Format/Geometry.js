@@ -367,6 +367,8 @@ function Geometry()
     this.kH = null;
     this.bH = null;
 
+    this.bDrawSmart = false;
+
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -1105,7 +1107,7 @@ Geometry.prototype=
 
     draw: function(shape_drawer)
     {
-        if(shape_drawer.Graphics && shape_drawer.Graphics.bDrawSmart)
+        if(shape_drawer.Graphics && shape_drawer.Graphics.bDrawSmart || this.bDrawSmart)
         {
             this.drawSmart(shape_drawer);
             return;

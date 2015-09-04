@@ -2282,8 +2282,6 @@ CDocumentContent.prototype =
     {
         if ( docpostype_DrawingObjects !== this.CurPos.Type )
         {
-            if ( true == this.Selection.Use )
-                this.Remove( 1, true );
 
             var Item = this.Content[this.CurPos.ContentPos];
             if ( type_Paragraph == Item.GetType() )
@@ -2298,6 +2296,8 @@ CDocumentContent.prototype =
                 Drawing.Set_Distance( 3.2, 0, 3.2, 0 );
                 Drawing.Set_PositionH(c_oAscRelativeFromH.Column, false, 0);
                 Drawing.Set_PositionV(c_oAscRelativeFromV.Paragraph, false, 0);
+                if ( true == this.Selection.Use )
+                    this.Remove( 1, true );
                 this.Paragraph_Add( Drawing );
                 this.Select_DrawingObject( Drawing.Get_Id() );
             }

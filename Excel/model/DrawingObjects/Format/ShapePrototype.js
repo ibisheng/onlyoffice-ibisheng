@@ -420,7 +420,7 @@ CShape.prototype.recalculateContent = function()
             this.recalcInfo.recalcTitle = null;
 
 
-            var oTextWarpContent = this.checkTextWarp(content, body_pr, oRecalcObj.w + oRecalcObj.correctW, oRecalcObj.h + oRecalcObj.correctH, true, false);
+            var oTextWarpContent = this.checkTextWarp(content, body_pr, oRecalcObj.textRectW + oRecalcObj.correctW, oRecalcObj.textRectH + oRecalcObj.correctH, true, false);
             this.txWarpStructParamarks = oTextWarpContent.oTxWarpStructParamarksNoTransform;
             this.txWarpStruct = oTextWarpContent.oTxWarpStructNoTransform;
 
@@ -429,7 +429,7 @@ CShape.prototype.recalculateContent = function()
         }
         else
         {
-            var oTextWarpContent = this.checkTextWarp(content, body_pr, oRecalcObj.w + oRecalcObj.correctW, oRecalcObj.h + oRecalcObj.correctH, true, true);
+            var oTextWarpContent = this.checkTextWarp(content, body_pr, oRecalcObj.textRectW + oRecalcObj.correctW, oRecalcObj.textRectH + oRecalcObj.correctH, true, true);
             this.txWarpStructParamarks = oTextWarpContent.oTxWarpStructParamarks;
             this.txWarpStruct = oTextWarpContent.oTxWarpStruct;
 
