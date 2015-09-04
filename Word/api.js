@@ -5873,8 +5873,10 @@ asc_docs_api.prototype.asyncFontsDocumentStartLoaded = function()
         if (_loader_object !== undefined && _loader_object != null)
         {
             for (var i in _loader_object.ImageMap) {
-				var localUrl = _loader_object.ImageMap[i];
-				g_oDocumentUrls.addImageUrl(localUrl, documentUrl + 'media/' + localUrl);
+				if(this.DocInfo.get_OfflineApp()) {
+					var localUrl = _loader_object.ImageMap[i];
+					g_oDocumentUrls.addImageUrl(localUrl, documentUrl + 'media/' + localUrl);
+				}
                 ++_count;
 			}
         }
