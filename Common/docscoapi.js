@@ -32,9 +32,7 @@
 	}
 
 	CDocsCoApi.prototype.init = function (user, docid, documentCallbackUrl, token, callback, editorType, documentFormatSave, isViewer) {
-		//раньше isRightURL был true в редакторе, false в doctrenderer
-		//теперь никогда не приходит url, поэтому надо использовать NATIVE_EDITOR_ENJINE
-		if (this._CoAuthoringApi && this._CoAuthoringApi.isRightURL() && !window["NATIVE_EDITOR_ENJINE"]) {
+		if (this._CoAuthoringApi && this._CoAuthoringApi.isRightURL()) {
 			var t = this;
 			this._CoAuthoringApi.onAuthParticipantsChanged = function (e, count) {t.callback_OnAuthParticipantsChanged(e, count);};
 			this._CoAuthoringApi.onParticipantsChanged = function (e, count) {t.callback_OnParticipantsChanged(e, count);};

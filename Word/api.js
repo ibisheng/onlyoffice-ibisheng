@@ -1527,8 +1527,11 @@ asc_docs_api.prototype._coAuthoringInit = function()
 			}
         }
 	};
-
-	this.CoAuthoringApi.set_url(null);
+	//в обычном серверном режиме портим ссылку, потому что CoAuthoring теперь имеет встроенный адрес
+	//todo надо использовать проверку get_OfflineApp, но она инициализируется только после loadDocument
+	if(!(window["NATIVE_EDITOR_ENJINE"] || !documentId)){
+		this.CoAuthoringApi.set_url(null);
+	}
     this.CoAuthoringApi.init(this.User, documentId, documentCallbackUrl, 'fghhfgsjdgfjs', function(){},
         c_oEditorId.Word, documentFormatSave, this.isViewMode);
 
@@ -5869,8 +5872,11 @@ asc_docs_api.prototype.asyncFontsDocumentStartLoaded = function()
         var _count = 0;
         if (_loader_object !== undefined && _loader_object != null)
         {
-            for (var i in _loader_object.ImageMap)
+            for (var i in _loader_object.ImageMap) {
+				var localUrl = _loader_object.ImageMap[i];
+				g_oDocumentUrls.addImageUrl(localUrl, documentUrl + 'media/' + localUrl);
                 ++_count;
+			}
         }
 
         _progress.ImagesCount = _count;

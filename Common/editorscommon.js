@@ -25,15 +25,13 @@ var g_nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="
 var g_cCharDelimiter = String.fromCharCode(5);
 
 function DocumentUrls(){
-	this.urls = null;
-	this.urlsReverse = null;
+	this.urls = {};
+	this.urlsReverse = {};
 	this.imageCount = 0;
 }
 DocumentUrls.prototype = {
 	mediaPrefix : 'media/',
 	init : function(urls){
-		this.urls = {};
-		this.urlsReverse = {};
 		this.addUrls(urls);
 	},
 	addUrls : function(urls){
