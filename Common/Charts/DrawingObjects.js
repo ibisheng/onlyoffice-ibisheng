@@ -930,7 +930,11 @@ function DrawingObjects() {
 
         for(i = 0; i < aImagesSync.length; ++i)
         {
-            aImagesSync[i] = getFullImageSrc2(aImagesSync[i]);
+			var localUrl = aImagesSync[i];
+			if(api.DocInfo["OfflineApp"]) {
+				g_oDocumentUrls.addImageUrl(localUrl, api.FontLoader.fontFilesPath + "../Excel/document/media/" + localUrl);
+			}
+            aImagesSync[i] = getFullImageSrc2(localUrl);
         }
 
         // Загружаем все картинки листа

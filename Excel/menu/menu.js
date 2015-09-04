@@ -546,9 +546,9 @@
 	var sUserNameAndId = "user_" + Math.floor ((Math.random() * 100) + 1);
 
     var offLineApp = 0; //  1;  // NOTE: ONLY FOR TEST DESKTOP APPLICATION
-
+    var c_DocInfo;
     if (!offLineApp) {
-        api.asc_LoadDocument({
+        c_DocInfo = {
             "Id"     : getURLParameter("key") ? decodeURIComponent(getURLParameter("key")) : "9876543210",
             "Url"    : getURLParameter("url") ? decodeURIComponent(getURLParameter("url")) : undefined,
             "Title"  : getURLParameter("title") ? decodeURIComponent(getURLParameter("title")).replace(new RegExp("\\+",'g')," ") : undefined,
@@ -558,9 +558,9 @@
             "UserId" : sUserNameAndId,
             "UserName" : sUserNameAndId,
             "ChartEditor" : bChartEditor
-        });
+        };
     } else {
-        api.asc_LoadDocument({
+        c_DocInfo = {
             "Id"     : getURLParameter("key") ? decodeURIComponent(getURLParameter("key")) : "9876543210",
             "Url"    : decodeURIComponent("file:///X:/AVS/Sources/TeamlabOffice/trunk/OfficeWeb/OfflineDocuments/Excel/test-native/"),
             "Title"  : getURLParameter("title") ? decodeURIComponent(getURLParameter("title")).replace(new RegExp("\\+",'g')," ") : undefined,
@@ -571,8 +571,11 @@
             "UserName" : sUserNameAndId,
             "ChartEditor" : bChartEditor,
             "OfflineApp" : true
-        });
+        };
     }
+    api.asc_setDocInfo(c_DocInfo);
+    api.asc_getEditorPermissions();
+    api.asc_LoadDocument();
 
 	$("#enableKE").data("state", true).click(function(){
 		var $this = $(this), s = $this.data("state");

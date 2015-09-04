@@ -1029,6 +1029,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					// Назначим id-сами, если он не пришел (для открытия тестового документа)
 					if (!this.documentId)
 						this.documentId = '9876543210';
+					this.DocInfo["OfflineApp"] = true;
 					this._OfflineAppDocumentStartLoad(fCallback);
 				} else {
 					var v = {
@@ -1733,7 +1734,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				}
 			};
 
-			this._coAuthoringSetServerUrl(null);
+			//в обычном серверном режиме портим ссылку, потому что CoAuthoring теперь имеет встроенный адрес
+			//todo надо использовать проверку get_OfflineApp
+			if(!(window["NATIVE_EDITOR_ENJINE"] || !this.documentId || !this.documentUrl)){
+				this._coAuthoringSetServerUrl(null);
+			}
 			this.CoAuthoringApi.init(t.User, t.documentId, t.documentCallbackUrl, 'fghhfgsjdgfjs',
 				function(){}, c_oEditorId.Spreadsheet, t.documentFormatSave, t.asc_getViewerMode());
 		};
