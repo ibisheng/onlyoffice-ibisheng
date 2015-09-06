@@ -3462,7 +3462,7 @@ CShape.prototype =
     },
 
     check_bounds: function (checker) {
-        if (this.spPr && this.spPr.geometry) {
+        if (this.spPr && this.spPr.geometry && this.spPr.geometry.pathLst.length > 0) {
             this.spPr.geometry.check_bounds(checker);
         }
         else {
@@ -3528,7 +3528,7 @@ CShape.prototype =
         var _transform_text = transformText ? transformText : this.transformText;
         if (graphics.IsSlideBoundsCheckerType === true) {
             graphics.transform3(_transform);
-            if (!this.spPr || null == this.spPr.geometry || !graphics.IsShapeNeedBounds(this.spPr.geometry.preset)) {
+            if (!this.spPr || null == this.spPr.geometry || this.spPr.geometry.pathLst.length === 0 || (this.spPr.geometry.pathLst.length === 1 && this.spPr.geometry.pathLst[0].ArrPathCommandInfo.length === 0) || !graphics.IsShapeNeedBounds(this.spPr.geometry.preset)) {
                 graphics._s();
                 graphics._m(0, 0);
                 graphics._l(this.extX, 0);
@@ -4400,7 +4400,7 @@ CShape.prototype =
             var invert_transform = this.getInvertTransform();
             var x_t = invert_transform.TransformPointX(x, y);
             var y_t = invert_transform.TransformPointY(x, y);
-            if (isRealObject(this.spPr) && isRealObject(this.spPr.geometry) && !(this.getObjectType && this.getObjectType() === historyitem_type_ChartSpace))
+            if (isRealObject(this.spPr) && isRealObject(this.spPr.geometry) && this.spPr.geometry.pathLst.length > 0 && !(this.getObjectType && this.getObjectType() === historyitem_type_ChartSpace))
                 return this.spPr.geometry.hitInInnerArea(this.getCanvasContext(), x_t, y_t);
             return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
         }

@@ -132,7 +132,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
 
     this.check_bounds = function(boundsChecker)
     {
-        if(this.geometry)
+        if(this.geometry && this.geometry.pathLst.length > 0)
         {
             this.geometry.check_bounds(boundsChecker);
         }
@@ -169,7 +169,7 @@ ObjectToDraw.prototype =
 {
     check_bounds: function(boundsChecker)
     {
-        if(this.geometry)
+        if(this.geometry && this.geometry.pathLst.length > 0)
         {
             this.geometry.check_bounds(boundsChecker);
         }
