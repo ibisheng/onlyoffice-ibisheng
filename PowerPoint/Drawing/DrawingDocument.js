@@ -1321,7 +1321,9 @@ function CDrawingDocument()
         else
         {
             this.GuiCanvasTextProps = document.createElement('canvas');
-            this.GuiCanvasTextProps.style = "position:absolute;left:0;top:0;";
+            this.GuiCanvasTextProps.style.position = "absolute";
+            this.GuiCanvasTextProps.style.left = "0px";
+            this.GuiCanvasTextProps.style.top = "0px";
             this.GuiCanvasTextProps.id = this.GuiCanvasTextPropsId;
 
             var _width = parseInt(_div_elem.offsetWidth);
