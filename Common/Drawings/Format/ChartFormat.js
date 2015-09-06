@@ -16082,6 +16082,17 @@ CMultiLvlStrCache.prototype =
         this.ptCount = pr;
     },
 
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(this.getObjectType());
+        w.WriteString2(this.Get_Id());
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    },
+
     Undo: function(data)
     {
         switch (data.Type)

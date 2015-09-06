@@ -869,9 +869,9 @@ function DrawingObjects() {
                 worksheet.expandRowsOnScroll(true); 	// для rowOff
             }
             var metrics = drawingObject.getGraphicObjectMetrics();
+            var isSerialize = drawingObject.graphicObject.fromSerialize;
             CheckSpPrXfrm(drawingObject.graphicObject);
-			var isSerialize = drawingObject.graphicObject.fromSerialize;
-            if(!api.wbModel.bCollaborativeChanges && isSerialize)
+            if(isSerialize)
             {
 
                 var rot = isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
