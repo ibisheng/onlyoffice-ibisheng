@@ -629,7 +629,9 @@ function CPPTXContentLoader()
                 }
                 case 1:
                 {
-                    spPr.setGeometry(this.Reader.ReadGeometry(spPr.xfrm));
+                    var oGeometry = this.Reader.ReadGeometry(spPr.xfrm);
+                    if(oGeometry && oGeometry.pathLst.length > 0)
+                        spPr.setGeometry(oGeometry);
                     if(spPr.geometry)
                         spPr.geometry.setParent(spPr);
                     break;

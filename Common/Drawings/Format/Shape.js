@@ -3462,7 +3462,7 @@ CShape.prototype =
     },
 
     check_bounds: function (checker) {
-        if (this.spPr && this.spPr.geometry && this.spPr.geometry.pathLst.length > 0) {
+        if (this.spPr && this.spPr.geometry) {
             this.spPr.geometry.check_bounds(checker);
         }
         else {

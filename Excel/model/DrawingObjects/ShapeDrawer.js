@@ -499,7 +499,7 @@ CShapeDrawer.prototype =
     {
         this.fromShape(shape, graphics);
 
-        if (!geom || geom.pathLst.length === 0)
+        if (!geom)
         {
             this.IsRectShape = true;
         }
@@ -698,7 +698,7 @@ CShapeDrawer.prototype =
             this.Graphics.m_oContext.globalCompositeOperation = "destination-out";
         }
 
-        if(geom && geom.pathLst.length > 0)
+        if(geom)
         {
             geom.draw(this);
         }

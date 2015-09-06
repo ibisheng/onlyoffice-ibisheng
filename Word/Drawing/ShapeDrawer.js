@@ -500,7 +500,7 @@ CShapeDrawer.prototype =
     {
         this.fromShape(shape, graphics);
 
-        if (!geom || geom.pathLst.length === 0)
+        if (!geom)
         {
             this.IsRectShape = true;
         }
@@ -665,7 +665,7 @@ CShapeDrawer.prototype =
             this.Graphics.put_TextureBounds(this.min_x, this.min_y, this.max_x - this.min_x, this.max_y - this.min_y);
         }
 
-        if(geom && geom.pathLst.length > 0)
+        if(geom)
         {
             geom.draw(this);
         }
