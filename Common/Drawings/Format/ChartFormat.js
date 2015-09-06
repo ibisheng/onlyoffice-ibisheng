@@ -13215,7 +13215,7 @@ CErrBars.prototype =
     Load_Changes: function(r)
     {
         var type = r.GetLong();
-        switch (data.Type)
+        switch (type)
         {
             case historyitem_ErrBars_SetErrBarType:
             {
