@@ -3350,6 +3350,8 @@ CPresentation.prototype =
                         paragraph.Check_NearestPos(NearPos);
                         target_doc_content.Insert_Content(Content.DocContent, NearPos);
                     }
+                    var oTargetTextObject = getTargetTextObject(this.Slides[this.CurPage].graphicObjects);
+                    oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
                 }
                 else
                 {

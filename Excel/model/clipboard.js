@@ -2036,7 +2036,8 @@
 					
 				worksheet._loadFonts(newFonts, function () {
 					oPasteProcessor.InsertInPlace(targetContent , oPasteProcessor.aContent);
-					
+                    var oTargetTextObject = getTargetTextObject(worksheet.objectRender.controller);
+                    oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
 					worksheet.objectRender.controller.startRecalculate();
                     worksheet.objectRender.controller.cursorMoveRight(false, false);
 					window.GlobalPasteFlag = false;

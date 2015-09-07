@@ -2582,7 +2582,12 @@ PasteProcessor.prototype =
 				return;
 			
             oDoc.Insert_Content(oSelectedContent, NearPos);
-			
+            if(this.oLogicDocument && this.oLogicDocument.DrawingObjects)
+            {
+                var oTargetTextObject = getTargetTextObject(this.oLogicDocument.DrawingObjects);
+                oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
+            }
+
 			this._selectShapesBeforeInsert(aNewContent, oDoc);
 			
             paragraph.Clear_NearestPosArray(aNewContent);

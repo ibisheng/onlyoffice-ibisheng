@@ -2245,6 +2245,8 @@ CGraphicObjects.prototype =
         if(content)
         {
             content.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
+            var oTargetTextObject = getTargetTextObject(this);
+            oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
             this.document.Recalculate();
         }
         else if(this.selectedObjects.length > 0)

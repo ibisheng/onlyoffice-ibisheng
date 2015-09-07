@@ -1227,6 +1227,7 @@ CShape.prototype =
                 }
             }
         }
+        this.checkExtentsByDocContent && this.checkExtentsByDocContent();
     },
 
     setPaddings: function (paddings) {
