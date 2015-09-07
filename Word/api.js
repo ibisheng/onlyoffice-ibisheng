@@ -1506,7 +1506,11 @@ asc_docs_api.prototype._coAuthoringInit = function()
 						case "ok":
 							var urls = input["data"];
 							g_oDocumentUrls.init(urls);
-							_onOpenCommand(function(){}, {'data': urls['Editor.bin']});
+							if(null != urls['Editor.bin']) {
+								_onOpenCommand(function(){}, {'data': urls['Editor.bin']});
+							} else {
+								t.asc_fireCallback("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
+							}
 						break;
 						case "needparams": break;
 						case "err":

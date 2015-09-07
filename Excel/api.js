@@ -1712,7 +1712,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 								case "ok":
 									var urls = input["data"];
 									g_oDocumentUrls.init(urls);
-									t._onOpenCommand(function (response) {t._startOpenDocument(response);}, urls['Editor.bin']);
+									if(null != urls['Editor.bin']) {
+										t._onOpenCommand(function (response) {t._startOpenDocument(response);}, urls['Editor.bin']);
+									} else {
+										t.handlers.trigger("asc_onError", c_oAscError.ID.ConvertationError,c_oAscError.Level.Critical);
+									}
 								break;
 								case "needparams": break;
 								case "err":
