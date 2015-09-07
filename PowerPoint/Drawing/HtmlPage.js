@@ -3274,7 +3274,7 @@ function CEditorPage(api)
         this.m_oDrawingDocument.CheckGuiControlColors(bIsAttack);
     }
 
-    this.GoToPage = function(lPageNum, isFromZoom)
+    this.GoToPage = function(lPageNum, isFromZoom, bIsAttack)
     {
         var drDoc = this.m_oDrawingDocument;
 
@@ -3359,7 +3359,7 @@ function CEditorPage(api)
 
         this.Thumbnails.LockMainObjType = false;
 
-        if (this.m_oDrawingDocument.IsEmptyPresentation != _old_empty || _bIsUpdate)
+        if (this.m_oDrawingDocument.IsEmptyPresentation != _old_empty || _bIsUpdate || bIsAttack === true)
             this.OnScroll();
     }
 

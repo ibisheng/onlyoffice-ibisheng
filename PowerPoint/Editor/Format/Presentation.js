@@ -3884,13 +3884,13 @@ CPresentation.prototype =
             if(array[array.length-1] != oldLen-1)
             {
                 //this.Set_CurPage(array[array.length-1]+1 - array.length);
-                this.DrawingDocument.m_oWordControl.GoToPage(array[array.length-1]+1 - array.length);
+                this.DrawingDocument.m_oWordControl.GoToPage(array[array.length-1]+1 - array.length, undefined, true);
 
             }
             else
             {
                 //this.Set_CurPage(this.Slides.length -1);
-                this.DrawingDocument.m_oWordControl.GoToPage(this.Slides.length -1);
+                this.DrawingDocument.m_oWordControl.GoToPage(this.Slides.length -1, undefined, true);
 
             }
             editor.sync_HideComment();
