@@ -1505,9 +1505,16 @@ DrawingObjectsController.prototype =
     setCellBackgroundColor: function (color)
     {
         var fill = new asc_CShapeFill();
-        fill.type = c_oAscFill.FILL_TYPE_SOLID;
-        fill.fill = new asc_CFillSolid();
-        fill.fill.color = color;
+        if(color)
+        {
+            fill.type = c_oAscFill.FILL_TYPE_SOLID;
+            fill.fill = new asc_CFillSolid();
+            fill.fill.color = color;
+        }
+        else
+        {
+            fill.type = c_oAscFill.FILL_TYPE_NOFILL;
+        }
 
         this.checkSelectedObjectsAndCallback(this.applyDrawingProps, [{fill: fill}], false, historydescription_Spreadsheet_SetCellBackgroundColor);
     },
@@ -2239,6 +2246,7 @@ DrawingObjectsController.prototype =
 
 
         var chart_type = plot_area.charts[0];
+        plot_area.removeCharts(1, plot_area.charts.length - 1);
         //Data Labels
         var i;
         var type = chartSettings.getType();
@@ -2571,7 +2579,6 @@ DrawingObjectsController.prototype =
                 {
                     new_chart_type = new CScatterChart();
                     plot_area.addChart(new_chart_type, 0);
-                    plot_area.removeCharts(1, plot_area.charts.length - 1);
                     new_chart_type.setFromOtherChart(chart_type);
                     for(var j = 0; j < new_chart_type.series.length; ++j)
                     {
