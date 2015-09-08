@@ -1051,7 +1051,7 @@ CChartsDrawer.prototype =
 					yVal = parseFloat(yNumCache.pts[j].val);
 					
 					xNumCache = series[l].xVal && series[l].xVal.numRef ? series[l].xVal.numRef.numCache : series[l].xVal && series[l].xVal.numLit ? series[l].xVal.numLit : null;
-					if(xNumCache && xNumCache.pts[j] && xNumCache.pts[j].val)
+					if(xNumCache && xNumCache.pts[j])
 					{
 						if(!isNaN(parseFloat(xNumCache.pts[j].val)))
 							xVal = parseFloat(xNumCache.pts[j].val);
@@ -4852,7 +4852,7 @@ drawScatterChart.prototype =
 				yVal = this._getYVal(n, i);
 				
 				xNumCache = seria.xVal && seria.xVal.numRef ? seria.xVal.numRef.numCache : seria.xVal && seria.xVal.numLit ? seria.xVal.numLit : null;
-				if(xNumCache && xNumCache.pts[n] && xNumCache.pts[n].val)
+				if(xNumCache && xNumCache.pts[n])
 				{
 					if(!isNaN(parseFloat(xNumCache.pts[n].val)))
 						xVal = parseFloat(xNumCache.pts[n].val);
