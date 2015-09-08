@@ -1760,7 +1760,9 @@ function OfflineEditor () {
 
     this.zoom = 1.0;
     this.textSelection = 0;
- 
+    this.selection = [];
+    this.cellPin = 0;
+
     // main
 
     this.openFile = function () {
@@ -1771,6 +1773,20 @@ function OfflineEditor () {
         window.g_file_path = "native_open_file";
         window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
         _api = new window["Asc"]["spreadsheet_api"]();
+
+        var c_DocInfo = {
+            "Id"     :  "9876543210",
+            "Url"    :  undefined,
+            "Title"  :  undefined,
+            "Format" :  undefined,
+            "VKey"   :  undefined,
+            "Origin" : 'localhost',
+            "UserId" : 'UserId',
+            "UserName" : 'UserName',
+            "ChartEditor" : true
+        };
+
+        _api.asc_setDocInfo(c_DocInfo);
         _api.asc_nativeOpenFile(window.native["GetFileString"]());
 
         this.registerEventsHandlers();
@@ -1842,8 +1858,9 @@ function OfflineEditor () {
 
         var worksheet = _api.wb.getWorksheet();
         var region = this._updateRegion(worksheet, x, y, width, height);
+        this.selection = _api.wb.getWorksheet()._getDrawSelection_Local(region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd);
 
-        return _api.wb.getWorksheet()._getDrawSelection_Local(region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd);
+        return this.selection;
     };
     this.getNearCellCoord = function(x, y) {
 
@@ -2149,15 +2166,28 @@ function offline_of() {_s.openFile();}
 function offline_stz(v) {_s.zoom = v; _api.asc_setZoom(v);}
 function offline_ds(x, y, width, height, ratio) {_s.drawSheet(x, y, width, height, ratio);}
 function offline_dh(x, y, width, height, type, ratio) {_s.drawHeader(x, y, width, height, type, ratio);}
-function offline_mouse_down(x, y) {
-    _api.wb.getWorksheet().changeSelectionStartPoint(x, y, true, true);
+function offline_mouse_down(x, y, pin) {
+    var ws = _api.wb.getWorksheet();
+    _s.cellPin = pin;
+    if (0 != _s.cellPin) {
+        ws.leftTopRange = ws.activeRange.clone();
+        return;
+    }
+
+    ws.changeSelectionStartPoint(x, y, true, true);
 }
 function offline_mouse_move(x, y) {
-    _api.wb.getWorksheet().changeSelectionEndPoint(x, y, true, true);
+    if (-1 == _s.cellPin)
+        _api.wb.getWorksheet()._changeSelectionTopLeft(x, y, true, true, true);
+    else if (1 === _s.cellPin)
+        _api.wb.getWorksheet()._changeSelectionTopLeft(x, y, true, true, false);
+    else
+        _api.wb.getWorksheet().changeSelectionEndPoint(x, y, true, true);
 }
 function offline_mouse_up(x, y) {
-    //_api.wb.getWorksheet().changeSelectionDone();
     _api.wb._onChangeSelectionDone(-1, -1);
+    _s.cellPin = 0;
+    _api.wb.getWorksheet().leftTopRange = undefined;
 }
 function offline_get_selection(x, y, width, height) {
     return _s.getSelection(x, y, width, height);

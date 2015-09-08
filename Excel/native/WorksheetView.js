@@ -582,3 +582,71 @@ WorksheetView.prototype._updateCache = function(c1, r1, c2, r2) {
     this._prepareCellTextMetricsCache(range);
 };
 
+WorksheetView.prototype._changeSelectionTopLeft = function (x, y, isCoord, isSelectMode, isTopLeft) {
+    //var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] : this.activeRange;
+
+    var isMoveActiveCellToLeftTop = false;
+    var ar = this.activeRange;
+    var copy = this.activeRange.clone();
+
+    var col = ar.startCol;
+    var row = ar.startRow;
+
+    if (isTopLeft) {
+        this.activeRange.startCol = this.leftTopRange.c2;
+        this.activeRange.startRow = this.leftTopRange.r2;
+    } else {
+        this.activeRange.startCol = this.leftTopRange.c1;
+        this.activeRange.startRow = this.leftTopRange.r1;
+    }
+
+    var newRange = isCoord ? this._calcSelectionEndPointByXY(x, y) : this._calcSelectionEndPointByOffset(x, y);
+    var isEqual = newRange.isEqual(ar);
+
+    if (!isEqual) {
+
+        if (newRange.c1 > col) {
+            col = newRange.c1;
+            isMoveActiveCellToLeftTop = true;
+        }
+
+        if (newRange.r1 > row) {
+            row = newRange.r1;
+            isMoveActiveCellToLeftTop = true;
+        }
+
+        ar.assign2(newRange);
+
+        this.activeRange.startCol = col;
+        this.activeRange.startRow = row;
+
+        if (isMoveActiveCellToLeftTop) {
+            this.activeRange.startCol = newRange.c1;
+            this.activeRange.startRow = newRange.r1;
+        }
+
+        //ToDo this.drawDepCells();
+
+        if (!this.isCellEditMode) {
+            if (!this.isSelectionDialogMode) {
+                this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/true));
+                if (!isSelectMode) {
+                    this.handlers.trigger("selectionChanged", this.getSelectionInfo(false));
+                    this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
+                }
+            } else {
+                // Смена диапазона
+                this.handlers.trigger("selectionRangeChanged", this.getSelectionRangeValue());
+            }
+        }
+    } else {
+        this.activeRange.startCol = col;
+        this.activeRange.startRow = row;
+    }
+
+    this.model.workbook.handlers.trigger("asc_onHideComment");
+
+    return this._calcActiveRangeOffset(x,y);
+};
+
+
