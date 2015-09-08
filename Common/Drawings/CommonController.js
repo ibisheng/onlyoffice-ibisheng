@@ -6208,6 +6208,14 @@ DrawingObjectsController.prototype =
 
                 oSelectedContent.MoveDrawing = true;
                 oContent.Insert_Content(oSelectedContent, oNearestPos);
+                oContent.Selection.Start    = false;
+                oContent.Selection.Use      = false;
+                oContent.Selection.StartPos = 0;
+                oContent.Selection.EndPos   = 0;
+                oContent.Selection.Flag     = selectionflag_Common;
+
+                oContent.CurPos.Type       = docpostype_Content;
+                oContent.CurPos.ContentPos = 0;
             }
             else
             {
