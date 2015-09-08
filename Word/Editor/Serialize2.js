@@ -8762,7 +8762,8 @@ function Binary_oMathReader(stream, oReadResult)
 			if (props.mcJc)
 			{
 				var oEqArr = oElem.Content[oElem.Content.length-1];
-				oEqArr.setJustification(props.mcJc);
+				oEqArr.fillPlaceholders();
+				oEqArr.setJustificationForConversion(props.mcJc);
 			}		
         }
 		else if (c_oSer_OMathContentType.Fraction === type)
