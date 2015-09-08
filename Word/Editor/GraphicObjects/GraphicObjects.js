@@ -86,6 +86,11 @@ CGraphicObjects.prototype =
         this.bNoCheckChartTextSelection = false;
     },
 
+
+    getDrawingDocument: function()
+    {
+        return editor.WordControl.m_oDrawingDocument;
+    },
     sortDrawingArrays: function()
     {
         for(var i = 0; i < this.graphicPages.length; ++i)

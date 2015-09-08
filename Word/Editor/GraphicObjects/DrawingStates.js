@@ -149,6 +149,7 @@ NullState.prototype =
         var start_target_doc_content, end_target_doc_content;
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
+            this.drawingObjects.setStartTrackPos(x, y, pageIndex);
             start_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
         }
 
@@ -1285,16 +1286,44 @@ TextAddState.prototype =
     {},
     onMouseMove: function(e, x, y, pageIndex)
     {
+        var startPos = this.drawingObjects.startTrackPos;
+        var tr_x, tr_y;
+        if(pageIndex === startPos.pageIndex)
+        {
+            tr_x = x;
+            tr_y = y;
+        }
+        else
+        {
+            var tr_point = this.drawingObjects.getDrawingDocument().ConvertCoordsToAnotherPage(x, y, pageIndex, startPos.pageIndex);
+            tr_x = tr_point.X;
+            tr_y = tr_point.Y;
+        }
+
         if(!e.IsLocked)
         {
-            this.onMouseUp(e, x, y, pageIndex);
+            this.onMouseUp(e, tr_x, tr_y, startPos.pageIndex);
             return;
         }
-        this.majorObject.selectionSetEnd(e, x, y, pageIndex);
+        this.majorObject.selectionSetEnd(e, tr_x, tr_y, startPos.pageIndex);
     },
     onMouseUp: function(e, x, y, pageIndex)
     {
-        this.majorObject.selectionSetEnd(e, x, y, pageIndex);
+        var startPos = this.drawingObjects.startTrackPos;
+        var tr_x, tr_y;
+        if(pageIndex === startPos.pageIndex)
+        {
+            tr_x = x;
+            tr_y = y;
+        }
+        else
+        {
+            var tr_point = this.drawingObjects.getDrawingDocument().ConvertCoordsToAnotherPage(x, y, pageIndex, startPos.pageIndex);
+            tr_x = tr_point.X;
+            tr_y = tr_point.Y;
+        }
+
+        this.majorObject.selectionSetEnd(e, tr_x, tr_y, startPos.pageIndex);
         this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
     }
 
