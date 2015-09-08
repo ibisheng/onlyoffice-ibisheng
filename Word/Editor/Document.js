@@ -2983,7 +2983,7 @@ CDocument.prototype =
                 TextArt.setParent(Drawing);
                 Drawing.Set_GraphicObject(TextArt);
                 Drawing.Set_DrawingType( drawing_Anchor );
-                Drawing.Set_WrappingType( WRAPPING_TYPE_SQUARE );
+                Drawing.Set_WrappingType( WRAPPING_TYPE_NONE );
                 Drawing.Set_BehindDoc( false );
                 Drawing.Set_Distance( 3.2, 0, 3.2, 0 );
                 Drawing.Set_PositionH(c_oAscRelativeFromH.Column, false, 0);
