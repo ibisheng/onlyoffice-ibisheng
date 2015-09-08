@@ -865,7 +865,7 @@ CEqArray.prototype.setPosition = function(pos, PosInfo)
 
     pos.x += this.size.width;
 };
-CEqArray.prototype.setJustification = function(js)
+CEqArray.prototype.setJustificationForConversion = function(js) // эта функция должна вызываться только при конвертации, после того как у всех элементов контенты заполнены
 {
     var lng = this.Content.length;
     var NewElement, Run;
