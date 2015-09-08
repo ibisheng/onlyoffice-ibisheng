@@ -5817,7 +5817,7 @@ function CDrawingDocument()
         var _ret = this.TableOutlineDr.checkMouseDown(pos, oWordControl);
         if (_ret === true)
         {
-            oWordControl.m_oLogicDocument.Selection_Remove();
+            oWordControl.m_oLogicDocument.Selection_Remove(true);
             this.TableOutlineDr.bIsTracked = true;
             this.LockCursorType("move");
 
