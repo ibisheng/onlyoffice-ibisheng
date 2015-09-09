@@ -526,7 +526,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		spreadsheet_api.prototype.asc_LoadDocument = function (c_DocInfo) {
 			var t = this;
 
-			//this.asc_setDocInfo(c_DocInfo);
+			if(!this.DocInfo && c_DocInfo)
+				this.asc_setDocInfo(c_DocInfo);
 
 			if (this.DocInfo["OfflineApp"] && (true == this.DocInfo["OfflineApp"])) {
 				this.isCoAuthoringEnable = false;

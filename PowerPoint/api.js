@@ -864,8 +864,8 @@ asc_docs_api.prototype.asc_setLocale = function(val)
 };
 asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 {
-	//this.asc_setDocInfo(c_DocInfo);
-	
+	if(!this.DocInfo && c_DocInfo)
+		this.asc_setDocInfo(c_DocInfo);
     this.WordControl.m_oDrawingDocument.m_bIsOpeningDocument = true;
 
 
