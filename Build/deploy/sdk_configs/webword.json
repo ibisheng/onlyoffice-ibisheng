@@ -16,7 +16,7 @@
     },
     "extract_api": {
         "src": "../../Word/api-all.js",
-        "dst": "../../Word/Build/Log/apiExport.js"
+        "dst": "../../Word/apiExport.js"
     },
     "compile": {
         "sdk": {
@@ -126,7 +126,7 @@
                 "../../Word/Editor/SerializeCommon.js",
                 "../../Word/apiDefines.js",
                 "../../Word/api-all.js",
-                "../../Word/Build/Log/apiExport.js",
+                "../../Word/apiExport.js",
                 "../../Word/document/empty.js",
                 "../../Word/Math/mathTypes.js",
                 "../../Word/Math/mathText.js",
@@ -235,8 +235,7 @@
                 "cwd": "../../Word/",
                 "src": [
                     "Build/Log/property.map",
-                    "Build/Log/variable.map",
-                    "Build/Log/apiExport.js"
+                    "Build/Log/variable.map"
                 ],
                 "dest": "<%= pkg.menu_path %>/Word/"
             }
@@ -249,7 +248,6 @@
         "build": [
             "increment_build",
             "concat_js_api",
-            "extract_js_api",
             "compile_sdk"
         ]
     }

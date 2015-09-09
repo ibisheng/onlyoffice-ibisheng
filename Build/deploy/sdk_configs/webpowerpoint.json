@@ -17,7 +17,7 @@
     },
     "extract_api": {
         "src": "../../PowerPoint/api-all.js",
-        "dst": "../../PowerPoint/Build/Log/apiExport.js"
+        "dst": "../../PowerPoint/apiExport.js"
     },
     "compile": {
         "sdk": {
@@ -141,7 +141,7 @@
                 "../../PowerPoint/Editor/Format/ChartSpacePrototype.js",
                 "../../PowerPoint/Editor/Format/GraphicFrame.js",
                 "../../PowerPoint/api-all.js",
-                "../../PowerPoint/Build/Log/apiExport.js",
+                "../../PowerPoint/apiExport.js",
                 "../../Excel/utils/utils.js",
                 "../../Excel/model/Serialize.js",
                 "../../Excel/model/WorkbookElems.js",
@@ -213,8 +213,7 @@
                 "src": [
                     "sdk-all.js.map",
                     "Build/Log/property.map",
-                    "Build/Log/variable.map",
-                    "Build/Log/apiExport.js"
+                    "Build/Log/variable.map"
                 ],
                 "dest": "<%= pkg.menu_path %>/PowerPoint/"
             },
@@ -233,7 +232,6 @@
         "build": [
             "increment_build",
             "concat_js_api",
-            "extract_js_api",
             "compile_sdk"
         ]
     }

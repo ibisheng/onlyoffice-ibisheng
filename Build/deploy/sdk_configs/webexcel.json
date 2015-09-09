@@ -9,7 +9,7 @@
     },
     "extract_api": {
         "src": "../../Word/apiCommon.js",
-        "dst": "../../Excel/Build/Log/apiCommonExport.js"
+        "dst": "../../Excel/apiCommonExport.js"
     },
     "compile": {
         "sdk": {
@@ -141,7 +141,7 @@
                 "../../Word/Editor/FontClassification.js",
                 "../../Word/Editor/Spelling.js",
                 "../../Word/Editor/GraphicObjects/WrapManager.js",
-				"../../Word/Editor/Common.js",
+                "../../Word/Editor/Common.js",
                 "../../Word/Math/mathTypes.js",
                 "../../Word/Math/mathText.js",
                 "../../Word/Math/mathContent.js",
@@ -157,7 +157,7 @@
                 "../../Word/Math/borderBox.js",
                 "../../Excel/model/DrawingObjects/GlobalCounters.js",
                 "../../Word/apiCommon.js",
-                "../../Excel/Build/Log/apiCommonExport.js",
+                "../../Excel/apiCommonExport.js",
                 "../../Excel/api.js",
                 "../../Excel/Private/api.js"
             ],
@@ -255,7 +255,6 @@
     "tasks": {
         "build": [
             "increment_build",
-            "extract_js_api",
             "compile_sdk"
         ]
     }
