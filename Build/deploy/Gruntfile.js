@@ -188,6 +188,7 @@ module.exports = function(grunt) {
 	});
 	
 	grunt.registerTask('compile_sdk_init', function(compilation_level) {
+		grunt.file.mkdir( packageFile['compile']['sdk']['log'] );
 		var map_file_path = packageFile['compile']['sdk']['dst'] + '.map';
 		var map_record_file_path = map_file_path + '.tmp';
 		var concat_res = {};
