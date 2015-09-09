@@ -222,7 +222,6 @@
     "tasks": {
         "build": [
             "increment_build",
-            "concat_js_api",
             "compile_sdk"
         ]
     }
