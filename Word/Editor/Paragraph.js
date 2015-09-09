@@ -15,6 +15,8 @@ var type_Paragraph = 0x0001;
 
 var UnknownValue  = null;
 
+
+
 // Класс Paragraph
 function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFromPresentation)
 {
@@ -223,12 +225,12 @@ Paragraph.prototype =
     {
         var Pr_old = this.Pr;
         var Pr_new = oNewPr;
-        this.private_AddPrChange();
         History.Add( this, { Type : historyitem_Paragraph_Pr, Old : Pr_old, New : Pr_new } );
 
         this.Pr = oNewPr;
 
         this.Recalc_CompiledPr();
+        this.private_UpdateTrackRevisionOnChangeParaPr(true);
     },
 
     Copy : function(Parent, DrawingDocument)
@@ -498,6 +500,7 @@ Paragraph.prototype =
         var oOldPr = OtherParagraph.Pr;
         OtherParagraph.Pr = this.Pr.Copy();
         History.Add( OtherParagraph, { Type : historyitem_Paragraph_Pr, Old : oOldPr, New : OtherParagraph.Pr } );
+        OtherParagraph.private_UpdateTrackRevisionOnChangeParaPr(true);
 
         if(this.bFromDocument)
             OtherParagraph.Style_Add( this.Style_Get(), true );
@@ -3378,6 +3381,8 @@ Paragraph.prototype =
 
                     // Надо пересчитать конечный стиль
                     this.CompiledPr.NeedRecalc = true;
+
+                    this.private_UpdateTrackRevisionOnChangeParaPr(true);
                 }
             }
             else
@@ -7167,6 +7172,7 @@ Paragraph.prototype =
 
         // Надо пересчитать конечный стиль
         this.CompiledPr.NeedRecalc = true;
+        this.private_UpdateTrackRevisionOnChangeParaPr(true);
     },
 
     // Добавляем нумерацию к данному параграфу, не делая никаких дополнительных действий
@@ -7181,6 +7187,7 @@ Paragraph.prototype =
 
         // Надо пересчитать конечный стиль
         this.CompiledPr.NeedRecalc = true;
+        this.private_UpdateTrackRevisionOnChangeParaPr(true);
     },
 
     // Изменяем уровень нумерации
@@ -7203,6 +7210,7 @@ Paragraph.prototype =
 
             // Надо пересчитать конечный стиль
             this.CompiledPr.NeedRecalc = true;
+            this.private_UpdateTrackRevisionOnChangeParaPr(true);
         }
     },
 
@@ -7292,6 +7300,7 @@ Paragraph.prototype =
 
         // Надо пересчитать конечный стиль
         this.CompiledPr.NeedRecalc = true;
+        this.private_UpdateTrackRevisionOnChangeParaPr(true);
     },
 
     // Используется ли заданная нумерация в параграфе
@@ -7424,6 +7433,7 @@ Paragraph.prototype =
             this.Pr.Lvl = Level;
             this.CompiledPr.NeedRecalc = true;
             this.Recalc_RunsCompiledPr();
+            this.private_UpdateTrackRevisionOnChangeParaPr(true);
         }
     },
 //-----------------------------------------------------------------------------------
@@ -7974,6 +7984,7 @@ Paragraph.prototype =
             this.private_AddPrChange();
             History.Add( this, { Type : historyitem_Paragraph_PStyle, Old : Id_old, New : Id } );
             this.Pr.PStyle = Id;
+            this.private_UpdateTrackRevisionOnChangeParaPr(true);
         }
 
         // Надо пересчитать конечный стиль самого параграфа и всех текстовых блоков
@@ -8040,6 +8051,7 @@ Paragraph.prototype =
         // Надо пересчитать конечный стиль
         this.CompiledPr.NeedRecalc = true;
         this.Recalc_RunsCompiledPr();
+        this.private_UpdateTrackRevisionOnChangeParaPr(true);
     },
 
     // Проверяем находится ли курсор в конце параграфа
@@ -8194,6 +8206,7 @@ Paragraph.prototype =
 
         // Надо пересчитать конечный стиль
         this.CompiledPr.NeedRecalc = true;
+        this.private_UpdateTrackRevisionOnChangeParaPr(true);
     },
 
     Set_Spacing : function(Spacing, bDeleteUndefined)
@@ -8245,6 +8258,7 @@ Paragraph.prototype =
 
         // Надо пересчитать конечный стиль
         this.CompiledPr.NeedRecalc = true;
+        this.private_UpdateTrackRevisionOnChangeParaPr(true);
     },
 
     Set_Align : function(Align)
@@ -8258,6 +8272,7 @@ Paragraph.prototype =
 
             // Надо пересчитать конечный стиль
             this.CompiledPr.NeedRecalc = true;
+            this.private_UpdateTrackRevisionOnChangeParaPr(true);
         }
     },
 
@@ -8307,6 +8322,7 @@ Paragraph.prototype =
 
         // Надо пересчитать конечный стиль
         this.CompiledPr.NeedRecalc = true;
+        this.private_UpdateTrackRevisionOnChangeParaPr(true);
     },
 
     Set_Tabs : function(Tabs)
@@ -8337,6 +8353,7 @@ Paragraph.prototype =
 
         // Надо пересчитать конечный стиль
         this.CompiledPr.NeedRecalc = true;
+        this.private_UpdateTrackRevisionOnChangeParaPr(true);
     },
 
     Set_ContextualSpacing : function(Value)
@@ -8349,6 +8366,7 @@ Paragraph.prototype =
 
             // Надо пересчитать конечный стиль
             this.CompiledPr.NeedRecalc = true;
+            this.private_UpdateTrackRevisionOnChangeParaPr(true);
         }
     },
 
@@ -8362,6 +8380,7 @@ Paragraph.prototype =
 
             // Надо пересчитать конечный стиль
             this.CompiledPr.NeedRecalc = true;
+            this.private_UpdateTrackRevisionOnChangeParaPr(true);
         }
     },
 
@@ -8375,6 +8394,7 @@ Paragraph.prototype =
 
             // Надо пересчитать конечный стиль
             this.CompiledPr.NeedRecalc = true;
+            this.private_UpdateTrackRevisionOnChangeParaPr(true);
         }
     },
 
@@ -8388,6 +8408,7 @@ Paragraph.prototype =
 
             // Надо пересчитать конечный стиль
             this.CompiledPr.NeedRecalc = true;
+            this.private_UpdateTrackRevisionOnChangeParaPr(true);
         }
     },
 
@@ -8401,6 +8422,7 @@ Paragraph.prototype =
 
             // Надо пересчитать конечный стиль
             this.CompiledPr.NeedRecalc = true;
+            this.private_UpdateTrackRevisionOnChangeParaPr(true);
         }
     },
 
@@ -8506,6 +8528,7 @@ Paragraph.prototype =
 
         // Надо пересчитать конечный стиль
         this.CompiledPr.NeedRecalc = true;
+        this.private_UpdateTrackRevisionOnChangeParaPr(true);
     },
 
     Set_Border : function(Border, HistoryType)
@@ -8525,6 +8548,7 @@ Paragraph.prototype =
 
         // Надо пересчитать конечный стиль
         this.CompiledPr.NeedRecalc = true;
+        this.private_UpdateTrackRevisionOnChangeParaPr(true);
     },
 
     Set_Bullet : function(Bullet)
@@ -8533,6 +8557,7 @@ Paragraph.prototype =
         History.Add( this, { Type : historyitem_Paragraph_PresentationPr_Bullet, New : Bullet, Old : this.Pr.Bullet } );
         this.Pr.Bullet = Bullet;
         this.CompiledPr.NeedRecalc = true;
+        this.private_UpdateTrackRevisionOnChangeParaPr(true);
     },
 
     // Проверяем начинается ли текущий параграф с новой страницы.
@@ -9170,14 +9195,16 @@ Paragraph.prototype =
     // Обновляем линейку
     Document_UpdateRulersState : function()
     {
-        if ( true === this.Is_Inline() )
+        if (true === this.Is_Inline())
         {
-            this.LogicDocument.Document_UpdateRulersStateBySection();
+            if (this.Parent instanceof CDocument)
+                this.LogicDocument.Document_UpdateRulersStateBySection();
         }
         else
         {
+            var StartPage = this.Parent.Get_StartPage_Absolute();
             var Frame = this.CalculatedFrame;
-            this.Parent.DrawingDocument.Set_RulerState_Paragraph( { L : Frame.L, T : Frame.T, R : Frame.L + Frame.W, B : Frame.T + Frame.H, PageIndex : Frame.PageIndex, Frame : this }, false );
+            this.Parent.DrawingDocument.Set_RulerState_Paragraph( { L : Frame.L, T : Frame.T, R : Frame.L + Frame.W, B : Frame.T + Frame.H, PageIndex : StartPage + Frame.PageIndex, Frame : this }, false );
         }
     },
 
@@ -9239,62 +9266,24 @@ Paragraph.prototype =
                 var X = Coords.X + 20;
                 var Y = Coords.Y;
 
-                if (true === this.Have_PrChange())
+                var TrackManager = this.LogicDocument.Get_TrackRevisionsManager();
+                var Changes = TrackManager.Get_ParagraphChanges(this.Get_Id());
+                if (Changes.length > 0)
                 {
-                    var Change = new CRevisionsChange();
-                    Change.put_Type(c_oAscRevisionsChangeType.ParaPr);
-                    Change.put_Value("Change paragraph properties.");
-                    Change.put_XY(X, Y);
-                    editor.sync_AddRevisionsChange(Change);
-                }
-
-                var ReviewType = this.Get_ReviewType();
-                if (reviewtype_Add == ReviewType)
-                {
-                    var Change = new CRevisionsChange();
-                    Change.put_Type(c_oAscRevisionsChangeType.ParaAdd);
-                    Change.put_Value("Add paragraph.");
-                    Change.put_XY(X, Y);
-                    editor.sync_AddRevisionsChange(Change);
-                }
-                else if (reviewtype_Remove == ReviewType)
-                {
-                    var Change = new CRevisionsChange();
-                    Change.put_Type(c_oAscRevisionsChangeType.ParaRem);
-                    Change.put_Value("Delete paragraph.");
-                    Change.put_XY(X, Y);
-                    editor.sync_AddRevisionsChange(Change);
-                }
-
-                var CurPos = this.Get_ParaContentPos(false, false);
-                var Run = this.Get_ElementByPos(CurPos);
-                if (para_Run === Run.Type)
-                {
-                    if (true === Run.Have_PrChange())
+                    for (var ChangeIndex = 0, ChangesCount = Changes.length; ChangeIndex < ChangesCount; ChangeIndex++)
                     {
-                        var Change = new CRevisionsChange();
-                        Change.put_Type(c_oAscRevisionsChangeType.TextPr);
-                        Change.put_Value("Change text properties.");
-                        Change.put_XY(X, Y);
-                        editor.sync_AddRevisionsChange(Change);
-                    }
+                        var Change = Changes[ChangeIndex];
 
-                    var RunReviewType = Run.Get_ReviewType();
-                    if (reviewtype_Add == RunReviewType)
-                    {
-                        var Change = new CRevisionsChange();
-                        Change.put_Type(c_oAscRevisionsChangeType.TextAdd);
-                        Change.put_Value("Add text.");
-                        Change.put_XY(X, Y);
-                        editor.sync_AddRevisionsChange(Change);
-                    }
-                    else if (reviewtype_Remove == RunReviewType)
-                    {
-                        var Change = new CRevisionsChange();
-                        Change.put_Type(c_oAscRevisionsChangeType.TextRem);
-                        Change.put_Value("Delete text.");
-                        Change.put_XY(X, Y);
-                        editor.sync_AddRevisionsChange(Change);
+                        var Type = Change.get_Type();
+                        if ((c_oAscRevisionsChangeType.TextAdd !== Type
+                            && c_oAscRevisionsChangeType.TextRem !== Type
+                            && c_oAscRevisionsChangeType.TextPr !== Type)
+                            || (StartPos.Compare(Change.get_StartPos()) >= 0
+                                && StartPos.Compare(Change.get_EndPos()) <= 0))
+                        {
+                            Change.put_XY(X, Y);
+                            editor.sync_AddRevisionsChange(Change);
+                        }
                     }
                 }
             }
@@ -9375,6 +9364,7 @@ Paragraph.prototype =
             this.private_AddPrChange();
             History.Add( this, { Type : historyitem_Paragraph_FramePr, Old : FramePr_old, New : undefined } );
             this.CompiledPr.NeedRecalc = true;
+            this.private_UpdateTrackRevisionOnChangeParaPr(true);
             return;
         }
 
@@ -9510,6 +9500,7 @@ Paragraph.prototype =
         this.private_AddPrChange();
         History.Add( this, { Type : historyitem_Paragraph_FramePr, Old : FramePr_old, New : this.Pr.FramePr } );
         this.CompiledPr.NeedRecalc = true;
+        this.private_UpdateTrackRevisionOnChangeParaPr(true);
     },
 
     Set_FramePr2 : function(FramePr)
@@ -9518,6 +9509,7 @@ Paragraph.prototype =
         History.Add( this, { Type : historyitem_Paragraph_FramePr, Old : this.Pr.FramePr, New : FramePr } );
         this.Pr.FramePr = FramePr;
         this.CompiledPr.NeedRecalc = true;
+        this.private_UpdateTrackRevisionOnChangeParaPr(true);
     },
 
     Set_FrameParaPr : function(Para)
@@ -9546,13 +9538,13 @@ Paragraph.prototype =
             var ParaPr = Para.Get_CompiledPr2(false).ParaPr;
             var Brd    = ParaPr.Brd;
 
-            var _X0 = X0 + ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
+            var _X0 = (undefined != Brd.Left && border_None != Brd.Left.Value ? Math.min(X0, X0 + ParaPr.Ind.Left, X0 + ParaPr.Ind.Left + ParaPr.Ind.FirstLine) : X0 + ParaPr.Ind.Left + ParaPr.Ind.FirstLine);
 
             if ( undefined != Brd.Left && border_None != Brd.Left.Value )
                 _X0 -= Brd.Left.Size + Brd.Left.Space + 1;
 
             if ( _X0 < X0 )
-                X0 = _X0
+                X0 = _X0;
 
             var _X1 = X1 - ParaPr.Ind.Right;
 
@@ -10079,6 +10071,11 @@ Paragraph.prototype =
     // Присоединяем контент параграфа Para к текущему параграфу
     Concat : function(Para)
     {
+        //var UpdateSelection = (true == this.Selection.Use || true === Para.Selection.Use);
+
+        //var Para1SelectionStartPos =
+
+
         this.DeleteCommentOnRemove = false;
         Para.DeleteCommentOnRemove = false;
 
@@ -10193,7 +10190,7 @@ Paragraph.prototype =
                     this.Pr.NumPr = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10202,7 +10199,7 @@ Paragraph.prototype =
                 this.Pr.Jc = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10214,7 +10211,7 @@ Paragraph.prototype =
                 this.Pr.Ind.FirstLine = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10226,7 +10223,7 @@ Paragraph.prototype =
                 this.Pr.Ind.Left = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10238,7 +10235,7 @@ Paragraph.prototype =
                 this.Pr.Ind.Right = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10247,7 +10244,7 @@ Paragraph.prototype =
                 this.Pr.ContextualSpacing = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10256,7 +10253,7 @@ Paragraph.prototype =
                 this.Pr.KeepLines = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10265,7 +10262,7 @@ Paragraph.prototype =
                 this.Pr.KeepNext = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10274,7 +10271,7 @@ Paragraph.prototype =
                 this.Pr.PageBreakBefore = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10286,7 +10283,7 @@ Paragraph.prototype =
                 this.Pr.Spacing.Line = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10298,7 +10295,7 @@ Paragraph.prototype =
                 this.Pr.Spacing.LineRule = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10310,7 +10307,7 @@ Paragraph.prototype =
                 this.Pr.Spacing.Before = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10322,7 +10319,7 @@ Paragraph.prototype =
                 this.Pr.Spacing.After = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10334,7 +10331,7 @@ Paragraph.prototype =
                 this.Pr.Spacing.AfterAutoSpacing = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10346,7 +10343,7 @@ Paragraph.prototype =
                 this.Pr.Spacing.BeforeAutoSpacing = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10359,7 +10356,7 @@ Paragraph.prototype =
                     this.Pr.Shd.Value = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10372,7 +10369,7 @@ Paragraph.prototype =
                     this.Pr.Shd.Color = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10385,7 +10382,7 @@ Paragraph.prototype =
                     this.Pr.Shd.Unifill = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10394,7 +10391,7 @@ Paragraph.prototype =
                 this.Pr.Shd = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10403,7 +10400,7 @@ Paragraph.prototype =
                 this.Pr.WidowControl = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10412,7 +10409,7 @@ Paragraph.prototype =
                 this.Pr.Tabs = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10426,7 +10423,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 this.Recalc_RunsCompiledPr();
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10453,7 +10450,7 @@ Paragraph.prototype =
                 this.Pr.Brd.Between = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10462,7 +10459,7 @@ Paragraph.prototype =
                 this.Pr.Brd.Bottom = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10471,7 +10468,7 @@ Paragraph.prototype =
                 this.Pr.Brd.Left = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10480,7 +10477,7 @@ Paragraph.prototype =
                 this.Pr.Brd.Right = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10489,7 +10486,7 @@ Paragraph.prototype =
                 this.Pr.Brd.Top = Data.Old;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10502,7 +10499,7 @@ Paragraph.prototype =
                     this.Pr = new CParaPr();
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10510,6 +10507,7 @@ Paragraph.prototype =
             {
                 this.Pr.Bullet = Data.Old;
                 this.CompiledPr.NeedRecalc = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10518,6 +10516,7 @@ Paragraph.prototype =
                 this.Pr.Lvl = Data.Old;
                 this.CompiledPr.NeedRecalc = true;
                 this.Recalc_RunsCompiledPr();
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10525,6 +10524,7 @@ Paragraph.prototype =
             {
                 this.Pr.FramePr = Data.Old;
                 this.CompiledPr.NeedRecalc = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10537,7 +10537,16 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_PrChange:
             {
-                this.Pr.PrChange = Data.Old;
+                this.Pr.PrChange   = Data.Old.PrChange;
+                this.Pr.ReviewInfo = Data.Old.ReviewInfo;
+                this.private_UpdateTrackRevisions();
+                break;
+            }
+
+            case historyitem_Paragraph_PrReviewInfo:
+            {
+                this.Pr.ReviewInfo = Data.Old;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
         }
@@ -10584,7 +10593,7 @@ Paragraph.prototype =
                     this.Pr.NumPr = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10593,7 +10602,7 @@ Paragraph.prototype =
                 this.Pr.Jc = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10605,7 +10614,7 @@ Paragraph.prototype =
                 this.Pr.Ind.FirstLine = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10617,7 +10626,7 @@ Paragraph.prototype =
                 this.Pr.Ind.Left = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10629,7 +10638,7 @@ Paragraph.prototype =
                 this.Pr.Ind.Right = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10638,7 +10647,7 @@ Paragraph.prototype =
                 this.Pr.ContextualSpacing = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10647,7 +10656,7 @@ Paragraph.prototype =
                 this.Pr.KeepLines = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10656,7 +10665,7 @@ Paragraph.prototype =
                 this.Pr.KeepNext = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10665,7 +10674,7 @@ Paragraph.prototype =
                 this.Pr.PageBreakBefore = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10677,7 +10686,7 @@ Paragraph.prototype =
                 this.Pr.Spacing.Line = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10689,7 +10698,7 @@ Paragraph.prototype =
                 this.Pr.Spacing.LineRule = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10701,7 +10710,7 @@ Paragraph.prototype =
                 this.Pr.Spacing.Before = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10713,7 +10722,7 @@ Paragraph.prototype =
                 this.Pr.Spacing.After = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10725,7 +10734,7 @@ Paragraph.prototype =
                 this.Pr.Spacing.AfterAutoSpacing = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10737,7 +10746,7 @@ Paragraph.prototype =
                 this.Pr.Spacing.BeforeAutoSpacing = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10750,7 +10759,7 @@ Paragraph.prototype =
                     this.Pr.Shd.Value = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10763,7 +10772,7 @@ Paragraph.prototype =
                     this.Pr.Shd.Color = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
             case historyitem_Paragraph_Shd_Unifill:
@@ -10775,6 +10784,7 @@ Paragraph.prototype =
                     this.Pr.Shd.Unifill = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10784,7 +10794,7 @@ Paragraph.prototype =
                 this.Pr.Shd = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10794,7 +10804,7 @@ Paragraph.prototype =
                 this.Pr.WidowControl = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10803,7 +10813,7 @@ Paragraph.prototype =
                 this.Pr.Tabs = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10817,7 +10827,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 this.Recalc_RunsCompiledPr();
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10844,7 +10854,7 @@ Paragraph.prototype =
                 this.Pr.Brd.Between = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10853,7 +10863,7 @@ Paragraph.prototype =
                 this.Pr.Brd.Bottom = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10862,7 +10872,7 @@ Paragraph.prototype =
                 this.Pr.Brd.Left = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10871,7 +10881,7 @@ Paragraph.prototype =
                 this.Pr.Brd.Right = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10880,7 +10890,7 @@ Paragraph.prototype =
                 this.Pr.Brd.Top = Data.New;
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10893,7 +10903,7 @@ Paragraph.prototype =
                     this.Pr = new CParaPr();
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10901,6 +10911,7 @@ Paragraph.prototype =
             {
                 this.Pr.Bullet = Data.New;
                 this.CompiledPr.NeedRecalc = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10909,6 +10920,7 @@ Paragraph.prototype =
                 this.Pr.Lvl = Data.New;
                 this.CompiledPr.NeedRecalc = true;
                 this.Recalc_RunsCompiledPr();
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10916,6 +10928,7 @@ Paragraph.prototype =
             {
                 this.Pr.FramePr = Data.New;
                 this.CompiledPr.NeedRecalc = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -10928,7 +10941,16 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_PrChange:
             {
-                this.Pr.PrChange = Data.New;
+                this.Pr.PrChange   = Data.New.PrChange;
+                this.Pr.ReviewInfo = Data.New.ReviewInfo;
+                this.private_UpdateTrackRevisions();
+                break;
+            }
+
+            case historyitem_Paragraph_PrReviewInfo:
+            {
+                this.Pr.ReviewInfo = Data.New;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
         }
@@ -11468,7 +11490,34 @@ Paragraph.prototype =
             case historyitem_Paragraph_PrChange:
             {
                 // Bool : is undefined ?
-                // false -> ParaPr
+                // false -> PrChange
+                // Bool : is undefined ?
+                // false -> ReviewInfo
+
+                if (undefined === Data.New.PrChange)
+                    Writer.WriteBool(true);
+                else
+                {
+                    Writer.WriteBool(false);
+                    Data.New.PrChange.Write_ToBinary(Writer);
+                }
+
+                if (undefined === Data.New.ReviewInfo)
+                    Writer.WriteBool(true);
+                else
+                {
+                    Writer.WriteBool(false);
+                    Data.New.ReviewInfo.Write_ToBinary(Writer);
+                }
+
+                break;
+            }
+
+            case historyitem_Paragraph_PrReviewInfo:
+            {
+                // Bool : is undefined ?
+                // false -> ReviewInfo
+
                 if (undefined === Data.New)
                     Writer.WriteBool(true);
                 else
@@ -11582,7 +11631,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11600,7 +11649,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11621,6 +11670,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11641,6 +11691,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11661,6 +11712,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11678,6 +11730,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11695,6 +11748,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11712,6 +11766,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11729,6 +11784,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11749,6 +11805,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11769,6 +11826,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11789,6 +11847,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11809,6 +11868,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11829,6 +11889,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11849,6 +11910,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11870,6 +11932,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11893,6 +11956,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11911,6 +11975,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11930,6 +11995,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11947,6 +12013,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11966,6 +12033,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -11984,6 +12052,7 @@ Paragraph.prototype =
                 this.CompiledPr.NeedRecalc = true;
                 this.Recalc_RunsCompiledPr();
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -12028,6 +12097,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -12047,6 +12117,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -12066,6 +12137,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -12085,6 +12157,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -12104,6 +12177,7 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -12120,7 +12194,7 @@ Paragraph.prototype =
                 }
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -12137,6 +12211,7 @@ Paragraph.prototype =
                     this.Pr.Bullet = undefined;
                 }
                 this.CompiledPr.NeedRecalc = true;
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -12146,6 +12221,7 @@ Paragraph.prototype =
                 this.Pr.Lvl = Reader.GetLong();
                 this.CompiledPr.NeedRecalc = true;
                 this.Recalc_RunsCompiledPr();
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -12166,7 +12242,7 @@ Paragraph.prototype =
                 }
 
                 this.CompiledPr.NeedRecalc = true;
-
+                this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
 
@@ -12185,13 +12261,41 @@ Paragraph.prototype =
             case historyitem_Paragraph_PrChange:
             {
                 // Bool : is undefined ?
-                // false -> ParaPr
+                // false -> PrChange
+                // Bool : is undefined ?
+                // false -> ReviewInfo
 
                 if (false === Reader.GetBool())
                 {
                     this.Pr.PrChange = new CParaPr();
                     this.Pr.PrChange.Read_FromBinary(Reader);
                 }
+
+                if (false === Reader.GetBool())
+                {
+                    this.Pr.ReviewInfo = new CReviewInfo();
+                    this.Pr.ReviewInfo.Read_FromBinary(Reader);
+                }
+
+                this.private_UpdateTrackRevisions();
+                break;
+            }
+
+            case historyitem_Paragraph_PrReviewInfo:
+            {
+                // Bool : is undefined ?
+                // false -> ReviewInfo
+
+                if (false === Reader.GetBool())
+                {
+                    this.Pr.ReviewInfo = new CReviewInfo();
+                    this.Pr.ReviewInfo.Read_FromBinary(Reader);
+                }
+                else
+                {
+                    this.Pr.ReviewInfo = undefined;
+                }
+
                 break;
             }
         }
@@ -12930,20 +13034,33 @@ Paragraph.prototype.Have_PrChange = function()
 {
     return this.Pr.Have_PrChange();
 };
+Paragraph.prototype.Accept_PrChange = function()
+{
+    this.Remove_PrChange();
+};
+Paragraph.prototype.Reject_PrChange = function()
+{
+    if (true === this.Have_PrChange())
+    {
+        this.Set_Pr(this.Pr.PrChange);
+    }
+};
 Paragraph.prototype.Add_PrChange = function()
 {
     if (false === this.Have_PrChange())
     {
         this.Pr.Add_PrChange();
-        History.Add(this, {Type : historyitem_Paragraph_PrChange, New : this.Pr.PrChange, Old : undefined});
+        History.Add(this, {Type : historyitem_Paragraph_PrChange, New : {PrChange : this.Pr.PrChange, ReviewInfo : this.Pr.ReviewInfo}, Old : {PrChange : undefined, ReviewInfo : undefined}});
+        this.private_UpdateTrackRevisions();
     }
 };
 Paragraph.prototype.Remove_PrChange = function()
 {
     if (true === this.Have_PrChange())
     {
-        History.Add(this, {Type : historyitem_Paragraph_PrChange, New : undefined, Old : this.Pr.PrChange});
+        History.Add(this, {Type : historyitem_Paragraph_PrChange, New : {PrChange : undefined, ReviewInfo: undefined}, Old : {PrChange : this.Pr.PrChange, ReviewInfo : this.Pr.ReviewInfo}});
         this.Pr.Remove_PrChange();
+        this.private_UpdateTrackRevisions();
     }
 };
 Paragraph.prototype.private_AddPrChange = function()
@@ -12960,6 +13077,11 @@ Paragraph.prototype.Get_ReviewType = function()
 {
     var EndRun = this.Get_ParaEndRun();
     return EndRun.Get_ReviewType();
+};
+Paragraph.prototype.Get_ReviewInfo = function()
+{
+    var EndRun = this.Get_ParaEndRun();
+    return EndRun.ReviewInfo;
 };
 Paragraph.prototype.Get_ParaEndRun = function()
 {
@@ -12991,7 +13113,7 @@ Paragraph.prototype.Check_RevisionsChanges = function(RevisionsManager)
     var ParaId = this.Get_Id();
 
     var Change, StartPos, EndPos;
-    if (this.Have_PrChange())
+    if (true === this.Have_PrChange())
     {
         StartPos = this.Get_StartPos();
         EndPos   = this.Get_EndPos(true);
@@ -13001,10 +13123,14 @@ Paragraph.prototype.Check_RevisionsChanges = function(RevisionsManager)
         Change.put_EndPos(EndPos);
         Change.put_Type(c_oAscRevisionsChangeType.ParaPr);
         Change.put_Value("Change paragraph properties.");
+        Change.put_UserId(this.Pr.ReviewInfo.Get_UserId());
+        Change.put_UserName(this.Pr.ReviewInfo.Get_UserName());
+        Change.put_DateTime(this.Pr.ReviewInfo.Get_DateTime());
         RevisionsManager.Add_Change(ParaId, Change);
     }
 
     var ReviewType = this.Get_ReviewType();
+    var ReviewInfo = this.Get_ReviewInfo();
     if (reviewtype_Add == ReviewType)
     {
         StartPos = this.Get_EndPos(false);
@@ -13015,6 +13141,9 @@ Paragraph.prototype.Check_RevisionsChanges = function(RevisionsManager)
         Change.put_EndPos(EndPos);
         Change.put_Type(c_oAscRevisionsChangeType.ParaAdd);
         Change.put_Value("Add paragraph.");
+        Change.put_UserId(ReviewInfo.Get_UserId());
+        Change.put_UserName(ReviewInfo.Get_UserName());
+        Change.put_DateTime(ReviewInfo.Get_DateTime());
         RevisionsManager.Add_Change(ParaId, Change);
     }
     else if (reviewtype_Remove == ReviewType)
@@ -13022,59 +13151,119 @@ Paragraph.prototype.Check_RevisionsChanges = function(RevisionsManager)
         StartPos = this.Get_EndPos(false);
         EndPos   = this.Get_EndPos(true);
 
+
         Change = new CRevisionsChange();
         Change.put_StartPos(StartPos);
         Change.put_EndPos(EndPos);
         Change.put_Type(c_oAscRevisionsChangeType.ParaRem);
         Change.put_Value("Delete paragraph.");
+        Change.put_UserId(ReviewInfo.Get_UserId());
+        Change.put_UserName(ReviewInfo.Get_UserName());
+        Change.put_DateTime(ReviewInfo.Get_DateTime());
         RevisionsManager.Add_Change(ParaId, Change);
     }
 
-//        // Обновляем рецензирование
-//        if (false === this.Selection.Use)
-//        {
-//            var TextTransform = this.Get_ParentTextTransform();
-//            var PageIndex = 0;
-//            var _X = this.Pages[PageIndex].XLimit;
-//            var _Y = this.Pages[PageIndex].Y;
-//            var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( _X, _Y, this.Get_StartPage_Absolute() + (PageIndex - this.PageNum), TextTransform);
-//
-//            var X = Coords.X + 20;
-//            var Y = Coords.Y;
-//
-//
-//            var CurPos = this.Get_ParaContentPos(false, false);
-//            var Run = this.Get_ElementByPos(CurPos);
-//            if (para_Run === Run.Type)
-//            {
-//                if (true === Run.Have_PrChange())
-//                {
-//                    var Change = new CRevisionsChange();
-//                    Change.put_Type(c_oAscRevisionsChangeType.TextPr);
-//                    Change.put_Value("Change text properties.");
-//                    Change.put_XY(X, Y);
-//                    editor.sync_AddRevisionsChange(Change);
-//                }
-//
-//                var RunReviewType = Run.Get_ReviewType();
-//                if (reviewtype_Add == RunReviewType)
-//                {
-//                    var Change = new CRevisionsChange();
-//                    Change.put_Type(c_oAscRevisionsChangeType.TextAdd);
-//                    Change.put_Value("Add text.");
-//                    Change.put_XY(X, Y);
-//                    editor.sync_AddRevisionsChange(Change);
-//                }
-//                else if (reviewtype_Remove == RunReviewType)
-//                {
-//                    var Change = new CRevisionsChange();
-//                    Change.put_Type(c_oAscRevisionsChangeType.TextRem);
-//                    Change.put_Value("Delete text.");
-//                    Change.put_XY(X, Y);
-//                    editor.sync_AddRevisionsChange(Change);
-//                }
-//            }
-//        }
+    var Checker    = new CParagraphRevisionsChangesChecker(this, RevisionsManager);
+    var ContentPos = new CParagraphContentPos();
+    for (var CurPos = 0, Count = this.Content.length; CurPos < Count; CurPos++)
+    {
+        ContentPos.Update(CurPos, 0);
+        this.Content[CurPos].Check_RevisionsChanges(Checker, ContentPos, 1);
+    }
+
+    Checker.Flush_AddRemoveChange();
+    Checker.Flush_TextPrChange();
+};
+Paragraph.prototype.private_UpdateTrackRevisionOnChangeParaPr = function(bUpdateInfo)
+{
+    if (true === this.Have_PrChange())
+    {
+        this.private_UpdateTrackRevisions();
+
+        if (true === bUpdateInfo && this.LogicDocument && true === this.LogicDocument.Is_TrackRevisions())
+        {
+            var OldReviewInfo = this.Pr.ReviewInfo.Copy();
+            this.Pr.ReviewInfo.Update();
+            History.Add(this, {Type : historyitem_Paragraph_PrReviewInfo, Old : OldReviewInfo, New : this.Pr.ReviewInfo.Copy()});
+        }
+    }
+};
+Paragraph.prototype.private_UpdateTrackRevisions = function()
+{
+    if (this.LogicDocument && this.LogicDocument.Get_TrackRevisionsManager)
+    {
+        var RevisionsManager = this.LogicDocument.Get_TrackRevisionsManager();
+        RevisionsManager.Check_Paragraph(this);
+    }
+};
+Paragraph.prototype.Accept_RevisionChanges = function(Type, bAll)
+{
+    if (true === this.Selection.Use || true === bAll)
+    {
+        var StartPos = this.Selection.StartPos;
+        var EndPos   = this.Selection.EndPos;
+        if (StartPos > EndPos)
+        {
+            StartPos = this.Selection.EndPos;
+            EndPos   = this.Selection.StartPos;
+        }
+
+        if (true === bAll)
+        {
+            StartPos = 0;
+            EndPos   = this.Content.length - 1;
+        }
+
+        // TODO: Как переделаем ParaEnd переделать здесь
+        if (EndPos >= this.Content.length - 1)
+        {
+            EndPos = this.Content.length - 2;
+            if (true === bAll || undefined === Type || c_oAscRevisionsChangeType.TextPr === Type)
+                this.Content[this.Content.length - 1].Accept_PrChange();
+        }
+
+        // Начинаем с конца, потому что при выполнении данной фунцкции, количество элементов может изменяться
+        for (var CurPos = EndPos; CurPos >= StartPos; CurPos--)
+        {
+            if (this.Content[CurPos].Accept_RevisionChanges)
+                this.Content[CurPos].Accept_RevisionChanges(Type, bAll);
+        }
+    }
+};
+Paragraph.prototype.Reject_RevisionChanges = function(Type, bAll)
+{
+    if (true === this.Selection.Use)
+    {
+        var StartPos = this.Selection.StartPos;
+        var EndPos   = this.Selection.EndPos;
+        if (StartPos > EndPos)
+        {
+            StartPos = this.Selection.EndPos;
+            EndPos   = this.Selection.StartPos;
+        }
+
+        // TODO: Как переделаем ParaEnd переделать здесь
+        if (EndPos >= this.Content.length - 1)
+        {
+            EndPos = this.Content.length - 2;
+            if (true === bAll || undefined === Type || c_oAscRevisionsChangeType.TextPr === Type)
+                this.Content[this.Content.length - 1].Reject_PrChange();
+        }
+
+        // Начинаем с конца, потому что при выполнении данной фунцкции, количество элементов может изменяться
+        for (var CurPos = EndPos; CurPos >= StartPos; CurPos--)
+        {
+            if (this.Content[CurPos].Reject_RevisionChanges)
+                this.Content[CurPos].Reject_RevisionChanges(Type, bAll);
+        }
+    }
+};
+Paragraph.prototype.Is_SelectedAll = function()
+{
+    var bStart = this.Selection_IsFromStart();
+    var bEnd   = this.Selection_CheckParaEnd();
+
+    return ((true === bStart && true === bEnd) || true === this.ApplyToAll ? true : false);
 };
 
 var pararecalc_0_All  = 0;
@@ -14097,3 +14286,142 @@ function CParagraphTabsCounter()
     this.Count = 0;
     this.Pos   = [];
 }
+
+function CParagraphRevisionsChangesChecker(Para, RevisionsManager)
+{
+    this.ParaId           = Para.Get_Id();
+    this.RevisionsManager = RevisionsManager;
+
+    // Блок информации для добавления/удаления текста
+    this.AddRemove =
+    {
+        ChangeType : null,
+        StartPos   : null,
+        EndPos     : null,
+        Value      : "",
+        UserId     : "",
+        UserName   : "",
+        DateTime   : 0
+    };
+
+    // Блок информации для сбора изменений настроек текста
+    this.TextPr =
+    {
+        Pr       : null,
+        StartPos : null,
+        EndPos   : null,
+        UserId   : "",
+        UserName : "",
+        DateTime : 0
+    };
+}
+CParagraphRevisionsChangesChecker.prototype.Flush_AddRemoveChange = function()
+{
+    var AddRemove = this.AddRemove;
+    if (reviewtype_Add === AddRemove.ChangeType || reviewtype_Remove === AddRemove.ChangeType)
+    {
+        var Change = new CRevisionsChange();
+        Change.put_Type(reviewtype_Add === AddRemove.ChangeType ? c_oAscRevisionsChangeType.TextAdd : c_oAscRevisionsChangeType.TextRem);
+        Change.put_Value(AddRemove.Value);
+        Change.put_StartPos(AddRemove.StartPos);
+        Change.put_EndPos(AddRemove.EndPos);
+        Change.put_UserId(AddRemove.UserId);
+        Change.put_UserName(AddRemove.UserName);
+        Change.put_DateTime(AddRemove.DateTime);
+        this.RevisionsManager.Add_Change(this.ParaId, Change);
+    }
+
+    AddRemove.ChangeType = null;
+    AddRemove.StartPos   = null;
+    AddRemove.EndPos     = null;
+    AddRemove.Value      = "";
+    AddRemove.UserId     = "";
+    AddRemove.UserName   = "";
+    AddRemove.DateTime   = 0;
+};
+CParagraphRevisionsChangesChecker.prototype.Flush_TextPrChange = function()
+{
+    var TextPr = this.TextPr;
+    if (null !== TextPr.Pr)
+    {
+        var Change = new CRevisionsChange();
+        Change.put_Type(c_oAscRevisionsChangeType.TextPr);
+
+        // TODO: Доделать put_Value
+        Change.put_Value(TextPr.Pr.Get_Description());
+
+        Change.put_StartPos(TextPr.StartPos);
+        Change.put_EndPos(TextPr.EndPos);
+        Change.put_UserId(TextPr.UserId);
+        Change.put_UserName(TextPr.UserName);
+        Change.put_DateTime(TextPr.DateTime);
+        this.RevisionsManager.Add_Change(this.ParaId, Change);
+    }
+
+    TextPr.Pr       = null;
+    TextPr.StartPos = null;
+    TextPr.EndPos   = null;
+    TextPr.UserId   = "";
+    TextPr.UserName = "";
+    TextPr.DateTime = 0;
+
+};
+CParagraphRevisionsChangesChecker.prototype.Get_AddRemoveType = function()
+{
+    return this.AddRemove.ChangeType;
+};
+CParagraphRevisionsChangesChecker.prototype.Start_AddRemove = function(ChangeType, ContentPos)
+{
+    this.AddRemove.ChangeType = ChangeType;
+    this.AddRemove.StartPos   = ContentPos.Copy();
+    this.AddRemove.EndPos     = ContentPos.Copy();
+    this.AddRemove.Value      = "";
+};
+CParagraphRevisionsChangesChecker.prototype.Set_AddRemoveEndPos = function(ContentPos)
+{
+    this.AddRemove.EndPos = ContentPos.Copy();
+};
+CParagraphRevisionsChangesChecker.prototype.Update_AddRemoveReviewInfo = function(ReviewInfo)
+{
+    if (ReviewInfo && this.AddRemove.DateTime <= ReviewInfo.Get_DateTime())
+    {
+        this.AddRemove.UserId   = ReviewInfo.Get_UserId();
+        this.AddRemove.UserName = ReviewInfo.Get_UserName();
+        this.AddRemove.DateTime = ReviewInfo.Get_DateTime();
+    }
+};
+CParagraphRevisionsChangesChecker.prototype.Add_Text = function(Text)
+{
+    this.AddRemove.Value += Text;
+};
+CParagraphRevisionsChangesChecker.prototype.Have_PrChange = function()
+{
+    return (null === this.TextPr.Pr ? false : true);
+};
+CParagraphRevisionsChangesChecker.prototype.Compare_PrChange = function(PrChange)
+{
+    if (null === this.TextPr.Pr)
+        return false;
+
+    return this.TextPr.Pr.Is_Equal(PrChange);
+};
+CParagraphRevisionsChangesChecker.prototype.Start_PrChange = function(Pr, ContentPos)
+{
+    this.TextPr.Pr = Pr;
+    this.TextPr.StartPos = ContentPos.Copy();
+    this.TextPr.EndPos   = ContentPos.Copy();
+};
+CParagraphRevisionsChangesChecker.prototype.Set_PrChangeEndPos = function(ContentPos)
+{
+    this.TextPr.EndPos = ContentPos.Copy();
+};
+CParagraphRevisionsChangesChecker.prototype.Update_PrChangeReviewInfo = function(ReviewInfo)
+{
+    if (ReviewInfo && this.TextPr.DateTime <= ReviewInfo.Get_DateTime())
+    {
+        this.TextPr.UserId   = ReviewInfo.Get_UserId();
+        this.TextPr.UserName = ReviewInfo.Get_UserName();
+        this.TextPr.DateTime = ReviewInfo.Get_DateTime();
+    }
+
+};

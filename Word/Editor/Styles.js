@@ -7611,10 +7611,10 @@ CTextPr.prototype =
         
         TextPr.Vanish     = this.Vanish;
 
-        if (true === bCopyPrChange)
+        if (true === bCopyPrChange && undefined !== this.PrChange)
         {
-            if (undefined !== this.PrChange)
-                TextPr.PrChange = this.PrChange.Copy();
+            TextPr.PrChange   = this.PrChange.Copy();
+            TextPr.ReviewInfo = this.ReviewInfo.Copy();
         }
         if(undefined != this.TextOutline)
         {
@@ -8645,12 +8645,199 @@ CTextPr.prototype =
 
     Add_PrChange : function()
     {
-        this.PrChange = this.Copy();
+        this.PrChange   = this.Copy();
+        this.ReviewInfo = new CReviewInfo();
+        this.ReviewInfo.Update();
     },
 
     Remove_PrChange : function()
     {
         delete this.PrChange;
+        delete this.ReviewInfo;
+    },
+
+    Get_DiffPrChange : function()
+    {
+        var TextPr = new CTextPr();
+
+        if (false === this.Have_PrChange())
+            return TextPr;
+
+        var PrChange = this.PrChange;
+        if (this.Bold !== PrChange.Bold)
+            TextPr.Bold = this.Bold;
+
+        if (this.Italic !== PrChange.Italic)
+            TextPr.Italic = this.Italic;
+
+        if (this.Strikeout !== PrChange.Strikeout)
+            TextPr.Strikeout = this.Strikeout;
+
+        if (this.Underline !== PrChange.Underline)
+            TextPr.Underline = this.Underline;
+
+        if (undefined !== this.FontFamily && (undefined === PrChange.FontFamily || this.FontFamily.Name !== PrChange.FontFamily.Name))
+            TextPr.FontFamily = {Name : this.FontFamily.Name, Index : -1};
+
+        if (undefined !== this.FontSize && (undefined === PrChange.FontSize || Math.abs(this.FontSize - PrChange.FontSize) >= 0.001))
+            TextPr.FontSize = this.FontSize;
+
+        if (undefined !== this.Color && (undefined === PrChange.Color || true !== this.Color.Compare(PrChange.Color)))
+            TextPr.Color = this.Color.Copy();
+
+        if (this.VertAlign !== PrChange.VertAlign)
+            TextPr.VertAlign = this.VertAlign;
+
+        if (highlight_None === this.HighLight)
+        {
+            if (highlight_None !== PrChange.HighLight)
+                TextPr.HighLight = highlight_None;
+        }
+        else if (undefined !== this.HighLight)
+        {
+            if (undefined === PrChange.HighLight || highlight_None === PrChange.HighLight || true !== this.HighLight.Compare(PrChange.HighLight))
+                TextPr.HighLight = this.HighLight.Copy();
+        }
+
+        if (this.RStyle !== PrChange.RStyle)
+            TextPr.RStyle = this.RStyle;
+
+        if (undefined !== this.Spacing && (undefined === PrChange.Spacing || Math.abs(this.Spacing - PrChange.Spacing) >= 0.001))
+            TextPr.Spacing = this.Spacing;
+
+        if (this.DStrikeout !== PrChange.DStrikeout)
+            TextPr.DStrikeout = this.DStrikeout;
+
+        if (this.Caps !== PrChange.Caps)
+            TextPr.Caps = this.Caps;
+
+        if (this.SmallCaps !== PrChange.SmallCaps)
+            TextPr.SmallCaps = this.SmallCaps;
+
+        if (undefined !== this.Position && (undefined === PrChange.Position || Math.abs(this.Position - PrChange.Position) >= 0.001))
+            TextPr.Position = this.Position;
+
+        if (undefined !== this.RFonts && (undefined === PrChange.RFonts || true !== this.RFonts.Is_Equal(TextPr.RFonts)))
+            TextPr.RFonts = this.RFonts.Copy();
+
+        if (this.BoldCS !== PrChange.BoldCS)
+            TextPr.BoldCS = this.BoldCS;
+
+        if (this.ItalicCS !== PrChange.ItalicCS)
+            TextPr.ItalicCS = this.ItalicCS;
+
+        if (undefined !== this.FontSizeCS && (undefined === PrChange.FontSizeCS || Math.abs(this.FontSizeCS - PrChange.FontSizeCS) >= 0.001))
+            TextPr.FontSizeCS = this.FontSizeCS;
+
+        if (this.CS !== PrChange.CS)
+            TextPr.CS = this.CS;
+
+        if (this.RTL !== PrChange.RTL)
+            TextPr.RTL = this.RTL;
+
+        if (undefined !== this.Lang && (undefined === PrChange.Lang || true !== this.Lang.Is_Equal(PrChange.Lang)))
+            TextPr.Lang = this.Lang.Copy();
+
+        if (undefined !== this.Unifill && (undefined === PrChange.Unifill || true !== this.Unifill.IsIdentical(PrChange.Unifill)))
+            TextPr.Unifill = this.Unifill.createDuplicate();
+
+        if (undefined !== this.TextOutline && (undefined === PrChange.TextOutline || true !== this.TextOutline.IsIdentical(PrChange.TextOutline)))
+            TextPr.TextOutline = this.TextOutline.createDublicate();
+
+        if (undefined !== this.TextFill && (undefined === PrChange.TextFill || true !== this.TextFill.IsIdentical(PrChange.TextFill)))
+            TextPr.TextFill = this.TextFill.createDublicate();
+
+        if (this.Vanish !== PrChange.Vanish)
+            TextPr.Vanish = this.Vanish;
+
+        return TextPr;
+    },
+
+    Get_Description : function()
+    {
+        var Description = "Text formatting: ";
+
+        if (undefined !== this.Bold)
+            Description += this.Bold ? "Bold; " : "No Bold; ";
+
+        if (undefined !== this.Italic)
+            Description += this.Italic ? "Italic; " : "No Italic; ";
+
+        if (undefined !== this.Strikeout)
+            Description += this.Strikeout ? "Strikeout; " : "No Strikeout; ";
+
+        if (undefined !== this.DStrikeout)
+            Description += this.DStrikeout ? "Double Strikeout; " : "No Double Strikeout; ";
+
+        if (undefined !== this.FontSize)
+            Description += this.FontSize + "FontSize; ";
+
+//        if (undefined !== this.Color && (undefined === PrChange.Color || true !== this.Color.Compare(PrChange.Color)))
+//            TextPr.Color = this.Color.Copy();
+//
+//        if (this.VertAlign !== PrChange.VertAlign)
+//            TextPr.VertAlign = this.VertAlign;
+//
+//        if (highlight_None === this.HighLight)
+//        {
+//            if (highlight_None !== PrChange.HighLight)
+//                TextPr.HighLight = highlight_None;
+//        }
+//        else if (undefined !== this.HighLight)
+//        {
+//            if (undefined === PrChange.HighLight || highlight_None === PrChange.HighLight || true !== this.HighLight.Compare(PrChange.HighLight))
+//                TextPr.HighLight = this.HighLight.Copy();
+//        }
+//
+//        if (this.RStyle !== PrChange.RStyle)
+//            TextPr.RStyle = this.RStyle;
+//
+//        if (undefined !== this.Spacing && (undefined === PrChange.Spacing || Math.abs(this.Spacing - PrChange.Spacing) >= 0.001))
+//            TextPr.Spacing = this.Spacing;
+//
+//        if (this.Caps !== PrChange.Caps)
+//            TextPr.Caps = this.Caps;
+//
+//        if (this.SmallCaps !== PrChange.SmallCaps)
+//            TextPr.SmallCaps = this.SmallCaps;
+//
+//        if (undefined !== this.Position && (undefined === PrChange.Position || Math.abs(this.Position - PrChange.Position) >= 0.001))
+//            TextPr.Position = this.Position;
+//
+//        if (undefined !== this.RFonts && (undefined === PrChange.RFonts || true !== this.RFonts.Is_Equal(TextPr.RFonts)))
+//            TextPr.RFonts = this.RFonts.Copy();
+//
+//        if (this.BoldCS !== PrChange.BoldCS)
+//            TextPr.BoldCS = this.BoldCS;
+//
+//        if (this.ItalicCS !== PrChange.ItalicCS)
+//            TextPr.ItalicCS = this.ItalicCS;
+//
+//        if (undefined !== this.FontSizeCS && (undefined === PrChange.FontSizeCS || Math.abs(this.FontSizeCS - PrChange.FontSizeCS) >= 0.001))
+//            TextPr.FontSizeCS = this.FontSizeCS;
+//
+//        if (this.CS !== PrChange.CS)
+//            TextPr.CS = this.CS;
+//
+//        if (this.RTL !== PrChange.RTL)
+//            TextPr.RTL = this.RTL;
+//
+//        if (undefined !== this.Lang && (undefined === PrChange.Lang || true !== this.Lang.Is_Equal(PrChange.Lang)))
+//            TextPr.Lang = this.Lang.Copy();
+//
+//        if (undefined !== this.Unifill && (undefined === PrChange.Unifill || true !== this.Unifill.IsIdentical(PrChange.Unifill)))
+//            TextPr.Unifill = this.Unifill.createDuplicate();
+//
+//        if (undefined !== this.TextOutline && (undefined === PrChange.TextOutline || true !== this.TextOutline.IsIdentical(PrChange.TextOutline)))
+//            TextPr.TextOutline = this.TextOutline.createDublicate();
+//
+//        if (undefined !== this.TextFill && (undefined === PrChange.TextFill || true !== this.TextFill.IsIdentical(PrChange.TextFill)))
+//            TextPr.TextFill = this.TextFill.createDublicate();
+//
+//        if (this.Vanish !== PrChange.Vanish)
+//            TextPr.Vanish = this.Vanish;
+
+        return Description;
     }
 };
 
@@ -9532,7 +9719,10 @@ CParaPr.prototype =
             ParaPr.Lvl = this.Lvl;
 
         if (true === bCopyPrChange && undefined !== this.PrChange)
-            ParaPr.PrChange = this.PrChange.Copy();
+        {
+            ParaPr.PrChange   = this.PrChange.Copy();
+            ParaPr.ReviewInfo = this.ReviewInfo.Copy();
+        }
 
         return ParaPr;
     },
@@ -10259,11 +10449,14 @@ CParaPr.prototype =
     Add_PrChange : function()
     {
         this.PrChange = this.Copy();
+        this.ReviewInfo = new CReviewInfo();
+        this.ReviewInfo.Update();
     },
 
     Remove_PrChange : function()
     {
         delete this.PrChange;
+        delete this.ReviewInfo;
     }
 }
 

@@ -2618,6 +2618,19 @@ ParaMath.prototype.Correct_AfterConvertFromEquation = function()
     //this.Root.Correct_AfterConvertFromEquation();
 };
 
+ParaMath.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth)
+{
+    // TODO: Реализовать
+};
+ParaMath.prototype.Accept_RevisionChanges = function(Type, bAll)
+{
+    // TODO: Реализовать
+};
+ParaMath.prototype.Reject_RevisionChanges = function(Type, bAll)
+{
+    // TODO: Реализовать
+};
+
 //----------------------------------------------------------------------------------------------------------------------
 // Классы с изменениями
 //----------------------------------------------------------------------------------------------------------------------

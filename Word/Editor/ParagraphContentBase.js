@@ -2001,6 +2001,10 @@ CParagraphContentWithParagraphLikeContent.prototype.Selection_CorrectLeftPos = f
 
     return true;
 };
+CParagraphContentWithParagraphLikeContent.prototype.Is_SelectionUse = function()
+{
+    return this.State.Selection.Use;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Spelling
 //----------------------------------------------------------------------------------------------------------------------
@@ -2160,6 +2164,55 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_ReviewType = function(Re
         }
         else if (Element.Set_ReviewType)
             Element.Set_ReviewType(ReviewType);
+    }
+};
+CParagraphContentWithParagraphLikeContent.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth)
+{
+    for (var CurPos = 0, Count = this.Content.length; CurPos < Count; CurPos++)
+    {
+        ContentPos.Update(CurPos, Depth);
+        this.Content[CurPos].Check_RevisionsChanges(Checker, ContentPos, Depth + 1);
+    }
+
+};
+CParagraphContentWithParagraphLikeContent.prototype.Accept_RevisionChanges = function(Type, bAll)
+{
+    if (true === this.Selection.Use)
+    {
+        var StartPos = this.Selection.StartPos;
+        var EndPos   = this.Selection.EndPos;
+        if (StartPos > EndPos)
+        {
+            StartPos = this.Selection.EndPos;
+            EndPos   = this.Selection.StartPos;
+        }
+
+        // Начинаем с конца, потому что при выполнении данной функции, количество элементов может изменяться
+        for (var CurPos = EndPos; CurPos >= StartPos; CurPos--)
+        {
+            if (this.Content[CurPos].Accept_RevisionChanges)
+                this.Content[CurPos].Accept_RevisionChanges(Type, bAll);
+        }
+    }
+};
+CParagraphContentWithParagraphLikeContent.prototype.Reject_RevisionChanges = function(Type, bAll)
+{
+    if (true === this.Selection.Use)
+    {
+        var StartPos = this.Selection.StartPos;
+        var EndPos   = this.Selection.EndPos;
+        if (StartPos > EndPos)
+        {
+            StartPos = this.Selection.EndPos;
+            EndPos   = this.Selection.StartPos;
+        }
+
+        // Начинаем с конца, потому что при выполнении данной функции, количество элементов может изменяться
+        for (var CurPos = EndPos; CurPos >= StartPos; CurPos--)
+        {
+            if (this.Content[CurPos].Reject_RevisionChanges)
+                this.Content[CurPos].Reject_RevisionChanges(Type, bAll);
+        }
     }
 };
 //----------------------------------------------------------------------------------------------------------------------

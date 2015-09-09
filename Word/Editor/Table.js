@@ -8558,7 +8558,7 @@ CTable.prototype =
     Select_All : function()
     {
         this.Selection.Use      = true;
-        this.Selection.Start    = false
+        this.Selection.Start    = false;
         this.Selection.Type     = table_Selection_Cell;
         this.Selection.Type2    = table_Selection_Common;
 
@@ -16419,64 +16419,66 @@ CTable.prototype =
 
                 // Здесь мы должны рассчитать ячейки, которые попали в вертикальное объединение и из-за этого не были рассчитаны
                 var CellsCount2 = Merged_Cell.length;
-                for ( var TempCellIndex = 0; TempCellIndex < CellsCount2; TempCellIndex++ )
+                for (var TempCellIndex = 0; TempCellIndex < CellsCount2; TempCellIndex++)
                 {
-                    var Cell       = Merged_Cell[TempCellIndex];
-                    var CurCell    = Cell.Index;
-                    var GridSpan   = Cell.Get_GridSpan();
+                    var Cell = Merged_Cell[TempCellIndex];
+                    var CurCell = Cell.Index;
+                    var GridSpan = Cell.Get_GridSpan();
                     var CurGridCol = Cell.Metrics.StartGridCol;
 
                     // Возьмем верхнюю ячейку теккущего объединения
-                    Cell = this.Internal_Get_StartMergedCell( CurRow, CurGridCol, GridSpan );
+                    Cell = this.Internal_Get_StartMergedCell(CurRow, CurGridCol, GridSpan);
 
-                    var CellMar     = Cell.Get_Margins();
-                    var CellMetrics = Row.Get_CellInfo( CurCell );
+                    var CellMar = Cell.Get_Margins();
+                    var CellMetrics = Row.Get_CellInfo(CurCell);
 
                     var X_content_start = CellMetrics.X_content_start;
-                    var X_content_end   = CellMetrics.X_content_end;
+                    var X_content_end = CellMetrics.X_content_end;
 
+                    // Если в текущей строке на данной странице не убралось ничего из других ячеек, тогда
+                    // рассчитываем вертикально объединенные ячейки до начала данной строки.
                     var Y_content_start = Cell.Temp.Y;
-                    var Y_content_end   = this.Pages[CurPage].YLimit;
+                    var Y_content_end   = false === bContentOnFirstPage ? Y : this.Pages[CurPage].YLimit;
 
                     // TODO: При расчете YLimit для ячейки сделать учет толщины нижних
                     //       границ ячейки и таблицы
-                    if ( null != CellSpacing )
+                    if (null != CellSpacing)
                     {
-                        if ( this.Content.length - 1 === CurRow )
+                        if (this.Content.length - 1 === CurRow)
                             Y_content_end -= CellSpacing;
                         else
                             Y_content_end -= CellSpacing / 2;
                     }
 
-                    var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
+                    var VMergeCount = this.Internal_GetVertMergeCount(CurRow, CurGridCol, GridSpan);
                     var BottomMargin = this.MaxBotMargin[CurRow + VMergeCount - 1];
                     Y_content_end -= BottomMargin;
 
-                    if ( (0 === Cell.Row.Index && 0 === CurPage) || Cell.Row.Index > FirstRow  )
+                    if ((0 === Cell.Row.Index && 0 === CurPage) || Cell.Row.Index > FirstRow)
                     {
                         Cell.PagesCount = 1;
-                        Cell.Content.Set_StartPage( CurPage );
-                        Cell.Content.Reset( X_content_start, Y_content_start, X_content_end, Y_content_end );
+                        Cell.Content.Set_StartPage(CurPage);
+                        Cell.Content.Reset(X_content_start, Y_content_start, X_content_end, Y_content_end);
                     }
 
                     // Какие-то ячейки в строке могут быть не разбиты на строки, а какие то разбиты.
                     // Здесь контролируем этот момент, чтобы у тех, которые не разбиты не вызывать
                     // Recalculate_Page от несуществующих страниц.
                     var CellPageIndex = CurPage - Cell.Content.Get_StartPage_Relative();
-                    if ( CellPageIndex < Cell.PagesCount )
+                    if (CellPageIndex < Cell.PagesCount)
                     {
-                        if ( recalcresult2_NextPage === Cell.Content.Recalculate_Page( CellPageIndex, true ) )
+                        if (recalcresult2_NextPage === Cell.Content.Recalculate_Page(CellPageIndex, true))
                         {
                             Cell.PagesCount = Cell.Content.Pages.length + 1;
                             bNextPage = true;
                         }
 
-                        var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex, undefined, true );
+                        var CellContentBounds = Cell.Content.Get_PageBounds(CellPageIndex, undefined, true);
                         var CellContentBounds_Bottom = CellContentBounds.Bottom + BottomMargin;
 
-                        if ( 0 != CurRow && false === this.RowsInfo[CurRow].FirstPage )
+                        if (0 != CurRow && false === this.RowsInfo[CurRow].FirstPage)
                         {
-                            if ( this.TableRowsBottom[CurRow - 1][CurPage] < CellContentBounds_Bottom )
+                            if (this.TableRowsBottom[CurRow - 1][CurPage] < CellContentBounds_Bottom)
                             {
                                 // Поскольку мы правим настройку не текущей строки, надо подправить и
                                 // запись о рассчитанной высоте строки
@@ -16487,13 +16489,14 @@ CTable.prototype =
                         }
                         else
                         {
-                            if ( undefined === this.TableRowsBottom[CurRow][CurPage] || this.TableRowsBottom[CurRow][CurPage] < CellContentBounds_Bottom )
+                            if (undefined === this.TableRowsBottom[CurRow][CurPage] || this.TableRowsBottom[CurRow][CurPage] < CellContentBounds_Bottom)
                                 this.TableRowsBottom[CurRow][CurPage] = CellContentBounds_Bottom;
                         }
                     }
 
                     CurGridCol += GridSpan;
                 }
+
 
                 // Еще раз обновляем параметр, есть ли текст на первой странице
                 bContentOnFirstPage = false;
@@ -19719,6 +19722,65 @@ CTable.prototype.Get_SectPr = function()
     }
 
     return null;
+};
+CTable.prototype.Is_SelectedAll = function()
+{
+    if (true !== this.Selection.Use)
+        return false;
+
+    var ArrayPos = 0;
+    var SelectionArray = this.Selection.Data;
+    for (var CurRow = 0, RowsCount = this.Content.length; CurRow < RowsCount; CurRow++)
+    {
+        var Row = this.Content[CurRow];
+        for (var CurCell = 0, CellsCount = Row.Get_CellsCount(); CurCell < CellsCount; CurCell++, ArrayPos++)
+        {
+            if (ArrayPos >= SelectionArray.length)
+                return false;
+
+            var Pos = SelectionArray[ArrayPos];
+            if (Pos.Row !== CurRow || Pos.Cell !== CurCell)
+                return false;
+        }
+    }
+
+    return true;
+};
+CTable.prototype.Accept_RevisionChanges = function(Type, bAll)
+{
+    if (true === this.ApplyToAll || (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0))
+    {
+        var Cells_array = this.Internal_Get_SelectionArray();
+        for (var Index = 0, Count = Cells_array.length; Index < Count; Index++)
+        {
+            var Pos = Cells_array[Index];
+            var Row = this.Content[Pos.Row];
+            var Cell = Row.Get_Cell(Pos.Cell);
+            var Cell_Content = Cell.Content;
+
+            Cell.Content.Accept_RevisionChanges(Type, true);
+        }
+    }
+    else
+        return this.CurCell.Content.Accept_RevisionChanges(Type, bAll);
+};
+CTable.prototype.Reject_RevisionChanges = function(Type, bAll)
+{
+    if (true === this.ApplyToAll || (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0))
+    {
+        var Cells_array = this.Internal_Get_SelectionArray();
+        for (var Index = 0, Count = Cells_array.length; Index < Count; Index++)
+        {
+            var Pos = Cells_array[Index];
+            var Row = this.Content[Pos.Row];
+            var Cell = Row.Get_Cell(Pos.Cell);
+            var Cell_Content = Cell.Content;
+
+            Cell_Content.Reject_RevisionChanges(Type, true);
+        }
+    }
+    else
+        return this.CurCell.Content.Reject_RevisionChanges(Type, bAll);
 };
 
 

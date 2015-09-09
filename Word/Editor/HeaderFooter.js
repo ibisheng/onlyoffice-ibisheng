@@ -1144,6 +1144,10 @@ CHeaderFooter.prototype.Get_SectPr = function()
 
     return null;
 };
+CHeaderFooter.prototype.Set_ParagraphFramePr = function(FramePr, bDelete)
+{
+    return this.Content.Set_ParagraphFramePr(FramePr, bDelete);
+};
 
 //-----------------------------------------------------------------------------------
 // Класс для работы с колонтитулами
@@ -2327,6 +2331,21 @@ CHeaderFooterController.prototype.Get_StyleFromFormatting = function()
         return this.CurHdrFtr.Content.Get_StyleFromFormatting();
 
     return null;
+};
+CHeaderFooterController.prototype.Set_ParagraphFramePr = function(FramePr, bDelete)
+{
+    if (null !== this.CurHdrFtr)
+        this.CurHdrFtr.Set_ParagraphFramePr(FramePr, bDelete);
+};
+CHeaderFooterController.prototype.Accept_RevisionChanges = function(Type, bAll)
+{
+    if (null !== this.CurHdrFtr)
+        this.CurHdrFtr.Content.Accept_RevisionChanges(Type, bAll);
+};
+CHeaderFooterController.prototype.Reject_RevisionChanges = function(Type, bAll)
+{
+    if (null !== this.CurHdrFtr)
+        this.CurHdrFtr.Content.Reject_RevisionChanges(Type, bAll);
 };
 
 

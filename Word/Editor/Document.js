@@ -820,6 +820,7 @@ function CDocument(DrawingDocument)
 
     // Режим рецензирования
     this.TrackRevisions = false;
+    this.TrackRevisionsManager = new CTrackRevisionsManager(this);
 
     // Контролируем изменения интерфейса
     this.ChangedStyles = []; // Объект с Id стилями, которые были изменены/удалены/добавлены
@@ -7004,9 +7005,13 @@ CDocument.prototype =
 
     Set_ParagraphFramePr : function(FramePr, bDelete)
     {
-        if ( docpostype_HdrFtr === this.CurPos.Type || docpostype_DrawingObjects === this.CurPos.Type )
+        if (docpostype_HdrFtr === this.CurPos.Type)
         {
-            // Никуда, кроме обычного параграфа в верхнем классе CDocument, добавить рамку нельзя
+            this.HdrFtr.Set_ParagraphFramePr(FramePr, bDelete);
+        }
+        else if (docpostype_DrawingObjects === this.CurPos.Type)
+        {
+            // Не добавляем и не работаем с рамками в автофигурах
             return;
         }
         else //if ( docpostype_Content === this.CurPos.Type )
@@ -10332,27 +10337,19 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 189 && false === editor.isViewMode ) // Клавиша Num-
         {
-            if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+            if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) && true === e.CtrlKey && true === e.ShiftKey)
             {
                 this.Create_NewHistoryPoint(historydescription_Document_MinusButton);
 
                 this.DrawingDocument.TargetStart();
                 this.DrawingDocument.TargetShow();
 
-                var Item = null;
-                if ( true === e.CtrlKey && true === e.ShiftKey )
-                {
-                    Item = new ParaText(String.fromCharCode(0x2013));
-                    Item.Set_SpaceAfter(false);
-                }
-                else if ( true === e.ShiftKey )
-                    Item = new ParaText("_");
-                else
-                    Item = new ParaText("-");
+                var Item = new ParaText(String.fromCharCode(0x2013));
+                Item.Set_SpaceAfter(false);
 
-                this.Paragraph_Add( Item );
+                this.Paragraph_Add(Item);
+                bRetValue = true;
             }
-            bRetValue = true;
         }
         else if ( e.KeyCode == 190 && true === e.CtrlKey ) // Ctrl + .
         {
@@ -10388,11 +10385,6 @@ CDocument.prototype =
     OnKeyPress : function(e)
     {
         if ( true === editor.isViewMode )
-            return false;
-
-        //Ctrl и Atl только для команд, word не водит текста с зажатыми Ctrl или Atl
-        //команды полностью обрабатываются в keypress
-        if (e.CtrlKey || (e.AltKey && !AscBrowser.isMacOs))
             return false;
 
         var Code;
@@ -14566,6 +14558,10 @@ CDocument.prototype.Is_TrackRevisions = function()
 {
     return this.TrackRevisions;
 };
+CDocument.prototype.Get_TrackRevisionsManager = function()
+{
+    return this.TrackRevisionsManager;
+};
 CDocument.prototype.Start_SilentMode = function()
 {
     this.TurnOff_Recalculate();
@@ -14731,6 +14727,215 @@ CDocument.prototype.TurnOnHistory = function()
 CDocument.prototype.Get_SectPr = function(Index)
 {
     return this.SectionsInfo.Get_SectPr(Index).SectPr;
+};
+CDocument.prototype.Continue_TrackRevisions = function()
+{
+    this.TrackRevisionsManager.Continue_TrackRevisions();
+};
+CDocument.prototype.Get_NextRevisionChange = function()
+{
+
+};
+CDocument.prototype.Get_PrevRevisionChange = function()
+{
+
+};
+CDocument.prototype.Accept_RevisionChanges = function(Type, bAll)
+{
+    // Принимаем все изменения, которые попали в селект.
+    // Принимаем изменения в следующей последовательности:
+    // 1. Изменение настроек параграфа
+    // 2. Изменение настроек текста
+    // 3. Добавление/удаление текста
+    // 4. Добавление/удаление параграфа
+
+    if (docpostype_HdrFtr === this.CurPos.Type)
+    {
+        this.HdrFtr.Apply_RevisionChanges();
+    }
+    else if (docpostype_DrawingObjects === this.CurPos.Type)
+    {
+        // TODO: Реализовать
+        //this.DrawingObjects.Accept_RevisionChanges();
+    }
+    else //if (docpostype_Content === this.CurPos.Type)
+    {
+        if (true === this.Selection.Use)
+        {
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = this.Selection.EndPos;
+            if (StartPos > EndPos)
+            {
+                StartPos = this.Selection.EndPos;
+                EndPos   = this.Selection.StartPos;
+            }
+            var LastElement = this.Content[EndPos];
+            var LastParaEnd = (type_Paragraph === LastElement.Get_Type() && true === LastElement.Selection_CheckParaEnd() ? true : false);
+
+            if (undefined === Type)
+            {
+                for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+                {
+                    var Element = this.Content[CurPos];
+                    if (type_Paragraph === Element.Get_Type() && true === Element.Is_SelectedAll() && true === Element.Have_PrChange())
+                    {
+                        Element.Accept_PrChange();
+                    }
+                }
+
+                for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+                {
+                    var Element = this.Content[CurPos];
+                    Element.Accept_RevisionChanges(Type, bAll);
+                }
+
+                EndPos = (true === LastParaEnd ? EndPos : EndPos - 1);
+                for (var CurPos = EndPos; CurPos >= StartPos; CurPos--)
+                {
+                    var Element = this.Content[CurPos];
+                    if (type_Paragraph === Element.Get_Type())
+                    {
+                        var ReviewType = Element.Get_ReviewType();
+                        if (reviewtype_Add === ReviewType)
+                        {
+                            Element.Set_ReviewType(reviewtype_Common);
+                        }
+                        else if (reviewtype_Remove === ReviewType)
+                        {
+                            Element.Set_ReviewType(reviewtype_Common);
+                            this.Concat_Paragraphs(CurPos);
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            var CurPos = this.CurPos.ContentPos;
+
+        }
+    }
+
+    this.Recalculate();
+    this.Document_UpdateInterfaceState();
+    this.Document_UpdateSelectionState();
+};
+CDocument.prototype.Reject_RevisionChanges = function(Type, bAll)
+{
+    // Отменяем все изменения, которые попали в селект.
+    // Отменяем изменения в следующей последовательности:
+    // 1. Изменение настроек параграфа
+    // 2. Изменение настроек текста
+    // 3. Добавление/удаление текста
+    // 4. Добавление/удаление параграфа
+
+    if (docpostype_HdrFtr === this.CurPos.Type)
+    {
+        this.HdrFtr.Reject_RevisionChanges();
+    }
+    else if (docpostype_DrawingObjects === this.CurPos.Type)
+    {
+        // TODO: Реализовать
+        //this.DrawingObjects.Reject_RevisionChanges();
+    }
+    else //if (docpostype_Content === this.CurPos.Type)
+    {
+        if (true === this.Selection.Use)
+        {
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = this.Selection.EndPos;
+            if (StartPos > EndPos)
+            {
+                StartPos = this.Selection.EndPos;
+                EndPos   = this.Selection.StartPos;
+            }
+            var LastElement = this.Content[EndPos];
+            var LastParaEnd = (type_Paragraph === LastElement.Get_Type() && true === LastElement.Selection_CheckParaEnd() ? true : false);
+
+            if (undefined === Type)
+            {
+                for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+                {
+                    var Element = this.Content[CurPos];
+                    if (type_Paragraph === Element.Get_Type() && true === Element.Is_SelectedAll() && true === Element.Have_PrChange())
+                    {
+                        Element.Reject_PrChange();
+                    }
+                }
+
+                for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+                {
+                    var Element = this.Content[CurPos];
+                    Element.Reject_RevisionChanges(Type, bAll);
+                }
+
+                EndPos = (true === LastParaEnd ? EndPos : EndPos - 1);
+                for (var CurPos = EndPos; CurPos >= StartPos; CurPos--)
+                {
+                    var Element = this.Content[CurPos];
+                    if (type_Paragraph === Element.Get_Type())
+                    {
+                        var ReviewType = Element.Get_ReviewType();
+                        if (reviewtype_Add === ReviewType)
+                        {
+                            Element.Set_ReviewType(reviewtype_Common);
+                            this.Concat_Paragraphs(CurPos);
+                        }
+                        else if (reviewtype_Remove === ReviewType)
+                        {
+                            Element.Set_ReviewType(reviewtype_Common);
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            var CurPos = this.CurPos.ContentPos;
+
+        }
+    }
+
+    this.Recalculate();
+    this.Document_UpdateInterfaceState();
+    this.Document_UpdateSelectionState();
+};
+CDocument.prototype.Add_ToContent = function(Pos, Item)
+{
+    this.Internal_Content_Add(Pos, Item);
+};
+CDocument.prototype.Remove_FromContent = function(Pos, Count)
+{
+    this.Internal_Content_Remove(Pos, Count);
+};
+CDocument.prototype.Concat_Paragraphs = function(Pos)
+{
+    if (Pos < this.Content.length - 1 && type_Paragraph === this.Content[Pos].Get_Type() && type_Paragraph === this.Content[Pos + 1].Get_Type())
+    {
+        var Para1 = this.Content[Pos];
+        var Para2 = this.Content[Pos + 1];
+
+        var OldSelectionStartPos = this.Selection.StartPos;
+        var OldSelectionEndPos   = this.Selection.EndPos;
+
+        Para1.Concat(Para2);
+        this.Remove_FromContent(Pos + 1, 1);
+
+        if (OldSelectionStartPos === Pos + 1 && OldSelectionEndPos === Pos + 1)
+        {
+            this.Selection_Remove();
+            this.CurPos.ContentPos = Pos;
+            Para1.Cursor_MoveToStartPos(false);
+        }
+        else if (OldSelectionStartPos <= Pos + 1 && Pos + 1 <= OldSelectionEndPos)
+        {
+            this.Selection.EndPos--;
+        }
+        else if (OldSelectionEndPos <= Pos + 1 && Pos + 1 <= OldSelectionStartPos)
+        {
+            this.Selection.StartPos--;
+        }
+    }
 };
 //-----------------------------------------------------------------------------------
 //
@@ -15029,4 +15234,60 @@ function CDocumentCompareDrawingsLogicPositions(Drawing1, Drawing2)
     this.Drawing1 = Drawing1;
     this.Drawing2 = Drawing2;
     this.Result   = 0;
+};
+
+function CTrackRevisionsManager(LogicDocument)
+{
+    this.LogicDocument = LogicDocument;
+    this.CheckPara     = {}; // Параграфы, которые нужно проверить
+    this.Changes       = {}; // Объект с ключом - Id параграфа, в котором лежит массив изменений
+}
+
+CTrackRevisionsManager.prototype.Check_Paragraph = function(Para)
+{
+    var ParaId = Para.Get_Id();
+    if (undefined == this.CheckPara[ParaId])
+        this.CheckPara[ParaId] = 1;
+    else
+        this.CheckPara[ParaId]++;
+};
+CTrackRevisionsManager.prototype.Add_Change = function(ParaId, Change)
+{
+    if (undefined === this.Changes[ParaId])
+        this.Changes[ParaId] = [];
+
+    this.Changes[ParaId].push(Change);
+};
+CTrackRevisionsManager.prototype.Get_ParagraphChanges = function(ParaId)
+{
+    if (this.Changes[ParaId])
+        return this.Changes[ParaId];
+
+    return [];
+};
+CTrackRevisionsManager.prototype.Continue_TrackRevisions = function()
+{
+    var bNeedUpdate = false;
+    for (var ParaId in this.CheckPara)
+    {
+        delete this.CheckPara[ParaId];
+        var Para = g_oTableId.Get_ById(ParaId);
+        if (Para && Para.Is_UseInDocument())
+        {
+            delete this.Changes[ParaId];
+            Para.Check_RevisionsChanges(this);
+            bNeedUpdate = true;
+        }
+    }
+
+    if (bNeedUpdate)
+        this.LogicDocument.Document_UpdateInterfaceState();
+};
+CTrackRevisionsManager.prototype.Get_NextChange = function()
+{
+
+};
+CTrackRevisionsManager.prototype.Get_PrevChange = function()
+{
+
 };

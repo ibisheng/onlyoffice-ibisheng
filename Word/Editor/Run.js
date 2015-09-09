@@ -43,6 +43,7 @@ function ParaRun(Paragraph, bMathRun)
     this.SpellingMarks = [];
 
     this.ReviewType    = reviewtype_Common;
+    this.ReviewInfo    = new CReviewInfo();
     if (editor && !editor.isPresentationEditor && editor.WordControl && editor.WordControl.m_oLogicDocument && true === editor.WordControl.m_oLogicDocument.Is_TrackRevisions())
         this.ReviewType = reviewtype_Add;
 
@@ -798,6 +799,7 @@ ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
     }
 
     this.protected_UpdateSpellChecking();
+    this.private_UpdateTrackRevisionOnChangeContent(true);
 
     // Обновляем позиции меток совместного редактирования
     this.CollaborativeMarks.Update_OnAdd( Pos );
@@ -919,6 +921,7 @@ ParaRun.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
     }
 
     this.protected_UpdateSpellChecking();
+    this.private_UpdateTrackRevisionOnChangeContent(true);
 
     // Обновляем позиции меток совместного редактирования
     this.CollaborativeMarks.Update_OnRemove( Pos, Count );
@@ -933,6 +936,8 @@ ParaRun.prototype.Concat_ToContent = function(NewItems)
     this.Content = this.Content.concat( NewItems );
 
     History.Add( this, { Type : historyitem_ParaRun_AddItem, Pos : StartPos, EndPos : this.Content.length - 1, Items : NewItems, Color : false } );
+
+    this.private_UpdateTrackRevisionOnChangeContent(true);
 
     // Отмечаем, что надо перемерить элементы в данном ране
     this.RecalcInfo.Measure = true;
@@ -1382,6 +1387,10 @@ ParaRun.prototype.Split = function (ContentPos, Depth)
 
 ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
 {
+    // Если задается Parent и ParentPos, тогда ран автоматически добавляется в родительский класс
+    var UpdateParent    = (undefined !== Parent && undefined !== ParentPos && this === Parent.Content[ParentPos] ? true : false);
+    var UpdateSelection = (true === UpdateParent && true === Parent.Is_SelectionUse() && true === this.Is_SelectionUse() ? true : false);
+
     // Создаем новый ран
     var bMathRun = this.Type == para_Math_Run;
     var NewRun = new ParaRun(this.Paragraph, bMathRun);
@@ -1413,8 +1422,16 @@ ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
     if ( -1 !== CheckEndPos )
         CurPos = CheckEndPos;
 
-    // Если задается Parent и ParentPos, тогда ран автоматически добавляется в родительский класс
-    if (undefined !== Parent && undefined !== ParentPos && this === Parent.Content[ParentPos])
+    var ParentOldSelectionStartPos, ParentOldSelectionEndPos, OldSelectionStartPos, OldSelectionEndPos;
+    if (true === UpdateSelection)
+    {
+        ParentOldSelectionStartPos = Parent.Selection.StartPos;
+        ParentOldSelectionEndPos   = Parent.Selection.EndPos;
+        OldSelectionStartPos = this.Selection.StartPos;
+        OldSelectionEndPos   = this.Selection.EndPos;
+    }
+
+    if (true === UpdateParent)
     {
         Parent.Add_ToContent(ParentPos + 1, NewRun);
 
@@ -1482,8 +1499,32 @@ ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
         }
     }
 
+    if (true === UpdateSelection)
+    {
+        if (ParentOldSelectionStartPos <= ParentPos && ParentPos <= ParentOldSelectionEndPos)
+            Parent.Selection.EndPos = ParentOldSelectionEndPos + 1;
+        else if (ParentOldSelectionEndPos <= ParentPos && ParentPos <= ParentOldSelectionStartPos)
+            Parent.Selection.StartPos = ParentOldSelectionStartPos + 1;
+
+        if (OldSelectionStartPos <= CurPos && CurPos <= OldSelectionEndPos)
+        {
+            this.Selection.EndPos = this.Content.length;
+            NewRun.Selection.Use      = true;
+            NewRun.Selection.StartPos = 0;
+            NewRun.Selection.EndPos   = OldSelectionEndPos - CurPos;
+        }
+        else if (OldSelectionEndPos <= CurPos && CurPos <= OldSelectionStartPos)
+        {
+            this.Selection.StartPos = this.Content.length;
+            NewRun.Selection.Use      = true;
+            NewRun.Selection.EndPos   = 0;
+            NewRun.Selection.StartPos = OldSelectionStartPos - CurPos;
+        }
+    }
+
     return NewRun;
 };
+
 
 ParaRun.prototype.Check_NearestPos = function(ParaNearPos, Depth)
 {
@@ -4219,11 +4260,11 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
                     if (null === Para.Get_DocumentNext() && true === Para.Parent.Is_TableCellContent())
                         bEndCell = true;
 
-                    Item.Draw(X, Y - this.YOffset, pGraphics, bEndCell);
+                    Item.Draw(X, Y - this.YOffset, pGraphics, bEndCell, reviewtype_Common !== ReviewType ?  true : false);
                 }
                 else
                 {
-                    Item.Draw(X, Y - this.YOffset, pGraphics, false);
+                    Item.Draw(X, Y - this.YOffset, pGraphics, false, false);
                 }
 
                 X += Item.Get_Width();
@@ -5154,6 +5195,11 @@ ParaRun.prototype.Selection_IsUse = function()
     return this.State.Selection.Use;
 };
 
+ParaRun.prototype.Is_SelectionUse = function()
+{
+    return this.State.Selection.Use;
+};
+
 ParaRun.prototype.Is_SelectedAll = function(Props)
 {
     var Selection = this.State.Selection;
@@ -5598,6 +5644,7 @@ ParaRun.prototype.Set_Pr = function(TextPr)
     this.Recalc_CompiledPr(true);
 
     this.protected_UpdateSpellChecking();
+    this.private_UpdateTrackRevisionOnChangeTextPr(true);
 };
 
 ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
@@ -5866,7 +5913,7 @@ ParaRun.prototype.Split_Run = function(Pos)
     var NewRun = new ParaRun(this.Paragraph, bMathRun);
 
     // Копируем настройки
-    NewRun.Set_Pr( this.Pr.Copy() );
+    NewRun.Set_Pr(this.Pr.Copy(true));
 
     if(bMathRun)
         NewRun.Set_MathPr(this.MathPrp.Copy());
@@ -6144,7 +6191,8 @@ ParaRun.prototype.Add_PrChange = function()
     if (false === this.Have_PrChange())
     {
         this.Pr.Add_PrChange();
-        History.Add(this, {Type : historyitem_ParaRun_PrChange, New : this.Pr.PrChange, Old : undefined});
+        History.Add(this, {Type : historyitem_ParaRun_PrChange, New : {PrChange : this.Pr.PrChange, ReviewInfo : this.Pr.ReviewInfo}, Old : {PrChange : undefined, ReviewInfo : undefined}});
+        this.private_UpdateTrackRevisions();
     }
 };
 
@@ -6152,9 +6200,29 @@ ParaRun.prototype.Remove_PrChange = function()
 {
     if (true === this.Have_PrChange())
     {
-        History.Add(this, {Type : historyitem_ParaRun_PrChange, New : undefined, Old : this.Pr.PrChange});
+        History.Add(this, {Type : historyitem_ParaRun_PrChange, New : {PrChange : undefined, ReviewInfo : undefined}, Old : {PrChange : this.Pr.PrChange, ReviewInfo : this.Pr.ReviewInfo}});
         this.Pr.Remove_PrChange();
+        this.private_UpdateTrackRevisions();
     }
+};
+
+ParaRun.prototype.Reject_PrChange = function()
+{
+    if (true === this.Have_PrChange())
+    {
+        this.Set_Pr(this.Pr.PrChange);
+        this.Remove_PrChange();
+    }
+};
+
+ParaRun.prototype.Accept_PrChange = function()
+{
+    this.Remove_PrChange();
+};
+
+ParaRun.prototype.Get_DiffPrChange = function()
+{
+    return this.Pr.Get_DiffPrChange();
 };
 
 ParaRun.prototype.Set_Bold = function(Value)
@@ -6167,6 +6235,7 @@ ParaRun.prototype.Set_Bold = function(Value)
         History.Add( this, { Type : historyitem_ParaRun_Bold, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
 
         this.Recalc_CompiledPr(true);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6184,7 +6253,8 @@ ParaRun.prototype.Set_Italic = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_Italic, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
 
-        this.Recalc_CompiledPr( true );
+        this.Recalc_CompiledPr(true);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6202,7 +6272,8 @@ ParaRun.prototype.Set_Strikeout = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_Strikeout, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
 
-        this.Recalc_CompiledPr( false );
+        this.Recalc_CompiledPr(false);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6220,7 +6291,8 @@ ParaRun.prototype.Set_Underline = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_Underline, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
 
-        this.Recalc_CompiledPr( false );
+        this.Recalc_CompiledPr(false);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6238,7 +6310,8 @@ ParaRun.prototype.Set_FontSize = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_FontSize, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
 
-        this.Recalc_CompiledPr( true );
+        this.Recalc_CompiledPr(true);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6256,7 +6329,8 @@ ParaRun.prototype.Set_Color = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_Color, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
 
-        this.Recalc_CompiledPr( false );
+        this.Recalc_CompiledPr(false);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6269,7 +6343,8 @@ ParaRun.prototype.Set_Unifill = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_Unifill, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
 
-        this.Recalc_CompiledPr( false );
+        this.Recalc_CompiledPr(false);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 ParaRun.prototype.Set_TextFill = function(Value)
@@ -6281,7 +6356,8 @@ ParaRun.prototype.Set_TextFill = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_TextFill, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
 
-        this.Recalc_CompiledPr( false );
+        this.Recalc_CompiledPr(false);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6294,7 +6370,8 @@ ParaRun.prototype.Set_TextOutline = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_TextOutline, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
 
-        this.Recalc_CompiledPr( false );
+        this.Recalc_CompiledPr(false);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6312,7 +6389,8 @@ ParaRun.prototype.Set_VertAlign = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_VertAlign, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
 
-        this.Recalc_CompiledPr( true );
+        this.Recalc_CompiledPr(true);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6329,7 +6407,8 @@ ParaRun.prototype.Set_HighLight = function(Value)
         this.Pr.HighLight = Value;
         History.Add( this, { Type : historyitem_ParaRun_HighLight, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
 
-        this.Recalc_CompiledPr( false );
+        this.Recalc_CompiledPr(false);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6347,7 +6426,8 @@ ParaRun.prototype.Set_RStyle = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_RStyle, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
 
-        this.Recalc_CompiledPr( true );
+        this.Recalc_CompiledPr(true);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6360,7 +6440,8 @@ ParaRun.prototype.Set_Spacing = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_Spacing, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
 
-        this.Recalc_CompiledPr( true );
+        this.Recalc_CompiledPr(true);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6378,7 +6459,8 @@ ParaRun.prototype.Set_DStrikeout = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_DStrikeout, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
 
-        this.Recalc_CompiledPr( false );
+        this.Recalc_CompiledPr(false);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6395,7 +6477,8 @@ ParaRun.prototype.Set_Caps = function(Value)
         this.Pr.Caps = Value;
 
         History.Add( this, { Type : historyitem_ParaRun_Caps, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
-        this.Recalc_CompiledPr( true );
+        this.Recalc_CompiledPr(true);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6412,7 +6495,8 @@ ParaRun.prototype.Set_SmallCaps = function(Value)
         this.Pr.SmallCaps = Value;
 
         History.Add( this, { Type : historyitem_ParaRun_SmallCaps, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
-        this.Recalc_CompiledPr( true );
+        this.Recalc_CompiledPr(true);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6429,7 +6513,8 @@ ParaRun.prototype.Set_Position = function(Value)
         this.Pr.Position = Value;
 
         History.Add( this, { Type : historyitem_ParaRun_Position, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
-        this.Recalc_CompiledPr( false );
+        this.Recalc_CompiledPr(false);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
 
         this.YOffset = this.Get_Position();
     }
@@ -6447,7 +6532,8 @@ ParaRun.prototype.Set_RFonts = function(Value)
 
     History.Add( this, { Type : historyitem_ParaRun_RFonts, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
 
-    this.Recalc_CompiledPr( true );
+    this.Recalc_CompiledPr(true);
+    this.private_UpdateTrackRevisionOnChangeTextPr(true);
 };
 
 ParaRun.prototype.Get_RFonts = function()
@@ -6499,6 +6585,7 @@ ParaRun.prototype.Set_RFonts_Ascii = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_RFonts_Ascii, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
         this.Recalc_CompiledPr(true);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6511,6 +6598,7 @@ ParaRun.prototype.Set_RFonts_HAnsi = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_RFonts_HAnsi, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
         this.Recalc_CompiledPr(true);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6523,6 +6611,7 @@ ParaRun.prototype.Set_RFonts_CS = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_RFonts_CS, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
         this.Recalc_CompiledPr(true);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6535,6 +6624,7 @@ ParaRun.prototype.Set_RFonts_EastAsia = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_RFonts_EastAsia, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
         this.Recalc_CompiledPr(true);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6547,6 +6637,7 @@ ParaRun.prototype.Set_RFonts_Hint = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_RFonts_Hint, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
         this.Recalc_CompiledPr(true);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6560,6 +6651,7 @@ ParaRun.prototype.Set_Lang = function(Value)
 
     History.Add( this, { Type : historyitem_ParaRun_Lang, New : this.Pr.Lang, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
     this.Recalc_CompiledPr(false);
+    this.private_UpdateTrackRevisionOnChangeTextPr(true);
 };
 
 ParaRun.prototype.Set_Lang2 = function(Lang)
@@ -6588,6 +6680,7 @@ ParaRun.prototype.Set_Lang_Bidi = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_Lang_Bidi, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
         this.Recalc_CompiledPr(false);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6600,6 +6693,7 @@ ParaRun.prototype.Set_Lang_EastAsia = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_Lang_EastAsia, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
         this.Recalc_CompiledPr(false);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6612,6 +6706,7 @@ ParaRun.prototype.Set_Lang_Val = function(Value)
 
         History.Add( this, { Type : historyitem_ParaRun_Lang_Val, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
         this.Recalc_CompiledPr(false);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 
@@ -6632,6 +6727,7 @@ ParaRun.prototype.Set_Shd = function(Shd)
 
     History.Add( this, { Type : historyitem_ParaRun_Shd, New : this.Pr.Shd, Old : OldShd, Color : this.private_IsCollPrChangeMine() } );
     this.Recalc_CompiledPr(false);
+    this.private_UpdateTrackRevisionOnChangeTextPr(true);
 };
 
 //-----------------------------------------------------------------------------------
@@ -6649,6 +6745,7 @@ ParaRun.prototype.Undo = function(Data)
 
             this.RecalcInfo.Measure = true;
             this.protected_UpdateSpellChecking();
+            this.private_UpdateTrackRevisionOnChangeContent(false);
 
             break;
         }
@@ -6664,6 +6761,7 @@ ParaRun.prototype.Undo = function(Data)
 
             this.RecalcInfo.Measure = true;
             this.protected_UpdateSpellChecking();
+            this.private_UpdateTrackRevisionOnChangeContent(false);
 
             break;
         }
@@ -6676,6 +6774,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr = undefined;
 
             this.Recalc_CompiledPr(true);
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
 
             break;
         }
@@ -6688,6 +6787,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.Bold = undefined;
 
             this.Recalc_CompiledPr(true);
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
 
             break;
         }
@@ -6700,6 +6800,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.Italic = undefined;
 
             this.Recalc_CompiledPr(true);
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
 
             break;
         }
@@ -6712,6 +6813,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.Strikeout = undefined;
 
             this.Recalc_CompiledPr(false);
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
 
             break;
         }
@@ -6724,6 +6826,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.Underline = undefined;
 
             this.Recalc_CompiledPr(false);
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
 
             break;
         }
@@ -6736,6 +6839,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.FontSize = undefined;
 
             this.Recalc_CompiledPr(true);
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
 
             break;
         }
@@ -6748,6 +6852,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.Color = undefined;
 
             this.Recalc_CompiledPr(false);
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
 
             break;
         }
@@ -6759,6 +6864,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.Unifill = undefined;
 
             this.Recalc_CompiledPr(false);
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -6770,6 +6876,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.TextFill = undefined;
 
             this.Recalc_CompiledPr(false);
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
         case historyitem_ParaRun_TextOutline:
@@ -6780,6 +6887,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.TextOutline = undefined;
 
             this.Recalc_CompiledPr(false);
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -6791,7 +6899,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.VertAlign = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -6803,7 +6911,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.HighLight = undefined;
 
             this.Recalc_CompiledPr(false);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -6815,7 +6923,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.RStyle = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -6827,7 +6935,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.Spacing = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
         case historyitem_ParaRun_DStrikeout:
@@ -6838,7 +6946,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.DStrikeout = undefined;
 
             this.Recalc_CompiledPr(false);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
         case historyitem_ParaRun_Caps:
@@ -6849,7 +6957,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.Caps = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
         case historyitem_ParaRun_SmallCaps:
@@ -6860,7 +6968,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.SmallCaps = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -6872,7 +6980,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.Position = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -6884,7 +6992,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.RFonts = new CRFonts();
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -6896,7 +7004,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.RFonts.Ascii = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -6908,7 +7016,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.RFonts.HAnsi = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -6920,7 +7028,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.RFonts.CS = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -6932,7 +7040,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.RFonts.EastAsia = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -6944,7 +7052,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.RFonts.Hint = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -6957,7 +7065,7 @@ ParaRun.prototype.Undo = function(Data)
 
             this.Recalc_CompiledPr(false);
             this.protected_UpdateSpellChecking();
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -6970,7 +7078,7 @@ ParaRun.prototype.Undo = function(Data)
 
             this.Recalc_CompiledPr(false);
             this.protected_UpdateSpellChecking();
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -6983,7 +7091,7 @@ ParaRun.prototype.Undo = function(Data)
 
             this.Recalc_CompiledPr(false);
             this.protected_UpdateSpellChecking();
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -6996,7 +7104,7 @@ ParaRun.prototype.Undo = function(Data)
 
             this.Recalc_CompiledPr(false);
             this.protected_UpdateSpellChecking();
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7004,7 +7112,7 @@ ParaRun.prototype.Undo = function(Data)
         {
             this.Pr.Shd = Data.Old;
             this.Recalc_CompiledPr(false);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7012,7 +7120,7 @@ ParaRun.prototype.Undo = function(Data)
         {
             this.MathPrp.sty = Data.Old;
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7020,19 +7128,35 @@ ParaRun.prototype.Undo = function(Data)
         {
             this.MathPrp = Data.Old;
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
         case historyitem_ParaRun_ReviewType:
         {
-            this.ReviewType = Data.Old;
+            this.ReviewType = Data.Old.ReviewType;
+            this.ReviewInfo = Data.Old.ReviewInfo;
+            this.private_UpdateTrackRevisions();
             break;
         }
 
         case historyitem_ParaRun_PrChange:
         {
-            this.Pr.PrChange = Data.Old;
+            this.Pr.PrChange   = Data.Old.PrChange;
+            this.Pr.ReviewInfo = Data.Old.ReviewInfo;
+            this.private_UpdateTrackRevisions();
+            break;
+        }
+
+        case historyitem_ParaRun_ContentReviewInfo:
+        {
+            this.ReviewInfo = Data.Old;
+            break;
+        }
+
+        case historyitem_ParaRun_PrReviewInfo:
+        {
+            this.Pr.ReviewInfo = Data.Old;
             break;
         }
     }
@@ -7055,7 +7179,7 @@ ParaRun.prototype.Redo = function(Data)
 
             this.RecalcInfo.Measure = true;
             this.protected_UpdateSpellChecking();
-
+            this.private_UpdateTrackRevisionOnChangeContent(false);
             break;
 
         }
@@ -7066,7 +7190,7 @@ ParaRun.prototype.Redo = function(Data)
 
             this.RecalcInfo.Measure = true;
             this.protected_UpdateSpellChecking();
-
+            this.private_UpdateTrackRevisionOnChangeContent(false);
             break;
         }
 
@@ -7078,7 +7202,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7090,7 +7214,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.Bold = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7102,7 +7226,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.Italic = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7114,7 +7238,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.Strikeout = undefined;
 
             this.Recalc_CompiledPr(false);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7126,7 +7250,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.Underline = undefined;
 
             this.Recalc_CompiledPr(false);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7138,7 +7262,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.FontSize = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7150,7 +7274,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.Color = undefined;
 
             this.Recalc_CompiledPr(false);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
         case historyitem_ParaRun_Unifill:
@@ -7161,6 +7285,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.Unifill = undefined;
 
             this.Recalc_CompiledPr(false);
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7172,6 +7297,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.TextFill = undefined;
 
             this.Recalc_CompiledPr(false);
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
         case historyitem_ParaRun_TextOutline:
@@ -7182,6 +7308,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.TextOutline = undefined;
 
             this.Recalc_CompiledPr(false);
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7194,7 +7321,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.VertAlign = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7206,7 +7333,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.HighLight = undefined;
 
             this.Recalc_CompiledPr(false);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7218,7 +7345,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.RStyle = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7230,7 +7357,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.Spacing = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
         case historyitem_ParaRun_DStrikeout:
@@ -7241,7 +7368,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.DStrikeout = undefined;
 
             this.Recalc_CompiledPr(false);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
         case historyitem_ParaRun_Caps:
@@ -7252,7 +7379,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.Caps = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
         case historyitem_ParaRun_SmallCaps:
@@ -7263,7 +7390,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.SmallCaps = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7275,7 +7402,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.Position = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7287,7 +7414,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.RFonts = new CRFonts();
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7299,7 +7426,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.RFonts.Ascii = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7311,7 +7438,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.RFonts.HAnsi = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7323,7 +7450,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.RFonts.CS = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7335,7 +7462,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.RFonts.EastAsia = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7347,7 +7474,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.RFonts.Hint = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7360,7 +7487,7 @@ ParaRun.prototype.Redo = function(Data)
 
             this.Recalc_CompiledPr(false);
             this.protected_UpdateSpellChecking();
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7373,7 +7500,7 @@ ParaRun.prototype.Redo = function(Data)
 
             this.Recalc_CompiledPr(false);
             this.protected_UpdateSpellChecking();
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7386,7 +7513,7 @@ ParaRun.prototype.Redo = function(Data)
 
             this.Recalc_CompiledPr(false);
             this.protected_UpdateSpellChecking();
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7399,7 +7526,7 @@ ParaRun.prototype.Redo = function(Data)
 
             this.Recalc_CompiledPr(false);
             this.protected_UpdateSpellChecking();
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7407,7 +7534,7 @@ ParaRun.prototype.Redo = function(Data)
         {
             this.Pr.Shd = Data.New;
             this.Recalc_CompiledPr(false);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7415,7 +7542,7 @@ ParaRun.prototype.Redo = function(Data)
         {
             this.MathPrp.sty = Data.New;
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -7423,19 +7550,35 @@ ParaRun.prototype.Redo = function(Data)
         {
             this.MathPrp = Data.New;
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
         case historyitem_ParaRun_ReviewType:
         {
-            this.ReviewType = Data.New;
+            this.ReviewType = Data.New.ReviewType;
+            this.ReviewInfo = Data.New.ReviewInfo;
+            this.private_UpdateTrackRevisions();
             break;
         }
 
         case historyitem_ParaRun_PrChange:
         {
-            this.Pr.PrChange = Data.New;
+            this.Pr.PrChange   = Data.New.PrChange;
+            this.Pr.ReviewInfo = Data.New.ReviewInfo;
+            this.private_UpdateTrackRevisions();
+            break;
+        }
+
+        case historyitem_ParaRun_ContentReviewInfo:
+        {
+            this.ReviewInfo = Data.New;
+            break;
+        }
+
+        case historyitem_ParaRun_PrReviewInfo:
+        {
+            this.Pr.ReviewInfo = Data.New;
             break;
         }
     }
@@ -7949,8 +8092,10 @@ ParaRun.prototype.Save_Changes = function(Data, Writer)
 
         case historyitem_ParaRun_ReviewType:
         {
-            // Long : ReviewType
-            Writer.WriteLong(Data.New);
+            // Long        : ReviewType
+            // CReviewInfo : ReviewInfo
+            Writer.WriteLong(Data.New.ReviewType);
+            Data.New.ReviewInfo.Write_ToBinary(Writer);
             break;
         }
 
@@ -7958,8 +8103,40 @@ ParaRun.prototype.Save_Changes = function(Data, Writer)
         {
             // Bool : is undefined ?
             // false -> TextPr
-            if (undefined === Data.New)
+            // Bool : is undefined ?
+            // false -> ReviewInfo
+
+            if (undefined === Data.New.PrChange)
+            {
                 Writer.WriteBool(true);
+            }
+            else
+            {
+                Writer.WriteBool(false);
+                Data.New.PrChange.Write_ToBinary(Writer);
+            }
+
+            if (undefined === Data.New.ReviewInfo)
+            {
+                Writer.WriteBool(true);
+            }
+            else
+            {
+                Writer.WriteBool(false);
+                Data.New.ReviewInfo.Write_ToBinary(Writer);
+            }
+
+            break;
+        }
+
+        case historyitem_ParaRun_ContentReviewInfo:
+        {
+            // Bool : is undefined ?
+            // false -> ReviewInfo
+            if (undefined === Data.New)
+            {
+                Writer.WriteBool(true);
+            }
             else
             {
                 Writer.WriteBool(false);
@@ -7968,6 +8145,21 @@ ParaRun.prototype.Save_Changes = function(Data, Writer)
             break;
         }
 
+        case historyitem_ParaRun_PrReviewInfo:
+        {
+            // Bool : is undefined ?
+            // false -> ReviewInfo
+            if (undefined === Data.New)
+            {
+                Writer.WriteBool(true);
+            }
+            else
+            {
+                Writer.WriteBool(false);
+                Data.New.Write_ToBinary(Writer);
+            }
+            break;
+        }
     }
 
     return Writer;
@@ -8021,7 +8213,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
 
             this.RecalcInfo.Measure = true;
             this.protected_UpdateSpellChecking();
-
+            this.private_UpdateTrackRevisionOnChangeContent(false);
             break;
         }
 
@@ -8046,7 +8238,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
 
             this.RecalcInfo.Measure = true;
             this.protected_UpdateSpellChecking();
-
+            this.private_UpdateTrackRevisionOnChangeContent(false);
             break;
         }
 
@@ -8057,6 +8249,8 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             this.Pr = new CTextPr();
             this.Pr.Read_FromBinary( Reader );
 
+            this.Recalc_CompiledPr(true);
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8073,7 +8267,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.Bold = Reader.GetBool();
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8090,7 +8284,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.Italic = Reader.GetBool();
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8105,7 +8299,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.Strikeout = Reader.GetBool();
 
             this.Recalc_CompiledPr(false);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8120,7 +8314,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.Underline = undefined;
 
             this.Recalc_CompiledPr(false);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8135,7 +8329,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.FontSize = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8153,7 +8347,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.Color = undefined;
 
             this.Recalc_CompiledPr(false);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8178,7 +8372,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.Unifill = undefined;
 
             this.Recalc_CompiledPr(false);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8197,6 +8391,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.TextFill = undefined;
 
             this.Recalc_CompiledPr(false);
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
         case historyitem_ParaRun_TextOutline:
@@ -8212,6 +8407,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.TextOutline = undefined;
 
             this.Recalc_CompiledPr(false);
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
         case historyitem_ParaRun_VertAlign:
@@ -8225,7 +8421,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.VertAlign = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8251,7 +8447,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.HighLight = undefined;
 
             this.Recalc_CompiledPr(false);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8267,7 +8463,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.RStyle = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8283,7 +8479,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.Spacing = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8299,7 +8495,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.DStrikeout = undefined;
 
             this.Recalc_CompiledPr(false);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8315,7 +8511,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.Caps = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8331,7 +8527,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.SmallCaps = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8347,7 +8543,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.Position = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8365,7 +8561,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.RFonts = new CRFonts();
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8386,7 +8582,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.RFonts.Ascii = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8407,7 +8603,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.RFonts.HAnsi = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8428,7 +8624,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.RFonts.CS = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8449,7 +8645,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.RFonts.EastAsia = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8464,7 +8660,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.RFonts.Hint = undefined;
 
             this.Recalc_CompiledPr(true);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8483,7 +8679,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
 
             this.Recalc_CompiledPr(true);
             this.protected_UpdateSpellChecking();
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8499,7 +8695,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
 
             this.Recalc_CompiledPr(true);
             this.protected_UpdateSpellChecking();
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8515,7 +8711,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
 
             this.Recalc_CompiledPr(true);
             this.protected_UpdateSpellChecking();
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8531,7 +8727,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
 
             this.Recalc_CompiledPr(true);
             this.protected_UpdateSpellChecking();
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
@@ -8550,7 +8746,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.Shd = undefined;
 
             this.Recalc_CompiledPr(false);
-
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
         case historyitem_ParaRun_MathStyle:
@@ -8563,6 +8759,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.MathPrp.sty = undefined;
 
             this.Recalc_CompiledPr(true);
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
         case historyitem_ParaRun_MathPrp:
@@ -8587,13 +8784,17 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.MathPrp.sty = Reader.GetLong();
 
             this.Recalc_CompiledPr(true);
+            this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;
         }
 
         case historyitem_ParaRun_ReviewType:
         {
-            // Long : ReviewType
+            // Long        : ReviewType
+            // CReviewInfo : ReviewInfo
             this.ReviewType = Reader.GetLong();
+            this.ReviewInfo.Read_FromBinary(Reader);
+            this.private_UpdateTrackRevisions();
             break;
         }
 
@@ -8601,11 +8802,49 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
         {
             // Bool : is undefined ?
             // false -> TextPr
+            // Bool : is undefined ?
+            // false -> ReviewInfo
 
             if (false === Reader.GetBool())
             {
                 this.Pr.PrChange = new CTextPr();
                 this.Pr.PrChange.Read_FromBinary(Reader);
+            }
+
+            if (false === Reader.GetBool())
+            {
+                this.Pr.ReviewInfo = new CReviewInfo();
+                this.Pr.ReviewInfo.Read_FromBinary(Reader);
+            }
+
+            this.private_UpdateTrackRevisions();
+            break;
+        }
+
+        case historyitem_ParaRun_ContentReviewInfo:
+        {
+            // Bool : is undefined ?
+            // false -> ReviewInfo
+            if (false === Reader.GetBool())
+            {
+                this.ReviewInfo = new CReviewInfo();
+                this.ReviewInfo.Read_FromBinary(Reader);
+            }
+            break;
+        }
+
+        case historyitem_ParaRun_PrReviewInfo:
+        {
+            // Bool : is undefined ?
+            // false -> ReviewInfo
+            if (false === Reader.GetBool())
+            {
+                this.ReviewInfo = new CReviewInfo();
+                this.ReviewInfo.Read_FromBinary(Reader);
+            }
+            else
+            {
+                this.ReviewInfo = undefined;
             }
             break;
         }
@@ -8726,7 +8965,7 @@ ParaRun.prototype.private_RecalcCtrPrp = function()
 {
     if (para_Math_Run === this.Type && undefined !== this.Parent && null !== this.Parent && null !== this.Parent.ParaMath)
         this.Parent.ParaMath.SetRecalcCtrPrp(this);
-}
+};
 function CParaRunSelection()
 {
     this.Use      = false;
@@ -9267,6 +9506,7 @@ ParaRun.prototype.Math_Apply_Style = function(Value)
         History.Add( this, { Type : historyitem_ParaRun_MathStyle, New : Value, Old : OldValue } );
 
         this.Recalc_CompiledPr(true);
+        this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
 ParaRun.prototype.IsNormalText = function()
@@ -9415,7 +9655,7 @@ ParaRun.prototype.Set_MathPr = function(MPrp)
 
     History.Add( this, { Type : historyitem_ParaRun_MathPrp, New : this.MathPrp, Old : OldValue } );
     this.Recalc_CompiledPr(true);
-
+    this.private_UpdateTrackRevisionOnChangeTextPr(true);
 };
 ParaRun.prototype.Set_MathTextPr2 = function(TextPr, MathPr)
 {
@@ -9569,8 +9809,14 @@ ParaRun.prototype.Set_ReviewType = function(Value)
 {
     if (Value !== this.ReviewType)
     {
-        History.Add(this, {Type : historyitem_ParaRun_ReviewType, New : Value, Old : this.ReviewType});
+        var OldReviewType = this.ReviewType;
+        var OldReviewInfo = this.ReviewInfo.Copy();
+
         this.ReviewType = Value;
+        this.ReviewInfo.Update();
+
+        History.Add(this, {Type : historyitem_ParaRun_ReviewType, New : {ReviewType :  this.ReviewType, ReviewInfo : this.ReviewInfo.Copy()}, Old : {ReviewType :  OldReviewType, ReviewInfo : OldReviewInfo}});
+        this.private_UpdateTrackRevisions();
     }
 };
 ParaRun.prototype.Get_Parent = function()
@@ -9623,6 +9869,218 @@ ParaRun.prototype.Get_AllParagraphs = function(Props, ParaArray)
             this.Content[CurPos].Get_AllParagraphs(Props, ParaArray);
     }
 };
+ParaRun.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth)
+{
+    if (this.Is_Empty())
+        return;
+
+    var ReviewType = this.Get_ReviewType();
+    if (ReviewType !== Checker.Get_AddRemoveType())
+    {
+        Checker.Flush_AddRemoveChange();
+        ContentPos.Update(0, Depth);
+
+        if (reviewtype_Add === ReviewType || reviewtype_Remove === ReviewType)
+            Checker.Start_AddRemove(ReviewType, ContentPos);
+    }
+
+    if (reviewtype_Add === ReviewType || reviewtype_Remove === ReviewType)
+    {
+        var Text = "";
+        var ContentLen = this.Content.length;
+        for (var CurPos = 0; CurPos < ContentLen; CurPos++)
+        {
+            var Item = this.Content[CurPos];
+            var ItemType = Item.Type;
+            switch (ItemType)
+            {
+                case para_Text : Text += String.fromCharCode(Item.Value); break;
+                case para_Space:
+                case para_Tab  : Text += " "; break;
+            }
+        }
+        Checker.Add_Text(Text);
+        ContentPos.Update(this.Content.length, Depth);
+        Checker.Set_AddRemoveEndPos(ContentPos);
+        Checker.Update_AddRemoveReviewInfo(this.ReviewInfo);
+    }
+
+    var HavePrChange = this.Have_PrChange();
+    var DiffPr = this.Get_DiffPrChange();
+    if (HavePrChange !== Checker.Have_PrChange() || true !== Checker.Compare_PrChange(DiffPr))
+    {
+        Checker.Flush_TextPrChange();
+        ContentPos.Update(0, Depth);
+        if (true === HavePrChange)
+        {
+            Checker.Start_PrChange(DiffPr, ContentPos);
+        }
+    }
+
+    if (true === HavePrChange)
+    {
+        ContentPos.Update(this.Content.length, Depth);
+        Checker.Set_PrChangeEndPos(ContentPos);
+        Checker.Update_PrChangeReviewInfo(this.Pr.ReviewInfo);
+    }
+};
+ParaRun.prototype.private_UpdateTrackRevisionOnChangeContent = function(bUpdateInfo)
+{
+    if (reviewtype_Common !== this.Get_ReviewType())
+    {
+        this.private_UpdateTrackRevisions();
+
+        if (true === bUpdateInfo && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
+        {
+            var OldReviewInfo = this.ReviewInfo.Copy();
+            this.ReviewInfo.Update();
+            History.Add(this, {Type : historyitem_ParaRun_ContentReviewInfo, Old : OldReviewInfo, New : this.ReviewInfo.Copy()});
+        }
+    }
+};
+ParaRun.prototype.private_UpdateTrackRevisionOnChangeTextPr = function(bUpdateInfo)
+{
+    if (true === this.Have_PrChange())
+    {
+        this.private_UpdateTrackRevisions();
+
+        if (true === bUpdateInfo && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
+        {
+            var OldReviewInfo = this.Pr.ReviewInfo.Copy();
+            this.Pr.ReviewInfo.Update();
+            History.Add(this, {Type : historyitem_ParaRun_PrReviewInfo, Old : OldReviewInfo, New : this.Pr.ReviewInfo.Copy()});
+        }
+    }
+};
+ParaRun.prototype.private_UpdateTrackRevisions = function()
+{
+    if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.LogicDocument.Get_TrackRevisionsManager)
+    {
+        var RevisionsManager = this.Paragraph.LogicDocument.Get_TrackRevisionsManager();
+        RevisionsManager.Check_Paragraph(this.Paragraph);
+    }
+};
+ParaRun.prototype.Accept_RevisionChanges = function(Type, bAll)
+{
+    var Parent = this.Get_Parent();
+    var RunPos = this.private_GetPosInParent();
+
+    var ReviewType   = this.Get_ReviewType();
+    var HavePrChange = this.Have_PrChange();
+
+    // Нет изменений в данном ране
+    if (reviewtype_Common === ReviewType && true !== HavePrChange)
+        return;
+
+    if (undefined === Type)
+    {
+        if (true === this.Selection.Use)
+        {
+            var StartPos = this.Selection.StartPos;
+            var EndPos = this.Selection.EndPos;
+            if (StartPos > EndPos)
+            {
+                StartPos = this.Selection.EndPos;
+                EndPos = this.Selection.StartPos;
+            }
+
+            var CenterRun = null, CenterRunPos = RunPos;
+            if (0 === StartPos && this.Content.length === EndPos)
+            {
+                CenterRun = this;
+            }
+            else if (StartPos > 0 && this.Content.length === EndPos)
+            {
+                CenterRun = this.Split2(StartPos, Parent, RunPos);
+                CenterRunPos = RunPos + 1;
+            }
+            else if (0 === StartPos && this.Content.length > EndPos)
+            {
+                CenterRun = this;
+                this.Split2(EndPos, Parent, RunPos);
+            }
+            else
+            {
+                this.Split2(EndPos, Parent, RunPos);
+                CenterRun = this.Split2(StartPos, Parent, RunPos);
+                CenterRunPos = RunPos + 1;
+            }
+
+            if (true === HavePrChange)
+            {
+                CenterRun.Remove_PrChange();
+            }
+
+            if (reviewtype_Add === ReviewType)
+            {
+                CenterRun.Set_ReviewType(reviewtype_Common);
+            }
+            else if (reviewtype_Remove === ReviewType)
+            {
+                Parent.Remove_FromContent(CenterRunPos, 1);
+            }
+        }
+    }
+};
+ParaRun.prototype.Reject_RevisionChanges = function(Type, bAll)
+{
+    var Parent = this.Get_Parent();
+    var RunPos = this.private_GetPosInParent();
+
+    var ReviewType   = this.Get_ReviewType();
+    var HavePrChange = this.Have_PrChange();
+
+    // Нет изменений в данном ране
+    if (reviewtype_Common === ReviewType && true !== HavePrChange)
+        return;
+
+    if (undefined === Type)
+    {
+        var StartPos = this.Selection.StartPos;
+        var EndPos = this.Selection.EndPos;
+        if (StartPos > EndPos)
+        {
+            StartPos = this.Selection.EndPos;
+            EndPos = this.Selection.StartPos;
+        }
+
+        var CenterRun = null, CenterRunPos = RunPos;
+        if (0 === StartPos && this.Content.length === EndPos)
+        {
+            CenterRun = this;
+        }
+        else if (StartPos > 0 && this.Content.length === EndPos)
+        {
+            CenterRun = this.Split2(StartPos, Parent, RunPos);
+            CenterRunPos = RunPos + 1;
+        }
+        else if (0 === StartPos && this.Content.length > EndPos)
+        {
+            CenterRun = this;
+            this.Split2(EndPos, Parent, RunPos);
+        }
+        else
+        {
+            this.Split2(EndPos, Parent, RunPos);
+            CenterRun = this.Split2(StartPos, Parent, RunPos);
+            CenterRunPos = RunPos + 1;
+        }
+
+        if (true === HavePrChange)
+        {
+            CenterRun.Set_Pr(CenterRun.Pr.PrChange);
+        }
+
+        if (reviewtype_Add === ReviewType)
+        {
+            Parent.Remove_FromContent(CenterRunPos, 1);
+        }
+        else if (reviewtype_Remove === ReviewType)
+        {
+            CenterRun.Set_ReviewType(reviewtype_Common);
+        }
+    }
+};
 
 function CParaRunStartState(Run)
 {
@@ -9634,3 +10092,52 @@ function CParaRunStartState(Run)
         this.Content.push(Run.Content[i]);
     }
 }
+
+function CReviewInfo()
+{
+    this.Editor   = editor;
+    this.UserId   = "";
+    this.UserName = "";
+    this.DateTime = "";
+}
+CReviewInfo.prototype.Update = function()
+{
+    if (this.Editor && this.Editor.DocInfo)
+    {
+        this.UserId   = this.Editor.DocInfo.get_UserId();
+        this.UserName = this.Editor.DocInfo.get_UserName();
+        this.DateTime = (new Date()).getTime();
+    }
+};
+CReviewInfo.prototype.Copy = function()
+{
+    var Info = new CReviewInfo();
+    Info.UserId   = this.UserId;
+    Info.UserName = this.UserName;
+    Info.DateTime = this.DateTime;
+    return Info;
+};
+CReviewInfo.prototype.Get_UserId = function()
+{
+    return this.UserId;
+};
+CReviewInfo.prototype.Get_UserName = function()
+{
+    return this.UserName;
+};
+CReviewInfo.prototype.Get_DateTime = function()
+{
+    return this.DateTime;
+};
+CReviewInfo.prototype.Write_ToBinary = function(Writer)
+{
+    Writer.WriteString2(this.UserId);
+    Writer.WriteString2(this.UserName);
+    Writer.WriteString2(this.DateTime);
+};
+CReviewInfo.prototype.Read_FromBinary = function(Reader)
+{
+    this.UserId   = Reader.GetString2();
+    this.UserName = Reader.GetString2();
+    this.DateTime = parseInt(Reader.GetString2());
+};

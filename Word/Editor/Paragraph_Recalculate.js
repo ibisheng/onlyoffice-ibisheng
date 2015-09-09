@@ -1969,7 +1969,7 @@ CParaLineMetrics.prototype =
         }
         return LineGap;
     }
-}
+};
 
 function CParaLineRange(X, XEnd)
 {
@@ -2594,7 +2594,7 @@ CParagraphRecalculateStateInfo.prototype =
             }
         }
     }
-}
+};
 
 function CParagraphRecalculateObject()
 {

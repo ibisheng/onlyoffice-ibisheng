@@ -2622,9 +2622,9 @@ ParaEnd.prototype =
         return para_End;
     },
     
-    Draw : function(X, Y, Context, bEndCell)
+    Draw : function(X, Y, Context, bEndCell, bForceDraw)
     {
-        if ( undefined !== editor && editor.ShowParaMarks )
+        if ((undefined !== editor && editor.ShowParaMarks) || true === bForceDraw)
         {
             Context.SetFontSlot( fontslot_ASCII );
 

@@ -1331,7 +1331,7 @@
             this.VAnchor = obj.VAnchor;
             this.VSpace  = obj.VSpace;
             this.W       = obj.W;
-            this.Wrap    = ( wrap_Around === obj.Wrap ? true : ( wrap_None === obj.Wrap ? false : undefined ) );
+            this.Wrap    = obj.Wrap;
             this.X       = obj.X;
             this.XAlign  = obj.XAlign;
             this.Y       = obj.Y;

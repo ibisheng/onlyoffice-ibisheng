@@ -2247,7 +2247,7 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
         else if ( wrap_Around === ParaPr.FramePr.Wrap )
             ParaPr.FramePr.Wrap = true;
         else
-            ParaPr.FramePr.Wrap = undefined;       
+            ParaPr.FramePr.Wrap = undefined;
     }
 
 	this.sync_ParaSpacingLine( ParaPr.Spacing );
@@ -7359,14 +7359,42 @@ asc_docs_api.prototype.sync_AddRevisionsChange = function(Change)
 {
     this.RevisionChangesStack.push(Change);
 };
+asc_docs_api.prototype.asc_AcceptChanges = function()
+{
+    History.Create_NewPoint();
+    this.WordControl.m_oLogicDocument.Accept_RevisionChanges(undefined, false);
+};
+asc_docs_api.prototype.asc_RejectChanges = function()
+{
+    History.Create_NewPoint();
+    this.WordControl.m_oLogicDocument.Reject_RevisionChanges(undefined, false);
+};
 
 function CRevisionsChange()
 {
-    this.Type  = c_oAscRevisionsChangeType.Unknown;
-    this.X     = 0;
-    this.Y     = 0;
-    this.Value = "";
+    this.Type      = c_oAscRevisionsChangeType.Unknown;
+    this.X         = 0;
+    this.Y         = 0;
+    this.Value     = "";
+
+    this.UserName  = "";
+    this.UderId    = "";
+    this.DateTime  = "1123123";
+
+    this.Paragraph = null;
+    this.StartPos  = null;
+    this.EndPos    = null;
 }
+CRevisionsChange.prototype.get_UserId = function(){return this.UserId;};
+CRevisionsChange.prototype.put_UserId = function(UserId){this.UserId = UserId;};
+CRevisionsChange.prototype.get_UserName = function(){return this.UserName;};
+CRevisionsChange.prototype.put_UserName = function(UserName){this.UserName = UserName;};
+CRevisionsChange.prototype.get_DateTime = function(){return this.DateTime};
+CRevisionsChange.prototype.put_DateTime = function(DateTime){this.DateTime = DateTime};
+CRevisionsChange.prototype.get_StartPos = function(){return this.StartPos};
+CRevisionsChange.prototype.put_StartPos = function(StartPos){this.StartPos = StartPos;};
+CRevisionsChange.prototype.get_EndPos = function(){return this.EndPos};
+CRevisionsChange.prototype.put_EndPos = function(EndPos){this.EndPos = EndPos;};
 CRevisionsChange.prototype.get_Type  = function(){return this.Type;};
 CRevisionsChange.prototype.get_X     = function(){return this.X;};
 CRevisionsChange.prototype.get_Y     = function(){return this.Y;};

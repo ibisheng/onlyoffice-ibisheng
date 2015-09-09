@@ -3484,7 +3484,8 @@ function CEditorPage(api)
             _c.m_oDrawingDocument.CheckFontCache();
         }
 
-        oThis.m_oLogicDocument.Spelling.Continue_CheckSpelling();
+        oThis.m_oLogicDocument.Continue_CheckSpelling();
+        oThis.m_oLogicDocument.Continue_TrackRevisions();
     }
     this.OnScroll = function()
     {

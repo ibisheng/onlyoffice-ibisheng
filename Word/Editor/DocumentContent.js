@@ -1757,12 +1757,50 @@ CDocumentContent.prototype =
             {
                 if ( this.Selection.StartPos == this.Selection.EndPos && type_Table === this.Content[this.Selection.StartPos].GetType() )
                     this.Content[this.Selection.StartPos].Document_UpdateRulersState(CurPage);
+                else
+                {
+                    var StartPos = ( this.Selection.EndPos <= this.Selection.StartPos ? this.Selection.EndPos   : this.Selection.StartPos );
+                    var EndPos   = ( this.Selection.EndPos <= this.Selection.StartPos ? this.Selection.StartPos : this.Selection.EndPos );
+
+                    var FramePr = undefined;
+
+                    for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
+                    {
+                        var Element = this.Content[Pos];
+                        if ( type_Paragraph != Element.GetType() )
+                        {
+                            FramePr = undefined;
+                            break;
+                        }
+                        else
+                        {
+                            var TempFramePr = Element.Get_FramePr();
+                            if ( undefined === FramePr )
+                            {
+                                if ( undefined === TempFramePr )
+                                    break;
+
+                                FramePr = TempFramePr;
+                            }
+                            else if ( undefined === TempFramePr || false === FramePr.Compare(TempFramePr) )
+                            {
+                                FramePr = undefined;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (undefined !== FramePr)
+                        this.Content[StartPos].Document_UpdateRulersState();
+                }
             }
             else
             {
                 var Item = this.Content[this.CurPos.ContentPos];
                 if ( type_Table === Item.GetType() )
                     Item.Document_UpdateRulersState(CurPage);
+                else
+                    Item.Document_UpdateRulersState();
             }
         }
     },
@@ -9366,6 +9404,253 @@ CDocumentContent.prototype.Get_SectPr = function()
         return this.Parent.Get_SectPr();
 
     return null;
+};
+CDocumentContent.prototype.Set_ParagraphFramePr = function(FramePr, bDelete)
+{
+    if (docpostype_DrawingObjects === this.CurPos.Type)
+    {
+        // Не добавляем и не работаем с рамками в автофигурах
+        return;
+    }
+    else //if ( docpostype_Content === this.CurPos.Type )
+    {
+        if ( true === this.Selection.Use )
+        {
+            // Проверим, если у нас все выделенные элементы - параграфы, с одинаковыми настройками
+            // FramePr, тогда мы можем применить новую настройку FramePr
+
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = this.Selection.EndPos;
+
+            if ( StartPos > EndPos )
+            {
+                StartPos = this.Selection.EndPos;
+                EndPos   = this.Selection.StartPos;
+            }
+
+            var Element = this.Content[StartPos];
+
+            if ( type_Paragraph != Element.GetType() || undefined === Element.Get_FramePr() )
+                return;
+
+            var FramePr = Element.Get_FramePr();
+            for ( var Pos = StartPos + 1; Pos < EndPos; Pos++ )
+            {
+                var TempElement = this.Content[Pos];
+
+                if ( type_Paragraph != TempElement.GetType() || undefined === TempElement.Get_FramePr() || true != FramePr.Compare( TempElement.Get_FramePr() ) )
+                    return;
+            }
+
+            // Раз дошли до сюда, значит можно у всех выделенных параграфов менять настройку рамки
+            var FrameParas = this.Content[StartPos].Internal_Get_FrameParagraphs();
+            var FrameCount = FrameParas.length;
+            for ( var Pos = 0; Pos < FrameCount; Pos++ )
+            {
+                FrameParas[Pos].Set_FramePr(FramePr, bDelete);
+            }
+        }
+        else
+        {
+            var Element = this.Content[this.CurPos.ContentPos];
+
+            if ( type_Paragraph != Element.GetType() )
+                return;
+
+            // Возможно, предыдущий элемент является буквицей
+            if ( undefined === Element.Get_FramePr()  )
+            {
+                var PrevElement = Element.Get_DocumentPrev();
+
+                if ( type_Paragraph != PrevElement.GetType() || undefined === PrevElement.Get_FramePr() || undefined === PrevElement.Get_FramePr().DropCap )
+                    return;
+
+                Element = PrevElement;
+            }
+
+
+            var FrameParas = Element.Internal_Get_FrameParagraphs();
+            var FrameCount = FrameParas.length;
+            for ( var Pos = 0; Pos < FrameCount; Pos++ )
+            {
+                FrameParas[Pos].Set_FramePr(FramePr, bDelete);
+            }
+
+        }
+    }
+};
+CDocumentContent.prototype.Accept_RevisionChanges = function(Type, bAll)
+{
+    if (docpostype_DrawingObjects === this.CurPos.Type)
+    {
+        // TODO: Реализовать
+        //this.DrawingObjects.Accept_RevisionChanges();
+    }
+    else //if (docpostype_Content === this.CurPos.Type)
+    {
+        if (true === this.Selection.Use || true === bAll)
+        {
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = this.Selection.EndPos;
+            if (StartPos > EndPos)
+            {
+                StartPos = this.Selection.EndPos;
+                EndPos   = this.Selection.StartPos;
+            }
+            var LastElement = this.Content[EndPos];
+            var LastParaEnd = (type_Paragraph === LastElement.Get_Type() && true === LastElement.Selection_CheckParaEnd() ? true : false);
+
+            if (true === bAll)
+            {
+                StartPos    = 0;
+                EndPos      = this.Content.length - 1;
+                LastParaEnd = true;
+            }
+
+            if (undefined === Type)
+            {
+                for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+                {
+                    var Element = this.Content[CurPos];
+                    if (type_Paragraph === Element.Get_Type() && (true === Element.Is_SelectedAll() || true === bAll) && true === Element.Have_PrChange())
+                    {
+                        Element.Accept_PrChange();
+                    }
+                }
+
+                for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+                {
+                    var Element = this.Content[CurPos];
+                    Element.Accept_RevisionChanges(Type, bAll);
+                }
+
+                EndPos = (true === LastParaEnd ? EndPos : EndPos - 1);
+                for (var CurPos = EndPos; CurPos >= StartPos; CurPos--)
+                {
+                    var Element = this.Content[CurPos];
+                    if (type_Paragraph === Element.Get_Type())
+                    {
+                        var ReviewType = Element.Get_ReviewType();
+                        if (reviewtype_Add === ReviewType)
+                        {
+                            Element.Set_ReviewType(reviewtype_Common);
+                        }
+                        else if (reviewtype_Remove === ReviewType)
+                        {
+                            Element.Set_ReviewType(reviewtype_Common);
+                            this.Concat_Paragraphs(CurPos);
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            var CurPos = this.CurPos.ContentPos;
+        }
+    }
+};
+CDocumentContent.prototype.Reject_RevisionChanges = function(Type, bAll)
+{
+    if (docpostype_DrawingObjects === this.CurPos.Type)
+    {
+        // TODO: Реализовать
+        //this.DrawingObjects.Reject_RevisionChanges();
+    }
+    else //if (docpostype_Content === this.CurPos.Type)
+    {
+        if (true === this.Selection.Use)
+        {
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = this.Selection.EndPos;
+            if (StartPos > EndPos)
+            {
+                StartPos = this.Selection.EndPos;
+                EndPos   = this.Selection.StartPos;
+            }
+            var LastElement = this.Content[EndPos];
+            var LastParaEnd = (type_Paragraph === LastElement.Get_Type() && true === LastElement.Selection_CheckParaEnd() ? true : false);
+
+            if (undefined === Type)
+            {
+                for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+                {
+                    var Element = this.Content[CurPos];
+                    if (type_Paragraph === Element.Get_Type() && true === Element.Is_SelectedAll() && true === Element.Have_PrChange())
+                    {
+                        Element.Reject_PrChange();
+                    }
+                }
+
+                for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+                {
+                    var Element = this.Content[CurPos];
+                    Element.Reject_RevisionChanges(Type, bAll);
+                }
+
+                EndPos = (true === LastParaEnd ? EndPos : EndPos - 1);
+                for (var CurPos = EndPos; CurPos >= StartPos; CurPos--)
+                {
+                    var Element = this.Content[CurPos];
+                    if (type_Paragraph === Element.Get_Type())
+                    {
+                        var ReviewType = Element.Get_ReviewType();
+                        if (reviewtype_Add === ReviewType)
+                        {
+                            Element.Set_ReviewType(reviewtype_Common);
+                            this.Concat_Paragraphs(CurPos);
+                        }
+                        else if (reviewtype_Remove === ReviewType)
+                        {
+                            Element.Set_ReviewType(reviewtype_Common);
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            var CurPos = this.CurPos.ContentPos;
+
+        }
+    }
+};
+CDocumentContent.prototype.Add_ToContent = function(Pos, Item)
+{
+    this.Internal_Content_Add(Pos, Item);
+};
+CDocumentContent.prototype.Remove_FromContent = function(Pos, Count)
+{
+    this.Internal_Content_Remove(Pos, Count);
+};
+CDocumentContent.prototype.Concat_Paragraphs = function(Pos)
+{
+    if (Pos < this.Content.length - 1 && type_Paragraph === this.Content[Pos].Get_Type() && type_Paragraph === this.Content[Pos + 1].Get_Type())
+    {
+        var Para1 = this.Content[Pos];
+        var Para2 = this.Content[Pos + 1];
+
+        var OldSelectionStartPos = this.Selection.StartPos;
+        var OldSelectionEndPos   = this.Selection.EndPos;
+
+        Para1.Concat(Para2);
+        this.Remove_FromContent(Pos + 1, 1);
+
+        if (OldSelectionStartPos === Pos + 1 && OldSelectionEndPos === Pos + 1)
+        {
+            this.Selection_Remove();
+            this.CurPos.ContentPos = Pos;
+            Para1.Cursor_MoveToStartPos(false);
+        }
+        else if (OldSelectionStartPos <= Pos + 1 && Pos + 1 <= OldSelectionEndPos)
+        {
+            this.Selection.EndPos--;
+        }
+        else if (OldSelectionEndPos <= Pos + 1 && Pos + 1 <= OldSelectionStartPos)
+        {
+            this.Selection.StartPos--;
+        }
+    }
 };
 
 function CDocumentContentStartState(DocContent)
