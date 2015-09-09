@@ -541,9 +541,9 @@ CDocumentContent.prototype =
         return this.Parent.Is_HdrFtr(bReturnHdrFtr);
     },
 
-    Is_DrawingShape : function()
+    Is_DrawingShape : function(bRetShape)
     {
-        return this.Parent.Is_DrawingShape();
+        return this.Parent.Is_DrawingShape(bRetShape);
     },
 
     // Данный запрос может прийти из внутреннего элемента(параграф, таблица), чтобы узнать

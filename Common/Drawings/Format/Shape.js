@@ -5053,10 +5053,15 @@ CShape.prototype =
         return oBodyPr && oBodyPr.prstTxWarp && (oBodyPr.prstTxWarp.pathLst.length / 2 - ((oBodyPr.prstTxWarp.pathLst.length / 2) >> 0) > 0);
     },
 
+    chekBodyPrTransform: function(oBodyPr)
+    {
+        return isRealObject(oBodyPr) && isRealObject(oBodyPr.prstTxWarp) && oBodyPr.prstTxWarp.preset !== "textNoShape";
+    },
+
     checkTextWarp: function(oContent, oBodyPr, dWidth, dHeight, bNeedNoTransform, bNeedWarp)
     {
         var oRet = {oTxWarpStruct: null, oTxWarpStructParamarks: null, oTxWarpStructNoTransform: null, oTxWarpStructParamarksNoTransform: null};
-        var bTransform = isRealObject(oBodyPr.prstTxWarp) && oBodyPr.prstTxWarp.preset !== "textNoShape" && bNeedWarp;
+        var bTransform = this.chekBodyPrTransform(oBodyPr) && bNeedWarp;
 		var warpGeometry = oBodyPr.prstTxWarp;
 		warpGeometry && warpGeometry.Recalculate(dWidth, dHeight);
 		this.recalcInfo.warpGeometry = warpGeometry;

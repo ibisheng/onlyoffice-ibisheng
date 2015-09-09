@@ -138,8 +138,12 @@ CTextBody.prototype =
         return false;
     },
 
-    Is_DrawingShape: function()
+    Is_DrawingShape: function(bRetShape)
     {
+        if(bRetShape === true)
+        {
+            return this.parent;
+        }
         return true;
     },
 

@@ -11322,8 +11322,12 @@ CDocument.prototype =
         return false;
     },
 
-    Is_DrawingShape : function()
+    Is_DrawingShape : function(bRetShape)
     {
+        if(bRetShape === true)
+        {
+            return null;
+        }
         return false;
     },
 

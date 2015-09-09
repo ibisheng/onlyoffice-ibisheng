@@ -425,8 +425,12 @@ CHeaderFooter.prototype =
         return true;
     },
 
-    Is_DrawingShape : function()
+    Is_DrawingShape : function(bRetShape)
     {
+        if(bRetShape === true)
+        {
+            return null;
+        }
         return false;
     },
 

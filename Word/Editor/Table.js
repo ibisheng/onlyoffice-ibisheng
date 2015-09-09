@@ -21582,9 +21582,9 @@ CTableCell.prototype =
         return false;
     },
 
-    Is_DrawingShape : function()
+    Is_DrawingShape : function(bRetShape)
     {
-        return this.Row.Table.Parent.Is_DrawingShape();
+        return this.Row.Table.Parent.Is_DrawingShape(bRetShape);
     },
 
     Is_HdrFtr : function(bReturnHdrFtr)

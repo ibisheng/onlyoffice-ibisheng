@@ -57,8 +57,12 @@ CGraphicFrame.prototype =
     getSlideIndex: CShape.prototype.getSlideIndex,
     calculateSnapArrays: CShape.prototype.calculateSnapArrays,
 
-    Is_DrawingShape: function()
+    Is_DrawingShape: function(bRetShape)
     {
+        if(bRetShape === true)
+        {
+            return null;
+        }
         return false;
     },
 

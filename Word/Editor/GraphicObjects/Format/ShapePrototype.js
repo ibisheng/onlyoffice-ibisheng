@@ -818,8 +818,12 @@ CShape.prototype.Is_Cell = function()
     return false;
 };
 
-CShape.prototype.Is_DrawingShape = function()
+CShape.prototype.Is_DrawingShape = function(bRetShape)
 {
+    if(bRetShape === true)
+    {
+        return this;
+    }
     return true;
 };
 

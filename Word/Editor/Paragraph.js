@@ -11099,6 +11099,20 @@ Paragraph.prototype =
             case historyitem_Paragraph_Shd_Color:
             case historyitem_Paragraph_Shd_Unifill:
             case historyitem_Paragraph_Shd:
+            {
+                if(this.Parent)
+                {
+                    var oDrawingShape = this.Parent.Is_DrawingShape(true);
+                    if(oDrawingShape)
+                    {
+                        if(oDrawingShape.chekBodyPrTransform(oDrawingShape.getBodyPr()) || oDrawingShape.checkContentWordArt(oDrawingShape.getDocContent()))
+                        {
+                            bNeedRecalc = true;
+                        }
+                    }
+                }
+                break;
+            }
             case historyitem_Paragraph_DocNext:
             case historyitem_Paragraph_DocPrev:
             {
