@@ -1763,7 +1763,14 @@ Paragraph.prototype =
                 var Element = aHigh.Get_Next();
                 while ( null != Element )
                 {
-                    pGraphics.b_color1( Element.r, Element.g, Element.b, 255 );
+                    if(!pGraphics.set_fillColor)
+                    {
+                        pGraphics.b_color1( Element.r, Element.g, Element.b, 255 );
+                    }
+                    else
+                    {
+                        pGraphics.set_fillColor( Element.r, Element.g, Element.b);
+                    }
                     pGraphics.rect( Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0, Element.Additional2 );
                     pGraphics.df();
                     Element = aHigh.Get_Next();
