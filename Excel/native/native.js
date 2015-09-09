@@ -2357,6 +2357,10 @@ function offline_get_cell_coord (c, r) {
         worksheet.cols[c].width,
         worksheet.rows[r].height];
 }
+function offline_get_header_sizes() {
+    var worksheet = _api.wb.getWorksheet();
+    return [worksheet.headersWidth, worksheet.headersHeight];
+}
 
 function offline_copy() {
 
