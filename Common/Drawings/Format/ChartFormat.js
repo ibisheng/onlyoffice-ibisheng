@@ -5873,7 +5873,7 @@ CDateAx.prototype =
     },
 
 
-    Read_FromBinar2: function(r)
+    Read_FromBinary2: function(r)
     {
         this.Id = r.GetString2();
     },
@@ -7302,7 +7302,7 @@ CSerAx.prototype =
         w.WriteString2(this.Get_Id());
     },
 
-    Read_FrommBinary2: function(r)
+    Read_FromBinary2: function(r)
     {
         this.Id = r.GetString2();
     },
@@ -9001,6 +9001,17 @@ CBandFmt.prototype =
     {
         History.Add(this, {Type: historyitem_BandFmt_SetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
+    },
+
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(this.getObjectType());
+        w.WriteString2(this.Get_Id());
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
     },
 
     Undo: function(data)
@@ -17144,6 +17155,16 @@ COfPieChart.prototype =
 
     removeDataLabels: CBarChart.prototype.removeDataLabels,
 
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(this.getObjectType());
+        w.WriteString2(this.Get_Id());
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    },
 
     addCustSplit: function(pr)
     {
@@ -18688,6 +18709,17 @@ CPivotFmt.prototype =
         return historyitem_type_PivotFmt;
     },
 
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(this.getObjectType());
+        w.WriteString2(this.Get_Id());
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    },
+
     setLbl: function(pr)
     {
         History.Add(this, {Type:historyitem_PivotFmt_SetDLbl, oldPr:this.dLbl, newPr: pr});
@@ -18910,6 +18942,18 @@ CRadarChart.prototype =
         {
             History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
         }
+    },
+
+
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(this.getObjectType());
+        w.WriteString2(this.Get_Id());
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
     },
 
     getSeriesConstructor: function()
@@ -21815,6 +21859,18 @@ CStringLiteral.prototype =
         return historyitem_type_StringLiteral;
     },
 
+
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(this.getObjectType());
+        w.WriteString2(this.Get_Id());
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    },
+
     setPt: function(pr)
     {
         History.Add(this, {Type: historyitem_StringLiteral_SetPt, newPr: pr, oldPr: this.pt});
@@ -23708,6 +23764,18 @@ CTrendLine.prototype =
             c.setTrendlineType(this.trendlineType);
         }
         return c;
+    },
+
+
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(this.getObjectType());
+        w.WriteString2(this.Get_Id());
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
     },
 
     Undo: function(data)
