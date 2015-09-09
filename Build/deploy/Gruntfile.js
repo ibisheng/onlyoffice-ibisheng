@@ -200,7 +200,7 @@ module.exports = function(grunt) {
 			closureCompiler: {
 				options: {
 					compilerFile: toolsFile['closure_compiler'],
-					javaFlags: ['-Xms1024m']
+					javaFlags: ['-Xms1536m']
 				},
 				sdk: {
 					TEMPcompilerOpts: {
