@@ -130,7 +130,7 @@ require([
             ,'Common.Controllers.ExternalDiagramEditor'
             /** proprietary end **/
 			,'Common.Controllers.ExternalMergeEditor'
-            ,'Common.Controllers.ReviewChanges'
+            //,'Common.Controllers.ReviewChanges'
         ]
     });
 
@@ -163,7 +163,7 @@ require([
         ,'common/main/lib/controller/ExternalDiagramEditor'
         /** proprietary end **/
 		,'common/main/lib/controller/ExternalMergeEditor'
-        ,'common/main/lib/controller/ReviewChanges'
+        //,'common/main/lib/controller/ReviewChanges'
     ], function() {
         app.start();
     });
