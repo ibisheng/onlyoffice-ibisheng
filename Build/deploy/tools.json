@@ -1,4 +1,4 @@
 {
-	"closure_compiler": "C:/Bin/Google/Closure-compiler-2014/compiler.jar",
+	"closure_compiler": "/home/ubuntu/compiler.jar",
 	"menu_path": "../../../menu/sdk"
 }
