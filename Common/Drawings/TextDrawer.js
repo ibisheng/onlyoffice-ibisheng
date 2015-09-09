@@ -73,7 +73,7 @@ CDocContentStructure.prototype.draw = function(graphics, transform, oTheme, oCol
 CDocContentStructure.prototype.drawComments = function(graphics, transform)
 {
     var i;
-    for(i = 0; i < this.m_aBackgrounds.length; ++i)
+    for(i = 0; i < this.m_aComments.length; ++i)
     {
         this.m_aComments[i].drawComment2(graphics, undefined, transform);
     }
