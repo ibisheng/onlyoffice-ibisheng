@@ -7,18 +7,6 @@
         "revision": "HEAD",
         "src": "../../Common ../../Word ../../PowerPoint"
     },
-    "concat_api": {
-        "../../PowerPoint/api-all.js": [
-            "../../PowerPoint/api.js",
-            "../../PowerPoint/Private/api.js",
-            "../../PowerPoint/apiCommon.js",
-            "../../Word/apiCommon.js"
-        ]
-    },
-    "extract_api": {
-        "src": "../../PowerPoint/api-all.js",
-        "dst": "../../PowerPoint/apiExport.js"
-    },
     "compile": {
         "sdk": {
             "src": [
@@ -140,7 +128,10 @@
                 "../../PowerPoint/Editor/Format/GroupPrototype.js",
                 "../../PowerPoint/Editor/Format/ChartSpacePrototype.js",
                 "../../PowerPoint/Editor/Format/GraphicFrame.js",
-                "../../PowerPoint/api-all.js",
+                "../../PowerPoint/api.js",
+                "../../PowerPoint/Private/api.js",
+                "../../PowerPoint/apiCommon.js",
+                "../../Word/apiCommon.js",
                 "../../PowerPoint/apiExport.js",
                 "../../Excel/utils/utils.js",
                 "../../Excel/model/Serialize.js",

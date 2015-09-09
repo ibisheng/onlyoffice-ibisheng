@@ -177,27 +177,6 @@ module.exports = function(grunt) {
 		}
 		grunt.file.write(defaultConfig, JSON.stringify(pkg, null, 4));
     });
-
-	
-	grunt.registerTask('concat_js_api_init', 'Concatinate JS API', function() {
-        grunt.initConfig({
-            concat:  packageFile['concat_api']
-        });
-    });
-	grunt.registerTask('concat_js_api', ['concat_js_api_init', 'concat']);
-	
-	grunt.registerTask('extract_js_api_init', 'Extract JS API', function(){
-		grunt.file.mkdir( packageFile['compile']['sdk']['log'] );
-		grunt.initConfig({
-			exec: {
-				api: {
-					command: 'bin\\ExtractJSApi.exe ' + packageFile['extract_api']['src'] + ' ' + packageFile['extract_api']['dst'],
-					stdout: false
-				}
-			}
-		});
-	});
-	grunt.registerTask('extract_js_api', ['extract_js_api_init', 'exec']);
 	
 	grunt.registerTask('create_map_file', function() {
 		//Не нашел как передать параметры в таску, поэтому  продублировал код.	

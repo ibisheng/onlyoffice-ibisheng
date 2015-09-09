@@ -7,17 +7,6 @@
         "revision": "HEAD",
         "src": "../../Common ../../Word"
     },
-    "concat_api": {
-        "../../Word/api-all.js": [
-            "../../Word/api.js",
-            "../../Word/Private/api.js",
-            "../../Word/apiCommon.js"
-        ]
-    },
-    "extract_api": {
-        "src": "../../Word/api-all.js",
-        "dst": "../../Word/apiExport.js"
-    },
     "compile": {
         "sdk": {
             "src": [
@@ -125,7 +114,9 @@
                 "../../Common/scroll.js",
                 "../../Word/Editor/SerializeCommon.js",
                 "../../Word/apiDefines.js",
-                "../../Word/api-all.js",
+                "../../Word/api.js",
+                "../../Word/Private/api.js",
+                "../../Word/apiCommon.js",
                 "../../Word/apiExport.js",
                 "../../Word/document/empty.js",
                 "../../Word/Math/mathTypes.js",

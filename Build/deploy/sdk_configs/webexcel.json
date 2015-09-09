@@ -7,10 +7,6 @@
         "revision": "HEAD",
         "src": "../../Common ../../Word ../../Excel ../../PowerPoint"
     },
-    "extract_api": {
-        "src": "../../Word/apiCommon.js",
-        "dst": "../../Excel/apiCommonExport.js"
-    },
     "compile": {
         "sdk": {
             "src": [
