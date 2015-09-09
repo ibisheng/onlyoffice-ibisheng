@@ -178,6 +178,7 @@ if(typeof CGraphicObjects !== "undefined")
             || changestype_Delete === CheckType
             || changestype_Remove === CheckType
             || changestype_Paragraph_Content === CheckType
+            || changestype_Paragraph_Properties === CheckType
             || changestype_Document_Content_Add === CheckType)
         {
             for(i = 0; i < this.selectedObjects.length; ++i)
