@@ -4384,8 +4384,10 @@ $(".colorWatch").mouseover(function(){
 	var isViewMode = "true" == getURLParameter("isViewMode");
 	editor.SetViewMode(isViewMode);
 	editor.asc_setDocInfo(c_DocInfo);
+	editor.asc_registerCallback('asc_onGetEditorPermissions', function(){
+		editor.LoadDocument();
+	});
 	editor.asc_getEditorPermissions();
-	editor.LoadDocument();
 	
 	
 	$(".mathList").click(function(event)

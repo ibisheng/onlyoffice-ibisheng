@@ -59,6 +59,7 @@
 			// Фиктивные вызовы
 			this.callback_OnSetIndexUser ("123");
 			this.onFirstLoadChangesEnd ();
+			callback();
 		}
 	};
 

@@ -523,11 +523,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this._onUpdateAfterApplyChanges();
 			}
 		};
-		spreadsheet_api.prototype.asc_LoadDocument = function (c_DocInfo) {
+		spreadsheet_api.prototype.asc_LoadDocument = function () {
 			var t = this;
-
-			if(!this.DocInfo && c_DocInfo)
-				this.asc_setDocInfo(c_DocInfo);
 
 			if (this.DocInfo["OfflineApp"] && (true == this.DocInfo["OfflineApp"])) {
 				this.isCoAuthoringEnable = false;
@@ -582,25 +579,26 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 
 		spreadsheet_api.prototype.asc_getEditorPermissions = function(){
-			this._coAuthoringInit();
-			if (this.DocInfo && this.DocInfo["Id"] && this.DocInfo["Url"]) {
-				var t = this;
-				var rdata = {
-					"c"			: "getsettings",
-					"id"		: this.DocInfo["Id"],
-					"userid"	: this.DocInfo["UserId"],
-					"format"	: this.DocInfo["Format"],
-					"vkey"		: this.DocInfo["VKey"],
-					"editorid"	: c_oEditorId.Spreadsheet
-				};
-				this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Perm;
-				sendCommand2(this, null, rdata);
-			} else {
-				this.handlers.trigger("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
-				// Фиктивно инициализируем
-				this.CoAuthoringUrl = window['g_cAscCoAuthoringUrl'] ? window['g_cAscCoAuthoringUrl'] : '';
-				this.SpellCheckUrl = window['g_cAscSpellCheckUrl'] ? window['g_cAscSpellCheckUrl'] : '';
-			}
+			var t = this;
+			this._coAuthoringInit(function(){
+				if (t.DocInfo && t.DocInfo["Id"] && t.DocInfo["Url"]) {
+					var rdata = {
+						"c"			: "getsettings",
+						"id"		: t.DocInfo["Id"],
+						"userid"	: t.DocInfo["UserId"],
+						"format"	: t.DocInfo["Format"],
+						"vkey"		: t.DocInfo["VKey"],
+						"editorid"	: c_oEditorId.Spreadsheet
+					};
+					t.advancedOptionsAction = c_oAscAdvancedOptionsAction.Perm;
+					sendCommand2(t, null, rdata);
+				} else {
+					t.handlers.trigger("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
+					// Фиктивно инициализируем
+					t.CoAuthoringUrl = window['g_cAscCoAuthoringUrl'] ? window['g_cAscCoAuthoringUrl'] : '';
+					t.SpellCheckUrl = window['g_cAscSpellCheckUrl'] ? window['g_cAscSpellCheckUrl'] : '';
+				}
+			});
 		};
 
 		spreadsheet_api.prototype.asc_getLicense = function () {
@@ -1484,7 +1482,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		/////////////////////////////////////////////////////////////////////////
 		///////////////////CoAuthoring and Chat api//////////////////////////////
 		/////////////////////////////////////////////////////////////////////////
-		spreadsheet_api.prototype._coAuthoringInit = function() {
+		spreadsheet_api.prototype._coAuthoringInit = function(fCallback) {
 			var t = this;
 
 			if (!this.isCoAuthoringEnable)
@@ -1518,6 +1516,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			if (!this.CoAuthoringApi) {
 				this.asyncServerIdEndLoaded ();
+				fCallback();
 				return; // Error
 			}
 			this.CoAuthoringApi.onParticipantsChanged   	= function (e, count) { t.handlers.trigger("asc_onParticipantsChanged", e, count); };
@@ -1750,7 +1749,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this._coAuthoringSetServerUrl(null);
 			}
 			this.CoAuthoringApi.init(t.User, t.documentId, t.documentCallbackUrl, 'fghhfgsjdgfjs',
-				function(){}, c_oEditorId.Spreadsheet, t.documentFormatSave, t.asc_getViewerMode());
+				fCallback, c_oEditorId.Spreadsheet, t.documentFormatSave, t.asc_getViewerMode());
 		};
 
 		// Set CoAuthoring server url
@@ -3655,7 +3654,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
             }
 			g_oIdCounter.Set_Load(false);
 
-			this._coAuthoringInit();
+			this._coAuthoringInit(function(){});
 			this.wb = new asc.WorkbookView(
 				this.wbModel,
 				this.controller,

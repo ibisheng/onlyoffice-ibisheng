@@ -574,8 +574,10 @@
         };
     }
     api.asc_setDocInfo(c_DocInfo);
+	api.asc_registerCallback('asc_onGetEditorPermissions', function(){
+		api.asc_LoadDocument();
+	});
     api.asc_getEditorPermissions();
-    api.asc_LoadDocument();
 
 	$("#enableKE").data("state", true).click(function(){
 		var $this = $(this), s = $this.data("state");

@@ -235,10 +235,11 @@ CChatMessage.prototype.get_Message = function() { return this.Message; };
  ToDo Register Callback OnCoAuthoringDisconnectUser возвращается userId
  */
 // Init CoAuthoring
-asc_docs_api.prototype._coAuthoringInit = function () {
+asc_docs_api.prototype._coAuthoringInit = function (fCallback) {
     if (!this.CoAuthoringApi) {
         g_oIdCounter.Set_Load(false);
         this.asyncServerIdEndLoaded ();
+		fCallback();
         return; // Error
     }
 
@@ -558,7 +559,7 @@ asc_docs_api.prototype._coAuthoringInit = function () {
 	if(!(window["NATIVE_EDITOR_ENJINE"] || !documentId)){
 		this.CoAuthoringApi.set_url(null);
 	}
-    this.CoAuthoringApi.init(this.User, documentId, documentCallbackUrl, 'fghhfgsjdgfjs', function(){}, c_oEditorId.Presentation,
+    this.CoAuthoringApi.init(this.User, documentId, documentCallbackUrl, 'fghhfgsjdgfjs', fCallback, c_oEditorId.Presentation,
 		documentFormatSave, this.isViewMode);
 
     // ToDo init other callbacks
@@ -750,27 +751,28 @@ asc_docs_api.prototype.Init = function()
 	this.WordControl.Init();
 };
 asc_docs_api.prototype.asc_getEditorPermissions = function() {
-	this._coAuthoringInit();
-	if (this.DocInfo && this.DocInfo.get_Id()) {
-		var rData = {
-			"c": "getsettings",
-			"id": this.DocInfo.get_Id(),
-			"userid": this.DocInfo.get_UserId(),
-			"format": this.DocInfo.get_Format(),
-			"vkey": this.DocInfo.get_VKey(),
-			"editorid": c_oEditorId.Presentation
-		};
+	var t = this;
+	this._coAuthoringInit(function(){
+		if (t.DocInfo && t.DocInfo.get_Id()) {
+			var rData = {
+				"c": "getsettings",
+				"id": t.DocInfo.get_Id(),
+				"userid": t.DocInfo.get_UserId(),
+				"format": t.DocInfo.get_Format(),
+				"vkey": t.DocInfo.get_VKey(),
+				"editorid": c_oEditorId.Presentation
+			};
 
-		var t = this;
-		this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Perm;
-		sendCommand2(this, null, rData);
-	} else {
-		var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
-		this.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
-		// Фиктивно инициализируем
-		this.CoAuthoringUrl = window['g_cAscCoAuthoringUrl'] ? window['g_cAscCoAuthoringUrl'] : '';
-		this.SpellCheckUrl = window['g_cAscSpellCheckUrl'] ? window['g_cAscSpellCheckUrl'] : '';
-	}
+			t.advancedOptionsAction = c_oAscAdvancedOptionsAction.Perm;
+			sendCommand2(t, null, rData);
+		} else {
+			var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
+			t.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
+			// Фиктивно инициализируем
+			t.CoAuthoringUrl = window['g_cAscCoAuthoringUrl'] ? window['g_cAscCoAuthoringUrl'] : '';
+			t.SpellCheckUrl = window['g_cAscSpellCheckUrl'] ? window['g_cAscSpellCheckUrl'] : '';
+		}
+	});
 };
 
 asc_docs_api.prototype.asc_getLicense = function () {
@@ -862,10 +864,8 @@ asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo)
 asc_docs_api.prototype.asc_setLocale = function(val)
 {
 };
-asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
+asc_docs_api.prototype.LoadDocument = function()
 {
-	if(!this.DocInfo && c_DocInfo)
-		this.asc_setDocInfo(c_DocInfo);
     this.WordControl.m_oDrawingDocument.m_bIsOpeningDocument = true;
 
 
