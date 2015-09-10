@@ -5458,8 +5458,8 @@ PasteProcessor.prototype =
                 {
                     switch(type)
                     {
-                        case "disc": num = numbering_numfmt_Bullet;break;
-                        case "decimal": num = numbering_numfmt_Decimal;break;
+                        case "disc"       : num = numbering_numfmt_Bullet;break;
+                        case "decimal"    : num = numbering_numfmt_Decimal;break;
                         case "lower-roman": num = numbering_numfmt_LowerRoman;break;
                         case "upper-roman": num = numbering_numfmt_UpperRoman;break;
                         case "lower-alpha": num = numbering_numfmt_LowerLetter;break;
@@ -5482,18 +5482,54 @@ PasteProcessor.prototype =
                 }
                 if(null == NumId && this.pasteInExcel !== true)
                 {
-                    //������� ����� ������
+                    // Создаем нумерацию
                     NumId  = this.oLogicDocument.Numbering.Create_AbstractNum();
-
-                    var AbstractNum = this.oLogicDocument.Numbering.Get_AbstractNum( NumId );
-                    AbstractNum.Create_Default_Bullet();
-                    switch(num)
+                    var AbstractNum = this.oLogicDocument.Numbering.Get_AbstractNum(NumId);
+                    if (numbering_numfmt_Bullet === num)
                     {
-                        case numbering_numfmt_Decimal: AbstractNum.Set_Lvl_Numbered_2(0);break;
-                        case numbering_numfmt_LowerRoman: AbstractNum.Set_Lvl_Numbered_5(0);break;
-                        case numbering_numfmt_UpperRoman: AbstractNum.Set_Lvl_Numbered_9(0);break;
-                        case numbering_numfmt_LowerLetter: AbstractNum.Set_Lvl_Numbered_8(0);break;
-                        case numbering_numfmt_UpperLetter: AbstractNum.Set_Lvl_Numbered_6(0);break;
+                        AbstractNum.Create_Default_Bullet();
+                        var LvlText = String.fromCharCode(0x00B7);
+                        var NumTextPr = new CTextPr();
+                        NumTextPr.RFonts.Set_All("Symbol", -1);
+
+                        switch(type)
+                        {
+                            case "disc":
+                            {
+                                NumTextPr.RFonts.Set_All("Symbol", -1);
+                                LvlText = String.fromCharCode(0x00B7);
+                                break;
+                            }
+                            case "circle":
+                            {
+                                NumTextPr.RFonts.Set_All("Courier New", -1);
+                                LvlText = "o";
+                                break;
+                            }
+                            case "square":
+                            {
+                                NumTextPr.RFonts.Set_All("Wingdings", -1);
+                                LvlText = String.fromCharCode(0x00A7);
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        AbstractNum.Create_Default_Numbered();
+                    }
+
+                    for (var iLvl = 0; iLvl <= 8; iLvl++)
+                    {
+                        switch(num)
+                        {
+                            case numbering_numfmt_Bullet     : AbstractNum.Set_Lvl_Bullet(iLvl, LvlText, NumTextPr); break;
+                            case numbering_numfmt_Decimal    : AbstractNum.Set_Lvl_Numbered_2(iLvl);break;
+                            case numbering_numfmt_LowerRoman : AbstractNum.Set_Lvl_Numbered_5(iLvl);break;
+                            case numbering_numfmt_UpperRoman : AbstractNum.Set_Lvl_Numbered_9(iLvl);break;
+                            case numbering_numfmt_LowerLetter: AbstractNum.Set_Lvl_Numbered_8(iLvl);break;
+                            case numbering_numfmt_UpperLetter: AbstractNum.Set_Lvl_Numbered_6(iLvl);break;
+                        }
                     }
                     //��������� ��������� ������ ����� �� ���������� ������� ���������� ��������
                     var oFirstTextChild = node;
