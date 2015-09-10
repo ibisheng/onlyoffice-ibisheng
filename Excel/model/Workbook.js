@@ -2494,7 +2494,9 @@ Workbook.prototype.getDefinesNames = function ( name, sheetId ) {
     return this.dependencyFormulas.getDefNameNodeByName( name, sheetId );
 };
 Workbook.prototype.getDefinedName = function ( name ) {
-    return this.dependencyFormulas.getDefNameNodeByName( name.Name, name.LocalSheetId );
+    var ws = this.getWorksheet( name.LocalSheetId ), sheetId = null;
+    ws ? sheetId = ws.getId() : null;
+    return this.dependencyFormulas.getDefNameNodeByName( name.Name, sheetId );
 };
 Workbook.prototype.delDefinesNames = function ( defName ) {
     History.Create_NewPoint();
