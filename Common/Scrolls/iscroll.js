@@ -1235,12 +1235,4 @@ dummyStyle = null;	// for the sake of it
 
 window.CTouchScroll = CTouchScroll;
 
-window.asc_sdk_transform = prefixStyle('transform');
-window.asc_sdk_transitionProperty = prefixStyle('transitionProperty');
-window.asc_sdk_transitionDuration = prefixStyle('transitionDuration');
-window.asc_sdk_transformOrigin = prefixStyle('transformOrigin');
-window.asc_sdk_transitionTimingFunction = prefixStyle('transitionTimingFunction');
-window.asc_sdk_transitionDelay = prefixStyle('transitionDelay');
-window.asc_sdk_cssVendor = cssVendor;
-
 })(window, document);
