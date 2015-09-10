@@ -3913,7 +3913,7 @@ CDocumentContent.prototype =
         {
             if ( true === AddToSelect )
             {
-                this.Selection_SetEnd( X, Y, true );
+                this.Selection_SetEnd(X, Y, this.CurPage + this.StartPage, true);
             }
             else
             {

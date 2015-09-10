@@ -2372,7 +2372,7 @@ CDocument.prototype =
         if (true === this.TurnOffRecalcCurPos)
             return;
 
-        if ( true === CollaborativeEditing.m_bGlobalLockSelection )
+        if (true === CollaborativeEditing.m_bGlobalLockSelection)
             return;
 
         if (docpostype_HdrFtr === this.CurPos.Type)
@@ -2381,16 +2381,16 @@ CDocument.prototype =
             if (null !== CurHdrFtr && -1 !== CurHdrFtr.RecalcInfo.CurPage)
                 this.CurPage = CurHdrFtr.RecalcInfo.CurPage;
         }
-        if ( docpostype_DrawingObjects === this.CurPos.Type )
+        else if (docpostype_DrawingObjects === this.CurPos.Type)
         {
             var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
-            if ( null != ParaDrawing )
+            if (null != ParaDrawing)
                 this.CurPage = ParaDrawing.PageNum;
         }
         else
         {
             var Pos = ( true === this.Selection.Use && selectionflag_Numbering !== this.Selection.Flag ? this.Selection.EndPos : this.CurPos.ContentPos );
-            if ( Pos >= 0 && ( null === this.FullRecalc.Id || this.FullRecalc.StartIndex > Pos ) )
+            if (Pos >= 0 && ( null === this.FullRecalc.Id || this.FullRecalc.StartIndex > Pos ))
             {
                 this.CurPage = this.Content[Pos].Get_CurrentPage_Absolute();
             }

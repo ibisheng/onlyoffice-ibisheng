@@ -735,10 +735,10 @@ CHeaderFooter.prototype =
         return bRetValue;
     },
 
-    Cursor_MoveAt : function( X, Y, PageIndex, AddToSelect, bRemoveOldSelection )
+    Cursor_MoveAt : function(X, Y, PageIndex, AddToSelect, bRemoveOldSelection)
     {
-        this.Set_Page( PageIndex );
-        return this.Content.Cursor_MoveAt( X, Y, AddToSelect, bRemoveOldSelection );
+        this.Set_Page(PageIndex);
+        return this.Content.Cursor_MoveAt(X, Y, AddToSelect, bRemoveOldSelection, PageIndex);
     },
 
     Cursor_MoveToCell : function(bNext)
