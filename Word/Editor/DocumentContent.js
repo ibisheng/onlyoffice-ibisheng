@@ -7487,26 +7487,29 @@ CDocumentContent.prototype =
     // Если bEnd = true, тогда это конец селекта.
     Selection_SetEnd : function(X, Y, PageIndex, MouseEvent)
     {
-        if ( PageIndex - this.StartPage >= this.Pages.length )
-            return;
-
-        this.CurPage = PageIndex - this.StartPage;
-
-        if ( docpostype_DrawingObjects === this.CurPos.Type )
+        if (docpostype_DrawingObjects === this.CurPos.Type)
         {
-            if ( g_mouse_event_type_up == MouseEvent.Type )
+            var CurPage = PageIndex - this.StartPage + this.Get_StartPage_Absolute();
+            if (this.Parent instanceof CHeaderFooter)
+                CurPage = PageIndex;
+
+            if (g_mouse_event_type_up == MouseEvent.Type)
             {
-                this.LogicDocument.DrawingObjects.OnMouseUp( MouseEvent, X, Y, this.CurPage + this.Get_StartPage_Absolute() );
+                this.LogicDocument.DrawingObjects.OnMouseUp(MouseEvent, X, Y, CurPage);
                 this.Selection.Start = false;
-                this.Selection.Use   = true;
+                this.Selection.Use = true;
             }
             else
             {
-                this.LogicDocument.DrawingObjects.OnMouseMove( MouseEvent, X, Y, this.CurPage + this.Get_StartPage_Absolute() );
+                this.LogicDocument.DrawingObjects.OnMouseMove(MouseEvent, X, Y, CurPage);
             }
             return;
         }
 
+        if (PageIndex - this.StartPage >= this.Pages.length)
+            return;
+
+        this.CurPage = PageIndex - this.StartPage;
 
         if ( selectionflag_Numbering === this.Selection.Flag )
             return;
