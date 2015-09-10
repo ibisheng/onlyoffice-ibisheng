@@ -5747,7 +5747,6 @@ CTable.prototype =
 
                 this.Internal_ReIndexing(Data.Pos);
                 this.Recalc_CompiledPr2();
-
                 break;
             }
 
@@ -5759,7 +5758,6 @@ CTable.prototype =
 
                 this.Internal_ReIndexing(Data.Pos);
                 this.Recalc_CompiledPr2();
-
                 break;
             }
 
@@ -6035,7 +6033,7 @@ CTable.prototype =
                 this.RowsInfo.splice( Data.Pos, 0, Data.Item.RowsInfo );
 
                 this.Internal_ReIndexing(Data.Pos);
-
+                this.Recalc_CompiledPr2();
                 break;
             }
 
@@ -6046,7 +6044,7 @@ CTable.prototype =
                 this.RowsInfo.splice( Data.Pos, 1 );
 
                 this.Internal_ReIndexing(Data.Pos);
-
+                this.Recalc_CompiledPr2();
                 break;
             }
 
@@ -7017,7 +7015,7 @@ CTable.prototype =
             {
                 // Bool : Inline
 
-                this.Inline = Reader.GetBool()
+                this.Inline = Reader.GetBool();
 
                 break;
             }
