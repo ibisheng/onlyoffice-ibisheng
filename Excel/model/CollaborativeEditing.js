@@ -213,8 +213,10 @@
 			// Когда не совместное редактирование чистить ничего не нужно, но отправлять нужно.
 			var bIsCollaborative = this.getCollaborativeEditing();
 
-			var bCheckRedraw = false;
-			var bRedrawGraphicObjects = false;
+			var bCheckRedraw = false,
+                bRedrawGraphicObjects = false,
+                bUnlockDefName = false,
+                dN;
 			if (bIsCollaborative && (0 < this.m_arrNeedUnlock.length ||
 				0 < this.m_arrNeedUnlock2.length)) {
 				bCheckRedraw = true;
@@ -232,6 +234,10 @@
                     drawing.lockType = c_oAscLockTypes.kLockTypeNone;
                     bRedrawGraphicObjects = true;
                 }
+                if(!bUnlockDefName){
+                    bUnlockDefName = this.handlers.trigger("checkDefNameLock", oLock);
+                }
+
 				this.handlers.trigger("releaseLocks", oLock.Element["guid"]);
 			}
 			// Очищаем примененные чужие изменения
@@ -246,6 +252,9 @@
 							drawing.lockType = c_oAscLockTypes.kLockTypeNone;
 							bRedrawGraphicObjects = true;
 						}
+                        if(!bUnlockDefName){
+                            bUnlockDefName = this.handlers.trigger("checkDefNameLock", oLock);
+                        }
 					}
 
 					this.m_arrNeedUnlock.splice(nIndex, 1);
@@ -282,6 +291,10 @@
 
 				if (bCheckRedraw || bRedrawGraphicObjects)
 					this.handlers.trigger("showDrawingObjects");
+
+                if(bUnlockDefName){
+                    this.handlers.trigger("unlockDefName");
+                }
 
 				if (0 === this.m_nUseType)
 					this.m_nUseType = 1;

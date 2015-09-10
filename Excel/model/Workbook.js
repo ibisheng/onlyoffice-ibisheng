@@ -1078,6 +1078,26 @@ DependencyGraph.prototype = {
         }
         return list;
     },
+    unlockDefName:function(){
+        var nodesList = this.defNameList;
+
+        for ( var id in nodesList ) {
+            if ( nodesList[id].isLock ) {
+                delete nodesList[id].isLock;
+            }
+        }
+    },
+    checkDefNameLock:function(){
+        var nodesList = this.defNameList;
+
+        for ( var id in nodesList ) {
+            if ( nodesList[id].isLock ) {
+                return true;
+            }
+        }
+        return false;
+    },
+
     getNextTableName:function ( ws, Ref ) {
         this.nTableNameMaxIndex++;
         var sNewName = this.sTableNamePattern + this.nTableNameMaxIndex,
@@ -1620,7 +1640,7 @@ DefNameVertex.prototype = {
         return new Asc.asc_CDefName( this.Name,
             this.Ref,
             this.sheetId == "WB" ? null : a ? a.getIndex() : null,
-            this.isTable, this.Hidden );
+            this.isTable, this.Hidden, this.isLock );
     },
 
     changeDefName:function ( newName ) {
@@ -2471,9 +2491,10 @@ Workbook.prototype.getDefinesNamesWB = function (defNameListId) {
     return names.sort(sort);
 };
 Workbook.prototype.getDefinesNames = function ( name, sheetId ) {
-
-    var res = this.dependencyFormulas.getDefNameNodeByName( name, sheetId );
-    return res;
+    return this.dependencyFormulas.getDefNameNodeByName( name, sheetId );
+};
+Workbook.prototype.getDefinedName = function ( name ) {
+    return this.dependencyFormulas.getDefNameNodeByName( name.Name, name.LocalSheetId );
 };
 Workbook.prototype.delDefinesNames = function ( defName ) {
     History.Create_NewPoint();
@@ -2599,6 +2620,12 @@ Workbook.prototype.findDefinesNames = function ( ref, sheetId ) {
 
     return this.dependencyFormulas.getDefNameNodeByRef( ref, sheetId );
 
+};
+Workbook.prototype.unlockDefName = function(){
+    this.dependencyFormulas.unlockDefName();
+};
+Workbook.prototype.checkDefNameLock = function(){
+    return this.dependencyFormulas.checkDefNameLock();
 };
 Workbook.prototype.buildDependency = function(){
 	this.dependencyFormulas.clear();

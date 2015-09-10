@@ -1509,10 +1509,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				"updateAllSheetsLock":				function () {t._onUpdateAllSheetsLock.apply(t, arguments);},
 				"showDrawingObjects":				function () {t._onShowDrawingObjects.apply(t, arguments);},
 				"showComments":						function () {t._onShowComments.apply(t, arguments);},
-				"cleanSelection":					function () {t._onCleanSelection.apply(t, arguments);},
-				"updateDocumentCanSave":			function () {t._onUpdateDocumentCanSave();},
-				"checkCommentRemoveLock":			function (lockElem) {return t._onCheckCommentRemoveLock(lockElem);}
-			}, this.asc_getViewerMode());
+                "cleanSelection":					function () {t._onCleanSelection.apply(t, arguments);},
+                "updateDocumentCanSave":			function () {t._onUpdateDocumentCanSave();},
+                "checkCommentRemoveLock":			function (lockElem) {return t._onCheckCommentRemoveLock(lockElem);},
+                "unlockDefName":				    function () {t._onUnlockDefName.apply(t, arguments);},
+                "checkDefNameLock":			        function (lockElem) {return t._onCheckDefNameLock(lockElem);}
+            }, this.asc_getViewerMode());
 
 			if (!this.CoAuthoringApi) {
 				this.asyncServerIdEndLoaded ();
@@ -1543,8 +1545,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 					if (lockType === c_oAscLockTypeElem.Object) {
 						drawing = g_oTableId.Get_ById(lockElem.Element["rangeOrObjectId"]);
-						if (drawing)
+						if (drawing){
 							drawing.lockType = lockElem.Type;
+                        }
 					}
 
 					if (t.wb) {
@@ -1553,6 +1556,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 						// Шлем update для листов
 						t._onUpdateSheetsLock(lockElem);
+
+                        t._onUpdateDefinedNames(lockElem);
 
 						var ws = t.wb.getWorksheet();
 						var lockSheetId = lockElem.Element["sheetId"];
@@ -2145,14 +2150,24 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
         spreadsheet_api.prototype.asc_setDefinedNames = function (defName) {
 //            return this.wb.setDefinedNames(defName);
+            // Проверка глобального лока
+            if (this.collaborativeEditing.getGlobalLock())
+                return;
             return this.wb.editDefinedNames(null, defName);
         };
 
         spreadsheet_api.prototype.asc_editDefinedNames = function (oldName, newName) {
+            // Проверка глобального лока
+            if (this.collaborativeEditing.getGlobalLock())
+                return;
+
             return this.wb.editDefinedNames(oldName, newName);
         };
 
         spreadsheet_api.prototype.asc_delDefinedNames = function (oldName) {
+            // Проверка глобального лока
+            if (this.collaborativeEditing.getGlobalLock())
+                return;
             return this.wb.delDefinedNames(oldName);
         };
 
@@ -2163,6 +2178,22 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
         spreadsheet_api.prototype.asc_getDefaultDefinedName = function () {
             return this.wb.getDefaultDefinedName();
         };
+
+        spreadsheet_api.prototype._onUpdateDefinedNames = function (lockElem) {
+            var dN = this.wbModel.dependencyFormulas.defNameList[lockElem.Element["rangeOrObjectId"]];
+            if(dN){
+                dN.isLock = lockElem["UserId"];
+                this.handlers.trigger("asc_onRefreshDefNameList");
+            }
+        }
+
+        spreadsheet_api.prototype._onUnlockDefName = function(){
+            this.wb.unlockDefName();
+        }
+
+        spreadsheet_api.prototype._onCheckDefNameLock = function(){
+            return this.wb._onCheckDefNameLock();
+        }
 
 		// Залочена ли работа с листом
 		spreadsheet_api.prototype.asc_isWorksheetLockedOrDeleted = function (index) {

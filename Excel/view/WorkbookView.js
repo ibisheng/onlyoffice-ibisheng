@@ -1970,20 +1970,53 @@
 
         WorkbookView.prototype.editDefinedNames = function (oldName, newName) {
             //ToDo проверка defName.ref на знак "=" в начале ссылки. знака нет тогда это либо число либо строка, так делает Excel.
-            var res = this.model.editDefinesNames(oldName, newName);
+            if (this.collaborativeEditing.getGlobalLock())
+                return;
+
+            var ws = this.getWorksheet(),
+                t = this
+
             if( oldName ){
-                this.handlers.trigger("asc_onEditDefName", oldName, newName);
+
+                var editDefinedNamesCallback = function (res) {
+                    if (res) {
+                        t.model.editDefinesNames(oldName, newName);
+                        t.handlers.trigger("asc_onEditDefName", oldName, newName);
+                        t.handlers.trigger("asc_onRefreshDefNameList");
+                    }
+                };
+                var defNameId = t.model.getDefinedName(oldName).nodeId;
+
+                ws._isLockedDefNames(editDefinedNamesCallback, defNameId);
+
             }
             else{
-                this.handlers.trigger("asc_onDefName", res);
+                this.handlers.trigger("asc_onDefName", this.model.editDefinesNames(oldName, newName));
             }
 
         };
 
         WorkbookView.prototype.delDefinedNames = function (oldName) {
             //ToDo проверка defName.ref на знак "=" в начале ссылки. знака нет тогда это либо число либо строка, так делает Excel.
+            if (this.collaborativeEditing.getGlobalLock())
+                return;
 
-            this.handlers.trigger("asc_onDelDefName", this.model.delDefinesNames(oldName));
+            var ws = this.getWorksheet(),
+                t = this
+
+            if( oldName ){
+
+                var delDefinedNamesCallback = function (res) {
+                    if (res) {
+                        t.handlers.trigger("asc_onDelDefName", this.model.delDefinesNames(oldName));
+                        t.handlers.trigger("asc_onRefreshDefNameList");
+                    }
+                };
+                var defNameId = t.model.getDefinedName(oldName).nodeId;
+
+                ws._isLockedDefNames(delDefinedNamesCallback, defNameId);
+
+            }
 
         };
 
@@ -1994,6 +2027,14 @@
 
             return new Asc.asc_CDefName( "", ws.getSelectionRangeValue(), null );
 
+        };
+        WorkbookView.prototype.unlockDefName = function () {
+            this.model.unlockDefName();
+            this.handlers.trigger("asc_onRefreshDefNameList");
+        };
+
+        WorkbookView.prototype._onCheckDefNameLock = function () {
+            return this.model.checkDefNameLock();
         };
 
 		// Печать
