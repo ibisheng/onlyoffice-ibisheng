@@ -1246,6 +1246,14 @@ SplineBezierState.prototype =
 
     onMouseUp: function(e, X, Y, pageIndex)
     {
+        if(asc["editor"])
+        {
+            asc["editor"].asc_endAddShape();
+        }
+        else if(editor && editor.sync_EndAddShape)
+        {
+            editor.sync_EndAddShape();
+        }
         this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
         this.drawingObjects.curState.updateAnchorPos();
     }
@@ -1722,6 +1730,15 @@ PolyLineAddState.prototype =
 
     onMouseUp: function()
     {
+
+        if(asc["editor"])
+        {
+            asc["editor"].asc_endAddShape();
+        }
+        else if(editor && editor.sync_EndAddShape)
+        {
+            editor.sync_EndAddShape();
+        }
         this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
     }
 };
@@ -1782,6 +1799,15 @@ PolyLineAddState2.prototype =
             this.drawingObjects.clearTrackObjects();
             this.drawingObjects.updateOverlay();
             this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
+
+            if(asc["editor"])
+            {
+                asc["editor"].asc_endAddShape();
+            }
+            else if(editor && editor.sync_EndAddShape)
+            {
+                editor.sync_EndAddShape();
+            }
         }
 
     }
@@ -1836,6 +1862,14 @@ AddPolyLine2State2.prototype =
             return {objectId: "1", bMarker: true};
         if(e.ClickCount > 1)
         {
+            if(asc["editor"])
+            {
+                asc["editor"].asc_endAddShape();
+            }
+            else if(editor && editor.sync_EndAddShape)
+            {
+                editor.sync_EndAddShape();
+            }
             this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
         }
     },
