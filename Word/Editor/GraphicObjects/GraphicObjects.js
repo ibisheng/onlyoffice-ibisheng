@@ -1,4 +1,86 @@
 "use strict";
+
+function CBoundsRectForMath(oDrawing)
+{
+    this.L = 0;
+    this.T = 0;
+    this.R = 0;
+    this.B = 0;
+
+    if(oDrawing)
+    {
+        this.Distance = oDrawing.Get_Distance();
+        switch (oDrawing.Get_Type())
+        {
+            case para_Drawing:
+            {
+                switch(oDrawing.wrappingType)
+                {
+                    case WRAPPING_TYPE_NONE:
+                    {
+                        break;
+                    }
+                    case WRAPPING_TYPE_SQUARE :
+                    case WRAPPING_TYPE_THROUGH:
+                    case WRAPPING_TYPE_TIGHT:
+                    {
+                        this.L = oDrawing.wrappingPolygon.left + this.Distance.L;
+                        this.R = oDrawing.wrappingPolygon.right - this.Distance.R;
+                        this.T = oDrawing.wrappingPolygon.top + this.Distance.T;
+                        this.B = oDrawing.wrappingPolygon.bottom - this.Distance.B;
+                        break;
+                    }
+                    case WRAPPING_TYPE_TOP_AND_BOTTOM:
+                    {
+                        var oLimits = editor.WordControl.m_oLogicDocument.Get_PageLimits(oDrawing.PageNum);
+                        this.L = oLimits.X;
+                        this.R = oLimits.XLimit;
+                        this.T = oDrawing.wrappingPolygon.top + this.Distance.T;
+                        this.B = oDrawing.wrappingPolygon.bottom - this.Distance.B;
+                        break;
+                    }
+                }
+                break;
+            }
+            case flowobject_Paragraph:
+            case flowobject_Table:
+            {
+                switch(oDrawing.WrappingType)
+                {
+                    case WRAPPING_TYPE_NONE:
+                    {
+                        break;
+                    }
+                    case WRAPPING_TYPE_SQUARE :
+                    case WRAPPING_TYPE_THROUGH:
+                    case WRAPPING_TYPE_TIGHT:
+                    {
+                        this.L = oDrawing.X;
+                        this.R = oDrawing.X + oDrawing.W;
+                        this.T = oDrawing.Y;
+                        this.B = oDrawing.Y + oDrawing.H;
+                        break;
+                    }
+                    case WRAPPING_TYPE_TOP_AND_BOTTOM:
+                    {
+                        var oLimits = editor.WordControl.m_oLogicDocument.Get_PageLimits(oDrawing.PageNum);
+                        this.L = oLimits.X;
+                        this.R = oLimits.XLimit;
+                        this.T = oDrawing.Y;
+                        this.B = oDrawing.Y + oDrawing.H;
+                        break;
+                    }
+                }
+            }
+        }
+
+    }
+    else
+    {
+        this.Distance = new CDistance(0, 0, 0, 0);
+    }
+}
+
 function CGraphicObjects(document, drawingDocument, api)
 {
     this.api = api;
@@ -163,6 +245,15 @@ CGraphicObjects.prototype =
     getChartObject: DrawingObjectsController.prototype.getChartObject,
     getChartSpace2: DrawingObjectsController.prototype.getChartSpace2,
 
+
+    getAllBoundsRectOnPageForMath: function(nPageIndex)
+    {
+        if(this.graphicPages[nPageIndex])
+        {
+            return this.graphicPages[nPageIndex].getAllBoundsRectOnPageForMath();
+        }
+        return [];
+    },
 
 
     clearPreTrackObjects: function()

@@ -1132,6 +1132,11 @@ CDocument.prototype =
         return this.clrSchemeMap;
     },
 
+    Get_AllBoundsRectOnPageForMath: function(nPageIndex)
+    {
+        return this.DrawingObjects.getAllBoundsRectOnPageForMath(nPageIndex);
+    },
+
     /**
      * Данная функция предназначена для отключения пересчета. Это может быть полезно, т.к. редактор всегда запускает пересчет после каждого действия.
      *

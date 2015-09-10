@@ -104,6 +104,13 @@ CFlowTable.prototype =
 
     },
 
+    Get_Distance : function()
+    {
+        var oDist = this.Distance;
+        return new CDistance(getValOrDefault(oDist.L, DISTANCE_TO_TEXT_LEFTRIGHT), getValOrDefault(oDist.T, 0), getValOrDefault(oDist.R, DISTANCE_TO_TEXT_LEFTRIGHT), getValOrDefault(oDist.B, 0));
+
+    },
+
     getArrayWrapIntervals: function(x0,y0, x1, y1, Y0Sp, Y1Sp, LeftField, RightField, ret)
     {
         if(this.WrappingType === WRAPPING_TYPE_THROUGH || this.WrappingType === WRAPPING_TYPE_TIGHT)
@@ -217,6 +224,13 @@ CFlowParagraph.prototype =
 
     Update_CursorType : function(X, Y, PageIndex)
     {
+
+    },
+
+    Get_Distance : function()
+    {
+        var oDist = this.Distance;
+        return new CDistance(getValOrDefault(oDist.L, DISTANCE_TO_TEXT_LEFTRIGHT), getValOrDefault(oDist.T, 0), getValOrDefault(oDist.R, DISTANCE_TO_TEXT_LEFTRIGHT), getValOrDefault(oDist.B, 0));
 
     },
 

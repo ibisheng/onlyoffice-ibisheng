@@ -93,6 +93,23 @@ CGraphicPage.prototype =
         }
     },
 
+    getAllBoundsRectOnPageForMath: function()
+    {
+        var aRet = [], i;
+        for(i = 0; i < this.wrappingObjects.length; ++i)
+        {
+            if(this.wrappingObjects[i].parent)
+            {
+                aRet.push(new CBoundsRectForMath(this.wrappingObjects[i].parent));
+            }
+        }
+        for(i = 0; i < this.flowTables.length; ++i)
+        {
+            aRet.push(new CBoundsRectForMath(this.flowTables[i]));
+        }
+        return aRet;
+    },
+
     concatPage: function(page)
     {
         this.inlineObjects = this.inlineObjects.concat(page.inlineObjects);

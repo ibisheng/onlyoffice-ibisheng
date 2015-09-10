@@ -192,7 +192,7 @@ CWrapPolygon.prototype =
 
     getArrayWrapIntervals: function(x0, y0, x1, y1, LeftField, RightField, ret)
     {
-        if(y1 < this.top || y0 > this.bottom)
+        if(y1 - this.top < 0.0001 || this.bottom - y0 < 0.0001)
             return ret;
 
         var ret2 = [];
