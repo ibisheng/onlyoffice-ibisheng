@@ -226,14 +226,6 @@ RegExp.escape = function(text) {
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 }
 
-String.prototype.repeat = function ( s, n ) {
-    var a = [];
-    while ( a.length < n ) {
-        a.push( s );
-    }
-    return a.join( '' );
-};
-
 parserHelp.setDigitSeparator( g_oDefaultCultureInfo.NumberDecimalSeparator );
 
 /** @constructor */

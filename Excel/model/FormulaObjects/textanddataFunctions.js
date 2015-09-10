@@ -1295,10 +1295,7 @@ cREPT.prototype.Calculate = function ( arg ) {
 
     if ( arg1.getValue() < 0 ) return this.value = new cError( cErrorType.wrong_value_type );
 
-    for ( var i = 0; i < arg1.getValue(); i++ ) {
-        res = res.concat( arg0.getValue() );
-    }
-    return this.value = new cString( res );
+    return this.value = new cString( arg0.getValue().repeat(arg1.getValue()) );
 }
 cREPT.prototype.getInfo = function () {
     return {

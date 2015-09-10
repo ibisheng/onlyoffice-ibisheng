@@ -384,7 +384,7 @@ function convertFromTo( src, from, to, charLim ) {
     else {
         charLim = parseInt( charLim );
         if ( charLim >= res.length ) {
-            return new cString( (String.prototype.repeat( '0', charLim - res.length ) + res).toUpperCase() );
+            return new cString( ( '0'.repeat( charLim - res.length ) + res).toUpperCase() );
         }
         else {
             return new cError( cErrorType.not_numeric );
@@ -1302,7 +1302,7 @@ cDEC2BIN.prototype.Calculate = function ( arg ) {
     if ( validDEC2BINNumber( arg0 ) && arg0 >= -512 && arg0 <= 511 && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined ) ) {
 
         if ( arg0 < 0 ) {
-            this.value = new cString( '1' + String.prototype.repeat( '0', 9 - (512 + arg0).toString( NumberBase.BIN ).length ) + (512 + arg0).toString( NumberBase.BIN ).toUpperCase() );
+            this.value = new cString( '1' +  '0'.repeat(9 - (512 + arg0).toString( NumberBase.BIN ).length ) + (512 + arg0).toString( NumberBase.BIN ).toUpperCase() );
         }
         else {
             this.value = convertFromTo( arg0, NumberBase.DEC, NumberBase.BIN, arg1 );
@@ -1663,7 +1663,7 @@ cHEX2BIN.prototype.Calculate = function ( arg ) {
 
             if ( negative ) {
                 var str = (512 + arg0DEC).toString( NumberBase.BIN );
-                this.value = new cString( '1' + String.prototype.repeat( '0', 9 - str.length ) + str );
+                this.value = new cString( '1' + '0'.repeat(9 - str.length ) + str );
             }
             else {
                 this.value = convertFromTo( arg0DEC, NumberBase.DEC, NumberBase.BIN, arg1 );
@@ -2663,7 +2663,7 @@ cOCT2BIN.prototype.Calculate = function ( arg ) {
 
             if ( negative ) {
                 var str = (512 + arg0DEC).toString( NumberBase.BIN );
-                this.value = new cString( ('1' + String.prototype.repeat( '0', 9 - str.length ) + str).toUpperCase() );
+                this.value = new cString( ('1' + '0'.repeat( 9 - str.length ) + str).toUpperCase() );
             }
             else {
                 this.value = convertFromTo( arg0DEC, NumberBase.DEC, NumberBase.BIN, arg1 );
