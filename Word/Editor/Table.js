@@ -12232,6 +12232,8 @@ CTable.prototype =
             }
         }
 
+        this.ReIndexing();
+        this.Recalc_CompiledPr2();
         this.Internal_RecalculateGrid();
         this.Internal_Recalculate_1();
 
