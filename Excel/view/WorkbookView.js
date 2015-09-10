@@ -1992,6 +1992,7 @@
             }
             else{
                 this.handlers.trigger("asc_onDefName", this.model.editDefinesNames(oldName, newName));
+                this.handlers.trigger("asc_onRefreshDefNameList");
             }
 
         };
@@ -2008,7 +2009,7 @@
 
                 var delDefinedNamesCallback = function (res) {
                     if (res) {
-                        t.handlers.trigger("asc_onDelDefName", this.model.delDefinesNames(oldName));
+                        t.handlers.trigger("asc_onDelDefName", t.model.delDefinesNames(oldName));
                         t.handlers.trigger("asc_onRefreshDefNameList");
                     }
                 };
