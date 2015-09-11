@@ -163,7 +163,8 @@ function CHorRuler()
     this.m_oTableMarkup     = null;
     this.DragTablePos       = -1;
 
-    this.TableMarginLeft    = 0;
+    this.TableMarginLeft = 0;
+    this.TableMarginLeftTrackStart = 0;
     this.TableMarginRight   = 0;
 
     this.m_oWordControl = null;
@@ -1008,7 +1009,7 @@ function CHorRuler()
             }
             case 8:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, _margin_left);
+                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, this.TableMarginLeftTrackStart);
 
                 // сначала определим граничные условия
                 var _min = 0;
@@ -1273,6 +1274,8 @@ function CHorRuler()
                 }
                 pos = left + pos * dKoef_mm_to_pix;
                 word_control.m_oOverlayApi.VertLine(pos);
+
+                this.TableMarginLeftTrackStart = this.TableMarginLeft;
                 break;
             }
         }

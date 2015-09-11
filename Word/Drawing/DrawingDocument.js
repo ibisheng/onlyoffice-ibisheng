@@ -4869,7 +4869,10 @@ function CDrawingDocument()
 
             if (0 == index)
             {
+                var _add = markup.X - position;
                 markup.X = position;
+                if (markup.Cols.length > 0)
+                    markup.Cols[0] += _add;
             }
             else
             {
