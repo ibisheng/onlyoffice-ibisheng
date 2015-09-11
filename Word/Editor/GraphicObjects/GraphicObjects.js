@@ -14,6 +14,7 @@ function CBoundsRectForMath(oDrawing)
         {
             case para_Drawing:
             {
+                this.WrapType = oDrawing.wrappingType;
                 switch(oDrawing.wrappingType)
                 {
                     case WRAPPING_TYPE_NONE:
@@ -45,6 +46,7 @@ function CBoundsRectForMath(oDrawing)
             case flowobject_Paragraph:
             case flowobject_Table:
             {
+                this.WrapType = oDrawing.WrappingType;
                 switch(oDrawing.WrappingType)
                 {
                     case WRAPPING_TYPE_NONE:
@@ -77,6 +79,7 @@ function CBoundsRectForMath(oDrawing)
     }
     else
     {
+        this.WrapType = WRAPPING_TYPE_NONE;
         this.Distance = new CDistance(0, 0, 0, 0);
     }
 }
