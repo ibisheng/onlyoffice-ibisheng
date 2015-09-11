@@ -994,7 +994,7 @@ function CHorRuler()
                 if (_y <= 3 || _y > 5.6)
                 {
                     this.IsDrawingCurTab = false;
-                    word_control.m_oOverlayApi.Clear();
+                    word_control.OnUpdateOverlay();
                 }
                 else
                 {
@@ -1325,7 +1325,7 @@ function CHorRuler()
     this.OnMouseUp = function(left, top, e)
     {
         var word_control = this.m_oWordControl;
-        this.m_oWordControl.m_oOverlayApi.Clear();
+        this.m_oWordControl.OnUpdateOverlay();
         var lockedElement = check_MouseUpEvent(e);
 
         this.m_dIndentLeft_old      = -10000;
@@ -1413,7 +1413,7 @@ function CHorRuler()
     this.OnMouseUpExternal = function()
     {
         var word_control = this.m_oWordControl;
-        this.m_oWordControl.m_oOverlayApi.Clear();
+        this.m_oWordControl.OnUpdateOverlay();
 
         this.m_dIndentLeft_old      = -10000;
         this.m_dIndentLeftFirst_old = -10000;
@@ -2632,7 +2632,7 @@ function CVerRuler()
         var lockedElement = check_MouseUpEvent(e);
 
         //this.m_oWordControl.m_oOverlayApi.UnShow();
-        this.m_oWordControl.m_oOverlayApi.Clear();
+        this.m_oWordControl.OnUpdateOverlay();
 
         switch (this.DragType)
         {
@@ -2668,7 +2668,7 @@ function CVerRuler()
     this.OnMouseUpExternal = function()
     {
         //this.m_oWordControl.m_oOverlayApi.UnShow();
-        this.m_oWordControl.m_oOverlayApi.Clear();
+        this.m_oWordControl.OnUpdateOverlay();
 
         switch (this.DragType)
         {

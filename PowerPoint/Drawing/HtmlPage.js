@@ -1847,6 +1847,12 @@ function CEditorPage(api)
 
     this.onKeyDown = function(e)
     {
+        if (oThis.m_oApi.asc_IsLongAction())
+        {
+            e.preventDefault();
+            return;
+        }
+
         var oWordControl = oThis;
         if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_oApi.asc_IsLongAction() || oWordControl.m_bIsMouseLock === true)
             return;
