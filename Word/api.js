@@ -1318,13 +1318,6 @@ asc_docs_api.prototype._coAuthoringSetChanges = function(e, oColor)
 
 asc_docs_api.prototype._coAuthoringInit = function(fCallback)
 {
-    if (!this.CoAuthoringApi) {
-		g_oIdCounter.Set_Load(false);
-		this.asyncServerIdEndLoaded ();
-		fCallback();
-        return; // Error
-	}
-
 	//Если User не задан, отключаем коавторинг.
 	if (null == this.User || null == this.User.asc_getId()) {
 		this.User = new Asc.asc_CUser();
@@ -1538,28 +1531,20 @@ asc_docs_api.prototype._coAuthoringInit = function(fCallback)
 // send chart message
 asc_docs_api.prototype.asc_coAuthoringChatSendMessage = function(message)
 {
-    if (!this.CoAuthoringApi)
-        return; // Error
-    this.CoAuthoringApi.sendMessage(message);
+  this.CoAuthoringApi.sendMessage(message);
 };
 // get chart messages, возвращается массив CChatMessage
 asc_docs_api.prototype.asc_coAuthoringChatGetMessages = function()
 {
-    if (!this.CoAuthoringApi)
-		return; // Error
-	this.CoAuthoringApi.getMessages();
+  this.CoAuthoringApi.getMessages();
 };
 // get users, возвращается массив users
 asc_docs_api.prototype.asc_coAuthoringGetUsers = function()
 {
-    if (!this.CoAuthoringApi)
-		return; // Error
-	this.CoAuthoringApi.getUsers();
+  this.CoAuthoringApi.getUsers();
 };
 // server disconnect
 asc_docs_api.prototype.asc_coAuthoringDisconnect = function () {
-	if (!this.CoAuthoringApi)
-		return; // Error
 	this.CoAuthoringApi.disconnect();
 	this.isCoAuthoringEnable = false;
 

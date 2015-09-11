@@ -1511,11 +1511,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       }
     }, this.asc_getViewerMode());
 
-    if (!this.CoAuthoringApi) {
-      this.asyncServerIdEndLoaded();
-      fCallback();
-      return; // Error
-    }
     this.CoAuthoringApi.onParticipantsChanged = function(e, count) {
       t.handlers.trigger("asc_onParticipantsChanged", e, count);
     };
@@ -1759,18 +1754,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     //в обычном серверном режиме портим ссылку, потому что CoAuthoring теперь имеет встроенный адрес
     //todo надо использовать проверку get_OfflineApp
     if (!(window["NATIVE_EDITOR_ENJINE"] || !this.documentId || !this.documentUrl)) {
-      this._coAuthoringSetServerUrl(null);
+      this.CoAuthoringApi.set_url(null);
     }
     this.CoAuthoringApi.init(t.User, t.documentId, t.documentCallbackUrl, 'fghhfgsjdgfjs', fCallback, c_oEditorId.Spreadsheet, t.documentFormatSave, t.asc_getViewerMode());
-  };
-
-  // Set CoAuthoring server url
-  spreadsheet_api.prototype._coAuthoringSetServerUrl = function(url) {
-    if (!this.CoAuthoringApi) {
-      return;
-    } // Error
-
-    this.CoAuthoringApi.set_url(url);
   };
 
   spreadsheet_api.prototype._onSaveChanges = function(recalcIndexColumns, recalcIndexRows) {
@@ -3382,30 +3368,18 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   /////////////////////////////////////////////////////////////////////////
   // send chart message
   spreadsheet_api.prototype.asc_coAuthoringChatSendMessage = function(message) {
-    if (!this.CoAuthoringApi) {
-      return;
-    } // Error
     this.CoAuthoringApi.sendMessage(message);
   };
   // get chart messages, возвращается массив CChatMessage
   spreadsheet_api.prototype.asc_coAuthoringChatGetMessages = function() {
-    if (!this.CoAuthoringApi) {
-      return;
-    } // Error
     this.CoAuthoringApi.getMessages();
   };
   // get users, возвращается массив users
   spreadsheet_api.prototype.asc_coAuthoringGetUsers = function() {
-    if (!this.CoAuthoringApi) {
-      return;
-    } // Error
     this.CoAuthoringApi.getUsers();
   };
   // server disconnect
   spreadsheet_api.prototype.asc_coAuthoringDisconnect = function() {
-    if (!this.CoAuthoringApi) {
-      return;
-    } // Error
     this.CoAuthoringApi.disconnect();
   };
   /////////////////////////////////////////////////////////////////////////

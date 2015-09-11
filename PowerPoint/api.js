@@ -234,14 +234,7 @@ CChatMessage.prototype.get_Message = function() { return this.Message; };
  */
 // Init CoAuthoring
 asc_docs_api.prototype._coAuthoringInit = function (fCallback) {
-    if (!this.CoAuthoringApi) {
-        g_oIdCounter.Set_Load(false);
-        this.asyncServerIdEndLoaded ();
-		fCallback();
-        return; // Error
-    }
-
-	if (null == this.User || null == this.User.asc_getId()) {
+  if (null == this.User || null == this.User.asc_getId()) {
 		this.User = new Asc.asc_CUser();
 		this.User.asc_setId("Unknown");
 		this.User.asc_setUserName("Unknown");
@@ -572,40 +565,23 @@ asc_docs_api.prototype.sync_CollaborativeChanges = function()
     this.asc_fireCallback("asc_onCollaborativeChanges");
 };
 
-// Set CoAuthoring server url
-asc_docs_api.prototype._coAuthoringSetServerUrl = function (url) {
-    if (!this.CoAuthoringApi)
-        return; // Error
-
-    this.CoAuthoringApi.set_url(url);
-};
 // server disconnect
 asc_docs_api.prototype.asc_coAuthoringDisconnect = function () {
-	//Just set viewer mode
-	this.SetViewMode(true);
-
-	//TODO: Uncomment when CoAuthoring will be done
-	//if (!this.CoAuthoringApi)
-	//	return; // Error
-	//this.CoAuthoringApi.disconnect();
+  this.CoAuthoringApi.disconnect();
+  //Just set viewer mode
+  this.SetViewMode(true);
 };
 // send chart message
 asc_docs_api.prototype.asc_coAuthoringChatSendMessage = function (message) {
-    if (!this.CoAuthoringApi)
-        return; // Error
     this.CoAuthoringApi.sendMessage(message);
 };
 // get chart messages, возвращается массив CChatMessage
 asc_docs_api.prototype.asc_coAuthoringChatGetMessages = function () {
-    if (!this.CoAuthoringApi)
-		return; // Error
-	this.CoAuthoringApi.getMessages();
+  this.CoAuthoringApi.getMessages();
 };
 // get users, возвращается массив users
 asc_docs_api.prototype.asc_coAuthoringGetUsers = function () {
-    if (!this.CoAuthoringApi)
-		return; // Error
-	this.CoAuthoringApi.getUsers();
+  this.CoAuthoringApi.getUsers();
 };
 
 asc_docs_api.prototype.asyncServerIdStartLoaded = function () {

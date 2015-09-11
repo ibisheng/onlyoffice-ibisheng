@@ -6,7 +6,6 @@ asc_docs_api.prototype['asc_GetFontThumbnailsPath'] = asc_docs_api.prototype.asc
 asc_docs_api.prototype['_coAuthoringInit'] = asc_docs_api.prototype._coAuthoringInit;
 asc_docs_api.prototype['pre_Save'] = asc_docs_api.prototype.pre_Save;
 asc_docs_api.prototype['sync_CollaborativeChanges'] = asc_docs_api.prototype.sync_CollaborativeChanges;
-asc_docs_api.prototype['_coAuthoringSetServerUrl'] = asc_docs_api.prototype._coAuthoringSetServerUrl;
 asc_docs_api.prototype['asc_coAuthoringDisconnect'] = asc_docs_api.prototype.asc_coAuthoringDisconnect;
 asc_docs_api.prototype['asc_coAuthoringChatSendMessage'] = asc_docs_api.prototype.asc_coAuthoringChatSendMessage;
 asc_docs_api.prototype['asc_coAuthoringChatGetMessages'] = asc_docs_api.prototype.asc_coAuthoringChatGetMessages;
