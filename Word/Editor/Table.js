@@ -2761,6 +2761,7 @@ CTable.prototype =
 
         var Table = new CTable( this.DrawingDocument, Parent, this.Inline, 0, 0, 0, 0, 0, 0, 0, TableGrid, this.bPresentation);
 
+        Table.Set_Distance(this.Distance.L, this.Distance.T, this.Distance.R, this.Distance.B);
         Table.Set_PositionH(this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
         Table.Set_PositionV(this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
 
