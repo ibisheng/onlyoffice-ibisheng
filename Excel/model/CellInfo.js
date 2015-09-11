@@ -273,5 +273,20 @@
         prot["asc_getIsHidden"]		    = prot.asc_getIsHidden;
         prot["asc_getIsLock"]		    = prot.asc_getIsLock;
 
+        function asc_CCheckDefName(s, r) {
+            this.status = s;
+            this.reason = r;
+        }
+        asc_CCheckDefName.prototype = {
+            asc_getStatus: function(){return this.status;},
+            asc_getReason: function(){return this.reason;}
+        };
+
+        window["Asc"].asc_CCheckDefName = window["Asc"]["asc_CCheckDefName"] = asc_CCheckDefName;
+        prot = asc_CCheckDefName.prototype;
+
+        prot["asc_getStatus"]			= prot.asc_getStatus;
+        prot["asc_getReason"]			= prot.asc_getReason;
+
 	}
 )(window);

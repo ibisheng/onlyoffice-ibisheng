@@ -2407,9 +2407,11 @@ Workbook.prototype.recalcWB = function(isRecalcWB){
 };
 Workbook.prototype.checkDefName = function ( checkName, scope ) {
 
-    var rxTest = rx_defName.test( checkName );
+    var rxTest = rx_defName.test( checkName ), res = new Asc.asc_CCheckDefName();
     if ( !rxTest ) {
-        return false;
+        res.status = false;
+        res.reason = c_oAscDefinedNameReason.WrongName;
+        return res;
     }
 
     if( scope !== null ){
@@ -2418,7 +2420,22 @@ Workbook.prototype.checkDefName = function ( checkName, scope ) {
 
     var defName = this.dependencyFormulas.getDefNameNode(getDefNameVertexId(scope, checkName));
 
-    return defName ? defName.getAscCDefName() : true;
+    if(defName){
+        defName = defName.getAscCDefName();
+        res.status = false;
+        if(defName.isLock){
+            res.reason = c_oAscDefinedNameReason.IsLocked;
+        }
+        else{
+            res.reason = c_oAscDefinedNameReason.Existed;
+        }
+    }
+    else{
+        res.status = true;
+        res.reason = c_oAscDefinedNameReason.OK;
+    }
+
+    return res;
 
 };
 Workbook.prototype.isDefinedNamesExists = function ( name, sheetId ) {

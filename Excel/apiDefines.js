@@ -326,3 +326,10 @@ var c_oAscGetDefinedNamesList = {
     WorksheetWorkbook   :   1,
     All                 :   2
 };
+
+var c_oAscDefinedNameReason = {
+    WrongName   :   -1,
+    IsLocked    :   -2,
+    Existed     :   -3,
+    OK          :    0
+};
