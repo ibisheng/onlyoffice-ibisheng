@@ -136,6 +136,12 @@
     }
   };
 
+  CDocsCoApi.prototype.setUserAlive = function() {
+    if (this._CoAuthoringApi && this._onlineWork) {
+      this._CoAuthoringApi.setUserAlive();
+    }
+  };
+
   CDocsCoApi.prototype.askLock = function(arrayBlockId, callback) {
     if (this._CoAuthoringApi && this._onlineWork) {
       this._CoAuthoringApi.askLock(arrayBlockId, callback);
@@ -645,6 +651,10 @@
     this._send({"type": "ping"});
   };
 
+  DocsCoApi.prototype.setUserAlive = function() {
+    this.bUserAlive = true;
+  };
+
   DocsCoApi.prototype._sendPrebuffered = function() {
     for (var i = 0; i < this._msgBuffer.length; i++) {
       this._sendRaw(this._msgBuffer[i]);
@@ -1047,6 +1057,8 @@
     this._isAuth = false;
     this._documentFormatSave = documentFormatSave;
     this._isViewer = isViewer;
+
+    this.bUserAlive = false;  // Активность пользователя
 
     this._initSocksJs();
   };

@@ -127,11 +127,11 @@ function asc_docs_api(name)
 	// Тип состояния на данный момент (сохранение, открытие или никакое)
 	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 
-    // CoAuthoring and Chat
-    this.User = undefined;
-    this.CoAuthoringApi = new CDocsCoApi();
-    this.isCoAuthoringEnable = true;
-    this.CoAuthoringApi.isPowerPoint = true;
+  // CoAuthoring and Chat
+  this.User = undefined;
+  this.CoAuthoringApi = new CDocsCoApi();
+  this.isCoAuthoringEnable = true;
+  this.CoAuthoringApi.isPowerPoint = true;
 	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
 	this.CoAuthoringUrl = '';				// Ссылка сервиса для совместного редактирования
@@ -659,8 +659,7 @@ asc_docs_api.prototype._onUpdateDocumentCanSave = function () {
 
 // Update user alive
 asc_docs_api.prototype.setUserAlive = function () {
-	if (this.TrackFile)
-		this.TrackFile.setUserAlive();
+  this.CoAuthoringApi.setUserAlive();
 };
 
 ///////////////////////////////////////////

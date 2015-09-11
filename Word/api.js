@@ -416,11 +416,11 @@ function asc_docs_api(name)
 	// Тип состояния на данный момент (сохранение, открытие или никакое)
 	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 	
-    // CoAuthoring and Chat
-    this.User = undefined;
-    this.CoAuthoringApi = new CDocsCoApi();
+  // CoAuthoring and Chat
+  this.User = undefined;
+  this.CoAuthoringApi = new CDocsCoApi();
 	this.isCoAuthoringEnable = true;
-    this.isCoMarksDraw = false;
+  this.isCoMarksDraw = false;
 	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
 	this.VersionHistory = null;				// Объект, который отвечает за точку в списке версий
@@ -1621,8 +1621,7 @@ asc_docs_api.prototype._onUpdateDocumentCanSave = function () {
 
 // Update user alive
 asc_docs_api.prototype.setUserAlive = function () {
-	if (this.TrackFile)
-		this.TrackFile.setUserAlive();
+  this.CoAuthoringApi.setUserAlive();
 };
 
 // get functions
