@@ -7152,14 +7152,21 @@ CDocument.prototype =
                         this.ContentLastChangePos = StartPos;
 
                         this.Recalculate();
-
                         this.Document_UpdateSelectionState();
                         this.Document_UpdateInterfaceState();
-
-                        return;
+                        break;
                     }
                     case  selectionflag_Numbering:
                     {
+                        var OldFontSize = this.Get_Paragraph_TextPr().FontSize;
+                        var NewFontSize = FontSize_IncreaseDecreaseValue(bIncrease, OldFontSize);
+                        var TextPr = new CTextPr();
+                        TextPr.FontSize = NewFontSize;
+                        this.Paragraph_Add(new ParaTextPr(TextPr), true);
+
+                        this.Recalculate();
+                        this.Document_UpdateSelectionState();
+                        this.Document_UpdateInterfaceState();
                         break;
                     }
                 }
