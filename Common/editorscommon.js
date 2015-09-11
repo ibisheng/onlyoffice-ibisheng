@@ -232,7 +232,6 @@ function g_fGetSaveUrl(urls){
 	return null;
 }
 function sendCommand2(editor, fCallback, rdata, dataContainer){
-	var sData;
 	//json не должен превышать размера g_nMaxJsonLength, иначе при его чтении будет exception
 	if(null == rdata["savetype"])
 	{

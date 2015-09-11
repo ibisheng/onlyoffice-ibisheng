@@ -725,32 +725,27 @@ asc_docs_api.prototype.Init = function()
 };
 asc_docs_api.prototype.asc_getEditorPermissions = function() {
 	var t = this;
-	if (undefined != window['qtDocBridge']) {
-		// set permissions
-		//var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
-		//editor.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());	
-	} else {
-		this._coAuthoringInit(function() {
-			if (t.DocInfo && t.DocInfo.get_Id()) {
-				var rData = {
-					"c": "getsettings",
-					"id": t.DocInfo.get_Id(),
-					"userid": t.DocInfo.get_UserId(),
-					"format": t.DocInfo.get_Format(),
-					"vkey": t.DocInfo.get_VKey(),
-					"editorid": c_oEditorId.Word
-				};
+  this._coAuthoringInit(function() {
+    if (t.DocInfo && t.DocInfo.get_Id()) {
+      var rData = {
+        "c": "getsettings",
+        "id": t.DocInfo.get_Id(),
+        "userid": t.DocInfo.get_UserId(),
+        "format": t.DocInfo.get_Format(),
+        "vkey": t.DocInfo.get_VKey(),
+        "editorid": c_oEditorId.Word
+      };
 
-				t.advancedOptionsAction = c_oAscAdvancedOptionsAction.Perm;
-				sendCommand2(t, null, rData);
-			} else {
-				var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
-				t.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
-				// Фиктивно инициализируем
-				t.SpellCheckUrl = window['g_cAscSpellCheckUrl'] ? window['g_cAscSpellCheckUrl'] : '';
-			}
-		});
-	}
+      t.advancedOptionsAction = c_oAscAdvancedOptionsAction.Perm;
+      sendCommand2(t, null, rData);
+    } else {
+      var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
+      t.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
+      // Фиктивно инициализируем
+      t.SpellCheckUrl = window['g_cAscSpellCheckUrl'] ? window['g_cAscSpellCheckUrl'] : '';
+      t._coSpellCheckInit();
+    }
+  });
 };
 
 asc_docs_api.prototype.asc_getLicense = function () 
@@ -774,8 +769,9 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(response) {
 	if (null != response && "getsettings" == response["type"]) {
 		var oSettings = response["data"];
 
-		//Set up coauthoring and spellcheker service
+		//Set up spellcheker service
 		this.SpellCheckUrl = oSettings['g_cAscSpellCheckUrl'];
+    this._coSpellCheckInit();
 
 		var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
 		var oEditorPermissions = new asc_CAscEditorPermissions(oSettings);
@@ -877,14 +873,12 @@ asc_docs_api.prototype.LoadDocument = function()
     if (this.DocInfo.get_OfflineApp() === true)
     {
         this.OfflineAppDocumentStartLoad();
-        this.asyncServerIdStartLoaded();
         return;
     }
 
 	if(documentId){
-		var oOpenOptions = this.DocInfo.get_Options();
 		var rData = {
-			"c"				: '',
+			"c"				: 'open',
 			"id"			: documentId,
 			"userid"		: documentUserId,
 			"format"		: documentFormat,
@@ -895,8 +889,6 @@ asc_docs_api.prototype.LoadDocument = function()
 			"embeddedfonts"	: this.isUseEmbeddedCutFonts,
 			"viewmode"		: this.isViewMode
 		};
-
-		rData['c'] = 'open';
 		this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 		sendCommand2( this, null, rData );
 	}
@@ -912,7 +904,6 @@ asc_docs_api.prototype.LoadDocument = function()
     }
 
 	this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, 0);
-    this.asyncServerIdStartLoaded();
 };
 
 asc_docs_api.prototype.SetFontsPath = function(path)
@@ -1140,8 +1131,6 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 		// проверяем какие шрифты нужны
 		this.WordControl.m_oDrawingDocument.CheckFontNeeds();
 		window.global_pptx_content_loader.CheckImagesNeeds(this.WordControl.m_oLogicDocument);
-
-		//this.asyncServerIdStartLoaded();
 
 		//this.FontLoader.LoadEmbeddedFonts(this.DocumentUrl, this.WordControl.m_oLogicDocument.EmbeddedFonts);
 		this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, false);
@@ -5801,12 +5790,6 @@ asc_docs_api.prototype.asc_enableKeyEvents = function(value){
 	}
 };
 
-asc_docs_api.prototype.asyncServerIdStartLoaded = function()
-{
-	this._coSpellCheckInit();
-	//this._coAuthoringInit();
-};
-
 asc_docs_api.prototype.asyncServerIdEndLoaded = function()
 {
     this.ServerIdWaitComplete = true;
@@ -6123,8 +6106,6 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
 
         if (this.isViewMode)
             this.SetViewMode(true);
-
-        //this.asyncServerIdStartLoaded();
         return;
     }
 
@@ -6148,8 +6129,6 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
         this.ServerImagesWaitComplete = true;
         if (true == this.ServerIdWaitComplete)
             this.OpenDocumentEndCallback();
-
-        //this.asyncServerIdStartLoaded();
     }
     else
     {

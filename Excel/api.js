@@ -1032,7 +1032,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
         this._OfflineAppDocumentStartLoad(fCallback);
       } else {
         var v = {
-          "c": '',
+          "c": 'open',
           "id": this.documentId,
           "userid": this.documentUserId,
           "format": this.documentFormat,
@@ -1043,7 +1043,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
           "embeddedfonts": this.isUseEmbeddedCutFonts,
           "viewmode": this.asc_getViewerMode()
         };
-        v["c"] = "open";
         sendCommand2(this, null, v);
       }
     }
@@ -1364,9 +1363,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
     this.wbModel = response.val;
 
-    // Начинаем соединение для совместного редактирования
-    this.asyncServerIdStartLoaded();
-
     this.FontLoader.LoadDocumentFonts(this.wbModel.generateFontMap2());
 
     // Какая-то непонятная заглушка, чтобы не падало в ipad
@@ -1385,7 +1381,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     if (null != response && "getsettings" == response["type"]) {
       var oSettings = response["data"];
 
-      //Set up coauthoring and spellcheker service
+      //Set up spellcheker service
       this.SpellCheckUrl = oSettings['g_cAscSpellCheckUrl'];
 
       var oEditorPermissions = new asc_CAscEditorPermissions(oSettings);
@@ -1414,12 +1410,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       var oLicense = (null != oSettings) ? new asc_CAscLicense(oSettings) : null;
       this.handlers.trigger("asc_onGetLicense", oLicense);
     }
-  };
-
-  // Стартуем соединение с сервером для совместного редактирования
-  spreadsheet_api.prototype.asyncServerIdStartLoaded = function() {
-    //Инициализируем контрол для совместного редактирования
-    //this._coAuthoringInit();
   };
 
   // Соединились с сервером

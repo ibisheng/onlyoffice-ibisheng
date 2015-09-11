@@ -584,11 +584,6 @@ asc_docs_api.prototype.asc_coAuthoringGetUsers = function () {
   this.CoAuthoringApi.getUsers();
 };
 
-asc_docs_api.prototype.asyncServerIdStartLoaded = function () {
-	//Инициализируем контрол для совместного редактирования
-	//this._coAuthoringInit();
-};
-
 asc_docs_api.prototype.asyncServerIdEndLoaded = function () {
     this.ServerIdWaitComplete = true;
     if (true == this.ServerImagesWaitComplete)
@@ -755,7 +750,7 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(response) {
 	if (null != response && "getsettings" == response["type"]) {
 		var oSettings = response["data"];
 
-		//Set up coauthoring and spellcheker service
+		//Set up spellcheker service
 		this.SpellCheckUrl = oSettings['g_cAscSpellCheckUrl'];
 
 		var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
@@ -3871,8 +3866,6 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
         this.ServerImagesWaitComplete = true;
         if (true == this.ServerIdWaitComplete)
             this.OpenDocumentEndCallback();
-
-        this.asyncServerIdStartLoaded();
     }    
 };
 

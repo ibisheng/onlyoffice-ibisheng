@@ -460,7 +460,6 @@ asc_docs_api.prototype['async_SaveToPdf'] = asc_docs_api.prototype.async_SaveToP
 asc_docs_api.prototype['async_SaveToPdf_PartCallback'] = asc_docs_api.prototype.async_SaveToPdf_PartCallback;
 asc_docs_api.prototype['async_SaveToPdf_Progress'] = asc_docs_api.prototype.async_SaveToPdf_Progress;
 asc_docs_api.prototype['asc_enableKeyEvents'] = asc_docs_api.prototype.asc_enableKeyEvents;
-asc_docs_api.prototype['asyncServerIdStartLoaded'] = asc_docs_api.prototype.asyncServerIdStartLoaded;
 asc_docs_api.prototype['asyncServerIdEndLoaded'] = asc_docs_api.prototype.asyncServerIdEndLoaded;
 asc_docs_api.prototype['asyncFontsDocumentStartLoaded'] = asc_docs_api.prototype.asyncFontsDocumentStartLoaded;
 asc_docs_api.prototype['GenerateStyles'] = asc_docs_api.prototype.GenerateStyles;
