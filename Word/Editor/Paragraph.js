@@ -8005,7 +8005,7 @@ Paragraph.prototype =
 
         // Не удаляем форматирование, при добавлении списка к данному параграфу
         var DefNumId = this.Parent.Get_Styles().Get_Default_ParaList();
-        if ( Id != DefNumId && ( Id_old != DefNumId || Id != this.Parent.Get_Styles().Get_Default_Paragraph() ) )
+        if (Id !== DefNumId)
         {
             this.Numbering_Remove();
             this.Set_ContextualSpacing( undefined );
