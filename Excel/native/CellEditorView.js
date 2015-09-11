@@ -239,30 +239,36 @@
 			var b = this.input.selectionStart;
 			
 			this.isOpened = true;
-			if (window.addEventListener) {
-				window.addEventListener("keydown"	, this.fKeyDown		, false);
-				window.addEventListener("keypress"	, this.fKeyPress	, false);
-				window.addEventListener("keyup"		, this.fKeyUp		, false);
-				window.addEventListener("mouseup"	, this.fKeyMouseUp	, false);
-				window.addEventListener("mousemove"	, this.fKeyMouseMove, false);
-			}
+//			if (window.addEventListener) {
+//				window.addEventListener("keydown"	, this.fKeyDown		, false);
+//				window.addEventListener("keypress"	, this.fKeyPress	, false);
+//				window.addEventListener("keyup"		, this.fKeyUp		, false);
+//				window.addEventListener("mouseup"	, this.fKeyMouseUp	, false);
+//				window.addEventListener("mousemove"	, this.fKeyMouseMove, false);
+//			}
 			this._setOptions(options);
 			this.isTopLineActive = true === this.input.isFocused;
 
 			this._updateFormulaEditMod(/*bIsOpen*/true);
 			this._draw();
 
-			if (!(options.cursorPos >= 0)) {
-				if (this.isTopLineActive) {
-					if (typeof b !== "undefined") {
-						if (this.cursorPos !== b) {this._moveCursor(kPosition, b);}
-					} else
-						this._moveCursor(kEndOfText);
-				} else if (options.isClearCell)
-					this._selectChars(kEndOfText);
-				else
-					this._moveCursor(kEndOfText);
-			}
+            if (this.isSelectAll) {
+                this._selectChars(kEndOfText);
+            } else {
+                this._moveCursor(kEndOfText);
+            }
+//
+//			if (!(options.cursorPos >= 0)) {
+//				if (this.isTopLineActive) {
+//					if (typeof b !== "undefined") {
+//						if (this.cursorPos !== b) {this._moveCursor(kPosition, b);}
+//					} else
+//						this._moveCursor(kEndOfText);
+//				} else if (options.isClearCell)
+//					this._selectChars(kEndOfText);
+//				else
+//					this._moveCursor(kEndOfText);
+//			}
 			/*
 			 * Выставляем фокус при открытии
 			 * При нажатии символа, фокус не ставим
@@ -287,19 +293,19 @@
 			}
 
 			this.isOpened = false;
-			if (window.removeEventListener) {
-				window.removeEventListener("keydown"	, this.fKeyDown		, false);
-				window.removeEventListener("keypress"	, this.fKeyPress	, false);
-				window.removeEventListener("keyup"		, this.fKeyUp		, false);
-				window.removeEventListener("mouseup"	, this.fKeyMouseUp	, false);
-				window.removeEventListener("mousemove"	, this.fKeyMouseMove, false);
-			}
+//			if (window.removeEventListener) {
+//				window.removeEventListener("keydown"	, this.fKeyDown		, false);
+//				window.removeEventListener("keypress"	, this.fKeyPress	, false);
+//				window.removeEventListener("keyup"		, this.fKeyUp		, false);
+//				window.removeEventListener("mouseup"	, this.fKeyMouseUp	, false);
+//				window.removeEventListener("mousemove"	, this.fKeyMouseMove, false);
+//			}
 			//this.input.blur();
-			this.isTopLineActive = false;
-			this.input.isFocused = false;
-			this._hideCursor();
+			//this.isTopLineActive = false;
+			//this.input.isFocused = false;
+			//this._hideCursor();
 			// hide
-			this._hideCanvas();
+			//this._hideCanvas();
 
 			// delete autoComplete
 			this.objAutoComplete = {};
@@ -671,6 +677,10 @@
 			this.right = opt.rightSide[0];
 			this.bottom = opt.bottomSide[0];
 
+            if (this.right === undefined) {
+                this.right = 0;
+            }
+
 			this.cursorPos = opt.cursorPos !== undefined ? opt.cursorPos : 0;
 			this.topLineIndex = 0;
 			this.selectionBegin = -1;
@@ -865,7 +875,7 @@
 			this._renderText();
 			this.input.value = this._getFragmentsText(fragments);
 			this._updateCursorPosition();
-			this._showCursor();
+			//this._showCursor();
 		};
 
 		CellEditor.prototype._update = function () {
@@ -994,10 +1004,10 @@
 		};
 
 		CellEditor.prototype._showCanvas = function () {
-			this.canvasOuterStyle.display = 'block';
+			//this.canvasOuterStyle.display = 'block';
 		};
 		CellEditor.prototype._hideCanvas = function () {
-			this.canvasOuterStyle.display = 'none';
+			//this.canvasOuterStyle.display = 'none';
 		};
 
 		CellEditor.prototype._adjustCanvas = function () {
@@ -1092,25 +1102,25 @@
 		// Cursor
 
 		CellEditor.prototype.showCursor = function () {
-			if (!this.options) {this.options = {};}
-			this.options.isHideCursor = false;
-			this._showCursor();
+//			if (!this.options) {this.options = {};}
+//			this.options.isHideCursor = false;
+//			this._showCursor();
 		};
 
 		CellEditor.prototype._showCursor = function () {
-			var t = this;
-			if (true === t.options.isHideCursor || t.isTopLineActive === true) {return;}
-			window.clearInterval(t.cursorTID);
-			t.cursorStyle.display = "block";
-			t.cursorTID = window.setInterval(function () {
-				t.cursorStyle.display = ("none" === t.cursorStyle.display) ? "block" : "none";
-			}, t.defaults.blinkInterval);
+//			var t = this;
+//			if (true === t.options.isHideCursor || t.isTopLineActive === true) {return;}
+//			window.clearInterval(t.cursorTID);
+//			t.cursorStyle.display = "block";
+//			t.cursorTID = window.setInterval(function () {
+//				t.cursorStyle.display = ("none" === t.cursorStyle.display) ? "block" : "none";
+//			}, t.defaults.blinkInterval);
 		};
 
 		CellEditor.prototype._hideCursor = function () {
-			var t = this;
-			window.clearInterval(t.cursorTID);
-			t.cursorStyle.display = "none";
+//			var t = this;
+//			window.clearInterval(t.cursorTID);
+//			t.cursorStyle.display = "none";
 		};
 
 		CellEditor.prototype._updateCursorPosition = function (redrawText) {
@@ -1155,9 +1165,9 @@
             this.curTop = curTop;
             this.curHeight = curHeight;
 
-			this.cursorStyle.left = curLeft + "px";
-			this.cursorStyle.top = curTop + "px";
-			this.cursorStyle.height = curHeight + "px";
+//			this.cursorStyle.left = curLeft + "px";
+//			this.cursorStyle.top = curTop + "px";
+//			this.cursorStyle.height = curHeight + "px";
 
 			if (cur) {this.input.scrollTop = this.input.clientHeight * cur.lineIndex;}
 			if (this.isTopLineActive && !this.skipTLUpdate) {this._updateTopLineCurPos();}
