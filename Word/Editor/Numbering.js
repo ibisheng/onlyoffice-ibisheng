@@ -660,6 +660,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( ")" ) );
+        Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl( Lvl );
         History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
@@ -680,6 +681,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( "." ) );
+        Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl( Lvl );
         History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
@@ -700,6 +702,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( "." ) );
+        Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl( Lvl );
         History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
@@ -720,6 +723,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( ")" ) );
+        Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl( Lvl );
         History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
@@ -740,6 +744,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( "." ) );
+        Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl( Lvl );
         History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
@@ -760,6 +765,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( "." ) );
+        Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl( Lvl );
         History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
@@ -780,6 +786,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( ")" ) );
+        Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl( Lvl );
         History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
@@ -800,6 +807,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( "." ) );
+        Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl( Lvl );
         History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
@@ -820,6 +828,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = [];
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( "." ) );
+        Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl( Lvl );
         History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
