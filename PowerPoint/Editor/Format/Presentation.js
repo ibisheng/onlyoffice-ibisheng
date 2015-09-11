@@ -370,6 +370,12 @@ CPresentation.prototype =
                     }
                     History.Get_RecalcData();
                     History.Reset_RecalcIndex();
+                    var DrawingShape = Para.Parent.Is_DrawingShape(true);
+                    if(DrawingShape && DrawingShape.recalcInfo && DrawingShape.recalcInfo.recalcTitle)
+                    {
+                        DrawingShape.recalcInfo.bRecalculatedTitle = true;
+                        DrawingShape.recalcInfo.recalcTitle = null;
+                    }
                     return;
                 }
             }
