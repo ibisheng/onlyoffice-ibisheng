@@ -429,7 +429,6 @@ function asc_docs_api(name)
 	this.SpellCheckApi = (window["AscDesktopEditor"] === undefined) ? new CSpellCheckApi() : new CSpellCheckApi_desktop();
 	this.isSpellCheckEnable = true;
 
-	this.CoAuthoringUrl = '';				// Ссылка сервиса для совместного редактирования
 	this.SpellCheckUrl = '';				// Ссылка сервиса для проверки орфографии
 	
 	// Chart
@@ -748,7 +747,6 @@ asc_docs_api.prototype.asc_getEditorPermissions = function() {
 				var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
 				t.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
 				// Фиктивно инициализируем
-				t.CoAuthoringUrl = window['g_cAscCoAuthoringUrl'] ? window['g_cAscCoAuthoringUrl'] : '';
 				t.SpellCheckUrl = window['g_cAscSpellCheckUrl'] ? window['g_cAscSpellCheckUrl'] : '';
 			}
 		});
@@ -777,7 +775,6 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(response) {
 		var oSettings = response["data"];
 
 		//Set up coauthoring and spellcheker service
-		this.CoAuthoringUrl = oSettings['g_cAscCoAuthoringUrl'];
 		this.SpellCheckUrl = oSettings['g_cAscSpellCheckUrl'];
 
 		var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
@@ -1328,16 +1325,11 @@ asc_docs_api.prototype._coAuthoringInit = function(fCallback)
         return; // Error
 	}
 
-	if (!this.isCoAuthoringEnable)
-		this.CoAuthoringUrl = '';
-
 	//Если User не задан, отключаем коавторинг.
 	if (null == this.User || null == this.User.asc_getId()) {
 		this.User = new Asc.asc_CUser();
 		this.User.asc_setId("Unknown");
 		this.User.asc_setUserName("Unknown");
-
-		this.CoAuthoringUrl = '';
 	}
 
     var t = this;
@@ -6958,11 +6950,6 @@ asc_docs_api.prototype.SetDrawImagePlaceParagraph = function(element_id, props)
     this.WordControl.m_oDrawingDocument.DrawGuiCanvasTextProps(props);
 };
 
-asc_docs_api.prototype.asc_setCoAuthoringEnable = function (isCoAuthoringEnable)
-{
-	this.isCoAuthoringEnable = !!isCoAuthoringEnable;
-};
-
 asc_docs_api.prototype.asc_getMasterCommentId = function()
 {
     return -1;
@@ -7446,7 +7433,6 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, ve
 {
 	this.DocumentUrl = "TeamlabNative";
 
-	this.CoAuthoringUrl = '';
 	this.SpellCheckUrl = '';
 
 	this.User = new Asc.asc_CUser();

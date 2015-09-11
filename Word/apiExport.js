@@ -526,7 +526,6 @@ asc_docs_api.prototype['asyncImageEndLoaded2'] = asc_docs_api.prototype.asyncIma
 asc_docs_api.prototype['OfflineAppDocumentStartLoad'] = asc_docs_api.prototype.OfflineAppDocumentStartLoad;
 asc_docs_api.prototype['OfflineAppDocumentEndLoad'] = asc_docs_api.prototype.OfflineAppDocumentEndLoad;
 asc_docs_api.prototype['SetDrawImagePlaceParagraph'] = asc_docs_api.prototype.SetDrawImagePlaceParagraph;
-asc_docs_api.prototype['asc_setCoAuthoringEnable'] = asc_docs_api.prototype.asc_setCoAuthoringEnable;
 asc_docs_api.prototype['asc_getMasterCommentId'] = asc_docs_api.prototype.asc_getMasterCommentId;
 asc_docs_api.prototype['asc_getAnchorPosition'] = asc_docs_api.prototype.asc_getAnchorPosition;
 asc_docs_api.prototype['asc_getChartObject'] = asc_docs_api.prototype.asc_getChartObject;

@@ -404,7 +404,6 @@ asc_docs_api.prototype['SlideTimingApplyToAll'] = asc_docs_api.prototype.SlideTi
 asc_docs_api.prototype['SlideTransitionPlay'] = asc_docs_api.prototype.SlideTransitionPlay;
 asc_docs_api.prototype['SetTextBoxInputMode'] = asc_docs_api.prototype.SetTextBoxInputMode;
 asc_docs_api.prototype['GetTextBoxInputMode'] = asc_docs_api.prototype.GetTextBoxInputMode;
-asc_docs_api.prototype['asc_setCoAuthoringEnable'] = asc_docs_api.prototype.asc_setCoAuthoringEnable;
 asc_docs_api.prototype['sync_EndAddShape'] = asc_docs_api.prototype.sync_EndAddShape;
 asc_docs_api.prototype['asc_getChartObject'] = asc_docs_api.prototype.asc_getChartObject;
 asc_docs_api.prototype['asc_addChartDrawingObject'] = asc_docs_api.prototype.asc_addChartDrawingObject;
