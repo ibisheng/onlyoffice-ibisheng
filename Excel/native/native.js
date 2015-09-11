@@ -2198,14 +2198,32 @@ function offline_get_worksheet_bounds() {
 function offline_complete_cell(x, y) {
     return _s.getNearCellCoord(x, y);
 }
-
-function offline_cell_editor_open(x, y, width, height, ratio) {
+function offline_keyboard_down(keys) {
+    var wb = _api.wb;
+    for (var i = 0; i < keys.length; ++i) {
+        if (37 === keys[i][2])          // LEFT
+            wb._onChangeSelection(true, -1, 0, false, false, undefined);
+        else if (39 === keys[i][2])     // RIGHT
+            wb._onChangeSelection(true, 1, 0, false, false, undefined);
+        if (38 === keys[i][2])          // UP
+            wb._onChangeSelection(true, 0, -1, false, false, undefined);
+        else if (40 === keys[i][2])     // DOWN
+            wb._onChangeSelection(true, 0, 1, false, false, undefined);
+        else if (9 === keys[i][2])     // TAB
+            wb._onChangeSelection(true, -1, 0, false, false, undefined);
+        else if (13 === keys[i][2])     // ENTER
+            wb._onChangeSelection(true, 0, 1, false, false, undefined);
+    }
+}
+function offline_cell_editor_open(isSelectAll, x, y, width, height, ratio) {
     _null_object.width = width * ratio;
     _null_object.height = height * ratio;
 
     var wb = _api.wb;
 
-    wb._onEditCell (x, y, true,undefined, undefined, true, false);
+    wb.cellEditor.isSelectAll = isSelectAll;
+
+    wb._onEditCell(x, y, true,undefined, undefined, true, false);
 
     return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom,
         wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
