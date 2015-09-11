@@ -897,20 +897,28 @@ CShapeDrawer.prototype =
 
                     _ctx.save();
 
+                    var __graphics = (this.Graphics.MaxEpsLine === undefined) ? this.Graphics : this.Graphics.Graphics;
+                    var bIsThumbnail = (__graphics.IsThumbnail === true) ? true : false;
+
                     var koefX = editor.WordControl.m_nZoomValue / 100;
                     var koefY = editor.WordControl.m_nZoomValue / 100;
+
+                    if (bIsThumbnail)
+                    {
+                        koefX = __graphics.m_dDpiX / g_dDpiX;
+                        koefY = __graphics.m_dDpiY / g_dDpiX;
+
+                        if (editor.WordControl.bIsRetinaSupport)
+                        {
+                            koefX /= 2;
+                            koefY /= 2;
+                        }
+                    }
 
                     // TODO: !!!
                     _ctx.translate(this.min_x, this.min_y);
 
-                    if (this.Graphics.MaxEpsLine === undefined)
-                    {
-                        _ctx.scale(koefX * this.Graphics.TextureFillTransformScaleX, koefY * this.Graphics.TextureFillTransformScaleY);
-                    }
-                    else
-                    {
-                        _ctx.scale(koefX * this.Graphics.Graphics.TextureFillTransformScaleX, koefY * this.Graphics.Graphics.TextureFillTransformScaleY);
-                    }
+                    _ctx.scale(koefX * __graphics.TextureFillTransformScaleX, koefY * __graphics.TextureFillTransformScaleY);
 
                     if (_is_ctx === true)
                     {
