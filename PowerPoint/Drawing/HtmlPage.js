@@ -1865,6 +1865,13 @@ function CEditorPage(api)
 
         if (oWordControl.Thumbnails.FocusObjType == FOCUS_OBJECT_THUMBNAILS)
         {
+            if (0 == oWordControl.Splitter1Pos)
+            {
+                // табнейлы не видны. Чего же тогда обрабатывать им клавиатуру
+                e.preventDefault();
+                return false;
+            }
+
             var ret = oWordControl.Thumbnails.onKeyDown(e);
             if (false === ret)
                 return false;
