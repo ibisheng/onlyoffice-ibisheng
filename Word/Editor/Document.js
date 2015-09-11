@@ -125,6 +125,9 @@ CSelectedContent.prototype =
             Element.Get_AllDrawingObjects(this.DrawingObjects);
             Element.Get_AllComments(this.Comments);
             Element.Get_AllMaths(this.Maths);
+
+            if (type_Paragraph === Element.Get_Type() && Count > 1)
+                Element.Correct_Content();
         }
 
         this.HaveMath = (this.Maths.length > 0 ? true : false);
