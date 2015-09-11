@@ -1572,7 +1572,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                                         ws.objectRender.showDrawingObjects(true);
                                     }
                                 }
-							} else if (lockType === c_oAscLockTypeElem.Range) {
+							} else if (lockType === c_oAscLockTypeElem.Range || lockType === c_oAscLockTypeElem.Sheet) {
 								ws.updateSelection();
 							}
 						} else if (-1 !== lockSheetId && 0 === lockSheetId.indexOf(CCellCommentator.sStartCommentId)) {
