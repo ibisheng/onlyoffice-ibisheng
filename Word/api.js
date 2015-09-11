@@ -2056,36 +2056,20 @@ asc_docs_api.prototype.UpdateTextPr = function(TextPr)
 {
 	if ( "undefined" != typeof(TextPr) )
 	{
-        if (TextPr.Bold !== undefined)
-            this.sync_BoldCallBack(TextPr.Bold);
-        if (TextPr.Italic !== undefined)
-            this.sync_ItalicCallBack(TextPr.Italic);
-        if (TextPr.Underline !== undefined)
-            this.sync_UnderlineCallBack(TextPr.Underline);
-        if (TextPr.Strikeout !== undefined)
-            this.sync_StrikeoutCallBack(TextPr.Strikeout);
-        if (TextPr.FontSize !== undefined)
-            this.sync_TextPrFontSizeCallBack(TextPr.FontSize);
-        if (TextPr.FontFamily !== undefined)
-            this.sync_TextPrFontFamilyCallBack(TextPr.FontFamily);
-
-        if (TextPr.VertAlign !== undefined)
-            this.sync_VerticalAlign(TextPr.VertAlign);
-        if (TextPr.HighLight !== undefined)
-            this.sync_TextHighLight(TextPr.HighLight);
-        if (TextPr.Spacing !== undefined)
-            this.sync_TextSpacing(TextPr.Spacing);
-        if (TextPr.DStrikeout !== undefined)
-            this.sync_TextDStrikeout(TextPr.DStrikeout);
-        if (TextPr.Caps !== undefined)
-            this.sync_TextCaps(TextPr.Caps);
-        if (TextPr.SmallCaps !== undefined)
-            this.sync_TextSmallCaps(TextPr.SmallCaps);
-        if (TextPr.Position !== undefined)
-            this.sync_TextPosition(TextPr.Position);
-        if (TextPr.Lang !== undefined)
-            this.sync_TextLangCallBack(TextPr.Lang);
-
+        this.sync_BoldCallBack(TextPr.Bold);
+        this.sync_ItalicCallBack(TextPr.Italic);
+        this.sync_UnderlineCallBack(TextPr.Underline);
+        this.sync_StrikeoutCallBack(TextPr.Strikeout);
+        this.sync_TextPrFontSizeCallBack(TextPr.FontSize);
+        this.sync_TextPrFontFamilyCallBack(TextPr.FontFamily);
+        this.sync_VerticalAlign(TextPr.VertAlign);
+        this.sync_TextHighLight(TextPr.HighLight);
+        this.sync_TextSpacing(TextPr.Spacing);
+        this.sync_TextDStrikeout(TextPr.DStrikeout);
+        this.sync_TextCaps(TextPr.Caps);
+        this.sync_TextSmallCaps(TextPr.SmallCaps);
+        this.sync_TextPosition(TextPr.Position);
+        this.sync_TextLangCallBack(TextPr.Lang);
         this.sync_TextColor(TextPr);
 	}
 };
