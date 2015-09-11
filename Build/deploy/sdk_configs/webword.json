@@ -209,7 +209,6 @@
                 "cwd": "../../Common/",
                 "src": [
                     "AllFonts.js",
-                    "docscoapisettings.js",
                     "spellcheckapisettings.js",
                     "commonDefines.js",
                     "apiCommon.js",
