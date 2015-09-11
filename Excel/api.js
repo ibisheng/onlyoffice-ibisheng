@@ -60,8 +60,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.documentFormat = "null";
 			this.documentVKey = null;
 			this.documentFormatSave = c_oAscFileType.XLSX;
-			this.documentFormatSaveCsvCodepage = 65001;//utf8
-			this.documentFormatSaveCsvDelimiter = c_oAscCsvDelimiter.Comma;
 			this.chartEditor = undefined;
 			this.documentOpenOptions = undefined;		// Опции при открытии (пока только опции для CSV)
 			this.documentCallbackUrl = undefined;		// Ссылка для отправления информации о документе
@@ -859,8 +857,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				case c_oAscAdvancedOptionsID.CSV:
 					// Проверяем тип состояния в данный момент
 					if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Open) {
-						this.documentFormatSaveCsvCodepage = option.asc_getCodePage();
-						this.documentFormatSaveCsvDelimiter = option.asc_getDelimiter();
 						var v = {
 							"id":this.documentId,
 							"userid": this.documentUserId,
@@ -1068,44 +1064,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						var url = g_fGetSaveUrl(input["data"]);
 						if(url) {
 							t.asc_processSavedFile(url, false);
-						} else {
-							t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-						}
-					} else {
-						t.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-					}
-				} else {
-					t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-				}
-			};
-			g_fSaveWithParts(function(fCallback1, oAdditionalData1, dataContainer1){sendCommand2(t, fCallback1, oAdditionalData1, dataContainer1);}, t.fCurCallback, null, oAdditionalData, dataContainer);
-		};
-
-		spreadsheet_api.prototype._asc_save = function () {
-			var t = this;
-			this.wb._initCommentsToSave();
-			var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
-			var dataContainer = {data: null, part: null, index: 0, count: 0};
-			dataContainer.data = oBinaryFileWriter.Write();
-			var oAdditionalData = {};
-			oAdditionalData["c"] = "save";
-			oAdditionalData["id"] = this.documentId;
-			oAdditionalData["userid"] = this.documentUserId;
-			oAdditionalData["vkey"] = this.documentVKey;
-			oAdditionalData["outputformat"] = this.documentFormatSave;
-			if(c_oAscFileType.CSV == this.documentFormatSave)
-			{
-				oAdditionalData["codepage"] = this.documentFormatSaveCsvCodepage;
-				oAdditionalData["delimiter"] = this.documentFormatSaveCsvDelimiter;
-			}
-			oAdditionalData["innersave"] = true;
-			oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
-			t.fCurCallback = function(incomeObject){
-				if(null != input && "save" == input["type"]) {
-					if('ok' == input["status"]){
-						var url = g_fGetSaveUrl(input["data"]);
-						if(url) {
-							t.asc_processSavedFile(url, true);
 						} else {
 							t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 						}
