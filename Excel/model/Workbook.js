@@ -1011,6 +1011,10 @@ DependencyGraph.prototype = {
         //this.defNameList[nodeId] = null;
         delete this.defNameList[nodeId];
 
+        if(!oldN){
+            return false;
+        }
+
         oldN.changeDefName( newDefName );
 
         this.defNameList[oldN.nodeId] = oldN;
