@@ -72,7 +72,7 @@ function handleSelectedObjects(drawingObjectsController, e, x, y, group, pageInd
         if(selected_objects[i].hitInBoundingRect(x, y) && (!selected_objects[i].hitInTextRect || !selected_objects[i].hitInTextRect(x, y)))
         {
             if(bWord && selected_objects[i].parent && selected_objects[i].parent.Is_Inline())
-                return handleInlineHitNoText(selected_objects[i], drawingObjectsController, e, x, y, pageIndex);
+                return handleInlineHitNoText(selected_objects[i], drawingObjectsController, e, x, y, pageIndex, true);
             else
                 return drawingObjectsController.handleMoveHit(selected_objects[i], e, x, y, group, true, selected_objects[i].selectStartPage, true);
         }
@@ -371,7 +371,7 @@ function handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, page
     var b_hit_to_text = drawing.hitInTextRect && drawing.hitInTextRect(x, y);
     if((_hit && !b_hit_to_text) || _hit_to_path)
     {
-        return handleInlineHitNoText(drawing, drawingObjectsController, e, x, y, pageIndex);
+        return handleInlineHitNoText(drawing, drawingObjectsController, e, x, y, pageIndex, false);
     }
     else if(b_hit_to_text)
     {
@@ -462,7 +462,7 @@ function handleInlineChart(drawing, drawingObjectsController, e, x, y, pageIndex
 
 
 
-function handleInlineHitNoText(drawing, drawingObjects, e, x, y, pageIndex)
+function handleInlineHitNoText(drawing, drawingObjects, e, x, y, pageIndex, bInSelect)
 {
     var selected_objects = drawingObjects.selectedObjects;
     if(!(e.CtrlKey || e.ShiftKey)
@@ -475,7 +475,7 @@ function handleInlineHitNoText(drawing, drawingObjects, e, x, y, pageIndex)
             drawingObjects.checkChartTextSelection();
             drawingObjects.resetSelection();
             drawing.select(drawingObjects, pageIndex);
-            drawingObjects.changeCurrentState(new PreMoveInlineObject(drawingObjects, drawing, bIsSelected, true, pageIndex, x, y));
+            drawingObjects.changeCurrentState(new PreMoveInlineObject(drawingObjects, drawing, bIsSelected, !bInSelect, pageIndex, x, y));
             if(e.ClickCount > 1 && !e.ShiftKey && !e.CtrlKey && ((drawingObjects.selection.groupSelection && drawingObjects.selection.groupSelection.selectedObjects.length === 1) || drawingObjects.selectedObjects.length === 1))
             {
                 if (drawing.getObjectType() === historyitem_type_ChartSpace && drawingObjects.handleChartDoubleClick)

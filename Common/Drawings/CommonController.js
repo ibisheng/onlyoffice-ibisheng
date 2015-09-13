@@ -534,7 +534,7 @@ DrawingObjectsController.prototype =
                         this.changeCurrentState(new PreMoveState(this, x, y, e.ShiftKey, e.CtrlKey,  object, is_selected, /*true*/!bInSelect));
                     else
                     {
-                        this.changeCurrentState(new PreMoveInlineObject(this, object, is_selected, true, pageIndex, x, y));
+                        this.changeCurrentState(new PreMoveInlineObject(this, object, is_selected, !bInSelect, pageIndex, x, y));
                     }
                 }
                 else
