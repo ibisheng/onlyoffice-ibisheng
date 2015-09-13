@@ -2579,8 +2579,15 @@ PasteProcessor.prototype =
 			//TODO проверку на excel пеерсмотреть!!!!
 			oSelectedContent.On_EndCollectElements(this.oLogicDocument);
 			if(!this.pasteInExcel && !this.oLogicDocument.Can_InsertContent(oSelectedContent, NearPos))
-				return;
-			
+            {
+                if(!this.pasteInExcel)
+                {
+                    this.oLogicDocument.Document_Undo();
+                    History.Clear_Redo();
+                }
+                return;
+            }
+
             oDoc.Insert_Content(oSelectedContent, NearPos);
             if(this.oLogicDocument && this.oLogicDocument.DrawingObjects)
             {
