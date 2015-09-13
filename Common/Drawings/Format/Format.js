@@ -2179,7 +2179,10 @@ CSolidFill.prototype =
     createDuplicate : function()
     {
         var duplicate = new CSolidFill();
-        duplicate.color = this.color.createDuplicate();
+        if(this.color)
+        {
+            duplicate.color = this.color.createDuplicate();
+        }
         return duplicate;
     },
 
@@ -2267,7 +2270,10 @@ CGs.prototype =
     {
         var duplicate = new CGs();
         duplicate.pos = this.pos;
-        duplicate.color = this.color.createDuplicate();
+        if(this.color)
+        {
+            duplicate.color = this.color.createDuplicate();
+        }
         return duplicate;
     },
 
@@ -2781,8 +2787,14 @@ CPattFill.prototype =
     {
         var duplicate = new CPattFill();
         duplicate.ftype = this.ftype;
-        duplicate.fgClr = this.fgClr.createDuplicate();
-        duplicate.bgClr = this.bgClr.createDuplicate();
+        if(this.fgClr)
+        {
+            duplicate.fgClr = this.fgClr.createDuplicate();
+        }
+        if(this.bgClr)
+        {
+            duplicate.bgClr = this.bgClr.createDuplicate();
+        }
         return duplicate;
     },
     compare : function(fill)

@@ -2961,9 +2961,17 @@ function CorrectUniFill(asc_fill, unifill, editorId)
                 {
                     ret.fill.fgClr = CorrectUniColor(_fill.fgClr, ret.fill.fgClr, editorId);
                 }
+                if(!ret.fill.fgClr)
+                {
+                    ret.fill.fgClr = CreateUniColorRGB(0, 0, 0);
+                }
                 if (undefined != _fill.bgClr)
                 {
                     ret.fill.bgClr = CorrectUniColor(_fill.bgClr, ret.fill.bgClr, editorId);
+                }
+                if(!ret.fill.bgClr)
+                {
+                    ret.fill.bgClr = CreateUniColorRGB(0, 0, 0);
                 }
 
                 break;
