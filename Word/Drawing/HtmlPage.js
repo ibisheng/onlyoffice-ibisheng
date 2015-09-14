@@ -2381,11 +2381,13 @@ function CEditorPage(api)
         oWordControl.StartUpdateOverlay();
 
         oWordControl.IsKeyDownButNoPress = true;
-        oWordControl.bIsUseKeyPress = (oWordControl.m_oLogicDocument.OnKeyDown(global_keyboardEvent) === true) ? false : true ;
+
+        var _ret_mouseDown = oWordControl.m_oLogicDocument.OnKeyDown(global_keyboardEvent);
+        oWordControl.bIsUseKeyPress = ((_ret_mouseDown & keydownresult_PreventKeyPress) != 0) ? false : true;
 
         oWordControl.EndUpdateOverlay();
 
-        if (false === oWordControl.bIsUseKeyPress)// || (true === global_keyboardEvent.AltKey && !AscBrowser.isMacOs))
+        if ((_ret_mouseDown & keydownresult_PreventDefault) != 0)// || (true === global_keyboardEvent.AltKey && !AscBrowser.isMacOs))
         {
             // убираем превент с альтом. Уж больно итальянцы недовольны.
             e.preventDefault();

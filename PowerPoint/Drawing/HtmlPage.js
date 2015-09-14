@@ -1854,8 +1854,22 @@ function CEditorPage(api)
         }
 
         var oWordControl = oThis;
-        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_oApi.asc_IsLongAction() || oWordControl.m_bIsMouseLock === true)
+        if (false === oWordControl.m_oApi.bInit_word_control)
+        {
+            check_KeyboardEvent2(e);
+            e.preventDefault();
             return;
+        }
+
+        if (oWordControl.IsFocus === false)
+            return;
+
+        if (oWordControl.m_oApi.asc_IsLongAction() || oWordControl.m_bIsMouseLock === true)
+        {
+            check_KeyboardEvent2(e);
+            e.preventDefault();
+            return;
+        }
 
         if (oThis.DemonstrationManager.Mode)
         {
@@ -1897,8 +1911,11 @@ function CEditorPage(api)
         oWordControl.StartUpdateOverlay();
 
         oWordControl.IsKeyDownButNoPress = true;
-        oWordControl.bIsUseKeyPress = (oWordControl.m_oLogicDocument.OnKeyDown(global_keyboardEvent) === true) ? false : true;
-        if (false === oWordControl.bIsUseKeyPress)// || true === global_keyboardEvent.AltKey)
+
+        var _ret_mouseDown = oWordControl.m_oLogicDocument.OnKeyDown(global_keyboardEvent);
+        oWordControl.bIsUseKeyPress = ((_ret_mouseDown & keydownresult_PreventKeyPress) != 0) ? false : true;
+
+        if ((_ret_mouseDown & keydownresult_PreventDefault) != 0)
         {
             // убираем превент с альтом. Уж больно итальянцы недовольны.
             e.preventDefault();
