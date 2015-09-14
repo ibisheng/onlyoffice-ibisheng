@@ -10,7 +10,7 @@ function _rect()
 
 var vector_koef = 25.4 / 72;
 
-function CPdfPrinter(sUrlPath)
+function CPdfPrinter()
 {
     this.DocumentRenderer = new CDocumentRenderer();
     this.DocumentRenderer.VectorMemoryForPrint = new CMemory();
@@ -18,8 +18,6 @@ function CPdfPrinter(sUrlPath)
     this.font = new window["Asc"].FontProperties("Arial", -1);
     this.Transform = new CMatrix();
     this.InvertTransform = new CMatrix();
-
-	this.sUrlPath = sUrlPath;
 
     this.bIsSimpleCommands = false;
 
@@ -360,9 +358,10 @@ CPdfPrinter.prototype =
     {
         if (this.bIsSimpleCommands)
             return this.DocumentRenderer.drawImage(_src, sx, sy, sw, sh, dx, dy);
-
-		if(0 == _src.indexOf(this.sUrlPath))
-			_src = _src.substring(this.sUrlPath.length);
+        var srcLocal = g_oDocumentUrls.getLocal(_src);
+        if (srcLocal){
+            _src = srcLocal;
+        }
         if (0 == sx && 0 == sy && sw == src_w && sh == src_h)
         {
             this.DocumentRenderer.Memory.WriteByte(CommandType.ctDrawImageFromFile);

@@ -72,9 +72,12 @@ function DocumentUrls(){
 	this.imageCount = 0;
 }
 DocumentUrls.prototype = {
-	mediaPrefix : 'media/',
-	init : function(urls){
+	mediaPrefix: 'media/',
+	init: function (urls) {
 		this.addUrls(urls);
+	},
+	getUrls: function () {
+		return this.urls;
 	},
 	addUrls : function(urls){
 		for(var i in urls){

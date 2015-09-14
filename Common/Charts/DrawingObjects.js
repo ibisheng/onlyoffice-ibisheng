@@ -152,10 +152,7 @@ function asc_CChartBinary(chart) {
             pptx_writer.WriteRecord1(1, chart.colorMapOverride, pptx_writer.WriteClrMap);
             this["colorMapBinary"] = pptx_writer.pos + ";" + pptx_writer.GetBase64Memory();
         }
-        if(typeof chart.DocumentUrl === "string" && chart.DocumentUrl.length  > 0)
-        {
-            this["DocumentUrl"] = chart.DocumentUrl;
-        }
+        this["urls"] = JSON.stringify(g_oDocumentUrls.getUrls());
     }
 }
 
@@ -1642,14 +1639,8 @@ function DrawingObjects() {
                 DEFAULT_COLOR_MAP = colorMapOverride;
             }
 
-            if(typeof chart["DocumentUrl"] === "string")
-            {
-                var DocumentUrl = chart["DocumentUrl"];
-                if(DocumentUrl.indexOf(g_sResourceServiceLocalUrl) === 0)
-                {
-                    window["Asc"]["editor"].documentId = DocumentUrl.slice(g_sResourceServiceLocalUrl.length, DocumentUrl.length);
-                }
-
+            if(typeof chart["urls"] === "string") {
+                g_oDocumentUrls.addUrls(JSON.parse(chart["urls"]));
             }
             var font_map = {};
             oNewChartSpace.documentGetAllFontNames(font_map);

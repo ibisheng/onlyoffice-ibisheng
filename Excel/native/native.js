@@ -2154,7 +2154,7 @@ function OfflineEditor () {
     this.offline_print = function(s, p) {
         var adjustPrint = asc_ReadAdjustPrint(s, p);
         var pagesData   = _api.wb.calcPagesPrint(adjustPrint);
-        var pdfWriter   = new CPdfPrinter(_api.wbModel.sUrlPath);
+        var pdfWriter   = new CPdfPrinter();
         var isEndPrint  = _api.wb.printSheet(pdfWriter, pagesData);
         var str =  pdfWriter.DocumentRenderer.Memory.GetBase64Memory();
         return str;

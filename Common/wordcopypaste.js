@@ -1357,7 +1357,7 @@ CopyProcessor.prototype =
 			
 			if(elementsContent.DocContent || (elementsContent.Drawings && elementsContent.Drawings.length) || (elementsContent.SlideObjects && elementsContent.SlideObjects.length))
 			{
-				this.oPresentationWriter.WriteString2(editor.DocumentUrl);
+				this.oPresentationWriter.WriteString2(documentId);
 				this.oPresentationWriter.WriteDouble(presentation.Width);
 				this.oPresentationWriter.WriteDouble(presentation.Height);
 			}
@@ -3495,7 +3495,7 @@ PasteProcessor.prototype =
                             else
                                 master = presentation.slideMasters[0];
 								
-                            if(editor.DocumentUrl !== p_url)
+                            if(documentId !== p_url)
                             {
                                 var layouts_count = stream.GetULong();
                                 for(var i = 0; i < layouts_count; ++i)
@@ -4766,7 +4766,7 @@ PasteProcessor.prototype =
 	
 	_readFromBinaryExcel: function(base64)
 	{
-		var oBinaryFileReader = new Asc.BinaryFileReader(null, true);
+		var oBinaryFileReader = new Asc.BinaryFileReader(true);
 		var tempWorkbook = new Workbook();
         tempWorkbook.theme = this.oDocument.theme ? this.oDocument.theme : this.oLogicDocument.theme;
 		if(!tempWorkbook.theme && this.oLogicDocument.themes && this.oLogicDocument.themes[0])

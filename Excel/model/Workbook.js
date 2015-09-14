@@ -1890,9 +1890,8 @@ $(function(){
 /**
  * @constructor
  */
-function Workbook(sUrlPath, eventsHandlers, oApi){
+function Workbook(eventsHandlers, oApi){
 	this.oApi = oApi;
-	this.sUrlPath = sUrlPath;
 	this.handlers = eventsHandlers;
 	this.needRecalc = {nodes: {}, length:0};
 	this.dependencyFormulas = new DependencyGraph(this);

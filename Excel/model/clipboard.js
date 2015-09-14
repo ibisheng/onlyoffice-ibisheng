@@ -1717,7 +1717,7 @@
 			
 			_pasteFromBinaryExcel: function(worksheet, base64, isIntoShape)
 			{
-				var oBinaryFileReader = new Asc.BinaryFileReader(null, true);
+				var oBinaryFileReader = new Asc.BinaryFileReader(true);
 				var tempWorkbook = new Workbook;
 				var t = this;
 				
@@ -2195,8 +2195,8 @@
 										var name = g_oDocumentUrls.imagePath2Local(elem.path);
 										if(aResult.addImages[i])
 										{
-											height = aResult.addImages[i].tag.height;
-											width = aResult.addImages[i].tag.width;
+											var height = aResult.addImages[i].tag.height;
+											var width = aResult.addImages[i].tag.width;
 											aResult.addImages[i].tag = 
 											{
 												height: height,

@@ -543,17 +543,17 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     var emptyWorkbook = getEmptyWorkbook() + "";
     if (emptyWorkbook.length && (Asc.c_oSerFormat.Signature === emptyWorkbook.substring(0, Asc.c_oSerFormat.Signature.length))) {
       this.isChartEditor = true;
-      var wb = this.asc_OpenDocument("", emptyWorkbook);
+      var wb = this.asc_OpenDocument(emptyWorkbook);
 
       this._startOpenDocument({returnCode: 0, val: wb});
     }
   };
 
-  spreadsheet_api.prototype.asc_OpenDocument = function(url, data) {
-    var wb = new Workbook(url, this.handlers, this);
+  spreadsheet_api.prototype.asc_OpenDocument = function(data) {
+    var wb = new Workbook(this.handlers, this);
     this.initGlobalObjects(wb);
     this.wbModel = wb;
-    var oBinaryFileReader = new Asc.BinaryFileReader(url);
+    var oBinaryFileReader = new Asc.BinaryFileReader();
     oBinaryFileReader.Read(data, wb);
     g_oIdCounter.Set_Load(false);
     return wb;
@@ -985,7 +985,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
         return;
       }
 
-      var wb = t.asc_OpenDocument(result.url, result.data);
+      var wb = t.asc_OpenDocument(result.data);
       if (callback) {
         callback({returnCode: 0, val: wb});
       }
@@ -998,7 +998,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
     var scriptElem = document.createElement('script');
     scriptElem.onload = scriptElem.onerror = function() {
-      t._OfflineAppDocumentEndLoad(src, fCallback);
+      t._OfflineAppDocumentEndLoad(fCallback);
     };
 
     scriptElem.setAttribute('src', src + "editor.js");
@@ -1006,11 +1006,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     document.getElementsByTagName('head')[0].appendChild(scriptElem);
   };
 
-  spreadsheet_api.prototype._OfflineAppDocumentEndLoad = function(sUrlPath, fCallback) {
+  spreadsheet_api.prototype._OfflineAppDocumentEndLoad = function(fCallback) {
     var data = getTestWorkbook();
     var sData = data + "";
     if (Asc.c_oSerFormat.Signature === sData.substring(0, Asc.c_oSerFormat.Signature.length)) {
-      var wb = this.asc_OpenDocument(sUrlPath, sData);
+      var wb = this.asc_OpenDocument(sData);
       fCallback({returnCode: 0, val: wb});
     }
   };
@@ -1090,7 +1090,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     oAdditionalData["outputformat"] = sFormat;
     if (c_oAscFileType.PDF === sFormat) {
       var printPagesData = this.wb.calcPagesPrint(this.adjustPrint);
-      var pdf_writer = new CPdfPrinter(this.wbModel.sUrlPath);
+      var pdf_writer = new CPdfPrinter();
       var isEndPrint = this.wb.printSheet(pdf_writer, printPagesData);
 
       dataContainer.data = pdf_writer.DocumentRenderer.Memory.GetBase64Memory();
@@ -3509,7 +3509,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
           t.adjustPrint = new asc_CAdjustPrint();
           var printPagesData = t.wb.calcPagesPrint(t.adjustPrint);
 
-          var pdf_writer = new CPdfPrinter(t.wbModel.sUrlPath);
+          var pdf_writer = new CPdfPrinter();
           t.wb.printSheet(pdf_writer, printPagesData);
 
           return pdf_writer.DocumentRenderer.Memory.GetBase64Memory();
@@ -3574,7 +3574,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
       if (!window['scriptBridge']['loadDocumentFromString']) {
         window['scriptBridge']['loadDocumentFromString'] = function(workbook) {
-          var wb = t.asc_OpenDocument("", workbook);
+          var wb = t.asc_OpenDocument(workbook);
           t._startOpenDocument({returnCode: 0, val: wb});
         }
       }
@@ -3591,7 +3591,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       if (!data || Asc.c_oSerFormat.Signature !== data.substring(0, Asc.c_oSerFormat.Signature.length)) {
         workbook = "XLSY;v1;1001;BAKAAgAAAwwDAAAEHwMAAADgAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIgAAAAAHgAAAAEZAAAAAAAAAAABAAAAAAIAAAAABAAAAAAFAAAAAAIdAAAAAxgAAAAGBAAAAAAHBAAAAAAIBAAAAAAJBAAAAAAECgAAAAUAAAAABQAAAAAGLwAAAAcqAAAAAQYGAAAAAAQAAAD/BAYOAAAAQwBhAGwAaQBiAHIAaQAGBQAAAAAAACZADwAAAAAAAAAAAQUAAAACAAAAAL0AAAAAOgAAAAEYAAAAAAYMAAAAUwBoAGUAZQB0ADEAAQQBAAAABAQAAABBADEACwoAAAABBQAAAAAAAC5ACQAAAAAAOgAAAAEYAAAAAAYMAAAAUwBoAGUAZQB0ADIAAQQCAAAABAQAAABBADEACwoAAAABBQAAAAAAAC5ACQAAAAAAOgAAAAEYAAAAAAYMAAAAUwBoAGUAZQB0ADMAAQQDAAAABAQAAABBADEACwoAAAABBQAAAAAAAC5ACQAAAAAFAAAAAAAAAAA=";
       }
-      var wb = t.asc_OpenDocument("", workbook);
+      var wb = t.asc_OpenDocument(workbook);
       t._startOpenDocument({returnCode: 0, val: wb});
     }
 
@@ -3636,10 +3636,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     this.User.asc_setId("TM");
     this.User.asc_setUserName("native");
 
-    this.wbModel = new Workbook(this.DocumentUrl, this.handlers, this);
+    this.wbModel = new Workbook(this.handlers, this);
     this.initGlobalObjects(this.wbModel);
 
-    var oBinaryFileReader = new Asc.BinaryFileReader(this.DocumentUrl);
+    var oBinaryFileReader = new Asc.BinaryFileReader();
 
     if (undefined === version) {
       oBinaryFileReader.Read(base64File, this.wbModel);
@@ -3712,7 +3712,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       _memory2.WriteString2 = _memory1["WriteString2"];
     }
 
-    var _printer = new CPdfPrinter(this.wbModel.sUrlPath);
+    var _printer = new CPdfPrinter();
     _printer.DocumentRenderer.Memory = _memory1;
     _printer.DocumentRenderer.VectorMemoryForPrint = _memory2;
     return _printer;
@@ -3728,7 +3728,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     var _printPagesData = this.wb.calcPagesPrint(_adjustPrint);
 
     if (undefined === _printer && _page === undefined) {
-      var pdf_writer = new CPdfPrinter(this.wbModel.sUrlPath);
+      var pdf_writer = new CPdfPrinter();
       var isEndPrint = this.wb.printSheet(pdf_writer, _printPagesData);
 
       if (undefined !== window["AscDesktopEditor"]) {

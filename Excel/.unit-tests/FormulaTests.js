@@ -385,7 +385,7 @@
         sData = data + "";
     if ( Asc.c_oSerFormat.Signature === sData.substring( 0, Asc.c_oSerFormat.Signature.length ) ) {
         var sUrlPath = "offlinedocs/";
-        wb = new Workbook( sUrlPath, new Asc.asc_CHandlersList(), {wb:{getWorksheet:function(){}}} );
+        wb = new Workbook( new Asc.asc_CHandlersList(), {wb:{getWorksheet:function(){}}} );
 
         History = new CHistory(wb);
 
@@ -403,7 +403,7 @@
 //        g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(wb);
         g_oIdCounter.Set_Load(false);
 
-        var oBinaryFileReader = new Asc.BinaryFileReader( sUrlPath );
+        var oBinaryFileReader = new Asc.BinaryFileReader();
         oBinaryFileReader.Read( sData, wb );
         ws = wb.getWorksheet( wb.getActive() );
         getFormulasInfo();

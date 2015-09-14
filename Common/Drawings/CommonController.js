@@ -4800,13 +4800,6 @@ DrawingObjectsController.prototype =
     Document_UpdateInterfaceState: function()
     {},
 
-    getDocumentUrl: function()
-    {
-        if(typeof editor !== "undefined" && isRealObject(editor) && typeof editor.DocumentUrl === "string")
-            return editor.DocumentUrl;
-        return null;
-    },
-
     getChartObject: function(type)
     {
         if(null != type)
@@ -4846,7 +4839,6 @@ DrawingObjectsController.prototype =
                 ret.spPr.xfrm.setOffY(0);
                 ret.theme = this.getTheme();
                 ret.colorMapOverride = this.getColorMapOverride();
-                ret.DocumentUrl = this.getDocumentUrl();
                 return ret;
             }, this, []);
         }
@@ -4857,7 +4849,6 @@ DrawingObjectsController.prototype =
             {
                 by_types.charts[0].theme = this.getTheme();
                 by_types.charts[0].colorMapOverride = this.getColorMapOverride();
-                by_types.charts[0].DocumentUrl = this.getDocumentUrl();
                 ExecuteNoHistory(function()
                 {
                     CheckSpPrXfrm2(by_types.charts[0]);

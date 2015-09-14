@@ -349,8 +349,6 @@ function CDocMeta()
     this.LockObject = null;
     this.stream = null;
 
-    //this.DocumentUrl = "";
-
     this.CountParagraphs = 0;
     this.CountWords = 0;
     this.CountSymbols = 0;
@@ -383,7 +381,6 @@ function CDocMeta()
 
     this.Load = function(url, doc_bin_base64)
     {
-        //this.DocumentUrl = url;
         var stream = CreateDocumentData(doc_bin_base64);
 
         this.PagesCount = stream.GetLong();

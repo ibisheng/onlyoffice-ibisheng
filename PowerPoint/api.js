@@ -984,7 +984,6 @@ asc_docs_api.prototype.SetInterfaceDrawImagePlace = function()
 asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 {
 	this.InitEditor();
-	this.DocumentUrl = url;
 	this.DocumentType = 2;
 
     var _loader = new BinaryPPTYLoader();
@@ -1002,7 +1001,7 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 
     this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 
-	this.FontLoader.LoadEmbeddedFonts(this.DocumentUrl, this.WordControl.m_oLogicDocument.EmbeddedFonts);
+	//this.FontLoader.LoadEmbeddedFonts(this.DocumentUrl, this.WordControl.m_oLogicDocument.EmbeddedFonts);
 	this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, false);
 
     this.ParcedDocument = true;
@@ -2191,10 +2190,9 @@ asc_docs_api.prototype.ShapeApply = function(prop)
     {
         var _image = this.ImageLoader.LoadImage(image_url, 1);
 
-        var sFindString = editor.DocumentUrl + "media/";
-        if(0 == image_url.indexOf(sFindString))
-        {
-            image_url = image_url.substring(sFindString.length);
+        var srcLocal = g_oDocumentUrls.getImageLocal(image_url);
+        if (srcLocal) {
+            image_url = srcLocal;
         }
         if(bShapeTexture)
         {
@@ -2312,10 +2310,9 @@ asc_docs_api.prototype.SetSlideProps = function(prop)
         {
             var _image = this.ImageLoader.LoadImage(image_url, 1);
 
-            var sFindString = editor.DocumentUrl + "media/";
-            if(0 == image_url.indexOf(sFindString))
-            {
-                image_url = image_url.substring(sFindString.length);
+            var srcLocal = g_oDocumentUrls.getImageLocal(image_url);
+            if (srcLocal) {
+                image_url = srcLocal;
                 bg.bgPr.Fill.fill.RasterImageId = image_url; // erase documentUrl
             }
 
@@ -3071,7 +3068,7 @@ asc_docs_api.prototype.canUnGroup = function()
 };
 
 asc_docs_api.prototype.AddImageUrl = function(url){
-	if(0 == url.indexOf(this.DocumentUrl))
+	if(g_oDocumentUrls.getLocal(url))
 	{
 		this.AddImageUrlAction(url);
 	}
@@ -3173,9 +3170,10 @@ asc_docs_api.prototype.AddImageUrlActionCallback = function(_image)
     }
     else
     {
-        var sFindString = editor.DocumentUrl + "media/";
-        if(0 == src.indexOf(sFindString))
-            src = src.substring(sFindString.length);
+        var srcLocal = g_oDocumentUrls.getImageLocal(src);
+        if (srcLocal) {
+            src = srcLocal;
+        }
 
         this.WordControl.m_oLogicDocument.Add_FlowImage(_w, _h, src);
     }
@@ -3236,11 +3234,10 @@ asc_docs_api.prototype.ImgApply = function(obj){
     {
 		var _img = this.ImageLoader.LoadImage(ImagePr.ImageUrl, 1);
 
-        var sFindString = editor.DocumentUrl + "media/";
-        if(0 == ImagePr.ImageUrl.indexOf(sFindString))
-        {
-            ImagePr.ImageUrl = ImagePr.ImageUrl.substring(sFindString.length); // erase documentUrl
-        }
+		var srcLocal = g_oDocumentUrls.getImageLocal(ImagePr.ImageUrl);
+		if (srcLocal){
+			ImagePr.ImageUrl = srcLocal;
+		}
 
 		if (null != _img)
         {
