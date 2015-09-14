@@ -73,6 +73,15 @@ var StartTime;
 var document_EditingType_Common = 0x00; // Обычный режим редактирования
 var document_EditingType_Review = 0x01; // Режим рецензирования
 
+
+var keydownflags_PreventDefault  = 0x0001;
+var keydownflags_PreventKeyPress = 0x0002;
+
+var keydownresult_PreventNothing  = 0x0000;
+var keydownresult_PreventDefault  = 0x0001;
+var keydownresult_PreventKeyPress = 0x0002;
+var keydownresult_PreventAll      = 0xFFFF;
+
 function CSelectedElement(Element, SelectedAll)
 {
     this.Element     = Element;
@@ -9424,7 +9433,7 @@ CDocument.prototype =
             this.SearchEngine.Reset_Current();
 
         var bUpdateSelection = true;
-        var bRetValue = false;
+        var bRetValue = keydownresult_PreventNothing;
 
         if ( e.KeyCode == 8 && false === editor.isViewMode ) // BackSpace
         {
@@ -9433,7 +9442,7 @@ CDocument.prototype =
                 this.Create_NewHistoryPoint(historydescription_Document_BackSpaceButton);
                 this.Remove(-1, true);
             }
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 9 && false === editor.isViewMode ) // Tab
         {
@@ -9479,7 +9488,7 @@ CDocument.prototype =
                     }
                 }
             }
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 13 ) // Enter
         {
@@ -9528,7 +9537,7 @@ CDocument.prototype =
                 }
             }
 
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 27 ) // Esc
         {
@@ -9572,7 +9581,7 @@ CDocument.prototype =
             {
                 this.Document_End_HdrFtrEditing();
             }
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 32 && false === editor.isViewMode ) // Space
         {
@@ -9614,7 +9623,7 @@ CDocument.prototype =
                 }
             }
 
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 33 ) // PgUp
         {
@@ -9720,7 +9729,7 @@ CDocument.prototype =
                 }
             }
 
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 34 ) // PgDn
         {
@@ -9829,7 +9838,7 @@ CDocument.prototype =
                 }
             }
 
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 35 ) // клавиша End
         {
@@ -9842,7 +9851,7 @@ CDocument.prototype =
                 this.Cursor_MoveEndOfLine( true === e.ShiftKey );
             }
 
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 36 ) // клавиша Home
         {
@@ -9855,7 +9864,7 @@ CDocument.prototype =
                 this.Cursor_MoveStartOfLine( true === e.ShiftKey );
             }
 
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 37 ) // Left Arrow
         {
@@ -9864,7 +9873,7 @@ CDocument.prototype =
                 this.DrawingDocument.TargetStart();
 
             this.Cursor_MoveLeft( true === e.ShiftKey, true === e.CtrlKey );
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 38 ) // Top Arrow
         {
@@ -9874,7 +9883,7 @@ CDocument.prototype =
                 this.DrawingDocument.TargetStart();
 
             this.Cursor_MoveUp( true === e.ShiftKey );
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 39 ) // Right Arrow
         {
@@ -9883,7 +9892,7 @@ CDocument.prototype =
                 this.DrawingDocument.TargetStart();
 
             this.Cursor_MoveRight( true === e.ShiftKey, true === e.CtrlKey );
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 40 ) // Bottom Arrow
         {
@@ -9893,14 +9902,14 @@ CDocument.prototype =
                 this.DrawingDocument.TargetStart();
 
             this.Cursor_MoveDown( true === e.ShiftKey );
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 45 ) // Insert
         {
             if ( true === e.CtrlKey ) // Ctrl + Insert (аналогично Ctrl + C)
             {
                 Editor_Copy(this.DrawingDocument.m_oWordControl.m_oApi);
-                //не возвращаем true чтобы не было preventDefault
+                bRetValue = keydownresult_PreventKeyPress;
             }
             else if ( true === e.ShiftKey && false === editor.isViewMode ) // Shift + Insert (аналогично Ctrl + V)
             {
@@ -9915,7 +9924,7 @@ CDocument.prototype =
                             window.GlobalPasteFlag = true;
                             editor.asc_IncrementCounterLongAction();
                             Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
-                            //не возвращаем true чтобы не было preventDefault
+                            bRetValue = keydownresult_PreventKeyPress;
                         }
                         else
                         {
@@ -9927,12 +9936,11 @@ CDocument.prototype =
                                 window.GlobalPasteFlag = true;
                                 editor.asc_IncrementCounterLongAction();
                                 Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
-                                //не возвращаем true чтобы не было preventDefault
+                                bRetValue = keydownresult_PreventKeyPress;
                             }
                         }
                     }
                 }
-                //не возвращаем true чтобы не было preventDefault
             }
         }
         else if ( e.KeyCode == 46 && false === editor.isViewMode ) // Delete
@@ -9944,7 +9952,7 @@ CDocument.prototype =
                     this.Create_NewHistoryPoint(historydescription_Document_DeleteButton);
                     this.Remove( 1, true );
                 }
-                bRetValue = true;
+                bRetValue = keydownresult_PreventAll;
             }
             else // Shift + Delete (аналогично Ctrl + X)
             {
@@ -9953,7 +9961,7 @@ CDocument.prototype =
                     this.Create_NewHistoryPoint(historydescription_Document_ShiftDeleteButton);
                     Editor_Copy(this.DrawingDocument.m_oWordControl.m_oApi, true);
                 }
-                //не возвращаем true чтобы не было preventDefault
+                bRetValue = keydownresult_PreventKeyPress;
             }
         }
         else if ( e.KeyCode == 49 && false === editor.isViewMode && true === e.CtrlKey && true === e.AltKey ) // Alt + Ctrl + Num1 - применяем стиль Heading1
@@ -9964,7 +9972,7 @@ CDocument.prototype =
                 this.Set_ParagraphStyle( "Heading 1" );
                 this.Document_UpdateInterfaceState();
             }
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 50 && false === editor.isViewMode && true === e.CtrlKey && true === e.AltKey ) // Alt + Ctrl + Num2 - применяем стиль Heading2
         {
@@ -9974,7 +9982,7 @@ CDocument.prototype =
                 this.Set_ParagraphStyle( "Heading 2" );
                 this.Document_UpdateInterfaceState();
             }
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 51 && false === editor.isViewMode && true === e.CtrlKey && true === e.AltKey ) // Alt + Ctrl + Num3 - применяем стиль Heading3
         {
@@ -9984,7 +9992,7 @@ CDocument.prototype =
                 this.Set_ParagraphStyle( "Heading 3" );
                 this.Document_UpdateInterfaceState();
             }
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if (e.KeyCode === 53 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + Num5 - зачеркиваем текст
         {
@@ -9997,14 +10005,14 @@ CDocument.prototype =
                     this.Paragraph_Add( new ParaTextPr( { Strikeout : TextPr.Strikeout === true ? false : true } ) );
                     this.Document_UpdateInterfaceState();
                 }
-                bRetValue = true;
+                bRetValue = keydownresult_PreventAll;
             }
         }
         else if ( e.KeyCode == 65 && true === e.CtrlKey ) // Ctrl + A - выделяем все
         {
             this.Select_All();
             bUpdateSelection = false;
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 66 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + B - делаем текст жирным
         {
@@ -10017,7 +10025,7 @@ CDocument.prototype =
                     this.Paragraph_Add( new ParaTextPr( { Bold : TextPr.Bold === true ? false : true } ) );
                     this.Document_UpdateInterfaceState();
                 }
-                bRetValue = true;
+                bRetValue = keydownresult_PreventAll;
             }
         }
         else if ( e.KeyCode == 67 && true === e.CtrlKey ) // Ctrl + C + ...
@@ -10025,12 +10033,12 @@ CDocument.prototype =
             if ( true === e.ShiftKey ) // Ctrl + Shift + C - копирование форматирования текста
             {
                 this.Document_Format_Copy();
-                bRetValue = true;
+                bRetValue = keydownresult_PreventAll;
             }
             else // Ctrl + C - copy
             {
                 Editor_Copy(this.DrawingDocument.m_oWordControl.m_oApi);
-                //не возвращаем true чтобы не было preventDefault
+                bRetValue = keydownresult_PreventKeyPress;
             }
         }
         else if ( e.KeyCode == 69 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + E + ...
@@ -10046,7 +10054,7 @@ CDocument.prototype =
                         this.Set_ParagraphAlign( ParaPr.Jc === align_Center ? align_Left : align_Center );
                         this.Document_UpdateInterfaceState();
                     }
-                    bRetValue = true;
+                    bRetValue = keydownresult_PreventAll;
                 }
             }
             else // Ctrl + Alt + E - добавляем знак евро €
@@ -10059,7 +10067,7 @@ CDocument.prototype =
                     this.DrawingDocument.TargetShow();
                     this.Paragraph_Add(new ParaText("€"));
                 }
-                bRetValue = true;
+                bRetValue = keydownresult_PreventAll;
             }
         }
         else if ( e.KeyCode == 73 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + I - делаем текст наклонным
@@ -10073,7 +10081,7 @@ CDocument.prototype =
                     this.Paragraph_Add( new ParaTextPr( { Italic : TextPr.Italic === true ? false : true } ) );
                     this.Document_UpdateInterfaceState();
                 }
-                bRetValue = true;
+                bRetValue = keydownresult_PreventAll;
             }
         }
         else if ( e.KeyCode == 74 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + J переключение прилегания параграфа между justify и left
@@ -10087,7 +10095,7 @@ CDocument.prototype =
                     this.Set_ParagraphAlign( ParaPr.Jc === align_Justify ? align_Left : align_Justify );
                     this.Document_UpdateInterfaceState();
                 }
-                bRetValue = true;
+                bRetValue = keydownresult_PreventAll;
             }
         }
         else if ( e.KeyCode == 75 && false === editor.isViewMode && true === e.CtrlKey && false === e.ShiftKey ) // Ctrl + K - добавление гиперссылки
@@ -10095,7 +10103,7 @@ CDocument.prototype =
             if ( true === this.Hyperlink_CanAdd(false) )
                 editor.sync_DialogAddHyperlink();
 
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 76 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + L + ...
         {
@@ -10107,7 +10115,7 @@ CDocument.prototype =
                     this.Set_ParagraphNumbering( { Type : 0, SubType : 1 } );
                     this.Document_UpdateInterfaceState();
                 }
-                bRetValue = true;
+                bRetValue = keydownresult_PreventAll;
             }
             else // Ctrl + L - переключение прилегания параграфа между left и justify
             {
@@ -10120,7 +10128,7 @@ CDocument.prototype =
                         this.Set_ParagraphAlign( ParaPr.Jc === align_Left ? align_Justify : align_Left );
                         this.Document_UpdateInterfaceState();
                     }
-                    bRetValue = true;
+                    bRetValue = keydownresult_PreventAll;
                 }
             }
         }
@@ -10131,7 +10139,7 @@ CDocument.prototype =
             else // Ctrl + M - увеличиваем левый отступ
                 editor.IncreaseIndent();
             
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 80 && true === e.CtrlKey ) // Ctrl + P + ...
         {
@@ -10142,12 +10150,12 @@ CDocument.prototype =
                     this.Create_NewHistoryPoint(historydescription_Document_AddPageNumHotKey);
                     this.Paragraph_Add( new ParaPageNum() );
                 }
-                bRetValue = true;
+                bRetValue = keydownresult_PreventAll;
             }
             else // Ctrl + P - print
             {
                 this.DrawingDocument.m_oWordControl.m_oApi.asc_Print();
-                bRetValue = true;
+                bRetValue = keydownresult_PreventAll;
             }
         }
         else if ( e.KeyCode == 82 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + R - переключение прилегания параграфа между right и left
@@ -10161,7 +10169,7 @@ CDocument.prototype =
                     this.Set_ParagraphAlign( ParaPr.Jc === align_Right ? align_Left : align_Right );
                     this.Document_UpdateInterfaceState();
                 }
-                bRetValue = true;
+                bRetValue = keydownresult_PreventAll;
             }
         }
         else if ( e.KeyCode == 83 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + S - save
@@ -10170,7 +10178,7 @@ CDocument.prototype =
             {
                 this.DrawingDocument.m_oWordControl.m_oApi.asc_Save();
             }
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 85 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + U - делаем текст подчеркнутым
         {
@@ -10183,7 +10191,7 @@ CDocument.prototype =
                     this.Paragraph_Add( new ParaTextPr( { Underline : TextPr.Underline === true ? false : true } ) );
                     this.Document_UpdateInterfaceState();
                 }
-                bRetValue = true;
+                bRetValue = keydownresult_PreventAll;
             }
         }
         else if ( e.KeyCode == 86 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + V - paste
@@ -10194,7 +10202,7 @@ CDocument.prototype =
                 {
                     this.Create_NewHistoryPoint(historydescription_Document_FormatPasteHotKey);
                     this.Document_Format_Paste();
-                    bRetValue = true;
+                    bRetValue = keydownresult_PreventAll;
                 }
                 else // Ctrl + V - paste
                 {
@@ -10207,7 +10215,7 @@ CDocument.prototype =
                             window.GlobalPasteFlag = true;
                             editor.asc_IncrementCounterLongAction();
                             Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
-                            //не возвращаем true чтобы не было preventDefault
+                            bRetValue = keydownresult_PreventKeyPress;
                         }
                         else
                         {
@@ -10219,14 +10227,14 @@ CDocument.prototype =
                                 window.GlobalPasteFlag = true;
                                 editor.asc_IncrementCounterLongAction();
                                 Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
-                                //не возвращаем true чтобы не было preventDefault
+                                bRetValue = keydownresult_PreventKeyPress;
                             }
                         }
                     }
                     else
                     {
                         if (!window.USER_AGENT_SAFARI_MACOS)
-                            bRetValue = true;
+                            bRetValue = keydownresult_PreventAll;
                     }
                 }
             }
@@ -10238,17 +10246,17 @@ CDocument.prototype =
                 this.Create_NewHistoryPoint(historydescription_Document_CurHotKey);
                 Editor_Copy(this.DrawingDocument.m_oWordControl.m_oApi, true);
             }
-            //не возвращаем true чтобы не было preventDefault
+            bRetValue = keydownresult_PreventKeyPress;
         }
         else if ( e.KeyCode == 89 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + Y - Redo
         {
             this.Document_Redo();
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 90 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + Z - Undo
         {
             this.Document_Undo();
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 93 || 57351 == e.KeyCode /*в Opera такой код*/ ) // контекстное меню
         {
@@ -10268,7 +10276,7 @@ CDocument.prototype =
             editor.sync_ContextMenuCallback( { Type : c_oAscContextMenuTypes.Common, X_abs : X_abs, Y_abs : Y_abs } );
 
             bUpdateSelection = false;
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 121 && true === e.ShiftKey ) // Shift + F10 - контекстное меню
         {
@@ -10288,19 +10296,19 @@ CDocument.prototype =
             editor.sync_ContextMenuCallback( { Type : c_oAscContextMenuTypes.Common, X_abs : X_abs, Y_abs : Y_abs } );
 
             bUpdateSelection = false;
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 144 ) // Num Lock
         {
             // Ничего не делаем
             bUpdateSelection = false;
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 145 ) // Scroll Lock
         {
             // Ничего не делаем
             bUpdateSelection = false;
-            bRetValue = true;
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 187 && false === editor.isViewMode) // =
         {
@@ -10318,7 +10326,7 @@ CDocument.prototype =
                             this.Paragraph_Add(new ParaTextPr({ VertAlign : TextPr.VertAlign === vertalign_SubScript ? vertalign_Baseline : vertalign_SubScript }));
                         this.Document_UpdateInterfaceState();
                     }
-                    bRetValue = true;
+                    bRetValue = keydownresult_PreventAll;
                 }
             }
             else if (true === e.AltKey) // Alt + =
@@ -10331,7 +10339,7 @@ CDocument.prototype =
                     {
                         this.Create_NewHistoryPoint(historydescription_Document_AddMathHotKey);
                         this.Paragraph_Add(new MathMenu (-1));
-                        bRetValue = true;
+                        bRetValue = keydownresult_PreventAll;
                     }
                 }
             }
@@ -10347,7 +10355,7 @@ CDocument.prototype =
                     this.Paragraph_Add( new ParaTextPr( { VertAlign : TextPr.VertAlign === vertalign_SuperScript ? vertalign_Baseline : vertalign_SuperScript } ) );
                     this.Document_UpdateInterfaceState();
                 }
-                bRetValue = true;
+                bRetValue = keydownresult_PreventAll;
             }
         }
         else if ( e.KeyCode == 189 && false === editor.isViewMode ) // Клавиша Num-
@@ -10363,7 +10371,7 @@ CDocument.prototype =
                 Item.Set_SpaceAfter(false);
 
                 this.Paragraph_Add(Item);
-                bRetValue = true;
+                bRetValue = keydownresult_PreventAll;
             }
         }
         else if ( e.KeyCode == 190 && true === e.CtrlKey ) // Ctrl + .
@@ -10377,21 +10385,23 @@ CDocument.prototype =
                     this.Paragraph_Add( new ParaTextPr( { VertAlign : TextPr.VertAlign === vertalign_SubScript ? vertalign_Baseline : vertalign_SubScript } ) );
                     this.Document_UpdateInterfaceState();
                 }
-                bRetValue = true;
+                bRetValue = keydownresult_PreventAll;
             }
         }
         else if ( e.KeyCode == 219 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + [
         {
             editor.FontSizeOut();
             this.Document_UpdateInterfaceState();
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 221 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + ]
         {
             editor.FontSizeIn();
             this.Document_UpdateInterfaceState();
+            bRetValue = keydownresult_PreventAll;
         }
 
-        if ( true == bRetValue && true === bUpdateSelection )
+        if (bRetValue & keydownflags_PreventKeyPress && true === bUpdateSelection )
             this.Document_UpdateSelectionState();
         
         return bRetValue;
