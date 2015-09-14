@@ -1354,6 +1354,7 @@ CDocumentContent.prototype =
             return this.Pages[0].Bounds;
 
         var Bounds = this.Pages[PageNum].Bounds;
+        var PageNumAbs = PageNum + this.Get_StartPage_Absolute();
 
         // В колонтитуле не учитывается.
         if ( true != this.Is_HdrFtr(false) || true === bForceCheckDrawings )
@@ -1366,18 +1367,21 @@ CDocumentContent.prototype =
             for ( var Index = 0; Index < Count; Index++ )
             {
                 var Obj = AllDrawingObjects[Index];
-                var ObjBounds = Obj.Get_Bounds();
-                if (true === Obj.Use_TextWrap())
+                if (PageNumAbs === Obj.Get_PageNum())
                 {
-                    if (ObjBounds.Bottom > Bounds.Bottom)
-                        Bounds.Bottom = ObjBounds.Bottom;
-                }
-                else if (undefined !== Height && ObjBounds.Top < this.Y + Height)
-                {
-                    if (ObjBounds.Bottom >= this.Y + Height)
-                        Bounds.Bottom = this.Y + Height;
-                    else if (ObjBounds.Bottom > Bounds.Bottom)
-                        Bounds.Bottom = ObjBounds.Bottom;
+                    var ObjBounds = Obj.Get_Bounds();
+                    if (true === Obj.Use_TextWrap())
+                    {
+                        if (ObjBounds.Bottom > Bounds.Bottom)
+                            Bounds.Bottom = ObjBounds.Bottom;
+                    }
+                    else if (undefined !== Height && ObjBounds.Top < this.Y + Height)
+                    {
+                        if (ObjBounds.Bottom >= this.Y + Height)
+                            Bounds.Bottom = this.Y + Height;
+                        else if (ObjBounds.Bottom > Bounds.Bottom)
+                            Bounds.Bottom = ObjBounds.Bottom;
+                    }
                 }
             }
 

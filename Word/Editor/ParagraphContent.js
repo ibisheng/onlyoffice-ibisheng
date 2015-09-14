@@ -6192,6 +6192,11 @@ ParaDrawing.prototype =
         this.PageNum = newPageIndex;
     },
 
+    Get_PageNum : function()
+    {
+        return this.PageNum;
+    },
+
 
     Get_AllParagraphs : function(Props, ParaArray)
     {
