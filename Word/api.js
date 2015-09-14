@@ -411,6 +411,9 @@ function asc_docs_api(name)
     this.isApplyChangesOnOpen = false;
     this.isApplyChangesOnOpenEnabled = true;
 
+  // Массив lock-ов, которые были на открытии документа
+  this.arrPreOpenLocksObjects = [];
+
 	this.mailMergeFileData = null;
 
 	// Тип состояния на данный момент (сохранение, открытие или никакое)
@@ -520,8 +523,7 @@ function asc_docs_api(name)
 
     this.ParcedDocument = false;
 	this.isStartCoAuthoringOnEndLoad = false;	// Подсоединились раньше, чем документ загрузился
-	
-	this.TrackFile = null;
+
 	this.fCurCallback = null;
 
 	var oThis = this;
@@ -1310,83 +1312,83 @@ asc_docs_api.prototype._coAuthoringInit = function(fCallback)
 	this.CoAuthoringApi.onAuthParticipantsChanged  	= function (e, count) { t.asc_fireCallback("asc_onAuthParticipantsChanged", e, count); };
     this.CoAuthoringApi.onMessage               	= function (e, clear) { t.asc_fireCallback("asc_onCoAuthoringChatReceiveMessage", e, clear); };
 	this.CoAuthoringApi.onConnectionStateChanged	= function (e) { t.asc_fireCallback("asc_onConnectionStateChanged", e); };
-	this.CoAuthoringApi.onLocksAcquired				= function (e)
-    {
-        if ( 2 != e["state"] )
-        {
-            var Id = e["block"];
-            var Class = g_oTableId.Get_ById( Id );
-            if ( null != Class )
-            {
-                var Lock = Class.Lock;
+  this.CoAuthoringApi.onLocksAcquired = function(e) {
+    if (t.isApplyChangesOnOpenEnabled) {
+      // Пока документ еще не загружен, будем сохранять функцию и аргументы
+      t.arrPreOpenLocksObjects.push(function(){t.CoAuthoringApi.onLocksAcquired(e);});
+      return;
+    }
 
-                var OldType = Class.Lock.Get_Type();
-                if ( locktype_Other2 === OldType || locktype_Other3 === OldType )
-                    Lock.Set_Type( locktype_Other3, true );
-                else
-                    Lock.Set_Type( locktype_Other, true );
+    if (2 != e["state"]) {
+      var Id = e["block"];
+      var Class = g_oTableId.Get_ById(Id);
+      if (null != Class) {
+        var Lock = Class.Lock;
 
-                // Выставляем ID пользователя, залочившего данный элемент
-                Lock.Set_UserId( e["user"] );
-
-                if ( Class instanceof CHeaderFooterController )
-                    editor.sync_LockHeaderFooters();
-                else if ( Class instanceof CDocument )
-                    editor.sync_LockDocumentProps();
-                else if ( Class instanceof CComment )
-                    editor.sync_LockComment(Class.Get_Id(), e["user"]);
-                else if ( Class instanceof CGraphicObjects )
-                    editor.sync_LockDocumentSchema();
-
-                // TODO: Здесь для ускорения надо сделать проверку, является ли текущим элемент с
-                //       заданным Id. Если нет, тогда и не надо обновлять состояние.
-                editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
-            }
-            else
-            {
-                CollaborativeEditing.Add_NeedLock(Id, e["user"]);
-            }
+        var OldType = Class.Lock.Get_Type();
+        if (locktype_Other2 === OldType || locktype_Other3 === OldType) {
+          Lock.Set_Type(locktype_Other3, true);
+        } else {
+          Lock.Set_Type(locktype_Other, true);
         }
-    };
-	this.CoAuthoringApi.onLocksReleased				= function (e, bChanges)
-    {
-        var Id = e["block"];
-        var Class = g_oTableId.Get_ById( Id );
-        if ( null != Class )
-        {
-            var Lock = Class.Lock;
-            if ( "undefined" != typeof(Lock) )
-            {
-                var CurType = Lock.Get_Type();
 
-                var NewType = locktype_None;
+        // Выставляем ID пользователя, залочившего данный элемент
+        Lock.Set_UserId(e["user"]);
 
-                if ( CurType === locktype_Other )
-                {
-                    if ( true != bChanges )
-                        NewType = locktype_None;
-                    else
-                    {
-                        NewType = locktype_Other2;
-                        CollaborativeEditing.Add_Unlock(Class);
-                    }
-                }
-                else if ( CurType === locktype_Mine )
-                {
-                    // Такого быть не должно
-                    NewType = locktype_Mine;
-                }
-                else if ( CurType === locktype_Other2 || CurType === locktype_Other3 )
-                    NewType = locktype_Other2;
-
-                Lock.Set_Type( NewType, true );
-            }
+        if (Class instanceof CHeaderFooterController) {
+          editor.sync_LockHeaderFooters();
+        } else if (Class instanceof CDocument) {
+          editor.sync_LockDocumentProps();
+        } else if (Class instanceof CComment) {
+          editor.sync_LockComment(Class.Get_Id(), e["user"]);
+        } else if (Class instanceof CGraphicObjects) {
+          editor.sync_LockDocumentSchema();
         }
-        else
-        {
-            CollaborativeEditing.Remove_NeedLock(Id);
+
+        // TODO: Здесь для ускорения надо сделать проверку, является ли текущим элемент с
+        //       заданным Id. Если нет, тогда и не надо обновлять состояние.
+        editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+      } else {
+        CollaborativeEditing.Add_NeedLock(Id, e["user"]);
+      }
+    }
+  };
+  this.CoAuthoringApi.onLocksReleased = function(e, bChanges) {
+    if (t.isApplyChangesOnOpenEnabled) {
+      // Пока документ еще не загружен, будем сохранять функцию и аргументы
+      t.arrPreOpenLocksObjects.push(function(){t.CoAuthoringApi.onLocksReleased(e, bChanges);});
+      return;
+    }
+
+    var Id = e["block"];
+    var Class = g_oTableId.Get_ById(Id);
+    if (null != Class) {
+      var Lock = Class.Lock;
+      if ("undefined" != typeof(Lock)) {
+        var CurType = Lock.Get_Type();
+
+        var NewType = locktype_None;
+
+        if (CurType === locktype_Other) {
+          if (true != bChanges) {
+            NewType = locktype_None;
+          } else {
+            NewType = locktype_Other2;
+            CollaborativeEditing.Add_Unlock(Class);
+          }
+        } else if (CurType === locktype_Mine) {
+          // Такого быть не должно
+          NewType = locktype_Mine;
+        } else if (CurType === locktype_Other2 || CurType === locktype_Other3) {
+          NewType = locktype_Other2;
         }
-    };
+
+        Lock.Set_Type(NewType, true);
+      }
+    } else {
+      CollaborativeEditing.Remove_NeedLock(Id);
+    }
+  };
 	this.CoAuthoringApi.onSaveChanges				= function (e, userId, bFirstLoad)
 	{
 		var bUseColor;
@@ -6185,6 +6187,12 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                     this.isApplyChangesOnOpen = true;
                     CollaborativeEditing.Apply_Changes();
                     CollaborativeEditing.Release_Locks();
+
+                  // Применяем все lock-и (ToDo возможно стоит пересмотреть вообще Lock-и)
+                  for (var i = 0; i < this.arrPreOpenLocksObjects.length; ++i) {
+                    this.arrPreOpenLocksObjects[i]();
+                  }
+                  this.arrPreOpenLocksObjects = [];
                 }
 
 //                History.RecalcData_Add( { Type : historyrecalctype_Inline, Data : { Pos : 0, PageNum : 0 } } );

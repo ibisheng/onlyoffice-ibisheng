@@ -68,6 +68,9 @@ function asc_docs_api(name)
     this.isApplyChangesOnOpen = false;
     this.isApplyChangesOnOpenEnabled = true;
 
+  // Массив lock-ов, которые были на открытии документа
+  this.arrPreOpenLocksObjects = [];
+
     this.IsSupportEmptyPresentation = true;
         
     this.ShowParaMarks = false;
@@ -169,8 +172,7 @@ function asc_docs_api(name)
     this.IsLongActionCurrent = 0;
     this.LongActionCallbacks = [];
 	this.LongActionCallbacksParams = [];
-	
-	this.TrackFile = null;
+
 	this.fCurCallback = null;
 	
 	var oThis = this;
@@ -245,204 +247,184 @@ asc_docs_api.prototype._coAuthoringInit = function (fCallback) {
     this.CoAuthoringApi.onAuthParticipantsChanged  	= function (e, count) { t.asc_fireCallback("asc_onAuthParticipantsChanged", e, count); };
     this.CoAuthoringApi.onMessage               	= function (e, clear) { t.asc_fireCallback( "asc_onCoAuthoringChatReceiveMessage", e, clear); };
     this.CoAuthoringApi.onConnectionStateChanged	= function (e) { t.asc_fireCallback( "asc_onConnectionStateChanged", e); };
-    this.CoAuthoringApi.onLocksAcquired				= function (e) {
-		if (2 != e["state"]) {
+  this.CoAuthoringApi.onLocksAcquired = function(e) {
+    if (t.isApplyChangesOnOpenEnabled) {
+      // Пока документ еще не загружен, будем сохранять функцию и аргументы
+      t.arrPreOpenLocksObjects.push(function(){t.CoAuthoringApi.onLocksAcquired(e);});
+      return;
+    }
 
-            var block_value = e["blockValue"];
-            var classes = [];
-            switch(block_value["type"])
-            {
-                case c_oAscLockTypeElemPresentation.Object:
-                {
-                    classes.push(block_value["objId"]);
-                    //classes.push(block_value["slideId"]);
-                    break;
-                }
-                case c_oAscLockTypeElemPresentation.Slide:
-                {
-                    classes.push(block_value["val"]);
-                    break;
-                }
-                case c_oAscLockTypeElemPresentation.Presentation:
-                {
-                    break;
-                }
-            }
-            var Id = e["block"];
+    if (2 != e["state"]) {
 
-            for(var i = 0; i < classes.length; ++i)
-            {
-                var Class = g_oTableId.Get_ById(classes[i]);// g_oTableId.Get_ById( Id );
-                if ( null != Class )
-                {
-                    var Lock = Class.Lock;
-
-                    var OldType = Class.Lock.Get_Type();
-                    if ( locktype_Other2 === OldType || locktype_Other3 === OldType )
-                        Lock.Set_Type( locktype_Other3, true );
-                    else
-                        Lock.Set_Type( locktype_Other, true );
-                    if ( Class instanceof PropLocker )
-                    {
-                        var object = g_oTableId.Get_ById(Class.objectId);
-                        if(object instanceof Slide && Class === object.deleteLock)
-                        {
-                            editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(object.num);
-                        }
-                    }
-                    // Выставляем ID пользователя, залочившего данный элемент
-                    Lock.Set_UserId( e["user"] );
-
-                     if ( Class instanceof PropLocker )
-                     {
-                         var object = g_oTableId.Get_ById(Class.objectId);
-                         if(object instanceof CPresentation)
-                         {
-                             if(Class === editor.WordControl.m_oLogicDocument.themeLock)
-                             {
-                                     editor.asc_fireCallback("asc_onLockDocumentTheme");
-                             }
-                             else if(Class === editor.WordControl.m_oLogicDocument.schemeLock)
-                             {
-                                 editor.asc_fireCallback("asc_onLockDocumentSchema");
-                             }
-                             else if(Class === editor.WordControl.m_oLogicDocument.slideSizeLock)
-                             {
-                                 editor.asc_fireCallback("asc_onLockDocumentProps");
-                             }
-                         }
-                     }
-                    if(Class instanceof CComment)
-                    {
-                        editor.sync_LockComment(Class.Get_Id(), e["user"]);
-                    }
-
-                    // TODO: Здесь для ускорения надо сделать проверку, является ли текущим элемент с
-                    //       заданным Id. Если нет, тогда и не надо обновлять состояние.
-                    editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
-                }
-                else
-                {
-                    if(classes[i].indexOf("new_object") > -1 && block_value["type"] === c_oAscLockTypeElemPresentation.Object)
-                    {
-                        var slide_id = block_value["slideId"];
-                        var delete_lock = g_oTableId.Get_ById(slide_id);
-                        if(isRealObject(delete_lock))
-                        {
-                            var Lock = delete_lock.Lock;
-                            var OldType = Lock.Get_Type();
-                            if ( locktype_Other2 === OldType || locktype_Other3 === OldType )
-                                Lock.Set_Type( locktype_Other3, true );
-                            else
-                                Lock.Set_Type( locktype_Other, true );
-                            editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(g_oTableId.Get_ById(delete_lock.objectId).num);
-                        }
-                        else
-                        {
-                            CollaborativeEditing.Add_NeedLock(slide_id, e["user"]);
-                        }
-                    }
-                    else
-                    {
-                        CollaborativeEditing.Add_NeedLock(classes[i], e["user"]);
-                    }
-                }
-            }
-		}
-    };
-    this.CoAuthoringApi.onLocksReleased = function (e, bChanges) {
-        var Id;
-        var block_value = e["block"];
-        var classes = [];
-        switch(block_value["type"])
+      var block_value = e["blockValue"];
+      var classes = [];
+      switch (block_value["type"]) {
+        case c_oAscLockTypeElemPresentation.Object:
         {
-            case c_oAscLockTypeElemPresentation.Object:
-            {
-                classes.push(block_value["objId"]);
-                //classes.push(block_value["slideId"]);
-                break;
-            }
-            case c_oAscLockTypeElemPresentation.Slide:
-            {
-                classes.push(block_value["val"]);
-                break;
-            }
-            case c_oAscLockTypeElemPresentation.Presentation:
-            {
-                break;
-            }
+          classes.push(block_value["objId"]);
+          //classes.push(block_value["slideId"]);
+          break;
         }
-        for(var i = 0; i < classes.length; ++i)
+        case c_oAscLockTypeElemPresentation.Slide:
         {
-            Id = classes[i];
-            var Class = g_oTableId.Get_ById( Id );
-            if ( null != Class )
-            {
-                var Lock = Class.Lock;
-
-                if ( "undefined" != typeof(Lock) )
-                {
-                    var CurType = Lock.Get_Type();
-
-                    var NewType = locktype_None;
-
-                    if ( CurType === locktype_Other )
-                    {
-                        if ( true != bChanges )
-                            NewType = locktype_None;
-                        else
-                        {
-                            NewType = locktype_Other2;
-                            CollaborativeEditing.Add_Unlock(Class);
-                        }
-                    }
-                    else if ( CurType === locktype_Mine )
-                    {
-                        // Такого быть не должно
-                        NewType = locktype_Mine;
-                    }
-                    else if ( CurType === locktype_Other2 || CurType === locktype_Other3 )
-                        NewType = locktype_Other2;
-
-                    Lock.Set_Type( NewType, true );
-                    if(Class instanceof PropLocker )
-                    {
-                        var object = g_oTableId.Get_ById(Class.objectId);
-                        if(object instanceof Slide && Class === object.deleteLock)
-                        {
-                            if(NewType !== locktype_Mine && NewType !== locktype_None)
-                                editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(object.num);
-                            else
-                                editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(object.num);
-                        }
-                        if(object instanceof CPresentation)
-                        {
-                            if(Class === object.themeLock)
-                            {
-                                if(NewType !== locktype_Mine && NewType !== locktype_None)
-                                    editor.asc_fireCallback("asc_onLockDocumentTheme");
-                                else
-                                    editor.asc_fireCallback("asc_onUnLockDocumentTheme");
-                            }
-                            if(Class === object.slideSizeLock)
-                            {
-                                if(NewType !== locktype_Mine && NewType !== locktype_None)
-                                    editor.asc_fireCallback("asc_onLockDocumentProps");
-                                else
-                                    editor.asc_fireCallback("asc_onUnLockDocumentProps");
-                            }
-                        }
-
-                    }
-
-                }
-            }
-            else
-            {
-                CollaborativeEditing.Remove_NeedLock(Id);
-            }
+          classes.push(block_value["val"]);
+          break;
         }
-    };
+        case c_oAscLockTypeElemPresentation.Presentation:
+        {
+          break;
+        }
+      }
+
+      for (var i = 0; i < classes.length; ++i) {
+        var Class = g_oTableId.Get_ById(classes[i]);// g_oTableId.Get_ById( Id );
+        if (null != Class) {
+          var Lock = Class.Lock;
+
+          var OldType = Class.Lock.Get_Type();
+          if (locktype_Other2 === OldType || locktype_Other3 === OldType) {
+            Lock.Set_Type(locktype_Other3, true);
+          } else {
+            Lock.Set_Type(locktype_Other, true);
+          }
+          if (Class instanceof PropLocker) {
+            var object = g_oTableId.Get_ById(Class.objectId);
+            if (object instanceof Slide && Class === object.deleteLock) {
+              editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(object.num);
+            }
+          }
+          // Выставляем ID пользователя, залочившего данный элемент
+          Lock.Set_UserId(e["user"]);
+
+          if (Class instanceof PropLocker) {
+            var object = g_oTableId.Get_ById(Class.objectId);
+            if (object instanceof CPresentation) {
+              if (Class === editor.WordControl.m_oLogicDocument.themeLock) {
+                editor.asc_fireCallback("asc_onLockDocumentTheme");
+              } else if (Class === editor.WordControl.m_oLogicDocument.schemeLock) {
+                editor.asc_fireCallback("asc_onLockDocumentSchema");
+              } else if (Class === editor.WordControl.m_oLogicDocument.slideSizeLock) {
+                editor.asc_fireCallback("asc_onLockDocumentProps");
+              }
+            }
+          }
+          if (Class instanceof CComment) {
+            editor.sync_LockComment(Class.Get_Id(), e["user"]);
+          }
+
+          // TODO: Здесь для ускорения надо сделать проверку, является ли текущим элемент с
+          //       заданным Id. Если нет, тогда и не надо обновлять состояние.
+          editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+        } else {
+          if (classes[i].indexOf("new_object") > -1 && block_value["type"] === c_oAscLockTypeElemPresentation.Object) {
+            var slide_id = block_value["slideId"];
+            var delete_lock = g_oTableId.Get_ById(slide_id);
+            if (isRealObject(delete_lock)) {
+              var Lock = delete_lock.Lock;
+              var OldType = Lock.Get_Type();
+              if (locktype_Other2 === OldType || locktype_Other3 === OldType) {
+                Lock.Set_Type(locktype_Other3, true);
+              } else {
+                Lock.Set_Type(locktype_Other, true);
+              }
+              editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(g_oTableId.Get_ById(delete_lock.objectId).num);
+            } else {
+              CollaborativeEditing.Add_NeedLock(slide_id, e["user"]);
+            }
+          } else {
+            CollaborativeEditing.Add_NeedLock(classes[i], e["user"]);
+          }
+        }
+      }
+    }
+  };
+  this.CoAuthoringApi.onLocksReleased = function(e, bChanges) {
+    if (t.isApplyChangesOnOpenEnabled) {
+      // Пока документ еще не загружен, будем сохранять функцию и аргументы
+      t.arrPreOpenLocksObjects.push(function(){t.CoAuthoringApi.onLocksReleased(e, bChanges);});
+      return;
+    }
+
+    var Id;
+    var block_value = e["block"];
+    var classes = [];
+    switch (block_value["type"]) {
+      case c_oAscLockTypeElemPresentation.Object:
+      {
+        classes.push(block_value["objId"]);
+        //classes.push(block_value["slideId"]);
+        break;
+      }
+      case c_oAscLockTypeElemPresentation.Slide:
+      {
+        classes.push(block_value["val"]);
+        break;
+      }
+      case c_oAscLockTypeElemPresentation.Presentation:
+      {
+        break;
+      }
+    }
+    for (var i = 0; i < classes.length; ++i) {
+      Id = classes[i];
+      var Class = g_oTableId.Get_ById(Id);
+      if (null != Class) {
+        var Lock = Class.Lock;
+
+        if ("undefined" != typeof(Lock)) {
+          var CurType = Lock.Get_Type();
+
+          var NewType = locktype_None;
+
+          if (CurType === locktype_Other) {
+            if (true != bChanges) {
+              NewType = locktype_None;
+            } else {
+              NewType = locktype_Other2;
+              CollaborativeEditing.Add_Unlock(Class);
+            }
+          } else if (CurType === locktype_Mine) {
+            // Такого быть не должно
+            NewType = locktype_Mine;
+          } else if (CurType === locktype_Other2 || CurType === locktype_Other3) {
+            NewType = locktype_Other2;
+          }
+
+          Lock.Set_Type(NewType, true);
+          if (Class instanceof PropLocker) {
+            var object = g_oTableId.Get_ById(Class.objectId);
+            if (object instanceof Slide && Class === object.deleteLock) {
+              if (NewType !== locktype_Mine && NewType !== locktype_None) {
+                editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(object.num);
+              } else {
+                editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(object.num);
+              }
+            }
+            if (object instanceof CPresentation) {
+              if (Class === object.themeLock) {
+                if (NewType !== locktype_Mine && NewType !== locktype_None) {
+                  editor.asc_fireCallback("asc_onLockDocumentTheme");
+                } else {
+                  editor.asc_fireCallback("asc_onUnLockDocumentTheme");
+                }
+              }
+              if (Class === object.slideSizeLock) {
+                if (NewType !== locktype_Mine && NewType !== locktype_None) {
+                  editor.asc_fireCallback("asc_onLockDocumentProps");
+                } else {
+                  editor.asc_fireCallback("asc_onUnLockDocumentProps");
+                }
+              }
+            }
+
+          }
+
+        }
+      } else {
+        CollaborativeEditing.Remove_NeedLock(Id);
+      }
+    }
+  };
     this.CoAuthoringApi.onSaveChanges				= function (e, userId, bFirstLoad) {
 		// bSendEvent = false - это означает, что мы загружаем имеющиеся изменения при открытии
 		var Changes = new CCollaborativeChanges();
@@ -3926,6 +3908,12 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                         }
                         return;
                     }
+
+                  // Применяем все lock-и (ToDo возможно стоит пересмотреть вообще Lock-и)
+                  for (var i = 0; i < this.arrPreOpenLocksObjects.length; ++i) {
+                    this.arrPreOpenLocksObjects[i]();
+                  }
+                  this.arrPreOpenLocksObjects = [];
                 }
             }
             this.WordControl.m_oLogicDocument.Recalculate({Drawings: {All:true, Map: {}}});

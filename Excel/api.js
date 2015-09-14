@@ -89,6 +89,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     //текущий обьект куда записываются информация для update, когда принимаются изменения в native редакторе
     this.oRedoObjectParamNative = null;
 
+    // Массив lock-ов, которые были на открытии документа
+    this.arrPreOpenLocksObjects = [];
+
     // CoAuthoring and Chat
     this.User = undefined;
     this.CoAuthoringApi = new CDocsCoApi();
@@ -159,8 +162,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
 
     this.formulasList = null;	// Список всех формул
-
-    this.TrackFile = null;
 
     this.fCallbackSendCommand = null;
 
@@ -1497,6 +1498,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       t.handlers.trigger("asc_onConnectionStateChanged", e);
     };
     this.CoAuthoringApi.onLocksAcquired = function(e) {
+      if (!t.IsSendDocumentLoadCompleate) {
+        // Пока документ еще не загружен, будем сохранять функцию и аргументы
+        t.arrPreOpenLocksObjects.push(function(){t.CoAuthoringApi.onLocksAcquired(e);});
+        return;
+      }
+
       if (2 != e["state"]) {
         var elementValue = e["blockValue"];
         var lockElem = t.collaborativeEditing.getLockByElem(elementValue, c_oAscLockTypes.kLockTypeOther);
@@ -1555,6 +1562,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       }
     };
     this.CoAuthoringApi.onLocksReleased = function(e, bChanges) {
+      if (!t.IsSendDocumentLoadCompleate) {
+        // Пока документ еще не загружен, будем сохранять функцию и аргументы
+        t.arrPreOpenLocksObjects.push(function(){t.CoAuthoringApi.onLocksReleased(e, bChanges);});
+        return;
+      }
+
       var element = e["block"];
       var lockElem = t.collaborativeEditing.getLockByElem(element, c_oAscLockTypes.kLockTypeOther);
       if (null != lockElem) {
@@ -1600,6 +1613,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       }
     };
     this.CoAuthoringApi.onLocksReleasedEnd = function() {
+      if (!t.IsSendDocumentLoadCompleate) {
+        // Пока документ еще не загружен ничего не делаем
+        return;
+      }
+
       if (t.wb) {
         // Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно сбросить блокировку toolbar
         t.wb._onWSSelectionChanged(/*info*/null);
@@ -1885,6 +1903,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
     // Применяем пришедшие при открытии изменения
     this._applyFirstLoadChanges();
+    // Применяем все lock-и (ToDo возможно стоит пересмотреть вообще Lock-и)
+    for (var i = 0; i < this.arrPreOpenLocksObjects.length; ++i) {
+      this.arrPreOpenLocksObjects[i]();
+    }
+    this.arrPreOpenLocksObjects = [];
+
     // Меняем тип состояния (на никакое)
     this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 
