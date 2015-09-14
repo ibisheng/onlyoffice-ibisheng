@@ -6084,7 +6084,7 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
         if(!this.Paragraph.bFromDocument)
         {
             var oCompiledPr = this.Get_CompiledPr(true);
-            this.Set_Unifill(CorrectUniFill(TextPr.AscUnifill, oCompiledPr.Unifill, 0));
+            this.Set_Unifill(CorrectUniFill(TextPr.AscUnifill, oCompiledPr.Unifill, 0), isRealObject(TextPr.AscUnifill) && TextPr.AscUnifill.asc_CheckForseSet() );
             this.Set_Color(undefined);
             this.Set_TextFill(undefined);
         }
@@ -6117,7 +6117,7 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
             }
             this.Set_Unifill(undefined);
             this.Set_Color(undefined);
-            this.Set_TextFill(CorrectUniFill(TextPr.AscFill, oMergeUnifill, 0));
+            this.Set_TextFill(CorrectUniFill(TextPr.AscFill, oMergeUnifill, 0), isRealObject(TextPr.AscFill) && TextPr.AscFill.asc_CheckForseSet());
         }
     }
 
@@ -6334,9 +6334,9 @@ ParaRun.prototype.Set_Color = function(Value)
     }
 };
 
-ParaRun.prototype.Set_Unifill = function(Value)
+ParaRun.prototype.Set_Unifill = function(Value, bForce)
 {
-    if ( ( undefined === Value && undefined !== this.Pr.Unifill ) || ( Value instanceof CUniFill && ( undefined === this.Pr.Unifill || false === CompareUnifillBool(this.Pr.Unifill, Value) ) ) )
+    if ( ( undefined === Value && undefined !== this.Pr.Unifill ) || ( Value instanceof CUniFill && ( undefined === this.Pr.Unifill || false === CompareUnifillBool(this.Pr.Unifill, Value) ) ) || bForce )
     {
         var OldValue = this.Pr.Unifill;
         this.Pr.Unifill = Value;
@@ -6347,9 +6347,9 @@ ParaRun.prototype.Set_Unifill = function(Value)
         this.private_UpdateTrackRevisionOnChangeTextPr(true);
     }
 };
-ParaRun.prototype.Set_TextFill = function(Value)
+ParaRun.prototype.Set_TextFill = function(Value, bForce)
 {
-    if ( ( undefined === Value && undefined !== this.Pr.TextFill ) || ( Value instanceof CUniFill && ( undefined === this.Pr.TextFill || false === CompareUnifillBool(this.Pr.TextFill.IsIdentical, Value) ) ) )
+    if ( ( undefined === Value && undefined !== this.Pr.TextFill ) || ( Value instanceof CUniFill && ( undefined === this.Pr.TextFill || false === CompareUnifillBool(this.Pr.TextFill.IsIdentical, Value) ) ) || bForce )
     {
         var OldValue = this.Pr.TextFill;
         this.Pr.TextFill = Value;

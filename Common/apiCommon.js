@@ -2192,7 +2192,19 @@
         asc_getFill: function() { return this.fill; },
         asc_putFill: function(v) { this.fill = v; },
         asc_getTransparent: function() { return this.transparent; },
-        asc_putTransparent: function(v) { this.transparent = v; }
+        asc_putTransparent: function(v) { this.transparent = v; },
+        asc_CheckForseSet: function()
+        {
+            if(isRealNumber(this.transparent))
+            {
+                return true;
+            }
+            if(isRealObject(this.fill) && this.fill.Positions != null)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 
 //{ asc_CShapeFill export
@@ -2207,6 +2219,7 @@
 
     prot["get_transparent"] = prot["asc_getTransparent"] = prot.asc_getTransparent;
     prot["put_transparent"] = prot["asc_putTransparent"] = prot.asc_putTransparent;
+    prot["asc_CheckForseSet"] = prot["asc_CheckForseSet"] = prot.asc_CheckForseSet;
 //}
 
 
