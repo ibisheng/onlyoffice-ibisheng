@@ -654,7 +654,7 @@ CGraphicFrame.prototype =
             {
                 if(this.graphicObject.Is_TableBorder( tx, ty, 0))
                 {
-                    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                    if(!editor.isViewMode && editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
                     {
                         History.Create_NewPoint(historydescription_Presentation_TableBorder);
                     }
