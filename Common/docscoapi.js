@@ -142,6 +142,12 @@
     }
   };
 
+  CDocsCoApi.prototype.setPingSettings = function(inverval, bSendUserAlive) {
+    if (this._CoAuthoringApi && this._onlineWork) {
+      this._CoAuthoringApi.setPingSettings(inverval, bSendUserAlive);
+    }
+  };
+
   CDocsCoApi.prototype.askLock = function(arrayBlockId, callback) {
     if (this._CoAuthoringApi && this._onlineWork) {
       this._CoAuthoringApi.askLock(arrayBlockId, callback);
@@ -648,11 +654,25 @@
   };
 
   DocsCoApi.prototype.ping = function() {
-    this._send({"type": "ping"});
+    // ua - активность пользователя. 0 - неактивный, 1 - активный, -1 - не обновлять
+    this._send({'type': 'ping', 'ua': this.bSendUserAlive ? (this.bUserAlive >> 0) : -1});
+    // После отправки сбрасываем активность
+    this.bUserAlive = false;
   };
 
   DocsCoApi.prototype.setUserAlive = function() {
     this.bUserAlive = true;
+  };
+
+  DocsCoApi.prototype.setPingSettings = function(inverval, bSendUserAlive) {
+    if (null !== this.pingIntervalID)
+      return;
+    this.bSendUserAlive = bSendUserAlive;
+    this.pingInterval = inverval * 1000;
+
+    var t = this;
+    this.ping();
+    this.pingIntervalID = setInterval(function() {t.ping();}, this.pingInterval);
   };
 
   DocsCoApi.prototype._sendPrebuffered = function() {
@@ -1033,14 +1053,6 @@
     if (this._initCallback) {
       this._initCallback({result: data["result"]});
     }
-    //ping
-    var fPing = function() {
-      setTimeout(function() {
-        t.ping();
-        fPing();
-      }, 60000);
-    };
-    fPing();
   };
 
   DocsCoApi.prototype.init = function(user, docid, documentCallbackUrl, token, callback, editorType, documentFormatSave, isViewer) {
@@ -1058,7 +1070,10 @@
     this._documentFormatSave = documentFormatSave;
     this._isViewer = isViewer;
 
-    this.bUserAlive = false;  // Активность пользователя
+    this.bUserAlive = false; // Активность пользователя
+    this.bSendUserAlive = false; // Отправлять ли активность пользователя
+    this.pingInterval = 300 * 1000;
+    this.pingIntervalID = null;
 
     this._initSocksJs();
   };

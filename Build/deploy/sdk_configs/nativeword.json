@@ -30,7 +30,6 @@
 				"../../Common/SerializeChart.js",
                 "../../Common/Drawings/Format/Constants.js",
                 "../../Common/Drawings/Format/Format.js",
-                "../../Common/trackFile.js",
 
 				"../../Common/FontsFreeType/font_map.js",
                 "../../Word/Drawing/Externals.js",

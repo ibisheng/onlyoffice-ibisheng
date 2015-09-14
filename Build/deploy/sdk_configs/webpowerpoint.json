@@ -34,7 +34,6 @@
                 "../../Common/Charts/DrawingArea.js",
                 "../../Common/NumFormat.js",
                 "../../Word/Editor/Serialize2.js",
-                "../../Common/trackFile.js",
                 "../../Word/Editor/Styles.js",
                 "../../Word/Editor/Numbering.js",
                 "../../Word/Drawing/Metafile.js",

@@ -17,7 +17,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   var asc_CAdjustPrint = asc.asc_CAdjustPrint;
   var asc_CAscEditorPermissions = asc.asc_CAscEditorPermissions;
   var asc_CAscLicense = asc.asc_CAscLicense;
-  var asc_CTrackFile = asc.CTrackFile;
   var prot;
   var CDocsCoApi = window["CDocsCoApi"];
 
@@ -593,6 +592,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
         t.advancedOptionsAction = c_oAscAdvancedOptionsAction.Perm;
         sendCommand2(t, null, rdata);
       } else {
+        // Фиктивный режим, фактически без документа
         t.handlers.trigger("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
         // Фиктивно инициализируем
         t.SpellCheckUrl = window['g_cAscSpellCheckUrl'] ? window['g_cAscSpellCheckUrl'] : '';
@@ -1385,22 +1385,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       this.SpellCheckUrl = oSettings['g_cAscSpellCheckUrl'];
 
       var oEditorPermissions = new asc_CAscEditorPermissions(oSettings);
-
       this.handlers.trigger("asc_onGetEditorPermissions", oEditorPermissions);
 
-      if (null != oSettings['trackingInfo'] && oEditorPermissions.asc_getCanEdit()) {
-        this.TrackFile = new asc_CTrackFile(oSettings['trackingInfo']);
-
-        this.TrackFile.setDocId(this.DocInfo["Id"]);
-        this.TrackFile.setUserId(this.DocInfo["UserId"]);
-        this.TrackFile.setTrackFunc(sendTrack);
-
-        if (null != oSettings['TrackingInterval']) {
-          this.TrackFile.setInterval(oSettings['TrackingInterval']);
-        }
-
-        this.TrackFile.Start();
-      }
+      this.CoAuthoringApi.setPingSettings(oSettings['TrackingInterval'], oEditorPermissions.asc_getCanLicense());
     }
   };
 

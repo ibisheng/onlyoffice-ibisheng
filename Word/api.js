@@ -739,6 +739,7 @@ asc_docs_api.prototype.asc_getEditorPermissions = function() {
       t.advancedOptionsAction = c_oAscAdvancedOptionsAction.Perm;
       sendCommand2(t, null, rData);
     } else {
+      // Фиктивный режим, фактически без документа
       var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
       t.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
       // Фиктивно инициализируем
@@ -777,19 +778,7 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(response) {
 		var oEditorPermissions = new asc_CAscEditorPermissions(oSettings);
 		this.asc_fireCallback("asc_onGetEditorPermissions", oEditorPermissions);
 
-		if (null != oSettings['trackingInfo'] && oEditorPermissions.asc_getCanEdit()) {
-			var asc_CTrackFile = window["Asc"].CTrackFile;
-			this.TrackFile = new asc_CTrackFile(oSettings['trackingInfo']);
-
-			this.TrackFile.setDocId(this.DocInfo.get_Id());
-			this.TrackFile.setUserId(this.DocInfo.get_UserId());
-			this.TrackFile.setTrackFunc(sendTrack);
-
-			if (null != oSettings['TrackingInterval'])
-				this.TrackFile.setInterval(oSettings['TrackingInterval']);
-
-			this.TrackFile.Start();
-		}
+    this.CoAuthoringApi.setPingSettings(oSettings['TrackingInterval'], oEditorPermissions.asc_getCanLicense());
 	}
 };
 
