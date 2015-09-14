@@ -954,10 +954,10 @@ DependencyGraph.prototype = {
         var nodesList = this.defNameList, retRes = {}, defN, seUndoRedo = [], nSE, wsIndex, ws = this.wb.getWorksheetById(sheetId ), wsName = ws.getName();
 
         for ( var id in nodesList ) {
-            if ( nodesList[id].isTable ) {
-                if(nodesList[id].Ref.indexOf(wsName) > -1){
-                    nodesList[id].Ref = null;
-                }
+            if ( nodesList[id].isTable && nodesList[id].Ref){
+                    var a = nodesList[id].Ref.split("!")[0];
+                    if( a.localeCompare(parserHelp.getEscapeSheetName(wsName)) == 0 )
+                        nodesList[id].Ref = null;
                 continue;
             }
             if ( !nodesList[id].isTable && nodesList[id].parsedRef && nodesList[id].parsedRef.removeSheet( sheetId ) ) {
@@ -2475,7 +2475,7 @@ Workbook.prototype.getDefinesNamesWB = function (defNameListId) {
             name = listDN[id]
 
             if ( name.Ref && !name.Hidden && name.Name.indexOf("_xlnm") < 0 ) {
-                if( name.parsedRef && name.parsedRef.isParsed && name.parsedRef.countRef == 1 && name.parsedRef.outStack.length == 1 && name.parsedRef.calculate().errorType !== cErrorType.bad_reference ){
+                if( name.isTable || name.parsedRef && name.parsedRef.isParsed && name.parsedRef.countRef == 1 && name.parsedRef.outStack.length == 1 && name.parsedRef.calculate().errorType !== cErrorType.bad_reference ){
                     arr.push( name.getAscCDefName() );
                 }
             }
