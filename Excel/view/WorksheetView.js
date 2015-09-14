@@ -10537,7 +10537,15 @@
 			var r, c, h, d, ct, isMerged;
 			var mergedRange, bUpdateRowHeight;
 
-			if (range === undefined) {range = this.activeRange.clone(true);}
+			if (range === undefined) {
+        range = this.activeRange.clone(true);
+      } else {
+        // ToDo заглушка..пора уже переделать обновление данных
+        if (range.r1 >= this.nRowsCount || range.c1 >= this.nColsCount)
+          return;
+        range.r2 = Math.min(range.r2, this.nRowsCount);
+        range.c2 = Math.min(range.c2, this.nColsCount);
+      }
 
 			if(gc_nMaxCol0 === range.c2 || gc_nMaxRow0 === range.r2)
 			{
