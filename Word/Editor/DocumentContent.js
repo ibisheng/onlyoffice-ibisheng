@@ -1751,8 +1751,6 @@ CDocumentContent.prototype =
     {
         if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
-            // Вызываем данную функцию, чтобы убрать рамку буквицы
-            this.DrawingDocument.Set_RulerState_Paragraph( null );
             this.LogicDocument.DrawingObjects.documentUpdateRulersState(CurPage);
         }
         else //if ( docpostype_Content === this.CurPos.Type )

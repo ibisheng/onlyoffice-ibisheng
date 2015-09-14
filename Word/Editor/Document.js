@@ -12007,6 +12007,7 @@ CDocument.prototype =
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
+            this.DrawingDocument.Set_RulerState_Paragraph( null );
             this.HdrFtr.Document_UpdateRulersState(this.CurPage);
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
