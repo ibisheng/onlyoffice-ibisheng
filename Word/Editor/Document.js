@@ -14468,6 +14468,7 @@ CDocument.prototype.private_UpdateCursorXY = function(bUpdateX, bUpdateY)
 };
 CDocument.prototype.private_MoveCursorDown = function(StartX, StartY, AddToSelect)
 {
+    var StartPage = this.CurPage;
     var CurY = StartY;
 
     var PageH = this.Pages[this.CurPage].Height;
@@ -14480,8 +14481,9 @@ CDocument.prototype.private_MoveCursorDown = function(StartX, StartY, AddToSelec
     {
         CurY += 0.1;
 
-        if (CurY > PageH)
+        if (CurY > PageH || this.CurPage > StartPage)
         {
+            this.CurPage = StartPage;
             if (this.Pages.length - 1 <= this.CurPage)
             {
                 Result = false;
@@ -14491,7 +14493,25 @@ CDocument.prototype.private_MoveCursorDown = function(StartX, StartY, AddToSelec
             {
                 this.CurPage++;
                 StartY = 0;
-                CurY   = 0;
+
+                var NewPage = this.CurPage;
+                while (true)
+                {
+                    this.Cursor_MoveAt(StartX, StartY, AddToSelect);
+                    this.private_UpdateCursorXY(false, true);
+
+                    if (this.CurPage < NewPage)
+                    {
+                        this.CurPage = NewPage;
+                        StartY += 0.1;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                CurY = StartY;
             }
         }
 
@@ -14512,6 +14532,7 @@ CDocument.prototype.private_MoveCursorDown = function(StartX, StartY, AddToSelec
 };
 CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
 {
+    var StartPage = this.CurPage;
     var CurY = StartY;
 
     var PageH = this.Pages[this.CurPage].Height;
@@ -14524,8 +14545,9 @@ CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
     {
         CurY -= 0.1;
 
-        if (CurY < 0)
+        if (CurY < 0 || this.CurPage < StartPage)
         {
+            this.CurPage = StartPage;
             if (0 === this.CurPage)
             {
                 Result = false;
@@ -14535,7 +14557,25 @@ CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
             {
                 this.CurPage--;
                 StartY = this.Pages[this.CurPage].Height;
-                CurY   = this.Pages[this.CurPage].Height;
+
+                var NewPage = this.CurPage;
+                while (true)
+                {
+                    this.Cursor_MoveAt(StartX, StartY, AddToSelect);
+                    this.private_UpdateCursorXY(false, true);
+
+                    if (this.CurPage > NewPage)
+                    {
+                        this.CurPage = NewPage;
+                        StartY -= 0.1;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                CurY = StartY;
             }
         }
 
