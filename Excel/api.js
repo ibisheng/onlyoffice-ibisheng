@@ -563,10 +563,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     History = new CHistory(wbModel);
 
     g_oTableId = new CTableId();
-    if (this.User) {
-      g_oIdCounter.Set_UserId(this.User.asc_getId());
-    }
-
     g_oUndoRedoCell = new UndoRedoCell(wbModel);
     g_oUndoRedoWorksheet = new UndoRedoWoorksheet(wbModel);
     g_oUndoRedoWorkbook = new UndoRedoWorkbook(wbModel);
