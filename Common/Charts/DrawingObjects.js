@@ -2648,11 +2648,14 @@ function DrawingObjects() {
             }
             else
             {
+                if(History.CurPoint && History.CurPoint.Items.length > 0)
+                {
                     ExecuteNoHistory(function(){
                         _this.controller.setGraphicObjectPropsCallBack(props);
                         _this.controller.startRecalculate();
                         _this.sendGraphicObjectProps();
                     }, this, []);
+                }
             }
 
            // _this.controller.setGraphicObjectProps( objectProperties );
