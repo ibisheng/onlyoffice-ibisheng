@@ -170,18 +170,19 @@ DependencyGraph.prototype = {
         }
         return arr;
     },
-	deleteNode : function(node){
-            if ( node.isArea ) {
-			var nodesSheetArea = this.nodesArea[node.sheetId];
-			if(nodesSheetArea)
-				nodesSheetArea.removeElement(new RangeDataManagerElem(node.getBBox(), node));
-		}
-            else {
-			var nodesSheetCell = this.nodesCell[node.sheetId];
-				if(nodesSheetCell)
-					nodesSheetCell.removeElement(new RangeDataManagerElem(node.getBBox(), node));
-			}
-	},
+    deleteNode:function ( node ) {
+        if(node.isDefinedName) return;
+        if ( node.isArea ) {
+            var nodesSheetArea = this.nodesArea[node.sheetId];
+            if ( nodesSheetArea )
+                nodesSheetArea.removeElement( new RangeDataManagerElem( node.getBBox(), node ) );
+        }
+        else {
+            var nodesSheetCell = this.nodesCell[node.sheetId];
+            if ( nodesSheetCell )
+                nodesSheetCell.removeElement( new RangeDataManagerElem( node.getBBox(), node ) );
+        }
+    },
 	deleteNodes : function(sheetId, bbox){
 		var bSetRefErrorOld = this.bSetRefError;
 		this.bSetRefError = true;
@@ -1408,7 +1409,6 @@ Vertex.prototype = {
 function DefNameVertex( scope, defName, defRef, defHidden, wb, isTable ) {
 
     this.sheetId = scope === null || scope === undefined ? "WB" : scope;
-
 //	this.sheetId = scope || "WB";
     this.cellId = defName.toLowerCase();
     this.Ref = defRef;
