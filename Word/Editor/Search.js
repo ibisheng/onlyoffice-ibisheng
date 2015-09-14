@@ -109,7 +109,7 @@ CDocumentSearch.prototype =
         this.CurId = -1;
     },
 
-    Replace : function(NewStr, Id)
+    Replace : function(NewStr, Id, bRestorePos)
     {
         var Para = this.Elements[Id];
         if ( undefined != Para )
@@ -117,6 +117,20 @@ CDocumentSearch.prototype =
             var SearchElement = Para.SearchResults[Id];
             if ( undefined != SearchElement )
             {
+                var ContentPos, StartPos, EndPos, bSelection;
+                if (true === bRestorePos)
+                {
+                    // Сохраняем позицию состояние параграфа, чтобы курсор остался в том же месте и после замены.
+                    bSelection = Para.Is_SelectionUse();
+                    ContentPos = Para.Get_ParaContentPos(false, false);
+                    StartPos   = Para.Get_ParaContentPos(true, true);
+                    EndPos     = Para.Get_ParaContentPos(true, false);
+
+                    Para.Check_NearestPos({ContentPos : ContentPos});
+                    Para.Check_NearestPos({ContentPos : StartPos});
+                    Para.Check_NearestPos({ContentPos : EndPos});
+                }
+
                 // Сначала в начальную позицию поиска добавляем новый текст
                 var StartContentPos = SearchElement.StartPos;
                 var StartRun = SearchElement.ClassesS[SearchElement.ClassesS.length - 1];
@@ -143,22 +157,23 @@ CDocumentSearch.prototype =
 
                 Para.Remove_SearchResult( Id );
                 delete this.Elements[Id];
+
+                if (true === bRestorePos)
+                {
+                    Para.Set_SelectionContentPos(StartPos, EndPos);
+                    Para.Set_ParaContentPos(ContentPos, true, -1, -1 );
+                    Para.Selection.Use = bSelection;
+                    Para.Clear_NearestPosArray();
+                }
             }
         }
     },
 
     Replace_All : function(NewStr, bUpdateStates)
     {
-        var bSelect = true;
-        for ( var Id in this.Elements )
+        for (var Id in this.Elements)
         {
-            if ( true === bSelect )
-            {
-                bSelect = false;
-                this.Select(Id, bUpdateStates);
-            }
-
-            this.Replace( NewStr, Id );
+            this.Replace(NewStr, Id, true);
         }
 
         this.Clear();
@@ -240,9 +255,9 @@ CDocument.prototype.Search_Replace = function(NewStr, bAll, Id)
         History.Create_NewPoint(bAll ? historydescription_Document_ReplaceAll : historydescription_Document_ReplaceSingle);
 
         if ( true === bAll )
-            this.SearchEngine.Replace_All( NewStr, true );
+            this.SearchEngine.Replace_All(NewStr, true);
         else
-            this.SearchEngine.Replace( NewStr, Id );
+            this.SearchEngine.Replace(NewStr, Id, false);
 
         this.SearchEngine.ClearOnRecalc = false;
         this.Recalculate();
