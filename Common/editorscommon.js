@@ -311,7 +311,7 @@ function getFullImageSrc2 (src) {
 	return src;
 }
 
-function fSortAscending( a, b ) {DocumentUrl
+function fSortAscending( a, b ) {
     return a - b;
 }
 function fSortDescending( a, b ) {
