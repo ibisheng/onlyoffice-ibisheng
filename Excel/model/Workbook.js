@@ -954,7 +954,7 @@ DependencyGraph.prototype = {
         var nodesList = this.defNameList, retRes = {}, defN, seUndoRedo = [], nSE, wsIndex, ws = this.wb.getWorksheetById(sheetId ), wsName = ws.getName();
 
         for ( var id in nodesList ) {
-            if ( nodesList[id].isTable && nodesList[id].Ref){
+            if ( nodesList[id].isTable && nodesList[id].Ref ){
                     var a = nodesList[id].Ref.split("!")[0];
                     if( a.localeCompare(parserHelp.getEscapeSheetName(wsName)) == 0 )
                         nodesList[id].Ref = null;
@@ -1657,6 +1657,46 @@ DefNameVertex.prototype = {
     relinkRef:function(){
         if( this.parsedRef.isParsed ){
             this.Ref = this.parsedRef.assemble();
+        }
+    },
+
+    renameDefNameToCollaborate:function(name){
+        var lastname = this.Name;
+        //из-за особенностей реализации формул, сначала делаем parse со старым именем, потом преименовываем, потом assemble
+        var aFormulas = [];
+        //переименование для отправки изменений
+        for(var i = 0, length = this.wb.aCollaborativeActions.length; i < length; ++i)
+        {
+            var aPointActions = this.wb.aCollaborativeActions[i];
+            for (var j = 0, length2 = aPointActions.length; j < length2; ++j) {
+                var action = aPointActions[j];
+                if (g_oUndoRedoWorkbook == action.oClass) {
+                    if (historyitem_Workbook_DefinedNamesAdd == action.nActionType) {
+                        if (lastname == action.oData.newName.Name)
+                            action.oData.newName.Name = name;
+                    }
+                }
+                else if (g_oUndoRedoCell == action.oClass) {
+                    if (action.oData instanceof UndoRedoData_CellSimpleData) {
+                        if (action.oData.oNewVal instanceof UndoRedoData_CellValueData) {
+                            var oNewVal = action.oData.oNewVal;
+                            if (null != oNewVal.formula && -1 != oNewVal.formula.indexOf(lastname)) {
+                                var oParser = new parserFormula(oNewVal.formula, "A1", this.wb.getWorksheet(0));
+                                oParser.parse();
+                                aFormulas.push({ formula: oParser, value: oNewVal });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        var clone = this.clone();
+        clone.Name = name;
+        this.wb.editDefinesNames( this.getAscCDefName(), clone.getAscCDefName() );
+        for(var i = 0, length = aFormulas.length; i < length; ++i)
+        {
+            var item = aFormulas[i];
+            item.value.formula = item.formula.assemble();
         }
     }
 
@@ -2442,25 +2482,10 @@ Workbook.prototype.checkDefName = function ( checkName, scope ) {
 
 };
 Workbook.prototype.isDefinedNamesExists = function ( name, sheetId ) {
-
     var n = name.toLowerCase();
-
-    if ( null != sheetId ) {
-        var ws = this.getWorksheetById( sheetId );
-        if ( null != ws ) {
-            var bExist = false;
-            if ( ws.DefinedNames )
-                bExist = !!ws.DefinedNames[n];
-            if ( bExist )
-                return bExist;
-        }
-    }
-    if ( this.DefinedNames ) {
-        return !!this.DefinedNames[n];
-    }
-    return false;
+    return !!this.dependencyFormulas.defNameList[getDefNameVertexId(sheetId, n)];
 };
-Workbook.prototype.getDefinesNamesWB = function (defNameListId) {
+Workbook.prototype.getDefinedNamesWB = function (defNameListId) {
     var names = [], name, thas = this, activeWS;
 
     /*c_oAscGetDefinedNamesList.
@@ -2639,15 +2664,53 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
 
 };
 Workbook.prototype.findDefinesNames = function ( ref, sheetId ) {
-
     return this.dependencyFormulas.getDefNameNodeByRef( ref, sheetId );
-
 };
 Workbook.prototype.unlockDefName = function(){
     this.dependencyFormulas.unlockDefName();
 };
 Workbook.prototype.checkDefNameLock = function(){
     return this.dependencyFormulas.checkDefNameLock();
+};
+Workbook.prototype.getUniqueDefinedNameFrom=function(name, bCopy){
+    var nIndex = 1,
+        dnNewName = "",
+        fGetPostfix = null,
+        name = name.Name,
+        sheetId = name.sheetId;
+    if(bCopy)
+    {
+
+        var result = /^(.*)(\d)$/.exec(name);
+        if(result)
+        {
+            fGetPostfix = function(nIndex){return "" + nIndex;};
+            name = result[1];
+        }
+        else
+        {
+            fGetPostfix = function(nIndex){return "_" + nIndex;};
+            name = name;
+        }
+    }
+    else
+    {
+        fGetPostfix = function(nIndex){return nIndex.toString();};
+    }
+    while(nIndex < 10000)
+    {
+        var sPosfix = fGetPostfix(nIndex);
+        dnNewName = name + sPosfix;
+        var bUniqueName = false;
+        if(!this.isDefinedNamesExists( dnNewName, sheetId )){
+            bUniqueName = true;
+            break;
+        }
+        if(bUniqueName)
+            break;
+        nIndex++;
+    }
+    return dnNewName;
 };
 Workbook.prototype.buildDependency = function(){
 	this.dependencyFormulas.clear();
@@ -3271,7 +3334,7 @@ Woorksheet.prototype.setTabColor=function(color){
 	    this.workbook.handlers.trigger("asc_onUpdateTabColor", this.getIndex());
 };
 Woorksheet.prototype.renameWsToCollaborate=function(name){
-	var lastname = this.getName();
+    var lastname = this.getName();
 	//из-за особенностей реализации формул, сначала делаем parse со старым именем, потом преименовываем, потом assemble
 	var aFormulas = [];
 	//переименование для отправки изменений

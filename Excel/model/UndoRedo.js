@@ -2870,6 +2870,15 @@ UndoRedoWorkbook.prototype = {
                 this.wb.handlers.trigger("asc_onDelDefName")
             }
             else{
+                if(this.wb.bCollaborativeChanges){
+                    var name = Data.newName.Name, lsID = this.wb.getWorksheet(Data.newName.LocalSheetId);
+                    lsID === null || lsID === undefined ? null : lsID = this.wb.getWorksheet(Data.newName.LocalSheetId).getId();
+                    if( this.wb.isDefinedNamesExists(name,lsID) ){
+                        var oConflictDefName = this.wb.getDefinesNames(name,lsID);
+                        if(null != oConflictDefName)
+                            oConflictDefName.renameDefNameToCollaborate(this.wb.getUniqueDefinedNameFrom(oConflictDefName, true));
+                    }
+                }
                 this.wb.editDefinesNames( null, Data.newName, !bUndo );
                 this.wb.handlers.trigger("asc_onEditDefName", null, Data.newName);
             }
