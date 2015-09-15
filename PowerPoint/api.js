@@ -2296,20 +2296,17 @@ asc_docs_api.prototype.SetSlideProps = function(prop)
         var _old_fill = this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage].backgroundFill;
         if (isRealObject(_old_fill))
             _old_fill = _old_fill.createDuplicate();
-
         var bg = new CBg();
         bg.bgPr = new CBgPr();
         bg.bgPr.Fill = CorrectUniFill(_back_fill, _old_fill);
-
         var image_url = "";
-        if (bg.bgPr.Fill != null && bg.bgPr.Fill.fill != null && bg.bgPr.Fill.fill.type == FILL_TYPE_BLIP)
+        if (_back_fill.asc_getType() == c_oAscFill.FILL_TYPE_BLIP && _back_fill.fill && typeof _back_fill.fill.url === "string" && _back_fill.fill.url.length > 0)
         {
-            image_url = bg.bgPr.Fill.fill.RasterImageId;
+            image_url = _back_fill.fill.url;
         }
-        if (image_url != "" && _back_fill.fill && _back_fill.fill.url != "" && _back_fill.fill.url != null)
+        if (image_url != "")
         {
             var _image = this.ImageLoader.LoadImage(image_url, 1);
-
             var srcLocal = g_oDocumentUrls.getImageLocal(image_url);
             if (srcLocal) {
                 image_url = srcLocal;
