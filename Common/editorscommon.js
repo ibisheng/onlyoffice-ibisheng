@@ -56,7 +56,6 @@ if (typeof String.prototype.repeat !== 'function') {
 }
 
 var g_oZipChanges = null;
-//var g_sResourceServiceLocalUrl = "/ResourceService.ashx?path=";
 var g_sDownloadServiceLocalUrl = "/downloadas";
 var g_sUploadServiceLocalUrl = "/upload";
 var g_nMaxJsonLength = 2097152;

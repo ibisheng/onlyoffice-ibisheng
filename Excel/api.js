@@ -3732,7 +3732,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       if (undefined !== window["AscDesktopEditor"]) {
         var pagescount = pdf_writer.DocumentRenderer.m_lPagesCount;
 
-        window["AscDesktopEditor"]["Print_Start"](g_sResourceServiceLocalUrl + this.documentId + "/", pagescount, "", -1);
+        window["AscDesktopEditor"]["Print_Start"](this.documentId + "/", pagescount, "", -1);
 
         for (var i = 0; i < pagescount; i++) {
           var _start = pdf_writer.DocumentRenderer.m_arrayPages[i].StartOffset;
