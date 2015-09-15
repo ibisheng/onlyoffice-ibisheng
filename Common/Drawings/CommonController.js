@@ -5940,7 +5940,7 @@ DrawingObjectsController.prototype =
         var shape_props, image_props, chart_props;
         var ascSelectedObjects = [];
 
-        var ret = [], i;
+        var ret = [], i, bParaLocked = false;
         if(isRealObject(props.shapeChartProps))
         {
             shape_props = new asc_CImgProperty();
@@ -6060,6 +6060,10 @@ DrawingObjectsController.prototype =
             shape_props.ShapeProperties.stroke.canChangeArrows  = shape_props.ShapeProperties.canChangeArrows === true;
             shape_props.Locked = props.shapeProps.locked === true;
 
+            if(!bParaLocked)
+            {
+                bParaLocked = shape_props.Locked;
+            }
             ret.push(shape_props);
         }
         if (isRealObject(props.imageProps))
@@ -6069,6 +6073,11 @@ DrawingObjectsController.prototype =
             image_props.Height = props.imageProps.h;
             image_props.ImageUrl = props.imageProps.ImageUrl;
             image_props.Locked = props.imageProps.locked === true;
+
+            if(!bParaLocked)
+            {
+                bParaLocked = image_props.Locked;
+            }
             ret.push(image_props);
         }
         if (isRealObject(props.chartProps) && isRealObject(props.chartProps.chartProps))
@@ -6078,6 +6087,10 @@ DrawingObjectsController.prototype =
             chart_props.Height = props.chartProps.h;
             chart_props.ChartProperties = props.chartProps.chartProps;
             chart_props.Locked = props.chartProps.locked === true;
+            if(!bParaLocked)
+            {
+                bParaLocked = chart_props.Locked;
+            }
             ret.push(chart_props);
         }
         for (i = 0; i < ret.length; i++)
@@ -6107,6 +6120,11 @@ DrawingObjectsController.prototype =
                     if(TextPr.RFonts.CS)
                         TextPr.RFonts.CS.Name        = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.CS.Name);
                 }
+            }
+
+            if(bParaLocked)
+            {
+                ParaPr.Locked = true;
             }
             this.prepareParagraphProperties(ParaPr, TextPr, ascSelectedObjects);
         }
