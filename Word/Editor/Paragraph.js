@@ -9348,7 +9348,10 @@ Paragraph.prototype =
 
     Is_Inline : function()
     {
-        if ( undefined != this.Pr.FramePr && c_oAscYAlign.Inline !== this.Pr.FramePr.YAlign )
+        if (undefined === this.Parent || (!(this.Parent instanceof CDocument) && (undefined === this.Parent.Parent || !(this.Parent.Parent instanceof CHeaderFooter))))
+            return true;
+
+        if (undefined != this.Pr.FramePr && c_oAscYAlign.Inline !== this.Pr.FramePr.YAlign)
             return false;
 
         return true;

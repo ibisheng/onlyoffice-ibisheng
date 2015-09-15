@@ -757,7 +757,7 @@ CDocumentContent.prototype =
                     RecalcResult = recalcresult_NextElement;
                 }
             }
-            else if ( type_Paragraph === Element.GetType() && true != Element.Is_Inline() && this.Parent instanceof CHeaderFooter )
+            else if (type_Paragraph === Element.GetType() && true != Element.Is_Inline())
             {
                 // TODO: Пока обрабатываем рамки только внутри верхнего класса внутри колонтитулов. Разобраться как и 
                 //       главное когда они работают внутри таблиц и автофигур.
