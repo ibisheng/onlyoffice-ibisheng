@@ -3626,8 +3626,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   };
 
   spreadsheet_api.prototype.asc_nativeOpenFile = function(base64File, version) {
-    this.DocumentUrl = "TeamlabNative";
-
     asc["editor"] = this;
 
     this.SpellCheckUrl = '';

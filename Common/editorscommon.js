@@ -51,7 +51,7 @@ if (typeof String.prototype.repeat !== 'function') {
             str += str;
         }
         return rpt;
-    }
+    };
 	String.prototype['repeat'] = String.prototype.repeat;
 }
 

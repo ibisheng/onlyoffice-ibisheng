@@ -7392,8 +7392,6 @@ asc_docs_api.prototype.asc_CloseFile = function()
 window["asc_docs_api"] = asc_docs_api;
 window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, version)
 {
-	this.DocumentUrl = "TeamlabNative";
-
 	this.SpellCheckUrl = '';
 
 	this.User = new Asc.asc_CUser();
