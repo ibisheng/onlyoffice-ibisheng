@@ -1257,12 +1257,18 @@ function DrawingObjects() {
                 var ty = graphicObject.transform.ty;
                 graphicObject.transform.tx -= left;
                 graphicObject.transform.ty -= top;
-                var txTxt, tyTxt;
+                var txTxt, tyTxt, txWA, tyWA;
                 if ( graphicObject.txBody && graphicObject.transformText ) {
                     txTxt = graphicObject.transformText.tx;
                     tyTxt = graphicObject.transformText.ty;
                     graphicObject.transformText.tx -= left;
                     graphicObject.transformText.ty -= top;
+                }
+
+                if(graphicObject.transformTextWordArt)
+                {
+                    graphicObject.transformTextWordArt.tx -= left;
+                    graphicObject.transformTextWordArt.ty -= top;
                 }
                 // Print
                 graphicObject.draw( ctx );
@@ -1272,6 +1278,11 @@ function DrawingObjects() {
                 if ( graphicObject.txBody && graphicObject.transformText ) {
                     graphicObject.transformText.tx = txTxt;
                     graphicObject.transformText.ty = tyTxt;
+                }
+                if(graphicObject.transformTextWordArt)
+                {
+                    graphicObject.transformTextWordArt.tx += left;
+                    graphicObject.transformTextWordArt.ty += top;
                 }
             }
         }
