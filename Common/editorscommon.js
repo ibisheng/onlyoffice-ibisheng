@@ -258,21 +258,6 @@ function sendCommand2(editor, fCallback, rdata, dataContainer){
 	});
 }
 
-function sendTrack (fCallback, url, rdata) {
-	asc_ajax({
-		type: 'POST',
-		url: url,
-		data: rdata,
-		contentType: "application/json",
-		error: function() {
-			if (fCallback) fCallback();
-		},
-		success: function(msg){
-			if (fCallback) fCallback((!msg || msg.length < 1) ? null : JSON.parse(msg));
-		},
-		dataType: "text"});
-}
-
 function g_fMapAscServerErrorToAscError (nServerError) {
 	var nRes = c_oAscError.ID.Unknown;
 	switch (nServerError) {
@@ -326,7 +311,7 @@ function getFullImageSrc2 (src) {
 	return src;
 }
 
-function fSortAscending( a, b ) {
+function fSortAscending( a, b ) {DocumentUrl
     return a - b;
 }
 function fSortDescending( a, b ) {
