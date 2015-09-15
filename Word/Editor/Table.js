@@ -9744,8 +9744,9 @@ CTable.prototype =
             {
                 this.CurCell.Content.Cursor_MoveToStartPos();
 
-                this.Selection.Use  = false;
-                this.Selection.Type = table_Selection_Text;
+                this.Selection.Use    = false;
+                this.Selection.Type   = table_Selection_Text;
+                this.Selection.CurRow = CurCell.Row.Index;
             }
             else
             {
