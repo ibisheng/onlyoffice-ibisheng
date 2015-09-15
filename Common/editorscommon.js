@@ -60,7 +60,6 @@ var g_oZipChanges = null;
 //var g_sResourceServiceLocalUrl = "/ResourceService.ashx?path=";
 var g_sDownloadServiceLocalUrl = "/downloadas";
 var g_sUploadServiceLocalUrl = "/upload";
-var g_sTrackingServiceLocalUrl = "/TrackingService.ashx";
 var g_nMaxJsonLength = 2097152;
 var g_nMaxJsonLengthChecked = g_nMaxJsonLength / 1000;
 var g_nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
