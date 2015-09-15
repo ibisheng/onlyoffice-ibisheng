@@ -94,12 +94,25 @@ CSectionPr.prototype =
     
     Clear_AllHdrFtr : function()
     {
-        this.Set_Header_First( null );
-        this.Set_Header_Even( null );
-        this.Set_Header_Default( null );
-        this.Set_Footer_First( null );
-        this.Set_Footer_Even( null );
-        this.Set_Footer_Default( null );
+        this.Set_Header_First(null);
+        this.Set_Header_Even(null);
+        this.Set_Header_Default(null);
+        this.Set_Footer_First(null);
+        this.Set_Footer_Even(null);
+        this.Set_Footer_Default(null);
+    },
+
+    Is_AllHdrFtrNull : function()
+    {
+        if (null !== this.FooterFirst
+            || null !== this.HeaderFirst
+            || null !== this.FooterDefault
+            || null !== this.HeaderDefault
+            || null !== this.FooterEven
+            || null !== this.HeaderEven)
+            return false;
+
+        return true;
     },
 
     Compare_PageSize : function(OtherSectionPr)
@@ -1557,7 +1570,7 @@ CSectionPr.prototype =
         this.PageNumType.Read_FromBinary( Reader );
         this.Columns.Read_FromBinary(Reader);
     }
-}
+};
 
 function CSectionPageSize()
 {
@@ -1637,7 +1650,7 @@ CSectionPageMargins.prototype =
         this.Header = Reader.GetDouble();
         this.Footer = Reader.GetDouble();
     }
-}
+};
 
 function CSectionBorders()
 {
@@ -1691,7 +1704,7 @@ CSectionBorders.prototype =
         this.OffsetFrom = Reader.GetByte();
         this.ZOrder     = Reader.GetByte();
     }
-}
+};
 
 function CSectionPageNumType()
 {
@@ -1713,7 +1726,7 @@ CSectionPageNumType.prototype =
 
         this.Start = Reader.GetLong();
     }    
-}
+};
 
 
 function CSectionPageNumInfo(FP, CP, bFirst, bEven, PageNum)
@@ -1735,7 +1748,7 @@ CSectionPageNumInfo.prototype =
         
         return true;
     }
-}
+};
 
 function CSectionColumn()
 {
@@ -1762,7 +1775,7 @@ CSectionColumn.prototype =
         this.W     = Reader.GetDouble();
         this.Space = Reader.GetDouble();
     }
-}
+};
 
 function CSectionColumns()
 {

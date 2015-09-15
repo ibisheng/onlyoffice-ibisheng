@@ -10960,7 +10960,7 @@ CDocument.prototype =
             this.Internal_Content_Add(this.Content.length, new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 ) );
 
         // Обновим информацию о секциях
-        this.SectionsInfo.Update_OnRemove( Position, Count );
+        this.SectionsInfo.Update_OnRemove(Position, Count, true);
 
         // Проверим последний параграф
         this.Check_SectionLastParagraph();
@@ -15273,7 +15273,7 @@ CDocumentSectionsInfo.prototype =
         }
     },
 
-    Update_OnRemove : function(Pos, Count)
+    Update_OnRemove : function(Pos, Count, bCheckHdrFtr)
     {
         var Len = this.Elements.length;
 
@@ -15281,13 +15281,33 @@ CDocumentSectionsInfo.prototype =
         {
             var CurPos = this.Elements[Index].Index;
 
-            if ( CurPos >= Pos && CurPos < Pos + Count )
+            if (CurPos >= Pos && CurPos < Pos + Count)
             {
-                this.Elements.splice( Index, 1 );
+                // Копируем поведение Word: Если у следующей секции не задан вообще ни один колонтитул,
+                // тогда копируем ссылки на колонтитулы из удаляемой секции. Если задан хоть один колонтитул,
+                // тогда этого не делаем.
+                if (true === bCheckHdrFtr && Index < Len - 1)
+                {
+                    var CurrSectPr = this.Elements[Index].SectPr;
+                    var NextSectPr = this.Elements[Index + 1].SectPr;
+                    if (true === NextSectPr.Is_AllHdrFtrNull() && true !== CurrSectPr.Is_AllHdrFtrNull())
+                    {
+                        NextSectPr.Set_Header_First(CurrSectPr.Get_Header_First());
+                        NextSectPr.Set_Header_Even(CurrSectPr.Get_Header_Even());
+                        NextSectPr.Set_Header_Default(CurrSectPr.Get_Header_Default());
+                        NextSectPr.Set_Footer_First(CurrSectPr.Get_Footer_First());
+                        NextSectPr.Set_Footer_Even(CurrSectPr.Get_Footer_Even());
+                        NextSectPr.Set_Footer_Default(CurrSectPr.Get_Footer_Default());
+                    }
+                }
+
+                this.Elements.splice(Index, 1);
                 Len--;
                 Index--;
+
+
             }
-            else if ( CurPos >= Pos + Count )
+            else if (CurPos >= Pos + Count)
                 this.Elements[Index].Index -= Count;
         }
     }
