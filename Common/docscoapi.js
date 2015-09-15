@@ -1118,7 +1118,6 @@
           'lastOtherSaveTime': t.lastOtherSaveTime,
           'block': t.ownedLockBlocks,
           'sessionId': t._id,
-          //'server'	: window.location.protocol + '//' + window.location.host + g_sMainServiceLocalUrl,
           'documentFormatSave': t._documentFormatSave,
           'isViewer': t._isViewer,
           'version': asc_coAuthV
