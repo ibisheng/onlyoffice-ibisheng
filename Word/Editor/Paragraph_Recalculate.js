@@ -891,11 +891,8 @@ Paragraph.prototype.private_RecalculateLineRanges      = function(CurLine, CurPa
         }
 
         // Такое может случиться, если мы насильно переносим автофигуру на следующую страницу
-        if (recalcresult_NextPage === PRS.RecalcResult)
+        if (recalcresult_NextPage === PRS.RecalcResult || recalcresult_PrevLine === PRS.RecalcResult || recalcresult_CurLine === PRS.RecalcResult || recalcresult_CurPagePara === PRS.RecalcResult)
             return false;
-
-        if (recalcresult_PrevLine === PRS.RecalcResult || recalcresult_CurPagePara === PRS.RecalcResult)
-            return true;
 
         CurRange++;
     }
