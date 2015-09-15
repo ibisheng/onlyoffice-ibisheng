@@ -1592,26 +1592,58 @@ DrawingObjectsController.prototype =
     hyperlinkRemove: function()
     {
         var content = this.getTargetDocContent(true);
-        return content && content.Hyperlink_Remove();
+        if(content)
+        {
+            var Ret = content.Hyperlink_Remove();
+            var target_text_object = getTargetTextObject(this);
+            if(target_text_object)
+            {
+                target_text_object.checkExtentsByDocContent && target_text_object.checkExtentsByDocContent();
+            }
+            return Ret;
+        }
+        return undefined;
     },
 
     hyperlinkModify: function( HyperProps )
     {
         var content = this.getTargetDocContent(true);
-        return content && content.Hyperlink_Modify(HyperProps);
+        if(content)
+        {
+            var Ret = content.Hyperlink_Modify(HyperProps);
+            var target_text_object = getTargetTextObject(this);
+            if(target_text_object)
+            {
+                target_text_object.checkExtentsByDocContent && target_text_object.checkExtentsByDocContent();
+            }
+            return Ret;
+        }
+        return undefined;
     },
 
     hyperlinkAdd: function( HyperProps )
     {
-        var content = this.getTargetDocContent(true);
+        var content = this.getTargetDocContent(true), bCheckExtents = false;
         if(content)
         {
             if(!this.document)
             {
                 if ( null != HyperProps.Text && "" != HyperProps.Text && true === content.Is_SelectionUse() )
-                    this.removeCallback(-1);
+                {
+                    this.removeCallback(-1, undefined, undefined, true);
+                    bCheckExtents = true;
+                }
             }
-            return content.Hyperlink_Add(HyperProps);
+            var Ret = content.Hyperlink_Add(HyperProps);
+            if(bCheckExtents)
+            {
+                var target_text_object = getTargetTextObject(this);
+                if(target_text_object)
+                {
+                    target_text_object.checkExtentsByDocContent && target_text_object.checkExtentsByDocContent();
+                }
+            }
+            return Ret;
         }
         return null;
     },
@@ -3778,7 +3810,7 @@ DrawingObjectsController.prototype =
         this.checkSelectedObjectsAndCallback(this.removeCallback, [dir, bOnlyText, bRemoveOnlySelection], false, historydescription_Spreadsheet_Remove);
     },
 
-    removeCallback: function(dir, bOnlyText, bRemoveOnlySelection)
+    removeCallback: function(dir, bOnlyText, bRemoveOnlySelection, bNoCheck)
     {
         var target_text_object = getTargetTextObject(this);
         if(target_text_object)
@@ -3795,7 +3827,7 @@ DrawingObjectsController.prototype =
                     content.Remove(dir, true, bRemoveOnlySelection)
                 }
 
-                target_text_object.checkExtentsByDocContent && target_text_object.checkExtentsByDocContent();
+                bNoCheck !== true && target_text_object.checkExtentsByDocContent && target_text_object.checkExtentsByDocContent();
             }
         }
         else if(this.selectedObjects.length > 0)
