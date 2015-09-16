@@ -9,6 +9,8 @@ function CCollaborativeEditing()
     this.m_aLinkData = [];
     this.m_aNewImages = [];
 
+    this.m_aChangedClasses = {};
+
     this.Start_CollaborationEditing = function()
     {
     };
@@ -193,11 +195,21 @@ function CCollaborativeEditing()
 //-----------------------------------------------------------------------------------
     this.Add_ChangedClass = function(Class)
     {
+        var Id = Class.Get_Id();
+        this.m_aChangedClasses[Id] = Class;
     };
 
-    this.Clear_CollaborativeMarks = function(bRepaint)
+    this.Clear_CollaborativeMarks = function()
     {
+        for ( var Id in this.m_aChangedClasses )
+        {
+            this.m_aChangedClasses[Id].Clear_CollaborativeMarks();
+        }
+
+        // Очищаем массив
+        this.m_aChangedClasses = {};
     };
+
 }
 
 var CollaborativeEditing = new CCollaborativeEditing();

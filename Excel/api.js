@@ -1969,6 +1969,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
         this.asc_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
       }
 
+      CollaborativeEditing.Clear_CollaborativeMarks();
       // Принимаем чужие изменения
       this.collaborativeEditing.applyChanges();
 

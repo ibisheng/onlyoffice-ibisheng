@@ -2208,24 +2208,27 @@ Paragraph.prototype =
                 Element = aRunReview.Get_Next();
             }
 
-            // Рисуем рект вокруг измененных ранов (измененных другим пользователем)
-            Element = aCollChange.Get_Next();
-            while (null !== Element)
+            if(this.bFromDocument)
             {
-                pGraphics.p_color(Element.r, Element.g, Element.b, 255);
-                pGraphics.AddSmartRect(Element.x0, Page.Y + Line.Top, Element.x1 - Element.x0, Line.Bottom - Line.Top, 0);
+                // Рисуем рект вокруг измененных ранов (измененных другим пользователем)
                 Element = aCollChange.Get_Next();
-            }
-                        // Рисуем подчеркивание орфографии
-            if(this.bFromDocument && this.LogicDocument && true === this.LogicDocument.Spelling.Use)
-            {
-                pGraphics.p_color( 255, 0, 0, 255 );
-                var SpellingW = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
-                Element = aSpelling.Get_Next();
-                while ( null != Element )
+                while (null !== Element)
                 {
-                    pGraphics.DrawSpellingLine(Element.y0, Element.x0, Element.x1, SpellingW);
+                    pGraphics.p_color(Element.r, Element.g, Element.b, 255);
+                    pGraphics.AddSmartRect(Element.x0, Page.Y + Line.Top, Element.x1 - Element.x0, Line.Bottom - Line.Top, 0);
+                    Element = aCollChange.Get_Next();
+                }
+                // Рисуем подчеркивание орфографии
+                if(this.LogicDocument && true === this.LogicDocument.Spelling.Use)
+                {
+                    pGraphics.p_color( 255, 0, 0, 255 );
+                    var SpellingW = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
                     Element = aSpelling.Get_Next();
+                    while ( null != Element )
+                    {
+                        pGraphics.DrawSpellingLine(Element.y0, Element.x0, Element.x1, SpellingW);
+                        Element = aSpelling.Get_Next();
+                    }
                 }
             }
             if(pGraphics.End_Command)
