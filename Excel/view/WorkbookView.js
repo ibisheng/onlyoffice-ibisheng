@@ -1974,7 +1974,12 @@
                 return;
 
             var ws = this.getWorksheet(),
-                t = this
+                t = this,
+                selectNameChange = function(){
+                    var ws = t.getWorksheet();
+                    ws.changeSelectionDone();
+                    t._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
+                };
 
             if( oldName ){
 
@@ -1983,6 +1988,7 @@
                         t.model.editDefinesNames(oldName, newName);
                         t.handlers.trigger("asc_onEditDefName", oldName, newName);
                         t.handlers.trigger("asc_onRefreshDefNameList");
+                        selectNameChange();
                     }
                 };
                 var defNameId = t.model.getDefinedName(oldName).nodeId;
@@ -1993,6 +1999,7 @@
             else{
                 this.handlers.trigger("asc_onDefName", this.model.editDefinesNames(oldName, newName));
                 this.handlers.trigger("asc_onRefreshDefNameList");
+                selectNameChange();
             }
 
         };
