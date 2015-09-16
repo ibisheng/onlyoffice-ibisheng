@@ -32,7 +32,7 @@
     }
   }
 
-  CDocsCoApi.prototype.init = function(user, docid, documentCallbackUrl, token, editorType, documentFormatSave, isViewer) {
+  CDocsCoApi.prototype.init = function(user, docid, documentCallbackUrl, token, editorType, documentFormatSave) {
     if (this._CoAuthoringApi && this._CoAuthoringApi.isRightURL()) {
       var t = this;
       this._CoAuthoringApi.onAuthParticipantsChanged = function(e, count) {
@@ -88,14 +88,21 @@
         t.callback_OnFirstConnect();
       };
 
-      this._CoAuthoringApi.init(user, docid, documentCallbackUrl, token, editorType, documentFormatSave, isViewer);
+      this._CoAuthoringApi.init(user, docid, documentCallbackUrl, token, editorType, documentFormatSave);
       this._onlineWork = true;
     } else {
       // Фиктивные вызовы
       this.onFirstConnect();
+    }
+  };
+
+  CDocsCoApi.prototype.auth = function(isViewer) {
+    // Фиктивные вызовы
+    if (this._CoAuthoringApi && this._onlineWork) {
+      this._CoAuthoringApi.auth(isViewer);
+    } else {
       this.callback_OnSetIndexUser("123");
       this.onFirstLoadChangesEnd();
-      callback();
     }
   };
 
@@ -375,6 +382,7 @@
     this._countEditUsers = 0;
     this._countUsers = 0;
 
+    this.isAuthInit = false;
     this._locks = {};
     this._msgBuffer = [];
     this._lockCallbacks = {};
@@ -1059,10 +1067,9 @@
       this._sendPrebuffered();
     }
     //TODO: Add errors
-    this.onFirstConnect();
   };
 
-  DocsCoApi.prototype.init = function(user, docid, documentCallbackUrl, token, editorType, documentFormatSave, isViewer) {
+  DocsCoApi.prototype.init = function(user, docid, documentCallbackUrl, token, editorType, documentFormatSave) {
     this._user = user;
     this._docid = docid;
     this._documentCallbackUrl = documentCallbackUrl;
@@ -1074,7 +1081,6 @@
     this._isPresentation = c_oEditorId.Presentation === editorType;
     this._isAuth = false;
     this._documentFormatSave = documentFormatSave;
-    this._isViewer = isViewer;
 
     this.bUserAlive = false; // Активность пользователя
     this.bSendUserAlive = false; // Отправлять ли активность пользователя
@@ -1082,6 +1088,42 @@
     this.pingIntervalID = null;
 
     this._initSocksJs();
+  };
+
+  // Авторизация (ее нужно делать после выставления состояния редактора view-mode)
+  DocsCoApi.prototype.auth = function(isViewer) {
+    this.isAuthInit = true;
+    this._isViewer = isViewer;
+    if (this._locks) {
+      this.ownedLockBlocks = [];
+      //If we already have locks
+      for (var block in this._locks) if (this._locks.hasOwnProperty(block)) {
+        var lock = this._locks[block];
+        if (lock["state"] === 2) {
+          //Our lock.
+          this.ownedLockBlocks.push(lock["blockValue"]);
+        }
+      }
+      this._locks = {};
+    }
+    this._send({
+      'type': 'auth',
+      'docid': this._docid,
+      'documentCallbackUrl': this._documentCallbackUrl,
+      'token': this._token,
+      'user': {
+        'id': this._user.asc_getId(),
+        'name': this._user.asc_getUserName(),
+        'indexUser': this._indexUser
+      },
+      'editorType': this.editorType,
+      'lastOtherSaveTime': this.lastOtherSaveTime,
+      'block': this.ownedLockBlocks,
+      'sessionId': this._id,
+      'documentFormatSave': this._documentFormatSave,
+      'isViewer': this._isViewer,
+      'version': asc_coAuthV
+    });
   };
 
   DocsCoApi.prototype._initSocksJs = function() {
@@ -1095,37 +1137,11 @@
       }
 
       t._state = ConnectionState.WaitAuth;
-      if (t._locks) {
-        t.ownedLockBlocks = [];
-        //If we already have locks
-        for (var block in t._locks) if (t._locks.hasOwnProperty(block)) {
-          var lock = t._locks[block];
-          if (lock["state"] === 2) {
-            //Our lock.
-            t.ownedLockBlocks.push(lock["blockValue"]);
-          }
-        }
-        t._locks = {};
+      if (t.isAuthInit) {
+        t.auth(t._isViewer);
+      } else {
+        t.onFirstConnect();
       }
-      t._send({
-          'type': 'auth',
-          'docid': t._docid,
-          'documentCallbackUrl': t._documentCallbackUrl,
-          'token': t._token,
-          'user': {
-            'id': t._user.asc_getId(),
-            'name': t._user.asc_getUserName(),
-            'indexUser': t._indexUser
-          },
-          'editorType': t.editorType,
-          'lastOtherSaveTime': t.lastOtherSaveTime,
-          'block': t.ownedLockBlocks,
-          'sessionId': t._id,
-          'documentFormatSave': t._documentFormatSave,
-          'isViewer': t._isViewer,
-          'version': asc_coAuthV
-        });
-
     };
     sockjs.onmessage = function(e) {
       //TODO: add checks and error handling

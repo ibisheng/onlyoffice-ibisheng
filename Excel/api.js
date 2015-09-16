@@ -501,12 +501,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     }
   };
   spreadsheet_api.prototype.asc_LoadDocument = function() {
-    var t = this;
+    this.CoAuthoringApi.auth(this.asc_getViewerMode());
 
     this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
     if (!this.chartEditor) {
       this._asc_open(function(response) {
-        t._startOpenDocument(response);
+        this._startOpenDocument(response);
       });
     }
   };
@@ -1719,7 +1719,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     if (!(window["NATIVE_EDITOR_ENJINE"] || !this.documentId || !this.documentUrl)) {
       this.CoAuthoringApi.set_url(null);
     }
-    this.CoAuthoringApi.init(t.User, t.documentId, t.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Spreadsheet, t.documentFormatSave, t.asc_getViewerMode());
+    this.CoAuthoringApi.init(t.User, t.documentId, t.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Spreadsheet, t.documentFormatSave);
   };
 
   spreadsheet_api.prototype._onSaveChanges = function(recalcIndexColumns, recalcIndexRows) {

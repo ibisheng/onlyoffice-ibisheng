@@ -825,47 +825,45 @@ asc_docs_api.prototype.asc_setLocale = function(val)
 {
 	this.InterfaceLocale = val;
 };
-asc_docs_api.prototype.LoadDocument = function()
-{
-    this.WordControl.m_oDrawingDocument.m_bIsOpeningDocument = true;
+asc_docs_api.prototype.LoadDocument = function() {
+  this.CoAuthoringApi.auth(this.isViewMode);
 
-	// Меняем тип состояния (на открытие)
-	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
+  this.WordControl.m_oDrawingDocument.m_bIsOpeningDocument = true;
 
-    if (this.DocInfo.get_OfflineApp() === true)
-    {
-        this.OfflineAppDocumentStartLoad();
-        return;
-    }
+  // Меняем тип состояния (на открытие)
+  this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
 
-	if(documentId){
-		var rData = {
-			"c"				: 'open',
-			"id"			: documentId,
-			"userid"		: documentUserId,
-			"format"		: documentFormat,
-			"vkey"			: documentVKey,
-			"editorid"		: c_oEditorId.Word,
-			"url"			: documentUrl,
-			"title"			: documentTitle,
-			"embeddedfonts"	: this.isUseEmbeddedCutFonts,
-			"viewmode"		: this.isViewMode
-		};
-		this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-		sendCommand2( this, null, rData );
-	}
-	else
-    {
-		// ToDo убрать зависимость от this.FontLoader.fontFilesPath
-        documentUrl = this.FontLoader.fontFilesPath + "../Word/document/";
-        this.DocInfo.put_OfflineApp(true);
+  if (this.DocInfo.get_OfflineApp() === true) {
+    this.OfflineAppDocumentStartLoad();
+    return;
+  }
 
-        // For test create unique id
-        documentId = "test_document_id";
-        this.OfflineAppDocumentStartLoad();
-    }
+  if (documentId) {
+    var rData = {
+      "c": 'open',
+      "id": documentId,
+      "userid": documentUserId,
+      "format": documentFormat,
+      "vkey": documentVKey,
+      "editorid": c_oEditorId.Word,
+      "url": documentUrl,
+      "title": documentTitle,
+      "embeddedfonts": this.isUseEmbeddedCutFonts,
+      "viewmode": this.isViewMode
+    };
+    this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+    sendCommand2(this, null, rData);
+  } else {
+    // ToDo убрать зависимость от this.FontLoader.fontFilesPath
+    documentUrl = this.FontLoader.fontFilesPath + "../Word/document/";
+    this.DocInfo.put_OfflineApp(true);
 
-	this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, 0);
+    // For test create unique id
+    documentId = "test_document_id";
+    this.OfflineAppDocumentStartLoad();
+  }
+
+  this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, 0);
 };
 
 asc_docs_api.prototype.SetFontsPath = function(path)
@@ -1495,10 +1493,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
 	if(!(window["NATIVE_EDITOR_ENJINE"] || !documentId)){
 		this.CoAuthoringApi.set_url(null);
 	}
-    this.CoAuthoringApi.init(this.User, documentId, documentCallbackUrl, 'fghhfgsjdgfjs',
-        c_oEditorId.Word, documentFormatSave, this.isViewMode);
-
-    // ToDo init other callbacks
+  this.CoAuthoringApi.init(this.User, documentId, documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Word, documentFormatSave);
 };
 
 // send chart message
@@ -6776,57 +6771,49 @@ asc_docs_api.prototype.add_SectionBreak = function(_Type)
     }
 };
 
-asc_docs_api.prototype.SetViewMode = function( isViewMode )
-{
-    if (isViewMode)
-    {
-		this.asc_SpellCheckDisconnect();
+asc_docs_api.prototype.SetViewMode = function(isViewMode) {
+  if (isViewMode) {
+    this.asc_SpellCheckDisconnect();
 
-        this.isViewMode = true;
-        this.ShowParaMarks = false;
-		CollaborativeEditing.m_bGlobalLock = true;
-        //this.isShowTableEmptyLine = false;
-        //this.WordControl.m_bIsRuler = true;
+    this.isViewMode = true;
+    this.ShowParaMarks = false;
+    CollaborativeEditing.m_bGlobalLock = true;
+    //this.isShowTableEmptyLine = false;
+    //this.WordControl.m_bIsRuler = true;
 
-        if (null == this.WordControl.m_oDrawingDocument.m_oDocumentRenderer)
-        {
-            this.WordControl.m_oDrawingDocument.ClearCachePages();
-            this.WordControl.HideRulers();
-        }
-        else
-        {
-            this.WordControl.HideRulers();
-            this.WordControl.OnScroll();
-        }
+    if (null == this.WordControl.m_oDrawingDocument.m_oDocumentRenderer) {
+      this.WordControl.m_oDrawingDocument.ClearCachePages();
+      this.WordControl.HideRulers();
+    } else {
+      this.WordControl.HideRulers();
+      this.WordControl.OnScroll();
     }
-    else
-    {
-        if (this.bInit_word_control === true && this.FontLoader.embedded_cut_manager.bIsCutFontsUse)
-        {
-            this.isLoadNoCutFonts = true;
-            this.FontLoader.embedded_cut_manager.bIsCutFontsUse = false;
-            this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, true);
-            return;
-        }
-
-        // быстрого перехода больше нет
-        /*
-        if ( this.bInit_word_control === true )
-        {
-            CollaborativeEditing.Apply_Changes();
-            CollaborativeEditing.Release_Locks();
-        }
-        */
-
-        this.isUseEmbeddedCutFonts = false;
-
-        this.isViewMode = false;
-        //this.WordControl.m_bIsRuler = true;
-        this.WordControl.checkNeedRules();
-        this.WordControl.m_oDrawingDocument.ClearCachePages();
-        this.WordControl.OnResize(true);
-        this.sync_InitEditorStyles2();
+  } else {
+    if (this.bInit_word_control === true && this.FontLoader.embedded_cut_manager.bIsCutFontsUse) {
+      this.isLoadNoCutFonts = true;
+      this.FontLoader.embedded_cut_manager.bIsCutFontsUse = false;
+      this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, true);
+      return;
     }
+
+    // быстрого перехода больше нет
+    /*
+     if ( this.bInit_word_control === true )
+     {
+     CollaborativeEditing.Apply_Changes();
+     CollaborativeEditing.Release_Locks();
+     }
+     */
+
+    this.isUseEmbeddedCutFonts = false;
+
+    this.isViewMode = false;
+    //this.WordControl.m_bIsRuler = true;
+    this.WordControl.checkNeedRules();
+    this.WordControl.m_oDrawingDocument.ClearCachePages();
+    this.WordControl.OnResize(true);
+    this.sync_InitEditorStyles2();
+  }
 };
 
 asc_docs_api.prototype.SetUseEmbeddedCutFonts = function(bUse)

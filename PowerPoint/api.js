@@ -795,48 +795,46 @@ asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo)
 asc_docs_api.prototype.asc_setLocale = function(val)
 {
 };
-asc_docs_api.prototype.LoadDocument = function()
-{
-    this.WordControl.m_oDrawingDocument.m_bIsOpeningDocument = true;
+asc_docs_api.prototype.LoadDocument = function() {
+  this.CoAuthoringApi.auth(this.isViewMode);
+
+  this.WordControl.m_oDrawingDocument.m_bIsOpeningDocument = true;
 
 
-	// Меняем тип состояния (на открытие)
-	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
+  // Меняем тип состояния (на открытие)
+  this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
 
-    if (this.DocInfo.get_OfflineApp() === true)
-    {
-        this.OfflineAppDocumentStartLoad();
-        return;
-    }
+  if (this.DocInfo.get_OfflineApp() === true) {
+    this.OfflineAppDocumentStartLoad();
+    return;
+  }
 
-    if (documentId) {
-        this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-		var rData = {
-			"id"			: documentId,
-			"userid"		: documentUserId,
-			"format"		: documentFormat,
-			"vkey"			: documentVKey,
-			"editorid"		: c_oEditorId.Presentation,
-			"c"				: "open",
-			"url"			: documentUrl,
-			"title"			: documentTitle,
-			"embeddedfonts"	: this.isUseEmbeddedCutFonts,
-			"viewmode"		: this.isViewMode
-		};
-			
-        sendCommand2(this, null, rData);
-    }
-    else
-    {
-		// ToDo убрать зависимость от this.FontLoader.fontFilesPath
-		documentUrl = this.FontLoader.fontFilesPath + "../PowerPoint/document/";
-        this.DocInfo.put_OfflineApp(true);
+  if (documentId) {
+    this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+    var rData = {
+      "id": documentId,
+      "userid": documentUserId,
+      "format": documentFormat,
+      "vkey": documentVKey,
+      "editorid": c_oEditorId.Presentation,
+      "c": "open",
+      "url": documentUrl,
+      "title": documentTitle,
+      "embeddedfonts": this.isUseEmbeddedCutFonts,
+      "viewmode": this.isViewMode
+    };
 
-        // For test create unique id
-        documentId = "test_presentation_id";
-        this.OfflineAppDocumentStartLoad();
-    }
-	this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, this.WordControl.m_nZoomType);
+    sendCommand2(this, null, rData);
+  } else {
+    // ToDo убрать зависимость от this.FontLoader.fontFilesPath
+    documentUrl = this.FontLoader.fontFilesPath + "../PowerPoint/document/";
+    this.DocInfo.put_OfflineApp(true);
+
+    // For test create unique id
+    documentId = "test_presentation_id";
+    this.OfflineAppDocumentStartLoad();
+  }
+  this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, this.WordControl.m_nZoomType);
 };
 
 asc_docs_api.prototype.SetFontsPath = function(path)
@@ -4594,45 +4592,41 @@ asc_docs_api.prototype.SetDeviceInputHelperId = function(idKeyboard)
     }
     window.ID_KEYBOARD_AREA.focus();
 };
-asc_docs_api.prototype.SetViewMode = function( isViewMode )
-{
-    if (isViewMode)
-    {
-        this.isViewMode = true;
-        this.ShowParaMarks = false;
-        this.WordControl.m_bIsRuler = false;
-        this.WordControl.m_oDrawingDocument.ClearCachePages();
-        this.WordControl.HideRulers();
+asc_docs_api.prototype.SetViewMode = function(isViewMode) {
+  if (isViewMode) {
+    this.isViewMode = true;
+    this.ShowParaMarks = false;
+    this.WordControl.m_bIsRuler = false;
+    this.WordControl.m_oDrawingDocument.ClearCachePages();
+    this.WordControl.HideRulers();
 
-        if (null != this.WordControl.m_oLogicDocument)
-            this.WordControl.m_oLogicDocument.viewMode = true;
+    if (null != this.WordControl.m_oLogicDocument) {
+      this.WordControl.m_oLogicDocument.viewMode = true;
     }
-    else
-    {
-        if (this.bInit_word_control === true && this.FontLoader.embedded_cut_manager.bIsCutFontsUse)
-        {
-            this.isLoadNoCutFonts = true;
-            this.FontLoader.embedded_cut_manager.bIsCutFontsUse = false;
-            this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, true);
-            return;
-        }
-
-        if ( this.bInit_word_control === true )
-        {
-            CollaborativeEditing.Apply_Changes();
-            CollaborativeEditing.Release_Locks();
-        }
-
-        this.isUseEmbeddedCutFonts = false;
-
-        this.isViewMode = false;
-        this.WordControl.checkNeedRules();
-        this.WordControl.m_oDrawingDocument.ClearCachePages();
-        this.WordControl.OnResize(true);
-
-        if (null != this.WordControl.m_oLogicDocument)
-            this.WordControl.m_oLogicDocument.viewMode = false;
+  } else {
+    if (this.bInit_word_control === true && this.FontLoader.embedded_cut_manager.bIsCutFontsUse) {
+      this.isLoadNoCutFonts = true;
+      this.FontLoader.embedded_cut_manager.bIsCutFontsUse = false;
+      this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, true);
+      return;
     }
+
+    if (this.bInit_word_control === true) {
+      CollaborativeEditing.Apply_Changes();
+      CollaborativeEditing.Release_Locks();
+    }
+
+    this.isUseEmbeddedCutFonts = false;
+
+    this.isViewMode = false;
+    this.WordControl.checkNeedRules();
+    this.WordControl.m_oDrawingDocument.ClearCachePages();
+    this.WordControl.OnResize(true);
+
+    if (null != this.WordControl.m_oLogicDocument) {
+      this.WordControl.m_oLogicDocument.viewMode = false;
+    }
+  }
 };
 
 asc_docs_api.prototype.SetUseEmbeddedCutFonts = function(bUse)
