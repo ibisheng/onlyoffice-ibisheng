@@ -222,6 +222,44 @@ CParagraphContentWithParagraphLikeContent.prototype.Copy = function(Selected)
 
     return NewElement;
 };
+CParagraphContentWithParagraphLikeContent.prototype.CopyContent = function(Selected)
+{
+    var CopyContent = [];
+
+    var StartPos = 0;
+    var EndPos = this.Content.length - 1;
+
+    if (true === Selected && true === this.State.Selection.Use)
+    {
+        StartPos = this.State.Selection.StartPos;
+        EndPos   = this.State.Selection.EndPos;
+        if (StartPos > EndPos)
+        {
+            StartPos = this.State.Selection.EndPos;
+            EndPos   = this.State.Selection.StartPos;
+        }
+    }
+
+    for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+    {
+        var Item = this.Content[CurPos];
+
+        if ((StartPos === CurPos || EndPos === CurPos) && true !== Item.Is_SelectedAll())
+        {
+            var Content = Item.CopyContent(Selected);
+            for (var ContentPos = 0, ContentLen = Content.length; ContentPos < ContentLen; ContentPos++)
+            {
+                CopyContent.push(Content[ContentPos]);
+            }
+        }
+        else
+        {
+            CopyContent.push(Item.Copy(false));
+        }
+    }
+
+    return CopyContent;
+};
 CParagraphContentWithParagraphLikeContent.prototype.Get_Paragraph = function()
 {
     return this.Paragraph;

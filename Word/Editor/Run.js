@@ -177,6 +177,11 @@ ParaRun.prototype.Copy2 = function()
     return NewRun;
 };
 
+ParaRun.prototype.CopyContent = function(Selected)
+{
+    return [this.Copy(Selected)];
+};
+
 ParaRun.prototype.Get_AllDrawingObjects = function(DrawingObjs)
 {
     var Count = this.Content.length;
@@ -5206,8 +5211,8 @@ ParaRun.prototype.Is_SelectedAll = function(Props)
     if ( false === Selection.Use && true !== this.Is_Empty( Props ) )
         return false;
 
-    var SkipAnchor = Props.SkipAnchor;
-    var SkipEnd    = Props.SkipEnd;
+    var SkipAnchor = Props ? Props.SkipAnchor : false;
+    var SkipEnd    = Props ? Props.SkipEnd    : false;
 
     var StartPos = Selection.StartPos;
     var EndPos   = Selection.EndPos;

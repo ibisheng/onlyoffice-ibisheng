@@ -6756,10 +6756,18 @@ Paragraph.prototype =
             {
                 var Item = this.Content[Pos];
 
-                if ( StartPos === Pos || EndPos === Pos )
-                    Para.Internal_Content_Add( Pos - StartPos, Item.Copy(true), false );
+                if ((StartPos === Pos || EndPos === Pos) && true !== Item.Is_SelectedAll())
+                {
+                    var Content = Item.CopyContent(true);
+                    for (var ContentPos = 0, ContentLen = Content.length; ContentPos < ContentLen; ContentPos++)
+                    {
+                        Para.Internal_Content_Add(Pos - StartPos + ContentPos, Content[ContentPos], false);
+                    }
+                }
                 else
-                    Para.Internal_Content_Add( Pos - StartPos, Item.Copy(false), false );
+                {
+                    Para.Internal_Content_Add(Pos - StartPos, Item.Copy(false), false);
+                }
             }
 
             // Добавляем секцию в конце

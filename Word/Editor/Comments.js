@@ -977,9 +977,14 @@ ParaComment.prototype =
         return true;
     },
     
-    Copy : function()
+    Copy : function(Selected)
     {
         return new ParaComment(this.Start, this.CommentId);
+    },
+
+    CopyContent : function(Selected)
+    {
+        return [];
     },
     
     Split : function()
