@@ -2339,7 +2339,6 @@ function CEditorPage(api)
         }
 
         check_KeyboardEvent(e);
-
         if (oWordControl.IsFocus === false)
         {
             // некоторые команды нужно продолжать обрабатывать
@@ -2355,7 +2354,6 @@ function CEditorPage(api)
             return;
         }
         */
-
         if (null == oWordControl.m_oLogicDocument)
         {
             var bIsPrev = (oWordControl.m_oDrawingDocument.m_oDocumentRenderer.OnKeyDown(global_keyboardEvent) === true) ? false : true;
@@ -2365,10 +2363,11 @@ function CEditorPage(api)
             }
             return;
         }
-
         if (oWordControl.m_oDrawingDocument.IsFreezePage(oWordControl.m_oDrawingDocument.m_lCurrentPage))
+        {
+            e.preventDefault();
             return;
-
+        }
         /*
         if (oWordControl.m_oApi.isViewMode)
         {
@@ -2381,7 +2380,6 @@ function CEditorPage(api)
         oWordControl.StartUpdateOverlay();
 
         oWordControl.IsKeyDownButNoPress = true;
-
         var _ret_mouseDown = oWordControl.m_oLogicDocument.OnKeyDown(global_keyboardEvent);
         oWordControl.bIsUseKeyPress = ((_ret_mouseDown & keydownresult_PreventKeyPress) != 0) ? false : true;
 

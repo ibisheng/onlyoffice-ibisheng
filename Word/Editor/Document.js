@@ -9450,7 +9450,7 @@ CDocument.prototype =
 
             if ( true === SelectedInfo.Is_InTable() && true != e.CtrlKey )
             {
-                this.Cursor_MoveToCell( true === e.ShiftKey ? false : true );
+                this.Cursor_MoveToCell(true === e.ShiftKey ? false : true);
             }
             else if ( true === SelectedInfo.Is_DrawingObjSelected() && true != e.CtrlKey )
             {
@@ -12066,11 +12066,14 @@ CDocument.prototype =
             {
                 this.Internal_CheckCurPage();
 
-                var Item = this.Content[this.CurPos.ContentPos];
-                if ( type_Table === Item.GetType() )
-                    Item.Document_UpdateRulersState(this.CurPage);
-                else
-                    Item.Document_UpdateRulersState();
+                if (this.CurPos.ContentPos >= 0 && (null === this.FullRecalc.Id || this.FullRecalc.StartIndex > this.CurPos.ContentPos))
+                {
+                    var Item = this.Content[this.CurPos.ContentPos];
+                    if ( type_Table === Item.GetType() )
+                        Item.Document_UpdateRulersState(this.CurPage);
+                    else
+                        Item.Document_UpdateRulersState();
+                }
             }
         }
 

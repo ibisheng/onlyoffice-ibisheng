@@ -18483,7 +18483,14 @@ CTable.prototype =
 
         this.Content.splice( Index, 0, NewRow );
         this.TableRowsBottom.splice( Index, 0, {} );
-        this.RowsInfo.splice( Index, 0, {} );
+        this.RowsInfo.splice( Index, 0, {
+            Pages        : 1,
+            Y            : [],
+            H            : [],
+            TopDy        : [],
+            MaxTopBorder : [],
+            FirstPage    : true,
+            StartPage    : 0} );
 
         if ( true === bReIndexing )
         {
