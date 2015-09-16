@@ -1258,17 +1258,17 @@ function cName( val, wb, ws ) {
     this.wb = wb;
     this.ws = ws;
     this.defName = this.wb.getDefinesNames( this.value, this.ws ? this.ws.getId() : null );
-    if ( this.defName && this.defName.Ref ) {
+    /*if ( this.defName && this.defName.Ref ) {
         this.ref = new parserFormula( this.defName.Ref, "", this.ws );
         this.ref.parse();
-    }
+    }*/
 }
 
 cName.prototype = Object.create( cBaseType.prototype );
 cName.prototype.reInit = function () {
     this.defName = this.wb.getDefinesNames( this.value, this.ws.getId() );
-    this.ref = new parserFormula( this.defName.Ref, "", this.ws );
-    this.ref.parse();
+    this.defName.parsedRef = new parserFormula( this.defName.Ref, "", this.ws );
+    this.defName.parsedRef.parse();
 };
 cName.prototype.toRef = function () {
 
@@ -1309,7 +1309,7 @@ cName.prototype.getValue = function () {
         return new cError( "#NAME?" );
     }
 
-    return this.ref.calculate();
+    return this.defName.parsedRef.calculate();
 };
 cName.prototype.getRef = function () {
 
@@ -1317,11 +1317,11 @@ cName.prototype.getRef = function () {
 cName.prototype.reParse = function () {
     var dN = this.wb.getDefinesNames( this.defName.Name, this.ws.getId() );
     if ( dN ) {
-        this.ref = new parserFormula( dN.Ref, "", this.ws );
-        this.ref.parse();
+        this.defName.parsedRef = new parserFormula( dN.Ref, "", this.ws );
+        this.defName.parsedRef.parse();
     }
     else {
-        this.ref = null;
+        this.defName.parsedRef = null;
     }
 };
 cName.prototype.addDefinedNameNode = function ( nameReParse ) {
@@ -1335,11 +1335,12 @@ cName.prototype.addDefinedNameNode = function ( nameReParse ) {
     }
 
     var dN = this.wb.getDefinesNames( this.defName.Name, this.ws.getId() );
-    dN = dN.getAscCDefName();
-    var node = this.wb.dependencyFormulas.addDefinedNameNode( dN.Name, dN.LocalSheetId, dN.Ref, dN.Hidden ),
+//    dN = dN.getAscCDefName();
+    var node/* = this.wb.dependencyFormulas.addDefinedNameNode( dN.Name, dN.LocalSheetId, dN.Ref, dN.Hidden )*/,
         wsR, ref, nTo;
-    for ( var i = 0; i < this.ref.outStack.length; i++ ) {
-        ref = this.ref.outStack[i];
+    node = dN;
+    for ( var i = 0; i < this.defName.parsedRef.outStack.length; i++ ) {
+        ref = this.defName.parsedRef.outStack[i];
 
         if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid() ) {
             nTo = this.wb.dependencyFormulas.addNode( ref.getWsId(), ref._cells.replace( this.regSpace, "" ) );
@@ -1351,6 +1352,9 @@ cName.prototype.addDefinedNameNode = function ( nameReParse ) {
                 nTo = this.wb.dependencyFormulas.addNode( wsR[j].Id, ref._cells.replace( this.regSpace, "" ) );
                 this.wb.dependencyFormulas.addEdge2( node, nTo );
             }
+        }
+        else if ( ref instanceof cName ){
+            this.wb.dependencyFormulas.addEdge2( node, this.defName );
         }
     }
     return node;
@@ -3286,6 +3290,11 @@ parserFormula.prototype = {
             found_operand = null, _3DRefTmp = null;
         var cFormulaList = (local && cFormulaFunctionLocalized) ? cFormulaFunctionLocalized : cFormulaFunction;
         while ( this.pCurrPos < this.Formula.length ) {
+
+            /*if ( parserHelp.isControlSymbols.call( this, this.Formula, this.pCurrPos )){
+                continue;
+            }*/
+
             /* Operators*/
             if ( parserHelp.isOperator.call( this, this.Formula, this.pCurrPos )/*  || isNextPtg(this.formula,this.pCurrPos) */ ) {
                 wasLeftParentheses = false;

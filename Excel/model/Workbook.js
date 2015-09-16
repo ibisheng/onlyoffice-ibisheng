@@ -924,6 +924,8 @@ DependencyGraph.prototype = {
         }
 
         if( !oRes.isTable ){
+            oRes.parsedRef = new parserFormula(oRes.Ref, "", oRes.wb.getWorksheet(0));
+            oRes.parsedRef.parse();
             oRes.parsedRef.buildDependencies(null,oRes);
         }
 
@@ -1418,13 +1420,13 @@ function DefNameVertex( scope, defName, defRef, defHidden, wb, isTable ) {
     this.nodeId = getDefNameVertexId( this.sheetId, defName );
     this.wb = wb;
 
-    if(!isTable){
+    /*if(!isTable){
         this.parsedRef = new parserFormula(this.Ref, "", this.wb.getWorksheet(0));
         if( this.Ref ){
             this.parsedRef.parse();
 //            this.parsedRef.buildDependencies();
         }
-    }
+    }*/
     /*else{
         this.sheetTableId = wb.getActiveWs().getId();
     }*/
