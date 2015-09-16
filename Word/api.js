@@ -7001,6 +7001,31 @@ asc_docs_api.prototype.asc_StartMailMergeByList = function(aList)
     if (!aFields || !aFields.length || aFields.length <= 0)
         return;
 
+    // Пробегаемся по названиям полей и делаем следующее:
+    // Если название пустой, тогда задем ему имя "F<номер столбца>"
+    // Если название совпадает, тогда добавляем ему число, чтобы имя стало уникальным.
+
+    var UsedNames = {};
+    for (var Pos = 0, Count = aFields.length; Pos < Count; Pos++)
+    {
+        if ("" === aFields[Pos])
+            aFields[Pos] = "F" + (Pos + 1);
+
+        if (undefined !==  UsedNames[aFields[Pos]])
+        {
+            var Add = 1;
+            var NewName = aFields[Pos] + Add;
+            while (undefined !== UsedNames[NewName])
+            {
+                Add++;
+                NewName = aFields[Pos] + Add;
+            }
+            aFields[Pos] = NewName;
+        }
+
+        UsedNames[aFields[Pos]] = 1;
+    }
+
     var DstList = [];
     var FieldsCount = aFields.length;
     for (var Index = 1, Count = aList.length ; Index < Count; Index++)
