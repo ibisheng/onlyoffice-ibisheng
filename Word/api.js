@@ -1017,43 +1017,6 @@ asc_docs_api.prototype.InitViewer = function()
     this.WordControl.m_oDrawingDocument.m_oDocumentRenderer = new CDocMeta();
 };
 
-asc_docs_api.prototype.OpenNewDocument = function()
-{
-	if (undefined != window['qtDocBridge'])
-	{
-		// push data to native QT code
-		window['qtDocBridge']['openedNewDocument'] ();
-	}
-	else
-	{
-		this.OpenEmptyDocument();
-	}
-};
-
-asc_docs_api.prototype.LoadDocumentFromDisk = function()
-{
-	if (undefined != window['qtDocBridge'])
-	{
-		// push data to native QT code
-		window['qtDocBridge']['loadedDocumentFromDisk'] ();
-	}
-	else
-	{
-		// may be it's useful for online version too
-	}
-};
-
-asc_docs_api.prototype.OpenTestDocumentViewer = function()
-{
-	this.LoadedObject = null;
-	this.DocumentType = 1;
-
-    this.InitViewer();
-    this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Load("./Document/", window["document_base64"]);
-    delete window["document_base64"];
-	this.FontLoader.LoadDocumentFonts(this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Fonts, true);
-};
-
 asc_docs_api.prototype.OpenDocument = function(url, gObject)
 {
     this.isOnlyReaderMode = false;
