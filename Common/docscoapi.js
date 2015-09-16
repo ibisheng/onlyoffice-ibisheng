@@ -28,10 +28,11 @@
       this.onUnSaveLock = options.onUnSaveLock;
       this.onRecalcLocks = options.onRecalcLocks;
       this.onDocumentOpen = options.onDocumentOpen;
+      this.onFirstConnect = options.onFirstConnect;
     }
   }
 
-  CDocsCoApi.prototype.init = function(user, docid, documentCallbackUrl, token, callback, editorType, documentFormatSave, isViewer) {
+  CDocsCoApi.prototype.init = function(user, docid, documentCallbackUrl, token, editorType, documentFormatSave, isViewer) {
     if (this._CoAuthoringApi && this._CoAuthoringApi.isRightURL()) {
       var t = this;
       this._CoAuthoringApi.onAuthParticipantsChanged = function(e, count) {
@@ -83,11 +84,15 @@
       this._CoAuthoringApi.onDocumentOpen = function(data) {
         t.callback_OnDocumentOpen(data);
       };
+      this._CoAuthoringApi.onFirstConnect = function() {
+        t.callback_OnFirstConnect();
+      };
 
-      this._CoAuthoringApi.init(user, docid, documentCallbackUrl, token, callback, editorType, documentFormatSave, isViewer);
+      this._CoAuthoringApi.init(user, docid, documentCallbackUrl, token, editorType, documentFormatSave, isViewer);
       this._onlineWork = true;
     } else {
       // Фиктивные вызовы
+      this.onFirstConnect();
       this.callback_OnSetIndexUser("123");
       this.onFirstLoadChangesEnd();
       callback();
@@ -335,6 +340,11 @@
       this.onDocumentOpen(e);
     }
   };
+  CDocsCoApi.prototype.callback_OnFirstConnect = function() {
+    if (this.onFirstConnect) {
+      this.onFirstConnect();
+    }
+  };
 
   function LockBufferElement(arrayBlockId, callback) {
     this._arrayBlockId = arrayBlockId;
@@ -351,13 +361,13 @@
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
       this.onRelockFailed = options.onRelockFailed;
       this.onDisconnect = options.onDisconnect;
-      this.onConnect = options.onConnect;
       this.onSaveChanges = options.onSaveChanges;
       this.onFirstLoadChangesEnd = options.onFirstLoadChangesEnd;
       this.onConnectionStateChanged = options.onConnectionStateChanged;
       this.onUnSaveLock = options.onUnSaveLock;
       this.onRecalcLocks = options.onRecalcLocks;
       this.onDocumentOpen = options.onDocumentOpen;
+      this.onFirstConnect = options.onFirstConnect;
     }
     this._state = ConnectionState.None;
     // Online-пользователи в документе
@@ -408,7 +418,6 @@
     this._token = null;
     this._user = null;
     this._userId = "Anonymous";
-    this._initCallback = null;
     this.ownedLockBlocks = [];
     this.sockjs_url = null;
     this.sockjs = null;
@@ -1050,17 +1059,14 @@
       this._sendPrebuffered();
     }
     //TODO: Add errors
-    if (this._initCallback) {
-      this._initCallback({result: data["result"]});
-    }
+    this.onFirstConnect();
   };
 
-  DocsCoApi.prototype.init = function(user, docid, documentCallbackUrl, token, callback, editorType, documentFormatSave, isViewer) {
+  DocsCoApi.prototype.init = function(user, docid, documentCallbackUrl, token, editorType, documentFormatSave, isViewer) {
     this._user = user;
     this._docid = docid;
     this._documentCallbackUrl = documentCallbackUrl;
     this._token = token;
-    this._initCallback = callback;
     this.ownedLockBlocks = [];
     this.sockjs_url = '/doc/' + docid + '/c';
     this.editorType = editorType;
@@ -1089,9 +1095,6 @@
       }
 
       t._state = ConnectionState.WaitAuth;
-      if (t.onConnect) {
-        t.onConnect();
-      }
       if (t._locks) {
         t.ownedLockBlocks = [];
         //If we already have locks

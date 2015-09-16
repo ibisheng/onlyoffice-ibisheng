@@ -726,29 +726,7 @@ asc_docs_api.prototype.Init = function()
 	this.WordControl.Init();
 };
 asc_docs_api.prototype.asc_getEditorPermissions = function() {
-	var t = this;
-  this._coAuthoringInit(function() {
-    if (t.DocInfo && t.DocInfo.get_Id()) {
-      var rData = {
-        "c": "getsettings",
-        "id": t.DocInfo.get_Id(),
-        "userid": t.DocInfo.get_UserId(),
-        "format": t.DocInfo.get_Format(),
-        "vkey": t.DocInfo.get_VKey(),
-        "editorid": c_oEditorId.Word
-      };
-
-      t.advancedOptionsAction = c_oAscAdvancedOptionsAction.Perm;
-      sendCommand2(t, null, rData);
-    } else {
-      // Фиктивный режим, фактически без документа
-      var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
-      t.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
-      // Фиктивно инициализируем
-      t.SpellCheckUrl = window['g_cAscSpellCheckUrl'] ? window['g_cAscSpellCheckUrl'] : '';
-      t._coSpellCheckInit();
-    }
-  });
+  this._coAuthoringInit();
 };
 
 asc_docs_api.prototype.asc_getLicense = function () 
@@ -1289,7 +1267,7 @@ asc_docs_api.prototype._coAuthoringSetChanges = function(e, oColor)
 		this._coAuthoringSetChange(e[Index], oColor);
 };
 
-asc_docs_api.prototype._coAuthoringInit = function(fCallback)
+asc_docs_api.prototype._coAuthoringInit = function()
 {
 	//Если User не задан, отключаем коавторинг.
 	if (null == this.User || null == this.User.asc_getId()) {
@@ -1434,6 +1412,28 @@ asc_docs_api.prototype._coAuthoringInit = function(fCallback)
 		CollaborativeEditing.End_CollaborationEditing();
 		editor.asc_setDrawCollaborationMarks(false);
 	};
+  this.CoAuthoringApi.onFirstConnect = function() {
+    if (t.DocInfo && t.DocInfo.get_Id()) {
+      var rData = {
+        "c": "getsettings",
+        "id": t.DocInfo.get_Id(),
+        "userid": t.DocInfo.get_UserId(),
+        "format": t.DocInfo.get_Format(),
+        "vkey": t.DocInfo.get_VKey(),
+        "editorid": c_oEditorId.Word
+      };
+
+      t.advancedOptionsAction = c_oAscAdvancedOptionsAction.Perm;
+      sendCommand2(t, null, rData);
+    } else {
+      // Фиктивный режим, фактически без документа
+      var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
+      t.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
+      // Фиктивно инициализируем
+      t.SpellCheckUrl = window['g_cAscSpellCheckUrl'] ? window['g_cAscSpellCheckUrl'] : '';
+      t._coSpellCheckInit();
+    }
+  };
 	/**
 	 * Event об отсоединении от сервера
 	 * @param {jQuery} e  event об отсоединении с причиной
@@ -1495,7 +1495,7 @@ asc_docs_api.prototype._coAuthoringInit = function(fCallback)
 	if(!(window["NATIVE_EDITOR_ENJINE"] || !documentId)){
 		this.CoAuthoringApi.set_url(null);
 	}
-    this.CoAuthoringApi.init(this.User, documentId, documentCallbackUrl, 'fghhfgsjdgfjs', fCallback,
+    this.CoAuthoringApi.init(this.User, documentId, documentCallbackUrl, 'fghhfgsjdgfjs',
         c_oEditorId.Word, documentFormatSave, this.isViewMode);
 
     // ToDo init other callbacks
