@@ -648,8 +648,10 @@
 
   DocsCoApi.prototype.disconnect = function() {
     // Отключаемся сами
+    clearInterval(this.pingIntervalID);
     this.isCloseCoAuthoring = true;
-    return this.sockjs.close();
+    this._send({"type": "close"});
+    this._state = ConnectionState.ClosedCoAuth;
   };
 
   DocsCoApi.prototype.openDocument = function(data) {
@@ -1092,6 +1094,8 @@
 
   // Авторизация (ее нужно делать после выставления состояния редактора view-mode)
   DocsCoApi.prototype.auth = function(isViewer) {
+    if (this.isCloseCoAuthoring)
+      return;
     this.isAuthInit = true;
     this._isViewer = isViewer;
     if (this._locks) {
@@ -1199,12 +1203,9 @@
         }
       }
       t._state = ConnectionState.Reconnect;
-      var bIsDisconnectAtAll = t.attemptCount >= t.maxAttemptCount || t.isCloseCoAuthoring;
+      var bIsDisconnectAtAll = t.attemptCount >= t.maxAttemptCount;
       if (bIsDisconnectAtAll) {
-        t._state = ConnectionState.Closed;
-      }
-      if (t.isCloseCoAuthoring) {
-        return;
+        t._state = ConnectionState.ClosedAll;
       }
       if (t.onDisconnect) {
         t.onDisconnect(evt.reason, bIsDisconnectAtAll, t.isCloseCoAuthoring);
