@@ -8374,11 +8374,10 @@
 									{
 										urls[elem.path] = elem.url;
 										var name = g_oDocumentUrls.imagePath2Local(elem.path);
+										aImagesSync.push(name);
 										var imageElem = val._aPastedImages[i];
-										if(null != imageElem)
-										{
-											aImagesSync.push(elem.url);
-											imageElem.SetUrl(elem.url);
+										if(null != imageElem) {
+											imageElem.SetUrl(name);
 										}
 									}
 								}

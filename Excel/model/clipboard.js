@@ -1900,11 +1900,10 @@
 									{
 										urls[elem.path] = elem.url;
 										var name = g_oDocumentUrls.imagePath2Local(elem.path);
+										aImagesSync.push(name);
 										var imageElem = aPastedImages[i];
-										if(null != imageElem)
-										{
-											aImagesSync.push(elem.url);
-											imageElem.SetUrl(elem.url);	
+										if(null != imageElem) {
+											imageElem.SetUrl(name);	
 										}
 									}
 								}
@@ -2201,7 +2200,7 @@
 											{
 												height: height,
 												width: width, 
-												src: elem.url
+												src: name
 											};
 										}
 									}
