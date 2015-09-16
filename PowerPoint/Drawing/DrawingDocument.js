@@ -1213,28 +1213,6 @@ function CDrawingDocument()
         this.m_oWordControl.m_oApi.ShowParaMarks = old_marks;
         return ret;
     }
-
-    this.isComleteRenderer = function()
-    {
-        if (this.m_lCurrentRendererPage >= this.SlidesCount)
-        {
-            this.m_lCurrentRendererPage = -1;
-            this.m_oDocRenderer = null;
-            this.m_oWordControl.m_oApi.ShowParaMarks = this.m_bOldShowMarks;
-            return true;
-        }
-        return false;
-    }
-    this.isComleteRenderer2 = function()
-    {
-        var start = Math.max(this.m_lCurrentRendererPage, 0);
-        var end = this.SlidesCount - 1;
-
-        if ((end + 1) >= this.SlidesCount)
-            return true;
-
-        return false;
-    }
     this.ToRendererPart = function()
     {
         var pagescount = this.SlidesCount;

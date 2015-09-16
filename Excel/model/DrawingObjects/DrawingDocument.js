@@ -2159,30 +2159,6 @@ function CDrawingDocument(drawingObjects)
         //console.log(ret);
         return ret;
     }
-
-    this.isComleteRenderer = function()
-    {
-        var pagescount = Math.min(this.m_lPagesCount, this.m_lCountCalculatePages);
-        if (this.m_lCurrentRendererPage >= pagescount)
-        {
-            this.m_lCurrentRendererPage = -1;
-            this.m_oDocRenderer = null;
-            this.m_oWordControl.m_oApi.ShowParaMarks = this.m_bOldShowMarks;
-            return true;
-        }
-        return false;
-    }
-    this.isComleteRenderer2 = function()
-    {
-        var pagescount = Math.min(this.m_lPagesCount, this.m_lCountCalculatePages);
-        var start = Math.max(this.m_lCurrentRendererPage, 0);
-        var end = Math.min(start + 50, pagescount - 1);
-
-        if ((end + 1) >= pagescount)
-            return true;
-
-        return false;
-    }
     this.ToRendererPart = function()
     {
         var pagescount = Math.min(this.m_lPagesCount, this.m_lCountCalculatePages);
@@ -2209,8 +2185,6 @@ function CDrawingDocument(drawingObjects)
             renderer.BeginPage(page.width_mm, page.height_mm);
             this.m_oLogicDocument.DrawPage(i, renderer);
             renderer.EndPage();
-
-            editor.async_SaveToPdf_Progress(parseInt((i + 1) * 100 / pagescount));
         }
 
         this.m_lCurrentRendererPage = end + 1;

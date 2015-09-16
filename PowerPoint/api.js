@@ -804,11 +804,6 @@ asc_docs_api.prototype.LoadDocument = function() {
   // Меняем тип состояния (на открытие)
   this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
 
-  if (this.DocInfo.get_OfflineApp() === true) {
-    this.OfflineAppDocumentStartLoad();
-    return;
-  }
-
   if (documentId) {
     this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
     var rData = {
@@ -832,7 +827,7 @@ asc_docs_api.prototype.LoadDocument = function() {
 
     // For test create unique id
     documentId = "test_presentation_id";
-    this.OfflineAppDocumentStartLoad();
+    this._OfflineAppDocumentStartLoad();
   }
   this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, this.WordControl.m_nZoomType);
 };
@@ -1023,35 +1018,24 @@ asc_docs_api.prototype.get_DocumentName = function()
 	return this.DocumentName;
 };
 
-asc_docs_api.prototype.OfflineAppDocumentStartLoad = function()
-{
-    var scriptElem = document.createElement('script');
+asc_docs_api.prototype._OfflineAppDocumentStartLoad = function() {
+  var t = this, scriptElem = document.createElement('script');
+  scriptElem.onload = scriptElem.onerror = function() {
+    t._OfflineAppDocumentEndLoad();
+  };
 
-    if (scriptElem.readyState)
-    {
-        scriptElem.onreadystatechange = function () {
-            if (this.readyState == 'complete' || this.readyState == 'loaded')
-            {
-                scriptElem.onreadystatechange = null;
-                setTimeout(editor.OfflineAppDocumentEndLoad, 0);
-            }
-        }
-    }
-    scriptElem.onload = scriptElem.onerror = this.OfflineAppDocumentEndLoad;
-
-    scriptElem.setAttribute('src',documentUrl + "editor.js");
-    scriptElem.setAttribute('type','text/javascript');
-    document.getElementsByTagName('head')[0].appendChild(scriptElem);
+  scriptElem.setAttribute('src', documentUrl + "editor.js");
+  scriptElem.setAttribute('type', 'text/javascript');
+  document.getElementsByTagName('head')[0].appendChild(scriptElem);
 };
 
-asc_docs_api.prototype.OfflineAppDocumentEndLoad = function()
-{
-    if (undefined == window["editor_bin"])
-        return;
+asc_docs_api.prototype._OfflineAppDocumentEndLoad = function() {
+  if (undefined == window["editor_bin"])
+    return;
 
-    editor.OpenDocument2(documentUrl, window["editor_bin"]);
-    //callback
-    editor.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
+  this.OpenDocument2(documentUrl, window["editor_bin"]);
+  //callback
+  this.DocumentOrientation = (null == this.WordControl.m_oLogicDocument) ? true : !this.WordControl.m_oLogicDocument.Orientation;
 };
 // Callbacks
 /* все имена callback'оф начинаются с On. Пока сделаны: 
@@ -1080,7 +1064,7 @@ var _callbacks = {};
 
 asc_docs_api.prototype.asc_registerCallback = function(name, callback) {
 	if (!_callbacks.hasOwnProperty(name))
-		_callbacks[name] = []
+		_callbacks[name] = [];
 	_callbacks[name].push(callback);
 };
 
@@ -1091,7 +1075,7 @@ asc_docs_api.prototype.asc_unregisterCallback = function(name, callback) {
 				_callbacks[name].splice(i, 1);
 		}
 	}
-		_callbacks[name] = []
+		_callbacks[name] = [];
 	_callbacks[name].push(callback);
 };
 

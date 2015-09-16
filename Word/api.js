@@ -833,11 +833,6 @@ asc_docs_api.prototype.LoadDocument = function() {
   // Меняем тип состояния (на открытие)
   this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
 
-  if (this.DocInfo.get_OfflineApp() === true) {
-    this.OfflineAppDocumentStartLoad();
-    return;
-  }
-
   if (documentId) {
     var rData = {
       "c": 'open',
@@ -860,7 +855,7 @@ asc_docs_api.prototype.LoadDocument = function() {
 
     // For test create unique id
     documentId = "test_document_id";
-    this.OfflineAppDocumentStartLoad();
+    this._OfflineAppDocumentStartLoad();
   }
 
   this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, 0);
@@ -2169,67 +2164,60 @@ asc_docs_api.prototype.asc_Print = function()
         }
     }
 
-	if (undefined != window['qtDocBridge'])
-	{
-        this.async_SaveToPdf();
-	}
-	else
-	{
-		this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);
-		var t = this;
-		if(null == this.WordControl.m_oLogicDocument)
-		{
-			var rData = {
-				"id":documentId,
-				"userid": documentUserId,
-				"vkey": documentVKey,
-				"format": documentFormat,
-				"c":"savefromorigin"};
-			this.fCurCallback = function(input) {
-				if(null != input && "savefromorigin" == input["type"]) {
-					if('ok' == input["status"]) {
-						var url = g_fGetSaveUrl(input["data"]);
-						if(url) {
-							t.processSavedFile(url, false);
-						}
-					} else {
-						t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-					}
-				} else {
-					t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-				}
-				// Меняем тип состояния (на никакое)
-				editor.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
-				t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);
-			};
-			// Меняем тип состояния (на сохранение)
-			this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
-			sendCommand2(t, null, rData);
-		}
-		else {
-			// Меняем тип состояния (на сохранение)
-			this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
-			_downloadAs(this, "save", null, null, c_oAscFileType.PDF, function(input){
-				if(null != input && "save" == input["type"]) {
-					if('ok' == input["status"]){
-						var url = g_fGetSaveUrl(input["data"]);
-						if(url) {
-							t.processSavedFile(url, false);
-						} else {
-							t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-						}
-					} else {
-						t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-					}
-				} else {
-					t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-				}
-				// Меняем тип состояния (на никакое)
-				editor.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
-				t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);
-			});
-		}
-	}
+  this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);
+  var t = this;
+  if(null == this.WordControl.m_oLogicDocument)
+  {
+    var rData = {
+      "id":documentId,
+      "userid": documentUserId,
+      "vkey": documentVKey,
+      "format": documentFormat,
+      "c":"savefromorigin"};
+    this.fCurCallback = function(input) {
+      if(null != input && "savefromorigin" == input["type"]) {
+        if('ok' == input["status"]) {
+          var url = g_fGetSaveUrl(input["data"]);
+          if(url) {
+            t.processSavedFile(url, false);
+          }
+        } else {
+          t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+        }
+      } else {
+        t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+      }
+      // Меняем тип состояния (на никакое)
+      editor.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+      t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);
+    };
+    // Меняем тип состояния (на сохранение)
+    this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
+    sendCommand2(t, null, rData);
+  }
+  else {
+    // Меняем тип состояния (на сохранение)
+    this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
+    _downloadAs(this, "save", null, null, c_oAscFileType.PDF, function(input){
+      if(null != input && "save" == input["type"]) {
+        if('ok' == input["status"]){
+          var url = g_fGetSaveUrl(input["data"]);
+          if(url) {
+            t.processSavedFile(url, false);
+          } else {
+            t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+          }
+        } else {
+          t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+        }
+      } else {
+        t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+      }
+      // Меняем тип состояния (на никакое)
+      editor.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+      t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);
+    });
+  }
 };
 asc_docs_api.prototype.Undo = function()
 {
@@ -5690,36 +5678,6 @@ asc_docs_api.prototype.sync_currentPageCallback = function(number){
 	this.asc_fireCallback("asc_onCurrentPage",number);
 };
 
-asc_docs_api.prototype.async_SaveToPdf = function(){
-
-    var oThis = this;
-    var pdf_interval = setInterval(function(){
-        var dd = oThis.WordControl.m_oDrawingDocument;
-
-        var is_end = dd.isComleteRenderer2();
-		oThis.async_SaveToPdf_PartCallback(dd.ToRendererPart(), is_end);
-        if (is_end)
-        {
-            clearInterval(pdf_interval);
-        }
-    }, 10);
-};
-
-asc_docs_api.prototype.async_SaveToPdf_PartCallback = function(part64, is_end)
-{
-	if (undefined != window['qtDocBridge'])
-	{
-		window['qtDocBridge']['printedDocumentPart'] (part64, is_end);
-	}
-};
-asc_docs_api.prototype.async_SaveToPdf_Progress = function(progress)
-{
-	if (undefined != window['qtDocBridge'])
-	{
-		window['qtDocBridge']['progressedSaveToPDF'] (progress);
-	}
-};
-
 /*----------------------------------------------------------------*/
 asc_docs_api.prototype.asc_enableKeyEvents = function(value){
 	if (this.WordControl.IsFocus != value) {
@@ -6204,11 +6162,6 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
 
     if (this.isViewMode)
         this.SetViewMode(true);
-		
-	if (undefined != window['qtDocBridge'])
-    {
-        window['qtDocBridge']['documentContentReady'] ();
-	}
 
 	// Меняем тип состояния (на никакое)
 	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
@@ -6302,14 +6255,8 @@ asc_docs_api.prototype.SendOpenProgress = function()
     //console.log("" + this.OpenDocumentProgress.CurrentFont);
 };
 
-asc_docs_api.prototype.sync_SendProgress = function(Percents)
-{
-    this.asc_fireCallback("asc_onOpenDocumentProgress2", Percents);
-	if (undefined != window['qtDocBridge'])
-    {
-        // push data to native QT code
-        window['qtDocBridge']['openedProgress'] (Percents);
-    }
+asc_docs_api.prototype.sync_SendProgress = function(Percents) {
+  this.asc_fireCallback("asc_onOpenDocumentProgress2", Percents);
 };
 
 asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
@@ -6798,54 +6745,31 @@ asc_docs_api.prototype.OnMouseUp = function(x, y)
 
 asc_docs_api.prototype.asyncImageEndLoaded2 = null;
 
-asc_docs_api.prototype.OfflineAppDocumentStartLoad = function()
-{
-	if (undefined != window['qtDocBridge'])
-    {
-        // native QT code
-        window['qtDocBridge']['documentLoadStart'] ();
-    }
-	
-    var scriptElem = document.createElement('script');
+asc_docs_api.prototype._OfflineAppDocumentStartLoad = function() {
+  var t = this, scriptElem = document.createElement('script');
 
-    if (scriptElem.readyState && false)
-    {
-        scriptElem.onreadystatechange = function () {
-            if (this.readyState == 'complete' || this.readyState == 'loaded')
-            {
-                scriptElem.onreadystatechange = null;
-                setTimeout(editor.OfflineAppDocumentEndLoad, 0);
-            }
-        }
-    }
-    scriptElem.onload = scriptElem.onerror = this.OfflineAppDocumentEndLoad;
+  scriptElem.onload = scriptElem.onerror = function() {
+    t._OfflineAppDocumentEndLoad();
+  };
 
-    scriptElem.setAttribute('src',documentUrl + "editor.js");
-    scriptElem.setAttribute('type','text/javascript');
-    document.getElementsByTagName('head')[0].appendChild(scriptElem);
+  scriptElem.setAttribute('src', documentUrl + "editor.js");
+  scriptElem.setAttribute('type', 'text/javascript');
+  document.getElementsByTagName('head')[0].appendChild(scriptElem);
 };
+asc_docs_api.prototype._OfflineAppDocumentEndLoad = function() {
+  var bIsViewer = false;
+  var sData = window["editor_bin"];
+  if (undefined == sData)
+    return;
+  if (c_oSerFormat.Signature !== sData.substring(0, c_oSerFormat.Signature.length)) {
+    bIsViewer = true;
+  }
 
-asc_docs_api.prototype.OfflineAppDocumentEndLoad = function()
-{
-	if (undefined != window['qtDocBridge'])
-    {
-        // native QT code
-        window['qtDocBridge']['documentLoadEnd'] ();
-    }
-	
-    if (undefined == window["editor_bin"])
-        return;
-
-    var bIsViewer = false;
-    if(window["editor_bin"].length > 0)
-    {
-        if(c_oSerFormat.Signature != window["editor_bin"].substring(0, c_oSerFormat.Signature.length))
-            bIsViewer = true;
-    }
-    if(true == bIsViewer)
-        editor.OpenDocument(documentUrl, window["editor_bin"]);
-    else
-        editor.OpenDocument2(documentUrl, window["editor_bin"]);
+  if (bIsViewer) {
+    this.OpenDocument(documentUrl, sData);
+  } else {
+    this.OpenDocument2(documentUrl, sData);
+  }
 };
 
 asc_docs_api.prototype.SetDrawImagePlaceParagraph = function(element_id, props)
@@ -6864,26 +6788,6 @@ asc_docs_api.prototype.asc_getAnchorPosition = function()
     var AnchorPos = this.WordControl.m_oLogicDocument.Get_SelectionAnchorPos();    
     return new asc_CRect(AnchorPos.X0, AnchorPos.Y, AnchorPos.X1 - AnchorPos.X0, 0);
 };
-
-function spellCheck (editor, rdata) {
-	//console.log("start - " + rdata);
-	// ToDo проверка на подключение
-	switch (rdata.type) {
-		case "spell":
-		case "suggest":
-			if (undefined != window['qtDocBridge'])
-			{
-				// push data to native QT code
-				window['qtDocBridge']['spellCheck'] (JSON.stringify(rdata));
-			}
-			else
-			{
-				editor.SpellCheckApi.spellCheck(JSON.stringify(rdata));
-			}
-			
-			break;
-	}
-}
 
 window["asc_nativeOnSpellCheck"] = function (response)
 {
