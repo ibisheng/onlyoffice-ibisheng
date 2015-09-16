@@ -2853,7 +2853,7 @@ CShape.prototype =
             oDocContent.Set_StartPage(0);
             oDocContent.Reset(0, 0, dMaxWidthRec, 20000);
             oDocContent.Recalculate_Page(oDocContent.StartPage, true);
-            oRet.w = dMaxWidthRec;
+            oRet.w = dMaxWidthRec + 0.001;
             oRet.contentH = oDocContent.Get_SummaryHeight();
             oRet.h = oRet.contentH;
             if(!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270))
@@ -2879,15 +2879,15 @@ CShape.prototype =
             {
                 if(!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270))
                 {
-                    oRet.w = w;
-                    oRet.h = h;
+                    oRet.w = w + 0.001;
+                    oRet.h = h + 0.001;
                     oRet.correctW = l_ins + r_ins;
                     oRet.correctH = t_ins + b_ins;
                 }
                 else
                 {
-                    oRet.w = h;
-                    oRet.h = w;
+                    oRet.w = h + 0.001;
+                    oRet.h = w + 0.001;
                     oRet.correctW = t_ins + b_ins;
                     oRet.correctH = l_ins + r_ins;
                 }
@@ -2899,15 +2899,15 @@ CShape.prototype =
                 {
                     if(!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270))
                     {
-                        oRet.w = w;
-                        oRet.h = h;
+                        oRet.w = w + 0.001;
+                        oRet.h = h + 0.001;
                         oRet.correctW = l_ins + r_ins;
                         oRet.correctH = t_ins + b_ins;
                     }
                     else
                     {
-                        oRet.w = h;
-                        oRet.h = w;
+                        oRet.w = h + 0.001;
+                        oRet.h = w + 0.001;
                         oRet.correctW = t_ins + b_ins;
                         oRet.correctH = l_ins + r_ins;
                     }
@@ -2916,15 +2916,15 @@ CShape.prototype =
                 {
                     if(!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270))
                     {
-                        oRet.w = h;
-                        oRet.h = w;
+                        oRet.w = h + 0.001;
+                        oRet.h = w + 0.001;
                         oRet.correctW = t_ins + b_ins;
                         oRet.correctH = l_ins + r_ins;
                     }
                     else
                     {
-                        oRet.w = w;
-                        oRet.h = h;
+                        oRet.w = w + 0.001;
+                        oRet.h = h + 0.001;
                         oRet.correctW = l_ins + r_ins;
                         oRet.correctH = t_ins + b_ins;
                     }
@@ -2964,8 +2964,8 @@ CShape.prototype =
             this.recalcInfo.recalcTitle =  oOldRecalcTitle;
             this.recalcInfo.bRecalculatedTitle =  bOldRecalcTitle;
             CheckSpPrXfrm(this, true);
-            this.spPr.xfrm.setExtX(this.extX);
-            this.spPr.xfrm.setExtY(this.extY);
+            this.spPr.xfrm.setExtX(this.extX + 0.001);
+            this.spPr.xfrm.setExtY(this.extY + 0.001);
             if(!this.bWordShape || this.group)
             {
                 this.spPr.xfrm.setOffX(this.x);
