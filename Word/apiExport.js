@@ -758,7 +758,6 @@ asc_CCommentDataWord.prototype['asc_putSolved'] = asc_CCommentDataWord.prototype
 asc_CCommentDataWord.prototype['asc_getReply'] = asc_CCommentDataWord.prototype.asc_getReply;
 asc_CCommentDataWord.prototype['asc_addReply'] = asc_CCommentDataWord.prototype.asc_addReply;
 asc_CCommentDataWord.prototype['asc_getRepliesCount'] = asc_CCommentDataWord.prototype.asc_getRepliesCount;
-window['spellCheck'] = spellCheck;
 window['_onOpenCommand'] = _onOpenCommand;
 window['_downloadAs'] = _downloadAs;
 window['_addImageUrl2'] = _addImageUrl2;

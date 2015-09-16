@@ -800,7 +800,6 @@ asc_docs_api.prototype.LoadDocument = function() {
 
   this.WordControl.m_oDrawingDocument.m_bIsOpeningDocument = true;
 
-
   // Меняем тип состояния (на открытие)
   this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
 
