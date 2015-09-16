@@ -5945,13 +5945,8 @@
                 var src = this.oMediaArray[nIndex];
                 if(null != src)
                 {
-                    if (window['scriptBridge']) {
-                        oDrawing.image.src = window['scriptBridge']['workPath']() + src;
-                        oDrawing.imageUrl = window['scriptBridge']['workPath']() + src;
-                    } else {
-                        oDrawing.image.src = src;
-                        oDrawing.imageUrl = src;
-                    }
+                  oDrawing.image.src = src;
+                  oDrawing.imageUrl = src;
                 }
             }
             else
