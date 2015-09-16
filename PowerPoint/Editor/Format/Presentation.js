@@ -2616,7 +2616,10 @@ CPresentation.prototype =
 
     Document_Format_Paste : function()
     {
-        // TODO: (начать с создания точки истории, либо добавить ее при обработке клавиш)
+        if(this.CopyTextPr && this.CopyParaPr)
+        {
+            this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.paragraphFormatPaste(this.CopyTextPr, this.CopyParaPr, false);
+        }
     },
 
     // Возвращаем выделенный текст, если в выделении не более 1 параграфа, и там нет картинок, нумерации страниц и т.д.

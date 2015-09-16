@@ -1264,7 +1264,7 @@ DrawingObjectsController.prototype =
         }
         else
         {
-            if(docContentFunction === CDocumentContent.prototype.Paragraph_Add && args[0].Type === para_TextPr)
+            if(docContentFunction === CDocumentContent.prototype.Paragraph_Add && args[0].Type === para_TextPr || docContentFunction === CDocumentContent.prototype.Paragraph_Format_Paste)
             {
                 this.applyDocContentFunction(docContentFunction, args, tableFunction);
             }
