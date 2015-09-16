@@ -10542,8 +10542,8 @@
         // ToDo заглушка..пора уже переделать обновление данных
         if (range.r1 >= this.nRowsCount || range.c1 >= this.nColsCount)
           return;
-        range.r2 = Math.min(range.r2, this.nRowsCount);
-        range.c2 = Math.min(range.c2, this.nColsCount);
+        range.r2 = Math.min(range.r2, this.nRowsCount - 1);
+        range.c2 = Math.min(range.c2, this.nColsCount - 1);
       }
 
 			if(gc_nMaxCol0 === range.c2 || gc_nMaxRow0 === range.r2)
