@@ -363,9 +363,7 @@ function CFontFileLoader(id)
 
         if (ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT && // проставляется в true на этапе сборки
 			this.CanUseOriginalFormat && // false if load embedded fonts
-			bIsSupportOriginalFormatFonts && // false if work on ie9
-			!window["qtDocBridge"] && // document editor desktop version
-			!window["scriptBridge"]) // table editor desktop version
+			bIsSupportOriginalFormatFonts) // false if work on ie9
         {
             this.LoadFontAsync2(basePath, _callback);
             return;
