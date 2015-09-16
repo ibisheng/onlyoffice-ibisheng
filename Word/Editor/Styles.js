@@ -7998,11 +7998,19 @@ CTextPr.prototype =
             this.Vanish = undefined;
 
         if(undefined !== this.Unifill && !this.Unifill.IsIdentical(TextPr.Unifill))
+        {
             this.Unifill = undefined;
+            this.Color = undefined;
+            this.TextFill = undefined;
+        }
 
 
         if(undefined !== this.TextFill &&  !this.TextFill.IsIdentical(TextPr.TextFill))
+        {
+            this.Unifill = undefined;
+            this.Color = undefined;
             this.TextFill = undefined;
+        }
 
 
         if(undefined !== this.TextOutline &&  !this.TextOutline.IsIdentical(TextPr.TextOutline))
