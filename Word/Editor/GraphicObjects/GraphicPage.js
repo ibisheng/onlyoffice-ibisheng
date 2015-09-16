@@ -145,9 +145,9 @@ CGraphicPage.prototype =
 
 
 
-    CheckRange: function(X0, Y0, X1, Y1, Y0sp, Y1Ssp, LeftField, RightField, HdrFtrRanges, docContent)
+    CheckRange: function(X0, Y0, X1, Y1, Y0sp, Y1Ssp, LeftField, RightField, HdrFtrRanges, docContent, bMathWrap)
     {
-        return this.wrapManager.checkRanges(X0, Y0, X1, Y1, Y0sp, Y1Ssp, LeftField, RightField, HdrFtrRanges, docContent);
+        return this.wrapManager.checkRanges(X0, Y0, X1, Y1, Y0sp, Y1Ssp, LeftField, RightField, HdrFtrRanges, docContent, bMathWrap);
     },
 
     removeFloatTableById: function(id)

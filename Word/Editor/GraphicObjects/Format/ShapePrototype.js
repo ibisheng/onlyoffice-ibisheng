@@ -415,9 +415,9 @@ CShape.prototype.Get_AllParagraphs = function(Props, ParaArray)
 
 
 
-CShape.prototype.getArrayWrapIntervals = function(x0,y0, x1, y1, Y0Sp, Y1Sp, LeftField, RightField, arr_intervals)
+CShape.prototype.getArrayWrapIntervals = function(x0,y0, x1, y1, Y0Sp, Y1Sp, LeftField, RightField, arr_intervals, bMathWrap)
 {
-    return this.parent.getArrayWrapIntervals(x0,y0, x1, y1, Y0Sp, Y1Sp, LeftField, RightField, arr_intervals);
+    return this.parent.getArrayWrapIntervals(x0,y0, x1, y1, Y0Sp, Y1Sp, LeftField, RightField, arr_intervals, bMathWrap);
 };
 CShape.prototype.updateTransformMatrix = function()
 {

@@ -190,13 +190,24 @@ CWrapPolygon.prototype =
         return {max: max_x, min: min_x};
     },
 
-    getArrayWrapIntervals: function(x0, y0, x1, y1, LeftField, RightField, ret)
+    getArrayWrapIntervals: function(x0, y0, x1, y1, LeftField, RightField, ret, bMathWrap)
     {
         if(y1 - this.top < 0.0001 || this.bottom - y0 < 0.0001)
             return ret;
 
         var ret2 = [];
-        switch(this.wordGraphicObject.wrappingType)
+        var nWrapType, nWrapSide;
+        if(bMathWrap === true)
+        {
+            nWrapType = WRAPPING_TYPE_SQUARE;
+            nWrapSide = WRAP_TEXT_SIDE_BOTH_SIDES
+        }
+        else
+        {
+            nWrapType = this.wordGraphicObject.wrappingType;
+            nWrapSide = this.wrapSide;
+        }
+        switch(nWrapType)
         {
             case WRAPPING_TYPE_NONE:
             {
@@ -204,7 +215,7 @@ CWrapPolygon.prototype =
             }
             case WRAPPING_TYPE_SQUARE:
             {
-                switch(this.wrapSide)
+                switch(nWrapSide)
                 {
                     case WRAP_TEXT_SIDE_BOTH_SIDES:
                     {
@@ -313,7 +324,7 @@ CWrapPolygon.prototype =
                     var oDistance = this.wordGraphicObject.Get_Distance();
                     max_x+= oDistance.R;
                     min_x-= oDistance.L;
-                    switch(this.wrapSide)
+                    switch(nWrapSide)
                     {
                         case WRAP_TEXT_SIDE_BOTH_SIDES:
                         {
@@ -347,9 +358,9 @@ CWrapPolygon.prototype =
             }
         }
         ret2.sort(function(a, b){return a.X0 - b.X0});
-        if(ret2.length > 0 &&  (this.wordGraphicObject.wrappingType === WRAPPING_TYPE_SQUARE || this.wordGraphicObject.wrappingType === WRAPPING_TYPE_TIGHT|| this.wordGraphicObject.wrappingType === WRAPPING_TYPE_THROUGH))
+        if(ret2.length > 0 &&  (nWrapType === WRAPPING_TYPE_SQUARE || nWrapType === WRAPPING_TYPE_TIGHT || nWrapType === WRAPPING_TYPE_THROUGH))
         {
-            var dx = this.wordGraphicObject.wrappingType === WRAPPING_TYPE_SQUARE ? 6.35 : 3.175 ;
+            var dx = nWrapType === WRAPPING_TYPE_SQUARE ? 6.35 : 3.175 ;
             if(ret2[0].X0  < LeftField + dx)
             {
                 ret2[0].X0 = x0 ;
@@ -362,8 +373,8 @@ CWrapPolygon.prototype =
         }
         for(var s = 0; s < ret2.length; ++s)
         {
-            ret2[s].typeLeft = this.wordGraphicObject.wrappingType;
-            ret2[s].typeRight = this.wordGraphicObject.wrappingType;
+            ret2[s].typeLeft = nWrapType;
+            ret2[s].typeRight = nWrapType;
         }
         for(s = 0; s < ret2.length; ++s)
         {
@@ -869,7 +880,7 @@ function CWrapManager(graphicPage)
 
 CWrapManager.prototype =
 {
-    checkRanges: function(x0, y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, hdrFtrRa, docContent)
+    checkRanges: function(x0, y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, hdrFtrRa, docContent, bMathWrap)
     {
         var arrGraphicObjects = this.arrGraphicObjects;
         var objects_count = arrGraphicObjects.length;
@@ -879,12 +890,12 @@ CWrapManager.prototype =
         {
             for(var index = 0; index < objects_count; ++index)
             {
-                arrGraphicObjects[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField,  arr_intervals);
+                arrGraphicObjects[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField,  arr_intervals, bMathWrap);
             }
             var arrFlowTables = this.graphicPage.flowTables;
             for(index = 0; index < arrFlowTables.length; ++index)
             {
-                arrFlowTables[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField,  arr_intervals);
+                arrFlowTables[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField,  arr_intervals, bMathWrap);
             }
         }
         else
@@ -895,7 +906,7 @@ CWrapManager.prototype =
                 {
                     if(arrGraphicObjects[index].parent && arrGraphicObjects[index].parent.DocumentContent === docContent)
                     {
-                        arrGraphicObjects[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals);
+                        arrGraphicObjects[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals, bMathWrap);
                     }
                 }
                 arrFlowTables = this.graphicPage.flowTables;
@@ -904,7 +915,7 @@ CWrapManager.prototype =
                     var cur_float_table = arrFlowTables[index];
                     if(cur_float_table.Table.Parent === docContent)
                     {
-                        cur_float_table.getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals);
+                        cur_float_table.getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals, bMathWrap);
                     }
                 }
             }
@@ -920,7 +931,7 @@ CWrapManager.prototype =
                     {
                         if(arrGraphicObjects[index].parent && arrGraphicObjects[index].parent.DocumentContent === docContent)
                         {
-                            arrGraphicObjects[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals);
+                            arrGraphicObjects[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals, bMathWrap);
                         }
                     }
                     arrFlowTables = hdr_footer_objects.flowTables;
@@ -929,7 +940,7 @@ CWrapManager.prototype =
                         var cur_float_table = arrFlowTables[index];
                         if(cur_float_table.Table.Parent === docContent)
                         {
-                            cur_float_table.getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals);
+                            cur_float_table.getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals, bMathWrap);
                         }
                     }
                 }
@@ -948,7 +959,7 @@ CWrapManager.prototype =
             var int1 = arr_intervals[s+1];
             var dist;
             if(int0.typeRight === WRAPPING_TYPE_SQUARE || int0.typeRight === WRAPPING_TYPE_TIGHT || int0.typeRight === WRAPPING_TYPE_THROUGH
-                || int1.typeLeft === WRAPPING_TYPE_SQUARE || int1.typeLeft === WRAPPING_TYPE_TIGHT || int1.typeLeft === WRAPPING_TYPE_THROUGH)
+                || int1.typeLeft === WRAPPING_TYPE_SQUARE || int1.typeLeft === WRAPPING_TYPE_TIGHT || int1.typeLeft === WRAPPING_TYPE_THROUGH || bMathWrap === true)
             {
                 dist = (int0.typeRight === WRAPPING_TYPE_TIGHT || int0.typeRight === WRAPPING_TYPE_THROUGH) || (int1.typeLeft === WRAPPING_TYPE_TIGHT || int1.typeLeft === WRAPPING_TYPE_THROUGH) ? 3.175 : 6.35;
                 var d = arr_intervals[s+1].X0 - arr_intervals[s].X1;

@@ -111,7 +111,7 @@ CFlowTable.prototype =
 
     },
 
-    getArrayWrapIntervals: function(x0,y0, x1, y1, Y0Sp, Y1Sp, LeftField, RightField, ret)
+    getArrayWrapIntervals: function(x0,y0, x1, y1, Y0Sp, Y1Sp, LeftField, RightField, ret, bMathWrap)
     {
         if(this.WrappingType === WRAPPING_TYPE_THROUGH || this.WrappingType === WRAPPING_TYPE_TIGHT)
         {
@@ -123,8 +123,8 @@ CFlowTable.prototype =
         if(y1 < top || y0 > bottom)
             return ret;
 
-        var b_check = false, X0, X1, Y1;
-        switch(this.WrappingType)
+        var b_check = false, X0, X1, Y1, WrapType = (bMathWrap === true) ? WRAPPING_TYPE_SQUARE : this.WrappingType;
+        switch(WrapType)
         {
             case WRAPPING_TYPE_NONE:
             {
@@ -234,8 +234,8 @@ CFlowParagraph.prototype =
 
     },
 
-    getArrayWrapIntervals: function(x0,y0, x1, y1, Y0Sp, Y1Sp, LeftField, RightField, ret)
+    getArrayWrapIntervals: function(x0,y0, x1, y1, Y0Sp, Y1Sp, LeftField, RightField, ret, bMathWrap)
     {
-        return CFlowTable.prototype.getArrayWrapIntervals.call(this, x0,y0, x1, y1, Y0Sp, Y1Sp, LeftField, RightField, ret);
+        return CFlowTable.prototype.getArrayWrapIntervals.call(this, x0,y0, x1, y1, Y0Sp, Y1Sp, LeftField, RightField, ret, bMathWrap);
     }
 };

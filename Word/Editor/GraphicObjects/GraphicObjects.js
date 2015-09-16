@@ -2852,11 +2852,11 @@ CGraphicObjects.prototype =
 
 
 
-    CheckRange: function(X0, Y0, X1, Y1, Y0Sp, Y1Sp, LeftField, RightField, PageNum, HdrFtrRanges, docContent)
+    CheckRange: function(X0, Y0, X1, Y1, Y0Sp, Y1Sp, LeftField, RightField, PageNum, HdrFtrRanges, docContent, bMathWrap)
     {
         if(isRealObject(this.graphicPages[PageNum]))
         {
-            var Ranges = this.graphicPages[PageNum].CheckRange(X0, Y0, X1, Y1, Y0Sp, Y1Sp, LeftField, RightField, HdrFtrRanges, docContent);
+            var Ranges = this.graphicPages[PageNum].CheckRange(X0, Y0, X1, Y1, Y0Sp, Y1Sp, LeftField, RightField, HdrFtrRanges, docContent, bMathWrap);
 
             var ResultRanges = [];
 

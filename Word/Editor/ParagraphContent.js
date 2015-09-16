@@ -6260,7 +6260,7 @@ ParaDrawing.prototype =
         return [];
     },
 
-    getArrayWrapIntervals: function(x0,y0, x1, y1, Y0Sp, Y1Sp, LeftField, RightField, arr_intervals)
+    getArrayWrapIntervals: function(x0,y0, x1, y1, Y0Sp, Y1Sp, LeftField, RightField, arr_intervals, bMathWrap)
     {
         if(this.wrappingType === WRAPPING_TYPE_THROUGH || this.wrappingType === WRAPPING_TYPE_TIGHT)
         {
@@ -6269,7 +6269,7 @@ ParaDrawing.prototype =
         }
 
         this.wrappingPolygon.wordGraphicObject = this;
-        return this.wrappingPolygon.getArrayWrapIntervals(x0,y0, x1, y1, LeftField, RightField, arr_intervals);
+        return this.wrappingPolygon.getArrayWrapIntervals(x0,y0, x1, y1, LeftField, RightField, arr_intervals, bMathWrap);
     },
 
 
