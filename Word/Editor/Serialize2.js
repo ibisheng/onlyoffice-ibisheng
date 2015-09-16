@@ -727,7 +727,7 @@ function CreateThemeUnifill(color, tint, shade){
 			case EThemeColor.themecolorHyperlink: id = 11;break;
 			case EThemeColor.themecolorLight1: id = 12;break;
 			case EThemeColor.themecolorLight2: id = 13;break;
-			case EThemeColor.themecolorNone: id = 14;break;
+			case EThemeColor.themecolorNone: return null;break;
 			case EThemeColor.themecolorText1: id = 15;break;
 			case EThemeColor.themecolorText2: id = 16;break;
 		}
