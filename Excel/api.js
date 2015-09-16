@@ -503,13 +503,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   spreadsheet_api.prototype.asc_LoadDocument = function() {
     var t = this;
 
-    if (this.DocInfo["OfflineApp"] && (true == this.DocInfo["OfflineApp"])) {
-      window['scriptBridge'] = {};
-      this.offlineModeInit();
-      this.offlineModeLoadDocument();
-      return;
-    }
-
     this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
     if (!this.chartEditor) {
       this._asc_open(function(response) {
@@ -3462,149 +3455,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     }
   };
 
-  // offline mode
-
-  spreadsheet_api.prototype.offlineModeInit = function() {
-    var t = this;
-
-    if (window['scriptBridge']) {
-      if (!window['scriptBridge']['_self']) {
-        window['scriptBridge']['_self'] = t;
-      }
-
-      if (!window['scriptBridge']['workPath']) {
-        window['scriptBridge']['workPath'] = function() {
-          return t.documentUrl;
-        };
-      }
-
-      if (!window['scriptBridge']['print']) {
-        window['scriptBridge']['print'] = function() {
-
-          var oAdditionalData = {};
-          oAdditionalData["documentId"] = t.documentId + "." + t.documentFormat;
-          oAdditionalData["vkey"] = t.documentVKey;
-          oAdditionalData["outputformat"] = c_oAscFileType.PDF;
-
-          t.adjustPrint = new asc_CAdjustPrint();
-          var printPagesData = t.wb.calcPagesPrint(t.adjustPrint);
-
-          var pdf_writer = new CPdfPrinter();
-          t.wb.printSheet(pdf_writer, printPagesData);
-
-          return pdf_writer.DocumentRenderer.Memory.GetBase64Memory();
-        };
-      }
-
-      if (!window['scriptBridge']['addFileImage']) {
-        window['scriptBridge']['addFileImage'] = function(imageUrl, x, y, width, height) {
-
-          t.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-
-          var ws = t.wb.getWorksheet();
-          var options = null;
-          if (x && y) {
-            var picker = ws.objectRender.getPositionInfo(x, y);
-            options = {cell: {col: picker.col, row: picker.row}, width: width, height: height};
-            // console.log(picker);
-          }
-
-          ws.objectRender.addImageDrawingObject(imageUrl, options);
-          t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-        };
-      }
-
-      if (!window['scriptBridge']['isDocumentModified']) {
-        window['scriptBridge']['isDocumentModified'] = function() {
-          var f = t.asc_isDocumentModified();
-          t.isDocumentModify = false;
-          t.handlers.trigger("asc_onDocumentModifiedChanged", false);
-          return f;
-        };
-      }
-
-      if (!window['scriptBridge']['save']) {
-        window['scriptBridge']['save'] = function(sFormat) {
-          var oAdditionalData = {};
-          oAdditionalData["documentId"] = t.documentId + "." + t.documentFormat;
-          oAdditionalData["vkey"] = t.documentVKey;
-          oAdditionalData["outputformat"] = sFormat;
-
-          t.wb._initCommentsToSave();
-          var oBinaryFileWriter = new Asc.BinaryFileWriter(t.wbModel);
-          oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
-
-          return oBinaryFileWriter.Write();
-        }
-      }
-
-      if (!window['scriptBridge']['showAdvancedOptionsDialog']) {
-        window['scriptBridge']['showAdvancedOptionsDialog'] = function(codepages) {
-          var cp = JSON.parse(codepages);
-          t.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
-          t.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), t.advancedOptionsAction);
-        }
-      }
-
-      if (!window['scriptBridge']['updateTitle']) {
-        window['scriptBridge']['updateTitle'] = function(title) {
-          t.documentTitle = title;
-        }
-      }
-
-      if (!window['scriptBridge']['loadDocumentFromString']) {
-        window['scriptBridge']['loadDocumentFromString'] = function(workbook) {
-          var wb = t.asc_OpenDocument(workbook);
-          t._startOpenDocument({returnCode: 0, val: wb});
-        }
-      }
-    }
-  };
-  spreadsheet_api.prototype.offlineModeLoadDocument = function() {
-    var t = this;
-
-    t.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-
-    function loadDocument(data) {
-
-      var workbook = data;
-      if (!data || Asc.c_oSerFormat.Signature !== data.substring(0, Asc.c_oSerFormat.Signature.length)) {
-        workbook = "XLSY;v1;1001;BAKAAgAAAwwDAAAEHwMAAADgAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIgAAAAAHgAAAAEZAAAAAAAAAAABAAAAAAIAAAAABAAAAAAFAAAAAAIdAAAAAxgAAAAGBAAAAAAHBAAAAAAIBAAAAAAJBAAAAAAECgAAAAUAAAAABQAAAAAGLwAAAAcqAAAAAQYGAAAAAAQAAAD/BAYOAAAAQwBhAGwAaQBiAHIAaQAGBQAAAAAAACZADwAAAAAAAAAAAQUAAAACAAAAAL0AAAAAOgAAAAEYAAAAAAYMAAAAUwBoAGUAZQB0ADEAAQQBAAAABAQAAABBADEACwoAAAABBQAAAAAAAC5ACQAAAAAAOgAAAAEYAAAAAAYMAAAAUwBoAGUAZQB0ADIAAQQCAAAABAQAAABBADEACwoAAAABBQAAAAAAAC5ACQAAAAAAOgAAAAEYAAAAAAYMAAAAUwBoAGUAZQB0ADMAAQQDAAAABAQAAABBADEACwoAAAABBQAAAAAAAC5ACQAAAAAFAAAAAAAAAAA=";
-      }
-      var wb = t.asc_OpenDocument(workbook);
-      t._startOpenDocument({returnCode: 0, val: wb});
-    }
-
-    $.ajax({
-      type: 'GET',
-      url: t.documentUrl + "editor.js?callback=?",
-      jsonpCallback: 'jsonCallback',
-      async: false,
-      cache: false,
-      dataType: 'jsonp',
-      contentType: "application/json",
-      crossDomain: true,
-      success: function(data) {
-        loadDocument(data);
-      },
-      error: function(jqXHR, textStatus, ex) {
-        // console.log(textStatus + "," + ex + "," + jqXHR.responseText);
-        loadDocument(undefined);
-      }
-    });
-  };
-
-  spreadsheet_api.prototype.asc_openNewDocument = function() {
-    if (undefined != window['appBridge']) {
-      window['appBridge']['dummyCommandNewDocument']();
-    }
-  };
-  spreadsheet_api.prototype.asc_loadDocumentFromDisk = function() {
-    if (undefined != window['appBridge']) {
-      window['appBridge']['dummyCommandLoadDocumentFromDisk']();
-    }
-  };
-
   spreadsheet_api.prototype.asc_nativeOpenFile = function(base64File, version) {
     asc["editor"] = this;
 
@@ -3992,11 +3842,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   prot["asc_undoAllChanges"] = prot.asc_undoAllChanges;
 
   prot["asc_setLocalization"] = prot.asc_setLocalization;
-
-  // offline mode
-
-  prot["asc_openNewDocument"] = prot.asc_openNewDocument;
-  prot["asc_loadDocumentFromDisk"] = prot.asc_loadDocumentFromDisk;
 
   // native
   prot["asc_nativeOpenFile"] = prot.asc_nativeOpenFile;
