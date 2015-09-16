@@ -9331,6 +9331,7 @@
 					functionModelAction = function () {
 						t.model.setColHidden(/*bHidden*/false, arn.c1, arn.c2);
 						fullRecalc = true;
+                        reinitRanges = true;
 					};
 					oChangeData.hided = new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0);
 					this._isLockedAll(onChangeWorksheetCallback);
@@ -9339,6 +9340,7 @@
 					functionModelAction = function () {
 						t.model.setColHidden(/*bHidden*/true, arn.c1, arn.c2);
 						fullRecalc = true;
+                        reinitRanges = true;
 					};
 					oChangeData.hided = new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0);
 					this._isLockedAll(onChangeWorksheetCallback);
@@ -9358,6 +9360,7 @@
 						t.model.setRowHidden(/*bHidden*/false, arn.r1, arn.r2);
 						t.autoFilters.reDrawFilter(arn);
 						fullRecalc = true;
+                        reinitRanges = true;
 					};
 					oChangeData.hided = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2);
 					this._isLockedAll(onChangeWorksheetCallback);
@@ -9367,6 +9370,7 @@
 						t.model.setRowHidden(/*bHidden*/true, arn.r1, arn.r2);
 						t.autoFilters.reDrawFilter(arn);
 						fullRecalc = true;
+                        reinitRanges = true;
 					};
 					oChangeData.hided = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2);
 					this._isLockedAll(onChangeWorksheetCallback);
@@ -9384,6 +9388,7 @@
 								History.StartTransaction();
 								if (range.addCellsShiftRight()) {
 									fullRecalc = true;
+                                    reinitRanges = true;
 									if(isCheckChangeAutoFilter === true)
 										t.autoFilters.insertColumn(prop, arn, c_oAscInsertOptions.InsertCellsAndShiftRight);
 									t.cellCommentator.updateCommentsDependencies(true, val, arn);
@@ -9405,6 +9410,7 @@
 								History.StartTransaction();
 								if (range.addCellsShiftBottom()) {
 									fullRecalc = true;
+                                    reinitRanges = true;
 									if(isCheckChangeAutoFilter === true)
 										t.autoFilters.insertRows(prop, arn, c_oAscInsertOptions.InsertCellsAndShiftDown);
 									t.cellCommentator.updateCommentsDependencies(true, val, arn);
@@ -9421,6 +9427,7 @@
 								History.Create_NewPoint();
 								History.StartTransaction();
 								fullRecalc = true;
+                                reinitRanges = true;
 								t.model.insertColsBefore(arn.c1, arn.c2 - arn.c1 + 1);
 								t.autoFilters.insertColumn(prop, arn, c_oAscInsertOptions.InsertColumns);
 								t.objectRender.updateDrawingObject(true, val, arn);
@@ -9435,6 +9442,7 @@
 						case c_oAscInsertOptions.InsertRows:
 							functionModelAction = function () {
 								fullRecalc = true;
+                                reinitRanges = true;
 								t.model.insertRowsBefore(arn.r1, arn.r2 - arn.r1 + 1);
 								t.autoFilters.insertRows(prop, arn, c_oAscInsertOptions.InsertRows);
 								t.objectRender.updateDrawingObject(true, val, arn);
@@ -9470,6 +9478,7 @@
 									t.objectRender.updateDrawingObject(false, val, checkRange);
 								}
 								History.EndTransaction();
+                                reinitRanges = true;
 							};
 
 							oChangeData.changedRange = new asc_Range(checkRange.c1, checkRange.r1, gc_nMaxCol0, checkRange.r2);
@@ -9495,6 +9504,8 @@
 										t.objectRender.updateDrawingObject(false, val, checkRange);
 									}
 									History.EndTransaction();
+
+                                    reinitRanges = true;
 							};
 
 							oChangeData.changedRange = new asc_Range(checkRange.c1, checkRange.r1, checkRange.c2, gc_nMaxRow0);
@@ -9507,6 +9518,7 @@
 
 							functionModelAction = function () {
 								fullRecalc = true;
+                                reinitRanges = true;
 								History.Create_NewPoint();
 								History.StartTransaction();
 								t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
@@ -9528,6 +9540,7 @@
 
 							functionModelAction = function () {
 								fullRecalc = true;
+                                reinitRanges = true;
 								History.Create_NewPoint();
 								History.StartTransaction();
 								t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
@@ -9551,6 +9564,7 @@
 						isUpdateCols = true;
 						isUpdateRows = true;
 						fullRecalc = true;
+                        reinitRanges = true;
 					};
 
 					this._isLockedAll (onChangeWorksheetCallback);
