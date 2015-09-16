@@ -512,16 +512,17 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   };
 
   spreadsheet_api.prototype.asc_LoadEmptyDocument = function() {
+    this.CoAuthoringApi.auth(this.asc_getViewerMode());
+    
     var emptyWorkbook = getEmptyWorkbook() + "";
     if (emptyWorkbook.length && (Asc.c_oSerFormat.Signature === emptyWorkbook.substring(0, Asc.c_oSerFormat.Signature.length))) {
       this.isChartEditor = true;
-      var wb = this.asc_OpenDocument(emptyWorkbook);
-
+      var wb = this._openDocument(emptyWorkbook);
       this._startOpenDocument({returnCode: 0, val: wb});
     }
   };
 
-  spreadsheet_api.prototype.asc_OpenDocument = function(data) {
+  spreadsheet_api.prototype._openDocument = function(data) {
     var wb = new Workbook(this.handlers, this);
     this.initGlobalObjects(wb);
     this.wbModel = wb;
@@ -938,7 +939,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
         return;
       }
 
-      var wb = t.asc_OpenDocument(result.data);
+      var wb = t._openDocument(result.data);
       if (callback) {
         callback({returnCode: 0, val: wb});
       }
@@ -963,7 +964,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     var data = getTestWorkbook();
     var sData = data + "";
     if (Asc.c_oSerFormat.Signature === sData.substring(0, Asc.c_oSerFormat.Signature.length)) {
-      var wb = this.asc_OpenDocument(sData);
+      var wb = this._openDocument(sData);
       fCallback({returnCode: 0, val: wb});
     }
   };
