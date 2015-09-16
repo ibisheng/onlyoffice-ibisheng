@@ -753,19 +753,12 @@ asc_docs_api.prototype.asc_getEditorPermissions = function() {
 
 asc_docs_api.prototype.asc_getLicense = function () 
 {
-	if (undefined != window['qtDocBridge'])
-	{
-		editor._onGetLicense(null);
-	}
-	else
-	{
-		var t = this;
-		var rdata = {
-			"c" 		: "getlicense"
-		};
-		//todo
-		sendCommand2(function (response) {t._onGetLicense(response);}, _sendCommandCallback, rdata);
-	}
+  var t = this;
+  var rdata = {
+    "c" 		: "getlicense"
+  };
+  //todo
+  sendCommand2(function (response) {t._onGetLicense(response);}, _sendCommandCallback, rdata);
 };
 
 asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(response) {
