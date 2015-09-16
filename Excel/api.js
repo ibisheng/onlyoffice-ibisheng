@@ -54,14 +54,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     this.documentUrl = "null";
     this.documentUrlChanges = null;
     this.documentTitle = "null";
-    this.documentTitleWithoutExtention = "null";
     this.documentFormat = "null";
     this.documentVKey = null;
     this.documentFormatSave = c_oAscFileType.XLSX;
     this.chartEditor = undefined;
     this.documentOpenOptions = undefined;		// Опции при открытии (пока только опции для CSV)
     this.documentCallbackUrl = undefined;		// Ссылка для отправления информации о документе
-    this.documentOrigin = "";
     this.DocInfo = null;
 
     // объекты, нужные для отправки в тулбар (шрифты, стили)
@@ -439,16 +437,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       // }
       // }
 
-      var nIndex = -1;
-      if (this.documentTitle) {
-        nIndex = this.documentTitle.lastIndexOf(".");
-      }
-      if (-1 != nIndex) {
-        this.documentTitleWithoutExtention = this.documentTitle.substring(0, nIndex);
-      } else {
-        this.documentTitleWithoutExtention = this.documentTitle;
-      }
-
       // Выставляем пользователя
       this.User = new asc.asc_CUser();
       this.User.asc_setId(this.DocInfo["UserId"]);
@@ -457,15 +445,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
     if (undefined !== window["AscDesktopEditor"]) {
       window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
-    }
-
-    var sProtocol = window.location.protocol;
-    var sHost = window.location.host;
-    this.documentOrigin = "";
-    if (sProtocol && "" != sProtocol) {
-      this.documentOrigin = sProtocol + "//" + sHost;
-    } else {
-      this.documentOrigin = sHost;
     }
   };
   spreadsheet_api.prototype.asc_getLocaleExample = function(val, number, date) {
@@ -920,7 +899,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       return;
     }
 
-    var t = this, rData, codePageCsv, delimiterCsv;
+    var t = this, codePageCsv, delimiterCsv;
     switch (result["type"]) {
       case "updateversion":
         if (this.asc_getViewerMode()) {
