@@ -6503,11 +6503,12 @@ CStylesPainter.prototype =
             graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm / 2, _canvas.height * g_dKoef_pix_to_mm / 2);
         graphics.m_oFontManager = g_fontManager;
 
+        var DocumentStyles = _api.WordControl.m_oLogicDocument.Get_Styles();
         this.defaultStyles = [];
         for (var i in styles)
         {
 			var style = styles[i];
-			if(true == style.qFormat)
+			if(true == style.qFormat && null === DocumentStyles.Get_StyleIdByName(style.Name, false))
 			{
 				this.drawStyle(graphics, style, cur_index);
 				this.defaultStyles[cur_index] = new CStyleImage(style.Name, cur_index, c_oAscStyleImage.Default, style.uiPriority);
