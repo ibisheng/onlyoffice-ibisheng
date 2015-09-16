@@ -1856,7 +1856,7 @@ asc_docs_api.prototype.put_TextPrFontName = function(name)
             History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
             this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({
                 FontFamily: {
-                    Name: fontinfo.Name,
+                    Name: name,
                     Index: -1
                 }
             }));

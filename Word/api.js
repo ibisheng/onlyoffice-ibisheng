@@ -2974,7 +2974,7 @@ asc_docs_api.prototype.put_TextPrFontName = function(name)
         if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
         {
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_SetTextFontName);
-            this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { FontFamily : { Name : fontinfo.Name , Index : -1 } } ) );
+            this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { FontFamily : { Name : name , Index : -1 } } ) );
         }
     }
 };
