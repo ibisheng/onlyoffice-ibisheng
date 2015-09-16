@@ -3382,6 +3382,9 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
             case para_End:
             {
                 var SectPr = PRSA.Paragraph.Get_SectionPr();
+                if (!PRSA.Paragraph.LogicDocument || PRSA.Paragraph.LogicDocument !== PRSA.Paragraph.Parent)
+                    SectPr = undefined;
+
                 if ( undefined !== SectPr )
                 {
                     // Нас интересует следующая секция
@@ -4233,6 +4236,8 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
             case para_End:
             {
                 var SectPr = Para.Get_SectionPr();
+                if (!Para.LogicDocument || Para.LogicDocument !== Para.Parent)
+                    SectPr = undefined;
 
                 if ( undefined === SectPr )
                 {
