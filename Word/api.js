@@ -762,64 +762,47 @@ asc_docs_api.prototype._onGetLicense = function (response) {
 		this.asc_fireCallback("asc_onGetLicense", oLicense);
 	}
 };
-asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo)
-{
-	if(c_DocInfo)
-		this.DocInfo = c_DocInfo;
-	
-	if (this.DocInfo) {
-		documentId = this.DocInfo.get_Id();
-		documentUserId = this.DocInfo.get_UserId();
-		documentUrl = this.DocInfo.get_Url();
-		documentTitle = this.DocInfo.get_Title();
-		documentFormat = this.DocInfo.get_Format();
-        documentCallbackUrl = this.DocInfo.get_CallbackUrl();
-		// if(documentFormat)
-		// {
-			// switch(documentFormat)
-			// {
-				// case "docx" : documentFormatSave = c_oAscFileType.DOCX;break;
-				// case "doc" : documentFormatSave = c_oAscFileType.DOC;break;
-				// case "odt" : documentFormatSave = c_oAscFileType.ODT;break;
-				// case "rtf" : documentFormatSave = c_oAscFileType.RTF;break;
-				// case "txt" : documentFormatSave = c_oAscFileType.TXT;break;
-				// case "htm" :
-				// case "html" : documentFormatSave = c_oAscFileType.HTML;break;
-				// case "mht" : documentFormatSave = c_oAscFileType.MHT;break;
-				// case "pdf" : documentFormatSave = c_oAscFileType.PDF;break;
-				// case "epub" : documentFormatSave = c_oAscFileType.EPUB;break;
-				// case "fb2" : documentFormatSave = c_oAscFileType.FB2;break;
-				// case "mobi" : documentFormatSave = c_oAscFileType.MOBI;break;
-			// }
-		// }
-		var nIndex = -1;
-		if(documentTitle)
-			nIndex = documentTitle.lastIndexOf(".");
-		if(-1 != nIndex)
-			documentTitleWithoutExtention = documentTitle.substring(0, nIndex);
-		else
-			documentTitleWithoutExtention = documentTitle;
-		
-		documentVKey = this.DocInfo.get_VKey();
-		// documentOrigin  = this.DocInfo.get_Origin();
-		var sProtocol = window.location.protocol;
-		var sHost = window.location.host;
-		documentOrigin = "";
-		if(sProtocol && "" != sProtocol)
-			documentOrigin = sProtocol + "//" + sHost;
-		else
-			documentOrigin = sHost;
+asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo) {
+  if (c_DocInfo) {
+    this.DocInfo = c_DocInfo;
+  }
 
-		this.User = new Asc.asc_CUser();
-		this.User.asc_setId(this.DocInfo.get_UserId());
-		this.User.asc_setUserName(this.DocInfo.get_UserName());
-	}
-	
-    this.DocumentName = documentTitle;
-    if (undefined !== window["AscDesktopEditor"])
-    {
-        window["AscDesktopEditor"]["SetDocumentName"](this.DocumentName);
+  if (this.DocInfo) {
+    documentId = this.DocInfo.get_Id();
+    documentUserId = this.DocInfo.get_UserId();
+    documentUrl = this.DocInfo.get_Url();
+    documentTitle = this.DocInfo.get_Title();
+    documentFormat = this.DocInfo.get_Format();
+    documentCallbackUrl = this.DocInfo.get_CallbackUrl();
+    var nIndex = -1;
+    if (documentTitle) {
+      nIndex = documentTitle.lastIndexOf(".");
     }
+    if (-1 != nIndex) {
+      documentTitleWithoutExtention = documentTitle.substring(0, nIndex);
+    } else {
+      documentTitleWithoutExtention = documentTitle;
+    }
+
+    documentVKey = this.DocInfo.get_VKey();
+    var sProtocol = window.location.protocol;
+    var sHost = window.location.host;
+    documentOrigin = "";
+    if (sProtocol && "" != sProtocol) {
+      documentOrigin = sProtocol + "//" + sHost;
+    } else {
+      documentOrigin = sHost;
+    }
+
+    this.User = new Asc.asc_CUser();
+    this.User.asc_setId(this.DocInfo.get_UserId());
+    this.User.asc_setUserName(this.DocInfo.get_UserName());
+  }
+
+  this.DocumentName = documentTitle;
+  if (undefined !== window["AscDesktopEditor"]) {
+    window["AscDesktopEditor"]["SetDocumentName"](this.DocumentName);
+  }
 };
 asc_docs_api.prototype.asc_setLocale = function(val)
 {
@@ -7243,30 +7226,34 @@ asc_docs_api.prototype.asc_continueSaving = function () {
 
 // Version History
 
-asc_docs_api.prototype.asc_showRevision = function (newObj) {
-	if (!newObj.docId)
-		return;
-	if (this.isCoAuthoringEnable)
-		this.asc_coAuthoringDisconnect();
+asc_docs_api.prototype.asc_showRevision = function(newObj) {
+  if (!newObj.docId) {
+    return;
+  }
+  if (this.isCoAuthoringEnable) {
+    this.asc_coAuthoringDisconnect();
+  }
 
-	var bUpdate = true;
-	if (null === this.VersionHistory)
-		this.VersionHistory = new window["Asc"].asc_CVersionHistory(newObj);
-	else
-		bUpdate = this.VersionHistory.update(newObj);
-	if (bUpdate) {
-		this.asc_CloseFile();
+  var bUpdate = true;
+  if (null === this.VersionHistory) {
+    this.VersionHistory = new window["Asc"].asc_CVersionHistory(newObj);
+  } else {
+    bUpdate = this.VersionHistory.update(newObj);
+  }
+  if (bUpdate) {
+    this.asc_CloseFile();
 
-		this.DocInfo.put_Id(this.VersionHistory.docId);
-		this.DocInfo.put_Url(this.VersionHistory.url);
-		documentUrlChanges = this.VersionHistory.urlChanges;
-		this.LoadDocument();
-	} else if (this.VersionHistory.currentChangeId < newObj.currentChangeId) {
-		// Нужно только добавить некоторые изменения
-		CollaborativeEditing.Clear_CollaborativeMarks();
-		editor.VersionHistory.applyChanges(editor);
-		CollaborativeEditing.Apply_Changes();
-	}
+    this.DocInfo.put_Id(this.VersionHistory.docId);
+    this.DocInfo.put_Url(this.VersionHistory.url);
+    documentUrlChanges = this.VersionHistory.urlChanges;
+    this.asc_setDocInfo(this.DocInfo);
+    this.LoadDocument();
+  } else if (this.VersionHistory.currentChangeId < newObj.currentChangeId) {
+    // Нужно только добавить некоторые изменения
+    CollaborativeEditing.Clear_CollaborativeMarks();
+    editor.VersionHistory.applyChanges(editor);
+    CollaborativeEditing.Apply_Changes();
+  }
 };
 asc_docs_api.prototype.asc_undoAllChanges = function ()
 {
