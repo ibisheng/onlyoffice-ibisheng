@@ -63,6 +63,15 @@ var g_nMaxJsonLengthChecked = g_nMaxJsonLength / 1000;
 var g_nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
 var g_cCharDelimiter = String.fromCharCode(5);
 
+function getEncodingParams() {
+	var res = [];
+	for(var i = 0; i < c_oAscEncodings.length; ++i) {
+		var encoding = c_oAscEncodings[i];
+		var newElem = {'codepage': encoding[0], 'name': encoding[3]};
+		res.push(newElem);
+	}
+	return res;
+}
 function DocumentUrls(){
 	this.urls = {};
 	this.urlsReverse = {};

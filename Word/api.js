@@ -15,7 +15,7 @@ var documentFormat = 'null';
 var documentVKey = null;
 var documentOrigin = "";
 var documentFormatSave = c_oAscFileType.DOCX;
-var documentFormatSaveTxtCodepage = 65001;//utf8
+var documentFormatSaveTxtCodepage = 46;//65001 utf8
 var documentCallbackUrl = undefined;		// Ссылка для отправления информации о документе
 
 function CDocOpenProgress()
@@ -1416,6 +1416,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
 					t.asc_getEditorPermissionsCallback(input);
 				}
 				break;
+				case 'reopen':
 				case 'open': {
 					switch(input["status"]) {
 						case "ok":
@@ -1427,7 +1428,22 @@ asc_docs_api.prototype._coAuthoringInit = function()
 								t.asc_fireCallback("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
 							}
 						break;
-						case "needparams": break;
+						case "needparams":
+						//todo dialog
+						var rData = {
+							"id":documentId,
+							"userid": documentUserId,
+							"format": documentFormat,
+							"vkey": documentVKey,
+							"editorid": c_oEditorId.Word,
+							"c":"reopen",
+							"url": documentUrl,
+							"title": documentTitle,
+							"codepage": documentFormatSaveTxtCodepage,
+							"embeddedfonts": t.isUseEmbeddedCutFonts
+						};
+						sendCommand2(t, null, rData);
+						break;
 						case "err":
 							t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
 						break;
