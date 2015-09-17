@@ -506,6 +506,8 @@ function CGraphics()
     this.TextureFillTransformScaleY = 1;
     this.IsThumbnail = false;
 
+    this.IsDemonstrationMode = false;
+
     this.GrState = new CGrState();
     this.GrState.Parent = this;
 
@@ -2043,7 +2045,7 @@ CGraphics.prototype =
 
     DrawLockObjectRect : function(lock_type, x, y, w, h)
     {
-		if (editor.isViewMode || this.IsThumbnail || lock_type == locktype_None)
+		if (editor.isViewMode || this.IsThumbnail || lock_type == locktype_None || this.IsDemonstrationMode)
 			return;
 
 		if (editor.WordControl.m_oDrawingDocument.IsLockObjectsEnable === false && lock_type == locktype_Mine)

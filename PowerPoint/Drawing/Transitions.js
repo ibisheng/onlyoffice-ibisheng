@@ -196,6 +196,9 @@ function CTransitionAnimation(htmlpage)
             g.transform(1,0,0,1,0,0);
             g.IsNoDrawingEmptyPlaceholder = true;
 
+            if (this.HtmlPage.DemonstrationManager.Mode)
+                g.IsDemonstrationMode = true;
+
             this.HtmlPage.m_oLogicDocument.DrawPage(slide_num - 1, g);
         }
     }
@@ -233,6 +236,9 @@ function CTransitionAnimation(htmlpage)
 
             g.transform(1,0,0,1,0,0);
             g.IsNoDrawingEmptyPlaceholder = true;
+
+            if (this.HtmlPage.DemonstrationManager.Mode)
+                g.IsDemonstrationMode = true;
 
             this.HtmlPage.m_oLogicDocument.DrawPage(slide_num, g);
         }
@@ -2663,6 +2669,9 @@ function CDemonstrationManager(htmlpage)
 
         g.transform(1,0,0,1,0,0);
         g.IsNoDrawingEmptyPlaceholder = true;
+
+        if (this.HtmlPage.DemonstrationManager.Mode)
+            g.IsDemonstrationMode = true;
 
         this.HtmlPage.m_oLogicDocument.DrawPage(slide_num, g);
 
