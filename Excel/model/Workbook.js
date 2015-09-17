@@ -1455,7 +1455,13 @@ DefNameVertex.prototype = {
     constructor:Vertex,
 
     clone:function(){
-        return new DefNameVertex( this.sheetId, this.cellId, this.Ref, this.Hidden, this.wb, this.isTable );
+        var dN = new DefNameVertex( this.sheetId, this.cellId, this.Ref, this.Hidden, this.wb, this.isTable );
+        dN.parsedRef = new parserFormula( dN.Ref, "", this.wb.getWorksheet(0) );
+        if( dN.Ref ){
+            dN.parsedRef.parse();
+//            dN.parsedRef.buildDependencies();
+        }
+        return dN;
     },
 
     changeScope:function( newScope ){
@@ -2188,6 +2194,7 @@ Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 			if(se){
 				for(var id in se){
 					var slave = se[id];
+                    if( slave.isDefinedName ) continue;
 					var cell = slave.returnCell();
 					if( cell && cell.formulaParsed && cell.formulaParsed.is3D )
 					{
