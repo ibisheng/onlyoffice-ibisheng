@@ -303,7 +303,7 @@ CDocumentContent.prototype =
     //         false - запрос пришел от родительского класса
     // Запрос от родительского класса нужен, например, для колонтитулов, потому
     // что у них врапится текст не колонтитула, а документа.
-    CheckRange : function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum_rel, Inner)
+    CheckRange : function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum_rel, Inner, bMathWrap)
     {
 		if(this.LogicDocument && typeof(editor) !== "undefined" && editor.isDocumentEditor)
 		{
@@ -311,7 +311,7 @@ CDocumentContent.prototype =
 				Inner = true;
 
 			if ( (false === this.TurnOffInnerWrap && true === Inner) || (false === Inner) )
-				return this.LogicDocument.DrawingObjects.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum_rel + this.Get_StartPage_Absolute(), [], this );
+				return this.LogicDocument.DrawingObjects.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum_rel + this.Get_StartPage_Absolute(), [], this, bMathWrap );
 		}
 
         return [];

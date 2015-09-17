@@ -391,9 +391,9 @@ CHeaderFooter.prototype =
         return this.Content.Is_PointInDrawingObjects( X, Y, this.Content.Get_StartPage_Absolute() );
     },
 
-    CheckRange : function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf)
+    CheckRange : function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, bMathWrap)
     {
-        return this.Content.CheckRange( X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, 0, false );
+        return this.Content.CheckRange( X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, 0, false, bMathWrap );
     },
 
     AddPageNum : function(Align)
@@ -1466,7 +1466,7 @@ CHeaderFooterController.prototype =
         Footer && Footer.Set_Page(OldPageFtr);
     },
 
-    CheckRange : function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageIndex)
+    CheckRange : function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageIndex, bMathWrap)
     {
         if (undefined === this.Pages[PageIndex])
             return [];
@@ -1478,10 +1478,10 @@ CHeaderFooterController.prototype =
         var FooterRange = [];
 
         if ( null != Header )
-            HeaderRange = Header.CheckRange( X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf );
+            HeaderRange = Header.CheckRange( X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, bMathWrap );
 
         if ( null != Footer )
-            FooterRange = Footer.CheckRange( X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf );
+            FooterRange = Footer.CheckRange( X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, bMathWrap );
 
         return HeaderRange.concat( FooterRange );
     },
