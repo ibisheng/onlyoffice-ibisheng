@@ -1846,6 +1846,10 @@ ScrollObject.prototype = {
         this.paneWidth = this.canvasW - this.arrowPosition * 2;
         this.RecalcScroller();
         if ( this.isVerticalScroll ) {
+
+            if (this.scrollVCurrentY > this.maxScrollY)
+                this.scrollVCurrentY = this.maxScrollY;
+
             this.scrollToY( this.scrollVCurrentY );
             if(this.maxScrollY == 0){
                 this.canvas.style.display = "none";
@@ -1855,6 +1859,10 @@ ScrollObject.prototype = {
             }
         }
         else if ( this.isHorizontalScroll ) {
+
+            if (this.scrollHCurrentX > this.maxScrollX)
+                this.scrollHCurrentX = this.maxScrollX;
+
             this.scrollToX( this.scrollHCurrentX );
             if(this.maxScrollX == 0){
                 this.canvas.style.display = "none";
