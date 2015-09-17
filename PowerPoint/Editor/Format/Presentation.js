@@ -2841,7 +2841,7 @@ CPresentation.prototype =
         {
             editor.sync_slidePropCallback(this.Slides[this.CurPage]);
             var graphic_objects = this.Slides[this.CurPage].graphicObjects;
-            var target_content = graphic_objects.getTargetDocContent(), drawing_props = graphic_objects.getDrawingProps(), i;
+            var target_content = graphic_objects.getTargetDocContent(undefined, true), drawing_props = graphic_objects.getDrawingProps(), i;
             var para_pr = graphic_objects.getParagraphParaPr(), text_pr = graphic_objects.getParagraphTextPr();
             var flag = undefined;
             if(!para_pr)
