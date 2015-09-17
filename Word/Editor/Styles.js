@@ -1118,11 +1118,7 @@ CStyle.prototype =
     {
         var TablePr =
         {
-            TableInd :
-            {
-                W    : 0,
-                Type : tblwidth_Mm
-            },
+            TableInd : 0 ,
             TableCellMar :
             {
                 Top :
