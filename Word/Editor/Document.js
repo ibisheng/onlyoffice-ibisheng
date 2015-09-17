@@ -6301,6 +6301,7 @@ CDocument.prototype =
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
             this.HdrFtr.Set_ParagraphShd(Shd);
+            this.Recalculate();
             this.Document_UpdateSelectionState();
             this.Document_UpdateInterfaceState();
             return;
@@ -6308,6 +6309,7 @@ CDocument.prototype =
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
             this.DrawingObjects.setParagraphShd(Shd);
+            this.Recalculate();
             this.Document_UpdateSelectionState();
             this.Document_UpdateInterfaceState();
             return;
@@ -11959,6 +11961,7 @@ CDocument.prototype =
             {
                 this.DrawingObjects.resetInterfaceTextPr();
                 this.Interface_Update_DrawingPr();
+                this.Interface_Update_ParaPr();
             }
         }
         else if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ) )
