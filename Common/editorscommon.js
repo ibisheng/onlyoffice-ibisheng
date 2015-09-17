@@ -774,7 +774,7 @@ var str_namedRanges = "A-Za-z\u005F\u0080-\u0081\u0083\u0085-\u0087\u0089-\u008A
     rx_Gt = /^ *> */,
     rx_Ge = /^ *>= */,
     rx_Ne = /^ *<> */,
-    rg = new XRegExp( "^([\\p{L}\\d.]+ *)[-+*/^&%<=>:;\\(\\)]" ),
+    rg = new XRegExp( "^((?:_xlfn.)?[\\p{L}\\d.]+ *)[-+*/^&%<=>:;\\(\\)]" ),
 //    rg = /^([\w\d.]+ *)[-+*\/^&%<=>:;\(\)]/,
     rgRange = /^\$?[A-Za-z]+\$?\d+:\$?[A-Za-z]+\$?\d+/,
     rgCols = /^\$?[A-Za-z]+:\$?[A-Za-z]+/,
@@ -818,7 +818,8 @@ var str_namedRanges = "A-Za-z\u005F\u0080-\u0081\u0083\u0085-\u0087\u0089-\u008A
     rx_numberDef = /^ *[+-]?\d*(\d|\.)\d*([eE][+-]?\d+)?/,
     rx_CommaDef = /^ *[,;] */,
     rx_arrayDef = /^\{(([+-]?\d*(\d|\.)\d*([eE][+-]?\d+)?)?(\"((\"\"|[^\"])*)\")?(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|FALSE|TRUE)?[,;]?)*\}/i,
-    rx_
+    rx_ControlSymbols = /^ *[\u0000-\u001F\u007F-\u009F] */,
+    rx_sFuncPref = /_xlfn\./i;
 
 
 /**
@@ -832,6 +833,19 @@ function parserHelper() {
 parserHelper.prototype._reset = function () {
 	this.operand_str = null;
 	this.pCurrPos = null;
+};
+parserHelper.prototype.isControlSymbols = function ( formula, start_pos, digitDelim ) {
+    if ( this instanceof parserHelper ) {
+        this._reset();
+    }
+
+    var match = (formula.substring( start_pos )).match( rx_ControlSymbols );
+    if (match != null) {
+        this.operand_str = match[0];
+        this.pCurrPos += match[0].length;
+        return true;
+    }
+    return false;
 };
 parserHelper.prototype.isOperator = function ( formula, start_pos ) {
 	if (this instanceof parserHelper) {

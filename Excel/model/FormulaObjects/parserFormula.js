@@ -1331,14 +1331,13 @@ cName.prototype.addDefinedNameNode = function ( nameReParse ) {
 
     if ( !this.defName || !this.defName.Ref ) {
         return this.wb.dependencyFormulas.addDefinedNameNode( this.value, null );
-//        return this.wb.dependencyFormulas.addDefinedNameNode( this.defName.Name, null );
     }
 
-    var dN = this.wb.getDefinesNames( this.defName.Name, this.ws.getId() );
-//    dN = dN.getAscCDefName();
-    var node/* = this.wb.dependencyFormulas.addDefinedNameNode( dN.Name, dN.LocalSheetId, dN.Ref, dN.Hidden )*/,
-        wsR, ref, nTo;
-    node = dN;
+    var node = this.wb.getDefinesNames( this.defName.Name, this.ws.getId() ), wsR, ref, nTo;
+    if(!this.defName.parsedRef){
+        this.defName.parsedRef = new parserFormula( this.defName.Ref, "", this.ws );
+        this.defName.parsedRef.parse();
+    }
     for ( var i = 0; i < this.defName.parsedRef.outStack.length; i++ ) {
         ref = this.defName.parsedRef.outStack[i];
 
@@ -1723,7 +1722,7 @@ cBaseFunction.prototype = {
         return new cString( localeName + "(" + str + ")" );
     },
     toString:function () {
-        return this.name.replace(/_xlfn\./i,"_xlfn.");
+        return this.name.replace(rx_sFuncPref,"_xlfn.");
     },
     setCA:function ( arg, ca, numFormat ) {
         this.value = arg;
