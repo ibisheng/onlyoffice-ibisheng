@@ -823,7 +823,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
           sendCommand2(this, null, v);
         } else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save) {
           this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
-          this._asc_downloadAs(c_oAscFileType.CSV, function(incomeObject) {
+          this._asc_downloadAs(c_oAscFileType.CSV, function(input) {
             if (null != input && "save" == input["type"]) {
               if ('ok' == input["status"]) {
                 var url = g_fGetSaveUrl(input["data"]);
@@ -1051,13 +1051,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     } else if (c_oAscFileType.CSV === sFormat && !options) {
       // Мы открывали команду, надо ее закрыть.
       this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
-      var v = {
-        "id": this.documentId,
-        "userid": this.documentUserId,
-        "vkey": this.documentVKey,
-        "c": "getcodepage"};
-      //todo
-      return sendCommand2(fCallback, this.fCallbackSendCommand, v);
+      var cp = {'delimiter': c_oAscCsvDelimiter.Comma, 'codepage': 46, 'encodings': getEncodingParams()};
+      this.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), this.advancedOptionsAction);
+      return;
     } else {
       this.wb._initCommentsToSave();
       var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
@@ -1709,7 +1705,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					  dataType: "text",
 					  success: function(result) {
 						var cp = JSON.parse(result);
-						cp.encodings = getEncodingParams();
+						cp['encodings'] = getEncodingParams();
 						t.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), t.advancedOptionsAction);
 					  },
 					  error: function() {
