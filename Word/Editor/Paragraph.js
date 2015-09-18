@@ -13018,6 +13018,13 @@ Paragraph.prototype.Get_StyleFromFormatting = function()
     else
         TextPr = this.Content[this.CurPos.ContentPos].Get_FirstTextPr();
 
+    // В стиль не добавляется HightLight
+    if (undefined !== TextPr.HighLight)
+    {
+        TextPr = TextPr.Copy();
+        TextPr.HighLight = undefined;
+    }
+
     // Мы создаем стиль параграфа и стиль рана, линкуем их и возвращаем стиль параграфа.
     var oParaStyle = new asc_CStyle();
     oParaStyle.put_Type(styletype_Paragraph);
