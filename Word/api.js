@@ -5741,13 +5741,9 @@ asc_docs_api.prototype.GenerateStyles = function()
     }
 
     var StylesPainter = new CStylesPainter();
-    if (null == this.LoadedObject && null != this.WordControl.m_oLogicDocument)
+    if (null != this.WordControl.m_oLogicDocument)
     {
-        StylesPainter.GenerateStyles(this, this.WordControl.m_oLogicDocument.Get_Styles().Style);
-    }
-    else
-    {
-        StylesPainter.GenerateStyles(this, this.LoadedObjectDS);
+        StylesPainter.GenerateStyles(this, (null == this.LoadedObject) ? this.WordControl.m_oLogicDocument.Get_Styles().Style : this.LoadedObjectDS);
     }
 };
 asc_docs_api.prototype.asyncFontsDocumentEndLoaded = function()

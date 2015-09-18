@@ -1070,6 +1070,9 @@ function CEditorPage(api)
                 break;
             }
         }
+		
+		if (oThis.m_nZoomValue <= _Zoom)
+			return;
 
         var _old_val = oThis.m_nZoomValue;
         oThis.m_nZoomValue = _Zoom;
@@ -1095,6 +1098,9 @@ function CEditorPage(api)
                 break;
             }
         }
+		
+		if (oThis.m_nZoomValue >= _Zoom)
+			return;
 
         var _old_val = oThis.m_nZoomValue;
         oThis.m_nZoomValue = _Zoom;
