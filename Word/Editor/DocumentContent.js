@@ -2472,7 +2472,7 @@ CDocumentContent.prototype =
                     {
                         // Если у нас что-то заселекчено и мы вводим текст или пробел
                         // и т.д., тогда сначала удаляем весь селект.
-                        this.Remove( 1, true );
+                        this.Remove(1, true, false, true);
                         break;
                     }
                     case para_TextPr:
