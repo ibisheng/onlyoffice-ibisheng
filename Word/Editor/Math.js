@@ -800,7 +800,7 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
 
     var XStart, XEnd;
 
-    if(this.ParaMathRPI.bInternalRanges == true/*this.ParaMathRPI.bStartRanges == true*/ && this.ParaMathRPI.IntervalState == MATH_INTERVAL_ON_SIDE)
+    if(this.ParaMathRPI.bInline == false/*this.ParaMathRPI.bInternalRanges == true && this.ParaMathRPI.IntervalState == MATH_INTERVAL_ON_SIDE*/)
     {
         XStart = this.ParaMathRPI.XStart;
         XEnd   = this.ParaMathRPI.XEnd;
@@ -1230,7 +1230,6 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.PageInfo.SetStartPos(Page, ParaLine);
 
         this.ParaMathRPI.Reset(PRS, ParaPr);
-
     }
     else
     {
@@ -1287,6 +1286,8 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
             if(UpdWrap == MATH_UPDWRAP_NEWRANGE)
             {
+                // Уберем из массива информацию о рассчитанных ширинах, чтобы не учлась рассчитанная ранее максимальная ширина (в связи с тем, что отрезок, в к-ом нужно расположить, изменился по ширине)
+                this.PageInfo.Reset_Page(Page);
                 this.ParaMathRPI.bInternalRanges = true;
                 PRS.EmptyLine = false;
                 this.private_SetRestartRecalcInfo(PRS);
@@ -1312,6 +1313,12 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
             //здесь обновляем WrapState, исходя из этого параметра будем считать WrapIndent
             this.PageInfo.UpdateCurrentWrap(DispDef, bInline);
+
+            // для неинлайновых формул не учитываем отступ первой строки
+            if(PRS.UseFirstLine === true && this.ParaMathRPI.bInline == false)
+            {
+                PRS.X -= ParaPr.Ind.FirstLine;
+            }
 
             // формулы не инлайновая, есть Ranges пересчитываем формулу в макс Range => private_RecalculateRangeInsideInterval
             if(this.ParaMathRPI.IntervalState !== MATH_INTERVAL_EMPTY && this.ParaMathRPI.bInternalRanges == true/*this.ParaMathRPI.bStartRanges == true*/) // картинки в другом параграфе и формула пересчитывается с учетом Ranges
@@ -1450,11 +1457,6 @@ ParaMath.prototype.private_RecalculateRangeInsideInterval = function(PRS, ParaPr
     if(this.ParaMathRPI.CheckRangesInLine(PRS))
     {
         this.PageInfo.ReverseCurrentMaxW(PRS.Line);
-    }
-
-    if(PRS.UseFirstLine === true)
-    {
-        PRS.X -= ParaPr.Ind.FirstLine;
     }
 
     var bInsideRange = PRS.X - 0.001 < this.ParaMathRPI.XStart && this.ParaMathRPI.XEnd < PRS.XEnd + 0.001;
@@ -1599,11 +1601,6 @@ ParaMath.prototype.Set_EmptyRange = function(PRS)
 };
 ParaMath.prototype.private_UpdateRangeY = function(PRS, RY)
 {
-    /*    this.Set_EmptyRange(PRS);
-
-    if(this.ParaMathRPI.ShiftY - PRS.Y > 0)
-    {*/
-
     if (Math.abs(RY - PRS.Y) < 0.001)
         PRS.Y = RY + 1; // смещаемся по 1мм
     else
@@ -1617,7 +1614,6 @@ ParaMath.prototype.private_UpdateRangeY = function(PRS, RY)
     PRS.Reset_Ranges();
     PRS.RecalcResult = recalcresult_CurLine;
 
-    /*}*/
 };
 ParaMath.prototype.private_SetShiftY = function(PRS, RY)
 {
