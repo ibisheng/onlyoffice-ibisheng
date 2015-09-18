@@ -1880,7 +1880,7 @@
 				{
 					var src = aPastedImages[k].Url;
 					
-					if(false == (/*0 == src.indexOf("data:") ||*/ 0 == src.indexOf(api.documentUrl) || 0 == src.indexOf(api.documentUrl)))
+					if(!g_oDocumentUrls.getImageLocal(src))
 						aImagesToDownload.push(src);
 				}
 				
@@ -2173,7 +2173,7 @@
 						this.oImages[image] = "local";
 					else*/ 
 					//TODO не вставляется картинка из EXCEL  - стоит base64 грузить на сервер bug 22957
-					if(false == (/*0 == src.indexOf("data:") ||*/ 0 == src.indexOf(api.documentUrl) || 0 == src.indexOf(api.documentUrl)))
+					if(!g_oDocumentUrls.getImageLocal(src))
 						aImagesToDownload.push(src);
 				}
 				
@@ -4698,16 +4698,6 @@
 		}
 		CopyProcessor.prototype =
 		{
-			getSrc : function(src)
-			{
-				//������� ����������� �� �� ��� editor.DocumentUrl ������������� ����.
-				//���������� ����� ����� ��� ����������� � word � docs.google
-				var start = src.substring(0, 6);
-				if(0 != src.indexOf("http:") && 0 != src.indexOf("data:") && 0 != src.indexOf("https:") && 0 != src.indexOf("ftp:") && 0 != src.indexOf("file:"))
-					return documentOrigin + src;
-				else
-					return src;
-			},
 			RGBToCSS : function(rgb)
 			{
 				var sResult = "#";
@@ -4933,7 +4923,6 @@
 						var sSrc = oGraphicObj.getBase64Img();
 						if(sSrc.length > 0)
 						{
-							sSrc = this.getSrc(sSrc);
 							sRes += "<img style=\"max-width:100%;\" width=\""+Math.round(ParaItem.Extent.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(ParaItem.Extent.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
 							break;
 						}
@@ -5336,8 +5325,8 @@
 												this.oBinaryFileWriter.CopyParagraph(tempParagraph);
 											};
 
-											var src = this.getSrc(base64_img);
-											this.Para.innerHTML += "<img style=\"max-width:100%;\" width=\""+Math.round(paraDrawing.absExtX * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(paraDrawing.absExtY * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" />";
+											var src = base64_img;
+											this.Para.innerHTML += "<img style=\"max-width:100%;\" width=\""+Math.round(paraDrawing.Extent.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(paraDrawing.Extent.H * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" />";
 
 											this.ElemToSelect.appendChild( this.Para );
 										}
@@ -5369,7 +5358,7 @@
 								{
 									var cur_element = selection_array[i].parent;
 									var base64_img = cur_element.getBase64Img();
-									var src = this.getSrc(base64_img);
+									var src = base64_img;
 
 									this.Para.innerHTML = "<img style=\"max-width:100%;\" width=\""+Math.round(cur_element.Extent.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(cur_element.Extent.H * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" />";
 

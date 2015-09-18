@@ -9,7 +9,7 @@ function CheckObjectLine(obj)
 
 function CheckWordArtTextPr(oTextPr)
 {
-    if(oTextPr.TextFill || oTextPr.TextOutline || (oTextPr.Unifill && oTextPr.Unifill.fill.type !== FILL_TYPE_SOLID))
+    if(oTextPr.TextFill || oTextPr.TextOutline || (oTextPr.Unifill && oTextPr.Unifill.fill && oTextPr.Unifill.fill.type !== FILL_TYPE_SOLID))
         return true;
     return false;
 }
@@ -4091,13 +4091,26 @@ CShape.prototype =
     {
         if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && typeof this.spPr.Fill.fill.RasterImageId === "string" && this.spPr.Fill.fill.RasterImageId.length > 0)
             images.push(this.spPr.Fill.fill.RasterImageId);
-        if(this.textBoxContent)
+        var oContent = this.getDocContent();
+        if(oContent)
         {
-            var drawings = this.textBoxContent.Get_AllDrawingObjects();
-            for(var i = 0; i < drawings.length; ++i)
+            if(this.bWordShape)
             {
-                drawings[i].GraphicObj && drawings[i].GraphicObj.getAllRasterImages && drawings[i].GraphicObj.getAllRasterImages(images);
+                var drawings = oContent.Get_AllDrawingObjects();
+                for(var i = 0; i < drawings.length; ++i)
+                {
+                    drawings[i].GraphicObj && drawings[i].GraphicObj.getAllRasterImages && drawings[i].GraphicObj.getAllRasterImages(images);
+                }
             }
+            var fCallback = function(oTextPr)
+            {
+                if( (oTextPr.Unifill && oTextPr.Unifill.fill && oTextPr.Unifill.fill.type == FILL_TYPE_BLIP))
+                {
+                    images.push(oTextPr.Unifill.fill.RasterImageId);
+                }
+                return false;
+            }
+            this.checkContentByCallback(oContent, fCallback);
         }
     },
 
@@ -4991,20 +5004,20 @@ CShape.prototype =
         this.bounds.h = this.bounds.b - this.bounds.t;
     },
 
-    checkRunWordArtContent: function(aContent)
+    checkRunWordArtContent: function(aContent, fCallback)
     {
         for(var j = 0; j < aContent.length; ++j)
         {
             if(aContent[j].Type === para_Run)
             {
-                if( CheckWordArtTextPr(aContent[j].Get_CompiledPr()))
+                if(fCallback(aContent[j].Get_CompiledPr()))
                 {
                     return true;
                 }
             }
             else if(aContent[j].Type === para_Hyperlink)
             {
-                if(this.checkRunWordArtContent(aContent[j].Content))
+                if(this.checkRunWordArtContent(aContent[j].Content, fCallback))
                 {
                     return true;
                 }
@@ -5013,8 +5026,7 @@ CShape.prototype =
         return false;
     },
 
-
-    checkContentWordArt: function(oContent)
+    checkContentByCallback: function(oContent, fCallback)
     {
         if(!oContent)
             return false;
@@ -5024,7 +5036,7 @@ CShape.prototype =
             oElement = oContent.Content[i];
             if(oElement.Get_Type() === type_Paragraph)
             {
-                if(this.checkRunWordArtContent(oElement.Content))
+                if(this.checkRunWordArtContent(oElement.Content, fCallback))
                 {
                     return true;
                 }
@@ -5037,7 +5049,7 @@ CShape.prototype =
                     oRow = aRows[j];
                     for(k = 0; k < oRow.Content.length; ++k)
                     {
-                        if(this.checkContentWordArt(oRow.Content[k].Content))
+                        if(this.checkContentByCallback(oRow.Content[k].Content, fCallback))
                         {
                             return true;
                         }
@@ -5046,6 +5058,11 @@ CShape.prototype =
             }
         }
         return false;
+    },
+
+    checkContentWordArt: function(oContent)
+    {
+        return this.checkContentByCallback(oContent, CheckWordArtTextPr);
     },
 
     checkNeedRecalcDocContentForTxWarp: function(oBodyPr)

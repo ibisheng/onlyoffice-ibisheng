@@ -518,16 +518,6 @@ CopyProcessor.prototype =
     {
         return this.oRoot.getInnerText();
     },
-    getSrc : function(src)
-    {
-        //������� ����������� �� �� ��� editor.DocumentUrl ������������� ����.
-        //���������� ����� ����� ��� ����������� � word � docs.google
-        var start = src.substring(0, 6);
-        if(0 != src.indexOf("http:") && 0 != src.indexOf("data:") && 0 != src.indexOf("https:") && 0 != src.indexOf("ftp:") && 0 != src.indexOf("file:"))
-            return documentOrigin + src;
-        else
-            return src;
-    },
     RGBToCSS : function(rgb, unifill)
     {
         if (null == rgb && null != unifill) {
@@ -741,7 +731,6 @@ CopyProcessor.prototype =
                 var sSrc = oGraphicObj.getBase64Img();
                 if(sSrc.length > 0)
                 {
-                    //sSrc = this.getSrc(sSrc);
 
                     var _w = ParaItem.Extent.W;
                     var _h = ParaItem.Extent.H;
@@ -1648,7 +1637,6 @@ CopyProcessor.prototype =
         var sSrc = slide.getBase64Img();
         //if(sSrc.length > 0)
         {
-           // sSrc = this.getSrc(sSrc);
             var _bounds_cheker = new CSlideBoundsChecker();
             slide.draw(_bounds_cheker, 0);
 			var oImg = new CopyElement("img");
@@ -1892,7 +1880,6 @@ CopyProcessor.prototype =
         var sSrc = oGraphicObj.getBase64Img();
         if(sSrc.length > 0)
         {
-            //sSrc = this.getSrc(sSrc);
             var _bounds_cheker = new CSlideBoundsChecker();
             oGraphicObj.draw(_bounds_cheker, 0);
 			

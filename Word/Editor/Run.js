@@ -8259,6 +8259,15 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             this.Pr = new CTextPr();
             this.Pr.Read_FromBinary( Reader );
 
+            var unifill = this.Pr.Unifill;
+            if(typeof CollaborativeEditing !== "undefined")
+            {
+                if(unifill && unifill.fill && unifill.fill.type === FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
+                {
+                    CollaborativeEditing.Add_NewImage(getFullImageSrc2(unifill.fill.RasterImageId));
+                }
+            }
+
             this.Recalc_CompiledPr(true);
             this.private_UpdateTrackRevisionOnChangeTextPr(false);
             break;

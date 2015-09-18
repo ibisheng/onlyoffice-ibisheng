@@ -3,7 +3,6 @@
 
 
 function OverlayObject(geometry, extX, extY, brush, pen, transform )
-    //({check_bounds: function(){},brush: this.originalShape.brush, pen: this.originalShape.pen, ext:{cx:this.originalShape.absExtX, cy:this.originalShape.absExtY}, geometry: this.geometry, TransformMatrix: this.originalShape.transform})
 {
     this.geometry = geometry;
     this.ext = {};
