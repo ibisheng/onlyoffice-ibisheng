@@ -9403,7 +9403,7 @@ ParaRun.prototype.Math_Is_End = function(_CurLine, _CurRange)
 
     return EndPos == this.Content.length;
 };
-ParaRun.prototype.IsEmptyLine = function(_CurLine, _CurRange)
+ParaRun.prototype.IsEmptyRange = function(_CurLine, _CurRange)
 {
     var CurLine  = _CurLine - this.StartLine;
     var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );

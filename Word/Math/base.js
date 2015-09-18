@@ -408,7 +408,7 @@ CMathBase.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
         CMathBase.superclass.Shift_Range.call(this, Dx, Dy, _CurLine, _CurRange);
     }
 };
-CMathBase.prototype.IsFirstRange = function(_CurLine, _CurRange)
+CMathBase.prototype.IsStartRange = function(_CurLine, _CurRange)
 {
     var CurLine  = _CurLine - this.StartLine;
     var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
@@ -2127,14 +2127,14 @@ CMathBase.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _C
         }
     }
 };
-CMathBase.prototype.IsEmptyLine = function(_CurLine, _CurRange)
+CMathBase.prototype.IsEmptyRange = function(_CurLine, _CurRange)
 {
     var bEmpty = false;
     var Numb = this.NumBreakContent;
 
     if(this.bOneLine == false)
     {
-        bEmpty = this.Content[Numb].IsEmptyLine(_CurLine, _CurRange);
+        bEmpty = this.Content[Numb].IsEmptyRange(_CurLine, _CurRange);
     }
 
     return bEmpty;

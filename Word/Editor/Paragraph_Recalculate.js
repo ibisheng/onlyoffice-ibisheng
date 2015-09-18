@@ -1219,7 +1219,7 @@ Paragraph.prototype.private_RecalculateLineCheckRanges = function(CurLine, CurPa
     var Ranges2;
 
     if ( true === this.Use_Wrap() )
-        Ranges2 = this.Parent.CheckRange(Left, Top, Right, Bottom, Top2, Bottom2, PageFields.X, PageFields.XLimit, this.PageNum + CurPage, true);
+        Ranges2 = this.Parent.CheckRange(Left, Top, Right, Bottom, Top2, Bottom2, PageFields.X, PageFields.XLimit, this.PageNum + CurPage, true, PRS.bMathWrap);
     else
         Ranges2 = [];
 
@@ -2204,6 +2204,7 @@ function CParagraphRecalculateStateWrap(Para)
     this.bOnlyForcedBreak    = false; // учитывается, если возможна разбивка только по операторам выше уровням => в этом случае можно сделать принудительный разрыв во внутреннем контенте
     this.bFastRecalculate    = false;
     this.bBoxOperator        = false;
+    this.bMathWrap           = false;
 }
 
 CParagraphRecalculateStateWrap.prototype =
@@ -2286,6 +2287,7 @@ CParagraphRecalculateStateWrap.prototype =
     {
         this.RestartPageRecalcInfo.Line   = 0;
         this.RestartPageRecalcInfo.Object = null;
+        this.bMathWrap                    = false;
     },
 
     Set_RestartPageRecalcInfo : function(Line, Object)

@@ -171,40 +171,43 @@ var MATH_EMPTY                  =  3;
 var MATH_PLACEHOLDER            =  4;
 var MATH_PARA_RUN               =  5;
 
-var LOCATION_TOP      =  0;
-var LOCATION_BOT      =  1;
-var LOCATION_LEFT     =  2;
-var LOCATION_RIGHT    =  3;
-var LOCATION_SEP      =  4;
+var LOCATION_TOP                =  0;
+var LOCATION_BOT                =  1;
+var LOCATION_LEFT               =  2;
+var LOCATION_RIGHT              =  3;
+var LOCATION_SEP                =  4;
 
-var VJUST_TOP          = 0;
-var VJUST_BOT          = 1;
+var VJUST_TOP                   = 0;
+var VJUST_BOT                   = 1;
 
 
 ////////////////////////////////////////
-var BREAK_BEFORE              =  0;
-var BREAK_AFTER               =  1;
-var BREAK_REPEAT              =  2;
+var BREAK_BEFORE                =  0;
+var BREAK_AFTER                 =  1;
+var BREAK_REPEAT                =  2;
 
-var BREAK_MIN_MIN             =  0;
-var BREAK_PLUS_MIN            =  1;
-var BREAK_MIN_PLUS            =  2;
+var BREAK_MIN_MIN               =  0;
+var BREAK_PLUS_MIN              =  1;
+var BREAK_MIN_PLUS              =  2;
 
-var STY_BOLD                  =  0;
-var STY_BI                    =  1;
-var STY_ITALIC                =  2;
-var STY_PLAIN                 =  3;
+var STY_BOLD                    =  0;
+var STY_BI                      =  1;
+var STY_ITALIC                  =  2;
+var STY_PLAIN                   =  3;
 
 /////////////////////////////////////////
 
-var ALIGN_MARGIN_WRAP = 0;
-var ALIGN_MARGIN      = 1;
-var ALIGN_WRAP        = 2;
-var ALIGN_EMPTY       = 3;
+var ALIGN_MARGIN_WRAP           = 0;
+var ALIGN_MARGIN                = 1;
+var ALIGN_WRAP                  = 2;
+var ALIGN_EMPTY                 = 3;
 
-var WRAP_MATH_EMPTY     = 0;
-var WRAP_MATH_ON_SIDE   = 1;
-var WRAP_MATH_TOPBOTTOM = 2;
+var MATH_INTERVAL_EMPTY         = 0;
+var MATH_INTERVAL_ON_SIDE       = 1;
 
-var MATH_SIZE            = 0;
-var MATH_BOUNDS_MEASURES = 1;
+var MATH_UPDWRAP_NOCHANGES      = 0;
+var MATH_UPDWRAP_NEWRANGE       = 1;
+var MATH_UPDWRAP_UNDERFLOW      = 2;
+
+var MATH_SIZE                   = 0;
+var MATH_BOUNDS_MEASURES        = 1;

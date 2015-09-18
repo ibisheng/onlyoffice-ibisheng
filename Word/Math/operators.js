@@ -3568,7 +3568,7 @@ CDelimiter.prototype.setPosition = function(pos, PosInfo)
     {
         var PosOper = new CMathPosition();
 
-        if(true === this.IsFirstRange(Line, Range))
+        if(true === this.IsStartRange(Line, Range))
         {
             PosOper.x = pos.x;
             PosOper.y = pos.y - this.begOper.size.ascent;
@@ -3626,7 +3626,7 @@ CDelimiter.prototype.Draw_Elements = function(PDSE)
 
     if(this.bOneLine == false)
     {
-        if(true === this.IsFirstRange(PDSE.Line, PDSE.Range))
+        if(true === this.IsStartRange(PDSE.Line, PDSE.Range))
         {
             this.begOper.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
             PDSE.X += this.BrGapLeft;

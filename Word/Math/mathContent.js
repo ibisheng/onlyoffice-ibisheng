@@ -1885,20 +1885,6 @@ CMathContent.prototype.getElem = function(nNum)
 {
     return this.Content[nNum];
 };
-CMathContent.prototype.Is_FirstComposition = function()
-{
-    var result = false;
-    if(this.Content.length > 1)
-    {
-        var bEmptyRun = this.Content[0].Is_Empty(),
-            bMathComp    = this.Content[1].Type == para_Math_Composition;
-
-        if(bEmptyRun && bMathComp)
-            result = true;
-    }
-
-    return result;
-};
 CMathContent.prototype.GetLastElement = function()
 {
     var pos = this.Content.length - 1;
@@ -3941,7 +3927,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var bOperBefore = this.ParaMath.Is_BrkBinBefore(); // true - оператор находится в начале строки, false - оператор находится в конце строки
 
     // для внутристроковой формулы : начало формулы - начало нового слова
-    if(this.bRoot && bInline && true == this.IsFirstRange(PRS.Line, PRS.Range) && PRS.Ranges.length == 0)
+    if(this.bRoot && bInline && true == this.IsStartRange(PRS.Line, PRS.Range) && PRS.Ranges.length == 0)
     {
         PRS.Update_CurPos(0, Depth);
         PRS.Update_CurPos(0, Depth+1); // нулевой элемент всегда Run
@@ -4319,7 +4305,7 @@ CMathContent.prototype.Recalculate_Reset = function(StartRange, StartLine, PRS)
         this.protected_ClearLines();
     }
 };
-CMathContent.prototype.IsEmptyLine = function(_CurLine, _CurRange)
+CMathContent.prototype.IsEmptyRange = function(_CurLine, _CurRange)
 {
     var CurLine  = _CurLine - this.StartLine;
     var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
@@ -4327,24 +4313,44 @@ CMathContent.prototype.IsEmptyLine = function(_CurLine, _CurRange)
     var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
     var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
 
-    var bEmpty = false;
+    var bEmpty = true;
 
     if(StartPos == EndPos)
     {
-        bEmpty = this.Content[StartPos].IsEmptyLine(_CurLine, _CurRange);
+        bEmpty = this.Content[StartPos].IsEmptyRange(_CurLine, _CurRange);
     }
     else
     {
         var Pos = StartPos;
 
-        while(Pos < EndPos && this.Content[Pos].Type == para_Math_Run && this.Content[Pos].Is_Empty() == true)
+        while(Pos <= EndPos)
         {
+            if(false == this.Content[Pos].IsEmptyRange(_CurLine, _CurRange))
+            {
+                bEmpty = false;
+                break;
+            }
             Pos++;
         }
+    }
 
-        if(Pos == EndPos && this.Content[Pos].Type == para_Math_Composition)
+    return bEmpty;
+};
+CMathContent.prototype.IsEmptyLine = function(_CurLine)
+{
+    var CurLine  = _CurLine - this.StartLine;
+
+    var StartRange = ( 0 === CurLine ? this.StartRange : 0 );
+    var RangesCount = StartRange + this.protected_GetRangesCount(CurLine);
+
+    var bEmpty = true;
+
+    for(var _CurRange = StartRange; _CurRange < RangesCount; _CurRange++)
+    {
+        if(false == this.IsEmptyRange(_CurLine, _CurRange))
         {
-            bEmpty = this.Content[Pos].IsEmptyLine(_CurLine, _CurRange);
+            bEmpty = false;
+            break;
         }
     }
 
@@ -4604,10 +4610,6 @@ CMathContent.prototype.Math_Is_End = function(_CurLine, _CurRange)
 
     return result;
 };
-CMathContent.prototype.IsStartLine = function(Line)
-{
-    return Line == this.StartLine;
-};
 CMathContent.prototype.GetAlignBrk = function(_CurLine, _CurRange)
 {
     var CurLine  = _CurLine - this.StartLine;
@@ -4621,7 +4623,8 @@ CMathContent.prototype.GetAlignBrk = function(_CurLine, _CurRange)
         {
             var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
 
-            while(this.Content[StartPos].Type == para_Math_Run && true == this.Content[StartPos].Is_EmptyRange(_CurLine, _CurRange))
+            var Lng = this.Content.length;
+            while(StartPos < Lng - 1 && this.Content[StartPos].Type == para_Math_Run && true == this.Content[StartPos].Is_EmptyRange(_CurLine, _CurRange))
             {
                 StartPos++;
             }
@@ -4652,9 +4655,13 @@ CMathContent.prototype.GetAlignBrk = function(_CurLine, _CurRange)
 
     return AlnAt;
 };
-CMathContent.prototype.IsFirstRange = function(Line, Range)
+CMathContent.prototype.IsStartRange = function(Line, Range)
 {
     return Line - this.StartLine == 0 && Range - this.StartRange == 0;
+};
+CMathContent.prototype.IsStartLine = function(Line)
+{
+    return Line == this.StartLine;
 };
 CMathContent.prototype.Get_SelectionDirection = function()
 {
