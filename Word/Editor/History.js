@@ -265,6 +265,26 @@ CHistory.prototype =
         this.Points.length = this.Index + 1;
     },
 
+    Is_LastPointEmpty : function()
+    {
+        if (!this.Points[this.Index] || this.Points[this.Index].Items.length <= 0)
+            return true;
+
+        return false;
+    },
+
+    Is_LastPointNeedRecalc : function()
+    {
+        if (!this.Points[this.Index])
+            return false;
+
+        var RecalcData = this.Get_RecalcData();
+        if (RecalcData.Flow.length > 0 || RecalcData.HdrFtr.length > 0 || -1 !== RecalcData.Inline.Pos)
+            return true;
+
+        return false;
+    },
+
     Clear_Redo : function()
     {
         // Удаляем ненужные точки

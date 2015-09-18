@@ -2556,7 +2556,7 @@ PasteProcessor.prototype =
         {
             this.oRecalcDocument.Recalculate();
             
-            if( oDocument.CurPos.Type !== docpostype_DrawingObjects || true === this.oLogicDocument.DrawingObjects.isSelectedText() )
+            if ((oDocument.CurPos.Type !== docpostype_DrawingObjects || true === this.oLogicDocument.DrawingObjects.isSelectedText()) && true === History.Is_LastPointNeedRecalc())
             {
                 this.oLogicDocument.Cursor_MoveRight(false, false, true);
             }
