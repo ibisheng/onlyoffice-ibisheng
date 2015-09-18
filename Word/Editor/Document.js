@@ -12344,7 +12344,7 @@ CDocument.prototype =
 
         if (null !== LogicDocument)
         {
-            if (true === LogicDocument.Is_SelectionUse())
+            if (true === LogicDocument.Is_SelectionUse() && true !== LogicDocument.Selection_IsEmpty(true))
             {
                 if (selectionflag_Numbering === LogicDocument.Selection.Flag)
                     bCanCopyCut = false;
