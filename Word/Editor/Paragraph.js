@@ -148,7 +148,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     EndRun.Add_ToContent( 0, new ParaEnd() );
 
     this.Content[0] = EndRun;
-    
+
     this.m_oPRSW = new CParagraphRecalculateStateWrap(this);
     this.m_oPRSC = new CParagraphRecalculateStateCounter();
     this.m_oPRSA = new CParagraphRecalculateStateAlign();
