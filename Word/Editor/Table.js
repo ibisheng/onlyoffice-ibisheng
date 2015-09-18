@@ -11641,166 +11641,11 @@ CTable.prototype =
         // В массиве this.Selection.Data идет список ячеек по строкам (без разрывов)
         // Перед объединением мы должны проверить совпадают ли начальная и конечная колонки
         // в сетке TableGrid для каждого ряда.
-
-        var bCanMerge = true;
-
-        var Grid_start = -1;
-        var Grid_end   = -1;
-
-        var RowsInfo = [];
-
         var Temp = this.Internal_CheckMerge();
-        bCanMerge  = Temp.bCanMerge;
-        Grid_start = Temp.Grid_start;
-        Grid_end   = Temp.Grid_end;
-        RowsInfo   = Temp.RowsInfo;
-
-        /*
-        for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
-        {
-            var Pos = this.Selection.Data[Index];
-            var Row = this.Content[Pos.Row];
-            var Cell = Row.Get_Cell( Pos.Cell );
-
-            var StartGridCol = Row.Get_CellInfo( Pos.Cell ).StartGridCol;
-            var EndGridCol   = StartGridCol + Cell.Get_GridSpan() - 1;
-
-            var VMergeCount  = this.Internal_GetVertMergeCount( Pos.Row, Row.Get_CellInfo( Pos.Cell ).StartGridCol, Cell.Get_GridSpan() );
-
-            for ( var RowIndex = Pos.Row; RowIndex <= Pos.Row + VMergeCount - 1; RowIndex++ )
-            {
-                if ( "undefined" === typeof(RowsInfo[RowIndex]) )
-                {
-                    RowsInfo[RowIndex] =
-                    {
-                        Grid_start : StartGridCol,
-                        Grid_end   : EndGridCol
-                    };
-                }
-                else
-                {
-                    if ( StartGridCol < RowsInfo[RowIndex].Grid_start )
-                        RowsInfo[RowIndex].Grid_start = StartGridCol;
-
-                    if ( EndGridCol > RowsInfo[RowIndex].Grid_end )
-                        RowsInfo[RowIndex].Grid_end = EndGridCol;
-                }
-            }
-        }
-
-        for ( var Index in RowsInfo )
-        {
-            if ( -1 === Grid_start )
-                Grid_start = RowsInfo[Index].Grid_start;
-            else if ( Grid_start != RowsInfo[Index].Grid_start )
-            {
-                bCanMerge = false;
-                break;
-            }
-
-            if ( -1 === Grid_end )
-                Grid_end = RowsInfo[Index].Grid_end;
-            else if ( Grid_end != RowsInfo[Index].Grid_end )
-            {
-                bCanMerge = false;
-                break;
-            }
-        }
-
-
-        if ( true === bCanMerge )
-        {
-            // Далее, мы должны убедиться, что у выеделенных ячеек верхние и нижние поля также
-            // ровные (т.е. без выступов).
-            // Для этого для каждой колонки, попавшей в отрезок [Grid_start, Grid_end] находим
-            // верхнюю и нижнюю ячейку и смотрим на верхнюю и нижнюю строки данных ячеек,
-            // соответственно
-
-            var TopRow = -1;
-            var BotRow = -1;
-
-            for ( var GridIndex = Grid_start; GridIndex <= Grid_end; GridIndex++ )
-            {
-                var Pos_top = null;
-                var Pos_bot = null;
-                for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
-                {
-                    var Pos = this.Selection.Data[Index];
-                    var Row = this.Content[Pos.Row];
-                    var Cell = Row.Get_Cell( Pos.Cell );
-
-                    var StartGridCol = Row.Get_CellInfo( Pos.Cell ).StartGridCol;
-                    var EndGridCol   = StartGridCol + Cell.Get_GridSpan() - 1;
-
-                    if ( GridIndex >= StartGridCol && GridIndex <= EndGridCol )
-                    {
-                        if ( null === Pos_top || Pos_top.Row > Pos.Row )
-                            Pos_top = Pos;
-
-                        if ( null === Pos_bot || Pos_bot.Row < Pos.Row )
-                            Pos_bot = Pos;
-                    }
-                }
-
-                if ( null === Pos_top || null === Pos_bot )
-                {
-                    bCanMerge = false;
-                    break;
-                }
-
-                if ( -1 === TopRow )
-                    TopRow = Pos_top.Row;
-                else if ( TopRow != Pos_top.Row )
-                {
-                    bCanMerge = false;
-                    break;
-                }
-
-                var Row  = this.Content[Pos_bot.Row];
-                var Cell = Row.Get_Cell( Pos_bot.Cell );
-
-                var VMergeCount = this.Internal_GetVertMergeCount( Pos_bot.Row, Row.Get_CellInfo( Pos_bot.Cell ).StartGridCol, Cell.Get_GridSpan() );
-                var CurBotRow = Pos_bot.Row + VMergeCount - 1;
-
-                if ( -1 === BotRow )
-                    BotRow = CurBotRow;
-                else if ( BotRow != CurBotRow )
-                {
-                    bCanMerge = false;
-                    break;
-                }
-            }
-
-            // Объединенные ячейки образуют прямоугольник, но возможно в нем есть вырезы,
-            // т.е. выделение такое, что в него попала строка с GridBefore или GridAfter > 0
-            if ( true === bCanMerge )
-            {
-                for ( var RowIndex = TopRow; RowIndex <= BotRow; RowIndex++ )
-                {
-                    var Row = this.Content[RowIndex];
-                    var Grid_before = Row.Get_Before().GridBefore;
-                    var Grid_after  = Row.Get_After().GridAfter;
-
-                    if ( Grid_after <= 0 && Grid_before <= 0 )
-                        continue;
-
-                    if ( Grid_start < Grid_before )
-                    {
-                        bCanMerge = false;
-                        break;
-                    }
-
-                    var Cell = Row.Get_Cell( Row.Get_CellsCount() - 1 );
-                    var Row_grid_end = Cell.Get_GridSpan() - 1 + Row.Get_CellInfo( Row.Get_CellsCount() - 1 ).StartGridCol;
-                    if ( Grid_end > Row_grid_end )
-                    {
-                        bCanMerge = false;
-                        break;
-                    }
-                }
-            }
-        }
-        */
+        var bCanMerge  = Temp.bCanMerge;
+        var Grid_start = Temp.Grid_start;
+        var Grid_end   = Temp.Grid_end;
+        var RowsInfo   = Temp.RowsInfo;
 
         if ( false === bCanMerge )
             return;
@@ -11826,9 +11671,16 @@ CTable.prototype =
             }
         }
 
+        // Выставим ширину результируещей ячейки
+        var SumW = 0;
+        for (var CurGridCol = Grid_start; CurGridCol <= Grid_end; CurGridCol++)
+        {
+            SumW += this.TableGridCalc[CurGridCol];
+        }
+        Cell_tl.Set_W(new CTableMeasurement(tblwidth_Mm, SumW));
+
         // Теперь нам надо удалить лишние ячейки и добавить ячейки с
         // вертикальным объединением.
-
         for ( var RowIndex in RowsInfo )
         {
             var Row = this.Content[RowIndex];
