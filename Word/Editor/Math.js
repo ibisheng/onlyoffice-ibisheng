@@ -1270,7 +1270,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     {
         // такая сиуация возможна, если разместили формулу под картинкой и нужно заново пересчитать формулу
         this.Set_EmptyRange(PRS);
-        this.private_SetShiftY(PRS, ParaPr, this.ParaMathRPI.ShiftY);
+        this.private_UpdateRangeY(PRS, this.ParaMathRPI.ShiftY);
     }
     else
     {
@@ -1293,8 +1293,11 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             }
             else if(UpdWrap == MATH_UPDWRAP_UNDERFLOW)
             {
-                this.Set_EmptyRange(PRS);
-                this.ParaMathRPI.Reset_WrapSettings(PRS, ParaPr);
+                // пересчитаем PRS.Y на след пересчете при this.ParaMathRPI.ShiftY - PRS.Y > 0
+                // в ф-ии private_UpdateRangeY
+                //this.Set_EmptyRange(PRS);
+                //this.ParaMathRPI.Reset_WrapSettings(PRS, ParaPr);
+                //this.private_SetRestartRecalcInfo(PRS);
             }
 
             bRecalcNormal = UpdWrap == MATH_UPDWRAP_NOCHANGES;
@@ -1432,7 +1435,9 @@ ParaMath.prototype.private_UpdateWrapSettings = function(PRS, ParaPr)
         {
             // если появился плавающий объект, относительно которого нельзя разместить формулу (в одном из Range, образованным плавающими объектами), то, соответсвенно, формула должна располагаться под плавающим объектом
 
-            this.private_SetShiftY(PRS, ParaPr, RY_NotWrap);
+            //this.private_SetShiftY(PRS, ParaPr, RY_NotWrap);
+            //this.ParaMathRPI.UpdateShiftY(RY_NotWrap);
+            this.private_SetShiftY(PRS, RY_NotWrap);
             UpdateWrap = MATH_UPDWRAP_UNDERFLOW;
         }
 
@@ -1475,8 +1480,10 @@ ParaMath.prototype.private_RecalculateRangeInsideInterval = function(PRS, ParaPr
 
         if(PRS.bMathWordLarge == true)
         {
-            this.private_SetShiftY(PRS, ParaPr, this.ParaMathRPI.RangeY);
-            this.ParaMathRPI.Reset_WrapSettings();
+            this.private_SetShiftY(PRS, this.ParaMathRPI.RangeY);
+            //this.ParaMathRPI.UpdateShiftY(this.ParaMathRPI.RangeY);
+            //this.ParaMathRPI.Reset_WrapSettings();
+            //this.private_SetRestartRecalcInfo(PRS);
         }
 
         PRS.RestartPageRecalcInfo.Object = this;
@@ -1590,9 +1597,9 @@ ParaMath.prototype.Set_EmptyRange = function(PRS)
 
     PRS.NewRange = true;
 };
-ParaMath.prototype.private_SetShiftY = function(PRS, ParaPr, RY)
+ParaMath.prototype.private_UpdateRangeY = function(PRS, RY)
 {
-/*    this.Set_EmptyRange(PRS);
+    /*    this.Set_EmptyRange(PRS);
 
     if(this.ParaMathRPI.ShiftY - PRS.Y > 0)
     {*/
@@ -1610,9 +1617,13 @@ ParaMath.prototype.private_SetShiftY = function(PRS, ParaPr, RY)
     PRS.Reset_Ranges();
     PRS.RecalcResult = recalcresult_CurLine;
 
-    this.ParaMathRPI.UpdateShiftY(RY);
-
     /*}*/
+};
+ParaMath.prototype.private_SetShiftY = function(PRS, RY)
+{
+    this.ParaMathRPI.UpdateShiftY(RY);
+    this.ParaMathRPI.Reset_WrapSettings();
+    this.private_SetRestartRecalcInfo(PRS);
 };
 ParaMath.prototype.private_UpdateXLimits = function(PRS)
 {
