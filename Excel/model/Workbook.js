@@ -1009,7 +1009,7 @@ DependencyGraph.prototype = {
         nodeId = getDefNameVertexId( sheetId || "WB", name );
 
         //sheetNodeList[nodeId] = null;
-        delete sheetNodeList[nodeId];
+        sheetNodeList ? delete sheetNodeList[nodeId] : null;
 
         //this.defNameList[nodeId] = null;
         delete this.defNameList[nodeId];
