@@ -1134,6 +1134,33 @@ ParaMath.prototype.Remove_SpellCheckerElement = function(Element)
 ParaMath.prototype.Clear_SpellingMarks = function()
 {
 };
+//----------------------------------------------------------------------------------------------------------------------
+// ParaField
+//----------------------------------------------------------------------------------------------------------------------
+ParaField.prototype.Restart_CheckSpelling = function()
+{
+};
+
+ParaField.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
+{
+    if ( true === SpellCheckerEngine.bWord )
+    {
+        SpellCheckerEngine.bWord = false;
+        SpellCheckerEngine.SpellChecker.Add( SpellCheckerEngine.StartPos, SpellCheckerEngine.EndPos, SpellCheckerEngine.sWord, SpellCheckerEngine.CurLcid );
+    }
+};
+
+ParaField.prototype.Add_SpellCheckerElement = function(Element, Start, Depth)
+{
+};
+
+ParaField.prototype.Remove_SpellCheckerElement = function(Element)
+{
+};
+
+ParaField.prototype.Clear_SpellingMarks = function()
+{
+};
 
 
 
