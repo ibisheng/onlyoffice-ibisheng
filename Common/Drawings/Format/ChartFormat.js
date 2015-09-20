@@ -22993,6 +22993,16 @@ CTitle.prototype =
         this.Refresh_RecalcData2();
     },
 
+    chekBodyPrTransform: function()
+    {
+        return false;
+    },
+
+    checkContentWordArt: function()
+    {
+        return false;
+    },
+
     Refresh_RecalcData2: function(pageIndex)
     {
         this.recalcInfo.recalculateTxBody = true;
