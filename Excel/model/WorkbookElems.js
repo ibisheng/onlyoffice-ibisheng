@@ -5043,7 +5043,7 @@ CustomFilter.prototype.isHideValue = function(val) {
 					result = true;
 			}
 		}
-		else if((this.Operator == c_oAscCustomAutoFilter.isGreaterThan ||this.Operator == c_oAscCustomAutoFilter.isGreaterThanOrEqualTo || this.Operator == c_oAscCustomAutoFilter.isLessThan || this.Operator == c_oAscCustomAutoFilter.isLessThanOrEqualTo) && !isNaN(filterVal))//только для чисел
+		else if((this.Operator == c_oAscCustomAutoFilter.isGreaterThan ||this.Operator == c_oAscCustomAutoFilter.isGreaterThanOrEqualTo || this.Operator == c_oAscCustomAutoFilter.isLessThan || this.Operator == c_oAscCustomAutoFilter.isLessThanOrEqualTo) && !isNaN(this.Val))//только для чисел
 		{
 			filterVal =  parseFloat(this.Val);
 			val = parseFloat(val);
