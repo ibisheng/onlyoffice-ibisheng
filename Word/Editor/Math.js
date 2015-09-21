@@ -318,10 +318,6 @@ CParaMathLineWidths.prototype.GetMax = function()
 {
     return this.MaxW;
 };
-/*CParaMathLineWidths.prototype.ReverseMaxW = function()
-{
-    this.MaxW = this.PrevMaxW;
-};*/
 CParaMathLineWidths.prototype.UpdateMinMax = function(Pos)
 {
     var bUpdMaxWidth = false;
@@ -466,11 +462,6 @@ CMathPageInfo.prototype.UpdateCurrentWidth = function(_Line, Width)
 
     return this.WPages[this.CurPage].UpdateWidth(Line, Width);
 };
-/*CMathPageInfo.prototype.ReverseCurrentMaxW = function(_Line)
-{
-    var Line = this.WPages[this.CurPage].GetNumberLine(_Line - this.StartLine);
-    this.WPages[this.CurPage].ReverseMaxW(Line);
-};*/
 CMathPageInfo.prototype.GetCurrentMaxWidthAllLines = function()
 {
     var MaxW = 0;
@@ -1474,13 +1465,10 @@ ParaMath.prototype.private_UpdateWrapSettings = function(PRS)
 };
 ParaMath.prototype.private_RecalculateRangeInsideInterval = function(PRS, ParaPr, Depth)
 {
-    /*if(this.ParaMathRPI.CheckRangesInLine(PRS))
-    {
-        this.PageInfo.ReverseCurrentMaxW(PRS.Line);
-    }*/
-
-    var bInsideRange = PRS.X - 0.001 < this.ParaMathRPI.XStart && this.ParaMathRPI.XEnd < PRS.XEnd + 0.001;
-    var bNextRangeSide   = this.ParaMathRPI.IntervalState == MATH_INTERVAL_ON_SIDE && bInsideRange == false; // пересчитываем только в том отрезке, в котором находится формула
+    // var bInsideRange = PRS.X - 0.001 < this.ParaMathRPI.XStart && this.ParaMathRPI.XEnd < PRS.XEnd + 0.001;
+    // наложим менее строгие условия попадания в отрезок
+    var bNotInsideRange = this.ParaMathRPI.XStart > PRS.XEnd || this.ParaMathRPI.XEnd < PRS.X;
+    var bNextRangeSide   = this.ParaMathRPI.IntervalState == MATH_INTERVAL_ON_SIDE && bNotInsideRange == true; // пересчитываем только в том отрезке, в котором находится формула
 
     // Номер  Range не влияет на UpdateWrapSettings, т.к. картинки могут располагаться одна под другой, и в одной ситуации это будет 0-ой Range,  в другой 1-ый
 
