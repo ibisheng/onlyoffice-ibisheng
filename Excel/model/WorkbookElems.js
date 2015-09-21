@@ -5024,6 +5024,8 @@ CustomFilter.prototype.isHideValue = function(val) {
 
 	var result = false;
 	var isDigitValue = isNaN(val) ? false : true;
+	if(!isDigitValue)
+		val = val.toLowerCase();
 	var checkComplexSymbols = null;
 	var filterVal, position;
 	if(checkComplexSymbols != null)
@@ -5032,14 +5034,15 @@ CustomFilter.prototype.isHideValue = function(val) {
 	{
 		if(this.Operator == c_oAscCustomAutoFilter.equals || this.Operator == c_oAscCustomAutoFilter.doesNotEqual)//общие для числа и текста
 		{
+			filterVal = isNaN(this.Val) ? this.Val.toLowerCase() : this.Val;
 			if (this.Operator == c_oAscCustomAutoFilter.equals)//equals
 			{
-				if(val == this.Val/* || valWithFormat == this.Val*/)
+				if(val == filterVal)
 					result = true;
 			}
 			else if (this.Operator == c_oAscCustomAutoFilter.doesNotEqual)//doesNotEqual
 			{
-				if(val != this.Val/* || valWithFormat != this.Val*/)
+				if(val != filterVal)
 					result = true;
 			}
 		}
@@ -5070,8 +5073,7 @@ CustomFilter.prototype.isHideValue = function(val) {
 		}
 		else if(this.Operator == c_oAscCustomAutoFilter.beginsWith || this.Operator == c_oAscCustomAutoFilter.doesNotBeginWith || this.Operator == c_oAscCustomAutoFilter.endsWith || this.Operator == c_oAscCustomAutoFilter.doesNotEndWith || this.Operator == c_oAscCustomAutoFilter.contains || this.Operator == c_oAscCustomAutoFilter.doesNotContain)//только для текста
 		{
-			filterVal = this.Val;
-			
+			filterVal = isNaN(this.Val) ? this.Val.toLowerCase() : this.Val;
 			switch (this.Operator)
 			{
 				case c_oAscCustomAutoFilter.beginsWith:
