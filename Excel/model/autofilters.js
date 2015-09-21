@@ -1422,7 +1422,7 @@ var maxIndividualValues = 10000;
 										var newColId = autoFilter.FilterColumns[j].ColId + diffColId;
 										if(newColId < 0 || (diff < 0 && col >= activeRange.c1 && col <= activeRange.c2))
 										{
-											autoFilter.FilterColumns[j].Filters.clean();
+											autoFilter.FilterColumns[j].clean();
 											t._openHiddenRowsFilterColumn(autoFilter, autoFilter.FilterColumns[j].ColId);
 											autoFilter.FilterColumns.splice(j, 1);
 											j--;
