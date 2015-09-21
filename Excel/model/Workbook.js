@@ -814,7 +814,6 @@ DependencyGraph.prototype = {
         return this.nodesId;
     },
 
-
     /*Defined Names section*/
     getDefNameNode:function ( node ) {
         var ret = this.defNameList[node];
@@ -890,32 +889,12 @@ DependencyGraph.prototype = {
             defNameSheetsList[dfv.nodeId] = dfv;
         }
         else if( null == oRes.Ref && null != defRef ){
-
             oRes.Ref = defRef;
             oRes.isTable = undefined;
             oRes.parsedRef = new parserFormula(oRes.Ref, "", oRes.wb.getWorksheet(0));
             oRes.parsedRef.parse();
 //            oRes.sheetId = sheetId;
-
         }
-
-//        if ( oRes.isArea ) {
-//            var nodesSheetArea = this.nodesArea[node.sheetId];
-//            if ( null == nodesSheetArea ) {
-//                nodesSheetArea = new RangeDataManager(function(data, from, to){_this._changeNode(data, from, to);});
-//                this.nodesArea[oRes.sheetId] = nodesSheetArea;
-//            }
-//            nodesSheetArea.add( oBBoxNode, node );
-//        }
-//        else {
-//            var nodesSheetCell = this.nodesCell[node.sheetId];
-//            if ( null == nodesSheetCell ) {
-//                nodesSheetCell = new CellArea(function(data, from, to){_this._changeNode(data, from, to);});
-//                this.nodesCell[node.sheetId] = nodesSheetCell;
-//            }
-//            nodesSheetCell.add( oBBoxNode.r1, oBBoxNode.c1, node );
-//        }
-
 
         /*поставить зависимость между ячейками и текущим ИД*/
 
@@ -923,7 +902,7 @@ DependencyGraph.prototype = {
             oRes.Ref = defRef;
         }
 
-        if( !oRes.isTable ){
+        if( !oRes.isTable && oRes.Ref != undefined && oRes.Ref != null ){
             oRes.parsedRef = new parserFormula(oRes.Ref, "", oRes.wb.getWorksheet(0));
             oRes.parsedRef.parse();
             oRes.parsedRef.buildDependencies(null,oRes);
@@ -957,9 +936,9 @@ DependencyGraph.prototype = {
 
         for ( var id in nodesList ) {
             if ( nodesList[id].isTable && nodesList[id].Ref ){
-                    var a = nodesList[id].Ref.split("!")[0];
-                    if( a.localeCompare(parserHelp.getEscapeSheetName(wsName)) == 0 )
-                        nodesList[id].Ref = null;
+                var a = nodesList[id].Ref.split("!")[0];
+                if( a.localeCompare(parserHelp.getEscapeSheetName(wsName)) == 0 )
+                    nodesList[id].Ref = null;
                 continue;
             }
             if ( !nodesList[id].isTable && nodesList[id].parsedRef && nodesList[id].parsedRef.removeSheet( sheetId ) ) {
@@ -976,25 +955,17 @@ DependencyGraph.prototype = {
                     new UndoRedoData_DefinedNames( defN.Name, defN.Ref, wsIndex ? wsIndex.getIndex() : undefined, defN.isTable, seUndoRedo ) );
 
                 if ( defN.sheetId == sheetId ) {
-
                     defN.Ref = null;
                     defN.parsedRef = null;
                     retRes[id] = defN;
-
                 }
                 else {
-
                     defN.Ref = defN.parsedRef.Formula = defN.parsedRef.assemble( true );
                     retRes[id] = defN;
-
                 }
-
             }
-
         }
-
         return retRes;
-
     },
     changeDefName:function ( oldDefName, newDefName ) {
 
@@ -1008,10 +979,8 @@ DependencyGraph.prototype = {
         sheetNodeList = this.defNameSheets[sheetId || "WB"];
         nodeId = getDefNameVertexId( sheetId || "WB", name );
 
-        //sheetNodeList[nodeId] = null;
         sheetNodeList ? delete sheetNodeList[nodeId] : null;
 
-        //this.defNameList[nodeId] = null;
         delete this.defNameList[nodeId];
 
         if(!oldN){
@@ -1049,9 +1018,7 @@ DependencyGraph.prototype = {
         for( var id in oldS ){
             defNamNode = oldS[id].clone();
             defNamNode.changeScope(newSheetId);
-
             defNamNode.changeRefToNewSheet(oldWS.getName(),newWS.getName());
-
             obj[defNamNode.nodeId] = defNamNode;
             this.defNameList[defNamNode.nodeId] = defNamNode;
         }
@@ -1762,17 +1729,6 @@ function buildRecalc(_wb,notrec, bForce){
 	    sortDependency(_wb)
 }
 
-function rebuildDefNameDependency(wb,dn){
-    var ws, dni;
-//    if( lc > 1 && !bForce) return;
-    for( var id in dn ){
-        dni = dn[id];
-        dni[0]
-        dni[1]
-        ws = wb.getWorksheetById(id);
-    }
-}
-
 function sortDependency( wb, setCellFormat ) {
 	if ( wb.isNeedCacheClean ){
 		buildRecalc(wb, true);
@@ -2152,6 +2108,9 @@ Workbook.prototype._insertWorksheetFormula=function(index){
 			{
 				for( var id in se ){
 					var slave = se[id];
+                    if(slave.isDefinedName){
+                        continue;
+                    }
 					var cell = slave.returnCell();
 					if( cell && cell.formulaParsed && cell.formulaParsed.is3D )
 					{
