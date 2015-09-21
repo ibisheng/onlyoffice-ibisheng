@@ -19,6 +19,7 @@
       this.onLocksReleased = options.onLocksReleased;
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
       this.onDisconnect = options.onDisconnect;
+      this.onWarning = options.onWarning;
       this.onFirstLoadChangesEnd = options.onFirstLoadChangesEnd;
       this.onConnectionStateChanged = options.onConnectionStateChanged;
       this.onSetIndexUser = options.onSetIndexUser;
@@ -55,6 +56,9 @@
       };
       this._CoAuthoringApi.onDisconnect = function(e, isDisconnectAtAll, isCloseCoAuthoring) {
         t.callback_OnDisconnect(e, isDisconnectAtAll, isCloseCoAuthoring);
+      };
+      this._CoAuthoringApi.onWarning = function(e) {
+        t.callback_OnWarning(e);
       };
       this._CoAuthoringApi.onFirstLoadChangesEnd = function() {
         t.callback_OnFirstLoadChangesEnd();
@@ -297,6 +301,12 @@
     }
   };
 
+  CDocsCoApi.prototype.callback_OnWarning = function(e) {
+    if (this.onWarning) {
+      this.onWarning(e);
+    }
+  };
+
   CDocsCoApi.prototype.callback_OnFirstLoadChangesEnd = function() {
     if (this.onFirstLoadChangesEnd) {
       this.onFirstLoadChangesEnd();
@@ -368,6 +378,7 @@
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
       this.onRelockFailed = options.onRelockFailed;
       this.onDisconnect = options.onDisconnect;
+      this.onWarning = options.onWarning;
       this.onSaveChanges = options.onSaveChanges;
       this.onFirstLoadChangesEnd = options.onFirstLoadChangesEnd;
       this.onConnectionStateChanged = options.onConnectionStateChanged;
@@ -1006,6 +1017,10 @@
     this.onDisconnect(data ? data['description'] : '', true, this.isCloseCoAuthoring);
   };
 
+  DocsCoApi.prototype._onWarning = function(data) {
+    this.onWarning(data ? data['description'] : '');
+  };
+
   DocsCoApi.prototype._onAuth = function(data) {
     var t = this;
     if (true === this._isAuth) {
@@ -1190,6 +1205,9 @@
           break;
         case 'documentOpen'    :
           t._documentOpen(dataObject);
+          break;
+        case 'warning':
+          t._onWarning(dataObject);
           break;
       }
     };
