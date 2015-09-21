@@ -1321,7 +1321,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             this.PageInfo.UpdateCurrentWrap(DispDef, bInline);
 
             // для неинлайновых формул не учитываем отступ первой строки
-            if(this.ParaMathRPI.bInline == false && true === PRS.UseFirstLine && 0 !== ParaRange && true === PRS.EmptyLine)
+            if(this.ParaMathRPI.bInline == false && true === PRS.UseFirstLine && true === PRS.EmptyLine)
             {
                 PRS.X -= ParaPr.Ind.FirstLine;
             }
@@ -1379,7 +1379,8 @@ ParaMath.prototype.private_UpdateWrapSettings = function(PRS)
 
         if(this.ParaMathRPI.IntervalState == MATH_INTERVAL_ON_SIDE) // WrapType == WRAPPING_TYPE_SQUARE || WrapType == WRAPPING_TYPE_THROUGH || WrapType == WRAPPING_TYPE_TIGHT
         {
-            var XRange = this.ParaMathRPI.XRange,
+            // вычтем здесь Ind.Left для корректного сравнения (т.к.стартовый отрезок = граница Range + Ind.Left ), а также если XStart окажется левой границей (прибаится лишний Ind.Left)
+            var XRange = this.ParaMathRPI.XRange - this.ParaMathRPI.IndLeft,
                 XLimit = this.ParaMathRPI.XLimit;
 
             // рассчитываем XStart, XEnd
