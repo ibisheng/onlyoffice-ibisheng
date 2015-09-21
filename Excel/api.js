@@ -1664,6 +1664,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
         t.handlers.trigger("asc_onError", isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
       }
     };
+    this.CoAuthoringApi.onWarning = function(e) {
+      t.handlers.trigger("asc_onError", c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
+    };
     this.CoAuthoringApi.onDocumentOpen = function(inputWrap) {
       if (inputWrap["data"]) {
         var input = inputWrap["data"];

@@ -486,62 +486,70 @@ asc_docs_api.prototype._coAuthoringInit = function () {
       t.SpellCheckUrl = window['g_cAscSpellCheckUrl'] ? window['g_cAscSpellCheckUrl'] : '';
     }
   };
-	/**
-	 * Event об отсоединении от сервера
-	 * @param {jQuery} e  event об отсоединении с причиной
-	 * @param {Bool} isDisconnectAtAll  окончательно ли отсоединяемся(true) или будем пробовать сделать reconnect(false) + сами отключились
-	 * @param {Bool} isCloseCoAuthoring
-	 */
-	this.CoAuthoringApi.onDisconnect				= function (e, isDisconnectAtAll, isCloseCoAuthoring) {
-        if (ConnectionState.None === t.CoAuthoringApi.get_state())
-            t.asyncServerIdEndLoaded();
-        if (isDisconnectAtAll) {
-            // Посылаем наверх эвент об отключении от сервера
-            t.asc_fireCallback("asc_onCoAuthoringDisconnect");
-            t.SetViewMode(true, true);
-            t.sync_ErrorCallback(isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect,
-                c_oAscError.Level.NoCritical);
+  /**
+   * Event об отсоединении от сервера
+   * @param {jQuery} e  event об отсоединении с причиной
+   * @param {Bool} isDisconnectAtAll  окончательно ли отсоединяемся(true) или будем пробовать сделать reconnect(false) + сами отключились
+   * @param {Bool} isCloseCoAuthoring
+   */
+  this.CoAuthoringApi.onDisconnect = function(e, isDisconnectAtAll, isCloseCoAuthoring) {
+    if (ConnectionState.None === t.CoAuthoringApi.get_state()) {
+      t.asyncServerIdEndLoaded();
+    }
+    if (isDisconnectAtAll) {
+      // Посылаем наверх эвент об отключении от сервера
+      t.asc_fireCallback("asc_onCoAuthoringDisconnect");
+      t.SetViewMode(true, true);
+      t.sync_ErrorCallback(isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
+    }
+  };
+  this.CoAuthoringApi.onWarning = function(e) {
+    t.sync_ErrorCallback(c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
+  };
+  this.CoAuthoringApi.onDocumentOpen = function(inputWrap) {
+    if (inputWrap["data"]) {
+      var input = inputWrap["data"];
+      switch (input["type"]) {
+        case 'getsettings':
+        {
+          t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+          t.asc_getEditorPermissionsCallback(input);
         }
-	};
-	this.CoAuthoringApi.onDocumentOpen				= function (inputWrap) {
-        if (inputWrap["data"]) {
-			var input = inputWrap["data"];
-			switch(input["type"]){
-				case 'getsettings':{
-					t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
-					t.asc_getEditorPermissionsCallback(input);
-				}
-				break;
-				case 'open': {
-					switch(input["status"]) {
-						case "ok":
-							var urls = input["data"];
-							g_oDocumentUrls.init(urls);
-							if(null != urls['Editor.bin']) {
-								_onOpenCommand(function(){}, {'data': urls['Editor.bin']});
-							} else {
-								t.asc_fireCallback("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.NoCritical);
-							}
-						break;
-						case "needparams": break;
-						case "err":
-							t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
-						break;
-						case "updateversion": break;
-					}
-				}
-				break;
-				default:
-					if(t.fCurCallback) {
-						t.fCurCallback(input);
-						t.fCurCallback = null;
-					} else {
-						t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-					}
-				break;
-			}
+          break;
+        case 'open':
+        {
+          switch (input["status"]) {
+            case "ok":
+              var urls = input["data"];
+              g_oDocumentUrls.init(urls);
+              if (null != urls['Editor.bin']) {
+                _onOpenCommand(function() {
+                }, {'data': urls['Editor.bin']});
+              } else {
+                t.asc_fireCallback("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.NoCritical);
+              }
+              break;
+            case "needparams":
+              break;
+            case "err":
+              t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
+              break;
+            case "updateversion":
+              break;
+          }
         }
-	};
+          break;
+        default:
+          if (t.fCurCallback) {
+            t.fCurCallback(input);
+            t.fCurCallback = null;
+          } else {
+            t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+          }
+          break;
+      }
+    }
+  };
 
 	//в обычном серверном режиме портим ссылку, потому что CoAuthoring теперь имеет встроенный адрес
 	//todo надо использовать проверку get_OfflineApp, но она инициализируется только после loadDocument

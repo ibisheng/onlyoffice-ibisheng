@@ -1373,23 +1373,26 @@ asc_docs_api.prototype._coAuthoringInit = function()
       t._coSpellCheckInit();
     }
   };
-	/**
-	 * Event об отсоединении от сервера
-	 * @param {jQuery} e  event об отсоединении с причиной
-	 * @param {Bool} isDisconnectAtAll  окончательно ли отсоединяемся(true) или будем пробовать сделать reconnect(false) + сами отключились
-	 * @param {Bool} isCloseCoAuthoring
-	 */
-	this.CoAuthoringApi.onDisconnect				= function (e, isDisconnectAtAll, isCloseCoAuthoring) {
-		if (ConnectionState.None === t.CoAuthoringApi.get_state())
-			t.asyncServerIdEndLoaded();
-		if (isDisconnectAtAll) {
-			// Посылаем наверх эвент об отключении от сервера
-			t.asc_fireCallback("asc_onCoAuthoringDisconnect");
-			t.SetViewMode(true);
-            t.sync_ErrorCallback(isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect,
-                c_oAscError.Level.NoCritical);
-		}
-	};
+  /**
+   * Event об отсоединении от сервера
+   * @param {jQuery} e  event об отсоединении с причиной
+   * @param {Bool} isDisconnectAtAll  окончательно ли отсоединяемся(true) или будем пробовать сделать reconnect(false) + сами отключились
+   * @param {Bool} isCloseCoAuthoring
+   */
+  this.CoAuthoringApi.onDisconnect = function(e, isDisconnectAtAll, isCloseCoAuthoring) {
+    if (ConnectionState.None === t.CoAuthoringApi.get_state()) {
+      t.asyncServerIdEndLoaded();
+    }
+    if (isDisconnectAtAll) {
+      // Посылаем наверх эвент об отключении от сервера
+      t.asc_fireCallback("asc_onCoAuthoringDisconnect");
+      t.SetViewMode(true);
+      t.sync_ErrorCallback(isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
+    }
+  };
+  this.CoAuthoringApi.onWarning = function(e) {
+    t.sync_ErrorCallback(c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
+  };
 	this.CoAuthoringApi.onDocumentOpen				= function (inputWrap) {
         if (inputWrap["data"]) {
 			var input = inputWrap["data"];
