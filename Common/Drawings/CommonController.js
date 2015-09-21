@@ -5020,7 +5020,7 @@ DrawingObjectsController.prototype =
                 }
                 else if (this.drawingObjects.cSld)
                 {
-                    if (!(bNoRedraw === true))
+                 //   if (!(bNoRedraw === true))
                     {
                         nPageNum2 = this.drawingObjects.num;
                     }

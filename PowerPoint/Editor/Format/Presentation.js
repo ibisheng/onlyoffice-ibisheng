@@ -1755,6 +1755,11 @@ CPresentation.prototype =
                 {
                     bNeedRedraw = false;
                 }
+                var bChart = oDrawingObjects.checkChartTextSelection(true);
+                if(!bNeedRedraw)
+                {
+                    bNeedRedraw = bChart;
+                }
                 if(e.ShiftKey || (!oDrawingObjects.selection.groupSelection && !oDrawingObjects.selection.textSelection && !oDrawingObjects.selection.chartSelection))
                 {
                     oDrawingObjects.resetSelection();
