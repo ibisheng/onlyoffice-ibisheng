@@ -1315,7 +1315,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     // Какая-то непонятная заглушка, чтобы не падало в ipad
     if (this.isMobileVersion) {
       window.USER_AGENT_SAFARI_MACOS = false;
-      PASTE_ELEMENT_ID2 = "wrd_pastebin";
+      PASTE_ELEMENT_ID = "wrd_pastebin";
       ELEMENT_DISPAY_STYLE = "none";
     }
 

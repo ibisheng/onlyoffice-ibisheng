@@ -96,7 +96,7 @@ var copyPasteUseBinary = true;
 
 if (window.USER_AGENT_SAFARI_MACOS)
 {
-    PASTE_ELEMENT_ID = "SelectId";
+    PASTE_ELEMENT_ID = COPY_ELEMENT_ID;
     ELEMENT_DISPAY_STYLE = "block";
 }
 

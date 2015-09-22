@@ -966,10 +966,10 @@
             {
                 //var oWordControl = api.WordControl;
                 var t = this;
-                var pastebin = document.getElementById(PASTE_ELEMENT_ID2);
+                var pastebin = document.getElementById(PASTE_ELEMENT_ID);
                 if(!pastebin){
                     pastebin = document.createElement("div");
-                    pastebin.setAttribute( 'id', PASTE_ELEMENT_ID2 );
+                    pastebin.setAttribute( 'id', PASTE_ELEMENT_ID );
 					pastebin.setAttribute( 'class', COPYPASTE_ELEMENT_CLASS );
                     pastebin.style.position = 'absolute';
                     pastebin.style.top = '100px';
@@ -5469,14 +5469,13 @@
 )(jQuery, window);
 
 var COPY_ELEMENT_ID2 = "clipboard-helper";
-var PASTE_ELEMENT_ID2 = "wrd_pastebin";
 
 var kElementTextId = "clipboard-helper-text";
 var isNeedEmptyAfterCut = false;
 
 if (window.USER_AGENT_SAFARI_MACOS)
 {
-	PASTE_ELEMENT_ID2 = "clipboard-helper";
+	PASTE_ELEMENT_ID = COPY_ELEMENT_ID2;
 }
 function SafariIntervalFocus2()
 {
