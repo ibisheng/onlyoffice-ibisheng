@@ -84,10 +84,6 @@ var c_oAscCsvDelimiter = {
   Space: 5
 };
 
-var c_oAscAdvancedOptionsID = {
-  CSV: 0
-};
-
 var c_oAscMergeOptions = {
   Unmerge: 0,
   Merge: 1,

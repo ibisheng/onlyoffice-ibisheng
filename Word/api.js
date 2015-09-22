@@ -15,7 +15,6 @@ var documentFormat = 'null';
 var documentVKey = null;
 var documentOrigin = "";
 var documentFormatSave = c_oAscFileType.DOCX;
-var documentFormatSaveTxtCodepage = 46;//65001 utf8
 var documentCallbackUrl = undefined;		// Ссылка для отправления информации о документе
 
 function CDocOpenProgress()
@@ -1415,20 +1414,8 @@ asc_docs_api.prototype._coAuthoringInit = function()
 							}
 						break;
 						case "needparams":
-						//todo dialog
-						var rData = {
-							"id":documentId,
-							"userid": documentUserId,
-							"format": documentFormat,
-							"vkey": documentVKey,
-							"editorid": c_oEditorId.Word,
-							"c":"reopen",
-							"url": documentUrl,
-							"title": documentTitle,
-							"codepage": documentFormatSaveTxtCodepage,
-							"embeddedfonts": t.isUseEmbeddedCutFonts
-						};
-						sendCommand2(t, null, rData);
+							var cp = {'codepage': c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
+							t.asc_fireCallback("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), t.advancedOptionsAction);
 						break;
 						case "err":
 							t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
@@ -2200,7 +2187,7 @@ asc_docs_api.prototype.asc_Print = function()
   else {
     // Меняем тип состояния (на сохранение)
     this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
-    _downloadAs(this, "save", null, null, c_oAscFileType.PDF, function(input){
+    _downloadAs(this, "save", null, null, null, c_oAscFileType.PDF, function(input){
       if(null != input && "save" == input["type"]) {
         if('ok' == input["status"]){
           var url = g_fGetSaveUrl(input["data"]);
@@ -2370,13 +2357,13 @@ asc_docs_api.prototype.asc_Save = function ()
 	}
 };
 
-asc_docs_api.prototype.asc_DownloadAs = function(typeFile) {//передаем число соответствующее своему формату.
+asc_docs_api.prototype.asc_DownloadAs = function(typeFile, txtOptions) {//передаем число соответствующее своему формату.
 	var actionType = this.mailMergeFileData ? c_oAscAsyncAction.MailMergeLoadFile : c_oAscAsyncAction.DownloadAs;
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 	var t = this;
 	// Меняем тип состояния (на сохранение)
 	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
-	_downloadAs(this, "save", null, null, typeFile, function (input) {
+	_downloadAs(this, "save", null, null, txtOptions, typeFile, function (input) {
 		if(null != input && ("save" == input["type"] || "sfct" == input["type"])) {
 			if('ok' == input["status"]){
 				var url = g_fGetSaveUrl(input["data"]);
@@ -2405,7 +2392,7 @@ asc_docs_api.prototype.asc_DownloadAsMailMerge = function(typeFile, StartIndex, 
 		var t = this;
 		// Меняем тип состояния (на сохранение)
 		this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
-		_downloadAs(this, "save", oDocumentMailMerge, null, typeFile, function (input) {
+		_downloadAs(this, "save", oDocumentMailMerge, null, null, typeFile, function (input) {
 			if(null != input && "save" == input["type"]) {
 				if('ok' == input["status"]){
 					var url = g_fGetSaveUrl(input["data"]);
@@ -2443,6 +2430,36 @@ asc_docs_api.prototype.AddURL = function(url){
 };
 asc_docs_api.prototype.Help = function(){
 
+};
+/*
+ idOption идентификатор дополнительного параметра, c_oAscAdvancedOptionsID.TXT.
+ option - какие свойства применить, пока массив. для TXT объект asc_CTXTAdvancedOptions(codepage)
+ exp:	asc_setAdvancedOptions(c_oAscAdvancedOptionsID.TXT, new Asc.asc_CCSVAdvancedOptions(1200) );
+ */
+asc_docs_api.prototype.asc_setAdvancedOptions = function(idOption, option) {
+  var t = this;
+  switch (idOption) {
+    case c_oAscAdvancedOptionsID.TXT:
+      // Проверяем тип состояния в данный момент
+      if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Open) {
+          var rData = {
+            "id":documentId,
+            "userid": documentUserId,
+            "format": documentFormat,
+            "vkey": documentVKey,
+            "editorid": c_oEditorId.Word,
+            "c":"reopen",
+            "url": documentUrl,
+            "title": documentTitle,
+            "codepage": option.asc_getCodePage(),
+            "embeddedfonts": t.isUseEmbeddedCutFonts
+          };
+          sendCommand2(t, null, rData);
+      } else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save) {
+          t.asc_DownloadAs(c_oAscFileType.TXT, option);
+      }
+      break;
+  }
 };
 asc_docs_api.prototype.SetFontRenderingMode = function(mode)
 {
@@ -6824,7 +6841,7 @@ function _onOpenCommand(fCallback, incomeObject) {
 		if(fCallback) fCallback();
 	});
 }
-function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, filetype, fCallback, fCallbackRequest) {
+function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, txtOptions, filetype, fCallback, fCallbackRequest) {
 	var dataContainer = {data: null, part: null, index: 0, count: 0};
 	var oAdditionalData = {};
     oAdditionalData["c"] = command;
@@ -6843,6 +6860,16 @@ function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, fi
 		// ToDo select csv params
 		oAdditionalData['codepage'] = 65001;
 		oAdditionalData['delimiter'] = 4; // c_oAscCsvDelimiter.Comma
+	} else if (c_oAscFileType.TXT === filetype) {
+		if (!txtOptions) {
+			// Мы открывали команду, надо ее закрыть.
+			editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
+			var cp = {'codepage': c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
+			editor.asc_fireCallback("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), t.advancedOptionsAction);
+			return;
+		} else if (txtOptions instanceof asc.asc_CTXTAdvancedOptions) {
+			oAdditionalData["codepage"] = txtOptions.asc_getCodePage();
+		}
 	} else {
 		var oLogicDocument;
 		if(null != oDocumentMailMerge)
@@ -7108,7 +7135,7 @@ asc_docs_api.prototype.asc_sendMailMergeData = function(oData)
 	oData.put_UserId(documentUserId);
 	oData.put_RecordCount(oData.get_RecordTo() - oData.get_RecordFrom() + 1);
 	var t = this;
-	_downloadAs(this, "sendmm", null, oData, c_oAscFileType.TXT, null, function(input){
+	_downloadAs(this, "sendmm", null, oData, null, c_oAscFileType.TXT, null, function(input){
 		if(null != input && "sendmm" == input["type"]) {
 			if("ok" == input["status"]) {
 				;

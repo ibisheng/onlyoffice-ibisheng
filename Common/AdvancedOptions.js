@@ -20,6 +20,10 @@
 					this.optionId = id;
 					this.options = new asc_CCSVOptions(opt);
 					break;
+				case c_oAscAdvancedOptionsID.TXT:
+					this.optionId = id;
+					this.options = new asc_CTXTOptions(opt);
+					break;
 			}
 		}
 		asc_CAdvancedOptions.prototype.asc_getOptionId = function(){ return this.optionId; };
@@ -54,6 +58,29 @@
 		prot["asc_getRecommendedSettings"]	= prot.asc_getRecommendedSettings;
 
 		/** @constructor */
+		function asc_CTXTOptions(opt){
+			this.codePages = function(){
+				var arr = [], c, encodings = opt["encodings"];
+				for(var i = 0; i < encodings.length; i++ ){
+					c = new asc_CCodePage();
+					c.init(encodings[i]);
+					arr.push(c);
+				}
+				return arr;
+			}();
+			this.recommendedSettings = new asc_CTXTAdvancedOptions (opt["codepage"]);
+		}
+		asc_CTXTOptions.prototype.asc_getCodePages = function(){ return this.codePages;};
+		asc_CTXTOptions.prototype.asc_getRecommendedSettings = function () { return this.recommendedSettings; };
+
+		window["Asc"].asc_CTXTOptions = asc_CTXTOptions;
+		window["Asc"]["asc_CTXTOptions"] = asc_CTXTOptions;
+		prot = asc_CTXTOptions.prototype;
+
+		prot["asc_getCodePages"]			= prot.asc_getCodePages;
+		prot["asc_getRecommendedSettings"]	= prot.asc_getRecommendedSettings;
+
+		/** @constructor */
 		function asc_CCSVAdvancedOptions(codepage,delimiter){
 			this.codePage = codepage;
 			this.delimiter = delimiter;
@@ -67,6 +94,18 @@
 		prot = asc_CCSVAdvancedOptions.prototype;
 		prot["asc_getDelimiter"] = prot.asc_getDelimiter;
 		prot["asc_setDelimiter"] = prot.asc_setDelimiter;
+		prot["asc_getCodePage"] = prot.asc_getCodePage;
+		prot["asc_setCodePage"] = prot.asc_setCodePage;
+		
+		/** @constructor */
+		function asc_CTXTAdvancedOptions(codepage){
+			this.codePage = codepage;
+		}
+		asc_CTXTAdvancedOptions.prototype.asc_getCodePage = function(){return this.codePage;};
+		asc_CTXTAdvancedOptions.prototype.asc_setCodePage = function(v){this.codePage = v;};
+
+		window["Asc"].asc_CTXTAdvancedOptions = window["Asc"]["asc_CTXTAdvancedOptions"] = asc_CTXTAdvancedOptions;
+		prot = asc_CTXTAdvancedOptions.prototype;
 		prot["asc_getCodePage"] = prot.asc_getCodePage;
 		prot["asc_setCodePage"] = prot.asc_setCodePage;
 

@@ -886,44 +886,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
           });
         }
         break;
-      case "needparams":
-        // Проверяем, возможно нам пришли опции для CSV
-        if (this.documentOpenOptions) {
-          codePageCsv = this.documentOpenOptions["codePage"];
-          delimiterCsv = this.documentOpenOptions["delimiter"];
-          if (null !== codePageCsv && undefined !== codePageCsv && null !== delimiterCsv && undefined !== delimiterCsv) {
-            this.asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV, new asc.asc_CCSVAdvancedOptions(codePageCsv, delimiterCsv));
-            break;
-          }
-        }
-        asc_ajax({
-          url: result["data"],
-          dataType: "text",
-          success: function(result) {
-            var cp = JSON.parse(result);
-            t.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), t.advancedOptionsAction);
-          },
-          error: function() {
-            t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
-            if (fCallback) {
-              fCallback({returnCode: c_oAscError.Level.Critical, val: c_oAscError.ID.Unknown});
-            }
-          }
-        });
-        break;
-      case "getcodepage":
-        // Проверяем, возможно нам пришли опции для CSV
-        if (this.documentOpenOptions) {
-          codePageCsv = this.documentOpenOptions["codePage"];
-          delimiterCsv = this.documentOpenOptions["delimiter"];
-          if (null !== codePageCsv && undefined !== codePageCsv && null !== delimiterCsv && undefined !== delimiterCsv) {
-            this.asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV, new asc.asc_CCSVAdvancedOptions(codePageCsv, delimiterCsv));
-            break;
-          }
-        }
-        var cp = JSON.parse(result["data"]);
-        this.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), this.advancedOptionsAction);
-        break;
     }
   };
 
@@ -1051,7 +1013,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     } else if (c_oAscFileType.CSV === sFormat && !options) {
       // Мы открывали команду, надо ее закрыть.
       this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
-      var cp = {'delimiter': c_oAscCsvDelimiter.Comma, 'codepage': 46, 'encodings': getEncodingParams()};
+      var cp = {'delimiter': c_oAscCsvDelimiter.Comma, 'codepage': c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
       this.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), this.advancedOptionsAction);
       return;
     } else {

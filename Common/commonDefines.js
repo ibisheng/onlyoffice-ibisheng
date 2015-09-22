@@ -57,6 +57,11 @@ var c_oAscAsyncAction = {
 	SendMailMerge		: 15  // рассылка mail merge по почте
 };
 
+var c_oAscAdvancedOptionsID = {
+  CSV: 0,
+  TXT: 1
+};
+
 var c_oAscAdvancedOptionsAction = {
 	None: 0,
 	Open: 1,
@@ -678,6 +683,7 @@ var c_oAscEncodings = [
     [ 50,   12000, "UTF-32",           "Unicode (UTF-32)" ],
     [ 51,   12001, "UTF-32BE",         "Unicode (UTF-32 Big Endian)" ]
 ];
+var c_oAscCodePageUtf8 = 46;//65001
 
 var c_oAscMaxTooltipLength = 256;
 var c_oAscMaxCellOrCommentLength = 32767; // По идее должно быть 32768, но видимо сравнение идеть на меньше (а не меньше либо равно)
