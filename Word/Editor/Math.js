@@ -605,7 +605,11 @@ ParaMath.prototype.Copy = function(Selected)
 
     return NewMath;
 };
-
+ParaMath.prototype.CopyContent = function(Selected)
+{
+    var NewMath = this.Copy(Selected);
+    return [NewMath];
+};
 ParaMath.prototype.Set_Paragraph = function(Paragraph)
 {
     this.Paragraph = Paragraph;
