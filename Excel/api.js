@@ -730,9 +730,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     ws.applyAutoFilter(type, autoFilterObject);
   };
 
-  spreadsheet_api.prototype.asc_sortColFilter = function(type, cellId) {
+  spreadsheet_api.prototype.asc_sortColFilter = function(type, cellId, displayName) {
     var ws = this.wb.getWorksheet();
-    ws.sortColFilter(type, cellId);
+    ws.sortColFilter(type, cellId, displayName);
   };
 
   spreadsheet_api.prototype.asc_getAddFormatTableOptions = function() {

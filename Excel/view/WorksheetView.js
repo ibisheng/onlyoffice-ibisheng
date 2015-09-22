@@ -10777,14 +10777,14 @@
 			this._isLockedAll(onChangeAutoFilterCallback);
 		};
 
-		WorksheetView.prototype.sortColFilter = function (type,cellId) {
+		WorksheetView.prototype.sortColFilter = function (type, cellId, displayName) {
 			var t = this;
 			var ar = this.activeRange.clone(true);
 			var onChangeAutoFilterCallback = function (isSuccess) {
 				if (false === isSuccess)
 					return;
 
-				t.autoFilters.sortColFilter(type, cellId, ar);
+				t.autoFilters.sortColFilter(type, cellId, ar, null, displayName);
 			};
 			this._isLockedAll(onChangeAutoFilterCallback);
 		};

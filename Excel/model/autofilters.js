@@ -168,7 +168,8 @@ var maxIndividualValues = 10000;
 			asc_getValues : function() { return this.values; },
 			asc_getFilterObj : function() { return this.filter; },
 			
-			asc_getSortState : function() { return this.sortVal; }
+			asc_getSortState : function() { return this.sortVal; },
+			asc_getDisplayName : function(val) { return this.displayName; },
 		};
 		
 		var g_oAutoFilterObj = {
@@ -1084,6 +1085,22 @@ var maxIndividualValues = 10000;
 						}
 					}
 				}
+				else if(type === historyitem_AutoFilter_Sort && cloneData.oldFilter)//сортировка
+				{
+					if(aWs.AutoFilter && cloneData.oldFilter.getType() === g_nFiltersType.autoFilter)
+						aWs.AutoFilter = cloneData.oldFilter.clone(null);
+					else if(aWs.TableParts)
+					{
+						for(var l = 0; l < aWs.TableParts.length; l++)
+						{
+							if(cloneData.oldFilter.DisplayName === aWs.TableParts[l].DisplayName)
+							{
+								aWs.TableParts[l] = cloneData.oldFilter.clone(null);
+								break;
+							}	
+						}
+					}
+				}
 				else if(cloneData.FilterColumns || cloneData.AutoFilter || cloneData.TableColumns || (cloneData.Ref && (cloneData instanceof AutoFilter || cloneData instanceof TablePart)))//add
 				{
 					if(cloneData.Ref)
@@ -1559,13 +1576,13 @@ var maxIndividualValues = 10000;
 				History.EndTransaction();
 			},
 			
-			sortColFilter: function(type, cellId, activeRange, isTurnOffHistory) {
+			sortColFilter: function(type, cellId, activeRange, isTurnOffHistory, displayName) {
 				var aWs = this._getCurrentWS();
 				var ws = this.worksheet;
 				var t = this;
 				var bUndoChanges = aWs.workbook.bUndoChanges;
 				var bRedoChanges = aWs.workbook.bRedoChanges;
-				var curFilter, sortRange, filterRef, startCol;
+				var curFilter, sortRange, filterRef, startCol, maxFilterRow;
 				
 				var onSortAutoFilterCallback = function(success)
 				{
@@ -1582,7 +1599,7 @@ var maxIndividualValues = 10000;
 						if(!curFilter.SortState)
 						{
 							curFilter.SortState = new SortState();
-							curFilter.SortState.Ref = curFilter.Ref;
+							curFilter.SortState.Ref = new Asc.Range(startCol, curFilter.Ref.r1, startCol, maxFilterRow);
 							curFilter.SortState.SortConditions = [];
 							curFilter.SortState.SortConditions[0] = new SortCondition();
 						}
@@ -1594,7 +1611,7 @@ var maxIndividualValues = 10000;
 						curFilter.SortState.SortConditions[0].Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
 						curFilter.SortState.SortConditions[0].ConditionDescending = resType;
 						
-						cellId = t._rangeToId(cellIdRange);
+						//cellId = t._rangeToId(cellIdRange);
 						
 						//сама сортировка
 						if(!bRedoChanges && !bUndoChanges)
@@ -1614,48 +1631,76 @@ var maxIndividualValues = 10000;
 					}
 				};
 				
-				if(cellId)
-					activeRange = t._idToRange(cellId);
+				//if(cellId)
+					//activeRange = t._idToRange(cellId);
 				
 				var resType = type == 'ascending';
-					
-				var filter = t.searchRangeInTableParts(activeRange);
-				if(filter === -2)//если захвачена часть ф/т
-					return;
-					
-				if(filter === -1)//если нет ф/т в выделенном диапазоне
+				
+				if(displayName !== undefined)
 				{
-					if(aWs.AutoFilter && aWs.AutoFilter.Ref)
-					{
-						curFilter = aWs.AutoFilter;
-						filterRef = curFilter.Ref;
-					}
+					curFilter = this._getFilterByDisplayName(displayName);
+					filterRef = curFilter.Ref;
 					
-					//в данному случае может быть захвачен а/ф, если он присутвует(надо проверить), либо нажата кнопка а/ф
-					if(curFilter && (filterRef.isEqual(activeRange) || cellId))
+					if(cellId !== '')
+						startCol = filterRef.c1 + cellId;
+					else
+						startCol = activeRange.startCol;
+				}
+				else
+				{
+					var filter = t.searchRangeInTableParts(activeRange);
+					if(filter === -2)//если захвачена часть ф/т
+						return;
+						
+					if(filter === -1)//если нет ф/т в выделенном диапазоне
 					{
+						if(aWs.AutoFilter && aWs.AutoFilter.Ref)
+						{
+							curFilter = aWs.AutoFilter;
+							filterRef = curFilter.Ref;
+						}
+						
+						//в данному случае может быть захвачен а/ф, если он присутвует(надо проверить), либо нажата кнопка а/ф
+						if(curFilter && (filterRef.isEqual(activeRange) || cellId !== ''))
+						{
+							if(cellId !== '')
+								startCol = filterRef.c1 + cellId;
+							else
+								startCol = activeRange.startCol;
+							
+							if(startCol === undefined)
+								startCol = activeRange.c1;
+						}
+						else//внутри а/ф либо без а/ф либо часть а/ф
+						{
+							ws.setSelectionInfo("sort", resType);
+							return;
+						}
+					}
+					else
+					{
+						//получаем данную ф/т
+						curFilter = aWs.TableParts[filter];
+						filterRef = curFilter.Ref;
+						
 						startCol = activeRange.startCol;
 						if(startCol === undefined)
 							startCol = activeRange.c1;
 					}
-					else//внутри а/ф либо без а/ф либо часть а/ф
-					{
-						ws.setSelectionInfo("sort", resType);
-						return;
-					}
 				}
-				else
+				
+				
+				maxFilterRow = filterRef.r2;
+				if(curFilter.getType() === g_nFiltersType.autoFilter && curFilter.isApplyAutoFilter() === false)//нужно подхватить нижние ячейки в случае, если это не применен а/ф
 				{
-					//получаем данную ф/т
-					curFilter = aWs.TableParts[filter];
-					filterRef = curFilter.Ref;
+					var automaticRange = this._getAdjacentCellsAF(curFilter.Ref, aWs, true);
+					var automaticRowCount = automaticRange.r2;
 					
-					startCol = activeRange.startCol;
-					if(startCol === undefined)
-						startCol = activeRange.c1;
+					if(automaticRowCount > maxFilterRow)
+						maxFilterRow = automaticRowCount;
 				}
-			
-				sortRange = aWs.getRange3(filterRef.r1 + 1, filterRef.c1, filterRef.r2, filterRef.c2);
+				
+				sortRange = aWs.getRange3(filterRef.r1 + 1, filterRef.c1, maxFilterRow, filterRef.c2);
 				if(isTurnOffHistory)
 					onSortAutoFilterCallback(true);
 				else
@@ -4733,6 +4778,7 @@ var maxIndividualValues = 10000;
 		prot["asc_getValues"]					= prot.asc_getValues;
 		prot["asc_getFilterObj"]				= prot.asc_getFilterObj;
 		prot["asc_getCellId"]					= prot.asc_getCellId;
+		prot["asc_getDisplayName"]				= prot.asc_getDisplayName;
 		
 		window["Asc"]["AutoFilterObj"]		    = window["Asc"].AutoFilterObj = AutoFilterObj;
 		prot									= AutoFilterObj.prototype;
