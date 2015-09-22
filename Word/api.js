@@ -6864,7 +6864,7 @@ function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, tx
 		// Мы открывали команду, надо ее закрыть.
 		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
 		var cp = {'codepage': c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
-		editor.asc_fireCallback("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), t.advancedOptionsAction);
+		editor.asc_fireCallback("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), editor.advancedOptionsAction);
 		return;
 	} else {
 		if (txtOptions instanceof asc.asc_CTXTAdvancedOptions) {
