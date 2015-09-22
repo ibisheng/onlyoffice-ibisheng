@@ -1316,7 +1316,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     if (this.isMobileVersion) {
       window.USER_AGENT_SAFARI_MACOS = false;
       PASTE_ELEMENT_ID2 = "wrd_pastebin";
-      ELEMENT_DISPAY_STYLE2 = "none";
+      ELEMENT_DISPAY_STYLE = "none";
     }
 
     if (window.USER_AGENT_SAFARI_MACOS) {

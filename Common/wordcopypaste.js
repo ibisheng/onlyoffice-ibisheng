@@ -91,6 +91,7 @@ window.PasteEndTimerId = -1;
 var COPY_ELEMENT_ID = "SelectId";
 var PASTE_ELEMENT_ID = "wrd_pastebin";
 var ELEMENT_DISPAY_STYLE = "none";
+var COPYPASTE_ELEMENT_CLASS = "sdk-element";
 var copyPasteUseBinary = true;
 
 if (window.USER_AGENT_SAFARI_MACOS)
@@ -111,7 +112,7 @@ function Editor_Copy_GetElem(api)
     {
         ElemToSelect = document.createElement("div");
         ElemToSelect.id = COPY_ELEMENT_ID;
-        ElemToSelect.className = "sdk-element";
+        ElemToSelect.className = COPYPASTE_ELEMENT_CLASS;
         ElemToSelect.style.position = "absolute";
         //���� ������� width ���������, �� �������� ����� ��������� ������������ �� span
         //� �������� � ����� ������ ��������� ������ <span>1</span><span> </span><span>2</span>
@@ -1987,7 +1988,7 @@ function Editor_Paste_GetElem(api, bClean)
     if(!pastebin){
         pastebin = document.createElement("div");
         pastebin.setAttribute( 'id', PASTE_ELEMENT_ID );
-        pastebin.className = "sdk-element";
+        pastebin.className = COPYPASTE_ELEMENT_CLASS;
 
         if (AscBrowser.isIE)
             pastebin.style.position = 'fixed';
@@ -7467,7 +7468,7 @@ function Editor_CopyPaste_Create(api)
 {
     var ElemToSelect = document.createElement("div");
     ElemToSelect.id = COPY_ELEMENT_ID;
-    ElemToSelect.className = "sdk-element";
+    ElemToSelect.className = COPYPASTE_ELEMENT_CLASS;
     ElemToSelect.style.position = "absolute";
 
     ElemToSelect.style.left = '0px';

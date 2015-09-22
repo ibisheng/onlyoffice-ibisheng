@@ -70,7 +70,7 @@
 				t.element.style.height = '100px';
 				t.element.style.overflow = 'hidden';
 				t.element.style.zIndex = -1000;
-				t.element.style.display = ELEMENT_DISPAY_STYLE2;
+				t.element.style.display = ELEMENT_DISPAY_STYLE;
 				t.element.setAttribute("contentEditable", true);
 
 				if (!found) {doc.body.appendChild(t.element);}
@@ -100,7 +100,7 @@
 					t.elementText.style.overflow = 'hidden';
 					t.elementText.style.zIndex = -1000;
 					//if(AscBrowser.isIE)
-						t.elementText.style.display = ELEMENT_DISPAY_STYLE2;
+						t.elementText.style.display = ELEMENT_DISPAY_STYLE;
 					t.elementText.setAttribute("contentEditable", true);
 	
 					if (!foundText) {doc.body.appendChild(t.elementText);}
@@ -759,14 +759,14 @@
 				window.setTimeout(
 						function() {
 							// отменяем возможность выделения
-							t.element.style.display = ELEMENT_DISPAY_STYLE2;
+							t.element.style.display = ELEMENT_DISPAY_STYLE;
 							doc.body.style.MozUserSelect = "none";
 							doc.body.style["-khtml-user-select"] = "none";
 							doc.body.style["-o-user-select"] = "none";
 							doc.body.style["user-select"] = "none";
 							doc.body.style["-webkit-user-select"] = "none";
 							
-							t.elementText.style.display = ELEMENT_DISPAY_STYLE2;
+							t.elementText.style.display = ELEMENT_DISPAY_STYLE;
 							var textInsert = t.elementText.value;
 							if(isOnlyLocalBufferSafari && navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac') && t.lStorageText)
 								textInsert = t.lStorageText;
@@ -948,10 +948,10 @@
 					if(!isTruePaste)
 						t._editorPasteExec(worksheet, pastebin);
 					
-					pastebin.style.display  = ELEMENT_DISPAY_STYLE2;
+					pastebin.style.display  = ELEMENT_DISPAY_STYLE;
 						
 					if(AscBrowser.isIE)
-						pastebin.style.display  = ELEMENT_DISPAY_STYLE2;
+						pastebin.style.display  = ELEMENT_DISPAY_STYLE;
 					
 					if (callback && callback.call) {callback();}
 				};
@@ -1229,7 +1229,7 @@
 						
 						bExist = true;
 					}
-					ifr.style.display  = ELEMENT_DISPAY_STYLE2;
+					ifr.style.display  = ELEMENT_DISPAY_STYLE;
 				}
 				if(bExist)
 				{
@@ -2776,7 +2776,7 @@
 				window.setTimeout(
 						function() {
 							// отменяем возможность выделения
-							t.element.style.display = ELEMENT_DISPAY_STYLE2;
+							t.element.style.display = ELEMENT_DISPAY_STYLE;
 							doc.body.style.MozUserSelect = "none";
 							doc.body.style["-khtml-user-select"] = "none";
 							doc.body.style["-o-user-select"] = "none";
@@ -5468,29 +5468,15 @@
 	}
 )(jQuery, window);
 
-window.USER_AGENT_MACOS = AscBrowser.isMacOs;
-window.USER_AGENT_SAFARI_MACOS = AscBrowser.isSafariMacOs;
-window.USER_AGENT_IE = AscBrowser.isIE || AscBrowser.isOpera;
-window.USER_AGENT_WEBKIT = AscBrowser.isWebkit;
-
-window.GlobalPasteFlag = false;
-window.GlobalPasteFlagCounter = 0;
 var COPY_ELEMENT_ID2 = "clipboard-helper";
 var PASTE_ELEMENT_ID2 = "wrd_pastebin";
-var ELEMENT_DISPAY_STYLE2 = "none";
-var COPYPASTE_ELEMENT_CLASS = "sdk-element";
+
 var kElementTextId = "clipboard-helper-text";
 var isNeedEmptyAfterCut = false;
-
-var PASTE_EMPTY_COUNTER_MAX = 10;
-var PASTE_EMPTY_COUNTER     = 0;
-var PASTE_EMPTY_USE         = AscBrowser.isMozilla;
-
 
 if (window.USER_AGENT_SAFARI_MACOS)
 {
 	PASTE_ELEMENT_ID2 = "clipboard-helper";
-	ELEMENT_DISPAY_STYLE2 = "block";
 }
 function SafariIntervalFocus2()
 {
@@ -5574,7 +5560,7 @@ function Editor_CopyPaste_Create2(api)
 		
 		Editor_Copy_Event_Excel(e, ElemToSelect);
 		e.preventDefault();
-	}
+	};
 	
 	ElemToSelect.oncut = function(e){
 		var api = window["Asc"]["editor"];
@@ -5583,7 +5569,7 @@ function Editor_CopyPaste_Create2(api)
 		
 		Editor_Copy_Event_Excel(e, ElemToSelect, true);
 		e.preventDefault();
-	}
+	};
 	
 	ElemToSelect.onpaste = function(e){
 		var api = window["Asc"]["editor"];
@@ -5592,7 +5578,7 @@ function Editor_CopyPaste_Create2(api)
 	
 		wb.clipboard._bodyPaste(ws,e);
 		e.preventDefault();
-	}
+	};
 
     ElemToSelect["onbeforecut"] = function(e){
         var api = window["Asc"]["editor"];
@@ -5608,7 +5594,7 @@ function Editor_CopyPaste_Create2(api)
 
         selection.removeAllRanges ();
         selection.addRange (rangeToSelect);
-    }
+    };
 
     ElemToSelect["onbeforecopy"] = function(e){
 		var api = window["Asc"]["editor"];
@@ -5624,7 +5610,7 @@ function Editor_CopyPaste_Create2(api)
 
         selection.removeAllRanges ();
         selection.addRange (rangeToSelect);
-    }
+    };
 	
     document.body.appendChild( ElemToSelect );
 	
@@ -5645,7 +5631,7 @@ function Editor_CopyPaste_Create2(api)
 	elementText.style.top = '100px';
 	elementText.style.overflow = 'hidden';
 	elementText.style.zIndex = -1000;
-	elementText.style.display = ELEMENT_DISPAY_STYLE2;
+	elementText.style.display = ELEMENT_DISPAY_STYLE;
 	elementText.setAttribute("contentEditable", true);
 	elementText.setAttribute("class", COPYPASTE_ELEMENT_CLASS);
 	
