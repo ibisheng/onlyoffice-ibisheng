@@ -3871,6 +3871,7 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                     CollaborativeEditing.Apply_Changes();
                     CollaborativeEditing.Release_Locks();
                     this.bNoSendComments = false;
+                    this.isApplyChangesOnOpen = false;
                     if(OtherChanges)
                     {
                         var _slides = this.WordControl.m_oLogicDocument.Slides;
