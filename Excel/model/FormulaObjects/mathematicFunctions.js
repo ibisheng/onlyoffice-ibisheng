@@ -3851,7 +3851,8 @@ function cSUMIF() {
         noneFormat:-2
     };
     this.numFormat = this.formatType.def;
-
+    this.operatorRE = new RegExp( "^ *[<=> ]+ *" );
+    this.spaceRE = /\s/g;
 }
 
 cSUMIF.prototype = Object.create( cBaseFunction.prototype )
@@ -3879,11 +3880,10 @@ cSUMIF.prototype.Calculate = function ( arg ) {
     }
 
     arg1 = arg1.toString();
-    var operators = new RegExp( "^ *[<=> ]+ *" ), match = arg1.match( operators ),
-        search, oper, val;
+    var match = arg1.match( this.operatorRE ), search, oper, val;
     if ( match ) {
         search = arg1.substr( match[0].length );
-        oper = match[0].replace( /\s/g, "" );
+        oper = match[0].replace( this.spaceRE, "" );
     }
     else {
         search = arg1;
@@ -3894,7 +3894,7 @@ cSUMIF.prototype.Calculate = function ( arg ) {
         for ( var i = 0; i < arg0Matrix.length; i++ ) {
             for ( var j = 0; j < arg0Matrix[i].length; j++ ) {
                 valMatrix0 = arg0Matrix[i][j];
-                valMatrix2 = arg2Matrix[i][j] ? arg2Matrix[i][j] : new cEmpty();
+                valMatrix2 = arg2Matrix[i]? (arg2Matrix[i][j] ? arg2Matrix[i][j] : new cEmpty()) : new cEmpty();
                 if ( matching( valMatrix0, valueForSearching, oper ) ) {
                     if ( valMatrix2 instanceof cNumber ) {
                         _sum += valMatrix2.getValue();

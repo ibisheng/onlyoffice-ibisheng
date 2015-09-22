@@ -1140,6 +1140,9 @@ cRef.prototype.getWS = function () {
 cRef.prototype.isValid = function () {
     return this._valid;
 };
+cRef.prototype.getMatrix = function () {
+    return [[this.getValue()]];
+}
 
 /** @constructor */
 function cRef3D( val, _wsFrom, wb ) {/*Ref means Sheat1!A1 for example*/
@@ -1273,7 +1276,7 @@ cName.prototype.reInit = function () {
 cName.prototype.toRef = function () {
 
     if ( !this.defName || !this.defName.Ref ) {
-        return new cError( "#NAME?" );
+        return new cError( cErrorType.wrong_name );
     }
 
     var _3DRefTmp, ref = this.defName.Ref, _wsFrom, _wsTo;
@@ -1293,7 +1296,7 @@ cName.prototype.toRef = function () {
             return new cRef3D( parserHelp.operand_str, _wsFrom, this.wb );
         }
     }
-    return new cError( "#NAME?" );
+    return new cError( cErrorType.wrong_name );
 };
 cName.prototype.toString = function () {
     if( this.defName ){
