@@ -95,8 +95,8 @@ var copyPasteUseBinary = true;
 
 if (window.USER_AGENT_SAFARI_MACOS)
 {
-    var PASTE_ELEMENT_ID = "SelectId";
-    var ELEMENT_DISPAY_STYLE = "block";
+    PASTE_ELEMENT_ID = "SelectId";
+    ELEMENT_DISPAY_STYLE = "block";
 }
 
 var PASTE_EMPTY_COUNTER_MAX = 10;
@@ -2122,7 +2122,7 @@ function CanPaste(oDocument)
         }
     }
     return true;
-};
+}
 function Editor_Paste(api, bClean)
 {
     window.GlobalPasteFlagCounter = 1;
@@ -2248,7 +2248,7 @@ function Editor_Paste(api, bClean)
 
     PASTE_EMPTY_COUNTER = 0;
     window.PasteEndTimerId = window.setTimeout( func_timeout, _interval_time );
-};
+}
 function CopyPasteCorrectString(str)
 {
     var res = str;
@@ -2258,7 +2258,7 @@ function CopyPasteCorrectString(str)
     res = res.replace(/'/g,'&apos;');
     res = res.replace(/"/g,'&quot;');
     return res;
-};
+}
 function Body_Paste(api, e)
 {
     var oWordControl = api.WordControl;
@@ -2428,7 +2428,7 @@ function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary)
 {
     var oPasteProcessor = new PasteProcessor(api, true, true, false);
     oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary);
-};
+}
 function trimString( str ){
     return str.replace(/^\s+|\s+$/g, '') ;
 };

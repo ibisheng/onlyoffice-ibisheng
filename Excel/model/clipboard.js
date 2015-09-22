@@ -5487,21 +5487,10 @@ var PASTE_EMPTY_COUNTER     = 0;
 var PASTE_EMPTY_USE         = AscBrowser.isMozilla;
 
 
-function CopyPasteCorrectString(str)
-{
-    var res = str;
-    res = res.replace(/&/g,'&amp;');
-    res = res.replace(/</g,'&lt;');
-    res = res.replace(/>/g,'&gt;');
-    res = res.replace(/'/g,'&apos;');
-    res = res.replace(/"/g,'&quot;');
-    return res;
-};
-
 if (window.USER_AGENT_SAFARI_MACOS)
 {
-	var PASTE_ELEMENT_ID2 = "clipboard-helper";
-	var ELEMENT_DISPAY_STYLE2 = "block";
+	PASTE_ELEMENT_ID2 = "clipboard-helper";
+	ELEMENT_DISPAY_STYLE2 = "block";
 }
 function SafariIntervalFocus2()
 {
