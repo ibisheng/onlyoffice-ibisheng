@@ -3243,16 +3243,23 @@ CCellValue.prototype =
 				}
 			}
 		}
-		if((0 == val.indexOf("http://") || 0 == val.indexOf("https://") || (0 == val.indexOf("www.") && val.length > 4)) && -1 == val.indexOf("\n"))
-		{
-			var sRealUrl = val;
-			if(0 != val.indexOf("http://") && 0 != val.indexOf("https://"))
-				sRealUrl = "http://" + sRealUrl;
-			var oNewHyperlink = new Hyperlink();
-			oNewHyperlink.Ref = cell.ws.getCell3(cell.nRow, cell.nCol);
-			oNewHyperlink.Hyperlink = encodeURI(sRealUrl);
-			oNewHyperlink.Ref.setHyperlink(oNewHyperlink);
-		}
+    if (0 == val.indexOf("http://") || 0 == val.indexOf("https://") || (0 == val.indexOf("www.") && val.length > 4)) {
+      // Удаляем концевые пробелы и
+      var endIndex = val.length - 1;
+      while (0 < endIndex && ('\n' === val[endIndex] || ' ' === val[endIndex])) {
+        --endIndex;
+      }
+      var sRealUrl = val.slice(0, endIndex);
+      if (-1 === sRealUrl.indexOf('\n')) {
+        if (0 != val.indexOf("http://") && 0 != val.indexOf("https://")) {
+          sRealUrl = "http://" + sRealUrl;
+        }
+        var oNewHyperlink = new Hyperlink();
+        oNewHyperlink.Ref = cell.ws.getCell3(cell.nRow, cell.nCol);
+        oNewHyperlink.Hyperlink = encodeURI(sRealUrl);
+        oNewHyperlink.Ref.setHyperlink(oNewHyperlink);
+      }
+    }
 	},
 	setValue2 : function(cell, aVal)
 	{
