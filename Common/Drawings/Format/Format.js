@@ -70,25 +70,9 @@ function scRGB_to_sRGB(value)
     return 1;
 }
 
-function checkRasterImageId(rasterImageId)
-{
-    //return rasterImageId;
-   // if ( 0 !== rasterImageId.indexOf("http:") && 0 !== rasterImageId.indexOf("data:") && 0 !== rasterImageId.indexOf("https:") && 0 !== rasterImageId.indexOf("ftp:") && 0 !== rasterImageId.indexOf("file:") )
-   // {
-        var imageLocal = g_oDocumentUrls.getImageLocal(rasterImageId);
-		if(imageLocal)
-        {
-            return imageLocal;
-        }
-        else
-        {
-            return rasterImageId;
-        }
-  //  }
-  // else
-  // {
-  //     return rasterImageId;
-  // }
+function checkRasterImageId(rasterImageId) {
+  var imageLocal = g_oDocumentUrls.getImageLocal(rasterImageId);
+  return imageLocal ? imageLocal : rasterImageId;
 }
 
 
