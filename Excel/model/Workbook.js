@@ -3030,6 +3030,7 @@ Woorksheet.prototype.rebuildColors=function(){
 	this._forEachCell(function(cell){
 		cell.cleanCache();
 	});
+  this.rebuildTabColor();
 };
 Woorksheet.prototype.generateFontMap=function(oFontMap){
 	//пробегаемся по Drawing
@@ -3300,6 +3301,11 @@ Woorksheet.prototype.setTabColor=function(color){
 	this.sheetPr.TabColor = color;
 	if (!this.workbook.bUndoChanges && !this.workbook.bRedoChanges)
 	    this.workbook.handlers.trigger("asc_onUpdateTabColor", this.getIndex());
+};
+Woorksheet.prototype.rebuildTabColor = function() {
+  if (this.sheetPr && this.sheetPr.TabColor) {
+    this.workbook.handlers.trigger("asc_onUpdateTabColor", this.getIndex());
+  }
 };
 Woorksheet.prototype.renameWsToCollaborate=function(name){
     var lastname = this.getName();
