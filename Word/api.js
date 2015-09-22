@@ -6860,17 +6860,16 @@ function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, tx
 		// ToDo select csv params
 		oAdditionalData['codepage'] = 65001;
 		oAdditionalData['delimiter'] = 4; // c_oAscCsvDelimiter.Comma
-	} else if (c_oAscFileType.TXT === filetype) {
-		if (!txtOptions) {
-			// Мы открывали команду, надо ее закрыть.
-			editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
-			var cp = {'codepage': c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
-			editor.asc_fireCallback("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), t.advancedOptionsAction);
-			return;
-		} else if (txtOptions instanceof asc.asc_CTXTAdvancedOptions) {
+	} else if (c_oAscFileType.TXT === filetype && !txtOptions) {
+		// Мы открывали команду, надо ее закрыть.
+		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
+		var cp = {'codepage': c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
+		editor.asc_fireCallback("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), t.advancedOptionsAction);
+		return;
+	} else {
+		if (txtOptions instanceof asc.asc_CTXTAdvancedOptions) {
 			oAdditionalData["codepage"] = txtOptions.asc_getCodePage();
 		}
-	} else {
 		var oLogicDocument;
 		if(null != oDocumentMailMerge)
 			oLogicDocument = oDocumentMailMerge;
