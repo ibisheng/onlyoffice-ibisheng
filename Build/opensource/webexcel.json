@@ -53,7 +53,7 @@
                 "../../Excel/model/WorkbookElems.js",
                 "../../Excel/model/Workbook.js",
                 "../../Excel/model/CellInfo.js",
-                "../../Excel/model/AdvancedOptions.js",
+                "../../Common/AdvancedOptions.js",
                 "../../Excel/model/History.js",
                 "../../Excel/model/UndoRedo.js",
                 "../../Excel/model/CellComment.js",
