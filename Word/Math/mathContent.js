@@ -4282,17 +4282,17 @@ CMathContent.prototype.private_BoxOperEmulator = function(PRS, Box, _Depth, Prev
         PRS.FirstItemOnLine = false;
     }
 };
-CMathContent.prototype.Math_Set_EmptyRange = function(PRS)
+CMathContent.prototype.Math_Set_EmptyRange = function(_CurLine, _CurRange)
 {
-    var CurLine  = PRS.Line - this.StartLine;
-    var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
 
     var RangeStartPos = this.protected_AddRange(CurLine, CurRange);
     var RangeEndPos   = RangeStartPos;
 
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 
-    this.Content[RangeStartPos].Math_Set_EmptyRange(PRS);
+    this.Content[RangeStartPos].Math_Set_EmptyRange(_CurLine, _CurRange);
 };
 CMathContent.prototype.Recalculate_Reset = function(StartRange, StartLine, PRS)
 {
@@ -4301,6 +4301,8 @@ CMathContent.prototype.Recalculate_Reset = function(StartRange, StartLine, PRS)
     {
         this.StartLine   = StartLine;
         this.StartRange  = StartRange;
+
+        this.Content[0].Recalculate_Reset(StartRange, StartLine, PRS);
 
         this.protected_ClearLines();
     }

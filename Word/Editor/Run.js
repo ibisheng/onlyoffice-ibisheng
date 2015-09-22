@@ -9440,7 +9440,6 @@ ParaRun.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
 
 
     // обновляем позиции start и end для Range
-    //this.Lines[0].Add_Range(0, RangeStartPos, RangeEndPos);
     var RangeStartPos = this.protected_AddRange(CurLine, CurRange);
     var RangeEndPos = Lng;
 
@@ -9487,10 +9486,10 @@ ParaRun.prototype.Math_RecalculateContent = function(PRS)
     this.size.ascent = ascent;
     this.size.height = ascent + descent;
 };
-ParaRun.prototype.Math_Set_EmptyRange = function(PRS)
+ParaRun.prototype.Math_Set_EmptyRange = function(_CurLine, _CurRange)
 {
-    var CurLine  = PRS.Line - this.StartLine;
-    var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
 
     var RangeStartPos = this.protected_AddRange(CurLine, CurRange);
     var RangeEndPos   = RangeStartPos;

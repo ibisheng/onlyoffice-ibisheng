@@ -218,7 +218,6 @@ function CParaMathLineWidths()
     this.Widths           = [];
 
     this.MaxW             = 0; // without first line
-    this.PrevMaxW         = 0;
 
     this.bWordLarge       = false;
     this.NeedUpdateWrap   = true;
@@ -230,7 +229,6 @@ function CParaMathLineWidths()
     this.Widths.length    = 0;
 
     this.MaxW             = 0;
-    this.PrevMaxW         = 0;
 
     this.bWordLarge       = false;
     this.NeedUpdateWrap   = true;
@@ -267,10 +265,6 @@ CParaMathLineWidths.prototype.UpdateWidth = function(Line, W)
     }
 
     return bUpdMaxWidth;
-};
-CParaMathLineWidths.prototype.UpdatePrevMaxWidth = function()
-{
-    this.PrevMaxW = this.MaxW;
 };
 CParaMathLineWidths.prototype.SetWordLarge = function(Line, bWordLarge)
 {
@@ -451,10 +445,6 @@ CMathPageInfo.prototype.GetCurrentStateWordLarge = function()
 CMathPageInfo.prototype.GetStarLinetWidth = function()
 {
     return this.WPages[0].GetFirst();
-};
-CMathPageInfo.prototype.UpdatePrevMaxWidth = function()
-{
-    this.WPages[this.CurPage].UpdatePrevMaxWidth();
 };
 CMathPageInfo.prototype.UpdateCurrentWidth = function(_Line, Width)
 {
@@ -768,98 +758,100 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
     // отступ первой строки не учитывается для неинлайновых формул
     var X = _X;
 
-    var MathSettings = Get_WordDocumentDefaultMathSettings();
-
-    var AbsolutePage = this.Paragraph == null ? 0 : this.Paragraph.Get_StartPage_Absolute();
-    var Page = AbsolutePage + _Page;
-
-    var WrapState = this.PageInfo.GetWrapStateOnPage(Page);
-    var bFirstLine = this.Root.IsStartLine(_CurLine);
-
-    // выставим сначала Position до пересчета выравнивания для формулы
-    // для расчета смещений относительно операторов
-
-    var PosInfo = new CMathPosInfo();
-
-    PosInfo.CurLine  = _CurLine;
-    PosInfo.CurRange = _CurRange;
-
-    if(true == this.NeedDispOperators(_CurLine))
+    if(this.ParaMathRPI.bLeaveRecalculate == false)
     {
-       this.DispositionOpers.length = 0;
-       PosInfo.DispositionOpers = this.DispositionOpers;
-    }
+        var MathSettings = Get_WordDocumentDefaultMathSettings();
 
-    var pos   = new CMathPosition();
-    this.Root.setPosition(pos, PosInfo);
+        var AbsolutePage = this.Paragraph == null ? 0 : this.Paragraph.Get_StartPage_Absolute();
+        var Page = AbsolutePage + _Page;
 
-    var XStart, XEnd;
+        var WrapState = this.PageInfo.GetWrapStateOnPage(Page);
+        var bFirstLine = this.Root.IsStartLine(_CurLine);
 
-    if(this.ParaMathRPI.bInline == false/*this.ParaMathRPI.bInternalRanges == true && this.ParaMathRPI.IntervalState == MATH_INTERVAL_ON_SIDE*/)
-    {
-        XStart = this.ParaMathRPI.XStart;
-        XEnd   = this.ParaMathRPI.XEnd;
-    }
-    else
-    {
-        XStart = _X;
-        XEnd   = _XLimit;
-    }
+        // выставим сначала Position до пересчета выравнивания для формулы
+        // для расчета смещений относительно операторов
 
-    XStart += MathSettings.Get_LeftMargin(WrapState);
-    XEnd   -= MathSettings.Get_RightMargin(WrapState);
+        var PosInfo = new CMathPosInfo();
 
-    var Jc = this.Get_Align();
+        PosInfo.CurLine  = _CurLine;
+        PosInfo.CurRange = _CurRange;
 
-    var W = this.PageInfo.GetMaxW(Page);
-
-    var alignBrk = this.Root.GetAlignBrk(_CurLine, _CurRange);
-    var DispLng = this.DispositionOpers.length;
-
-    var bAlignAt = WrapState === ALIGN_MARGIN_WRAP && DispLng > 0 && bFirstLine === false && alignBrk > 0;
-
-    if(bFirstLine == true || bAlignAt == true) // первая строка первой страницы, если строка разбивается на несколько отрезков, то это уже будет inline-формула => ф-ия Get_AlignToLine не будет вызвана
-    {                                          // bAlignAt == true - учтем выравниевание первой строки + прибавим смещение для alnAt
-        var StartLineWidth = this.PageInfo.GetStarLinetWidth(); // если страница не первая, то ширину первой строки формулы не учитываем
-
-        switch(Jc)
+        if(true == this.NeedDispOperators(_CurLine))
         {
-            case align_Left:    X = XStart; break;
-            case align_Right:   X = Math.max(XEnd - StartLineWidth, XStart); break;
-            case align_Center:  X = Math.max(XStart + (XEnd - XStart - StartLineWidth)/2, XStart); break;
-            case align_Justify:
-            {
-                X = Math.max(XStart + (XEnd - XStart - W)/2, XStart);
-                break;
-            }
+            this.DispositionOpers.length = 0;
+            PosInfo.DispositionOpers = this.DispositionOpers;
         }
 
-        if(bAlignAt == true)
-        {
-            var PosAln  = alignBrk < DispLng ?  alignBrk -1 : DispLng - 1;
-            X += this.DispositionOpers[PosAln];
-        }
-    }
-    else
-    {
-        var wrap = 0;
-        var wrapIndent = MathSettings.Get_WrapIndent(WrapState);
+        var pos   = new CMathPosition();
+        this.Root.setPosition(pos, PosInfo);
 
-        if(true == MathSettings.IsWrap(WrapState))
-        {
-            wrap = this.Root.Get_WrapToLine(_CurLine, _CurRange, wrapIndent);
-        }
+        var XStart, XEnd;
 
-        if(Jc == align_Justify)
+        if(this.ParaMathRPI.bInline == false)
         {
-            X = XEnd - XStart > W ? XStart + (XEnd - XStart - W)/2 + wrap : XStart;
+            XStart = this.ParaMathRPI.XStart;
+            XEnd   = this.ParaMathRPI.XEnd;
         }
         else
         {
-            X = XEnd - XStart > W ? XStart + wrap : XStart;
+            XStart = _X;
+            XEnd   = _XLimit;
+        }
+
+        XStart += MathSettings.Get_LeftMargin(WrapState);
+        XEnd   -= MathSettings.Get_RightMargin(WrapState);
+
+        var Jc = this.Get_Align();
+
+        var W = this.PageInfo.GetMaxW(Page);
+
+        var alignBrk = this.Root.GetAlignBrk(_CurLine, _CurRange);
+        var DispLng = this.DispositionOpers.length;
+
+        var bAlignAt = WrapState === ALIGN_MARGIN_WRAP && DispLng > 0 && bFirstLine === false && alignBrk > 0;
+
+        if(bFirstLine == true || bAlignAt == true) // первая строка первой страницы, если строка разбивается на несколько отрезков, то это уже будет inline-формула => ф-ия Get_AlignToLine не будет вызвана
+        {                                          // bAlignAt == true - учтем выравниевание первой строки + прибавим смещение для alnAt
+            var StartLineWidth = this.PageInfo.GetStarLinetWidth(); // если страница не первая, то ширину первой строки формулы не учитываем
+
+            switch(Jc)
+            {
+                case align_Left:    X = XStart; break;
+                case align_Right:   X = Math.max(XEnd - StartLineWidth, XStart); break;
+                case align_Center:  X = Math.max(XStart + (XEnd - XStart - StartLineWidth)/2, XStart); break;
+                case align_Justify:
+                {
+                    X = Math.max(XStart + (XEnd - XStart - W)/2, XStart);
+                    break;
+                }
+            }
+
+            if(bAlignAt == true)
+            {
+                var PosAln  = alignBrk < DispLng ?  alignBrk -1 : DispLng - 1;
+                X += this.DispositionOpers[PosAln];
+            }
+        }
+        else
+        {
+            var wrap = 0;
+            var wrapIndent = MathSettings.Get_WrapIndent(WrapState);
+
+            if(true == MathSettings.IsWrap(WrapState))
+            {
+                wrap = this.Root.Get_WrapToLine(_CurLine, _CurRange, wrapIndent);
+            }
+
+            if(Jc == align_Justify)
+            {
+                X = XEnd - XStart > W ? XStart + (XEnd - XStart - W)/2 + wrap : XStart;
+            }
+            else
+            {
+                X = XEnd - XStart > W ? XStart + wrap : XStart;
+            }
         }
     }
-
 
     return X;
 };
@@ -1266,17 +1258,11 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.Set_EmptyRange(PRS);
         this.private_UpdateRangeY(PRS, this.ParaMathRPI.ShiftY);
     }
-    else if(false === this.ParaMathRPI.CheckRangesInfo(PRS))
-    {
-        PRS.EmptyLine             = false;
-
-        PRS.RecalcResult = recalcresult_NextLine;
-        PRS.RestartPageRecalcInfo.Object = this;
-
-        PRS.NewRange = true;
-    }
     else
     {
+        this.ParaMathRPI.bLeaveRecalculate     = false === this.ParaMathRPI.CheckRangesInfo(PRS);
+        // такая ситуация возможна  когда пришел пересчет заново и кол-во отрезков выравнивания 0 (либо меньше, чем нужно)
+        // при этом если это первый Range данной формулы, то пришел еще Reset, то есть пересчитать придется, при этом не меняем max ширину, т.к. если мы уже пересчитали с учетом Range, она не должна поменяться
         this.Root.Set_Paragraph(Para);
         this.Root.Set_ParaMath(this, null);
 
@@ -1485,7 +1471,6 @@ ParaMath.prototype.private_RecalculateRangeInsideInterval = function(PRS, ParaPr
 
         this.private_UpdateXLimits(PRS);
 
-        this.PageInfo.UpdatePrevMaxWidth();
         this.private_RecalculateRoot(PRS, ParaPr, Depth);
 
 
@@ -1549,7 +1534,7 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
             }
 
             this.PageInfo.UpdateCurrentWidth(PRS.Line, 0);
-            this.Root.Math_Set_EmptyRange(PRS);
+            this.Root.Math_Set_EmptyRange(PRS.Line, PRS.Range);
             PRS.bMathWordLarge = false;
             PRS.NewRange = true;
             PRS.MoveToLBP = false;
@@ -1599,7 +1584,7 @@ ParaMath.prototype.Set_EmptyRange = function(PRS)
 {
     PRS.EmptyLine             = false;
 
-    this.Root.Math_Set_EmptyRange(PRS);
+    this.Root.Math_Set_EmptyRange(PRS.Line, PRS.Range);
 
     PRS.RecalcResult = recalcresult_NextLine;
     PRS.RestartPageRecalcInfo.Object = this;
@@ -1729,7 +1714,7 @@ ParaMath.prototype.UpdateWidthLine = function(PRS, Width)
 {
     var PrevRecalcObject = PRS.RestartPageRecalcInfo.Object;
 
-    if(PrevRecalcObject == null || PrevRecalcObject == this)
+    if(PrevRecalcObject == null || PrevRecalcObject == this && this.ParaMathRPI.bLeaveRecalculate == false)
     {
         var MathSettings = Get_WordDocumentDefaultMathSettings(),
             Page = this.AbsolutePage + PRS.Page;
@@ -3697,11 +3682,12 @@ function CMathRecalculateInfo()
     this.XRange                 = 0;
     this.XLimit                 = 0;
     this.IndLeft                = 0;
-
     this.bInternalRanges        = false;
+    this.bLeaveRecalculate      = false;
 
     this.RangeY                 = null; // max среди нижних границ плавающих объектов
     this.ShiftY                 = 0;
+
 
     this.InfoLine = new CMathInfoLines();
 }
@@ -3719,6 +3705,7 @@ CMathRecalculateInfo.prototype.Reset_WrapSettings = function()
     this.RangeY                 = null;
 
     this.bInternalRanges        = false;
+    this.bLeaveRecalculate      = false;
     this.IntervalState          = MATH_INTERVAL_EMPTY;
 
     this.XStart                 = this.XRange;
@@ -3744,7 +3731,6 @@ CMathRecalculateInfo.prototype.CheckRangesInfo = function(PRS)
 {
     return this.InfoLine.CheckRangesInfo(PRS);
 };
-
 
 function CMathInfoLines()
 {
