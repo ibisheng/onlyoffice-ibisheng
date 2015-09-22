@@ -137,7 +137,7 @@
                 "../../Excel/model/WorkbookElems.js",
                 "../../Excel/model/Workbook.js",
                 "../../Excel/model/CellInfo.js",
-                "../../Excel/model/AdvancedOptions.js",
+                "../../Common/AdvancedOptions.js",
                 "../../Common/Locks.js"
             ],
             "dst": "../../Word/sdk-all.js",
