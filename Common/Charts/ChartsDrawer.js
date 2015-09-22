@@ -4956,8 +4956,12 @@ drawScatterChart.prototype =
     {
 		var brush, pen, dataSeries, seria, markerBrush, markerPen, numCache;
 		
+		//TODO 2 раза проходимся по сериям!
+		//add clip rect
 		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
-		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 2) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
+		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 2) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, (this.chartProp.trueHeight + 2) / this.chartProp.pxToMM);
+		
+		//draw lines
 		for (var i = 0; i < this.paths.series.length; i++) {
 			seria = this.chartProp.series[i];
 			brush = seria.brush;
@@ -4978,10 +4982,20 @@ drawScatterChart.prototype =
 					
 				this.cChartDrawer.drawPath(this.paths.series[i][n], pen, brush);
 			}
-			
+		}
+		//end clip rect
+		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
+		
+		//draw points
+		for (var i = 0; i < this.paths.series.length; i++) {
 			//draw point
 			for(var k = 0; k < this.paths.points[i].length; k++)
 			{	
+				seria = this.chartProp.series[i];
+				
+				numCache = seria.yVal.numRef ? seria.yVal.numRef.numCache : seria.yVal.numLit;
+				dataSeries = this.paths.series[i];
+				
 				if(numCache.pts[k])
 				{
 					markerBrush = numCache.pts[k].compiledMarker ? numCache.pts[k].compiledMarker.brush : null;
@@ -4996,7 +5010,6 @@ drawScatterChart.prototype =
 					this.cChartDrawer.drawPath(this.paths.points[i][k].path, markerPen, markerBrush, true);
 			}
         }
-		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
     },
 	
 	_getYPosition: function(val, yPoints, isOx)
