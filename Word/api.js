@@ -6866,6 +6866,22 @@ function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, tx
 		var cp = {'codepage': c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
 		editor.asc_fireCallback("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), editor.advancedOptionsAction);
 		return;
+	} else if (c_oAscFileType.HTML === filetype) {
+		var htmlUTF16 = window["asc_docs_api"].prototype["asc_nativeGetHtml"].call(editor);
+		var oZBase32Encoder = new ZBase32Encoder();
+		var htmlUTF8 = oZBase32Encoder.GetUTF8_fromUTF16(htmlUTF16);
+		var memory = new CMemory();
+		memory.WriteByte(0xef);
+		memory.WriteByte(0xbb);
+		memory.WriteByte(0xbf);
+		memory.WriteBuffer(htmlUTF8, 0, htmlUTF8.length);
+		var urlHtml = "data:application/octet-stream;charset=utf-8;base64," + memory.GetBase64Memory();
+		editor.processSavedFile(urlHtml, false);
+		//Меняем тип состояния (на никакое)
+		editor.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
+		//todo чтобы поддержать имя файла похоже придется делать через <a/> или saveAs
+		return;
 	} else {
 		if (txtOptions instanceof asc.asc_CTXTAdvancedOptions) {
 			oAdditionalData["codepage"] = txtOptions.asc_getCodePage();
