@@ -6866,7 +6866,7 @@ function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, tx
 		var cp = {'codepage': c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
 		editor.asc_fireCallback("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), editor.advancedOptionsAction);
 		return;
-	} else if (c_oAscFileType.HTML === filetype) {
+	} else if (c_oAscFileType.HTML === filetype && null == oDocumentMailMerge && null == oMailMergeSendData) {
 		var htmlUTF16 = window["asc_docs_api"].prototype["asc_nativeGetHtml"].call(editor);
 		var oZBase32Encoder = new ZBase32Encoder();
 		var htmlUTF8 = oZBase32Encoder.GetUTF8_fromUTF16(htmlUTF16);
