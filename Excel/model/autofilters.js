@@ -1440,7 +1440,7 @@ var maxIndividualValues = 10000;
 										if(newColId < 0 || (diff < 0 && col >= activeRange.c1 && col <= activeRange.c2))
 										{
 											autoFilter.FilterColumns[j].clean();
-											t._openHiddenRowsFilterColumn(autoFilter, autoFilter.FilterColumns[j].ColId);
+											t._openHiddenRowsAfterDeleteColumn(autoFilter, autoFilter.FilterColumns[j].ColId);
 											autoFilter.FilterColumns.splice(j, 1);
 											j--;
 										}	
@@ -3887,9 +3887,24 @@ var maxIndividualValues = 10000;
 				}
 			},
 			
-			_openHiddenRowsFilterColumn: function(autoFilter, colId)
+			_openHiddenRowsAfterDeleteColumn: function(autoFilter, colId)
 			{
-				this._getOpenAndClosedValues(autoFilter, colId, true);
+				var ref = autoFilter.Ref;
+				var filterColumns = autoFilter.FilterColumns;
+				var aWs = this._getCurrentWS();
+				
+				colId = this._getTrueColId(autoFilter, colId);
+				
+				for(var i = ref.r1 + 1; i <= ref.r2; i++)
+				{
+					if(aWs.getRowHidden(i) === false)
+						continue;
+						
+					if(!this._hiddenAnotherFilter(filterColumns, colId, i, ref.c1))//filter another button
+					{
+						aWs.setRowHidden(false, i, i);
+					}
+				}
 			},
 			
 			//TODO CHANGE!!!
