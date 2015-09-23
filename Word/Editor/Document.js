@@ -14204,6 +14204,10 @@ CDocument.prototype.EndPreview_MailMergeResult = function()
 
     editor.sync_EndPreviewMailMergeResult();
 };
+CDocument.prototype.Is_MailMergePreviewResult = function()
+{
+    return this.MailMergePreview;
+};
 CDocument.prototype.Add_MailMergeField = function(Name)
 {
     if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))

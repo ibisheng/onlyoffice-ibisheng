@@ -5359,6 +5359,9 @@ CTable.prototype =
 
     Is_Inline : function()
     {
+        if (this.Parent && true === this.Parent.Is_DrawingShape())
+            return true;
+
         return this.Inline;
     },
 
