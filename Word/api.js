@@ -537,17 +537,7 @@ function asc_docs_api(name)
 	});
 	// init drag&drop
 	InitDragAndDrop(document.getElementById(this.HtmlElementName), function (error, files) {
-		if (c_oAscServerError.NoError !== error) {
-			oThis.asc_fireCallback("asc_onError", error, c_oAscError.Level.NoCritical);
-			return;
-		}
-		oThis.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-		UploadImageFiles(files, documentId, documentUserId, function (error) {
-			if (c_oAscServerError.NoError !== error) {
-				oThis.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-				oThis.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-			}
-		});
+		oThis._uploadCallback(error, files);
 	});
 
     if (window.editor == undefined)
@@ -4717,13 +4707,29 @@ asc_docs_api.prototype.ChangeShapeImageFromFile = function()
 
 asc_docs_api.prototype.AddImage = function(){
 	var t = this;
-	ShowImageFileDialog(documentId, documentUserId, function (error) {
+	ShowImageFileDialog(documentId, documentUserId, function(error, files){
+		t._uploadCallback(error, files);
+	}, function (error) {
 		if (c_oAscServerError.NoError !== error)
 			t.asc_fireCallback("asc_onError", error, c_oAscError.Level.NoCritical);
 		t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 	});
 };
-
+asc_docs_api.prototype._uploadCallback = function(error, files){
+	var t = this;
+	if (c_oAscServerError.NoError !== error) {
+		t.sync_ErrorCallback(error, c_oAscError.Level.NoCritical);
+	} else {
+		t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+		UploadImageFiles(files, documentId, documentUserId, function (error, url) {
+			if (c_oAscServerError.NoError !== error)
+				t.sync_ErrorCallback(error, c_oAscError.Level.NoCritical);
+			else
+				t.AddImageUrl(url);
+			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+		});
+	}
+}
 asc_docs_api.prototype.AddImageUrl2 = function(url)
 {
     this.AddImageUrl(getFullImageSrc2(url));

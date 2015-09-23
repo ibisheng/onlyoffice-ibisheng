@@ -178,31 +178,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       if (c_oAscServerError.NoError !== error) {
         t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
       } else {
-        var ws = t.wb.getWorksheet();
-        if (ws) {
-          if (t.isImageChangeUrl || t.isShapeImageChangeUrl || t.isTextArtChangeUrl) {
-            ws.objectRender.editImageDrawingObject(url);
-          } else {
-            ws.objectRender.addImageDrawingObject(url, null);
-          }
-        }
+        t._addImageUrl(url);
       }
 
       t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
     });
     // init drag&drop
     InitDragAndDrop(this.HtmlElement, function(error, files) {
-      if (c_oAscServerError.NoError !== error) {
-        t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
-        return;
-      }
-      t.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-      UploadImageFiles(files, t.documentId, t.documentUserId, function(error) {
-        if (c_oAscServerError.NoError !== error) {
-          t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
-          t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-        }
-      });
+      t._uploadCallback(error, files);
     });
 
     this.formulasList = getFormulasInfo();
@@ -2634,14 +2617,41 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
   spreadsheet_api.prototype.asc_showImageFileDialog = function() {
     var t = this;
-    ShowImageFileDialog(this.documentId, this.documentUserId, function(error) {
+    ShowImageFileDialog(this.documentId, this.documentUserId, function(error, files) {
+      t._uploadCallback(error, files);
+    }, function(error) {
       if (c_oAscServerError.NoError !== error) {
         t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
       }
       t.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
     });
   };
-
+  spreadsheet_api.prototype._uploadCallback = function(error, files) {
+    var t = this;
+    if (c_oAscServerError.NoError !== error) {
+      t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
+    } else {
+      t.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+      UploadImageFiles(files, t.documentId, t.documentUserId, function(error, url) {
+        if (c_oAscServerError.NoError !== error) {
+          t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
+        } else {
+          t._addImageUrl(url);
+        }
+        t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+      });
+    }
+  };
+  spreadsheet_api.prototype._addImageUrl = function(url) {
+    var ws = this.wb.getWorksheet();
+    if (ws) {
+      if (this.isImageChangeUrl || this.isShapeImageChangeUrl || this.isTextArtChangeUrl) {
+        ws.objectRender.editImageDrawingObject(url);
+      } else {
+        ws.objectRender.addImageDrawingObject(url, null);
+      }
+    }
+  };
   spreadsheet_api.prototype.asc_setSelectedDrawingObjectLayer = function(layerType) {
     var ws = this.wb.getWorksheet();
     return ws.objectRender.setGraphicObjectLayer(layerType);

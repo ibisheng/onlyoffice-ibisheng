@@ -58,6 +58,7 @@ if (typeof String.prototype.repeat !== 'function') {
 var g_oZipChanges = null;
 var g_sDownloadServiceLocalUrl = "/downloadas";
 var g_sUploadServiceLocalUrl = "/upload";
+var g_sUploadServiceLocalUrlOld = "/uploadold";
 var g_nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
 var g_cCharDelimiter = String.fromCharCode(5);
 
@@ -616,27 +617,39 @@ function InitOnMessage (callback) {
 		}, false);
 	}
 }
-function ShowImageFileDialog (documentId, documentUserId, callback) {
-	var frameWindow = GetUploadIFrame();
-	var content = '<html><head></head><body><form action="'+g_sUploadServiceLocalUrl+'/'+documentId+'/'+documentUserId+'/'+g_oDocumentUrls.getMaxIndex()+'" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" accept="image/*" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
-	frameWindow.document.open();
-	frameWindow.document.write(content);
-	frameWindow.document.close();
-
-	var fileName = frameWindow.document.getElementById("apiiuFile");
-	var fileSubmit = frameWindow.document.getElementById("apiiuSubmit");
-
-	fileName.onchange = function (e) {
-		if (e && e.target && e.target.files) {
-			var nError = ValidateUploadImage(e.target.files);
-			if (c_oAscServerError.NoError != nError) {
-				callback(g_fMapAscServerErrorToAscError(nError));
-				return;
+function ShowImageFileDialog (documentId, documentUserId, callback, callbackOld) {
+	var fileName;
+	if ("undefined" != typeof(FileReader)) {
+		fileName = GetUploadInput(function (e) {
+			if (e && e.target && e.target.files) {
+				var nError = ValidateUploadImage(e.target.files);
+				callback(nError, e.target.files);
+			} else {
+				callback(c_oAscServerError.Unknown);
 			}
-		}
-		callback(c_oAscServerError.NoError);
-		fileSubmit.click();
-	};
+		});
+	} else {
+		var frameWindow = GetUploadIFrame();
+		var content = '<html><head></head><body><form action="'+g_sUploadServiceLocalUrlOld+'/'+documentId+'/'+documentUserId+'/'+g_oDocumentUrls.getMaxIndex()+'" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" accept="image/*" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
+		frameWindow.document.open();
+		frameWindow.document.write(content);
+		frameWindow.document.close();
+
+		fileName = frameWindow.document.getElementById("apiiuFile");
+		var fileSubmit = frameWindow.document.getElementById("apiiuSubmit");
+
+		fileName.onchange = function (e) {
+			if (e && e.target && e.target.files) {
+				var nError = ValidateUploadImage(e.target.files);
+				if (c_oAscServerError.NoError != nError) {
+					callbackOld(nError);
+					return;
+				}
+			}
+			callbackOld(c_oAscServerError.NoError);
+			fileSubmit.click();
+		};
+	}
 
 	//todo пересмотреть opera
 	if (AscBrowser.isOpera)
@@ -645,7 +658,7 @@ function ShowImageFileDialog (documentId, documentUserId, callback) {
 		fileName.click();
 }
 function InitDragAndDrop (oHtmlElement, callback) {
-	if ("undefined" != typeof(FileReader) && "undefined" != typeof(FormData) && null != oHtmlElement) {
+	if ("undefined" != typeof(FileReader) && null != oHtmlElement) {
 		oHtmlElement["ondragover"] = function (e) {
 			e.preventDefault();
 			e.dataTransfer.dropEffect = CanDropFiles(e) ? 'copy' : 'none';
@@ -655,34 +668,35 @@ function InitDragAndDrop (oHtmlElement, callback) {
 			e.preventDefault();
 			var files = e.dataTransfer.files;
 			var nError = ValidateUploadImage(files);
-			if (c_oAscServerError.NoError !== nError) {
-				callback(g_fMapAscServerErrorToAscError(nError));
-				return;
-			}
-
-			callback(c_oAscServerError.NoError, files);
+			callback(nError, files);
 		};
 	}
 }
 function UploadImageFiles (files, documentId, documentUserId, callback) {
-	var xhr = new XMLHttpRequest();
-	var fd = new FormData();
-	for(var i = 0, length = files.length; i < length; i++)
-		fd.append('file[' + i + ']', files[i]);
-	xhr.open('POST', g_sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex());
-	xhr.onreadystatechange = function() {
-		if (4 == this.readyState) {
-			if((this.status == 200 || this.status == 1223)) {
-				var frameWindow = GetUploadIFrame();
-				var content = this.responseText;
-				frameWindow.document.open();
-				frameWindow.document.write(content);
-				frameWindow.document.close();
-			} else
-				callback(c_oAscError.ID.Unknown);
-		}
-	};
-	xhr.send(fd);
+	if (files.length > 0) {
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', g_sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex());
+		xhr.onreadystatechange = function() {
+			if (4 == this.readyState) {
+				if((this.status == 200 || this.status == 1223)) {
+					var urls = JSON.parse(this.responseText);
+					g_oDocumentUrls.addUrls(urls);
+					var firstUrl;
+					for (var i in urls) {
+						if (urls.hasOwnProperty(i)) {
+							firstUrl = urls[i];
+							break;
+						}
+					}
+					callback(c_oAscServerError.NoError, firstUrl);
+				} else
+					callback(c_oAscError.ID.Unknown);
+			}
+		};
+		xhr.send(files[0]);
+	} else {
+		callback(c_oAscError.ID.Unknown);
+	}
 }
 function ValidateUploadImage( files ) {
 	var nRes = c_oAscServerError.NoError;
@@ -758,6 +772,23 @@ function GetUploadIFrame() {
         document.body.appendChild( frame );
     }
     return window.frames[sIFrameName];
+}
+function GetUploadInput(onchange) {
+    var inputName = 'apiiuFile';
+    var input = document.getElementById( inputName );
+    //удаляем чтобы очистить input от предыдущего ввода
+    if (input) {
+        document.body.removeChild(input);
+    }
+    input = document.createElement("input");
+    input.setAttribute('id', inputName);
+    input.setAttribute('name', inputName);
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+    input.setAttribute('style', 'position:absolute;left:-2px;top:-2px;width:1px;height:1px;z-index:-1000;');
+    input.onchange = onchange;
+    document.body.appendChild( input );
+    return input;
 }
 
 var arrayRowSeparatorDef = ";", arrayColSeparatorDef = ",", digitSeparatorDef = ".", functionArgumentSeparatorDef = ",",
