@@ -169,7 +169,7 @@ var maxIndividualValues = 10000;
 			asc_getFilterObj : function() { return this.filter; },
 			
 			asc_getSortState : function() { return this.sortVal; },
-			asc_getDisplayName : function(val) { return this.displayName; },
+			asc_getDisplayName : function(val) { return this.displayName; }
 		};
 		
 		var g_oAutoFilterObj = {
