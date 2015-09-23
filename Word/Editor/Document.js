@@ -10482,7 +10482,8 @@ CDocument.prototype =
             {
                 this.Selection.Use   = true;
                 this.Selection.Start = true;
-                
+
+                this.HdrFtr.WaitMouseDown = false;
                 var CurHdrFtr = this.HdrFtr.CurHdrFtr;
                 var DocContent = CurHdrFtr.Content;
                 
