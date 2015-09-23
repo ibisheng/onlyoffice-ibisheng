@@ -1301,6 +1301,7 @@ CGraphicObjects.prototype =
                             drawing.wrappingPolygon.fromOther(selectedObjects[i].parent.wrappingPolygon);
                         }
                         drawing.Set_BehindDoc(selectedObjects[i].parent.behindDoc);
+                        drawing.Set_RelativeHeight(selectedObjects[i].parent.RelativeHeight);
                         drawing.Set_PositionH(selectedObjects[i].parent.PositionH.RelativeFrom, selectedObjects[i].parent.PositionH.Align, selectedObjects[i].parent.PositionH.Value + selectedObjects[i].bounds.x);
                         drawing.Set_PositionV(selectedObjects[i].parent.PositionV.RelativeFrom, selectedObjects[i].parent.PositionV.Align, selectedObjects[i].parent.PositionV.Value + selectedObjects[i].bounds.y);
                     }
@@ -1424,6 +1425,112 @@ CGraphicObjects.prototype =
        //        parent_paragraph.Document_UpdateRulersState();
        //    }
        //}
+    },
+
+    updateParentParagraphParaPr : function()
+    {
+        if(this.selectedObjects[0] && this.selectedObjects[0].parent && this.selectedObjects[0].parent.Is_Inline() && this.selectedObjects[0].getObjectType() === historyitem_type_ImageShape)
+        {
+            var parent_para = this.selectedObjects[0].parent.Get_ParentParagraph(), ParaPr;
+            if(parent_para)
+            {
+                ParaPr = parent_para.Get_CompiledPr2(true).ParaPr;
+                if(ParaPr)
+                {
+
+
+                    var NumType    = -1;
+                    var NumSubType = -1;
+                    if ( !(null == ParaPr.NumPr || 0 === ParaPr.NumPr.NumId || "0" === ParaPr.NumPr.NumId) )
+                    {
+                        var Numb = this.document.Numbering.Get_AbstractNum( ParaPr.NumPr.NumId );
+
+                        if ( undefined !== Numb && undefined !== Numb.Lvl[ParaPr.NumPr.Lvl] )
+                        {
+                            var Lvl = Numb.Lvl[ParaPr.NumPr.Lvl];
+                            var NumFormat = Lvl.Format;
+                            var NumText   = Lvl.LvlText;
+
+                            if ( numbering_numfmt_Bullet === NumFormat )
+                            {
+                                NumType    = 0;
+                                NumSubType = 0;
+
+                                var TextLen = NumText.length;
+                                if ( 1 === TextLen && numbering_lvltext_Text === NumText[0].Type )
+                                {
+                                    var NumVal = NumText[0].Value.charCodeAt(0);
+
+                                    if ( 0x00B7 === NumVal )
+                                        NumSubType = 1;
+                                    else if ( 0x006F === NumVal )
+                                        NumSubType = 2;
+                                    else if ( 0x00A7 === NumVal )
+                                        NumSubType = 3;
+                                    else if ( 0x0076 === NumVal )
+                                        NumSubType = 4;
+                                    else if ( 0x00D8 === NumVal )
+                                        NumSubType = 5;
+                                    else if ( 0x00FC === NumVal )
+                                        NumSubType = 6;
+                                    else if ( 0x00A8 === NumVal )
+                                        NumSubType = 7;
+                                }
+                            }
+                            else
+                            {
+                                NumType    = 1;
+                                NumSubType = 0;
+
+                                var TextLen = NumText.length;
+                                if ( 2 === TextLen && numbering_lvltext_Num === NumText[0].Type && numbering_lvltext_Text === NumText[1].Type )
+                                {
+                                    var NumVal2 = NumText[1].Value;
+
+                                    if ( numbering_numfmt_Decimal === NumFormat )
+                                    {
+                                        if ( "." === NumVal2 )
+                                            NumSubType = 1;
+                                        else if ( ")" === NumVal2 )
+                                            NumSubType = 2;
+                                    }
+                                    else if ( numbering_numfmt_UpperRoman === NumFormat )
+                                    {
+                                        if ( "." === NumVal2 )
+                                            NumSubType = 3;
+                                    }
+                                    else if ( numbering_numfmt_UpperLetter === NumFormat )
+                                    {
+                                        if ( "." === NumVal2 )
+                                            NumSubType = 4;
+                                    }
+                                    else if ( numbering_numfmt_LowerLetter === NumFormat )
+                                    {
+                                        if ( ")" === NumVal2 )
+                                            NumSubType = 5;
+                                        else if ( "." === NumVal2 )
+                                            NumSubType = 6;
+                                    }
+                                    else if ( numbering_numfmt_LowerRoman === NumFormat )
+                                    {
+                                        if ( "." === NumVal2 )
+                                            NumSubType = 7;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    ParaPr.ListType = { Type : NumType, SubType : NumSubType };
+
+                    editor.sync_ParaSpacingLine( ParaPr.Spacing );
+                    editor.Update_ParaInd(ParaPr.Ind);
+                    editor.sync_PrAlignCallBack(ParaPr.Jc);
+                    editor.sync_ParaStyleName(ParaPr.StyleName);
+                    editor.sync_ListType(ParaPr.ListType);
+                }
+            }
+        }
     },
 
     documentUpdateInterfaceState: function()

@@ -4576,6 +4576,7 @@ ParaDrawing.prototype =
             c.wrappingPolygon.fromOther(this.wrappingPolygon);
         }
         c.Set_BehindDoc(this.behindDoc);
+        c.Set_RelativeHeight(this.RelativeHeight);
         if(isRealNumber(this.Extent.W) && isRealNumber(this.Extent.H))
         {
             c.setExtent(this.Extent.W, this.Extent.H);

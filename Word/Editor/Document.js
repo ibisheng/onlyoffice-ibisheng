@@ -5027,10 +5027,22 @@ CDocument.prototype =
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
-            var bRetValue = this.DrawingObjects.setParagraphSpacing(Spacing);
+            if (true != this.DrawingObjects.isSelectedText())
+            {
+                var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
+                if (null != ParaDrawing)
+                {
+                    var Paragraph = ParaDrawing.Parent;
+                    Paragraph.Set_Spacing(Spacing, false);
+                    this.Recalculate();
+                }
+            }
+            else
+            {
+                this.DrawingObjects.setParagraphSpacing(Spacing);
+            }
             this.Document_UpdateSelectionState();
             this.Document_UpdateInterfaceState();
-            return bRetValue;
         }
         else //if ( docpostype_Content === this.CurPos.Type )
         {
@@ -11945,9 +11957,8 @@ CDocument.prototype =
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
             var drawin_objects = this.DrawingObjects;
-            if(drawin_objects.selection.textSelection
-                || drawin_objects.selection.groupSelection && drawin_objects.selection.groupSelection.selection.textSelection
-                || drawin_objects.selection.chartSelection && drawin_objects.selection.chartSelection.selection.textSelection)
+            var oTargetTextObject = getTargetTextObject(this.DrawingObjects);
+            if(oTargetTextObject)
             {
                 this.Interface_Update_DrawingPr();
                 this.DrawingObjects.documentUpdateInterfaceState();
@@ -11956,7 +11967,8 @@ CDocument.prototype =
             {
                 this.DrawingObjects.resetInterfaceTextPr();
                 this.Interface_Update_DrawingPr();
-                this.Interface_Update_ParaPr();
+                this.DrawingObjects.updateParentParagraphParaPr();
+
             }
         }
         else if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ) )
