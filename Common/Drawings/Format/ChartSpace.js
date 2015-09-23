@@ -6805,7 +6805,7 @@ CChartSpace.prototype =
                             }
                             if(ser.spPr && ser.spPr.ln)
                                 compiled_line.merge(ser.spPr.ln);
-                            if(Array.isArray(ser.dPt))
+                            if(Array.isArray(ser.dPt) && !(ser.getObjectType && ser.getObjectType() === historyitem_type_AreaSeries))
                             {
                                 for(var j = 0; j < ser.dPt.length; ++j)
                                 {
@@ -7027,7 +7027,7 @@ CChartSpace.prototype =
                                 {
                                     compiled_brush.merge(ser.spPr.Fill);
                                 }
-                                if(Array.isArray(ser.dPt))
+                                if(Array.isArray(ser.dPt) && !(ser.getObjectType && ser.getObjectType() === historyitem_type_AreaSeries))
                                 {
                                     for(var k = 0; k < ser.dPt.length; ++k)
                                     {
@@ -7095,7 +7095,7 @@ CChartSpace.prototype =
                                     {
                                         compiled_line.merge(ser.spPr.ln);
                                     }
-                                    if(Array.isArray(ser.dPt))
+                                    if(Array.isArray(ser.dPt) && !(ser.getObjectType && ser.getObjectType() === historyitem_type_AreaSeries))
                                     {
                                         for(var k = 0; k < ser.dPt.length; ++k)
                                         {
