@@ -58,8 +58,6 @@ if (typeof String.prototype.repeat !== 'function') {
 var g_oZipChanges = null;
 var g_sDownloadServiceLocalUrl = "/downloadas";
 var g_sUploadServiceLocalUrl = "/upload";
-var g_nMaxJsonLength = 2097152;
-var g_nMaxJsonLengthChecked = g_nMaxJsonLength / 1000;
 var g_nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
 var g_cCharDelimiter = String.fromCharCode(5);
 
@@ -240,28 +238,29 @@ function g_fGetSaveUrl(urls){
 	}
 	return null;
 }
-function sendCommand2(editor, fCallback, rdata, dataContainer){
-	//json не должен превышать размера g_nMaxJsonLength, иначе при его чтении будет exception
-	if(null == rdata["savetype"])
-	{
-		editor.CoAuthoringApi.openDocument(rdata);
-		return;
-	}
-	rdata["userconnectionid"] = editor.CoAuthoringApi.getUserConnectionId();
-	asc_ajax({
-        type: 'POST',
-        url: g_sDownloadServiceLocalUrl + '/' + rdata["id"] + '?cmd=' + encodeURIComponent(JSON.stringify(rdata)),
-        data: dataContainer.part || dataContainer.data,
-        contentType: "application/octet-stream",
-        error: function(){
-			if(fCallback)
-				fCallback(null, true);
-        },
-        success: function(msg){
-			if(fCallback)
-				fCallback(JSON.parse(msg), true);
-		}
-	});
+function sendCommand2(editor, fCallback, rdata, dataContainer) {
+  //json не должен превышать размера 2097152, иначе при его чтении будет exception
+  if (null == rdata["savetype"]) {
+    editor.CoAuthoringApi.openDocument(rdata);
+    return;
+  }
+  rdata["userconnectionid"] = editor.CoAuthoringApi.getUserConnectionId();
+  asc_ajax({
+    type: 'POST',
+    url: g_sDownloadServiceLocalUrl + '/' + rdata["id"] + '?cmd=' + encodeURIComponent(JSON.stringify(rdata)),
+    data: dataContainer.part || dataContainer.data,
+    contentType: "application/octet-stream",
+    error: function() {
+      if (fCallback) {
+        fCallback(null, true);
+      }
+    },
+    success: function(msg) {
+      if (fCallback) {
+        fCallback(JSON.parse(msg), true);
+      }
+    }
+  });
 }
 
 function g_fMapAscServerErrorToAscError (nServerError) {
