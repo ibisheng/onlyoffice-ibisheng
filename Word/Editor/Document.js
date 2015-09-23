@@ -14170,6 +14170,7 @@ CDocument.prototype.Preview_MailMergeResult = function(Index)
     if (true !== this.MailMergePreview)
     {
         this.MailMergePreview = true;
+        this.Selection_Remove();
         CollaborativeEditing.m_bGlobalLock = true;
     }
 
