@@ -1124,11 +1124,7 @@ CopyProcessor.prototype =
             this._MergeProp(oCellMar, tablePr.TableCellMar);
         tcStyle += this._MarginToStyle(oCellMar, "padding");
 
-        var oCellBorder = {};
-        if(null != cellPr && null != cellPr.TableCellBorders)
-            this._MergeProp(oCellBorder, cellPr.TableCellBorders);
-        if(null != tablePr && null != tablePr.TableBorders)
-            this._MergeProp(oCellBorder, tablePr.TableBorders);
+        var oCellBorder = cell.Get_Borders();
         tcStyle += this._BordersToStyle(oCellBorder, false, false);
 
         if("" != tcStyle)
