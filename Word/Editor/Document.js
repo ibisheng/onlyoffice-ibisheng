@@ -573,29 +573,23 @@ CDocumentFieldsManager.prototype.Register_Field = function(oField)
 };
 CDocumentFieldsManager.prototype.Update_MailMergeFields = function(Map)
 {
-    for (var FieldName in Map)
+    for (var FieldName in this.m_oMailMergeFields)
     {
-        if (undefined !== this.m_oMailMergeFields[FieldName])
+        for (var Index = 0, Count = this.m_oMailMergeFields[FieldName].length; Index < Count; Index++)
         {
-            for (var Index = 0, Count = this.m_oMailMergeFields[FieldName].length; Index < Count; Index++)
-            {
-                var oField = this.m_oMailMergeFields[FieldName][Index];
-                oField.Map_MailMerge(Map[FieldName]);
-            }
+            var oField = this.m_oMailMergeFields[FieldName][Index];
+            oField.Map_MailMerge(Map[FieldName]);
         }
     }
 };
 CDocumentFieldsManager.prototype.Replace_MailMergeFields = function(Map)
 {
-    for (var FieldName in Map)
+    for (var FieldName in this.m_oMailMergeFields)
     {
-        if (undefined !== this.m_oMailMergeFields[FieldName])
+        for (var Index = 0, Count = this.m_oMailMergeFields[FieldName].length; Index < Count; Index++)
         {
-            for (var Index = 0, Count = this.m_oMailMergeFields[FieldName].length; Index < Count; Index++)
-            {
-                var oField = this.m_oMailMergeFields[FieldName][Index];
-                oField.Replace_MailMerge(Map[FieldName]);
-            }
+            var oField = this.m_oMailMergeFields[FieldName][Index];
+            oField.Replace_MailMerge(Map[FieldName]);
         }
     }
 };

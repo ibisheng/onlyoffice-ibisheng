@@ -275,8 +275,13 @@ ParaField.prototype.Is_NeedRestoreTemplate = function()
 
     return false;
 };
-ParaField.prototype.Replace_MailMerge = function(Value)
+ParaField.prototype.Replace_MailMerge = function(_Value)
 {
+    // Пока у нас в Value может быть только текст, в будущем планируется, чтобы могли быть картинки.
+    var Value = _Value;
+    if (undefined === Value || null === Value)
+        Value = "";
+
     var Paragraph = this.Paragraph;
 
     if (!Paragraph)
