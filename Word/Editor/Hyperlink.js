@@ -198,13 +198,13 @@ ParaHyperlink.prototype.Clear_TextFormatting = function( DefHyper )
 {
     var Count = this.Content.length;
 
-    for ( var Pos = 0; Pos < Count; Pos++ )
+    for (var Pos = 0; Pos < Count; Pos++)
     {
         var Item = this.Content[Pos];
-        Item.Clear_TextFormatting( DefHyper );
+        Item.Clear_TextFormatting(DefHyper);
 
-        if ( para_Run === Item.Type )
-            Item.Set_RStyle( DefHyper );
+        if (para_Run === Item.Type && null !== DefHyper && undefined !== DefHyper)
+            Item.Set_RStyle(DefHyper);
     }
 };
 
@@ -214,6 +214,19 @@ ParaHyperlink.prototype.Split = function (ContentPos, Depth)
     NewHyperlink.Set_Value(this.Value);
     NewHyperlink.Set_ToolTip(this.ToolTip);
     return NewHyperlink;
+};
+
+ParaHyperlink.prototype.CopyContent = function(Selected)
+{
+    var Content = ParaHyperlink.superclass.CopyContent.apply(this, arguments);
+
+    for (var CurPos = 0, Count = Content.length; CurPos < Count; CurPos++)
+    {
+        var Item = Content[CurPos];
+        Item.Clear_TextFormatting();
+    }
+
+    return Content;
 };
 
 //-----------------------------------------------------------------------------------

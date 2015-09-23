@@ -1208,7 +1208,12 @@ ParaComment.prototype =
     {
         return this;
     },
-    
+
+    Get_ClassesByPos : function(Classes, ContentPos, Depth)
+    {
+        Classes.push(this);
+    },
+
     Get_PosByDrawing : function(Id, ContentPos, Depth)
     {
         return false;

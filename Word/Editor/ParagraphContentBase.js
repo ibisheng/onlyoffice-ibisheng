@@ -1109,6 +1109,13 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_AllParagraphs = function
             this.Content[CurPos].Get_AllParagraphs(Props, ParaArray);
     }
 };
+CParagraphContentWithParagraphLikeContent.prototype.Get_ClassesByPos = function(Classes, ContentPos, Depth)
+{
+    Classes.push(this);
+    var CurPos = ContentPos.Get(Depth);
+    if (0 <= CurPos && CurPos <= this.Content.length - 1)
+        this.Content[CurPos].Get_ClassesByPos(Classes, ContentPos, Depth + 1);
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции пересчета
 //----------------------------------------------------------------------------------------------------------------------

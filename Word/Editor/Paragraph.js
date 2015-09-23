@@ -4243,6 +4243,18 @@ Paragraph.prototype =
         return null;
     },
 
+    // Получаем список классов по заданной позиции
+    Get_ClassesByPos : function(ContentPos)
+    {
+        var Classes = [];
+
+        var CurPos = ContentPos.Get(0);
+        if (0 <= CurPos && CurPos <= this.Content.length - 1)
+            this.Content[CurPos].Get_ClassesByPos(Classes, ContentPos, 1);
+
+        return Classes;
+    },
+
     // Получаем по заданной позиции элемент текста
     Get_RunElementByPos : function(ContentPos)
     {

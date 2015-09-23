@@ -10099,6 +10099,37 @@ ParaRun.prototype.Reject_RevisionChanges = function(Type, bAll)
         }
     }
 };
+ParaRun.prototype.Is_InHyperlink = function()
+{
+    if (!this.Paragraph)
+        return false;
+
+    var ContentPos = this.Paragraph.Get_PosByElement(this);
+    var Classes    = this.Paragraph.Get_ClassesByPos(ContentPos);
+
+    var bHyper = false;
+    var bRun   = false;
+
+    for (var Index = 0, Count = Classes.length; Index < Count; Index++)
+    {
+        var Item = Classes[Index];
+        if (Item === this)
+        {
+            bRun = true;
+            break;
+        }
+        else if (Item instanceof ParaHyperlink)
+        {
+            bHyper = true;
+        }
+    }
+
+    return (bHyper && bRun);
+};
+ParaRun.prototype.Get_ClassesByPos = function(Classes, ContentPos, Depth)
+{
+    Classes.push(this);
+};
 
 function CParaRunStartState(Run)
 {

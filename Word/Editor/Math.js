@@ -610,6 +610,11 @@ ParaMath.prototype.CopyContent = function(Selected)
     var NewMath = this.Copy(Selected);
     return [NewMath];
 };
+ParaMath.prototype.CopyContent = function(Selected)
+{
+    return [this.Copy(Selected)];
+};
+
 ParaMath.prototype.Set_Paragraph = function(Paragraph)
 {
     this.Paragraph = Paragraph;
@@ -2369,6 +2374,12 @@ ParaMath.prototype.Get_PosByElement = function(Class, ContentPos, Depth, UseRang
 ParaMath.prototype.Get_ElementByPos = function(ContentPos, Depth)
 {
     return this.Root.Get_ElementByPos(ContentPos, Depth);
+};
+
+ParaMath.prototype.Get_ClassesByPos = function(Classes, ContentPos, Depth)
+{
+    Classes.push(this);
+    // TODO: Реализовать
 };
 
 ParaMath.prototype.Get_PosByDrawing = function(Id, ContentPos, Depth)

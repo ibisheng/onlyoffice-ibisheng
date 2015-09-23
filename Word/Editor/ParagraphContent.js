@@ -5008,15 +5008,19 @@ ParaDrawing.prototype =
     Remove_FromDocument : function(bRecalculate)
     {
         var Result = null;
-        var Run = this.Parent.Get_DrawingObjectRun( this.Id );
+        var Run = this.Parent.Get_DrawingObjectRun(this.Id);
 
-        if ( null !== Run )
+        if (null !== Run)
         {
-            Run.Remove_DrawingObject( this.Id );
-            Result = Run.Get_TextPr();
+            Run.Remove_DrawingObject(this.Id);
+
+            if (true === Run.Is_InHyperlink())
+                Result = new CTextPr();
+            else
+                Result = Run.Get_TextPr();
         }
 
-        if ( false != bRecalculate )
+        if (false != bRecalculate)
             editor.WordControl.m_oLogicDocument.Recalculate();
 
         return Result;
