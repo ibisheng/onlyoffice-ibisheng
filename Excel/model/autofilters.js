@@ -611,7 +611,7 @@ var maxIndividualValues = 10000;
 				var aWs = this._getCurrentWS();
 				var filter = aWs.AutoFilter;
 				
-				if(filter && styleName && filter.Ref.isIntersect(activeRange) && !(filter.Ref.containsRange(activeRange) && (activeRange.isOneCell() || (filter.Ref.isEqual(activeRange)))))
+				if(filter && styleName && filter.Ref.isIntersect(activeRange) && !(filter.Ref.containsRange(activeRange) && (activeRange.isOneCell() || (filter.Ref.isEqual(activeRange))) || (filter.Ref.r1 === activeRange.r1 && activeRange.containsRange(filter.Ref))))
 				{
 					aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
 					result = false;
@@ -3996,7 +3996,7 @@ var maxIndividualValues = 10000;
 						}
 						else
 						{
-							if(!allF[i].AutoFilter)
+							if(allF[i].getType() ===  g_nFiltersType.autoFilter)
 							{
 								if(isAll === false && activeCells && range && !activeCells.containsRange(range) && !(range.containsRange(activeCells) && activeCells.c1 == activeCells.c2 && activeCells.r1 == activeCells.r2))//если задеваем часть примененного фильтра и добавляем форматированную таблицу
 								{
@@ -4028,8 +4028,12 @@ var maxIndividualValues = 10000;
 						if(this._crossRange(activeCells,range))
 						{
 							//если мы находимся в общем фильтре и нажали на кнопку общего фильтра - тогда нет ошибки
-							if(!(aWs.AutoFilter && i == 0 && isAll == true)/* && allF[i].AutoFilter !== undefined*/)
-								num = 'error';
+							if(!(allF[i].getType() ===  g_nFiltersType.autoFilter && allF[i].Ref.r1 === activeCells.r1))
+							{
+								if(!(aWs.AutoFilter && i == 0 && isAll == true)/* && allF[i].AutoFilter !== undefined*/)
+									num = 'error';
+							}
+							
 						}
 					}
 				}
