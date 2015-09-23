@@ -14256,7 +14256,7 @@ CDocument.prototype.Get_MailMergedDocument = function(_nStartIndex, _nEndIndex)
 
     for (var Index = nStartIndex; Index <= nEndIndex; Index++)
     {
-        // Подменяем ссылку на менедре полей, чтобы скопированные поля регистрировались в новом классе
+        // Подменяем ссылку на менеджер полей, чтобы скопированные поля регистрировались в новом классе
         this.FieldsManager = LogicDocument.FieldsManager;
         var NewNumbering = this.Numbering.Copy_All_AbstractNums();
         LogicDocument.Numbering.Append_AbstractNums(NewNumbering.AbstractNums);
@@ -14266,17 +14266,28 @@ CDocument.prototype.Get_MailMergedDocument = function(_nStartIndex, _nEndIndex)
         for (var ContentIndex = 0; ContentIndex < ContentCount; ContentIndex++)
         {
             LogicDocument.Content[OverallIndex++] = this.Content[ContentIndex].Copy(LogicDocument, this.DrawingDocument);
-        }
 
-        LogicDocument.FieldsManager.Replace_MailMergeFields(this.MailMergeMap[Index]);
+            if (type_Paragraph === this.Content[ContentIndex].Get_Type())
+            {
+                var ParaSectPr = this.Content[ContentIndex].Get_SectionPr();
+                if (ParaSectPr)
+                {
+                    var NewParaSectPr = new CSectionPr();
+                    NewParaSectPr.Copy(ParaSectPr, true);
+                    LogicDocument.Content[OverallIndex - 1].Set_SectionPr(NewParaSectPr, false);
+                }
+            }
+        }
 
         // Добавляем дополнительный параграф с окончанием секции
         var SectionPara = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
         var SectPr = new CSectionPr();
-        SectPr.Copy(this.SectPr);
+        SectPr.Copy(this.SectPr, true);
         SectPr.Set_Type(section_type_NextPage);
         SectionPara.Set_SectionPr(SectPr, false);
         LogicDocument.Content[OverallIndex++] = SectionPara;
+
+        LogicDocument.FieldsManager.Replace_MailMergeFields(this.MailMergeMap[Index]);
     }
 
     this.CopyNumberingMap = null;

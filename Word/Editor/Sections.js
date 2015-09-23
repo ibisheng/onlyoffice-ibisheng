@@ -60,7 +60,7 @@ CSectionPr.prototype =
         return this.Id;
     },
 
-    Copy : function(Other)
+    Copy : function(Other, CopyHdrFtr)
     {
         // Тип
         this.Set_Type( Other.Type );
@@ -82,12 +82,47 @@ CSectionPr.prototype =
         this.Set_Borders_ZOrder( Other.Borders.ZOrder );
         
         // Колонтитулы
-        this.Set_Header_First( Other.HeaderFirst );
-        this.Set_Header_Even( Other.HeaderEven );
-        this.Set_Header_Default( Other.HeaderDefault );
-        this.Set_Footer_First( Other.FooterFirst );
-        this.Set_Footer_Even( Other.FooterEven );
-        this.Set_Footer_Default( Other.FooterDefault );
+        if (true === CopyHdrFtr)
+        {
+            if (Other.HeaderFirst)
+                this.Set_Header_First(Other.HeaderFirst.Copy());
+            else
+                this.Set_Header_First(null);
+
+            if (Other.HeaderEven)
+                this.Set_Header_Even(Other.HeaderEven.Copy());
+            else
+                this.Set_Header_Even(null);
+
+            if (Other.HeaderDefault)
+                this.Set_Header_Default(Other.HeaderDefault.Copy());
+            else
+                this.Set_Header_Default(null);
+
+            if (Other.FooterFirst)
+                this.Set_Footer_First(Other.FooterFirst.Copy());
+            else
+                this.Set_Footer_First(null);
+
+            if (Other.FooterEven)
+                this.Set_Footer_Even(Other.FooterEven.Copy());
+            else
+                this.Set_Footer_Even(null);
+
+            if (Other.FooterDefault)
+                this.Set_Footer_Default(Other.FooterDefault.Copy());
+            else
+                this.Set_Footer_Default(null);
+        }
+        else
+        {
+            this.Set_Header_First(Other.HeaderFirst);
+            this.Set_Header_Even(Other.HeaderEven);
+            this.Set_Header_Default(Other.HeaderDefault);
+            this.Set_Footer_First(Other.FooterFirst);
+            this.Set_Footer_Even(Other.FooterEven);
+            this.Set_Footer_Default(Other.FooterDefault);
+        }
         
         this.Set_PageNum_Start( Other.PageNumType.Start );
     },
