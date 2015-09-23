@@ -1,5 +1,5 @@
 module.exports = function(grunt) {
-    var revision, defaultConfig, packageFile, toolsConfig, toolsFile;
+    var revision="unknown", defaultConfig, packageFile, toolsConfig, toolsFile;
 
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
@@ -16,7 +16,9 @@ module.exports = function(grunt) {
 			cmd: 'svnversion',
 			args: ['../../../../../'],
 			}, function (error, result, code) {
-				revision = null !== error ? undefined : result;
+				if (null !== error) {
+					revision = result;
+				}
 				
 				// All done, continue to the next tasks
 				done();
