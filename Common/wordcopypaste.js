@@ -2609,9 +2609,10 @@ PasteProcessor.prototype =
 
         if(false == this.bNested && nInsertLength > 0)
         {
+            var bNeedMoveCursor = History.Is_LastPointNeedRecalc();
             this.oRecalcDocument.Recalculate();
             
-            if ((oDocument.CurPos.Type !== docpostype_DrawingObjects || true === this.oLogicDocument.DrawingObjects.isSelectedText()) && true === History.Is_LastPointNeedRecalc())
+            if ((oDocument.CurPos.Type !== docpostype_DrawingObjects || true === this.oLogicDocument.DrawingObjects.isSelectedText()) && true === bNeedMoveCursor)
             {
                 this.oLogicDocument.Cursor_MoveRight(false, false, true);
             }
