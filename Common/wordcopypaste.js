@@ -746,7 +746,7 @@ CopyProcessor.prototype =
 		if(aProp.length > 0)
 			oTarget.oAttributes["style"] = aProp.join(';');
     },
-    ParseItem : function(ParaItem, oTarget)
+    ParseItem : function(ParaItem, oTarget, nextParaItem, lengthContent)
     {
         switch ( ParaItem.Type )
         {
@@ -757,7 +757,13 @@ CopyProcessor.prototype =
 					oTarget.addChild(new CopyElement(CopyPasteCorrectString(sValue), true));
                 break;
             case para_Space:
-				oTarget.addChild(new CopyElement(" ", true));
+				//TODO пересмотреть обработку пробелов - возможно стоит всегда копировать неразрывный пробел!!!!!
+				//в случае нескольких пробелов друг за другом добавляю неразрывный пробел, иначе добавиться только один
+				//lengthContent - если в элемент добавляется только один пробел, этот элемент не записывается в буфер, поэтому добавляем неразрывный пробел
+				if((nextParaItem && nextParaItem.Type === para_Space) || lengthContent === 1)
+					oTarget.addChild(new CopyElement("&nbsp;", true));
+				else
+					oTarget.addChild(new CopyElement(" ", true));	
 				break;
 			case para_Tab:
 				var oSpan = new CopyElement("span");
@@ -821,7 +827,7 @@ CopyProcessor.prototype =
     },
     CopyRun: function (Item, oTarget) {
         for (var i = 0; i < Item.Content.length; i++)
-            this.ParseItem(Item.Content[i], oTarget);
+            this.ParseItem(Item.Content[i], oTarget, Item.Content[i + 1], Item.Content.length);
     },
     CopyRunContent: function (Container, oTarget, bOmitHyperlink) {
         for (var i = 0; i < Container.Content.length; i++) {
