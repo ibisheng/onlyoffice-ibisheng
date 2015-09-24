@@ -24,16 +24,17 @@ AscBrowser.userAgent = navigator.userAgent.toLowerCase();
 
 // ie detect
 AscBrowser.isIE =  (AscBrowser.userAgent.indexOf("msie") > -1 ||
-                    AscBrowser.userAgent.indexOf("trident") > -1);
+                    AscBrowser.userAgent.indexOf("trident") > -1 ||
+					AscBrowser.userAgent.indexOf("edge") > -1);
 
 // macOs detect
 AscBrowser.isMacOs = (AscBrowser.userAgent.indexOf('mac') > -1);
 
 // chrome detect
-AscBrowser.isChrome = (AscBrowser.userAgent.indexOf("chrome") > -1);
+AscBrowser.isChrome = !AscBrowser.isIE && (AscBrowser.userAgent.indexOf("chrome") > -1);
 
 // safari detect
-AscBrowser.isSafari = !AscBrowser.isChrome && (AscBrowser.userAgent.indexOf("safari") > -1);
+AscBrowser.isSafari = !AscBrowser.isIE && !AscBrowser.isChrome && (AscBrowser.userAgent.indexOf("safari") > -1);
 
 // macOs safari detect
 AscBrowser.isSafariMacOs = (AscBrowser.isSafari && AscBrowser.isMacOs);
@@ -56,7 +57,7 @@ AscBrowser.isGecko = (AscBrowser.userAgent.indexOf("gecko/") > -1);
 AscBrowser.isOpera = !!window.opera;
 
 // webkit detect
-AscBrowser.isWebkit = (AscBrowser.userAgent.indexOf("webkit") > -1);
+AscBrowser.isWebkit = !AscBrowser.isIE && (AscBrowser.userAgent.indexOf("webkit") > -1);
 
 // arm detect
 AscBrowser.isArm = (AscBrowser.userAgent.indexOf("arm") > -1);

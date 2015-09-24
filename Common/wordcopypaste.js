@@ -2037,7 +2037,7 @@ function Editor_Paste_GetElem(api, bClean)
         }
     }
 
-    if (!window.USER_AGENT_SAFARI_MACOS)
+    if (!window.USER_AGENT_SAFARI_MACOS && !AscBrowser.isIE)
     {
         pastebin.onpaste = function(e){
             if (!window.GlobalPasteFlag)
