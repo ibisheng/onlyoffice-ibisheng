@@ -4302,7 +4302,8 @@ CMathContent.prototype.Recalculate_Reset = function(StartRange, StartLine, PRS)
         this.StartLine   = StartLine;
         this.StartRange  = StartRange;
 
-        this.Content[0].Recalculate_Reset(StartRange, StartLine, PRS);
+        if(this.Content.length > 0)
+            this.Content[0].Recalculate_Reset(StartRange, StartLine, PRS);
 
         this.protected_ClearLines();
     }
