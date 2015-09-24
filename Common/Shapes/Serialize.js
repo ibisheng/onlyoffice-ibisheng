@@ -1893,7 +1893,7 @@ function BinaryPPTYLoader()
 
                                                         if (_at222 == 0)
                                                         {
-                                                            uni_fill.setTransparent((255 * s.GetLong() / 100000) >> 0);
+                                                            uni_fill.setTransparent(255 * s.GetLong() / 100000);
                                                         }
                                                     }
 
@@ -2172,7 +2172,7 @@ function BinaryPPTYLoader()
                         {
                             if (mods[i].name == "alpha")
                             {
-                                uni_fill.setTransparent((255 * mods[i].val / 100000) >> 0);
+                                uni_fill.setTransparent(255 * mods[i].val / 100000);
                                 uni_fill.fill.color.Mods.removeMod(i);
                                 break;
                             }

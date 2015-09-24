@@ -291,7 +291,7 @@ NullState.prototype =
             var no_shape_child_array = [];
             for(var i = 0; i < drawing_page.inlineObjects.length; ++i)
             {
-                if(!drawing_page.inlineObjects[i].parent.isShapeChild())
+                if(!(drawing_page.inlineObjects[i].parent && drawing_page.inlineObjects[i].parent.isShapeChild()))
                     no_shape_child_array.push(drawing_page.inlineObjects[i]);
             }
             ret = handleInlineObjects(this.drawingObjects, no_shape_child_array, e, x, y, pageIndex, true);
