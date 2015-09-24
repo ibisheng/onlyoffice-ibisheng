@@ -123,7 +123,7 @@ CSelectedContent.prototype =
         this.MoveDrawing = Value;
     },
     
-    On_EndCollectElements : function(LogicDocument)
+    On_EndCollectElements : function(LogicDocument, bFromCopy)
     {
         // Теперь пройдемся по всем найденным элементам и выясним есть ли автофигуры и комментарии
         var Count = this.Elements.length;
@@ -194,32 +194,35 @@ CSelectedContent.prototype =
                 Para.DeleteCommentOnRemove = OldVal;
             }
         }
-        
-        // Новые комментарии мы дублируем и добавляем в список комментариев
-        Count = NewComments.length;
-        var Count2 = this.Comments.length;
-        var DocumentComments = LogicDocument.Comments;        
-        for (var Pos = 0; Pos < Count; Pos++)
+
+        if (true !== bFromCopy)
         {
-            var Id = NewComments[Pos];
-            var OldComment = DocumentComments.Get_ById(Id);
-            
-            if (null !== OldComment)
+            // Новые комментарии мы дублируем и добавляем в список комментариев
+            Count = NewComments.length;
+            var Count2 = this.Comments.length;
+            var DocumentComments = LogicDocument.Comments;
+            for (var Pos = 0; Pos < Count; Pos++)
             {
-                var NewComment = OldComment.Copy();
+                var Id = NewComments[Pos];
+                var OldComment = DocumentComments.Get_ById(Id);
 
-                if (History.Is_On())
+                if (null !== OldComment)
                 {
-                    DocumentComments.Add(NewComment);
-                    editor.sync_AddComment(NewComment.Get_Id(), NewComment.Data);
+                    var NewComment = OldComment.Copy();
 
-                    // поправим Id в самих элементах ParaComment
-                    for (var Pos2 = 0; Pos2 < Count2; Pos2++)
+                    if (History.Is_On())
                     {
-                        var Element = this.Comments[Pos2].Comment;
-                        if (Id === Element.CommentId)
+                        DocumentComments.Add(NewComment);
+                        editor.sync_AddComment(NewComment.Get_Id(), NewComment.Data);
+
+                        // поправим Id в самих элементах ParaComment
+                        for (var Pos2 = 0; Pos2 < Count2; Pos2++)
                         {
-                            Element.Set_CommentId(NewComment.Get_Id());
+                            var Element = this.Comments[Pos2].Comment;
+                            if (Id === Element.CommentId)
+                            {
+                                Element.Set_CommentId(NewComment.Get_Id());
+                            }
                         }
                     }
                 }
@@ -9003,7 +9006,7 @@ CDocument.prototype =
             }
         }
         
-        SelectedContent.On_EndCollectElements(this);
+        SelectedContent.On_EndCollectElements(this, false);
 
 		if (!bUseHistory)
             History.TurnOn();
