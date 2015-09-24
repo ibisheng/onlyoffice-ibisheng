@@ -851,6 +851,27 @@ Paragraph.prototype.private_RecalculateLineFillRanges  = function(CurLine, CurPa
         }
     }
 
+    // Проверим неинлайн формулу в первой строке
+    if (0 === CurLine && true === UseFirstLine)
+    {
+        var CurPos = 0;
+        var Count = this.Content.length;
+        while (CurPos < Count)
+        {
+            if (true === this.Check_MathPara(CurPos))
+            {
+                UseFirstLine = false;
+                break;
+            }
+            else if (true !== this.Content[CurPos].Is_Empty())
+            {
+                break;
+            }
+
+            CurPos++;
+        }
+    }
+
     PRS.UseFirstLine = UseFirstLine;
 
     // Заполняем строку отрезками обтекания. Выставляем начальные сдвиги для отрезков. Начало промежутка = конец вырезаемого промежутка
@@ -1206,7 +1227,7 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
 
 Paragraph.prototype.private_RecalculateLineCheckRanges = function(CurLine, CurPage, PRS, ParaPr)
 {
-    var Left    = ( 0 !== CurLine ? this.X + ParaPr.Ind.Left : this.X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine );
+    var Left    = ( false === PRS.UseFirstLine ? this.X + ParaPr.Ind.Left : this.X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine );
     var Right   = this.XLimit - ParaPr.Ind.Right;
     var Top     = PRS.LineTop;
     var Bottom  = PRS.LineBottom;
