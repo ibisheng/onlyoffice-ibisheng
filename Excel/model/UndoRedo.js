@@ -2866,7 +2866,7 @@ UndoRedoWorkbook.prototype = {
 		}
         else if(historyitem_Workbook_DefinedNamesAdd === Type ){
             if(bUndo){
-                this.wb.delDefinesNames( Data.newName );
+                this.wb.delDefinesNames( Data.newName, true );
                 this.wb.handlers.trigger("asc_onDelDefName")
             }
             else{
@@ -2879,7 +2879,7 @@ UndoRedoWorkbook.prototype = {
                             oConflictDefName.renameDefNameToCollaborate(this.wb.getUniqueDefinedNameFrom(oConflictDefName, true));
                     }
                 }
-                this.wb.editDefinesNames( null, Data.newName, !bUndo );
+                this.wb.editDefinesNames( null, Data.newName, true );
                 this.wb.handlers.trigger("asc_onEditDefName", null, Data.newName);
             }
             /*TODO
@@ -2898,12 +2898,12 @@ UndoRedoWorkbook.prototype = {
                 oldName = Data.oldName;
                 newName = Data.newName;
             }
-            res = this.wb.editDefinesNames( oldName, newName, bUndo );
+            res = this.wb.editDefinesNames( oldName, newName, true );
             this.wb.handlers.trigger("asc_onEditDefName", oldName, newName);
         }
         else if(historyitem_Workbook_DefinedNamesDelete === Type ){
             if(bUndo){
-                this.wb.editDefinesNames( null, Data, bUndo );
+                this.wb.editDefinesNames( null, Data, true );
                 if( Data.slaveEdge ){
                     var n;
                     for(var i = 0; i < Data.slaveEdge.length; i++){
@@ -2913,19 +2913,16 @@ UndoRedoWorkbook.prototype = {
                             this.wb.needRecalc.length++;
 
                             n = n.returnCell();
-                            n ? function(){
+                            if(n){
                                 n.formulaParsed = new parserFormula( n.formulaParsed.Formula, n.formulaParsed.cellId, n.formulaParsed.ws )
-                                n.formulaParsed.parse();
-                                n.formulaParsed.buildDependencies();
-                            }() : null;
+                            }
                         }
                     }
-                    sortDependency(this.wb);
                 }
                 this.wb.handlers.trigger("asc_onEditDefName", null, Data);
             }
             else{
-                this.wb.delDefinesNames( Data );
+                this.wb.delDefinesNames( Data, true );
             }
         }
 	}

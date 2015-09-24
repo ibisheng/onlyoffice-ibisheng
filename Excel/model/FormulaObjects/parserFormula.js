@@ -1328,38 +1328,22 @@ cName.prototype.reParse = function () {
     }
 };
 cName.prototype.addDefinedNameNode = function ( nameReParse ) {
-    if ( nameReParse ) {
-        this.reParse();
-    }
-
     if ( !this.defName || !this.defName.Ref ) {
         return this.wb.dependencyFormulas.addDefinedNameNode( this.value, null );
     }
+    return this.wb.getDefinesNames( this.defName.Name, this.ws.getId() );
+};
+cName.prototype.Calculate = function(){
+    if ( !this.defName || !this.defName.Ref ) {
+        return new cError( cErrorType.wrong_name );
+    }
 
-    var node = this.wb.getDefinesNames( this.defName.Name, this.ws.getId() ), wsR, ref, nTo;
     if(!this.defName.parsedRef){
-        this.defName.parsedRef = new parserFormula( this.defName.Ref, "", this.ws );
-        this.defName.parsedRef.parse();
+        return new cError( cErrorType.wrong_name );
     }
-    for ( var i = 0; i < this.defName.parsedRef.outStack.length; i++ ) {
-        ref = this.defName.parsedRef.outStack[i];
 
-        if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid() ) {
-            nTo = this.wb.dependencyFormulas.addNode( ref.getWsId(), ref._cells.replace( this.regSpace, "" ) );
-            this.wb.dependencyFormulas.addEdge2( node, nTo );
-        }
-        else if ( ref instanceof cArea3D && ref.isValid() ) {
-            wsR = ref.wsRange();
-            for ( var j = 0; j < wsR.length; j++ ) {
-                nTo = this.wb.dependencyFormulas.addNode( wsR[j].Id, ref._cells.replace( this.regSpace, "" ) );
-                this.wb.dependencyFormulas.addEdge2( node, nTo );
-            }
-        }
-        else if ( ref instanceof cName ){
-            this.wb.dependencyFormulas.addEdge2( node, this.defName );
-        }
-    }
-    return node;
+    return this.defName.parsedRef.calculate();
+
 };
 
 /** @constructor */
@@ -3750,17 +3734,9 @@ parserFormula.prototype = {
         if ( this.outStack.length < 1 ) {
             return this.value = new cError( cErrorType.wrong_name );
         }
-        var elemArr = [], stack = [], _tmp, numFormat = -1;
+        var elemArr = [], _tmp, numFormat = -1, currentElement = null;
         for ( var i = 0; i < this.outStack.length; i++ ) {
-            _tmp = this.outStack[i];
-            if ( _tmp instanceof cName ) {
-                _tmp = _tmp.toRef( this.ws.getId() );
-            }
-            stack[i] = _tmp;
-        }
-        var currentElement = null;
-        while ( stack.length != 0 ) {
-            currentElement = stack.shift();
+            currentElement = this.outStack[i];
             if ( currentElement.name == "(" ) {
                 continue;
             }
@@ -3783,6 +3759,9 @@ parserFormula.prototype = {
                     }
                     elemArr.push( _tmp );
                 }
+            }
+            else if( currentElement.type == cElementType.name ){
+                elemArr.push( currentElement.Calculate() );
             }
             else {
                 elemArr.push( currentElement );
@@ -4243,14 +4222,6 @@ parserFormula.prototype = {
         for ( var i = 0; i < this.outStack.length; i++ ) {
             ref = this.outStack[i];
 
-            if ( ref instanceof cName ) {
-                nTo = ref.addDefinedNameNode( nameReParse );
-                this.wb.dependencyFormulas.addEdge2( node, nTo );
-//                ref = ref.toRef( this.ws.getId() );
-//                if ( ref instanceof cError )
-//                    continue;
-            }
-
             if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea || ref instanceof cArea3D) &&
                 ref.isValid() && this.outStack[i + 1] && this.outStack[i + 1] instanceof cBaseFunction &&
                 this.reRowCol.test( this.outStack[i + 1].name ) ) {
@@ -4258,12 +4229,12 @@ parserFormula.prototype = {
                 continue;
             }
 
-
-            if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid() ) {
+            if ( ref instanceof cName ) {
+                nTo = ref.addDefinedNameNode( /*nameReParse*/ );
+                this.wb.dependencyFormulas.addEdge2( node, nTo );
+            }
+            else if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid() ) {
                 nTo = this.wb.dependencyFormulas.addNode( ref.getWsId(), ref._cells.replace( this.regSpace, "" ) );
-
-//                ref.setNode( nTo );
-
                 this.wb.dependencyFormulas.addEdge2( node, nTo );
             }
             else if ( ref instanceof cArea3D && ref.isValid() ) {
