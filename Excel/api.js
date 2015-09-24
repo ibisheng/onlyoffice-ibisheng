@@ -175,7 +175,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     this.topLineEditorElement = document.getElementById(this.topLineEditorName);
     // init OnMessage
     InitOnMessage(function(error, url) {
-      if (c_oAscServerError.NoError !== error) {
+      if (c_oAscError.ID.No !== error) {
         t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
       } else {
         t._addImageUrl(url);
@@ -2620,7 +2620,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     ShowImageFileDialog(this.documentId, this.documentUserId, function(error, files) {
       t._uploadCallback(error, files);
     }, function(error) {
-      if (c_oAscServerError.NoError !== error) {
+      if (c_oAscError.ID.No !== error) {
         t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
       }
       t.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
@@ -2628,12 +2628,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   };
   spreadsheet_api.prototype._uploadCallback = function(error, files) {
     var t = this;
-    if (c_oAscServerError.NoError !== error) {
+    if (c_oAscError.ID.No !== error) {
       t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
     } else {
       t.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
       UploadImageFiles(files, t.documentId, t.documentUserId, function(error, url) {
-        if (c_oAscServerError.NoError !== error) {
+        if (c_oAscError.ID.No !== error) {
           t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
         } else {
           t._addImageUrl(url);

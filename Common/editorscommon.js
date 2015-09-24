@@ -605,7 +605,7 @@ function InitOnMessage (callback) {
 										break;
 									}
 								}
-								callback(c_oAscServerError.NoError, firstUrl);
+								callback(c_oAscError.ID.No, firstUrl);
 							}
 
 						} else
@@ -623,9 +623,9 @@ function ShowImageFileDialog (documentId, documentUserId, callback, callbackOld)
 		fileName = GetUploadInput(function (e) {
 			if (e && e.target && e.target.files) {
 				var nError = ValidateUploadImage(e.target.files);
-				callback(nError, e.target.files);
+				callback(g_fMapAscServerErrorToAscError(nError), e.target.files);
 			} else {
-				callback(c_oAscServerError.Unknown);
+				callback(c_oAscError.ID.Unknown);
 			}
 		});
 	} else {
@@ -642,11 +642,11 @@ function ShowImageFileDialog (documentId, documentUserId, callback, callbackOld)
 			if (e && e.target && e.target.files) {
 				var nError = ValidateUploadImage(e.target.files);
 				if (c_oAscServerError.NoError != nError) {
-					callbackOld(nError);
+					callbackOld(g_fMapAscServerErrorToAscError(nError));
 					return;
 				}
 			}
-			callbackOld(c_oAscServerError.NoError);
+			callbackOld(c_oAscError.ID.No);
 			fileSubmit.click();
 		};
 	}
@@ -668,7 +668,7 @@ function InitDragAndDrop (oHtmlElement, callback) {
 			e.preventDefault();
 			var files = e.dataTransfer.files;
 			var nError = ValidateUploadImage(files);
-			callback(nError, files);
+			callback(g_fMapAscServerErrorToAscError(nError), files);
 		};
 	}
 }
@@ -688,7 +688,7 @@ function UploadImageFiles (files, documentId, documentUserId, callback) {
 							break;
 						}
 					}
-					callback(c_oAscServerError.NoError, firstUrl);
+					callback(c_oAscError.ID.No, firstUrl);
 				} else
 					callback(c_oAscError.ID.Unknown);
 			}

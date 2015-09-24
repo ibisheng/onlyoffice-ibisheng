@@ -528,7 +528,7 @@ function asc_docs_api(name)
 	var oThis = this;
 	// init OnMessage
 	InitOnMessage(function (error, url) {
-		if (c_oAscServerError.NoError !== error)
+		if (c_oAscError.ID.No !== error)
 			oThis.sync_ErrorCallback(error, c_oAscError.Level.NoCritical);
 		else
 			oThis.AddImageUrl(url);
@@ -4710,19 +4710,19 @@ asc_docs_api.prototype.AddImage = function(){
 	ShowImageFileDialog(documentId, documentUserId, function(error, files){
 		t._uploadCallback(error, files);
 	}, function (error) {
-		if (c_oAscServerError.NoError !== error)
+		if (c_oAscError.ID.No !== error)
 			t.asc_fireCallback("asc_onError", error, c_oAscError.Level.NoCritical);
 		t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 	});
 };
 asc_docs_api.prototype._uploadCallback = function(error, files){
 	var t = this;
-	if (c_oAscServerError.NoError !== error) {
+	if (c_oAscError.ID.No !== error) {
 		t.sync_ErrorCallback(error, c_oAscError.Level.NoCritical);
 	} else {
 		t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 		UploadImageFiles(files, documentId, documentUserId, function (error, url) {
-			if (c_oAscServerError.NoError !== error)
+			if (c_oAscError.ID.No !== error)
 				t.sync_ErrorCallback(error, c_oAscError.Level.NoCritical);
 			else
 				t.AddImageUrl(url);
