@@ -14762,6 +14762,16 @@ CDocument.prototype.Remove_Style = function(sStyleName)
         this.Document_UpdateInterfaceState();
     }
 };
+CDocument.prototype.Remove_AllCustomStyles = function()
+{
+    if (false === this.Document_Is_SelectionLocked(changestype_Document_Styles))
+    {
+        History.Create_NewPoint(historydescription_Document_RemoveAllCustomStyles);
+        this.Styles.Remove_AllCustomStylesFromInterface();
+        this.Recalculate();
+        this.Document_UpdateInterfaceState();
+    }
+};
 CDocument.prototype.Add_ChangedStyle = function(arrStylesId)
 {
     for (var nIndex = 0, nCount = arrStylesId.length; nIndex < nCount; nIndex++)

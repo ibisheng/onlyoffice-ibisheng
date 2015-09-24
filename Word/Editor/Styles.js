@@ -4797,6 +4797,18 @@ CStyles.prototype =
         this.Update_Interface(StyleId);
     },
 
+    Remove_AllCustomStylesFromInterface : function()
+    {
+        for (var StyleId in this.Style)
+        {
+            var Style = this.Style[StyleId];
+            if ((styletype_Paragraph === Style.Get_Type() || styletype_Character === Style.Get_Type()) && true === Style.Get_QFormat())
+            {
+                this.Remove_StyleFromInterface(StyleId);
+            }
+        }
+    },
+
     Create_StyleFromInterface : function(oAscStyle, bCheckLink)
     {
         var oStyle = new CStyle();

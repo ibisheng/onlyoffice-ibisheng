@@ -7188,6 +7188,10 @@ asc_docs_api.prototype.asc_RemoveStyle = function(sName)
 {
     this.WordControl.m_oLogicDocument.Remove_Style(sName);
 };
+asc_docs_api.prototype.asc_RemoveAllCustomStyles = function()
+{
+    this.WordControl.m_oLogicDocument.Remove_AllCustomStyles();
+};
 asc_docs_api.prototype.asc_IsStyleDefault = function(sName)
 {
     return this.WordControl.m_oLogicDocument.Is_StyleDefault(sName);

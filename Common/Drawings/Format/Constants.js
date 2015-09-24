@@ -1574,6 +1574,7 @@ var historydescription_Presentation_SetVert                        = 0x0122;
 var historydescription_Document_AddNewStyle                        = 0x0123;
 var historydescription_Document_RemoveStyle                        = 0x0124;
 var historydescription_Document_AddTextArt                         = 0x0125;
+var historydescription_Document_RemoveAllCustomStyles              = 0x0126;
 
 
 
@@ -1879,6 +1880,7 @@ function Get_HistoryPointStringDescription(nDescription)
         case historydescription_Document_AddNewStyle                        : sString = "Document_AddNewStyle                       "; break;
         case historydescription_Document_RemoveStyle                        : sString = "Document_RemoveStyle                       "; break;
         case historydescription_Document_AddTextArt                         : sString = "Document_AddTextArt                        "; break;
+        case historydescription_Document_RemoveAllCustomStyles              : sString = "Document_RemoveAllCustomStyles             "; break;
     }
     return sString;
 }
