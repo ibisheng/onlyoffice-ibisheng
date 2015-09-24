@@ -241,6 +241,11 @@ function g_fGetSaveUrl(urls){
 }
 function sendCommand2(editor, fCallback, rdata, dataContainer) {
   //json не должен превышать размера 2097152, иначе при его чтении будет exception
+  var docConnectionId = editor.CoAuthoringApi.getDocId();
+  if (docConnectionId && docConnectionId !== rdata["id"]) {
+    //на случай если поменялся documentId в Version History
+    rdata['docconnectionid'] = docConnectionId;
+  }
   if (null == rdata["savetype"]) {
     editor.CoAuthoringApi.openDocument(rdata);
     return;

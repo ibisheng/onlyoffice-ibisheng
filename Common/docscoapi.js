@@ -100,6 +100,13 @@
     }
   };
 
+  CDocsCoApi.prototype.getDocId = function() {
+    if (this._CoAuthoringApi) {
+      return this._CoAuthoringApi.getDocId()
+    }
+    return undefined;
+  };
+
   CDocsCoApi.prototype.auth = function(isViewer) {
     // Фиктивные вызовы
     if (this._CoAuthoringApi && this._onlineWork) {
@@ -1106,7 +1113,9 @@
 
     this._initSocksJs();
   };
-
+  DocsCoApi.prototype.getDocId = function() {
+    return this._docid;
+  };
   // Авторизация (ее нужно делать после выставления состояния редактора view-mode)
   DocsCoApi.prototype.auth = function(isViewer) {
     if (this.isCloseCoAuthoring)
