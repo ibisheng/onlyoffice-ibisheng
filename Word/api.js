@@ -6866,7 +6866,7 @@ function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, tx
 		// ToDo select csv params
 		oAdditionalData['codepage'] = 65001;
 		oAdditionalData['delimiter'] = 4; // c_oAscCsvDelimiter.Comma
-	} else if (c_oAscFileType.TXT === filetype && !txtOptions) {
+	} else if (c_oAscFileType.TXT === filetype && !txtOptions && null == oDocumentMailMerge && null == oMailMergeSendData) {
 		// Мы открывали команду, надо ее закрыть.
 		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
 		var cp = {'codepage': c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
