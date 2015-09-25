@@ -929,15 +929,18 @@ DependencyGraph.prototype = {
         var nodesList = this.defNameList, retRes = {}, defN, seUndoRedo = [], nSE, wsIndex, ws = this.wb.getWorksheetById(sheetId ), wsName = ws.getName();
 
         for ( var id in nodesList ) {
-            if ( nodesList[id].isTable && nodesList[id].Ref ){
-                var a = nodesList[id].Ref.split("!")[0];
-                if( a.localeCompare(parserHelp.getEscapeSheetName(wsName)) == 0 )
-                    nodesList[id].Ref = null;
+            defN = nodesList[id];
+            if ( defN.isTable && defN.Ref ){
+                var a = defN.Ref.split("!")[0];
+                if( a.localeCompare(parserHelp.getEscapeSheetName(wsName)) == 0 ){
+                    History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames( defN.Name, defN.Ref, undefined, defN.isTable ) );
+                    defN.Ref = null;
+                }
                 continue;
             }
-            if ( !nodesList[id].isTable && nodesList[id].parsedRef && nodesList[id].parsedRef.removeSheet( sheetId ) ) {
+            if ( !defN.isTable && defN.parsedRef && defN.parsedRef.removeSheet( sheetId ) ) {
                 seUndoRedo = [];
-                defN = nodesList[id];
+
                 nSE = defN.getSlaveEdges();
                 for ( var nseID in nSE ) {
                     seUndoRedo.push( nseID );
@@ -2273,10 +2276,7 @@ Workbook.prototype.removeWorksheet=function(nIndex, outputParams){
                     }() : null;
 
                 }
-//                History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames( nodesList[id].Name, nodesList[id].Ref, nodesList[id].Scope, seUndoRedo ) );
             }
-//            History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames( defName.Name, defName.Ref, defName.Scope, null/*seUndoRedo*/ ) );
-//            sortDependency( this );
         }
 
 		var wsActive = this.getActiveWs();
