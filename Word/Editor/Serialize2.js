@@ -3768,6 +3768,14 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
         //Paragraph.Selection последний элемент входит в выделение
         //Run.Selection последний элемент не входит в выделение
         var oThis = this;
+		if(null != this.copyParams)
+        {
+			//анализируем используемые стили
+			var runStyle = oRun.Pr.RStyle;
+			if(null != runStyle)
+				this.copyParams.oUsedStyleMap[runStyle] = 1;
+        }
+		
         var ParaStart = 0;
         var ParaEnd = oRun.Content.length;
         if (true == bUseSelection) {
@@ -5307,7 +5315,7 @@ function BinaryFileReader(doc, openParams)
         }
         //обрабатываем стили
         var isAlreadyContainsStyle;
-        var oStyleTypes = { par: 1, table: 2, lvl: 3 };
+        var oStyleTypes = { par: 1, table: 2, lvl: 3, run: 4};
         var addNewStyles = false;
         var fParseStyle = function (aStyles, oDocumentStyles, oReadResult, nStyleType) {
             if (aStyles == undefined)
@@ -5327,7 +5335,9 @@ function BinaryFileReader(doc, openParams)
                                 elem.pPr.PStyle = j;
                             else if (oStyleTypes.table == nStyleType)
                                 elem.pPr.Set_TableStyle2(j);
-                            else
+							else if (oStyleTypes.run == nStyleType)
+								elem.pPr.RStyle = j;
+							else
                                 elem.pPr.PStyle = j;
                             break;
                         }
@@ -5338,6 +5348,8 @@ function BinaryFileReader(doc, openParams)
                             elem.pPr.PStyle = isEqualName;
                         else if (nStyleType == oStyleTypes.table)
                             elem.pPr.Set_TableStyle2(isEqualName);
+						else if (nStyleType == oStyleTypes.run)
+							elem.pPr.RStyle = isEqualName;
                     }
                     else if (!isAlreadyContainsStyle && isEqualName == null)//нужно добавить новый стиль
                     {
@@ -5347,12 +5359,16 @@ function BinaryFileReader(doc, openParams)
                             elem.pPr.PStyle = nStyleId;
                         else if (nStyleType == oStyleTypes.table)
                             elem.pPr.Set_TableStyle2(nStyleId);
+						else if (nStyleType == oStyleTypes.run)
+							elem.pPr.RStyle = nStyleId;
+						
                         addNewStyles = true;
                     }
                 }
             }
         }
-
+		
+		fParseStyle(this.oReadResult.runStyles, this.Document.Styles, this.oReadResult, oStyleTypes.run);
         fParseStyle(this.oReadResult.paraStyles, this.Document.Styles, this.oReadResult, oStyleTypes.par);
         fParseStyle(this.oReadResult.tableStyles, this.Document.Styles, this.oReadResult, oStyleTypes.table);
         fParseStyle(this.oReadResult.lvlStyles, this.Document.Styles, this.oReadResult, oStyleTypes.lvl);
