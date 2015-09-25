@@ -6467,7 +6467,7 @@ DrawingObjectsController.prototype =
                 }
             }
         };
-        this.drawingObjects.objectLocker.checkObjects(callback2);
+        return this.drawingObjects.objectLocker.checkObjects(callback2);
     },
 
     setGraphicObjectPropsCallBack: function(props)

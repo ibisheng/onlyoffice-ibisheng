@@ -3057,10 +3057,11 @@ function ObjectLocker(ws) {
                 callback(result, sync);
         }
 
+        var bRet = true;
         if ( !aObjectId.length || (false === worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) ) {
             // Запрещено совместное редактирование
             asc_applyFunction(callbackEx, true, true);
-            return;
+            return bRet;
         }
 
         var sheetId = worksheet.model.getId();
@@ -3081,7 +3082,7 @@ function ObjectLocker(ws) {
             else if ( false !== worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther) ) {
                 // Уже ячейку кто-то редактирует
                 asc_applyFunction(callbackEx, false);
-                return;
+                return false;
             }
             if ( _t.bLock )
                 worksheet.collaborativeEditing.addCheckLock(lockInfo);
@@ -3090,6 +3091,7 @@ function ObjectLocker(ws) {
             worksheet.collaborativeEditing.onEndCheckLock(callbackEx);
         else
             asc_applyFunction(callbackEx, true, true);
+        return bRet;
     }
 }
 
