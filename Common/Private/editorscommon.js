@@ -42,7 +42,9 @@ function CheckLicense(licenseUrl, userId, callback) {
 function CheckUserInLicense(userId, oLicense) {
   var res = false;
   try {
-    if (oLicense.users && oLicense.users.hasOwnProperty(userId)) {
+    if ('onlyoffice' === oLicense['company_id']) {
+      res = true;
+    } else if (oLicense.users && oLicense.users.hasOwnProperty(userId)) {
       var endDate = new Date(oLicense.users[userId]);
       res = endDate >= new Date();
     }
