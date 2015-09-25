@@ -22,6 +22,7 @@
                 "../../Common/downloaderfiles.js",
                 "../../Common/commonDefines.js",
                 "../../Common/editorscommon.js",
+				"../../Common/Private/editorscommon.js",
                 "../../Common/Shapes/Serialize.js",
                 "../../Common/Shapes/SerializeWriter.js",
                 "../../Common/SerializeCommonWordExcel.js",

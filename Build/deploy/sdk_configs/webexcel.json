@@ -18,6 +18,7 @@
                 "../../Common/apiCommon.js",
                 "../../Common/commonDefines.js",
                 "../../Common/editorscommon.js",
+				"../../Common/Private/editorscommon.js",
                 "../../Common/NumFormat.js",
                 "../../Common/Charts/charts.js",
                 "../../Common/Charts/DrawingArea.js",

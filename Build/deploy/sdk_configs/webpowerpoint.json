@@ -25,6 +25,7 @@
                 "../../Common/docscoapi.js",
                 "../../Common/wordcopypaste.js",
                 "../../Common/editorscommon.js",
+				"../../Common/Private/editorscommon.js",
                 "../../PowerPoint/Drawing/ThemeLoader.js",
                 "../../Common/Charts/DrawingObjects.js",
                 "../../Common/SerializeCommonWordExcel.js",
