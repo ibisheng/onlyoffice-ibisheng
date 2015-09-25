@@ -15,7 +15,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   var asc_applyFunction = asc.applyFunction;
   var asc_CCollaborativeEditing = asc.CCollaborativeEditing;
   var asc_CAdjustPrint = asc.asc_CAdjustPrint;
-  var asc_CAscEditorPermissions = asc.asc_CAscEditorPermissions;
   var prot;
   var CDocsCoApi = window["CDocsCoApi"];
 
@@ -535,27 +534,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     CHART_STYLE_MANAGER = new CChartStyleManager();
   };
 
-  spreadsheet_api.prototype.asc_getEditorPermissions = function(licenseUrl) {
-    var t = this;
-    if (this.DocInfo && this.DocInfo["Id"] && this.DocInfo["Url"]) {
-      CheckLicense(licenseUrl, function (err, res) {
-        t._onCheckLicenseEnd(err, res);
-      });
-    } else {
-      // Фиктивный вызов
-      this._onCheckLicenseEnd(true, false);
-    }
+  spreadsheet_api.prototype.asc_getEditorPermissions = function() {
     this._coAuthoringInit();
   };
-  spreadsheet_api.prototype._onCheckLicenseEnd = function(err, res) {
-    this.licenseResult = {err: err, res: res};
-    this._sendLicenseInfo();
-  };
-  spreadsheet_api.prototype._sendLicenseInfo = function() {
-    if (null !== this.licenseResult && this.isOnFirstConnectEnd) {
-      var oResult = asc_CAscEditorPermissions();
-      oResult.asc_setCanLicense(this.licenseResult.res);
-      this.handlers.trigger('asc_onGetEditorPermissions', oResult);
+  spreadsheet_api.prototype._onEndPermissions = function() {
+    if (this.isOnFirstConnectEnd) {
+      this.handlers.trigger('asc_onGetEditorPermissions', new asc.asc_CAscEditorPermissions());
     }
   };
 
@@ -1568,7 +1552,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     };
     this.CoAuthoringApi.onFirstConnect = function() {
       t.isOnFirstConnectEnd = true;
-      t._sendLicenseInfo();
+      t._onEndPermissions();
     };
     /**
      * Event об отсоединении от сервера

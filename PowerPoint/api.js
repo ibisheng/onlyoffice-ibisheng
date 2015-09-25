@@ -466,7 +466,7 @@ asc_docs_api.prototype._coAuthoringInit = function () {
   };
   this.CoAuthoringApi.onFirstConnect = function() {
     t.isOnFirstConnectEnd = true;
-    t._sendLicenseInfo();
+    t._onEndPermissions();
   };
   /**
    * Event об отсоединении от сервера
@@ -694,77 +694,62 @@ asc_docs_api.prototype.sync_ChangeLastSelectedElement = function(type, obj)
     }
 };
 
-asc_docs_api.prototype.Init = function()
-{
-	this.WordControl.Init();
+asc_docs_api.prototype.Init = function() {
+  this.WordControl.Init();
 };
-asc_docs_api.prototype.asc_getEditorPermissions = function(licenseUrl) {
-  var t = this;
-  if (this.DocInfo && this.DocInfo.get_Id()) {
-    CheckLicense(licenseUrl, function (err, res) {
-      t._onCheckLicenseEnd(err, res);
-    });
-  } else {
-    // Фиктивный вызов
-    this._onCheckLicenseEnd(true, false);
-  }
+asc_docs_api.prototype.asc_getEditorPermissions = function() {
 	this._coAuthoringInit();
 };
-asc_docs_api.prototype._onCheckLicenseEnd = function(err, res) {
-  this.licenseResult = {err: err, res: res};
-  this._sendLicenseInfo();
-};
-asc_docs_api.prototype._sendLicenseInfo = function() {
-  if (null !== this.licenseResult && this.isOnFirstConnectEnd) {
-    var oResult = new window['Asc'].asc_CAscEditorPermissions();
-    oResult.asc_setCanLicense(this.licenseResult.res);
-    this.asc_fireCallback('asc_onGetEditorPermissions', oResult);
+asc_docs_api.prototype._onEndPermissions = function() {
+  if (this.isOnFirstConnectEnd) {
+    this.asc_fireCallback('asc_onGetEditorPermissions', new window['Asc'].asc_CAscEditorPermissions());
   }
 };
 
-asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo)
-{
-	if(c_DocInfo)
-		this.DocInfo = c_DocInfo;
-	
-	if(this.DocInfo){
-		documentId = this.DocInfo.get_Id();
-		documentUserId = this.DocInfo.get_UserId();
-		documentUrl = this.DocInfo.get_Url();
-		documentTitle = this.DocInfo.get_Title();
-		documentFormat = this.DocInfo.get_Format();
-        documentCallbackUrl = this.DocInfo.get_CallbackUrl();
-		var nIndex = -1;
-		if(documentTitle)
-			nIndex = documentTitle.lastIndexOf(".");
-		if(-1 != nIndex)
-			documentTitleWithoutExtention = documentTitle.substring(0, nIndex);
-		else
-			documentTitleWithoutExtention = documentTitle;
-		
-		documentVKey = this.DocInfo.get_VKey();
-		// documentOrigin  = this.DocInfo.get_Origin();
-        var sProtocol = window.location.protocol;
-        var sHost = window.location.host;
-        documentOrigin = "";
-        if(sProtocol && "" != sProtocol)
-            documentOrigin = sProtocol + "//" + sHost;
-        else
-            documentOrigin = sHost;
+asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo) {
+  if (c_DocInfo) {
+    this.DocInfo = c_DocInfo;
+  }
 
-		this.User = new Asc.asc_CUser();
-		this.User.asc_setId(this.DocInfo.get_UserId());
-		this.User.asc_setUserName(this.DocInfo.get_UserName());
+  if (this.DocInfo) {
+    documentId = this.DocInfo.get_Id();
+    documentUserId = this.DocInfo.get_UserId();
+    documentUrl = this.DocInfo.get_Url();
+    documentTitle = this.DocInfo.get_Title();
+    documentFormat = this.DocInfo.get_Format();
+    documentCallbackUrl = this.DocInfo.get_CallbackUrl();
+    var nIndex = -1;
+    if (documentTitle) {
+      nIndex = documentTitle.lastIndexOf(".");
+    }
+    if (-1 != nIndex) {
+      documentTitleWithoutExtention = documentTitle.substring(0, nIndex);
+    } else {
+      documentTitleWithoutExtention = documentTitle;
     }
 
-    this.DocumentName = documentTitle;
-	if (undefined !== window["AscDesktopEditor"])
-    {
-        window["AscDesktopEditor"]["SetDocumentName"](this.DocumentName);
+    documentVKey = this.DocInfo.get_VKey();
+    // documentOrigin  = this.DocInfo.get_Origin();
+    var sProtocol = window.location.protocol;
+    var sHost = window.location.host;
+    documentOrigin = "";
+    if (sProtocol && "" != sProtocol) {
+      documentOrigin = sProtocol + "//" + sHost;
+    } else {
+      documentOrigin = sHost;
     }
+
+    this.User = new Asc.asc_CUser();
+    this.User.asc_setId(this.DocInfo.get_UserId());
+    this.User.asc_setUserName(this.DocInfo.get_UserName());
+  }
+
+  this.DocumentName = documentTitle;
+  if (undefined !== window["AscDesktopEditor"]) {
+    window["AscDesktopEditor"]["SetDocumentName"](this.DocumentName);
+  }
 };
-asc_docs_api.prototype.asc_setLocale = function(val)
-{
+asc_docs_api.prototype.asc_setLocale = function(val) {
 };
 asc_docs_api.prototype.LoadDocument = function() {
   this.CoAuthoringApi.auth(this.isViewMode);

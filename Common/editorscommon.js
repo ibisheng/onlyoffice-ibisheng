@@ -132,10 +132,6 @@ DocumentUrls.prototype = {
 };
 var g_oDocumentUrls = new DocumentUrls();
 
-function CheckLicense(licenseUrl, callback) {
-  callback(false, false);
-}
-
 function OpenFileResult () {
 	this.bSerFormat = false;
 	this.data = null;

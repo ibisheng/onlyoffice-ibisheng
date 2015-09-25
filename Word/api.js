@@ -719,29 +719,13 @@ asc_docs_api.prototype.Init = function()
 {
 	this.WordControl.Init();
 };
-asc_docs_api.prototype.asc_getEditorPermissions = function(licenseUrl) {
-  var t = this;
-  if (this.DocInfo && this.DocInfo.get_Id()) {
-    CheckLicense(licenseUrl, function (err, res) {
-      t._onCheckLicenseEnd(err, res);
-    });
-  } else {
-    // Фиктивный вызов
-    this._onCheckLicenseEnd(true, false);
-  }
+asc_docs_api.prototype.asc_getEditorPermissions = function() {
   this._coAuthoringInit();
 };
 
-asc_docs_api.prototype._onCheckLicenseEnd = function(err, res) {
-  this.licenseResult = {err: err, res: res};
-  this._sendLicenseInfo();
-};
-
-asc_docs_api.prototype._sendLicenseInfo = function() {
-  if (null !== this.licenseResult && this.isOnFirstConnectEnd) {
-    var oResult = new window['Asc'].asc_CAscEditorPermissions();
-    oResult.asc_setCanLicense(this.licenseResult.res);
-    this.asc_fireCallback('asc_onGetEditorPermissions', oResult);
+asc_docs_api.prototype._onEndPermissions = function() {
+  if (this.isOnFirstConnectEnd) {
+    this.asc_fireCallback('asc_onGetEditorPermissions', new window['Asc'].asc_CAscEditorPermissions());
   }
 };
 
@@ -1339,7 +1323,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
 	};
   this.CoAuthoringApi.onFirstConnect = function() {
     t.isOnFirstConnectEnd = true;
-    t._sendLicenseInfo();
+    t._onEndPermissions();
   };
   /**
    * Event об отсоединении от сервера
