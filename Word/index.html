@@ -35,7 +35,7 @@
         }
 
         .loader-page-romb {
-            width: 50px;
+            width: 40px;
             display: inline-block;
         }
 
@@ -200,7 +200,7 @@
 
         var params = getUrlParams(),
             lang = (params["lang"] || 'en').split("-")[0],
-            customer = encodeUrlParam(params["customer"] || 'ONLYOFFICE');
+            customer = encodeUrlParam(params["customer"] || 'ONLYOFFICE'),
             loading = 'Loading...';
         
         if ( lang == 'de')      loading = 'Ladevorgang...';
@@ -235,10 +235,7 @@
     <!-- debug end -->
 	
 	<!-- 3rdparty -->
-    <script type="text/javascript" src="../../../../OfficeWeb/Common/3rdparty/sockjs/sockjs-0.3.min.js"></script>
-    <script type="text/javascript" src="../../../../OfficeWeb/Common/3rdparty/xregexp/xregexp-all-min.js"></script> 
-    <script type="text/javascript" src="../../../../OfficeWeb/Common/3rdparty/underscore/underscore-min.js"></script>
-	<script type="text/javascript" src="../../../../OfficeWeb/Common/3rdparty/jsrsasign/jsrsasign-latest-all-min.js"></script>
+	<script type="text/javascript" src="../../../vendor/xregexp/xregexp-all-min.js"></script>
 	
 	<!-- sdk -->
     <script type="text/javascript" src="../../../../OfficeWeb/Common/AllFonts.js"></script>
@@ -422,8 +419,6 @@
 	<script type="text/javascript" src="../../../../OfficeWeb/OfflineDocuments/ApplyDocumentChanges.js"></script>
 	
     <!-- application -->
-    <!--<script data-main="app" src="../../../vendor/jszip/jszip.min.js"></script>-->
-    <!--<script data-main="app" src="../../../vendor/jszip-utils/jszip-utils.min.js"></script>-->
     <script data-main="app" src="../../../vendor/requirejs/require.js"></script>
 </body>
 </html>

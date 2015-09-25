@@ -13,28 +13,31 @@ require.config({
     // scripts that do not call define() to register a module
     baseUrl: '../../',
     paths: {
-			jquery          : '../vendor/jquery/jquery',
-			underscore      : '../vendor/underscore/underscore',
-			backbone        : '../vendor/backbone/backbone',
-			bootstrap       : '../vendor/bootstrap/dist/js/bootstrap',
-			text            : '../vendor/requirejs-text/text',
-			perfectscrollbar: 'common/main/lib/mods/perfect-scrollbar',
-			jmousewheel     : '../vendor/perfect-scrollbar/src/jquery.mousewheel',
-			xregexp         : '../vendor/xregexp/xregexp-all-min',
-			sockjs          : '../vendor/sockjs/sockjs.min',
-			jszip           : '../vendor/jszip/jszip.min',
-			jsziputils      : '../vendor/jszip-utils/jszip-utils.min',
-			api             : 'api/documents/api',
-			core            : 'common/main/lib/core/application',
-			notification    : 'common/main/lib/core/NotificationCenter',
-			keymaster       : 'common/main/lib/core/keymaster',
-			tip             : 'common/main/lib/util/Tip',
+        jquery          : '../vendor/jquery/jquery',
+        underscore      : '../vendor/underscore/underscore',
+        backbone        : '../vendor/backbone/backbone',
+        bootstrap       : '../vendor/bootstrap/dist/js/bootstrap',
+        text            : '../vendor/requirejs-text/text',
+        perfectscrollbar: 'common/main/lib/mods/perfect-scrollbar',
+        jmousewheel     : '../vendor/perfect-scrollbar/src/jquery.mousewheel',
+        xregexp         : '../vendor/xregexp/xregexp-all-min',
+        sockjs          : '../vendor/sockjs/sockjs.min',
+        jszip           : '../vendor/jszip/jszip.min',
+        jsziputils      : '../vendor/jszip-utils/jszip-utils.min',
+        jsrsasign       : '../vendor/jsrsasign/jsrsasign-latest-all-min',
+        allfonts        : '../sdk/Common/AllFonts',
+        //sdk             : '../sdk/Word/sdk-all',
+        api             : 'api/documents/api',
+        core            : 'common/main/lib/core/application',
+        notification    : 'common/main/lib/core/NotificationCenter',
+        keymaster       : 'common/main/lib/core/keymaster',
+        tip             : 'common/main/lib/util/Tip',
         localstorage    : 'common/main/lib/util/LocalStorage',
-			analytics       : 'common/Analytics',
-			gateway         : 'common/Gateway',
-			locale          : 'common/locale',
-			irregularstack  : 'common/IrregularStack'
-		},
+        analytics       : 'common/Analytics',
+        gateway         : 'common/Gateway',
+        locale          : 'common/locale',
+        irregularstack  : 'common/IrregularStack'
+    },
 //    urlArgs: "_dc=" +  (new Date()).getTime(), // debug only, be sure to remove it before deploying your code.
     shim: {
         underscore: {
@@ -77,7 +80,8 @@ require.config({
                 'xregexp',
                 'sockjs',
                 'jszip',
-                'jsziputils'
+                'jsziputils',
+                'jsrsasign'
             ]
         },
         gateway: {
@@ -94,15 +98,20 @@ require.config({
 });
 
 require([
-	'backbone',
-	'bootstrap',
-	'core',
-	'api',
-	'analytics',
-	'gateway',
-	'locale',
-	'jszip',
-	'jsziputils'
+    'backbone',
+    'bootstrap',
+    'core',
+    //'sdk',
+    'api',
+    'analytics',
+    'gateway',
+    'locale',
+    'jszip',
+    'jsziputils',
+    'jsrsasign',
+    'allfonts',
+	'sockjs',
+	'underscore'
 ], function (Backbone, Bootstrap, Core) {
     Backbone.history.start();
 
@@ -129,7 +138,7 @@ require([
             /** proprietary begin **/
             ,'Common.Controllers.ExternalDiagramEditor'
             /** proprietary end **/
-			,'Common.Controllers.ExternalMergeEditor'
+            ,'Common.Controllers.ExternalMergeEditor'
             //,'Common.Controllers.ReviewChanges'
         ]
     });
@@ -162,7 +171,7 @@ require([
         ,'documenteditor/main/app/view/ChartSettings'
         ,'common/main/lib/controller/ExternalDiagramEditor'
         /** proprietary end **/
-		,'common/main/lib/controller/ExternalMergeEditor'
+        ,'common/main/lib/controller/ExternalMergeEditor'
         //,'common/main/lib/controller/ReviewChanges'
     ], function() {
         app.start();
