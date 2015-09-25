@@ -1430,7 +1430,30 @@ CGraphicObjects.prototype =
 
     updateTextPr: function()
     {
-        editor.UpdateTextPr(this.getParagraphTextPr());
+        var TextPr = this.getParagraphTextPr();
+        if(TextPr)
+        {
+            var theme = this.document.Get_Theme();
+            if(theme && theme.themeElements && theme.themeElements.fontScheme)
+            {
+                if(TextPr.FontFamily)
+                {
+                    TextPr.FontFamily.Name =  theme.themeElements.fontScheme.checkFont(TextPr.FontFamily.Name);
+                }
+                if(TextPr.RFonts)
+                {
+                    if(TextPr.RFonts.Ascii)
+                        TextPr.RFonts.Ascii.Name     = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.Ascii.Name);
+                    if(TextPr.RFonts.EastAsia)
+                        TextPr.RFonts.EastAsia.Name  = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.EastAsia.Name);
+                    if(TextPr.RFonts.HAnsi)
+                        TextPr.RFonts.HAnsi.Name     = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.HAnsi.Name);
+                    if(TextPr.RFonts.CS)
+                        TextPr.RFonts.CS.Name        = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.CS.Name);
+                }
+            }
+            editor.UpdateTextPr(TextPr);
+        }
     },
 
     updateParentParagraphParaPr : function()
