@@ -5454,13 +5454,17 @@ function BinaryFileReader(doc, openParams)
 		}
 		
 		var oCommentsNewId = {};
+		//меняем CDocumentContent на Document для возможности вставки комментариев в колонтитул и таблицу
+		var isIntoShape = this.Document && this.Document.Parent && this.Document.Parent instanceof CShape ? true : false;
+		var isIntoDocumentContent = this.Document instanceof CDocumentContent ? true : false;
+		var document = this.Document && isIntoDocumentContent && !isIntoShape ? this.Document.LogicDocument : this.Document;
 		for(var i in this.oReadResult.oComments)
 		{
-			if(this.oReadResult.oCommentsPlaces && this.oReadResult.oCommentsPlaces[i] && this.oReadResult.oCommentsPlaces[i].Start != null && this.oReadResult.oCommentsPlaces[i].End != null && this.Document && this.Document.Comments && isCopyPaste === true)
+			if(this.oReadResult.oCommentsPlaces && this.oReadResult.oCommentsPlaces[i] && this.oReadResult.oCommentsPlaces[i].Start != null && this.oReadResult.oCommentsPlaces[i].End != null && document && document.Comments && isCopyPaste === true)
 			{
 				var oOldComment = this.oReadResult.oComments[i];
-				var oNewComment = new CComment(this.Document.Comments, fInitCommentData(oOldComment))
-				this.Document.Comments.Add(oNewComment);
+				var oNewComment = new CComment(document.Comments, fInitCommentData(oOldComment))
+				document.Comments.Add(oNewComment);
 				oCommentsNewId[oOldComment.Id] = oNewComment;
 			}
 		}
