@@ -92,56 +92,6 @@
 		prot["asc_getIsAnalyticsEnable"]	= prot.asc_getIsAnalyticsEnable;
 
 		/**
-		 * Класс asc_CAscLicense для лицензии
-		 * -----------------------------------------------------------------------------
-		 *
-		 * @constructor
-		 * @memberOf Asc
-		 */
-		function asc_CAscLicense (settings) {
-			if ( !(this instanceof asc_CAscLicense) ) {
-				return new asc_CAscLicense();
-			}
-			if(settings) {
-				this.customer = settings["customer"];
-				this.customerAddr = settings["customer_addr"];
-				this.customerWww = settings["customer_www"];
-				this.customerMail = settings["customer_mail"];
-				this.customerInfo = settings["customer_info"];
-				this.customerLogo = settings["customer_logo"];
-			} else {
-				this.customer = null;
-				this.customerAddr = null;
-				this.customerWww = null;
-				this.customerMail = null;
-				this.customerInfo = null;
-				this.customerLogo = null;
-			}
-			return this;
-		}
-
-		asc_CAscLicense.prototype.asc_getCustomer = function () {return this.customer;};
-		asc_CAscLicense.prototype.asc_getCustomerAddr = function () {return this.customerAddr;};
-		asc_CAscLicense.prototype.asc_getCustomerWww = function () {return this.customerWww;};
-		asc_CAscLicense.prototype.asc_getCustomerMail = function () {return this.customerMail;};
-		asc_CAscLicense.prototype.asc_getCustomerInfo = function () {return this.customerInfo;};
-		asc_CAscLicense.prototype.asc_getCustomerLogo = function () {return this.customerLogo;};
-
-		/*
-		 * Export
-		 * -----------------------------------------------------------------------------
-		 */
-		window["Asc"]["asc_CAscLicense"] = window["Asc"].asc_CAscLicense = asc_CAscLicense;
-
-		prot = asc_CAscLicense.prototype;
-		prot["asc_getCustomer"]				= prot.asc_getCustomer;
-		prot["asc_getCustomerAddr"]			= prot.asc_getCustomerAddr;
-		prot["asc_getCustomerWww"]			= prot.asc_getCustomerWww;
-		prot["asc_getCustomerMail"]			= prot.asc_getCustomerMail;
-		prot["asc_getCustomerInfo"]			= prot.asc_getCustomerInfo;
-		prot["asc_getCustomerLogo"]			= prot.asc_getCustomerLogo;
-
-		/**
 		 * Класс CColor для работы с цветами
 		 * -----------------------------------------------------------------------------
 		 *

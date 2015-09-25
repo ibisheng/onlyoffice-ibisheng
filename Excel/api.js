@@ -16,7 +16,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   var asc_CCollaborativeEditing = asc.CCollaborativeEditing;
   var asc_CAdjustPrint = asc.asc_CAdjustPrint;
   var asc_CAscEditorPermissions = asc.asc_CAscEditorPermissions;
-  var asc_CAscLicense = asc.asc_CAscLicense;
   var prot;
   var CDocsCoApi = window["CDocsCoApi"];
 
@@ -73,6 +72,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     this.tablePictures = null;
 
     this.asyncMethodCallback = undefined;
+
+    // Результат получения лицензии
+    this.licenseResult = null;
+    // Подключились ли уже к серверу
+    this.isOnFirstConnectEnd = false;
 
     // Тип состояния на данный момент (сохранение, открытие или никакое)
     this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
@@ -531,19 +535,28 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     CHART_STYLE_MANAGER = new CChartStyleManager();
   };
 
-  spreadsheet_api.prototype.asc_getEditorPermissions = function() {
+  spreadsheet_api.prototype.asc_getEditorPermissions = function(licenseUrl) {
+    var t = this;
+    if (this.DocInfo && this.DocInfo["Id"] && this.DocInfo["Url"]) {
+      CheckLicense(licenseUrl, function (err, res) {
+        t._onCheckLicenseEnd(err, res);
+      });
+    } else {
+      // Фиктивный вызов
+      this._onCheckLicenseEnd(true, false);
+    }
     this._coAuthoringInit();
   };
-
-  spreadsheet_api.prototype.asc_getLicense = function() {
-    var t = this;
-    var rdata = {
-      "c": "getlicense"
-    };
-    //todo
-    sendCommand2(function(response) {
-      t._onGetLicense(response);
-    }, this.fCallbackSendCommand, rdata);
+  spreadsheet_api.prototype._onCheckLicenseEnd = function(err, res) {
+    this.licenseResult = {err: err, res: res};
+    this._sendLicenseInfo();
+  };
+  spreadsheet_api.prototype._sendLicenseInfo = function() {
+    if (null !== this.licenseResult && this.isOnFirstConnectEnd) {
+      var oResult = asc_CAscEditorPermissions();
+      oResult.asc_setCanLicense(this.licenseResult.res);
+      this.handlers.trigger('asc_onGetEditorPermissions', oResult);
+    }
   };
 
   spreadsheet_api.prototype.asc_DownloadAs = function(typeFile) {//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
@@ -1086,7 +1099,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
    * asc_onWorkbookLocked			(result)											- эвент залочена ли работа с листами или нет
    * asc_onWorksheetLocked		(index, result)										- эвент залочен ли лист или нет
    * asc_onGetEditorPermissions	(permission)										- эвент о правах редактора
-   * asc_onGetLicense				(license)											- эвент о лицензии
    * asc_onStopFormatPainter		()													- эвент об окончании форматирования по образцу
    * asc_onUpdateSheetSettings	()													- эвент об обновлении свойств листа (закрепленная область, показывать сетку/заголовки)
    * asc_onUpdateTabColor			(index)												- эвент об обновлении цвета иконки листа
@@ -1267,28 +1279,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
     if (window.USER_AGENT_SAFARI_MACOS) {
       setInterval(SafariIntervalFocus2, 10);
-    }
-  };
-
-  spreadsheet_api.prototype._onGetEditorPermissions = function(response) {
-    if (null != response && "getsettings" == response["type"]) {
-      var oSettings = response["data"];
-
-      //Set up spellcheker service
-      this.SpellCheckUrl = oSettings['g_cAscSpellCheckUrl'];
-
-      var oEditorPermissions = new asc_CAscEditorPermissions(oSettings);
-      this.handlers.trigger("asc_onGetEditorPermissions", oEditorPermissions);
-
-      this.CoAuthoringApi.setPingSettings(oSettings['TrackingInterval'], oEditorPermissions.asc_getCanLicense());
-    }
-  };
-
-  spreadsheet_api.prototype._onGetLicense = function(response) {
-    if (null != response && "getlicense" == response.type) {
-      var oSettings = JSON.parse(response.data);
-      var oLicense = (null != oSettings) ? new asc_CAscLicense(oSettings) : null;
-      this.handlers.trigger("asc_onGetLicense", oLicense);
     }
   };
 
@@ -1551,8 +1541,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     this.CoAuthoringApi.onFirstLoadChangesEnd = function() {
       t.asyncServerIdEndLoaded();
     };
+    this.CoAuthoringApi.onSpellCheckInit = function(e) {
+      t.SpellCheckUrl = e;
+    };
     this.CoAuthoringApi.onSetIndexUser = function(e) {
-      g_oIdCounter.Set_UserId("" + e);
+      g_oIdCounter.Set_UserId('' + e);
     };
     this.CoAuthoringApi.onStartCoAuthoring = function(isStartEvent) {
       t.startCollaborationEditing();
@@ -1574,23 +1567,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       t.endCollaborationEditing();
     };
     this.CoAuthoringApi.onFirstConnect = function() {
-      if (t.DocInfo && t.DocInfo["Id"] && t.DocInfo["Url"]) {
-        var rdata = {
-          "c": "getsettings",
-          "id": t.DocInfo["Id"],
-          "userid": t.DocInfo["UserId"],
-          "format": t.DocInfo["Format"],
-          "vkey": t.DocInfo["VKey"],
-          "editorid": c_oEditorId.Spreadsheet
-        };
-        t.advancedOptionsAction = c_oAscAdvancedOptionsAction.Perm;
-        sendCommand2(t, null, rdata);
-      } else {
-        // Фиктивный режим, фактически без документа
-        t.handlers.trigger("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
-        // Фиктивно инициализируем
-        t.SpellCheckUrl = window['g_cAscSpellCheckUrl'] ? window['g_cAscSpellCheckUrl'] : '';
-      }
+      t.isOnFirstConnectEnd = true;
+      t._sendLicenseInfo();
     };
     /**
      * Event об отсоединении от сервера
@@ -1617,12 +1595,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       if (inputWrap["data"]) {
         var input = inputWrap["data"];
         switch (input["type"]) {
-          case 'getsettings':
-          {
-            t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
-            t._onGetEditorPermissions(input);
-          }
-            break;
           case 'reopen':
           case 'open':
           {
@@ -1829,7 +1801,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
   // Update user alive
   spreadsheet_api.prototype.setUserAlive = function() {
-    this.CoAuthoringApi.setUserAlive();
   };
 
   // End Load document
@@ -3606,7 +3577,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   prot["asc_getLocaleExample"] = prot.asc_getLocaleExample;
   prot["asc_setLocale"] = prot.asc_setLocale;
   prot["asc_getEditorPermissions"] = prot.asc_getEditorPermissions;
-  prot["asc_getLicense"] = prot.asc_getLicense;
   prot["asc_LoadDocument"] = prot.asc_LoadDocument;
   prot["asc_LoadEmptyDocument"] = prot.asc_LoadEmptyDocument;
   prot["asc_DownloadAs"] = prot.asc_DownloadAs;

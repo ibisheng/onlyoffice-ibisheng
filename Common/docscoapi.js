@@ -23,6 +23,7 @@
       this.onFirstLoadChangesEnd = options.onFirstLoadChangesEnd;
       this.onConnectionStateChanged = options.onConnectionStateChanged;
       this.onSetIndexUser = options.onSetIndexUser;
+      this.onSpellCheckInit = options.onSpellCheckInit;
       this.onSaveChanges = options.onSaveChanges;
       this.onStartCoAuthoring = options.onStartCoAuthoring;
       this.onEndCoAuthoring = options.onEndCoAuthoring;
@@ -69,6 +70,9 @@
       this._CoAuthoringApi.onSetIndexUser = function(e) {
         t.callback_OnSetIndexUser(e);
       };
+      this._CoAuthoringApi.onSpellCheckInit = function(e) {
+        t.callback_OnSpellCheckInit(e);
+      };
       this._CoAuthoringApi.onSaveChanges = function(e, userId, bFirstLoad) {
         t.callback_OnSaveChanges(e, userId, bFirstLoad);
       };
@@ -108,11 +112,12 @@
   };
 
   CDocsCoApi.prototype.auth = function(isViewer) {
-    // Фиктивные вызовы
     if (this._CoAuthoringApi && this._onlineWork) {
       this._CoAuthoringApi.auth(isViewer);
     } else {
-      this.callback_OnSetIndexUser("123");
+      // Фиктивные вызовы
+      this.callback_OnSpellCheckInit(window['g_cAscSpellCheckUrl'] ? window['g_cAscSpellCheckUrl'] : '');
+      this.callback_OnSetIndexUser('123');
       this.onFirstLoadChangesEnd();
     }
   };
@@ -156,18 +161,6 @@
   CDocsCoApi.prototype.sendMessage = function(message) {
     if (this._CoAuthoringApi && this._onlineWork) {
       this._CoAuthoringApi.sendMessage(message);
-    }
-  };
-
-  CDocsCoApi.prototype.setUserAlive = function() {
-    if (this._CoAuthoringApi && this._onlineWork) {
-      this._CoAuthoringApi.setUserAlive();
-    }
-  };
-
-  CDocsCoApi.prototype.setPingSettings = function(inverval, bSendUserAlive) {
-    if (this._CoAuthoringApi && this._onlineWork) {
-      this._CoAuthoringApi.setPingSettings(inverval, bSendUserAlive);
     }
   };
 
@@ -331,6 +324,11 @@
       this.onSetIndexUser(e);
     }
   };
+  CDocsCoApi.prototype.callback_OnSpellCheckInit = function(e) {
+    if (this.onSpellCheckInit) {
+      this.onSpellCheckInit(e);
+    }
+  };
 
   CDocsCoApi.prototype.callback_OnSaveChanges = function(e, userId, bFirstLoad) {
     if (this.onSaveChanges) {
@@ -386,6 +384,8 @@
       this.onRelockFailed = options.onRelockFailed;
       this.onDisconnect = options.onDisconnect;
       this.onWarning = options.onWarning;
+      this.onSetIndexUser = options.onSetIndexUser;
+      this.onSpellCheckInit = options.onSpellCheckInit;
       this.onSaveChanges = options.onSaveChanges;
       this.onFirstLoadChangesEnd = options.onFirstLoadChangesEnd;
       this.onConnectionStateChanged = options.onConnectionStateChanged;
@@ -691,25 +691,7 @@
   };
 
   DocsCoApi.prototype.ping = function() {
-    // ua - активность пользователя. 0 - неактивный, 1 - активный, -1 - не обновлять
-    this._send({'type': 'ping', 'ua': this.bSendUserAlive ? (this.bUserAlive >> 0) : -1});
-    // После отправки сбрасываем активность
-    this.bUserAlive = false;
-  };
-
-  DocsCoApi.prototype.setUserAlive = function() {
-    this.bUserAlive = true;
-  };
-
-  DocsCoApi.prototype.setPingSettings = function(inverval, bSendUserAlive) {
-    if (null !== this.pingIntervalID)
-      return;
-    this.bSendUserAlive = bSendUserAlive;
-    this.pingInterval = inverval * 1000;
-
-    var t = this;
-    this.ping();
-    this.pingIntervalID = setInterval(function() {t.ping();}, this.pingInterval);
+    this._send({'type': 'ping'});
   };
 
   DocsCoApi.prototype._sendPrebuffered = function() {
@@ -913,6 +895,11 @@
       this.onSetIndexUser(data);
     }
   };
+  DocsCoApi.prototype._onSpellCheckInit = function(data) {
+    if (this.onSpellCheckInit) {
+      this.onSpellCheckInit(data);
+    }
+  };
 
   DocsCoApi.prototype._onSavePartChanges = function(data) {
     // Очищаем предыдущий таймер
@@ -1066,6 +1053,7 @@
 
       this._onAuthParticipantsChanged(data['participants']);
 
+      this._onSpellCheckInit(data['g_cAscSpellCheckUrl']);
       this._onSetIndexUser(this._indexUser = data['indexUser']);
       this._userId = this._user.asc_getId() + this._indexUser;
 
@@ -1089,6 +1077,8 @@
 
       //Send prebuffered
       this._sendPrebuffered();
+
+      this.pingIntervalID = setInterval(function() {t.ping();}, this.pingInterval);
     }
     //TODO: Add errors
   };
@@ -1106,9 +1096,7 @@
     this._isAuth = false;
     this._documentFormatSave = documentFormatSave;
 
-    this.bUserAlive = false; // Активность пользователя
-    this.bSendUserAlive = false; // Отправлять ли активность пользователя
-    this.pingInterval = 300 * 1000;
+    this.pingInterval = 60 * 1000;
     this.pingIntervalID = null;
 
     this._initSocksJs();

@@ -65,8 +65,7 @@ var c_oAscAdvancedOptionsID = {
 var c_oAscAdvancedOptionsAction = {
 	None: 0,
 	Open: 1,
-	Save: 2,
-	Perm: 3
+	Save: 2
 };
 
 // Режимы отрисовки
