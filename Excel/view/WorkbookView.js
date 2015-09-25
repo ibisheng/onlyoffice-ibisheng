@@ -1988,6 +1988,7 @@
                         t.model.editDefinesNames(oldName, newName);
                         t.handlers.trigger("asc_onEditDefName", oldName, newName);
                         t.handlers.trigger("asc_onRefreshDefNameList");
+                        this.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.LockDefNameManager);
                         selectNameChange();
                     }
                 };
@@ -1999,6 +2000,7 @@
             else{
                 this.handlers.trigger("asc_onDefName", this.model.editDefinesNames(oldName, newName));
                 this.handlers.trigger("asc_onRefreshDefNameList");
+                this.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.LockDefNameManager);
                 selectNameChange();
             }
 
@@ -2039,6 +2041,7 @@
         WorkbookView.prototype.unlockDefName = function () {
             this.model.unlockDefName();
             this.handlers.trigger("asc_onRefreshDefNameList");
+            this.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.OK);
         };
 
         WorkbookView.prototype._onCheckDefNameLock = function () {

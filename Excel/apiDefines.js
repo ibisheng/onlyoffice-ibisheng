@@ -48,6 +48,8 @@ var c_oAscError = {
     FrmlParenthesesCorrectCount: -38,
 
     InvalidReferenceOrName: -40,
+    LockCreateDefName: -41,
+
 
     AutoFilterDataRangeError: -50,
     AutoFilterChangeFormatTableError: -51,
@@ -326,5 +328,6 @@ var c_oAscDefinedNameReason = {
   WrongName: -1,
   IsLocked: -2,
   Existed: -3,
+  LockDefNameManager:- 4,
   OK: 0
 };
