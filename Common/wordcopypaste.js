@@ -4217,6 +4217,17 @@ PasteProcessor.prototype =
 				
 				var oCurPar = oCurCell.Content.Content[0];
 				
+				var hyperLink = range.getHyperlink();
+				var oCurHyperlink = null;
+				if(hyperLink)
+				{
+					var oCurHyperlink = new ParaHyperlink();
+					oCurHyperlink.Set_Paragraph(this.oCurPar);
+					oCurHyperlink.Set_Value( hyperLink.Hyperlink );
+					if(hyperLink.Tooltip)
+						oCurHyperlink.Set_ToolTip(hyperLink.Tooltip);
+				}
+				
 				var value2 = range.getValue2();
 				for(var n = 0; n < value2.length; n++)
 				{
@@ -4275,8 +4286,14 @@ PasteProcessor.prototype =
 					}
 					
 					//add run
-					oCurPar.Internal_Content_Add(n, oCurRun, false);
+					if(oCurHyperlink)
+						oCurHyperlink.Add_ToContent(n, oCurRun, false);
+					else
+						oCurPar.Internal_Content_Add(n, oCurRun, false);
 				}
+				
+				if(oCurHyperlink)
+					oCurPar.Internal_Content_Add(n, oCurHyperlink, false);
 				
 				j = j + gridSpan - 1;
 			}
