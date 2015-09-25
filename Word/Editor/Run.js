@@ -2451,8 +2451,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                                 }
 
+                                // в первой строке может не быть ни одного break Operator, при этом слово не выходит за границы, т.о. обновляем FirstItemOnLine также и на Word = true
                                 // т.к. оператор идет в начале строки, то соответственно слово в стоке не будет первым, если в строке больше одного оператора
-                                if(bNoOneBreakOperator == false)
+                                if(bNoOneBreakOperator == false || Word == true)
                                     FirstItemOnLine = false;
 
                             }
