@@ -11969,6 +11969,7 @@ CDocument.prototype =
             else
             {
                 this.DrawingObjects.resetInterfaceTextPr();
+                this.DrawingObjects.updateTextPr();
                 this.Interface_Update_DrawingPr();
                 this.DrawingObjects.updateParentParagraphParaPr();
 
