@@ -18,11 +18,14 @@ require.config({
         backbone        : '../vendor/backbone/backbone',
         bootstrap       : '../vendor/bootstrap/dist/js/bootstrap',
         text            : '../vendor/requirejs-text/text',
-        perfectscrollbar: '../vendor/perfect-scrollbar/src/perfect-scrollbar',
+        perfectscrollbar: 'common/main/lib/mods/perfect-scrollbar',
         jmousewheel     : '../vendor/perfect-scrollbar/src/jquery.mousewheel',
         xregexp         : '../vendor/xregexp/xregexp-all-min',
         sockjs          : '../vendor/sockjs/sockjs.min',
-		jsziputils      : '../vendor/jszip-utils/jszip-utils.min',
+        jsziputils      : '../vendor/jszip-utils/jszip-utils.min',
+        jsrsasign       : '../vendor/jsrsasign/jsrsasign-latest-all-min',
+        allfonts        : '../sdk/Common/AllFonts',
+        //sdk             : '../sdk/PowerPoint/sdk-all',
         api             : 'api/documents/api',
         core            : 'common/main/lib/core/application',
         notification    : 'common/main/lib/core/NotificationCenter',
@@ -67,6 +70,17 @@ require.config({
                 'irregularstack'
             ]
         },
+        sdk: {
+            deps: [
+                'jquery',
+                'underscore',
+                'allfonts',
+                'xregexp',
+                'sockjs',
+                'jsziputils',
+                'jsrsasign'
+            ]
+        },
         gateway: {
             deps: [
                 'jquery'
@@ -84,11 +98,17 @@ require([
     'backbone',
     'bootstrap',
     'core',
+    //'sdk',
     'api',
     'analytics',
     'gateway',
     'locale',
-	'jsziputils'
+    'jsziputils',
+    'jsrsasign',
+    'allfonts',
+    'sockjs',
+    'xregexp',
+    'underscore'
 ], function (Backbone, Bootstrap, Core) {
     Backbone.history.start();
 

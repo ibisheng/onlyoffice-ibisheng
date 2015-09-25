@@ -37,7 +37,7 @@
         }
 
         .loader-page-romb {
-            width: 50px;
+            width: 40px;
             display: inline-block;
         }
 
@@ -193,9 +193,19 @@
             return urlParams;
         }
 
-        var lang = getUrlParams()["lang"] || 'en';
-        lang = lang.split("-")[0];
-        var loading = 'Loading...';
+        function encodeUrlParam(str) {
+            return str.replace(/&/g, '&amp;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+        }
+
+        var params = getUrlParams(),
+            lang = (params["lang"] || 'en').split("-")[0],
+            customer = encodeUrlParam(params["customer"] || 'ONLYOFFICE'),
+            loading = 'Loading...';
+
         if ( lang == 'de')      loading = 'Ladevorgang...';
         else if ( lang == 'es') loading = 'Cargando...';
         else if ( lang == 'fr') loading = 'Chargement en cours...';
@@ -204,8 +214,6 @@
         else if ( lang == 'ru') loading = 'Загрузка...';
         else if ( lang == 'sl') loading = 'Nalaganje...';
         else if ( lang == 'tr') loading = 'Yükleniyor...';
-
-        var customer = getUrlParams()["customer"] || 'ONLYOFFICE';
 
         document.write(
             '<div id="loading-mask" class="loadmask">' +
@@ -225,16 +233,12 @@
     <div id="viewport"></div>
 	<!-- sdk -->
 	<script type="text/javascript" src="../../../../OfficeWeb/Common/AllFonts.js"></script>
-    <!--<script type="text/javascript" src="../../../sdk/Excel/sdk-all.js"></script>-->
 	
 	<script type="text/javascript" src="../../../vendor/jquery/jquery.min.js"></script>
     <script type="text/javascript" src="../../../vendor/xregexp/xregexp-all-min.js"></script>
-    <script type="text/javascript" src="../../../vendor/sockjs/sockjs.min.js"></script>
-    <script type="text/javascript" src="../../../vendor/underscore/underscore-min.js"></script>
     <link rel="stylesheet" type="text/css" href="../../../vendor/perfect-scrollbar/src/perfect-scrollbar.css" />
 	<script type="text/javascript" src="../../../vendor/perfect-scrollbar/src/jquery.mousewheel.js"></script>
 	<script type="text/javascript" src="../../../vendor/perfect-scrollbar/src/perfect-scrollbar.js"></script>
-    <script type="text/javascript" src="../../../../OfficeWeb/Common/3rdparty/jsrsasign/jsrsasign-latest-all-min.js"></script>
 
     <script type="text/javascript">
         window.g_debug_mode = true;
