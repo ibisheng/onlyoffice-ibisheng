@@ -19,17 +19,35 @@ function CheckLicense(licenseUrl, userId, callback) {
         salt: ""
       }, CryptoJS.enc.Hex.parse(g_sAESKey), {iv: CryptoJS.enc.Hex.parse(g_sAESKey.slice(0, g_sAESKey.length / 2))});
       var sJson = decrypted.toString(CryptoJS.enc.Utf8);
-      var oJson = JSON.parse(sJson);
+      var oLicense = JSON.parse(sJson);
 
-      var hSig = oJson.signature;
-      delete oJson.signature;
+      var hSig = oLicense.signature;
+      delete oLicense.signature;
 
       var x509 = new X509();
       x509.readCertPEM(g_sPublicRSAKey);
-      var isValid = x509.subjectPublicKeyRSA.verifyString(JSON.stringify(oJson), hSig);
-      callback(false, isValid);
+      var isValid = x509.subjectPublicKeyRSA.verifyString(JSON.stringify(oLicense), hSig);
+      callback(false, isValid ? CheckUserInLicense(userId, oLicense) : false);
     } catch(e) {
       callback(true, false);
     }
   });
+}
+/**
+ *
+ * @param userId
+ * @param oLicense
+ * @returns {boolean}
+ */
+function CheckUserInLicense(userId, oLicense) {
+  var res = false;
+  try {
+    if (oLicense.users && oLicense.users.hasOwnProperty(userId)) {
+      var endDate = new Date(oLicense.users[userId]);
+      res = endDate >= new Date();
+    }
+  } catch(e) {
+    res = false;
+  }
+  return res;
 }
