@@ -3771,7 +3771,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 		if(null != this.copyParams)
         {
 			//анализируем используемые стили
-			var runStyle = oRun.Pr.RStyle;
+			var runStyle = oRun.Pr.RStyle !== undefined ? oRun.Pr.RStyle : null;
 			if(null != runStyle)
 				this.copyParams.oUsedStyleMap[runStyle] = 1;
         }
