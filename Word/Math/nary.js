@@ -587,6 +587,30 @@ CNary.prototype.Draw_Elements = function(PDSE)
 
     this.Arg.Draw_Elements(PDSE);
 };
+CNary.prototype.UpdateBoundsPosInfo = function(PRSA, _CurLine, _CurRange, _CurPage)
+{
+    if(this.bOneLine == false)
+    {
+        var CurLine  = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange);
+
+        this.Bounds.SetGenPos(CurLine, CurRange, PRSA);
+        this.Bounds.SetPage(CurLine, CurRange, _CurPage);
+
+        if(false == this.Base.IsJustDraw())
+        {
+            this.Base.UpdateBoundsPosInfo(PRSA, _CurLine, _CurRange, _CurPage);
+        }
+
+        this.Arg.UpdateBoundsPosInfo(PRSA, _CurLine, _CurRange, _CurPage);
+
+    }
+    else
+    {
+        CNary.superclass.UpdateBoundsPosInfo(this, PRSA, _CurLine, _CurRange, _CurPage);
+    }
+
+};
 CNary.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
 {
     if(this.bOneLine)
@@ -674,7 +698,6 @@ CNary.prototype.setPosition = function(pos, PosInfo)
         }
     }
 };
-
 function CNaryUnd(bInside)
 {
     CMathBase.call(this, bInside);
