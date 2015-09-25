@@ -1988,7 +1988,7 @@
                         t.model.editDefinesNames(oldName, newName);
                         t.handlers.trigger("asc_onEditDefName", oldName, newName);
                         t.handlers.trigger("asc_onRefreshDefNameList");
-                        this.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.LockDefNameManager);
+                        t.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.LockDefNameManager);
                         selectNameChange();
                     }
                 };
