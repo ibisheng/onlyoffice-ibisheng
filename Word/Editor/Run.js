@@ -1130,7 +1130,13 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
 
 
                 var RGBA;
-                if(CurTextPr.Unifill)
+                if(CurTextPr.TextFill)
+                {
+                    CurTextPr.TextFill.check(Para.Get_Theme(), Para.Get_ColorMap());
+                    var oColor = CurTextPr.TextFill.getRGBAColor();
+                    Para.DrawingDocument.SetTargetColor( oColor.R, oColor.G, oColor.B );
+                }
+                else if(CurTextPr.Unifill)
                 {
                     CurTextPr.Unifill.check(Para.Get_Theme(), Para.Get_ColorMap());
                     RGBA = CurTextPr.Unifill.getRGBAColor();
