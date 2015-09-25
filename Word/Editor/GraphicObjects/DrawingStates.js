@@ -583,38 +583,36 @@ RotateState.prototype =
                 }
                 if(bMoveState && e.CtrlKey)
                 {
-                    if(e.CtrlKey)
+                    for(i = 0; i < aNearestPos.length; ++i)
                     {
-                        for(i = 0; i < aNearestPos.length; ++i)
+                        if(aDrawings[i].Locked !== true)
+                            checkObjectInArray(aCheckParagraphs, aNearestPos[i].Paragraph);
+                        else
+                            checkObjectInArray(aCheckParagraphs, aParentParagraphs[i]);
+                    }
+                    if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : aCheckParagraphs, CheckType : changestype_Paragraph_Content}))
+                    {
+                        this.drawingObjects.resetSelection();
+                        History.Create_NewPoint(historydescription_Document_RotateFlowDrawingCtrl);
+                        for(i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
                         {
+                            bounds = aBounds[i];
+                            para_drawing = aDrawings[i].Copy();
+                            para_drawing.Set_RelativeHeight(this.drawingObjects.getZIndex());
                             if(aDrawings[i].Locked !== true)
-                                checkObjectInArray(aCheckParagraphs, aNearestPos[i].Paragraph);
-                            else
-                                checkObjectInArray(aCheckParagraphs, aParentParagraphs[i]);
-                        }
-                        if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : aCheckParagraphs, CheckType : changestype_Paragraph_Content}))
-                        {
-                            this.drawingObjects.resetSelection();
-                            History.Create_NewPoint(historydescription_Document_RotateFlowDrawingCtrl);
-                            for(i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
                             {
-                                bounds = aBounds[i];
-                                para_drawing = aDrawings[i].Copy();
-                                if(aDrawings[i].Locked !== true)
-                                {
-                                    aNearestPos[i].Paragraph.Check_NearestPos(aNearestPos[i]);
-                                    para_drawing.Set_XYForAdd(bounds.posX, bounds.posY, aNearestPos[i], pageIndex);
-                                    para_drawing.Add_ToDocument(aNearestPos[i], false);
-                                }
-                                else
-                                {
-                                    para_drawing.Set_XY(bounds.posX, bounds.posY, aDrawings[i].Get_ParentParagraph(), pageIndex, true);
-                                    para_drawing.Add_ToDocument2(aDrawings[i].Get_ParentParagraph());
-                                }
-                                this.drawingObjects.selectObject(para_drawing.GraphicObj, pageIndex);
+                                aNearestPos[i].Paragraph.Check_NearestPos(aNearestPos[i]);
+                                para_drawing.Set_XYForAdd(bounds.posX, bounds.posY, aNearestPos[i], pageIndex);
+                                para_drawing.Add_ToDocument(aNearestPos[i], false);
                             }
-                            this.drawingObjects.document.Recalculate();
+                            else
+                            {
+                                para_drawing.Set_XY(bounds.posX, bounds.posY, aDrawings[i].Get_ParentParagraph(), pageIndex, true);
+                                para_drawing.Add_ToDocument2(aDrawings[i].Get_ParentParagraph());
+                            }
+                            this.drawingObjects.selectObject(para_drawing.GraphicObj, pageIndex);
                         }
+                        this.drawingObjects.document.Recalculate();
                     }
                 }
                 else
