@@ -1309,11 +1309,6 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             //здесь обновляем WrapState, исходя из этого параметра будем считать WrapIndent
             this.PageInfo.UpdateCurrentWrap(DispDef, bInline);
 
-            // для неинлайновых формул не учитываем отступ первой строки
-            if(this.ParaMathRPI.bInline == false && true === PRS.UseFirstLine && true === PRS.EmptyLine)
-            {
-                PRS.X -= ParaPr.Ind.FirstLine;
-            }
 
             // формулы не инлайновая, есть Ranges пересчитываем формулу в макс Range => private_RecalculateRangeInsideInterval
             if(this.ParaMathRPI.IntervalState !== MATH_INTERVAL_EMPTY && this.ParaMathRPI.bInternalRanges == true/*this.ParaMathRPI.bStartRanges == true*/) // картинки в другом параграфе и формула пересчитывается с учетом Ranges
@@ -1501,7 +1496,7 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
         //PRS.Reset_RestartPageRecalcInfo();
         // не вызываем функцию Reset_RestartPageRecalcInfo, т.к. в данной функции учитывается флаг, что начали пересчитывать заново
         PRS.RestartPageRecalcInfo.Line   = 0;
-        // выставляем только для инлайновых формул => может случится так, что в одном параграфе окажутся несколько формул и для того, чтобы при первом пересчете пересчитались настрокйки нужно возвращать null
+        // выставляем только для инлайновых формул => может случится так, что в одном параграфе окажутся несколько формул и для того, чтобы при первом пересчете пересчитались настройки нужно возвращать null
         // при последующих пересчетах PRS.RestartPageRecalcInfo.Object будет выставлен null на Reset_RestartPageRecalcInfo в ф-ии private_RecalculatePage
 
         PRS.RestartPageRecalcInfo.Object = this.ParaMathRPI.bInline ? null : this;

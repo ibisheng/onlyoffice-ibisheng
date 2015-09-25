@@ -2344,9 +2344,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     var bOperInEndContent = bOperBefore === false && bEndRunToContent === true && Pos == ContentLen - 1 && Word == true, // необходимо для того, чтобы у контентов мат объектов (к-ые могут разбиваться на строки) не было отметки Set_LineBreakPos, иначе скобка (или GapLeft), перед которой стоит break_Operator, перенесется на следующую строку (без текста !)
                         bLowPriority      = bCompareOper == false  && bFirstCompareOper == false;
 
-                    bNoOneBreakOperator = false;
-
-                    if(Pos == 0 && true === this.MathPrp.IsBreak())
+                    if(Pos == 0 && true === this.MathPrp.IsBreak()) // принудительный перенос
                     {
                         if(FirstItemOnLine === true)
                         {
@@ -2368,7 +2366,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             }
                         }
                     }
-                    else if(bOperInEndContent || bLowPriority)
+                    else if(bOperInEndContent || bLowPriority) // у этого break Operator приоритет низкий(находится во вложенном контенте) => по нему не разбиваем, обрабатываем как обычную букву
                     {
                         if(X + SpaceLen + WordLen + BrkLen > XEnd)
                         {
@@ -2403,20 +2401,47 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         {
                             bOverXEnd = X + WordLen + SpaceLen + BrkLen > XEnd; // BrkLen прибавляем дла случая, если идут подряд Brk Operators в конце
 
-                            if(bOverXEnd && FirstItemOnLine === false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                            if(X + WordLen + SpaceLen + BrkLen > XEnd)
                             {
-                                MoveToLBP = true;
-                                NewRange = true;
+                                // если вышли за границы не обновляем параметр bInsideOper, т.к. если уже были breakOperator, то, соответственно, он уже выставлен в true
+                                // а если на этом уровне не было breakOperator, то и обновлять его нне нужо
+
+                                if(FirstItemOnLine === false)
+                                {
+                                    MoveToLBP = true;
+                                    NewRange = true;
+                                }
+                                else
+                                {
+                                    if(Word == true)
+                                    {
+                                        bMathWordLarge = true;
+                                    }
+
+                                    X += SpaceLen + WordLen;
+                                    PRS.Set_LineBreakPos(Pos);
+
+                                    SpaceLen = 0;
+                                    WordLen = 0;
+
+                                    NewRange = true;
+                                    EmptyLine = false;
+                                }
                             }
                             else
                             {
                                 if(FirstItemOnLine === false)
                                     bInsideOper = true;
 
-                                if(Word == true)
+
+                                if(Word == false && FirstItemOnLine == true )
                                 {
-                                    if(bOverXEnd) // FirstItemOnLine == true
-                                        bMathWordLarge = true;
+                                    SpaceLen += BrkLen;
+                                }
+                                else
+                                {
+                                    // проверка на FirstItemOnLine == false нужна для случая, если иду подряд несколько breakOperator
+                                    // в этом случае Word == false && FirstItemOnLine == false, нужно также поставить отметку для потенциального переноса
 
                                     X += SpaceLen + WordLen;
                                     PRS.Set_LineBreakPos(Pos);
@@ -2424,26 +2449,12 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                     WordLen = BrkLen;
                                     SpaceLen = 0;
 
+                                }
+
+                                // т.к. оператор идет в начале строки, то соответственно слово в стоке не будет первым, если в строке больше одного оператора
+                                if(bNoOneBreakOperator == false)
                                     FirstItemOnLine = false;
-                                }
-                                else
-                                {
-                                    if(SpaceLen !== 0)
-                                        FirstItemOnLine = false;
 
-                                    if(FirstItemOnLine == false)
-                                    {
-                                        PRS.Set_LineBreakPos(Pos);
-                                        X += SpaceLen + WordLen;
-                                        SpaceLen = BrkLen;
-                                        WordLen = 0;
-                                    }
-                                    else
-                                    {
-                                        SpaceLen += BrkLen;
-                                    }
-
-                                }
                             }
                         }
                         else   // оператор "после" => оператор находится в конце строки
@@ -2485,6 +2496,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             }
                         }
                     }
+
+                    bNoOneBreakOperator = false;
 
                     break;
                 }
