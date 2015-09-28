@@ -314,7 +314,7 @@
 				}
 			},
 			
-			getSelectedBinary: function () {
+			getSelectedBinary: function (isCut) {
 				var api = window["Asc"]["editor"];
 				if(!api || !api.wb)
 					return false;
@@ -335,7 +335,25 @@
 					sBase64 = this._getBinaryForCopy(worksheetView);
 				History.TurnOn();
 				
-				return {sBase64: sBase64, html: html, text: this.lStorageText};
+				var objectRender = worksheetView.objectRender;
+				var selectedImages = objectRender.getSelectedGraphicObjects();
+				
+				var drawingUrls = [];
+				if(selectedImages && selectedImages.length)
+				{
+					var url, correctUrl, graphicObj;
+					for(var i = 0; i < selectedImages.length; i++)
+					{
+						graphicObj = selectedImages[i];
+						if(graphicObj.isImage())
+						{
+							url = graphicObj;
+							drawingUrls[i] = graphicObj.getBase64Img();
+						}	
+					}
+				}
+				
+				return {sBase64: sBase64, html: html, text: this.lStorageText, drawingUrls: drawingUrls};
 			},
 			
 			_getHtmlBase64: function(range, worksheet, isCut)
