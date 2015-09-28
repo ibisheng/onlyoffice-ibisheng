@@ -9423,6 +9423,10 @@
 							this._isLockedCells(oChangeData.changedRange, null, onChangeWorksheetCallback);
 							break;
 						case c_oAscInsertOptions.InsertColumns:
+							isCheckChangeAutoFilter = t.autoFilters.isRangeIntersectionSeveralTableParts(arn, true);
+							if(isCheckChangeAutoFilter === true)
+								return;
+						
 							functionModelAction = function () {
 								History.Create_NewPoint();
 								History.StartTransaction();

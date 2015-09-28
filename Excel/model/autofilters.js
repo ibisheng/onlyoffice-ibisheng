@@ -1776,6 +1776,35 @@ var maxIndividualValues = 10000;
 				return res;
 			},
 			
+			//если активный диапазон захватывает части нескольких табли, либо часть одной таблицы и одну целую
+			isRangeIntersectionSeveralTableParts: function(activeRange, isWriteError)
+			{
+				//TODO сделать общую функцию с isActiveCellsCrossHalfFTable
+				var aWs = this._getCurrentWS();
+				var tableParts = aWs.TableParts; 
+				
+				var numPartOfTablePart = 0, isAllTablePart;
+				for(var i = 0; i < tableParts.length; i++ )
+				{
+					if(activeRange.intersection(tableParts[i].Ref))
+					{
+						if(activeRange.containsRange(tableParts[i].Ref))
+							isAllTablePart = true;
+						else
+							numPartOfTablePart++;
+							
+						if(numPartOfTablePart >= 2 || (numPartOfTablePart >= 1 && isAllTablePart === true))
+						{
+							if(isWriteError)
+								aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+							return true;
+						}
+					}
+				}
+				
+				return false;
+			},
+			
 			_setStyleTablePartsAfterOpenRows: function(ref)
 			{
 				var aWs = this._getCurrentWS();
