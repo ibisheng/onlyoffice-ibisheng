@@ -1019,6 +1019,10 @@
     var t = this;
     if (true === this._isAuth) {
       this._state = ConnectionState.Authorized;
+      // Мы должны только соединиться для получения файла. Совместное редактирование уже было отключено.
+      if (this.isCloseCoAuthoring)
+        return;
+
       // Мы уже авторизовывались, нужно обновить пользователей (т.к. пользователи могли входить и выходить пока у нас не было соединения)
       this._onAuthParticipantsChanged(data['participants']);
 
@@ -1106,8 +1110,6 @@
   };
   // Авторизация (ее нужно делать после выставления состояния редактора view-mode)
   DocsCoApi.prototype.auth = function(isViewer) {
-    if (this.isCloseCoAuthoring)
-      return;
     this.isAuthInit = true;
     this._isViewer = isViewer;
     if (this._locks) {
@@ -1138,6 +1140,7 @@
       'sessionId': this._id,
       'documentFormatSave': this._documentFormatSave,
       'isViewer': this._isViewer,
+      'isCloseCoAuthoring': this.isCloseCoAuthoring,
       'version': asc_coAuthV
     });
   };
