@@ -6481,7 +6481,7 @@ DrawingObjectsController.prototype =
         var _this = this;
         var callback2 = function(bLock)
         {
-            callback.apply(_this, bLock);
+            callback.apply(_this, [bLock]);
             if(bLock)
             {
                 _this.startRecalculate();
