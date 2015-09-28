@@ -2563,17 +2563,17 @@ ParaMath.prototype.Read_FromBinary2 = function(Reader)
 
 ParaMath.prototype.Get_ContentSelection = function()
 {
-        var oContent = this.GetSelectContent().Content;
+    var oContent = this.GetSelectContent().Content;
 
     if (oContent.bRoot)
         return null;
 
     //
 
-    var Bounds = oContent.Get_Bounds();
-    return Bounds;
+    /*var Bounds = oContent.Get_Bounds();
+    return Bounds;*/
 
-    /*var ContentBounds = oContent.Get_Bounds();
+    var ContentBounds = oContent.Get_Bounds();
     var ParaMathBounds = [];
 
     for(var i = 0; i < ContentBounds.length; i++)
@@ -2581,7 +2581,7 @@ ParaMath.prototype.Get_ContentSelection = function()
         ParaMathBounds[i] = ContentBounds[i][0];
     }
 
-    return ParaMathBounds;*/
+    return ParaMathBounds;
 
 };
 
@@ -2725,9 +2725,9 @@ ParaMath.prototype.Get_Bounds = function()
         return [{X : 0, Y : 0, W : 0, H : 0, Page : 0}];
     else
     {
-        return this.Root.Get_Bounds();
+        //return this.Root.Get_Bounds();
 
-        /*var RootBounds = this.Root.Get_Bounds();
+        var RootBounds = this.Root.Get_Bounds();
         var ParaMathBounds = [];
 
         for(var i = 0; i < RootBounds.length; i++)
@@ -2735,7 +2735,8 @@ ParaMath.prototype.Get_Bounds = function()
             ParaMathBounds[i] = RootBounds[i][0];
         }
 
-        return ParaMathBounds;*/
+        return ParaMathBounds;
+
     }
 };
 
