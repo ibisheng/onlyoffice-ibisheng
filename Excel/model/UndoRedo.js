@@ -2889,7 +2889,7 @@ UndoRedoWorkbook.prototype = {
             * */
         }
         else if(historyitem_Workbook_DefinedNamesChange === Type ){
-            var oldName, newName, res;
+            var oldName, newName;
             if(bUndo){
                 oldName = Data.newName;
                 newName= Data.oldName;
@@ -2907,7 +2907,7 @@ UndoRedoWorkbook.prototype = {
                 oldName = Data.oldName;
                 newName = Data.newName;
             }
-            res = this.wb.editDefinesNames( oldName, newName, true );
+            this.wb.editDefinesNames( oldName, newName, true );
             this.wb.handlers.trigger("asc_onEditDefName", oldName, newName);
         }
         else if(historyitem_Workbook_DefinedNamesDelete === Type ){
@@ -3473,6 +3473,14 @@ UndoRedoWoorksheet.prototype = {
 						if(null != oConflictWs)
 							oConflictWs.renameWsToCollaborate(this.wb.getUniqueSheetNameFrom(oConflictWs.getName(), true));
 					}
+                    var dN;
+                    for(var id in arrDefNameRecalc ){
+                        dN  = arrDefNameRecalc[id];
+                        if( !dN.parsedRef ){
+                            dN.parsedRef = new parserFormula(dN.Ref, "", ws.workbook.getWorksheet(0));
+                            dN.parsedRef.parse();
+                        }
+                    }
 				}
 				ws.setName(name, true);
 			}

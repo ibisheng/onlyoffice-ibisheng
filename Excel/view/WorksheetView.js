@@ -10065,18 +10065,27 @@
                 _C2H50H_ = this.model.workbook.getDefinesNames( reference, this.model.workbook.getActiveWs().getId() );
 
                 if( !_C2H50H_ ){
+                    if (this.collaborativeEditing.getGlobalLock()){
+                        this.handlers.trigger("asc_onError",c_oAscError.ID.LockCreateDefName,c_oAscError.Level.NoCritical);
+                        var ar_norm = ascRange.normalize(),
+                            mc = this.model.getMergedByCell(ar_norm.r1, ar_norm.c1);
+
+                        return {range:mc?mc:range, sheet:this.model.getName()};
+                    }
                     _C2H50H_  = this.model.workbook.editDefinesNames( null, defName );
                 }
 
                 if(_C2H50H_){
-                    _C2H50H_ = this.model.workbook.getDefinesNames( reference, this.model.workbook.getActiveWs().getId() );
-
                     sheetName = _C2H50H_.Ref.split("!");
                     ref = sheetName[1];
                     sheetName = sheetName[0];
 
                     if(_C2H50H_.isTable || (_C2H50H_.parsedRef.RefPos.length == 1 && _C2H50H_.parsedRef.outStack.length == 1) ){
-                        range = {range:asc.g_oRangeCache.getAscRange(ref), sheet:sheetName};
+                        range = asc.g_oRangeCache.getAscRange(ref);
+                        ar_norm = range.normalize();
+                        mc = this.model.getMergedByCell(ar_norm.r1, ar_norm.c1);
+                        range = {range:mc?mc:range, sheet:sheetName};
+
                         if( sheetName[0] == "'" && sheetName[sheetName.length-1] == "'" ){
                             range.sheet = range.sheet.substring(1,range.sheet.length-1);
                         }
@@ -10087,7 +10096,10 @@
                 }
             }
             else{
-                range = {range:range, sheet:this.model.getName()};
+                var ar_norm = range.normalize(),
+                    mc = this.model.getMergedByCell(ar_norm.r1, ar_norm.c1);
+
+                range = {range:mc?mc:range, sheet:this.model.getName()};
             }
 			return range;// ? this.setSelection(range, true) : null;
 		};

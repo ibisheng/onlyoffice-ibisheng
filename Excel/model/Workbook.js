@@ -1030,7 +1030,7 @@ DependencyGraph.prototype = {
                 oldS[id].Ref = oldS[id].Ref.replace(oName,nName);
             }
             else{
-                oldS[id].relinkRef();
+                oldS[id].relinkRef(oName, nName);
             }
         }
 
@@ -1613,7 +1613,7 @@ DefNameVertex.prototype = {
         this.nodeId = getDefNameVertexId( this.sheetId, newName.Name );
     },
 
-    relinkRef:function(){
+    relinkRef:function(oName, nName){
         if( this.parsedRef.isParsed ){
             this.Ref = this.parsedRef.assemble();
         }
@@ -2602,9 +2602,9 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
                 }
             }
         }
-        if(retRes){
+        /*if(retRes){
             retRes = retRes.getAscCDefName();
-        }
+        }*/
     }
     if(!bUndo)
         buildRecalc(this);

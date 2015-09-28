@@ -1958,7 +1958,8 @@
         WorkbookView.prototype.setDefinedNames = function (defName) {
             //ToDo проверка defName.ref на знак "=" в начале ссылки. знака нет тогда это либо число либо строка, так делает Excel.
 
-            this.handlers.trigger("asc_onDefName", this.model.setDefinesNames(defName.Name,defName.Ref,defName.Scope ));
+            this.model.setDefinesNames(defName.Name,defName.Ref,defName.Scope);
+            this.handlers.trigger("asc_onDefName");
 
         };
 
@@ -1998,7 +1999,8 @@
 
             }
             else{
-                this.handlers.trigger("asc_onDefName", this.model.editDefinesNames(oldName, newName));
+                this.model.editDefinesNames(oldName, newName);
+                this.handlers.trigger("asc_onDefName");
                 this.handlers.trigger("asc_onRefreshDefNameList");
                 this.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.LockDefNameManager);
                 selectNameChange();
