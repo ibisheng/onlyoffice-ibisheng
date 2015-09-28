@@ -554,7 +554,7 @@ CGraphics.prototype =
         */
 
         this.m_oLastFont.Clear();
-        this.m_oContext.save();
+       // this.m_oContext.save();
     },
     EndDraw : function()
     {

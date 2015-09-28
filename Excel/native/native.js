@@ -1853,6 +1853,7 @@ function OfflineEditor () {
         return [left, top];
     };
     this.getSelection = function(x, y, width, height) {
+
         _null_object.width = width;
         _null_object.height = height;
 
@@ -2167,14 +2168,31 @@ function offline_stz(v) {_s.zoom = v; _api.asc_setZoom(v);}
 function offline_ds(x, y, width, height, ratio) {_s.drawSheet(x, y, width, height, ratio);}
 function offline_dh(x, y, width, height, type, ratio) {_s.drawHeader(x, y, width, height, type, ratio);}
 function offline_mouse_down(x, y, pin) {
+
+    _s.isShapeAction = false;
+
     var ws = _api.wb.getWorksheet();
+    var wb = _api.wb;
+    var graphicsInfo = wb._onGetGraphicsInfo(x, y);
+    if (graphicsInfo) {
+        console.log('drawing onclick: ' + graphicsInfo.id);
+
+        var e = {Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
+        wb._onGraphicObjectMouseDown(e, x, y);
+        wb._onUpdateSelectionShape(true);
+        _s.isShapeAction = true;
+
+        return {id:graphicsInfo.id};
+    }
+
     _s.cellPin = pin;
     if (0 != _s.cellPin) {
         ws.leftTopRange = ws.activeRange.clone();
-        return;
+        return null;
     }
 
     ws.changeSelectionStartPoint(x, y, true, true);
+    return null;
 }
 function offline_mouse_move(x, y) {
     if (-1 == _s.cellPin)
@@ -2185,6 +2203,15 @@ function offline_mouse_move(x, y) {
         _api.wb.getWorksheet().changeSelectionEndPoint(x, y, true, true);
 }
 function offline_mouse_up(x, y) {
+    var ws = _api.wb.getWorksheet();
+    var wb = _api.wb;
+
+    if (_s.isShapeAction) {
+        var e = {Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
+        wb._onGraphicObjectMouseUp(e, x, y);
+        return;
+    }
+
     _api.wb._onChangeSelectionDone(-1, -1);
     _s.cellPin = 0;
     _api.wb.getWorksheet().leftTopRange = undefined;
@@ -2223,7 +2250,12 @@ function offline_cell_editor_open(isSelectAll, x, y, width, height, ratio) {
 
     wb.cellEditor.isSelectAll = isSelectAll;
 
-    wb._onEditCell(x, y, true,undefined, undefined, true, false);
+   // if (isCoord) {
+        wb._onEditCell(x, y, true, undefined, undefined, true, false);
+   // }
+   // else {
+   //     wb._onEditCell(parseInt(x), parseInt(y), false, undefined, undefined, true, false);
+   // }
 
     return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom,
         wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
@@ -2362,6 +2394,8 @@ function offline_get_cell_in_coord (x, y) {
     return [
         activeCell.c1,
         activeCell.r1,
+        activeCell.c2,
+        activeCell.r2,
         worksheet.cols[activeCell.c1].left,
         worksheet.rows[activeCell.r1].top,
         worksheet.cols[activeCell.c1].width,
@@ -2370,7 +2404,8 @@ function offline_get_cell_in_coord (x, y) {
 function offline_get_cell_coord (c, r) {
     var worksheet = _api.wb.getWorksheet();
 
-    return [worksheet.cols[c].left,
+    return [
+        worksheet.cols[c].left,
         worksheet.rows[r].top,
         worksheet.cols[c].width,
         worksheet.rows[r].height];
@@ -2396,15 +2431,20 @@ function offline_copy() {
     }
 
     // text format
-    _stream["WriteByte"](0);
-    _stream["WriteString2"](sBase64.text);
+  //  _stream["WriteByte"](0);
+  //  _stream["WriteString2"](sBase64.text);
 
     // image
-//    if (null != sBase64.drawingUrls && sBase64.drawingUrls.length > 0)
-//    {
-//        _stream["WriteByte"](1);
-//        _stream["WriteStringA"](sBase64.drawingUrls[0]);
-//    }
+    if (null != sBase64.drawingUrls && sBase64.drawingUrls.length > 0)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteStringA"](sBase64.drawingUrls[0]);
+    }
+    else
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteString2"](sBase64.text);
+    }
 
     // owner format
     _stream["WriteByte"](2);
@@ -2467,6 +2507,23 @@ function offline_cut() {
     _stream["WriteByte"](255);
 
     return _stream;
+}
+function offline_calculate_visible_range(x, y, w, h) {
+
+    var worksheet = _api.wb.getWorksheet();
+    var range = _s._updateRegion(worksheet, x, y, w, h);
+
+    worksheet.visibleRange.c1 = range.columnBeg < 0 ? 0 : range.columnBeg;
+    worksheet.visibleRange.r1 = range.rowBeg < 0 ? 0 : range.rowBeg;
+    worksheet.visibleRange.c2 = range.columnEnd < 0 ? 0 : range.columnEnd;
+    worksheet.visibleRange.r2 = range.rowEnd < 0 ? 0 : range.rowEnd;
+
+    return [worksheet.visibleRange.c1, worksheet.visibleRange.r1, worksheet.visibleRange.c2, worksheet.visibleRange.r2,
+        worksheet.cols[worksheet.visibleRange.c1].left,
+        worksheet.rows[worksheet.visibleRange.r1].top,
+        worksheet.cols[worksheet.visibleRange.c1].width,
+        worksheet.rows[worksheet.visibleRange.r1].height
+    ];
 }
 
 function offline_apply_event(type,params) {
