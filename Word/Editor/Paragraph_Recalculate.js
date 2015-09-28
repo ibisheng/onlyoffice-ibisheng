@@ -2219,6 +2219,7 @@ function CParagraphRecalculateStateWrap(Para)
     // у "крайних" в строке операторов/мат объектов сооответствующий Gap равен нулю
     this.OperGapRight        = 0;
     this.OperGapLeft         = 0;
+    this.MaxWordLen          = 0;
     this.bNoOneBreakOperator = true;  // прежде чем обновлять позицию в контент Run, учтем были ли до этого break-операторы (проверки на Word == false не достаточно, т.к. формула мб инлайновая и тогда не нужно обновлять позицию)
     this.BreakBox            = false;
     this.bInsideOper         = false; // учитываем есть ли разбивка внутри мат объекта, чтобы случайно не вставить в конец пред оператора (при Brk_Before == false)
@@ -2226,6 +2227,7 @@ function CParagraphRecalculateStateWrap(Para)
     this.bFastRecalculate    = false;
     this.bBoxOperator        = false;
     this.bMathWrap           = false;
+    this.bBreakPosInLWord    = true; // обновляем LineBreakPos (Set_LineBreakPos) для WordLarge. Не обновляем для инлайновой формулы, перед формулой есть еще текст, чтобы не перебить LineBreakPos и выставить по тем меткам, которые были до формулы разбиение
 }
 
 CParagraphRecalculateStateWrap.prototype =
@@ -2265,6 +2267,7 @@ CParagraphRecalculateStateWrap.prototype =
         this.bFastRecalculate    = false;
         this.bBoxOperator        = false;
         this.BreakBox            = false;
+        this.bBreakPosInLWord    = true;
     },
 
     // Обнуляем некоторые параметры перед новым отрезком
@@ -2302,6 +2305,7 @@ CParagraphRecalculateStateWrap.prototype =
         this.BreakBox           = false;
         this.bFastRecalculate   = false;
         this.bBoxOperator       = false;
+        this.bBreakPosInLWord    = true;
     },
 
     Reset_RestartPageRecalcInfo : function()

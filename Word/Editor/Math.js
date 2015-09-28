@@ -1510,6 +1510,12 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
 
     this.private_UpdateXLimits(PRS);
 
+    var bStartRange    = this.Root.IsStartRange(PRS.Line, PRS.Range);
+    var bNotBrPosInLWord = this.ParaMathRPI.bInline == true && bStartRange == true && PRS.Ranges.length > 0 && PRS.Word == true;
+    PRS.bBreakPosInLWord = bNotBrPosInLWord == false;  //не обновляем для инлайновой формулы, когда WordLarge, перед формулой есть еще текст, чтобы не перебить LineBreakPos и выставить по тем меткам, которые были до формулы разбиение
+
+    var bEmptyLine = PRS.EmptyLine;
+
     this.private_RecalculateRoot(PRS, ParaPr, Depth);
 
     var WrapState = this.PageInfo.GetCurrentWrapState();
@@ -1525,17 +1531,19 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
         }
         else if(this.ParaMathRPI.bInline == true && PRS.Ranges.length > 0)
         {
-            // разместим остальные элементы под картинкой, если только все Range пустые в данной строке
-            if (PRS.RangesCount === PRS.Range && this.Root.IsEmptyLine(PRS.Line))
+            if(PRS.bBreakPosInLWord == true)
             {
-                PRS.EmptyLine = true;
+                PRS.EmptyLine = bEmptyLine; // вернем пред знач-е
+                this.Root.Math_Set_EmptyRange(PRS.Line, PRS.Range);
+                PRS.bMathWordLarge = false;
+                PRS.NewRange = true;
+                PRS.MoveToLBP = false;
             }
-
-            this.PageInfo.UpdateCurrentWidth(PRS.Line, 0);
-            this.Root.Math_Set_EmptyRange(PRS.Line, PRS.Range);
-            PRS.bMathWordLarge = false;
-            PRS.NewRange = true;
-            PRS.MoveToLBP = false;
+            else
+            {
+                //не обновляем для инлайновой формулы, когда WordLarge, перед формулой есть еще текст, чтобы не перебить LineBreakPos и выставить по тем меткам, которые были до формулы разбиение
+                PRS.MoveToLBP = true;
+            }
         }
     }
 };
@@ -2555,17 +2563,17 @@ ParaMath.prototype.Read_FromBinary2 = function(Reader)
 
 ParaMath.prototype.Get_ContentSelection = function()
 {
-    var oContent = this.GetSelectContent().Content;
+        var oContent = this.GetSelectContent().Content;
 
     if (oContent.bRoot)
         return null;
 
     //
 
-    /*var Bounds = oContent.Get_Bounds();
-    return Bounds;*/
+    var Bounds = oContent.Get_Bounds();
+    return Bounds;
 
-    var ContentBounds = oContent.Get_Bounds();
+    /*var ContentBounds = oContent.Get_Bounds();
     var ParaMathBounds = [];
 
     for(var i = 0; i < ContentBounds.length; i++)
@@ -2573,7 +2581,7 @@ ParaMath.prototype.Get_ContentSelection = function()
         ParaMathBounds[i] = ContentBounds[i][0];
     }
 
-    return ParaMathBounds;
+    return ParaMathBounds;*/
 
 };
 
@@ -2717,9 +2725,9 @@ ParaMath.prototype.Get_Bounds = function()
         return [{X : 0, Y : 0, W : 0, H : 0, Page : 0}];
     else
     {
-        //return this.Root.Get_Bounds();
+        return this.Root.Get_Bounds();
 
-        var RootBounds = this.Root.Get_Bounds();
+        /*var RootBounds = this.Root.Get_Bounds();
         var ParaMathBounds = [];
 
         for(var i = 0; i < RootBounds.length; i++)
@@ -2727,8 +2735,7 @@ ParaMath.prototype.Get_Bounds = function()
             ParaMathBounds[i] = RootBounds[i][0];
         }
 
-        return ParaMathBounds;
-
+        return ParaMathBounds;*/
     }
 };
 

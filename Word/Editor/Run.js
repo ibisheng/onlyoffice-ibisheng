@@ -2419,7 +2419,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                     }
 
                                     X += SpaceLen + WordLen;
-                                    PRS.Set_LineBreakPos(Pos);
+
+                                    if(PRS.bBreakPosInLWord == true)
+                                        PRS.Set_LineBreakPos(Pos);
 
                                     SpaceLen = 0;
                                     WordLen = 0;
@@ -2488,7 +2490,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 SpaceLen = 0;
                                 WordLen = 0;
 
-                                PRS.Set_LineBreakPos(Pos+1); // LineBreakPos обновляем здесь, т.к. слово может начаться с мат объекта, а не с Run, в мат объекте нет соответствующей проверки
+                                if(PRS.bBreakPosInLWord == true)
+                                    PRS.Set_LineBreakPos(Pos+1); // LineBreakPos обновляем здесь, т.к. слово может начаться с мат объекта, а не с Run, в мат объекте нет соответствующей проверки
 
                                 FirstItemOnLine = false;
 
