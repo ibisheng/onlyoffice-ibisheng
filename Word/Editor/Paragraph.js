@@ -13173,6 +13173,7 @@ Paragraph.prototype.Check_RevisionsChanges = function(RevisionsManager)
         EndPos   = this.Get_EndPos(true);
 
         Change = new CRevisionsChange();
+        Change.put_Paragraph(this);
         Change.put_StartPos(StartPos);
         Change.put_EndPos(EndPos);
         Change.put_Type(c_oAscRevisionsChangeType.ParaPr);
@@ -13191,6 +13192,7 @@ Paragraph.prototype.Check_RevisionsChanges = function(RevisionsManager)
         EndPos   = this.Get_EndPos(true);
 
         Change = new CRevisionsChange();
+        Change.put_Paragraph(this);
         Change.put_StartPos(StartPos);
         Change.put_EndPos(EndPos);
         Change.put_Type(c_oAscRevisionsChangeType.ParaAdd);
@@ -13207,6 +13209,7 @@ Paragraph.prototype.Check_RevisionsChanges = function(RevisionsManager)
 
 
         Change = new CRevisionsChange();
+        Change.put_Paragraph(this);
         Change.put_StartPos(StartPos);
         Change.put_EndPos(EndPos);
         Change.put_Type(c_oAscRevisionsChangeType.ParaRem);
@@ -14343,6 +14346,7 @@ function CParagraphTabsCounter()
 
 function CParagraphRevisionsChangesChecker(Para, RevisionsManager)
 {
+    this.Paragraph        = Para;
     this.ParaId           = Para.Get_Id();
     this.RevisionsManager = RevisionsManager;
 
@@ -14376,6 +14380,7 @@ CParagraphRevisionsChangesChecker.prototype.Flush_AddRemoveChange = function()
     {
         var Change = new CRevisionsChange();
         Change.put_Type(reviewtype_Add === AddRemove.ChangeType ? c_oAscRevisionsChangeType.TextAdd : c_oAscRevisionsChangeType.TextRem);
+        Change.put_Paragraph(this.Paragraph);
         Change.put_Value(AddRemove.Value);
         Change.put_StartPos(AddRemove.StartPos);
         Change.put_EndPos(AddRemove.EndPos);
@@ -14404,6 +14409,7 @@ CParagraphRevisionsChangesChecker.prototype.Flush_TextPrChange = function()
         // TODO: Доделать put_Value
         Change.put_Value(TextPr.Pr.Get_Description());
 
+        Change.put_Paragraph(this.Paragraph);
         Change.put_StartPos(TextPr.StartPos);
         Change.put_EndPos(TextPr.EndPos);
         Change.put_UserId(TextPr.UserId);

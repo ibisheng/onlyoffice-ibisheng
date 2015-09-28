@@ -9496,7 +9496,7 @@ CDocumentContent.prototype.Accept_RevisionChanges = function(Type, bAll)
     if (docpostype_DrawingObjects === this.CurPos.Type)
     {
         // TODO: Реализовать
-        //this.DrawingObjects.Accept_RevisionChanges();
+        //this.DrawingObjects.Accept_RevisionChanges(Type, bAll);
     }
     else //if (docpostype_Content === this.CurPos.Type)
     {
@@ -9519,7 +9519,7 @@ CDocumentContent.prototype.Accept_RevisionChanges = function(Type, bAll)
                 LastParaEnd = true;
             }
 
-            if (undefined === Type)
+            if (undefined === Type || c_oAscRevisionsChangeType.ParaPr === Type)
             {
                 for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
                 {
@@ -9529,13 +9529,16 @@ CDocumentContent.prototype.Accept_RevisionChanges = function(Type, bAll)
                         Element.Accept_PrChange();
                     }
                 }
+            }
 
-                for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
-                {
-                    var Element = this.Content[CurPos];
-                    Element.Accept_RevisionChanges(Type, bAll);
-                }
+            for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+            {
+                var Element = this.Content[CurPos];
+                Element.Accept_RevisionChanges(Type, bAll);
+            }
 
+            if (undefined === Type || c_oAscRevisionsChangeType.ParaAdd === Type || c_oAscRevisionsChangeType.ParaRem === Type)
+            {
                 EndPos = (true === LastParaEnd ? EndPos : EndPos - 1);
                 for (var CurPos = EndPos; CurPos >= StartPos; CurPos--)
                 {
@@ -9543,11 +9546,11 @@ CDocumentContent.prototype.Accept_RevisionChanges = function(Type, bAll)
                     if (type_Paragraph === Element.Get_Type())
                     {
                         var ReviewType = Element.Get_ReviewType();
-                        if (reviewtype_Add === ReviewType)
+                        if (reviewtype_Add === ReviewType && (undefined === Type || c_oAscRevisionsChangeType.ParaAdd === Type))
                         {
                             Element.Set_ReviewType(reviewtype_Common);
                         }
-                        else if (reviewtype_Remove === ReviewType)
+                        else if (reviewtype_Remove === ReviewType && (undefined === Type || c_oAscRevisionsChangeType.ParaRem === Type))
                         {
                             Element.Set_ReviewType(reviewtype_Common);
                             this.Concat_Paragraphs(CurPos);
@@ -9556,10 +9559,6 @@ CDocumentContent.prototype.Accept_RevisionChanges = function(Type, bAll)
                 }
             }
         }
-        else
-        {
-            var CurPos = this.CurPos.ContentPos;
-        }
     }
 };
 CDocumentContent.prototype.Reject_RevisionChanges = function(Type, bAll)
@@ -9567,23 +9566,30 @@ CDocumentContent.prototype.Reject_RevisionChanges = function(Type, bAll)
     if (docpostype_DrawingObjects === this.CurPos.Type)
     {
         // TODO: Реализовать
-        //this.DrawingObjects.Reject_RevisionChanges();
+        //this.DrawingObjects.Reject_RevisionChanges(Type, bAll);
     }
     else //if (docpostype_Content === this.CurPos.Type)
     {
-        if (true === this.Selection.Use)
+        if (true === this.Selection.Use || true === bAll)
         {
             var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
+            var EndPos = this.Selection.EndPos;
             if (StartPos > EndPos)
             {
                 StartPos = this.Selection.EndPos;
-                EndPos   = this.Selection.StartPos;
+                EndPos = this.Selection.StartPos;
             }
             var LastElement = this.Content[EndPos];
             var LastParaEnd = (type_Paragraph === LastElement.Get_Type() && true === LastElement.Selection_CheckParaEnd() ? true : false);
 
-            if (undefined === Type)
+            if (true === bAll)
+            {
+                StartPos = 0;
+                EndPos = this.Content.length - 1;
+                LastParaEnd = true;
+            }
+
+            if (undefined === Type || c_oAscRevisionsChangeType.ParaPr === Type)
             {
                 for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
                 {
@@ -9593,13 +9599,16 @@ CDocumentContent.prototype.Reject_RevisionChanges = function(Type, bAll)
                         Element.Reject_PrChange();
                     }
                 }
+            }
 
-                for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
-                {
-                    var Element = this.Content[CurPos];
-                    Element.Reject_RevisionChanges(Type, bAll);
-                }
+            for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+            {
+                var Element = this.Content[CurPos];
+                Element.Reject_RevisionChanges(Type, bAll);
+            }
 
+            if (undefined === Type || c_oAscRevisionsChangeType.ParaAdd === Type || c_oAscRevisionsChangeType.ParaRem === Type)
+            {
                 EndPos = (true === LastParaEnd ? EndPos : EndPos - 1);
                 for (var CurPos = EndPos; CurPos >= StartPos; CurPos--)
                 {
@@ -9607,23 +9616,18 @@ CDocumentContent.prototype.Reject_RevisionChanges = function(Type, bAll)
                     if (type_Paragraph === Element.Get_Type())
                     {
                         var ReviewType = Element.Get_ReviewType();
-                        if (reviewtype_Add === ReviewType)
+                        if (reviewtype_Add === ReviewType && (undefined === Type || c_oAscRevisionsChangeType.ParaAdd === Type))
                         {
                             Element.Set_ReviewType(reviewtype_Common);
                             this.Concat_Paragraphs(CurPos);
                         }
-                        else if (reviewtype_Remove === ReviewType)
+                        else if (reviewtype_Remove === ReviewType && (undefined === Type || c_oAscRevisionsChangeType.ParaRem === Type))
                         {
                             Element.Set_ReviewType(reviewtype_Common);
                         }
                     }
                 }
             }
-        }
-        else
-        {
-            var CurPos = this.CurPos.ContentPos;
-
         }
     }
 };
