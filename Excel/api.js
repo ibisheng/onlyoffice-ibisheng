@@ -560,7 +560,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     this._asc_downloadAs(typeFile, function(input) {
       if (null != input && ("save" == input["type"] || "sfct" == input["type"])) {
         if ('ok' == input["status"]) {
-          var url = g_fGetSaveUrl(input["data"]);
+          var url = input["data"];
           if (url) {
             t.asc_processSavedFile(url, false);
           } else {
@@ -807,7 +807,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
           this._asc_downloadAs(c_oAscFileType.CSV, function(input) {
             if (null != input && "save" == input["type"]) {
               if ('ok' == input["status"]) {
-                var url = g_fGetSaveUrl(input["data"]);
+                var url = input["data"];
                 if (url) {
                   t.asc_processSavedFile(url, false);
                 } else {
@@ -946,19 +946,21 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
     var dataContainer = {data: null, part: null, index: 0, count: 0};
     dataContainer.data = oBinaryFileWriter.Write();
+    var filetype = 0x1002;
     var oAdditionalData = {};
     oAdditionalData["c"] = "sfct";
     oAdditionalData["id"] = this.documentId;
     oAdditionalData["userid"] = this.documentUserId;
     oAdditionalData["vkey"] = this.documentVKey;
-    oAdditionalData["outputformat"] = 0x1002;
+    oAdditionalData["outputformat"] = filetype;
+    oAdditionalData["title"] = changeFileExtention(this.documentTitle, getExtentionByFormat(filetype));
     this.wb._initCommentsToSave();
     oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
     var t = this;
     t.fCurCallback = function(incomeObject) {
       if (null != input && "save" == input["type"]) {
         if ('ok' == input["status"]) {
-          var url = g_fGetSaveUrl(input["data"]);
+          var url = input["data"];
           if (url) {
             t.asc_processSavedFile(url, false);
           } else {
@@ -985,6 +987,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     oAdditionalData["userid"] = this.documentUserId;
     oAdditionalData["vkey"] = this.documentVKey;
     oAdditionalData["outputformat"] = sFormat;
+    oAdditionalData["title"] = changeFileExtention(this.documentTitle, getExtentionByFormat(sFormat));
     if (c_oAscFileType.PDF === sFormat) {
       var printPagesData = this.wb.calcPagesPrint(this.adjustPrint);
       var pdf_writer = new CPdfPrinter();

@@ -231,14 +231,6 @@ function g_fOpenFileCommand (binUrl, changesUrl, Signature, callback) {
 	} else
 		bEndLoadChanges = true;
 }
-function g_fGetSaveUrl(urls){
-	for(var i in urls) {
-		if(-1 != i.indexOf('output')) {
-			return urls[i];
-		}
-	}
-	return null;
-}
 function sendCommand2(editor, fCallback, rdata, dataContainer) {
   //json не должен превышать размера 2097152, иначе при его чтении будет exception
   var docConnectionId = editor.CoAuthoringApi.getDocId();
@@ -591,6 +583,43 @@ function GetFileExtension (sName) {
 	if (-1 != nIndex)
 		return sName.substring(nIndex + 1).toLowerCase();
 	return null;
+}
+function changeFileExtention (sName, sNewExt) {
+  var sOldExt = GetFileExtension(sName);
+  if(sOldExt) {
+    return sName.substring(0, sName.length - sOldExt.length) + sNewExt;
+  } else {
+    return sName + '.' + sNewExt;
+  }
+}
+function getExtentionByFormat (format) {
+  switch(format) {
+    case c_oAscFileType.PDF: return 'pdf'; break;
+    case c_oAscFileType.HTML: return 'html'; break;
+    // Word
+    case c_oAscFileType.DOCX: return 'docx'; break;
+    case c_oAscFileType.DOC: return 'doc'; break;
+    case c_oAscFileType.ODT: return 'odt'; break;
+    case c_oAscFileType.RTF: return 'rtf'; break;
+    case c_oAscFileType.TXT: return 'txt'; break;
+    case c_oAscFileType.MHT: return 'mht'; break;
+    case c_oAscFileType.EPUB: return 'epub'; break;
+    case c_oAscFileType.FB2: return 'fb2'; break;
+    case c_oAscFileType.MOBI: return 'mobi'; break;
+    case c_oAscFileType.DOCY: return 'doct'; break;
+    case c_oAscFileType.JSON: return 'json'; break;
+    // Excel
+    case c_oAscFileType.XLSX: return 'xlsx'; break;
+    case c_oAscFileType.XLS: return 'xls'; break;
+    case c_oAscFileType.ODS: return 'ods'; break;
+    case c_oAscFileType.CSV: return 'csv'; break;
+    case c_oAscFileType.XLSY: return 'xlst'; break;
+    // PowerPoint
+    case c_oAscFileType.PPTX: return 'pptx'; break;
+    case c_oAscFileType.PPT: return 'ppt'; break;
+    case c_oAscFileType.ODP: return 'odp'; break;
+  }
+  return '';
 }
 function InitOnMessage (callback) {
 	if (window.addEventListener) {

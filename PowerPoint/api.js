@@ -1335,7 +1335,7 @@ asc_docs_api.prototype.asc_Print = function(){
 	_downloadAs(this, c_oAscFileType.PDF, function(input){
 		if(null != input && "save" == input["type"]) {
 			if('ok' == input["status"]){
-				var url = g_fGetSaveUrl(input["data"]);
+				var url = input["data"];
 				if(url) {
 					t.processSavedFile(url, false);
 				} else {
@@ -1509,7 +1509,7 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile){//передаем ч
 	_downloadAs(this, typeFile, function(input){
 		if(null != input && ("save" == input["type"] || "sfct" == input["type"])) {
 			if('ok' == input["status"]){
-				var url = g_fGetSaveUrl(input["data"]);
+				var url = input["data"];
 				if(url) {
 					t.processSavedFile(url, false);
 				} else {
@@ -5066,6 +5066,7 @@ function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)
 	oAdditionalData["userid"] = documentUserId;
 	oAdditionalData["vkey"] = documentVKey;
 	oAdditionalData["outputformat"] = filetype;
+	oAdditionalData["title"] = changeFileExtention(documentTitle, getExtentionByFormat(filetype));
 	oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 	if(c_oAscFileType.PDF == filetype)
 	{

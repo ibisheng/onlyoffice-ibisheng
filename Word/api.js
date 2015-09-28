@@ -2113,7 +2113,7 @@ asc_docs_api.prototype.asc_Print = function()
     this.fCurCallback = function(input) {
       if(null != input && "savefromorigin" == input["type"]) {
         if('ok' == input["status"]) {
-          var url = g_fGetSaveUrl(input["data"]);
+          var url = input["data"];
           if(url) {
             t.processSavedFile(url, false);
           }
@@ -2137,7 +2137,7 @@ asc_docs_api.prototype.asc_Print = function()
     _downloadAs(this, "save", null, null, null, c_oAscFileType.PDF, function(input){
       if(null != input && "save" == input["type"]) {
         if('ok' == input["status"]){
-          var url = g_fGetSaveUrl(input["data"]);
+          var url = input["data"];
           if(url) {
             t.processSavedFile(url, false);
           } else {
@@ -2313,7 +2313,7 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile, txtOptions) {//пер
 	_downloadAs(this, "save", null, null, txtOptions, typeFile, function (input) {
 		if(null != input && ("save" == input["type"] || "sfct" == input["type"])) {
 			if('ok' == input["status"]){
-				var url = g_fGetSaveUrl(input["data"]);
+				var url = input["data"];
 				if(url) {
 					t.processSavedFile(url, false);
 				} else {
@@ -2342,7 +2342,7 @@ asc_docs_api.prototype.asc_DownloadAsMailMerge = function(typeFile, StartIndex, 
 		_downloadAs(this, "save", oDocumentMailMerge, null, null, typeFile, function (input) {
 			if(null != input && "save" == input["type"]) {
 				if('ok' == input["status"]){
-					var url = g_fGetSaveUrl(input["data"]);
+					var url = input["data"];
 					if(url) {
 						if(bIsDownload) {
 							t.processSavedFile(url, false);
@@ -6813,6 +6813,7 @@ function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, tx
     oAdditionalData["userid"] = documentUserId;
     oAdditionalData["vkey"] = documentVKey;
     oAdditionalData["outputformat"] = filetype;
+    oAdditionalData["title"] = changeFileExtention(documentTitle, getExtentionByFormat(filetype));
 	oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 	if (null == oDocumentMailMerge &&  c_oAscFileType.PDF === filetype) {
 		var dd = editor.WordControl.m_oDrawingDocument;
