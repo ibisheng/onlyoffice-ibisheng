@@ -607,7 +607,7 @@ CNary.prototype.UpdateBoundsPosInfo = function(PRSA, _CurLine, _CurRange, _CurPa
     }
     else
     {
-        CNary.superclass.UpdateBoundsPosInfo(this, PRSA, _CurLine, _CurRange, _CurPage);
+        CNary.superclass.UpdateBoundsPosInfo.call(this, PRSA, _CurLine, _CurRange, _CurPage);
     }
 
 };
