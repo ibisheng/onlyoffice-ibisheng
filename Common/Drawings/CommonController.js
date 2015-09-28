@@ -6470,6 +6470,28 @@ DrawingObjectsController.prototype =
         return this.drawingObjects.objectLocker.checkObjects(callback2);
     },
 
+    checkSelectedObjectsAndCallback2: function(callback)
+    {
+        var selection_state = this.getSelectionState();
+        this.drawingObjects.objectLocker.reset();
+        for(var i = 0; i < this.selectedObjects.length; ++i)
+        {
+            this.drawingObjects.objectLocker.addObjectId(this.selectedObjects[i].Get_Id());
+        }
+        var _this = this;
+        var callback2 = function(bLock)
+        {
+            callback.apply(_this, bLock);
+            if(bLock)
+            {
+                _this.startRecalculate();
+                _this.drawingObjects.sendGraphicObjectProps();
+            }
+
+        };
+        return this.drawingObjects.objectLocker.checkObjects(callback2);
+    },
+
     setGraphicObjectPropsCallBack: function(props)
     {
         var apply_props;
