@@ -590,6 +590,11 @@ var maxIndividualValues = 10000;
 								aWs.setRowHidden(hiddenObj.h, hiddenObj.start, i);
 							}
 						}
+						else if(hiddenObj.h !== null)
+						{
+							aWs.setRowHidden(hiddenObj.h, hiddenObj.start, i - 1);
+							hiddenObj.h = null
+						}
 					}
 				}
 				
@@ -2128,6 +2133,8 @@ var maxIndividualValues = 10000;
 				
 				var filter = this._getFilterByDisplayName(displayName);
 				var index = null;
+				//if(!filter)
+					//return {filter: null, index: index, ColId: colId};
 				var autoFilter = displayName === null ? filter : filter.AutoFilter;
 				
 				colId = this._getTrueColId(filter, colId);
