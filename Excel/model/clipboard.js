@@ -2022,10 +2022,11 @@
 				newFonts = this._convertFonts(oPasteProcessor.oFonts);
 
 
-                History.Create_NewPoint();
 				History.StartTransaction();
 				oPasteProcessor._Execute(node, {}, true, true, false);
 				if(!oPasteProcessor.aContent || !oPasteProcessor.aContent.length) {
+					window.GlobalPasteFlag = false;
+					window.GlobalPasteFlagCounter = 0;
 					History.EndTransaction();
 					return false;
 				}
@@ -2106,10 +2107,19 @@
 				var isIntoShape = worksheet.objectRender.controller.getTargetDocContent();
 				if(isIntoShape)
 				{
-
-					var resultPasteInShape = this._pasteInShape(worksheet, node, onlyFromLocalStorage, isIntoShape);
-					if(resultPasteInShape == true)
-						return;
+					var callback = function(isSuccess)
+					{
+						if(isSuccess)
+							t._pasteInShape(worksheet, node, onlyFromLocalStorage, isIntoShape);
+						else
+						{
+							window.GlobalPasteFlag = false;
+							window.GlobalPasteFlagCounter = 0;
+						}
+					};
+					
+					worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
+					return;
 				}
 				
 				//****binary****
@@ -4688,8 +4698,8 @@
 			//this.ElemToSelect = ElemToSelect;
 			this.Ul = document.createElement( "ul" );
 			this.Ol = document.createElement( "ol" );
-			this.Para;
-			this.bOccurEndPar;
+			this.Para = null;
+			this.bOccurEndPar = null;
 			this.oCurHyperlink = null;
 			this.oCurHyperlinkElem = null;
 			this.oPresentationWriter = new CBinaryFileWriter();
