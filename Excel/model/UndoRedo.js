@@ -2875,7 +2875,7 @@ UndoRedoWorkbook.prototype = {
                     lsID === null || lsID === undefined ? null : lsID = this.wb.getWorksheet(Data.newName.LocalSheetId).getId();
                     if( this.wb.isDefinedNamesExists(name,lsID) ){
                         var oConflictDefName = this.wb.getDefinesNames(name,lsID);
-                        if(null != oConflictDefName)
+                        if(oConflictDefName)
                             oConflictDefName.renameDefNameToCollaborate(this.wb.getUniqueDefinedNameFrom(oConflictDefName, true));
                     }
                     this.wb.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.OK);
@@ -2901,7 +2901,7 @@ UndoRedoWorkbook.prototype = {
                     lsID === null || lsID === undefined ? null : lsID = this.wb.getWorksheet(Data.newName.LocalSheetId).getId();
                     if( this.wb.isDefinedNamesExists(name,lsID) ){
                         var oConflictDefName = this.wb.getDefinesNames(name,lsID);
-                        if(null != oConflictDefName)
+                        if(oConflictDefName)
                             oConflictDefName.renameDefNameToCollaborate(this.wb.getUniqueDefinedNameFrom(oConflictDefName, true));
                     }
                     this.wb.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.OK);

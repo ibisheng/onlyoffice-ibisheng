@@ -1977,40 +1977,23 @@
             var ws = this.getWorksheet(),
                 t = this,
                 selectNameChange = function(){
-                    var ws = t.getWorksheet();
-                    ws.changeSelectionDone();
                     t._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
                 };
-
-//            if( oldName ){
 
             var editDefinedNamesCallback = function (res) {
                 if (res) {
                     t.model.editDefinesNames(oldName, newName);
                     t.handlers.trigger("asc_onEditDefName", oldName, newName);
                     t.handlers.trigger("asc_onRefreshDefNameList");
-//                        t.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.LockDefNameManager);
                     selectNameChange();
                 }
             };
-            var defNameId
+            var defNameId;
             if( oldName ){
                 defNameId = t.model.getDefinedName(oldName).nodeId;
             }
-//            else{
-//                defNameId = t.model.getDefinedName(newName).nodeId;
-//            }
 
             ws._isLockedDefNames(editDefinedNamesCallback, defNameId);
-
-//            }
-//            else{
-//                this.model.editDefinesNames(oldName, newName);
-//                this.handlers.trigger("asc_onDefName");
-//                this.handlers.trigger("asc_onRefreshDefNameList");
-////                this.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.LockDefNameManager);
-//                selectNameChange();
-//            }
 
         };
 
@@ -2028,6 +2011,7 @@
                     if (res) {
                         t.handlers.trigger("asc_onDelDefName", t.model.delDefinesNames(oldName));
                         t.handlers.trigger("asc_onRefreshDefNameList");
+                        t._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
                     }
                 };
                 var defNameId = t.model.getDefinedName(oldName).nodeId;
