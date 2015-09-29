@@ -1066,6 +1066,9 @@ function DrawingObjects() {
 	_this.getContextHeight = function () {
 		return drawingCtx.getHeight();
 	};
+    _this.getContext = function () {
+        return drawingCtx;
+    };
 
     _this.getWorksheetModel = function() {
         return worksheet.model;
@@ -2950,10 +2953,11 @@ function DrawingObjects() {
     _this.checkCursorDrawingObject = function(x, y) {
 
         var offsets = _this.drawingArea.getOffsets(x, y);
+       // console.log('getOffsets: ' + x + ':' + y);
         if ( offsets ) {
             var objectInfo = { cursor: null, id: null, object: null };
             var graphicObjectInfo = _this.controller.isPointInDrawingObjects( pxToMm(x - offsets.x), pxToMm(y - offsets.y) );
-
+           // console.log('isPointInDrawingObjects: ' + pxToMm(x - offsets.x) + ':' + pxToMm(y - offsets.y));
             if ( graphicObjectInfo && graphicObjectInfo.objectId ) {
                 objectInfo.id = graphicObjectInfo.objectId;
                 objectInfo.object = _this.getDrawingBase(graphicObjectInfo.objectId);
