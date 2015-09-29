@@ -6481,6 +6481,10 @@ DrawingObjectsController.prototype =
         var _this = this;
         var callback2 = function(bLock)
         {
+            if(bLock)
+            {
+                History.Create_NewPoint();
+            }
             callback.apply(_this, [bLock]);
             if(bLock)
             {
