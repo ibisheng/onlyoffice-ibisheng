@@ -2082,6 +2082,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       dN.isLock = lockElem["UserId"];
       this.handlers.trigger("asc_onRefreshDefNameList");
     }
+      this.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.LockDefNameManager);
   }
 
   spreadsheet_api.prototype._onUnlockDefName = function() {

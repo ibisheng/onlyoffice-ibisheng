@@ -2878,6 +2878,7 @@ UndoRedoWorkbook.prototype = {
                         if(null != oConflictDefName)
                             oConflictDefName.renameDefNameToCollaborate(this.wb.getUniqueDefinedNameFrom(oConflictDefName, true));
                     }
+                    this.wb.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.OK);
                 }
                 this.wb.editDefinesNames( null, Data.newName, true );
                 this.wb.handlers.trigger("asc_onEditDefName", null, Data.newName);
@@ -2903,6 +2904,7 @@ UndoRedoWorkbook.prototype = {
                         if(null != oConflictDefName)
                             oConflictDefName.renameDefNameToCollaborate(this.wb.getUniqueDefinedNameFrom(oConflictDefName, true));
                     }
+                    this.wb.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.OK);
                 }
                 oldName = Data.oldName;
                 newName = Data.newName;
