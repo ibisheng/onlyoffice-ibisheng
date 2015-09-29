@@ -1,4 +1,4 @@
 {
-	"closure_compiler": "/home/ubuntu/compiler.jar",
+	"closure_compiler": "compiler.jar",
 	"menu_path": "../../../menu/sdk"
 }

@@ -1,5 +1,7 @@
 module.exports = function(grunt) {
     var revision="unknown", defaultConfig, packageFile, toolsConfig, toolsFile;
+	
+	var path = require('path');
 
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
@@ -194,6 +196,9 @@ module.exports = function(grunt) {
 		var map_file_path = packageFile['compile']['sdk']['dst'] + '.map';
 		var map_record_file_path = map_file_path + '.tmp';
 		var concat_res = {};
+		var closureHome = (undefined !== process.env['CLOSURE_HOME'])? process.env['CLOSURE_HOME'] : "" ;
+		var compilerFile = path.join(closureHome, toolsFile['closure_compiler']);
+		grunt.log.ok('compilerFile = %s'.green, compilerFile);
 		concat_res[packageFile['compile']['sdk']['dst']] = [
 					packageFile['compile']['sdk']['dst'],
 					packageFile['compile']['defines']['dst'],
@@ -201,7 +206,7 @@ module.exports = function(grunt) {
 		grunt.initConfig({
 			closureCompiler: {
 				options: {
-					compilerFile: toolsFile['closure_compiler'],
+					compilerFile: compilerFile,
 					javaFlags: ['-Xms2048m']
 				},
 				sdk: {
