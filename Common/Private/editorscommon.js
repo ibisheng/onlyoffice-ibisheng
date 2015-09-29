@@ -41,12 +41,14 @@ function CheckLicense(licenseUrl, userId, callback) {
  */
 function CheckUserInLicense(userId, oLicense) {
   var res = false;
+  var superuser = 'onlyoffice';
   try {
-    if ('onlyoffice' === oLicense['company_id']) {
-      res = true;
-    } else if (oLicense.users && oLicense.users.hasOwnProperty(userId)) {
-      var endDate = new Date(oLicense.users[userId]);
-      res = endDate >= new Date();
+    if (oLicense.users) {
+      if (oLicense.users.hasOwnProperty(userId) || (superuser === oLicense['company_id'] &&
+        oLicense.users.hasOwnProperty(userId = superuser))) {
+        var endDate = new Date(oLicense.users[userId]['end_date']);
+        res = endDate >= new Date();
+      }
     }
   } catch(e) {
     res = false;
