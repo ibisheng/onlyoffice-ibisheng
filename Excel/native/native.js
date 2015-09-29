@@ -261,7 +261,7 @@ document.createElement = function(type)
     return _null_object;
 };
 
-function _return_empty_html_element() { return _null_object; };
+function _return_empty_html_element() { return _null_object; }
 
 document.createDocumentFragment = _return_empty_html_element;
 document.getElementsByTagName = function(tag) {
@@ -620,6 +620,15 @@ window.native.Call_VR_Table = function(_params, _cols, _margins, _rows)
 window.native.Call_Menu_Event = function(type, _params)
 {
     return _api.Call_Menu_Event(type, _params);
+};
+
+window["NativeCorrectImageUrlOnPaste"] = function(url)
+{
+    return window["native"]["CorrectImageUrlOnPaste"](url);
+};
+window["NativeCorrectImageUrlOnCopy"] = function(url)
+{
+    return window["native"]["CorrectImageUrlOnCopy"](url);
 };
 
 // FT_Common
@@ -2160,6 +2169,129 @@ function OfflineEditor () {
         var str =  pdfWriter.DocumentRenderer.Memory.GetBase64Memory();
         return str;
     };
+
+    this.offline_addImageDrawingObject = function(imageUrl, options) {
+        var worksheet = _api.wb.getWorksheet();
+        var objectRender = worksheet.objectRender;
+        var _this = objectRender;
+
+        function ascCvtRatio(fromUnits, toUnits) {
+            return asc.getCvtRatio(fromUnits, toUnits, objectRender.getContext().getPPIX());
+        }
+
+        function ptToMm(val) {
+            return val * ascCvtRatio(1, 3);
+        }
+
+        function pxToPt(val) {
+            return val * ascCvtRatio(0, 1);
+        }
+
+        function pxToMm(val) {
+            return val * ascCvtRatio(0, 3);
+        }
+
+        if (imageUrl && !objectRender.isViewerMode()) {
+
+            var _image = _api.ImageLoader.LoadImage(imageUrl, 1);
+            var isOption = true;//options && options.cell;
+
+            var calculateObjectMetrics = function (object, width, height) {
+                // Обработка картинок большого разрешения
+                var metricCoeff = 1;
+
+                var coordsFrom = _this.coordsManager.calculateCoords(object.from);
+                var realTopOffset = coordsFrom.y;
+                var realLeftOffset = coordsFrom.x;
+
+                var areaWidth = worksheet.getCellLeft(worksheet.getLastVisibleCol(), 0) - worksheet.getCellLeft(worksheet.getFirstVisibleCol(true), 0); 	// по ширине
+                if (areaWidth < width) {
+                    metricCoeff = width / areaWidth;
+
+                    width = areaWidth;
+                    height /= metricCoeff;
+                }
+
+                var areaHeight = worksheet.getCellTop(worksheet.getLastVisibleRow(), 0) - worksheet.getCellTop(worksheet.getFirstVisibleRow(true), 0); 	// по высоте
+                if (areaHeight < height) {
+                    metricCoeff = height / areaHeight;
+
+                    height = areaHeight;
+                    width /= metricCoeff;
+                }
+
+                var findVal = pxToPt(realLeftOffset + width);
+                var toCell = worksheet.findCellByXY(findVal, 0, true, false, true);
+                while (toCell.col === null && worksheet.cols.length < gc_nMaxCol) {
+                    worksheet.expandColsOnScroll(true);
+                    toCell = worksheet.findCellByXY(findVal, 0, true, false, true);
+                }
+                object.to.col = toCell.col;
+                object.to.colOff = ptToMm(toCell.colOff);
+
+                findVal = pxToPt(realTopOffset + height);
+                toCell = worksheet.findCellByXY(0, findVal, true, true, false);
+                while (toCell.row === null && worksheet.rows.length < gc_nMaxRow) {
+                    worksheet.expandRowsOnScroll(true);
+                    toCell = worksheet.findCellByXY(0, findVal, true, true, false);
+                }
+                object.to.row = toCell.row;
+                object.to.rowOff = ptToMm(toCell.rowOff);
+
+               // worksheet.handlers.trigger("reinitializeScroll");
+            };
+
+            var addImageObject = function (_image) {
+
+                //if (!_image.Image) {
+                //    worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
+                //} else {
+
+                var drawingObject = _this.createDrawingObject();
+                drawingObject.worksheet = worksheet;
+
+                drawingObject.from.col = //isOption ? options.cell.col :
+                    worksheet.getSelectedColumnIndex();
+                drawingObject.from.row = //isOption ? options.cell.row :
+                    worksheet.getSelectedRowIndex();
+
+                // Проверяем начальные координаты при вставке
+                while (!worksheet.cols[drawingObject.from.col]) {
+                    worksheet.expandColsOnScroll(true);
+                }
+                worksheet.expandColsOnScroll(true); 	// для colOff
+
+                while (!worksheet.rows[drawingObject.from.row]) {
+                    worksheet.expandRowsOnScroll(true);
+                }
+                worksheet.expandRowsOnScroll(true); 	// для rowOff
+
+                //calculateObjectMetrics(drawingObject, isOption ? options.width : _image.Image.width, isOption ? options.height : _image.Image.height);
+
+                calculateObjectMetrics(drawingObject, options.width, options.height);
+
+                var coordsFrom = _this.coordsManager.calculateCoords(drawingObject.from);
+                var coordsTo = _this.coordsManager.calculateCoords(drawingObject.to);
+
+                // CImage
+                _this.objectLocker.reset();
+                _this.objectLocker.addObjectId(g_oIdCounter.Get_NewId());
+                _this.objectLocker.checkObjects(function (bLock) {
+                    if (bLock !== true)
+                        return;
+                    _this.controller.resetSelection();
+                    _this.controller.addImageFromParams(imageUrl,
+                        // _image.src,
+                        pxToMm(coordsFrom.x) + MOVE_DELTA, pxToMm(coordsFrom.y) + MOVE_DELTA, pxToMm(coordsTo.x - coordsFrom.x), pxToMm(coordsTo.y - coordsFrom.y));
+                });
+                //}
+
+                worksheet.setSelectionShape(true);
+            };
+
+            addImageObject(new Image());
+        }
+    };
 }
 var _s = new OfflineEditor();
 
@@ -2181,6 +2313,9 @@ function offline_mouse_down(x, y, pin) {
         wb._onGraphicObjectMouseDown(e, x, y);
         wb._onUpdateSelectionShape(true);
         _s.isShapeAction = true;
+
+       // _s.selectShapeWidth  = graphicsInfo.object.graphicObject.extX;
+       // _s.selectShapeHeight = graphicsInfo.object.graphicObject.extY;
 
         return {id:graphicsInfo.id};
     }
@@ -2430,9 +2565,8 @@ function offline_copy() {
         return _stream;
     }
 
-    // text format
-  //  _stream["WriteByte"](0);
-  //  _stream["WriteString2"](sBase64.text);
+    _stream["WriteByte"](0);
+    _stream["WriteString2"](sBase64.text);
 
     // image
     if (null != sBase64.drawingUrls && sBase64.drawingUrls.length > 0)
@@ -2440,36 +2574,34 @@ function offline_copy() {
         _stream["WriteByte"](1);
         _stream["WriteStringA"](sBase64.drawingUrls[0]);
     }
-    else
-    {
-        _stream["WriteByte"](0);
-        _stream["WriteString2"](sBase64.text);
-    }
+   // else
+    //{
+        // owner format
+        _stream["WriteByte"](2);
+        _stream["WriteStringA"](sBase64.sBase64);
+   // }
 
-    // owner format
-    _stream["WriteByte"](2);
-    _stream["WriteStringA"](sBase64.sBase64);
-
-    _stream["WriteByte"](3);
-    _stream["WriteString2"](sBase64.html);
+    // _stream["WriteByte"](3);
+    // _stream["WriteString2"](sBase64.html);
 
     _stream["WriteByte"](255);
 
     return _stream;
 }
-function offline_paste(type, param) {
+function offline_paste(params) {
+    var type = params[0];
     if (0 == type)
     {
         // TEXT
     }
     else if (1 == type)
     {
-        // IMAGE
+        _s.offline_addImageDrawingObject(params[1], {width: params[2], height: params[3]});
     }
     else if (2 == type)
     {
         var worksheet = _api.wb.getWorksheet();
-       _api.wb.clipboard._pasteFromBinaryExcel(worksheet, param);
+       _api.wb.clipboard._pasteFromBinaryExcel(worksheet, params[1]);
     }
 }
 function offline_cut() {
@@ -2628,7 +2760,7 @@ function offline_apply_event(type,params) {
         }
         case 112: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_PASTE
         {
-            offline_paste(params[0], params[1]);
+            offline_paste(params);
             break;
         }
         case 113: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_DELETE
