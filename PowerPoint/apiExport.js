@@ -448,7 +448,6 @@ CContextMenuData.prototype['get_Type'] = CContextMenuData.prototype.get_Type;
 CContextMenuData.prototype['get_X'] = CContextMenuData.prototype.get_X;
 CContextMenuData.prototype['get_Y'] = CContextMenuData.prototype.get_Y;
 CContextMenuData.prototype['get_IsSlideSelect'] = CContextMenuData.prototype.get_IsSlideSelect;
-window['_sendCommandCallback'] = _sendCommandCallback;
 window['_onOpenCommand'] = _onOpenCommand;
 window['_downloadAs'] = _downloadAs;
 window['CDocOpenProgress'] = CDocOpenProgress;

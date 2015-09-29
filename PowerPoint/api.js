@@ -5020,26 +5020,6 @@ asc_docs_api.prototype.sync_ContextMenuCallback = function(Data)
     this.asc_fireCallback("asc_onContextMenu", Data);
 };
 
-function _sendCommandCallback (fCallback, error, result) {
-	if (error || !result) {
-		editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
-		if(fCallback)
-			fCallback();
-		return;
-	}
-
-	switch(result["type"]){
-		case "updateversion":
-			if (editor.isViewMode)
-				_onOpenCommand(fCallback, result);
-			else
-				editor.asc_fireCallback("asc_onDocumentUpdateVersion", function () {
-					editor.SetViewMode(true);
-					_onOpenCommand(fCallback, result);
-				});
-			break;
-	}
-}
 function _onOpenCommand(fCallback, incomeObject) {
 	g_fOpenFileCommand(incomeObject["data"], documentUrlChanges, c_oSerFormat.Signature, function (error, result) {
 		if (error || !result.bSerFormat) {

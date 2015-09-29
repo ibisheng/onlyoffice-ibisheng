@@ -164,8 +164,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
     this.formulasList = null;	// Список всех формул
 
-    this.fCallbackSendCommand = null;
-
     this.fCurCallback = null;
 
     this._init();
@@ -192,10 +190,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     });
 
     this.formulasList = getFormulasInfo();
-
-    this.fCallbackSendCommand = function(fCallback, error, result) {
-      t._sendCommandCallback(fCallback, error, result);
-    };
   };
 
   spreadsheet_api.prototype.asc_CheckGuiControlColors = function() {
@@ -844,30 +838,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   spreadsheet_api.prototype.asc_getPageOptions = function(index) {
     var sheetIndex = (undefined !== index && null !== index) ? index : this.wbModel.getActive();
     return this.wbModel.getWorksheet(sheetIndex).PagePrintOptions;
-  };
-
-  spreadsheet_api.prototype._sendCommandCallback = function(fCallback, error, result) {
-    if (error || !result) {
-      this.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
-      if (fCallback) {
-        fCallback({returnCode: c_oAscError.Level.Critical, val: c_oAscError.ID.Unknown});
-      }
-      return;
-    }
-
-    var t = this, codePageCsv, delimiterCsv;
-    switch (result["type"]) {
-      case "updateversion":
-        if (this.asc_getViewerMode()) {
-          this._onOpenCommand(fCallback, result["data"]);
-        } else {
-          this.handlers.trigger("asc_onDocumentUpdateVersion", function() {
-            t.asc_setViewerMode(true);
-            t._onOpenCommand(fCallback, result["data"]);
-          });
-        }
-        break;
-    }
   };
 
   spreadsheet_api.prototype._onOpenCommand = function(callback, data) {
