@@ -7643,6 +7643,11 @@
 			// Пересчитываем координаты
 			x *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
 			y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
+			
+			//если выделена ячейка заголовка ф/т, меняем выделение с ячейки на столбец ф/т
+			if (null === this.startCellMoveRange)
+				this.autoFilters.changeSelectionFromCellToColumn(this.activeRange);
+			
 			var ar = this.activeRange.clone(true);
 
 			// Колонка по X и строка по Y

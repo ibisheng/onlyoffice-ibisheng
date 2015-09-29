@@ -1851,6 +1851,27 @@ var maxIndividualValues = 10000;
 				return false;
 			},
 			
+			changeSelectionFromCellToColumn: function(activeRange)
+			{
+				var aWs = this._getCurrentWS();
+				var ws = this.worksheet
+				var tableParts = aWs.TableParts; 
+				
+				if(tableParts && tableParts.length && activeRange.isOneCell())
+				{
+					for(var i = 0; i < tableParts.length; i++ )
+					{
+						if(tableParts[i].Ref.containsFirstLineRange(activeRange))
+						{
+							var newActiveRange = new Asc.Range(activeRange.c1, activeRange.r1, activeRange.c1, tableParts[i].Ref.r2);
+							if(!activeRange.isEqual(newActiveRange))
+								ws.setSelection(newActiveRange);
+							break;
+						}
+					}
+				}
+			},
+			
 			_setStyleTablePartsAfterOpenRows: function(ref)
 			{
 				var aWs = this._getCurrentWS();
