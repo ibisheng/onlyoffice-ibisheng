@@ -1074,8 +1074,6 @@ asc_docs_api.prototype.asc_unregisterCallback = function(name, callback) {
 				_callbacks[name].splice(i, 1);
 		}
 	}
-		_callbacks[name] = [];
-	_callbacks[name].push(callback);
 };
 
 asc_docs_api.prototype.asc_fireCallback = function(name) {
