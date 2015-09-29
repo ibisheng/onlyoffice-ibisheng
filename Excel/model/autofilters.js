@@ -1024,6 +1024,9 @@ var maxIndividualValues = 10000;
 					case historyitem_AutoFilter_CleanAutoFilter:
 						this.isApplyAutoFilterInCell(data.activeCells, true);
 						break;
+					case historyitem_AutoFilter_CleanFormat:
+						this.cleanFormat(data.activeCells, true);
+						break;
 				}
 				History.TurnOn();
 			},
@@ -1101,6 +1104,23 @@ var maxIndividualValues = 10000;
 							if(cloneData.oldFilter.DisplayName === aWs.TableParts[l].DisplayName)
 							{
 								aWs.TableParts[l] = cloneData.oldFilter.clone(null);
+								break;
+							}	
+						}
+					}
+				}
+				else if(type === historyitem_AutoFilter_CleanFormat)
+				{
+					if(aWs.TableParts)
+					{
+						for(var l = 0; l < aWs.TableParts.length; l++)
+						{
+							//TODO сравниваю не по DisplayName по следующей причине: делаем undo всему, затем redo, и форматированная таблицы добавляется с новым именем
+							//если передавать в redo displaName -> конфликт при совместном ред.(1- ый добавляет ф/т + undo, 2-ой добавляет ф/т, первый делает redo->2 одинаковых имени)
+							if(cloneData.Ref.isEqual(aWs.TableParts[l].Ref))
+							{
+								aWs.TableParts[l] = cloneData.clone(null);
+								this._setColorStyleTable(cloneData.Ref, cloneData, null, true);
 								break;
 							}	
 						}
@@ -1283,9 +1303,35 @@ var maxIndividualValues = 10000;
 			cleanFormat: function(range)
 			{
 				var aWs = this._getCurrentWS();
+				var t = this, selectedTableParts;
 				//if first row AF in ActiveRange  - delete AF
 				if(aWs.AutoFilter && aWs.AutoFilter.Ref && range.containsFirstLineRange(aWs.AutoFilter.Ref))
 					this.isEmptyAutoFilters(aWs.AutoFilter.Ref);
+				else
+				{
+					//*****callBack on delete filter
+					var deleteFormatCallBack = function()
+					{	
+						History.Create_NewPoint();
+						History.StartTransaction();
+						
+						for(var i = 0; i < selectedTableParts.length; i++)
+						{
+							var cloneFilter = selectedTableParts[i].clone(null);
+							
+							selectedTableParts[i].TableStyleInfo.Name = null;
+							t._cleanStyleTable(selectedTableParts[i].Ref);
+							
+							t._addHistoryObj(cloneFilter, historyitem_AutoFilter_CleanFormat, {activeCells: range});
+						}
+						
+						History.EndTransaction();
+					};
+					
+					selectedTableParts = this._searchFiltersInRange(range, true);
+					if(selectedTableParts && selectedTableParts.length)
+						deleteFormatCallBack();
+				}
 			},
 			
 			isCheckMoveRange: function(arnFrom)
