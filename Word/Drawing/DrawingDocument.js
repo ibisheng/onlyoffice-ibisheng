@@ -2008,7 +2008,10 @@ function CDrawingDocument()
 		}
 
         if (isFull)
+        {
             this.m_oWordControl.OnScroll();
+            this.m_oWordControl.m_oApi.asc_fireCallback("asc_onEndCalculate");
+        }
 
         //console.log("end " + this.m_lCountCalculatePages + "," + isFull + "," + isBreak);
     }

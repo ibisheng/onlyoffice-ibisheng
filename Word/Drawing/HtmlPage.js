@@ -3639,6 +3639,11 @@ function CEditorPage(api)
         this.UpdateHorRuler();
         this.UpdateVerRuler();
 
+        if (window["AutoTester"] !== undefined)
+        {
+            window["AutoTester"]["RunTest"]();
+        }
+
         //this.m_oDrawingDocument.CheckFontCache();
     }
 
