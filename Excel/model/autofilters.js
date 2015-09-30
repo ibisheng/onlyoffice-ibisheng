@@ -4553,7 +4553,6 @@ var maxIndividualValues = 10000;
 			{
 				var aWs = this._getCurrentWS();
 				var findFilters = this._searchFiltersInRange(arnFrom);
-				var bUndoRedoChanges = aWs.workbook.bUndoChanges || aWs.workbook.bRedoChanges;
 				
 				if(findFilters && findFilters.length)
 				{
@@ -4572,7 +4571,7 @@ var maxIndividualValues = 10000;
 							if(!ref.intersection(newRange) && !this._intersectionRangeWithTableParts(newRange, aWs, arnFrom))
 							{
 								//TODO позже не копировать стиль при перемещении всей таблицы
-								if(!bUndoRedoChanges)
+								if(!(aWs.workbook.bUndoChanges || aWs.workbook.bRedoChanges))
 								{
 									var cleanRange = new Range(aWs, newRange.r1, newRange.c1, newRange.r2, newRange.c2);
 									cleanRange.cleanFormat();
