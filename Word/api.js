@@ -2107,6 +2107,7 @@ asc_docs_api.prototype.asc_Print = function()
       "userid": documentUserId,
       "vkey": documentVKey,
       "format": documentFormat,
+      "title": changeFileExtention(documentTitle, getExtentionByFormat(c_oAscFileType.PDF)),
       "c":"savefromorigin"};
     this.fCurCallback = function(input) {
       if(null != input && "savefromorigin" == input["type"]) {
