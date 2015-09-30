@@ -1851,27 +1851,6 @@ var maxIndividualValues = 10000;
 				return false;
 			},
 			
-			changeSelectionFromCellToColumn: function(activeRange)
-			{
-				var aWs = this._getCurrentWS();
-				var ws = this.worksheet
-				var tableParts = aWs.TableParts; 
-				
-				if(tableParts && tableParts.length && activeRange.isOneCell())
-				{
-					for(var i = 0; i < tableParts.length; i++ )
-					{
-						if(tableParts[i].Ref.containsFirstLineRange(activeRange))
-						{
-							var newActiveRange = new Asc.Range(activeRange.c1, activeRange.r1, activeRange.c1, tableParts[i].Ref.r2);
-							if(!activeRange.isEqual(newActiveRange))
-								ws.setSelection(newActiveRange);
-							break;
-						}
-					}
-				}
-			},
-			
 			_setStyleTablePartsAfterOpenRows: function(ref)
 			{
 				var aWs = this._getCurrentWS();
@@ -4561,6 +4540,7 @@ var maxIndividualValues = 10000;
 			{
 				var aWs = this._getCurrentWS();
 				var findFilters = this._searchFiltersInRange(arnFrom);
+				var undoRedo = aWs.workbook.bUndoChanges || aWs.workbook.bRedoChanges;
 				
 				if(findFilters && findFilters.length)
 				{
@@ -4577,7 +4557,89 @@ var maxIndividualValues = 10000;
 							bWithoutFilter = findFilters[i].AutoFilter === null;
 							
 							if(!ref.intersection(newRange) && !this._intersectionRangeWithTableParts(newRange, aWs, arnFrom))
+							{
+								//TODO позже не копировать стиль при перемещении всей таблицы
+								if(!undoRedo)
+								{
+									var cleanRange = new Range(aWs, newRange.r1, newRange.c1, newRange.r2, newRange.c2);
+									cleanRange.cleanFormat();
+								}
 								this.addAutoFilter(findFilters[i].TableStyleInfo.Name, newRange, null, offLock);
+							}	
+						}
+					}
+				}
+			},
+			
+			//с учётом последних скрытых строк
+			_activeRangeContainsTablePart(activeRange, tablePartRef)
+			{
+				var aWs = this._getCurrentWS();
+				var res = false;
+				
+				if(activeRange.r1 === tablePartRef.r1 && activeRange.c1 === tablePartRef.c1 && activeRange.c2 === tablePartRef.c2 && activeRange.r2 < tablePartRef.r2)
+				{
+					res = true;
+					for(var i = activeRange.r2 + 1; i <= tablePartRef.r2; i++)
+					{
+						if(!aWs.getRowHidden(i))
+						{
+							res = false;
+							break;
+						}
+					}
+				}
+				
+				return res;
+			},
+			
+			changeSelectionTablePart: function(activeRange)
+			{
+				if(activeRange.isOneCell())
+					this._changeSelectionFromCellToColumn(activeRange);
+				else
+					this._changeSelectionToAllTablePart(activeRange);
+			}, 
+			
+			_changeSelectionToAllTablePart: function(activeRange)
+			{
+				var aWs = this._getCurrentWS();
+				var ws = this.worksheet;
+				
+				var tableParts = aWs.TableParts;
+				var tablePart;
+				for(var i = 0; i < tableParts.length; i++)
+				{
+					tablePart = tableParts[i];
+					if(tablePart.Ref.intersection(activeRange))
+					{
+						if(this._activeRangeContainsTablePart(activeRange, tablePart.Ref))
+						{
+							var newActiveRange = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2, tablePart.Ref.r2);
+							ws.setSelection(newActiveRange);
+						}
+							
+						break;
+					}
+				}
+			},
+			
+			_changeSelectionFromCellToColumn: function(activeRange)
+			{
+				var aWs = this._getCurrentWS();
+				var ws = this.worksheet
+				var tableParts = aWs.TableParts; 
+				
+				if(tableParts && tableParts.length && activeRange.isOneCell())
+				{
+					for(var i = 0; i < tableParts.length; i++ )
+					{
+						if(tableParts[i].Ref.containsFirstLineRange(activeRange))
+						{
+							var newActiveRange = new Asc.Range(activeRange.c1, activeRange.r1, activeRange.c1, tableParts[i].Ref.r2);
+							if(!activeRange.isEqual(newActiveRange))
+								ws.setSelection(newActiveRange);
+							break;
 						}
 					}
 				}

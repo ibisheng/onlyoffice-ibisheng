@@ -7645,8 +7645,9 @@
 			y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
 			
 			//если выделена ячейка заголовка ф/т, меняем выделение с ячейки на столбец ф/т
+			//если выделена вся видимая часть форматированной таблицы, но не выделены последние скрытые строчки
 			if (null === this.startCellMoveRange)
-				this.autoFilters.changeSelectionFromCellToColumn(this.activeRange);
+				this.autoFilters.changeSelectionTablePart(this.activeRange);
 			
 			var ar = this.activeRange.clone(true);
 
