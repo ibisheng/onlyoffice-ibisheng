@@ -7177,20 +7177,69 @@ asc_docs_api.prototype.sync_EndCatchRevisionsChanges = function()
 {
     this.asc_fireCallback("asc_onShowRevisionsChange", this.RevisionChangesStack);
 };
-
 asc_docs_api.prototype.sync_AddRevisionsChange = function(Change)
 {
     this.RevisionChangesStack.push(Change);
 };
-asc_docs_api.prototype.asc_AcceptChanges = function()
+asc_docs_api.prototype.asc_AcceptChanges = function(Change)
 {
     History.Create_NewPoint();
-    this.WordControl.m_oLogicDocument.Accept_RevisionChanges(undefined, false);
+
+    if (undefined !== Change)
+    {
+        this.WordControl.m_oLogicDocument.Accept_RevisionChange(Change);
+    }
+    else
+    {
+        var CurrentChange = this.WordControl.m_oLogicDocument.Get_TrackRevisionsManager().Get_CurrentChange();
+        if (null !== CurrentChange)
+        {
+            this.WordControl.m_oLogicDocument.Accept_RevisionChange(CurrentChange);
+            this.asc_GetNextRevisionsChange();
+        }
+        else
+        {
+            this.WordControl.m_oLogicDocument.Accept_RevisionChanges(undefined, false);
+        }
+    }
 };
-asc_docs_api.prototype.asc_RejectChanges = function()
+asc_docs_api.prototype.asc_RejectChanges = function(Change)
 {
     History.Create_NewPoint();
-    this.WordControl.m_oLogicDocument.Reject_RevisionChanges(undefined, false);
+
+    if (undefined !== Change)
+    {
+        this.WordControl.m_oLogicDocument.Reject_RevisionChange(Change);
+    }
+    else
+    {
+        var CurrentChange = this.WordControl.m_oLogicDocument.Get_TrackRevisionsManager().Get_CurrentChange();
+        if (null !== CurrentChange)
+        {
+            this.WordControl.m_oLogicDocument.Reject_RevisionChange(CurrentChange);
+            this.asc_GetNextRevisionsChange();
+        }
+        else
+        {
+            this.WordControl.m_oLogicDocument.Reject_RevisionChanges(undefined, false);
+        }
+    }
+};
+asc_docs_api.prototype.asc_HaveRevisionsChanges = function()
+{
+    this.WordControl.m_oLogicDocument.Have_RevisionChanges();
+};
+asc_docs_api.prototype.asc_hasNewReviewChanges = function()
+{
+    return this.asc_HaveRevisionsChanges();
+};
+asc_docs_api.prototype.asc_GetNextRevisionsChange = function()
+{
+    return this.WordControl.m_oLogicDocument.Get_NextRevisionChange();
+};
+asc_docs_api.prototype.asc_GetPrevRevisionsChange = function()
+{
+    return this.WordControl.m_oLogicDocument.Get_PrevRevisionChange();
 };
 
 function CRevisionsChange()
@@ -7201,8 +7250,8 @@ function CRevisionsChange()
     this.Value     = "";
 
     this.UserName  = "";
-    this.UderId    = "";
-    this.DateTime  = "1123123";
+    this.UserId    = "";
+    this.DateTime  = "";
 
     this.Paragraph = null;
     this.StartPos  = null;
@@ -7225,6 +7274,9 @@ CRevisionsChange.prototype.get_Value = function(){return this.Value;};
 CRevisionsChange.prototype.put_Type  = function(Type){this.Type = Type;};
 CRevisionsChange.prototype.put_XY    = function(X, Y){this.X = X; this.Y = Y;};
 CRevisionsChange.prototype.put_Value = function(Value){this.Value = Value;};
+CRevisionsChange.prototype.put_Paragraph = function(Para){this.Paragraph = Para;};
+CRevisionsChange.prototype.get_Paragraph = function(){return this.Paragraph;};
+
 
 asc_docs_api.prototype.asc_stopSaving = function () {
 	this.asc_IncrementCounterLongAction();

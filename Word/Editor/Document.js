@@ -3541,7 +3541,10 @@ CDocument.prototype =
                 }
 
                 this.Document_UpdateSelectionState();
-                this.Document_UpdateInterfaceState();
+
+                // Если у нас отслеживаются изменения, тогда интерфейс обновится на функции Continue_TrackRevisions
+                if (true !== this.TrackRevisions)
+                    this.Document_UpdateInterfaceState();
             }
 
             // Специальная заглушка для функции TextBox_Put
@@ -11936,7 +11939,7 @@ CDocument.prototype =
     },
 
     // Обновляем текущее состояние (определяем где мы находимся, картинка/параграф/таблица/колонтитул)
-    Document_UpdateInterfaceState : function()
+    Document_UpdateInterfaceState : function(bSaveCurRevisionChange)
     {
         if (true === this.TurnOffInterfaceEvents)
             return;
@@ -11947,6 +11950,9 @@ CDocument.prototype =
         // Удаляем весь список
         editor.sync_BeginCatchSelectedElements();
         editor.sync_BeginCatchRevisionsChanges();
+
+        if (true !== bSaveCurRevisionChange)
+            this.TrackRevisionsManager.Clear_CurrentChange();
 
         // Уберем из интерфейса записи о том где мы находимся (параграф, таблица, картинка или колонтитул)
         editor.ClearPropObjCallback();
@@ -14847,11 +14853,65 @@ CDocument.prototype.Continue_TrackRevisions = function()
 };
 CDocument.prototype.Get_NextRevisionChange = function()
 {
+    this.TrackRevisionsManager.Continue_TrackRevisions();
+    var Change = this.TrackRevisionsManager.Get_NextChange();
+    if (null !== Change)
+    {
+        var Para = Change.get_Paragraph();
+        Para.Selection.Use = true;
+        Para.Set_SelectionContentPos(Change.get_StartPos(), Change.get_EndPos());
+        Para.Set_ParaContentPos(Change.get_StartPos(), false, -1, -1);
+        Para.Document_SetThisElementCurrent(false);
 
+        this.Document_UpdateSelectionState();
+        this.Document_UpdateInterfaceState(true);
+    }
 };
 CDocument.prototype.Get_PrevRevisionChange = function()
 {
+    this.TrackRevisionsManager.Continue_TrackRevisions();
+    var Change = this.TrackRevisionsManager.Get_PrevChange();
+    if (null !== Change)
+    {
+        var Para = Change.get_Paragraph();
+        Para.Selection.Use = true;
+        Para.Set_SelectionContentPos(Change.get_StartPos(), Change.get_EndPos());
+        Para.Set_ParaContentPos(Change.get_StartPos(), false, -1, -1);
+        Para.Document_SetThisElementCurrent(false);
 
+        this.Document_UpdateSelectionState();
+        this.Document_UpdateInterfaceState(true);
+    }
+};
+CDocument.prototype.Get_RevisionsChangeParagraph = function(Direction, CurrentPara)
+{
+    var SearchEngine = new CRevisionsChangeParagraphSearchEngine(Direction, CurrentPara, this.TrackRevisionsManager);
+    if (docpostype_HdrFtr === this.CurPos.Type)
+    {
+        // TODO: Реализовать
+        return null;
+    }
+    else if (docpostype_DrawingObjects === this.CurPos.Type)
+    {
+        // TODO: Реализовать
+        return null;
+    }
+    else //if (docpostype_Content === this.CurPos.Type)
+    {
+        var Pos = (true === this.Selection.Use ? (this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos) : this.CurPos.ContentPos);
+
+        this.Content[Pos].Get_RevisionsChangeParagraph(SearchEngine);
+        while (true !== SearchEngine.Is_Found())
+        {
+            Pos = (Direction > 0 ? Pos + 1 : Pos - 1);
+            if (Pos >= this.Content.length || Pos < 0)
+                break;
+
+            this.Content[Pos].Get_RevisionsChangeParagraph(SearchEngine);
+        }
+
+        return SearchEngine.Get_FoundedParagraph();
+    }
 };
 CDocument.prototype.Accept_RevisionChange = function(Change)
 {
@@ -15433,6 +15493,9 @@ function CTrackRevisionsManager(LogicDocument)
     this.LogicDocument = LogicDocument;
     this.CheckPara     = {}; // Параграфы, которые нужно проверить
     this.Changes       = {}; // Объект с ключом - Id параграфа, в котором лежит массив изменений
+
+    this.CurChange     = null; // Текущеее изменение
+    this.CurPara       = null; // Параграф с текущим изменением
 }
 
 CTrackRevisionsManager.prototype.Check_Paragraph = function(Para)
@@ -15477,11 +15540,89 @@ CTrackRevisionsManager.prototype.Continue_TrackRevisions = function()
 };
 CTrackRevisionsManager.prototype.Get_NextChange = function()
 {
+    var NextPara = null;
+    if (null !== this.CurChange && null !== this.CurPara)
+    {
+        var ChangesArray = this.Changes[this.CurPara.Get_Id()];
+        var ChangeIndex = -1;
+        for (var Index = 0, Count = ChangesArray.length; Index < Count; Index++)
+        {
+            if (this.CurChange === ChangesArray[Index])
+            {
+                ChangeIndex = Index;
+                break;
+            }
+        }
 
+        if (-1 !== ChangeIndex && ChangeIndex < ChangesArray.length - 1)
+        {
+            this.CurChange = ChangesArray[ChangeIndex + 1];
+            return this.CurChange;
+        }
+
+        NextPara = this.LogicDocument.Get_RevisionsChangeParagraph(1, this.CurPara);
+    }
+    else
+    {
+        NextPara = this.LogicDocument.Get_RevisionsChangeParagraph(1, null);
+    }
+
+    var NextChangesArray = this.Changes[NextPara.Get_Id()];
+    if (null !== NextPara && undefined !== NextChangesArray && NextChangesArray.length > 0)
+    {
+        this.CurChange = NextChangesArray[0];
+        this.CurPara   = NextPara;
+        return this.CurChange;
+    }
+    else
+    {
+        this.CurChange = null;
+        this.CurPara   = null;
+        return null;
+    }
 };
 CTrackRevisionsManager.prototype.Get_PrevChange = function()
 {
+    var PrevPara = null;
+    if (null !== this.CurChange && null !== this.CurPara)
+    {
+        var ChangesArray = this.Changes[this.CurPara.Get_Id()];
+        var ChangeIndex = -1;
+        for (var Index = 0, Count = ChangesArray.length; Index < Count; Index++)
+        {
+            if (this.CurChange === ChangesArray[Index])
+            {
+                ChangeIndex = Index;
+                break;
+            }
+        }
 
+        if (-1 !== ChangeIndex && ChangeIndex > 0)
+        {
+            this.CurChange = ChangesArray[ChangeIndex - 1];
+            return this.CurChange;
+        }
+
+        PrevPara = this.LogicDocument.Get_RevisionsChangeParagraph(-1, this.CurPara);
+    }
+    else
+    {
+        PrevPara = this.LogicDocument.Get_RevisionsChangeParagraph(-1, null);
+    }
+
+    var PrevChangesArray = this.Changes[PrevPara.Get_Id()];
+    if (null !== PrevPara && undefined !== PrevChangesArray && PrevChangesArray.length > 0)
+    {
+        this.CurChange = PrevChangesArray[PrevChangesArray.length - 1];
+        this.CurPara   = PrevPara;
+        return this.CurChange;
+    }
+    else
+    {
+        this.CurChange = null;
+        this.CurPara   = null;
+        return null;
+    }
 };
 CTrackRevisionsManager.prototype.Have_Changes = function()
 {
@@ -15493,3 +15634,56 @@ CTrackRevisionsManager.prototype.Have_Changes = function()
 
     return false;
 };
+CTrackRevisionsManager.prototype.Clear_CurrentChange = function()
+{
+    this.CurChange = null;
+    this.CurPara   = null;
+};
+CTrackRevisionsManager.prototype.Get_CurrentChangeParagraph = function()
+{
+    return this.CurPara;
+};
+CTrackRevisionsManager.prototype.Get_CurrentChange = function()
+{
+    return this.CurChange;
+};
+
+function CRevisionsChangeParagraphSearchEngine(Direction, CurrentPara, TrackManager)
+{
+    this.TrackManager = TrackManager;
+    this.Direction    = Direction;
+    this.CurrentPara  = CurrentPara;
+    this.CurrentFound = false;
+
+    this.Para         = null;
+}
+CRevisionsChangeParagraphSearchEngine.prototype.Set_CurrentFound = function()
+{
+    this.CurrentFound = true;
+};
+CRevisionsChangeParagraphSearchEngine.prototype.Is_CurrentFound = function()
+{
+    return this.CurrentFound;
+};
+CRevisionsChangeParagraphSearchEngine.prototype.Get_CurrentParagraph = function()
+{
+    return this.CurrentPara;
+};
+CRevisionsChangeParagraphSearchEngine.prototype.Set_FoundedParagraph = function(Para)
+{
+    if (this.TrackManager.Get_ParagraphChanges(Para.Get_Id()).length > 0)
+        this.Para = Para;
+};
+CRevisionsChangeParagraphSearchEngine.prototype.Is_Found = function()
+{
+    return (null === this.Para ? false : true);
+};
+CRevisionsChangeParagraphSearchEngine.prototype.Get_FoundedParagraph = function()
+{
+    return this.Para;
+};
+CRevisionsChangeParagraphSearchEngine.prototype.Get_Direction = function()
+{
+    return this.Direction;
+};
+

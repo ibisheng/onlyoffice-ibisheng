@@ -126,13 +126,11 @@ CParagraphContentWithContentBase.prototype.protected_FillRange = function(LineIn
     this.Lines[RangeOffset + 0] = StartPos;
     this.Lines[RangeOffset + 1] = EndPos;
 };
-
 CParagraphContentWithContentBase.prototype.protected_FillRangeEndPos = function(LineIndex, RangeIndex, EndPos)
 {
     var RangeOffset = this.protected_GetRangeOffset(LineIndex, RangeIndex);
     this.Lines[RangeOffset + 1] = EndPos;
 };
-
 CParagraphContentWithContentBase.prototype.protected_UpdateSpellChecking = function()
 {
     if(undefined !== this.Paragraph && null !== this.Paragraph)
@@ -156,7 +154,6 @@ CParagraphContentWithContentBase.prototype.Is_UseInDocument = function(Id)
     }
     return false;
 };
-
 CParagraphContentWithContentBase.prototype.protected_GetPrevRangeEndPos = function(LineIndex, RangeIndex)
 {
     var RangeCount  = this.protected_GetRangesCount(LineIndex - 1);
@@ -164,7 +161,14 @@ CParagraphContentWithContentBase.prototype.protected_GetPrevRangeEndPos = functi
 
     return LineIndex == 0 && RangeIndex == 0 ? 0 : this.Lines[RangeOffset + 1];
 };
-
+CParagraphContentWithContentBase.prototype.private_UpdateTrackRevisions = function()
+{
+    if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.LogicDocument.Get_TrackRevisionsManager)
+    {
+        var RevisionsManager = this.Paragraph.LogicDocument.Get_TrackRevisionsManager();
+        RevisionsManager.Check_Paragraph(this.Paragraph);
+    }
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Класс CParagraphContentWithContentBase
 //   Это базовый класс для элементов параграфа, которые сами по себе могут содержать элементы параграфа.
@@ -458,6 +462,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Check_Content = function()
 CParagraphContentWithParagraphLikeContent.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 {
     this.Content.splice(Pos, 0, Item);
+    this.private_UpdateTrackRevisions();
 
     if (true === UpdatePosition)
     {
@@ -529,6 +534,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Add_ToContent = function(Pos
 CParagraphContentWithParagraphLikeContent.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
 {
     this.Content.splice(Pos, Count);
+    this.private_UpdateTrackRevisions();
 
     if (true === UpdatePosition)
     {

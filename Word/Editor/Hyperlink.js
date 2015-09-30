@@ -299,7 +299,7 @@ ParaHyperlink.prototype.Undo = function(Data)
         case historyitem_Hyperlink_AddItem :
         {
             this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
-
+            this.private_UpdateTrackRevisions();
             this.protected_UpdateSpellChecking();
             break;
         }
@@ -312,7 +312,7 @@ ParaHyperlink.prototype.Undo = function(Data)
             var Array_end   = this.Content.slice( Pos );
 
             this.Content = Array_start.concat( Data.Items, Array_end );
-
+            this.private_UpdateTrackRevisions();
             this.protected_UpdateSpellChecking();
             break;
         }
@@ -344,7 +344,7 @@ ParaHyperlink.prototype.Redo = function(Data)
             var Array_end   = this.Content.slice( Pos );
 
             this.Content = Array_start.concat( Data.Items, Array_end );
-
+            this.private_UpdateTrackRevisions();
             this.protected_UpdateSpellChecking();
             break;
         }
@@ -352,7 +352,7 @@ ParaHyperlink.prototype.Redo = function(Data)
         case historyitem_Hyperlink_RemoveItem :
         {
             this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
-
+            this.private_UpdateTrackRevisions();
             this.protected_UpdateSpellChecking();
             break;
         }
@@ -500,7 +500,7 @@ ParaHyperlink.prototype.Load_Changes = function(Reader)
                     this.Content.splice( Pos, 0, Element );
                 }
             }
-
+            this.private_UpdateTrackRevisions();
             this.protected_UpdateSpellChecking();
             break;
         }
@@ -522,7 +522,7 @@ ParaHyperlink.prototype.Load_Changes = function(Reader)
 
                 this.Content.splice( ChangesPos, 1 );
             }
-
+            this.private_UpdateTrackRevisions();
             this.protected_UpdateSpellChecking();
             break;
         }

@@ -9631,6 +9631,39 @@ CDocumentContent.prototype.Reject_RevisionChanges = function(Type, bAll)
         }
     }
 };
+CDocumentContent.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
+{
+    if (true === SearchEngine.Is_Found())
+        return;
+
+    var Direction = SearchEngine.Get_Direction();
+    var Pos = 0;
+    if (true !== SearchEngine.Is_CurrentFound())
+    {
+        Pos = (true === this.Selection.Use ? (this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos) : this.CurPos.ContentPos);
+    }
+    else
+    {
+        if (Direction > 0)
+        {
+            Pos = 0;
+        }
+        else
+        {
+            Pos = this.Content.length - 1;
+        }
+    }
+
+    this.Content[Pos].Get_RevisionsChangeParagraph(SearchEngine);
+    while (true !== SearchEngine.Is_Found())
+    {
+        Pos = (Direction > 0 ? Pos + 1 : Pos - 1);
+        if (Pos >= this.Content.length || Pos < 0)
+            break;
+
+        this.Content[Pos].Get_RevisionsChangeParagraph(SearchEngine);
+    }
+};
 CDocumentContent.prototype.Add_ToContent = function(Pos, Item)
 {
     this.Internal_Content_Add(Pos, Item);

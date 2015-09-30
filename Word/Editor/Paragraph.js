@@ -516,6 +516,7 @@ Paragraph.prototype =
     {
         History.Add( this, { Type : historyitem_Paragraph_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
         this.Content.splice( Pos, 0, Item );
+        this.private_UpdateTrackRevisions();
 
         if ( this.CurPos.ContentPos >= Pos )
         {
@@ -605,6 +606,7 @@ Paragraph.prototype =
         this.Content = this.Content.concat( Items );
 
         History.Add( this, { Type : historyitem_Paragraph_AddItem, Pos : StartPos, EndPos : this.Content.length - 1, Items : Items } );
+        this.private_UpdateTrackRevisions();
 
         // Нам нужно сбросить рассчет всех добавленных элементов и выставить у них родительский класс и параграф
         for ( var CurPos = StartPos; CurPos < this.Content.length; CurPos++ )
@@ -625,6 +627,7 @@ Paragraph.prototype =
         var Item = this.Content[Pos];
         History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
         this.Content.splice( Pos, 1 );
+        this.private_UpdateTrackRevisions();
 
         if ( this.Selection.StartPos > Pos )
         {
@@ -728,6 +731,7 @@ Paragraph.prototype =
 
         var DeletedItems = this.Content.slice( Pos, Pos + Count );
         History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+        this.private_UpdateTrackRevisions();
 
         if ( this.Selection.StartPos > Pos + Count )
             this.Selection.StartPos -= Count;
@@ -9284,8 +9288,8 @@ Paragraph.prototype =
 
         if (this.Is_TrackRevisions() && editor && this.bFromDocument)
         {
-            // Обновляем рецензирование
-            if (false === this.Selection.Use)
+            var TrackManager = this.LogicDocument.Get_TrackRevisionsManager();
+            if (this === TrackManager.Get_CurrentChangeParagraph())
             {
                 var TextTransform = this.Get_ParentTextTransform();
                 var PageIndex = 0;
@@ -9296,7 +9300,25 @@ Paragraph.prototype =
                 var X = Coords.X + 20;
                 var Y = Coords.Y;
 
-                var TrackManager = this.LogicDocument.Get_TrackRevisionsManager();
+                var Change = TrackManager.Get_CurrentChange();
+                if (null !== Change)
+                {
+                    var Type = Change.get_Type();
+                    Change.put_XY(X, Y);
+                    editor.sync_AddRevisionsChange(Change);
+                }
+            }
+            else if (false === this.Selection.Use)
+            {
+                var TextTransform = this.Get_ParentTextTransform();
+                var PageIndex = 0;
+                var _X = this.Pages[PageIndex].XLimit;
+                var _Y = this.Pages[PageIndex].Y;
+                var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( _X, _Y, this.Get_StartPage_Absolute() + (PageIndex - this.PageNum), TextTransform);
+
+                var X = Coords.X + 20;
+                var Y = Coords.Y;
+
                 var Changes = TrackManager.Get_ParagraphChanges(this.Get_Id());
                 if (Changes.length > 0)
                 {
@@ -10198,7 +10220,7 @@ Paragraph.prototype =
                 var EndPos   = Data.EndPos;
 
                 this.Content.splice( StartPos, EndPos - StartPos + 1 );
-
+                this.private_UpdateTrackRevisions();
                 break;
             }
 
@@ -10210,7 +10232,7 @@ Paragraph.prototype =
                 var Array_end   = this.Content.slice( Pos );
 
                 this.Content = Array_start.concat( Data.Items, Array_end );
-
+                this.private_UpdateTrackRevisions();
                 break;
             }
 
@@ -10602,7 +10624,7 @@ Paragraph.prototype =
                 var Array_end   = this.Content.slice( Pos );
 
                 this.Content = Array_start.concat( Data.Items, Array_end );
-
+                this.private_UpdateTrackRevisions();
                 break;
 
             }
@@ -10613,7 +10635,7 @@ Paragraph.prototype =
                 var EndPos   = Data.EndPos;
 
                 this.Content.splice( StartPos, EndPos - StartPos + 1 );
-
+                this.private_UpdateTrackRevisions();
                 break;
             }
 
@@ -11635,7 +11657,7 @@ Paragraph.prototype =
                 }
 
                 this.private_ResetSelection();
-
+                this.private_UpdateTrackRevisions();
                 break;
             }
 
@@ -11658,7 +11680,7 @@ Paragraph.prototype =
                 }
 
                 this.private_ResetSelection();
-
+                this.private_UpdateTrackRevisions();
                 break;
             }
 
@@ -13184,6 +13206,17 @@ Paragraph.prototype.Check_RevisionsChanges = function(RevisionsManager)
         RevisionsManager.Add_Change(ParaId, Change);
     }
 
+    var Checker    = new CParagraphRevisionsChangesChecker(this, RevisionsManager);
+    var ContentPos = new CParagraphContentPos();
+    for (var CurPos = 0, Count = this.Content.length - 1; CurPos < Count; CurPos++)
+    {
+        ContentPos.Update(CurPos, 0);
+        this.Content[CurPos].Check_RevisionsChanges(Checker, ContentPos, 1);
+    }
+
+    Checker.Flush_AddRemoveChange();
+    Checker.Flush_TextPrChange();
+
     var ReviewType = this.Get_ReviewType();
     var ReviewInfo = this.Get_ReviewInfo();
     if (reviewtype_Add == ReviewType)
@@ -13219,17 +13252,6 @@ Paragraph.prototype.Check_RevisionsChanges = function(RevisionsManager)
         Change.put_DateTime(ReviewInfo.Get_DateTime());
         RevisionsManager.Add_Change(ParaId, Change);
     }
-
-    var Checker    = new CParagraphRevisionsChangesChecker(this, RevisionsManager);
-    var ContentPos = new CParagraphContentPos();
-    for (var CurPos = 0, Count = this.Content.length; CurPos < Count; CurPos++)
-    {
-        ContentPos.Update(CurPos, 0);
-        this.Content[CurPos].Check_RevisionsChanges(Checker, ContentPos, 1);
-    }
-
-    Checker.Flush_AddRemoveChange();
-    Checker.Flush_TextPrChange();
 };
 Paragraph.prototype.private_UpdateTrackRevisionOnChangeParaPr = function(bUpdateInfo)
 {
@@ -13285,6 +13307,8 @@ Paragraph.prototype.Accept_RevisionChanges = function(Type, bAll)
             if (this.Content[CurPos].Accept_RevisionChanges)
                 this.Content[CurPos].Accept_RevisionChanges(Type, bAll);
         }
+
+        this.private_UpdateTrackRevisions();
     }
 };
 Paragraph.prototype.Reject_RevisionChanges = function(Type, bAll)
@@ -13313,6 +13337,25 @@ Paragraph.prototype.Reject_RevisionChanges = function(Type, bAll)
             if (this.Content[CurPos].Reject_RevisionChanges)
                 this.Content[CurPos].Reject_RevisionChanges(Type, bAll);
         }
+
+        this.private_UpdateTrackRevisions();
+    }
+};
+Paragraph.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
+{
+    if (true === SearchEngine.Is_Found())
+        return;
+
+    if (true !== SearchEngine.Is_CurrentFound())
+    {
+        if (this !== SearchEngine.Get_CurrentParagraph())
+            SearchEngine.Set_FoundedParagraph(this);
+        else
+            SearchEngine.Set_CurrentFound();
+    }
+    else
+    {
+        SearchEngine.Set_FoundedParagraph(this);
     }
 };
 Paragraph.prototype.Is_SelectedAll = function()

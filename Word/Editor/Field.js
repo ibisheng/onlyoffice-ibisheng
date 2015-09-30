@@ -343,8 +343,8 @@ ParaField.prototype.Undo = function(Data)
         case historyitem_Field_AddItem :
         {
             this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
-
             this.protected_UpdateSpellChecking();
+            this.private_UpdateTrackRevisions();
             break;
         }
 
@@ -356,8 +356,8 @@ ParaField.prototype.Undo = function(Data)
             var Array_end   = this.Content.slice( Pos );
 
             this.Content = Array_start.concat( Data.Items, Array_end );
-
             this.protected_UpdateSpellChecking();
+            this.private_UpdateTrackRevisions();
             break;
         }
     }
@@ -375,7 +375,7 @@ ParaField.prototype.Redo = function(Data)
             var Array_end   = this.Content.slice( Pos );
 
             this.Content = Array_start.concat( Data.Items, Array_end );
-
+            this.private_UpdateTrackRevisions();
             this.protected_UpdateSpellChecking();
             break;
         }
@@ -383,7 +383,7 @@ ParaField.prototype.Redo = function(Data)
         case historyitem_Field_RemoveItem :
         {
             this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
-
+            this.private_UpdateTrackRevisions();
             this.protected_UpdateSpellChecking();
             break;
         }
@@ -503,7 +503,7 @@ ParaField.prototype.Load_Changes = function(Reader)
                     this.Content.splice( Pos, 0, Element );
                 }
             }
-
+            this.private_UpdateTrackRevisions();
             this.protected_UpdateSpellChecking();
             break;
         }
@@ -525,7 +525,7 @@ ParaField.prototype.Load_Changes = function(Reader)
 
                 this.Content.splice( ChangesPos, 1 );
             }
-
+            this.private_UpdateTrackRevisions();
             this.protected_UpdateSpellChecking();
             break;
         }

@@ -19667,7 +19667,70 @@ CTable.prototype.Reject_RevisionChanges = function(Type, bAll)
     else
         return this.CurCell.Content.Reject_RevisionChanges(Type, bAll);
 };
+CTable.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
+{
+    if (true === SearchEngine.Is_Found())
+        return;
 
+    var CurCell = 0, CurRow = 0;
+    if (true !== SearchEngine.Is_CurrentFound())
+    {
+        var Cells_array = this.Internal_Get_SelectionArray();
+        if (Cells_array.length <= 0)
+            return;
+
+        CurRow  = Cells_array[0].Row;
+        CurCell = Cells_array[0].Cell;
+    }
+    else
+    {
+        if (SearchEngine.Get_Direction() > 0)
+        {
+            CurRow  = 0;
+            CurCell = 0;
+        }
+        else
+        {
+            CurRow  = this.Get_RowsCount() - 1;
+            CurCell = this.Get_Row(CurRow).Get_CellsCount() - 1;
+        }
+    }
+
+    var Cell = this.Get_Row(CurRow).Get_Cell(CurCell);
+
+    while (null != Cell && vmerge_Restart != Cell.Get_VMerge())
+        Cell = this.private_GetPrevCell(CurRow, CurCell);
+
+    Cell.Content.Get_RevisionsChangeParagraph(SearchEngine);
+    while (true !== SearchEngine.Is_Found())
+    {
+        if (SearchEngine.Get_Direction() > 0)
+        {
+            Cell = this.private_GetNextCell(Cell.Row.Index, Cell.Index);
+            while (null != Cell && vmerge_Restart != Cell.Get_VMerge())
+                Cell = this.private_GetNextCell(Cell.Row.Index, Cell.Index);
+        }
+        else
+        {
+            Cell = this.private_GetPrevCell(Cell.Row.Index, Cell.Index);
+            while (null != Cell && vmerge_Restart != Cell.Get_VMerge())
+                Cell = this.private_GetPrevCell(Cell.Row.Index, Cell.Index);
+        }
+
+        if (null === Cell)
+            break;
+
+        Cell.Content.Get_RevisionsChangeParagraph(SearchEngine);
+    }
+};
+CTable.prototype.private_GetNextCell = function(RowIndex, CellIndex)
+{
+    return this.Internal_Get_NextCell({Cell : CellIndex, Row : RowIndex});
+};
+CTable.prototype.private_GetPrevCell = function(RowIndex, CellIndex)
+{
+    return this.Internal_Get_PrevCell({Cell : CellIndex, Row : RowIndex});
+};
 
 // Класс CTableRow
 function CTableRow(Table, Cols, TableGrid)
