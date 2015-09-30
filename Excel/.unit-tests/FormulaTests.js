@@ -1767,6 +1767,34 @@
     } )
 
     /*
+    * Mathematical Function
+    * */
+    test( "Test: \"CEILING\"", function () {
+
+        oParser = new parserFormula( "CEILING(2.5,1)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 3 );
+
+        oParser = new parserFormula( "CEILING(-2.5,-2)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), -4 );
+
+        oParser = new parserFormula( "CEILING(-2.5,2)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), -2 );
+
+        oParser = new parserFormula( "CEILING(1.5,0.1)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 1.5 );
+
+        oParser = new parserFormula( "CEILING(0.234,0.01)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 0.24 );
+
+    } )
+
+
+    /*
      * Statistical Function
      * */
     test( "Test: \"AVEDEV\"", function () {
