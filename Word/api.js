@@ -7629,6 +7629,16 @@ window["asc_docs_api"].prototype["asc_nativeGetPDF"] = function()
     return _renderer.Memory.data;
 };
 
+// cool api (autotests)
+window.asc_docs_api.prototype["Add_Text"] = window.asc_docs_api.prototype.Add_Text = function(_text)
+{
+    this.WordControl.m_oLogicDocument.TextBox_Put(_text);
+};
+window.asc_docs_api.prototype["Add_NewParagraph"] = window.asc_docs_api.prototype.Add_NewParagraph = function()
+{
+    this.WordControl.m_oLogicDocument.Add_NewParagraph(_text);
+};
+
 // desktop editor spellcheck
 function CSpellCheckApi_desktop()
 {
