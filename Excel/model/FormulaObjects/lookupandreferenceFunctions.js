@@ -861,7 +861,7 @@ cMATCH.prototype.Calculate = function ( arg ) {
     }
 
     if ( arg0 instanceof cArea3D || arg0 instanceof cArray || arg0 instanceof cArea ) {
-        return this.value = new cError( cErrorType.not_available );
+        return this.value = new cError( cErrorType.wrong_value_type );
     }
     else if ( arg0 instanceof cError ) {
         return this.value = arg0;
