@@ -4584,7 +4584,7 @@ var maxIndividualValues = 10000;
 			},
 			
 			//с учётом последних скрытых строк
-			_activeRangeContainsTablePart(activeRange, tablePartRef)
+			_activeRangeContainsTablePart: function(activeRange, tablePartRef)
 			{
 				var aWs = this._getCurrentWS();
 				var res = false;
