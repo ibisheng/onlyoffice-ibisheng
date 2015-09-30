@@ -565,7 +565,7 @@ cCEILING.prototype.Calculate = function ( arg ) {
     function ceilingHelper( number, significance ) {
         if ( significance == 0 )
             return new cNumber( 0.0 );
-        if ( ( number > 0 && significance < 0 ) || ( number < 0 && significance > 0 ) )
+        if ( number > 0 && significance  < 0 )
             return new cError( cErrorType.not_numeric );
         else if ( number / significance === Infinity )
             return new cError( cErrorType.not_numeric );
@@ -576,7 +576,7 @@ cCEILING.prototype.Calculate = function ( arg ) {
             }
             var quotientTr = Math.floor( quotient );
 
-            var nolpiat = 5 * ( quotient < 0 ? -1.0 : quotient > 0 ? 1.0 : 0.0 ) * Math.pow( 10, Math.floor( Math.log10( Math.abs( quotient ) ) ) - cExcelSignificantDigits );
+            var nolpiat = 5 * Math.sign(quotient) * Math.pow( 10, Math.floor( Math.log10( Math.abs( quotient ) ) ) - cExcelSignificantDigits );
 
             if ( Math.abs( quotient - quotientTr ) > nolpiat ) {
                 ++quotientTr;
