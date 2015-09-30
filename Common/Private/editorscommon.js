@@ -6,7 +6,7 @@ var g_sAESKey = '7f3d2338390c1e3e154c21005f51010e065b0f1a1e101600202473150c022a1
 
 function CheckLicense(licenseUrl, userId, callback) {
   licenseUrl = licenseUrl ? licenseUrl : g_sLicenseDefaultUrl;
-  require('jsziputils').getBinaryContent(licenseUrl, function(err, data) {
+  g_fGetJSZipUtils().getBinaryContent(licenseUrl, function(err, data) {
     if (err) {
       callback(true, false);
       return;

@@ -171,6 +171,9 @@ function g_fSaveWithParts(fSendCommand, fCallback, fCallbackRequest, oAdditional
 	}, oAdditionalData, dataContainer);
 }
 
+function g_fGetJSZipUtils() {
+  return window['JSZipUtils'] ? window['JSZipUtils'] : require('jsziputils');
+}
 function g_fGetImageFromChanges (name) {
 	var file;
 	var ext = GetFileExtension(name);
@@ -216,7 +219,7 @@ function g_fOpenFileCommand(binUrl, changesUrl, Signature, callback) {
     }
   });
   if (null != changesUrl) {
-    require('jsziputils').getBinaryContent(changesUrl, function(err, data) {
+    g_fGetJSZipUtils().getBinaryContent(changesUrl, function(err, data) {
       bEndLoadChanges = true;
       if (err) {
         bError = true;
