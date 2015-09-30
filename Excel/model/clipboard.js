@@ -1764,12 +1764,16 @@
 							}
 						}
 					}
-					else {
-						var newFonts = {};
-						pasteData.generateFontMap(newFonts);
-						worksheet._loadFonts(newFonts, function() {
-							worksheet.setSelectionInfo('paste', pasteData, false, "binary");
-						});
+					else 
+					{	
+						if(this._checkPasteFromBinaryExcel(worksheet, true))
+						{
+							var newFonts = {};
+							pasteData.generateFontMap(newFonts);
+							worksheet._loadFonts(newFonts, function() {
+								worksheet.setSelectionInfo('paste', pasteData, false, "binary");
+							});
+						}
 					}
 					
 					return true;
@@ -1855,6 +1859,22 @@
 				}
 				
 				return false;
+			},
+			
+			_checkPasteFromBinaryExcel: function(worksheet, isWriteError)
+			{
+				var activeCellsPasteFragment = Asc.g_oRangeCache.getAscRange(this.activeRange);
+				var rMax = (activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1) + worksheet.activeRange.r1;
+				var cMax = (activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1) + worksheet.activeRange.c1;
+				
+				//если область вставки выходит за пределы доступной области
+				if(cMax > gc_nMaxCol0 || rMax > gc_nMaxRow0)
+				{
+					if(isWriteError)
+						worksheet.handlers.trigger ("onErrorEvent", c_oAscError.ID.PasteMaxRangeError, c_oAscError.Level.NoCritical);
+					return false;
+				}
+				return true;
 			},
 			
 			_getClassBinaryFromHtml: function(node)
