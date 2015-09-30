@@ -1036,6 +1036,10 @@ var maxIndividualValues = 10000;
 				var aWs = this._getCurrentWS();
 				var undoData = data.undo;
 				var cloneData;
+				
+				if(!undoData)
+					return;
+				
 				if(undoData.clone)
 					cloneData = undoData.clone(null);
 				else
@@ -1111,7 +1115,7 @@ var maxIndividualValues = 10000;
 				}
 				else if(type === historyitem_AutoFilter_CleanFormat)
 				{
-					if(aWs.TableParts)
+					if(aWs.TableParts && cloneData && cloneData.Ref)
 					{
 						for(var l = 0; l < aWs.TableParts.length; l++)
 						{
@@ -1331,6 +1335,15 @@ var maxIndividualValues = 10000;
 					selectedTableParts = this._searchFiltersInRange(range, true);
 					if(selectedTableParts && selectedTableParts.length)
 						deleteFormatCallBack();
+					else
+					{
+						//TODO сделать так, чтобы табличный стиль без таблицы не переносился. если делаем move из ф/т, копируем стиль таблицы из tableXfs в xfs
+						History.Create_NewPoint();
+						History.StartTransaction();
+						this._cleanStyleTable(range);
+						t._addHistoryObj(null, historyitem_AutoFilter_CleanFormat, {activeCells: range});
+						History.EndTransaction();
+					}
 				}
 			},
 			
