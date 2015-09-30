@@ -23,10 +23,10 @@ asc_docs_api.prototype.asc_addComment = function(AscCommentData) {
     return Comment.Get_Id();
   }
 };
-asc_docs_api.prototype.asc_getEditorPermissions = function(licenseUrl) {
+asc_docs_api.prototype.asc_getEditorPermissions = function(licenseUrl, companyId) {
   var t = this;
   if (this.DocInfo && this.DocInfo.get_Id()) {
-    CheckLicense(licenseUrl, this.DocInfo.get_UserId(), function(err, res) {
+    CheckLicense(licenseUrl, companyId, this.DocInfo.get_UserId(), function(err, res) {
       t._onCheckLicenseEnd(err, res);
     });
   } else {

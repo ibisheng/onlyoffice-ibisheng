@@ -24,10 +24,10 @@
     }
   };
 
-  asc['spreadsheet_api'].prototype.asc_getEditorPermissions = function(licenseUrl) {
+  asc['spreadsheet_api'].prototype.asc_getEditorPermissions = function(licenseUrl, companyId) {
     var t = this;
     if (this.DocInfo && this.DocInfo["Id"] && this.DocInfo["Url"]) {
-      CheckLicense(licenseUrl, this.DocInfo["UserId"], function(err, res) {
+      CheckLicense(licenseUrl, companyId, this.DocInfo["UserId"], function(err, res) {
         t._onCheckLicenseEnd(err, res);
       });
     } else {
