@@ -2655,11 +2655,24 @@ function DrawingObjects() {
             {
                 if(History.CurPoint && History.CurPoint.Items.length > 0)
                 {
-                    ExecuteNoHistory(function(){
+                   // ExecuteNoHistory(function(){
+                        var Point = History.CurPoint;
+
+                        // Откатываем все действия в обратном порядке (относительно их выполенения)
+                        for ( var Index = Point.Items.length - 1; Index > -1; Index-- )
+                        {
+                            var Item = Point.Items[Index];
+                            if(!Item.Class.Read_FromBinary2)
+                                Item.Class.Undo( Item.Type, Item.Data, Item.SheetId );
+                            else
+                                Item.Class.Undo(Item.Data);
+                        }
+                    Point.Items.length = 0;
+                        _this.controller.setSelectionState(Point.SelectionState, Point.SelectionState.length-1);
                         _this.controller.setGraphicObjectPropsCallBack(props);
                         _this.controller.startRecalculate();
-                        _this.sendGraphicObjectProps();
-                    }, this, []);
+                        //_this.sendGraphicObjectProps();
+                    //}, this, []);
                 }
             }
 

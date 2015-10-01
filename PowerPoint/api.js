@@ -2167,6 +2167,7 @@ asc_docs_api.prototype.ShapeApply = function(prop)
         {
             if( !this.noCreatePoint && !this.exucuteHistory && this.exucuteHistoryEnd)
             {
+                History.UndoLastPoint();
                 var slide = this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage];
                 slide.graphicObjects.applyDrawingProps(prop);
                 slide.graphicObjects.recalculate();
@@ -2187,13 +2188,15 @@ asc_docs_api.prototype.ShapeApply = function(prop)
         {
             if(this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage])
             {
-                ExecuteNoHistory(function(){
+                //ExecuteNoHistory(function(){
+
+                    History.UndoLastPoint();
                     var slide = this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage];
                     slide.graphicObjects.applyDrawingProps(prop);
                     slide.graphicObjects.recalculate();
                     this.WordControl.m_oDrawingDocument.OnRecalculatePage(this.WordControl.m_oLogicDocument.CurPage, slide);
                     this.WordControl.m_oDrawingDocument.OnEndRecalculate();
-                }, this, []);
+                //}, this, []);
             }
         }
     }
@@ -2202,10 +2205,12 @@ asc_docs_api.prototype.ShapeApply = function(prop)
 asc_docs_api.prototype.setStartPointHistory = function(){
     this.noCreatePoint = true;
     this.exucuteHistory = true;
+    this.asc_IncrementCounterLongAction();
 };
 asc_docs_api.prototype.setEndPointHistory   = function(){
     this.noCreatePoint = false;
     this.exucuteHistoryEnd = true;
+    this.asc_DecrementCounterLongAction();
 };
 asc_docs_api.prototype.SetSlideProps = function(prop)
 {

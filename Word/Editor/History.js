@@ -137,6 +137,22 @@ CHistory.prototype =
         return false;
     },
 
+    UndoLastPoint : function()
+    {
+        var oPoint = this.Points[this.Index];
+        if(oPoint)
+        {
+            var aItems = oPoint.Items;
+            for (var i = aItems.length - 1; i >= 0; i--)
+            {
+                var oItem = aItems[i];
+                oItem.Class.Undo(oItem.Data);
+            }
+            oPoint.Items.length = 0;
+            this.Document.Set_SelectionState(oPoint.State);
+        }
+    },
+
     Undo : function(Options)
     {
         this.Check_UninonLastPoints();

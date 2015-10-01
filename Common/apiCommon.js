@@ -2883,16 +2883,27 @@ function CorrectUniFill(asc_fill, unifill, editorId)
             }
             case c_oAscFill.FILL_TYPE_BLIP:
             {
-                if (ret.fill == null || ret.fill.type != FILL_TYPE_BLIP)
-                {
-                    ret.fill = new CBlipFill();
-                }
 
                 var _url = _fill.url;
                 var _tx_id = _fill.texture_id;
                 if (null != _tx_id && (0 <= _tx_id) && (_tx_id < g_oUserTexturePresets.length))
                 {
                     _url = g_oUserTexturePresets[_tx_id];
+                }
+
+
+                if (ret.fill == null)
+                {
+                    ret.fill = new CBlipFill();
+                }
+
+                if(ret.fill.type != FILL_TYPE_BLIP)
+                {
+                    if(!(typeof (_url) === "string" && _url.length > 0) || !isRealNumber(_fill.type))
+                    {
+                        break;
+                    }
+                    ret.fill = new CBlipFill();
                 }
 
                 if (_url != null && _url !== undefined && _url != "")
@@ -2911,9 +2922,21 @@ function CorrectUniFill(asc_fill, unifill, editorId)
             }
             case c_oAscFill.FILL_TYPE_PATT:
             {
-                if (ret.fill == null || ret.fill.type != FILL_TYPE_PATT)
+                if (ret.fill == null)
                 {
                     ret.fill = new CPattFill();
+                }
+
+                if(ret.fill.type != FILL_TYPE_PATT)
+                {
+                    if(undefined != _fill.PatternType && undefined != _fill.fgClr && undefined != _fill.bgClr)
+                    {
+                        ret.fill = new CPattFill();
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
 
                 if (undefined != _fill.PatternType)
@@ -2941,13 +2964,26 @@ function CorrectUniFill(asc_fill, unifill, editorId)
             }
             case c_oAscFill.FILL_TYPE_GRAD:
             {
-                if (ret.fill == null || ret.fill.type != FILL_TYPE_GRAD)
+                if (ret.fill == null)
                 {
                     ret.fill = new CGradFill();
                 }
 
                 var _colors     = _fill.Colors;
                 var _positions  = _fill.Positions;
+
+                if(ret.fill.type != FILL_TYPE_GRAD )
+                {
+                    if(undefined != _colors && undefined != _positions)
+                    {
+                        ret.fill = new CGradFill();
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
                 if (undefined != _colors && undefined != _positions)
                 {
                     if (_colors.length == _positions.length)

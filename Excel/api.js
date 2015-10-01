@@ -2704,11 +2704,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   spreadsheet_api.prototype.setStartPointHistory = function() {
     this.noCreatePoint = true;
     this.exucuteHistory = true;
+    this.asc_stopSaving();
   };
 
   spreadsheet_api.prototype.setEndPointHistory = function() {
     this.noCreatePoint = false;
     this.exucuteHistoryEnd = true;
+    this.asc_continueSaving();
   };
 
   spreadsheet_api.prototype.asc_startAddShape = function(sPreset) {

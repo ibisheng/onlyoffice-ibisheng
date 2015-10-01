@@ -2529,10 +2529,14 @@ asc_docs_api.prototype.sync_CanCopyCutCallback = function(bCanCopyCut)
 asc_docs_api.prototype.setStartPointHistory = function(){
     this.noCreatePoint = true;
     this.exucuteHistory = true;
+    this.asc_IncrementCounterLongAction();
+    this.WordControl.m_oLogicDocument.TurnOff_InterfaceEvents();
 };
 asc_docs_api.prototype.setEndPointHistory   = function(){
     this.noCreatePoint = false;
     this.exucuteHistoryEnd = true;
+    this.asc_DecrementCounterLongAction();
+    this.WordControl.m_oLogicDocument.TurnOn_InterfaceEvents();
 };
 
 function CDocInfoProp(obj)
@@ -5020,6 +5024,7 @@ asc_docs_api.prototype.ImgApply = function(obj)
             {
                 if( !this.noCreatePoint && !this.exucuteHistory && this.exucuteHistoryEnd)
                 {
+                    History.UndoLastPoint();
                     this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
                     this.exucuteHistoryEnd = false;
                 }
@@ -5035,9 +5040,10 @@ asc_docs_api.prototype.ImgApply = function(obj)
             }
             else
             {
-                ExecuteNoHistory(function(){
+                //ExecuteNoHistory(function(){
+                    History.UndoLastPoint();
                     this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
-                }, this, []);
+                //}, this, []);
             }
         }
     }
