@@ -50,8 +50,17 @@ module.exports = function(grunt) {
     grunt.registerTask('build_all', ['build_webword_init', 'build_sdk', 'build_webexcel_init', 'build_sdk', 'build_webpowerpoint_init', 'build_sdk']);
 
     grunt.registerTask('compile_sdk_init', function() {
+		var pkg = grunt.file.readJSON(defaultConfig);
+		pkg.info.rev = "unknown";
+		
+		if(undefined !== process.env['BUILD_NUMBER'])
+			pkg.info.build = parseInt(process.env['BUILD_NUMBER']);
+			
+		if(undefined !== process.env['SVN_REVISION'])
+			pkg.info.rev = parseInt(process.env['SVN_REVISION']);*/
+		
         grunt.initConfig({
-            pkg: grunt.file.readJSON(defaultConfig),
+            pkg: pkg,
             uglify: {
 				options: {
 				banner: '/*\n' +
@@ -84,7 +93,7 @@ module.exports = function(grunt) {
 						' * Creative Commons Attribution-ShareAlike 4.0 International. See the License\n' +
 						' * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode\n' +
 						' *\n' +
-						' * Version: <%= pkg.info.version %> (build:<%= pkg.info.build %>)\n' +
+						' * Version: <%= pkg.info.version %> (build:<%= pkg.info.build %>, rev:<%= pkg.info.rev %>)\n' +
 						' */'
 				},
                 sdk: {
