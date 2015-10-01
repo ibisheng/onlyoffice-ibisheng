@@ -792,14 +792,21 @@ CopyProcessor.prototype =
                 var sSrc = oGraphicObj.getBase64Img();
                 if(sSrc.length > 0)
                 {
-
-                    var _w = ParaItem.Extent.W;
-                    var _h = ParaItem.Extent.H;
-
+					var _h, _w;
+					if(oGraphicObj.cachedPixH)
+						_h = oGraphicObj.cachedPixH;
+					else
+						_h = ParaItem.Extent.H * g_dKoef_mm_to_pix;
+					
+					if(oGraphicObj.cachedPixW)
+						_w = oGraphicObj.cachedPixW;
+					else
+						_w = ParaItem.Extent.W * g_dKoef_mm_to_pix;
+						
 					var oImg = new CopyElement("img");
 					oImg.oAttributes["style"] = "max-width:100%;";
-					oImg.oAttributes["width"] = Math.round(_w * g_dKoef_mm_to_pix);
-					oImg.oAttributes["height"] = Math.round(_h * g_dKoef_mm_to_pix);
+					oImg.oAttributes["width"] = Math.round(_w);
+					oImg.oAttributes["height"] = Math.round(_h);
 					oImg.oAttributes["src"] = sSrc;
 					oTarget.addChild(oImg);
                     break;
