@@ -2008,6 +2008,8 @@ CShape.prototype =
         copy.setWordShape(this.bWordShape);
         copy.setBDeleted(this.bDeleted);
         copy.cachedImage = this.getBase64Img();
+        copy.cachedPixH = this.cachedPixH;
+        copy.cachedPixW = this.cachedPixW;
         return copy;
     },
 
@@ -3488,6 +3490,19 @@ CShape.prototype =
         var img_object = ShapeToImageConverter(this, this.pageIndex);
         if(img_object)
         {
+            if(img_object.ImageNative)
+            {
+                try
+                {
+                    this.cachedPixW = img_object.ImageNative.width;
+                    this.cachedPixH = img_object.ImageNative.height;
+                }
+                catch(e)
+                {
+                    this.cachedPixW = 50;
+                    this.cachedPixH = 50;
+                }
+            }
             return img_object.ImageUrl;
         }
         else

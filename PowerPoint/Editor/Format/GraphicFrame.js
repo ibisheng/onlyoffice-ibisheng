@@ -215,6 +215,8 @@ CGraphicFrame.prototype =
         if(!this.recalcInfo.recalculateTable && !this.recalcInfo.recalculateSizes && !this.recalcInfo.recalculateTransform)
         {
             ret.cachedImage = this.getBase64Img();
+            ret.cachedPixW = this.cachedPixW;
+            ret.cachedPixH = this.cachedPixH;
         }
         return ret;
     },

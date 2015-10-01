@@ -243,6 +243,8 @@ CGroupShape.prototype =
         }
         copy.setBDeleted(this.bDeleted);
         copy.cachedImage = this.getBase64Img();
+        copy.cachedPixH = this.cachedPixH;
+        copy.cachedPixW = this.cachedPixW;
         return copy;
     },
 
