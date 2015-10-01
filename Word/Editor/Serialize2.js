@@ -5354,6 +5354,7 @@ function BinaryFileReader(doc, openParams)
                     else if (!isAlreadyContainsStyle && isEqualName == null)//нужно добавить новый стиль
                     {
                         //todo править и BaseOn
+						stylePaste.style.BasedOn = null;
                         var nStyleId = oDocumentStyles.Add(stylePaste.style);
                         if (nStyleType == oStyleTypes.par || nStyleType == oStyleTypes.lvl)
                             elem.pPr.PStyle = nStyleId;
