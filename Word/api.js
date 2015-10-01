@@ -7229,7 +7229,7 @@ asc_docs_api.prototype.asc_HaveRevisionsChanges = function()
 {
     this.WordControl.m_oLogicDocument.Have_RevisionChanges();
 };
-asc_docs_api.prototype.asc_hasNewReviewChanges = function()
+asc_docs_api.prototype.asc_HaveNewRevisionsChanges = function()
 {
     return this.asc_HaveRevisionsChanges();
 };

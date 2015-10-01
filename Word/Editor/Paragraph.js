@@ -13208,8 +13208,11 @@ Paragraph.prototype.Check_RevisionsChanges = function(RevisionsManager)
 
     var Checker    = new CParagraphRevisionsChangesChecker(this, RevisionsManager);
     var ContentPos = new CParagraphContentPos();
-    for (var CurPos = 0, Count = this.Content.length - 1; CurPos < Count; CurPos++)
+    for (var CurPos = 0, Count = this.Content.length; CurPos < Count; CurPos++)
     {
+        if (CurPos === Count - 1)
+            Checker.Set_ParaEndRun();
+
         ContentPos.Update(CurPos, 0);
         this.Content[CurPos].Check_RevisionsChanges(Checker, ContentPos, 1);
     }
@@ -14392,6 +14395,7 @@ function CParagraphRevisionsChangesChecker(Para, RevisionsManager)
     this.Paragraph        = Para;
     this.ParaId           = Para.Get_Id();
     this.RevisionsManager = RevisionsManager;
+    this.ParaEndRun       = false;
 
     // Блок информации для добавления/удаления текста
     this.AddRemove =
@@ -14527,4 +14531,12 @@ CParagraphRevisionsChangesChecker.prototype.Update_PrChangeReviewInfo = function
         this.TextPr.DateTime = ReviewInfo.Get_DateTime();
     }
 
+};
+CParagraphRevisionsChangesChecker.prototype.Is_ParaEndRun = function()
+{
+    return this.ParaEndRun;
+};
+CParagraphRevisionsChangesChecker.prototype.Set_ParaEndRun = function()
+{
+    this.ParaEndRun = true;
 };

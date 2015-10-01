@@ -9915,35 +9915,42 @@ ParaRun.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth)
     if (this.Is_Empty())
         return;
 
-    var ReviewType = this.Get_ReviewType();
-    if (ReviewType !== Checker.Get_AddRemoveType())
+    if (true !== Checker.Is_ParaEndRun())
     {
-        Checker.Flush_AddRemoveChange();
-        ContentPos.Update(0, Depth);
+        var ReviewType = this.Get_ReviewType();
+        if (ReviewType !== Checker.Get_AddRemoveType())
+        {
+            Checker.Flush_AddRemoveChange();
+            ContentPos.Update(0, Depth);
+
+            if (reviewtype_Add === ReviewType || reviewtype_Remove === ReviewType)
+                Checker.Start_AddRemove(ReviewType, ContentPos);
+        }
 
         if (reviewtype_Add === ReviewType || reviewtype_Remove === ReviewType)
-            Checker.Start_AddRemove(ReviewType, ContentPos);
-    }
-
-    if (reviewtype_Add === ReviewType || reviewtype_Remove === ReviewType)
-    {
-        var Text = "";
-        var ContentLen = this.Content.length;
-        for (var CurPos = 0; CurPos < ContentLen; CurPos++)
         {
-            var Item = this.Content[CurPos];
-            var ItemType = Item.Type;
-            switch (ItemType)
+            var Text = "";
+            var ContentLen = this.Content.length;
+            for (var CurPos = 0; CurPos < ContentLen; CurPos++)
             {
-                case para_Text : Text += String.fromCharCode(Item.Value); break;
-                case para_Space:
-                case para_Tab  : Text += " "; break;
+                var Item = this.Content[CurPos];
+                var ItemType = Item.Type;
+                switch (ItemType)
+                {
+                    case para_Text :
+                        Text += String.fromCharCode(Item.Value);
+                        break;
+                    case para_Space:
+                    case para_Tab  :
+                        Text += " ";
+                        break;
+                }
             }
+            Checker.Add_Text(Text);
+            ContentPos.Update(this.Content.length, Depth);
+            Checker.Set_AddRemoveEndPos(ContentPos);
+            Checker.Update_AddRemoveReviewInfo(this.ReviewInfo);
         }
-        Checker.Add_Text(Text);
-        ContentPos.Update(this.Content.length, Depth);
-        Checker.Set_AddRemoveEndPos(ContentPos);
-        Checker.Update_AddRemoveReviewInfo(this.ReviewInfo);
     }
 
     var HavePrChange = this.Have_PrChange();
