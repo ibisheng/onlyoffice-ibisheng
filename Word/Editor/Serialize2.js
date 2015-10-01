@@ -896,7 +896,7 @@ function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml)
 		this.WriteTableEnd(this.copyParams.nDocumentWriterTablePos);
 		
         this.WriteTable(c_oSerTableTypes.Numbering, new BinaryNumberingTableWriter(this.memory, this.Document, {}, this.copyParams.oUsedNumIdMap));
-        this.WriteTable(c_oSerTableTypes.Style, new BinaryStyleTableWriter(this.memory, this.Document, this.copyParams.oUsedNumIdMap, this.copyParams.oUsedStyleMap));
+        this.WriteTable(c_oSerTableTypes.Style, new BinaryStyleTableWriter(this.memory, this.Document, this.copyParams.oUsedNumIdMap, this.copyParams));
 		
 		this.WriteMainTableEnd();
 		window.global_pptx_content_writer._End();
@@ -944,11 +944,11 @@ function BinarySigTableWriter(memory)
         this.memory.WriteLong(c_oSerFormat.Version);
     }
 };
-function BinaryStyleTableWriter(memory, doc, oNumIdMap, oUsedStyleMap)
+function BinaryStyleTableWriter(memory, doc, oNumIdMap, copyParams)
 {
     this.memory = memory;
     this.Document = doc;
-	this.oUsedStyleMap = oUsedStyleMap;
+	this.copyParams = copyParams;
     this.bs = new BinaryCommonWriter(this.memory);
 	this.btblPrs = new Binary_tblPrWriter(this.memory, oNumIdMap);
     this.bpPrs = new Binary_pPrWriter(this.memory, oNumIdMap, null);
@@ -976,8 +976,8 @@ function BinaryStyleTableWriter(memory, doc, oNumIdMap, oUsedStyleMap)
     {
         var oThis = this;
 		var oStyleToWrite = styles;
-		if(null != this.oUsedStyleMap)
-			oStyleToWrite = this.oUsedStyleMap;
+		if(this.copyParams && this.copyParams.oUsedStyleMap)
+			oStyleToWrite = this.copyParams.oUsedStyleMap;
         for(var styleId in oStyleToWrite)
         {
             var style = styles[styleId];
@@ -996,6 +996,8 @@ function BinaryStyleTableWriter(memory, doc, oNumIdMap, oUsedStyleMap)
     this.WriteStyle = function(id, style, bDefault)
     {
         var oThis = this;
+		var compilePr = this.copyParams ? this.Document.Styles.Get_Pr(id, style.Get_Type()) : null;
+		
         //ID
         if(null != id)
         {
@@ -1051,7 +1053,11 @@ function BinaryStyleTableWriter(memory, doc, oNumIdMap, oUsedStyleMap)
         //unhideWhenUsed
         if(null != style.unhideWhenUsed)
             this.bs.WriteItem(c_oSer_sts.Style_unhideWhenUsed, function(){oThis.memory.WriteBool(style.unhideWhenUsed);});
-        //TextPr
+        
+		if(compilePr !== null)
+			style = compilePr;
+		
+		//TextPr
         if(null != style.TextPr)
             this.bs.WriteItem(c_oSer_sts.Style_TextPr, function(){oThis.brPrs.Write_rPr(style.TextPr);});
         //ParaPr
