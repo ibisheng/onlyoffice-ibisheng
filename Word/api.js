@@ -7193,14 +7193,11 @@ asc_docs_api.prototype.asc_AcceptChanges = function(Change)
     {
         var CurrentChange = this.WordControl.m_oLogicDocument.Get_TrackRevisionsManager().Get_CurrentChange();
         if (null !== CurrentChange)
-        {
             this.WordControl.m_oLogicDocument.Accept_RevisionChange(CurrentChange);
-            this.asc_GetNextRevisionsChange();
-        }
         else
-        {
             this.WordControl.m_oLogicDocument.Accept_RevisionChanges(undefined, false);
-        }
+
+        this.asc_GetNextRevisionsChange();
     }
 };
 asc_docs_api.prototype.asc_RejectChanges = function(Change)
@@ -7215,14 +7212,11 @@ asc_docs_api.prototype.asc_RejectChanges = function(Change)
     {
         var CurrentChange = this.WordControl.m_oLogicDocument.Get_TrackRevisionsManager().Get_CurrentChange();
         if (null !== CurrentChange)
-        {
             this.WordControl.m_oLogicDocument.Reject_RevisionChange(CurrentChange);
-            this.asc_GetNextRevisionsChange();
-        }
         else
-        {
             this.WordControl.m_oLogicDocument.Reject_RevisionChanges(undefined, false);
-        }
+
+        this.asc_GetNextRevisionsChange();
     }
 };
 asc_docs_api.prototype.asc_HaveRevisionsChanges = function()
