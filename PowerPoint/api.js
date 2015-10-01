@@ -3026,6 +3026,7 @@ asc_docs_api.prototype.AddImageUrl = function(url){
 			"userid": documentUserId,
 			"vkey": documentVKey,
 			"c":"imgurl",
+			"saveindex": g_oDocumentUrls.getMaxIndex(),
 			"data": url};
 			
 		var t = this;

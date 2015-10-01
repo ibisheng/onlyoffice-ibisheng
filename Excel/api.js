@@ -2507,6 +2507,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       "userid": this.documentUserId,
       "vkey": this.documentVKey,
       "c": "imgurl",
+      "saveindex": g_oDocumentUrls.getMaxIndex(),
       "data": imageUrl};
 
     var t = this;
