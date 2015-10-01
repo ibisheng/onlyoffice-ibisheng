@@ -409,6 +409,8 @@ function asc_docs_api(name)
 
     this.isApplyChangesOnOpen = false;
     this.isApplyChangesOnOpenEnabled = true;
+	
+	this.IsSpellCheckCurrentWord = false;
 
   // Массив lock-ов, которые были на открытии документа
   this.arrPreOpenLocksObjects = [];
@@ -7674,7 +7676,32 @@ window.asc_docs_api.prototype["Add_Text"] = window.asc_docs_api.prototype.Add_Te
 };
 window.asc_docs_api.prototype["Add_NewParagraph"] = window.asc_docs_api.prototype.Add_NewParagraph = function()
 {
-    this.WordControl.m_oLogicDocument.Add_NewParagraph(_text);
+    this.WordControl.m_oLogicDocument.Add_NewParagraph(true);
+};
+window.asc_docs_api.prototype["Cursor_MoveLeft"] = window.asc_docs_api.prototype.Cursor_MoveLeft = function()
+{
+    this.WordControl.m_oLogicDocument.Cursor_MoveLeft();
+};
+window.asc_docs_api.prototype["Cursor_MoveRight"] = window.asc_docs_api.prototype.Cursor_MoveRight = function()
+{
+    this.WordControl.m_oLogicDocument.Cursor_MoveRight();
+};
+window.asc_docs_api.prototype["Cursor_MoveUp"] = window.asc_docs_api.prototype.Cursor_MoveUp = function()
+{
+    this.WordControl.m_oLogicDocument.Cursor_MoveUp();
+};
+window.asc_docs_api.prototype["Cursor_MoveDown"] = window.asc_docs_api.prototype.Cursor_MoveDown = function()
+{
+    this.WordControl.m_oLogicDocument.Cursor_MoveDown();
+};
+
+window.asc_docs_api.prototype["asc_IsSpellCheckCurrentWord"] = window.asc_docs_api.prototype.asc_IsSpellCheckCurrentWord = function()
+{
+	return this.IsSpellCheckCurrentWord;
+};
+window.asc_docs_api.prototype["asc_putSpellCheckCurrentWord"] = window.asc_docs_api.prototype.asc_putSpellCheckCurrentWord = function(value)
+{
+	this.IsSpellCheckCurrentWord = value;
 };
 
 // desktop editor spellcheck

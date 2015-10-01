@@ -1977,6 +1977,7 @@ function CDrawingDocument()
         {
             //this.m_oWordControl.m_oLogicDocument.RecalculateCurPos();
             this.m_lCurrentPage = this.m_oWordControl.m_oLogicDocument.Get_CurPage();
+			this.m_oWordControl.m_oApi.asc_fireCallback("asc_onEndCalculate");
         }
 
         if (-1 != this.m_lCurrentPage)
@@ -2009,8 +2010,7 @@ function CDrawingDocument()
 
         if (isFull)
         {
-            this.m_oWordControl.OnScroll();
-            this.m_oWordControl.m_oApi.asc_fireCallback("asc_onEndCalculate");
+            this.m_oWordControl.OnScroll();            
         }
 
         //console.log("end " + this.m_lCountCalculatePages + "," + isFull + "," + isBreak);

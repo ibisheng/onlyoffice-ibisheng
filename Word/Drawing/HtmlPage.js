@@ -3770,6 +3770,8 @@ function CEditorPage(api)
                 }
             }
         }
+		
+		oWordControl.m_oApi.asc_fireCallback("asc_onPaintTimer");
 
         this.m_nPaintTimerId = setTimeout(oWordControl.onTimerScroll2, oWordControl.m_nTimerScrollInterval);
         //window.requestAnimationFrame(oWordControl.onTimerScroll2);
