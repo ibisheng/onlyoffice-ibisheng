@@ -2509,7 +2509,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       "c": "imgurl",
       "data": imageUrl};
 
-    var oThis = this;
+    var t = this;
     this.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
     this.fCurCallback = function(input) {
       if (null != input && "imgurl" == input["type"]) {
@@ -2528,7 +2528,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
           }
           g_oDocumentUrls.addUrls(urls);
           if (firstUrl) {
-            var ws = oThis.wb.getWorksheet();
+            var ws = t.wb.getWorksheet();
             ws.objectRender.addImageDrawingObject(firstUrl, null);
           } else {
             t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
@@ -2539,7 +2539,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       } else {
         t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
       }
-      oThis.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+      t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
     };
     sendCommand2(this, null, rData);
   };
