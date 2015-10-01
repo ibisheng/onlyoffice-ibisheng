@@ -3044,6 +3044,14 @@
                 if(null != xfs.align && false == xfs.align.isEqual(g_oDefaultAlignAbs))
                     sStyle.align = this._getStringFromObjWithProperty(xfs.align);
                 sStyle.val += "|" + sStyle.align;
+                sStyle.val += "|";
+                if (null != xfs.QuotePrefix) {
+                  sStyle.val += xfs.QuotePrefix;
+                }
+                sStyle.val += "|";
+                if (null != xfs.XfId) {
+                  sStyle.val += xfs.XfId;
+                }
             }
 
             return sStyle;
