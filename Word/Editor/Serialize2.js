@@ -8789,7 +8789,12 @@ function Binary_oMathReader(stream, oReadResult)
 			if (props.mcJc)
 			{
 				var oEqArr = oElem.Content[oElem.Content.length-1];
-				oEqArr.fillPlaceholders();
+				for(var j=0; j<oEqArr.Content.length; j++)
+				{
+					var oContentElem = oEqArr.Content[j];
+					if (oContentElem.Content.length == 0)
+						oContentElem.fillPlaceholders();
+				}
 				oEqArr.setJustificationForConversion(props.mcJc);
 			}		
         }
