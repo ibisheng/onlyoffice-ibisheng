@@ -10474,7 +10474,7 @@ CParaPr.prototype =
         delete this.PrChange;
         delete this.ReviewInfo;
     }
-}
+};
 
 function Copy_Bounds(Bounds)
 {
@@ -10499,7 +10499,7 @@ function asc_CStyle()
 
     this.TextPr = new CTextPr();
     this.ParaPr = new CParaPr();
-};
+}
 asc_CStyle.prototype.get_Name = function()
 {
     return this.Name;

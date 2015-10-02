@@ -995,6 +995,15 @@ ParaComment.prototype =
     Apply_TextPr : function()
     {
     },
+
+    Check_RevisionsChanges : function(Checker, ContentPos, Depth)
+    {
+    },
+
+    Get_ParaPosByContentPos : function(ContentPos, Depth)
+    {
+        return new CParaPos(StartRange, StartLine, 0, 0);
+    },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
 //-----------------------------------------------------------------------------------

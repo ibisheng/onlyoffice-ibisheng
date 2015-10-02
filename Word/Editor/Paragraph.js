@@ -327,15 +327,15 @@ Paragraph.prototype =
 
     Get_AllDrawingObjects : function(DrawingObjs)
     {
-        if ( undefined === DrawingObjs )
+        if (undefined === DrawingObjs)
             DrawingObjs = [];
 
         var Count = this.Content.length;
-        for ( var Pos = 0; Pos < Count; Pos++ )
+        for (var Pos = 0; Pos < Count; Pos++)
         {
             var Item = this.Content[Pos];
-            if ( para_Hyperlink === Item.Type || para_Run === Item.Type )
-                Item.Get_AllDrawingObjects( DrawingObjs );
+            if (Item.Get_AllDrawingObjects)
+                Item.Get_AllDrawingObjects(DrawingObjs);
         }
 
         return DrawingObjs;
@@ -9289,43 +9289,32 @@ Paragraph.prototype =
         if (this.Is_TrackRevisions() && editor && this.bFromDocument)
         {
             var TrackManager = this.LogicDocument.Get_TrackRevisionsManager();
+            var TextTransform = this.Get_ParentTextTransform();
+
+            var ContentPos = this.Get_ParaContentPos(this.Selection.Use, true);
+            var ParaPos    = this.Get_ParaPosByContentPos(ContentPos);
+            var Page_abs   = this.Get_StartPage_Absolute() + ParaPos.Page;
+            var _Y         = this.Pages[ParaPos.Page].Y + this.Lines[ParaPos.Line].Top;
+            var _X         = (this.LogicDocument ? this.LogicDocument.Get_PageLimits(Page_abs).XLimit : 0);
+            var Coords     = this.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, Page_abs, TextTransform);
+
             if (this === TrackManager.Get_CurrentChangeParagraph())
             {
-                var TextTransform = this.Get_ParentTextTransform();
-                var PageIndex = 0;
-                var _X = this.Pages[PageIndex].XLimit;
-                var _Y = this.Pages[PageIndex].Y;
-                var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( _X, _Y, this.Get_StartPage_Absolute() + (PageIndex - this.PageNum), TextTransform);
-
-                var X = Coords.X + 20;
-                var Y = Coords.Y;
-
                 var Change = TrackManager.Get_CurrentChange();
                 if (null !== Change)
                 {
-                    var Type = Change.get_Type();
-                    Change.put_XY(X, Y);
-                    editor.sync_AddRevisionsChange(Change);
+                    Change.put_InternalPos(_X, _Y, Page_abs);
+                    TrackManager.Add_VisibleChange(Change);
                 }
             }
             else if (false === this.Selection.Use)
             {
-                var TextTransform = this.Get_ParentTextTransform();
-                var PageIndex = 0;
-                var _X = this.Pages[PageIndex].XLimit;
-                var _Y = this.Pages[PageIndex].Y;
-                var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( _X, _Y, this.Get_StartPage_Absolute() + (PageIndex - this.PageNum), TextTransform);
-
-                var X = Coords.X + 20;
-                var Y = Coords.Y;
-
                 var Changes = TrackManager.Get_ParagraphChanges(this.Get_Id());
                 if (Changes.length > 0)
                 {
                     for (var ChangeIndex = 0, ChangesCount = Changes.length; ChangeIndex < ChangesCount; ChangeIndex++)
                     {
                         var Change = Changes[ChangeIndex];
-
                         var Type = Change.get_Type();
                         if ((c_oAscRevisionsChangeType.TextAdd !== Type
                             && c_oAscRevisionsChangeType.TextRem !== Type
@@ -9333,8 +9322,8 @@ Paragraph.prototype =
                             || (StartPos.Compare(Change.get_StartPos()) >= 0
                                 && StartPos.Compare(Change.get_EndPos()) <= 0))
                         {
-                            Change.put_XY(X, Y);
-                            editor.sync_AddRevisionsChange(Change);
+                            Change.put_InternalPos(_X, _Y, Page_abs);
+                            TrackManager.Add_VisibleChange(Change);
                         }
                     }
                 }
@@ -13352,13 +13341,48 @@ Paragraph.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
     if (true !== SearchEngine.Is_CurrentFound())
     {
         if (this !== SearchEngine.Get_CurrentParagraph())
-            SearchEngine.Set_FoundedParagraph(this);
+        {
+            // Возможно текущий параграф находится в одной из автофигур
+            var DrawingObjects = this.Get_AllDrawingObjects();
+            for (var DrawingIndex = 0, Count = DrawingObjects.length; DrawingIndex < Count; DrawingIndex++)
+            {
+                DrawingObjects[DrawingIndex].Get_RevisionsChangeParagraph(SearchEngine);
+                if (true === SearchEngine.Is_Found())
+                    return;
+            }
+
+            // Если все еще не нашли текущий параграф, тогда данный выставляем текущим
+            if (true !== SearchEngine.Is_CurrentFound())
+                SearchEngine.Set_CurrentFound();
+        }
         else
+        {
             SearchEngine.Set_CurrentFound();
+        }
     }
     else
     {
-        SearchEngine.Set_FoundedParagraph(this);
+        var Direction = SearchEngine.Get_Direction();
+        if (Direction < 0)
+        {
+            SearchEngine.Set_FoundedParagraph(this);
+            if (true === SearchEngine.Is_Found())
+                return;
+        }
+
+        if (true === SearchEngine.Is_Found())
+            return;
+
+        var DrawingObjects = this.Get_AllDrawingObjects();
+        for (var DrawingIndex = 0, Count = DrawingObjects.length; DrawingIndex < Count; DrawingIndex++)
+        {
+            DrawingObjects[DrawingIndex].Get_RevisionsChangeParagraph(SearchEngine);
+            if (true === SearchEngine.Is_Found())
+                return;
+        }
+
+        if (Direction > 0)
+            SearchEngine.Set_FoundedParagraph(this);
     }
 };
 Paragraph.prototype.Is_SelectedAll = function()

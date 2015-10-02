@@ -6755,6 +6755,11 @@ ParaDrawing.prototype =
             LogicDocument.Document_UpdateSelectionState();
             LogicDocument.Document_UpdateInterfaceState();
         }
+    },
+
+    Get_RevisionsChangeParagraph : function(SearchEngine)
+    {
+        console.log("Drawing revisions change");
     }
 };
 
