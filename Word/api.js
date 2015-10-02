@@ -6845,7 +6845,7 @@ function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, tx
 		_e.KeyCode = 27;
 		editor.WordControl.m_oLogicDocument.OnKeyDown(_e);
 		//сделано через сервер, потому что нет простого механизма сохранения на клиенте
-		dataContainer.data = window["asc_docs_api"].prototype["asc_nativeGetHtml"].call(editor);
+		dataContainer.data = '\ufeff' + window["asc_docs_api"].prototype["asc_nativeGetHtml"].call(editor);
 	} else {
 		if (txtOptions instanceof asc.asc_CTXTAdvancedOptions) {
 			oAdditionalData["codepage"] = txtOptions.asc_getCodePage();
