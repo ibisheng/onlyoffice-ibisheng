@@ -490,6 +490,7 @@ function asc_docs_api(name)
     this.noCreatePoint = false;
     this.exucuteHistory = false;
     this.exucuteHistoryEnd = false;
+    this.nCurPointItemsLength = 0;
 	this.isDocumentEditor = true;
 
     this.OpenDocumentProgress = new CDocOpenProgress();
@@ -5024,9 +5025,10 @@ asc_docs_api.prototype.ImgApply = function(obj)
             {
                 if( !this.noCreatePoint && !this.exucuteHistory && this.exucuteHistoryEnd)
                 {
-                    History.UndoLastPoint();
+                    History.UndoLastPoint(this.nCurPointItemsLength);
                     this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
                     this.exucuteHistoryEnd = false;
+                    this.nCurPointItemsLength = 0;
                 }
                 else
                 {
@@ -5036,12 +5038,17 @@ asc_docs_api.prototype.ImgApply = function(obj)
                 if(this.exucuteHistory)
                 {
                     this.exucuteHistory = false;
+                    var oPoint = History.Points[History.Index];
+                    if(oPoint)
+                    {
+                        this.nCurPointItemsLength = oPoint.Items.length;
+                    }
                 }
             }
             else
             {
                 //ExecuteNoHistory(function(){
-                    History.UndoLastPoint();
+                    History.UndoLastPoint(this.nCurPointItemsLength);
                     this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
                 //}, this, []);
             }

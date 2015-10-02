@@ -386,6 +386,8 @@ function DrawingObjects() {
     _this.asyncImageEndLoaded = null;
     _this.asyncImagesDocumentEndLoaded = null;
 
+
+    _this.nCurPointItemsLength = 0;
     // Task timer
     var aDrawTasks = [];
 
@@ -2641,6 +2643,7 @@ function DrawingObjects() {
                     _this.controller.startRecalculate();
                     _this.sendGraphicObjectProps();
                     api.exucuteHistoryEnd = false;
+                    _this.nCurPointItemsLength = 0;
                 }
                 else
                 {
@@ -2648,6 +2651,14 @@ function DrawingObjects() {
                 }
                 if(api.exucuteHistory)
                 {
+                    if(History.CurPoint)
+                    {
+                        _this.nCurPointItemsLength = History.CurPoint.Items.length;
+                    }
+                    else
+                    {
+                        _this.nCurPointItemsLength = 0;
+                    }
                     api.exucuteHistory = false;
                 }
             }
@@ -2655,24 +2666,19 @@ function DrawingObjects() {
             {
                 if(History.CurPoint && History.CurPoint.Items.length > 0)
                 {
-                   // ExecuteNoHistory(function(){
-                        var Point = History.CurPoint;
-
-                        // Откатываем все действия в обратном порядке (относительно их выполенения)
-                        for ( var Index = Point.Items.length - 1; Index > -1; Index-- )
-                        {
-                            var Item = Point.Items[Index];
-                            if(!Item.Class.Read_FromBinary2)
-                                Item.Class.Undo( Item.Type, Item.Data, Item.SheetId );
-                            else
-                                Item.Class.Undo(Item.Data);
-                        }
-                    Point.Items.length = 0;
-                        _this.controller.setSelectionState(Point.SelectionState, Point.SelectionState.length-1);
-                        _this.controller.setGraphicObjectPropsCallBack(props);
-                        _this.controller.startRecalculate();
-                        //_this.sendGraphicObjectProps();
-                    //}, this, []);
+                    var Point = History.CurPoint;
+                    var nBottomIndex = this.nCurPointItemsLength - 1;
+                    for ( var Index = Point.Items.length - 1; Index > nBottomIndex; Index-- )
+                    {
+                        var Item = Point.Items[Index];
+                        if(!Item.Class.Read_FromBinary2)
+                            Item.Class.Undo( Item.Type, Item.Data, Item.SheetId );
+                        else
+                            Item.Class.Undo(Item.Data);
+                    }
+                    Point.Items.length = this.nCurPointItemsLength;
+                    _this.controller.setGraphicObjectPropsCallBack(props);
+                    _this.controller.startRecalculate();
                 }
             }
 

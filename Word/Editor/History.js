@@ -137,19 +137,27 @@ CHistory.prototype =
         return false;
     },
 
-    UndoLastPoint : function()
+    UndoLastPoint : function(nBottomIndex)
     {
         var oPoint = this.Points[this.Index];
         if(oPoint)
         {
             var aItems = oPoint.Items;
-            for (var i = aItems.length - 1; i >= 0; i--)
+            var _bottomIndex;
+            if(isRealNumber(nBottomIndex))
+            {
+                _bottomIndex = nBottomIndex - 1;
+            }
+            else
+            {
+                _bottomIndex = -1;
+            }
+            for (var i = aItems.length - 1; i > _bottomIndex; i--)
             {
                 var oItem = aItems[i];
                 oItem.Class.Undo(oItem.Data);
             }
-            oPoint.Items.length = 0;
-            this.Document.Set_SelectionState(oPoint.State);
+            oPoint.Items.length = _bottomIndex + 1;
         }
     },
 
