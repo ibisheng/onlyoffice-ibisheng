@@ -9978,7 +9978,7 @@ CDocument.prototype =
                 bRetValue = keydownresult_PreventKeyPress;
             }
         }
-        else if ( e.KeyCode == 49 && false === editor.isViewMode && true === e.CtrlKey && true === e.AltKey ) // Alt + Ctrl + Num1 - применяем стиль Heading1
+        else if ( e.KeyCode == 49 && false === editor.isViewMode && true === e.AltKey && !e.AltGr ) // Alt + Ctrl + Num1 - применяем стиль Heading1
         {
             if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
             {
@@ -9988,7 +9988,7 @@ CDocument.prototype =
             }
             bRetValue = keydownresult_PreventAll;
         }
-        else if ( e.KeyCode == 50 && false === editor.isViewMode && true === e.CtrlKey && true === e.AltKey ) // Alt + Ctrl + Num2 - применяем стиль Heading2
+        else if ( e.KeyCode == 50 && false === editor.isViewMode && true === e.AltKey && !e.AltGr) // Alt + Ctrl + Num2 - применяем стиль Heading2
         {
             if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
             {
@@ -9998,7 +9998,7 @@ CDocument.prototype =
             }
             bRetValue = keydownresult_PreventAll;
         }
-        else if ( e.KeyCode == 51 && false === editor.isViewMode && true === e.CtrlKey && true === e.AltKey ) // Alt + Ctrl + Num3 - применяем стиль Heading3
+        else if ( e.KeyCode == 51 && false === editor.isViewMode && true === e.AltKey && !e.AltGr ) // Alt + Ctrl + Num3 - применяем стиль Heading3
         {
             if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
             {
@@ -10343,7 +10343,7 @@ CDocument.prototype =
                     bRetValue = keydownresult_PreventAll;
                 }
             }
-            else if (true === e.AltKey) // Alt + =
+            else if (true === e.AltKey && !e.AltGr) // Alt + =
             {
                 var oSelectedInfo = this.Get_SelectedElementsInfo();
                 var oMath = oSelectedInfo.Get_Math();

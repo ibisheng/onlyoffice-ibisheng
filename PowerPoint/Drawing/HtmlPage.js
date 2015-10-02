@@ -1842,7 +1842,7 @@ function CEditorPage(api)
         global_keyboardEvent.AltKey     = false;
         global_keyboardEvent.CtrlKey    = false;
         global_keyboardEvent.ShiftKey   = false;
-
+		global_keyboardEvent.AltGr		= false;
     }
 
     this.onKeyDown = function(e)

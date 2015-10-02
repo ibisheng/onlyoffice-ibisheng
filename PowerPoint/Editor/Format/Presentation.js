@@ -2039,15 +2039,15 @@ CPresentation.prototype =
                 bRetValue = keydownresult_PreventKeyPress;
             }
         }
-        else if ( e.KeyCode == 49 && false === editor.isViewMode && true === e.CtrlKey && true === e.AltKey ) // Alt + Ctrl + Num1 - применяем стиль Heading1
+        else if ( e.KeyCode == 49 && false === editor.isViewMode && true === e.AltKey && !e.AltGr ) // Alt + Ctrl + Num1 - применяем стиль Heading1
         {
             bRetValue = keydownresult_PreventAll;
         }
-        else if ( e.KeyCode == 50 && false === editor.isViewMode && true === e.CtrlKey && true === e.AltKey ) // Alt + Ctrl + Num2 - применяем стиль Heading2
+        else if ( e.KeyCode == 50 && false === editor.isViewMode && true === e.AltKey && !e.AltGr ) // Alt + Ctrl + Num2 - применяем стиль Heading2
         {
             bRetValue = keydownresult_PreventAll;
         }
-        else if ( e.KeyCode == 51 && false === editor.isViewMode && true === e.CtrlKey && true === e.AltKey ) // Alt + Ctrl + Num3 - применяем стиль Heading3
+        else if ( e.KeyCode == 51 && false === editor.isViewMode && true === e.AltKey && !e.AltGr ) // Alt + Ctrl + Num3 - применяем стиль Heading3
         {
             bRetValue = keydownresult_PreventAll;
         }
@@ -2448,11 +2448,6 @@ CPresentation.prototype =
     OnKeyPress : function(e)
     {
         if ( true === editor.isViewMode )
-            return false;
-
-        //Ctrl и Atl только для команд, word не водит текста с зажатыми Ctrl или Atl
-        //команды полностью обрабатываются в keypress
-        if(e.CtrlKey || e.AltKey)
             return false;
 
         var Code;

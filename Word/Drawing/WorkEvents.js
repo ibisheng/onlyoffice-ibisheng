@@ -111,6 +111,7 @@ function CKeyboardEvent()
     this.AltKey     = false;                        // ������ �� ������ alt
     this.CtrlKey    = false;                        // ������ �� ������ ctrl
     this.ShiftKey   = false;                        // ������ �� ������ shift
+	this.AltGr      = false;
 
     this.Sender     = null;                         // �� ������ html �������� ������ �����
 
@@ -129,6 +130,11 @@ function check_KeyboardEvent(e)
         global_keyboardEvent.CtrlKey = e.ctrlKey || e.metaKey;
     else
         global_keyboardEvent.CtrlKey = e.ctrlKey;
+	
+	global_keyboardEvent.AltGr = (global_keyboardEvent.CtrlKey && global_keyboardEvent.AltKey) ? true : false;
+	
+	if (global_keyboardEvent.CtrlKey && global_keyboardEvent.AltKey)
+		global_keyboardEvent.CtrlKey = false;
 
     global_keyboardEvent.ShiftKey = e.shiftKey;
 
@@ -148,6 +154,11 @@ function check_KeyboardEvent2(e)
         global_keyboardEvent.CtrlKey = e.ctrlKey;
 
     global_keyboardEvent.ShiftKey = e.shiftKey;
+	
+	global_keyboardEvent.AltGr = (global_keyboardEvent.CtrlKey && global_keyboardEvent.AltKey) ? true : false;
+	
+	if (global_keyboardEvent.CtrlKey && global_keyboardEvent.AltKey)
+		global_keyboardEvent.CtrlKey = false;
 }
 
 function check_MouseMoveEvent(e)
