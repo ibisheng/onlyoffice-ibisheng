@@ -132,8 +132,12 @@ function check_KeyboardEvent(e)
         global_keyboardEvent.CtrlKey = e.ctrlKey;
 	
 	global_keyboardEvent.AltGr = (global_keyboardEvent.CtrlKey && global_keyboardEvent.AltKey) ? true : false;
+	if (AscBrowser.isMacOs)
+	{
+		global_keyboardEvent.AltGr = (!global_keyboardEvent.CtrlKey && global_keyboardEvent.AltKey) ? true : false;
+	}
 	
-	if (global_keyboardEvent.CtrlKey && global_keyboardEvent.AltKey)
+	if (global_keyboardEvent.AltGr)
 		global_keyboardEvent.CtrlKey = false;
 
     global_keyboardEvent.ShiftKey = e.shiftKey;
