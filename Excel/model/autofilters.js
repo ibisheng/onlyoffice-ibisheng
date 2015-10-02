@@ -4553,6 +4553,7 @@ var maxIndividualValues = 10000;
 			{
 				var aWs = this._getCurrentWS();
 				var findFilters = this._searchFiltersInRange(arnFrom);
+				var bUndoRedoChanges = aWs.workbook.bUndoChanges || aWs.workbook.bRedoChanges;
 				
 				if(findFilters && findFilters.length)
 				{
@@ -4571,7 +4572,7 @@ var maxIndividualValues = 10000;
 							if(!ref.intersection(newRange) && !this._intersectionRangeWithTableParts(newRange, aWs, arnFrom))
 							{
 								//TODO позже не копировать стиль при перемещении всей таблицы
-								if(!(aWs.workbook.bUndoChanges || aWs.workbook.bRedoChanges))
+								if(!bUndoRedoChanges)
 								{
 									var cleanRange = new Range(aWs, newRange.r1, newRange.c1, newRange.r2, newRange.c2);
 									cleanRange.cleanFormat();
@@ -4956,8 +4957,77 @@ var maxIndividualValues = 10000;
 					result = false;
 				
 				return result;
-			}
+			},
 			
+			_generateColumnName2: function(tableColumns, prevColumnName)
+			{
+				var columnName = "Column";
+				var name = prevColumnName.split(columnName);
+				var indexColumn = name[1];
+				var nextIndex;
+				
+				//ищем среди tableColumns, возможно такое имя уже имеется
+				var checkNextName = function()
+				{
+					var nextName = columnName + nextIndex;
+					for(var i = 0; i < tableColumns.length; i++)
+					{
+						if(tableColumns[i].Name === nextName)
+							return false;
+					}
+					return true;
+				};
+				
+				//если сменилась первая цифра
+				var checkChangeIndex = function()
+				{
+					if((nextIndex + 1).toString().substr(0, 1) !== (indexColumn).toString().substr(0, 1))
+						return true;
+					else 
+						return false;
+				};
+				
+				if(indexColumn && !isNaN(indexColumn))//если нашли числовой индекс
+				{
+					indexColumn = parseFloat(indexColumn);
+					nextIndex = indexColumn + 1;
+					var string = "";
+					
+					var firstInput = true;
+					while(checkNextName() === false)
+					{
+						if(firstInput === true)
+						{
+							string += "1";
+							nextIndex = parseFloat(indexColumn + "2");
+						}
+						else
+						{
+							if(checkChangeIndex())
+							{
+								string += "0";
+								nextIndex = parseFloat(indexColumn + string);
+							}
+							else
+								nextIndex++;
+						}
+						
+						firstInput = false;
+					}
+					
+				}
+				else//если не нашли, то индекс начинаем с 1
+				{
+					var nextIndex = 1;
+					while(checkNextName() === false)
+					{
+						nextIndex++;
+					}
+				}
+				
+				var res = columnName + nextIndex;
+				return res;
+			}			
 		};
 
 		/*

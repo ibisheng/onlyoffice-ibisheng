@@ -4443,11 +4443,7 @@ TablePart.prototype.addTableColumns = function(activeRange, aF)
 		var curCol = num + this.Ref.c1;
 		if(activeRange.c1 <= curCol && activeRange.c2 >= curCol)
 		{
-			var newNameColumn = aF._generateColumnName(newTableColumns.concat(this.TableColumns), curCol - 1);
-			var newTableColumn = new TableColumn();
-			newTableColumn.Name = newNameColumn;
-			
-			newTableColumns[newTableColumns.length] = newTableColumn;
+			newTableColumns[newTableColumns.length] = new TableColumn();
 		}
 		else
 		{
@@ -4456,6 +4452,12 @@ TablePart.prototype.addTableColumns = function(activeRange, aF)
 		}
 		
 		num++;
+	}
+	
+	for(var j = 0; j < newTableColumns.length; j++)
+	{
+		if(newTableColumns[j].Name === null)
+			newTableColumns[j].Name = aF._generateColumnName2(newTableColumns, newTableColumns[j - 1].Name);
 	}
 	
 	this.TableColumns = newTableColumns;
