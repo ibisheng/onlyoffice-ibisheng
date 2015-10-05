@@ -1266,7 +1266,8 @@ var maxIndividualValues = 10000;
 							aWs.AutoFilter = null;
 							
 						//открываем скрытые строки
-						aWs.setRowHidden(false, bbox.r1, bbox.r2);
+						if(oldFilter.isApplyAutoFilter())
+							aWs.setRowHidden(false, bbox.r1, bbox.r2);
 
 						//заносим в историю
 						if(isTablePart){
@@ -4026,6 +4027,19 @@ var maxIndividualValues = 10000;
 					if(!this._hiddenAnotherFilter(filterColumns, colId, i, ref.c1))//filter another button
 					{
 						aWs.setRowHidden(false, i, i);
+					}
+				}
+			},
+			
+			_openAllHiddenRowsByFilter: function(filter)
+			{
+				var autoFilter = filter && filter.getType() ===  g_nFiltersType.tablePart ? filter.AutoFilter : filter;
+				if(autoFilter && autoFilter.FilterColumns)
+				{
+					var filterColumns = autoFilter.FilterColumns;
+					for(var i = 0; i < filterColumns.length; i++)
+					{
+						this._openHiddenRowsAfterDeleteColumn(autoFilter, filterColumns[i].ColId);
 					}
 				}
 			},
