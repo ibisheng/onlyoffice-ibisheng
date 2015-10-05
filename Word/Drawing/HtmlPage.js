@@ -3326,7 +3326,7 @@ function CEditorPage(api)
 
     this.OnPaint = function()
     {
-        if (this.DrawingFreeze)
+        if (this.DrawingFreeze || true === window["DisableVisibleComponents"])
             return;
         //console.log("paint");
 
