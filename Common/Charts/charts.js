@@ -698,9 +698,69 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
 			}
 			break;
 		}
+        case "textButtonPour":
+        {
+            textStr = "abcde";
+            for(var i = 0; i < textStr.length; ++i)
+            {
+                oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+            }
+
+            oContent.Add_NewParagraph();
+            textStr = "abc";
+            for(var i = 0; i < textStr.length; ++i)
+            {
+                oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+            }
+
+
+            oContent.Add_NewParagraph();
+            textStr = "abcde";
+            for(var i = 0; i < textStr.length; ++i)
+            {
+                oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+            }
+            break;
+        }
+        case "textDeflateInflate":
+        {
+            textStr = "abcde";
+            for(var i = 0; i < textStr.length; ++i)
+            {
+                oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+            }
+            oContent.Add_NewParagraph();
+            textStr = "abcde";
+            for(var i = 0; i < textStr.length; ++i)
+            {
+                oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+            }
+            break;
+        }
+        case "textDeflateInflateDeflate":
+        {
+            textStr = "abcde";
+            for(var i = 0; i < textStr.length; ++i)
+            {
+                oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+            }
+            oContent.Add_NewParagraph();
+            textStr = "abcde";
+            for(var i = 0; i < textStr.length; ++i)
+            {
+                oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+            }
+            oContent.Add_NewParagraph();
+            textStr = "abcde";
+            for(var i = 0; i < textStr.length; ++i)
+            {
+                oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+            }
+            break;
+        }
 		default:
 		{
-			var textStr = "abcde";
+			textStr = "abcde";
 			for(var i = 0; i < textStr.length; ++i)
 			{
 				oContent.Paragraph_Add(new ParaText(textStr[i]), false);
