@@ -1567,21 +1567,18 @@ CDocumentContent.prototype =
 
     Get_CurrentParagraph : function()
     {
-        if ( docpostype_DrawingObjects === this.CurPos.Type )
+        if (docpostype_DrawingObjects === this.CurPos.Type)
             return this.LogicDocument.DrawingObjects.getCurrentParagraph();
         else //if ( docpostype_Content === this.CurPos.Type )
         {
-            if ( true === this.Selection.Use )
+            var Pos = true === this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos;
+            if (Pos < 0 || Pos >= this.Content.length)
                 return null;
 
-            if ( this.CurPos.ContentPos < 0 )
-                return null;
-
-            var Item = this.Content[this.CurPos.ContentPos];
-            if ( type_Paragraph === Item.GetType() )
-                return Item;
-            else if ( type_Table === Item.GetType() )
-                return Item.Get_CurrentParagraph();
+            if (type_Paragraph === this.Content[Pos].Get_Type())
+                return this.Content[Pos];
+            else if (type_Table === this.Content[Pos].Get_Type())
+                return this.Content[Pos].Get_CurrentParagraph();
         }
 
         return null;

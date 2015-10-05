@@ -5559,7 +5559,9 @@ ParaDrawing.prototype =
     {
         if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.getCurrentParagraph === "function")
             return this.GraphicObj.getCurrentParagraph();
-        return null;
+
+        if (this.Parent instanceof Paragraph)
+            return this.Parent;
     },
     getSelectedText: function(bClearText)
     {
@@ -6759,7 +6761,8 @@ ParaDrawing.prototype =
 
     Get_RevisionsChangeParagraph : function(SearchEngine)
     {
-        console.log("Drawing revisions change");
+        if (this.GraphicObj && this.GraphicObj.textBoxContent)
+            this.GraphicObj.textBoxContent.Get_RevisionsChangeParagraph(SearchEngine);
     }
 };
 

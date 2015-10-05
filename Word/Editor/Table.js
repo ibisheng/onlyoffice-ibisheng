@@ -9849,8 +9849,8 @@ CTable.prototype =
     {
         Info.Set_Table();
 
-        if ( false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ) )
-            this.CurCell.Content.Get_SelectedElementsInfo( Info );
+        if (false === this.Selection.Use || (true === this.Selection.Use && table_Selection_Text === this.Selection.Type))
+            this.CurCell.Content.Get_SelectedElementsInfo(Info);
     },
 
     Get_SelectedContent : function(SelectedContent)
@@ -10794,7 +10794,16 @@ CTable.prototype =
 
     Get_CurrentParagraph : function()
     {
-        return this.CurCell.Content.Get_CurrentParagraph();
+        var SelectionArray = this.Internal_Get_SelectionArray();
+        if (SelectionArray.length > 0)
+        {
+            var CurCell = SelectionArray[0].Cell;
+            var CurRow  = SelectionArray[0].Row;
+
+            return this.Get_Row(CurRow).Get_Cell(CurCell).Content.Get_CurrentParagraph();
+        }
+
+        return null;
     },
 
     Set_ImageProps : function(Props)

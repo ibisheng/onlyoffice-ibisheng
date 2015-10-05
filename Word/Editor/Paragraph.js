@@ -13338,41 +13338,9 @@ Paragraph.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
     if (true === SearchEngine.Is_Found())
         return;
 
-    if (true !== SearchEngine.Is_CurrentFound())
+    var Direction = SearchEngine.Get_Direction();
+    if (Direction > 0)
     {
-        if (this !== SearchEngine.Get_CurrentParagraph())
-        {
-            // Возможно текущий параграф находится в одной из автофигур
-            var DrawingObjects = this.Get_AllDrawingObjects();
-            for (var DrawingIndex = 0, Count = DrawingObjects.length; DrawingIndex < Count; DrawingIndex++)
-            {
-                DrawingObjects[DrawingIndex].Get_RevisionsChangeParagraph(SearchEngine);
-                if (true === SearchEngine.Is_Found())
-                    return;
-            }
-
-            // Если все еще не нашли текущий параграф, тогда данный выставляем текущим
-            if (true !== SearchEngine.Is_CurrentFound())
-                SearchEngine.Set_CurrentFound();
-        }
-        else
-        {
-            SearchEngine.Set_CurrentFound();
-        }
-    }
-    else
-    {
-        var Direction = SearchEngine.Get_Direction();
-        if (Direction < 0)
-        {
-            SearchEngine.Set_FoundedParagraph(this);
-            if (true === SearchEngine.Is_Found())
-                return;
-        }
-
-        if (true === SearchEngine.Is_Found())
-            return;
-
         var DrawingObjects = this.Get_AllDrawingObjects();
         for (var DrawingIndex = 0, Count = DrawingObjects.length; DrawingIndex < Count; DrawingIndex++)
         {
@@ -13380,9 +13348,27 @@ Paragraph.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
             if (true === SearchEngine.Is_Found())
                 return;
         }
+    }
 
-        if (Direction > 0)
-            SearchEngine.Set_FoundedParagraph(this);
+    if (true !== SearchEngine.Is_CurrentFound())
+    {
+        if (this === SearchEngine.Get_CurrentParagraph())
+            SearchEngine.Set_CurrentFound(this);
+    }
+    else
+    {
+        SearchEngine.Set_FoundedParagraph(this);
+    }
+
+    if (Direction < 0 && true !== SearchEngine.Is_Found())
+    {
+        var DrawingObjects = this.Get_AllDrawingObjects();
+        for (var DrawingIndex = DrawingObjects.length - 1; DrawingIndex >= 0; DrawingIndex--)
+        {
+            DrawingObjects[DrawingIndex].Get_RevisionsChangeParagraph(SearchEngine);
+            if (true === SearchEngine.Is_Found())
+                return;
+        }
     }
 };
 Paragraph.prototype.Is_SelectedAll = function()

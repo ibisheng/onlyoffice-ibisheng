@@ -11474,29 +11474,24 @@ CDocument.prototype =
     Get_CurrentParagraph : function()
     {
         // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
+        if (docpostype_HdrFtr === this.CurPos.Type)
         {
             return this.HdrFtr.Get_CurrentParagraph();
         }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
+        else if (docpostype_DrawingObjects === this.CurPos.Type)
+        {
             return this.DrawingObjects.getCurrentParagraph();
+        }
         else //if ( docpostype_Content === this.CurPos.Type )
         {
-            if ( true === this.Selection.Use )
+            var Pos = true === this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos;
+            if (Pos < 0 || Pos >= this.Content.length)
                 return null;
 
-            if ( this.CurPos.ContentPos < 0 )
-                return null;
-
-            if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ) )
-            {
-                if ( true == this.Selection.Use )
-                    return this.Content[this.Selection.StartPos].Get_CurrentParagraph();
-                else
-                    return this.Content[this.CurPos.ContentPos].Get_CurrentParagraph();
-            }
-            else if ( type_Paragraph == this.Content[this.CurPos.ContentPos].GetType() )
-                return this.Content[this.CurPos.ContentPos];
+            if (type_Paragraph === this.Content[Pos].Get_Type())
+                return this.Content[Pos];
+            else if (type_Table === this.Content[Pos].Get_Type())
+                return this.Content[Pos].Get_CurrentParagraph();
 
             return null;
         }
@@ -11536,12 +11531,10 @@ CDocument.prototype =
                 }
                 else
                 {
-                    if ( this.Selection.StartPos != this.Selection.EndPos )
+                    if (this.Selection.StartPos != this.Selection.EndPos)
                         Info.Set_MixedSelection();
                     else
-                    {
                         this.Content[this.Selection.StartPos].Get_SelectedElementsInfo(Info);
-                    }
                 }
             }
             else
@@ -11976,7 +11969,6 @@ CDocument.prototype =
                 this.DrawingObjects.updateTextPr();
                 this.Interface_Update_DrawingPr();
                 this.DrawingObjects.updateParentParagraphParaPr();
-
             }
         }
         else if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ) )
@@ -14857,6 +14849,7 @@ CDocument.prototype.Get_NextRevisionChange = function()
     var Change = this.TrackRevisionsManager.Get_NextChange();
     if (null !== Change)
     {
+        this.Selection_Remove();
         var Para = Change.get_Paragraph();
         Para.Selection.Use = true;
         Para.Set_SelectionContentPos(Change.get_StartPos(), Change.get_EndPos());
@@ -14873,6 +14866,7 @@ CDocument.prototype.Get_PrevRevisionChange = function()
     var Change = this.TrackRevisionsManager.Get_PrevChange();
     if (null !== Change)
     {
+        this.Selection_Remove();
         var Para = Change.get_Paragraph();
         Para.Selection.Use = true;
         Para.Set_SelectionContentPos(Change.get_StartPos(), Change.get_EndPos());
@@ -14885,15 +14879,30 @@ CDocument.prototype.Get_PrevRevisionChange = function()
 };
 CDocument.prototype.Get_RevisionsChangeParagraph = function(Direction, CurrentPara)
 {
+    return this.private_GetRevisionsChangeParagraph(Direction, CurrentPara).Get_FoundedParagraph();
+};
+CDocument.prototype.private_GetRevisionsChangeParagraph = function(Direction, CurrentPara)
+{
     var SearchEngine = new CRevisionsChangeParagraphSearchEngine(Direction, CurrentPara, this.TrackRevisionsManager);
+    if (null === CurrentPara)
+    {
+        CurrentPara = this.Get_CurrentParagraph();
+        if (null === CurrentPara)
+            return SearchEngine;
+
+        SearchEngine.Set_CurrentParagraph(CurrentPara);
+        SearchEngine.Set_FoundedParagraph(CurrentPara);
+        if (true === SearchEngine.Is_Found())
+            return SearchEngine;
+    }
+
     if (docpostype_HdrFtr === this.CurPos.Type)
     {
         // TODO: Реализовать
-        return null;
     }
     else //if (docpostype_Content === this.CurPos.Type)
     {
-        var Pos = (true === this.Selection.Use ? (this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos) : this.CurPos.ContentPos);
+        var Pos = (true === this.Selection.Use && docpostype_DrawingObjects !== this.CurPos.Type ? (this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos) : this.CurPos.ContentPos);
 
         this.Content[Pos].Get_RevisionsChangeParagraph(SearchEngine);
         while (true !== SearchEngine.Is_Found())
@@ -14904,9 +14913,9 @@ CDocument.prototype.Get_RevisionsChangeParagraph = function(Direction, CurrentPa
 
             this.Content[Pos].Get_RevisionsChangeParagraph(SearchEngine);
         }
-
-        return SearchEngine.Get_FoundedParagraph();
     }
+
+    return SearchEngine;
 };
 CDocument.prototype.Accept_RevisionChange = function(Change)
 {
@@ -14927,6 +14936,7 @@ CDocument.prototype.Accept_RevisionChange = function(Change)
 
         if (false === this.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_ElementsArray_and_Type, Elements : [Para], CheckType : ChangesType}))
         {
+            this.Selection_Remove();
             Para.Selection.Use = true;
             Para.Set_SelectionContentPos(Change.get_StartPos(), Change.get_EndPos());
             Para.Set_ParaContentPos(Change.get_StartPos(), false, -1, -1);
@@ -14955,6 +14965,7 @@ CDocument.prototype.Reject_RevisionChange = function(Change)
 
         if (false === this.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_ElementsArray_and_Type, Elements : [Para], CheckType : ChangesType}))
         {
+            this.Selection_Remove();
             Para.Selection.Use = true;
             Para.Set_SelectionContentPos(Change.get_StartPos(), Change.get_EndPos());
             Para.Set_ParaContentPos(Change.get_StartPos(), false, -1, -1);
@@ -14979,8 +14990,7 @@ CDocument.prototype.Accept_RevisionChanges = function(Type, bAll)
     }
     else if (docpostype_DrawingObjects === this.CurPos.Type)
     {
-        // TODO: Реализовать
-        //this.DrawingObjects.Accept_RevisionChanges(Type, bAll);
+        this.DrawingObjects.Accept_RevisionChanges(Type, bAll);
     }
     else //if (docpostype_Content === this.CurPos.Type)
     {
@@ -15058,8 +15068,7 @@ CDocument.prototype.Reject_RevisionChanges = function(Type, bAll)
     }
     else if (docpostype_DrawingObjects === this.CurPos.Type)
     {
-        // TODO: Реализовать
-        //this.DrawingObjects.Reject_RevisionChanges(Type, bAll);
+        this.DrawingObjects.Reject_RevisionChanges(Type, bAll);
     }
     else //if (docpostype_Content === this.CurPos.Type)
     {
@@ -15565,8 +15574,9 @@ CTrackRevisionsManager.prototype.Get_NextChange = function()
     }
     else
     {
-        NextPara = this.LogicDocument.Get_RevisionsChangeParagraph(1, null);
-        if (null !== NextPara)
+        var SearchEngine = this.LogicDocument.private_GetRevisionsChangeParagraph(1, null);
+        NextPara = SearchEngine.Get_FoundedParagraph();
+        if (null !== NextPara && NextPara === SearchEngine.Get_CurrentParagraph())
         {
             var NextChangesArray = this.Changes[NextPara.Get_Id()];
             if (undefined !== NextChangesArray && NextChangesArray.length > 0)
@@ -15638,8 +15648,9 @@ CTrackRevisionsManager.prototype.Get_PrevChange = function()
     }
     else
     {
-        PrevPara = this.LogicDocument.Get_RevisionsChangeParagraph(-1, null);
-        if (null !== PrevPara)
+        var SearchEngine = this.LogicDocument.private_GetRevisionsChangeParagraph(-1, null);
+        PrevPara = SearchEngine.Get_FoundedParagraph();
+        if (null !== PrevPara && PrevPara === SearchEngine.Get_CurrentParagraph())
         {
             var PrevChangesArray = this.Changes[PrevPara.Get_Id()];
             if (undefined !== PrevChangesArray && PrevChangesArray.length > 0)
@@ -15813,9 +15824,13 @@ function CRevisionsChangeParagraphSearchEngine(Direction, CurrentPara, TrackMana
 
     this.Para         = null;
 }
-CRevisionsChangeParagraphSearchEngine.prototype.Set_CurrentFound = function()
+CRevisionsChangeParagraphSearchEngine.prototype.Set_CurrentFound = function(Para)
 {
     this.CurrentFound = true;
+};
+CRevisionsChangeParagraphSearchEngine.prototype.Set_CurrentParagraph = function(Para)
+{
+    this.CurrentPara = Para;
 };
 CRevisionsChangeParagraphSearchEngine.prototype.Is_CurrentFound = function()
 {

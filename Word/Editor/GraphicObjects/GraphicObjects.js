@@ -1784,6 +1784,10 @@ CGraphicObjects.prototype =
         }
         else
         {
+            var ParaDrawing = this.getMajorParaDrawing();
+            if (ParaDrawing && ParaDrawing.Parent instanceof Paragraph)
+                return ParaDrawing.Paragraph;
+
             return null;
         }
     },
