@@ -54,6 +54,7 @@ var c_oAscError = {
     AutoFilterDataRangeError: -50,
     AutoFilterChangeFormatTableError: -51,
     AutoFilterChangeError: -52,
+	AutoFilterMoveToHiddenRangeError: -53,
 	
 	PasteMaxRangeError: - 65,
 	

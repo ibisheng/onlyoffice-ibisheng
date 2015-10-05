@@ -1347,7 +1347,7 @@ var maxIndividualValues = 10000;
 				}
 			},
 			
-			isCheckMoveRange: function(arnFrom)
+			isCheckMoveRange: function(arnFrom, arnTo)
 			{	
 				var aWs = this._getCurrentWS();
 				
@@ -1375,6 +1375,28 @@ var maxIndividualValues = 10000;
 					return false;
 				}
 				
+				
+				//2)если затрагиваем перемещаемым диапазоном часть а/ф со скрытыми строчками
+				if(!this.checkMoveRangeIntoApplyAutoFilter(arnTo))
+				{
+					aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterMoveToHiddenRangeError, c_oAscError.Level.NoCritical)	
+					return false;
+				}
+				
+				return true;
+			},
+			
+			checkMoveRangeIntoApplyAutoFilter: function(arnTo)
+			{
+				var aWs = this._getCurrentWS();
+				if(aWs.AutoFilter && aWs.AutoFilter.Ref && arnTo.intersection(aWs.AutoFilter.Ref))
+				{
+					//если затрагиваем скрытые строки а/ф - выдаём ошибку
+					if(this._searchHiddenRowsByFilter(aWs.AutoFilter, arnTo))
+					{
+						return false;
+					}
+				}
 				return true;
 			},
 			
@@ -4471,6 +4493,26 @@ var maxIndividualValues = 10000;
 						}
 					}
 				}
+			},
+			
+			_searchHiddenRowsByFilter: function(filter, range)
+			{
+				var ref = filter.Ref;
+				var aWs = this._getCurrentWS();
+				var intersection = filter.Ref.intersection(range);
+				
+				if(intersection && filter.isApplyAutoFilter())
+				{
+					for(var i = intersection.r1; i <= intersection.r2; i++)
+					{
+						if(aWs.getRowHidden(i) === true)
+						{
+							return true;
+						}
+					}
+				}
+				
+				return false;
 			},
 			
 			_searchFiltersInRange: function(range, bFindOnlyTableParts)//find filters in this range

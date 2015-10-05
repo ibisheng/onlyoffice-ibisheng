@@ -7906,7 +7906,7 @@
 			if (resmove === -2) {
 				this.handlers.trigger("onErrorEvent", c_oAscError.ID.CannotMoveRange, c_oAscError.Level.NoCritical);
 				this._cleanSelectionMoveRange();
-			} else if (resmove === -1) {
+			} else if (resmove === -1 && this.autoFilters.checkMoveRangeIntoApplyAutoFilter(arnTo)) {
 				var t = this;
 				this.model.workbook.handlers.trigger("asc_onConfirmAction", c_oAscConfirm.ConfirmReplaceRange,
 					function (can) {
@@ -7986,7 +7986,7 @@
 					onApplyMoveAutoFiltersCallback();
 			};
 			
-			if (this.autoFilters.isCheckMoveRange(arnFrom))
+			if (this.autoFilters.isCheckMoveRange(arnFrom, arnTo))
 				this._isLockedCells([arnFrom, arnTo], null, onApplyMoveRangeHandleCallback);
 			else
 				this._cleanSelectionMoveRange();
