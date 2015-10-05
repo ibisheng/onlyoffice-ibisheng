@@ -388,6 +388,25 @@ CGraphicObjects.prototype =
         return {W: page_limits.XLimit, H: page_limits.YLimit};
     },
 
+    Accept_RevisionChanges: function(Type, bAll)
+    {
+        var oDocContent = this.getTargetDocContent();
+        if(oDocContent)
+        {
+            oDocContent.Accept_RevisionChanges(Type, bAll);
+        }
+    },
+
+
+    Reject_RevisionChanges: function(Type, bAll)
+    {
+        var oDocContent = this.getTargetDocContent();
+        if(oDocContent)
+        {
+            oDocContent.Reject_RevisionChanges(Type, bAll);
+        }
+    },
+
     Get_Props: function()
     {
         var props_by_types = DrawingObjectsController.prototype.getDrawingProps.call(this);
