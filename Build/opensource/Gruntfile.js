@@ -57,7 +57,7 @@ module.exports = function(grunt) {
 			pkg.info.build = parseInt(process.env['BUILD_NUMBER']);
 			
 		if(undefined !== process.env['SVN_REVISION'])
-			pkg.info.rev = parseInt(process.env['SVN_REVISION']);*/
+			pkg.info.rev = parseInt(process.env['SVN_REVISION']);
 		
         grunt.initConfig({
             pkg: pkg,
