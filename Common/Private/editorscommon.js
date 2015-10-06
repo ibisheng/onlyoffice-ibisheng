@@ -4,7 +4,7 @@ var g_sLicenseDefaultUrl = "/license";
 var g_sPublicRSAKey = '-----BEGIN CERTIFICATE-----MIIBvTCCASYCCQD55fNzc0WF7TANBgkqhkiG9w0BAQUFADAjMQswCQYDVQQGEwJKUDEUMBIGA1UEChMLMDAtVEVTVC1SU0EwHhcNMTAwNTI4MDIwODUxWhcNMjAwNTI1MDIwODUxWjAjMQswCQYDVQQGEwJKUDEUMBIGA1UEChMLMDAtVEVTVC1SU0EwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBANGEYXtfgDRlWUSDn3haY4NVVQiKI9CzThoua9+DxJuiseyzmBBe7Roh1RPqdvmtOHmEPbJ+kXZYhbozzPRbFGHCJyBfCLzQfVos9/qUQ88u83b0SFA2MGmQWQAlRtLy66EkR4rDRwTj2DzR4EEXgEKpIvo8VBs/3+sHLF3ESgAhAgMBAAEwDQYJKoZIhvcNAQEFBQADgYEAEZ6mXFFq3AzfaqWHmCy1ARjlauYAa8ZmUFnLm0emg9dkVBJ63aEqARhtok6bDQDzSJxiLpCEF6G4b/Nv/M/MLyhP+OoOTmETMegAVQMq71choVJyOFE5BtQa6M/lCHEOya5QUfoRF2HF9EjRF44K3OK+u3ivTSj3zwjtpudY5Xo=-----END CERTIFICATE-----';
 var g_sAESKey = '7f3d2338390c1e3e154c21005f51010e065b0f1a1e101600202473150c022a11';
 
-function CheckLicense(licenseUrl, customerId, userId, callback) {
+function CheckLicense(licenseUrl, customerId, userId, userName, callback) {
   licenseUrl = licenseUrl ? licenseUrl : g_sLicenseDefaultUrl;
   g_fGetJSZipUtils().getBinaryContent(licenseUrl, function(err, data) {
     if (err) {
@@ -27,7 +27,7 @@ function CheckLicense(licenseUrl, customerId, userId, callback) {
       var x509 = new X509();
       x509.readCertPEM(g_sPublicRSAKey);
       var isValid = x509.subjectPublicKeyRSA.verifyString(JSON.stringify(oLicense), hSig);
-      callback(false, isValid ? CheckUserInLicense(customerId, userId, oLicense) : false);
+      callback(false, isValid ? CheckUserInLicense(customerId, userId, userName, oLicense) : false);
     } catch(e) {
       callback(true, false);
     }
@@ -40,14 +40,15 @@ function CheckLicense(licenseUrl, customerId, userId, callback) {
  * @param oLicense
  * @returns {boolean}
  */
-function CheckUserInLicense(customerId, userId, oLicense) {
+function CheckUserInLicense(customerId, userId, userName, oLicense) {
   var res = false;
   var superuser = 'onlyoffice';
   try {
     if (oLicense.users) {
-      if ((customerId === oLicense['customer_id'] && oLicense.users.hasOwnProperty(userId)) ||
-        (superuser === oLicense['customer_id'] && oLicense.users.hasOwnProperty(userId = superuser))) {
-        var endDate = new Date(oLicense.users[userId]['end_date']);
+        var sUserHash = CryptoJS.SHA256(userId + userName).toString(CryptoJS.enc.Hex).toLowerCase();
+      if ((customerId === oLicense['customer_id'] && oLicense.users.hasOwnProperty(sUserHash)) ||
+        (superuser === oLicense['customer_id'] && oLicense.users.hasOwnProperty(sUserHash = superuser))) {
+        var endDate = new Date(oLicense.users[sUserHash]['end_date']);
         res = endDate >= new Date();
       }
     }
