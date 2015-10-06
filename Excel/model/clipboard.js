@@ -51,7 +51,21 @@
 
 				if (!t.element) {
 					t.element = doc.getElementById(COPY_ELEMENT_ID2);
-					if (!t.element) {found = false; t.element = doc.createElement("DIV");}
+					if (!t.element) 
+					{
+						found = false; 
+						
+						if(AscBrowser.isIE)
+						{
+							var iframe = doc.createElement("iframe");
+							iframe.id = "ieCopyFrame";
+							doc.body.appendChild(iframe);
+							var temp = doc.getElementById("ieCopyFrame");
+							t.element = temp.contentDocument.body.appendChild(doc.createElement("div"));
+						}
+						else
+							t.element = doc.createElement("DIV");
+					}
 				}
 
 				t.element.id = COPY_ELEMENT_ID2;
@@ -73,7 +87,7 @@
 				t.element.style.display = ELEMENT_DISPAY_STYLE;
 				t.element.setAttribute("contentEditable", true);
 
-				if (!found) {doc.body.appendChild(t.element);}
+				if (!found && !AscBrowser.isIE) {doc.body.appendChild(t.element);}
 				
 				//fix for ipad
 				if(!AscBrowser.isMobileVersion)
