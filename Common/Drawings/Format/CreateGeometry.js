@@ -2437,9 +2437,9 @@ function CreateGeometry(prst){
             break;
         }
         case 'curvedDownArrow':{
-            f.AddAdj('adj1', 15, '12960');
-            f.AddAdj('adj2', 15, '19440');
-            f.AddAdj('adj3', 15, '14400');
+            f.AddAdj('adj1', 15, '25000');
+            f.AddAdj('adj2', 15, '50000');
+            f.AddAdj('adj3', 15, '25000');
             f.AddGuide('maxAdj2', 0, '50000', 'w', 'ss');
             f.AddGuide('a2', 10, '0', 'adj2', 'maxAdj2');
             f.AddGuide('a1', 10, '0', 'adj1', '100000');
@@ -2601,9 +2601,10 @@ function CreateGeometry(prst){
             break;
         }
         case 'curvedRightArrow':{
-            f.AddAdj('adj1', 15, '12960');
-            f.AddAdj('adj2', 15, '19440');
-            f.AddAdj('adj3', 15, '14400');
+
+            f.AddAdj('adj1', 15, '25000');
+            f.AddAdj('adj2', 15, '50000');
+            f.AddAdj('adj3', 15, '25000');
             f.AddGuide('maxAdj2', 0, '50000', 'h', 'ss');
             f.AddGuide('a2', 10, '0', 'adj2', 'maxAdj2');
             f.AddGuide('a1', 10, '0', 'adj1', 'a2');
