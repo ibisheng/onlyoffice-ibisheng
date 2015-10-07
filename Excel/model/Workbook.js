@@ -1024,13 +1024,15 @@ DependencyGraph.prototype = {
     },
     relinkDefNameByWorksheet:function (oName, nName){
 
-        var oldS = this.defNameList;
+        var oldS = this.defNameList, dN;
         for( var id in oldS ){
-            if(oldS[id].isTable){
-                oldS[id].Ref = oldS[id].Ref.replace(oName,nName);
+            dN = oldS[id];
+            if(dN.isTable ){
+                if(dN.Ref)
+                    dN.Ref = dN.Ref.replace(oName,nName);
             }
             else{
-                oldS[id].relinkRef(oName, nName);
+                dN.relinkRef(oName, nName);
             }
         }
 
@@ -1614,7 +1616,7 @@ DefNameVertex.prototype = {
     },
 
     relinkRef:function(oName, nName){
-        if( this.parsedRef.isParsed ){
+        if( this.parsedRef && this.parsedRef.isParsed ){
             this.Ref = this.parsedRef.assemble();
         }
     },

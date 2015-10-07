@@ -3478,7 +3478,7 @@ UndoRedoWoorksheet.prototype = {
                     var dN;
                     for(var id in arrDefNameRecalc ){
                         dN  = arrDefNameRecalc[id];
-                        if( !dN.parsedRef ){
+                        if( !dN.parsedRef && dN.Ref ){
                             dN.parsedRef = new parserFormula(dN.Ref, "", ws.workbook.getWorksheet(0));
                             dN.parsedRef.parse();
                         }
