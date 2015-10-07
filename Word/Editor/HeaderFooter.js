@@ -349,9 +349,10 @@ CHeaderFooter.prototype =
 
     RecalculateCurPos : function()
     {
-        if ( -1 !== this.RecalcInfo.CurPage )
+        if (-1 !== this.RecalcInfo.CurPage)
             return this.Content.RecalculateCurPos();
 
+        this.DrawingDocument.UpdateTarget(0, 0, this.Content.Get_StartPage_Absolute());
         return null;
     },
 
@@ -550,8 +551,10 @@ CHeaderFooter.prototype =
     {
         if (-1 === this.RecalcInfo.CurPage)
         {
+            // Если колонтитул не рассчитан, либо данный колонтитул неиспользуется, тогда смещаемся к первой странице
             this.DrawingDocument.TargetEnd();
             this.DrawingDocument.SelectEnabled(false);
+            this.LogicDocument.NeedUpdateTarget = true;
             return;
         }
 
@@ -583,6 +586,9 @@ CHeaderFooter.prototype =
                 {
                     if ( false === this.Content.Selection_IsEmpty() )
                     {
+                        if (true !== this.Content.Selection.Start)
+                            this.RecalculateCurPos();
+
                         this.DrawingDocument.TargetEnd();
                         this.DrawingDocument.SelectEnabled(true);
                         this.DrawingDocument.SelectClear();
@@ -1166,6 +1172,13 @@ CHeaderFooter.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
 {
     return this.Content.Get_RevisionsChangeParagraph(SearchEngine);
 };
+CHeaderFooter.prototype.Get_SelectionBounds = function()
+{
+    if (-1 !== this.RecalcInfo.CurPage)
+        return this.Content.Get_SelectionBounds();
+
+    return null;
+};
 
 //-----------------------------------------------------------------------------------
 // Класс для работы с колонтитулами
@@ -1607,7 +1620,7 @@ CHeaderFooterController.prototype =
 
     Document_UpdateSelectionState : function()
     {
-        if ( null != this.CurHdrFtr )
+        if (null != this.CurHdrFtr)
             this.CurHdrFtr.Document_UpdateSelectionState();
     },
 
@@ -2364,6 +2377,13 @@ CHeaderFooterController.prototype.Reject_RevisionChanges = function(Type, bAll)
 {
     if (null !== this.CurHdrFtr)
         this.CurHdrFtr.Content.Reject_RevisionChanges(Type, bAll);
+};
+CHeaderFooterController.prototype.Get_SelectionBounds = function()
+{
+    if (null !== this.CurHdrFtr)
+        return this.CurHdrFtr.Get_SelectionBounds();
+
+    return null;
 };
 
 

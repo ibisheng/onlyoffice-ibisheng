@@ -8243,7 +8243,7 @@ CDocument.prototype =
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
-            return this.HdrFtr.CurHdrFtr.Content.Get_SelectionBounds();
+            return this.HdrFtr.Get_SelectionBounds();
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
