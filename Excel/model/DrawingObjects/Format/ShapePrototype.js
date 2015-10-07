@@ -33,6 +33,12 @@ CShape.prototype.getTextArtTranslate = function()
 {
     return Asc["editor"].textArtTranslate;
 };
+
+CShape.prototype.isEmptyPlaceholder = function()
+{
+    return false;
+};
+
 CShape.prototype.getTextArtPreviewManager = function()
 {
     return Asc["editor"].textArtPreviewManager;
