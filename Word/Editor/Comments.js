@@ -1002,7 +1002,7 @@ ParaComment.prototype =
 
     Get_ParaPosByContentPos : function(ContentPos, Depth)
     {
-        return new CParaPos(StartRange, StartLine, 0, 0);
+        return new CParaPos(this.StartRange, this.StartLine, 0, 0);
     },
 //-----------------------------------------------------------------------------------
 // Функции пересчета

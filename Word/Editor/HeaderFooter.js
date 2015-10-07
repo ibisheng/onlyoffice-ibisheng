@@ -277,34 +277,34 @@ CHeaderFooter.prototype =
     Set_CurrentElement : function(bUpdateStates)
     {
         var PageIndex = -1;
-        
+
         for (var Key in this.Parent.Pages)
         {
             var PIndex = Key | 0;
-            if ( ( this === this.Parent.Pages[PIndex].Header || this === this.Parent.Pages[PIndex].Footer ) && ( -1 === PageIndex || PageIndex > PIndex ) )
+            if ((this === this.Parent.Pages[PIndex].Header || this === this.Parent.Pages[PIndex].Footer) && (-1 === PageIndex || PageIndex > PIndex))
                 PageIndex = PIndex;
         }
-        
-        if ( -1 === PageIndex )
-            return;
-        
-        this.Parent.CurHdrFtr     = this;
+
+        this.Parent.CurHdrFtr = this;
         this.Parent.WaitMouseDown = true;
-        this.Parent.CurPage       = PageIndex;
+        this.Parent.CurPage = PageIndex;
+
+        if (-1 === PageIndex)
+            this.RecalcInfo.CurPage = -1;
 
         var OldDocPosType = this.LogicDocument.CurPos.Type;
         this.LogicDocument.CurPos.Type = docpostype_HdrFtr;
 
-        if ( true === bUpdateStates )
+        if (true === bUpdateStates && -1 !== PageIndex)
         {
-            this.Set_Page( PageIndex );
-            
+            this.Set_Page(PageIndex);
+
             this.LogicDocument.Document_UpdateInterfaceState();
             this.LogicDocument.Document_UpdateRulersState();
             this.LogicDocument.Document_UpdateSelectionState();
         }
 
-        if ( docpostype_HdrFtr !== OldDocPosType )
+        if (docpostype_HdrFtr !== OldDocPosType)
         {
             this.DrawingDocument.ClearCachePages();
             this.DrawingDocument.FirePaint();
@@ -548,6 +548,13 @@ CHeaderFooter.prototype =
 
     Document_UpdateSelectionState : function()
     {
+        if (-1 === this.RecalcInfo.CurPage)
+        {
+            this.DrawingDocument.TargetEnd();
+            this.DrawingDocument.SelectEnabled(false);
+            return;
+        }
+
         if ( docpostype_DrawingObjects == this.Content.CurPos.Type )
         {
             return this.LogicDocument.DrawingObjects.documentUpdateSelectionState();
@@ -910,6 +917,9 @@ CHeaderFooter.prototype =
 
     Selection_Check : function(X, Y, Page_Abs, NearPos)
     {
+        if (-1 === this.RecalcInfo.CurPage)
+            return false;
+
         var HdrFtrPage = this.Content.Get_StartPage_Absolute();
         if ( undefined !== NearPos || HdrFtrPage === Page_Abs )
             return this.Content.Selection_Check( X, Y, Page_Abs, NearPos );
@@ -1151,6 +1161,10 @@ CHeaderFooter.prototype.Get_SectPr = function()
 CHeaderFooter.prototype.Set_ParagraphFramePr = function(FramePr, bDelete)
 {
     return this.Content.Set_ParagraphFramePr(FramePr, bDelete);
+};
+CHeaderFooter.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
+{
+    return this.Content.Get_RevisionsChangeParagraph(SearchEngine);
 };
 
 //-----------------------------------------------------------------------------------

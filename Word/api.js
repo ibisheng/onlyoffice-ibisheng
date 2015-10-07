@@ -7242,6 +7242,10 @@ asc_docs_api.prototype.asc_GetPrevRevisionsChange = function()
 {
     return this.WordControl.m_oLogicDocument.Get_PrevRevisionChange();
 };
+asc_docs_api.prototype.sync_UpdateRevisionsChangesPosition = function(X, Y)
+{
+    this.asc_fireCallback("asc_onUpdateRevisionsChangesPosition", X, Y);
+};
 
 function CRevisionsChange()
 {
@@ -7257,6 +7261,11 @@ function CRevisionsChange()
     this.Paragraph = null;
     this.StartPos  = null;
     this.EndPos    = null;
+
+    this._X       = 0;
+    this._Y       = 0;
+    this._PageNum = 0;
+    this._PosChanged = false;
 }
 CRevisionsChange.prototype.get_UserId = function(){return this.UserId;};
 CRevisionsChange.prototype.put_UserId = function(UserId){this.UserId = UserId;};
@@ -7277,7 +7286,41 @@ CRevisionsChange.prototype.put_XY    = function(X, Y){this.X = X; this.Y = Y;};
 CRevisionsChange.prototype.put_Value = function(Value){this.Value = Value;};
 CRevisionsChange.prototype.put_Paragraph = function(Para){this.Paragraph = Para;};
 CRevisionsChange.prototype.get_Paragraph = function(){return this.Paragraph;};
+CRevisionsChange.prototype.put_InternalPos = function(x, y, pageNum)
+{
+    if (this._PageNum !== pageNum
+        || Math.abs(this._X - x) > 0.001
+        || Math.abs(this._Y - y) > 0.001)
+    {
+        this._X = x;
+        this._Y = y;
+        this._PageNum = pageNum;
+        this._PosChanged = true;
+    }
+    else
+    {
+        this._PosChanged = false;
+    }
+};
+CRevisionsChange.prototype.get_InternalPosX = function()
+{
+    return this._X;
+};
+CRevisionsChange.prototype.get_InternalPosY = function()
+{
+    return this._Y;
+};
+CRevisionsChange.prototype.get_InternalPosPageNum = function()
+{
+    return this._PageNum;
+};
+CRevisionsChange.prototype.ComparePrevPosition = function()
+{
+    if (true === this._PosChanged)
+        return false;
 
+    return true;
+};
 
 asc_docs_api.prototype.asc_stopSaving = function () {
 	this.asc_IncrementCounterLongAction();

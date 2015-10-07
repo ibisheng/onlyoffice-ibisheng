@@ -95,7 +95,7 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
     this.StartState = null;
 
-    this.ReindexStartPos = -1;
+    this.ReindexStartPos = 0;
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );

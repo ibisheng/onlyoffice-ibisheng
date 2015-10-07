@@ -150,6 +150,22 @@ CSectionPr.prototype =
         return true;
     },
 
+    Get_AllHdrFtrs : function(HdrFtrs)
+    {
+        if (!HdrFtrs)
+            HdrFtrs = [];
+
+        if (null !== this.HeaderFirst) HdrFtrs.push(this.HeaderFirst);
+        if (null !== this.HeaderEven) HdrFtrs.push(this.HeaderEven);
+        if (null !== this.HeaderDefault) HdrFtrs.push(this.HeaderDefault);
+
+        if (null !== this.FooterFirst) HdrFtrs.push(this.FooterFirst);
+        if (null !== this.FooterEven) HdrFtrs.push(this.FooterEven);
+        if (null !== this.FooterDefault) HdrFtrs.push(this.FooterDefault);
+
+        return HdrFtrs;
+    },
+
     Compare_PageSize : function(OtherSectionPr)
     {
         var ThisPS = this.PageSize;

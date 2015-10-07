@@ -9289,12 +9289,15 @@ Paragraph.prototype =
         if (this.Is_TrackRevisions() && editor && this.bFromDocument)
         {
             var TrackManager = this.LogicDocument.Get_TrackRevisionsManager();
-            var TextTransform = this.Get_ParentTextTransform();
-
-            var ContentPos = this.Get_ParaContentPos(this.Selection.Use, true);
-            var ParaPos    = this.Get_ParaPosByContentPos(ContentPos);
-            var Page_abs   = this.Get_StartPage_Absolute() + ParaPos.Page;
-            var _Y         = this.Pages[ParaPos.Page].Y + this.Lines[ParaPos.Line].Top;
+            var _Y = 0, Page_abs = 0, TextTransform = undefined;
+            if (this.Pages.length > 0 && this.Lines.length > 0)
+            {
+                var ContentPos = this.Get_ParaContentPos(this.Selection.Use, true);
+                var ParaPos    = this.Get_ParaPosByContentPos(ContentPos);
+                Page_abs   = this.Get_StartPage_Absolute() + ParaPos.Page;
+                _Y         = this.Pages[ParaPos.Page].Y + this.Lines[ParaPos.Line].Top;
+                TextTransform = this.Get_ParentTextTransform();
+            }
             var _X         = (this.LogicDocument ? this.LogicDocument.Get_PageLimits(Page_abs).XLimit : 0);
             var Coords     = this.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, Page_abs, TextTransform);
 
@@ -13377,6 +13380,13 @@ Paragraph.prototype.Is_SelectedAll = function()
     var bEnd   = this.Selection_CheckParaEnd();
 
     return ((true === bStart && true === bEnd) || true === this.ApplyToAll ? true : false);
+};
+Paragraph.prototype.Get_HdrFtr = function()
+{
+    if (this.Parent)
+        return this.Parent.Is_HdrFtr(true);
+
+    return null;
 };
 
 var pararecalc_0_All  = 0;
