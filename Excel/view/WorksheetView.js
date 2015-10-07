@@ -8366,6 +8366,8 @@
 					//показываем плашку для отправки изображений на сервер
 					api.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 					
+					var oObjectsForDownload = GetObjectsForImageDownload(val._aPastedImages);
+					
 					var rData = {"id": api.documentId, "c":"imgurls", "vkey": api.documentVKey, "userid": api.documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": val._images};
 					api.fCurCallback = function(input) {
 						if(null != input && "imgurls" == input["type"]){
@@ -8381,9 +8383,18 @@
 										urls[elem.path] = elem.url;
 										var name = g_oDocumentUrls.imagePath2Local(elem.path);
 										aImagesSync.push(name);
-										var imageElem = val._aPastedImages[i];
+										var imageElem = oObjectsForDownload && oObjectsForDownload.aBuilderImagesByUrl && oObjectsForDownload.aBuilderImagesByUrl[i] ? oObjectsForDownload.aBuilderImagesByUrl[i] : null;
 										if(null != imageElem) {
-											imageElem.SetUrl(name);
+											if(imageElem.length)
+											{
+												for(var j = 0; j < imageElem.length; j++)
+												{	
+													if(imageElem[j])
+														imageElem[j].SetUrl(name);
+												}
+											}
+											else
+												imageElem.SetUrl(name);
 										}
 									}
 								}
