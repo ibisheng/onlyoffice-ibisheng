@@ -3780,12 +3780,12 @@
 				if(pasteData.images && pasteData.images.length)
 					this.isUsuallyPutImages = true;
 				
-				if(documentContent && documentContent.length)
-				{
-					var documentContentBounds = new Asc.DocumentContentBounds();
-					var coverDocument = documentContentBounds.getBounds(0,0, documentContent);
-					this._parseChildren(coverDocument, activeRange);
-				}
+				if(!documentContent || (documentContent && !documentContent.length))
+					return;
+				
+				var documentContentBounds = new Asc.DocumentContentBounds();
+				var coverDocument = documentContentBounds.getBounds(0,0, documentContent);
+				this._parseChildren(coverDocument, activeRange);
 				
 				this.aResult.fontsNew = this.fontsNew;
 				this.aResult.rowSpanSpCount = 0;
