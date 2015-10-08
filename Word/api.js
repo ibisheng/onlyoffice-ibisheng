@@ -778,7 +778,7 @@ asc_docs_api.prototype.asc_setLocale = function(val)
 {
 	this.InterfaceLocale = val;
 };
-asc_docs_api.prototype.LoadDocument = function() {
+asc_docs_api.prototype.LoadDocument = function(isVersionHistory) {
   this.CoAuthoringApi.auth(this.isViewMode);
 
   this.WordControl.m_oDrawingDocument.m_bIsOpeningDocument = true;
@@ -799,6 +799,11 @@ asc_docs_api.prototype.LoadDocument = function() {
       "embeddedfonts": this.isUseEmbeddedCutFonts,
       "viewmode": this.isViewMode
     };
+    if (isVersionHistory) {
+      //чтобы результат пришел только этому соединению, а не всем кто в документе
+      rData["userconnectionid"] = this.CoAuthoringApi.getUserConnectionId();
+    }
+
     this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
     sendCommand2(this, null, rData);
   } else {
@@ -7352,7 +7357,7 @@ asc_docs_api.prototype.asc_showRevision = function(newObj) {
     this.DocInfo.put_Url(this.VersionHistory.url);
     documentUrlChanges = this.VersionHistory.urlChanges;
     this.asc_setDocInfo(this.DocInfo);
-    this.LoadDocument();
+    this.LoadDocument(true);
   } else if (this.VersionHistory.currentChangeId < newObj.currentChangeId) {
     // Нужно только добавить некоторые изменения
     CollaborativeEditing.Clear_CollaborativeMarks();
