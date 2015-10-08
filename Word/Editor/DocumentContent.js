@@ -9490,12 +9490,7 @@ CDocumentContent.prototype.Set_ParagraphFramePr = function(FramePr, bDelete)
 };
 CDocumentContent.prototype.Accept_RevisionChanges = function(Type, bAll)
 {
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        // TODO: Реализовать
-        //this.DrawingObjects.Accept_RevisionChanges(Type, bAll);
-    }
-    else //if (docpostype_Content === this.CurPos.Type)
+    if (docpostype_Content === this.CurPos.Type || true === bAll)
     {
         if (true === this.Selection.Use || true === bAll)
         {
@@ -9557,15 +9552,14 @@ CDocumentContent.prototype.Accept_RevisionChanges = function(Type, bAll)
             }
         }
     }
+    else if (docpostype_DrawingObjects === this.CurPos.Type)
+    {
+        this.DrawingObjects.Accept_RevisionChanges(Type, bAll);
+    }
 };
 CDocumentContent.prototype.Reject_RevisionChanges = function(Type, bAll)
 {
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        // TODO: Реализовать
-        //this.DrawingObjects.Reject_RevisionChanges(Type, bAll);
-    }
-    else //if (docpostype_Content === this.CurPos.Type)
+    if (docpostype_Content === this.CurPos.Type || true === bAll)
     {
         if (true === this.Selection.Use || true === bAll)
         {
@@ -9591,7 +9585,7 @@ CDocumentContent.prototype.Reject_RevisionChanges = function(Type, bAll)
                 for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
                 {
                     var Element = this.Content[CurPos];
-                    if (type_Paragraph === Element.Get_Type() && true === Element.Is_SelectedAll() && true === Element.Have_PrChange())
+                    if (type_Paragraph === Element.Get_Type() && (true === Element.Is_SelectedAll() || true === bAll) && true === Element.Have_PrChange())
                     {
                         Element.Reject_PrChange();
                     }
@@ -9626,6 +9620,10 @@ CDocumentContent.prototype.Reject_RevisionChanges = function(Type, bAll)
                 }
             }
         }
+    }
+    else if (docpostype_DrawingObjects === this.CurPos.Type)
+    {
+        this.DrawingObjects.Reject_RevisionChanges(Type, bAll);
     }
 };
 CDocumentContent.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
@@ -9698,6 +9696,15 @@ CDocumentContent.prototype.Concat_Paragraphs = function(Pos)
         }
     }
 };
+CDocumentContent.prototype.Get_ElementsCount = function()
+{
+    return this.Content.length;
+};
+CDocumentContent.prototype.Get_ElementByIndex = function(Index)
+{
+    return this.Content[Index];
+};
+
 
 function CDocumentContentStartState(DocContent)
 {

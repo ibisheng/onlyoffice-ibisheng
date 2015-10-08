@@ -7195,41 +7195,17 @@ asc_docs_api.prototype.sync_AddRevisionsChange = function(Change)
 };
 asc_docs_api.prototype.asc_AcceptChanges = function(Change)
 {
-    History.Create_NewPoint();
-
     if (undefined !== Change)
-    {
         this.WordControl.m_oLogicDocument.Accept_RevisionChange(Change);
-    }
     else
-    {
-        var CurrentChange = this.WordControl.m_oLogicDocument.Get_TrackRevisionsManager().Get_CurrentChange();
-        if (null !== CurrentChange)
-            this.WordControl.m_oLogicDocument.Accept_RevisionChange(CurrentChange);
-        else
-            this.WordControl.m_oLogicDocument.Accept_RevisionChanges(undefined, false);
-
-        this.asc_GetNextRevisionsChange();
-    }
+        this.WordControl.m_oLogicDocument.Accept_RevisionChangesBySelection();
 };
 asc_docs_api.prototype.asc_RejectChanges = function(Change)
 {
-    History.Create_NewPoint();
-
     if (undefined !== Change)
-    {
         this.WordControl.m_oLogicDocument.Reject_RevisionChange(Change);
-    }
     else
-    {
-        var CurrentChange = this.WordControl.m_oLogicDocument.Get_TrackRevisionsManager().Get_CurrentChange();
-        if (null !== CurrentChange)
-            this.WordControl.m_oLogicDocument.Reject_RevisionChange(CurrentChange);
-        else
-            this.WordControl.m_oLogicDocument.Reject_RevisionChanges(undefined, false);
-
-        this.asc_GetNextRevisionsChange();
-    }
+        this.WordControl.m_oLogicDocument.Reject_RevisionChangesBySelection();
 };
 asc_docs_api.prototype.asc_HaveRevisionsChanges = function()
 {
@@ -7250,6 +7226,14 @@ asc_docs_api.prototype.asc_GetPrevRevisionsChange = function()
 asc_docs_api.prototype.sync_UpdateRevisionsChangesPosition = function(X, Y)
 {
     this.asc_fireCallback("asc_onUpdateRevisionsChangesPosition", X, Y);
+};
+asc_docs_api.prototype.asc_AcceptAllChanges = function()
+{
+    this.WordControl.m_oLogicDocument.Accept_AllRevisionChanges();
+};
+asc_docs_api.prototype.asc_RejectAllChanges = function()
+{
+    this.WordControl.m_oLogicDocument.Reject_AllRevisionChanges();
 };
 
 function CRevisionsChange()

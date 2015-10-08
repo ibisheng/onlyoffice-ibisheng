@@ -2228,7 +2228,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Check_RevisionsChanges = fun
 };
 CParagraphContentWithParagraphLikeContent.prototype.Accept_RevisionChanges = function(Type, bAll)
 {
-    if (true === this.Selection.Use)
+    if (true === this.Selection.Use || true === bAll)
     {
         var StartPos = this.Selection.StartPos;
         var EndPos   = this.Selection.EndPos;
@@ -2236,6 +2236,12 @@ CParagraphContentWithParagraphLikeContent.prototype.Accept_RevisionChanges = fun
         {
             StartPos = this.Selection.EndPos;
             EndPos   = this.Selection.StartPos;
+        }
+
+        if (true === bAll)
+        {
+            StartPos = 0;
+            EndPos   = this.Content.length - 1;
         }
 
         // Начинаем с конца, потому что при выполнении данной функции, количество элементов может изменяться
@@ -2248,7 +2254,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Accept_RevisionChanges = fun
 };
 CParagraphContentWithParagraphLikeContent.prototype.Reject_RevisionChanges = function(Type, bAll)
 {
-    if (true === this.Selection.Use)
+    if (true === this.Selection.Use || true === bAll)
     {
         var StartPos = this.Selection.StartPos;
         var EndPos   = this.Selection.EndPos;
@@ -2256,6 +2262,12 @@ CParagraphContentWithParagraphLikeContent.prototype.Reject_RevisionChanges = fun
         {
             StartPos = this.Selection.EndPos;
             EndPos   = this.Selection.StartPos;
+        }
+
+        if (true === bAll)
+        {
+            StartPos = 0;
+            EndPos   = this.Content.length - 1;
         }
 
         // Начинаем с конца, потому что при выполнении данной функции, количество элементов может изменяться

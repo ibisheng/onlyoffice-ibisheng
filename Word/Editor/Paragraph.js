@@ -407,6 +407,11 @@ Paragraph.prototype =
                 }
             }
         }
+        else if (true === Props.Selected)
+        {
+            if (true === this.Selection.Use)
+                ParaArray.push(this);
+        }
     },
 
     Get_PageBounds : function(PageIndex)
@@ -13308,7 +13313,7 @@ Paragraph.prototype.Accept_RevisionChanges = function(Type, bAll)
 };
 Paragraph.prototype.Reject_RevisionChanges = function(Type, bAll)
 {
-    if (true === this.Selection.Use)
+    if (true === this.Selection.Use || true === bAll)
     {
         var StartPos = this.Selection.StartPos;
         var EndPos   = this.Selection.EndPos;
@@ -13316,6 +13321,12 @@ Paragraph.prototype.Reject_RevisionChanges = function(Type, bAll)
         {
             StartPos = this.Selection.EndPos;
             EndPos   = this.Selection.StartPos;
+        }
+
+        if (true === bAll)
+        {
+            StartPos = 0;
+            EndPos   = this.Content.length - 1;
         }
 
         // TODO: Как переделаем ParaEnd переделать здесь
