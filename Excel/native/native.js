@@ -1802,6 +1802,9 @@ function OfflineEditor () {
         this.asc_WriteAllWorksheets(true);
 
         window["NativeSupportTimeouts"] = true;
+
+        _api.wb.showWorksheet(undefined, false, true);
+        _api.wb.getWorksheet()._fixSelectionOfMergedCells();
     };
     this.registerEventsHandlers = function () {
 
@@ -2305,9 +2308,10 @@ function offline_mouse_down(x, y, pin) {
 
     var ws = _api.wb.getWorksheet();
     var wb = _api.wb;
+    ws.objectRender.drawingArea.reinitRanges();
     var graphicsInfo = wb._onGetGraphicsInfo(x, y);
     if (graphicsInfo) {
-        console.log('drawing onclick: ' + graphicsInfo.id);
+        //console.log('drawing onclick: ' + graphicsInfo.id);
 
         var e = {Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
         wb._onGraphicObjectMouseDown(e, x, y);
@@ -2775,6 +2779,12 @@ function offline_apply_event(type,params) {
         }
 
         // add objects
+
+        case 50:  // ASC_MENU_EVENT_TYPE_INSERT_IMAGE
+        {
+            _s.offline_addImageDrawingObject(params[0], {width: params[1], height: params[2]});
+            break;
+        }
 
         case 53:  // ASC_MENU_EVENT_TYPE_INSERT_SHAPE
         {
