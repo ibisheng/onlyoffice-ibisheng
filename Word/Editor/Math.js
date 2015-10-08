@@ -1203,10 +1203,13 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var ParaRange = PRS.Range;
     var Page      = this.AbsolutePage + PRS.Page;
 
-    var PrevLineObject = PRS.RestartPageRecalcInfo.Object;
+
     var bStartRange    = this.Root.IsStartRange(ParaLine, ParaRange);
 
     // первый пересчет
+    var PrevLineObject = PRS.RestartPageRecalcInfo.Object;
+    var PrevObject = PrevLineObject == null || this.Id == PrevLineObject.Id ? null : PrevLineObject;
+
     if(PrevLineObject == null && true == bStartRange && PRS.bFastRecalculate == false)
     {
         // информация о пересчете
@@ -1323,6 +1326,11 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
             this.ParaMathRPI.ClearRecalculate();
         }
+    }
+
+    if(PRS.NewRange == false)
+    {
+        PRS.RestartPageRecalcInfo.Object = PrevObject; // возвращаем формулу, которая инициировала пересчет (если это была текущая формула, то null)
     }
 
 };
