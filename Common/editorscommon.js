@@ -718,8 +718,10 @@ function InitDragAndDrop (oHtmlElement, callback) {
 }
 function UploadImageFiles (files, documentId, documentUserId, callback) {
 	if (files.length > 0) {
+		var file = files[0];
 		var xhr = new XMLHttpRequest();
-		xhr.open('POST', g_sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex());
+		xhr.open('POST', g_sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex(), true);
+		xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
 		xhr.onreadystatechange = function() {
 			if (4 == this.readyState) {
 				if((this.status == 200 || this.status == 1223)) {
@@ -737,7 +739,7 @@ function UploadImageFiles (files, documentId, documentUserId, callback) {
 					callback(c_oAscError.ID.Unknown);
 			}
 		};
-		xhr.send(files[0]);
+		xhr.send(file);
 	} else {
 		callback(c_oAscError.ID.Unknown);
 	}
