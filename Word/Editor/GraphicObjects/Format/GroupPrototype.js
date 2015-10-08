@@ -156,11 +156,6 @@ CGroupShape.prototype.recalculate = function()
             this.recalculateArrGraphicObjects();
             this.recalcInfo.recalculateArrGraphicObjects = false;
         }
-        if(this.recalcInfo.recalculateWrapPolygon)
-        {
-            this.recalculateWrapPolygon();
-            this.recalcInfo.recalculateWrapPolygon = false;
-        }
         for(var i = 0; i < this.spTree.length; ++i)
         {
             this.spTree[i].recalculate();
@@ -169,6 +164,11 @@ CGroupShape.prototype.recalculate = function()
         {
             this.recalculateBounds();
             this.recalcInfo.recalculateBounds = false;
+        }
+        if(this.recalcInfo.recalculateWrapPolygon)
+        {
+            this.recalculateWrapPolygon();
+            this.recalcInfo.recalculateWrapPolygon = false;
         }
     }, this, []);
 };
