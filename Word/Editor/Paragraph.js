@@ -9291,7 +9291,7 @@ Paragraph.prototype =
                 this.Content[this.CurPos.ContentPos].Document_UpdateInterfaceState();
         }
 
-        if (this.Is_TrackRevisions() && editor && this.bFromDocument)
+        if (editor && this.bFromDocument)
         {
             var TrackManager = this.LogicDocument.Get_TrackRevisionsManager();
             var _Y = 0, Page_abs = 0, TextTransform = undefined;

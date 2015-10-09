@@ -1420,7 +1420,7 @@ CHeaderFooterController.prototype =
                 Header.Reset( X, Y, XLimit, YLimit );
                 bRecalcHeader = Header.Recalculate(PageIndex, SectPr);
             }
-            else 
+            else
             {
                if ( -1 === Header.RecalcInfo.CurPage )
                     Header.Set_Page(PageIndex);
@@ -2367,16 +2367,6 @@ CHeaderFooterController.prototype.Set_ParagraphFramePr = function(FramePr, bDele
 {
     if (null !== this.CurHdrFtr)
         this.CurHdrFtr.Set_ParagraphFramePr(FramePr, bDelete);
-};
-CHeaderFooterController.prototype.Accept_RevisionChanges = function(Type, bAll)
-{
-    if (null !== this.CurHdrFtr)
-        this.CurHdrFtr.Content.Accept_RevisionChanges(Type, bAll);
-};
-CHeaderFooterController.prototype.Reject_RevisionChanges = function(Type, bAll)
-{
-    if (null !== this.CurHdrFtr)
-        this.CurHdrFtr.Content.Reject_RevisionChanges(Type, bAll);
 };
 CHeaderFooterController.prototype.Get_SelectionBounds = function()
 {

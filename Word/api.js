@@ -2337,43 +2337,6 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile, txtOptions) {//пер
 		t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 	});
 };
-asc_docs_api.prototype.asc_DownloadAsMailMerge = function(typeFile, StartIndex, EndIndex, bIsDownload) {
-	var oDocumentMailMerge = this.WordControl.m_oLogicDocument.Get_MailMergedDocument(StartIndex, EndIndex);
-	if(null != oDocumentMailMerge){
-		var actionType = c_oAscAsyncAction.DownloadMerge;
-		if(bIsDownload)
-			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
-		var t = this;
-		// Меняем тип состояния (на сохранение)
-		this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
-		_downloadAs(this, "save", oDocumentMailMerge, null, null, typeFile, function (input) {
-			if(null != input && "save" == input["type"]) {
-				if('ok' == input["status"]){
-					var url = input["data"];
-					if(url) {
-						if(bIsDownload) {
-							t.processSavedFile(url, false);
-						} else {
-							t.asc_fireCallback("asc_onSaveMailMerge", url);
-						}
-					} else {
-						t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-					}
-				} else {
-					t.asc_fireCallback("asc_onError", c_oAscError.ID.MailMergeSaveFile, c_oAscError.Level.NoCritical);
-				}
-			} else {
-				t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-			}
-			if(bIsDownload) {
-				t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
-			}
-			// Меняем тип состояния (на никакое)
-			t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
-		});
-	}
-	return null != oDocumentMailMerge ? true : false;
-};
 asc_docs_api.prototype.Resize = function(){
 	if (false === this.bInit_word_control)
 		return;
@@ -7014,227 +6977,60 @@ asc_docs_api.prototype.asc_AddMath2 = function(Type)
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с MailMerge
 //----------------------------------------------------------------------------------------------------------------------
-asc_docs_api.prototype.asc_StartMailMerge = function(oData)
-{
-	this.mailMergeFileData = oData;
-	this.asc_DownloadAs(c_oAscFileType.JSON);
-};
-asc_docs_api.prototype.asc_StartMailMergeByList = function(aList)
-{
-    if (!aList || !aList.length || aList.length <= 1)
-        return;
-
-    var aFields = aList[0];
-    if (!aFields || !aFields.length || aFields.length <= 0)
-        return;
-
-    // Пробегаемся по названиям полей и делаем следующее:
-    // Если название пустой, тогда задем ему имя "F<номер столбца>"
-    // Если название совпадает, тогда добавляем ему число, чтобы имя стало уникальным.
-
-    var UsedNames = {};
-    for (var Pos = 0, Count = aFields.length; Pos < Count; Pos++)
-    {
-        if ("" === aFields[Pos])
-            aFields[Pos] = "F" + (Pos + 1);
-
-        if (undefined !==  UsedNames[aFields[Pos]])
-        {
-            var Add = 1;
-            var NewName = aFields[Pos] + Add;
-            while (undefined !== UsedNames[NewName])
-            {
-                Add++;
-                NewName = aFields[Pos] + Add;
-            }
-            aFields[Pos] = NewName;
-        }
-
-        UsedNames[aFields[Pos]] = 1;
-    }
-
-    var DstList = [];
-    var FieldsCount = aFields.length;
-    for (var Index = 1, Count = aList.length ; Index < Count; Index++)
-    {
-        var oSrcElement = aList[Index];
-        var oDstElement = {};
-        for (var FieldIndex = 0; FieldIndex < FieldsCount; FieldIndex++)
-        {
-            var sFieldName = aFields[FieldIndex];
-            oDstElement[sFieldName] = oSrcElement[FieldIndex];
-        }
-
-        DstList.push(oDstElement);
-    }
-
-	this.WordControl.m_oLogicDocument.Start_MailMerge(DstList);
-};
-asc_docs_api.prototype.asc_GetReceptionsCount = function()
-{
-    return this.WordControl.m_oLogicDocument.Get_MailMergeReceptionsCount();
-};
-asc_docs_api.prototype.asc_GetMailMergeFieldsNameList = function()
-{
-    return this.WordControl.m_oLogicDocument.Get_MailMergeFieldsNameList();
-};
-asc_docs_api.prototype.asc_AddMailMergeField = function(Name)
-{
-    this.WordControl.m_oLogicDocument.Add_MailMergeField(Name);
-};
-asc_docs_api.prototype.asc_SetHighlightMailMergeFields = function(Value)
-{
-    this.WordControl.m_oLogicDocument.Set_HightlightMailMergeFields(Value);
-};
-asc_docs_api.prototype.asc_PreviewMailMergeResult = function(Index)
-{
-    this.WordControl.m_oLogicDocument.Preview_MailMergeResult(Index);
-};
-asc_docs_api.prototype.asc_EndPreviewMailMergeResult = function()
-{
-    this.WordControl.m_oLogicDocument.EndPreview_MailMergeResult();
-};
-asc_docs_api.prototype.sync_StartMailMerge = function()
-{
-    this.asc_fireCallback("asc_onStartMailMerge");
-};
-asc_docs_api.prototype.sync_PreviewMailMergeResult = function(Index)
-{
-    this.asc_fireCallback("asc_onPreviewMailMergeResult", Index);
-};
-asc_docs_api.prototype.sync_EndPreviewMailMergeResult = function()
-{
-    this.asc_fireCallback("asc_onEndPreviewMailMergeResult");
-};
-asc_docs_api.prototype.sync_HighlightMailMergeFields = function(Value)
-{
-    this.asc_fireCallback("asc_onHighlightMailMergeFields", Value);
-};
-asc_docs_api.prototype.asc_getMailMergeData = function()
-{
-    return this.WordControl.m_oLogicDocument.Get_MailMergeReceptionsList();
-};
-asc_docs_api.prototype.asc_setMailMergeData = function(aList)
-{
-    this.asc_StartMailMergeByList(aList);
-};
-asc_docs_api.prototype.asc_sendMailMergeData = function(oData)
-{
-	var actionType = c_oAscAsyncAction.SendMailMerge;
-	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
-
-	oData.put_UserId(documentUserId);
-	oData.put_RecordCount(oData.get_RecordTo() - oData.get_RecordFrom() + 1);
-	var t = this;
-	_downloadAs(this, "sendmm", null, oData, null, c_oAscFileType.TXT, null, function(input){
-		if(null != input && "sendmm" == input["type"]) {
-			if("ok" == input["status"]) {
-				;
-			} else {
-				t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-			}
-		} else {
-			t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-		}
-		t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
-	});
-};
-asc_docs_api.prototype.asc_GetMailMergeFiledValue = function(nIndex, sName)
-{
-    return this.WordControl.m_oLogicDocument.Get_MailMergeFileldValue(nIndex, sName);
-};
+asc_docs_api.prototype.asc_StartMailMerge = function(oData){};
+asc_docs_api.prototype.asc_StartMailMergeByList = function(aList){};
+asc_docs_api.prototype.asc_GetReceptionsCount = function(){};
+asc_docs_api.prototype.asc_GetMailMergeFieldsNameList = function(){};
+asc_docs_api.prototype.asc_AddMailMergeField = function(Name){};
+asc_docs_api.prototype.asc_SetHighlightMailMergeFields = function(Value){};
+asc_docs_api.prototype.asc_PreviewMailMergeResult = function(Index){};
+asc_docs_api.prototype.asc_EndPreviewMailMergeResult = function(){};
+asc_docs_api.prototype.sync_StartMailMerge = function(){};
+asc_docs_api.prototype.sync_PreviewMailMergeResult = function(Index){};
+asc_docs_api.prototype.sync_EndPreviewMailMergeResult = function(){};
+asc_docs_api.prototype.sync_HighlightMailMergeFields = function(Value){};
+asc_docs_api.prototype.asc_getMailMergeData = function(){};
+asc_docs_api.prototype.asc_setMailMergeData = function(aList){};
+asc_docs_api.prototype.asc_sendMailMergeData = function(oData){};
+asc_docs_api.prototype.asc_GetMailMergeFiledValue = function(nIndex, sName){};
 //----------------------------------------------------------------------------------------------------------------------
 // Работаем со стилями
 //----------------------------------------------------------------------------------------------------------------------
 asc_docs_api.prototype.asc_GetStyleFromFormatting = function()
 {
-    return this.WordControl.m_oLogicDocument.Get_StyleFromFormatting();
 };
 asc_docs_api.prototype.asc_AddNewStyle = function(oStyle)
 {
-    this.WordControl.m_oLogicDocument.Add_NewStyle(oStyle);
 };
 asc_docs_api.prototype.asc_RemoveStyle = function(sName)
 {
-    this.WordControl.m_oLogicDocument.Remove_Style(sName);
 };
 asc_docs_api.prototype.asc_RemoveAllCustomStyles = function()
 {
-    this.WordControl.m_oLogicDocument.Remove_AllCustomStyles();
 };
 asc_docs_api.prototype.asc_IsStyleDefault = function(sName)
 {
-    return this.WordControl.m_oLogicDocument.Is_StyleDefault(sName);
 };
 asc_docs_api.prototype.asc_IsDefaultStyleChanged = function(sName)
 {
-    return this.WordControl.m_oLogicDocument.Is_DefaultStyleChanged(sName);
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Работаем с рецензированием
 //----------------------------------------------------------------------------------------------------------------------
-asc_docs_api.prototype.asc_SetTrackRevisions = function(bTrack)
-{
-    return this.WordControl.m_oLogicDocument.Set_TrackRevisions(bTrack);
-};
-asc_docs_api.prototype.asc_IsTrackResivisions = function()
-{
-    return this.WordControl.m_oLogicDocument.Is_TrackRevisions();
-};
-asc_docs_api.prototype.sync_BeginCatchRevisionsChanges = function()
-{
-    this.RevisionChangesStack = [];
-};
-asc_docs_api.prototype.sync_EndCatchRevisionsChanges = function()
-{
-    this.asc_fireCallback("asc_onShowRevisionsChange", this.RevisionChangesStack);
-};
-asc_docs_api.prototype.sync_AddRevisionsChange = function(Change)
-{
-    this.RevisionChangesStack.push(Change);
-};
-asc_docs_api.prototype.asc_AcceptChanges = function(Change)
-{
-    if (undefined !== Change)
-        this.WordControl.m_oLogicDocument.Accept_RevisionChange(Change);
-    else
-        this.WordControl.m_oLogicDocument.Accept_RevisionChangesBySelection();
-};
-asc_docs_api.prototype.asc_RejectChanges = function(Change)
-{
-    if (undefined !== Change)
-        this.WordControl.m_oLogicDocument.Reject_RevisionChange(Change);
-    else
-        this.WordControl.m_oLogicDocument.Reject_RevisionChangesBySelection();
-};
-asc_docs_api.prototype.asc_HaveRevisionsChanges = function()
-{
-    this.WordControl.m_oLogicDocument.Have_RevisionChanges();
-};
-asc_docs_api.prototype.asc_HaveNewRevisionsChanges = function()
-{
-    return this.asc_HaveRevisionsChanges();
-};
-asc_docs_api.prototype.asc_GetNextRevisionsChange = function()
-{
-    return this.WordControl.m_oLogicDocument.Get_NextRevisionChange();
-};
-asc_docs_api.prototype.asc_GetPrevRevisionsChange = function()
-{
-    return this.WordControl.m_oLogicDocument.Get_PrevRevisionChange();
-};
-asc_docs_api.prototype.sync_UpdateRevisionsChangesPosition = function(X, Y)
-{
-    this.asc_fireCallback("asc_onUpdateRevisionsChangesPosition", X, Y);
-};
-asc_docs_api.prototype.asc_AcceptAllChanges = function()
-{
-    this.WordControl.m_oLogicDocument.Accept_AllRevisionChanges();
-};
-asc_docs_api.prototype.asc_RejectAllChanges = function()
-{
-    this.WordControl.m_oLogicDocument.Reject_AllRevisionChanges();
-};
+asc_docs_api.prototype.asc_SetTrackRevisions = function(bTrack){};
+asc_docs_api.prototype.asc_IsTrackResivisions = function(){return false;};
+asc_docs_api.prototype.sync_BeginCatchRevisionsChanges = function(){};
+asc_docs_api.prototype.sync_EndCatchRevisionsChanges = function(){};
+asc_docs_api.prototype.sync_AddRevisionsChange = function(Change){};
+asc_docs_api.prototype.asc_AcceptChanges = function(Change){};
+asc_docs_api.prototype.asc_RejectChanges = function(Change){};
+asc_docs_api.prototype.asc_HaveRevisionsChanges = function(){return false};
+asc_docs_api.prototype.asc_HaveNewRevisionsChanges = function(){return false};
+asc_docs_api.prototype.asc_GetNextRevisionsChange = function(){};
+asc_docs_api.prototype.asc_GetPrevRevisionsChange = function(){};
+asc_docs_api.prototype.sync_UpdateRevisionsChangesPosition = function(X, Y){};
+asc_docs_api.prototype.asc_AcceptAllChanges = function(){};
+asc_docs_api.prototype.asc_RejectAllChanges = function(){};
 
 function CRevisionsChange()
 {

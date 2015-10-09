@@ -115,7 +115,6 @@
                 "../../Word/Editor/SerializeCommon.js",
                 "../../Word/apiDefines.js",
                 "../../Word/api.js",
-                "../../Word/Private/api.js",
                 "../../Word/apiCommon.js",
                 "../../Word/apiExport.js",
                 "../../Word/document/empty.js",
@@ -139,7 +138,12 @@
                 "../../Excel/model/Workbook.js",
                 "../../Excel/model/CellInfo.js",
                 "../../Common/AdvancedOptions.js",
-                "../../Common/Locks.js"
+                "../../Common/Locks.js",
+
+                "../../Word/Private/api.js",
+				"../../Word/Private/StyleManager.js",
+				"../../Word/Private/MailMerge.js",
+				"../../Word/Private/TrackRevisions.js"
             ],
             "dst": "../../Word/sdk-all.js",
             "externs": [

@@ -1575,6 +1575,12 @@ var historydescription_Document_AddNewStyle                        = 0x0123;
 var historydescription_Document_RemoveStyle                        = 0x0124;
 var historydescription_Document_AddTextArt                         = 0x0125;
 var historydescription_Document_RemoveAllCustomStyles              = 0x0126;
+var historydescription_Document_AcceptAllRevisionChanges           = 0x0127;
+var historydescription_Document_RejectAllRevisionChanges           = 0x0128;
+var historydescription_Document_AcceptRevisionChange               = 0x0129;
+var historydescription_Document_RejectRevisionChange               = 0x012a;
+var historydescription_Document_AcceptRevisionChangesBySelection   = 0x012b;
+var historydescription_Document_RejectRevisionChangesBySelection   = 0x012c;
 
 
 
@@ -1881,6 +1887,13 @@ function Get_HistoryPointStringDescription(nDescription)
         case historydescription_Document_RemoveStyle                        : sString = "Document_RemoveStyle                       "; break;
         case historydescription_Document_AddTextArt                         : sString = "Document_AddTextArt                        "; break;
         case historydescription_Document_RemoveAllCustomStyles              : sString = "Document_RemoveAllCustomStyles             "; break;
+        case historydescription_Document_AcceptAllRevisionChanges           : sString = "Document_AcceptAllRevisionChanges          "; break;
+        case historydescription_Document_RejectAllRevisionChanges           : sString = "Document_RejectAllRevisionChanges          "; break;
+        case historydescription_Document_AcceptRevisionChange               : sString = "Document_AcceptRevisionChange              "; break;
+        case historydescription_Document_RejectRevisionChange               : sString = "Document_RejectRevisionChange              "; break;
+        case historydescription_Document_AcceptRevisionChangesBySelection   : sString = "Document_AcceptRevisionChangesBySelection  "; break;
+        case historydescription_Document_RejectRevisionChangesBySelection   : sString = "Document_RejectRevisionChangesBySelection  "; break;
+
     }
     return sString;
 }

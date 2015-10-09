@@ -2224,7 +2224,6 @@ CParagraphContentWithParagraphLikeContent.prototype.Check_RevisionsChanges = fun
         ContentPos.Update(CurPos, Depth);
         this.Content[CurPos].Check_RevisionsChanges(Checker, ContentPos, Depth + 1);
     }
-
 };
 CParagraphContentWithParagraphLikeContent.prototype.Accept_RevisionChanges = function(Type, bAll)
 {
