@@ -6996,24 +6996,12 @@ asc_docs_api.prototype.asc_GetMailMergeFiledValue = function(nIndex, sName){};
 //----------------------------------------------------------------------------------------------------------------------
 // Работаем со стилями
 //----------------------------------------------------------------------------------------------------------------------
-asc_docs_api.prototype.asc_GetStyleFromFormatting = function()
-{
-};
-asc_docs_api.prototype.asc_AddNewStyle = function(oStyle)
-{
-};
-asc_docs_api.prototype.asc_RemoveStyle = function(sName)
-{
-};
-asc_docs_api.prototype.asc_RemoveAllCustomStyles = function()
-{
-};
-asc_docs_api.prototype.asc_IsStyleDefault = function(sName)
-{
-};
-asc_docs_api.prototype.asc_IsDefaultStyleChanged = function(sName)
-{
-};
+asc_docs_api.prototype.asc_GetStyleFromFormatting = function(){return null;};
+asc_docs_api.prototype.asc_AddNewStyle = function(oStyle){};
+asc_docs_api.prototype.asc_RemoveStyle = function(sName){};
+asc_docs_api.prototype.asc_RemoveAllCustomStyles = function(){};
+asc_docs_api.prototype.asc_IsStyleDefault = function(sName){return true;};
+asc_docs_api.prototype.asc_IsDefaultStyleChanged = function(sName){return false;};
 //----------------------------------------------------------------------------------------------------------------------
 // Работаем с рецензированием
 //----------------------------------------------------------------------------------------------------------------------

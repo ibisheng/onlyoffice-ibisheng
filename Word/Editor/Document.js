@@ -14597,6 +14597,13 @@ CDocument.prototype.Get_ElementByIndex = function(Index)
 {
     return this.Content[Index];
 };
+
+//-----------------------------------------------------------------------------------
+// Private
+//-----------------------------------------------------------------------------------
+CDocument.prototype.EndPreview_MailMergeResult = function(){};
+CDocument.prototype.Continue_TrackRevisions = function(){};
+
 //-----------------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------------
