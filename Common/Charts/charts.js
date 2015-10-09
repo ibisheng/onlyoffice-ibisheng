@@ -815,6 +815,8 @@ TextArtPreviewManager.prototype.getShape =  function()
 	var oTrack = new NewShapeTrack("textRect", 0, 0, oParentObjects.theme, oParentObjects.master, oParentObjects.layout, oParentObjects.slide, 0);
 	oTrack.track({}, oShape.convertPixToMM(this.canvasWidth), oShape.convertPixToMM(this.canvasHeight));
 	oShape = oTrack.getShape(bWord, oShape.getDrawingDocument(), oShape.drawingObjects);
+    oShape.setStyle(null);
+    oShape.spPr.setFill(CreateUnfilFromRGB(255, 255, 255));
 	var oBodypr = oShape.getBodyPr().createDuplicate();
 	oBodypr.lIns = 0;
 	oBodypr.tIns = 0;

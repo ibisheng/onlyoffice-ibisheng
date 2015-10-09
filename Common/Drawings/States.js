@@ -25,7 +25,18 @@ StartAddNewShape.prototype =
         this.startX = x;
         this.startY = y;
         this.drawingObjects.arrPreTrackObjects.length = 0;
-        this.drawingObjects.arrPreTrackObjects.push(new NewShapeTrack(this.preset, x, y, this.drawingObjects.getTheme(), null, null, null, 0));
+        var layout = null, master = null, slide = null;
+        if(this.drawingObjects.drawingObjects && this.drawingObjects.drawingObjects.cSld &&  this.drawingObjects.drawingObjects.getParentObjects)
+        {
+            var oParentObjects = this.drawingObjects.drawingObjects.getParentObjects();
+            if(isRealObject(oParentObjects))
+            {
+                layout = oParentObjects.layout;
+                master = oParentObjects.master;
+                slide = oParentObjects.slide;
+            }
+        }
+        this.drawingObjects.arrPreTrackObjects.push(new NewShapeTrack(this.preset, x, y, this.drawingObjects.getTheme(), master, layout, slide, 0));
         this.bStart = true;
         this.drawingObjects.swapTrackObjects();
     },

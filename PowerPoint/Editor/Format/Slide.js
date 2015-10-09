@@ -885,6 +885,20 @@ Slide.prototype =
         }
     },
 
+    getParentObjects: function()
+    {
+        var oRet = {master: null, layout: null, slide: this};
+        if(this.Layout)
+        {
+            oRet.layout = this.Layout;
+            if(this.Layout.Master)
+            {
+                oRet.master = this.Layout.Master;
+            }
+        }
+        return oRet;
+    },
+
     getAllImages: function(images)
     {
         if(this.cSld.Bg && this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill && this.cSld.Bg.bgPr.Fill.fill instanceof  CBlipFill && typeof this.cSld.Bg.bgPr.Fill.fill.RasterImageId === "string" )

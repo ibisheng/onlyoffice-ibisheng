@@ -78,6 +78,11 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             fill.fill.color.color.id = 12;
             pen.merge(ln);
             brush.merge(fill);
+            if(slide)
+            {
+                brush = CreateNoFillUniFill();
+                pen = CreateNoFillLine();
+            }
         }
 
         if(this.arrowsCount > 0)
