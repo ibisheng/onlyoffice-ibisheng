@@ -1381,6 +1381,1334 @@ function asc_menu_WriteFontFamily(_type, _family, _stream) {
 
     _stream["WriteByte"](255);
 }
+function asc_menu_ReadAscFill_solid(_params, _cursor){
+    var _fill = new asc_CFillSolid();
+
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _fill.color = asc_menu_ReadColor(_params, _cursor);
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+
+    return _fill;
+}
+function asc_menu_WriteAscFill_solid(_type, _fill, _stream){
+    if (!_fill)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    asc_menu_WriteColor(0, _fill.color, _stream);
+
+    _stream["WriteByte"](255);
+}
+function asc_menu_ReadAscFill_patt(_params, _cursor){
+    var _fill = new asc_CFillHatch();
+
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _fill.PatternType = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                _fill.bgClr = asc_menu_ReadColor(_params, _cursor);
+                break;
+            }
+            case 2:
+            {
+                _fill.fgClr = asc_menu_ReadColor(_params, _cursor);
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+
+    return _fill;
+}
+function asc_menu_WriteAscFill_patt(_type, _fill, _stream){
+    if (!_fill)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_fill.PatternType !== undefined && _fill.PatternType !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteLong"](_fill.PatternType);
+    }
+
+    asc_menu_WriteColor(1, _fill.bgClr, _stream);
+    asc_menu_WriteColor(2, _fill.fgClr, _stream);
+
+    _stream["WriteByte"](255);
+}
+function asc_menu_ReadAscFill_grad(_params, _cursor){
+    var _fill = new asc_CFillGrad();
+
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _fill.GradType = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                _fill.LinearAngle = _params[_cursor.pos++];
+                break;
+            }
+            case 2:
+            {
+                _fill.LinearScale = _params[_cursor.pos++];
+                break;
+            }
+            case 3:
+            {
+                _fill.PathType = _params[_cursor.pos++];
+                break;
+            }
+            case 4:
+            {
+                var _count = _params[_cursor.pos++];
+
+                if (_count > 0)
+                {
+                    _fill.Colors = [];
+                    _fill.Positions = [];
+                }
+                for (var i = 0; i < _count; i++)
+                {
+                    _fill.Colors[i] = null;
+                    _fill.Positions[i] = null;
+
+                    var _continue2 = true;
+                    while (_continue2)
+                    {
+                        var _attr2 = _params[_cursor.pos++];
+                        switch (_attr2)
+                        {
+                            case 0:
+                            {
+                                _fill.Colors[i] = asc_menu_ReadColor(_params, _cursor);
+                                break;
+                            }
+                            case 1:
+                            {
+                                _fill.Positions[i] = _params[_cursor.pos++];
+                                break;
+                            }
+                            case 255:
+                            default:
+                            {
+                                _continue2 = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+
+    return _fill;
+}
+function asc_menu_WriteAscFill_grad(_type, _fill, _stream){
+    if (!_fill)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_fill.GradType !== undefined && _fill.GradType !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteLong"](_fill.GradType);
+    }
+
+    if (_fill.LinearAngle !== undefined && _fill.LinearAngle !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteDouble2"](_fill.LinearAngle);
+    }
+
+    if (_fill.LinearScale !== undefined && _fill.LinearScale !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteBool"](_fill.LinearScale);
+    }
+
+    if (_fill.PathType !== undefined && _fill.PathType !== null)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteLong"](_fill.PathType);
+    }
+
+    if (_fill.Colors !== null && _fill.Colors !== undefined && _fill.Positions !== null && _fill.Positions !== undefined)
+    {
+        if (_fill.Colors.length == _fill.Positions.length)
+        {
+            var _count = _fill.Colors.length;
+            _stream["WriteByte"](4);
+            _stream["WriteLong"](_count);
+
+            for (var i = 0; i < _count; i++)
+            {
+                asc_menu_WriteColor(0, _fill.Colors[i], _stream);
+
+                if (_fill.Positions[i] !== undefined && _fill.Positions[i] !== null)
+                {
+                    _stream["WriteByte"](1);
+                    _stream["WriteDouble2"](_fill.Positions[i]);
+                }
+
+                _stream["WriteByte"](255);
+            }
+        }
+    }
+
+    _stream["WriteByte"](255);
+}
+function asc_menu_ReadAscFill_blip(_params, _cursor){
+    var _fill = new asc_CFillBlip();
+
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _fill.type = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                _fill.url = _params[_cursor.pos++];
+                break;
+            }
+            case 2:
+            {
+                _fill.texture_id = _params[_cursor.pos++];
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+
+    return _fill;
+}
+function asc_menu_WriteAscFill_blip(_type, _fill, _stream){
+    if (!_fill)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_fill.type !== undefined && _fill.type !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteLong"](_fill.type);
+    }
+
+    if (_fill.url !== undefined && _fill.url !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteString2"](_fill.url);
+    }
+
+    if (_fill.texture_id !== undefined && _fill.texture_id !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteLong"](_fill.texture_id);
+    }
+
+    _stream["WriteByte"](255);
+}
+function asc_menu_ReadAscFill(_params, _cursor){
+    var _fill = new asc_CShapeFill();
+
+    //_fill.type = c_oAscFill.FILL_TYPE_NOFILL;
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _fill.type = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                switch (_fill.type)
+                {
+                    case c_oAscFill.FILL_TYPE_SOLID:
+                    {
+                        _fill.fill = asc_menu_ReadAscFill_solid(_params, _cursor);
+                        break;
+                    }
+                    case c_oAscFill.FILL_TYPE_PATT:
+                    {
+                        _fill.fill = asc_menu_ReadAscFill_patt(_params, _cursor);
+                        break;
+                    }
+                    case c_oAscFill.FILL_TYPE_GRAD:
+                    {
+                        _fill.fill = asc_menu_ReadAscFill_grad(_params, _cursor);
+                        break;
+                    }
+                    case c_oAscFill.FILL_TYPE_BLIP:
+                    {
+                        _fill.fill = asc_menu_ReadAscFill_blip(_params, _cursor);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+                break;
+            }
+            case 2:
+            {
+                _fill.transparent = _params[_cursor.pos++];
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+
+    return _fill;
+
+}
+function asc_menu_WriteAscFill(_type, _fill, _stream){
+    if (!_fill)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_fill.type !== undefined && _fill.type !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteLong"](_fill.type);
+    }
+
+    if (_fill.fill !== undefined && _fill.fill !== null)
+    {
+        switch (_fill.type)
+        {
+            case c_oAscFill.FILL_TYPE_SOLID:
+            {
+                _fill.fill = asc_menu_WriteAscFill_solid(1, _fill.fill, _stream);
+                break;
+            }
+            case c_oAscFill.FILL_TYPE_PATT:
+            {
+                _fill.fill = asc_menu_ReadAscFill_patt(1, _fill.fill, _stream);
+                break;
+            }
+            case c_oAscFill.FILL_TYPE_GRAD:
+            {
+                _fill.fill = asc_menu_ReadAscFill_grad(1, _fill.fill, _stream);
+                break;
+            }
+            case c_oAscFill.FILL_TYPE_BLIP:
+            {
+                _fill.fill = asc_menu_ReadAscFill_blip(1, _fill.fill, _stream);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    if (_fill.transparent !== undefined && _fill.transparent !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteLong"](_fill.transparent);
+    }
+
+    _stream["WriteByte"](255);
+}
+function asc_menu_ReadAscStroke(_params, _cursor){
+    var _stroke = new asc_CStroke();
+
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _stroke.type = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                _stroke.width = _params[_cursor.pos++];
+                break;
+            }
+            case 2:
+            {
+                _stroke.color = asc_menu_ReadColor(_params, _cursor);
+                break;
+            }
+            case 3:
+            {
+                _stroke.LineJoin = _params[_cursor.pos++];
+                break;
+            }
+            case 4:
+            {
+                _stroke.LineCap = _params[_cursor.pos++];
+                break;
+            }
+            case 5:
+            {
+                _stroke.LineBeginStyle = _params[_cursor.pos++];
+                break;
+            }
+            case 6:
+            {
+                _stroke.LineBeginSize = _params[_cursor.pos++];
+                break;
+            }
+            case 7:
+            {
+                _stroke.LineEndStyle = _params[_cursor.pos++];
+                break;
+            }
+            case 8:
+            {
+                _stroke.LineEndSize = _params[_cursor.pos++];
+                break;
+            }
+            case 9:
+            {
+                _stroke.canChangeArrows = _params[_cursor.pos++];
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+
+    return _stroke;
+}
+function asc_menu_WriteAscStroke(_type, _stroke, _stream){
+    if (!_stroke)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_stroke.type !== undefined && _stroke.type !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteLong"](_stroke.type);
+    }
+    if (_stroke.width !== undefined && _stroke.width !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteDouble2"](_stroke.width);
+    }
+
+    asc_menu_WriteColor(2, _stroke.color, _stream);
+
+    if (_stroke.LineJoin !== undefined && _stroke.LineJoin !== null)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteByte"](_stroke.LineJoin);
+    }
+    if (_stroke.LineCap !== undefined && _stroke.LineCap !== null)
+    {
+        _stream["WriteByte"](4);
+        _stream["WriteByte"](_stroke.LineCap);
+    }
+    if (_stroke.LineBeginStyle !== undefined && _stroke.LineBeginStyle !== null)
+    {
+        _stream["WriteByte"](5);
+        _stream["WriteByte"](_stroke.LineBeginStyle);
+    }
+    if (_stroke.LineBeginSize !== undefined && _stroke.LineBeginSize !== null)
+    {
+        _stream["WriteByte"](6);
+        _stream["WriteByte"](_stroke.LineBeginSize);
+    }
+    if (_stroke.LineEndStyle !== undefined && _stroke.LineEndStyle !== null)
+    {
+        _stream["WriteByte"](7);
+        _stream["WriteByte"](_stroke.LineEndStyle);
+    }
+    if (_stroke.LineEndSize !== undefined && _stroke.LineEndSize !== null)
+    {
+        _stream["WriteByte"](8);
+        _stream["WriteByte"](_stroke.LineEndSize);
+    }
+
+    if (_stroke.canChangeArrows !== undefined && _stroke.canChangeArrows !== null)
+    {
+        _stream["WriteByte"](9);
+        _stream["WriteBool"](_stroke.canChangeArrows);
+    }
+
+    _stream["WriteByte"](255);
+
+}
+function asc_menu_ReadPaddings(_params, _cursor){
+    var _paddings = new asc_CPaddings();
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _paddings.Left = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                _paddings.Top = _params[_cursor.pos++];
+                break;
+            }
+            case 2:
+            {
+                _paddings.Right = _params[_cursor.pos++];
+                break;
+            }
+            case 3:
+            {
+                _paddings.Bottom = _params[_cursor.pos++];
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+    return _paddings;
+}
+function asc_menu_WritePaddings(_type, _paddings, _stream){
+    if (!_paddings)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_paddings.Left !== undefined && _paddings.Left !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteDouble2"](_paddings.Left);
+    }
+    if (_paddings.Top !== undefined && _paddings.Top !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteDouble2"](_paddings.Top);
+    }
+    if (_paddings.Right !== undefined && _paddings.Right !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteDouble2"](_paddings.Right);
+    }
+    if (_paddings.Bottom !== undefined && _paddings.Bottom !== null)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteDouble2"](_paddings.Bottom);
+    }
+
+    _stream["WriteByte"](255);
+}
+function asc_menu_ReadPosition(_params, _cursor){
+    var _position = new CPosition();
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _position.X = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                _position.Y = _params[_cursor.pos++];
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+    return _position;
+}
+function asc_menu_WritePosition(_type, _position, _stream){
+    if (!_position)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_position.X !== undefined && _position.X !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteDouble2"](_position.X);
+    }
+    if (_position.Y !== undefined && _position.Y !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteDouble2"](_position.Y);
+    }
+
+    _stream["WriteByte"](255);
+}
+function asc_menu_ReadImagePosition(_params, _cursor){
+    var _position = new CPosition();
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _position.RelativeFrom = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                _position.UseAlign = _params[_cursor.pos++];
+                break;
+            }
+            case 2:
+            {
+                _position.Align = _params[_cursor.pos++];
+                break;
+            }
+            case 3:
+            {
+                _position.Value = _params[_cursor.pos++];
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+    return _position;
+}
+function asc_menu_WriteImagePosition(_type, _position, _stream){
+    if (!_position)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_position.RelativeFrom !== undefined && _position.RelativeFrom !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteLong"](_position.RelativeFrom);
+    }
+    if (_position.UseAlign !== undefined && _position.UseAlign !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteBool"](_position.UseAlign);
+    }
+    if (_position.Align !== undefined && _position.Align !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteLong"](_position.Align);
+    }
+    if (_position.Value !== undefined && _position.Value !== null)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteLong"](_position.Value);
+    }
+
+    _stream["WriteByte"](255);
+}
+function asc_menu_ReadAscValAxisSettings(_params, _cursor){
+    var _settings = new asc_ValAxisSettings();
+
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _settings.minValRule = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                _settings.minVal = _params[_cursor.pos++];
+                break;
+            }
+            case 2:
+            {
+                _settings.maxValRule = _params[_cursor.pos++];
+                break;
+            }
+            case 3:
+            {
+                _settings.maxVal = _params[_cursor.pos++];
+                break;
+            }
+            case 4:
+            {
+                _settings.invertValOrder = _params[_cursor.pos++];
+                break;
+            }
+            case 5:
+            {
+                _settings.logScale = _params[_cursor.pos++];
+                break;
+            }
+            case 6:
+            {
+                _settings.logBase = _params[_cursor.pos++];
+                break;
+            }
+            case 7:
+            {
+                _settings.dispUnitsRule = _params[_cursor.pos++];
+                break;
+            }
+            case 8:
+            {
+                _settings.units = _params[_cursor.pos++];
+                break;
+            }
+            case 9:
+            {
+                _settings.showUnitsOnChart = _params[_cursor.pos++];
+                break;
+            }
+            case 10:
+            {
+                _settings.majorTickMark = _params[_cursor.pos++];
+                break;
+            }
+            case 11:
+            {
+                _settings.minorTickMark = _params[_cursor.pos++];
+                break;
+            }
+            case 12:
+            {
+                _settings.tickLabelsPos = _params[_cursor.pos++];
+                break;
+            }
+            case 13:
+            {
+                _settings.crossesRule = _params[_cursor.pos++];
+                break;
+            }
+            case 14:
+            {
+                _settings.crosses = _params[_cursor.pos++];
+                break;
+            }
+            case 15:
+            {
+                _settings.axisType = _params[_cursor.pos++];
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+
+    return _settings;
+}
+function asc_menu_WriteAscValAxisSettings(_type, _settings, _stream){
+    if (!_settings)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_settings.minValRule !== undefined && _settings.minValRule !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteLong"](_settings.minValRule);
+    }
+    if (_settings.minVal !== undefined && _settings.minVal !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteLong"](_settings.minVal);
+    }
+    if (_settings.maxValRule !== undefined && _settings.maxValRule !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteLong"](_settings.maxValRule);
+    }
+    if (_settings.maxVal !== undefined && _settings.maxVal !== null)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteLong"](_settings.maxVal);
+    }
+    if (_settings.invertValOrder !== undefined && _settings.invertValOrder !== null)
+    {
+        _stream["WriteByte"](4);
+        _stream["WriteBool"](_settings.invertValOrder);
+    }
+    if (_settings.logScale !== undefined && _settings.logScale !== null)
+    {
+        _stream["WriteByte"](5);
+        _stream["WriteBool"](_settings.logScale);
+    }
+    if (_settings.logBase !== undefined && _settings.logBase !== null)
+    {
+        _stream["WriteByte"](6);
+        _stream["WriteLong"](_settings.logBase);
+    }
+    if (_settings.dispUnitsRule !== undefined && _settings.dispUnitsRule !== null)
+    {
+        _stream["WriteByte"](7);
+        _stream["WriteLong"](_settings.dispUnitsRule);
+    }
+    if (_settings.units !== undefined && _settings.units !== null)
+    {
+        _stream["WriteByte"](8);
+        _stream["WriteLong"](_settings.units);
+    }
+    if (_settings.showUnitsOnChart !== undefined && _settings.showUnitsOnChart !== null)
+    {
+        _stream["WriteByte"](9);
+        _stream["WriteBool"](_settings.showUnitsOnChart);
+    }
+    if (_settings.majorTickMark !== undefined && _settings.majorTickMark !== null)
+    {
+        _stream["WriteByte"](10);
+        _stream["WriteLong"](_settings.majorTickMark);
+    }
+    if (_settings.minorTickMark !== undefined && _settings.minorTickMark !== null)
+    {
+        _stream["WriteByte"](11);
+        _stream["WriteLong"](_settings.minorTickMark);
+    }
+    if (_settings.tickLabelsPos !== undefined && _settings.tickLabelsPos !== null)
+    {
+        _stream["WriteByte"](12);
+        _stream["WriteLong"](_settings.tickLabelsPos);
+    }
+    if (_settings.crossesRule !== undefined && _settings.crossesRule !== null)
+    {
+        _stream["WriteByte"](13);
+        _stream["WriteLong"](_settings.crossesRule);
+    }
+    if (_settings.crosses !== undefined && _settings.crosses !== null)
+    {
+        _stream["WriteByte"](14);
+        _stream["WriteLong"](_settings.crosses);
+    }
+    if (_settings.axisType !== undefined && _settings.axisType !== null)
+    {
+        _stream["WriteByte"](15);
+        _stream["WriteLong"](_settings.axisType);
+    }
+
+    _stream["WriteByte"](255);
+}
+function asc_menu_ReadChartPr(_params, _cursor){
+    var _settings = new asc_ChartSettings();
+
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _settings.style = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                _settings.title = _params[_cursor.pos++];
+                break;
+            }
+            case 2:
+            {
+                _settings.rowCols = _params[_cursor.pos++];
+                break;
+            }
+            case 3:
+            {
+                _settings.horAxisLabel = _params[_cursor.pos++];
+                break;
+            }
+            case 4:
+            {
+                _settings.vertAxisLabel = _params[_cursor.pos++];
+                break;
+            }
+            case 5:
+            {
+                _settings.legendPos = _params[_cursor.pos++];
+                break;
+            }
+            case 6:
+            {
+                _settings.dataLabelsPos = _params[_cursor.pos++];
+                break;
+            }
+            case 7:
+            {
+                _settings.horAx = _params[_cursor.pos++];
+                break;
+            }
+            case 8:
+            {
+                _settings.vertAx = _params[_cursor.pos++];
+                break;
+            }
+            case 9:
+            {
+                _settings.horGridLines = _params[_cursor.pos++];
+                break;
+            }
+            case 10:
+            {
+                _settings.vertGridLines = _params[_cursor.pos++];
+                break;
+            }
+            case 11:
+            {
+                _settings.type = _params[_cursor.pos++];
+                break;
+            }
+            case 12:
+            {
+                _settings.showSerName = _params[_cursor.pos++];
+                break;
+            }
+            case 13:
+            {
+                _settings.showCatName = _params[_cursor.pos++];
+                break;
+            }
+            case 14:
+            {
+                _settings.showVal = _params[_cursor.pos++];
+                break;
+            }
+            case 15:
+            {
+                _settings.separator = _params[_cursor.pos++];
+                break;
+            }
+            case 16:
+            {
+                _settings.horAxisProps = asc_menu_ReadAscValAxisSettings(_params, _cursor);
+                break;
+            }
+            case 17:
+            {
+                _settings.vertAxisProps = asc_menu_ReadAscValAxisSettings(_params, _cursor);
+                break;
+            }
+            case 18:
+            {
+                _settings.range = _params[_cursor.pos++];
+                break;
+            }
+            case 19:
+            {
+                _settings.inColumns = _params[_cursor.pos++];
+                break;
+            }
+            case 20:
+            {
+                _settings.showMarker = _params[_cursor.pos++];
+                break;
+            }
+            case 21:
+            {
+                _settings.bLine = _params[_cursor.pos++];
+                break;
+            }
+            case 22:
+            {
+                _settings.smooth = _params[_cursor.pos++];
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+
+    return _settings;
+}
+function asc_menu_WriteChartPr(_type, _chartPr, _stream){
+    if (!_chartPr)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_chartPr.style !== undefined && _chartPr.style !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteLong"](_chartPr.style);
+    }
+    if (_chartPr.title !== undefined && _chartPr.title !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteLong"](_chartPr.title);
+    }
+    if (_chartPr.rowCols !== undefined && _chartPr.rowCols !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteLong"](_chartPr.rowCols);
+    }
+    if (_chartPr.horAxisLabel !== undefined && _chartPr.horAxisLabel !== null)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteLong"](_chartPr.horAxisLabel);
+    }
+    if (_chartPr.vertAxisLabel !== undefined && _chartPr.vertAxisLabel !== null)
+    {
+        _stream["WriteByte"](4);
+        _stream["WriteLong"](_chartPr.vertAxisLabel);
+    }
+    if (_chartPr.legendPos !== undefined && _chartPr.legendPos !== null)
+    {
+        _stream["WriteByte"](5);
+        _stream["WriteLong"](_chartPr.legendPos);
+    }
+    if (_chartPr.dataLabelsPos !== undefined && _chartPr.dataLabelsPos !== null)
+    {
+        _stream["WriteByte"](6);
+        _stream["WriteLong"](_chartPr.dataLabelsPos);
+    }
+    if (_chartPr.horAx !== undefined && _chartPr.horAx !== null)
+    {
+        _stream["WriteByte"](7);
+        _stream["WriteLong"](_chartPr.horAx);
+    }
+    if (_chartPr.vertAx !== undefined && _chartPr.vertAx !== null)
+    {
+        _stream["WriteByte"](8);
+        _stream["WriteLong"](_chartPr.vertAx);
+    }
+    if (_chartPr.horGridLines !== undefined && _chartPr.horGridLines !== null)
+    {
+        _stream["WriteByte"](9);
+        _stream["WriteLong"](_chartPr.horGridLines);
+    }
+    if (_chartPr.vertGridLines !== undefined && _chartPr.vertGridLines !== null)
+    {
+        _stream["WriteByte"](10);
+        _stream["WriteLong"](_chartPr.vertGridLines);
+    }
+    if (_chartPr.type !== undefined && _chartPr.type !== null)
+    {
+        _stream["WriteByte"](11);
+        _stream["WriteLong"](_chartPr.type);
+    }
+
+    if (_chartPr.showSerName !== undefined && _chartPr.showSerName !== null)
+    {
+        _stream["WriteByte"](12);
+        _stream["WriteBool"](_chartPr.showSerName);
+    }
+    if (_chartPr.showCatName !== undefined && _chartPr.showCatName !== null)
+    {
+        _stream["WriteByte"](13);
+        _stream["WriteBool"](_chartPr.showCatName);
+    }
+    if (_chartPr.showVal !== undefined && _chartPr.showVal !== null)
+    {
+        _stream["WriteByte"](14);
+        _stream["WriteBool"](_chartPr.showVal);
+    }
+
+    if (_chartPr.separator !== undefined && _chartPr.separator !== null)
+    {
+        _stream["WriteByte"](15);
+        _stream["WriteString2"](_chartPr.separator);
+    }
+
+    asc_menu_WriteAscValAxisSettings(16, _chartPr.horAxisProps, _stream);
+    asc_menu_WriteAscValAxisSettings(17, _chartPr.vertAxisProps, _stream);
+
+    if (_chartPr.range !== undefined && _chartPr.range !== null)
+    {
+        _stream["WriteByte"](18);
+        _stream["WriteString2"](_chartPr.range);
+    }
+
+    if (_chartPr.inColumns !== undefined && _chartPr.inColumns !== null)
+    {
+        _stream["WriteByte"](19);
+        _stream["WriteBool"](_chartPr.inColumns);
+    }
+    if (_chartPr.showMarker !== undefined && _chartPr.showMarker !== null)
+    {
+        _stream["WriteByte"](20);
+        _stream["WriteBool"](_chartPr.showMarker);
+    }
+    if (_chartPr.bLine !== undefined && _chartPr.bLine !== null)
+    {
+        _stream["WriteByte"](21);
+        _stream["WriteBool"](_chartPr.bLine);
+    }
+    if (_chartPr.smooth !== undefined && _chartPr.smooth !== null)
+    {
+        _stream["WriteByte"](22);
+        _stream["WriteBool"](_chartPr.showVal);
+    }
+
+    _stream["WriteByte"](255);
+}
+function asc_menu_ReadShapePr(_params, _cursor){
+    var _settings = new asc_CShapeProperty();
+
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _settings.type = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                _settings.fill = asc_menu_ReadAscFill(_params, _cursor);
+                break;
+            }
+            case 2:
+            {
+                _settings.stroke = asc_menu_ReadAscStroke(_params, _cursor);
+                break;
+            }
+            case 3:
+            {
+                _settings.paddings = asc_menu_ReadPaddings(_params, _cursor);
+                break;
+            }
+            case 4:
+            {
+                _settings.canFill = _params[_cursor.pos++];
+                break;
+            }
+            case 5:
+            {
+                _settings.bFromChart = _params[_cursor.pos++];
+                break;
+            }
+            case 6:
+            {
+                _settings.InsertPageNum = _params[_cursor.pos++];
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+
+    return _settings;
+}
+function asc_menu_WriteShapePr(_type, _shapePr, _stream){
+    if (!_shapePr)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_shapePr.type !== undefined && _shapePr.type !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteString2"](_shapePr.type);
+    }
+
+    asc_menu_WriteAscFill(1, _shapePr.fill, _stream);
+    asc_menu_WriteAscStroke(2, _shapePr.stroke, _stream);
+    asc_menu_WritePaddings(3, _shapePr.paddings, _stream);
+
+    if (_shapePr.canFill !== undefined && _shapePr.canFill !== null)
+    {
+        _stream["WriteByte"](4);
+        _stream["WriteBool"](_shapePr.canFill);
+    }
+    if (_shapePr.bFromChart !== undefined && _shapePr.bFromChart !== null)
+    {
+        _stream["WriteByte"](5);
+        _stream["WriteBool"](_shapePr.bFromChart);
+    }
+
+    _stream["WriteByte"](255);
+}
+function asc_menu_WriteImagePr(_imagePr, _stream){
+    if (_imagePr.CanBeFlow !== undefined && _imagePr.CanBeFlow !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteBool"](_imagePr.CanBeFlow);
+    }
+    if (_imagePr.Width !== undefined && _imagePr.Width !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteDouble2"](_imagePr.Width);
+    }
+    if (_imagePr.Height !== undefined && _imagePr.Height !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteDouble2"](_imagePr.Height);
+    }
+    if (_imagePr.WrappingStyle !== undefined && _imagePr.WrappingStyle !== null)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteLong"](_imagePr.WrappingStyle);
+    }
+
+    asc_menu_WritePaddings(4, _imagePr.Paddings, _stream);
+    asc_menu_WritePosition(5, _imagePr.Position, _stream);
+
+    if (_imagePr.AllowOverlap !== undefined && _imagePr.AllowOverlap !== null)
+    {
+        _stream["WriteByte"](6);
+        _stream["WriteBool"](_imagePr.AllowOverlap);
+    }
+
+    asc_menu_WriteImagePosition(7, _imagePr.PositionH, _stream);
+    asc_menu_WriteImagePosition(8, _imagePr.PositionV, _stream);
+
+    if (_imagePr.Internal_Position !== undefined && _imagePr.Internal_Position !== null)
+    {
+        _stream["WriteByte"](9);
+        _stream["WriteLong"](_imagePr.Internal_Position);
+    }
+
+    if (_imagePr.ImageUrl !== undefined && _imagePr.ImageUrl !== null)
+    {
+        _stream["WriteByte"](10);
+        _stream["WriteString2"](_imagePr.ImageUrl);
+    }
+
+    if (_imagePr.Locked !== undefined && _imagePr.Locked !== null)
+    {
+        _stream["WriteByte"](11);
+        _stream["WriteBool"](_imagePr.Locked);
+    }
+
+    asc_menu_WriteChartPr(12, _imagePr.ChartProperties, _stream);
+    asc_menu_WriteShapePr(13, _imagePr.ShapeProperties, _stream);
+
+    if (_imagePr.ChangeLevel !== undefined && _imagePr.ChangeLevel !== null)
+    {
+        _stream["WriteByte"](14);
+        _stream["WriteLong"](_imagePr.ChangeLevel);
+    }
+
+    if (_imagePr.Group !== undefined && _imagePr.Group !== null)
+    {
+        _stream["WriteByte"](15);
+        _stream["WriteLong"](_imagePr.Group);
+    }
+
+    if (_imagePr.fromGroup !== undefined && _imagePr.fromGroup !== null)
+    {
+        _stream["WriteByte"](16);
+        _stream["WriteBool"](_imagePr.fromGroup);
+    }
+    if (_imagePr.severalCharts !== undefined && _imagePr.severalCharts !== null)
+    {
+        _stream["WriteByte"](17);
+        _stream["WriteBool"](_imagePr.severalCharts);
+    }
+
+    if (_imagePr.severalChartTypes !== undefined && _imagePr.severalChartTypes !== null)
+    {
+        _stream["WriteByte"](18);
+        _stream["WriteLong"](_imagePr.severalChartTypes);
+    }
+    if (_imagePr.severalChartStyles !== undefined && _imagePr.severalChartStyles !== null)
+    {
+        _stream["WriteByte"](19);
+        _stream["WriteLong"](_imagePr.severalChartStyles);
+    }
+    if (_imagePr.verticalTextAlign !== undefined && _imagePr.verticalTextAlign !== null)
+    {
+        _stream["WriteByte"](20);
+        _stream["WriteLong"](_imagePr.verticalTextAlign);
+    }
+
+    _stream["WriteByte"](255);
+}
 
 function asc_ReadCBorder(s, p) {
     var color = null;
@@ -1843,6 +3171,8 @@ function OfflineEditor () {
             stream["ClearNoAttack"]();
             asc_WriteCCelInfo(cellInfo, stream);
             window["native"]["OnCallMenuEvent"](2402, stream); // ASC_SPREADSHEETS_EVENT_TYPE_SELECTION_CHANGED
+
+            t.onSelectionChanged(cellInfo);
         });
         _api.asc_registerCallback('asc_onEditorSelectionChanged', function(font) {
             var stream = global_memory_stream_menu;
@@ -2169,27 +3499,73 @@ function OfflineEditor () {
         var pagesData   = _api.wb.calcPagesPrint(adjustPrint);
         var pdfWriter   = new CPdfPrinter();
         var isEndPrint  = _api.wb.printSheet(pdfWriter, pagesData);
-        var str =  pdfWriter.DocumentRenderer.Memory.GetBase64Memory();
-        return str;
+        return pdfWriter.DocumentRenderer.Memory.GetBase64Memory();
     };
 
-    this.offline_addImageDrawingObject = function(imageUrl, options) {
+    this.onSelectionChanged = function(info) {
+        var stream = global_memory_stream_menu;
+        stream["ClearNoAttack"]();
+
+        var SelectedObjects = [], selectType = info.asc_getFlags().asc_getSelectionType();
+        if (selectType == c_oAscSelectionType.RangeImage || selectType == c_oAscSelectionType.RangeShape ||
+            selectType == c_oAscSelectionType.RangeChart || selectType == c_oAscSelectionType.RangeChartText ||
+            selectType == c_oAscSelectionType.RangeShapeText)
+        {
+            SelectedObjects = _api.asc_getGraphicObjectProps();
+
+            var count = SelectedObjects.length;
+            var naturalCount = count;
+
+            stream["WriteLong"](naturalCount);
+
+            for (var i = 0; i < count; i++)
+            {
+                switch (SelectedObjects[i].asc_getObjectType())
+                {
+                    case c_oAscTypeSelectElement.Image:
+                    {
+                        stream["WriteLong"](c_oAscTypeSelectElement.Image);
+                        asc_menu_WriteImagePr(SelectedObjects[i].Value, stream);
+                        break;
+                    }
+                    case c_oAscTypeSelectElement.Hyperlink:
+                    {
+                        stream["WriteLong"](c_oAscTypeSelectElement.Hyperlink);
+                        asc_menu_WriteHyperPr(SelectedObjects[i].Value, stream);
+                        break;
+                    }
+                    case c_oAscTypeSelectElement.SpellCheck:
+                    default:
+                    {
+                        // none
+                        break;
+                    }
+                }
+            }
+
+            if (count)
+            {
+                window["native"]["OnCallMenuEvent"](6, stream);
+            }
+        }
+    };
+
+    this.offline_addImageDrawingObject = function(options) {
         var worksheet = _api.wb.getWorksheet();
         var objectRender = worksheet.objectRender;
         var _this = objectRender;
+        var objectId = null;
+        var imageUrl = options[0];
 
         function ascCvtRatio(fromUnits, toUnits) {
             return asc.getCvtRatio(fromUnits, toUnits, objectRender.getContext().getPPIX());
         }
-
         function ptToMm(val) {
             return val * ascCvtRatio(1, 3);
         }
-
         function pxToPt(val) {
             return val * ascCvtRatio(0, 1);
         }
-
         function pxToMm(val) {
             return val * ascCvtRatio(0, 3);
         }
@@ -2241,7 +3617,7 @@ function OfflineEditor () {
                 object.to.row = toCell.row;
                 object.to.rowOff = ptToMm(toCell.rowOff);
 
-               // worksheet.handlers.trigger("reinitializeScroll");
+                // worksheet.handlers.trigger("reinitializeScroll");
             };
 
             var addImageObject = function (_image) {
@@ -2271,7 +3647,7 @@ function OfflineEditor () {
 
                 //calculateObjectMetrics(drawingObject, isOption ? options.width : _image.Image.width, isOption ? options.height : _image.Image.height);
 
-                calculateObjectMetrics(drawingObject, options.width, options.height);
+                calculateObjectMetrics(drawingObject, options[1], options[2]);
 
                 var coordsFrom = _this.coordsManager.calculateCoords(drawingObject.from);
                 var coordsTo = _this.coordsManager.calculateCoords(drawingObject.to);
@@ -2290,10 +3666,56 @@ function OfflineEditor () {
                 //}
 
                 worksheet.setSelectionShape(true);
+
+                if (_this.controller.selectedObjects.length) {
+                    objectId = _this.controller.selectedObjects[0].Id;
+                }
             };
 
             addImageObject(new Image());
         }
+
+        return objectId;
+    };
+    this.offline_addShapeDrawingObject = function(params) {
+        var ws = _api.wb.getWorksheet();
+        var objectRender = ws.objectRender;
+        var objectId = null;
+        var current = {pos: 0};
+        var shapeProp = asc_menu_ReadShapePr(params[0], current);
+        var left = params[1];
+        var top = params[2];
+        var right = params[3];
+        var bottom  = params[4];
+
+        function ascCvtRatio(fromUnits, toUnits) {
+            return asc.getCvtRatio(fromUnits, toUnits, objectRender.getContext().getPPIX());
+        }
+        function ptToMm(val) {
+            return val * ascCvtRatio(1, 3);
+        }
+        function pxToPt(val) {
+            return val * ascCvtRatio(0, 1);
+        }
+        function pxToMm(val) {
+            return val * ascCvtRatio(0, 3);
+        }
+
+        _api.asc_startAddShape(shapeProp.type);
+
+        objectRender.controller.OnMouseDown({}, pxToMm(left), pxToMm(top), 0);
+        objectRender.controller.OnMouseMove({IsLocked: true}, pxToMm(right), pxToMm(bottom), 0);
+        objectRender.controller.OnMouseUp({}, pxToMm(left), pxToMm(bottom), 0);
+
+        _api.asc_endAddShape();
+
+        if (objectRender.controller.selectedObjects.length) {
+            objectId = objectRender.controller.selectedObjects[0].Id;
+        }
+
+        ws.setSelectionShape(true);
+
+        return objectId;
     };
 }
 var _s = new OfflineEditor();
@@ -2303,7 +3725,6 @@ function offline_stz(v) {_s.zoom = v; _api.asc_setZoom(v);}
 function offline_ds(x, y, width, height, ratio) {_s.drawSheet(x, y, width, height, ratio);}
 function offline_dh(x, y, width, height, type, ratio) {_s.drawHeader(x, y, width, height, type, ratio);}
 function offline_mouse_down(x, y, pin) {
-
     _s.isShapeAction = false;
 
     var ws = _api.wb.getWorksheet();
@@ -2311,49 +3732,51 @@ function offline_mouse_down(x, y, pin) {
     ws.objectRender.drawingArea.reinitRanges();
     var graphicsInfo = wb._onGetGraphicsInfo(x, y);
     if (graphicsInfo) {
-        //console.log('drawing onclick: ' + graphicsInfo.id);
-
-        var e = {Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
+        var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
         wb._onGraphicObjectMouseDown(e, x, y);
         wb._onUpdateSelectionShape(true);
         _s.isShapeAction = true;
-
-       // _s.selectShapeWidth  = graphicsInfo.object.graphicObject.extX;
-       // _s.selectShapeHeight = graphicsInfo.object.graphicObject.extY;
-
         return {id:graphicsInfo.id};
     }
 
     _s.cellPin = pin;
+
     if (0 != _s.cellPin) {
         ws.leftTopRange = ws.activeRange.clone();
-        return null;
+    } else {
+        ws.changeSelectionStartPoint(x, y, true, true);
     }
 
-    ws.changeSelectionStartPoint(x, y, true, true);
     return null;
 }
 function offline_mouse_move(x, y) {
-    if (-1 == _s.cellPin)
-        _api.wb.getWorksheet()._changeSelectionTopLeft(x, y, true, true, true);
-    else if (1 === _s.cellPin)
-        _api.wb.getWorksheet()._changeSelectionTopLeft(x, y, true, true, false);
-    else
-        _api.wb.getWorksheet().changeSelectionEndPoint(x, y, true, true);
+    var ws = _api.wb.getWorksheet();
+    if (_s.isShapeAction) {
+        var wb = _api.wb;
+        var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
+        ws.objectRender.graphicObjectMouseMove(e, x, y);
+    } else {
+        if (-1 == _s.cellPin)
+            ws._changeSelectionTopLeft(x, y, true, true, true);
+        else if (1 === _s.cellPin)
+            ws._changeSelectionTopLeft(x, y, true, true, false);
+        else
+            ws.changeSelectionEndPoint(x, y, true, true);
+    }
 }
 function offline_mouse_up(x, y) {
     var ws = _api.wb.getWorksheet();
     var wb = _api.wb;
 
     if (_s.isShapeAction) {
-        var e = {Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
+        var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
         wb._onGraphicObjectMouseUp(e, x, y);
-        return;
+        _s.isShapeAction = false;
+    } else {
+        wb._onChangeSelectionDone(-1, -1);
+        _s.cellPin = 0;
+        wb.getWorksheet().leftTopRange = undefined;
     }
-
-    _api.wb._onChangeSelectionDone(-1, -1);
-    _s.cellPin = 0;
-    _api.wb.getWorksheet().leftTopRange = undefined;
 }
 function offline_get_selection(x, y, width, height) {
     return _s.getSelection(x, y, width, height);
@@ -2389,12 +3812,12 @@ function offline_cell_editor_open(isSelectAll, x, y, width, height, ratio) {
 
     wb.cellEditor.isSelectAll = isSelectAll;
 
-   // if (isCoord) {
-        wb._onEditCell(x, y, true, undefined, undefined, true, false);
-   // }
-   // else {
-   //     wb._onEditCell(parseInt(x), parseInt(y), false, undefined, undefined, true, false);
-   // }
+    // if (isCoord) {
+    wb._onEditCell(x, y, true, undefined, undefined, true, false);
+    // }
+    // else {
+    //     wb._onEditCell(parseInt(x), parseInt(y), false, undefined, undefined, true, false);
+    // }
 
     return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom,
         wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
@@ -2423,7 +3846,7 @@ function offline_cell_editor_key_event(keys, width, height, ratio) {
     wb.cellEditor._draw();
 
     return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom,
-    wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
+        wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
 }
 function offline_cell_editor_mouse_event(events, width, height, ratio) {
 
@@ -2503,29 +3926,6 @@ function offline_cell_editor_close(x, y, width, height, ratio) {
 function offline_cell_editor_selection() {
     return _api.wb.cellEditor._drawSelection();
 }
-
-function offline_add_shape(x, y) {
-
-//    var e = {
-//        ShiftKey: false,
-//        shiftKey: false,
-//        CtrlKey: false,
-//        metaKey: false,
-//        ctrlKey: false,
-//        Button: false,
-//        button: false,
-//        ClickCount: 1
-//    };
-//
-//    var ws = _api.wb.getWorksheet();
-//    _api.asc_startAddShape('leftRightArrow');
-//
-//    ws.objectRender.graphicObjectMouseDown(e, 0, 0);
-//    ws.objectRender.graphicObjectMouseUp(e, 200, 200);
-//
-//    _api.asc_endAddShape();
-}
-
 function offline_get_cell_in_coord (x, y) {
     var worksheet = _api.wb.getWorksheet(),
         activeCell = worksheet.getActiveCell(x, y, true);
@@ -2578,12 +3978,12 @@ function offline_copy() {
         _stream["WriteByte"](1);
         _stream["WriteStringA"](sBase64.drawingUrls[0]);
     }
-   // else
+    // else
     //{
-        // owner format
-        _stream["WriteByte"](2);
-        _stream["WriteStringA"](sBase64.sBase64);
-   // }
+    // owner format
+    _stream["WriteByte"](2);
+    _stream["WriteStringA"](sBase64.sBase64);
+    // }
 
     // _stream["WriteByte"](3);
     // _stream["WriteString2"](sBase64.html);
@@ -2605,7 +4005,7 @@ function offline_paste(params) {
     else if (2 == type)
     {
         var worksheet = _api.wb.getWorksheet();
-       _api.wb.clipboard._pasteFromBinaryExcel(worksheet, params[1]);
+        _api.wb.clipboard._pasteFromBinaryExcel(worksheet, params[1]);
     }
 }
 function offline_cut() {
@@ -2782,13 +4182,13 @@ function offline_apply_event(type,params) {
 
         case 50:  // ASC_MENU_EVENT_TYPE_INSERT_IMAGE
         {
-            _s.offline_addImageDrawingObject(params[0], {width: params[1], height: params[2]});
+            _return = _s.offline_addImageDrawingObject(params);
             break;
         }
 
         case 53:  // ASC_MENU_EVENT_TYPE_INSERT_SHAPE
         {
-            offline_add_shape(0, 0);
+            _return = _s.offline_addShapeDrawingObject(params);
             break;
         }
 
