@@ -66,24 +66,22 @@ StartAddNewShape.prototype =
             if(!this.bMoved && this instanceof StartAddNewShape)
             {
                 var ext_x, ext_y;
-                if(typeof SHAPE_ASPECTS[this.preset] === "number")
+                if(typeof SHAPE_EXT[this.preset] === "number")
                 {
-                    var _aspect = SHAPE_ASPECTS[this.preset];
-                    if(_aspect >= 1)
-                    {
-                        ext_y = 25.4;
-                        ext_x = ext_y*_aspect;
-                    }
-                    else
-                    {
-                        ext_x = 25.4;
-                        ext_y = ext_x/_aspect;
-                    }
+                    ext_x = SHAPE_EXT[this.preset];
                 }
                 else
                 {
                     ext_x = 25.4;
-                    ext_y = 25.4;
+                }
+                if(typeof SHAPE_ASPECTS[this.preset] === "number")
+                {
+                    var _aspect = SHAPE_ASPECTS[this.preset];
+                    ext_y = ext_x/_aspect;
+                }
+                else
+                {
+                    ext_y = ext_x;
                 }
                 this.onMouseMove({IsLocked: true}, this.startX + ext_x, this.startY + ext_y);
             }
