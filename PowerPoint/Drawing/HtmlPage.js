@@ -842,6 +842,9 @@ function CEditorPage(api)
                 break;
             }
         }
+		
+		if (oThis.m_nZoomValue <= _Zoom)
+			return;
 
         oThis.m_nZoomValue = _Zoom;
         oThis.zoom_Fire(0);
@@ -864,6 +867,9 @@ function CEditorPage(api)
                 break;
             }
         }
+		
+		if (oThis.m_nZoomValue >= _Zoom)
+			return;
 
         oThis.m_nZoomValue = _Zoom;
         oThis.zoom_Fire(0);
