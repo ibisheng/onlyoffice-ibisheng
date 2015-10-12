@@ -1624,11 +1624,17 @@ var maxIndividualValues = 10000;
 							
 							filter.moveRef(null, diff, t.worksheet);
 						}
-						else if(activeRange.r1 > ref.r1 && activeRange.r1 <= ref.r2)//inside
+						else if(activeRange.r1 > ref.r1 && activeRange.r2 <= ref.r2)//inside
 						{
 							oldFilter = filter.clone(null);
 							
 							filter.changeRef(null, diff);
+						}
+						else if(activeRange.r1 > ref.r1 && activeRange.r2 > ref.r2)
+						{
+							oldFilter = filter.clone(null);
+							
+							filter.changeRef(null, diff + (activeRange.r2 - ref.r2));
 						}
 					}
 					
