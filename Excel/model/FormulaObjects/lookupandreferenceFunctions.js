@@ -574,17 +574,17 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
             }
         }
         else if ( parserHelp.isArea.call( o, o.Formula, o.pCurrPos ) ) {
-            found_operand = new cArea( o.operand_str.toUpperCase(), r.worksheet );
+            found_operand = new cArea( o.operand_str.toUpperCase(), r1.worksheet );
             if ( o.operand_str.indexOf( "$" ) > -1 )
                 found_operand.isAbsolute = true;
         }
         else if ( parserHelp.isRef.call( o, o.Formula, o.pCurrPos, true ) ) {
-            found_operand = new cRef( o.operand_str.toUpperCase(), r.worksheet );
+            found_operand = new cRef( o.operand_str.toUpperCase(), r1.worksheet );
             if ( o.operand_str.indexOf( "$" ) > -1 )
                 found_operand.isAbsolute = true;
         }
         else if ( parserHelp.isName.call( o, o.Formula, o.pCurrPos, wb )[0] ) {
-            found_operand = new cName( o.operand_str, wb, r.worksheet );
+            found_operand = new cName( o.operand_str, wb, r1.worksheet );
         }
     }
 
@@ -612,8 +612,16 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
         var cellName = r1.getFirst().getID(), wsId = r1.worksheet.getId();
 
         if ( (found_operand instanceof cRef || found_operand instanceof cRef3D || found_operand instanceof cArea) && found_operand.isValid() ) {
-            var nFrom = wb.dependencyFormulas.addNode( wsId, cellName ),
-                nTo = wb.dependencyFormulas.addNode( found_operand.getWsId(), found_operand._cells );
+            var nFrom, nTo;
+
+            if( r2 ){
+                nFrom = r2.defName;
+            }
+            else{
+                nFrom = wb.dependencyFormulas.addNode( wsId, cellName );
+            }
+
+            nTo = wb.dependencyFormulas.addNode( found_operand.getWsId(), found_operand._cells );
 
             found_operand.setNode( nTo );
 
@@ -625,8 +633,8 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
 
             for ( var j = 0; j < wsR.length; j++ ){
                 if( r2 ){
-                    nTo = wb.dependencyFormulas.addNode( wsR[j].Id, _cell ),
-                        wb.dependencyFormulas.addEdge2( r2.defName, nTo );
+                    nTo = wb.dependencyFormulas.addNode( wsR[j].Id, _cell );
+                    wb.dependencyFormulas.addEdge2( r2.defName, nTo );
                 }
                 else
                     wb.dependencyFormulas.addEdge( wsId, cellName.replace( /\$/g, "" ), wsR[j].Id, _cell );
@@ -1029,11 +1037,17 @@ cOFFSET.prototype.Calculate = function ( arg ) {
         var r1 = arguments[1], r2 = arguments[2], wb = r1.worksheet.workbook, cellName = r1.getFirst().getID(), wsId = r1.worksheet.getId();
 
         if ( (this.value instanceof cRef || this.value instanceof cRef3D || this.value instanceof cArea) && this.value.isValid() ) {
-            var nFrom = wb.dependencyFormulas.addNode( wsId, cellName ),
-                nTo = wb.dependencyFormulas.addNode( this.value.getWsId(), this.value._cells.replace( /\$/g, "" ) );
+            var nFrom, nTo;
 
+            if( r2 ){
+                nFrom = r2.defName;
+            }
+            else{
+                nFrom = wb.dependencyFormulas.addNode( wsId, cellName );
+            }
+
+            nTo = wb.dependencyFormulas.addNode( this.value.getWsId(), this.value._cells.replace( /\$/g, "" ) );
             this.value.setNode( nTo );
-
             wb.dependencyFormulas.addEdge2( nFrom, nTo );
         }
         else if ( this.value instanceof cArea3D && this.value.isValid() ) {
