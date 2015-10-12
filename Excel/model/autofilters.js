@@ -504,7 +504,7 @@ var maxIndividualValues = 10000;
 				var bRedoChanges = aWs.workbook.bRedoChanges;
 				
 				//**get filter**
-				var filterObj = this._getPressedFilter(autoFiltersObject.displayName, autoFiltersObject.cellId);
+				var filterObj = this._getPressedFilter(ar, autoFiltersObject.cellId)
 				var currentFilter = filterObj.filter;
 				
 				if(filterObj.filter === null)
@@ -2244,21 +2244,62 @@ var maxIndividualValues = 10000;
 				return result;
 			},
 			
-			_getPressedFilter: function(displayName, colId)
+			//TODO избавиться от split, передавать cellId и tableName
+			_getPressedFilter: function(activeRange, cellId)
 			{
 				var aWs = this._getCurrentWS();
 				
-				var filter = this._getFilterByDisplayName(displayName);
+				if(cellId !== undefined)
+				{
+					var curCellId = cellId.split('af')[0];
+					var col = aWs.getCell(new CellAddress(curCellId)).first.col - 1;
+					var row = aWs.getCell(new CellAddress(curCellId)).first.row - 1;
+					activeRange =  new Asc.Range(col, row, col, row);
+				}
+				
+				var ColId = null;
+				var filter = null;
 				var index = null;
-				//if(!filter)
-					//return {filter: null, index: index, ColId: colId};
-				var autoFilter = displayName === null ? filter : filter.AutoFilter;
+				var autoFilter;
+				if(aWs.AutoFilter)
+				{
+					if(aWs.AutoFilter.Ref.containsRange(activeRange))
+					{
+						filter = aWs.AutoFilter;
+						autoFilter = filter;
+						ColId = activeRange.c1 - aWs.AutoFilter.Ref.c1;
+					}
+				}
 				
-				colId = this._getTrueColId(filter, colId);
+				if(aWs.TableParts && aWs.TableParts.length)
+				{
+					for(var i = 0; i < aWs.TableParts.length; i++)
+					{	
+						if(aWs.TableParts[i].Ref.containsRange(activeRange))
+						{
+							filter = aWs.TableParts[i];
+							autoFilter = filter.AutoFilter;
+							ColId = activeRange.c1 - aWs.TableParts[i].Ref.c1;
+						}
+					}
+				}
+				
+				ColId = this._getTrueColId(filter, ColId);
+				
 				if(autoFilter && autoFilter.FilterColumns)
-					index = this._getFilterColumnNum(autoFilter.FilterColumns, colId);
+				{
+					for(var i = 0; i < autoFilter.FilterColumns.length; i++)
+					{
+						if(autoFilter.FilterColumns[i].ColId === ColId)
+						{
+							index = i;
+							break;
+						}
+					}
+				}
 				
-				return {filter: filter, index: index, ColId: colId};
+				
+				return {filter: filter, index: index, activeRange: activeRange, ColId: ColId};
 			},
 			
 			_getFilterByDisplayName: function(displayName)
@@ -3578,7 +3619,7 @@ var maxIndividualValues = 10000;
 				var autoFilterObject = new Asc.AutoFiltersOptions();
 
 				autoFilterObject.asc_setSortState(sortVal);
-				autoFilterObject.asc_setCellId(colId);
+				autoFilterObject.asc_setCellId(cellId);
 				autoFilterObject.asc_setValues(values);
 				autoFilterObject.asc_setFilterObj(filterObj);
 				autoFilterObject.asc_setAutomaticRowCount(automaticRowCount);
