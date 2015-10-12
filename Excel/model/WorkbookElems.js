@@ -4762,7 +4762,12 @@ Filters.prototype.init = function(obj) {
 				this.Dates.push(autoFilterDateElem);
 			}
 			else
-				this.Values[obj.values[i].text] = true;
+			{
+				if(obj.values[i].text === "")
+					this.Blank = true;
+				else
+					this.Values[obj.values[i].text] = true;
+			}
 		}	
 		else
 			allFilterOpenElements = false;
@@ -4777,7 +4782,14 @@ Filters.prototype.isHideValue = function(val, isDateTimeFormat) {
 	if(isDateTimeFormat && this.Dates)
 		res = this.binarySearch(val, this.Dates) !== -1 ? false : true;
 	else if(this.Values)
-		res = !this.Values[val] ? true : false;
+	{
+		if(val === "")
+		{
+			res = !this.Blank ? true : false;
+		}
+		else		
+			res = !this.Values[val] ? true : false;
+	}
 	
 	return res;
 };
