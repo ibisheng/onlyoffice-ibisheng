@@ -837,7 +837,7 @@ function GetUploadInput(onchange) {
     return input;
 }
 
-var arrayRowSeparatorDef = ";", arrayColSeparatorDef = ",", digitSeparatorDef = ".", functionArgumentSeparatorDef = ";,",
+var arrayRowSeparatorDef = ";", arrayColSeparatorDef = ",", digitSeparatorDef = ".", functionArgumentSeparatorDef = ",",
     arrayRowSeparator = ";", arrayColSeparator = ",", digitSeparator = ".", functionArgumentSeparator = ",";
 
 /*Functions that checks of an element in formula*/
@@ -1301,7 +1301,7 @@ parserHelper.prototype.setDigitSeparator = function( sep ){
         functionArgumentSeparator = functionArgumentSeparatorDef;
         rx_number = new RegExp("^ *[+-]?\\d*(\\d|\\"+ digitSeparatorDef +")\\d*([eE][+-]?\\d+)?");
         rx_Comma = new RegExp("^ *["+functionArgumentSeparatorDef+"] *");
-        rx_array = new RegExp("^\\{(([+-]?\\d*(\\d|\\ "+digitSeparatorDef+")\\d*([eE][+-]?\\d+)?)?(\"((\"\"|[^\"])*)\")?(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|FALSE|TRUE)?["+arrayRowSeparatorDef+"\\"+arrayColSeparatorDef +"]?)*\\}","i");
+        rx_array = new RegExp("^\\{(([+-]?\\d*(\\d|\\"+digitSeparatorDef+")\\d*([eE][+-]?\\d+)?)?(\"((\"\"|[^\"])*)\")?(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|FALSE|TRUE)?["+arrayRowSeparatorDef+"\\"+arrayColSeparatorDef +"]?)*\\}","i");
         rx_arraySeparators = new RegExp("^ *["+arrayRowSeparatorDef+"\\"+arrayColSeparatorDef+"] *");
     }
 };
