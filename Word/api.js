@@ -1358,11 +1358,21 @@ asc_docs_api.prototype._coAuthoringInit = function()
 				case 'reopen':
 				case 'open': {
 					switch(input["status"]) {
+						case "updateversion":
 						case "ok":
 							var urls = input["data"];
 							g_oDocumentUrls.init(urls);
 							if(null != urls['Editor.bin']) {
-								_onOpenCommand(function(){}, {'data': urls['Editor.bin']});
+								if ('ok' === input["status"] || editor.isViewMode) {
+									_onOpenCommand(function(){}, {'data': urls['Editor.bin']});
+								} else {
+									editor.asc_fireCallback("asc_onDocumentUpdateVersion", function () {
+										if (editor.isCoAuthoringEnable) {
+											editor.asc_coAuthoringDisconnect();
+										}
+										_onOpenCommand(function(){}, {'data': urls['Editor.bin']});
+									});
+								}
 							} else {
 								t.asc_fireCallback("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
 							}
@@ -1374,7 +1384,6 @@ asc_docs_api.prototype._coAuthoringInit = function()
 						case "err":
 							t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
 						break;
-						case "updateversion": break;
 					}
 				}
 				break;

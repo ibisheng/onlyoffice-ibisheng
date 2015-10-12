@@ -96,6 +96,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     // CoAuthoring and Chat
     this.User = undefined;
     this.CoAuthoringApi = new CDocsCoApi();
+    this.isCoAuthoringEnable = true;
     this.collaborativeEditing = null;
     this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
@@ -1557,13 +1558,25 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
           case 'open':
           {
             switch (input["status"]) {
+              case "updateversion":
               case "ok":
                 var urls = input["data"];
                 g_oDocumentUrls.init(urls);
                 if (null != urls['Editor.bin']) {
-                  t._onOpenCommand(function(response) {
-                    t._startOpenDocument(response);
-                  }, urls['Editor.bin']);
+                  if ('ok' === input["status"] || t.asc_getViewerMode()) {
+                    t._onOpenCommand(function(response) {
+                      t._startOpenDocument(response);
+                    }, urls['Editor.bin']);
+                  } else {
+                    t.handlers.trigger("asc_onDocumentUpdateVersion", function () {
+                      if (t.isCoAuthoringEnable) {
+                        t.asc_coAuthoringDisconnect();
+                      }
+                      t._onOpenCommand(function(response) {
+                        t._startOpenDocument(response);
+                      }, urls['Editor.bin']);
+                    });
+                  }
                 } else {
                   t.handlers.trigger("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
                 }
@@ -1600,8 +1613,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                 break;
               case "err":
                 t.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
-                break;
-              case "updateversion":
                 break;
             }
           }
@@ -3280,6 +3291,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   // server disconnect
   spreadsheet_api.prototype.asc_coAuthoringDisconnect = function() {
     this.CoAuthoringApi.disconnect();
+    this.isCoAuthoringEnable = false;
+
+    // Выставляем view-режим
+    this.asc_setViewerMode(true);
   };
   /////////////////////////////////////////////////////////////////////////
   ////////////////////////////AutoSave api/////////////////////////////////

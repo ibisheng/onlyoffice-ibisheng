@@ -141,6 +141,7 @@ function asc_docs_api(name)
   this.User = undefined;
   this.CoAuthoringApi = new CDocsCoApi();
   this.CoAuthoringApi.isPowerPoint = true;
+  this.isCoAuthoringEnable = true;
 	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
 	this.SpellCheckUrl = '';				// Ссылка сервиса для проверки орфографии
@@ -497,12 +498,21 @@ asc_docs_api.prototype._coAuthoringInit = function () {
         case 'open':
         {
           switch (input["status"]) {
+            case "updateversion":
             case "ok":
               var urls = input["data"];
               g_oDocumentUrls.init(urls);
               if (null != urls['Editor.bin']) {
-                _onOpenCommand(function() {
-                }, {'data': urls['Editor.bin']});
+                if ('ok' === input["status"] || editor.isViewMode) {
+                  _onOpenCommand(function(){}, {'data': urls['Editor.bin']});
+                } else {
+                  editor.asc_fireCallback("asc_onDocumentUpdateVersion", function () {
+                    if (editor.isCoAuthoringEnable) {
+                      editor.asc_coAuthoringDisconnect();
+                    }
+                    _onOpenCommand(function(){}, {'data': urls['Editor.bin']});
+                  });
+                }
               } else {
                 t.asc_fireCallback("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.NoCritical);
               }
@@ -511,8 +521,6 @@ asc_docs_api.prototype._coAuthoringInit = function () {
               break;
             case "err":
               t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
-              break;
-            case "updateversion":
               break;
           }
         }
@@ -556,6 +564,8 @@ asc_docs_api.prototype.sync_CollaborativeChanges = function()
 // server disconnect
 asc_docs_api.prototype.asc_coAuthoringDisconnect = function () {
   this.CoAuthoringApi.disconnect();
+  this.isCoAuthoringEnable = false;
+  
   //Just set viewer mode
   this.SetViewMode(true);
 };
