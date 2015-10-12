@@ -472,6 +472,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   spreadsheet_api.prototype.asc_setLocale = function(val) {
     g_oDefaultCultureInfo = g_aCultureInfos[val];
     if (this.wbModel) {
+      parserHelp.setDigitSeparator( g_oDefaultCultureInfo.NumberDecimalSeparator );
       oGeneralEditFormatCache.cleanCache();
       oNumFormatCache.cleanCache();
       this.wbModel.rebuildColors();

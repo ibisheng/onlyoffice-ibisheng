@@ -837,7 +837,7 @@ function GetUploadInput(onchange) {
     return input;
 }
 
-var arrayRowSeparatorDef = ";", arrayColSeparatorDef = ",", digitSeparatorDef = ".", functionArgumentSeparatorDef = ",",
+var arrayRowSeparatorDef = ";", arrayColSeparatorDef = ",", digitSeparatorDef = ".", functionArgumentSeparatorDef = ";,",
     arrayRowSeparator = ";", arrayColSeparator = ",", digitSeparator = ".", functionArgumentSeparator = ",";
 
 /*Functions that checks of an element in formula*/
@@ -863,16 +863,13 @@ var str_namedRanges = "A-Za-z\u005F\u0080-\u0081\u0083\u0085-\u0087\u0089-\u008A
     rx_ref3D = new XRegExp( "^(?<name_from>[^:]+)(:(?<name_to>[^:]+))?!" ),
     rx_before_operators = /^ *[,()]/,
     rx_number = /^ *[+-]?\d*(\d|\.)\d*([eE][+-]?\d+)?/,
-//    rx_number = new RegExp("^ *[+-]?\\d*(\\d|"+ (digitSeparator == "." ? "\\." : digitSeparator) +")\\d*([eE][+-]?\\d+)?"),
     rx_LeftParentheses = /^ *\( */,
     rx_RightParentheses = /^ *\)/,
     rx_Comma = /^ *[,;] */,
     rx_arraySeparators = /^ *[,;] */,
-//    rx_Comma = new RegExp("^ *[,;] *"),
     rx_error = /^(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA)/i,
     rx_bool = /^(TRUE|FALSE)([-+*\/^&%<=>: ;),]|$)/i,
     rx_string = /^\"((\"\"|[^\"])*)\"/,
-//    rx_name = new XRegExp( "^(?<name>\\p{L}[\\p{L}\\d.]*)([-+*\\/^&%<=>: ;),]|$)" ),
     rx_test_ws_name = new test_ws_name2(),
     rx_LeftBrace = /^ *\{ */,
     rx_RightBrace = /^ *\}/,
@@ -888,7 +885,6 @@ var str_namedRanges = "A-Za-z\u005F\u0080-\u0081\u0083\u0085-\u0087\u0089-\u008A
     rg_validOCTNumber = /^[0-7]{1,10}$/,
     rg_complex_number = new XRegExp( "^(?<real>[-+]?(?:\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?))?(?<img>([-+]?(\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?)?[ij])?)", "g" ),
     rx_name = new XRegExp( "^(?<name>" + "[" + str_namedRanges + "]" + "[" + str_namedRanges + "\\d.]*)([-+*\\/^&%<=>: ;),]|$)" ),
-//    rx_defName = new RegExp("(^(["+str_namedRanges+"_])(["+str_namedRanges+"_0-9]*)$)","i" ),
     rx_defName = new test_defName(),
     rx_arraySeparatorsDef = /^ *[,;] */,
     rx_numberDef = /^ *[+-]?\d*(\d|\.)\d*([eE][+-]?\d+)?/,
@@ -1293,21 +1289,21 @@ parserHelper.prototype.setDigitSeparator = function( sep ){
         arrayRowSeparator = ";";
         arrayColSeparator = "\\";
         functionArgumentSeparator = ";";
-        rx_number = new RegExp("^ *[+-]?\\d*(\\d|"+ digitSeparator +")\\d*([eE][+-]?\\d+)?");
+        rx_number = new RegExp("^ *[+-]?\\d*(\\d|\\"+ digitSeparator +")\\d*([eE][+-]?\\d+)?");
         rx_Comma = new RegExp("^ *["+functionArgumentSeparator+"] *");
-        rx_array = new RegExp("^\\{(([+-]?\\d*(\\d|"+digitSeparator+")\\d*([eE][+-]?\\d+)?)?(\"((\"\"|[^\"])*)\")?(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|FALSE|TRUE)?["+arrayRowSeparator+"\\"+arrayColSeparator +"]?)*\\}","i");
+        rx_array = new RegExp("^\\{(([+-]?\\d*(\\d|\\"+digitSeparator+")\\d*([eE][+-]?\\d+)?)?(\"((\"\"|[^\"])*)\")?(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|FALSE|TRUE)?["+arrayRowSeparator+"\\"+arrayColSeparator +"]?)*\\}","i");
         rx_arraySeparators = new RegExp("^ *["+arrayRowSeparator+"\\"+arrayColSeparator+"] *");
     }
-    /*else{
+    else{
         arrayRowSeparator = arrayRowSeparatorDef;
         arrayColSeparator = arrayColSeparatorDef;
         digitSeparator = digitSeparatorDef;
         functionArgumentSeparator = functionArgumentSeparatorDef;
-        rx_number = new RegExp("^ *[+-]?\\d*(\\d|"+ digitSeparatorDef +")\\d*([eE][+-]?\\d+)?");
+        rx_number = new RegExp("^ *[+-]?\\d*(\\d|\\"+ digitSeparatorDef +")\\d*([eE][+-]?\\d+)?");
         rx_Comma = new RegExp("^ *["+functionArgumentSeparatorDef+"] *");
-        rx_array = new RegExp("^\\{(([+-]?\\d*(\\d|"+digitSeparatorDef+")\\d*([eE][+-]?\\d+)?)?(\"((\"\"|[^\"])*)\")?(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|FALSE|TRUE)?["+arrayRowSeparatorDef+"\\"+arrayColSeparatorDef +"]?)*\\}","i");
+        rx_array = new RegExp("^\\{(([+-]?\\d*(\\d|\\ "+digitSeparatorDef+")\\d*([eE][+-]?\\d+)?)?(\"((\"\"|[^\"])*)\")?(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|FALSE|TRUE)?["+arrayRowSeparatorDef+"\\"+arrayColSeparatorDef +"]?)*\\}","i");
         rx_arraySeparators = new RegExp("^ *["+arrayRowSeparatorDef+"\\"+arrayColSeparatorDef+"] *");
-    }*/
+    }
 };
 
 var parserHelp = new parserHelper();
