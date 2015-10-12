@@ -6356,10 +6356,8 @@ CTable.prototype =
 
         if ( true === bNeedRecalc )
         {
-            if (true !== History.Is_UndoOperation() && true !== History.Is_RedoOperation())
-                this.Internal_RecalculateGrid();
-
-            this.Refresh_RecalcData2( nRowIndex, 0 );
+            History.Add_RecalcTableGrid(this.Get_Id());
+            this.Refresh_RecalcData2(nRowIndex, 0);
         }
     },
 
@@ -19494,7 +19492,7 @@ CTable.prototype =
             return NewGrid;
         }
 
-        return undefined;
+        return [];
     },
 
     private_SetTableLayoutFixedAndUpdateGrid : function(nExceptColNum)
@@ -19742,6 +19740,22 @@ CTable.prototype.private_GetNextCell = function(RowIndex, CellIndex)
 CTable.prototype.private_GetPrevCell = function(RowIndex, CellIndex)
 {
     return this.Internal_Get_PrevCell({Cell : CellIndex, Row : RowIndex});
+};
+CTable.prototype.Check_ChangedTableGrid = function()
+{
+    var TableGrid_old = this.Internal_Copy_Grid(this.TableGridCalc);
+    this.Internal_RecalculateGrid();
+    var TableGrid_new = this.TableGridCalc;
+    for (var CurCol = 0, ColsCount = this.TableGridCalc.length; CurCol < ColsCount; CurCol++)
+    {
+        if (Math.abs(TableGrid_old[CurCol] - TableGrid_new[CurCol]) > 0.001)
+        {
+            this.RecalcInfo.TableBorders = true;
+            return true;
+        }
+    }
+
+    return false;
 };
 
 // Класс CTableRow
@@ -22680,29 +22694,13 @@ CTableCell.prototype =
 
         var Table   = this.Row.Table;
         var TablePr = Table.Get_CompiledPr(false).TablePr;
-        if (tbllayout_AutoFit === TablePr.TableLayout && true !== History.Is_UndoOperation() && true !== History.Is_RedoOperation())
+        if (tbllayout_AutoFit === TablePr.TableLayout)
         {
             if (this.Row.Table.Parent.Pages.length > 0)
             {
                 // Если изменение внутри ячейки влечет за собой изменение сетки таблицы, тогда
                 // пересчитывать таблицу надо с самого начала.
-                var CurCol;
-                var ColsCount = Table.TableGridCalc.length;
-                var TableGrid_old = [];
-                for (CurCol = 0; CurCol < ColsCount; CurCol++)
-                    TableGrid_old[CurCol] = Table.TableGridCalc[CurCol];
-
-                Table.Internal_RecalculateGrid();
-                var TableGrid_new = Table.TableGridCalc;
-
-                for (CurCol = 0; CurCol < ColsCount; CurCol++)
-                {
-                    if (Math.abs(TableGrid_old[CurCol] - TableGrid_new[CurCol]) > 0.001)
-                    {
-                        Table.RecalcInfo.TableBorders = true;
-                        return Table.Refresh_RecalcData2(0, 0);
-                    }
-                }
+                History.Add_RecalcTableGrid(Table.Get_Id());
             }
             else
                 return Table.Refresh_RecalcData2(0, 0);

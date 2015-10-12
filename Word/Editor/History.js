@@ -6,11 +6,6 @@
  * Time: 14:35
  */
 
-var historyoperation_None          = 0x00;
-var historyoperation_Undo          = 0x01;
-var historyoperation_Redo          = 0x02;
-var historyoperation_GetRecalcData = 0x03;
-
 function CHistory(Document)
 {
     this.Index      = -1;
@@ -40,8 +35,6 @@ function CHistory(Document)
 
     this.FileCheckSum = 0;
     this.FileSize     = 0;
-
-    this.Operation = historyoperation_None;
 }
 
 CHistory.prototype =
@@ -174,8 +167,6 @@ CHistory.prototype =
         if ( true != this.Can_Undo() )
             return null;
 
-        this.private_StartOperation(historyoperation_Undo);
-
         if (editor)
             editor.setUserAlive();
 
@@ -219,7 +210,6 @@ CHistory.prototype =
         if (null != Point)
             this.Document.Set_SelectionState( Point.State );
 
-        this.private_EndOperation();
         return this.RecalculateData;
     },
 
@@ -231,8 +221,6 @@ CHistory.prototype =
 
         if (editor)
             editor.setUserAlive();
-
-        this.private_StartOperation(historyoperation_Redo);
         
         this.Document.Selection_Remove();
         
@@ -257,7 +245,6 @@ CHistory.prototype =
 
         this.Document.Set_SelectionState( State );
 
-        this.private_EndOperation();
         return this.RecalculateData;
     },
 
@@ -430,7 +417,9 @@ CHistory.prototype =
                 All: false,
                 Map: {},
                 ThemeInfo: null
-            }
+            },
+
+            Tables : []
         };
     },
 
@@ -523,6 +512,27 @@ CHistory.prototype =
                     }
                 }
                 break;
+            }
+        }
+    },
+
+    Add_RecalcTableGrid : function(TableId)
+    {
+        this.RecalculateData.Tables[TableId] = true;
+    },
+
+    OnEnd_GetRecalcData : function()
+    {
+        // Пересчитываем таблицы
+        for (var TableId in this.RecalculateData.Tables)
+        {
+            var Table = g_oTableId.Get_ById(TableId);
+            if (null !== Table)
+            {
+                if (true === Table.Check_ChangedTableGrid())
+                {
+                    Table.Refresh_RecalcData2(0, 0);
+                }
             }
         }
     },
@@ -650,6 +660,7 @@ CHistory.prototype =
             }
         }
 
+        this.OnEnd_GetRecalcData();
         return this.RecalculateData;
     },
 
@@ -837,23 +848,6 @@ CHistory.prototype =
         return OverallTime;
     }
 
-};
-
-CHistory.prototype.private_StartOperation = function(Type)
-{
-    this.Operation = Type;
-};
-CHistory.prototype.private_EndOperation = function(Type)
-{
-    this.Operation = historyoperation_None;
-};
-CHistory.prototype.Is_UndoOperation = function()
-{
-    return (this.Operation === historyoperation_Undo ? true : false);
-};
-CHistory.prototype.Is_RedoOperation = function()
-{
-    return (this.Operation === historyoperation_Redo ? true : false);
 };
 
 var History = null;
