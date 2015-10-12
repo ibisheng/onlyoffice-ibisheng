@@ -1592,12 +1592,13 @@ DefNameVertex.prototype = {
 
     returnCell:function () {
         //todo
-        if ( null == this.cell && this.wb && !this.isArea && this.Ref !== null && this.Ref !== undefined ) {
-            var ws = this.wb.getWorksheetById( this.sheetId );
-            if ( ws )
-                this.cell = ws._getCellNoEmpty( this.bbox.r1, this.bbox.c1 );
-        }
-        return this.cell;
+        return false;
+//        if ( null == this.cell && this.wb && !this.isArea && this.Ref !== null && this.Ref !== undefined ) {
+//            var ws = this.wb.getWorksheetById( this.sheetId );
+//            if ( ws )
+//                this.cell = ws._getCellNoEmpty( this.bbox.r1, this.bbox.c1 );
+//        }
+//        return this.cell;
     },
 
     getAscCDefName:function () {
