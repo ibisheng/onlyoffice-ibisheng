@@ -5603,6 +5603,21 @@ DrawingObjectsController.prototype =
                     }
                 }
             }
+            else
+            {
+                var oParentGroup = drawing.group.getMainGroup();
+                if(oParentGroup)
+                {
+                    locked = oParentGroup.lockType !== c_oAscLockTypes.kLockTypeNone && oParentGroup.lockType !== c_oAscLockTypes.kLockTypeMine ;
+                    if(typeof editor !== "undefined" && isRealObject(editor) && editor.isPresentationEditor)
+                    {
+                        if(oParentGroup.Lock)
+                        {
+                            locked = oParentGroup.Lock.Is_Locked();
+                        }
+                    }
+                }
+            }
             switch(drawing.getObjectType())
             {
                 case historyitem_type_Shape:
