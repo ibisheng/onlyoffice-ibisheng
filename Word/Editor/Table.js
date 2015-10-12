@@ -6356,6 +6356,9 @@ CTable.prototype =
 
         if ( true === bNeedRecalc )
         {
+            if (true !== History.Is_UndoOperation() && true !== History.Is_RedoOperation())
+                this.Internal_RecalculateGrid();
+
             this.Refresh_RecalcData2( nRowIndex, 0 );
         }
     },
@@ -21175,7 +21178,7 @@ function CTableCell(Row, ColW)
         CurPage : 0,
         Y_VAlign_offset : [] // Сдвиг, который нужно сделать из-за VAlign (массив по страницам)
     };
-    
+
     this.Index = 0;
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
@@ -21750,7 +21753,6 @@ CTableCell.prototype =
     {
         this.Content.Cursor_MoveToEndPos();
     },
-
 //-----------------------------------------------------------------------------------
 // Работаем с настройками ячейки
 //-----------------------------------------------------------------------------------
@@ -22678,32 +22680,32 @@ CTableCell.prototype =
 
         var Table   = this.Row.Table;
         var TablePr = Table.Get_CompiledPr(false).TablePr;
-        if ( tbllayout_AutoFit === TablePr.TableLayout )
+        if (tbllayout_AutoFit === TablePr.TableLayout && true !== History.Is_UndoOperation() && true !== History.Is_RedoOperation())
         {
-            if ( this.Row.Table.Parent.Pages.length > 0  )
+            if (this.Row.Table.Parent.Pages.length > 0)
             {
                 // Если изменение внутри ячейки влечет за собой изменение сетки таблицы, тогда
                 // пересчитывать таблицу надо с самого начала.
                 var CurCol;
                 var ColsCount = Table.TableGridCalc.length;
                 var TableGrid_old = [];
-                for ( CurCol = 0; CurCol < ColsCount; CurCol++ )
+                for (CurCol = 0; CurCol < ColsCount; CurCol++)
                     TableGrid_old[CurCol] = Table.TableGridCalc[CurCol];
 
                 Table.Internal_RecalculateGrid();
                 var TableGrid_new = Table.TableGridCalc;
 
-                for ( CurCol = 0; CurCol < ColsCount; CurCol++ )
+                for (CurCol = 0; CurCol < ColsCount; CurCol++)
                 {
-                    if ( Math.abs( TableGrid_old[CurCol] - TableGrid_new[CurCol] ) > 0.001 )
+                    if (Math.abs(TableGrid_old[CurCol] - TableGrid_new[CurCol]) > 0.001)
                     {
                         Table.RecalcInfo.TableBorders = true;
-                        return Table.Refresh_RecalcData2( 0, 0 );
+                        return Table.Refresh_RecalcData2(0, 0);
                     }
                 }
             }
             else
-                return Table.Refresh_RecalcData2( 0, 0 );
+                return Table.Refresh_RecalcData2(0, 0);
         }
 
         this.Row.Refresh_RecalcData2( this.Index, Page_Rel );
