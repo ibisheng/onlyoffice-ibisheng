@@ -930,7 +930,7 @@ function DrawingObjects() {
         for(i = 0; i < aImagesSync.length; ++i)
         {
 			var localUrl = aImagesSync[i];
-			if(api.DocInfo["OfflineApp"]) {
+			if(api.DocInfo.asc_getOfflineApp()) {
 				g_oDocumentUrls.addImageUrl(localUrl, api.FontLoader.fontFilesPath + "../Excel/document/media/" + localUrl);
 			}
             aImagesSync[i] = getFullImageSrc2(localUrl);

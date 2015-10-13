@@ -396,15 +396,15 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     }
 
     if (this.DocInfo) {
-      this.documentId = this.DocInfo["Id"];
-      this.documentUserId = this.DocInfo["UserId"];
-      this.documentUrl = this.DocInfo["Url"];
-      this.documentTitle = this.DocInfo["Title"];
-      this.documentFormat = this.DocInfo["Format"];
-      this.documentVKey = this.DocInfo["VKey"];
-      this.chartEditor = this.DocInfo["ChartEditor"];
-      this.documentOpenOptions = this.DocInfo["Options"];
-      this.documentCallbackUrl = this.DocInfo["CallbackUrl"];
+      this.documentId = this.DocInfo.asc_getId();
+      this.documentUserId = this.DocInfo.asc_getUserId();
+      this.documentUrl = this.DocInfo.asc_getUrl();
+      this.documentTitle = this.DocInfo.asc_getTitle();
+      this.documentFormat = this.DocInfo.asc_getFormat();
+      this.documentVKey = this.DocInfo.asc_getVKey();
+      this.chartEditor = this.DocInfo.asc_getChartEditor();
+      this.documentOpenOptions = this.DocInfo.asc_getOptions();
+      this.documentCallbackUrl = this.DocInfo.asc_getCallbackUrl();
       // if(this.documentFormat)
       // {
       // switch(this.documentFormat)
@@ -420,8 +420,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
       // Выставляем пользователя
       this.User = new asc.asc_CUser();
-      this.User.asc_setId(this.DocInfo["UserId"]);
-      this.User.asc_setUserName(this.DocInfo["UserName"]);
+      this.User.asc_setId(this.DocInfo.asc_getUserId());
+      this.User.asc_setUserName(this.DocInfo.asc_getUserName());
     }
 
     if (undefined !== window["AscDesktopEditor"]) {
@@ -894,7 +894,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
         if (!this.documentId) {
           this.documentId = '9876543210';
         }
-        this.DocInfo["OfflineApp"] = true;
+        this.DocInfo.asc_putOfflineApp(true);
         this._OfflineAppDocumentStartLoad(fCallback);
       } else {
         var v = {

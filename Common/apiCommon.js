@@ -2625,6 +2625,182 @@
 	prot["asc_setUrlChanges"]		= prot.asc_setUrlChanges;
 	prot["asc_setCurrentChangeId"]	= prot.asc_setCurrentChangeId;
 	prot["asc_setArrColors"]		= prot.asc_setArrColors;
+
+
+    function asc_CUserInfo(obj)
+    {
+        if(obj)
+        {
+            if(typeof obj.Id != 'undefined'){
+                this.Id = obj.Id;
+            }
+            if(typeof obj.FullName != 'undefined'){
+                this.FullName = obj.FullName;
+            }
+            if(typeof obj.FirstName != 'undefined'){
+                this.FirstName = obj.FirstName;
+            }
+            if(typeof obj.LastName != 'undefined'){
+                this.LastName = obj.LastName;
+            }
+        }
+        else
+        {
+            this.Id       = null;
+            this.FullName = null;
+            this.FirstName = null;
+            this.LastName = null;
+        }
+    }
+    asc_CUserInfo.prototype.asc_putId =   asc_CUserInfo.prototype.put_Id = function(v){this.Id = v;};
+    asc_CUserInfo.prototype.asc_getId =   asc_CUserInfo.prototype.get_Id = function(){return this.Id;};
+    asc_CUserInfo.prototype.asc_putFullName =  asc_CUserInfo.prototype.put_FullName = function(v){this.FullName = v;};
+    asc_CUserInfo.prototype.asc_getFullName =  asc_CUserInfo.prototype.get_FullName = function(){return this.FullName;};
+    asc_CUserInfo.prototype.asc_putFirstName = asc_CUserInfo.prototype.put_FirstName = function(v){this.FirstName = v;};
+    asc_CUserInfo.prototype.asc_getFirstName = asc_CUserInfo.prototype.get_FirstName = function(){return this.FirstName;};
+    asc_CUserInfo.prototype.asc_putLastName =  asc_CUserInfo.prototype.put_LastName = function(v){this.LastName = v;};
+    asc_CUserInfo.prototype.asc_getLastName =  asc_CUserInfo.prototype.get_LastName = function(){return this.LastName;};
+
+    prot = asc_CUserInfo.prototype;
+    prot["asc_putId"] =        prot["put_Id"]         = asc_CUserInfo.prototype.asc_putId;
+    prot["asc_getId"] =        prot["get_Id"]         = asc_CUserInfo.prototype.asc_getId;
+    prot["asc_putFullName"] =  prot["put_FullName"]   = asc_CUserInfo.prototype.asc_putFullName;
+    prot["asc_getFullName"] =  prot["get_FullName"]   = asc_CUserInfo.prototype.asc_getFullName;
+    prot["asc_putFirstName"] = prot["put_FirstName"]  = asc_CUserInfo.prototype.asc_putFirstName;
+    prot["asc_getFirstName"] = prot["get_FirstName"]  = asc_CUserInfo.prototype.asc_getFirstName;
+    prot["asc_putLastName"] =  prot["put_LastName"]   = asc_CUserInfo.prototype.asc_putLastName;
+    prot["asc_getLastName"] =  prot["get_LastName"]   = asc_CUserInfo.prototype.asc_getLastName;
+
+    window["CUserInfo"] = window["Asc"].asc_CUserInfo = window["Asc"]["asc_CUserInfo"] = asc_CUserInfo;
+
+
+    function asc_CDocInfo (obj){
+        if(obj){
+            if (typeof obj.Id != 'undefined'){
+                this.Id = obj.Id;
+            }
+            if (typeof obj.Url != 'undefined'){
+                this.Url = obj.Url;
+            }
+            if (typeof obj.Title != 'undefined'){
+                this.Title = obj.Title;
+            }
+            if (typeof obj.Format != 'undefined'){
+                this.Format = obj.Format;
+            }
+            if (typeof obj.VKey != 'undefined'){
+                this.VKey = obj.VKey;
+            }
+            if (typeof obj.UserId != 'undefined'){
+                this.UserId = obj.UserId;
+            }
+
+            if(typeof obj.UserInfo != 'undefined'){
+                this.UserInfo = new asc_CUserInfo(obj.UserInfo);
+            }
+
+            if (typeof obj.Options != 'undefined'){
+                this.Options = obj.Options;
+            }
+            if (typeof obj.CallbackUrl != 'undefined'){
+                this.CallbackUrl = obj.CallbackUrl;
+            }
+            if (obj.OfflineApp === true)
+                this.OfflineApp = true;
+
+            this.TemplateReplacement = (undefined !== obj.TemplateReplacement && null !== obj.TemplateReplacement ? obj.TemplateReplacement : null)
+            if(typeof obj.ChartEditor != 'undefined'){
+                this.ChartEditor = obj.ChartEditor;
+            }
+
+        }
+        else
+        {
+            this.Id                  = null;
+            this.Url                 = null;
+            this.Title               = null;
+            this.Format              = null;
+            this.VKey                = null;
+            this.UserInfo            = null;
+            this.Options             = null;
+            this.CallbackUrl         = null;
+            this.TemplateReplacement = null;
+            this.ChartEditor         = null;
+        }
+    }
+     asc_CDocInfo.prototype.get_Id =  asc_CDocInfo.prototype.asc_getId = function(){return this.Id};
+     asc_CDocInfo.prototype.put_Id =  asc_CDocInfo.prototype.asc_putId = function(v){this.Id = v;};
+     asc_CDocInfo.prototype.get_Url = asc_CDocInfo.prototype.asc_getUrl = function(){return this.Url;};
+     asc_CDocInfo.prototype.put_Url = asc_CDocInfo.prototype.asc_putUrl = function(v){this.Url = v;};
+     asc_CDocInfo.prototype.get_Title =  asc_CDocInfo.prototype.asc_getTitle = function(){return this.Title;};
+     asc_CDocInfo.prototype.put_Title =  asc_CDocInfo.prototype.asc_putTitle = function(v){this.Title = v;};
+     asc_CDocInfo.prototype.get_Format = asc_CDocInfo.prototype.asc_getFormat = function(){return this.Format;};
+     asc_CDocInfo.prototype.put_Format = asc_CDocInfo.prototype.asc_putFormat = function(v){this.Format = v;};
+     asc_CDocInfo.prototype.get_VKey = asc_CDocInfo.prototype.asc_getVKey = function(){return this.VKey;};
+     asc_CDocInfo.prototype.put_VKey = asc_CDocInfo.prototype.asc_putVKey = function(v){this.VKey = v;};
+     asc_CDocInfo.prototype.get_OfflineApp = asc_CDocInfo.prototype.asc_getOfflineApp = function(){return this.OfflineApp;};
+     asc_CDocInfo.prototype.put_OfflineApp = asc_CDocInfo.prototype.asc_putOfflineApp = function(v){this.OfflineApp = v;};
+     asc_CDocInfo.prototype.get_UserId =  asc_CDocInfo.prototype.asc_getUserId = function(){return (this.UserInfo ? this.UserInfo.get_Id() : null );};
+     asc_CDocInfo.prototype.get_UserName = asc_CDocInfo.prototype.asc_getUserName = function(){
+         return (this.UserInfo ? this.UserInfo.get_FullName() : null );
+     };
+    asc_CDocInfo.prototype.get_UserName2 = asc_CDocInfo.prototype.asc_getUserName2 = function(){
+        if(!this.UserInfo)
+        {
+            return "";
+        }
+        var sFirstName = this.UserInfo.asc_getFirstName();
+        var sLastName = this.UserInfo.asc_getLastName();
+         return (typeof sFirstName === "string" ? sFirstName : "") + (typeof sLastName === "string" ? sLastName : "");
+     };
+     asc_CDocInfo.prototype.get_Options =  asc_CDocInfo.prototype.asc_getOptions = function(){return this.Options;};
+     asc_CDocInfo.prototype.put_Options =  asc_CDocInfo.prototype.asc_putOptions = function(v){this.Options = v;};
+     asc_CDocInfo.prototype.get_CallbackUrl = asc_CDocInfo.prototype.asc_getCallbackUrl = function(){return this.CallbackUrl;};
+     asc_CDocInfo.prototype.put_CallbackUrl = asc_CDocInfo.prototype.asc_putCallbackUrl = function(v){this.CallbackUrl = v;};
+     asc_CDocInfo.prototype.get_TemplateReplacement = asc_CDocInfo.prototype.asc_getTemplateReplacement = function(){return this.TemplateReplacement;};
+     asc_CDocInfo.prototype.put_TemplateReplacement = asc_CDocInfo.prototype.asc_putTemplateReplacement = function(v){this.TemplateReplacement = v;};
+     asc_CDocInfo.prototype.get_UserFirstName = asc_CDocInfo.prototype.asc_getUserFirstName = function(){return this.UserFirstName;};
+     asc_CDocInfo.prototype.put_UserFirstName = asc_CDocInfo.prototype.asc_putUserFirstName = function(v){this.UserFirstName = v;};
+     asc_CDocInfo.prototype.get_UserLastName =  asc_CDocInfo.prototype.asc_getUserLastName = function(){return this.UserLastName;};
+     asc_CDocInfo.prototype.put_UserLastName =  asc_CDocInfo.prototype.asc_putUserLastName = function(v){this.UserLastName = v;};
+     asc_CDocInfo.prototype.get_ChartEditor =  asc_CDocInfo.prototype.asc_getChartEditor = function(){return this.ChartEditor;};
+     asc_CDocInfo.prototype.put_ChartEditor =  asc_CDocInfo.prototype.asc_putChartEditor = function(v){this.ChartEditor = v;};
+     asc_CDocInfo.prototype.get_UserInfo =  asc_CDocInfo.prototype.asc_getUserInfo = function(){return this.UserInfo;};
+     asc_CDocInfo.prototype.put_UserInfo =  asc_CDocInfo.prototype.asc_putUserInfo = function(v){this.UserInfo = v;};
+
+    window["CDocInfo"] = window["Asc"].asc_CDocInfo = window["Asc"]["asc_CDocInfo"] = asc_CDocInfo;
+
+    prot = asc_CDocInfo.prototype;
+
+    prot["get_Id"]                  = prot["asc_getId"]                  =   prot.asc_getId;
+    prot["put_Id"]                  = prot["asc_putId"]                  =   prot.asc_putId;
+    prot["get_Url"]                 = prot["asc_getUrl"]                 =   prot.asc_getUrl;
+    prot["put_Url"]                 = prot["asc_putUrl"]                 =   prot.asc_putUrl;
+    prot["get_Title"]               = prot["asc_getTitle"]               =   prot.asc_getTitle;
+    prot["put_Title"]               = prot["asc_putTitle"]               =   prot.asc_putTitle;
+    prot["get_Format"]              = prot["asc_getFormat"]              =   prot.asc_getFormat;
+    prot["put_Format"]              = prot["asc_putFormat"]              =   prot.asc_putFormat;
+    prot["get_VKey"]                = prot["asc_getVKey"]                =   prot.asc_getVKey;
+    prot["put_VKey"]                = prot["asc_putVKey"]                =   prot.asc_putVKey;
+    prot["get_OfflineApp"]          = prot["asc_getOfflineApp"]          =   prot.asc_getOfflineApp;
+    prot["put_OfflineApp"]          = prot["asc_putOfflineApp"]          =   prot.asc_putOfflineApp;
+    prot["get_UserId"]              = prot["asc_getUserId"]              =   prot.asc_getUserId;
+    prot["put_UserId"]              = prot["asc_putUserId"]              =   prot.asc_putUserId;
+    prot["get_UserName"]            = prot["asc_getUserName"]            =   prot.asc_getUserName;
+    prot["get_UserName2"]           = prot["asc_getUserName2"]            =   prot.asc_getUserName2;
+    prot["get_Options"]             = prot["asc_getOptions"]             =   prot.asc_getOptions;
+    prot["put_Options"]             = prot["asc_putOptions"]             =   prot.asc_putOptions;
+    prot["get_CallbackUrl"]         = prot["asc_getCallbackUrl"]         =   prot.asc_getCallbackUrl;
+    prot["put_CallbackUrl"]         = prot["asc_putCallbackUrl"]         =   prot.asc_putCallbackUrl;
+    prot["get_TemplateReplacement"] = prot["asc_getTemplateReplacement"] =   prot.asc_getTemplateReplacement;
+    prot["put_TemplateReplacement"] = prot["asc_putTemplateReplacement"] =   prot.asc_putTemplateReplacement;
+    prot["get_UserFirstName"]           = prot["asc_getUserFirstName"]           =   prot.asc_getUserFirstName;
+    prot["put_UserFirstName"]           = prot["asc_putUserFirstName"]           =   prot.asc_putUserFirstName;
+    prot["get_UserLastName"]            = prot["asc_getUserLastName"]            =   prot.asc_getUserLastName;
+    prot["put_UserLastName"]            = prot["asc_putUserLastName"]            =   prot.asc_putUserLastName;
+    prot["get_ChartEditor"]            = prot["asc_getChartEditor"]            =   prot.asc_getChartEditor;
+    prot["put_ChartEditor"]            = prot["asc_putChartEditor"]            =   prot.asc_putChartEditor;
+
 }
 )(window);
 
@@ -2685,6 +2861,7 @@ var asc_CParagraphFrame = window["asc_CParagraphFrame"];
 var CMouseMoveData = window["CMouseMoveData"];
 var asc_TextArtProperties = window["asc_TextArtProperties"];
 var asc_TextArtTranslate = window["asc_TextArtTranslate"];
+var CDocInfo = window["CDocInfo"];
 
 
 
