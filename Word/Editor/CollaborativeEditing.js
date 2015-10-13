@@ -226,6 +226,8 @@ function CCollaborativeEditing()
 
     this.m_oMemory      = new CMemory(); // Глобальные класс для сохранения
 
+    this.m_bFast  = false;
+
 //    // CollaborativeEditing LOG
 //    this.m_nErrorLog_PointChangesCount = 0;
 //    this.m_nErrorLog_SavedPCC          = 0;
@@ -248,6 +250,16 @@ function CCollaborativeEditing()
         this.m_aCheckLocks  = [];
         this.m_aNewObjects  = [];
         this.m_aNewImages   = [];
+    };
+
+    this.Set_Fast = function()
+    {
+        this.m_bFast = true;
+    };
+
+    this.Is_Fast = function()
+    {
+        return this.m_bFast;
     };
 
     this.Is_SingleUser = function()
@@ -308,6 +320,11 @@ function CCollaborativeEditing()
     {
         this.m_aNeedUnlock2.push( Lock );
 		editor._onUpdateDocumentCanSave();
+    };
+
+    this.Have_OtherChanges = function()
+    {
+        return (this.m_aChanges.length > 0 ? true: false);
     };
 
     this.Apply_OtherChanges = function()

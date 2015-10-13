@@ -970,6 +970,8 @@ CDocument.prototype =
                 this.private_ProcessTemplateReplacement(TemplateReplacementData);
             }
         }
+
+        //this.Set_FastCollaborativeEditing(true);
     },
     
     Add_TestDocument : function()
@@ -9451,7 +9453,7 @@ CDocument.prototype =
 
         if ( e.KeyCode == 8 && false === editor.isViewMode ) // BackSpace
         {
-            if (false === this.Document_Is_SelectionLocked(changestype_Remove))
+            if (true === CollaborativeEditing.Is_Fast() || false === this.Document_Is_SelectionLocked(changestype_Remove))
             {
                 this.Create_NewHistoryPoint(historydescription_Document_BackSpaceButton);
                 this.Remove(-1, true);
@@ -9599,7 +9601,7 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 32 && false === editor.isViewMode ) // Space
         {
-            if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+            if (true === CollaborativeEditing.Is_Fast() || false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
             {
                 this.Create_NewHistoryPoint(historydescription_Document_SpaceButton);
 
@@ -9961,7 +9963,7 @@ CDocument.prototype =
         {
             if ( true != e.ShiftKey )
             {
-                if ( false === this.Document_Is_SelectionLocked(changestype_Delete) )
+                if (true === CollaborativeEditing.Is_Fast() || false === this.Document_Is_SelectionLocked(changestype_Delete))
                 {
                     this.Create_NewHistoryPoint(historydescription_Document_DeleteButton);
                     this.Remove( 1, true );
@@ -10438,7 +10440,7 @@ CDocument.prototype =
 
         if ( Code > 0x20 )
         {
-            if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+            if (true === CollaborativeEditing.Is_Fast() || false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
             {
                 this.Create_NewHistoryPoint(historydescription_Document_AddLetter);
 
@@ -14596,6 +14598,30 @@ CDocument.prototype.Get_ElementsCount = function()
 CDocument.prototype.Get_ElementByIndex = function(Index)
 {
     return this.Content[Index];
+};
+CDocument.prototype.Set_FastCollaborativeEditing = function(isOn)
+{
+    CollaborativeEditing.Set_Fast(true);
+    editor.SetCollaborativeMarksShowType(c_oAscCollaborativeMarksShowType.All);
+};
+CDocument.prototype.Continue_FastCollaborativeEditing = function()
+{
+    if (true !== CollaborativeEditing.Is_Fast())
+        return;
+
+    // TODO: Убрать эту функцю
+    editor.SetCollaborativeMarksShowType(c_oAscCollaborativeMarksShowType.All);
+
+    if (true !== History.Have_Changes() && true === CollaborativeEditing.Have_OtherChanges())
+    {
+        // Принимаем чужие изменение. Своих нет, но функцию отсылки надо вызвать, чтобы снялить локи.
+        CollaborativeEditing.Apply_Changes();
+        CollaborativeEditing.Send_Changes();
+    }
+    else if (true === History.Have_Changes() || true === CollaborativeEditing.Have_OtherChanges())
+    {
+        editor.asc_Save();
+    }
 };
 
 //-----------------------------------------------------------------------------------

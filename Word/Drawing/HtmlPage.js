@@ -3493,6 +3493,7 @@ function CEditorPage(api)
 
         oThis.m_oLogicDocument.Continue_CheckSpelling();
         oThis.m_oLogicDocument.Continue_TrackRevisions();
+        oThis.m_oLogicDocument.Continue_FastCollaborativeEditing();
     }
     this.OnScroll = function()
     {

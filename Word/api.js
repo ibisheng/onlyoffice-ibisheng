@@ -5591,7 +5591,8 @@ asc_docs_api.prototype.sync_UnLockDocumentProps = function()
 
 asc_docs_api.prototype.sync_CollaborativeChanges = function()
 {
-    this.asc_fireCallback("asc_onCollaborativeChanges");
+    if (true !== CollaborativeEditing.Is_Fast())
+        this.asc_fireCallback("asc_onCollaborativeChanges");
 };
 
 asc_docs_api.prototype.sync_LockDocumentSchema = function()
