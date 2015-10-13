@@ -239,8 +239,16 @@ CDocument.prototype.Search_Replace = function(NewStr, bAll, Id)
     var CheckParagraphs = [];
     if ( true === bAll )
     {
-        for ( var Id in this.SearchEngine.Elements )
-            CheckParagraphs.push( this.SearchEngine.Elements[Id] );
+        var CheckParagraphsObj = {};
+        for (var Id in this.SearchEngine.Elements)
+        {
+            CheckParagraphsObj[this.SearchEngine.Elements[Id].Get_Id()] = this.SearchEngine.Elements[Id];
+        }
+
+        for (var ParaId in CheckParagraphsObj)
+        {
+            CheckParagraphs.push(CheckParagraphsObj[ParaId]);
+        }
     }
     else
     {
