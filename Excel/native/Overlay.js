@@ -1,13 +1,14 @@
 "use strict";
 
-var TRACK_CIRCLE_RADIUS     = 5;
-var TRACK_RECT_SIZE2        = 4;
-var TRACK_RECT_SIZE         = 8;
+var TRACK_CIRCLE_RADIUS     = 15;
+var TRACK_RECT_SIZE2        = 6;//4;
+var TRACK_RECT_SIZE         = 10;//8;
 var TRACK_DISTANCE_ROTATE   = 25;
 var TRACK_DISTANCE_ROTATE2  = 25;
-var TRACK_ADJUSTMENT_SIZE   = 10;
-var TRACK_WRAPPOINTS_SIZE   = 6;
-var IMAGE_ROTATE_TRACK_W    = 21;
+var TRACK_ADJUSTMENT_SIZE   = 12;//10;
+var TRACK_WRAPPOINTS_SIZE   = 8;//6;
+var IMAGE_ROTATE_TRACK_W    = 25;//21;
+
 
 var bIsUseImageRotateTrack  = true;
 if (bIsUseImageRotateTrack)
@@ -549,6 +550,7 @@ CAutoshapeTrack.prototype =
     // path commands
     _s : function()
     {
+        console.log('PD_PathStart');
         this.Native["PD_PathStart"]();
     },
     _e : function()
