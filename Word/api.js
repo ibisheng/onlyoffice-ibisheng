@@ -2233,9 +2233,11 @@ function OnSave_Callback(e) {
 			// Отключаемся от сохранения, соединение потеряно
 			editor.canSave = true;
 		} else {
+
+            var TimeoutInterval = (true === CollaborativeEditing.Is_Fast() ? 1 : 1000);
 			setTimeout(function () {
 				editor.CoAuthoringApi.askSaveChanges(OnSave_Callback);
-			}, 1000);
+			}, TimeoutInterval);
 		}
 	}
 }
