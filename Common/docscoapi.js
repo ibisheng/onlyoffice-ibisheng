@@ -539,7 +539,7 @@
           }
         }, this.errorTimeOut);
       }
-      this._send({"type": 'getLock', 'editorType': this.editorType, 'block': arrayBlockId});
+      this._send({"type": 'getLock', 'block': arrayBlockId});
     } else {
       // Вернем ошибку, т.к. залочены элементы
       window.setTimeout(function() {
