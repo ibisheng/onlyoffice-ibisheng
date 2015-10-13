@@ -3767,6 +3767,7 @@
 			this.clipboard = clipboard;
 			this.ws = ws;
 			this.isUsuallyPutImages = null;
+			this.maxLengthRowCount = 0;
 			
 			return this;
 		}
@@ -3929,16 +3930,16 @@
 						row = aResult.length;
 				}
 				
-				if(this.aResult[row] && this.aResult[row][col] && this.aResult[row][col][0] && this.aResult[row][col][0].length === 0 && (this.aResult[row][col][0].borders || this.aResult[row][col][0].rowSpan != null))
+				if(this.aResult[row + this.maxLengthRowCount] && this.aResult[row + this.maxLengthRowCount][col] && this.aResult[row + this.maxLengthRowCount][col][0] && this.aResult[row + this.maxLengthRowCount][col][0].length === 0 && (this.aResult[row + this.maxLengthRowCount][col][0].borders || this.aResult[row + this.maxLengthRowCount][col][0].rowSpan != null))
 				{
-					if(this.aResult[row][col][0].borders)
-						oNewItem.borders = this.aResult[row][col][0].borders;
-					if(this.aResult[row][col][0].rowSpan != null)
+					if(this.aResult[row + this.maxLengthRowCount][col][0].borders)
+						oNewItem.borders = this.aResult[row + this.maxLengthRowCount][col][0].borders;
+					if(this.aResult[row + this.maxLengthRowCount][col][0].rowSpan != null)
 					{
-						oNewItem.rowSpan = this.aResult[row][col][0].rowSpan;
-						oNewItem.colSpan = this.aResult[row][col][0].colSpan;
+						oNewItem.rowSpan = this.aResult[row + this.maxLengthRowCount][col][0].rowSpan;
+						oNewItem.colSpan = this.aResult[row + this.maxLengthRowCount][col][0].colSpan;
 					}
-					delete this.aResult[row][col];
+					delete this.aResult[row + this.maxLengthRowCount][col];
 				};
 	
 				if(!aResult[row])
@@ -3969,7 +3970,7 @@
 					
 				//так же wrap выставляем у параграфа, чьим родителем является ячейка таблицы	
 				if(this._getParentByTag(paragraph, c_oAscBoundsElementType.Cell) != null)
-					oNewItem.wrap = true;
+					oNewItem.wrap = false;
 				
 				//Numbering
 				var LvlPr = null;
@@ -4009,9 +4010,12 @@
 				//проходимся по контенту paragraph
 				for(var n = 0; n < content.length; n++)
 				{
+					if(!aResult[row + this.maxLengthRowCount])
+						aResult[row + this.maxLengthRowCount] = [];
+					
 					//s  - меняется в зависимости от табуляции
-					if(!aResult[row][s + c1])
-						aResult[row][s + c1] = [];
+					if(!aResult[row + this.maxLengthRowCount][s + c1])
+						aResult[row + this.maxLengthRowCount][s + c1] = [];
 						
 					if(text == null)
 						text = "";
@@ -4179,12 +4183,12 @@
 							cloneNewItem  = this._getCloneNewItem(oNewItem);
 							
 							//переходим в следующую ячейку
-							if(typeof aResult[row][s + c1] == "object")
-								aResult[row][s + c1][aResult[row][s + c1].length] = cloneNewItem;
+							if(typeof aResult[row + this.maxLengthRowCount][s + c1] == "object")
+								aResult[row + this.maxLengthRowCount][s + c1][aResult[row + this.maxLengthRowCount][s + c1].length] = cloneNewItem;
 							else
 							{
-								aResult[row][s + c1] = [];
-								aResult[row][s + c1][0] = cloneNewItem;
+								aResult[row + this.maxLengthRowCount][s + c1] = [];
+								aResult[row + this.maxLengthRowCount][s + c1][0] = cloneNewItem;
 							}
 								
 							text = "";
@@ -4211,6 +4215,13 @@
 							{
 								aResult[row][s + c1] = [];
 								aResult[row][s + c1][0] = oNewItem;
+							}
+							
+							var checkMaxTextLength = this.clipboard._checkMaxTextLength(this.aResult, row + this.maxLengthRowCount, s + c1);
+							if(checkMaxTextLength)
+							{	
+								aResult = checkMaxTextLength.aResult;
+								this.maxLengthRowCount += checkMaxTextLength.r - row;
 							}
 						};
 					}
