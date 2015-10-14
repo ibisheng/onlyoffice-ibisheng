@@ -1584,7 +1584,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
               case "needparams":
 				// Проверяем, возможно нам пришли опции для CSV
 				if (t.documentOpenOptions) {
-				  var codePageCsv = t.documentOpenOptions["codePage"],
+				  var codePageCsv = c_oAscEncodingsMap[t.documentOpenOptions["codePage"]] || c_oAscCodePageUtf8,
                       delimiterCsv = t.documentOpenOptions["delimiter"];
 				  if (null !== codePageCsv && undefined !== codePageCsv && null !== delimiterCsv && undefined !== delimiterCsv) {
 					t.asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV, new asc.asc_CCSVAdvancedOptions(codePageCsv, delimiterCsv));

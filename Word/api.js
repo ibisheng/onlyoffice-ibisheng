@@ -6746,8 +6746,8 @@ function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, tx
 		oAdditionalData['url'] = editor.mailMergeFileData['url'];
 		oAdditionalData['format'] = editor.mailMergeFileData['fileType'];
 		// ToDo select csv params
-		oAdditionalData['codepage'] = 65001;
-		oAdditionalData['delimiter'] = 4; // c_oAscCsvDelimiter.Comma
+		oAdditionalData['codepage'] = c_oAscCodePageUtf8;
+		oAdditionalData['delimiter'] = c_oAscCsvDelimiter.Comma
 	} else if (c_oAscFileType.TXT === filetype && !txtOptions && null == oDocumentMailMerge && null == oMailMergeSendData) {
 		// Мы открывали команду, надо ее закрыть.
 		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
