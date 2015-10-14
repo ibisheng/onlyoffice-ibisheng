@@ -201,6 +201,7 @@ function asc_docs_api(name)
     if (window.editor == undefined)
     {
         window.editor = this;
+		window.editor;
         window['editor'] = window.editor;
         
         if (window["NATIVE_EDITOR_ENJINE"])
@@ -4540,6 +4541,9 @@ asc_docs_api.prototype.ClearFormating = function()
 {
     this.WordControl.m_oLogicDocument.Paragraph_ClearFormatting();
 };
+
+window.ID_KEYBOARD_AREA = undefined;
+window.ID_KEYBOARD_AREA;
 asc_docs_api.prototype.SetDeviceInputHelperId = function(idKeyboard)
 {
     if (window.ID_KEYBOARD_AREA === undefined && this.WordControl.m_oMainView != null)

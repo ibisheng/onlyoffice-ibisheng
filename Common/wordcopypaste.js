@@ -77,16 +77,16 @@ function ResetNewUrls(data, aUrls, aBuilderImagesByUrl, oImageMap)
     }
 }
 
-window.USER_AGENT_MACOS = AscBrowser.isMacOs;
-window.USER_AGENT_SAFARI_MACOS = AscBrowser.isSafariMacOs;
-window.USER_AGENT_IE = AscBrowser.isIE || AscBrowser.isOpera;
-window.USER_AGENT_WEBKIT = AscBrowser.isWebkit;
+window.USER_AGENT_MACOS = AscBrowser.isMacOs; window.USER_AGENT_MACOS;
+window.USER_AGENT_SAFARI_MACOS = AscBrowser.isSafariMacOs; window.USER_AGENT_SAFARI_MACOS;
+window.USER_AGENT_IE = AscBrowser.isIE || AscBrowser.isOpera; window.USER_AGENT_IE;
+window.USER_AGENT_WEBKIT = AscBrowser.isWebkit; window.USER_AGENT_WEBKIT;
 
-window.GlobalPasteFlagCounter = 0;
-window.GlobalPasteFlag = false;
-window.GlobalCopyFlag = false;
+window.GlobalPasteFlagCounter = 0; window.GlobalPasteFlagCounter;
+window.GlobalPasteFlag = false; window.GlobalPasteFlag;
+window.GlobalCopyFlag = false; window.GlobalCopyFlag;
 
-window.PasteEndTimerId = -1;
+window.PasteEndTimerId = -1; window.PasteEndTimerId;
 
 var COPY_ELEMENT_ID = "SelectId";
 var PASTE_ELEMENT_ID = "wrd_pastebin";

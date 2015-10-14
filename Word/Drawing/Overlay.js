@@ -13,6 +13,7 @@ var bIsUseImageRotateTrack  = true;
 if (bIsUseImageRotateTrack)
 {
     window.g_track_rotate_marker = new Image();
+	window.g_track_rotate_marker;
     window.g_track_rotate_marker.asc_complete = false;
     window.g_track_rotate_marker.onload = function(){
         window.g_track_rotate_marker.asc_complete = true;
@@ -20,6 +21,7 @@ if (bIsUseImageRotateTrack)
     window.g_track_rotate_marker.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAMAAACeyVWkAAAAVFBMVEUAAAD///////////////////////////////////////////////////////98fHy2trb09PTT09OysrKqqqqJiYng4ODr6+uamprGxsbi4uKGhoYjgM0eAAAADnRSTlMAy00k7/z0jbeuMzDljsugwZgAAACpSURBVBjTdZHbEoMgDESDAl6bgIqX9v//s67UYpm6D0xyYMImoaiuUr3pVdVRUtnwqaY8YaE5SRcfaPgqc+DSIh7WIGGaEVoUqRGN4oZlcDIiqYlaPjQz5CNu6cFJwLiuSO3nlLBDrKhn3l4rcnH4NcAdGd5EZMfCsoMFBxM6CD57G+u6vC48PMVnHtrYhP/x+7+3cw7zdJnD3cyA7QXa4nYXaW+a9Xdvb6zqE5Jb7LmzAAAAAElFTkSuQmCC";
 
     window.g_track_rotate_marker2 = new Image();
+	window.g_track_rotate_marker2;
     window.g_track_rotate_marker2.asc_complete = false;
     window.g_track_rotate_marker2.onload = function(){
         window.g_track_rotate_marker2.asc_complete = true;

@@ -1283,6 +1283,7 @@ var g_oLcidIdToNameMap = {};
     }
 
     window.CDetectFontUse = CDetectFontUse;
+	window.CDetectFontUse;
 })(window.document);
 
 var g_font_detector = new window.CDetectFontUse();

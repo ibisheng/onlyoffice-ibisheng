@@ -1,5 +1,17 @@
 "use strict";
 
+window.g_fontNamesEncoder = undefined;
+window.g_fontNamesEncoder;
+
+window.g_font_files = undefined;
+window.g_font_files;
+
+window.g_font_infos = undefined;
+window.g_font_infos;
+
+window.g_map_font_index = {};
+window.g_map_font_index;
+
 function ZBase32Encoder()
 {
     this.EncodingTable = "ybndrfg8ejkmcpqxot1uwisza345h769";
@@ -1478,8 +1490,7 @@ function DecodeBase64(imData, szSrc)
     var __len_infos = window["__fonts_infos"].length;
 
     window.g_font_infos = new Array(__len_infos);
-    window.g_map_font_index = {};
-
+	
     for (var i = 0; i < __len_infos; i++)
     {
         var _info = window["__fonts_infos"][i];

@@ -1145,4 +1145,6 @@ function CPPTXContentWriter()
 }
 
 window.global_pptx_content_loader = new CPPTXContentLoader();
+window.global_pptx_content_loader;
 window.global_pptx_content_writer = new CPPTXContentWriter();
+window.global_pptx_content_writer;

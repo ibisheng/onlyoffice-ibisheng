@@ -1,6 +1,7 @@
 "use strict";
 
-var g_fontManager2 = null;
+window.g_fontManager2 = null;
+window.g_fontManager2;
 
 function CClipManager()
 {

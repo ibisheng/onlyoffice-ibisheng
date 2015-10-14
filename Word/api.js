@@ -480,6 +480,7 @@ function asc_docs_api(name)
     if (window.editor == undefined)
     {
         window.editor = this;
+		window.editor;
         window['editor'] = window.editor;
         
         if (window["NATIVE_EDITOR_ENJINE"])

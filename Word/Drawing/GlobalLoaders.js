@@ -656,9 +656,12 @@
 	
     // exports
     window.g_font_loader    = new CGlobalFontLoader();
+	window.g_font_loader;
     window.g_image_loader   = new CGlobalImageLoader();
+	window.g_image_loader;
 
     window.g_flow_anchor = new Image();
+	window.g_flow_anchor;
     window.g_flow_anchor.asc_complete = false;
     window.g_flow_anchor.onload = function(){
         window.g_flow_anchor.asc_complete = true;
@@ -666,6 +669,7 @@
     window.g_flow_anchor.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAPBAMAAADNDVhEAAAAIVBMVEUAAAANDQ0NDQ0NDQ0NDQ0NDQ0AAAANDQ0NDQ0NDQ0NDQ1jk7YPAAAACnRSTlMAGkD4mb9c5s9TDghpXQAAAFZJREFUCNdjYGBgW8YABlxcIBLBZ1gAEfZa5QWiGRkWMAIpAaA4iHQE0YwODEtANMsChkIwv4BBWQBICyswMC1iWADEDAzKoUuDFUAGNC9uABvIaQkkABpxD6lFb9lRAAAAAElFTkSuQmCC";
 
     window.g_flow_anchor2 = new Image();
+	window.g_flow_anchor2;
     window.g_flow_anchor2.asc_complete = false;
     window.g_flow_anchor2.onload = function(){
         window.g_flow_anchor2.asc_complete = true;

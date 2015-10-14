@@ -1231,5 +1231,5 @@
     dummyStyle = null;	// for the sake of it
 
     window.CTouchScroll = CTouchScroll;
-
+	window.CTouchScroll;
 })( window, document );

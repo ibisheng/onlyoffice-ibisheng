@@ -635,10 +635,10 @@
 	};
 	
     // exports
-    window.g_font_loader    = new CGlobalFontLoader();
-    window.g_image_loader   = new CGlobalImageLoader();
+    window.g_font_loader    = new CGlobalFontLoader(); window.g_font_loader;
+    window.g_image_loader   = new CGlobalImageLoader(); window.g_image_loader;
 
-    window.g_flow_anchor = new Image();
+    window.g_flow_anchor = new Image(); window.g_flow_anchor;
     window.g_flow_anchor.asc_complete = false;
     window.g_flow_anchor.onload = function(){
         window.g_flow_anchor.asc_complete = true;

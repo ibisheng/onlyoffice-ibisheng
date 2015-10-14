@@ -13,6 +13,7 @@ var bIsUseImageRotateTrack  = true;
 if (bIsUseImageRotateTrack)
 {
     window.g_track_rotate_marker = new Image();
+	window.g_track_rotate_marker;
     window.g_track_rotate_marker.asc_complete = false;
     window.g_track_rotate_marker.onload = function(){
         window.g_track_rotate_marker.asc_complete = true;

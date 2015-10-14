@@ -5413,6 +5413,7 @@ function CSlideDrawer()
 }
 
 window.g_comment_image = new Image();
+window.g_comment_image;
 window.g_comment_image.asc_complete = false;
 window.g_comment_image.onload = function(){
     window.g_comment_image.asc_complete = true;

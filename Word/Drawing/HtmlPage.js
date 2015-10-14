@@ -69,6 +69,9 @@ var GlobalSkinFlat = {
 
 var GlobalSkin = GlobalSkinTeamlab;
 
+window.IS_USE_INPUT = undefined;
+window.IS_USE_INPUT;
+
 function CEditorPage(api)
 {
     this.Name = "";
