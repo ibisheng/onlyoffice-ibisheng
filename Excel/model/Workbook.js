@@ -1060,14 +1060,16 @@ DependencyGraph.prototype = {
         }
     },
     checkDefNameLock:function(){
-        var nodesList = this.defNameList;
+        var nodesList = this.defNameList, countNodes = 0;
 
         for ( var id in nodesList ) {
+            countNodes++;
             if ( nodesList[id].isLock ) {
                 return true;
             }
         }
-        return false;
+        return !countNodes;
+//        return false;
     },
 
     getNextTableName:function ( ws, Ref ) {
