@@ -7440,36 +7440,36 @@ window["asc_docs_api"].prototype["asc_nativeGetPDF"] = function()
 };
 
 // cool api (autotests)
-window.asc_docs_api.prototype["Add_Text"] = window.asc_docs_api.prototype.Add_Text = function(_text)
+window["asc_docs_api"].prototype["Add_Text"] = function(_text)
 {
     this.WordControl.m_oLogicDocument.TextBox_Put(_text);
 };
-window.asc_docs_api.prototype["Add_NewParagraph"] = window.asc_docs_api.prototype.Add_NewParagraph = function()
+window["asc_docs_api"].prototype["Add_NewParagraph"] = function()
 {
     this.WordControl.m_oLogicDocument.Add_NewParagraph(true);
 };
-window.asc_docs_api.prototype["Cursor_MoveLeft"] = window.asc_docs_api.prototype.Cursor_MoveLeft = function()
+window["asc_docs_api"].prototype["Cursor_MoveLeft"] = function()
 {
     this.WordControl.m_oLogicDocument.Cursor_MoveLeft();
 };
-window.asc_docs_api.prototype["Cursor_MoveRight"] = window.asc_docs_api.prototype.Cursor_MoveRight = function()
+window["asc_docs_api"].prototype["Cursor_MoveRight"] = function()
 {
     this.WordControl.m_oLogicDocument.Cursor_MoveRight();
 };
-window.asc_docs_api.prototype["Cursor_MoveUp"] = window.asc_docs_api.prototype.Cursor_MoveUp = function()
+window["asc_docs_api"].prototype["Cursor_MoveUp"] = function()
 {
     this.WordControl.m_oLogicDocument.Cursor_MoveUp();
 };
-window.asc_docs_api.prototype["Cursor_MoveDown"] = window.asc_docs_api.prototype.Cursor_MoveDown = function()
+window["asc_docs_api"].prototype["Cursor_MoveDown"] = function()
 {
     this.WordControl.m_oLogicDocument.Cursor_MoveDown();
 };
 
-window.asc_docs_api.prototype["asc_IsSpellCheckCurrentWord"] = window.asc_docs_api.prototype.asc_IsSpellCheckCurrentWord = function()
+window["asc_docs_api"].prototype["asc_IsSpellCheckCurrentWord"] = function()
 {
 	return this.IsSpellCheckCurrentWord;
 };
-window.asc_docs_api.prototype["asc_putSpellCheckCurrentWord"] = window.asc_docs_api.prototype.asc_putSpellCheckCurrentWord = function(value)
+window["asc_docs_api"].prototype["asc_putSpellCheckCurrentWord"] = function(value)
 {
 	this.IsSpellCheckCurrentWord = value;
 };
