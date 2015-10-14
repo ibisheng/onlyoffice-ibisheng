@@ -3111,19 +3111,17 @@ function OfflineEditor () {
         window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
         _api = new window["Asc"]["spreadsheet_api"]();
 
-        var c_DocInfo = {
-            "Id"     :  "9876543210",
-            "Url"    :  undefined,
-            "Title"  :  undefined,
-            "Format" :  undefined,
-            "VKey"   :  undefined,
-            "Origin" : 'localhost',
-            "UserId" : 'UserId',
-            "UserName" : 'UserName',
-            "ChartEditor" : true
-        };
+        var userInfo = new Asc.asc_CUserInfo();
+        userInfo.asc_putId('ios');
+        userInfo.asc_putFullName('ios');
+        userInfo.asc_getLastName('ios');
+        var docInfo =  new Asc.asc_CDocInfo();
+        docInfo.put_Id('ios');
 
-        _api.asc_setDocInfo(c_DocInfo);
+        docInfo.put_ChartEditor(true);
+        docInfo.put_UserInfo(userInfo);
+
+        _api.asc_setDocInfo(docInfo);
         _api.asc_nativeOpenFile(window.native["GetFileString"]());
 
         this.registerEventsHandlers();
@@ -3953,6 +3951,11 @@ function offline_get_header_sizes() {
     var worksheet = _api.wb.getWorksheet();
     return [worksheet.headersWidth, worksheet.headersHeight];
 }
+function offline_get_graphics_object(x, y) {
+    var ws = _api.wb.getWorksheet();
+    ws.objectRender.drawingArea.reinitRanges();
+    return ws.objectRender.checkCursorDrawingObject(x, y);
+}
 
 function offline_copy() {
 
@@ -4044,6 +4047,40 @@ function offline_cut() {
 
     return _stream;
 }
+function offline_delete() {
+    var e = {altKey: false,
+        bubbles: true,
+        cancelBubble: false,
+        cancelable: true,
+        charCode: 0,
+        ctrlKey: false,
+        defaultPrevented: false,
+        detail: 0,
+        eventPhase: 3,
+        keyCode: 46,
+        type: 'keydown',
+        which: 46,
+        preventDefault: function() {}
+    };
+
+    var stream = global_memory_stream_menu;
+    stream["ClearNoAttack"]();
+
+    var ws = _api.wb.getWorksheet();
+    var graphicObjects = ws.objectRender.getSelectedGraphicObjects();
+    if (graphicObjects.length) {
+        if (ws.objectRender.graphicObjectKeyDown(e)) {
+            stream["WriteLong"](1);    // SHAPE
+            return stream;
+        }
+    }
+ 
+    stream["WriteString"](0);
+
+    // delete cell content
+
+    return stream;
+}
 function offline_calculate_visible_range(x, y, w, h) {
 
     var worksheet = _api.wb.getWorksheet();
@@ -4083,6 +4120,18 @@ function offline_apply_event(type,params) {
         {
             _api.asc_Redo();
             _s.asc_WriteAllWorksheets(true);
+            break;
+        }
+
+        case 52: // ASC_MENU_EVENT_TYPE_INSERT_HYPERLINK
+        {
+            var props = asc_menu_ReadHyperPr(params, _current);
+            _api.asc_insertHyperlink(props);
+            break;
+        }
+        case 59: // ASC_MENU_EVENT_TYPE_REMOVE_HYPERLINK
+        {
+            _api.asc_removeHyperlink();
             break;
         }
 
@@ -4169,7 +4218,7 @@ function offline_apply_event(type,params) {
         }
         case 113: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_DELETE
         {
-            //this.Call_Menu_Context_Delete();
+            _return = offline_delete();
             break;
         }
         case 114: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_SELECT
