@@ -2744,25 +2744,12 @@
      asc_CDocInfo.prototype.get_UserName = asc_CDocInfo.prototype.asc_getUserName = function(){
          return (this.UserInfo ? this.UserInfo.get_FullName() : null );
      };
-    asc_CDocInfo.prototype.get_UserName2 = asc_CDocInfo.prototype.asc_getUserName2 = function(){
-        if(!this.UserInfo)
-        {
-            return "";
-        }
-        var sFirstName = this.UserInfo.asc_getFirstName();
-        var sLastName = this.UserInfo.asc_getLastName();
-         return (typeof sFirstName === "string" ? sFirstName : "") + (typeof sLastName === "string" ? sLastName : "");
-     };
      asc_CDocInfo.prototype.get_Options =  asc_CDocInfo.prototype.asc_getOptions = function(){return this.Options;};
      asc_CDocInfo.prototype.put_Options =  asc_CDocInfo.prototype.asc_putOptions = function(v){this.Options = v;};
      asc_CDocInfo.prototype.get_CallbackUrl = asc_CDocInfo.prototype.asc_getCallbackUrl = function(){return this.CallbackUrl;};
      asc_CDocInfo.prototype.put_CallbackUrl = asc_CDocInfo.prototype.asc_putCallbackUrl = function(v){this.CallbackUrl = v;};
      asc_CDocInfo.prototype.get_TemplateReplacement = asc_CDocInfo.prototype.asc_getTemplateReplacement = function(){return this.TemplateReplacement;};
      asc_CDocInfo.prototype.put_TemplateReplacement = asc_CDocInfo.prototype.asc_putTemplateReplacement = function(v){this.TemplateReplacement = v;};
-     asc_CDocInfo.prototype.get_UserFirstName = asc_CDocInfo.prototype.asc_getUserFirstName = function(){return this.UserFirstName;};
-     asc_CDocInfo.prototype.put_UserFirstName = asc_CDocInfo.prototype.asc_putUserFirstName = function(v){this.UserFirstName = v;};
-     asc_CDocInfo.prototype.get_UserLastName =  asc_CDocInfo.prototype.asc_getUserLastName = function(){return this.UserLastName;};
-     asc_CDocInfo.prototype.put_UserLastName =  asc_CDocInfo.prototype.asc_putUserLastName = function(v){this.UserLastName = v;};
      asc_CDocInfo.prototype.get_ChartEditor =  asc_CDocInfo.prototype.asc_getChartEditor = function(){return this.ChartEditor;};
      asc_CDocInfo.prototype.put_ChartEditor =  asc_CDocInfo.prototype.asc_putChartEditor = function(v){this.ChartEditor = v;};
      asc_CDocInfo.prototype.get_UserInfo =  asc_CDocInfo.prototype.asc_getUserInfo = function(){return this.UserInfo;};
@@ -2785,19 +2772,13 @@
     prot["get_OfflineApp"]          = prot["asc_getOfflineApp"]          =   prot.asc_getOfflineApp;
     prot["put_OfflineApp"]          = prot["asc_putOfflineApp"]          =   prot.asc_putOfflineApp;
     prot["get_UserId"]              = prot["asc_getUserId"]              =   prot.asc_getUserId;
-    prot["put_UserId"]              = prot["asc_putUserId"]              =   prot.asc_putUserId;
     prot["get_UserName"]            = prot["asc_getUserName"]            =   prot.asc_getUserName;
-    prot["get_UserName2"]           = prot["asc_getUserName2"]            =   prot.asc_getUserName2;
     prot["get_Options"]             = prot["asc_getOptions"]             =   prot.asc_getOptions;
     prot["put_Options"]             = prot["asc_putOptions"]             =   prot.asc_putOptions;
     prot["get_CallbackUrl"]         = prot["asc_getCallbackUrl"]         =   prot.asc_getCallbackUrl;
     prot["put_CallbackUrl"]         = prot["asc_putCallbackUrl"]         =   prot.asc_putCallbackUrl;
     prot["get_TemplateReplacement"] = prot["asc_getTemplateReplacement"] =   prot.asc_getTemplateReplacement;
     prot["put_TemplateReplacement"] = prot["asc_putTemplateReplacement"] =   prot.asc_putTemplateReplacement;
-    prot["get_UserFirstName"]           = prot["asc_getUserFirstName"]           =   prot.asc_getUserFirstName;
-    prot["put_UserFirstName"]           = prot["asc_putUserFirstName"]           =   prot.asc_putUserFirstName;
-    prot["get_UserLastName"]            = prot["asc_getUserLastName"]            =   prot.asc_getUserLastName;
-    prot["put_UserLastName"]            = prot["asc_putUserLastName"]            =   prot.asc_putUserLastName;
     prot["get_ChartEditor"]            = prot["asc_getChartEditor"]            =   prot.asc_getChartEditor;
     prot["put_ChartEditor"]            = prot["asc_putChartEditor"]            =   prot.asc_putChartEditor;
 	prot["get_UserInfo"]            = prot["asc_getUserInfo"]            =   prot.asc_getUserInfo;

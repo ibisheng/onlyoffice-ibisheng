@@ -27,7 +27,14 @@
   asc['spreadsheet_api'].prototype.asc_getEditorPermissions = function(licenseUrl, customerId) {
     var t = this;
     if (this.DocInfo && this.DocInfo.asc_getId() && this.DocInfo.asc_getUrl()) {
-      CheckLicense(licenseUrl, customerId, this.DocInfo.asc_getUserId(), this.DocInfo.get_UserName2(),  function(err, res) {
+
+        var sUserFirstName = null, sUserLastName = null;
+        var oUserInfo = this.DocInfo.get_UserInfo();
+        if(oUserInfo){
+            sUserFirstName = oUserInfo.get_FirstName();
+            sUserLastName = oUserInfo.get_LastName();
+        }
+        CheckLicense(licenseUrl, customerId, this.DocInfo.asc_getUserId(), sUserFirstName, sUserLastName, function(err, res) {
         t._onCheckLicenseEnd(err, res);
       });
     } else {

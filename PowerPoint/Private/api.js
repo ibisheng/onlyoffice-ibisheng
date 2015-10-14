@@ -19,7 +19,14 @@ asc_docs_api.prototype.asc_addComment = function(AscCommentData) {
 asc_docs_api.prototype.asc_getEditorPermissions = function(licenseUrl, customerId) {
   var t = this;
   if (this.DocInfo && this.DocInfo.get_Id()) {
-    CheckLicense(licenseUrl, customerId, this.DocInfo.get_UserId(), this.DocInfo.get_UserName2(), function(err, res) {
+
+        var sUserFirstName = null, sUserLastName = null;
+        var oUserInfo = this.DocInfo.get_UserInfo();
+        if(oUserInfo){
+          sUserFirstName = oUserInfo.get_FirstName();
+          sUserLastName = oUserInfo.get_LastName();
+        }
+        CheckLicense(licenseUrl, customerId, this.DocInfo.get_UserId(), sUserFirstName, sUserLastName, function(err, res) {
       t._onCheckLicenseEnd(err, res);
     });
   } else {
