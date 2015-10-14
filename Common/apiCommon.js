@@ -2800,7 +2800,8 @@
     prot["put_UserLastName"]            = prot["asc_putUserLastName"]            =   prot.asc_putUserLastName;
     prot["get_ChartEditor"]            = prot["asc_getChartEditor"]            =   prot.asc_getChartEditor;
     prot["put_ChartEditor"]            = prot["asc_putChartEditor"]            =   prot.asc_putChartEditor;
-
+	prot["get_UserInfo"]            = prot["asc_getUserInfo"]            =   prot.asc_getUserInfo;
+    prot["put_UserInfo"]            = prot["asc_putUserInfo"]            =   prot.asc_putUserInfo;
 }
 )(window);
 
