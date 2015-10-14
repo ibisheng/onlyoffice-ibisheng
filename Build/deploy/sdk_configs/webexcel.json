@@ -161,7 +161,11 @@
             "externs": [
                 "../../Common/Build/Externs.js",
                 "../../Common/3rdparty/jquery/jquery.min.js",
+                "../../Common/3rdparty/Underscore/underscore-min.js",
+                "../../Common/3rdparty/Sockjs/sockjs-0.3.min.js",
                 "../../Common/3rdparty/XRegExp/xregexp-all-min.js",
+                "../../Common/3rdparty/jszip/jszip.min.js",
+                "../../Common/3rdparty/jszip-utils/jszip-utils.min.js",
                 "../../Common/3rdparty/perfect-scrollbar/jquery.mousewheel.js",
                 "../../Common/3rdparty/perfect-scrollbar/perfect-scrollbar.js"
             ],
