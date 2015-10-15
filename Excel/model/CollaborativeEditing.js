@@ -234,9 +234,9 @@
                     drawing.lockType = c_oAscLockTypes.kLockTypeNone;
                     bRedrawGraphicObjects = true;
                 }
-                /*if(!bUnlockDefName){
+                if(!bUnlockDefName){
                     bUnlockDefName = this.handlers.trigger("checkDefNameLock", oLock);
-                }*/
+                }
 
 				this.handlers.trigger("releaseLocks", oLock.Element["guid"]);
 			}
@@ -252,9 +252,9 @@
 							drawing.lockType = c_oAscLockTypes.kLockTypeNone;
 							bRedrawGraphicObjects = true;
 						}
-                        /*if(!bUnlockDefName){
+                        if(!bUnlockDefName){
                             bUnlockDefName = this.handlers.trigger("checkDefNameLock", oLock);
-                        }*/
+                        }
 					}
 
 					this.m_arrNeedUnlock.splice(nIndex, 1);
@@ -292,9 +292,9 @@
 				if (bCheckRedraw || bRedrawGraphicObjects)
 					this.handlers.trigger("showDrawingObjects");
 
-//                if(bUnlockDefName){
+                if(bUnlockDefName){
                     this.handlers.trigger("unlockDefName");
-//                }
+                }
 
 				if (0 === this.m_nUseType)
 					this.m_nUseType = 1;
