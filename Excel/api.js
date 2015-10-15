@@ -863,7 +863,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
   spreadsheet_api.prototype._OfflineAppDocumentStartLoad = function(fCallback) {
     var t = this, src = this.FontLoader.fontFilesPath;
-    src += window.g_offline_doc ? window.g_offline_doc : "../Excel/document/";
+    //window.g_offline_doc defined in external script, so use it in square breaks
+    src += window["g_offline_doc"] ? window["g_offline_doc"] : "../Excel/document/";
 
     var scriptElem = document.createElement('script');
     scriptElem.onload = scriptElem.onerror = function() {
