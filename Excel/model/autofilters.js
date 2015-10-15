@@ -626,7 +626,7 @@ var maxIndividualValues = 10000;
 					aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
 					result = false;
 				}
-				else if(styleName && addFormatTableOptionsObj.isTitle === false && this._isEmptyCellsUnderRange(activeRange) == false && this._isPartTablePartsUnderRange(activeRange))//add format table without title if down another format table
+				else if(styleName && addFormatTableOptionsObj && addFormatTableOptionsObj.isTitle === false && this._isEmptyCellsUnderRange(activeRange) == false && this._isPartTablePartsUnderRange(activeRange))//add format table without title if down another format table
 				{
 					aWs.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 					result = false;
@@ -963,10 +963,13 @@ var maxIndividualValues = 10000;
 				return result;
 			},
 			
-			getAddFormatTableOptions: function(activeCells)
+			getAddFormatTableOptions: function(activeCells, userRange)
 			{
 				var aWs = this._getCurrentWS();
 				var objOptions = new AddFormatTableOptions();
+				
+				if(userRange)
+					activeCells = Asc.g_oRangeCache.getAscRange(userRange);
 				
 				var alreadyAddFilter = this._searchFilters(activeCells, false);
 				//в случае если меняем стиль фильтра
@@ -1889,6 +1892,25 @@ var maxIndividualValues = 10000;
 						}
 					}
 				}
+				
+				return false;
+			},
+			
+			isRangeIntersectionTableOrFilter: function(range)
+			{
+				var aWs = this._getCurrentWS();
+				var tableParts = aWs.TableParts;
+				
+				for(var i = 0; i < tableParts.length; i++ )
+				{
+					if(range.intersection(tableParts[i].Ref))
+					{
+						return true;
+					}
+				}
+				
+				if(aWs.AutoFilter && aWs.AutoFilter.Ref && range.intersection(aWs.AutoFilter.Ref))
+					return true;
 				
 				return false;
 			},

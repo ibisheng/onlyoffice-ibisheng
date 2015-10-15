@@ -10746,6 +10746,7 @@
 			var onChangeAutoFilterCallback = function (isSuccess) {
 				if (false === isSuccess)
 				{
+					t.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedAllError, c_oAscError.Level.NoCritical);
 					t.handlers.trigger("selectionChanged", t.getSelectionInfo());
 					return;
 				}
@@ -10822,9 +10823,9 @@
 			this._isLockedAll(onChangeAutoFilterCallback);
 		};
 
-		WorksheetView.prototype.getAddFormatTableOptions = function () {
+		WorksheetView.prototype.getAddFormatTableOptions = function (range) {
 			var ar = this.activeRange.clone(true);
-			return this.autoFilters.getAddFormatTableOptions(ar);
+			return this.autoFilters.getAddFormatTableOptions(ar, range);
 		};
 		
 		WorksheetView.prototype.clearFilter = function () {

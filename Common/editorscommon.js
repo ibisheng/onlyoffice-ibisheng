@@ -1277,7 +1277,7 @@ parserHelper.prototype.checkDataRange = function (model, wb, dialogType, dataRan
 				return c_oAscError.ID.MaxDataSeriesError;
 		} else if (c_oAscSelectionDialogType.FormatTable === dialogType) {
 			// ToDo убрать эту проверку, заменить на более грамотную после правки функции _searchFilters
-			if ('error' === wb.getWorksheet().autoFilters._searchFilters(dataRange, false))
+			if (true === wb.getWorksheet().autoFilters.isRangeIntersectionTableOrFilter(dataRange))
 				return c_oAscError.ID.AutoFilterDataRangeError;
 		}
 	}
