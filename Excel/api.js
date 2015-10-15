@@ -2059,12 +2059,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   };
 
   spreadsheet_api.prototype._onUpdateDefinedNames = function(lockElem) {
-    var dN = this.wbModel.dependencyFormulas.defNameList[lockElem.Element["rangeOrObjectId"]];
-    if (dN) {
-      dN.isLock = lockElem["UserId"];
-      this.handlers.trigger("asc_onRefreshDefNameList");
-    }
-      this.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.LockDefNameManager);
+      if( lockElem.Element.subType == c_oAscLockTypeElemSubType.DefinedNames ){
+          var dN = this.wbModel.dependencyFormulas.defNameList[lockElem.Element["rangeOrObjectId"]];
+          if (dN) {
+              dN.isLock = lockElem["UserId"];
+              this.handlers.trigger("asc_onRefreshDefNameList");
+          }
+          this.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.LockDefNameManager);
+      }
   }
 
   spreadsheet_api.prototype._onUnlockDefName = function() {

@@ -217,7 +217,8 @@ var c_oAscLockTypeElemSubType = {
   InsertColumns: 2,
   DeleteRows: 3,
   InsertRows: 4,
-  ChangeProperties: 5
+  ChangeProperties: 5,
+  DefinedNames: 6
 };
 
 var c_oAscRecalcIndexTypes = {

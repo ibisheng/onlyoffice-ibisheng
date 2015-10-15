@@ -9090,7 +9090,7 @@
 				return;
 			}
 			var sheetId = this.model.getId();
-			var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, -1, defNameId);
+			var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, c_oAscLockTypeElemSubType.DefinedNames, -1, defNameId);
 
 			if (false === this.collaborativeEditing.getCollaborativeEditing()) {
 				// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
