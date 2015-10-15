@@ -1,6 +1,6 @@
 "use strict";
 
-var TRACK_CIRCLE_RADIUS     = 15;
+var TRACK_CIRCLE_RADIUS     = 10;
 var TRACK_RECT_SIZE2        = 6;//4;
 var TRACK_RECT_SIZE         = 10;//8;
 var TRACK_DISTANCE_ROTATE   = 25;

@@ -778,6 +778,22 @@ function CPoint2() {
     this.fRight = 0;
     this.fBottom = 0;
 }
+function CPosition( obj ) {
+    if (obj)
+    {
+        this.X = (undefined == obj.X) ? null : obj.X;
+        this.Y = (undefined == obj.Y) ? null : obj.Y;
+    }
+    else
+    {
+        this.X = null;
+        this.Y = null;
+    }
+}
+CPosition.prototype.get_X = function() { return this.X; };
+CPosition.prototype.put_X = function(v) { this.X = v; };
+CPosition.prototype.get_Y = function() { return this.Y; };
+CPosition.prototype.put_Y = function(v) { this.Y = v; };
 function CFontManager() {
     this.m_oLibrary = {};
     this.Initialize = function(){};
@@ -3722,7 +3738,7 @@ function offline_of() {_s.openFile();}
 function offline_stz(v) {_s.zoom = v; _api.asc_setZoom(v);}
 function offline_ds(x, y, width, height, ratio) {_s.drawSheet(x, y, width, height, ratio);}
 function offline_dh(x, y, width, height, type, ratio) {_s.drawHeader(x, y, width, height, type, ratio);}
-function offline_mouse_down(x, y, pin) {
+function offline_mouse_down(x, y, pin, isViewer) {
     _s.isShapeAction = false;
 
     var ws = _api.wb.getWorksheet();
@@ -3747,12 +3763,14 @@ function offline_mouse_down(x, y, pin) {
 
     return null;
 }
-function offline_mouse_move(x, y) {
+function offline_mouse_move(x, y, isViewer) {
     var ws = _api.wb.getWorksheet();
     if (_s.isShapeAction) {
-        var wb = _api.wb;
-        var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
-        ws.objectRender.graphicObjectMouseMove(e, x, y);
+        if (!isViewer) {
+            var wb = _api.wb;
+            var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
+            ws.objectRender.graphicObjectMouseMove(e, x, y);
+        }
     } else {
         if (-1 == _s.cellPin)
             ws._changeSelectionTopLeft(x, y, true, true, true);
@@ -3762,13 +3780,15 @@ function offline_mouse_move(x, y) {
             ws.changeSelectionEndPoint(x, y, true, true);
     }
 }
-function offline_mouse_up(x, y) {
+function offline_mouse_up(x, y, isViewer) {
     var ws = _api.wb.getWorksheet();
     var wb = _api.wb;
 
     if (_s.isShapeAction) {
-        var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
-        wb._onGraphicObjectMouseUp(e, x, y);
+        //if (!isViewer) {
+            var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
+            wb._onGraphicObjectMouseUp(e, x, y);
+        //}
         _s.isShapeAction = false;
     } else {
         wb._onChangeSelectionDone(-1, -1);
@@ -3953,7 +3973,7 @@ function offline_get_header_sizes() {
 }
 function offline_get_graphics_object(x, y) {
     var ws = _api.wb.getWorksheet();
-    ws.objectRender.drawingArea.reinitRanges();
+   // ws.objectRender.drawingArea.reinitRanges();
     return ws.objectRender.checkCursorDrawingObject(x, y);
 }
 
@@ -4074,7 +4094,7 @@ function offline_delete() {
             return stream;
         }
     }
- 
+
     stream["WriteString"](0);
 
     // delete cell content
@@ -4120,6 +4140,177 @@ function offline_apply_event(type,params) {
         {
             _api.asc_Redo();
             _s.asc_WriteAllWorksheets(true);
+            break;
+        }
+
+        case 9 : // ASC_MENU_EVENT_TYPE_IMAGE
+        {
+            var _imagePr = new asc_CImgProperty();
+            while (_continue)
+            {
+                _attr = params[_current.pos++];
+                switch (_attr)
+                {
+                    case 0:
+                    {
+                        _imagePr.CanBeFlow = params[_current.pos++];
+                        break;
+                    }
+                    case 1:
+                    {
+                        _imagePr.Width = params[_current.pos++];
+                        break;
+                    }
+                    case 2:
+                    {
+                        _imagePr.Height = params[_current.pos++];
+                        break;
+                    }
+                    case 3:
+                    {
+                        _imagePr.WrappingStyle = params[_current.pos++];
+                        break;
+                    }
+                    case 4:
+                    {
+                        _imagePr.Paddings = asc_menu_ReadPaddings(params, _current);
+                        break;
+                    }
+                    case 5:
+                    {
+                        _imagePr.Position = asc_menu_ReadPosition(params, _current);
+                        break;
+                    }
+                    case 6:
+                    {
+                        _imagePr.AllowOverlap = params[_current.pos++];
+                        break;
+                    }
+                    case 7:
+                    {
+                        _imagePr.PositionH = asc_menu_ReadImagePosition(params, _current);
+                        break;
+                    }
+                    case 8:
+                    {
+                        _imagePr.PositionV = asc_menu_ReadImagePosition(params, _current);
+                        break;
+                    }
+                    case 9:
+                    {
+                        _imagePr.Internal_Position = params[_current.pos++];
+                        break;
+                    }
+                    case 10:
+                    {
+                        _imagePr.ImageUrl = params[_current.pos++];
+                        break;
+                    }
+                    case 11:
+                    {
+                        _imagePr.Locked = params[_current.pos++];
+                        break;
+                    }
+                    case 12:
+                    {
+                        _imagePr.ChartProperties = asc_menu_ReadChartPr(params, _current);
+                        break;
+                    }
+                    case 13:
+                    {
+                        _imagePr.ShapeProperties = asc_menu_ReadShapePr(params, _current);
+                        break;
+                    }
+                    case 14:
+                    {
+                        _imagePr.ChangeLevel = params[_current.pos++];
+                        break;
+                    }
+                    case 15:
+                    {
+                        _imagePr.Group = params[_current.pos++];
+                        break;
+                    }
+                    case 16:
+                    {
+                        _imagePr.fromGroup = params[_current.pos++];
+                        break;
+                    }
+                    case 17:
+                    {
+                        _imagePr.severalCharts = params[_current.pos++];
+                        break;
+                    }
+                    case 18:
+                    {
+                        _imagePr.severalChartTypes = params[_current.pos++];
+                        break;
+                    }
+                    case 19:
+                    {
+                        _imagePr.severalChartStyles = params[_current.pos++];
+                        break;
+                    }
+                    case 20:
+                    {
+                        _imagePr.verticalTextAlign = params[_current.pos++];
+                        break;
+                    }
+                    case 21:
+                    {
+                        var bIsNeed = params[_current.pos++];
+
+                        if (bIsNeed)
+                        {
+//                            var _originSize = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"](_imagePr.ImageUrl);
+//                            var _w = _originSize[0];
+//                            var _h = _originSize[1];
+//
+//                            // сбрасываем урл
+//                            _imagePr.ImageUrl = undefined;
+//
+//                            var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
+//                            var _page_width = Page_Width;
+//                            var _page_height = Page_Height;
+//                            var _page_x_left_margin = X_Left_Margin;
+//                            var _page_y_top_margin = Y_Top_Margin;
+//                            var _page_x_right_margin = X_Right_Margin;
+//                            var _page_y_bottom_margin = Y_Bottom_Margin;
+//
+//                            if (_section_select)
+//                            {
+//                                if (_section_select.W)
+//                                    _page_width = _section_select.W;
+//
+//                                if (_section_select.H)
+//                                    _page_height = _section_select.H;
+//                            }
+//
+//                            var __w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
+//                            var __h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
+//
+//                            var wI = (undefined !== _w) ? Math.max(_w * g_dKoef_pix_to_mm, 1) : 1;
+//                            var hI = (undefined !== _h) ? Math.max(_h * g_dKoef_pix_to_mm, 1) : 1;
+//
+//                            wI = Math.max(5, Math.min(wI, __w));
+//                            hI = Math.max(5, Math.min(hI, __h));
+//
+//                            _imagePr.Width = wI;
+//                            _imagePr.Height = hI;
+                        }
+
+                        break;
+                    }
+                    case 255:
+                    default:
+                    {
+                        _continue = false;
+                        break;
+                    }
+                }
+            }
+
+            _api.asc_setGraphicObjectProps(_imagePr);
             break;
         }
 
