@@ -12,3 +12,6 @@ function Ext(){};
 function FB(){};
 function twttr(){};
 function _gaq(){};
+
+function constructor(){};
+function superclass(){};
