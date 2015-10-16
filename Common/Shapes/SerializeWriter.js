@@ -2202,6 +2202,8 @@ function CBinaryFileWriter()
 				var imageLocal = g_oDocumentUrls.getImageLocal(_src);
                 if(imageLocal)
                     _src = imageLocal;
+                else
+                    imageLocal = _src;
 
                 oThis.image_map[_src] = true;
 
@@ -2288,6 +2290,36 @@ function CBinaryFileWriter()
                     oThis.EndRecord();
                 }
 
+                if (oThis.IsUseFullUrl) {
+                  var displayN = oThis._isDisplayedImage(imageLocal);
+                  if (0 != displayN) {
+                    var additionalSrc = [];
+                    if (0 != (displayN & 1)) {
+                      additionalSrc.push(changeFileExtention(imageLocal, "wmf"));
+                    }
+                    if (0 != (displayN & 2)) {
+                      additionalSrc.push(changeFileExtention(imageLocal, "emf"));
+                    }
+                    if (0 != (displayN & 4)) {
+                      additionalSrc.push(changeFileExtention(imageLocal, "bin"));
+                      additionalSrc.push(changeFileExtention(imageLocal, "txt"));
+                    }
+                    var additionalUrl = [];
+                    for (var i = 0; i < additionalSrc.length; ++i) {
+                      var imageUrl = g_oDocumentUrls.getImageUrl(additionalSrc[i]);
+                      if (imageUrl) {
+                        additionalUrl.push(imageUrl);
+                      }
+                    }
+                    oThis.StartRecord(101);
+                    oThis.WriteUChar(additionalUrl.length);
+                    for (var i = 0; i < additionalUrl.length; ++i) {
+                      oThis.WriteString2(additionalUrl[i]);
+                    }
+                    oThis.EndRecord();
+                  }
+                }
+
                 oThis.EndRecord();
                 break;
             }
@@ -2304,7 +2336,25 @@ function CBinaryFileWriter()
                 break;
         }
     }
-
+    this._isDisplayedImage = function (strName) {
+      var res = 0;
+      if (strName) {
+        //шаблон display[N]image.ext
+        var findStr = "display";
+        var index = strName.indexOf(findStr);
+        if (-1 != index) {
+          if (index + findStr.length < strName.length) {
+            var displayN = parseInt(strName[index + findStr.length]);
+            if (1 <= displayN && displayN <= 6) {
+              var imageIndex = index + findStr.length + 1;
+              if (imageIndex == strName.indexOf("image", imageIndex))
+                res = displayN;
+            }
+          }
+        }
+      }
+      return res;
+    }
     this.WriteLn = function(ln)
     {
         if (undefined === ln || null == ln)

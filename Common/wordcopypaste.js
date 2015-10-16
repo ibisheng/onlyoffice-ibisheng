@@ -45,12 +45,22 @@ function GetObjectsForImageDownload(aBuilderImages)
             aBuilderImagesByUrl.push(oMapImages[key]);
         }
     }
+    //в конце добавляем ссылки на wmf, ole
+    for(var i = 0; i < aBuilderImages.length; ++i)
+    {
+        var oBuilderImage = aBuilderImages[i];
+        if (oBuilderImage.AdditionalUrls) {
+            for(var j = 0; j < oBuilderImage.AdditionalUrls.length; ++j) {
+                aUrls.push(oBuilderImage.AdditionalUrls[j]);
+            }
+        }
+    }
     return {aUrls: aUrls, aBuilderImagesByUrl: aBuilderImagesByUrl};
 }
 
 function ResetNewUrls(data, aUrls, aBuilderImagesByUrl, oImageMap)
 {
-    for (var i = 0, length = data.length; i < length; ++i)
+    for (var i = 0, length = Math.min(data.length, aBuilderImagesByUrl.length); i < length; ++i)
     {
         var elem = data[i];
         if (null != elem.url)
@@ -3133,9 +3143,19 @@ PasteProcessor.prototype =
 									}
 								}
 							}
+							//в конце добавляем ссылки на wmf, ole
+							for(var i = 0; i < objects.arrImages.length; ++i)
+							{
+								var oBuilderImage = objects.arrImages[i];
+								if (oBuilderImage.AdditionalUrls) {
+									for(var j = 0; j < oBuilderImage.AdditionalUrls.length; ++j) {
+										aImagesToDownload.push(oBuilderImage.AdditionalUrls[j]);
+									}
+								}
+							}
                             sendImgUrls(oThis.api, aImagesToDownload, function (data) {
                             var image_map = {};
-                            for (var i = 0, length = data.length; i < length; ++i) {
+                            for (var i = 0, length = Math.min(data.length, objects.arrImages.length); i < length; ++i) {
                               var elem = data[i];
                               if (null != elem.url) {
                                 var name = g_oDocumentUrls.imagePath2Local(elem.path);
@@ -4622,7 +4642,7 @@ PasteProcessor.prototype =
 			{
         sendImgUrls(oThis.api, aImagesToDownload, function (data) {
           var image_map = {};
-          for (var i = 0, length = data.length; i < length; ++i) {
+          for (var i = 0, length = Math.min(data.length, aImagesToDownload.length); i < length; ++i) {
             var elem = data[i];
             var sFrom = aImagesToDownload[i];
             if (null != elem.url) {

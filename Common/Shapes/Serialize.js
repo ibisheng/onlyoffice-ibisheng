@@ -200,7 +200,7 @@ function CBuilderImages(blip_fill, full_url, image_shape, sp_pr, ln, text_pr, pa
     this.ParaTextPr = para_text_pr;
     this.Run        = run;
     this.Paragraph  = paragraph;
-
+    this.AdditionalUrls = [];//для wmf, ole
 }
 CBuilderImages.prototype =
 {
@@ -1992,6 +1992,20 @@ function BinaryPPTYLoader()
 
                                 s.Seek2(_e2);
                                 break;
+                            }
+                            case 101:
+                            {
+                              var oBuilderImages = this.RebuildImages[this.RebuildImages.length - 1];
+                              if (this.IsUseFullUrl && oBuilderImages) {
+                                s.Skip2(4);
+                                var urlsCount = s.GetUChar();
+                                for (var i = 0; i < urlsCount; ++i) {
+                                  oBuilderImages.AdditionalUrls.push(s.GetString2());
+                                }
+                              } else {
+                                s.SkipRecord();
+                              }
+                              break;
                             }
                             default:
                             {
