@@ -2372,11 +2372,13 @@ function CEditorPage(api)
             }
             return;
         }
+        /*
         if (oWordControl.m_oDrawingDocument.IsFreezePage(oWordControl.m_oDrawingDocument.m_lCurrentPage))
         {
             e.preventDefault();
             return;
         }
+        */
         /*
         if (oWordControl.m_oApi.isViewMode)
         {
@@ -2603,8 +2605,10 @@ function CEditorPage(api)
             return;
         }
 
+        /*
         if (oWordControl.m_oDrawingDocument.IsFreezePage(oWordControl.m_oDrawingDocument.m_lCurrentPage))
             return;
+        */
 
         check_KeyboardEvent(e);
 
@@ -3422,25 +3426,26 @@ function CEditorPage(api)
                     this.m_oDrawingDocument.StopRenderingPage(i);
                 }
 
+                var __x = drawPage.left;
+                var __y = drawPage.top;
+                var __w = drawPage.right - __x;
+                var __h = drawPage.bottom - __y;
+                if (this.bIsRetinaSupport)
+                {
+                    __x <<= 1;
+                    __y <<= 1;
+                    __w <<= 1;
+                    __h <<= 1;
+                }
+
+                this.m_oDrawingDocument.CheckRecalculatePage(__w, __h, i);
                 if (null == drawPage.cachedImage)
                 {
                     this.m_oDrawingDocument.StartRenderingPage(i);
                 }
 
-                if (!this.bIsRetinaSupport)
-                {
-                    this.m_oDrawingDocument.m_arrPages[i].Draw(context, drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top);
-                    //this.m_oBoundsController.CheckRect(drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top);
-                }
-                else
-                {
-                    var __x = drawPage.left << 1;
-                    var __y = drawPage.top << 1;
-                    var __w = (drawPage.right << 1) - __x;
-                    var __h = (drawPage.bottom << 1) - __y;
-                    this.m_oDrawingDocument.m_arrPages[i].Draw(context, __x, __y, __w, __h);
-                    //this.m_oBoundsController.CheckRect(__x, __y, __w, __h);
-                }
+                this.m_oDrawingDocument.m_arrPages[i].Draw(context, __x, __y, __w, __h);
+                //this.m_oBoundsController.CheckRect(__x, __y, __w, __h);
             }
         }
 

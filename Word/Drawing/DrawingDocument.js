@@ -1006,7 +1006,32 @@ function CDrawingPage()
     this.bottom = 0;
 
     this.cachedImage = null;
+
+    this.IsRecalculate = false;
+    this.RecalculateTime = -1;
 }
+CDrawingPage.prototype =
+{
+    SetRepaint : function(cache_manager)
+    {
+        if (this.cachedImage != null && this.cachedImage.image != null)
+        {
+            this.IsRecalculate = true;
+            if (-1 == this.RecalculateTime)
+                this.RecalculateTime = new Date().getTime();
+            return;
+        }
+        this.UnLock(cache_manager);
+    },
+
+    UnLock : function(cache_manager)
+    {
+        cache_manager.UnLock(this.cachedImage);
+        this.cachedImage = null;
+        this.IsRecalculate = false;
+        this.RecalculateTime = -1;
+    }
+};
 
 function CPage()
 {
@@ -1849,11 +1874,7 @@ function CDrawingDocument()
         if (!page)
             return;
 
-        if (null != page.drawingPage.cachedImage)
-        {
-            this.m_oCacheManager.UnLock(page.drawingPage.cachedImage);
-            page.drawingPage.cachedImage = null;
-        }
+        page.drawingPage.SetRepaint(this.m_oCacheManager);
 
         // перерисовать, если только страница видна на экране
         if (index >= this.m_lDrawingFirst && index <= this.m_lDrawingEnd)
@@ -1903,11 +1924,7 @@ function CDrawingDocument()
 
         page.index = index;
 
-        if (null != page.drawingPage.cachedImage)
-        {
-            this.m_oCacheManager.UnLock(page.drawingPage.cachedImage);
-            page.drawingPage.cachedImage = null;
-        }
+        page.drawingPage.SetRepaint(this.m_oCacheManager);
 
         // ������ ���� ��� �������� �� ������ - �� ����� ������� ���������
         if (index >= this.m_lDrawingFirst && index <= this.m_lDrawingEnd)
@@ -1931,11 +1948,7 @@ function CDrawingDocument()
         for (var index = this.m_lCountCalculatePages; index < this.m_lPagesCount; index++)
         {
             var page = this.m_arrPages[index];
-            if (null != page.drawingPage.cachedImage)
-            {
-                this.m_oCacheManager.UnLock(page.drawingPage.cachedImage);
-                page.drawingPage.cachedImage = null;
-            }
+            page.drawingPage.SetRepaint(this.m_oCacheManager);
         }
 
         this.m_bIsBreakRecalculate = (isFull === true) ? false : true;
@@ -2025,6 +2038,30 @@ function CDrawingDocument()
 		this.m_oWordControl.OnScroll();
 	}
 
+    this.CheckRecalculatePage = function(width, height, pageIndex)
+    {
+        var _drawingPage = this.m_arrPages[pageIndex].drawingPage;
+        var isUnlock = false;
+        if (_drawingPage.cachedImage != null && _drawingPage.cachedImage.image != null && (width != _drawingPage.cachedImage.image.width || height != _drawingPage.cachedImage.image.height))
+            isUnlock = true;
+
+        if (_drawingPage.IsRecalculate)
+        {
+            if (this.IsFreezePage(pageIndex))
+            {
+                if ((Math.abs(_drawingPage.RecalculateTime - (new Date().getTime())) > 500 /*0.5 sec*/))
+                    isUnlock = true;
+            }
+            else
+            {
+                isUnlock = true;
+            }
+        }
+
+        if (isUnlock)
+            _drawingPage.UnLock(this.m_oCacheManager);
+    }
+
     this.StartRenderingPage = function(pageIndex)
     {
         if (true === this.IsFreezePage(pageIndex))
@@ -2062,6 +2099,7 @@ function CDrawingDocument()
             }
         }
 
+        page.drawingPage.UnLock(this.m_oCacheManager);
         page.drawingPage.cachedImage = this.m_oCacheManager.Lock(w, h);
 
         //var StartTime = new Date().getTime();
@@ -2181,18 +2219,17 @@ function CDrawingDocument()
     {
 		if (null != this.m_oDocumentRenderer)
 			this.m_oDocumentRenderer.stopRenderingPage(pageIndex);
-        if (null != this.m_arrPages[pageIndex].drawingPage.cachedImage)
-        {
-            this.m_oCacheManager.UnLock(this.m_arrPages[pageIndex].drawingPage.cachedImage);
-            this.m_arrPages[pageIndex].drawingPage.cachedImage = null;
-        }
+
+        this.m_arrPages[pageIndex].drawingPage.UnLock(this.m_oCacheManager);
     }
 
     this.ClearCachePages = function()
     {
         for (var i = 0; i < this.m_lPagesCount; i++)
         {
-            this.StopRenderingPage(i);
+            var page = this.m_arrPages[i];
+            if (page)
+                page.drawingPage.SetRepaint(this.m_oCacheManager);
         }
     }
 
