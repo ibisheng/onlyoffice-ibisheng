@@ -34,6 +34,7 @@
 		 *
 		 * @constructor
 		 * @memberOf Asc
+		 * @extends {StringRender}
 		 */
 		function CellTextRender(drawingCtx) {
 			CellTextRender.superclass.constructor.call(this, drawingCtx);
