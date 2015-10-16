@@ -1925,53 +1925,15 @@
 			_loadImagesOnServer: function(aPastedImages, callback)
 			{
 				var api = asc["editor"];
-				var aImagesToDownload = [];
-				var t = this;
 				
-				for(var k = 0; k < aPastedImages.length; k++)
-				{
-					var src = aPastedImages[k].Url;
-					
-					if(!g_oDocumentUrls.getImageLocal(src))
-						aImagesToDownload.push(src);
-				}
-				
-				if(aImagesToDownload.length > 0)
-				{
-					var rData = {"id": api.documentId, "c":"imgurls", "vkey": api.documentVKey, "userid": api.documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": aImagesToDownload};
-					api.fCurCallback = function(input) {
-						if(null != input && "imgurls" == input["type"]){
-							if("ok" == input["status"]) {
-								var data = input["data"];
-								var urls = {};
-								var aImagesSync = [];
-								for(var i = 0, length = data.length; i < length; ++i)
-								{
-									var elem = data[i];
-									if(elem.url)
-									{
-										urls[elem.path] = elem.url;
-										var name = g_oDocumentUrls.imagePath2Local(elem.path);
-										aImagesSync.push(name);
-										var imageElem = aPastedImages[i];
-										if(null != imageElem) {
-											imageElem.SetUrl(name);	
-										}
-									}
-								}
-								g_oDocumentUrls.addUrls(urls);
-							} else {
-								api.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-							}
-						} else {
-							api.handlers.trigger("asc_onError", c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
-						}
-						callback();
-					};
-					sendCommand2( api, null, rData );
-				}
-				else
+				var oObjectsForDownload = GetObjectsForImageDownload(aPastedImages);
+
+				sendImgUrls(api, oObjectsForDownload.aUrls, function (data) {
+					var oImageMap = {};
+					ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
+
 					callback();
+				}, true);
 			},
 			
 			ReadPresentationShapes: function(stream, worksheet)
@@ -2219,68 +2181,6 @@
 				window.GlobalPasteFlagCounter = 0;
 				window.GlobalPasteFlag = false;
             },
-			
-			_correctImageUrl: function (aResult, worksheet)
-			{
-				var api = asc["editor"];
-				var aImagesToDownload = [];
-				var t = this;
-				var addImages = aResult.addImages ? aResult.addImages : [];
-				
-				for(var k = 0; k < addImages.length; k++)
-				{
-					var src = addImages[k].tag.src;
-					//TODO просмотреть для локальных ссылок
-					/*if(0 == src.indexOf("file:"))
-						this.oImages[image] = "local";
-					else*/ 
-					//TODO не вставляется картинка из EXCEL  - стоит base64 грузить на сервер bug 22957
-					if(!g_oDocumentUrls.getImageLocal(src))
-						aImagesToDownload.push(src);
-				}
-				
-				if(aImagesToDownload.length > 0)
-				{
-					var rData = {"id": api.documentId, "c":"imgurls", "vkey": api.documentVKey, "userid": api.documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": aImagesToDownload};
-					api.fCurCallback = function(input) {
-						if(null != input && "imgurls" == input["type"]){
-							if("ok" == input["status"]) {
-								var data = input["data"];
-								var urls = {};
-								for(var i = 0, length = data.length; i < length; ++i)
-								{
-									var elem = data[i];
-									if(elem.url)
-									{
-										urls[elem.path] = elem.url;
-										var name = g_oDocumentUrls.imagePath2Local(elem.path);
-										if(aResult.addImages[i])
-										{
-											var height = aResult.addImages[i].tag.height;
-											var width = aResult.addImages[i].tag.width;
-											aResult.addImages[i].tag = 
-											{
-												height: height,
-												width: width, 
-												src: name
-											};
-										}
-									}
-								}
-								g_oDocumentUrls.addUrls(urls);
-							} else {
-								api.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-							}
-						} else {
-							api.handlers.trigger("asc_onError", c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
-						}
-						t._pasteResult(aResult, worksheet);
-					};
-					sendCommand2( api, null, rData );
-				}
-				else
-					t._pasteResult(aResult, worksheet);
-			},
 			
 			_pasteResult: function(aResult, worksheet)
 			{

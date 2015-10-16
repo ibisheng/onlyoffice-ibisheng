@@ -2442,11 +2442,19 @@ function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary)
 function trimString( str ){
     return str.replace(/^\s+|\s+$/g, '') ;
 };
-function sendImgUrls(api, images, callback) {
-  var rData = {"id": documentId, "c": "imgurls", "vkey": documentVKey, "userid": documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": images};
-  api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+function sendImgUrls(api, images, callback, bExcel) {
+  var rData = {"id": bExcel ? api.documentId : documentId, "c": "imgurls", "vkey": bExcel ? api.documentVKey : documentVKey, "userid":  bExcel ? api.documentUserId : documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": images};
+  if(!bExcel)
+      api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+  else
+      api.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+
   api.fCurCallback = function (input) {
-    api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+    if(!bExcel)
+        api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+     else
+        api.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+
     if (null != input && "imgurls" == input["type"]) {
       if ("ok" == input["status"]) {
         var data = input["data"];
@@ -2460,10 +2468,16 @@ function sendImgUrls(api, images, callback) {
         g_oDocumentUrls.addUrls(urls);
         callback(data);
       } else {
-        api.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+          if(!bExcel)
+            api.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+          else
+            api.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
       }
     } else {
-      api.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+      if(!bExcel)
+        api.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+      else
+        api.handlers.trigger("asc_onError", c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
     }
   };
   sendCommand2(api, null, rData);
@@ -3605,84 +3619,6 @@ PasteProcessor.prototype =
 
                                 this.SetShortImageId(objects.arrImages);
                                 this.api.pre_Paste(fonts, im_arr, paste_callback);
-                            }
-                            return;
-                        }
-                        case "TeamLab4":
-                        {
-                            var objects = this.ReadPresentationShapes(stream);
-                            var arr_shapes = objects.arrShapes;
-                            var presentation = editor.WordControl.m_oLogicDocument;
-                            oThis = this;
-                            var fonts = [];
-                            var images = [];
-                            for(var i = 0; i < arr_shapes.length; ++i)
-                            {
-                                if(arr_shapes[i].getAllFonts)
-                                    arr_shapes[i].getAllFonts(fonts);
-                                if(arr_shapes[i].getAllImages)
-                                    arr_shapes[i].getAllImages(images);
-                            }
-                            var paste_callback = function()
-                            {
-                                if(false == oThis.bNested)
-                                {
-                                    var b_add_slide = false;
-
-                                    if(presentation.Slides.length === 0)
-                                    {
-                                        presentation.addNextSlide();
-                                        b_add_slide = true;
-                                    }
-                                    if(presentation.Document_Is_SelectionLocked(changestype_AddShapes, arr_shapes) === false)
-                                    {
-                                        var slide = presentation.Slides[presentation.CurPage];
-                                        if(presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-                                        {
-                                            slide.graphicObjects.resetSelectionState();
-                                            for(var i = 0; i < arr_shapes.length; ++i)
-                                            {
-                                                if(b_add_slide)
-                                                {
-                                                    arr_shapes[i].setParent(presentation.Slides[0]);
-                                                }
-                                                arr_shapes[i].changeSize(presentation.Width, presentation.Height);
-                                                slide.addToSpTreeToPos(slide.cSld.spTree.length, arr_shapes[i]);
-                                                arr_shapes[i].select(slide.graphicObjects);
-
-                                            }
-                                        }
-                                        presentation.Recalculate();
-                                    }
-                                    nodeDisplay.blur();
-                                    nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
-                                }
-                            };
-
-                            var aImagesToDownload = [];
-                            for(var i in images)
-                                aImagesToDownload.push(i);
-                            if(aImagesToDownload.length > 0)
-                            {
-                              sendImgUrls(oThis.api, aImagesToDownload, function (data) {
-                                var image_map = {};
-                                for (var i = 0, length = data.length; i < length; ++i) {
-                                  var elem = data[i];
-                                  var sFrom = aImagesToDownload[i];
-                                  if (null != elem.url) {
-                                    var name = g_oDocumentUrls.imagePath2Local(elem.path);
-                                    oThis.oImages[sFrom] = name;
-                                    image_map[i] = name;
-                                  } else {
-                                    image_map[i] = sFrom;
-                                  }
-                                }
-                                oThis.api.pre_Paste(fonts, image_map, paste_callback);
-                              });
-                            }
-                            else
-                            {
-                                this.api.pre_Paste(fonts, [], paste_callback);
                             }
                             return;
                         }

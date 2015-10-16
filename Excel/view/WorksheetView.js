@@ -8363,55 +8363,16 @@
 				}
 				else if(val.addImagesFromWord && val.addImagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 				{
-					//показываем плашку для отправки изображений на сервер
-					api.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-					
 					var oObjectsForDownload = GetObjectsForImageDownload(val._aPastedImages);
-					
-					var rData = {"id": api.documentId, "c":"imgurls", "vkey": api.documentVKey, "userid": api.documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": val._images};
-					api.fCurCallback = function(input) {
-						if(null != input && "imgurls" == input["type"]){
-							if("ok" == input["status"]) {
-								var data = input["data"];
-								var urls = {};
-								var aImagesSync = [];
-								for(var i = 0, length = data.length; i < length; ++i)
-								{
-									var elem = data[i];
-									if(elem.url)
-									{
-										urls[elem.path] = elem.url;
-										var name = g_oDocumentUrls.imagePath2Local(elem.path);
-										aImagesSync.push(name);
-										var imageElem = oObjectsForDownload && oObjectsForDownload.aBuilderImagesByUrl && oObjectsForDownload.aBuilderImagesByUrl[i] ? oObjectsForDownload.aBuilderImagesByUrl[i] : null;
-										if(null != imageElem) {
-											if(imageElem.length)
-											{
-												for(var j = 0; j < imageElem.length; j++)
-												{	
-													if(imageElem[j])
-														imageElem[j].SetUrl(name);
-												}
-											}
-											else
-												imageElem.SetUrl(name);
-										}
-									}
-								}
-								g_oDocumentUrls.addUrls(urls);
 
-								if(val.onlyImages !== true)
-									t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
-								api.wb.clipboard._insertImagesFromBinaryWord(t, val, aImagesSync);
-							} else {
-								api.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-							}
-						} else {
-							api.handlers.trigger("asc_onError", c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
-						}
-						api.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-					};
-					sendCommand2( api, null, rData );
+                    sendImgUrls(api, oObjectsForDownload.aUrls, function (data) {
+                        var oImageMap = {};
+                        ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
+
+                        if(val.onlyImages !== true)
+                            t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
+                        api.wb.clipboard._insertImagesFromBinaryWord(t, val, oImageMap);
+                    }, true);
 				}
 				else if(val.onlyImages !== true)
 						t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
