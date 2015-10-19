@@ -7447,7 +7447,12 @@ window["asc_docs_api"].prototype["Add_Text"] = function(_text)
 };
 window["asc_docs_api"].prototype["Add_NewParagraph"] = function()
 {
-    this.WordControl.m_oLogicDocument.Add_NewParagraph(true);
+    var LogicDocument = this.WordControl.m_oLogicDocument;
+    if (false === LogicDocument.Document_Is_SelectionLocked(changestype_Document_Content_Add))
+    {
+        LogicDocument.Create_NewHistoryPoint(historydescription_Document_EnterButton);
+        LogicDocument.Add_NewParagraph(true);
+    }
 };
 window["asc_docs_api"].prototype["Cursor_MoveLeft"] = function()
 {
@@ -7465,7 +7470,10 @@ window["asc_docs_api"].prototype["Cursor_MoveDown"] = function()
 {
     this.WordControl.m_oLogicDocument.Cursor_MoveDown();
 };
-
+window["asc_docs_api"].prototype["Get_DocumentRecalcId"] = function(value)
+{
+    return this.WordControl.m_oLogicDocument.RecalcId;
+};
 window["asc_docs_api"].prototype["asc_IsSpellCheckCurrentWord"] = function()
 {
 	return this.IsSpellCheckCurrentWord;
