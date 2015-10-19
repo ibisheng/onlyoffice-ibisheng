@@ -557,7 +557,7 @@ Paragraph.prototype.private_RecalculatePage            = function(CurPage, bFirs
         {
             // В эту ветку мы попадаем, если в параграфе встретилась картинка, которая находится ниже данного
             // параграфа, и можно пересчитать заново данный параграф.
-            RecalcResult = this.private_RecalculatePage(CurPage);
+            RecalcResult = this.private_RecalculatePage(CurPage, false);
             break;
         }
         else //if ( recalcresult_CurPage === RecalcResult || recalcresult_PrevPage === RecalcResult )
