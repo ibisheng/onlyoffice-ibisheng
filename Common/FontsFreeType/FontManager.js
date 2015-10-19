@@ -127,7 +127,7 @@ CGlyphData.prototype =
         this.m_oCanvas.height = height;
 
         this.m_oContext = this.m_oCanvas.getContext('2d');
-        this.m_oContext.globalCompositeOperation = "source-atop";
+        this.m_oContext.globalCompositeOperation = "source-in";
     },
     checkColor : function(r,g,b,w,h)
     {
