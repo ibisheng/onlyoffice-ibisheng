@@ -7470,7 +7470,7 @@ window["asc_docs_api"].prototype["Cursor_MoveDown"] = function()
 {
     this.WordControl.m_oLogicDocument.Cursor_MoveDown();
 };
-window["asc_docs_api"].prototype["Get_DocumentRecalcId"] = function(value)
+window["asc_docs_api"].prototype["Get_DocumentRecalcId"] = function()
 {
     return this.WordControl.m_oLogicDocument.RecalcId;
 };
