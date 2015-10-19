@@ -61,6 +61,8 @@
 							iframe.id = "ieCopyFrame";
 							doc.body.appendChild(iframe);
 							var temp = doc.getElementById("ieCopyFrame");
+							if (temp.contentDocument.body == null)
+								temp.contentDocument.write("<body></body>");
 							t.element = temp.contentDocument.body.appendChild(doc.createElement("div"));
 						}
 						else
