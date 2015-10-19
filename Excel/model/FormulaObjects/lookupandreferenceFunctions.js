@@ -45,14 +45,14 @@ function cADDRESS() {
     this.argumentsCurrent = 0;
     this.argumentsMax = 5;
     this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        def       :-1, //подразумевается формат первой ячейки входящей в формулу.
         noneFormat:-2
     };
     this.numFormat = this.formatType.def;
 
 }
 
-cADDRESS.prototype = Object.create( cBaseFunction.prototype )
+cADDRESS.prototype = Object.create( cBaseFunction.prototype );
 cADDRESS.prototype.Calculate = function ( arg ) {
 
     var rowNumber = arg[0], colNumber = arg[1],
@@ -130,8 +130,8 @@ cADDRESS.prototype.Calculate = function ( arg ) {
             break;
     }
 
-	return this.value = new cString((sheetName instanceof cEmpty) ? strRef :
-		parserHelp.get3DRef(sheetName.toString(), strRef));
+    return this.value = new cString( (sheetName instanceof cEmpty) ? strRef :
+        parserHelp.get3DRef( sheetName.toString(), strRef ) );
 };
 cADDRESS.prototype.getInfo = function () {
     return {
@@ -158,7 +158,7 @@ function cCHOOSE() {
     this.argumentsCurrent = 0;
     this.argumentsMax = 30;
     this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        def       :-1, //подразумевается формат первой ячейки входящей в формулу.
         noneFormat:-2
     };
     this.numFormat = this.formatType.def;
@@ -207,7 +207,7 @@ function cCOLUMN() {
     this.argumentsCurrent = 0;
     this.argumentsMax = 1;
     this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        def       :-1, //подразумевается формат первой ячейки входящей в формулу.
         noneFormat:-2
     };
     this.numFormat = this.formatType.def;
@@ -260,7 +260,7 @@ function cCOLUMNS() {
     this.argumentsCurrent = 0;
     this.argumentsMax = 1;
     this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        def       :-1, //подразумевается формат первой ячейки входящей в формулу.
         noneFormat:-2
     };
     this.numFormat = this.formatType.def;
@@ -298,7 +298,7 @@ function cGETPIVOTDATA() {
     cBaseFunction.call( this, "GETPIVOTDATA" );
 }
 
-cGETPIVOTDATA.prototype = Object.create( cBaseFunction.prototype )
+cGETPIVOTDATA.prototype = Object.create( cBaseFunction.prototype );
 
 var g_oHLOOKUPCache = new VHLOOKUPCache( true );
 
@@ -314,7 +314,7 @@ function cHLOOKUP() {
     this.argumentsCurrent = 0;
     this.argumentsMax = 4;
     this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        def       :-1, //подразумевается формат первой ячейки входящей в формулу.
         noneFormat:-2
     };
     this.numFormat = this.formatType.def;
@@ -457,7 +457,7 @@ function cINDEX() {
     this.argumentsCurrent = 0;
     this.argumentsMax = 4;
     this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        def       :-1, //подразумевается формат первой ячейки входящей в формулу.
         noneFormat:-2
     };
     this.numFormat = this.formatType.def;
@@ -467,15 +467,16 @@ function cINDEX() {
 cINDEX.prototype = Object.create( cBaseFunction.prototype );
 cINDEX.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0],
-        arg1 = arg[1] && !(arg[1] instanceof cEmpty) ? arg[1] : new cNumber(1),
-        arg2 = arg[2] && !(arg[2] instanceof cEmpty) ? arg[2] : new cNumber(1),
-        arg3 = arg[3] && !(arg[3] instanceof cEmpty) ? arg[3] : new cNumber(1), res;
+        arg1 = arg[1] && !(arg[1] instanceof cEmpty) ? arg[1] : new cNumber( 1 ),
+        arg2 = arg[2] && !(arg[2] instanceof cEmpty) ? arg[2] : new cNumber( 1 ),
+        arg3 = arg[3] && !(arg[3] instanceof cEmpty) ? arg[3] : new cNumber( 1 ), res;
 
-    if (arg0 instanceof cArea3D) {
+    if ( arg0 instanceof cArea3D ) {
         arg0 = arg0.tocArea();
-        if( !arg0 )
-            return this.value = new cError(cErrorType.not_available);
-    } else if (arg0 instanceof cError) {
+        if ( !arg0 )
+            return this.value = new cError( cErrorType.not_available );
+    }
+    else if ( arg0 instanceof cError ) {
         return this.value = arg0;
     }
 
@@ -483,37 +484,38 @@ cINDEX.prototype.Calculate = function ( arg ) {
     arg2 = arg2.tocNumber();
     arg3 = arg3.tocNumber();
 
-    if (arg1 instanceof cError || arg2 instanceof cError || arg3 instanceof cError) {
-        return this.value = new cError(cErrorType.wrong_value_type);
+    if ( arg1 instanceof cError || arg2 instanceof cError || arg3 instanceof cError ) {
+        return this.value = new cError( cErrorType.wrong_value_type );
     }
 
     arg1 = arg1.getValue();
     arg2 = arg2.getValue();
     arg3 = arg3.getValue();
 
-    if (arg1 < 0 || arg2 < 0) {
-        return this.value = new cError(cErrorType.wrong_value_type);
+    if ( arg1 < 0 || arg2 < 0 ) {
+        return this.value = new cError( cErrorType.wrong_value_type );
     }
 
-    if (arg0 instanceof cArray || arg0 instanceof cArea) {
+    if ( arg0 instanceof cArray || arg0 instanceof cArea ) {
         var _a_ = arg0.getMatrix();
-        if( _a_.length == 1 ){/*одна строка*/
-            res = arg0.getValue2( 0, arg1 - 1);
+        if ( _a_.length == 1 ) {/*одна строка*/
+            res = arg0.getValue2( 0, arg1 - 1 );
         }
-        else{
+        else {
 //            console.log(_a_)
-            res = arg0.getValue2(arg1 - 1, arg2 - 1);
+            res = arg0.getValue2( arg1 - 1, arg2 - 1 );
         }
-    } else if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
-        if( (arg1 == 0 || arg1 == 1) && (arg2 ==0 || arg2 == 1) ){
+    }
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+        if ( (arg1 == 0 || arg1 == 1) && (arg2 == 0 || arg2 == 1) ) {
             res = arg0.tryConvert();
         }
     }
-    else{
-        res = new cError(cErrorType.wrong_value_type);
+    else {
+        res = new cError( cErrorType.wrong_value_type );
     }
 
-    return this.value = res ? res : new cError(cErrorType.bad_reference);
+    return this.value = res ? res : new cError( cErrorType.bad_reference );
 };
 cINDEX.prototype.getInfo = function () {
     return {
@@ -535,7 +537,7 @@ function cINDIRECT() {
     this.argumentsCurrent = 0;
     this.argumentsMax = 2;
     this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        def       :-1, //подразумевается формат первой ячейки входящей в формулу.
         noneFormat:-2
     };
     this.numFormat = this.formatType.def;
@@ -590,7 +592,7 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
 
     if ( arg0 instanceof cArray ) {
         var ret = new cArray();
-        arg0.foreach( function ( elem, r, c ) {
+        arg0.foreach( function ( elem, r ) {
             o = { Formula:elem.toString(), pCurrPos:0 };
             parseReference();
             if ( !ret.array[r] )
@@ -605,7 +607,7 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
     }
 
     if ( found_operand ) {
-        if ( found_operand instanceof cName ){
+        if ( found_operand instanceof cName ) {
             found_operand = found_operand.toRef();
         }
 
@@ -614,10 +616,10 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
         if ( (found_operand instanceof cRef || found_operand instanceof cRef3D || found_operand instanceof cArea) && found_operand.isValid() ) {
             var nFrom, nTo;
 
-            if( r2 ){
+            if ( r2 ) {
                 nFrom = r2.defName;
             }
-            else{
+            else {
                 nFrom = wb.dependencyFormulas.addNode( wsId, cellName );
             }
 
@@ -629,10 +631,10 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
         }
         else if ( found_operand instanceof cArea3D && found_operand.isValid() ) {
             var wsR = found_operand.wsRange(),
-                nTo, nFrom, _cell = found_operand._cells.replace( /\$/g, "" );
+                nTo, _cell = found_operand._cells.replace( /\$/g, "" );
 
-            for ( var j = 0; j < wsR.length; j++ ){
-                if( r2 ){
+            for ( var j = 0; j < wsR.length; j++ ) {
+                if ( r2 ) {
                     nTo = wb.dependencyFormulas.addNode( wsR[j].Id, _cell );
                     wb.dependencyFormulas.addEdge2( r2.defName, nTo );
                 }
@@ -667,7 +669,7 @@ function cLOOKUP() {
     this.argumentsCurrent = 0;
     this.argumentsMax = 3;
     this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        def       :-1, //подразумевается формат первой ячейки входящей в формулу.
         noneFormat:-2
     };
     this.numFormat = this.formatType.def;
@@ -808,7 +810,7 @@ function cMATCH() {
     this.argumentsCurrent = 0;
     this.argumentsMax = 3;
     this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        def       :-1, //подразумевается формат первой ячейки входящей в формулу.
         noneFormat:-2
     };
     this.numFormat = this.formatType.def;
@@ -896,9 +898,9 @@ cMATCH.prototype.Calculate = function ( arg ) {
         return this.value = arg0;
     }
 
-    if (arg1 instanceof cArray || arg1 instanceof cArea)
+    if ( arg1 instanceof cArray || arg1 instanceof cArea )
         arg1 = arg1.getMatrix();
-    else if (arg1 instanceof  cArea3D && arg1.wsFrom == arg1.wsTo)
+    else if ( arg1 instanceof  cArea3D && arg1.wsFrom == arg1.wsTo )
         arg1 = arg1.getMatrix()[0];
     else
         return this.value = new cError( cErrorType.not_available );
@@ -932,7 +934,7 @@ function cOFFSET() {
     this.argumentsCurrent = 0;
     this.argumentsMax = 5;
     this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        def       :-1, //подразумевается формат первой ячейки входящей в формулу.
         noneFormat:-2
     };
     this.numFormat = this.formatType.def;
@@ -1033,16 +1035,16 @@ cOFFSET.prototype.Calculate = function ( arg ) {
         this.value = new cError( cErrorType.wrong_value_type );
     }
 
-    if( this.value instanceof cArea || this.value instanceof cRef || this.value instanceof cRef3D || this.value instanceof cArea3D ){
+    if ( this.value instanceof cArea || this.value instanceof cRef || this.value instanceof cRef3D || this.value instanceof cArea3D ) {
         var r1 = arguments[1], r2 = arguments[2], wb = r1.worksheet.workbook, cellName = r1.getFirst().getID(), wsId = r1.worksheet.getId();
 
         if ( (this.value instanceof cRef || this.value instanceof cRef3D || this.value instanceof cArea) && this.value.isValid() ) {
             var nFrom, nTo;
 
-            if( r2 ){
+            if ( r2 ) {
                 nFrom = r2.defName;
             }
-            else{
+            else {
                 nFrom = wb.dependencyFormulas.addNode( wsId, cellName );
             }
 
@@ -1052,11 +1054,11 @@ cOFFSET.prototype.Calculate = function ( arg ) {
         }
         else if ( this.value instanceof cArea3D && this.value.isValid() ) {
             var wsR = this.value.wsRange(),
-                nTo, nFrom, _cell = this.value._cells.replace( /\$/g, "" );
+                nTo, _cell = this.value._cells.replace( /\$/g, "" );
 
-            for ( var j = 0; j < wsR.length; j++ ){
-                if( r2 ){
-                    nTo = wb.dependencyFormulas.addNode( wsR[j].Id, _cell ),
+            for ( var j = 0; j < wsR.length; j++ ) {
+                if ( r2 ) {
+                    nTo = wb.dependencyFormulas.addNode( wsR[j].Id, _cell );
                     wb.dependencyFormulas.addEdge2( r2.defName, nTo );
                 }
                 else
@@ -1087,7 +1089,7 @@ function cROW() {
     this.argumentsCurrent = 0;
     this.argumentsMax = 1;
     this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        def       :-1, //подразумевается формат первой ячейки входящей в формулу.
         noneFormat:-2
     };
     this.numFormat = this.formatType.def;
@@ -1140,7 +1142,7 @@ function cROWS() {
     this.argumentsCurrent = 0;
     this.argumentsMax = 1;
     this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        def       :-1, //подразумевается формат первой ячейки входящей в формулу.
         noneFormat:-2
     };
     this.numFormat = this.formatType.def;
@@ -1190,7 +1192,7 @@ function cTRANSPOSE() {
     this.argumentsCurrent = 0;
     this.argumentsMax = 1;
     this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        def       :-1, //подразумевается формат первой ячейки входящей в формулу.
         noneFormat:-2
     };
     this.numFormat = this.formatType.noneFormat;
@@ -1246,11 +1248,11 @@ function VHLOOKUPCache( bHor ) {
 }
 
 VHLOOKUPCache.prototype.get = function ( range, valueForSearching, isValueString, arg3Value ) {
-    var res = null;
-    var _this = this;
-    var wsId = range.getWorksheet().getId();
-    var sRangeName = wsId + g_cCharDelimiter + range.getName();
-    var cacheElem = this.cacheId[sRangeName];
+    var res,
+        _this = this,
+        wsId = range.getWorksheet().getId(),
+        sRangeName = wsId + g_cCharDelimiter + range.getName(),
+        cacheElem = this.cacheId[sRangeName];
     if ( null == cacheElem ) {
         cacheElem = {id:sRangeName, foreachArray:[], results:{}};
         range._foreachNoEmpty( /*func for cell in col*/ function ( cell, r, c, r1, c1 ) {
@@ -1350,7 +1352,7 @@ function cVLOOKUP() {
     this.argumentsCurrent = 0;
     this.argumentsMax = 4;
     this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        def       :-1, //подразумевается формат первой ячейки входящей в формулу.
         noneFormat:-2
     };
     this.numFormat = this.formatType.def;
@@ -1359,7 +1361,7 @@ function cVLOOKUP() {
 //    this.setArgumentsMax( 4 );
 }
 
-cVLOOKUP.prototype = Object.create( cBaseFunction.prototype )
+cVLOOKUP.prototype = Object.create( cBaseFunction.prototype );
 cVLOOKUP.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool() : new cBool( true );
     var numberCol = arg2.getValue() - 1, valueForSearching, resR = -1, min, regexp;
@@ -1512,7 +1514,7 @@ cVLOOKUP.prototype.Calculate = function ( arg ) {
     else if ( arg1 instanceof cArray ) {
         if ( arg0 instanceof cString )
             regexp = searchRegExp( valueForSearching );
-        arg1.foreach( function ( elem, r, c ) {
+        arg1.foreach( function ( elem, r ) {
             if ( r == 0 )
                 min = elem.getValue();
 
@@ -1536,7 +1538,7 @@ cVLOOKUP.prototype.Calculate = function ( arg ) {
             }
 
             min = Math.min( min, elem.getValue() );
-        } )
+        } );
 
         if ( min > valueForSearching ) {
             return this.value = new cError( cErrorType.not_available );
@@ -1564,17 +1566,17 @@ cVLOOKUP.prototype.Calculate = function ( arg ) {
 
     var c = new CellAddress( resR, bb.c1 + numberCol, 0 );
 
-    var v = arg1.getWS()._getCellNoEmpty( c.getRow0(), c.getCol0() )
+    var v = arg1.getWS()._getCellNoEmpty( c.getRow0(), c.getCol0() );
     if ( v )
         v = v.getValueWithoutFormat();
     else
         v = "";
 
     return this.value = checkTypeCell( v );
-}
+};
 cVLOOKUP.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( lookup-value  ,  table-array  ,  col-index-num  [  ,  [  range-lookup-flag  ] ] )"
     };
-}
+};
