@@ -28,7 +28,7 @@ function CheckLicense(licenseUrl, customerId, userId, userFirstName, userLastNam
       x509.readCertPEM(g_sPublicRSAKey);
       var isValid = x509.subjectPublicKeyRSA.verifyString(JSON.stringify(oLicense), hSig);
       callback(false, isValid ? CheckUserInLicense(customerId, userId, userFirstName, userLastName, oLicense) : false);
-    } catch(e) {
+    } catch (e) {
       callback(true, false);
     }
   });
@@ -37,6 +37,8 @@ function CheckLicense(licenseUrl, customerId, userId, userFirstName, userLastNam
  *
  * @param customerId
  * @param userId
+ * @param userFirstName
+ * @param userLastName
  * @param oLicense
  * @returns {boolean}
  */
@@ -45,16 +47,14 @@ function CheckUserInLicense(customerId, userId, userFirstName, userLastName, oLi
   var superuser = 'onlyoffice';
   try {
     if (oLicense.users) {
-
-        var userName = (typeof userFirstName === "string" ? userFirstName : "") + (typeof userLastName === "string" ? userLastName : "");
-        var sUserHash = CryptoJS.SHA256(userId + userName).toString(CryptoJS.enc.Hex).toLowerCase();
-      if ((customerId === oLicense['customer_id'] && oLicense.users.hasOwnProperty(sUserHash)) ||
-        (superuser === oLicense['customer_id'] && oLicense.users.hasOwnProperty(sUserHash = superuser))) {
+      var userName = (null == userFirstName ? '' : userFirstName) + (null == userLastName ? '' : userLastName);
+      var sUserHash = CryptoJS.SHA256(userId + userName).toString(CryptoJS.enc.Hex).toLowerCase();
+      if ((customerId === oLicense['customer_id'] && oLicense.users.hasOwnProperty(sUserHash)) || (superuser === oLicense['customer_id'] && oLicense.users.hasOwnProperty(sUserHash = superuser))) {
         var endDate = new Date(oLicense.users[sUserHash]['end_date']);
         res = endDate >= new Date();
       }
     }
-  } catch(e) {
+  } catch (e) {
     res = false;
   }
   return res;
