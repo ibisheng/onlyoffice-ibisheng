@@ -2484,15 +2484,17 @@ function sendImgUrls(api, images, callback, bExcel) {
       nError = c_oAscError.ID.Unknown;
     }
     if ( c_oAscError.ID.No !== nError ) {
+      if(!bExcel)
+        api.asc_fireCallback("asc_onError", nError, c_oAscError.Level.NoCritical);
+      else
+        api.handlers.trigger("asc_onError", nError, c_oAscError.Level.NoCritical);
+    }
+    if (!data) {
       //todo сделать функцию очистки, чтобы можно было оборвать paste и показать error
       data = [];
       for ( var i = 0; i < images.length; ++i) {
         data.push({'url': 'error', 'path': 'error'});
       }
-      if(!bExcel)
-        api.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-      else
-        api.handlers.trigger("asc_onError", c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
     }
     callback(data);
   };
