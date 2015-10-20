@@ -10047,17 +10047,17 @@
                 _C2H50H_ = this.model.workbook.getDefinesNames( reference, this.model.workbook.getActiveWs().getId() );
 
                 if( !_C2H50H_ ){
-                    if (this.collaborativeEditing.getGlobalLock()){
-                        this.handlers.trigger("asc_onError",c_oAscError.ID.LockCreateDefName,c_oAscError.Level.NoCritical);
-                        var ar_norm = ascRange.normalize(),
-                            mc = this.model.getMergedByCell(ar_norm.r1, ar_norm.c1);
 
-                        return {range:mc?mc:range, sheet:this.model.getName()};
+                    if ( this.collaborativeEditing.getGlobalLock() || !this.handlers.trigger("getLockDefNameManagerStatus") ){
+                        this.handlers.trigger("onErrorEvent",c_oAscError.ID.LockCreateDefName,c_oAscError.Level.NoCritical);
+                        this._updateSelectionNameAndInfo();
+                        return true;
                     }
                     _C2H50H_  = this.model.workbook.editDefinesNames( null, defName );
                 }
 
                 if(_C2H50H_){
+                    this._isLockedDefNames(null, _C2H50H_.nodeId);
                     sheetName = _C2H50H_.Ref.split("!");
                     ref = sheetName[1];
                     sheetName = sheetName[0];
@@ -10718,8 +10718,10 @@
 					t.autoFilters.addAutoFilter(styleName, ar, addFormatTableOptionsObj);
 			};
 			
-			if(t.autoFilters.checkAddAutoFilter(ar, styleName, addFormatTableOptionsObj) === true)
+			if(t.autoFilters.checkAddAutoFilter(ar, styleName, addFormatTableOptionsObj) === true){
 				this._isLockedAll (onChangeAutoFilterCallback);
+                this._isLockedDefNames(null,null);
+            }
 			else//для того, чтобы в случае ошибки кнопка отжималась!
 				t.handlers.trigger("selectionChanged", t.getSelectionInfo());
 		};

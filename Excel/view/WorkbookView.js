@@ -428,7 +428,8 @@
 				"onStopFormatPainter"		: function () {self.handlers.trigger("asc_onStopFormatPainter");},
 				"onDocumentPlaceChanged"	: function () {self._onDocumentPlaceChanged();},
 				"updateSheetViewSettings"	: function () {self.handlers.trigger("asc_onUpdateSheetViewSettings");},
-				"onScroll"					: function (d) {self.controller.scroll(d);}
+				"onScroll"					: function (d) {self.controller.scroll(d);},
+                "getLockDefNameManagerStatus":function(){return self.defNameAllowCreate}
 			});
 
 			this.model.handlers.add("cleanCellCache", function (wsId, oRanges, canChangeColWidth, bLockDraw, updateHeight) {
@@ -533,6 +534,8 @@
 				// Посылаем callback об изменении списка листов
 				self.handlers.trigger("asc_onSheetsChanged");
 			});
+
+            this.handlers.add("asc_onLockDefNameManager",function(reason){self.defNameAllowCreate = !(reason == c_oAscDefinedNameReason.LockDefNameManager);})
 
 			this.cellCommentator = new CCellCommentator({
 				model: new WorkbookCommentsModel(this.handlers),
@@ -1523,14 +1526,21 @@
 			if (this.skipHelpSelector)
 				return;
 			// ToDo для ускорения можно завести объект, куда класть результаты поиска по формулам и второй раз не искать.
-			var arrResult = [];
-			if (isFormula && formulaName) {
-				formulaName = formulaName.toUpperCase();
-				for (var i = 0; i < this.formulasList.length; ++i) {
-					if (0 === this.formulasList[i].indexOf(formulaName))
-						arrResult.push(this.formulasList[i]);
-				}
-			}
+            var arrResult = [], defNamesList, defName;
+            if (isFormula && formulaName) {
+                formulaName = formulaName.toUpperCase();
+                for (var i = 0; i < this.formulasList.length; ++i) {
+                    if (0 === this.formulasList[i].indexOf(formulaName))
+                        arrResult.push(this.formulasList[i]);
+                }
+                /*defNamesList = this.getDefinedNames(c_oAscGetDefinedNamesList.WorksheetWorkbook)
+                for(var id in defNamesList){
+                    defName = defNamesList[id];
+                    console.log(defName.Name)
+                    if (0 === defName.Name.toLowerCase().indexOf(formulaName.toLowerCase()))
+                        arrResult.push(defName.Name);
+                }*/
+            }
 			if (0 < arrResult.length) {
 				this.popUpSelector.show(true, arrResult, this.getWorksheet().getActiveCellCoord());
 				this.lastFormulaPos = formulaPos;

@@ -292,9 +292,9 @@
 				if (bCheckRedraw || bRedrawGraphicObjects)
 					this.handlers.trigger("showDrawingObjects");
 
-                if(bUnlockDefName){
+//                if(bUnlockDefName){
                     this.handlers.trigger("unlockDefName");
-                }
+//                }
 
 				if (0 === this.m_nUseType)
 					this.m_nUseType = 1;
