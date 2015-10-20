@@ -2464,10 +2464,11 @@ function sendImgUrls(api, images, callback, bExcel) {
         api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
      else
         api.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-
+    var nError = c_oAscError.ID.No;
+    var data;
     if (null != input && "imgurls" == input["type"]) {
       if ("ok" == input["status"]) {
-        var data = input["data"];
+        data = input["data"];
         var urls = {};
         for (var i = 0, length = data.length; i < length; ++i) {
           var elem = data[i];
@@ -2476,19 +2477,24 @@ function sendImgUrls(api, images, callback, bExcel) {
           }
         }
         g_oDocumentUrls.addUrls(urls);
-        callback(data);
       } else {
-          if(!bExcel)
-            api.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-          else
-            api.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+        nError = g_fMapAscServerErrorToAscError(parseInt(input["data"]));
       }
     } else {
+      nError = c_oAscError.ID.Unknown;
+    }
+    if ( c_oAscError.ID.No !== nError ) {
+      //todo сделать функцию очистки, чтобы можно было оборвать paste и показать error
+      data = [];
+      for ( var i = 0; i < images.length; ++i) {
+        data.push({'url': 'error', 'path': 'error'});
+      }
       if(!bExcel)
         api.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
       else
         api.handlers.trigger("asc_onError", c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
     }
+    callback(data);
   };
   sendCommand2(api, null, rData);
 }
