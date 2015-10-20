@@ -3202,7 +3202,10 @@ PasteProcessor.prototype =
 							for(var i = 0; i < hyperlinks.length; i++)
 							{
 								newElement = document.createElement("span");
-								newElement.style = hyperlinks[i].style;
+
+								var cssText = hyperlinks[i].getAttribute('style');
+								if(cssText)
+									newElement.getAttribute('style', cssText);
 								
 								$(newElement).append(hyperlinks[i].children);
 								
