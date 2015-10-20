@@ -2912,6 +2912,61 @@ function asc_ReadPageOptions(s, p) {
 
     return pageOptions;
 }
+function asc_ReadCHyperLink(_params, _cursor) {
+    var _settings = new Asc.asc_CHyperlink();
+
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _settings.asc_setType(_params[_cursor.pos++]);
+                break;
+            }
+            case 1:
+            {
+                _settings.asc_setHyperlinkUrl(_params[_cursor.pos++]);
+                break;
+            }
+            case 2:
+            {
+                _settings.asc_setTooltip(_params[_cursor.pos++]);
+                break;
+            }
+            case 3:
+            {
+                _settings.asc_setLocation(_params[_cursor.pos++]);
+                break;
+            }
+            case 4:
+            {
+                _settings.asc_setSheet(_params[_cursor.pos++]);
+                break;
+            }
+            case 5:
+            {
+                _settings.asc_setRange(_params[_cursor.pos++]);
+                break;
+            }
+            case 6:
+            {
+                _settings.asc_setText(_params[_cursor.pos++]);
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+
+    return _settings;
+}
 
 function asc_WriteCBorder(i, c, s) {
     if (!c) return;
@@ -3973,8 +4028,12 @@ function offline_get_header_sizes() {
 }
 function offline_get_graphics_object(x, y) {
     var ws = _api.wb.getWorksheet();
-   // ws.objectRender.drawingArea.reinitRanges();
-    return ws.objectRender.checkCursorDrawingObject(x, y);
+    var drawingInfo = ws.objectRender.checkCursorDrawingObject(x, y);
+    if (drawingInfo) {
+        return drawingInfo.id;
+    }
+
+    return null;
 }
 
 function offline_copy() {
@@ -4316,7 +4375,7 @@ function offline_apply_event(type,params) {
 
         case 52: // ASC_MENU_EVENT_TYPE_INSERT_HYPERLINK
         {
-            var props = asc_menu_ReadHyperPr(params, _current);
+            var props = asc_ReadCHyperLink(params, _current);
             _api.asc_insertHyperlink(props);
             break;
         }
@@ -4425,7 +4484,6 @@ function offline_apply_event(type,params) {
             _return = _s.offline_addImageDrawingObject(params);
             break;
         }
-
         case 53:  // ASC_MENU_EVENT_TYPE_INSERT_SHAPE
         {
             _return = _s.offline_addShapeDrawingObject(params);
