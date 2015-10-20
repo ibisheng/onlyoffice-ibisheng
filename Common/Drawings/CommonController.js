@@ -4925,7 +4925,7 @@ DrawingObjectsController.prototype =
         }
         if(chart_selection && chart_selection.selection.textSelection)
         {
-            var content = chart_selection.selection.textSelection.getDocContent();
+            var content = chart_selection.selection.textSelection.getDocContent(), bDeleteTitle = false;;
             if(content)
             {
                 if(content.Is_Empty())
@@ -4934,10 +4934,11 @@ DrawingObjectsController.prototype =
                     {
                         History.Create_NewPoint(historydescription_CommonControllerCheckChartText);
                         chart_selection.selection.title.parent.setTitle(null);
+                        bDeleteTitle = true;
                     }
                 }
             }
-            if(chart_selection.recalcInfo.bRecalculatedTitle)
+            if(chart_selection.recalcInfo.bRecalculatedTitle || bDeleteTitle)
             {
                 chart_selection.recalcInfo.recalcTitle = null;
                 chart_selection.handleUpdateInternalChart();
