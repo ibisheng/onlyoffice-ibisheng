@@ -3263,13 +3263,22 @@ function OfflineEditor () {
 
         return [left, top];
     };
-    this.getSelection = function(x, y, width, height) {
+    this.getSelection = function(x, y, width, height, autocorrection) {
 
         _null_object.width = width;
         _null_object.height = height;
 
         var worksheet = _api.wb.getWorksheet();
-        var region = this._updateRegion(worksheet, x, y, width, height);
+        var region = null;
+        var range = worksheet.activeRange.intersection(worksheet.visibleRange);
+
+        if (autocorrection) {
+            this._resizeWorkRegion(worksheet, worksheet.activeRange.c2 + 1, worksheet.activeRange.r2 + 1);
+            region = {columnBeg:0, columnEnd:worksheet.cols.length - 1,columnOff:0, rowBeg:0, rowEnd:worksheet.rows.length - 1, rowOff:0};
+        } else {
+            region = this._updateRegion(worksheet, x, y, width, height);
+        }
+
         this.selection = _api.wb.getWorksheet()._getDrawSelection_Local(region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd);
 
         return this.selection;
@@ -3538,6 +3547,28 @@ function OfflineEditor () {
             rowEnd: rowEnd,
             rowOff: rowOff
         };
+    };
+    this._resizeWorkRegion = function (worksheet, col, row) {
+
+        if (col >= worksheet.cols.length) {
+            do {
+                worksheet.nColsCount = worksheet.cols.length + 1;
+                worksheet._calcWidthColumns(2); // fullRecalc
+
+                if (col < worksheet.cols.length)
+                    break
+            } while (1);
+        }
+
+        if (row >= worksheet.rows.length) {
+            do {
+                worksheet.nRowsCount = worksheet.rows.length + 1;
+                worksheet._calcHeightRows(2); // fullRecalc
+
+                if (row < worksheet.rows.length)
+                    break
+            } while (1);
+        }
     };
 
     this.offline_showWorksheet = function(index) {
@@ -3851,8 +3882,8 @@ function offline_mouse_up(x, y, isViewer) {
         wb.getWorksheet().leftTopRange = undefined;
     }
 }
-function offline_get_selection(x, y, width, height) {
-    return _s.getSelection(x, y, width, height);
+function offline_get_selection(x, y, width, height, autocorrection) {
+    return _s.getSelection(x, y, width, height, autocorrection);
 }
 function offline_get_worksheet_bounds() {
     return _s.getMaxBounds();
@@ -4389,7 +4420,7 @@ function offline_apply_event(type,params) {
         {
             var findOptions = new Asc.asc_CFindOptions();
 
-            if (7 ===params.length) {
+            if (7 === params.length) {
                 findOptions.asc_setFindWhat(params[0]);
                 findOptions.asc_setScanForward(params[1]);
                 findOptions.asc_setIsMatchCase(params[2]);
