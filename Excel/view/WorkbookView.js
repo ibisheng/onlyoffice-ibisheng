@@ -203,6 +203,8 @@
 
             this.MobileTouchManager = null;
 
+            this.defNameAllowCreate = true;
+
 			this._init(fontRenderingMode);
 
 			return this;
