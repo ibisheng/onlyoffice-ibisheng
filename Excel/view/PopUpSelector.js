@@ -106,6 +106,7 @@
     this.isFormula = isFormula;
 
     var item, isFirst, value, selectElement = null;
+    var sIcon = this.isFormula ? '<span class="menu-item-icon mnu-popup-func"></span>' : '';
     for (var i = 0; i < arrItems.length; ++i) {
       item = document.createElement('li');
       isFirst = (0 === i);
@@ -124,7 +125,7 @@
         value = arrItems[i];
       }
 
-      item.innerHTML = '<a><span class="menu-item-icon mnu-popup-func"></span>' + value + '</a>';
+      item.innerHTML = '<a>' + sIcon + value + '</a>';
       item.setAttribute('val', value);
 
       if (item.addEventListener) {
