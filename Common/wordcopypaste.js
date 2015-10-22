@@ -270,7 +270,19 @@ function Editor_Copy(api, bCut)
 	//document.body.style["color"] = "transparent";
 	
 	ElemToSelect.style.MozUserSelect = "all";
-	ElemToSelect.focus();
+
+    if (!AscBrowser.isMozilla)
+    {
+        ElemToSelect.focus();
+    }
+    else
+    {
+        if (window.editor && window.editor.GetTextBoxInputMode)
+        {
+            if (window.editor.GetTextBoxInputMode() === true)
+                ElemToSelect.focus();
+        }
+    }
 	
     if (null != api.WordControl.m_oLogicDocument)
     {
@@ -2271,6 +2283,31 @@ function Editor_Paste(api, bClean)
 }
 function CopyPasteCorrectString(str)
 {
+    /*
+    // эта реализация на порядок быстрее. Перед выпуском не меняю ничего
+    var _ret = "";
+    var _len = str.length;
+
+    for (var i = 0; i < _len; i++)
+    {
+        var _symbol = str[i];
+        if (_symbol == "&")
+            _ret += "&amp;";
+        else if (_symbol == "<")
+            _ret += "&lt;";
+        else if (_symbol == ">")
+            _ret += "&gt;";
+        else if (_symbol == "'")
+            _ret += "&apos;";
+        else if (_symbol == "\"")
+            _ret += "&quot;";
+        else
+            _ret += _symbol;
+    }
+
+    return _ret;
+    */
+
     var res = str;
     res = res.replace(/&/g,'&amp;');
     res = res.replace(/</g,'&lt;');
