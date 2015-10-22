@@ -1316,7 +1316,7 @@ cName.prototype.toString = function () {
 cName.prototype.getValue = function () {
 
     if ( !this.defName ) {
-        return new cError( "#NAME?" );
+        return new cError( cErrorType.wrong_name );
     }
 
     return this.defName.parsedRef.calculate(this);
