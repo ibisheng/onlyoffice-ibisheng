@@ -256,9 +256,9 @@ function CCollaborativeEditing()
         this.m_aNewImages = [];
     };
 
-    this.Set_Fast = function()
+    this.Set_Fast = function(bFast)
     {
-        this.m_bFast = true;
+        this.m_bFast = bFast;
     };
 
     this.Is_Fast = function()

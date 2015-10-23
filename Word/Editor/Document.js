@@ -14615,7 +14615,7 @@ CDocument.prototype.Get_ElementByIndex = function(Index)
 };
 CDocument.prototype.Set_FastCollaborativeEditing = function(isOn)
 {
-    CollaborativeEditing.Set_Fast(true);
+    CollaborativeEditing.Set_Fast(isOn);
     editor.SetCollaborativeMarksShowType(c_oAscCollaborativeMarksShowType.All);
 };
 CDocument.prototype.Continue_FastCollaborativeEditing = function()
