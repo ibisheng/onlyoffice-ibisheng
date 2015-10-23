@@ -166,6 +166,7 @@
                 "../../Common/3rdparty/XRegExp/xregexp-all-min.js",
                 "../../Common/3rdparty/jszip/jszip.min.js",
                 "../../Common/3rdparty/jszip-utils/jszip-utils.min.js",
+				"../../Common/3rdparty/jsrsasign/jsrsasign-latest-all-min.js",
                 "../../Common/3rdparty/perfect-scrollbar/jquery.mousewheel.js",
                 "../../Common/3rdparty/perfect-scrollbar/perfect-scrollbar.js"
             ],
