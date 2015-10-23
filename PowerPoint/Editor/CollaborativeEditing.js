@@ -286,6 +286,11 @@ function CCollaborativeEditing()
         this.m_aNeedUnlock2.push( Lock );
     };
 
+    this.Is_Fast = function()
+    {
+        return false;
+    };
+
     this.Apply_OtherChanges = function()
     {
         // Чтобы заново созданные параграфы не отображались залоченными

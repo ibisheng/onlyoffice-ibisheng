@@ -4300,18 +4300,33 @@ DrawingObjectsController.prototype =
         if(oContent)
         {
             oContent.Selection_Remove();
+            var oTextSelection;
             if(this.selection.groupSelection)
             {
+                oTextSelection = this.selection.groupSelection.selection.textSelection;
                 this.selection.groupSelection.selection.textSelection = null;
             }
+
             if(this.selection.textSelection)
             {
+                oTextSelection = this.selection.textSelection;
                 this.selection.textSelection = null;
             }
+
+            if(oTextSelection && oTextSelection.recalcInfo)
+            {
+                if(oTextSelection.recalcInfo.bRecalculatedTitle)
+                {
+                    oTextSelection.recalcInfo.recalcTitle = null;
+                    oTextSelection.recalcInfo.bRecalculatedTitle = false;
+                }
+            }
+
             if(this.selection.chartSelection)
             {
                 this.selection.chartSelection.selection.textSelection = null
             }
+
         }
     },
 
