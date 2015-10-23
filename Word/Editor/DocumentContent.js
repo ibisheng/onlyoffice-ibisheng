@@ -8925,6 +8925,8 @@ CDocumentContent.prototype =
                         Element.Parent = this;
 
                         this.Content.splice( Pos, 0, Element );
+                        CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
+                        this.protected_ReindexContent(Pos);
                     }
                 }
 
@@ -8947,6 +8949,8 @@ CDocumentContent.prototype =
                         continue;
 
                     this.Content.splice( Pos, 1 );
+                    CollaborativeEditing.Update_DocumentPositionsOnRemove(this, Pos, 1);
+                    this.protected_ReindexContent(Pos);
 
                     if ( Pos > 0 )
                     {
@@ -9533,7 +9537,162 @@ CDocumentContent.prototype.Get_ElementByIndex = function(Index)
 {
     return this.Content[Index];
 };
+CDocumentContent.prototype.Get_ContentPosition = function(bSelection, bStart, PosArray)
+{
+    if (undefined === PosArray)
+        PosArray = [];
 
+    var Pos = (true === bSelection ? (true === bStart ? this.Selection.StartPos : this.Selection.EndPos) : this.CurPos.ContentPos);
+    PosArray.push({Class : this, Position : Pos});
+
+    if (undefined !== this.Content[Pos] && this.Content[Pos].Get_ContentPosition)
+        this.Content[Pos].Get_ContentPosition(bSelection, bStart, PosArray);
+
+    return PosArray;
+};
+CDocumentContent.prototype.Get_DocumentPositionFromObject = function(PosArray)
+{
+    if (!PosArray)
+        PosArray = [];
+
+    if (this.Parent && this.Parent.Get_DocumentPositionFromObject)
+        this.Parent.Get_DocumentPositionFromObject(PosArray);
+
+    return PosArray;
+};
+CDocumentContent.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+{
+    if (this.Content.length <= 0)
+        return;
+
+    var StartPos = 0, EndPos = 0;
+    switch (StartFlag)
+    {
+        case 0 : StartPos = StartDocPos[Depth].Position; break;
+        case 1 : StartPos = 0; break;
+        case -1: StartPos = this.Content.length - 1; break;
+    }
+
+    switch (EndFlag)
+    {
+        case 0 : EndPos = EndDocPos[Depth].Position; break;
+        case 1 : EndPos = 0; break;
+        case -1: EndPos = this.Content.length - 1; break;
+    }
+
+    var _StartDocPos = StartDocPos, _StartFlag = StartFlag;
+    if (null !== StartDocPos && true === StartDocPos[Depth].Deleted)
+    {
+        if (StartPos < this.Content.length)
+        {
+            _StartDocPos = null;
+            _StartFlag = 1;
+        }
+        else if (StartPos > 0)
+        {
+            StartPos--;
+            _StartDocPos = null;
+            _StartFlag = -1;
+        }
+        else
+        {
+            // Такого не должно быть
+            return;
+        }
+    }
+
+    var _EndDocPos = EndDocPos, _EndFlag = EndFlag;
+    if (null !== EndDocPos && true === EndDocPos[Depth].Deleted)
+    {
+        if (EndPos < this.Content.length)
+        {
+            _EndDocPos = null;
+            _EndFlag = 1;
+        }
+        else if (EndPos > 0)
+        {
+            EndPos--;
+            _EndDocPos = null;
+            _EndFlag = -1;
+        }
+        else
+        {
+            // Такого не должно быть
+            return;
+        }
+    }
+
+    StartPos = Math.min(this.Content.length - 1, Math.max(0, StartPos));
+    EndPos   = Math.min(this.Content.length - 1, Math.max(0, EndPos));
+
+    this.Selection.Use      = true;
+    this.Selection.StartPos = StartPos;
+    this.Selection.EndPos   = EndPos;
+
+    if (StartPos !== EndPos)
+    {
+        this.Content[StartPos].Set_ContentSelection(_StartDocPos, null, Depth + 1, _StartFlag, StartPos > EndPos ? 1 : -1);
+        this.Content[EndPos].Set_ContentSelection(null, _EndDocPos, Depth + 1, StartPos > EndPos ? -1 : 1, _EndFlag);
+
+        var _StartPos = StartPos;
+        var _EndPos = EndPos;
+        var Direction = 1;
+
+        if (_StartPos > _EndPos)
+        {
+            _StartPos = EndPos;
+            _EndPos = StartPos;
+            Direction = -1;
+        }
+
+        for (var CurPos = _StartPos + 1; CurPos < _EndPos; CurPos++)
+        {
+            this.Content[CurPos].Select_All(Direction);
+        }
+    }
+    else
+    {
+        this.Content[StartPos].Set_ContentSelection(_StartDocPos, _EndDocPos, Depth + 1, _StartFlag, _EndFlag);
+    }
+};
+CDocumentContent.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
+{
+    if (this.Content.length <= 0)
+        return;
+
+    var Pos = 0;
+    switch (Flag)
+    {
+        case 0 : Pos = DocPos[Depth].Position; break;
+        case 1 : Pos = 0; break;
+        case -1: Pos = this.Content.length - 1; break;
+    }
+
+    var _DocPos = DocPos, _Flag = Flag;
+    if (null !== DocPos && true === DocPos[Depth].Deleted)
+    {
+        if (Pos < this.Content.length)
+        {
+            _DocPos = null;
+            _Flag = 1;
+        }
+        else if (Pos > 0)
+        {
+            Pos--;
+            _DocPos = null;
+            _Flag = -1;
+        }
+        else
+        {
+            // Такого не должно быть
+            return;
+        }
+    }
+
+    Pos = Math.min(this.Content.length - 1, Math.max(0, Pos));
+    this.CurPos.ContentPos = Pos;
+    this.Content[Pos].Set_ContentPosition(_DocPos, Depth + 1, _Flag);
+};
 
 function CDocumentContentStartState(DocContent)
 {
@@ -9614,4 +9773,22 @@ CDocumentRecalculateObject.prototype =
         }
     }
         
+};
+
+function CDocumentContentBase()
+{
+}
+
+CDocumentContentBase.prototype.Get_ContentPosition = function(bSelection, bStart, PosArray)
+{
+    if (undefined === PosArray)
+        PosArray = [];
+
+    var Pos = (true === bSelection ? (true === bStart ? this.Selection.StartPos : this.Selection.EndPos) : this.CurPos.ContentPos);
+    PosArray.push({Class : this, Position : Pos});
+
+    if (undefined !== this.Content[Pos] && this.Content[Pos].Get_ContentPosition)
+        this.Content[Pos].Get_ContentPosition(bSelection, bStart, PosArray);
+
+    return PosArray;
 };

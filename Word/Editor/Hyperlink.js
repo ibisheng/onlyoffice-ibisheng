@@ -498,6 +498,7 @@ ParaHyperlink.prototype.Load_Changes = function(Reader)
                 if ( null != Element )
                 {
                     this.Content.splice( Pos, 0, Element );
+                    CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
                 }
             }
             this.private_UpdateTrackRevisions();
@@ -521,6 +522,7 @@ ParaHyperlink.prototype.Load_Changes = function(Reader)
                     continue;
 
                 this.Content.splice( ChangesPos, 1 );
+                CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
             }
             this.private_UpdateTrackRevisions();
             this.protected_UpdateSpellChecking();

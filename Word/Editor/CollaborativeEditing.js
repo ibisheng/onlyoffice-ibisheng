@@ -213,43 +213,47 @@ function CCollaborativeEditing()
     this.m_aLinkData    = []; // Массив, указателей, которые нам надо выставить при загрузке чужих изменений
     this.m_aEndActions  = []; // Массив действий, которые надо выполнить после принятия чужих изменений
 
-    this.m_bGlobalLock  = false;         // Запрещаем производить любые "редактирующие" действия (т.е. то, что в историю запишется)
+    this.m_bGlobalLock          = false; // Запрещаем производить любые "редактирующие" действия (т.е. то, что в историю запишется)
     this.m_bGlobalLockSelection = false; // Запрещаем изменять селект и курсор
-    this.m_aCheckLocks  = [];    // Массив для проверки залоченности объектов, которые мы собираемся изменять
+    this.m_aCheckLocks          = [];    // Массив для проверки залоченности объектов, которые мы собираемся изменять
 
-    this.m_aNewObjects  = []; // Массив со списком чужих новых объектов
-    this.m_aNewImages   = []; // Массив со списком картинок, которые нужно будет загрузить на сервере
+    this.m_aNewObjects = []; // Массив со списком чужих новых объектов
+    this.m_aNewImages  = []; // Массив со списком картинок, которые нужно будет загрузить на сервере
 
-    this.m_aDC          = {}; // Массив(ассоциативный) классов DocumentContent
+    this.m_aDC = {}; // Массив(ассоциативный) классов DocumentContent
 
     this.m_aChangedClasses = {}; // Массив(ассоциативный) классов, в которых есть изменения выделенные цветом
 
-    this.m_oMemory      = new CMemory(); // Глобальные класс для сохранения
+    this.m_oMemory = new CMemory(); // Глобальные класс для сохранения
 
-    this.m_bFast  = false;
+    this.m_aDocumentPositions      = []; // Список сохраненных позиций документа, которые мы обновляем при принятии чужих изменений
+    this.m_aDocumentPositionsSplit = []; // Список позиций, учавствующий в текущем сплите рана
+    this.m_aDocumentPositionsMap   = []; // Мап позиций, полученный после различных сплитов ранов
 
-//    // CollaborativeEditing LOG
-//    this.m_nErrorLog_PointChangesCount = 0;
-//    this.m_nErrorLog_SavedPCC          = 0;
-//    this.m_nErrorLog_CurPointIndex     = -1;
-//    this.m_nErrorLog_SumIndex          = 0;
+    this.m_bFast = false; // Быстрое совместное редактирование
+
+    //    // CollaborativeEditing LOG
+    //    this.m_nErrorLog_PointChangesCount = 0;
+    //    this.m_nErrorLog_SavedPCC          = 0;
+    //    this.m_nErrorLog_CurPointIndex     = -1;
+    //    this.m_nErrorLog_SumIndex          = 0;
 
     var oThis = this;
 
     this.Clear = function()
     {
-        this.m_nUseType     = 1;
+        this.m_nUseType = 1;
 
-        this.m_aUsers       = [];
-        this.m_aChanges     = [];
-        this.m_aNeedUnlock  = [];
+        this.m_aUsers = [];
+        this.m_aChanges = [];
+        this.m_aNeedUnlock = [];
         this.m_aNeedUnlock2 = [];
-        this.m_aNeedLock    = [];
-        this.m_aLinkData    = [];
-        this.m_aEndActions  = [];
-        this.m_aCheckLocks  = [];
-        this.m_aNewObjects  = [];
-        this.m_aNewImages   = [];
+        this.m_aNeedLock = [];
+        this.m_aLinkData = [];
+        this.m_aEndActions = [];
+        this.m_aCheckLocks = [];
+        this.m_aNewObjects = [];
+        this.m_aNewImages = [];
     };
 
     this.Set_Fast = function()
@@ -274,25 +278,25 @@ function CCollaborativeEditing()
     {
         this.m_nUseType = -1;
     };
-    
+
     this.End_CollaborationEditing = function()
     {
-        if ( this.m_nUseType <= 0 ) 
+        if (this.m_nUseType <= 0)
             this.m_nUseType = 0;
     };
 
     this.Add_User = function(UserId)
     {
-        if ( -1 === this.Find_User(UserId) )
-            this.m_aUsers.push( UserId );
+        if (-1 === this.Find_User(UserId))
+            this.m_aUsers.push(UserId);
     };
 
     this.Find_User = function(UserId)
     {
         var Len = this.m_aUsers.length;
-        for ( var Index = 0; Index < Len; Index++ )
+        for (var Index = 0; Index < Len; Index++)
         {
-            if ( this.m_aUsers[Index] === UserId )
+            if (this.m_aUsers[Index] === UserId)
                 return Index;
         }
 
@@ -301,54 +305,57 @@ function CCollaborativeEditing()
 
     this.Remove_User = function(UserId)
     {
-        var Pos = this.Find_User( UserId );
-        if ( -1 != Pos )
-            this.m_aUsers.splice( Pos, 1 );
+        var Pos = this.Find_User(UserId);
+        if (-1 != Pos)
+            this.m_aUsers.splice(Pos, 1);
     };
 
     this.Add_Changes = function(Changes)
     {
-        this.m_aChanges.push( Changes );
+        this.m_aChanges.push(Changes);
     };
 
     this.Add_Unlock = function(LockClass)
     {
-        this.m_aNeedUnlock.push( LockClass );
+        this.m_aNeedUnlock.push(LockClass);
     };
 
     this.Add_Unlock2 = function(Lock)
     {
-        this.m_aNeedUnlock2.push( Lock );
-		editor._onUpdateDocumentCanSave();
+        this.m_aNeedUnlock2.push(Lock);
+        editor._onUpdateDocumentCanSave();
     };
 
     this.Have_OtherChanges = function()
     {
-        return (this.m_aChanges.length > 0 ? true: false);
+        return (this.m_aChanges.length > 0 ? true : false);
     };
 
     this.Apply_OtherChanges = function()
     {
         // Чтобы заново созданные параграфы не отображались залоченными
-        g_oIdCounter.Set_Load( true );
+        g_oIdCounter.Set_Load(true);
 
         // Применяем изменения, пока они есть
         var _count = this.m_aChanges.length;
-		for (var i = 0; i < _count; i++)
+        for (var i = 0; i < _count; i++)
         {
             if (window["NATIVE_EDITOR_ENJINE"] === true && window["native"]["CheckNextChange"])
             {
                 if (!window["native"]["CheckNextChange"]())
                     break;
             }
-        
+
             var Changes = this.m_aChanges[i];
             Changes.Apply_Data();
-//            // CollaborativeEditing LOG
-//            this.m_nErrorLog_PointChangesCount++;
+            //            // CollaborativeEditing LOG
+            //            this.m_nErrorLog_PointChangesCount++;
         }
-		
-		this.m_aChanges = [];
+
+        // Найдем RecalcData
+        //var RecalcData = History.Get_RecalcData();
+
+        this.m_aChanges = [];
 
         // У новых элементов выставляем указатели на другие классы
         this.Apply_LinkData();
@@ -358,7 +365,7 @@ function CCollaborativeEditing()
 
         this.OnEnd_ReadForeignChanges();
 
-        g_oIdCounter.Set_Load( false );
+        g_oIdCounter.Set_Load(false);
     };
 
     this.Get_SelfChanges = function()
@@ -366,20 +373,20 @@ function CCollaborativeEditing()
         // Генерируем свои изменения
         var aChanges = [];
         var PointsCount = History.Points.length;
-        for ( var PointIndex = 0; PointIndex < PointsCount; PointIndex++ )
+        for (var PointIndex = 0; PointIndex < PointsCount; PointIndex++)
         {
             var Point = History.Points[PointIndex];
             var LastPoint = Point.Items.length;
 
-            for ( var Index = 0; Index < LastPoint; Index++ )
+            for (var Index = 0; Index < LastPoint; Index++)
             {
                 var Item = Point.Items[Index];
                 var oChanges = new CCollaborativeChanges();
-                oChanges.Set_FromUndoRedo( Item.Class, Item.Data, Item.Binary );
+                oChanges.Set_FromUndoRedo(Item.Class, Item.Data, Item.Binary);
                 // Изменения могут обрабатываться другим кодом, поэтому здесь
                 // явно указываются имена свойств, что бы избежать их последующей
                 // минимизации.
-                aChanges.push( {"id": oChanges.m_sId, "data": oChanges.m_pData} );
+                aChanges.push({"id" : oChanges.m_sId, "data" : oChanges.m_pData});
             }
         }
         return aChanges;
@@ -390,7 +397,7 @@ function CCollaborativeEditing()
         var OtherChanges = ( this.m_aChanges.length > 0 ? true : false );
 
         // Если нет чужих изменений, тогда и делать ничего не надо
-        if ( true === OtherChanges )
+        if (true === OtherChanges)
         {
             editor.WordControl.m_oLogicDocument.Stop_Recalculate();
             editor.WordControl.m_oLogicDocument.EndPreview_MailMergeResult();
@@ -398,7 +405,24 @@ function CCollaborativeEditing()
             editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.ApplyChanges);
 
             var LogicDocument = editor.WordControl.m_oLogicDocument;
-            var DocState = LogicDocument.Get_SelectionState2();
+
+            var DocState;
+            if (true !== this.Is_Fast())
+            {
+                DocState = LogicDocument.Get_SelectionState2();
+            }
+            else
+            {
+                DocState = LogicDocument.Save_DocumentStateBeforeLoadChanges();
+                this.Clear_DocumentPositions();
+
+                if (DocState.Pos)
+                    this.Add_DocumentPosition(DocState.Pos);
+                if (DocState.StartPos)
+                    this.Add_DocumentPosition(DocState.StartPos);
+                if (DocState.EndPos)
+                    this.Add_DocumentPosition(DocState.EndPos);
+            }
 
             this.Clear_NewImages();
 
@@ -407,11 +431,26 @@ function CCollaborativeEditing()
             // После того как мы приняли чужие изменения, мы должны залочить новые объекты, которые были залочены
             this.Lock_NeedLock();
 
-            LogicDocument.Set_SelectionState2( DocState );
+            if (true !== this.Is_Fast())
+            {
+                LogicDocument.Set_SelectionState2(DocState);
+            }
+            else
+            {
+                if (DocState.Pos)
+                    this.Update_DocumentPosition(DocState.Pos);
+                if (DocState.StartPos)
+                    this.Update_DocumentPosition(DocState.StartPos);
+                if (DocState.EndPos)
+                    this.Update_DocumentPosition(DocState.EndPos);
+
+                LogicDocument.Load_DocumentStateAfterLoadChanges(DocState);
+            }
+
             this.OnStart_Load_Objects();
         }
-    };    
-    
+    };
+
     this.Send_Changes = function()
     {
         // Пересчитываем позиции
@@ -419,9 +458,9 @@ function CCollaborativeEditing()
 
         // Генерируем свои изменения
         var StartPoint = ( null === History.SavedIndex ? 0 : History.SavedIndex + 1 );
-        var LastPoint  = -1;
-        
-        if ( this.m_nUseType <= 0 )
+        var LastPoint = -1;
+
+        if (this.m_nUseType <= 0)
         {
             // (ненужные точки предварительно удаляем)
             History.Clear_Redo();
@@ -434,8 +473,8 @@ function CCollaborativeEditing()
 
         // Просчитаем сколько изменений на сервер пересылать не надо
         var SumIndex = 0;
-        var StartPoint2 = Math.min( StartPoint, LastPoint + 1 );
-        for ( var PointIndex = 0; PointIndex < StartPoint2; PointIndex++ )
+        var StartPoint2 = Math.min(StartPoint, LastPoint + 1);
+        for (var PointIndex = 0; PointIndex < StartPoint2; PointIndex++)
         {
             var Point = History.Points[PointIndex];
             SumIndex += Point.Items.length;
@@ -443,16 +482,16 @@ function CCollaborativeEditing()
         var deleteIndex = ( null === History.SavedIndex ? null : SumIndex );
 
         var aChanges = [];
-        for ( var PointIndex = StartPoint; PointIndex <= LastPoint; PointIndex++ )
+        for (var PointIndex = StartPoint; PointIndex <= LastPoint; PointIndex++)
         {
             var Point = History.Points[PointIndex];
             History.Update_PointInfoItem(PointIndex, StartPoint, LastPoint, SumIndex, deleteIndex);
 
-            for ( var Index = 0; Index < Point.Items.length; Index++ )
+            for (var Index = 0; Index < Point.Items.length; Index++)
             {
                 var Item = Point.Items[Index];
                 var oChanges = new CCollaborativeChanges();
-                oChanges.Set_FromUndoRedo( Item.Class, Item.Data, Item.Binary );
+                oChanges.Set_FromUndoRedo(Item.Class, Item.Data, Item.Binary);
                 aChanges.push(oChanges.m_pData);
             }
         }
@@ -460,34 +499,34 @@ function CCollaborativeEditing()
         this.Release_Locks();
 
         var UnlockCount2 = this.m_aNeedUnlock2.length;
-        for ( var Index = 0; Index < UnlockCount2; Index++ )
+        for (var Index = 0; Index < UnlockCount2; Index++)
         {
             var Class = this.m_aNeedUnlock2[Index];
-            Class.Lock.Set_Type( locktype_None, false);
-            editor.CoAuthoringApi.releaseLocks( Class.Get_Id() );
+            Class.Lock.Set_Type(locktype_None, false);
+            editor.CoAuthoringApi.releaseLocks(Class.Get_Id());
         }
 
-        this.m_aNeedUnlock.length  = 0;
+        this.m_aNeedUnlock.length = 0;
         this.m_aNeedUnlock2.length = 0;
 
-		var deleteIndex = ( null === History.SavedIndex ? null : SumIndex );
-		if (0 < aChanges.length || null !== deleteIndex)
-        	editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex);
-		else
-			editor.CoAuthoringApi.unLockDocument(true);
+        var deleteIndex = ( null === History.SavedIndex ? null : SumIndex );
+        if (0 < aChanges.length || null !== deleteIndex)
+            editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex);
+        else
+            editor.CoAuthoringApi.unLockDocument(true);
 
-        if ( -1 === this.m_nUseType )
-        {
-            // Чистим Undo/Redo только во время совместного редактирования
-            History.Clear();
-            History.SavedIndex = null;                        
-        }
-        else if ( 0 === this.m_nUseType )
+        if (-1 === this.m_nUseType)
         {
             // Чистим Undo/Redo только во время совместного редактирования
             History.Clear();
             History.SavedIndex = null;
-            
+        }
+        else if (0 === this.m_nUseType)
+        {
+            // Чистим Undo/Redo только во время совместного редактирования
+            History.Clear();
+            History.SavedIndex = null;
+
             this.m_nUseType = 1;
         }
         else
@@ -508,25 +547,25 @@ function CCollaborativeEditing()
     this.Release_Locks = function()
     {
         var UnlockCount = this.m_aNeedUnlock.length;
-        for ( var Index = 0; Index < UnlockCount; Index++ )
+        for (var Index = 0; Index < UnlockCount; Index++)
         {
             var CurLockType = this.m_aNeedUnlock[Index].Lock.Get_Type();
-            if  ( locktype_Other3 != CurLockType && locktype_Other != CurLockType )
+            if (locktype_Other3 != CurLockType && locktype_Other != CurLockType)
             {
-                this.m_aNeedUnlock[Index].Lock.Set_Type( locktype_None, false);
+                this.m_aNeedUnlock[Index].Lock.Set_Type(locktype_None, false);
 
-                if ( this.m_aNeedUnlock[Index] instanceof CHeaderFooterController )
+                if (this.m_aNeedUnlock[Index] instanceof CHeaderFooterController)
                     editor.sync_UnLockHeaderFooters();
-                else if ( this.m_aNeedUnlock[Index] instanceof CDocument )
+                else if (this.m_aNeedUnlock[Index] instanceof CDocument)
                     editor.sync_UnLockDocumentProps();
-                else if ( this.m_aNeedUnlock[Index] instanceof CComment )
-                    editor.sync_UnLockComment( this.m_aNeedUnlock[Index].Get_Id() );
-                else if ( this.m_aNeedUnlock[Index] instanceof CGraphicObjects )
+                else if (this.m_aNeedUnlock[Index] instanceof CComment)
+                    editor.sync_UnLockComment(this.m_aNeedUnlock[Index].Get_Id());
+                else if (this.m_aNeedUnlock[Index] instanceof CGraphicObjects)
                     editor.sync_UnLockDocumentSchema();
             }
-            else if ( locktype_Other3 === CurLockType )
+            else if (locktype_Other3 === CurLockType)
             {
-                this.m_aNeedUnlock[Index].Lock.Set_Type( locktype_Other, false);
+                this.m_aNeedUnlock[Index].Lock.Set_Type(locktype_Other, false);
             }
         }
     };
@@ -553,26 +592,26 @@ function CCollaborativeEditing()
 
         var RecalculateData =
         {
-            Inline : { Pos : 0, PageNum : 0 },
-            Flow   : [],
-            HdrFtr : [],
-            Drawings: {
-                All: true,
-                Map:{}
+            Inline   : { Pos : 0, PageNum : 0 },
+            Flow     : [],
+            HdrFtr   : [],
+            Drawings : {
+                All : true,
+                Map : {}
             }
-        };        
+        };
 
         LogicDocument.Reset_RecalculateCache();
 
-        LogicDocument.Recalculate( false, false, RecalculateData );
+        LogicDocument.Recalculate(false, false, RecalculateData);
         LogicDocument.Document_UpdateSelectionState();
         LogicDocument.Document_UpdateInterfaceState();
-        
-		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.ApplyChanges);
+
+        editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.ApplyChanges);
     };
-//-----------------------------------------------------------------------------------
-// Функции для работы с ссылками, у новых объектов
-//-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    // Функции для работы с ссылками, у новых объектов
+    //-----------------------------------------------------------------------------------
     this.Clear_LinkData = function()
     {
         this.m_aLinkData.length = 0;
@@ -580,31 +619,31 @@ function CCollaborativeEditing()
 
     this.Add_LinkData = function(Class, LinkData)
     {
-        this.m_aLinkData.push( { Class : Class, LinkData : LinkData } );
+        this.m_aLinkData.push({ Class : Class, LinkData : LinkData });
     };
 
     this.Apply_LinkData = function()
     {
         var Count = this.m_aLinkData.length;
-        for ( var Index = 0; Index < Count; Index++ )
+        for (var Index = 0; Index < Count; Index++)
         {
             var Item = this.m_aLinkData[Index];
-            Item.Class.Load_LinkData( Item.LinkData );
+            Item.Class.Load_LinkData(Item.LinkData);
         }
 
         this.Clear_LinkData();
     };
-//-----------------------------------------------------------------------------------
-// Функции для проверки корректности новых изменений
-//-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    // Функции для проверки корректности новых изменений
+    //-----------------------------------------------------------------------------------
     this.Check_MergeData = function()
     {
         var LogicDocument = editor.WordControl.m_oLogicDocument;
         LogicDocument.Comments.Check_MergeData();
     };
-//-----------------------------------------------------------------------------------
-// Функции для проверки залоченности объектов
-//-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    // Функции для проверки залоченности объектов
+    //-----------------------------------------------------------------------------------
     this.Get_GlobalLock = function()
     {
         return this.m_bGlobalLock;
@@ -617,7 +656,7 @@ function CCollaborativeEditing()
 
     this.Add_CheckLock = function(oItem)
     {
-        this.m_aCheckLocks.push( oItem );
+        this.m_aCheckLocks.push(oItem);
     };
 
     this.OnEnd_CheckLock = function()
@@ -625,39 +664,39 @@ function CCollaborativeEditing()
         var aIds = [];
 
         var Count = this.m_aCheckLocks.length;
-        for ( var Index = 0; Index < Count; Index++ )
+        for (var Index = 0; Index < Count; Index++)
         {
             var oItem = this.m_aCheckLocks[Index];
 
-            if ( true === oItem ) // сравниваем по значению и типу обязательно
+            if (true === oItem) // сравниваем по значению и типу обязательно
                 return true;
-            else if ( false !== oItem )
-                aIds.push( oItem );
+            else if (false !== oItem)
+                aIds.push(oItem);
         }
 
-        if ( aIds.length > 0 )
+        if (aIds.length > 0)
         {
             // Отправляем запрос на сервер со списком Id
-            editor.CoAuthoringApi.askLock( aIds, this.OnCallback_AskLock );
+            editor.CoAuthoringApi.askLock(aIds, this.OnCallback_AskLock);
 
             // Ставим глобальный лок, только во время совместного редактирования
-            if ( -1 === this.m_nUseType )
+            if (-1 === this.m_nUseType)
                 this.m_bGlobalLock = true;
             else
             {
                 // Пробегаемся по массиву и проставляем, что залочено нами
                 var Count = this.m_aCheckLocks.length;
-                for ( var Index = 0; Index < Count; Index++ )
+                for (var Index = 0; Index < Count; Index++)
                 {
                     var oItem = this.m_aCheckLocks[Index];
 
-                    if ( true !== oItem && false !== oItem ) // сравниваем по значению и типу обязательно
+                    if (true !== oItem && false !== oItem) // сравниваем по значению и типу обязательно
                     {
-                        var Class = g_oTableId.Get_ById( oItem );
-                        if ( null != Class )
+                        var Class = g_oTableId.Get_ById(oItem);
+                        if (null != Class)
                         {
-                            Class.Lock.Set_Type( locktype_Mine, false );
-                            this.Add_Unlock2( Class );
+                            Class.Lock.Set_Type(locktype_Mine, false);
+                            this.Add_Unlock2(Class);
                         }
                     }
                 }
@@ -686,17 +725,17 @@ function CCollaborativeEditing()
                 // Пробегаемся по массиву и проставляем, что залочено нами
 
                 var Count = oThis.m_aCheckLocks.length;
-                for ( var Index = 0; Index < Count; Index++ )
+                for (var Index = 0; Index < Count; Index++)
                 {
                     var oItem = oThis.m_aCheckLocks[Index];
 
-                    if ( true !== oItem && false !== oItem ) // сравниваем по значению и типу обязательно
+                    if (true !== oItem && false !== oItem) // сравниваем по значению и типу обязательно
                     {
-                        var Class = g_oTableId.Get_ById( oItem );
-                        if ( null != Class )
+                        var Class = g_oTableId.Get_ById(oItem);
+                        if (null != Class)
                         {
-                            Class.Lock.Set_Type( locktype_Mine );
-                            oThis.Add_Unlock2( Class );
+                            Class.Lock.Set_Type(locktype_Mine);
+                            oThis.Add_Unlock2(Class);
                         }
                     }
                 }
@@ -705,7 +744,7 @@ function CCollaborativeEditing()
             {
                 // Если у нас началось редактирование диаграммы, а вернулось, что ее редактировать нельзя,
                 // посылаем сообщение о закрытии редактора диаграмм.
-                if ( true === editor.isChartEditor )
+                if (true === editor.isChartEditor)
                     editor.sync_closeChartEditor();
 
                 // Делаем откат на 1 шаг назад и удаляем из Undo/Redo эту последнюю точку
@@ -716,9 +755,9 @@ function CCollaborativeEditing()
             editor.isChartEditor = false;
         }
     };
-//-----------------------------------------------------------------------------------
-// Функции для работы с залоченными объектами, которые еще не были добавлены
-//-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    // Функции для работы с залоченными объектами, которые еще не были добавлены
+    //-----------------------------------------------------------------------------------
     this.Reset_NeedLock = function()
     {
         this.m_aNeedLock = {};
@@ -736,23 +775,23 @@ function CCollaborativeEditing()
 
     this.Lock_NeedLock = function()
     {
-        for ( var Id in this.m_aNeedLock )
+        for (var Id in this.m_aNeedLock)
         {
-            var Class = g_oTableId.Get_ById( Id );
+            var Class = g_oTableId.Get_ById(Id);
 
-            if ( null != Class )
+            if (null != Class)
             {
                 var Lock = Class.Lock;
-                Lock.Set_Type( locktype_Other, false );
-                Lock.Set_UserId( this.m_aNeedLock[Id] );
+                Lock.Set_Type(locktype_Other, false);
+                Lock.Set_UserId(this.m_aNeedLock[Id]);
             }
         }
 
         this.Reset_NeedLock();
     };
-//-----------------------------------------------------------------------------------
-// Функции для работы с новыми объектами, созданными на других клиентах
-//-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    // Функции для работы с новыми объектами, созданными на других клиентах
+    //-----------------------------------------------------------------------------------
     this.Clear_NewObjects = function()
     {
         this.m_aNewObjects.length = 0;
@@ -760,7 +799,7 @@ function CCollaborativeEditing()
 
     this.Add_NewObject = function(Class)
     {
-        this.m_aNewObjects.push( Class );
+        this.m_aNewObjects.push(Class);
         Class.FromBinary = true;
     };
 
@@ -778,7 +817,7 @@ function CCollaborativeEditing()
     {
         var Count = this.m_aNewObjects.length;
 
-        for ( var Index = 0; Index < Count; Index++ )
+        for (var Index = 0; Index < Count; Index++)
         {
             var Class = this.m_aNewObjects[Index];
             Class.FromBinary = false;
@@ -794,9 +833,9 @@ function CCollaborativeEditing()
         this.Clear_EndActions();
         this.Clear_NewObjects();
     };
-//-----------------------------------------------------------------------------------
-// Функции для работы с новыми объектами, созданными на других клиентах
-//-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    // Функции для работы с новыми объектами, созданными на других клиентах
+    //-----------------------------------------------------------------------------------
     this.Clear_NewImages = function()
     {
         this.m_aNewImages.length = 0;
@@ -804,11 +843,11 @@ function CCollaborativeEditing()
 
     this.Add_NewImage = function(Url)
     {
-        this.m_aNewImages.push( Url );
+        this.m_aNewImages.push(Url);
     };
-//-----------------------------------------------------------------------------------
-// Функции для работы с массивом m_aDC
-//-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    // Функции для работы с массивом m_aDC
+    //-----------------------------------------------------------------------------------
     this.Add_NewDC = function(Class)
     {
         var Id = Class.Get_Id();
@@ -817,7 +856,7 @@ function CCollaborativeEditing()
 
     this.Clear_DCChanges = function()
     {
-        for ( var Id in this.m_aDC )
+        for (var Id in this.m_aDC)
         {
             this.m_aDC[Id].Clear_ContentChanges();
         }
@@ -828,16 +867,16 @@ function CCollaborativeEditing()
 
     this.Refresh_DCChanges = function()
     {
-        for ( var Id in this.m_aDC )
+        for (var Id in this.m_aDC)
         {
             this.m_aDC[Id].Refresh_ContentChanges();
         }
 
         this.Clear_DCChanges();
     };
-//-----------------------------------------------------------------------------------
-// Функции для работы с отметками изменений
-//-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    // Функции для работы с отметками изменений
+    //-----------------------------------------------------------------------------------
     this.Add_ChangedClass = function(Class)
     {
         var Id = Class.Get_Id();
@@ -846,7 +885,7 @@ function CCollaborativeEditing()
 
     this.Clear_CollaborativeMarks = function(bRepaint)
     {
-        for ( var Id in this.m_aChangedClasses )
+        for (var Id in this.m_aChangedClasses)
         {
             this.m_aChangedClasses[Id].Clear_CollaborativeMarks();
         }
@@ -854,16 +893,149 @@ function CCollaborativeEditing()
         // Очищаем массив
         this.m_aChangedClasses = {};
 
-        if ( true === bRepaint )
+        if (true === bRepaint)
         {
             editor.WordControl.m_oLogicDocument.DrawingDocument.ClearCachePages();
             editor.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
         }
     };
 
-	this.getOwnLocksLength = function () {
-		return this.m_aNeedUnlock2.length;
-	};
+    this.getOwnLocksLength = function()
+    {
+        return this.m_aNeedUnlock2.length;
+    };
 }
+//----------------------------------------------------------------------------------------------------------------------
+// Функции для работы с сохраненными позициями документа.
+//----------------------------------------------------------------------------------------------------------------------
+//   Принцип следующий. Заданная позиция - это Run + Позиция внутри данного Run.
+//   Если заданный ран был разбит (операция Split), тогда отслеживаем куда перешла
+//   заданная позиция, в новый ран или осталась в старом? Если в новый, тогда сохраняем
+//   новый ран как отдельную позицию в массив m_aDocumentPositions, и добавляем мап
+//   старой позиции в новую m_aDocumentPositionsMap. В конце действия, когда нам нужно
+//   определить где же находистся наша позиция, мы сначала проверяем Map, если в нем есть
+//   конечная позиция, проверяем является ли заданная позиция валидной в документе.
+//   Если да, тогда выставляем ее, если нет, тогда берем Run исходной позиции, и
+//   пытаемся сформировать полную позицию по данному Run. Если и это не получается,
+//   тогда восстанавливаем позицию по измененной полной исходной позиции.
+//----------------------------------------------------------------------------------------------------------------------
+CCollaborativeEditing.prototype.Clear_DocumentPositions = function()
+{
+    this.m_aDocumentPositions      = [];
+    this.m_aDocumentPositionsSplit = [];
+    this.m_aDocumentPositionsMap   = [];
+};
+CCollaborativeEditing.prototype.Add_DocumentPosition = function(DocumentPos)
+{
+    this.m_aDocumentPositions.push(DocumentPos);
+};
+CCollaborativeEditing.prototype.Update_DocumentPositionsOnAdd = function(Class, Pos)
+{
+    for (var PosIndex = 0, PosCount = this.m_aDocumentPositions.length; PosIndex < PosCount; ++PosIndex)
+    {
+        var DocPos = this.m_aDocumentPositions[PosIndex];
+        for (var ClassPos = 0, ClassLen = DocPos.length; ClassPos < ClassLen; ++ClassPos)
+        {
+            var _Pos = DocPos[ClassPos];
+            if (Class === _Pos.Class && _Pos.Position && _Pos.Position >= Pos)
+            {
+                _Pos.Position++;
+                break;
+            }
+        }
+    }
+};
+CCollaborativeEditing.prototype.Update_DocumentPositionsOnRemove = function(Class, Pos, Count)
+{
+    for (var PosIndex = 0, PosCount = this.m_aDocumentPositions.length; PosIndex < PosCount; ++PosIndex)
+    {
+        var DocPos = this.m_aDocumentPositions[PosIndex];
+        for (var ClassPos = 0, ClassLen = DocPos.length; ClassPos < ClassLen; ++ClassPos)
+        {
+            var _Pos = DocPos[ClassPos];
+            if (Class === _Pos.Class && _Pos.Position)
+            {
+                if (_Pos.Position > Pos + Count)
+                {
+                    _Pos.Position -= Count;
+                }
+                else if (_Pos.Position >= Pos)
+                {
+                    // Элемент, в котором находится наша позиция, удаляется. Ставим специальную отметку об этом.
+                    _Pos.Position = Pos;
+                    _Pos.Deleted = true;
+                }
+
+                break;
+            }
+        }
+    }
+};
+CCollaborativeEditing.prototype.OnStart_SplitRun = function(SplitRun, SplitPos)
+{
+    this.m_aDocumentPositionsSplit = [];
+
+    for (var PosIndex = 0, PosCount = this.m_aDocumentPositions.length; PosIndex < PosCount; ++PosIndex)
+    {
+        var DocPos = this.m_aDocumentPositions[PosIndex];
+        for (var ClassPos = 0, ClassLen = DocPos.length; ClassPos < ClassLen; ++ClassPos)
+        {
+            var _Pos = DocPos[ClassPos];
+            if (SplitRun === _Pos.Class && _Pos.Position && _Pos.Position >= SplitPos)
+            {
+                this.m_aDocumentPositionsSplit.push({DocPos : DocPos, NewRunPos : _Pos.Position - SplitPos});
+            }
+        }
+    }
+};
+CCollaborativeEditing.prototype.OnEnd_SplitRun = function(NewRun)
+{
+    if (!NewRun)
+        return;
+
+    for (var PosIndex = 0, PosCount = this.m_aDocumentPositionsSplit.length; PosIndex < PosCount; ++PosIndex)
+    {
+        var NewDocPos = [];
+        NewDocPos.push({Class : NewRun, Position : this.m_aDocumentPositionsSplit[PosIndex].NewRunPos});
+        this.m_aDocumentPositions.push(NewDocPos);
+        this.m_aDocumentPositionsMap.push({StartPos : this.m_aDocumentPositionsSplit[PosIndex].DocPos, EndPos : NewDocPos});
+    }
+};
+CCollaborativeEditing.prototype.Update_DocumentPosition = function(DocPos)
+{
+    // Смотрим куда мапится заданная позиция
+    var NewDocPos = DocPos;
+    for (var PosIndex = 0, PosCount = this.m_aDocumentPositionsMap.length; PosIndex < PosCount; ++PosIndex)
+    {
+        if (this.m_aDocumentPositionsMap[PosIndex].StartPos === NewDocPos)
+            NewDocPos = this.m_aDocumentPositionsMap[PosIndex].EndPos;
+    }
+
+    // Нашли результирующую позицию. Проверим является ли она валидной для документа.
+    if (NewDocPos !== DocPos && NewDocPos.length === 1 && NewDocPos[0].Class instanceof ParaRun)
+    {
+        var Run = NewDocPos[0].Class;
+        var Para = Run.Get_Paragraph();
+        if (Para && true === Para.Is_UseInDocument())
+        {
+            DocPos.length = 0;
+            DocPos.push({Class : Run, Position : NewDocPos[0].Position});
+            Run.Get_DocumentPositionFromObject(DocPos);
+        }
+    }
+    // Возможно ран с позицией переместился в другой класс
+    else if (DocPos.length > 0 && DocPos[DocPos.length - 1].Class instanceof ParaRun)
+    {
+        var Run = DocPos[DocPos.length - 1].Class;
+        var RunPos = DocPos[DocPos.length - 1].Position;
+        var Para = Run.Get_Paragraph();
+        if (Para && true === Para.Is_UseInDocument())
+        {
+            DocPos.length = 0;
+            DocPos.push({Class : Run, Position : RunPos});
+            Run.Get_DocumentPositionFromObject(DocPos);
+        }
+    }
+};
 
 var CollaborativeEditing = new CCollaborativeEditing();

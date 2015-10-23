@@ -7059,11 +7059,14 @@ CTable.prototype =
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var Pos     = this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong() );
-                    var Element = g_oTableId.Get_ById( Reader.GetString2() );
+                    var Pos     = this.m_oContentChanges.Check(contentchanges_Add, Reader.GetLong());
+                    var Element = g_oTableId.Get_ById(Reader.GetString2());
 
-                    if ( null != Element )
-                        this.Content.splice( Pos, 0, Element );
+                    if (null != Element)
+                    {
+                        this.Content.splice(Pos, 0, Element);
+                        CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
+                    }
                 }
 
                 this.Recalc_CompiledPr2();
@@ -7081,13 +7084,14 @@ CTable.prototype =
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var Pos = this.m_oContentChanges.Check( contentchanges_Remove, Reader.GetLong() );
+                    var Pos = this.m_oContentChanges.Check(contentchanges_Remove, Reader.GetLong());
 
                     // действие совпало, не делаем его
-                    if ( false === Pos )
+                    if (false === Pos)
                         continue;
 
-                    this.Content.splice( Pos, 1 );
+                    this.Content.splice(Pos, 1);
+                    CollaborativeEditing.Update_DocumentPositionsOnRemove(this, Pos, 1);
                 }
 
                 this.Recalc_CompiledPr2();
@@ -9851,7 +9855,21 @@ CTable.prototype =
         Info.Set_Table();
 
         if (false === this.Selection.Use || (true === this.Selection.Use && table_Selection_Text === this.Selection.Type))
+        {
             this.CurCell.Content.Get_SelectedElementsInfo(Info);
+        }
+        else if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.StartPos.Pos.Row === this.Selection.EndPos.Pos.Row && this.Selection.StartPos.Pos.Cell === this.Selection.EndPos.Pos.Cell)
+        {
+            var Row = this.Get_Row(this.Selection.StartPos.Pos.Row);
+            if (!Row)
+                return;
+
+            var Cell = Row.Get_Cell(this.Selection.StartPos.Pos.Cell);
+            if (!Cell)
+                return;
+
+            Info.Set_SingleCell(Cell);
+        }
     },
 
     Get_SelectedContent : function(SelectedContent)
@@ -19757,6 +19775,264 @@ CTable.prototype.Check_ChangedTableGrid = function()
 
     return false;
 };
+CTable.prototype.Get_ContentPosition = function(bSelection, bStart, PosArray)
+{
+    if (!PosArray)
+        PosArray = [];
+
+    var CurRow  = (true === bSelection ? (true === bStart ? this.Selection.StartPos.Pos.Row  : this.Selection.EndPos.Pos.Row)  : this.CurCell.Row.Index);
+    var CurCell = (true === bSelection ? (true === bStart ? this.Selection.StartPos.Pos.Cell : this.Selection.EndPos.Pos.Cell) : this.CurCell.Index);
+
+    var Row = this.Get_Row(CurRow);
+    PosArray.push({Class : this, Position : CurRow});
+    PosArray.push({Class : this.Get_Row(CurRow), Position : CurCell});
+
+    if (Row && CurCell >= 0 && CurCell < Row.Get_CellsCount())
+    {
+        var Cell = Row.Get_Cell(CurCell);
+        Cell.Content.Get_ContentPosition(bSelection, bStart, PosArray);
+    }
+
+    return PosArray;
+};
+CTable.prototype.Get_Index = function()
+{
+    if (!this.Parent)
+        return -1;
+
+    this.Parent.Update_ContentIndexing();
+    return this.Index;
+};
+CTable.prototype.Get_DocumentPositionFromObject = function(PosArray)
+{
+    if (!PosArray)
+        PosArray = [];
+
+    if (this.Parent)
+    {
+        PosArray.splice(0, 0, {Class : this.Parent, Position : this.Get_Index()});
+        this.Parent.Get_DocumentPositionFromObject(PosArray);
+    }
+
+    return PosArray;
+};
+CTable.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+{
+    var IsOneElement = true;
+    var StartRow = 0;
+    switch (StartFlag)
+    {
+        case 0 : StartRow = StartDocPos[Depth].Position; break;
+        case 1 : StartRow = 0; IsOneElement = false; break;
+        case -1: StartRow = this.Content.length - 1; IsOneElement = false; break;
+    }
+
+    var EndRow = 0;
+    switch (EndFlag)
+    {
+        case 0 : EndRow = EndDocPos[Depth].Position; break;
+        case 1 : EndRow = 0; IsOneElement = false; break;
+        case -1: EndRow = this.Content.length - 1; IsOneElement = false; break;
+    }
+
+    var _StartDocPos = StartDocPos, _StartFlag = StartFlag;
+    if (null !== StartDocPos && true === StartDocPos[Depth].Deleted)
+    {
+        if (StartRow < this.Content.length)
+        {
+            _StartDocPos = null;
+            _StartFlag = 1;
+        }
+        else if (StartRow > 0)
+        {
+            StartRow--;
+            _StartDocPos = null;
+            _StartFlag = -1;
+        }
+        else
+        {
+            // Такого не должно быть
+            return;
+        }
+    }
+
+    var _EndDocPos = EndDocPos, _EndFlag = EndFlag;
+    if (null !== EndDocPos && true === EndDocPos[Depth].Deleted)
+    {
+        if (EndRow < this.Content.length)
+        {
+            _EndDocPos = null;
+            _EndFlag = 1;
+        }
+        else if (EndRow > 0)
+        {
+            EndRow--;
+            _EndDocPos = null;
+            _EndFlag = -1;
+        }
+        else
+        {
+            // Такого не должно быть
+            return;
+        }
+    }
+
+    var StartCell = 0;
+    switch (_StartFlag)
+    {
+        case 0 : StartCell = _StartDocPos[Depth + 1].Position; break;
+        case 1 : StartCell = 0; break;
+        case -1: StartCell = this.Content[StartRow].Get_CellsCount() - 1; break;
+    }
+
+    var EndCell = 0;
+    switch (_EndFlag)
+    {
+        case 0 : EndCell = _EndDocPos[Depth + 1].Position; break;
+        case 1 : EndCell = 0; break;
+        case -1: EndCell = this.Content[EndRow].Get_CellsCount() - 1; break;
+    }
+
+    var __StartDocPos = _StartDocPos, __StartFlag = _StartFlag;
+    if (null !== _StartDocPos && true === _StartDocPos[Depth + 1].Deleted)
+    {
+        if (StartCell < this.Content[StartRow].Get_CellsCount())
+        {
+            __StartDocPos = null;
+            __StartFlag = 1;
+        }
+        else if (StartCell > 0)
+        {
+            StartCell--;
+            __StartDocPos = null;
+            __StartFlag = -1;
+        }
+        else
+        {
+            // Такого не должно быть
+            return;
+        }
+    }
+
+    var __EndDocPos = _EndDocPos, __EndFlag = _EndFlag;
+    if (null !== _EndDocPos && true === _EndDocPos[Depth + 1].Deleted)
+    {
+        if (EndCell < this.Content[EndCell].Get_CellsCount())
+        {
+            __EndDocPos = null;
+            __EndFlag   = 1;
+        }
+        else if (EndCell > 0)
+        {
+            EndCell--;
+            __EndDocPos = null;
+            __EndFlag   = -1;
+        }
+        else
+        {
+            // Такого не должно быть
+            return;
+        }
+    }
+
+    this.Selection.Use          = true;
+    this.Selection.StartPos.Pos = {Row : StartRow, Cell : StartCell};
+    this.Selection.EndPos.Pos   = {Row : EndRow, Cell : EndCell};
+    this.Selection.CurRow       = EndRow;
+    this.Selection.Data         = null;
+    this.Selection.Type2        = table_Selection_Common;
+    this.Selection.Data2        = null;
+
+    if (StartRow === EndRow && StartCell === EndCell)
+    {
+        this.CurCell = this.Get_Row(StartRow).Get_Cell(StartCell);
+        this.Selection.Type = table_Selection_Text;
+        this.CurCell.Content.Set_ContentSelection(__StartDocPos, __EndDocPos, Depth + 2, __StartFlag, __EndFlag);
+    }
+    else
+    {
+        this.Selection.Type = table_Selection_Cell;
+        this.Internal_Selection_UpdateCells(IsOneElement ? false : true);
+    }
+};
+CTable.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
+{
+    var CurRow = 0;
+    switch (Flag)
+    {
+        case 0 : CurRow = DocPos[Depth].Position; break;
+        case 1 : CurRow = 0; break;
+        case -1: CurRow = this.Content.length - 1; break;
+    }
+
+    var _DocPos = DocPos, _Flag = Flag;
+    if (null !== DocPos && true === DocPos[Depth].Deleted)
+    {
+        if (CurRow < this.Content.length)
+        {
+            _DocPos = null;
+            _Flag = 1;
+        }
+        else if (CurRowRow > 0)
+        {
+            CurRow--;
+            _DocPos = null;
+            _Flag = -1;
+        }
+        else
+        {
+            // Такого не должно быть
+            return;
+        }
+    }
+
+    var CurCell = 0;
+    switch (_Flag)
+    {
+        case 0 : CurCell = _DocPos[Depth + 1].Position; break;
+        case 1 : CurCell = 0; break;
+        case -1: CurCell = this.Content[StartRow].Get_CellsCount() - 1; break;
+    }
+
+    var __DocPos = _DocPos, __Flag = _Flag;
+    if (null !== _DocPos && true === _DocPos[Depth + 1].Deleted)
+    {
+        if (CurCell < this.Content[CurRow].Get_CellsCount())
+        {
+            __DocPos = null;
+            __Flag = 1;
+        }
+        else if (CurCell > 0)
+        {
+            CurCell--;
+            __DocPos = null;
+            __Flag = -1;
+        }
+        else
+        {
+            // Такого не должно быть
+            return;
+        }
+    }
+
+    var Row  = this.Get_Row(CurRow);
+    if (!Row)
+        return;
+
+    var Cell = Row.Get_Cell(CurCell);
+    if (!Cell)
+        return;
+
+    this.CurCell = Cell;
+    this.CurCell.Content.Set_ContentPosition(__DocPos, Depth + 2, __Flag);
+};
+CTable.prototype.Set_CurCell = function(Cell)
+{
+    if (!Cell || this !== Cell.Get_Table())
+        return;
+
+    this.CurCell = Cell;
+};
 
 // Класс CTableRow
 function CTableRow(Table, Cols, TableGrid)
@@ -21023,11 +21299,14 @@ CTableRow.prototype =
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var Pos     = this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong() );
-                    var Element = g_oTableId.Get_ById( Reader.GetString2() );
+                    var Pos     = this.m_oContentChanges.Check(contentchanges_Add, Reader.GetLong());
+                    var Element = g_oTableId.Get_ById(Reader.GetString2());
 
-                    if ( null != Element )
-                        this.Content.splice( Pos, 0, Element );
+                    if (null != Element)
+                    {
+                        this.Content.splice(Pos, 0, Element);
+                        CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
+                    }
                 }
 
                 this.Internal_ReIndexing();
@@ -21044,13 +21323,14 @@ CTableRow.prototype =
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var Pos = this.m_oContentChanges.Check( contentchanges_Remove, Reader.GetLong() );
+                    var Pos = this.m_oContentChanges.Check(contentchanges_Remove, Reader.GetLong());
 
                     // действие совпало, не делаем его
-                    if ( false === Pos )
+                    if (false === Pos)
                         continue;
 
-                    this.Content.splice( Pos, 1 );
+                    this.Content.splice(Pos, 1);
+                    CollaborativeEditing.Update_DocumentPositionsOnRemove(this, Pos, 1);
                 }
 
                 this.Internal_ReIndexing();
@@ -21133,6 +21413,19 @@ CTableRow.prototype =
     Load_LinkData : function(LinkData)
     {
     }
+};
+CTableRow.prototype.Get_DocumentPositionFromObject = function(PosArray)
+{
+    if (!PosArray)
+        PosArray = [];
+
+    if (this.Table)
+    {
+        PosArray.splice(0, 0, {Class : this.Table, Position : this.Index});
+        this.Table.Get_DocumentPositionFromObject(PosArray);
+    }
+
+    return PosArray;
 };
 
 // Класс CTableCell
@@ -23189,7 +23482,6 @@ CTableCell.prototype =
         CollaborativeEditing.Add_NewObject( this );
     },
 
-
     Load_LinkData : function(LinkData)
     {
     }
@@ -23215,6 +23507,31 @@ CTableCell.prototype.Get_SectPr = function()
         return this.Row.Table.Get_SectPr();
 
     return null;
+};
+CTableCell.prototype.Get_DocumentPositionFromObject = function(PosArray)
+{
+    if (!PosArray)
+        PosArray = [];
+
+    if (this.Row)
+    {
+        PosArray.splice(0, 0, {Class : this.Row, Position : this.Index});
+        this.Row.Get_DocumentPositionFromObject(PosArray);
+    }
+
+    return PosArray;
+};
+CTableCell.prototype.Get_Table = function()
+{
+    var Row = this.Row;
+    if (!Row)
+        return null;
+
+    var Table = Row.Table;
+    if (!Table)
+        return null;
+
+    return Table;
 };
 
 

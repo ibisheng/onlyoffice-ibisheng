@@ -760,7 +760,7 @@ function CDocument(DrawingDocument)
 
     this.NeedUpdateTarget = false;
 
-    this.ReindexStartPos = -1;
+    this.ReindexStartPos = 0;
 
     // Класс для работы с колонтитулами
     this.HdrFtr = new CHeaderFooterController(this, this.DrawingDocument);
@@ -851,6 +851,7 @@ function CSelectedElementsInfo()
     this.m_oMath           = null;  // Формула, в которой находится выделение
     this.m_oHyperlink      = null;  // Гиперссылка, в которой находится выделение
     this.m_oField          = null;  // Поле, в котором находится выделение
+    this.m_oSingleCell     = null;  // Выделенная ячейка (специальная ситуация, когда выделена ровно одна ячейка)
 
     this.Reset = function()
     {
@@ -929,6 +930,16 @@ function CSelectedElementsInfo()
     {
         return this.m_bMixedSelection;
     };
+
+    this.Set_SingleCell = function(Cell)
+    {
+        this.m_oCell = Cell;
+    };
+
+    this.Get_SingleCell = function()
+    {
+        return this.m_oCell;
+    };
 }
 
 CDocument.prototype =
@@ -958,7 +969,6 @@ CDocument.prototype =
         // Проверяем последний параграф на наличие секции 
         this.Check_SectionLastParagraph();
 
-                
         // Перемещаем курсор в начало документа
         this.Cursor_MoveToStartPos(false);
 
@@ -13142,10 +13152,12 @@ CDocument.prototype =
                         
                         Element.Parent = this;
 
-                        this.Content.splice( Pos, 0, Element );
+                        this.Content.splice(Pos, 0, Element);
+                        CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
 
                         // Обновим информацию о секциях
                         this.SectionsInfo.Update_OnAdd( Pos, [ Element ] );
+                        this.protected_ReindexContent(Pos);
                     }
                 }
 
@@ -13170,6 +13182,7 @@ CDocument.prototype =
                     //Pos = Math.min(Pos, this.Content.length - 1);
 
                     this.Content.splice(Pos, 1);
+                    CollaborativeEditing.Update_DocumentPositionsOnRemove(this, Pos, 1);
 
                     if ( Pos > 0 )
                     {
@@ -13190,6 +13203,7 @@ CDocument.prototype =
 
                     // Обновим информацию о секциях
                     this.SectionsInfo.Update_OnRemove( Pos, 1 );
+                    this.protected_ReindexContent(Pos);
                 }
 
                 break;
@@ -14622,6 +14636,252 @@ CDocument.prototype.Continue_FastCollaborativeEditing = function()
     {
         editor.asc_Save();
     }
+};
+CDocument.prototype.Save_DocumentStateBeforeLoadChanges = function()
+{
+    var State = {};
+
+    State.CurPos =
+    {
+        X          : this.CurPos.X,
+        Y          : this.CurPos.Y,
+        RealX      : this.CurPos.RealX,
+        RealY      : this.CurPos.RealY,
+        Type       : this.CurPos.Type
+    };
+
+    State.Selection =
+    {
+        Start          : this.Selection.Start,
+        Use            : this.Selection.Use,
+        Flag           : this.Selection.Flag,
+        UpdateOnRecalc : this.Selection.UpdateOnRecalc,
+        DragDrop       : {Flag : this.Selection.DragDrop.Flag, Data : null === this.Selection.DragDrop.Data ? null : {X : this.Selection.DragDrop.Data.X, Y : this.Selection.DragDrop.Data.Y, PageNum : this.Selection.DragDrop.Data.PageNum}}
+    };
+
+    State.SingleCell = this.Get_SelectedElementsInfo().Get_SingleCell();
+    State.Pos      = [];
+    State.StartPos = [];
+    State.EndPos   = [];
+
+    switch (this.CurPos.Type)
+    {
+        case docpostype_HdrFtr:
+        {
+            break;
+        }
+        case docpostype_DrawingObjects:
+        {
+            break;
+        }
+        case docpostype_Content:
+        {
+            State.Pos      = this.Get_ContentPosition(false, false);
+            State.StartPos = this.Get_ContentPosition(true, true);
+            State.EndPos   = this.Get_ContentPosition(true, false);
+            break;
+        }
+    }
+
+    this.Selection_Remove();
+    return State;
+};
+CDocument.prototype.Load_DocumentStateAfterLoadChanges = function(State)
+{
+    this.CurPos.X     = State.CurPos.X;
+    this.CurPos.Y     = State.CurPos.Y;
+    this.CurPos.RealX = State.CurPos.RealX;
+    this.CurPos.RealY = State.CurPos.RealY;
+    this.CurPos.Type  = State.CurPos.Type;
+
+    this.Selection.Start          = State.Selection.Start;
+    this.Selection.Use            = State.Selection.Use;
+    this.Selection.Flag           = State.Selection.Flag;
+    this.Selection.UpdateOnRecalc = State.Selection.UpdateOnRecalc;
+    this.Selection.DragDrop.Flag  = State.Selection.DragDrop.Flag;
+    this.Selection.DragDrop.Data  = State.Selection.DragDrop.Data === null ? null : {X : State.Selection.DragDrop.Data.X, Y : State.Selection.DragDrop.Data.X, PageNum : State.Selection.DragDrop.Data.PageNum};
+
+    switch (this.CurPos.Type)
+    {
+        case docpostype_HdrFtr:
+        {
+            break;
+        }
+        case docpostype_DrawingObjects:
+        {
+            break;
+        }
+        case docpostype_Content:
+        {
+            if (true === this.Selection.Use)
+            {
+                this.Set_ContentPosition(State.StartPos, 0, 0);
+                this.Set_ContentSelection(State.StartPos, State.EndPos, 0, 0, 0);
+            }
+            else
+            {
+                this.Set_ContentPosition(State.Pos, 0, 0);
+                this.NeedUpdateTarget = true;
+                this.RecalculateCurPos();
+            }
+
+            break;
+        }
+    }
+
+    if (true === this.Selection.Use && null !== State.SingleCell && undefined !== State.SingleCell)
+    {
+        var Cell = State.SingleCell;
+        var Table = Cell.Get_Table();
+        if (Table && true === Table.Is_UseInDocument())
+        {
+            Table.Set_CurCell(Cell);
+            Table.Selection_Remove();
+            Table.Table_Select(c_oAscTableSelectionType.Cell);
+        }
+    }
+};
+CDocument.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+{
+    var StartPos = 0, EndPos = 0;
+    switch (StartFlag)
+    {
+        case 0 : StartPos = StartDocPos[Depth].Position; break;
+        case 1 : StartPos = 0; break;
+        case -1: StartPos = this.Content.length - 1; break;
+    }
+
+    switch (EndFlag)
+    {
+        case 0 : EndPos = EndDocPos[Depth].Position; break;
+        case 1 : EndPos = 0; break;
+        case -1: EndPos = this.Content.length - 1; break;
+    }
+
+    var _StartDocPos = StartDocPos, _StartFlag = StartFlag;
+    if (null !== StartDocPos && true === StartDocPos[Depth].Deleted)
+    {
+        if (StartPos < this.Content.length)
+        {
+            _StartDocPos = null;
+            _StartFlag = 1;
+        }
+        else if (StartPos > 0)
+        {
+            StartPos--;
+            _StartDocPos = null;
+            _StartFlag = -1;
+        }
+        else
+        {
+            // Такого не должно быть
+            return;
+        }
+    }
+
+    var _EndDocPos = EndDocPos, _EndFlag = EndFlag;
+    if (null !== EndDocPos && true === EndDocPos[Depth].Deleted)
+    {
+        if (EndPos < this.Content.length)
+        {
+            _EndDocPos = null;
+            _EndFlag = 1;
+        }
+        else if (EndPos > 0)
+        {
+            EndPos--;
+            _EndDocPos = null;
+            _EndFlag = -1;
+        }
+        else
+        {
+            // Такого не должно быть
+            return;
+        }
+    }
+
+    this.Selection.StartPos = StartPos;
+    this.Selection.EndPos   = EndPos;
+
+    if (StartPos !== EndPos)
+    {
+        this.Content[StartPos].Set_ContentSelection(_StartDocPos, null, Depth + 1, _StartFlag, StartPos > EndPos ? 1 : -1);
+        this.Content[EndPos].Set_ContentSelection(null, _EndDocPos, Depth + 1, StartPos > EndPos ? -1 : 1, _EndFlag);
+
+        var _StartPos = StartPos;
+        var _EndPos = EndPos;
+        var Direction = 1;
+
+        if (_StartPos > _EndPos)
+        {
+            _StartPos = EndPos;
+            _EndPos = StartPos;
+            Direction = -1;
+        }
+
+        for (var CurPos = _StartPos + 1; CurPos < _EndPos; CurPos++)
+        {
+            this.Content[CurPos].Select_All(Direction);
+        }
+    }
+    else
+    {
+        this.Content[StartPos].Set_ContentSelection(_StartDocPos, _EndDocPos, Depth + 1, _StartFlag, _EndFlag);
+    }
+};
+CDocument.prototype.Get_ContentPosition = function(bSelection, bStart, PosArray)
+{
+    if (undefined === PosArray)
+        PosArray = [];
+
+    var Pos = (true === bSelection ? (true === bStart ? this.Selection.StartPos : this.Selection.EndPos) : this.CurPos.ContentPos);
+    PosArray.push({Class : this, Position : Pos});
+
+    if (undefined !== this.Content[Pos] && this.Content[Pos].Get_ContentPosition)
+        this.Content[Pos].Get_ContentPosition(bSelection, bStart, PosArray);
+
+    return PosArray;
+};
+CDocument.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
+{
+    var Pos = 0;
+    switch (Flag)
+    {
+        case 0 : Pos = DocPos[Depth].Position; break;
+        case 1 : Pos = 0; break;
+        case -1: Pos = this.Content.length - 1; break;
+    }
+
+    var _DocPos = DocPos, _Flag = Flag;
+    if (null !== DocPos && true === DocPos[Depth].Deleted)
+    {
+        if (Pos < this.Content.length)
+        {
+            _DocPos = null;
+            _Flag = 1;
+        }
+        else if (Pos > 0)
+        {
+            Pos--;
+            _DocPos = null;
+            _Flag = -1;
+        }
+        else
+        {
+            // Такого не должно быть
+            return;
+        }
+    }
+
+    this.CurPos.ContentPos = Pos;
+    this.Content[Pos].Set_ContentPosition(_DocPos, Depth + 1, _Flag);
+};
+CDocument.prototype.Get_DocumentPositionFromObject = function(PosArray)
+{
+    if (!PosArray)
+        PosArray = [];
+
+    return PosArray;
 };
 
 //-----------------------------------------------------------------------------------

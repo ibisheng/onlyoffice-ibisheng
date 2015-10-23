@@ -11630,23 +11630,25 @@ Paragraph.prototype =
 
                     if ( null != Element )
                     {
-                        if ( para_Comment === Element.Type )
+                        if (para_Comment === Element.Type)
                         {
-                            var Comment = g_oTableId.Get_ById( Element.CommentId );
+                            var Comment = g_oTableId.Get_ById(Element.CommentId);
 
                             // При копировании не всегда сразу заполняется правильно CommentId
                             if (null != Comment && Comment instanceof CComment)
                             {
-                                if ( true === Element.Start )
-                                    Comment.Set_StartId( this.Get_Id() );
+                                if (true === Element.Start)
+                                    Comment.Set_StartId(this.Get_Id());
                                 else
-                                    Comment.Set_EndId( this.Get_Id() );
+                                    Comment.Set_EndId(this.Get_Id());
                             }
-
-                            Element.Set_Paragraph(this);
                         }
 
-                        this.Content.splice( Pos, 0, Element );
+                        if (Element.Set_Paragraph)
+                            Element.Set_Paragraph(this);
+
+                        this.Content.splice(Pos, 0, Element);
+                        CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
 
                         if (Element.Recalc_RunsCompiledPr)
                             Element.Recalc_RunsCompiledPr();
@@ -11667,13 +11669,14 @@ Paragraph.prototype =
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var ChangesPos = this.m_oContentChanges.Check( contentchanges_Remove, Reader.GetLong() );
+                    var ChangesPos = this.m_oContentChanges.Check(contentchanges_Remove, Reader.GetLong());
 
                     // действие совпало, не делаем его
-                    if ( false === ChangesPos )
+                    if (false === ChangesPos)
                         continue;
 
-                    this.Content.splice( ChangesPos, 1 );
+                    this.Content.splice(ChangesPos, 1);
+                    CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
                 }
 
                 this.private_ResetSelection();
@@ -12431,10 +12434,14 @@ Paragraph.prototype =
         var Count = Reader.GetLong();
         for ( var Index = 0; Index < Count; Index++ )
         {
-            var Element = g_oTableId.Get_ById( Reader.GetString2() );
+            var Element = g_oTableId.Get_ById(Reader.GetString2());
 
-            if ( null != Element )
-                this.Content.push( Element );
+            if (null != Element)
+            {
+                this.Content.push(Element);
+                if (Element.Set_Paragraph)
+                    Element.Set_Paragraph(this);
+            }
         }
 
         CollaborativeEditing.Add_NewObject( this );
@@ -12457,6 +12464,8 @@ Paragraph.prototype =
         {
             CollaborativeEditing.Add_LinkData(this, {});
         }
+
+        this.PageNum = 0;
     },
 
     Load_LinkData : function(LinkData)
@@ -13398,6 +13407,165 @@ Paragraph.prototype.Get_HdrFtr = function()
         return this.Parent.Is_HdrFtr(true);
 
     return null;
+};
+Paragraph.prototype.Get_ContentPosition = function(bSelection, bStart, PosArray)
+{
+    if (!PosArray)
+        PosArray = [];
+
+    var Index = PosArray.length;
+
+    var ParaContentPos = this.Get_ParaContentPos(bSelection, bStart);
+
+    var Depth = ParaContentPos.Get_Depth();
+    while (Depth > 0)
+    {
+        var Pos = ParaContentPos.Get(Depth);
+        var Class = this.Get_ElementByPos(ParaContentPos);
+        ParaContentPos.Decrease_Depth(1);
+        Depth--;
+
+        PosArray.splice(Index, 0, {Class : Class, Position : Pos});
+    }
+
+    PosArray.splice(Index, 0, {Class : this, Position : ParaContentPos.Get(0)});
+    return PosArray;
+};
+Paragraph.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+{
+    var StartPos = 0, EndPos = 0;
+    switch (StartFlag)
+    {
+        case 0 : StartPos = StartDocPos[Depth].Position; break;
+        case 1 : StartPos = 0; break;
+        case -1: StartPos = this.Content.length - 1; break;
+    }
+
+    switch (EndFlag)
+    {
+        case 0 : EndPos = EndDocPos[Depth].Position; break;
+        case 1 : EndPos = 0; break;
+        case -1: EndPos = this.Content.length - 1; break;
+    }
+
+    var _StartDocPos = StartDocPos, _StartFlag = StartFlag;
+    if (null !== StartDocPos && true === StartDocPos[Depth].Deleted)
+    {
+        if (StartPos < this.Content.length)
+        {
+            _StartDocPos = null;
+            _StartFlag = 1;
+        }
+        else if (StartPos > 0)
+        {
+            StartPos--;
+            _StartDocPos = null;
+            _StartFlag = -1;
+        }
+        else
+        {
+            // Такого не должно быть
+            return;
+        }
+    }
+
+    var _EndDocPos = EndDocPos, _EndFlag = EndFlag;
+    if (null !== EndDocPos && true === EndDocPos[Depth].Deleted)
+    {
+        if (EndPos < this.Content.length)
+        {
+            _EndDocPos = null;
+            _EndFlag = 1;
+        }
+        else if (EndPos > 0)
+        {
+            EndPos--;
+            _EndDocPos = null;
+            _EndFlag = -1;
+        }
+        else
+        {
+            // Такого не должно быть
+            return;
+        }
+    }
+
+    this.Selection.Use      = true;
+    this.Selection.StartPos = StartPos;
+    this.Selection.EndPos   = EndPos;
+
+    if (StartPos !== EndPos)
+    {
+        this.Content[StartPos].Set_ContentSelection(_StartDocPos, null, Depth + 1, _StartFlag, StartPos > EndPos ? 1 : -1);
+        this.Content[EndPos].Set_ContentSelection(null, _EndDocPos, Depth + 1, StartPos > EndPos ? -1 : 1, _EndFlag);
+
+        var _StartPos = StartPos;
+        var _EndPos = EndPos;
+        var Direction = 1;
+
+        if (_StartPos > _EndPos)
+        {
+            _StartPos = EndPos;
+            _EndPos = StartPos;
+            Direction = -1;
+        }
+
+        for (var CurPos = _StartPos + 1; CurPos < _EndPos; CurPos++)
+        {
+            this.Content[CurPos].Select_All(Direction);
+        }
+    }
+    else
+    {
+        this.Content[StartPos].Set_ContentSelection(_StartDocPos, _EndDocPos, Depth + 1, _StartFlag, _EndFlag);
+    }
+};
+Paragraph.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
+{
+    var Pos = 0;
+    switch (Flag)
+    {
+        case 0 : Pos = DocPos[Depth].Position; break;
+        case 1 : Pos = 0; break;
+        case -1: Pos = this.Content.length - 1; break;
+    }
+
+    var _DocPos = DocPos, _Flag = Flag;
+    if (null !== DocPos && true === DocPos[Depth].Deleted)
+    {
+        if (Pos < this.Content.length)
+        {
+            _DocPos = null;
+            _Flag = 1;
+        }
+        else if (Pos > 0)
+        {
+            Pos--;
+            _DocPos = null;
+            _Flag = -1;
+        }
+        else
+        {
+            // Такого не должно быть
+            return;
+        }
+    }
+
+    this.CurPos.ContentPos = Pos;
+    this.Content[Pos].Set_ContentPosition(_DocPos, Depth + 1, _Flag);
+};
+Paragraph.prototype.Get_DocumentPositionFromObject = function(PosArray)
+{
+    if (!PosArray)
+        PosArray = [];
+
+    if (this.Parent)
+    {
+        PosArray.splice(0, 0, {Class : this.Parent, Position : this.Get_Index()});
+        this.Parent.Get_DocumentPositionFromObject(PosArray);
+    }
+
+    return PosArray;
 };
 
 var pararecalc_0_All  = 0;

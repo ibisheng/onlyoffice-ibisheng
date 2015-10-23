@@ -717,55 +717,129 @@ ParaRun.prototype.Remove_ParaEnd = function()
     return true;
 };
 
+/**
+ * Обновляем позиции селекта, курсора и переносов строк при добавлении элемента в контент данного рана.
+ * @param Pos
+ */
+ParaRun.prototype.private_UpdatePositionsOnAdd = function(Pos)
+{
+    // Обновляем текущую позицию
+    if (this.State.ContentPos >= Pos)
+        this.State.ContentPos++;
+
+    // Обновляем начало и конец селекта
+    if (true === this.State.Selection.Use)
+    {
+        if (this.State.Selection.StartPos >= Pos)
+            this.State.Selection.StartPos++;
+
+        if (this.State.Selection.EndPos >= Pos)
+            this.State.Selection.EndPos++;
+    }
+
+    // Также передвинем всем метки переносов страниц и строк
+    var LinesCount = this.protected_GetLinesCount();
+    for (var CurLine = 0; CurLine < LinesCount; CurLine++)
+    {
+        var RangesCount = this.protected_GetRangesCount(CurLine);
+
+        for (var CurRange = 0; CurRange < RangesCount; CurRange++)
+        {
+            var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+            var EndPos = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+            if (StartPos > Pos)
+                StartPos++;
+
+            if (EndPos > Pos)
+                EndPos++;
+
+            this.protected_FillRange(CurLine, CurRange, StartPos, EndPos);
+        }
+
+        // Особый случай, когда мы добавляем элемент в самый последний ран
+        if (Pos === this.Content.length - 1 && LinesCount - 1 === CurLine)
+        {
+            this.protected_FillRangeEndPos(CurLine, RangesCount - 1, this.protected_GetRangeEndPos(CurLine, RangesCount - 1) + 1);
+        }
+    }
+};
+
+/**
+ * Обновляем позиции селекта, курсора и переносов строк при удалении элементов из контента данного рана.
+ * @param Pos
+ * @param Count
+ */
+ParaRun.prototype.private_UpdatePositionsOnRemove = function(Pos, Count)
+{
+    // Обновим текущую позицию
+    if (this.State.ContentPos > Pos + Count)
+        this.State.ContentPos -= Count;
+    else if (this.State.ContentPos > Pos)
+        this.State.ContentPos = Pos;
+
+    // Обновим начало и конец селекта
+    if (true === this.State.Selection.Use)
+    {
+        if (this.State.Selection.StartPos <= this.State.Selection.EndPos)
+        {
+            if (this.State.Selection.StartPos > Pos + Count)
+                this.State.Selection.StartPos -= Count;
+            else if (this.State.Selection.StartPos > Pos)
+                this.State.Selection.StartPos = Pos;
+
+            if (this.State.Selection.EndPos >= Pos + Count)
+                this.State.Selection.EndPos -= Count;
+            else if (this.State.Selection.EndPos > Pos)
+                this.State.Selection.EndPos = Math.max(0, Pos - 1);
+        }
+        else
+        {
+            if (this.State.Selection.StartPos >= Pos + Count)
+                this.State.Selection.StartPos -= Count;
+            else if (this.State.Selection.StartPos > Pos)
+                this.State.Selection.StartPos = Math.max(0, Pos - 1);
+
+            if (this.State.Selection.EndPos > Pos + Count)
+                this.State.Selection.EndPos -= Count;
+            else if (this.State.Selection.EndPos > Pos)
+                this.State.Selection.EndPos = Pos;
+        }
+    }
+
+    // Также передвинем всем метки переносов страниц и строк
+    var LinesCount = this.protected_GetLinesCount();
+    for (var CurLine = 0; CurLine < LinesCount; CurLine++)
+    {
+        var RangesCount = this.protected_GetRangesCount(CurLine);
+        for (var CurRange = 0; CurRange < RangesCount; CurRange++)
+        {
+            var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+            var EndPos = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+            if (StartPos > Pos + Count)
+                StartPos -= Count;
+            else if (StartPos > Pos)
+                StartPos = Math.max(0, Pos);
+
+            if (EndPos >= Pos + Count)
+                EndPos -= Count;
+            else if (EndPos >= Pos)
+                EndPos = Math.max(0, Pos);
+
+            this.protected_FillRange(CurLine, CurRange, StartPos, EndPos);
+        }
+    }
+};
+
 // Добавляем элемент в позицию с сохранием в историю
 ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 {
     History.Add( this, { Type : historyitem_ParaRun_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
     this.Content.splice( Pos, 0, Item );
 
-    if ( true === UpdatePosition )
-    {
-        // Обновляем текущую позицию
-        if ( this.State.ContentPos >= Pos )
-            this.State.ContentPos++;
-
-        // Обновляем начало и конец селекта
-        if ( true === this.State.Selection.Use )
-        {
-            if ( this.State.Selection.StartPos >= Pos )
-                this.State.Selection.StartPos++;
-
-            if ( this.State.Selection.EndPos >= Pos )
-                this.State.Selection.EndPos++;
-        }
-
-        // Также передвинем всем метки переносов страниц и строк
-        var LinesCount = this.protected_GetLinesCount();
-        for ( var CurLine = 0; CurLine < LinesCount; CurLine++ )
-        {
-            var RangesCount = this.protected_GetRangesCount(CurLine);
-
-            for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
-            {
-                var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-                var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-                if (StartPos > Pos)
-                    StartPos++;
-
-                if (EndPos > Pos)
-                    EndPos++;
-
-                this.protected_FillRange(CurLine, CurRange, StartPos, EndPos);
-            }
-
-            // Особый случай, когда мы добавляем элемент в самый последний ран
-            if (Pos === this.Content.length - 1 && LinesCount - 1 === CurLine)
-            {
-                this.protected_FillRangeEndPos(CurLine, RangesCount - 1, this.protected_GetRangeEndPos(CurLine, RangesCount - 1) + 1);
-            }
-        }
-    }
+    if (true === UpdatePosition)
+        this.private_UpdatePositionsOnAdd(Pos);
 
     // Обновляем позиции в NearestPos
     var NearPosLen = this.NearPosArray.length;
@@ -821,67 +895,8 @@ ParaRun.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
 
     this.Content.splice( Pos, Count );
 
-    if ( true === UpdatePosition )
-    {
-        // Обновим текущую позицию
-        if ( this.State.ContentPos > Pos + Count )
-            this.State.ContentPos -= Count;
-        else if ( this.State.ContentPos > Pos )
-            this.State.ContentPos = Pos;
-
-        // Обновим начало и конец селекта
-        if ( true === this.State.Selection.Use )
-        {
-            if ( this.State.Selection.StartPos <= this.State.Selection.EndPos )
-            {
-                if ( this.State.Selection.StartPos > Pos + Count )
-                    this.State.Selection.StartPos -= Count;
-                else if ( this.State.Selection.StartPos > Pos )
-                    this.State.Selection.StartPos = Pos;
-
-                if ( this.State.Selection.EndPos >= Pos + Count )
-                    this.State.Selection.EndPos -= Count;
-                else if ( this.State.Selection.EndPos > Pos )
-                    this.State.Selection.EndPos = Math.max( 0, Pos - 1 );
-            }
-            else
-            {
-                if ( this.State.Selection.StartPos >= Pos + Count )
-                    this.State.Selection.StartPos -= Count;
-                else if ( this.State.Selection.StartPos > Pos )
-                    this.State.Selection.StartPos = Math.max( 0, Pos - 1 );
-
-                if ( this.State.Selection.EndPos > Pos + Count )
-                    this.State.Selection.EndPos -= Count;
-                else if ( this.State.Selection.EndPos > Pos )
-                    this.State.Selection.EndPos = Pos;
-            }
-        }
-
-        // Также передвинем всем метки переносов страниц и строк
-        var LinesCount = this.protected_GetLinesCount();
-        for ( var CurLine = 0; CurLine < LinesCount; CurLine++ )
-        {
-            var RangesCount = this.protected_GetRangesCount(CurLine);
-            for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
-            {
-                var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-                var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-                if (StartPos > Pos + Count)
-                    StartPos -= Count;
-                else if (StartPos > Pos)
-                    StartPos = Math.max( 0 , Pos );
-
-                if (EndPos >= Pos + Count)
-                    EndPos -= Count;
-                else if (EndPos >= Pos)
-                    EndPos = Math.max( 0 , Pos );
-
-                this.protected_FillRange(CurLine, CurRange, StartPos, EndPos);
-            }
-        }
-    }
+    if (true === UpdatePosition)
+        this.private_UpdatePositionsOnRemove(Pos, Count);
 
     // Обновляем позиции в NearestPos
     var NearPosLen = this.NearPosArray.length;
@@ -1398,6 +1413,8 @@ ParaRun.prototype.Split = function (ContentPos, Depth)
 
 ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
 {
+    History.Add(this, {Type : historyitem_ParaRun_OnStartSplit, Pos : CurPos});
+
     // Если задается Parent и ParentPos, тогда ран автоматически добавляется в родительский класс
     var UpdateParent    = (undefined !== Parent && undefined !== ParentPos && this === Parent.Content[ParentPos] ? true : false);
     var UpdateSelection = (true === UpdateParent && true === Parent.Is_SelectionUse() && true === this.Is_SelectionUse() ? true : false);
@@ -1533,6 +1550,7 @@ ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
         }
     }
 
+    History.Add(this, {Type : historyitem_ParaRun_OnEndSplit, NewRun : NewRun});
     return NewRun;
 };
 
@@ -5212,7 +5230,41 @@ ParaRun.prototype.Set_SelectionContentPos = function(StartContentPos, EndContent
     Selection.EndPos   = EndPos;
     Selection.Use      = true;
 };
+ParaRun.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+{
+    var StartPos = 0;
+    switch (StartFlag)
+    {
+        case  1: StartPos = 0; break;
+        case -1: StartPos = this.Content.length; break;
+        case  0: StartPos = StartDocPos[Depth].Position; break;
+    }
 
+    var EndPos = 0;
+    switch (EndFlag)
+    {
+        case  1: EndPos = 0; break;
+        case -1: EndPos = this.Content.length; break;
+        case  0: EndPos = EndDocPos[Depth].Position; break;
+    }
+
+    var Selection = this.State.Selection;
+    Selection.StartPos = StartPos;
+    Selection.EndPos   = EndPos;
+    Selection.Use      = true;
+};
+ParaRun.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
+{
+    var Pos = 0;
+    switch (Flag)
+    {
+        case  1: Pos = 0; break;
+        case -1: Pos = this.Content.length; break;
+        case  0: Pos = DocPos[Depth].Position; break;
+    }
+
+    this.State.ContentPos = Pos;
+};
 ParaRun.prototype.Set_SelectionAtEndPos = function()
 {
     this.Set_SelectionContentPos(null, null, 0, -1, -1);
@@ -5941,6 +5993,8 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 
 ParaRun.prototype.Split_Run = function(Pos)
 {
+    History.Add(this, {Type : historyitem_ParaRun_OnStartSplit, Pos : Pos});
+
     // Создаем новый ран
     var bMathRun = this.Type == para_Math_Run;
     var NewRun = new ParaRun(this.Paragraph, bMathRun);
@@ -6020,7 +6074,7 @@ ParaRun.prototype.Split_Run = function(Pos)
         }
     }
 
-
+    History.Add(this, {Type : historyitem_ParaRun_OnEndSplit, NewRun : NewRun});
     return NewRun;
 };
 
@@ -8193,6 +8247,17 @@ ParaRun.prototype.Save_Changes = function(Data, Writer)
             }
             break;
         }
+
+        case historyitem_ParaRun_OnStartSplit:
+        {
+            Writer.WriteLong(Data.Pos);
+            break;
+        }
+        case historyitem_ParaRun_OnEndSplit:
+        {
+            Writer.WriteString2(Data.NewRun.Get_Id());
+            break;
+        }
     }
 
     return Writer;
@@ -8240,7 +8305,9 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                         CollaborativeEditing.Add_ChangedClass(this);
                     }
 
-                    this.Content.splice( Pos, 0, Element );
+                    this.Content.splice(Pos, 0, Element);
+                    this.private_UpdatePositionsOnAdd(Pos);
+                    CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
                 }
             }
 
@@ -8259,14 +8326,16 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
 
             for ( var Index = 0; Index < Count; Index++ )
             {
-                var ChangesPos = this.m_oContentChanges.Check( contentchanges_Remove, Reader.GetLong() );
+                var ChangesPos = this.m_oContentChanges.Check(contentchanges_Remove, Reader.GetLong());
 
                 // действие совпало, не делаем его
-                if ( false === ChangesPos )
+                if (false === ChangesPos)
                     continue;
 
-                this.CollaborativeMarks.Update_OnRemove( ChangesPos, 1 );
-                this.Content.splice( ChangesPos, 1 );
+                this.CollaborativeMarks.Update_OnRemove(ChangesPos, 1);
+                this.Content.splice(ChangesPos, 1);
+                this.private_UpdatePositionsOnRemove(ChangesPos, 1);
+                CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
             }
 
             this.RecalcInfo.Measure = true;
@@ -8888,6 +8957,21 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             {
                 this.ReviewInfo = undefined;
             }
+            break;
+        }
+
+        case historyitem_ParaRun_OnStartSplit:
+        {
+            // Long
+            var Pos = Reader.GetLong();
+            CollaborativeEditing.OnStart_SplitRun(this, Pos);
+            break;
+        }
+        case historyitem_ParaRun_OnEndSplit:
+        {
+            // String2
+            var RunId = Reader.GetString2();
+            CollaborativeEditing.OnEnd_SplitRun(g_oTableId.Get_ById(RunId));
             break;
         }
     }
@@ -10168,6 +10252,30 @@ ParaRun.prototype.Is_InHyperlink = function()
 ParaRun.prototype.Get_ClassesByPos = function(Classes, ContentPos, Depth)
 {
     Classes.push(this);
+};
+ParaRun.prototype.Get_DocumentPositionFromObject = function(PosArray)
+{
+    if (!PosArray)
+        PosArray = [];
+
+    if (this.Paragraph)
+    {
+        var ParaContentPos = this.Paragraph.Get_PosByElement(this);
+        var Depth = ParaContentPos.Get_Depth();
+        while (Depth > 0)
+        {
+            var Pos = ParaContentPos.Get(Depth);
+            var Class = this.Get_ElementByPos(ParaContentPos);
+            ParaContentPos.Decrease_Depth(1);
+            Depth--;
+
+            PosArray.splice(0, 0, {Class : Class, Position : Pos});
+        }
+        PosArray.splice(0, 0, {Class : this.Paragraph, Position : ParaContentPos.Get(0)});
+        this.Paragraph.Get_DocumentPositionFromObject(PosArray);
+    }
+
+    return PosArray;
 };
 
 function CParaRunStartState(Run)
