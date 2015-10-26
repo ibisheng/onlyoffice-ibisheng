@@ -1729,8 +1729,8 @@ function CDrawingDocument()
             __y = transform.TransformPointY(x, y);
         }
 
-        var x_pix = (this.SlideCurrectRect.left + __x * dKoef + _word_control.m_oMainContent.AbsolutePosition.L * g_dKoef_mm_to_pix) >> 0;
-        var y_pix = (this.SlideCurrectRect.top  + __y * dKoef + _word_control.m_oMainContent.AbsolutePosition.T * g_dKoef_mm_to_pix) >> 0;
+        var x_pix = (this.SlideCurrectRect.left + __x * dKoef + (_word_control.m_oMainContent.AbsolutePosition.L + _word_control.m_oMainView.AbsolutePosition.L) * g_dKoef_mm_to_pix) >> 0;
+        var y_pix = (this.SlideCurrectRect.top  + __y * dKoef + (_word_control.m_oMainContent.AbsolutePosition.T + _word_control.m_oMainView.AbsolutePosition.T) * g_dKoef_mm_to_pix) >> 0;
 
         return { X : x_pix, Y : y_pix, Error: false };
     }
