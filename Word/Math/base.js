@@ -1500,6 +1500,11 @@ CMathBase.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine
         SearchPos.Pos.Update2(nFindIndex, Depth);
     }
 
+    if (SearchPos.InText == true)
+    {
+        SearchPos.InTextPos.Update( nFindIndex, Depth );
+    }
+
 
     return bResult;
 };
