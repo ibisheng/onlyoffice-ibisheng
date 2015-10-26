@@ -232,8 +232,25 @@ function CCollaborativeEditing()
 
     this.m_oMemory      = new CMemory(); // Глобальные класс для сохранения
 
+    this.m_bFast  = false;
+
     var oThis = this;
 
+
+    this.Set_Fast = function(bFast)
+    {
+        this.m_bFast = bFast;
+    };
+
+    this.Is_Fast = function()
+    {
+        return this.m_bFast;
+    };
+
+    this.Have_OtherChanges = function()
+    {
+        return (this.m_aChanges.length > 0 ? true: false);
+    };
 
     this.Start_CollaborationEditing = function()
     {
@@ -982,5 +999,27 @@ function CCollaborativeEditing()
     };
 
 }
+
+CCollaborativeEditing.prototype.Clear_DocumentPositions = function()
+{
+};
+CCollaborativeEditing.prototype.Add_DocumentPosition = function(DocumentPos)
+{
+};
+CCollaborativeEditing.prototype.Update_DocumentPositionsOnAdd = function(Class, Pos)
+{
+};
+CCollaborativeEditing.prototype.Update_DocumentPositionsOnRemove = function(Class, Pos, Count)
+{
+};
+CCollaborativeEditing.prototype.OnStart_SplitRun = function(SplitRun, SplitPos)
+{
+};
+CCollaborativeEditing.prototype.OnEnd_SplitRun = function(NewRun)
+{
+};
+CCollaborativeEditing.prototype.Update_DocumentPosition = function(DocPos)
+{
+};
 
 var CollaborativeEditing = new CCollaborativeEditing();
