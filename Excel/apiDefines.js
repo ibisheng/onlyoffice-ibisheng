@@ -81,15 +81,6 @@ var c_oAscAlignType = {
   BOTTOM: "bottom"
 };
 
-var c_oAscCsvDelimiter = {
-  None: 0,
-  Tab: 1,
-  Semicolon: 2,
-  Сolon: 3,
-  Comma: 4,
-  Space: 5
-};
-
 var c_oAscMergeOptions = {
   Unmerge: 0,
   Merge: 1,

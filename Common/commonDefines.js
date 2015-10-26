@@ -609,6 +609,14 @@ var c_oAscLineBeginSize = {
 	large_mid	: 7,
 	large_large	: 8
 };
+var c_oAscCsvDelimiter = {
+	None: 0,
+	Tab: 1,
+	Semicolon: 2,
+	Сolon: 3,
+	Comma: 4,
+	Space: 5
+};
 
 var c_oAscEncodings = [
     [ 0,    28596, "ISO-8859-6",       "Arabic (ISO 8859-6)" ],
