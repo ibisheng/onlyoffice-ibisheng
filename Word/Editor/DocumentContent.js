@@ -468,15 +468,18 @@ CDocumentContent.prototype =
     {
         var Page_Rel = this.Get_Page_Relative( Page_Abs );
 
-        var bInText      = (null === this.Is_InText(X, Y, Page_Rel)      ? false : true);
-        var nInDrawing   = this.LogicDocument.DrawingObjects.isPointInDrawingObjects( X, Y, Page_Abs, this );
-
-        if ( true != bAnchor )
+        if (this.Parent && this.Parent instanceof CHeaderFooter)
         {
-            // Проверяем попадание в графические объекты
-            var NearestPos = this.LogicDocument.DrawingObjects.getNearestPos( X, Y, Page_Abs, Drawing );
-            if ( ( nInDrawing === DRAWING_ARRAY_TYPE_BEFORE || nInDrawing === DRAWING_ARRAY_TYPE_INLINE || ( false === bInText && nInDrawing >= 0 ) ) && null != NearestPos )
-                return NearestPos;
+            var bInText = (null === this.Is_InText(X, Y, Page_Rel) ? false : true);
+            var nInDrawing = this.LogicDocument.DrawingObjects.isPointInDrawingObjects(X, Y, Page_Abs, this);
+
+            if (true != bAnchor)
+            {
+                // Проверяем попадание в графические объекты
+                var NearestPos = this.LogicDocument.DrawingObjects.getNearestPos(X, Y, Page_Abs, Drawing);
+                if (( nInDrawing === DRAWING_ARRAY_TYPE_BEFORE || nInDrawing === DRAWING_ARRAY_TYPE_INLINE || ( false === bInText && nInDrawing >= 0 ) ) && null != NearestPos)
+                    return NearestPos;
+            }
         }
 
         var ContentPos = this.Internal_GetContentPosByXY( X, Y, Page_Rel );
