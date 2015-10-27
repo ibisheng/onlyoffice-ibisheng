@@ -170,6 +170,7 @@ asc_docs_api.prototype['asc_DownloadAsMailMerge'] = asc_docs_api.prototype.asc_D
 asc_docs_api.prototype['Resize'] = asc_docs_api.prototype.Resize;
 asc_docs_api.prototype['AddURL'] = asc_docs_api.prototype.AddURL;
 asc_docs_api.prototype['Help'] = asc_docs_api.prototype.Help;
+asc_docs_api.prototype['asc_setAdvancedOptions'] = asc_docs_api.prototype.asc_setAdvancedOptions;
 asc_docs_api.prototype['SetFontRenderingMode'] = asc_docs_api.prototype.SetFontRenderingMode;
 asc_docs_api.prototype['processSavedFile'] = asc_docs_api.prototype.processSavedFile;
 asc_docs_api.prototype['startGetDocInfo'] = asc_docs_api.prototype.startGetDocInfo;
