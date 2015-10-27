@@ -1686,6 +1686,205 @@ function CPage()
     }
 }
 
+function CDrawingCollaborativeTarget()
+{
+    this.Id = "";
+
+    this.X = 0;
+    this.Y = 0;
+    this.Size = 0;
+    this.Page = -1;
+
+    this.Transform = null;
+
+    this.HtmlElement = null;
+    this.HtmlElementX = 0;
+    this.HtmlElementY = 0;
+
+    this.Style = "";
+}
+CDrawingCollaborativeTarget.prototype =
+{
+    CheckPosition : function(_drawing_doc, _x, _y, _size, _page, _transform)
+    {
+        // 1) создаем новый элемент, если еще его не было
+        var bIsHtmlElementCreate = false;
+        if (this.HtmlElement == null)
+        {
+            bIsHtmlElementCreate = true;
+            this.HtmlElement = document.createElement('canvas');
+            this.HtmlElement.style.cssText = "position:absolute;padding:0;margin:0;-webkit-user-select:none;width:1px;height:1px;display:none;z-index:3;";
+            this.HtmlElement.width = 1;
+            this.HtmlElement.height = 1;
+
+            // заодно заполняем стиль
+            var bUseColor;
+            if (_drawing_doc.m_oWordControl.m_oApi.CollaborativeMarksShowType === c_oAscCollaborativeMarksShowType.None)
+                bUseColor = false;
+
+            var oUser = _drawing_doc.m_oWordControl.m_oApi.CoAuthoringApi.getUser(this.Id);
+            var nColor = oUser ? oUser.asc_getColorValue() :  null;
+            var oColor = false === bUseColor ? null : (null !== nColor ? new CDocumentColor( (nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF ) : new CDocumentColor( 191, 255, 199 ));
+            this.Style ="rgb(" + oColor.r + "," + oColor.g + "," + oColor.b + ")";
+        }
+
+        // 2) определяем размер
+        this.Transform = _transform;
+        this.Size = _size;
+
+        var _old_x = this.X;
+        var _old_y = this.Y;
+        var _old_page = this.Page;
+
+        this.X = _x;
+        this.Y = _y;
+        this.Page = _page;
+
+        var _oldW = this.HtmlElement.width;
+        var _oldH = this.HtmlElement.height;
+
+        var _newW = 2;
+        var _newH = (this.Size * _drawing_doc.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100) >> 0;
+
+        if (null != this.Transform && !global_MatrixTransformer.IsIdentity2(this.Transform))
+        {
+            var _x1 = this.Transform.TransformPointX(x, y);
+            var _y1 = this.Transform.TransformPointY(x, y);
+
+            var _x2 = this.Transform.TransformPointX(x, y + this.Size);
+            var _y2 = this.Transform.TransformPointY(x, y + this.Size);
+
+            var pos1 = _drawing_doc.ConvertCoordsToCursor2(_x1, _y1, this.Page);
+            var pos2 = _drawing_doc.ConvertCoordsToCursor2(_x2, _y2, this.Page);
+
+            _newW = (Math.abs(pos1.X - pos2.X) >> 0) + 1;
+            _newH = (Math.abs(pos1.Y - pos2.Y) >> 0) + 1;
+
+            if (2 > _newW)
+                _newW = 2;
+            if (2 > _newH)
+                _newH = 2;
+
+            if (_oldW == _newW && _oldH == _newH)
+            {
+                if (_newW != 2 && _newH != 2)
+                {
+                    // просто очищаем
+                    this.HtmlElement.width = _newW;
+                }
+            }
+            else
+            {
+                this.HtmlElement.style.width = _newW + "px";
+                this.HtmlElement.style.height = _newH + "px";
+
+                this.HtmlElement.width = _newW;
+                this.HtmlElement.height = _newH;
+            }
+            var ctx = this.HtmlElement.getContext('2d');
+
+            if (_newW  == 2 || _newH == 2)
+            {
+                ctx.fillStyle = this.Style;
+                ctx.fillRect(0, 0, _newW, _newH);
+            }
+            else
+            {
+                ctx.beginPath();
+                ctx.strokeStyle = this.Style;
+                ctx.lineWidth = 2;
+
+                if (((pos1.X - pos2.X)*(pos1.Y - pos2.Y)) >= 0)
+                {
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(_newW, _newH);
+                }
+                else
+                {
+                    ctx.moveTo(0, _newH);
+                    ctx.lineTo(_newW, 0);
+                }
+
+                ctx.stroke();
+            }
+
+            this.HtmlElementX = Math.min(pos1.X, pos2.X) >> 0;
+            this.HtmlElementY = Math.min(pos1.Y, pos2.Y) >> 0;
+            if ((!_drawing_doc.m_oWordControl.MobileTouchManager && !window.USER_AGENT_SAFARI_MACOS) || !window.USER_AGENT_WEBKIT)
+            {
+                this.HtmlElement.style.left = this.HtmlElementX + "px";
+                this.HtmlElement.style.top = this.HtmlElementY + "px";
+            }
+            else
+            {
+                this.HtmlElement.style.left = "0px";
+                this.HtmlElement.style.top  = "0px";
+                this.HtmlElement.style["webkitTransform"] = "matrix(1, 0, 0, 1, " + this.HtmlElementX + "," + this.HtmlElementY + ")";
+            }
+        }
+        else
+        {
+            if (_oldW == _newW && _oldH == _newH)
+            {
+                // просто очищаем
+                this.HtmlElement.width = _newW;
+            }
+            else
+            {
+                this.HtmlElement.style.width = _newW + "px";
+                this.HtmlElement.style.height = _newH + "px";
+
+                this.HtmlElement.width = _newW;
+                this.HtmlElement.height = _newH;
+            }
+
+            var ctx = this.HtmlElement.getContext('2d');
+
+            ctx.fillStyle = this.Style;
+            ctx.fillRect(0, 0, _newW, _newH);
+
+            if (null != this.Transform)
+            {
+                _x += this.Transform.tx;
+                _y += this.Transform.ty;
+            }
+
+            var pos = this.ConvertCoordsToCursor2(_x, _y, this.Page);
+
+            this.HtmlElementX = pos.X >> 0;
+            this.HtmlElementY = pos.Y >> 0;
+
+            if ((!_drawing_doc.m_oWordControl.MobileTouchManager && !window.USER_AGENT_SAFARI_MACOS) || !window.USER_AGENT_WEBKIT)
+            {
+                this.HtmlElement.style.left = this.HtmlElementX + "px";
+                this.HtmlElement.style.top = this.HtmlElementY + "px";
+            }
+            else
+            {
+                this.HtmlElement.style.left = "0px";
+                this.HtmlElement.style.top  = "0px";
+                this.HtmlElement.style["webkitTransform"] = "matrix(1, 0, 0, 1, " + this.HtmlElementX + "," + this.HtmlElementY + ")";
+            }
+        }
+
+        // 3) добавить, если нужно
+        if (bIsHtmlElementCreate)
+        {
+            _drawing_doc.m_oWordControl.m_oMainView.HtmlElement.appendChild(this.HtmlElement);
+        }
+    },
+
+    Remove : function(_drawing_doc)
+    {
+        _drawing_doc.m_oWordControl.m_oMainView.HtmlElement.removeChild(this.HtmlElement);
+    },
+
+    Update : function(_drawing_doc)
+    {
+        this.CheckPosition(_drawing_doc, this.X, this.Y, this.Size, this.Page, this.Transform);
+    }
+};
+
 function CDrawingDocument()
 {
     this.IsLockObjectsEnable = false;
@@ -1738,6 +1937,8 @@ function CDrawingDocument()
     this.TargetHtmlElement = null;
     this.TargetHtmlElementLeft = 0;
     this.TargetHtmlElementTop = 0;
+
+    this.CollaborativeTargets = [];
 
     this.m_bIsBreakRecalculate = false;
     this.m_bIsUpdateDocSize = false;
@@ -6379,7 +6580,42 @@ function CDrawingDocument()
         var _MathPainter = new CMathPainter(this.m_oWordControl.m_oApi);
         _MathPainter.Generate();
         this.MathMenuLoad = true;
-    }
+    };
+
+    // collaborative targets
+    this.Collaborative_UpdateTarget = function(_id, _x, _y, _size, _page, _transform)
+    {
+        for (var i = 0; i < this.CollaborativeTargets.length; i++)
+        {
+            if (_id == this.CollaborativeTargets[i].Id)
+            {
+                _target.CheckPosition(this, _x, _y, _size, _page, _transform);
+                return;
+            }
+        }
+        var _target = new CDrawingCollaborativeTarget()
+        _target.Id = _id;
+        _target.CheckPosition(this, _x, _y, _size, _page, _transform);
+        this.CollaborativeTargets[this.CollaborativeTargets.length] = _target;
+    };
+    this.Collaborative_RemoveTarget = function(_id)
+    {
+        for (var i = 0; i < this.CollaborativeTargets.length; i++)
+        {
+            if (_id == this.CollaborativeTargets[i].Id)
+            {
+                this.CollaborativeTargets[i].Remove(this);
+                this.CollaborativeTargets.splice(i, 1);
+            }
+        }
+    };
+    this.Collaborative_TargetsUpdate = function()
+    {
+        for (var i = 0; i < this.CollaborativeTargets.length; i++)
+        {
+            this.CollaborativeTargets[i].Update(this);
+        }
+    };
 }
 
 function CStyleImage(_name, _ind, _type, _uiPriority)

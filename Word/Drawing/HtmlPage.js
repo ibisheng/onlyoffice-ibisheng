@@ -3740,6 +3740,8 @@ function CEditorPage(api)
 
             if (null != oWordControl.m_oLogicDocument && oWordControl.m_oApi.bInit_word_control)
                 oWordControl.m_oLogicDocument.Viewer_OnChangePosition();
+
+            oWordControl.m_oDrawingDocument.Collaborative_TargetsUpdate();
         }
         if (null != oWordControl.m_oLogicDocument)
         {
