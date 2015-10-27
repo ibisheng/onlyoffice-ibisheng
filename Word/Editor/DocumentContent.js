@@ -8232,7 +8232,7 @@ CDocumentContent.prototype =
         if ( null != FlowTable )
             return FlowTable.Table.Index;
 
-        var StartPos = this.Pages[PageNum].Pos;
+        var StartPos = Math.min(this.Pages[PageNum].Pos, this.Content.length - 1);
         var EndPos   = this.Content.length - 1;
 
         if ( PageNum < this.Pages.length - 1 )

@@ -1179,6 +1179,10 @@ CHeaderFooter.prototype.Get_SelectionBounds = function()
 
     return null;
 };
+CHeaderFooter.prototype.Get_DocumentContent = function()
+{
+    return this.Content;
+};
 
 //-----------------------------------------------------------------------------------
 // Класс для работы с колонтитулами
@@ -1220,14 +1224,6 @@ CHeaderFooterController.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с колонтитулами
 //-----------------------------------------------------------------------------------        
-    Set_CurHdrFtr : function(HdrFtr)
-    {
-        if (null !== this.CurHdrFtr)
-            this.CurHdrFtr.Selection_Remove();
-
-        this.CurHdrFtr = HdrFtr;
-    },
-
     GoTo_NextHdrFtr : function()
     {
         var CurHdrFtr = this.CurHdrFtr;
@@ -2375,7 +2371,17 @@ CHeaderFooterController.prototype.Get_SelectionBounds = function()
 
     return null;
 };
+CHeaderFooterController.prototype.Get_CurHdrFtr = function()
+{
+    return this.CurHdrFtr;
+};
+CHeaderFooterController.prototype.Set_CurHdrFtr = function(HdrFtr)
+{
+    if (null !== this.CurHdrFtr)
+        this.CurHdrFtr.Selection_Remove();
 
+    this.CurHdrFtr = HdrFtr;
+};
 
 function CHdrFtrPage()
 {

@@ -8019,8 +8019,8 @@ CDocument.prototype =
                 return Item.Index;
         }
 
-        var StartPos = this.Pages[PageNum].Pos;
-        var EndPos   = Math.min( this.Pages[PageNum].EndPos, this.Content.length - 1 );
+        var StartPos = Math.min(this.Pages[PageNum].Pos, this.Content.length - 1);
+        var EndPos   = Math.min(this.Pages[PageNum].EndPos, this.Content.length - 1);
 
         // Сохраним позиции всех Inline элементов на данной странице
         var InlineElements = [];
@@ -11295,18 +11295,21 @@ CDocument.prototype =
     {
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
-            var CurHdrFtr = this.HdrFtr.CurHdrFtr;
-            if ( null == CurHdrFtr )
-                return;
-
-            CurHdrFtr.Selection_Remove();
-
             this.CurPos.Type = docpostype_Content;
-
-            if ( hdrftr_Header == CurHdrFtr.Type )
-                this.Cursor_MoveAt( 0, 0, false );
+            var CurHdrFtr = this.HdrFtr.Get_CurHdrFtr();
+            if (null === CurHdrFtr || undefined === CurHdrFtr)
+            {
+                this.Cursor_MoveToStartPos(false);
+            }
             else
-                this.Cursor_MoveAt( 0, 100000, false ); // TODO: Переделать здесь по нормальному
+            {
+                CurHdrFtr.Selection_Remove();
+
+                if (hdrftr_Header == CurHdrFtr.Type)
+                    this.Cursor_MoveAt(0, 0, false);
+                else
+                    this.Cursor_MoveAt(0, 100000, false); // TODO: Переделать здесь по нормальному
+            }
 
             this.DrawingDocument.ClearCachePages();
             this.DrawingDocument.FirePaint();
@@ -14668,10 +14671,68 @@ CDocument.prototype.Save_DocumentStateBeforeLoadChanges = function()
     {
         case docpostype_HdrFtr:
         {
+            var HdrFtr = this.HdrFtr.Get_CurHdrFtr();
+            if (null !== HdrFtr)
+            {
+                var HdrFtrContent = HdrFtr.Get_DocumentContent();
+                State.HdrFtr = HdrFtr;
+
+                State.HdrFtrDocPosType = HdrFtrContent.CurPos.Type;
+                State.HdrFtrSelection  = HdrFtrContent.Selection.Use;
+
+                if (docpostype_Content === HdrFtrContent.CurPos.Type)
+                {
+                    State.Pos      = HdrFtrContent.Get_ContentPosition(false, false, undefined);
+                    State.StartPos = HdrFtrContent.Get_ContentPosition(true, true, undefined);
+                    State.EndPos   = HdrFtrContent.Get_ContentPosition(true, false, undefined);
+                }
+                else // if (docpostype_Drawing === HdrFtrContent.CurPos.Type)
+                {
+                    var DrawingContent = this.DrawingObjects.getTargetDocContent();
+                    var ParaDrawing    = this.DrawingObjects.getMajorParaDrawing();
+
+                    if (null === DrawingContent || null === ParaDrawing)
+                    {
+                        this.DrawingObjects.Save_DocumentStateBeforeLoadChanges(State);
+                    }
+                    else
+                    {
+                        State.ParaDrawing      = ParaDrawing;
+                        State.DrawingContent   = DrawingContent;
+                        State.DrawingSelection = DrawingContent.Selection.Use;
+                        State.X                = ParaDrawing.X;
+                        State.Y                = ParaDrawing.Y;
+
+                        State.Pos      = DrawingContent.Get_ContentPosition(false, false, undefined);
+                        State.StartPos = DrawingContent.Get_ContentPosition(true, true, undefined);
+                        State.EndPos   = DrawingContent.Get_ContentPosition(true, false, undefined);
+                    }
+                }
+            }
+
             break;
         }
         case docpostype_DrawingObjects:
         {
+            var DrawingContent = this.DrawingObjects.getTargetDocContent();
+            var ParaDrawing    = this.DrawingObjects.getMajorParaDrawing();
+            if (null === DrawingContent || null === ParaDrawing)
+            {
+                this.DrawingObjects.Save_DocumentStateBeforeLoadChanges(State);
+            }
+            else
+            {
+                State.ParaDrawing      = ParaDrawing;
+                State.DrawingContent   = DrawingContent;
+                State.DrawingSelection = DrawingContent.Selection.Use;
+                State.X                = ParaDrawing.X;
+                State.Y                = ParaDrawing.Y;
+
+                State.Pos      = DrawingContent.Get_ContentPosition(false, false, undefined);
+                State.StartPos = DrawingContent.Get_ContentPosition(true, true, undefined);
+                State.EndPos   = DrawingContent.Get_ContentPosition(true, false, undefined);
+            }
+
             break;
         }
         case docpostype_Content:
@@ -14705,10 +14766,110 @@ CDocument.prototype.Load_DocumentStateAfterLoadChanges = function(State)
     {
         case docpostype_HdrFtr:
         {
+            var HdrFtr = State.HdrFtr;
+            if (null !== HdrFtr && undefined !== HdrFtr && true === HdrFtr.Is_UseInDocument())
+            {
+                this.HdrFtr.Set_CurHdrFtr(HdrFtr);
+                var HdrFtrContent = HdrFtr.Get_DocumentContent();
+                if (docpostype_Content === State.HdrFtrDocPosType)
+                {
+                    HdrFtrContent.CurPos.Type   = docpostype_Content;
+                    HdrFtrContent.Selection.Use = State.HdrFtrSelection;
+                    if (true === HdrFtrContent.Selection.Use)
+                    {
+                        HdrFtrContent.Set_ContentPosition(State.StartPos, 0, 0);
+                        HdrFtrContent.Set_ContentSelection(State.StartPos, State.EndPos, 0, 0, 0);
+                    }
+                    else
+                    {
+                        HdrFtrContent.Set_ContentPosition(State.Pos, 0, 0);
+                        this.NeedUpdateTarget = true;
+                        this.RecalculateCurPos();
+                    }
+                }
+                else if (docpostype_DrawingObjects === State.HdrFtrDocPosType)
+                {
+                    HdrFtrContent.CurPos.Type = docpostype_DrawingObjects;
+
+                    var DrawingContent = State.DrawingContent;
+                    var ParaDrawing    = State.ParaDrawing;
+                    if (DrawingContent && ParaDrawing)
+                    {
+                        if (true === ParaDrawing.Is_UseInDocument())
+                        {
+                            DrawingContent.Set_CurrentElement(0, false);
+                            if (true === State.DrawingSelection)
+                            {
+                                DrawingContent.Set_ContentPosition(State.StartPos, 0, 0);
+                                DrawingContent.Set_ContentSelection(State.StartPos, State.EndPos, 0, 0, 0);
+                            }
+                            else
+                            {
+                                DrawingContent.Set_ContentPosition(State.Pos, 0, 0);
+                                this.NeedUpdateTarget = true;
+                                this.RecalculateCurPos();
+                            }
+                        }
+                        else
+                        {
+                            HdrFtrContent.CurPos.Type = docpostype_Content;
+                            this.Cursor_MoveAt(State.X ? State.X : 0, State.Y ? State.Y : 0, false);
+                        }
+                    }
+                    else
+                    {
+                        if (true !== this.DrawingObjects.Load_DocumentStateAfterLoadChanges(State))
+                        {
+                            HdrFtrContent.CurPos.Type = docpostype_Content;
+                            this.Cursor_MoveAt(State.X ? State.X : 0, State.Y ? State.Y : 0, false);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                this.Document_End_HdrFtrEditing();
+                return;
+            }
+
             break;
         }
         case docpostype_DrawingObjects:
         {
+            var DrawingContent = State.DrawingContent;
+            var ParaDrawing    = State.ParaDrawing;
+            if (DrawingContent && ParaDrawing)
+            {
+                if (true === ParaDrawing.Is_UseInDocument())
+                {
+                    DrawingContent.Set_CurrentElement(0, false);
+                    if (true === State.DrawingSelection)
+                    {
+                        DrawingContent.Set_ContentPosition(State.StartPos, 0, 0);
+                        DrawingContent.Set_ContentSelection(State.StartPos, State.EndPos, 0, 0, 0);
+                    }
+                    else
+                    {
+                        DrawingContent.Set_ContentPosition(State.Pos, 0, 0);
+                        this.NeedUpdateTarget = true;
+                        this.RecalculateCurPos();
+                    }
+                }
+                else
+                {
+                    this.CurPos.Type = docpostype_Content;
+                    this.Cursor_MoveAt(State.X ? State.X : 0, State.Y ? State.Y : 0, false);
+                }
+            }
+            else
+            {
+                if (true !== this.DrawingObjects.Load_DocumentStateAfterLoadChanges(State))
+                {
+                    this.CurPos.Type = docpostype_Content;
+                    this.Cursor_MoveAt(State.X ? State.X : 0, State.Y ? State.Y : 0, false);
+                }
+            }
+
             break;
         }
         case docpostype_Content:
