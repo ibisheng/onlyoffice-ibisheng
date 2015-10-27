@@ -10261,17 +10261,21 @@ ParaRun.prototype.Get_DocumentPositionFromObject = function(PosArray)
     if (this.Paragraph)
     {
         var ParaContentPos = this.Paragraph.Get_PosByElement(this);
-        var Depth = ParaContentPos.Get_Depth();
-        while (Depth > 0)
+        if (null !== ParaContentPos)
         {
-            var Pos = ParaContentPos.Get(Depth);
-            var Class = this.Get_ElementByPos(ParaContentPos);
-            ParaContentPos.Decrease_Depth(1);
-            Depth--;
+            var Depth = ParaContentPos.Get_Depth();
+            while (Depth > 0)
+            {
+                var Pos = ParaContentPos.Get(Depth);
+                var Class = this.Get_ElementByPos(ParaContentPos);
+                ParaContentPos.Decrease_Depth(1);
+                Depth--;
 
-            PosArray.splice(0, 0, {Class : Class, Position : Pos});
+                PosArray.splice(0, 0, {Class : Class, Position : Pos});
+            }
+            PosArray.splice(0, 0, {Class : this.Paragraph, Position : ParaContentPos.Get(0)});
         }
-        PosArray.splice(0, 0, {Class : this.Paragraph, Position : ParaContentPos.Get(0)});
+
         this.Paragraph.Get_DocumentPositionFromObject(PosArray);
     }
 

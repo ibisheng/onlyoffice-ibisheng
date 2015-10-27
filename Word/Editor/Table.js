@@ -19818,6 +19818,9 @@ CTable.prototype.Get_DocumentPositionFromObject = function(PosArray)
 };
 CTable.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
+    if (!StartDocPos[Depth] || this !== StartDocPos[Depth].Class || !EndDocPos[Depth] || this !== EndDocPos[Depth].Class)
+        return;
+
     var IsOneElement = true;
     var StartRow = 0;
     switch (StartFlag)
@@ -19957,6 +19960,9 @@ CTable.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, 
 };
 CTable.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
 {
+    if (!DocPos[Depth] || this !== DocPos[Depth].Class)
+        return;
+
     var CurRow = 0;
     switch (Flag)
     {

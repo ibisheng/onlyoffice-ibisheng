@@ -13433,6 +13433,9 @@ Paragraph.prototype.Get_ContentPosition = function(bSelection, bStart, PosArray)
 };
 Paragraph.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
+    if (!StartDocPos[Depth] || this !== StartDocPos[Depth].Class || !EndDocPos[Depth] || this !== EndDocPos[Depth].Class)
+        return;
+
     var StartPos = 0, EndPos = 0;
     switch (StartFlag)
     {
@@ -13522,6 +13525,9 @@ Paragraph.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Dept
 };
 Paragraph.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
 {
+    if (!DocPos[Depth] || this !== DocPos[Depth].Class)
+        return;
+
     var Pos = 0;
     switch (Flag)
     {

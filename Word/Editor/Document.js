@@ -14904,6 +14904,9 @@ CDocument.prototype.Load_DocumentStateAfterLoadChanges = function(State)
 };
 CDocument.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
+    if (!StartDocPos[Depth] || this !== StartDocPos[Depth].Class || !EndDocPos[Depth] || this !== EndDocPos[Depth].Class)
+        return;
+
     var StartPos = 0, EndPos = 0;
     switch (StartFlag)
     {
@@ -15005,6 +15008,9 @@ CDocument.prototype.Get_ContentPosition = function(bSelection, bStart, PosArray)
 };
 CDocument.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
 {
+    if (!DocPos[Depth] || this !== DocPos[Depth].Class)
+        return;
+
     var Pos = 0;
     switch (Flag)
     {
@@ -15035,7 +15041,9 @@ CDocument.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
     }
 
     this.CurPos.ContentPos = Pos;
-    this.Content[Pos].Set_ContentPosition(_DocPos, Depth + 1, _Flag);
+
+    if (this.Content[Pos])
+        this.Content[Pos].Set_ContentPosition(_DocPos, Depth + 1, _Flag);
 };
 CDocument.prototype.Get_DocumentPositionFromObject = function(PosArray)
 {
