@@ -101,13 +101,10 @@ DocumentUrls.prototype = {
 		return this.getUrl(this.mediaPrefix + strPath);
 	},
 	getImageLocal : function(url){
-		if(this.urlsReverse){
-			var imageLocal = this.urlsReverse[url];
-			if(imageLocal && this.mediaPrefix == imageLocal.substring(0, this.mediaPrefix.length))
-				imageLocal = imageLocal.substring(this.mediaPrefix.length);
-			return imageLocal;
-		}
-		return null;
+		var imageLocal = this.getLocal(url);
+		if(imageLocal && this.mediaPrefix == imageLocal.substring(0, this.mediaPrefix.length))
+			imageLocal = imageLocal.substring(this.mediaPrefix.length);
+		return imageLocal;
 	},
 	imagePath2Local : function(imageLocal){
 		if(imageLocal && this.mediaPrefix == imageLocal.substring(0, this.mediaPrefix.length))
@@ -122,7 +119,11 @@ DocumentUrls.prototype = {
 	},
 	getLocal : function(url){
 		if(this.urlsReverse){
-			return this.urlsReverse[url];
+			var res = this.urlsReverse[url];
+			if (!res && typeof editor !== 'undefined' && editor.ThemeLoader && 0 == url.indexOf(editor.ThemeLoader.ThemesUrl)) {
+				res = url.substring(editor.ThemeLoader.ThemesUrl.length);
+			}
+			return res;
 		}
 		return null;
 	},
