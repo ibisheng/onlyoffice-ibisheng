@@ -1353,7 +1353,7 @@ asc_docs_api.prototype.asc_Print = function(){
 					t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 				}
 			} else {
-				t.asc_fireCallback("asc_onError", c_oAscError.ID.MailMergeSaveFile, c_oAscError.Level.NoCritical);
+				t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
 			}
 		} else {
 			t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
@@ -1527,7 +1527,7 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile){//передаем ч
 					t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 				}
 			} else {
-				t.asc_fireCallback("asc_onError", c_oAscError.ID.MailMergeSaveFile, c_oAscError.Level.NoCritical);
+				t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
 			}
 		} else {
 			t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
