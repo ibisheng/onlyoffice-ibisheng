@@ -537,7 +537,7 @@
 				self.handlers.trigger("asc_onSheetsChanged");
 			});
 
-            this.handlers.add("asc_onLockDefNameManager",function(reason){self.defNameAllowCreate = !(reason == c_oAscDefinedNameReason.LockDefNameManager);})
+            this.handlers.add("asc_onLockDefNameManager",function(reason){self.defNameAllowCreate = !(reason == c_oAscDefinedNameReason.LockDefNameManager);});
 
 			this.cellCommentator = new CCellCommentator({
 				model: new WorkbookCommentsModel(this.handlers),

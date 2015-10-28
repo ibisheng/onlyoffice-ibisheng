@@ -3249,7 +3249,7 @@ CCellValue.prototype =
       while (0 < endIndex && ('\n' === val[endIndex] || ' ' === val[endIndex])) {
         --endIndex;
       }
-      var sRealUrl = val.slice(0, endIndex);
+      var sRealUrl = val.slice(0, endIndex + 1);
       if (-1 === sRealUrl.indexOf('\n')) {
         if (0 != val.indexOf("http://") && 0 != val.indexOf("https://")) {
           sRealUrl = "http://" + sRealUrl;
