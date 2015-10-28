@@ -10057,6 +10057,7 @@
                 }
 
                 if(_C2H50H_){
+                    range = true;
                     this._isLockedDefNames(null, _C2H50H_.nodeId);
                     sheetName = _C2H50H_.Ref.split("!");
                     ref = sheetName[1];
