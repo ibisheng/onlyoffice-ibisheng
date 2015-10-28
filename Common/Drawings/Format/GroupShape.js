@@ -1509,6 +1509,7 @@ CGroupShape.prototype =
 
     resetInternalSelection: DrawingObjectsController.prototype.resetInternalSelection,
     recalculateCurPos: DrawingObjectsController.prototype.recalculateCurPos,
+    loadDocumentStateAfterLoadChanges: DrawingObjectsController.prototype.loadDocumentStateAfterLoadChanges,
     checkHitToBounds: CShape.prototype.checkHitToBounds,
     checkDrawingBaseCoords: CShape.prototype.checkDrawingBaseCoords,
     setDrawingBaseCoords: CShape.prototype.setDrawingBaseCoords,

@@ -423,6 +423,19 @@ CChartSpace.prototype =
        }
     },
 
+    loadDocumentStateAfterLoadChanges: function(state)
+    {
+        this.selection.title          = null;
+        this.selection.legend         = null;
+        this.selection.legendEntry    = null;
+        this.selection.axisLbls       = null;
+        this.selection.dataLbls       = null;
+        this.selection.dataLbl        = null;
+        this.selection.textSelection  = null;
+        this.selection.plotArea       = null;
+        return false;
+    },
+
     resetInternalSelection: function(noResetContentSelect)
     {
         if(this.selection.textSelection)

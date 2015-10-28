@@ -142,7 +142,7 @@ CParagraphContentWithContentBase.prototype.Is_UseInDocument = function(Id)
     {
         for(var i = 0; i < this.Content.length; ++i)
         {
-            if(this.Content[i].Get_Id() === Id)
+            if(this.Content[i].Get_Id && this.Content[i].Get_Id() === Id)
             {
                 break;
             }

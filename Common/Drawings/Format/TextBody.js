@@ -766,7 +766,23 @@ CTextBody.prototype =
     Get_PrevElementEndInfo : function(CurElement)
     {
         return null;
-    }
+    },
+
+    Is_UseInDocument: function(Id)
+    {
+        if(Id != undefined)
+        {
+            if(!this.content || this.content.Get_Id() !== Id)
+            {
+                return false;
+            }
+        }
+        if(this.parent && this.parent.Is_UseInDocument)
+        {
+            return this.parent.Is_UseInDocument();
+        }
+        return false;
+    },
 };
 
 function CreateParaContentFromString(str)

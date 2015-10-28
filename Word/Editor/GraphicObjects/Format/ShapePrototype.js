@@ -692,7 +692,23 @@ CShape.prototype.Is_ThisElementCurrent = function(CurElement)
 };
 CShape.prototype.Is_UseInDocument = function()
 {
-    return !this.bDeleted;
+    if(this.group)
+    {
+        var aSpTree = this.group.spTree;
+        for(var i = 0; i < aSpTree.length; ++i)
+        {
+            if(aSpTree[i] === this)
+            {
+                return this.group.Is_UseInDocument();
+            }
+            return false;
+        }
+    }
+    if(this.parent && this.parent.Is_UseInDocument && this.parent.GraphicObj === this)
+    {
+        return this.parent.Is_UseInDocument();
+    }
+    return false;
 };
 CShape.prototype.Is_HdrFtr = function(bool)
 {

@@ -1012,6 +1012,9 @@ ParaRun.prototype.Get_CurrentParaPos = function()
 
 ParaRun.prototype.Get_ParaPosByContentPos = function(ContentPos, Depth)
 {
+    if (this.StartRange < 0 || this.StartLine < 0)
+        return new CParaPos(0, 0, 0, 0);
+
     var Pos = ContentPos.Get(Depth);
 
     var CurLine  = 0;

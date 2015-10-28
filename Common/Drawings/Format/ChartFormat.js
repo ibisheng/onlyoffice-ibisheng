@@ -23267,6 +23267,15 @@ CTitle.prototype =
         return this.chart.extX*0.5;
     },
 
+    Is_UseInDocument: function()
+    {
+        if(this.parent && this.parent.title === this &&
+            this.chart && this.chart.Is_UseInDocument)
+        {
+            return this.chart.Is_UseInDocument();
+        }
+        return false;
+    },
     getBodyPr: CDLbl.prototype.getBodyPr,
 
     getCompiledStyle: CDLbl.prototype.getCompiledStyle,

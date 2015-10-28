@@ -2752,6 +2752,86 @@ CGraphicObjects.prototype =
         return false;
     },
 
+
+    Save_DocumentStateBeforeLoadChanges: function(oState)
+    {
+        oState.DrawingsSelectionState = this.getSelectionState()[0];
+        var oPos = this.getLeftTopSelectedObject2();
+        oState.X = oPos.X;
+        oState.Y = oPos.Y;
+    },
+
+    Load_DocumentStateAfterLoadChanges: function(oState)
+    {
+        this.clearPreTrackObjects();
+        this.clearTrackObjects();
+        this.resetSelection();
+        this.changeCurrentState(new NullState(this));
+        return this.loadDocumentStateAfterLoadChanges(oState.DrawingsSelectionState);
+    },
+
+    loadDocumentStateAfterLoadChanges: function(oSelectionState)
+    {
+        if(oSelectionState)
+        {
+            if(oSelectionState.textObject)
+            {
+                if(oSelectionState.textObject.Is_UseInDocument())
+                {
+                    this.selectObject(oSelectionState.textObject, oSelectionState.textObject.parent.PageNum);
+                }
+            }
+            else if(oSelectionState.groupObject)
+            {
+                if(oSelectionState.groupObject.Is_UseInDocument())
+                {
+                    this.selectObject(oSelectionState.groupObject, oSelectionState.groupObject.parent.PageNum);
+                    oSelectionState.groupSelection.resetSelection(oSelectionState.groupSelection);
+                    if(oSelectionState.groupObject.loadDocumentStateAfterLoadChanges(oSelectionState.groupSelection))
+                    {
+                        this.selection.groupSelection = oSelectionState.groupObject;
+                    }
+                }
+            }
+            else if(oSelectionState.chartObject)
+            {
+                if(oSelectionState.chartObject.Is_UseInDocument())
+                {
+                    this.selectObject(oSelectionState.chartObject, oSelectionState.chartObject.parent.PageNum);
+                    oSelectionState.chartObject.resetSelection();
+                    if(oSelectionState.chartObject.loadDocumentStateAfterLoadChanges(oSelectionState.chartSelection))
+                    {
+                        this.selection.chartSelection = oSelectionState.chartObject;
+                    }
+                }
+            }
+            else if(oSelectionState.wrapObject)
+            {
+                if(oSelectionState.wrapObject.parent && oSelectionState.wrapObject.parent.Is_UseInDocument && oSelectionState.wrapObject.parent.Is_UseInDocument())
+                {
+                    this.selectObject(oSelectionState.wrapObject, oSelectionState.wrapObject.parent.PageNum);
+                    if(oSelectionState.wrapObject.canChangeWrapPolygon && oSelectionState.wrapObject.canChangeWrapPolygon() && !oSelectionState.wrapObject.parent.Is_Inline())
+                    {
+                        this.selection.wrapPolygonSelection = oSelectionState.wrapObject;
+                    }
+                }
+            }
+            else
+            {
+                for(var i = 0; i < oSelectionState.selection.length; ++i)
+                {
+                    var oSp = oSelectionState.selection[i].object;
+                    if(oSp.Is_UseInDocument())
+                    {
+                        this.selectObject(oSp, oSp.parent.PageNum);
+                    }
+                }
+            }
+        }
+        return this.selectedObjects.length > 0;
+    },
+
+
     canChangeWrapPolygon: function()
     {
         return !this.selection.groupSelection && !this.selection.textSelection && !this.selection.chartSelection
@@ -2965,6 +3045,17 @@ CGraphicObjects.prototype =
             return this.getLeftTopSelectedObjectByPage(aSelectedObjectsCopy[0].selectStartPage);
         }
         return {X: 0, Y: 0, PageIndex: pageIndex};
+    },
+
+    getLeftTopSelectedObject2: function()
+    {
+        if(this.selectedObjects.length > 0)
+        {
+            var aSelectedObjectsCopy = [].concat(this.selectedObjects);
+            aSelectedObjectsCopy.sort(function(a, b){return a.selectStartPage - b.selectStartPage});
+            return this.getLeftTopSelectedObjectByPage(aSelectedObjectsCopy[0].selectStartPage);
+        }
+        return {X: 0, Y: 0, PageIndex: 0};
     },
 
     getLeftTopSelectedObjectByPage: function(pageIndex)

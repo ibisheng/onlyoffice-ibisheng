@@ -15,6 +15,7 @@ CImageShape.prototype.hitToHandles = CShape.prototype.hitToHandles;
 CImageShape.prototype.hitInBoundingRect = CShape.prototype.hitInBoundingRect;
 CImageShape.prototype.getRotateAngle = CShape.prototype.getRotateAngle;
 CImageShape.prototype.recalculateWrapPolygon = CShape.prototype.recalculateWrapPolygon;
+CImageShape.prototype.Is_UseInDocument = CShape.prototype.Is_UseInDocument;
 
 CImageShape.prototype.setRecalculateInfo = function()
 {
