@@ -1188,8 +1188,6 @@ CMathContent.prototype.private_CorrectContent = function()
         var bLeftRun  = currPos > 0 ? this.Content[currPos-1].Type == para_Math_Run : false,
             bRightRun = currPos < len - 1 ? this.Content[currPos + 1].Type === para_Math_Run : false;
 
-        var bLeftEmptyRun = bLeftRun ? this.Content[currPos-1].Is_Empty() : false;
-
         var bCurrComp       = current.Type == para_Math_Composition,
             bCurrEmptyRun   = current.Type == para_Math_Run && current.Is_Empty();
 
@@ -1205,14 +1203,7 @@ CMathContent.prototype.private_CorrectContent = function()
             currPos += 2;
 
         }
-        /*else if(bCurrComp && bLeftEmptyRun)
-        {
-            emptyRun = this.Content[currPos-1];
-
-            this.Apply_TextPrForRunEmpty(emptyRun, current);
-            currPos++;
-        }*/
-        else if(bDeleteEmptyRun)
+        else if(bDeleteEmptyRun && this.NearPosArray.length == 0) // если NearPosArray не нулевой длины, то это вызов происходит на Insert_Content, не удаляем пустые Run
         {
             this.Remove_FromContent(currPos, 1);
 
@@ -1223,7 +1214,7 @@ CMathContent.prototype.private_CorrectContent = function()
                     this.CurPos = currPos - 1;
                     this.Content[this.CurPos].Cursor_MoveToEndPos(false);
                 }
-                else //if (bRightRun)
+                else
                 {
                     this.CurPos = currPos;
                     this.Content[this.CurPos].Cursor_MoveToStartPos();
@@ -1231,7 +1222,9 @@ CMathContent.prototype.private_CorrectContent = function()
             }
         }
         else
+        {
             currPos++;
+        }
 
         len = this.Content.length;
 
@@ -1250,12 +1243,6 @@ CMathContent.prototype.private_CorrectContent = function()
             this.Apply_TextPrForRunEmpty(emptyRun, this.Content[len - 1]);
             this.Internal_Content_Add(currPos, emptyRun);
         }
-        /*else if(bLastRunEmpty)
-        {
-            emptyRun = this.Content[len-1];
-
-            this.Apply_TextPrForRunEmpty(emptyRun, this.Content[len - 2]);
-        }*/
     }
 
 };
@@ -1286,31 +1273,6 @@ CMathContent.prototype.Correct_Content = function(bInnerCorrection)
     }
 
     this.private_CorrectContent();
-
-    // Удаляем лишние пустые раны
-    /*for (var nPos = 0, nLen = this.Content.length; nPos < nLen - 1; nPos++)
-     {
-     var oCurrElement = this.Content[nPos];
-     var oNextElement = this.Content[nPos + 1];
-     if (para_Math_Run === oCurrElement.Type && para_Math_Run === oNextElement.Type)
-     {
-     if (oCurrElement.Is_Empty())
-     {
-     this.Remove_FromContent(nPos);
-     nPos--;
-     nLen--;
-     }
-     else if (oNextElement.Is_Empty())
-     {
-     this.Remove_FromContent(nPos + 1);
-     nPos--;
-     nLen--;
-     }
-     }
-
-     if(para_Math_Run === oCurrElement.Type)
-     oCurrElement.Math_Correct_Content();
-     }*/
 
     // Если в контенте ничего нет, тогда добавляем пустой ран
     if (this.Content.length < 1)

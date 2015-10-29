@@ -1493,18 +1493,16 @@ CMathBase.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine
     SearchPos.CurX = aBounds[nFindIndex].X;
     SearchPos.CurY = aBounds[nFindIndex].Y;
 
-    var bResult = this.Content[nFindIndex].Get_ParaContentPosByXY(SearchPos, Depth + 1, _CurLine, _CurRange, StepEnd);
+    if ( false === SearchPos.InText )
+        SearchPos.InTextPos.Update2( nFindIndex, Depth );
 
-    if(true === bResult)
+    var bResult = false;
+
+    if(true === this.Content[nFindIndex].Get_ParaContentPosByXY(SearchPos, Depth + 1, _CurLine, _CurRange, StepEnd))
     {
         SearchPos.Pos.Update2(nFindIndex, Depth);
+        bResult = true;
     }
-
-    if (SearchPos.InText == true)
-    {
-        SearchPos.InTextPos.Update( nFindIndex, Depth );
-    }
-
 
     return bResult;
 };
