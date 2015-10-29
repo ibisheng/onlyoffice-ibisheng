@@ -4134,6 +4134,8 @@ function offline_get_header_sizes() {
 }
 function offline_get_graphics_object(x, y) {
     var ws = _api.wb.getWorksheet();
+    ws.objectRender.drawingArea.reinitRanges();
+
     var drawingInfo = ws.objectRender.checkCursorDrawingObject(x, y);
     if (drawingInfo) {
         return drawingInfo.id;
