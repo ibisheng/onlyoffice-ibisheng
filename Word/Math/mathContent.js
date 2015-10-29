@@ -1304,7 +1304,10 @@ CMathContent.prototype.Correct_Content = function(bInnerCorrection)
         }
 
         if(bEmptyContent)
+        {
             this.Content[0].fillPlaceholders();
+            this.Content[0].Recalc_CompiledPr(true);
+        }
     }
 
 };
