@@ -3170,6 +3170,8 @@ function OfflineEditor () {
     this.textSelection = 0;
     this.selection = [];
     this.cellPin = 0;
+    this.col0 = 0;
+    this.row0 = 0;
 
     // main
 
@@ -3200,8 +3202,17 @@ function OfflineEditor () {
 
         window["NativeSupportTimeouts"] = true;
 
+        var ws = _api.wb.getWorksheet();
+
         _api.wb.showWorksheet(undefined, false, true);
-        _api.wb.getWorksheet()._fixSelectionOfMergedCells();
+        ws._fixSelectionOfMergedCells();
+
+        if (ws.topLeftFrozenCell) {
+            this.row0 = ws.topLeftFrozenCell.getRow0();
+            this.col0 = ws.topLeftFrozenCell.getCol0();
+        }
+
+       // _api.asc_getTextArtPreviews();
     };
     this.registerEventsHandlers = function () {
 
@@ -3249,6 +3260,18 @@ function OfflineEditor () {
             asc_WriteCFont(-1, font, stream);
             window["native"]["OnCallMenuEvent"](2403, stream); // ASC_SPREADSHEETS_EVENT_TYPE_EDITOR_SELECTION_CHANGED
         });
+    };
+    this.updateFrozen = function () {
+        var ws = _api.wb.getWorksheet();
+        if (ws.topLeftFrozenCell) {
+            _s.row0 = ws.topLeftFrozenCell.getRow0();
+            _s.col0 = ws.topLeftFrozenCell.getCol0();
+        }
+        else
+        {
+            _s.row0 = 0;
+            _s.col0 = 0;
+        }
     };
 
     // prop
@@ -3444,11 +3467,6 @@ function OfflineEditor () {
             worksheet._drawCorner();
     };
 
-    // add
-    this.addShape = function (x, y, width, height) {
-
-    };
-
     // internal
 
     this._updateRegion = function (worksheet, x, y, width, height) {
@@ -3548,31 +3566,60 @@ function OfflineEditor () {
             rowOff: rowOff
         };
     };
-    this._resizeWorkRegion = function (worksheet, col, row) {
+    this._resizeWorkRegion = function (worksheet, col, row, isCoords) {
 
-        if (col >= worksheet.cols.length) {
-            do {
-                worksheet.nColsCount = worksheet.cols.length + 1;
-                worksheet._calcWidthColumns(2); // fullRecalc
+        if (undefined !== isCoords) {
 
-                if (col < worksheet.cols.length)
-                    break
-            } while (1);
+            if (col >= worksheet.cols[worksheet.cols.length - 1].left) {
+
+                do {
+                    worksheet.nColsCount = worksheet.cols.length + 1;
+                    worksheet._calcWidthColumns(2); // fullRecalc
+
+                    if (col < worksheet.cols[worksheet.cols.length - 1].left) {
+                        break
+                    }
+                } while (1);
+            }
+
+            if (row >= worksheet.rows[worksheet.rows.length - 1].top) {
+
+                do {
+                    worksheet.nRowsCount = worksheet.rows.length + 1;
+                    worksheet._calcHeightRows(2); // fullRecalc
+
+                    if (row < worksheet.rows[worksheet.rows.length - 1].top) {
+                        break
+                    }
+                } while (1);
+            }
         }
+        else
+        {
+            if (col >= worksheet.cols.length) {
+                do {
+                    worksheet.nColsCount = worksheet.cols.length + 1;
+                    worksheet._calcWidthColumns(2); // fullRecalc
 
-        if (row >= worksheet.rows.length) {
-            do {
-                worksheet.nRowsCount = worksheet.rows.length + 1;
-                worksheet._calcHeightRows(2); // fullRecalc
+                    if (col < worksheet.cols.length)
+                        break
+                } while (1);
+            }
 
-                if (row < worksheet.rows.length)
-                    break
-            } while (1);
+            if (row >= worksheet.rows.length) {
+                do {
+                    worksheet.nRowsCount = worksheet.rows.length + 1;
+                    worksheet._calcHeightRows(2); // fullRecalc
+
+                    if (row < worksheet.rows.length)
+                        break
+                } while (1);
+            }
         }
     };
 
     this.offline_showWorksheet = function(index) {
-
+        var me = this;
         var t = _api;
         var ws = _api.wbModel.getWorksheet(index);
         var isHidden = ws.getHidden();
@@ -3584,6 +3631,8 @@ function OfflineEditor () {
                     // Посылаем callback об изменении списка листов
                     t.sheetsChanged();
                 }
+
+                me.updateFrozen();
             }
         };
         if (_api.isHidden) {
@@ -3592,7 +3641,9 @@ function OfflineEditor () {
             _api._getIsLockObjectSheet(lockInfo, showWorksheetCallback);
         }
         else
+        {
             showWorksheetCallback(true);
+        }
     };
     this.offline_print = function(s, p) {
         var adjustPrint = asc_ReadAdjustPrint(s, p);
@@ -3829,6 +3880,14 @@ function offline_mouse_down(x, y, pin, isViewer) {
 
     var ws = _api.wb.getWorksheet();
     var wb = _api.wb;
+
+    _s._resizeWorkRegion(ws, x, y, true);
+
+    var range =  ws.visibleRange.clone();
+    range.c1 = _s.col0;
+    range.r1 = _s.row0;
+    ws.visibleRange = range;
+
     ws.objectRender.drawingArea.reinitRanges();
     var graphicsInfo = wb._onGetGraphicsInfo(x, y);
     if (graphicsInfo) {
@@ -3836,6 +3895,7 @@ function offline_mouse_down(x, y, pin, isViewer) {
         wb._onGraphicObjectMouseDown(e, x, y);
         wb._onUpdateSelectionShape(true);
         _s.isShapeAction = true;
+        ws.visibleRange = range;
         return {id:graphicsInfo.id};
     }
 
@@ -3847,10 +3907,18 @@ function offline_mouse_down(x, y, pin, isViewer) {
         ws.changeSelectionStartPoint(x, y, true, true);
     }
 
+    ws.visibleRange = range;
+
     return null;
 }
 function offline_mouse_move(x, y, isViewer) {
     var ws = _api.wb.getWorksheet();
+
+    var range =  ws.visibleRange.clone();
+    range.c1 = _s.col0;
+    range.r1 = _s.row0;
+    ws.visibleRange = range;
+
     if (_s.isShapeAction) {
         if (!isViewer) {
             var wb = _api.wb;
@@ -3865,22 +3933,29 @@ function offline_mouse_move(x, y, isViewer) {
         else
             ws.changeSelectionEndPoint(x, y, true, true);
     }
+
+    ws.visibleRange = range;
 }
 function offline_mouse_up(x, y, isViewer) {
     var ws = _api.wb.getWorksheet();
     var wb = _api.wb;
 
+    var range =  ws.visibleRange.clone();
+    range.c1 = _s.col0;
+    range.r1 = _s.row0;
+    ws.visibleRange = range;
+
     if (_s.isShapeAction) {
-        //if (!isViewer) {
-            var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
-            wb._onGraphicObjectMouseUp(e, x, y);
-        //}
+        var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
+        wb._onGraphicObjectMouseUp(e, x, y);
         _s.isShapeAction = false;
     } else {
         wb._onChangeSelectionDone(-1, -1);
         _s.cellPin = 0;
         wb.getWorksheet().leftTopRange = undefined;
     }
+
+    ws.visibleRange = range;
 }
 function offline_get_selection(x, y, width, height, autocorrection) {
     return _s.getSelection(x, y, width, height, autocorrection);
