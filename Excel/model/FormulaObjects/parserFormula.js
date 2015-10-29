@@ -1707,6 +1707,7 @@ cBaseFunction.prototype = {
     Assemble2Locale:function ( arg, start, count, locale, digitDelim ) {
 
         var str = "", c = start + count - 1, localeName = locale ? locale[this.toString()] : this.toString();
+		localeName = localeName || this.toString();
         for ( var i = start; i <= c; i++ ) {
             str += arg[i].toLocaleString( digitDelim );
             if ( i !== c ) {
