@@ -661,7 +661,6 @@ CGraphics.prototype =
 
         //if (null != this.m_oFontManager)
         //{
-        //    this.Native["setTextMatrix"](_t.sx,_t.shy,_t.shx,_t.sy,_t.tx,_t.ty);
         //    this.m_oFontManager.SetTextMatrix(_t.sx,_t.shy,_t.shx,_t.sy,_t.tx,_t.ty);
         //}
     },
