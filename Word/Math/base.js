@@ -2083,9 +2083,9 @@ CMathBase.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _C
     var CurLine = _CurLine - this.StartLine;
     var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
 
-    if(CurLine == 0 && CurRange == 0)
+    if(PRS.bFastRecalculate === false)
     {
-        this.Bounds.Reset();
+        this.Bounds.Reset(CurLine, CurRange);
     }
 
     var StartPos, EndPos;
@@ -2319,9 +2319,10 @@ function CMathBounds()
 {
     this.Bounds = [];
 }
-CMathBounds.prototype.Reset = function()
+CMathBounds.prototype.Reset = function(CurLine, CurRange)
 {
-    this.Bounds.length = 0;
+    if(CurRange == 0)
+        this.Bounds.length = CurLine;
 };
 CMathBounds.prototype.CheckLineBound = function(Line, Range)
 {

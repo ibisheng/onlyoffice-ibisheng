@@ -622,6 +622,11 @@ CNary.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRa
         var CurLine = _CurLine - this.StartLine;
         var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
 
+        if(PRS.bFastRecalculate === false)
+        {
+            this.Bounds.Reset(CurLine, CurRange);
+        }
+
         // т.к. ParaNumbering привязывается к первому текстовому элементы, он может находится в аргументе
         // обновляем LineMetrics для Base после того, как обновим метрики для аргумента
 
@@ -630,13 +635,11 @@ CNary.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRa
         var BoundArg = this.Arg.Get_LineBound(_CurLine, _CurRange);
 
         this.Bounds.UpdateMetrics(CurLine, CurRange, BoundArg);
-
         this.UpdatePRS(PRS, BoundArg);
-
 
         if(CurLine == 0 && CurRange == 0)
         {
-            this.Bounds.Reset();
+            //this.Bounds.Reset();
 
             if(this.Base.IsJustDraw())
             {

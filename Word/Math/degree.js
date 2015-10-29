@@ -433,9 +433,9 @@ CDegree.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
     var CurLine = _CurLine - this.StartLine;
     var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
 
-    if(CurLine == 0 && CurRange == 0)
+    if(PRS.bFastRecalculate === false)
     {
-        this.Bounds.Reset();
+        this.Bounds.Reset(CurLine, CurRange);
     }
 
     if(this.bOneLine == false && this.baseContent.Math_Is_End( _CurLine, _CurRange))
@@ -842,9 +842,9 @@ CDegreeSubSup.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine
     var CurLine = _CurLine - this.StartLine;
     var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
 
-    if(CurLine == 0 && CurRange == 0)
+    if(PRS.bFastRecalculate === false)
     {
-        this.Bounds.Reset();
+        this.Bounds.Reset(CurLine, CurRange);
     }
 
     if(this.bOneLine === false && true === this.Need_Iters(_CurLine, _CurRange))
@@ -864,7 +864,8 @@ CDegreeSubSup.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine
         this.Bounds.UpdateMetrics(CurLine, CurRange, Bound);
         ContentMetrics.UpdateMetrics(Bound);
 
-        this.iters.Bounds.Reset();
+        this.iters.Recalculate_Reset( PRS.Range, PRS.Line, PRS );
+        this.iters.Bounds.Reset(0, 0);
         this.iters.Bounds.UpdateMetrics(0, 0, this.iters.size);
 
         this.UpdatePRS(PRS, Bound);

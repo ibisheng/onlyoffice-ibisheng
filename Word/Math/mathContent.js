@@ -4397,9 +4397,9 @@ CMathContent.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine,
     var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
     var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
 
-    if(CurLine == 0 && CurRange == 0)
+    if(PRS.bFastRecalculate === false)
     {
-        this.Bounds.Reset();
+        this.Bounds.Reset(CurLine, CurRange);
     }
 
     var NewContentMetrics = new CMathBoundsMeasures();
