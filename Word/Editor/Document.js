@@ -700,6 +700,8 @@ function CDocument(DrawingDocument)
     this.StyleCounter = 0;
     this.NumInfoCounter = 0;
 
+    this.Api = editor;
+
     // Сначала настраиваем размеры страницы и поля
     this.SectPr = new CSectionPr(this);
     this.SectionsInfo = new CDocumentSectionsInfo();
@@ -14619,15 +14621,30 @@ CDocument.prototype.Get_ElementByIndex = function(Index)
 CDocument.prototype.Set_FastCollaborativeEditing = function(isOn)
 {
     CollaborativeEditing.Set_Fast(isOn);
-    editor.SetCollaborativeMarksShowType(c_oAscCollaborativeMarksShowType.All);
+    editor.SetCollaborativeMarksShowType(c_oAscCollaborativeMarksShowType.None);
 };
 CDocument.prototype.Continue_FastCollaborativeEditing = function()
 {
     if (true !== CollaborativeEditing.Is_Fast())
         return;
 
+    if (true === this.Selection_Is_TableBorderMove() || true === this.Api.isStartAddShape)
+        return;
+
     // TODO: Убрать эту функцю
-    editor.SetCollaborativeMarksShowType(c_oAscCollaborativeMarksShowType.All);
+    editor.SetCollaborativeMarksShowType(c_oAscCollaborativeMarksShowType.None);
+
+    //// TODO: Сделать это пореже
+    //var CurTime = new Date().getTime();
+    //if (CurTime - LastCursorTime > 1000)
+    //{
+    //    var CursorInfo = History.Get_DocumentPositionBinary();
+    //    if (null !== CursorInfo)
+    //    {
+    //        editor.asc_coAuthoringChatSendMessage(CursorInfo);
+    //        LastCursorTime = CurTime;
+    //    }
+    //}
 
     if (true !== History.Have_Changes() && true === CollaborativeEditing.Have_OtherChanges())
     {
@@ -14637,7 +14654,7 @@ CDocument.prototype.Continue_FastCollaborativeEditing = function()
     }
     else if (true === History.Have_Changes() || true === CollaborativeEditing.Have_OtherChanges())
     {
-        editor.asc_Save();
+        this.Api.asc_Save();
     }
 };
 CDocument.prototype.Save_DocumentStateBeforeLoadChanges = function()
@@ -15051,6 +15068,114 @@ CDocument.prototype.Get_DocumentPositionFromObject = function(PosArray)
         PosArray = [];
 
     return PosArray;
+};
+CDocument.prototype.Get_CursorLogicPosition = function()
+{
+    var DocPos = null;
+    if (docpostype_HdrFtr === this.CurPos.Type)
+    {
+        var HdrFtr = this.HdrFtr.Get_CurHdrFtr();
+        if (HdrFtr)
+        {
+            return this.private_GetLogicDocumentPosition(HdrFtr.Get_DocumentContent());
+        }
+    }
+    else
+    {
+        return this.private_GetLogicDocumentPosition(this);
+    }
+
+    return null;
+};
+CDocument.prototype.private_GetLogicDocumentPosition = function(LogicDocument)
+{
+    if (!LogicDocument)
+        return null;
+
+    if (docpostype_DrawingObjects === LogicDocument.CurPos.Type)
+    {
+        var ParaDrawing    = this.DrawingObjects.getMajorParaDrawing();
+        var DrawingContent = this.DrawingObjects.getTargetDocContent();
+        if (!ParaDrawing)
+            return null;
+
+        if (DrawingContent)
+        {
+            return DrawingContent.Get_ContentPosition(DrawingContent.Is_SelectionUse(), false);
+        }
+        else
+        {
+            var Run = ParaDrawing.Get_Run();
+            if (null === Run)
+                return null;
+
+            var DrawingInRunPos = Run.Get_DrawingObjectSimplePos();
+            if (-1 === DrawingInRunPos)
+                return null;
+
+            var DocPos = [{Class : Run, Position : DrawingInRunPos}];
+            Run.Get_DocumentPositionFromObject(DocPos);
+            return DocPos;
+        }
+    }
+    else
+    {
+        return LogicDocument.Get_ContentPosition(LogicDocument.Is_SelectionUse(), false);
+    }
+};
+CDocument.prototype.Get_DocumentPositionInfoForCollaborative = function()
+{
+    var DocPos = this.Get_CursorLogicPosition();
+    if (!DocPos || DocPos.length <= 0)
+        return null;
+
+    var Last = DocPos[DocPos.length - 1];
+    if (!(Last.Class instanceof ParaRun))
+        return null;
+
+    return Last;
+};
+CDocument.prototype.Update_ForeignCursor = function(CursorInfo, UserId)
+{
+    if (!this.Api.User)
+        return;
+
+    if (UserId === this.Api.User.asc_getId())
+        return;
+
+    var Changes = new CCollaborativeChanges();
+    var Reader = Changes.Internal_Load_Data2(CursorInfo, 0, CursorInfo.length);
+
+    var RunId    = Reader.GetString2();
+    var InRunPos = Reader.GetLong();
+
+    var Run = g_oTableId.Get_ById(RunId);
+    if (!Run)
+    {
+        this.DrawingDocument.Collaborative_RemoveTarget(UserId);
+        return;
+    }
+
+    var Paragraph = Run.Get_Paragraph();
+    if (!Paragraph)
+    {
+        this.DrawingDocument.Collaborative_RemoveTarget(UserId);
+        return;
+    }
+
+    var ParaContentPos = Paragraph.Get_PosByElement(Run);
+    if (!ParaContentPos)
+    {
+        this.DrawingDocument.Collaborative_RemoveTarget(UserId);
+        return;
+    }
+    ParaContentPos.Update(InRunPos, ParaContentPos.Get_Depth() + 1);
+
+    var XY = Paragraph.Get_XYByContentPos(ParaContentPos);
+    if (XY && XY.Height > 0.001)
+        this.DrawingDocument.Collaborative_UpdateTarget(UserId, XY.X, XY.Y, XY.Height, XY.PageNum, Paragraph.Get_ParentTextTransform());
+    else
+        this.DrawingDocument.Collaborative_RemoveTarget(UserId);
 };
 
 //-----------------------------------------------------------------------------------

@@ -4104,6 +4104,14 @@ ParaDrawing.prototype =
         return this.Parent;
     },
 
+    Get_Run : function()
+    {
+        if (this.Parent)
+            return this.Parent.Get_DrawingObjectRun(this.Id);
+
+        return null;
+    },
+
     Get_Props : function(OtherProps)
     {
         // Сначала заполняем свойства

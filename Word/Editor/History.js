@@ -846,8 +846,19 @@ CHistory.prototype =
         }
 
         return OverallTime;
-    }
+    },
 
+    Get_DocumentPositionBinary : function()
+    {
+        var PosInfo = this.Document.Get_DocumentPositionInfoForCollaborative();
+        if (!PosInfo)
+            return null;
+        var BinaryPos = this.BinaryWriter.GetCurPosition();
+        this.BinaryWriter.WriteString2(PosInfo.Class.Get_Id());
+        this.BinaryWriter.WriteLong(PosInfo.Position);
+        var BinaryLen = this.BinaryWriter.GetCurPosition() - BinaryPos;
+        return  (BinaryLen + ";" + this.BinaryWriter.GetBase64Memory2(BinaryPos, BinaryLen));
+    }
 };
 
 var History = null;

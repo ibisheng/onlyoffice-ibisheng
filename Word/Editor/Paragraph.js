@@ -1032,12 +1032,12 @@ Paragraph.prototype =
     Internal_Recalculate_CurPos : function(Pos, UpdateCurPos, UpdateTarget, ReturnTarget)
     {
         if ( this.Lines.length <= 0 )
-            return { X : 0, Y : 0, Height : 0, Internal : { Line : 0, Page : 0, Range : 0 } };
+            return { X : 0, Y : 0, Height : 0, PageNum : 0, Internal : { Line : 0, Page : 0, Range : 0 } };
 
         var LinePos = this.Get_CurrentParaPos();
 
         if (-1 === LinePos.Line)
-            return { X : 0, Y : 0, Height : 0, Internal : { Line : 0, Page : 0, Range : 0 } };
+            return { X : 0, Y : 0, Height : 0, PageNum : 0, Internal : { Line : 0, Page : 0, Range : 0 } };
 
         var CurLine  = LinePos.Line;
         var CurRange = LinePos.Range;
@@ -13572,6 +13572,53 @@ Paragraph.prototype.Get_DocumentPositionFromObject = function(PosArray)
     }
 
     return PosArray;
+};
+Paragraph.prototype.Get_XYByContentPos = function(ContentPos)
+{
+    var ParaContentPos = this.Get_ParaContentPos(false, false);
+
+    this.Set_ParaContentPos(ContentPos, true, -1, -1);
+    var Result = this.Internal_Recalculate_CurPos(-1, false, false, true);
+    this.Set_ParaContentPos(ParaContentPos, true, this.CurPos.Line, this.CurPos.Range);
+    return Result;
+
+
+    if (this.Lines.length <= 0)
+        return {X : 0, Y : 0, PageNum : 0, Height : 0};
+
+    var ParaPos = this.Get_ParaPosByContentPos(ContentPos);
+    if (ParaPos.Line < 0 || ParaPos >= this.Lines.length || ParaPos.Page < 0 || ParaPos.Page >= this.Pages.length || ParaPos.Range < 0 || ParaPos.Range >= this.Lines[ParaPos.Line].Ranges.length)
+        return {X : 0, Y : 0, PageNum : 0, Height : 0};
+
+    var CurLine  = ParaPos.Line;
+    var CurRange = ParaPos.Range;
+    var CurPage  = ParaPos.Page;
+
+    var X = this.Lines[CurLine].Ranges[CurRange].XVisible;
+    var Y = this.Pages[CurPage].Y + this.Lines[CurLine].Y;
+
+    var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+    var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+
+    if (true === this.Numbering.Check_Range(CurRange, CurLine))
+        X += this.Numbering.WidthVisible;
+
+    var CurPos = ContentPos.Get(0);
+    for (var Pos = StartPos; Pos <= EndPos; ++Pos)
+    {
+        var Item = this.Content[Pos];
+
+        if (CurPos === Pos)
+        {
+            return Item.Get_XYByContentPos(ContentPos, 1, X, Y, true, CurRange, CurLine, CurPage);
+        }
+        else
+        {
+            X = Item.Get_XYByContentPos(ContentPos, 1, X, Y, false, CurRange, CurLine, CurPage).X;
+        }
+    }
+
+    return {X : X, Y : Y, PageNum : CurPage + this.Get_StartPage_Absolute(), Height : this.Lines[CurLine].Bottom - this.Lines[CurLine].Top};
 };
 
 var pararecalc_0_All  = 0;

@@ -1288,14 +1288,14 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
             }
 
 
-            return { X : X, Y : TargetY, Height : Height, Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
+            return { X : X, Y : TargetY, Height : Height, PageNum : CurPage + Para.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
         }
         else
             return { X : X, Y : Y, PageNum : CurPage + Para.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
 
     }
 
-    return { X : X, Y: Y,  Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
+    return { X : X, Y: Y,  PageNum : CurPage + Para.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
 };
 
 // Проверяем, произошло ли простейшее изменение (набор или удаление текста)
@@ -1597,6 +1597,19 @@ ParaRun.prototype.Get_DrawingObjectContentPos = function(Id, ContentPos, Depth)
     }
 
     return false;
+};
+
+ParaRun.prototype.Get_DrawingObjectSimplePos = function(Id)
+{
+    var ContentLen = this.Content.length;
+    for (var CurPos = 0; CurPos < ContentLen; CurPos++)
+    {
+        var Element = this.Content[CurPos];
+        if (para_Drawing === Element.Type && Id === Element.Get_Id())
+            return CurPos;
+    }
+
+    return -1;
 };
 
 ParaRun.prototype.Remove_DrawingObject = function(Id)
