@@ -1731,6 +1731,13 @@ var maxIndividualValues = 10000;
 					//activeRange = t._idToRange(cellId);
 				
 				var resType = type == 'ascending';
+				var isCellIdString = false;
+				if(cellId !== undefined && cellId != "" && typeof cellId == 'string')
+				{
+					activeRange = t._idToRange(cellId);
+					displayName = undefined;
+					isCellIdString = true;
+				}
 				
 				if(displayName !== undefined)
 				{
@@ -1759,7 +1766,7 @@ var maxIndividualValues = 10000;
 						//в данному случае может быть захвачен а/ф, если он присутвует(надо проверить), либо нажата кнопка а/ф
 						if(curFilter && (filterRef.isEqual(activeRange) || cellId !== ''))
 						{
-							if(cellId !== '')
+							if(cellId !== '' && !isCellIdString)
 								startCol = filterRef.c1 + cellId;
 							else
 								startCol = activeRange.startCol;
