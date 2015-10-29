@@ -2708,7 +2708,7 @@
             if (obj.OfflineApp === true)
                 this.OfflineApp = true;
 
-            this.TemplateReplacement = (undefined !== obj.TemplateReplacement && null !== obj.TemplateReplacement ? obj.TemplateReplacement : null)
+            this.TemplateReplacement = (null != obj.TemplateReplacement ? obj.TemplateReplacement : null);
             if(typeof obj.ChartEditor != 'undefined'){
                 this.ChartEditor = obj.ChartEditor;
             }
