@@ -1203,7 +1203,7 @@ CMathContent.prototype.private_CorrectContent = function()
             currPos += 2;
 
         }
-        else if(bDeleteEmptyRun && this.NearPosArray.length == 0) // если NearPosArray не нулевой длины, то это вызов происходит на Insert_Content, не удаляем пустые Run
+        else if(bDeleteEmptyRun && false == current.Is_CheckingNearestPos()) // если NearPosArray не нулевой длины, то это вызов происходит на Insert_Content, не удаляем пустые Run
         {
             this.Remove_FromContent(currPos, 1);
 
@@ -1232,10 +1232,7 @@ CMathContent.prototype.private_CorrectContent = function()
 
     if(len > 1)
     {
-        var bLastComp     =  this.Content[len - 1].Type == para_Math_Composition,
-            bLastRunEmpty =  this.Content[len - 2].Type == para_Math_Composition && this.Content[len - 1].Type == para_Math_Run && this.Content[len-1].Is_Empty();
-
-        if(bLastComp)
+        if(this.Content[len - 1].Type == para_Math_Composition)
         {
             emptyRun = new ParaRun(null, true);
             emptyRun.Set_RFont_ForMathRun();
@@ -1288,17 +1285,26 @@ CMathContent.prototype.Correct_Content = function(bInnerCorrection)
 
     if(bOnlyPlh == false)
     {
+        var bEmptyContent = true;
+
         for (var nPos = 0, nCount = this.Content.length; nPos < nCount; nPos++)
         {
             if(para_Math_Run === this.Content[nPos].Type)
+            {
                 this.Content[nPos].Math_Correct_Content();
+
+                if(false === this.Content[nPos].Is_Empty())
+                    bEmptyContent = false;
+            }
+            else
+            {
+                bEmptyContent = false;
+            }
+
         }
 
-        if (this.Content.length == 1)
-        {
-            if(this.Content[0].Is_Empty())
-                this.Content[0].fillPlaceholders();
-        }
+        if(bEmptyContent)
+            this.Content[0].fillPlaceholders();
     }
 
 };
