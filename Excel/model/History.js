@@ -771,7 +771,12 @@ CHistory.prototype.Get_DeleteIndex = function () {
 		return null;
 	var DeleteIndex = 0;
 	for (var i = 0; i < DeletePointIndex; ++i) {
-		DeleteIndex += this.Points[i].Items.length;
+		var point = this.Points[i];
+		for (var j = 0; j < point.Items.length; ++j) {
+			if (!point.Items[j].LocalChange) {//LocalChange изменения не пойдут в совместное редактирование.
+				DeleteIndex += 1;
+			}
+		}
 		DeleteIndex += 1; // Это на взаимное расположение Sheet. Пишется в каждой точке изменений.
 	}
 	return DeleteIndex;
