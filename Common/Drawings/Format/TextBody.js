@@ -782,7 +782,7 @@ CTextBody.prototype =
             return this.parent.Is_UseInDocument();
         }
         return false;
-    },
+    }
 };
 
 function CreateParaContentFromString(str)
