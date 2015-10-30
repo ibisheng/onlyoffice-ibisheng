@@ -382,8 +382,8 @@ CWrapPolygon.prototype =
         }
         for(var s = 0; s < ret2.length; ++s)
         {
-            ret2[s].typeLeft = nWrapType;
-            ret2[s].typeRight = nWrapType;
+            ret2[s].typeLeft = this.wordGraphicObject.wrappingType;
+            ret2[s].typeRight = this.wordGraphicObject.wrappingType;
         }
         for(s = 0; s < ret2.length; ++s)
         {
