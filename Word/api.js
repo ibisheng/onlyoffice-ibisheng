@@ -2252,7 +2252,7 @@ asc_docs_api.prototype.asc_Save = function ()
 	}
 };
 
-asc_docs_api.prototype.asc_DownloadAs = function(typeFile, txtOptions) {//передаем число соответствующее своему формату.
+asc_docs_api.prototype.asc_DownloadAs = function(typeFile, isGetUrl, txtOptions) {//передаем число соответствующее своему формату.
 	var actionType = this.mailMergeFileData ? c_oAscAsyncAction.MailMergeLoadFile : c_oAscAsyncAction.DownloadAs;
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 	var t = this;
@@ -2263,7 +2263,7 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile, txtOptions) {//пер
 			if('ok' == input["status"]){
 				var url = input["data"];
 				if(url) {
-					t.processSavedFile(url, false);
+					t.processSavedFile(url, isGetUrl);
 				} else {
 					t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 				}
@@ -2314,7 +2314,7 @@ asc_docs_api.prototype.asc_setAdvancedOptions = function(idOption, option) {
           };
           sendCommand2(t, null, rData);
       } else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save) {
-          t.asc_DownloadAs(c_oAscFileType.TXT, option);
+          t.asc_DownloadAs(c_oAscFileType.TXT, false, option);
       }
       break;
   }
@@ -2357,7 +2357,7 @@ asc_docs_api.prototype.processSavedFile = function(url, bInner) {
 		});
 	} else {
 		if (bInner) {
-			this.asc_fireCallback("asc_onSaveUrl", url, function (hasError) {
+			this.asc_fireCallback("asc_onDownloadUrl", url, function (hasError) {
 			});
 		} else {
 			getFile(url);

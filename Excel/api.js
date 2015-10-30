@@ -539,7 +539,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     }
   };
 
-  spreadsheet_api.prototype.asc_DownloadAs = function(typeFile) {//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
+  spreadsheet_api.prototype.asc_DownloadAs = function(typeFile, isGetUrl) {//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
     if (!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction) {
       return;
     }
@@ -558,7 +558,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
         if ('ok' == input["status"]) {
           var url = input["data"];
           if (url) {
-            t.asc_processSavedFile(url, false);
+            t.asc_processSavedFile(url, isGetUrl);
           } else {
             t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
           }
@@ -825,7 +825,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   };
   spreadsheet_api.prototype.asc_processSavedFile = function(url, bInner) {
     if (bInner) {
-      this.handlers.trigger("asc_onSaveUrl", url, function(hasError) {
+      this.handlers.trigger("asc_onDownloadUrl", url, function(hasError) {
       });
     } else {
       getFile(url);

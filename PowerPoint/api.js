@@ -1508,13 +1508,13 @@ asc_docs_api.prototype.asc_Save = function () {
 };
 asc_docs_api.prototype.processSavedFile = function(url, bInner){
 	if(bInner)
-		editor.asc_fireCallback("asc_onSaveUrl", url, function(hasError){});
+		editor.asc_fireCallback("asc_onDownloadUrl", url, function(hasError){});
 	else
 	{
 		getFile(url);
 	}
 };
-asc_docs_api.prototype.asc_DownloadAs = function(typeFile){//передаем число соответствующее своему формату.
+asc_docs_api.prototype.asc_DownloadAs = function(typeFile, isGetUrl){//передаем число соответствующее своему формату.
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
 	var t = this;
 	_downloadAs(this, typeFile, function(input){
@@ -1522,7 +1522,7 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile){//передаем ч
 			if('ok' == input["status"]){
 				var url = input["data"];
 				if(url) {
-					t.processSavedFile(url, false);
+					t.processSavedFile(url, isGetUrl);
 				} else {
 					t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 				}
