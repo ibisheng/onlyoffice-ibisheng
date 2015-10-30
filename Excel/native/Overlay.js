@@ -778,6 +778,18 @@ CAutoshapeTrack.prototype =
         this.Native["PD_EndClipPath"]();
     },
 
+    // NOTE! добавлять в CommonController в метод  - drawSelect: function(pageIndex, drawingDocument)
+
+    BeginDrawTracking: function()
+    {
+        this.Native["BeginDrawTracking"]();
+    },
+
+    EndDrawTracking: function()
+    {
+        this.Native["EndDrawTracking"]();
+    },
+
     /*************************************************************************/
     /******************************** TRACKS *********************************/
     /*************************************************************************/

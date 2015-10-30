@@ -3212,7 +3212,17 @@ function OfflineEditor () {
             this.col0 = ws.topLeftFrozenCell.getCol0();
         }
 
-       // _api.asc_getTextArtPreviews();
+
+//        ws.topLeftFrozenCel = null;
+//        ws.topLeftFrozenCell = ws.model.sheetViews[0].pane = null;
+//        ws.visibleRange.c1 = 0;
+//        ws.visibleRange.r1 = 0;
+//        ws.visibleRange.r2 = 0;
+//        ws.visibleRange.c2 = 0;
+//
+//        ws.objectRender.drawingArea.init();
+
+        // _api.asc_getTextArtPreviews();
     };
     this.registerEventsHandlers = function () {
 
@@ -3894,6 +3904,7 @@ function offline_mouse_down(x, y, pin, isViewer) {
         var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
         wb._onGraphicObjectMouseDown(e, x, y);
         wb._onUpdateSelectionShape(true);
+
         _s.isShapeAction = true;
         ws.visibleRange = range;
         return {id:graphicsInfo.id};
@@ -3948,6 +3959,7 @@ function offline_mouse_up(x, y, isViewer) {
     if (_s.isShapeAction) {
         var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
         wb._onGraphicObjectMouseUp(e, x, y);
+        wb._onChangeSelectionDone(x, y);
         _s.isShapeAction = false;
     } else {
         wb._onChangeSelectionDone(-1, -1);
@@ -4139,6 +4151,16 @@ function offline_get_graphics_object(x, y) {
     var drawingInfo = ws.objectRender.checkCursorDrawingObject(x, y);
     if (drawingInfo) {
         return drawingInfo.id;
+    }
+
+    return null;
+}
+function offline_get_selected_object() {
+    var ws = _api.wb.getWorksheet();
+    var selectedImages = ws.objectRender.getSelectedGraphicObjects();
+    if(selectedImages && selectedImages.length)
+    {
+        return selectedImages[0].Get_Id();
     }
 
     return null;

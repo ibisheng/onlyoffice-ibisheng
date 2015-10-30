@@ -3845,6 +3845,16 @@ function CDrawingDocument(drawingObjects)
 //        this.m_oWordControl.OnScroll();
     }
 
+    this.BeginDrawTracking = function()
+    {
+        this.AutoShapesTrack.BeginDrawTracking();
+    },
+
+    this.EndDrawTracking = function()
+    {
+        this.AutoShapesTrack.EndDrawTracking();
+    },
+
     // вот здесь весь трекинг
     this.DrawTrack = function(type, matrix, left, top, width, height, isLine, canRotate, isNoMove)
     {
