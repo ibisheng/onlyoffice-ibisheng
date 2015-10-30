@@ -200,7 +200,7 @@ CWrapPolygon.prototype =
         if(bMathWrap === true)
         {
             nWrapType = WRAPPING_TYPE_SQUARE;
-            nWrapSide = WRAP_TEXT_SIDE_BOTH_SIDES
+            nWrapSide = this.wrapSide;
         }
         else
         {
