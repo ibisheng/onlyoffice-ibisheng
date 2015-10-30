@@ -1514,7 +1514,7 @@ asc_docs_api.prototype.processSavedFile = function(url, bInner){
 		getFile(url);
 	}
 };
-asc_docs_api.prototype.asc_DownloadAs = function(typeFile, isGetUrl){//передаем число соответствующее своему формату.
+asc_docs_api.prototype.asc_DownloadAs = function(typeFile, bIsDownload){//передаем число соответствующее своему формату.
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
 	var t = this;
 	_downloadAs(this, typeFile, function(input){
@@ -1522,7 +1522,7 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile, isGetUrl){//пере�
 			if('ok' == input["status"]){
 				var url = input["data"];
 				if(url) {
-					t.processSavedFile(url, isGetUrl);
+					t.processSavedFile(url, bIsDownload);
 				} else {
 					t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 				}
