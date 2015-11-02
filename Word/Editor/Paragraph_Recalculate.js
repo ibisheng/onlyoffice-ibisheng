@@ -527,7 +527,6 @@ Paragraph.prototype.private_RecalculatePage            = function(CurPage, bFirs
             PRS.Reset_Ranges();
             PRS.Reset_PageBreak();
             PRS.Reset_RunRecalcInfo();
-            PRS.Reset_MathRecalcInfo();
         }
         else if (recalcresult_PrevLine === RecalcResult)
         {
@@ -2229,7 +2228,6 @@ function CParagraphRecalculateStateWrap(Para)
     this.bBoxOperator        = false;
     this.bMathWrap           = false;
     this.bBreakPosInLWord    = true; // обновляем LineBreakPos (Set_LineBreakPos) для WordLarge. Не обновляем для инлайновой формулы, перед формулой есть еще текст, чтобы не перебить LineBreakPos и выставить по тем меткам, которые были до формулы разбиение
-    this.bContinueMathRecalc = false;
 }
 
 CParagraphRecalculateStateWrap.prototype =
@@ -2360,10 +2358,7 @@ CParagraphRecalculateStateWrap.prototype =
     {
         this.RunRecalcInfoBreak = this.RunRecalcInfoLast;
     },
-    Reset_MathRecalcInfo: function()
-    {
-        this.bContinueMathRecalc = false;
-    },
+
     Restore_RunRecalcInfo : function()
     {
         this.RunRecalcInfoLast = this.RunRecalcInfoBreak;

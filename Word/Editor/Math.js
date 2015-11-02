@@ -264,7 +264,7 @@ CParaMathLineWidths.prototype.UpdateWidth = function(Line, W)
         bUpdMaxWidth = Math.abs(Max - this.MaxW) > 0.0001;
     }
 
-    return Line !== 0 && bUpdMaxWidth; // проверка на первую строку необходима для того, чтобы не вытставить  PRS.bContinueMathRecalc = true
+    return bUpdMaxWidth;
 };
 CParaMathLineWidths.prototype.SetWordLarge = function(Line, bWordLarge)
 {
@@ -1210,7 +1210,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var PrevLineObject = PRS.RestartPageRecalcInfo.Object;
     var PrevObject = PrevLineObject == null || this.Id == PrevLineObject.Id ? null : PrevLineObject;
 
-    if(PrevLineObject == null && true == bStartRange && PRS.bFastRecalculate == false && PRS.bContinueMathRecalc == false)
+    if(PrevLineObject == null && true == bStartRange && PRS.bFastRecalculate == false)
     {
         // информация о пересчете
         var RPI = new CRPI();
@@ -1239,7 +1239,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         // или же произошли какие-то изменения на странице и вызвался пересчет для этой страницы (PrevLineObject == null) и отсутствует быстрый пересчет (PRS.bFastRecalculate == false)
 
         var bResetNextPage = true == this.PageInfo.IsResetNextPage(Page);
-        var bResetPageInfo = PrevLineObject == null && PRS.bFastRecalculate == false && PRS.bContinueMathRecalc == false && true == this.PageInfo.IsFirstLineOnPage(ParaLine, Page);
+        var bResetPageInfo = PrevLineObject == null && PRS.bFastRecalculate == false && true == this.PageInfo.IsFirstLineOnPage(ParaLine, Page);
 
         if(bResetNextPage == true || bResetPageInfo == true)
         {
@@ -1275,8 +1275,8 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.PageInfo.UpdateCurrentPage(Page, ParaLine);
 
         var bRecalcNormal = true;
-        var bOneLineMath = PRS.bContinueMathRecalc == true && true == bStartRange && PrevLineObject == null; // пересчет заново не нужен, т.к. продолжаем пересчитывать (PRS.bContinueMathRecalc == true)
-        if(this.ParaMathRPI.bInline == false &&  PRS.bFastRecalculate == false && bOneLineMath == false)
+
+        if(this.ParaMathRPI.bInline == false &&  PRS.bFastRecalculate == false)
         {
             var UpdWrap = this.private_UpdateWrapSettings(PRS, ParaPr);
 
@@ -1326,11 +1326,6 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
             this.ParaMathRPI.ClearRecalculate();
         }
-    }
-
-    if(PRS.RecalcResult == recalcresult_PrevLine) // неинлайновая формула не пересчитана
-    {
-        PRS.bContinueMathRecalc = true;
     }
 
     if(PRS.NewRange == false)
@@ -1702,6 +1697,7 @@ ParaMath.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cu
 
     var RootAscent  = this.Root.GetAscent(_CurLine, _CurRange),
         RootDescent = this.Root.GetDescent(_CurLine, _CurRange);
+
 
     if(PRS.LineAscent < RootAscent)
         PRS.LineAscent = RootAscent;
@@ -2692,6 +2688,28 @@ ParaMath.prototype.Split = function (ContentPos, Depth)
     NewParaMath.Jc = this.Jc;
 
     this.Root.SplitContent(NewParaMath.Root, ContentPos, Depth);
+
+    //var Pos = ContentPos.Get(Depth);
+
+    /*if(this.Root.Content[Pos].Type == para_Math_Run)
+    {
+
+
+        var NewRun = this.Root.Content[Pos].Split(ContentPos, Depth+1);
+        NewParaMath.Root.Add_ToContent(0, NewRun);
+
+        var len = this.Root.Content.length;
+
+        if(Pos < len - 1)
+        {
+            NewParaMath.Root.Concat_ToContent( this.Root.Content.slice(Pos + 1) );
+            this.Root.Remove_FromContent(Pos+1, len - Pos - 1);
+        }
+
+        this.SetNeedResize();
+        NewParaMath.SetNeedResize();
+
+    }*/
 
     return NewParaMath;
 };
