@@ -2008,6 +2008,7 @@
             }
 
             ws._isLockedDefNames(editDefinedNamesCallback, defNameId);
+            ws._isLockedAll();
 
         };
 
