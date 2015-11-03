@@ -50,7 +50,7 @@ function CheckUserInLicense(customerId, userId, userFirstName, userLastName, oLi
       var userName = (null == userFirstName ? '' : userFirstName) + (null == userLastName ? '' : userLastName);
       var sUserHash = CryptoJS.SHA256(userId + userName).toString(CryptoJS.enc.Hex).toLowerCase();
       if ((customerId === oLicense['customer_id'] && oLicense['users'].hasOwnProperty(sUserHash)) || (superuser === oLicense['customer_id'] && oLicense['users'].hasOwnProperty(sUserHash = superuser))) {
-        var endDate = new Date(oLicense['users'][sUserHash]['end_date']);
+        var endDate = new Date(oLicense['end_date']);
         res = endDate >= new Date();
       }
     }
