@@ -2060,7 +2060,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   };
 
   spreadsheet_api.prototype._onUpdateDefinedNames = function(lockElem) {
-      if( lockElem.Element["subType"] == c_oAscLockTypeElemSubType.DefinedNames ){
+//      if( lockElem.Element["subType"] == c_oAscLockTypeElemSubType.DefinedNames ){
+      if( lockElem.Element["sheetId"] == -1 && lockElem.Element["rangeOrObjectId"] != -1 ){
           var dN = this.wbModel.dependencyFormulas.defNameList[lockElem.Element["rangeOrObjectId"]];
           if (dN) {
               dN.isLock = lockElem["UserId"];

@@ -9051,7 +9051,7 @@
 				return;
 			}
 			var sheetId = this.model.getId();
-			var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, c_oAscLockTypeElemSubType.DefinedNames, -1, defNameId);
+			var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null/*c_oAscLockTypeElemSubType.DefinedNames*/, -1, defNameId);
 
 			if (false === this.collaborativeEditing.getCollaborativeEditing()) {
 				// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
@@ -10701,6 +10701,11 @@
 			// Проверка глобального лока
 			if (this.collaborativeEditing.getGlobalLock())
 				return;
+
+            if(!this.handlers.trigger("getLockDefNameManagerStatus")){
+                this.handlers.trigger("onErrorEvent",c_oAscError.ID.LockCreateDefName,c_oAscError.Level.NoCritical);
+                return;
+            }
 			
 			var t = this;
 			var ar = t.activeRange.clone(true);

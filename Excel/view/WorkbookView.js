@@ -1989,18 +1989,18 @@
                 return;
 
             var ws = this.getWorksheet(),
-                t = this,
-                selectNameChange = function(){
-                    t._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
-                };
+                t = this;
 
             var editDefinedNamesCallback = function (res) {
                 if (res) {
                     t.model.editDefinesNames(oldName, newName);
                     t.handlers.trigger("asc_onEditDefName", oldName, newName);
                     t.handlers.trigger("asc_onRefreshDefNameList");
-                    selectNameChange();
                 }
+                else{
+                    t.handlers.trigger("asc_onError",c_oAscError.ID.LockCreateDefName,c_oAscError.Level.NoCritical);
+                }
+                t._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
             };
             var defNameId;
             if( oldName ){
@@ -2008,7 +2008,6 @@
             }
 
             ws._isLockedDefNames(editDefinedNamesCallback, defNameId);
-            ws._isLockedAll();
 
         };
 
@@ -2026,8 +2025,11 @@
                     if (res) {
                         t.handlers.trigger("asc_onDelDefName", t.model.delDefinesNames(oldName));
                         t.handlers.trigger("asc_onRefreshDefNameList");
-                        t._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
                     }
+                    else{
+                        t.handlers.trigger("asc_onError",c_oAscError.ID.LockCreateDefName,c_oAscError.Level.NoCritical);
+                    }
+                    t._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
                 };
                 var defNameId = t.model.getDefinedName(oldName).nodeId;
 
