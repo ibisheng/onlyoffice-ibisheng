@@ -683,8 +683,11 @@
 
     DrawingContext.prototype.updateTransforms = function() {
         this._calcMFT();
-        this.fmgrGraphics[1].SetTextMatrix(
-            this._mt.sx, this._mt.shy, this._mt.shx, this._mt.sy, this._mt.tx, this._mt.ty);
+
+        //this.fmgrGraphics[1].SetTextMatrix(
+        //    this._mt.sx, this._mt.shy, this._mt.shx, this._mt.sy, this._mt.tx, this._mt.ty);
+
+        this.nctx["PD_transform"](this._mt.sx, this._mt.shy, this._mt.shx, this._mt.sy, this._mt.tx, this._mt.ty);
     };
 
     DrawingContext.prototype.resetTransforms = function(){
@@ -879,8 +882,11 @@
 
             r = true;
 
-            this.fmgrGraphics[1].SetTextMatrix(
-                this._mt.sx, this._mt.shy, this._mt.shx, this._mt.sy, this._mt.tx, this._mt.ty);
+            //this.fmgrGraphics[1].SetTextMatrix(
+            //    this._mt.sx, this._mt.shy, this._mt.shx, this._mt.sy, this._mt.tx, this._mt.ty);
+
+            this.nctx["PD_transform"](this._mt.sx, this._mt.shy, this._mt.shx, this._mt.sy, this._mt.tx, this._mt.ty);
+
         } else {
 
             _fontinfo = g_fontApplication.GetFontInfo(this.font.FontFamily.Name, fontStyle, this.LastFontOriginInfo);
