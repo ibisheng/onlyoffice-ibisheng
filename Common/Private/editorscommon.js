@@ -49,7 +49,13 @@ function CheckUserInLicense(customerId, userId, userFirstName, userLastName, oLi
     if (oLicense['users']) {
       var userName = (null == userFirstName ? '' : userFirstName) + (null == userLastName ? '' : userLastName);
       var sUserHash = CryptoJS.SHA256(userId + userName).toString(CryptoJS.enc.Hex).toLowerCase();
-      if ((customerId === oLicense['customer_id'] && oLicense['users'].hasOwnProperty(sUserHash)) || (superuser === oLicense['customer_id'] && oLicense['users'].hasOwnProperty(sUserHash = superuser))) {
+      var checkUserHash = false;
+      var version = parseFloat(oLicense['version']);
+      if (customerId === oLicense['customer_id'] || oLicense['customer_id'] === (sUserHash = superuser)) {
+        // users для новой версии - массив
+        checkUserHash = (1.4 < version) ? (-1 !== oLicense['users'].indexOf(sUserHash)) : oLicense['users'].hasOwnProperty(sUserHash);
+      }
+      if (checkUserHash) {
         var endDate = new Date(oLicense['end_date']);
         res = endDate >= new Date();
       }
