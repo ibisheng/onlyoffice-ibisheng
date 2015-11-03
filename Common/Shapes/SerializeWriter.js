@@ -1888,6 +1888,7 @@ function CBinaryFileWriter()
 
         oThis._WriteString1(0, url);
         oThis._WriteString2(2, action);
+        oThis._WriteString2(4, hlink.tooltip);
 
         oThis.WriteUChar(g_nodeAttributeEnd);
     }
@@ -2508,7 +2509,7 @@ function CBinaryFileWriter()
                 }
                 case para_Hyperlink:
                 {
-                    var _hObj = { Value : _elem.Value };
+                    var _hObj = { Value : _elem.Value, tooltip: _elem.Get_ToolTip()};
                     var _content_len_h = _elem.Content.length;
 
                     for (var hi = 0; hi < _content_len_h; hi++)

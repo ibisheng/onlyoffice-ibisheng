@@ -6202,7 +6202,7 @@ function BinaryPPTYLoader()
                 }
                 case 4:
                 {
-                    var tooltip = s.GetString2();
+                    hyper.tooltip = s.GetString2();
                     break;
                 }
                 case 5:
@@ -7305,6 +7305,9 @@ function BinaryPPTYLoader()
                                     {
                                         hyperlink = new ParaHyperlink();
                                         hyperlink.Set_Value(_run.hlink.url);
+                                        if (_run.hlink.tooltip) {
+                                          hyperlink.Set_ToolTip(_run.hlink.tooltip);
+                                        }
                                         if(!_run.Unifill)
                                         {
                                             _run.Unifill = CreateUniFillSchemeColorWidthTint(11, 0);
@@ -7440,6 +7443,9 @@ function BinaryPPTYLoader()
                                     {
                                         hyperlink = new ParaHyperlink();
                                         hyperlink.Set_Value(_run.hlink.url);
+                                        if (_run.hlink.tooltip) {
+                                          hyperlink.Set_ToolTip(_run.hlink.tooltip);
+                                        }
                                     }
                                     var text_pr = new CTextPr();
                                     if(_run.Unifill && !_run.Unifill.fill)

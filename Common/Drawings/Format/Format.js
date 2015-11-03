@@ -10164,6 +10164,7 @@ function CHyperlink()
 {
     this.url = "";
     this.action = "";
+    this.tooltip = null;
 }
 
 CHyperlink.prototype =
