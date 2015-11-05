@@ -5024,6 +5024,40 @@ function offline_apply_event(type,params) {
             break;
         }
 
+        case 2410: // ASC_SPREADSHEETS_EVENT_TYPE_GET_FORMULAS
+        {
+            if (undefined !== params) {
+                var localizeData = JSON.parse(params);
+                _api.asc_setLocalization(localizeData);
+            }
+
+            _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+
+            var info = _api.asc_getFormulasInfo();
+            if (info) {
+                _stream["WriteLong"](info.length);
+
+                for (var i = 0; i < info.length; ++i) {
+                    _stream["WriteString2"](info[i].asc_getGroupName());
+
+                    var ascFunctions = info[i].asc_getFormulasArray();
+                    _stream["WriteLong"](ascFunctions.length);
+
+                    for (var j = 0; j < ascFunctions.length; ++j) {
+                        _stream["WriteString2"](ascFunctions[j].asc_getName());
+                        _stream["WriteString2"]( ascFunctions[j].asc_getArguments());
+                    }
+                }
+            } else {
+                _stream["WriteLong"](0);
+            }
+
+            _return = _stream;
+
+            break;
+        }
+
         default:
             break;
     }
