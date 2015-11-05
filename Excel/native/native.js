@@ -3306,7 +3306,7 @@ function OfflineEditor () {
         var range = worksheet.activeRange.intersection(worksheet.visibleRange);
 
         if (autocorrection) {
-            this._resizeWorkRegion(worksheet, worksheet.activeRange.c2 + 1, worksheet.activeRange.r2 + 1);
+            this._resizeWorkRegion(worksheet, worksheet.activeRange.c2, worksheet.activeRange.r2);
             region = {columnBeg:0, columnEnd:worksheet.cols.length - 1,columnOff:0, rowBeg:0, rowEnd:worksheet.rows.length - 1, rowOff:0};
         } else {
             region = this._updateRegion(worksheet, x, y, width, height);
