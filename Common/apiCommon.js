@@ -137,7 +137,8 @@
 		 * Export
 		 * -----------------------------------------------------------------------------
 		 */
-		window["CColor"] = CColor;
+		window["CColor"] = window.CColor = CColor;
+		window.CColor;
 		
 		prot = CColor.prototype;
 		prot["getR"]	= prot.getR;
