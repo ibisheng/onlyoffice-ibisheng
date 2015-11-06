@@ -2,7 +2,6 @@
 
 var g_sLicenseDefaultUrl = "/license";
 var g_sPublicRSAKey = '-----BEGIN CERTIFICATE-----MIIBvTCCASYCCQD55fNzc0WF7TANBgkqhkiG9w0BAQUFADAjMQswCQYDVQQGEwJKUDEUMBIGA1UEChMLMDAtVEVTVC1SU0EwHhcNMTAwNTI4MDIwODUxWhcNMjAwNTI1MDIwODUxWjAjMQswCQYDVQQGEwJKUDEUMBIGA1UEChMLMDAtVEVTVC1SU0EwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBANGEYXtfgDRlWUSDn3haY4NVVQiKI9CzThoua9+DxJuiseyzmBBe7Roh1RPqdvmtOHmEPbJ+kXZYhbozzPRbFGHCJyBfCLzQfVos9/qUQ88u83b0SFA2MGmQWQAlRtLy66EkR4rDRwTj2DzR4EEXgEKpIvo8VBs/3+sHLF3ESgAhAgMBAAEwDQYJKoZIhvcNAQEFBQADgYEAEZ6mXFFq3AzfaqWHmCy1ARjlauYAa8ZmUFnLm0emg9dkVBJ63aEqARhtok6bDQDzSJxiLpCEF6G4b/Nv/M/MLyhP+OoOTmETMegAVQMq71choVJyOFE5BtQa6M/lCHEOya5QUfoRF2HF9EjRF44K3OK+u3ivTSj3zwjtpudY5Xo=-----END CERTIFICATE-----';
-var g_sAESKey = '7f3d2338390c1e3e154c21005f51010e065b0f1a1e101600202473150c022a11';
 
 function CheckLicense(licenseUrl, customerId, userId, userFirstName, userLastName, callback) {
   licenseUrl = licenseUrl ? licenseUrl : g_sLicenseDefaultUrl;
@@ -13,13 +12,14 @@ function CheckLicense(licenseUrl, customerId, userId, userFirstName, userLastNam
     }
 
     try {
-      var base64TextData = String.fromCharCode.apply(null, new Uint8Array(data));
-      var decrypted = CryptoJS.AES.decrypt({
-        ciphertext: CryptoJS.enc.Base64.parse(base64TextData),
-        salt: ""
-      }, CryptoJS.enc.Hex.parse(g_sAESKey), {iv: CryptoJS.enc.Hex.parse(g_sAESKey.slice(0, g_sAESKey.length / 2))});
-      var sJson = decrypted.toString(CryptoJS.enc.Utf8);
-      var oLicense = JSON.parse(sJson);
+      var tmpSize;
+      var maxSize = 0x4000;
+      var sTextData = '';
+      for (var i = 0; i < data.byteLength; i += maxSize) {
+        tmpSize = data.byteLength - i;
+        sTextData += String.fromCharCode.apply(null, new Uint8Array(data, i, (tmpSize < maxSize) ? tmpSize : maxSize));
+      }
+      var oLicense = JSON.parse(sTextData);
 
       var hSig = oLicense['signature'];
       delete oLicense['signature'];
@@ -50,10 +50,9 @@ function CheckUserInLicense(customerId, userId, userFirstName, userLastName, oLi
       var userName = (null == userFirstName ? '' : userFirstName) + (null == userLastName ? '' : userLastName);
       var sUserHash = CryptoJS.SHA256(userId + userName).toString(CryptoJS.enc.Hex).toLowerCase();
       var checkUserHash = false;
-      var version = parseFloat(oLicense['version']);
       if (customerId === oLicense['customer_id'] || oLicense['customer_id'] === (sUserHash = superuser)) {
         // users для новой версии - массив
-        checkUserHash = (1.4 < version) ? (-1 !== oLicense['users'].indexOf(sUserHash)) : oLicense['users'].hasOwnProperty(sUserHash);
+        checkUserHash = (-1 !== oLicense['users'].indexOf(sUserHash));
       }
       if (checkUserHash) {
         var endDate = new Date(oLicense['end_date']);
