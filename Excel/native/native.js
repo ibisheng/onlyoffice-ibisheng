@@ -838,7 +838,7 @@ CStylesPainter.prototype = {
             _count_doc = this.docStyles.length;
 
         var aPriorityStyles = [];
-        var fAddToPriorityStyles = function(style){
+        var fAddToPriorityStyles = function(style) {
             var index = style.Style.uiPriority;
             if(null == index)
                 index = 0;
@@ -910,7 +910,6 @@ CStylesPainter.prototype = {
             }
         }
     },
-
     GenerateDocumentStyles: function(_api, _graphics)
     {
         if (_api.WordControl.m_oLogicDocument == null)
@@ -967,7 +966,6 @@ CStylesPainter.prototype = {
             }
         }
     },
-
     drawStyle: function(graphics, style, _api)
     {
         var _w_px = this.STYLE_THUMBNAIL_WIDTH;
@@ -1101,7 +1099,7 @@ CStylesPainter.prototype = {
         _api.WordControl.m_oDrawingDocument.Native["DD_EndNativeDraw"](_stream);
         graphics.ClearParams();
     }
-}
+};
 
 window["use_native_fonts_only"] = true;
 
@@ -3146,6 +3144,21 @@ function asc_WriteCCelInfo(c, s) {
 
     s['WriteByte'](255);
 }
+function asc_WriteColorSchemes(schemas, s) {
+
+    s["WriteLong"](schemas.length);
+
+    for (var i = 0; i < schemas.length; ++i) {
+        s["WriteString2"](schemas[i].get_name());
+
+        var colors = schemas[i].get_colors();
+        s["WriteLong"](colors.length);
+
+        for (var j = 0; j < colors.length; ++j) {
+            asc_menu_WriteColor(0, colors[j], s);
+        }
+    }
+}
 
 //--------------------------------------------------------------------------------
 // defines
@@ -3175,7 +3188,7 @@ function OfflineEditor () {
 
     // main
 
-    this.openFile = function () {
+    this.openFile = function (isViewer) {
         window["CreateMainTextMeasurerWrapper"]();
 
         deviceScale = window.native["GetDeviceScale"]();
@@ -3194,11 +3207,16 @@ function OfflineEditor () {
         docInfo.put_ChartEditor(true);
         docInfo.put_UserInfo(userInfo);
 
+        this.registerEventsHandlers();
+
         _api.asc_setDocInfo(docInfo);
         _api.asc_nativeOpenFile(window.native["GetFileString"]());
 
-        this.registerEventsHandlers();
         this.asc_WriteAllWorksheets(true);
+
+        _api.asc_SendThemeColorScheme();
+
+        //this.offline_generateStyle();
 
         window["NativeSupportTimeouts"] = true;
 
@@ -3212,6 +3230,7 @@ function OfflineEditor () {
             this.col0 = ws.topLeftFrozenCell.getCol0();
         }
 
+        // TODO: сделать закрепленные области
 
 //        ws.topLeftFrozenCel = null;
 //        ws.topLeftFrozenCell = ws.model.sheetViews[0].pane = null;
@@ -3269,6 +3288,13 @@ function OfflineEditor () {
             stream["ClearNoAttack"]();
             asc_WriteCFont(-1, font, stream);
             window["native"]["OnCallMenuEvent"](2403, stream); // ASC_SPREADSHEETS_EVENT_TYPE_EDITOR_SELECTION_CHANGED
+        });
+        _api.asc_registerCallback('asc_onSendThemeColorSchemes', function(schemes) {
+
+            var stream = global_memory_stream_menu;
+            stream["ClearNoAttack"]();
+            asc_WriteColorSchemes(schemes, stream);
+            window["native"]["OnCallMenuEvent"](2404, stream); // ASC_SPREADSHEETS_EVENT_TYPE_COLOR_SCHEMES
         });
     };
     this.updateFrozen = function () {
@@ -3878,6 +3904,13 @@ function OfflineEditor () {
 
         return objectId;
     };
+
+    this.offline_generateStyle = function() {
+        // Отправка стилей ячеек
+        var guiStyles = _api.wb.getCellStyles();
+        //bResult = this.handlers.trigger("asc_onInitEditorStyles", guiStyles);
+        // this.guiStyles = (false === bResult) ? guiStyles : null;
+    }
 }
 var _s = new OfflineEditor();
 
@@ -5026,11 +5059,6 @@ function offline_apply_event(type,params) {
 
         case 2410: // ASC_SPREADSHEETS_EVENT_TYPE_GET_FORMULAS
         {
-            if (undefined !== params) {
-                var localizeData = JSON.parse(params);
-                _api.asc_setLocalization(localizeData);
-            }
-
             _stream = global_memory_stream_menu;
             _stream["ClearNoAttack"]();
 
@@ -5046,15 +5074,29 @@ function offline_apply_event(type,params) {
 
                     for (var j = 0; j < ascFunctions.length; ++j) {
                         _stream["WriteString2"](ascFunctions[j].asc_getName());
-                        _stream["WriteString2"]( ascFunctions[j].asc_getArguments());
+                        _stream["WriteString2"](ascFunctions[j].asc_getArguments());
                     }
                 }
             } else {
                 _stream["WriteLong"](0);
             }
 
+            if (undefined !== params) {
+                var localizeData = JSON.parse(params);
+                _api.asc_setLocalization(localizeData);
+            }
+
             _return = _stream;
 
+            break;
+        }
+
+        case 2415: // ASC_SPREADSHEETS_EVENT_TYPE_CHANGE_COLOR_SCHEME
+        {
+            if (undefined !== params) {
+                var indexScheme = parseInt(params);
+                _api.asc_ChangeColorScheme(indexScheme);
+            }
             break;
         }
 
