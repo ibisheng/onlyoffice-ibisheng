@@ -1597,10 +1597,13 @@ NumFormat.prototype =
 				}
                 else if(numFormat_Year == item.type)
                 {
-                    if(item.val == 2)
-                        oCurText.text += (oParsedNumber.date.year+'').substring(2);
-                    else if(item.val == 4)
-                        oCurText.text += oParsedNumber.date.year;
+                  if (item.val > 0) {
+                    if (item.val <= 2) {
+                      oCurText.text += (oParsedNumber.date.year+'').substring(2);
+                    } else {
+                      oCurText.text += oParsedNumber.date.year;
+                    }
+                  }
                 }
                 else if(numFormat_Month == item.type)
                 {
@@ -1615,16 +1618,16 @@ NumFormat.prototype =
                         else
                             oCurText.text += cultureInfo.AbbreviatedMonthNames[m];
                     }
-                    else if (item.val == 4) {
-                        if (this.bDay && cultureInfo.MonthGenitiveNames.length > 0)
-                            oCurText.text += cultureInfo.MonthGenitiveNames[m];
-                        else
-                            oCurText.text += cultureInfo.MonthNames[m];
-                    }
                     else if (item.val == 5) {
                         var sMonthName = cultureInfo.MonthNames[m];
                         if (sMonthName.length > 0)
                             oCurText.text += sMonthName[0];
+                    }
+                    else if (item.val > 0){
+                        if (this.bDay && cultureInfo.MonthGenitiveNames.length > 0)
+                            oCurText.text += cultureInfo.MonthGenitiveNames[m];
+                        else
+                            oCurText.text += cultureInfo.MonthNames[m];
                     }
                 }
                 else if(numFormat_Day == item.type)
@@ -1635,7 +1638,7 @@ NumFormat.prototype =
                         oCurText.text += this._ZeroPad(oParsedNumber.date.d);
                     else if(item.val == 3)
                         oCurText.text += cultureInfo.AbbreviatedDayNames[oParsedNumber.date.dayWeek];
-                    else if(item.val == 4)
+                    else if(item.val > 0)
                         oCurText.text += cultureInfo.DayNames[oParsedNumber.date.dayWeek];
                     
                 }
@@ -1649,7 +1652,7 @@ NumFormat.prototype =
 
                     if(item.val == 1)
                         oCurText.text += h;
-                    else if(item.val == 2)
+                    else if(item.val > 0)
                         oCurText.text += this._ZeroPad(h);
                 }
                 else if(numFormat_Minute == item.type)
@@ -1659,7 +1662,7 @@ NumFormat.prototype =
                         min = oParsedNumber.date.countDay*24*60 + oParsedNumber.date.hour*60 + oParsedNumber.date.min;
                     if(item.val == 1)
                         oCurText.text += min;
-                    else if(item.val == 2)
+                    else if(item.val > 0)
                         oCurText.text += this._ZeroPad(min);
                 }
                 else if(numFormat_Second == item.type)
@@ -1672,7 +1675,7 @@ NumFormat.prototype =
 
                     if(item.val == 1)
                         oCurText.text += s;
-                    else if(item.val == 2)
+                    else if(item.val > 0)
                         oCurText.text += this._ZeroPad(s);
                 }
                 else if (numFormat_AmPm == item.type) {
