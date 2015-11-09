@@ -580,7 +580,7 @@ var c_oAscServerError = {
 
 var c_oAscImageUploadProp = {//Не все браузеры позволяют получить информацию о файле до загрузки(например ie9), меняя параметры здесь надо поменять аналогичные параметры в web.common
     MaxFileSize:25000000, //25 mb
-    SupportedFormats:[ "jpg", "jpeg", "jpe", "png", "gif", "bmp", "ico"]
+    SupportedFormats:[ "jpg", "jpeg", "jpe", "png", "gif", "bmp"]
 };
 
 /**
