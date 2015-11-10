@@ -2064,7 +2064,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       if( lockElem.Element["sheetId"] == -1 && lockElem.Element["rangeOrObjectId"] != -1 ){
           var dN = this.wbModel.dependencyFormulas.defNameList[lockElem.Element["rangeOrObjectId"]];
           if (dN) {
-              dN.isLock = lockElem["UserId"];
+              dN.isLock = lockElem.UserId;
               this.handlers.trigger("asc_onRefreshDefNameList");
           }
           this.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.LockDefNameManager);
