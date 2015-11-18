@@ -3548,6 +3548,12 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 						aNum = Numbering.Get_AbstractNum(oNumPr.NumId);
 					if(null != aNum)
 					{
+						if (null != aNum.NumStyleLink) {
+							this.copyParams.oUsedStyleMap[aNum.NumStyleLink] = 1;
+						}
+						if (null != aNum.StyleLink) {
+							this.copyParams.oUsedStyleMap[aNum.StyleLink] = 1;
+						}
 						for(var i = 0, length = aNum.Lvl.length; i < length; ++i)
 						{
 							var oLvl = aNum.Lvl[i];
@@ -4658,6 +4664,8 @@ function BinaryFileReader(doc, openParams)
 		paraStyles: null,
 		tableStyles: null,
 		lvlStyles: null,
+		styleLinks: null,
+		numStyleLinks: null,
 		DefpPr: null,
 		DefrPr: null,
 		DocumentContent: null,
@@ -4833,6 +4841,8 @@ function BinaryFileReader(doc, openParams)
 		this.oReadResult.paraStyles = [];
 		this.oReadResult.tableStyles = [];
 		this.oReadResult.lvlStyles = [];
+		this.oReadResult.styleLinks = [];
+		this.oReadResult.numStyleLinks = [];
 		this.oReadResult.DocumentContent = [];
 		this.oReadResult.bLastRun = null;
 		this.oReadResult.aPostOpenStyleNumCallbacks = [];
@@ -5129,7 +5139,7 @@ function BinaryFileReader(doc, openParams)
                 stDefault.TableGrid = sNewStyleId;
 			oDocStyle.Add(oNewStyle);
 		}
-		var oStyleTypes = {par: 1, table: 2, lvl: 3, run: 4};
+		var oStyleTypes = {par: 1, table: 2, lvl: 3, run: 4, styleLink: 5, numStyleLink: 6};
 		var fParseStyle = function(aStyles, oDocumentStyles, nStyleType)
 		{
 			for(var i = 0, length = aStyles.length; i < length; ++i)
@@ -5144,6 +5154,10 @@ function BinaryFileReader(doc, openParams)
 						elem.pPr.PStyle = sStyleId;
 					else if(oStyleTypes.table == nStyleType)
 						elem.pPr.TableStyle = sStyleId;
+					else if(oStyleTypes.styleLink == nStyleType)
+						elem.pPr.StyleLink = sStyleId;
+					else if(oStyleTypes.numStyleLink == nStyleType)
+						elem.pPr.NumStyleLink = sStyleId;
 					else
 						elem.pPr.PStyle = sStyleId;
 				}
@@ -5153,6 +5167,8 @@ function BinaryFileReader(doc, openParams)
 		fParseStyle(this.oReadResult.paraStyles, styles, oStyleTypes.par);
 		fParseStyle(this.oReadResult.tableStyles, styles, oStyleTypes.table);
 		fParseStyle(this.oReadResult.lvlStyles, styles, oStyleTypes.lvl);
+		fParseStyle(this.oReadResult.styleLinks, styles, oStyleTypes.styleLink);
+		fParseStyle(this.oReadResult.numStyleLinks, styles, oStyleTypes.numStyleLink);
 		if(null == stDefault.Character)
         {
             var oNewStyle = new CStyle( "GenStyleDefChar", null, null, styletype_Character );
@@ -5321,7 +5337,7 @@ function BinaryFileReader(doc, openParams)
         }
         //обрабатываем стили
         var isAlreadyContainsStyle;
-        var oStyleTypes = { par: 1, table: 2, lvl: 3, run: 4};
+        var oStyleTypes = { par: 1, table: 2, lvl: 3, run: 4, styleLink: 5, numStyleLink: 6};
         var addNewStyles = false;
         var fParseStyle = function (aStyles, oDocumentStyles, oReadResult, nStyleType) {
             if (aStyles == undefined)
@@ -5343,6 +5359,10 @@ function BinaryFileReader(doc, openParams)
                                 elem.pPr.Set_TableStyle2(j);
 							else if (oStyleTypes.run == nStyleType)
 								elem.pPr.RStyle = j;
+                            else if(oStyleTypes.styleLink == nStyleType)
+                                elem.pPr.StyleLink = j;
+                            else if(oStyleTypes.numStyleLink == nStyleType)
+                                elem.pPr.NumStyleLink = j;
 							else
                                 elem.pPr.PStyle = j;
                             break;
@@ -5356,6 +5376,10 @@ function BinaryFileReader(doc, openParams)
                             elem.pPr.Set_TableStyle2(isEqualName);
 						else if (nStyleType == oStyleTypes.run)
 							elem.pPr.RStyle = isEqualName;
+                        else if(nStyleType == oStyleTypes.styleLink)
+                            elem.pPr.StyleLink = isEqualName;
+                        else if(nStyleType == oStyleTypes.numStyleLink)
+                            elem.pPr.NumStyleLink = isEqualName;
                     }
                     else if (!isAlreadyContainsStyle && isEqualName == null)//нужно добавить новый стиль
                     {
@@ -5368,6 +5392,10 @@ function BinaryFileReader(doc, openParams)
                             elem.pPr.Set_TableStyle2(nStyleId);
 						else if (nStyleType == oStyleTypes.run)
 							elem.pPr.RStyle = nStyleId;
+                        else if(nStyleType == oStyleTypes.styleLink)
+                            elem.pPr.StyleLink = nStyleId;
+                        else if(nStyleType == oStyleTypes.numStyleLink)
+                            elem.pPr.NumStyleLink = nStyleId;
 						
                         addNewStyles = true;
                     }
@@ -5379,6 +5407,8 @@ function BinaryFileReader(doc, openParams)
         fParseStyle(this.oReadResult.paraStyles, this.Document.Styles, this.oReadResult, oStyleTypes.par);
         fParseStyle(this.oReadResult.tableStyles, this.Document.Styles, this.oReadResult, oStyleTypes.table);
         fParseStyle(this.oReadResult.lvlStyles, this.Document.Styles, this.oReadResult, oStyleTypes.lvl);
+        fParseStyle(this.oReadResult.styleLinks, this.Document.Styles, this.oReadResult, oStyleTypes.styleLink);
+		fParseStyle(this.oReadResult.numStyleLinks, this.Document.Styles, this.oReadResult, oStyleTypes.numStyleLink);
         var aContent = this.oReadResult.DocumentContent;
         for (var i = 0, length = this.oReadResult.aPostOpenStyleNumCallbacks.length; i < length; ++i)
             this.oReadResult.aPostOpenStyleNumCallbacks[i].call();
@@ -7123,10 +7153,12 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
 				return oThis.ReadLevels(t, l, nLevelNum++, oNewNum);
             });
         }
-		else if ( c_oSerNumTypes.NumStyleLink === type )
-			oNewNum.NumStyleLink = this.stream.GetString2LE(length);
-		else if ( c_oSerNumTypes.StyleLink === type )
-			oNewNum.StyleLink = this.stream.GetString2LE(length);
+		else if ( c_oSerNumTypes.NumStyleLink === type ) {
+			this.oReadResult.numStyleLinks.push({pPr: oNewNum, style: this.stream.GetString2LE(length)});
+		}
+		else if ( c_oSerNumTypes.StyleLink === type ) {
+			this.oReadResult.styleLinks.push({pPr: oNewNum, style: this.stream.GetString2LE(length)});
+		}
         else if ( c_oSerNumTypes.AbstractNum_Id === type )
         {
 			this.m_oANumToNumClass[this.stream.GetULongLE()] = oNewNum;
