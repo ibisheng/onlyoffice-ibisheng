@@ -2151,7 +2151,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var OperGapLeft     = PRS.OperGapLeft;
 
     var bInsideOper         = PRS.bInsideOper;
-    var bFirstCompareOper   = PRS.bFirstCompareOper;
+    var bContainCompareOper = PRS.bContainCompareOper;
     var bEndRunToContent    = PRS.bEndRunToContent;
     var bNoOneBreakOperator = PRS.bNoOneBreakOperator;
     var BreakBox            = PRS.BreakBox;
@@ -2376,7 +2376,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     var bOperBefore = this.ParaMath.Is_BrkBinBefore() == true;
 
                     var bOperInEndContent = bOperBefore === false && bEndRunToContent === true && Pos == ContentLen - 1 && Word == true, // необходимо для того, чтобы у контентов мат объектов (к-ые могут разбиваться на строки) не было отметки Set_LineBreakPos, иначе скобка (или GapLeft), перед которой стоит break_Operator, перенесется на следующую строку (без текста !)
-                        bLowPriority      = bCompareOper == false  && bFirstCompareOper == false;
+                        bLowPriority      = bCompareOper == false && bContainCompareOper == false;
 
                     if(Pos == 0 && true === this.MathPrp.IsBreak()) // принудительный перенос
                     {
@@ -2425,11 +2425,12 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         var WorLenCompareOper = WordLen + X - XRange + (bOperBefore  ? SpaceLen : BrkLen);
 
                         var bOverXEnd;
+                        var bNotUpdBreakOper = false;
 
                         var bCompareWrapIndent = PRS.bFirstLine == true ? WorLenCompareOper > PRS.WrapIndent : true;
 
-                        if(PRS.bPriorityOper == true && bCompareOper == true && bFirstCompareOper == true && bCompareWrapIndent == true && !(Word == false && FirstItemOnLine === true)) // (Word == true && FirstItemOnLine == true) - не первый элемент в строке
-                            bFirstCompareOper = false;
+                        if(PRS.bPriorityOper == true && bCompareOper == true && bContainCompareOper == true && bCompareWrapIndent == true && !(Word == false && FirstItemOnLine === true)) // (Word == true && FirstItemOnLine == true) - не первый элемент в строке
+                            bContainCompareOper = false;
 
                         if(bOperBefore)  // оператор "до" => оператор находится в начале строки
                         {
@@ -2455,7 +2456,16 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                     X += SpaceLen + WordLen;
 
                                     if(PRS.bBreakPosInLWord == true)
+                                    {
                                         PRS.Set_LineBreakPos(Pos);
+
+                                    }
+                                    else
+                                    {
+                                        bNotUpdBreakOper = true;
+                                    }
+
+                                    RangeEndPos = Pos;
 
                                     SpaceLen = 0;
                                     WordLen = 0;
@@ -2516,6 +2526,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 if(bOverXEnd) // FirstItemOnLine == true
                                 {
                                     bMathWordLarge = true;
+
                                 }
 
                                 X += BrkLen + WordLen;
@@ -2524,8 +2535,17 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 SpaceLen = 0;
                                 WordLen = 0;
 
-                                if(PRS.bBreakPosInLWord == true)
-                                    PRS.Set_LineBreakPos(Pos+1); // LineBreakPos обновляем здесь, т.к. слово может начаться с мат объекта, а не с Run, в мат объекте нет соответствующей проверки
+                                var bNotUpdate = bOverXEnd == true && PRS.bBreakPosInLWord == false;
+
+                                // FirstItemOnLine == true
+                                if(bNotUpdate == false) // LineBreakPos обновляем здесь, т.к. слово может начаться с мат объекта, а не с Run, в мат объекте нет соответствующей проверки
+                                {
+                                    PRS.Set_LineBreakPos(Pos+1);
+                                }
+                                else
+                                {
+                                    bNotUpdBreakOper = true;
+                                }
 
                                 FirstItemOnLine = false;
 
@@ -2535,7 +2555,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         }
                     }
 
-                    bNoOneBreakOperator = false;
+                    if(bNotUpdBreakOper == false)
+                        bNoOneBreakOperator = false;
 
                     break;
                 }
@@ -2641,6 +2662,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                                 Word = false;
                                 SpaceLen = 0;
+
                                 WordLen = 0;
                             }
                         }
@@ -2805,6 +2827,10 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     {
                         NewRange = true;
                         EmptyLine = false;
+
+                        // здесь оставляем проверку, т.к. в случае, если после неинлайновой формулы нах-ся инлайновая необходимо в любом случае сделать перенос (проверка в private_RecalculateRange(), где выставляется PRS.ForceNewLine = true не пройдет)
+                        if (true === PRS.MathNotInline)
+                            PRS.ForceNewLine = true;
                     }
 
                     RangeEndPos = Pos + 1;
@@ -2872,7 +2898,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     PRS.XEnd            = XEnd;
 
     PRS.bInsideOper         = bInsideOper;
-    PRS.bFirstCompareOper   = bFirstCompareOper;
+    PRS.bContainCompareOper = bContainCompareOper;
     PRS.bEndRunToContent    = bEndRunToContent;
     PRS.bNoOneBreakOperator = bNoOneBreakOperator;
     PRS.BreakBox            = BreakBox;

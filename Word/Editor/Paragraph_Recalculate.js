@@ -508,7 +508,10 @@ Paragraph.prototype.private_RecalculatePage            = function(CurPage, bFirs
     PRS.Reset_PageBreak();
 
     if (false !== bFirstRecalculate)
+    {
         PRS.Reset_RestartPageRecalcInfo();
+        PRS.Reset_MathRecalcInfo();
+    }
 
     var RecalcResult;
     while (true)
@@ -527,6 +530,7 @@ Paragraph.prototype.private_RecalculatePage            = function(CurPage, bFirs
             PRS.Reset_Ranges();
             PRS.Reset_PageBreak();
             PRS.Reset_RunRecalcInfo();
+            PRS.Reset_MathRecalcInfo();
         }
         else if (recalcresult_PrevLine === RecalcResult)
         {
@@ -898,7 +902,7 @@ Paragraph.prototype.private_RecalculateLineRanges      = function(CurLine, CurPa
         PRS.Range = CurRange;
         this.private_RecalculateRange(CurRange, CurLine, CurPage, RangesCount, PRS, ParaPr);
 
-        if ( true === PRS.ForceNewPage || true === PRS.NewPage )
+        if ( true === PRS.ForceNewPage || true === PRS.NewPage || true === PRS.ForceNewLine )
         {
             // Поскольку мы выходим досрочно из цикла, нам надо удалить лишние отрезки обтекания
             this.Lines[CurLine].Ranges.length = CurRange + 1;
@@ -1227,12 +1231,22 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
 
 Paragraph.prototype.private_RecalculateLineCheckRanges = function(CurLine, CurPage, PRS, ParaPr)
 {
-    var Left    = ( false === PRS.UseFirstLine ? this.X + ParaPr.Ind.Left : this.X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine );
     var Right   = this.XLimit - ParaPr.Ind.Right;
     var Top     = PRS.LineTop;
     var Bottom  = PRS.LineBottom;
     var Top2    = PRS.LineTop2;
     var Bottom2 = PRS.LineBottom2;
+
+    var Left;
+
+    if(true === PRS.MathNotInline)
+    {
+        Left = this.X;
+    }
+    else
+    {
+        Left = ( false === PRS.UseFirstLine ? this.X + ParaPr.Ind.Left : this.X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine );
+    }
 
     var PageFields = this.Parent.Get_PageFields( this.PageNum + CurPage );
 
@@ -1240,7 +1254,7 @@ Paragraph.prototype.private_RecalculateLineCheckRanges = function(CurLine, CurPa
     var Ranges2;
 
     if ( true === this.Use_Wrap() )
-        Ranges2 = this.Parent.CheckRange(Left, Top, Right, Bottom, Top2, Bottom2, PageFields.X, PageFields.XLimit, this.PageNum + CurPage, true, PRS.bMathWrap);
+        Ranges2 = this.Parent.CheckRange(Left, Top, Right, Bottom, Top2, Bottom2, PageFields.X, PageFields.XLimit, this.PageNum + CurPage, true, PRS.MathNotInline);
     else
         Ranges2 = [];
 
@@ -1301,7 +1315,21 @@ Paragraph.prototype.private_RecalculateLineCheckRangeY = function(CurLine, CurPa
 
     // Если строка пустая в следствии того, что у нас было обтекание, тогда мы не добавляем новую строку,
     // а просто текущую смещаем ниже.
-    if (true !== PRS.End && true === PRS.EmptyLine && PRS.RangesCount > 0)
+
+
+    if(true === PRS.EmptyLine && true === PRS.bMathRangeY) // нужный PRS.Y выставляется в ParaMath
+    {
+        PRS.bMathRangeY = false;
+        // Отмечаем, что данная строка переносится по Y из-за обтекания
+        PRS.RangeY = true;
+
+        // Пересчитываем заново данную строку
+        PRS.Reset_Ranges();
+        PRS.RecalcResult = recalcresult_CurLine;
+
+        return false;
+    }
+    else if (true !== PRS.End && true === PRS.EmptyLine && PRS.RangesCount > 0)
     {
         // Найдем верхнюю точку объектов обтекания (т.е. так чтобы при новом обсчете не учитывался только
         // этот объект, заканчивающийся выше всех)
@@ -1683,6 +1711,14 @@ Paragraph.prototype.private_RecalculateRange           = function(CurRange, CurL
 
         if ( para_Math === Item.Type )
         {
+            var NotInlineMath = this.Check_MathPara(Pos);
+            if (true === NotInlineMath && true !== PRS.EmptyLine)
+            {
+                PRS.ForceNewLine = true;
+                PRS.NewRange = true;
+                Pos--;
+                break;
+            }
             // TODO: Надо бы перенести эту проверку на изменение контента параграфа
             Item.Set_Inline(true === this.Check_MathPara(Pos)? false : true);
         }
@@ -2210,24 +2246,28 @@ function CParagraphRecalculateStateWrap(Para)
     this.bEndRunToContent    = false;
     this.PosEndRun           = new CParagraphContentPos();
 
-    this.WrapIndent          = 0; // WrapIndent нужен для сравнения с длиной слова (когда слово разбивается по Compare Oper): ширина первой строки формулы не должна быть меньше WrapIndent
-    this.bFirstCompareOper   = true;
-    this.bFirstLine          = false;
-    this.MathFirstItem       = true; // параметр необходим для принудительного переноса
-    this.bPriorityOper       = true;
-
+    // параметры, необходимые для расчета разбиения по операторам
     // у "крайних" в строке операторов/мат объектов сооответствующий Gap равен нулю
     this.OperGapRight        = 0;
     this.OperGapLeft         = 0;
-    this.MaxWordLen          = 0;
+    this.bPriorityOper       = true;  // есть ли в контенте операторы с высоким приоритетом разбиения
+    this.WrapIndent          = 0;     // WrapIndent нужен для сравнения с длиной слова (когда слово разбивается по Compare Oper): ширина первой строки формулы не должна быть меньше WrapIndent
+    this.bContainCompareOper = true;  // содержаться ли в текущем контенте операторы с высоким приоритетом
+    this.MathFirstItem       = true;  // параметр необходим для принудительного переноса
+    this.bFirstLine          = false;
+
     this.bNoOneBreakOperator = true;  // прежде чем обновлять позицию в контент Run, учтем были ли до этого break-операторы (проверки на Word == false не достаточно, т.к. формула мб инлайновая и тогда не нужно обновлять позицию)
     this.BreakBox            = false;
     this.bInsideOper         = false; // учитываем есть ли разбивка внутри мат объекта, чтобы случайно не вставить в конец пред оператора (при Brk_Before == false)
     this.bOnlyForcedBreak    = false; // учитывается, если возможна разбивка только по операторам выше уровням => в этом случае можно сделать принудительный разрыв во внутреннем контенте
-    this.bFastRecalculate    = false;
     this.bBoxOperator        = false;
-    this.bMathWrap           = false;
+
+    //-----------------------------//
+    this.bFastRecalculate    = false;
     this.bBreakPosInLWord    = true; // обновляем LineBreakPos (Set_LineBreakPos) для WordLarge. Не обновляем для инлайновой формулы, перед формулой есть еще текст, чтобы не перебить LineBreakPos и выставить по тем меткам, которые были до формулы разбиение
+    this.bContinueRecalc     = false;
+    this.bMathRangeY         = false; // используется для переноса формулы под картинку
+    this.MathNotInline       = null;
 }
 
 CParagraphRecalculateStateWrap.prototype =
@@ -2250,6 +2290,7 @@ CParagraphRecalculateStateWrap.prototype =
 
         this.NewPage             = false;
         this.ForceNewPage        = false;
+        this.ForceNewLine        = false;
 
         this.bMath_OneLine       = false;
         this.bMathWordLarge      = false;
@@ -2260,7 +2301,7 @@ CParagraphRecalculateStateWrap.prototype =
         this.OperGapLeft         = 0;
         this.WrapIndent          = 0;
         this.MathFirstItem       = true;
-        this.bFirstCompareOper   = true;
+        this.bContainCompareOper = true;
         this.bInsideOper         = false;
         this.bOnlyForcedBreak    = false;
         this.bNoOneBreakOperator = true;
@@ -2268,6 +2309,8 @@ CParagraphRecalculateStateWrap.prototype =
         this.bBoxOperator        = false;
         this.BreakBox            = false;
         this.bBreakPosInLWord    = true;
+
+        this.MathNotInline      = null;
     },
 
     // Обнуляем некоторые параметры перед новым отрезком
@@ -2295,16 +2338,16 @@ CParagraphRecalculateStateWrap.prototype =
         this.bEndRunToContent = false;
         this.PosEndRun        = new CParagraphContentPos();
 
-        this.OperGapRight       = 0;
-        this.OperGapLeft        = 0;
-        this.WrapIndent         = 0;
-        this.bFirstCompareOper  = true;
-        this.bInsideOper        = false;
-        this.bOnlyForcedBreak   = false;
+        this.OperGapRight        = 0;
+        this.OperGapLeft         = 0;
+        this.WrapIndent          = 0;
+        this.bContainCompareOper = true;
+        this.bInsideOper         = false;
+        this.bOnlyForcedBreak    = false;
         this.bNoOneBreakOperator = true;
-        this.BreakBox           = false;
-        this.bFastRecalculate   = false;
-        this.bBoxOperator       = false;
+        this.BreakBox            = false;
+        this.bFastRecalculate    = false;
+        this.bBoxOperator        = false;
         this.bBreakPosInLWord    = true;
     },
 
@@ -2312,7 +2355,6 @@ CParagraphRecalculateStateWrap.prototype =
     {
         this.RestartPageRecalcInfo.Line   = 0;
         this.RestartPageRecalcInfo.Object = null;
-        this.bMathWrap                    = false;
     },
 
     Set_RestartPageRecalcInfo : function(Line, Object)
@@ -2357,6 +2399,11 @@ CParagraphRecalculateStateWrap.prototype =
     Reset_RunRecalcInfo : function()
     {
         this.RunRecalcInfoBreak = this.RunRecalcInfoLast;
+    },
+
+    Reset_MathRecalcInfo: function()
+    {
+        this.bContinueRecalc = false;
     },
 
     Restore_RunRecalcInfo : function()

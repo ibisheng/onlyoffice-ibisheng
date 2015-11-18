@@ -817,45 +817,6 @@ CMathContent.prototype.Math_UpdateGaps = function(_CurLine, _CurRange)
         }
     }
 };
-/*CMathContent.prototype.Resize = function(oMeasure, RPI)      // пересчитываем всю формулу
-{
-    if ( false === this.RecalcInfo.Measure )
-        return;
-
-    this.WidthToElement.length = 0;
-
-    var lng = this.Content.length;
-
-    this.size.SetZero();
-    this.InfoPoints.SetDefault();
-
-    for(var pos = 0; pos < lng; pos++)
-    {
-        if(this.Content[pos].Type == para_Math_Composition)
-        {
-            this.Content[pos].Resize(oMeasure, RPI);
-
-            if(this.RecalcInfo.bEqArray)
-                this.InfoPoints.ContentPoints.UpdatePoint(this.Content[pos].size.width);
-        }
-        else if(this.Content[pos].Type == para_Math_Run)
-        {
-            this.Content[pos].Math_Recalculate(oMeasure, this.InfoPoints.ContentPoints);
-        }
-
-        this.WidthToElement[pos] = this.size.width;
-
-        var oSize = this.Content[pos].size;
-        this.size.width += oSize.width;
-
-        var oDescent = oSize.height - oSize.ascent,
-            SizeDescent = this.size.height - this.size.ascent;
-
-        this.size.ascent = this.size.ascent > oSize.ascent ? this.size.ascent : oSize.ascent;
-
-        this.size.height = SizeDescent < oDescent ? oDescent + this.size.ascent : SizeDescent + this.size.ascent;
-    }
-};*/
 CMathContent.prototype.IsEqArray = function()
 {
     return this.RecalcInfo.bEqArray;
@@ -4097,7 +4058,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 }
                 var CheckWrapIndent = PRS.bFirstLine == true ? PRS.X - PRS.XRange > PRS.WrapIndent : true;
 
-                if(PRS.bPriorityOper == true && PRS.bInsideOper == true && CheckWrapIndent == true)
+                if(PRS.bInsideOper == true && CheckWrapIndent == true)
                 {
                     PRS.bOnlyForcedBreak = true;
                 }

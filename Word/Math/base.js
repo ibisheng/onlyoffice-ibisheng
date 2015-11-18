@@ -1836,6 +1836,7 @@ CMathBase.prototype.GetFirstElement = function()
 CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 {
     var WordLen = PRS.WordLen; // запоминаем, чтобы внутр мат объекты не увеличили WordLen
+    var bContainCompareOper = PRS.bContainCompareOper;
 
     var bOneLine = PRS.bMath_OneLine;
     this.bOneLine = this.bCanBreak == false || PRS.bMath_OneLine == true;
@@ -1939,6 +1940,7 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     }
 
     PRS.bMath_OneLine = bOneLine;
+    PRS.bContainCompareOper = bContainCompareOper;
 };
 CMathBase.prototype.Get_WrapToLine = function(_CurLine, _CurRange, WrapIndent)
 {

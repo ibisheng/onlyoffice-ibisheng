@@ -3316,6 +3316,7 @@ CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     {
         var CurLine  = PRS.Line - this.StartLine;
         var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
+        var bContainCompareOper = PRS.bContainCompareOper;
 
         this.protected_AddRange(CurLine, CurRange);
 
@@ -3357,6 +3358,7 @@ CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.protected_FillRange(CurLine, CurRange, 0, 0);
 
         PRS.bMath_OneLine = false;
+        PRS.bContainCompareOper = bContainCompareOper;
     }
     else
     {

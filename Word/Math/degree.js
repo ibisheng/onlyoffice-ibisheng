@@ -889,6 +889,8 @@ CDegreeSubSup.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         var CurLine  = PRS.Line - this.StartLine;
         var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
 
+        var bContainCompareOper = PRS.bContainCompareOper;
+
         var iterUp = this.iters.iterUp,
             iterDn = this.iters.iterDn;
 
@@ -937,8 +939,9 @@ CDegreeSubSup.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         if(PRS.NewRange == false)
             PRS.WordLen += this.BrGapRight;
 
-
         this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
+
+        PRS.bContainCompareOper = bContainCompareOper;
     }
 };
 CDegreeSubSup.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)

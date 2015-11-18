@@ -472,6 +472,8 @@ CNary.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
         this.setDistance();
 
+        var bContainCompareOper = PRS.bContainCompareOper;
+
         var RangeStartPos = this.protected_AddRange(CurLine, CurRange),
             RangeEndPos = 2;
 
@@ -519,6 +521,7 @@ CNary.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 
         PRS.bMath_OneLine = false;
+        PRS.bContainCompareOper = bContainCompareOper;
     }
 };
 CNary.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)

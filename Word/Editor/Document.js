@@ -457,6 +457,7 @@ function CDocumentRecalcInfo()
     this.KeepNextParagraph         = null;    // Параграф, который надо пересчитать из-за того, что следующий начался с новой страницы
 
     this.FrameRecalc               = false;  // Пересчитываем ли рамку
+    this.ParaMath                  = null;
 }
 
 CDocumentRecalcInfo.prototype =
@@ -474,12 +475,14 @@ CDocumentRecalcInfo.prototype =
         this.WidowControlReset         = false;
 
         this.KeepNextParagraph         = null;
+
+        this.ParaMath                  = null;
     },
 
     // Проверяем, можно ли начать пересчет какого-либо элемента
     Can_RecalcObject : function()
     {
-        if ( null === this.FlowObject && null === this.WidowControlParagraph && null === this.KeepNextParagraph )
+        if ( null === this.FlowObject && null === this.WidowControlParagraph && null === this.KeepNextParagraph && null == this.ParaMath)
             return true;
 
         return false;
@@ -491,6 +494,17 @@ CDocumentRecalcInfo.prototype =
         this.FlowObjectPage          = RelPage;
         this.FlowObjectElementsCount = ElementsCount;
         this.RecalcResult            = RecalcResult;
+    },
+    Set_ParaMath : function(Object)
+    {
+        this.ParaMath = Object;
+    },
+    Check_ParaMath: function(ParaMath)
+    {
+        if ( ParaMath === this.ParaMath )
+            return true;
+
+        return false;
     },
 
     Check_FlowObject : function(FlowObject)
