@@ -9624,10 +9624,14 @@ ParaRun.prototype.Math_RecalculateContent = function(PRS)
 
         if(this.bEqArray)
         {
-            if(Type !== para_Math_Ampersand)
-                WidthPoints.UpdatePoint(WidthItem);
-            else
+            if(Type === para_Math_Ampersand && true === Item.IsAlignPoint())
+            {
                 WidthPoints.AddNewAlignRange();
+            }
+            else
+            {
+                WidthPoints.UpdatePoint(WidthItem);
+            }
         }
     }
 
@@ -9883,10 +9887,11 @@ ParaRun.prototype.ApplyPoints = function(PointsInfo)
 
         for(var Pos = 0; Pos < this.Content.length; Pos++)
         {
-            if(this.Content[Pos].Type == para_Math_Ampersand)
+            var Item = this.Content[Pos];
+            if(Item.Type === para_Math_Ampersand && true === Item.IsAlignPoint())
             {
                 PointsInfo.NextAlignRange();
-                this.Content[Pos].size.width = PointsInfo.GetAlign();
+                Item.size.width = PointsInfo.GetAlign();
             }
 
             this.size.width += this.Content[Pos].Get_WidthVisible(); // Get_Width => Get_WidthVisible

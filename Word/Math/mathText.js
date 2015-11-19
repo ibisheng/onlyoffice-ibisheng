@@ -974,7 +974,7 @@ function CMathAmp()
 {
     CMathAmp.superclass.constructor.call(this);
 
-    this.bEqArray = false;
+    this.bAlignPoint = false;
     this.Type = para_Math_Ampersand;
 
     this.value = 0x26;
@@ -985,10 +985,10 @@ function CMathAmp()
 Asc.extendClass(CMathAmp, CMathBaseText);
 CMathAmp.prototype.Measure = function(oMeasure, TextPr, InfoMathText)
 {
-    this.bEqArray = InfoMathText.bEqArray;
+    this.bAlignPoint = InfoMathText.bEqArray == true && InfoMathText.bNormalText == false;
     this.AmpText.Measure(oMeasure, TextPr, InfoMathText);
 
-    if(this.bEqArray)
+    if(this.bAlignPoint)
     {
         this.size.width  = 0;
         this.size.ascent = 0;
@@ -1013,21 +1013,21 @@ CMathAmp.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
 CMathAmp.prototype.getCodeChr = function()
 {
     var code = null;
-    if(!this.bEqArray)
+    if(!this.bAlignPoint)
         code = this.AmpText.getCodeChr();
 
     return code;
 };
 CMathAmp.prototype.IsText = function()
 {
-    return !this.bEqArray;
+    return !this.bAlignPoint;
 };
 CMathAmp.prototype.setPosition = function(pos)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y;
 
-    if(this.bEqArray == false)
+    if(this.bAlignPoint == false)
         this.AmpText.setPosition(pos);
 };
 CMathAmp.prototype.relate = function(Parent)
@@ -1037,7 +1037,7 @@ CMathAmp.prototype.relate = function(Parent)
 };
 CMathAmp.prototype.Draw = function(x, y, pGraphics, InfoTextPr)
 {
-    if(this.bEqArray==false)
+    if(this.bAlignPoint == false)
         this.AmpText.Draw(x + this.GapLeft, y, pGraphics, InfoTextPr);
     else if(editor.ShowParaMarks) // показать метки выравнивания, если включена отметка о знаках параграфа
     {
@@ -1054,7 +1054,7 @@ CMathAmp.prototype.Is_InclineLetter = function()
 };
 CMathAmp.prototype.IsAlignPoint = function()
 {
-    return this.bEqArray;
+    return this.bAlignPoint;
 };
 CMathAmp.prototype.Copy = function()
 {
