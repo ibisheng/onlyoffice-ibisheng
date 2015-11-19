@@ -2619,6 +2619,7 @@ CPresentation.prototype =
         if(this.CopyTextPr && this.CopyParaPr)
         {
             this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.paragraphFormatPaste(this.CopyTextPr, this.CopyParaPr, false);
+            this.Document_UpdateInterfaceState();
         }
     },
 
