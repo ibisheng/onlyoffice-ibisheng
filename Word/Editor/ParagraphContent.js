@@ -6769,8 +6769,8 @@ ParaDrawing.prototype =
 
     Get_RevisionsChangeParagraph : function(SearchEngine)
     {
-        if (this.GraphicObj && this.GraphicObj.textBoxContent)
-            this.GraphicObj.textBoxContent.Get_RevisionsChangeParagraph(SearchEngine);
+        if (this.GraphicObj && this.GraphicObj.Get_RevisionsChangeParagraph)
+            this.GraphicObj.Get_RevisionsChangeParagraph(SearchEngine);
     }
 };
 

@@ -8117,6 +8117,46 @@ CChartSpace.prototype =
         }
     },
 
+
+    Get_RevisionsChangeParagraph: function(SearchEngine){
+        var titles = this.getAllTitles(), i;
+        if(titles.length === 0){
+            return;
+        }
+        var oSelectedTitle = this.selection.title || this.selection.textSelection;
+        if(oSelectedTitle){
+            for(i = 0; i < titles.length; ++i){
+                if(oSelectedTitle === titles[i]){
+                    break;
+                }
+            }
+            if(i === titles.length){
+                return;
+            }
+        }
+        else{
+            if(SearchEngine.Get_Direction() > 0){
+                i = 0;
+            }
+            else{
+                i = titles.length - 1;
+            }
+        }
+        while(!SearchEngine.Is_Found()){
+            titles[i].Get_RevisionsChangeParagraph(SearchEngine);
+            if(SearchEngine.Get_Direction() > 0){
+                if(i === titles.length - 1){
+                    break;
+                }
+            }
+            else{
+                if(i === 0){
+                    break;
+                }
+            }
+        }
+    },
+
     Search : function(Str, Props, SearchEngine, Type)
     {
         var titles = this.getAllTitles();

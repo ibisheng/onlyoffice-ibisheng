@@ -968,6 +968,57 @@ CGroupShape.prototype =
         return bRet;
     },
 
+    Get_RevisionsChangeParagraph: function(SearchEngine){
+        var i;
+        if(this.selectedObjects.length === 0){
+            if(SearchEngine.Get_Direction() > 0){
+                i = 0;
+            }
+            else{
+                i = this.arrGraphicObjects.length - 1;
+            }
+        }
+        else{
+            if(SearchEngine.Get_Direction() > 0){
+                for(i = 0; i < this.arrGraphicObjects.length; ++i){
+                    if(this.arrGraphicObjects[i].selected){
+                        break;
+                    }
+                }
+                if(i === this.arrGraphicObjects.length){
+                    return;
+                }
+            }
+            else{
+                for(i = this.arrGraphicObjects.length - 1; i > -1 ; --i){
+                    if(this.arrGraphicObjects[i].selected){
+                        break;
+                    }
+                }
+                if(i === -1){
+                    return;
+                }
+            }
+        }
+        while(!SearchEngine.Is_Found()){
+            if(this.arrGraphicObjects[i].Get_RevisionsChangeParagraph){
+                this.arrGraphicObjects[i].Get_RevisionsChangeParagraph(SearchEngine);
+            }
+            if(SearchEngine.Get_Direction() > 0){
+                if(i === this.arrGraphicObjects.length - 1){
+                    break;
+                }
+                ++i;
+            }
+            else{
+                if(i === 0){
+                    break;
+                }
+                --i;
+            }
+        }
+    },
+
     Search : function(Str, Props, SearchEngine, Type)
     {
         var Len = this.arrGraphicObjects.length;

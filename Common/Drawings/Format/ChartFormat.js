@@ -23027,6 +23027,12 @@ CTitle.prototype =
         }
     },
 
+    Get_RevisionsChangeParagraph: function(SearchEngine){
+        var oContent = this.getDocContent();
+        if(oContent){
+            oContent.Get_RevisionsChangeParagraph(SearchEngine);
+        }
+    },
 
     Search : function(Str, Props, SearchEngine, Type)
     {

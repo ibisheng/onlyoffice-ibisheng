@@ -701,8 +701,8 @@ CShape.prototype.Is_UseInDocument = function()
             {
                 return this.group.Is_UseInDocument();
             }
-            return false;
         }
+        return false;
     }
     if(this.parent && this.parent.Is_UseInDocument && this.parent.GraphicObj === this)
     {
