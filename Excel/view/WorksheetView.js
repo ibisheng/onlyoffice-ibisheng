@@ -8904,6 +8904,8 @@
 										range.setNumFormat(nameFormat);
 								}
 								
+								//TODO вместо range где возможно использовать cell
+								var cellFrom, cellTo;
 								if(value2.length == 1 || numFormula != null || (skipFormat != null && noSkipVal!= null))
 								{
 									if(numFormula == null)
@@ -8927,12 +8929,17 @@
 											numFor++;
 										}
 									}
-									else if(isOneMerge && range && range.bbox)
-									{
-										this._getCell(range.bbox.c1, range.bbox.r1).setValue(newVal.getValue());
-									}
 									else
-										firstRange.setValue(newVal.getValue());
+									{
+										cellFrom = newVal.getCells();
+										if(isOneMerge && range && range.bbox)
+											cellTo = this._getCell(range.bbox.c1, range.bbox.r1).getCells();
+										else
+											cellTo = firstRange.getCells();
+										
+										if(cellFrom && cellTo && cellFrom[0] && cellTo[0])
+											cellTo[0].setValueData(cellFrom[0].getValueData());
+									}
 
 									if(!isOneMerge)//settings for text
 									{
