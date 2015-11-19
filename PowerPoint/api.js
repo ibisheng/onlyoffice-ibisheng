@@ -4306,6 +4306,10 @@ asc_docs_api.prototype.ShowThumbnails = function(bIsShow)
         this.WordControl.OldSplitter1Pos = old;
     }
 };
+asc_docs_api.prototype.asc_DeleteVerticalScroll = function()
+{
+    this.WordControl.DeleteVerticalScroll();
+};
 
 asc_docs_api.prototype.syncOnThumbnailsShow = function()
 {

@@ -2364,6 +2364,13 @@ function CEditorPage(api)
         this.OnScroll();
     }
 
+    this.DeleteVerticalScroll = function()
+    {
+        this.m_oMainView.Bounds.R = 0;
+        this.m_oPanelRight.HtmlElement.style.display = "none";
+        this.OnResize();
+    }
+
     this.OnResize = function(isAttack)
     {
         var isNewSize = this.checkBodySize();
