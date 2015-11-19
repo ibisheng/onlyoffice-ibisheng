@@ -139,18 +139,16 @@ CAccentLine.prototype.draw = function(x, y, pGraphics)
 {
     var fontSize = this.Parent.Get_TxtPrControlLetter().FontSize;
 
-    var penW = fontSize*0.067 * 25.4/96;
-    var x1 = x + 25.4/96,
-        x2 = x +  this.stretch - 25.4/96;
+    var penW = fontSize*0.0166;
+    var x1 = x + 0.26458,
+        x2 = x +  this.stretch - 0.26458;
 
-    //pGraphics.p_color(0,0,0, 255);
     pGraphics.drawHorLine(0, y, x1, x2, penW);
 };
 
 
 function CAccentDoubleLine()
 {
-    this.diff = 0;
     CGlyphOperator.call(this);
 }
 Asc.extendClass(CAccentDoubleLine, CGlyphOperator);
@@ -171,26 +169,21 @@ CAccentDoubleLine.prototype.calcSize = function(stretch)
     DoubleLine.add(0x33F);
     DoubleLine.Measure(g_oTextMeasurer);
 
-    this.diff = DoubleLine.size.ascent - Line.size.ascent;
-
     return {width: width, height: height};
 };
 CAccentDoubleLine.prototype.draw = function(x, y, pGraphics)
 {
     var fontSize = this.Parent.Get_TxtPrControlLetter().FontSize;
 
-    var diff = this.diff;
+    var diff = fontSize*0.05;
 
-    if(diff < 2*25.4/96)
-        diff = 2*25.4/96;
+    var penW = fontSize*0.0166;
 
-    var penW = fontSize*0.067 * 25.4/96;
-    var x1 = x + 25.4/96,
-        x2 = x +  this.stretch - 25.4/96,
+    var x1 = x + 0.26458,
+        x2 = x +  this.stretch - 0.26458,
         y1 = y,
         y2 = y + diff;
 
-    //pGraphics.p_color(0,0,0, 255);
     pGraphics.drawHorLine(0, y1, x1, x2, penW);
 
     pGraphics.drawHorLine(0, y2, x1, x2, penW);
