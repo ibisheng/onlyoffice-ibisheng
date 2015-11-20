@@ -590,7 +590,7 @@ var c_oAscImageUploadProp = {//Не все браузеры позволяют �
  * @constructor
  */
 function GetFileExtension (sName) {
-	var nIndex = sName.lastIndexOf(".");
+	var nIndex = sName ? sName.lastIndexOf(".") : -1;
 	if (-1 != nIndex)
 		return sName.substring(nIndex + 1).toLowerCase();
 	return null;
