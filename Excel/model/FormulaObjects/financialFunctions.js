@@ -4286,21 +4286,18 @@ cPMT.prototype.Calculate = function ( arg ) {
     type = type.tocNumber();
 
     if ( rate instanceof cError ) return this.value = rate;
-
     if ( nper instanceof cError ) return this.value = nper;
-    if ( nper.getValue() == 0 ) return this.value = new cError( cErrorType.division_by_zero );
-
     if ( pv instanceof cError ) return this.value = pv;
     if ( fv instanceof cError ) return this.value = fv;
     if ( type instanceof cError ) return this.value = type;
-
-    if ( type.getValue() != 1 && type.getValue() != 0 ) return this.value = new cError( cErrorType.not_numeric );
 
     rate = rate.getValue();
     nper = nper.getValue();
     fv = fv.getValue();
     type = type.getValue();
     pv = pv.getValue();
+
+    if ( type != 1 && type != 0 || nper == 0 ) return this.value = new cError( cErrorType.not_numeric );
 
     var res;
     if ( rate != 0 ) {
