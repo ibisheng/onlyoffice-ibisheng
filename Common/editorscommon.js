@@ -961,9 +961,12 @@ parserHelper.prototype.isArea = function ( formula, start_pos ) {
 	var subSTR = formula.substring( start_pos );
 	var match = subSTR.match( rgRange ) || subSTR.match( rgCols ) || subSTR.match( rgRows );
 	if (match != null) {
-		this.pCurrPos += match[0].length;
-		this.operand_str = match[0];
-		return true;
+        var m0 = match[0].split(":");
+        if( g_oCellAddressUtils.getCellAddress(m0[0]).isValid() && g_oCellAddressUtils.getCellAddress(m0[1]).isValid() ){
+            this.pCurrPos += match[0].length;
+            this.operand_str = match[0];
+            return true;
+        }
 	}
 	return false;
 };
@@ -975,7 +978,7 @@ parserHelper.prototype.isRef = function ( formula, start_pos, allRef ) {
 	var match = substr.match( rx_ref );
 	if (match != null) {
 		var m0 = match[0], m1 = match[1], m2 = match[2];
-		if ( match.length >= 3 && g_oCellAddressUtils.colstrToColnum( m1.substr( 0, (m1.length - m2.length) ) ) <= gc_nMaxCol && parseInt( m2 ) <= gc_nMaxRow ) {
+		if (  g_oCellAddressUtils.getCellAddress(m1).isValid() /*match.length >= 3 && g_oCellAddressUtils.colstrToColnum( m1.substr( 0, (m1.length - m2.length) ) ) <= gc_nMaxCol && parseInt( m2 ) <= gc_nMaxRow*/ ) {
 			this.pCurrPos += m0.indexOf( " " ) > -1 ? m0.length - 1 : m1.length;
 			this.operand_str = m1;
 			return true;

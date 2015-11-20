@@ -69,7 +69,27 @@ cFormulaFunctionGroup['Mathematic'] = [
     cSUMXMY2,
     cTAN,
     cTANH,
-    cTRUNC
+    cTRUNC,
+
+    /*new funcions with _xlnf-prefix*/
+    cACOT,
+    cACOTH,
+    cAGGREGATE,
+    cARABIC,
+    cBASE,
+    cCEILING_MATH,
+    cCEILING_PRECISE,
+    cCOMBINA,
+    cCOT,
+    cCOTH,
+    cCSC,
+    cCSCH,
+    cDECIMAL,
+    cFLOOR_MATH,
+    cFLOOR_PRECISE,
+    cMUNIT,
+    cSEC,
+    cSECH
 ];
 
 function cABS() {
@@ -3859,11 +3879,23 @@ cSUMIF.prototype = Object.create( cBaseFunction.prototype )
 cSUMIF.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : arg[0], _sum = 0, valueForSearching, regexpSearch;
     if ( !(arg0 instanceof cRef || arg0 instanceof cRef3D || arg0 instanceof cArea) ) {
-        return this.value = new cError( cErrorType.wrong_value_type );
+        if ( arg0 instanceof cArea3D ) {
+            arg0 = arg0.tocArea();
+            if ( !arg0 )
+                return this.value = new cError( cErrorType.wrong_value_type );
+        }
+        else
+            return this.value = new cError( cErrorType.wrong_value_type );
     }
 
     if ( !(arg2 instanceof cRef || arg2 instanceof cRef3D || arg2 instanceof cArea) ) {
-        return this.value = new cError( cErrorType.wrong_value_type );
+        if ( arg2 instanceof cArea3D ) {
+            arg2 = arg2.tocArea();
+            if ( !arg2 )
+                return this.value = new cError( cErrorType.wrong_value_type );
+        }
+        else
+            return this.value = new cError( cErrorType.wrong_value_type );
     }
 
     if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
@@ -3976,7 +4008,7 @@ cSUMPRODUCT.prototype.Calculate = function ( arg ) {
         col = Math.max( resArr[0][0].length, col );
 
         if ( row != resArr[i].length || col != resArr[i][0].length ) {
-            return this.value = new cError( cErrorType.wrong_value_type );
+            return this.value = new cError( cErrorType.not_numeric );
         }
 
         if ( arg[i] instanceof cError )

@@ -42,7 +42,13 @@ cFormulaFunctionGroup['TextAndData'] = [
     cTEXT,
     cTRIM,
     cUPPER,
-    cVALUE
+    cVALUE,
+
+    /*new funcions with _xlnf-prefix*/
+    cDBCS,
+    cNUMBERVALUE,
+    cUNICHAR,
+    cUNICODE
 ];
 
 function cASC() {
@@ -1667,7 +1673,7 @@ cTEXT.prototype.Calculate = function ( arg ) {
 
     var oFormat = oNumFormatCache.get( arg1.toString() );
     var a = g_oFormatParser.parse(arg0.getValue()+""), aText;
-    aText = oFormat.format( a ? a.value : arg0.getValue(), arg0 instanceof cNumber || a ? CellValueType.Number : CellValueType.String, gc_nMaxDigCountView, null );
+    aText = oFormat.format( a ? a.value : arg0.getValue(), (arg0 instanceof cNumber || a) ? CellValueType.Number : CellValueType.String, gc_nMaxDigCountView, null );
     var text = "";
 
     for ( var i = 0, length = aText.length; i < length; ++i ) {

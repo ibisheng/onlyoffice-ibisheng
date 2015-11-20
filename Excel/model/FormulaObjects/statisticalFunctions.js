@@ -89,10 +89,74 @@ cFormulaFunctionGroup['Statistical'] = [
     cVAR,
     cVARA,
     cVARP,
-//  cVARdotP,
     cVARPA,
     cWEIBULL,
-    cZTEST
+    cZTEST,
+    /*new funcions with _xlnf-prefix*/
+    cBETA_DIST,
+    cBETA_INV,
+    cBINOM_DIST,
+    cBINOM_DIST_RANGE,
+    cBINOM_INV,
+    cCHISQ_DIST,
+    cCHISQ_DIST_RT,
+    cCHISQ_INV,
+    cCHISQ_INV_RT,
+    cCHISQ_TEST,
+    cCONFIDENCE_NORM,
+    cCONFIDENCE_T,
+    cCOVARIANCE_P,
+    cCOVARIANCE_S,
+    cEXPON_DIST,
+    cF_DIST,
+    cF_DIST_RT,
+    cF_INV,
+    cF_INV_RT,
+    cF_TEST,
+    cFORECAST_ETS,
+    cFORECAST_ETS_CONFINT,
+    cFORECAST_ETS_SEASONALITY,
+    cFORECAST_ETS_STAT,
+    cFORECAST_LINEAR,
+    cGAMMA,
+    cGAMMA_DIST,
+    cGAMMA_INV,
+    cGAMMALN_PRECISE,
+    cGAUSS,
+    cHYPGEOM_DIST,
+    cLOGNORM_DIST,
+    cLOGNORM_INV,
+    cMODE_MULT,
+    cMODE_SNGL,
+    cNEGBINOM_DIST,
+    cNORM_DIST,
+    cNORM_INV,
+    cNORM_S_DIST,
+    cNORM_S_INV,
+    cPERCENTILE_EXC,
+    cPERCENTILE_INC,
+    cPERCENTRANK_EXC,
+    cPERCENTRANK_INC,
+    cPERMUTATIONA,
+    cPHI,
+    cPOISSON_DIST,
+    cQUARTILE_EXC,
+    cQUARTILE_INC,
+    cRANK_AVG,
+    cRANK_EQ,
+    cSKEW_P,
+    cSTDEV_P,
+    cSTDEV_S,
+    cT_DIST,
+    cT_DIST_2T,
+    cT_DIST_RT,
+    cT_INV,
+    cT_INV_2T,
+    cT_TEST,
+    cVAR_P,
+    cVAR_S,
+    cWEIBULL_DIST,
+    cZ_TEST
 ];
 function cAVEDEV() {
 //    cBaseFunction.call( this, "AVEDEV" );
@@ -4348,6 +4412,8 @@ function cSMALL() {
 cSMALL.prototype = Object.create( cBaseFunction.prototype );
 cSMALL.prototype.Calculate = function ( arg ) {
 
+    var retArr = new cArray();
+
     function frequency( A, k ) {
 
         var tA = [];
@@ -4374,6 +4440,14 @@ cSMALL.prototype.Calculate = function ( arg ) {
             return new cNumber( tA[k.getValue() - 1] );
     }
 
+    function actionArray(elem,r,c){
+        var e = elem.tocNumber();
+
+        if ( e instanceof cError ) retArr.addElement(e);
+
+        retArr.addElement(frequency( arg0, e ));
+    }
+
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea || arg0 instanceof cArray ) {
         arg0 = arg0.getMatrix();
@@ -4389,12 +4463,10 @@ cSMALL.prototype.Calculate = function ( arg ) {
         arg1 = arg1.cross( arguments[1].first );
     }
     else if ( arg1 instanceof cArray ) {
-        arg1 = arg1.getElement( 0 );
+//        arg1 = arg1.getElement( 0 );
+        arg1.foreach(actionArray);
+        return this.value = retArr;
     }
-
-    arg1 = arg1.tocNumber();
-
-    if ( arg1 instanceof cError ) return this.value = arg1;
 
     return this.value = frequency( arg0, arg1 );
 

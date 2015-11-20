@@ -5136,7 +5136,7 @@ Cell.prototype.setValue=function(val,callback, isCopyPaste){
 				}
 			}
 			else{
-				val = "="+this.formulaParsed.assembleLocale();
+				val = "="+this.formulaParsed.assemble();
 			}
 
 		}

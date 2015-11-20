@@ -15,7 +15,11 @@ cFormulaFunctionGroup['Logical'] = [
     cIFERROR,
     cNOT,
     cOR,
-    cTRUE
+    cTRUE,
+
+    /*new funcions with _xlnf-prefix*/
+    cIFNA,
+    cXOR
 ];
 
 function cAND() {

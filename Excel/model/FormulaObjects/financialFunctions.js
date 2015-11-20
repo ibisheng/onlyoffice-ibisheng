@@ -504,7 +504,11 @@ cFormulaFunctionGroup['Financial'] = [
     cXNPV,
     cYIELD,
     cYIELDDISC,
-    cYIELDMAT
+    cYIELDMAT,
+
+    /*new funcions with _xlnf-prefix*/
+    cPDURATION,
+    cRRI
 ];
 
 function cACCRINT() {
@@ -2754,7 +2758,7 @@ cINTRATE.prototype.Calculate = function ( arg ) {
     var res = ( ( redemption / investment ) - 1 ) / yearFrac( Date.prototype.getDateFromExcel( settlement ), Date.prototype.getDateFromExcel( maturity ), basis );
 
     this.value = new cNumber( res );
-    this.value.numFormat = 9;
+    this.value.numFormat = 10;
     return this.value;
 
 };
@@ -4941,7 +4945,7 @@ cRATE.prototype.Calculate = function ( arg ) {
     type = type.getValue();
     quess = quess.getValue();
 
-    if ( type != 1 && type != 0 || nper <= 0 || pmt >= 0 ) return this.value = new cError( cErrorType.not_numeric );
+    if ( type != 1 && type != 0 || nper <= 0 ) return this.value = new cError( cErrorType.not_numeric );
 
     this.value = new cNumber( RateIteration( nper, pmt, pv, fv, type, quess ) );
     this.value.numFormat = 9;

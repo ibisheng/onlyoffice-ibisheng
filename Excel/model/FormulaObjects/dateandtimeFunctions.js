@@ -270,7 +270,11 @@ cFormulaFunctionGroup['DateAndTime'] = [
     cWORKDAY,
     cWORKDAY_INTL,
     cYEAR,
-    cYEARFRAC
+    cYEARFRAC,
+
+    /*new funcions with _xlnf-prefix*/
+    cDAYS,
+    cISOWEEKNUM
 ];
 
 function cDATE() {

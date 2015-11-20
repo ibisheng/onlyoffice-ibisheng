@@ -956,7 +956,24 @@ cFormulaFunctionGroup['Engineering'] = [
     cIMSUM,
     cOCT2BIN,
     cOCT2DEC,
-    cOCT2HEX
+    cOCT2HEX,
+
+    /*new funcions with _xlnf-prefix*/
+    cBITAND,
+    cBITLSHIFT,
+    cBITOR,
+    cBITRSHIFT,
+    cBITXOR,
+    cERF_PRECISE,
+    cERFC_PRECISE,
+    cIMCOSH,
+    cIMCOT,
+    cIMCSC,
+    cIMCSCH,
+    cIMSEC,
+    cIMSECH,
+    cIMSINH,
+    cIMTAN
 ];
 
 function cBESSELI() {

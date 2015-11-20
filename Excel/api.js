@@ -1455,6 +1455,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
         if (t.wb) {
           // Шлем update для листов
           t._onUpdateSheetsLock(lockElem);
+          /*снимаем лок для DefName*/
+          t.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.OK);
         }
       }
     };

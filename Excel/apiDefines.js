@@ -328,3 +328,9 @@ var c_oAscDefinedNameReason = {
   LockDefNameManager:- 4,
   OK: 0
 };
+
+var c_oAscPopUpSelectorType = {
+    Func: 0,
+    Range: 1,
+    Table: 2
+};

@@ -30,7 +30,10 @@ cFormulaFunctionGroup['LookupAndReference'] = [
     cROWS,
     cRTD,
     cTRANSPOSE,
-    cVLOOKUP
+    cVLOOKUP,
+
+    /*new funcions with _xlnf-prefix*/
+    cFORMULATEXT
 ];
 
 function cADDRESS() {

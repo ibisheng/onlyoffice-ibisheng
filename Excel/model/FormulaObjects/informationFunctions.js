@@ -23,7 +23,12 @@ cFormulaFunctionGroup['Information'] = [
     cISTEXT,
     cN,
     cNA,
-    cTYPE
+    cTYPE,
+
+    /*new funcions with _xlnf-prefix*/
+    cISFORMULA,
+    cSHEET,
+    cSHEETS
 ];
 /*
  здесь вынесены функции, которы по назначению не могут быть использованы в веб редакторах документах.

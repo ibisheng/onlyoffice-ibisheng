@@ -1524,49 +1524,56 @@
 			}
 		};
 
-    WorkbookView.prototype._onUpdateCellEditor = function(text, cursorPosition, isFormula, formulaPos, formulaName) {
-      if (this.skipHelpSelector) {
-        return;
-      }
-      // ToDo для ускорения можно завести объект, куда класть результаты поиска по формулам и второй раз не искать.
-      var arrResult = [], defNamesList, defName;
-      if (isFormula && formulaName) {
-        formulaName = formulaName.toUpperCase();
-        for (var i = 0; i < this.formulasList.length; ++i) {
-          if (0 === this.formulasList[i].indexOf(formulaName)) {
-            arrResult.push(this.formulasList[i]);
-          }
-        }
-        /*defNamesList = this.getDefinedNames(c_oAscGetDefinedNamesList.WorksheetWorkbook)
-         for(var id in defNamesList){
-         defName = defNamesList[id];
-         console.log(defName.Name)
-         if (0 === defName.Name.toLowerCase().indexOf(formulaName.toLowerCase()))
-         arrResult.push(defName.Name);
-         }*/
-      }
-      if (0 < arrResult.length) {
-        this.popUpSelector.show(true, arrResult, this.getWorksheet().getActiveCellCoord());
-        this.lastFormulaPos = formulaPos;
-        this.lastFormulaName = formulaName;
-      } else {
-        this.popUpSelector.hide();
-        this.lastFormulaPos = -1;
-        this.lastFormulaName = '';
-      }
-    };
+        WorkbookView.prototype._onUpdateCellEditor = function ( text, cursorPosition, isFormula, formulaPos, formulaName ) {
+            if ( this.skipHelpSelector ) {
+                return;
+            }
+            // ToDo для ускорения можно завести объект, куда класть результаты поиска по формулам и второй раз не искать.
+            var arrResult = [], defNamesList, defName;
+            if ( isFormula && formulaName ) {
+                formulaName = formulaName.toUpperCase();
+                for ( var i = 0; i < this.formulasList.length; ++i ) {
+                    if ( 0 === this.formulasList[i].indexOf( formulaName ) ) {
+//            arrResult.push(this.formulasList[i]);
+                        arrResult.push( {name:this.formulasList[i], type:c_oAscPopUpSelectorType.Func} )
+                    }
+                }
+                defNamesList = this.getDefinedNames( c_oAscGetDefinedNamesList.WorksheetWorkbook )
+                for ( var id in defNamesList ) {
+                    defName = defNamesList[id];
+                    if ( 0 === defName.Name.toLowerCase().indexOf( formulaName.toLowerCase() ) ) {
+                        if ( !defName.isTable )
+                            arrResult.push( {name:defName.Name, type:c_oAscPopUpSelectorType.Range} );
+                        else
+                            arrResult.push( {name:defName.Name, type:c_oAscPopUpSelectorType.Table} );
+                    }
+                }
+            }
+            if ( 0 < arrResult.length ) {
+                this.popUpSelector.show( true, arrResult, this.getWorksheet().getActiveCellCoord() );
+                this.lastFormulaPos = formulaPos;
+                this.lastFormulaName = formulaName;
+            }
+            else {
+                this.popUpSelector.hide();
+                this.lastFormulaPos = -1;
+                this.lastFormulaName = '';
+            }
+        };
 		WorkbookView.prototype._onPopUpSelectorKeyDown = function (event) {
 			if (!this.popUpSelector.getVisible())
 				return true;
 			return this.popUpSelector.onKeyDown(event);
 		};
 		WorkbookView.prototype._onPopUpSelectorInsert = function (value) {
+            var name;
 			if (this.controller.isCellEditMode) {
-				if (-1 === this.arrExcludeFormulas.indexOf(value))
-					value += '('; // ToDo сделать проверки при добавлении, чтобы не вызывать постоянно окно
-				this.cellEditor.replaceText(this.lastFormulaPos, this.lastFormulaName.length, value);
+                name = value.name;
+				if (-1 === this.arrExcludeFormulas.indexOf(value.name) && value.type == c_oAscPopUpSelectorType.Func )
+					name += '('; // ToDo сделать проверки при добавлении, чтобы не вызывать постоянно окно
+				this.cellEditor.replaceText(this.lastFormulaPos, this.lastFormulaName.length, name);
 			} else
-				this.getWorksheet().setSelectionInfo("value", value, /*onlyActive*/true);
+				this.getWorksheet().setSelectionInfo("value", name, /*onlyActive*/true);
 		};
 
 		// Вставка формулы в редактор

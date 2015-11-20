@@ -137,8 +137,8 @@
 			/** @type RegExp */
 			this.reReplaceTab = /[\t\v\f]/g;
 			// RegExp с поддержкой рэнджей вида $E1:$F2
-			this.reRangeStr = "[^a-z0-9_$!:](\\$?[a-z]+\\$?\\d+:\\$?[a-z]+\\$?\\d+(?=[^a-z0-9_]|$)|\\$?[a-z]+:\\$?[a-z]+(?=[^a-z0-9_]|$)|\\$?\\d+:\\$?\\d+(?=[^a-z0-9_]|$)|\\$?[a-z]+\\$?\\d+(?=[^a-z0-9_]|$))";
-			this.rangeChars = "= - + * / ( { , < > ^ ! & : ;".split(' ');
+			this.reRangeStr = "[^a-z0-9_$!](\\$?[a-z]+\\$?\\d+:\\$?[a-z]+\\$?\\d+(?=[^a-z0-9_]|$)|\\$?[a-z]+:\\$?[a-z]+(?=[^a-z0-9_]|$)|\\$?\\d+:\\$?\\d+(?=[^a-z0-9_]|$)|\\$?[a-z]+\\$?\\d+(?=[^a-z0-9_]|$))";
+			this.rangeChars = ["=","-","+","*","/","(","{",",","<",">","^","!","&",":",";"," "];
             this.reNotFormula  = new XRegExp( "[^\\p{L}0-9_]", "i" );
             this.reFormula = new XRegExp( "^([\\p{L}][\\p{L}0-9_]*)", "i" );
 
@@ -689,12 +689,15 @@
 		};
 
 		CellEditor.prototype._parseFormulaRanges = function () {
-			var s = this._getFragmentsText(this.options.fragments);
+			var s = this._getFragmentsText(this.options.fragments ), t = this;
+
+//            var tokens = getTokens(s);
+//            console.log(tokens.items);
 
 			// в Chrome 23 есть баг в RegExp с флагом "g" - не обнуляется lastIndex
 			// поэтому используем такую хитрую конструкцию re[reIdx]
 			var reIdx = 0;
-			var re = [new RegExp(this.reRangeStr, "gi")];
+			var re = new RegExp(this.reRangeStr, "gi");
 
 			var ret = false;
 			var m, range, i;
@@ -703,8 +706,47 @@
 				return ret;
 			}
 
+            /*function cb(ref){
+                for(var id in ref){
+                    range = t._parseRangeStr(ref[id].name)
+                    if(range){
+                        ret = true;
+                        range.cursorePos = ref[id].offset;
+                        range.formulaRangeLength = ref[id].length;
+                        t.handlers.trigger("newRange", range);
+                    }
+                }
+            }
+
+            var __s__ = new Date().getTime();
+            var parres = parserTest.parse(s,cb);
+            var __e__ = new Date().getTime();
+            console.log("e-s "+ (__e__ - __s__));*/
+
+            /*var _f = new parserFormula(s.substr(1),"A1",Asc.editor.wbModel.getActiveWs());
+            _f.parse();
+
+            var r, _index = 0, offset, _e, _s;
+            if( _f.RefPos.length > 0 ) {
+                for(var index = 0; index < _f.RefPos.length; index++){
+                    r = _f.RefPos[index];
+                    offset = r.end;
+                    _e = r.end; _s = r.start;
+                    r = s.substring(r.start+1,r.end+1);
+                    range = t._parseRangeStr(r);
+                    if(range){
+                        ret = true;
+                        range.cursorePos = offset-(_e - _s)+1;
+                        range.formulaRangeLength = _e - _s ;
+                        t.handlers.trigger("newRange", range);
+                    }
+                }
+            }
+            return ret;*/
+
 			var fromIndex = 0;
-			while (null !== (m = re[reIdx].exec(s))) {
+			while (null !== (m = re.exec(s))) {
+                console.log(m[1])
 				range = this._parseRangeStr(m[1]);
 				if (range) {
 					ret = true;
@@ -715,9 +757,10 @@
 				} else {
 					i = m[1].indexOf(":");
 					if (i >= 0) {
-						s = "(" + s.slice(m.index + 1 + i + 1);
-						reIdx = re.length;
-						re.push(new RegExp(this.reRangeStr, "gi"));
+                        re.lastIndex = i + s.indexOf( m[1] );
+//						s = "(" + s.slice(m.index + 1 + i + 1);
+//						reIdx = re.length;
+//						re.push(new RegExp(this.reRangeStr, "gi"));
 					}
 				}
 			}
@@ -725,38 +768,86 @@
 		};
 
 		CellEditor.prototype._findRangeUnderCursor = function () {
+            //TODO разобрать случай K1:srtunfk4
 			var t = this;
 			var s = t.textRender.getChars(0, t.textRender.getCharsCount());
 			var re = new RegExp("^" + this.reRangeStr, "i");
 			var reW = /[^a-z0-9_$]/i;
 			var beg = t.cursorPos - 1;
-			var colon = -1;
+			var colon = -1, colonNum = 0;
 			var ch, res, range;
 
-			for (; beg >= 0; --beg) {
-				ch = s.charAt(beg);
-				if (!reW.test(ch)) {
-					continue;
-				}
-				res = s.slice(beg).match(re);
-				if (ch === ":" && colon < 0) {
-					if (!res || res[1].indexOf(":") < 0) {
-						colon = beg;
-						continue;
-					}
-				}
-				if (res && t.cursorPos > beg + res.index && t.cursorPos <= beg + res.index + res[0].length) {
-					range = t._parseRangeStr(res[1]);
-					if (!range) {
-						beg = colon;
-						res = s.slice(beg).match(re);
-						if (res && t.cursorPos > beg + res.index && t.cursorPos <= beg + res.index + res[0].length) {
-							range = t._parseRangeStr(res[1]);
-						}
-					}
-				}
-				break;
-			}
+
+            var arrFR = this.handlers.trigger("getFormulaRanges");
+            for( var id = 0; id < arrFR.length; id++ ){
+                /*так как у нас уже есть некий массив с рейнджами которые в формуле, то пробегаемся по ним и смотрим, находится ли курсор в позиции над этим диапазоном, дабы не парсить всю формулу заново
+                * необходимо чтобы парсить случаи когда используется что-то такое sumnas2:K2 - sumnas2 невалидная ссылка.
+                * */
+                var a = arrFR[id];
+                if( t.cursorPos >= a.cursorePos && t.cursorPos <= a.formulaRangeLength ){
+                    return {index:a.cursorePos, length: a.formulaRangeLength, range:a.clone(true)};
+                }
+            }
+
+            /*не нашли диапазонов под курсором, прасим формулу*/
+            for ( ; beg >= 0; --beg ) {
+                ch = s.charAt(beg);
+                if (!reW.test(ch)) {
+                    continue;
+                }
+                res = s.slice(beg).match(re);
+                if (ch === ":" && res ) {
+                    colonNum++;
+                    colon = beg;
+                    continue;
+                }
+                if (res && t.cursorPos > beg + res.index && t.cursorPos <= beg + res.index + res[0].length) {
+                    range = t._parseRangeStr(res[1]);
+                    if (!range) {
+                        beg = colon;
+                        res = s.slice(beg).match(re);
+                        if (res && t.cursorPos > beg + res.index && t.cursorPos <= beg + res.index + res[0].length) {
+                            range = t._parseRangeStr(res[1]);
+                        }
+                    }
+                }
+                break;
+            }
+            if( !range && res && colonNum > 1 ){
+                /*разбираем случаи когда в формуле написано что-то в стиле A1:B4:C6(последний символ ":" будет оператором объединения), A1:B4:C6:G6(средний символ ":" будет оператором объединения)*/
+                s = res.input;
+                beg = t.cursorPos - 1;
+                colon = -1;
+                if( (colonNum & 1) == 0 ){
+                    for (var pos = s.length-1; pos > 0; --beg, --pos) {
+                        ch = s.charAt(pos);
+                        if (ch === ":") {
+                            res = s.slice(pos).match(re);
+                            break;
+                        }
+                    }
+                }
+                else{
+                    for (var pos = s.length-1; pos > 0; --beg, --pos) {
+                        ch = s.charAt(pos);
+                        if (!reW.test(ch)) {
+                            continue;
+                        }
+                        res = s.slice(pos).match(re);
+                        if (ch === ":" && colon < 0) {
+                            if (!res || res[1].indexOf(":") < 0) {
+                                colon = beg;
+                                continue;
+                            }
+                        }
+                        break;
+                    }
+                }
+                if (res) {
+                    //console.log(res[1])
+                    range = t._parseRangeStr(res[1]);
+                }
+            }
 			return !range ?
 					{index: -1, length: 0, range: null} :
 					{index: beg + res.index + 1, length: res[1].length, range: range};
@@ -1297,7 +1388,9 @@
 
 			if (!this._checkMaxCellLength(length)) {return false;}
 
-			if (this.selectionBegin !== this.selectionEnd) {this._removeChars(undefined, undefined, isRange);}
+			if (this.selectionBegin !== this.selectionEnd) {
+                this._removeChars(undefined, undefined, isRange);
+            }
 
 			if (pos === undefined) {pos = this.cursorPos;}
 

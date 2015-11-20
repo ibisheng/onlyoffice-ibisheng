@@ -105,9 +105,10 @@
     }
     this.isFormula = isFormula;
 
-    var item, isFirst, value, selectElement = null;
-    var sIcon = this.isFormula ? '<span class="menu-item-icon mnu-popup-func"></span>' : '';
+    var item, isFirst, value, selectElement = null, obj
+    var sIcon = this.isFormula ? '<span class="menu-item-icon %1%"></span>' : '', _sIcon;
     for (var i = 0; i < arrItems.length; ++i) {
+        obj = arrItems[i];
       item = document.createElement('li');
       isFirst = (0 === i);
       if (isFirst) {
@@ -119,14 +120,26 @@
           selectElement = item;
         }
 
-        value = arrItems[i];
-        item.setAttribute('title', arrItems[i].arg);
+        value = obj.name;
+        item.setAttribute('title', obj.arg);
       } else {
-        value = arrItems[i];
+        value = obj.name;
       }
 
-      item.innerHTML = '<a>' + sIcon + value + '</a>';
+
+        if( c_oAscPopUpSelectorType.Range === obj.type )
+            _sIcon = sIcon.replace("%1%","mnu-popup-range");
+        else if( c_oAscPopUpSelectorType.Table === obj.type )
+            _sIcon = sIcon.replace("%1%","mnu-popup-table");
+        else if( c_oAscPopUpSelectorType.Func === obj.type )
+            _sIcon = sIcon.replace("%1%","mnu-popup-func");
+        else
+            _sIcon = sIcon.replace("%1%","");
+
+        item.innerHTML = '<a>' + _sIcon + value + '</a>';
+
       item.setAttribute('val', value);
+      item.setAttribute('type', obj.type);
 
       if (item.addEventListener) {
         item.addEventListener('mousedown', this.fMouseDown, false);
@@ -205,7 +218,7 @@
           if (this.isFormula) {
             this._onMouseDblClick();
           } else {
-            this._onInsert(this.selectElement.getAttribute('val'));
+            this._onInsert({name:this.selectElement.getAttribute('val'),type:this.selectElement.getAttribute('type')});
           }
         } else {
           retVal = true;
@@ -242,7 +255,7 @@
     if (this.isFormula) {
       this._onChangeSelection(element);
     } else {
-      this._onInsert(element.getAttribute('val'));
+      this._onInsert({name:element.getAttribute('val'),type:element.getAttribute('type')});
     }
   };
   PopUpSelector.prototype._onMouseDblClick = function(event) {
@@ -254,8 +267,8 @@
       this._onMouseDown(event);
       return;
     }
-    var elementVal = (event ? event.currentTarget : this.selectElement).getAttribute('val');
-    this._onInsert(elementVal);
+    var elementVal = event ? event.currentTarget : this.selectElement;
+    this._onInsert({name:elementVal.getAttribute('val'),type:elementVal.getAttribute('type')});
   };
   PopUpSelector.prototype._onMouseOver = function(event) {
     if (this.isFormula) {
