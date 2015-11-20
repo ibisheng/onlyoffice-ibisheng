@@ -16,11 +16,11 @@ asc_docs_api.prototype.asc_StartMailMerge = function(oData)
 asc_docs_api.prototype.asc_StartMailMergeByList = function(aList)
 {
     if (!aList || !aList.length || aList.length <= 1)
-        return;
+        aList = [[]];
 
     var aFields = aList[0];
     if (!aFields || !aFields.length || aFields.length <= 0)
-        return;
+        aFields = [];
 
     // Пробегаемся по названиям полей и делаем следующее:
     // Если название пустой, тогда задем ему имя "F<номер столбца>"
