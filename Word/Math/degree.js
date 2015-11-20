@@ -678,8 +678,7 @@ CDegreeSubSupBase.prototype.GetSize = function(oMeasure, Metric)
         baseHeight = Metric.H,
         baseWidth  = Metric.W;
 
-    var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
-    shCenter *= 1.4;
+    var shCenter = 1.4*this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
     var PlH = 0.26*this.ParaMath.GetPlh(oMeasure, mgCtrPrp);
 
@@ -692,12 +691,11 @@ CDegreeSubSupBase.prototype.GetSize = function(oMeasure, Metric)
 
     if(!this.baseContent.IsJustDraw())
     {
-        var last = this.baseContent.GetLastElement();
+        var BaseItem = this.Pr.type == DEGREE_SubSup ? this.baseContent.GetLastElement() : this.baseContent.GetFirstElement();
 
-        var BaseRun      = last.Type == para_Math_Run && mgCtrPrp.FontSize >= last.Get_CompiledPr(false).FontSize;
-        TextElement  = BaseRun || (last.Type !== para_Math_Run && last.IsJustDraw());
+        var BaseRun  = BaseItem.Type == para_Math_Run && mgCtrPrp.FontSize >= BaseItem.Get_CompiledPr(false).FontSize;
+        TextElement  = BaseRun || (BaseItem.Type !== para_Math_Run && BaseItem.IsJustDraw());
     }
-
 
     if(TextElement)
     {
