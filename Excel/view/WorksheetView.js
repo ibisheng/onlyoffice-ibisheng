@@ -10897,21 +10897,35 @@
 			History.TurnOn();
 			this._updateCellsRange(oAllRange.bbox); // ToDo Стоит обновить nRowsCount и nColsCount
 		};
-		WorksheetView.prototype.getData = function () {
-			var arrResult = [], cell, c, r, row;
-			var maxCols = Math.min(this.model.getColsCount(), gc_nMaxCol);
-			var maxRows = Math.min(this.model.getRowsCount(), gc_nMaxRow);
+    WorksheetView.prototype.getData = function() {
+      var arrResult, arrCells = [], cell, c, r, row, lastC = -1, lastR = -1, val;
+      var maxCols = Math.min(this.model.getColsCount(), gc_nMaxCol);
+      var maxRows = Math.min(this.model.getRowsCount(), gc_nMaxRow);
 
-			for (r = 0; r < maxRows; ++r) {
-				row = [];
-				for (c = 0; c < maxCols; ++c) {
-					cell = this.model._getCellNoEmpty(r, c);
-					row.push(cell ? cell.getValue() : '');
-				}
-				arrResult.push(row);
-			}
-			return arrResult;
-		};
+      for (r = 0; r < maxRows; ++r) {
+        row = [];
+        for (c = 0; c < maxCols; ++c) {
+          cell = this.model._getCellNoEmpty(r, c);
+          if (cell && '' !== (val = cell.getValue())) {
+            lastC = Math.max(lastC, c);
+            lastR = Math.max(lastR, r);
+          } else {
+            val = '';
+          }
+          row.push(val);
+        }
+        arrCells.push(row);
+      }
+
+      arrResult = arrCells.slice(0, lastR + 1);
+      ++lastC;
+      if (lastC < maxCols) {
+        for (r = 0; r < arrResult.length; ++r) {
+          arrResult[r] = arrResult[r].slice(0, lastC);
+        }
+      }
+      return arrResult;
+    };
 
 		/*
 		 * Export
