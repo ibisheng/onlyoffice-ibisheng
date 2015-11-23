@@ -534,9 +534,10 @@ CBox.prototype.getBase = function()
 {
     return this.Content[0];
 };
-CBox.prototype.UpdatePRS_OneLine = function(PRS, WordLen)
+CBox.prototype.UpdatePRS_OneLine = function(PRS, WordLen, MathFirstItem)
 {
     PRS.WordLen   = WordLen;
+    PRS.MathFirstItem = MathFirstItem; // вернем MathFirstItem, который был до расчета Box, т.к . при расчете он мог измениться (при наличии внутри Box др мат объектов)
 };
 CBox.prototype.IsOperatorEmulator = function()
 {

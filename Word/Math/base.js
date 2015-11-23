@@ -1839,6 +1839,7 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var bContainCompareOper = PRS.bContainCompareOper;
 
     var bOneLine = PRS.bMath_OneLine;
+    var MathFirstItem = PRS.MathFirstItem;
     this.bOneLine = this.bCanBreak == false || PRS.bMath_OneLine == true;
 
     if(this.kind !== MATH_DELIMITER)
@@ -1871,7 +1872,7 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
         this.recalculateSize(g_oTextMeasurer);
 
-        this.UpdatePRS_OneLine(PRS, WordLen);
+        this.UpdatePRS_OneLine(PRS, WordLen, MathFirstItem);
         this.Bounds.SetWidth(0, 0, this.size.width);
         this.Bounds.UpdateMetrics(0, 0, this.size);
     }
