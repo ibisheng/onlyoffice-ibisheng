@@ -23,6 +23,15 @@ var g_nFiltersType = {
 	tablePart: 2
 };
 
+var g_nFormulaTablePartInfo = {
+	all: 1, 
+	data: 2,
+	headers: 3,
+	totals: 4,
+	thisRow: 5,
+	columns: 6
+};
+
 var g_oThemeColorsDefaultModsSpreadsheet = [
     [0, -4.9989318521683403E-2, -0.14999847407452621, -0.249977111117893, -0.34998626667073579, -0.499984740745262],
     [0, -9.9978637043366805E-2, -0.249977111117893, -0.499984740745262, -0.749992370372631, -0.89999084444715716],
@@ -4466,6 +4475,67 @@ TablePart.prototype.addTableColumns = function(activeRange, aF)
 TablePart.prototype.getType = function(F)
 {
 	return g_nFiltersType.tablePart;
+};
+
+TablePart.prototype.getTableRangeForFormula = function(objectParam)
+{
+	var res = null;
+	switch(objectParam.param)
+	{
+		case g_nFormulaTablePartInfo.all: 
+		{
+			break
+		}
+		case g_nFormulaTablePartInfo.data: 
+		{
+			break
+		}
+		case g_nFormulaTablePartInfo.headers: 
+		{
+			break
+		}
+		case g_nFormulaTablePartInfo.totals: 
+		{
+			break
+		}
+		case g_nFormulaTablePartInfo.thisRow: 
+		{
+			break
+		}
+		case g_nFormulaTablePartInfo.columns: 
+		{
+			var startCol = this._getTableIndexColumnByName(objectParam.startCol);
+			var endCol = this._getTableIndexColumnByName(objectParam.endCol);
+			
+			if(startCol === null)
+				break;
+			if(endCol === null)
+				endCol = startCol;
+			
+			res = new Asc.Range(this.Ref.c1 + startCol, this.Ref.r1, this.Ref.c1 + endCol, this.Ref.r2);
+			
+			break
+		}
+	}
+	return res;
+};
+
+TablePart.prototype._getTableIndexColumnByName = function(name)
+{
+	var res = null;
+	if(name === null || name === undefined || !this.TableColumns)
+		return res;
+		
+	for(var i = 0; i < this.TableColumns.length; i++)
+	{
+		if(name === this.TableColumns[i].Name)
+		{
+			res = i;
+			break;
+		}
+	}
+	
+	return res;
 };
 
 /** @constructor */

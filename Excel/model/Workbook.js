@@ -2916,6 +2916,17 @@ Workbook.prototype.DeserializeHistoryNative = function(oRedoObjectParam, data, i
 	}
 	return oRedoObjectParam;
 };
+Workbook.prototype.getTableRangeForFormula = function(name, objectParam){
+	var res = null;
+	for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
+    {
+        var ws = this.aWorksheets[i];
+		res = ws.getTableRangeForFormula(name, objectParam);
+		if(res !== null)
+			break;
+    }
+	return res;
+};
 //-------------------------------------------------------------------------------------------------
 /**
  * @constructor
@@ -4744,6 +4755,21 @@ Woorksheet.prototype._setHandlersTablePart = function(){
 	{
 		this.TableParts[i].setHandlers(this.handlers);
 	}
+};
+Woorksheet.prototype.getTableRangeForFormula = function(name, objectParam){
+	var res = null;
+	if(!this.TableParts)
+		return res;
+	
+	for(var i = 0; i < this.TableParts.length; i++)
+	{
+		if(this.TableParts[i].Name === name)
+		{
+			res = this.TableParts[i].getTableRangeForFormula(objectParam);
+			break;
+		}
+	}
+	return res;
 };
 
 function inCache(aCache, sFormula, aRefs)
