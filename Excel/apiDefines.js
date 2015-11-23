@@ -54,11 +54,12 @@ var c_oAscError = {
     AutoFilterDataRangeError: -50,
     AutoFilterChangeFormatTableError: -51,
     AutoFilterChangeError: -52,
-	AutoFilterMoveToHiddenRangeError: -53,
-	LockedAllError: -54,
-	
-	PasteMaxRangeError: - 65,
-	
+    AutoFilterMoveToHiddenRangeError: -53,
+    LockedAllError: -54,
+    LockedWorksheetRename: -55,
+
+    PasteMaxRangeError: -65,
+
     MaxDataSeriesError: -80,
     CannotFillRange: -81,
 
@@ -325,12 +326,12 @@ var c_oAscDefinedNameReason = {
   WrongName: -1,
   IsLocked: -2,
   Existed: -3,
-  LockDefNameManager:- 4,
+  LockDefNameManager: -4,
   OK: 0
 };
 
 var c_oAscPopUpSelectorType = {
-    Func: 0,
-    Range: 1,
-    Table: 2
+  Func: 0,
+  Range: 1,
+  Table: 2
 };
