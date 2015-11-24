@@ -218,21 +218,24 @@ NullState.prototype =
                 }
                 return ret;
             }
-            ret = handleFloatObjects(this.drawingObjects, selection.groupSelection.arrGraphicObjects, e, x, y, selection.groupSelection, pageIndex, true);
-            if(ret)
-            {
-                if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
-                {
-                    end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
-                    if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
-                    {
 
-                        this.drawingObjects.checkChartTextSelection(true);
-                        this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
-                        this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
+            if(selection.groupSelection.selectStartPage === pageIndex){
+                ret = handleFloatObjects(this.drawingObjects, selection.groupSelection.arrGraphicObjects, e, x, y, selection.groupSelection, pageIndex, true);
+                if(ret)
+                {
+                    if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+                    {
+                        end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+                        if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
+                        {
+
+                            this.drawingObjects.checkChartTextSelection(true);
+                            this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
+                            this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
+                        }
                     }
+                    return ret;
                 }
-                return ret;
             }
         }
         else if(selection.chartSelection)
@@ -1120,19 +1123,8 @@ MoveInGroupState.prototype =
         }
         else
         {
-         //   var nearest_pos = this.drawingObjects.document.Get_NearestPos(this.group.parent.pageIndex, this.group.parent.X + (bounds.x - old_x), this.group.parent.Y + (bounds.y - old_y), true, this.group.parent);
-           // if(nearest_pos.Paragraph !== check_paragraphs[0] && this.group.parent.Locked !== true )
-           // {
-           //     check_paragraphs.push(nearest_pos.Paragraph);
-           //     this.group.parent.Remove_FromDocument(false);
-           //     nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
-           //     this.group.parent.Set_XYForAdd(this.group.posX + posX, this.group.posY + posY, nearest_pos, this.group.parent.pageIndex);
-           //     this.group.parent.Add_ToDocument(nearest_pos, false);
-           // }
-           // else
-            {
-                this.group.parent.Set_XY(this.group.posX + posX, this.group.posY + posY, check_paragraphs[0], this.group.parent.pageIndex, false);
-            }
+            this.group.parent.CheckWH();
+            this.group.parent.Set_XY(this.group.posX + posX, this.group.posY + posY, check_paragraphs[0], this.group.parent.pageIndex, false);
             check_paragraphs.length = 0;
          }
         if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : changestype_Paragraph_Content}))
