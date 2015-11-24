@@ -6948,7 +6948,7 @@ asc_docs_api.prototype.asc_IsDefaultStyleChanged = function(sName){return false;
 // Работаем с рецензированием
 //----------------------------------------------------------------------------------------------------------------------
 asc_docs_api.prototype.asc_SetTrackRevisions = function(bTrack){};
-asc_docs_api.prototype.asc_IsTrackResivisions = function(){return false;};
+asc_docs_api.prototype.asc_IsTrackRevisions = function(){return false;};
 asc_docs_api.prototype.sync_BeginCatchRevisionsChanges = function(){};
 asc_docs_api.prototype.sync_EndCatchRevisionsChanges = function(){};
 asc_docs_api.prototype.sync_AddRevisionsChange = function(Change){};

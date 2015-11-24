@@ -12,7 +12,7 @@ asc_docs_api.prototype.asc_SetTrackRevisions = function(bTrack)
 {
     return this.WordControl.m_oLogicDocument.Set_TrackRevisions(bTrack);
 };
-asc_docs_api.prototype.asc_IsTrackResivisions = function()
+asc_docs_api.prototype.asc_IsTrackRevisions = function()
 {
     return this.WordControl.m_oLogicDocument.Is_TrackRevisions();
 };
