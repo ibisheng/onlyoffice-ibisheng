@@ -6268,7 +6268,7 @@
 			return res;
 		};
 
-		WorksheetView.prototype._calcActiveRangeOffset = function (x,y) {
+		WorksheetView.prototype._calcActiveRangeOffsetIsCoord = function (x,y) {
 			var vr = this.visibleRange;
 			var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] : this.activeRange;
 			if (this.isFormulaEditMode) {
@@ -6279,25 +6279,6 @@
 					ar.r2 = (ar.r2 >= this.nRowsCount) ? this.nRowsCount - 1 : ar.r2;
 				}
 			}
-//			var arn = ar.clone(true);
-//			var isMC = this._isMergedCells(arn);
-//			var adjustRight = ar.c2 >= vr.c2 || ar.c1 >= vr.c2 && isMC;
-//			var adjustBottom = ar.r2 >= vr.r2 || ar.r1 >= vr.r2 && isMC;
-//			var incX = ar.c1 < vr.c1 && isMC ? arn.c1 - vr.c1 : ar.c2 < vr.c1 ? ar.c2 - vr.c1 : 0;
-//			var incY = ar.r1 < vr.r1 && isMC ? arn.r1 - vr.r1 : ar.r2 < vr.r1 ? ar.r2 - vr.r1 : 0;
-
-//			var offsetFrozen = this.getFrozenPaneOffset();
-
-//			if (adjustRight) {
-//				while (this._isColDrawnPartially(isMC ? arn.c2 : ar.c2, vr.c1 + incX, offsetFrozen.offsetX)) {++incX;}
-//			}
-//			if (adjustBottom) {
-//				while (this._isRowDrawnPartially(isMC ? arn.r2 : ar.r2, vr.r1 + incY, offsetFrozen.offsetY)) {++incY;}
-//			}
-//          return {
-//              deltaX: ar.type === c_oAscSelectionType.RangeCol || ar.type === c_oAscSelectionType.RangeCells ? incX : 0,
-//              deltaY: ar.type === c_oAscSelectionType.RangeRow || ar.type === c_oAscSelectionType.RangeCells ? incY : 0
-//          };
 
             x *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
             y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
@@ -6314,9 +6295,6 @@
             }else if ( x >= this.drawingCtx.getWidth() - this.width_2px)
                 d.deltaX = 1;
 
-//            d.deltaX += incX;
-//            d.deltaY += incY;
-
             if (ar.type === c_oAscSelectionType.RangeRow)
                 d.deltaX = 0;
             else if (ar.type === c_oAscSelectionType.RangeCol)
@@ -6329,6 +6307,38 @@
             return d;
 
 		};
+
+        WorksheetView.prototype._calcActiveRangeOffset = function () {
+            var vr = this.visibleRange;
+            var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] : this.activeRange;
+            if (this.isFormulaEditMode) {
+                // Для формул нужно сделать ограничение по range (у нас хранится полный диапазон)
+                if (ar.c2 >= this.nColsCount || ar.r2 >= this.nRowsCount) {
+                    ar = ar.clone(true);
+                    ar.c2 = (ar.c2 >= this.nColsCount) ? this.nColsCount - 1 : ar.c2;
+                    ar.r2 = (ar.r2 >= this.nRowsCount) ? this.nRowsCount - 1 : ar.r2;
+                }
+            }
+            var arn = ar.clone(true);
+            var isMC = this._isMergedCells(arn);
+            var adjustRight = ar.c2 >= vr.c2 || ar.c1 >= vr.c2 && isMC;
+            var adjustBottom = ar.r2 >= vr.r2 || ar.r1 >= vr.r2 && isMC;
+            var incX = ar.c1 < vr.c1 && isMC ? arn.c1 - vr.c1 : ar.c2 < vr.c1 ? ar.c2 - vr.c1 : 0;
+            var incY = ar.r1 < vr.r1 && isMC ? arn.r1 - vr.r1 : ar.r2 < vr.r1 ? ar.r2 - vr.r1 : 0;
+
+            var offsetFrozen = this.getFrozenPaneOffset();
+
+            if (adjustRight) {
+                while (this._isColDrawnPartially(isMC ? arn.c2 : ar.c2, vr.c1 + incX, offsetFrozen.offsetX)) {++incX;}
+            }
+            if (adjustBottom) {
+                while (this._isRowDrawnPartially(isMC ? arn.r2 : ar.r2, vr.r1 + incY, offsetFrozen.offsetY)) {++incY;}
+            }
+            return {
+                deltaX: ar.type === c_oAscSelectionType.RangeCol || ar.type === c_oAscSelectionType.RangeCells ? incX : 0,
+                deltaY: ar.type === c_oAscSelectionType.RangeRow || ar.type === c_oAscSelectionType.RangeCells ? incY : 0
+            };
+        };
 
 		/**
 		 * @param {ActiveRange} [range]
@@ -6895,7 +6905,11 @@
 				this._moveActiveCellToOffset(x, y);
                 var x1 = this.getCellLeftRelative(this.activeRange.c1, /*pt*/0 ),
                     y1 = this.getCellTopRelative(this.activeRange.r1, /*pt*/0);
-				ret = this._calcActiveRangeOffset(x1,y1);
+				if( isCoord )
+                    ret = this._calcActiveRangeOffsetIsCoord(x1,y1);
+                else
+                    ret = this._calcActiveRangeOffset();
+
 			}
 
 			if (this.isSelectionDialogMode) {
@@ -7038,7 +7052,9 @@
 
 			this.model.workbook.handlers.trigger("asc_onHideComment");
 
-			return this._calcActiveRangeOffset(x,y);
+            return isCoord ? this._calcActiveRangeOffsetIsCoord( x, y ) :
+                             this._calcActiveRangeOffsetIsCoord( this.getCellLeftRelative(x<0?this.activeRange.c1:this.activeRange.c2, /*pt*/0 ),
+                                                                 this.getCellTopRelative(y<0?this.activeRange.r1:this.activeRange.r2, /*pt*/0) );
 		};
 
 		// Окончание выделения
