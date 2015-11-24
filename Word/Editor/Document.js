@@ -15197,7 +15197,7 @@ CDocument.prototype.Update_ForeignCursor = function(CursorInfo, UserId)
 //-----------------------------------------------------------------------------------
 CDocument.prototype.EndPreview_MailMergeResult = function(){};
 CDocument.prototype.Continue_TrackRevisions = function(){};
-
+CDocument.prototype.Set_TrackRevisions = function(bTrack){};
 //-----------------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------------
@@ -15894,10 +15894,10 @@ CTrackRevisionsManager.prototype.private_GetChangeRelatedParagraphs = function(C
 
                 if (LogicDocument && -1 !== ParaIndex)
                 {
-                    if (ParaIndex < LogicDocument.Get_ElementsCount())
+                    if (ParaIndex < LogicDocument.Get_ElementsCount() - 1)
                     {
                         var Element = LogicDocument.Get_ElementByIndex(ParaIndex + 1);
-                        if (type_Paragraph === Element.Get_Type())
+                        if (Element && type_Paragraph === Element.Get_Type())
                             RelatedParas[Element.Get_Id()] = true;
                     }
                 }

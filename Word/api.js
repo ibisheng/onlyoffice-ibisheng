@@ -5649,9 +5649,18 @@ asc_docs_api.prototype.GenerateStyles = function()
     }
 
     var StylesPainter = new CStylesPainter();
-    if (null != this.WordControl.m_oLogicDocument)
+    var LogicDocument = this.WordControl.m_oLogicDocument;
+    if (LogicDocument)
     {
+        var isTrackRevision = LogicDocument.Is_TrackRevisions();
+
+        if (true === isTrackRevision)
+            LogicDocument.Set_TrackRevisions(false);
+
         StylesPainter.GenerateStyles(this, (null == this.LoadedObject) ? this.WordControl.m_oLogicDocument.Get_Styles().Style : this.LoadedObjectDS);
+
+        if (true === isTrackRevision)
+            LogicDocument.Set_TrackRevisions(true);
     }
 };
 asc_docs_api.prototype.asyncFontsDocumentEndLoaded = function()
