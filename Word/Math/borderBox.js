@@ -524,7 +524,7 @@ CBox.prototype.fillContent = function()
     }
     else
     {
-        this.bCanBreak == false;
+        this.bCanBreak = false;
     }
 
     this.setDimension(1, 1);
