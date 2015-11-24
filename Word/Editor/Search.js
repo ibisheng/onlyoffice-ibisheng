@@ -48,6 +48,12 @@ CDocumentSearch.prototype =
         this.MatchCase = Props.MatchCase;
     },
 
+    Reset : function()
+    {
+        this.Text          = "";
+        this.MatchCase     = false;
+    },
+
     Compare : function(Text, Props)
     {
         if ( this.Text === Text && this.MatchCase === Props.MatchCase )
@@ -62,7 +68,7 @@ CDocumentSearch.prototype =
         this.MatchCase   = false;
 
         // Очищаем предыдущие элементы поиска
-        for ( var Id in this.Elements )
+        for (var Id in this.Elements)
         {
             var Paragraph = this.Elements[Id];
             Paragraph.Clear_SearchResults();
@@ -140,7 +146,7 @@ CDocumentSearch.prototype =
                 var Len = NewStr.length;
                 for ( var Pos = 0; Pos < Len; Pos++ )
                 {
-                    StartRun.Add_ToContent( RunPos + Pos, new ParaText(NewStr[Pos]) );
+                    StartRun.Add_ToContent(RunPos + Pos, ' ' === NewStr[Pos] ? new ParaSpace() : new ParaText(NewStr[Pos]));
                 }
 
                 // Выделяем старый объект поиска и удаляем его
@@ -171,9 +177,10 @@ CDocumentSearch.prototype =
 
     Replace_All : function(NewStr, bUpdateStates)
     {
-        for (var Id in this.Elements)
+        for (var Id = this.Id; Id >= 0; --Id)
         {
-            this.Replace(NewStr, Id, true);
+            if (this.Elements[Id])
+                this.Replace(NewStr, Id, true);
         }
 
         this.Clear();
@@ -262,10 +269,19 @@ CDocument.prototype.Search_Replace = function(NewStr, bAll, Id)
     {
         History.Create_NewPoint(bAll ? historydescription_Document_ReplaceAll : historydescription_Document_ReplaceSingle);
 
-        if ( true === bAll )
+        if (true === bAll)
+        {
             this.SearchEngine.Replace_All(NewStr, true);
+        }
         else
+        {
             this.SearchEngine.Replace(NewStr, Id, false);
+
+            // TODO: В будушем надо будет переделать, чтобы искалось заново только в том параграфе, в котором произошла замена
+            //       Тут появляется проблема с вложенным поиском, если то что мы заменяем содержится в том, на что мы заменяем.
+            if (true === this.Is_TrackRevisions())
+                this.SearchEngine.Reset();
+        }
 
         this.SearchEngine.ClearOnRecalc = false;
         this.Recalculate();
