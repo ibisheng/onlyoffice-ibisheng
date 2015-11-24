@@ -5520,12 +5520,18 @@ Paragraph.prototype =
                 Hyperlink.Add_ToContent( HyperPos++, this.Content[CurPos] );
             }
 
+            if (0 === Hyperlink.Content.length)
+            {
+                Hyperlink.Add_ToContent(0, new ParaRun(this, false));
+            }
+
             this.Internal_Content_Remove2( StartPos + 1, EndPos - StartPos );
             this.Internal_Content_Add( StartPos + 1, Hyperlink );
 
             if (null !== NewElementE)
                 this.Internal_Content_Add(StartPos + 2, NewElementE);
 
+            this.Selection_Remove();
             this.Selection.StartPos = StartPos + 1;
             this.Selection.EndPos   = StartPos + 1;
 
