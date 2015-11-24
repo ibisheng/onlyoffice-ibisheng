@@ -2601,11 +2601,14 @@ Paragraph.prototype =
 
                 if (this.LogicDocument && true === this.LogicDocument.Is_TrackRevisions())
                 {
-                    for (var Pos = StartPos; Pos <= EndPos; Pos++)
+                    var _StartPos = Math.max(0, StartPos);
+                    var _EndPos   = Math.min(this.Content.length - 1, EndPos);
+
+                    for (var Pos = _StartPos; Pos <= _EndPos; ++Pos)
                     {
                         this.Content[Pos].Selection_Remove();
-                        this.Content[Pos].Selection_Remove();
                     }
+
                     this.CurPos.ContentPos = StartPos;
                 }
 
