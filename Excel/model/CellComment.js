@@ -1143,36 +1143,6 @@ CCellCommentator.prototype.findComment = function(id) {
 };
 
 CCellCommentator.prototype.addComment = function(comment, bIsNotUpdate) {
-	var t = this;
-	var oComment = comment;
-	var bChange = false;
-	oComment.wsId = this.worksheet.model.getId();
-	oComment.setId();
-
-	if (!oComment.bDocument) {
-		if (!bIsNotUpdate) {
-			oComment.asc_putCol(this.worksheet.getSelectedColumnIndex());
-			oComment.asc_putRow(this.worksheet.getSelectedRowIndex());
-		}
-
-		var existComments = this.getComments(oComment.nCol, oComment.nRow);
-		if (existComments.length) {
-			oComment = existComments[0];
-			bChange = true;
-		} else {
-			if ((oComment.nCol != null) && (oComment.nRow != null)) {
-				var cellAddress = new CellAddress(oComment.nRow, oComment.nCol, 0);
-				oComment.sQuoteText = cellAddress.getID() + " : " + this.worksheet.model.getCell(cellAddress).getValueWithFormat();
-			}
-		}
-	}
-
-	var onAddCommentCallback = function (isSuccess) {
-		if (false === isSuccess)
-			return;
-		t._addComment(oComment, bChange, bIsNotUpdate);
-	};
-	this.isLockedComment(oComment, onAddCommentCallback);
 };
 
 CCellCommentator.prototype.changeComment = function(id, oComment, bChangeCoords, bNoEvent, bNoAscLock, bNoDraw) {
