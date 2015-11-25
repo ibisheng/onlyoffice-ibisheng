@@ -1119,12 +1119,28 @@ asc_docs_api.prototype._coAuthoringInit = function()
 	}
 
     var t = this;
-    this.CoAuthoringApi.onParticipantsChanged   	= function (e, CountEditUsers) {
+    this.CoAuthoringApi.onParticipantsChanged   	= function (e, CountEditUsers)
+    {
         t.asc_fireCallback("asc_onParticipantsChanged", e, CountEditUsers);
     };
 	this.CoAuthoringApi.onAuthParticipantsChanged  	= function (e, count) { t.asc_fireCallback("asc_onAuthParticipantsChanged", e, count); };
-    this.CoAuthoringApi.onMessage               	= function (e, clear) { t.asc_fireCallback("asc_onCoAuthoringChatReceiveMessage", e, clear); };
-	this.CoAuthoringApi.onConnectionStateChanged	= function (e) { t.asc_fireCallback("asc_onConnectionStateChanged", e); };
+    this.CoAuthoringApi.onMessage               	= function (e, clear)
+    {
+        if (true === CollaborativeEditing.Is_Fast())
+        {
+            t.WordControl.m_oLogicDocument.Update_ForeignCursor(e[e.length - 1].message, e[e.length - 1].user, true);
+        }
+
+        //t.asc_fireCallback("asc_onCoAuthoringChatReceiveMessage", e, clear);
+    };
+	this.CoAuthoringApi.onConnectionStateChanged	= function (e)
+    {
+        if (true === CollaborativeEditing.Is_Fast() && false === e.state)
+        {
+            editor.WordControl.m_oLogicDocument.Remove_ForeignCursor(e.id);
+        }
+        t.asc_fireCallback("asc_onConnectionStateChanged", e);
+    };
   this.CoAuthoringApi.onLocksAcquired = function(e) {
     if (t.isApplyChangesOnOpenEnabled) {
       // Пока документ еще не загружен, будем сохранять функцию и аргументы
@@ -2226,8 +2242,12 @@ function OnSave_Callback(e) {
             }
 		};
 
+        var CursorInfo = null;
+        if (true === CollaborativeEditing.Is_Fast())
+            CursorInfo = History.Get_DocumentPositionBinary();
+
 		// Пересылаем свои изменения
-		CollaborativeEditing.Send_Changes();
+		CollaborativeEditing.Send_Changes({UserId : editor.CoAuthoringApi.getUserConnectionId(), CursorInfo : CursorInfo});
 	} else {
 		var nState = editor.CoAuthoringApi.get_state();
 		if (ConnectionState.Close === nState) {

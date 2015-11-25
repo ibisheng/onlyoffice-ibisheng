@@ -562,21 +562,9 @@ DrawingObjectsController.prototype =
 
     recalculateCurPos: function()
     {
-        if(this.selection.textSelection)
-        {
-            var content = this.selection.textSelection.getDocContent();
-            if(content)
-            {
-                content.RecalculateCurPos();
-            }
-        }
-        else if(this.selection.groupSelection)
-        {
-            this.selection.groupSelection.recalculateCurPos();
-        }
-        else if(this.selection.chartSelection)
-        {
-            this.selection.chartSelection.recalculateCurPos();
+        var oTargetDocContent = this.getTargetDocContent(undefined, true);
+        if(oTargetDocContent){
+            oTargetDocContent.RecalculateCurPos();
         }
     },
 
@@ -4785,6 +4773,14 @@ DrawingObjectsController.prototype =
         return bRetValue;
     },
 
+    checkTrackDrawings: function(){
+        return this.curState instanceof  StartAddNewShape
+        || this.curState instanceof  SplineBezierState
+        || this.curState instanceof  PolyLineAddState
+        || this.curState instanceof  AddPolyLine2State
+        || this.arrTrackObjects.length > 0 || this.arrPreTrackObjects.length > 0;
+    },
+
     checkEndAddShape: function()
     {
         if(this.curState instanceof  StartAddNewShape
@@ -5538,6 +5534,103 @@ DrawingObjectsController.prototype =
             }
         }
         return [selection_state];
+    },
+
+    Save_DocumentStateBeforeLoadChanges: function(oState)
+    {
+        var oTargetDocContent = this.getTargetDocContent(undefined, true);
+        if(oTargetDocContent)
+        {
+            oState.Pos      = oTargetDocContent.Get_ContentPosition(false, false, undefined);
+            oState.StartPos = oTargetDocContent.Get_ContentPosition(true, true, undefined);
+            oState.EndPos   = oTargetDocContent.Get_ContentPosition(true, false, undefined);
+            oState.DrawingSelection = oTargetDocContent.Selection.Use;
+        }
+        oState.DrawingsSelectionState = this.getSelectionState()[0];
+    },
+
+    loadDocumentStateAfterLoadChanges: function(oSelectionState)
+    {
+        var bDocument = isRealObject(this.document);
+        var nPageIndex = 0;
+        if(!bDocument)
+        {
+            if(this.drawingObjects.getObjectType && this.drawingObjects.getObjectType() === historyitem_type_Slide)
+            {
+                nPageIndex = this.drawingObjects.num;
+            }
+        }
+        if(oSelectionState && oSelectionState.DrawingsSelectionState)
+        {
+            var oDrawingSelectionState = oSelectionState.DrawingsSelectionState;
+            if(oDrawingSelectionState.textObject)
+            {
+                if(oDrawingSelectionState.textObject.Is_UseInDocument())
+                {
+                    this.selectObject(oDrawingSelectionState.textObject, bDocument ? oDrawingSelectionState.textObject.parent.PageNum : nPageIndex);
+                    var oDocContent = oDrawingSelectionState.textObject.getDocContent();
+                    if(oDocContent){
+                        if (true === oSelectionState.DrawingSelection)
+                        {
+                            oDocContent.Set_ContentPosition(oSelectionState.StartPos, 0, 0);
+                            oDocContent.Set_ContentSelection(oSelectionState.StartPos, oSelectionState.EndPos, 0, 0, 0);
+                        }
+                        else
+                        {
+                            oDocContent.Set_ContentPosition(oSelectionState.Pos, 0, 0);
+                        }
+                        this.selection.textSelection = oDrawingSelectionState.textObject;
+                    }
+                }
+            }
+            else if(oDrawingSelectionState.groupObject)
+            {
+                if(oDrawingSelectionState.groupObject.Is_UseInDocument())
+                {
+                    this.selectObject(oDrawingSelectionState.groupObject, bDocument ? oDrawingSelectionState.groupObject.parent.PageNum : nPageIndex);
+                    oDrawingSelectionState.groupSelection.resetSelection(oDrawingSelectionState.groupSelection);
+                    if(oDrawingSelectionState.groupObject.loadDocumentStateAfterLoadChanges(oDrawingSelectionState.groupSelection))
+                    {
+                        this.selection.groupSelection = oDrawingSelectionState.groupObject;
+                    }
+                }
+            }
+            else if(oDrawingSelectionState.chartObject)
+            {
+                if(oDrawingSelectionState.chartObject.Is_UseInDocument())
+                {
+                    this.selectObject(oDrawingSelectionState.chartObject, bDocument ? oDrawingSelectionState.chartObject.parent.PageNum : nPageIndex);
+                    oDrawingSelectionState.chartObject.resetSelection();
+                    if(oDrawingSelectionState.chartObject.loadDocumentStateAfterLoadChanges(oDrawingSelectionState.chartSelection))
+                    {
+                        this.selection.chartSelection = oDrawingSelectionState.chartObject;
+                    }
+                }
+            }
+            else if(oDrawingSelectionState.wrapObject)
+            {
+                if(oDrawingSelectionState.wrapObject.parent && oDrawingSelectionState.wrapObject.parent.Is_UseInDocument && oDrawingSelectionState.wrapObject.parent.Is_UseInDocument())
+                {
+                    this.selectObject(oDrawingSelectionState.wrapObject, oDrawingSelectionState.wrapObject.parent.PageNum);
+                    if(oDrawingSelectionState.wrapObject.canChangeWrapPolygon && oDrawingSelectionState.wrapObject.canChangeWrapPolygon() && !oDrawingSelectionState.wrapObject.parent.Is_Inline())
+                    {
+                        this.selection.wrapPolygonSelection = oDrawingSelectionState.wrapObject;
+                    }
+                }
+            }
+            else
+            {
+                for(var i = 0; i < oDrawingSelectionState.selection.length; ++i)
+                {
+                    var oSp = oDrawingSelectionState.selection[i].object;
+                    if(oSp.Is_UseInDocument())
+                    {
+                        this.selectObject(oSp, bDocument ? oSp.parent.PageNum : nPageIndex);
+                    }
+                }
+            }
+        }
+        return this.selectedObjects.length > 0;
     },
 
 

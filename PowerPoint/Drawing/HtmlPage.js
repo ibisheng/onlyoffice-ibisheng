@@ -2795,6 +2795,8 @@ function CEditorPage(api)
             _c.m_nCurrentTimeClearCache = 0;
             _c.m_oDrawingDocument.CheckFontCache();
         }
+
+        this.m_oLogicDocument.Continue_FastCollaborativeEditing();
     }
     this.OnScroll = function()
     {
@@ -3057,7 +3059,8 @@ function CEditorPage(api)
             if (!oWordControl.m_oApi.asc_IsLongAction() && !window.GlobalCopyFlag)
                 oWordControl.TextBoxInput.focus();
         }
-		
+
+        var isRepaint = oWordControl.m_bIsScroll;
         if (oWordControl.m_bIsScroll)
         {
             oWordControl.m_bIsScroll = false;
@@ -3081,6 +3084,8 @@ function CEditorPage(api)
 
             oWordControl.CheckFontCache();
         }
+
+        oWordControl.m_oDrawingDocument.Collaborative_TargetsUpdate(isRepaint);
 
         if (oWordControl.m_oApi.autoSaveGap != 0 && !oWordControl.m_oApi.isViewMode && !oWordControl.TextBoxInputFocus)
         {

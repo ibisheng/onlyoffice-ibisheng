@@ -11,6 +11,13 @@ DrawingObjectsController.prototype.getDrawingArray = function()
     return this.drawingObjects.cSld.spTree;
 };
 
+DrawingObjectsController.prototype.recalculateCurPos = function(){
+    var oTargetDocContent = this.getTargetDocContent(undefined, true);
+    if(oTargetDocContent){
+        oTargetDocContent.RecalculateCurPos();
+    }
+    editor.WordControl.m_oLogicDocument.NeedUpdateTargetForCollaboration = true;
+};
 
 DrawingObjectsController.prototype.getColorMap = function()
 {

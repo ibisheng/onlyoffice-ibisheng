@@ -5,230 +5,204 @@
 
 function CCollaborativeEditing()
 {
+    CCollaborativeEditing.superclass.constructor.call(this);
+}
 
-    this.m_aLinkData = [];
-    this.m_aNewImages = [];
+Asc.extendClass(CCollaborativeEditing, CCollaborativeEditingBase);
 
-    this.m_aChangedClasses = {};
+CCollaborativeEditing.prototype.Set_Fast = function(bFast)
+{
+    this.m_bFast = bFast;
+};
 
-    this.m_bFast = false;
+CCollaborativeEditing.prototype.Is_Fast = function()
+{
+    return this.m_bFast;
+};
 
-    this.Set_Fast = function(bFast)
-    {
-        this.m_bFast = bFast;
-    };
+CCollaborativeEditing.prototype.Have_OtherChanges = function()
+{
+    return false;
+};
 
-    this.Is_Fast = function()
-    {
-        return this.m_bFast;
-    };
+CCollaborativeEditing.prototype.Start_CollaborationEditing = function()
+{
+};
 
-    this.Have_OtherChanges = function()
-    {
-        return false;
-    };
+CCollaborativeEditing.prototype.Add_User = function(UserId)
+{
+};
 
-    this.Start_CollaborationEditing = function()
-    {
-    };
+CCollaborativeEditing.prototype.Find_User = function(UserId)
+{
+};
 
-    this.Add_User = function(UserId)
-    {
-    };
+CCollaborativeEditing.prototype.Remove_User = function(UserId)
+{
+};
 
-    this.Find_User = function(UserId)
-    {
-    };
+CCollaborativeEditing.prototype.Add_Changes = function(Changes)
+{
+};
 
-    this.Remove_User = function(UserId)
-    {
-    };
+CCollaborativeEditing.prototype.Add_Unlock = function(LockClass)
+{
+};
 
-    this.Add_Changes = function(Changes)
-    {
-    };
+CCollaborativeEditing.prototype.Add_Unlock2 = function(Lock)
+{
+};
 
-    this.Add_Unlock = function(LockClass)
-    {
-    };
+CCollaborativeEditing.prototype.Apply_OtherChanges = function()
+{
+};
 
-    this.Add_Unlock2 = function(Lock)
-    {
-    };
 
-    this.Apply_OtherChanges = function()
-    {
-    };
+CCollaborativeEditing.prototype.Apply_Changes = function()
+{
+};
 
-    this.Get_SelfChanges = function()
-    {
+CCollaborativeEditing.prototype.Send_Changes = function()
+{
+};
 
-    };
+CCollaborativeEditing.prototype.Release_Locks = function()
+{
+};
 
-    this.Apply_Changes = function()
-    {
-    };
+CCollaborativeEditing.prototype.OnStart_Load_Objects = function()
+{
+};
 
-    this.Send_Changes = function()
-    {
-    };
-
-    this.Release_Locks = function()
-    {
-    };
-
-    this.OnStart_Load_Objects = function()
-    {
-    };
-
-    this.OnEnd_Load_Objects = function()
-    {
-    };
+CCollaborativeEditing.prototype.OnEnd_Load_Objects = function()
+{
+};
 //-----------------------------------------------------------------------------------
 // Функции для работы с ссылками, у новых объектов
 //-----------------------------------------------------------------------------------
-    this.Clear_LinkData = function()
-    {
-        this.m_aLinkData.length = 0;
-    };
+CCollaborativeEditing.prototype.Clear_LinkData = function()
+{
+    this.m_aLinkData.length = 0;
+};
 
-    this.Add_LinkData = function(Class, LinkData)
-    {
-        this.m_aLinkData.push( { Class : Class, LinkData : LinkData } );
-    };
+CCollaborativeEditing.prototype.Add_LinkData = function(Class, LinkData)
+{
+    this.m_aLinkData.push( { Class : Class, LinkData : LinkData } );
+};
 
-    this.Apply_LinkData = function()
+CCollaborativeEditing.prototype.Apply_LinkData = function()
+{
+    var Count = this.m_aLinkData.length;
+    for ( var Index = 0; Index < Count; Index++ )
     {
-        var Count = this.m_aLinkData.length;
-        for ( var Index = 0; Index < Count; Index++ )
+        var Item = this.m_aLinkData[Index];
+        Item.Class.Load_LinkData( Item.LinkData );
+    }
+
+    this.Clear_LinkData();
+
+
+    if(this.m_aNewImages.length > 0)
+    {
+        Asc["editor"].ImageLoader.LoadDocumentImages(this.m_aNewImages, null, function()
         {
-            var Item = this.m_aLinkData[Index];
-            Item.Class.Load_LinkData( Item.LinkData );
-        }
+            CollaborativeEditing.m_aNewImages.length = 0;
+            Asc["editor"]._onShowDrawingObjects();
+            var worksheet = Asc["editor"].wb.getWorksheet();
+            worksheet && worksheet.objectRender && worksheet.objectRender.controller && worksheet.objectRender.controller.getGraphicObjectProps();
+        });
 
-        this.Clear_LinkData();
-
-
-        if(this.m_aNewImages.length > 0)
-        {
-            Asc["editor"].ImageLoader.LoadDocumentImages(this.m_aNewImages, null, function()
-            {
-                CollaborativeEditing.m_aNewImages.length = 0;
-                Asc["editor"]._onShowDrawingObjects();
-                var worksheet = Asc["editor"].wb.getWorksheet();
-                worksheet && worksheet.objectRender && worksheet.objectRender.controller && worksheet.objectRender.controller.getGraphicObjectProps();
-            });
-
-        }
-    };
+    }
+};
 //-----------------------------------------------------------------------------------
 // Функции для проверки корректности новых изменений
 //-----------------------------------------------------------------------------------
-    this.Check_MergeData = function()
-    {
-    };
+CCollaborativeEditing.prototype.Check_MergeData = function()
+{
+};
 //-----------------------------------------------------------------------------------
 // Функции для проверки залоченности объектов
 //-----------------------------------------------------------------------------------
-    this.Get_GlobalLock = function()
-    {
-    };
+CCollaborativeEditing.prototype.Get_GlobalLock = function()
+{
+};
 
-    this.OnStart_CheckLock = function()
-    {
-    };
+CCollaborativeEditing.prototype.OnStart_CheckLock = function()
+{
+};
 
-    this.Add_CheckLock = function(oItem)
-    {
-    };
+CCollaborativeEditing.prototype.Add_CheckLock = function(oItem)
+{
+};
 
-    this.OnEnd_CheckLock = function()
-    {
-    };
+CCollaborativeEditing.prototype.OnEnd_CheckLock = function()
+{
+};
 
-    this.OnCallback_AskLock = function(result)
-    {
-    };
+CCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
+{
+};
 //-----------------------------------------------------------------------------------
 // Функции для работы с залоченными объектами, которые еще не были добавлены
 //-----------------------------------------------------------------------------------
-    this.Reset_NeedLock = function()
-    {
-    };
+CCollaborativeEditing.prototype.Reset_NeedLock = function()
+{
+};
 
-    this.Add_NeedLock = function(Id, sUser)
-    {
-    };
+CCollaborativeEditing.prototype.Add_NeedLock = function(Id, sUser)
+{
+};
 
-    this.Remove_NeedLock = function(Id)
-    {
-    };
+CCollaborativeEditing.prototype.Remove_NeedLock = function(Id)
+{
+};
 
-    this.Lock_NeedLock = function()
-    {
-    };
+CCollaborativeEditing.prototype.Lock_NeedLock = function()
+{
+};
 //-----------------------------------------------------------------------------------
 // Функции для работы с новыми объектами, созданными на других клиентах
 //-----------------------------------------------------------------------------------
-    this.Clear_NewObjects = function()
-    {
-    };
+CCollaborativeEditing.prototype.Clear_NewObjects = function()
+{
+};
 
-    this.Add_NewObject = function(Class)
-    {
-    };
+CCollaborativeEditing.prototype.Add_NewObject = function(Class)
+{
+};
 
-    this.OnEnd_ReadForeignChanges = function()
-    {
-    };
-//-----------------------------------------------------------------------------------
-// Функции для работы с новыми объектами, созданными на других клиентах
-//-----------------------------------------------------------------------------------
-    this.Clear_NewImages = function()
-    {
-        this.m_aNewImages.length = 0;
-    };
+CCollaborativeEditing.prototype.OnEnd_ReadForeignChanges = function()
+{
+};
 
-    this.Add_NewImage = function(Url)
-    {
-        this.m_aNewImages.push( Url );
-    };
 //-----------------------------------------------------------------------------------
 // Функции для работы с массивом m_aDC
 //-----------------------------------------------------------------------------------
-    this.Add_NewDC = function(Class)
-    {
-    };
+CCollaborativeEditing.prototype.Add_NewDC = function(Class)
+{
+};
 
-    this.Clear_DCChanges = function()
-    {
-    };
+CCollaborativeEditing.prototype.Clear_DCChanges = function()
+{
+};
 
-    this.Refresh_DCChanges = function()
-    {
-    };
+CCollaborativeEditing.prototype.Refresh_DCChanges = function()
+{
+};
 //-----------------------------------------------------------------------------------
 // Функции для работы с отметками изменений
 //-----------------------------------------------------------------------------------
-    this.Add_ChangedClass = function(Class)
+
+CCollaborativeEditing.prototype.Clear_CollaborativeMarks = function()
+{
+    for ( var Id in this.m_aChangedClasses )
     {
-        var Id = Class.Get_Id();
-        this.m_aChangedClasses[Id] = Class;
-    };
+        this.m_aChangedClasses[Id].Clear_CollaborativeMarks();
+    }
 
-    this.Clear_CollaborativeMarks = function()
-    {
-        for ( var Id in this.m_aChangedClasses )
-        {
-            this.m_aChangedClasses[Id].Clear_CollaborativeMarks();
-        }
-
-        // Очищаем массив
-        this.m_aChangedClasses = {};
-    };
-
-}
-
+    // Очищаем массив
+    this.m_aChangedClasses = {};
+};
 
 CCollaborativeEditing.prototype.Clear_DocumentPositions = function()
 {

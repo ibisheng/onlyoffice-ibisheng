@@ -4,6 +4,8 @@ CGroupShape.prototype.addToRecalculate = CShape.prototype.addToRecalculate;
 CGroupShape.prototype.handleUpdateTheme = CShape.prototype.handleUpdateTheme;
 CGroupShape.prototype.getSlideIndex = CShape.prototype.getSlideIndex;
 
+CGroupShape.prototype.Is_UseInDocument = CShape.prototype.Is_UseInDocument;
+
 CGroupShape.prototype.handleUpdateFill = function()
 {
     for(var i = 0; i < this.spTree.length; ++i)

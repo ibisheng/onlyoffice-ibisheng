@@ -384,6 +384,11 @@ CHistory.prototype =
             var ContentChanges = new CContentChangesElement( ( bAdd == true ? contentchanges_Add : contentchanges_Remove ), Data.Pos, Count, Item );
             Class.Add_ContentChanges( ContentChanges );
             CollaborativeEditing.Add_NewDC( Class );
+
+            if (true === bAdd)
+                CollaborativeEditing.Update_DocumentPositionsOnAdd(Class, Data.Pos);
+            else
+                CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, Data.Pos, Count);
         }
         if(CollaborativeEditing.AddPosExtChanges && Class instanceof CXfrm)
         {

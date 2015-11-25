@@ -191,11 +191,15 @@ NullState.prototype =
             ret = handleSelectedObjects(this.drawingObjects, e, x, y, selection.groupSelection, pageIndex, false);
             if(ret)
             {
-                end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
-                if((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
+                if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
                 {
-                    this.drawingObjects.checkChartTextSelection(true);
-                    this.drawingObjects.drawingObjects.showDrawingObjects(true);
+                    end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+                    if((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
+                    {
+                        this.drawingObjects.checkChartTextSelection(true);
+                        this.drawingObjects.drawingObjects.showDrawingObjects(true);
+                    }
+                    CollaborativeEditing.Update_ForeignCursorsPositions();
                 }
                 return ret;
             }
@@ -210,6 +214,7 @@ NullState.prototype =
                         this.drawingObjects.checkChartTextSelection(true);
                         this.drawingObjects.drawingObjects.showDrawingObjects(true);
                     }
+                    CollaborativeEditing.Update_ForeignCursorsPositions();
                 }
                 return ret;
             }
@@ -227,6 +232,7 @@ NullState.prototype =
                     this.drawingObjects.checkChartTextSelection(true);
                     this.drawingObjects.drawingObjects.showDrawingObjects(true);
                 }
+                CollaborativeEditing.Update_ForeignCursorsPositions();
             }
             return ret;
         }
@@ -242,6 +248,7 @@ NullState.prototype =
                     this.drawingObjects.checkChartTextSelection(true);
                     this.drawingObjects.drawingObjects.showDrawingObjects(true);
                 }
+                CollaborativeEditing.Update_ForeignCursorsPositions();
             }
             return ret;
         }

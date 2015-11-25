@@ -695,26 +695,25 @@ CDocumentFieldsManager.prototype.Restore_MailMergeTemplate = function()
 
 function CDocument(DrawingDocument)
 {
-    this.History   = History;
-    History.Document = this;
-
-    // Создаем глобальные объекты, необходимые для совместного редактирования
-    this.IdCounter = g_oIdCounter;
-    this.TableId = g_oTableId;
-    this.CollaborativeEditing = null;
-    if (typeof CollaborativeEditing !== "undefined")
-        this.CollaborativeEditing = CollaborativeEditing;
+    // Сохраняем ссылки на глобальные объекты
+    this.History              = History;
+    this.IdCounter            = g_oIdCounter;
+    this.TableId              = g_oTableId;
+    this.CollaborativeEditing = (CollaborativeEditing instanceof CWordCollaborativeEditing ? CollaborativeEditing : null);
+    this.Api                  = editor;
+    //------------------------------------------------------------------------
+    this.History.Document = this;
+    if (this.CollaborativeEditing)
+        this.CollaborativeEditing.m_oLogicDocument = this;
     //------------------------------------------------------------------------
 
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = this.IdCounter.Get_NewId();
 
     this.StartPage = 0; // Для совместимости с CDocumentContent
     this.CurPage   = 0;
 
     this.StyleCounter = 0;
     this.NumInfoCounter = 0;
-
-    this.Api = editor;
 
     // Сначала настраиваем размеры страницы и поля
     this.SectPr = new CSectionPr(this);
@@ -776,6 +775,11 @@ function CDocument(DrawingDocument)
 
     this.NeedUpdateTarget = false;
 
+    // Флаг, который контролирует нужно ли обновлять наш курсор у остальных редакторов нашего документа.
+    // Также следим за частотой обновления, чтобы оно проходило не чаще одного раза в секунду.
+    this.NeedUpdateTargetForCollaboration = true;
+    this.LastUpdateTargetTime             = 0;
+
     this.ReindexStartPos = 0;
 
     // Класс для работы с колонтитулами
@@ -817,7 +821,7 @@ function CDocument(DrawingDocument)
     this.DrawingObjects = null;
 
     if (typeof CGraphicObjects !== "undefined")
-        this.DrawingObjects = new CGraphicObjects(this, this.DrawingDocument, editor);
+        this.DrawingObjects = new CGraphicObjects(this, this.DrawingDocument, this.Api);
     this.theme          = GenerateDefaultTheme(this);
     this.clrSchemeMap   = GenerateDefaultColorMap();
 
@@ -851,7 +855,7 @@ function CDocument(DrawingDocument)
     this.ChangedStyles = []; // Объект с Id стилями, которые были изменены/удалены/добавлены
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-    g_oTableId.Add( this, this.Id );
+    this.TableId.Add(this, this.Id);
 }
 
 var selected_None              = -1;
@@ -997,7 +1001,7 @@ CDocument.prototype =
             }
         }
 
-        //this.Set_FastCollaborativeEditing(true);
+        this.Set_FastCollaborativeEditing(true);
     },
     
     Add_TestDocument : function()
@@ -2466,6 +2470,10 @@ CDocument.prototype =
     // Отрисовка содержимого Документа
     Draw : function(nPageIndex, pGraphics)
     {
+        // TODO: Пока делаем обновление курсоров при каждой отрисовке. Необходимо поменять
+        this.CollaborativeEditing.Update_ForeignCursorsPositions();
+        //--------------------------------------------------------------------------------------------------------------
+
         this.Comments.Reset_Drawing( nPageIndex );
 
         // Определим секцию
@@ -4119,6 +4127,8 @@ CDocument.prototype =
 
     Cursor_MoveToStartPos : function(AddToSelect)
     {
+        this.private_UpdateTargetForCollaboration();
+
         if ( true === AddToSelect )
         {
             if ( docpostype_HdrFtr === this.CurPos.Type )
@@ -4198,6 +4208,8 @@ CDocument.prototype =
 
     Cursor_MoveToEndPos : function(AddToSelect)
     {
+        this.private_UpdateTargetForCollaboration();
+
         if ( true === AddToSelect )
         {
             if ( docpostype_HdrFtr === this.CurPos.Type )
@@ -4277,6 +4289,8 @@ CDocument.prototype =
 
     Cursor_MoveLeft : function(AddToSelect, Word)
     {
+        this.private_UpdateTargetForCollaboration();
+
         if ( "undefined" === typeof(Word) || null === Word )
             Word = false;
 
@@ -4453,6 +4467,8 @@ CDocument.prototype =
 
     Cursor_MoveRight : function(AddToSelect, Word, FromPaste)
     {
+        this.private_UpdateTargetForCollaboration();
+
         if ( "undefined" === typeof(Word) || null === Word )
             Word = false;
 
@@ -4660,6 +4676,8 @@ CDocument.prototype =
 
     Cursor_MoveUp : function(AddToSelect)
     {
+        this.private_UpdateTargetForCollaboration();
+
         if (docpostype_HdrFtr === this.CurPos.Type && docpostype_DrawingObjects === this.HdrFtr.CurHdrFtr.Content.CurPos.Type)
         {
             var RetValue = this.HdrFtr.Cursor_MoveUp(AddToSelect);
@@ -4697,6 +4715,8 @@ CDocument.prototype =
 
     Cursor_MoveDown : function(AddToSelect)
     {
+        this.private_UpdateTargetForCollaboration();
+
         if (docpostype_HdrFtr === this.CurPos.Type && docpostype_DrawingObjects === this.HdrFtr.CurHdrFtr.Content.CurPos.Type)
         {
             var RetValue = this.HdrFtr.Cursor_MoveDown(AddToSelect);
@@ -4734,6 +4754,8 @@ CDocument.prototype =
 
     Cursor_MoveEndOfLine : function(AddToSelect)
     {
+        this.private_UpdateTargetForCollaboration();
+
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
@@ -4812,6 +4834,8 @@ CDocument.prototype =
 
     Cursor_MoveStartOfLine : function(AddToSelect)
     {
+        this.private_UpdateTargetForCollaboration();
+
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
@@ -4890,6 +4914,8 @@ CDocument.prototype =
 
     Cursor_MoveAt : function( X, Y, AddToSelect )
     {
+        this.private_UpdateTargetForCollaboration();
+
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
@@ -4944,6 +4970,8 @@ CDocument.prototype =
 
     Cursor_MoveToCell : function(bNext)
     {
+        this.private_UpdateTargetForCollaboration();
+
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
             this.HdrFtr.Cursor_MoveToCell( bNext );
@@ -7401,9 +7429,10 @@ CDocument.prototype =
         this.DrawingObjects.shapeApply(shapeProps);
     },
 
-
     Select_Drawings : function(DrawingArray, TargetContent)
     {
+        this.private_UpdateTargetForCollaboration();
+
         if(DrawingArray.length === 1 && DrawingArray[0].Is_Inline())
             return;
         this.DrawingObjects.resetSelection();
@@ -8859,6 +8888,8 @@ CDocument.prototype =
     // Селектим весь параграф
     Select_All : function()
     {
+        this.private_UpdateTargetForCollaboration();
+
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
@@ -9315,6 +9346,8 @@ CDocument.prototype =
 
     Document_SelectNumbering : function(NumPr, Index)
     {
+        this.private_UpdateTargetForCollaboration();
+
         this.Selection_Remove();
 
         this.Selection.Use  = true;
@@ -9466,6 +9499,8 @@ CDocument.prototype =
 
     OnKeyDown : function(e)
     {
+        this.private_UpdateTargetForCollaboration();
+
         // Если мы только что расширяли документ двойным щелчком, то сохраняем это действие
         if ( true === this.History.Is_ExtendDocumentToPos() )
             this.History.Clear_Additional();
@@ -10490,7 +10525,9 @@ CDocument.prototype =
     {
         if ( PageIndex < 0 )
             return;
-        
+
+        this.private_UpdateTargetForCollaboration();
+
         // Сбрасываем проверку Drag-n-Drop
         this.Selection.DragDrop.Flag = 0;
         this.Selection.DragDrop.Data = null;
@@ -10567,6 +10604,8 @@ CDocument.prototype =
     {
         if ( PageIndex < 0 )
             return;
+
+        this.private_UpdateTargetForCollaboration();
 
         if ( 1 === this.Selection.DragDrop.Flag )
         {
@@ -10734,6 +10773,9 @@ CDocument.prototype =
         if ( PageIndex < 0 )
             return;
 
+        if (true === this.Selection.Start)
+            this.private_UpdateTargetForCollaboration();
+
         this.Update_CursorType( X, Y, PageIndex, e );
 
         if ( 1 === this.Selection.DragDrop.Flag )
@@ -10832,7 +10874,6 @@ CDocument.prototype =
     {
         return null;
     },
-
 
     Get_ShapeStyleForPara: function()
     {
@@ -14634,41 +14675,48 @@ CDocument.prototype.Get_ElementByIndex = function(Index)
 };
 CDocument.prototype.Set_FastCollaborativeEditing = function(isOn)
 {
-    CollaborativeEditing.Set_Fast(isOn);
-    editor.SetCollaborativeMarksShowType(c_oAscCollaborativeMarksShowType.None);
+    this.CollaborativeEditing.Set_Fast(isOn);
+
+    if (c_oAscCollaborativeMarksShowType.LastChanges === this.Api.GetCollaborativeMarksShowType())
+        this.Api.SetCollaborativeMarksShowType(c_oAscCollaborativeMarksShowType.All);
 };
 CDocument.prototype.Continue_FastCollaborativeEditing = function()
 {
-    if (true !== CollaborativeEditing.Is_Fast())
+    if (true !== this.CollaborativeEditing.Is_Fast())
         return;
 
     if (true === this.Selection_Is_TableBorderMove() || true === this.Api.isStartAddShape)
         return;
 
-    // TODO: Убрать эту функцю
-    editor.SetCollaborativeMarksShowType(c_oAscCollaborativeMarksShowType.None);
-
-    //// TODO: Сделать это пореже
-    //var CurTime = new Date().getTime();
-    //if (CurTime - LastCursorTime > 1000)
-    //{
-    //    var CursorInfo = History.Get_DocumentPositionBinary();
-    //    if (null !== CursorInfo)
-    //    {
-    //        editor.asc_coAuthoringChatSendMessage(CursorInfo);
-    //        LastCursorTime = CurTime;
-    //    }
-    //}
-
-    if (true !== History.Have_Changes() && true === CollaborativeEditing.Have_OtherChanges())
+    var HaveChanges = this.History.Have_Changes();
+    if (true !== HaveChanges && true === this.CollaborativeEditing.Have_OtherChanges())
     {
         // Принимаем чужие изменение. Своих нет, но функцию отсылки надо вызвать, чтобы снялить локи.
-        CollaborativeEditing.Apply_Changes();
-        CollaborativeEditing.Send_Changes();
+        this.CollaborativeEditing.Apply_Changes();
+        this.CollaborativeEditing.Send_Changes();
     }
-    else if (true === History.Have_Changes() || true === CollaborativeEditing.Have_OtherChanges())
+    else if (true === HaveChanges || true === this.CollaborativeEditing.Have_OtherChanges())
     {
         this.Api.asc_Save();
+    }
+
+    var CurTime = new Date().getTime();
+    if (true === this.NeedUpdateTargetForCollaboration && (CurTime - this.LastUpdateTargetTime > 1000))
+    {
+        this.NeedUpdateTargetForCollaboration = false;
+        if (true !== HaveChanges)
+        {
+            var CursorInfo = this.History.Get_DocumentPositionBinary();
+            if (null !== CursorInfo)
+            {
+                this.Api.asc_coAuthoringChatSendMessage(CursorInfo);
+                this.LastUpdateTargetTime = CurTime;
+            }
+        }
+        else
+        {
+            this.LastUpdateTargetTime = CurTime;
+        }
     }
 };
 CDocument.prototype.Save_DocumentStateBeforeLoadChanges = function()
@@ -14935,7 +14983,7 @@ CDocument.prototype.Load_DocumentStateAfterLoadChanges = function(State)
 };
 CDocument.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
-    if (!StartDocPos[Depth] || this !== StartDocPos[Depth].Class || !EndDocPos[Depth] || this !== EndDocPos[Depth].Class)
+    if ((0 === StartFlag && (!StartDocPos[Depth] || this !== StartDocPos[Depth].Class)) || (0 === EndFlag && (!EndDocPos[Depth] || this !== EndDocPos[Depth].Class)))
         return;
 
     var StartPos = 0, EndPos = 0;
@@ -15123,7 +15171,7 @@ CDocument.prototype.private_GetLogicDocumentPosition = function(LogicDocument)
             if (null === Run)
                 return null;
 
-            var DrawingInRunPos = Run.Get_DrawingObjectSimplePos();
+            var DrawingInRunPos = Run.Get_DrawingObjectSimplePos(ParaDrawing.Get_Id());
             if (-1 === DrawingInRunPos)
                 return null;
 
@@ -15149,13 +15197,20 @@ CDocument.prototype.Get_DocumentPositionInfoForCollaborative = function()
 
     return Last;
 };
-CDocument.prototype.Update_ForeignCursor = function(CursorInfo, UserId)
+CDocument.prototype.Update_ForeignCursor = function(CursorInfo, UserId, Show)
 {
     if (!this.Api.User)
         return;
 
-    if (UserId === this.Api.User.asc_getId())
+    if (UserId === this.Api.CoAuthoringApi.getUserConnectionId())
         return;
+
+    if (!CursorInfo)
+    {
+        this.DrawingDocument.Collaborative_RemoveTarget(UserId);
+        this.CollaborativeEditing.Remove_ForeignCursor(UserId);
+        return;
+    }
 
     var Changes = new CCollaborativeChanges();
     var Reader = Changes.Internal_Load_Data2(CursorInfo, 0, CursorInfo.length);
@@ -15163,33 +15218,50 @@ CDocument.prototype.Update_ForeignCursor = function(CursorInfo, UserId)
     var RunId    = Reader.GetString2();
     var InRunPos = Reader.GetLong();
 
-    var Run = g_oTableId.Get_ById(RunId);
+    var Run = this.TableId.Get_ById(RunId);
     if (!Run)
     {
         this.DrawingDocument.Collaborative_RemoveTarget(UserId);
+        this.CollaborativeEditing.Remove_ForeignCursor(UserId);
         return;
     }
 
-    var Paragraph = Run.Get_Paragraph();
-    if (!Paragraph)
+    var CursorPos = [{Class : Run, Position : InRunPos}];
+    Run.Get_DocumentPositionFromObject(CursorPos);
+    this.CollaborativeEditing.Add_ForeignCursor(UserId, CursorPos);
+
+    if (true === Show)
     {
-        this.DrawingDocument.Collaborative_RemoveTarget(UserId);
-        return;
-    }
+        var Paragraph = Run.Get_Paragraph();
+        if (!Paragraph)
+        {
+            this.DrawingDocument.Collaborative_RemoveTarget(UserId);
+            this.CollaborativeEditing.Remove_ForeignCursor(UserId);
+            return;
+        }
 
-    var ParaContentPos = Paragraph.Get_PosByElement(Run);
-    if (!ParaContentPos)
-    {
-        this.DrawingDocument.Collaborative_RemoveTarget(UserId);
-        return;
-    }
-    ParaContentPos.Update(InRunPos, ParaContentPos.Get_Depth() + 1);
+        var ParaContentPos = Paragraph.Get_PosByElement(Run);
+        if (!ParaContentPos)
+        {
+            this.DrawingDocument.Collaborative_RemoveTarget(UserId);
+            return;
+        }
+        ParaContentPos.Update(InRunPos, ParaContentPos.Get_Depth() + 1);
 
-    var XY = Paragraph.Get_XYByContentPos(ParaContentPos);
-    if (XY && XY.Height > 0.001)
-        this.DrawingDocument.Collaborative_UpdateTarget(UserId, XY.X, XY.Y, XY.Height, XY.PageNum, Paragraph.Get_ParentTextTransform());
-    else
-        this.DrawingDocument.Collaborative_RemoveTarget(UserId);
+        var XY = Paragraph.Get_XYByContentPos(ParaContentPos);
+        if (XY && XY.Height > 0.001)
+            this.DrawingDocument.Collaborative_UpdateTarget(UserId, XY.X, XY.Y, XY.Height, XY.PageNum, Paragraph.Get_ParentTextTransform());
+        else
+            this.DrawingDocument.Collaborative_RemoveTarget(UserId);
+    }
+};
+CDocument.prototype.Remove_ForeignCursor = function(UserId)
+{
+    this.DrawingDocument.Collaborative_RemoveTarget(UserId);
+};
+CDocument.prototype.private_UpdateTargetForCollaboration = function()
+{
+    this.NeedUpdateTargetForCollaboration = true;
 };
 
 //-----------------------------------------------------------------------------------

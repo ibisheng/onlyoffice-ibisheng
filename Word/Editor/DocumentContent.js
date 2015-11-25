@@ -9565,7 +9565,7 @@ CDocumentContent.prototype.Get_DocumentPositionFromObject = function(PosArray)
 };
 CDocumentContent.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
-    if (!StartDocPos[Depth] || this !== StartDocPos[Depth].Class || !EndDocPos[Depth] || this !== EndDocPos[Depth].Class)
+    if ((0 === StartFlag && (!StartDocPos[Depth] || this !== StartDocPos[Depth].Class)) || (0 === EndFlag && (!EndDocPos[Depth] || this !== EndDocPos[Depth].Class)))
         return;
 
     if (this.Content.length <= 0)

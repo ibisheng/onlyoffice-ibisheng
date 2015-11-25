@@ -2307,6 +2307,7 @@ function CDrawingDocument()
     this.TargetHtmlElementTop = 0;
 
     this.CollaborativeTargets = [];
+    this.CollaborativeTargetsUpdateTasks = [];
 
     this.m_bIsBreakRecalculate = false;
     this.m_bIsUpdateDocSize = false;
@@ -6887,8 +6888,14 @@ function CDrawingDocument()
     };
 
     // collaborative targets
-    this.Collaborative_UpdateTarget = function(_id, _x, _y, _size, _page, _transform)
+    this.Collaborative_UpdateTarget = function(_id, _x, _y, _size, _page, _transform, is_from_paint)
     {
+        if (is_from_paint !== true)
+        {
+            this.CollaborativeTargetsUpdateTasks.push([_id, _x, _y, _size, _page, _transform]);
+            return;
+        }
+
         for (var i = 0; i < this.CollaborativeTargets.length; i++)
         {
             if (_id == this.CollaborativeTargets[i].Id)
@@ -6897,7 +6904,7 @@ function CDrawingDocument()
                 return;
             }
         }
-        var _target = new CDrawingCollaborativeTarget()
+        var _target = new CDrawingCollaborativeTarget();
         _target.Id = _id;
         _target.CheckPosition(this, _x, _y, _size, _page, _transform);
         this.CollaborativeTargets[this.CollaborativeTargets.length] = _target;
@@ -6913,11 +6920,24 @@ function CDrawingDocument()
             }
         }
     };
-    this.Collaborative_TargetsUpdate = function()
+    this.Collaborative_TargetsUpdate = function(bIsChangePosition)
     {
-        for (var i = 0; i < this.CollaborativeTargets.length; i++)
+        var _len_tasks = this.CollaborativeTargetsUpdateTasks.length;
+        var i = 0;
+        for (i = 0; i < _len_tasks; i++)
         {
-            this.CollaborativeTargets[i].Update(this);
+            var _tmp = this.CollaborativeTargetsUpdateTasks[i];
+            this.Collaborative_UpdateTarget(_tmp[0], _tmp[1], _tmp[2], _tmp[3], _tmp[4], _tmp[5], true);
+        }
+        if (_len_tasks != 0)
+            this.CollaborativeTargetsUpdateTasks.splice(0, _len_tasks);
+
+        if (bIsChangePosition)
+        {
+            for (i = 0; i < this.CollaborativeTargets.length; i++)
+            {
+                this.CollaborativeTargets[i].Update(this);
+            }
         }
     };
 }

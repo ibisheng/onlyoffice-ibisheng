@@ -886,6 +886,17 @@ CShape.prototype.recalcText = function()
             this.recalcGeometry();
             this.recalcWrapPolygon();
             this.recalcBounds();
+
+            this.recalcTransform();
+
+            if(!this.group){
+                if(this.parent && this.parent.Parent){
+                    var Run = this.parent.Parent.Get_DrawingObjectRun( this.parent.Id );
+                    if(Run){
+                        Run.RecalcInfo.Measure = true;
+                    }
+                }
+            }
         }
     }
 };

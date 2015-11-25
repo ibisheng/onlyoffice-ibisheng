@@ -38,6 +38,7 @@
                 "../../Word/Editor/Styles.js",
                 "../../Word/Editor/Numbering.js",
                 "../../Word/Drawing/Metafile.js",
+				"../../Common/CollaborativeEditingBase.js",
                 "../../PowerPoint/Editor/CollaborativeEditing.js",
                 "../../Word/Drawing/GraphicsEvents.js",
                 "../../Word/Drawing/WorkEvents.js",

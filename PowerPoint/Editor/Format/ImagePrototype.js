@@ -21,6 +21,7 @@ CImageShape.prototype.setParent2 = CShape.prototype.setParent2;
 CImageShape.prototype.handleUpdateTheme = CShape.prototype.handleUpdateTheme;
 CImageShape.prototype.getIsSingleBody = CShape.prototype.getIsSingleBody;
 CImageShape.prototype.getSlideIndex = CShape.prototype.getSlideIndex;
+CImageShape.prototype.Is_UseInDocument = CShape.prototype.Is_UseInDocument;
 
 CImageShape.prototype.setRecalculateInfo = function()
 {

@@ -3733,6 +3733,7 @@ function CEditorPage(api)
         }
         
         oWordControl.m_nTimeDrawingLast = new Date().getTime();
+        var isRepaint = oWordControl.m_bIsScroll;
         if (oWordControl.m_bIsScroll)
         {
             oWordControl.m_bIsScroll = false;
@@ -3740,8 +3741,6 @@ function CEditorPage(api)
 
             if (null != oWordControl.m_oLogicDocument && oWordControl.m_oApi.bInit_word_control)
                 oWordControl.m_oLogicDocument.Viewer_OnChangePosition();
-
-            oWordControl.m_oDrawingDocument.Collaborative_TargetsUpdate();
         }
         if (null != oWordControl.m_oLogicDocument)
         {
@@ -3753,6 +3752,8 @@ function CEditorPage(api)
             oWordControl.CheckFontCache();
             oWordControl.m_oDrawingDocument.CheckTrackTable();
         }
+
+        oWordControl.m_oDrawingDocument.Collaborative_TargetsUpdate(isRepaint);
 
         if (oWordControl.m_oApi.autoSaveGap != 0 && !oWordControl.m_oApi.isViewMode && !oWordControl.TextBoxInputFocus)
         {

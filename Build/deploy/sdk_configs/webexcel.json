@@ -152,6 +152,7 @@
                 "../../Word/Math/operators.js",
                 "../../Word/Math/accent.js",
                 "../../Word/Math/borderBox.js",
+				"../../Common/CollaborativeEditingBase.js",
                 "../../Excel/model/DrawingObjects/GlobalCounters.js",
                 "../../Word/apiCommon.js",
                 "../../Excel/apiCommonExport.js",

@@ -31,6 +31,26 @@ CRFonts.prototype.Merge = function(RFonts)
 CShape.prototype.setDrawingObjects = function(drawingObjects)
 {
 };
+CShape.prototype.Is_UseInDocument = function(drawingObjects)
+{
+    if(this.group)
+    {
+        var aSpTree = this.group.spTree;
+        for(var i = 0; i < aSpTree.length; ++i)
+        {
+            if(aSpTree[i] === this)
+            {
+                return this.group.Is_UseInDocument();
+            }
+            return false;
+        }
+    }
+    if(this.parent && this.parent.Is_UseInDocument && this.parent.GraphicObj === this)
+    {
+        return this.parent.Is_UseInDocument();
+    }
+    return false;
+};
 CShape.prototype.setWorksheet = function(worksheet)
 {
     History.Add(this, {Type: historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});

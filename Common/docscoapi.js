@@ -808,6 +808,13 @@
       }
     }
     this._updateChanges(data["changes"], data["changesIndex"], false);
+
+    if (true === CollaborativeEditing.Is_Fast() && data["excelAdditionalInfo"])
+    {
+      var CursorInfo = JSON.parse(data["excelAdditionalInfo"]);
+      CollaborativeEditing.Add_ForeignCursorToUpdate(CursorInfo.UserId, CursorInfo.CursorInfo);
+    }
+
     if (this.onRecalcLocks) {
       this.onRecalcLocks(data["excelAdditionalInfo"]);
     }

@@ -1417,6 +1417,7 @@ ParaRun.prototype.Split = function (ContentPos, Depth)
 ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
 {
     History.Add(this, {Type : historyitem_ParaRun_OnStartSplit, Pos : CurPos});
+    CollaborativeEditing.OnStart_SplitRun(this, CurPos);
 
     // Если задается Parent и ParentPos, тогда ран автоматически добавляется в родительский класс
     var UpdateParent    = (undefined !== Parent && undefined !== ParentPos && this === Parent.Content[ParentPos] ? true : false);
@@ -1554,6 +1555,7 @@ ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
     }
 
     History.Add(this, {Type : historyitem_ParaRun_OnEndSplit, NewRun : NewRun});
+    CollaborativeEditing.OnEnd_SplitRun(NewRun);
     return NewRun;
 };
 
@@ -6036,6 +6038,7 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 ParaRun.prototype.Split_Run = function(Pos)
 {
     History.Add(this, {Type : historyitem_ParaRun_OnStartSplit, Pos : Pos});
+    CollaborativeEditing.OnStart_SplitRun(this, Pos);
 
     // Создаем новый ран
     var bMathRun = this.Type == para_Math_Run;
@@ -6117,6 +6120,7 @@ ParaRun.prototype.Split_Run = function(Pos)
     }
 
     History.Add(this, {Type : historyitem_ParaRun_OnEndSplit, NewRun : NewRun});
+    CollaborativeEditing.OnEnd_SplitRun(NewRun);
     return NewRun;
 };
 

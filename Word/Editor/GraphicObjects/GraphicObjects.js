@@ -2767,70 +2767,11 @@ CGraphicObjects.prototype =
         this.clearTrackObjects();
         this.resetSelection();
         this.changeCurrentState(new NullState(this));
-        return this.loadDocumentStateAfterLoadChanges(oState.DrawingsSelectionState);
+        return this.loadDocumentStateAfterLoadChanges(oState);
     },
 
-    loadDocumentStateAfterLoadChanges: function(oSelectionState)
-    {
-        if(oSelectionState)
-        {
-            if(oSelectionState.textObject)
-            {
-                if(oSelectionState.textObject.Is_UseInDocument())
-                {
-                    this.selectObject(oSelectionState.textObject, oSelectionState.textObject.parent.PageNum);
-                }
-            }
-            else if(oSelectionState.groupObject)
-            {
-                if(oSelectionState.groupObject.Is_UseInDocument())
-                {
-                    this.selectObject(oSelectionState.groupObject, oSelectionState.groupObject.parent.PageNum);
-                    oSelectionState.groupSelection.resetSelection(oSelectionState.groupSelection);
-                    if(oSelectionState.groupObject.loadDocumentStateAfterLoadChanges(oSelectionState.groupSelection))
-                    {
-                        this.selection.groupSelection = oSelectionState.groupObject;
-                    }
-                }
-            }
-            else if(oSelectionState.chartObject)
-            {
-                if(oSelectionState.chartObject.Is_UseInDocument())
-                {
-                    this.selectObject(oSelectionState.chartObject, oSelectionState.chartObject.parent.PageNum);
-                    oSelectionState.chartObject.resetSelection();
-                    if(oSelectionState.chartObject.loadDocumentStateAfterLoadChanges(oSelectionState.chartSelection))
-                    {
-                        this.selection.chartSelection = oSelectionState.chartObject;
-                    }
-                }
-            }
-            else if(oSelectionState.wrapObject)
-            {
-                if(oSelectionState.wrapObject.parent && oSelectionState.wrapObject.parent.Is_UseInDocument && oSelectionState.wrapObject.parent.Is_UseInDocument())
-                {
-                    this.selectObject(oSelectionState.wrapObject, oSelectionState.wrapObject.parent.PageNum);
-                    if(oSelectionState.wrapObject.canChangeWrapPolygon && oSelectionState.wrapObject.canChangeWrapPolygon() && !oSelectionState.wrapObject.parent.Is_Inline())
-                    {
-                        this.selection.wrapPolygonSelection = oSelectionState.wrapObject;
-                    }
-                }
-            }
-            else
-            {
-                for(var i = 0; i < oSelectionState.selection.length; ++i)
-                {
-                    var oSp = oSelectionState.selection[i].object;
-                    if(oSp.Is_UseInDocument())
-                    {
-                        this.selectObject(oSp, oSp.parent.PageNum);
-                    }
-                }
-            }
-        }
-        return this.selectedObjects.length > 0;
-    },
-
+    loadDocumentStateAfterLoadChanges:  DrawingObjectsController.prototype.loadDocumentStateAfterLoadChanges,
+    checkTrackDrawings:  DrawingObjectsController.prototype.checkTrackDrawings,
 
     canChangeWrapPolygon: function()
     {

@@ -56,6 +56,15 @@ CGraphicFrame.prototype =
     checkDrawingBaseCoords: CShape.prototype.checkDrawingBaseCoords,
     getSlideIndex: CShape.prototype.getSlideIndex,
     calculateSnapArrays: CShape.prototype.calculateSnapArrays,
+    Is_UseInDocument: CShape.prototype.Is_UseInDocument,
+
+    Get_DocumentPositionFromObject: function(PosArray)
+    {
+        if (!PosArray)
+            PosArray = [];
+
+        return PosArray;
+    },
 
     Is_DrawingShape: function(bRetShape)
     {
