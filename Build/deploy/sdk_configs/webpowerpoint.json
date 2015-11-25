@@ -25,7 +25,7 @@
                 "../../Common/docscoapi.js",
                 "../../Common/wordcopypaste.js",
                 "../../Common/editorscommon.js",
-				"../../Common/Private/editorscommon.js",
+				"../../Common/Private/license.js",
                 "../../PowerPoint/Drawing/ThemeLoader.js",
                 "../../Common/Charts/DrawingObjects.js",
                 "../../Common/SerializeCommonWordExcel.js",
@@ -180,7 +180,6 @@
                 "cwd": "../../PowerPoint/",
                 "src": [
                     "api.js",
-                    "Private/api.js",
                     "apiCommon.js",
                     "apiDefines.js"
                 ],

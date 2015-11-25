@@ -15,26 +15,17 @@
   var asc = window["Asc"];
   var prot;
 
-  asc['spreadsheet_api'].prototype.asc_addComment = function(oComment) {
-    if (oComment.bDocument) {
-      this.wb.cellCommentator.asc_addComment(oComment);
-    } else {
-      var ws = this.wb.getWorksheet();
-      ws.cellCommentator.asc_addComment(oComment);
-    }
-  };
-
   asc['spreadsheet_api'].prototype.asc_getEditorPermissions = function(licenseUrl, customerId) {
     var t = this;
     if (this.DocInfo && this.DocInfo.asc_getId() && this.DocInfo.asc_getUrl()) {
 
-        var sUserFirstName = null, sUserLastName = null;
-        var oUserInfo = this.DocInfo.get_UserInfo();
-        if(oUserInfo){
-            sUserFirstName = oUserInfo.get_FirstName();
-            sUserLastName = oUserInfo.get_LastName();
-        }
-        CheckLicense(licenseUrl, customerId, this.DocInfo.asc_getUserId(), sUserFirstName, sUserLastName, function(err, res) {
+      var sUserFirstName = null, sUserLastName = null;
+      var oUserInfo = this.DocInfo.get_UserInfo();
+      if (oUserInfo) {
+        sUserFirstName = oUserInfo.get_FirstName();
+        sUserLastName = oUserInfo.get_LastName();
+      }
+      CheckLicense(licenseUrl, customerId, this.DocInfo.asc_getUserId(), sUserFirstName, sUserLastName, function(err, res) {
         t._onCheckLicenseEnd(err, res);
       });
     } else {
@@ -56,6 +47,5 @@
   };
 
   prot = asc['spreadsheet_api'].prototype;
-  prot['asc_addComment'] = prot.asc_addComment;
   prot['asc_getEditorPermissions'] = prot.asc_getEditorPermissions;
 })(jQuery, window);

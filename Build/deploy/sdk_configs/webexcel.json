@@ -18,7 +18,7 @@
                 "../../Common/apiCommon.js",
                 "../../Common/commonDefines.js",
                 "../../Common/editorscommon.js",
-				"../../Common/Private/editorscommon.js",
+				"../../Common/Private/license.js",
                 "../../Common/NumFormat.js",
                 "../../Common/Charts/charts.js",
                 "../../Common/Charts/DrawingArea.js",
@@ -157,7 +157,8 @@
                 "../../Word/apiCommon.js",
                 "../../Excel/apiCommonExport.js",
                 "../../Excel/api.js",
-                "../../Excel/Private/api.js"
+                "../../Excel/Private/license.js",
+				"../../Excel/Private/comments.js"
             ],
             "dst": "../../Excel/sdk-all.js",
             "externs": [
@@ -204,7 +205,6 @@
                 "cwd": "../../Excel/",
                 "src": [
                     "api.js",
-                    "Private/api.js",
                     "apiDefines.js",
                     "view/EventsController.js",
                     "view/HandlerList.js",
