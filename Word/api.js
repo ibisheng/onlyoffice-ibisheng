@@ -1082,20 +1082,6 @@ asc_docs_api.prototype.get_PropertyThemeColorSchemes = function()
 /////////////////////////////////////////////////////////////////////////
 ///////////////////CoAuthoring and Chat api//////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-
-function CChatMessage(user, message)
-{
-    this.UserId = (undefined != user_id) ? user_id : null;
-    this.Message = (undefined != message) ? message : null;
-}
-CChatMessage.prototype.get_UserId = function() { return this.UserId; };
-CChatMessage.prototype.get_Message = function() { return this.Message; };
-
-/*
-    ToDo Register Callback OnCoAuthoringChatReceiveMessage return object CChatMessage (возможно возвращается МАСС�?В CChatMessage со всеми сообщениями)
-    ToDo Register Callback OnCoAuthoringConnectUser возвращается userId
-    ToDo Register Callback OnCoAuthoringDisconnectUser возвращается userId
- */
 // Init CoAuthoring
 asc_docs_api.prototype._coAuthoringSetChange = function(change, oColor)
 {
@@ -1366,7 +1352,7 @@ asc_docs_api.prototype.asc_coAuthoringChatSendMessage = function(message)
 {
   this.CoAuthoringApi.sendMessage(message);
 };
-// get chart messages, возвращается массив CChatMessage
+// get chart messages
 asc_docs_api.prototype.asc_coAuthoringChatGetMessages = function()
 {
   this.CoAuthoringApi.getMessages();

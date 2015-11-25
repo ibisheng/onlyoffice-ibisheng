@@ -3292,7 +3292,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   spreadsheet_api.prototype.asc_coAuthoringChatSendMessage = function(message) {
     this.CoAuthoringApi.sendMessage(message);
   };
-  // get chart messages, возвращается массив CChatMessage
+  // get chart messages
   spreadsheet_api.prototype.asc_coAuthoringChatGetMessages = function() {
     this.CoAuthoringApi.getMessages();
   };
