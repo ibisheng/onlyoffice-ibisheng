@@ -5966,7 +5966,7 @@
 					return {cursor: kCurAutoFilter, target: c_oTargetType.FilterObject, col: -1, row: -1, idFilter: autoFilterInfo.id};
 				
 				// Проверим есть ли комменты
-				var comments = this.cellCommentator.asc_getComments(c.col, r.row);
+				var comments = this.cellCommentator.getComments(c.col, r.row);
 				var coords = undefined;
 				var indexes = undefined;
 
@@ -6625,7 +6625,7 @@
 			} else
 				cell_info.hyperlink = null;
 
-			cell_info.comments = this.cellCommentator.asc_getComments(ar.c1, ar.r1);
+			cell_info.comments = this.cellCommentator.getComments(ar.c1, ar.r1);
 			cell_info.flags.merge = null !== range.hasMerged();
 
 			if (bExt) {
@@ -8831,7 +8831,7 @@
 											//change nRow, nCol
 											commentData.asc_putCol(c + autoC*plCol);
 											commentData.asc_putRow(r + autoR*plRow);
-											t.cellCommentator.asc_addComment(commentData, true);
+											t.cellCommentator.addComment(commentData, true);
 										}
 									}
 								}

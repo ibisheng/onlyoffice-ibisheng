@@ -937,7 +937,7 @@
 			var ws = this.getWorksheet();
 			var comments = ws.cellCommentator.getCommentsXY(x, y);
 			if (comments.length)
-				ws.cellCommentator.asc_showComment(comments[0].asc_getId());
+				ws.cellCommentator.showComment(comments[0].asc_getId());
 		};
 
 		WorkbookView.prototype._onUpdateSelectionName = function () {

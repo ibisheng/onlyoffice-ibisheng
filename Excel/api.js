@@ -2661,51 +2661,51 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
   spreadsheet_api.prototype.asc_changeComment = function(id, oComment) {
     if (oComment.bDocument) {
-      this.wb.cellCommentator.asc_changeComment(id, oComment);
+      this.wb.cellCommentator.changeComment(id, oComment);
     } else {
       var ws = this.wb.getWorksheet();
-      ws.cellCommentator.asc_changeComment(id, oComment);
+      ws.cellCommentator.changeComment(id, oComment);
     }
   };
 
   spreadsheet_api.prototype.asc_selectComment = function(id) {
     var ws = this.wb.getWorksheet();
-    ws.cellCommentator.asc_selectComment(id, /*bMove*/true);
+    ws.cellCommentator.selectComment(id, /*bMove*/true);
   };
 
   spreadsheet_api.prototype.asc_showComment = function(id, bNew) {
     var ws = this.wb.getWorksheet();
-    ws.cellCommentator.asc_showComment(id, bNew);
+    ws.cellCommentator.showComment(id, bNew);
   };
 
   spreadsheet_api.prototype.asc_findComment = function(id) {
     var ws = this.wb.getWorksheet();
-    return ws.cellCommentator.asc_findComment(id);
+    return ws.cellCommentator.findComment(id);
   };
 
   spreadsheet_api.prototype.asc_removeComment = function(id) {
     var ws = this.wb.getWorksheet();
-    ws.cellCommentator.asc_removeComment(id);
-    this.wb.cellCommentator.asc_removeComment(id);
+    ws.cellCommentator.removeComment(id);
+    this.wb.cellCommentator.removeComment(id);
   };
 
   spreadsheet_api.prototype.asc_getComments = function(col, row) {
     var ws = this.wb.getWorksheet();
-    return ws.cellCommentator.asc_getComments(col, row);
+    return ws.cellCommentator.getComments(col, row);
   };
 
   spreadsheet_api.prototype.asc_getDocumentComments = function() {
-    return this.wb.cellCommentator.asc_getDocumentComments();
+    return this.wb.cellCommentator.getDocumentComments();
   };
 
   spreadsheet_api.prototype.asc_showComments = function() {
     var ws = this.wb.getWorksheet();
-    return ws.cellCommentator.asc_showComments();
+    return ws.cellCommentator.showComments();
   };
 
   spreadsheet_api.prototype.asc_hideComments = function() {
     var ws = this.wb.getWorksheet();
-    return ws.cellCommentator.asc_hideComments();
+    return ws.cellCommentator.hideComments();
   };
 
   spreadsheet_api.prototype.asc_getWorkbookComments = function() {

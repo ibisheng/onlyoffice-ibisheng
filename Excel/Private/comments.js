@@ -17,10 +17,10 @@
 
   asc['spreadsheet_api'].prototype.asc_addComment = function(oComment) {
     if (oComment.bDocument) {
-      this.wb.cellCommentator.asc_addComment(oComment);
+      this.wb.cellCommentator.addComment(oComment);
     } else {
       var ws = this.wb.getWorksheet();
-      ws.cellCommentator.asc_addComment(oComment);
+      ws.cellCommentator.addComment(oComment);
     }
   };
 
