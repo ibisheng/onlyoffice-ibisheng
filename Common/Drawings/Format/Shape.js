@@ -2859,14 +2859,26 @@ CShape.prototype =
                 }
             }
             var dMaxWidthRec = RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, this.bWordShape);
-            oDocContent.Set_StartPage(0);
-            oDocContent.Reset(0, 0, dMaxWidthRec, 20000);
-            oDocContent.Recalculate_Page(oDocContent.StartPage, true);
-            oRet.w = dMaxWidthRec + 0.001;
-            oRet.contentH = oDocContent.Get_SummaryHeight();
-            oRet.h = oRet.contentH;
             if(!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270))
             {
+                if(dMaxWidthRec < w)
+                {
+                    oDocContent.Set_StartPage(0);
+                    oDocContent.Reset(0, 0, w, 20000);
+                    oDocContent.Recalculate_Page(oDocContent.StartPage, true);
+                    oRet.w = w + 0.001;
+                    oRet.contentH = oDocContent.Get_SummaryHeight();
+                    oRet.h = oRet.contentH;
+                }
+                else
+                {
+                    oDocContent.Set_StartPage(0);
+                    oDocContent.Reset(0, 0, dMaxWidthRec, 20000);
+                    oDocContent.Recalculate_Page(oDocContent.StartPage, true);
+                    oRet.w = dMaxWidthRec + 0.001;
+                    oRet.contentH = oDocContent.Get_SummaryHeight();
+                    oRet.h = oRet.contentH;
+                }
                 oRet.correctW = l_ins + r_ins;
                 oRet.correctH = t_ins + b_ins;
                 oRet.textRectW = w;
@@ -2874,12 +2886,29 @@ CShape.prototype =
             }
             else
             {
+                if(dMaxWidthRec < h)
+                {
+                    oDocContent.Set_StartPage(0);
+                    oDocContent.Reset(0, 0, h, 20000);
+                    oDocContent.Recalculate_Page(oDocContent.StartPage, true);
+                    oRet.w = h + 0.001;
+                    oRet.contentH = oDocContent.Get_SummaryHeight();
+                    oRet.h = oRet.contentH;
+                }
+                else
+                {
+                    oDocContent.Set_StartPage(0);
+                    oDocContent.Reset(0, 0, dMaxWidthRec, 20000);
+                    oDocContent.Recalculate_Page(oDocContent.StartPage, true);
+                    oRet.w = dMaxWidthRec + 0.001;
+                    oRet.contentH = oDocContent.Get_SummaryHeight();
+                    oRet.h = oRet.contentH;
+                }
                 oRet.correctW = t_ins + b_ins;
                 oRet.correctH = l_ins + r_ins;
                 oRet.textRectW = h;
                 oRet.textRectH = w;
             }
-
         }
         else//nTWTSquare
         {

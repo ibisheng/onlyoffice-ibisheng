@@ -2808,6 +2808,9 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 
 		window["Asc"]["editor"]._loadFonts(oFontMap, function(){
                 var wsViews = window["Asc"]["editor"].wb.wsViews;
+                if(oThis.oApi.collaborativeEditing.getFast()){
+                    CollaborativeEditing.Clear_DocumentPositions();
+                }
                 for(var i in wsViews)
                 {
                     if(isRealObject(wsViews[i]) && isRealObject(wsViews[i].objectRender) && isRealObject(wsViews[i].objectRender.controller))
@@ -2815,6 +2818,17 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
                         if ( wsViews[i].isChartAreaEditMode ) {
                             wsViews[i].isChartAreaEditMode = false;
                             wsViews[i].arrActiveChartsRanges = [];
+                        }
+                        if(oThis.oApi.collaborativeEditing.getFast()){
+                            var oState = wsViews[i].objectRender.saveStateBeforeLoadChanges();
+                            if(oState){
+                                if (oState.Pos)
+                                    CollaborativeEditing.Add_DocumentPosition(oState.Pos);
+                                if (oState.StartPos)
+                                    CollaborativeEditing.Add_DocumentPosition(oState.StartPos);
+                                if (oState.EndPos)
+                                    CollaborativeEditing.Add_DocumentPosition(oState.EndPos);
+                            }
                         }
                         wsViews[i].objectRender.controller.resetSelection();
                     }
@@ -2839,7 +2853,24 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 				        History.RedoAdd(oRedoObjectParam, item.oClass, item.nActionType, item.nSheetId, item.oRange, item.oData);
 				    }
 				}
-			
+			    if(oThis.oApi.collaborativeEditing.getFast()){
+
+
+                    for(var i in wsViews){
+                        if(isRealObject(wsViews[i]) && isRealObject(wsViews[i].objectRender) && isRealObject(wsViews[i].objectRender.controller)){
+                            var oState = wsViews[i].objectRender.getStateBeforeLoadChanges();
+                            if(oState){
+                                if (oState.Pos)
+                                    CollaborativeEditing.Update_DocumentPosition(oState.Pos);
+                                if (oState.StartPos)
+                                    CollaborativeEditing.Update_DocumentPosition(oState.StartPos);
+                                if (oState.EndPos)
+                                    CollaborativeEditing.Update_DocumentPosition(oState.EndPos);
+                            }
+                            wsViews[i].objectRender.loadStateAfterLoadChanges();
+                        }
+                    }
+                }
 				History.UndoRedoEnd(null, oRedoObjectParam, false);
 
 				oThis.bCollaborativeChanges = false;

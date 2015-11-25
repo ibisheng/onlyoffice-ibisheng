@@ -3108,9 +3108,9 @@ function CEditorPage(api)
 
                 if ((_curTime - oWordControl.m_nLastAutosaveTime) > _interval && !oWordControl.m_oDrawingDocument.TransitionSlide.IsPlaying() && !oWordControl.m_oApi.asc_IsLongAction())
                 {
-                    if (History.Have_Changes() == true)
+                    if (History.Have_Changes(false) == true)
                     {
-                        oWordControl.m_oApi.asc_Save();
+                        oWordControl.m_oApi.asc_Save(true);
                     }
                     oWordControl.m_nLastAutosaveTime = _curTime;
                 }

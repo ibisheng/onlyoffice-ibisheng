@@ -275,7 +275,8 @@ function CPresentation(DrawingDocument)
     this.TableStylesIdMap = {};
     this.bNeedUpdateChartPreview = false;
     this.LastUpdateTargetTime             = 0;
-    this.NeedUpdateTargetForCollaboration = true;
+    this.NeedUpdateTargetForCollaboration = false;
+    this.oLastCheckContent = null;
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
    //
@@ -336,7 +337,8 @@ CPresentation.prototype =
         if(!this.NeedUpdateTargetForCollaboration){
             if(this.Slides[this.CurPage]){
                 var oTargetDocContent = this.Slides[this.CurPage].graphicObjects.getTargetDocContent();
-                if(!oTargetDocContent){
+                if(oTargetDocContent !== this.oLastCheckContent){
+                    this.oLastCheckContent = oTargetDocContent;
                     return true;
                 }
             }
@@ -356,7 +358,7 @@ CPresentation.prototype =
             }
         }
 
-        var bHaveChanges = History.Have_Changes();
+        var bHaveChanges = History.Have_Changes(false);
         if (true !== bHaveChanges && true === CollaborativeEditing.Have_OtherChanges())
         {
             // Принимаем чужие изменение. Своих нет, но функцию отсылки надо вызвать, чтобы снялить локи.
@@ -365,7 +367,7 @@ CPresentation.prototype =
         }
         else if (true === bHaveChanges || true === CollaborativeEditing.Have_OtherChanges())
         {
-            editor.asc_Save();
+            editor.asc_Save(true);
         }
 
         var CurTime = new Date().getTime();
@@ -377,7 +379,7 @@ CPresentation.prototype =
                 var CursorInfo = History.Get_DocumentPositionBinary();
                 if (null !== CursorInfo)
                 {
-                    editor.asc_coAuthoringChatSendMessage(CursorInfo);
+                    editor.CoAuthoringApi.sendCursor(CursorInfo);
                     this.LastUpdateTargetTime = CurTime;
                 }
             }
@@ -2202,7 +2204,6 @@ CPresentation.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
                 {
-                    this.Create_NewHistoryPoint(historydescription_Document_ShiftDeleteButton);
                     Editor_Copy(this.DrawingDocument.m_oWordControl.m_oApi, true);
                 }
                 bRetValue = keydownresult_PreventKeyPress;
@@ -2407,7 +2408,7 @@ CPresentation.prototype =
         {
             if (true === this.History.Have_Changes() || CollaborativeEditing.m_aChanges.length > 0)
             {
-                this.DrawingDocument.m_oWordControl.m_oApi.asc_Save();
+                this.DrawingDocument.m_oWordControl.m_oApi.asc_Save(false);
             }
             bRetValue = keydownresult_PreventAll;
         }
@@ -2483,7 +2484,6 @@ CPresentation.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
             {
-                this.Create_NewHistoryPoint(historydescription_Document_CurHotKey);
                 Editor_Copy(this.DrawingDocument.m_oWordControl.m_oApi, true);
             }
             bRetValue = keydownresult_PreventKeyPress;
@@ -3373,9 +3373,9 @@ CPresentation.prototype =
         this.Document_UpdateInterfaceState();
     },
 
-    Set_FastCollaborativeEditing: function()
+    Set_FastCollaborativeEditing: function(isOn)
     {
-        CollaborativeEditing.Set_Fast(true);
+        CollaborativeEditing.Set_Fast(isOn);
     },
 
     Get_SelectionState : function()

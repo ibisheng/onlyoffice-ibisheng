@@ -75,6 +75,7 @@ CGroupShape.prototype.recalcBounds = function()
 
 CGroupShape.prototype.addToDrawingObjects =  CShape.prototype.addToDrawingObjects;
 CGroupShape.prototype.getDrawingObjectsController =  CShape.prototype.getDrawingObjectsController;
+CGroupShape.prototype.Is_UseInDocument =  CShape.prototype.Is_UseInDocument;
 CGroupShape.prototype.setDrawingObjects = function(drawingObjects)
 {
     this.drawingObjects = drawingObjects;

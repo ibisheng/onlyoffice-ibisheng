@@ -1,0 +1,233 @@
+{
+    "info": {
+        "version": "3.5.0",
+        "build": 158
+    },
+    "update_src": {
+        "revision": "HEAD",
+        "src": "../../Common ../../Word ../../PowerPoint"
+    },
+    "compile": {
+        "sdk": {
+            "src": [
+                "../../Common/Build/License.js",
+                "../../Common/browser.js",
+                "../../Common/FontsFreeType/font_engine.js",
+                "../../Common/FontsFreeType/FontFile.js",
+                "../../Common/FontsFreeType/FontManager.js",
+                "../../Common/FontsFreeType/font_map.js",
+                "../../Word/Drawing/Externals.js",
+                "../../Word/Drawing/GlobalLoaders.js",
+                "../../Common/commonDefines.js",
+                "../../Common/apiCommon.js",
+                "../../Common/downloaderfiles.js",
+                "../../Common/docscoapicommon.js",
+                "../../Common/docscoapi.js",
+                "../../Common/wordcopypaste.js",
+                "../../Common/editorscommon.js",
+				"../../Common/Private/editorscommon.js",
+                "../../PowerPoint/Drawing/ThemeLoader.js",
+                "../../Common/Charts/DrawingObjects.js",
+                "../../Common/SerializeCommonWordExcel.js",
+                "../../Common/SerializeChart.js",
+                "../../Common/Charts/charts.js",
+                "../../Common/Charts/ChartsDrawer.js",
+                "../../Common/Charts/DrawingArea.js",
+                "../../Common/NumFormat.js",
+                "../../Word/Editor/Serialize2.js",
+                "../../Word/Editor/Styles.js",
+                "../../Word/Editor/Numbering.js",
+                "../../Word/Drawing/Metafile.js",
+				"../../Common/CollaborativeEditingBase.js",
+                "../../PowerPoint/Editor/CollaborativeEditing.js",
+                "../../Word/Drawing/GraphicsEvents.js",
+                "../../Word/Drawing/WorkEvents.js",
+                "../../Common/Controls.js",
+                "../../Word/Drawing/Rulers.js",
+                "../../Word/Editor/Table.js",
+                "../../Word/Editor/Common.js",
+                "../../Word/Editor/Sections.js",
+                "../../Common/scroll.js",
+                "../../Word/Editor/History.js",
+                "../../Common/Drawings/Hit.js",
+                "../../Common/Drawings/States.js",
+                "../../Common/Drawings/DrawingObjectsHandlers.js",
+                "../../Common/Drawings/TrackObjects/AdjustmentTracks.js",
+                "../../Common/Drawings/TrackObjects/ResizeTracks.js",
+                "../../Common/Drawings/TrackObjects/RotateTracks.js",
+                "../../Common/Drawings/TrackObjects/NewShapeTracks.js",
+                "../../Common/Drawings/TrackObjects/PolyLine.js",
+                "../../Common/Drawings/TrackObjects/Spline.js",
+                "../../Common/Drawings/TrackObjects/MoveTracks.js",
+                "../../Word/Drawing/HatchPattern.js",
+                "../../Word/Drawing/Graphics.js",
+                "../../Word/Drawing/Overlay.js",
+                "../../Word/Drawing/ShapeDrawer.js",
+                "../../PowerPoint/Drawing/Transitions.js",
+                "../../PowerPoint/Drawing/DrawingDocument.js",
+                "../../PowerPoint/Drawing/HtmlPage.js",
+                "../../PowerPoint/apiDefines.js",
+                "../../Common/Drawings/Format/Constants.js",
+                "../../Common/Shapes/Serialize.js",
+                "../../Common/Shapes/SerializeWriter.js",
+                "../../Word/Editor/SerializeCommon.js",
+                "../../Common/Drawings/Math.js",
+                "../../Common/Drawings/ArcTo.js",
+                "../../Word/Drawing/ColorArray.js",
+                "../../PowerPoint/Editor/Format/Presentation.js",
+                "../../Common/Drawings/CommonController.js",
+                "../../Excel/view/DrawingObjectsController.js",
+                "../../PowerPoint/Editor/DrawingObjectsController.js",
+                "../../Common/Drawings/Format/Format.js",
+                "../../Common/Drawings/Format/CreateGeometry.js",
+                "../../Common/Drawings/Format/Geometry.js",
+                "../../Common/Drawings/Format/Path.js",
+                "../../Common/Drawings/Format/Shape.js",
+                "../../Common/Drawings/Format/Image.js",
+                "../../Common/Drawings/Format/GroupShape.js",
+                "../../Common/Drawings/Format/ChartSpace.js",
+                "../../Common/Drawings/Format/ChartFormat.js",
+                "../../Common/Drawings/Format/TextBody.js",
+                "../../Common/Drawings/TextDrawer.js",
+                "../../PowerPoint/Editor/Format/Slide.js",
+                "../../PowerPoint/Editor/Format/SlideMaster.js",
+                "../../PowerPoint/Editor/Format/Layout.js",
+                "../../PowerPoint/Editor/Format/Comments.js",
+                "../../Word/Editor/Styles.js",
+                "../../Word/Editor/Numbering.js",
+                "../../Word/Editor/ParagraphContent.js",
+                "../../Word/Editor/ParagraphContentBase.js",
+                "../../Word/Editor/Hyperlink.js",
+                "../../Word/Editor/Field.js",
+                "../../Word/Editor/Run.js",
+                "../../Word/Math/mathTypes.js",
+                "../../Word/Math/mathText.js",
+                "../../Word/Math/mathContent.js",
+                "../../Word/Math/base.js",
+                "../../Word/Math/fraction.js",
+                "../../Word/Math/degree.js",
+                "../../Word/Math/matrix.js",
+                "../../Word/Math/limit.js",
+                "../../Word/Math/nary.js",
+                "../../Word/Math/radical.js",
+                "../../Word/Math/operators.js",
+                "../../Word/Math/accent.js",
+                "../../Word/Math/borderBox.js",
+                "../../Word/Editor/FlowObjects.js",
+                "../../Word/Editor/Paragraph.js",
+                "../../Word/Editor/Paragraph_Recalculate.js",
+                "../../Word/Editor/Document.js",
+                "../../Word/Editor/DocumentContent.js",
+                "../../Word/Editor/HeaderFooter.js",
+                "../../Word/Editor/Table.js",
+                "../../Word/Editor/Math.js",
+                "../../Word/Editor/Spelling.js",
+                "../../Word/Editor/Search.js",
+                "../../Word/Editor/FontClassification.js",
+                "../../PowerPoint/Editor/Format/ShapePrototype.js",
+                "../../PowerPoint/Editor/Format/ImagePrototype.js",
+                "../../PowerPoint/Editor/Format/GroupPrototype.js",
+                "../../PowerPoint/Editor/Format/ChartSpacePrototype.js",
+                "../../PowerPoint/Editor/Format/GraphicFrame.js",
+                "../../PowerPoint/api.js",
+                "../../PowerPoint/Private/api.js",
+                "../../PowerPoint/apiCommon.js",
+                "../../Word/apiCommon.js",
+                "../../PowerPoint/apiExport.js",
+                "../../Excel/utils/utils.js",
+                "../../Excel/model/Serialize.js",
+                "../../Excel/model/WorkbookElems.js",
+                "../../Excel/model/Workbook.js",
+                "../../Excel/model/CellInfo.js",
+                "../../Common/AdvancedOptions.js",
+                "../../Common/Locks.js",
+				"../../PowerPoint/Local/api.js"
+            ],
+            "dst": "../../PowerPoint/sdk-all.js",
+            "externs": [
+                "../../Common/Build/Externs.js",
+                "../../Common/3rdparty/jquery/jquery.min.js",
+                "../../Common/3rdparty/Underscore/underscore-min.js",
+                "../../Common/3rdparty/Sockjs/sockjs-0.3.min.js",
+                "../../Common/3rdparty/XRegExp/xregexp-all-min.js",
+                "../../Common/3rdparty/jszip/jszip.min.js",
+                "../../Common/3rdparty/jszip-utils/jszip-utils.min.js",
+				"../../Common/3rdparty/jsrsasign/jsrsasign-latest-all-min.js"
+            ],
+            "map": "sdk-all.js.map",
+            "log": "../../PowerPoint/Build/Log",
+            "define": [
+                "ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS=false",
+                "ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT=true"
+            ]
+        },
+        "defines": {
+            "src": [
+                "../../Common/Shapes/EditorSettings.js",
+                "../../PowerPoint/themes/Themes.js",
+                "../../PowerPoint/apiDefines.js",
+                "../../Common/commonDefines.js"
+            ],
+            "dst": "apiDefines.min.js"
+        },
+        "source_map": {
+            "url": "http://localhost:8080/sdk/PowerPoint"
+        }
+    },
+    "deploy": {
+        "copy": {
+            "api": {
+                "expand": true,
+                "cwd": "../../PowerPoint/",
+                "src": [
+                    "api.js",
+                    "Private/api.js",
+                    "apiCommon.js",
+                    "apiDefines.js"
+                ],
+                "dest": "<%= pkg.menu_path %>/PowerPoint/"
+            },
+            "sdk": {
+                "expand": true,
+                "cwd": "../../PowerPoint/",
+                "src": [
+                    "sdk-all.js",
+                    "themes/theme*/**"
+                ],
+                "dest": "<%= pkg.menu_path %>/PowerPoint/"
+            },
+            "doc": {
+                "expand": true,
+                "cwd": "../../PowerPoint/",
+                "src": "document/**",
+                "dest": "<%= pkg.menu_path %>/PowerPoint/"
+            },
+            "log": {
+                "expand": true,
+                "cwd": "../../PowerPoint/",
+                "flatten": true,
+                "src": [
+                    "sdk-all.js.map",
+                    "Build/Log/property.map",
+                    "Build/Log/variable.map"
+                ],
+                "dest": "<%= pkg.menu_path %>/PowerPoint/"
+            },
+            "sample": {
+                "expand": true,
+                "cwd": "../../PowerPoint/",
+                "src": "index.html.deploy",
+                "dest": "<%= pkg.menu_path %>/PowerPoint/"
+            }
+        },
+        "store_log": {
+            "dst": "../../PowerPoint/Build/Log"
+        }
+    },
+    "tasks": {
+        "build": [
+            "increment_build",
+            "compile_sdk"
+        ]
+    }
+}

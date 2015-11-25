@@ -10,15 +10,17 @@ function CWordCollaborativeEditing()
 {
     CWordCollaborativeEditing.superclass.constructor.call(this);
 
-    this.m_oLogicDocument     = null;
-    this.m_aDocumentPositions = new CDocumentPositionsManager();
-    this.m_aForeignCursorsPos = new CDocumentPositionsManager();
-    this.m_aForeignCursors    = {};
+    this.m_oLogicDocument        = null;
+    this.m_aDocumentPositions    = new CDocumentPositionsManager();
+    this.m_aForeignCursorsPos    = new CDocumentPositionsManager();
+    this.m_aForeignCursors       = {};
+    this.m_aForeignCursorsXY     = {};
+    this.m_aForeignCursorsToShow = {};
 }
 
 Asc.extendClass(CWordCollaborativeEditing, CCollaborativeEditingBase);
 
-CWordCollaborativeEditing.prototype.Send_Changes = function(AdditionalInfo)
+CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalInfo, IsUpdateInterface)
 {
     // Пересчитываем позиции
     this.Refresh_DCChanges();
@@ -99,12 +101,15 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(AdditionalInfo)
     else
     {
         // Обновляем точку последнего сохранения в истории
-        History.Reset_SavedIndex();
+        History.Reset_SavedIndex(IsUserSave);
     }
 
-    // Обновляем интерфейс
-    editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
-    editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
+    if (false !== IsUpdateInterface)
+    {
+        // Обновляем интерфейс
+        editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+        editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
+    }
 
     // Перерисовываем документ (для обновления локов)
     editor.WordControl.m_oLogicDocument.DrawingDocument.ClearCachePages();
@@ -289,6 +294,11 @@ CWordCollaborativeEditing.prototype.Remove_ForeignCursor = function(UserId)
 {
     this.m_aForeignCursorsPos.Remove_DocumentPosition(this.m_aCursorsToUpdate[UserId]);
     delete this.m_aForeignCursors[UserId];
+
+    var DrawingDocument = this.m_oLogicDocument.DrawingDocument;
+    DrawingDocument.Collaborative_RemoveTarget(UserId);
+    this.Remove_ForeignCursorXY(UserId);
+    this.Remove_ForeignCursorToShow(UserId);
 };
 CWordCollaborativeEditing.prototype.Update_DocumentPositionsOnAdd = function(Class, Pos)
 {
@@ -316,7 +326,6 @@ CWordCollaborativeEditing.prototype.Update_DocumentPosition = function(DocPos)
 };
 CWordCollaborativeEditing.prototype.Update_ForeignCursorsPositions = function()
 {
-    var DrawingDocument = this.m_oLogicDocument.DrawingDocument;
     for (var UserId in this.m_aForeignCursors)
     {
         var DocPos = this.m_aForeignCursors[UserId];
@@ -328,31 +337,159 @@ CWordCollaborativeEditing.prototype.Update_ForeignCursorsPositions = function()
         var Run      = DocPos[DocPos.length - 1].Class;
         var InRunPos = DocPos[DocPos.length - 1].Position;
 
-        if (!(Run instanceof ParaRun))
-            continue;
-
-        var Paragraph = Run.Get_Paragraph();
-        if (!Paragraph)
-        {
-            DrawingDocument.Collaborative_RemoveTarget(UserId);
-            continue;
-        }
-
-        var ParaContentPos = Paragraph.Get_PosByElement(Run);
-        if (!ParaContentPos)
-        {
-            DrawingDocument.Collaborative_RemoveTarget(UserId);
-            continue;
-        }
-        ParaContentPos.Update(InRunPos, ParaContentPos.Get_Depth() + 1);
-
-        var XY = Paragraph.Get_XYByContentPos(ParaContentPos);
-        if (XY && XY.Height > 0.001)
-            DrawingDocument.Collaborative_UpdateTarget(UserId, XY.X, XY.Y, XY.Height, XY.PageNum, Paragraph.Get_ParentTextTransform());
-        else
-            DrawingDocument.Collaborative_RemoveTarget(UserId);
+        this.Update_ForeignCursorPosition(UserId, Run, InRunPos, false);
     }
 };
+CWordCollaborativeEditing.prototype.Update_ForeignCursorPosition = function(UserId, Run, InRunPos, isRemoveLabel)
+{
+    var DrawingDocument = this.m_oLogicDocument.DrawingDocument;
 
+    if (!(Run instanceof ParaRun))
+        return;
+
+    var Paragraph = Run.Get_Paragraph();
+
+    if (!Paragraph)
+    {
+        DrawingDocument.Collaborative_RemoveTarget(UserId);
+        return;
+    }
+
+    var ParaContentPos = Paragraph.Get_PosByElement(Run);
+    if (!ParaContentPos)
+    {
+        DrawingDocument.Collaborative_RemoveTarget(UserId);
+        return;
+    }
+    ParaContentPos.Update(InRunPos, ParaContentPos.Get_Depth() + 1);
+
+    var XY = Paragraph.Get_XYByContentPos(ParaContentPos);
+    if (XY && XY.Height > 0.001)
+    {
+        DrawingDocument.Collaborative_UpdateTarget(UserId, XY.X, XY.Y, XY.Height, XY.PageNum, Paragraph.Get_ParentTextTransform());
+        this.Add_ForeignCursorXY(UserId, XY.X, XY.Y, XY.PageNum, XY.Height, Paragraph, isRemoveLabel);
+
+        if (true === this.m_aForeignCursorsToShow[UserId])
+        {
+            this.Show_ForeignCursorLabel(UserId);
+            this.Remove_ForeignCursorToShow(UserId);
+        }
+    }
+    else
+    {
+        DrawingDocument.Collaborative_RemoveTarget(UserId);
+        this.Remove_ForeignCursorXY(UserId);
+        this.Remove_ForeignCursorToShow(UserId);
+    }
+};
+CWordCollaborativeEditing.prototype.Check_ForeignCursorsLabels = function(X, Y, PageIndex)
+{
+    if (!this.m_oLogicDocument)
+        return;
+
+    var DrawingDocument = this.m_oLogicDocument.Get_DrawingDocument();
+    var RadiusX = DrawingDocument.GetMMPerDot(7);
+    var RadiusY = DrawingDocument.GetMMPerDot(3);
+
+    for (var UserId in this.m_aForeignCursorsXY)
+    {
+        var Cursor = this.m_aForeignCursorsXY[UserId];
+        if (Math.abs(X - Cursor.X) < RadiusX &&  Cursor.Y - RadiusY < Y && Y < Cursor.Y + Cursor.H + RadiusY && Cursor.PageIndex === PageIndex)
+            this.Show_ForeignCursorLabel(UserId);
+    }
+};
+CWordCollaborativeEditing.prototype.Show_ForeignCursorLabel = function(UserId)
+{
+    if (!this.m_oLogicDocument)
+        return;
+
+    var Api = this.m_oLogicDocument.Get_Api();
+    var DrawingDocument = this.m_oLogicDocument.Get_DrawingDocument();
+
+    if (!this.m_aForeignCursorsXY[UserId])
+        return;
+
+    var Cursor = this.m_aForeignCursorsXY[UserId];
+    var X = Cursor.X;
+    var Y = Cursor.Y;
+    var PageIndex = Cursor.PageIndex;
+    var TextTransform = Cursor.Paragraph.Get_ParentTextTransform();
+
+    var User   = Api.CoAuthoringApi.getUser(UserId);
+    var nColor = User ? User.asc_getColorValue() :  null;
+    var oColor = (null !== nColor ? new CDocumentColor((nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF) : new CDocumentColor(191, 255, 199));
+
+    var Coords = DrawingDocument.ConvertCoordsToCursorWR(X, Y, PageIndex, TextTransform);
+    Api.sync_ShowForeignCursorLabel(UserId, Coords.X, Coords.Y, oColor);
+
+    if (Cursor.ShowId)
+        clearTimeout(Cursor.ShowId);
+
+    Cursor.ShowId = setTimeout(function()
+    {
+        Cursor.ShowId = null;
+        Api.sync_HideForeignCursorLabel(UserId);
+    }, 3000);
+};
+CWordCollaborativeEditing.prototype.Add_ForeignCursorToShow = function(UserId)
+{
+    this.m_aForeignCursorsToShow[UserId] = true;
+};
+CWordCollaborativeEditing.prototype.Remove_ForeignCursorToShow = function(UserId)
+{
+    delete this.m_aForeignCursorsToShow[UserId];
+};
+CWordCollaborativeEditing.prototype.Add_ForeignCursorXY = function(UserId, X, Y, PageIndex, H, Paragraph, isRemoveLabel)
+{
+    if (!this.m_aForeignCursorsXY[UserId])
+    {
+        this.m_aForeignCursorsXY[UserId] = {X: X, Y: Y, H: H, PageIndex: PageIndex, Paragraph: Paragraph, ShowId: null};
+    }
+    else
+    {
+        var Cursor = this.m_aForeignCursorsXY[UserId];
+        if (Cursor.ShowId)
+        {
+            var Api = this.m_oLogicDocument.Get_Api();
+            clearTimeout(Cursor.ShowId);
+
+            if (true === isRemoveLabel)
+            {
+                Api.sync_HideForeignCursorLabel(UserId);
+            }
+            else
+            {
+                Cursor.ShowId = setTimeout(function ()
+                {
+                    Cursor.ShowId = null;
+                    Api.sync_HideForeignCursorLabel(UserId);
+                }, 3000);
+            }
+        }
+        else
+        {
+            Cursor.ShowId = null;
+        }
+
+        Cursor.X         = X;
+        Cursor.Y         = Y;
+        Cursor.PageIndex = PageIndex;
+        Cursor.H         = H;
+    }
+};
+CWordCollaborativeEditing.prototype.Remove_ForeignCursorXY = function(UserId)
+{
+    if (this.m_aForeignCursorsXY[UserId])
+    {
+        if (this.m_aForeignCursorsXY[UserId].ShowId)
+        {
+            var Api = this.m_oLogicDocument.Get_Api();
+            Api.sync_HideForeignCursorLabel(UserId);
+            clearTimeout(this.m_aForeignCursorsXY[UserId].ShowId);
+        }
+
+        delete this.m_aForeignCursorsXY[UserId];
+    }
+};
 
 var CollaborativeEditing = new CWordCollaborativeEditing();

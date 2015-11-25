@@ -106,6 +106,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
     // AutoSave
     this.lastSaveTime = null;				// Время последнего сохранения
+    this.autoSaveGapRealTime = 30;	  // Интервал быстрого автосохранения (когда выставлен флаг realtime) - 30 мс.
     this.autoSaveGapFast = 2000;			// Интервал быстрого автосохранения (когда человек один) - 2 сек.
     this.autoSaveGapSlow = 10 * 60 * 1000;	// Интервал медленного автосохранения (когда совместно) - 10 минут
 
@@ -1131,6 +1132,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     this.wb.setDocumentPlaceChangedEnabled(val);
   };
 
+  spreadsheet_api.prototype.asc_SetFastCollaborative = function(bFast) {
+    if (this.collaborativeEditing) {
+      CollaborativeEditing.Set_Fast(bFast);
+      this.collaborativeEditing.setFast(bFast);
+    }
+  };
+
   // Посылает эвент о том, что обновились листы
   spreadsheet_api.prototype.sheetsChanged = function() {
     this.handlers.trigger("asc_onSheetsChanged");
@@ -1253,7 +1261,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
   // Эвент о пришедщих изменениях
   spreadsheet_api.prototype.syncCollaborativeChanges = function() {
-    this.handlers.trigger("asc_onCollaborativeChanges");
+    // Для быстрого сохранения уведомлять не нужно.
+    if (!this.collaborativeEditing.getFast()) {
+      this.handlers.trigger("asc_onCollaborativeChanges");
+    }
   };
 
   // Применение изменений документа, пришедших при открытии
@@ -3308,15 +3319,28 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   ////////////////////////////AutoSave api/////////////////////////////////
   /////////////////////////////////////////////////////////////////////////
   spreadsheet_api.prototype._autoSave = function() {
-    if (0 === this.autoSaveGap || this.asc_getCellEditMode() || !History.Is_Modified() || !History.IsEndTransaction() || !this.canSave) {
+    if ((0 === this.autoSaveGap && !this.collaborativeEditing.getFast()) || this.asc_getCellEditMode() ||
+      !History.IsEndTransaction() || !this.canSave) {
+      return;
+    }
+    if (!History.Is_Modified() && !(this.collaborativeEditing.getCollaborativeEditing() && 0 !== this.collaborativeEditing.getOwnLocksLength())) {
+      if (this.collaborativeEditing.getFast() && this.collaborativeEditing.haveOtherChanges()) {
+        CollaborativeEditing.Clear_CollaborativeMarks();
+
+        // Принимаем чужие изменения
+        this.collaborativeEditing.applyChanges();
+        // Пересылаем свои изменения (просто стираем чужие lock-и, т.к. своих изменений нет)
+        this.collaborativeEditing.sendChanges();
+      }
       return;
     }
     if (null === this.lastSaveTime) {
       this.lastSaveTime = new Date();
       return;
     }
-    var isFastSave = !this.collaborativeEditing.getCollaborativeEditing();
-    var gap = new Date() - this.lastSaveTime - (isFastSave ? this.autoSaveGapFast : this.autoSaveGapSlow);
+    var saveGap = this.collaborativeEditing.getFast() ? this.autoSaveGapRealTime :
+      (this.collaborativeEditing.getCollaborativeEditing() ? this.autoSaveGapSlow : this.autoSaveGapFast);
+    var gap = new Date() - this.lastSaveTime - saveGap;
     if (0 <= gap) {
       this.asc_Save(true);
     }
@@ -3324,7 +3348,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
   spreadsheet_api.prototype._onUpdateDocumentCanSave = function() {
     // Можно модифицировать это условие на более быстрое (менять самим состояние в аргументах, а не запрашивать каждый раз)
-    var tmp = this.asc_isDocumentModified() || (this.collaborativeEditing.getCollaborativeEditing() && 0 !== this.collaborativeEditing.getOwnLocksLength());
+    var tmp = History.Is_Modified() || (this.collaborativeEditing.getCollaborativeEditing() && 0 !== this.collaborativeEditing.getOwnLocksLength());
     if (tmp !== this.isDocumentCanSave) {
       this.isDocumentCanSave = tmp;
       this.handlers.trigger('asc_onDocumentCanSaveChanged', this.isDocumentCanSave);
@@ -3597,6 +3621,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   prot["asc_changeArtImageFromFile"] = prot.asc_changeArtImageFromFile;
 
   prot["asc_SetDocumentPlaceChangedEnabled"] = prot.asc_SetDocumentPlaceChangedEnabled;
+  prot["asc_SetFastCollaborative"] = prot.asc_SetFastCollaborative;
 
   // Workbook interface
 

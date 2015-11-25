@@ -4371,9 +4371,16 @@ DrawingObjectsController.prototype =
         var bRetValue = false;
         var state = drawingObjectsController.curState;
         var isViewMode = drawingObjectsController.drawingObjects.isViewerMode();
+        var oApi = window["Asc"]["editor"];
         if ( e.keyCode == 8 && false === isViewMode ) // BackSpace
         {
-            drawingObjectsController.remove(-1);
+            var oTargetTextObject = getTargetTextObject(this);
+            if(oTargetTextObject && oApi.collaborativeEditing.getFast()){
+                this.checkSelectedObjectsAndCallbackNoCheckLock(this.removeCallback,  [-1, undefined, undefined], false, historydescription_Spreadsheet_Remove)
+            }
+            else{
+                drawingObjectsController.remove(-1);
+            }
             bRetValue = true;
         }
         else if ( e.keyCode == 9 && false === isViewMode ) // Tab
@@ -4386,7 +4393,13 @@ DrawingObjectsController.prototype =
                 {
                     oThis.paragraphAdd(new ParaTab());
                 };
-                this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_AddTab)
+
+                if(oApi.collaborativeEditing.getFast()){
+                    this.checkSelectedObjectsAndCallbackNoCheckLock(callBack, [], false, historydescription_Spreadsheet_AddTab);
+                }
+                else{
+                    this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_AddTab)
+                }
             }
             else
             {
@@ -4407,7 +4420,13 @@ DrawingObjectsController.prototype =
                 }
                 else
                 {
-                    this.checkSelectedObjectsAndCallback(this.addNewParagraph, [], false, historydescription_Spreadsheet_AddNewParagraph);
+
+                    if(oApi.collaborativeEditing.getFast()){
+                        this.checkSelectedObjectsAndCallbackNoCheckLock(this.addNewParagraph, [], false, historydescription_Spreadsheet_AddNewParagraph);
+                    }
+                    else{
+                        this.checkSelectedObjectsAndCallback(this.addNewParagraph, [], false, historydescription_Spreadsheet_AddNewParagraph);
+                    }
                     this.recalculate();
                 }
             }
@@ -4497,8 +4516,12 @@ DrawingObjectsController.prototype =
                 {
                     oThis.paragraphAdd(new ParaSpace(1));
                 };
-                this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_AddSpace);
-                this.recalculate();
+                if(oApi.collaborativeEditing.getFast()){
+                    this.checkSelectedObjectsAndCallbackNoCheckLock(callBack, [], false, historydescription_Spreadsheet_AddSpace);
+                }
+                else{
+                    this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_AddSpace);
+                }
                 //}
                // else
                // {
@@ -4523,11 +4546,16 @@ DrawingObjectsController.prototype =
                 {
                     content.Cursor_MoveToEndPos();
                     drawingObjectsController.updateSelectionState();
+                    drawingObjectsController.updateOverlay();
+                    this.drawingObjects.sendGraphicObjectProps();
+
                 }
                 else // Переходим в конец строки
                 {
                     content.Cursor_MoveEndOfLine(e.shiftKey);
                     drawingObjectsController.updateSelectionState();
+                    drawingObjectsController.updateOverlay();
+                    this.drawingObjects.sendGraphicObjectProps();
                 }
             }
             bRetValue = true;
@@ -4541,11 +4569,15 @@ DrawingObjectsController.prototype =
                 {
                     content.Cursor_MoveToStartPos();
                     drawingObjectsController.updateSelectionState();
+                    drawingObjectsController.updateOverlay();
+                    this.drawingObjects.sendGraphicObjectProps();
                 }
                 else // Переходим в конец строки
                 {
                     content.Cursor_MoveStartOfLine(e.shiftKey);
                     drawingObjectsController.updateSelectionState();
+                    drawingObjectsController.updateOverlay();
+                    this.drawingObjects.sendGraphicObjectProps();
                 }
             }
             bRetValue = true;
@@ -4553,24 +4585,36 @@ DrawingObjectsController.prototype =
         else if ( e.keyCode == 37 ) // Left Arrow
         {
             this.cursorMoveLeft(e.shiftKey,ctrlKey );
+
+            drawingObjectsController.updateSelectionState();
+            drawingObjectsController.updateOverlay();
             this.drawingObjects.sendGraphicObjectProps();
             bRetValue = true;
         }
         else if ( e.keyCode == 38 ) // Top Arrow
         {
             this.cursorMoveUp(e.shiftKey);
+
+            drawingObjectsController.updateSelectionState();
+            drawingObjectsController.updateOverlay();
             this.drawingObjects.sendGraphicObjectProps();
             bRetValue = true;
         }
         else if ( e.keyCode == 39 ) // Right Arrow
         {
             this.cursorMoveRight(e.shiftKey,ctrlKey );
+
+            drawingObjectsController.updateSelectionState();
+            drawingObjectsController.updateOverlay();
             this.drawingObjects.sendGraphicObjectProps();
             bRetValue = true;
         }
         else if ( e.keyCode == 40 ) // Bottom Arrow
         {
             this.cursorMoveDown(e.shiftKey);
+
+            drawingObjectsController.updateSelectionState();
+            drawingObjectsController.updateOverlay();
             this.drawingObjects.sendGraphicObjectProps();
             bRetValue = true;
         }
@@ -4580,7 +4624,13 @@ DrawingObjectsController.prototype =
         }
         else if ( e.keyCode == 46 && false === isViewMode ) // Delete
         {
-            drawingObjectsController.remove(1);
+            var oTargetTextObject = getTargetTextObject(this);
+            if(oTargetTextObject && oApi.collaborativeEditing.getFast()){
+                this.checkSelectedObjectsAndCallbackNoCheckLock(this.removeCallback,  [1, undefined, undefined], false, historydescription_Spreadsheet_Remove)
+            }
+            else{
+                drawingObjectsController.remove(1);
+            }
             bRetValue = true;
         }
         else if ( e.keyCode == 65 && true === ctrlKey ) // Ctrl + A - выделяем все
@@ -4745,8 +4795,13 @@ DrawingObjectsController.prototype =
                     Item = new ParaText( "-" );
                 oThis.paragraphAdd(Item);
             };
-            this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_AddItem);
-            this.recalculate();
+            if(oApi.collaborativeEditing.getFast()){
+                this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_AddItem);
+            }
+            else{
+                this.checkSelectedObjectsAndCallbackNoCheckLock(callBack, [], false, historydescription_Spreadsheet_AddItem);
+            }
+          //  this.recalculate();
             bRetValue = true;
         }
         else if ( e.keyCode == 190 && true === ctrlKey ) // Ctrl + .
@@ -6592,6 +6647,19 @@ DrawingObjectsController.prototype =
             }
         };
         return this.drawingObjects.objectLocker.checkObjects(callback2);
+    },
+
+    checkSelectedObjectsAndCallbackNoCheckLock: function(callback, args, bNoSendProps, nHistoryPointType)
+    {
+        var nPointType = isRealNumber(nHistoryPointType) ? nHistoryPointType : historydescription_CommonControllerCheckSelected;
+        History.Create_NewPoint(nPointType);
+
+        callback.apply(this, args);
+        this.startRecalculate();
+        if(!(bNoSendProps === true))
+        {
+            this.drawingObjects.sendGraphicObjectProps();
+        }
     },
 
     checkSelectedObjectsAndCallback2: function(callback)

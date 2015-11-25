@@ -34,6 +34,26 @@ CShape.prototype.getTextArtTranslate = function()
     return Asc["editor"].textArtTranslate;
 };
 
+CShape.prototype.Is_UseInDocument = function(){
+    if(this.group)
+    {
+        var aSpTree = this.group.spTree;
+        for(var i = 0; i < aSpTree.length; ++i)
+        {
+            if(aSpTree[i] === this)
+            {
+                return this.group.Is_UseInDocument();
+            }
+            return false;
+        }
+    }
+    if(this.drawingBase)
+    {
+        return this.drawingBase.isUseInDocument();
+    }
+    return false;
+};
+
 CShape.prototype.isEmptyPlaceholder = function()
 {
     return false;

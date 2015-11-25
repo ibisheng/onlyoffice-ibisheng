@@ -358,74 +358,6 @@ function CFontFileLoader(id)
         return (0 == this.Status || 1 == this.Status);
     }
 
-
-    this.LoadFontAsync = function(basePath, _callback, isEmbed)
-    {
-        if (window["AscDesktopEditor"] !== undefined && this.CanUseOriginalFormat)
-        {
-            if (-1 != this.Status)
-                return true;
-
-            this.callback = null;
-            this.Status = 2;
-            window["AscDesktopEditor"]["LoadFontBase64"](this.Id);
-            this._callback_font_load();
-            return;
-        }
-
-        if (ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT && // проставляется в true на этапе сборки
-			this.CanUseOriginalFormat && // false if load embedded fonts
-			bIsSupportOriginalFormatFonts) // false if work on ie9
-        {
-            this.LoadFontAsync2(basePath, _callback);
-            return;
-        }
-
-        this.callback = _callback;
-        if (-1 != this.Status)
-            return true;
-
-        this.Status = 2;
-        if (bIsLocalFontsUse)
-        {
-            postLoadScript(this.Id);
-            return;
-        }
-
-        var scriptElem = document.createElement('script');
-
-        if (scriptElem.readyState && false)
-        {
-            scriptElem.onreadystatechange = function () {
-                if (this.readyState == 'complete' || this.readyState == 'loaded')
-                {
-                    scriptElem.onreadystatechange = null;
-                    setTimeout(oThis._callback_font_load, 0);
-                }
-            }
-        }
-        scriptElem.onload = scriptElem.onerror = oThis._callback_font_load;
-
-		var src;
-        if (this.IsNeedAddJSToFontPath)
-        {
-            if (!window.g_fontNamesEncoder)
-                window.g_fontNamesEncoder = new ZBase32Encoder();
-
-            //var _name = this.Id + ".js";
-            var _name = window.g_fontNamesEncoder.Encode(this.Id + ".js") + ".js";
-            src = basePath + "js/" + _name;
-        }
-        else
-            src = basePath + this.Id + ".js";
-		if(isEmbed)
-			src = g_oDocumentUrls.getUrl(src);
-		scriptElem.setAttribute('src', src);
-        scriptElem.setAttribute('type','text/javascript');
-        document.getElementsByTagName('head')[0].appendChild(scriptElem);
-        return false;
-    }
-
     this._callback_font_load = function()
     {
         if (!window[oThis.Id])
@@ -554,7 +486,74 @@ function CFontFileLoader(id)
 CFontFileLoader.prototype.SetStreamIndex = function(index)
 {
 	this.stream_index = index;
-}
+};
+CFontFileLoader.prototype.LoadFontAsync = function(basePath, _callback, isEmbed)
+{
+	var oThis = this;
+	if (window["AscDesktopEditor"] !== undefined && this.CanUseOriginalFormat)
+	{
+		if (-1 != this.Status)
+			return true;
+
+		this.callback = null;
+		this.Status = 2;
+		window["AscDesktopEditor"]["LoadFontBase64"](this.Id);
+		this._callback_font_load();
+		return;
+	}
+
+	if (ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT && // проставляется в true на этапе сборки
+		this.CanUseOriginalFormat && // false if load embedded fonts
+		bIsSupportOriginalFormatFonts) // false if work on ie9
+	{
+		this.LoadFontAsync2(basePath, _callback);
+		return;
+	}
+
+	this.callback = _callback;
+	if (-1 != this.Status)
+		return true;
+
+	this.Status = 2;
+	if (bIsLocalFontsUse)
+	{
+		postLoadScript(this.Id);
+		return;
+	}
+
+	var scriptElem = document.createElement('script');
+
+	if (scriptElem.readyState && false)
+	{
+		scriptElem.onreadystatechange = function () {
+			if (this.readyState == 'complete' || this.readyState == 'loaded')
+			{
+				scriptElem.onreadystatechange = null;
+				setTimeout(oThis._callback_font_load, 0);
+			}
+		}
+	}
+	scriptElem.onload = scriptElem.onerror = oThis._callback_font_load;
+
+	var src;
+	if (this.IsNeedAddJSToFontPath)
+	{
+		if (!window.g_fontNamesEncoder)
+			window.g_fontNamesEncoder = new ZBase32Encoder();
+
+		//var _name = this.Id + ".js";
+		var _name = window.g_fontNamesEncoder.Encode(this.Id + ".js") + ".js";
+		src = basePath + "js/" + _name;
+	}
+	else
+		src = basePath + this.Id + ".js";
+	if(isEmbed)
+		src = g_oDocumentUrls.getUrl(src);
+	scriptElem.setAttribute('src', src);
+	scriptElem.setAttribute('type','text/javascript');
+	document.getElementsByTagName('head')[0].appendChild(scriptElem);
+	return false;
+};
 
 var FONT_TYPE_ADDITIONAL = 0;
 var FONT_TYPE_STANDART = 1;

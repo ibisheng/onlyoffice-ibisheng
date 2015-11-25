@@ -2079,18 +2079,13 @@ CDrawingCollaborativeTarget.prototype =
         {
             bIsHtmlElementCreate = true;
             this.HtmlElement = document.createElement('canvas');
-            this.HtmlElement.style.cssText = "position:absolute;padding:0;margin:0;-webkit-user-select:none;width:1px;height:1px;display:none;z-index:3;";
+            this.HtmlElement.style.cssText = "position:absolute;padding:0;margin:0;-webkit-user-select:none;width:1px;height:1px;display:block;z-index:3;";
             this.HtmlElement.width = 1;
             this.HtmlElement.height = 1;
 
-            // заодно заполняем стиль
-            var bUseColor;
-            if (_drawing_doc.m_oWordControl.m_oApi.CollaborativeMarksShowType === c_oAscCollaborativeMarksShowType.None)
-                bUseColor = false;
-
             var oUser = _drawing_doc.m_oWordControl.m_oApi.CoAuthoringApi.getUser(this.Id);
             var nColor = oUser ? oUser.asc_getColorValue() :  null;
-            var oColor = false === bUseColor ? null : (null !== nColor ? new CDocumentColor( (nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF ) : new CDocumentColor( 191, 255, 199 ));
+            var oColor = (null !== nColor ? new CDocumentColor( (nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF ) : new CDocumentColor( 191, 255, 199 ));
             this.Style ="rgb(" + oColor.r + "," + oColor.g + "," + oColor.b + ")";
         }
 
@@ -2114,11 +2109,11 @@ CDrawingCollaborativeTarget.prototype =
 
         if (null != this.Transform && !global_MatrixTransformer.IsIdentity2(this.Transform))
         {
-            var _x1 = this.Transform.TransformPointX(x, y);
-            var _y1 = this.Transform.TransformPointY(x, y);
+            var _x1 = this.Transform.TransformPointX(_x, _y);
+            var _y1 = this.Transform.TransformPointY(_x, _y);
 
-            var _x2 = this.Transform.TransformPointX(x, y + this.Size);
-            var _y2 = this.Transform.TransformPointY(x, y + this.Size);
+            var _x2 = this.Transform.TransformPointX(_x, _y + this.Size);
+            var _y2 = this.Transform.TransformPointY(_x, _y + this.Size);
 
             var pos1 = _drawing_doc.ConvertCoordsToCursor2(_x1, _y1, this.Page);
             var pos2 = _drawing_doc.ConvertCoordsToCursor2(_x2, _y2, this.Page);
@@ -2215,7 +2210,7 @@ CDrawingCollaborativeTarget.prototype =
                 _y += this.Transform.ty;
             }
 
-            var pos = this.ConvertCoordsToCursor2(_x, _y, this.Page);
+            var pos = _drawing_doc.ConvertCoordsToCursor2(_x, _y, this.Page);
 
             this.HtmlElementX = pos.X >> 0;
             this.HtmlElementY = pos.Y >> 0;
@@ -6900,7 +6895,7 @@ function CDrawingDocument()
         {
             if (_id == this.CollaborativeTargets[i].Id)
             {
-                _target.CheckPosition(this, _x, _y, _size, _page, _transform);
+                this.CollaborativeTargets[i].CheckPosition(this, _x, _y, _size, _page, _transform);
                 return;
             }
         }

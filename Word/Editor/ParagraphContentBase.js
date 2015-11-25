@@ -1543,8 +1543,8 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_PosByElement = function(
 
         if (CurLine >= 0 && CurLine < this.protected_GetLinesCount() && CurRange >= 0 && CurRange < this.protected_GetRangesCount(CurLine))
         {
-            StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-            EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+            StartPos = Math.min(this.Content.length - 1, Math.max(0, this.protected_GetRangeStartPos(CurLine, CurRange)));
+            EndPos   = Math.min(this.Content.length - 1, Math.max(0, this.protected_GetRangeEndPos(CurLine, CurRange)));
         }
     }
 

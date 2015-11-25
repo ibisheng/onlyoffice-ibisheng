@@ -377,6 +377,9 @@ function DrawingObjects() {
     var aObjects = [];
     var aImagesSync = [];
 
+
+    var oStateBeforeLoadChanges = null;
+
     _this.zoom = { last: 1, current: 1 };
     _this.isViewerMode = null;
     _this.objectLocker = null;
@@ -436,6 +439,20 @@ function DrawingObjects() {
     }
 
     //{ prototype
+
+
+    DrawingBase.prototype.isUseInDocument = function() {
+        if(worksheet && worksheet.model){
+            var aDrawings = worksheet.model.Drawings;
+            for(var i = 0; i < aDrawings.length; ++i){
+                if(aDrawings[i] === this){
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+
     DrawingBase.prototype.getAllFonts = function(AllFonts) {
         var _t = this;
         _t.graphicObject && _t.graphicObject.documentGetAllFontNames && _t.graphicObject.documentGetAllFontNames(AllFonts);
@@ -773,6 +790,36 @@ function DrawingObjects() {
     //-----------------------------------------------------------------------------------
     // Constructor
     //-----------------------------------------------------------------------------------
+
+
+    _this.saveStateBeforeLoadChanges = function(){
+        if(this.controller){
+            oStateBeforeLoadChanges = {};
+            this.controller.Save_DocumentStateBeforeLoadChanges(oStateBeforeLoadChanges);
+        }
+        else{
+            oStateBeforeLoadChanges = null;
+        }
+        return oStateBeforeLoadChanges;
+    };
+
+    _this.loadStateAfterLoadChanges = function(){
+        if(_this.controller){
+            _this.controller.clearPreTrackObjects();
+            _this.controller.clearTrackObjects();
+            _this.controller.resetSelection();
+            _this.controller.changeCurrentState(new NullState(this.controller));
+            if(oStateBeforeLoadChanges){
+                _this.controller.loadDocumentStateAfterLoadChanges(oStateBeforeLoadChanges);
+            }
+        }
+        oStateBeforeLoadChanges = null;
+        return oStateBeforeLoadChanges;
+    };
+
+    _this.getStateBeforeLoadChanges = function(){
+        return oStateBeforeLoadChanges;
+    };
 
     _this.createDrawingObject = function(type) {
         var drawingBase = new DrawingBase(worksheet);

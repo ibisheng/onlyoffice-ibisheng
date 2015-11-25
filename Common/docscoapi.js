@@ -15,6 +15,7 @@
       this.onAuthParticipantsChanged = options.onAuthParticipantsChanged;
       this.onParticipantsChanged = options.onParticipantsChanged;
       this.onMessage = options.onMessage;
+      this.onCursor =  options.onCursor;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
@@ -45,6 +46,9 @@
       };
       this._CoAuthoringApi.onMessage = function(e, clear) {
         t.callback_OnMessage(e, clear);
+      };
+      this._CoAuthoringApi.onCursor = function(e) {
+        t.callback_OnCursor(e);
       };
       this._CoAuthoringApi.onLocksAcquired = function(e) {
         t.callback_OnLocksAcquired(e);
@@ -164,6 +168,12 @@
     }
   };
 
+  CDocsCoApi.prototype.sendCursor = function(cursor) {
+    if (this._CoAuthoringApi && this._onlineWork) {
+      this._CoAuthoringApi.sendCursor(cursor);
+    }
+  };
+
   CDocsCoApi.prototype.askLock = function(arrayBlockId, callback) {
     if (this._CoAuthoringApi && this._onlineWork) {
       this._CoAuthoringApi.askLock(arrayBlockId, callback);
@@ -268,6 +278,12 @@
   CDocsCoApi.prototype.callback_OnMessage = function(e, clear) {
     if (this.onMessage) {
       this.onMessage(e, clear);
+    }
+  };
+
+  CDocsCoApi.prototype.callback_OnCursor = function(e) {
+    if (this.onCursor) {
+      this.onCursor(e);
     }
   };
 
@@ -378,6 +394,7 @@
       this.onAuthParticipantsChanged = options.onAuthParticipantsChanged;
       this.onParticipantsChanged = options.onParticipantsChanged;
       this.onMessage = options.onMessage;
+      this.onCursor = options.onCursor;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
@@ -690,6 +707,12 @@
     }
   };
 
+  DocsCoApi.prototype.sendCursor = function(cursor) {
+    if (typeof cursor === 'string') {
+      this._send({"type": "cursor", "cursor": cursor});
+    }
+  };
+
   DocsCoApi.prototype.ping = function() {
     this._send({'type': 'ping'});
   };
@@ -724,6 +747,12 @@
   DocsCoApi.prototype._onMessages = function(data, clear) {
     if (data["messages"] && this.onMessage) {
       this.onMessage(data["messages"], clear);
+    }
+  };
+
+  DocsCoApi.prototype._onCursor = function(data) {
+    if (data["messages"] && this.onCursor) {
+      this.onCursor(data["messages"]);
     }
   };
 
@@ -1154,7 +1183,7 @@
 
   DocsCoApi.prototype._initSocksJs = function() {
     var t = this;
-    var sockjs = this.sockjs = new SockJS(this.sockjs_url, null, {debug: true});
+    var sockjs = this.sockjs = new (this._getSockJs())(this.sockjs_url, null, {debug: true});
 
     sockjs.onopen = function() {
       if (t.reconnectTimeout) {
@@ -1180,6 +1209,9 @@
           break;
         case 'message'      :
           t._onMessages(dataObject, false);
+          break;
+        case 'cursor'       :
+          t._onCursor(dataObject);
           break;
         case 'getLock'      :
           t._onGetLock(dataObject);
@@ -1255,6 +1287,10 @@
       t._initSocksJs();
     }, this.reconnectInterval);
 
+  };
+
+  DocsCoApi.prototype._getSockJs = function() {
+    return window['SockJS'] ? window['SockJS'] : require('sockjs');
   };
 
   window["CDocsCoApi"] = CDocsCoApi;

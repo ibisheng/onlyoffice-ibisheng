@@ -50,6 +50,8 @@
 			this.m_oInsertColumns			= {}; // Массив листов с массивами списков добавленных колонок
 			this.m_oInsertRows				= {}; // Массив листов с массивами списков добавленных строк
 
+      this.m_bFast  = false;
+
 			this.init();
 
 			return this;
@@ -87,11 +89,21 @@
 			this.m_bIsViewerMode = isViewerMode;
 		};
 
+  CCollaborativeEditing.prototype.setFast = function (bFast) {
+    return this.m_bFast = bFast;
+  };
+  CCollaborativeEditing.prototype.getFast = function () {
+    return this.m_bFast;
+  };
 		CCollaborativeEditing.prototype.getCollaborativeEditing = function () {
 			if (true !== this.isCoAuthoringExcellEnable() || this.m_bIsViewerMode)
 				return false;
 			return 1 !== this.m_nUseType;
 		};
+
+  CCollaborativeEditing.prototype.haveOtherChanges = function () {
+    return 0 < this.m_arrChanges.length;
+  };
 
 		CCollaborativeEditing.prototype.getOwnLocksLength = function () {
 			return this.m_arrNeedUnlock2.length;

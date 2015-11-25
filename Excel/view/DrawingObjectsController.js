@@ -453,10 +453,16 @@ DrawingObjectsController.prototype.onKeyPress = function(e)
     var bRetValue = false;
     if ( Code > 0x20 )
     {
-        this.checkSelectedObjectsAndCallback(function()
-        {
-            this.paragraphAdd( new ParaText( String.fromCharCode( Code ) ) );
-        }, [], false, historydescription_Spreadsheet_ParagraphAdd);
+        if( window["Asc"]["editor"].collaborativeEditing.getFast()){
+            this.checkSelectedObjectsAndCallbackNoCheckLock(function(){
+                this.paragraphAdd( new ParaText( String.fromCharCode( Code ) ) );
+            }, [], false, historydescription_Spreadsheet_ParagraphAdd);
+        }
+        else{
+            this.checkSelectedObjectsAndCallback(function(){
+                this.paragraphAdd( new ParaText( String.fromCharCode( Code ) ) );
+            }, [], false, historydescription_Spreadsheet_ParagraphAdd);
+        }
         bRetValue = true;
     }
     //if ( true == bRetValue )

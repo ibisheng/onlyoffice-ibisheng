@@ -4227,14 +4227,16 @@ Paragraph.prototype =
             var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
             var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
 
-            for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+            if (0 <= StartPos && StartPos < this.Content.length && 0 <= EndPos && EndPos < this.Content.length)
             {
-                var Element = this.Content[CurPos];
+                for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+                {
+                    var Element = this.Content[CurPos];
+                    ContentPos.Update(CurPos, 0);
 
-                ContentPos.Update(CurPos, 0);
-
-                if (true === Element.Get_PosByElement(Class, ContentPos, 1, true, CurRange, CurLine))
-                    return ContentPos;
+                    if (true === Element.Get_PosByElement(Class, ContentPos, 1, true, CurRange, CurLine))
+                        return ContentPos;
+                }
             }
         }
 
@@ -13534,7 +13536,7 @@ Paragraph.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Dept
 };
 Paragraph.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
 {
-    if (!DocPos[Depth] || this !== DocPos[Depth].Class)
+    if (0 === Flag && (!DocPos[Depth] || this !== DocPos[Depth].Class))
         return;
 
     var Pos = 0;

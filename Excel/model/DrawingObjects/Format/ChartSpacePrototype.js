@@ -11,6 +11,7 @@ CChartSpace.prototype.setDrawingObjects = CShape.prototype.setDrawingObjects;
 CChartSpace.prototype.setDrawingBase = CShape.prototype.setDrawingBase;
 CChartSpace.prototype.deleteDrawingBase = CShape.prototype.deleteDrawingBase;
 CChartSpace.prototype.getDrawingObjectsController = CShape.prototype.getDrawingObjectsController;
+CChartSpace.prototype.Is_UseInDocument = CShape.prototype.Is_UseInDocument;
 
 CChartSpace.prototype.recalculateTransform = function()
 {

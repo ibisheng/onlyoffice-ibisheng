@@ -20,7 +20,7 @@ function CCollaborativeEditing()
 Asc.extendClass(CCollaborativeEditing, CCollaborativeEditingBase);
 
 
-CCollaborativeEditing.prototype.Send_Changes = function()
+CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave)
 {
     // Пересчитываем позиции
     this.Refresh_DCChanges();
@@ -159,7 +159,7 @@ CCollaborativeEditing.prototype.Send_Changes = function()
     else
     {
         // Обновляем точку последнего сохранения в истории
-        History.Reset_SavedIndex();
+        History.Reset_SavedIndex(IsUserSave);
     }
 
     for(var i = 0; i < num_arr.length; ++i)

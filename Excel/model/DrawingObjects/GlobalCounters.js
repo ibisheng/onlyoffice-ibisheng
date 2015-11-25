@@ -10,16 +10,6 @@ function CCollaborativeEditing()
 
 Asc.extendClass(CCollaborativeEditing, CCollaborativeEditingBase);
 
-CCollaborativeEditing.prototype.Set_Fast = function(bFast)
-{
-    this.m_bFast = bFast;
-};
-
-CCollaborativeEditing.prototype.Is_Fast = function()
-{
-    return this.m_bFast;
-};
-
 CCollaborativeEditing.prototype.Have_OtherChanges = function()
 {
     return false;
@@ -202,28 +192,6 @@ CCollaborativeEditing.prototype.Clear_CollaborativeMarks = function()
 
     // Очищаем массив
     this.m_aChangedClasses = {};
-};
-
-CCollaborativeEditing.prototype.Clear_DocumentPositions = function()
-{
-};
-CCollaborativeEditing.prototype.Add_DocumentPosition = function(DocumentPos)
-{
-};
-CCollaborativeEditing.prototype.Update_DocumentPositionsOnAdd = function(Class, Pos)
-{
-};
-CCollaborativeEditing.prototype.Update_DocumentPositionsOnRemove = function(Class, Pos, Count)
-{
-};
-CCollaborativeEditing.prototype.OnStart_SplitRun = function(SplitRun, SplitPos)
-{
-};
-CCollaborativeEditing.prototype.OnEnd_SplitRun = function(NewRun)
-{
-};
-CCollaborativeEditing.prototype.Update_DocumentPosition = function(DocPos)
-{
 };
 
 var CollaborativeEditing = new CCollaborativeEditing();

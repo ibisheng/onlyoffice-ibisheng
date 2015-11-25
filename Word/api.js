@@ -462,6 +462,9 @@ function asc_docs_api(name)
 
 	this.fCurCallback = null;
 
+    // Флаг, контролирующий сохранение было сделано пользователем или нет (по умолчанию - нет)
+    this.IsUserSave = false;
+
 	var oThis = this;
 	// init OnMessage
 	InitOnMessage(function (error, url) {
@@ -1109,42 +1112,41 @@ asc_docs_api.prototype._coAuthoringSetChanges = function(e, oColor)
 		this._coAuthoringSetChange(e[Index], oColor);
 };
 
-asc_docs_api.prototype._coAuthoringInit = function()
-{
-	//Если User не задан, отключаем коавторинг.
-	if (null == this.User || null == this.User.asc_getId()) {
-		this.User = new Asc.asc_CUser();
-		this.User.asc_setId("Unknown");
-		this.User.asc_setUserName("Unknown");
-	}
+asc_docs_api.prototype._coAuthoringInit = function() {
+  //Если User не задан, отключаем коавторинг.
+  if (null == this.User || null == this.User.asc_getId()) {
+    this.User = new Asc.asc_CUser();
+    this.User.asc_setId("Unknown");
+    this.User.asc_setUserName("Unknown");
+  }
 
-    var t = this;
-    this.CoAuthoringApi.onParticipantsChanged   	= function (e, CountEditUsers)
-    {
-        t.asc_fireCallback("asc_onParticipantsChanged", e, CountEditUsers);
-    };
-	this.CoAuthoringApi.onAuthParticipantsChanged  	= function (e, count) { t.asc_fireCallback("asc_onAuthParticipantsChanged", e, count); };
-    this.CoAuthoringApi.onMessage               	= function (e, clear)
-    {
-        if (true === CollaborativeEditing.Is_Fast())
-        {
-            t.WordControl.m_oLogicDocument.Update_ForeignCursor(e[e.length - 1].message, e[e.length - 1].user, true);
-        }
-
-        //t.asc_fireCallback("asc_onCoAuthoringChatReceiveMessage", e, clear);
-    };
-	this.CoAuthoringApi.onConnectionStateChanged	= function (e)
-    {
-        if (true === CollaborativeEditing.Is_Fast() && false === e.state)
-        {
-            editor.WordControl.m_oLogicDocument.Remove_ForeignCursor(e.id);
-        }
-        t.asc_fireCallback("asc_onConnectionStateChanged", e);
-    };
+  var t = this;
+  this.CoAuthoringApi.onParticipantsChanged = function(e, CountEditUsers) {
+    t.asc_fireCallback("asc_onParticipantsChanged", e, CountEditUsers);
+  };
+  this.CoAuthoringApi.onAuthParticipantsChanged = function(e, count) {
+    t.asc_fireCallback("asc_onAuthParticipantsChanged", e, count);
+  };
+  this.CoAuthoringApi.onMessage = function(e, clear) {
+    t.asc_fireCallback("asc_onCoAuthoringChatReceiveMessage", e, clear);
+  };
+  this.CoAuthoringApi.onCursor = function(e) {
+    if (true === CollaborativeEditing.Is_Fast()) {
+      t.WordControl.m_oLogicDocument.Update_ForeignCursor(e[e.length - 1].cursor, e[e.length - 1].user, true);
+    }
+  };
+  this.CoAuthoringApi.onConnectionStateChanged = function(e) {
+    if (true === CollaborativeEditing.Is_Fast() && false === e.state) {
+      editor.WordControl.m_oLogicDocument.Remove_ForeignCursor(e.id);
+    }
+    t.asc_fireCallback("asc_onConnectionStateChanged", e);
+  };
   this.CoAuthoringApi.onLocksAcquired = function(e) {
     if (t.isApplyChangesOnOpenEnabled) {
       // Пока документ еще не загружен, будем сохранять функцию и аргументы
-      t.arrPreOpenLocksObjects.push(function(){t.CoAuthoringApi.onLocksAcquired(e);});
+      t.arrPreOpenLocksObjects.push(function() {
+        t.CoAuthoringApi.onLocksAcquired(e);
+      });
       return;
     }
 
@@ -1185,7 +1187,9 @@ asc_docs_api.prototype._coAuthoringInit = function()
   this.CoAuthoringApi.onLocksReleased = function(e, bChanges) {
     if (t.isApplyChangesOnOpenEnabled) {
       // Пока документ еще не загружен, будем сохранять функцию и аргументы
-      t.arrPreOpenLocksObjects.push(function(){t.CoAuthoringApi.onLocksReleased(e, bChanges);});
+      t.arrPreOpenLocksObjects.push(function() {
+        t.CoAuthoringApi.onLocksReleased(e, bChanges);
+      });
       return;
     }
 
@@ -1218,23 +1222,25 @@ asc_docs_api.prototype._coAuthoringInit = function()
       CollaborativeEditing.Remove_NeedLock(Id);
     }
   };
-	this.CoAuthoringApi.onSaveChanges				= function (e, userId, bFirstLoad)
-	{
-		var bUseColor;
-		if (bFirstLoad)
-			bUseColor = -1 === CollaborativeEditing.m_nUseType;
-        if (editor.CollaborativeMarksShowType === c_oAscCollaborativeMarksShowType.None)
-            bUseColor = false;
+  this.CoAuthoringApi.onSaveChanges = function(e, userId, bFirstLoad) {
+    var bUseColor;
+    if (bFirstLoad) {
+      bUseColor = -1 === CollaborativeEditing.m_nUseType;
+    }
+    if (editor.CollaborativeMarksShowType === c_oAscCollaborativeMarksShowType.None) {
+      bUseColor = false;
+    }
 
-		var oUser = t.CoAuthoringApi.getUser(userId);
-		var nColor = oUser ? oUser.asc_getColorValue() :  null;
-        var oColor = false === bUseColor ? null : (null !== nColor ? new CDocumentColor( (nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF ) : new CDocumentColor( 191, 255, 199 ));
+    var oUser = t.CoAuthoringApi.getUser(userId);
+    var nColor = oUser ? oUser.asc_getColorValue() : null;
+    var oColor = false === bUseColor ? null : (null !== nColor ? new CDocumentColor((nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF) : new CDocumentColor(191, 255, 199));
 
-        t._coAuthoringSetChange(e, oColor);
-		// т.е. если bSendEvent не задан, то посылаем  сообщение + когда загрузился документ
-        if (!bFirstLoad && t.bInit_word_control)
-            t.sync_CollaborativeChanges();
-	};
+    t._coAuthoringSetChange(e, oColor);
+    // т.е. если bSendEvent не задан, то посылаем  сообщение + когда загрузился документ
+    if (!bFirstLoad && t.bInit_word_control) {
+      t.sync_CollaborativeChanges();
+    }
+  };
   this.CoAuthoringApi.onFirstLoadChangesEnd = function() {
     t.asyncServerIdEndLoaded();
   };
@@ -1245,34 +1251,34 @@ asc_docs_api.prototype._coAuthoringInit = function()
   this.CoAuthoringApi.onSetIndexUser = function(e) {
     g_oIdCounter.Set_UserId('' + e);
   };
-	this.CoAuthoringApi.onStartCoAuthoring		= function (isStartEvent) {
-		CollaborativeEditing.Start_CollaborationEditing();
-		t.asc_setDrawCollaborationMarks(true);
+  this.CoAuthoringApi.onStartCoAuthoring = function(isStartEvent) {
+    CollaborativeEditing.Start_CollaborationEditing();
+    t.asc_setDrawCollaborationMarks(true);
 
-		if (t.ParcedDocument) {
-			t.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
+    if (t.ParcedDocument) {
+      t.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
 
-			if (!isStartEvent) {
-				if (true != History.Is_Clear()) {
-					CollaborativeEditing.Apply_Changes();
-					CollaborativeEditing.Send_Changes();
-				} else {
-					// Изменений нет, но нужно сбросить lock
-					t.CoAuthoringApi.unLockDocument(true);
-				}
-			}
-		} else {
-			t.isStartCoAuthoringOnEndLoad = true;
-			if (!isStartEvent) {
-				// Документ еще не подгрузился, но нужно сбросить lock
-				t.CoAuthoringApi.unLockDocument(false);
-			}
-		}
-	};
-	this.CoAuthoringApi.onEndCoAuthoring			= function (isStartEvent) {
-		CollaborativeEditing.End_CollaborationEditing();
-		editor.asc_setDrawCollaborationMarks(false);
-	};
+      if (!isStartEvent) {
+        if (true != History.Is_Clear()) {
+          CollaborativeEditing.Apply_Changes();
+          CollaborativeEditing.Send_Changes();
+        } else {
+          // Изменений нет, но нужно сбросить lock
+          t.CoAuthoringApi.unLockDocument(true);
+        }
+      }
+    } else {
+      t.isStartCoAuthoringOnEndLoad = true;
+      if (!isStartEvent) {
+        // Документ еще не подгрузился, но нужно сбросить lock
+        t.CoAuthoringApi.unLockDocument(false);
+      }
+    }
+  };
+  this.CoAuthoringApi.onEndCoAuthoring = function(isStartEvent) {
+    CollaborativeEditing.End_CollaborationEditing();
+    editor.asc_setDrawCollaborationMarks(false);
+  };
   this.CoAuthoringApi.onFirstConnect = function() {
     t.isOnFirstConnectEnd = true;
     t._onEndPermissions();
@@ -1297,58 +1303,61 @@ asc_docs_api.prototype._coAuthoringInit = function()
   this.CoAuthoringApi.onWarning = function(e) {
     t.sync_ErrorCallback(c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
   };
-	this.CoAuthoringApi.onDocumentOpen				= function (inputWrap) {
-        if (inputWrap["data"]) {
-			var input = inputWrap["data"];
-			switch(input["type"]){
-				case 'reopen':
-				case 'open': {
-					switch(input["status"]) {
-						case "updateversion":
-						case "ok":
-							var urls = input["data"];
-							g_oDocumentUrls.init(urls);
-							if(null != urls['Editor.bin']) {
-								if ('ok' === input["status"] || editor.isViewMode) {
-									_onOpenCommand(function(){}, {'data': urls['Editor.bin']});
-								} else {
-									editor.asc_fireCallback("asc_onDocumentUpdateVersion", function () {
-										if (editor.isCoAuthoringEnable) {
-											editor.asc_coAuthoringDisconnect();
-										}
-										_onOpenCommand(function(){}, {'data': urls['Editor.bin']});
-									});
-								}
-							} else {
-								t.asc_fireCallback("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
-							}
-						break;
-						case "needparams":
-							var cp = {'codepage': c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
-							t.asc_fireCallback("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), t.advancedOptionsAction);
-						break;
-						case "err":
-							t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
-						break;
-					}
-				}
-				break;
-				default:
-					if(t.fCurCallback) {
-						t.fCurCallback(input);
-						t.fCurCallback = null;
-					} else {
-						t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-					}
-				break;
-			}
+  this.CoAuthoringApi.onDocumentOpen = function(inputWrap) {
+    if (inputWrap["data"]) {
+      var input = inputWrap["data"];
+      switch (input["type"]) {
+        case 'reopen':
+        case 'open':
+        {
+          switch (input["status"]) {
+            case "updateversion":
+            case "ok":
+              var urls = input["data"];
+              g_oDocumentUrls.init(urls);
+              if (null != urls['Editor.bin']) {
+                if ('ok' === input["status"] || editor.isViewMode) {
+                  _onOpenCommand(function() {
+                  }, {'data': urls['Editor.bin']});
+                } else {
+                  editor.asc_fireCallback("asc_onDocumentUpdateVersion", function() {
+                    if (editor.isCoAuthoringEnable) {
+                      editor.asc_coAuthoringDisconnect();
+                    }
+                    _onOpenCommand(function() {
+                    }, {'data': urls['Editor.bin']});
+                  });
+                }
+              } else {
+                t.asc_fireCallback("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
+              }
+              break;
+            case "needparams":
+              var cp = {'codepage': c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
+              t.asc_fireCallback("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), t.advancedOptionsAction);
+              break;
+            case "err":
+              t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
+              break;
+          }
         }
-	};
-	//в обычном серверном режиме портим ссылку, потому что CoAuthoring теперь имеет встроенный адрес
-	//todo надо использовать проверку get_OfflineApp, но она инициализируется только после loadDocument
-	if(!(window["NATIVE_EDITOR_ENJINE"] || !documentId)){
-		this.CoAuthoringApi.set_url(null);
-	}
+          break;
+        default:
+          if (t.fCurCallback) {
+            t.fCurCallback(input);
+            t.fCurCallback = null;
+          } else {
+            t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+          }
+          break;
+      }
+    }
+  };
+  //в обычном серверном режиме портим ссылку, потому что CoAuthoring теперь имеет встроенный адрес
+  //todo надо использовать проверку get_OfflineApp, но она инициализируется только после loadDocument
+  if (!(window["NATIVE_EDITOR_ENJINE"] || !documentId)) {
+    this.CoAuthoringApi.set_url(null);
+  }
   this.CoAuthoringApi.init(this.User, documentId, documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Word, documentFormatSave);
 };
 
@@ -2223,6 +2232,7 @@ function OnSave_Callback(e) {
 			CollaborativeEditing.Clear_CollaborativeMarks();
 
 		// Принимаем чужие изменения
+        var HaveOtherChanges = CollaborativeEditing.Have_OtherChanges();
 		CollaborativeEditing.Apply_Changes();
 
 		editor.CoAuthoringApi.onUnSaveLock = function () {
@@ -2247,7 +2257,8 @@ function OnSave_Callback(e) {
             CursorInfo = History.Get_DocumentPositionBinary();
 
 		// Пересылаем свои изменения
-		CollaborativeEditing.Send_Changes({UserId : editor.CoAuthoringApi.getUserConnectionId(), CursorInfo : CursorInfo});
+		CollaborativeEditing.Send_Changes(editor.IsUserSave, {UserId : editor.CoAuthoringApi.getUserConnectionId(), CursorInfo : CursorInfo}, HaveOtherChanges);
+        editor.IsUserSave = false;
 	} else {
 		var nState = editor.CoAuthoringApi.get_state();
 		if (ConnectionState.Close === nState) {
@@ -2263,8 +2274,11 @@ function OnSave_Callback(e) {
 	}
 }
 
-asc_docs_api.prototype.asc_Save = function ()
+asc_docs_api.prototype.asc_Save = function (isNoUserSave)
 {
+    if (true !== isNoUserSave)
+        this.IsUserSave = true;
+
     if (true === this.canSave && !this.asc_IsLongAction())
 	{
 		this.canSave = false;
@@ -5140,6 +5154,29 @@ asc_docs_api.prototype.sync_MouseMoveCallback = function(Data)
 {
     this.asc_fireCallback("asc_onMouseMove", Data );
 };
+
+asc_docs_api.prototype.sync_ShowForeignCursorLabel = function(UserId, X, Y, Color)
+{
+    // TODO: Временно делаем через события мыши
+    this.sync_MouseMoveStartCallback();
+    var MMData = new CMouseMoveData();
+    MMData.X_abs            = X;
+    MMData.Y_abs            = Y - 20;
+    MMData.Type             = c_oAscMouseMoveDataTypes.LockedObject;
+    MMData.UserId           = UserId;
+    MMData.LockedObjectType = c_oAscMouseMoveLockedObjectType.Common;
+    this.sync_MouseMoveCallback(MMData);
+    this.sync_MouseMoveEndCallback();
+};
+asc_docs_api.prototype.sync_HideForeignCursorLabel = function(UserId)
+{
+    // TODO: Временно делаем через события мыши
+    this.sync_MouseMoveStartCallback();
+    var MMData = new CMouseMoveData();
+    MMData.Type             = c_oAscMouseMoveDataTypes.Common;
+    this.sync_MouseMoveCallback(MMData);
+    this.sync_MouseMoveEndCallback();
+};
 asc_docs_api.prototype.asc_setChartTranslate = function(translate) {
     this.chartTranslate = translate;
 };
@@ -7123,6 +7160,11 @@ asc_docs_api.prototype.asc_CloseFile = function()
 
     this.WordControl.m_oDrawingDocument.CloseFile();
 };
+asc_docs_api.prototype.asc_SetFastCollaborative = function(isOn)
+{
+    if (CollaborativeEditing)
+        CollaborativeEditing.Set_Fast(isOn);
+};
 
 window["asc_docs_api"] = asc_docs_api;
 window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, version)
@@ -7542,5 +7584,5 @@ function CSpellCheckApi_desktop()
 
 window["AscDesktopEditor_Save"] = function()
 {
-    return editor.asc_Save();
+    return editor.asc_Save(false);
 };

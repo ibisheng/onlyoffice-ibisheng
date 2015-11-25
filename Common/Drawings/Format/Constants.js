@@ -1439,7 +1439,7 @@ var historydescription_Document_SetTextUnderlineHotKey             = 0x009d;
 var historydescription_Document_FormatPasteHotKey                  = 0x009e;
 var historydescription_Document_PasteHotKey                        = 0x009f;
 var historydescription_Document_PasteSafariHotKey                  = 0x00a0;
-var historydescription_Document_CurHotKey                          = 0x00a1;
+var historydescription_Document_CutHotKey                          = 0x00a1;
 var historydescription_Document_SetTextVertAlignHotKey             = 0x00a2;
 var historydescription_Document_AddMathHotKey                      = 0x00a3;
 var historydescription_Document_SetTextVertAlignHotKey2            = 0x00a4;
@@ -1751,7 +1751,7 @@ function Get_HistoryPointStringDescription(nDescription)
         case historydescription_Document_FormatPasteHotKey                  : sString = "Document_FormatPasteHotKey                 "; break;
         case historydescription_Document_PasteHotKey                        : sString = "Document_PasteHotKey                       "; break;
         case historydescription_Document_PasteSafariHotKey                  : sString = "Document_PasteSafariHotKey                 "; break;
-        case historydescription_Document_CurHotKey                          : sString = "Document_CurHotKey                         "; break;
+        case historydescription_Document_CutHotKey                          : sString = "Document_CutHotKey                         "; break;
         case historydescription_Document_SetTextVertAlignHotKey             : sString = "Document_SetTextVertAlignHotKey            "; break;
         case historydescription_Document_AddMathHotKey                      : sString = "Document_AddMathHotKey                     "; break;
         case historydescription_Document_SetTextVertAlignHotKey2            : sString = "Document_SetTextVertAlignHotKey2           "; break;

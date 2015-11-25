@@ -411,6 +411,7 @@ function Editor_Copy(api, bCut)
         if(true == bCut)
         {
             //������� ���������� ��������
+            api.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_CutHotKey);
             api.WordControl.m_oLogicDocument.Remove(1, true, true);
             api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
         }
@@ -3075,12 +3076,12 @@ PasteProcessor.prototype =
                     var oObjectsForDownload = GetObjectsForImageDownload(aContent.aPastedImages);
 					if(oObjectsForDownload.aUrls.length > 0)
 					{
-						if(onlyBinary && window.NativeCorrectImageUrlOnPaste)
+						if(onlyBinary && window["NativeCorrectImageUrlOnPaste"])
 						{
 							var url;
 							for(var i = 0, length = aContent.aPastedImages.length; i < length; ++i)
 							{
-								url = window.NativeCorrectImageUrlOnPaste(aContent.aPastedImages[i].Url);
+								url = window["NativeCorrectImageUrlOnPaste"](aContent.aPastedImages[i].Url);
 								aContent.images[i] = url;
 								
 								var imageElem = aContent.aPastedImages[i];
@@ -4669,16 +4670,23 @@ PasteProcessor.prototype =
 				{
 					if (window["AscDesktopEditor"] !== undefined)
 					{
-						var _base64 = window["AscDesktopEditor"]["GetImageBase64"](src);
-						if (_base64 != "")
+						if (window["AscDesktopEditor"]["LocalFileGetImageUrl"] !== undefined)
 						{
-							aImagesToDownload.push(_base64);
-							_mapLocal[_base64] = src;
+							aImagesToDownload.push(src);
 						}
 						else
 						{
-							this.oImages[image] = "local";
-						}							
+							var _base64 = window["AscDesktopEditor"]["GetImageBase64"](src);
+							if (_base64 != "")
+							{
+								aImagesToDownload.push(_base64);
+								_mapLocal[_base64] = src;
+							}
+							else
+							{
+								this.oImages[image] = "local";
+							}
+						}						
 					}
 					else
 						this.oImages[image] = "local";
@@ -7555,7 +7563,8 @@ function Editor_CopyPaste_Create(api)
 		{	
 			ElemToSelect.innerHTML = "";
 			Editor_Copy_Event(e, ElemToSelect);
-			
+
+            api.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_CutHotKey);
 			api.WordControl.m_oLogicDocument.Remove(1, true, true);
 			api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
 		}

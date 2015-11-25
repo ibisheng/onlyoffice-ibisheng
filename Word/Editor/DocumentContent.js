@@ -9663,7 +9663,7 @@ CDocumentContent.prototype.Set_ContentSelection = function(StartDocPos, EndDocPo
 };
 CDocumentContent.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
 {
-    if (!DocPos[Depth] || this !== DocPos[Depth].Class)
+    if (0 === Flag && (!DocPos[Depth] || this !== DocPos[Depth].Class))
         return;
 
     if (this.Content.length <= 0)

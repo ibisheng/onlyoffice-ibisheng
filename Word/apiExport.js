@@ -546,7 +546,7 @@ asc_docs_api.prototype['asc_showRevision'] = asc_docs_api.prototype.asc_showRevi
 asc_docs_api.prototype['asc_undoAllChanges'] = asc_docs_api.prototype.asc_undoAllChanges;
 asc_docs_api.prototype['asc_CloseFile'] = asc_docs_api.prototype.asc_CloseFile;
 asc_docs_api.prototype['asc_addComment'] = asc_docs_api.prototype.asc_addComment;
-
+asc_docs_api.prototype['asc_SetFastCollaborative'] = asc_docs_api.prototype.asc_SetFastCollaborative;
 window['CChatMessage'] = CChatMessage;
 CChatMessage.prototype['get_UserId'] = CChatMessage.prototype.get_UserId;
 CChatMessage.prototype['get_Message'] = CChatMessage.prototype.get_Message;

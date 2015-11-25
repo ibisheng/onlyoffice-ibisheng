@@ -315,11 +315,11 @@ CCollaborativeEditingBase.prototype.Add_Unlock2 = function(Lock)
 };
 CCollaborativeEditingBase.prototype.Have_OtherChanges = function()
 {
-    return (this.m_aChanges.length > 0 ? true: false);
+    return (0 < this.m_aChanges.length);
 };
 CCollaborativeEditingBase.prototype.Apply_Changes = function()
 {
-    var OtherChanges = ( this.m_aChanges.length > 0 ? true : false );
+    var OtherChanges = (this.m_aChanges.length > 0);
 
     // Если нет чужих изменений, тогда и делать ничего не надо
     if (true === OtherChanges)
@@ -633,6 +633,9 @@ CCollaborativeEditingBase.prototype.Refresh_ForeignCursors = function()
     {
         var CursorInfo = this.m_aCursorsToUpdate[UserId];
         this.m_oLogicDocument.Update_ForeignCursor(CursorInfo, UserId, false);
+
+        if (this.Add_ForeignCursorToShow)
+            this.Add_ForeignCursorToShow(UserId);
     }
     this.m_aCursorsToUpdate = {};
 };

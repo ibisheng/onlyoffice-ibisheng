@@ -17,6 +17,7 @@ CImageShape.prototype.hitInBoundingRect = CShape.prototype.hitInBoundingRect;
 CImageShape.prototype.getRotateAngle = CShape.prototype.getRotateAngle;
 CImageShape.prototype.setWorksheet = CShape.prototype.setWorksheet;
 CImageShape.prototype.getDrawingObjectsController = CShape.prototype.getDrawingObjectsController;
+CImageShape.prototype.Is_UseInDocument = CShape.prototype.Is_UseInDocument;
 
 CImageShape.prototype.setRecalculateInfo = function()
 {

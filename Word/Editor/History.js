@@ -12,7 +12,7 @@ function CHistory(Document)
     this.SavedIndex = null;        // Номер точки отката, на которой произошло последнее сохранение
     this.ForceSave  = false;       // Нужно сохранение, случается, когда у нас точка SavedIndex смещается из-за объединения точек, и мы делаем Undo
     this.RecIndex   = -1;          // Номер точки, на которой произошел последний пересчет
-    this.Points     = []; // Точки истории, в каждой хранится массив с изменениями после текущей точки
+    this.Points     = [];          // Точки истории, в каждой хранится массив с изменениями после текущей точки
     this.Document   = Document;
 
     this.RecalculateData =
@@ -35,10 +35,19 @@ function CHistory(Document)
 
     this.FileCheckSum = 0;
     this.FileSize     = 0;
+
+    // Параметры для специального сохранения для локальной версии редактора
+    this.UserSaveMode   = false;
+    this.UserSavedIndex = null;  // Номер точки, на которой произошло последнее сохранение пользователем (не автосохранение)
 }
 
 CHistory.prototype =
 {
+    Is_UserSaveMode : function()
+    {
+        return this.UserSaveMode;
+    },
+
     Update_FileDescription : function(oStream)
     {
         var pData = oStream.data;
@@ -111,10 +120,11 @@ CHistory.prototype =
 
     Clear : function()
     {
-        this.Index         = -1;
-        this.SavedIndex    = null;
-        this.ForceSave     = false;
-        this.Points.length = 0;
+        this.Index          = -1;
+        this.SavedIndex     = null;
+        this.ForceSave      = false;
+        this.UserSavedIndex = null;
+        this.Points.length  = 0;
 		this.TurnOffHistory = 0;
         this.Internal_RecalcData_Clear();
     },
@@ -253,11 +263,8 @@ CHistory.prototype =
 		if ( 0 !== this.TurnOffHistory )
 			return;
 
-        if ( this.Index < this.SavedIndex && null !== this.SavedIndex )
-        {
-            this.SavedIndex = this.Index;
-            this.ForceSave  = true;
-        }
+        if (null !== this.SavedIndex && this.Index < this.SavedIndex)
+            this.Set_SavedIndex(this.Index);
 
         this.Clear_Additional();
 
@@ -593,11 +600,8 @@ CHistory.prototype =
             Description: historydescription_Document_AddLetter
         };
 
-		if ( this.SavedIndex >= this.Points.length - 2 && null !== this.SavedIndex )
-        {
-			this.SavedIndex = this.Points.length - 3;
-            this.ForceSave  = true;
-        }
+		if (null !== this.SavedIndex && this.SavedIndex >= this.Points.length - 2)
+            this.Set_SavedIndex(this.Points.length - 3);
 
         this.Points.splice( this.Points.length - 2, 2, NewPoint );
         if ( this.Index >= this.Points.length )
@@ -626,21 +630,65 @@ CHistory.prototype =
 		return (0 === this.TurnOffHistory);
     },
 
-    Reset_SavedIndex : function()
+    Reset_SavedIndex : function(IsUserSave)
     {
-        this.SavedIndex = this.Index;
-        this.ForceSave   = false;
+        if (true === this.Is_UserSaveMode())
+        {
+            this.SavedIndex = this.Index;
+            if (true === IsUserSave)
+            {
+                this.UserSavedIndex = this.Index;
+                this.ForceSave      = false;
+            }
+        }
+        else
+        {
+            this.SavedIndex = this.Index;
+            this.ForceSave  = false;
+        }
     },
 
-    Have_Changes : function()
+    Set_SavedIndex : function(Index)
     {
-        if ( -1 === this.Index && null === this.SavedIndex && false === this.ForceSave )
-            return false;
-        
-        if ( this.Index != this.SavedIndex || true === this.ForceSave )
-            return true;
+        if (true === this.Is_UserSaveMode())
+        {
+            this.SavedIndex = Index;
 
-        return false;
+            if (null !== this.UserSavedIndex && this.UserSavedIndex > this.SavedIndex)
+            {
+                this.UserSavedIndex = Index;
+                this.ForceSave      = true;
+            }
+        }
+        else
+        {
+            this.SavedIndex = Index;
+            this.ForceSave  = true;
+        }
+    },
+
+    Have_Changes : function(IsUserSave)
+    {
+        if (true === this.Is_UserSaveMode() && false !== IsUserSave)
+        {
+            if (-1 === this.Index && null === this.UserSavedIndex && false === this.ForceSave)
+                return false;
+
+            if (this.Index != this.UserSavedIndex || true === this.ForceSave)
+                return true;
+
+            return false;
+        }
+        else
+        {
+            if (-1 === this.Index && null === this.SavedIndex && false === this.ForceSave)
+                return false;
+
+            if (this.Index != this.SavedIndex || true === this.ForceSave)
+                return true;
+
+            return false;
+        }
     },
 
     Get_RecalcData : function()
