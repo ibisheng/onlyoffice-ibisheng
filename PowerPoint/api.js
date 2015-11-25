@@ -1368,33 +1368,15 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr, bParaPr){
 /*----------------------------------------------------------------*/
 /*functions for working with clipboard, document*/
 /*TODO: Print,Undo,Redo,Copy,Cut,Paste,Share,Save,DownloadAs,ReturnToDocuments(вернуться на предыдущую страницу) & callbacks for these functions*/
-asc_docs_api.prototype.asc_Print = function(){
+asc_docs_api.prototype.asc_Print = function(bIsDownloadEvent){
 
     if (window["AscDesktopEditor"])
     {
         window["AscDesktopEditor"]["Print"]();
         return;
     }
-
-	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);
-	var t = this;
-	_downloadAs(this, c_oAscFileType.PDF, function(input){
-		if(null != input && "save" == input["type"]) {
-			if('ok' == input["status"]){
-				var url = input["data"];
-				if(url) {
-					t.processSavedFile(url, false);
-				} else {
-					t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-				}
-			} else {
-				t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-			}
-		} else {
-			t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-		}
-		t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);
-	}, true);
+    var options = bIsDownloadEvent ? {downloadType: 'asc_onPrintUrl'} : null;
+	_downloadAs(this, c_oAscFileType.PDF, c_oAscAsyncAction.Print, options);
 };
 asc_docs_api.prototype.Undo = function(){
 	this.WordControl.m_oLogicDocument.Document_Undo();
@@ -1547,34 +1529,17 @@ asc_docs_api.prototype.asc_Save = function (isNoUserSave)
         this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
     }
 };
-asc_docs_api.prototype.processSavedFile = function(url, bInner){
-	if(bInner)
-		editor.asc_fireCallback("asc_onDownloadUrl", url, function(hasError){});
+asc_docs_api.prototype.processSavedFile = function(url, downloadType){
+	if(downloadType)
+		editor.asc_fireCallback(downloadType, url, function(hasError){});
 	else
 	{
 		getFile(url);
 	}
 };
-asc_docs_api.prototype.asc_DownloadAs = function(typeFile, bIsDownload){//передаем число соответствующее своему формату.
-	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
-	var t = this;
-	_downloadAs(this, typeFile, function(input){
-		if(null != input && ("save" == input["type"] || "sfct" == input["type"])) {
-			if('ok' == input["status"]){
-				var url = input["data"];
-				if(url) {
-					t.processSavedFile(url, bIsDownload);
-				} else {
-					t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-				}
-			} else {
-				t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-			}
-		} else {
-			t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-		}
-		t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
-	}, true);
+asc_docs_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent){//передаем число соответствующее своему формату.
+	var options = bIsDownloadEvent ? {downloadType: 'asc_onDownloadUrl'} : null;
+	_downloadAs(this, typeFile, c_oAscAsyncAction.DownloadAs, options);
 };
 asc_docs_api.prototype.Resize = function(){
 	if (false === this.bInit_word_control)
@@ -5096,11 +5061,19 @@ function _onOpenCommand(fCallback, incomeObject) {
 		if(fCallback) fCallback();
 	});
 }
-function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)
+function _downloadAs(editor, filetype, actionType, options)
 {
+    if (!options) {
+      options = {};
+    }
+    if (actionType) {
+      editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+    }
+    
 	var dataContainer = {data: null, part: null, index: 0, count: 0};
+    var command = "save";
 	var oAdditionalData = {};
-	oAdditionalData["c"] = "save";
+	oAdditionalData["c"] = command;
 	oAdditionalData["id"] = documentId;
 	oAdditionalData["userid"] = documentUserId;
 	oAdditionalData["vkey"] = documentVKey;
@@ -5114,6 +5087,26 @@ function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)
 	}
 	else
 		dataContainer.data = editor.WordControl.SaveDocument();
+    var fCallback = function(input) {
+      var error = c_oAscError.ID.Unknown;
+      if(null != input && command == input["type"]) {
+        if('ok' == input["status"]){
+          var url = input["data"];
+          if(url) {
+            error = c_oAscError.ID.No;
+            editor.processSavedFile(url, options.downloadType);
+          }
+        } else {
+          error = g_fMapAscServerErrorToAscError(parseInt(input["data"]));
+        }
+      }
+      if (c_oAscError.ID.No != error) {
+        editor.asc_fireCallback("asc_onError", error, c_oAscError.Level.NoCritical);
+      }
+      if (actionType) {
+        editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+      }
+    };
 	editor.fCurCallback = fCallback;
 	g_fSaveWithParts(function(fCallback1, oAdditionalData1, dataContainer1){sendCommand2(editor, fCallback1, oAdditionalData1, dataContainer1);}, fCallback, null, oAdditionalData, dataContainer);
 }

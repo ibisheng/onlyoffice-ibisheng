@@ -115,13 +115,11 @@ asc_docs_api.prototype.asc_setMailMergeData = function(aList)
 asc_docs_api.prototype.asc_sendMailMergeData = function(oData)
 {
     var actionType = c_oAscAsyncAction.SendMailMerge;
-    this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
-
     oData.put_UserId(documentUserId);
     oData.put_RecordCount(oData.get_RecordTo() - oData.get_RecordFrom() + 1);
+    var options = {oMailMergeSendData: oData, isNoCallback: true};
     var t = this;
-    _downloadAs(this, "sendmm", null, oData, null, c_oAscFileType.TXT, null, function(input)
-    {
+    _downloadAs(this, "sendmm", c_oAscFileType.TXT, actionType, options, function(input) {
         if (null != input && "sendmm" == input["type"])
         {
             if ("ok" == input["status"])
@@ -149,51 +147,13 @@ asc_docs_api.prototype.asc_DownloadAsMailMerge = function(typeFile, StartIndex, 
     var oDocumentMailMerge = this.WordControl.m_oLogicDocument.Get_MailMergedDocument(StartIndex, EndIndex);
     if (null != oDocumentMailMerge)
     {
-        var actionType = c_oAscAsyncAction.DownloadMerge;
-        if (bIsDownload)
-            this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
-        var t = this;
-        // Меняем тип состояния (на сохранение)
-        this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
-        _downloadAs(this, "save", oDocumentMailMerge, null, null, typeFile, function(input)
-        {
-            if (null != input && "save" == input["type"])
-            {
-                if ('ok' == input["status"])
-                {
-                    var url = input["data"];
-                    if (url)
-                    {
-                        if (bIsDownload)
-                        {
-                            t.processSavedFile(url, false);
-                        }
-                        else
-                        {
-                            t.asc_fireCallback("asc_onSaveMailMerge", url);
-                        }
-                    }
-                    else
-                    {
-                        t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-                    }
-                }
-                else
-                {
-                    t.asc_fireCallback("asc_onError", c_oAscError.ID.MailMergeSaveFile, c_oAscError.Level.NoCritical);
-                }
-            }
-            else
-            {
-                t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-            }
-            if (bIsDownload)
-            {
-                t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
-            }
-            // Меняем тип состояния (на никакое)
-            t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
-        });
+        var actionType = null;
+        var options = {oDocumentMailMerge: oDocumentMailMerge, downloadType: 'asc_onSaveMailMerge', errorDirect: c_oAscError.ID.MailMergeSaveFile};
+        if (bIsDownload) {
+            actionType = c_oAscAsyncAction.DownloadMerge;
+            options.downloadType = null;
+        }
+        _downloadAs(this, "save", typeFile, actionType, options, null);
     }
     return null != oDocumentMailMerge ? true : false;
 };

@@ -2054,7 +2054,7 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
 /*----------------------------------------------------------------*/
 /*functions for working with clipboard, document*/
 /*TODO: Print,Undo,Redo,Copy,Cut,Paste,Share,Save,DownloadAs,ReturnToDocuments(вернуться на предыдущую страницу) & callbacks for these functions*/
-asc_docs_api.prototype.asc_Print = function()
+asc_docs_api.prototype.asc_Print = function(bIsDownloadEvent)
 {
     if (window["AscDesktopEditor"])
     {
@@ -2069,62 +2069,15 @@ asc_docs_api.prototype.asc_Print = function()
             return;
         }
     }
-
-  this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);
-  var t = this;
-  if(null == this.WordControl.m_oLogicDocument)
-  {
-    var rData = {
-      "id":documentId,
-      "userid": documentUserId,
-      "vkey": documentVKey,
-      "format": documentFormat,
-      "title": changeFileExtention(documentTitle, getExtentionByFormat(c_oAscFileType.PDF)),
-      "c":"savefromorigin"};
-    this.fCurCallback = function(input) {
-      if(null != input && "savefromorigin" == input["type"]) {
-        if('ok' == input["status"]) {
-          var url = input["data"];
-          if(url) {
-            t.processSavedFile(url, false);
-          }
-        } else {
-          t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-        }
-      } else {
-        t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-      }
-      // Меняем тип состояния (на никакое)
-      editor.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
-      t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);
-    };
-    // Меняем тип состояния (на сохранение)
-    this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
-    sendCommand2(t, null, rData);
+  var command;
+  var options = {isNoData: false, downloadType: bIsDownloadEvent ? 'asc_onPrintUrl' : null};
+  if (null == this.WordControl.m_oLogicDocument) {
+    command = 'savefromorigin';
+    options.isNoData = true;
+  } else {
+    command = 'save';
   }
-  else {
-    // Меняем тип состояния (на сохранение)
-    this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
-    _downloadAs(this, "save", null, null, null, c_oAscFileType.PDF, function(input){
-      if(null != input && "save" == input["type"]) {
-        if('ok' == input["status"]){
-          var url = input["data"];
-          if(url) {
-            t.processSavedFile(url, false);
-          } else {
-            t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-          }
-        } else {
-          t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-        }
-      } else {
-        t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-      }
-      // Меняем тип состояния (на никакое)
-      editor.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
-      t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);
-    });
-  }
+  _downloadAs(this, command, c_oAscFileType.PDF, c_oAscAsyncAction.Print, options, null);
 };
 asc_docs_api.prototype.Undo = function()
 {
@@ -2286,31 +2239,10 @@ asc_docs_api.prototype.asc_Save = function (isNoUserSave)
 	}
 };
 
-asc_docs_api.prototype.asc_DownloadAs = function(typeFile, bIsDownload, txtOptions) {//передаем число соответствующее своему формату.
+asc_docs_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) {//передаем число соответствующее своему формату.
 	var actionType = this.mailMergeFileData ? c_oAscAsyncAction.MailMergeLoadFile : c_oAscAsyncAction.DownloadAs;
-	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
-	var t = this;
-	// Меняем тип состояния (на сохранение)
-	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
-	_downloadAs(this, "save", null, null, txtOptions, typeFile, function (input) {
-		if(null != input && ("save" == input["type"] || "sfct" == input["type"])) {
-			if('ok' == input["status"]){
-				var url = input["data"];
-				if(url) {
-					t.processSavedFile(url, bIsDownload);
-				} else {
-					t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-				}
-			} else {
-				t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-			}
-		} else {
-			t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-		}
-		// Меняем тип состояния (на никакое)
-		t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
-		t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
-	});
+    var options = {downloadType: bIsDownloadEvent ? 'asc_onDownloadUrl' : null};
+	_downloadAs(this, "save", typeFile, actionType, options, null);
 };
 asc_docs_api.prototype.Resize = function(){
 	if (false === this.bInit_word_control)
@@ -2348,7 +2280,8 @@ asc_docs_api.prototype.asc_setAdvancedOptions = function(idOption, option) {
           };
           sendCommand2(t, null, rData);
       } else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save) {
-          t.asc_DownloadAs(c_oAscFileType.TXT, false, option);
+          var options = {txtOptions: option};
+          _downloadAs(t, "save", c_oAscFileType.TXT, c_oAscAsyncAction.DownloadAs, options, null);
       }
       break;
   }
@@ -2371,7 +2304,7 @@ asc_docs_api.prototype.SetFontRenderingMode = function(mode)
     if (this.bInit_word_control)
         this.WordControl.OnScroll();
 };
-asc_docs_api.prototype.processSavedFile = function(url, bInner) {
+asc_docs_api.prototype.processSavedFile = function(url, downloadType) {
 	var t = this;
 	if (this.mailMergeFileData) {
 		this.mailMergeFileData = null;
@@ -2390,8 +2323,8 @@ asc_docs_api.prototype.processSavedFile = function(url, bInner) {
 			}
 		});
 	} else {
-		if (bInner) {
-			this.asc_fireCallback("asc_onDownloadUrl", url, function (hasError) {
+		if (downloadType) {
+			this.asc_fireCallback(downloadType, url, function (hasError) {
 			});
 		} else {
 			getFile(url);
@@ -6795,7 +6728,16 @@ function _onOpenCommand(fCallback, incomeObject) {
 		if(fCallback) fCallback();
 	});
 }
-function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, txtOptions, filetype, fCallback, fCallbackRequest) {
+function _downloadAs(editor, command, filetype, actionType, options, fCallbackRequest) {
+    if (!options) {
+      options = {};
+    }
+    if (actionType) {
+        editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+    }
+    // Меняем тип состояния (на сохранение)
+    editor.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
+    
 	var dataContainer = {data: null, part: null, index: 0, count: 0};
 	var oAdditionalData = {};
     oAdditionalData["c"] = command;
@@ -6805,7 +6747,9 @@ function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, tx
     oAdditionalData["outputformat"] = filetype;
     oAdditionalData["title"] = changeFileExtention(documentTitle, getExtentionByFormat(filetype));
 	oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
-	if (null == oDocumentMailMerge &&  c_oAscFileType.PDF === filetype) {
+	if (options.isNoData) {
+		;//nothing
+	} else if (null == options.oDocumentMailMerge &&  c_oAscFileType.PDF === filetype) {
 		var dd = editor.WordControl.m_oDrawingDocument;
 		dataContainer.data = dd.ToRendererPart();
         //console.log(oAdditionalData["data"]);
@@ -6815,13 +6759,15 @@ function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, tx
 		// ToDo select csv params
 		oAdditionalData['codepage'] = c_oAscCodePageUtf8;
 		oAdditionalData['delimiter'] = c_oAscCsvDelimiter.Comma
-	} else if (c_oAscFileType.TXT === filetype && !txtOptions && null == oDocumentMailMerge && null == oMailMergeSendData) {
+	} else if (c_oAscFileType.TXT === filetype && !options.txtOptions && null == options.oDocumentMailMerge && null == options.oMailMergeSendData) {
 		// Мы открывали команду, надо ее закрыть.
-		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
+		if (actionType) {
+			editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+		}
 		var cp = {'codepage': c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
 		editor.asc_fireCallback("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), editor.advancedOptionsAction);
 		return;
-	} else if (c_oAscFileType.HTML === filetype && null == oDocumentMailMerge && null == oMailMergeSendData) {
+	} else if (c_oAscFileType.HTML === filetype && null == options.oDocumentMailMerge && null == options.oMailMergeSendData) {
 		//в asc_nativeGetHtml будет вызван select all, чтобы выделился документ должны выйти из колонтитулов и автофигур
 		var _e = new CKeyboardEvent();
 		_e.CtrlKey = false;
@@ -6830,23 +6776,23 @@ function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, tx
 		//сделано через сервер, потому что нет простого механизма сохранения на клиенте
 		dataContainer.data = '\ufeff' + window["asc_docs_api"].prototype["asc_nativeGetHtml"].call(editor);
 	} else {
-		if (txtOptions instanceof asc.asc_CTXTAdvancedOptions) {
-			oAdditionalData["codepage"] = txtOptions.asc_getCodePage();
+		if (options.txtOptions instanceof asc.asc_CTXTAdvancedOptions) {
+			oAdditionalData["codepage"] = options.txtOptions.asc_getCodePage();
 		}
 		var oLogicDocument;
-		if(null != oDocumentMailMerge)
-			oLogicDocument = oDocumentMailMerge;
+		if(null != options.oDocumentMailMerge)
+			oLogicDocument = options.oDocumentMailMerge;
 		else
 			oLogicDocument = editor.WordControl.m_oLogicDocument;
 		var oBinaryFileWriter;
-		if(null != oMailMergeSendData && c_oAscFileType.HTML == oMailMergeSendData.get_MailFormat())
+		if(null != options.oMailMergeSendData && c_oAscFileType.HTML == options.oMailMergeSendData.get_MailFormat())
 			oBinaryFileWriter = new BinaryFileWriter(oLogicDocument, false, true);
 		else
 			oBinaryFileWriter = new BinaryFileWriter(oLogicDocument);
 		dataContainer.data = oBinaryFileWriter.Write();
 	}
-	if(null != oMailMergeSendData){
-		oAdditionalData["mailmergesend"] = oMailMergeSendData;
+	if(null != options.oMailMergeSendData){
+		oAdditionalData["mailmergesend"] = options.oMailMergeSendData;
 		var MailMergeMap = editor.WordControl.m_oLogicDocument.MailMergeMap;
 		var aJsonOut = [];
 		if(MailMergeMap.length > 0){
@@ -6866,6 +6812,36 @@ function _downloadAs(editor, command, oDocumentMailMerge, oMailMergeSendData, tx
 		}
 		dataContainer.data = dataContainer.data.length + ';' + dataContainer.data + JSON.stringify(aJsonOut);
 	}
+    var fCallback = null;
+    if (!options.isNoCallback) {
+        fCallback = function (input) {
+          var error = c_oAscError.ID.Unknown;
+          //input = {'type': command, 'status': 'err', 'data': -80};
+          if (null != input && command == input['type']) {
+            if ('ok' == input['status']){
+              if (options.isNoUrl) {
+                error = c_oAscError.ID.No;
+              } else {
+                var url = input['data'];
+                if (url) {
+                  error = c_oAscError.ID.No;
+                  editor.processSavedFile(url, options.downloadType);
+                }
+              }
+            } else {
+              error = g_fMapAscServerErrorToAscError(parseInt(input["data"]));
+            }
+          }
+          if (c_oAscError.ID.No != error) {
+            editor.asc_fireCallback('asc_onError', options.errorDirect || error, c_oAscError.Level.NoCritical);
+          }
+          // Меняем тип состояния (на никакое)
+          editor.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+          if (actionType) {
+            editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+          }
+        };
+    }
 	editor.fCurCallback = fCallback;
 	g_fSaveWithParts(function(fCallback1, oAdditionalData1, dataContainer1){sendCommand2(editor, fCallback1, oAdditionalData1, dataContainer1);}, fCallback, fCallbackRequest, oAdditionalData, dataContainer);
 }
