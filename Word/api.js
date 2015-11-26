@@ -286,7 +286,7 @@ CMailMergeSendData.prototype.put_UserId = function(v){this["userId"] = v;};
 /** @constructor */
 function asc_docs_api(name)
 {
-  asc_docs_api.superclass.constructor.call(this);
+  asc_docs_api.superclass.constructor.call(this, name);
 
     if (window["AscDesktopEditor"])
     {
@@ -302,8 +302,6 @@ function asc_docs_api(name)
     g_oTableId = new CTableId();
 
 	/************ private!!! **************/
-    this.HtmlElementName = name;
-
     this.WordControl = new CEditorPage(this);
     this.WordControl.Name = this.HtmlElementName;
 

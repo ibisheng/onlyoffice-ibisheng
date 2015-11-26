@@ -1,7 +1,9 @@
 ﻿"use strict";
 
 /** @constructor */
-function baseEditorsApi() {
+function baseEditorsApi(name) {
+  this.HtmlElementName = name;
+
   this.CoAuthoringApi = new window['CDocsCoApi']();
 }
 // send chart message

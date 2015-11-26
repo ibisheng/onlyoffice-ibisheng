@@ -33,7 +33,7 @@ CErrorData.prototype.get_Value = function() { return this.Value; };
 /** @constructor */
 function asc_docs_api(name)
 {
-  asc_docs_api.superclass.constructor.call(this);
+  asc_docs_api.superclass.constructor.call(this, name);
 
 	g_fontApplication.Init();
 
@@ -43,8 +43,6 @@ function asc_docs_api(name)
     g_oTableId = new CTableId();
 
 	/************ private!!! **************/
-    this.HtmlElementName = name;
-
     this.WordControl = new CEditorPage(this);
     this.WordControl.Name = this.HtmlElementName;
 
