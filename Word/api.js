@@ -324,7 +324,6 @@ function asc_docs_api(name)
     this.isPageBreakBefore = false;
     this.isKeepLinesTogether = false;
 
-    this.isMobileVersion = false;
     this.isPaintFormat = c_oAscFormatPainterState.kOff;
     this.isMarkerFormat = false;
     this.isViewMode = false;

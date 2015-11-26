@@ -78,7 +78,6 @@ function asc_docs_api(name)
     this.isPresentationEditor = true;
     this.bAlignBySelected     = false;
 
-    this.isMobileVersion = false;
     this.isPaintFormat = false;
     this.isViewMode = false;
     this.isShowTableEmptyLine = false;//true;

@@ -6,6 +6,8 @@ function baseEditorsApi(name) {
 
   this.HtmlElementName = name;
 
+  this.isMobileVersion = false;
+
   this.CoAuthoringApi = new window['CDocsCoApi']();
 }
 // send chart message
