@@ -123,7 +123,6 @@ function asc_docs_api(name)
     this._lastConvertProgress = 0;
 
   this.CoAuthoringApi.isPowerPoint = true;
-  this.isCoAuthoringEnable = true;
 	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
 	this.SpellCheckUrl = '';				// Ссылка сервиса для проверки орфографии

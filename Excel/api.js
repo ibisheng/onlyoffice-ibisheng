@@ -84,8 +84,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     // Массив lock-ов, которые были на открытии документа
     this.arrPreOpenLocksObjects = [];
 
-
-    this.isCoAuthoringEnable = true;
     this.collaborativeEditing = null;
     this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 

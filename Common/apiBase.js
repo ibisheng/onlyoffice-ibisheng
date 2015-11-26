@@ -17,6 +17,7 @@ function baseEditorsApi(name) {
   // CoAuthoring and Chat
   this.User = undefined;
   this.CoAuthoringApi = new window['CDocsCoApi']();
+  this.isCoAuthoringEnable = true;
 
   // Результат получения лицензии
   this.licenseResult = null;

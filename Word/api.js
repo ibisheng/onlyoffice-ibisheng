@@ -340,7 +340,6 @@ function asc_docs_api(name)
 
 	this.mailMergeFileData = null;
 
-	this.isCoAuthoringEnable = true;
   this.isCoMarksDraw = false;
 	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
