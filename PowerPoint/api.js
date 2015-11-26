@@ -136,13 +136,6 @@ function asc_docs_api(name)
 		this.chartPreviewManager = new ChartPreviewManager();
 	else
 		this.chartPreviewManager = null;
-	if(typeof asc_CChartTranslate !== "undefined")
-		this.chartTranslate = new asc_CChartTranslate();
-	else
-		this.chartTranslate = null;
-
-
-    this.textArtTranslate = new asc_TextArtTranslate();
 
     if(typeof TextArtPreviewManager !== "undefined")
         this.textArtPreviewManager = new TextArtPreviewManager();
@@ -3171,15 +3164,6 @@ asc_docs_api.prototype.ImgApply = function(obj){
 		this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
 	}
 };
-
-asc_docs_api.prototype.asc_setChartTranslate = function(translate) {
-    this.chartTranslate = translate;
-};
-asc_docs_api.prototype.asc_setTextArtTranslate = function(translate) {
-
-    this.textArtTranslate = new asc_TextArtTranslate();
-};
-
 
 asc_docs_api.prototype.ChartApply = function(obj)
 {

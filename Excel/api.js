@@ -112,10 +112,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       this.textArtPreviewManager = new TextArtPreviewManager();
     }
 
-    // Chart
-    this.chartTranslate = new asc_CChartTranslate();
-    this.textArtTranslate = new asc_TextArtTranslate();
-
     // Shapes
     this.isStartAddShape = false;
     this.ImageLoader.put_Api(this);
@@ -2467,14 +2463,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   };
 
   // Images & Charts
-
-  spreadsheet_api.prototype.asc_setChartTranslate = function(translate) {
-    this.chartTranslate = translate;
-  };
-  spreadsheet_api.prototype.asc_setTextArtTranslate = function(translate) {
-
-    this.textArtTranslate = translate;
-  };
 
   spreadsheet_api.prototype.asc_drawingObjectsExist = function() {
     for (var i = 0; i < this.wb.model.aWorksheets.length; i++) {

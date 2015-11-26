@@ -14,6 +14,10 @@ function baseEditorsApi(name) {
   // Тип состояния на данный момент (сохранение, открытие или никакое)
   this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 
+  // Chart
+  this.chartTranslate = new asc_CChartTranslate();
+  this.textArtTranslate = new asc_TextArtTranslate();
+
   // CoAuthoring and Chat
   this.User = undefined;
   this.CoAuthoringApi = new window['CDocsCoApi']();
@@ -44,4 +48,11 @@ baseEditorsApi.prototype.asc_coAuthoringGetUsers = function() {
 // get permissions
 baseEditorsApi.prototype.asc_getEditorPermissions = function() {
   this._coAuthoringInit();
+};
+// Images & Charts
+baseEditorsApi.prototype.asc_setChartTranslate = function(translate) {
+  this.chartTranslate = translate;
+};
+baseEditorsApi.prototype.asc_setTextArtTranslate = function(translate) {
+  this.textArtTranslate = translate;
 };

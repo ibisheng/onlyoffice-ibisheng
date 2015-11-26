@@ -350,10 +350,6 @@ function asc_docs_api(name)
 	this.isSpellCheckEnable = true;
 
 	this.SpellCheckUrl = '';				// Ссылка сервиса для проверки орфографии
-	
-	// Chart
-	this.chartTranslate = new asc_CChartTranslate();
-    this.textArtTranslate = new asc_TextArtTranslate();
 
     // это чтобы сразу показать ридер, без возможности вернуться в редактор/вьюер
     this.isOnlyReaderMode = false;
@@ -5060,12 +5056,6 @@ asc_docs_api.prototype.sync_HideForeignCursorLabel = function(UserId)
     this.sync_MouseMoveEndCallback();
 
     //this.asc_fireCallback("asc_onHideForeignCursorLabel", UserId);
-};
-asc_docs_api.prototype.asc_setChartTranslate = function(translate) {
-    this.chartTranslate = translate;
-};
-asc_docs_api.prototype.asc_setTextArtTranslate = function(translate) {
-    this.textArtTranslate = new asc_TextArtTranslate();
 };
 
 //-----------------------------------------------------------------
