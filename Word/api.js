@@ -293,9 +293,6 @@ function asc_docs_api(name)
         window["AscDesktopEditor"]["CreateEditorApi"]();
     }
 
-    g_fontApplication.Init();
-
-
     var CSpellCheckApi  = window["CSpellCheckApi"];
 
     History    = new CHistory();

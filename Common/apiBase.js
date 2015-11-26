@@ -2,6 +2,8 @@
 
 /** @constructor */
 function baseEditorsApi(name) {
+  g_fontApplication.Init();
+
   this.HtmlElementName = name;
 
   this.CoAuthoringApi = new window['CDocsCoApi']();

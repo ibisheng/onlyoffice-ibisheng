@@ -35,8 +35,6 @@ function asc_docs_api(name)
 {
   asc_docs_api.superclass.constructor.call(this, name);
 
-	g_fontApplication.Init();
-
     var CSpellCheckApi  = window["CSpellCheckApi"];
 
     History    = new CHistory();
