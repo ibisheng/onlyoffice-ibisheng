@@ -1304,7 +1304,7 @@ asc_docs_api.prototype._coAuthoringInit = function() {
   };
   //в обычном серверном режиме портим ссылку, потому что CoAuthoring теперь имеет встроенный адрес
   //todo надо использовать проверку get_OfflineApp, но она инициализируется только после loadDocument
-  if (!(window["NATIVE_EDITOR_ENJINE"] || !documentId)) {
+  if (!(window["NATIVE_EDITOR_ENJINE"] || offlineMode === documentUrl)) {
     this.CoAuthoringApi.set_url(null);
   }
   this.CoAuthoringApi.init(this.User, documentId, documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Word, documentFormatSave);

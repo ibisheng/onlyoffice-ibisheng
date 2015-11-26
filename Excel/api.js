@@ -1601,7 +1601,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
     //в обычном серверном режиме портим ссылку, потому что CoAuthoring теперь имеет встроенный адрес
     //todo надо использовать проверку get_OfflineApp
-    if (!(window["NATIVE_EDITOR_ENJINE"] || !this.documentId || !this.documentUrl)) {
+    if (!(window["NATIVE_EDITOR_ENJINE"] || offlineMode === this.documentUrl)) {
       this.CoAuthoringApi.set_url(null);
     }
     this.CoAuthoringApi.init(t.User, t.documentId, t.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Spreadsheet, t.documentFormatSave);
