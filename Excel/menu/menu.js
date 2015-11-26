@@ -549,8 +549,8 @@
     var c_DocInfo;
     if (!offLineApp) {
         c_DocInfo = {
-            "Id"     : getURLParameter("key") ? decodeURIComponent(getURLParameter("key")) : "9876543210",
-            "Url"    : getURLParameter("url") ? decodeURIComponent(getURLParameter("url")) : undefined,
+            "Id"     : getURLParameter("key") ? decodeURIComponent(getURLParameter("key")) : "test_spreadsheet_id",
+            "Url"    : getURLParameter("url") ? decodeURIComponent(getURLParameter("url")) : '_offline_',
             "Title"  : getURLParameter("title") ? decodeURIComponent(getURLParameter("title")).replace(new RegExp("\\+",'g')," ") : undefined,
             "Format" : getURLParameter("filetype") ? decodeURIComponent(getURLParameter("filetype")) : undefined,
             "VKey"   : getURLParameter("vkey") ? decodeURIComponent(getURLParameter("vkey")) : undefined,

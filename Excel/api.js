@@ -849,11 +849,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       // Меняем тип состояния (на открытие)
       this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
 
-      if (!this.documentId || !this.documentUrl) {
-        // Назначим id-сами, если он не пришел (для открытия тестового документа)
-        if (!this.documentId) {
-          this.documentId = '9876543210';
-        }
+      if (offlineMode === this.documentUrl) {
         this.DocInfo.asc_putOfflineApp(true);
         this._OfflineAppDocumentStartLoad(fCallback);
       } else {

@@ -739,3 +739,5 @@ var changestype_2_ElementsArray_and_Type = 5; // Аналогично преды
 
 var contentchanges_Add    = 1;
 var contentchanges_Remove = 2;
+
+var offlineMode = '_offline_';

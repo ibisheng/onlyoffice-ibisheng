@@ -716,7 +716,7 @@ asc_docs_api.prototype.LoadDocument = function(isVersionHistory) {
   // Меняем тип состояния (на открытие)
   this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
 
-  if (documentId) {
+  if (offlineMode !== documentUrl) {
     var rData = {
       "c": 'open',
       "id": documentId,
@@ -741,8 +741,6 @@ asc_docs_api.prototype.LoadDocument = function(isVersionHistory) {
     documentUrl = this.FontLoader.fontFilesPath + "../Word/document/";
     this.DocInfo.put_OfflineApp(true);
 
-    // For test create unique id
-    documentId = "test_document_id";
     this._OfflineAppDocumentStartLoad();
   }
 

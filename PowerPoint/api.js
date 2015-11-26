@@ -777,7 +777,7 @@ asc_docs_api.prototype.LoadDocument = function() {
   // Меняем тип состояния (на открытие)
   this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
 
-  if (documentId) {
+  if (offlineMode !== documentUrl) {
     this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
     var rData = {
       "id": documentId,
@@ -798,8 +798,6 @@ asc_docs_api.prototype.LoadDocument = function() {
     documentUrl = this.FontLoader.fontFilesPath + "../PowerPoint/document/";
     this.DocInfo.put_OfflineApp(true);
 
-    // For test create unique id
-    documentId = "test_presentation_id";
     this._OfflineAppDocumentStartLoad();
   }
   this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, this.WordControl.m_nZoomType);

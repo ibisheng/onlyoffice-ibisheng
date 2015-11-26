@@ -3029,18 +3029,13 @@ $(document).ready(function(){
 
         var sProtocol = window.location.protocol;
         var sHost = window.location.host;
-        var documentOrigin = "";
-        if(sProtocol && "" != sProtocol)
-            documentOrigin = sProtocol + "//" + sHost;
-        else
-            documentOrigin = sHost;
         var c_DocInfo = new CDocInfo ();
         c_DocInfo.put_Id( getURLParameter("key") ?
             decodeURIComponent(getURLParameter("key")) :
-            undefined );
+            'test_presentation_id' );
         c_DocInfo.put_Url( getURLParameter("url") ?
             decodeURIComponent(getURLParameter("url")) :
-            undefined );
+            '_offline_' );
         c_DocInfo.put_Title( getURLParameter("title") ?
             decodeURIComponent(getURLParameter("title")).replace(new RegExp("\\+",'g')," ") :
             undefined );
