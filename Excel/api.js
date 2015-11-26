@@ -70,9 +70,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
     this.asyncMethodCallback = undefined;
 
-
-    // Тип состояния на данный момент (сохранение, открытие или никакое)
-    this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
     // Переменная отвечает, загрузились ли фонты
     this.FontLoadWaitComplete = false;
     // Переменная отвечает, получили ли мы ответ с сервера совместного редактирования

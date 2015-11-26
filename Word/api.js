@@ -340,9 +340,6 @@ function asc_docs_api(name)
 
 	this.mailMergeFileData = null;
 
-	// Тип состояния на данный момент (сохранение, открытие или никакое)
-	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
-
 	this.isCoAuthoringEnable = true;
   this.isCoMarksDraw = false;
 	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)

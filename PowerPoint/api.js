@@ -123,9 +123,6 @@ function asc_docs_api(name)
     this.OpenDocumentProgress = new CDocOpenProgress();
     this._lastConvertProgress = 0;
 
-	// Тип состояния на данный момент (сохранение, открытие или никакое)
-	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
-
   this.CoAuthoringApi.isPowerPoint = true;
   this.isCoAuthoringEnable = true;
 	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
