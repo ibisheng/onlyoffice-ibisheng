@@ -70,8 +70,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
     this.asyncMethodCallback = undefined;
 
-    // Результат получения лицензии
-    this.licenseResult = null;
     // Подключились ли уже к серверу
     this.isOnFirstConnectEnd = false;
 

@@ -12,6 +12,9 @@ function baseEditorsApi(name) {
   this.ImageLoader = window.g_image_loader;
 
   this.CoAuthoringApi = new window['CDocsCoApi']();
+
+  // Результат получения лицензии
+  this.licenseResult = null;
 }
 // send chart message
 baseEditorsApi.prototype.asc_coAuthoringChatSendMessage = function(message) {

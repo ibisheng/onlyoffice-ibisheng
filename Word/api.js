@@ -343,8 +343,6 @@ function asc_docs_api(name)
 	// Тип состояния на данный момент (сохранение, открытие или никакое)
 	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 
-  // Результат получения лицензии
-  this.licenseResult = null;
   // Подключились ли уже к серверу
   this.isOnFirstConnectEnd = false;
 	
