@@ -22,6 +22,8 @@ function baseEditorsApi(name) {
   this.licenseResult = null;
   // Подключились ли уже к серверу
   this.isOnFirstConnectEnd = false;
+
+  this.canSave = true;        // Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
 }
 baseEditorsApi.prototype.asc_GetFontThumbnailsPath = function() {
   return '../Common/Images/';

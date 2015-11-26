@@ -108,7 +108,6 @@ function asc_docs_api(name)
 
     this.isSaveFonts_Images = false;
     this.saveImageMap = null;
-    this.canSave = true;//Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
 
     this.ServerIdWaitComplete = false;
     this.ServerImagesWaitComplete = false;
@@ -133,8 +132,6 @@ function asc_docs_api(name)
     /**************************************/
 	// AutoSave
 	this.autoSaveGap = 0;				// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
-
-	this.canSave = true;				//Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
 
 	if(typeof ChartPreviewManager !== "undefined")	
 		this.chartPreviewManager = new ChartPreviewManager();

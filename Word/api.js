@@ -387,7 +387,7 @@ function asc_docs_api(name)
 
     this.isSaveFonts_Images = false;
     this.saveImageMap = null;
-	this.canSave  = true;//Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
+
 
     this.isLoadImagesCustom = false;
     this.loadCustomImageMap = null;
