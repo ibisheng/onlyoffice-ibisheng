@@ -179,6 +179,8 @@
             this.showMarker = null;
             this.bLine = null;
             this.smooth = null;
+            this.showHorAxis = null;
+            this.showVerAxis = null;
         }
         asc_ChartSettings.prototype =
         {
@@ -543,6 +545,20 @@
                         break;
                     }
                 }
+            },
+
+            putShowHorAxis: function(v){
+                this.showHorAxis = v;
+            },
+            getShowHorAxis: function(){
+                return this.showHorAxis;
+            },
+
+            putShowVerAxis: function(v){
+                this.showVerAxis = v;
+            },
+            getShowVerAxis: function(){
+                return this.showVerAxis;
             }
         };
 
@@ -594,6 +610,11 @@
         prot["putSmooth"]   = prot.putSmooth;
         prot["getSmooth"]   = prot.getSmooth;
         prot["changeType"]   = prot.changeType;
+        prot["putShowHorAxis"]   = prot.putShowHorAxis;
+        prot["getShowHorAxis"]   = prot.getShowHorAxis;
+
+        prot["putShowVerAxis"]   = prot.putShowVerAxis;
+        prot["getShowVerAxis"]   = prot.getShowVerAxis;
 
         window["asc_ChartSettings"] = asc_ChartSettings;
 

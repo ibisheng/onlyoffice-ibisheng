@@ -2696,6 +2696,9 @@ DrawingObjectsController.prototype =
                 }
             }
             hor_axis.setMenuProps(chartSettings.getHorAxisProps());
+            if(isRealBool(chartSettings.getShowHorAxis())){
+                hor_axis.setDelete(!chartSettings.getShowHorAxis());
+            }
         }
 
         //vertAxis
@@ -2769,7 +2772,10 @@ DrawingObjectsController.prototype =
                     }
                 }
             }
-            vert_axis.setMenuProps(chartSettings.getVertAxisProps())
+            vert_axis.setMenuProps(chartSettings.getVertAxisProps());
+            if(isRealBool(chartSettings.getShowVerAxis())){
+                vert_axis.setDelete(!chartSettings.getShowVerAxis());
+            }
         }
 
         //gridLines
@@ -3215,11 +3221,15 @@ DrawingObjectsController.prototype =
         var chart_type_object_type = chart_type.getObjectType();
 
         if(hor_axis)
+        {
+            ret.putShowHorAxis(!hor_axis.bDelete);
             ret.putHorAxisProps(hor_axis.getMenuProps());
+        }
         ret.putHorGridLines(calc_grid_lines(vert_axis));
 
         if(vert_axis)
         {
+            ret.putShowVerAxis(!vert_axis.bDelete);
             ret.putVertAxisProps(vert_axis.getMenuProps());
             if(chart_type.getObjectType() === historyitem_type_AreaChart && !isRealNumber(vert_axis.crossBetween))
             {
