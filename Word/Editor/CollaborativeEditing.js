@@ -388,14 +388,17 @@ CWordCollaborativeEditing.prototype.Check_ForeignCursorsLabels = function(X, Y, 
         return;
 
     var DrawingDocument = this.m_oLogicDocument.Get_DrawingDocument();
-    var RadiusX = DrawingDocument.GetMMPerDot(7);
-    var RadiusY = DrawingDocument.GetMMPerDot(3);
+    var Px7 = DrawingDocument.GetMMPerDot(7);
+    var Px3 = DrawingDocument.GetMMPerDot(3);
 
     for (var UserId in this.m_aForeignCursorsXY)
     {
         var Cursor = this.m_aForeignCursorsXY[UserId];
-        if (Math.abs(X - Cursor.X) < RadiusX &&  Cursor.Y - RadiusY < Y && Y < Cursor.Y + Cursor.H + RadiusY && Cursor.PageIndex === PageIndex)
-            this.Show_ForeignCursorLabel(UserId);
+        if ((Cursor.Transform && Cursor.PageIndex === PageIndex && Cursor.X0 - Px3 < X && X < Cursor.X1 + Px3 && Cursor.Y0 - Px3 < Y && Y < Cursor.Y1 + Px3)
+            || (Math.abs(X - Cursor.X) < Px7 && Cursor.Y - Px3 < Y && Y < Cursor.Y + Cursor.H + Px3 && Cursor.PageIndex === PageIndex))
+        {
+                this.Show_ForeignCursorLabel(UserId);
+        }
     }
 };
 CWordCollaborativeEditing.prototype.Show_ForeignCursorLabel = function(UserId)
@@ -410,10 +413,10 @@ CWordCollaborativeEditing.prototype.Show_ForeignCursorLabel = function(UserId)
         return;
 
     var Cursor = this.m_aForeignCursorsXY[UserId];
-    var X = Cursor.X;
-    var Y = Cursor.Y;
-    var PageIndex = Cursor.PageIndex;
-    var TextTransform = Cursor.Paragraph.Get_ParentTextTransform();
+    var X             = Cursor.X;
+    var Y             = Cursor.Y;
+    var PageIndex     = Cursor.PageIndex;
+    var TextTransform = Cursor.Transform;
 
     var Color  = DrawingDocument.Collaborative_GetTargetColor(UserId);
     if (!Color)
@@ -441,13 +444,15 @@ CWordCollaborativeEditing.prototype.Remove_ForeignCursorToShow = function(UserId
 };
 CWordCollaborativeEditing.prototype.Add_ForeignCursorXY = function(UserId, X, Y, PageIndex, H, Paragraph, isRemoveLabel)
 {
+    var Cursor;
     if (!this.m_aForeignCursorsXY[UserId])
     {
-        this.m_aForeignCursorsXY[UserId] = {X: X, Y: Y, H: H, PageIndex: PageIndex, Paragraph: Paragraph, ShowId: null};
+        Cursor = {X: X, Y: Y, H: H, PageIndex: PageIndex, Transform: null, ShowId: null};
+        this.m_aForeignCursorsXY[UserId] = Cursor;
     }
     else
     {
-        var Cursor = this.m_aForeignCursorsXY[UserId];
+        Cursor = this.m_aForeignCursorsXY[UserId];
         if (Cursor.ShowId)
         {
             var Api = this.m_oLogicDocument.Get_Api();
@@ -476,6 +481,27 @@ CWordCollaborativeEditing.prototype.Add_ForeignCursorXY = function(UserId, X, Y,
         Cursor.PageIndex = PageIndex;
         Cursor.H         = H;
     }
+
+    var Transform = Paragraph.Get_ParentTextTransform();
+    if (Transform)
+    {
+        Cursor.Transform = Transform;
+
+        var X0 = Transform.TransformPointX(Cursor.X, Cursor.Y);
+        var Y0 = Transform.TransformPointY(Cursor.X, Cursor.Y);
+        var X1 = Transform.TransformPointX(Cursor.X, Cursor.Y + Cursor.H);
+        var Y1 = Transform.TransformPointY(Cursor.X, Cursor.Y + Cursor.H);
+
+        Cursor.X0 = Math.min(X0, X1);
+        Cursor.Y0 = Math.min(Y0, Y1);
+        Cursor.X1 = Math.max(X0, X1);
+        Cursor.Y1 = Math.max(Y0, Y1);
+    }
+    else
+    {
+        Cursor.Transform = null;
+    }
+
 };
 CWordCollaborativeEditing.prototype.Remove_ForeignCursorXY = function(UserId)
 {
