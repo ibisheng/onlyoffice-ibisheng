@@ -5614,11 +5614,14 @@ DrawingObjectsController.prototype =
         oState.DrawingsSelectionState = this.getSelectionState()[0];
     },
 
-    loadDocumentStateAfterLoadChanges: function(oSelectionState)
+    loadDocumentStateAfterLoadChanges: function(oSelectionState, PageIndex)
     {
         var bDocument = isRealObject(this.document);
         var nPageIndex = 0;
-        if(!bDocument)
+        if(isRealNumber(PageIndex)){
+            nPageIndex = PageIndex;
+        }
+        else if(!bDocument)
         {
             if(this.drawingObjects.getObjectType && this.drawingObjects.getObjectType() === historyitem_type_Slide)
             {
@@ -5630,9 +5633,9 @@ DrawingObjectsController.prototype =
             var oDrawingSelectionState = oSelectionState.DrawingsSelectionState;
             if(oDrawingSelectionState.textObject)
             {
-                if(oDrawingSelectionState.textObject.Is_UseInDocument())
+                if(oDrawingSelectionState.textObject.Is_UseInDocument() && (!oDrawingSelectionState.textObject.group || oDrawingSelectionState.textObject.group === this))
                 {
-                    this.selectObject(oDrawingSelectionState.textObject, bDocument ? oDrawingSelectionState.textObject.parent.PageNum : nPageIndex);
+                    this.selectObject(oDrawingSelectionState.textObject, bDocument ? (oDrawingSelectionState.textObject.parent ? oDrawingSelectionState.textObject.parent.PageNum : nPageIndex) : nPageIndex);
                     var oDocContent = oDrawingSelectionState.textObject.getDocContent();
                     if(oDocContent){
                         if (true === oSelectionState.DrawingSelection)
@@ -5643,6 +5646,10 @@ DrawingObjectsController.prototype =
                         else
                         {
                             oDocContent.Set_ContentPosition(oSelectionState.Pos, 0, 0);
+                            if(this.document){
+                                this.document.NeedUpdateTarget = true;
+                                this.document.RecalculateCurPos();
+                            }
                         }
                         this.selection.textSelection = oDrawingSelectionState.textObject;
                     }
@@ -5652,9 +5659,18 @@ DrawingObjectsController.prototype =
             {
                 if(oDrawingSelectionState.groupObject.Is_UseInDocument())
                 {
-                    this.selectObject(oDrawingSelectionState.groupObject, bDocument ? oDrawingSelectionState.groupObject.parent.PageNum : nPageIndex);
-                    oDrawingSelectionState.groupSelection.resetSelection(oDrawingSelectionState.groupSelection);
-                    if(oDrawingSelectionState.groupObject.loadDocumentStateAfterLoadChanges(oDrawingSelectionState.groupSelection))
+                    this.selectObject(oDrawingSelectionState.groupObject, bDocument ? (oDrawingSelectionState.groupObject.parent ? oDrawingSelectionState.groupObject.parent.PageNum : nPageIndex) : nPageIndex);
+                    oDrawingSelectionState.groupObject.resetSelection(this);
+
+                    var oState =
+                    {
+                        DrawingsSelectionState: oDrawingSelectionState.groupSelection,
+                        Pos: oSelectionState.Pos,
+                        StartPos: oSelectionState.StartPos,
+                        EndPos: oSelectionState.EndPos,
+                        DrawingSelection: oSelectionState.DrawingSelection
+                    };
+                    if(oDrawingSelectionState.groupObject.loadDocumentStateAfterLoadChanges(oState, nPageIndex))
                     {
                         this.selection.groupSelection = oDrawingSelectionState.groupObject;
                     }
@@ -5664,7 +5680,7 @@ DrawingObjectsController.prototype =
             {
                 if(oDrawingSelectionState.chartObject.Is_UseInDocument())
                 {
-                    this.selectObject(oDrawingSelectionState.chartObject, bDocument ? oDrawingSelectionState.chartObject.parent.PageNum : nPageIndex);
+                    this.selectObject(oDrawingSelectionState.chartObject, bDocument ? (oDrawingSelectionState.chartObject.parent ? oDrawingSelectionState.chartObject.parent.PageNum : nPageIndex) : nPageIndex);
                     oDrawingSelectionState.chartObject.resetSelection();
                     if(oDrawingSelectionState.chartObject.loadDocumentStateAfterLoadChanges(oDrawingSelectionState.chartSelection))
                     {
@@ -5690,7 +5706,7 @@ DrawingObjectsController.prototype =
                     var oSp = oDrawingSelectionState.selection[i].object;
                     if(oSp.Is_UseInDocument())
                     {
-                        this.selectObject(oSp, bDocument ? oSp.parent.PageNum : nPageIndex);
+                        this.selectObject(oSp, bDocument ? (oSp.parent ? oSp.parent.PageNum : nPageIndex) : nPageIndex);
                     }
                 }
             }

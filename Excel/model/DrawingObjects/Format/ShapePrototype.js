@@ -44,8 +44,8 @@ CShape.prototype.Is_UseInDocument = function(){
             {
                 return this.group.Is_UseInDocument();
             }
-            return false;
         }
+        return false;
     }
     if(this.drawingBase)
     {

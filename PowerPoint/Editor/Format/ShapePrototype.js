@@ -42,12 +42,16 @@ CShape.prototype.Is_UseInDocument = function(drawingObjects)
             {
                 return this.group.Is_UseInDocument();
             }
-            return false;
         }
+        return false;
     }
-    if(this.parent && this.parent.Is_UseInDocument && this.parent.GraphicObj === this)
-    {
-        return this.parent.Is_UseInDocument();
+    if(this.parent && this.parent.cSld){
+        var aSpTree = this.parent.cSld.spTree;
+        for(var i = 0; i < aSpTree.length; ++i){
+            if(aSpTree[i] === this){
+                return true;
+            }
+        }
     }
     return false;
 };

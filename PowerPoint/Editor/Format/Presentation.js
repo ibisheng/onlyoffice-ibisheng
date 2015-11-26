@@ -3428,7 +3428,12 @@ CPresentation.prototype =
                     return;
                 }
             }
-            this.Slides[this.CurPage].graphicObjects.loadDocumentStateAfterLoadChanges(oState);
+            var oDrawingObjects = this.Slides[this.CurPage].graphicObjects;
+            oDrawingObjects.clearPreTrackObjects();
+            oDrawingObjects.clearTrackObjects();
+            oDrawingObjects.resetSelection();
+            oDrawingObjects.changeCurrentState(new NullState(oDrawingObjects));
+            oDrawingObjects.loadDocumentStateAfterLoadChanges(oState);
         }
     },
 
