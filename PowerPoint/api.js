@@ -171,7 +171,7 @@ function asc_docs_api(name)
 
     CHART_STYLE_MANAGER = new CChartStyleManager();
 }
-Asc.extendClass(asc_docs_api, baseEditorsApi);
+asc.extendClass(asc_docs_api, baseEditorsApi);
 
 /////////////////////////////////////////////////////////////////////////
 ///////////////////CoAuthoring and Chat api//////////////////////////////
