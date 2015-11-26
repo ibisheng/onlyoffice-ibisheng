@@ -699,7 +699,7 @@ function CDocument(DrawingDocument)
     this.History              = History;
     this.IdCounter            = g_oIdCounter;
     this.TableId              = g_oTableId;
-    this.CollaborativeEditing = (CollaborativeEditing instanceof CWordCollaborativeEditing ? CollaborativeEditing : null);
+    this.CollaborativeEditing = (("undefined" !== typeof(CWordCollaborativeEditing) && CollaborativeEditing instanceof CWordCollaborativeEditing) ? CollaborativeEditing : null);
     this.Api                  = editor;
     //------------------------------------------------------------------------
     this.History.Document = this;
