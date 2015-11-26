@@ -87,8 +87,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     // Массив lock-ов, которые были на открытии документа
     this.arrPreOpenLocksObjects = [];
 
-    // CoAuthoring and Chat
-    this.User = undefined;
 
     this.isCoAuthoringEnable = true;
     this.collaborativeEditing = null;

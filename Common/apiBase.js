@@ -11,6 +11,8 @@ function baseEditorsApi(name) {
   this.FontLoader = window.g_font_loader;
   this.ImageLoader = window.g_image_loader;
 
+  // CoAuthoring and Chat
+  this.User = undefined;
   this.CoAuthoringApi = new window['CDocsCoApi']();
 
   // Результат получения лицензии
