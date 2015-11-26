@@ -5032,30 +5032,11 @@ asc_docs_api.prototype.sync_MouseMoveCallback = function(Data)
 
 asc_docs_api.prototype.sync_ShowForeignCursorLabel = function(UserId, X, Y, Color)
 {
-    // TODO: Временно делаем через события мыши
-    this.sync_MouseMoveStartCallback();
-    var MMData = new CMouseMoveData();
-    MMData.X_abs            = X;
-    MMData.Y_abs            = Y - 20;
-    MMData.Type             = c_oAscMouseMoveDataTypes.LockedObject;
-    MMData.UserId           = UserId;
-    MMData.LockedObjectType = c_oAscMouseMoveLockedObjectType.Common;
-    MMData.Color            = Color;
-    this.sync_MouseMoveCallback(MMData);
-    this.sync_MouseMoveEndCallback();
-
-    //this.asc_fireCallback("asc_onShowForeignCursorLabel", UserId, X, Y, new CColor(Color.r, Color.g, Color.b, 255));
+    this.asc_fireCallback("asc_onShowForeignCursorLabel", UserId, X, Y, new CColor(Color.r, Color.g, Color.b, 255));
 };
 asc_docs_api.prototype.sync_HideForeignCursorLabel = function(UserId)
 {
-    // TODO: Временно делаем через события мыши
-    this.sync_MouseMoveStartCallback();
-    var MMData = new CMouseMoveData();
-    MMData.Type             = c_oAscMouseMoveDataTypes.Common;
-    this.sync_MouseMoveCallback(MMData);
-    this.sync_MouseMoveEndCallback();
-
-    //this.asc_fireCallback("asc_onHideForeignCursorLabel", UserId);
+    this.asc_fireCallback("asc_onHideForeignCursorLabel", UserId);
 };
 
 //-----------------------------------------------------------------

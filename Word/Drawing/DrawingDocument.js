@@ -2244,6 +2244,9 @@ CDrawingCollaborativeTarget.prototype =
             }
         }
 
+        if (CollaborativeEditing)
+            CollaborativeEditing.Update_ForeignCursorLabelPosition(this.Id, this.HtmlElementX, this.HtmlElementY, this.Color);
+
         // 3) добавить, если нужно
         if (bIsHtmlElementCreate)
         {
@@ -6958,6 +6961,17 @@ function CDrawingDocument()
         {
             if (UserId == this.CollaborativeTargets[i].Id)
                 return this.CollaborativeTargets[i].Color;
+        }
+
+        return null;
+    };
+
+    this.Collaborative_GetTargetPosition = function(UserId)
+    {
+        for (var i = 0; i < this.CollaborativeTargets.length; i++)
+        {
+            if (UserId == this.CollaborativeTargets[i].Id)
+                return {X : this.CollaborativeTargets[i].HtmlElementX, Y : this.CollaborativeTargets[i].HtmlElementY};
         }
 
         return null;

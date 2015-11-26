@@ -6,6 +6,8 @@
  * Time: 12:01
  */
 
+var FOREIGN_CURSOR_LABEL_HIDETIME = 1500;
+
 function CWordCollaborativeEditing()
 {
     CWordCollaborativeEditing.superclass.constructor.call(this);
@@ -418,13 +420,6 @@ CWordCollaborativeEditing.prototype.Show_ForeignCursorLabel = function(UserId)
     var PageIndex     = Cursor.PageIndex;
     var TextTransform = Cursor.Transform;
 
-    var Color  = DrawingDocument.Collaborative_GetTargetColor(UserId);
-    if (!Color)
-        return;
-
-    var Coords = DrawingDocument.ConvertCoordsToCursorWR(X, Y, PageIndex, TextTransform);
-    Api.sync_ShowForeignCursorLabel(UserId, Coords.X, Coords.Y, Color);
-
     if (Cursor.ShowId)
         clearTimeout(Cursor.ShowId);
 
@@ -432,7 +427,15 @@ CWordCollaborativeEditing.prototype.Show_ForeignCursorLabel = function(UserId)
     {
         Cursor.ShowId = null;
         Api.sync_HideForeignCursorLabel(UserId);
-    }, 3000);
+    }, FOREIGN_CURSOR_LABEL_HIDETIME);
+
+    var Color  = DrawingDocument.Collaborative_GetTargetColor(UserId);
+    var Coords = DrawingDocument.Collaborative_GetTargetPosition(UserId);
+    //var Coords = DrawingDocument.ConvertCoordsToCursorWR(X, Y, PageIndex, TextTransform);
+    if (!Color || !Coords)
+        return;
+
+    this.Update_ForeignCursorLabelPosition(UserId, Coords.X, Coords.Y, Color);
 };
 CWordCollaborativeEditing.prototype.Add_ForeignCursorToShow = function(UserId)
 {
@@ -468,7 +471,7 @@ CWordCollaborativeEditing.prototype.Add_ForeignCursorXY = function(UserId, X, Y,
                 {
                     Cursor.ShowId = null;
                     Api.sync_HideForeignCursorLabel(UserId);
-                }, 3000);
+                }, FOREIGN_CURSOR_LABEL_HIDETIME);
             }
         }
         else
@@ -516,6 +519,18 @@ CWordCollaborativeEditing.prototype.Remove_ForeignCursorXY = function(UserId)
 
         delete this.m_aForeignCursorsXY[UserId];
     }
+};
+CWordCollaborativeEditing.prototype.Update_ForeignCursorLabelPosition = function(UserId, X, Y, Color)
+{
+    if (!this.m_oLogicDocument)
+        return;
+
+    var Cursor = this.m_aForeignCursorsXY[UserId];
+    if (!Cursor || !Cursor.ShowId)
+        return;
+
+    var Api = this.m_oLogicDocument.Get_Api();
+    Api.sync_ShowForeignCursorLabel(UserId, X, Y, Color);
 };
 
 var CollaborativeEditing = new CWordCollaborativeEditing();
