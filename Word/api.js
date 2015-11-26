@@ -5084,8 +5084,11 @@ asc_docs_api.prototype.sync_ShowForeignCursorLabel = function(UserId, X, Y, Colo
     MMData.Type             = c_oAscMouseMoveDataTypes.LockedObject;
     MMData.UserId           = UserId;
     MMData.LockedObjectType = c_oAscMouseMoveLockedObjectType.Common;
+    MMData.Color            = new CColor(Color.r, Color.g, Color.b, 255);
     this.sync_MouseMoveCallback(MMData);
     this.sync_MouseMoveEndCallback();
+
+    //this.asc_fireCallback("asc_onShowForeignCursorLabel", UserId, X, Y, new CColor(Color.r, Color.g, Color.b, 255));
 };
 asc_docs_api.prototype.sync_HideForeignCursorLabel = function(UserId)
 {
@@ -5095,6 +5098,8 @@ asc_docs_api.prototype.sync_HideForeignCursorLabel = function(UserId)
     MMData.Type             = c_oAscMouseMoveDataTypes.Common;
     this.sync_MouseMoveCallback(MMData);
     this.sync_MouseMoveEndCallback();
+
+    //this.asc_fireCallback("asc_onHideForeignCursorLabel", UserId);
 };
 asc_docs_api.prototype.asc_setChartTranslate = function(translate) {
     this.chartTranslate = translate;

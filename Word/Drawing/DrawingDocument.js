@@ -2067,6 +2067,8 @@ function CDrawingCollaborativeTarget()
     this.HtmlElementX = 0;
     this.HtmlElementY = 0;
 
+    this.Color = null;
+
     this.Style = "";
 }
 CDrawingCollaborativeTarget.prototype =
@@ -2086,7 +2088,21 @@ CDrawingCollaborativeTarget.prototype =
             var oUser = _drawing_doc.m_oWordControl.m_oApi.CoAuthoringApi.getUser(this.Id);
             var nColor = oUser ? oUser.asc_getColorValue() :  null;
             var oColor = (null !== nColor ? new CDocumentColor( (nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF ) : new CDocumentColor( 191, 255, 199 ));
-            this.Style ="rgb(" + oColor.r + "," + oColor.g + "," + oColor.b + ")";
+
+            var Y  = Math.max(0, Math.min(255,       0.299    * oColor.r + 0.587    * oColor.g + 0.114    * oColor.b));
+            var Cb = Math.max(0, Math.min(255, 128 - 0.168736 * oColor.r - 0.331264 * oColor.g + 0.5      * oColor.b));
+            var Cr = Math.max(0, Math.min(255, 128 + 0.5      * oColor.r - 0.418688 * oColor.g - 0.081312 * oColor.b));
+
+            if (Y > 63)
+                Y = 63;
+
+            var R = Math.max(0, Math.min(255, Y                        + 1.402   * (Cr - 128))) | 0;
+            var G = Math.max(0, Math.min(255, Y - 0.34414 * (Cb - 128) - 0.71414 * (Cr - 128))) | 0;
+            var B = Math.max(0, Math.min(255, Y + 1.772   * (Cb - 128)                       )) | 0;
+
+            this.Color = new CDocumentColor(R, G, B);
+
+            this.Style ="rgb(" + R + "," + G + "," + B + ")";
         }
 
         // 2) определяем размер
@@ -6934,6 +6950,17 @@ function CDrawingDocument()
                 this.CollaborativeTargets[i].Update(this);
             }
         }
+    };
+
+    this.Collaborative_GetTargetColor = function(UserId)
+    {
+        for (var i = 0; i < this.CollaborativeTargets.length; i++)
+        {
+            if (UserId == this.CollaborativeTargets[i].Id)
+                return this.CollaborativeTargets[i].Color;
+        }
+
+        return null;
     };
 }
 

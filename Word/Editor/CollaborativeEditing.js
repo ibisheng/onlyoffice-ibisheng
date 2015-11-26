@@ -415,12 +415,12 @@ CWordCollaborativeEditing.prototype.Show_ForeignCursorLabel = function(UserId)
     var PageIndex = Cursor.PageIndex;
     var TextTransform = Cursor.Paragraph.Get_ParentTextTransform();
 
-    var User   = Api.CoAuthoringApi.getUser(UserId);
-    var nColor = User ? User.asc_getColorValue() :  null;
-    var oColor = (null !== nColor ? new CDocumentColor((nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF) : new CDocumentColor(191, 255, 199));
+    var Color  = DrawingDocument.Collaborative_GetTargetColor(UserId);
+    if (!Color)
+        return;
 
     var Coords = DrawingDocument.ConvertCoordsToCursorWR(X, Y, PageIndex, TextTransform);
-    Api.sync_ShowForeignCursorLabel(UserId, Coords.X, Coords.Y, oColor);
+    Api.sync_ShowForeignCursorLabel(UserId, Coords.X, Coords.Y, Color);
 
     if (Cursor.ShowId)
         clearTimeout(Cursor.ShowId);
