@@ -33,9 +33,10 @@ CErrorData.prototype.get_Value = function() { return this.Value; };
 /** @constructor */
 function asc_docs_api(name)
 {
+  asc_docs_api.superclass.constructor.call(this);
+
 	g_fontApplication.Init();
 
-    var CDocsCoApi      = window["CDocsCoApi"];
     var CSpellCheckApi  = window["CSpellCheckApi"];
 
     History    = new CHistory();
@@ -139,7 +140,7 @@ function asc_docs_api(name)
 
   // CoAuthoring and Chat
   this.User = undefined;
-  this.CoAuthoringApi = new CDocsCoApi();
+
   this.CoAuthoringApi.isPowerPoint = true;
   this.isCoAuthoringEnable = true;
 	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
@@ -213,6 +214,7 @@ function asc_docs_api(name)
 
     CHART_STYLE_MANAGER = new CChartStyleManager();
 }
+asc.extendClass(asc_docs_api, baseEditorsApi);
 
 asc_docs_api.prototype.asc_GetFontThumbnailsPath = function()
 {
@@ -589,18 +591,6 @@ asc_docs_api.prototype.asc_coAuthoringDisconnect = function () {
   
   //Just set viewer mode
   this.SetViewMode(true);
-};
-// send chart message
-asc_docs_api.prototype.asc_coAuthoringChatSendMessage = function (message) {
-    this.CoAuthoringApi.sendMessage(message);
-};
-// get chart messages
-asc_docs_api.prototype.asc_coAuthoringChatGetMessages = function () {
-  this.CoAuthoringApi.getMessages();
-};
-// get users, возвращается массив users
-asc_docs_api.prototype.asc_coAuthoringGetUsers = function () {
-  this.CoAuthoringApi.getUsers();
 };
 
 asc_docs_api.prototype.asyncServerIdEndLoaded = function () {

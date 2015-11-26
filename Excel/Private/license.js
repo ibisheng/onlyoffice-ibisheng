@@ -1,6 +1,6 @@
 ﻿"use strict";
 
-/* api.js
+/* license.js
  *
  * Author: Alexander.Trofimov@avsmedia.net
  * Date:   Apr 23, 2015

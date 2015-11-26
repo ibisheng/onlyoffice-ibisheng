@@ -286,6 +286,8 @@ CMailMergeSendData.prototype.put_UserId = function(v){this["userId"] = v;};
 /** @constructor */
 function asc_docs_api(name)
 {
+  asc_docs_api.superclass.constructor.call(this);
+
     if (window["AscDesktopEditor"])
     {
         window["AscDesktopEditor"]["CreateEditorApi"]();
@@ -293,7 +295,7 @@ function asc_docs_api(name)
 
     g_fontApplication.Init();
 
-    var CDocsCoApi      = window["CDocsCoApi"];
+
     var CSpellCheckApi  = window["CSpellCheckApi"];
 
     History    = new CHistory();
@@ -356,7 +358,7 @@ function asc_docs_api(name)
 	
   // CoAuthoring and Chat
   this.User = undefined;
-  this.CoAuthoringApi = new CDocsCoApi();
+
 	this.isCoAuthoringEnable = true;
   this.isCoMarksDraw = false;
 	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
@@ -493,6 +495,7 @@ function asc_docs_api(name)
 
     this.RevisionChangesStack = [];
 }
+asc.extendClass(asc_docs_api, baseEditorsApi);
 
 asc_docs_api.prototype.LoadFontsFromServer = function(_fonts)
 {
@@ -1347,21 +1350,6 @@ asc_docs_api.prototype._coAuthoringInit = function() {
   this.CoAuthoringApi.init(this.User, documentId, documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Word, documentFormatSave);
 };
 
-// send chart message
-asc_docs_api.prototype.asc_coAuthoringChatSendMessage = function(message)
-{
-  this.CoAuthoringApi.sendMessage(message);
-};
-// get chart messages
-asc_docs_api.prototype.asc_coAuthoringChatGetMessages = function()
-{
-  this.CoAuthoringApi.getMessages();
-};
-// get users, возвращается массив users
-asc_docs_api.prototype.asc_coAuthoringGetUsers = function()
-{
-  this.CoAuthoringApi.getUsers();
-};
 // server disconnect
 asc_docs_api.prototype.asc_coAuthoringDisconnect = function () {
 	this.CoAuthoringApi.disconnect();

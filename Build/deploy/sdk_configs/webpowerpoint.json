@@ -129,6 +129,7 @@
                 "../../PowerPoint/Editor/Format/GroupPrototype.js",
                 "../../PowerPoint/Editor/Format/ChartSpacePrototype.js",
                 "../../PowerPoint/Editor/Format/GraphicFrame.js",
+                "../../Common/apiBase.js",
                 "../../PowerPoint/api.js",
                 "../../PowerPoint/Private/license.js",
 				"../../PowerPoint/Private/comments.js",
@@ -180,6 +181,7 @@
                 "expand": true,
                 "cwd": "../../PowerPoint/",
                 "src": [
+                    "../Common/apiBase.js",
                     "api.js",
                     "apiCommon.js",
                     "apiDefines.js"

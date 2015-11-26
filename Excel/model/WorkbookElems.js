@@ -3810,7 +3810,7 @@ TreeRB.prototype = {
 
 function IntervalTreeRB(){
 	IntervalTreeRB.superclass.constructor.call(this);
-};
+}
 Asc.extendClass(IntervalTreeRB, TreeRB);
 IntervalTreeRB.prototype._init = function (x) {
 	this.nil = new IntervalTreeRBNode();

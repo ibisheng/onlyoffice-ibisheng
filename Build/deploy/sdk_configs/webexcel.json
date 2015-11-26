@@ -156,6 +156,7 @@
                 "../../Excel/model/DrawingObjects/GlobalCounters.js",
                 "../../Word/apiCommon.js",
                 "../../Excel/apiCommonExport.js",
+                "../../Common/apiBase.js",
                 "../../Excel/api.js",
                 "../../Excel/Private/license.js",
 				"../../Excel/Private/comments.js"
@@ -204,6 +205,7 @@
                 "expand": true,
                 "cwd": "../../Excel/",
                 "src": [
+                    "../Common/apiBase.js",
                     "api.js",
                     "apiDefines.js",
                     "view/EventsController.js",

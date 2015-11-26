@@ -16,10 +16,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   var asc_CCollaborativeEditing = asc.CCollaborativeEditing;
   var asc_CAdjustPrint = asc.asc_CAdjustPrint;
   var prot;
-  var CDocsCoApi = window["CDocsCoApi"];
+
 
   /** @constructor */
   function spreadsheet_api(name, inputName, eventsHandlers) {
+    spreadsheet_api.superclass.constructor.call(this);
+
     g_fontApplication.Init();
     /************ private!!! **************/
     this.HtmlElementName = name;
@@ -95,7 +97,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
     // CoAuthoring and Chat
     this.User = undefined;
-    this.CoAuthoringApi = new CDocsCoApi();
+
     this.isCoAuthoringEnable = true;
     this.collaborativeEditing = null;
     this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
@@ -171,6 +173,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     this._init();
     return this;
   }
+  asc.extendClass(spreadsheet_api, baseEditorsApi);
 
   spreadsheet_api.prototype._init = function() {
     var t = this;
@@ -3288,18 +3291,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   /////////////////////////////////////////////////////////////////////////
   ///////////////////CoAuthoring and Chat api//////////////////////////////
   /////////////////////////////////////////////////////////////////////////
-  // send chart message
-  spreadsheet_api.prototype.asc_coAuthoringChatSendMessage = function(message) {
-    this.CoAuthoringApi.sendMessage(message);
-  };
-  // get chart messages
-  spreadsheet_api.prototype.asc_coAuthoringChatGetMessages = function() {
-    this.CoAuthoringApi.getMessages();
-  };
-  // get users, возвращается массив users
-  spreadsheet_api.prototype.asc_coAuthoringGetUsers = function() {
-    this.CoAuthoringApi.getUsers();
-  };
+
+
   // server disconnect
   spreadsheet_api.prototype.asc_coAuthoringDisconnect = function() {
     this.CoAuthoringApi.disconnect();

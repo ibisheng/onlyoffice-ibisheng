@@ -115,6 +115,7 @@
                 "../../Common/scroll.js",
                 "../../Word/Editor/SerializeCommon.js",
                 "../../Word/apiDefines.js",
+                "../../Common/apiBase.js",
                 "../../Word/api.js",
                 "../../Word/Private/license.js",
 				"../../Word/Private/comments.js",
@@ -182,6 +183,7 @@
                 "expand": true,
                 "cwd": "../../Word/",
                 "src": [
+                    "../Common/apiBase.js",
                     "api.js",
                     "apiCommon.js",
                     "apiDefines.js"
