@@ -18,10 +18,6 @@ asc_docs_api.prototype.asc_getEditorPermissions = function(licenseUrl, customerI
   }
   this._coAuthoringInit();
 };
-asc_docs_api.prototype._onCheckLicenseEnd = function(err, res) {
-  this.licenseResult = {err: err, res: res};
-  this._onEndPermissions();
-};
 asc_docs_api.prototype._onEndPermissions = function() {
   if (null !== this.licenseResult && this.isOnFirstConnectEnd) {
     var oResult = new window['Asc'].asc_CAscEditorPermissions();

@@ -64,3 +64,8 @@ function CheckUserInLicense(customerId, userId, userFirstName, userLastName, oLi
   }
   return res;
 }
+
+baseEditorsApi.prototype._onCheckLicenseEnd = function(err, res) {
+  this.licenseResult = {err: err, res: res};
+  this._onEndPermissions();
+};

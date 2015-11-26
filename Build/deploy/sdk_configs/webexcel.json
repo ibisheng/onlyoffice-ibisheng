@@ -18,7 +18,6 @@
                 "../../Common/apiCommon.js",
                 "../../Common/commonDefines.js",
                 "../../Common/editorscommon.js",
-				"../../Common/Private/license.js",
                 "../../Common/NumFormat.js",
                 "../../Common/Charts/charts.js",
                 "../../Common/Charts/DrawingArea.js",
@@ -158,6 +157,7 @@
                 "../../Excel/apiCommonExport.js",
                 "../../Common/apiBase.js",
                 "../../Excel/api.js",
+				"../../Common/Private/license.js",
                 "../../Excel/Private/license.js",
 				"../../Excel/Private/comments.js"
             ],

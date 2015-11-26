@@ -34,10 +34,6 @@
     }
     this._coAuthoringInit();
   };
-  asc['spreadsheet_api'].prototype._onCheckLicenseEnd = function(err, res) {
-    this.licenseResult = {err: err, res: res};
-    this._onEndPermissions();
-  };
   asc['spreadsheet_api'].prototype._onEndPermissions = function() {
     if (null !== this.licenseResult && this.isOnFirstConnectEnd) {
       var oResult = new asc.asc_CAscEditorPermissions();
