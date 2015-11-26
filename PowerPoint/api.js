@@ -47,8 +47,6 @@ function asc_docs_api(name)
     this.ThemeLoader = new CThemeLoader();
     this.ThemeLoader.Api = this;
 
-    this.FontLoader = window.g_font_loader;
-    this.ImageLoader = window.g_image_loader;
     this.FontLoader.put_Api(this);
     this.ImageLoader.put_Api(this);
 

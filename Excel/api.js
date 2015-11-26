@@ -37,7 +37,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     this.wb = null;
     this.wbModel = null;
 
-    this.FontLoader = window.g_font_loader;
+
     this.FontLoader.put_Api(this);
 
     this.FontLoader.SetStandartFonts();
@@ -130,7 +130,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
     // Shapes
     this.isStartAddShape = false;
-    this.ImageLoader = window.g_image_loader;
     this.ImageLoader.put_Api(this);
     this.shapeElementId = null;
     this.textArtElementId = null;

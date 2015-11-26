@@ -8,6 +8,9 @@ function baseEditorsApi(name) {
 
   this.isMobileVersion = false;
 
+  this.FontLoader = window.g_font_loader;
+  this.ImageLoader = window.g_image_loader;
+
   this.CoAuthoringApi = new window['CDocsCoApi']();
 }
 // send chart message

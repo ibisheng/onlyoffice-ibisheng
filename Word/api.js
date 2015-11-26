@@ -302,8 +302,6 @@ function asc_docs_api(name)
     this.WordControl = new CEditorPage(this);
     this.WordControl.Name = this.HtmlElementName;
 
-    this.FontLoader = window.g_font_loader;
-    this.ImageLoader = window.g_image_loader;
     this.FontLoader.put_Api(this);
     this.ImageLoader.put_Api(this);
 
