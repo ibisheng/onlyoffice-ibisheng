@@ -28,6 +28,8 @@ function baseEditorsApi(name) {
   this.User = undefined;
   this.CoAuthoringApi = new window['CDocsCoApi']();
   this.isCoAuthoringEnable = true;
+  // Массив lock-ов, которые были на открытии документа
+  this.arrPreOpenLocksObjects = [];
 
   // Результат получения лицензии
   this.licenseResult = null;

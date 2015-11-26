@@ -55,9 +55,6 @@ function asc_docs_api(name)
     this.isApplyChangesOnOpen = false;
     this.isApplyChangesOnOpenEnabled = true;
 
-  // Массив lock-ов, которые были на открытии документа
-  this.arrPreOpenLocksObjects = [];
-
     this.IsSupportEmptyPresentation = true;
         
     this.ShowParaMarks = false;

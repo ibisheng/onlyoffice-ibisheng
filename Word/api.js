@@ -327,9 +327,6 @@ function asc_docs_api(name)
 	
 	this.IsSpellCheckCurrentWord = false;
 
-  // Массив lock-ов, которые были на открытии документа
-  this.arrPreOpenLocksObjects = [];
-
 	this.mailMergeFileData = null;
 
   this.isCoMarksDraw = false;
