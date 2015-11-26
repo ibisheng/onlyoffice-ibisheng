@@ -368,10 +368,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     this.asc_SendThemeColorSchemes(infos);
   };
 
-  spreadsheet_api.prototype.asc_GetFontThumbnailsPath = function() {
-    return "../Common/Images/";
-  };
-
   spreadsheet_api.prototype.asc_Init = function(fontsPath) {
     var t = this;
     asc["editor"] = ( asc["editor"] || t );
@@ -520,9 +516,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     CHART_STYLE_MANAGER = new CChartStyleManager();
   };
 
-  spreadsheet_api.prototype.asc_getEditorPermissions = function() {
-    this._coAuthoringInit();
-  };
   spreadsheet_api.prototype._onEndPermissions = function() {
     if (this.isOnFirstConnectEnd) {
       this.handlers.trigger('asc_onGetEditorPermissions', new asc.asc_CAscEditorPermissions());

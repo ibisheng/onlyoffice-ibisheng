@@ -198,11 +198,6 @@ function asc_docs_api(name)
 }
 asc.extendClass(asc_docs_api, baseEditorsApi);
 
-asc_docs_api.prototype.asc_GetFontThumbnailsPath = function()
-{
-    return "../Common/Images/";
-};
-
 /////////////////////////////////////////////////////////////////////////
 ///////////////////CoAuthoring and Chat api//////////////////////////////
 /////////////////////////////////////////////////////////////////////////
@@ -701,9 +696,6 @@ asc_docs_api.prototype.sync_ChangeLastSelectedElement = function(type, obj)
 
 asc_docs_api.prototype.Init = function() {
   this.WordControl.Init();
-};
-asc_docs_api.prototype.asc_getEditorPermissions = function() {
-	this._coAuthoringInit();
 };
 asc_docs_api.prototype._onEndPermissions = function() {
   if (this.isOnFirstConnectEnd) {

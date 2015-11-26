@@ -515,11 +515,6 @@ asc_docs_api.prototype.SetLanguage = function(langId)
         this.CurrentTranslate = translations_map[langId];
 };
 
-asc_docs_api.prototype.asc_GetFontThumbnailsPath = function()
-{
-    return "../Common/Images/";
-};
-
 asc_docs_api.prototype.TranslateStyleName = function(style_name)
 {
     var ret = this.CurrentTranslate.DefaultStyles[style_name];
@@ -638,9 +633,6 @@ asc_docs_api.prototype.sync_ChangeLastSelectedElement = function(type, obj)
 asc_docs_api.prototype.Init = function()
 {
 	this.WordControl.Init();
-};
-asc_docs_api.prototype.asc_getEditorPermissions = function() {
-  this._coAuthoringInit();
 };
 
 asc_docs_api.prototype._onEndPermissions = function() {

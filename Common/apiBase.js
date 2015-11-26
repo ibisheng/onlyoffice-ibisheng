@@ -23,6 +23,9 @@ function baseEditorsApi(name) {
   // Подключились ли уже к серверу
   this.isOnFirstConnectEnd = false;
 }
+baseEditorsApi.prototype.asc_GetFontThumbnailsPath = function() {
+  return '../Common/Images/';
+};
 // send chart message
 baseEditorsApi.prototype.asc_coAuthoringChatSendMessage = function(message) {
   this.CoAuthoringApi.sendMessage(message);
@@ -34,4 +37,8 @@ baseEditorsApi.prototype.asc_coAuthoringChatGetMessages = function() {
 // get users, возвращается массив users
 baseEditorsApi.prototype.asc_coAuthoringGetUsers = function() {
   this.CoAuthoringApi.getUsers();
+};
+// get permissions
+baseEditorsApi.prototype.asc_getEditorPermissions = function() {
+  this._coAuthoringInit();
 };
