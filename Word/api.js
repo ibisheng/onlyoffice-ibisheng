@@ -1136,8 +1136,7 @@ asc_docs_api.prototype._coAuthoringInit = function() {
           editor.sync_LockDocumentSchema();
         }
 
-        // TODO: Здесь для ускорения надо сделать проверку, является ли текущим элемент с
-        //       заданным Id. Если нет, тогда и не надо обновлять состояние.
+        // Теперь обновлять состояние необходимо, чтобы обновить локи в режиме рецензирования.
         editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
       } else {
         CollaborativeEditing.Add_NeedLock(Id, e["user"]);
@@ -1177,6 +1176,9 @@ asc_docs_api.prototype._coAuthoringInit = function() {
         }
 
         Lock.Set_Type(NewType, true);
+
+        // Теперь обновлять состояние необходимо, чтобы обновить локи в режиме рецензирования.
+        editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
       }
     } else {
       CollaborativeEditing.Remove_NeedLock(Id);
@@ -5043,7 +5045,7 @@ asc_docs_api.prototype.sync_ShowForeignCursorLabel = function(UserId, X, Y, Colo
     MMData.Type             = c_oAscMouseMoveDataTypes.LockedObject;
     MMData.UserId           = UserId;
     MMData.LockedObjectType = c_oAscMouseMoveLockedObjectType.Common;
-    MMData.Color            = new CColor(Color.r, Color.g, Color.b, 255);
+    MMData.Color            = Color;
     this.sync_MouseMoveCallback(MMData);
     this.sync_MouseMoveEndCallback();
 
@@ -6991,8 +6993,24 @@ CRevisionsChange.prototype.get_Value = function(){return this.Value;};
 CRevisionsChange.prototype.put_Type  = function(Type){this.Type = Type;};
 CRevisionsChange.prototype.put_XY    = function(X, Y){this.X = X; this.Y = Y;};
 CRevisionsChange.prototype.put_Value = function(Value){this.Value = Value;};
-CRevisionsChange.prototype.put_Paragraph = function(Para){this.Paragraph = Para;};
+CRevisionsChange.prototype.put_Paragraph = function(Para)
+{
+    this.Paragraph = Para;
+};
 CRevisionsChange.prototype.get_Paragraph = function(){return this.Paragraph;};
+CRevisionsChange.prototype.get_LockUserId = function()
+{
+    if (this.Paragraph)
+    {
+        var Lock = this.Paragraph.Get_Lock();
+        var LockType = Lock.Get_Type();
+
+        if (locktype_Mine !== LockType && locktype_None !== LockType)
+            return Lock.Get_UserId();
+    }
+
+    return null;
+};
 CRevisionsChange.prototype.put_InternalPos = function(x, y, pageNum)
 {
     if (this._PageNum !== pageNum

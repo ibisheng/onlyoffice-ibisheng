@@ -765,6 +765,7 @@ CRevisionsChange.prototype['get_Value'] = CRevisionsChange.prototype.get_Value;
 CRevisionsChange.prototype['put_Type'] = CRevisionsChange.prototype.put_Type;
 CRevisionsChange.prototype['put_XY'] = CRevisionsChange.prototype.put_XY;
 CRevisionsChange.prototype['put_Value'] = CRevisionsChange.prototype.put_Value;
+CRevisionsChange.prototype['get_LockUserId'] = CRevisionsChange.prototype.get_LockUserId;
 window['CSpellCheckApi_desktop'] = CSpellCheckApi_desktop;
 window['CAscTableStyle'] = CAscTableStyle;
 CAscTableStyle.prototype['get_Id'] = CAscTableStyle.prototype.get_Id;

@@ -13631,6 +13631,10 @@ Paragraph.prototype.Get_XYByContentPos = function(ContentPos)
 
     return {X : X, Y : Y, PageNum : CurPage + this.Get_StartPage_Absolute(), Height : this.Lines[CurLine].Bottom - this.Lines[CurLine].Top};
 };
+Paragraph.prototype.Get_Lock = function()
+{
+    return this.Lock;
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;
