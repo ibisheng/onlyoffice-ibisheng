@@ -2548,57 +2548,6 @@
     prot["get_LockedObjectType"] = CMouseMoveData.prototype.get_LockedObjectType;
     window["CMouseMoveData"] = CMouseMoveData;
 
-	/** @constructor */
-	function asc_CVersionHistory (newObj) {
-		this.docId = null;
-		this.url = null;
-		this.urlChanges = null;
-		this.currentChangeId = -1;
-		this.newChangeId = -1;
-		this.colors = null;
-		this.changes = null;
-
-		if (newObj) this.update(newObj);
-	}
-	asc_CVersionHistory.prototype.update = function (newObj) {
-		var bUpdate = (this.docId !== newObj.docId || this.url !== newObj.url ||
-			this.urlChanges !== newObj.urlChanges || this.currentChangeId > newObj.currentChangeId);
-		if (bUpdate) {
-			this.docId = newObj.docId;
-			this.url = newObj.url;
-			this.urlChanges = newObj.urlChanges;
-			this.currentChangeId = -1;
-			this.changes = null;
-		}
-		this.colors = newObj.colors;
-		this.newChangeId = newObj.currentChangeId;
-		return bUpdate;
-	};
-	asc_CVersionHistory.prototype.applyChanges = function (editor) {
-		var color;
-		this.newChangeId = (null == this.newChangeId) ? (this.changes.length - 1) : this.newChangeId;
-		for (var i = this.currentChangeId + 1; i <= this.newChangeId && i < this.changes.length; ++i) {
-			color = this.colors[i];
-			editor._coAuthoringSetChanges(this.changes[i], i !== this.newChangeId ? null : (color ?
-				new CDocumentColor((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF) :
-				new CDocumentColor(191, 255, 199)));
-		}
-		this.currentChangeId = this.newChangeId;
-	};
-	asc_CVersionHistory.prototype.asc_setDocId = function(val) {this.docId = val;};
-	asc_CVersionHistory.prototype.asc_setUrl = function(val) {this.url = val;};
-	asc_CVersionHistory.prototype.asc_setUrlChanges = function(val) {this.urlChanges = val;};
-	asc_CVersionHistory.prototype.asc_setCurrentChangeId = function(val) {this.currentChangeId = val;};
-	asc_CVersionHistory.prototype.asc_setArrColors = function(val) {this.colors = val;};
-
-	window["Asc"].asc_CVersionHistory = window["Asc"]["asc_CVersionHistory"] = asc_CVersionHistory;
-	prot = asc_CVersionHistory.prototype;
-	prot["asc_setDocId"]			= prot.asc_setDocId;
-	prot["asc_setUrl"]				= prot.asc_setUrl;
-	prot["asc_setUrlChanges"]		= prot.asc_setUrlChanges;
-	prot["asc_setCurrentChangeId"]	= prot.asc_setCurrentChangeId;
-	prot["asc_setArrColors"]		= prot.asc_setArrColors;
-
 
     function asc_CUserInfo(obj)
     {

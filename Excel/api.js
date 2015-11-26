@@ -77,8 +77,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     this.collaborativeEditing = null;
     this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
-    this.VersionHistory = null;				// Объект, который отвечает за точку в списке версий
-
     // AutoSave
     this.lastSaveTime = null;				// Время последнего сохранения
     this.autoSaveGapRealTime = 30;	  // Интервал быстрого автосохранения (когда выставлен флаг realtime) - 30 мс.
@@ -3318,26 +3316,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   };
   spreadsheet_api.prototype.asc_continueSaving = function() {
     this.waitSave = false;
-  };
-
-  // Version History
-
-  spreadsheet_api.prototype.asc_showRevision = function(url, urlChanges, currentChangeId) {
-    var bUpdate = true;
-    if (null === this.VersionHistory) {
-      this.VersionHistory = new asc.CVersionHistory(url, urlChanges, currentChangeId);
-    } else {
-      bUpdate = this.VersionHistory.update(url, urlChanges, currentChangeId);
-    }
-    if (bUpdate) {
-      this.documentUrl = url;
-      this.documentUrlChanges = urlChanges;
-      this.asc_LoadDocument();
-    }
-  };
-
-  spreadsheet_api.prototype.asc_undoAllChanges = function() {
-    // ToDo Add code here
   };
 
   // Выставление локали

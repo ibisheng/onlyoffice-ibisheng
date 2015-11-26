@@ -114,7 +114,6 @@ function asc_docs_api(name)
   this.CoAuthoringApi.isPowerPoint = true;
 	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
-	this.VersionHistory = null;				// Объект, который отвечает за точку в списке версий
     /**************************************/
 	// AutoSave
 	this.autoSaveGap = 0;				// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
@@ -4909,24 +4908,6 @@ asc_docs_api.prototype.asc_stopSaving = function () {
 };
 asc_docs_api.prototype.asc_continueSaving = function () {
 	this.asc_DecrementCounterLongAction();
-};
-
-// Version History
-
-asc_docs_api.prototype.asc_showRevision = function (url, urlChanges, currentChangeId) {
-	var bUpdate = true;
-	if (null === this.VersionHistory)
-		this.VersionHistory = new window["Asc"].CVersionHistory(url, urlChanges, currentChangeId);
-	else
-		bUpdate = this.VersionHistory.update(url, urlChanges, currentChangeId);
-	if (bUpdate) {
-		documentUrl = url;
-		documentUrlChanges = urlChanges;
-		this.LoadDocument();
-	}
-};
-asc_docs_api.prototype.asc_undoAllChanges = function () {
-	// ToDo Add code here
 };
 
 //-----------------------------------------------------------------

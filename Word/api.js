@@ -332,8 +332,6 @@ function asc_docs_api(name)
   this.isCoMarksDraw = false;
 	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
-	this.VersionHistory = null;				// Объект, который отвечает за точку в списке версий
-
 	// Spell Checking
 	this.SpellCheckApi = (window["AscDesktopEditor"] === undefined) ? new CSpellCheckApi() : new CSpellCheckApi_desktop();
 	this.isSpellCheckEnable = true;
@@ -7011,37 +7009,6 @@ asc_docs_api.prototype.asc_continueSaving = function () {
 	this.asc_DecrementCounterLongAction();
 };
 
-// Version History
-
-asc_docs_api.prototype.asc_showRevision = function(newObj) {
-  if (!newObj.docId) {
-    return;
-  }
-  if (this.isCoAuthoringEnable) {
-    this.asc_coAuthoringDisconnect();
-  }
-
-  var bUpdate = true;
-  if (null === this.VersionHistory) {
-    this.VersionHistory = new window["Asc"].asc_CVersionHistory(newObj);
-  } else {
-    bUpdate = this.VersionHistory.update(newObj);
-  }
-  if (bUpdate) {
-    this.asc_CloseFile();
-
-    this.DocInfo.put_Id(this.VersionHistory.docId);
-    this.DocInfo.put_Url(this.VersionHistory.url);
-    documentUrlChanges = this.VersionHistory.urlChanges;
-    this.asc_setDocInfo(this.DocInfo);
-    this.LoadDocument(true);
-  } else if (this.VersionHistory.currentChangeId < newObj.currentChangeId) {
-    // Нужно только добавить некоторые изменения
-    CollaborativeEditing.Clear_CollaborativeMarks();
-    editor.VersionHistory.applyChanges(editor);
-    CollaborativeEditing.Apply_Changes();
-  }
-};
 asc_docs_api.prototype.asc_undoAllChanges = function ()
 {
     this.WordControl.m_oLogicDocument.Document_Undo({All : true});

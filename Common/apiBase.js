@@ -40,6 +40,9 @@ function baseEditorsApi(name) {
   this.isOnFirstConnectEnd = false;
 
   this.canSave = true;        // Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
+
+  // Version History
+  this.VersionHistory = null;				// Объект, который отвечает за точку в списке версий
 }
 baseEditorsApi.prototype.asc_GetFontThumbnailsPath = function() {
   return '../Common/Images/';
@@ -66,4 +69,9 @@ baseEditorsApi.prototype.asc_setChartTranslate = function(translate) {
 };
 baseEditorsApi.prototype.asc_setTextArtTranslate = function(translate) {
   this.textArtTranslate = translate;
+};
+// Version History
+baseEditorsApi.prototype.asc_showRevision = function(newObj) {
+};
+baseEditorsApi.prototype.asc_undoAllChanges = function() {
 };
