@@ -14,6 +14,9 @@ function baseEditorsApi(name) {
   this.ImageLoader.put_Api(this);
   this.FontLoader.SetStandartFonts();
 
+  this.LoadedObject = null;
+  this.DocumentType = 0; // 0 - empty, 1 - test, 2 - document (from json)
+
   // Тип состояния на данный момент (сохранение, открытие или никакое)
   this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 

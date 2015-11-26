@@ -47,9 +47,6 @@ function asc_docs_api(name)
     this.ThemeLoader = new CThemeLoader();
     this.ThemeLoader.Api = this;
 
-    this.LoadedObject = null;
-    this.DocumentType = 0; // 0 - empty, 1 - test, 2 - document (from json)
-
     this.DocumentUrl = "";
     this.DocumentName = "";
 	this.DocInfo = null;

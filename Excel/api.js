@@ -37,9 +37,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     this.wb = null;
     this.wbModel = null;
 
-    this.LoadedObject = null;
-    this.DocumentType = 0; // 0 - empty, 1 - test, 2 - document (from json)
-
     this.DocumentName = "";
     this.documentId = undefined;
     this.documentUserId = undefined;
