@@ -139,16 +139,22 @@ CDocument.prototype.private_GetRevisionsChangeParagraph = function(Direction, Cu
     {
         this.private_GetRevisionsChangeParagraphInHdrFtr(SearchEngine, HdrFtr);
 
-        if (Direction < 0 && true !== SearchEngine.Is_Found())
-            this.private_GetRevisionsChangeParagraphInDocument(SearchEngine, this.Content.length - 1);
+        if (true !== SearchEngine.Is_Found())
+            this.private_GetRevisionsChangeParagraphInDocument(SearchEngine, Direction < 0 ? this.Content.length - 1 : 0);
+
+        if (true !== SearchEngine.Is_Found())
+            this.private_GetRevisionsChangeParagraphInHdrFtr(SearchEngine, null);
     }
     else
     {
         var Pos = (true === this.Selection.Use && docpostype_DrawingObjects !== this.CurPos.Type ? (this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos) : this.CurPos.ContentPos);
         this.private_GetRevisionsChangeParagraphInDocument(SearchEngine, Pos);
 
-        if (Direction > 0 && true !== SearchEngine.Is_Found())
+        if (true !== SearchEngine.Is_Found())
             this.private_GetRevisionsChangeParagraphInHdrFtr(SearchEngine, null);
+
+        if (true !== SearchEngine.Is_Found())
+            this.private_GetRevisionsChangeParagraphInDocument(SearchEngine, Direction > 0 ? 0 : this.Content.length - 1);
     }
 
     return SearchEngine;
