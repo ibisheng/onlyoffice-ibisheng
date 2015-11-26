@@ -343,9 +343,6 @@ function asc_docs_api(name)
 	// Тип состояния на данный момент (сохранение, открытие или никакое)
 	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 
-  // Подключились ли уже к серверу
-  this.isOnFirstConnectEnd = false;
-	
   // CoAuthoring and Chat
   this.User = undefined;
 

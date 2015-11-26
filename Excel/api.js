@@ -70,8 +70,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
     this.asyncMethodCallback = undefined;
 
-    // Подключились ли уже к серверу
-    this.isOnFirstConnectEnd = false;
 
     // Тип состояния на данный момент (сохранение, открытие или никакое)
     this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;

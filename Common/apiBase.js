@@ -15,6 +15,8 @@ function baseEditorsApi(name) {
 
   // Результат получения лицензии
   this.licenseResult = null;
+  // Подключились ли уже к серверу
+  this.isOnFirstConnectEnd = false;
 }
 // send chart message
 baseEditorsApi.prototype.asc_coAuthoringChatSendMessage = function(message) {
