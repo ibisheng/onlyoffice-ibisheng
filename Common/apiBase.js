@@ -10,6 +10,9 @@ function baseEditorsApi(name) {
 
   this.FontLoader = window.g_font_loader;
   this.ImageLoader = window.g_image_loader;
+  this.FontLoader.put_Api(this);
+  this.ImageLoader.put_Api(this);
+  this.FontLoader.SetStandartFonts();
 
   // Тип состояния на данный момент (сохранение, открытие или никакое)
   this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;

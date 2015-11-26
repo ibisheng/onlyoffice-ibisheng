@@ -302,11 +302,6 @@ function asc_docs_api(name)
     this.WordControl = new CEditorPage(this);
     this.WordControl.Name = this.HtmlElementName;
 
-    this.FontLoader.put_Api(this);
-    this.ImageLoader.put_Api(this);
-
-    this.FontLoader.SetStandartFonts();
-
     this.LoadedObject = null;
     this.DocumentType = 0; // 0 - empty, 1 - test, 2 - document (from json)
 
