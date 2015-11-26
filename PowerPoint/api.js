@@ -21,15 +21,6 @@ var c_oSerFormat = {
     Signature	: "PPTY"
 };
 
-
-function CErrorData()
-{
-    this.Value = 0;
-}
-
-CErrorData.prototype.put_Value = function(v){ this.Value = v; };
-CErrorData.prototype.get_Value = function() { return this.Value; };
-
 /** @constructor */
 function asc_docs_api(name)
 {

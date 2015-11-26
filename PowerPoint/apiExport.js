@@ -1,6 +1,3 @@
-window['CErrorData'] = CErrorData;
-CErrorData.prototype['put_Value'] = CErrorData.prototype.put_Value;
-CErrorData.prototype['get_Value'] = CErrorData.prototype.get_Value;
 window['asc_docs_api'] = asc_docs_api;
 asc_docs_api.prototype['asc_GetFontThumbnailsPath'] = asc_docs_api.prototype.asc_GetFontThumbnailsPath;
 asc_docs_api.prototype['_coAuthoringInit'] = asc_docs_api.prototype._coAuthoringInit;
