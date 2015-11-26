@@ -77,8 +77,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     this.collaborativeEditing = null;
     this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
-    this.SpellCheckUrl = '';				// Ссылка сервиса для проверки орфографии
-
     this.VersionHistory = null;				// Объект, который отвечает за точку в списке версий
 
     // AutoSave

@@ -31,6 +31,9 @@ function baseEditorsApi(name) {
   // Массив lock-ов, которые были на открытии документа
   this.arrPreOpenLocksObjects = [];
 
+  // Spell Checking
+  this.SpellCheckUrl = '';    // Ссылка сервиса для проверки орфографии
+
   // Результат получения лицензии
   this.licenseResult = null;
   // Подключились ли уже к серверу

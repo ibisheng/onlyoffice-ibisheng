@@ -338,8 +338,6 @@ function asc_docs_api(name)
 	this.SpellCheckApi = (window["AscDesktopEditor"] === undefined) ? new CSpellCheckApi() : new CSpellCheckApi_desktop();
 	this.isSpellCheckEnable = true;
 
-	this.SpellCheckUrl = '';				// Ссылка сервиса для проверки орфографии
-
     // это чтобы сразу показать ридер, без возможности вернуться в редактор/вьюер
     this.isOnlyReaderMode = false;
 	
