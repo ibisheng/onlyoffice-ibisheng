@@ -1837,7 +1837,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
       // Пересылаем всегда, но чистим только если началось совместное редактирование
       // Пересылаем свои изменения
-      this.collaborativeEditing.sendChanges();
+      this.collaborativeEditing.sendChanges(this.IsUserSave);
     } else {
       nState = t.CoAuthoringApi.get_state();
       if (ConnectionState.Close === nState) {
@@ -3470,7 +3470,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
    */
 
   window["AscDesktopEditor_Save"] = function() {
-    return window["Asc"]["editor"].asc_Save();
+    return window["Asc"]["editor"].asc_Save(false);
   };
 
   asc["spreadsheet_api"] = spreadsheet_api;

@@ -121,8 +121,15 @@ function CHistory(workbook)
 	this.HasLoadFonts = false;
 
 	this.SavedIndex = null;			// Номер точки отката, на которой произошло последнее сохранение
-	this.ForceSave  = false;       // Нужно сохранение, случается, когда у нас точка SavedIndex смещается из-за объединения точек, и мы делаем Undo
+  this.ForceSave  = false;       // Нужно сохранение, случается, когда у нас точка SavedIndex смещается из-за объединения точек, и мы делаем Undo
+
+  // Параметры для специального сохранения для локальной версии редактора
+  this.UserSaveMode   = false;
+  this.UserSavedIndex = null;  // Номер точки, на которой произошло последнее сохранение пользователем (не автосохранение)
 }
+CHistory.prototype.Is_UserSaveMode = function() {
+  return this.UserSaveMode;
+};
 CHistory.prototype.Clear = function()
 {
 	this.Index         = -1;
@@ -134,7 +141,8 @@ CHistory.prototype.Clear = function()
 	this.HasLoadFonts = false;
 
 	this.SavedIndex = null;
-	this.ForceSave= false;
+  this.ForceSave= false;
+  this.UserSavedIndex = null;
 
 	this._sendCanUndoRedo();
 };
@@ -739,15 +747,27 @@ CHistory.prototype.Is_On = function()
 {
 	return (0 === this.TurnOffHistory);
 };
-CHistory.prototype.Reset_SavedIndex = function()
-{
-	this.SavedIndex = this.Index;
-	this.ForceSave  = false;
+CHistory.prototype.Reset_SavedIndex = function(IsUserSave) {
+  this.SavedIndex = this.Index;
+  if (this.Is_UserSaveMode()) {
+    if (IsUserSave) {
+      this.UserSavedIndex = this.Index;
+      this.ForceSave  = false;
+    }
+  } else {
+    this.ForceSave  = false;
+  }
 };
-CHistory.prototype.Set_SavedIndex = function(Index)
-{
-	this.SavedIndex = Index;
-	this.ForceSave  = true;
+CHistory.prototype.Set_SavedIndex = function(Index) {
+  this.SavedIndex = Index;
+  if (this.Is_UserSaveMode()) {
+    if (null !== this.UserSavedIndex && this.UserSavedIndex > this.SavedIndex) {
+      this.UserSavedIndex = Index;
+      this.ForceSave = true;
+    }
+  } else {
+    this.ForceSave = true;
+  }
 };
 /** @returns {number|null} */
 CHistory.prototype.Get_DeleteIndex = function () {
@@ -767,15 +787,13 @@ CHistory.prototype.Get_DeleteIndex = function () {
 	return DeleteIndex;
 };
 /** @returns {boolean} */
-CHistory.prototype.Is_Modified = function()
-{
-	if (-1 === this.Index && null === this.SavedIndex && false === this.ForceSave)
-		return false;
+CHistory.prototype.Is_Modified = function(IsUserSave) {
+  var checkIndex = (this.Is_UserSaveMode() && IsUserSave) ? this.UserSavedIndex : this.SavedIndex;
+  if (-1 === this.Index && null === checkIndex && false === this.ForceSave) {
+    return false;
+  }
 
-	if (this.Index != this.SavedIndex || true === this.ForceSave)
-		return true;
-
-	return false;
+  return (this.Index != checkIndex || true === this.ForceSave);
 };
 CHistory.prototype.GetSerializeArray = function()
 {

@@ -218,7 +218,7 @@
 			return true;
 		};
 
-		CCollaborativeEditing.prototype.sendChanges = function () {
+		CCollaborativeEditing.prototype.sendChanges = function (IsUserSave) {
 			if (!this.isCoAuthoringExcellEnable())
 				return;
 
@@ -312,7 +312,7 @@
 					this.m_nUseType = 1;
 			} else {
 				// Обновляем точку последнего сохранения в истории
-				History.Reset_SavedIndex();
+				History.Reset_SavedIndex(IsUserSave);
 			}
 		};
 

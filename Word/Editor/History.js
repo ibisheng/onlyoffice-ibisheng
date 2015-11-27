@@ -632,63 +632,40 @@ CHistory.prototype =
 
     Reset_SavedIndex : function(IsUserSave)
     {
-        if (true === this.Is_UserSaveMode())
-        {
-            this.SavedIndex = this.Index;
-            if (true === IsUserSave)
-            {
-                this.UserSavedIndex = this.Index;
-                this.ForceSave      = false;
-            }
+      this.SavedIndex = this.Index;
+      if (true === this.Is_UserSaveMode()) {
+        if (true === IsUserSave) {
+          this.UserSavedIndex = this.Index;
+          this.ForceSave = false;
         }
-        else
-        {
-            this.SavedIndex = this.Index;
-            this.ForceSave  = false;
-        }
+      } else {
+        this.ForceSave = false;
+      }
     },
 
     Set_SavedIndex : function(Index)
     {
-        if (true === this.Is_UserSaveMode())
-        {
-            this.SavedIndex = Index;
-
-            if (null !== this.UserSavedIndex && this.UserSavedIndex > this.SavedIndex)
-            {
-                this.UserSavedIndex = Index;
-                this.ForceSave      = true;
-            }
+      this.SavedIndex = Index;
+      if (true === this.Is_UserSaveMode()) {
+        if (null !== this.UserSavedIndex && this.UserSavedIndex > this.SavedIndex) {
+          this.UserSavedIndex = Index;
+          this.ForceSave = true;
         }
-        else
-        {
-            this.SavedIndex = Index;
-            this.ForceSave  = true;
-        }
+      } else {
+        this.ForceSave = true;
+      }
     },
 
     Have_Changes : function(IsUserSave)
     {
-        if (true === this.Is_UserSaveMode() && false !== IsUserSave)
-        {
-            if (-1 === this.Index && null === this.UserSavedIndex && false === this.ForceSave)
-                return false;
+      var checkIndex = (this.Is_UserSaveMode() && IsUserSave) ? this.UserSavedIndex : this.SavedIndex;
+      if (-1 === this.Index && null === checkIndex && false === this.ForceSave)
+        return false;
 
-            if (this.Index != this.UserSavedIndex || true === this.ForceSave)
-                return true;
+      if (this.Index != checkIndex || true === this.ForceSave)
+        return true;
 
-            return false;
-        }
-        else
-        {
-            if (-1 === this.Index && null === this.SavedIndex && false === this.ForceSave)
-                return false;
-
-            if (this.Index != this.SavedIndex || true === this.ForceSave)
-                return true;
-
-            return false;
-        }
+      return false;
     },
 
     Get_RecalcData : function()
