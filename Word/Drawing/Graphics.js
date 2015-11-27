@@ -3034,5 +3034,63 @@ CGraphics.prototype =
             this.DrawPresentationComment(type, x, y, w, h);
             this.SetIntegerGrid(false);
         }
+    },
+
+    DrawPolygon : function(oPath, lineWidth, shift)
+    {
+        this.m_oContext.lineWidth = lineWidth;
+        this.m_oContext.beginPath();
+
+        var Points    = oPath.Points;
+
+        var nCount = Points.length;
+        // берем предпоследнюю точку, т.к. последняя совпадает с первой
+        var PrevX = Points[nCount - 2].X, PrevY = Points[nCount - 2].Y;
+        var _x = Points[nCount - 2].X,
+            _y = Points[nCount - 2].Y;
+        var StartX, StartY ;
+
+        for (var nIndex = 0; nIndex < nCount; nIndex++)
+        {
+            if(PrevX > Points[nIndex].X)
+            {
+                _y = Points[nIndex].Y - shift;
+            }
+            else if(PrevX < Points[nIndex].X)
+            {
+                _y  = Points[nIndex].Y + shift;
+            }
+
+            if(PrevY < Points[nIndex].Y)
+            {
+                _x = Points[nIndex].X - shift;
+            }
+            else if(PrevY > Points[nIndex].Y)
+            {
+                _x = Points[nIndex].X + shift;
+            }
+
+            PrevX = Points[nIndex].X;
+            PrevY = Points[nIndex].Y;
+
+            if(nIndex > 0)
+            {
+                if (1 == nIndex)
+                {
+                    StartX = _x;
+                    StartY = _y;
+                    this._m(_x, _y);
+                }
+                else
+                {
+                    this._l(_x, _y);
+                }
+            }
+        }
+
+        this._l(StartX, StartY);
+        this.m_oContext.closePath();
+        this.m_oContext.stroke();
+        this.m_oContext.beginPath();
     }
 };

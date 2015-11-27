@@ -15,7 +15,9 @@ var type_Paragraph = 0x0001;
 
 var UnknownValue  = null;
 
-
+//var REVIEW_COLOR = {r : 255, g : 0, b : 58};
+//var REVIEW_COLOR = {r : 204, g : 51, b : 0};
+var REVIEW_COLOR = {r : 255, g : 0, b : 0};
 
 // Класс Paragraph
 function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFromPresentation)
@@ -1497,7 +1499,7 @@ Paragraph.prototype =
                     var Y_top    = this.Pages[CurPage].Bounds.Top;
                     var Y_bottom = this.Pages[CurPage].Bounds.Bottom;
 
-                    pGraphics.p_color(255, 0, 0, 255);
+                    pGraphics.p_color(REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, 255);
                     pGraphics.drawVerLine(0, X_min, Y_top, Y_bottom, 0);
                 }
             }
@@ -2117,6 +2119,10 @@ Paragraph.prototype =
 
         PDSL.SpellingCounter = this.SpellChecker.Get_DrawingInfo( this.Get_PageStartPos(CurPage) );
 
+        var RunPrReview = null;
+
+        var arrRunReviewAreas = [];
+        var arrRunReviewRects = [];
         for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
         {
             var Line      = this.Lines[CurLine];
@@ -2209,13 +2215,29 @@ Paragraph.prototype =
             }
 
             // Рисуем красный рект вокруг измененных ранов
-            Element = aRunReview.Get_Next();
+            var arrRunReviewRectsLine = [];
+            Element = aRunReview.Get_NextForward();
             while (null !== Element)
             {
-                pGraphics.p_color(Element.r, Element.g, Element.b, 255);
-                pGraphics.AddSmartRect(Element.x0, Page.Y + Line.Top, Element.x1 - Element.x0, Line.Bottom - Line.Top, 0);
-                Element = aRunReview.Get_Next();
+                if (null === RunPrReview || true !== RunPrReview.Is_Equal(Element.Additional.RunPr))
+                {
+                    if (arrRunReviewRectsLine.length > 0 && arrRunReviewRects)
+                    {
+                        arrRunReviewRects.push(arrRunReviewRectsLine);
+                        arrRunReviewRectsLine = [];
+                    }
+                    RunPrReview = Element.Additional.RunPr;
+                    arrRunReviewRects = [];
+                    arrRunReviewAreas.push(arrRunReviewRects);
+
+                }
+
+                arrRunReviewRectsLine.push({X : Element.x0, Y : Page.Y + Line.Y - Line.Metrics.TextAscent, W : Element.x1 - Element.x0, H : Line.Metrics.TextDescent + Line.Metrics.TextAscent + Line.Metrics.LineGap, Page : 0});
+                Element = aRunReview.Get_NextForward();
             }
+
+            if (arrRunReviewRectsLine.length > 0)
+                arrRunReviewRects.push(arrRunReviewRectsLine);
 
             if(this.bFromDocument)
             {
@@ -2243,6 +2265,23 @@ Paragraph.prototype =
             if(pGraphics.End_Command)
             {
                 pGraphics.End_Command()
+            }
+        }
+
+        if (pGraphics.DrawPolygon)
+        {
+            for (var ReviewAreaIndex = 0, ReviewAreasCount = arrRunReviewAreas.length; ReviewAreaIndex < ReviewAreasCount; ++ReviewAreaIndex)
+            {
+                var arrRunReviewRects = arrRunReviewAreas[ReviewAreaIndex];
+                var ReviewPolygon = new CPolygon();
+                ReviewPolygon.fill(arrRunReviewRects);
+                var PolygonPaths = ReviewPolygon.GetPaths(0);
+                pGraphics.p_color(REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, 255);
+                for (var PolygonIndex = 0, PolygonsCount = PolygonPaths.length; PolygonIndex < PolygonsCount; ++PolygonIndex)
+                {
+                    var Path = PolygonPaths[PolygonIndex];
+                    pGraphics.DrawPolygon(Path, 1, 0);
+                }
             }
         }
     },
@@ -13829,23 +13868,7 @@ CParaDrawingRangeLines.prototype =
         {
             var PrevEl = this.Elements[Count - 1];
 
-            if (Math.abs(PrevEl.y0 - Element.y0) < 0.001
-                && Math.abs(PrevEl.y1 - Element.y1) < 0.001
-                && Math.abs(PrevEl.x1 - Element.x0) < 0.001
-                && Math.abs(PrevEl.w - Element.w) < 0.001
-                && PrevEl.r === Element.r
-                && PrevEl.g === Element.g
-                && PrevEl.b === Element.b
-                && (false
-                    || (undefined === PrevEl.Additional
-                        && undefined === Element.Additional)
-                    || (undefined !== PrevEl.Additional
-                        && undefined !== Element.Additional
-                        && (false
-                            || (undefined !== PrevEl.Additional.Active
-                                && PrevEl.Additional.Active === Element.Additional.Active)
-                            || (undefined !== PrevEl.Additional.RunPr
-                                && true === Element.Additional.RunPr.Is_Equal(PrevEl.Additional.RunPr))))))
+            if (this.private_CanUnionElements(PrevEl, Element))
             {
                 Element.x0 = PrevEl.x0;
                 Count--;
@@ -13857,6 +13880,63 @@ CParaDrawingRangeLines.prototype =
         this.Elements.length = Count;
 
         return Element;
+    },
+
+    Get_NextForward : function()
+    {
+        var Count = this.Elements.length;
+        if (Count <= 0)
+            return null;
+
+        var Element = this.Elements[0];
+        var Pos = 1;
+
+        while (Pos < Count)
+        {
+            var NextEl = this.Elements[Pos];
+
+            if (this.private_CanUnionElements(NextEl, Element))
+            {
+                Element.x1 = NextEl.x1;
+                Pos++;
+            }
+            else
+                break;
+        }
+
+        this.Elements.splice(0, Pos);
+        return Element;
+    },
+
+    private_CanUnionElements : function(PrevEl, Element)
+    {
+        if (true
+            && Math.abs(PrevEl.y0 - Element.y0) < 0.001
+            && Math.abs(PrevEl.y1 - Element.y1) < 0.001
+            && Math.abs(PrevEl.x1 - Element.x0) < 0.001
+            && Math.abs(PrevEl.w - Element.w) < 0.001
+            && PrevEl.r === Element.r
+            && PrevEl.g === Element.g
+            && PrevEl.b === Element.b
+            && (false
+                || (true
+                    && undefined === PrevEl.Additional
+                    && undefined === Element.Additional)
+                || (true
+                    && undefined !== PrevEl.Additional
+                    && undefined !== Element.Additional
+                    && (false
+                        || (true
+                            && undefined !== PrevEl.Additional.Active
+                            && PrevEl.Additional.Active === Element.Additional.Active)
+                        || (true
+                            && undefined !== PrevEl.Additional.RunPr
+                            && true === Element.Additional.RunPr.Is_Equal(PrevEl.Additional.RunPr))))))
+        {
+            return true;
+        }
+
+        return false;
     },
 
     Correct_w_ForUnderline : function()

@@ -4201,7 +4201,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
     var ReviewType = this.Get_ReviewType();
     if (reviewtype_Add === ReviewType || reviewtype_Remove === ReviewType)
     {
-        pGraphics.b_color1(255, 0, 0, 255);
+        pGraphics.b_color1(REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, 255);
     }
     else if (CurTextPr.Unifill)
     {
@@ -4286,7 +4286,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
 
                     if (reviewtype_Add === ReviewType || reviewtype_Remove === ReviewType)
                     {
-                        pGraphics.b_color1(255, 0, 0, 255);
+                        pGraphics.b_color1(REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, 255);
                     }
                     else if (RGBA)
                     {
@@ -4333,7 +4333,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
                     if (reviewtype_Common !== ReviewType)
                     {
                         pGraphics.SetTextPr(EndTextPr, PDSE.Theme);
-                        pGraphics.b_color1(255, 0, 0, 255);
+                        pGraphics.b_color1(REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, 255);
                     }
                     else if (EndTextPr.Unifill)
                     {
@@ -4539,14 +4539,14 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
                 if ( para_Drawing != ItemType || drawing_Anchor != Item.DrawingType )
                 {
                     if (true === bRemReview)
-                        aStrikeout.Add(StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, 255, 0, 0);
+                        aStrikeout.Add(StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b);
                     else if (true === CurTextPr.DStrikeout)
                         aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
                     else if ( true === CurTextPr.Strikeout )
                         aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
 
                     if (true === bAddReview)
-                        aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, 255, 0, 0);
+                        aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b);
                     else if (true === CurTextPr.Underline)
                         aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
 
@@ -4564,14 +4564,14 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
                 if ( PDSL.Spaces > 0 )
                 {
                     if (true === bRemReview)
-                        aStrikeout.Add(StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, 255, 0, 0);
+                        aStrikeout.Add(StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b);
                     else if (true === CurTextPr.DStrikeout)
                         aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr  );
                     else if ( true === CurTextPr.Strikeout )
                         aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr  );
 
                     if (true === bAddReview)
-                        aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, 255, 0, 0);
+                        aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b);
                     else if (true === CurTextPr.Underline)
                         aUnderline.Add( UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
 
