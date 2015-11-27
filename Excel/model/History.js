@@ -293,7 +293,7 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 		Point = this.Points[this.Index];
 		CollaborativeEditing.Apply_LinkData();
 		bCoaut = true;
-        if(!window["NATIVE_EDITOR_ENJINE"]) {
+        if(!window["NATIVE_EDITOR_ENJINE"] || window['IS_NATIVE_EDITOR']) {
             this.Get_RecalcData(Point);
             wsViews = Asc["editor"].wb.wsViews;
             for (i = 0; i < wsViews.length; ++i) {
@@ -340,7 +340,7 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 				this.workbook.handlers.trigger("asc_onUpdateTabColor", curSheet.getIndex());
 		}
 
-        if(!window["NATIVE_EDITOR_ENJINE"]) {
+        if(!window["NATIVE_EDITOR_ENJINE"] || window['IS_NATIVE_EDITOR']) {
             this.Get_RecalcData(Point);
             wsViews = Asc["editor"].wb.wsViews;
             for (i = 0; i < wsViews.length; ++i) {

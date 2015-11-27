@@ -19,6 +19,7 @@ window.location.href = "";
 
 window.NATIVE_EDITOR_ENJINE = true;
 window.NATIVE_EDITOR_ENJINE_SYNC_RECALC = true;
+window.IS_NATIVE_EDITOR = true;
 
 var document = {};
 window.document = document;
@@ -3216,7 +3217,7 @@ function OfflineEditor () {
 
         _api.asc_SendThemeColorScheme();
 
-        //this.offline_generateStyle();
+        this.offline_generateStyle();
 
         window["NativeSupportTimeouts"] = true;
 
@@ -3242,6 +3243,8 @@ function OfflineEditor () {
 //        ws.objectRender.drawingArea.init();
 
         // _api.asc_getTextArtPreviews();
+
+        this.offline_afteInit();
     };
     this.registerEventsHandlers = function () {
 
@@ -3910,9 +3913,39 @@ function OfflineEditor () {
         var guiStyles = _api.wb.getCellStyles();
         //bResult = this.handlers.trigger("asc_onInitEditorStyles", guiStyles);
         // this.guiStyles = (false === bResult) ? guiStyles : null;
-    }
+    };
+
+    this.offline_afteInit = function () {
+
+        _api.asc_ApplyColorScheme = function(bRedraw) {
+
+            var wsViews = Asc["editor"].wb.wsViews;
+            for (var i = 0; i < wsViews.length; ++i) {
+                if (wsViews[i] && wsViews[i].objectRender && wsViews[i].objectRender.controller) {
+                    wsViews[i].objectRender.controller.startRecalculate();
+                }
+            }
+
+            //    this.chartPreviewManager.clearPreviews();
+            //    this.textArtPreviewManager.clear();
+
+            // На view-режиме не нужно отправлять стили
+            if (true !== this.asc_getViewerMode() && !this.isMobileVersion) {
+                // Отправка стилей
+                this._sendWorkbookStyles();
+            }
+
+            if (bRedraw) {
+                this.handlers.trigger("asc_onUpdateChartStyles");
+                this.wb.drawWS();
+            }
+        };
+    };
 }
 var _s = new OfflineEditor();
+
+
+
 
 function offline_of() {_s.openFile();}
 function offline_stz(v) {_s.zoom = v; _api.asc_setZoom(v);}

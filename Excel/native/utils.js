@@ -1321,16 +1321,16 @@
             //var th = this.native.GetStyleHeight();
             var sd = this.native.GetDeviceScale();
 
-            this.styleThumbnailWidth	       = 80;//112;
-            this.styleThumbnailHeight	   = 40;//38;
-            this.styleThumbnailWidthPt	   = this.styleThumbnailWidth * 72 / 96;
-            this.styleThumbnailHeightPt	   = this.styleThumbnailHeight * 72 / 96;
+            this.styleThumbnailWidth	       = 80 * (72 / 96);//112;
+            this.styleThumbnailHeight	   = 40 * (72 / 96);//38;
+            this.styleThumbnailWidthPt	   = this.styleThumbnailWidth;// * (72 / 96);
+            this.styleThumbnailHeightPt	   = this.styleThumbnailHeight;// * ( 72 / 96);
 
 			this.styleThumbnailWidthWithRetina	= this.styleThumbnailWidth;
 			this.styleThumbnailHeightWithRetina	= this.styleThumbnailHeight;
 			if (sd > 1) {
-			//	this.styleThumbnailWidthWithRetina <<= 1;
-			//	this.styleThumbnailHeightWithRetina <<= 1;
+				this.styleThumbnailWidthWithRetina <<= 1;
+				this.styleThumbnailHeightWithRetina <<= 1;
 			}
 		}
 
