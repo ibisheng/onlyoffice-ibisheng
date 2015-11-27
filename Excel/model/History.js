@@ -109,10 +109,8 @@ function CHistory(workbook)
 {
 	this.workbook = workbook;
     this.Index    = -1;
-	this.SavePoint = null;
     this.Points   = [];
 	this.CurPoint = null;
-	this.IsModify = null;
     this.TurnOffHistory = 0;
     this.Transaction = 0;
     this.LocalChange = false;//если true все добавленный изменения не пойдут в совместное редактирование.
@@ -123,20 +121,20 @@ function CHistory(workbook)
 	this.HasLoadFonts = false;
 
 	this.SavedIndex = null;			// Номер точки отката, на которой произошло последнее сохранение
+	this.ForceSave  = false;       // Нужно сохранение, случается, когда у нас точка SavedIndex смещается из-за объединения точек, и мы делаем Undo
 }
 CHistory.prototype.Clear = function()
 {
 	this.Index         = -1;
-	this.SavePoint = null;
 	this.Points.length = 0;
 	this.CurPoint = null;
-	this.IsModify = null;
 	this.TurnOffHistory = 0;
 	this.Transaction = 0;
 	this.LoadFonts = {};
 	this.HasLoadFonts = false;
 
 	this.SavedIndex = null;
+	this.ForceSave= false;
 
 	this._sendCanUndoRedo();
 };
@@ -536,7 +534,7 @@ CHistory.prototype.Check_UninonLastPoints = function()
 	};
 
 	if ( this.SavedIndex >= this.Points.length - 2 && null !== this.SavedIndex )
-		this.SavedIndex = this.Points.length - 3;
+		this.Set_SavedIndex(this.Points.length - 3);
 
 	this.Points.splice( this.Points.length - 2, 2, NewPoint );
 	if ( this.Index >= this.Points.length )
@@ -553,7 +551,7 @@ CHistory.prototype.Create_NewPoint = function()
 		return;
 
 	if (null !== this.SavedIndex && this.Index < this.SavedIndex)
-		this.SavedIndex = this.Index;
+		this.Set_SavedIndex(this.Index);
 
 	this._checkCurPoint();
 	var Items = [];
@@ -647,12 +645,7 @@ CHistory.prototype._sendCanUndoRedo = function()
 {
 	this.workbook.handlers.trigger("setCanUndo", this.Can_Undo());
 	this.workbook.handlers.trigger("setCanRedo", this.Can_Redo());
-	var IsModify = this.Is_Modified();
-	if(this.IsModify != IsModify)
-	{
-		this.IsModify = IsModify;
-		this.workbook.handlers.trigger("setDocumentModified", this.IsModify);
-	}
+	this.workbook.handlers.trigger("setDocumentModified", this.Is_Modified());
 };
 CHistory.prototype._checkCurPoint = function()
 {
@@ -746,23 +739,15 @@ CHistory.prototype.Is_On = function()
 {
 	return (0 === this.TurnOffHistory);
 };
-CHistory.prototype.Save = function()
-{
-	this.SavePoint = null;
-	if(null != this.CurPoint && this.CurPoint.Items.length > 0)
-		this.SavePoint = this.CurPoint;
-	else if(this.Index >= 0 && this.Index < this.Points.length)
-		this.SavePoint = this.Points[this.Index];
-	var IsModify = this.Is_Modified();
-	if(this.IsModify != IsModify)
-	{
-		this.IsModify = IsModify;
-		this.workbook.handlers.trigger("setDocumentModified", this.IsModify);
-	}
-};
 CHistory.prototype.Reset_SavedIndex = function()
 {
 	this.SavedIndex = this.Index;
+	this.ForceSave  = false;
+};
+CHistory.prototype.Set_SavedIndex = function(Index)
+{
+	this.SavedIndex = Index;
+	this.ForceSave  = true;
 };
 /** @returns {number|null} */
 CHistory.prototype.Get_DeleteIndex = function () {
@@ -784,22 +769,12 @@ CHistory.prototype.Get_DeleteIndex = function () {
 /** @returns {boolean} */
 CHistory.prototype.Is_Modified = function()
 {
-	if(null != this.CurPoint && this.CurPoint.Items.length > 0)
-	{
-		if(null != this.SavePoint)
-			return this.CurPoint != this.SavePoint;
-		else
-			return true;
-	}
-	else if(this.Index >= 0 && this.Index < this.Points.length)
-	{
-		if(null != this.SavePoint)
-			return this.Points[this.Index] != this.SavePoint;
-		else
-			return true;
-	}
-	else if(null != this.SavePoint)
+	if (-1 === this.Index && null === this.SavedIndex && false === this.ForceSave)
+		return false;
+
+	if (this.Index != this.SavedIndex || true === this.ForceSave)
 		return true;
+
 	return false;
 };
 CHistory.prototype.GetSerializeArray = function()

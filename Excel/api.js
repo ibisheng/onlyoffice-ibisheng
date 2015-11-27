@@ -1814,9 +1814,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       // Принимаем чужие изменения
       this.collaborativeEditing.applyChanges();
 
-      // Cбросим флаги модификации
-      History.Save();
-
       this.CoAuthoringApi.onUnSaveLock = function() {
         t.CoAuthoringApi.onUnSaveLock = null;
 
