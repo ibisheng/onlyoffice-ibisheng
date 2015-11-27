@@ -40,6 +40,7 @@ function baseEditorsApi(name) {
   this.isOnFirstConnectEnd = false;
 
   this.canSave = true;        // Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
+  this.IsUserSave = false;    // Флаг, контролирующий сохранение было сделано пользователем или нет (по умолчанию - нет)
 
   // Version History
   this.VersionHistory = null;				// Объект, который отвечает за точку в списке версий

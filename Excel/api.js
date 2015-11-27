@@ -84,7 +84,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     this.autoSaveGapSlow = 10 * 60 * 1000;	// Интервал медленного автосохранения (когда совместно) - 10 минут
 
     this.autoSaveGap = 0;					// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
-    this.isAutoSave = false;				// Флаг, означает что запущено автосохранение
 
     this.waitSave = false;					// Отложенное сохранение, происходит во время долгих операций
 
@@ -518,8 +517,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       return;
     }
 
-    this.isAutoSave = !!isAutoSave;
-    if (!this.isAutoSave) {
+    this.IsUserSave = !isAutoSave;
+    if (this.IsUserSave) {
       this.asc_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
     }
     /* Нужно закрыть редактор (до выставления флага canSave, т.к. мы должны успеть отправить
@@ -1807,23 +1806,20 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
         // Нужно снять lock с сохранения
         this.CoAuthoringApi.onUnSaveLock = function() {
           t.canSave = true;
-          t.isAutoSave = false;
+          t.IsUserSave = false;
           t.lastSaveTime = null;
         };
         this.CoAuthoringApi.unSaveLock();
         return;
       }
 
-      if (this.isAutoSave) {
+      if (!this.IsUserSave) {
         this.asc_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
       }
 
       CollaborativeEditing.Clear_CollaborativeMarks();
       // Принимаем чужие изменения
       this.collaborativeEditing.applyChanges();
-
-      // Сохраняем файл на сервер
-      //this._asc_save();
 
       // Cбросим флаги модификации
       History.Save();
@@ -1837,7 +1833,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
         }
 
         t.canSave = true;
-        t.isAutoSave = false;
+        t.IsUserSave = false;
         t.lastSaveTime = null;
 
         t.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
@@ -1856,15 +1852,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       nState = t.CoAuthoringApi.get_state();
       if (ConnectionState.Close === nState) {
         // Отключаемся от сохранения, соединение потеряно
-        if (!this.isAutoSave) {
+        if (this.IsUserSave) {
           this.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
         }
-        this.isAutoSave = false;
+        this.IsUserSave = false;
         this.canSave = true;
       } else {
         // Если автосохранение, то не будем ждать ответа, а просто перезапустим таймер на немного
-        if (this.isAutoSave) {
-          this.isAutoSave = false;
+        if (!this.IsUserSave) {
           this.canSave = true;
           return;
         }

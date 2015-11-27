@@ -131,10 +131,7 @@ function asc_docs_api(name)
 	this.LongActionCallbacksParams = [];
 
 	this.fCurCallback = null;
-	
-	// Флаг, контролирующий сохранение было сделано пользователем или нет (по умолчанию - нет)
-    this.IsUserSave = false;
-	
+
 	var oThis = this;
 	// init OnMessage
 	InitOnMessage(function (error, url) {
@@ -1380,68 +1377,65 @@ asc_docs_api.prototype.Share = function(){
 
 
 function OnSave_Callback(e) {
-	if (false == e["saveLock"]) {
-		if (editor.asc_IsLongAction()) {
-			// Мы не можем в этот момент сохранять, т.к. попали в ситуацию, когда мы залочили сохранение и успели нажать вставку до ответа
-			// Нужно снять lock с сохранения
-			editor.CoAuthoringApi.onUnSaveLock = function () {
-				editor.canSave = true;
-			};
-			editor.CoAuthoringApi.unSaveLock();
-			return;
-		}
-		editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+  if (false == e["saveLock"]) {
+    if (editor.asc_IsLongAction()) {
+      // Мы не можем в этот момент сохранять, т.к. попали в ситуацию, когда мы залочили сохранение и успели нажать вставку до ответа
+      // Нужно снять lock с сохранения
+      editor.CoAuthoringApi.onUnSaveLock = function() {
+        editor.canSave = true;
+      };
+      editor.CoAuthoringApi.unSaveLock();
+      return;
+    }
+    editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
-		if (c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType)
-			CollaborativeEditing.Clear_CollaborativeMarks();
+    if (c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType) {
+      CollaborativeEditing.Clear_CollaborativeMarks();
+    }
 
-		// Принимаем чужие изменения
-		CollaborativeEditing.Apply_Changes();
+    // Принимаем чужие изменения
+    CollaborativeEditing.Apply_Changes();
 
-		editor.CoAuthoringApi.onUnSaveLock = function () {
-			editor.CoAuthoringApi.onUnSaveLock = null;
+    editor.CoAuthoringApi.onUnSaveLock = function() {
+      editor.CoAuthoringApi.onUnSaveLock = null;
 
-			// Выставляем, что документ не модифицирован
-			editor.SetUnchangedDocument();
-			editor.canSave = true;
-			editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+      // Выставляем, что документ не модифицирован
+      editor.SetUnchangedDocument();
+      editor.canSave = true;
+      editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
-			// Обновляем состояние возможности сохранения документа
-			editor._onUpdateDocumentCanSave();
+      // Обновляем состояние возможности сохранения документа
+      editor._onUpdateDocumentCanSave();
 
-			if (undefined !== window["AscDesktopEditor"])
-            {
-                window["AscDesktopEditor"]["OnSave"]();
-            }
-		};
+      if (undefined !== window["AscDesktopEditor"]) {
+        window["AscDesktopEditor"]["OnSave"]();
+      }
+    };
 
-		// Пересылаем свои изменения
-		CollaborativeEditing.Send_Changes(editor.IsUserSave);
-		editor.IsUserSave = false;
-	} else {
-		var nState = editor.CoAuthoringApi.get_state();
-		if (ConnectionState.Close === nState) {
-			// Отключаемся от сохранения, соединение потеряно
-			editor.canSave = true;
-		} else {
-            var TimeoutInterval = (true === CollaborativeEditing.Is_Fast() ? 1 : 1000);
-			setTimeout(function () {
-				editor.CoAuthoringApi.askSaveChanges(OnSave_Callback);
-			}, TimeoutInterval);
-		}
-	}
+    // Пересылаем свои изменения
+    CollaborativeEditing.Send_Changes(editor.IsUserSave);
+    editor.IsUserSave = false;
+  } else {
+    var nState = editor.CoAuthoringApi.get_state();
+    if (ConnectionState.Close === nState) {
+      // Отключаемся от сохранения, соединение потеряно
+      editor.IsUserSave = false;
+      editor.canSave = true;
+    } else {
+      var TimeoutInterval = (true === CollaborativeEditing.Is_Fast() ? 1 : 1000);
+      setTimeout(function() {
+        editor.CoAuthoringApi.askSaveChanges(OnSave_Callback);
+      }, TimeoutInterval);
+    }
+  }
 }
 
-asc_docs_api.prototype.asc_Save = function (isNoUserSave) 
-{
-	if (true !== isNoUserSave)
-        this.IsUserSave = true;
-	
-    if (!this.asc_IsLongAction() && true === this.canSave)
-    {
-        this.canSave = false;
-        this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
-    }
+asc_docs_api.prototype.asc_Save = function(isAutoSave) {
+  this.IsUserSave = !isAutoSave;
+  if (true === this.canSave && !this.asc_IsLongAction()) {
+    this.canSave = false;
+    this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
+  }
 };
 asc_docs_api.prototype.processSavedFile = function(url, downloadType){
 	if(downloadType)
