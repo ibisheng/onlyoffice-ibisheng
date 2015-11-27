@@ -8432,6 +8432,8 @@ CTextPr.prototype =
         if (this.Vanish !== PrChange.Vanish)
             TextPr.Vanish = this.Vanish;
 
+        // TODO: Shd
+
         return TextPr;
     },
 
@@ -8522,6 +8524,96 @@ CTextPr.prototype =
         return Description;
     }
 };
+CTextPr.prototype.Get_Bold = function()
+{
+    return this.Bold;
+};
+CTextPr.prototype.Get_Italic = function()
+{
+    return this.Italic;
+};
+CTextPr.prototype.Get_Strikeout = function()
+{
+    return this.Strikeout;
+};
+CTextPr.prototype.Get_Underline = function()
+{
+    return this.Underline;
+};
+CTextPr.prototype.Get_Color = function()
+{
+    return this.Color;
+};
+CTextPr.prototype.Get_VertAlign = function()
+{
+    return this.VertAlign;
+};
+CTextPr.prototype.Get_Highlight = function()
+{
+    return this.HighLight;
+};
+CTextPr.prototype.Get_Spacing = function()
+{
+    return this.Spacing;
+};
+CTextPr.prototype.Get_DStrikeout = function()
+{
+    return this.DStrikeout;
+};
+CTextPr.prototype.Get_Caps = function()
+{
+    return this.Caps;
+};
+CTextPr.prototype.Get_SmallCaps = function()
+{
+    return this.SmallCaps;
+};
+CTextPr.prototype.Get_Position = function()
+{
+    return this.Position;
+};
+CTextPr.prototype.Get_FontFamily = function()
+{
+    if (this.RFonts && this.RFonts.Ascii && this.RFonts.Ascii.Name)
+        return this.RFonts.Ascii.Name;
+
+    return undefined;
+};
+CTextPr.prototype.Get_FontSize = function()
+{
+    return this.FontSize;
+};
+CTextPr.prototype.Get_Lang = function()
+{
+    if (this.Lang)
+        return this.Lang.Val;
+
+    return undefined;
+};
+CTextPr.prototype.Get_Shd = function()
+{
+    return this.Shd;
+};
+//----------------------------------------------------------------------------------------------------------------------
+// CTextPr Export
+//----------------------------------------------------------------------------------------------------------------------
+CTextPr.prototype['Get_Bold']       = CTextPr.prototype.Get_Bold;
+CTextPr.prototype['Get_Italic']     = CTextPr.prototype.Get_Italic;
+CTextPr.prototype['Get_Strikeout']  = CTextPr.prototype.Get_Strikeout;
+CTextPr.prototype['Get_Underline']  = CTextPr.prototype.Get_Underline;
+CTextPr.prototype['Get_Color']      = CTextPr.prototype.Get_Color;
+CTextPr.prototype['Get_VertAlign']  = CTextPr.prototype.Get_VertAlign;
+CTextPr.prototype['Get_Highlight']  = CTextPr.prototype.Get_Highlight;
+CTextPr.prototype['Get_Spacing']    = CTextPr.prototype.Get_Spacing;
+CTextPr.prototype['Get_DStrikeout'] = CTextPr.prototype.Get_DStrikeout;
+CTextPr.prototype['Get_Caps']       = CTextPr.prototype.Get_Caps;
+CTextPr.prototype['Get_SmallCaps']  = CTextPr.prototype.Get_SmallCaps;
+CTextPr.prototype['Get_Position']   = CTextPr.prototype.Get_Position;
+CTextPr.prototype['Get_FontFamily'] = CTextPr.prototype.Get_FontFamily;
+CTextPr.prototype['Get_FontSize']   = CTextPr.prototype.Get_FontSize;
+CTextPr.prototype['Get_Lang']       = CTextPr.prototype.Get_Lang;
+CTextPr.prototype['Get_Shd']        = CTextPr.prototype.Get_Shd;
+//----------------------------------------------------------------------------------------------------------------------
 
 function CParaTab(Value, Pos)
 {
@@ -8805,6 +8897,21 @@ CParaInd.prototype =
             this.FirstLine = Reader.GetDouble();
     }
 };
+CParaInd.prototype.Get_Diff = function(Ind)
+{
+    var DiffInd = new CParaInd();
+
+    if (this.Left !== Ind.Left)
+        DiffInd.Left = this.Left;
+
+    if (this.Left !== Ind.Right)
+        DiffInd.Right = this.Right;
+
+    if (this.FirstLine !== Ind.FirstLine)
+        DiffInd.FirstLine = this.FirstLine;
+
+    return DiffInd;
+};
 
 function CParaSpacing()
 {
@@ -8944,6 +9051,30 @@ CParaSpacing.prototype =
         if ( Flags & 32 )
             this.BeforeAutoSpacing = Reader.GetBool();
     }
+};
+CParaSpacing.prototype.Get_Diff = function(Spacing)
+{
+    var DiffSpacing = new CParaSpacing();
+
+    if (this.Line !== Spacing.Line)
+        DiffSpacing.Line = this.Line;
+
+    if (this.LineRule !== Spacing.LineRule)
+        DiffSpacing.LineRule = this.LineRule;
+
+    if (this.Before !== Spacing.Before)
+        DiffSpacing.Before = this.Before;
+
+    if (this.BeforeAutoSpacing !== Spacing.BeforeAutoSpacing)
+        DiffSpacing.BeforeAutoSpacing = this.BeforeAutoSpacing;
+
+    if (this.After !== Spacing.After)
+        DiffSpacing.After = this.After;
+
+    if (this.AfterAutoSpacing !== Spacing.AfterAutoSpacing)
+        DiffSpacing.AfterAutoSpacing = this.AfterAutoSpacing;
+
+    return DiffSpacing;
 };
 
 function CNumPr()
@@ -10141,6 +10272,145 @@ CParaPr.prototype =
         delete this.ReviewInfo;
     }
 };
+CParaPr.prototype.Get_DiffPrChange = function()
+{
+    var ParaPr = new CParaPr();
+
+    if (false === this.Have_PrChange())
+        return ParaPr;
+
+    var PrChange = this.PrChange;
+
+    if (this.ContextualSpacing !== PrChange.ContextualSpacing)
+        ParaPr.ContextualSpacing = this.ContextualSpacing;
+
+    ParaPr.Ind = this.Ind.Get_Diff(PrChange.Ind);
+
+    if (this.Jc !== PrChange.Jc)
+        ParaPr.Jc = this.Jc;
+
+    if (this.KeepLines !== PrChange.KeepLines)
+        ParaPr.KeepLines = this.KeepLines;
+
+    if (this.KeepNext !== PrChange.KeepNext)
+        ParaPr.KeepNext = this.KeepNext;
+
+    if (this.PageBreakBefore !== PrChange.PageBreakBefore)
+        ParaPr.PageBreakBefore = this.PageBreakBefore;
+
+    ParaPr.Spacing = this.Spacing.Get_Diff(PrChange.Spacing);
+
+    // TODO: Shd
+    // TODO: Brd
+
+    if (this.WidowControl !== PrChange.WidowControl)
+        ParaPr.WidowControl = this.WidowControl;
+
+    if (this.Tabs !== PrChange.Tabs)
+        ParaPr.Tabs = this.Tabs;
+
+    if (this.NumPr !== PrChange.NumPr)
+        ParaPr.NumPr = this.NumPr;
+
+    if (this.PStyle !== PrChange.PStyle)
+        ParaPr.PStyle = this.PStyle;
+
+    return ParaPr;
+};
+CParaPr.prototype.Get_ContextualSpacing = function()
+{
+    return this.ContextualSpacing;
+};
+CParaPr.prototype.Get_IndLeft = function()
+{
+    return this.Ind.Left;
+};
+CParaPr.prototype.Get_IndRight = function()
+{
+    return this.Ind.Right;
+};
+CParaPr.prototype.Get_IndFirstLine = function()
+{
+    return this.Ind.FirstLine;
+};
+CParaPr.prototype.Get_Jc = function()
+{
+    return this.Jc;
+};
+CParaPr.prototype.Get_KeepLines = function()
+{
+    return this.KeepLines;
+};
+CParaPr.prototype.Get_KeepNext = function()
+{
+    return this.KeepNext;
+};
+CParaPr.prototype.Get_PageBreakBefore = function()
+{
+    return this.PageBreakBefore;
+};
+CParaPr.prototype.Get_SpacingLine = function()
+{
+    return this.Spacing.Line;
+};
+CParaPr.prototype.Get_SpacingLineRule = function()
+{
+    return this.Spacing.LineRule;
+};
+CParaPr.prototype.Get_SpacingBefore = function()
+{
+    return this.Spacing.Before;
+};
+CParaPr.prototype.Get_SpacingBeforeAutoSpacing = function()
+{
+    return this.Spacing.BeforeAutoSpacing;
+};
+CParaPr.prototype.Get_SpacingAfter = function()
+{
+    return this.Spacing.After;
+};
+CParaPr.prototype.Get_SpacingAfterAutoSpacing = function()
+{
+    return this.Spacing.AfterAutoSpacing;
+};
+CParaPr.prototype.Get_WidowControl = function()
+{
+    return this.WidowControl;
+};
+CParaPr.prototype.Get_Tabs = function()
+{
+    return this.Tabs;
+};
+CParaPr.prototype.Get_NumPr = function()
+{
+    return this.NumPr;
+};
+CParaPr.prototype.Get_PStyle = function()
+{
+    return this.PStyle;
+};
+//----------------------------------------------------------------------------------------------------------------------
+// CParaPr Export
+//----------------------------------------------------------------------------------------------------------------------
+CParaPr.prototype['Get_ContextualSpacing']        = CParaPr.prototype.Get_ContextualSpacing;
+CParaPr.prototype['Get_IndLeft']                  = CParaPr.prototype.Get_IndLeft;
+CParaPr.prototype['Get_IndRight']                 = CParaPr.prototype.Get_IndRight;
+CParaPr.prototype['Get_IndFirstLine']             = CParaPr.prototype.Get_IndFirstLine;
+CParaPr.prototype['Get_Jc']                       = CParaPr.prototype.Get_Jc;
+CParaPr.prototype['Get_KeepLines']                = CParaPr.prototype.Get_KeepLines;
+CParaPr.prototype['Get_KeepNext']                 = CParaPr.prototype.Get_KeepNext;
+CParaPr.prototype['Get_PageBreakBefore']          = CParaPr.prototype.Get_PageBreakBefore;
+CParaPr.prototype['Get_SpacingLine']              = CParaPr.prototype.Get_SpacingLine;
+CParaPr.prototype['Get_SpacingLineRule']          = CParaPr.prototype.Get_SpacingLineRule;
+CParaPr.prototype['Get_SpacingBefore']            = CParaPr.prototype.Get_SpacingBefore;
+CParaPr.prototype['Get_SpacingBeforeAutoSpacing'] = CParaPr.prototype.Get_SpacingBeforeAutoSpacing;
+CParaPr.prototype['Get_SpacingAfter']             = CParaPr.prototype.Get_SpacingAfter;
+CParaPr.prototype['Get_SpacingAfterAutoSpacing']  = CParaPr.prototype.Get_SpacingAfterAutoSpacing;
+CParaPr.prototype['Get_WidowControl']             = CParaPr.prototype.Get_WidowControl;
+CParaPr.prototype['Get_Tabs']                     = CParaPr.prototype.Get_Tabs;
+CParaPr.prototype['Get_NumPr']                    = CParaPr.prototype.Get_NumPr;
+CParaPr.prototype['Get_PStyle']                   = CParaPr.prototype.Get_PStyle;
+//----------------------------------------------------------------------------------------------------------------------
 
 function Copy_Bounds(Bounds)
 {

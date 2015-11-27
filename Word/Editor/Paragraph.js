@@ -13255,7 +13255,7 @@ Paragraph.prototype.Check_RevisionsChanges = function(RevisionsManager)
         Change.put_StartPos(StartPos);
         Change.put_EndPos(EndPos);
         Change.put_Type(c_oAscRevisionsChangeType.ParaPr);
-        Change.put_Value("Change paragraph properties.");
+        Change.put_Value(this.Pr.Get_DiffPrChange());
         Change.put_UserId(this.Pr.ReviewInfo.Get_UserId());
         Change.put_UserName(this.Pr.ReviewInfo.Get_UserName());
         Change.put_DateTime(this.Pr.ReviewInfo.Get_DateTime());
@@ -13288,7 +13288,6 @@ Paragraph.prototype.Check_RevisionsChanges = function(RevisionsManager)
         Change.put_StartPos(StartPos);
         Change.put_EndPos(EndPos);
         Change.put_Type(c_oAscRevisionsChangeType.ParaAdd);
-        Change.put_Value("Add paragraph.");
         Change.put_UserId(ReviewInfo.Get_UserId());
         Change.put_UserName(ReviewInfo.Get_UserName());
         Change.put_DateTime(ReviewInfo.Get_DateTime());
@@ -13299,13 +13298,11 @@ Paragraph.prototype.Check_RevisionsChanges = function(RevisionsManager)
         StartPos = this.Get_EndPos(false);
         EndPos   = this.Get_EndPos(true);
 
-
         Change = new CRevisionsChange();
         Change.put_Paragraph(this);
         Change.put_StartPos(StartPos);
         Change.put_EndPos(EndPos);
         Change.put_Type(c_oAscRevisionsChangeType.ParaRem);
-        Change.put_Value("Delete paragraph.");
         Change.put_UserId(ReviewInfo.Get_UserId());
         Change.put_UserName(ReviewInfo.Get_UserName());
         Change.put_DateTime(ReviewInfo.Get_DateTime());
@@ -14799,10 +14796,7 @@ CParagraphRevisionsChangesChecker.prototype.Flush_TextPrChange = function()
     {
         var Change = new CRevisionsChange();
         Change.put_Type(c_oAscRevisionsChangeType.TextPr);
-
-        // TODO: Доделать put_Value
-        Change.put_Value(TextPr.Pr.Get_Description());
-
+        Change.put_Value(TextPr.Pr.Get_DiffPrChange());
         Change.put_Paragraph(this.Paragraph);
         Change.put_StartPos(TextPr.StartPos);
         Change.put_EndPos(TextPr.EndPos);
