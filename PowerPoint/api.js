@@ -1383,6 +1383,7 @@ function OnSave_Callback(e) {
       // Нужно снять lock с сохранения
       editor.CoAuthoringApi.onUnSaveLock = function() {
         editor.canSave = true;
+        editor.IsUserSave = false;
       };
       editor.CoAuthoringApi.unSaveLock();
       return;
@@ -1402,6 +1403,7 @@ function OnSave_Callback(e) {
       // Выставляем, что документ не модифицирован
       editor.SetUnchangedDocument();
       editor.canSave = true;
+      editor.IsUserSave = false;
       editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
       // Обновляем состояние возможности сохранения документа
@@ -1414,13 +1416,12 @@ function OnSave_Callback(e) {
 
     // Пересылаем свои изменения
     CollaborativeEditing.Send_Changes(editor.IsUserSave);
-    editor.IsUserSave = false;
   } else {
     var nState = editor.CoAuthoringApi.get_state();
     if (ConnectionState.Close === nState) {
       // Отключаемся от сохранения, соединение потеряно
-      editor.IsUserSave = false;
       editor.canSave = true;
+      editor.IsUserSave = false;
     } else {
       var TimeoutInterval = (true === CollaborativeEditing.Is_Fast() ? 1 : 1000);
       setTimeout(function() {
