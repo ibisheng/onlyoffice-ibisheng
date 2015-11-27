@@ -2723,8 +2723,72 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   };
 
   spreadsheet_api.prototype.asc_setGraphicObjectProps = function(props) {
+
     var ws = this.wb.getWorksheet();
-    return ws.objectRender.setGraphicObjectProps(props);
+    var fReplaceCallback = null, sImageUrl = null;
+    if(!isNullOrEmptyString(props.ImageUrl)){
+      if(!g_oDocumentUrls.getImageLocal(props.ImageUrl)){
+        sImageUrl = props.ImageUrl;
+        fReplaceCallback = function(sLocalUrl){
+          props.ImageUrl = sLocalUrl;
+        }
+      }
+    }
+    else if(props.ShapeProperties && props.ShapeProperties.fill && props.ShapeProperties.fill.fill &&
+    !isNullOrEmptyString(props.ShapeProperties.fill.fill.url)){
+      if(!g_oDocumentUrls.getImageLocal(props.ShapeProperties.fill.fill.url)){
+        sImageUrl = props.ShapeProperties.fill.fill.url;
+        fReplaceCallback = function(sLocalUrl){
+          props.ShapeProperties.fill.fill.url = sLocalUrl;
+        }
+      }
+    }
+    if(fReplaceCallback){
+      var rData = {
+        "id": this.documentId,
+        "userid": this.documentUserId,
+        "vkey": this.documentVKey,
+        "c": "imgurl",
+        "saveindex": g_oDocumentUrls.getMaxIndex(),
+        "data": sImageUrl};
+
+      var t = this;
+      this.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+      this.fCurCallback = function(input) {
+        if (null != input && "imgurl" == input["type"]) {
+          if ("ok" == input["status"]) {
+            var data = input["data"];
+            var urls = {};
+            var firstUrl;
+            for (var i = 0; i < data.length; ++i) {
+              var elem = data[i];
+              if (elem.url) {
+                if (!firstUrl) {
+                  firstUrl = elem.url;
+                }
+                urls[elem.path] = elem.url;
+              }
+            }
+            g_oDocumentUrls.addUrls(urls);
+            if (firstUrl) {
+              fReplaceCallback(firstUrl);
+              ws.objectRender.setGraphicObjectProps(props);
+            } else {
+              t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+            }
+          } else {
+            t.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+          }
+        } else {
+          t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+        }
+        t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+      };
+      sendCommand2(this, null, rData);
+    }
+    else{
+      ws.objectRender.setGraphicObjectProps(props);
+    }
   };
 
   spreadsheet_api.prototype.asc_getOriginalImageSize = function() {

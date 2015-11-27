@@ -2038,45 +2038,94 @@ asc_docs_api.prototype.ShapeApply = function(prop)
             bShapeTexture = false;
         }
     }
-    if (image_url != "")
-    {
-        var _image = this.ImageLoader.LoadImage(image_url, 1);
-
-        var srcLocal = g_oDocumentUrls.getImageLocal(image_url);
-        if (srcLocal) {
+    if (!isNullOrEmptyString(image_url)){
+        var sImageUrl = null;
+        if(!g_oDocumentUrls.getImageLocal(image_url)){
+          sImageUrl = image_url;
+        }
+      var oApi = this;
+        var fApplyCallback = function(){
+          var _image = oApi.ImageLoader.LoadImage(image_url, 1);
+          var srcLocal = g_oDocumentUrls.getImageLocal(image_url);
+          if (srcLocal) {
             image_url = srcLocal;
-        }
-        if(bShapeTexture)
-        {
+          }
+          if(bShapeTexture)
+          {
             prop.fill.fill.asc_putUrl(image_url); // erase documentUrl
-        }
-        else
-        {
+          }
+          else
+          {
             oFill.fill.asc_putUrl(image_url);
-        }
-        if (null != _image)
-        {
-            this.WordControl.m_oLogicDocument.ShapeApply(prop);
+          }
+          if (null != _image)
+          {
+            oApi.WordControl.m_oLogicDocument.ShapeApply(prop);
             if(bShapeTexture)
             {
-                this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(image_url);
+              oApi.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(image_url);
             }
             else
             {
-                this.WordControl.m_oDrawingDocument.DrawImageTextureFillTextArt(image_url);
+              oApi.WordControl.m_oDrawingDocument.DrawImageTextureFillTextArt(image_url);
             }
-        }
-        else
-        {
-            this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+          }
+          else
+          {
+            oApi.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
             var oProp = prop;
-            this.asyncImageEndLoaded2 = function(_image)
+            oApi.asyncImageEndLoaded2 = function(_image)
             {
-                this.WordControl.m_oLogicDocument.ShapeApply(oProp);
-                this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(image_url);
-                this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
-                this.asyncImageEndLoaded2 = null;
+              oApi.WordControl.m_oLogicDocument.ShapeApply(oProp);
+              oApi.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(image_url);
+              oApi.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+              oApi.asyncImageEndLoaded2 = null;
             }
+          }
+        };
+        if(!sImageUrl){
+          fApplyCallback();
+        }
+        else{
+          this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+          this.fCurCallback = function(input) {
+            if(null != input && "imgurl" == input["type"]){
+              if("ok" ==input["status"]) {
+                var data = input["data"];
+                var urls = {};
+                var firstUrl;
+                for(var i = 0; i < data.length; ++i){
+                  var elem = data[i];
+                  if(elem.url){
+                    if(!firstUrl){
+                      firstUrl = elem.url;
+                    }
+                    urls[elem.path] = elem.url;
+                  }
+                }
+                g_oDocumentUrls.addUrls(urls);
+                if(firstUrl) {
+                  image_url = firstUrl;
+                  fApplyCallback();
+                } else {
+                  oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+                }
+              } else {
+                oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+              }
+            } else {
+              oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+            }
+            oApi.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+          };
+          var rData = {
+            "id":documentId,
+            "userid": documentUserId,
+            "vkey": documentVKey,
+            "c":"imgurl",
+            "saveindex": g_oDocumentUrls.getMaxIndex(),
+            "data": sImageUrl};
+          sendCommand2(this, null, rData );
         }
     }
     else
@@ -3096,29 +3145,75 @@ asc_docs_api.prototype.ImgApply = function(obj){
 	
 	ImagePr.ImageUrl = obj.ImageUrl;
 
-	if(ImagePr.ImageUrl != undefined && ImagePr.ImageUrl != null && ImagePr.ImageUrl != "")
-    {
-		var _img = this.ImageLoader.LoadImage(ImagePr.ImageUrl, 1);
 
-		var srcLocal = g_oDocumentUrls.getImageLocal(ImagePr.ImageUrl);
-		if (srcLocal){
-			ImagePr.ImageUrl = srcLocal;
-		}
+	if(!isNullOrEmptyString(ImagePr.ImageUrl)){
+      var sImageUrl = null;
+      if(!g_oDocumentUrls.getImageLocal(ImagePr.ImageUrl)){
+        sImageUrl = ImagePr.ImageUrl;
+      }
 
-		if (null != _img)
-        {
-			//ImagePr.ImageUrl = _img.src;
-			this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
-		}
-		else
-        {
-			this.asyncImageEndLoaded2 = function(_image)
-            {
-				//ImagePr.ImageUrl = _image.src;
-				this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
-                this.asyncImageEndLoaded2 = null;
-			}
-		}
+      var oApi = this;
+      var fApplyCallback = function(){
+        var _img = oApi.ImageLoader.LoadImage(ImagePr.ImageUrl, 1);
+        var srcLocal = g_oDocumentUrls.getImageLocal(ImagePr.ImageUrl);
+        if (srcLocal){
+          ImagePr.ImageUrl = srcLocal;
+        }
+        if (null != _img){
+          oApi.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+        }
+        else{
+            oApi.asyncImageEndLoaded2 = function(_image){
+              oApi.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+              oApi.asyncImageEndLoaded2 = null;
+          }
+        }
+      };
+      if(!sImageUrl){
+        fApplyCallback();
+      }
+      else{
+        this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+        this.fCurCallback = function(input) {
+          if(null != input && "imgurl" == input["type"]){
+            if("ok" ==input["status"]) {
+              var data = input["data"];
+              var urls = {};
+              var firstUrl;
+              for(var i = 0; i < data.length; ++i){
+                var elem = data[i];
+                if(elem.url){
+                  if(!firstUrl){
+                    firstUrl = elem.url;
+                  }
+                  urls[elem.path] = elem.url;
+                }
+              }
+              g_oDocumentUrls.addUrls(urls);
+              if(firstUrl) {
+                ImagePr.ImageUrl = firstUrl;
+                fApplyCallback();
+              } else {
+                oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+              }
+            } else {
+              oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+            }
+          } else {
+            oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+          }
+          oApi.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+        };
+
+        var rData = {
+          "id":documentId,
+          "userid": documentUserId,
+          "vkey": documentVKey,
+          "c":"imgurl",
+          "saveindex": g_oDocumentUrls.getMaxIndex(),
+          "data": sImageUrl};
+        sendCommand2(this, null, rData );
+      }
 	}
 	else
     {

@@ -4767,43 +4767,95 @@ asc_docs_api.prototype.ImgApply = function(obj)
         if (ImagePr.ShapeProperties)
             ImagePr.ImageUrl = "";
 
-        if(ImagePr.ImageUrl != undefined && ImagePr.ImageUrl != null && ImagePr.ImageUrl != "")
-        {
-            var _img = this.ImageLoader.LoadImage(ImagePr.ImageUrl, 1);
-            if (null != _img)
-            {
-                ImagePr.ImageUrl = _img.src;
-                this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_ApplyImagePrWithUrl);
-                this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
-            }
-            else
-            {
-                this.asyncImageEndLoaded2 = function(_image)
-                {
-                    ImagePr.ImageUrl = _image.src;
-                    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_ApplyImagePrWithUrlLong);
-                    this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+
+        var sImageUrl = null, fReplaceCallback = null, bImageUrl = false, sImageToDownLoad = "";
+        if(!isNullOrEmptyString(ImagePr.ImageUrl)){
+            if(!g_oDocumentUrls.getImageLocal(ImagePr.ImageUrl)){
+                sImageUrl = ImagePr.ImageUrl;
+                fReplaceCallback = function(sUrl){
+                    ImagePr.ImageUrl = sUrl;
+                    sImageToDownLoad = sUrl;
                 }
             }
+            sImageToDownLoad = ImagePr.ImageUrl;
         }
-        else if (ImagePr.ShapeProperties && ImagePr.ShapeProperties.fill && ImagePr.ShapeProperties.fill.fill &&
-            ImagePr.ShapeProperties.fill.fill.url !== undefined && ImagePr.ShapeProperties.fill.fill.url != null && ImagePr.ShapeProperties.fill.fill.url != "")
-        {
-            var _img = this.ImageLoader.LoadImage(ImagePr.ShapeProperties.fill.fill.url, 1);
-            if (null != _img)
-            {
-                ImagePr.ImageUrl = _img.src;
-                this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_ApplyImagePrWithFillUrl);
-                this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
-            }
-            else
-            {
-                this.asyncImageEndLoaded2 = function(_image)
-                {
-                    ImagePr.ImageUrl = _image.src;
-                    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_ApplyImagePrWithFillUrlLong);
-                    this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+        else if(ImagePr.ShapeProperties && ImagePr.ShapeProperties.fill &&
+            ImagePr.ShapeProperties.fill.fill && !isNullOrEmptyString(ImagePr.ShapeProperties.fill.fill.url)){
+            if(!g_oDocumentUrls.getImageLocal(ImagePr.ShapeProperties.fill.fill.url)){
+                sImageUrl = ImagePr.ShapeProperties.fill.fill.url;
+                fReplaceCallback = function(sUrl){
+                    ImagePr.ShapeProperties.fill.fill.url = sUrl;
+                    sImageToDownLoad = sUrl;
                 }
+            }
+            sImageToDownLoad = ImagePr.ShapeProperties.fill.fill.url;
+        }
+
+        var oApi = this;
+
+        if(!isNullOrEmptyString(sImageToDownLoad)){
+
+            var fApplyCallback = function(){
+                var _img = oApi.ImageLoader.LoadImage(sImageToDownLoad, 1);
+                if (null != _img)
+                {
+                    oApi.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_ApplyImagePrWithUrl);
+                    oApi.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+                }
+                else
+                {
+                    oApi.asyncImageEndLoaded2 = function(_image)
+                    {
+                        oApi.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_ApplyImagePrWithUrlLong);
+                        oApi.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+                    }
+                }
+            };
+
+            if(sImageUrl){
+                var rData = {
+                    "id": documentId,
+                    "userid": documentUserId,
+                    "vkey": documentVKey,
+                    "c": "imgurl",
+                    "saveindex": g_oDocumentUrls.getMaxIndex(),
+                    "data": sImageToDownLoad};
+
+                this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+                this.fCurCallback = function(input) {
+                    if(null != input && "imgurl" == input["type"]){
+                        if("ok" ==input["status"]) {
+                            var data = input["data"];
+                            var urls = {};
+                            var firstUrl;
+                            for(var i = 0; i < data.length; ++i){
+                                var elem = data[i];
+                                if(elem.url){
+                                    if(!firstUrl){
+                                        firstUrl = elem.url;
+                                    }
+                                    urls[elem.path] = elem.url;
+                                }
+                            }
+                            g_oDocumentUrls.addUrls(urls);
+                            if(firstUrl) {
+                                fReplaceCallback(firstUrl);
+                                fApplyCallback();
+                            } else {
+                                oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+                            }
+                        } else {
+                            oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+                        }
+                    } else {
+                        oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+                    }
+                    oApi.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+                };
+                sendCommand2(this, null, rData );
+            }
+            else{
+                fApplyCallback();
             }
         }
         else
