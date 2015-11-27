@@ -406,16 +406,6 @@ function asc_docs_api(name)
 	
 	this.isChartEditor = false;
 
-	if(typeof ChartPreviewManager != "undefined")
-		this.chartPreviewManager = new ChartPreviewManager();
-	else
-		this.chartPreviewManager = null;
-
-	if(typeof TextArtPreviewManager != "undefined")
-		this.textArtPreviewManager = new TextArtPreviewManager();
-	else
-		this.textArtPreviewManager = null;
-
     this.IsLongActionCurrent = 0;
     this.LongActionCallbacks = [];
     this.LongActionCallbacksParams = [];

@@ -109,16 +109,6 @@ function asc_docs_api(name)
 	// AutoSave
 	this.autoSaveGap = 0;				// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
 
-	if(typeof ChartPreviewManager !== "undefined")	
-		this.chartPreviewManager = new ChartPreviewManager();
-	else
-		this.chartPreviewManager = null;
-
-    if(typeof TextArtPreviewManager !== "undefined")
-        this.textArtPreviewManager = new TextArtPreviewManager();
-    else
-        this.textArtPreviewManager = null;
-
     // объекты, нужные для отправки в тулбар (шрифты, стили)
     this._gui_fonts = null;
     this._gui_editor_themes = null;

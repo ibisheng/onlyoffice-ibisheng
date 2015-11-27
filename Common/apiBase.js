@@ -23,6 +23,8 @@ function baseEditorsApi(name) {
   // Chart
   this.chartTranslate = new asc_CChartTranslate();
   this.textArtTranslate = new asc_TextArtTranslate();
+  this.chartPreviewManager = new ChartPreviewManager();
+  this.textArtPreviewManager = new TextArtPreviewManager();
 
   // CoAuthoring and Chat
   this.User = undefined;
