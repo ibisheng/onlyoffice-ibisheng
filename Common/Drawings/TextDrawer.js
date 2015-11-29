@@ -1356,7 +1356,7 @@ CTextDrawer.prototype =
                 oPath.setPathW(this.pathW);
                 oPath.setPathH(this.pathH);
                 oPath.setExtrusionOk(false);
-                oPath.setFill("norm");
+                oPath.setFill("none");
                 oPath.setStroke(true);
                 oLastObjectToDraw.geometry.AddPath(oPath)
             }
@@ -1460,6 +1460,8 @@ CTextDrawer.prototype =
     },
     df : function()
     {
+        var oPathToDraw = this.Get_PathToDraw();
+        oPathToDraw.setFill("norm");
     },
 
     drawpath : function(type)
