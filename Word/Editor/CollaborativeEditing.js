@@ -6,7 +6,6 @@
  * Time: 12:01
  */
 
-var FOREIGN_CURSOR_LABEL_HIDETIME = 1500;
 
 function CWordCollaborativeEditing()
 {

@@ -1403,9 +1403,12 @@ function OnSave_Callback(e) {
         window["AscDesktopEditor"]["OnSave"]();
       }
     };
-
-    // Пересылаем свои изменения
-    CollaborativeEditing.Send_Changes(editor.IsUserSave);
+      var CursorInfo = null;
+      if (true === CollaborativeEditing.Is_Fast()) {
+          CursorInfo = History.Get_DocumentPositionBinary();
+      }
+      // Пересылаем свои изменения
+    CollaborativeEditing.Send_Changes(editor.IsUserSave, {UserId: editor.CoAuthoringApi.getUserConnectionId(), CursorInfo: CursorInfo});
   } else {
     var nState = editor.CoAuthoringApi.get_state();
     if (ConnectionState.Close === nState) {
@@ -4269,6 +4272,16 @@ asc_docs_api.prototype.sync_MouseMoveCallback = function(Data)
         }
     }
     this.asc_fireCallback("asc_onMouseMove", Data );
+};
+
+asc_docs_api.prototype.sync_ShowForeignCursorLabel = function(UserId, X, Y, Color)
+{
+
+    this.asc_fireCallback("asc_onShowForeignCursorLabel", UserId, X, Y, new CColor(Color.r, Color.g, Color.b, 255));
+};
+asc_docs_api.prototype.sync_HideForeignCursorLabel = function(UserId)
+{
+    this.asc_fireCallback("asc_onHideForeignCursorLabel", UserId);
 };
 
 asc_docs_api.prototype.ShowThumbnails = function(bIsShow)

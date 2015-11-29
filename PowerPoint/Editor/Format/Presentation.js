@@ -722,40 +722,7 @@ CPresentation.prototype =
                 return;
             }
             var bTable = (oTargetDocContentOrTable instanceof CTable);
-
-            var Paragraph = Run.Get_Paragraph();
-            if (!Paragraph || !Paragraph.Parent){
-                this.DrawingDocument.Collaborative_RemoveTarget(UserId);
-                return;
-            }
-
-            if(!bTable){
-                if(oTargetDocContentOrTable !== Paragraph.Parent){
-                    this.DrawingDocument.Collaborative_RemoveTarget(UserId);
-                    return;
-                }
-            }
-            else{
-                if(!Paragraph.Parent.Parent || !Paragraph.Parent.Parent.Row ||
-                    !Paragraph.Parent.Parent.Row.Table || Paragraph.Parent.Parent.Row.Table !== oTargetDocContentOrTable){
-                    this.DrawingDocument.Collaborative_RemoveTarget(UserId);
-                    return;
-                }
-            }
-
-            var ParaContentPos = Paragraph.Get_PosByElement(Run);
-            if (!ParaContentPos){
-                this.DrawingDocument.Collaborative_RemoveTarget(UserId);
-                return;
-            }
-
-            ParaContentPos.Update(InRunPos, ParaContentPos.Get_Depth() + 1);
-
-            var XY = Paragraph.Get_XYByContentPos(ParaContentPos);
-            if (XY && XY.Height > 0.001)
-                this.DrawingDocument.Collaborative_UpdateTarget(UserId, XY.X, XY.Y, XY.Height, XY.PageNum, Paragraph.Get_ParentTextTransform());
-            else
-                this.DrawingDocument.Collaborative_RemoveTarget(UserId);
+            CollaborativeEditing.Update_ForeignCursorPosition(UserId, Run, InRunPos, true, oTargetDocContentOrTable, bTable);
         }
     },
 
@@ -1798,19 +1765,18 @@ CPresentation.prototype =
     },
 
 
-    Update_CursorType : function( X, Y, MouseEvent )
-    {
-        var graphicObjectInfo = this.Slides[this.CurPage].graphicObjects.isPointInDrawingObjects(X, Y, MouseEvent);
-        if(graphicObjectInfo)
-        {
-           if(!graphicObjectInfo.updated)
-           {
-               this.DrawingDocument.SetCursorType(graphicObjectInfo.cursorType);
-           }
-        }
-        else
-        {
-            this.DrawingDocument.SetCursorType("default");
+    Update_CursorType : function( X, Y, MouseEvent ){
+        if(this.Slides[this.CurPage]){
+            var graphicObjectInfo = this.Slides[this.CurPage].graphicObjects.isPointInDrawingObjects(X, Y, MouseEvent);
+            if(graphicObjectInfo){
+                if(!graphicObjectInfo.updated){
+                    this.DrawingDocument.SetCursorType(graphicObjectInfo.cursorType);
+                }
+            }
+            else{
+                this.DrawingDocument.SetCursorType("default");
+            }
+            CollaborativeEditing.Check_ForeignCursorsLabels(X, Y, this.CurPage);
         }
     },
 
