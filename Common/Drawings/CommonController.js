@@ -5625,7 +5625,7 @@ DrawingObjectsController.prototype =
         {
             if(this.drawingObjects.getObjectType && this.drawingObjects.getObjectType() === historyitem_type_Slide)
             {
-                nPageIndex = this.drawingObjects.num;
+                nPageIndex = 0;
             }
         }
         if(oSelectionState && oSelectionState.DrawingsSelectionState)
