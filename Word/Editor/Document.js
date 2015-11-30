@@ -702,9 +702,12 @@ function CDocument(DrawingDocument)
     this.CollaborativeEditing = (("undefined" !== typeof(CWordCollaborativeEditing) && CollaborativeEditing instanceof CWordCollaborativeEditing) ? CollaborativeEditing : null);
     this.Api                  = editor;
     //------------------------------------------------------------------------
-    this.History.Document = this;
-    if (this.CollaborativeEditing)
-        this.CollaborativeEditing.m_oLogicDocument = this;
+    if (DrawingDocument)
+    {
+        this.History.Document = this;
+        if (this.CollaborativeEditing)
+            this.CollaborativeEditing.m_oLogicDocument = this;
+    }
     //------------------------------------------------------------------------
 
     this.Id = this.IdCounter.Get_NewId();
@@ -1000,6 +1003,7 @@ CDocument.prototype =
                 this.private_ProcessTemplateReplacement(TemplateReplacementData);
             }
         }
+        this.Set_FastCollaborativeEditing(true);
     },
     
     Add_TestDocument : function()
