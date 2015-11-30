@@ -377,7 +377,7 @@ ParaRun.prototype.Add = function(Item, bMath)
             }
         }
 
-        if (this.Content.length === CurPos && RunPos < Parent.Content.length - 1)
+        if (this.Content.length === CurPos && (RunPos < Parent.Content.length - 2 || (RunPos < Parent.Content.length - 1 && !(Parent instanceof Paragraph))))
         {
             var NextElement = Parent.Content[RunPos + 1];
             if (para_Run === NextElement.Type && DstReviewType === NextElement.Get_ReviewType() && true === this.Pr.Is_Equal(NextElement.Pr))
@@ -10269,7 +10269,7 @@ ParaRun.prototype.Reject_RevisionChanges = function(Type, bAll)
         if (reviewtype_Add === ReviewType && (undefined === Type || c_oAscRevisionsChangeType.TextAdd === Type))
         {
             Parent.Remove_FromContent(CenterRunPos, 1);
-            
+
             if (Parent.Get_ContentLength() <= 0)
                 Parent.Add_ToContent(0, new ParaRun());
         }

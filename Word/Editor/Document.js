@@ -3520,21 +3520,19 @@ CDocument.prototype =
                     if ( true === Item.Cursor_IsStart() )
                     {
                         this.Add_NewParagraph(undefined, true);
-                        this.Content[this.CurPos.ContentPos - 1].Cursor_MoveToStartPos();
-                        this.Content[this.CurPos.ContentPos - 1].Add( ParaItem );
-                        this.Content[this.CurPos.ContentPos - 1].Clear_Formatting();
-                        // Нам нужно пересчитать все изменения, начиная с текущего элемента
-                        this.ContentLastChangePos = this.CurPos.ContentPos - 1;
+                        var CurPos = this.CurPos.ContentPos - 1;
+                        this.Content[CurPos].Cursor_MoveToStartPos();
+                        this.Content[CurPos].Add(ParaItem);
+                        this.Content[CurPos].Clear_Formatting();
                     }
                     else
                     {
                         this.Add_NewParagraph(undefined, true);
                         this.Add_NewParagraph(undefined, true);
-                        this.Content[this.CurPos.ContentPos - 1].Cursor_MoveToStartPos();
-                        this.Content[this.CurPos.ContentPos - 1].Add( ParaItem );
-                        this.Content[this.CurPos.ContentPos - 1].Clear_Formatting();
-                        // Нам нужно пересчитать все изменения, начиная с текущего элемента
-                        this.ContentLastChangePos = this.CurPos.ContentPos - 2;
+                        var CurPos = this.CurPos.ContentPos - 1;
+                        this.Content[CurPos].Cursor_MoveToStartPos();
+                        this.Content[CurPos].Add(ParaItem);
+                        this.Content[CurPos].Clear_Formatting();
                     }
 
                     if ( false != bRecalculate )
