@@ -2824,6 +2824,10 @@ ParaMath.prototype.Reject_RevisionChanges = function(Type, bAll)
 {
     // TODO: Реализовать
 };
+ParaMath.prototype.Set_ReviewType = function(ReviewType, RemovePrChange)
+{
+    // TODO: Реализовать так же, как CParagraphContentWithParagraphLikeContent.prototype.Set_ReviewType
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 // Классы с изменениями
