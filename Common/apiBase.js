@@ -21,6 +21,9 @@ function baseEditorsApi(name) {
   this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
   this.OpenDocumentProgress = new COpenProgress();
 
+  // AutoSave
+  this.autoSaveGap = 0;					// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
+
   // Chart
   this.chartTranslate = new asc_CChartTranslate();
   this.textArtTranslate = new asc_TextArtTranslate();
@@ -72,6 +75,12 @@ baseEditorsApi.prototype.sendEvent = function() {
 };
 baseEditorsApi.prototype.SendOpenProgress = function() {
   this.sendEvent("asc_onOpenDocumentProgress", this.OpenDocumentProgress);
+};
+// Выставление интервала автосохранения (0 - означает, что автосохранения нет)
+baseEditorsApi.prototype.asc_setAutoSaveGap = function(autoSaveGap) {
+  if (typeof autoSaveGap === "number") {
+    this.autoSaveGap = autoSaveGap * 1000; // Нам выставляют в секундах
+  }
 };
 // send chart message
 baseEditorsApi.prototype.asc_coAuthoringChatSendMessage = function(message) {

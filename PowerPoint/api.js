@@ -94,10 +94,6 @@ function asc_docs_api(name)
   this.CoAuthoringApi.isPowerPoint = true;
 	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
-    /**************************************/
-	// AutoSave
-	this.autoSaveGap = 0;				// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
-
     // объекты, нужные для отправки в тулбар (шрифты, стили)
     this._gui_fonts = null;
     this._gui_editor_themes = null;
@@ -4056,13 +4052,6 @@ asc_docs_api.prototype.ClearSearch = function()
 asc_docs_api.prototype.GetCurrentVisiblePage = function()
 {
     return this.WordControl.m_oDrawingDocument.SlideCurrent;
-};
-
-// Выставление интервала автосохранения (0 - означает, что автосохранения нет)
-asc_docs_api.prototype.asc_setAutoSaveGap = function (autoSaveGap) {
-	if (typeof autoSaveGap === "number") {
-		this.autoSaveGap = autoSaveGap * 1000; // Нам выставляют в секундах
-	}
 };
 
 asc_docs_api.prototype.asc_SetDocumentPlaceChangedEnabled = function(bEnabled)

@@ -324,9 +324,6 @@ function asc_docs_api(name)
 	
     /**************************************/
 
-	// AutoSave
-	this.autoSaveGap = 0;				// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
-
     this.bInit_word_control = false;
 	this.isDocumentModify = false;
 
@@ -6205,13 +6202,6 @@ asc_docs_api.prototype.GetCurrentVisiblePage = function()
         return lPage1;
 
     return lPage2;
-};
-
-// Выставление интервала автосохранения (0 - означает, что автосохранения нет)
-asc_docs_api.prototype.asc_setAutoSaveGap = function (autoSaveGap) {
-	if (typeof autoSaveGap === "number") {
-		this.autoSaveGap = autoSaveGap * 1000; // Нам выставляют в секундах
-	}
 };
 
 asc_docs_api.prototype.asc_SetDocumentPlaceChangedEnabled = function(bEnabled)

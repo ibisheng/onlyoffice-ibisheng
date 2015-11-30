@@ -83,8 +83,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     this.autoSaveGapFast = 2000;			// Интервал быстрого автосохранения (когда человек один) - 2 сек.
     this.autoSaveGapSlow = 10 * 60 * 1000;	// Интервал медленного автосохранения (когда совместно) - 10 минут
 
-    this.autoSaveGap = 0;					// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
-
     this.waitSave = false;					// Отложенное сохранение, происходит во время долгих операций
 
     // Shapes
@@ -624,13 +622,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   spreadsheet_api.prototype.asc_clearFilter = function() {
     var ws = this.wb.getWorksheet();
     return ws.clearFilter();
-  };
-
-  // Выставление интервала автосохранения (0 - означает, что автосохранения нет)
-  spreadsheet_api.prototype.asc_setAutoSaveGap = function(autoSaveGap) {
-    if (typeof autoSaveGap === "number") {
-      this.autoSaveGap = autoSaveGap * 1000; // Нам выставляют в секундах
-    }
   };
 
   spreadsheet_api.prototype.asc_setMobileVersion = function(isMobile) {
