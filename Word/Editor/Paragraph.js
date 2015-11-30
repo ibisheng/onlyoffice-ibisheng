@@ -13526,8 +13526,11 @@ Paragraph.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Dept
 
     if (StartPos !== EndPos)
     {
-        this.Content[StartPos].Set_ContentSelection(_StartDocPos, null, Depth + 1, _StartFlag, StartPos > EndPos ? 1 : -1);
-        this.Content[EndPos].Set_ContentSelection(null, _EndDocPos, Depth + 1, StartPos > EndPos ? -1 : 1, _EndFlag);
+        if (this.Content[StartPos] && this.Content[StartPos].Set_ContentSelection)
+            this.Content[StartPos].Set_ContentSelection(_StartDocPos, null, Depth + 1, _StartFlag, StartPos > EndPos ? 1 : -1);
+
+        if (this.Content[EndPos] && this.Content[EndPos].Set_ContentSelection)
+            this.Content[EndPos].Set_ContentSelection(null, _EndDocPos, Depth + 1, StartPos > EndPos ? -1 : 1, _EndFlag);
 
         var _StartPos = StartPos;
         var _EndPos = EndPos;
@@ -13547,7 +13550,8 @@ Paragraph.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Dept
     }
     else
     {
-        this.Content[StartPos].Set_ContentSelection(_StartDocPos, _EndDocPos, Depth + 1, _StartFlag, _EndFlag);
+        if (this.Content[StartPos] && this.Content[StartPos].Set_ContentSelection)
+            this.Content[StartPos].Set_ContentSelection(_StartDocPos, _EndDocPos, Depth + 1, _StartFlag, _EndFlag);
     }
 };
 Paragraph.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
@@ -13585,7 +13589,10 @@ Paragraph.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
     }
 
     this.CurPos.ContentPos = Pos;
-    this.Content[Pos].Set_ContentPosition(_DocPos, Depth + 1, _Flag);
+    if (this.Content[Pos] && this.Content[Pos].Set_ContentPosition)
+        this.Content[Pos].Set_ContentPosition(_DocPos, Depth + 1, _Flag);
+    else
+        this.Correct_ContentPos2();
 };
 Paragraph.prototype.Get_DocumentPositionFromObject = function(PosArray)
 {
