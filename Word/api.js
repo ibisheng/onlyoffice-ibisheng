@@ -403,8 +403,6 @@ function asc_docs_api(name)
     //выставляем тип copypaste
     g_bIsDocumentCopyPaste = true;
     this.DocumentReaderMode = null;
-	
-	this.isChartEditor = false;
 
     this.IsLongActionCurrent = 0;
     this.LongActionCallbacks = [];

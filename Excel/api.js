@@ -87,9 +87,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
     this.waitSave = false;					// Отложенное сохранение, происходит во время долгих операций
 
-    // Режим вставки диаграмм в редакторе документов
-    this.isChartEditor = false;
-
     // Shapes
     this.isStartAddShape = false;
     this.shapeElementId = null;

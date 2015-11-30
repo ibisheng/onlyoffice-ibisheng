@@ -25,6 +25,8 @@ function baseEditorsApi(name) {
   this.textArtTranslate = new asc_TextArtTranslate();
   this.chartPreviewManager = new ChartPreviewManager();
   this.textArtPreviewManager = new TextArtPreviewManager();
+  // Режим вставки диаграмм в редакторе документов
+  this.isChartEditor = false;
 
   // CoAuthoring and Chat
   this.User = undefined;
