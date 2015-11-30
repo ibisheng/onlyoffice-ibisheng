@@ -1968,7 +1968,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
           var dN = this.wbModel.dependencyFormulas.defNameList[lockElem.Element["rangeOrObjectId"]];
           if (dN) {
               dN.isLock = lockElem.UserId;
-              this.handlers.trigger("asc_onRefreshDefNameList");
+              this.handlers.trigger("asc_onRefreshDefNameList",dN.getAscCDefName());
           }
           this.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.LockDefNameManager);
       }
@@ -2269,6 +2269,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
    * @param {String} reference  Ссылка на ячейку вида A1 или R1C1
    */
   spreadsheet_api.prototype.asc_findCell = function(reference) {
+    if(this.wb.cellEditor.isOpened) return;
     var d = this.wb.findCell(reference);
 
     if (!d) {

@@ -2011,7 +2011,8 @@
             };
             var defNameId;
             if( oldName ){
-                defNameId = t.model.getDefinedName(oldName).nodeId;
+                defNameId = t.model.getDefinedName(oldName);
+                defNameId = defNameId ? defNameId.nodeId : null;
             }
 
             ws._isLockedDefNames(editDefinedNamesCallback, defNameId);
