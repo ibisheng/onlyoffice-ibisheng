@@ -382,8 +382,6 @@ function asc_docs_api(name)
     this.ParcedDocument = false;
 	this.isStartCoAuthoringOnEndLoad = false;	// Подсоединились раньше, чем документ загрузился
 
-	this.fCurCallback = null;
-
 	var oThis = this;
 	// init OnMessage
 	InitOnMessage(function (error, url) {

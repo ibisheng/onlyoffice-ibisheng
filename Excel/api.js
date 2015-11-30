@@ -100,8 +100,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
     this.formulasList = null;	// Список всех формул
 
-    this.fCurCallback = null;
-
     this._init();
     return this;
   }

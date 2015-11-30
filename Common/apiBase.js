@@ -61,6 +61,8 @@ function baseEditorsApi(name) {
 
   // Использовать ли обрезанные шрифты
   this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
+
+  this.fCurCallback = null;
 }
 baseEditorsApi.prototype.asc_GetFontThumbnailsPath = function() {
   return '../Common/Images/';

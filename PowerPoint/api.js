@@ -109,8 +109,6 @@ function asc_docs_api(name)
     this.LongActionCallbacks = [];
 	this.LongActionCallbacksParams = [];
 
-	this.fCurCallback = null;
-
 	var oThis = this;
 	// init OnMessage
 	InitOnMessage(function (error, url) {
