@@ -567,9 +567,17 @@ CHistory.prototype =
         if ( Point1.Items.length > 63 )
             return;
 
+        var StartIndex1 = 0;
+        var StartIndex2 = 0;
+        if (Point1.Items.length > 0 && Point1.Items[0].Data && historyitem_TableId_Description === Point1.Items[0].Data.Type)
+            StartIndex1 = 1;
+
+        if (Point2.Items.length > 0 && Point2.Items[0].Data && historyitem_TableId_Description === Point2.Items[0].Data.Type)
+            StartIndex2 = 1;
+
         var PrevItem = null;
         var Class = null;
-        for ( var Index = 0; Index < Point1.Items.length; Index++ )
+        for ( var Index = StartIndex1; Index < Point1.Items.length; Index++ )
         {
             var Item = Point1.Items[Index];
 
@@ -581,7 +589,7 @@ CHistory.prototype =
             PrevItem = Item;
         }
 
-        for ( var Index = 0; Index < Point2.Items.length; Index++ )
+        for ( var Index = StartIndex2; Index < Point2.Items.length; Index++ )
         {
             var Item = Point2.Items[Index];
 
@@ -591,13 +599,19 @@ CHistory.prototype =
             PrevItem = Item;
         }
 
+        if (0 !== StartIndex1)
+            Point1.Items.splice(0, 1);
+
+        if (0 !== StartIndex2)
+            Point2.Items.splice(0, 1);
+
         var NewPoint =
         {
             State      : Point1.State,
             Items      : Point1.Items.concat(Point2.Items),
             Time       : Point1.Time,
             Additional : {},
-            Description: historydescription_Document_AddLetter
+            Description: historydescription_Document_AddLetterUnion
         };
 
 		if (null !== this.SavedIndex && this.SavedIndex >= this.Points.length - 2)

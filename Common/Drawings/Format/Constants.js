@@ -1583,6 +1583,7 @@ var historydescription_Document_AcceptRevisionChange               = 0x0129;
 var historydescription_Document_RejectRevisionChange               = 0x012a;
 var historydescription_Document_AcceptRevisionChangesBySelection   = 0x012b;
 var historydescription_Document_RejectRevisionChangesBySelection   = 0x012c;
+var historydescription_Document_AddLetterUnion                     = 0x012d;
 
 
 
@@ -1895,6 +1896,7 @@ function Get_HistoryPointStringDescription(nDescription)
         case historydescription_Document_RejectRevisionChange               : sString = "Document_RejectRevisionChange              "; break;
         case historydescription_Document_AcceptRevisionChangesBySelection   : sString = "Document_AcceptRevisionChangesBySelection  "; break;
         case historydescription_Document_RejectRevisionChangesBySelection   : sString = "Document_RejectRevisionChangesBySelection  "; break;
+        case historydescription_Document_AddLetterUnion                     : sString = "Document_AddLetterUnion                    "; break;
 
     }
     return sString;
