@@ -1843,6 +1843,14 @@ CMathContent.prototype.GetFirstElement = function()
 
     return first;
 };
+CMathContent.prototype.Get_ElementByPos = function(ContentPos, Depth)
+{
+    if (Depth >= ContentPos.Depth)
+        return this;
+
+    var CurPos = ContentPos.Get(Depth);
+    return this.Content[CurPos].Get_ElementByPos(ContentPos, Depth + 1);
+};
 
 ////////////////////////////////////////////////////////////////
 

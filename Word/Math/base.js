@@ -2266,6 +2266,8 @@ CMathBase.prototype.Set_ParaContentPos          = CMathContent.prototype.Set_Par
 CMathBase.prototype.Get_CurrentParaPos          = CMathContent.prototype.Get_CurrentParaPos;
 CMathBase.prototype.private_UpdatePosOnAdd      = CMathContent.prototype.private_UpdatePosOnAdd;
 CMathBase.prototype.private_CorrectSelectionPos = CMathContent.prototype.private_CorrectSelectionPos;
+CMathBase.prototype.Get_ElementByPos            = CMathContent.prototype.Get_ElementByPos;
+
 CMathBase.prototype.private_CorrectCurPos = function()
 {
     if (this.CurPos > this.Content.length - 1)
