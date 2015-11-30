@@ -54,6 +54,13 @@ function baseEditorsApi(name) {
   this.noCreatePoint = false;
   this.exucuteHistory = false;
   this.exucuteHistoryEnd = false;
+
+  // На этапе сборки значение переменной ASC_DOCS_API_USE_EMBEDDED_FONTS может менятся.
+  // По дефолту встроенные шрифты использоваться не будут, как и при любом значении
+  // ASC_DOCS_API_USE_EMBEDDED_FONTS, кроме "true"(написание от регистра не зависит).
+
+  // Использовать ли обрезанные шрифты
+  this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
 }
 baseEditorsApi.prototype.asc_GetFontThumbnailsPath = function() {
   return '../Common/Images/';

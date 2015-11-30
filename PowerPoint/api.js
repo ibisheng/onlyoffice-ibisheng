@@ -72,11 +72,6 @@ function asc_docs_api(name)
 
     this.isLoadNoCutFonts = false;
 
-    // На этапе сборки значение переменной ASC_DOCS_API_USE_EMBEDDED_FONTS может менятся.
-	// По дефолту встроенные шрифты использоваться не будут, как и при любом значении
-	// ASC_DOCS_API_USE_EMBEDDED_FONTS, кроме "true"(написание от регистра не зависит).
-    this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
-
     this.nCurPointItemsLength = 0;
 
     this.pasteCallback = null;
