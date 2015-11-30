@@ -2822,6 +2822,8 @@ function DrawingObjects() {
             settings.putStyle(2);
             settings.putType(c_oAscChartTypeSettings.lineNormal);
             settings.putTitle(c_oAscChartTitleShowSettings.noOverlay);
+            settings.putShowHorAxis(true);
+            settings.putShowVerAxis(true);
             var series = getChartSeries(worksheet.model, settings);
             if(series && series.series.length > 1)
             {

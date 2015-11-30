@@ -430,8 +430,10 @@
                 var bSwapScatter = ((this.type === c_oAscChartTypeSettings.scatter) !== (type === c_oAscChartTypeSettings.scatter));
 
 
+
                 var nOldType = this.type;
                 this.putType(type);
+
                 var hor_axis_settings = this.getHorAxisProps();
                 var vert_axis_settings = this.getVertAxisProps();
                 var new_hor_axis_settings, new_vert_axis_settings, oTempVal;
@@ -456,6 +458,8 @@
                         this.putVertAxisProps(null);
                         this.putHorAxisLabel(null);
                         this.putVertAxisLabel(null);
+                        this.putShowHorAxis(null);
+                        this.putShowVerAxis(null);
                         break;
                     }
                     case c_oAscChartTypeSettings.barNormal           :
@@ -485,11 +489,21 @@
                             this.putVertAxisProps(new_vert_axis_settings);
                         }
 
-                        if( bSwapLines)
+                        if(bSwapLines)
                         {
                             this.putShowMarker(false);
                             this.putSmooth(null);
                             this.putLine(true);
+                        }
+                        if(nOldType === c_oAscChartTypeSettings.hBarNormal || nOldType === c_oAscChartTypeSettings.hBarStacked || nOldType === c_oAscChartTypeSettings.hBarStackedPer){
+                            var bTemp = this.showHorAxis;
+                            this.putShowHorAxis(this.showVerAxis)
+                            this.putShowVerAxis(bTemp);
+                        }
+                        else if(nOldType === c_oAscChartTypeSettings.pie || nOldType === c_oAscChartTypeSettings.doughnut)
+                        {
+                            this.putShowHorAxis(true);
+                            this.putShowVerAxis(true);
                         }
                         break;
                     }
@@ -509,6 +523,17 @@
                             new_vert_axis_settings.setDefault();
                             this.putVertAxisProps(new_vert_axis_settings);
                         }
+                        if(nOldType === c_oAscChartTypeSettings.pie || nOldType === c_oAscChartTypeSettings.doughnut){
+                            this.putShowHorAxis(true);
+                            this.putShowVerAxis(true);
+                        }
+                        else if(nOldType !== c_oAscChartTypeSettings.hBarNormal
+                            && nOldType !== c_oAscChartTypeSettings.hBarStacked
+                            && nOldType !== c_oAscChartTypeSettings.hBarStackedPer){
+                            var bTemp = this.showHorAxis;
+                            this.putShowHorAxis(this.showVerAxis)
+                            this.putShowVerAxis(bTemp);
+                        }
                         //this.putHorGridLines(c_oAscGridLinesSettings.none);
                         //this.putVertGridLines(c_oAscGridLinesSettings.major);
                         break;
@@ -521,7 +546,6 @@
                     case c_oAscChartTypeSettings.scatterSmooth       :
                     case c_oAscChartTypeSettings.scatterSmoothMarker :
                     {
-
                         if(!hor_axis_settings || hor_axis_settings.getAxisType() !== c_oAscAxisType.val)
                         {
                             new_hor_axis_settings = new asc_ValAxisSettings();
@@ -541,6 +565,15 @@
                             this.putShowMarker(true);
                             this.putSmooth(null);
                             this.putLine(false);
+                        }
+                        if(nOldType === c_oAscChartTypeSettings.hBarNormal || nOldType === c_oAscChartTypeSettings.hBarStacked || nOldType === c_oAscChartTypeSettings.hBarStackedPer){
+                            var bTemp = this.showHorAxis;
+                            this.putShowHorAxis(this.showVerAxis)
+                            this.putShowVerAxis(bTemp);
+                        }
+                        else if(nOldType === c_oAscChartTypeSettings.pie || nOldType === c_oAscChartTypeSettings.doughnut){
+                            this.putShowHorAxis(true);
+                            this.putShowVerAxis(true);
                         }
                         break;
                     }

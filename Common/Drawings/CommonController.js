@@ -1803,18 +1803,6 @@ DrawingObjectsController.prototype =
         return G_O_DEFAULT_COLOR_MAP;
     },
 
-    getAscChartObject: function()
-    {
-        //var chart = null;
-        //for (var i = 0; i < this.selectedObjects.length; i++) {
-        //    if ( this.selectedObjects[i].isChart() )
-        //    {
-        //        this.selectedObjects[i].drObjects = this;
-        //        return this.selectedObjects[i];
-        //    }
-        //}
-        //return chart;
-    },
 
     editChartDrawingObjects: function(chart)
     {
