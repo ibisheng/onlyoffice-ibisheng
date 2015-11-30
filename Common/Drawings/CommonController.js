@@ -5604,7 +5604,7 @@ DrawingObjectsController.prototype =
 
     loadDocumentStateAfterLoadChanges: function(oSelectionState, PageIndex)
     {
-        var bDocument = isRealObject(this.document);
+        var bDocument = isRealObject(this.document), bNeedRecalculateCurPos = false;
         var nPageIndex = 0;
         if(isRealNumber(PageIndex)){
             nPageIndex = PageIndex;
@@ -5634,10 +5634,7 @@ DrawingObjectsController.prototype =
                         else
                         {
                             oDocContent.Set_ContentPosition(oSelectionState.Pos, 0, 0);
-                            if(this.document){
-                                this.document.NeedUpdateTarget = true;
-                                this.document.RecalculateCurPos();
-                            }
+                            bNeedRecalculateCurPos = true;
                         }
                         this.selection.textSelection = oDrawingSelectionState.textObject;
                     }
@@ -5661,6 +5658,9 @@ DrawingObjectsController.prototype =
                     if(oDrawingSelectionState.groupObject.loadDocumentStateAfterLoadChanges(oState, nPageIndex))
                     {
                         this.selection.groupSelection = oDrawingSelectionState.groupObject;
+                        if(!oSelectionState.DrawingSelection){
+                            bNeedRecalculateCurPos = true;
+                        }
                     }
                 }
             }
@@ -5698,6 +5698,11 @@ DrawingObjectsController.prototype =
                     }
                 }
             }
+        }
+
+        if(this.document && bNeedRecalculateCurPos){
+            this.document.NeedUpdateTarget = true;
+            this.document.RecalculateCurPos();
         }
         return this.selectedObjects.length > 0;
     },
