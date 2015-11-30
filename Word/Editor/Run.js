@@ -1623,7 +1623,59 @@ ParaRun.prototype.Remove_DrawingObject = function(Id)
 
         if ( para_Drawing === Element.Type && Id === Element.Get_Id() )
         {
-            this.Remove_FromContent( CurPos, 1, true );
+            var TrackRevisions = null;
+            if (this.Paragraph && this.Paragraph.LogicDocument)
+                TrackRevisions = this.Paragraph.LogicDocument.Is_TrackRevisions();
+
+            if (true === TrackRevisions)
+            {
+                var ReviewType = this.Get_ReviewType();
+                if (reviewtype_Common === ReviewType)
+                {
+                    // Разбиваем ран на две части
+                    var StartPos = CurPos;
+                    var EndPos = CurPos + 1;
+
+                    var Parent = this.Get_Parent();
+                    var RunPos = this.private_GetPosInParent(Parent);
+
+                    if (-1 !== RunPos && Parent)
+                    {
+                        var DeletedRun = null;
+                        if (StartPos <= 0 && EndPos >= this.Content.length)
+                            DeletedRun = this;
+                        else if (StartPos <= 0)
+                        {
+                            this.Split2(EndPos, Parent, RunPos);
+                            DeletedRun = this;
+                        }
+                        else if (EndPos >= this.Content.length)
+                        {
+                            DeletedRun = this.Split2(StartPos, Parent, RunPos);
+                        }
+                        else
+                        {
+                            this.Split2(EndPos, Parent, RunPos);
+                            DeletedRun = this.Split2(StartPos, Parent, RunPos);
+                        }
+
+                        DeletedRun.Set_ReviewType(reviewtype_Remove);
+                    }
+                }
+                else if (reviewtype_Add === ReviewType)
+                {
+                    this.Remove_FromContent(CurPos, 1, true);
+                }
+                else if (reviewtype_Remove === ReviewType)
+                {
+                    // Ничего не делаем
+                }
+            }
+            else
+            {
+                this.Remove_FromContent(CurPos, 1, true);
+            }
+
             return;
         }
     }

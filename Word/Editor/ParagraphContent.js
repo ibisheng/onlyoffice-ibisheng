@@ -3955,6 +3955,8 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
     this.DrawingDocument = DrawingDocument;
     this.Parent          = Parent;
 
+    this.LogicDocument   = DrawingDocument ? DrawingDocument.m_oLogicDocument : null;
+
     // Расстояние до окружающего текста
     this.Distance =
     {
@@ -5002,7 +5004,19 @@ ParaDrawing.prototype =
         NearPos.Paragraph.Check_NearestPos( NearPos );
 
         var RunPr = this.Remove_FromDocument( false );
-        this.Add_ToDocument( NearPos, true, RunPr );
+
+        if (this.LogicDocument && true === this.LogicDocument.Is_TrackRevisions())
+        {
+            var NewParaDrawing = this.Copy();
+            NewParaDrawing.Add_ToDocument(NearPos, true, RunPr);
+            this.LogicDocument.Select_DrawingObject(NewParaDrawing.Get_Id());
+            console.log("1");
+        }
+        else
+        {
+            this.Add_ToDocument(NearPos, true, RunPr);
+            console.log("2");
+        }
     },
 
     GoTo_Text : function(bBefore, bUpdateStates)
@@ -5990,6 +6004,7 @@ ParaDrawing.prototype =
     {
         this.Id = Reader.GetString2();
         this.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+        this.LogicDocument   = this.DrawingDocument ? this.DrawingDocument.m_oLogicDocument : null;
 
         this.Extent.W = readDouble(Reader);
         this.Extent.H = readDouble(Reader);

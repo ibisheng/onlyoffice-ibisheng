@@ -8679,26 +8679,6 @@ Paragraph.prototype =
         return Run;
     },
 
-    // Ищем графический объект по Id и удаляем запись он нем в параграфе
-    Remove_DrawingObject : function(Id)
-    {
-        for ( var Index = 0; Index < this.Content.length; Index++ )
-        {
-            var Item = this.Content[Index];
-            if ( para_Drawing === Item.Type && Id === Item.Get_Id() )
-            {
-                var HdrFtr = this.Parent.Is_HdrFtr(true);
-                if ( null != HdrFtr && true != Item.Is_Inline() )
-                    HdrFtr.RecalcInfo.NeedRecalc = true;
-
-                this.Internal_Content_Remove( Index );
-                return Index;
-            }
-        }
-
-        return -1;
-    },
-
     Get_DrawingObjectContentPos : function(Id)
     {
         var ContentPos = new CParagraphContentPos();
