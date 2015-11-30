@@ -1,25 +1,5 @@
 "use strict";
 
-function CDocOpenProgress()
-{
-    this.Type = c_oAscAsyncAction.Open;
-
-    this.FontsCount = 0;
-    this.CurrentFont = 0;
-
-    this.ImagesCount = 0;
-    this.CurrentImage = 0;
-}
-
-CDocOpenProgress.prototype.get_Type = function(){return this.Type};
-CDocOpenProgress.prototype.get_FontsCount = function(){return this.FontsCount};
-CDocOpenProgress.prototype.get_CurrentFont = function(){return this.CurrentFont};
-CDocOpenProgress.prototype.get_ImagesCount = function(){return this.ImagesCount};
-CDocOpenProgress.prototype.get_CurrentImage = function(){return this.CurrentImage};
-
-// ---------------------------------------------------------------
-
-
 // ---------------------------------------------------------------
 
 function CAscSlideTiming()

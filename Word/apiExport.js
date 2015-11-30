@@ -1,9 +1,3 @@
-window['CDocOpenProgress'] = CDocOpenProgress;
-CDocOpenProgress.prototype['get_Type'] = CDocOpenProgress.prototype.get_Type;
-CDocOpenProgress.prototype['get_FontsCount'] = CDocOpenProgress.prototype.get_FontsCount;
-CDocOpenProgress.prototype['get_CurrentFont'] = CDocOpenProgress.prototype.get_CurrentFont;
-CDocOpenProgress.prototype['get_ImagesCount'] = CDocOpenProgress.prototype.get_ImagesCount;
-CDocOpenProgress.prototype['get_CurrentImage'] = CDocOpenProgress.prototype.get_CurrentImage;
 window['CAscSection'] = CAscSection;
 CAscSection.prototype['get_PageWidth'] = CAscSection.prototype.get_PageWidth;
 CAscSection.prototype['get_PageHeight'] = CAscSection.prototype.get_PageHeight;
@@ -448,7 +442,6 @@ asc_docs_api.prototype['asyncImageEndLoaded'] = asc_docs_api.prototype.asyncImag
 asc_docs_api.prototype['asyncImageEndLoadedBackground'] = asc_docs_api.prototype.asyncImageEndLoadedBackground;
 asc_docs_api.prototype['IsAsyncOpenDocumentImages'] = asc_docs_api.prototype.IsAsyncOpenDocumentImages;
 asc_docs_api.prototype['SendOpenProgress'] = asc_docs_api.prototype.SendOpenProgress;
-asc_docs_api.prototype['sync_SendProgress'] = asc_docs_api.prototype.sync_SendProgress;
 asc_docs_api.prototype['pre_Paste'] = asc_docs_api.prototype.pre_Paste;
 asc_docs_api.prototype['pre_Save'] = asc_docs_api.prototype.pre_Save;
 asc_docs_api.prototype['SyncLoadImages'] = asc_docs_api.prototype.SyncLoadImages;

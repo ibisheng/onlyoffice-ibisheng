@@ -96,9 +96,6 @@ function asc_docs_api(name)
 
     this.SelectedObjectsStack = [];
 
-    this.OpenDocumentProgress = new CDocOpenProgress();
-    this._lastConvertProgress = 0;
-
   this.CoAuthoringApi.isPowerPoint = true;
 	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
@@ -147,6 +144,10 @@ function asc_docs_api(name)
     CHART_STYLE_MANAGER = new CChartStyleManager();
 }
 asc.extendClass(asc_docs_api, baseEditorsApi);
+
+asc_docs_api.prototype.sendEvent = function() {
+  this.asc_fireCallback.apply(this, arguments);
+};
 
 /////////////////////////////////////////////////////////////////////////
 ///////////////////CoAuthoring and Chat api//////////////////////////////
@@ -3997,25 +3998,6 @@ asc_docs_api.prototype.get_PresentationHeight = function()
         return 0;
     return this.WordControl.m_oLogicDocument.Height;
 };
-
-asc_docs_api.prototype.SendOpenProgress = function()
-{
-    // Пока отсылаем старый callback
-    this.asc_fireCallback("asc_onOpenDocumentProgress", this.OpenDocumentProgress);
-    var _progress = this.OpenDocumentProgress;
-    var _percents = (_progress.get_CurrentFont() + _progress.get_CurrentImage())/(_progress.get_FontsCount() + _progress.get_ImagesCount());
-    // приводим к 0..100
-    _percents *= 100;
-    // рассчет исходя из того, что часть прогресса прошли на конвертации
-    _percents = Math.min(this._lastConvertProgress + _percents * (100.0 - this._lastConvertProgress) / 100.0, 100.0);
-    return this.sync_SendProgress(_percents);
-    //console.log("" + this.OpenDocumentProgress.CurrentFont);
-};
-
-asc_docs_api.prototype.sync_SendProgress = function(Percents)
-{
-    this.asc_fireCallback("asc_onOpenDocumentProgress2", Percents);
-}
 
 asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
 {

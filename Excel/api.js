@@ -97,15 +97,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
     //находится ли фокус в рабочей области редактора(используется для copy/paste в MAC)
     this.IsFocus = null;
-    /**************************************/
-
-    this.OpenDocumentProgress = {
-      Type: c_oAscAsyncAction.Open,
-      FontsCount: 0,
-      CurrentFont: 0,
-      ImagesCount: 0,
-      CurrentImage: 0
-    };
 
     // На этапе сборки значение переменной ASC_DOCS_API_USE_EMBEDDED_FONTS может менятся.
     // По дефолту встроенные шрифты использоваться не будут, как и при любом значении
@@ -122,6 +113,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     return this;
   }
   asc.extendClass(spreadsheet_api, baseEditorsApi);
+
+  spreadsheet_api.prototype.sendEvent = function() {
+    this.handlers.trigger.apply(this.handlers, arguments);
+  };
 
   spreadsheet_api.prototype._init = function() {
     var t = this;
@@ -960,7 +955,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
    * asc_onEndAction				(type, id)
    * asc_onInitEditorFonts		(gui_fonts)
    * asc_onInitEditorStyles		(gui_styles)
-   * asc_onOpenDocumentProgress	(_OpenDocumentProgress)
+   * asc_onOpenDocumentProgress	(COpenProgress)
    * asc_onAdvancedOptions		(asc_CAdvancedOptions, ascAdvancedOptionsAction)	- эвент на получение дополнительных опций (открытие/сохранение CSV)
    * asc_onError					(c_oAscError.ID, c_oAscError.Level)					- эвент об ошибке
    * asc_onEditCell				(c_oAscCellEditorState)								- эвент на редактирование ячейки с состоянием (переходами из формулы и обратно)
@@ -1112,17 +1107,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
   spreadsheet_api.prototype.asyncFontEndLoaded = function(font) {
     this.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
-  };
-
-  spreadsheet_api.prototype.SendOpenProgress = function() {
-    var _OpenDocumentProgress = {
-      "Type": this.OpenDocumentProgress.Type,
-      "FontsCount": this.OpenDocumentProgress.FontsCount,
-      "CurrentFont": this.OpenDocumentProgress.CurrentFont,
-      "ImagesCount": this.OpenDocumentProgress.ImagesCount,
-      "CurrentImage": this.OpenDocumentProgress.CurrentImage
-    };
-    this.handlers.trigger("asc_onOpenDocumentProgress", _OpenDocumentProgress);
   };
 
   /**

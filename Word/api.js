@@ -17,23 +17,6 @@ var documentOrigin = "";
 var documentFormatSave = c_oAscFileType.DOCX;
 var documentCallbackUrl = undefined;		// Ссылка для отправления информации о документе
 
-function CDocOpenProgress()
-{
-    this.Type = c_oAscAsyncAction.Open;
-
-    this.FontsCount = 0;
-    this.CurrentFont = 0;
-
-    this.ImagesCount = 0;
-    this.CurrentImage = 0;
-}
-
-CDocOpenProgress.prototype.get_Type = function(){return this.Type};
-CDocOpenProgress.prototype.get_FontsCount = function(){return this.FontsCount};
-CDocOpenProgress.prototype.get_CurrentFont = function(){return this.CurrentFont};
-CDocOpenProgress.prototype.get_ImagesCount = function(){return this.ImagesCount};
-CDocOpenProgress.prototype.get_CurrentImage = function(){return this.CurrentImage};
-
 function CAscSection()
 {
     this.PageWidth = 0;
@@ -382,9 +365,6 @@ function asc_docs_api(name)
     this.nCurPointItemsLength = 0;
 	this.isDocumentEditor = true;
 
-    this.OpenDocumentProgress = new CDocOpenProgress();
-    this._lastConvertProgress = 0;
-
     this.CurrentTranslate = translations_map["en"];
 
     this.CollaborativeMarksShowType = c_oAscCollaborativeMarksShowType.All;
@@ -439,6 +419,10 @@ function asc_docs_api(name)
     this.RevisionChangesStack = [];
 }
 asc.extendClass(asc_docs_api, baseEditorsApi);
+
+asc_docs_api.prototype.sendEvent = function() {
+  this.asc_fireCallback.apply(this, arguments);
+};
 
 asc_docs_api.prototype.LoadFontsFromServer = function(_fonts)
 {
@@ -6080,24 +6064,6 @@ asc_docs_api.prototype.asyncImageEndLoadedBackground = function(_image)
 asc_docs_api.prototype.IsAsyncOpenDocumentImages = function()
 {
     return true;
-};
-
-asc_docs_api.prototype.SendOpenProgress = function()
-{
-    // Пока отсылаем старый callback
-    this.asc_fireCallback("asc_onOpenDocumentProgress", this.OpenDocumentProgress);
-    var _progress = this.OpenDocumentProgress;
-    var _percents = (_progress.get_CurrentFont() + _progress.get_CurrentImage())/(_progress.get_FontsCount() + _progress.get_ImagesCount());
-    // приводим к 0..100
-    _percents *= 100;
-    // рассчет исходя из того, что часть прогресса прошли на конвертации
-    _percents = this._lastConvertProgress + _percents * (100.0 - this._lastConvertProgress) / 100.0;
-    return this.sync_SendProgress(_percents);
-    //console.log("" + this.OpenDocumentProgress.CurrentFont);
-};
-
-asc_docs_api.prototype.sync_SendProgress = function(Percents) {
-  this.asc_fireCallback("asc_onOpenDocumentProgress2", Percents);
 };
 
 asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)

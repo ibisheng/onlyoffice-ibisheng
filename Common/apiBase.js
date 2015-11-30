@@ -19,6 +19,7 @@ function baseEditorsApi(name) {
 
   // Тип состояния на данный момент (сохранение, открытие или никакое)
   this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+  this.OpenDocumentProgress = new COpenProgress();
 
   // Chart
   this.chartTranslate = new asc_CChartTranslate();
@@ -56,6 +57,12 @@ function baseEditorsApi(name) {
 }
 baseEditorsApi.prototype.asc_GetFontThumbnailsPath = function() {
   return '../Common/Images/';
+};
+// Events
+baseEditorsApi.prototype.sendEvent = function() {
+};
+baseEditorsApi.prototype.SendOpenProgress = function() {
+  this.sendEvent("asc_onOpenDocumentProgress", this.OpenDocumentProgress);
 };
 // send chart message
 baseEditorsApi.prototype.asc_coAuthoringChatSendMessage = function(message) {

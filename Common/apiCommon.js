@@ -2738,6 +2738,31 @@
     prot["put_ChartEditor"]            = prot["asc_putChartEditor"]            =   prot.asc_putChartEditor;
 	prot["get_UserInfo"]            = prot["asc_getUserInfo"]            =   prot.asc_getUserInfo;
     prot["put_UserInfo"]            = prot["asc_putUserInfo"]            =   prot.asc_putUserInfo;
+
+  // ToDo продолжаем делать плохие вещи...Нужно с этим что-то делать!
+  function COpenProgress() {
+    this.Type = c_oAscAsyncAction.Open;
+
+    this.FontsCount = 0;
+    this.CurrentFont = 0;
+
+    this.ImagesCount = 0;
+    this.CurrentImage = 0;
+  }
+
+  COpenProgress.prototype.asc_getType = function(){return this.Type};
+  COpenProgress.prototype.asc_getFontsCount = function(){return this.FontsCount};
+  COpenProgress.prototype.asc_getCurrentFont = function(){return this.CurrentFont};
+  COpenProgress.prototype.asc_getImagesCount = function(){return this.ImagesCount};
+  COpenProgress.prototype.asc_getCurrentImage = function(){return this.CurrentImage};
+
+  prot = COpenProgress.prototype;
+  prot["asc_getType"] =  COpenProgress.prototype.asc_getType;
+  prot["asc_getFontsCount"] =  COpenProgress.prototype.asc_getFontsCount;
+  prot["asc_getCurrentFont"] = COpenProgress.prototype.asc_getCurrentFont;
+  prot["asc_getImagesCount"] =  COpenProgress.prototype.asc_getImagesCount;
+  prot["asc_getCurrentImage"] =  COpenProgress.prototype.asc_getCurrentImage;
+  window["COpenProgress"] = COpenProgress;
 }
 )(window);
 
@@ -2796,6 +2821,7 @@ var asc_CStroke = window["asc_CStroke"];
 var CParagraphFrame = window["CParagraphFrame"];
 var asc_CParagraphFrame = window["asc_CParagraphFrame"];
 var CMouseMoveData = window["CMouseMoveData"];
+var COpenProgress = window["COpenProgress"];
 var asc_TextArtProperties = window["asc_TextArtProperties"];
 var asc_TextArtTranslate = window["asc_TextArtTranslate"];
 var CDocInfo = window["CDocInfo"];
@@ -2841,8 +2867,6 @@ CAscMathCategory.prototype["get_Data"] = function(){ return this.Data; };
 CAscMathCategory.prototype["get_W"] = function(){ return this.W; };
 CAscMathCategory.prototype["get_H"] = function(){ return this.H; };
 CAscMathCategory.prototype.private_Sort = function(){ this.Data.sort( function(a,b){ return a.Id- b.Id; } ); };
-
-
 
 // эта функция ДОЛЖНА минимизироваться
 function CreateAscFill(unifill)
