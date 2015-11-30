@@ -489,11 +489,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       return;
     }
 
-    if (undefined != window['appBridge']) {
-      window['appBridge']['dummyCommandDownloadAs']();     // TEST
-      return;
-    }
-
     this._asc_downloadAs(typeFile, c_oAscAsyncAction.DownloadAs, {downloadType: bIsDownloadEvent ? 'asc_onDownloadUrl': null});
   };
 
@@ -896,11 +891,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
         }
       }
       dataContainer.data = oBinaryFileWriter.Write();
-
-      if (undefined != window['appBridge']) {
-        window['appBridge']['dummyCommandSave_CSV'](dataContainer.data);
-        return;
-      }
     }
     var fCallback = function(input) {
       var error = c_oAscError.ID.Unknown;
@@ -1133,12 +1123,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       "CurrentImage": this.OpenDocumentProgress.CurrentImage
     };
     this.handlers.trigger("asc_onOpenDocumentProgress", _OpenDocumentProgress);
-
-    if (undefined != window['appBridge']) {
-      var progress = (this.OpenDocumentProgress.CurrentFont + this.OpenDocumentProgress.CurrentImage) / (this.OpenDocumentProgress.ImagesCount + this.OpenDocumentProgress.FontsCount);
-
-      window['appBridge']['dummyCommandOpenDocumentProgress'](progress * 100);
-    }
   };
 
   /**
@@ -1753,10 +1737,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       setTimeout(function() {
         t.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Recalc)
       }, 500);
-    }
-
-    if (undefined != window['appBridge']) {
-      window['appBridge']['dummyCommandOpenDocumentProgress'](10000);
     }
   };
 
