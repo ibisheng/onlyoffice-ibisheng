@@ -15160,6 +15160,23 @@ CDocument.prototype.Get_Api = function()
 {
     return this.Api;
 };
+CDocument.prototype.private_CorrectDocumentPosition = function()
+{
+    if (this.CurPos.ContentPos < 0 || this.CurPos.ContentPos >= this.Content.length)
+    {
+        this.Selection_Remove();
+        if (this.CurPos.ContentPos < 0)
+        {
+            this.CurPos.ContentPos = 0;
+            this.Content[0].Cursor_MoveToStartPos(false);
+        }
+        else
+        {
+            this.CurPos.ContentPos = this.Content.length - 1;
+            this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(false);
+        }
+    }
+};
 //-----------------------------------------------------------------------------------
 // Private
 //-----------------------------------------------------------------------------------

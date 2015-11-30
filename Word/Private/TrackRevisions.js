@@ -302,6 +302,7 @@ CDocument.prototype.Accept_AllRevisionChanges = function()
             }
         }
 
+        this.private_CorrectDocumentPosition();
         this.Recalculate();
         this.Document_UpdateSelectionState();
         this.Document_UpdateInterfaceState();
@@ -323,6 +324,7 @@ CDocument.prototype.Reject_AllRevisionChanges = function()
             }
         }
 
+        this.private_CorrectDocumentPosition();
         this.Recalculate();
         this.Document_UpdateSelectionState();
         this.Document_UpdateInterfaceState();
