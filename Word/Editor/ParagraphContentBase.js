@@ -1122,6 +1122,10 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_ClassesByPos = function(
     if (0 <= CurPos && CurPos <= this.Content.length - 1)
         this.Content[CurPos].Get_ClassesByPos(Classes, ContentPos, Depth + 1);
 };
+CParagraphContentWithParagraphLikeContent.prototype.Get_ContentLength = function()
+{
+    return this.Content.length;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции пересчета
 //----------------------------------------------------------------------------------------------------------------------

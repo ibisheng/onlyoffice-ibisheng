@@ -13671,6 +13671,10 @@ Paragraph.prototype.Get_Lock = function()
 {
     return this.Lock;
 };
+Paragraph.prototype.Get_ContentLength = function()
+{
+    return this.Content.length;
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;
