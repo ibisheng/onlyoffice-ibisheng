@@ -3216,8 +3216,11 @@ function OfflineEditor () {
         this.asc_WriteAllWorksheets(true);
 
         _api.asc_SendThemeColorScheme();
+        _api.asc_ApplyColorScheme(false);
 
-        this.offline_generateStyle();
+        //_api.asc_SendThemeColorScheme();
+
+        //this.offline_generateStyle();
 
         window["NativeSupportTimeouts"] = true;
 
@@ -3298,6 +3301,18 @@ function OfflineEditor () {
             stream["ClearNoAttack"]();
             asc_WriteColorSchemes(schemes, stream);
             window["native"]["OnCallMenuEvent"](2404, stream); // ASC_SPREADSHEETS_EVENT_TYPE_COLOR_SCHEMES
+        });
+
+//        _api.asc_registerCallback('asc_onInitTablePictures',   function () {
+//            var stream = global_memory_stream_menu;
+//            stream["ClearNoAttack"]();
+//            window["native"]["OnCallMenuEvent"](2406, stream); // ASC_SPREADSHEETS_EVENT_TYPE_CELL_STYLES
+//        });
+
+        _api.asc_registerCallback('asc_onInitEditorStyles', function () {
+            var stream = global_memory_stream_menu;
+            stream["ClearNoAttack"]();
+            window["native"]["OnCallMenuEvent"](2405, stream); // ASC_SPREADSHEETS_EVENT_TYPE_TABLE_STYLES
         });
     };
     this.updateFrozen = function () {
@@ -3916,36 +3931,9 @@ function OfflineEditor () {
     };
 
     this.offline_afteInit = function () {
-
-        _api.asc_ApplyColorScheme = function(bRedraw) {
-
-            var wsViews = Asc["editor"].wb.wsViews;
-            for (var i = 0; i < wsViews.length; ++i) {
-                if (wsViews[i] && wsViews[i].objectRender && wsViews[i].objectRender.controller) {
-                    wsViews[i].objectRender.controller.startRecalculate();
-                }
-            }
-
-            //    this.chartPreviewManager.clearPreviews();
-            //    this.textArtPreviewManager.clear();
-
-            // На view-режиме не нужно отправлять стили
-            if (true !== this.asc_getViewerMode() && !this.isMobileVersion) {
-                // Отправка стилей
-                this._sendWorkbookStyles();
-            }
-
-            if (bRedraw) {
-                this.handlers.trigger("asc_onUpdateChartStyles");
-                this.wb.drawWS();
-            }
-        };
     };
 }
 var _s = new OfflineEditor();
-
-
-
 
 function offline_of() {_s.openFile();}
 function offline_stz(v) {_s.zoom = v; _api.asc_setZoom(v);}

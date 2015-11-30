@@ -1317,14 +1317,13 @@
 			this.docStylesImage = "";
 			this.docStyles = null;
 
-            //var tw = this.native.GetStyleWidth();
-            //var th = this.native.GetStyleHeight();
             var sd = this.native.GetDeviceScale();
 
-            this.styleThumbnailWidth	       = 80 * (72 / 96);//112;
-            this.styleThumbnailHeight	   = 40 * (72 / 96);//38;
-            this.styleThumbnailWidthPt	   = this.styleThumbnailWidth;// * (72 / 96);
-            this.styleThumbnailHeightPt	   = this.styleThumbnailHeight;// * ( 72 / 96);
+            this.styleThumbnailWidth = 92 * 72 / 96;
+            this.styleThumbnailHeight = 48 * 72 / 96;
+
+            this.styleThumbnailWidthPt = Math.floor(this.styleThumbnailWidth * 72 / 96);
+            this.styleThumbnailHeightPt = Math.floor(this.styleThumbnailHeight * 72 / 96);
 
 			this.styleThumbnailWidthWithRetina	= this.styleThumbnailWidth;
 			this.styleThumbnailHeightWithRetina	= this.styleThumbnailHeight;
@@ -1343,6 +1342,9 @@
 			asc_getDefaultStylesImage: function () { return this.defaultStylesImage; },
 			asc_getDocStylesImage: function () { return this.docStylesImage; },
 			generateStylesAll: function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
+
+                this.native.SetStylesType(0);
+
 				this.generateDefaultStyles(cellStylesAll, fmgrGraphics, oFont, stringRenderer);
 				this.generateDocumentStyles(cellStylesAll, fmgrGraphics, oFont, stringRenderer);
 			},
