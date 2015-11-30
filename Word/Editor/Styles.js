@@ -8424,10 +8424,10 @@ CTextPr.prototype =
             TextPr.Unifill = this.Unifill.createDuplicate();
 
         if (undefined !== this.TextOutline && (undefined === PrChange.TextOutline || true !== this.TextOutline.IsIdentical(PrChange.TextOutline)))
-            TextPr.TextOutline = this.TextOutline.createDublicate();
+            TextPr.TextOutline = this.TextOutline.createDuplicate();
 
         if (undefined !== this.TextFill && (undefined === PrChange.TextFill || true !== this.TextFill.IsIdentical(PrChange.TextFill)))
-            TextPr.TextFill = this.TextFill.createDublicate();
+            TextPr.TextFill = this.TextFill.createDuplicate();
 
         if (this.Vanish !== PrChange.Vanish)
             TextPr.Vanish = this.Vanish;

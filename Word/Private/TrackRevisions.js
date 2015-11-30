@@ -301,7 +301,7 @@ CDocument.prototype.Accept_AllRevisionChanges = function()
                 LogicDoc.Accept_RevisionChanges(undefined, true);
             }
         }
-
+        this.Selection_Remove();
         this.private_CorrectDocumentPosition();
         this.Recalculate();
         this.Document_UpdateSelectionState();
@@ -323,7 +323,7 @@ CDocument.prototype.Reject_AllRevisionChanges = function()
                 LogicDoc.Reject_RevisionChanges(undefined, true);
             }
         }
-
+        this.Selection_Remove();
         this.private_CorrectDocumentPosition();
         this.Recalculate();
         this.Document_UpdateSelectionState();
