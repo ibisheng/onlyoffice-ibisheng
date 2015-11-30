@@ -18948,7 +18948,8 @@ CTable.prototype =
         this.Markup.Rows = [];
         for ( var CurRow = Row_start; CurRow <= Row_last; CurRow++ )
         {
-            this.Markup.Rows.push( { Y : this.RowsInfo[CurRow].Y[PageNum], H : this.RowsInfo[CurRow].H[PageNum] } );
+            if (this.RowsInfo[CurRow] && this.RowsInfo[CurRow].Y[PageNum] && this.RowsInfo[CurRow].H[PageNum])
+                this.Markup.Rows.push( { Y : this.RowsInfo[CurRow].Y[PageNum], H : this.RowsInfo[CurRow].H[PageNum] } );
         }
 
         this.Markup.CurCol = CellIndex;
