@@ -379,9 +379,6 @@ function asc_docs_api(name)
 
     this.SelectedObjectsStack = [];
 
-    this.noCreatePoint = false;
-    this.exucuteHistory = false;
-    this.exucuteHistoryEnd = false;
     this.nCurPointItemsLength = 0;
 	this.isDocumentEditor = true;
 

@@ -48,6 +48,11 @@ function baseEditorsApi(name) {
 
   // Version History
   this.VersionHistory = null;				// Объект, который отвечает за точку в списке версий
+
+  //Флаги для применения свойств через слайдеры
+  this.noCreatePoint = false;
+  this.exucuteHistory = false;
+  this.exucuteHistoryEnd = false;
 }
 baseEditorsApi.prototype.asc_GetFontThumbnailsPath = function() {
   return '../Common/Images/';

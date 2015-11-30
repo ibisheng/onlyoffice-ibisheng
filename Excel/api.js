@@ -95,11 +95,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     this.isShapeImageChangeUrl = false;
     this.isTextArtChangeUrl = false;
 
-    //Флаги для применения свойств через слайдеры
-    this.noCreatePoint = false;
-    this.exucuteHistory = false;
-    this.exucuteHistoryEnd = false;
-
     //находится ли фокус в рабочей области редактора(используется для copy/paste в MAC)
     this.IsFocus = null;
     /**************************************/
