@@ -2814,19 +2814,19 @@ ParaMath.prototype.Correct_AfterConvertFromEquation = function()
 
 ParaMath.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth)
 {
-    // TODO: Реализовать
+    return this.Root.Check_RevisionsChanges(Checker, ContentPos, Depth);
 };
 ParaMath.prototype.Accept_RevisionChanges = function(Type, bAll)
 {
-    // TODO: Реализовать
+    return this.Root.Accept_RevisionChanges(Type, bAll);
 };
 ParaMath.prototype.Reject_RevisionChanges = function(Type, bAll)
 {
-    // TODO: Реализовать
+    return this.Root.Reject_RevisionChanges(Type, bAll);
 };
 ParaMath.prototype.Set_ReviewType = function(ReviewType, RemovePrChange)
 {
-    // TODO: Реализовать так же, как CParagraphContentWithParagraphLikeContent.prototype.Set_ReviewType
+    return this.Root.Set_ReviewType(ReviewType, RemovePrChange);
 };
 
 //----------------------------------------------------------------------------------------------------------------------
