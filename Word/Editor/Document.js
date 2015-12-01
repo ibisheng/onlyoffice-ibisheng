@@ -14688,7 +14688,7 @@ CDocument.prototype.Continue_FastCollaborativeEditing = function()
     if (true === this.Api.asc_IsLongAction())
         return;
 
-    if (true !== this.CollaborativeEditing.Is_Fast())
+    if (true !== this.CollaborativeEditing.Is_Fast() || true === this.CollaborativeEditing.Is_SingleUser())
         return;
 
     if (true === this.Selection_Is_TableBorderMove() || true === this.Api.isStartAddShape)
