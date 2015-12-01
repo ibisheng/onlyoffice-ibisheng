@@ -8332,6 +8332,12 @@ CTextPr.prototype =
         this.ReviewInfo.Update();
     },
 
+    Set_PrChange : function(PrChange, ReviewInfo)
+    {
+        this.PrChange   = PrChange;
+        this.ReviewInfo = ReviewInfo;
+    },
+
     Remove_PrChange : function()
     {
         delete this.PrChange;
@@ -10264,6 +10270,12 @@ CParaPr.prototype =
         this.PrChange = this.Copy();
         this.ReviewInfo = new CReviewInfo();
         this.ReviewInfo.Update();
+    },
+
+    Set_PrChange : function(PrChange, ReviewInfo)
+    {
+        this.PrChange   = PrChange;
+        this.ReviewInfo = ReviewInfo;
     },
 
     Remove_PrChange : function()

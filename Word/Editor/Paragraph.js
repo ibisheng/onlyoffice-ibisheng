@@ -13167,6 +13167,12 @@ Paragraph.prototype.Add_PrChange = function()
         this.private_UpdateTrackRevisions();
     }
 };
+Paragraph.prototype.Set_PrChange = function(PrChange, ReviewInfo)
+{
+    History.Add(this, {Type : historyitem_Paragraph_PrChange, Old : {PrChange : this.Pr.PrChange, ReviewInfo : this.Pr.ReviewInfo ? this.Pr.ReviewInfo.Copy() : undefined}, New : {PrChange : PrChange, ReviewInfo : ReviewInfo ? ReviewInfo.Copy() : undefined}});
+    this.Pr.Set_PrChange(PrChange, ReviewInfo);
+    this.private_UpdateTrackRevisions();
+};
 Paragraph.prototype.Remove_PrChange = function()
 {
     if (true === this.Have_PrChange())

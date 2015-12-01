@@ -6381,6 +6381,13 @@ ParaRun.prototype.Add_PrChange = function()
     }
 };
 
+ParaRun.prototype.Set_PrChange = function(PrChange, ReviewInfo)
+{
+    History.Add(this, {Type : historyitem_ParaRun_PrChange, New : {PrChange : PrChange, ReviewInfo : ReviewInfo ? ReviewInfo.Copy() : undefined}, Old : {PrChange : this.Pr.PrChange, ReviewInfo : this.Pr.ReviewInfo ? this.Pr.ReviewInfo.Copy() : undefined}});
+    this.Pr.Set_PrChange(PrChange, ReviewInfo);
+    this.private_UpdateTrackRevisions();
+};
+
 ParaRun.prototype.Remove_PrChange = function()
 {
     if (true === this.Have_PrChange())
@@ -10046,6 +10053,15 @@ ParaRun.prototype.Set_ReviewType = function(Value)
         History.Add(this, {Type : historyitem_ParaRun_ReviewType, New : {ReviewType :  this.ReviewType, ReviewInfo : this.ReviewInfo.Copy()}, Old : {ReviewType :  OldReviewType, ReviewInfo : OldReviewInfo}});
         this.private_UpdateTrackRevisions();
     }
+};
+ParaRun.prototype.Set_ReviewTypeWithInfo = function(ReviewType, ReviewInfo)
+{
+    History.Add(this, {Type : historyitem_ParaRun_ReviewType, Old : {ReviewType :  this.ReviewType, ReviewInfo : this.ReviewInfo ? this.ReviewInfo.Copy() : undefined}, New : {ReviewType :  ReviewType, ReviewInfo : ReviewInfo ? ReviewInfo.Copy() : undefined}});
+
+    this.ReviewType = ReviewType;
+    this.ReviewInfo = ReviewInfo;
+
+    this.private_UpdateTrackRevisions();
 };
 ParaRun.prototype.Get_Parent = function()
 {
