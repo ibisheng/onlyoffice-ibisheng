@@ -5576,6 +5576,7 @@ Paragraph.prototype =
                 this.Internal_Content_Add(StartPos + 2, NewElementE);
 
             this.Selection_Remove();
+            this.Selection.Use      = true;
             this.Selection.StartPos = StartPos + 1;
             this.Selection.EndPos   = StartPos + 1;
 
