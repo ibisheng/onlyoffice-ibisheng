@@ -2693,7 +2693,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             {
                                 if (ParaLine != Para.Pages[CurPage].FirstLine)
                                 {
-                                    Para.Recalculate_Drawing_AddPageBreak(CurLine, CurPage, false);
+                                    Para.Recalculate_Drawing_AddPageBreak(ParaLine, CurPage, false);
                                     PRS.RecalcResult = recalcresult_NextPage;
                                     PRS.NewRange = true;
                                     return;
