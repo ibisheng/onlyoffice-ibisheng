@@ -237,7 +237,6 @@ asc_docs_api.prototype['sync_StrikeoutCallBack'] = asc_docs_api.prototype.sync_S
 asc_docs_api.prototype['sync_TextPrFontFamilyCallBack'] = asc_docs_api.prototype.sync_TextPrFontFamilyCallBack;
 asc_docs_api.prototype['sync_TextPrFontSizeCallBack'] = asc_docs_api.prototype.sync_TextPrFontSizeCallBack;
 asc_docs_api.prototype['sync_PrLineSpacingCallBack'] = asc_docs_api.prototype.sync_PrLineSpacingCallBack;
-asc_docs_api.prototype['sync_InitEditorFonts'] = asc_docs_api.prototype.sync_InitEditorFonts;
 asc_docs_api.prototype['sync_InitEditorStyles'] = asc_docs_api.prototype.sync_InitEditorStyles;
 asc_docs_api.prototype['sync_InitEditorStyles2'] = asc_docs_api.prototype.sync_InitEditorStyles2;
 asc_docs_api.prototype['sync_InitEditorTableStyles'] = asc_docs_api.prototype.sync_InitEditorTableStyles;

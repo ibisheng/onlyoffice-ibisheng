@@ -52,7 +52,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     this.DocInfo = null;
 
     // объекты, нужные для отправки в тулбар (шрифты, стили)
-    this.guiFonts = null;		// Переменная для сохранения фонтов для облегченной версии (переход в edit mod)
     this.guiStyles = null;		// Переменная для сохранения стилей ячеек
     this._gui_control_colors = null;
     this._gui_color_schemes = null;
@@ -986,10 +985,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
      проверяем, подписан ли кто-то на эвент? Если да, то отправляем и больше ничего не делаем.
      Если никто не подписан, то сохраняем у себя переменную и как только кто-то подписывается - отправляем ее
      */
-    if (null !== this.guiFonts && "asc_onInitEditorFonts" === name) {
-      this.handlers.trigger("asc_onInitEditorFonts", this.guiFonts);
-      this.guiFonts = null;
-    } else if (null !== this.guiStyles && "asc_onInitEditorStyles" === name) {
+    if (null !== this.guiStyles && "asc_onInitEditorStyles" === name) {
       this.handlers.trigger("asc_onInitEditorStyles", this.guiStyles);
       this.guiStyles = null;
     } else if (null !== this.tablePictures && "asc_onInitTablePictures" === name) {
@@ -1042,22 +1038,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   // Посылает эвент о том, что обновились листы
   spreadsheet_api.prototype.sheetsChanged = function() {
     this.handlers.trigger("asc_onSheetsChanged");
-  };
-
-
-  // Fonts loading interface
-
-  spreadsheet_api.prototype.sync_InitEditorFonts = function(gui_fonts) {
-    /*
-     Не самая хорошая схема для отправки эвентов:
-     проверяем, подписан ли кто-то на эвент? Если да, то отправляем и больше ничего не делаем.
-     Если никто не подписан, то сохраняем у себя переменную и как только кто-то подписывается - отправляем ее
-     */
-    if (false === this.handlers.trigger("asc_onInitEditorFonts", gui_fonts)) {
-      this.guiFonts = gui_fonts;
-    } else {
-      this.guiFonts = null;
-    }
   };
 
   spreadsheet_api.prototype.asyncFontsDocumentStartLoaded = function() {

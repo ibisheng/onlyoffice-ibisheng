@@ -95,7 +95,6 @@ function asc_docs_api(name)
 	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
     // объекты, нужные для отправки в тулбар (шрифты, стили)
-    this._gui_fonts = null;
     this._gui_editor_themes = null;
     this._gui_document_themes = null;
     //выставляем тип copypaste
@@ -1013,7 +1012,7 @@ asc_docs_api.prototype.get_PropertyEditorTextArts = function()
 };
 asc_docs_api.prototype.get_PropertyEditorFonts = function()
 {
-    return this._gui_fonts;
+    return null;
 };
 asc_docs_api.prototype.get_PropertyStandartTextures = function()
 {
@@ -1796,10 +1795,6 @@ asc_docs_api.prototype.sync_PrLineSpacingCallBack = function(LineSpacing){
 	this.asc_fireCallback("asc_onLineSpacing", new asc_CParagraphSpacing ( LineSpacing ) );
 };
 
-
-asc_docs_api.prototype.sync_InitEditorFonts = function(gui_fonts){
-    this._gui_fonts = gui_fonts;
-};
 asc_docs_api.prototype.sync_InitEditorThemes = function(gui_editor_themes, gui_document_themes){
     this._gui_editor_themes = gui_editor_themes;
     this._gui_document_themes = gui_document_themes;

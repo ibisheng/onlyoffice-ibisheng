@@ -361,7 +361,6 @@ function asc_docs_api(name)
     this.CollaborativeMarksShowType = c_oAscCollaborativeMarksShowType.All;
 
     // объекты, нужные для отправки в тулбар (шрифты, стили)
-    this._gui_fonts = null;
     this._gui_styles = null;
     this._gui_control_colors = null;
     this._gui_color_schemes = null;
@@ -959,7 +958,7 @@ asc_docs_api.prototype.get_PropertyEditorTextArts = function()
 };
 asc_docs_api.prototype.get_PropertyEditorFonts = function()
 {
-    return this._gui_fonts;
+    return null;
 };
 asc_docs_api.prototype.get_PropertyStandartTextures = function()
 {
@@ -2885,9 +2884,6 @@ asc_docs_api.prototype.sync_TextPrFontSizeCallBack = function(FontSize){
 };
 asc_docs_api.prototype.sync_PrLineSpacingCallBack = function(LineSpacing){
     this.asc_fireCallback("asc_onLineSpacing", new asc_CParagraphInd( LineSpacing ) );
-};
-asc_docs_api.prototype.sync_InitEditorFonts = function(gui_fonts){
-    this._gui_fonts = gui_fonts;
 };
 asc_docs_api.prototype.sync_InitEditorStyles = function(styles_painter){
     this._gui_styles = styles_painter;
