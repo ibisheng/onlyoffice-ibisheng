@@ -101,12 +101,18 @@ baseEditorsApi.prototype.asc_coAuthoringGetUsers = function() {
 baseEditorsApi.prototype.asc_getEditorPermissions = function() {
   this._coAuthoringInit();
 };
-// Images & Charts
+// Images & Charts & TextArts
 baseEditorsApi.prototype.asc_setChartTranslate = function(translate) {
   this.chartTranslate = translate;
 };
 baseEditorsApi.prototype.asc_setTextArtTranslate = function(translate) {
   this.textArtTranslate = translate;
+};
+baseEditorsApi.prototype.asc_getChartPreviews = function(chartType) {
+  return this.chartPreviewManager.getChartPreviews(chartType);
+};
+baseEditorsApi.prototype.asc_getTextArtPreviews = function() {
+  return this.textArtPreviewManager.getWordArtStyles();
 };
 // Version History
 baseEditorsApi.prototype.asc_showRevision = function(newObj) {

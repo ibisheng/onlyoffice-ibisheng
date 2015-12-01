@@ -2453,14 +2453,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     return ws.objectRender.addTextArt(nStyle);
   };
 
-  spreadsheet_api.prototype.asc_getChartPreviews = function(chartType) {
-    return this.chartPreviewManager.getChartPreviews(chartType);
-  };
-
-  spreadsheet_api.prototype.asc_getTextArtPreviews = function() {
-    return this.textArtPreviewManager.getWordArtStyles();
-  };
-
   spreadsheet_api.prototype.asc_checkDataRange = function(dialogType, dataRange, fullCheck, isRows, chartType) {
     return parserHelp.checkDataRange(this.wbModel, this.wb, dialogType, dataRange, fullCheck, isRows, chartType);
   };
