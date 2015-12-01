@@ -260,6 +260,9 @@ CCollaborativeEditingBase.prototype.Clear = function()
 CCollaborativeEditingBase.prototype.Set_Fast = function(bFast)
 {
     this.m_bFast = bFast;
+
+    if (false === bFast)
+        this.Remove_AllForeignCursors();
 };
 CCollaborativeEditingBase.prototype.Is_Fast = function()
 {
@@ -661,6 +664,7 @@ CCollaborativeEditingBase.prototype.Remove_ForeignCursor = function(UserId){
     this.m_aForeignCursorsPos.Remove_DocumentPosition(this.m_aCursorsToUpdate[UserId]);
     delete this.m_aForeignCursors[UserId];
 };
+CCollaborativeEditingBase.prototype.Remove_AllForeignCursors = function(){};
 CCollaborativeEditingBase.prototype.Update_DocumentPositionsOnAdd = function(Class, Pos){
     this.m_aDocumentPositions.Update_DocumentPositionsOnAdd(Class, Pos);
     this.m_aForeignCursorsPos.Update_DocumentPositionsOnAdd(Class, Pos);

@@ -303,6 +303,13 @@ CWordCollaborativeEditing.prototype.Remove_ForeignCursor = function(UserId)
     this.Remove_ForeignCursorXY(UserId);
     this.Remove_ForeignCursorToShow(UserId);
 };
+CWordCollaborativeEditing.prototype.Remove_AllForeignCursors = function()
+{
+    for (var UserId in this.m_aForeignCursors)
+    {
+        this.Remove_ForeignCursor(UserId);
+    }
+};
 CWordCollaborativeEditing.prototype.Update_DocumentPositionsOnAdd = function(Class, Pos)
 {
     this.m_aDocumentPositions.Update_DocumentPositionsOnAdd(Class, Pos);
