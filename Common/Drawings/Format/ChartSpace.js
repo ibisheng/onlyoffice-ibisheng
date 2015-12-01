@@ -8148,11 +8148,13 @@ CChartSpace.prototype =
                 if(i === titles.length - 1){
                     break;
                 }
+				++i;
             }
             else{
                 if(i === 0){
                     break;
                 }
+				--i;
             }
         }
     },
