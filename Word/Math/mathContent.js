@@ -3954,11 +3954,6 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     PRS.NewRange = true;
                     PRS.MoveToLBP = true;
                 }
-
-                /*else
-                {
-                    Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
-                }*/
             }
         }
         else // контент может занимать несколько строк
@@ -3981,11 +3976,9 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 // перед мат объектом идет box break_operator и он не является первым элементом в строке
                 if(Item.kind == MATH_BOX)
                 {
-
                     if(true == Item.IsBreak(bInline))
                     {
                         this.private_ForceBreakBox(PRS, Item, _Depth, PrevLastPos, LastPos); // _Depth, PrevLastPos, LastPos запоминаем до пересчета, поэтому передаем эти параметры в функцию
-
                     }
                     else if(true == Item.IsOperatorEmulator())
                     {
@@ -4063,6 +4056,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 {
                     PRS.MathFirstItem = false;
                 }
+
                 var CheckWrapIndent = PRS.bFirstLine == true ? PRS.X - PRS.XRange > PRS.WrapIndent : true;
 
                 if(PRS.bInsideOper == true && CheckWrapIndent == true)
@@ -4170,22 +4164,33 @@ CMathContent.prototype.private_BoxOperEmulator = function(PRS, Box, _Depth, Prev
     var BoxLen      = Box.size.width,
         BoxGapRight = Box.GapRight;
 
+    var CheckWrapIndent = PRS.bFirstLine == true ? PRS.X - PRS.XRange > PRS.WrapIndent : true;
+    var bOperBefore = this.ParaMath.Is_BrkBinBefore() == true;
+
+    var bOnlyForcedBreakBefore = bOperBefore == true && PRS.MathFirstItem == false,
+        bOnlyforcedBreakAfter  = bOperBefore == false;
+
+    if(CheckWrapIndent == true && (bOnlyForcedBreakBefore || bOnlyforcedBreakAfter))
+    {
+        PRS.bOnlyForcedBreak = true;
+    }
+
     var bOverXEnd;
 
-    if(true === this.ParaMath.Is_BrkBinBefore()) // оператор находится в начале строки
+    if(bOperBefore) // оператор находится в начале строки
     {
         bOverXEnd = PRS.X + PRS.WordLen + PRS.SpaceLen > PRS.XEnd;
 
-        if(PRS.FirstItemOnLine == false && bOverXEnd)
+        if(true == PRS.MathFirstItem)
+        {
+            PRS.WordLen += PRS.SpaceLen + PRS.WordLen + BoxLen;
+        }
+        else if(PRS.FirstItemOnLine == false && bOverXEnd)
         {
             PRS.MoveToLBP = true;
             PRS.NewRange = true;
 
             this.ParaMath.UpdateWidthLine(PRS, PRS.X - PRS.XRange);
-        }
-        else if(true == PRS.MathFirstItem)
-        {
-            PRS.WordLen += PRS.SpaceLen + PRS.WordLen + BoxLen;
         }
         else
         {
