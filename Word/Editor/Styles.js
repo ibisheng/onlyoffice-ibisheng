@@ -3963,7 +3963,7 @@ function CStyles(bCreateDefault)
         this.Default.Table = this.Add( Style_Table );
 
         // Создаем стиль "Без интервала"
-        var Style_NoSpacing = new CStyle("No Spacing", null, null, styletype_Paragraph );
+        var Style_NoSpacing = new CStyle("No Spacing", this.Default.Paragraph, null, styletype_Paragraph );
         Style_NoSpacing.Create_NoSpacing();
         this.Add( Style_NoSpacing );
 
