@@ -150,8 +150,9 @@ CStyles.prototype.Create_StyleFromInterface = function(oAscStyle, bCheckLink)
         oStyle.Set_SemiHidden(oOldStyle.Get_SemiHidden());
         oStyle.Set_UnhideWhenUsed(oOldStyle.Get_UnhideWhenUsed());
 
-        // Если удаляемый стиль - стиль, который стоит в BasedOn, тогда мы должны смержить BasedOn стиль с заданным
-        if (BasedOnId === OldId)
+        // Если удаляемый стиль - стиль, который стоит в BasedOn, либо это вообще дефолтовый стиль, тогда мы должны
+        // его смержить с заданным.
+        if (BasedOnId === OldId || OldId === this.Default.Paragraph)
         {
             oStyle.Set_BasedOn(null);
             var OldStyleParaPr = oOldStyle.ParaPr.Copy();
