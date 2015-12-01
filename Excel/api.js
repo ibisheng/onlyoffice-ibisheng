@@ -52,13 +52,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
     this.DocInfo = null;
 
     // объекты, нужные для отправки в тулбар (шрифты, стили)
-    this.guiStyles = null;		// Переменная для сохранения стилей ячеек
     this._gui_control_colors = null;
     this._gui_color_schemes = null;
     this.GuiControlColorsMap = null;
     this.IsSendStandartColors = false;
-
-    this.tablePictures = null;
 
     this.asyncMethodCallback = undefined;
 
@@ -985,13 +982,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
      проверяем, подписан ли кто-то на эвент? Если да, то отправляем и больше ничего не делаем.
      Если никто не подписан, то сохраняем у себя переменную и как только кто-то подписывается - отправляем ее
      */
-    if (null !== this.guiStyles && "asc_onInitEditorStyles" === name) {
-      this.handlers.trigger("asc_onInitEditorStyles", this.guiStyles);
-      this.guiStyles = null;
-    } else if (null !== this.tablePictures && "asc_onInitTablePictures" === name) {
-      this.handlers.trigger("asc_onInitTablePictures", this.tablePictures);
-      this.tablePictures = null;
-    } else if (null !== this._gui_control_colors && "asc_onSendThemeColors" === name) {
+    if (null !== this._gui_control_colors && "asc_onSendThemeColors" === name) {
       this.handlers.trigger("asc_onSendThemeColors", this._gui_control_colors.Colors, this._gui_control_colors.StandartColors);
       this._gui_control_colors = null;
     } else if (null !== this._gui_color_schemes && "asc_onSendThemeColorSchemes" === name) {
@@ -1624,14 +1615,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
       }
 
       // Отправка стилей форматированных таблиц
-      var tablePictures = this.wb.getTablePictures();
-      var bResult = this.handlers.trigger("asc_onInitTablePictures", tablePictures);
-      this.tablePictures = (false === bResult) ? tablePictures : null;
-
+      this.handlers.trigger("asc_onInitTablePictures", this.wb.getTablePictures());
       // Отправка стилей ячеек
-      var guiStyles = this.wb.getCellStyles();
-      bResult = this.handlers.trigger("asc_onInitEditorStyles", guiStyles);
-      this.guiStyles = (false === bResult) ? guiStyles : null;
+      this.handlers.trigger("asc_onInitEditorStyles", this.wb.getCellStyles());
     }
   };
 

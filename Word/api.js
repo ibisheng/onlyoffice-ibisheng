@@ -361,7 +361,6 @@ function asc_docs_api(name)
     this.CollaborativeMarksShowType = c_oAscCollaborativeMarksShowType.All;
 
     // объекты, нужные для отправки в тулбар (шрифты, стили)
-    this._gui_styles = null;
     this._gui_control_colors = null;
     this._gui_color_schemes = null;
 
@@ -971,10 +970,6 @@ asc_docs_api.prototype.get_PropertyStandartTextures = function()
         arr[i].Image = g_oUserTexturePresets[i];
     }
     return arr;
-};
-asc_docs_api.prototype.get_PropertyEditorStyles = function()
-{
-    return this._gui_styles;
 };
 asc_docs_api.prototype.get_PropertyThemeColors = function()
 {
@@ -2886,12 +2881,7 @@ asc_docs_api.prototype.sync_PrLineSpacingCallBack = function(LineSpacing){
     this.asc_fireCallback("asc_onLineSpacing", new asc_CParagraphInd( LineSpacing ) );
 };
 asc_docs_api.prototype.sync_InitEditorStyles = function(styles_painter){
-    this._gui_styles = styles_painter;
     this.asc_fireCallback("asc_onInitEditorStyles", styles_painter);
-};
-asc_docs_api.prototype.sync_InitEditorStyles2 = function(){
-    if (null != this._gui_styles)
-        this.asc_fireCallback("asc_onInitEditorStyles", this._gui_styles);
 };
 asc_docs_api.prototype.sync_InitEditorTableStyles = function(styles, is_retina_enabled){
     this.asc_fireCallback("asc_onInitTableTemplates",styles, is_retina_enabled);
@@ -6507,7 +6497,6 @@ asc_docs_api.prototype.SetViewMode = function(isViewMode) {
     this.WordControl.checkNeedRules();
     this.WordControl.m_oDrawingDocument.ClearCachePages();
     this.WordControl.OnResize(true);
-    this.sync_InitEditorStyles2();
   }
 };
 
