@@ -4170,16 +4170,26 @@ CMathContent.prototype.private_BoxOperEmulator = function(PRS, Box, _Depth, Prev
     var BoxLen      = Box.size.width,
         BoxGapRight = Box.GapRight;
 
-    if(true === this.ParaMath.Is_BrkBinBefore()) // break_operator должен идти в начале слова
-    {
-        PRS.X += PRS.SpaceLen + PRS.WordLen;
+    var bOverXEnd;
 
-        if(true == PRS.MathFirstItem)
+    if(true === this.ParaMath.Is_BrkBinBefore()) // оператор находится в начале строки
+    {
+        bOverXEnd = PRS.X + PRS.WordLen + PRS.SpaceLen > PRS.XEnd;
+
+        if(PRS.FirstItemOnLine == false && bOverXEnd)
         {
-            PRS.WordLen += BoxLen;
+            PRS.MoveToLBP = true;
+            PRS.NewRange = true;
+
+            this.ParaMath.UpdateWidthLine(PRS, PRS.X - PRS.XRange);
+        }
+        else if(true == PRS.MathFirstItem)
+        {
+            PRS.WordLen += PRS.SpaceLen + PRS.WordLen + BoxLen;
         }
         else
         {
+            PRS.X += PRS.SpaceLen + PRS.WordLen;
             // обновим : начало нового слова - конец предыдущего Run
             PRS.bInsideOper = true;
             PRS.FirstItemOnLine = false;
@@ -4195,7 +4205,7 @@ CMathContent.prototype.private_BoxOperEmulator = function(PRS, Box, _Depth, Prev
     }
     else
     {
-        var bOverXEnd = PRS.X + PRS.SpaceLen + PRS.WordLen + BoxLen - BoxGapRight > PRS.XEnd;
+        bOverXEnd = PRS.X + PRS.SpaceLen + PRS.WordLen + BoxLen - BoxGapRight > PRS.XEnd;
 
         PRS.OperGapRight = BoxGapRight;
 
