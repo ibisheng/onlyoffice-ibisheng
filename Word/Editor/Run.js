@@ -10413,6 +10413,17 @@ ParaRun.prototype.Get_DocumentPositionFromObject = function(PosArray)
 
     return PosArray;
 };
+ParaRun.prototype.Is_UseInParagraph = function()
+{
+    if (!this.Paragraph)
+        return false;
+
+    var ContentPos = this.Paragraph.Get_PosByElement(this);
+    if (!ContentPos)
+        return false;
+
+    return true;
+};
 
 function CParaRunStartState(Run)
 {

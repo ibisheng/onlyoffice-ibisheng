@@ -1568,7 +1568,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_PosByElement = function(
 };
 CParagraphContentWithParagraphLikeContent.prototype.Get_ElementByPos = function(ContentPos, Depth)
 {
-    if (Depth >= ContentPos.Depth)
+    if (Depth + 1 >= ContentPos.Depth)
         return this;
 
     var CurPos = ContentPos.Get(Depth);
@@ -1887,6 +1887,142 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_SelectionContentPos = fu
     {
         this.Content[StartPos].Set_SelectionContentPos( StartContentPos, EndContentPos, Depth + 1, StartFlag, EndFlag );
     }
+};
+CParagraphContentWithParagraphLikeContent.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+{
+    if ((0 === StartFlag && (!StartDocPos[Depth] || this !== StartDocPos[Depth].Class)) || (0 === EndFlag && (!EndDocPos[Depth] || this !== EndDocPos[Depth].Class)))
+        return;
+
+    var StartPos = 0, EndPos = 0;
+    switch (StartFlag)
+    {
+        case 0 : StartPos = StartDocPos[Depth].Position; break;
+        case 1 : StartPos = 0; break;
+        case -1: StartPos = this.Content.length - 1; break;
+    }
+
+    switch (EndFlag)
+    {
+        case 0 : EndPos = EndDocPos[Depth].Position; break;
+        case 1 : EndPos = 0; break;
+        case -1: EndPos = this.Content.length - 1; break;
+    }
+
+    var _StartDocPos = StartDocPos, _StartFlag = StartFlag;
+    if (null !== StartDocPos && true === StartDocPos[Depth].Deleted)
+    {
+        if (StartPos < this.Content.length)
+        {
+            _StartDocPos = null;
+            _StartFlag = 1;
+        }
+        else if (StartPos > 0)
+        {
+            StartPos--;
+            _StartDocPos = null;
+            _StartFlag = -1;
+        }
+        else
+        {
+            // Такого не должно быть
+            return;
+        }
+    }
+
+    var _EndDocPos = EndDocPos, _EndFlag = EndFlag;
+    if (null !== EndDocPos && true === EndDocPos[Depth].Deleted)
+    {
+        if (EndPos < this.Content.length)
+        {
+            _EndDocPos = null;
+            _EndFlag = 1;
+        }
+        else if (EndPos > 0)
+        {
+            EndPos--;
+            _EndDocPos = null;
+            _EndFlag = -1;
+        }
+        else
+        {
+            // Такого не должно быть
+            return;
+        }
+    }
+
+    this.Selection.Use      = true;
+    this.Selection.StartPos = Math.max(0, Math.min(this.Content.length - 1, StartPos));
+    this.Selection.EndPos   = Math.max(0, Math.min(this.Content.length - 1, EndPos));
+
+    if (StartPos !== EndPos)
+    {
+        if (this.Content[StartPos] && this.Content[StartPos].Set_ContentSelection)
+            this.Content[StartPos].Set_ContentSelection(_StartDocPos, null, Depth + 1, _StartFlag, StartPos > EndPos ? 1 : -1);
+
+        if (this.Content[EndPos] && this.Content[EndPos].Set_ContentSelection)
+            this.Content[EndPos].Set_ContentSelection(null, _EndDocPos, Depth + 1, StartPos > EndPos ? -1 : 1, _EndFlag);
+
+        var _StartPos = StartPos;
+        var _EndPos = EndPos;
+        var Direction = 1;
+
+        if (_StartPos > _EndPos)
+        {
+            _StartPos = EndPos;
+            _EndPos = StartPos;
+            Direction = -1;
+        }
+
+        for (var CurPos = _StartPos + 1; CurPos < _EndPos; CurPos++)
+        {
+            this.Content[CurPos].Select_All(Direction);
+        }
+    }
+    else
+    {
+        if (this.Content[StartPos] && this.Content[StartPos].Set_ContentSelection)
+            this.Content[StartPos].Set_ContentSelection(_StartDocPos, _EndDocPos, Depth + 1, _StartFlag, _EndFlag);
+    }
+};
+CParagraphContentWithParagraphLikeContent.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
+{
+    if (0 === Flag && (!DocPos[Depth] || this !== DocPos[Depth].Class))
+        return;
+
+    var Pos = 0;
+    switch (Flag)
+    {
+        case 0 : Pos = DocPos[Depth].Position; break;
+        case 1 : Pos = 0; break;
+        case -1: Pos = this.Content.length - 1; break;
+    }
+
+    var _DocPos = DocPos, _Flag = Flag;
+    if (null !== DocPos && true === DocPos[Depth].Deleted)
+    {
+        if (Pos < this.Content.length)
+        {
+            _DocPos = null;
+            _Flag = 1;
+        }
+        else if (Pos > 0)
+        {
+            Pos--;
+            _DocPos = null;
+            _Flag = -1;
+        }
+        else
+        {
+            // Такого не должно быть
+            return;
+        }
+    }
+
+    this.State.ContentPos = Math.max(0, Math.min(this.Content.length - 1, Pos));
+    if (this.Content[Pos] && this.Content[Pos].Set_ContentPosition)
+        this.Content[Pos].Set_ContentPosition(_DocPos, Depth + 1, _Flag);
+    else
+        this.Content[Pos].Cursor_MoveToStartPos();
 };
 CParagraphContentWithParagraphLikeContent.prototype.Selection_IsUse = function()
 {

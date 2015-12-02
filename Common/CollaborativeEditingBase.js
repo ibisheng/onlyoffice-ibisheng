@@ -806,7 +806,7 @@ CDocumentPositionsManager.prototype.Update_DocumentPosition = function(DocPos)
     {
         var Run = NewDocPos[0].Class;
         var Para = Run.Get_Paragraph();
-        if (Para && true === Para.Is_UseInDocument())
+        if (Para && true === Para.Is_UseInDocument() && true === Run.Is_UseInParagraph())
         {
             DocPos.length = 0;
             DocPos.push({Class : Run, Position : NewDocPos[0].Position});
@@ -819,7 +819,7 @@ CDocumentPositionsManager.prototype.Update_DocumentPosition = function(DocPos)
         var Run = DocPos[DocPos.length - 1].Class;
         var RunPos = DocPos[DocPos.length - 1].Position;
         var Para = Run.Get_Paragraph();
-        if (Para && true === Para.Is_UseInDocument())
+        if (Para && true === Para.Is_UseInDocument() && true === Run.Is_UseInParagraph())
         {
             DocPos.length = 0;
             DocPos.push({Class : Run, Position : RunPos});
