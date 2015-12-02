@@ -4780,6 +4780,10 @@ asc_docs_api.prototype.shapes_bringBackward = function()
     this.WordControl.m_oLogicDocument.bringBackward();
 };
 
+asc_docs_api.prototype.asc_setLoopShow = function(isLoop){
+    this.WordControl.m_oLogicDocument.setShowLoop(isLoop);
+};
+
 asc_docs_api.prototype.sync_endDemonstration = function()
 {
     this.asc_fireCallback("asc_onEndDemonstration");

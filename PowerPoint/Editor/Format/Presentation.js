@@ -189,6 +189,148 @@ function CreatePresentationTableStyles(Styles, IdMap)
     return def.Id;
 }
 
+
+function CShowPr(){
+    this.browse        = undefined;
+    this.kiosk         = undefined; //{restart: uInt}
+    this.penClr        = undefined;
+    this.present       = false;
+    this.show          = undefined;// {showAll: true/false, range: {start: uInt, end: uInt}, custShow: uInt};
+    this.loop          = undefined;
+    this.showAnimation = undefined;
+    this.showNarration = undefined;
+    this.useTimings    = undefined;
+}
+
+CShowPr.prototype.Write_ToBinary = function(w){
+    var nStartPos = w.GetCurPosition();
+    w.Skip(4);
+    var Flags = 0;
+    if(isRealBool(this.browse)){
+        Flags |= 1;
+        w.WriteBool(this.browse);
+    }
+    if(isRealObject(this.kiosk)){
+        Flags |= 2;
+        if(isRealNumber(this.kiosk.restart)){
+            Flags |= 4;
+            w.WriteLong(this.kiosk.restart);
+        }
+    }
+    if(isRealObject(this.penClr)){
+        Flags |= 8;
+        this.penClr.Write_ToBinary(w);
+    }
+    w.WriteBool(this.present);
+    if(isRealObject(this.show)){
+        Flags |= 16;
+        w.WriteBool(this.show.showAll);
+        if(!this.show.showAll){
+           if(this.show.range){
+               Flags |= 32;
+               w.WriteLong(this.range.start);
+               w.WriteLong(this.range.end);
+           }
+           else if(isRealNumber(this.show.custShow)){
+               Flags |= 64;
+               w.WriteLong(this.show.custShow);
+           }
+        }
+    }
+    if(isRealBool(this.loop)){
+        Flags |= 128;
+        w.WriteBool(this.loop);
+    }
+    if(isRealBool(this.showAnimation)){
+        Flags |= 256;
+        w.WriteBool(this.showAnimation);
+    }
+    if(isRealBool(this.showNarration)){
+        Flags |= 512;
+        w.WriteBool(this.showNarration);
+    }
+    if(isRealBool(this.useTimings)){
+        Flags |= 1024;
+        w.WriteBool(this.useTimings);
+    }
+    var nEndPos = w.GetCurPosition();
+    w.Seek(nStartPos);
+    w.WriteLong(Flags);
+    w.Seek(nEndPos);
+}
+
+CShowPr.prototype.Read_FromBinary = function(r){
+    var Flags = r.GetLong();
+    if(Flags & 1){
+        this.browse = r.GetBool();
+    }
+    if(Flags & 2){
+        this.kiosk = {};
+        if(Flags & 4){
+            this.kiosk.restart = r.GetLong();
+        }
+    }
+    if(Flags & 8){
+        this.penClr = new CUniColor();
+        this.penClr.Read_FromBinary(r);
+    }
+    this.present = r.Read_FromBinary(r);
+    if(Flags & 16){
+        this.show = {};
+        this.show.showAll = r.GetBool();
+        if(Flags & 32){
+            var start = r.GetLong();
+            var end = r.GetLong();
+            this.show.range = {start: start, end: end};
+        }
+        else if(Flags & 64){
+            this.show.custShow = r.GetLong();
+        }
+    }
+    if(Flags & 128){
+        this.loop = r.GetBool();
+    }
+    if(Flags & 256){
+        this.showAnimation = r.GetBool();
+    }
+    if(Flags & 512){
+        this.showNarration = r.GetBool();
+    }
+    if(Flags & 1024){
+        this.useTimings = r.GetBool();
+    }
+}
+
+CShowPr.prototype.Copy = function(){
+    var oCopy = new CShowPr();
+    oCopy.browse = this.browse;
+    if(isRealObject(this.kiosk)){
+        oCopy.kiosk = {};
+        if(isRealBool)
+        oCopy.kiosk = {resetart: this.kiosk.restart};
+    }
+    if(this.penClr){
+        oCopy.penClr = this.penClr.createDuplicate();
+    }
+    oCopy.present = this.present;
+    if(isRealObject(this.show)){
+        oCopy.show = {};
+        oCopy.show.showAll = this.show.showAll;
+        if(isRealObject(this.show.range)){
+            oCopy.show.range = {start: this.show.range.start, end: this.show.range.end};
+        }
+        else if(isRealNumber(this.show.custShow)){
+            oCopy.show.custShow = this.show.custShow;
+        }
+    }
+    oCopy.loop          = this.loop;
+    oCopy.showAnimation = this.showAnimation;
+    oCopy.showNarration = this.showNarration;
+    oCopy.useTimings    = this.useTimings;
+    return oCopy;
+}
+
+
 function CPresentation(DrawingDocument)
 {
     this.History   = History;
@@ -287,10 +429,57 @@ function CPresentation(DrawingDocument)
     this.CommentAuthors = {};
     this.createDefaultTableStyles();
     this.bGoToPage = false;
+
+    this.custShowList = [];
+    this.clrMru = [];
+    this.prnPr  = null;
+    this.showPr = null;
 }
 
 CPresentation.prototype =
 {
+    setShowLoop: function(value){
+        if(value === false){
+            if(!this.showPr){
+                return;
+            }
+            else{
+                if(this.showPr.loop !== false){
+                    var oCopyShowPr = this.showPr.Copy();
+                    oCopyShowPr.loop = false;
+                    this.setShowPr(oCopyShowPr);
+                }
+            }
+        }
+        else{
+            if(!this.showPr){
+                var oShowPr = new CShowPr();
+                oShowPr.loop = true;
+                this.setShowPr(oShowPr);
+            }
+            else{
+                if(!this.showPr.loop){
+                    var oCopyShowPr = this.showPr.Copy();
+                    oCopyShowPr.loop = true;
+                    this.setShowPr(oCopyShowPr);
+                }
+            }
+        }
+    },
+
+    isLoopShowMode: function(){
+        if(this.showPr){
+            return this.showPr.loop === true;
+        }
+        return false;
+    },
+
+
+    setShowPr: function(oShowPr){
+        History.Add(this, {Type: historyitem_Presentation_SetShowPr, oldPr: this.showPr, newPr: oShowPr});
+        this.showPr = oShowPr;
+    },
+
     createDefaultTableStyles: function()
     {
         //ExecuteNoHistory(function(){
@@ -3603,6 +3792,11 @@ CPresentation.prototype =
 
         switch ( Type )
         {
+            case historyitem_Presentation_SetShowPr:
+            {
+                this.showPr = Data.oldPr;
+                break;
+            }
             case historyitem_Document_DefaultTab:
             {
                 Default_Tab_Stop = Data.Old;
@@ -3653,6 +3847,11 @@ CPresentation.prototype =
 
         switch ( Type )
         {
+            case historyitem_Presentation_SetShowPr:
+            {
+                this.showPr = Data.newPr;
+                break;
+            }
             case historyitem_Presentation_AddSlide:
             {
                 this.Slides.splice(Data.Pos, 0, g_oTableId.Get_ById(Data.Id));
@@ -4359,6 +4558,17 @@ CPresentation.prototype =
 
         switch ( Type )
         {
+            case historyitem_Presentation_SetShowPr:
+            {
+                if(Data.newPr){
+                    Writer.WriteBool(true);
+                    Data.newPr.Write_ToBinary(Writer);
+                }
+                else{
+                    Writer.WriteBool(false);
+                }
+                break;
+            }
             case historyitem_Document_DefaultTab:
             {
                 // Double : Default Tab
@@ -4421,6 +4631,17 @@ CPresentation.prototype =
 
         switch ( Type )
         {
+            case historyitem_Presentation_SetShowPr:
+            {
+                if(Reader.GetBool()){
+                    this.showPr = new CShowPr();
+                    this.showPr.Read_FromBinary(Reader);
+                }
+                else{
+                    this.showPr = null;
+                }
+                break;
+            }
             case historyitem_Presentation_AddSlide:
             {
                 var pos = this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong());

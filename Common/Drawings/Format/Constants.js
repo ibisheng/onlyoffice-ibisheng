@@ -702,6 +702,7 @@ var historyitem_Presentation_SlideSize         = 2668;
 var historyitem_Presentation_AddSlideMaster    = 2669;
 var historyitem_Presentation_ChangeTheme       = 2670;
 var historyitem_Presentation_ChangeColorScheme = 2671;
+var historyitem_Presentation_SetShowPr         = 2672;
 
 var historyitem_GraphicFrameSetSpPr          = 2672;
 var historyitem_GraphicFrameSetGraphicObject = 2673;
