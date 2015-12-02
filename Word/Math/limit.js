@@ -30,6 +30,15 @@ CMathLimitPr.prototype.Read_FromBinary = function(Reader)
     this.type = Reader.GetLong();
 };
 
+/**
+ *
+ * @param bInside
+ * @param Type
+ * @param FName
+ * @param Iterator
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CLimitPrimary(bInside, Type, FName, Iterator)
 {
     CLimitPrimary.superclass.constructor.call(this, bInside);
@@ -118,6 +127,12 @@ CLimitPrimary.prototype.recalculateSize = function(oMeasure)
     this.size.ascent = ascent;
 };
 
+/**
+ *
+ * @param props
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CLimit(props)
 {
     CLimit.superclass.constructor.call(this);
@@ -204,6 +219,12 @@ CLimit.prototype.Document_UpdateInterfaceState = function(MathProps)
     MathProps.Pr   = null;
 };
 
+/**
+ *
+ * @param props
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CMathFunc(props)
 {
     CMathFunc.superclass.constructor.call(this);

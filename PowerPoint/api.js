@@ -21,7 +21,12 @@ var c_oSerFormat = {
     Signature	: "PPTY"
 };
 
-/** @constructor */
+/**
+ *
+ * @param name
+ * @constructor
+ * @extends {baseEditorsApi}
+ */
 function asc_docs_api(name)
 {
   asc_docs_api.superclass.constructor.call(this, name);

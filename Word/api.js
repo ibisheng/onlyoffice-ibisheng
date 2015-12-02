@@ -266,7 +266,12 @@ CMailMergeSendData.prototype.put_UserId = function(v){this["userId"] = v;};
 // var _api = new asc_docs_api();
 // _api.init(oWordControl);
 
-/** @constructor */
+/**
+ *
+ * @param name
+ * @constructor
+ * @extends {baseEditorsApi}
+ */
 function asc_docs_api(name)
 {
   asc_docs_api.superclass.constructor.call(this, name);

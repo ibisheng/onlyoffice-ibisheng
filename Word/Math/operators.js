@@ -282,7 +282,11 @@ CGlyphOperator.prototype.PreRecalc = function(Parent)
     this.Parent = Parent;
 };
 
-
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function COperatorBracket()
 {
     CGlyphOperator.call(this);
@@ -816,7 +820,11 @@ COperatorBracket.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._c(XX[102], YY[102], XX[103], YY[103], XX[0], YY[0]);
 };
 
-
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function COperatorParenthesis()
 {
     CGlyphOperator.call(this);
@@ -963,7 +971,11 @@ COperatorParenthesis.prototype.drawPath = function(pGraphics, XX, YY)
 
 // TODO
 // установить минимальный размер стрелок
-
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function COperatorAngleBracket()
 {
     CGlyphOperator.call(this);
@@ -1075,6 +1087,11 @@ COperatorAngleBracket.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[7], YY[7]);
 };
 
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function CSquareBracket()
 {
     CGlyphOperator.call(this);
@@ -1146,6 +1163,11 @@ CSquareBracket.prototype.calcSize = function()
     return {width: width, height: height};
 };
 
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function CHalfSquareBracket()
 {
     CGlyphOperator.call(this);
@@ -1213,7 +1235,11 @@ CHalfSquareBracket.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[6], YY[6]);
 };
 
-
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function COperatorLine()
 {
     CGlyphOperator.call(this);
@@ -1277,6 +1303,11 @@ COperatorLine.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[4], YY[4]);
 };
 
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function CWhiteSquareBracket()
 {
     CGlyphOperator.call(this);
@@ -1378,6 +1409,11 @@ CWhiteSquareBracket.prototype.drawPath = function(pGraphics, XX, YY, PDSE)
     pGraphics._l(XX[13], YY[13]);
 };
 
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function COperatorDoubleLine()
 {
     CGlyphOperator.call(this);
@@ -1454,7 +1490,11 @@ COperatorDoubleLine.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[9], YY[9]);
 };
 
-
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function CSingleArrow()
 {
     CGlyphOperator.call(this);
@@ -1527,6 +1567,11 @@ CSingleArrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[10], YY[10]);
 };
 
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function CLeftRightArrow()
 {
     CGlyphOperator.call(this);
@@ -1612,6 +1657,11 @@ CLeftRightArrow.prototype.drawPath = function(pGraphics, XX, YY)
 
 };
 
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function CDoubleArrow()
 {
     CGlyphOperator.call(this);
@@ -1707,7 +1757,11 @@ CDoubleArrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[17], YY[17]);
 };
 
-
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function CLR_DoubleArrow()
 {
     CGlyphOperator.call(this);
@@ -1816,7 +1870,11 @@ CLR_DoubleArrow.prototype.drawPath = function(pGraphics, XX, YY, PDSE)
     pGraphics._l(XX[23], YY[23]);
 };
 
-
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function CCombiningArrow()
 {
     CGlyphOperator.call(this);
@@ -1887,6 +1945,11 @@ CCombiningArrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[10], YY[10]);
 };
 
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function CCombiningHalfArrow()
 {
     CGlyphOperator.call(this);
@@ -1953,6 +2016,11 @@ CCombiningHalfArrow.prototype.calcCoord = function(stretch)
     return {XX: XX, YY: YY, W: W, H: H};
 };
 
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function CCombining_LR_Arrow()
 {
     CGlyphOperator.call(this);
@@ -3196,6 +3264,12 @@ CMathDelimiterPr.prototype.Read_FromBinary = function(Reader)
     this.column     = Reader.GetLong();
 };
 
+/**
+ *
+ * @param props
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CDelimiter(props)
 {
     CDelimiter.superclass.constructor.call(this);
@@ -3738,7 +3812,11 @@ CDelimiter.prototype.GetFirstElement = function()
     return Result;
 };
 
-
+/**
+ *
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CCharacter()
 {
     this.operator = new COperator(OPER_GROUP_CHAR);
@@ -3928,7 +4006,12 @@ CMathGroupChrPr.prototype.Read_FromBinary = function(Reader)
     this.pos     = Reader.GetLong();
 };
 
-
+/**
+ *
+ * @param props
+ * @constructor
+ * @extends {CCharacter}
+ */
 function CGroupCharacter(props)
 {
     CGroupCharacter.superclass.constructor.call(this);

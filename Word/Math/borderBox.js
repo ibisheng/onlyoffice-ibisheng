@@ -140,6 +140,12 @@ CMathBorderBoxPr.prototype.Read_FromBinary = function(Reader)
     this.strikeV    = Reader.GetBool();
 };
 
+/**
+ *
+ * @param props
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CBorderBox(props)
 {
     CBorderBox.superclass.constructor.call(this);
@@ -491,6 +497,12 @@ CMathBoxPr.prototype.Read_FromBinary = function(Reader)
     }
 };
 
+/**
+ *
+ * @param props
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CBox(props)
 {
     CBox.superclass.constructor.call(this);
@@ -579,6 +591,12 @@ CMathBarPr.prototype.Read_FromBinary = function(Reader)
     this.pos = Reader.GetLong();
 };
 
+/**
+ *
+ * @param props
+ * @constructor
+ * @extends {CCharacter}
+ */
 function CBar(props)
 {
     CBar.superclass.constructor.call(this);
@@ -720,6 +738,12 @@ CMathPhantomPr.prototype.Read_FromBinary = function(Reader)
     this.zeroWid  = Reader.GetBool();
 };
 
+/**
+ *
+ * @param props
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CPhantom(props)
 {
     CPhantom.superclass.constructor.call(this);

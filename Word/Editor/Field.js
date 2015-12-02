@@ -9,6 +9,14 @@
 var fieldtype_UNKNOWN    = 0x0000;
 var fieldtype_MERGEFIELD = 0x0001;
 
+/**
+ *
+ * @param FieldType
+ * @param Arguments
+ * @param Switches
+ * @constructor
+ * @extends {CParagraphContentWithParagraphLikeContent}
+ */
 function ParaField(FieldType, Arguments, Switches)
 {
     ParaField.superclass.constructor.call(this);

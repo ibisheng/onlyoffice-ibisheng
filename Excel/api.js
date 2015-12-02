@@ -18,7 +18,15 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
   var prot;
 
 
-  /** @constructor */
+  /**
+   *
+   * @param name
+   * @param inputName
+   * @param eventsHandlers
+   * @constructor
+   * @returns {spreadsheet_api}
+   * @extends {baseEditorsApi}
+   */
   function spreadsheet_api(name, inputName, eventsHandlers) {
     spreadsheet_api.superclass.constructor.call(this, name);
 

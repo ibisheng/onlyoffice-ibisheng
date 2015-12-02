@@ -9,6 +9,13 @@ var reviewtype_Common = 0x00;
 var reviewtype_Remove = 0x01;
 var reviewtype_Add    = 0x02;
 
+/**
+ *
+ * @param Paragraph
+ * @param bMathRun
+ * @constructor
+ * @extends {CParagraphContentWithContentBase}
+ */
 function ParaRun(Paragraph, bMathRun)
 {
     ParaRun.superclass.constructor.call(this);

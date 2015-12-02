@@ -292,6 +292,12 @@ CMathRadicalPr.prototype.Read_FromBinary = function(Reader)
     this.degHide = Reader.GetBool();
 };
 
+/**
+ *
+ * @param props
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CRadical(props)
 {
     CRadical.superclass.constructor.call(this);

@@ -6,7 +6,11 @@
  * Time: 12:01
  */
 
-
+/**
+ * 
+ * @constructor
+ * @extends {CCollaborativeEditingBase}
+ */
 function CWordCollaborativeEditing()
 {
     CWordCollaborativeEditing.superclass.constructor.call(this);

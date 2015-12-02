@@ -683,7 +683,11 @@ CMPrp.prototype =
     }
 };
 
-
+/**
+ *
+ * @constructor
+ * @extends {CParagraphContentWithParagraphLikeContent}
+ */
 function CMathContent()
 {
     CMathContent.superclass.constructor.call(this);

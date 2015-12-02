@@ -1,5 +1,12 @@
 "use strict";
 
+/**
+ *
+ * @param bInside
+ * @returns {CMathBase}
+ * @constructor
+ * @extends {CParagraphContentWithParagraphLikeContent}
+ */
 function CMathBase(bInside)
 {
     CMathBase.superclass.constructor.call(this);

@@ -3,6 +3,11 @@
 // Global counters
 //-----------------------------------------------------------------------------------
 
+/**
+ *
+ * @constructor
+ * @extends {CCollaborativeEditingBase}
+ */
 function CCollaborativeEditing()
 {
     CCollaborativeEditing.superclass.constructor.call(this);

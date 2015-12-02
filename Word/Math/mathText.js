@@ -145,6 +145,12 @@ CMathBaseText.prototype.IsNeedUpdateGaps = function()
     return this.bUpdateGaps;
 };
 
+/**
+ *
+ * @param bJDraw
+ * @constructor
+ * @extends {CMathBaseText}
+ */
 function CMathText(bJDraw)
 {
     CMathText.superclass.constructor.call(this);
@@ -970,6 +976,11 @@ CMathText.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 };*/
 
+/**
+ *
+ * @constructor
+ * @extends {CMathBaseText}
+ */
 function CMathAmp()
 {
     CMathAmp.superclass.constructor.call(this);

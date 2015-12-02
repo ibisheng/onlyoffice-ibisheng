@@ -436,7 +436,12 @@
 				return result;
 			}
 		};
-		
+
+    /**
+     *
+     * @constructor
+     * @extends {Range}
+     */
 		function ActiveRange(){
 			if(1 == arguments.length)
 			{
@@ -564,6 +569,11 @@
 			// }
 		};
 
+    /**
+     *
+     * @constructor
+     * @extends {Range}
+     */
 		function FormulaRange(){
 			if(1 == arguments.length)
 			{

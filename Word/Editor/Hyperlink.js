@@ -4,6 +4,11 @@
  * Created by Ilja.Kirillov on 17.02.14.
  */
 
+/**
+ *
+ * @constructor
+ * @extends {CParagraphContentWithParagraphLikeContent}
+ */
 function ParaHyperlink()
 {
     ParaHyperlink.superclass.constructor.call(this);

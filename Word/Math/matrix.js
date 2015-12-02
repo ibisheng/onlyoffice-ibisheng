@@ -199,7 +199,11 @@ CMathMatrixPr.prototype.Read_FromBinary = function(Reader)
     }
 };
 
-
+/**
+ *
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CMatrixBase()
 {
     CMatrixBase.superclass.constructor.call(this);
@@ -426,6 +430,12 @@ CMatrixBase.prototype.getRowSpace = function(spaceRow, FontSize)
     return lineGap;
 };
 
+/**
+ *
+ * @param props
+ * @constructor
+ * @extends {CMatrixBase}
+ */
 function CMathMatrix(props)
 {
     CMathMatrix.superclass.constructor.call(this);
@@ -657,7 +667,12 @@ CMathEqArrPr.prototype.Read_FromBinary = function(Reader)
 };
 
 
-////
+/**
+ *
+ * @param props
+ * @constructor
+ * @extends {CMatrixBase}
+ */
 function CEqArray(props)
 {
     CEqArray.superclass.constructor.call(this);

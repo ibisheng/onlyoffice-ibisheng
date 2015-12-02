@@ -32,6 +32,13 @@ CMathDegreePr.prototype.Read_FromBinary = function(Reader)
     this.type = Reader.GetLong(Reader);
 };
 
+/**
+ *
+ * @param props
+ * @param bInside
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CDegreeBase(props, bInside)
 {
     CDegreeBase.superclass.constructor.call(this, bInside);
@@ -393,6 +400,13 @@ CDegreeBase.prototype.setIterator = function(iterator)
     this.iterContent = iterator;
 };
 
+/**
+ *
+ * @param props
+ * @param bInside
+ * @constructor
+ * @extends {CDegreeBase}
+ */
 function CDegree(props, bInside)
 {
     CDegree.superclass.constructor.call(this, props, bInside);
@@ -491,6 +505,13 @@ CDegree.prototype.setPosition = function(pos, PosInfo)
     }
 };
 
+/**
+ *
+ * @param iterUp
+ * @param iterDn
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CIterators(iterUp, iterDn)
 {
     CIterators.superclass.constructor.call(this, true);
@@ -605,7 +626,13 @@ CMathDegreeSubSupPr.prototype.Read_FromBinary = function(Reader)
     this.alnScr = Reader.GetBool();
 };
 
-
+/**
+ *
+ * @param props
+ * @param bInside
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CDegreeSubSupBase(props, bInside)
 {
     CDegreeSubSupBase.superclass.constructor.call(this, bInside);
@@ -804,7 +831,13 @@ CDegreeSubSupBase.prototype.setLowerIterator = function(iterator)
     this.iters.iterDn = iterator;
 };
 
-
+/**
+ *
+ * @param props
+ * @param bInside
+ * @constructor
+ * @extends {CDegreeSubSupBase}
+ */
 function CDegreeSubSup(props, bInside)
 {
     CDegreeSubSup.superclass.constructor.call(this, props, bInside);

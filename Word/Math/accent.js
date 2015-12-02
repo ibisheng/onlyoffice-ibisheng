@@ -15,6 +15,11 @@
 // 0x20D0 half left arrow (harpoon)
 // 0x20D1 half right arrow (harpoon)
 
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function CAccentCircumflex()
 {
     CGlyphOperator.call(this);
@@ -119,6 +124,11 @@ CAccentCircumflex.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[11], YY[11]);
 };
 
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function CAccentLine()
 {
     CGlyphOperator.call(this);
@@ -146,7 +156,11 @@ CAccentLine.prototype.draw = function(x, y, pGraphics)
     pGraphics.drawHorLine(0, y, x1, x2, penW);
 };
 
-
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function CAccentDoubleLine()
 {
     CGlyphOperator.call(this);
@@ -189,7 +203,11 @@ CAccentDoubleLine.prototype.draw = function(x, y, pGraphics)
     pGraphics.drawHorLine(0, y2, x1, x2, penW);
 };
 
-
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function CAccentTilde()
 {
     CGlyphOperator.call(this);
@@ -289,7 +307,11 @@ CAccentTilde.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[26], YY[26]);
 };
 
-
+/**
+ *
+ * @constructor
+ * @extends {CGlyphOperator}
+ */
 function CAccentBreve()
 {
     CGlyphOperator.call(this);
@@ -415,6 +437,12 @@ CMathAccentPr.prototype.Read_FromBinary = function(Reader)
     this.chrType = -1 === chrType ? null : chrType;
 };
 
+/**
+ *
+ * @param props
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CAccent(props)
 {
     CAccent.superclass.constructor.call(this);

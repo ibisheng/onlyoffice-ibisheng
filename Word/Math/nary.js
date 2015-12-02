@@ -124,6 +124,12 @@ CMathNaryPr.prototype.Read_FromBinary = function(Reader)
     this.supHide = Reader.GetBool();
 };
 
+/**
+ *
+ * @param props
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CNary(props)
 {
     CNary.superclass.constructor.call(this);
@@ -704,6 +710,13 @@ CNary.prototype.setPosition = function(pos, PosInfo)
         }
     }
 };
+
+/**
+ *
+ * @param bInside
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CNaryUnd(bInside)
 {
     CMathBase.call(this, bInside);
@@ -750,7 +763,12 @@ CNaryUnd.prototype.setUpperIterator = function(iterator)
     this.elements[0][0] = iterator;
 };
 
-
+/**
+ *
+ * @param bInside
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CNaryOvr(bInside)
 {
     CMathBase.call(this, bInside);
@@ -810,6 +828,12 @@ CNaryOvr.prototype.setLowerIterator = function(iterator)
     this.elements[1][0] = iterator;
 };
 
+/**
+ *
+ * @param bInside
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CNaryUndOvr(bInside)
 {
     this.gapTop = 0;
@@ -1037,6 +1061,11 @@ CNaryOperator.prototype.Get_TxtPrControlLetter = function()
     return this.Parent.Get_TxtPrControlLetter();
 };
 
+/**
+ *
+ * @constructor
+ * @extends {CNaryOperator}
+ */
 function CSigma()
 {
     CNaryOperator.call(this);
@@ -1238,6 +1267,12 @@ CSigma.prototype.calculateSizeGlyph = function()
     return {width : width, height : height};
 };
 
+/**
+ *
+ * @param bFlip
+ * @constructor
+ * @extends {CNaryOperator}
+ */
 function CProduct(bFlip)
 {
     CNaryOperator.call(this, bFlip);
@@ -1403,6 +1438,12 @@ CProduct.prototype.calculateSizeGlyph = function()
     return {width : width, height : height};
 };
 
+/**
+ *
+ * @param bFlip
+ * @constructor
+ * @extends {CNaryOperator}
+ */
 function CUnion(bFlip)
 {
     CNaryOperator.call(this, bFlip);
@@ -1472,6 +1513,12 @@ CUnion.prototype.calculateSizeGlyph = function()
     return {width : width, height : height};
 };
 
+/**
+ *
+ * @param bFlip
+ * @constructor
+ * @extends {CNaryOperator}
+ */
 function CLogicalOr(bFlip)
 {
     CNaryOperator.call(this, bFlip);
@@ -1549,6 +1596,11 @@ CLogicalOr.prototype.calculateSizeGlyph = function()
     return {width : width, height : height};
 };
 
+/**
+ *
+ * @constructor
+ * @extends {CNaryOperator}
+ */
 function CIntegral()
 {
     CNaryOperator.call(this);
@@ -1679,6 +1731,11 @@ CIntegral.prototype.calculateSizeGlyph = function()
     return {width : width, height : height};
 };
 
+/**
+ *
+ * @constructor
+ * @extends {CIntegral}
+ */
 function CDoubleIntegral()
 {
     CIntegral.call(this);
@@ -1720,6 +1777,11 @@ CDoubleIntegral.prototype.calculateSizeGlyph = function()
     return {width : width, height : height};
 };
 
+/**
+ *
+ * @constructor
+ * @extends {CIntegral}
+ */
 function CTripleIntegral()
 {
     CIntegral.call(this);
@@ -2036,6 +2098,11 @@ CVolume.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics.ds();
 };
 
+/**
+ *
+ * @constructor
+ * @extends {CNaryOperator}
+ */
 function CContourIntegral()
 {
     CNaryOperator.call(this);
@@ -2121,7 +2188,11 @@ CContourIntegral.prototype.calculateSizeGlyph = function()
     return {width : width, height : height};
 };
 
-
+/**
+ *
+ * @constructor
+ * @extends {CNaryOperator}
+ */
 function CSurfaceIntegral()
 {
     CNaryOperator.call(this);
@@ -2207,6 +2278,11 @@ CSurfaceIntegral.prototype.calculateSizeGlyph = function()
     return {width : width, height : height};
 };
 
+/**
+ *
+ * @constructor
+ * @extends {CNaryOperator}
+ */
 function CVolumeIntegral()
 {
     CNaryOperator.call(this);

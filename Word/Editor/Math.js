@@ -517,6 +517,11 @@ CMathPageInfo.prototype.IsFirstLineOnPage = function(_Line, _Page)
 };
 
 
+/**
+ *
+ * @constructor
+ * @extends {CParagraphContentWithContentBase}
+ */
 function ParaMath()
 {
     ParaMath.superclass.constructor.call(this);

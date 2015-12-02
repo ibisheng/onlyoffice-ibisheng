@@ -10,10 +10,11 @@ function CParagraphContentBase()
 {
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-// Класс CParagraphContentWithContentBase
-//   Это базовый класс для элементов содержимого(контент) параграфа, у которых есть свое содержимое.
-//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Это базовый класс для элементов содержимого(контент) параграфа, у которых есть свое содержимое.
+ * @constructor
+ * @extends {CParagraphContentBase}
+ */
 function CParagraphContentWithContentBase()
 {
     CParagraphContentWithContentBase.superclass.constructor.call(this);
@@ -169,10 +170,11 @@ CParagraphContentWithContentBase.prototype.private_UpdateTrackRevisions = functi
         RevisionsManager.Check_Paragraph(this.Paragraph);
     }
 };
-//----------------------------------------------------------------------------------------------------------------------
-// Класс CParagraphContentWithContentBase
-//   Это базовый класс для элементов параграфа, которые сами по себе могут содержать элементы параграфа.
-//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Это базовый класс для элементов параграфа, которые сами по себе могут содержать элементы параграфа.
+ * @constructor
+ * @extends {CParagraphContentWithContentBase}
+ */
 function CParagraphContentWithParagraphLikeContent()
 {
     CParagraphContentWithParagraphLikeContent.superclass.constructor.call(this);

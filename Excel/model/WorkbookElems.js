@@ -3512,12 +3512,20 @@ TreeRBNode.prototype = {
 		return this.key == x.key;
 	}
 };
+/**
+ *
+ * @param low
+ * @param high
+ * @param storedValue
+ * @constructor
+ * @extends {TreeRBNode}
+ */
 function IntervalTreeRBNode(low, high, storedValue){
 	IntervalTreeRBNode.superclass.constructor.call(this, low, storedValue);
 	this.high = high;
 	this.maxHigh = this.high;
 	this.minLow = this.key;
-};
+}
 Asc.extendClass(IntervalTreeRBNode, TreeRBNode);
 IntervalTreeRBNode.prototype.isEqual = function (x) {
 	return this.key == x.key && this.high == x.high;
@@ -3527,7 +3535,7 @@ function TreeRB(){
 	this.nil = null;
 	this.root = null;
 	this._init();
-};
+}
 TreeRB.prototype = {
 	constructor: TreeRB,
 	_init : function(){
@@ -3808,6 +3816,11 @@ TreeRB.prototype = {
 	}
 };
 
+/**
+ *
+ * @constructor
+ * @extends {TreeRB}
+ */
 function IntervalTreeRB(){
 	IntervalTreeRB.superclass.constructor.call(this);
 }

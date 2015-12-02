@@ -26,6 +26,12 @@ CMathFractionPr.prototype.Read_FromBinary = function(Reader)
     this.type = Reader.GetLong();
 };
 
+/**
+ *
+ * @param props
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CFraction(props)
 {
     CFraction.superclass.constructor.call(this);
@@ -457,6 +463,13 @@ CFraction.prototype.Document_UpdateInterfaceState = function(MathProps)
     MathProps.Pr   = null;
 };
 
+/**
+ *
+ * @param bInside
+ * @param MathContent
+ * @constructor
+ * @extends {CMathBase}
+ */
 function CFractionBase(bInside, MathContent)
 {
     CFractionBase.superclass.constructor.call(this, bInside);
@@ -486,6 +499,12 @@ CFractionBase.prototype.Get_Id = function()
     return this.elements[0][0].Get_Id();
 };
 
+/**
+ *
+ * @param MathContent
+ * @constructor
+ * @extends {CFractionBase}
+ */
 function CNumerator(MathContent)
 {
     CNumerator.superclass.constructor.call(this, true, MathContent);
@@ -536,6 +555,12 @@ CNumerator.prototype.recalculateSize = function()
     this.size.ascent = ascent;
 };
 
+/**
+ *
+ * @param MathContent
+ * @constructor
+ * @extends {CFractionBase}
+ */
 function CDenominator(MathContent)
 {
     CDenominator.superclass.constructor.call(this, true, MathContent);
