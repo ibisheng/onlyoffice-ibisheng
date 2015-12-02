@@ -924,7 +924,9 @@ CPresentation.prototype =
 
 // Отрисовка содержимого Документа
     Draw : function(nPageIndex, pGraphics){
-        CollaborativeEditing.Update_ForeignCursorsPositions();
+		if(!pGraphics.IsSlideBoundsCheckerType){
+			CollaborativeEditing.Update_ForeignCursorsPositions();
+		}
         this.Slides[nPageIndex] && this.Slides[nPageIndex].draw(pGraphics);
     },
 

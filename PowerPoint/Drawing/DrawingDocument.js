@@ -1149,6 +1149,10 @@ CDrawingCollaborativeTarget.prototype =
             this.HtmlElement.style.left = this.HtmlElementX + "px";
             this.HtmlElement.style.top = this.HtmlElementY + "px";
         }
+		
+		
+        if (CollaborativeEditing)
+            CollaborativeEditing.Update_ForeignCursorLabelPosition(this.Id, this.HtmlElementX, this.HtmlElementY, this.Color);
 
         // 3) добавить, если нужно
         if (bIsHtmlElementCreate)
