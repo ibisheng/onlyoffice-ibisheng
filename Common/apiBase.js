@@ -1,5 +1,7 @@
 ﻿"use strict";
 
+var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
+
 /** @constructor */
 function baseEditorsApi(name) {
   g_fontApplication.Init();

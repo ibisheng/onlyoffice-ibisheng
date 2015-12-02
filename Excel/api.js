@@ -3,7 +3,6 @@
 /** @define {boolean} */
 var ASC_SPREADSHEET_API_CO_AUTHORING_ENABLE = true;
 var editor;
-var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 (/**
  * @param {jQuery} $
  * @param {Window} window

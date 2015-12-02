@@ -3,7 +3,6 @@
 /** @define {boolean} */
 var ASC_DOCS_API_DEBUG = true;
 
-var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 var documentId = undefined;
 var documentUserId = undefined;
 var documentUrl = 'null';
