@@ -1568,7 +1568,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_PosByElement = function(
 };
 CParagraphContentWithParagraphLikeContent.prototype.Get_ElementByPos = function(ContentPos, Depth)
 {
-    if (Depth + 1 >= ContentPos.Depth)
+    if (Depth >= ContentPos.Depth)
         return this;
 
     var CurPos = ContentPos.Get(Depth);
