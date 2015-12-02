@@ -165,12 +165,12 @@ asc_docs_api.prototype._coAuthoringInit = function() {
   };
   this.CoAuthoringApi.onCursor = function(e) {
     if (true === CollaborativeEditing.Is_Fast()) {
-      t.WordControl.m_oLogicDocument.Update_ForeignCursor(e[e.length - 1].cursor, e[e.length - 1].user, true);
+      t.WordControl.m_oLogicDocument.Update_ForeignCursor(e[e.length - 1]['cursor'], e[e.length - 1]['user'], true);
     }
   };
   this.CoAuthoringApi.onConnectionStateChanged = function(e) {
-    if (true === CollaborativeEditing.Is_Fast() && false === e.state) {
-      editor.WordControl.m_oLogicDocument.Remove_ForeignCursor(e.id);
+    if (true === CollaborativeEditing.Is_Fast() && false === e['state']) {
+      editor.WordControl.m_oLogicDocument.Remove_ForeignCursor(e['id']);
     }
     t.asc_fireCallback("asc_onConnectionStateChanged", e);
   };
