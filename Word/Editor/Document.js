@@ -992,6 +992,10 @@ CDocument.prototype =
         // Проверяем последний параграф на наличие секции 
         this.Check_SectionLastParagraph();
 
+        // Специальная проверка плохо заданных нумераций через стиль. Когда ссылка на нумерацию в стиле есть,
+        // а обратной ссылки в нумерации на стиль - нет.
+        this.Styles.Check_StyleNumberingOnLoad(this.Numbering);
+
         // Перемещаем курсор в начало документа
         this.Cursor_MoveToStartPos(false);
 

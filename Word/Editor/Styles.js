@@ -4746,6 +4746,33 @@ CStyles.prototype =
 
         return arrStyles;
     },
+
+    Check_StyleNumberingOnLoad : function(Numbering)
+    {
+        // TODO: Похоже Word сначала пробегается по дефолтовым стилям, типа Heading, потом по остальным.
+        for (var StyleId in this.Style)
+        {
+            var Style = this.Style[StyleId];
+
+            var NumPr = Style.ParaPr.NumPr;
+            if (!NumPr || !NumPr.NumId)
+                continue;
+
+            var AbstractNum = Numbering.Get_AbstractNum(NumPr.NumId);
+            if (!Num)
+                continue;
+
+            var iLvl = (NumPr.Lvl ? NumPr.Lvl : 0);
+            var NumLvl = AbstractNum.Get_Lvl(iLvl);
+
+            if (!NumLvl || NumLvl.PStyle)
+                continue;
+
+            var NewLvl = AbstractNum.Internal_CopyLvl(NumLvl);
+            NewLvl.PStyle = StyleId;
+            AbstractNum.Set_Lvl(iLvl, NewLvl);
+        }
+    },
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------

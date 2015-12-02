@@ -333,7 +333,7 @@ CAbstractNum.prototype =
             return;
 
         var Lvl_old = this.Lvl[iLvl];
-
+        this.Lvl[iLvl] = Lvl_new;
         History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
     },
 	
