@@ -263,6 +263,9 @@ CDocument.prototype.Accept_RevisionChangesBySelection = function()
         {
             this.Create_NewHistoryPoint(historydescription_Document_AcceptRevisionChangesBySelection);
             this.Accept_RevisionChanges(undefined, false);
+
+            if (true === this.History.Is_LastPointEmpty())
+                this.History.Remove_LastPoint();
         }
     }
 
@@ -281,6 +284,9 @@ CDocument.prototype.Reject_RevisionChangesBySelection = function()
         {
             this.Create_NewHistoryPoint(historydescription_Document_AcceptRevisionChangesBySelection);
             this.Reject_RevisionChanges(undefined, false);
+
+            if (true === this.History.Is_LastPointEmpty())
+                this.History.Remove_LastPoint();
         }
     }
 
@@ -301,6 +307,13 @@ CDocument.prototype.Accept_AllRevisionChanges = function()
                 LogicDoc.Accept_RevisionChanges(undefined, true);
             }
         }
+
+        if (true === this.History.Is_LastPointEmpty())
+        {
+            this.History.Remove_LastPoint();
+            return;
+        }
+
         this.Selection_Remove();
         this.private_CorrectDocumentPosition();
         this.Recalculate();
@@ -323,6 +336,13 @@ CDocument.prototype.Reject_AllRevisionChanges = function()
                 LogicDoc.Reject_RevisionChanges(undefined, true);
             }
         }
+
+        if (true === this.History.Is_LastPointEmpty())
+        {
+            this.History.Remove_LastPoint();
+            return;
+        }
+
         this.Selection_Remove();
         this.private_CorrectDocumentPosition();
         this.Recalculate();

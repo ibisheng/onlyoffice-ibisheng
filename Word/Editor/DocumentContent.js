@@ -1483,7 +1483,7 @@ CDocumentContent.prototype =
         var Run = new ParaRun(Para1, false);
         Run.Add_ToContent(0, new ParaPageNum());
         Para1.Add_ToContent(0, Run);
-        
+
         this.Recalculate();
     },
 
