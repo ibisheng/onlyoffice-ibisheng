@@ -7,7 +7,7 @@
  */
 
 /**
- * 
+ *
  * @constructor
  * @extends {CCollaborativeEditingBase}
  */

@@ -20,30 +20,14 @@
 		 * @memberOf Asc
 		 */
 		function asc_CAscEditorPermissions (settings) {
-			if ( !(this instanceof asc_CAscEditorPermissions) ) {
-				return new asc_CAscEditorPermissions();
-			}
-			if(settings) {
-				this.canLicense = settings["canLicense"];
-
-				this.canEdit = settings["canEdit"];
-				this.canDownload = settings["canDownload"];
-				this.canCoAuthoring = settings["canCoAuthoring"];
-				this.canReaderMode = settings["canReaderMode"];
-				this.canBranding = settings["canBranding"];
-				this.isAutosaveEnable = settings["isAutosaveEnable"];
-				this.AutosaveMinInterval = settings["AutosaveMinInterval"];
-				this.isAnalyticsEnable = settings["isAnalyticsEnable"];
-			} else {
-				this.canEdit = true;
-				this.canDownload = true;
-				this.canCoAuthoring = true;
-				this.canReaderMode = true;
-				this.canBranding = true;
-				this.isAutosaveEnable = true;
-				this.AutosaveMinInterval = 300;
-				this.isAnalyticsEnable = false;
-			}
+			this.canEdit = true;
+			this.canDownload = true;
+			this.canCoAuthoring = true;
+			this.canReaderMode = true;
+			this.canBranding = false;
+			this.isAutosaveEnable = true;
+			this.AutosaveMinInterval = 300;
+			this.isAnalyticsEnable = false;
 			return this;
 		}
 
@@ -61,15 +45,7 @@
 			asc_getIsAnalyticsEnable: function(){ return this.isAnalyticsEnable; },
 
 			asc_setCanLicense: function(v){ this.canLicense = v; },
-
-			asc_setCanEdit: function(v){ this.canEdit = v; },
-			asc_setCanDownload: function(v){ this.canDownload = v; },
-			asc_setCanCoAuthoring: function(v){ this.canCoAuthoring = v; },
-			asc_setCanReaderMode: function(v){ this.canReaderMode = v; },
-			asc_setCanBranding: function(v){ this.canBranding = v; },
-			asc_setIsAutosaveEnable: function(v){ this.isAutosaveEnable = v; },
-			asc_setAutosaveMinInterval: function(v){ this.AutosaveMinInterval = v; },
-			asc_setIsAnalyticsEnable: function(v){ this.isAnalyticsEnable = v; }
+      asc_setCanBranding: function(v){ this.canBranding = v; }
 		};
 		
 		/*

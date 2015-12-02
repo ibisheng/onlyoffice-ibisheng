@@ -15,14 +15,15 @@ asc_docs_api.prototype.asc_getEditorPermissions = function(licenseUrl, customerI
     });
   } else {
     // Фиктивный вызов
-    this._onCheckLicenseEnd(true, false);
+    this._onCheckLicenseEnd(true, g_oLicenseResult.Error);
   }
   this._coAuthoringInit();
 };
 asc_docs_api.prototype._onEndPermissions = function() {
   if (null !== this.licenseResult && this.isOnFirstConnectEnd) {
     var oResult = new window['Asc'].asc_CAscEditorPermissions();
-    oResult.asc_setCanLicense(this.licenseResult.res);
+    oResult.asc_setCanLicense(g_oLicenseResult.Success === this.licenseResult.res);
+    oResult.asc_setCanBranding(g_oLicenseResult.Error !== this.licenseResult.res); // Для тех, у кого есть лицензия, branding доступен
     this.asc_fireCallback('asc_onGetEditorPermissions', oResult);
   }
 };

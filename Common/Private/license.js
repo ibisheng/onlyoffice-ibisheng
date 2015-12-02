@@ -1,5 +1,11 @@
 ﻿"use strict";
 
+var g_oLicenseResult = {
+  Error   : 1,
+  Expired : 2,
+  Success : 3
+};
+
 var g_sLicenseDefaultUrl = "/license";
 var g_sPublicRSAKey = '-----BEGIN CERTIFICATE-----MIIBvTCCASYCCQD55fNzc0WF7TANBgkqhkiG9w0BAQUFADAjMQswCQYDVQQGEwJKUDEUMBIGA1UEChMLMDAtVEVTVC1SU0EwHhcNMTAwNTI4MDIwODUxWhcNMjAwNTI1MDIwODUxWjAjMQswCQYDVQQGEwJKUDEUMBIGA1UEChMLMDAtVEVTVC1SU0EwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBANGEYXtfgDRlWUSDn3haY4NVVQiKI9CzThoua9+DxJuiseyzmBBe7Roh1RPqdvmtOHmEPbJ+kXZYhbozzPRbFGHCJyBfCLzQfVos9/qUQ88u83b0SFA2MGmQWQAlRtLy66EkR4rDRwTj2DzR4EEXgEKpIvo8VBs/3+sHLF3ESgAhAgMBAAEwDQYJKoZIhvcNAQEFBQADgYEAEZ6mXFFq3AzfaqWHmCy1ARjlauYAa8ZmUFnLm0emg9dkVBJ63aEqARhtok6bDQDzSJxiLpCEF6G4b/Nv/M/MLyhP+OoOTmETMegAVQMq71choVJyOFE5BtQa6M/lCHEOya5QUfoRF2HF9EjRF44K3OK+u3ivTSj3zwjtpudY5Xo=-----END CERTIFICATE-----';
 
@@ -7,7 +13,7 @@ function CheckLicense(licenseUrl, customerId, userId, userFirstName, userLastNam
   licenseUrl = licenseUrl ? licenseUrl : g_sLicenseDefaultUrl;
   g_fGetJSZipUtils().getBinaryContent(licenseUrl, function(err, data) {
     if (err) {
-      callback(true, false);
+      callback(true, g_oLicenseResult.Error);
       return;
     }
 
@@ -27,9 +33,9 @@ function CheckLicense(licenseUrl, customerId, userId, userFirstName, userLastNam
       var x509 = new X509();
       x509.readCertPEM(g_sPublicRSAKey);
       var isValid = x509.subjectPublicKeyRSA.verifyString(JSON.stringify(oLicense), hSig);
-      callback(false, isValid ? CheckUserInLicense(customerId, userId, userFirstName, userLastName, oLicense) : false);
+      callback(false, isValid ? CheckUserInLicense(customerId, userId, userFirstName, userLastName, oLicense) : g_oLicenseResult.Error);
     } catch (e) {
-      callback(true, false);
+      callback(true, g_oLicenseResult.Error);
     }
   });
 }
@@ -43,7 +49,7 @@ function CheckLicense(licenseUrl, customerId, userId, userFirstName, userLastNam
  * @returns {boolean}
  */
 function CheckUserInLicense(customerId, userId, userFirstName, userLastName, oLicense) {
-  var res = false;
+  var res = g_oLicenseResult.Error;
   var superuser = 'onlyoffice';
   try {
     if (oLicense['users']) {
@@ -56,11 +62,11 @@ function CheckUserInLicense(customerId, userId, userFirstName, userLastName, oLi
       }
       if (checkUserHash) {
         var endDate = new Date(oLicense['end_date']);
-        res = endDate >= new Date();
+        res = (endDate >= new Date()) ? g_oLicenseResult.Success : g_oLicenseResult.Expired;
       }
     }
   } catch (e) {
-    res = false;
+    res = g_oLicenseResult.Error;
   }
   return res;
 }
