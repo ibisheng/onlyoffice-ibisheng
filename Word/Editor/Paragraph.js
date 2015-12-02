@@ -13455,8 +13455,8 @@ Paragraph.prototype.Get_ContentPosition = function(bSelection, bStart, PosArray)
     while (Depth > 0)
     {
         var Pos = ParaContentPos.Get(Depth);
-        var Class = this.Get_ElementByPos(ParaContentPos);
         ParaContentPos.Decrease_Depth(1);
+        var Class = this.Get_ElementByPos(ParaContentPos);
         Depth--;
 
         PosArray.splice(Index, 0, {Class : Class, Position : Pos});
