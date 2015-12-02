@@ -5010,12 +5010,10 @@ ParaDrawing.prototype =
             var NewParaDrawing = this.Copy();
             NewParaDrawing.Add_ToDocument(NearPos, true, RunPr);
             this.LogicDocument.Select_DrawingObject(NewParaDrawing.Get_Id());
-            console.log("1");
         }
         else
         {
             this.Add_ToDocument(NearPos, true, RunPr);
-            console.log("2");
         }
     },
 
