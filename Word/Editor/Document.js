@@ -14859,7 +14859,15 @@ CDocument.prototype.Load_DocumentStateAfterLoadChanges = function(State)
             if (true !== this.DrawingObjects.Load_DocumentStateAfterLoadChanges(State))
             {
                 this.CurPos.Type = docpostype_Content;
-                this.Cursor_MoveAt(State.X ? State.X : 0, State.Y ? State.Y : 0, false);
+
+                var ContentPos = 0;
+                if (this.Pages[this.CurPage])
+                    ContentPos = this.Pages[this.CurPage].Pos + 1;
+                else
+                    ContentPos = 0;
+                ContentPos = Math.max(0, Math.min(this.Content.length - 1, ContentPos));
+                this.CurPos.ContentPos = ContentPos;
+                this.Content[ContentPos].Cursor_MoveToStartPos(false);
             }
             break;
         }
