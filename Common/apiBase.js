@@ -18,6 +18,7 @@ function baseEditorsApi(name) {
 
   this.LoadedObject = null;
   this.DocumentType = 0; // 0 - empty, 1 - test, 2 - document (from json)
+  this.DocInfo = null;
 
   // Тип состояния на данный момент (сохранение, открытие или никакое)
   this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;

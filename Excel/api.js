@@ -54,7 +54,6 @@ var editor;
     this.chartEditor = undefined;
     this.documentOpenOptions = undefined;		// Опции при открытии (пока только опции для CSV)
     this.documentCallbackUrl = undefined;		// Ссылка для отправления информации о документе
-    this.DocInfo = null;
 
     // объекты, нужные для отправки в тулбар (шрифты, стили)
     this._gui_control_colors = null;

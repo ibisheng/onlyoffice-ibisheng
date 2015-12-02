@@ -287,7 +287,6 @@ function asc_docs_api(name)
 	//todo убрать из native, copypaste, chart, loadfont
     //this.DocumentUrl = "";
     this.DocumentName = "";
-	this.DocInfo = null;
 	this.InterfaceLocale = null;
         
     this.ShowParaMarks = false;

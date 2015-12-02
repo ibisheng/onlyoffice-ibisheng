@@ -40,7 +40,6 @@ function asc_docs_api(name)
 
     this.DocumentUrl = "";
     this.DocumentName = "";
-	this.DocInfo = null;
     this.bNoSendComments = false;
 
     this.isApplyChangesOnOpen = false;
