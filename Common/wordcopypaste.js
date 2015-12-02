@@ -1433,7 +1433,7 @@ CopyProcessor.prototype =
 			
 			if(elementsContent.DocContent || (elementsContent.Drawings && elementsContent.Drawings.length) || (elementsContent.SlideObjects && elementsContent.SlideObjects.length))
 			{
-				this.oPresentationWriter.WriteString2(documentId);
+				this.oPresentationWriter.WriteString2(this.api.documentId);
 				this.oPresentationWriter.WriteDouble(presentation.Width);
 				this.oPresentationWriter.WriteDouble(presentation.Height);
 			}
@@ -2489,9 +2489,9 @@ function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary)
 }
 function trimString( str ){
     return str.replace(/^\s+|\s+$/g, '') ;
-};
+}
 function sendImgUrls(api, images, callback, bExcel) {
-  var rData = {"id": bExcel ? api.documentId : documentId, "c": "imgurls", "vkey": bExcel ? api.documentVKey : documentVKey, "userid":  bExcel ? api.documentUserId : documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": images};
+  var rData = {"id": api.documentId, "c": "imgurls", "vkey": bExcel ? api.documentVKey : documentVKey, "userid":  bExcel ? api.documentUserId : documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": images};
   if(!bExcel)
       api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
   else
@@ -3488,7 +3488,7 @@ PasteProcessor.prototype =
                             else
                                 master = presentation.slideMasters[0];
 								
-                            if(documentId !== p_url)
+                            if(this.api.documentId !== p_url)
                             {
                                 var layouts_count = stream.GetULong();
                                 for(var i = 0; i < layouts_count; ++i)

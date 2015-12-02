@@ -43,7 +43,6 @@ var editor;
     this.wbModel = null;
 
     this.DocumentName = "";
-    this.documentId = undefined;
     this.documentUserId = undefined;
     this.documentUrl = "null";
     this.documentUrlChanges = null;

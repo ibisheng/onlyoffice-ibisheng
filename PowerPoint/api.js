@@ -1,6 +1,5 @@
 "use strict";
 
-var documentId = undefined;
 var documentUserId = undefined;
 var documentUrl = 'null';
 var documentUrlChanges = null;
@@ -472,7 +471,7 @@ asc_docs_api.prototype._coAuthoringInit = function() {
   if (!(window["NATIVE_EDITOR_ENJINE"] || offlineMode === documentUrl)) {
     this.CoAuthoringApi.set_url(null);
   }
-  this.CoAuthoringApi.init(this.User, documentId, documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Presentation, documentFormatSave);
+  this.CoAuthoringApi.init(this.User, this.documentId, documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Presentation, documentFormatSave);
 
   // ToDo init other callbacks
 };
@@ -647,7 +646,7 @@ asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo) {
   }
 
   if (this.DocInfo) {
-    documentId = this.DocInfo.get_Id();
+    this.documentId = this.DocInfo.get_Id();
     documentUserId = this.DocInfo.get_UserId();
     documentUrl = this.DocInfo.get_Url();
     documentTitle = this.DocInfo.get_Title();
@@ -690,7 +689,7 @@ asc_docs_api.prototype.LoadDocument = function() {
   if (offlineMode !== documentUrl) {
     this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
     var rData = {
-      "id": documentId,
+      "id": this.documentId,
       "userid": documentUserId,
       "format": documentFormat,
       "vkey": documentVKey,
@@ -1953,7 +1952,7 @@ asc_docs_api.prototype.put_ShowSnapLines = function(isShow)
 asc_docs_api.prototype.get_ShowSnapLines = function()
 {
     return this.ShowSnapLines;
-}
+};
 
 asc_docs_api.prototype.put_ShowParaMarks = function(isShow){
 	this.ShowParaMarks = isShow;
@@ -2092,7 +2091,7 @@ asc_docs_api.prototype.ShapeApply = function(prop)
             oApi.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
           };
           var rData = {
-            "id":documentId,
+            "id":this.documentId,
             "userid": documentUserId,
             "vkey": documentVKey,
             "c":"imgurl",
@@ -2903,7 +2902,7 @@ asc_docs_api.prototype.ChangeArtImageFromFile = function()
 
 asc_docs_api.prototype.AddImage = function(){
 	var t = this;
-	ShowImageFileDialog(documentId, documentUserId, function (error, files) {
+	ShowImageFileDialog(this.documentId, documentUserId, function (error, files) {
 		t._uploadCallback(error, files);
 	}, function (error) {
 		if (c_oAscError.ID.No !== error)
@@ -2917,7 +2916,7 @@ asc_docs_api.prototype._uploadCallback = function(error, files) {
 		t.sync_ErrorCallback(error, c_oAscError.Level.NoCritical);
 	} else {
 		t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-		UploadImageFiles(files, documentId, documentUserId, function (error, url) {
+		UploadImageFiles(files, this.documentId, documentUserId, function (error, url) {
 			if (c_oAscError.ID.No !== error)
 				t.sync_ErrorCallback(error, c_oAscError.Level.NoCritical);
 			else
@@ -2962,7 +2961,7 @@ asc_docs_api.prototype.AddImageUrl = function(url){
 	else
 	{
 		var rData = {
-			"id":documentId,
+			"id":this.documentId,
 			"userid": documentUserId,
 			"vkey": documentVKey,
 			"c":"imgurl",
@@ -3065,7 +3064,7 @@ asc_docs_api.prototype.AddImageUrlActionCallback = function(_image)
 
         this.WordControl.m_oLogicDocument.Add_FlowImage(_w, _h, src);
     }
-}
+};
 
 asc_docs_api.prototype.AddImageUrlAction = function(url){
     var _image = this.ImageLoader.LoadImage(url, 1);
@@ -3179,7 +3178,7 @@ asc_docs_api.prototype.ImgApply = function(obj){
         };
 
         var rData = {
-          "id":documentId,
+          "id":this.documentId,
           "userid": documentUserId,
           "vkey": documentVKey,
           "c":"imgurl",
@@ -3205,7 +3204,7 @@ asc_docs_api.prototype.ChartApply = function(obj)
         }
     }
     this.WordControl.m_oLogicDocument.ChartApply(obj);
-}
+};
 asc_docs_api.prototype.set_Size = function(width, height){
 
 };
@@ -4993,7 +4992,7 @@ function _downloadAs(editor, filetype, actionType, options)
     var command = "save";
 	var oAdditionalData = {};
 	oAdditionalData["c"] = command;
-	oAdditionalData["id"] = documentId;
+	oAdditionalData["id"] = editor.documentId;
 	oAdditionalData["userid"] = documentUserId;
 	oAdditionalData["vkey"] = documentVKey;
 	oAdditionalData["outputformat"] = filetype;

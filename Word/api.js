@@ -1,6 +1,5 @@
 ﻿"use strict";
 
-var documentId = undefined;
 var documentUserId = undefined;
 var documentUrl = 'null';
 var documentUrlChanges = null;
@@ -578,7 +577,7 @@ asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo) {
   }
 
   if (this.DocInfo) {
-    documentId = this.DocInfo.get_Id();
+    this.documentId = this.DocInfo.get_Id();
     documentUserId = this.DocInfo.get_UserId();
     documentUrl = this.DocInfo.get_Url();
     documentTitle = this.DocInfo.get_Title();
@@ -623,7 +622,7 @@ asc_docs_api.prototype.LoadDocument = function(isVersionHistory) {
   if (offlineMode !== documentUrl) {
     var rData = {
       "c": 'open',
-      "id": documentId,
+      "id": this.documentId,
       "userid": documentUserId,
       "format": documentFormat,
       "vkey": documentVKey,
@@ -1237,7 +1236,7 @@ asc_docs_api.prototype._coAuthoringInit = function() {
   if (!(window["NATIVE_EDITOR_ENJINE"] || offlineMode === documentUrl)) {
     this.CoAuthoringApi.set_url(null);
   }
-  this.CoAuthoringApi.init(this.User, documentId, documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Word, documentFormatSave);
+  this.CoAuthoringApi.init(this.User, this.documentId, documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Word, documentFormatSave);
 };
 
 // server disconnect
@@ -1268,7 +1267,7 @@ asc_docs_api.prototype._coSpellCheckInit = function() {
         };
     }
 
-	this.SpellCheckApi.init(documentId);
+	this.SpellCheckApi.init(this.documentId);
 };
 
 asc_docs_api.prototype.asc_getSpellCheckLanguages = function() {
@@ -2129,7 +2128,7 @@ asc_docs_api.prototype.asc_setAdvancedOptions = function(idOption, option) {
       // Проверяем тип состояния в данный момент
       if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Open) {
           var rData = {
-            "id":documentId,
+            "id":this.documentId,
             "userid": documentUserId,
             "format": documentFormat,
             "vkey": documentVKey,
@@ -4401,7 +4400,7 @@ asc_docs_api.prototype.ChangeShapeImageFromFile = function()
 
 asc_docs_api.prototype.AddImage = function(){
 	var t = this;
-	ShowImageFileDialog(documentId, documentUserId, function(error, files){
+	ShowImageFileDialog(this.documentId, documentUserId, function(error, files){
 		t._uploadCallback(error, files);
 	}, function (error) {
 		if (c_oAscError.ID.No !== error)
@@ -4415,7 +4414,7 @@ asc_docs_api.prototype._uploadCallback = function(error, files){
 		t.sync_ErrorCallback(error, c_oAscError.Level.NoCritical);
 	} else {
 		t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-		UploadImageFiles(files, documentId, documentUserId, function (error, url) {
+		UploadImageFiles(files, this.documentId, documentUserId, function (error, url) {
 			if (c_oAscError.ID.No !== error)
 				t.sync_ErrorCallback(error, c_oAscError.Level.NoCritical);
 			else
@@ -4423,7 +4422,7 @@ asc_docs_api.prototype._uploadCallback = function(error, files){
 			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 		});
 	}
-}
+};
 asc_docs_api.prototype.AddImageUrl2 = function(url)
 {
     this.AddImageUrl(getFullImageSrc2(url));
@@ -4440,7 +4439,7 @@ asc_docs_api.prototype.AddImageUrl = function(url, imgProp)
 		else
 		{
 			var rData = {
-				"id": documentId,
+				"id": this.documentId,
 				"userid": documentUserId,
 				"vkey": documentVKey,
 				"c": "imgurl",
@@ -4756,7 +4755,7 @@ asc_docs_api.prototype.ImgApply = function(obj)
 
             if(sImageUrl){
                 var rData = {
-                    "id": documentId,
+                    "id": this.documentId,
                     "userid": documentUserId,
                     "vkey": documentVKey,
                     "c": "imgurl",
@@ -6601,7 +6600,7 @@ function _downloadAs(editor, command, filetype, actionType, options, fCallbackRe
 	var dataContainer = {data: null, part: null, index: 0, count: 0};
 	var oAdditionalData = {};
     oAdditionalData["c"] = command;
-    oAdditionalData["id"] = documentId;
+    oAdditionalData["id"] = editor.documentId;
     oAdditionalData["userid"] = documentUserId;
     oAdditionalData["vkey"] = documentVKey;
     oAdditionalData["outputformat"] = filetype;
