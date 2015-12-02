@@ -8,7 +8,6 @@ var documentTitle = 'null';
 var documentTitleWithoutExtention = 'null';
 var documentFormat = 'null';
 var documentVKey = null;
-var documentOrigin = "";
 var documentFormatSave = c_oAscFileType.PPTX;//пока не во что другое сохранять не можем.
 var documentCallbackUrl = undefined;		// Ссылка для отправления информации о документе
 
@@ -666,15 +665,8 @@ asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo) {
     }
 
     documentVKey = this.DocInfo.get_VKey();
-    // documentOrigin  = this.DocInfo.get_Origin();
     var sProtocol = window.location.protocol;
-    var sHost = window.location.host;
-    documentOrigin = "";
-    if (sProtocol && "" != sProtocol) {
-      documentOrigin = sProtocol + "//" + sHost;
-    } else {
-      documentOrigin = sHost;
-    }
+    this.documentOrigin = ((sProtocol && '' !== sProtocol) ? sProtocol + '//' : '') + window.location.host;
 
     this.User = new Asc.asc_CUser();
     this.User.asc_setId(this.DocInfo.get_UserId());

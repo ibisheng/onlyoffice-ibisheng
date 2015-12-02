@@ -2263,7 +2263,6 @@ $(".colorWatch").mouseover(function(){
 	c_DocInfo.put_VKey( getURLParameter("vkey") ?
 							decodeURIComponent(getURLParameter("vkey")) :
 							undefined );
-	//c_DocInfo.put_Origin(documentOrigin);
 	
 	editor.LoadDocument(c_DocInfo);
  },500)

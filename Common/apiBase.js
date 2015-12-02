@@ -22,6 +22,7 @@ function baseEditorsApi(name) {
   // Тип состояния на данный момент (сохранение, открытие или никакое)
   this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
   this.OpenDocumentProgress = new COpenProgress();
+  this.documentOrigin = ''; // ToDo скорее всего лишняя переменная и можно обойтись и без нее
 
   // AutoSave
   this.autoSaveGap = 0;					// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах

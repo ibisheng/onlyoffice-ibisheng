@@ -582,10 +582,10 @@ function CopyProcessor(api, onlyBinaryCopy)
 	this.oBinaryFileWriter = new BinaryFileWriter(this.oDocument);
 	this.oPresentationWriter = new CBinaryFileWriter();
     this.oPresentationWriter.Start_UseFullUrl();
-    this.oPresentationWriter.Start_UseDocumentOrigin(documentOrigin);
+    this.oPresentationWriter.Start_UseDocumentOrigin(this.api.documentOrigin);
 	
 	this.oRoot = new CopyElement("root");
-};
+}
 CopyProcessor.prototype =
 {
     getInnerHtml : function()

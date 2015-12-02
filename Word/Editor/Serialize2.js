@@ -852,7 +852,7 @@ function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml)
     {
 		var api = this.Document.DrawingDocument.m_oWordControl.m_oApi;
 		window.global_pptx_content_writer.Start_UseFullUrl();
-        window.global_pptx_content_writer.Start_UseDocumentOrigin(documentOrigin);
+        window.global_pptx_content_writer.Start_UseDocumentOrigin(api.documentOrigin);
         window.global_pptx_content_writer._Start();
 		this.copyParams.bLockCopyElems = 0;
 		this.copyParams.itemCount = 0;
