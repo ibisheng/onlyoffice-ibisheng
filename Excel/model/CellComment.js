@@ -460,12 +460,6 @@ CCellCommentator.prototype.isViewerMode = function () {
 };
 
 CCellCommentator.prototype.isLockedComment = function(oComment, callbackFunc) {
-	if (false === this.worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) {
-		// Запрещено совместное редактирование
-		Asc.applyFunction(callbackFunc, true);
-		return;
-	}
-
 	var objectGuid = oComment.asc_getId();
 	if (objectGuid) {
 		// Комментарии не должны влиять на lock-листа, поэтому вместо добавления нового c_oAscLockTypeElem, поменяем имя листа

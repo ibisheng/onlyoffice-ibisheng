@@ -1,8 +1,5 @@
 "use strict";
 
-/** @define {boolean} */
-var ASC_DOCS_API_DEBUG = true;
-
 var documentId = undefined;
 var documentUserId = undefined;
 var documentUrl = 'null';

@@ -3130,7 +3130,7 @@ function ObjectLocker(ws) {
         }
 
         var bRet = true;
-        if ( !aObjectId.length || (false === worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) ) {
+        if (!aObjectId.length) {
             // Запрещено совместное редактирование
             asc_applyFunction(callbackEx, true, true);
             return bRet;

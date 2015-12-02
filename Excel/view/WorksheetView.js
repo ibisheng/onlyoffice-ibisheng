@@ -6633,22 +6633,19 @@
 				cell_info.numFormat = c.getNumFormatStr();
 			}
 
-			if (false !== this.collaborativeEditing.isCoAuthoringExcellEnable()) {
-				// Разрешено совместное редактирование
-				var sheetId = this.model.getId();
-				// Пересчет для входящих ячеек в добавленные строки/столбцы
-				var isIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, ar);
-				if (false === isIntersection) {
-					var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null,
-						sheetId, new asc.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
+      var sheetId = this.model.getId();
+      // Пересчет для входящих ячеек в добавленные строки/столбцы
+      var isIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, ar);
+      if (false === isIntersection) {
+        var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null,
+          sheetId, new asc.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
 
-					if (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
-						c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
-						// Уже ячейку кто-то редактирует
-						cell_info.isLocked = true;
-					}
-				}
-			}
+        if (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
+          c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
+          // Уже ячейку кто-то редактирует
+          cell_info.isLocked = true;
+        }
+      }
 			
 			return cell_info;
 		};
@@ -9037,11 +9034,6 @@
 
 		// Залочена ли панель для закрепления
 		WorksheetView.prototype._isLockedFrozenPane = function (callback) {
-			if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
-				// Запрещено совместное редактирование
-				asc_applyFunction(callback, true);
-				return;
-			}
 			var sheetId = this.model.getId();
 			var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, c_oAscLockNameFrozenPane);
 
@@ -9067,12 +9059,7 @@
 			this.collaborativeEditing.onEndCheckLock(callback);
 		};
 
-        WorksheetView.prototype._isLockedDefNames = function (callback,defNameId) {
-			if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
-				// Запрещено совместное редактирование
-				asc_applyFunction(callback, true);
-				return;
-			}
+    WorksheetView.prototype._isLockedDefNames = function (callback,defNameId) {
 			var sheetId = this.model.getId();
 			var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null/*c_oAscLockTypeElemSubType.DefinedNames*/, -1, defNameId);
 
@@ -9100,11 +9087,6 @@
 
 		// Залочен ли весь лист
 		WorksheetView.prototype._isLockedAll = function (callback) {
-			if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
-				// Запрещено совместное редактирование
-				asc_applyFunction(callback, true);
-				return;
-			}
 			var sheetId = this.model.getId();
 			var subType = c_oAscLockTypeElemSubType.ChangeProperties;
 			var ar = this.activeRange;
@@ -9178,11 +9160,6 @@
 		};
 		// Функция проверки lock (возвращаемый результат нельзя использовать в качестве ответа, он нужен только для редактирования ячейки)
 		WorksheetView.prototype._isLockedCells = function (range, subType, callback) {
-			if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
-				// Запрещено совместное редактирование
-				asc_applyFunction(callback, true);
-				return true;
-			}
 			var sheetId = this.model.getId();
 			var isIntersection = false;
 			var newCallback = callback;

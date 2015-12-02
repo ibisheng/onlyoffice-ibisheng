@@ -1090,16 +1090,11 @@
 				}
 			};
 
-			if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
-				// Запрещено совместное редактирование
-				editFunction();
-				editLockCallback(true);
-			} else {
-				// Стартуем редактировать ячейку
-				this.collaborativeEditing.onStartEditCell();
-				if (ws._isLockedCells(activeCellRange, /*subType*/null, editLockCallback))
-					editFunction();
-			}
+      // Стартуем редактировать ячейку
+      this.collaborativeEditing.onStartEditCell();
+      if (ws._isLockedCells(activeCellRange, /*subType*/null, editLockCallback)) {
+        editFunction();
+      }
 		};
 
 		WorkbookView.prototype._onStopCellEditing = function () {
@@ -1656,12 +1651,7 @@
 
 				var activeCellRange = ws.getActiveCell(0, 0, /*isCoord*/false);
 
-				if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
-					// Запрещено совместное редактирование
-					openEditor(true);
-				} else {
-					ws._isLockedCells(activeCellRange, /*subType*/null, openEditor);
-				}
+        ws._isLockedCells(activeCellRange, /*subType*/null, openEditor);
 			}
 		};
 

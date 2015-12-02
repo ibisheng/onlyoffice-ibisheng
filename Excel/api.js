@@ -1,7 +1,5 @@
 ﻿"use strict";
 
-/** @define {boolean} */
-var ASC_SPREADSHEET_API_CO_AUTHORING_ENABLE = true;
 var editor;
 (/**
  * @param {jQuery} $
@@ -1775,12 +1773,6 @@ var editor;
   };
 
   spreadsheet_api.prototype._getIsLockObjectSheet = function(lockInfo, callback) {
-    if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
-      // Запрещено совместное редактирование
-      asc_applyFunction(callback, true);
-      return;
-    }
-
     if (false === this.collaborativeEditing.getCollaborativeEditing()) {
       // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
       asc_applyFunction(callback, true);
@@ -1802,11 +1794,6 @@ var editor;
   };
   // Залочена ли панель для закрепления
   spreadsheet_api.prototype._isLockedTabColor = function(index, callback) {
-    if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
-      // Запрещено совместное редактирование
-      asc_applyFunction(callback, true);
-      return;
-    }
     var sheetId = this.wbModel.getWorksheet(index).getId();
     var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, c_oAscLockNameTabColor);
 
@@ -1947,11 +1934,6 @@ var editor;
       sheetId = ws.getId();
     }
 
-    if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
-      // Запрещено совместное редактирование
-      return false;
-    }
-
     var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
     // Проверим, редактирует ли кто-то лист
     return (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false));
@@ -1959,11 +1941,6 @@ var editor;
 
   // Залочена ли работа с листами
   spreadsheet_api.prototype.asc_isWorkbookLocked = function() {
-    if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
-      // Запрещено совместное редактирование
-      return false;
-    }
-
     var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, null, null);
     // Проверим, редактирует ли кто-то лист
     return (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false));

@@ -68,11 +68,6 @@
 			this.m_oRecalcIndexRows = {};
 		};
 
-		// Разрешено ли совместное редактирование
-		CCollaborativeEditing.prototype.isCoAuthoringExcellEnable = function() {
-			return ASC_SPREADSHEET_API_CO_AUTHORING_ENABLE;
-		};
-
 		// Начало совместного редактирования
 		CCollaborativeEditing.prototype.startCollaborationEditing = function() {
 			this.m_nUseType = -1;
@@ -96,7 +91,7 @@
     return this.m_bFast;
   };
 		CCollaborativeEditing.prototype.getCollaborativeEditing = function () {
-			if (true !== this.isCoAuthoringExcellEnable() || this.m_bIsViewerMode)
+			if (this.m_bIsViewerMode)
 				return false;
 			return 1 !== this.m_nUseType;
 		};
@@ -200,9 +195,6 @@
 
 		// Возвращает - нужно ли отправлять end action
 		CCollaborativeEditing.prototype.applyChanges = function () {
-			if (!this.isCoAuthoringExcellEnable())
-				return true;
-
 			var t = this;
 			var length = this.m_arrChanges.length;
 			// Принимаем изменения
@@ -219,9 +211,6 @@
 		};
 
 		CCollaborativeEditing.prototype.sendChanges = function (IsUserSave) {
-			if (!this.isCoAuthoringExcellEnable())
-				return;
-
 			// Когда не совместное редактирование чистить ничего не нужно, но отправлять нужно.
 			var bIsCollaborative = this.getCollaborativeEditing();
 
@@ -614,56 +603,44 @@
 
 		// Undo для добавления/удаления столбцов
 		CCollaborativeEditing.prototype.undoCols = function (sheetId, count) {
-			if (this.isCoAuthoringExcellEnable()) {
-				if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId))
-					return;
-				this.m_oRecalcIndexColumns[sheetId].remove(count);
-			}
+      if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId))
+        return;
+      this.m_oRecalcIndexColumns[sheetId].remove(count);
 		};
 		// Undo для добавления/удаления строк
 		CCollaborativeEditing.prototype.undoRows = function (sheetId, count) {
-			if (this.isCoAuthoringExcellEnable()) {
-				if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId))
-					return;
-				this.m_oRecalcIndexRows[sheetId].remove(count);
-			}
+      if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId))
+        return;
+      this.m_oRecalcIndexRows[sheetId].remove(count);
 		};
 
 		CCollaborativeEditing.prototype.removeCols = function (sheetId, position, count) {
-			if (this.isCoAuthoringExcellEnable()) {
-				if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId)) {
-					this.m_oRecalcIndexColumns[sheetId] = new CRecalcIndex();
-				}
-				this.m_oRecalcIndexColumns[sheetId].add(c_oAscRecalcIndexTypes.RecalcIndexRemove, position,
-					count, /*bIsSaveIndex*/false);
-			}
+      if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId)) {
+        this.m_oRecalcIndexColumns[sheetId] = new CRecalcIndex();
+      }
+      this.m_oRecalcIndexColumns[sheetId].add(c_oAscRecalcIndexTypes.RecalcIndexRemove, position,
+        count, /*bIsSaveIndex*/false);
 		};
 		CCollaborativeEditing.prototype.addCols = function (sheetId, position, count) {
-			if (this.isCoAuthoringExcellEnable()) {
-				if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId)) {
-					this.m_oRecalcIndexColumns[sheetId] = new CRecalcIndex();
-				}
-				this.m_oRecalcIndexColumns[sheetId].add(c_oAscRecalcIndexTypes.RecalcIndexAdd, position,
-					count, /*bIsSaveIndex*/false);
-			}
+      if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId)) {
+        this.m_oRecalcIndexColumns[sheetId] = new CRecalcIndex();
+      }
+      this.m_oRecalcIndexColumns[sheetId].add(c_oAscRecalcIndexTypes.RecalcIndexAdd, position,
+        count, /*bIsSaveIndex*/false);
 		};
 		CCollaborativeEditing.prototype.removeRows = function (sheetId, position, count) {
-			if (this.isCoAuthoringExcellEnable()) {
-				if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId)) {
-					this.m_oRecalcIndexRows[sheetId] = new CRecalcIndex();
-				}
-				this.m_oRecalcIndexRows[sheetId].add(c_oAscRecalcIndexTypes.RecalcIndexRemove, position,
-					count, /*bIsSaveIndex*/false);
-			}
+      if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId)) {
+        this.m_oRecalcIndexRows[sheetId] = new CRecalcIndex();
+      }
+      this.m_oRecalcIndexRows[sheetId].add(c_oAscRecalcIndexTypes.RecalcIndexRemove, position,
+        count, /*bIsSaveIndex*/false);
 		};
 		CCollaborativeEditing.prototype.addRows = function (sheetId, position, count) {
-			if (this.isCoAuthoringExcellEnable()) {
-				if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId)) {
-					this.m_oRecalcIndexRows[sheetId] = new CRecalcIndex();
-				}
-				this.m_oRecalcIndexRows[sheetId].add(c_oAscRecalcIndexTypes.RecalcIndexAdd, position,
-					count, /*bIsSaveIndex*/false);
-			}
+      if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId)) {
+        this.m_oRecalcIndexRows[sheetId] = new CRecalcIndex();
+      }
+      this.m_oRecalcIndexRows[sheetId].add(c_oAscRecalcIndexTypes.RecalcIndexAdd, position,
+        count, /*bIsSaveIndex*/false);
 		};
 		CCollaborativeEditing.prototype.addColsRange = function (sheetId, range) {
 			if (!this.m_oInsertColumns.hasOwnProperty(sheetId)) {
