@@ -45,7 +45,6 @@ asc_docs_api.prototype['asc_checkNeedCallback'] = asc_docs_api.prototype.asc_che
 asc_docs_api.prototype['get_TextProps'] = asc_docs_api.prototype.get_TextProps;
 asc_docs_api.prototype['get_PropertyEditorShapes'] = asc_docs_api.prototype.get_PropertyEditorShapes;
 asc_docs_api.prototype['get_PropertyEditorTextArts'] = asc_docs_api.prototype.get_PropertyEditorTextArts;
-asc_docs_api.prototype['get_PropertyEditorFonts'] = asc_docs_api.prototype.get_PropertyEditorFonts;
 asc_docs_api.prototype['get_PropertyStandartTextures'] = asc_docs_api.prototype.get_PropertyStandartTextures;
 asc_docs_api.prototype['get_PropertyEditorThemes'] = asc_docs_api.prototype.get_PropertyEditorThemes;
 asc_docs_api.prototype['get_ContentCount'] = asc_docs_api.prototype.get_ContentCount;

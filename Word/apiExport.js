@@ -121,7 +121,6 @@ asc_docs_api.prototype['asc_fireCallback'] = asc_docs_api.prototype.asc_fireCall
 asc_docs_api.prototype['asc_checkNeedCallback'] = asc_docs_api.prototype.asc_checkNeedCallback;
 asc_docs_api.prototype['get_PropertyEditorShapes'] = asc_docs_api.prototype.get_PropertyEditorShapes;
 asc_docs_api.prototype['get_PropertyEditorTextArts'] = asc_docs_api.prototype.get_PropertyEditorTextArts;
-asc_docs_api.prototype['get_PropertyEditorFonts'] = asc_docs_api.prototype.get_PropertyEditorFonts;
 asc_docs_api.prototype['get_PropertyStandartTextures'] = asc_docs_api.prototype.get_PropertyStandartTextures;
 asc_docs_api.prototype['get_PropertyThemeColors'] = asc_docs_api.prototype.get_PropertyThemeColors;
 asc_docs_api.prototype['get_PropertyThemeColorSchemes'] = asc_docs_api.prototype.get_PropertyThemeColorSchemes;

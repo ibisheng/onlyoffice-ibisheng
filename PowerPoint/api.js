@@ -1003,10 +1003,6 @@ asc_docs_api.prototype.get_PropertyEditorTextArts = function()
     var ret = [g_oPresetTxWarpGroups, g_PresetTxWarpTypes];
     return ret;
 };
-asc_docs_api.prototype.get_PropertyEditorFonts = function()
-{
-    return null;
-};
 asc_docs_api.prototype.get_PropertyStandartTextures = function()
 {
     var _count = g_oUserTexturePresets.length;
