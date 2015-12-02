@@ -14652,24 +14652,19 @@ CDocument.prototype.Concat_Paragraphs = function(Pos)
 
         var OldSelectionStartPos = this.Selection.StartPos;
         var OldSelectionEndPos   = this.Selection.EndPos;
+        var OldCurPos            = this.CurPos.ContentPos;
 
         Para1.Concat(Para2);
         this.Remove_FromContent(Pos + 1, 1);
 
-        if (OldSelectionStartPos === Pos + 1 && OldSelectionEndPos === Pos + 1)
-        {
-            this.Selection_Remove();
-            this.CurPos.ContentPos = Pos;
-            Para1.Cursor_MoveToStartPos(false);
-        }
-        else if (OldSelectionStartPos <= Pos + 1 && Pos + 1 <= OldSelectionEndPos)
-        {
-            this.Selection.EndPos--;
-        }
-        else if (OldSelectionEndPos <= Pos + 1 && Pos + 1 <= OldSelectionStartPos)
-        {
-            this.Selection.StartPos--;
-        }
+        if (OldCurPos > Pos)
+            this.CurPos.ContentPos = OldCurPos - 1;
+
+        if (OldSelectionStartPos > Pos)
+            this.Selection.StartPos = OldSelectionStartPos - 1;
+
+        if (OldSelectionEndPos > Pos)
+            this.Selection.EndPos = OldSelectionEndPos - 1;
     }
 };
 CDocument.prototype.Get_ElementsCount = function()
