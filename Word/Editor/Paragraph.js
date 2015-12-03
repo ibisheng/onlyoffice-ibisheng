@@ -7913,10 +7913,26 @@ Paragraph.prototype =
                 if ( undefined != Pr.ParaPr.NumPr.NumId && 0 != Pr.ParaPr.NumPr.NumId )
                 {
                     var AbstractNum = Numbering.Get_AbstractNum( Pr.ParaPr.NumPr.NumId );
-                    Lvl = AbstractNum.Get_LvlByStyle( StyleId );
-                    if ( -1 != Lvl )
-                    {}
-                    else
+
+                    var _StyleId = StyleId;
+                    Lvl = AbstractNum.Get_LvlByStyle(_StyleId);
+                    var PassedStyleId = {};
+                    PassedStyleId[_StyleId] = true;
+                    while (-1 === Lvl)
+                    {
+                        var Style = Styles.Get(_StyleId);
+                        if (!Style)
+                            break;
+
+                        _StyleId = Style.Get_BasedOn();
+                        if (!_StyleId || true === PassedStyleId[_StyleId])
+                            break;
+
+                        PassedStyleId[_StyleId] = true;
+                        Lvl = AbstractNum.Get_LvlByStyle(_StyleId);
+                    }
+
+                    if (-1 === Lvl)
                         Pr.ParaPr.NumPr = undefined;
                 }
             }
