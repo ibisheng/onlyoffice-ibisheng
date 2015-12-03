@@ -2802,14 +2802,6 @@ CDocumentContent.prototype =
 
                         var bStartEmpty, bEndEmpty;
 
-                        // Если удаление идет по добавлению текста и выделение заканчивается таблицей,
-                        // тогда мы просто сбрасываем выделение.
-                        if (true === bOnTextAdd && type_Table == EndType)
-                        {
-                            this.CurPos.ContentPos = StartPos;
-                            return this.Cursor_MoveLeft(false, false);
-                        }
-
                         if (type_Paragraph == StartType)
                         {
                             // Удаляем выделенную часть параграфа
@@ -2848,16 +2840,37 @@ CDocumentContent.prototype =
                             }
                             else
                             {
-                                this.CurPos.ContentPos = StartPos + 1;
-                                this.Content[StartPos + 1].Cursor_MoveToStartPos();
+                                if (true === bOnTextAdd && type_Table === this.Content[StartPos + 1].Get_Type() && type_Table === this.Content[StartPos].Get_Type())
+                                {
+                                    this.Internal_Content_Add(StartPos + 1, new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0));
+                                    this.CurPos.ContentPos = StartPos + 1;
+                                    this.Content[StartPos + 1].Cursor_MoveToStartPos();
+                                }
+                                else if (true === bOnTextAdd && type_Table === this.Content[StartPos + 1].Get_Type())
+                                {
+                                    this.CurPos.ContentPos = StartPos;
+                                    this.Content[StartPos].Cursor_MoveToEndPos(false, false);
+                                }
+                                else
+                                {
+                                    this.CurPos.ContentPos = StartPos + 1;
+                                    this.Content[StartPos + 1].Cursor_MoveToStartPos();
+                                }
                             }
                         }
                         else if (true != bStartEmpty)
                         {
                             if (true === bOnTextAdd && type_Table === StartType)
                             {
-                                // Удаляем весь промежуточный контент, но последний параграф не удаляем
-                                this.Internal_Content_Remove(StartPos + 1, EndPos - StartPos - 1);
+                                // Удаляем весь промежуточный контент и конечный элемент, если это
+                                // таблица, поскольку таблица не может быть последним элементом в документе удаляем без проверок.
+                                if (EndType === type_Table)
+                                    this.Internal_Content_Remove(StartPos + 1, EndPos - StartPos);
+                                else
+                                    this.Internal_Content_Remove(StartPos + 1, EndPos - StartPos - 1);
+
+                                if (type_Table === this.Content[StartPos + 1].Get_Type() && true === bOnTextAdd)
+                                    this.Internal_Content_Add(StartPos + 1, new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0));
 
                                 // Встаем в начало параграфа
                                 this.CurPos.ContentPos = StartPos + 1;
@@ -2888,6 +2901,9 @@ CDocumentContent.prototype =
                             // Удаляем весь промежуточный контент и начальный параграф
                             this.Internal_Content_Remove(StartPos, EndPos - StartPos);
 
+                            if (type_Table === this.Content[StartPos].Get_Type() && true === bOnTextAdd)
+                                this.Internal_Content_Add(StartPos, new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0));
+
                             // Встаем в начало параграфа
                             this.CurPos.ContentPos = StartPos;
                             this.Content[StartPos].Cursor_MoveToStartPos();
@@ -2896,8 +2912,16 @@ CDocumentContent.prototype =
                         {
                             if (true === bOnTextAdd)
                             {
-                                // Удаляем весь промежуточный контент, начальный параграф, а конечный не удаляем
-                                this.Internal_Content_Remove(StartPos, EndPos - StartPos);
+                                // Удаляем весь промежуточный контент, начальный элемент и конечный элемент, если это
+                                // таблица, поскольку таблица не может быть последним элементом в документе удаляем без проверок.
+                                if (EndType === type_Table && bOnTextAdd)
+                                    this.Internal_Content_Remove(StartPos, EndPos - StartPos + 1);
+                                else
+                                    this.Internal_Content_Remove(StartPos, EndPos - StartPos);
+
+                                if (type_Table === this.Content[StartPos].Get_Type() && true === bOnTextAdd)
+                                    this.Internal_Content_Add(StartPos, new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0));
+
                                 this.CurPos.ContentPos = StartPos;
                                 this.Content[StartPos].Cursor_MoveToStartPos();
                             }
