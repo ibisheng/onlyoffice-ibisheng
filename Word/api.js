@@ -5478,14 +5478,21 @@ asc_docs_api.prototype.GenerateStyles = function()
     if (LogicDocument)
     {
         var isTrackRevision = LogicDocument.Is_TrackRevisions();
+        var isShowParaMarks = LogicDocument.Is_ShowParagraphMarks();
 
         if (true === isTrackRevision)
             LogicDocument.Set_TrackRevisions(false);
+
+        if (true === isShowParaMarks)
+            LogicDocument.Set_ShowParagraphMarks(false, false);
 
         StylesPainter.GenerateStyles(this, (null == this.LoadedObject) ? this.WordControl.m_oLogicDocument.Get_Styles().Style : this.LoadedObjectDS);
 
         if (true === isTrackRevision)
             LogicDocument.Set_TrackRevisions(true);
+
+        if (true === isShowParaMarks)
+            LogicDocument.Set_ShowParagraphMarks(true, false);
     }
 };
 asc_docs_api.prototype.asyncFontsDocumentEndLoaded = function()

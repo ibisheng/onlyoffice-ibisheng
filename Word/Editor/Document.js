@@ -15180,6 +15180,20 @@ CDocument.prototype.private_ToggleParagraphAlignByHotkey = function(Align)
         }
     }
 };
+CDocument.prototype.Is_ShowParagraphMarks = function()
+{
+    return this.Api.ShowParaMarks;
+};
+CDocument.prototype.Set_ShowParagraphMarks = function(isShow, isRedraw)
+{
+    this.Api.ShowParaMarks = isShow;
+
+    if (true === isRedraw)
+    {
+        this.DrawingDocument.ClearCachePages();
+        this.DrawingDocument.FirePaint();
+    }
+};
 //-----------------------------------------------------------------------------------
 // Private
 //-----------------------------------------------------------------------------------
