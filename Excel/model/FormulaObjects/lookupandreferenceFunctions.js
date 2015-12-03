@@ -505,7 +505,6 @@ cINDEX.prototype.Calculate = function ( arg ) {
             res = arg0.getValue2( 0, arg1 - 1 );
         }
         else {
-//            console.log(_a_)
             res = arg0.getValue2( arg1 - 1, arg2 - 1 );
         }
     }

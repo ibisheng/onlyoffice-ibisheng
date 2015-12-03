@@ -746,7 +746,6 @@
 
 			var fromIndex = 0;
 			while (null !== (m = re.exec(s))) {
-                console.log(m[1])
 				range = this._parseRangeStr(m[1]);
 				if (range) {
 					ret = true;
@@ -844,7 +843,6 @@
                     }
                 }
                 if (res) {
-                    //console.log(res[1])
                     range = t._parseRangeStr(res[1]);
                 }
             }

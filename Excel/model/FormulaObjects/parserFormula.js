@@ -4134,9 +4134,6 @@ parserFormula.prototype = {
             }
         }
         if ( res != undefined && res != null ) {
-//            this.Formula = res.toString();
-//            console.log( this.cellId + " " + res.toString() );
-//            return this.Formula;
             return res.toString();
         }
         else {
