@@ -146,7 +146,7 @@
                 "../../Excel/model/Workbook.js",
                 "../../Excel/model/CellInfo.js",
                 "../../Common/AdvancedOptions.js",
-                "../../Common/Locks.js"
+                "../../Common/Private/Locks.js"
             ],
             "dst": "../../Word/sdk-all.js",
             "externs": [

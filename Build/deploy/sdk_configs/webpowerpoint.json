@@ -142,7 +142,7 @@
                 "../../Excel/model/Workbook.js",
                 "../../Excel/model/CellInfo.js",
                 "../../Common/AdvancedOptions.js",
-                "../../Common/Locks.js"
+                "../../Common/Private/Locks.js"
             ],
             "dst": "../../PowerPoint/sdk-all.js",
             "externs": [
