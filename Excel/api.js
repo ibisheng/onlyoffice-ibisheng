@@ -44,7 +44,6 @@ var editor;
 
     this.DocumentName = "";
     this.documentUserId = undefined;
-    this.documentUrl = "null";
     this.documentUrlChanges = null;
     this.documentTitle = "null";
     this.documentFormat = "null";

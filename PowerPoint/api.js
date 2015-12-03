@@ -1,7 +1,6 @@
 "use strict";
 
 var documentUserId = undefined;
-var documentUrl = 'null';
 var documentUrlChanges = null;
 var documentTitle = 'null';
 var documentTitleWithoutExtention = 'null';
@@ -468,7 +467,7 @@ asc_docs_api.prototype._coAuthoringInit = function() {
 
   //в обычном серверном режиме портим ссылку, потому что CoAuthoring теперь имеет встроенный адрес
   //todo надо использовать проверку get_OfflineApp, но она инициализируется только после loadDocument
-  if (!(window["NATIVE_EDITOR_ENJINE"] || offlineMode === documentUrl)) {
+  if (!(window["NATIVE_EDITOR_ENJINE"] || offlineMode === this.documentUrl)) {
     this.CoAuthoringApi.set_url(null);
   }
   this.CoAuthoringApi.init(this.User, this.documentId, documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Presentation, documentFormatSave);
@@ -648,7 +647,7 @@ asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo) {
   if (this.DocInfo) {
     this.documentId = this.DocInfo.get_Id();
     documentUserId = this.DocInfo.get_UserId();
-    documentUrl = this.DocInfo.get_Url();
+    this.documentUrl = this.DocInfo.get_Url();
     documentTitle = this.DocInfo.get_Title();
     documentFormat = this.DocInfo.get_Format();
     documentCallbackUrl = this.DocInfo.get_CallbackUrl();
@@ -686,7 +685,7 @@ asc_docs_api.prototype.LoadDocument = function() {
   // Меняем тип состояния (на открытие)
   this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
 
-  if (offlineMode !== documentUrl) {
+  if (offlineMode !== this.documentUrl) {
     this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
     var rData = {
       "id": this.documentId,
@@ -695,7 +694,7 @@ asc_docs_api.prototype.LoadDocument = function() {
       "vkey": documentVKey,
       "editorid": c_oEditorId.Presentation,
       "c": "open",
-      "url": documentUrl,
+      "url": this.documentUrl,
       "title": documentTitle,
       "embeddedfonts": this.isUseEmbeddedCutFonts,
       "viewmode": this.isViewMode
@@ -704,7 +703,7 @@ asc_docs_api.prototype.LoadDocument = function() {
     sendCommand2(this, null, rData);
   } else {
     // ToDo убрать зависимость от this.FontLoader.fontFilesPath
-    documentUrl = this.FontLoader.fontFilesPath + "../PowerPoint/document/";
+    this.documentUrl = this.FontLoader.fontFilesPath + "../PowerPoint/document/";
     this.DocInfo.put_OfflineApp(true);
 
     this._OfflineAppDocumentStartLoad();
@@ -905,7 +904,7 @@ asc_docs_api.prototype._OfflineAppDocumentStartLoad = function() {
     t._OfflineAppDocumentEndLoad();
   };
 
-  scriptElem.setAttribute('src', documentUrl + "editor.js");
+  scriptElem.setAttribute('src', this.documentUrl + "editor.js");
   scriptElem.setAttribute('type', 'text/javascript');
   document.getElementsByTagName('head')[0].appendChild(scriptElem);
 };
@@ -914,7 +913,7 @@ asc_docs_api.prototype._OfflineAppDocumentEndLoad = function() {
   if (undefined == window["editor_bin"])
     return;
 
-  this.OpenDocument2(documentUrl, window["editor_bin"]);
+  this.OpenDocument2(this.documentUrl, window["editor_bin"]);
   //callback
   this.DocumentOrientation = (null == this.WordControl.m_oLogicDocument) ? true : !this.WordControl.m_oLogicDocument.Orientation;
 };
@@ -3625,7 +3624,7 @@ asc_docs_api.prototype.asyncFontsDocumentStartLoaded = function()
 			for (var i in _loader_object.ImageMap) {
 				if(this.DocInfo.get_OfflineApp()) {
 					var localUrl = _loader_object.ImageMap[i];
-					g_oDocumentUrls.addImageUrl(localUrl, documentUrl + 'media/' + localUrl);
+					g_oDocumentUrls.addImageUrl(localUrl, this.documentUrl + 'media/' + localUrl);
 				}
                 ++_count;
 			}
