@@ -4942,6 +4942,9 @@ function BinaryFileReader(doc, openParams)
         stDefault.Numbering = null;
         stDefault.Paragraph = null;
 		stDefault.Table = null;
+
+        //надо сбросить то, что остался после открытия документа(повторное открытие в Version History)
+        window.global_pptx_content_loader.Clear();
 	}
     this.ReadMainTable = function()
     {
