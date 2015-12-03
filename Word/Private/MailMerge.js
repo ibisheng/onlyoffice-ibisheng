@@ -115,7 +115,7 @@ asc_docs_api.prototype.asc_setMailMergeData = function(aList)
 asc_docs_api.prototype.asc_sendMailMergeData = function(oData)
 {
     var actionType = c_oAscAsyncAction.SendMailMerge;
-    oData.put_UserId(documentUserId);
+    oData.put_UserId(this.documentUserId);
     oData.put_RecordCount(oData.get_RecordTo() - oData.get_RecordFrom() + 1);
     var options = {oMailMergeSendData: oData, isNoCallback: true};
     var t = this;

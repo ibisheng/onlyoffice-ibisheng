@@ -2491,7 +2491,7 @@ function trimString( str ){
     return str.replace(/^\s+|\s+$/g, '') ;
 }
 function sendImgUrls(api, images, callback, bExcel) {
-  var rData = {"id": api.documentId, "c": "imgurls", "vkey": bExcel ? api.documentVKey : documentVKey, "userid":  bExcel ? api.documentUserId : documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": images};
+  var rData = {"id": api.documentId, "c": "imgurls", "vkey": bExcel ? api.documentVKey : documentVKey, "userid":  api.documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": images};
   if(!bExcel)
       api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
   else

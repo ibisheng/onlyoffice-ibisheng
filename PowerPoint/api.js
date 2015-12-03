@@ -1,6 +1,5 @@
 "use strict";
 
-var documentUserId = undefined;
 var documentUrlChanges = null;
 var documentTitle = 'null';
 var documentTitleWithoutExtention = 'null';
@@ -646,7 +645,7 @@ asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo) {
 
   if (this.DocInfo) {
     this.documentId = this.DocInfo.get_Id();
-    documentUserId = this.DocInfo.get_UserId();
+    this.documentUserId = this.DocInfo.get_UserId();
     this.documentUrl = this.DocInfo.get_Url();
     documentTitle = this.DocInfo.get_Title();
     documentFormat = this.DocInfo.get_Format();
@@ -689,7 +688,7 @@ asc_docs_api.prototype.LoadDocument = function() {
     this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
     var rData = {
       "id": this.documentId,
-      "userid": documentUserId,
+      "userid": this.documentUserId,
       "format": documentFormat,
       "vkey": documentVKey,
       "editorid": c_oEditorId.Presentation,
@@ -2091,7 +2090,7 @@ asc_docs_api.prototype.ShapeApply = function(prop)
           };
           var rData = {
             "id":this.documentId,
-            "userid": documentUserId,
+            "userid": this.documentUserId,
             "vkey": documentVKey,
             "c":"imgurl",
             "saveindex": g_oDocumentUrls.getMaxIndex(),
@@ -2901,7 +2900,7 @@ asc_docs_api.prototype.ChangeArtImageFromFile = function()
 
 asc_docs_api.prototype.AddImage = function(){
 	var t = this;
-	ShowImageFileDialog(this.documentId, documentUserId, function (error, files) {
+	ShowImageFileDialog(this.documentId, this.documentUserId, function (error, files) {
 		t._uploadCallback(error, files);
 	}, function (error) {
 		if (c_oAscError.ID.No !== error)
@@ -2915,7 +2914,7 @@ asc_docs_api.prototype._uploadCallback = function(error, files) {
 		t.sync_ErrorCallback(error, c_oAscError.Level.NoCritical);
 	} else {
 		t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-		UploadImageFiles(files, this.documentId, documentUserId, function (error, url) {
+		UploadImageFiles(files, this.documentId, this.documentUserId, function (error, url) {
 			if (c_oAscError.ID.No !== error)
 				t.sync_ErrorCallback(error, c_oAscError.Level.NoCritical);
 			else
@@ -2923,7 +2922,7 @@ asc_docs_api.prototype._uploadCallback = function(error, files) {
 			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 		});
 	}
-}
+};
 asc_docs_api.prototype.StartAddShape = function(prst, is_apply)
 {
     this.WordControl.m_oLogicDocument.StartAddShape(prst, is_apply);
@@ -2961,7 +2960,7 @@ asc_docs_api.prototype.AddImageUrl = function(url){
 	{
 		var rData = {
 			"id":this.documentId,
-			"userid": documentUserId,
+			"userid": this.documentUserId,
 			"vkey": documentVKey,
 			"c":"imgurl",
 			"saveindex": g_oDocumentUrls.getMaxIndex(),
@@ -3178,7 +3177,7 @@ asc_docs_api.prototype.ImgApply = function(obj){
 
         var rData = {
           "id":this.documentId,
-          "userid": documentUserId,
+          "userid": this.documentUserId,
           "vkey": documentVKey,
           "c":"imgurl",
           "saveindex": g_oDocumentUrls.getMaxIndex(),
@@ -4992,7 +4991,7 @@ function _downloadAs(editor, filetype, actionType, options)
 	var oAdditionalData = {};
 	oAdditionalData["c"] = command;
 	oAdditionalData["id"] = editor.documentId;
-	oAdditionalData["userid"] = documentUserId;
+	oAdditionalData["userid"] = editor.documentUserId;
 	oAdditionalData["vkey"] = documentVKey;
 	oAdditionalData["outputformat"] = filetype;
 	oAdditionalData["title"] = changeFileExtention(documentTitle, getExtentionByFormat(filetype));
