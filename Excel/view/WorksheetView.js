@@ -8048,7 +8048,7 @@
 					}
 				}
 
-				var isLargeRange = t._isLargeRange(range), callTrigger = false;
+				var isLargeRange = t._isLargeRange(range.bbox), callTrigger = false;
 				var res;
 				var mc, r, c, cell;
 
