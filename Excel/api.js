@@ -369,7 +369,7 @@ var editor;
     var t = this;
     this.CoAuthoringApi.auth(this.asc_getViewerMode());
 
-    this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+    this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
     if (!this.chartEditor) {
       this._asc_open(function(response) {
         t._startOpenDocument(response);
@@ -434,7 +434,7 @@ var editor;
 
     this.IsUserSave = !isAutoSave;
     if (this.IsUserSave) {
-      this.asc_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+      this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
     }
     /* Нужно закрыть редактор (до выставления флага canSave, т.к. мы должны успеть отправить
      asc_onDocumentModifiedChanged для подписки на сборку) Баг http://bugzserver/show_bug.cgi?id=28331 */
@@ -780,7 +780,7 @@ var editor;
       options = {};
     }
     if (actionType) {
-      this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+      this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
     }
     // Меняем тип состояния (на сохранение)
     this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
@@ -910,7 +910,7 @@ var editor;
    * asc_onContextMenu			(event)												- эвент на контекстное меню
    */
 
-  spreadsheet_api.prototype.asc_StartAction = function(type, id) {
+  spreadsheet_api.prototype.sync_StartAction = function(type, id) {
     this.handlers.trigger("asc_onStartAction", type, id);
     //console.log("asc_onStartAction: type = " + type + " id = " + id);
   };
@@ -981,7 +981,7 @@ var editor;
     this.OpenDocumentProgress.Type = c_oAscAsyncAction.LoadDocumentFonts;
     this.OpenDocumentProgress.FontsCount = this.FontLoader.fonts_loading.length;
     this.OpenDocumentProgress.CurrentFont = 0;
-    this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentFonts);
+    this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentFonts);
   };
 
   spreadsheet_api.prototype.asyncFontsDocumentEndLoaded = function() {
@@ -1001,7 +1001,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asyncFontStartLoaded = function() {
-    this.asc_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
+    this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
   };
 
   spreadsheet_api.prototype.asyncFontEndLoaded = function(font) {
@@ -1613,7 +1613,7 @@ var editor;
     } else {
       var t = this;
       setTimeout(function() {
-        t.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Recalc)
+        t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Recalc)
       }, 500);
     }
   };
@@ -1657,7 +1657,7 @@ var editor;
       }
 
       if (!this.IsUserSave) {
-        this.asc_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+        this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
       }
 
       CollaborativeEditing.Clear_CollaborativeMarks();
@@ -2298,7 +2298,7 @@ var editor;
       "data": imageUrl};
 
     var t = this;
-    this.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+    this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
     this.fCurCallback = function(input) {
       if (null != input && "imgurl" == input["type"]) {
         if ("ok" == input["status"]) {
@@ -2340,16 +2340,16 @@ var editor;
       if (c_oAscError.ID.No !== error) {
         t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
       }
-      t.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+      t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
     });
   };
   spreadsheet_api.prototype._uploadCallback = function(error, files) {
     var t = this;
     if (c_oAscError.ID.No !== error) {
-      t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
+      this.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
     } else {
-      t.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-      UploadImageFiles(files, t.documentId, t.documentUserId, function(error, url) {
+      this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+      UploadImageFiles(files, this.documentId, this.documentUserId, function(error, url) {
         if (c_oAscError.ID.No !== error) {
           t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
         } else {
@@ -2575,7 +2575,7 @@ var editor;
         "data": sImageUrl};
 
       var t = this;
-      this.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+      this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
       this.fCurCallback = function(input) {
         if (null != input && "imgurl" == input["type"]) {
           if ("ok" == input["status"]) {

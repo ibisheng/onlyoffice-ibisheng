@@ -2492,10 +2492,7 @@ function trimString( str ){
 }
 function sendImgUrls(api, images, callback, bExcel) {
   var rData = {"id": api.documentId, "c": "imgurls", "vkey": api.documentVKey, "userid":  api.documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": images};
-  if(!bExcel)
-      api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-  else
-      api.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+  api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 
   api.fCurCallback = function (input) {
     if(!bExcel)

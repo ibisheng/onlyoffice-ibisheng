@@ -126,6 +126,8 @@ baseEditorsApi.prototype.SendOpenProgress = function() {
 baseEditorsApi.prototype.sync_InitEditorFonts = function(gui_fonts) {
   this.sendEvent("asc_onInitEditorFonts", gui_fonts);
 };
+baseEditorsApi.prototype.sync_StartAction = function() {
+};
 // Выставление интервала автосохранения (0 - означает, что автосохранения нет)
 baseEditorsApi.prototype.asc_setAutoSaveGap = function(autoSaveGap) {
   if (typeof autoSaveGap === "number") {
