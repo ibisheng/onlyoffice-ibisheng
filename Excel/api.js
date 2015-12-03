@@ -804,7 +804,7 @@ var editor;
     } else if (c_oAscFileType.CSV === sFormat && !options.CSVOptions) {
       // Мы открывали команду, надо ее закрыть.
       if (actionType) {
-        this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+        this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
       }
       var cp = {'delimiter': c_oAscCsvDelimiter.Comma, 'codepage': c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
       this.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), this.advancedOptionsAction);
@@ -839,7 +839,7 @@ var editor;
       // Меняем тип состояния (на никакое)
       t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
       if (actionType) {
-        t.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+        t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
       }
     };
     t.fCurCallback = fCallback;
@@ -915,7 +915,7 @@ var editor;
     //console.log("asc_onStartAction: type = " + type + " id = " + id);
   };
 
-  spreadsheet_api.prototype.asc_EndAction = function(type, id) {
+  spreadsheet_api.prototype.sync_EndAction = function(type, id) {
     this.handlers.trigger("asc_onEndAction", type, id);
     //console.log("asc_onEndAction: type = " + type + " id = " + id);
   };
@@ -985,7 +985,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asyncFontsDocumentEndLoaded = function() {
-    this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentFonts);
+    this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentFonts);
 
     if (this.asyncMethodCallback !== undefined) {
       this.asyncMethodCallback();
@@ -1005,7 +1005,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asyncFontEndLoaded = function(font) {
-    this.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
+    this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
   };
 
   /**
@@ -1077,7 +1077,7 @@ var editor;
     if (this.collaborativeEditing.applyChanges()) {
       // Изменений не было
       this.IsSendDocumentLoadCompleate = true;
-      this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+      this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
     }
   };
 
@@ -1479,7 +1479,7 @@ var editor;
       // При открытии после принятия изменений мы должны сбросить пересчетные индексы
       this.collaborativeEditing.clearRecalcIndex();
       this.IsSendDocumentLoadCompleate = true;
-      this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+      this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
     } else if (this.wb && !window["NATIVE_EDITOR_ENJINE"]) {
       // Нужно послать 'обновить свойства' (иначе для удаления данных не обновится строка формул).
       // ToDo Возможно стоит обновлять только строку формул
@@ -1676,7 +1676,7 @@ var editor;
         t.IsUserSave = false;
         t.lastSaveTime = null;
 
-        t.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+        t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
         // Обновляем состояние возможности сохранения документа
         t.onUpdateDocumentModified(false);
 
@@ -1693,7 +1693,7 @@ var editor;
       if (ConnectionState.Close === nState) {
         // Отключаемся от сохранения, соединение потеряно
         if (this.IsUserSave) {
-          this.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+          this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
         }
         this.IsUserSave = false;
         this.canSave = true;
@@ -2327,7 +2327,7 @@ var editor;
       } else {
         t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
       }
-      t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+      t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
     };
     sendCommand2(this, null, rData);
   };
@@ -2355,7 +2355,7 @@ var editor;
         } else {
           t._addImageUrl(url);
         }
-        t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+        t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
       });
     }
   };
@@ -2604,7 +2604,7 @@ var editor;
         } else {
           t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
         }
-        t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+        t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
       };
       sendCommand2(this, null, rData);
     }

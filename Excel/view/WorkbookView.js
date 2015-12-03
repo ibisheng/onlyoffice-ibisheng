@@ -423,7 +423,7 @@
 				"selectionNameChanged"		: function () {self._onSelectionNameChanged.apply(self, arguments);},
 				"selectionMathInfoChanged"	: function () {self._onSelectionMathInfoChanged.apply(self, arguments);},
 				"onErrorEvent"				: function (errorId, level) {self.handlers.trigger("asc_onError", errorId, level);},
-				"slowOperation"				: function (isStart) {(isStart ? self.Api.sync_StartAction : self.Api.asc_EndAction).call(self.Api, c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SlowOperation);},
+				"slowOperation"				: function (isStart) {(isStart ? self.Api.sync_StartAction : self.Api.sync_EndAction).call(self.Api, c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SlowOperation);},
 				"setAutoFiltersDialog"  	: function (arrVal) {self.handlers.trigger("asc_onSetAFDialog", arrVal);},
 				"selectionRangeChanged"		: function (val) {self.handlers.trigger("asc_onSelectionRangeChanged", val);},
 				"onRenameCellTextEnd"		: function (countFind, countReplace) {self.handlers.trigger("asc_onRenameCellTextEnd", countFind, countReplace);},
@@ -1945,8 +1945,7 @@
 			History.EndTransaction();
 			if (options.isReplaceAll) {
 				// Заканчиваем медленную операцию
-				this.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction,
-					c_oAscAsyncAction.SlowOperation);
+				this.Api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SlowOperation);
 			}
 		};
 
