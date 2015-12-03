@@ -1327,20 +1327,16 @@
 			this.docStylesImage = "";
 			this.docStyles = null;
 
-            var sd = this.native.GetDeviceScale();
+            var pxTomm = 1.0; // 72.0 / 96.0;
 
-            this.styleThumbnailWidth = 92 * 72 / 96;
-            this.styleThumbnailHeight = 48 * 72 / 96;
+            this.styleThumbnailWidth = 92;// * pxTomm;
+            this.styleThumbnailHeight = 48;// * pxTomm;
 
-            this.styleThumbnailWidthPt = Math.floor(this.styleThumbnailWidth * 72 / 96);
-            this.styleThumbnailHeightPt = Math.floor(this.styleThumbnailHeight * 72 / 96);
+            this.styleThumbnailWidthPt = Math.floor(this.styleThumbnailWidth * pxTomm);
+            this.styleThumbnailHeightPt = Math.floor(this.styleThumbnailHeight * pxTomm);
 
 			this.styleThumbnailWidthWithRetina	= this.styleThumbnailWidth;
 			this.styleThumbnailHeightWithRetina	= this.styleThumbnailHeight;
-			if (sd > 1) {
-				this.styleThumbnailWidthWithRetina <<= 1;
-				this.styleThumbnailHeightWithRetina <<= 1;
-			}
 		}
 
 		asc_CStylesPainter.prototype = {
@@ -1365,7 +1361,7 @@
 				//var oCanvas = {}; //document.createElement('canvas');
 				//oCanvas.width = this.styleThumbnailWidthWithRetina;
 				//oCanvas.height = nDefaultStylesCount * this.styleThumbnailHeightWithRetina;
-				var oGraphics = new asc.DrawingContext({canvas: null, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+				var oGraphics = new asc.DrawingContext({canvas: null, units: 0/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
 				var oStyle, oCustomStyle;
 				this.defaultStyles = [];
@@ -1392,7 +1388,7 @@
 				//var oCanvas = document.createElement('canvas');
 				//oCanvas.width = this.styleThumbnailWidthWithRetina;
 				//oCanvas.height = nDocumentStylesCount * this.styleThumbnailHeightWithRetina;
-				var oGraphics = new asc.DrawingContext({canvas: null, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+				var oGraphics = new asc.DrawingContext({canvas: null, units: 0/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
 				var oStyle;
 				this.docStyles = [];
@@ -1427,16 +1423,23 @@
 						oGraphics.setStrokeStyle(b.c);
 
 						// ToDo поправить
-						oGraphics.setLineWidth(b.w).beginPath().moveTo(x1, y1).lineTo(x2, y2).stroke();
+						oGraphics.setLineWidth(b.w).beginPath();//.moveTo(x1, y1).lineTo(x2, y2).stroke();
+
+                        window["native"]["PD_PathMoveTo"](x1, y1);
+                        window["native"]["PD_PathLineTo"](x2, y2);
+
+                        oGraphics.stroke();
 					}
 				};
 
 				// borders
 				var oBorders = oStyle.getBorder();
-				drawBorder(oBorders.l, 0, nOffsetY, 0, nOffsetY + this.styleThumbnailHeightPt);
-				drawBorder(oBorders.r, this.styleThumbnailWidthPt, nOffsetY, this.styleThumbnailWidthPt, nOffsetY + this.styleThumbnailHeightPt);
-				drawBorder(oBorders.t, 0, nOffsetY, this.styleThumbnailWidthPt, nOffsetY);
-				drawBorder(oBorders.b, 0, nOffsetY + this.styleThumbnailHeightPt, this.styleThumbnailWidthPt, nOffsetY + this.styleThumbnailHeightPt);
+				drawBorder(oBorders.l, 0, 0, 0, this.styleThumbnailHeightPt); // left
+				drawBorder(oBorders.r, this.styleThumbnailWidthPt - 0.25, 0, this.styleThumbnailWidthPt - 0.25, this.styleThumbnailHeightPt);     // right
+				drawBorder(oBorders.t, 0, 0, this.styleThumbnailWidthPt, 0); // up
+				drawBorder(oBorders.b, 0, this.styleThumbnailHeightPt - 0.25, this.styleThumbnailWidthPt,  this.styleThumbnailHeightPt - 0.25);   // down
+
+                //oGraphics.rect(0, nOffsetY, this.styleThumbnailWidthPt, this.styleThumbnailHeightPt).clip();
 
 				// Draw text
 				var fc = oStyle.getFontColor();

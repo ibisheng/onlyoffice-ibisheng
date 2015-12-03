@@ -55,23 +55,19 @@ aStandartNumFormats[47] = "mm:ss.0";
 aStandartNumFormats[48] = "##0.0E+0";
 aStandartNumFormats[49] = "@";
 aStandartNumFormatsId = {};
-for(var i in aStandartNumFormats)
-{
+for(var i in aStandartNumFormats) {
     aStandartNumFormatsId[aStandartNumFormats[i]] = i - 0;
 }
 //-------------------------------------------------------------------------------------------------
 
-function ConvertJSC_Array(_array)
-{
+function ConvertJSC_Array(_array) {
     var _len = _array.length;
     var ret = new Uint8Array(_len);
     for (var i = 0; i < _len; i++)
         ret[i] = _array.getAt(i);
     return ret;
 }
-
-function Image()
-{
+function Image() {
     this.src = "";
     this.onload = function()
     {
@@ -80,31 +76,24 @@ function Image()
     {
     }
 }
-
-function _image_data()
-{
+function _image_data() {
     this.data = null;
     this.length = 0;
 }
 
-function native_pattern_fill()
-{
+function native_pattern_fill() {
 }
-native_pattern_fill.prototype =
-{
+native_pattern_fill.prototype = {
     setTransform : function(transform) {}
 };
 
-function native_gradient_fill()
-{
+function native_gradient_fill() {
 }
-native_gradient_fill.prototype =
-{
+native_gradient_fill.prototype = {
     addColorStop : function(offset,color) {}
 };
 
-function native_context2d(parent)
-{
+function native_context2d(parent) {
     this.canvas = parent;
 
     this.globalAlpha = 0;
@@ -124,8 +113,7 @@ function native_context2d(parent)
     this.textAlign = 0;
     this.textBaseline = 0;
 }
-native_context2d.prototype =
-{
+native_context2d.prototype = {
     save : function() {},
     restore : function() {},
 
@@ -251,8 +239,7 @@ _null_object.getContext = function(type) {
 
 window._null_object = _null_object;
 
-document.createElement = function(type)
-{
+document.createElement = function(type) {
     if (type && type.toLowerCase)
     {
         if (type.toLowerCase() == "canvas")
@@ -292,8 +279,7 @@ var native_renderer = null;
 var _api = null;
 var Asc = window["Asc"];
 
-function NativeOpenFileData(data, version)
-{
+function NativeOpenFileData(data, version) {
     window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
 
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
@@ -307,9 +293,7 @@ function NativeOpenFileData(data, version)
         _api.asc_nativeOpenFile(data, version);
     }
 }
-
-function NativeOpenFile(arguments)
-{
+function NativeOpenFile(arguments) {
     window["CreateMainTextMeasurerWrapper"]();
 
     var doc_bin = window.native.GetFileString(window.native.GetFilePath());
@@ -326,9 +310,7 @@ function NativeOpenFile(arguments)
         _api.asc_nativeOpenFile(doc_bin);
     }
 }
-
-function NativeOpenFile2(_params)
-{
+function NativeOpenFile2(_params) {
     window["CreateMainTextMeasurerWrapper"]();
 
     window.g_file_path = "native_open_file";
@@ -354,14 +336,10 @@ function NativeOpenFile2(_params)
         _api.asc_nativeOpenFile(doc_bin);
     }
 }
-
-function NativeCalculateFile()
-{
+function NativeCalculateFile() {
     _api.asc_nativeCalculateFile();
 }
-
-function NativeApplyChangesData(data, isFull)
-{
+function NativeApplyChangesData(data, isFull) {
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
         _api.asc_nativeApplyChanges2(data, isFull);
@@ -371,9 +349,7 @@ function NativeApplyChangesData(data, isFull)
         _api.asc_nativeApplyChanges2(data, isFull);
     }
 }
-
-function NativeApplyChanges()
-{
+function NativeApplyChanges() {
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
         var __changes = [];
@@ -408,25 +384,20 @@ function NativeApplyChanges()
         _api.asc_nativeApplyChanges(__changes);
     }
 }
-function NativeGetFileString()
-{
+function NativeGetFileString() {
     return _api.asc_nativeGetFile();
 }
-function NativeGetFileData()
-{
+function NativeGetFileData() {
     return _api.asc_nativeGetFileData();
 }
-
-function GetNativeCountPages()
-{
+function GetNativeCountPages() {
     return _api.asc_nativePrintPagesCount();
 }
 
 window.memory1 = null;
 window.memory2 = null;
 
-function GetNativePageBase64(pageIndex)
-{
+function GetNativePageBase64(pageIndex) {
     if (null == window.memory1)
         window.memory1 = CreateNativeMemoryStream();
     else
@@ -450,14 +421,10 @@ function GetNativePageBase64(pageIndex)
     _api.asc_nativePrint(native_renderer, pageIndex);
     return window.memory1;
 }
-
-function GetNativePageMeta(pageIndex)
-{
+function GetNativePageMeta(pageIndex) {
     return _api.GetNativePageMeta(pageIndex);
 }
-
-function GetNativeId()
-{
+function GetNativeId() {
     return window.native.GetFileId();
 }
 
@@ -516,125 +483,24 @@ function setInterval(func, interval) {
     return _id;
 }
 
-window.clearTimeout     = clearTimeout;
-window.setTimeout       = setTimeout;
-window.clearInterval    = clearInterval;
-window.setInterval      = setInterval;
+window.clearTimeout = clearTimeout;
+window.setTimeout = setTimeout;
+window.clearInterval = clearInterval;
+window.setInterval = setInterval;
 
 var console = {
     log : function(param) { window.native.consoleLog(param); }
 };
 
-// HTML page interface
-window.native.Call_OnUpdateOverlay = function(param)
-{
-    return _api.Call_OnUpdateOverlay(param);
-};
-
-window.native.Call_OnMouseDown = function(e)
-{
-    return _api.Call_OnMouseDown(e);
-};
-window.native.Call_OnMouseUp = function(e)
-{
-    return _api.Call_OnMouseUp(e);
-};
-window.native.Call_OnMouseMove = function(e)
-{
-    return _api.Call_OnMouseMove(e);
-};
-window.native.Call_OnCheckMouseDown = function(e)
-{
-    return _api.Call_OnCheckMouseDown(e);
-};
-
-window.native.Call_OnKeyDown = function(e)
-{
-    return _api.Call_OnKeyDown(e);
-};
-window.native.Call_OnKeyPress = function(e)
-{
-    return _api.Call_OnKeyPress(e);
-};
-window.native.Call_OnKeyUp = function(e)
-{
-    return _api.Call_OnKeyUp(e);
-};
-window.native.Call_OnKeyboardEvent = function(e)
-{
-    return _api.Call_OnKeyboardEvent(e);
-};
-
-window.native.Call_CalculateResume = function()
-{
-    return _api.Call_CalculateResume();
-};
-
-window.native.Call_TurnOffRecalculate = function()
-{
-    return _api.Call_TurnOffRecalculate();
-};
-window.native.Call_TurnOnRecalculate = function()
-{
-    return _api.Call_TurnOnRecalculate();
-};
-
-window.native.Call_CheckTargetUpdate = function()
-{
-    return _api.Call_CheckTargetUpdate();
-};
-window.native.Call_Common = function(type, param)
-{
-    return _api.Call_Common(type, param);
-};
-
-window.native.Call_HR_Tabs = function(arrT, arrP)
-{
-    return _api.Call_HR_Tabs(arrT, arrP);
-};
-window.native.Call_HR_Pr = function(_indent_left, _indent_right, _indent_first)
-{
-    return _api.Call_HR_Pr(_indent_left, _indent_right, _indent_first);
-};
-window.native.Call_HR_Margins = function(_margin_left, _margin_right)
-{
-    return _api.Call_HR_Margins(_margin_left, _margin_right);
-};
-window.native.Call_HR_Table = function(_params, _cols, _margins, _rows)
-{
-    return _api.Call_HR_Table(_params, _cols, _margins, _rows);
-};
-
-window.native.Call_VR_Margins = function(_top, _bottom)
-{
-    return _api.Call_VR_Margins(_top, _bottom);
-};
-window.native.Call_VR_Header = function(_header_top, _header_bottom)
-{
-    return _api.Call_VR_Header(_header_top, _header_bottom);
-};
-window.native.Call_VR_Table = function(_params, _cols, _margins, _rows)
-{
-    return _api.Call_VR_Table(_params, _cols, _margins, _rows);
-};
-
-window.native.Call_Menu_Event = function(type, _params)
-{
-    return _api.Call_Menu_Event(type, _params);
-};
-
-window["NativeCorrectImageUrlOnPaste"] = function(url)
-{
+window["NativeCorrectImageUrlOnPaste"] = function(url) {
     return window["native"]["CorrectImageUrlOnPaste"](url);
 };
-window["NativeCorrectImageUrlOnCopy"] = function(url)
-{
+window["NativeCorrectImageUrlOnCopy"] = function(url) {
     return window["native"]["CorrectImageUrlOnCopy"](url);
 };
 
 // FT_Common
-function _FT_Common()
-{
+function _FT_Common() {
     this.UintToInt = function(v)
     {
         return (v>2147483647)?v-4294967296:v;
@@ -741,17 +607,16 @@ function _FT_Common()
 //--------------------------------------------------------------------------------
 // font engine
 //--------------------------------------------------------------------------------
-var FONT_ITALIC_ANGLE   = 0.3090169943749;
+var FONT_ITALIC_ANGLE = 0.3090169943749;
 var FT_ENCODING_UNICODE = 1970170211;
-var FT_ENCODING_NONE    = 0;
-var FT_ENCODING_MS_SYMBOL   = 1937337698;
+var FT_ENCODING_NONE = 0;
+var FT_ENCODING_MS_SYMBOL = 1937337698;
 var FT_ENCODING_APPLE_ROMAN = 1634889070;
 
 var LOAD_MODE = 40970;
 var REND_MODE = 0;
 
-var FontStyle =
-{
+var FontStyle = {
     FontStyleRegular:    0,
     FontStyleBold:       1,
     FontStyleItalic:     2,
@@ -759,9 +624,7 @@ var FontStyle =
     FontStyleUnderline:  4,
     FontStyleStrikeout:  8
 };
-
-var EGlyphState =
-{
+var EGlyphState = {
     glyphstateNormal:   0,
     glyphstateDeafault: 1,
     glyphstateMiss:     2
@@ -801,312 +664,7 @@ function CFontManager() {
     this.ClearFontsRasterCache = function(){};
 }
 
-function CStylesPainter() {
-    this.STYLE_THUMBNAIL_WIDTH  = GlobalSkin.STYLE_THUMBNAIL_WIDTH;
-    this.STYLE_THUMBNAIL_HEIGHT = GlobalSkin.STYLE_THUMBNAIL_HEIGHT;
-
-    this.CurrentTranslate = null;
-    this.IsRetinaEnabled = false;
-
-    this.defaultStyles = [];
-    this.docStyles = [];
-    this.mergedStyles = [];
-}
-CStylesPainter.prototype = {
-    GenerateStyles: function(_api, ds)
-    {
-        if (_api.WordControl.bIsRetinaSupport)
-        {
-            this.STYLE_THUMBNAIL_WIDTH  <<= 1;
-            this.STYLE_THUMBNAIL_HEIGHT <<= 1;
-            this.IsRetinaEnabled = true;
-        }
-
-        this.CurrentTranslate = _api.CurrentTranslate;
-
-        var _stream = global_memory_stream_menu;
-        var _graphics = new CDrawingStream();
-
-        _api.WordControl.m_oDrawingDocument.Native["DD_PrepareNativeDraw"]();
-
-        this.GenerateDefaultStyles(_api, ds, _graphics);
-        this.GenerateDocumentStyles(_api, _graphics);
-
-        // стили сформированы. осталось просто сформировать единый список
-        var _count_default = this.defaultStyles.length;
-        var _count_doc = 0;
-        if (null != this.docStyles)
-            _count_doc = this.docStyles.length;
-
-        var aPriorityStyles = [];
-        var fAddToPriorityStyles = function(style) {
-            var index = style.Style.uiPriority;
-            if(null == index)
-                index = 0;
-            var aSubArray = aPriorityStyles[index];
-            if(null == aSubArray)
-            {
-                aSubArray = [];
-                aPriorityStyles[index] = aSubArray;
-            }
-            aSubArray.push(style);
-        };
-        var _map_document = {};
-
-        for (var i = 0; i < _count_doc; i++)
-        {
-            var style = this.docStyles[i];
-            _map_document[style.Name] = 1;
-            fAddToPriorityStyles(style);
-        }
-
-        for (var i = 0; i < _count_default; i++)
-        {
-            var style = this.defaultStyles[i];
-            if(null == _map_document[style.Name])
-                fAddToPriorityStyles(style);
-        }
-
-        this.mergedStyles = [];
-        for(var index in aPriorityStyles)
-        {
-            var aSubArray = aPriorityStyles[index];
-            aSubArray.sort(function(a, b){
-                if(a.Name < b.Name)
-                    return -1;
-                else if(a.Name > b.Name)
-                    return 1;
-                else
-                    return 0;
-            });
-            for(var i = 0, length = aSubArray.length; i < length; ++i)
-            {
-                this.mergedStyles.push(aSubArray[i]);
-            }
-        }
-
-        var _count = this.mergedStyles.length;
-        for (var i = 0; i < _count; i++)
-        {
-            this.drawStyle(_graphics, this.mergedStyles[i].Style, _api);
-        }
-
-        _stream["ClearNoAttack"]();
-
-        _stream["WriteByte"](1);
-
-        _api.WordControl.m_oDrawingDocument.Native["DD_EndNativeDraw"](_stream);
-    },
-    GenerateDefaultStyles: function(_api, ds, _graphics)
-    {
-        var styles = ds;
-
-        for (var i in styles)
-        {
-            var style = styles[i];
-            if (true == style.qFormat)
-            {
-                this.defaultStyles.push({ Name: style.Name, Style: style });
-                //this.drawStyle(_graphics, style, _api);
-            }
-        }
-    },
-    GenerateDocumentStyles: function(_api, _graphics)
-    {
-        if (_api.WordControl.m_oLogicDocument == null)
-            return;
-
-        var __Styles = _api.WordControl.m_oLogicDocument.Get_Styles();
-        var styles = __Styles.Style;
-
-        if (styles == null)
-            return;
-
-        for (var i in styles)
-        {
-            var style = styles[i];
-            if (true == style.qFormat)
-            {
-                // как только меняется сериалайзер - меняется и код здесь. Да, не очень удобно,
-                // зато быстро делается
-                var formalStyle = i.toLowerCase().replace(/\s/g, "");
-                var res = formalStyle.match(/^heading([1-9][0-9]*)$/);
-                var index = (res) ? res[1] - 1 : -1;
-
-                var _dr_style = __Styles.Get_Pr(i, styletype_Paragraph);
-                _dr_style.Name = style.Name;
-                _dr_style.Id = i;
-
-                //this.drawStyle(_graphics, _dr_style, _api);
-
-                var _name = _dr_style.Name;
-                // алгоритм смены имени
-                if (style.Default)
-                {
-                    switch (style.Default)
-                    {
-                        case 1:
-                            break;
-                        case 2:
-                            _name = "No List";
-                            break;
-                        case 3:
-                            _name = "Normal";
-                            break;
-                        case 4:
-                            _name = "Normal Table";
-                            break;
-                    }
-                }
-                else if (index != -1)
-                {
-                    _name = "Heading ".concat(index + 1);
-                }
-
-                this.docStyles.push({ Name: _name, Style: _dr_style });
-            }
-        }
-    },
-    drawStyle: function(graphics, style, _api)
-    {
-        var _w_px = this.STYLE_THUMBNAIL_WIDTH;
-        var _h_px = this.STYLE_THUMBNAIL_HEIGHT;
-        var dKoefToMM = g_dKoef_pix_to_mm;
-
-        if (AscBrowser.isRetina)
-        {
-            _w_px *= 2;
-            _h_px *= 2;
-            dKoefToMM /= 2;
-        }
-
-        _api.WordControl.m_oDrawingDocument.Native["DD_StartNativeDraw"](_w_px, _h_px, _w_px * dKoefToMM, _h_px * dKoefToMM);
-
-        g_oTableId.m_bTurnOff = true;
-        History.TurnOff();
-
-        var oldDefTabStop = Default_Tab_Stop;
-        Default_Tab_Stop = 1;
-
-        var hdr = new CHeaderFooter(_api.WordControl.m_oLogicDocument.HdrFtr, _api.WordControl.m_oLogicDocument, _api.WordControl.m_oDrawingDocument, hdrftr_Header);
-        var _dc = hdr.Content;//new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, true, false);
-
-        var par = new Paragraph(_api.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
-        var run = new ParaRun(par, false);
-
-        for (var i = 0; i < style.Name.length; i++)
-        {
-            run.Add_ToContent(i, new ParaText(style.Name.charAt(i)), false);
-        }
-
-        _dc.Internal_Content_Add(0, par, false);
-        par.Add_ToContent(0, run);
-        par.Style_Add(style.Id, false);
-        par.Set_Align(align_Left);
-        par.Set_Tabs(new CParaTabs());
-
-        var _brdL = style.ParaPr.Brd.Left;
-        if ( undefined !== _brdL && null !== _brdL )
-        {
-            var brdL = new CDocumentBorder();
-            brdL.Set_FromObject(_brdL);
-            brdL.Space = 0;
-            par.Set_Border(brdL, historyitem_Paragraph_Borders_Left);
-        }
-
-        var _brdT = style.ParaPr.Brd.Top;
-        if ( undefined !== _brdT && null !== _brdT )
-        {
-            var brd = new CDocumentBorder();
-            brd.Set_FromObject(_brdT);
-            brd.Space = 0;
-            par.Set_Border(brd, historyitem_Paragraph_Borders_Top);
-        }
-
-        var _brdB = style.ParaPr.Brd.Bottom;
-        if ( undefined !== _brdB && null !== _brdB )
-        {
-            var brd = new CDocumentBorder();
-            brd.Set_FromObject(_brdB);
-            brd.Space = 0;
-            par.Set_Border(brd, historyitem_Paragraph_Borders_Bottom);
-        }
-
-        var _brdR = style.ParaPr.Brd.Right;
-        if ( undefined !== _brdR && null !== _brdR )
-        {
-            var brd = new CDocumentBorder();
-            brd.Set_FromObject(_brdR);
-            brd.Space = 0;
-            par.Set_Border(brd, historyitem_Paragraph_Borders_Right);
-        }
-
-        var _ind = new CParaInd();
-        _ind.FirstLine = 0;
-        _ind.Left = 0;
-        _ind.Right = 0;
-        par.Set_Ind(_ind, false);
-
-        var _sp = new CParaSpacing();
-        _sp.Line              = 1;
-        _sp.LineRule          = linerule_Auto;
-        _sp.Before            = 0;
-        _sp.BeforeAutoSpacing = false;
-        _sp.After             = 0;
-        _sp.AfterAutoSpacing  = false;
-        par.Set_Spacing(_sp, false);
-
-        _dc.Reset(0, 0, 10000, 10000);
-        _dc.Recalculate_Page(0, true);
-
-        _dc.Reset(0, 0, par.Lines[0].Ranges[0].W + 0.001, 10000);
-        _dc.Recalculate_Page(0, true);
-
-        var y = 0;
-        var b = dKoefToMM * _h_px;
-        var w = dKoefToMM * _w_px;
-        var off = 10 * dKoefToMM;
-        var off2 = 5 * dKoefToMM;
-        var off3 = 1 * dKoefToMM;
-
-        graphics.transform(1,0,0,1,0,0);
-        graphics.save();
-        graphics._s();
-        graphics._m(off2, y + off3);
-        graphics._l(w - off, y + off3);
-        graphics._l(w - off, b - off3);
-        graphics._l(off2, b - off3);
-        graphics._z();
-        graphics.clip();
-
-        var baseline = par.Lines[0].Y;
-        par.Shift(0, off + 0.5, y + 0.75 * (b - y) - baseline);
-        par.Draw(0, graphics);
-
-        graphics.restore();
-
-        Default_Tab_Stop = oldDefTabStop;
-
-        g_oTableId.m_bTurnOff = false;
-        History.TurnOn();
-
-        var _stream = global_memory_stream_menu;
-
-        _stream["ClearNoAttack"]();
-
-        _stream["WriteByte"](0);
-        _stream["WriteString2"](style.Name);
-
-        _api.WordControl.m_oDrawingDocument.Native["DD_EndNativeDraw"](_stream);
-        graphics.ClearParams();
-    }
-};
-
 window["use_native_fonts_only"] = true;
-
-//--------------------------------------------------------------------------------
-
-// declarate unused methods and objects
 window["ftm"] = FT_Memory;
 
 // FT_Common
@@ -2966,6 +2524,76 @@ function asc_ReadCHyperLink(_params, _cursor) {
 
     return _settings;
 }
+function asc_ReadAddFormatTableOptions(s, p) {
+    var format = new asc.AddFormatTableOptions();
+
+    var next = true;
+    while (next)
+    {
+        var _attr = s[p.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                format.asc_setRange(s[p.pos++]);
+                break;
+            }
+            case 1:
+            {
+                format.asc_setIsTitle(s[p.pos++]);
+                break;
+            }
+            case 255:
+            default:
+            {
+                next = false;
+                break;
+            }
+        }
+    }
+
+    return format;
+}
+function asc_ReadAutoFilter(s, p) {
+    var filter = {};
+
+    var next = true;
+    while (next)
+    {
+        var _attr = s[p.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                filter.styleName = s[p.pos++];
+                break;
+            }
+            case 1:
+            {
+                filter.format = asc_ReadAddFormatTableOptions(s, p);
+                break;
+            }
+            case 2:
+            {
+                filter.tableName = s[p.pos++];
+                break;
+            }
+            case 3:
+            {
+                filter.optionType = s[p.pos++];
+                break;
+            }
+            case 255:
+            default:
+            {
+                next = false;
+                break;
+            }
+        }
+    }
+
+    return filter;
+}
 
 function asc_WriteCBorder(i, c, s) {
     if (!c) return;
@@ -3059,6 +2687,27 @@ function asc_WriteCBorders(i, c, s) {
 
     s['WriteByte'](255);
 }
+function asc_WriteAutoFilterInfo(i, c, s) {
+    if (!c) return;
+
+    if (i !== -1) s['WriteByte'](i);
+
+    s['WriteByte'](0);
+    s['WriteBool'](c.asc_getIsAutoFilter());
+    s['WriteBool'](c.asc_getIsApplyAutoFilter());
+
+    if (c.asc_getTableStyleName()) {
+        s['WriteByte'](1);
+        s['WriteString2'](c.asc_getTableStyleName());
+    }
+
+    if (c.asc_getTableName()) {
+        s['WriteByte'](2);
+        s['WriteString2'](c.asc_getTableName());
+    }
+
+    s['WriteByte'](255);
+}
 function asc_WriteCCelInfo(c, s) {
     if (!c) return;
 
@@ -3115,14 +2764,6 @@ function asc_WriteCCelInfo(c, s) {
     s['WriteByte'](18);
     s['WriteBool'](c.asc_getLocked());
 
-    s['WriteByte'](19);
-    s['WriteBool'](c.asc_getIsFormatTable());
-
-    if (null != c.asc_getTableStyleName()) {
-        s['WriteByte'](20);
-        s['WriteString2'](c.asc_getTableStyleName());
-    }
-
     if (null != c.asc_getStyleName()) {
         s['WriteByte'](21);
         s['WriteString2'](c.asc_getStyleName());
@@ -3137,11 +2778,7 @@ function asc_WriteCCelInfo(c, s) {
         s['WriteDouble2'](c.asc_getAngle());
     }
 
-    s['WriteByte'](24);
-    s['WriteBool'](c.asc_getClearFilter());
-
-    s['WriteByte'](25);
-    s['WriteBool'](c.asc_getIsAutoFilter());
+    asc_WriteAutoFilterInfo(30, c.asc_getAutoFilterInfo(), s);
 
     s['WriteByte'](255);
 }
@@ -3159,6 +2796,21 @@ function asc_WriteColorSchemes(schemas, s) {
             asc_menu_WriteColor(0, colors[j], s);
         }
     }
+}
+function asc_WriteAddFormatTableOptions(c, s) {
+    if (!c) return;
+
+    if (c.asc_getRange()) {
+        s['WriteByte'](0);
+        s['WriteString2'](c.asc_getRange());
+    }
+
+    if (c.asc_getIsTitle()) {
+        s['WriteByte'](1);
+        s['WriteLong'](c.asc_getIsTitle());
+    }
+
+    s['WriteByte'](255);
 }
 
 //--------------------------------------------------------------------------------
@@ -3207,6 +2859,8 @@ function OfflineEditor () {
 
         docInfo.put_ChartEditor(true);
         docInfo.put_UserInfo(userInfo);
+
+        this.offline_beforeInit();
 
         this.registerEventsHandlers();
 
@@ -3289,6 +2943,12 @@ function OfflineEditor () {
 
             t.onSelectionChanged(cellInfo);
         });
+        _api.asc_registerCallback('asc_onSelectionNameChanged', function(name) {
+            var stream = global_memory_stream_menu;
+            stream["ClearNoAttack"]();
+            stream['WriteString2'](name);
+            window["native"]["OnCallMenuEvent"](2310, stream); // ASC_SPREADSHEETS_EVENT_TYPE_EDITOR_SELECTION_NAME_CHANGED
+        });
         _api.asc_registerCallback('asc_onEditorSelectionChanged', function(font) {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
@@ -3302,17 +2962,22 @@ function OfflineEditor () {
             asc_WriteColorSchemes(schemes, stream);
             window["native"]["OnCallMenuEvent"](2404, stream); // ASC_SPREADSHEETS_EVENT_TYPE_COLOR_SCHEMES
         });
-
-//        _api.asc_registerCallback('asc_onInitTablePictures',   function () {
-//            var stream = global_memory_stream_menu;
-//            stream["ClearNoAttack"]();
-//            window["native"]["OnCallMenuEvent"](2406, stream); // ASC_SPREADSHEETS_EVENT_TYPE_CELL_STYLES
-//        });
-
+        _api.asc_registerCallback('asc_onInitTablePictures',   function () {
+            var stream = global_memory_stream_menu;
+            stream["ClearNoAttack"]();
+            window["native"]["OnCallMenuEvent"](12, stream); // ASC_MENU_EVENT_TYPE_TABLE_STYLES
+        });
         _api.asc_registerCallback('asc_onInitEditorStyles', function () {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
             window["native"]["OnCallMenuEvent"](2405, stream); // ASC_SPREADSHEETS_EVENT_TYPE_TABLE_STYLES
+        });
+        _api.asc_registerCallback('asc_onError', function(id, level, errData) {
+            var stream = global_memory_stream_menu;
+            stream["ClearNoAttack"]();
+            stream['WriteLong'](id);
+            stream['WriteLong'](level);
+            window["native"]["OnCallMenuEvent"](500, stream); // ASC_MENU_EVENT_TYPE_ON_ERROR
         });
     };
     this.updateFrozen = function () {
@@ -3922,6 +3587,62 @@ function OfflineEditor () {
 
         return objectId;
     };
+    this.offline_addChartDrawingObject = function(params) {
+        var ws = _api.wb.getWorksheet();
+        var objectRender = ws.objectRender;
+        var objectId = null;
+        var current = {pos: 0};
+        var settings = asc_menu_ReadChartPr(params[0], current);
+        var left = params[1];
+        var top = params[2];
+        var right = params[3];
+        var bottom = params[4];
+
+        var selectedRange = ws.getSelectedRange();
+        if (selectedRange)
+        {
+            var box = selectedRange.getBBox0();
+            settings.putInColumns(!(box.r2 - box.r1 < box.c2 - box.c1));
+        }
+        settings.putRange(ws.getSelectionRangeValue());
+        //settings.putShowHorAxis(true);
+        //settings.putShowVerAxis(true);
+        var series = getChartSeries(ws.model, settings);
+        if(series && series.series.length > 1)
+        {
+            settings.putLegendPos(c_oAscChartLegendShowSettings.right);
+        }
+        else
+        {
+            settings.putLegendPos(c_oAscChartLegendShowSettings.none);
+        }
+       // settings.putHorAxisLabel(c_oAscChartHorAxisLabelShowSettings.none);
+       // settings.putVertAxisLabel(c_oAscChartVertAxisLabelShowSettings.none);
+       // settings.putDataLabelsPos(c_oAscChartDataLabelsPos.none);
+       // settings.putHorGridLines(c_oAscGridLinesSettings.major);
+       // settings.putVertGridLines(c_oAscGridLinesSettings.none);
+
+        var vert_axis_settings = new asc_ValAxisSettings();
+        settings.putVertAxisProps(vert_axis_settings);
+        vert_axis_settings.setDefault();
+
+        var hor_axis_settings = new asc_CatAxisSettings();
+        settings.putHorAxisProps(hor_axis_settings);
+        hor_axis_settings.setDefault();
+
+        settings.left = left;
+        settings.top = top;
+        settings.width = right - left;
+        settings.height = bottom - top;
+
+        _api.asc_addChartDrawingObject(settings);
+
+        if (objectRender.controller.selectedObjects.length) {
+            objectId = objectRender.controller.selectedObjects[0].Id;
+        }
+
+        return objectId;
+    };
 
     this.offline_generateStyle = function() {
         // Отправка стилей ячеек
@@ -3930,6 +3651,539 @@ function OfflineEditor () {
         // this.guiStyles = (false === bResult) ? guiStyles : null;
     };
 
+    this.offline_beforeInit = function () {
+
+        var pxToMM = 1;//72 / 96;
+        //var styleThumbnailWidth = 61 * pxToMM;
+        //var styleThumbnailHeight = 46 * pxToMM;
+
+        var styleThumbnailWidth  = Math.floor(92.0 * pxToMM);
+        var styleThumbnailHeight = Math.floor(48.0 * pxToMM);
+
+        asc.AutoFilters.prototype = Object.create (asc.AutoFilters.prototype);
+        asc.AutoFilters.prototype.constructor = asc.AutoFilters;
+
+        asc.AutoFilters.prototype.getTablePictures =  function(wb, fmgrGraphics, oFont) {
+
+            window['native'].SetStylesType(1);
+
+            if (AscBrowser.isRetina) {
+                styleThumbnailWidth <<= 1;
+                styleThumbnailHeight <<= 1;
+            }
+
+            var canvas = document.createElement('canvas');
+            canvas.width = styleThumbnailWidth;
+            canvas.height = styleThumbnailHeight;
+            var customStyles = wb.TableStyles.CustomStyles;
+            var result  = [];
+            var options;
+            var n = 0;
+            if(customStyles)
+            {
+                for(var i in customStyles)
+                {
+                    if(customStyles[i].table)
+                    {
+                        window['native'].BeginDrawDocumentStyle(customStyles[i].displayName, n);
+
+                        options =
+                        {
+                            name: i,
+                            displayName: customStyles[i].displayName,
+                            type: 'custom',
+                            image: this._drawSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont)
+                        };
+
+                       // result[n] = new formatTablePictures(options);
+                        n++;
+
+                        window['native'].EndDrawStyle();
+                    }
+                }
+            }
+            var defaultStyles = wb.TableStyles.DefaultStyles;
+            if(defaultStyles)
+            {
+                for(var i in defaultStyles)
+                {
+                    if(defaultStyles[i].table)
+                    {
+                        window['native'].BeginDrawDefaultStyle(defaultStyles[i].displayName, n);
+
+                        options =
+                        {
+                            name: i,
+                            displayName: defaultStyles[i].displayName,
+                            type: 'default',
+                            image: this._drawSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont)
+                        };
+                        //result[n] = new formatTablePictures(options);
+                        n++;
+
+                        window['native'].EndDrawStyle();
+                    }
+                }
+            }
+            return result;
+        };
+        asc.AutoFilters.prototype._drawSmallIconTable = function(canvas, style, fmgrGraphics, oFont) {
+
+            var ctx = new Asc.DrawingContext({canvas: canvas, units: 0/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+            var styleOptions = style;
+            //по умолчанию ставим строку заголовка и чередующиеся строки, позже нужно будет получать параметр
+            var styleInfo = false;
+
+            var nativeRender = window["native"];
+
+            if(!styleInfo)
+            {
+                styleInfo = {
+                    ShowColumnStripes: false,
+                    ShowFirstColumn: false,
+                    ShowLastColumn: false,
+                    ShowRowStripes: true,
+                    TotalsRowCount: 0
+                }
+            }
+
+            var xSize = styleThumbnailWidth  * pxToMM;       //61 * pxToMM;
+            var ySize = styleThumbnailHeight * pxToMM;      //45 * pxToMM;
+
+            var stepY = (ySize)/5;
+            var stepX = (styleThumbnailWidth * pxToMM)/5;   //(60 * pxToMM)/5;
+            var whiteColor = new CColor(255, 255, 255);
+            var blackColor = new CColor(0, 0, 0);
+
+            //**draw background**
+            var defaultColorBackground;
+            if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill)
+                defaultColorBackground = styleOptions.wholeTable.dxf.fill.bg;
+            else
+                defaultColorBackground = whiteColor;
+
+            var color;
+            if(styleOptions != undefined)
+            {
+                if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
+                {
+                    ctx.setFillStyle(styleOptions.wholeTable.dxf.fill.bg);
+                    ctx.fillRect(0,0,xSize,ySize);
+                }
+                else
+                {
+                    ctx.setFillStyle(whiteColor);
+                    ctx.fillRect(0,0,xSize,ySize);
+                }
+                if(styleInfo.ShowColumnStripes)//column stripes
+                {
+                    for(k = 0; k < 6; k++)
+                    {
+                        color = defaultColorBackground;
+                        if((k)%2 == 0)
+                        {
+                            if(styleOptions.firstColumnStripe && styleOptions.firstColumnStripe.dxf.fill && null != styleOptions.firstColumnStripe.dxf.fill.bg)
+                                color =  styleOptions.firstColumnStripe.dxf.fill.bg;
+                            else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
+                                color =  styleOptions.wholeTable.dxf.fill.bg;
+                        }
+                        else
+                        {
+                            if(styleOptions.secondColumnStripe && styleOptions.secondColumnStripe.dxf.fill && null != styleOptions.secondColumnStripe.dxf.fill.bg)
+                                color = styleOptions.secondColumnStripe.dxf.fill.bg;
+                            else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
+                                color =  styleOptions.wholeTable.dxf.fill.bg;
+                        }
+                        ctx.setFillStyle(color);
+                        ctx.fillRect(k*stepX,0,stepX,ySize);
+                    }
+                }
+
+                if(styleInfo.ShowRowStripes)//row stripes
+                {
+                    for(k = 0; k < 6; k++)
+                    {
+                        color = null;
+                        if(styleOptions)//styleOptions.headerRow
+                        {
+                            if(k ==0)
+                                k++;
+                            if((k)%2 != 0)
+                            {
+                                if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill && null != styleOptions.firstRowStripe.dxf.fill.bg)
+                                    color = styleOptions.firstRowStripe.dxf.fill.bg;
+                            }
+                            else
+                            {
+                                if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill && null != styleOptions.secondRowStripe.dxf.fill.bg)
+                                    color = styleOptions.secondRowStripe.dxf.fill.bg;
+                                else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
+                                    color = styleOptions.wholeTable.dxf.fill.bg;
+
+                            }
+                            if(color != null)
+                            {
+                                ctx.setFillStyle(color);
+                                if(k == 1)
+                                    ctx.fillRect(0, k*stepY, xSize, stepY);
+                                else if(k == 3)
+                                    ctx.fillRect(0, k*stepY, xSize,stepY);
+                                else
+                                    ctx.fillRect(0, k*stepY, xSize, stepY);
+                                //else
+                                //ctx.fillRect(0,k*stepY,xSize,stepY);
+                            }
+
+                        }
+                        else
+                        {
+                            color = null;
+                            if((k+1)%2 != 0)
+                            {
+                                if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill && null != styleOptions.firstRowStripe.dxf.fill.bg)
+                                    color =  styleOptions.firstRowStripe.dxf.fill.bg;
+                            }
+                            else
+                            {
+                                if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill && null != styleOptions.secondRowStripe.dxf.fill.bg)
+                                    color =  styleOptions.secondRowStripe.dxf.fill.bg;
+                                else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
+                                    color =  styleOptions.wholeTable.dxf.fill.bg;
+                            }
+
+                            if(color != null)
+                            {
+                                ctx.setFillStyle(color);
+                                ctx.fillRect(0, k*stepY, xSize, stepY);
+                            }
+                        }
+
+                    }
+
+                }
+                if(styleInfo.ShowFirstColumn && styleOptions.firstColumn)//first column
+                {
+                    if(styleOptions.firstColumn && styleOptions.firstColumn.dxf.fill && null != styleOptions.firstColumn.dxf.fill.bg)
+                        ctx.setFillStyle(styleOptions.firstColumn.dxf.fill.bg);
+                    else
+                        ctx.setFillStyle(defaultColorBackground);
+                    ctx.fillRect(0,0,stepX,ySize);
+                }
+                if(styleInfo.ShowLastColumn)//last column
+                {
+                    color = null;
+                    if(styleOptions.lastColumn && styleOptions.lastColumn.dxf.fill && null != styleOptions.lastColumn.dxf.fill.bg)
+                        color =styleOptions.lastColumn.dxf.fill.bg;
+
+                    if(color != null)
+                    {
+                        ctx.setFillStyle(color);
+                        ctx.fillRect(4*stepX,0,stepX,ySize);
+                    }
+
+                }
+                if(styleOptions)//header row
+                {
+                    if(styleOptions.headerRow && styleOptions.headerRow.dxf.fill && null != styleOptions.headerRow.dxf.fill.bg)
+                    {
+                        ctx.setFillStyle(styleOptions.headerRow.dxf.fill.bg);
+                    }
+                    else
+                    {
+                        ctx.setFillStyle(defaultColorBackground);
+                    }
+                    ctx.fillRect(0, 0, xSize, stepY);
+
+                }
+                if(styleInfo.TotalsRowCount)//total row
+                {
+                    color = null;
+                    if(styleOptions.totalRow && styleOptions.totalRow.dxf.fill && null != styleOptions.totalRow.dxf.fill.bg)
+                        color = styleOptions.totalRow.dxf.fill.bg;
+                    else
+                        color = defaultColorBackground;
+                    ctx.setFillStyle(color);
+                    ctx.fillRect(0, stepY*4, xSize, stepY);
+                }
+
+
+                //первая ячейка
+                if(styleOptions.firstHeaderCell && styleInfo.ShowFirstColumn)
+                {
+                    if(styleOptions.firstHeaderCell && styleOptions.firstHeaderCell.dxf.fill && null != styleOptions.firstHeaderCell.dxf.fill.bg)
+                        ctx.setFillStyle(styleOptions.firstHeaderCell.dxf.fill.bg);
+                    else
+                        ctx.setFillStyle(defaultColorBackground);
+                    ctx.fillRect(0,0,stepX,stepY);
+                }
+                //последняя в первой строке
+                if(styleOptions.lastHeaderCell && styleInfo.ShowLastColumn)
+                {
+                    if(styleOptions.lastHeaderCell && styleOptions.lastHeaderCell.dxf.fill && null != styleOptions.lastHeaderCell.dxf.fill.bg)
+                        ctx.setFillStyle(styleOptions.lastHeaderCell.dxf.fill.bg);
+                    else
+                        ctx.setFillStyle(defaultColorBackground);
+                    ctx.fillRect(4*stepX,0,stepX,stepY);
+                }
+                //первая в последней строке
+                if(styleOptions.firstTotalCell  && styleInfo.TotalsRowCount && styleInfo.ShowFirstColumn)
+                {
+                    if(styleOptions.firstTotalCell && styleOptions.firstTotalCell.dxf.fill && null != styleOptions.firstTotalCell.dxf.fill.bg)
+                        ctx.setFillStyle(styleOptions.firstTotalCell.dxf.fill.bg);
+                    else
+                        ctx.setFillStyle(defaultColorBackground);
+                    ctx.fillRect(0,4*stepY,stepX,stepY);
+                }
+                //последняя ячейка
+                if(styleOptions.lastTotalCell  && styleInfo.TotalsRowCount && styleInfo.ShowLastColumn)
+                {
+                    if(styleOptions.lastTotalCell && styleOptions.lastTotalCell.dxf.fill && null != styleOptions.lastTotalCell.dxf.fill.bg)
+                        ctx.setFillStyle(styleOptions.lastTotalCell.dxf.fill.bg);
+                    else
+                        ctx.setFillStyle(defaultColorBackground);
+                    ctx.fillRect(4*stepX,4*stepY,stepX,ySize);
+                }
+
+            }
+            else
+            {
+                ctx.setFillStyle(whiteColor);
+                ctx.fillRect(0,0,xSize,ySize);
+            }
+
+            //**draw vertical and horizontal lines**
+            if(styleOptions != undefined)
+            {
+                ctx.setLineWidth(1);
+                ctx.beginPath();
+                if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.border)
+                {
+                    var borders = styleOptions.wholeTable.dxf.border;
+                    if(borders.t.s !== c_oAscBorderStyles.None)
+                    {
+                        ctx.setStrokeStyle(borders.t.c);
+                        ctx.lineHor(0, 0, xSize);
+                    }
+                    if(borders.b.s !== c_oAscBorderStyles.None)
+                    {
+                        ctx.setStrokeStyle(borders.b.c);
+                       // ctx.lineHor(0, ySize-0.5, xSize);
+
+                        nativeRender["PD_PathMoveTo"](0, ySize-0.5);
+                        nativeRender["PD_PathLineTo"](xSize, ySize-0.5);
+                    }
+                    if(borders.l.s !== c_oAscBorderStyles.None)
+                    {
+                        ctx.setStrokeStyle(borders.l.c);
+                        ctx.lineVer(0, 0, ySize);
+                    }
+                    if(borders.r.s !== c_oAscBorderStyles.None)
+                    {
+                        ctx.setStrokeStyle(borders.r.c);
+                        //ctx.lineVer(xSize-0.5, 0, ySize);
+
+                        nativeRender["PD_PathMoveTo"](xSize-0.5, 0);
+                        nativeRender["PD_PathLineTo"](xSize-0.5, ySize);
+                    }
+                    if(borders.ih.s !== c_oAscBorderStyles.None)
+                    {
+                        ctx.setStrokeStyle(borders.ih.c);
+                        for(var n = 1; n < 5; n++)
+                        {
+                            ctx.lineHor(0, stepY*n, xSize);
+                        }
+                        ctx.stroke();
+                    }
+                    if(borders.iv.s !== c_oAscBorderStyles.None)
+                    {
+                        ctx.setStrokeStyle(borders.iv.c);
+                        for(var n = 1; n < 5; n++)
+                        {
+                            ctx.lineVer(stepX*n, 0, ySize);
+                        }
+                        ctx.stroke();
+                    }
+
+                }
+
+                var border;
+                if(styleInfo.ShowRowStripes)
+                {
+                    if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.border)
+                        border = styleOptions.firstRowStripe.dxf.border;
+                    else if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.border)
+                        border = styleOptions.secondRowStripe.dxf.border;
+
+                    if(border)
+                    {
+                        for(n = 1; n < 5; n++)
+                        {
+                            ctx.lineHor(0, stepY*n, xSize);
+                        }
+                        ctx.stroke();
+                    }
+                }
+                if(styleOptions.totalRow && styleInfo.TotalsRowCount && styleOptions.totalRow.dxf.border)
+                {
+                    border = styleOptions.totalRow.dxf.border;
+                    if(border.t.s !== c_oAscBorderStyles.None)
+                    {
+                        ctx.setStrokeStyle(border.t.c);
+                        ctx.lineVer(0, xSize, ySize);
+                    }
+                }
+                if(styleOptions.headerRow && styleOptions.headerRow.dxf.border)//header row
+                {
+                    border = styleOptions.headerRow.dxf.border;
+                    if(border.t.s !== c_oAscBorderStyles.None)
+                    {
+                        ctx.setStrokeStyle(border.t.c);
+                        ctx.lineHor(0, 0, xSize);
+                    }
+                    if(border.b.s !== c_oAscBorderStyles.None)
+                    {
+                        ctx.setStrokeStyle(border.b.c);
+                        ctx.lineHor(0, stepY, xSize);
+                    }
+                    ctx.stroke();
+                }
+                ctx.closePath();
+            }
+
+            //**draw marks line**
+            var defaultColor;
+            if(!styleOptions || !styleOptions.wholeTable || !styleOptions.wholeTable.dxf.font)
+                defaultColor = blackColor;
+            else
+                defaultColor = styleOptions.wholeTable.dxf.font.c;
+
+            for(var n = 1; n < 6; n++)
+            {
+                ctx.beginPath();
+                color = null;
+                if(n == 1 && styleOptions && styleOptions.headerRow && styleOptions.headerRow.dxf.font)
+                    color = styleOptions.headerRow.dxf.font.c;
+                else if(n == 5 && styleOptions && styleOptions.totalRow && styleOptions.totalRow.dxf.font)
+                    color = styleOptions.totalRow.dxf.font.c;
+                else if(styleOptions && styleOptions.headerRow && styleInfo.ShowRowStripes)
+                {
+                    if((n == 2 || (n == 5 && !styleOptions.totalRow)) &&  styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.font)
+                        color  = styleOptions.firstRowStripe.dxf.font.c;
+                    else if(n == 3 && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font)
+                        color  = styleOptions.secondRowStripe.dxf.font.c;
+                    else
+                        color = defaultColor
+                }
+                else if(styleOptions && !styleOptions.headerRow && styleInfo.ShowRowStripes)
+                {
+                    if((n == 1 || n == 3 || (n == 5 && !styleOptions.totalRow)) && styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.font)
+                        color  = styleOptions.firstRowStripe.dxf.font.c;
+                    else if((n == 2 || n == 4) && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font)
+                        color  = styleOptions.secondRowStripe.dxf.font.c;
+                    else
+                        color = defaultColor
+                }
+                else
+                    color = defaultColor;
+                ctx.setStrokeStyle(color);
+                var k = 0;
+                var strY = n*stepY - stepY/2;
+                while(k < 6)
+                {
+                    //ctx.lineHor(k*stepX + 3 * pxToMM, strY, (k + 1)*stepX - 2 * pxToMM);
+
+                    nativeRender["PD_PathMoveTo"](k*stepX + stepX * 0.25, strY);
+                    nativeRender["PD_PathLineTo"]((k + 1)*stepX - stepX * 0.25, strY);
+                    k++;
+                }
+                ctx.stroke();
+                ctx.closePath();
+            }
+        };
+
+       // ChartPreviewManager.prototype = Object.create (ChartPreviewManager.prototype);
+       // ChartPreviewManager.prototype.constructor = ChartPreviewManager;
+
+        // chat styles
+        ChartPreviewManager.prototype.clearPreviews = function() {
+            window["native"]["ClearCacheChartStyles"]();
+        };
+        ChartPreviewManager.prototype.createChartPreview = function(_graphics, type, styleIndex) {
+            return ExecuteNoHistory(function(){
+                if(!this.chartsByTypes[type])
+                    this.chartsByTypes[type] = this.getChartByType(type);
+                var chart_space = this.chartsByTypes[type];
+                if(chart_space.style !== styleIndex)
+                {
+                    chart_space.style = styleIndex;
+                    chart_space.recalculateMarkers();
+                    chart_space.recalculateSeriesColors();
+                    chart_space.recalculatePlotAreaChartBrush();
+                    chart_space.recalculatePlotAreaChartPen();
+                    chart_space.recalculateChartBrush();
+                    chart_space.recalculateChartPen();
+                    chart_space.recalculateUpDownBars();
+                }
+                chart_space.recalculatePenBrush();
+
+                var _width_px = this.CHART_PREVIEW_WIDTH_PIX;
+                var _height_px = this.CHART_PREVIEW_WIDTH_PIX;
+                if (AscBrowser.isRetina)
+                {
+                    _width_px <<= 1;
+                    _height_px <<= 1;
+                }
+
+                window['native'].BeginDrawDefaultStyle(type + '', styleIndex);
+
+                //window["native"]["DD_StartNativeDraw"](_width_px, _height_px, 50, 50);
+
+                var dKoefToMM = g_dKoef_pix_to_mm;
+                if (this.IsRetinaEnabled)
+                    dKoefToMM /= 2;
+
+                chart_space.draw(_graphics);
+                _graphics.ClearParams();
+
+                window['native'].EndDrawStyle();
+
+//               var _stream = global_memory_stream_menu;
+//               _stream["ClearNoAttack"]();
+//               _stream["WriteByte"](4);
+//               _stream["WriteLong"](type);
+//               _stream["WriteLong"](styleIndex);
+//                window["native"]["DD_EndNativeDraw"](_stream);
+
+            }, this, []);
+
+        };
+        ChartPreviewManager.prototype.getChartPreviews = function(chartType) {
+           // console.log('NATIVE getChartPreviews : ' + chartType);
+
+            if (isRealNumber(chartType))
+            {
+                var bIsCached = window["native"]["IsCachedChartStyles"](chartType);
+                if (!bIsCached)
+                {
+                   // window["native"]["DD_PrepareNativeDraw"]();
+
+                    window['native'].SetStylesType(2);
+
+                    var _graphics = new CDrawingStream();
+
+                    for (var i = 1; i < 49; ++i) {
+                        this.createChartPreview(_graphics, chartType, i);
+                    }
+
+                   // var _stream = global_memory_stream_menu;
+                   // _stream["ClearNoAttack"]();
+                   // _stream["WriteByte"](5);
+                   // _api.WordControl.m_oDrawingDocument.Native["DD_EndNativeDraw"](_stream);
+                }
+            }
+        };
+
+    };
     this.offline_afteInit = function () {
     };
 }
@@ -4626,6 +4880,12 @@ function offline_apply_event(type,params) {
             _return = _stream;
             break;
         }
+        case 201: // ASC_MENU_EVENT_TYPE_DOCUMENT_CHARTSTYLES
+        {
+            _api.chartPreviewManager.getChartPreviews(parseInt(params));
+            _return = global_memory_stream_menu;
+            break;
+        }
         case 202: // ASC_MENU_EVENT_TYPE_DOCUMENT_PDFBASE64
         {
             _stream = global_memory_stream_menu;
@@ -4673,6 +4933,11 @@ function offline_apply_event(type,params) {
             _return = _s.offline_addShapeDrawingObject(params);
             break;
         }
+        case 400: // ASC_MENU_EVENT_TYPE_INSERT_CHART
+        {
+            _return = _s.offline_addChartDrawingObject(params);
+            break;
+        }
 
         // Cell interface
 
@@ -4680,6 +4945,7 @@ function offline_apply_event(type,params) {
         {
             var borders = null;
             var border = null;
+            var filterInfo = null;
 
             while (_continue) {
                 _attr = params[_current.pos++];
@@ -5118,6 +5384,36 @@ function offline_apply_event(type,params) {
                 var indexScheme = parseInt(params);
                 _api.asc_ChangeColorScheme(indexScheme);
             }
+            break;
+        }
+
+        case 3000: // ASC_SPREADSHEETS_EVENT_TYPE_FILTER_ADD_AUTO
+        {
+            var filter = asc_ReadAutoFilter(params, _current);
+            _api.asc_addAutoFilter(filter.styleName, filter.format);
+            break;
+        }
+
+        case 3010: // ASC_SPREADSHEETS_EVENT_TYPE_FILTER_CHANGE_AUTO
+        {
+            var changeFilter = asc_ReadAutoFilter(params, _current);
+            _api.asc_changeAutoFilter(changeFilter.tableName, changeFilter.optionType, changeFilter.styleName);
+            break;
+        }
+
+        case 3040: // ASC_SPREADSHEETS_EVENT_TYPE_FILTER_FORMAT_TABLE_OPTIONS
+        {
+            var formatOptions = _api.asc_getAddFormatTableOptions(params);
+            _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            asc_WriteAddFormatTableOptions(formatOptions, _stream);
+            _return = _stream;
+            break;
+        }
+
+        case 3050: // ASC_SPREADSHEETS_EVENT_TYPE_FILTER_CLEAR
+        {
+            _api.asc_clearFilter();
             break;
         }
 
