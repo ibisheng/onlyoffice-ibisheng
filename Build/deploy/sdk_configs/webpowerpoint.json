@@ -17,7 +17,7 @@
                 "../../Common/FontsFreeType/FontManager.js",
                 "../../Common/FontsFreeType/font_map.js",
                 "../../Word/Drawing/Externals.js",
-                "../../Word/Drawing/GlobalLoaders.js",
+                "../../Common/GlobalLoaders.js",
                 "../../Common/commonDefines.js",
                 "../../Common/apiCommon.js",
                 "../../Common/downloaderfiles.js",

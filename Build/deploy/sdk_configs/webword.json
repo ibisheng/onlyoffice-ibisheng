@@ -33,7 +33,7 @@
                 "../../Common/FontsFreeType/FontManager.js",
                 "../../Common/FontsFreeType/font_map.js",
                 "../../Word/Drawing/Externals.js",
-                "../../Word/Drawing/GlobalLoaders.js",
+                "../../Common/GlobalLoaders.js",
                 "../../Word/Drawing/translations.js",
                 "../../Common/Charts/charts.js",
                 "../../Common/Charts/ChartsDrawer.js",
