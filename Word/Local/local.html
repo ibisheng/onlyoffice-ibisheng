@@ -203,11 +203,11 @@
 	
 	window.onupdaterecents = function(_params)
 	{
-		var _len = _params.length / 3;
+		var _len = _params.length;
 		var _contents = "<tr class=\"tableHeader\"><td class=\"tableHeaderCell\" style=\"text-align: center; width: 30px\"></td><td class=\"tableHeaderCell\"></td><td class=\"tableHeaderCell\" style=\"text-align: center; width: 70px\"></td></tr>";
 		for (var i = 0; i < _len; i++)
 		{
-			_contents += AddRecent(_params[i * 3 + 1], _params[i * 3 + 2], _params[i * 3], false, i);
+			_contents += AddRecent(_params[i].type, _params[i].path + "; date: " + _params[i].modifyed, _params[i].id, false, i);
 		}
 		document.getElementById("tableRecents").innerHTML = _contents;
 		
@@ -227,7 +227,7 @@
 		var _contents = "<tr class=\"tableHeader\"><td class=\"tableHeaderCell\" style=\"text-align: center; width: 30px\"></td><td class=\"tableHeaderCell\"></td><td class=\"tableHeaderCell\" style=\"text-align: center; width: 70px\"></td></tr>";
 		for (var i = 0; i < _len; i++)
 		{
-			_contents += AddRecover(_params[i * 3 + 1], _params[i * 3 + 2], _params[i * 3], false, i);
+			_contents += AddRecover(_params[i].type, _params[i].path, _params[i].id, false, i);
 		}
 		document.getElementById("tableRecovers").innerHTML = _contents;
 		
