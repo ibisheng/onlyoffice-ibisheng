@@ -2359,6 +2359,15 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_ReviewType = function(Re
             Element.Set_ReviewType(ReviewType);
     }
 };
+CParagraphContentWithParagraphLikeContent.prototype.Set_ReviewTypeWithInfo = function(ReviewType, ReviewInfo)
+{
+    for (var Index = 0, Count = this.Content.length; Index < Count; Index++)
+    {
+        var Element = this.Content[Index];
+        if (Element && Element.Set_ReviewTypeWithInfo)
+            Element.Set_ReviewTypeWithInfo(ReviewType, ReviewInfo);
+    }
+};
 CParagraphContentWithParagraphLikeContent.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth)
 {
     for (var CurPos = 0, Count = this.Content.length; CurPos < Count; CurPos++)
