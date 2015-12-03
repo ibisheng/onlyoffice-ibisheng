@@ -1,6 +1,5 @@
 ﻿"use strict";
 
-var documentUrlChanges = null;
 var documentTitle = 'null';
 var documentTitleWithoutExtention = 'null';
 var documentFormat = 'null';
@@ -6565,7 +6564,7 @@ window["asc_nativeOnSpellCheck"] = function (response)
 };
 
 function _onOpenCommand(fCallback, incomeObject) {
-	g_fOpenFileCommand(incomeObject["data"], documentUrlChanges, c_oSerFormat.Signature, function (error, result) {
+	g_fOpenFileCommand(incomeObject["data"], editor.documentUrlChanges, c_oSerFormat.Signature, function (error, result) {
 		if (error) {
 			editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
 			if(fCallback) fCallback();

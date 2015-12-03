@@ -86,7 +86,7 @@ baseEditorsApi.prototype.asc_showRevision = function(newObj) {
 
     this.DocInfo.put_Id(this.VersionHistory.docId);
     this.DocInfo.put_Url(this.VersionHistory.url);
-    documentUrlChanges = this.VersionHistory.urlChanges;
+    this.documentUrlChanges = this.VersionHistory.urlChanges;
     this.asc_setDocInfo(this.DocInfo);
     this.LoadDocument(true);
   } else if (this.VersionHistory.currentChangeId < newObj.currentChangeId) {
