@@ -165,6 +165,18 @@ baseEditorsApi.prototype.asc_getChartPreviews = function(chartType) {
 baseEditorsApi.prototype.asc_getTextArtPreviews = function() {
   return this.textArtPreviewManager.getWordArtStyles();
 };
+// Add image
+baseEditorsApi.prototype.asc_addImage = function() {
+  var t = this;
+  ShowImageFileDialog(this.documentId, this.documentUserId, function(error, files) {
+    t._uploadCallback(error, files);
+  }, function(error) {
+    if (c_oAscError.ID.No !== error) {
+      t.sendEvent("asc_onError", error, c_oAscError.Level.NoCritical);
+    }
+    t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+  });
+};
 // Version History
 baseEditorsApi.prototype.asc_showRevision = function(newObj) {
 };

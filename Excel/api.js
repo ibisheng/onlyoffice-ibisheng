@@ -2333,15 +2333,8 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_showImageFileDialog = function() {
-    var t = this;
-    ShowImageFileDialog(this.documentId, this.documentUserId, function(error, files) {
-      t._uploadCallback(error, files);
-    }, function(error) {
-      if (c_oAscError.ID.No !== error) {
-        t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
-      }
-      t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-    });
+    // ToDo заменить на общую функцию для всех
+    this.asc_addImage();
   };
   spreadsheet_api.prototype._uploadCallback = function(error, files) {
     var t = this;

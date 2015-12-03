@@ -2851,14 +2851,7 @@ asc_docs_api.prototype.ChangeArtImageFromFile = function()
 };
 
 asc_docs_api.prototype.AddImage = function(){
-	var t = this;
-	ShowImageFileDialog(this.documentId, this.documentUserId, function (error, files) {
-		t._uploadCallback(error, files);
-	}, function (error) {
-		if (c_oAscError.ID.No !== error)
-			t.asc_fireCallback("asc_onError", error, c_oAscError.Level.NoCritical);
-		t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-	});
+  this.asc_addImage();
 };
 asc_docs_api.prototype._uploadCallback = function(error, files) {
 	var t =this;
