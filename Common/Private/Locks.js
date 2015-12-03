@@ -6,7 +6,7 @@
 
 if(typeof CDocument !== "undefined")
 {
-    CDocument.prototype.Document_Is_SelectionLocked = function(CheckType, AdditionalData)
+    CDocument.prototype.Document_Is_SelectionLocked = function(CheckType, AdditionalData, DontLockInFastMode)
     {
         if ( true === CollaborativeEditing.Get_GlobalLock() )
             return true;
@@ -117,7 +117,7 @@ if(typeof CDocument !== "undefined")
             }
         }
 
-        var bResult = CollaborativeEditing.OnEnd_CheckLock();
+        var bResult = CollaborativeEditing.OnEnd_CheckLock(DontLockInFastMode);
 
         if ( true === bResult )
         {

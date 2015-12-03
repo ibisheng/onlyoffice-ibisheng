@@ -9518,7 +9518,7 @@ CDocument.prototype =
 
         if ( e.KeyCode == 8 && false === editor.isViewMode ) // BackSpace
         {
-            if (true === CollaborativeEditing.Is_Fast() || false === this.Document_Is_SelectionLocked(changestype_Remove))
+            if (false === this.Document_Is_SelectionLocked(changestype_Remove, null, true))
             {
                 this.Create_NewHistoryPoint(historydescription_Document_BackSpaceButton);
                 this.Remove(-1, true);
@@ -9666,7 +9666,7 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 32 && false === editor.isViewMode ) // Space
         {
-            if (true === CollaborativeEditing.Is_Fast() || false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+            if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true))
             {
                 this.Create_NewHistoryPoint(historydescription_Document_SpaceButton);
 
@@ -10028,7 +10028,7 @@ CDocument.prototype =
         {
             if ( true != e.ShiftKey )
             {
-                if (true === CollaborativeEditing.Is_Fast() || false === this.Document_Is_SelectionLocked(changestype_Delete))
+                if (false === this.Document_Is_SelectionLocked(changestype_Delete, null, true))
                 {
                     this.Create_NewHistoryPoint(historydescription_Document_DeleteButton);
                     this.Remove( 1, true );
@@ -10492,7 +10492,7 @@ CDocument.prototype =
 
     OnKeyPress : function(e)
     {
-        if ( true === editor.isViewMode )
+        if (true === this.Api.isViewMode)
             return false;
 
         var Code;
@@ -10507,7 +10507,7 @@ CDocument.prototype =
 
         if ( Code > 0x20 )
         {
-            if (true === CollaborativeEditing.Is_Fast() || false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+            if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true))
             {
                 this.Create_NewHistoryPoint(historydescription_Document_AddLetter);
 
