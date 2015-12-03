@@ -535,6 +535,7 @@ asc_docs_api.prototype['asc_undoAllChanges'] = asc_docs_api.prototype.asc_undoAl
 asc_docs_api.prototype['asc_CloseFile'] = asc_docs_api.prototype.asc_CloseFile;
 asc_docs_api.prototype['asc_addComment'] = asc_docs_api.prototype.asc_addComment;
 asc_docs_api.prototype['asc_SetFastCollaborative'] = asc_docs_api.prototype.asc_SetFastCollaborative;
+asc_docs_api.prototype['asc_isOffline'] = asc_docs_api.prototype.asc_isOffline;
 window['CMathProp'] = CMathProp;
 CMathProp.prototype['get_Type'] = CMathProp.prototype.get_Type;
 window['CParagraphPropEx'] = CParagraphPropEx;

@@ -406,6 +406,7 @@ asc_docs_api.prototype['asc_undoAllChanges'] = asc_docs_api.prototype.asc_undoAl
 asc_docs_api.prototype['sync_ContextMenuCallback'] = asc_docs_api.prototype.sync_ContextMenuCallback;
 asc_docs_api.prototype['asc_addComment'] = asc_docs_api.prototype.asc_addComment;
 asc_docs_api.prototype['asc_SetFastCollaborative'] = asc_docs_api.prototype.asc_SetFastCollaborative;
+asc_docs_api.prototype['asc_isOffline'] = asc_docs_api.prototype.asc_isOffline;
 window['OnSave_Callback'] = OnSave_Callback;
 window['asc_CCommentData'] = asc_CCommentData;
 asc_CCommentData.prototype['asc_getText'] = asc_CCommentData.prototype.asc_getText;

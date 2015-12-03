@@ -3604,4 +3604,6 @@ var editor;
   prot["asc_nativePrint"] = prot.asc_nativePrint;
   prot["asc_nativePrintPagesCount"] = prot.asc_nativePrintPagesCount;
   prot["asc_nativeGetPDF"] = prot.asc_nativeGetPDF;
+  
+  prot['asc_isOffline'] = prot.asc_isOffline;
 })(jQuery, window);

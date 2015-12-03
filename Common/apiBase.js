@@ -166,3 +166,7 @@ baseEditorsApi.prototype.asc_showRevision = function(newObj) {
 };
 baseEditorsApi.prototype.asc_undoAllChanges = function() {
 };
+
+baseEditorsApi.prototype.asc_isOffline = function() {
+	return false;
+};
