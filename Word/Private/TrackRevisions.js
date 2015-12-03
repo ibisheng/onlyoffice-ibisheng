@@ -14,6 +14,8 @@ asc_docs_api.prototype.asc_SetTrackRevisions = function(bTrack)
 };
 asc_docs_api.prototype.asc_IsTrackRevisions = function()
 {
+    if (this.isViewMode)
+        return false;
     return this.WordControl.m_oLogicDocument.Is_TrackRevisions();
 };
 asc_docs_api.prototype.sync_BeginCatchRevisionsChanges = function()
