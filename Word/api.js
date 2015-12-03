@@ -1,6 +1,5 @@
 ﻿"use strict";
 
-var documentTitleWithoutExtention = 'null';
 var documentFormat = 'null';
 var documentVKey = null;
 var documentFormatSave = c_oAscFileType.DOCX;
@@ -577,16 +576,6 @@ asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo) {
     this.documentTitle = this.DocInfo.get_Title();
     documentFormat = this.DocInfo.get_Format();
     this.documentCallbackUrl = this.DocInfo.get_CallbackUrl();
-    var nIndex = -1;
-    if (this.documentTitle) {
-      nIndex = this.documentTitle.lastIndexOf(".");
-    }
-    if (-1 != nIndex) {
-      documentTitleWithoutExtention = this.documentTitle.substring(0, nIndex);
-    } else {
-      documentTitleWithoutExtention = this.documentTitle;
-    }
-
     documentVKey = this.DocInfo.get_VKey();
     var sProtocol = window.location.protocol;
     this.documentOrigin = ((sProtocol && '' !== sProtocol) ? sProtocol + '//' : '') + window.location.host;
