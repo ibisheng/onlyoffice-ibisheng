@@ -42,7 +42,6 @@ var editor;
     this.wb = null;
     this.wbModel = null;
 
-    this.documentVKey = null;
     this.documentFormatSave = c_oAscFileType.XLSX;
     this.chartEditor = undefined;
     this.documentOpenOptions = undefined;		// Опции при открытии (пока только опции для CSV)

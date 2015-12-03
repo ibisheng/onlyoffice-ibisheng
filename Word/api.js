@@ -1,6 +1,5 @@
 ﻿"use strict";
 
-var documentVKey = null;
 var documentFormatSave = c_oAscFileType.DOCX;
 
 function CAscSection()
@@ -575,7 +574,7 @@ asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo) {
     this.documentTitle = this.DocInfo.get_Title();
     this.documentFormat = this.DocInfo.get_Format();
     this.documentCallbackUrl = this.DocInfo.get_CallbackUrl();
-    documentVKey = this.DocInfo.get_VKey();
+    this.documentVKey = this.DocInfo.get_VKey();
     var sProtocol = window.location.protocol;
     this.documentOrigin = ((sProtocol && '' !== sProtocol) ? sProtocol + '//' : '') + window.location.host;
 
@@ -606,7 +605,7 @@ asc_docs_api.prototype.LoadDocument = function(isVersionHistory) {
       "id": this.documentId,
       "userid": this.documentUserId,
       "format": this.documentFormat,
-      "vkey": documentVKey,
+      "vkey": this.documentVKey,
       "editorid": c_oEditorId.Word,
       "url": this.documentUrl,
       "title": this.documentTitle,
@@ -2108,7 +2107,7 @@ asc_docs_api.prototype.asc_setAdvancedOptions = function(idOption, option) {
             "id":this.documentId,
             "userid": this.documentUserId,
             "format": this.documentFormat,
-            "vkey": documentVKey,
+            "vkey": this.documentVKey,
             "editorid": c_oEditorId.Word,
             "c":"reopen",
             "url": this.documentUrl,
@@ -4418,7 +4417,7 @@ asc_docs_api.prototype.AddImageUrl = function(url, imgProp)
 			var rData = {
 				"id": this.documentId,
 				"userid": this.documentUserId,
-				"vkey": documentVKey,
+				"vkey": this.documentVKey,
 				"c": "imgurl",
 				"saveindex": g_oDocumentUrls.getMaxIndex(),
 				"data": url};
@@ -4734,7 +4733,7 @@ asc_docs_api.prototype.ImgApply = function(obj)
                 var rData = {
                     "id": this.documentId,
                     "userid": this.documentUserId,
-                    "vkey": documentVKey,
+                    "vkey": this.documentVKey,
                     "c": "imgurl",
                     "saveindex": g_oDocumentUrls.getMaxIndex(),
                     "data": sImageToDownLoad};
@@ -6579,7 +6578,7 @@ function _downloadAs(editor, command, filetype, actionType, options, fCallbackRe
     oAdditionalData["c"] = command;
     oAdditionalData["id"] = editor.documentId;
     oAdditionalData["userid"] = editor.documentUserId;
-    oAdditionalData["vkey"] = documentVKey;
+    oAdditionalData["vkey"] = editor.documentVKey;
     oAdditionalData["outputformat"] = filetype;
     oAdditionalData["title"] = changeFileExtention(editor.documentTitle, getExtentionByFormat(filetype));
 	oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;

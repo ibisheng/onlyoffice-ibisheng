@@ -1,6 +1,5 @@
 "use strict";
 
-var documentVKey = null;
 var documentFormatSave = c_oAscFileType.PPTX;//пока не во что другое сохранять не можем.
 
 var c_oSerFormat = {
@@ -644,7 +643,7 @@ asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo) {
     this.documentTitle = this.DocInfo.get_Title();
     this.documentFormat = this.DocInfo.get_Format();
     this.documentCallbackUrl = this.DocInfo.get_CallbackUrl();
-    documentVKey = this.DocInfo.get_VKey();
+    this.documentVKey = this.DocInfo.get_VKey();
     var sProtocol = window.location.protocol;
     this.documentOrigin = ((sProtocol && '' !== sProtocol) ? sProtocol + '//' : '') + window.location.host;
 
@@ -673,7 +672,7 @@ asc_docs_api.prototype.LoadDocument = function() {
       "id": this.documentId,
       "userid": this.documentUserId,
       "format": this.documentFormat,
-      "vkey": documentVKey,
+      "vkey": this.documentVKey,
       "editorid": c_oEditorId.Presentation,
       "c": "open",
       "url": this.documentUrl,
@@ -2070,7 +2069,7 @@ asc_docs_api.prototype.ShapeApply = function(prop)
           var rData = {
             "id":this.documentId,
             "userid": this.documentUserId,
-            "vkey": documentVKey,
+            "vkey": this.documentVKey,
             "c":"imgurl",
             "saveindex": g_oDocumentUrls.getMaxIndex(),
             "data": sImageUrl};
@@ -2940,7 +2939,7 @@ asc_docs_api.prototype.AddImageUrl = function(url){
 		var rData = {
 			"id":this.documentId,
 			"userid": this.documentUserId,
-			"vkey": documentVKey,
+			"vkey": this.documentVKey,
 			"c":"imgurl",
 			"saveindex": g_oDocumentUrls.getMaxIndex(),
 			"data": url};
@@ -3157,7 +3156,7 @@ asc_docs_api.prototype.ImgApply = function(obj){
         var rData = {
           "id":this.documentId,
           "userid": this.documentUserId,
-          "vkey": documentVKey,
+          "vkey": this.documentVKey,
           "c":"imgurl",
           "saveindex": g_oDocumentUrls.getMaxIndex(),
           "data": sImageUrl};
@@ -4971,7 +4970,7 @@ function _downloadAs(editor, filetype, actionType, options)
 	oAdditionalData["c"] = command;
 	oAdditionalData["id"] = editor.documentId;
 	oAdditionalData["userid"] = editor.documentUserId;
-	oAdditionalData["vkey"] = documentVKey;
+	oAdditionalData["vkey"] = editor.documentVKey;
 	oAdditionalData["outputformat"] = filetype;
 	oAdditionalData["title"] = changeFileExtention(editor.documentTitle, getExtentionByFormat(filetype));
 	oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;

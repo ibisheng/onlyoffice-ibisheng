@@ -19,6 +19,7 @@ function baseEditorsApi(name) {
   this.LoadedObject = null;
   this.DocumentType = 0; // 0 - empty, 1 - test, 2 - document (from json)
   this.DocInfo = null;
+  this.documentVKey = null;
   this.documentId = undefined;
   this.documentUserId = undefined;
   this.documentUrl = "null";
