@@ -50,7 +50,6 @@ var editor;
     this.documentFormatSave = c_oAscFileType.XLSX;
     this.chartEditor = undefined;
     this.documentOpenOptions = undefined;		// Опции при открытии (пока только опции для CSV)
-    this.documentCallbackUrl = undefined;		// Ссылка для отправления информации о документе
 
     // объекты, нужные для отправки в тулбар (шрифты, стили)
     this._gui_control_colors = null;
@@ -1503,7 +1502,7 @@ var editor;
     if (!(window["NATIVE_EDITOR_ENJINE"] || offlineMode === this.documentUrl)) {
       this.CoAuthoringApi.set_url(null);
     }
-    this.CoAuthoringApi.init(t.User, t.documentId, t.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Spreadsheet, t.documentFormatSave);
+    this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Spreadsheet, this.documentFormatSave);
   };
 
   spreadsheet_api.prototype._onSaveChanges = function(recalcIndexColumns, recalcIndexRows) {

@@ -22,6 +22,7 @@ function baseEditorsApi(name) {
   this.documentId = undefined;
   this.documentUserId = undefined;
   this.documentUrl = "null";
+  this.documentCallbackUrl = undefined;		// Ссылка для отправления информации о документе
 
   // Тип состояния на данный момент (сохранение, открытие или никакое)
   this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;

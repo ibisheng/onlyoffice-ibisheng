@@ -6,7 +6,6 @@ var documentTitleWithoutExtention = 'null';
 var documentFormat = 'null';
 var documentVKey = null;
 var documentFormatSave = c_oAscFileType.PPTX;//пока не во что другое сохранять не можем.
-var documentCallbackUrl = undefined;		// Ссылка для отправления информации о документе
 
 var c_oSerFormat = {
     Version		: 1,
@@ -469,7 +468,7 @@ asc_docs_api.prototype._coAuthoringInit = function() {
   if (!(window["NATIVE_EDITOR_ENJINE"] || offlineMode === this.documentUrl)) {
     this.CoAuthoringApi.set_url(null);
   }
-  this.CoAuthoringApi.init(this.User, this.documentId, documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Presentation, documentFormatSave);
+  this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Presentation, documentFormatSave);
 
   // ToDo init other callbacks
 };
@@ -649,7 +648,7 @@ asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo) {
     this.documentUrl = this.DocInfo.get_Url();
     documentTitle = this.DocInfo.get_Title();
     documentFormat = this.DocInfo.get_Format();
-    documentCallbackUrl = this.DocInfo.get_CallbackUrl();
+    this.documentCallbackUrl = this.DocInfo.get_CallbackUrl();
     var nIndex = -1;
     if (documentTitle) {
       nIndex = documentTitle.lastIndexOf(".");

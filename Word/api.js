@@ -6,7 +6,6 @@ var documentTitleWithoutExtention = 'null';
 var documentFormat = 'null';
 var documentVKey = null;
 var documentFormatSave = c_oAscFileType.DOCX;
-var documentCallbackUrl = undefined;		// Ссылка для отправления информации о документе
 
 function CAscSection()
 {
@@ -580,7 +579,7 @@ asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo) {
     this.documentUrl = this.DocInfo.get_Url();
     documentTitle = this.DocInfo.get_Title();
     documentFormat = this.DocInfo.get_Format();
-    documentCallbackUrl = this.DocInfo.get_CallbackUrl();
+    this.documentCallbackUrl = this.DocInfo.get_CallbackUrl();
     var nIndex = -1;
     if (documentTitle) {
       nIndex = documentTitle.lastIndexOf(".");
@@ -1234,7 +1233,7 @@ asc_docs_api.prototype._coAuthoringInit = function() {
   if (!(window["NATIVE_EDITOR_ENJINE"] || offlineMode === this.documentUrl)) {
     this.CoAuthoringApi.set_url(null);
   }
-  this.CoAuthoringApi.init(this.User, this.documentId, documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Word, documentFormatSave);
+  this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Word, documentFormatSave);
 };
 
 // server disconnect
