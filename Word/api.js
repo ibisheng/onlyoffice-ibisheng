@@ -1,7 +1,5 @@
 ﻿"use strict";
 
-var documentFormatSave = c_oAscFileType.DOCX;
-
 function CAscSection()
 {
     this.PageWidth = 0;
@@ -274,6 +272,8 @@ function asc_docs_api(name)
 	/************ private!!! **************/
     this.WordControl = new CEditorPage(this);
     this.WordControl.Name = this.HtmlElementName;
+
+  this.documentFormatSave = c_oAscFileType.DOCX;
 
 	//todo убрать из native, copypaste, chart, loadfont
     //this.DocumentUrl = "";
@@ -1212,7 +1212,7 @@ asc_docs_api.prototype._coAuthoringInit = function() {
   if (!(window["NATIVE_EDITOR_ENJINE"] || offlineMode === this.documentUrl)) {
     this.CoAuthoringApi.set_url(null);
   }
-  this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Word, documentFormatSave);
+  this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Word, this.documentFormatSave);
 };
 
 // server disconnect

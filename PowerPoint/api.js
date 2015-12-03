@@ -1,7 +1,5 @@
 "use strict";
 
-var documentFormatSave = c_oAscFileType.PPTX;//пока не во что другое сохранять не можем.
-
 var c_oSerFormat = {
     Version		: 1,
     Signature	: "PPTY"
@@ -25,6 +23,8 @@ function asc_docs_api(name)
 	/************ private!!! **************/
     this.WordControl = new CEditorPage(this);
     this.WordControl.Name = this.HtmlElementName;
+
+  this.documentFormatSave = c_oAscFileType.PPTX;
 
     this.ThemeLoader = new CThemeLoader();
     this.ThemeLoader.Api = this;
@@ -462,7 +462,7 @@ asc_docs_api.prototype._coAuthoringInit = function() {
   if (!(window["NATIVE_EDITOR_ENJINE"] || offlineMode === this.documentUrl)) {
     this.CoAuthoringApi.set_url(null);
   }
-  this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Presentation, documentFormatSave);
+  this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Presentation, this.documentFormatSave);
 
   // ToDo init other callbacks
 };
