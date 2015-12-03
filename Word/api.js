@@ -561,32 +561,6 @@ asc_docs_api.prototype._onEndPermissions = function() {
     this.asc_fireCallback('asc_onGetEditorPermissions', new window['Asc'].asc_CAscEditorPermissions());
   }
 };
-
-asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo) {
-  if (c_DocInfo) {
-    this.DocInfo = c_DocInfo;
-  }
-
-  if (this.DocInfo) {
-    this.documentId = this.DocInfo.get_Id();
-    this.documentUserId = this.DocInfo.get_UserId();
-    this.documentUrl = this.DocInfo.get_Url();
-    this.documentTitle = this.DocInfo.get_Title();
-    this.documentFormat = this.DocInfo.get_Format();
-    this.documentCallbackUrl = this.DocInfo.get_CallbackUrl();
-    this.documentVKey = this.DocInfo.get_VKey();
-    var sProtocol = window.location.protocol;
-    this.documentOrigin = ((sProtocol && '' !== sProtocol) ? sProtocol + '//' : '') + window.location.host;
-
-    this.User = new Asc.asc_CUser();
-    this.User.asc_setId(this.DocInfo.get_UserId());
-    this.User.asc_setUserName(this.DocInfo.get_UserName());
-  }
-
-  if (undefined !== window["AscDesktopEditor"]) {
-    window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
-  }
-};
 asc_docs_api.prototype.asc_setLocale = function(val)
 {
 	this.InterfaceLocale = val;

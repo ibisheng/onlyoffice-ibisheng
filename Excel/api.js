@@ -313,32 +313,6 @@ var editor;
       t._loadFonts(fonts, callback);
     });
   };
-  spreadsheet_api.prototype.asc_setDocInfo = function(c_DocInfo) {
-    if (c_DocInfo) {
-      this.DocInfo = c_DocInfo;
-    }
-
-    if (this.DocInfo) {
-      this.documentId = this.DocInfo.asc_getId();
-      this.documentUserId = this.DocInfo.asc_getUserId();
-      this.documentUrl = this.DocInfo.asc_getUrl();
-      this.documentTitle = this.DocInfo.asc_getTitle();
-      this.documentFormat = this.DocInfo.asc_getFormat();
-      this.documentVKey = this.DocInfo.asc_getVKey();
-      this.chartEditor = this.DocInfo.asc_getChartEditor();
-      this.documentOpenOptions = this.DocInfo.asc_getOptions();
-      this.documentCallbackUrl = this.DocInfo.asc_getCallbackUrl();
-
-      // Выставляем пользователя
-      this.User = new asc.asc_CUser();
-      this.User.asc_setId(this.DocInfo.asc_getUserId());
-      this.User.asc_setUserName(this.DocInfo.asc_getUserName());
-    }
-
-    if (undefined !== window["AscDesktopEditor"]) {
-      window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
-    }
-  };
   spreadsheet_api.prototype.asc_getLocaleExample = function(val, number, date) {
     var res = '';
     var cultureInfo = g_aCultureInfos[val];

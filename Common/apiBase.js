@@ -86,6 +86,34 @@ baseEditorsApi.prototype.asc_GetFontThumbnailsPath = function() {
 baseEditorsApi.prototype.asc_getDocumentName = function() {
   return this.documentTitle;
 };
+baseEditorsApi.prototype.asc_setDocInfo = function(oDocInfo) {
+  if (oDocInfo) {
+    this.DocInfo = oDocInfo;
+  }
+
+  if (this.DocInfo) {
+    this.documentId = this.DocInfo.get_Id();
+    this.documentUserId = this.DocInfo.get_UserId();
+    this.documentUrl = this.DocInfo.get_Url();
+    this.documentTitle = this.DocInfo.get_Title();
+    this.documentFormat = this.DocInfo.get_Format();
+    this.documentCallbackUrl = this.DocInfo.get_CallbackUrl();
+    this.documentVKey = this.DocInfo.get_VKey();
+    var sProtocol = window.location.protocol;
+    this.documentOrigin = ((sProtocol && '' !== sProtocol) ? sProtocol + '//' : '') + window.location.host;
+
+    this.documentOpenOptions = this.DocInfo.asc_getOptions();
+    this.chartEditor = this.DocInfo.asc_getChartEditor();
+
+    this.User = new Asc.asc_CUser();
+    this.User.asc_setId(this.DocInfo.get_UserId());
+    this.User.asc_setUserName(this.DocInfo.get_UserName());
+  }
+
+  if (undefined !== window["AscDesktopEditor"]) {
+    window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
+  }
+};
 // Events
 baseEditorsApi.prototype.sendEvent = function() {
 };
