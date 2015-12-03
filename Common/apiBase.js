@@ -29,6 +29,9 @@ function baseEditorsApi(name) {
   this.documentTitle = "null";
   this.documentFormatSave = c_oAscFileType.UNKNOWN;
 
+  this.chartEditor = undefined;
+  this.documentOpenOptions = undefined;		// Опции при открытии (пока только опции для CSV)
+
   // Тип состояния на данный момент (сохранение, открытие или никакое)
   this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
   this.OpenDocumentProgress = new COpenProgress();
