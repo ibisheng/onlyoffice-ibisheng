@@ -2271,8 +2271,24 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         {
                             // Отмечаем начало нового слова
                             PRS.Set_LineBreakPos(Pos);
-                            WordLen = LetterLen;
-                            Word = true;
+
+                            // Если текущий символ с переносом, например, дефис, тогда на нем заканчивается слово
+                            if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.Is_SpaceAfter() )
+                            {
+                                // Добавляем длину пробелов до слова и ширину самого слова.
+                                X += SpaceLen + LetterLen;
+
+                                Word = false;
+                                FirstItemOnLine = false;
+                                EmptyLine = false;
+                                SpaceLen = 0;
+                                WordLen = 0;
+                            }
+                            else
+                            {
+                                Word = true;
+                                WordLen = LetterLen;
+                            }
                         }
 
                     }
