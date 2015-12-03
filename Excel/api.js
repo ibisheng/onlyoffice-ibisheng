@@ -42,8 +42,6 @@ var editor;
     this.wb = null;
     this.wbModel = null;
 
-    this.DocumentName = "";
-    this.documentTitle = "null";
     this.documentFormat = "null";
     this.documentVKey = null;
     this.documentFormatSave = c_oAscFileType.XLSX;

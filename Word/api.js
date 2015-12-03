@@ -1,6 +1,5 @@
 ﻿"use strict";
 
-var documentTitle = 'null';
 var documentTitleWithoutExtention = 'null';
 var documentFormat = 'null';
 var documentVKey = null;
@@ -281,7 +280,6 @@ function asc_docs_api(name)
 
 	//todo убрать из native, copypaste, chart, loadfont
     //this.DocumentUrl = "";
-    this.DocumentName = "";
 	this.InterfaceLocale = null;
         
     this.ShowParaMarks = false;
@@ -576,17 +574,17 @@ asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo) {
     this.documentId = this.DocInfo.get_Id();
     this.documentUserId = this.DocInfo.get_UserId();
     this.documentUrl = this.DocInfo.get_Url();
-    documentTitle = this.DocInfo.get_Title();
+    this.documentTitle = this.DocInfo.get_Title();
     documentFormat = this.DocInfo.get_Format();
     this.documentCallbackUrl = this.DocInfo.get_CallbackUrl();
     var nIndex = -1;
-    if (documentTitle) {
-      nIndex = documentTitle.lastIndexOf(".");
+    if (this.documentTitle) {
+      nIndex = this.documentTitle.lastIndexOf(".");
     }
     if (-1 != nIndex) {
-      documentTitleWithoutExtention = documentTitle.substring(0, nIndex);
+      documentTitleWithoutExtention = this.documentTitle.substring(0, nIndex);
     } else {
-      documentTitleWithoutExtention = documentTitle;
+      documentTitleWithoutExtention = this.documentTitle;
     }
 
     documentVKey = this.DocInfo.get_VKey();
@@ -598,9 +596,8 @@ asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo) {
     this.User.asc_setUserName(this.DocInfo.get_UserName());
   }
 
-  this.DocumentName = documentTitle;
   if (undefined !== window["AscDesktopEditor"]) {
-    window["AscDesktopEditor"]["SetDocumentName"](this.DocumentName);
+    window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
   }
 };
 asc_docs_api.prototype.asc_setLocale = function(val)
@@ -624,7 +621,7 @@ asc_docs_api.prototype.LoadDocument = function(isVersionHistory) {
       "vkey": documentVKey,
       "editorid": c_oEditorId.Word,
       "url": this.documentUrl,
-      "title": documentTitle,
+      "title": this.documentTitle,
       "embeddedfonts": this.isUseEmbeddedCutFonts,
       "viewmode": this.isViewMode
     };
@@ -869,7 +866,7 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 };
 asc_docs_api.prototype.get_DocumentName = function()
 {
-	return this.DocumentName;
+	return this.documentTitle;
 };
 // Callbacks
 /* все имена callback'оф начинаются с On. Пока сделаны:
@@ -2131,7 +2128,7 @@ asc_docs_api.prototype.asc_setAdvancedOptions = function(idOption, option) {
             "editorid": c_oEditorId.Word,
             "c":"reopen",
             "url": this.documentUrl,
-            "title": documentTitle,
+            "title": this.documentTitle,
             "codepage": option.asc_getCodePage(),
             "embeddedfonts": t.isUseEmbeddedCutFonts
           };
@@ -6600,7 +6597,7 @@ function _downloadAs(editor, command, filetype, actionType, options, fCallbackRe
     oAdditionalData["userid"] = editor.documentUserId;
     oAdditionalData["vkey"] = documentVKey;
     oAdditionalData["outputformat"] = filetype;
-    oAdditionalData["title"] = changeFileExtention(documentTitle, getExtentionByFormat(filetype));
+    oAdditionalData["title"] = changeFileExtention(editor.documentTitle, getExtentionByFormat(filetype));
 	oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
 	if (options.isNoData) {
 		;//nothing

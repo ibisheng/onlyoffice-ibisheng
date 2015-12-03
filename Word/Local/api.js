@@ -222,7 +222,7 @@ function DesktopOfflineUpdateLocalName(_api)
 	if (_ind != 1000000)
 		_name = _name.substring(_ind + 1);
 	
-	_api.DocumentName = _name;
+	_api.documentTitle = _name;
 	window["AscDesktopEditor"]["SetDocumentName"](_name);
 }
 
