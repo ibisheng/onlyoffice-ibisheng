@@ -1,5 +1,10 @@
 "use strict";
 
+function CheckLicense(licenseUrl, customerId, userId, userFirstName, userLastName, callback) 
+{
+    callback(true, g_oLicenseResult.Success);
+}
+
 /////////////////////////////////////////////////////////
 //////////////       FONTS       ////////////////////////
 /////////////////////////////////////////////////////////
@@ -141,6 +146,11 @@ function DesktopOfflineUpdateLocalName(_api)
 window["CDocsCoApi"].prototype.askSaveChanges = function(callback) 
 {
     callback({"saveLock": false});
+};
+window["CDocsCoApi"].prototype.saveChanges = function(arrayChanges, deleteIndex, excelAdditionalInfo)
+{
+	window["AscDesktopEditor"]["LocalFileSaveChanges"](arrayChanges.join("\",\""), deleteIndex, arrayChanges.length);
+	this.onUnSaveLock();
 };
 
 window["NativeCorrectImageUrlOnCopy"] = function(url)

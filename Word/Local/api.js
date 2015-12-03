@@ -8,15 +8,15 @@ asc_docs_api.prototype._OfflineAppDocumentStartLoad = function()
 	History.UserSaveMode = true;
     window["AscDesktopEditor"]["LocalStartOpen"]();
 };
-asc_docs_api.prototype._OfflineAppDocumentEndLoad = function(_data)
+asc_docs_api.prototype._OfflineAppDocumentEndLoad = function(_url, _data)
 {
     if (c_oSerFormat.Signature !== _data.substring(0, c_oSerFormat.Signature.length))
 	{
-		this.OpenDocument(documentUrl, _data);
+		this.OpenDocument(_url, _data);
 	}
     else
 	{
-		this.OpenDocument2(documentUrl, _data);
+		this.OpenDocument2(_url, _data);
 		this.WordControl.m_oLogicDocument.Set_FastCollaborativeEditing(false);
 	}
 	DesktopOfflineUpdateLocalName(this);
@@ -24,7 +24,7 @@ asc_docs_api.prototype._OfflineAppDocumentEndLoad = function(_data)
 window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
 {
     g_oDocumentUrls.documentUrl = _url;
-    editor._OfflineAppDocumentEndLoad(_data);
+    editor._OfflineAppDocumentEndLoad(_url, _data);
 };
 
 /////////////////////////////////////////////////////////

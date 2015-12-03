@@ -8,9 +8,9 @@ asc_docs_api.prototype._OfflineAppDocumentStartLoad = function()
 	History.UserSaveMode = true;
     window["AscDesktopEditor"]["LocalStartOpen"]();
 };
-asc_docs_api.prototype._OfflineAppDocumentEndLoad = function(_data)
+asc_docs_api.prototype._OfflineAppDocumentEndLoad = function(_url, _data)
 {
-    this.OpenDocument2(documentUrl, _data);
+    this.OpenDocument2(_url, _data);
 	this.WordControl.m_oLogicDocument.Set_FastCollaborativeEditing(false);
 	this.DocumentOrientation = (null == this.WordControl.m_oLogicDocument) ? true : !this.WordControl.m_oLogicDocument.Orientation;
 	DesktopOfflineUpdateLocalName(this);
@@ -18,7 +18,7 @@ asc_docs_api.prototype._OfflineAppDocumentEndLoad = function(_data)
 window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
 {
     g_oDocumentUrls.documentUrl = _url;
-    editor._OfflineAppDocumentEndLoad(_data);
+    editor._OfflineAppDocumentEndLoad(_url, _data);
 };
 
 /////////////////////////////////////////////////////////
