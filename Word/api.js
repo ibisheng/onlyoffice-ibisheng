@@ -864,10 +864,6 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
     if (window.USER_AGENT_SAFARI_MACOS)
         setInterval(SafariIntervalFocus, 10);
 };
-asc_docs_api.prototype.asc_getDocumentName = function()
-{
-	return this.documentTitle;
-};
 // Callbacks
 /* все имена callback'оф начинаются с On. Пока сделаны:
 	OnBold,

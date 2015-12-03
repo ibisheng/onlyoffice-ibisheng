@@ -80,6 +80,9 @@ function baseEditorsApi(name) {
 baseEditorsApi.prototype.asc_GetFontThumbnailsPath = function() {
   return '../Common/Images/';
 };
+baseEditorsApi.prototype.asc_getDocumentName = function() {
+  return this.documentTitle;
+};
 // Events
 baseEditorsApi.prototype.sendEvent = function() {
 };

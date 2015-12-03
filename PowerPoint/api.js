@@ -887,10 +887,6 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
     if (window.USER_AGENT_SAFARI_MACOS)
         setInterval(SafariIntervalFocus, 10);
 };
-asc_docs_api.prototype.asc_getDocumentName = function()
-{
-	return this.documentTitle;
-};
 
 asc_docs_api.prototype._OfflineAppDocumentStartLoad = function() {
   var t = this, scriptElem = document.createElement('script');

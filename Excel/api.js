@@ -890,11 +890,6 @@ var editor;
     }, fCallback, null, oAdditionalData, dataContainer);
   };
 
-
-  spreadsheet_api.prototype.asc_getDocumentName = function() {
-    return this.documentTitle;
-  };
-
   spreadsheet_api.prototype.asc_getDocumentFormat = function() {
     return this.documentFormat;
   };
