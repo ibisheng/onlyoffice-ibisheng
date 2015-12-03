@@ -1,6 +1,6 @@
 {
     "info": {
-        "version": "3.5.0",
+        "version": "3.6.0",
         "build": 148
     },
     "update_src": {
@@ -18,7 +18,6 @@
                 "../../Common/apiCommon.js",
                 "../../Common/commonDefines.js",
                 "../../Common/editorscommon.js",
-				"../../Common/Private/editorscommon.js",
                 "../../Common/NumFormat.js",
                 "../../Common/Charts/charts.js",
                 "../../Common/Charts/DrawingArea.js",
@@ -32,7 +31,7 @@
                 "../../Word/Drawing/WorkEvents.js",
                 "../../Word/Drawing/Externals.js",
                 "../../Word/Drawing/Metafile.js",
-                "../../Excel/model/DrawingObjects/GlobalLoaders.js",
+                "../../Common/GlobalLoaders.js",
                 "../../Excel/apiDefines.js",
                 "../../Excel/document/empty-workbook.js",
                 "../../Excel/utils/utils.js",
@@ -43,7 +42,8 @@
                 "../../Excel/model/CollaborativeEditing.js",
                 "../../Excel/model/ConditionalFormatting.js",
                 "../../Excel/model/FormulaObjects/parserFormula.js",
-                "../../Excel/model/FormulaObjects/dateandtimeFunctions.js",
+                "../../Excel/model/FormulaObjects/_xlfnFunctions.js",
+				"../../Excel/model/FormulaObjects/dateandtimeFunctions.js",
                 "../../Excel/model/FormulaObjects/engineeringFunctions.js",
                 "../../Excel/model/FormulaObjects/cubeFunctions.js",
                 "../../Excel/model/FormulaObjects/databaseFunctions.js",
@@ -155,8 +155,12 @@
                 "../../Excel/model/DrawingObjects/GlobalCounters.js",
                 "../../Word/apiCommon.js",
                 "../../Excel/apiCommonExport.js",
+                "../../Common/apiBase.js",
                 "../../Excel/api.js",
-                "../../Excel/Private/api.js",
+				"../../Common/Private/license.js",
+                "../../Excel/Private/license.js",
+				"../../Excel/Private/comments.js",
+				"../../Common/Local/common.js",
 				"../../Excel/Local/api.js"
             ],
             "dst": "../../Excel/sdk-all.js",
@@ -164,7 +168,7 @@
                 "../../Common/Build/Externs.js",
                 "../../Common/3rdparty/jquery/jquery.min.js",
                 "../../Common/3rdparty/Underscore/underscore-min.js",
-                "../../Common/3rdparty/Sockjs/sockjs-0.3.min.js",
+                "../../Common/3rdparty/Sockjs/sockjs.min.js",
                 "../../Common/3rdparty/XRegExp/xregexp-all-min.js",
                 "../../Common/3rdparty/jszip/jszip.min.js",
                 "../../Common/3rdparty/jszip-utils/jszip-utils.min.js",
@@ -175,7 +179,6 @@
             "map": "sdk-all.js.map",
             "log": "../../Excel/Build/Log",
             "define": [
-                "ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS=false",
                 "ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT=true"
             ]
         },
@@ -203,8 +206,8 @@
                 "expand": true,
                 "cwd": "../../Excel/",
                 "src": [
+                    "../Common/apiBase.js",
                     "api.js",
-                    "Private/api.js",
                     "apiDefines.js",
                     "view/EventsController.js",
                     "view/HandlerList.js",
