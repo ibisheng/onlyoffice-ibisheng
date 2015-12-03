@@ -1,6 +1,5 @@
 "use strict";
 
-var documentFormat = 'null';
 var documentVKey = null;
 var documentFormatSave = c_oAscFileType.PPTX;//пока не во что другое сохранять не можем.
 
@@ -643,7 +642,7 @@ asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo) {
     this.documentUserId = this.DocInfo.get_UserId();
     this.documentUrl = this.DocInfo.get_Url();
     this.documentTitle = this.DocInfo.get_Title();
-    documentFormat = this.DocInfo.get_Format();
+    this.documentFormat = this.DocInfo.get_Format();
     this.documentCallbackUrl = this.DocInfo.get_CallbackUrl();
     documentVKey = this.DocInfo.get_VKey();
     var sProtocol = window.location.protocol;
@@ -673,7 +672,7 @@ asc_docs_api.prototype.LoadDocument = function() {
     var rData = {
       "id": this.documentId,
       "userid": this.documentUserId,
-      "format": documentFormat,
+      "format": this.documentFormat,
       "vkey": documentVKey,
       "editorid": c_oEditorId.Presentation,
       "c": "open",

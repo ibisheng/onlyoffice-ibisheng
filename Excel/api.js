@@ -42,7 +42,6 @@ var editor;
     this.wb = null;
     this.wbModel = null;
 
-    this.documentFormat = "null";
     this.documentVKey = null;
     this.documentFormatSave = c_oAscFileType.XLSX;
     this.chartEditor = undefined;
@@ -330,18 +329,6 @@ var editor;
       this.chartEditor = this.DocInfo.asc_getChartEditor();
       this.documentOpenOptions = this.DocInfo.asc_getOptions();
       this.documentCallbackUrl = this.DocInfo.asc_getCallbackUrl();
-      // if(this.documentFormat)
-      // {
-      // switch(this.documentFormat)
-      // {
-      // case "xlsx" : this.documentFormatSave = c_oAscFileType.XLSX;break;
-      // case "xls"  : this.documentFormatSave = c_oAscFileType.XLS;break;
-      // case "ods"  : this.documentFormatSave = c_oAscFileType.ODS;break;
-      // case "csv"  : this.documentFormatSave = c_oAscFileType.CSV;break;
-      // case "htm"  :
-      // case "html" : this.documentFormatSave = c_oAscFileType.HTML;break;
-      // }
-      // }
 
       // Выставляем пользователя
       this.User = new asc.asc_CUser();
@@ -888,10 +875,6 @@ var editor;
     g_fSaveWithParts(function(fCallback1, oAdditionalData1, dataContainer1) {
       sendCommand2(t, fCallback1, oAdditionalData1, dataContainer1);
     }, fCallback, null, oAdditionalData, dataContainer);
-  };
-
-  spreadsheet_api.prototype.asc_getDocumentFormat = function() {
-    return this.documentFormat;
   };
 
   spreadsheet_api.prototype.asc_isDocumentModified = function() {
@@ -3427,7 +3410,6 @@ var editor;
   prot["asc_Redo"] = prot.asc_Redo;
 
   prot["asc_getDocumentName"] = prot.asc_getDocumentName;
-  prot["asc_getDocumentFormat"] = prot.asc_getDocumentFormat;
   prot["asc_isDocumentModified"] = prot.asc_isDocumentModified;
   prot["asc_isDocumentCanSave"] = prot.asc_isDocumentCanSave;
   prot["asc_getCanUndo"] = prot.asc_getCanUndo;
