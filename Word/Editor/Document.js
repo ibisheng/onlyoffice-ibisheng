@@ -10125,17 +10125,8 @@ CDocument.prototype =
         {
             if ( true !== e.AltKey ) // Ctrl + E - переключение прилегания параграфа между center и left
             {
-                var ParaPr = this.Get_Paragraph_ParaPr();
-                if ( null != ParaPr )
-                {
-                    if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
-                    {
-                        this.Create_NewHistoryPoint(historydescription_Document_SetParagraphAlignHotKey);
-                        this.Set_ParagraphAlign( ParaPr.Jc === align_Center ? align_Left : align_Center );
-                        this.Document_UpdateInterfaceState();
-                    }
-                    bRetValue = keydownresult_PreventAll;
-                }
+                this.private_ToggleParagraphAlignByHotkey(align_Center);
+                bRetValue = keydownresult_PreventAll;
             }
             else // Ctrl + Alt + E - добавляем знак евро €
             {
@@ -10166,17 +10157,8 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 74 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + J переключение прилегания параграфа между justify и left
         {
-            var ParaPr = this.Get_Paragraph_ParaPr();
-            if ( null != ParaPr )
-            {
-                if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
-                {
-                    this.Create_NewHistoryPoint(historydescription_Document_SetParagraphAlignHotKey2);
-                    this.Set_ParagraphAlign( ParaPr.Jc === align_Justify ? align_Left : align_Justify );
-                    this.Document_UpdateInterfaceState();
-                }
-                bRetValue = keydownresult_PreventAll;
-            }
+            this.private_ToggleParagraphAlignByHotkey(align_Justify);
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 75 && false === editor.isViewMode && true === e.CtrlKey && false === e.ShiftKey ) // Ctrl + K - добавление гиперссылки
         {
@@ -10199,17 +10181,8 @@ CDocument.prototype =
             }
             else // Ctrl + L - переключение прилегания параграфа между left и justify
             {
-                var ParaPr = this.Get_Paragraph_ParaPr();
-                if ( null != ParaPr )
-                {
-                    if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
-                    {
-                        this.Create_NewHistoryPoint(historydescription_Document_SetParagraphAlignHotKey3);
-                        this.Set_ParagraphAlign( ParaPr.Jc === align_Left ? align_Justify : align_Left );
-                        this.Document_UpdateInterfaceState();
-                    }
-                    bRetValue = keydownresult_PreventAll;
-                }
+                this.private_ToggleParagraphAlignByHotkey(align_Left);
+                bRetValue = keydownresult_PreventAll;
             }
         }
         else if ( e.KeyCode == 77 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + M + ...
@@ -10240,17 +10213,8 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 82 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + R - переключение прилегания параграфа между right и left
         {
-            var ParaPr = this.Get_Paragraph_ParaPr();
-            if ( null != ParaPr )
-            {
-                if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
-                {
-                    this.Create_NewHistoryPoint(historydescription_Document_SetParagraphAlignHotKey4);
-                    this.Set_ParagraphAlign( ParaPr.Jc === align_Right ? align_Left : align_Right );
-                    this.Document_UpdateInterfaceState();
-                }
-                bRetValue = keydownresult_PreventAll;
-            }
+            this.private_ToggleParagraphAlignByHotkey(align_Right);
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 83 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + S - save
         {
@@ -15181,6 +15145,38 @@ CDocument.prototype.private_CorrectDocumentPosition = function()
         {
             this.CurPos.ContentPos = this.Content.length - 1;
             this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(false);
+        }
+    }
+};
+CDocument.prototype.private_ToggleParagraphAlignByHotkey = function(Align)
+{
+    var SelectedInfo = this.Get_SelectedElementsInfo();
+    var Math = SelectedInfo.Get_Math();
+    if (null !== Math && true !== Math.Is_Inline())
+    {
+        var MathAlign = Math.Get_Align();
+        if (Align !== MathAlign)
+        {
+            if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+            {
+                this.Create_NewHistoryPoint(historydescription_Document_SetParagraphAlignHotKey);
+                Math.Set_Align(Align);
+                this.Recalculate();
+                this.Document_UpdateInterfaceState();
+            }
+        }
+    }
+    else
+    {
+        var ParaPr = this.Get_Paragraph_ParaPr();
+        if (null != ParaPr)
+        {
+            if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties))
+            {
+                this.Create_NewHistoryPoint(historydescription_Document_SetParagraphAlignHotKey);
+                this.Set_ParagraphAlign(ParaPr.Jc === Align ? (Align === align_Left ? align_Justify : align_Left) : Align);
+                this.Document_UpdateInterfaceState();
+            }
         }
     }
 };

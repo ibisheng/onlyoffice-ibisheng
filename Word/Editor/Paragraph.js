@@ -5339,15 +5339,7 @@ Paragraph.prototype =
 
                 if ( para_Run === this.Content[EndPos].Type )
                 {
-                    var CenterRunPos = this.Internal_ReplaceRun( EndPos, NewElements );
-
-                    // TODO: разобраться здесь получше, как правильно обновлять позицию
-                    if ( StartPos === this.CurPos.ContentPos )
-                        this.CurPos.ContentPos = CenterRunPos;
-
-                    // Подправим селект
-                    this.Selection.StartPos = CenterRunPos;
-                    this.Selection.EndPos   = CenterRunPos;
+                    this.Internal_ReplaceRun( EndPos, NewElements );
                 }
             }
             else
@@ -5395,9 +5387,7 @@ Paragraph.prototype =
 
             if ( para_Run === Element.Type )
             {
-                var CenterRunPos = this.Internal_ReplaceRun( Pos, NewElements );
-                this.CurPos.ContentPos = CenterRunPos;
-                this.CurPos.Line       = -1;
+                this.Internal_ReplaceRun( Pos, NewElements );
             }
             
             if ( true === this.Cursor_IsEnd() )
@@ -5459,7 +5449,11 @@ Paragraph.prototype =
         // CRun - всегда не null
         var CenterRunPos = Pos;
 
-        if ( null !== LRun )
+        var OldSelectionStartPos = this.Selection.StartPos;
+        var OldSelectionEndPos   = this.Selection.EndPos;
+        var OldCurPos            = this.CurPos.ContentPos;
+
+        if (null !== LRun)
         {
             this.Internal_Content_Add( Pos + 1, CRun );
             CenterRunPos = Pos + 1;
@@ -5469,8 +5463,86 @@ Paragraph.prototype =
             // Если LRun - null, значит CRun - это и есть тот ран который стоит уже в позиции Pos
         }
 
-        if ( null !== RRun )
-            this.Internal_Content_Add( CenterRunPos + 1, RRun );
+        if (null !== RRun)
+        {
+            this.Internal_Content_Add(CenterRunPos + 1, RRun);
+        }
+
+        if (OldCurPos > Pos)
+        {
+            if (null !== LRun)
+                this.CurPos.ContentPos++;
+
+            if (null !== RRun)
+                this.CurPos.ContentPos++;
+        }
+        else if (OldCurPos === Pos)
+        {
+            this.CurPos.ContentPos = CenterRunPos;
+        }
+        this.CurPos.Line = -1;
+
+        if (OldSelectionStartPos > Pos)
+        {
+            if (null !== LRun)
+                this.Selection.StartPos++;
+
+            if (null !== RRun)
+                this.Selection.StartPos++;
+        }
+        else if (OldSelectionStartPos === Pos)
+        {
+            if (OldSelectionEndPos > OldSelectionStartPos)
+            {
+                this.Selection.StartPos = Pos;
+            }
+            else if (OldSelectionEndPos < OldSelectionStartPos)
+            {
+                if (null !== LRun && null !== RRun)
+                    this.Selection.StartPos = Pos + 2;
+                else if (null !== LRun || null !== RRun)
+                    this.Selection.StartPos = Pos + 1;
+                else
+                    this.Selection.StartPos = Pos;
+            }
+            else
+            {
+                // TODO: Тут надо бы выяснить направление селекта
+                this.Selection.StartPos = Pos;
+
+                if (null !== LRun && null !== RRun)
+                    this.Selection.EndPos = Pos + 2;
+                else if (null !== LRun || null !== RRun)
+                    this.Selection.EndPos = Pos + 1;
+                else
+                    this.Selection.EndPos = Pos;
+            }
+        }
+
+        if (OldSelectionEndPos > Pos)
+        {
+            if (null !== LRun)
+                this.Selection.EndPos++;
+
+            if (null !== RRun)
+                this.Selection.EndPos++;
+        }
+        else if (OldSelectionEndPos === Pos)
+        {
+            if (OldSelectionEndPos > OldSelectionStartPos)
+            {
+                if (null !== LRun && null !== RRun)
+                    this.Selection.EndPos = Pos + 2;
+                else if (null !== LRun || null !== RRun)
+                    this.Selection.EndPos = Pos + 1;
+                else
+                    this.Selection.EndPos = Pos;
+            }
+            else if (OldSelectionEndPos < OldSelectionStartPos)
+            {
+                this.Selection.EndPos = Pos;
+            }
+        }
 
         return CenterRunPos;
     },
