@@ -2630,7 +2630,7 @@ Paragraph.prototype =
                 this.Content[StartPos].Remove(nCount, bOnAddText);
 
                 // Мы не удаляем последний элемент с ParaEnd
-                if (StartPos < this.Content.length - 2  && true === this.Content[StartPos].Is_Empty() && true !== this.Content[StartPos].Is_CheckingNearestPos())
+                if (StartPos <= this.Content.length - 2  && true === this.Content[StartPos].Is_Empty() && true !== this.Content[StartPos].Is_CheckingNearestPos() && nCount > -1 && true !== bOnAddText)
                 {
                     if ( this.Selection.StartPos === this.Selection.EndPos )
                         this.Selection.Use = false;
@@ -2651,7 +2651,16 @@ Paragraph.prototype =
                     this.CurPos.ContentPos = StartPos;
                 }
 
-                this.Correct_ContentPos2();
+                if (nCount > -1 && true !== bOnAddText)
+                {
+                    this.Correct_ContentPos2();
+                }
+                else
+                {
+                    this.CurPos.ContentPos  = StartPos;
+                    this.Selection.StartPos = StartPos;
+                    this.Selection.EndPos   = StartPos;
+                }
 
                 this.DeleteCommentOnRemove = true;
 
@@ -2664,7 +2673,9 @@ Paragraph.prototype =
             if ( true !== this.Content[this.CurPos.ContentPos].Selection_IsUse() )
             {
                 this.Selection_Remove();
-                this.Correct_Content();
+
+                if (nCount > -1 && true !== bOnAddText)
+                    this.Correct_Content();
             }
             else
             {
@@ -2674,7 +2685,8 @@ Paragraph.prototype =
                 this.Selection.StartPos = this.CurPos.ContentPos;
                 this.Selection.EndPos   = this.CurPos.ContentPos;
 
-                this.Correct_Content();
+                if (nCount > -1 && true !== bOnAddText)
+                    this.Correct_Content();
 
                 this.Document_SetThisElementCurrent(false);
 
