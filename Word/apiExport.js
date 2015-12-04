@@ -418,7 +418,6 @@ asc_docs_api.prototype['sync_zoomChangeCallback'] = asc_docs_api.prototype.sync_
 asc_docs_api.prototype['sync_countPagesCallback'] = asc_docs_api.prototype.sync_countPagesCallback;
 asc_docs_api.prototype['sync_currentPageCallback'] = asc_docs_api.prototype.sync_currentPageCallback;
 asc_docs_api.prototype['asc_enableKeyEvents'] = asc_docs_api.prototype.asc_enableKeyEvents;
-asc_docs_api.prototype['asyncServerIdEndLoaded'] = asc_docs_api.prototype.asyncServerIdEndLoaded;
 asc_docs_api.prototype['asyncFontsDocumentStartLoaded'] = asc_docs_api.prototype.asyncFontsDocumentStartLoaded;
 asc_docs_api.prototype['GenerateStyles'] = asc_docs_api.prototype.GenerateStyles;
 asc_docs_api.prototype['asyncFontsDocumentEndLoaded'] = asc_docs_api.prototype.asyncFontsDocumentEndLoaded;

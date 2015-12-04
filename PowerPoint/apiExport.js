@@ -6,7 +6,6 @@ asc_docs_api.prototype['asc_coAuthoringDisconnect'] = asc_docs_api.prototype.asc
 asc_docs_api.prototype['asc_coAuthoringChatSendMessage'] = asc_docs_api.prototype.asc_coAuthoringChatSendMessage;
 asc_docs_api.prototype['asc_coAuthoringChatGetMessages'] = asc_docs_api.prototype.asc_coAuthoringChatGetMessages;
 asc_docs_api.prototype['asc_coAuthoringGetUsers'] = asc_docs_api.prototype.asc_coAuthoringGetUsers;
-asc_docs_api.prototype['asyncServerIdEndLoaded'] = asc_docs_api.prototype.asyncServerIdEndLoaded;
 asc_docs_api.prototype['syncCollaborativeChanges'] = asc_docs_api.prototype.syncCollaborativeChanges;
 asc_docs_api.prototype['SetCollaborativeMarksShowType'] = asc_docs_api.prototype.SetCollaborativeMarksShowType;
 asc_docs_api.prototype['GetCollaborativeMarksShowType'] = asc_docs_api.prototype.GetCollaborativeMarksShowType;
