@@ -211,6 +211,9 @@ baseEditorsApi.prototype._coAuthoringInitBase = function() {
     t.SpellCheckUrl = e;
     t._coSpellCheckInit();
   };
+  this.CoAuthoringApi.onSetIndexUser = function(e) {
+    g_oIdCounter.Set_UserId('' + e);
+  };
   this.CoAuthoringApi.onFirstConnect = function() {
     t.isOnFirstConnectEnd = true;
     t._onEndPermissions();

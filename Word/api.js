@@ -1040,9 +1040,6 @@ asc_docs_api.prototype._coAuthoringInit = function() {
   this.CoAuthoringApi.onFirstLoadChangesEnd = function() {
     t.asyncServerIdEndLoaded();
   };
-  this.CoAuthoringApi.onSetIndexUser = function(e) {
-    g_oIdCounter.Set_UserId('' + e);
-  };
   this.CoAuthoringApi.onStartCoAuthoring = function(isStartEvent) {
     CollaborativeEditing.Start_CollaborationEditing();
     t.asc_setDrawCollaborationMarks(true);
