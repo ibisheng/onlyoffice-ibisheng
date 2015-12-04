@@ -1539,7 +1539,7 @@ var editor;
 
         t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
         // Обновляем состояние возможности сохранения документа
-        t.onUpdateDocumentModified(false);
+        t.onUpdateDocumentModified(History.Is_Modified());
 
         if (undefined !== window["AscDesktopEditor"]) {
           window["AscDesktopEditor"]["OnSave"]();
