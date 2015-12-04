@@ -127,7 +127,6 @@ asc_docs_api.prototype['get_PropertyThemeColors'] = asc_docs_api.prototype.get_P
 asc_docs_api.prototype['get_PropertyThemeColorSchemes'] = asc_docs_api.prototype.get_PropertyThemeColorSchemes;
 asc_docs_api.prototype['_coAuthoringSetChange'] = asc_docs_api.prototype._coAuthoringSetChange;
 asc_docs_api.prototype['_coAuthoringSetChanges'] = asc_docs_api.prototype._coAuthoringSetChanges;
-asc_docs_api.prototype['_coAuthoringInit'] = asc_docs_api.prototype._coAuthoringInit;
 asc_docs_api.prototype['asc_coAuthoringChatSendMessage'] = asc_docs_api.prototype.asc_coAuthoringChatSendMessage;
 asc_docs_api.prototype['asc_coAuthoringChatGetMessages'] = asc_docs_api.prototype.asc_coAuthoringChatGetMessages;
 asc_docs_api.prototype['asc_coAuthoringGetUsers'] = asc_docs_api.prototype.asc_coAuthoringGetUsers;

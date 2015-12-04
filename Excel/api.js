@@ -1058,14 +1058,6 @@ var editor;
   /////////////////////////////////////////////////////////////////////////
   spreadsheet_api.prototype._coAuthoringInit = function() {
     var t = this;
-
-    //Если User не задан, отключаем коавторинг.
-    if (null == this.User || null == this.User.asc_getId()) {
-      this.User = new asc.asc_CUser();
-      this.User.asc_setId("Unknown");
-      this.User.asc_setUserName("Unknown");
-    }
-
     this.collaborativeEditing = new asc_CCollaborativeEditing(/*handlers*/{
       "askLock": function() {
         t.CoAuthoringApi.askLock.apply(t.CoAuthoringApi, arguments);
@@ -1333,9 +1325,6 @@ var editor;
         t.handlers.trigger("asc_onError", isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
       }
     };
-    this.CoAuthoringApi.onWarning = function(e) {
-      t.handlers.trigger("asc_onError", c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
-    };
     this.CoAuthoringApi.onDocumentOpen = function(inputWrap) {
       if (inputWrap["data"]) {
         var input = inputWrap["data"];
@@ -1415,11 +1404,7 @@ var editor;
       }
     };
 
-    //в обычном серверном режиме портим ссылку, потому что CoAuthoring теперь имеет встроенный адрес
-    //todo надо использовать проверку get_OfflineApp
-    if (!(window["NATIVE_EDITOR_ENJINE"] || offlineMode === this.documentUrl)) {
-      this.CoAuthoringApi.set_url(null);
-    }
+    this._coAuthoringInitBase();
     this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Spreadsheet, this.documentFormatSave);
   };
 

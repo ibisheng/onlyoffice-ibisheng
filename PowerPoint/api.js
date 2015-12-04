@@ -129,12 +129,6 @@ asc_docs_api.prototype._coAuthoringSetChanges = function(e, oColor)
 };
 
 asc_docs_api.prototype._coAuthoringInit = function() {
-  if (null == this.User || null == this.User.asc_getId()) {
-    this.User = new Asc.asc_CUser();
-    this.User.asc_setId("Unknown");
-    this.User.asc_setUserName("Unknown");
-  }
-
   var t = this;
   this.CoAuthoringApi.onParticipantsChanged = function(e, count) {
     t.asc_fireCallback("asc_onParticipantsChanged", e, count);
@@ -404,9 +398,6 @@ asc_docs_api.prototype._coAuthoringInit = function() {
       t.sync_ErrorCallback(isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
     }
   };
-  this.CoAuthoringApi.onWarning = function(e) {
-    t.sync_ErrorCallback(c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
-  };
   this.CoAuthoringApi.onDocumentOpen = function(inputWrap) {
     if (inputWrap["data"]) {
       var input = inputWrap["data"];
@@ -455,14 +446,8 @@ asc_docs_api.prototype._coAuthoringInit = function() {
     }
   };
 
-  //в обычном серверном режиме портим ссылку, потому что CoAuthoring теперь имеет встроенный адрес
-  //todo надо использовать проверку get_OfflineApp, но она инициализируется только после loadDocument
-  if (!(window["NATIVE_EDITOR_ENJINE"] || offlineMode === this.documentUrl)) {
-    this.CoAuthoringApi.set_url(null);
-  }
+  this._coAuthoringInitBase();
   this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Presentation, this.documentFormatSave);
-
-  // ToDo init other callbacks
 };
 
 

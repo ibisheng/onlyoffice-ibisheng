@@ -189,6 +189,25 @@ baseEditorsApi.prototype._onEndPermissions = function() {
     this.sendEvent('asc_onGetEditorPermissions', new window['Asc'].asc_CAscEditorPermissions());
   }
 };
+// CoAuthoring
+baseEditorsApi.prototype._coAuthoringInitBase = function() {
+  var t = this;
+  //Если User не задан, отключаем коавторинг.
+  if (null == this.User || null == this.User.asc_getId()) {
+    this.User = new Asc.asc_CUser();
+    this.User.asc_setId("Unknown");
+    this.User.asc_setUserName("Unknown");
+  }
+  //в обычном серверном режиме портим ссылку, потому что CoAuthoring теперь имеет встроенный адрес
+  //todo надо использовать проверку get_OfflineApp
+  if (!(window['NATIVE_EDITOR_ENJINE'] || offlineMode === this.documentUrl)) {
+    this.CoAuthoringApi.set_url(null);
+  }
+
+  this.CoAuthoringApi.onWarning = function(e) {
+    t.sendEvent('asc_onError', c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
+  };
+};
 // Images & Charts & TextArts
 baseEditorsApi.prototype.asc_setChartTranslate = function(translate) {
   this.chartTranslate = translate;
