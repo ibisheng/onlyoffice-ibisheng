@@ -204,6 +204,10 @@ baseEditorsApi.prototype._coAuthoringInitBase = function() {
     this.CoAuthoringApi.set_url(null);
   }
 
+  this.CoAuthoringApi.onFirstConnect = function() {
+    t.isOnFirstConnectEnd = true;
+    t._onEndPermissions();
+  };
   this.CoAuthoringApi.onWarning = function(e) {
     t.sendEvent('asc_onError', c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
   };

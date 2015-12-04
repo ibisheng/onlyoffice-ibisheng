@@ -1303,10 +1303,6 @@ var editor;
     this.CoAuthoringApi.onEndCoAuthoring = function(isStartEvent) {
       t.endCollaborationEditing();
     };
-    this.CoAuthoringApi.onFirstConnect = function() {
-      t.isOnFirstConnectEnd = true;
-      t._onEndPermissions();
-    };
     /**
      * Event об отсоединении от сервера
      * @param {jQuery} e  event об отсоединении с причиной

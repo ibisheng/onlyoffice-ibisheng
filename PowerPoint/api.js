@@ -377,10 +377,6 @@ asc_docs_api.prototype._coAuthoringInit = function() {
       t.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
     }
   };
-  this.CoAuthoringApi.onFirstConnect = function() {
-    t.isOnFirstConnectEnd = true;
-    t._onEndPermissions();
-  };
   /**
    * Event об отсоединении от сервера
    * @param {jQuery} e  event об отсоединении с причиной
