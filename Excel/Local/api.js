@@ -29,7 +29,29 @@
 			window.OfflineOpenCallback = undefined;
 			History.UserSaveMode = true;
 		}
-	};  
+		
+		DesktopOfflineUpdateLocalName(this);
+	};
+	
+	asc['spreadsheet_api'].prototype.asc_addImageDrawingObject = function(url)
+	{
+		var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
+		
+		var ws = this.wb.getWorksheet();
+		if (ws) 
+		{
+			var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
+			ws.objectRender.addImageDrawingObject(g_oDocumentUrls.getImageUrl(_url) , null);
+		}
+	};
+	asc['spreadsheet_api'].prototype.asc_showImageFileDialog = function()
+	{
+		window["AscDesktopEditor"]["LocalFileGetImageUrlFromOpenFileDialog"]();
+	};
+	asc['spreadsheet_api'].prototype.asc_addImage = function()
+	{
+	  window["AscDesktopEditor"]["LocalFileGetImageUrlFromOpenFileDialog"]();
+	};
 })(jQuery, window);
 
 window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
@@ -108,7 +130,7 @@ window["DesktopOfflineAppDocumentApplyChanges"] = function(_changes)
 /////////////////////////////////////////////////////////
 window["Asc"]['spreadsheet_api'].prototype.asc_Save = function (isNoUserSave)
 {
-  var t = this;
+	var t = this;
     if (true !== isNoUserSave)
         this.IsUserSave = true;
 
@@ -125,6 +147,12 @@ window["Asc"]['spreadsheet_api'].prototype.asc_Save = function (isNoUserSave)
 			window["DesktopOfflineAppDocumentStartSave"]();
 	}
 };
+
+window["Asc"]['spreadsheet_api'].prototype.asc_isOffline = function()
+{
+	return true;
+};
+
 window["DesktopOfflineAppDocumentStartSave"] = function()
 {
     window["Asc"]["editor"].sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
@@ -137,9 +165,20 @@ window["DesktopOfflineAppDocumentEndSave"] = function(isCancel)
 		DesktopOfflineUpdateLocalName(window["Asc"]["editor"]);
 };
 
-window["Asc"]['spreadsheet_api'].prototype.asc_isOffline = function()
-{
-	return true;
-};
+window["Asc"]['spreadsheet_api'].prototype["asc_addImageDrawingObject"] = window["Asc"]['spreadsheet_api'].prototype.asc_addImageDrawingObject;
+window["Asc"]['spreadsheet_api'].prototype["asc_showImageFileDialog"] = window["Asc"]['spreadsheet_api'].prototype.asc_showImageFileDialog;
 window["Asc"]['spreadsheet_api'].prototype["asc_Save"] = window["Asc"]['spreadsheet_api'].prototype.asc_Save;
 window["Asc"]['spreadsheet_api'].prototype["asc_isOffline"] = window["Asc"]['spreadsheet_api'].prototype.asc_isOffline;
+
+window["DesktopOfflineAppDocumentAddImageEnd"] = function(url)
+{
+	if (url == "")
+		return;
+	
+	var ws = window["Asc"]["editor"].wb.getWorksheet();
+    if (ws) 
+	{
+		var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
+        ws.objectRender.addImageDrawingObject(g_oDocumentUrls.getImageUrl(_url) , null);
+    }
+};

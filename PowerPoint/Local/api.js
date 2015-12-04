@@ -137,6 +137,8 @@ asc_docs_api.prototype.asc_isOffline = function()
 {
 	return true;
 };
+
+asc_docs_api.prototype["asc_addImage"] = asc_docs_api.prototype.asc_addImage;
 asc_docs_api.prototype["AddImageUrl"] = asc_docs_api.prototype.AddImageUrl;
 asc_docs_api.prototype["AddImage"] = asc_docs_api.prototype.AddImage;
 asc_docs_api.prototype["asc_Save"] = asc_docs_api.prototype.asc_Save;
