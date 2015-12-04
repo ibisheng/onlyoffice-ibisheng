@@ -131,7 +131,6 @@ asc_docs_api.prototype['asc_coAuthoringChatSendMessage'] = asc_docs_api.prototyp
 asc_docs_api.prototype['asc_coAuthoringChatGetMessages'] = asc_docs_api.prototype.asc_coAuthoringChatGetMessages;
 asc_docs_api.prototype['asc_coAuthoringGetUsers'] = asc_docs_api.prototype.asc_coAuthoringGetUsers;
 asc_docs_api.prototype['asc_coAuthoringDisconnect'] = asc_docs_api.prototype.asc_coAuthoringDisconnect;
-asc_docs_api.prototype['_coSpellCheckInit'] = asc_docs_api.prototype._coSpellCheckInit;
 asc_docs_api.prototype['asc_getSpellCheckLanguages'] = asc_docs_api.prototype.asc_getSpellCheckLanguages;
 asc_docs_api.prototype['asc_SpellCheckDisconnect'] = asc_docs_api.prototype.asc_SpellCheckDisconnect;
 asc_docs_api.prototype['_onUpdateDocumentCanSave'] = asc_docs_api.prototype._onUpdateDocumentCanSave;

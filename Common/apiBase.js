@@ -207,6 +207,10 @@ baseEditorsApi.prototype._coAuthoringInitBase = function() {
   this.CoAuthoringApi.onMessage = function(e, clear) {
     t.sendEvent('asc_onCoAuthoringChatReceiveMessage', e, clear);
   };
+  this.CoAuthoringApi.onSpellCheckInit = function(e) {
+    t.SpellCheckUrl = e;
+    t._coSpellCheckInit();
+  };
   this.CoAuthoringApi.onFirstConnect = function() {
     t.isOnFirstConnectEnd = true;
     t._onEndPermissions();
@@ -214,6 +218,9 @@ baseEditorsApi.prototype._coAuthoringInitBase = function() {
   this.CoAuthoringApi.onWarning = function(e) {
     t.sendEvent('asc_onError', c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
   };
+};
+// SpellCheck
+baseEditorsApi.prototype._coSpellCheckInit = function() {
 };
 // Images & Charts & TextArts
 baseEditorsApi.prototype.asc_setChartTranslate = function(translate) {

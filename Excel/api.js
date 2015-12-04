@@ -1275,9 +1275,6 @@ var editor;
     this.CoAuthoringApi.onFirstLoadChangesEnd = function() {
       t.asyncServerIdEndLoaded();
     };
-    this.CoAuthoringApi.onSpellCheckInit = function(e) {
-      t.SpellCheckUrl = e;
-    };
     this.CoAuthoringApi.onSetIndexUser = function(e) {
       g_oIdCounter.Set_UserId('' + e);
     };

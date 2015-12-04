@@ -343,10 +343,6 @@ asc_docs_api.prototype._coAuthoringInit = function() {
   this.CoAuthoringApi.onFirstLoadChangesEnd = function() {
     t.asyncServerIdEndLoaded();
   };
-  this.CoAuthoringApi.onSpellCheckInit = function(e) {
-    t.SpellCheckUrl = e;
-    // ToDo Init SpellCheck
-  };
   this.CoAuthoringApi.onSetIndexUser = function(e) {
     g_oIdCounter.Set_UserId('' + e);
   };
