@@ -158,6 +158,10 @@ baseEditorsApi.prototype.sync_StartAction = function() {
 };
 baseEditorsApi.prototype.sync_EndAction = function() {
 };
+baseEditorsApi.prototype.sync_TryUndoInFastCollaborative = function()
+{
+  this.sendEvent("asc_OnTryUndoInFastCollaborative");
+};
 // Выставление интервала автосохранения (0 - означает, что автосохранения нет)
 baseEditorsApi.prototype.asc_setAutoSaveGap = function(autoSaveGap) {
   if (typeof autoSaveGap === "number") {
@@ -179,6 +183,11 @@ baseEditorsApi.prototype.asc_coAuthoringGetUsers = function() {
 // get permissions
 baseEditorsApi.prototype.asc_getEditorPermissions = function() {
   this._coAuthoringInit();
+};
+baseEditorsApi.prototype._onEndPermissions = function() {
+  if (this.isOnFirstConnectEnd) {
+    this.sendEvent('asc_onGetEditorPermissions', new window['Asc'].asc_CAscEditorPermissions());
+  }
 };
 // Images & Charts & TextArts
 baseEditorsApi.prototype.asc_setChartTranslate = function(translate) {
@@ -228,11 +237,7 @@ baseEditorsApi.prototype.asc_showRevision = function(newObj) {
 };
 baseEditorsApi.prototype.asc_undoAllChanges = function() {
 };
-
+// Offline mode
 baseEditorsApi.prototype.asc_isOffline = function() {
 	return false;
-};
-baseEditorsApi.prototype.sync_TryUndoInFastCollaborative = function()
-{
-    this.sendEvent("asc_OnTryUndoInFastCollaborative");
 };

@@ -623,11 +623,6 @@ asc_docs_api.prototype.sync_ChangeLastSelectedElement = function(type, obj)
 asc_docs_api.prototype.Init = function() {
   this.WordControl.Init();
 };
-asc_docs_api.prototype._onEndPermissions = function() {
-  if (this.isOnFirstConnectEnd) {
-    this.asc_fireCallback('asc_onGetEditorPermissions', new window['Asc'].asc_CAscEditorPermissions());
-  }
-};
 asc_docs_api.prototype.asc_setLocale = function(val) {
 };
 asc_docs_api.prototype.LoadDocument = function() {

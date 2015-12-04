@@ -391,12 +391,6 @@ var editor;
     g_oUndoRedoAutoFilters = new UndoRedoAutoFilters(wbModel);
   };
 
-  spreadsheet_api.prototype._onEndPermissions = function() {
-    if (this.isOnFirstConnectEnd) {
-      this.handlers.trigger('asc_onGetEditorPermissions', new asc.asc_CAscEditorPermissions());
-    }
-  };
-
   spreadsheet_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) {//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
     if (!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction) {
       return;
