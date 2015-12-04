@@ -65,13 +65,15 @@ CDocument.prototype.Get_StyleFromFormatting = function()
 };
 /**
  * Добавляем новый стиль (или заменяем старый с таким же названием).
+ * И сразу применяем его к выделенному фрагменту.
  */
 CDocument.prototype.Add_NewStyle = function(oStyle)
 {
-    if (false === this.Document_Is_SelectionLocked(changestype_Document_Styles))
+    if (false === this.Document_Is_SelectionLocked(changestype_Document_Styles, {Type : changestype_2_AdditionalTypes, Types : [changestype_Paragraph_Properties]}))
     {
         History.Create_NewPoint(historydescription_Document_AddNewStyle);
-        this.Styles.Create_StyleFromInterface(oStyle);
+        var NewStyle = this.Styles.Create_StyleFromInterface(oStyle);
+        this.Set_ParagraphStyle(NewStyle.Get_Name());
         this.Recalculate();
         this.Document_UpdateInterfaceState();
     }

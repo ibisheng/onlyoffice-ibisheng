@@ -5482,11 +5482,10 @@ Paragraph.prototype =
 
         if (OldCurPos > Pos)
         {
-            if (null !== LRun)
-                this.CurPos.ContentPos++;
-
-            if (null !== RRun)
-                this.CurPos.ContentPos++;
+            if (null !== LRun && null !== RRun)
+                this.CurPos.ContentPos = OldCurPos + 2;
+            else if (null !== RRun || null !== RRun)
+                this.CurPos.ContentPos = OldCurPos + 1;
         }
         else if (OldCurPos === Pos)
         {
@@ -5496,11 +5495,10 @@ Paragraph.prototype =
 
         if (OldSelectionStartPos > Pos)
         {
-            if (null !== LRun)
-                this.Selection.StartPos++;
-
-            if (null !== RRun)
-                this.Selection.StartPos++;
+            if (null !== LRun && null !== RRun)
+                this.Selection.StartPos = OldSelectionStartPos + 2;
+            else if (null !== RRun || null !== RRun)
+                this.Selection.StartPos = OldSelectionStartPos + 1;
         }
         else if (OldSelectionStartPos === Pos)
         {
@@ -5533,11 +5531,10 @@ Paragraph.prototype =
 
         if (OldSelectionEndPos > Pos)
         {
-            if (null !== LRun)
-                this.Selection.EndPos++;
-
-            if (null !== RRun)
-                this.Selection.EndPos++;
+            if (null !== LRun && null !== RRun)
+                this.Selection.EndPos = OldSelectionEndPos + 2;
+            else if (null !== RRun || null !== RRun)
+                this.Selection.EndPos = OldSelectionEndPos + 1;
         }
         else if (OldSelectionEndPos === Pos)
         {
@@ -13184,10 +13181,23 @@ Paragraph.prototype.Get_StyleFromFormatting = function()
 {
     // Получим настройки первого рана попавшего в выделение
     var TextPr = null;
+    var CurPos = 0;
     if (true === this.Selection.Use)
-        TextPr = this.Content[this.Selection.StartPos > this.Selection.EndPos? this.Selection.EndPos : this.Selection.StartPos].Get_FirstTextPr();
+    {
+        var StartPos = this.Selection.StartPos > this.Selection.EndPos ? this.Selection.EndPos : this.Selection.StartPos;
+        var EndPos   = this.Selection.StartPos > this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos;
+
+        for (CurPos = StartPos; CurPos < EndPos; ++CurPos)
+        {
+            if (true !== this.Content[CurPos].Selection_IsEmpty())
+                break;
+        }
+    }
     else
-        TextPr = this.Content[this.CurPos.ContentPos].Get_FirstTextPr();
+    {
+        CurPos = this.CurPos.ContentPos;
+    }
+    TextPr = this.Content[CurPos].Get_FirstTextPr();
 
     // В стиль не добавляется HightLight
     if (undefined !== TextPr.HighLight)

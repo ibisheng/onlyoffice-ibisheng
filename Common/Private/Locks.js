@@ -13,6 +13,63 @@ if(typeof CDocument !== "undefined")
 
         CollaborativeEditing.OnStart_CheckLock();
 
+        this.private_DocumentIsSelectionLocked(CheckType);
+
+        if ( "undefined" != typeof(AdditionalData) && null != AdditionalData )
+        {
+            if ( changestype_2_InlineObjectMove === AdditionalData.Type )
+            {
+                var PageNum = AdditionalData.PageNum;
+                var X       = AdditionalData.X;
+                var Y       = AdditionalData.Y;
+
+                var NearestPara = this.Get_NearestPos(PageNum, X, Y).Paragraph;
+                NearestPara.Document_Is_SelectionLocked(changestype_Document_Content);
+            }
+            else if ( changestype_2_HdrFtr === AdditionalData.Type )
+            {
+                this.HdrFtr.Document_Is_SelectionLocked(changestype_HdrFtr);
+            }
+            else if ( changestype_2_Comment === AdditionalData.Type )
+            {
+                this.Comments.Document_Is_SelectionLocked( AdditionalData.Id );
+            }
+            else if ( changestype_2_Element_and_Type === AdditionalData.Type )
+            {
+                AdditionalData.Element.Document_Is_SelectionLocked( AdditionalData.CheckType, false );
+            }
+            else if ( changestype_2_ElementsArray_and_Type === AdditionalData.Type )
+            {
+                var Count = AdditionalData.Elements.length;
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    AdditionalData.Elements[Index].Document_Is_SelectionLocked( AdditionalData.CheckType, false );
+                }
+            }
+            else if (changestype_2_AdditionalTypes === AdditionalData.Type)
+            {
+                var Count = AdditionalData.Types.length;
+                for (var Index = 0; Index < Count; ++Index)
+                {
+                    this.private_DocumentIsSelectionLocked(AdditionalData.Types[Index]);
+                }
+            }
+        }
+
+        var bResult = CollaborativeEditing.OnEnd_CheckLock(DontLockInFastMode);
+
+        if ( true === bResult )
+        {
+            this.Document_UpdateSelectionState();
+            this.Document_UpdateInterfaceState();
+            //this.Document_UpdateRulersState();
+        }
+
+        return bResult;
+    };
+
+    CDocument.prototype.private_DocumentIsSelectionLocked = function(CheckType)
+    {
         if ( changestype_None != CheckType )
         {
             if ( changestype_Document_SectPr === CheckType )
@@ -83,50 +140,6 @@ if(typeof CDocument !== "undefined")
                 }
             }
         }
-
-        if ( "undefined" != typeof(AdditionalData) && null != AdditionalData )
-        {
-            if ( changestype_2_InlineObjectMove === AdditionalData.Type )
-            {
-                var PageNum = AdditionalData.PageNum;
-                var X       = AdditionalData.X;
-                var Y       = AdditionalData.Y;
-
-                var NearestPara = this.Get_NearestPos(PageNum, X, Y).Paragraph;
-                NearestPara.Document_Is_SelectionLocked(changestype_Document_Content);
-            }
-            else if ( changestype_2_HdrFtr === AdditionalData.Type )
-            {
-                this.HdrFtr.Document_Is_SelectionLocked(changestype_HdrFtr);
-            }
-            else if ( changestype_2_Comment === AdditionalData.Type )
-            {
-                this.Comments.Document_Is_SelectionLocked( AdditionalData.Id );
-            }
-            else if ( changestype_2_Element_and_Type === AdditionalData.Type )
-            {
-                AdditionalData.Element.Document_Is_SelectionLocked( AdditionalData.CheckType, false );
-            }
-            else if ( changestype_2_ElementsArray_and_Type === AdditionalData.Type )
-            {
-                var Count = AdditionalData.Elements.length;
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    AdditionalData.Elements[Index].Document_Is_SelectionLocked( AdditionalData.CheckType, false );
-                }
-            }
-        }
-
-        var bResult = CollaborativeEditing.OnEnd_CheckLock(DontLockInFastMode);
-
-        if ( true === bResult )
-        {
-            this.Document_UpdateSelectionState();
-            this.Document_UpdateInterfaceState();
-            //this.Document_UpdateRulersState();
-        }
-
-        return bResult;
     };
 }
 
