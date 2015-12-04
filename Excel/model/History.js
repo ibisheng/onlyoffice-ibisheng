@@ -832,3 +832,4 @@ CHistory.prototype._addFonts = function (isCreateNew) {
 		this.HasLoadFonts = false;
 	}
 };
+var History = null;
