@@ -410,3 +410,6 @@ baseEditorsApi.prototype.asc_undoAllChanges = function() {
 baseEditorsApi.prototype.asc_isOffline = function() {
 	return false;
 };
+baseEditorsApi.prototype.asc_getUrlType = function(url) {
+	return getUrlType(url);
+};

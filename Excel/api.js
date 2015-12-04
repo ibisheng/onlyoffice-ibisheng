@@ -3434,4 +3434,5 @@ var editor;
   prot["asc_nativeGetPDF"] = prot.asc_nativeGetPDF;
   
   prot['asc_isOffline'] = prot.asc_isOffline;
+  prot['asc_getUrlType'] = prot.asc_getUrlType;
 })(jQuery, window);

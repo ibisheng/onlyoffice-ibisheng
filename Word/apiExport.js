@@ -532,6 +532,7 @@ asc_docs_api.prototype['asc_CloseFile'] = asc_docs_api.prototype.asc_CloseFile;
 asc_docs_api.prototype['asc_addComment'] = asc_docs_api.prototype.asc_addComment;
 asc_docs_api.prototype['asc_SetFastCollaborative'] = asc_docs_api.prototype.asc_SetFastCollaborative;
 asc_docs_api.prototype['asc_isOffline'] = asc_docs_api.prototype.asc_isOffline;
+asc_docs_api.prototype['asc_getUrlType'] = asc_docs_api.prototype.asc_getUrlType;
 window['CMathProp'] = CMathProp;
 CMathProp.prototype['get_Type'] = CMathProp.prototype.get_Type;
 window['CParagraphPropEx'] = CParagraphPropEx;

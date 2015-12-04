@@ -617,6 +617,11 @@ var c_oAscCsvDelimiter = {
 	Comma: 4,
 	Space: 5
 };
+var c_oAscUrlType = {
+	Invalid : 0,
+	Http: 1,
+	Email: 2
+};
 
 var c_oAscEncodings = [
     [ 0,    28596, "ISO-8859-6",       "Arabic (ISO 8859-6)" ],
