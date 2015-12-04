@@ -4403,6 +4403,9 @@ asc_docs_api.prototype.SetDeviceInputHelperId = function(idKeyboard)
     }
     window.ID_KEYBOARD_AREA.focus();
 };
+asc_docs_api.prototype.getViewMode = function() {
+  return this.isViewMode;
+};
 asc_docs_api.prototype.SetViewMode = function(isViewMode) {
   if (isViewMode) {
     this.isViewMode = true;

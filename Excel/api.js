@@ -344,7 +344,7 @@ var editor;
   };
   spreadsheet_api.prototype.asc_LoadDocument = function() {
     var t = this;
-    this.CoAuthoringApi.auth(this.asc_getViewerMode());
+    this.CoAuthoringApi.auth(this.getViewMode());
 
     this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
     if (!this.chartEditor) {
@@ -355,7 +355,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_LoadEmptyDocument = function() {
-    this.CoAuthoringApi.auth(this.asc_getViewerMode());
+    this.CoAuthoringApi.auth(this.getViewMode());
 
     var emptyWorkbook = getEmptyWorkbook() + "";
     if (emptyWorkbook.length && (Asc.c_oSerFormat.Signature === emptyWorkbook.substring(0, Asc.c_oSerFormat.Signature.length))) {
@@ -550,7 +550,7 @@ var editor;
     AscBrowser.isMobileVersion = isMobile;
   };
 
-  spreadsheet_api.prototype.asc_getViewerMode = function() {
+  spreadsheet_api.prototype.getViewMode = function() {
     return this.controller.getViewerMode();
   };
 
@@ -701,7 +701,7 @@ var editor;
           "url": this.documentUrl,
           "title": this.documentTitle,
           "embeddedfonts": this.isUseEmbeddedCutFonts,
-          "viewmode": this.asc_getViewerMode()
+          "viewmode": this.getViewMode()
         };
         sendCommand2(this, null, v);
       }
@@ -1102,7 +1102,7 @@ var editor;
       "checkDefNameLock": function(lockElem) {
         return t._onCheckDefNameLock(lockElem);
       }
-    }, this.asc_getViewerMode());
+    }, this.getViewMode());
 
     this.CoAuthoringApi.onParticipantsChanged = function(e, count) {
       t.handlers.trigger("asc_onParticipantsChanged", e, count);
@@ -1320,7 +1320,7 @@ var editor;
                 var urls = input["data"];
                 g_oDocumentUrls.init(urls);
                 if (null != urls['Editor.bin']) {
-                  if ('ok' === input["status"] || t.asc_getViewerMode()) {
+                  if ('ok' === input["status"] || t.getViewMode()) {
                     t._onOpenCommand(function(response) {
                       t._startOpenDocument(response);
                     }, urls['Editor.bin']);
@@ -3008,7 +3008,7 @@ var editor;
     }
 
     // На view-режиме не нужно отправлять стили
-    if (true !== this.asc_getViewerMode() && !this.isMobileVersion) {
+    if (true !== this.getViewMode() && !this.isMobileVersion) {
       // Отправка стилей
       this._sendWorkbookStyles();
     }

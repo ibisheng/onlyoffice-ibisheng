@@ -6330,6 +6330,9 @@ asc_docs_api.prototype.add_SectionBreak = function(_Type)
     }
 };
 
+asc_docs_api.prototype.getViewMode = function() {
+  return this.isViewMode;
+};
 asc_docs_api.prototype.SetViewMode = function(isViewMode) {
   if (isViewMode) {
     this.asc_SpellCheckDisconnect();
