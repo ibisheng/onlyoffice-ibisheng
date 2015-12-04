@@ -136,9 +136,6 @@ asc_docs_api.prototype._coAuthoringInit = function() {
   this.CoAuthoringApi.onAuthParticipantsChanged = function(e, count) {
     t.asc_fireCallback("asc_onAuthParticipantsChanged", e, count);
   };
-  this.CoAuthoringApi.onMessage = function(e, clear) {
-    t.asc_fireCallback("asc_onCoAuthoringChatReceiveMessage", e, clear);
-  };
   this.CoAuthoringApi.onCursor = function(e) {
     if (true === CollaborativeEditing.Is_Fast()) {
       t.WordControl.m_oLogicDocument.Update_ForeignCursor(e[e.length - 1]['cursor'], e[e.length - 1]['user'], true);

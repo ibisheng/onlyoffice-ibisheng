@@ -1112,9 +1112,6 @@ var editor;
     this.CoAuthoringApi.onAuthParticipantsChanged = function(e, count) {
       t.handlers.trigger("asc_onAuthParticipantsChanged", e, count);
     };
-    this.CoAuthoringApi.onMessage = function(e, clear) {
-      t.handlers.trigger("asc_onCoAuthoringChatReceiveMessage", e, clear);
-    };
     this.CoAuthoringApi.onConnectionStateChanged = function(e) {
       t.handlers.trigger("asc_onConnectionStateChanged", e);
     };

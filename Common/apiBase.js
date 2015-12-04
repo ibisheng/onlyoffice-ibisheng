@@ -204,6 +204,9 @@ baseEditorsApi.prototype._coAuthoringInitBase = function() {
     this.CoAuthoringApi.set_url(null);
   }
 
+  this.CoAuthoringApi.onMessage = function(e, clear) {
+    t.sendEvent('asc_onCoAuthoringChatReceiveMessage', e, clear);
+  };
   this.CoAuthoringApi.onFirstConnect = function() {
     t.isOnFirstConnectEnd = true;
     t._onEndPermissions();
