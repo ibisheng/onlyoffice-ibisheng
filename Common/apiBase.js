@@ -221,6 +221,12 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
   this.CoAuthoringApi.onMessage = function(e, clear) {
     t.sendEvent('asc_onCoAuthoringChatReceiveMessage', e, clear);
   };
+  this.CoAuthoringApi.onAuthParticipantsChanged = function(e, count) {
+    t.sendEvent("asc_onAuthParticipantsChanged", e, count);
+  };
+  this.CoAuthoringApi.onParticipantsChanged = function(e, CountEditUsers) {
+    t.sendEvent("asc_onParticipantsChanged", e, CountEditUsers);
+  };
   this.CoAuthoringApi.onSpellCheckInit = function(e) {
     t.SpellCheckUrl = e;
     t._coSpellCheckInit();

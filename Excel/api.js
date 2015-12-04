@@ -1129,12 +1129,6 @@ var editor;
       }
     }, this.getViewMode());
 
-    this.CoAuthoringApi.onParticipantsChanged = function(e, count) {
-      t.handlers.trigger("asc_onParticipantsChanged", e, count);
-    };
-    this.CoAuthoringApi.onAuthParticipantsChanged = function(e, count) {
-      t.handlers.trigger("asc_onAuthParticipantsChanged", e, count);
-    };
     this.CoAuthoringApi.onConnectionStateChanged = function(e) {
       t.handlers.trigger("asc_onConnectionStateChanged", e);
     };
