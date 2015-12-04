@@ -165,6 +165,8 @@ baseEditorsApi.prototype.sync_TryUndoInFastCollaborative = function()
 {
   this.sendEvent("asc_OnTryUndoInFastCollaborative");
 };
+baseEditorsApi.prototype.asc_setViewMode = function() {
+};
 baseEditorsApi.prototype.getViewMode = function() {
 };
 // Open
@@ -284,7 +286,13 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
 };
 baseEditorsApi.prototype._coAuthoringInitEnd = function() {
 };
+// server disconnect
 baseEditorsApi.prototype.asc_coAuthoringDisconnect = function() {
+  this.CoAuthoringApi.disconnect();
+  this.isCoAuthoringEnable = false;
+
+  // Выставляем view-режим
+  this.asc_setViewMode(true);
 };
 // SpellCheck
 baseEditorsApi.prototype._coSpellCheckInit = function() {

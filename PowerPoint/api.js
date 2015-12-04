@@ -376,7 +376,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
     if (isDisconnectAtAll) {
       // Посылаем наверх эвент об отключении от сервера
       t.asc_fireCallback("asc_onCoAuthoringDisconnect");
-      t.SetViewMode(true, true);
+      t.asc_setViewMode(true);
       t.sync_ErrorCallback(isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
     }
   };
@@ -404,15 +404,6 @@ asc_docs_api.prototype.sync_CollaborativeChanges = function()
 {
     if (true !== CollaborativeEditing.Is_Fast())
         this.asc_fireCallback("asc_onCollaborativeChanges");
-};
-
-// server disconnect
-asc_docs_api.prototype.asc_coAuthoringDisconnect = function () {
-  this.CoAuthoringApi.disconnect();
-  this.isCoAuthoringEnable = false;
-  
-  //Just set viewer mode
-  this.SetViewMode(true);
 };
 
 asc_docs_api.prototype.asyncServerIdEndLoaded = function () {
@@ -3528,7 +3519,7 @@ asc_docs_api.prototype.asyncFontsDocumentEndLoaded = function()
     if (this.isLoadNoCutFonts)
     {
         this.isLoadNoCutFonts = false;
-        this.SetViewMode(false);
+        this.asc_setViewMode(false);
         return;
     }
 
@@ -3765,7 +3756,7 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
     }
 
     if (this.isViewMode)
-        this.SetViewMode(true);
+        this.asc_setViewMode(true);
 
 	// Меняем тип состояния (на никакое)
 	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
@@ -4359,7 +4350,7 @@ asc_docs_api.prototype.SetDeviceInputHelperId = function(idKeyboard)
 asc_docs_api.prototype.getViewMode = function() {
   return this.isViewMode;
 };
-asc_docs_api.prototype.SetViewMode = function(isViewMode) {
+asc_docs_api.prototype.asc_setViewMode = function(isViewMode) {
   if (isViewMode) {
     this.isViewMode = true;
     this.ShowParaMarks = false;
@@ -4394,6 +4385,9 @@ asc_docs_api.prototype.SetViewMode = function(isViewMode) {
       this.WordControl.m_oLogicDocument.viewMode = false;
     }
   }
+};
+asc_docs_api.prototype.SetViewMode = function(isViewMode) {
+  this.asc_setViewMode(isViewMode);
 };
 
 asc_docs_api.prototype.SetUseEmbeddedCutFonts = function(bUse)

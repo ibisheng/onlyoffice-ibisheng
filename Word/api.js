@@ -1077,21 +1077,12 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
     if (isDisconnectAtAll) {
       // Посылаем наверх эвент об отключении от сервера
       t.asc_fireCallback("asc_onCoAuthoringDisconnect");
-      t.SetViewMode(true);
+      t.asc_setViewMode(true);
       t.sync_ErrorCallback(isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
     }
   };
 
   this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Word, this.documentFormatSave);
-};
-
-// server disconnect
-asc_docs_api.prototype.asc_coAuthoringDisconnect = function () {
-	this.CoAuthoringApi.disconnect();
-	this.isCoAuthoringEnable = false;
-
-	// Выставляем view-режим
-	this.SetViewMode(true);
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -5433,7 +5424,7 @@ asc_docs_api.prototype.asyncFontsDocumentEndLoaded = function()
     if (this.isLoadNoCutFonts)
     {
         this.isLoadNoCutFonts = false;
-        this.SetViewMode(false);
+        this.asc_setViewMode(false);
         return;
     }
 
@@ -5629,7 +5620,7 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
         this.WordControl.InitControl();
 
         if (this.isViewMode)
-            this.SetViewMode(true);
+            this.asc_setViewMode(true);
         return;
     }
 
@@ -5785,7 +5776,7 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
         this.WordControl.m_oDrawingDocument.SendMathToMenu();
 
     if (this.isViewMode)
-        this.SetViewMode(true);
+        this.asc_setViewMode(true);
 
 	// Меняем тип состояния (на никакое)
 	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
@@ -6283,7 +6274,7 @@ asc_docs_api.prototype.add_SectionBreak = function(_Type)
 asc_docs_api.prototype.getViewMode = function() {
   return this.isViewMode;
 };
-asc_docs_api.prototype.SetViewMode = function(isViewMode) {
+asc_docs_api.prototype.asc_setViewMode = function(isViewMode) {
   if (isViewMode) {
     this.asc_SpellCheckDisconnect();
 
@@ -6325,6 +6316,9 @@ asc_docs_api.prototype.SetViewMode = function(isViewMode) {
     this.WordControl.m_oDrawingDocument.ClearCachePages();
     this.WordControl.OnResize(true);
   }
+};
+asc_docs_api.prototype.SetViewMode = function(isViewMode) {
+  this.asc_setViewMode(isViewMode);
 };
 
 asc_docs_api.prototype.SetUseEmbeddedCutFonts = function(bUse)

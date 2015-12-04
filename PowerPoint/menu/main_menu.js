@@ -1109,7 +1109,6 @@ $(document).ready(function(){
             case "td_formatmodel":
                 //console.log("td_formatmodel");
                 editor.SetPaintFormat(true);
-                //editor.SetViewMode(false);
                 break;
         }
 
@@ -3050,7 +3049,7 @@ $(document).ready(function(){
         c_DocInfo.put_UserName( globalCurentUser );
 
         var isViewMode = "true" == getURLParameter("isViewMode");
-        editor.SetViewMode(isViewMode);
+        editor.asc_setViewMode(isViewMode);
 
         editor.asc_setDocInfo(c_DocInfo);
         editor.asc_getEditorPermissions();

@@ -351,6 +351,7 @@ asc_docs_api.prototype['SetPaintFormat'] = asc_docs_api.prototype.SetPaintFormat
 asc_docs_api.prototype['sync_PaintFormatCallback'] = asc_docs_api.prototype.sync_PaintFormatCallback;
 asc_docs_api.prototype['ClearFormating'] = asc_docs_api.prototype.ClearFormating;
 asc_docs_api.prototype['SetDeviceInputHelperId'] = asc_docs_api.prototype.SetDeviceInputHelperId;
+asc_docs_api.prototype['asc_setViewMode'] = asc_docs_api.prototype.asc_setViewMode;
 asc_docs_api.prototype['SetViewMode'] = asc_docs_api.prototype.SetViewMode;
 asc_docs_api.prototype['SetUseEmbeddedCutFonts'] = asc_docs_api.prototype.SetUseEmbeddedCutFonts;
 asc_docs_api.prototype['IsNeedDefaultFonts'] = asc_docs_api.prototype.IsNeedDefaultFonts;

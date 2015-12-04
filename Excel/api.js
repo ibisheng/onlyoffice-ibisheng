@@ -554,7 +554,7 @@ var editor;
     return this.controller.getViewerMode();
   };
 
-  spreadsheet_api.prototype.asc_setViewerMode = function(isViewerMode) {
+  spreadsheet_api.prototype.asc_setViewMode = function(isViewerMode) {
     this.controller.setViewerMode(isViewerMode);
     if (this.collaborativeEditing) {
       this.collaborativeEditing.setViewerMode(isViewerMode);
@@ -583,6 +583,9 @@ var editor;
         this.collaborativeEditing.sendChanges();
       }
     }
+  };
+  spreadsheet_api.prototype.asc_setViewerMode = function(isViewerMode) {
+    this.asc_setViewMode(isViewerMode);
   };
 
   spreadsheet_api.prototype.asc_setUseEmbeddedCutFonts = function(bUse) {
@@ -1325,7 +1328,7 @@ var editor;
         // Посылаем наверх эвент об отключении от сервера
         t.handlers.trigger("asc_onCoAuthoringDisconnect");
         // И переходим в режим просмотра т.к. мы не можем сохранить таблицу
-        t.asc_setViewerMode(true);
+        t.asc_setViewMode(true);
         t.handlers.trigger("asc_onError", isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
       }
     };
@@ -2964,19 +2967,6 @@ var editor;
   };
 
   /////////////////////////////////////////////////////////////////////////
-  ///////////////////CoAuthoring and Chat api//////////////////////////////
-  /////////////////////////////////////////////////////////////////////////
-
-
-  // server disconnect
-  spreadsheet_api.prototype.asc_coAuthoringDisconnect = function() {
-    this.CoAuthoringApi.disconnect();
-    this.isCoAuthoringEnable = false;
-
-    // Выставляем view-режим
-    this.asc_setViewerMode(true);
-  };
-  /////////////////////////////////////////////////////////////////////////
   ////////////////////////////AutoSave api/////////////////////////////////
   /////////////////////////////////////////////////////////////////////////
   spreadsheet_api.prototype._autoSave = function() {
@@ -3249,6 +3239,7 @@ var editor;
   prot["asc_setAutoSaveGap"] = prot.asc_setAutoSaveGap;
 
   prot["asc_setMobileVersion"] = prot.asc_setMobileVersion;
+  prot["asc_setViewMode"] = prot.asc_setViewMode;
   prot["asc_setViewerMode"] = prot.asc_setViewerMode;
   prot["asc_setUseEmbeddedCutFonts"] = prot.asc_setUseEmbeddedCutFonts;
   prot["asc_setAdvancedOptions"] = prot.asc_setAdvancedOptions;

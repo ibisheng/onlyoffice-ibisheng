@@ -473,6 +473,7 @@ asc_docs_api.prototype['StartChangeWrapPolygon'] = asc_docs_api.prototype.StartC
 asc_docs_api.prototype['ClearFormating'] = asc_docs_api.prototype.ClearFormating;
 asc_docs_api.prototype['GetSectionInfo'] = asc_docs_api.prototype.GetSectionInfo;
 asc_docs_api.prototype['add_SectionBreak'] = asc_docs_api.prototype.add_SectionBreak;
+asc_docs_api.prototype['asc_setViewMode'] = asc_docs_api.prototype.asc_setViewMode;
 asc_docs_api.prototype['SetViewMode'] = asc_docs_api.prototype.SetViewMode;
 asc_docs_api.prototype['SetUseEmbeddedCutFonts'] = asc_docs_api.prototype.SetUseEmbeddedCutFonts;
 asc_docs_api.prototype['IsNeedDefaultFonts'] = asc_docs_api.prototype.IsNeedDefaultFonts;
