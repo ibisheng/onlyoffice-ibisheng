@@ -14894,7 +14894,7 @@ CParagraphRevisionsChangesChecker.prototype.Flush_TextPrChange = function()
     {
         var Change = new CRevisionsChange();
         Change.put_Type(c_oAscRevisionsChangeType.TextPr);
-        Change.put_Value(TextPr.Pr.Get_DiffPrChange());
+        Change.put_Value(TextPr.Pr);
         Change.put_Paragraph(this.Paragraph);
         Change.put_StartPos(TextPr.StartPos);
         Change.put_EndPos(TextPr.EndPos);
