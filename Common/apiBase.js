@@ -178,6 +178,21 @@ baseEditorsApi.prototype.isLongAction = function() {
 baseEditorsApi.prototype.incrementCounterLongAction = function() {
   ++this.IsLongActionCurrent;
 };
+baseEditorsApi.prototype.decrementCounterLongAction = function() {
+  this.IsLongActionCurrent--;
+  if (this.IsLongActionCurrent < 0) {
+    this.IsLongActionCurrent = 0;
+  }
+
+  if (!this.isLongAction()) {
+    var _length = this.LongActionCallbacks.length;
+    for (var i = 0; i < _length; i++) {
+      this.LongActionCallbacks[i](this.LongActionCallbacksParams[i]);
+    }
+    this.LongActionCallbacks.splice(0, _length);
+    this.LongActionCallbacksParams.splice(0, _length);
+  }
+};
 // Open
 baseEditorsApi.prototype._onOpenCommand = function(data) {
 };

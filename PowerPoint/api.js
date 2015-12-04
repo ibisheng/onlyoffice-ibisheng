@@ -1339,25 +1339,7 @@ asc_docs_api.prototype.sync_EndAction = function(type, id){
 
     if (c_oAscAsyncActionType.BlockInteraction == type)
     {
-        this.asc_DecrementCounterLongAction();
-    }
-};
-
-asc_docs_api.prototype.asc_DecrementCounterLongAction = function()
-{
-    this.IsLongActionCurrent--;
-    if (this.IsLongActionCurrent < 0)
-        this.IsLongActionCurrent = 0;
-
-    if (!this.isLongAction())
-    {
-        var _length = this.LongActionCallbacks.length;
-        for (var i = 0; i < _length; i++)
-        {
-            this.LongActionCallbacks[i](this.LongActionCallbacksParams[i]);
-        }
-        this.LongActionCallbacks.splice(0, _length);
-        this.LongActionCallbacksParams.splice(0, _length);
+        this.decrementCounterLongAction();
     }
 };
 
@@ -1972,7 +1954,7 @@ asc_docs_api.prototype.setStartPointHistory = function(){
 asc_docs_api.prototype.setEndPointHistory   = function(){
     this.noCreatePoint = false;
     this.exucuteHistoryEnd = true;
-    this.asc_DecrementCounterLongAction();
+    this.decrementCounterLongAction();
 };
 asc_docs_api.prototype.SetSlideProps = function(prop)
 {
@@ -3543,7 +3525,7 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
     {
         this.isPasteFonts_Images = false;
         this.pasteImageMap = null;
-        this.asc_DecrementCounterLongAction();
+        this.decrementCounterLongAction();
         this.pasteCallback();
         window.GlobalPasteFlag = false;
         window.GlobalPasteFlagCounter = 0;
@@ -3784,7 +3766,7 @@ asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
     {
         // никаких евентов. ничего грузить не нужно. сделано для сафари под макОс.
         // там при LongActions теряется фокус и вставляются пробелы
-        this.asc_DecrementCounterLongAction();
+        this.decrementCounterLongAction();
         this.pasteCallback();
         window.GlobalPasteFlag = false;
         window.GlobalPasteFlagCounter = 0;
@@ -4737,7 +4719,7 @@ asc_docs_api.prototype.asc_stopSaving = function () {
     this.incrementCounterLongAction();
 };
 asc_docs_api.prototype.asc_continueSaving = function () {
-	this.asc_DecrementCounterLongAction();
+	this.decrementCounterLongAction();
 };
 
 //-----------------------------------------------------------------
