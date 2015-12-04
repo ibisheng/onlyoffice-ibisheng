@@ -229,3 +229,7 @@ baseEditorsApi.prototype.asc_undoAllChanges = function() {
 baseEditorsApi.prototype.asc_isOffline = function() {
 	return false;
 };
+baseEditorsApi.prototype.sync_TryUndoInFastCollaborative = function()
+{
+    this.sendEvent("OnTryUndoInFastCollaborative");
+};

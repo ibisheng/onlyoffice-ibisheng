@@ -14,6 +14,8 @@ function CHistory(Document)
     this.RecIndex   = -1;          // Номер точки, на которой произошел последний пересчет
     this.Points     = [];          // Точки истории, в каждой хранится массив с изменениями после текущей точки
     this.Document   = Document;
+    this.Api                  = null;
+    this.CollaborativeEditing = null;
 
     this.RecalculateData =
     {
@@ -43,6 +45,16 @@ function CHistory(Document)
 
 CHistory.prototype =
 {
+    Set_LogicDocument : function(LogicDocument)
+    {
+        if (!LogicDocument)
+            return;
+
+        this.Document             = LogicDocument;
+        this.Api                  = LogicDocument.Get_Api();
+        this.CollaborativeEditing = LogicDocument.Get_CollaborativeEditing();
+    },
+
     Is_UserSaveMode : function()
     {
         return this.UserSaveMode;
@@ -174,11 +186,16 @@ CHistory.prototype =
         this.Check_UninonLastPoints();
 
         // Проверяем можно ли сделать Undo
-        if ( true != this.Can_Undo() )
-            return null;
+        if (true !== this.Can_Undo())
+        {
+            if (this.Api && this.CollaborativeEditing && true === this.CollaborativeEditing.Is_Fast() && true !== this.CollaborativeEditing.Is_SingleUser())
+                this.Api.sync_TryUndoInFastCollaborative();
 
-        if (editor)
-            editor.setUserAlive();
+            return null;
+        }
+
+        if (this.Api)
+            this.Api.setUserAlive();
 
         // Запоминаем самое последнее состояние документа для Redo
         if ( this.Index === this.Points.length - 1 )
@@ -229,8 +246,8 @@ CHistory.prototype =
         if ( true != this.Can_Redo() )
             return null;
 
-        if (editor)
-            editor.setUserAlive();
+        if (this.Api)
+            this.Api.setUserAlive();
         
         this.Document.Selection_Remove();
         
@@ -325,11 +342,11 @@ CHistory.prototype =
     // Data  - сами изменения
     Add : function(Class, Data)
     {
-		if ( 0 !== this.TurnOffHistory || this.Index < 0 )
+		if (0 !== this.TurnOffHistory || this.Index < 0)
             return;
 
-        if (editor)
-            editor.setUserAlive();
+        if (this.Api)
+            this.Api.setUserAlive();
 
         // Заглушка на случай, если у нас во время создания одной точки в истории, после нескольких изменений идет
         // пересчет, потом снова добавляются изменения и снова запускается пересчет и т.д.
@@ -357,6 +374,10 @@ CHistory.prototype =
         };
 
         this.Points[this.Index].Items.push( Item );
+
+        if (!this.CollaborativeEditing)
+            return;
+
         var bPresentation = !(typeof CPresentation === "undefined");
         var bSlide = !(typeof Slide === "undefined");
         if ( ( Class instanceof CDocument        && ( historyitem_Document_AddItem        === Data.Type || historyitem_Document_RemoveItem        === Data.Type ) ) ||
@@ -390,14 +411,14 @@ CHistory.prototype =
 
             var ContentChanges = new CContentChangesElement( ( bAdd == true ? contentchanges_Add : contentchanges_Remove ), Data.Pos, Count, Item );
             Class.Add_ContentChanges( ContentChanges );
-            CollaborativeEditing.Add_NewDC( Class );
+            this.CollaborativeEditing.Add_NewDC( Class );
 
             if (true === bAdd)
-                CollaborativeEditing.Update_DocumentPositionsOnAdd(Class, Data.Pos);
+                this.CollaborativeEditing.Update_DocumentPositionsOnAdd(Class, Data.Pos);
             else
-                CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, Data.Pos, Count);
+                this.CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, Data.Pos, Count);
         }
-        if(CollaborativeEditing.AddPosExtChanges && Class instanceof CXfrm)
+        if(this.CollaborativeEditing.AddPosExtChanges && Class instanceof CXfrm)
         {
             if(historyitem_Xfrm_SetOffX  === Data.Type ||
                 historyitem_Xfrm_SetOffY === Data.Type ||
@@ -408,7 +429,7 @@ CHistory.prototype =
                 historyitem_Xfrm_SetChExtX === Data.Type ||
                 historyitem_Xfrm_SetChExtY  === Data.Type)
             {
-                CollaborativeEditing.AddPosExtChanges(Item,
+                this.CollaborativeEditing.AddPosExtChanges(Item,
                     historyitem_Xfrm_SetOffX  === Data.Type ||
                     historyitem_Xfrm_SetExtX === Data.Type ||
                         historyitem_Xfrm_SetChOffX === Data.Type ||
@@ -853,8 +874,8 @@ CHistory.prototype =
             this.Points[this.Index].Additional = {};
         }
 
-        if ( true === editor.isMarkerFormat)
-            editor.sync_MarkerFormatCallback(false);
+        if (this.Api && true === this.Api.isMarkerFormat)
+            this.Api.sync_MarkerFormatCallback(false);
     },
 
     Get_EditingTime : function(dTime)

@@ -704,7 +704,9 @@ function CDocument(DrawingDocument)
     //------------------------------------------------------------------------
     if (DrawingDocument)
     {
-        this.History.Document = this;
+        if (this.History)
+            this.History.Set_LogicDocument(this);
+
         if (this.CollaborativeEditing)
             this.CollaborativeEditing.m_oLogicDocument = this;
     }
@@ -15153,6 +15155,10 @@ CDocument.prototype.Get_DrawingDocument = function()
 CDocument.prototype.Get_Api = function()
 {
     return this.Api;
+};
+CDocument.prototype.Get_CollaborativeEditing = function()
+{
+    return this.CollaborativeEditing;
 };
 CDocument.prototype.private_CorrectDocumentPosition = function()
 {
