@@ -130,6 +130,21 @@ asc_docs_api.prototype.sendEvent = function() {
 ///////////////////CoAuthoring and Chat api//////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 // Init CoAuthoring
+asc_docs_api.prototype._coAuthoringSetChange = function(change, oColor)
+{
+	var oChange = new CCollaborativeChanges();
+	oChange.Set_Data( change );
+	oChange.Set_Color( oColor );
+	CollaborativeEditing.Add_Changes( oChange );
+};
+
+asc_docs_api.prototype._coAuthoringSetChanges = function(e, oColor)
+{
+	var Count = e.length;
+	for (var Index = 0; Index < Count; ++Index)
+		this._coAuthoringSetChange(e[Index], oColor);
+};
+
 asc_docs_api.prototype._coAuthoringInit = function() {
   if (null == this.User || null == this.User.asc_getId()) {
     this.User = new Asc.asc_CUser();

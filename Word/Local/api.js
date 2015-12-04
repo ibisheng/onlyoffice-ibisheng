@@ -81,8 +81,9 @@ CHistory.prototype.Have_Changes = function(IsUserSave)
 	
 window["DesktopOfflineAppDocumentApplyChanges"] = function(_changes)
 {
-    editor["asc_nativeApplyChanges"](_changes);
-	editor["asc_nativeCalculateFile"]();
+	editor._coAuthoringSetChanges(_changes, new CDocumentColor( 191, 255, 199 ));
+    //editor["asc_nativeApplyChanges"](_changes);
+	//editor["asc_nativeCalculateFile"]();
 };
 
 /////////////////////////////////////////////////////////
