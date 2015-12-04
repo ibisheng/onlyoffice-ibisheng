@@ -98,6 +98,8 @@ var editor;
   spreadsheet_api.prototype._init = function() {
     this.topLineEditorElement = document.getElementById(this.topLineEditorName);
     this.formulasList = getFormulasInfo();
+    // ToDo нужно ли это
+    asc['editor'] = ( asc['editor'] || this );
   };
 
   spreadsheet_api.prototype.asc_CheckGuiControlColors = function() {
@@ -286,12 +288,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_Init = function(fontsPath) {
-    var t = this;
-    asc["editor"] = ( asc["editor"] || t );
-    t.FontLoader.fontFilesPath = fontsPath;
-    t.asc_registerCallback("loadFonts", function(fonts, callback) {
-      t._loadFonts(fonts, callback);
-    });
+    this.asc_SetFontsPath(fontsPath);
   };
   spreadsheet_api.prototype.asc_getLocaleExample = function(val, number, date) {
     var res = '';
@@ -3321,6 +3318,7 @@ var editor;
   prot = spreadsheet_api.prototype;
 
   prot["asc_GetFontThumbnailsPath"] = prot.asc_GetFontThumbnailsPath;
+  prot["asc_SetFontsPath"] = prot.asc_SetFontsPath;
   prot["asc_Init"] = prot.asc_Init;
   prot["asc_setDocInfo"] = prot.asc_setDocInfo;
   prot["asc_getLocaleExample"] = prot.asc_getLocaleExample;

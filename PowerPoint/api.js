@@ -666,7 +666,7 @@ asc_docs_api.prototype.LoadDocument = function() {
 
 asc_docs_api.prototype.SetFontsPath = function(path)
 {
-	this.FontLoader.fontFilesPath = path;
+  this.asc_SetFontsPath(path);
 };
 asc_docs_api.prototype.SetThemesPath = function(path)
 {

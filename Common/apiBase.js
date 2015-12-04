@@ -142,6 +142,9 @@ baseEditorsApi.prototype.asc_setDocInfo = function(oDocInfo) {
     window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
   }
 };
+baseEditorsApi.asc_SetFontsPath = function(path) {
+  this.FontLoader.fontFilesPath = path;
+};
 // Events
 baseEditorsApi.prototype.sendEvent = function() {
 };

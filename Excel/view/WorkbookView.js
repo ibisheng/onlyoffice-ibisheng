@@ -1684,13 +1684,6 @@
 				var ws = t.getWorksheet();
 				t.clipboard.pasteRange(ws);
 			} else {
-				// t.clipboard.pasteCellValue(function (text, fonts) {
-					// if (fonts.length > 0) {
-						// t.handlers.trigger("loadFonts", fonts, function(){t.cellEditor.paste(fragments)});
-					// } else {
-						// t.cellEditor.pasteText(text);
-					// }
-				// });
 				t.clipboard.pasteAsText(function (text) {
 					t.cellEditor.pasteText(text);
 				});

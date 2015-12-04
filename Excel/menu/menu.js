@@ -532,7 +532,7 @@
 		$("#themeSelect ul").empty().append(cellThemeContent);
 	});
 	
-	api.asc_Init("../Fonts/");
+	api.asc_SetFontsPath("../Fonts/");
 	//api.asc_setViewerMode(true);
 
 	function getURLParameter(name) {
