@@ -1314,24 +1314,6 @@ var editor;
     this.CoAuthoringApi.onEndCoAuthoring = function(isStartEvent) {
       t.endCollaborationEditing();
     };
-    /**
-     * Event об отсоединении от сервера
-     * @param {jQuery} e  event об отсоединении с причиной
-     * @param {Bool} isDisconnectAtAll  окончательно ли отсоединяемся(true) или будем пробовать сделать reconnect(false) + сами отключились
-     * @param {Bool} isCloseCoAuthoring
-     */
-    this.CoAuthoringApi.onDisconnect = function(e, isDisconnectAtAll, isCloseCoAuthoring) {
-      if (ConnectionState.None === t.CoAuthoringApi.get_state()) {
-        t.asyncServerIdEndLoaded();
-      }
-      if (isDisconnectAtAll) {
-        // Посылаем наверх эвент об отключении от сервера
-        t.handlers.trigger("asc_onCoAuthoringDisconnect");
-        // И переходим в режим просмотра т.к. мы не можем сохранить таблицу
-        t.asc_setViewMode(true);
-        t.handlers.trigger("asc_onError", isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
-      }
-    };
 
     this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Spreadsheet, this.documentFormatSave);
   };

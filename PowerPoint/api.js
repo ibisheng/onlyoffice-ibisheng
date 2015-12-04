@@ -363,23 +363,6 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
       t.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
     }
   };
-  /**
-   * Event об отсоединении от сервера
-   * @param {jQuery} e  event об отсоединении с причиной
-   * @param {Bool} isDisconnectAtAll  окончательно ли отсоединяемся(true) или будем пробовать сделать reconnect(false) + сами отключились
-   * @param {Bool} isCloseCoAuthoring
-   */
-  this.CoAuthoringApi.onDisconnect = function(e, isDisconnectAtAll, isCloseCoAuthoring) {
-    if (ConnectionState.None === t.CoAuthoringApi.get_state()) {
-      t.asyncServerIdEndLoaded();
-    }
-    if (isDisconnectAtAll) {
-      // Посылаем наверх эвент об отключении от сервера
-      t.asc_fireCallback("asc_onCoAuthoringDisconnect");
-      t.asc_setViewMode(true);
-      t.sync_ErrorCallback(isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
-    }
-  };
 
   this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Presentation, this.documentFormatSave);
 };

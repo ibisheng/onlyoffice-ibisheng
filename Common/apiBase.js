@@ -174,6 +174,8 @@ baseEditorsApi.prototype._onOpenCommand = function(data) {
 };
 baseEditorsApi.prototype._onNeedParams = function(data) {
 };
+baseEditorsApi.prototype.asyncServerIdEndLoaded = function() {
+};
 // Выставление интервала автосохранения (0 - означает, что автосохранения нет)
 baseEditorsApi.prototype.asc_setAutoSaveGap = function(autoSaveGap) {
   if (typeof autoSaveGap === "number") {
@@ -235,6 +237,24 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
   };
   this.CoAuthoringApi.onWarning = function(e) {
     t.sendEvent('asc_onError', c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
+  };
+  /**
+   * Event об отсоединении от сервера
+   * @param {jQuery} e  event об отсоединении с причиной
+   * @param {Bool} isDisconnectAtAll  окончательно ли отсоединяемся(true) или будем пробовать сделать reconnect(false) + сами отключились
+   * @param {Bool} isCloseCoAuthoring
+   */
+  this.CoAuthoringApi.onDisconnect = function(e, isDisconnectAtAll, isCloseCoAuthoring) {
+    if (ConnectionState.None === t.CoAuthoringApi.get_state()) {
+      t.asyncServerIdEndLoaded();
+    }
+    if (isDisconnectAtAll) {
+      // Посылаем наверх эвент об отключении от сервера
+      t.sendEvent('asc_onCoAuthoringDisconnect');
+      // И переходим в режим просмотра т.к. мы не можем сохранить файл
+      t.asc_setViewMode(true);
+      t.sendEvent('asc_onError', isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
+    }
   };
   this.CoAuthoringApi.onDocumentOpen = function(inputWrap) {
     if (inputWrap["data"]) {
