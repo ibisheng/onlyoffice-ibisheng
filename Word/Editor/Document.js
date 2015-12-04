@@ -14673,7 +14673,7 @@ CDocument.prototype.Set_FastCollaborativeEditing = function(isOn)
 };
 CDocument.prototype.Continue_FastCollaborativeEditing = function()
 {
-    if (true === this.Api.asc_IsLongAction())
+    if (this.Api.isLongAction())
         return;
 
     if (true !== this.CollaborativeEditing.Is_Fast() || true === this.CollaborativeEditing.Is_SingleUser())

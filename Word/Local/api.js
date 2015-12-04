@@ -101,7 +101,7 @@ asc_docs_api.prototype.asc_Save = function (isNoUserSave)
     if (true !== isNoUserSave)
         this.IsUserSave = true;
 
-    if (true === this.canSave && !this.asc_IsLongAction())
+    if (true === this.canSave && !this.isLongAction())
 	{
 		var _isNaturalSave = this.IsUserSave;
 		this.canSave = false;

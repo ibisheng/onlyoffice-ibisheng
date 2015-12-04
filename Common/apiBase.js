@@ -41,6 +41,9 @@ function baseEditorsApi(name) {
   // Переменная отвечает, получили ли мы ответ с сервера совместного редактирования
   this.ServerIdWaitComplete = false;
 
+  // Long action
+  this.IsLongActionCurrent = 0;
+
   // AutoSave
   this.autoSaveGap = 0;					// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
 
@@ -168,6 +171,9 @@ baseEditorsApi.prototype.sync_TryUndoInFastCollaborative = function()
 baseEditorsApi.prototype.asc_setViewMode = function() {
 };
 baseEditorsApi.prototype.getViewMode = function() {
+};
+baseEditorsApi.prototype.isLongAction = function() {
+  return (0 !== this.IsLongActionCurrent);
 };
 // Open
 baseEditorsApi.prototype._onOpenCommand = function(data) {

@@ -190,7 +190,6 @@ asc_docs_api.prototype['sync_StartAction'] = asc_docs_api.prototype.sync_StartAc
 asc_docs_api.prototype['sync_EndAction'] = asc_docs_api.prototype.sync_EndAction;
 asc_docs_api.prototype['asc_IncrementCounterLongAction'] = asc_docs_api.prototype.asc_IncrementCounterLongAction;
 asc_docs_api.prototype['asc_DecrementCounterLongAction'] = asc_docs_api.prototype.asc_DecrementCounterLongAction;
-asc_docs_api.prototype['asc_IsLongAction'] = asc_docs_api.prototype.asc_IsLongAction;
 asc_docs_api.prototype['asc_CheckLongActionCallback'] = asc_docs_api.prototype.asc_CheckLongActionCallback;
 asc_docs_api.prototype['sync_AddURLCallback'] = asc_docs_api.prototype.sync_AddURLCallback;
 asc_docs_api.prototype['sync_ErrorCallback'] = asc_docs_api.prototype.sync_ErrorCallback;

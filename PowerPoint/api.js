@@ -88,7 +88,6 @@ function asc_docs_api(name)
     //выставляем тип copypaste
     g_bIsDocumentCopyPaste = false;
 
-    this.IsLongActionCurrent = 0;
     this.LongActionCallbacks = [];
 	this.LongActionCallbacksParams = [];
 
@@ -1170,7 +1169,7 @@ asc_docs_api.prototype.Share = function(){
 
 function OnSave_Callback(e) {
   if (false == e["saveLock"]) {
-    if (editor.asc_IsLongAction()) {
+    if (editor.isLongAction()) {
       // Мы не можем в этот момент сохранять, т.к. попали в ситуацию, когда мы залочили сохранение и успели нажать вставку до ответа
       // Нужно снять lock с сохранения
       editor.CoAuthoringApi.onUnSaveLock = function() {
@@ -1228,7 +1227,7 @@ function OnSave_Callback(e) {
 
 asc_docs_api.prototype.asc_Save = function(isAutoSave) {
   this.IsUserSave = !isAutoSave;
-  if (true === this.canSave && !this.asc_IsLongAction()) {
+  if (true === this.canSave && !this.isLongAction()) {
     this.canSave = false;
     this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
   }
@@ -1354,7 +1353,7 @@ asc_docs_api.prototype.asc_DecrementCounterLongAction = function()
     if (this.IsLongActionCurrent < 0)
         this.IsLongActionCurrent = 0;
 
-    if (!this.asc_IsLongAction())
+    if (!this.isLongAction())
     {
         var _length = this.LongActionCallbacks.length;
         for (var i = 0; i < _length; i++)
@@ -1366,13 +1365,9 @@ asc_docs_api.prototype.asc_DecrementCounterLongAction = function()
     }
 };
 
-asc_docs_api.prototype.asc_IsLongAction = function()
-{
-    return (0 == this.IsLongActionCurrent) ? false : true;
-};
 asc_docs_api.prototype.asc_CheckLongActionCallback = function(_callback, _param)
 {
-    if (this.asc_IsLongAction())
+    if (this.isLongAction())
     {
         this.LongActionCallbacks[this.LongActionCallbacks.length] = _callback;
         this.LongActionCallbacksParams[this.LongActionCallbacksParams.length] = _param;

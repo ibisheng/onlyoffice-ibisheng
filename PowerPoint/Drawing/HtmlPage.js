@@ -1853,7 +1853,7 @@ function CEditorPage(api)
 
     this.onKeyDown = function(e)
     {
-        if (oThis.m_oApi.asc_IsLongAction())
+        if (oThis.m_oApi.isLongAction())
         {
             e.preventDefault();
             return;
@@ -1870,7 +1870,7 @@ function CEditorPage(api)
         if (oWordControl.IsFocus === false)
             return;
 
-        if (oWordControl.m_oApi.asc_IsLongAction() || oWordControl.m_bIsMouseLock === true)
+        if (oWordControl.m_oApi.isLongAction() || oWordControl.m_bIsMouseLock === true)
         {
             check_KeyboardEvent2(e);
             e.preventDefault();
@@ -1909,7 +1909,7 @@ function CEditorPage(api)
         }
 
         var oWordControl = oThis;
-        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_oApi.asc_IsLongAction() === true || oWordControl.m_bIsMouseLock === true)
+        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_oApi.isLongAction() || oWordControl.m_bIsMouseLock === true)
             return;
 
         check_KeyboardEvent(e);
@@ -1953,7 +1953,7 @@ function CEditorPage(api)
     this.onKeyDownTBIM = function(e)
     {
         var oWordControl = oThis;
-        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_oApi.asc_IsLongAction() === true || oWordControl.m_bIsMouseLock === true)
+        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_oApi.isLongAction() || oWordControl.m_bIsMouseLock === true)
             return;
 
         check_KeyboardEvent(e);
@@ -2065,7 +2065,7 @@ function CEditorPage(api)
         }
 
         var oWordControl = oThis;
-        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_oApi.asc_IsLongAction() === true || oWordControl.m_bIsMouseLock === true)
+        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_oApi.isLongAction() || oWordControl.m_bIsMouseLock === true)
             return;
 
         if (window.opera && !oWordControl.IsKeyDownButNoPress)
@@ -3056,7 +3056,7 @@ function CEditorPage(api)
 		
 		if (oWordControl.IsFocus && oWordControl.TextBoxInputMode && oWordControl.TextBoxInput && !window.USER_AGENT_SAFARI_MACOS)
         {
-            if (!oWordControl.m_oApi.asc_IsLongAction() && !window.GlobalCopyFlag)
+            if (!oWordControl.m_oApi.isLongAction() && !window.GlobalCopyFlag)
                 oWordControl.TextBoxInput.focus();
         }
 
@@ -3106,7 +3106,7 @@ function CEditorPage(api)
             {
                 var _interval = (CollaborativeEditing.m_nUseType <= 0) ? oWordControl.m_nIntervalSlowAutosave : oWordControl.m_nIntervalFastAutosave;
 
-                if ((_curTime - oWordControl.m_nLastAutosaveTime) > _interval && !oWordControl.m_oDrawingDocument.TransitionSlide.IsPlaying() && !oWordControl.m_oApi.asc_IsLongAction())
+                if ((_curTime - oWordControl.m_nLastAutosaveTime) > _interval && !oWordControl.m_oDrawingDocument.TransitionSlide.IsPlaying() && !oWordControl.m_oApi.isLongAction())
                 {
                     if (History.Have_Changes(false) == true)
                     {

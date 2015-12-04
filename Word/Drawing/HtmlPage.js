@@ -2302,7 +2302,7 @@ function CEditorPage(api)
 
     this.onKeyDown = function(e)
     {
-        if (oThis.m_oApi.asc_IsLongAction())
+        if (oThis.m_oApi.isLongAction())
         {
             e.preventDefault();
             return;
@@ -2443,7 +2443,7 @@ function CEditorPage(api)
 
     this.onKeyDownTBIM = function(e)
     {
-        if (oThis.m_oApi.asc_IsLongAction())
+        if (oThis.m_oApi.isLongAction())
         {
             e.preventDefault();
             return;
@@ -2554,7 +2554,7 @@ function CEditorPage(api)
 		if (window.GlobalPasteFlag || window.GlobalCopyFlag)
 			return;
 			
-        if (oThis.m_oApi.asc_IsLongAction())
+        if (oThis.m_oApi.isLongAction())
 		{
             e.preventDefault();
             return;
@@ -3728,7 +3728,7 @@ function CEditorPage(api)
 
         if (oWordControl.IsFocus && oWordControl.TextBoxInputMode && oWordControl.TextBoxInput && !window.USER_AGENT_SAFARI_MACOS)
         {
-            if (!oWordControl.m_oApi.asc_IsLongAction() && !window.GlobalCopyFlag)
+            if (!oWordControl.m_oApi.isLongAction() && !window.GlobalCopyFlag)
                 oWordControl.TextBoxInput.focus();
         }
         

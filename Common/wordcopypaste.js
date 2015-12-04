@@ -444,7 +444,7 @@ function Editor_Copy_Event(e, ElemToSelect)
 	var api = editor;
 	var oWordControl = api.WordControl;
 	
-	if (oWordControl.m_oApi.asc_IsLongAction())
+	if (oWordControl.m_oApi.isLongAction())
 	{
 		e.preventDefault();
 		return;
