@@ -4590,9 +4590,9 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
                 if (this.Paragraph)
                 {
                     if (bAddReview)
-                        aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, 255, 0, 0);
+                        aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b);
                     else if (bRemReview)
-                        aStrikeout.Add(StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, 255, 0, 0);
+                        aStrikeout.Add(StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b);
                 }
 
                 X += ItemWidthVisible;
@@ -4661,7 +4661,9 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             case para_Math_BreakOperator:
             case para_Math_Ampersand:
             {
-                if ( true === CurTextPr.DStrikeout )
+                if (true === bRemReview)
+                    aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, undefined, CurTextPr );
+                else if (true === CurTextPr.DStrikeout)
                     aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
                 else if ( true === CurTextPr.Strikeout )
                     aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
@@ -4673,6 +4675,8 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             case para_Math_Placeholder:
             {
                 var ctrPrp = this.Parent.GetCtrPrp();
+                if (true === bRemReview)
+                    aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, undefined, CurTextPr );
                 if(true === ctrPrp.DStrikeout)
                     aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
                 else if(true === ctrPrp.Strikeout)

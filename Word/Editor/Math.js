@@ -843,6 +843,10 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
 
 ParaMath.prototype.Remove = function(Direction, bOnAddText)
 {
+    var TrackRevisions = null;
+    if (this.Paragraph && this.Paragraph.LogicDocument)
+        TrackRevisions = this.Paragraph.LogicDocument.Is_TrackRevisions();
+
     var oSelectedContent = this.GetSelectContent();
 
     var nStartPos = oSelectedContent.Start;
@@ -852,6 +856,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
     if (nStartPos === nEndPos)
     {
         var oElement = oContent.getElem(nStartPos);
+        var ElementReviewType = oElement.Get_ReviewType();
 
         // Если данный элемент - ран, удаляем внутри рана, если нет, тогда удаляем целиком элемент
         if (para_Math_Run === oElement.Type)
@@ -933,17 +938,31 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
         }
         else
         {
-            oContent.Remove_FromContent(nStartPos, 1);
-
+            this.Selection_Remove();
             oContent.CurPos = nStartPos;
 
-            if (para_Math_Run === oContent.Content[nStartPos].Type)
-                oContent.Content[nStartPos].Cursor_MoveToStartPos();
+            if (true === TrackRevisions)
+            {
+                if (reviewtype_Common === ElementReviewType)
+                {
+                    oElement.Set_ReviewType(reviewtype_Remove);
+                }
+                else if (reviewtype_Add === ElementReviewType)
+                {
+                    oContent.Remove_FromContent(nStartPos, 1);
+                    if (para_Math_Run === oContent.Content[nStartPos].Type)
+                        oContent.Content[nStartPos].Cursor_MoveToStartPos();
+                }
+            }
+            else
+            {
+                oContent.Remove_FromContent(nStartPos, 1);
+                if (para_Math_Run === oContent.Content[nStartPos].Type)
+                    oContent.Content[nStartPos].Cursor_MoveToStartPos();
+            }
 
             oContent.Correct_Content();
             oContent.Correct_ContentPos(-1); // -1, потому что нам надо встать перед элементом, а не после
-
-            this.Selection_Remove();
         }
     }
     else
@@ -959,25 +978,52 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
         var oStartElement = oContent.getElem(nStartPos);
         var oEndElement = oContent.getElem(nEndPos);
 
-        // Если последний элемент - ран, удаляем внутри, если нет, тогда удаляем целиком элемент
-        if (para_Math_Run === oEndElement.Type)
-            oEndElement.Remove(Direction);
-        else
-            oContent.Remove_FromContent(nEndPos, 1);
-
-        // Удаляем все промежуточные элементы
-        oContent.Remove_FromContent(nStartPos + 1, nEndPos - nStartPos - 1);
-
-        // Если первый элемент - ран, удаляем внутри рана, если нет, тогда удаляем целиком элемент
-        if (para_Math_Run === oStartElement.Type)
-            oStartElement.Remove(Direction);
-        else
-            oContent.Remove_FromContent(nStartPos, 1);
-
+        this.Selection_Remove();
         oContent.CurPos = nStartPos;
+        if (true === TrackRevisions)
+        {
+            for (var CurPos = nEndPos; CurPos >= nStartPos; --CurPos)
+            {
+                var Element = oContent.getElem(CurPos);
+                var ElementReviewType = Element.Get_ReviewType();
+
+                if (para_Math_Run === Element.Type && (CurPos === nEndPos || CurPos === nStartPos))
+                {
+                    // Удаление разруливается внутри рана
+                    Element.Remove(Direction);
+                }
+                else
+                {
+                    if (reviewtype_Common === ElementReviewType)
+                    {
+                        Element.Set_ReviewType(reviewtype_Remove);
+                    }
+                    else if (reviewtype_Add === ElementReviewType)
+                    {
+                        oContent.Remove_FromContent(CurPos, 1);
+                    }
+                }
+            }
+        }
+        else
+        {
+            // Если последний элемент - ран, удаляем внутри, если нет, тогда удаляем целиком элемент
+            if (para_Math_Run === oEndElement.Type)
+                oEndElement.Remove(Direction);
+            else
+                oContent.Remove_FromContent(nEndPos, 1);
+
+            // Удаляем все промежуточные элементы
+            oContent.Remove_FromContent(nStartPos + 1, nEndPos - nStartPos - 1);
+
+            // Если первый элемент - ран, удаляем внутри рана, если нет, тогда удаляем целиком элемент
+            if (para_Math_Run === oStartElement.Type)
+                oStartElement.Remove(Direction);
+            else
+                oContent.Remove_FromContent(nStartPos, 1);
+        }
         oContent.Correct_Content();
         oContent.Correct_ContentPos(Direction);
-        this.Selection_Remove();
     }
 };
 
@@ -3696,9 +3742,9 @@ CChangesMathEqArrayPr.prototype.Load_Changes = function(Reader, Class)
 function CChangesMathBaseReviewType(NewType, NewInfo, OldType, OldInfo)
 {
     this.NewType = NewType;
-    this.NewInfo = NewInfo ? undefined : NewInfo.Copy();
+    this.NewInfo = NewInfo ? NewInfo.Copy() : undefined;
     this.OldType = OldType;
-    this.OldInfo = OldInfo ? undefined : OldInfo.Copy();
+    this.OldInfo = OldInfo ? OldInfo.Copy() : undefined;
 }
 CChangesMathBaseReviewType.prototype.Type = historyitem_Math_ReviewType;
 CChangesMathBaseReviewType.prototype.Undo = function(Class)

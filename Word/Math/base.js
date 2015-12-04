@@ -1720,6 +1720,10 @@ CMathBase.prototype.Draw_Lines = function(PDSL)
     var aStrikeout  = PDSL.Strikeout;
     var aDStrikeout = PDSL.DStrikeout;
 
+    var ReviewType = this.Get_ReviewType();
+    var bAddReview = reviewtype_Add === ReviewType ? true : false;
+    var bRemReview = reviewtype_Remove === ReviewType ? true : false;
+
     var ArgSize     = this.Get_CompiledArgSize();
     var fontCoeff   = MatGetKoeffArgSize(CtrPrp.FontSize, ArgSize.value);
 
@@ -1761,7 +1765,9 @@ CMathBase.prototype.Draw_Lines = function(PDSL)
 
     var Bound = this.Bounds.Get_LineBound(CurLine, CurRange);
 
-    if ( true === CtrPrp.DStrikeout )
+    if (true === bRemReview)
+        aStrikeout.Add(Y, Y, X, X + Bound.W, LineW, REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b);
+    else if ( true === CtrPrp.DStrikeout )
         aDStrikeout.Add( Y, Y, X, X + Bound.W, LineW, CurColor.r, CurColor.g, CurColor.b );
     else if ( true === CtrPrp.Strikeout )
         aStrikeout.Add( Y, Y, X, X + Bound.W, LineW, CurColor.r, CurColor.g, CurColor.b );
@@ -1781,6 +1787,7 @@ CMathBase.prototype.Draw_Lines = function(PDSL)
 
     for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
         this.Content[CurPos].Draw_Lines(PDSL);
+
 
 
     PDSL.X = Bound.X + Bound.W;
@@ -2318,20 +2325,17 @@ CMathBase.prototype.Get_ReviewType = function()
 {
     return this.ReviewType;
 };
-CMathBase.prototype.Set_ReviewType = function(Value)
+CMathBase.prototype.Set_ReviewType = function(Type)
 {
     CMathBase.superclass.Set_ReviewType.apply(this, arguments);
 
-    if (Value !== this.ReviewType)
+    if (Type !== this.ReviewType)
     {
-        var OldReviewType = this.ReviewType;
-        var OldReviewInfo = this.ReviewInfo.Copy();
+        var NewInfo = new CReviewInfo();
+        NewInfo.Update();
 
-        this.ReviewType = Value;
-        this.ReviewInfo.Update();
-
-        History.Add(this, new CChangesMathBaseReviewType(Value, this.ReviewInfo, OldReviewType, OldReviewInfo));
-        this.private_UpdateTrackRevisions();
+        History.Add(this, new CChangesMathBaseReviewType(Type, NewInfo, this.ReviewType, this.ReviewInfo));
+        this.raw_SetReviewType(Type, NewInfo);
     }
 };
 CMathBase.prototype.Set_ReviewTypeWithInfo = function(ReviewType, ReviewInfo)
