@@ -231,5 +231,5 @@ baseEditorsApi.prototype.asc_isOffline = function() {
 };
 baseEditorsApi.prototype.sync_TryUndoInFastCollaborative = function()
 {
-    this.sendEvent("OnTryUndoInFastCollaborative");
+    this.sendEvent("asc_OnTryUndoInFastCollaborative");
 };
