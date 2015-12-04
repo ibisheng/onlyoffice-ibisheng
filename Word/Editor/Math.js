@@ -672,8 +672,8 @@ ParaMath.prototype.Add = function(Item)
 
         if(oContent.bRoot == false && Run.IsPlaceholder())
         {
-            var ctrPrp = oContent.Parent.Get_CtrPrp(); // копия ctrPrp
-            Run.Apply_TextPr(ctrPrp, undefined, true);
+            var CtrRunPr = oContent.Get_ParentCtrRunPr(false); // ctrPrp (не копия)
+            Run.Apply_TextPr(CtrRunPr, undefined, true);
         }
 
         if(Item.Value == 38)

@@ -17,26 +17,27 @@ function CMathBase(bInside)
     this.size = new CMathSize();
 
     //  Properties
-    this.Parent = null;
-    this.ParaMath = null; // ссылка на общую формулу
+    this.Parent 			 = null;
+    this.ParaMath 			 = null; // ссылка на общую формулу
 
-    this.CtrPrp = new CTextPr();
-    this.CompiledCtrPrp = new CTextPr();
+    this.CtrPrp 			 = new CTextPr();
+    this.CompiledCtrPrp 	 = new CTextPr(); 
     this.TextPrControlLetter = new CTextPr();
+	//this.CtrPr               = new CCtrPr();
 
-    this.ArgSize = new CMathArgSize();
+    this.ArgSize             = new CMathArgSize();
 
     /////////////////
-    this.nRow = 0;
-    this.nCol = 0;
+    this.nRow                = 0;
+    this.nCol                = 0;
 
-    this.bInside = bInside === true;
+    this.bInside             = bInside === true;
 
-    this.bOneLine        = true;
-    this.bCanBreak       = false;
-    this.NumBreakContent = -1;
+    this.bOneLine            = true;
+    this.bCanBreak           = false;
+    this.NumBreakContent     = -1;
 
-    this.elements    = [];
+    this.elements            = [];
 
     this.Bounds = new CMathBounds();
 
@@ -125,13 +126,13 @@ CMathBase.prototype.setCtrPrp = function(txtPrp) // выставляем ctrPrp 
         this.CtrPrp.Merge(txtPrp);
     }
 };
-CMathBase.prototype.Get_CtrPrp = function()
+CMathBase.prototype.Get_CtrPrp = function(bCopy)
 {
     var CtrPrp;
     if(this.bInside === true)
-        CtrPrp = this.Parent.Get_CtrPrp();
+        CtrPrp = this.Parent.Get_CtrPrp(bCopy);
     else
-        CtrPrp = this.CtrPrp.Copy();
+        CtrPrp = bCopy ? this.CtrPrp.Copy() : this.CtrPrp;
 
     return CtrPrp;
 };
@@ -2592,7 +2593,6 @@ function CEmptyRunRecalculateObject(StartLine, StartRange)
 
     this.WrapState   = ALIGN_EMPTY;
 }
-
 CEmptyRunRecalculateObject.prototype =
 {
     Save_Lines : function(Obj, Copy)

@@ -745,7 +745,7 @@ CMathContent.prototype.init = function()
 {
 
 };
-CMathContent.prototype.addElementToContent = function(obj)   //for "read"
+CMathContent.prototype.addElementToContent = function(obj)
 {
     this.Internal_Content_Add(this.Content.length, obj, false);
     this.CurPos = this.Content.length-1;
@@ -1141,74 +1141,76 @@ CMathContent.prototype.private_CorrectContent = function()
 {
     var len = this.Content.length;
 
-    var current = null;
-    var emptyRun;
+    var EmptyRun = null;
+    var RPr      = null;
+    var CurrPos = 0;
 
-    var currPos = 0;
-
-    while(currPos < len)
+    while(CurrPos < len)
     {
-        current = this.Content[currPos];
+        var Current = this.Content[CurrPos];
 
-        var bLeftRun  = currPos > 0 ? this.Content[currPos-1].Type == para_Math_Run : false,
-            bRightRun = currPos < len - 1 ? this.Content[currPos + 1].Type === para_Math_Run : false;
+        var bLeftRun  = CurrPos > 0 ? this.Content[CurrPos-1].Type == para_Math_Run : false,
+            bRightRun = CurrPos < len - 1 ? this.Content[CurrPos + 1].Type === para_Math_Run : false;
 
-        var bCurrComp       = current.Type == para_Math_Composition,
-            bCurrEmptyRun   = current.Type == para_Math_Run && current.Is_Empty();
+        var bCurrComp       = Current.Type == para_Math_Composition,
+            bCurrEmptyRun   = Current.Type == para_Math_Run && Current.Is_Empty();
 
         var bDeleteEmptyRun = bCurrEmptyRun && (bLeftRun || bRightRun);
 
         if(bCurrComp && !bLeftRun)
         {
-            emptyRun = new ParaRun(null, true);
-            emptyRun.Set_RFont_ForMathRun();
+            EmptyRun = new ParaRun(null, true);
+            EmptyRun.Set_RFont_ForMathRun();
 
-            this.Apply_TextPrForRunEmpty(emptyRun, current);
-            this.Internal_Content_Add(currPos, emptyRun);
-            currPos += 2;
+            //this.Apply_TextPrForRunEmpty(EmptyRun, Current);
+            RPr = Current.Get_CtrPrp(false);
+            EmptyRun.Apply_Pr(RPr);
+            this.Internal_Content_Add(CurrPos, EmptyRun);
+            CurrPos += 2;
 
         }
-        else if(bDeleteEmptyRun && false == current.Is_CheckingNearestPos()) // если NearPosArray не нулевой длины, то это вызов происходит на Insert_Content, не удаляем пустые Run
+        else if(bDeleteEmptyRun && false == Current.Is_CheckingNearestPos()) // если NearPosArray не нулевой длины, то это вызов происходит на Insert_Content, не удаляем пустые Run
         {
-            this.Remove_FromContent(currPos, 1);
+            this.Remove_FromContent(CurrPos, 1);
 
-            if (this.CurPos === currPos)
+            if (this.CurPos === CurrPos)
             {
                 if (bLeftRun)
                 {
-                    this.CurPos = currPos - 1;
+                    this.CurPos = CurrPos - 1;
                     this.Content[this.CurPos].Cursor_MoveToEndPos(false);
                 }
                 else
                 {
-                    this.CurPos = currPos;
+                    this.CurPos = CurrPos;
                     this.Content[this.CurPos].Cursor_MoveToStartPos();
                 }
             }
         }
         else
         {
-            currPos++;
+            CurrPos++;
         }
 
         len = this.Content.length;
-
     }
 
     if(len > 1)
     {
         if(this.Content[len - 1].Type == para_Math_Composition)
         {
-            emptyRun = new ParaRun(null, true);
-            emptyRun.Set_RFont_ForMathRun();
+            EmptyRun = new ParaRun(null, true);
+            EmptyRun.Set_RFont_ForMathRun();
 
-            this.Apply_TextPrForRunEmpty(emptyRun, this.Content[len - 1]);
-            this.Internal_Content_Add(currPos, emptyRun);
+            //this.Apply_TextPrForRunEmpty(EmptyRun, this.Content[len - 1]);
+            RPr = this.Content[len - 1].Get_CtrPrp(false);
+            EmptyRun.Apply_Pr(RPr);
+            this.Internal_Content_Add(CurrPos, EmptyRun);
         }
     }
 
 };
-CMathContent.prototype.Apply_TextPrForRunEmpty = function(emptyRun, Composition)
+/*CMathContent.prototype.Apply_TextPrForRunEmpty = function(emptyRun, Composition)
 {
     var ctrPrp = Composition.Get_CtrPrp();
 
@@ -1222,7 +1224,7 @@ CMathContent.prototype.Apply_TextPrForRunEmpty = function(emptyRun, Composition)
     ctrPrp.Italic = undefined;
 
     emptyRun.Set_Pr(ctrPrp);
-};
+};*/
 CMathContent.prototype.Correct_Content = function(bInnerCorrection)
 {
     if (true === bInnerCorrection)
@@ -1347,11 +1349,15 @@ CMathContent.prototype.Get_TextPr = function(ContentPos, Depth)
     var TextPr;
 
     if(this.IsPlaceholder())
-        TextPr = this.Parent.Get_CtrPrp();
+        TextPr = this.Parent.Get_CtrPrp(true);
     else
         TextPr = this.Content[pos].Get_TextPr(ContentPos, Depth + 1);
 
     return TextPr;
+};
+CMathContent.prototype.Get_ParentCtrRunPr = function(bCopy)
+{
+    return this.Parent.Get_CtrPrp(bCopy);
 };
 CMathContent.prototype.Get_CompiledTextPr = function(Copy, bAll)
 {
@@ -1489,7 +1495,7 @@ CMathContent.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll, 
             this.Selection.EndPos   = CRunPos;
 
         }
-        else if(bSelectOneElement && this.Content[StartPos].Type == para_Math_Composition)
+        else if(bSelectOneElement && this.Content[StartPos].Type == para_Math_Composition)  // заселекчен только один мат. объект
         {
             this.Content[StartPos].Apply_TextPr(TextPr, IncFontSize, true);
         }
