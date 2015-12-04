@@ -219,7 +219,10 @@ CHeaderFooter.prototype =
             {
                 // Обновляем интерфейс, чтобы обновить настройки колонтитула, т.к. мы могли попасть в новую секцию
                 this.LogicDocument.Document_UpdateSelectionState();
-                this.LogicDocument.Document_UpdateInterfaceState();
+
+                // Если у нас отслеживаются изменения, тогда интерфейс обновится на функции Continue_TrackRevisions
+                if (true !== this.LogicDocument.Is_TrackRevisions())
+                    this.LogicDocument.Document_UpdateInterfaceState();
             }
         }
         else            

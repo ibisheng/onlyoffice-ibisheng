@@ -466,7 +466,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Add_ToContent = function(Pos
     this.Content.splice(Pos, 0, Item);
     this.private_UpdateTrackRevisions();
 
-    if (true === UpdatePosition)
+    if (false !== UpdatePosition)
     {
         // Обновляем текущую позицию
         if (this.State.ContentPos >= Pos)
@@ -538,7 +538,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove_FromContent = functio
     this.Content.splice(Pos, Count);
     this.private_UpdateTrackRevisions();
 
-    if (true === UpdatePosition)
+    if (false !== UpdatePosition)
     {
         // Обновим текущую позицию
         if (this.State.ContentPos > Pos + Count)
