@@ -24,6 +24,8 @@ window.IS_NATIVE_EDITOR = true;
 var document = {};
 window.document = document;
 
+var History = {};
+
 //-------------------------------------------------------------------------------------------------
 aStandartNumFormats = [];
 aStandartNumFormats[0] = "General";
@@ -3685,15 +3687,16 @@ function OfflineEditor () {
                 {
                     if(customStyles[i].table)
                     {
-                        window['native'].BeginDrawDocumentStyle(customStyles[i].displayName, n);
+                        window['native'].BeginDrawDocumentStyle(customStyles[i].name, n);
+                        this._drawSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont);
 
-                        options =
-                        {
-                            name: i,
-                            displayName: customStyles[i].displayName,
-                            type: 'custom',
-                            image: this._drawSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont)
-                        };
+//                        options =
+//                        {
+//                            name: i,
+//                            displayName: customStyles[i].displayName,
+//                            type: 'custom',
+//                            image: this._drawSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont)
+//                        };
 
                        // result[n] = new formatTablePictures(options);
                         n++;
@@ -3709,15 +3712,16 @@ function OfflineEditor () {
                 {
                     if(defaultStyles[i].table)
                     {
-                        window['native'].BeginDrawDefaultStyle(defaultStyles[i].displayName, n);
+                        window['native'].BeginDrawDefaultStyle(defaultStyles[i].name, n);
+                        this._drawSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont);
 
-                        options =
-                        {
-                            name: i,
-                            displayName: defaultStyles[i].displayName,
-                            type: 'default',
-                            image: this._drawSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont)
-                        };
+//                        options =
+//                        {
+//                            name: i,
+//                            displayName: defaultStyles[i].displayName,
+//                            type: 'default',
+//                            image: this._drawSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont)
+//                        };
                         //result[n] = new formatTablePictures(options);
                         n++;
 
@@ -4326,26 +4330,43 @@ function offline_cell_editor_key_event(keys, width, height, ratio) {
     _null_object.height = height * ratio;
 
     var wb = _api.wb;
+    var cellEditor =  _api.wb.cellEditor;
 
     for (var i = 0; i < keys.length; ++i) {
+        var operationCode = keys[i][0];
+        var value = keys[i][1];
+        var value2 = keys[i][2];
+
         var event = {
-            which:keys[i][1],
+            which: value,
             metaKey: undefined,
             ctrlKey: undefined
         };
 
-        if (1 === keys[i][0]) {
-            wb.cellEditor._onWindowKeyPress(event);
+        if (1 === operationCode) {
+            cellEditor._onWindowKeyPress(event);
         }
-        else if (0 === keys[i][0]) {
-            wb.cellEditor._onWindowKeyDown(event);
+        else if (0 === operationCode) {
+            cellEditor._onWindowKeyDown(event);
+        }
+        else if (2 === operationCode) {
+            var position = value;
+            cellEditor._moveCursor(-11, position);
+        }
+        else if (3 === operationCode) {
+            var left = value;
+            var right = value2;
+
+            cellEditor.cursorPos = left;//Math.min(left, cellEditor.cursorPos);
+            cellEditor.selectionBegin = left;
+            cellEditor.selectionEnd = right;//Math.min(left, cellEditor.selectionEnd);
         }
     }
 
-    wb.cellEditor._draw();
+    cellEditor._draw();
 
-    return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom,
-        wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
+    return [cellEditor.left, cellEditor.top, cellEditor.right, cellEditor.bottom,
+        cellEditor.curLeft, cellEditor.curTop, cellEditor.curHeight];
 }
 function offline_cell_editor_mouse_event(events, width, height, ratio) {
 
@@ -4424,6 +4445,22 @@ function offline_cell_editor_close(x, y, width, height, ratio) {
 }
 function offline_cell_editor_selection() {
     return _api.wb.cellEditor._drawSelection();
+}
+function offline_cell_editor_move_select(position) {
+    var cellEditor =  _api.wb.cellEditor;
+
+    cellEditor._moveCursor(-11, Math.min(position,cellEditor.textRender.chars.length));
+
+//    cellEditor.cursorPos = position;
+//    cellEditor.selectionBegin = position;
+//    cellEditor.selectionEnd = position;
+}
+function offline_cell_editor_select_range(from, to) {
+    var cellEditor =  _api.wb.cellEditor;
+
+    cellEditor.cursorPos = from;
+    cellEditor.selectionBegin = from;
+    cellEditor.selectionEnd = to;
 }
 function offline_get_cell_in_coord (x, y) {
     var worksheet = _api.wb.getWorksheet(),

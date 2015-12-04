@@ -920,7 +920,9 @@
 			//this._showCursor();
 
 			this._updateUndoRedoChanged();
-		};
+
+            window["native"].onCellEditorChangeText(this.textRender.chars);
+        };
 
 		CellEditor.prototype._fireUpdated = function () {
 			var t = this;
@@ -1053,7 +1055,7 @@
 		};
 
 		CellEditor.prototype._cleanSelection = function () {
-			this.overlayCtx.clear();
+			//this.overlayCtx.clear();
 		};
 
 		CellEditor.prototype._drawSelection = function () {
