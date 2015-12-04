@@ -190,7 +190,7 @@ baseEditorsApi.prototype._onEndPermissions = function() {
   }
 };
 // CoAuthoring
-baseEditorsApi.prototype._coAuthoringInitBase = function() {
+baseEditorsApi.prototype._coAuthoringInit = function() {
   var t = this;
   //Если User не задан, отключаем коавторинг.
   if (null == this.User || null == this.User.asc_getId()) {
@@ -221,6 +221,10 @@ baseEditorsApi.prototype._coAuthoringInitBase = function() {
   this.CoAuthoringApi.onWarning = function(e) {
     t.sendEvent('asc_onError', c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
   };
+
+  this._coAuthoringInitEnd();
+};
+baseEditorsApi.prototype._coAuthoringInitEnd = function() {
 };
 // SpellCheck
 baseEditorsApi.prototype._coSpellCheckInit = function() {

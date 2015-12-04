@@ -1056,7 +1056,7 @@ var editor;
   /////////////////////////////////////////////////////////////////////////
   ///////////////////CoAuthoring and Chat api//////////////////////////////
   /////////////////////////////////////////////////////////////////////////
-  spreadsheet_api.prototype._coAuthoringInit = function() {
+  spreadsheet_api.prototype._coAuthoringInitEnd = function() {
     var t = this;
     this.collaborativeEditing = new asc_CCollaborativeEditing(/*handlers*/{
       "askLock": function() {
@@ -1391,7 +1391,6 @@ var editor;
       }
     };
 
-    this._coAuthoringInitBase();
     this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Spreadsheet, this.documentFormatSave);
   };
 

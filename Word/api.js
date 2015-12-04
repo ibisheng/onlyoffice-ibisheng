@@ -916,7 +916,7 @@ asc_docs_api.prototype._coAuthoringSetChanges = function(e, oColor)
 		this._coAuthoringSetChange(e[Index], oColor);
 };
 
-asc_docs_api.prototype._coAuthoringInit = function() {
+asc_docs_api.prototype._coAuthoringInitEnd = function() {
   var t = this;
   this.CoAuthoringApi.onParticipantsChanged = function(e, CountEditUsers) {
     t.asc_fireCallback("asc_onParticipantsChanged", e, CountEditUsers);
@@ -1136,7 +1136,6 @@ asc_docs_api.prototype._coAuthoringInit = function() {
     }
   };
 
-  this._coAuthoringInitBase();
   this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Word, this.documentFormatSave);
 };
 
