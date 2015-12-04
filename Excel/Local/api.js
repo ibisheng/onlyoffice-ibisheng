@@ -108,6 +108,7 @@ window["DesktopOfflineAppDocumentApplyChanges"] = function(_changes)
 /////////////////////////////////////////////////////////
 window["Asc"]['spreadsheet_api'].prototype.asc_Save = function (isNoUserSave)
 {
+  var t = this;
     if (true !== isNoUserSave)
         this.IsUserSave = true;
 
@@ -115,7 +116,7 @@ window["Asc"]['spreadsheet_api'].prototype.asc_Save = function (isNoUserSave)
 	{
 		var _isNaturalSave = this.IsUserSave;
 		this.canSave = false;
-		this.CoAuthoringApi.askSaveChanges(window["Asc"]["editor"].onSaveCallback);
+		this.CoAuthoringApi.askSaveChanges(function(e){t.onSaveCallback(e);});
 		
 		if (this.CoAuthoringApi.onUnSaveLock)
 			this.CoAuthoringApi.onUnSaveLock();
