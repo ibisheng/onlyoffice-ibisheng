@@ -380,53 +380,6 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
       t.sync_ErrorCallback(isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
     }
   };
-  this.CoAuthoringApi.onDocumentOpen = function(inputWrap) {
-    if (inputWrap["data"]) {
-      var input = inputWrap["data"];
-      switch (input["type"]) {
-        case 'open':
-        {
-          switch (input["status"]) {
-            case "updateversion":
-            case "ok":
-              var urls = input["data"];
-              g_oDocumentUrls.init(urls);
-              if (null != urls['Editor.bin']) {
-                if ('ok' === input["status"] || editor.isViewMode) {
-                  _onOpenCommand(function() {
-                  }, {'data': urls['Editor.bin']});
-                } else {
-                  editor.asc_fireCallback("asc_onDocumentUpdateVersion", function() {
-                    if (editor.isCoAuthoringEnable) {
-                      editor.asc_coAuthoringDisconnect();
-                    }
-                    _onOpenCommand(function() {
-                    }, {'data': urls['Editor.bin']});
-                  });
-                }
-              } else {
-                t.asc_fireCallback("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.NoCritical);
-              }
-              break;
-            case "needparams":
-              break;
-            case "err":
-              t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
-              break;
-          }
-        }
-          break;
-        default:
-          if (t.fCurCallback) {
-            t.fCurCallback(input);
-            t.fCurCallback = null;
-          } else {
-            t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-          }
-          break;
-      }
-    }
-  };
 
   this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Presentation, this.documentFormatSave);
 };
@@ -4857,21 +4810,20 @@ asc_docs_api.prototype.sync_ContextMenuCallback = function(Data)
     this.asc_fireCallback("asc_onContextMenu", Data);
 };
 
-function _onOpenCommand(fCallback, incomeObject) {
-	g_fOpenFileCommand(incomeObject["data"], editor.documentUrlChanges, c_oSerFormat.Signature, function (error, result) {
+asc_docs_api.prototype._onOpenCommand = function(data) {
+  var t = this;
+	g_fOpenFileCommand(data, this.documentUrlChanges, c_oSerFormat.Signature, function (error, result) {
 		if (error || !result.bSerFormat) {
-			editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
-			if(fCallback) fCallback();
+			t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
 			return;
 		}
 
-		editor.OpenDocument2(result.url, result.data);
-		editor.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
-		editor.sync_DocSizeCallback(Page_Width, Page_Height);
-		editor.sync_PageOrientCallback(editor.get_DocumentOrientation());
-		if(fCallback) fCallback();
+		t.OpenDocument2(result.url, result.data);
+		t.DocumentOrientation = (null == t.WordControl.m_oLogicDocument) ? true : !t.WordControl.m_oLogicDocument.Orientation;
+		t.sync_DocSizeCallback(Page_Width, Page_Height);
+		t.sync_PageOrientCallback(t.get_DocumentOrientation());
 	});
-}
+};
 function _downloadAs(editor, filetype, actionType, options)
 {
     if (!options) {

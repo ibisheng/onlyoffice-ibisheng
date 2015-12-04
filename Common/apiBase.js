@@ -165,6 +165,13 @@ baseEditorsApi.prototype.sync_TryUndoInFastCollaborative = function()
 {
   this.sendEvent("asc_OnTryUndoInFastCollaborative");
 };
+baseEditorsApi.prototype.getViewMode = function() {
+};
+// Open
+baseEditorsApi.prototype._onOpenCommand = function(data) {
+};
+baseEditorsApi.prototype._onNeedParams = function(data) {
+};
 // Выставление интервала автосохранения (0 - означает, что автосохранения нет)
 baseEditorsApi.prototype.asc_setAutoSaveGap = function(autoSaveGap) {
   if (typeof autoSaveGap === "number") {
@@ -227,10 +234,57 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
   this.CoAuthoringApi.onWarning = function(e) {
     t.sendEvent('asc_onError', c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
   };
+  this.CoAuthoringApi.onDocumentOpen = function(inputWrap) {
+    if (inputWrap["data"]) {
+      var input = inputWrap["data"];
+      switch (input["type"]) {
+        case 'reopen':
+        case 'open':
+          switch (input["status"]) {
+            case "updateversion":
+            case "ok":
+              var urls = input["data"];
+              g_oDocumentUrls.init(urls);
+              if (null != urls['Editor.bin']) {
+                if ('ok' === input["status"] || t.getViewMode()) {
+                  t._onOpenCommand(urls['Editor.bin']);
+                } else {
+                  t.sendEvent("asc_onDocumentUpdateVersion", function() {
+                    if (t.isCoAuthoringEnable) {
+                      t.asc_coAuthoringDisconnect();
+                    }
+                    t._onOpenCommand(urls['Editor.bin']);
+                  })
+                }
+              } else {
+                t.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
+              }
+              break;
+            case "needparams":
+              t._onNeedParams(input["data"]);
+              break;
+            case "err":
+              t.sendEvent("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
+              break;
+          }
+          break;
+        default:
+          if (t.fCurCallback) {
+            t.fCurCallback(input);
+            t.fCurCallback = null;
+          } else {
+            t.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+          }
+          break;
+      }
+    }
+  };
 
   this._coAuthoringInitEnd();
 };
 baseEditorsApi.prototype._coAuthoringInitEnd = function() {
+};
+baseEditorsApi.prototype.asc_coAuthoringDisconnect = function() {
 };
 // SpellCheck
 baseEditorsApi.prototype._coSpellCheckInit = function() {

@@ -639,22 +639,44 @@ var editor;
     return this.wbModel.getWorksheet(sheetIndex).PagePrintOptions;
   };
 
-  spreadsheet_api.prototype._onOpenCommand = function(callback, data) {
+  spreadsheet_api.prototype._onNeedParams = function(data) {
+    var t = this;
+    // Проверяем, возможно нам пришли опции для CSV
+    if (this.documentOpenOptions) {
+      var codePageCsv = c_oAscEncodingsMap[this.documentOpenOptions["codePage"]] || c_oAscCodePageUtf8, delimiterCsv = this.documentOpenOptions["delimiter"];
+      if (null != codePageCsv && null != delimiterCsv) {
+        this.asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV, new asc.asc_CCSVAdvancedOptions(codePageCsv, delimiterCsv));
+        return;
+      }
+    }
+    if (data) {
+      asc_ajax({
+        url: data,
+        dataType: "text",
+        success: function(result) {
+          var cp = JSON.parse(result);
+          cp['encodings'] = getEncodingParams();
+          t.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), t.advancedOptionsAction);
+        },
+        error: function() {
+          t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
+        }
+      });
+    } else {
+      t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+    }
+  };
+  spreadsheet_api.prototype._onOpenCommand = function(data) {
     var t = this;
     g_fOpenFileCommand(data, this.documentUrlChanges, Asc.c_oSerFormat.Signature, function(error, result) {
       if (error || !result.bSerFormat) {
         var oError = {returnCode: c_oAscError.Level.Critical, val: c_oAscError.ID.Unknown};
         t.handlers.trigger("asc_onError", oError.val, oError.returnCode);
-        if (callback) {
-          callback(oError);
-        }
         return;
       }
 
       var wb = t._openDocument(result.data);
-      if (callback) {
-        callback({returnCode: 0, val: wb});
-      }
+      t._startOpenDocument({returnCode: 0, val: wb});
     });
   };
 
@@ -1305,84 +1327,6 @@ var editor;
         // И переходим в режим просмотра т.к. мы не можем сохранить таблицу
         t.asc_setViewerMode(true);
         t.handlers.trigger("asc_onError", isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
-      }
-    };
-    this.CoAuthoringApi.onDocumentOpen = function(inputWrap) {
-      if (inputWrap["data"]) {
-        var input = inputWrap["data"];
-        switch (input["type"]) {
-          case 'reopen':
-          case 'open':
-          {
-            switch (input["status"]) {
-              case "updateversion":
-              case "ok":
-                var urls = input["data"];
-                g_oDocumentUrls.init(urls);
-                if (null != urls['Editor.bin']) {
-                  if ('ok' === input["status"] || t.getViewMode()) {
-                    t._onOpenCommand(function(response) {
-                      t._startOpenDocument(response);
-                    }, urls['Editor.bin']);
-                  } else {
-                    t.handlers.trigger("asc_onDocumentUpdateVersion", function () {
-                      if (t.isCoAuthoringEnable) {
-                        t.asc_coAuthoringDisconnect();
-                      }
-                      t._onOpenCommand(function(response) {
-                        t._startOpenDocument(response);
-                      }, urls['Editor.bin']);
-                    });
-                  }
-                } else {
-                  t.handlers.trigger("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
-                }
-                break;
-              case "needparams":
-				// Проверяем, возможно нам пришли опции для CSV
-				if (t.documentOpenOptions) {
-				  var codePageCsv = c_oAscEncodingsMap[t.documentOpenOptions["codePage"]] || c_oAscCodePageUtf8,
-                      delimiterCsv = t.documentOpenOptions["delimiter"];
-				  if (null !== codePageCsv && undefined !== codePageCsv && null !== delimiterCsv && undefined !== delimiterCsv) {
-					t.asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV, new asc.asc_CCSVAdvancedOptions(codePageCsv, delimiterCsv));
-					break;
-				  }
-				}
-				if(input["data"]) {
-					asc_ajax({
-					  url: input["data"],
-					  dataType: "text",
-					  success: function(result) {
-						var cp = JSON.parse(result);
-						cp['encodings'] = getEncodingParams();
-						t.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), t.advancedOptionsAction);
-					  },
-					  error: function() {
-						t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
-						if (fCallback) {
-						  fCallback({returnCode: c_oAscError.Level.Critical, val: c_oAscError.ID.Unknown});
-						}
-					  }
-					});
-				} else {
-					t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-				}
-                break;
-              case "err":
-                t.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
-                break;
-            }
-          }
-            break;
-          default:
-            if (t.fCurCallback) {
-              t.fCurCallback(input);
-              t.fCurCallback = null;
-            } else {
-              t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-            }
-            break;
-        }
       }
     };
 

@@ -1081,56 +1081,6 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
       t.sync_ErrorCallback(isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
     }
   };
-  this.CoAuthoringApi.onDocumentOpen = function(inputWrap) {
-    if (inputWrap["data"]) {
-      var input = inputWrap["data"];
-      switch (input["type"]) {
-        case 'reopen':
-        case 'open':
-        {
-          switch (input["status"]) {
-            case "updateversion":
-            case "ok":
-              var urls = input["data"];
-              g_oDocumentUrls.init(urls);
-              if (null != urls['Editor.bin']) {
-                if ('ok' === input["status"] || editor.isViewMode) {
-                  _onOpenCommand(function() {
-                  }, {'data': urls['Editor.bin']});
-                } else {
-                  editor.asc_fireCallback("asc_onDocumentUpdateVersion", function() {
-                    if (editor.isCoAuthoringEnable) {
-                      editor.asc_coAuthoringDisconnect();
-                    }
-                    _onOpenCommand(function() {
-                    }, {'data': urls['Editor.bin']});
-                  });
-                }
-              } else {
-                t.asc_fireCallback("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
-              }
-              break;
-            case "needparams":
-              var cp = {'codepage': c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
-              t.asc_fireCallback("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), t.advancedOptionsAction);
-              break;
-            case "err":
-              t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
-              break;
-          }
-        }
-          break;
-        default:
-          if (t.fCurCallback) {
-            t.fCurCallback(input);
-            t.fCurCallback = null;
-          } else {
-            t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-          }
-          break;
-      }
-    }
-  };
 
   this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Word, this.documentFormatSave);
 };
@@ -6457,26 +6407,29 @@ window["asc_nativeOnSpellCheck"] = function (response)
         editor.SpellCheckApi.onSpellCheck(response);
 };
 
-function _onOpenCommand(fCallback, incomeObject) {
-	g_fOpenFileCommand(incomeObject["data"], editor.documentUrlChanges, c_oSerFormat.Signature, function (error, result) {
+asc_docs_api.prototype._onNeedParams = function(data) {
+  var cp = {'codepage': c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
+  this.asc_fireCallback("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), this.advancedOptionsAction);
+};
+asc_docs_api.prototype._onOpenCommand = function(data) {
+  var t = this;
+	g_fOpenFileCommand(data, this.documentUrlChanges, c_oSerFormat.Signature, function (error, result) {
 		if (error) {
-			editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
-			if(fCallback) fCallback();
+			t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
 			return;
 		}
 
-		if (result.changes && editor.VersionHistory) {
-			editor.VersionHistory.changes = result.changes;
-			editor.VersionHistory.applyChanges(editor);
+		if (result.changes && t.VersionHistory) {
+			t.VersionHistory.changes = result.changes;
+			t.VersionHistory.applyChanges(t);
 		}
 
 		if (result.bSerFormat)
-			editor.OpenDocument2(result.url, result.data);
+			t.OpenDocument2(result.url, result.data);
 		else
-			editor.OpenDocument(result.url, result.data);
-		if(fCallback) fCallback();
+			t.OpenDocument(result.url, result.data);
 	});
-}
+};
 function _downloadAs(editor, command, filetype, actionType, options, fCallbackRequest) {
     if (!options) {
       options = {};
