@@ -97,19 +97,7 @@ var editor;
   };
 
   spreadsheet_api.prototype._init = function() {
-    var t = this;
     this.topLineEditorElement = document.getElementById(this.topLineEditorName);
-    // init OnMessage
-    InitOnMessage(function(error, url) {
-      if (c_oAscError.ID.No !== error) {
-        t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
-      } else {
-        t._addImageUrl(url);
-      }
-
-      t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-    });
-
     this.formulasList = getFormulasInfo();
   };
 

@@ -366,15 +366,6 @@ function asc_docs_api(name)
 	this.isStartCoAuthoringOnEndLoad = false;	// Подсоединились раньше, чем документ загрузился
 
 	var oThis = this;
-	// init OnMessage
-	InitOnMessage(function (error, url) {
-		if (c_oAscError.ID.No !== error)
-			oThis.sync_ErrorCallback(error, c_oAscError.Level.NoCritical);
-		else
-			oThis.AddImageUrl(url);
-
-		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-	});
 
     if (window.editor == undefined)
     {
