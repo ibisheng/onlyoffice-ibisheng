@@ -161,3 +161,8 @@ window["NativeCorrectImageUrlOnPaste"] = function(url)
 {
 	return window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
 };
+
+// меняем среду
+AscBrowser.isSafari = false;
+AscBrowser.isSafariMacOs = false;
+window.USER_AGENT_SAFARI_MACOS = false;
