@@ -88,8 +88,6 @@ function asc_docs_api(name)
     //выставляем тип copypaste
     g_bIsDocumentCopyPaste = false;
 
-    this.LongActionCallbacks = [];
-	this.LongActionCallbacksParams = [];
 
     if (window.editor == undefined)
     {
@@ -1340,20 +1338,6 @@ asc_docs_api.prototype.sync_EndAction = function(type, id){
     if (c_oAscAsyncActionType.BlockInteraction == type)
     {
         this.decrementCounterLongAction();
-    }
-};
-
-asc_docs_api.prototype.asc_CheckLongActionCallback = function(_callback, _param)
-{
-    if (this.isLongAction())
-    {
-        this.LongActionCallbacks[this.LongActionCallbacks.length] = _callback;
-        this.LongActionCallbacksParams[this.LongActionCallbacksParams.length] = _param;
-        return false;
-    }
-    else
-    {
-        return true;
     }
 };
 

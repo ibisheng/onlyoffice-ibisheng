@@ -357,9 +357,6 @@ function asc_docs_api(name)
     g_bIsDocumentCopyPaste = true;
     this.DocumentReaderMode = null;
 
-    this.LongActionCallbacks = [];
-    this.LongActionCallbacksParams = [];
-
     this.ParcedDocument = false;
 	this.isStartCoAuthoringOnEndLoad = false;	// Подсоединились раньше, чем документ загрузился
 
@@ -2165,20 +2162,6 @@ asc_docs_api.prototype.sync_EndAction = function(type, id){
     if (c_oAscAsyncActionType.BlockInteraction == type)
     {
         this.decrementCounterLongAction();
-    }
-};
-
-asc_docs_api.prototype.asc_CheckLongActionCallback = function(_callback, _param)
-{
-    if (this.isLongAction())
-    {
-        this.LongActionCallbacks[this.LongActionCallbacks.length] = _callback;
-        this.LongActionCallbacksParams[this.LongActionCallbacksParams.length] = _param;
-        return false;
-    }
-    else
-    {
-        return true;
     }
 };
 

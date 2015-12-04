@@ -250,7 +250,7 @@ CWordCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
     {
         // Здесь проверяем есть ли длинная операция, если она есть, то до ее окончания нельзя делать
         // Undo, иначе точка истории уберется, а изменения допишутся в предыдущую.
-        if (false == oEditor.asc_CheckLongActionCallback(oThis.OnCallback_AskLock, result))
+        if (false == oEditor.checkLongActionCallback(oThis.OnCallback_AskLock, result))
             return;
 
         // Снимаем глобальный лок

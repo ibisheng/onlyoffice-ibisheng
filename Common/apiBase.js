@@ -43,6 +43,8 @@ function baseEditorsApi(name) {
 
   // Long action
   this.IsLongActionCurrent = 0;
+  this.LongActionCallbacks = [];
+  this.LongActionCallbacksParams = [];
 
   // AutoSave
   this.autoSaveGap = 0;					// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
@@ -191,6 +193,15 @@ baseEditorsApi.prototype.decrementCounterLongAction = function() {
     }
     this.LongActionCallbacks.splice(0, _length);
     this.LongActionCallbacksParams.splice(0, _length);
+  }
+};
+baseEditorsApi.prototype.checkLongActionCallback = function(_callback, _param) {
+  if (this.isLongAction()) {
+    this.LongActionCallbacks[this.LongActionCallbacks.length] = _callback;
+    this.LongActionCallbacksParams[this.LongActionCallbacksParams.length] = _param;
+    return false;
+  } else {
+    return true;
   }
 };
 // Open

@@ -357,7 +357,7 @@ CCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
 {
     if (true === CollaborativeEditing.m_bGlobalLock)
     {
-        if (false == editor.asc_CheckLongActionCallback(CollaborativeEditing.OnCallback_AskLock, result))
+        if (false == editor.checkLongActionCallback(CollaborativeEditing.OnCallback_AskLock, result))
             return;
 
         // Снимаем глобальный лок

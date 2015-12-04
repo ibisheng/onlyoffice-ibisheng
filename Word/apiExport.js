@@ -188,7 +188,6 @@ asc_docs_api.prototype['sync_SaveCallBack'] = asc_docs_api.prototype.sync_SaveCa
 asc_docs_api.prototype['sync_DownloadAsCallBack'] = asc_docs_api.prototype.sync_DownloadAsCallBack;
 asc_docs_api.prototype['sync_StartAction'] = asc_docs_api.prototype.sync_StartAction;
 asc_docs_api.prototype['sync_EndAction'] = asc_docs_api.prototype.sync_EndAction;
-asc_docs_api.prototype['asc_CheckLongActionCallback'] = asc_docs_api.prototype.asc_CheckLongActionCallback;
 asc_docs_api.prototype['sync_AddURLCallback'] = asc_docs_api.prototype.sync_AddURLCallback;
 asc_docs_api.prototype['sync_ErrorCallback'] = asc_docs_api.prototype.sync_ErrorCallback;
 asc_docs_api.prototype['sync_HelpCallback'] = asc_docs_api.prototype.sync_HelpCallback;
