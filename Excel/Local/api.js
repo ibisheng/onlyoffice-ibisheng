@@ -35,6 +35,13 @@
 window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
 {
     g_oDocumentUrls.documentUrl = _url;
+	if (g_oDocumentUrls.documentUrl.indexOf("file:") != 0)
+	{
+		if (g_oDocumentUrls.documentUrl.indexOf("/") != 0)
+			g_oDocumentUrls.documentUrl = "/" + g_oDocumentUrls.documentUrl;
+		g_oDocumentUrls.documentUrl = "file://" + g_oDocumentUrls.documentUrl;
+	}
+	
     window["Asc"]["editor"]._OfflineAppDocumentEndLoad(_data);
 };
 

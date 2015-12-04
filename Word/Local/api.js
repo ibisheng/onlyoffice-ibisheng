@@ -24,6 +24,13 @@ asc_docs_api.prototype._OfflineAppDocumentEndLoad = function(_url, _data)
 window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
 {
     g_oDocumentUrls.documentUrl = _url;
+	if (g_oDocumentUrls.documentUrl.indexOf("file:") != 0)
+	{
+		if (g_oDocumentUrls.documentUrl.indexOf("/") != 0)
+			g_oDocumentUrls.documentUrl = "/" + g_oDocumentUrls.documentUrl;
+		g_oDocumentUrls.documentUrl = "file://" + g_oDocumentUrls.documentUrl;
+	}
+	
     editor._OfflineAppDocumentEndLoad(_url, _data);
 };
 
