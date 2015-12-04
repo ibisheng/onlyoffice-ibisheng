@@ -1270,9 +1270,6 @@ var editor;
         t.collaborativeEditing._recalcLockArray(c_oAscLockTypes.kLockTypeOther, oRecalcIndexColumns, oRecalcIndexRows);
       }
     };
-    this.CoAuthoringApi.onFirstLoadChangesEnd = function() {
-      t.asyncServerIdEndLoaded();
-    };
     this.CoAuthoringApi.onStartCoAuthoring = function(isStartEvent) {
       t.startCollaborationEditing();
 

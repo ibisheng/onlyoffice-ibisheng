@@ -217,6 +217,9 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
   this.CoAuthoringApi.onSetIndexUser = function(e) {
     g_oIdCounter.Set_UserId('' + e);
   };
+  this.CoAuthoringApi.onFirstLoadChangesEnd = function() {
+    t.asyncServerIdEndLoaded();
+  };
   this.CoAuthoringApi.onFirstConnect = function() {
     t.isOnFirstConnectEnd = true;
     t._onEndPermissions();

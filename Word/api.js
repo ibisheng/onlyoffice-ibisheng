@@ -1036,9 +1036,6 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
       t.sync_CollaborativeChanges();
     }
   };
-  this.CoAuthoringApi.onFirstLoadChangesEnd = function() {
-    t.asyncServerIdEndLoaded();
-  };
   this.CoAuthoringApi.onStartCoAuthoring = function(isStartEvent) {
     CollaborativeEditing.Start_CollaborationEditing();
     t.asc_setDrawCollaborationMarks(true);
