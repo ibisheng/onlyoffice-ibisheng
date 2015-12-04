@@ -128,6 +128,10 @@ asc_docs_api.prototype.AddImage = function()
 {
 	window["AscDesktopEditor"]["LocalFileGetImageUrlFromOpenFileDialog"]();
 };
+asc_docs_api.prototype.asc_addImage = function()
+{
+  window["AscDesktopEditor"]["LocalFileGetImageUrlFromOpenFileDialog"]();
+};
 asc_docs_api.prototype.asc_isOffline = function()
 {
 	return true;

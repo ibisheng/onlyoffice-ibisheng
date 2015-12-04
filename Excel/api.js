@@ -2621,17 +2621,17 @@ var editor;
 
   spreadsheet_api.prototype.asc_changeImageFromFile = function() {
     this.isImageChangeUrl = true;
-    this.asc_showImageFileDialog();
+    this.asc_addImage();
   };
 
   spreadsheet_api.prototype.asc_changeShapeImageFromFile = function() {
     this.isShapeImageChangeUrl = true;
-    this.asc_showImageFileDialog();
+    this.asc_addImage();
   };
 
   spreadsheet_api.prototype.asc_changeArtImageFromFile = function() {
     this.isTextArtChangeUrl = true;
-    this.asc_showImageFileDialog();
+    this.asc_addImage();
   };
 
   spreadsheet_api.prototype.asc_putPrLineSpacing = function(type, value) {
@@ -3483,6 +3483,7 @@ var editor;
   prot["asc_getWordChartObject"] = prot.asc_getWordChartObject;
   prot["asc_cleanWorksheet"] = prot.asc_cleanWorksheet;
   prot["asc_showImageFileDialog"] = prot.asc_showImageFileDialog;
+  prot["asc_addImage"] = prot.asc_addImage;
   prot["asc_setData"] = prot.asc_setData;
   prot["asc_getData"] = prot.asc_getData;
 

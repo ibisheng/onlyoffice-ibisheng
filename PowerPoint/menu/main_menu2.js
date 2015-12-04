@@ -815,7 +815,7 @@ $("#td_orient, #td_redo, #td_undo, #td_bold, #td_italic, #td_underline, #td_prin
 			//_img.innerHtml = "./Images/Test.jpg";
             _img.src = "./Images/Test.jpg";
             */
-            editor.AddImage(true);
+            editor.asc_addImage(true);
             break;
 		case "td_imageInText2":
             editor.AddImageUrl("./Images/Test.jpg");

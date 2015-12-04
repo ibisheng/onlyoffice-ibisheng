@@ -341,6 +341,7 @@ asc_docs_api.prototype['sync_TblAlignChangedCallback'] = asc_docs_api.prototype.
 asc_docs_api.prototype['ChangeImageFromFile'] = asc_docs_api.prototype.ChangeImageFromFile;
 asc_docs_api.prototype['ChangeShapeImageFromFile'] = asc_docs_api.prototype.ChangeShapeImageFromFile;
 asc_docs_api.prototype['AddImage'] = asc_docs_api.prototype.AddImage;
+asc_docs_api.prototype['asc_addImage'] = asc_docs_api.prototype.asc_addImage;
 asc_docs_api.prototype['AddImageUrl2'] = asc_docs_api.prototype.AddImageUrl2;
 asc_docs_api.prototype['AddImageUrl'] = asc_docs_api.prototype.AddImageUrl;
 asc_docs_api.prototype['AddImageUrlAction'] = asc_docs_api.prototype.AddImageUrlAction;

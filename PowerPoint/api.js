@@ -2847,22 +2847,22 @@ asc_docs_api.prototype.sync_TblAlignChangedCallback = function(style){
 asc_docs_api.prototype.ChangeImageFromFile = function()
 {
     this.isImageChangeUrl = true;
-    this.AddImage();
+    this.asc_addImage();
 };
 asc_docs_api.prototype.ChangeShapeImageFromFile = function()
 {
     this.isShapeImageChangeUrl = true;
-    this.AddImage();
+    this.asc_addImage();
 };
 asc_docs_api.prototype.ChangeSlideImageFromFile = function()
 {
     this.isSlideImageChangeUrl = true;
-    this.AddImage();
+    this.asc_addImage();
 };
 asc_docs_api.prototype.ChangeArtImageFromFile = function()
 {
     this.isTextArtChangeUrl = true;
-    this.AddImage();
+    this.asc_addImage();
 };
 
 asc_docs_api.prototype.AddImage = function(){

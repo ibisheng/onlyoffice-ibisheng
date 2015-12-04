@@ -230,6 +230,7 @@ asc_docs_api.prototype['ChangeShapeImageFromFile'] = asc_docs_api.prototype.Chan
 asc_docs_api.prototype['ChangeSlideImageFromFile'] = asc_docs_api.prototype.ChangeSlideImageFromFile;
 asc_docs_api.prototype['ChangeArtImageFromFile'] = asc_docs_api.prototype.ChangeArtImageFromFile;
 asc_docs_api.prototype['AddImage'] = asc_docs_api.prototype.AddImage;
+asc_docs_api.prototype['asc_addImage'] = asc_docs_api.prototype.asc_addImage;
 asc_docs_api.prototype['StartAddShape'] = asc_docs_api.prototype.StartAddShape;
 asc_docs_api.prototype['AddTextArt'] = asc_docs_api.prototype.AddTextArt;
 asc_docs_api.prototype['canGroup'] = asc_docs_api.prototype.canGroup;
