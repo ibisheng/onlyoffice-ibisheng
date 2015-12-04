@@ -333,8 +333,20 @@ CShowPr.prototype.Copy = function(){
 
 function CPresentation(DrawingDocument)
 {
-    this.History   = History;
-    History.Document = this;
+    this.History              = History;
+    this.IdCounter            = g_oIdCounter;
+    this.TableId              = g_oTableId;
+    this.CollaborativeEditing = (("undefined" !== typeof(CCollaborativeEditing) && CollaborativeEditing instanceof CCollaborativeEditing) ? CollaborativeEditing : null);
+    this.Api                  = editor;
+    //------------------------------------------------------------------------
+    if (DrawingDocument)
+    {
+        if (this.History)
+            this.History.Set_LogicDocument(this);
+
+        if (this.CollaborativeEditing)
+            this.CollaborativeEditing.m_oLogicDocument = this;
+    }
 
     //------------------------------------------------------------------------
 
@@ -491,6 +503,14 @@ CPresentation.prototype =
     Init : function()
     {
 
+    },
+
+    Get_Api: function(){
+        return this.Api;
+    },
+
+    Get_CollaborativeEditing: function(){
+        return this.CollaborativeEditing;
     },
 
     addSlideMaster: function(pos, master)
