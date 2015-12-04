@@ -29,7 +29,6 @@ var editor;
 
     /************ private!!! **************/
     this.topLineEditorName = inputName;
-    this.HtmlElement = null;
     this.topLineEditorElement = null;
 
     this.controller = new asc.asc_CEventsController();
