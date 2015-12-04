@@ -1162,7 +1162,6 @@ CMathContent.prototype.private_CorrectContent = function()
             EmptyRun = new ParaRun(null, true);
             EmptyRun.Set_RFont_ForMathRun();
 
-            //this.Apply_TextPrForRunEmpty(EmptyRun, Current);
             RPr = Current.Get_CtrPrp(false);
             EmptyRun.Apply_Pr(RPr);
             this.Internal_Content_Add(CurrPos, EmptyRun);
@@ -1202,7 +1201,6 @@ CMathContent.prototype.private_CorrectContent = function()
             EmptyRun = new ParaRun(null, true);
             EmptyRun.Set_RFont_ForMathRun();
 
-            //this.Apply_TextPrForRunEmpty(EmptyRun, this.Content[len - 1]);
             RPr = this.Content[len - 1].Get_CtrPrp(false);
             EmptyRun.Apply_Pr(RPr);
             this.Internal_Content_Add(CurrPos, EmptyRun);
@@ -1210,21 +1208,7 @@ CMathContent.prototype.private_CorrectContent = function()
     }
 
 };
-/*CMathContent.prototype.Apply_TextPrForRunEmpty = function(emptyRun, Composition)
-{
-    var ctrPrp = Composition.Get_CtrPrp();
 
-    var mathPrp = new CMPrp();
-
-    mathPrp.SetStyle(ctrPrp.Bold, ctrPrp.Italic);
-
-    emptyRun.Set_MathPr(mathPrp);
-
-    ctrPrp.Bold   = undefined;
-    ctrPrp.Italic = undefined;
-
-    emptyRun.Set_Pr(ctrPrp);
-};*/
 CMathContent.prototype.Correct_Content = function(bInnerCorrection)
 {
     if (true === bInnerCorrection)
