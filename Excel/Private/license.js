@@ -34,14 +34,6 @@
     }
     this._coAuthoringInit();
   };
-  asc['spreadsheet_api'].prototype._onEndPermissions = function() {
-    if (null !== this.licenseResult && this.isOnFirstConnectEnd) {
-      var oResult = new asc.asc_CAscEditorPermissions();
-      oResult.asc_setCanLicense(g_oLicenseResult.Success === this.licenseResult.res);
-      oResult.asc_setCanBranding(g_oLicenseResult.Error !== this.licenseResult.res); // Для тех, у кого есть лицензия, branding доступен
-      this.handlers.trigger('asc_onGetEditorPermissions', oResult);
-    }
-  };
 
   prot = asc['spreadsheet_api'].prototype;
   prot['asc_getEditorPermissions'] = prot.asc_getEditorPermissions;
