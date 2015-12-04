@@ -2428,6 +2428,15 @@ CParagraphContentWithParagraphLikeContent.prototype.Reject_RevisionChanges = fun
         }
     }
 };
+CParagraphContentWithParagraphLikeContent.prototype.private_UpdateTrackRevisions = function()
+{
+    if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.LogicDocument.Get_TrackRevisionsManager)
+    {
+        var RevisionsManager = this.Paragraph.LogicDocument.Get_TrackRevisionsManager();
+        RevisionsManager.Check_Paragraph(this.Paragraph);
+    }
+};
+
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые должны быть реализованы в классах наследниках
 //----------------------------------------------------------------------------------------------------------------------

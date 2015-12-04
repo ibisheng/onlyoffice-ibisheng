@@ -2858,6 +2858,7 @@ var historyitem_Math_RFontsEastAsia            =  18;
 var historyitem_Math_RFontsHint                =  19;
 var historyitem_Math_CtrPrpHighLight           =  20;
 var historyitem_Math_ArgSize                   =  21;
+var historyitem_Math_ReviewType                =  22;
 
 
 function ReadChanges_FromBinary(Reader, Class)
@@ -3691,6 +3692,60 @@ CChangesMathEqArrayPr.prototype.Load_Changes = function(Reader, Class)
     this.Redo(Class);
 };
 
+
+function CChangesMathBaseReviewType(NewType, NewInfo, OldType, OldInfo)
+{
+    this.NewType = NewType;
+    this.NewInfo = NewInfo ? undefined : NewInfo.Copy();
+    this.OldType = OldType;
+    this.OldInfo = OldInfo ? undefined : OldInfo.Copy();
+}
+CChangesMathBaseReviewType.prototype.Type = historyitem_Math_ReviewType;
+CChangesMathBaseReviewType.prototype.Undo = function(Class)
+{
+    Class.raw_SetReviewType(this.OldType, this.OldInfo);
+};
+CChangesMathBaseReviewType.prototype.Redo = function(Class)
+{
+    Class.raw_SetReviewType(this.NewType, this.NewInfo);
+};
+CChangesMathBaseReviewType.prototype.Save_Changes = function(Writer)
+{
+    // Long        : ReviewType
+    // Bool        : ReviewInfo undefined ?
+    //   false     : ReviewInfo
+
+    Writer.WriteLong(this.NewType);
+
+    if (undefined === this.NewInfo)
+    {
+        Writer.WriteBool(true);
+    }
+    else
+    {
+        Writer.WriteBool(false);
+        this.NewInfo.Write_ToBinary(Writer);
+    }
+};
+CChangesMathBaseReviewType.prototype.Load_Changes = function(Reader, Class)
+{
+    // Long        : ReviewType
+    // CReviewInfo : ReviewInfo
+
+    this.NewType = Reader.GetLong();
+
+    if (true === Reader.GetBool())
+    {
+        this.NewInfo = undefined;
+    }
+    else
+    {
+        this.NewInfo = new CReviewInfo();
+        this.NewInfo.Read_FromBinary(Reader);
+    }
+
+    this.Redo(Class);
+};
 
 function MatGetKoeffArgSize(FontSize, ArgSize)
 {

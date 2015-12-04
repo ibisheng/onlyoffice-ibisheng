@@ -73,6 +73,13 @@ function CMathBase(bInside)
 
     this.NearPosArray = [];
 
+    this.ReviewType = reviewtype_Common;
+    this.ReviewInfo = new CReviewInfo();
+
+    var Api = editor;
+    if (Api && !Api.isPresentationEditor && Api.WordControl && Api.WordControl.m_oLogicDocument && true === Api.WordControl.m_oLogicDocument.Is_TrackRevisions())
+        this.ReviewType = reviewtype_Add;
+
     return this;
 }
 Asc.extendClass(CMathBase, CParagraphContentWithParagraphLikeContent);
@@ -1306,6 +1313,9 @@ CMathBase.prototype.Write_ToBinary2 = function( Writer )
     // Array of Strings : Content[Index].Id
     // Variable         : Pr
     // Variable(CTextPr): CtrPrp
+    // Long             : ReviewType
+    // Bool             : undefined == ReviewInfo
+    // if false         : ReviewInfo
 
     Writer.WriteString2(this.Id);
 
@@ -1318,6 +1328,17 @@ CMathBase.prototype.Write_ToBinary2 = function( Writer )
 
     this.Pr.Write_ToBinary(Writer);
     this.CtrPrp.Write_ToBinary(Writer);
+    Writer.WriteLong(this.ReviewType);
+
+    if (undefined !== this.ReviewInfo)
+    {
+        Writer.WriteBool(false);
+        this.ReviewInfo.Write_ToBinary(Writer);
+    }
+    else
+    {
+        Writer.WriteBool(true);
+    }
 };
 CMathBase.prototype.Read_FromBinary2 = function( Reader )
 {
@@ -1326,6 +1347,10 @@ CMathBase.prototype.Read_FromBinary2 = function( Reader )
     // Array of Strings : Content[Index].Id
     // Variable         : Pr
     // Variable(CTextPr): CtrPrp
+    // Long             : ReviewType
+    // Bool             : undefined == ReviewInfo
+    // if false         : ReviewInfo
+
 
     this.Id = Reader.GetString2();
 
@@ -1340,6 +1365,18 @@ CMathBase.prototype.Read_FromBinary2 = function( Reader )
 
     this.Pr.Read_FromBinary(Reader);
     this.CtrPrp.Read_FromBinary(Reader);
+
+    this.ReviewType = Reader.GetLong();
+    if (true === Reader.GetBool())
+    {
+        this.ReviewInfo = undefined;
+    }
+    else
+    {
+        this.ReviewInfo = new CReviewInfo();
+        this.ReviewInfo.Read_FromBinary(Reader);
+    }
+
 
     this.fillContent();
 };
@@ -1798,6 +1835,11 @@ CMathBase.prototype.Make_ShdColor = function(PDSE, CurTextPr)
         }
     }
 
+    if (reviewtype_Common !== this.ReviewType)
+    {
+        pGraphics.p_color(REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, 255);
+        pGraphics.b_color1(REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, 255);
+    }
 
     if(BgColor == undefined)
         BgColor = new CDocumentColor( 255, 255, 255, false );
@@ -2264,6 +2306,39 @@ CMathBase.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRang
             this.Content[CurPos].Get_Range_VisibleWidth(RangeW, _CurLine, _CurRange);
         }
     }
+};
+CMathBase.prototype.raw_SetReviewType = function(Type, Info)
+{
+    this.ReviewType = Type;
+    this.ReviewInfo = Info;
+    this.private_UpdateTrackRevisions();
+};
+CMathBase.prototype.Get_ReviewType = function()
+{
+    return this.ReviewType;
+};
+CMathBase.prototype.Set_ReviewType = function(Value)
+{
+    CMathBase.superclass.Set_ReviewType.apply(this, arguments);
+
+    if (Value !== this.ReviewType)
+    {
+        var OldReviewType = this.ReviewType;
+        var OldReviewInfo = this.ReviewInfo.Copy();
+
+        this.ReviewType = Value;
+        this.ReviewInfo.Update();
+
+        History.Add(this, new CChangesMathBaseReviewType(Value, this.ReviewInfo, OldReviewType, OldReviewInfo));
+        this.private_UpdateTrackRevisions();
+    }
+};
+CMathBase.prototype.Set_ReviewTypeWithInfo = function(ReviewType, ReviewInfo)
+{
+    CMathBase.superclass.Set_ReviewType.apply(this, arguments);
+
+    History.Add(this, new CChangesMathBaseReviewType(ReviewType, ReviewInfo, this.ReviewType, this.ReviewInfo));
+    this.raw_SetReviewType(ReviewType, ReviewInfo);
 };
 
 CMathBase.prototype.Math_Set_EmptyRange         = CMathContent.prototype.Math_Set_EmptyRange;
