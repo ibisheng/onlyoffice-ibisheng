@@ -110,7 +110,6 @@ function CHistory(workbook)
 	this.workbook = workbook;
     this.Index    = -1;
     this.Points   = [];
-	this.CurPoint = null;
     this.TurnOffHistory = 0;
     this.Transaction = 0;
     this.LocalChange = false;//если true все добавленный изменения не пойдут в совместное редактирование.
@@ -134,7 +133,6 @@ CHistory.prototype.Clear = function()
 {
 	this.Index         = -1;
 	this.Points.length = 0;
-	this.CurPoint = null;
 	this.TurnOffHistory = 0;
 	this.Transaction = 0;
 	this.LoadFonts = {};
@@ -149,12 +147,12 @@ CHistory.prototype.Clear = function()
 /** @returns {boolean} */
 CHistory.prototype.Can_Undo = function()
 {
-	return ((null != this.CurPoint && this.CurPoint.Items.length > 0) || this.Index >= 0);
+	return this.Index >= 0;
 };
 /** @returns {boolean} */
 CHistory.prototype.Can_Redo = function()
 {
-	return ((null == this.CurPoint || 0 == this.CurPoint.Items.length) && this.Points.length > 0 && this.Index < this.Points.length - 1);
+	return this.Points.length > 0 && this.Index < this.Points.length - 1;
 };
 
 CHistory.prototype.Undo = function()
@@ -165,8 +163,6 @@ CHistory.prototype.Undo = function()
 
 	if (this.Index === this.Points.length - 1)
 		this.LastState = this.workbook.handlers.trigger("getSelectionState");
-
-	this._checkCurPoint();
 
 	var Point = this.Points[this.Index--];
 	var oRedoObjectParam = new Asc.RedoObjectParam();
@@ -248,7 +244,10 @@ CHistory.prototype.RedoAdd = function(oRedoObjectParam, Class, Type, sheetid, ra
 			}
 		}
 	}
-	this._addRedoObjectParam(oRedoObjectParam, this.CurPoint.Items[this.CurPoint.Items.length - 1]);
+    var curPoint = this.Points[this.Index];
+    if (curPoint) {
+        this._addRedoObjectParam(oRedoObjectParam, curPoint.Items[curPoint.Items.length - 1]);
+    }
 };
 
 CHistory.prototype.CheckXfrmChanges = function(xfrm)
@@ -289,7 +288,6 @@ CHistory.prototype.RedoExecute = function(Point, oRedoObjectParam)
 CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 	var wsViews, i, oState = null, bCoaut = false;
 	if (!bUndo && null == Point) {
-		this._checkCurPoint();
 		Point = this.Points[this.Index];
 		CollaborativeEditing.Apply_LinkData();
 		bCoaut = true;
@@ -415,7 +413,6 @@ CHistory.prototype.Redo = function()
 	var oRedoObjectParam = new Asc.RedoObjectParam();
 	this.UndoRedoPrepare(oRedoObjectParam, false);
 
-	this.CurPoint = null;
 	var Point = this.Points[++this.Index];
 
 	this.RedoExecute(Point, oRedoObjectParam);
@@ -456,7 +453,7 @@ CHistory.prototype.Get_RecalcData = function(Point2)
 			}
 			else
 			{
-				Point = this.CurPoint;
+				Point = this.Points[this.Index];
 			}
 			if(Point)
 			{
@@ -561,7 +558,6 @@ CHistory.prototype.Create_NewPoint = function()
 	if (null !== this.SavedIndex && this.Index < this.SavedIndex)
 		this.Set_SavedIndex(this.Index);
 
-	this._checkCurPoint();
 	var Items = [];
 	var UpdateRigions = {};
 	var Time  = new Date().getTime();
@@ -573,7 +569,8 @@ CHistory.prototype.Create_NewPoint = function()
 	if (wsActive)
 		UndoSheetId = wsActive.getId();
 
-	this.CurPoint = {
+    // Создаем новую точку
+    this.Points[++this.Index] = {
 		Items : Items, // Массив изменений, начиная с текущего момента
 		UpdateRigions : UpdateRigions,
 		UndoSheetId: UndoSheetId,
@@ -582,7 +579,10 @@ CHistory.prototype.Create_NewPoint = function()
 		SelectRangeRedo : oSelectRange,
 		Time  : Time,   // Текущее время
 		SelectionState : oSelectionState
-	};
+    };
+
+    // Удаляем ненужные точки
+    this.Points.length = this.Index + 1;
 
 	this._addFonts(true);
 };
@@ -592,12 +592,8 @@ CHistory.prototype.Create_NewPoint = function()
 // Data  - сами изменения
 CHistory.prototype.Add = function(Class, Type, sheetid, range, Data, LocalChange)
 {
-	if ( 0 !== this.TurnOffHistory )
+	if ( 0 !== this.TurnOffHistory || this.Index < 0 )
 		return;
-
-	if ( null == this.CurPoint )
-		return;
-	var oCurPoint = this.CurPoint;
 
 	var Item;
 	if ( this.RecIndex >= this.Index )
@@ -633,19 +629,20 @@ CHistory.prototype.Add = function(Class, Type, sheetid, range, Data, LocalChange
 	if(null != LocalChange)
 		Item.LocalChange = LocalChange;
 
-	oCurPoint.Items.push( Item );
+    var curPoint = this.Points[this.Index];
+	curPoint.Items.push( Item );
 	if (null != range && null != sheetid)
 	{
-		var updateRange = oCurPoint.UpdateRigions[sheetid];
+		var updateRange = curPoint.UpdateRigions[sheetid];
 		if(null != updateRange)
 			updateRange.union2(range);
 		else
 			updateRange = range.clone();
-		oCurPoint.UpdateRigions[sheetid] = updateRange;
+		curPoint.UpdateRigions[sheetid] = updateRange;
 	}
 	if (null != sheetid)
-		oCurPoint.UndoSheetId = sheetid;
-	if(1 == oCurPoint.Items.length)
+		curPoint.UndoSheetId = sheetid;
+	if(1 == curPoint.Items.length)
 		this._sendCanUndoRedo();
 };
 
@@ -655,64 +652,56 @@ CHistory.prototype._sendCanUndoRedo = function()
 	this.workbook.handlers.trigger("setCanRedo", this.Can_Redo());
 	this.workbook.handlers.trigger("setDocumentModified", this.Is_Modified());
 };
-CHistory.prototype._checkCurPoint = function()
-{
-	if(null != this.CurPoint && this.CurPoint.Items.length > 0)
-	{
-		// Создаем новую точку
-		this.Points[++this.Index] = this.CurPoint;
-		// Удаляем ненужные точки
-		this.Points.length = this.Index + 1;
-		this.CurPoint = null;
-	}
-};
 CHistory.prototype.SetSelection = function(range)
 {
 	if ( 0 !== this.TurnOffHistory )
 		return;
-
-	if ( null == this.CurPoint )
-		return;
-	this.CurPoint.SelectRange = range;
+    var curPoint = this.Points[this.Index];
+	if (curPoint) {
+        curPoint.SelectRange = range;
+    }
 };
 CHistory.prototype.SetSelectionRedo = function(range)
 {
 	if ( 0 !== this.TurnOffHistory )
 		return;
-
-	if ( null == this.CurPoint )
-		return;
-	this.CurPoint.SelectRangeRedo = range;
+    var curPoint = this.Points[this.Index];
+	if (curPoint) {
+        curPoint.SelectRangeRedo = range;
+    }
 };
 CHistory.prototype.GetSelection = function()
 {
 	var oRes = null;
-	if(null != this.CurPoint)
-		oRes = this.CurPoint.SelectRange;
+    var curPoint = this.Points[this.Index];
+	if(curPoint)
+		oRes = curPoint.SelectRange;
 	return oRes;
 };
 CHistory.prototype.GetSelectionRedo = function()
 {
 	var oRes = null;
-	if(null != this.CurPoint)
-		oRes = this.CurPoint.SelectRangeRedo;
+    var curPoint = this.Points[this.Index];
+    if (curPoint) {
+        oRes = curPoint.SelectRangeRedo;
+    }
 	return oRes;
 };
 CHistory.prototype.SetSheetRedo = function (sheetId) {
     if (0 !== this.TurnOffHistory)
         return;
-
-    if (null == this.CurPoint)
-        return;
-    this.CurPoint.RedoSheetId = sheetId;
+    var curPoint = this.Points[this.Index];
+    if (curPoint) {
+        curPoint.RedoSheetId = sheetId;
+    }
 };
 CHistory.prototype.SetSheetUndo = function (sheetId) {
     if (0 !== this.TurnOffHistory)
         return;
-
-    if (null == this.CurPoint)
-        return;
-    this.CurPoint.UndoSheetId = sheetId;
+    var curPoint = this.Points[this.Index];
+    if (curPoint) {
+        curPoint.UndoSheetId = sheetId;
+    }
 };
 CHistory.prototype.TurnOff = function()
 {
@@ -798,7 +787,6 @@ CHistory.prototype.Is_Modified = function(IsUserSave) {
 CHistory.prototype.GetSerializeArray = function()
 {
 	var aRes = [];
-	this._checkCurPoint();
 	var i = 0;
 	if (null != this.SavedIndex)
 		i = this.SavedIndex + 1;
@@ -818,10 +806,11 @@ CHistory.prototype.GetSerializeArray = function()
 //функция, которая перемещает последнее действие на первую позицию(в текущей точке)
 CHistory.prototype.ChangeActionsEndToStart = function()
 {
-	if(null != this.CurPoint && this.CurPoint.Items.length > 0)
+    var curPoint = this.Points[this.Index];
+	if(curPoint && curPoint.Items.length > 0)
 	{
-		var endAction = this.CurPoint.Items.pop();
-		this.CurPoint.Items.unshift(endAction);
+		var endAction = curPoint.Items.pop();
+		curPoint.Items.unshift(endAction);
 	}
 };
 CHistory.prototype.loadFonts = function (fonts) {
