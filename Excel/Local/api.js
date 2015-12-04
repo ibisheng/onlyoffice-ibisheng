@@ -121,8 +121,10 @@ CHistory.prototype.Have_Changes = function(IsUserSave)
 	
 window["DesktopOfflineAppDocumentApplyChanges"] = function(_changes)
 {
-    window["Asc"]["editor"].asc_nativeApplyChanges(_changes);
-	window["Asc"]["editor"].asc_nativeCalculateFile();
+	for (var i = 0, l = _changes.length; i < l; ++i) 
+	{
+		window["Asc"]["editor"].CoAuthoringApi.onSaveChanges(_changes[i], null, true);
+    }
 };
 
 /////////////////////////////////////////////////////////
