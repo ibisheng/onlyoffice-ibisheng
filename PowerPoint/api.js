@@ -2868,21 +2868,6 @@ asc_docs_api.prototype.ChangeArtImageFromFile = function()
 asc_docs_api.prototype.AddImage = function(){
   this.asc_addImage();
 };
-asc_docs_api.prototype._uploadCallback = function(error, files) {
-	var t =this;
-	if (c_oAscError.ID.No !== error) {
-		t.sync_ErrorCallback(error, c_oAscError.Level.NoCritical);
-	} else {
-		t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-		UploadImageFiles(files, this.documentId, this.documentUserId, function (error, url) {
-			if (c_oAscError.ID.No !== error)
-				t.sync_ErrorCallback(error, c_oAscError.Level.NoCritical);
-			else
-				t.AddImageUrl(url);
-			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-		});
-	}
-};
 asc_docs_api.prototype.StartAddShape = function(prst, is_apply)
 {
     this.WordControl.m_oLogicDocument.StartAddShape(prst, is_apply);
@@ -2911,6 +2896,10 @@ asc_docs_api.prototype.canUnGroup = function()
     return this.WordControl.m_oLogicDocument.canUnGroup();
 };
 
+asc_docs_api.prototype._addImageUrl = function(url) {
+  // ToDo пока временная функция для стыковки.
+  this.AddImageUrl(url);
+};
 asc_docs_api.prototype.AddImageUrl = function(url){
 	if(g_oDocumentUrls.getLocal(url))
 	{

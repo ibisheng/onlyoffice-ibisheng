@@ -2336,22 +2336,6 @@ var editor;
     // ToDo заменить на общую функцию для всех
     this.asc_addImage();
   };
-  spreadsheet_api.prototype._uploadCallback = function(error, files) {
-    var t = this;
-    if (c_oAscError.ID.No !== error) {
-      this.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
-    } else {
-      this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-      UploadImageFiles(files, this.documentId, this.documentUserId, function(error, url) {
-        if (c_oAscError.ID.No !== error) {
-          t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
-        } else {
-          t._addImageUrl(url);
-        }
-        t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-      });
-    }
-  };
   spreadsheet_api.prototype._addImageUrl = function(url) {
     var ws = this.wb.getWorksheet();
     if (ws) {

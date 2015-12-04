@@ -4351,26 +4351,15 @@ asc_docs_api.prototype.ChangeShapeImageFromFile = function()
 asc_docs_api.prototype.AddImage = function(){
 	this.asc_addImage();
 };
-asc_docs_api.prototype._uploadCallback = function(error, files){
-	var t = this;
-	if (c_oAscError.ID.No !== error) {
-		t.sync_ErrorCallback(error, c_oAscError.Level.NoCritical);
-	} else {
-		t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-		UploadImageFiles(files, this.documentId, this.documentUserId, function (error, url) {
-			if (c_oAscError.ID.No !== error)
-				t.sync_ErrorCallback(error, c_oAscError.Level.NoCritical);
-			else
-				t.AddImageUrl(url);
-			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-		});
-	}
-};
 asc_docs_api.prototype.AddImageUrl2 = function(url)
 {
     this.AddImageUrl(getFullImageSrc2(url));
 };
 
+asc_docs_api.prototype._addImageUrl = function(url) {
+  // ToDo пока временная функция для стыковки.
+  this.AddImageUrl(url);
+};
 asc_docs_api.prototype.AddImageUrl = function(url, imgProp)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )

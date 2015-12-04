@@ -177,6 +177,22 @@ baseEditorsApi.prototype.asc_addImage = function() {
     t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
   });
 };
+baseEditorsApi.prototype._uploadCallback = function(error, files) {
+  var t = this;
+  if (c_oAscError.ID.No !== error) {
+    this.sendEvent("asc_onError", error, c_oAscError.Level.NoCritical);
+  } else {
+    this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+    UploadImageFiles(files, this.documentId, this.documentUserId, function(error, url) {
+      if (c_oAscError.ID.No !== error) {
+        t.sendEvent("asc_onError", error, c_oAscError.Level.NoCritical);
+      } else {
+        t._addImageUrl(url);
+      }
+      t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+    });
+  }
+};
 // Version History
 baseEditorsApi.prototype.asc_showRevision = function(newObj) {
 };
