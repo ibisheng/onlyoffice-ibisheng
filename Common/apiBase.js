@@ -38,6 +38,9 @@ function baseEditorsApi(name) {
   this.OpenDocumentProgress = new COpenProgress();
   this.documentOrigin = ''; // ToDo скорее всего лишняя переменная и можно обойтись и без нее
 
+  // Переменная отвечает, получили ли мы ответ с сервера совместного редактирования
+  this.ServerIdWaitComplete = false;
+
   // AutoSave
   this.autoSaveGap = 0;					// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
 

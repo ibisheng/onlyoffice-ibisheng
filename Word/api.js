@@ -334,7 +334,6 @@ function asc_docs_api(name)
     this.isLoadImagesCustom = false;
     this.loadCustomImageMap = null;
 
-    this.ServerIdWaitComplete = false;
     this.ServerImagesWaitComplete = false;
 
     this.DocumentOrientation = orientation_Portrait ? true : false;

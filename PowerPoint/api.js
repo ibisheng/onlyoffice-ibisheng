@@ -70,7 +70,6 @@ function asc_docs_api(name)
     this.isSaveFonts_Images = false;
     this.saveImageMap = null;
 
-    this.ServerIdWaitComplete = false;
     this.ServerImagesWaitComplete = false;
 
     this.ParcedDocument = false;
