@@ -98,7 +98,6 @@ var editor;
 
   spreadsheet_api.prototype._init = function() {
     var t = this;
-    this.HtmlElement = document.getElementById(this.HtmlElementName);
     this.topLineEditorElement = document.getElementById(this.topLineEditorName);
     // init OnMessage
     InitOnMessage(function(error, url) {
@@ -109,10 +108,6 @@ var editor;
       }
 
       t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-    });
-    // init drag&drop
-    InitDragAndDrop(this.HtmlElement, function(error, files) {
-      t._uploadCallback(error, files);
     });
 
     this.formulasList = getFormulasInfo();

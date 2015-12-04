@@ -103,10 +103,6 @@ function asc_docs_api(name)
 
 		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 	});
-	// init drag&drop
-	InitDragAndDrop(document.getElementById(this.HtmlElementName), function (error, files) {
-		oThis._uploadCallback(error, files);
-	});
 
     if (window.editor == undefined)
     {
@@ -789,13 +785,12 @@ asc_docs_api.prototype.CreateComponents = function()
                             </div>";
     }
 
-	var element = document.getElementById(this.HtmlElementName);
-	if (element != null)
+	if (this.HtmlElement != null)
     {
         if (GlobalSkin.Name == "flat")
-            element.style.backgroundColor = GlobalSkin.BackgroundColorThumbnails;
+          this.HtmlElement.style.backgroundColor = GlobalSkin.BackgroundColorThumbnails;
 
-        element.innerHTML = _innerHTML;
+      this.HtmlElement.innerHTML = _innerHTML;
     }
 };
 

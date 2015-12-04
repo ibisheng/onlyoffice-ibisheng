@@ -7,6 +7,7 @@ function baseEditorsApi(name) {
   g_fontApplication.Init();
 
   this.HtmlElementName = name;
+  this.HtmlElement = null;
 
   this.isMobileVersion = false;
 
@@ -82,7 +83,19 @@ function baseEditorsApi(name) {
   this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
 
   this.fCurCallback = null;
+
+  this._baseInit();
+  return this;
 }
+baseEditorsApi.prototype._baseInit = function() {
+  var t = this;
+  this.HtmlElement = document.getElementById(this.HtmlElementName);
+
+  // init drag&drop
+  InitDragAndDrop(this.HtmlElement, function(error, files) {
+    t._uploadCallback(error, files);
+  });
+};
 baseEditorsApi.prototype.asc_GetFontThumbnailsPath = function() {
   return '../Common/Images/';
 };

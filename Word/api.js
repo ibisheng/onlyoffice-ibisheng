@@ -375,10 +375,6 @@ function asc_docs_api(name)
 
 		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 	});
-	// init drag&drop
-	InitDragAndDrop(document.getElementById(this.HtmlElementName), function (error, files) {
-		oThis._uploadCallback(error, files);
-	});
 
     if (window.editor == undefined)
     {
@@ -683,9 +679,8 @@ asc_docs_api.prototype.CreateComponents = function()
 {
     this.CreateCSS();
 
-	var element = document.getElementById(this.HtmlElementName);
-	if (element != null)
-		element.innerHTML = "<div id=\"id_main\" class=\"block_elem\" style=\"-moz-user-select:none;-khtml-user-select:none;user-select:none;background-color:" + GlobalSkin.BackgroundColor + ";overflow:hidden;\" UNSELECTABLE=\"on\">\
+	if (this.HtmlElement != null)
+    this.HtmlElement.innerHTML = "<div id=\"id_main\" class=\"block_elem\" style=\"-moz-user-select:none;-khtml-user-select:none;user-select:none;background-color:" + GlobalSkin.BackgroundColor + ";overflow:hidden;\" UNSELECTABLE=\"on\">\
 								<div id=\"id_panel_left\" class=\"block_elem\">\
 									<canvas id=\"id_buttonTabs\" class=\"block_elem\"></canvas>\
 									<canvas id=\"id_vert_ruler\" class=\"block_elem\"></canvas>\
