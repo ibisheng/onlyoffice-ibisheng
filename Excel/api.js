@@ -393,7 +393,6 @@ var editor;
     g_oUndoRedoRow = new UndoRedoRowCol(wbModel, true);
     g_oUndoRedoComment = new UndoRedoComment(wbModel);
     g_oUndoRedoAutoFilters = new UndoRedoAutoFilters(wbModel);
-    CHART_STYLE_MANAGER = new CChartStyleManager();
   };
 
   spreadsheet_api.prototype._onEndPermissions = function() {

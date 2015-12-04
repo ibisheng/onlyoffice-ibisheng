@@ -105,6 +105,8 @@ baseEditorsApi.prototype._baseInit = function() {
   InitDragAndDrop(this.HtmlElement, function(error, files) {
     t._uploadCallback(error, files);
   });
+
+  CHART_STYLE_MANAGER = new CChartStyleManager();
 };
 baseEditorsApi.prototype.asc_GetFontThumbnailsPath = function() {
   return '../Common/Images/';

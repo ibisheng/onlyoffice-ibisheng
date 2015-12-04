@@ -365,8 +365,6 @@ function asc_docs_api(name)
     this.ParcedDocument = false;
 	this.isStartCoAuthoringOnEndLoad = false;	// Подсоединились раньше, чем документ загрузился
 
-	var oThis = this;
-
     if (window.editor == undefined)
     {
         window.editor = this;
@@ -376,7 +374,6 @@ function asc_docs_api(name)
         if (window["NATIVE_EDITOR_ENJINE"])
             editor = window.editor;
     }
-    CHART_STYLE_MANAGER = new CChartStyleManager();
 
     this.RevisionChangesStack = [];
 }

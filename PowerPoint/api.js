@@ -93,8 +93,6 @@ function asc_docs_api(name)
     this.LongActionCallbacks = [];
 	this.LongActionCallbacksParams = [];
 
-	var oThis = this;
-
     if (window.editor == undefined)
     {
         window.editor = this;
@@ -104,8 +102,6 @@ function asc_docs_api(name)
         if (window["NATIVE_EDITOR_ENJINE"])
             editor = window.editor;
     }
-
-    CHART_STYLE_MANAGER = new CChartStyleManager();
 }
 asc.extendClass(asc_docs_api, baseEditorsApi);
 
