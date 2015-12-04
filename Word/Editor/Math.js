@@ -939,8 +939,6 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
         else
         {
             this.Selection_Remove();
-            oContent.CurPos = nStartPos;
-
             if (true === TrackRevisions)
             {
                 if (reviewtype_Common === ElementReviewType)
@@ -960,7 +958,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                 if (para_Math_Run === oContent.Content[nStartPos].Type)
                     oContent.Content[nStartPos].Cursor_MoveToStartPos();
             }
-
+            oContent.CurPos = nStartPos;
             oContent.Correct_Content();
             oContent.Correct_ContentPos(-1); // -1, потому что нам надо встать перед элементом, а не после
         }
@@ -979,7 +977,6 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
         var oEndElement = oContent.getElem(nEndPos);
 
         this.Selection_Remove();
-        oContent.CurPos = nStartPos;
         if (true === TrackRevisions)
         {
             for (var CurPos = nEndPos; CurPos >= nStartPos; --CurPos)
@@ -1001,8 +998,20 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                     else if (reviewtype_Add === ElementReviewType)
                     {
                         oContent.Remove_FromContent(CurPos, 1);
+                        nEndPos--;
                     }
                 }
+            }
+
+            if (Direction < 0)
+            {
+                oContent.CurPos = nStartPos;
+            }
+            else
+            {
+                oContent.CurPos = nEndPos;
+                if (para_Math_Run === oContent.Content[nEndPos].Type)
+                    oContent.Content[nEndPos].Cursor_MoveToStartPos();
             }
         }
         else
@@ -1021,6 +1030,8 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                 oStartElement.Remove(Direction);
             else
                 oContent.Remove_FromContent(nStartPos, 1);
+
+            oContent.CurPos = nStartPos;
         }
         oContent.Correct_Content();
         oContent.Correct_ContentPos(Direction);
