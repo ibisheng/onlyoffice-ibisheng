@@ -2116,7 +2116,7 @@ function Editor_Paste_Button(api)
         document.body.style["-webkit-user-select"] = "none";
 
 		History.Create_NewPoint(historydescription_PasteButtonIE);
-        editor.asc_IncrementCounterLongAction();
+        editor.incrementCounterLongAction();
         Editor_Paste(api, false);
         return true;
     }
@@ -2126,7 +2126,7 @@ function Editor_Paste_Button(api)
 		if(ElemToSelect && ElemToSelect.innerHTML !== "&nbsp;" && ElemToSelect.innerHTML !== "")
 		{
 			History.Create_NewPoint(historydescription_PasteButtonNotIE);
-            editor.asc_IncrementCounterLongAction();
+            editor.incrementCounterLongAction();
 			Editor_Paste_Exec(api, ElemToSelect);
 		}
 		else

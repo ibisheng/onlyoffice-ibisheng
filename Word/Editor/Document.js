@@ -10028,7 +10028,7 @@ CDocument.prototype =
                             this.Create_NewHistoryPoint(historydescription_Document_ShiftInsert);
 
                             window.GlobalPasteFlag = true;
-                            editor.asc_IncrementCounterLongAction();
+                            editor.incrementCounterLongAction();
                             Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                             bRetValue = keydownresult_PreventKeyPress;
                         }
@@ -10040,7 +10040,7 @@ CDocument.prototype =
 
                                 SafariIntervalFocus();
                                 window.GlobalPasteFlag = true;
-                                editor.asc_IncrementCounterLongAction();
+                                editor.incrementCounterLongAction();
                                 Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                                 bRetValue = keydownresult_PreventKeyPress;
                             }
@@ -10282,7 +10282,7 @@ CDocument.prototype =
                             this.Create_NewHistoryPoint(historydescription_Document_PasteHotKey);
 
                             window.GlobalPasteFlag = true;
-                            editor.asc_IncrementCounterLongAction();
+                            editor.incrementCounterLongAction();
                             Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                             bRetValue = keydownresult_PreventKeyPress;
                         }
@@ -10294,7 +10294,7 @@ CDocument.prototype =
 
                                 SafariIntervalFocus();
                                 window.GlobalPasteFlag = true;
-                                editor.asc_IncrementCounterLongAction();
+                                editor.incrementCounterLongAction();
                                 Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                                 bRetValue = keydownresult_PreventKeyPress;
                             }

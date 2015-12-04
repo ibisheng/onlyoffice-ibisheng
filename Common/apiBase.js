@@ -175,6 +175,9 @@ baseEditorsApi.prototype.getViewMode = function() {
 baseEditorsApi.prototype.isLongAction = function() {
   return (0 !== this.IsLongActionCurrent);
 };
+baseEditorsApi.prototype.incrementCounterLongAction = function() {
+  ++this.IsLongActionCurrent;
+};
 // Open
 baseEditorsApi.prototype._onOpenCommand = function(data) {
 };

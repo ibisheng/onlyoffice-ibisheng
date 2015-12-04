@@ -2080,7 +2080,7 @@ asc_docs_api.prototype.sync_CanCopyCutCallback = function(bCanCopyCut)
 asc_docs_api.prototype.setStartPointHistory = function(){
     this.noCreatePoint = true;
     this.exucuteHistory = true;
-    this.asc_IncrementCounterLongAction();
+    this.incrementCounterLongAction();
     this.WordControl.m_oLogicDocument.TurnOff_InterfaceEvents();
 };
 asc_docs_api.prototype.setEndPointHistory   = function(){
@@ -2155,7 +2155,7 @@ asc_docs_api.prototype.sync_StartAction = function(type, id){
 	//console.log("asc_onStartAction: type = " + type + " id = " + id);
 
     if (c_oAscAsyncActionType.BlockInteraction == type)
-        this.asc_IncrementCounterLongAction();
+        this.incrementCounterLongAction();
 };
 asc_docs_api.prototype.sync_EndAction = function(type, id){
 	//this.AsyncAction
@@ -2168,10 +2168,6 @@ asc_docs_api.prototype.sync_EndAction = function(type, id){
     }
 };
 
-asc_docs_api.prototype.asc_IncrementCounterLongAction = function()
-{
-    this.IsLongActionCurrent++;
-};
 asc_docs_api.prototype.asc_DecrementCounterLongAction = function()
 {
     this.IsLongActionCurrent--;
@@ -6755,7 +6751,7 @@ CRevisionsChange.prototype.ComparePrevPosition = function()
 };
 
 asc_docs_api.prototype.asc_stopSaving = function () {
-	this.asc_IncrementCounterLongAction();
+	this.incrementCounterLongAction();
 };
 asc_docs_api.prototype.asc_continueSaving = function () {
 	this.asc_DecrementCounterLongAction();
