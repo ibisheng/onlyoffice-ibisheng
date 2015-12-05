@@ -146,7 +146,7 @@ baseEditorsApi.prototype.asc_setDocInfo = function(oDocInfo) {
     this.User.asc_setUserName(this.DocInfo.get_UserName());
   }
 
-  if (undefined !== window["AscDesktopEditor"]) {
+  if (undefined !== window["AscDesktopEditor"] && offlineMode != this.documentUrl) {
     window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
   }
 };
