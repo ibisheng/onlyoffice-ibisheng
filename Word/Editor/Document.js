@@ -14821,7 +14821,6 @@ CDocument.prototype.Load_DocumentStateAfterLoadChanges = function(State)
                     {
                         HdrFtrContent.Set_ContentPosition(State.Pos, 0, 0);
                         this.NeedUpdateTarget = true;
-                        this.RecalculateCurPos();
                     }
                 }
                 else if (docpostype_DrawingObjects === State.HdrFtrDocPosType)
@@ -14871,7 +14870,6 @@ CDocument.prototype.Load_DocumentStateAfterLoadChanges = function(State)
             {
                 this.Set_ContentPosition(State.Pos, 0, 0);
                 this.NeedUpdateTarget = true;
-                this.RecalculateCurPos();
             }
 
             break;
