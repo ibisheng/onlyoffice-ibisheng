@@ -6785,11 +6785,21 @@
 			// Пересчитываем X и Y относительно закрепленной области
 			xL += offsetX;
 			yL += offsetY;
+
 			// Пересчитываем в px
 			xL *= asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() );
 			yL *= asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIY() );
+
 			var width = this.getColumnWidth (this.activeRange.startCol, /*px*/0);
 			var height = this.getRowHeight(this.activeRange.startRow, /*px*/0);
+
+      if (AscBrowser.isRetina) {
+        xL >>= 1;
+        yL >>= 1;
+        width >>= 1;
+        height >>= 1;
+      }
+
 			return new asc_CRect (xL, yL, width, height);
 		};
 
