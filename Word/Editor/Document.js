@@ -3724,10 +3724,14 @@ CDocument.prototype =
                 if (true === this.Is_TrackRevisions())
                 {
                     // Если есть параграфы, которые были добавлены во время рецензирования, тогда мы их удаляем
+
+                    // TODO: Надо убрать вызовы пересчета изнутри документа
+                    this.TurnOff_Recalculate();
                     for (var Index = StartPos; Index <= EndPos; Index++)
                     {
                         this.Content[Index].Remove(1, true);
                     }
+                    this.TurnOn_Recalculate();
 
                     this.Selection_Remove();
                     for (var Index = EndPos - 1; Index >= StartPos; Index--)
