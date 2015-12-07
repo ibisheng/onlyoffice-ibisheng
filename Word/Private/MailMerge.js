@@ -302,7 +302,7 @@ CDocument.prototype.Get_MailMergedDocument = function(_nStartIndex, _nEndIndex)
     History.TurnOff();
     g_oTableId.TurnOff();
 
-    var LogicDocument = new CDocument();
+    var LogicDocument = new CDocument(undefined, false);
     History.Document = this;
 
     // Копируем стили, они все одинаковые для всех документов

@@ -693,7 +693,7 @@ CDocumentFieldsManager.prototype.Restore_MailMergeTemplate = function()
     }
 };
 
-function CDocument(DrawingDocument)
+function CDocument(DrawingDocument, isMainLogicDocument)
 {
     // Сохраняем ссылки на глобальные объекты
     this.History              = History;
@@ -702,7 +702,7 @@ function CDocument(DrawingDocument)
     this.CollaborativeEditing = (("undefined" !== typeof(CWordCollaborativeEditing) && CollaborativeEditing instanceof CWordCollaborativeEditing) ? CollaborativeEditing : null);
     this.Api                  = editor;
     //------------------------------------------------------------------------
-    if (DrawingDocument)
+    if (false !== isMainLogicDocument)
     {
         if (this.History)
             this.History.Set_LogicDocument(this);
