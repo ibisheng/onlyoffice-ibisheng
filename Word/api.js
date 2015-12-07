@@ -5493,12 +5493,6 @@ asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
     }
 
 };
-
-asc_docs_api.prototype.asyncImagesDocumentStartLoaded = function()
-{
-	// евент о заморозке не нужен... оно и так заморожено
-	// просто нужно вывести информацию в статус бар (что началась загрузка картинок)
-};
 asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
 {
     this.ImageLoader.bIsLoadDocumentFirst = false;

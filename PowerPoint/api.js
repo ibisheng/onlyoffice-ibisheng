@@ -3460,12 +3460,6 @@ asc_docs_api.prototype.asyncFontsDocumentEndLoaded = function()
     this.ImageLoader.bIsLoadDocumentFirst = true;
 	this.ImageLoader.LoadDocumentImages(_loader_object.ImageMap, true);
 };
-
-asc_docs_api.prototype.asyncImagesDocumentStartLoaded = function()
-{
-	// евент о заморозке не нужен... оно и так заморожено
-	// просто нужно вывести информацию в статус бар (что началась загрузка картинок)
-};
 asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
 {
     this.ImageLoader.bIsLoadDocumentFirst = false;

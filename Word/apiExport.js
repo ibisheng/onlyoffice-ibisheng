@@ -420,7 +420,6 @@ asc_docs_api.prototype['CreateFontsCharMap'] = asc_docs_api.prototype.CreateFont
 asc_docs_api.prototype['sync_SendThemeColors'] = asc_docs_api.prototype.sync_SendThemeColors;
 asc_docs_api.prototype['sync_SendThemeColorSchemes'] = asc_docs_api.prototype.sync_SendThemeColorSchemes;
 asc_docs_api.prototype['ChangeColorScheme'] = asc_docs_api.prototype.ChangeColorScheme;
-asc_docs_api.prototype['asyncImagesDocumentStartLoaded'] = asc_docs_api.prototype.asyncImagesDocumentStartLoaded;
 asc_docs_api.prototype['asyncImagesDocumentEndLoaded'] = asc_docs_api.prototype.asyncImagesDocumentEndLoaded;
 asc_docs_api.prototype['OpenDocumentEndCallback'] = asc_docs_api.prototype.OpenDocumentEndCallback;
 asc_docs_api.prototype['UpdateInterfaceState'] = asc_docs_api.prototype.UpdateInterfaceState;

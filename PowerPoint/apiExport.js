@@ -284,7 +284,6 @@ asc_docs_api.prototype['sync_UnLockComment'] = asc_docs_api.prototype.sync_UnLoc
 asc_docs_api.prototype['asyncFontsDocumentStartLoaded'] = asc_docs_api.prototype.asyncFontsDocumentStartLoaded;
 asc_docs_api.prototype['GenerateStyles'] = asc_docs_api.prototype.GenerateStyles;
 asc_docs_api.prototype['asyncFontsDocumentEndLoaded'] = asc_docs_api.prototype.asyncFontsDocumentEndLoaded;
-asc_docs_api.prototype['asyncImagesDocumentStartLoaded'] = asc_docs_api.prototype.asyncImagesDocumentStartLoaded;
 asc_docs_api.prototype['asyncImagesDocumentEndLoaded'] = asc_docs_api.prototype.asyncImagesDocumentEndLoaded;
 asc_docs_api.prototype['asc_getComments'] = asc_docs_api.prototype.asc_getComments;
 asc_docs_api.prototype['OpenDocumentEndCallback'] = asc_docs_api.prototype.OpenDocumentEndCallback;

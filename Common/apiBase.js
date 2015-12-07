@@ -223,6 +223,10 @@ baseEditorsApi.prototype._onNeedParams = function(data) {
 };
 baseEditorsApi.prototype.asyncServerIdEndLoaded = function() {
 };
+baseEditorsApi.prototype.asyncImagesDocumentStartLoaded = function() {
+  // евент о заморозке не нужен... оно и так заморожено
+  // просто нужно вывести информацию в статус бар (что началась загрузка картинок)
+};
 // Выставление интервала автосохранения (0 - означает, что автосохранения нет)
 baseEditorsApi.prototype.asc_setAutoSaveGap = function(autoSaveGap) {
   if (typeof autoSaveGap === "number") {
