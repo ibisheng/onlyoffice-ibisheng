@@ -1428,6 +1428,7 @@ CDLbl.prototype =
 
     Save_Changes: function(data, w)
     {
+        w.WriteLong(data.Type);
         switch(data.Type)
         {
             case historyitem_DLbl_SetDLblPos:
@@ -1473,7 +1474,7 @@ CDLbl.prototype =
                 w.WriteBool(isRealBool(data.newPr));
                 if(isRealBool(data.newPr))
                 {
-                    w.WriteBool(isRealBool(data.newPr));
+                    w.WriteBool(data.newPr);
                 }
                 break;
             }
