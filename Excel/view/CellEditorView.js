@@ -2212,6 +2212,12 @@
 			var offs = $(t.canvasOverlay).offset();
 			var x = (event.pageX - offs.left) / t.kx;
 			var y = (event.pageY - offs.top) / t.ky;
+
+      if (AscBrowser.isRetina) {
+        x <<= 1;
+        y <<= 1;
+      }
+
 			return {x: x, y: y};
 		};
 
