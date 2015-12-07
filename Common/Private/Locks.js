@@ -650,17 +650,29 @@ if(typeof CPresentation !== "undefined")
 
         if(CheckType === changestype_SlideTiming)
         {
-            var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
-            for(var i = 0; i < selected_slides.length; ++i)
+            if(!AdditionalData || !AdditionalData.All)
             {
-                var check_obj =
-                {
-                    "type": c_oAscLockTypeElemPresentation.Slide,
-                    "val": this.Slides[selected_slides[i]].timingLock.Get_Id(),
-                    "guid": this.Slides[selected_slides[i]].timingLock.Get_Id()
-                };
-                this.Slides[selected_slides[i]].timingLock.Lock.Check(check_obj);
+                    var check_obj =
+                    {
+                        "type": c_oAscLockTypeElemPresentation.Slide,
+                        "val": this.Slides[this.CurPage].timingLock.Get_Id(),
+                        "guid": this.Slides[this.CurPage].timingLock.Get_Id()
+                    };
+                    this.Slides[this.CurPage].timingLock.Lock.Check(check_obj);
             }
+            else{
+                for(var i = 0; i < this.Slides.length; ++i)
+                {
+                    var check_obj =
+                    {
+                        "type": c_oAscLockTypeElemPresentation.Slide,
+                        "val": this.Slides[i].timingLock.Get_Id(),
+                        "guid": this.Slides[i].timingLock.Get_Id()
+                    };
+                    this.Slides[i].timingLock.Lock.Check(check_obj);
+                }
+            }
+
         }
 
         if(CheckType === changestype_Text_Props)

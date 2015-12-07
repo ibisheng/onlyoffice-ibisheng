@@ -1585,6 +1585,7 @@ var historydescription_Document_RejectRevisionChange               = 0x012a;
 var historydescription_Document_AcceptRevisionChangesBySelection   = 0x012b;
 var historydescription_Document_RejectRevisionChangesBySelection   = 0x012c;
 var historydescription_Document_AddLetterUnion                     = 0x012d;
+var historydescription_Presentation_ApplyTimingToAll               = 0x012e;
 
 
 
