@@ -5733,10 +5733,6 @@ asc_docs_api.prototype.asyncFontEndLoaded = function(fontinfo)
 	// отжать заморозку меню
 };
 
-asc_docs_api.prototype.asyncImageStartLoaded = function()
-{
-    // здесь прокинуть евент о заморозке меню
-};
 asc_docs_api.prototype.asyncImageEndLoaded = function(_image)
 {
     // отжать заморозку меню

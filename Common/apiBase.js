@@ -223,6 +223,9 @@ baseEditorsApi.prototype._onNeedParams = function(data) {
 };
 baseEditorsApi.prototype.asyncServerIdEndLoaded = function() {
 };
+baseEditorsApi.prototype.asyncImageStartLoaded = function() {
+  // здесь прокинуть евент о заморозке меню
+};
 baseEditorsApi.prototype.asyncImagesDocumentStartLoaded = function() {
   // евент о заморозке не нужен... оно и так заморожено
   // просто нужно вывести информацию в статус бар (что началась загрузка картинок)

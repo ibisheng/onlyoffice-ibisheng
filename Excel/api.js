@@ -2476,9 +2476,6 @@ var editor;
     ws.objectRender.setDrawImagePlaceParagraph(element_id, props);
   };
 
-  spreadsheet_api.prototype.asyncImageStartLoaded = function() {
-  };
-
   spreadsheet_api.prototype.asyncImageEndLoaded = function(_image) {
     if (this.wb) {
       var ws = this.wb.getWorksheet();

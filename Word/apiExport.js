@@ -425,7 +425,6 @@ asc_docs_api.prototype['OpenDocumentEndCallback'] = asc_docs_api.prototype.OpenD
 asc_docs_api.prototype['UpdateInterfaceState'] = asc_docs_api.prototype.UpdateInterfaceState;
 asc_docs_api.prototype['asyncFontStartLoaded'] = asc_docs_api.prototype.asyncFontStartLoaded;
 asc_docs_api.prototype['asyncFontEndLoaded'] = asc_docs_api.prototype.asyncFontEndLoaded;
-asc_docs_api.prototype['asyncImageStartLoaded'] = asc_docs_api.prototype.asyncImageStartLoaded;
 asc_docs_api.prototype['asyncImageEndLoaded'] = asc_docs_api.prototype.asyncImageEndLoaded;
 asc_docs_api.prototype['asyncImageEndLoadedBackground'] = asc_docs_api.prototype.asyncImageEndLoadedBackground;
 asc_docs_api.prototype['IsAsyncOpenDocumentImages'] = asc_docs_api.prototype.IsAsyncOpenDocumentImages;
