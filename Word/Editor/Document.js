@@ -1009,7 +1009,10 @@ CDocument.prototype =
                 this.private_ProcessTemplateReplacement(TemplateReplacementData);
             }
         }
-        this.Set_FastCollaborativeEditing(true);
+		if(null !== this.CollaborativeEditing)
+		{
+			this.Set_FastCollaborativeEditing(true);
+		}
     },
     
     Add_TestDocument : function()

@@ -2160,7 +2160,7 @@
 				var t = this;
 				var oPasteProcessor;
 				var oTempDrawingDocument = worksheet.model.DrawingDocument;
-			    var newCDocument = new CDocument(oTempDrawingDocument);
+			    var newCDocument = new CDocument(oTempDrawingDocument, false);
 				newCDocument.bFromDocument = true;
 				//TODo!!!!!!
 				newCDocument.Content[0].bFromDocument = true;
@@ -2588,7 +2588,7 @@
 				//передавать CDrawingDocument текущего worksheet
 				var oTempDrawingDocument = worksheet.model.DrawingDocument;
 				
-			    var newCDocument = new CDocument(oTempDrawingDocument);
+			    var newCDocument = new CDocument(oTempDrawingDocument, false);
 				newCDocument.bFromDocument = true;
 				newCDocument.theme = this.Api.wbModel.theme;
 				
@@ -3328,7 +3328,7 @@
 						//вставляем табличку из презентаций
 						var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(this, ws);
 						
-						var newCDocument = new CDocument(oTempDrawingDocument);
+						var newCDocument = new CDocument(oTempDrawingDocument, false);
 						newCDocument.bFromDocument = true;
 						newCDocument.theme = this.Api.wbModel.theme;
 						
@@ -3441,7 +3441,7 @@
 						//вставляем табличку из презентаций
 						var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(this, ws);
 						
-						var newCDocument = new CDocument(oTempDrawingDocument);
+						var newCDocument = new CDocument(oTempDrawingDocument, false);
 						newCDocument.bFromDocument = true;
 						newCDocument.theme = this.Api.wbModel.theme;
 						
