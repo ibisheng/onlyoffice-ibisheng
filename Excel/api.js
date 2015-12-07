@@ -2481,6 +2481,11 @@ var editor;
   };
 
   spreadsheet_api.prototype.asyncImagesDocumentEndLoaded = function() {
+    if (c_oAscAdvancedOptionsAction.None === this.advancedOptionsAction && this.wb) {
+      var ws = this.wb.getWorksheet();
+      ws.objectRender.showDrawingObjects(true);
+      ws.objectRender.controller.getGraphicObjectProps();
+    }
   };
 
   spreadsheet_api.prototype.asyncImageEndLoadedBackground = function() {
