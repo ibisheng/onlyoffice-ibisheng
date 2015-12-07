@@ -294,26 +294,39 @@
 			},
 			
 			setOffset : function(offset){
+                if ( this.r1 == 0 && this.r2 == gc_nMaxRow0 && offset.offsetRow != 0 || this.c1 == 0 && this.c2 == gc_nMaxCol0 && offset.offsetCol != 0 ) {
+                    return;
+                }
 				this.setOffsetFirst(offset);
 				this.setOffsetLast(offset);
 			},
 
 			setOffsetFirst : function(offset){
-				this.c1 += offset.offsetCol;
-				if( this.c1 < 0 )
-					this.c1 = 0;
-				this.r1 += offset.offsetRow;
+                this.c1 += offset.offsetCol;
+                if( this.c1 < 0 ) {
+                    this.c1 = 0;
+                }
+                if( this.c1 > gc_nMaxCol0 ) {
+                    this.c1 = gc_nMaxCol0;
+                }
+                this.r1 += offset.offsetRow;
 				if( this.r1 < 0 )
 					this.r1 = 0;
+                if( this.r1 > gc_nMaxRow0 )
+                    this.r1 = gc_nMaxRow0;
 			},
 
 			setOffsetLast : function(offset){
 				this.c2 += offset.offsetCol;
 				if( this.c2 < 0 )
 					this.c2 = 0;
+                if( this.c2 > gc_nMaxCol0 )
+					this.c2 = gc_nMaxCol0;
 				this.r2 += offset.offsetRow;
 				if( this.r2 < 0 )
 					this.r2 = 0;
+                if( this.r2 > gc_nMaxRow0 )
+                    this.r2 = gc_nMaxRow0;
 			},
 			
 			getName : function() {
