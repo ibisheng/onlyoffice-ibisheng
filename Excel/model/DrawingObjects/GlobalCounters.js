@@ -93,12 +93,11 @@ CCollaborativeEditing.prototype.Apply_LinkData = function()
         var Item = this.m_aLinkData[Index];
         Item.Class.Load_LinkData( Item.LinkData );
     }
-
     this.Clear_LinkData();
-
-
     if(this.m_aNewImages.length > 0)
     {
+        var old_val =  Asc["editor"].ImageLoader.bIsAsyncLoadDocumentImages;
+        Asc["editor"].ImageLoader.bIsAsyncLoadDocumentImages = true;
         Asc["editor"].ImageLoader.LoadDocumentImages(this.m_aNewImages, null, function()
         {
             CollaborativeEditing.m_aNewImages.length = 0;
@@ -106,7 +105,7 @@ CCollaborativeEditing.prototype.Apply_LinkData = function()
             var worksheet = Asc["editor"].wb.getWorksheet();
             worksheet && worksheet.objectRender && worksheet.objectRender.controller && worksheet.objectRender.controller.getGraphicObjectProps();
         });
-
+        Asc["editor"].ImageLoader.bIsAsyncLoadDocumentImages = old_val;
     }
 };
 //-----------------------------------------------------------------------------------
