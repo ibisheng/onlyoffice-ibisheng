@@ -5004,17 +5004,19 @@ Paragraph.prototype =
         {
             var StartPos = null;
 
-            if ( true === this.Selection.Use )
-                StartPos = this.Get_ParaContentPos( true, true );
+            if (true === this.Selection.Use)
+                StartPos = this.Get_ParaContentPos(true, true);
+            else if (true === StartSelectFromEnd)
+                StartPos = this.Get_EndPos(true);
             else
-                StartPos = this.Get_ParaContentPos( false, false );
+                StartPos = this.Get_ParaContentPos(false, false);
 
             var EndPos = this.Get_EndPos(true);
 
             this.Selection.Use   = true;
             this.Selection.Start = false;
 
-            this.Set_SelectionContentPos( StartPos, EndPos );
+            this.Set_SelectionContentPos(StartPos, EndPos);
         }
         else
         {

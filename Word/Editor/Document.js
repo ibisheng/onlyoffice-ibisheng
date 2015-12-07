@@ -4363,7 +4363,7 @@ CDocument.prototype =
 
                             if ( type_Paragraph == Item.GetType()  )
                             {
-                                Item.Cursor_MoveToEndPos(true);
+                                Item.Cursor_MoveToEndPos(true, true);
                                 Item.Cursor_MoveLeft( 1, true, Word );
                             }
                             else if ( type_Table == Item.GetType() )
