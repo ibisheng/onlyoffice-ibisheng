@@ -2296,8 +2296,9 @@
 
             if(ws.aCols.length > 0 || null != ws.oAllCol)
                 this.bs.WriteItem(c_oSerWorksheetsTypes.Cols, function(){oThis.WriteWorksheetCols(ws);});
-
-            this.bs.WriteItem(c_oSerWorksheetsTypes.SheetViews, function(){oThis.WriteSheetViews(ws);});
+            
+            if(!oThis.isCopyPaste)
+               this.bs.WriteItem(c_oSerWorksheetsTypes.SheetViews, function(){oThis.WriteSheetViews(ws);});
 
             if (null !== ws.sheetPr)
                 this.bs.WriteItem(c_oSerWorksheetsTypes.SheetPr, function () {oThis.WriteSheetPr(ws.sheetPr);});
