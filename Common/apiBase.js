@@ -162,7 +162,7 @@ baseEditorsApi.prototype.SendOpenProgress = function() {
 baseEditorsApi.prototype.sync_InitEditorFonts = function(gui_fonts) {
   this.sendEvent("asc_onInitEditorFonts", gui_fonts);
 };
-baseEditorsApi.prototype.sync_StartAction = function() {
+baseEditorsApi.prototype.sync_StartAction = function(type, id) {
   this.sendEvent('asc_onStartAction', type, id);
   //console.log("asc_onStartAction: type = " + type + " id = " + id);
 
@@ -170,7 +170,7 @@ baseEditorsApi.prototype.sync_StartAction = function() {
     this.incrementCounterLongAction();
   }
 };
-baseEditorsApi.prototype.sync_EndAction = function() {
+baseEditorsApi.prototype.sync_EndAction = function(type, id) {
   this.sendEvent('asc_onEndAction', type, id);
   //console.log("asc_onEndAction: type = " + type + " id = " + id);
 
