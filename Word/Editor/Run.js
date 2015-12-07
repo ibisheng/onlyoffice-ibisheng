@@ -10123,7 +10123,7 @@ ParaRun.prototype.private_GetPosInParent = function(_Parent)
 };
 ParaRun.prototype.Make_ThisElementCurrent = function()
 {
-    if (this.Paragraph)
+    if (this.Paragraph && true === this.Paragraph.Is_UseInDocument() && true === this.Is_UseInParagraph())
     {
         var ContentPos = this.Paragraph.Get_PosByElement(this);
         ContentPos.Add(this.State.ContentPos);
