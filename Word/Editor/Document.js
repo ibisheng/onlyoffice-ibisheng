@@ -15604,7 +15604,7 @@ CTrackRevisionsManager.prototype.Continue_TrackRevisions = function()
     {
         delete this.CheckPara[ParaId];
         var Para = g_oTableId.Get_ById(ParaId);
-        if (Para && Para.Is_UseInDocument())
+        if (Para && Para instanceof Paragraph && Para.Is_UseInDocument())
         {
             delete this.Changes[ParaId];
             Para.Check_RevisionsChanges(this);
