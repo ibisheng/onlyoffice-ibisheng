@@ -315,7 +315,8 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 
 		if (this.workbook.bCollaborativeChanges) {
 		    //active может поменяться только при remove, hide листов
-		    this.workbook.handlers.trigger('showWorksheet', this.workbook.getActive());
+            var ws = this.workbook.getActiveWs();
+            this.workbook.handlers.trigger('showWorksheet', ws.getId());
 		}
 		else {
 		    // ToDo какое-то не очень решение брать 0-й элемент и у него получать индекс!
