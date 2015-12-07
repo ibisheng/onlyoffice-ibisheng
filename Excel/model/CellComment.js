@@ -970,6 +970,14 @@ CCellCommentator.prototype.getCommentsCoords = function(comments) {
 
 		coords.dHeightPX += this.commentPadding * 2;
 		coords.dHeightMM = this.pxToMm(coords.dHeightPX);
+
+    if (AscBrowser.isRetina) {
+      coords.dWidthPX >>= 1;
+      coords.dHeightPX >>= 1;
+      coords.dLeftPX >>= 1;
+      coords.dTopPX >>= 1;
+      coords.dReverseLeftPX >>= 1;
+    }
 	}
 
 	return coords;

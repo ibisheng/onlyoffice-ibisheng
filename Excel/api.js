@@ -2503,8 +2503,6 @@ var editor;
           worksheet.objectRender.showDrawingObjects(false, new GraphicOption(worksheet, c_oAscGraphicOption.ScrollVertical, drawing_area.frozenPlaces[i].range, {offsetX: 0, offsetY: 0}));
         }
       }
-
-
     }
   };
 
