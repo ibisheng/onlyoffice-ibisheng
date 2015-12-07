@@ -921,7 +921,7 @@
 
 			this._updateUndoRedoChanged();
 
-            window["native"].onCellEditorChangeText(this.textRender.chars);
+            window["native"].onCellEditorChangeText(this._getFragmentsText(this.options.fragments));
         };
 
 		CellEditor.prototype._fireUpdated = function () {

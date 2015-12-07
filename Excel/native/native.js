@@ -4331,16 +4331,17 @@ function offline_cell_editor_key_event(keys, width, height, ratio) {
 
     var wb = _api.wb;
     var cellEditor =  _api.wb.cellEditor;
+    var operationCode, left,right, position, value, value2;
 
     for (var i = 0; i < keys.length; ++i) {
-        var operationCode = keys[i][0];
-        var value = keys[i][1];
-        var value2 = keys[i][2];
+        operationCode = keys[i][0];
+        value = keys[i][1];
+        value2 = keys[i][2];
 
         var event = {
-            which: value,
-            metaKey: undefined,
-            ctrlKey: undefined
+            which:value,
+            metaKey:undefined,
+            ctrlKey:undefined
         };
 
         if (1 === operationCode) {
@@ -4350,16 +4351,19 @@ function offline_cell_editor_key_event(keys, width, height, ratio) {
             cellEditor._onWindowKeyDown(event);
         }
         else if (2 === operationCode) {
-            var position = value;
+            position = value;
             cellEditor._moveCursor(-11, position);
         }
         else if (3 === operationCode) {
-            var left = value;
-            var right = value2;
+            left = value;
+            right = value2;
 
-            cellEditor.cursorPos = left;//Math.min(left, cellEditor.cursorPos);
+            cellEditor.cursorPos = left;
             cellEditor.selectionBegin = left;
-            cellEditor.selectionEnd = right;//Math.min(left, cellEditor.selectionEnd);
+            cellEditor.selectionEnd = right;
+        }
+        else if (4 == operationCode) {
+            cellEditor.pasteText(keys[i][3]);
         }
     }
 
