@@ -1169,7 +1169,7 @@ CGraphicObjects.prototype =
 
     handleChartDoubleClick: function(drawing, chart, e, x, y, pageIndex)
     {
-        if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : drawing.Get_ParentParagraph(), CheckType : changestype_Paragraph_Content} ))
+        if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
         {
             editor.asc_doubleClickOnChart(this.getChartObject());
         }
