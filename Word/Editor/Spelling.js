@@ -856,7 +856,7 @@ Paragraph.prototype.Internal_CheckSpelling = function()
 {
     if ( pararecalc_0_Spell_None !== this.RecalcInfo.Recalc_0_Spell.Type )
     {
-        if ( null != g_oTableId.Get_ById( this.Get_Id() ) )
+        if (this === g_oTableId.Get_ById(this.Get_Id()))
             this.LogicDocument && this.LogicDocument.Spelling.Add_ParagraphToCheck(this.Get_Id(), this);
     }
 };
