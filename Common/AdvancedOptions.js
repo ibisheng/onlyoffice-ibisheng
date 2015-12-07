@@ -45,7 +45,7 @@
 				}
 				return arr;
 			}();
-			this.recommendedSettings = new asc_CCSVAdvancedOptions (opt["codepage"], opt["delimiter"]);
+			this.recommendedSettings = new asc_CCSVAdvancedOptions (opt["codepage"], /*opt["delimiter"]*/c_oAscCsvDelimiter.Comma); // ToDo разделитель пока только "," http://bugzserver/show_bug.cgi?id=31009
 		}
 		asc_CCSVOptions.prototype.asc_getCodePages = function(){ return this.codePages;};
 		asc_CCSVOptions.prototype.asc_getRecommendedSettings = function () { return this.recommendedSettings; };

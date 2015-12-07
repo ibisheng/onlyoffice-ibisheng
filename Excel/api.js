@@ -596,7 +596,6 @@ var editor;
    exp:	asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV, new Asc.asc_CCSVAdvancedOptions(1200, c_oAscCsvDelimiter.Comma) );
    */
   spreadsheet_api.prototype.asc_setAdvancedOptions = function(idOption, option) {
-    var t = this;
     switch (idOption) {
       case c_oAscAdvancedOptionsID.CSV:
         // Проверяем тип состояния в данный момент
