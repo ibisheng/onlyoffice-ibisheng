@@ -982,10 +982,6 @@ var editor;
     }
   };
 
-  spreadsheet_api.prototype.asyncFontStartLoaded = function() {
-    this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
-  };
-
   spreadsheet_api.prototype.asyncFontEndLoaded = function(font) {
     this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
   };

@@ -223,6 +223,10 @@ baseEditorsApi.prototype._onNeedParams = function(data) {
 };
 baseEditorsApi.prototype.asyncServerIdEndLoaded = function() {
 };
+baseEditorsApi.prototype.asyncFontStartLoaded = function() {
+  // здесь прокинуть евент о заморозке меню
+  this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
+};
 baseEditorsApi.prototype.asyncImageStartLoaded = function() {
   // здесь прокинуть евент о заморозке меню
 };

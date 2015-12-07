@@ -287,7 +287,6 @@ asc_docs_api.prototype['asyncFontsDocumentEndLoaded'] = asc_docs_api.prototype.a
 asc_docs_api.prototype['asyncImagesDocumentEndLoaded'] = asc_docs_api.prototype.asyncImagesDocumentEndLoaded;
 asc_docs_api.prototype['asc_getComments'] = asc_docs_api.prototype.asc_getComments;
 asc_docs_api.prototype['OpenDocumentEndCallback'] = asc_docs_api.prototype.OpenDocumentEndCallback;
-asc_docs_api.prototype['asyncFontStartLoaded'] = asc_docs_api.prototype.asyncFontStartLoaded;
 asc_docs_api.prototype['asyncFontEndLoaded'] = asc_docs_api.prototype.asyncFontEndLoaded;
 asc_docs_api.prototype['asyncImageEndLoaded'] = asc_docs_api.prototype.asyncImageEndLoaded;
 asc_docs_api.prototype['get_PresentationWidth'] = asc_docs_api.prototype.get_PresentationWidth;

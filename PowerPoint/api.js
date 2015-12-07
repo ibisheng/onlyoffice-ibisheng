@@ -3671,11 +3671,6 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
 	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 };
 
-asc_docs_api.prototype.asyncFontStartLoaded = function()
-{
-	// здесь прокинуть евент о заморозке меню
-    this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
-};
 asc_docs_api.prototype.asyncFontEndLoaded = function(fontinfo)
 {
     this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);

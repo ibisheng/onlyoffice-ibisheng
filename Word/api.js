@@ -5695,11 +5695,6 @@ asc_docs_api.prototype.UpdateInterfaceState = function()
     }
 };
 
-asc_docs_api.prototype.asyncFontStartLoaded = function()
-{
-	// здесь прокинуть евент о заморозке меню
-    this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
-};
 asc_docs_api.prototype.asyncFontEndLoaded = function(fontinfo)
 {
     this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
