@@ -1321,21 +1321,6 @@ asc_docs_api.prototype.sync_SaveCallBack = function(){
 asc_docs_api.prototype.sync_DownloadAsCallBack = function(){
 	this.asc_fireCallback("asc_onDownload");
 };
-asc_docs_api.prototype.sync_StartAction = function(type, id){
-	//this.AsyncAction
-	this.asc_fireCallback("asc_onStartAction", type, id);
-
-    if (c_oAscAsyncActionType.BlockInteraction == type)
-        this.incrementCounterLongAction();
-};
-asc_docs_api.prototype.sync_EndAction = function(type, id){
-    this.asc_fireCallback("asc_onEndAction", type, id);
-
-    if (c_oAscAsyncActionType.BlockInteraction == type)
-    {
-        this.decrementCounterLongAction();
-    }
-};
 
 asc_docs_api.prototype.sync_AddURLCallback = function(){
 	this.asc_fireCallback("asc_onAddURL");
@@ -4693,13 +4678,6 @@ asc_docs_api.prototype.asc_editChartDrawingObject = function(chartBinary)
 asc_docs_api.prototype.sync_closeChartEditor = function()
 {
     this.asc_fireCallback("asc_onCloseChartEditor");
-};
-
-asc_docs_api.prototype.asc_stopSaving = function () {
-    this.incrementCounterLongAction();
-};
-asc_docs_api.prototype.asc_continueSaving = function () {
-	this.decrementCounterLongAction();
 };
 
 //-----------------------------------------------------------------

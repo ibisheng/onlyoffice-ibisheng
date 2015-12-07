@@ -163,8 +163,20 @@ baseEditorsApi.prototype.sync_InitEditorFonts = function(gui_fonts) {
   this.sendEvent("asc_onInitEditorFonts", gui_fonts);
 };
 baseEditorsApi.prototype.sync_StartAction = function() {
+  this.sendEvent('asc_onStartAction', type, id);
+  //console.log("asc_onStartAction: type = " + type + " id = " + id);
+
+  if (c_oAscAsyncActionType.BlockInteraction === type) {
+    this.incrementCounterLongAction();
+  }
 };
 baseEditorsApi.prototype.sync_EndAction = function() {
+  this.sendEvent('asc_onEndAction', type, id);
+  //console.log("asc_onEndAction: type = " + type + " id = " + id);
+
+  if (c_oAscAsyncActionType.BlockInteraction === type) {
+    this.decrementCounterLongAction();
+  }
 };
 baseEditorsApi.prototype.sync_TryUndoInFastCollaborative = function()
 {
@@ -354,6 +366,12 @@ baseEditorsApi.prototype.asc_coAuthoringDisconnect = function() {
 
   // Выставляем view-режим
   this.asc_setViewMode(true);
+};
+baseEditorsApi.prototype.asc_stopSaving = function() {
+  this.incrementCounterLongAction();
+};
+baseEditorsApi.prototype.asc_continueSaving = function() {
+  this.decrementCounterLongAction();
 };
 // SpellCheck
 baseEditorsApi.prototype._coSpellCheckInit = function() {

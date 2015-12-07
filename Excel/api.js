@@ -69,8 +69,6 @@ var editor;
     this.autoSaveGapFast = 2000;			// Интервал быстрого автосохранения (когда человек один) - 2 сек.
     this.autoSaveGapSlow = 10 * 60 * 1000;	// Интервал медленного автосохранения (когда совместно) - 10 минут
 
-    this.waitSave = false;					// Отложенное сохранение, происходит во время долгих операций
-
     // Shapes
     this.isStartAddShape = false;
     this.shapeElementId = null;
@@ -398,7 +396,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_Save = function(isAutoSave) {
-    if (!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction || this.waitSave) {
+    if (!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction || this.isLongAction()) {
       return;
     }
 
@@ -905,16 +903,6 @@ var editor;
    * asc_onContextMenu			(event)												- эвент на контекстное меню
    */
 
-  spreadsheet_api.prototype.sync_StartAction = function(type, id) {
-    this.handlers.trigger("asc_onStartAction", type, id);
-    //console.log("asc_onStartAction: type = " + type + " id = " + id);
-  };
-
-  spreadsheet_api.prototype.sync_EndAction = function(type, id) {
-    this.handlers.trigger("asc_onEndAction", type, id);
-    //console.log("asc_onEndAction: type = " + type + " id = " + id);
-  };
-
   spreadsheet_api.prototype.asc_registerCallback = function(name, callback, replaceOldCallback) {
     this.handlers.add(name, callback, replaceOldCallback);
 
@@ -985,7 +973,6 @@ var editor;
     if (this.asyncMethodCallback !== undefined) {
       this.asyncMethodCallback();
       this.asyncMethodCallback = undefined;
-      this.waitSave = false;
     } else {
       // Шрифты загрузились, возможно стоит подождать совместное редактирование
       this.FontLoadWaitComplete = true;
@@ -1015,7 +1002,6 @@ var editor;
     if (window["NATIVE_EDITOR_ENJINE"]) {
       return callback();
     }
-    this.waitSave = true;
     this.asyncMethodCallback = callback;
     var arrLoadFonts = [];
     for (var i in fonts)
@@ -1501,7 +1487,7 @@ var editor;
     var t = this;
     var nState;
     if (false == e["saveLock"]) {
-      if (this.waitSave) {
+      if (this.isLongAction()) {
         // Мы не можем в этот момент сохранять, т.к. попали в ситуацию, когда мы залочили сохранение и успели нажать вставку до ответа
         // Нужно снять lock с сохранения
         this.CoAuthoringApi.onUnSaveLock = function() {
@@ -2999,15 +2985,6 @@ var editor;
         window["AscDesktopEditor"]["onDocumentModifiedChanged"](bIsModified);
       }
     }
-  };
-
-  // Other
-
-  spreadsheet_api.prototype.asc_stopSaving = function() {
-    this.waitSave = true;
-  };
-  spreadsheet_api.prototype.asc_continueSaving = function() {
-    this.waitSave = false;
   };
 
   // Выставление локали
