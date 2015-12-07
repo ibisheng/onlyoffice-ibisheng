@@ -417,10 +417,6 @@ asc_docs_api.prototype._onUpdateDocumentCanSave = function () {
 	}
 };
 
-// Update user alive
-asc_docs_api.prototype.setUserAlive = function () {
-};
-
 ///////////////////////////////////////////
 asc_docs_api.prototype.SetUnchangedDocument = function()
 {

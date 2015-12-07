@@ -1438,10 +1438,6 @@ var editor;
     this.collaborativeEditing.endCollaborationEditing();
   };
 
-  // Update user alive
-  spreadsheet_api.prototype.setUserAlive = function() {
-  };
-
   // End Load document
   spreadsheet_api.prototype._openDocumentEndCallback = function() {
     // Не инициализируем дважды

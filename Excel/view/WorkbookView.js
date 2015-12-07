@@ -394,7 +394,6 @@
 						"updateUndoRedoChanged"		: function (bCanUndo, bCanRedo) {
 							self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
 							self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
-							self.Api.setUserAlive();
 						},
 						"applyCloseEvent"			: function () {self.controller._onWindowKeyDown.apply(self.controller, arguments);},
 						"isViewerMode"				: function () {return self.controller.settings.isViewerMode;},
@@ -476,11 +475,9 @@
 			});
 			this.model.handlers.add("setCanUndo", function (bCanUndo) {
 				self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
-				self.Api.setUserAlive();
 			});
 			this.model.handlers.add("setCanRedo", function (bCanRedo) {
 				self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
-				self.Api.setUserAlive();
 			});
 			this.model.handlers.add("setDocumentModified", function (bIsModified) {
 				self.Api.onUpdateDocumentModified(bIsModified);

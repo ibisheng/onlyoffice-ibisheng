@@ -194,9 +194,6 @@ CHistory.prototype =
             return null;
         }
 
-        if (this.Api)
-            this.Api.setUserAlive();
-
         // Запоминаем самое последнее состояние документа для Redo
         if ( this.Index === this.Points.length - 1 )
             this.LastState = this.Document.Get_SelectionState();
@@ -246,9 +243,6 @@ CHistory.prototype =
         if ( true != this.Can_Redo() )
             return null;
 
-        if (this.Api)
-            this.Api.setUserAlive();
-        
         this.Document.Selection_Remove();
         
         var Point = this.Points[++this.Index];
@@ -344,9 +338,6 @@ CHistory.prototype =
     {
 		if (0 !== this.TurnOffHistory || this.Index < 0)
             return;
-
-        if (this.Api)
-            this.Api.setUserAlive();
 
         // Заглушка на случай, если у нас во время создания одной точки в истории, после нескольких изменений идет
         // пересчет, потом снова добавляются изменения и снова запускается пересчет и т.д.

@@ -11,7 +11,6 @@ asc_docs_api.prototype['SetCollaborativeMarksShowType'] = asc_docs_api.prototype
 asc_docs_api.prototype['GetCollaborativeMarksShowType'] = asc_docs_api.prototype.GetCollaborativeMarksShowType;
 asc_docs_api.prototype['Clear_CollaborativeMarks'] = asc_docs_api.prototype.Clear_CollaborativeMarks;
 asc_docs_api.prototype['_onUpdateDocumentCanSave'] = asc_docs_api.prototype._onUpdateDocumentCanSave;
-asc_docs_api.prototype['setUserAlive'] = asc_docs_api.prototype.setUserAlive;
 asc_docs_api.prototype['SetUnchangedDocument'] = asc_docs_api.prototype.SetUnchangedDocument;
 asc_docs_api.prototype['SetDocumentModified'] = asc_docs_api.prototype.SetDocumentModified;
 asc_docs_api.prototype['isDocumentModified'] = asc_docs_api.prototype.isDocumentModified;

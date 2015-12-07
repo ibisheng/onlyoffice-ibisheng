@@ -134,7 +134,6 @@ asc_docs_api.prototype['asc_coAuthoringDisconnect'] = asc_docs_api.prototype.asc
 asc_docs_api.prototype['asc_getSpellCheckLanguages'] = asc_docs_api.prototype.asc_getSpellCheckLanguages;
 asc_docs_api.prototype['asc_SpellCheckDisconnect'] = asc_docs_api.prototype.asc_SpellCheckDisconnect;
 asc_docs_api.prototype['_onUpdateDocumentCanSave'] = asc_docs_api.prototype._onUpdateDocumentCanSave;
-asc_docs_api.prototype['setUserAlive'] = asc_docs_api.prototype.setUserAlive;
 asc_docs_api.prototype['put_FramePr'] = asc_docs_api.prototype.put_FramePr;
 asc_docs_api.prototype['asyncFontEndLoaded_MathDraw'] = asc_docs_api.prototype.asyncFontEndLoaded_MathDraw;
 asc_docs_api.prototype['sendMathTypesToMenu'] = asc_docs_api.prototype.sendMathTypesToMenu;
