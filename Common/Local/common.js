@@ -85,7 +85,13 @@ DocumentUrls.prototype =
 	},
 	addImageUrl : function(strPath, url){
 	},
-	getImageUrl : function(strPath){
+	getImageUrl : function(strPath){		
+		if (0 === strPath.indexOf('theme'))
+			return null;
+		
+		if (window.editor && window.editor.ThemeLoader && window.editor.ThemeLoader.ThemesUrl != "" && strPath.indexOf(window.editor.ThemeLoader.ThemesUrl) == 0)
+			return null;
+		
 		return this.documentUrl + "/media/" + strPath;
 	},
 	getImageLocal : function(url){
@@ -97,7 +103,13 @@ DocumentUrls.prototype =
 	imagePath2Local : function(imageLocal){
 		return this.getImageLocal(imageLocal);
 	},
-	getUrl : function(strPath){
+	getUrl : function(strPath){		
+		if (0 === strPath.indexOf('theme'))
+			return null;
+		
+		if (window.editor && window.editor.ThemeLoader && window.editor.ThemeLoader.ThemesUrl != "" && strPath.indexOf(window.editor.ThemeLoader.ThemesUrl) == 0)
+			return null;
+		
 		return this.documentUrl + "/media/" + strPath;
 	},
 	getLocal : function(url){		
