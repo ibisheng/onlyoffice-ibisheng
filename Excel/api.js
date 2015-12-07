@@ -2488,9 +2488,6 @@ var editor;
     }
   };
 
-  spreadsheet_api.prototype.asyncImagesDocumentStartLoaded = function() {
-  };
-
   spreadsheet_api.prototype.asyncImagesDocumentEndLoaded = function() {
   };
 
