@@ -496,7 +496,6 @@
     function CGlobalImageLoader()
     {
         this.map_image_index = {};
-        this.imagesPath = "";
 
         // loading
         this.Api = null;
