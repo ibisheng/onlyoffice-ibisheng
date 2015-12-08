@@ -15228,6 +15228,17 @@ CDocument.prototype.Set_ShowParagraphMarks = function(isShow, isRedraw)
         this.DrawingDocument.FirePaint();
     }
 };
+CDocument.prototype.Get_StyleNameById = function(StyleId)
+{
+    if (!this.Styles)
+        return "";
+
+    var Style = this.Styles.Get(StyleId);
+    if (!Style)
+        return "";
+
+    return Style.Get_Name();
+};
 //-----------------------------------------------------------------------------------
 // Private
 //-----------------------------------------------------------------------------------

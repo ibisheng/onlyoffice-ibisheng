@@ -6573,6 +6573,7 @@ asc_docs_api.prototype.asc_RemoveStyle = function(sName){};
 asc_docs_api.prototype.asc_RemoveAllCustomStyles = function(){};
 asc_docs_api.prototype.asc_IsStyleDefault = function(sName){return true;};
 asc_docs_api.prototype.asc_IsDefaultStyleChanged = function(sName){return false;};
+asc_docs_api.prototype.asc_GetStyleNameById = function(StyleId){return this.WordControl.m_oLogicDocument.Get_StyleNameById(StyleId);};
 //----------------------------------------------------------------------------------------------------------------------
 // Работаем с рецензированием
 //----------------------------------------------------------------------------------------------------------------------

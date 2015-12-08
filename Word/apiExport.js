@@ -506,6 +506,7 @@ asc_docs_api.prototype['asc_RemoveStyle'] = asc_docs_api.prototype.asc_RemoveSty
 asc_docs_api.prototype['asc_RemoveAllCustomStyles'] = asc_docs_api.prototype.asc_RemoveAllCustomStyles;
 asc_docs_api.prototype['asc_IsStyleDefault'] = asc_docs_api.prototype.asc_IsStyleDefault;
 asc_docs_api.prototype['asc_IsDefaultStyleChanged'] = asc_docs_api.prototype.asc_IsDefaultStyleChanged;
+asc_docs_api.prototype['asc_GetStyleNameById'] = asc_docs_api.prototype.asc_GetStyleNameById;
 asc_docs_api.prototype['asc_SetTrackRevisions'] = asc_docs_api.prototype.asc_SetTrackRevisions;
 asc_docs_api.prototype['asc_IsTrackRevisions'] = asc_docs_api.prototype.asc_IsTrackRevisions;
 asc_docs_api.prototype['sync_BeginCatchRevisionsChanges'] = asc_docs_api.prototype.sync_BeginCatchRevisionsChanges;
