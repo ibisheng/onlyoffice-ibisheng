@@ -49,6 +49,8 @@ function baseEditorsApi(name) {
   // AutoSave
   this.autoSaveGap = 0;					// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
 
+  this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
+
   // Chart
   this.chartTranslate = new asc_CChartTranslate();
   this.textArtTranslate = new asc_TextArtTranslate();
@@ -434,6 +436,12 @@ baseEditorsApi.prototype._uploadCallback = function(error, files) {
 baseEditorsApi.prototype.asc_showRevision = function(newObj) {
 };
 baseEditorsApi.prototype.asc_undoAllChanges = function() {
+};
+/**
+ * Эта функция возвращает true, если есть изменения или есть lock-и в документе
+ */
+baseEditorsApi.prototype.asc_isDocumentCanSave = function() {
+  return this.isDocumentCanSave;
 };
 // Offline mode
 baseEditorsApi.prototype.asc_isOffline = function() {

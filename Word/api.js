@@ -301,7 +301,6 @@ function asc_docs_api(name)
 	this.mailMergeFileData = null;
 
   this.isCoMarksDraw = false;
-	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
 	// Spell Checking
 	this.SpellCheckApi = (window["AscDesktopEditor"] === undefined) ? new CSpellCheckApi() : new CSpellCheckApi_desktop();
@@ -463,13 +462,6 @@ asc_docs_api.prototype.isDocumentModified = function()
 		return true;
 	}
     return this.isDocumentModify;
-};
-
-/**
- * Эта функция возвращает true, если есть изменения или есть lock-и в документе
- */
-asc_docs_api.prototype.asc_isDocumentCanSave = function () {
-	return this.isDocumentCanSave;
 };
 
 asc_docs_api.prototype.sync_BeginCatchSelectedElements = function()

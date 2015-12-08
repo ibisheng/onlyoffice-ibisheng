@@ -61,7 +61,6 @@ var editor;
     this.oRedoObjectParamNative = null;
 
     this.collaborativeEditing = null;
-    this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
     // AutoSave
     this.lastSaveTime = null;				// Время последнего сохранения
@@ -845,12 +844,6 @@ var editor;
       return History.Is_Modified();
     }
     return false;
-  };
-  /**
-   * Эта функция возвращает true, если есть изменения или есть lock-и в документе
-   */
-  spreadsheet_api.prototype.asc_isDocumentCanSave = function() {
-    return this.isDocumentCanSave;
   };
 
   spreadsheet_api.prototype.asc_getCanUndo = function() {

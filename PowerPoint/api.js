@@ -80,7 +80,6 @@ function asc_docs_api(name)
     this.SelectedObjectsStack = [];
 
   this.CoAuthoringApi.isPowerPoint = true;
-	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
     // объекты, нужные для отправки в тулбар (шрифты, стили)
     this._gui_editor_themes = null;
@@ -442,13 +441,6 @@ asc_docs_api.prototype.isDocumentModified = function()
 		return true;
 	}
     return this.isDocumentModify;
-};
-
-/**
- * Эта функция возвращает true, если есть изменения или есть lock-и в документе
- */
-asc_docs_api.prototype.asc_isDocumentCanSave = function () {
-	return this.isDocumentCanSave;
 };
 
 asc_docs_api.prototype.sync_BeginCatchSelectedElements = function()
