@@ -10302,7 +10302,11 @@ ParaRun.prototype.Accept_RevisionChanges = function(Type, bAll)
             Parent.Remove_FromContent(CenterRunPos, 1);
 
             if (Parent.Get_ContentLength() <= 0)
+            {
+                Parent.Selection_Remove();
                 Parent.Add_ToContent(0, new ParaRun());
+                Parent.Cursor_MoveToStartPos();
+            }
         }
     }
 };
@@ -10366,7 +10370,11 @@ ParaRun.prototype.Reject_RevisionChanges = function(Type, bAll)
             Parent.Remove_FromContent(CenterRunPos, 1);
 
             if (Parent.Get_ContentLength() <= 0)
+            {
+                Parent.Selection_Remove();
                 Parent.Add_ToContent(0, new ParaRun());
+                Parent.Cursor_MoveToStartPos();
+            }
         }
         else if (reviewtype_Remove === ReviewType && (undefined === Type || c_oAscRevisionsChangeType.TextRem === Type))
         {
