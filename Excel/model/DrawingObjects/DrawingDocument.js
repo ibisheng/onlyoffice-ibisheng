@@ -1981,8 +1981,6 @@ function CDrawingDocument(drawingObjects)
 
             this.m_lPagesCount = this.m_lCountCalculatePages;
             this.m_oWordControl.CalculateDocumentSize();
-
-            this.m_bIsOpeningDocument = false;
             /*
             if (true === this.m_bIsUpdateDocSize)
             {
