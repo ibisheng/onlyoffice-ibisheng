@@ -118,9 +118,7 @@ CFraction.prototype.drawSkewedFraction = function(PDSE)
 {
     var mgCtrPrp = this.Get_TxtPrControlLetter();
 
-    var penW = mgCtrPrp.FontSize*0.0211;
-
-    var gap = this.dW/2 - penW/7.5;
+    var gap = this.dW/2 - mgCtrPrp.FontSize*0.0028;
     var plh = 9.877777777777776 * mgCtrPrp.FontSize / 36;
 
     var minHeight = 2*this.dW,
@@ -138,6 +136,9 @@ CFraction.prototype.drawSkewedFraction = function(PDSE)
 
     var heightSlash = this.size.height*2/3;
 
+    var x1,  y1,  x2,  y2, b,
+        xx1, yy1, xx2, yy2;
+
     if(heightSlash < maxHeight)
     {
         if(heightSlash < minHeight)
@@ -151,20 +152,19 @@ CFraction.prototype.drawSkewedFraction = function(PDSE)
             tg = (heightSlash - maxHeight)*(tg1 - tg2)/(middleHeight - maxHeight) + tg2;
         }
 
-        var b = this.elements[0][0].size.height - tg*(this.elements[0][0].size.width + gap);
+        b = this.elements[0][0].size.height - tg*(this.elements[0][0].size.width + gap);
 
-        var y1 =  this.elements[0][0].size.height/3,
-            y2 =  this.elements[0][0].size.height/3 + heightSlash;
+        y1 =  this.elements[0][0].size.height/3;
+        y2 =  this.elements[0][0].size.height/3 + heightSlash;
 
-        var x1 =  (y1 - b)/tg,
-            x2 =  (y2 - b)/tg;
+        x1 =  (y1 - b)/tg;
+        x2 =  (y2 - b)/tg;
 
-        var xx1 = X + x1,
-            xx2 = X + x2;
+        xx1 = X + x1;
+        xx2 = X + x2;
 
-        var yy1 = Y + y1,
-            yy2 = Y + y2;
-
+        yy1 = Y + y1;
+        yy2 = Y + y2;
     }
     else
     {
@@ -182,33 +182,23 @@ CFraction.prototype.drawSkewedFraction = function(PDSE)
             shift = maxVal;
 
         var y0 = this.elements[0][0].size.height - shift;
-        var b = this.elements[0][0].size.height - tg*(this.elements[0][0].size.width + gap);
 
-        var y1 = y0,
-            y2 = y0 + heightSlash;
+        b  = this.elements[0][0].size.height - tg*(this.elements[0][0].size.width + gap);
 
-        var x1 = (y1 - b)/tg,
-            x2 = (y2 - b)/tg;
+        y1 = y0;
+        y2 = y0 + heightSlash;
 
-        var xx1 = X + x1,
-            xx2 = X + x2;
+        x1 = (y1 - b)/tg;
+        x2 = (y2 - b)/tg;
 
-        var yy1 = Y + y1,
-            yy2 = Y + y2;
+        xx1 = X + x1;
+        xx2 = X + x2;
 
+        yy1 = Y + y1;
+        yy2 = Y + y2;
     }
 
-    PDSE.Graphics.SetFont(mgCtrPrp);
-
-    PDSE.Graphics.p_width(penW*1000);
-
-    this.Make_ShdColor(PDSE, this.Get_CompiledCtrPrp());
-    PDSE.Graphics._s();
-    PDSE.Graphics._m(xx1, yy1);
-    PDSE.Graphics._l(xx2, yy2);
-    PDSE.Graphics.ds();
-
-    PDSE.Graphics._s();
+    this.drawFractionalLine(PDSE, xx1, yy1, xx2, yy2);
 
     CFraction.superclass.Draw_Elements.call(this, PDSE);
 };
@@ -226,22 +216,44 @@ CFraction.prototype.drawLinearFraction = function(PDSE)
         x2 = X + this.elements[0][0].size.width + shift,
         y2 = Y + this.size.height;
 
+    this.drawFractionalLine(PDSE, x1, y1, x2, y2);
+
+    CFraction.superclass.Draw_Elements.call(this, PDSE);
+};
+CFraction.prototype.drawFractionalLine = function(PDSE, x1, y1, x2, y2)
+{
     var mgCtrPrp = this.Get_TxtPrControlLetter();
     var penW = mgCtrPrp.FontSize*0.0211;
 
     PDSE.Graphics.SetFont(mgCtrPrp);
+
     PDSE.Graphics.p_width(penW*1000);
 
     this.Make_ShdColor(PDSE, this.Get_CompiledCtrPrp());
-
-    PDSE.Graphics._s();
-    PDSE.Graphics._m(x1, y1);
-    PDSE.Graphics._l(x2, y2);
-    PDSE.Graphics.ds();
-
     PDSE.Graphics._s();
 
-    CFraction.superclass.Draw_Elements.call(this, PDSE);
+    var sideY = y2 - y1,
+        sideX = x1 - x2;
+
+    var hypoth = Math.sqrt(sideY*sideY + sideX*sideX);
+
+    var sin = sideY/hypoth,
+        cos = sideX/hypoth;
+
+    var dx = sin*penW/2, dy = cos*penW/2;
+
+    var xx1 = x1 - dx, yy1 = y1 - dy,
+        xx2 = x1 + dx, yy2 = y1 + dy,
+        xx3 = x2 + dx, yy3 = y2 + dy,
+        xx4 = x2 - dx, yy4 = y2 - dy;
+
+    PDSE.Graphics._m(xx1, yy1);
+    PDSE.Graphics._l(xx2, yy2);
+    PDSE.Graphics._l(xx3, yy3);
+    PDSE.Graphics._l(xx4, yy4);
+    PDSE.Graphics._l(xx1, yy1);
+
+    PDSE.Graphics.df();
 };
 CFraction.prototype.getNumerator = function()
 {
@@ -343,7 +355,6 @@ CFraction.prototype.recalculateSkewed = function(oMeasure)
 {
     var mgCtrPrp = this.Get_TxtPrControlLetter();
 
-    //this.gapSlash = 5.011235894097222 * mgCtrPrp.FontSize/36;
     this.dW = 5.011235894097222 * mgCtrPrp.FontSize/36;
     var width = this.elements[0][0].size.width + this.dW + this.elements[0][1].size.width;
     var height = this.elements[0][0].size.height + this.elements[0][1].size.height;
