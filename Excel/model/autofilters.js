@@ -1195,7 +1195,8 @@ var maxIndividualValues = 10000;
 							if(cloneData.Ref.isEqual(aWs.TableParts[l].Ref))
 							{
 								this._cleanStyleTable(cloneData.Ref);
-								aWs.TableParts.splice(l,1);
+                                aWs.workbook.dependencyFormulas.delTableName(aWs.TableParts[l].DisplayName,aWs.getName());
+                                aWs.TableParts.splice(l,1);
 							}	
 						}
 					}
@@ -3442,6 +3443,9 @@ var maxIndividualValues = 10000;
 					}
 
 					newFilter.DisplayName = aWs.workbook.dependencyFormulas.getNextTableName(aWs, ref);
+
+                    //для Redo надо выставлять имя которое было, а не генерить новое
+                    //newFilter.DisplayName = aWs.workbook.dependencyFormulas.addTableName(cloneData.DisplayName, aWs, cloneData.Ref);
 					
 					newFilter.TableStyleInfo = new TableStyleInfo();
 					newFilter.TableStyleInfo.Name = style;
