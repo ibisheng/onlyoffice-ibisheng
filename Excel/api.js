@@ -2929,6 +2929,8 @@ var editor;
         this.collaborativeEditing.applyChanges();
         // Пересылаем свои изменения (просто стираем чужие lock-и, т.к. своих изменений нет)
         this.collaborativeEditing.sendChanges();
+        // Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
+        this.wb._onWSSelectionChanged(/*info*/null);
       }
       return;
     }
