@@ -1772,6 +1772,12 @@ CMathBase.prototype.Draw_Lines = function(PDSL)
     else if ( true === CtrPrp.Strikeout )
         aStrikeout.Add( Y, Y, X, X + Bound.W, LineW, CurColor.r, CurColor.g, CurColor.b );
 
+    this.Draw_LinesForContent(PDSL);
+
+    PDSL.X = Bound.X + Bound.W;
+};
+CMathBase.prototype.Draw_LinesForContent = function(PDSL)
+{
     var StartPos, EndPos;
 
     if(this.bOneLine)
@@ -1787,10 +1793,6 @@ CMathBase.prototype.Draw_Lines = function(PDSL)
 
     for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
         this.Content[CurPos].Draw_Lines(PDSL);
-
-
-
-    PDSL.X = Bound.X + Bound.W;
 };
 CMathBase.prototype.Make_ShdColor = function(PDSE, CurTextPr)
 {

@@ -439,7 +439,7 @@ CRadical.prototype.recalculateSize = function(oMeasure)
         gSign = this.signRadical.gapSign,
         // в случае смещения baseline контента тоже смещается, и по высоте артгумент может выйти чуть за пределы (т.о. значок интеграла будет расположен чуть выше, чем следовало бы, и размер аргумента выйде за границы)
         gArg = this.signRadical.gapArg > 2*g_dKoef_pt_to_mm ? this.signRadical.gapArg : 2*g_dKoef_pt_to_mm; // делаем смещение, т.к. для fontSize 11, 14 и меньше высота плейсхолдера не совпадает
-    // с высотой отрисовки плейсхолдера и происходит наложение черты значка радикала и плейсхолдера
+                                                                                                            // с высотой отрисовки плейсхолдера и происходит наложение черты значка радикала и плейсхолдера
 
     var gapBase = gSign + gArg;
 
@@ -567,6 +567,18 @@ CRadical.prototype.setPosition = function(pos, PosInfo)
 
     pos.x += this.size.width;
 };
+CRadical.prototype.Draw_LinesForContent = function(PDSL)
+{
+    if(this.Pr.type == SQUARE_RADICAL)
+    {
+        this.RealBase.Draw_Lines(PDSL);
+    }
+    else
+    {
+        this.RealBase.Draw_Lines(PDSL);
+        this.Iterator.Draw_Lines(PDSL);
+    }
+};
 CRadical.prototype.Draw_Elements = function(PDSE)
 {
     var X = PDSE.X;
@@ -601,4 +613,3 @@ CRadical.prototype.Is_ContentUse = function(MathContent)
 
     return false;
 };
-
