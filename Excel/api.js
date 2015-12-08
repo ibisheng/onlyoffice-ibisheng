@@ -341,9 +341,7 @@ var editor;
     this.CoAuthoringApi.auth(this.getViewMode());
 
     this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-    if (!this.chartEditor) {
-      this._asc_open();
-    }
+    this._asc_open();
   };
 
   spreadsheet_api.prototype.asc_LoadEmptyDocument = function() {
@@ -693,30 +691,28 @@ var editor;
   };
 
   spreadsheet_api.prototype._asc_open = function() {
-    if (!this.chartEditor) {
-      // Меняем тип состояния (на открытие)
-      this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
+    // Меняем тип состояния (на открытие)
+    this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
 
-      if (offlineMode === this.documentUrl) {
-        // ToDo убрать зависимость от this.FontLoader.fontFilesPath
-        this.documentUrl = this.FontLoader.fontFilesPath + "../Excel/document/";
-        this.DocInfo.asc_putOfflineApp(true);
-        this._OfflineAppDocumentStartLoad();
-      } else {
-        var v = {
-          "c": 'open',
-          "id": this.documentId,
-          "userid": this.documentUserId,
-          "format": this.documentFormat,
-          "vkey": this.documentVKey,
-          "editorid": this.editorId,
-          "url": this.documentUrl,
-          "title": this.documentTitle,
-          "embeddedfonts": this.isUseEmbeddedCutFonts,
-          "viewmode": this.getViewMode()
-        };
-        sendCommand2(this, null, v);
-      }
+    if (offlineMode === this.documentUrl) {
+      // ToDo убрать зависимость от this.FontLoader.fontFilesPath
+      this.documentUrl = this.FontLoader.fontFilesPath + "../Excel/document/";
+      this.DocInfo.asc_putOfflineApp(true);
+      this._OfflineAppDocumentStartLoad();
+    } else {
+      var v = {
+        "c": 'open',
+        "id": this.documentId,
+        "userid": this.documentUserId,
+        "format": this.documentFormat,
+        "vkey": this.documentVKey,
+        "editorid": this.editorId,
+        "url": this.documentUrl,
+        "title": this.documentTitle,
+        "embeddedfonts": this.isUseEmbeddedCutFonts,
+        "viewmode": this.getViewMode()
+      };
+      sendCommand2(this, null, v);
     }
   };
 

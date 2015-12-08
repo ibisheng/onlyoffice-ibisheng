@@ -32,7 +32,6 @@ function baseEditorsApi(name) {
   this.documentTitle = "null";
   this.documentFormatSave = c_oAscFileType.UNKNOWN;
 
-  this.chartEditor = undefined;
   this.documentOpenOptions = undefined;		// Опции при открытии (пока только опции для CSV)
 
   // Тип состояния на данный момент (сохранение, открытие или никакое)
@@ -143,7 +142,6 @@ baseEditorsApi.prototype.asc_setDocInfo = function(oDocInfo) {
     this.documentOrigin = ((sProtocol && '' !== sProtocol) ? sProtocol + '//' : '') + window.location.host;
 
     this.documentOpenOptions = this.DocInfo.asc_getOptions();
-    this.chartEditor = this.DocInfo.asc_getChartEditor();
 
     this.User = new Asc.asc_CUser();
     this.User.asc_setId(this.DocInfo.get_UserId());

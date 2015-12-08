@@ -2640,9 +2640,6 @@
                 this.OfflineApp = true;
 
             this.TemplateReplacement = (null != obj.TemplateReplacement ? obj.TemplateReplacement : null);
-            if(typeof obj.ChartEditor != 'undefined'){
-                this.ChartEditor = obj.ChartEditor;
-            }
 
         }
         else
@@ -2656,7 +2653,6 @@
             this.Options             = null;
             this.CallbackUrl         = null;
             this.TemplateReplacement = null;
-            this.ChartEditor         = null;
         }
     }
      asc_CDocInfo.prototype.get_Id =  asc_CDocInfo.prototype.asc_getId = function(){return this.Id};
@@ -2681,8 +2677,6 @@
      asc_CDocInfo.prototype.put_CallbackUrl = asc_CDocInfo.prototype.asc_putCallbackUrl = function(v){this.CallbackUrl = v;};
      asc_CDocInfo.prototype.get_TemplateReplacement = asc_CDocInfo.prototype.asc_getTemplateReplacement = function(){return this.TemplateReplacement;};
      asc_CDocInfo.prototype.put_TemplateReplacement = asc_CDocInfo.prototype.asc_putTemplateReplacement = function(v){this.TemplateReplacement = v;};
-     asc_CDocInfo.prototype.get_ChartEditor =  asc_CDocInfo.prototype.asc_getChartEditor = function(){return this.ChartEditor;};
-     asc_CDocInfo.prototype.put_ChartEditor =  asc_CDocInfo.prototype.asc_putChartEditor = function(v){this.ChartEditor = v;};
      asc_CDocInfo.prototype.get_UserInfo =  asc_CDocInfo.prototype.asc_getUserInfo = function(){return this.UserInfo;};
      asc_CDocInfo.prototype.put_UserInfo =  asc_CDocInfo.prototype.asc_putUserInfo = function(v){this.UserInfo = v;};
 
@@ -2710,8 +2704,6 @@
     prot["put_CallbackUrl"]         = prot["asc_putCallbackUrl"]         =   prot.asc_putCallbackUrl;
     prot["get_TemplateReplacement"] = prot["asc_getTemplateReplacement"] =   prot.asc_getTemplateReplacement;
     prot["put_TemplateReplacement"] = prot["asc_putTemplateReplacement"] =   prot.asc_putTemplateReplacement;
-    prot["get_ChartEditor"]            = prot["asc_getChartEditor"]            =   prot.asc_getChartEditor;
-    prot["put_ChartEditor"]            = prot["asc_putChartEditor"]            =   prot.asc_putChartEditor;
 	prot["get_UserInfo"]            = prot["asc_getUserInfo"]            =   prot.asc_getUserInfo;
     prot["put_UserInfo"]            = prot["asc_putUserInfo"]            =   prot.asc_putUserInfo;
 

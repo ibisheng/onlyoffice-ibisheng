@@ -540,7 +540,6 @@
 	var sProtocol = window.location.protocol;
 	var sHost = window.location.host;
 	var key = !!getURLParameter("key");
-	var bChartEditor = !!getURLParameter("charteditor");
 	var sUserNameAndId = "user_" + Math.floor ((Math.random() * 100) + 1);
 
     var offLineApp = 0; //  1;  // NOTE: ONLY FOR TEST DESKTOP APPLICATION
@@ -554,8 +553,7 @@
             "VKey"   : getURLParameter("vkey") ? decodeURIComponent(getURLParameter("vkey")) : undefined,
             "Origin" : (sProtocol.search(/\w+/) >= 0 ? sProtocol + "//" : "") + sHost,
             "UserId" : sUserNameAndId,
-            "UserName" : sUserNameAndId,
-            "ChartEditor" : bChartEditor
+            "UserName" : sUserNameAndId
         };
     } else {
         c_DocInfo = {
@@ -567,7 +565,6 @@
             "Origin" : (sProtocol.search(/\w+/) >= 0 ? sProtocol + "//" : "") + sHost,
             "UserId" : sUserNameAndId,
             "UserName" : sUserNameAndId,
-            "ChartEditor" : bChartEditor,
             "OfflineApp" : true
         };
     }
