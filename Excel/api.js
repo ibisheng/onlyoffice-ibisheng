@@ -26,6 +26,7 @@ var editor;
    */
   function spreadsheet_api(name, inputName, eventsHandlers) {
     spreadsheet_api.superclass.constructor.call(this, name);
+    this.editorId = c_oEditorId.Spreadsheet;
 
     /************ private!!! **************/
     this.topLineEditorName = inputName;

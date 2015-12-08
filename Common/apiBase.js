@@ -6,6 +6,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 function baseEditorsApi(name) {
   g_fontApplication.Init();
 
+  this.editorId = null;
+
   this.HtmlElementName = name;
   this.HtmlElement = null;
 
