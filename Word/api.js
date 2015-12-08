@@ -276,7 +276,6 @@ function asc_docs_api(name)
   this.documentFormatSave = c_oAscFileType.DOCX;
 
 	//todo убрать из native, copypaste, chart, loadfont
-    //this.DocumentUrl = "";
 	this.InterfaceLocale = null;
         
     this.ShowParaMarks = false;

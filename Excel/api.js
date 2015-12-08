@@ -677,16 +677,13 @@ var editor;
   };
 
   spreadsheet_api.prototype._OfflineAppDocumentStartLoad = function(fCallback) {
-    var t = this, src = this.FontLoader.fontFilesPath;
-    //window.g_offline_doc defined in external script, so use it in square breaks
-    src += window["g_offline_doc"] ? window["g_offline_doc"] : "../Excel/document/";
-
+    var t = this;
     var scriptElem = document.createElement('script');
     scriptElem.onload = scriptElem.onerror = function() {
       t._OfflineAppDocumentEndLoad(fCallback);
     };
 
-    scriptElem.setAttribute('src', src + "editor.js");
+    scriptElem.setAttribute('src', this.documentUrl + "editor.js");
     scriptElem.setAttribute('type', 'text/javascript');
     document.getElementsByTagName('head')[0].appendChild(scriptElem);
   };
@@ -706,6 +703,8 @@ var editor;
       this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
 
       if (offlineMode === this.documentUrl) {
+        // ToDo убрать зависимость от this.FontLoader.fontFilesPath
+        this.documentUrl = this.FontLoader.fontFilesPath + "../Excel/document/";
         this.DocInfo.asc_putOfflineApp(true);
         this._OfflineAppDocumentStartLoad(fCallback);
       } else {
