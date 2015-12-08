@@ -1005,6 +1005,7 @@ var historyitem_Drawing_SetLocked         = 15;// Устанавливаем п�
 var historyitem_Drawing_SetRelativeHeight = 16;// Устанавливаем Z-Index
 var historyitem_Drawing_SetEffectExtent   = 17;// Устанавливаем EffectExtent
 var historyitem_Drawing_SetParent         = 18;// Устанавливаем Parent
+var historyitem_Drawing_SetParaMath       = 19; // Добавляем новую формулу для конвертации старого формата в новый
 
 
 

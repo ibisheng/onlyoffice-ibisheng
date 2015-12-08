@@ -5271,6 +5271,11 @@ ParaDrawing.prototype =
                 this.Parent = Data.oldPr;
                 break;
             }
+            case historyitem_Drawing_SetParaMath:
+            {
+                this.ParaMath = Data.Old;
+                break;
+            }
         }
     },
 
@@ -5402,6 +5407,12 @@ ParaDrawing.prototype =
                 this.Parent = Data.newPr;
                 break;
             }
+            case historyitem_Drawing_SetParaMath:
+            {
+                this.ParaMath = Data.New;
+                break;
+            }
+
         }
     },
 
@@ -5791,6 +5802,23 @@ ParaDrawing.prototype =
                 writeObject(Writer, Data.newPr);
                 break;
             }
+            case historyitem_Drawing_SetParaMath:
+            {
+                // Bool    : isUndefined
+                // String2 : ParaMath.Id
+
+                if (Data.New instanceof ParaMath)
+                {
+                    Writer.WriteBool(false);
+                    Writer.WriteString2(Data.New.Get_Id());
+                }
+                else
+                {
+                    Writer.WriteBool(true);
+                }
+
+                break;
+            }
         }
 
         return Writer;
@@ -5970,6 +5998,22 @@ ParaDrawing.prototype =
                 this.Parent = readObject(Reader);
                 break;
             }
+            case historyitem_Drawing_SetParaMath:
+            {
+                // Bool    : isUndefined
+                // String2 : ParaMath.Id
+
+                this.ParaMath = undefined;
+                if (false === Reader.GetBool())
+                {
+                    var paraMath = g_oTableId.Get_ById(Reader.GetString2());
+                    if (paraMath instanceof ParaMath)
+                        this.ParaMath = paraMath;
+                }
+
+                break;
+            }
+
         }
     },
 //-----------------------------------------------------------------------------------
@@ -6708,6 +6752,17 @@ ParaDrawing.prototype =
             return true;
 
         return false;
+    },
+
+    Get_ParaMath : function()
+    {
+        return this.ParaMath;
+    },
+
+    Set_ParaMath : function(ParaMath)
+    {
+        History.Add(this, {Type : historyitem_Drawing_SetParaMath, New : ParaMath, Old : this.ParaMath});
+        this.ParaMath = ParaMath;
     },
 
     Convert_ToMathObject : function()
