@@ -587,11 +587,12 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     this.Inline = Inline;
 
     this.Lock = new CLock();
-    if ( false === g_oIdCounter.m_bLoad )
+    // TODO: Когда у g_oIdCounter будет тоже проверка на TurnOff заменить здесь
+    if (false === g_oIdCounter.m_bLoad && true === History.Is_On())
     {
         this.Lock.Set_Type(locktype_Mine, false);
-        if (typeof CollaborativeEditing !== "undefined")
-            CollaborativeEditing.Add_Unlock2( this );
+        if (CollaborativeEditing)
+            CollaborativeEditing.Add_Unlock2(this);
     }
     
     this.DrawingDocument = null;

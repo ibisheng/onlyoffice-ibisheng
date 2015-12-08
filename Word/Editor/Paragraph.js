@@ -115,10 +115,12 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     // True, если ячейка попадает в выделение по ячейкам.
 
     this.Lock = new CLock(); // Зажат ли данный параграф другим пользователем
-    if ( false === g_oIdCounter.m_bLoad )
+    // TODO: Когда у g_oIdCounter будет тоже проверка на TurnOff заменить здесь
+    if (false === g_oIdCounter.m_bLoad && true === History.Is_On())
     {
-        //this.Lock.Set_Type( locktype_Mine, false );
-        //CollaborativeEditing.Add_Unlock2( this );
+        this.Lock.Set_Type(locktype_Mine, false);
+        if (CollaborativeEditing)
+            CollaborativeEditing.Add_Unlock2(this);
     }
 
     this.DeleteCommentOnRemove    = true; // Удаляем ли комменты в функциях Internal_Content_Remove
