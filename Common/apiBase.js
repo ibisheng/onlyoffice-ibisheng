@@ -119,6 +119,21 @@ baseEditorsApi.prototype._baseInit = function() {
 
   CHART_STYLE_MANAGER = new CChartStyleManager();
 };
+baseEditorsApi.prototype._editorNameById = function() {
+  var res = '';
+  switch (this.editorId) {
+    case c_oEditorId.Word:
+      res = 'Word';
+      break;
+    case c_oEditorId.Spreadsheet:
+      res = 'Excel';
+      break;
+    case c_oEditorId.Presentation:
+      res = 'PowerPoint';
+      break;
+  }
+  return res;
+};
 baseEditorsApi.prototype.asc_GetFontThumbnailsPath = function() {
   return '../Common/Images/';
 };
@@ -228,7 +243,7 @@ baseEditorsApi.prototype.asc_LoadDocument = function(isVersionHistory) {
 
   if (offlineMode === this.documentUrl) {
     // ToDo убрать зависимость от this.FontLoader.fontFilesPath
-    this.documentUrl = this.FontLoader.fontFilesPath + "../Excel/document/"; // поменять!
+    this.documentUrl = this.FontLoader.fontFilesPath + '../' + this._editorNameById() + '/document/';
     this.DocInfo.asc_putOfflineApp(true);
     this._OfflineAppDocumentStartLoad();
   } else {

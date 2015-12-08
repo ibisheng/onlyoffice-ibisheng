@@ -497,35 +497,7 @@ asc_docs_api.prototype.Init = function() {
 asc_docs_api.prototype.asc_setLocale = function(val) {
 };
 asc_docs_api.prototype.LoadDocument = function() {
-  this.CoAuthoringApi.auth(this.isViewMode);
-
-  // Меняем тип состояния (на открытие)
-  this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
-
-  if (offlineMode !== this.documentUrl) {
-    this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-    var rData = {
-      "id": this.documentId,
-      "userid": this.documentUserId,
-      "format": this.documentFormat,
-      "vkey": this.documentVKey,
-      "editorid": this.editorId,
-      "c": "open",
-      "url": this.documentUrl,
-      "title": this.documentTitle,
-      "embeddedfonts": this.isUseEmbeddedCutFonts,
-      "viewmode": this.isViewMode
-    };
-
-    sendCommand2(this, null, rData);
-  } else {
-    // ToDo убрать зависимость от this.FontLoader.fontFilesPath
-    this.documentUrl = this.FontLoader.fontFilesPath + "../PowerPoint/document/";
-    this.DocInfo.put_OfflineApp(true);
-
-    this._OfflineAppDocumentStartLoad();
-  }
-  this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, this.WordControl.m_nZoomType);
+  this.asc_LoadDocument();
 };
 
 asc_docs_api.prototype.SetThemesPath = function(path)
