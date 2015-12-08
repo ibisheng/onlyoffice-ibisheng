@@ -511,7 +511,7 @@ asc_docs_api.prototype.LoadDocument = function() {
       "userid": this.documentUserId,
       "format": this.documentFormat,
       "vkey": this.documentVKey,
-      "editorid": c_oEditorId.Presentation,
+      "editorid": this.editorId,
       "c": "open",
       "url": this.documentUrl,
       "title": this.documentTitle,
