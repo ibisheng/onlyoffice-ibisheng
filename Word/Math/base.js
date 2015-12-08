@@ -1778,6 +1778,9 @@ CMathBase.prototype.Draw_Lines = function(PDSL)
 };
 CMathBase.prototype.Draw_LinesForContent = function(PDSL)
 {
+    var CurLine  = PDSL.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PDSL.Range - this.StartRange : PDSL.Range );
+    
     var StartPos, EndPos;
 
     if(this.bOneLine)
