@@ -6839,6 +6839,14 @@ ParaDrawing.prototype =
     {
         if (this.GraphicObj && this.GraphicObj.Get_RevisionsChangeParagraph)
             this.GraphicObj.Get_RevisionsChangeParagraph(SearchEngine);
+    },
+
+    Get_ObjectType : function()
+    {
+        if (this.GraphicObj)
+            return this.GraphicObj.getObjectType();
+
+        return historyitem_type_Drawing;
     }
 };
 

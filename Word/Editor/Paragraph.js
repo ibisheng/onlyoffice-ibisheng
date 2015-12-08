@@ -14860,7 +14860,7 @@ function CParagraphRevisionsChangesChecker(Para, RevisionsManager)
         ChangeType : null,
         StartPos   : null,
         EndPos     : null,
-        Value      : "",
+        Value      : [],
         UserId     : "",
         UserName   : "",
         DateTime   : 0
@@ -14897,7 +14897,7 @@ CParagraphRevisionsChangesChecker.prototype.Flush_AddRemoveChange = function()
     AddRemove.ChangeType = null;
     AddRemove.StartPos   = null;
     AddRemove.EndPos     = null;
-    AddRemove.Value      = "";
+    AddRemove.Value      = [];
     AddRemove.UserId     = "";
     AddRemove.UserName   = "";
     AddRemove.DateTime   = 0;
@@ -14936,7 +14936,7 @@ CParagraphRevisionsChangesChecker.prototype.Start_AddRemove = function(ChangeTyp
     this.AddRemove.ChangeType = ChangeType;
     this.AddRemove.StartPos   = ContentPos.Copy();
     this.AddRemove.EndPos     = ContentPos.Copy();
-    this.AddRemove.Value      = "";
+    this.AddRemove.Value      = [];
 };
 CParagraphRevisionsChangesChecker.prototype.Set_AddRemoveEndPos = function(ContentPos)
 {
@@ -14953,15 +14953,51 @@ CParagraphRevisionsChangesChecker.prototype.Update_AddRemoveReviewInfo = functio
 };
 CParagraphRevisionsChangesChecker.prototype.Add_Text = function(Text)
 {
-    this.AddRemove.Value += Text;
+    if (!Text || "" === Text)
+        return;
+
+    var Value = this.AddRemove.Value;
+    var ValueLen = Value.length;
+    if (ValueLen <= 0 || "string" !== typeof Value[ValueLen - 1])
+    {
+        Value.push("" + Text);
+    }
+    else
+    {
+        Value[ValueLen - 1] += Text;
+    }
 };
 CParagraphRevisionsChangesChecker.prototype.Add_Math = function(MathElement)
 {
-    this.AddRemove.Value += "[ FORMULA ]";
+    this.AddRemove.Value.push(c_oAscRevisionsObjectType.MathEquation);
 };
 CParagraphRevisionsChangesChecker.prototype.Add_Drawing = function(Drawing)
 {
-    this.AddRemove.Value += "[ DRAWING ]";
+    if (Drawing)
+    {
+        var Type = Drawing.Get_ObjectType();
+        switch (Type)
+        {
+            case historyitem_type_Chart:
+            case historyitem_type_ChartSpace:
+            {
+                this.AddRemove.Value.push(c_oAscRevisionsObjectType.Chart);
+                break;
+            }
+            case historyitem_type_ImageShape:
+            case historyitem_type_Image:
+            {
+                this.AddRemove.Value.push(c_oAscRevisionsObjectType.Image);
+                break;
+            }
+            case historyitem_type_Shape:
+            default:
+            {
+                this.AddRemove.Value.push(c_oAscRevisionsObjectType.Shape);
+                break;
+            }
+        }
+    }
 };
 CParagraphRevisionsChangesChecker.prototype.Have_PrChange = function()
 {

@@ -579,4 +579,12 @@ var c_oAscRevisionsChangeType = {
   ParaPr: 0x06
 };
 
+var c_oAscRevisionsObjectType =
+{
+  Image        : 0,
+  Shape        : 1,
+  Chart        : 2,
+  MathEquation : 3
+};
+
 window["flat_desine"] = false;
