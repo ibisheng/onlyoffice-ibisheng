@@ -1269,8 +1269,6 @@ var editor;
     this.CoAuthoringApi.onEndCoAuthoring = function(isStartEvent) {
       t.endCollaborationEditing();
     };
-
-    this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Spreadsheet, this.documentFormatSave);
   };
 
   spreadsheet_api.prototype._onSaveChanges = function(recalcIndexColumns, recalcIndexRows) {

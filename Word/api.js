@@ -1041,8 +1041,6 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
     CollaborativeEditing.End_CollaborationEditing();
     editor.asc_setDrawCollaborationMarks(false);
   };
-
-  this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Word, this.documentFormatSave);
 };
 
 /////////////////////////////////////////////////////////////////////////

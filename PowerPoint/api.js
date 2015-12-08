@@ -354,8 +354,6 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
       t.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
     }
   };
-
-  this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', c_oEditorId.Presentation, this.documentFormatSave);
 };
 
 

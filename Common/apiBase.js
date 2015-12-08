@@ -371,6 +371,7 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
   };
 
   this._coAuthoringInitEnd();
+  this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', this.editorId, this.documentFormatSave);
 };
 baseEditorsApi.prototype._coAuthoringInitEnd = function() {
 };
