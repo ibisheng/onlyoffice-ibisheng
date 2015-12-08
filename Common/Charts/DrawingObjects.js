@@ -2668,14 +2668,18 @@ function DrawingObjects() {
         else if ( objectProperties.ShapeProperties && objectProperties.ShapeProperties.fill && objectProperties.ShapeProperties.fill.fill &&
             !isNullOrEmptyString(objectProperties.ShapeProperties.fill.fill.url) ) {
 
-            _img = api.ImageLoader.LoadImage(objectProperties.ShapeProperties.fill.fill.url, 1);
-            if ( null != _img ) {
+            if (window['IS_NATIVE_EDITOR']) {
                 _this.controller.setGraphicObjectProps( objectProperties );
-            }
-            else {
-                _this.asyncImageEndLoaded = function(_image) {
+            } else {
+                _img = api.ImageLoader.LoadImage(objectProperties.ShapeProperties.fill.fill.url, 1);
+                if ( null != _img ) {
                     _this.controller.setGraphicObjectProps( objectProperties );
-                    _this.asyncImageEndLoaded = null;
+                }
+                else {
+                    _this.asyncImageEndLoaded = function(_image) {
+                        _this.controller.setGraphicObjectProps( objectProperties );
+                        _this.asyncImageEndLoaded = null;
+                    }
                 }
             }
         }

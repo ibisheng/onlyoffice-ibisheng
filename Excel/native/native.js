@@ -2694,18 +2694,23 @@ function asc_WriteAutoFilterInfo(i, c, s) {
 
     if (i !== -1) s['WriteByte'](i);
 
-    s['WriteByte'](0);
-    s['WriteBool'](c.asc_getIsAutoFilter());
-    s['WriteBool'](c.asc_getIsApplyAutoFilter());
-
     if (c.asc_getTableStyleName()) {
-        s['WriteByte'](1);
+        s['WriteByte'](0);
         s['WriteString2'](c.asc_getTableStyleName());
     }
 
     if (c.asc_getTableName()) {
-        s['WriteByte'](2);
+        s['WriteByte'](1);
         s['WriteString2'](c.asc_getTableName());
+    }
+    if (null !== c.asc_getIsAutoFilter()) {
+        s['WriteByte'](2);
+        s['WriteBool'](c.asc_getIsAutoFilter());
+    }
+
+    if (null !== c.asc_getIsApplyAutoFilter()) {
+        s['WriteByte'](3);
+        s['WriteString2'](c.asc_getIsApplyAutoFilter());
     }
 
     s['WriteByte'](255);
@@ -2809,7 +2814,7 @@ function asc_WriteAddFormatTableOptions(c, s) {
 
     if (c.asc_getIsTitle()) {
         s['WriteByte'](1);
-        s['WriteLong'](c.asc_getIsTitle());
+        s['WriteBool'](c.asc_getIsTitle());
     }
 
     s['WriteByte'](255);
@@ -2856,10 +2861,9 @@ function OfflineEditor () {
         userInfo.asc_putId('ios');
         userInfo.asc_putFullName('ios');
         userInfo.asc_getLastName('ios');
+
         var docInfo =  new Asc.asc_CDocInfo();
         docInfo.put_Id('ios');
-
-        docInfo.put_ChartEditor(true);
         docInfo.put_UserInfo(userInfo);
 
         this.offline_beforeInit();
@@ -4800,21 +4804,29 @@ function offline_apply_event(type,params) {
 
                         if (bIsNeed)
                         {
-//                            var _originSize = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"](_imagePr.ImageUrl);
-//                            var _w = _originSize[0];
-//                            var _h = _originSize[1];
+                            var _originSize = this.Native["GetOriginalImageSize"](_imagePr.ImageUrl);
+                            var _w = _originSize[0];
+                            var _h = _originSize[1];
+
+                            // сбрасываем урл
+                            //_imagePr.ImageUrl = undefined;
+
+//                            var Page_Width     = 210;
+//                            var Page_Height    = 297;
 //
-//                            // сбрасываем урл
-//                            _imagePr.ImageUrl = undefined;
+//                            var X_Left_Margin   = 30;  // 3   cm
+//                            var X_Right_Margin  = 15;  // 1.5 cm
+//                            var Y_Bottom_Margin = 20;  // 2   cm
+//                            var Y_Top_Margin    = 20;  // 2   cm
 //
-//                            var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
+//                            //var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
 //                            var _page_width = Page_Width;
 //                            var _page_height = Page_Height;
 //                            var _page_x_left_margin = X_Left_Margin;
 //                            var _page_y_top_margin = Y_Top_Margin;
 //                            var _page_x_right_margin = X_Right_Margin;
 //                            var _page_y_bottom_margin = Y_Bottom_Margin;
-//
+
 //                            if (_section_select)
 //                            {
 //                                if (_section_select.W)
@@ -4823,7 +4835,7 @@ function offline_apply_event(type,params) {
 //                                if (_section_select.H)
 //                                    _page_height = _section_select.H;
 //                            }
-//
+
 //                            var __w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
 //                            var __h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
 //
@@ -4832,9 +4844,9 @@ function offline_apply_event(type,params) {
 //
 //                            wI = Math.max(5, Math.min(wI, __w));
 //                            hI = Math.max(5, Math.min(hI, __h));
-//
-//                            _imagePr.Width = wI;
-//                            _imagePr.Height = hI;
+
+                            _imagePr.Width = _w;  // wI;
+                            _imagePr.Height = _h; // hI;
                         }
 
                         break;
@@ -4848,7 +4860,11 @@ function offline_apply_event(type,params) {
                 }
             }
 
-            _api.asc_setGraphicObjectProps(_imagePr);
+            var ws = _api.wb.getWorksheet();
+            var objectRender = ws.objectRender;
+            ws.objectRender.setGraphicObjectProps(_imagePr);
+
+           // _api.asc_setGraphicObjectProps(_imagePr);
             break;
         }
 
