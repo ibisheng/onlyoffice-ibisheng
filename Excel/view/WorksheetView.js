@@ -4226,160 +4226,168 @@
 			}
 		};
 
-		WorksheetView.prototype._addCellTextToCache = function (col, row, canChangeColWidth) {
-            var self = this;
+    WorksheetView.prototype._addCellTextToCache = function(col, row, canChangeColWidth) {
+      var self = this;
 
-            function makeFnIsGoodNumFormat(flags, width) {
-                return function (str) {
-                    return self.stringRender.measureString(str, flags, width).width <= width;
-                };
-            }
+      function makeFnIsGoodNumFormat(flags, width) {
+        return function(str) {
+          return self.stringRender.measureString(str, flags, width).width <= width;
+        };
+      }
 
-            var c = this._getCell(col, row);
-            if (null === c) {return col;}
+      var c = this._getCell(col, row);
+      if (null === c) {
+        return col;
+      }
 
-            var bUpdateScrollX = false;
-            var bUpdateScrollY = false;
-            // Проверка на увеличение колличества столбцов
-            if (col >= this.cols.length) {
-                bUpdateScrollX = this.expandColsOnScroll(/*isNotActive*/ false, /*updateColsCount*/ true);
-            }
-            // Проверка на увеличение колличества строк
-            if (row >= this.rows.length) {
-                bUpdateScrollY = this.expandRowsOnScroll(/*isNotActive*/ false, /*updateRowsCount*/ true);
-            }
-            if (bUpdateScrollX && bUpdateScrollY) {
-                this.handlers.trigger("reinitializeScroll");
-            } else if (bUpdateScrollX) {
-                this.handlers.trigger("reinitializeScrollX");
-            } else if (bUpdateScrollY) {
-                this.handlers.trigger("reinitializeScrollY");
-            }
+      var bUpdateScrollX = false;
+      var bUpdateScrollY = false;
+      // Проверка на увеличение колличества столбцов
+      if (col >= this.cols.length) {
+        bUpdateScrollX = this.expandColsOnScroll(/*isNotActive*/ false, /*updateColsCount*/ true);
+      }
+      // Проверка на увеличение колличества строк
+      if (row >= this.rows.length) {
+        bUpdateScrollY = this.expandRowsOnScroll(/*isNotActive*/ false, /*updateRowsCount*/ true);
+      }
+      if (bUpdateScrollX && bUpdateScrollY) {
+        this.handlers.trigger("reinitializeScroll");
+      } else if (bUpdateScrollX) {
+        this.handlers.trigger("reinitializeScrollX");
+      } else if (bUpdateScrollY) {
+        this.handlers.trigger("reinitializeScrollY");
+      }
 
-			var str, tm, isMerged = false, strCopy;
+      var str, tm, isMerged = false, strCopy;
 
-            // Range для замерженной ячейки
-            var fl = this._getCellFlags(c);
-			var mc = fl.merged;
-            var fMergedColumns = false;	// Замержены ли колонки (если да, то автоподбор ширины не должен работать)
-            var fMergedRows = false;	// Замержены ли строки (если да, то автоподбор высоты не должен работать)
-            if (null !== mc) {
-                if (col !== mc.c1 || row !== mc.r1) {return mc.c2;} // skip other merged cell from range
-                if (mc.c1 !== mc.c2)
-                    fMergedColumns = true;
-                if (mc.r1 !== mc.r2)
-                    fMergedRows = true;
-				isMerged = true;
-            }
+      // Range для замерженной ячейки
+      var fl = this._getCellFlags(c);
+      var mc = fl.merged;
+      var fMergedColumns = false;	// Замержены ли колонки (если да, то автоподбор ширины не должен работать)
+      var fMergedRows = false;	// Замержены ли строки (если да, то автоподбор высоты не должен работать)
+      if (null !== mc) {
+        if (col !== mc.c1 || row !== mc.r1) {
+          return mc.c2;
+        } // skip other merged cell from range
+        if (mc.c1 !== mc.c2) {
+          fMergedColumns = true;
+        }
+        if (mc.r1 !== mc.r2) {
+          fMergedRows = true;
+        }
+        isMerged = true;
+      }
 
-			var angle = c.getAngle();
-			if (this._isCellEmptyTextString(c)) {
-				if (!angle && c.isNotDefaultFont()) {
-					// Пустая ячейка с измененной гарнитурой или размером, учитвается в высоте
-					str = c.getValue2();
-					if (0 < str.length) {
-						// Без текста не будет толка
-						strCopy = [str[0].clone()];
-						strCopy[0].text = 'A';
-						tm = this._roundTextMetrics(this.stringRender.measureString(strCopy, fl));
-						this._updateRowHeight(tm, col, row, isMerged, fMergedRows);
-					}
-				}
+      var angle = c.getAngle();
+      if (this._isCellEmptyTextString(c)) {
+        if (!angle && c.isNotDefaultFont()) {
+          // Пустая ячейка с измененной гарнитурой или размером, учитвается в высоте
+          str = c.getValue2();
+          if (0 < str.length) {
+            // Без текста не будет толка
+            strCopy = [str[0].clone()];
+            strCopy[0].text = 'A';
+            tm = this._roundTextMetrics(this.stringRender.measureString(strCopy, fl));
+            this._updateRowHeight(tm, col, row, isMerged, fMergedRows);
+          }
+        }
 
-				return mc ? mc.c2 : col;
-			}
+        return mc ? mc.c2 : col;
+      }
 
-            var dDigitsCount = 0;
-            var colWidth = 0;
-            var cellType = c.getType();
-			fl.isNumberFormat = (null === cellType || CellValueType.String !== cellType); // Автоподбор делается по любому типу (кроме строки)
-            var numFormatStr = c.getNumFormatStr();
-            var pad = this.width_padding * 2 + this.width_1px;
-            var sstr, sfl, stm;
+      var dDigitsCount = 0;
+      var colWidth = 0;
+      var cellType = c.getType();
+      fl.isNumberFormat = (null === cellType || CellValueType.String !== cellType); // Автоподбор делается по любому типу (кроме строки)
+      var numFormatStr = c.getNumFormatStr();
+      var pad = this.width_padding * 2 + this.width_1px;
+      var sstr, sfl, stm;
 
-            if (!this.cols[col].isCustomWidth && fl.isNumberFormat && !fMergedColumns &&
-                (c_oAscCanChangeColWidth.numbers === canChangeColWidth ||
-                c_oAscCanChangeColWidth.all === canChangeColWidth)) {
-                colWidth = this.cols[col].innerWidth;
-                // Измеряем целую часть числа
-				sstr = c.getValue2(gc_nMaxDigCountView, function(){return true;});
-                if ("General" === numFormatStr && c_oAscCanChangeColWidth.all !== canChangeColWidth) {
-					// asc.truncFracPart изменяет исходный массив, поэтому клонируем
-					var fragmentsTmp = [];
-					for (var k = 0; k < sstr.length; ++k)
-						fragmentsTmp.push(sstr[k].clone());
-					sstr = asc.truncFracPart(fragmentsTmp);
-				}
-                sfl = fl.clone();
-                sfl.wrapText = false;
-                stm = this._roundTextMetrics( this.stringRender.measureString(sstr, sfl, colWidth) );
-                // Если целая часть числа не убирается в ячейку, то расширяем столбец
-                if (stm.width > colWidth) {this._changeColWidth(col, stm.width, pad);}
-                // Обновленная ячейка
-                dDigitsCount = this.cols[col].charCount;
-                colWidth = this.cols[col].innerWidth;
-            } else if (null === mc) {
-                // Обычная ячейка
-                dDigitsCount = this.cols[col].charCount;
-                colWidth = this.cols[col].innerWidth;
-                // подбираем ширину
-                if (!this.cols[col].isCustomWidth && !fMergedColumns && !fl.wrapText &&
-                    c_oAscCanChangeColWidth.all === canChangeColWidth) {
-                    sstr = c.getValue2(gc_nMaxDigCountView, function(){return true;});
-                    stm = this._roundTextMetrics( this.stringRender.measureString(sstr, fl, colWidth) );
-                    if (stm.width > colWidth) {
-						this._changeColWidth(col, stm.width, pad);
-                        // Обновленная ячейка
-                        dDigitsCount = this.cols[col].charCount;
-                        colWidth = this.cols[col].innerWidth;
-                    }
-                }
-            } else {
-                // Замерженная ячейка, нужна сумма столбцов
-                for (var i = mc.c1; i <= mc.c2 && i < this.cols.length; ++i) {
-                    colWidth += this.cols[i].width;
-					dDigitsCount += this.cols[i].charCount;
-                }
-                colWidth -= pad;
-            }
+      if (!this.cols[col].isCustomWidth && fl.isNumberFormat && !fMergedColumns && (c_oAscCanChangeColWidth.numbers === canChangeColWidth || c_oAscCanChangeColWidth.all === canChangeColWidth)) {
+        colWidth = this.cols[col].innerWidth;
+        // Измеряем целую часть числа
+        sstr = c.getValue2(gc_nMaxDigCountView, function() {
+          return true;
+        });
+        if ("General" === numFormatStr && c_oAscCanChangeColWidth.all !== canChangeColWidth) {
+          // asc.truncFracPart изменяет исходный массив, поэтому клонируем
+          var fragmentsTmp = [];
+          for (var k = 0; k < sstr.length; ++k)
+            fragmentsTmp.push(sstr[k].clone());
+          sstr = asc.truncFracPart(fragmentsTmp);
+        }
+        sfl = fl.clone();
+        sfl.wrapText = false;
+        stm = this._roundTextMetrics(this.stringRender.measureString(sstr, sfl, colWidth));
+        // Если целая часть числа не убирается в ячейку, то расширяем столбец
+        if (stm.width > colWidth) {
+          this._changeColWidth(col, stm.width, pad);
+        }
+        // Обновленная ячейка
+        dDigitsCount = this.cols[col].charCount;
+        colWidth = this.cols[col].innerWidth;
+      } else if (null === mc) {
+        // Обычная ячейка
+        dDigitsCount = this.cols[col].charCount;
+        colWidth = this.cols[col].innerWidth;
+        // подбираем ширину
+        if (!this.cols[col].isCustomWidth && !fMergedColumns && !fl.wrapText && c_oAscCanChangeColWidth.all === canChangeColWidth) {
+          sstr = c.getValue2(gc_nMaxDigCountView, function() {
+            return true;
+          });
+          stm = this._roundTextMetrics(this.stringRender.measureString(sstr, fl, colWidth));
+          if (stm.width > colWidth) {
+            this._changeColWidth(col, stm.width, pad);
+            // Обновленная ячейка
+            dDigitsCount = this.cols[col].charCount;
+            colWidth = this.cols[col].innerWidth;
+          }
+        }
+      } else {
+        // Замерженная ячейка, нужна сумма столбцов
+        for (var i = mc.c1; i <= mc.c2 && i < this.cols.length; ++i) {
+          colWidth += this.cols[i].width;
+          dDigitsCount += this.cols[i].charCount;
+        }
+        colWidth -= pad;
+      }
 
-            // ToDo dDigitsCount нужно рассчитывать исходя не из дефалтового шрифта и размера, а исходя из текущего шрифта и размера ячейки
-                str  = c.getValue2(dDigitsCount, makeFnIsGoodNumFormat(fl, colWidth));
-            var ha   = c.getAlignHorizontalByValue().toLowerCase();
-            var va   = c.getAlignVertical().toLowerCase();
-            var maxW = fl.wrapText || fl.shrinkToFit || isMerged || asc.isFixedWidthCell(str) ? this._calcMaxWidth(col, row, mc) : undefined;
-                tm   = this._roundTextMetrics( this.stringRender.measureString(str, fl, maxW) );
-            var cto  = (isMerged || fl.wrapText) ?
-            {
-                maxWidth:  maxW - this.cols[col].innerWidth + this.cols[col].width,
-                leftSide: 0,
-                rightSide: 0
-            } : this._calcCellTextOffset(col, row, ha, tm.width);
+      // ToDo dDigitsCount нужно рассчитывать исходя не из дефалтового шрифта и размера, а исходя из текущего шрифта и размера ячейки
+      str = c.getValue2(dDigitsCount, makeFnIsGoodNumFormat(fl, colWidth));
+      var ha = c.getAlignHorizontalByValue().toLowerCase();
+      var va = c.getAlignVertical().toLowerCase();
+      var maxW = fl.wrapText || fl.shrinkToFit || isMerged || asc.isFixedWidthCell(str) ? this._calcMaxWidth(col, row, mc) : undefined;
+      tm = this._roundTextMetrics(this.stringRender.measureString(str, fl, maxW));
+      var cto = (isMerged || fl.wrapText) ? {
+        maxWidth: maxW - this.cols[col].innerWidth + this.cols[col].width,
+        leftSide: 0,
+        rightSide: 0
+      } : this._calcCellTextOffset(col, row, ha, tm.width);
 
-            // check right side of cell text and append columns if it exceeds existing cells borders
-            if (!isMerged) {
-                var rside = this.cols[col - cto.leftSide].left + tm.width;
-                var lc    = this.cols[this.cols.length - 1];
-                if (rside > lc.left + lc.width) {
-                    this._appendColumns(rside);
-                    cto = this._calcCellTextOffset(col, row, ha, tm.width);
-                }
-            }
-            var oFontColor = c.getFontcolor();
-            var rowHeight = this.rows[row].height;
-            var textBound = {};
+      // check right side of cell text and append columns if it exceeds existing cells borders
+      if (!isMerged) {
+        var rside = this.cols[col - cto.leftSide].left + tm.width;
+        var lc = this.cols[this.cols.length - 1];
+        if (rside > lc.left + lc.width) {
+          this._appendColumns(rside);
+          cto = this._calcCellTextOffset(col, row, ha, tm.width);
+        }
+      }
+      var oFontColor = c.getFontcolor();
+      var rowHeight = this.rows[row].height;
+      var textBound = {};
 
-            if (angle) {
-                //  повернутый текст учитывает мерж ячеек по строкам
-                if (fMergedRows) {
-                    rowHeight = 0;
+      if (angle) {
+        //  повернутый текст учитывает мерж ячеек по строкам
+        if (fMergedRows) {
+          rowHeight = 0;
 
-                    for (var j = mc.r1; j <= mc.r2 && j < this.nRowsCount; ++j) {
-                        rowHeight += this.rows[j].height;
-                    }
-                }
+          for (var j = mc.r1; j <= mc.r2 && j < this.nRowsCount; ++j) {
+            rowHeight += this.rows[j].height;
+          }
+        }
 
-                textBound = this.stringRender.getTransformBound(angle, 0, 0, colWidth, rowHeight, tm.width, ha, va, maxW);
+        textBound = this.stringRender.getTransformBound(angle, 0, 0, colWidth, rowHeight, tm.width, ha, va, maxW);
 
 //  NOTE: надо сделать как в экселе если проекция строчки на Y больше высоты ячейки подставлять # и рисовать все по центру
 
@@ -4398,34 +4406,34 @@
 //                            tm   =  this._roundTextMetrics(this.stringRender.measureString(str, fl, maxW));
 //                        }
 //                    }
-            }
+      }
 
-            this._fetchCellCache(col, row).text = {
-                state		: this.stringRender.getInternalState(),
-                flags		: fl,
-                color		: (oFontColor || this.settings.cells.defaultState.color),
-                metrics		: tm,
-                cellW		: cto.maxWidth,
-                cellHA		: ha,
-                cellVA		: va,
-                sideL		: cto.leftSide,
-                sideR		: cto.rightSide,
-                cellType	: cellType,
-                isFormula	: c.isFormula(),
-                angle		: angle,
-                textBound	: textBound
-            };
+      this._fetchCellCache(col, row).text = {
+        state: this.stringRender.getInternalState(),
+        flags: fl,
+        color: (oFontColor || this.settings.cells.defaultState.color),
+        metrics: tm,
+        cellW: cto.maxWidth,
+        cellHA: ha,
+        cellVA: va,
+        sideL: cto.leftSide,
+        sideR: cto.rightSide,
+        cellType: cellType,
+        isFormula: c.isFormula(),
+        angle: angle,
+        textBound: textBound
+      };
 
-            this._fetchCellCacheText(col, row).hasText = true;
+      this._fetchCellCacheText(col, row).hasText = true;
 
-            if (cto.leftSide !== 0 || cto.rightSide !== 0) {
-				this._addErasedBordersToCache(col - cto.leftSide, col + cto.rightSide, row);
-			}
+      if (!angle && (cto.leftSide !== 0 || cto.rightSide !== 0)) {
+        this._addErasedBordersToCache(col - cto.leftSide, col + cto.rightSide, row);
+      }
 
-			this._updateRowHeight(tm, col, row, isMerged, fMergedRows, va, ha, angle, maxW, colWidth, textBound);
+      this._updateRowHeight(tm, col, row, isMerged, fMergedRows, va, ha, angle, maxW, colWidth, textBound);
 
-            return mc ? mc.c2 : col;
-        };
+      return mc ? mc.c2 : col;
+    };
 
 		WorksheetView.prototype._updateRowHeight = function (tm, col, row, isMerged, fMergedRows, va, ha, angle,
 															 maxW, colWidth, textBound) {
