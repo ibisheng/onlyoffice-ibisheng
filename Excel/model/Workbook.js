@@ -817,7 +817,7 @@ DependencyGraph.prototype = {
     /*Defined Names section*/
     getDefNameNode:function ( node ) {
         var ret = this.defNameList[node];
-        return ret && ret.Ref == null ? null : ret;
+        return ret ? null : ret;
     },
     getDefNameNodeByName:function ( name, sheetId ) {
 
@@ -2440,6 +2440,9 @@ Workbook.prototype.checkDefName = function ( checkName, scope ) {
         res.status = false;
         if(defName.isLock){
             res.reason = c_oAscDefinedNameReason.IsLocked;
+        }
+        else if( defName.Ref == null ){
+            res.reason = c_oAscDefinedNameReason.NameReserved;
         }
         else{
             res.reason = c_oAscDefinedNameReason.Existed;

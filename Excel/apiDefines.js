@@ -334,6 +334,7 @@ var c_oAscDefinedNameReason = {
   IsLocked: -2,
   Existed: -3,
   LockDefNameManager: -4,
+  NameReserved: -5,
   OK: 0
 };
 
