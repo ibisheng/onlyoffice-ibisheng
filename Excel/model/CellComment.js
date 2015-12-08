@@ -783,6 +783,7 @@ CCellCommentator.prototype.sortComments = function(sortData) {
 				comment = new asc_CCommentData(line[j]);
 				comment.nRow = places[i].to;
 				this.changeComment(comment.asc_getId(), comment, true);
+        isChangeComment = true;
 			}
 		}
 	}
