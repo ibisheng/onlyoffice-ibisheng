@@ -99,7 +99,6 @@ asc_docs_api.prototype['asc_setDocInfo'] = asc_docs_api.prototype.asc_setDocInfo
 asc_docs_api.prototype['asc_setLocale'] = asc_docs_api.prototype.asc_setLocale;
 asc_docs_api.prototype['LoadDocument'] = asc_docs_api.prototype.LoadDocument;
 asc_docs_api.prototype['asc_SetFontsPath'] = asc_docs_api.prototype.asc_SetFontsPath;
-asc_docs_api.prototype['SetFontsPath'] = asc_docs_api.prototype.SetFontsPath;
 asc_docs_api.prototype['SetTextBoxInputMode'] = asc_docs_api.prototype.SetTextBoxInputMode;
 asc_docs_api.prototype['GetTextBoxInputMode'] = asc_docs_api.prototype.GetTextBoxInputMode;
 asc_docs_api.prototype['ChangeReaderMode'] = asc_docs_api.prototype.ChangeReaderMode;

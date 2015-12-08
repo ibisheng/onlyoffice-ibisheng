@@ -539,10 +539,6 @@ asc_docs_api.prototype.LoadDocument = function() {
   this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, this.WordControl.m_nZoomType);
 };
 
-asc_docs_api.prototype.SetFontsPath = function(path)
-{
-  this.asc_SetFontsPath(path);
-};
 asc_docs_api.prototype.SetThemesPath = function(path)
 {
     this.ThemeLoader.ThemesUrl = path;

@@ -283,9 +283,6 @@ var editor;
     this.asc_SendThemeColorSchemes(infos);
   };
 
-  spreadsheet_api.prototype.asc_Init = function(fontsPath) {
-    this.asc_SetFontsPath(fontsPath);
-  };
   spreadsheet_api.prototype.asc_getLocaleExample = function(val, number, date) {
     var res = '';
     var cultureInfo = g_aCultureInfos[val];
@@ -3154,7 +3151,6 @@ var editor;
 
   prot["asc_GetFontThumbnailsPath"] = prot.asc_GetFontThumbnailsPath;
   prot["asc_SetFontsPath"] = prot.asc_SetFontsPath;
-  prot["asc_Init"] = prot.asc_Init;
   prot["asc_setDocInfo"] = prot.asc_setDocInfo;
   prot["asc_getLocaleExample"] = prot.asc_getLocaleExample;
   prot["asc_setLocale"] = prot.asc_setLocale;

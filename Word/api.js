@@ -578,11 +578,6 @@ asc_docs_api.prototype.LoadDocument = function(isVersionHistory) {
   this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, 0);
 };
 
-asc_docs_api.prototype.SetFontsPath = function(path)
-{
-  this.asc_SetFontsPath(path);
-};
-
 asc_docs_api.prototype.SetTextBoxInputMode = function(bIsEA)
 {
     this.WordControl.SetTextBoxMode(bIsEA);
