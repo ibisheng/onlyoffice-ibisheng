@@ -678,17 +678,6 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
         setInterval(SafariIntervalFocus, 10);
 };
 
-asc_docs_api.prototype._OfflineAppDocumentStartLoad = function() {
-  var t = this, scriptElem = document.createElement('script');
-  scriptElem.onload = scriptElem.onerror = function() {
-    t._OfflineAppDocumentEndLoad();
-  };
-
-  scriptElem.setAttribute('src', this.documentUrl + "editor.js");
-  scriptElem.setAttribute('type', 'text/javascript');
-  document.getElementsByTagName('head')[0].appendChild(scriptElem);
-};
-
 asc_docs_api.prototype._OfflineAppDocumentEndLoad = function() {
   if (undefined == window["editor_bin"])
     return;

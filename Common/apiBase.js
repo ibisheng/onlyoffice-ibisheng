@@ -266,6 +266,17 @@ baseEditorsApi.prototype.asc_LoadDocument = function(isVersionHistory) {
     sendCommand2(this, null, rData);
   }
 };
+baseEditorsApi.prototype._OfflineAppDocumentStartLoad = function() {
+  var t = this;
+  var scriptElem = document.createElement('script');
+  scriptElem.onload = scriptElem.onerror = function() {
+    t._OfflineAppDocumentEndLoad();
+  };
+
+  scriptElem.setAttribute('src', this.documentUrl + 'editor.js');
+  scriptElem.setAttribute('type', 'text/javascript');
+  document.getElementsByTagName('head')[0].appendChild(scriptElem);
+};
 baseEditorsApi.prototype._onOpenCommand = function(data) {
 };
 baseEditorsApi.prototype._onNeedParams = function(data) {
