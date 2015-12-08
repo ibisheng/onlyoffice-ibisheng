@@ -5459,7 +5459,7 @@ function SafariIntervalFocus2()
 			return;
 		var pastebin = document.getElementById(COPY_ELEMENT_ID2);
 		var pastebinText = document.getElementById(kElementTextId);
-		if(pastebinText && (api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isCellEditMode) && api.IsFocus)
+		if(pastebinText && (api.wb && api.wb.getCellEditMode()) && api.IsFocus)
 		{
 			pastebinText.focus();
 		}	

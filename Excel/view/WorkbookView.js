@@ -1717,10 +1717,7 @@
 		};
 
 		WorkbookView.prototype.bIsEmptyClipboard = function () {
-			var t = this, ws, v;
-			var result = t.clipboard.bIsEmptyClipboard(t.controller.isCellEditMode);
-			
-			return result;
+			return this.clipboard.bIsEmptyClipboard(this.controller.isCellEditMode);
 		};
 		
 		WorkbookView.prototype.cutToClipboardButton = function () {
