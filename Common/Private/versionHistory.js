@@ -88,7 +88,7 @@ baseEditorsApi.prototype.asc_showRevision = function(newObj) {
     this.DocInfo.put_Url(this.VersionHistory.url);
     this.documentUrlChanges = this.VersionHistory.urlChanges;
     this.asc_setDocInfo(this.DocInfo);
-    this.LoadDocument(true);
+    this.asc_LoadDocument(true);
   } else if (this.VersionHistory.currentChangeId < newObj.currentChangeId) {
     // Нужно только добавить некоторые изменения
     CollaborativeEditing.Clear_CollaborativeMarks();

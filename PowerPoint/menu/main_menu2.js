@@ -2264,7 +2264,7 @@ $(".colorWatch").mouseover(function(){
 							decodeURIComponent(getURLParameter("vkey")) :
 							undefined );
 	
-	editor.LoadDocument(c_DocInfo);
+	editor.asc_LoadDocument(c_DocInfo);
  },500)
 
  

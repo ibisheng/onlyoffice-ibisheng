@@ -532,40 +532,7 @@ asc_docs_api.prototype.asc_setLocale = function(val)
 	this.InterfaceLocale = val;
 };
 asc_docs_api.prototype.LoadDocument = function(isVersionHistory) {
-  this.CoAuthoringApi.auth(this.isViewMode);
-
-  // Меняем тип состояния (на открытие)
-  this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
-
-  if (offlineMode !== this.documentUrl) {
-    var rData = {
-      "c": 'open',
-      "id": this.documentId,
-      "userid": this.documentUserId,
-      "format": this.documentFormat,
-      "vkey": this.documentVKey,
-      "editorid": this.editorId,
-      "url": this.documentUrl,
-      "title": this.documentTitle,
-      "embeddedfonts": this.isUseEmbeddedCutFonts,
-      "viewmode": this.isViewMode
-    };
-    if (isVersionHistory) {
-      //чтобы результат пришел только этому соединению, а не всем кто в документе
-      rData["userconnectionid"] = this.CoAuthoringApi.getUserConnectionId();
-    }
-
-    this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-    sendCommand2(this, null, rData);
-  } else {
-    // ToDo убрать зависимость от this.FontLoader.fontFilesPath
-    this.documentUrl = this.FontLoader.fontFilesPath + "../Word/document/";
-    this.DocInfo.put_OfflineApp(true);
-
-    this._OfflineAppDocumentStartLoad();
-  }
-
-  this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, 0);
+  this.asc_LoadDocument(isVersionHistory);
 };
 
 asc_docs_api.prototype.SetTextBoxInputMode = function(bIsEA)

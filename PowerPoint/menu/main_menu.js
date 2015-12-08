@@ -3053,11 +3053,7 @@ $(document).ready(function(){
 
         editor.asc_setDocInfo(c_DocInfo);
         editor.asc_getEditorPermissions();
-        editor.LoadDocument();
-
-
-
-
+        editor.asc_LoadDocument();
     },500)
 
 

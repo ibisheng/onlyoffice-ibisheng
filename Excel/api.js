@@ -337,12 +337,6 @@ var editor;
       }
     }
   };
-  spreadsheet_api.prototype.asc_LoadDocument = function() {
-    this.CoAuthoringApi.auth(this.getViewMode());
-
-    this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-    this._asc_open();
-  };
 
   spreadsheet_api.prototype.asc_LoadEmptyDocument = function() {
     this.CoAuthoringApi.auth(this.getViewMode());
@@ -687,32 +681,6 @@ var editor;
     var sData = data + "";
     if (Asc.c_oSerFormat.Signature === sData.substring(0, Asc.c_oSerFormat.Signature.length)) {
       this._startOpenDocument(sData);
-    }
-  };
-
-  spreadsheet_api.prototype._asc_open = function() {
-    // Меняем тип состояния (на открытие)
-    this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
-
-    if (offlineMode === this.documentUrl) {
-      // ToDo убрать зависимость от this.FontLoader.fontFilesPath
-      this.documentUrl = this.FontLoader.fontFilesPath + "../Excel/document/";
-      this.DocInfo.asc_putOfflineApp(true);
-      this._OfflineAppDocumentStartLoad();
-    } else {
-      var v = {
-        "c": 'open',
-        "id": this.documentId,
-        "userid": this.documentUserId,
-        "format": this.documentFormat,
-        "vkey": this.documentVKey,
-        "editorid": this.editorId,
-        "url": this.documentUrl,
-        "title": this.documentTitle,
-        "embeddedfonts": this.isUseEmbeddedCutFonts,
-        "viewmode": this.getViewMode()
-      };
-      sendCommand2(this, null, v);
     }
   };
 

@@ -219,6 +219,38 @@ baseEditorsApi.prototype.checkLongActionCallback = function(_callback, _param) {
   }
 };
 // Open
+baseEditorsApi.prototype.asc_LoadDocument = function(isVersionHistory) {
+  // Меняем тип состояния (на открытие)
+  this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
+  this.CoAuthoringApi.auth(this.getViewMode());
+
+  this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+
+  if (offlineMode === this.documentUrl) {
+    // ToDo убрать зависимость от this.FontLoader.fontFilesPath
+    this.documentUrl = this.FontLoader.fontFilesPath + "../Excel/document/"; // поменять!
+    this.DocInfo.asc_putOfflineApp(true);
+    this._OfflineAppDocumentStartLoad();
+  } else {
+    var rData = {
+      "c": 'open',
+      "id": this.documentId,
+      "userid": this.documentUserId,
+      "format": this.documentFormat,
+      "vkey": this.documentVKey,
+      "editorid": this.editorId,
+      "url": this.documentUrl,
+      "title": this.documentTitle,
+      "embeddedfonts": this.isUseEmbeddedCutFonts,
+      "viewmode": this.getViewMode()
+    };
+    if (isVersionHistory) {
+      //чтобы результат пришел только этому соединению, а не всем кто в документе
+      rData["userconnectionid"] = this.CoAuthoringApi.getUserConnectionId();
+    }
+    sendCommand2(this, null, rData);
+  }
+};
 baseEditorsApi.prototype._onOpenCommand = function(data) {
 };
 baseEditorsApi.prototype._onNeedParams = function(data) {
