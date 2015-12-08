@@ -10145,7 +10145,7 @@ ParaRun.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth)
     if (this.Is_Empty())
         return;
 
-    if (true !== Checker.Is_ParaEndRun())
+    if (true !== Checker.Is_ParaEndRun() && true !== Checker.Is_CheckOnlyTextPr())
     {
         var ReviewType = this.Get_ReviewType();
         if (ReviewType !== Checker.Get_AddRemoveType())
@@ -10167,13 +10167,29 @@ ParaRun.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth)
                 var ItemType = Item.Type;
                 switch (ItemType)
                 {
+                    case para_Drawing:
+                    {
+                        Checker.Add_Text(Text);
+                        Text = "";
+                        Checker.Add_Drawing(Item);
+                        break;
+                    }
                     case para_Text :
+                    {
                         Text += String.fromCharCode(Item.Value);
                         break;
+                    }
+                    case para_Math_Text:
+                    {
+                        Text += String.fromCharCode(Item.getCodeChr());
+                        break;
+                    }
                     case para_Space:
                     case para_Tab  :
+                    {
                         Text += " ";
                         break;
+                    }
                 }
             }
             Checker.Add_Text(Text);

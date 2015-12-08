@@ -2350,6 +2350,41 @@ CMathBase.prototype.Set_ReviewTypeWithInfo = function(ReviewType, ReviewInfo)
     History.Add(this, new CChangesMathBaseReviewType(ReviewType, ReviewInfo, this.ReviewType, this.ReviewInfo));
     this.raw_SetReviewType(ReviewType, ReviewInfo);
 };
+CMathBase.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth)
+{
+    var ReviewType = this.Get_ReviewType();
+
+    if (true !== Checker.Is_CheckOnlyTextPr())
+    {
+        if (ReviewType !== Checker.Get_AddRemoveType())
+        {
+            Checker.Flush_AddRemoveChange();
+            ContentPos.Update(0, Depth);
+
+            if (reviewtype_Add === ReviewType || reviewtype_Remove === ReviewType)
+            {
+                this.Get_StartPos(ContentPos, Depth);
+                Checker.Start_AddRemove(ReviewType, ContentPos);
+            }
+        }
+
+        if (reviewtype_Add === ReviewType || reviewtype_Remove === ReviewType)
+        {
+            Checker.Add_Math(this);
+            Checker.Update_AddRemoveReviewInfo(this.ReviewInfo);
+            this.Get_EndPos(false, ContentPos, Depth);
+            Checker.Set_AddRemoveEndPos(ContentPos);
+        }
+    }
+
+    if (reviewtype_Common !== ReviewType)
+        Checker.Begin_CheckOnlyTextPr();
+
+    CMathBase.superclass.Check_RevisionsChanges.apply(this, arguments);
+
+    if (reviewtype_Common !== ReviewType)
+        Checker.End_CheckOnlyTextPr();
+};
 
 CMathBase.prototype.Math_Set_EmptyRange         = CMathContent.prototype.Math_Set_EmptyRange;
 CMathBase.prototype.Set_ParaMath                = CMathContent.prototype.Set_ParaMath;

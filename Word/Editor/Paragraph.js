@@ -14852,6 +14852,7 @@ function CParagraphRevisionsChangesChecker(Para, RevisionsManager)
     this.ParaId           = Para.Get_Id();
     this.RevisionsManager = RevisionsManager;
     this.ParaEndRun       = false;
+    this.CheckOnlyTextPr  = 0;
 
     // Блок информации для добавления/удаления текста
     this.AddRemove =
@@ -14954,6 +14955,14 @@ CParagraphRevisionsChangesChecker.prototype.Add_Text = function(Text)
 {
     this.AddRemove.Value += Text;
 };
+CParagraphRevisionsChangesChecker.prototype.Add_Math = function(MathElement)
+{
+    this.AddRemove.Value += "[ FORMULA ]";
+};
+CParagraphRevisionsChangesChecker.prototype.Add_Drawing = function(Drawing)
+{
+    this.AddRemove.Value += "[ DRAWING ]";
+};
 CParagraphRevisionsChangesChecker.prototype.Have_PrChange = function()
 {
     return (null === this.TextPr.Pr ? false : true);
@@ -14992,4 +15001,16 @@ CParagraphRevisionsChangesChecker.prototype.Is_ParaEndRun = function()
 CParagraphRevisionsChangesChecker.prototype.Set_ParaEndRun = function()
 {
     this.ParaEndRun = true;
+};
+CParagraphRevisionsChangesChecker.prototype.Begin_CheckOnlyTextPr = function()
+{
+    this.CheckOnlyTextPr++;
+};
+CParagraphRevisionsChangesChecker.prototype.End_CheckOnlyTextPr = function()
+{
+    this.CheckOnlyTextPr--;
+};
+CParagraphRevisionsChangesChecker.prototype.Is_CheckOnlyTextPr = function()
+{
+    return (0 === this.CheckOnlyTextPr ? false : true);
 };

@@ -653,6 +653,9 @@ ParaMath.prototype.Get_CompiledTextPr = function(Copy)
 
 ParaMath.prototype.Add = function(Item)
 {
+    var LogicDocument  = (this.Paragraph ? this.Paragraph.LogicDocument : undefined);
+    var TrackRevisions = (LogicDocument && true === LogicDocument.Is_TrackRevisions() ? true : false);
+
     var Type = Item.Type;
     var oSelectedContent = this.GetSelectContent();
 
@@ -673,7 +676,14 @@ ParaMath.prototype.Add = function(Item)
         if(oContent.bRoot == false && Run.IsPlaceholder())
         {
             var CtrRunPr = oContent.Get_ParentCtrRunPr(false); // ctrPrp (не копия)
+
+            if (true === TrackRevisions)
+                LogicDocument.Set_TrackRevisions(false);
+
             Run.Apply_TextPr(CtrRunPr, undefined, true);
+
+            if (true === TrackRevisions)
+                LogicDocument.Set_TrackRevisions(true);
         }
 
         if(Item.Value == 38)
@@ -724,8 +734,14 @@ ParaMath.prototype.Add = function(Item)
         };
 
         TextPr.RFonts.Set_All("Cambria Math", -1);
+
+        if (true === TrackRevisions)
+            LogicDocument.Set_TrackRevisions(false);
+
         oContent.Apply_TextPr(TextPr, undefined, false, Pos_ApplyTextPr);
-        //oContent.Set_MathTextPr2(MathTxtPr.TextPr, MathTxtPr.MathPr, false, StartPos + 1, lng2 - lng);
+
+        if (true === TrackRevisions)
+            LogicDocument.Set_TrackRevisions(true);
     }
 
     if ((para_Text === Type || para_Space === Type) && null !== NewElement)

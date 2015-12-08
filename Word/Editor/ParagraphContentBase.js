@@ -1840,8 +1840,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_SelectionContentPos = fu
     // Удалим отметки о старом селекте
     if ( OldStartPos < StartPos && OldStartPos < EndPos )
     {
-        var TempLimit = Math.min( StartPos, EndPos );
-        for ( var CurPos = OldStartPos; CurPos < TempLimit; CurPos++ )
+        var TempBegin = OldStartPos;
+        var TempEnd   = Math.min(this.Content.length - 1, Math.min(StartPos, EndPos) - 1);
+        for (var CurPos = TempBegin; CurPos <= TempEnd; ++CurPos)
         {
             this.Content[CurPos].Selection_Remove();
         }
@@ -1849,8 +1850,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_SelectionContentPos = fu
 
     if ( OldEndPos > StartPos && OldEndPos > EndPos )
     {
-        var TempLimit = Math.max( StartPos, EndPos );
-        for ( var CurPos = TempLimit + 1; CurPos <= OldEndPos; CurPos++ )
+        var TempBegin = Math.max(StartPos, EndPos) + 1;
+        var TempEnd   = Math.min(OldEndPos, this.Content.length - 1);
+        for (var CurPos = TempBegin; CurPos <= TempEnd; ++CurPos)
         {
             this.Content[CurPos].Selection_Remove();
         }
@@ -2436,7 +2438,6 @@ CParagraphContentWithParagraphLikeContent.prototype.private_UpdateTrackRevisions
         RevisionsManager.Check_Paragraph(this.Paragraph);
     }
 };
-
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые должны быть реализованы в классах наследниках
 //----------------------------------------------------------------------------------------------------------------------
