@@ -79,7 +79,10 @@ function CMathBase(bInside)
 
     var Api = editor;
     if (Api && !Api.isPresentationEditor && Api.WordControl && Api.WordControl.m_oLogicDocument && true === Api.WordControl.m_oLogicDocument.Is_TrackRevisions())
+    {
         this.ReviewType = reviewtype_Add;
+        this.ReviewInfo.Update();
+    }
 
     return this;
 }
@@ -1378,7 +1381,6 @@ CMathBase.prototype.Read_FromBinary2 = function( Reader )
         this.ReviewInfo.Read_FromBinary(Reader);
     }
 
-
     this.fillContent();
 };
 CMathBase.prototype.Get_Id = function()
@@ -1848,7 +1850,7 @@ CMathBase.prototype.Make_ShdColor = function(PDSE, CurTextPr)
         }
     }
 
-    if (reviewtype_Common !== this.ReviewType)
+    if (reviewtype_Common !== this.Get_ReviewType())
     {
         pGraphics.p_color(REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, 255);
         pGraphics.b_color1(REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, 255);
@@ -2328,10 +2330,18 @@ CMathBase.prototype.raw_SetReviewType = function(Type, Info)
 };
 CMathBase.prototype.Get_ReviewType = function()
 {
-    return this.ReviewType;
+    if (this.Id)
+        return this.ReviewType;
+    else if (this.Parent && this.Parent.Get_ReviewType)
+        return this.Parent.Get_ReviewType();
+
+    return reviewtype_Common;
 };
 CMathBase.prototype.Set_ReviewType = function(Type)
 {
+    if (!this.Id)
+        return;
+
     CMathBase.superclass.Set_ReviewType.apply(this, arguments);
 
     if (Type !== this.ReviewType)
@@ -2345,6 +2355,9 @@ CMathBase.prototype.Set_ReviewType = function(Type)
 };
 CMathBase.prototype.Set_ReviewTypeWithInfo = function(ReviewType, ReviewInfo)
 {
+    if (!this.Id)
+        return;
+
     CMathBase.superclass.Set_ReviewType.apply(this, arguments);
 
     History.Add(this, new CChangesMathBaseReviewType(ReviewType, ReviewInfo, this.ReviewType, this.ReviewInfo));
