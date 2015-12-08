@@ -342,9 +342,7 @@ var editor;
 
     this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
     if (!this.chartEditor) {
-      this._asc_open(function(response) {
-        t._startOpenDocument(response);
-      });
+      this._asc_open();
     }
   };
 
@@ -354,8 +352,7 @@ var editor;
     var emptyWorkbook = getEmptyWorkbook() + "";
     if (emptyWorkbook.length && (Asc.c_oSerFormat.Signature === emptyWorkbook.substring(0, Asc.c_oSerFormat.Signature.length))) {
       this.isChartEditor = true;
-      var wb = this._openDocument(emptyWorkbook);
-      this._startOpenDocument({returnCode: 0, val: wb});
+      this._startOpenDocument(emptyWorkbook);
     }
   };
 
@@ -671,16 +668,15 @@ var editor;
         return;
       }
 
-      var wb = t._openDocument(result.data);
-      t._startOpenDocument({returnCode: 0, val: wb});
+      t._startOpenDocument(result.data);
     });
   };
 
-  spreadsheet_api.prototype._OfflineAppDocumentStartLoad = function(fCallback) {
+  spreadsheet_api.prototype._OfflineAppDocumentStartLoad = function() {
     var t = this;
     var scriptElem = document.createElement('script');
     scriptElem.onload = scriptElem.onerror = function() {
-      t._OfflineAppDocumentEndLoad(fCallback);
+      t._OfflineAppDocumentEndLoad();
     };
 
     scriptElem.setAttribute('src', this.documentUrl + "editor.js");
@@ -688,16 +684,15 @@ var editor;
     document.getElementsByTagName('head')[0].appendChild(scriptElem);
   };
 
-  spreadsheet_api.prototype._OfflineAppDocumentEndLoad = function(fCallback) {
+  spreadsheet_api.prototype._OfflineAppDocumentEndLoad = function() {
     var data = getTestWorkbook();
     var sData = data + "";
     if (Asc.c_oSerFormat.Signature === sData.substring(0, Asc.c_oSerFormat.Signature.length)) {
-      var wb = this._openDocument(sData);
-      fCallback({returnCode: 0, val: wb});
+      this._startOpenDocument(sData);
     }
   };
 
-  spreadsheet_api.prototype._asc_open = function(fCallback) { //fCallback({returnCode:"", val:obj, ...})
+  spreadsheet_api.prototype._asc_open = function() {
     if (!this.chartEditor) {
       // Меняем тип состояния (на открытие)
       this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
@@ -706,7 +701,7 @@ var editor;
         // ToDo убрать зависимость от this.FontLoader.fontFilesPath
         this.documentUrl = this.FontLoader.fontFilesPath + "../Excel/document/";
         this.DocInfo.asc_putOfflineApp(true);
-        this._OfflineAppDocumentStartLoad(fCallback);
+        this._OfflineAppDocumentStartLoad();
       } else {
         var v = {
           "c": 'open',
@@ -994,12 +989,8 @@ var editor;
     this.FontLoader.LoadDocumentFonts2(arrLoadFonts);
   };
 
-  spreadsheet_api.prototype._startOpenDocument = function(response) {
-    if (response.returnCode !== 0) {
-      return;
-    }
-
-    this.wbModel = response.val;
+  spreadsheet_api.prototype._startOpenDocument = function(sData) {
+    this.wbModel = this._openDocument(sData);
 
     this.FontLoader.LoadDocumentFonts(this.wbModel.generateFontMap2());
 
