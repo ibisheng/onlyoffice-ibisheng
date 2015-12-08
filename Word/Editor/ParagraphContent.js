@@ -4591,6 +4591,8 @@ ParaDrawing.prototype =
         {
             c.setExtent(this.Extent.W, this.Extent.H);
         }
+        if (this.ParaMath)
+            c.Set_ParaMath(this.ParaMath.Copy());
         return c;
     },
 
