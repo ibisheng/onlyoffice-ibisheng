@@ -2481,7 +2481,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asyncImagesDocumentEndLoaded = function() {
-    if (c_oAscAdvancedOptionsAction.None === this.advancedOptionsAction && this.wb) {
+    if (c_oAscAdvancedOptionsAction.None === this.advancedOptionsAction && this.wb && !window["NATIVE_EDITOR_ENJINE"]) {
       var ws = this.wb.getWorksheet();
       ws.objectRender.showDrawingObjects(true);
       ws.objectRender.controller.getGraphicObjectProps();
