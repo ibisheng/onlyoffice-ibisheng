@@ -5005,11 +5005,11 @@ ParaDrawing.prototype =
 
         var RunPr = this.Remove_FromDocument( false );
 
-        if (this.LogicDocument && true === this.LogicDocument.Is_TrackRevisions())
+        if (this.LogicDocument && this.DocumentContent && true === this.LogicDocument.Is_TrackRevisions())
         {
             var NewParaDrawing = this.Copy();
             NewParaDrawing.Add_ToDocument(NearPos, true, RunPr);
-            this.LogicDocument.Select_DrawingObject(NewParaDrawing.Get_Id());
+            this.DocumentContent.Select_DrawingObject(NewParaDrawing.Get_Id());
         }
         else
         {
