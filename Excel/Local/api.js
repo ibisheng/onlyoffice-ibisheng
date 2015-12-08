@@ -13,10 +13,12 @@
 
 	var asc = window["Asc"];
 	var prot;
+	
+	var _fOpenCallBack = undefined;
 
 	asc['spreadsheet_api'].prototype._OfflineAppDocumentStartLoad = function(fCallback)
 	{
-		window.OfflineOpenCallback = fCallback;
+		_fOpenCallBack = fCallback;
 		window["AscDesktopEditor"]["LocalStartOpen"]();
 	};
 	
@@ -25,8 +27,8 @@
 		if (true)
 		{
 			var wb = this._openDocument(_data);
-			window.OfflineOpenCallback({returnCode: 0, val: wb});
-			window.OfflineOpenCallback = undefined;
+			_fOpenCallBack({returnCode: 0, val: wb});
+			_fOpenCallBack = undefined;
 			History.UserSaveMode = true;
 		}
 		
@@ -89,34 +91,22 @@ CHistory.prototype.Reset_SavedIndex = function(IsUserSave)
 		this.ForceSave  = false;
 	}
 };
-CHistory.prototype.Have_Changes = function(IsUserSave)
+
+CHistory.prototype.Is_Modified = function(IsUserSave) 
 {
-	if (true === this.Is_UserSaveMode() && false !== IsUserSave)
+	var checkIndex = (this.Is_UserSaveMode() && IsUserSave) ? this.UserSavedIndex : this.SavedIndex;
+	if (-1 === this.Index && null === checkIndex && false === this.ForceSave) 
 	{
-		if (-1 === this.Index && null === this.UserSavedIndex && false === this.ForceSave)
+		if (window["AscDesktopEditor"])
 		{
 			if (0 != window["AscDesktopEditor"]["LocalFileGetOpenChangesCount"]())
 				return true;
 			if (!window["AscDesktopEditor"]["LocalFileGetSaved"]())
 				return true;
-			return false;
 		}
-
-		if (this.Index != this.UserSavedIndex || true === this.ForceSave)
-			return true;
-
 		return false;
 	}
-	else
-	{
-		if (-1 === this.Index && null === this.SavedIndex && false === this.ForceSave)
-			return false;
-
-		if (this.Index != this.SavedIndex || true === this.ForceSave)
-			return true;
-
-		return false;
-	}
+	return (this.Index != checkIndex || true === this.ForceSave);
 };
 	
 window["DesktopOfflineAppDocumentApplyChanges"] = function(_changes)

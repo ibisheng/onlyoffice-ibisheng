@@ -62,10 +62,13 @@ CHistory.prototype.Have_Changes = function(IsUserSave)
 	{
 		if (-1 === this.Index && null === this.UserSavedIndex && false === this.ForceSave)
 		{
-			if (0 != window["AscDesktopEditor"]["LocalFileGetOpenChangesCount"]())
-				return true;
-			if (!window["AscDesktopEditor"]["LocalFileGetSaved"]())
-				return true;
+			if (window["AscDesktopEditor"])
+			{
+				if (0 != window["AscDesktopEditor"]["LocalFileGetOpenChangesCount"]())
+					return true;
+				if (!window["AscDesktopEditor"]["LocalFileGetSaved"]())
+					return true;
+			}
 			return false;
 		}
 
