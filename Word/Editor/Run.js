@@ -4691,7 +4691,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             PDSL.SpellingCounter--;
     }
 
-    if (true === this.Pr.Have_PrChange())
+    if (true === this.Pr.Have_PrChange() && para_Math_Run !== this.Type)
         PDSL.RunReview.Add(0, 0, PDSL.X, X, 0, 255, 0, 0, {RunPr : this.Pr});
 
     var CollPrChangeColor = this.private_GetCollPrChangeOther();
