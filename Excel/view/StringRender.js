@@ -384,12 +384,14 @@
                 }
             }
 
-            var bound = { dx: dx, dy: dy, x: x, y: y, sx: sx, sw: sw, height: 0 };
+            var bound = { dx: dx, dy: dy, x: x, y: y, sx: sx, sw: sw, height: 0, width: 0 };
 
             if (angle === 90 || angle === -90) {
+                bound.width = tm.height;
                 bound.height = textW;
             } else {
                 bound.height = Math.abs(Math.sin(angle / 180.0 * Math.PI) * textW) + (mul) * tm.height;
+                bound.width = Math.abs(Math.cos(angle / 180.0 * Math.PI) * textW) + Math.abs(Math.sin(angle / 180.0 * Math.PI) * tm.height);
 				// Делаем кратным 1pt
 				bound.height = asc_calcnpt(bound.height, 96);
             }
