@@ -13,12 +13,9 @@
 
 	var asc = window["Asc"];
 	var prot;
-	
-	var _fOpenCallBack = undefined;
 
-	asc['spreadsheet_api'].prototype._OfflineAppDocumentStartLoad = function(fCallback)
+	asc['spreadsheet_api'].prototype._OfflineAppDocumentStartLoad = function()
 	{
-		_fOpenCallBack = fCallback;
 		window["AscDesktopEditor"]["LocalStartOpen"]();
 	};
 	
@@ -26,9 +23,7 @@
 	{
 		if (true)
 		{
-			var wb = this._openDocument(_data);
-			_fOpenCallBack({returnCode: 0, val: wb});
-			_fOpenCallBack = undefined;
+      this._startOpenDocument(_data);
 			History.UserSaveMode = true;
 		}
 		

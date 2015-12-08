@@ -337,7 +337,6 @@ var editor;
     }
   };
   spreadsheet_api.prototype.asc_LoadDocument = function() {
-    var t = this;
     this.CoAuthoringApi.auth(this.getViewMode());
 
     this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
