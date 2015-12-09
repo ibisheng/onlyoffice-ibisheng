@@ -2172,7 +2172,7 @@ function getUserColorById(userId, userName, isDark, isNumericValue)
         var nColor = c_oAscArrUserColors[g_oUserNextColorIndex % c_oAscArrUserColors.length];
         ++g_oUserNextColorIndex;
 
-      res = g_oUserColorById[userId|userName] = new CUserCacheColor(nColor);
+      res = g_oUserColorById[userId||userName] = new CUserCacheColor(nColor);
     }
 
     if (!res)
