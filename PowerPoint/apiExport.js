@@ -290,7 +290,6 @@ asc_docs_api.prototype['asyncFontEndLoaded'] = asc_docs_api.prototype.asyncFontE
 asc_docs_api.prototype['asyncImageEndLoaded'] = asc_docs_api.prototype.asyncImageEndLoaded;
 asc_docs_api.prototype['get_PresentationWidth'] = asc_docs_api.prototype.get_PresentationWidth;
 asc_docs_api.prototype['get_PresentationHeight'] = asc_docs_api.prototype.get_PresentationHeight;
-asc_docs_api.prototype['SendOpenProgress'] = asc_docs_api.prototype.SendOpenProgress;
 asc_docs_api.prototype['pre_Paste'] = asc_docs_api.prototype.pre_Paste;
 asc_docs_api.prototype['pre_SaveCallback'] = asc_docs_api.prototype.pre_SaveCallback;
 asc_docs_api.prototype['initEvents2MobileAdvances'] = asc_docs_api.prototype.initEvents2MobileAdvances;

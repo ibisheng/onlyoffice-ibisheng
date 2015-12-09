@@ -426,7 +426,6 @@ asc_docs_api.prototype['asyncFontEndLoaded'] = asc_docs_api.prototype.asyncFontE
 asc_docs_api.prototype['asyncImageEndLoaded'] = asc_docs_api.prototype.asyncImageEndLoaded;
 asc_docs_api.prototype['asyncImageEndLoadedBackground'] = asc_docs_api.prototype.asyncImageEndLoadedBackground;
 asc_docs_api.prototype['IsAsyncOpenDocumentImages'] = asc_docs_api.prototype.IsAsyncOpenDocumentImages;
-asc_docs_api.prototype['SendOpenProgress'] = asc_docs_api.prototype.SendOpenProgress;
 asc_docs_api.prototype['pre_Paste'] = asc_docs_api.prototype.pre_Paste;
 asc_docs_api.prototype['pre_Save'] = asc_docs_api.prototype.pre_Save;
 asc_docs_api.prototype['SyncLoadImages'] = asc_docs_api.prototype.SyncLoadImages;
