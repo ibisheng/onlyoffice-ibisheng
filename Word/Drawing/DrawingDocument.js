@@ -7037,146 +7037,163 @@ CStylesPainter.prototype =
         // теперь просто отдаем евент наверх
         _api.sync_InitEditorStyles(this);
     },
-    GenerateDefaultStyles: function(_api, ds)
-    {
-        var styles = ds;
-        var _count = 0;
-        for (var i in styles)
-            _count++;
+  GenerateDefaultStyles: function(_api, ds) {
+    var styles = ds;
+    var _count = 0;
+    for (var i in styles)
+      _count++;
 
-        var cur_index = 0;
+    var cur_index = 0;
 
-        if (false)
-        {
-            this.defaultStylesImage = "data:image/png;base64,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";
-            this.defaultStyles = [];
-            for (var i in styles)
-            {
-                this.defaultStyles[cur_index] = new CStyleImage(styles[i].Name, cur_index, c_oAscStyleImage.Default, '');
-                cur_index++;
-            }
+    // добавили переводы => нельзя кэшировать
 
-            return;
+    var _canvas = document.createElement('canvas');
+    _canvas.width = this.STYLE_THUMBNAIL_WIDTH;
+    _canvas.height = _count * this.STYLE_THUMBNAIL_HEIGHT;
+    var ctx = _canvas.getContext('2d');
+
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, _canvas.width, _canvas.height);
+
+    var graphics = new CGraphics();
+    if (!this.IsRetinaEnabled) {
+      graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm, _canvas.height * g_dKoef_pix_to_mm);
+    } else {
+      graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm / 2, _canvas.height * g_dKoef_pix_to_mm / 2);
+    }
+    graphics.m_oFontManager = g_fontManager;
+
+    var _canvas2 = document.createElement('canvas');
+    _canvas2.width = this.STYLE_THUMBNAIL_WIDTH;
+    _canvas2.height = this.STYLE_THUMBNAIL_HEIGHT;
+    var ctx2 = _canvas2.getContext('2d');
+
+    ctx2.fillStyle = "#FFFFFF";
+    ctx2.fillRect(0, 0, _canvas2.width, _canvas2.height);
+
+    var graphics2 = new CGraphics();
+    if (!this.IsRetinaEnabled) {
+      graphics2.init(ctx2, _canvas2.width, _canvas2.height, _canvas2.width * g_dKoef_pix_to_mm, _canvas2.height * g_dKoef_pix_to_mm);
+    } else {
+      graphics2.init(ctx2, _canvas2.width, _canvas2.height, _canvas2.width * g_dKoef_pix_to_mm / 2, _canvas2.height * g_dKoef_pix_to_mm / 2);
+    }
+    graphics2.m_oFontManager = g_fontManager;
+
+    var DocumentStyles = _api.WordControl.m_oLogicDocument.Get_Styles();
+    this.defaultStyles = [];
+    for (var i in styles) {
+      var style = styles[i];
+      if (true == style.qFormat && null === DocumentStyles.Get_StyleIdByName(style.Name, false)) {
+        this.drawStyle(graphics, style, cur_index);
+        this.drawStyle2(graphics2, style);
+        this.defaultStyles[cur_index] = new CStyleImage(style.Name, cur_index, c_oAscStyleImage.Default, _canvas2.toDataURL("image/png"), style.uiPriority);
+        cur_index++;
+      }
+    }
+
+    this.defaultStylesImage = _canvas.toDataURL("image/png");
+  },
+
+  GenerateDocumentStyles: function(_api) {
+    if (_api.WordControl.m_oLogicDocument == null) {
+      return;
+    }
+
+    var __Styles = _api.WordControl.m_oLogicDocument.Get_Styles();
+    var styles = __Styles.Style;
+
+    if (styles == null) {
+      return;
+    }
+
+    var _count = 0;
+    for (var i in styles)
+      _count++;
+    if (0 == _count) {
+      return;
+    }
+
+    var cur_index = 0;
+
+    var _canvas = document.createElement('canvas');
+    _canvas.width = this.STYLE_THUMBNAIL_WIDTH;
+    _canvas.height = _count * this.STYLE_THUMBNAIL_HEIGHT;
+    var ctx = _canvas.getContext('2d');
+
+    if (window["flat_desine"] !== true) {
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0, 0, _canvas.width, _canvas.height);
+    }
+
+    var graphics = new CGraphics();
+    if (!this.IsRetinaEnabled) {
+      graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm, _canvas.height * g_dKoef_pix_to_mm);
+    } else {
+      graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm / 2, _canvas.height * g_dKoef_pix_to_mm / 2);
+    }
+    graphics.m_oFontManager = g_fontManager;
+
+    var _canvas2 = document.createElement('canvas');
+    _canvas2.width = this.STYLE_THUMBNAIL_WIDTH;
+    _canvas2.height = this.STYLE_THUMBNAIL_HEIGHT;
+    var ctx2 = _canvas2.getContext('2d');
+
+    if (window["flat_desine"] !== true) {
+      ctx2.fillStyle = "#FFFFFF";
+      ctx2.fillRect(0, 0, _canvas2.width, _canvas2.height);
+    }
+
+    var graphics2 = new CGraphics();
+    if (!this.IsRetinaEnabled) {
+      graphics2.init(ctx2, _canvas2.width, _canvas2.height, _canvas2.width * g_dKoef_pix_to_mm, _canvas2.height * g_dKoef_pix_to_mm);
+    } else {
+      graphics2.init(ctx2, _canvas2.width, _canvas2.height, _canvas2.width * g_dKoef_pix_to_mm / 2, _canvas2.height * g_dKoef_pix_to_mm / 2);
+    }
+    graphics2.m_oFontManager = g_fontManager;
+
+    this.docStyles = [];
+    for (var i in styles) {
+      var style = styles[i];
+      if (true == style.qFormat) {
+        // как только меняется сериалайзер - меняется и код здесь. Да, не очень удобно,
+        // зато быстро делается
+        var formalStyle = i.toLowerCase().replace(/\s/g, "");
+        var res = formalStyle.match(/^heading([1-9][0-9]*)$/);
+        var index = (res) ? res[1] - 1 : -1;
+
+        var _dr_style = __Styles.Get_Pr(i, styletype_Paragraph);
+        _dr_style.Name = style.Name;
+        _dr_style.Id = i;
+
+        this.drawStyle(graphics, _dr_style, cur_index);
+        this.drawStyle2(graphics2, style);
+        this.docStyles[cur_index] = new CStyleImage(style.Name, cur_index, c_oAscStyleImage.Document, _canvas2.toDataURL("image/png"), style.uiPriority);
+
+        // алгоритм смены имени
+        if (style.Default) {
+          switch (style.Default) {
+            case 1:
+              break;
+            case 2:
+              this.docStyles[cur_index].Name = "No List";
+              break;
+            case 3:
+              this.docStyles[cur_index].Name = "Normal";
+              break;
+            case 4:
+              this.docStyles[cur_index].Name = "Normal Table";
+              break;
+          }
+        } else if (index != -1) {
+          this.docStyles[cur_index].Name = "Heading ".concat(index + 1);
         }
 
-        // добавили переводы => нельзя кэшировать
+        cur_index++;
+      }
+    }
 
-        var _canvas = document.createElement('canvas');
-        _canvas.width = this.STYLE_THUMBNAIL_WIDTH;
-        _canvas.height = _count * this.STYLE_THUMBNAIL_HEIGHT;
-        var ctx = _canvas.getContext('2d');
-
-        ctx.fillStyle = "#FFFFFF";
-        ctx.fillRect(0, 0, _canvas.width, _canvas.height);
-
-        var graphics = new CGraphics();
-        if (!this.IsRetinaEnabled)
-            graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm, _canvas.height * g_dKoef_pix_to_mm);
-        else
-            graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm / 2, _canvas.height * g_dKoef_pix_to_mm / 2);
-        graphics.m_oFontManager = g_fontManager;
-
-        var DocumentStyles = _api.WordControl.m_oLogicDocument.Get_Styles();
-        this.defaultStyles = [];
-        for (var i in styles)
-        {
-			var style = styles[i];
-			if(true == style.qFormat && null === DocumentStyles.Get_StyleIdByName(style.Name, false))
-			{
-				this.drawStyle(graphics, style, cur_index);
-				this.defaultStyles[cur_index] = new CStyleImage(style.Name, cur_index, c_oAscStyleImage.Default, '', style.uiPriority);
-				cur_index++;
-			}
-        }
-
-        this.defaultStylesImage = _canvas.toDataURL("image/png");
-    },
-
-    GenerateDocumentStyles: function(_api)
-    {
-        if (_api.WordControl.m_oLogicDocument == null)
-            return;
-
-        var __Styles = _api.WordControl.m_oLogicDocument.Get_Styles();
-        var styles = __Styles.Style;
-
-        if (styles == null)
-            return;
-
-        var _count = 0;
-        for (var i in styles)
-            _count++;
-        if (0 == _count)
-            return;
-
-        var cur_index = 0;
-        
-        var _canvas = document.createElement('canvas');
-        _canvas.width = this.STYLE_THUMBNAIL_WIDTH;
-        _canvas.height = _count * this.STYLE_THUMBNAIL_HEIGHT;
-        var ctx = _canvas.getContext('2d');
-
-        if (window["flat_desine"] !== true)
-        {
-            ctx.fillStyle = "#FFFFFF";
-            ctx.fillRect(0, 0, _canvas.width, _canvas.height);
-        }
-
-        var graphics = new CGraphics();
-        if (!this.IsRetinaEnabled)
-            graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm, _canvas.height * g_dKoef_pix_to_mm);
-        else
-            graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm / 2, _canvas.height * g_dKoef_pix_to_mm / 2);
-        graphics.m_oFontManager = g_fontManager;
-
-        this.docStyles = [];
-        for (var i in styles)
-        {
-			var style = styles[i];
-			if(true == style.qFormat)
-			{
-				// как только меняется сериалайзер - меняется и код здесь. Да, не очень удобно,
-				// зато быстро делается
-				var formalStyle = i.toLowerCase().replace(/\s/g, "");
-				var res = formalStyle.match(/^heading([1-9][0-9]*)$/);
-				var index = (res) ? res[1] - 1 : -1;
-
-                var _dr_style = __Styles.Get_Pr(i, styletype_Paragraph);
-                _dr_style.Name = style.Name;
-                _dr_style.Id = i;
-
-				this.drawStyle(graphics, _dr_style, cur_index);
-				this.docStyles[cur_index] = new CStyleImage(style.Name, cur_index, c_oAscStyleImage.Document, '', style.uiPriority);
-
-				// алгоритм смены имени
-				if (style.Default)
-				{
-					switch (style.Default)
-					{
-						case 1:
-							break;
-						case 2:
-							this.docStyles[cur_index].Name = "No List";
-							break;
-						case 3:
-							this.docStyles[cur_index].Name = "Normal";
-							break;
-						case 4:
-							this.docStyles[cur_index].Name = "Normal Table";
-							break;
-					}
-				}
-				else if (index != -1)
-				{
-					this.docStyles[cur_index].Name = "Heading ".concat(index + 1);
-				}
-
-				cur_index++;
-			}
-        }
-
-        this.docStylesImage = _canvas.toDataURL("image/png");
-    },
+    this.docStylesImage = _canvas.toDataURL("image/png");
+  },
 
     drawStyle: function(graphics, style, index)
     {
@@ -7364,7 +7381,194 @@ CStylesPainter.prototype =
             g_oTableId.m_bTurnOff = false;
             History.TurnOn();
         }
+    },
+  drawStyle2: function(graphics, style)
+  {
+    var font = { FontFamily : { Name: "Times New Roman", Index : -1 }, Color : { r : 0, g : 0, b : 0 }, Bold : false, Italic : false, FontSize : 10 };
+
+    var textPr = style.TextPr;
+    if (textPr.FontFamily != undefined)
+    {
+      font.FontFamily.Name = textPr.FontFamily.Name;
+      font.FontFamily.Index = textPr.FontFamily.Index;
     }
+
+    if (textPr.Bold != undefined)
+      font.Bold = textPr.Bold;
+    if (textPr.Italic != undefined)
+      font.Italic = textPr.Italic;
+
+    if (textPr.FontSize != undefined)
+      font.FontSize = textPr.FontSize;
+
+    graphics.SetFont(font);
+
+    if (textPr.Color == undefined)
+      graphics.b_color1(0, 0, 0, 255);
+    else
+      graphics.b_color1(textPr.Color.r, textPr.Color.g, textPr.Color.b, 255);
+
+    var dKoefToMM = g_dKoef_pix_to_mm;
+    if (this.IsRetinaEnabled)
+      dKoefToMM /= 2;
+
+    if (window["flat_desine"] !== true)
+    {
+      var y = dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
+      var b = dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
+      var w = dKoefToMM * this.STYLE_THUMBNAIL_WIDTH;
+
+      graphics.transform(1,0,0,1,0,0);
+      graphics.save();
+      graphics._s();
+      graphics._m(-0.5, y);
+      graphics._l(w, y);
+      graphics._l(w, b);
+      graphics._l(0, b);
+      graphics._z();
+      graphics.clip();
+
+      graphics.t(this.CurrentTranslate.StylesText, 0.5, (y + b) / 2);
+
+      var ctx = graphics.m_oContext;
+      ctx.setTransform(1,0,0,1,0,0);
+      ctx.fillStyle = "#E8E8E8";
+
+      var _b = this.STYLE_THUMBNAIL_HEIGHT - 1.5;
+      var _x = 2;
+      var _w = this.STYLE_THUMBNAIL_WIDTH - 4;
+      var _h = (this.STYLE_THUMBNAIL_HEIGHT / 3) >> 0;
+      ctx.beginPath();
+      ctx.moveTo(_x, _b - _h);
+      ctx.lineTo(_x + _w, _b - _h);
+      ctx.lineTo(_x + _w, _b);
+      ctx.lineTo(_x, _b);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "#D8D8D8";
+      ctx.beginPath();
+      ctx.rect(0.5, this.STYLE_THUMBNAIL_HEIGHT + 0.5, this.STYLE_THUMBNAIL_WIDTH - 1, this.STYLE_THUMBNAIL_HEIGHT - 1);
+
+      ctx.stroke();
+
+      graphics.restore();
+    }
+    else
+    {
+      g_oTableId.m_bTurnOff = true;
+      History.TurnOff();
+
+      var oldDefTabStop = Default_Tab_Stop;
+      Default_Tab_Stop = 1;
+
+      var hdr = new CHeaderFooter(editor.WordControl.m_oLogicDocument.HdrFtr, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, hdrftr_Header);
+      var _dc = hdr.Content;//new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, true, false);
+
+      var par = new Paragraph(editor.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
+      var run = new ParaRun(par, false);
+
+      for (var i = 0; i < style.Name.length; i++)
+      {
+        run.Add_ToContent(i, new ParaText(style.Name.charAt(i)), false);
+      }
+
+      _dc.Internal_Content_Add(0, par, false);
+      par.Add_ToContent(0, run);
+      par.Style_Add(style.Id, false);
+      par.Set_Align(align_Left);
+      par.Set_Tabs(new CParaTabs());
+
+      var _brdL = style.ParaPr.Brd.Left;
+      if ( undefined !== _brdL && null !== _brdL )
+      {
+        var brdL = new CDocumentBorder();
+        brdL.Set_FromObject(_brdL);
+        brdL.Space = 0;
+        par.Set_Border(brdL, historyitem_Paragraph_Borders_Left);
+      }
+
+      var _brdT = style.ParaPr.Brd.Top;
+      if ( undefined !== _brdT && null !== _brdT )
+      {
+        var brd = new CDocumentBorder();
+        brd.Set_FromObject(_brdT);
+        brd.Space = 0;
+        par.Set_Border(brd, historyitem_Paragraph_Borders_Top);
+      }
+
+      var _brdB = style.ParaPr.Brd.Bottom;
+      if ( undefined !== _brdB && null !== _brdB )
+      {
+        var brd = new CDocumentBorder();
+        brd.Set_FromObject(_brdB);
+        brd.Space = 0;
+        par.Set_Border(brd, historyitem_Paragraph_Borders_Bottom);
+      }
+
+      var _brdR = style.ParaPr.Brd.Right;
+      if ( undefined !== _brdR && null !== _brdR )
+      {
+        var brd = new CDocumentBorder();
+        brd.Set_FromObject(_brdR);
+        brd.Space = 0;
+        par.Set_Border(brd, historyitem_Paragraph_Borders_Right);
+      }
+
+      var _ind = new CParaInd();
+      _ind.FirstLine = 0;
+      _ind.Left = 0;
+      _ind.Right = 0;
+      par.Set_Ind(_ind, false);
+
+      var _sp = new CParaSpacing();
+      _sp.Line              = 1;
+      _sp.LineRule          = linerule_Auto;
+      _sp.Before            = 0;
+      _sp.BeforeAutoSpacing = false;
+      _sp.After             = 0;
+      _sp.AfterAutoSpacing  = false;
+      par.Set_Spacing(_sp, false);
+
+      _dc.Reset(0, 0, 10000, 10000);
+      _dc.Recalculate_Page(0, true);
+
+      _dc.Reset(0, 0, par.Lines[0].Ranges[0].W + 0.001, 10000);
+      _dc.Recalculate_Page(0, true);
+      //par.Reset(0, 0, 10000, 10000, 0);
+      //par.Recalculate_Page(0);
+
+      var y = dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
+      var b = dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
+      var w = dKoefToMM * this.STYLE_THUMBNAIL_WIDTH;
+      var off = 10 * dKoefToMM;
+      var off2 = 5 * dKoefToMM;
+      var off3 = 1 * dKoefToMM;
+
+      graphics.transform(1,0,0,1,0,0);
+      graphics.save();
+      graphics._s();
+      graphics._m(off2, y + off3);
+      graphics._l(w - off, y + off3);
+      graphics._l(w - off, b - off3);
+      graphics._l(off2, b - off3);
+      graphics._z();
+      graphics.clip();
+
+      //graphics.t(style.Name, off + 0.5, y + 0.75 * (b - y));
+      var baseline = par.Lines[0].Y;
+      par.Shift(0, off + 0.5, y + 0.75 * (b - y) - baseline);
+      par.Draw(0, graphics);
+
+      graphics.restore();
+
+      Default_Tab_Stop = oldDefTabStop;
+
+      g_oTableId.m_bTurnOff = false;
+      History.TurnOn();
+    }
+  }
 }
 
 function CMathPainter(_api)

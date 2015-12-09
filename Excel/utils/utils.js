@@ -1465,8 +1465,7 @@
         var oColor = oStyle.getFill();
         if (null !== oColor) {
           oGraphics.setFillStyle(oColor);
-          oGraphics.rect(0, 0, this.styleThumbnailWidthPt, this.styleThumbnailHeightPt);
-          oGraphics.fill();
+          oGraphics.fillRect(0, 0, this.styleThumbnailWidthPt, this.styleThumbnailHeightPt);
         }
 
         var drawBorder = function (b, x1, y1, x2, y2) {
