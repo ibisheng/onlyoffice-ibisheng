@@ -4014,7 +4014,15 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                     {
                         CheckSpPrXfrm2(item.GraphicObj)
                     }
-                    oThis.bs.WriteItem(c_oSerRunType.pptxDrawing, function () { oThis.WriteImage(item); });
+					
+					if(this.copyParams && item.ParaMath)
+					{
+						oThis.bs.WriteItem(c_oSerRunType.object, function () { oThis.WriteObject(item); });
+					}
+					else
+					{
+						oThis.bs.WriteItem(c_oSerRunType.pptxDrawing, function () { oThis.WriteImage(item); });
+					}
                     break;
             }
         }
@@ -4446,6 +4454,13 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
             this.bs.WriteItem(c_oSerDocTableType.Cell_Content, function(){oInnerDocument.WriteDocumentContent(cell.Content);});
         }
     };
+	this.WriteObject = function (obj)
+    {
+        var oThis = this;
+		
+		oThis.bs.WriteItem(c_oSerParType.OMath, function(){oThis.boMaths.WriteArgNodes(obj.ParaMath.Root);});
+		oThis.bs.WriteItem(c_oSerRunType.pptxDrawing, function () { oThis.WriteImage(obj); });
+	};
 };
 function BinaryOtherTableWriter(memory, doc)
 {
@@ -8161,7 +8176,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         if(null != oParaDrawing.wrappingPolygon)
             oParaDrawing.addWrapPolygon(oParaDrawing.wrappingPolygon);
 		if (oDrawing.ParaMath)
-			oParaDrawing.ParaMath = oDrawing.ParaMath;
+			oParaDrawing.Set_ParaMath(oDrawing.ParaMath);
 
         if(oParaDrawing.GraphicObj)
         {

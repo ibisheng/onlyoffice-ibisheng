@@ -1307,6 +1307,7 @@ CGraphicObjects.prototype =
                     drawing.Set_DrawingType(selectedObjects[i].parent.DrawingType);
                     drawing.GraphicObj.setParent(drawing);
                     drawing.CheckWH();
+					drawing.Set_ParaMath(selectedObjects[i].parent.ParaMath);
                     if(selectedObjects[i].parent.Extent)
                     {
                         drawing.setExtent(selectedObjects[i].parent.Extent.W, selectedObjects[i].parent.Extent.H)
