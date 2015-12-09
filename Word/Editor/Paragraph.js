@@ -13465,6 +13465,8 @@ Paragraph.prototype.Accept_RevisionChanges = function(Type, bAll)
                 this.Content[CurPos].Accept_RevisionChanges(Type, bAll);
         }
 
+        this.Correct_Content();
+        this.Correct_ContentPos(false);
         this.private_UpdateTrackRevisions();
     }
 };
@@ -13501,6 +13503,8 @@ Paragraph.prototype.Reject_RevisionChanges = function(Type, bAll)
                 this.Content[CurPos].Reject_RevisionChanges(Type, bAll);
         }
 
+        this.Correct_Content();
+        this.Correct_ContentPos(false);
         this.private_UpdateTrackRevisions();
     }
 };
