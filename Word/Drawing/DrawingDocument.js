@@ -7079,7 +7079,7 @@ CStylesPainter.prototype =
             this.defaultStyles = [];
             for (var i in styles)
             {
-                this.defaultStyles[cur_index] = new CStyleImage(styles[i].Name, cur_index, c_oAscStyleImage.Default);
+                this.defaultStyles[cur_index] = new CStyleImage(styles[i].Name, cur_index, c_oAscStyleImage.Default, '');
                 cur_index++;
             }
 
@@ -7111,7 +7111,7 @@ CStylesPainter.prototype =
 			if(true == style.qFormat && null === DocumentStyles.Get_StyleIdByName(style.Name, false))
 			{
 				this.drawStyle(graphics, style, cur_index);
-				this.defaultStyles[cur_index] = new CStyleImage(style.Name, cur_index, c_oAscStyleImage.Default, style.uiPriority);
+				this.defaultStyles[cur_index] = new CStyleImage(style.Name, cur_index, c_oAscStyleImage.Default, '', style.uiPriority);
 				cur_index++;
 			}
         }
@@ -7173,7 +7173,7 @@ CStylesPainter.prototype =
                 _dr_style.Id = i;
 
 				this.drawStyle(graphics, _dr_style, cur_index);
-				this.docStyles[cur_index] = new CStyleImage(style.Name, cur_index, c_oAscStyleImage.Document, style.uiPriority);
+				this.docStyles[cur_index] = new CStyleImage(style.Name, cur_index, c_oAscStyleImage.Document, '', style.uiPriority);
 
 				// алгоритм смены имени
 				if (style.Default)

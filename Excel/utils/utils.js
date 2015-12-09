@@ -1358,6 +1358,12 @@
 				oCanvas.height = nDefaultStylesCount * this.styleThumbnailHeightWithRetina;
 				var oGraphics = new asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
+        // ToDo оставить один, когда меню добавит обработку (нарезаем по одной картинке)
+        var oCanvas2 = document.createElement('canvas');
+        oCanvas2.width = this.styleThumbnailWidthWithRetina;
+        oCanvas2.height = this.styleThumbnailHeightWithRetina;
+        var oGraphics2 = new asc.DrawingContext({canvas: oCanvas2, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+
 				var oStyle, oCustomStyle;
 				this.defaultStyles = [];
 				for (var i = 0, styleIndex = 0; i < nLength; ++i) {
@@ -1367,8 +1373,10 @@
 					// ToDo Возможно стоит переписать немного, чтобы не пробегать каждый раз по массиву custom-стилей (нужно генерировать AllStyles)
 					oCustomStyle = cellStylesAll.getCustomStyleByBuiltinId(oStyle.BuiltinId);
 
-					this.defaultStyles[i] = new CStyleImage(oStyle.Name, styleIndex, c_oAscStyleImage.Default);
 					this.drawStyle(oGraphics, stringRenderer, oCustomStyle || oStyle, oStyle.Name, styleIndex);
+
+          this.drawStyle2(oGraphics2, stringRenderer, oCustomStyle || oStyle, oStyle.Name);
+          this.defaultStyles[i] = new CStyleImage(oStyle.Name, styleIndex, c_oAscStyleImage.Default, oCanvas2.toDataURL("image/png"));
 					++styleIndex;
 				}
 
@@ -1383,14 +1391,23 @@
 				oCanvas.height = nDocumentStylesCount * this.styleThumbnailHeightWithRetina;
 				var oGraphics = new asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
+        // ToDo оставить один, когда меню добавит обработку (нарезаем по одной картинке)
+        var oCanvas2 = document.createElement('canvas');
+        oCanvas2.width = this.styleThumbnailWidthWithRetina;
+        oCanvas2.height = this.styleThumbnailHeightWithRetina;
+        var oGraphics2 = new asc.DrawingContext({canvas: oCanvas2, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+
 				var oStyle;
 				this.docStyles = [];
 				for (var i = 0, styleIndex = 0; i < nLength; ++i) {
 					oStyle = cellStyles[i];
 					if (oStyle.Hidden || null != oStyle.BuiltinId)
 						continue;
-					this.docStyles[styleIndex] = new CStyleImage(oStyle.Name, styleIndex, c_oAscStyleImage.Document);
 					this.drawStyle(oGraphics, stringRenderer, oStyle, oStyle.Name, styleIndex);
+
+          this.drawStyle2(oGraphics2, stringRenderer, oCustomStyle || oStyle, oStyle.Name);
+          this.docStyles[styleIndex] = new CStyleImage(oStyle.Name, styleIndex, c_oAscStyleImage.Document, oCanvas2.toDataURL("image/png"));
+
 					++styleIndex;
 				}
 
@@ -1407,7 +1424,6 @@
 				oGraphics.rect(0, nOffsetY, this.styleThumbnailWidthPt, this.styleThumbnailHeightPt).clip();
 				if (null !== oColor)
 					oGraphics.fill();
-
 
 				var drawBorder = function (b, x1, y1, x2, y2) {
 					if (null != b && c_oAscBorderStyles.None !== b.s) {
@@ -1442,7 +1458,50 @@
 				oGraphics.setFillStyle(oFontColor);
 				oGraphics.fillText(sStyleName, width_padding, textY + tm.baseline);
 				oGraphics.restore();
-			}
+			},
+      drawStyle2: function (oGraphics, stringRenderer, oStyle, sStyleName) {
+        oGraphics.clear();
+        // Fill cell
+        var oColor = oStyle.getFill();
+        if (null !== oColor) {
+          oGraphics.setFillStyle(oColor);
+          oGraphics.rect(0, 0, this.styleThumbnailWidthPt, this.styleThumbnailHeightPt);
+          oGraphics.fill();
+        }
+
+        var drawBorder = function (b, x1, y1, x2, y2) {
+          if (null != b && c_oAscBorderStyles.None !== b.s) {
+            oGraphics.setStrokeStyle(b.c);
+
+            // ToDo поправить
+            oGraphics.setLineWidth(b.w).beginPath().moveTo(x1, y1).lineTo(x2, y2).stroke();
+          }
+        };
+
+        // borders
+        var oBorders = oStyle.getBorder();
+        drawBorder(oBorders.l, 0, 0, 0, this.styleThumbnailHeightPt);
+        drawBorder(oBorders.r, this.styleThumbnailWidthPt, 0, this.styleThumbnailWidthPt, this.styleThumbnailHeightPt);
+        drawBorder(oBorders.t, 0, 0, this.styleThumbnailWidthPt, 0);
+        drawBorder(oBorders.b, 0, this.styleThumbnailHeightPt, this.styleThumbnailWidthPt, this.styleThumbnailHeightPt);
+
+        // Draw text
+        var fc = oStyle.getFontColor();
+        var oFontColor = fc !== null ? fc : new CColor(0, 0, 0);
+        var format = oStyle.getFont();
+        // Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
+        var oFont = new asc.FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs,
+          format.b, format.i, format.u, format.s);
+
+        var width_padding = 3; // 4 * 72 / 96
+
+        var tm = stringRenderer.measureString(sStyleName);
+        // Текст будем рисовать по центру (в Excel чуть по другому реализовано, у них постоянный отступ снизу)
+        var textY = 0.5 * (this.styleThumbnailHeightPt - tm.height);
+        oGraphics.setFont(oFont);
+        oGraphics.setFillStyle(oFontColor);
+        oGraphics.fillText(sStyleName, width_padding, textY + tm.baseline);
+      }
 		};
 
 		/** @constructor */
