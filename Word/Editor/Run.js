@@ -52,7 +52,10 @@ function ParaRun(Paragraph, bMathRun)
     this.ReviewType    = reviewtype_Common;
     this.ReviewInfo    = new CReviewInfo();
     if (editor && !editor.isPresentationEditor && editor.WordControl && editor.WordControl.m_oLogicDocument && true === editor.WordControl.m_oLogicDocument.Is_TrackRevisions())
+    {
         this.ReviewType = reviewtype_Add;
+        this.ReviewInfo.Update();
+    }
 
     if(bMathRun)
     {

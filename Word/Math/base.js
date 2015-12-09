@@ -2387,6 +2387,24 @@ CMathBase.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth
             Checker.Update_AddRemoveReviewInfo(this.ReviewInfo);
             this.Get_EndPos(false, ContentPos, Depth);
             Checker.Set_AddRemoveEndPos(ContentPos);
+
+            // Нам нужно проставить конечную позицию в начало следующего рана, чтобы выделился данный элемент целиком
+            if (this.Paragraph)
+            {
+                var TempContentPos = this.Paragraph.Get_PosByElement(this);
+                if (TempContentPos)
+                {
+                    var InParentPos = TempContentPos.Get(TempContentPos.Get_Depth());
+                    TempContentPos.Decrease_Depth(1);
+                    var Parent = this.Paragraph.Get_ElementByPos(TempContentPos);
+                    if (Parent && Parent.Content && this === Parent.Content[InParentPos] && Parent.Content[InParentPos + 1] && para_Math_Run === Parent.Content[InParentPos + 1].Type)
+                    {
+                        ContentPos.Update(InParentPos + 1, Depth - 1);
+                        Parent.Content[InParentPos + 1].Get_StartPos(ContentPos, Depth);
+                        Checker.Set_AddRemoveEndPos(ContentPos);
+                    }
+                }
+            }
         }
     }
 
