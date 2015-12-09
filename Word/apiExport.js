@@ -412,7 +412,6 @@ asc_docs_api.prototype['getCurrentPage'] = asc_docs_api.prototype.getCurrentPage
 asc_docs_api.prototype['sync_countPagesCallback'] = asc_docs_api.prototype.sync_countPagesCallback;
 asc_docs_api.prototype['sync_currentPageCallback'] = asc_docs_api.prototype.sync_currentPageCallback;
 asc_docs_api.prototype['asc_enableKeyEvents'] = asc_docs_api.prototype.asc_enableKeyEvents;
-asc_docs_api.prototype['asyncFontsDocumentStartLoaded'] = asc_docs_api.prototype.asyncFontsDocumentStartLoaded;
 asc_docs_api.prototype['GenerateStyles'] = asc_docs_api.prototype.GenerateStyles;
 asc_docs_api.prototype['asyncFontsDocumentEndLoaded'] = asc_docs_api.prototype.asyncFontsDocumentEndLoaded;
 asc_docs_api.prototype['CreateFontsCharMap'] = asc_docs_api.prototype.CreateFontsCharMap;

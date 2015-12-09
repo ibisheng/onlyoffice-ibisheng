@@ -280,7 +280,6 @@ asc_docs_api.prototype['sync_UpdateCommentPosition'] = asc_docs_api.prototype.sy
 asc_docs_api.prototype['sync_ChangeCommentData'] = asc_docs_api.prototype.sync_ChangeCommentData;
 asc_docs_api.prototype['sync_LockComment'] = asc_docs_api.prototype.sync_LockComment;
 asc_docs_api.prototype['sync_UnLockComment'] = asc_docs_api.prototype.sync_UnLockComment;
-asc_docs_api.prototype['asyncFontsDocumentStartLoaded'] = asc_docs_api.prototype.asyncFontsDocumentStartLoaded;
 asc_docs_api.prototype['GenerateStyles'] = asc_docs_api.prototype.GenerateStyles;
 asc_docs_api.prototype['asyncFontsDocumentEndLoaded'] = asc_docs_api.prototype.asyncFontsDocumentEndLoaded;
 asc_docs_api.prototype['asyncImagesDocumentEndLoaded'] = asc_docs_api.prototype.asyncImagesDocumentEndLoaded;
