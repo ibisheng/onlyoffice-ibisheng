@@ -1000,7 +1000,7 @@ CDrawingCollaborativeTarget.prototype =
         {
             bIsHtmlElementCreate = true;
             this.HtmlElement = document.createElement('canvas');
-            this.HtmlElement.style.cssText = "position:absolute;padding:0;margin:0;-webkit-user-select:none;width:1px;height:1px;display:none;z-index:3;";
+            this.HtmlElement.style.cssText = "pointer-events: none;position:absolute;padding:0;margin:0;-webkit-user-select:none;width:1px;height:1px;display:none;z-index:3;";
             this.HtmlElement.width = 1;
             this.HtmlElement.height = 1;
 
