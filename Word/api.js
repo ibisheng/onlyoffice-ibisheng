@@ -135,7 +135,6 @@ CHeaderProp.prototype.get_Locked = function() { return this.Locked; };
 
 
 // [!dirty hack for minimizer - don't delete this comment!] function CStylesPainter ()
-// [!dirty hack for minimizer - don't delete this comment!] function CStyleImage ()
 // [!dirty hack for minimizer - don't delete this comment!] function CFont ()
 CStylesPainter.prototype.get_DefaultStylesImage = function() { return this.defaultStylesImage; };
 CStylesPainter.prototype.get_DocStylesImage = function() { return this.docStylesImage; };
@@ -143,10 +142,6 @@ CStylesPainter.prototype.get_MergedStyles = function() { return this.mergedStyle
 CStylesPainter.prototype.get_STYLE_THUMBNAIL_WIDTH = function() { return this.STYLE_THUMBNAIL_WIDTH; };
 CStylesPainter.prototype.get_STYLE_THUMBNAIL_HEIGHT = function() { return this.STYLE_THUMBNAIL_HEIGHT; };
 CStylesPainter.prototype.get_IsRetinaEnabled = function() { return this.IsRetinaEnabled; };
-
-CStyleImage.prototype.get_ThumbnailOffset = function() { return this.ThumbnailOffset; };
-CStyleImage.prototype.get_Type = function() { return this.Type; };
-CStyleImage.prototype.get_Name = function() { return this.Name; };
 
 CFont.prototype.asc_getFontId = function() { return this.id; };
 CFont.prototype.asc_getFontName = function() { return this.name; };

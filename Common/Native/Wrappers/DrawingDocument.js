@@ -87,14 +87,6 @@ CTableMarkup.prototype =
     }
 };
 
-function CStyleImage(_name, _ind, _type, _uiPriority)
-{
-    this.Name = _name;
-    this.ThumbnailOffset = _ind;
-    this.Type = _type;
-    this.uiPriority = _uiPriority;
-}
-
 function CTableOutline(Table, PageNum, X, Y, W, H)
 {
     this.Table = Table;

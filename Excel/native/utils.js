@@ -1301,20 +1301,6 @@
 		}
 
 		/** @constructor */
-		function asc_CStyleImage(name, thumbnailOffset, type) {
-			this.name = name;
-			this.thumbnailOffset = thumbnailOffset;
-			this.type = type;
-		}
-
-		asc_CStyleImage.prototype = {
-			constructor: asc_CStyleImage,
-			asc_getName: function () { return this.name; },
-			asc_getThumbnailOffset: function () { return this.thumbnailOffset; },
-			asc_getType: function () { return this.type; }
-		};
-
-		/** @constructor */
 		function asc_CStylesPainter() {
 
             this.native = window["native"];
@@ -1372,7 +1358,7 @@
 					// ToDo Возможно стоит переписать немного, чтобы не пробегать каждый раз по массиву custom-стилей (нужно генерировать AllStyles)
 					oCustomStyle = cellStylesAll.getCustomStyleByBuiltinId(oStyle.BuiltinId);
 
-					this.defaultStyles[i] = new asc_CStyleImage(oStyle.Name, styleIndex, c_oAscStyleImage.Default);
+					this.defaultStyles[i] = new CStyleImage(oStyle.Name, styleIndex, c_oAscStyleImage.Default);
                     this.native.BeginDrawDefaultStyle(oStyle.Name, styleIndex);
 					this.drawStyle(oGraphics, stringRenderer, oCustomStyle || oStyle, oStyle.Name, styleIndex);
                     this.native.EndDrawStyle();
@@ -1396,7 +1382,7 @@
 					oStyle = cellStyles[i];
 					if (oStyle.Hidden || null != oStyle.BuiltinId)
 						continue;
-					this.docStyles[styleIndex] = new asc_CStyleImage(oStyle.Name, styleIndex, c_oAscStyleImage.Document);
+					this.docStyles[styleIndex] = new CStyleImage(oStyle.Name, styleIndex, c_oAscStyleImage.Document);
                     this.native.BeginDrawDocumentStyle(oStyle.Name, styleIndex);
 					this.drawStyle(oGraphics, stringRenderer, oStyle, oStyle.Name, styleIndex);
                     this.native.EndDrawStyle();
@@ -1707,12 +1693,6 @@
 		prot["asc_setShowRowColHeaders"] = prot.asc_setShowRowColHeaders;
 
 		window["Asc"]["asc_CPane"] = window["Asc"].asc_CPane = asc_CPane;
-
-		window["Asc"]["asc_CStyleImage"] = window["Asc"].asc_CStyleImage = asc_CStyleImage;
-		prot = asc_CStyleImage.prototype;
-		prot["asc_getName"] = prot.asc_getName;
-		prot["asc_getThumbnailOffset"] = prot.asc_getThumbnailOffset;
-		prot["asc_getType"] = prot.asc_getType;
 
 		window["Asc"]["asc_CStylesPainter"] = window["Asc"].asc_CStylesPainter = asc_CStylesPainter;
 		prot = asc_CStylesPainter.prototype;

@@ -4868,13 +4868,6 @@ function CDrawingDocument(drawingObjects)
     }
 }
 
-function CStyleImage(_name, _ind, _type, _uiPriority)
-{
-    this.Name = _name;
-    this.ThumbnailOffset = _ind;
-    this.Type = _type;
-	this.uiPriority = _uiPriority;
-}
 function CStylesPainter()
 {
     // base64 defaultStyles image

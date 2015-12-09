@@ -2836,6 +2836,16 @@ CAscMathCategory.prototype["get_W"] = function(){ return this.W; };
 CAscMathCategory.prototype["get_H"] = function(){ return this.H; };
 CAscMathCategory.prototype.private_Sort = function(){ this.Data.sort( function(a,b){ return a.Id- b.Id; } ); };
 
+function CStyleImage(name, ind, type, uiPriority) {
+  this.name = name;
+  this.thumbnailOffset = ind;
+  this.type = type;
+  this.uiPriority = uiPriority;
+}
+CStyleImage.prototype['asc_getThumbnailOffset'] = CStyleImage.prototype['get_ThumbnailOffset'] = function() { return this.thumbnailOffset; };
+CStyleImage.prototype['asc_getType'] = CStyleImage.prototype['get_Type'] = function() { return this.type; };
+CStyleImage.prototype['asc_getName'] = CStyleImage.prototype['get_Name'] = function() { return this.name; };
+
 // эта функция ДОЛЖНА минимизироваться
 function CreateAscFill(unifill)
 {
