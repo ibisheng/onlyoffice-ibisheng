@@ -1405,7 +1405,7 @@
 						continue;
 					this.drawStyle(oGraphics, stringRenderer, oStyle, oStyle.Name, styleIndex);
 
-          this.drawStyle2(oGraphics2, stringRenderer, oCustomStyle || oStyle, oStyle.Name);
+          this.drawStyle2(oGraphics2, stringRenderer, oStyle, oStyle.Name);
           this.docStyles[styleIndex] = new CStyleImage(oStyle.Name, styleIndex, c_oAscStyleImage.Document, oCanvas2.toDataURL("image/png"));
 
 					++styleIndex;
