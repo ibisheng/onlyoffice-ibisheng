@@ -873,22 +873,56 @@ CMathBase.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
     }
     else
     {
+        if(TextPr.AscFill || TextPr.AscLine || TextPr.AscUnifill)
+        {
+            var oCompiledPr = this.Get_CompiledCtrPrp();
+            if(TextPr.AscFill)
+            {
+                this.Set_TextFill(CorrectUniFill(TextPr.AscFill, oCompiledPr.TextFill, 0));
+            }
+            if(TextPr.AscUnifill)
+            {
+                this.Set_Unifill(CorrectUniFill(TextPr.AscUnifill, oCompiledPr.Unifill, 0));
+            }
+            if(TextPr.AscLine)
+            {
+                this.Set_TextOutline(CorrectUniStroke(TextPr.AscLine, oCompiledPr.TextOutline, 0));
+            }
+            return;
+        }
         if(TextPr.FontSize !== undefined)
             this.Set_FontSizeCtrPrp(TextPr.FontSize);
 
         if(TextPr.Shd !== undefined)
             this.Set_Shd(TextPr.Shd);
 
-        if ( undefined !== TextPr.Color && undefined === TextPr.Unifill )
+        if(undefined != TextPr.Unifill)
         {
-            this.Set_Color( null === TextPr.Color ? undefined : TextPr.Color );
-            this.Set_Unifill( undefined );
+            this.Set_Unifill(TextPr.Unifill.createDuplicate());
+            if(undefined != this.CtrPrp.Color)
+            {
+                this.Set_Color(undefined);
+            }
+            if(undefined != this.CtrPrp.TextFill)
+            {
+                this.Set_TextFill(undefined);
+            }
         }
-
-        if ( undefined !== TextPr.Unifill )
+        if(undefined != TextPr.TextOutline)
         {
-            this.Set_Unifill(null === TextPr.Unifill ? undefined : TextPr.Unifill);
-            this.Set_Color(undefined);
+            this.Set_TextOutline(TextPr.TextOutline);
+        }
+        if(undefined != TextPr.TextFill)
+        {
+            this.Set_TextFill(TextPr.TextFill);
+            if(undefined != this.CtrPrp.Color)
+            {
+                this.Set_Color(undefined);
+            }
+            if(undefined != this.CtrPrp.Unifill)
+            {
+                this.Set_Unifill(undefined);
+            }
         }
 
         if ( undefined != TextPr.HighLight )
@@ -973,6 +1007,22 @@ CMathBase.prototype.Set_Unifill = function(Value)
     {
         History.Add(this, new CChangesMathUnifill(Value, this.CtrPrp.Unifill));
         this.raw_SetUnifill(Value);
+    }
+};
+CMathBase.prototype.Set_TextFill = function(Value)
+{
+    if ( ( undefined === Value && undefined !== this.CtrPrp.TextFill ) || ( Value instanceof CUniFill && ( undefined === this.CtrPrp.TextFill || false === CompareUnifillBool(this.CtrPrp.TextFill, Value) ) ) )
+    {
+        History.Add(this, new CChangesMathTextFill(Value, this.CtrPrp.TextFill));
+        this.raw_SetTextFill(Value);
+    }
+};
+CMathBase.prototype.Set_TextOutline = function(Value)
+{
+    if ( ( undefined === Value && undefined !== this.CtrPrp.TextOutline ) || ( Value instanceof CLn && ( undefined === this.CtrPrp.TextOutline || false === Value.IsIdentical(this.CtrPrp.TextOutline) ) ) )
+    {
+        History.Add(this, new CChangesMathTextOutline(Value, this.CtrPrp.TextOutline));
+        this.raw_SetTextOutline(Value);
     }
 };
 CMathBase.prototype.Set_HighLight = function(Value)
@@ -1124,6 +1174,16 @@ CMathBase.prototype.raw_SetColor = function(Value)
 CMathBase.prototype.raw_SetUnifill = function(Value)
 {
     this.CtrPrp.Unifill = Value;
+    this.NeedUpdate_CtrPrp();
+};
+CMathBase.prototype.raw_SetTextFill = function(Value)
+{
+    this.CtrPrp.TextFill = Value;
+    this.NeedUpdate_CtrPrp();
+};
+CMathBase.prototype.raw_SetTextOutline = function(Value)
+{
+    this.CtrPrp.TextOutline = Value;
     this.NeedUpdate_CtrPrp();
 };
 CMathBase.prototype.raw_SetHighLight = function(Value)

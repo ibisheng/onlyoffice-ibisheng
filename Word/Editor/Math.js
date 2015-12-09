@@ -2932,6 +2932,8 @@ var historyitem_Math_RFontsHint                =  19;
 var historyitem_Math_CtrPrpHighLight           =  20;
 var historyitem_Math_ArgSize                   =  21;
 var historyitem_Math_ReviewType                =  22;
+var historyitem_Math_CtrPrpTextFill            =  23;
+var historyitem_Math_CtrPrpTextOutline         =  24;
 
 
 function ReadChanges_FromBinary(Reader, Class)
@@ -2958,6 +2960,8 @@ function ReadChanges_FromBinary(Reader, Class)
         case historyitem_Math_RFontsEastAsia        : Changes = new CChangesMath_RFontsEastAsia(); break;
         case historyitem_Math_RFontsHint            : Changes = new CChangesMath_RFontsHint(); break;
         case historyitem_Math_CtrPrpHighLight       : Changes = new CChangesMathHighLight(); break;
+        case historyitem_Math_CtrPrpTextFill        : Changes = new CChangesMathTextFill(); break;
+        case historyitem_Math_CtrPrpTextOutline     : Changes = new CChangesMathTextOutline(); break;
     }
 
     if (null !== Changes)
@@ -3195,7 +3199,92 @@ CChangesMathUnifill.prototype.Load_Changes = function(Reader, Class)
 
     this.Redo(Class);
 };
+function CChangesMathTextFill(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathTextFill.prototype.Type = historyitem_Math_CtrPrpTextFill;
+CChangesMathTextFill.prototype.Undo = function(Class)
+{
+    Class.raw_SetTextFill(this.Old);
+};
+CChangesMathTextFill.prototype.Redo = function(Class)
+{
+    Class.raw_SetTextFill(this.New);
+};
+CChangesMathTextFill.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
 
+    if ( undefined !== this.New )
+    {
+        Writer.WriteBool(false);
+        this.New.Write_ToBinary(Writer);
+    }
+    else
+    {
+        Writer.WriteBool(true);
+    }
+};
+CChangesMathTextFill.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+
+    if ( Reader.GetBool() == false)
+    {
+        this.New = new CUniFill();
+        this.New.Read_FromBinary(Reader);
+    }
+    else
+    {
+        this.New = undefined;
+    }
+    this.Redo(Class);
+};
+function CChangesMathTextOutline(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathTextOutline.prototype.Type = historyitem_Math_CtrPrpTextOutline;
+CChangesMathTextOutline.prototype.Undo = function(Class)
+{
+    Class.raw_SetTextOutline(this.Old);
+};
+CChangesMathTextOutline.prototype.Redo = function(Class)
+{
+    Class.raw_SetTextOutline(this.New);
+};
+CChangesMathTextOutline.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
+
+    if ( undefined !== this.New )
+    {
+        Writer.WriteBool(false);
+        this.New.Write_ToBinary(Writer);
+    }
+    else
+    {
+        Writer.WriteBool(true);
+    }
+};
+CChangesMathTextOutline.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+
+    if ( Reader.GetBool() == false)
+    {
+        this.New = new CLn();
+        this.New.Read_FromBinary(Reader);
+    }
+    else
+    {
+        this.New = undefined;
+    }
+    this.Redo(Class);
+};
 function CChangesMathUnderline(NewValue, OldValue)
 {
     this.New = NewValue;

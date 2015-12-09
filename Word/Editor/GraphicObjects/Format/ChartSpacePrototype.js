@@ -255,6 +255,10 @@ CChartSpace.prototype.recalculate = function()
         return;
     ExecuteNoHistory(function()
     {
+        var bOldTrackRevision =  editor.WordControl.m_oLogicDocument.TrackRevisions;
+        if(bOldTrackRevision){
+            editor.WordControl.m_oLogicDocument.TrackRevisions = false;
+        }
         this.updateLinks();
 
         if(this.recalcInfo.recalcTitle)
@@ -452,7 +456,9 @@ CChartSpace.prototype.recalculate = function()
         {
             this.updatePosition(this.posX, this.posY);
         }
-
+        if(bOldTrackRevision){
+            editor.WordControl.m_oLogicDocument.TrackRevisions = true;
+        }
     }, this, []);
 };
 
