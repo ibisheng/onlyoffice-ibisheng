@@ -6165,9 +6165,6 @@ asc_docs_api.prototype.asc_setViewMode = function(isViewMode) {
     this.WordControl.OnResize(true);
   }
 };
-asc_docs_api.prototype.SetViewMode = function(isViewMode) {
-  this.asc_setViewMode(isViewMode);
-};
 
 asc_docs_api.prototype.SetUseEmbeddedCutFonts = function(bUse)
 {

@@ -4232,9 +4232,6 @@ asc_docs_api.prototype.asc_setViewMode = function(isViewMode) {
     }
   }
 };
-asc_docs_api.prototype.SetViewMode = function(isViewMode) {
-  this.asc_setViewMode(isViewMode);
-};
 
 asc_docs_api.prototype.SetUseEmbeddedCutFonts = function(bUse)
 {
