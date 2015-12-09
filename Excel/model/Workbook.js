@@ -817,7 +817,7 @@ DependencyGraph.prototype = {
     /*Defined Names section*/
     getDefNameNode:function ( node ) {
         var ret = this.defNameList[node];
-        return ret ? null : ret;
+        return ret ? ret : null;
     },
     getDefNameNodeByName:function ( name, sheetId ) {
 
