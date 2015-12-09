@@ -2156,17 +2156,57 @@ CContentChangesElement.prototype.Make_ArrayOfSimpleActions = function(Type, Pos,
 	return Positions;
 };
 var g_oUserColorById = {}, g_oUserNextColorIndex = 0;
-function getUserColorById(userId, userName) {
-  var res;
-  if (g_oUserColorById.hasOwnProperty(userId)) {
-    res = g_oUserColorById[userId];
-  } else if (g_oUserColorById.hasOwnProperty(userName)) {
-    res = g_oUserColorById[userName];
-  } else {
-    res = g_oUserColorById[userId] = c_oAscArrUserColors[g_oUserNextColorIndex % c_oAscArrUserColors.length];
-    ++g_oUserNextColorIndex;
-  }
-  return res;
+function getUserColorById(userId, userName, isDark, isNumericValue)
+{
+    var res;
+    if (g_oUserColorById.hasOwnProperty(userId))
+    {
+        res = g_oUserColorById[userId];
+    }
+    else if (g_oUserColorById.hasOwnProperty(userName))
+    {
+        res = g_oUserColorById[userName];
+    }
+    else
+    {
+        var nColor = c_oAscArrUserColors[g_oUserNextColorIndex % c_oAscArrUserColors.length];
+        ++g_oUserNextColorIndex;
+
+        if (userId)
+        {
+            res = g_oUserColorById[userId] = new CUserCacheColor(nColor);
+        }
+        else
+        {
+            res = g_oUserColorById[userName] = new CUserCacheColor(nColor);
+        }
+    }
+
+    if (!res)
+        return new CColor(0, 0, 0, 255);
+
+    var oColor = true === isDark ? res.Dark : res.Light;
+    return true === isNumericValue ? ((oColor.r << 16) & 0xFF0000) | ((oColor.g << 8) & 0xFF00) | (oColor.b & 0xFF) : oColor;
+}
+function CUserCacheColor(nColor)
+{
+    var r = (nColor >> 16) & 0xFF;
+    var g = (nColor >> 8) & 0xFF;
+    var b = nColor & 0xFF;
+
+    var Y  = Math.max(0, Math.min(255,       0.299    * r + 0.587    * g + 0.114    * b));
+    var Cb = Math.max(0, Math.min(255, 128 - 0.168736 * r - 0.331264 * g + 0.5      * b));
+    var Cr = Math.max(0, Math.min(255, 128 + 0.5      * r - 0.418688 * g - 0.081312 * b));
+
+    if (Y > 63)
+        Y = 63;
+
+    var R = Math.max(0, Math.min(255, Y                        + 1.402   * (Cr - 128))) | 0;
+    var G = Math.max(0, Math.min(255, Y - 0.34414 * (Cb - 128) - 0.71414 * (Cr - 128))) | 0;
+    var B = Math.max(0, Math.min(255, Y + 1.772   * (Cb - 128)                       )) | 0;
+
+    this.Light = new CColor(r, g, b, 255);
+    this.Dark  = new CColor(R, G, B, 255);
 }
 
 var g_oIdCounter = new CIdCounter();

@@ -968,9 +968,8 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
       bUseColor = false;
     }
 
-    var nColor = getUserColorById(userId);
-    var oColor = false === bUseColor ? null : new CDocumentColor((nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF);
-
+    var oCommonColor = getUserColorById(userId, null, false, false);
+    var oColor = false === bUseColor ? null : new CDocumentColor(oCommonColor.r, oCommonColor.g, oCommonColor.b);
     t._coAuthoringSetChange(e, oColor);
     // т.е. если bSendEvent не задан, то посылаем  сообщение + когда загрузился документ
     if (!bFirstLoad && t.bInit_word_control) {

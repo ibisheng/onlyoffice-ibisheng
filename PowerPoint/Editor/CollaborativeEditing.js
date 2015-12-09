@@ -568,7 +568,7 @@ CCollaborativeEditing.prototype.Show_ForeignCursorLabel = function(UserId)
         Api.sync_HideForeignCursorLabel(UserId);
     }, FOREIGN_CURSOR_LABEL_HIDETIME);
 
-    var Color  = DrawingDocument.Collaborative_GetTargetColor(UserId);
+    var Color  = getUserColorById(UserId, null, true);
     var Coords = DrawingDocument.Collaborative_GetTargetPosition(UserId);
     if (!Color || !Coords)
         return;
