@@ -4989,7 +4989,15 @@ CPresentation.prototype =
             oTextArt.spPr.xfrm.setOffX((this.Slides[this.CurPage].Width - oTextArt.spPr.xfrm.extX)/2);
             oTextArt.spPr.xfrm.setOffY((this.Slides[this.CurPage].Height - oTextArt.spPr.xfrm.extY)/2);
             this.Slides[this.CurPage].graphicObjects.resetSelection();
-            this.Slides[this.CurPage].graphicObjects.selectObject(oTextArt, 0);
+
+            if(oTextArt.bSelectedText){
+                this.Slides[this.CurPage].graphicObjects.selectObject(oTextArt, 0);
+            }
+            else{
+                var oContent = oTextArt.getDocContent();
+                oContent.Content[0].Document_SetThisElementCurrent(false);
+                this.Select_All();
+            }
             this.Recalculate();
             this.Document_UpdateInterfaceState();
         }

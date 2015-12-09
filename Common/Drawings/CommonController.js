@@ -6455,11 +6455,13 @@ DrawingObjectsController.prototype =
 
                 oContent.CurPos.Type       = docpostype_Content;
                 oContent.CurPos.ContentPos = 0;
+                oShape.bSelectedText = true;
             }
             else
             {
                 sText = oShape.getTextArtTranslate().DefaultText;
                 AddToContentFromString(oContent, sText);
+                oShape.bSelectedText = false;
             }
         }
         else if(this.drawingObjects.cSld)
@@ -6480,15 +6482,18 @@ DrawingObjectsController.prototype =
                     oNearestPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
                     paragraph.Check_NearestPos(oNearestPos);
                     oContent.Insert_Content(oSelectedContent, oNearestPos);
+                    oShape.bSelectedText = true;
                 }
                 else
                 {
                     sText = oShape.getTextArtTranslate().DefaultText;
                     AddToContentFromString(oContent, sText);
+                    oShape.bSelectedText = false;
                 }
             }
             else
             {
+                oShape.bSelectedText = false;
                 sText = oShape.getTextArtTranslate().DefaultText;
                 AddToContentFromString(oContent, sText);
             }

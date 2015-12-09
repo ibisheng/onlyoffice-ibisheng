@@ -382,6 +382,9 @@ DrawingObjectsController.prototype.addTextArtFromParams = function(nStyle, dRect
 
     oTextArt.checkDrawingBaseCoords();
     this.selectObject(oTextArt, 0);
+    var oContent = oTextArt.getDocContent();
+    this.selection.textSelection = oTextArt;
+    oContent.Select_All();
     oTextArt.addToRecalculate();
     this.startRecalculate();
 };

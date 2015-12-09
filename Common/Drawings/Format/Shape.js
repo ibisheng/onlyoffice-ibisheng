@@ -2861,7 +2861,7 @@ CShape.prototype =
             var dMaxWidthRec = RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, this.bWordShape);
             if(!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270))
             {
-                if(dMaxWidthRec < w)
+                if(dMaxWidthRec < w && (!this.bWordShape && !this.bCheckAutoFitFlag))
                 {
                     oDocContent.Set_StartPage(0);
                     oDocContent.Reset(0, 0, w, 20000);
@@ -2886,7 +2886,7 @@ CShape.prototype =
             }
             else
             {
-                if(dMaxWidthRec < h)
+                if(dMaxWidthRec < h && !this.bWordShape)
                 {
                     oDocContent.Set_StartPage(0);
                     oDocContent.Reset(0, 0, h, 20000);

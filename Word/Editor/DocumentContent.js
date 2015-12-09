@@ -2342,7 +2342,14 @@ CDocumentContent.prototype =
                 if ( true == this.Selection.Use )
                     this.Remove( 1, true );
                 this.Paragraph_Add( Drawing );
-                this.Select_DrawingObject( Drawing.Get_Id() );
+                if(TextArt.bSelectedText){
+                    this.Select_DrawingObject(Drawing.Get_Id());
+                }
+                else{
+                    var oContent = Drawing.GraphicObj.getDocContent();
+                    oContent.Content[0].Document_SetThisElementCurrent(false);
+                    this.LogicDocument.Select_All();
+                }
             }
             else if ( type_Table == Item.GetType() )
             {
