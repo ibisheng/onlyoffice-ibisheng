@@ -272,7 +272,7 @@ var maxIndividualValues = 10000;
 
 			constructor: AutoFilters,
 			
-			addAutoFilter: function(styleName, activeRange, addFormatTableOptionsObj, offLock, bWithoutFilter)
+			addAutoFilter: function(styleName, activeRange, addFormatTableOptionsObj, offLock, bWithoutFilter, tablePartDisplayName)
 			{
 				var aWs = this._getCurrentWS(), addNameColumn, filterRange, t = this, ws = this.worksheet, cloneFilter;
 				var isTurnOffHistory = aWs.workbook.bUndoChanges || aWs.workbook.bRedoChanges;
@@ -345,14 +345,15 @@ var maxIndividualValues = 10000;
 						}
 
 						//add to model
-						t._addNewFilter(filterRange, styleName, bWithoutFilter);
+						var newTablePart = t._addNewFilter(filterRange, styleName, bWithoutFilter, tablePartDisplayName);
+						var newDisplayName = newTablePart && newTablePart.DisplayName ? newTablePart.DisplayName : null;
 						
 						if(styleName)
 							t._setColorStyleTable(aWs.TableParts[aWs.TableParts.length - 1].Ref, aWs.TableParts[aWs.TableParts.length - 1], null, true);
 						
 						//history
 						t._addHistoryObj({Ref: filterRange}, historyitem_AutoFilter_Add,
-							{activeCells: filterRange, styleName: styleName, addFormatTableOptionsObj: addFormatTableOptionsObj}, null, filterRange, bWithoutFilter);
+							{activeCells: filterRange, styleName: styleName, addFormatTableOptionsObj: addFormatTableOptionsObj, displayName: newDisplayName}, null, filterRange, bWithoutFilter);
 						History.SetSelectionRedo(filterRange);
 					}
 					
@@ -1004,7 +1005,7 @@ var maxIndividualValues = 10000;
 				History.TurnOff();
 				switch (type) {
 					case historyitem_AutoFilter_Add:
-						this.addAutoFilter(data.styleName, data.activeCells, data.addFormatTableOptionsObj, null, data.bWithoutFilter);
+						this.addAutoFilter(data.styleName, data.activeCells, data.addFormatTableOptionsObj, null, data.bWithoutFilter, data.displayName);
 						break;
 					case historyitem_AutoFilter_Delete:
 						this.deleteAutoFilter(data.activeCells);
@@ -2401,6 +2402,7 @@ var maxIndividualValues = 10000;
 					oHistoryObject.moveFrom             = redoObject.arnFrom;
 					oHistoryObject.moveTo               = redoObject.arnTo;
 					oHistoryObject.bWithoutFilter       = bWithoutFilter ? bWithoutFilter : false;
+					oHistoryObject.displayName          = redoObject.displayName;
 				}
 				else
 				{
@@ -3392,7 +3394,7 @@ var maxIndividualValues = 10000;
 
 			},
 			
-			_addNewFilter: function(ref, style, bWithoutFilter)
+			_addNewFilter: function(ref, style, bWithoutFilter, tablePartDisplayName)
 			{
 				var aWs = this._getCurrentWS();
 				var newFilter;
@@ -3442,10 +3444,13 @@ var maxIndividualValues = 10000;
 						newFilter.AutoFilter.Ref = ref;
 					}
 
-					newFilter.DisplayName = aWs.workbook.dependencyFormulas.getNextTableName(aWs, ref);
-
-                    //для Redo надо выставлять имя которое было, а не генерить новое
-                    //newFilter.DisplayName = aWs.workbook.dependencyFormulas.addTableName(cloneData.DisplayName, aWs, cloneData.Ref);
+					if(tablePartDisplayName)
+					{
+						newFilter.DisplayName = tablePartDisplayName;
+						aWs.workbook.dependencyFormulas.addTableName(tablePartDisplayName, aWs, ref);
+					}
+					else
+						newFilter.DisplayName = aWs.workbook.dependencyFormulas.getNextTableName(aWs, ref);
 					
 					newFilter.TableStyleInfo = new TableStyleInfo();
 					newFilter.TableStyleInfo.Name = style;
