@@ -3047,6 +3047,23 @@ CShape.prototype =
             this.y = this.spPr.xfrm.offY;
             this.extX = this.spPr.xfrm.extX;
             this.extY = this.spPr.xfrm.extY;
+
+
+
+            var oldFromCol = this.drawingBase.from.col,
+                oldFromColOff =  this.drawingBase.from.colOff,
+                oldFromRow =  this.drawingBase.from.row,
+                oldFromRowOff =  this.drawingBase.from.rowOff,
+                oldToCol =       this.drawingBase.to.col,
+                oldToColOff =    this.drawingBase.to.colOff,
+                oldToRow    =    this.drawingBase.to.row,
+                oldToRowOff =    this.drawingBase.to.rowOff,
+                oldPosX     =    this.drawingBase.Pos.X,
+                oldPosY     =    this.drawingBase.Pos.Y,
+                oldCx       =    this.drawingBase.ext.cx,
+                oldCy       =    this.drawingBase.ext.cy;
+
+
             this.drawingBase.setGraphicObjectCoords();
             this.x = oldX;
             this.y = oldY;
@@ -3054,35 +3071,39 @@ CShape.prototype =
             this.extY = oldExtY;
             var from = this.drawingBase.from, to = this.drawingBase.to;
             History.Add(this, {Type: historyitem_AutoShapes_SetDrawingBaseCoors,
-                fromCol: from.col,
-                fromColOff: from.colOff,
-                fromRow   : from.row,
-                fromRowOff: from.rowOff,
-                toCol: to.col,
-                toColOff: to.colOff,
-                toRow   : to.row,
-                toRowOff: to.rowOff,
-                posX    : this.drawingBase.Pos.X,
-                posY    : this.drawingBase.Pos.Y,
-                cx      : this.drawingBase.ext.cx,
-                cy      : this.drawingBase.ext.cy
-            });
+                fromCol       : from.col,
+                fromColOff    : from.colOff,
+                fromRow       : from.row,
+                fromRowOff    : from.rowOff,
+                toCol         : to.col,
+                toColOff      : to.colOff,
+                toRow         : to.row,
+                toRowOff      : to.rowOff,
+                posX          : this.drawingBase.Pos.X,
+                posY          : this.drawingBase.Pos.Y,
+                cx            : this.drawingBase.ext.cx,
+                cy            : this.drawingBase.ext.cy,
+
+                oldFromCol    : oldFromCol,
+                oldFromColOff : oldFromColOff,
+                oldFromRow    : oldFromRow,
+                oldFromRowOff : oldFromRowOff,
+                oldToCol      : oldToCol,
+                oldToColOff   : oldToColOff,
+                oldToRow      : oldToRow,
+                oldToRowOff   : oldToRowOff,
+                oldPosX       : oldPosX,
+                oldPosY       : oldPosY ,
+                oldCx         : oldCx,
+                oldCy         : oldCy
+        });
         }
     },
 
-    setDrawingBaseCoords: function(fromCol, fromColOff, fromRow, fromRowOff, toCol, toColOff, toRow, toRowOff)
+    setDrawingBaseCoords: function(fromCol, fromColOff, fromRow, fromRowOff, toCol, toColOff, toRow, toRowOff, posX, posY, extX, extY)
     {
         if(this.drawingBase)
         {
-            this.drawingBase.from.col = fromCol;
-            this.drawingBase.from.colOff = fromColOff;
-            this.drawingBase.from.row = fromRow;
-            this.drawingBase.from.rowOff = fromRowOff;
-
-            this.drawingBase.to.col = toCol;
-            this.drawingBase.to.colOff = toColOff;
-            this.drawingBase.to.row = toRow;
-            this.drawingBase.to.rowOff = toRowOff;
             History.Add(this, {Type: historyitem_AutoShapes_SetDrawingBaseCoors,
                 fromCol:    fromCol,
                 fromColOff: fromColOff,
@@ -3091,8 +3112,41 @@ CShape.prototype =
                 toCol:    toCol,
                 toColOff: toColOff,
                 toRow   : toRow,
-                toRowOff: toRowOff
+                toRowOff: toRowOff,
+                posX    : posX,
+                posY    : posY,
+                cx      : extX,
+                cy      : extY,
+
+                oldFromCol   : this.drawingBase.from.col,
+                oldFromColOff: this.drawingBase.from.colOff,
+                oldFromRow   : this.drawingBase.from.row,
+                oldFromRowOff: this.drawingBase.from.rowOff,
+                oldToCol     : this.drawingBase.to.col,
+                oldToColOff  : this.drawingBase.to.colOff,
+                oldToRow     : this.drawingBase.to.row,
+                oldToRowOff  : this.drawingBase.to.rowOff,
+                oldPosX      : this.drawingBase.Pos.X,
+                oldPosY      : this.drawingBase.Pos.Y,
+                oldCx        : this.drawingBase.ext.cx,
+                oldCy        : this.drawingBase.ext.cy
             });
+
+
+            this.drawingBase.from.col    = fromCol;
+            this.drawingBase.from.colOff = fromColOff;
+            this.drawingBase.from.row    = fromRow;
+            this.drawingBase.from.rowOff = fromRowOff;
+
+            this.drawingBase.to.col    = toCol;
+            this.drawingBase.to.colOff = toColOff;
+            this.drawingBase.to.row    = toRow;
+            this.drawingBase.to.rowOff = toRowOff;
+
+            this.drawingBase.Pos.X  = posX;
+            this.drawingBase.Pos.Y  = posY;
+            this.drawingBase.ext.cx = extX;
+            this.drawingBase.ext.cy = extY;
         }
     },
 
@@ -4627,7 +4681,21 @@ CShape.prototype =
         {
             case historyitem_AutoShapes_SetDrawingBaseCoors:
             {
-
+                if(this.drawingBase)
+                {
+                    this.drawingBase.from.col    = data.oldFromCol;
+                    this.drawingBase.from.colOff = data.oldFromColOff;
+                    this.drawingBase.from.row    = data.oldFromRow;
+                    this.drawingBase.from.rowOff = data.oldFromRowOff;
+                    this.drawingBase.to.col      = data.oldToCol;
+                    this.drawingBase.to.colOff   = data.oldToColOff;
+                    this.drawingBase.to.row      = data.oldToRow;
+                    this.drawingBase.to.rowOff   = data.oldToRowOff;
+                    this.drawingBase.Pos.X       = data.oldPosX;
+                    this.drawingBase.Pos.Y       = data.oldPosY;
+                    this.drawingBase.ext.cx      = data.oldCx;
+                    this.drawingBase.ext.cy      = data.oldCy;
+                }
                 break;
             }
             case historyitem_AutoShapes_RemoveFromDrawingObjects:
@@ -4713,6 +4781,25 @@ CShape.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            {
+                if(this.drawingBase)
+                {
+                    this.drawingBase.from.col    = data.fromCol;
+                    this.drawingBase.from.colOff = data.fromColOff;
+                    this.drawingBase.from.row    = data.fromRow;
+                    this.drawingBase.from.rowOff = data.fromRowOff;
+                    this.drawingBase.to.col      = data.toCol;
+                    this.drawingBase.to.colOff   = data.toColOff;
+                    this.drawingBase.to.row      = data.toRow;
+                    this.drawingBase.to.rowOff   = data.toRowOff;
+                    this.drawingBase.Pos.X       = data.posX;
+                    this.drawingBase.Pos.Y       = data.posY;
+                    this.drawingBase.ext.cx      = data.cx;
+                    this.drawingBase.ext.cy      = data.cy;
+                }
+                break;
+            }
             case historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());

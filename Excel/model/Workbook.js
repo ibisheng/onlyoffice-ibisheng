@@ -3178,7 +3178,7 @@ Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
             drawingObject.graphicObject.setWorksheet(oNewWs);
             drawingObject.graphicObject.addToDrawingObjects();
             var drawingBase = this.Drawings[i];
-            drawingObject.graphicObject.setDrawingBaseCoords(drawingBase.from.col, drawingBase.from.colOff, drawingBase.from.row, drawingBase.from.rowOff, drawingBase.to.col, drawingBase.to.colOff, drawingBase.to.row, drawingBase.to.rowOff);
+            drawingObject.graphicObject.setDrawingBaseCoords(drawingBase.from.col, drawingBase.from.colOff, drawingBase.from.row, drawingBase.from.rowOff, drawingBase.to.col, drawingBase.to.colOff, drawingBase.to.row, drawingBase.to.rowOff, drawingBase.Pos.X, drawingBase.Pos.Y, drawingBase.ext.cx, drawingBase.ext.cy);
             oNewWs.Drawings[oNewWs.Drawings.length - 1] = drawingObject;
         }
         NEW_WORKSHEET_DRAWING_DOCUMENT = null;

@@ -668,6 +668,25 @@ CImageShape.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            {
+                if(this.drawingBase)
+                {
+                    this.drawingBase.from.col    = data.oldFromCol;
+                    this.drawingBase.from.colOff = data.oldFromColOff;
+                    this.drawingBase.from.row    = data.oldFromRow;
+                    this.drawingBase.from.rowOff = data.oldFromRowOff;
+                    this.drawingBase.to.col      = data.oldToCol;
+                    this.drawingBase.to.colOff   = data.oldToColOff;
+                    this.drawingBase.to.row      = data.oldToRow;
+                    this.drawingBase.to.rowOff   = data.oldToRowOff;
+                    this.drawingBase.Pos.X       = data.oldPosX;
+                    this.drawingBase.Pos.Y       = data.oldPosY;
+                    this.drawingBase.ext.cx      = data.oldCx;
+                    this.drawingBase.ext.cy      = data.oldCy;
+                }
+                break;
+            }
             case historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 addToDrawings(this.worksheet, this, data.Pos);
@@ -725,6 +744,25 @@ CImageShape.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            {
+                if(this.drawingBase)
+                {
+                    this.drawingBase.from.col    = data.fromCol;
+                    this.drawingBase.from.colOff = data.fromColOff;
+                    this.drawingBase.from.row    = data.fromRow;
+                    this.drawingBase.from.rowOff = data.fromRowOff;
+                    this.drawingBase.to.col      = data.toCol;
+                    this.drawingBase.to.colOff   = data.toColOff;
+                    this.drawingBase.to.row      = data.toRow;
+                    this.drawingBase.to.rowOff   = data.toRowOff;
+                    this.drawingBase.Pos.X       = data.posX;
+                    this.drawingBase.Pos.Y       = data.posY;
+                    this.drawingBase.ext.cx      = data.cx;
+                    this.drawingBase.ext.cy      = data.cy;
+                }
+                break;
+            }
             case historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
