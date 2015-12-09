@@ -965,9 +965,8 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
       bUseColor = false;
     }
 
-    var oUser = t.CoAuthoringApi.getUser(userId);
-    var nColor = oUser ? oUser.asc_getColorValue() : null;
-    var oColor = false === bUseColor ? null : (null !== nColor ? new CDocumentColor((nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF) : new CDocumentColor(191, 255, 199));
+    var nColor = getUserColorById(userId);
+    var oColor = false === bUseColor ? null : new CDocumentColor((nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF);
 
     t._coAuthoringSetChange(e, oColor);
     // т.е. если bSendEvent не задан, то посылаем  сообщение + когда загрузился документ

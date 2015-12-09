@@ -2155,6 +2155,19 @@ CContentChangesElement.prototype.Make_ArrayOfSimpleActions = function(Type, Pos,
 
 	return Positions;
 };
+var g_oUserColorById = {}, g_oUserNextColorIndex = 0;
+function getUserColorById(userId, userName) {
+  var res;
+  if (g_oUserColorById.hasOwnProperty(userId)) {
+    res = g_oUserColorById[userId];
+  } else if (g_oUserColorById.hasOwnProperty(userName)) {
+    res = g_oUserColorById[userName];
+  } else {
+    res = g_oUserColorById[userId] = c_oAscArrUserColors[g_oUserNextColorIndex % c_oAscArrUserColors.length];
+    ++g_oUserNextColorIndex;
+  }
+  return res;
+}
 
 var g_oIdCounter = new CIdCounter();
 var g_oTableId = null;

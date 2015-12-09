@@ -2085,9 +2085,8 @@ CDrawingCollaborativeTarget.prototype =
             this.HtmlElement.width = 1;
             this.HtmlElement.height = 1;
 
-            var oUser = _drawing_doc.m_oWordControl.m_oApi.CoAuthoringApi.getUser(this.Id);
-            var nColor = oUser ? oUser.asc_getColorValue() :  null;
-            var oColor = (null !== nColor ? new CDocumentColor( (nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF ) : new CDocumentColor( 191, 255, 199 ));
+            var nColor = getUserColorById(this.Id);
+            var oColor = new CDocumentColor( (nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF );
 
             var Y  = Math.max(0, Math.min(255,       0.299    * oColor.r + 0.587    * oColor.g + 0.114    * oColor.b));
             var Cb = Math.max(0, Math.min(255, 128 - 0.168736 * oColor.r - 0.331264 * oColor.g + 0.5      * oColor.b));

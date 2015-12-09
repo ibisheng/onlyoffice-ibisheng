@@ -237,13 +237,6 @@
     }
   };
 
-  CDocsCoApi.prototype.getUser = function(userId) {
-    if (this._CoAuthoringApi && this._onlineWork) {
-      return this._CoAuthoringApi.getUser(userId);
-    }
-    return null;
-  };
-
   CDocsCoApi.prototype.getUserConnectionId = function() {
     if (this._CoAuthoringApi && this._onlineWork) {
       return this._CoAuthoringApi.getUserConnectionId();
@@ -498,10 +491,6 @@
     return this._userId;
   };
 
-  DocsCoApi.prototype.getUser = function() {
-    return this._user;
-  };
-
   DocsCoApi.prototype.getLocks = function() {
     return this._locks;
   };
@@ -675,10 +664,6 @@
     if (this.onAuthParticipantsChanged) {
       this.onAuthParticipantsChanged(this._participants, this._countUsers);
     }
-  };
-
-  DocsCoApi.prototype.getUser = function(userId) {
-    return this._participants[userId];
   };
 
   DocsCoApi.prototype.disconnect = function() {
