@@ -311,7 +311,9 @@ var c_oSerRunType = {
 	pptxDrawing: 12,
 	_LastRun: 13, //для копирования через бинарник
 	object: 14,
-	delText: 15
+	delText: 15,
+    del: 16,
+    ins: 17
 };
 var c_oSerImageType = {
     MediaId:0,
@@ -628,7 +630,9 @@ var c_oSer_OMathContentType = {
 	CtrlPr: 58,
 	pagebreak: 59,
 	linebreak: 60,
-	Run: 61
+	Run: 61,
+    Ins: 62,
+	Del: 63
 };
 var c_oSer_HyperlinkType = {
     Content: 0,
@@ -663,7 +667,8 @@ var c_oSerProp_RevisionType = {
     tblGridChange: 10,
     tblPrChange: 11,
     tcPrChange: 12,
-    trPrChange: 13
+    trPrChange: 13,
+    ContentRun: 14
 };
 var ETblStyleOverrideType = {
 	tblstyleoverridetypeBand1Horz:  0,
@@ -812,6 +817,9 @@ function WriteTrackRevision(bs, Id, reviewInfo, options) {
             var delText = reviewtype_Remove == options.ReviewType;
             bs.WriteItem(c_oSerProp_RevisionType.Content, function(){options.bdtw.WriteRun(options.run, options.bUseSelection, delText);});
         }
+        if (null != options.runContent) {
+            bs.WriteItem(c_oSerProp_RevisionType.ContentRun, function(){options.bmw.WriteMRunContent(options.runContent);});
+        }
         if (null != options.rPr) {
             bs.WriteItem(c_oSerProp_RevisionType.rPrChange, function(){options.brPrs.Write_rPr(options.rPr, null, null);});
         }
@@ -839,6 +847,10 @@ function ReadTrackRevision(type, length, stream, reviewInfo, options) {
             res = options.bdtr.bcr.Read1(length, function (t, l) {
                 return options.bdtr.ReadParagraphContent(t, l, options.parStruct);
             });
+        } else if(c_oSerProp_RevisionType.ContentRun == type) {
+            res = options.bmr.bcr.Read1(length, function(t, l){
+                return options.bmr.ReadMathMRun(t, l, options.run, options.props, options.oElem, options.parStruct);
+            });
         } else if(c_oSerProp_RevisionType.rPrChange == type) {
             res = options.brPrr.Read(length, options.rPr, null);
         } else if(c_oSerProp_RevisionType.pPrChange == type) {
@@ -849,6 +861,13 @@ function ReadTrackRevision(type, length, stream, reviewInfo, options) {
     } else
         res = c_oSerConstants.ReadUnknown;
     return res;
+};
+function initMathRevisions(elem ,props) {
+    if(props.del) {
+        elem.Set_ReviewTypeWithInfo(reviewtype_Remove, props.del);
+    } else if(props.ins) {
+        elem.Set_ReviewTypeWithInfo(reviewtype_Add, props.ins);
+    }
 };
 
 function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml)
@@ -1982,7 +2001,7 @@ function Binary_rPrWriter(memory, saveParams)
             }
 		}
         if (rPrReview && rPrReview.PrChange && rPrReview.ReviewInfo) {
-            var brPrs = new Binary_rPrWriter(this.memory, this.saveParams)
+            var brPrs = new Binary_rPrWriter(this.memory, this.saveParams);
             this.memory.WriteByte(c_oSerProp_rPrType.rPrChange);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
             this.bs.WriteItemWithLength(function(){WriteTrackRevision(_this.bs, _this.saveParams.trackRevisionId++, rPrReview.ReviewInfo, {brPrs: brPrs, rPr: rPrReview.PrChange});});
@@ -2004,6 +2023,7 @@ function Binary_rPrWriter(memory, saveParams)
 function Binary_oMathWriter(memory, oMathPara, saveParams)
 {
     this.memory = memory;
+    this.saveParams = saveParams;
     this.bs = new BinaryCommonWriter(this.memory);
 	this.brPrs = new Binary_rPrWriter(this.memory, saveParams);
 	
@@ -2089,6 +2109,18 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
 	this.WriteMRun = function(oMRun)
 	{
 		var oThis = this;
+        var ReviewType = oMRun.Get_ReviewType();
+        if (reviewtype_Remove == ReviewType) {
+            this.bs.WriteItem(c_oSer_OMathContentType.Del,function(){WriteTrackRevision(oThis.bs, oThis.saveParams.trackRevisionId++, oMRun.ReviewInfo, {bmw: oThis, runContent: oMRun, ReviewType: ReviewType});});
+        } else if (reviewtype_Add == ReviewType) {
+            this.bs.WriteItem(c_oSer_OMathContentType.Ins,function(){WriteTrackRevision(oThis.bs, oThis.saveParams.trackRevisionId++, oMRun.ReviewInfo, {bmw: oThis, runContent: oMRun, ReviewType: ReviewType});});
+        } else {
+            this.WriteMRunContent(oMRun);
+        }
+    }
+    this.WriteMRunContent = function(oMRun)
+    {
+        var oThis = this;
 		var props = oMRun.getPropsForWrite();
 		var oText = "";
 		var ContentLen = oMRun.Content.length;
@@ -2296,7 +2328,17 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
 	this.WriteCtrlPr = function(oElem)
 	{
 		var oThis = this;
-		this.bs.WriteItem(c_oSerRunType.rPr, function(){oThis.brPrs.Write_rPr(oElem.CtrPrp, null, null);});
+        var ReviewType = reviewtype_Common;
+        if (oElem.Get_ReviewType) {
+            ReviewType = oElem.Get_ReviewType();
+        }
+        if (reviewtype_Remove == ReviewType || reviewtype_Add == ReviewType && oElem.ReviewInfo) {
+            var brPrs = new Binary_rPrWriter(this.memory, this.saveParams);
+            var recordType = reviewtype_Remove == ReviewType ? c_oSerRunType.del : c_oSerRunType.ins;
+            this.bs.WriteItem(recordType, function(){WriteTrackRevision(oThis.bs, oThis.saveParams.trackRevisionId++, oElem.ReviewInfo, {brPrs: brPrs, rPr: oElem.CtrPrp});});
+        } else {
+            this.bs.WriteItem(c_oSerRunType.rPr, function(){oThis.brPrs.Write_rPr(oElem.CtrPrp, null, null);});
+        }
 	}
 	this.WriteDegHide = function(DegHide)
 	{
@@ -8932,6 +8974,7 @@ function Binary_oMathReader(stream, oReadResult)
                 return oThis.ReadMathAccPr(t,l,props);
             });
 			var oMathAcc = new CAccent(props);
+            initMathRevisions(oMathAcc, props);
 			if (oParent)
 				oParent.addElementToContent(oMathAcc);
 			oContent.content = oMathAcc.getBase();
@@ -9233,6 +9276,7 @@ function Binary_oMathReader(stream, oReadResult)
                 return oThis.ReadMathBarPr(t,l,props,oBar);
             });		
 			var oBar = new CBar(props);
+            initMathRevisions(oBar, props);
 			if (oParent)
 				oParent.addElementToContent(oBar);
 			oContent.content = oBar.getBase();
@@ -9296,6 +9340,7 @@ function Binary_oMathReader(stream, oReadResult)
                 return oThis.ReadMathBorderBoxPr(t,l,props);
             });	
 			var oBorderBox = new CBorderBox(props);
+            initMathRevisions(oBorderBox, props);
 			if (oParent)
 				oParent.addElementToContent(oBorderBox);
 			oContent.content = oBorderBox.getBase();
@@ -9382,6 +9427,7 @@ function Binary_oMathReader(stream, oReadResult)
                 return oThis.ReadMathBoxPr(t,l,props);
             });
 			var oBox = new CBox(props);
+            initMathRevisions(oBox, props);
 			if (oParent)
 				oParent.addElementToContent(oBox);
 			oContent.content = oBox.getBase();
@@ -9533,11 +9579,26 @@ function Binary_oMathReader(stream, oReadResult)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
-		if (c_oSerRunType.rPr === type)
-		{
+		if (c_oSerRunType.rPr === type) {
 			var MathTextRPr = new CTextPr();
 			res = this.brPrr.Read(length, MathTextRPr, null);
 			props.ctrPrp = MathTextRPr;
+		} else if (c_oSerRunType.del === type) {
+            var rPrChange = new CParaPr();
+            var reviewInfo = new CReviewInfo();
+            var brPrr = new Binary_rPrReader(this.Document, this.oReadResult, this.stream);
+            res = this.bcr.Read1(length, function(t, l){
+                return ReadTrackRevision(t, l, oThis.stream, reviewInfo, {brPrr: brPrr, rPr: rPrChange});
+            });
+            props.del = reviewInfo;
+		} else if (c_oSerRunType.ins === type) {
+            var rPrChange = new CParaPr();
+            var reviewInfo = new CReviewInfo();
+            var brPrr = new Binary_rPrReader(this.Document, this.oReadResult, this.stream);
+            res = this.bcr.Read1(length, function(t, l){
+                return ReadTrackRevision(t, l, oThis.stream, reviewInfo, {brPrr: brPrr, rPr: rPrChange});
+            });
+            props.ins = reviewInfo;
 		}
         else
             res = c_oSerConstants.ReadUnknown;
@@ -9555,6 +9616,7 @@ function Binary_oMathReader(stream, oReadResult)
             });				
 			props.counter = 0;
 			var oDelimiter = new CDelimiter(props);
+            initMathRevisions(oDelimiter, props);
 			oElem.addElementToContent(oDelimiter);			
 			for (var i=0; i<props.column; i++)
 				arrContent[i] = oDelimiter.getBase(i);
@@ -9659,7 +9721,8 @@ function Binary_oMathReader(stream, oReadResult)
 			if (!props.ctrPrp)
 				props.ctrPrp = new CTextPr();
 			props.counter = 0;
-			var oEqArr = new CEqArray(props);			
+			var oEqArr = new CEqArray(props);
+            initMathRevisions(oEqArr, props);
 			oElem.addElementToContent(oEqArr);			
 			for (var i=0; i<props.row; i++)
 				arrContent[i] = oEqArr.getElement(i);
@@ -9742,6 +9805,7 @@ function Binary_oMathReader(stream, oReadResult)
                 return oThis.ReadMathFPr(t,l,props);
             });	
 			var oFraction = new CFraction(props);
+            initMathRevisions(oFraction, props);
 			if (oParent)
 				oParent.addElementToContent(oFraction);
 			oElemDen.content = oFraction.getDenominator();
@@ -9793,6 +9857,7 @@ function Binary_oMathReader(stream, oReadResult)
                 return oThis.ReadMathFuncPr(t,l,props);
             });
 			var oFunc = new CMathFunc(props);
+            initMathRevisions(oFunc, props);
 			if (oParent)
 				oParent.addElementToContent(oFunc);	
 			oContent.content = oFunc.getArgument();
@@ -9850,6 +9915,7 @@ function Binary_oMathReader(stream, oReadResult)
                 return oThis.ReadMathGroupChrPr(t,l,props);
             });
 			var oGroupChr = new CGroupCharacter(props);
+            initMathRevisions(oGroupChr, props);
 			if (oParent)
 				oParent.addElementToContent(oGroupChr);
 			oContent.content = oGroupChr.getBase();
@@ -9973,6 +10039,7 @@ function Binary_oMathReader(stream, oReadResult)
             });
 			props.type = LIMIT_LOW;
 			var oLimLow = new CLimit(props);
+            initMathRevisions(oLimLow, props);
 			if (oParent)
 				oParent.addElementToContent(oLimLow);
 			oContent.content = oLimLow.getFName();
@@ -10019,6 +10086,7 @@ function Binary_oMathReader(stream, oReadResult)
             });
 			props.type = LIMIT_UP;
 			var oLimUpp = new CLimit(props);
+            initMathRevisions(oLimUpp, props);
 			if (oParent)			
 				oParent.addElementToContent(oLimUpp);
 			oContent.content = oLimUpp.getFName();
@@ -10076,6 +10144,7 @@ function Binary_oMathReader(stream, oReadResult)
                 return oThis.ReadMathMPr(t,l,props);
             });			
 			var oMatrix = new CMathMatrix(props);
+            initMathRevisions(oMatrix, props);
 			if (oParent)
 				oParent.addElementToContent(oMatrix);
 			oMatr.content = oMatrix;
@@ -10363,6 +10432,18 @@ function Binary_oMathReader(stream, oReadResult)
         else if (c_oSer_OMathContentType.linebreak === type)
         {
             oNewElem = new ParaNewLine();
+        } else if (c_oSer_OMathContentType.Del === type) {
+            var reviewInfo = new CReviewInfo();
+			res = this.bcr.Read1(length, function(t, l){
+                return ReadTrackRevision(t, l, oThis.stream, reviewInfo, {run: oMRun, props: props, oParent: oParent, parStruct: oParStruct, bmr: oThis});
+			});
+            oMRun.Set_ReviewTypeWithInfo(reviewtype_Remove, reviewInfo);
+        } else if (c_oSer_OMathContentType.Ins === type) {
+            var reviewInfo = new CReviewInfo();
+			res = this.bcr.Read1(length, function(t, l){
+                return ReadTrackRevision(t, l, oThis.stream, reviewInfo, {run: oMRun, props: props, oParent: oParent, parStruct: oParStruct, bmr: oThis});
+			});
+            oMRun.Set_ReviewTypeWithInfo(reviewtype_Add, reviewInfo);
         }
         else
             res = c_oSerConstants.ReadUnknown;
@@ -10375,7 +10456,7 @@ function Binary_oMathReader(stream, oReadResult)
         }
 		
         return res;
-    };	
+    };
     this.ReadMathMRPr = function(type, length, props)
     {
         var res = c_oSerConstants.ReadOk;
@@ -10432,6 +10513,7 @@ function Binary_oMathReader(stream, oReadResult)
 			if (!props.ctrPrp)
 				props.ctrPrp = new CTextPr();
 			var oNary = new CNary(props);
+            initMathRevisions(oNary, props);
 			if (oParent)
 				oParent.addElementToContent(oNary);
 			oSub.content = oNary.getLowerIterator();
@@ -10619,6 +10701,7 @@ function Binary_oMathReader(stream, oReadResult)
                 return oThis.ReadMathPhantPr(t,l,props);
             });
 			var oPhant = new CPhantom(props);
+            initMathRevisions(oPhant, props);
 			if (oParent)
 				oParent.addElementToContent(oPhant);
 			oContent.content = oPhant.getBase();
@@ -10717,6 +10800,7 @@ function Binary_oMathReader(stream, oReadResult)
                 return oThis.ReadMathRadPr(t,l,props);
             });
 			oRad.content = new CRadical(props);
+            initMathRevisions(oRad.content, props);
 			if (oParent)
 				oParent.addElementToContent(oRad.content);
 			oDeg.content = oRad.content.getDegree();
@@ -10849,6 +10933,7 @@ function Binary_oMathReader(stream, oReadResult)
             });
 			props.type = DEGREE_PreSubSup;
 			var oSPre = new CDegreeSubSup(props);
+            initMathRevisions(oSPre, props);
 			if (oParent)
 				oParent.addElementToContent(oSPre);
 			oSub.content = oSPre.getLowerIterator();
@@ -10902,6 +10987,7 @@ function Binary_oMathReader(stream, oReadResult)
             });
 			props.type = DEGREE_SUBSCRIPT;
 			var oSSub = new CDegree(props);
+            initMathRevisions(oSSub, props);
 			if (oParent)
 				oParent.addElementToContent(oSSub);
 			oSub.content = oSSub.getLowerIterator();
@@ -10948,6 +11034,7 @@ function Binary_oMathReader(stream, oReadResult)
             });
 			props.type = DEGREE_SubSup;
 			var oSSubSup = new CDegreeSubSup(props);
+            initMathRevisions(oSSubSup, props);
 			if (oParent)
 				oParent.addElementToContent(oSSubSup);
 			oSub.content = oSSubSup.getLowerIterator();
@@ -11040,6 +11127,7 @@ function Binary_oMathReader(stream, oReadResult)
             });
 			props.type = DEGREE_SUPERSCRIPT;
 			var oSSup = new CDegree(props);
+            initMathRevisions(oSSup, props);
 			if (oParent)
 				oParent.addElementToContent(oSSup);
 			oSup.conten = oSSup.getUpperIterator();
