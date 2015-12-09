@@ -15,9 +15,7 @@ var type_Paragraph = 0x0001;
 
 var UnknownValue  = null;
 
-//var REVIEW_COLOR = {r : 255, g : 0, b : 58};
-//var REVIEW_COLOR = {r : 204, g : 51, b : 0};
-var REVIEW_COLOR = {r : 255, g : 0, b : 0};
+var REVIEW_COLOR = new CColor(255, 0, 0, 255);
 
 // Класс Paragraph
 function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFromPresentation)
@@ -1501,7 +1499,8 @@ Paragraph.prototype =
                     var Y_top    = this.Pages[CurPage].Bounds.Top;
                     var Y_bottom = this.Pages[CurPage].Bounds.Bottom;
 
-                    pGraphics.p_color(REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, 255);
+                    var ReviewColor = this.Get_PrReviewColor();
+                    pGraphics.p_color(ReviewColor.r, ReviewColor.g, ReviewColor.b, 255);
                     pGraphics.drawVerLine(0, X_min, Y_top, Y_bottom, 0);
                 }
             }
@@ -2123,6 +2122,7 @@ Paragraph.prototype =
 
         var RunPrReview = null;
 
+        var arrRunReviewAreasColors = [];
         var arrRunReviewAreas = [];
         var arrRunReviewRects = [];
         for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
@@ -2231,7 +2231,7 @@ Paragraph.prototype =
                     RunPrReview = Element.Additional.RunPr;
                     arrRunReviewRects = [];
                     arrRunReviewAreas.push(arrRunReviewRects);
-
+                    arrRunReviewAreasColors.push(new CDocumentColor(Element.r, Element.g, Element.b));
                 }
 
                 arrRunReviewRectsLine.push({X : Element.x0, Y : Page.Y + Line.Y - Line.Metrics.TextAscent, W : Element.x1 - Element.x0, H : Line.Metrics.TextDescent + Line.Metrics.TextAscent + Line.Metrics.LineGap, Page : 0});
@@ -2275,10 +2275,11 @@ Paragraph.prototype =
             for (var ReviewAreaIndex = 0, ReviewAreasCount = arrRunReviewAreas.length; ReviewAreaIndex < ReviewAreasCount; ++ReviewAreaIndex)
             {
                 var arrRunReviewRects = arrRunReviewAreas[ReviewAreaIndex];
+                var oRunReviewColor = arrRunReviewAreasColors[ReviewAreaIndex];
                 var ReviewPolygon = new CPolygon();
                 ReviewPolygon.fill(arrRunReviewRects);
                 var PolygonPaths = ReviewPolygon.GetPaths(0);
-                pGraphics.p_color(REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, 255);
+                pGraphics.p_color(oRunReviewColor.r, oRunReviewColor.g, oRunReviewColor.b, 255);
                 for (var PolygonIndex = 0, PolygonsCount = PolygonPaths.length; PolygonIndex < PolygonsCount; ++PolygonIndex)
                 {
                     var Path = PolygonPaths[PolygonIndex];
@@ -13260,6 +13261,13 @@ Paragraph.prototype.Clear_CollaborativeMarks = function()
 Paragraph.prototype.Have_PrChange = function()
 {
     return this.Pr.Have_PrChange();
+};
+Paragraph.prototype.Get_PrReviewColor = function()
+{
+    if (this.Pr.ReviewInfo)
+        return this.Pr.ReviewInfo.Get_Color();
+
+    return REVIEW_COLOR;
 };
 Paragraph.prototype.Accept_PrChange = function()
 {

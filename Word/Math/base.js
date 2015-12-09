@@ -1785,6 +1785,9 @@ CMathBase.prototype.Draw_Lines = function(PDSL)
     var ReviewType = this.Get_ReviewType();
     var bAddReview = reviewtype_Add === ReviewType ? true : false;
     var bRemReview = reviewtype_Remove === ReviewType ? true : false;
+    var ReviewColor = null;
+    if (bAddReview || bRemReview)
+        ReviewColor = this.ReviewInfo.Get_Color();
 
     var ArgSize     = this.Get_CompiledArgSize();
     var fontCoeff   = MatGetKoeffArgSize(CtrPrp.FontSize, ArgSize.value);
@@ -1828,7 +1831,7 @@ CMathBase.prototype.Draw_Lines = function(PDSL)
     var Bound = this.Bounds.Get_LineBound(CurLine, CurRange);
 
     if (true === bRemReview)
-        aStrikeout.Add(Y, Y, X, X + Bound.W, LineW, REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b);
+        aStrikeout.Add(Y, Y, X, X + Bound.W, LineW, ReviewColor.r, ReviewColor.g, ReviewColor.b);
     else if ( true === CtrPrp.DStrikeout )
         aDStrikeout.Add( Y, Y, X, X + Bound.W, LineW, CurColor.r, CurColor.g, CurColor.b );
     else if ( true === CtrPrp.Strikeout )
@@ -1912,8 +1915,9 @@ CMathBase.prototype.Make_ShdColor = function(PDSE, CurTextPr)
 
     if (reviewtype_Common !== this.Get_ReviewType())
     {
-        pGraphics.p_color(REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, 255);
-        pGraphics.b_color1(REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, 255);
+        var ReviewColor = this.Get_ReviewColor();
+        pGraphics.p_color(ReviewColor.r, ReviewColor.g, ReviewColor.b, 255);
+        pGraphics.b_color1(ReviewColor.r, ReviewColor.g, ReviewColor.b, 255);
     }
 
     if(BgColor == undefined)
@@ -2396,6 +2400,22 @@ CMathBase.prototype.Get_ReviewType = function()
         return this.Parent.Get_ReviewType();
 
     return reviewtype_Common;
+};
+CMathBase.prototype.Get_ReviewColor = function()
+{
+    if (this.Id)
+    {
+        if (this.ReviewInfo)
+            return this.ReviewInfo.Get_Color();
+        else
+            return new CDocumentColor(255, 0, 0);
+    }
+    else if (this.Parent && this.Parent.Get_ReviewColor)
+    {
+        return this.Parent.Get_ReviewColor();
+    }
+
+    return REVIEW_COLOR;
 };
 CMathBase.prototype.Set_ReviewType = function(Type)
 {

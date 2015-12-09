@@ -4276,10 +4276,12 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
     var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
 
     var RGBA;
-    var ReviewType = this.Get_ReviewType();
+    var ReviewType  = this.Get_ReviewType();
+    var ReviewColor = null;
     if (reviewtype_Add === ReviewType || reviewtype_Remove === ReviewType)
     {
-        pGraphics.b_color1(REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, 255);
+        ReviewColor = this.Get_ReviewColor();
+        pGraphics.b_color1(ReviewColor.r, ReviewColor.g, ReviewColor.b, 255);
     }
     else if (CurTextPr.Unifill)
     {
@@ -4364,7 +4366,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
 
                     if (reviewtype_Add === ReviewType || reviewtype_Remove === ReviewType)
                     {
-                        pGraphics.b_color1(REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, 255);
+                        pGraphics.b_color1(ReviewColor.r, ReviewColor.g, ReviewColor.b, 255);
                     }
                     else if (RGBA)
                     {
@@ -4411,7 +4413,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
                     if (reviewtype_Common !== ReviewType)
                     {
                         pGraphics.SetTextPr(EndTextPr, PDSE.Theme);
-                        pGraphics.b_color1(REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, 255);
+                        pGraphics.b_color1(ReviewColor.r, ReviewColor.g, ReviewColor.b, 255);
                     }
                     else if (EndTextPr.Unifill)
                     {
@@ -4525,9 +4527,10 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 
     var CurColor, RGBA, Theme = this.Paragraph.Get_Theme(), ColorMap = this.Paragraph.Get_ColorMap();
 
-    var ReviewType = this.Get_ReviewType();
-    var bAddReview = reviewtype_Add === ReviewType ? true : false;
-    var bRemReview = reviewtype_Remove === ReviewType ? true : false;
+    var ReviewType  = this.Get_ReviewType();
+    var bAddReview  = reviewtype_Add === ReviewType ? true : false;
+    var bRemReview  = reviewtype_Remove === ReviewType ? true : false;
+    var ReviewColor = this.Get_ReviewColor();
 
     // Выставляем цвет обводки
     if ( true === PDSL.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill ) )
@@ -4593,9 +4596,9 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
                 if (this.Paragraph)
                 {
                     if (bAddReview)
-                        aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b);
+                        aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, ReviewColor.r, ReviewColor.g, ReviewColor.b);
                     else if (bRemReview)
-                        aStrikeout.Add(StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b);
+                        aStrikeout.Add(StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, ReviewColor.r, ReviewColor.g, ReviewColor.b);
                 }
 
                 X += ItemWidthVisible;
@@ -4617,14 +4620,14 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
                 if ( para_Drawing != ItemType || drawing_Anchor != Item.DrawingType )
                 {
                     if (true === bRemReview)
-                        aStrikeout.Add(StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b);
+                        aStrikeout.Add(StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, ReviewColor.r, ReviewColor.g, ReviewColor.b);
                     else if (true === CurTextPr.DStrikeout)
                         aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
                     else if ( true === CurTextPr.Strikeout )
                         aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
 
                     if (true === bAddReview)
-                        aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b);
+                        aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, ReviewColor.r, ReviewColor.g, ReviewColor.b);
                     else if (true === CurTextPr.Underline)
                         aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
 
@@ -4642,14 +4645,14 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
                 if ( PDSL.Spaces > 0 )
                 {
                     if (true === bRemReview)
-                        aStrikeout.Add(StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b);
+                        aStrikeout.Add(StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, ReviewColor.r, ReviewColor.g, ReviewColor.b);
                     else if (true === CurTextPr.DStrikeout)
                         aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr  );
                     else if ( true === CurTextPr.Strikeout )
                         aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr  );
 
                     if (true === bAddReview)
-                        aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b);
+                        aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, ReviewColor.r, ReviewColor.g, ReviewColor.b);
                     else if (true === CurTextPr.Underline)
                         aUnderline.Add( UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
 
@@ -4665,7 +4668,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             case para_Math_Ampersand:
             {
                 if (true === bRemReview)
-                    aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, undefined, CurTextPr );
+                    aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, ReviewColor.r, ReviewColor.g, ReviewColor.b, undefined, CurTextPr );
                 else if (true === CurTextPr.DStrikeout)
                     aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
                 else if ( true === CurTextPr.Strikeout )
@@ -4679,7 +4682,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             {
                 var ctrPrp = this.Parent.GetCtrPrp();
                 if (true === bRemReview)
-                    aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, REVIEW_COLOR.r, REVIEW_COLOR.g, REVIEW_COLOR.b, undefined, CurTextPr );
+                    aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, ReviewColor.r, ReviewColor.g, ReviewColor.b, undefined, CurTextPr );
                 if(true === ctrPrp.DStrikeout)
                     aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
                 else if(true === ctrPrp.Strikeout)
@@ -4695,7 +4698,10 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
     }
 
     if (true === this.Pr.Have_PrChange() && para_Math_Run !== this.Type)
-        PDSL.RunReview.Add(0, 0, PDSL.X, X, 0, 255, 0, 0, {RunPr : this.Pr});
+    {
+        var ReviewColor = this.Get_PrReviewColor();
+        PDSL.RunReview.Add(0, 0, PDSL.X, X, 0, ReviewColor.r, ReviewColor.g, ReviewColor.b, {RunPr: this.Pr});
+    }
 
     var CollPrChangeColor = this.private_GetCollPrChangeOther();
     if (false !== CollPrChangeColor)
@@ -6399,6 +6405,14 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
 ParaRun.prototype.Have_PrChange = function()
 {
     return this.Pr.Have_PrChange();
+};
+
+ParaRun.prototype.Get_PrReviewColor = function()
+{
+    if (this.Pr.ReviewInfo)
+        return this.Pr.ReviewInfo.Get_Color();
+
+    return REVIEW_COLOR;
 };
 
 ParaRun.prototype.Add_PrChange = function()
@@ -10070,6 +10084,13 @@ ParaRun.prototype.Get_ReviewType = function()
 {
     return this.ReviewType;
 };
+ParaRun.prototype.Get_ReviewColor = function()
+{
+    if (this.ReviewInfo)
+        return this.ReviewInfo.Get_Color();
+
+    return REVIEW_COLOR;
+};
 ParaRun.prototype.Set_ReviewType = function(Value)
 {
     if (Value !== this.ReviewType)
@@ -10530,4 +10551,11 @@ CReviewInfo.prototype.Read_FromBinary = function(Reader)
     this.UserId   = Reader.GetString2();
     this.UserName = Reader.GetString2();
     this.DateTime = parseInt(Reader.GetString2());
+};
+CReviewInfo.prototype.Get_Color = function()
+{
+    if (!this.UserId && !this.UserName)
+        return REVIEW_COLOR;
+
+    return getUserColorById(this.UserId, this.UserName, true, false);
 };
