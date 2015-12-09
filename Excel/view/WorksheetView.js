@@ -10049,13 +10049,13 @@
                 var actRange = this.getActiveRangeObj(), ascRange;
 
                 var mc = this.model.getMergedByCell(actRange.startRow, actRange.startCol);
-                var c1 = mc ? mc.c1 : actRange.startCol;
-                var r1 = mc ? mc.r1 : actRange.startRow;
+                var c1 = mc ? mc.c1 : actRange.c1;
+                var r1 = mc ? mc.r1 : actRange.r1;
                 var ar_norm = actRange.normalize(),
                     mc_norm = mc ? mc.normalize() : null;
 
-                var c2 = mc_norm ? mc_norm.isEqual(ar_norm)? mc_norm.c1 : ar_norm.c2 : ar_norm.c2;
-                var r2 = mc_norm ? mc_norm.isEqual(ar_norm)? mc_norm.r1 : ar_norm.r2 : ar_norm.r2;
+                var c2 = mc_norm ? ( mc_norm.isEqual(ar_norm) ? mc_norm.c1 : ar_norm.c2 ) : ar_norm.c2;
+                var r2 = mc_norm ? ( mc_norm.isEqual(ar_norm) ? mc_norm.r1 : ar_norm.r2 ) : ar_norm.r2;
 
                 ascRange = new asc_Range(c1, r1, c2, r2 );
                 /*TODO: сделать поиск по названиям автофигур, должен искать до того как вызвать поиск по именованным диапазонам*/
