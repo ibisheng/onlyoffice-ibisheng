@@ -371,7 +371,10 @@ asc.extendClass(asc_docs_api, baseEditorsApi);
 asc_docs_api.prototype.sendEvent = function() {
   this.asc_fireCallback.apply(this, arguments);
 };
-
+// Просмотр PDF
+asc_docs_api.prototype.isPdfViewer = function() {
+  return (null === this.WordControl.m_oLogicDocument);
+};
 asc_docs_api.prototype.LoadFontsFromServer = function(_fonts)
 {
     if (undefined === _fonts)
@@ -6169,13 +6172,6 @@ asc_docs_api.prototype.asc_setViewMode = function(isViewMode) {
 asc_docs_api.prototype.SetUseEmbeddedCutFonts = function(bUse)
 {
     this.isUseEmbeddedCutFonts = bUse;
-};
-
-asc_docs_api.prototype.IsNeedDefaultFonts = function()
-{
-    if (this.WordControl.m_oLogicDocument != null)
-        return true;
-    return false;
 };
 
 asc_docs_api.prototype.OnMouseUp = function(x, y)

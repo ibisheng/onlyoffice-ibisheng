@@ -342,7 +342,6 @@ asc_docs_api.prototype['ClearFormating'] = asc_docs_api.prototype.ClearFormating
 asc_docs_api.prototype['SetDeviceInputHelperId'] = asc_docs_api.prototype.SetDeviceInputHelperId;
 asc_docs_api.prototype['asc_setViewMode'] = asc_docs_api.prototype.asc_setViewMode;
 asc_docs_api.prototype['SetUseEmbeddedCutFonts'] = asc_docs_api.prototype.SetUseEmbeddedCutFonts;
-asc_docs_api.prototype['IsNeedDefaultFonts'] = asc_docs_api.prototype.IsNeedDefaultFonts;
 asc_docs_api.prototype['can_AddHyperlink'] = asc_docs_api.prototype.can_AddHyperlink;
 asc_docs_api.prototype['add_Hyperlink'] = asc_docs_api.prototype.add_Hyperlink;
 asc_docs_api.prototype['sync_HyperlinkClickCallback'] = asc_docs_api.prototype.sync_HyperlinkClickCallback;

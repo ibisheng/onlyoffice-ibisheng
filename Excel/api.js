@@ -921,14 +921,6 @@ var editor;
     this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
   };
 
-  /**
-   * Функция для загрузчика шрифтов (нужно ли грузить default шрифты). Для Excel всегда возвращаем false
-   * @returns {boolean}
-   */
-  spreadsheet_api.prototype.IsNeedDefaultFonts = function() {
-    return false;
-  };
-
   spreadsheet_api.prototype._loadFonts = function(fonts, callback) {
     if (window["NATIVE_EDITOR_ENJINE"]) {
       return callback();

@@ -4238,13 +4238,6 @@ asc_docs_api.prototype.SetUseEmbeddedCutFonts = function(bUse)
     this.isUseEmbeddedCutFonts = bUse;
 };
 
-asc_docs_api.prototype.IsNeedDefaultFonts = function()
-{
-    if (this.WordControl.m_oLogicDocument != null)
-        return true;
-    return false;
-};
-
 asc_docs_api.prototype.can_AddHyperlink = function()
 {
     var bCanAdd = this.WordControl.m_oLogicDocument.Hyperlink_CanAdd();

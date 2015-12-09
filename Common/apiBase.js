@@ -170,6 +170,10 @@ baseEditorsApi.prototype.asc_setDocInfo = function(oDocInfo) {
 baseEditorsApi.prototype.asc_SetFontsPath = function(path) {
   this.FontLoader.fontFilesPath = path;
 };
+// Просмотр PDF
+baseEditorsApi.prototype.isPdfViewer = function() {
+  return false;
+};
 // Events
 baseEditorsApi.prototype.sendEvent = function() {
 };
@@ -232,6 +236,22 @@ baseEditorsApi.prototype.checkLongActionCallback = function(_callback, _param) {
   } else {
     return true;
   }
+};
+/**
+ * Функция для загрузчика шрифтов (нужно ли грузить default шрифты). Для Excel всегда возвращаем false
+ * @returns {boolean}
+ */
+baseEditorsApi.prototype.IsNeedDefaultFonts = function() {
+  var res = false;
+  switch (this.editorId) {
+    case c_oEditorId.Word:
+      res = !this.isPdfViewer();
+      break;
+    case c_oEditorId.Presentation:
+      res = true;
+      break;
+  }
+  return res;
 };
 // Open
 baseEditorsApi.prototype.asc_LoadDocument = function(isVersionHistory) {
