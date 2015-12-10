@@ -2855,6 +2855,9 @@ function DrawingObjects() {
             settings.putHorAxisProps(hor_axis_settings);
             hor_axis_settings.setDefault();
         }
+        else{
+            this.controller.checkSelectedObjectsAndFireCallback(function(){});
+        }
         return settings;
     };
 

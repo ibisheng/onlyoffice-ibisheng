@@ -59,6 +59,7 @@ function baseEditorsApi(name) {
   this.textArtPreviewManager = new TextArtPreviewManager();
   // Режим вставки диаграмм в редакторе документов
   this.isChartEditor = false;
+  this.isOpenedChartFrame = false;
 
   // CoAuthoring and Chat
   this.User = undefined;
@@ -481,8 +482,11 @@ baseEditorsApi.prototype.asc_getChartPreviews = function(chartType) {
 baseEditorsApi.prototype.asc_getTextArtPreviews = function() {
   return this.textArtPreviewManager.getWordArtStyles();
 };
+baseEditorsApi.prototype.asc_onOpenChartFrame = function() {
+    this.isOpenedChartFrame = true;
+};
 baseEditorsApi.prototype.asc_onCloseChartFrame = function() {
-
+    this.isOpenedChartFrame = false;
 };
 // Add image
 baseEditorsApi.prototype._addImageUrl = function() {

@@ -2034,6 +2034,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_getChartObject = function() {		// Return new or existing chart. For image return null
+    this.asc_onOpenChartFrame();
     var ws = this.wb.getWorksheet();
     return ws.objectRender.getAscChartObject();
   };
@@ -2846,7 +2847,7 @@ var editor;
   ////////////////////////////AutoSave api/////////////////////////////////
   /////////////////////////////////////////////////////////////////////////
   spreadsheet_api.prototype._autoSave = function() {
-    if ((0 === this.autoSaveGap && !this.collaborativeEditing.getFast()) || this.asc_getCellEditMode() || this.asc_getIsTrackShape() ||
+    if ((0 === this.autoSaveGap && !this.collaborativeEditing.getFast()) || this.asc_getCellEditMode() || this.asc_getIsTrackShape() || this.isOpenedChartFrame ||
       !History.IsEndTransaction() || !this.canSave) {
       return;
     }
