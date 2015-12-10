@@ -9140,6 +9140,8 @@ ParaRun.prototype.Write_ToBinary2 = function(Writer)
     // String   : Paragraph Id
     // Variable : CTextPr
     // Long     : ReviewType
+    // Bool     : isUndefined ReviewInfo
+    // ->false  : ReviewInfo
     // Long     : Количество элементов
     // Array of variable : массив с элементами
 
@@ -9162,6 +9164,15 @@ ParaRun.prototype.Write_ToBinary2 = function(Writer)
     Writer.WriteString2( null !== ParagraphToWrite && undefined !== ParagraphToWrite ? ParagraphToWrite.Get_Id() : "" );
     PrToWrite.Write_ToBinary( Writer );
     Writer.WriteLong(this.ReviewType);
+    if (this.ReviewInfo)
+    {
+        Writer.WriteBool(false);
+        this.ReviewInfo.Write_ToBinary(Writer);
+    }
+    else
+    {
+        Writer.WriteBool(true);
+    }
 
     var Count = ContentToWrite.length;
     Writer.WriteLong( Count );
@@ -9179,6 +9190,8 @@ ParaRun.prototype.Read_FromBinary2 = function(Reader)
     // String   : Paragraph Id
     // Variable : CTextPr
     // Long     : ReviewType
+    // Bool     : isUndefined ReviewInfo
+    // ->false  : ReviewInfo
     // Long     : Количество элементов
     // Array of variable : массив с элементами
 
@@ -9188,6 +9201,9 @@ ParaRun.prototype.Read_FromBinary2 = function(Reader)
     this.Pr        = new CTextPr();
     this.Pr.Read_FromBinary( Reader );
     this.ReviewType = Reader.GetLong();
+    this.ReviewInfo = new CReviewInfo();
+    if (false === Reader.GetBool())
+        this.ReviewInfo.Read_FromBinary(Reader);
 
     if (para_Math_Run == this.Type)
 	{
