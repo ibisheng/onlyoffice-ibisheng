@@ -1224,6 +1224,16 @@ CDrawingDocument.prototype =
     CheckFontNeeds : function()
     {
     },
+	
+	BeginDrawTracking: function()
+    {
+        this.AutoShapesTrack.BeginDrawTracking();
+    },
+
+    EndDrawTracking: function()
+    {
+        this.AutoShapesTrack.EndDrawTracking();
+    },
 
     // треки
     DrawTrack : function(type, matrix, left, top, width, height, isLine, canRotate)
