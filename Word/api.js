@@ -976,6 +976,12 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
       t.sync_CollaborativeChanges();
     }
   };
+  this.CoAuthoringApi.onRecalcLocks = function(e) {
+    if (e && true === CollaborativeEditing.Is_Fast()) {
+      var CursorInfo = JSON.parse(e);
+      CollaborativeEditing.Add_ForeignCursorToUpdate(CursorInfo.UserId, CursorInfo.CursorInfo, CursorInfo.UserShortId);
+    }
+  };
   this.CoAuthoringApi.onStartCoAuthoring = function(isStartEvent) {
     CollaborativeEditing.Start_CollaborationEditing();
     t.asc_setDrawCollaborationMarks(true);
