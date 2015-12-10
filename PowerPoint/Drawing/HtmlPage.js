@@ -3125,6 +3125,7 @@ function CEditorPage(api)
     {
         var oWordControl = oThis;
         oWordControl.m_nTimeDrawingLast = new Date().getTime();
+        var isRepaint = oWordControl.m_bIsScroll;
         if (oWordControl.m_bIsScroll)
         {
             oWordControl.m_bIsScroll = false;
@@ -3148,6 +3149,7 @@ function CEditorPage(api)
 
             oWordControl.CheckFontCache();
         }
+        oWordControl.m_oDrawingDocument.Collaborative_TargetsUpdate(isRepaint);
     }
 
     this.UpdateHorRuler = function()
