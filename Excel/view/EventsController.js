@@ -851,13 +851,15 @@
 
 				case 36: // home
 					stop();                          // Отключим стандартную обработку браузера нажатия home
-					dc = -2.5;
+					if( t.isFormulaEditMode ) break;
+                    dc = -2.5;
 					if (ctrlKey) {dr = -2.5;}
 					break;
 
 				case 35: // end
 					stop();                          // Отключим стандартную обработку браузера нажатия end
-					dc = 2.5;
+                    if( t.isFormulaEditMode ) break;
+                    dc = 2.5;
 					if (ctrlKey) {
 						dr = 2.5;
 					}
