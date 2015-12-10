@@ -7386,6 +7386,10 @@ CStylesPainter.prototype =
     },
   drawStyle2: function(graphics, style)
   {
+    var ctx = graphics.m_oContext;
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, this.STYLE_THUMBNAIL_WIDTH, this.STYLE_THUMBNAIL_HEIGHT);
+
     var font = { FontFamily : { Name: "Times New Roman", Index : -1 }, Color : { r : 0, g : 0, b : 0 }, Bold : false, Italic : false, FontSize : 10 };
 
     var textPr = style.TextPr;
@@ -7432,7 +7436,6 @@ CStylesPainter.prototype =
 
       graphics.t(this.CurrentTranslate.StylesText, 0.5, (y + b) / 2);
 
-      var ctx = graphics.m_oContext;
       ctx.setTransform(1,0,0,1,0,0);
       ctx.fillStyle = "#E8E8E8";
 
