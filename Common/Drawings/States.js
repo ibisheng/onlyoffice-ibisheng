@@ -357,7 +357,12 @@ function PreChangeAdjState(drawingObjects, majorObject)
 PreChangeAdjState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+        {
+            return {objectId: this.majorObject && this.majorObject.Get_Id(), bMarker: true, cursorType: "crosshair"};
+        }
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -430,7 +435,12 @@ function PreRotateState(drawingObjects, majorObject)
 PreRotateState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+        {
+            return {objectId: this.majorObject.Get_Id(), cursorType: "crosshair", bMarker: true};
+        }
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -626,7 +636,12 @@ function PreResizeState(drawingObjects, majorObject, cardDirection)
 PreResizeState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+        {
+            return {objectId: this.majorObject.Get_Id(), cursorType: "crosshair", bMarker: true};
+        }
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -697,7 +712,12 @@ function PreMoveState(drawingObjects,  startX, startY, shift, ctrl, majorObject,
 PreMoveState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+        {
+            return {objectId: this.majorObject.Get_Id(), cursorType: "move", bMarker: true};
+        }
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -1061,7 +1081,12 @@ function PreRotateInGroupState(drawingObjects, group, majorObject)
 PreRotateInGroupState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+        {
+            return {objectId: this.majorObject.Get_Id(), cursorType: "crosshair", bMarker: true};
+        }
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -1110,7 +1135,12 @@ function PreResizeInGroupState(drawingObjects, group, majorObject, cardDirection
 PreResizeInGroupState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+        {
+            return {objectId: this.majorObject.Get_Id(), cursorType: "crosshair", bMarker: true};
+        }
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -1153,7 +1183,12 @@ function PreChangeAdjInGroupState(drawingObjects, group)
 PreChangeAdjInGroupState.prototype =
 {
     onMouseDown: function(e, x, y,pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+        {
+            return {objectId:  this.group.Get_Id(), bMarker: true, cursorType: "crosshair"};
+        }
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
