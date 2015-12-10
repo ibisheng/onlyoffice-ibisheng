@@ -959,6 +959,9 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
             {
                 if (reviewtype_Common === ElementReviewType)
                 {
+                    if (para_Math_Run === oElement.Type !== oElement.Type)
+                        oElement.Reject_RevisionChanges(c_oAscRevisionsChangeType.TextAdd, true);
+
                     oElement.Set_ReviewType(reviewtype_Remove);
                 }
                 else if (reviewtype_Add === ElementReviewType)
@@ -1008,6 +1011,9 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                 {
                     if (reviewtype_Common === ElementReviewType)
                     {
+                        if (para_Math_Run === Element.Type !== Element.Type)
+                            Element.Reject_RevisionChanges(c_oAscRevisionsChangeType.TextAdd, true);
+
                         Element.Set_ReviewType(reviewtype_Remove);
                     }
                     else if (reviewtype_Add === ElementReviewType)
