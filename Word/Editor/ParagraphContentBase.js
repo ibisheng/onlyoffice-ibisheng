@@ -1128,6 +1128,40 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_ContentLength = function
 {
     return this.Content.length;
 };
+CParagraphContentWithParagraphLikeContent.prototype.Get_Parent = function()
+{
+    if (this.Parent)
+        return this.Parent;
+
+    if (!this.Paragraph)
+        return null;
+
+    var ContentPos = this.Paragraph.Get_PosByElement(this);
+    if (null == ContentPos || undefined == ContentPos || ContentPos.Get_Depth() < 0)
+        return null;
+
+    ContentPos.Decrease_Depth(1);
+    return this.Paragraph.Get_ElementByPos(ContentPos);
+};
+CParagraphContentWithParagraphLikeContent.prototype.Get_PosInParent = function(Parent)
+{
+    var _Parent = (_Parent? Parent : this.Get_Parent());
+    if (!_Parent)
+        return -1;
+
+    for (var Pos = 0, Count = _Parent.Content.length; Pos < Count; ++Pos)
+    {
+        if (this === _Parent.Content[Pos])
+            return Pos;
+    }
+
+    return -1;
+};
+CParagraphContentWithParagraphLikeContent.prototype.Correct_Content = function()
+{
+    if (this.Content.length < 0)
+        this.Add_ToContent(0, new ParaRun(this.Paragraph, false));
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции пересчета
 //----------------------------------------------------------------------------------------------------------------------
@@ -2397,11 +2431,43 @@ CParagraphContentWithParagraphLikeContent.prototype.Accept_RevisionChanges = fun
         }
 
         // Начинаем с конца, потому что при выполнении данной функции, количество элементов может изменяться
-        for (var CurPos = EndPos; CurPos >= StartPos; CurPos--)
+        if (this.Content[EndPos].Accept_RevisionChanges)
+            this.Content[EndPos].Accept_RevisionChanges(Type, bAll);
+
+        if (StartPos < EndPos)
         {
-            if (this.Content[CurPos].Accept_RevisionChanges)
-                this.Content[CurPos].Accept_RevisionChanges(Type, bAll);
+            for (var CurPos = EndPos - 1; CurPos > StartPos; CurPos--)
+            {
+                var Element = this.Content[CurPos];
+                var ReviewType = Element.Get_ReviewType ? Element.Get_ReviewType() : reviewtype_Common;
+
+                var isGoInside = false;
+                if (reviewtype_Add === ReviewType)
+                {
+                    if (undefined === Type || c_oAscRevisionsChangeType.TextAdd === Type)
+                        Element.Set_ReviewType(reviewtype_Common);
+
+                    isGoInside = true;
+                }
+                else if (reviewtype_Remove === ReviewType)
+                {
+                    if (undefined === Type || c_oAscRevisionsChangeType.TextRem === Type)
+                        this.Remove_FromContent(CurPos, 1, true);
+                }
+                else if (reviewtype_Common === ReviewType)
+                {
+                    isGoInside = true;
+                }
+
+                if (true === isGoInside && Element.Accept_RevisionChanges)
+                    Element.Accept_RevisionChanges(Type, true);
+            }
+
+            if (this.Content[StartPos].Accept_RevisionChanges)
+                this.Content[StartPos].Accept_RevisionChanges(Type, bAll);
         }
+
+        this.Correct_Content();
     }
 };
 CParagraphContentWithParagraphLikeContent.prototype.Reject_RevisionChanges = function(Type, bAll)
@@ -2423,11 +2489,43 @@ CParagraphContentWithParagraphLikeContent.prototype.Reject_RevisionChanges = fun
         }
 
         // Начинаем с конца, потому что при выполнении данной функции, количество элементов может изменяться
-        for (var CurPos = EndPos; CurPos >= StartPos; CurPos--)
+        if (this.Content[EndPos].Reject_RevisionChanges)
+            this.Content[EndPos].Reject_RevisionChanges(Type, bAll);
+
+        if (StartPos < EndPos)
         {
-            if (this.Content[CurPos].Reject_RevisionChanges)
-                this.Content[CurPos].Reject_RevisionChanges(Type, bAll);
+            for (var CurPos = EndPos - 1; CurPos > StartPos; CurPos--)
+            {
+                var Element = this.Content[CurPos];
+                var ReviewType = Element.Get_ReviewType ? Element.Get_ReviewType() : reviewtype_Common;
+
+                var isGoInside = false;
+                if (reviewtype_Remove === ReviewType)
+                {
+                    if (undefined === Type || c_oAscRevisionsChangeType.TextRem === Type)
+                        Element.Set_ReviewType(reviewtype_Common);
+
+                    isGoInside = true;
+                }
+                else if (reviewtype_Add === ReviewType)
+                {
+                    if (undefined === Type || c_oAscRevisionsChangeType.TextAdd === Type)
+                        this.Remove_FromContent(CurPos, 1, true);
+                }
+                else if (reviewtype_Common === ReviewType)
+                {
+                    isGoInside = true;
+                }
+
+                if (true === isGoInside && Element.Reject_RevisionChanges)
+                    Element.Reject_RevisionChanges(Type, true);
+            }
+
+            if (this.Content[StartPos].Reject_RevisionChanges)
+                this.Content[StartPos].Reject_RevisionChanges(Type, bAll);
         }
+
+        this.Correct_Content();
     }
 };
 CParagraphContentWithParagraphLikeContent.prototype.private_UpdateTrackRevisions = function()

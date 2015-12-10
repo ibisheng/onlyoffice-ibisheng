@@ -2417,12 +2417,13 @@ CMathBase.prototype.Get_ReviewColor = function()
 
     return REVIEW_COLOR;
 };
-CMathBase.prototype.Set_ReviewType = function(Type)
+CMathBase.prototype.Set_ReviewType = function(Type, isSetToContent)
 {
     if (!this.Id)
         return;
 
-    CMathBase.superclass.Set_ReviewType.apply(this, arguments);
+    if (false !== isSetToContent)
+        CMathBase.superclass.Set_ReviewType.apply(this, arguments);
 
     if (Type !== this.ReviewType)
     {
@@ -2438,7 +2439,7 @@ CMathBase.prototype.Set_ReviewTypeWithInfo = function(ReviewType, ReviewInfo)
     if (!this.Id)
         return;
 
-    CMathBase.superclass.Set_ReviewType.apply(this, arguments);
+    CMathBase.superclass.Set_ReviewTypeWithInfo.apply(this, arguments);
 
     History.Add(this, new CChangesMathBaseReviewType(ReviewType, ReviewInfo, this.ReviewType, this.ReviewInfo));
     this.raw_SetReviewType(ReviewType, ReviewInfo);
@@ -2495,6 +2496,56 @@ CMathBase.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth
 
     if (reviewtype_Common !== ReviewType)
         Checker.End_CheckOnlyTextPr();
+};
+CMathBase.prototype.Accept_RevisionChanges = function(Type, bAll)
+{
+    var ReviewType = this.ReviewType;
+    if (reviewtype_Add === ReviewType && (undefined === Type || c_oAscRevisionsChangeType.TextAdd === Type))
+    {
+        this.Set_ReviewType(reviewtype_Common, false);
+    }
+    else if (reviewtype_Remove === ReviewType && (undefined === Type || c_oAscRevisionsChangeType.TextRem === Type))
+    {
+        var Parent = this.Get_Parent();
+        var PosInParent = this.Get_PosInParent(Parent);
+
+        if (!Parent || -1 === PosInParent)
+        {
+            this.Set_ReviewType(reviewtype_Common, false);
+        }
+        else
+        {
+            Parent.Remove_FromContent(PosInParent, 1);
+            return;
+        }
+    }
+
+    CMathBase.superclass.Accept_RevisionChanges.apply(this, arguments);
+};
+CMathBase.prototype.Reject_RevisionChanges = function(Type, bAll)
+{
+    var ReviewType = this.ReviewType;
+    if (reviewtype_Remove === ReviewType && (undefined === Type || c_oAscRevisionsChangeType.TextRem === Type))
+    {
+        this.Set_ReviewType(reviewtype_Common, false);
+    }
+    else if (reviewtype_Add === ReviewType && (undefined === Type || c_oAscRevisionsChangeType.TextAdd === Type))
+    {
+        var Parent = this.Get_Parent();
+        var PosInParent = this.Get_PosInParent(Parent);
+
+        if (!Parent || -1 === PosInParent)
+        {
+            this.Set_ReviewType(reviewtype_Common, false);
+        }
+        else
+        {
+            Parent.Remove_FromContent(PosInParent, 1);
+            return;
+        }
+    }
+
+    CMathBase.superclass.Reject_RevisionChanges.apply(this, arguments);
 };
 
 CMathBase.prototype.Math_Set_EmptyRange         = CMathContent.prototype.Math_Set_EmptyRange;

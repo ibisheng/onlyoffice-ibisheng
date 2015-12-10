@@ -2947,6 +2947,7 @@ function ReadChanges_FromBinary(Reader, Class)
         case historyitem_Math_ParaJc                : Changes = new CChangesMathParaJc(); break;
         case historyitem_Math_CtrPrpShd             : Changes = new CChangesMathShd(); break;
         case historyitem_Math_AddItems_ToMathBase   : Changes = new CChangesMathAddItems(); break;
+        case historyitem_Math_EqArrayPr             : Changes = new CChangesMathEqArrayPr(); break;
         case historyitem_Math_CtrPrpColor           : Changes = new CChangesMathColor(); break;
         case historyitem_Math_CtrPrpUnifill         : Changes = new CChangesMathUnifill(); break;
         case historyitem_Math_CtrPrpUnderline       : Changes = new CChangesMathUnderline(); break;
@@ -2960,6 +2961,7 @@ function ReadChanges_FromBinary(Reader, Class)
         case historyitem_Math_RFontsEastAsia        : Changes = new CChangesMath_RFontsEastAsia(); break;
         case historyitem_Math_RFontsHint            : Changes = new CChangesMath_RFontsHint(); break;
         case historyitem_Math_CtrPrpHighLight       : Changes = new CChangesMathHighLight(); break;
+        case historyitem_Math_ReviewType            : Changes = new CChangesMathBaseReviewType(); break;
         case historyitem_Math_CtrPrpTextFill        : Changes = new CChangesMathTextFill(); break;
         case historyitem_Math_CtrPrpTextOutline     : Changes = new CChangesMathTextOutline(); break;
     }
