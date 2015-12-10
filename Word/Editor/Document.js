@@ -14693,7 +14693,7 @@ CDocument.prototype.Continue_FastCollaborativeEditing = function()
     if (true !== this.CollaborativeEditing.Is_Fast() || true === this.CollaborativeEditing.Is_SingleUser())
         return;
 
-    if (true === this.Selection_Is_TableBorderMove() || true === this.Api.isStartAddShape)
+    if (true === this.Selection_Is_TableBorderMove() || true === this.Api.isStartAddShape || this.DrawingObjects.checkTrackDrawings())
         return;
 
     var HaveChanges = this.History.Have_Changes(false);

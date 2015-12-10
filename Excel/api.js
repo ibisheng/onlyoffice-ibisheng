@@ -2447,6 +2447,10 @@ var editor;
     return this.wb ? this.wb.getCellEditMode() : false;
   };
 
+  spreadsheet_api.prototype.asc_getIsTrackShape = function()  {
+    return this.wb ? this.wb.getIsTrackShape() : false;
+  };
+
   spreadsheet_api.prototype.asc_setCellFontName = function(fontName) {
     var t = this, fonts = {};
     fonts[fontName] = 1;
@@ -2842,7 +2846,7 @@ var editor;
   ////////////////////////////AutoSave api/////////////////////////////////
   /////////////////////////////////////////////////////////////////////////
   spreadsheet_api.prototype._autoSave = function() {
-    if ((0 === this.autoSaveGap && !this.collaborativeEditing.getFast()) || this.asc_getCellEditMode() ||
+    if ((0 === this.autoSaveGap && !this.collaborativeEditing.getFast()) || this.asc_getCellEditMode() || this.asc_getIsTrackShape() ||
       !History.IsEndTransaction() || !this.canSave) {
       return;
     }
@@ -3208,6 +3212,7 @@ var editor;
   prot["asc_addImage"] = prot.asc_addImage;
   prot["asc_setData"] = prot.asc_setData;
   prot["asc_getData"] = prot.asc_getData;
+  prot["asc_onCloseChartFrame"] = prot.asc_onCloseChartFrame;
 
   // Cell comment interface
   prot["asc_addComment"] = prot.asc_addComment;

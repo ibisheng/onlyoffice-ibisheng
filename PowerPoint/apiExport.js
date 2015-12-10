@@ -243,6 +243,7 @@ asc_docs_api.prototype['deleteImage'] = asc_docs_api.prototype.deleteImage;
 asc_docs_api.prototype['set_ImgDistanceFromText'] = asc_docs_api.prototype.set_ImgDistanceFromText;
 asc_docs_api.prototype['set_PositionOnPage'] = asc_docs_api.prototype.set_PositionOnPage;
 asc_docs_api.prototype['get_OriginalSizeImage'] = asc_docs_api.prototype.get_OriginalSizeImage;
+asc_docs_api.prototype['asc_onCloseChartFrame'] = asc_docs_api.prototype.asc_onCloseChartFrame;
 asc_docs_api.prototype['sync_AddImageCallback'] = asc_docs_api.prototype.sync_AddImageCallback;
 asc_docs_api.prototype['sync_ImgPropCallback'] = asc_docs_api.prototype.sync_ImgPropCallback;
 asc_docs_api.prototype['SetDrawingFreeze'] = asc_docs_api.prototype.SetDrawingFreeze;

@@ -481,6 +481,9 @@ baseEditorsApi.prototype.asc_getChartPreviews = function(chartType) {
 baseEditorsApi.prototype.asc_getTextArtPreviews = function() {
   return this.textArtPreviewManager.getWordArtStyles();
 };
+baseEditorsApi.prototype.asc_onCloseChartFrame = function() {
+
+};
 // Add image
 baseEditorsApi.prototype._addImageUrl = function() {
 };

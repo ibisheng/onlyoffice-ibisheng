@@ -468,6 +468,7 @@ asc_docs_api.prototype['asc_getAnchorPosition'] = asc_docs_api.prototype.asc_get
 asc_docs_api.prototype['asc_getChartObject'] = asc_docs_api.prototype.asc_getChartObject;
 asc_docs_api.prototype['asc_addChartDrawingObject'] = asc_docs_api.prototype.asc_addChartDrawingObject;
 asc_docs_api.prototype['asc_doubleClickOnChart'] = asc_docs_api.prototype.asc_doubleClickOnChart;
+asc_docs_api.prototype['asc_onCloseChartFrame'] = asc_docs_api.prototype.asc_onCloseChartFrame;
 asc_docs_api.prototype['asc_editChartDrawingObject'] = asc_docs_api.prototype.asc_editChartDrawingObject;
 asc_docs_api.prototype['asc_getChartPreviews'] = asc_docs_api.prototype.asc_getChartPreviews;
 asc_docs_api.prototype['asc_getTextArtPreviews'] = asc_docs_api.prototype.asc_getTextArtPreviews;

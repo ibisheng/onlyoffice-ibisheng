@@ -1462,6 +1462,16 @@
 			return this.controller.isCellEditMode;
 		};
 
+        WorkbookView.prototype.getIsTrackShape = function(){
+          var ws = this.getWorksheet();
+            if(!ws){
+                return false;
+            }
+            if(ws.objectRender && ws.objectRender.controller){
+                return ws.objectRender.controller.checkTrackDrawings();
+            }
+        };
+
 		WorkbookView.prototype.getZoom = function () {
 			return this.drawingCtx.getZoom();
 		};
