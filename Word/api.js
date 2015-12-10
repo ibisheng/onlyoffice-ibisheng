@@ -867,7 +867,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
   var t = this;
   this.CoAuthoringApi.onCursor = function(e) {
     if (true === CollaborativeEditing.Is_Fast()) {
-      t.WordControl.m_oLogicDocument.Update_ForeignCursor(e[e.length - 1]['cursor'], e[e.length - 1]['user'], true);
+      t.WordControl.m_oLogicDocument.Update_ForeignCursor(e[e.length - 1]['cursor'], e[e.length - 1]['user'], true, e[e.length - 1]['useridoriginal']);
     }
   };
   this.CoAuthoringApi.onConnectionStateChanged = function(e) {
@@ -1836,7 +1836,7 @@ function OnSave_Callback(e) {
     }
 
     // Пересылаем свои изменения
-    CollaborativeEditing.Send_Changes(editor.IsUserSave, {UserId: editor.CoAuthoringApi.getUserConnectionId(), CursorInfo: CursorInfo}, HaveOtherChanges);
+    CollaborativeEditing.Send_Changes(editor.IsUserSave, {UserId: editor.CoAuthoringApi.getUserConnectionId(), UserShortId : editor.DocInfo.get_UserId(), CursorInfo: CursorInfo}, HaveOtherChanges);
   } else {
     var nState = editor.CoAuthoringApi.get_state();
     if (ConnectionState.Close === nState) {

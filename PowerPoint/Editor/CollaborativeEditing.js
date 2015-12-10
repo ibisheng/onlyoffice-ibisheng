@@ -188,12 +188,13 @@ CCollaborativeEditingBase.prototype.Refresh_ForeignCursors = function()
     for (var UserId in this.m_aCursorsToUpdate)
     {
         var CursorInfo = this.m_aCursorsToUpdate[UserId];
-        editor.WordControl.m_oLogicDocument.Update_ForeignCursor(CursorInfo, UserId, false);
+        editor.WordControl.m_oLogicDocument.Update_ForeignCursor(CursorInfo, UserId, false, this.m_aCursorsToUpdateShortId[UserId]);
 
         if (this.Add_ForeignCursorToShow)
             this.Add_ForeignCursorToShow(UserId);
     }
     this.m_aCursorsToUpdate = {};
+    this.m_aCursorsToUpdateShortId = {};
 };
 
 CCollaborativeEditing.prototype.Release_Locks = function()
@@ -522,7 +523,8 @@ CCollaborativeEditing.prototype.Update_ForeignCursorPosition = function(UserId, 
     ParaContentPos.Update(InRunPos, ParaContentPos.Get_Depth() + 1);
     var XY = Paragraph.Get_XYByContentPos(ParaContentPos);
     if (XY && XY.Height > 0.001){
-        DrawingDocument.Collaborative_UpdateTarget(UserId, XY.X, XY.Y, XY.Height, oPresentation.CurPage, Paragraph.Get_ParentTextTransform());
+        var ShortId = this.m_aForeignCursorsId[UserId] ? this.m_aForeignCursorsId[UserId] : UserId;
+        DrawingDocument.Collaborative_UpdateTarget(UserId, ShortId, XY.X, XY.Y, XY.Height, oPresentation.CurPage, Paragraph.Get_ParentTextTransform());
         this.Add_ForeignCursorXY(UserId, XY.X, XY.Y, XY.PageNum, XY.Height, Paragraph, isRemoveLabel);
         if (true === this.m_aForeignCursorsToShow[UserId]){
             this.Show_ForeignCursorLabel(UserId);
@@ -568,7 +570,8 @@ CCollaborativeEditing.prototype.Show_ForeignCursorLabel = function(UserId)
         Api.sync_HideForeignCursorLabel(UserId);
     }, FOREIGN_CURSOR_LABEL_HIDETIME);
 
-    var Color  = getUserColorById(UserId, null, true);
+    var UserShortId = this.m_aForeignCursorsId[UserId] ? this.m_aForeignCursorsId[UserId] : UserId;
+    var Color  = getUserColorById(UserShortId, null, true);
     var Coords = DrawingDocument.Collaborative_GetTargetPosition(UserId);
     if (!Color || !Coords)
         return;

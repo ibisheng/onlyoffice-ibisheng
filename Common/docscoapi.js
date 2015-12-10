@@ -826,7 +826,7 @@
     if (true === CollaborativeEditing.Is_Fast() && data["excelAdditionalInfo"])
     {
       var CursorInfo = JSON.parse(data["excelAdditionalInfo"]);
-      CollaborativeEditing.Add_ForeignCursorToUpdate(CursorInfo.UserId, CursorInfo.CursorInfo);
+      CollaborativeEditing.Add_ForeignCursorToUpdate(CursorInfo.UserId, CursorInfo.CursorInfo, CursorInfo.UserShortId);
     }
 
     if (this.onRecalcLocks) {

@@ -888,7 +888,7 @@ CPresentation.prototype =
     },
 
 
-    Update_ForeignCursor: function(CursorInfo, UserId, Show)
+    Update_ForeignCursor: function(CursorInfo, UserId, Show, UserShortId)
     {
         if (!editor.User)
             return;
@@ -918,7 +918,7 @@ CPresentation.prototype =
 
         var CursorPos = [{Class : Run, Position : InRunPos}];
         Run.Get_DocumentPositionFromObject(CursorPos);
-        CollaborativeEditing.Add_ForeignCursor(UserId, CursorPos);
+        CollaborativeEditing.Add_ForeignCursor(UserId, CursorPos, UserShortId);
 
         if (true === Show){
 

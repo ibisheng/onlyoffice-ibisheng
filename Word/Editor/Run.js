@@ -1031,6 +1031,9 @@ ParaRun.prototype.Get_ParaPosByContentPos = function(ContentPos, Depth)
     var CurRange = 0;
 
     var LinesCount = this.protected_GetLinesCount();
+    if (LinesCount <= 0)
+        return new CParaPos(0, 0, 0, 0);
+
     for (; CurLine < LinesCount; CurLine++)
     {
         var RangesCount = this.protected_GetRangesCount(CurLine);
@@ -1046,7 +1049,6 @@ ParaRun.prototype.Get_ParaPosByContentPos = function(ContentPos, Depth)
     }
 
     return new CParaPos((LinesCount === 1 ? this.protected_GetRangesCount(0) - 1 + this.StartRange : this.protected_GetRangesCount(0) - 1), LinesCount - 1 + this.StartLine, 0, 0);
-
 };
 
 ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _CurLine, CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)

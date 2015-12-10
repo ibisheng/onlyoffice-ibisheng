@@ -226,7 +226,8 @@ function CCollaborativeEditingBase()
 
     this.m_oMemory      = new CMemory(); // Глобальные класс для сохранения
 
-    this.m_aCursorsToUpdate = {}; // Курсоры, которые нужно обновить после принятия изменений
+    this.m_aCursorsToUpdate        = {}; // Курсоры, которые нужно обновить после принятия изменений
+    this.m_aCursorsToUpdateShortId = {};
 
     //// CollaborativeEditing LOG
     //this.m_nErrorLog_PointChangesCount = 0;
@@ -240,6 +241,7 @@ function CCollaborativeEditingBase()
     this.m_aDocumentPositions = new CDocumentPositionsManager();
     this.m_aForeignCursorsPos = new CDocumentPositionsManager();
     this.m_aForeignCursors    = {};
+    this.m_aForeignCursorsId  = {};
 }
 
 CCollaborativeEditingBase.prototype.Clear = function()
@@ -626,9 +628,10 @@ CCollaborativeEditingBase.prototype.Clear_CollaborativeMarks = function(bRepaint
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с обновлением курсоров после принятия изменений
 //----------------------------------------------------------------------------------------------------------------------
-CCollaborativeEditingBase.prototype.Add_ForeignCursorToUpdate = function(UserId, CursorInfo)
+CCollaborativeEditingBase.prototype.Add_ForeignCursorToUpdate = function(UserId, CursorInfo, UserShortId)
 {
     this.m_aCursorsToUpdate[UserId] = CursorInfo;
+    this.m_aCursorsToUpdateShortId[UserId] = UserShortId;
 };
 CCollaborativeEditingBase.prototype.Refresh_ForeignCursors = function()
 {
@@ -638,12 +641,13 @@ CCollaborativeEditingBase.prototype.Refresh_ForeignCursors = function()
     for (var UserId in this.m_aCursorsToUpdate)
     {
         var CursorInfo = this.m_aCursorsToUpdate[UserId];
-        this.m_oLogicDocument.Update_ForeignCursor(CursorInfo, UserId, false);
+        this.m_oLogicDocument.Update_ForeignCursor(CursorInfo, UserId, false, this.m_aCursorsToUpdateShortId[UserId]);
 
         if (this.Add_ForeignCursorToShow)
             this.Add_ForeignCursorToShow(UserId);
     }
     this.m_aCursorsToUpdate = {};
+    this.m_aCursorsToUpdateShortId = {};
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с сохраненными позициями в Word-документах. Они объявлены в базовом классе, потому что вызываются
@@ -655,10 +659,11 @@ CCollaborativeEditingBase.prototype.Clear_DocumentPositions = function(){
 CCollaborativeEditingBase.prototype.Add_DocumentPosition = function(DocumentPos){
     this.m_aDocumentPositions.Add_DocumentPosition(DocumentPos);
 };
-CCollaborativeEditingBase.prototype.Add_ForeignCursor = function(UserId, DocumentPos){
+CCollaborativeEditingBase.prototype.Add_ForeignCursor = function(UserId, DocumentPos, UserShortId){
     this.m_aForeignCursorsPos.Remove_DocumentPosition(this.m_aCursorsToUpdate[UserId]);
     this.m_aForeignCursors[UserId] = DocumentPos;
     this.m_aForeignCursorsPos.Add_DocumentPosition(DocumentPos);
+    this.m_aForeignCursorsId[UserId] = UserShortId;
 };
 CCollaborativeEditingBase.prototype.Remove_ForeignCursor = function(UserId){
     this.m_aForeignCursorsPos.Remove_DocumentPosition(this.m_aCursorsToUpdate[UserId]);

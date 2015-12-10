@@ -302,11 +302,12 @@ CWordCollaborativeEditing.prototype.Add_DocumentPosition = function(DocumentPos)
 {
     this.m_aDocumentPositions.Add_DocumentPosition(DocumentPos);
 };
-CWordCollaborativeEditing.prototype.Add_ForeignCursor = function(UserId, DocumentPos)
+CWordCollaborativeEditing.prototype.Add_ForeignCursor = function(UserId, DocumentPos, UserShortId)
 {
     this.m_aForeignCursorsPos.Remove_DocumentPosition(this.m_aCursorsToUpdate[UserId]);
     this.m_aForeignCursors[UserId] = DocumentPos;
     this.m_aForeignCursorsPos.Add_DocumentPosition(DocumentPos);
+    this.m_aForeignCursorsId[UserId] = UserShortId;
 };
 CWordCollaborativeEditing.prototype.Remove_ForeignCursor = function(UserId)
 {
@@ -391,7 +392,8 @@ CWordCollaborativeEditing.prototype.Update_ForeignCursorPosition = function(User
     var XY = Paragraph.Get_XYByContentPos(ParaContentPos);
     if (XY && XY.Height > 0.001)
     {
-        DrawingDocument.Collaborative_UpdateTarget(UserId, XY.X, XY.Y, XY.Height, XY.PageNum, Paragraph.Get_ParentTextTransform());
+        var ShortId = this.m_aForeignCursorsId[UserId] ? this.m_aForeignCursorsId[UserId] : UserId;
+        DrawingDocument.Collaborative_UpdateTarget(UserId, ShortId, XY.X, XY.Y, XY.Height, XY.PageNum, Paragraph.Get_ParentTextTransform());
         this.Add_ForeignCursorXY(UserId, XY.X, XY.Y, XY.PageNum, XY.Height, Paragraph, isRemoveLabel);
 
         if (true === this.m_aForeignCursorsToShow[UserId])
@@ -447,7 +449,8 @@ CWordCollaborativeEditing.prototype.Show_ForeignCursorLabel = function(UserId)
         Api.sync_HideForeignCursorLabel(UserId);
     }, FOREIGN_CURSOR_LABEL_HIDETIME);
 
-    var Color  = getUserColorById(UserId, null, true);
+    var UserShortId = this.m_aForeignCursorsId[UserId] ? this.m_aForeignCursorsId[UserId] : UserId;
+    var Color  = getUserColorById(UserShortId, null, true);
     var Coords = DrawingDocument.Collaborative_GetTargetPosition(UserId);
     if (!Color || !Coords)
         return;

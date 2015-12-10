@@ -972,6 +972,7 @@ function CDrawingPage()
 function CDrawingCollaborativeTarget()
 {
     this.Id = "";
+    this.ShortId = "";
 
     this.X = 0;
     this.Y = 0;
@@ -1001,7 +1002,7 @@ CDrawingCollaborativeTarget.prototype =
             this.HtmlElement.width = 1;
             this.HtmlElement.height = 1;
 
-            this.Color = getUserColorById(this.Id, null, true);
+            this.Color = getUserColorById(this.ShortId, null, true);
             this.Style ="rgb(" + this.Color.r + "," + this.Color.g + "," + this.Color.b + ")";
         }
 
@@ -3426,11 +3427,11 @@ function CDrawingDocument()
     }
 
     // collaborative targets
-    this.Collaborative_UpdateTarget = function(_id, _x, _y, _size, _page, _transform, is_from_paint)
+    this.Collaborative_UpdateTarget = function(_id, _shortId, _x, _y, _size, _page, _transform, is_from_paint)
     {
         if (is_from_paint !== true)
         {
-            this.CollaborativeTargetsUpdateTasks.push([_id, _x, _y, _size, _page, _transform]);
+            this.CollaborativeTargetsUpdateTasks.push([_id, _shortId, _x, _y, _size, _page, _transform]);
             return;
         }
 
@@ -3444,6 +3445,7 @@ function CDrawingDocument()
         }
         var _target = new CDrawingCollaborativeTarget();
         _target.Id = _id;
+        _target.ShortId = _shortId;
         _target.CheckPosition(this, _x, _y, _size, _page, _transform);
         this.CollaborativeTargets[this.CollaborativeTargets.length] = _target;
     };
@@ -3465,7 +3467,7 @@ function CDrawingDocument()
         for (i = 0; i < _len_tasks; i++)
         {
             var _tmp = this.CollaborativeTargetsUpdateTasks[i];
-            this.Collaborative_UpdateTarget(_tmp[0], _tmp[1], _tmp[2], _tmp[3], _tmp[4], _tmp[5], true);
+            this.Collaborative_UpdateTarget(_tmp[0], _tmp[1], _tmp[2], _tmp[3], _tmp[4], _tmp[5], _tmp[6], true);
         }
         if (_len_tasks != 0)
             this.CollaborativeTargetsUpdateTasks.splice(0, _len_tasks);

@@ -128,7 +128,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
   var t = this;
   this.CoAuthoringApi.onCursor = function(e) {
     if (true === CollaborativeEditing.Is_Fast()) {
-      t.WordControl.m_oLogicDocument.Update_ForeignCursor(e[e.length - 1]['cursor'], e[e.length - 1]['user'], true);
+      t.WordControl.m_oLogicDocument.Update_ForeignCursor(e[e.length - 1]['cursor'], e[e.length - 1]['user'], true, e[e.length - 1]['useridoriginal']);
     }
   };
   this.CoAuthoringApi.onConnectionStateChanged = function(e) {

@@ -15118,7 +15118,7 @@ CDocument.prototype.Get_DocumentPositionInfoForCollaborative = function()
 
     return Last;
 };
-CDocument.prototype.Update_ForeignCursor = function(CursorInfo, UserId, Show)
+CDocument.prototype.Update_ForeignCursor = function(CursorInfo, UserId, Show, UserShortId)
 {
     if (!this.Api.User)
         return;
@@ -15147,7 +15147,7 @@ CDocument.prototype.Update_ForeignCursor = function(CursorInfo, UserId, Show)
 
     var CursorPos = [{Class : Run, Position : InRunPos}];
     Run.Get_DocumentPositionFromObject(CursorPos);
-    this.CollaborativeEditing.Add_ForeignCursor(UserId, CursorPos);
+    this.CollaborativeEditing.Add_ForeignCursor(UserId, CursorPos, UserShortId);
 
     if (true === Show)
         this.CollaborativeEditing.Update_ForeignCursorPosition(UserId, Run, InRunPos, true);
