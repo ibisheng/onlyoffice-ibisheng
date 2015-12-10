@@ -5448,6 +5448,7 @@ function offline_apply_event(type,params) {
         {
             var filter = asc_ReadAutoFilter(params, _current);
             _api.asc_addAutoFilter(filter.styleName, filter.format);
+            _api.wb.getWorksheet().handlers.trigger('selectionChanged', _api.wb.getWorksheet().getSelectionInfo());
             break;
         }
 
@@ -5455,6 +5456,7 @@ function offline_apply_event(type,params) {
         {
             var changeFilter = asc_ReadAutoFilter(params, _current);
             _api.asc_changeAutoFilter(changeFilter.tableName, changeFilter.optionType, changeFilter.styleName);
+            _api.wb.getWorksheet().handlers.trigger('selectionChanged', _api.wb.getWorksheet().getSelectionInfo());
             break;
         }
 
