@@ -414,6 +414,7 @@
     this._locks = {};
     this._msgBuffer = [];
     this._lockCallbacks = {};
+    this._lockCallbacksErrorTimerId = {};
     this._saveCallback = [];
     this.saveLockCallbackErrorTimeOutId = null;
     this.saveCallbackErrorTimeOutId = null;
@@ -512,6 +513,7 @@
     }
 
     // ask all elements in array
+    var t = this;
     var i = 0;
     var lengthArray = (arrayBlockId) ? arrayBlockId.length : 0;
     var isLock = false;
@@ -530,18 +532,22 @@
     idLockInArray = (this._isExcel || this._isPresentation) ? arrayBlockId[0]['guid'] : arrayBlockId[0];
 
     if (!isLock) {
+      if (this._lockCallbacksErrorTimerId.hasOwnProperty(idLockInArray)) {
+        // Два раза для одного id нельзя запрашивать lock, не дождавшись ответа
+        return;
+      }
       //Ask
       this._locks[idLockInArray] = {'state': 1};//1-asked for block
-      if (callback && _.isFunction(callback)) {
+      if (callback) {
         this._lockCallbacks[idLockInArray] = callback;
-        var lockCalbacks = this._lockCallbacks;
 
         //Set reconnectTimeout
-        window.setTimeout(function() {
-          if (lockCalbacks.hasOwnProperty(idLockInArray)) {
+        this._lockCallbacksErrorTimerId[idLockInArray] = window.setTimeout(function() {
+          if (t.lockCalbacks.hasOwnProperty(idLockInArray)) {
             //Not signaled already
-            callback({error: 'Timed out'});
-            delete lockCalbacks[idLockInArray];
+            t.lockCalbacks[idLockInArray]({error: 'Timed out'});
+            delete t.lockCalbacks[idLockInArray];
+            delete t._lockCallbacksErrorTimerId[idLockInArray];
           }
         }, this.errorTimeOut);
       }
@@ -764,6 +770,10 @@
               } else {
                 this._lockCallbacks[blockTmp]({"error": "Already locked by " + lock["user"]});
               }
+              if (this._lockCallbacksErrorTimerId.hasOwnProperty(blockTmp)) {
+                clearTimeout(this._lockCallbacksErrorTimerId[blockTmp]);
+                delete this._lockCallbacksErrorTimerId[blockTmp];
+              }
               delete this._lockCallbacks[blockTmp];
             }
             if (this.onLocksAcquired && changed) {
@@ -860,6 +870,7 @@
         // Очищаем предыдущий таймер
         if (null !== this.saveLockCallbackErrorTimeOutId) {
           clearTimeout(this.saveLockCallbackErrorTimeOutId);
+          this.saveLockCallbackErrorTimeOutId = null;
         }
 
         this._saveCallback[indexCallback] = null;
@@ -872,10 +883,12 @@
     // Очищаем предыдущий таймер сохранения
     if (null !== this.saveCallbackErrorTimeOutId) {
       clearTimeout(this.saveCallbackErrorTimeOutId);
+      this.saveCallbackErrorTimeOutId = null;
     }
     // Очищаем предыдущий таймер снятия блокировки
     if (null !== this.unSaveLockCallbackErrorTimeOutId) {
       clearTimeout(this.unSaveLockCallbackErrorTimeOutId);
+      this.unSaveLockCallbackErrorTimeOutId = null;
     }
 
     // Возвращаем состояние
@@ -926,6 +939,7 @@
     // Очищаем предыдущий таймер
     if (null !== this.saveCallbackErrorTimeOutId) {
       clearTimeout(this.saveCallbackErrorTimeOutId);
+      this.saveCallbackErrorTimeOutId = null;
     }
 
     if (-1 !== data['changesIndex']) {
@@ -1174,6 +1188,7 @@
     sockjs.onopen = function() {
       if (t.reconnectTimeout) {
         clearTimeout(t.reconnectTimeout);
+        t.reconnectTimeout = null;
         t.attemptCount = 0;
       }
 
@@ -1266,6 +1281,7 @@
     var t = this;
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout);
+      t.reconnectTimeout = null;
     }
     ++this.attemptCount;
     this.reconnectTimeout = setTimeout(function() {
