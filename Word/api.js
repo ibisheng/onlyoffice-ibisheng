@@ -6646,8 +6646,8 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, ve
 	this.SpellCheckUrl = '';
 
 	this.User = new Asc.asc_CUser();
-	this.User.asc_setId("TM");
-	this.User.asc_setUserName("native");
+	this.User.setId("TM");
+	this.User.setUserName("native");
 	
 	this.WordControl.m_bIsRuler = false;
 	this.WordControl.Init();

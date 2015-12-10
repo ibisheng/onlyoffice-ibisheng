@@ -39,7 +39,7 @@
 			asc_getCanDownload: function(){ return this.canDownload; },
 			asc_getCanCoAuthoring: function(){ return this.canCoAuthoring; },
 			asc_getCanReaderMode: function(){ return this.canReaderMode; },
-			asc_getCanBranding: function(v){ return this.canBranding; },
+			asc_getCanBranding: function(){ return this.canBranding; },
 			asc_getIsAutosaveEnable: function(){ return this.isAutosaveEnable; },
 			asc_getAutosaveMinInterval: function(){ return this.AutosaveMinInterval; },
 			asc_getIsAnalyticsEnable: function(){ return this.isAnalyticsEnable; },

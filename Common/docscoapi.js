@@ -4,7 +4,7 @@
   'use strict';
 
   var asc = window["Asc"];
-  var asc_coAuthV = '3.0.8';
+  var asc_coAuthV = '3.0.9';
 
   // Класс надстройка, для online и offline работы
   function CDocsCoApi(options) {
@@ -904,7 +904,7 @@
             if (change['user'] !== this._userId) {
               this.lastOtherSaveTime = change['time'];
             }
-            this.onSaveChanges(JSON.parse(changesOneUser), change['user'], bFirstLoad);
+            this.onSaveChanges(JSON.parse(changesOneUser), change['useridoriginal'], bFirstLoad);
           }
         }
       }
@@ -992,8 +992,9 @@
 
   DocsCoApi.prototype._onConnectionStateChanged = function(data) {
     var userStateChanged = null, userId, stateChanged = false, isEditUser = true;
-    if (undefined !== data["state"] && this.onConnectionStateChanged) {
-      userStateChanged = new asc.asc_CUser(data);
+    if (this.onConnectionStateChanged) {
+      userStateChanged = new asc.asc_CUser(data['user']);
+      userStateChanged.setState(data["state"]);
 
       userId = userStateChanged.asc_getId();
       isEditUser = !userStateChanged.asc_getView();
@@ -1152,7 +1153,7 @@
       'token': this._token,
       'user': {
         'id': this._user.asc_getId(),
-        'name': this._user.asc_getUserName(),
+        'username': this._user.asc_getUserName(),
         'indexUser': this._indexUser
       },
       'editorType': this.editorType,
@@ -1160,7 +1161,7 @@
       'block': this.ownedLockBlocks,
       'sessionId': this._id,
       'documentFormatSave': this._documentFormatSave,
-      'isViewer': this._isViewer,
+      'view': this._isViewer,
       'isCloseCoAuthoring': this.isCloseCoAuthoring,
       'version': asc_coAuthV
     });

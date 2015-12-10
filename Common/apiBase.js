@@ -159,8 +159,8 @@ baseEditorsApi.prototype.asc_setDocInfo = function(oDocInfo) {
     this.documentOpenOptions = this.DocInfo.asc_getOptions();
 
     this.User = new Asc.asc_CUser();
-    this.User.asc_setId(this.DocInfo.get_UserId());
-    this.User.asc_setUserName(this.DocInfo.get_UserName());
+    this.User.setId(this.DocInfo.get_UserId());
+    this.User.setUserName(this.DocInfo.get_UserName());
   }
 
   if (undefined !== window["AscDesktopEditor"] && offlineMode != this.documentUrl) {
@@ -347,8 +347,8 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
   //Если User не задан, отключаем коавторинг.
   if (null == this.User || null == this.User.asc_getId()) {
     this.User = new Asc.asc_CUser();
-    this.User.asc_setId("Unknown");
-    this.User.asc_setUserName("Unknown");
+    this.User.setId("Unknown");
+    this.User.setUserName("Unknown");
   }
   //в обычном серверном режиме портим ссылку, потому что CoAuthoring теперь имеет встроенный адрес
   //todo надо использовать проверку get_OfflineApp

@@ -2937,8 +2937,8 @@ var editor;
     this.SpellCheckUrl = '';
 
     this.User = new asc.asc_CUser();
-    this.User.asc_setId("TM");
-    this.User.asc_setUserName("native");
+    this.User.setId("TM");
+    this.User.setUserName("native");
 
     this.wbModel = new Workbook(this.handlers, this);
     this.initGlobalObjects(this.wbModel);
