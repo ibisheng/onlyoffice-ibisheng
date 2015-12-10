@@ -7168,7 +7168,7 @@ CStylesPainter.prototype =
         _dr_style.Id = i;
 
         this.drawStyle(graphics, _dr_style, cur_index);
-        this.drawStyle2(graphics2, style);
+        this.drawStyle2(graphics2, _dr_style);
         this.docStyles[cur_index] = new CStyleImage(style.Name, cur_index, c_oAscStyleImage.Document, _canvas2.toDataURL("image/png"), style.uiPriority);
 
         // алгоритм смены имени
@@ -7416,7 +7416,7 @@ CStylesPainter.prototype =
 
     if (window["flat_desine"] !== true)
     {
-      var y = dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
+      var y = 0;
       var b = dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
       var w = dKoefToMM * this.STYLE_THUMBNAIL_WIDTH;
 
@@ -7451,7 +7451,7 @@ CStylesPainter.prototype =
       ctx.lineWidth = 1;
       ctx.strokeStyle = "#D8D8D8";
       ctx.beginPath();
-      ctx.rect(0.5, this.STYLE_THUMBNAIL_HEIGHT + 0.5, this.STYLE_THUMBNAIL_WIDTH - 1, this.STYLE_THUMBNAIL_HEIGHT - 1);
+      ctx.rect(0.5, 0.5, this.STYLE_THUMBNAIL_WIDTH - 1, this.STYLE_THUMBNAIL_HEIGHT - 1);
 
       ctx.stroke();
 
@@ -7541,7 +7541,7 @@ CStylesPainter.prototype =
       //par.Reset(0, 0, 10000, 10000, 0);
       //par.Recalculate_Page(0);
 
-      var y = dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
+      var y = 0;
       var b = dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
       var w = dKoefToMM * this.STYLE_THUMBNAIL_WIDTH;
       var off = 10 * dKoefToMM;
