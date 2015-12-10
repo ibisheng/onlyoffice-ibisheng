@@ -992,7 +992,6 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
         var oStartElement = oContent.getElem(nStartPos);
         var oEndElement = oContent.getElem(nEndPos);
 
-        this.Selection_Remove();
         if (true === TrackRevisions)
         {
             for (var CurPos = nEndPos; CurPos >= nStartPos; --CurPos)
@@ -1019,6 +1018,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                 }
             }
 
+            this.Selection_Remove();
             if (Direction < 0)
             {
                 oContent.CurPos = nStartPos;
@@ -1047,6 +1047,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
             else
                 oContent.Remove_FromContent(nStartPos, 1);
 
+            this.Selection_Remove();
             oContent.CurPos = nStartPos;
         }
         oContent.Correct_Content();
