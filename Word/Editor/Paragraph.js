@@ -14943,6 +14943,10 @@ CParagraphRevisionsChangesChecker.prototype.Get_AddRemoveType = function()
 {
     return this.AddRemove.ChangeType;
 };
+CParagraphRevisionsChangesChecker.prototype.Get_AddRemoveUserId = function()
+{
+    return this.AddRemove.UserId;
+};
 CParagraphRevisionsChangesChecker.prototype.Start_AddRemove = function(ChangeType, ContentPos)
 {
     this.AddRemove.ChangeType = ChangeType;
@@ -15040,7 +15044,6 @@ CParagraphRevisionsChangesChecker.prototype.Update_PrChangeReviewInfo = function
         this.TextPr.UserName = ReviewInfo.Get_UserName();
         this.TextPr.DateTime = ReviewInfo.Get_DateTime();
     }
-
 };
 CParagraphRevisionsChangesChecker.prototype.Is_ParaEndRun = function()
 {
@@ -15061,4 +15064,8 @@ CParagraphRevisionsChangesChecker.prototype.End_CheckOnlyTextPr = function()
 CParagraphRevisionsChangesChecker.prototype.Is_CheckOnlyTextPr = function()
 {
     return (0 === this.CheckOnlyTextPr ? false : true);
+};
+CParagraphRevisionsChangesChecker.prototype.Get_PrChangeUserId = function()
+{
+    return this.TextPr.UserId;
 };

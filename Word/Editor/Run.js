@@ -357,7 +357,7 @@ ParaRun.prototype.Add = function(Item, bMath)
         TrackRevisions = this.Paragraph.LogicDocument.Is_TrackRevisions();
 
     var ReviewType = this.Get_ReviewType();
-    if ((true === TrackRevisions && reviewtype_Add !== ReviewType) || (false === TrackRevisions && reviewtype_Common !== ReviewType))
+    if ((true === TrackRevisions && (reviewtype_Add !== ReviewType || true !== this.ReviewInfo.Is_CurrentUser())) || (false === TrackRevisions && reviewtype_Common !== ReviewType))
     {
         var DstReviewType = true === TrackRevisions ? reviewtype_Add : reviewtype_Common;
 
@@ -378,7 +378,7 @@ ParaRun.prototype.Add = function(Item, bMath)
         if (0 === CurPos && RunPos > 0)
         {
             var PrevElement = Parent.Content[RunPos - 1];
-            if (para_Run === PrevElement.Type && DstReviewType === PrevElement.Get_ReviewType() && true === this.Pr.Is_Equal(PrevElement.Pr))
+            if (para_Run === PrevElement.Type && DstReviewType === PrevElement.Get_ReviewType() && true === this.Pr.Is_Equal(PrevElement.Pr) && PrevElement.ReviewInfo && true === PrevElement.ReviewInfo.Is_CurrentUser())
             {
                 PrevElement.State.ContentPos = PrevElement.Content.length;
                 PrevElement.Add_ToContent(PrevElement.Content.length, Item, true);
@@ -390,7 +390,7 @@ ParaRun.prototype.Add = function(Item, bMath)
         if (this.Content.length === CurPos && (RunPos < Parent.Content.length - 2 || (RunPos < Parent.Content.length - 1 && !(Parent instanceof Paragraph))))
         {
             var NextElement = Parent.Content[RunPos + 1];
-            if (para_Run === NextElement.Type && DstReviewType === NextElement.Get_ReviewType() && true === this.Pr.Is_Equal(NextElement.Pr))
+            if (para_Run === NextElement.Type && DstReviewType === NextElement.Get_ReviewType() && true === this.Pr.Is_Equal(NextElement.Pr) && NextElement.ReviewInfo && true === NextElement.ReviewInfo.Is_CurrentUser())
             {
                 NextElement.State.ContentPos = 0;
                 NextElement.Add_ToContent(0, Item, true);
@@ -411,10 +411,16 @@ ParaRun.prototype.Add = function(Item, bMath)
             Parent.Add_ToContent(RunPos + 1, NewRun);
         else
         {
+            var OldReviewInfo = (this.ReviewInfo ? this.ReviewInfo.Copy() : undefined);
+            var OldReviewType = this.ReviewType;
+
             // Нужно разделить данный ран в текущей позиции
             var RightRun = this.Split2(CurPos);
             Parent.Add_ToContent(RunPos + 1, NewRun);
             Parent.Add_ToContent(RunPos + 2, RightRun);
+
+            this.Set_ReviewTypeWithInfo(OldReviewType, OldReviewInfo);
+            RightRun.Set_ReviewTypeWithInfo(OldReviewType, OldReviewInfo);
         }
 
         NewRun.Make_ThisElementCurrent();
@@ -10190,7 +10196,7 @@ ParaRun.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth)
     if (true !== Checker.Is_ParaEndRun() && true !== Checker.Is_CheckOnlyTextPr())
     {
         var ReviewType = this.Get_ReviewType();
-        if (ReviewType !== Checker.Get_AddRemoveType())
+        if (ReviewType !== Checker.Get_AddRemoveType() || (reviewtype_Common !== ReviewType && this.ReviewInfo.Get_UserId() !== Checker.Get_AddRemoveUserId()))
         {
             Checker.Flush_AddRemoveChange();
             ContentPos.Update(0, Depth);
@@ -10243,7 +10249,7 @@ ParaRun.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth)
 
     var HavePrChange = this.Have_PrChange();
     var DiffPr = this.Get_DiffPrChange();
-    if (HavePrChange !== Checker.Have_PrChange() || true !== Checker.Compare_PrChange(DiffPr))
+    if (HavePrChange !== Checker.Have_PrChange() || true !== Checker.Compare_PrChange(DiffPr) || this.Pr.ReviewInfo.Get_UserId() !== Checker.Get_PrChangeUserId())
     {
         Checker.Flush_TextPrChange();
         ContentPos.Update(0, Depth);
@@ -10266,7 +10272,7 @@ ParaRun.prototype.private_UpdateTrackRevisionOnChangeContent = function(bUpdateI
     {
         this.private_UpdateTrackRevisions();
 
-        if (true === bUpdateInfo && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
+        if (true === bUpdateInfo && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions() && this.ReviewInfo && true === this.ReviewInfo.Is_CurrentUser())
         {
             var OldReviewInfo = this.ReviewInfo.Copy();
             this.ReviewInfo.Update();
@@ -10576,4 +10582,18 @@ CReviewInfo.prototype.Get_Color = function()
         return REVIEW_COLOR;
 
     return getUserColorById(this.UserId, this.UserName, true, false);
+};
+CReviewInfo.prototype.Is_CurrentUser = function()
+{
+    if (this.Editor)
+    {
+        var UserId = this.Editor.DocInfo.get_UserId();
+        return (UserId === this.UserId);
+    }
+
+    return true;
+};
+CReviewInfo.prototype.Get_UserId = function()
+{
+    return this.UserId;
 };
