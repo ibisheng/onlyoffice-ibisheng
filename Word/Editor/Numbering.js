@@ -1386,6 +1386,8 @@ CAbstractNum.prototype =
         Lvl_new.Jc      = Lvl.Jc;
         Lvl_new.Format  = Lvl.Format;
 
+        Lvl_new.PStyle  = Lvl.PStyle;
+
         Lvl_new.LvlText = [];
         for ( var Index = 0; Index < Lvl.LvlText.length; Index++ )
         {
@@ -1407,12 +1409,14 @@ CAbstractNum.prototype =
         Lvl.LvlText = Lvl_new.LvlText;
         Lvl.TextPr  = Lvl_new.TextPr;
         Lvl.ParaPr  = Lvl_new.ParaPr;
+        Lvl.PStyle  = Lvl_new.PStyle;
     },
 
     Write_Lvl_ToBinary : function(Lvl, Writer)
     {
         // Long               : Jc
         // Long               : Format
+        // String             : PStyle
         // Variable           : TextPr
         // Variable           : ParaPr
         // Long               : количество элементов в LvlText
@@ -1420,6 +1424,8 @@ CAbstractNum.prototype =
 
         Writer.WriteLong( Lvl.Jc );
         Writer.WriteLong( Lvl.Format );
+
+        Writer.WriteString2(Lvl.PStyle ? Lvl.PStyle : "");
 
         Lvl.TextPr.Write_ToBinary(Writer);
         Lvl.ParaPr.Write_ToBinary(Writer);
@@ -1435,6 +1441,7 @@ CAbstractNum.prototype =
     {
         // Long               : Jc
         // Long               : Format
+        // String             : PStyle
         // Variable           : TextPr
         // Variable           : ParaPr
         // Long               : количество элементов в LvlText
@@ -1442,6 +1449,10 @@ CAbstractNum.prototype =
 
         Lvl.Jc     = Reader.GetLong();
         Lvl.Format = Reader.GetLong();
+
+        Lvl.PStyle = Reader.GetString2();
+        if ("" === Lvl.PStyle)
+            Lvl.PStyle = undefined;
 
         Lvl.TextPr = new CTextPr();
         Lvl.ParaPr = new CParaPr();
