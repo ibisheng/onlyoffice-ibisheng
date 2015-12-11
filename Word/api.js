@@ -445,9 +445,7 @@ asc_docs_api.prototype.SetUnchangedDocument = function()
 asc_docs_api.prototype.SetDocumentModified = function(bValue)
 {
     this.isDocumentModify = bValue;
-
-    if (true !== CollaborativeEditing.Is_Fast() || true === CollaborativeEditing.Is_SingleUser())
-        this.asc_fireCallback("asc_onDocumentModifiedChanged");
+    this.asc_fireCallback("asc_onDocumentModifiedChanged");
 
     if (undefined !== window["AscDesktopEditor"])
     {
