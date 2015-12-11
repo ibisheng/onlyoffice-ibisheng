@@ -377,7 +377,7 @@ var editor;
       return;
     }
 
-    this._asc_downloadAs(typeFile, c_oAscAsyncAction.DownloadAs, {downloadType: bIsDownloadEvent ? 'asc_onDownloadUrl': null});
+    this._asc_downloadAs(typeFile, c_oAscAsyncAction.DownloadAs, {downloadType: bIsDownloadEvent ? DownloadType.Download: DownloadType.None});
   };
 
   spreadsheet_api.prototype.asc_Save = function(isAutoSave) {
@@ -410,7 +410,7 @@ var editor;
     }
 
     this.adjustPrint = adjustPrint ? adjustPrint : new asc_CAdjustPrint();
-    this._asc_downloadAs(c_oAscFileType.PDF, c_oAscAsyncAction.Print, {downloadType: bIsDownloadEvent ? 'asc_onPrintUrl': null});
+    this._asc_downloadAs(c_oAscFileType.PDF, c_oAscAsyncAction.Print, {downloadType: bIsDownloadEvent ? DownloadType.Print: DownloadType.None});
   };
 
   spreadsheet_api.prototype.asc_Copy = function() {
@@ -605,14 +605,6 @@ var editor;
         break;
     }
   };
-  spreadsheet_api.prototype.asc_processSavedFile = function(url, downloadType) {
-    if (downloadType) {
-      this.handlers.trigger(downloadType, url, function(hasError) {
-      });
-    } else {
-      getFile(url);
-    }
-  };
   // Опции страницы (для печати)
   spreadsheet_api.prototype.asc_setPageOptions = function(options, index) {
     var sheetIndex = (undefined !== index && null !== index) ? index : this.wbModel.getActive();
@@ -692,7 +684,7 @@ var editor;
         if ('ok' == input["status"]) {
           var url = input["data"];
           if (url) {
-            t.asc_processSavedFile(url, false);
+            t.processSavedFile(url, false);
           } else {
             t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
           }
@@ -761,7 +753,7 @@ var editor;
           var url = input["data"];
           if (url) {
             error = c_oAscError.ID.No;
-            t.asc_processSavedFile(url, options.downloadType);
+            t.processSavedFile(url, options.downloadType);
           }
         } else {
           error = g_fMapAscServerErrorToAscError(parseInt(input["data"]));

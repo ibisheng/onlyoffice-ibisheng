@@ -80,6 +80,13 @@ var c_oAscAsyncActionType = {
 	BlockInteraction	: 1
 };
 
+var DownloadType = {
+  None      : '',
+  Download  : 'asc_onDownloadUrl',
+  Print     : 'asc_onPrintUrl',
+  MailMerge : 'asc_onSaveMailMerge'
+};
+
 var CellValueType = {
 	Number	: 0,
 	String	: 1,

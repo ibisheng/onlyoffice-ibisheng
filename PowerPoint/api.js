@@ -1023,7 +1023,7 @@ asc_docs_api.prototype.asc_Print = function(bIsDownloadEvent){
         window["AscDesktopEditor"]["Print"]();
         return;
     }
-    var options = bIsDownloadEvent ? {downloadType: 'asc_onPrintUrl'} : null;
+    var options = {downloadType: bIsDownloadEvent ? DownloadType.Print: DownloadType.None};
 	_downloadAs(this, c_oAscFileType.PDF, c_oAscAsyncAction.Print, options);
 };
 asc_docs_api.prototype.Undo = function(){
@@ -1178,16 +1178,8 @@ asc_docs_api.prototype.asc_Save = function(isAutoSave) {
     this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
   }
 };
-asc_docs_api.prototype.processSavedFile = function(url, downloadType){
-	if(downloadType)
-		editor.asc_fireCallback(downloadType, url, function(hasError){});
-	else
-	{
-		getFile(url);
-	}
-};
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent){//передаем число соответствующее своему формату.
-	var options = bIsDownloadEvent ? {downloadType: 'asc_onDownloadUrl'} : null;
+	var options = {downloadType: bIsDownloadEvent ? DownloadType.Download: DownloadType.None};
 	_downloadAs(this, typeFile, c_oAscAsyncAction.DownloadAs, options);
 };
 asc_docs_api.prototype.Resize = function(){

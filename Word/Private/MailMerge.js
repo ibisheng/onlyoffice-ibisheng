@@ -148,7 +148,7 @@ asc_docs_api.prototype.asc_DownloadAsMailMerge = function(typeFile, StartIndex, 
     if (null != oDocumentMailMerge)
     {
         var actionType = null;
-        var options = {oDocumentMailMerge: oDocumentMailMerge, downloadType: 'asc_onSaveMailMerge', errorDirect: c_oAscError.ID.MailMergeSaveFile};
+        var options = {oDocumentMailMerge: oDocumentMailMerge, downloadType: DownloadType.MailMerge, errorDirect: c_oAscError.ID.MailMergeSaveFile};
         if (bIsDownload) {
             actionType = c_oAscAsyncAction.DownloadMerge;
             options.downloadType = null;

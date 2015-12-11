@@ -66,7 +66,6 @@ asc_docs_api.prototype['Cut'] = asc_docs_api.prototype.Cut;
 asc_docs_api.prototype['Paste'] = asc_docs_api.prototype.Paste;
 asc_docs_api.prototype['Share'] = asc_docs_api.prototype.Share;
 asc_docs_api.prototype['asc_Save'] = asc_docs_api.prototype.asc_Save;
-asc_docs_api.prototype['processSavedFile'] = asc_docs_api.prototype.processSavedFile;
 asc_docs_api.prototype['asc_DownloadAs'] = asc_docs_api.prototype.asc_DownloadAs;
 asc_docs_api.prototype['Resize'] = asc_docs_api.prototype.Resize;
 asc_docs_api.prototype['AddURL'] = asc_docs_api.prototype.AddURL;

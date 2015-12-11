@@ -315,6 +315,15 @@ baseEditorsApi.prototype.asyncImagesDocumentStartLoaded = function() {
   // евент о заморозке не нужен... оно и так заморожено
   // просто нужно вывести информацию в статус бар (что началась загрузка картинок)
 };
+// Save
+baseEditorsApi.prototype.processSavedFile = function(url, downloadType) {
+  if (DownloadType.None !== downloadType) {
+    this.sendEvent(downloadType, url, function(hasError) {
+    });
+  } else {
+    getFile(url);
+  }
+};
 // Выставление интервала автосохранения (0 - означает, что автосохранения нет)
 baseEditorsApi.prototype.asc_setAutoSaveGap = function(autoSaveGap) {
   if (typeof autoSaveGap === "number") {

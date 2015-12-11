@@ -1697,7 +1697,7 @@ asc_docs_api.prototype.asc_Print = function(bIsDownloadEvent)
         }
     }
   var command;
-  var options = {isNoData: false, downloadType: bIsDownloadEvent ? 'asc_onPrintUrl' : null};
+  var options = {isNoData: false, downloadType: bIsDownloadEvent ? DownloadType.Print: DownloadType.None};
   if (null == this.WordControl.m_oLogicDocument) {
     command = 'savefromorigin';
     options.isNoData = true;
@@ -1866,7 +1866,7 @@ asc_docs_api.prototype.asc_Save = function(isAutoSave) {
 
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) {//передаем число соответствующее своему формату.
 	var actionType = this.mailMergeFileData ? c_oAscAsyncAction.MailMergeLoadFile : c_oAscAsyncAction.DownloadAs;
-    var options = {downloadType: bIsDownloadEvent ? 'asc_onDownloadUrl' : null};
+    var options = {downloadType: bIsDownloadEvent ? DownloadType.Download: DownloadType.None};
 	_downloadAs(this, "save", typeFile, actionType, options, null);
 };
 asc_docs_api.prototype.Resize = function(){
@@ -1931,7 +1931,7 @@ asc_docs_api.prototype.SetFontRenderingMode = function(mode)
 };
 asc_docs_api.prototype.processSavedFile = function(url, downloadType) {
 	var t = this;
-	if (this.mailMergeFileData) {
+	if (DownloadType.MailMerge === downloadType) {
 		this.mailMergeFileData = null;
 		asc_ajax({
 			url: url,
@@ -1948,12 +1948,7 @@ asc_docs_api.prototype.processSavedFile = function(url, downloadType) {
 			}
 		});
 	} else {
-		if (downloadType) {
-			this.asc_fireCallback(downloadType, url, function (hasError) {
-			});
-		} else {
-			getFile(url);
-		}
+    this.constructor.prototype.processSavedFile(url, downloadType);
 	}
 };
 asc_docs_api.prototype.startGetDocInfo = function(){

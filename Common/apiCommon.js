@@ -35,8 +35,8 @@
 			constructor: asc_CAscEditorPermissions,
 			asc_getCanLicense: function(){ return this.canLicense; },
 
-			asc_getCanEdit: function(){ return this.canEdit; },
-			asc_getCanDownload: function(){ return this.canDownload; },
+			asc_getCanEdit: function(){ return this.canEdit; }, //ToDo убрать
+			asc_getCanDownload: function(){ return this.canDownload; }, //ToDo убрать
 			asc_getCanCoAuthoring: function(){ return this.canCoAuthoring; },
 			asc_getCanReaderMode: function(){ return this.canReaderMode; },
 			asc_getCanBranding: function(){ return this.canBranding; },
