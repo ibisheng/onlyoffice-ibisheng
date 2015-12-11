@@ -8,6 +8,7 @@ var c_oMainTables = {
     ViewProps		: 4,
     VmlDrawing		: 5,
     TableStyles		: 6,
+    PresProps		: 7,
 
     Themes			: 20,
     ThemeOverride	: 21,
@@ -430,7 +431,10 @@ function CBinaryFileWriter()
         // ViewProps
 		if (presentation.ViewProps)
 			this.WriteViewProps(presentation.ViewProps);
-
+        
+        // PresProps
+		this.WritePresProps(presentation);
+        
         // presentation
         this.WritePresentation(presentation);
 
@@ -767,6 +771,64 @@ function CBinaryFileWriter()
     {
         this.StartMainRecord(c_oMainTables.ViewProps);
         this.StartRecord(c_oMainTables.ViewProps);
+        this.EndRecord();
+    }
+    this.WritePresProps = function(presentation)
+    {       
+        this.StartMainRecord(c_oMainTables.PresProps);
+        this.StartRecord(c_oMainTables.PresProps);
+        
+        //showPr
+        var showPr = presentation.showPr;
+        if (showPr) {
+            this.StartRecord(1);
+            this.WriteUChar(g_nodeAttributeStart);
+
+            this._WriteBool2(0, showPr.loop);
+            this._WriteBool2(1, showPr.showAnimation);
+            this._WriteBool2(2, showPr.showNarration);
+            this._WriteBool2(3, showPr.useTimings);
+
+            this.WriteUChar(g_nodeAttributeEnd);
+            
+            if (showPr.browse) {
+                this.StartRecord(0);
+                //todo browseShowScrollbar
+                this.EndRecord();
+            }
+            if (showPr.show && null != showPr.show.custShow) {
+                this.StartRecord(1);
+                this.WriteUChar(g_nodeAttributeStart);
+                this._WriteInt2(0, showPr.show.custShow);
+                this.WriteUChar(g_nodeAttributeEnd);
+                this.EndRecord();
+            }
+            if (showPr.kiosk) {
+                this.StartRecord(2);
+                this.WriteUChar(g_nodeAttributeStart);
+                this._WriteInt2(0, showPr.kiosk.restart);
+                this.WriteUChar(g_nodeAttributeEnd);
+                this.EndRecord();
+            }
+            this.WriteRecord1(3, showPr.penClr, this.WriteUniColor);
+            if (showPr.present) {
+                this.StartRecord(4);
+                this.EndRecord();
+            }
+            if (showPr.show && null != showPr.show.showAll) {
+                this.StartRecord(5);
+                this.EndRecord();
+            }
+            if (showPr.show.range && null != showPr.show.range.start && null != showPr.show.range.end) {
+                this.StartRecord(6);
+                this.WriteUChar(g_nodeAttributeStart);
+                this._WriteInt2(0, showPr.show.range.start);
+                this._WriteInt2(1, showPr.show.range.end);
+                this.WriteUChar(g_nodeAttributeEnd);
+                this.EndRecord();
+            }
+            this.EndRecord();
+        }
         this.EndRecord();
     }
 

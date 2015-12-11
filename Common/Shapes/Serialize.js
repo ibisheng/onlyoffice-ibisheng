@@ -548,6 +548,12 @@ function BinaryPPTYLoader()
                 s.Seek2(_main_tables["6"]);
                 this.presentation.TableStyles = this.ReadTableStyles();
             }
+            if (undefined != _main_tables["7"])
+            {
+                // presprops
+                s.Seek2(_main_tables["7"]);
+                this.ReadPresProps(this.presentation);
+            }
         }
 
         if (undefined != _main_tables["20"])
@@ -910,6 +916,235 @@ function BinaryPPTYLoader()
     this.ReadVmlDrawing = function()
     {
         return null;
+    }
+    this.ReadPresProps = function(presentation)
+    {
+        var s = this.stream;
+
+        var _type = s.GetUChar();
+
+        var _rec_start = s.cur;
+        var _end_rec = _rec_start + s.GetLong() + 4;
+
+        while (s.cur < _end_rec)
+        {
+            var _at = s.GetUChar();
+            switch (_at)
+            {
+                case 0:
+                {
+                    s.SkipRecord();
+                    break;
+                }
+                case 1:
+                {
+                    presentation.showPr = this.ReadShowPr();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
+        s.Seek2(_end_rec);
+    }
+    this.ReadShowPr = function()
+    {
+        var showPr = new CShowPr();
+        var s = this.stream;
+
+        var _rec_start = s.cur;
+        var _end_rec = _rec_start + s.GetLong() + 4;
+
+        s.Skip2(1); // start attributes
+
+        while (true)
+        {
+            var _at = s.GetUChar();
+            if (_at == g_nodeAttributeEnd)
+                break;
+
+            switch (_at)
+            {
+                case 0:
+                {
+                    showPr.loop = s.GetBool();
+                    break;
+                }
+                case 1:
+                {
+                    showPr.showAnimation = s.GetBool();
+                    break;
+                }
+                case 2:
+                {
+                    showPr.showNarration = s.GetBool();
+                    break;
+                }
+                case 3:
+                {
+                    showPr.useTimings = s.GetBool();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
+        while (s.cur < _end_rec)
+        {
+            var _at = s.GetUChar();
+            switch (_at)
+            {
+                case 0:
+                {
+                    //todo browseShowScrollbar
+                    showPr.browse = true;
+                    s.SkipRecord();
+                    break;
+                }
+                case 1:
+                {
+                    this.ReadShowPrCustShow(showPr);
+                    break;
+                }
+                case 2:
+                {
+                    this.ReadShowPrKiosk(showPr);
+                    break;
+                }
+                case 3:
+                {
+                    showPr.penClr = this.ReadUniColor();
+                    break;
+                }
+                case 4:
+                {
+                    showPr.present = true;
+                    s.SkipRecord();
+                    break;
+                }
+                case 5:
+                {
+                    if (!showPr.show){
+                        showPr.show = {showAll: null, range: null, custShow: null};
+                    }
+                    showPr.show.showAll = true;
+                    s.SkipRecord();
+                    break;
+                }
+                case 6:
+                {
+                    this.ReadShowPrSldRg(showPr);
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
+        s.Seek2(_end_rec);
+        return showPr;
+    }
+    this.ReadShowPrCustShow = function(showPr)
+    {
+        var s = this.stream;
+
+        var _rec_start = s.cur;
+        var _end_rec = _rec_start + s.GetLong() + 4;
+
+        s.Skip2(1); // start attributes
+
+        while (true)
+        {
+            var _at = s.GetUChar();
+            if (_at == g_nodeAttributeEnd)
+                break;
+
+            switch (_at)
+            {
+                case 0:
+                {
+                    if (!showPr.show){
+                        showPr.show = {showAll: null, range: null, custShow: null};
+                    }
+                    showPr.show.custShow = s.GetLong();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
+        s.Seek2(_end_rec);
+    }
+    this.ReadShowPrKiosk = function(showPr)
+    {
+        showPr.kiosk = {restart: null};
+        var s = this.stream;
+
+        var _rec_start = s.cur;
+        var _end_rec = _rec_start + s.GetLong() + 4;
+
+        s.Skip2(1); // start attributes
+
+        while (true)
+        {
+            var _at = s.GetUChar();
+            if (_at == g_nodeAttributeEnd)
+                break;
+
+            switch (_at)
+            {
+                case 0:
+                {
+                    showPr.kiosk.restart = s.GetLong();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
+        s.Seek2(_end_rec);
+    }
+    this.ReadShowPrSldRg = function(showPr)
+    {
+        if (!showPr.show){
+            showPr.show = {showAll: null, range: null, custShow: null};
+        }
+        showPr.show.range = {start: null, end: null};
+        var s = this.stream;
+
+        var _rec_start = s.cur;
+        var _end_rec = _rec_start + s.GetLong() + 4;
+
+        s.Skip2(1); // start attributes
+
+        while (true)
+        {
+            var _at = s.GetUChar();
+            if (_at == g_nodeAttributeEnd)
+                break;
+
+            switch (_at)
+            {
+                case 0:
+                {
+                    showPr.show.range.start = s.GetLong();
+                    break;
+                }
+                case 1:
+                {
+                    showPr.show.range.end = s.GetLong();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
+        s.Seek2(_end_rec);
     }
     this.ReadTableStyles = function()
     {
