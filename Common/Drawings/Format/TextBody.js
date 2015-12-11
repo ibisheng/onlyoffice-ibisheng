@@ -123,8 +123,17 @@ CTextBody.prototype =
             ret.setBodyPr(this.bodyPr.createDuplicate());
         if(this.lstStyle)
             ret.setLstStyle(this.lstStyle.createDuplicate());
-        if(this.content)
+        if(this.content){
+            var bTrackRevision = false;
+            if(typeof editor !== "undefined" && editor && editor.WordControl && editor.WordControl.m_oLogicDocument.TrackRevisions === true){
+                bTrackRevision= true;
+                editor.WordControl.m_oLogicDocument.TrackRevisions = false;
+            }
             ret.setContent(this.content.Copy3(ret));
+            if(bTrackRevision){
+                editor.WordControl.m_oLogicDocument.TrackRevisions = true;
+            }
+        }
         return ret;
     },
 

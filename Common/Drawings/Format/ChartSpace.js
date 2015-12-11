@@ -602,7 +602,16 @@ CChartSpace.prototype =
         if(this.selection.textSelection)
         {
             this.selection.textSelection.checkDocContent();
+
+            var bTrackRevision = false;
+            if(typeof editor !== "undefined" && editor && editor.WordControl && editor.WordControl.m_oLogicDocument.TrackRevisions === true){
+                bTrackRevision = true;
+                editor.WordControl.m_oLogicDocument.TrackRevisions = false;
+            }
             this.selection.textSelection.applyTextFunction(docContentFunction, tableFunction, args);
+            if(bTrackRevision){
+                editor.WordControl.m_oLogicDocument.TrackRevisions = true;
+            }
         }
     },
 

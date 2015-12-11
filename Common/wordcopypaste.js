@@ -2942,7 +2942,13 @@ PasteProcessor.prototype =
             // }
             // });
             // return;
-
+            var bTurnOffTrackRevisions = false;
+            if(this.oDocument && this.oDocument.bPresentation){
+                if(oThis.api.WordControl.m_oLogicDocument.TrackRevisions){
+                    oThis.api.WordControl.m_oLogicDocument.TrackRevisions = false;
+                    bTurnOffTrackRevisions = true;
+                }
+            }
             if(copyPasteUseBinary)
             {
                 if(onlyBinary)
@@ -3045,7 +3051,9 @@ PasteProcessor.prototype =
 						this.aContent = aContent.content;
 						oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
 					}
-					
+					if(bTurnOffTrackRevisions){
+                        oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
+                    }
 					return;
 				}
 				else if(pasteFromBinary)//вставка из редактора документов
@@ -3100,6 +3108,9 @@ PasteProcessor.prototype =
                         oThis.SetShortImageId(aContent.aPastedImages);
                         oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
                     }
+                    if(bTurnOffTrackRevisions){
+                        oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
+                    }
 					return;
 				}
 				else if(base64FromPresentation)//вставка из редактора презентаций в документы
@@ -3145,6 +3156,9 @@ PasteProcessor.prototype =
 							this.aContent = aContent;
 	
 							oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
+                            if(bTurnOffTrackRevisions){
+                                oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
+                            }
 							return;
 						}
 						case "Drawings":
@@ -3217,6 +3231,9 @@ PasteProcessor.prototype =
                             oThis.aContent = aContent.content;
                             oThis.api.pre_Paste(aContent.fonts, image_map, fPrepasteCallback);
                           });
+                            if(bTurnOffTrackRevisions){
+                                oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
+                            }
 							return;
 						}
 					}
@@ -3263,7 +3280,9 @@ PasteProcessor.prototype =
 							}
 						}
 					}
-					
+                    if(bTurnOffTrackRevisions){
+                        oThis.api.WordControl.m_oLogicDocument.TrackRevisions = false;
+                    }
 					//�� ����� ���������� �������� ��� ������� ��������� �������
                     oThis._Execute(node, {}, true, true, false);
 						
@@ -3274,7 +3293,13 @@ PasteProcessor.prototype =
 						nodeDisplay.blur();
 						nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
                     }
+                    if(bTurnOffTrackRevisions){
+                        oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
+                    }
                 });
+            if(bTurnOffTrackRevisions){
+                oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
+            }
         }
         else//presentation
         {
