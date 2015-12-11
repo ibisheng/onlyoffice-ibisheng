@@ -2663,7 +2663,21 @@ ParaMath.prototype.Get_ContentSelection = function()
     {
         if(oContent.bOneLine)
         {
-            Bounds = oContent.Get_Bounds();
+            Bounds = [];
+            Bounds[0] = [];
+
+            var StartParaPage = this.Paragraph.Get_StartPage_Absolute();
+            var ContentBounds = oContent.Get_Bounds();
+            var oBound = ContentBounds[0][0];
+
+            Bounds[0][0] =
+            {
+                X:      oBound.X,
+                Y:      oBound.Y,
+                W:      oBound.W,
+                H:      oBound.H,
+                Page:   oBound.Page + StartParaPage
+            };
         }
         else
         {
@@ -2822,7 +2836,7 @@ ParaMath.prototype.private_GetBounds = function(Content)
 
             if(Content.bRoot == false)
             {
-                if(HLine < oBound.H)
+                if(HLine < oBound.H) // сделано для случаев, когда межстрочный интервал небольшой
                 {
                     Height = HLine;
                     Y = YLine;
