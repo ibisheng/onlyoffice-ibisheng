@@ -181,6 +181,17 @@ function g_fSaveWithParts(fSendCommand, fCallback, fCallbackRequest, oAdditional
 	}, oAdditionalData, dataContainer);
 }
 
+function g_fLoadFileContent(url, callback) {
+  asc_ajax({
+    url: url,
+    dataType: "text",
+    success: callback,
+    error: function() {
+      callback(null);
+    }
+  });
+}
+
 function g_fGetJSZipUtils() {
   return window['JSZipUtils'] ? window['JSZipUtils'] : require('jsziputils');
 }

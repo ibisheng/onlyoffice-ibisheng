@@ -1933,20 +1933,17 @@ asc_docs_api.prototype.processSavedFile = function(url, downloadType) {
 	var t = this;
 	if (DownloadType.MailMerge === downloadType) {
 		this.mailMergeFileData = null;
-		asc_ajax({
-			url: url,
-			dataType: "text",
-			success: function (result) {
-				try {
-					t.asc_StartMailMergeByList(JSON.parse(result));
-				} catch (e) {
-					t.asc_fireCallback("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
-				}
-			},
-			error: function () {
-				t.asc_fireCallback("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
-			}
-		});
+    g_fLoadFileContent(url, function(result) {
+      if (null === result) {
+        t.asc_fireCallback("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
+        return;
+      }
+      try {
+        t.asc_StartMailMergeByList(JSON.parse(result));
+      } catch (e) {
+        t.asc_fireCallback("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
+      }
+    });
 	} else {
     this.constructor.prototype.processSavedFile(url, downloadType);
 	}
