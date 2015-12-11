@@ -627,17 +627,14 @@ var editor;
       }
     }
     if (data) {
-      asc_ajax({
-        url: data,
-        dataType: "text",
-        success: function(result) {
-          var cp = JSON.parse(result);
-          cp['encodings'] = getEncodingParams();
-          t.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), t.advancedOptionsAction);
-        },
-        error: function() {
+      g_fLoadFileContent(url, function(result) {
+        if (null === result) {
           t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
+          return;
         }
+        var cp = JSON.parse(result);
+        cp['encodings'] = getEncodingParams();
+        t.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), t.advancedOptionsAction);
       });
     } else {
       t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
