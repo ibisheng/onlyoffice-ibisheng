@@ -1572,6 +1572,19 @@ cArray.prototype.fillFromArray = function ( arr ) {
         this.countElement += arr[i].length;
     }
 };
+cArray.prototype.getElementByCell = function ( cellAddress ) {
+    if ( this.cellAddress ){
+        if( this.countElementInRow == 1 ){
+            this.getElementRowCol( cellAddress.getRow0(), 0 );
+        }
+        if( this.rowCount == 1 ){
+            this.getElementRowCol( 0, cellAddress.getCol0() );
+        }
+    }
+    else{
+        return this.getElement( 0 );
+    }
+};
 
 /** @constructor */
 function cUndefined() {
