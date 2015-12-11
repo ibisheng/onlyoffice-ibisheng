@@ -627,7 +627,7 @@ var editor;
       }
     }
     if (data) {
-      g_fLoadFileContent(url, function(result) {
+      g_fLoadFileContent(data, function(result) {
         if (null === result) {
           t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
           return;
