@@ -1945,7 +1945,7 @@ asc_docs_api.prototype.processSavedFile = function(url, downloadType) {
       }
     });
 	} else {
-    this.constructor.prototype.processSavedFile(url, downloadType);
+    asc_docs_api.superclass.constructor.prototype.processSavedFile.call(this, url, downloadType);
 	}
 };
 asc_docs_api.prototype.startGetDocInfo = function(){
