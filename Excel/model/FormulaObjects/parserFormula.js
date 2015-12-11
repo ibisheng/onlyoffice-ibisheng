@@ -692,7 +692,7 @@ cArea.prototype.index = function ( r, c, n ) {
 
 /** @constructor */
 function cArea3D( val, wsFrom, wsTo, wb ) {/*Area3D means "Sheat1!A1:E5" for example*/
-    this.constructor.call( this, val, cElementType.cellsRange );
+    this.constructor.call( this, val, cElementType.cellsRange3D );
 
     this._wb = wb;
     this._cells = val;
@@ -1167,7 +1167,7 @@ cRef.prototype.getBBox0 = function () {
 
 /** @constructor */
 function cRef3D( val, _wsFrom, wb ) {/*Ref means Sheat1!A1 for example*/
-    this.constructor.call( this, val, cElementType.cell );
+    this.constructor.call( this, val, cElementType.cell3D );
     this.wb = this._wb = wb;
     this._cells = val;
     this.isAbsolute = false;
