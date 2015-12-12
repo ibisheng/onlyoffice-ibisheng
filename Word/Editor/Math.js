@@ -2327,7 +2327,7 @@ ParaMath.prototype.Draw_Elements = function(PDSE)
 
     this.Root.Draw_Elements(PDSE);
 
-    PDSE.X = X + this.Root.GetWidth(PDSE.Line, PDSE.Range);
+    PDSE.X = X + this.Root.Get_Width(PDSE.Line, PDSE.Range);
 
     /*PDSE.Graphics.p_color(255,0,0, 255);
      PDSE.Graphics.drawHorLine(0, PDSE.Y - this.Ascent + this.Height, PDSE.X - 30, PDSE.X + this.Width + 30 , 1);*/
@@ -2435,11 +2435,20 @@ ParaMath.prototype.Cursor_MoveToEndPos = function(SelectFromEnd)
 
 ParaMath.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd, Flag) // получить логическую позицию по XY
 {
+    var Result = false;
 
-    var Result = this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
+    var CurX = SearchPos.CurX;
 
-    if(SearchPos.InText)
-        SearchPos.DiffX  = 0.001; // чтобы всегда встать в формулу, если попали в текст
+    if(SearchPos.X > SearchPos.CurX) // еобходимая проверка, если случайно пришла ф-ия поиска позиции, без этой проверки будет некорректно выполнен поиск (если внутри формулы есть мат объекты => позиции поиска перетрутся в CMathBase)
+    {
+        Result = this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
+
+        if(SearchPos.InText)
+            SearchPos.DiffX  = 0.001; // чтобы всегда встать в формулу, если попали в текст
+    }
+
+    SearchPos.CurX = CurX + this.Root.Get_Width(_CurLine, _CurRange);
+
 
     return Result;
 };
