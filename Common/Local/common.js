@@ -174,6 +174,28 @@ window["NativeCorrectImageUrlOnPaste"] = function(url)
 	return window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
 };
 
+function InitDragAndDrop(oHtmlElement, callback) {
+	if ("undefined" != typeof(FileReader) && null != oHtmlElement) {
+		oHtmlElement["ondragover"] = function (e) {
+			e.preventDefault();
+			e.dataTransfer.dropEffect = CanDropFiles(e) ? 'copy' : 'none';
+			return false;
+		};
+		oHtmlElement["ondrop"] = function (e) {
+			e.preventDefault();
+			
+			var _files = window["AscDesktopEditor"]["GetDropFiles"]();
+			for (var i = 0; i < _files.length; i++)
+			{
+				if (window["AscDesktopEditor"]["IsImageFile"](_files[i]))
+				{
+					window["DesktopOfflineAppDocumentAddImageEnd"](_files[i]);
+				}
+			}
+		};
+	}
+}
+
 // меняем среду
 AscBrowser.isSafari = false;
 AscBrowser.isSafariMacOs = false;
