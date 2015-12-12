@@ -198,31 +198,7 @@ CFraction.prototype.drawSkewedFraction = function(PDSE)
         yy2 = Y + y2;
     }
 
-    if(PDSE.Graphics.Start_Command) // textArt
-    {
-        this.drawFractionalLine(PDSE, xx1, yy1, xx2, yy2);
-    }
-    else // чтобы линии были четкие как и раньше, рисуем линию заданной толщины (не в textArt)
-    {
-        var penW = mgCtrPrp.FontSize*0.0211;
-
-        var intGrid = PDSE.Graphics.GetIntegerGrid();
-        PDSE.Graphics.SetIntegerGrid(true);
-
-        PDSE.Graphics.SetFont(mgCtrPrp);
-
-        PDSE.Graphics.p_width(penW*1000);
-
-        this.Make_ShdColor(PDSE, this.Get_CompiledCtrPrp());
-        PDSE.Graphics._s();
-        PDSE.Graphics._m(xx1, yy1);
-        PDSE.Graphics._l(xx2, yy2);
-        PDSE.Graphics.ds();
-
-        PDSE.Graphics.SetIntegerGrid(intGrid);
-
-        PDSE.Graphics._s();
-    }
+    this.drawFractionalLine(PDSE, xx1, yy1, xx2, yy2);
 
     CFraction.superclass.Draw_Elements.call(this, PDSE);
 };
@@ -240,31 +216,7 @@ CFraction.prototype.drawLinearFraction = function(PDSE)
         x2 = X + this.elements[0][0].size.width + shift,
         y2 = Y + this.size.height;
 
-    if(PDSE.Graphics.Start_Command) // textArt
-    {
-        this.drawFractionalLine(PDSE, x1, y1, x2, y2);
-    }
-    else // чтобы линии были четкие как и раньше, рисуем линию заданной толщины (не в textArt)
-    {
-        var mgCtrPrp = this.Get_TxtPrControlLetter();
-        var penW = mgCtrPrp.FontSize*0.0211;
-
-        var intGrid = PDSE.Graphics.GetIntegerGrid();
-        PDSE.Graphics.SetIntegerGrid(true);
-        PDSE.Graphics.SetFont(mgCtrPrp);
-        PDSE.Graphics.p_width(penW*1000);
-
-        this.Make_ShdColor(PDSE, this.Get_CompiledCtrPrp());
-
-        PDSE.Graphics._s();
-        PDSE.Graphics._m(x1, y1);
-        PDSE.Graphics._l(x2, y2);
-        PDSE.Graphics.ds();
-
-        PDSE.Graphics.SetIntegerGrid(intGrid);
-
-        PDSE.Graphics._s();
-    }
+    this.drawFractionalLine(PDSE, x1, y1, x2, y2);
 
     CFraction.superclass.Draw_Elements.call(this, PDSE);
 };
@@ -280,28 +232,43 @@ CFraction.prototype.drawFractionalLine = function(PDSE, x1, y1, x2, y2)
     this.Make_ShdColor(PDSE, this.Get_CompiledCtrPrp());
     PDSE.Graphics._s();
 
-    var sideY = y2 - y1,
-        sideX = x1 - x2;
+    if(PDSE.Graphics.Start_Command)  // textArt
+    {
+        var sideY = y2 - y1,
+            sideX = x1 - x2;
 
-    var hypoth = Math.sqrt(sideY*sideY + sideX*sideX);
+        var hypoth = Math.sqrt(sideY*sideY + sideX*sideX);
 
-    var sin = sideY/hypoth,
-        cos = sideX/hypoth;
+        var sin = sideY/hypoth,
+            cos = sideX/hypoth;
 
-    var dx = sin*penW/2, dy = cos*penW/2;
+        var dx = sin*penW/2, dy = cos*penW/2;
 
-    var xx1 = x1 - dx, yy1 = y1 - dy,
-        xx2 = x1 + dx, yy2 = y1 + dy,
-        xx3 = x2 + dx, yy3 = y2 + dy,
-        xx4 = x2 - dx, yy4 = y2 - dy;
+        var xx1 = x1 - dx, yy1 = y1 - dy,
+            xx2 = x1 + dx, yy2 = y1 + dy,
+            xx3 = x2 + dx, yy3 = y2 + dy,
+            xx4 = x2 - dx, yy4 = y2 - dy;
 
-    PDSE.Graphics._m(xx1, yy1);
-    PDSE.Graphics._l(xx2, yy2);
-    PDSE.Graphics._l(xx3, yy3);
-    PDSE.Graphics._l(xx4, yy4);
-    PDSE.Graphics._l(xx1, yy1);
+        PDSE.Graphics._m(xx1, yy1);
+        PDSE.Graphics._l(xx2, yy2);
+        PDSE.Graphics._l(xx3, yy3);
+        PDSE.Graphics._l(xx4, yy4);
+        PDSE.Graphics._l(xx1, yy1);
 
-    PDSE.Graphics.df();
+        PDSE.Graphics.df();
+    }
+    else  // чтобы линии были четкие как и раньше, рисуем линию заданной толщины (не в textArt)
+    {
+        var intGrid = PDSE.Graphics.GetIntegerGrid();
+        PDSE.Graphics.SetIntegerGrid(true);
+
+        PDSE.Graphics._s();
+        PDSE.Graphics._m(x1, y1);
+        PDSE.Graphics._l(x2, y2);
+        PDSE.Graphics.ds();
+
+        PDSE.Graphics.SetIntegerGrid(intGrid);
+    }
 
     PDSE.Graphics._s();
 };
