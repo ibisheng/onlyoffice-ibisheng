@@ -17,106 +17,139 @@ function CSignRadical()
         bHigh:          false
     };
 
-    //this.sizeTick = null;
-    //this.widthSlash = null;
 }
 CSignRadical.prototype.draw = function(x, y, pGraphics, PDSE)
 {
-    var txtPrp = this.Parent.Get_CompiledCtrPrp();
-    //var txtPrp = this.Parent.getTxtPrp();
-    var penW = txtPrp.FontSize*g_dKoef_pt_to_mm*0.042;
+    var txtPrp   = this.Parent.Get_CompiledCtrPrp();
+    var FontSize = txtPrp.FontSize;
 
-    y += penW/2 + this.gapSign; // смещаем, для отрисовки верхней линии радикала
+    var penW =  FontSize*0.01185;
 
+    var penW1 = 1.25*penW,
+        penW2 = 5.4*penW,
+        penW3 = 1.8*penW;
+
+    y += this.gapSign; // смещаем
 
     //// Tick for degree ////
-    var x1 = this.pos.x + x,
-        x2 = x1 + 0.048*txtPrp.FontSize;
 
     var Height = this.size.height - this.gapSign;
+    var sin1 = 0.456, // 0.0242/0.054
+        cos1 = 0.89,
+        tg1  = 0.512;
 
-    var y2 = this.pos.y + y + Height - this.measure.heightTick,
-        y1 = y2 + 0.0242*txtPrp.FontSize;
+    var hTick = this.pos.y + y + Height - this.measure.heightTick;
 
-    var tg =  0.048/0.0242;
-    var tX = tg*0.85*penW,
-        tY = 0.92*penW / tg;
+    var xx1 = this.pos.x + x,         yy1 = hTick + 0.03*FontSize,
+        xx2 = xx1 + penW1*sin1,       yy2 = yy1 + penW1*cos1,
+        xx3 = xx2 + 0.03*FontSize,    yy3 = tg1*(xx2 - xx3) + yy2;
 
-    var x3 = x2,
-        y3 = y2 - tY;
-    //////////////////////
+    var sin2 = 0.876,
+        tg =  1.848;
 
-    //// Tick lower ////
-
-    var sin = 0.876,
-        cos = 0.474;
-
-    var y4 = this.pos.y + y + Height - penW;
-    var y7 = y4 + penW/2*cos;
-
-
-    var x4, x7;
+    var yy4 = this.pos.y + y + Height;
+    var xx4;
+    var shift = penW1*0.2336;
 
     if( !this.measure.bHigh )
     {
-        x4 = x3 + (y4-y3)/tg;
-        x7 = x4 + penW/2*sin;
+        xx4 = xx3 + (yy4-yy3)/tg - shift;
     }
     else
     {
-        x4 = x1 + this.measure.widthSlash - penW/3*sin;
-        x7 = x1 + this.measure.widthSlash;
+        xx4 = xx1 + this.measure.widthSlash - shift;
     }
 
-    var x5 = x4 - penW*0.6*sin, y5 = y4 - penW/5,
-        x6 = x7 + penW/3*sin,   y6 = y5;
+    //// Tick for Base ////
 
-    /////////////////////
+    var xx5 = xx4 + shift,                      yy5 = yy4,
+        xx6 = xx1 + this.measure.widthSlash,    yy6 = this.pos.y + y + penW3,
+        xx7 = this.pos.x + x + this.size.width, yy7 = yy6,
+        xx8 = xx7,                              yy8 = yy7 - penW3;
 
-    /// Line for argument
+    var tg3     = (yy6 - yy5)/(xx6 - xx5);
+    var hypoth3 = Math.sqrt((xx6 - xx5)*(xx6 - xx5) + (yy6 - yy5)*(yy6 - yy5));
+    var cos3    = (xx6 - xx5)/hypoth3;
+    var sin3    = (yy5 - yy6)/hypoth3;
 
-    var x8 = x1 + this.measure.widthSlash,
-        x9 = this.pos.x + x + this.size.width;
+    var yy9 = yy8, xx9 = xx6 - penW3*sin3;
 
-    var y8 = this.pos.y + y,
-        y9 = this.pos.y + y;
+    var tg2 = (yy4 - yy3)/(xx4 - xx3);
 
-    /////////////////////
+    //  y = tg3*(x - xx9) + yy9
+    //
+    //
+    //  y = tg2*(x - xx4) + yy4 - penW2*sin2
+    //  tg2 = (yy4 - yy3)/(xx4 - xx3)
+    //  tg3*(x - xx9) + yy9 = tg2*(x - xx4) + yy4 - penW2*sin2
+    //  tg3*x - tg3*xx9 + yy9 = tg2*x - tg2*xx4 + yy4 - penW2*sin2
+    //  tg3*x - tg2*x = yy4 - penW2*sin2 - tg2*xx4 + tg3*xx9 - yy9
+    //
+    //
 
+    var xx10, yy10;
 
-    pGraphics.p_width(penW*0.8*1000);
+    if( !this.measure.bHigh )
+    {
+        xx10 = (yy4 - tg2*xx4 + tg3*xx9 - yy9 - penW2)/(tg3 - tg2);
+        yy10 = tg3*(xx10 - xx9) + yy9;
+    }
+    else
+    {
+        xx10 = xx9;
+        yy10 = tg2*(xx10 - xx4) + yy4 - penW2*sin2;
+    }
 
-    this.Parent.Make_ShdColor(PDSE, txtPrp);
-    //pGraphics.p_color(0,0,0, 255);
+    var yy11 =  hTick;
+    var xx11 = (yy11 - yy4 + penW2)/tg2 + xx4;
 
-    pGraphics._s();
-    pGraphics._m(x1, y1);
-    pGraphics._l(x2, y2);
-    pGraphics.ds();
+    var mgCtrPrp = this.Parent.Get_TxtPrControlLetter();
 
+    PDSE.Graphics.SetFont(mgCtrPrp);
 
-    pGraphics.p_width(1.7*penW*1000);
-    pGraphics._s();
-    pGraphics._m(x3, y3);
-    pGraphics._l(x4, y4);
-    pGraphics.ds();
+    this.Parent.Make_ShdColor(PDSE, this.Parent.Get_CompiledCtrPrp());
+    PDSE.Graphics._s();
 
-    pGraphics.p_width(penW*1000);
+    if(PDSE.Graphics.Start_Command)
+    {
+        PDSE.Graphics.p_width(0); // в pGraphics выставится ширина равная 1 px
 
-    pGraphics._s();
-    pGraphics._m(x5, y5);
-    pGraphics._l(x6, y6);
-    pGraphics.ds();
+        PDSE.Graphics._m(xx1,  yy1);
+        PDSE.Graphics._l(xx2,  yy2);
+        PDSE.Graphics._l(xx3,  yy3);
+        PDSE.Graphics._l(xx4,  yy4);
+        PDSE.Graphics._l(xx5,  yy5);
+        PDSE.Graphics._l(xx6,  yy6);
+        PDSE.Graphics._l(xx7,  yy7);
+        PDSE.Graphics._l(xx8,  yy8);
+        PDSE.Graphics._l(xx9,  yy9);
+        PDSE.Graphics._l(xx10, yy10);
+        PDSE.Graphics._l(xx11, yy11);
+        PDSE.Graphics._l(xx1,  yy1);
 
+        PDSE.Graphics.df();
+    }
+    else // чтобы линии были четкие не в WordArt, рисуем знак радикала по заданному пути линиями нужной толщины
+    {
+        var intGrid = pGraphics.GetIntegerGrid();
+        pGraphics.SetIntegerGrid(true);             // для того чтобы линии были отрисованы четко (неразмыто)
 
-    pGraphics.p_width(penW*1000);
-    pGraphics._s();
-    pGraphics._m(x7, y7);
-    pGraphics._l(x8, y8);
-    pGraphics._l(x9, y9);
-    pGraphics.ds();
+        pGraphics.p_width(penW3*1000);
 
-    pGraphics._s();
+        PDSE.Graphics._m(xx2,  yy2);
+        PDSE.Graphics._l(xx3,  yy3);
+        PDSE.Graphics._l(xx4,  yy4);
+        PDSE.Graphics._l(xx5,  yy5);
+        PDSE.Graphics._l(xx6,  yy6);
+        PDSE.Graphics._l(xx7,  yy7);
+
+        PDSE.Graphics.ds();
+
+        pGraphics.SetIntegerGrid(intGrid);
+    }
+
+    PDSE.Graphics._s();
+
 };
 CSignRadical.prototype.recalculateSize = function(oMeasure, sizeArg)
 {
