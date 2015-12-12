@@ -110,7 +110,7 @@ CSignRadical.prototype.draw = function(x, y, pGraphics, PDSE)
     this.Parent.Make_ShdColor(PDSE, this.Parent.Get_CompiledCtrPrp());
     PDSE.Graphics._s();
 
-    if(PDSE.Graphics.Start_Command)
+    if(PDSE.Graphics.Start_Command) // textArt
     {
         PDSE.Graphics.p_width(0); // в pGraphics выставится ширина равная 1 px
 
