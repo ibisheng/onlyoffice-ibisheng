@@ -415,7 +415,6 @@ var editor;
 
   spreadsheet_api.prototype.asc_Copy = function() {
     if (window["AscDesktopEditor"]) {
-      window["AscDesktopEditorButtonMode"] = true;
 
       var _e = {};
       _e.ctrlKey = true;
@@ -423,8 +422,6 @@ var editor;
       _e.which = 67;
 
       this.controller._onWindowKeyDown(_e);
-
-      window["AscDesktopEditorButtonMode"] = false;
 
       return;
     }
@@ -436,7 +433,6 @@ var editor;
 
   spreadsheet_api.prototype.asc_Paste = function() {
     if (window["AscDesktopEditor"]) {
-      window["AscDesktopEditorButtonMode"] = true;
 
       var _e = {};
       _e.ctrlKey = true;
@@ -444,8 +440,6 @@ var editor;
       _e.which = 86;
 
       this.controller._onWindowKeyDown(_e);
-
-      window["AscDesktopEditorButtonMode"] = false;
 
       return;
     }
@@ -457,7 +451,6 @@ var editor;
 
   spreadsheet_api.prototype.asc_Cut = function() {
     if (window["AscDesktopEditor"]) {
-      window["AscDesktopEditorButtonMode"] = true;
 
       var _e = {};
       _e.ctrlKey = true;
@@ -465,8 +458,6 @@ var editor;
       _e.which = 88;
 
       this.controller._onWindowKeyDown(_e);
-
-      window["AscDesktopEditorButtonMode"] = false;
 
       return;
     }

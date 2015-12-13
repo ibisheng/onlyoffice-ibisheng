@@ -200,3 +200,5 @@ function InitDragAndDrop(oHtmlElement, callback) {
 AscBrowser.isSafari = false;
 AscBrowser.isSafariMacOs = false;
 window.USER_AGENT_SAFARI_MACOS = false;
+
+window["AscDesktopEditorButtonMode"] = true;
