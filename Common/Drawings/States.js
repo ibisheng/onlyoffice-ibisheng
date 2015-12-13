@@ -117,6 +117,9 @@ StartAddNewShape.prototype =
                     if(oThis.preset === "textRect")
                     {
                         oThis.drawingObjects.selection.textSelection = shape;
+                        shape.recalculate();
+                        shape.selectionSetStart(e, x, y, 0);
+                        shape.selectionSetEnd(e, x, y, 0);
                     }
                     oThis.drawingObjects.startRecalculate();
                     oThis.drawingObjects.drawingObjects.sendGraphicObjectProps();
