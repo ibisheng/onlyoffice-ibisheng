@@ -30,6 +30,13 @@
 		DesktopOfflineUpdateLocalName(this);
 	};
 	
+	asc['spreadsheet_api'].prototype._onNeedParams = function(data) 
+	{
+		var cp = JSON.parse("{\"codepage\":46,\"delimiter\":1}");
+		cp['encodings'] = getEncodingParams();
+		this.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), c_oAscAdvancedOptionsAction.Open);
+	};
+	
 	asc['spreadsheet_api'].prototype.asc_addImageDrawingObject = function(url)
 	{
 		var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
@@ -50,6 +57,17 @@
 	  window["AscDesktopEditor"]["LocalFileGetImageUrlFromOpenFileDialog"]();
 	};
 })(jQuery, window);
+
+window["Asc"]['spreadsheet_api'].prototype.asc_setAdvancedOptions = function(idOption, option) 
+{
+	window["AscDesktopEditor"]["SetAdvancedOptions"]("" + option.asc_getCodePage(), "" + option.asc_getDelimiter());
+};
+window["Asc"]['spreadsheet_api'].prototype["asc_setAdvancedOptions"] = window["Asc"]['spreadsheet_api'].prototype.asc_setAdvancedOptions;
+
+window["asc_initAdvancedOptions"] = function()
+{	
+	window["Asc"]["editor"]._onNeedParams(undefined);
+};
 
 window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
 {

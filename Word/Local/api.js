@@ -34,6 +34,17 @@ window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
     editor._OfflineAppDocumentEndLoad(_url, _data);
 };
 
+asc_docs_api.prototype.asc_setAdvancedOptions = function(idOption, option) 
+{
+	window["AscDesktopEditor"]["SetAdvancedOptions"]("" + option.asc_getCodePage());
+};
+asc_docs_api.prototype["asc_setAdvancedOptions"] = asc_docs_api.prototype.asc_setAdvancedOptions;
+
+window["asc_initAdvancedOptions"] = function()
+{	
+	editor._onNeedParams(undefined);
+};
+
 /////////////////////////////////////////////////////////
 //////////////        CHANGES       /////////////////////
 /////////////////////////////////////////////////////////
