@@ -543,10 +543,10 @@
 
         //Set reconnectTimeout
         this._lockCallbacksErrorTimerId[idLockInArray] = window.setTimeout(function() {
-          if (t.lockCalbacks.hasOwnProperty(idLockInArray)) {
+          if (t._lockCallbacks.hasOwnProperty(idLockInArray)) {
             //Not signaled already
-            t.lockCalbacks[idLockInArray]({error: 'Timed out'});
-            delete t.lockCalbacks[idLockInArray];
+            t._lockCallbacks[idLockInArray]({error: 'Timed out'});
+            delete t._lockCallbacks[idLockInArray];
             delete t._lockCallbacksErrorTimerId[idLockInArray];
           }
         }, this.errorTimeOut);
