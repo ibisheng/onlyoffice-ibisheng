@@ -1739,6 +1739,9 @@ CMathContent.prototype.private_UpdatePosOnRemove = function(Pos, Count)
             else if (this.Selection.EndPos > Pos)
                 this.Selection.EndPos = Pos;
         }
+
+        this.Selection.StartPos = Math.min(this.Content.length - 1, Math.max(0, this.Selection.StartPos));
+        this.Selection.EndPos   = Math.min(this.Content.length - 1, Math.max(0, this.Selection.EndPos));
     }
 
     // Обновляем позиции в NearestPos
@@ -1993,7 +1996,10 @@ CMathContent.prototype.Load_Changes = function(Reader)
                 var Element = g_oTableId.Get_ById( Reader.GetString2() );
 
                 if ( null != Element )
+                {
                     this.Content.splice(Pos, 0, Element);
+                    CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
+                }
             }
 
             break;
@@ -2009,6 +2015,7 @@ CMathContent.prototype.Load_Changes = function(Reader)
             {
                 var ChangesPos = Reader.GetLong();
                 this.Content.splice(ChangesPos, 1);
+                CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
             }
 
             break;

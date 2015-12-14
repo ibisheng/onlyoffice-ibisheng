@@ -2936,7 +2936,14 @@ ParaMath.prototype.Set_ReviewType = function(ReviewType, RemovePrChange)
 {
     return this.Root.Set_ReviewType(ReviewType, RemovePrChange);
 };
-
+ParaMath.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+{
+    return this.Root.Set_ContentSelection(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag);
+};
+ParaMath.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
+{
+    return this.Root.Set_ContentPosition(DocPos, Depth, Flag);
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Классы с изменениями
 //----------------------------------------------------------------------------------------------------------------------

@@ -77,7 +77,7 @@ CParagraphContentWithContentBase.prototype.protected_GetRangesCount = function(L
 };
 
 // Здесь предполагается, что строки с номерами меньше, чем LineIndex заданы, а также заданы и отрезки в строке 
-// LineIndex, с номерами меньшими, чем RangeIndex. В данной функции удаляются все записи, которые идут после LineIndex, 
+// LineIndex, с номерами меньшими, чем RangeIndex. В данной функции удаляются все записи, которые идут после LineIndex,
 // RangeIndex. Т.е. удаляются все строки, с номерами больше, чем LineIndex, и в строке LineIndex удаляются все отрезки 
 // с номерами больше, чем RangeIndex. Возвращается позиция предпоследнего отрезка, либо 0.
 CParagraphContentWithContentBase.prototype.protected_AddRange = function(LineIndex, RangeIndex)
@@ -573,6 +573,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove_FromContent = functio
                 else if (this.State.Selection.EndPos > Pos)
                     this.State.Selection.EndPos = Pos;
             }
+
+            this.Selection.StartPos = Math.min(this.Content.length - 1, Math.max(0, this.Selection.StartPos));
+            this.Selection.EndPos   = Math.min(this.Content.length - 1, Math.max(0, this.Selection.EndPos));
         }
 
         // Также передвинем всем метки переносов страниц и строк
@@ -2055,6 +2058,11 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_ContentPosition = functi
     }
 
     this.State.ContentPos = Math.max(0, Math.min(this.Content.length - 1, Pos));
+
+    // TODO: Как только в CMathContent CurPos перейдет на стандартное this.State.ContentPos убрать эту проверку
+    if (this.CurPos)
+        this.CurPos = this.State.ContentPos;
+
     if (this.Content[Pos] && this.Content[Pos].Set_ContentPosition)
         this.Content[Pos].Set_ContentPosition(_DocPos, Depth + 1, _Flag);
     else
