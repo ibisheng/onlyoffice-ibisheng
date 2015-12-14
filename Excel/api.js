@@ -1810,8 +1810,10 @@ var editor;
     var copyWorksheet = function(res) {
       if (res) {
         t.wb._initCommentsToSave();
-        t.wbModel.copyWorksheet(i, where, newName);
+        // ToDo перейти от wsViews на wsViewsId (сейчас вызываем раньше, чем в модели, т.к. там будет sortDependency
+        // и cleanCellCache, который создаст уже скопированный лист(и splice сработает неправильно))
         t.wb.copyWorksheet(i, where);
+        t.wbModel.copyWorksheet(i, where, newName);
         // Делаем активным скопированный
         t.asc_showWorksheet(where);
         t.asc_setZoom(scale);
