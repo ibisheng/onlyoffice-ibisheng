@@ -150,6 +150,7 @@ asc_docs_api.prototype['Share'] = asc_docs_api.prototype.Share;
 asc_docs_api.prototype['asc_Save'] = asc_docs_api.prototype.asc_Save;
 asc_docs_api.prototype['asc_DownloadAs'] = asc_docs_api.prototype.asc_DownloadAs;
 asc_docs_api.prototype['asc_DownloadAsMailMerge'] = asc_docs_api.prototype.asc_DownloadAsMailMerge;
+asc_docs_api.prototype['asc_DownloadOrigin'] = asc_docs_api.prototype.asc_DownloadOrigin;
 asc_docs_api.prototype['Resize'] = asc_docs_api.prototype.Resize;
 asc_docs_api.prototype['AddURL'] = asc_docs_api.prototype.AddURL;
 asc_docs_api.prototype['Help'] = asc_docs_api.prototype.Help;

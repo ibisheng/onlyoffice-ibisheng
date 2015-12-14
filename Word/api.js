@@ -1694,15 +1694,18 @@ asc_docs_api.prototype.asc_Print = function(bIsDownloadEvent)
             return;
         }
     }
+    this._print(c_oAscAsyncAction.Print, bIsDownloadEvent ? DownloadType.Print: DownloadType.None);
+};
+asc_docs_api.prototype._print = function(actionType, downloadType) {
   var command;
-  var options = {isNoData: false, downloadType: bIsDownloadEvent ? DownloadType.Print: DownloadType.None};
+  var options = {isNoData: false, downloadType: downloadType};
   if (null == this.WordControl.m_oLogicDocument) {
     command = 'savefromorigin';
     options.isNoData = true;
   } else {
     command = 'save';
   }
-  _downloadAs(this, command, c_oAscFileType.PDF, c_oAscAsyncAction.Print, options, null);
+  _downloadAs(this, command, c_oAscFileType.PDF, actionType, options, null);
 };
 asc_docs_api.prototype.Undo = function()
 {
@@ -1849,7 +1852,11 @@ asc_docs_api.prototype.asc_Save = function(isAutoSave) {
     this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
   }
 };
-
+asc_docs_api.prototype.asc_DownloadOrigin = function(bIsDownloadEvent) {
+    //скачивание оригинального pdf, djvu, xps
+    //todo реализовать не через print
+    this._print(c_oAscAsyncAction.DownloadAs, bIsDownloadEvent ? DownloadType.Download: DownloadType.None);
+};
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) {//передаем число соответствующее своему формату.
 	var actionType = this.mailMergeFileData ? c_oAscAsyncAction.MailMergeLoadFile : c_oAscAsyncAction.DownloadAs;
     var options = {downloadType: bIsDownloadEvent ? DownloadType.Download: DownloadType.None};
