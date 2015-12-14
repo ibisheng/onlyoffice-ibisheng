@@ -766,7 +766,7 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.RecalcId   = 0; // Номер пересчета
     this.FullRecalc = new CDocumentRecalculateState();
     
-    this.TurnOffRecalc          = false;
+    this.TurnOffRecalc          = 0;
     this.TurnOffInterfaceEvents = false;
     this.TurnOffRecalcCurPos    = false;
 
@@ -1195,7 +1195,7 @@ CDocument.prototype =
      */
     TurnOff_Recalculate : function()
     {
-        this.TurnOffRecalc = true;
+        this.TurnOffRecalc++;
     },
 
     /**
@@ -1205,10 +1205,18 @@ CDocument.prototype =
      */
     TurnOn_Recalculate : function(bRecalculate)
     {
-        this.TurnOffRecalc = false;
+        this.TurnOffRecalc--;
 
         if (bRecalculate)
             this.Recalculate();
+    },
+
+    Is_OnRecalculate : function()
+    {
+        if (0 === this.TurnOffRecalc)
+            return true;
+
+        return false;
     },
 
     // Пересчет содержимого Документа
@@ -1216,7 +1224,7 @@ CDocument.prototype =
     {
         StartTime = new Date().getTime();
 
-        if ( true === this.TurnOffRecalc )
+        if (true !== this.Is_OnRecalculate())
             return;
 
         // Останавливаем поиск
@@ -3600,7 +3608,7 @@ CDocument.prototype =
             }
 
             // Специальная заглушка для функции TextBox_Put
-            if ( true != this.TurnOffRecalc )
+            if (true === this.Is_OnRecalculate())
                 this.Document_UpdateUndoRedoState();
         }
     },

@@ -72,11 +72,11 @@ asc_docs_api.prototype["Call_CalculateResume"] = function()
 
 asc_docs_api.prototype["Call_TurnOffRecalculate"] = function()
 {
-    this.WordControl.m_oLogicDocument.TurnOffRecalc = true;
+    this.WordControl.m_oLogicDocument.TurnOff_Recalculate();
 };
 asc_docs_api.prototype["Call_TurnOnRecalculate"] = function()
 {
-    this.WordControl.m_oLogicDocument.TurnOffRecalc = false;
+    this.WordControl.m_oLogicDocument.TurnOn_Recalculate();
     this.WordControl.m_oLogicDocument.Recalculate();
 };
 

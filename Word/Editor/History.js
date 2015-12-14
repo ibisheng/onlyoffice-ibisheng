@@ -565,7 +565,7 @@ CHistory.prototype =
     {
         // Не объединяем точки в истории, когда отключается пересчет.
         // TODO: Неправильно изменяется RecalcIndex
-        if (true === this.Document.TurnOffRecalc)
+        if (true !== this.Document.Is_OnRecalculate())
             return;
 
         // Не объединяем точки истории, если на предыдущей точке произошло сохранение
