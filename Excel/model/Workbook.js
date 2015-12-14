@@ -5958,7 +5958,9 @@ Range.prototype._setPropertyNoEmpty=function(actionRow, actionCol, actionCell){
 	else
 	{
 		var oRes = this._foreachRowNoEmpty(actionRow, actionCell);
-		if(null != oRes && null != actionCol)
+		if(null != oRes)
+			return oRes;
+		if(null != actionCol)
 			oRes = this._foreachColNoEmpty(actionCol, null);
 		return oRes;
 	}
