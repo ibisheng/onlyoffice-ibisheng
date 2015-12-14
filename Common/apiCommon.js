@@ -3150,6 +3150,7 @@ function CorrectUniFill(asc_fill, unifill, editorId)
                         ret.fill.lin.angle = _angle;
                     if (undefined != _scale)
                         ret.fill.lin.scale = _scale;
+                    ret.fill.path = null;
                 }
                 else if (c_oAscFillGradType.GRAD_PATH == _grad_type)
                 {
