@@ -2764,7 +2764,7 @@ CPattFill.prototype =
             return false;
         }
 
-        return this.fgClr.IsIdentical(fill.fgClr) && this.bgClr.IsIdentical(fill.bgClr);
+        return this.fgClr.IsIdentical(fill.fgClr) && this.bgClr.IsIdentical(fill.bgClr) &&  this.ftype === fill.ftype;
     },
 
     createDuplicate : function()
