@@ -139,6 +139,11 @@ window["DesktopOfflineAppDocumentEndSave"] = function(isCancel)
 	if (isCancel !== true)
 		DesktopOfflineUpdateLocalName(editor);
 };
+asc_docs_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) 
+{
+	editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+	window["AscDesktopEditor"]["LocalFileSave"](true);
+};
 
 asc_docs_api.prototype.AddImageUrl = function(url, imgProp)
 {
@@ -162,6 +167,7 @@ asc_docs_api.prototype["asc_addImage"] = asc_docs_api.prototype.asc_addImage;
 asc_docs_api.prototype["AddImageUrl"] = asc_docs_api.prototype.AddImageUrl;
 asc_docs_api.prototype["AddImage"] = asc_docs_api.prototype.AddImage;
 asc_docs_api.prototype["asc_Save"] = asc_docs_api.prototype.asc_Save;
+asc_docs_api.prototype["asc_DownloadAs"] = asc_docs_api.prototype.asc_DownloadAs;
 asc_docs_api.prototype["asc_isOffline"] = asc_docs_api.prototype.asc_isOffline;
 
 window["DesktopOfflineAppDocumentAddImageEnd"] = function(url)

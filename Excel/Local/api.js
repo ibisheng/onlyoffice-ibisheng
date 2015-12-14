@@ -152,6 +152,11 @@ window["Asc"]['spreadsheet_api'].prototype.asc_Save = function (isNoUserSave)
 			window["DesktopOfflineAppDocumentStartSave"]();
 	}
 };
+window["Asc"]['spreadsheet_api'].asc_DownloadAs = function(typeFile, bIsDownloadEvent) 
+{
+	window["Asc"]["editor"].sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+	window["AscDesktopEditor"]["LocalFileSave"](true);
+};
 
 window["Asc"]['spreadsheet_api'].prototype.asc_isOffline = function()
 {
@@ -173,6 +178,7 @@ window["DesktopOfflineAppDocumentEndSave"] = function(isCancel)
 window["Asc"]['spreadsheet_api'].prototype["asc_addImageDrawingObject"] = window["Asc"]['spreadsheet_api'].prototype.asc_addImageDrawingObject;
 window["Asc"]['spreadsheet_api'].prototype["asc_showImageFileDialog"] = window["Asc"]['spreadsheet_api'].prototype.asc_showImageFileDialog;
 window["Asc"]['spreadsheet_api'].prototype["asc_Save"] = window["Asc"]['spreadsheet_api'].prototype.asc_Save;
+window["Asc"]['spreadsheet_api'].prototype["asc_DownloadAs"] = window["Asc"]['spreadsheet_api'].prototype.asc_DownloadAs;
 window["Asc"]['spreadsheet_api'].prototype["asc_isOffline"] = window["Asc"]['spreadsheet_api'].prototype.asc_isOffline;
 
 window["DesktopOfflineAppDocumentAddImageEnd"] = function(url)
