@@ -2076,8 +2076,6 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
 			}
 			newSheet._BuildDependencies(cwf.cells);
 		}
-
-		sortDependency(this);
 		History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetAdd, null, null, new UndoRedoData_SheetAdd(insertBefore, newSheet.getName(), wsFrom.getId(), newSheet.getId()));
 		History.SetSheetUndo(wsActive.getId());
 		History.SetSheetRedo(newSheet.getId());
@@ -2085,6 +2083,7 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
         {
             wsFrom.copyDrawingObjects(newSheet, wsFrom);
         }
+        sortDependency(this);
 	}
 };
 Workbook.prototype.insertWorksheet = function (index, sheet, cwf) {

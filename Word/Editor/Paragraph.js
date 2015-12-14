@@ -108,7 +108,10 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
         this.LogicDocument   = bFromPresentation ? null : this.DrawingDocument.m_oLogicDocument;
         this.bFromDocument   = bFromPresentation === true ? false : !!this.LogicDocument;
     }   
-
+    else
+    {
+        this.bFromDocument = !(true === bFromPresentation);
+    }
     this.ApplyToAll = false; // Специальный параметр, используемый в ячейках таблицы.
     // True, если ячейка попадает в выделение по ячейкам.
 
