@@ -36,6 +36,8 @@ function baseEditorsApi(name) {
 
   // Тип состояния на данный момент (сохранение, открытие или никакое)
   this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+  // Тип скачивания файлы(download или event).нужен для txt, csv. запоминаем на asc_DownloadAs используем asc_setAdvancedOptions
+  this.downloadType = DownloadType.None;
   this.OpenDocumentProgress = new COpenProgress();
   this.documentOrigin = ''; // ToDo скорее всего лишняя переменная и можно обойтись и без нее
 

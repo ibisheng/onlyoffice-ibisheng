@@ -588,7 +588,9 @@ var editor;
 
           sendCommand2(this, null, v);
         } else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save) {
-          this._asc_downloadAs(c_oAscFileType.CSV, c_oAscAsyncAction.DownloadAs, {CSVOptions: option});
+          var options = {CSVOptions: option, downloadType: this.downloadType};
+          this.downloadType = DownloadType.None;
+          this._asc_downloadAs(c_oAscFileType.CSV, c_oAscAsyncAction.DownloadAs, options);
         }
         break;
     }
@@ -718,6 +720,7 @@ var editor;
         this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
       }
       var cp = {'delimiter': c_oAscCsvDelimiter.Comma, 'codepage': c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
+      this.downloadType = options.downloadType;
       this.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), this.advancedOptionsAction);
       return;
     } else {

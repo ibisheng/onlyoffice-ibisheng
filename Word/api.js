@@ -1888,7 +1888,8 @@ asc_docs_api.prototype.asc_setAdvancedOptions = function(idOption, option) {
           };
           sendCommand2(t, null, rData);
       } else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save) {
-          var options = {txtOptions: option};
+          var options = {txtOptions: option, downloadType: this.downloadType};
+          this.downloadType = DownloadType.None;
           _downloadAs(t, "save", c_oAscFileType.TXT, c_oAscAsyncAction.DownloadAs, options, null);
       }
       break;
@@ -6268,6 +6269,7 @@ function _downloadAs(editor, command, filetype, actionType, options, fCallbackRe
 			editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 		}
 		var cp = {'codepage': c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
+		editor.downloadType = options.downloadType;
 		editor.asc_fireCallback("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), editor.advancedOptionsAction);
 		return;
 	} else if (c_oAscFileType.HTML === filetype && null == options.oDocumentMailMerge && null == options.oMailMergeSendData) {
