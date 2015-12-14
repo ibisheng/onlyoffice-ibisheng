@@ -3078,8 +3078,7 @@ ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
             case para_Math_BreakOperator:
             {
                 ContentMetrics.UpdateMetrics(Item.size);
-
-                UpdateLineMetricsText = true;
+                
                 break;
             }
             case para_Space:
