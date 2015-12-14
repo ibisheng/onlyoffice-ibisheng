@@ -154,12 +154,13 @@ CHistory.prototype.Can_Redo = function()
 {
 	return this.Points.length > 0 && this.Index < this.Points.length - 1;
 };
-
+/** @returns {boolean} */
 CHistory.prototype.Undo = function()
 {
-	// Проверяем можно ли сделать Undo
-	if ( true != this.Can_Undo() )
-		return;
+  // Проверяем можно ли сделать Undo
+  if (true !== this.Can_Undo()) {
+    return false;
+  }
 
 	if (this.Index === this.Points.length - 1)
 		this.LastState = this.workbook.handlers.trigger("getSelectionState");
@@ -179,6 +180,7 @@ CHistory.prototype.Undo = function()
 		this._addRedoObjectParam(oRedoObjectParam, Item);
 	}
 	this.UndoRedoEnd(Point, oRedoObjectParam, true);
+  return true;
 };
 CHistory.prototype.UndoRedoPrepare = function (oRedoObjectParam, bUndo) {
 	if (this.Is_On()) {

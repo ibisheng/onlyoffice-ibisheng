@@ -1747,7 +1747,9 @@
 
 		WorkbookView.prototype.undo = function () {
 			if (!this.controller.isCellEditMode) {
-				History.Undo();
+				if (!History.Undo() && this.collaborativeEditing.getFast() && this.collaborativeEditing.getCollaborativeEditing()) {
+          this.Api.sync_TryUndoInFastCollaborative();
+        }
 			} else {
 				this.cellEditor.undo();
 			}
