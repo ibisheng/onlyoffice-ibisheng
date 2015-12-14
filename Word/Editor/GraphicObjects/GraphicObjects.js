@@ -1189,7 +1189,16 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            content.Add_InlineImage(W, H, Img, Chart, bFlow );
+            if(!content.bPresentation){
+                content.Add_InlineImage(W, H, Img, Chart, bFlow );
+            }
+            else{
+                if(this.selectedObjects.length > 0)
+                {
+                    this.resetSelection2();
+                    this.document.Add_InlineImage(W, H, Img, Chart, bFlow );
+                }
+            }
         }
         else
         {
