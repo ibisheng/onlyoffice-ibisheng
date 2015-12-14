@@ -136,8 +136,6 @@ CHeaderProp.prototype.get_Locked = function() { return this.Locked; };
 
 // [!dirty hack for minimizer - don't delete this comment!] function CStylesPainter ()
 // [!dirty hack for minimizer - don't delete this comment!] function CFont ()
-CStylesPainter.prototype.get_DefaultStylesImage = function() { return this.defaultStylesImage; };
-CStylesPainter.prototype.get_DocStylesImage = function() { return this.docStylesImage; };
 CStylesPainter.prototype.get_MergedStyles = function() { return this.mergedStyles; };
 CStylesPainter.prototype.get_STYLE_THUMBNAIL_WIDTH = function() { return this.STYLE_THUMBNAIL_WIDTH; };
 CStylesPainter.prototype.get_STYLE_THUMBNAIL_HEIGHT = function() { return this.STYLE_THUMBNAIL_HEIGHT; };
@@ -1933,7 +1931,7 @@ asc_docs_api.prototype.processSavedFile = function(url, downloadType) {
       }
     });
 	} else {
-    asc_docs_api.superclass.constructor.prototype.processSavedFile.call(this, url, downloadType);
+    asc_docs_api.superclass.processSavedFile.call(this, url, downloadType);
 	}
 };
 asc_docs_api.prototype.startGetDocInfo = function(){

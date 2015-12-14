@@ -1358,7 +1358,7 @@
 					// ToDo Возможно стоит переписать немного, чтобы не пробегать каждый раз по массиву custom-стилей (нужно генерировать AllStyles)
 					oCustomStyle = cellStylesAll.getCustomStyleByBuiltinId(oStyle.BuiltinId);
 
-					this.defaultStyles[i] = new CStyleImage(oStyle.Name, styleIndex, c_oAscStyleImage.Default);
+					this.defaultStyles[i] = new CStyleImage(oStyle.Name, c_oAscStyleImage.Default);
                     this.native.BeginDrawDefaultStyle(oStyle.Name, styleIndex);
 					this.drawStyle(oGraphics, stringRenderer, oCustomStyle || oStyle, oStyle.Name, styleIndex);
                     this.native.EndDrawStyle();
@@ -1382,7 +1382,7 @@
 					oStyle = cellStyles[i];
 					if (oStyle.Hidden || null != oStyle.BuiltinId)
 						continue;
-					this.docStyles[styleIndex] = new CStyleImage(oStyle.Name, styleIndex, c_oAscStyleImage.Document);
+					this.docStyles[styleIndex] = new CStyleImage(oStyle.Name, c_oAscStyleImage.Document);
                     this.native.BeginDrawDocumentStyle(oStyle.Name, styleIndex);
 					this.drawStyle(oGraphics, stringRenderer, oStyle, oStyle.Name, styleIndex);
                     this.native.EndDrawStyle();

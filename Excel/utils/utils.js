@@ -1314,152 +1314,85 @@
 		}
 
 
-		/** @constructor */
-		function asc_CStylesPainter() {
-			// base64 defaultStyles image
-			this.defaultStylesImage = "";
-			this.defaultStyles = null;
+    /** @constructor */
+    function asc_CStylesPainter() {
+      this.defaultStyles = null;
+      this.docStyles = null;
 
-			// base64 docStyles image
-			this.docStylesImage = "";
-			this.docStyles = null;
+      this.styleThumbnailWidth = 112;
+      this.styleThumbnailHeight = 38;
+      this.styleThumbnailWidthPt = this.styleThumbnailWidth * 72 / 96;
+      this.styleThumbnailHeightPt = this.styleThumbnailHeight * 72 / 96;
 
-			this.styleThumbnailWidth	= 112;
-			this.styleThumbnailHeight	= 38;
-			this.styleThumbnailWidthPt	= this.styleThumbnailWidth * 72 / 96;
-			this.styleThumbnailHeightPt	= this.styleThumbnailHeight * 72 / 96;
+      this.styleThumbnailWidthWithRetina = this.styleThumbnailWidth;
+      this.styleThumbnailHeightWithRetina = this.styleThumbnailHeight;
+      if (AscBrowser.isRetina) {
+        this.styleThumbnailWidthWithRetina <<= 1;
+        this.styleThumbnailHeightWithRetina <<= 1;
+      }
+    }
 
-			this.styleThumbnailWidthWithRetina	= this.styleThumbnailWidth;
-			this.styleThumbnailHeightWithRetina	= this.styleThumbnailHeight;
-			if (AscBrowser.isRetina) {
-				this.styleThumbnailWidthWithRetina <<= 1;
-				this.styleThumbnailHeightWithRetina <<= 1;
-			}
-		}
+    asc_CStylesPainter.prototype = {
+      constructor: asc_CStylesPainter,
+      asc_getStyleThumbnailWidth: function() {
+        return this.styleThumbnailWidthWithRetina;
+      },
+      asc_getStyleThumbnailHeight: function() {
+        return this.styleThumbnailHeightWithRetina;
+      },
+      asc_getDefaultStyles: function() {
+        return this.defaultStyles;
+      },
+      asc_getDocStyles: function() {
+        return this.docStyles;
+      },
+      generateStylesAll: function(cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
+        this.generateDefaultStyles(cellStylesAll, fmgrGraphics, oFont, stringRenderer);
+        this.generateDocumentStyles(cellStylesAll, fmgrGraphics, oFont, stringRenderer);
+      },
+      generateDefaultStyles: function(cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
+        var cellStyles = cellStylesAll.DefaultStyles;
 
-		asc_CStylesPainter.prototype = {
-			constructor: asc_CStylesPainter,
-			asc_getStyleThumbnailWidth: function () { return this.styleThumbnailWidthWithRetina; },
-			asc_getStyleThumbnailHeight: function () { return this.styleThumbnailHeightWithRetina; },
-			asc_getDefaultStyles: function () { return this.defaultStyles; },
-			asc_getDocStyles: function () { return this.docStyles; },
-			asc_getDefaultStylesImage: function () { return this.defaultStylesImage; },
-			asc_getDocStylesImage: function () { return this.docStylesImage; },
-			generateStylesAll: function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
-				this.generateDefaultStyles(cellStylesAll, fmgrGraphics, oFont, stringRenderer);
-				this.generateDocumentStyles(cellStylesAll, fmgrGraphics, oFont, stringRenderer);
-			},
-			generateDefaultStyles: function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
-				var nDefaultStylesCount = cellStylesAll.getDefaultStylesCount();
-				var cellStyles = cellStylesAll.DefaultStyles;
-				var nLength = cellStyles.length;
-				var oCanvas = document.createElement('canvas');
-				oCanvas.width = this.styleThumbnailWidthWithRetina;
-				oCanvas.height = nDefaultStylesCount * this.styleThumbnailHeightWithRetina;
-				var oGraphics = new asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+        var oCanvas = document.createElement('canvas');
+        oCanvas.width = this.styleThumbnailWidthWithRetina;
+        oCanvas.height = this.styleThumbnailHeightWithRetina;
+        var oGraphics = new asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
-        // ToDo оставить один, когда меню добавит обработку (нарезаем по одной картинке)
-        var oCanvas2 = document.createElement('canvas');
-        oCanvas2.width = this.styleThumbnailWidthWithRetina;
-        oCanvas2.height = this.styleThumbnailHeightWithRetina;
-        var oGraphics2 = new asc.DrawingContext({canvas: oCanvas2, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+        var oStyle, oCustomStyle;
+        this.defaultStyles = [];
+        for (var i = 0; i < cellStyles.length; ++i) {
+          oStyle = cellStyles[i];
+          if (oStyle.Hidden) {
+            continue;
+          }
+          // ToDo Возможно стоит переписать немного, чтобы не пробегать каждый раз по массиву custom-стилей (нужно генерировать AllStyles)
+          oCustomStyle = cellStylesAll.getCustomStyleByBuiltinId(oStyle.BuiltinId);
 
-				var oStyle, oCustomStyle;
-				this.defaultStyles = [];
-				for (var i = 0, styleIndex = 0; i < nLength; ++i) {
-					oStyle = cellStyles[i];
-					if (oStyle.Hidden)
-						continue;
-					// ToDo Возможно стоит переписать немного, чтобы не пробегать каждый раз по массиву custom-стилей (нужно генерировать AllStyles)
-					oCustomStyle = cellStylesAll.getCustomStyleByBuiltinId(oStyle.BuiltinId);
+          this.drawStyle(oGraphics, stringRenderer, oCustomStyle || oStyle, oStyle.Name);
+          this.defaultStyles.push(new CStyleImage(oStyle.Name, c_oAscStyleImage.Default, oCanvas.toDataURL("image/png")));
+        }
+      },
+      generateDocumentStyles: function(cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
+        var cellStyles = cellStylesAll.CustomStyles;
 
-					this.drawStyle(oGraphics, stringRenderer, oCustomStyle || oStyle, oStyle.Name, styleIndex);
+        var oCanvas = document.createElement('canvas');
+        oCanvas.width = this.styleThumbnailWidthWithRetina;
+        oCanvas.height = this.styleThumbnailHeightWithRetina;
+        var oGraphics = new asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
-          this.drawStyle2(oGraphics2, stringRenderer, oCustomStyle || oStyle, oStyle.Name);
-          this.defaultStyles[i] = new CStyleImage(oStyle.Name, styleIndex, c_oAscStyleImage.Default, oCanvas2.toDataURL("image/png"));
-					++styleIndex;
-				}
+        var oStyle;
+        this.docStyles = [];
+        for (var i = 0; i < cellStyles.length; ++i) {
+          oStyle = cellStyles[i];
+          if (oStyle.Hidden || null != oStyle.BuiltinId) {
+            continue;
+          }
 
-				this.defaultStylesImage = (0 === styleIndex) ? "" : oCanvas.toDataURL("image/png");
-			},
-			generateDocumentStyles: function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
-				var nDocumentStylesCount = cellStylesAll.getCustomStylesCount();
-				var cellStyles = cellStylesAll.CustomStyles;
-				var nLength = cellStyles.length;
-				var oCanvas = document.createElement('canvas');
-				oCanvas.width = this.styleThumbnailWidthWithRetina;
-				oCanvas.height = nDocumentStylesCount * this.styleThumbnailHeightWithRetina;
-				var oGraphics = new asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
-
-        // ToDo оставить один, когда меню добавит обработку (нарезаем по одной картинке)
-        var oCanvas2 = document.createElement('canvas');
-        oCanvas2.width = this.styleThumbnailWidthWithRetina;
-        oCanvas2.height = this.styleThumbnailHeightWithRetina;
-        var oGraphics2 = new asc.DrawingContext({canvas: oCanvas2, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
-
-				var oStyle;
-				this.docStyles = [];
-				for (var i = 0, styleIndex = 0; i < nLength; ++i) {
-					oStyle = cellStyles[i];
-					if (oStyle.Hidden || null != oStyle.BuiltinId)
-						continue;
-					this.drawStyle(oGraphics, stringRenderer, oStyle, oStyle.Name, styleIndex);
-
-          this.drawStyle2(oGraphics2, stringRenderer, oStyle, oStyle.Name);
-          this.docStyles[styleIndex] = new CStyleImage(oStyle.Name, styleIndex, c_oAscStyleImage.Document, oCanvas2.toDataURL("image/png"));
-
-					++styleIndex;
-				}
-
-				this.docStylesImage = (0 === styleIndex) ? "" : oCanvas.toDataURL("image/png");
-			},
-			drawStyle: function (oGraphics, stringRenderer, oStyle, sStyleName, nIndex) {
-				var nOffsetY = nIndex * this.styleThumbnailHeightPt;
-
-				// Fill cell
-				var oColor = oStyle.getFill();
-				oGraphics.save().beginPath();
-				if (null !== oColor)
-					oGraphics.setFillStyle(oColor);
-				oGraphics.rect(0, nOffsetY, this.styleThumbnailWidthPt, this.styleThumbnailHeightPt).clip();
-				if (null !== oColor)
-					oGraphics.fill();
-
-				var drawBorder = function (b, x1, y1, x2, y2) {
-					if (null != b && c_oAscBorderStyles.None !== b.s) {
-						oGraphics.setStrokeStyle(b.c);
-
-						// ToDo поправить
-						oGraphics.setLineWidth(b.w).beginPath().moveTo(x1, y1).lineTo(x2, y2).stroke();
-					}
-				};
-
-				// borders
-				var oBorders = oStyle.getBorder();
-				drawBorder(oBorders.l, 0, nOffsetY, 0, nOffsetY + this.styleThumbnailHeightPt);
-				drawBorder(oBorders.r, this.styleThumbnailWidthPt, nOffsetY, this.styleThumbnailWidthPt, nOffsetY + this.styleThumbnailHeightPt);
-				drawBorder(oBorders.t, 0, nOffsetY, this.styleThumbnailWidthPt, nOffsetY);
-				drawBorder(oBorders.b, 0, nOffsetY + this.styleThumbnailHeightPt, this.styleThumbnailWidthPt, nOffsetY + this.styleThumbnailHeightPt);
-
-				// Draw text
-				var fc = oStyle.getFontColor();
-				var oFontColor = fc !== null ? fc : new CColor(0, 0, 0);
-				var format = oStyle.getFont();
-				// Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
-				var oFont = new asc.FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs,
-					format.b, format.i, format.u, format.s);
-
-				var width_padding = 3; // 4 * 72 / 96
-
-				var tm = stringRenderer.measureString(sStyleName);
-				// Текст будем рисовать по центру (в Excel чуть по другому реализовано, у них постоянный отступ снизу)
-				var textY = 0.5 * (nOffsetY + (nOffsetY + this.styleThumbnailHeightPt) - tm.height);
-				oGraphics.setFont(oFont);
-				oGraphics.setFillStyle(oFontColor);
-				oGraphics.fillText(sStyleName, width_padding, textY + tm.baseline);
-				oGraphics.restore();
-			},
-      drawStyle2: function (oGraphics, stringRenderer, oStyle, sStyleName) {
+          this.drawStyle(oGraphics, stringRenderer, oStyle, oStyle.Name);
+          this.docStyles.push(new CStyleImage(oStyle.Name, c_oAscStyleImage.Document, oCanvas.toDataURL("image/png")));
+        }
+      },
+      drawStyle: function(oGraphics, stringRenderer, oStyle, sStyleName) {
         oGraphics.clear();
         // Fill cell
         var oColor = oStyle.getFill();
@@ -1468,7 +1401,7 @@
           oGraphics.fillRect(0, 0, this.styleThumbnailWidthPt, this.styleThumbnailHeightPt);
         }
 
-        var drawBorder = function (b, x1, y1, x2, y2) {
+        var drawBorder = function(b, x1, y1, x2, y2) {
           if (null != b && c_oAscBorderStyles.None !== b.s) {
             oGraphics.setStrokeStyle(b.c);
 
@@ -1489,8 +1422,7 @@
         var oFontColor = fc !== null ? fc : new CColor(0, 0, 0);
         var format = oStyle.getFont();
         // Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
-        var oFont = new asc.FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs,
-          format.b, format.i, format.u, format.s);
+        var oFont = new asc.FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs, format.b, format.i, format.u, format.s);
 
         var width_padding = 3; // 4 * 72 / 96
 
@@ -1501,7 +1433,7 @@
         oGraphics.setFillStyle(oFontColor);
         oGraphics.fillText(sStyleName, width_padding, textY + tm.baseline);
       }
-		};
+    };
 
 		/** @constructor */
 		function asc_CSheetPr() {
@@ -1756,8 +1688,6 @@
 		prot["asc_getStyleThumbnailHeight"] = prot.asc_getStyleThumbnailHeight;
 		prot["asc_getDefaultStyles"] = prot.asc_getDefaultStyles;
 		prot["asc_getDocStyles"] = prot.asc_getDocStyles;
-		prot["asc_getDefaultStylesImage"] = prot.asc_getDefaultStylesImage;
-		prot["asc_getDocStylesImage"] = prot.asc_getDocStylesImage;
 
 		window["Asc"]["asc_CSheetPr"] = window["Asc"].asc_CSheetPr = asc_CSheetPr;
 

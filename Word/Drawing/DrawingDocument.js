@@ -6952,11 +6952,7 @@ function CDrawingDocument()
 }
 function CStylesPainter()
 {
-    // base64 defaultStyles image
-    this.defaultStylesImage = "";
     this.defaultStyles = null;
-
-    this.docStylesImage = "";
     this.docStyles = null;
 
     this.mergedStyles = null;
@@ -7041,17 +7037,11 @@ CStylesPainter.prototype =
     },
   GenerateDefaultStyles: function(_api, ds) {
     var styles = ds;
-    var _count = 0;
-    for (var i in styles)
-      _count++;
-
-    var cur_index = 0;
 
     // добавили переводы => нельзя кэшировать
-
     var _canvas = document.createElement('canvas');
     _canvas.width = this.STYLE_THUMBNAIL_WIDTH;
-    _canvas.height = _count * this.STYLE_THUMBNAIL_HEIGHT;
+    _canvas.height = this.STYLE_THUMBNAIL_HEIGHT;
     var ctx = _canvas.getContext('2d');
 
     ctx.fillStyle = "#FFFFFF";
@@ -7065,35 +7055,15 @@ CStylesPainter.prototype =
     }
     graphics.m_oFontManager = g_fontManager;
 
-    var _canvas2 = document.createElement('canvas');
-    _canvas2.width = this.STYLE_THUMBNAIL_WIDTH;
-    _canvas2.height = this.STYLE_THUMBNAIL_HEIGHT;
-    var ctx2 = _canvas2.getContext('2d');
-
-    ctx2.fillStyle = "#FFFFFF";
-    ctx2.fillRect(0, 0, _canvas2.width, _canvas2.height);
-
-    var graphics2 = new CGraphics();
-    if (!this.IsRetinaEnabled) {
-      graphics2.init(ctx2, _canvas2.width, _canvas2.height, _canvas2.width * g_dKoef_pix_to_mm, _canvas2.height * g_dKoef_pix_to_mm);
-    } else {
-      graphics2.init(ctx2, _canvas2.width, _canvas2.height, _canvas2.width * g_dKoef_pix_to_mm / 2, _canvas2.height * g_dKoef_pix_to_mm / 2);
-    }
-    graphics2.m_oFontManager = g_fontManager;
-
     var DocumentStyles = _api.WordControl.m_oLogicDocument.Get_Styles();
     this.defaultStyles = [];
     for (var i in styles) {
       var style = styles[i];
       if (true == style.qFormat && null === DocumentStyles.Get_StyleIdByName(style.Name, false)) {
-        this.drawStyle(graphics, style, cur_index);
-        this.drawStyle2(graphics2, style);
-        this.defaultStyles[cur_index] = new CStyleImage(style.Name, cur_index, c_oAscStyleImage.Default, _canvas2.toDataURL("image/png"), style.uiPriority);
-        cur_index++;
+        this.drawStyle(graphics, style);
+        this.defaultStyles.push(new CStyleImage(style.Name, c_oAscStyleImage.Default, _canvas.toDataURL("image/png"), style.uiPriority));
       }
     }
-
-    this.defaultStylesImage = _canvas.toDataURL("image/png");
   },
 
   GenerateDocumentStyles: function(_api) {
@@ -7108,18 +7078,11 @@ CStylesPainter.prototype =
       return;
     }
 
-    var _count = 0;
-    for (var i in styles)
-      _count++;
-    if (0 == _count) {
-      return;
-    }
-
     var cur_index = 0;
 
     var _canvas = document.createElement('canvas');
     _canvas.width = this.STYLE_THUMBNAIL_WIDTH;
-    _canvas.height = _count * this.STYLE_THUMBNAIL_HEIGHT;
+    _canvas.height = this.STYLE_THUMBNAIL_HEIGHT;
     var ctx = _canvas.getContext('2d');
 
     if (window["flat_desine"] !== true) {
@@ -7135,24 +7098,6 @@ CStylesPainter.prototype =
     }
     graphics.m_oFontManager = g_fontManager;
 
-    var _canvas2 = document.createElement('canvas');
-    _canvas2.width = this.STYLE_THUMBNAIL_WIDTH;
-    _canvas2.height = this.STYLE_THUMBNAIL_HEIGHT;
-    var ctx2 = _canvas2.getContext('2d');
-
-    if (window["flat_desine"] !== true) {
-      ctx2.fillStyle = "#FFFFFF";
-      ctx2.fillRect(0, 0, _canvas2.width, _canvas2.height);
-    }
-
-    var graphics2 = new CGraphics();
-    if (!this.IsRetinaEnabled) {
-      graphics2.init(ctx2, _canvas2.width, _canvas2.height, _canvas2.width * g_dKoef_pix_to_mm, _canvas2.height * g_dKoef_pix_to_mm);
-    } else {
-      graphics2.init(ctx2, _canvas2.width, _canvas2.height, _canvas2.width * g_dKoef_pix_to_mm / 2, _canvas2.height * g_dKoef_pix_to_mm / 2);
-    }
-    graphics2.m_oFontManager = g_fontManager;
-
     this.docStyles = [];
     for (var i in styles) {
       var style = styles[i];
@@ -7167,9 +7112,8 @@ CStylesPainter.prototype =
         _dr_style.Name = style.Name;
         _dr_style.Id = i;
 
-        this.drawStyle(graphics, _dr_style, cur_index);
-        this.drawStyle2(graphics2, _dr_style);
-        this.docStyles[cur_index] = new CStyleImage(style.Name, cur_index, c_oAscStyleImage.Document, _canvas2.toDataURL("image/png"), style.uiPriority);
+        this.drawStyle(graphics, _dr_style);
+        this.docStyles[cur_index] = new CStyleImage(style.Name, c_oAscStyleImage.Document, _canvas.toDataURL("image/png"), style.uiPriority);
 
         // алгоритм смены имени
         if (style.Default) {
@@ -7193,198 +7137,8 @@ CStylesPainter.prototype =
         cur_index++;
       }
     }
-
-    this.docStylesImage = _canvas.toDataURL("image/png");
   },
-
-    drawStyle: function(graphics, style, index)
-    {
-        var font = { FontFamily : { Name: "Times New Roman", Index : -1 }, Color : { r : 0, g : 0, b : 0 }, Bold : false, Italic : false, FontSize : 10 };
-
-        var textPr = style.TextPr;
-        if (textPr.FontFamily != undefined)
-        {
-            font.FontFamily.Name = textPr.FontFamily.Name;
-            font.FontFamily.Index = textPr.FontFamily.Index;
-        }
-
-        if (textPr.Bold != undefined)
-            font.Bold = textPr.Bold;
-        if (textPr.Italic != undefined)
-            font.Italic = textPr.Italic;
-
-        if (textPr.FontSize != undefined)
-            font.FontSize = textPr.FontSize;
-
-        graphics.SetFont(font);
-
-        if (textPr.Color == undefined)
-            graphics.b_color1(0, 0, 0, 255);
-        else
-            graphics.b_color1(textPr.Color.r, textPr.Color.g, textPr.Color.b, 255);
-
-        var dKoefToMM = g_dKoef_pix_to_mm;
-        if (this.IsRetinaEnabled)
-            dKoefToMM /= 2;
-
-        if (window["flat_desine"] !== true)
-        {
-            var y = index * dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
-            var b = (index + 1) * dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
-            var w = dKoefToMM * this.STYLE_THUMBNAIL_WIDTH;
-
-            graphics.transform(1,0,0,1,0,0);
-            graphics.save();
-            graphics._s();
-            graphics._m(-0.5, y);
-            graphics._l(w, y);
-            graphics._l(w, b);
-            graphics._l(0, b);
-            graphics._z();
-            graphics.clip();
-
-            graphics.t(this.CurrentTranslate.StylesText, 0.5, (y + b) / 2);
-
-            var ctx = graphics.m_oContext;
-            ctx.setTransform(1,0,0,1,0,0);
-            ctx.fillStyle = "#E8E8E8";
-
-            var _b = (index + 1) * this.STYLE_THUMBNAIL_HEIGHT - 1.5;
-            var _x = 2;
-            var _w = this.STYLE_THUMBNAIL_WIDTH - 4;
-            var _h = (this.STYLE_THUMBNAIL_HEIGHT / 3) >> 0;
-            ctx.beginPath();
-            ctx.moveTo(_x, _b - _h);
-            ctx.lineTo(_x + _w, _b - _h);
-            ctx.lineTo(_x + _w, _b);
-            ctx.lineTo(_x, _b);
-            ctx.closePath();
-            ctx.fill();
-
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = "#D8D8D8";
-            ctx.beginPath();
-            ctx.rect(0.5, index * this.STYLE_THUMBNAIL_HEIGHT + 0.5, this.STYLE_THUMBNAIL_WIDTH - 1, this.STYLE_THUMBNAIL_HEIGHT - 1);
-
-            ctx.stroke();
-
-            graphics.restore();
-        }
-        else
-        {
-            g_oTableId.m_bTurnOff = true;
-            History.TurnOff();
-
-            var oldDefTabStop = Default_Tab_Stop;
-            Default_Tab_Stop = 1;
-
-            var hdr = new CHeaderFooter(editor.WordControl.m_oLogicDocument.HdrFtr, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, hdrftr_Header);
-            var _dc = hdr.Content;//new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, true, false);
-
-            var par = new Paragraph(editor.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
-            var run = new ParaRun(par, false);
-
-            for (var i = 0; i < style.Name.length; i++)
-            {
-                run.Add_ToContent(i, new ParaText(style.Name.charAt(i)), false);
-            }
-
-            _dc.Internal_Content_Add(0, par, false);
-            par.Add_ToContent(0, run);
-            par.Style_Add(style.Id, false);
-            par.Set_Align(align_Left);
-            par.Set_Tabs(new CParaTabs());
-
-            var _brdL = style.ParaPr.Brd.Left;
-            if ( undefined !== _brdL && null !== _brdL )
-            {
-                var brdL = new CDocumentBorder();
-                brdL.Set_FromObject(_brdL);
-                brdL.Space = 0;
-                par.Set_Border(brdL, historyitem_Paragraph_Borders_Left);
-            }
-
-            var _brdT = style.ParaPr.Brd.Top;
-            if ( undefined !== _brdT && null !== _brdT )
-            {
-                var brd = new CDocumentBorder();
-                brd.Set_FromObject(_brdT);
-                brd.Space = 0;
-                par.Set_Border(brd, historyitem_Paragraph_Borders_Top);
-            }
-
-            var _brdB = style.ParaPr.Brd.Bottom;
-            if ( undefined !== _brdB && null !== _brdB )
-            {
-                var brd = new CDocumentBorder();
-                brd.Set_FromObject(_brdB);
-                brd.Space = 0;
-                par.Set_Border(brd, historyitem_Paragraph_Borders_Bottom);
-            }
-
-            var _brdR = style.ParaPr.Brd.Right;
-            if ( undefined !== _brdR && null !== _brdR )
-            {
-                var brd = new CDocumentBorder();
-                brd.Set_FromObject(_brdR);
-                brd.Space = 0;
-                par.Set_Border(brd, historyitem_Paragraph_Borders_Right);
-            }
-
-            var _ind = new CParaInd();
-            _ind.FirstLine = 0;
-            _ind.Left = 0;
-            _ind.Right = 0;
-            par.Set_Ind(_ind, false);
-
-            var _sp = new CParaSpacing();
-            _sp.Line              = 1;
-            _sp.LineRule          = linerule_Auto;
-            _sp.Before            = 0;
-            _sp.BeforeAutoSpacing = false;
-            _sp.After             = 0;
-            _sp.AfterAutoSpacing  = false;
-            par.Set_Spacing(_sp, false);
-
-            _dc.Reset(0, 0, 10000, 10000);
-            _dc.Recalculate_Page(0, true);
-
-            _dc.Reset(0, 0, par.Lines[0].Ranges[0].W + 0.001, 10000);
-            _dc.Recalculate_Page(0, true);
-            //par.Reset(0, 0, 10000, 10000, 0);
-            //par.Recalculate_Page(0);
-
-            var y = index * dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
-            var b = (index + 1) * dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
-            var w = dKoefToMM * this.STYLE_THUMBNAIL_WIDTH;
-            var off = 10 * dKoefToMM;
-            var off2 = 5 * dKoefToMM;
-            var off3 = 1 * dKoefToMM;
-
-            graphics.transform(1,0,0,1,0,0);
-            graphics.save();
-            graphics._s();
-            graphics._m(off2, y + off3);
-            graphics._l(w - off, y + off3);
-            graphics._l(w - off, b - off3);
-            graphics._l(off2, b - off3);
-            graphics._z();
-            graphics.clip();
-
-            //graphics.t(style.Name, off + 0.5, y + 0.75 * (b - y));
-            var baseline = par.Lines[0].Y;
-            par.Shift(0, off + 0.5, y + 0.75 * (b - y) - baseline);
-            par.Draw(0, graphics);
-
-            graphics.restore();
-
-            Default_Tab_Stop = oldDefTabStop;
-
-            g_oTableId.m_bTurnOff = false;
-            History.TurnOn();
-        }
-    },
-  drawStyle2: function(graphics, style)
+  drawStyle: function(graphics, style)
   {
     var ctx = graphics.m_oContext;
     ctx.fillStyle = "#FFFFFF";
