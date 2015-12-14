@@ -569,7 +569,9 @@ CHistory.prototype =
             return;
 
         // Не объединяем точки истории, если на предыдущей точке произошло сохранение
-        if ( this.Points.length < 2 )
+        if (this.Points.length < 2
+            || (true !== this.Is_UserSaveMode() && null !== this.SavedIndex && this.SavedIndex >= this.Points.length - 2)
+            || (true === this.Is_UserSaveMode() && null !== this.UserSavedIndex && this.UserSavedIndex >= this.Points.length - 2))
             return;
 
         var Point1 = this.Points[this.Points.length - 2];
