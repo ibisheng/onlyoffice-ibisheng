@@ -3585,6 +3585,8 @@ CStyle.prototype =
                 break;
             }
         }
+
+        CollaborativeEditing.Add_LinkData(this, {StyleUpdate : true});
     },
 
     Write_ToBinary2 : function(Writer)
@@ -3852,6 +3854,12 @@ CStyle.prototype =
 
     Load_LinkData : function(LinkData)
     {
+        if (true === LinkData.StyleUpdate)
+        {
+            // TODO: Делаем это, чтобы обновились найстройки у параграфов, использующих данный стиль.
+            //       Надо бы переделать на нормальную функцию.
+            this.Refresh_RecalcData2();
+        }
     }
 };
 
@@ -4938,6 +4946,7 @@ CStyles.prototype =
                 var Id = Reader.GetString2();
                 this.Style[Id] = g_oTableId.Get_ById( Id );
                 this.Update_Interface(Id);
+                CollaborativeEditing.Add_LinkData(this, {UpdateStyleId : Id});
                 break;
             }
             case historyitem_Styles_Remove:
@@ -4947,8 +4956,17 @@ CStyles.prototype =
                 var Id = Reader.GetString2();
                 delete this.Style[Id];
                 this.Update_Interface(Id);
+                CollaborativeEditing.Add_LinkData(this, {UpdateStyleId : Id});
                 break;
             }
+        }
+    },
+
+    Load_LinkData : function(LinkData)
+    {
+        if (undefined !== LinkData.UpdateStyleId)
+        {
+            this.Refresh_RecalcData2(LinkData.UpdateStyleId);
         }
     }
 };
