@@ -24,7 +24,6 @@ asc_docs_api.prototype['asc_getEditorPermissions'] = asc_docs_api.prototype.asc_
 asc_docs_api.prototype['asc_setDocInfo'] = asc_docs_api.prototype.asc_setDocInfo;
 asc_docs_api.prototype['asc_setLocale'] = asc_docs_api.prototype.asc_setLocale;
 asc_docs_api.prototype['asc_LoadDocument'] = asc_docs_api.prototype.asc_LoadDocument;
-asc_docs_api.prototype['LoadDocument'] = asc_docs_api.prototype.LoadDocument;
 asc_docs_api.prototype['asc_SetFontsPath'] = asc_docs_api.prototype.asc_SetFontsPath;
 asc_docs_api.prototype['SetThemesPath'] = asc_docs_api.prototype.SetThemesPath;
 asc_docs_api.prototype['CreateCSS'] = asc_docs_api.prototype.CreateCSS;

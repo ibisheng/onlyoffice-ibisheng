@@ -502,9 +502,6 @@ asc_docs_api.prototype.Init = function() {
 };
 asc_docs_api.prototype.asc_setLocale = function(val) {
 };
-asc_docs_api.prototype.LoadDocument = function() {
-  this.asc_LoadDocument();
-};
 
 asc_docs_api.prototype.SetThemesPath = function(path)
 {

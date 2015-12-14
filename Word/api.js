@@ -527,9 +527,6 @@ asc_docs_api.prototype.asc_setLocale = function(val)
 {
 	this.InterfaceLocale = val;
 };
-asc_docs_api.prototype.LoadDocument = function(isVersionHistory) {
-  this.asc_LoadDocument(isVersionHistory);
-};
 
 asc_docs_api.prototype.SetTextBoxInputMode = function(bIsEA)
 {
