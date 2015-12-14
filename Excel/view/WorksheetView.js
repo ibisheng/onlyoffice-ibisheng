@@ -10082,7 +10082,7 @@
                         ref = sheetName[1];
                         sheetName = sheetName[0];
                         if ( sheetName[0] == "'" && sheetName[sheetName.length - 1] == "'" ) {
-                            sheetName = sheetName.substring( 1, range.sheet.length - 1 );
+                            sheetName = sheetName.substring( 1, sheetName.length - 1 );
                         }
                         range = asc.g_oRangeCache.getAscRange( ref );
                         sheetName = this.model.workbook.getWorksheetByName( sheetName );
