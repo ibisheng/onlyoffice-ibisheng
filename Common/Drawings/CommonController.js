@@ -6616,7 +6616,7 @@ DrawingObjectsController.prototype =
             if(props && props.ChartProperties && typeof props.ChartProperties.range === "string")
             {
                 var editor = window["Asc"]["editor"];
-                var check = parserHelp.checkDataRange(editor.wbModel, editor.wb, c_oAscSelectionDialogType.Chart, props.ChartProperties.range, true, !props.ChartProperties.isColumn, props.ChartProperties.type);
+                var check = parserHelp.checkDataRange(editor.wbModel, editor.wb, c_oAscSelectionDialogType.Chart, props.ChartProperties.range, true, !props.ChartProperties.inColumns, props.ChartProperties.type);
                 if(check === c_oAscError.ID.StockChartError || check === c_oAscError.ID.DataRangeError
                     || check === c_oAscError.ID.MaxDataSeriesError)
                 {
