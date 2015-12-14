@@ -1683,7 +1683,10 @@ asc_docs_api.prototype.asc_Print = function(bIsDownloadEvent)
         if (null != this.WordControl.m_oDrawingDocument.m_oDocumentRenderer)
         {
             if (window["AscDesktopEditor"]["IsSupportNativePrint"](this.DocumentUrl) === true)
-                return;
+			{
+				window["AscDesktopEditor"]["Print"]();
+				return;
+			}
         }
         else
         {
