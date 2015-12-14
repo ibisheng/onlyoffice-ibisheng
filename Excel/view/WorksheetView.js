@@ -705,16 +705,15 @@
 
 		// Проверяет, есть ли числовые значения в диапазоне
 		WorksheetView.prototype._hasNumberValueInActiveRange = function () {
-			var cell, cellType, isNumberFormat;
-			var result = null;
+			var cell, cellType, isNumberFormat, arrCols = null, arrRows = null;
 			if (this._rangeIsSingleCell(this.activeRange)) {
 				// Для одной ячейки не стоит ничего делать
-				return result;
+				return null;
 			}
 			var mergedRange = this.model.getMergedByCell(this.activeRange.r1, this.activeRange.c1);
 			if (mergedRange && mergedRange.isEqual(this.activeRange)) {
 				// Для одной ячейки не стоит ничего делать
-				return result;
+				return null;
 			}
 
 			for (var c = this.activeRange.c1; c <= this.activeRange.c2; ++c) {
@@ -725,25 +724,24 @@
 						cellType = cell.cellType;
 						isNumberFormat = (null == cellType || CellValueType.Number === cellType);
 						if (isNumberFormat) {
-							if (null === result) {
-								result = {};
-								result.arrCols = [];
-								result.arrRows = [];
+							if (!arrCols) {
+								arrCols = [];
+								arrRows = [];
 							}
-							result.arrCols.push(c);
-							result.arrRows.push(r);
+							arrCols.push(c);
+							arrRows.push(r);
 						}
 					}
 				}
 			}
-			if (null !== result) {
+			if (arrCols) {
 				// Делаем массивы уникальными и сортируем
-				$.unique(result.arrCols);
-				$.unique(result.arrRows);
-				result.arrCols = result.arrCols.sort(fSortAscending);
-				result.arrRows = result.arrRows.sort(fSortAscending);
-			}
-			return result;
+        arrCols = arrCols.filter(fOnlyUnique);
+        arrRows = arrRows.filter(fOnlyUnique);
+        return {arrCols: arrCols.sort(fSortAscending), arrRows: arrRows.sort(fSortAscending)};
+			} else {
+        return null;
+      }
 		};
 
 		// Автодополняет формулу диапазоном, если это возможно

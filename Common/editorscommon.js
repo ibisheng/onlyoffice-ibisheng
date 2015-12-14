@@ -351,6 +351,9 @@ function fSortAscending( a, b ) {
 function fSortDescending( a, b ) {
     return b - a;
 }
+function fOnlyUnique(value, index, self) {
+  return self.indexOf(value) === index;
+}
 function isLeadingSurrogateChar(nCharCode) {
     return (nCharCode >= 0xD800 && nCharCode <= 0xDFFF);
 }
