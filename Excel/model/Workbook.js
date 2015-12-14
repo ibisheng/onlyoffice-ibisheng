@@ -3149,7 +3149,7 @@ Woorksheet.prototype.clone=function(sNewId, sName){
 		for (i = 0; i < this.aComments.length; i++) {
 			var comment = new asc_CCommentData(this.aComments[i]);
 			comment.wsId = oNewWs.getId();
-			comment.setId();
+      comment.nId = "sheet" + comment.wsId + "_" + (i + 1);
 			oNewWs.aComments.push(comment);
 		}
 	}
