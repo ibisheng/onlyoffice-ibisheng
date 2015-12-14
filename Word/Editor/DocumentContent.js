@@ -3068,16 +3068,15 @@ CDocumentContent.prototype =
                         }
                         else if ( Count > 0 )
                         {
-                            if (true === this.Is_TrackRevisions())
+                            if (this.CurPos.ContentPos < this.Content.length - 1 && type_Paragraph == this.Content[this.CurPos.ContentPos + 1].GetType())
                             {
-                                this.Content[this.CurPos.ContentPos].Set_ReviewType(reviewtype_Remove);
-                                this.CurPos.ContentPos++;
-                                this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
-                            }
-                            else
-                            {
-
-                                if (this.CurPos.ContentPos < this.Content.length - 1 && type_Paragraph == this.Content[this.CurPos.ContentPos + 1].GetType())
+                                if (true === this.Is_TrackRevisions())
+                                {
+                                    this.Content[this.CurPos.ContentPos].Set_ReviewType(reviewtype_Remove);
+                                    this.CurPos.ContentPos++;
+                                    this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
+                                }
+                                else
                                 {
                                     if (true === this.Content[this.CurPos.ContentPos].IsEmpty())
                                     {
@@ -3093,13 +3092,13 @@ CDocumentContent.prototype =
                                         this.Internal_Content_Remove(this.CurPos.ContentPos + 1, 1);
                                     }
                                 }
-                                else if (true == this.Content[this.CurPos.ContentPos].IsEmpty() && this.CurPos.ContentPos == this.Content.length - 1 && this.CurPos.ContentPos != 0 && type_Table != this.Content[this.CurPos.ContentPos - 1].GetType())
-                                {
-                                    // Если данный параграф пустой, последний, не единственный и идущий перед
-                                    // ним элемент не таблица, удаляем его
-                                    this.Internal_Content_Remove(this.CurPos.ContentPos, 1);
-                                    this.CurPos.ContentPos--;
-                                }
+                            }
+                            else if (true == this.Content[this.CurPos.ContentPos].IsEmpty() && this.CurPos.ContentPos == this.Content.length - 1 && this.CurPos.ContentPos != 0 && type_Table != this.Content[this.CurPos.ContentPos - 1].GetType())
+                            {
+                                // Если данный параграф пустой, последний, не единственный и идущий перед
+                                // ним элемент не таблица, удаляем его
+                                this.Internal_Content_Remove(this.CurPos.ContentPos, 1);
+                                this.CurPos.ContentPos--;
                             }
                         }
 

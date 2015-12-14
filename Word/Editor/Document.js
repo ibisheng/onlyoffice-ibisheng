@@ -3426,11 +3426,7 @@ CDocument.prototype =
             var bRetValue = this.DrawingObjects.paragraphAdd(ParaItem, bRecalculate);
             this.Document_UpdateSelectionState();
             this.Document_UpdateUndoRedoState();
-
-            // Если у нас отслеживаются изменения, тогда интерфейс обновится на функции Continue_TrackRevisions
-            if (true !== this.TrackRevisions)
-                this.Document_UpdateInterfaceState();
-
+            this.Document_UpdateInterfaceState();
             return bRetValue;
         }
         else //if ( docpostype === this.CurPos.Type )
@@ -3605,10 +3601,7 @@ CDocument.prototype =
                 }
 
                 this.Document_UpdateSelectionState();
-
-                // Если у нас отслеживаются изменения, тогда интерфейс обновится на функции Continue_TrackRevisions
-                if (true !== this.TrackRevisions)
-                    this.Document_UpdateInterfaceState();
+                this.Document_UpdateInterfaceState();
             }
 
             // Специальная заглушка для функции TextBox_Put
@@ -15836,6 +15829,9 @@ CTrackRevisionsManager.prototype.Get_VisibleChanges = function()
 };
 CTrackRevisionsManager.prototype.Begin_CollectChanges = function(bSaveCurrentChange)
 {
+    if (true === this.private_HaveParasToCheck())
+        return;
+
     if (true !== bSaveCurrentChange)
         this.Clear_CurrentChange();
 
@@ -15844,6 +15840,9 @@ CTrackRevisionsManager.prototype.Begin_CollectChanges = function(bSaveCurrentCha
 };
 CTrackRevisionsManager.prototype.End_CollectChanges = function(oEditor)
 {
+    if (true === this.private_HaveParasToCheck())
+        return;
+
     if (null !== this.CurChange)
         this.VisibleChanges = [this.CurChange];
 
@@ -16032,6 +16031,17 @@ CTrackRevisionsManager.prototype.Get_AllChangesRelatedParagraphsBySelectedParagr
         }
     }
     return this.private_ConvertParagraphsObjectToArray(RelatedParas);
+};
+CTrackRevisionsManager.prototype.private_HaveParasToCheck = function()
+{
+    for (var ParaId in this.CheckPara)
+    {
+        var Para = g_oTableId.Get_ById(ParaId);
+        if (Para && Para instanceof Paragraph && Para.Is_UseInDocument())
+            return true;
+    }
+
+    return false;
 };
 
 function CRevisionsChangeParagraphSearchEngine(Direction, CurrentPara, TrackManager)
