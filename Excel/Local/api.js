@@ -23,7 +23,7 @@
 	{
 		if (true)
 		{
-      this._startOpenDocument(_data);
+			this._startOpenDocument(_data);
 			History.UserSaveMode = true;
 		}
 		
@@ -133,11 +133,16 @@ window["DesktopOfflineAppDocumentApplyChanges"] = function(_changes)
 /////////////////////////////////////////////////////////
 ////////////////        SAVE       //////////////////////
 /////////////////////////////////////////////////////////
-window["Asc"]['spreadsheet_api'].prototype.asc_Save = function (isNoUserSave)
+window["Asc"]['spreadsheet_api'].prototype.asc_Save = function (isNoUserSave, isSaveAs)
 {
 	var t = this;
     if (true !== isNoUserSave)
         this.IsUserSave = true;
+	
+	if (this.IsUserSave)
+	{
+		this.LastUserSavedIndex = History.UserSavedIndex;
+	}
 
     if (true === this.canSave && !this.isLongAction())
 	{
@@ -149,13 +154,12 @@ window["Asc"]['spreadsheet_api'].prototype.asc_Save = function (isNoUserSave)
 			this.CoAuthoringApi.onUnSaveLock();
 		
 		if (_isNaturalSave === true)
-			window["DesktopOfflineAppDocumentStartSave"]();
+			window["DesktopOfflineAppDocumentStartSave"](isSaveAs);
 	}
 };
-window["Asc"]['spreadsheet_api'].asc_DownloadAs = function(typeFile, bIsDownloadEvent) 
+window["Asc"]['spreadsheet_api'].prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) 
 {
-	window["Asc"]["editor"].sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
-	window["AscDesktopEditor"]["LocalFileSave"](true);
+	this.asc_Save(false, true);
 };
 
 window["Asc"]['spreadsheet_api'].prototype.asc_isOffline = function()
@@ -163,16 +167,27 @@ window["Asc"]['spreadsheet_api'].prototype.asc_isOffline = function()
 	return true;
 };
 
-window["DesktopOfflineAppDocumentStartSave"] = function()
+window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs)
 {
-    window["Asc"]["editor"].sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
-	window["AscDesktopEditor"]["LocalFileSave"]();
+	window["Asc"]["editor"].sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+	if (isSaveAs === true)
+		window["AscDesktopEditor"]["LocalFileSave"](true);
+	else
+		window["AscDesktopEditor"]["LocalFileSave"]();
 };
 window["DesktopOfflineAppDocumentEndSave"] = function(isCancel)
 {
 	window["Asc"]["editor"].sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
 	if (isCancel !== true)
 		DesktopOfflineUpdateLocalName(window["Asc"]["editor"]);
+	else
+	{
+		History.UserSavedIndex = window["Asc"]["editor"].LastUserSavedIndex;
+		
+		window["Asc"]["editor"].onUpdateDocumentModified(History.Is_Modified(true));
+	}
+	
+	window["Asc"]["editor"].LastUserSavedIndex = undefined;
 };
 
 window["Asc"]['spreadsheet_api'].prototype["asc_addImageDrawingObject"] = window["Asc"]['spreadsheet_api'].prototype.asc_addImageDrawingObject;

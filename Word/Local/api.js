@@ -110,10 +110,15 @@ window["DesktopOfflineAppDocumentApplyChanges"] = function(_changes)
 /////////////////////////////////////////////////////////
 ////////////////        SAVE       //////////////////////
 /////////////////////////////////////////////////////////
-asc_docs_api.prototype.asc_Save = function (isNoUserSave)
+asc_docs_api.prototype.asc_Save = function (isNoUserSave, isSaveAs)
 {
     if (true !== isNoUserSave)
         this.IsUserSave = true;
+	
+	if (this.IsUserSave)
+	{
+		this.LastUserSavedIndex = History.UserSavedIndex;
+	}
 
     if (true === this.canSave && !this.isLongAction())
 	{
@@ -125,24 +130,33 @@ asc_docs_api.prototype.asc_Save = function (isNoUserSave)
 			this.CoAuthoringApi.onUnSaveLock();
 		
 		if (_isNaturalSave === true)
-			window["DesktopOfflineAppDocumentStartSave"]();
+			window["DesktopOfflineAppDocumentStartSave"](isSaveAs);
 	}
 };
-window["DesktopOfflineAppDocumentStartSave"] = function()
+window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs)
 {
     editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
-	window["AscDesktopEditor"]["LocalFileSave"]();
+	if (isSaveAs === true)
+		window["AscDesktopEditor"]["LocalFileSave"](true);
+	else
+		window["AscDesktopEditor"]["LocalFileSave"]();
 };
 window["DesktopOfflineAppDocumentEndSave"] = function(isCancel)
 {
 	editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
 	if (isCancel !== true)
 		DesktopOfflineUpdateLocalName(editor);
+	else
+	{
+		History.UserSavedIndex = editor.LastUserSavedIndex;
+		editor.UpdateInterfaceState();
+	}
+	
+	editor.LastUserSavedIndex = undefined;
 };
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) 
 {
-	editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
-	window["AscDesktopEditor"]["LocalFileSave"](true);
+	this.asc_Save(false, true);
 };
 
 asc_docs_api.prototype.AddImageUrl = function(url, imgProp)
