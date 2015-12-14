@@ -1915,7 +1915,7 @@ asc_docs_api.prototype.SetFontRenderingMode = function(mode)
 };
 asc_docs_api.prototype.processSavedFile = function(url, downloadType) {
 	var t = this;
-	if (DownloadType.MailMerge === downloadType) {
+	if (this.mailMergeFileData) {
 		this.mailMergeFileData = null;
     g_fLoadFileContent(url, function(result) {
       if (null === result) {
