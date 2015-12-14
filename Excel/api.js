@@ -1145,6 +1145,7 @@ var editor;
         t.wb._onWSSelectionChanged(/*info*/null);
 
         var worksheet = t.wb.getWorksheet();
+        worksheet.cleanSelection();
         worksheet._drawSelection();
         worksheet._drawFrozenPaneLines();
         if (worksheet.objectRender) {
