@@ -875,12 +875,18 @@ CShape.prototype.Is_TopDocument = function()
     return false;
 };
 
-CShape.prototype.recalcText = function()
+CShape.prototype.recalcText = function(bResetRecalcCache)
 {
     if(this.recalculateText && this.recalcTxBoxContent && this.recalculateText)
     {
         this.recalcTxBoxContent();
         this.recalcTransformText();
+        if(bResetRecalcCache){
+            var oContent = this.getDocContent();
+            if(oContent){
+                oContent.Reset_RecalculateCache();
+            }
+        }
         if(this.checkAutofit && this.checkAutofit())
         {
             this.recalcGeometry();

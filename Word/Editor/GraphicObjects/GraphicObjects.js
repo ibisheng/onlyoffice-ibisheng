@@ -303,7 +303,7 @@ CGraphicObjects.prototype =
                 {
                     if(this.drawingObjects[i].GraphicObj.recalcText)
                     {
-                        this.drawingObjects[i].GraphicObj.recalcText();
+                        this.drawingObjects[i].GraphicObj.recalcText(true);
                     }
                     this.drawingObjects[i].GraphicObj.recalculate();
                 }

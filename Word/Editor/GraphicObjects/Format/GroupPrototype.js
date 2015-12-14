@@ -12,7 +12,7 @@ CGroupShape.prototype.handleUpdateFill = function()
         this.spTree[i].handleUpdateFill();
     }
 };
-CGroupShape.prototype.recalcText = function()
+CGroupShape.prototype.recalcText = function(bResetCache)
 {
     if(this.spTree)
     {
@@ -20,7 +20,7 @@ CGroupShape.prototype.recalcText = function()
         {
             if(this.spTree[i].recalcText)
             {
-                this.spTree[i].recalcText();
+                this.spTree[i].recalcText(bResetCache);
             }
         }
     }
