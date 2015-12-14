@@ -558,9 +558,6 @@ var editor;
       }
     }
   };
-  spreadsheet_api.prototype.asc_setViewerMode = function(isViewerMode) {
-    this.asc_setViewMode(isViewerMode);
-  };
 
   spreadsheet_api.prototype.asc_setUseEmbeddedCutFonts = function(bUse) {
     this.isUseEmbeddedCutFonts = bUse;
@@ -3090,7 +3087,6 @@ var editor;
 
   prot["asc_setMobileVersion"] = prot.asc_setMobileVersion;
   prot["asc_setViewMode"] = prot.asc_setViewMode;
-  prot["asc_setViewerMode"] = prot.asc_setViewerMode;
   prot["asc_setUseEmbeddedCutFonts"] = prot.asc_setUseEmbeddedCutFonts;
   prot["asc_setAdvancedOptions"] = prot.asc_setAdvancedOptions;
   prot["asc_setPageOptions"] = prot.asc_setPageOptions;
