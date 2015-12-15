@@ -7718,7 +7718,7 @@ CTextPr.prototype =
 
         if(undefined !== this.Unifill && !this.Unifill.IsIdentical(TextPr.Unifill))
         {
-            this.Unifill = undefined;
+            this.Unifill = CompareUniFill(this.Unifill, TextPr.Unifill);
             this.Color = undefined;
             this.TextFill = undefined;
         }
@@ -7728,7 +7728,7 @@ CTextPr.prototype =
         {
             this.Unifill = undefined;
             this.Color = undefined;
-            this.TextFill = undefined;
+            this.TextFill = CompareUniFill(this.TextFill, TextPr.TextFill);;
         }
 
 
