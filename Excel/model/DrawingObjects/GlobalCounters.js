@@ -94,20 +94,18 @@ CCollaborativeEditing.prototype.Apply_LinkData = function()
         Item.Class.Load_LinkData( Item.LinkData );
     }
     this.Clear_LinkData();
+
+};
+CCollaborativeEditing.prototype.Load_Images = function(){
     if(this.m_aNewImages.length > 0)
     {
         var old_val =  Asc["editor"].ImageLoader.bIsAsyncLoadDocumentImages;
         Asc["editor"].ImageLoader.bIsAsyncLoadDocumentImages = true;
-        Asc["editor"].ImageLoader.LoadDocumentImages(this.m_aNewImages, null, function()
-        {
-            CollaborativeEditing.m_aNewImages.length = 0;
-            Asc["editor"]._onShowDrawingObjects();
-            var worksheet = Asc["editor"].wb.getWorksheet();
-            worksheet && worksheet.objectRender && worksheet.objectRender.controller && worksheet.objectRender.controller.getGraphicObjectProps();
-        });
+        Asc["editor"].ImageLoader.LoadDocumentImages(this.m_aNewImages, null);
+        CollaborativeEditing.m_aNewImages.length = 0;
         Asc["editor"].ImageLoader.bIsAsyncLoadDocumentImages = old_val;
     }
-};
+}
 //-----------------------------------------------------------------------------------
 // Функции для проверки корректности новых изменений
 //-----------------------------------------------------------------------------------

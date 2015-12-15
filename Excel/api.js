@@ -1228,6 +1228,7 @@ var editor;
     } else if (this.wb && !window["NATIVE_EDITOR_ENJINE"]) {
       // Нужно послать 'обновить свойства' (иначе для удаления данных не обновится строка формул).
       // ToDo Возможно стоит обновлять только строку формул
+      CollaborativeEditing.Load_Images();
       this.wb._onWSSelectionChanged(null);
       this.wb.getWorksheet().updateVisibleRange();
     }
@@ -2401,6 +2402,7 @@ var editor;
       if (drawing_area) {
         for (var i = 0; i < drawing_area.frozenPlaces.length; ++i) {
           worksheet.objectRender.showDrawingObjects(false, new GraphicOption(worksheet, c_oAscGraphicOption.ScrollVertical, drawing_area.frozenPlaces[i].range, {offsetX: 0, offsetY: 0}));
+            worksheet.objectRender.controller && worksheet.objectRender.controller.getGraphicObjectProps();
         }
       }
     }
