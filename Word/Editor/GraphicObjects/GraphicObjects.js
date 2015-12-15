@@ -2765,6 +2765,14 @@ CGraphicObjects.prototype =
 
     Save_DocumentStateBeforeLoadChanges: function(oState)
     {
+        var oTargetDocContent = this.getTargetDocContent(undefined, true);
+        if(oTargetDocContent)
+        {
+            oState.Pos      = oTargetDocContent.Get_ContentPosition(false, false, undefined);
+            oState.StartPos = oTargetDocContent.Get_ContentPosition(true, true, undefined);
+            oState.EndPos   = oTargetDocContent.Get_ContentPosition(true, false, undefined);
+            oState.DrawingSelection = oTargetDocContent.Selection.Use;
+        }
         oState.DrawingsSelectionState = this.getSelectionState()[0];
         var oPos = this.getLeftTopSelectedObject2();
         oState.X = oPos.X;
