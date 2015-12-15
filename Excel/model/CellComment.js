@@ -587,6 +587,9 @@ CCellCommentator.prototype.drawCommentCells = function() {
 		nRow = mergedRange ? mergedRange.r1 : commentCell.nRow;
 
 		if (metrics = this.worksheet.getCellMetrics(nCol, nRow)) {
+      if (0 === metrics.width || 0 === metrics.height) {
+        continue;
+      }
 			x = metrics.left + metrics.width;
 			y = metrics.top;
 			this.drawingCtx.beginPath();
