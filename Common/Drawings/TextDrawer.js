@@ -1731,6 +1731,7 @@ CTextDrawer.prototype =
         this.checkCurveBezier(r, y + penW, x + (2/3) * (r - x), y + penW, x + ((r-x)/3), y + penW, x, y + penW);//this._l(x, y + penW);
         this._z();
         this.ds();
+        this.df();
     },
 
 
