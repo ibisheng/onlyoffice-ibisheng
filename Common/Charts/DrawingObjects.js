@@ -2969,10 +2969,26 @@ function DrawingObjects() {
         }
     };
 
-    _this.updateSizeDrawingObjects = function(target) {
+    _this.updateSizeDrawingObjects = function(target, bNoChangeCoords) {
 
-		if(!History.Is_On())
-			return;
+		if(!History.Is_On() || true === bNoChangeCoords){
+            if (target.target === c_oTargetType.RowResize) {
+                for (i = 0; i < aObjects.length; i++) {
+                    drawingObject = aObjects[i];
+                    if (drawingObject.from.row >= target.row) {
+                        drawingObject.checkBoundsFromTo();
+                    }
+                }
+            } else {
+                for (i = 0; i < aObjects.length; i++) {
+                    drawingObject = aObjects[i];
+                    if (drawingObject.from.col >= target.col) {
+                        drawingObject.checkBoundsFromTo();
+                    }
+                }
+            }
+            return;
+        }
 
         var i, bNeedRecalc = false, drawingObject, coords;
         if (target.target === c_oTargetType.RowResize) {

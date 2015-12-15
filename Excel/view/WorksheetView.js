@@ -4115,8 +4115,9 @@
 				this._updateRowPositions();
 				this._calcVisibleRows();
 
-				if (this.objectRender)
-					this.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: firstUpdateRow});
+				if (this.objectRender){
+                    this.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: firstUpdateRow}, true);
+                }
 			}
 		};
 
