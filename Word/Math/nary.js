@@ -945,8 +945,9 @@ function CNaryOperator(flip)
 {
     this.size = new CMathSize();
     this.pos = new CMathPosition();
-    this.ParaMath = null;
     this.bFlip = (flip == -1);
+    this.Parent   = null;
+    this.ParaMath = null;
     this.sizeGlyph = null;
 }
 CNaryOperator.prototype.Draw_Elements = function(PDSE)
@@ -1741,13 +1742,13 @@ function CDoubleIntegral()
     CIntegral.call(this);
 }
 Asc.extendClass(CDoubleIntegral, CIntegral);
-CDoubleIntegral.prototype.drawPath = function(pGraphics, XX, YY)
+CDoubleIntegral.prototype.drawPath = function(pGraphics, XX, YY, Width)
 {
-    // XX[9] - ширина
-
     var XX2 = [],
         YY2 = [];
-    var w = (XX[9] - XX[29])*0.6;
+
+    // Width прийдрийдет для TextArt, смещение второго интеграла и для обводки, и для заливки должно быть одинаковым, чтобы корректно отрисовалась обводка
+    var w = Width == undefined ? (XX[9] - XX[29])*0.6 : Width*0.36;
 
     for(var i = 0; i < XX.length; i++)
     {
@@ -1787,13 +1788,13 @@ function CTripleIntegral()
     CIntegral.call(this);
 }
 Asc.extendClass(CTripleIntegral, CIntegral);
-CTripleIntegral.prototype.drawPath = function(pGraphics, XX, YY)
+CTripleIntegral.prototype.drawPath = function(pGraphics, XX, YY, Width)
 {
-    // XX[9] - ширина
-
     var XX2 = [],
         YY2 = [];
-    var w = (XX[9] - XX[29])*0.6;
+
+    // Width прийдрийдет для TextArt, смещения второго и третьего интегралов и для обводки, и для заливки должны быть одинаковыми, чтобы корректно отрисовалась обводка
+    var w = Width == undefined ? (XX[9] - XX[29])*0.6 : Width*0.26;
 
     var XX3 = [],
         YY3 = [];
@@ -1886,7 +1887,6 @@ CCircle.prototype.getCoord = function()
 };
 CCircle.prototype.drawPath = function(pGraphics, XX, YY)
 {
-    pGraphics._s();
     pGraphics._m(XX[0], YY[0]);
     pGraphics._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2]);
     pGraphics._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4]);
@@ -1905,8 +1905,6 @@ CCircle.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._c(XX[27], YY[27], XX[28], YY[28], XX[29], YY[29]);
     pGraphics._c(XX[29], YY[29], XX[30], YY[30], XX[31], YY[31]);
     pGraphics._c(XX[31], YY[31], XX[32], YY[32], XX[33], YY[33]);
-    pGraphics.ds();
-
 };
 
 
@@ -1972,7 +1970,6 @@ CSurface.prototype.getCoord = function()
 };
 CSurface.prototype.drawPath = function(pGraphics, XX, YY)
 {
-    pGraphics._s();
     pGraphics._m(XX[0], YY[0]);
     pGraphics._l(XX[0], YY[0]);
     pGraphics._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2] );
@@ -1996,7 +1993,6 @@ CSurface.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._c(XX[36], YY[36], XX[37], YY[37], XX[38], YY[38] );
     pGraphics._c(XX[38], YY[38], XX[39], YY[39], XX[40], YY[40] );
     pGraphics._c(XX[40], YY[40], XX[41], YY[41], XX[42], YY[42] );
-    pGraphics.ds();
 };
 
 function CVolume()
@@ -2068,7 +2064,6 @@ CVolume.prototype.getCoord = function()
 };
 CVolume.prototype.drawPath = function(pGraphics, XX, YY)
 {
-    pGraphics._s();
     pGraphics._m(XX[0], YY[0]);
     pGraphics._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2] );
     pGraphics._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4] );
@@ -2095,7 +2090,6 @@ CVolume.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._c(XX[44], YY[44], XX[45], YY[45], XX[46], YY[46] );
     pGraphics._c(XX[46], YY[46], XX[47], YY[47], XX[48], YY[48] );
     pGraphics._c(XX[48], YY[48], XX[49], YY[49], XX[50], YY[50] );
-    pGraphics.ds();
 };
 
 /**
@@ -2103,78 +2097,240 @@ CVolume.prototype.drawPath = function(pGraphics, XX, YY)
  * @constructor
  * @extends {CNaryOperator}
  */
-function CContourIntegral()
+function CClosedPathIntegral()
 {
     CNaryOperator.call(this);
 }
-Asc.extendClass(CContourIntegral, CNaryOperator);
-CContourIntegral.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
+Asc.extendClass(CClosedPathIntegral, CNaryOperator);
+CClosedPathIntegral.prototype.drawGlyph = function(parameters)
 {
-    var circle = new CCircle();
-    var coord = circle.getCoord();
+    var x           = parameters.x,
+        y           = parameters.y,
+        Integral    = parameters.Integral,
+        Circle      = parameters.Circle,
+        CoeffWidth  = parameters.CoeffWidth,
+        PDSE        = parameters.PDSE;
 
-    var X = coord.X,
-        Y = coord.Y,
-        W = coord.W,
-        H = coord.H;
-
-    var integr = new CIntegral(),
-		coord2 = integr.getCoord();
-
-    var XX = coord2.X,
-        YY = coord2.Y,
-        WW = coord2.W,
-        HH = coord2.H;
-
-    //var textScale =  this.getTxtPrp().FontSize/850;// 1000 pt
-    var FontSize = this.Get_TxtPrControlLetter().FontSize;
-    var textScale =  FontSize/850;// 1000 pt
-    var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
-
-    var shX = (WW - W)*alpha/2,
-        shY = (HH - H)*alpha*0.48;
+    var pGraphics   = parameters.PDSE.Graphics;
 
 
-    for(var i = 0; i < X.length; i++)
+    var oCompiledPr = this.Parent.Get_CompiledCtrPrp();
+
+    if(CoeffWidth == undefined)
+        CoeffWidth = 1;
+
+    var CoordCircle     = Circle.getCoord(),
+        CoordIntegral   = Integral.getCoord();
+
+    var CircleX = CoordCircle.X,
+        CircleY = CoordCircle.Y,
+        CircleW = CoordCircle.W,
+        CircleH = CoordCircle.H;
+
+    var IntegralX = CoordIntegral.X,
+        IntegralY = CoordIntegral.Y,
+        IntegralW = CoeffWidth*CoordIntegral.W,
+        IntegralH = CoordIntegral.H;
+
+    var FontSize  = this.Get_TxtPrControlLetter().FontSize;
+    var textScale = FontSize/850;// 1000 pt
+    var alpha     = textScale*0.00413; // 25.4/96 /64;
+
+    var shX = (IntegralW - CircleW)*alpha*0.5,
+        shY = (IntegralH - CircleH)*alpha*0.48;
+
+    var ExtX    = [],  ExtY    = [],
+        InsideX = [],  InsideY = [];
+
+    for(var j = 0; j < IntegralX.length; j++)
     {
-        X[i] = this.pos.x + x + shX + X[i]*alpha;
-        Y[i] = this.pos.y + y + shY + Y[i]*alpha;
+        IntegralX[j] = this.pos.x + x + IntegralX[j]*alpha;
+        IntegralY[j] = this.pos.y + y + IntegralY[j]*alpha;
     }
 
-
-    for(var i = 0; i < XX.length; i++)
-    {
-        XX[i] = this.pos.x + x + XX[i]*alpha;
-        YY[i] = this.pos.y + y + YY[i]*alpha;
-    }
-
-    var penCircle = 750*FontSize/32;
+    var CircleLng = CircleX.length;
 
     var intGrid = pGraphics.GetIntegerGrid();
     pGraphics.SetIntegerGrid(false);
 
-
-    pGraphics.p_width(penCircle);
-
     this.Parent.Make_ShdColor(PDSE, this.Parent.Get_CompiledCtrPrp());
-    //pGraphics.b_color1(0,0,0, 255);
-    //pGraphics.p_color(0,0,0, 255);
 
-    circle.drawPath(pGraphics, X, Y);
+    if(pGraphics.Start_Command)
+    {
+        for(var i = 0; i < CircleLng; i++)
+        {
+            ExtX[i]     = this.pos.x + x + shX + CircleX[i]*alpha*1.1 - CircleW*alpha*0.04;
+            ExtY[i]     = this.pos.y + y + shY + CircleY[i]*alpha*1.1;
 
-    pGraphics.p_width(1000);
+            InsideX[i]  = this.pos.x + x + shX + CircleX[CircleLng - i - 1]*alpha*0.9 + CircleW*alpha*0.06;
+            InsideY[i]  = this.pos.y + y + shY + CircleY[CircleLng - i - 1]*alpha*0.9 + CircleH*alpha*0.1;
+        }
+
+        var oTextOutline = oCompiledPr.TextOutline;
+
+        var oCompiledPr2 = oCompiledPr.Copy();
+        oCompiledPr2.TextFill = CreateNoFillUniFill();
+        oCompiledPr2.Unifill  = null;
+        oCompiledPr2.Color    = null;
+        pGraphics.SetTextPr(oCompiledPr2, PDSE.Theme);
+        pGraphics._s();
+        Circle.drawPath(pGraphics, ExtX, ExtY);
+        pGraphics._z();
+        Circle.drawPath(pGraphics, InsideX, InsideY);
+        pGraphics._z();
+        pGraphics.ds();
+        pGraphics.df();
+        pGraphics._s();
+        Integral.drawPath(pGraphics, IntegralX, IntegralY, IntegralW*alpha);
+        pGraphics.ds();
+        pGraphics.df();
+
+        // делаем заливку уже обводки
+
+        var WidthLine = (pGraphics.m_oTextPr.TextOutline.w/36000) *0.6; // сместим заливку на половину толщины линии , чтобы не было зазоров м/ду обводкой и заливкой
+
+        // последняя точка совпадает в пути с первой, поэтому берем предпоследнюю
+
+        var PrevX = ExtX[CircleLng - 2],
+            PrevY = ExtY[CircleLng - 2];
+
+        for(var i = 1; i < CircleLng; i++)
+        {
+            if(PrevY > ExtY[i])
+            {
+                ExtX[i]                     += WidthLine;
+                InsideX[CircleLng - i - 1]  -= WidthLine;
+            }
+            else if(PrevY < ExtY[i])
+            {
+                ExtX[i]                     -= WidthLine;
+                InsideX[CircleLng - i - 1]  += WidthLine;
+            }
+
+            if(PrevX > ExtX[i])
+            {
+                ExtY[i]                     -= WidthLine;
+                InsideY[CircleLng - i - 1]  += WidthLine;
+            }
+            else if(PrevX < ExtX[i])
+            {
+                ExtY[i]                    += WidthLine;
+                InsideY[CircleLng - i - 1] -= WidthLine;
+            }
+
+            PrevX = ExtX[i];
+            PrevY = ExtY[i];
+        }
+
+        ExtX[0] = ExtX[CircleX.length - 1];
+        ExtY[0] = ExtY[CircleX.length - 1];
+
+        InsideY[CircleX.length - 1] = InsideY[0];
+        InsideY[CircleX.length - 1] = InsideY[0];
+
+        var IntegralLng = IntegralX.length;
+        PrevX = IntegralX[IntegralLng - 2];
+        PrevY = IntegralY[IntegralLng - 2];
+
+        for(var j = 0; j < IntegralLng; j++)
+        {
+            var CurrentX = IntegralX[j],
+                CurrentY = IntegralY[j];
+
+            if(PrevY > IntegralY[j])
+                IntegralX[j] += WidthLine;
+            else if(PrevY < IntegralY[j])
+                IntegralX[j] -= WidthLine;
+
+            if(PrevX > IntegralX[j])
+                IntegralY[j] -= WidthLine;
+            else if(PrevX < IntegralX[j])
+                IntegralY[j] += WidthLine;
+
+
+            PrevX = CurrentX;
+            PrevY = CurrentY;
+        }
+
+
+        IntegralX[0] = IntegralX[IntegralLng - 1];
+        IntegralY[0] = IntegralY[IntegralLng - 1];
+
+        // т.к. при отрисовке textArt сравниаются ссылки текстовых настроек и если они совпали, то текстовые настройки не меняются и отрисовка происходит с теми же текстовые настройками, к-ые выставлены ранее
+        oCompiledPr.TextOutline  = null;
+
+        pGraphics.SetTextPr(oCompiledPr, PDSE.Theme);
+
+        pGraphics._s();
+        Circle.drawPath(pGraphics, ExtX, ExtY);
+        pGraphics._z();
+        Circle.drawPath(pGraphics, InsideX, InsideY);
+        pGraphics._z();
+        pGraphics.ds();
+        pGraphics.df();
+
+        pGraphics._s();
+        Integral.drawPath(pGraphics, IntegralX, IntegralY, IntegralW*alpha);
+        pGraphics.ds();
+        pGraphics.df();
+
+        oCompiledPr.TextOutline = oTextOutline; // меняем обратно, чтобы не изменились скомпилированные текстовые настройки
+    }
+    else
+    {
+        for(var i = 0; i < CircleLng; i++)
+        {
+            CircleX[i] = this.pos.x + x + shX + CircleX[i]*alpha;
+            CircleY[i] = this.pos.y + y + shY + CircleY[i]*alpha;
+        }
+
+        var penCircle = 750*FontSize/32;
+        pGraphics.p_width(penCircle);
+
+        pGraphics._s();
+        Circle.drawPath(pGraphics, CircleX, CircleY);
+        pGraphics.ds();
+
+        pGraphics.p_width(0);
+
+        pGraphics._s();
+
+        Integral.drawPath(pGraphics, IntegralX, IntegralY);
+        pGraphics.df();
+    }
 
     pGraphics._s();
 
-    integr.drawPath(pGraphics, XX, YY);
-
-    pGraphics.df();
     pGraphics.SetIntegerGrid(intGrid);
+};
 
+
+/**
+ *
+ * @constructor
+ * @extends {CClosedPathIntegral}
+ */
+function CContourIntegral()
+{
+    CClosedPathIntegral.call(this);
+}
+Asc.extendClass(CContourIntegral, CClosedPathIntegral);
+CContourIntegral.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
+{
+    var parameters =
+    {
+        x:              x,
+        y:              y,
+        CoeffWidth:     1.0,
+        PDSE:           PDSE,
+        Integral:       new CIntegral(),
+        Circle:         new CCircle()
+    };
+
+    CContourIntegral.superclass.drawGlyph.call(this, parameters);
 };
 CContourIntegral.prototype.calculateSizeGlyph = function()
 {
-    //var betta = this.getTxtPrp().FontSize/36;
     var betta = this.Get_TxtPrControlLetter().FontSize/36;
 
     var _width =  8.624*betta,
@@ -2191,80 +2347,29 @@ CContourIntegral.prototype.calculateSizeGlyph = function()
 /**
  *
  * @constructor
- * @extends {CNaryOperator}
+ * @extends {CClosedPathIntegral}
  */
 function CSurfaceIntegral()
 {
-    CNaryOperator.call(this);
+    CClosedPathIntegral.call(this);
 }
-Asc.extendClass(CSurfaceIntegral, CNaryOperator);
+Asc.extendClass(CSurfaceIntegral, CClosedPathIntegral);
 CSurfaceIntegral.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
 {
-    var surf = new CSurface();
-    var coord = surf.getCoord();
-
-    var X = coord.X,
-        Y = coord.Y,
-        W = coord.W,
-        H = coord.H;
-
-    var integr = new CDoubleIntegral(),
-    	coord2 = integr.getCoord();
-
-    var XX = coord2.X,
-        YY = coord2.Y,
-        WW = 1.6*coord2.W,
-        HH = coord2.H;
-
-    var FontSize = this.Get_TxtPrControlLetter().FontSize;
-    var textScale =  FontSize/850; // 1000 pt
-    var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
-
-
-    var shX = (WW - W)*alpha/2,
-        shY = (HH - H)*alpha*0.48;
-
-
-    for(var i = 0; i < X.length; i++)
+    var parameters =
     {
-        X[i] = this.pos.x + x + shX + X[i]*alpha;
-        Y[i] = this.pos.y + y + shY + Y[i]*alpha;
-    }
+        x:              x,
+        y:              y,
+        CoeffWidth:     1.6,
+        PDSE:           PDSE,
+        Integral:       new CDoubleIntegral(),
+        Circle:         new CSurface()
+    };
 
-
-    for(var i = 0; i < XX.length; i++)
-    {
-        XX[i] = this.pos.x + x + XX[i]*alpha;
-        YY[i] = this.pos.y + y + YY[i]*alpha;
-    }
-
-    var penSurface = 750*FontSize/32;
-
-    var intGrid = pGraphics.GetIntegerGrid();
-    pGraphics.SetIntegerGrid(false);
-
-    pGraphics.p_width(penSurface);
-
-    this.Parent.Make_ShdColor(PDSE, this.Parent.Get_CompiledCtrPrp());
-    //pGraphics.b_color1(0,0,0, 255);
-    //pGraphics.p_color(0,0,0, 255);
-
-    surf.drawPath(pGraphics, X, Y);
-
-    pGraphics.p_width(1000);
-
-    pGraphics._s();
-
-    integr.drawPath(pGraphics, XX, YY);
-
-    pGraphics.df();
-
-    pGraphics.SetIntegerGrid(intGrid);
-
+    CSurfaceIntegral.superclass.drawGlyph.call(this, parameters);
 };
 CSurfaceIntegral.prototype.calculateSizeGlyph = function()
 {
-    //var betta = this.getTxtPrp().FontSize/36;
     var betta = this.Get_TxtPrControlLetter().FontSize/36;
 
     var _width =  14.2296*betta,
@@ -2281,79 +2386,29 @@ CSurfaceIntegral.prototype.calculateSizeGlyph = function()
 /**
  *
  * @constructor
- * @extends {CNaryOperator}
+ * @extends {CClosedPathIntegral}
  */
 function CVolumeIntegral()
 {
-    CNaryOperator.call(this);
+    CClosedPathIntegral.call(this);
 }
-Asc.extendClass(CVolumeIntegral, CNaryOperator);
+Asc.extendClass(CVolumeIntegral, CClosedPathIntegral);
 CVolumeIntegral.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
 {
-    var volume = new CVolume();
-    var coord = volume.getCoord();
-
-    var X = coord.X,
-        Y = coord.Y,
-        W = coord.W,
-        H = coord.H;
-
-    var integr = new CTripleIntegral(),
-    	coord2 = integr.getCoord();
-
-    var XX = coord2.X,
-        YY = coord2.Y,
-        WW = 2.1*coord2.W,
-        HH = coord2.H;
-
-    var FontSize = this.Get_TxtPrControlLetter().FontSize;
-    var textScale = FontSize/850; // 1000 pt
-    var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
-
-
-    var shX = (WW - W)*alpha/2,
-        shY = (HH - H)*alpha*0.47;
-
-
-    for(var i = 0; i < X.length; i++)
+    var parameters =
     {
-        X[i] = this.pos.x + x + shX + X[i]*alpha;
-        Y[i] = this.pos.y + y + shY + Y[i]*alpha;
-    }
+        x:              x,
+        y:              y,
+        CoeffWidth:     2.1,
+        PDSE:           PDSE,
+        Integral:       new CTripleIntegral(),
+        Circle:         new CVolume()
+    };
 
-    for(var i = 0; i < XX.length; i++)
-    {
-        XX[i] = this.pos.x + x + XX[i]*alpha;
-        YY[i] = this.pos.y + y + YY[i]*alpha;
-    }
-
-    var penVolume = 750*FontSize/32;
-
-    var intGrid = pGraphics.GetIntegerGrid();
-    pGraphics.SetIntegerGrid(false);
-
-    pGraphics.p_width(penVolume);
-
-    this.Parent.Make_ShdColor(PDSE, this.Parent.Get_CompiledCtrPrp());
-    //pGraphics.b_color1(0,0,0, 255);
-    //pGraphics.p_color(0,0,0, 255);
-
-    volume.drawPath(pGraphics, X, Y);
-
-    pGraphics.p_width(1000);
-
-    pGraphics._s();
-
-    integr.drawPath(pGraphics, XX, YY);
-
-    pGraphics.df();
-
-    pGraphics.SetIntegerGrid(intGrid);
-
+    CVolumeIntegral.superclass.drawGlyph.call(this, parameters);
 };
 CVolumeIntegral.prototype.calculateSizeGlyph = function()
 {
-    //var betta = this.getTxtPrp().FontSize/36;
     var betta = this.Get_TxtPrControlLetter().FontSize/36;
 
     var _width =  18.925368*betta,

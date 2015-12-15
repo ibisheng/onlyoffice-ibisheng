@@ -131,10 +131,10 @@ CSignRadical.prototype.draw = function(x, y, pGraphics, PDSE)
     }
     else // чтобы линии были четкие не в WordArt, рисуем знак радикала по заданному пути линиями нужной толщины
     {
-        var intGrid = pGraphics.GetIntegerGrid();
-        pGraphics.SetIntegerGrid(true);             // для того чтобы линии были отрисованы четко (неразмыто)
+        var intGrid = PDSE.Graphics.GetIntegerGrid();
+        PDSE.Graphics.SetIntegerGrid(true);             // для того чтобы линии были отрисованы четко (неразмыто)
 
-        pGraphics.p_width(penW3*1000);
+        PDSE.Graphics.p_width(penW3*1000);
 
         PDSE.Graphics._m(xx2,  yy2);
         PDSE.Graphics._l(xx3,  yy3);
@@ -145,7 +145,7 @@ CSignRadical.prototype.draw = function(x, y, pGraphics, PDSE)
 
         PDSE.Graphics.ds();
 
-        pGraphics.SetIntegerGrid(intGrid);
+        PDSE.Graphics.SetIntegerGrid(intGrid);
     }
 
     PDSE.Graphics._s();
