@@ -6132,6 +6132,7 @@
 				ar.type = c_oAscSelectionType.RangeCells;
 				this._fixSelectionOfMergedCells();
 			}
+            this.isFormulaEditMode?this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] = new ActiveRange(ar.getAllRange()):null;
 		};
 
 		WorksheetView.prototype._moveActiveCellToOffset = function (dc, dr) {

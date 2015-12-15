@@ -783,7 +783,7 @@
                 * необходимо чтобы парсить случаи когда используется что-то такое sumnas2:K2 - sumnas2 невалидная ссылка.
                 * */
                 var a = arrFR[id];
-                if( t.cursorPos >= a.cursorePos && t.cursorPos <= a.formulaRangeLength ){
+                if( t.cursorPos >= a.cursorePos && t.cursorPos <= a.cursorePos + a.formulaRangeLength ){
                     return {index:a.cursorePos, length: a.formulaRangeLength, range:a.clone(true)};
                 }
             }
