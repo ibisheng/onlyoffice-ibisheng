@@ -592,7 +592,7 @@
 
 		CellEditor.prototype.isFormula = function() {
 			var fragments = this.options.fragments;
-			return fragments.length > 0 && fragments[0].text.length > 0 && fragments[0].text.charAt(0) === "=";
+			return fragments && fragments.length > 0 && fragments[0].text.length > 0 && fragments[0].text.charAt(0) === "=";
 		};
 
 		CellEditor.prototype.insertFormula = function (functionName,isDefName) {
