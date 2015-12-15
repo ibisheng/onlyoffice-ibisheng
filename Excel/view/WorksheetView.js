@@ -6132,7 +6132,6 @@
 				ar.type = c_oAscSelectionType.RangeCells;
 				this._fixSelectionOfMergedCells();
 			}
-            this.isFormulaEditMode?this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] = new ActiveRange(ar.getAllRange()):null;
 		};
 
 		WorksheetView.prototype._moveActiveCellToOffset = function (dc, dr) {
@@ -10689,7 +10688,7 @@
 
 /*            var defName = this.model.workbook.findDefinesNames(this.model.getName()+"!"+currentRange.getAbsName(),this.model.getId());
             console.log("defName #2 " + defName);*/
-            editor.enterCellRange(/*defName || */currentRange.getName());
+            editor.enterCellRange(/*defName || */currentRange.getAllRange().getName());
 
 			for (var tmpRange, i = 0; i < this.arrActiveFormulaRanges.length; ++i) {
 				tmpRange = this.arrActiveFormulaRanges[i];
