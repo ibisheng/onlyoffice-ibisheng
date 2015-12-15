@@ -153,6 +153,8 @@
 				selectionTimeout: 20
 			};
 
+            this.dontUpdateText = false;
+
 			this._init(settings);
 
 			return this;
@@ -921,7 +923,9 @@
 
 			this._updateUndoRedoChanged();
 
-            window["native"].onCellEditorChangeText(this._getFragmentsText(this.options.fragments));
+            if (!this.dontUpdateText) {
+                window["native"].onCellEditorChangeText(this._getFragmentsText(this.options.fragments));
+            }
         };
 
 		CellEditor.prototype._fireUpdated = function () {
@@ -1322,7 +1326,11 @@
 
 			if (!this._checkMaxCellLength(length)) {return false;}
 
+            this.dontUpdateText = true;
+
 			if (this.selectionBegin !== this.selectionEnd) {this._removeChars(undefined, undefined, isRange);}
+
+            this.dontUpdateText = false;
 
 			if (pos === undefined) {pos = this.cursorPos;}
 

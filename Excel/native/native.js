@@ -2946,7 +2946,6 @@ function OfflineEditor () {
             stream["ClearNoAttack"]();
             asc_WriteCCelInfo(cellInfo, stream);
             window["native"]["OnCallMenuEvent"](2402, stream); // ASC_SPREADSHEETS_EVENT_TYPE_SELECTION_CHANGED
-
             t.onSelectionChanged(cellInfo);
         });
         _api.asc_registerCallback('asc_onSelectionNameChanged', function(name) {
@@ -2962,7 +2961,6 @@ function OfflineEditor () {
             window["native"]["OnCallMenuEvent"](2403, stream); // ASC_SPREADSHEETS_EVENT_TYPE_EDITOR_SELECTION_CHANGED
         });
         _api.asc_registerCallback('asc_onSendThemeColorSchemes', function(schemes) {
-
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
             asc_WriteColorSchemes(schemes, stream);
@@ -2984,6 +2982,12 @@ function OfflineEditor () {
             stream['WriteLong'](id);
             stream['WriteLong'](level);
             window["native"]["OnCallMenuEvent"](500, stream); // ASC_MENU_EVENT_TYPE_ON_ERROR
+        });
+        _api.asc_registerCallback('asc_onEditCell', function(state) {
+            var stream = global_memory_stream_menu;
+            stream["ClearNoAttack"]();
+            stream['WriteLong'](state);
+            window["native"]["OnCallMenuEvent"](2600, stream); // ASC_SPREADSHEETS_EVENT_TYPE_ON_EDIT_CELL
         });
     };
     this.updateFrozen = function () {
@@ -4201,7 +4205,7 @@ function offline_of() {_s.openFile();}
 function offline_stz(v) {_s.zoom = v; _api.asc_setZoom(v);}
 function offline_ds(x, y, width, height, ratio) {_s.drawSheet(x, y, width, height, ratio);}
 function offline_dh(x, y, width, height, type, ratio) {_s.drawHeader(x, y, width, height, type, ratio);}
-function offline_mouse_down(x, y, pin, isViewer) {
+function offline_mouse_down(x, y, pin, isViewer, isFormulaEditMode) {
     _s.isShapeAction = false;
 
     var ws = _api.wb.getWorksheet();
@@ -4227,11 +4231,22 @@ function offline_mouse_down(x, y, pin, isViewer) {
     }
 
     _s.cellPin = pin;
+    _s.isFormulaEditMode = isFormulaEditMode;
 
     if (0 != _s.cellPin) {
         ws.leftTopRange = ws.activeRange.clone();
     } else {
+
+        if (isFormulaEditMode) {
+            var ret = wb.cellEditor.canEnterCellRange();
+            ret ? wb.cellEditor.activateCellRange() : true;
+        }
+
         ws.changeSelectionStartPoint(x, y, true, true);
+
+        if (isFormulaEditMode) {
+            ws.enterCellRange(wb.cellEditor);
+        }
     }
 
     ws.visibleRange = range;
@@ -4240,6 +4255,7 @@ function offline_mouse_down(x, y, pin, isViewer) {
 }
 function offline_mouse_move(x, y, isViewer) {
     var ws = _api.wb.getWorksheet();
+    var wb = _api.wb;
 
     var range =  ws.visibleRange.clone();
     range.c1 = _s.col0;
@@ -4248,7 +4264,6 @@ function offline_mouse_move(x, y, isViewer) {
 
     if (_s.isShapeAction) {
         if (!isViewer) {
-            var wb = _api.wb;
             var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
             ws.objectRender.graphicObjectMouseMove(e, x, y);
         }
@@ -4257,8 +4272,13 @@ function offline_mouse_move(x, y, isViewer) {
             ws._changeSelectionTopLeft(x, y, true, true, true);
         else if (1 === _s.cellPin)
             ws._changeSelectionTopLeft(x, y, true, true, false);
-        else
+        else {
             ws.changeSelectionEndPoint(x, y, true, true);
+
+            if (_s.isFormulaEditMode) {
+                ws.enterCellRange(wb.cellEditor);
+            }
+        }
     }
 
     ws.visibleRange = range;
@@ -4311,6 +4331,14 @@ function offline_keyboard_down(keys) {
             wb._onChangeSelection(true, 0, 1, false, false, undefined);
     }
 }
+function offline_cell_editor_draw(width, height, ratio) {
+    _null_object.width = width * ratio;
+    _null_object.height = height * ratio;
+
+    var wb = _api.wb;
+    var cellEditor = _api.wb.cellEditor;
+    cellEditor._draw();
+}
 function offline_cell_editor_open(isSelectAll, x, y, width, height, ratio) {
     _null_object.width = width * ratio;
     _null_object.height = height * ratio;
@@ -4319,12 +4347,7 @@ function offline_cell_editor_open(isSelectAll, x, y, width, height, ratio) {
 
     wb.cellEditor.isSelectAll = isSelectAll;
 
-    // if (isCoord) {
     wb._onEditCell(x, y, true, undefined, undefined, true, false);
-    // }
-    // else {
-    //     wb._onEditCell(parseInt(x), parseInt(y), false, undefined, undefined, true, false);
-    // }
 
     return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom,
         wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
@@ -4805,11 +4828,10 @@ function offline_apply_event(type,params) {
                         if (bIsNeed)
                         {
                             var _originSize = this.Native["GetOriginalImageSize"](_imagePr.ImageUrl);
-                            var _w = _originSize[0];
-                            var _h = _originSize[1];
+                            var _w = _originSize[0] * 25.4 / 96.0;
+                            var _h = _originSize[1] * 25.4 / 96.0;
 
-                            // сбрасываем урл
-                            //_imagePr.ImageUrl = undefined;
+                            _imagePr.ImageUrl = undefined;
 
 //                            var Page_Width     = 210;
 //                            var Page_Height    = 297;
@@ -4839,14 +4861,14 @@ function offline_apply_event(type,params) {
 //                            var __w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
 //                            var __h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
 //
-//                            var wI = (undefined !== _w) ? Math.max(_w * g_dKoef_pix_to_mm, 1) : 1;
-//                            var hI = (undefined !== _h) ? Math.max(_h * g_dKoef_pix_to_mm, 1) : 1;
-//
-//                            wI = Math.max(5, Math.min(wI, __w));
-//                            hI = Math.max(5, Math.min(hI, __h));
+                            var wI = (undefined !== _w) ? Math.max(_w * 25.4 / 96.0, 1) : 1;
+                            var hI = (undefined !== _h) ? Math.max(_h * 25.4 / 96.0, 1) : 1;
 
-                            _imagePr.Width = _w;  // wI;
-                            _imagePr.Height = _h; // hI;
+                            wI = Math.max(5, Math.min(wI, __w));
+                            hI = Math.max(5, Math.min(hI, __h));
+
+                            _imagePr.Width = wI;
+                            _imagePr.Height = hI;
                         }
 
                         break;

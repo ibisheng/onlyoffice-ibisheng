@@ -217,9 +217,9 @@ WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFr
 
     isFrozen = !!isFrozen;
     if (asc["editor"].isStartAddShape || this.objectRender.selectedGraphicObjectsExists()) {
-        if (this.isChartAreaEditMode) {
-            this._drawFormulaRanges(this.arrActiveChartsRanges);
-        }
+        //if (this.isChartAreaEditMode) {
+        //    this._drawFormulaRanges(this.arrActiveChartsRanges);
+        //}
         return;
     }
 
@@ -425,7 +425,7 @@ WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFr
         //	//ctx.lineVer(x2, y1 + t, y2 + b - fillHandleHeight);
         //}
 
-       // native_selection = [x1, y1, x2, y2, this.activeRange.type];
+        // native_selection = [x1, y1, x2, y2, this.activeRange.type];
 
         //return [x1, y1, x2, y2, this.activeRange.type ];
     }
@@ -478,25 +478,23 @@ WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFr
         }
 
         //if (!(isFrozen && (!drawRightSide || !drawBottomSide))) {
-            // Рисуем "квадрат" для автозаполнения (располагается "квадрат" в правом нижнем углу последней ячейки выделения)
-            //cr = range.intersection(new asc_Range(range.c2, range.r2, range.c2, range.r2));
-            //if (cr !== null) {
-            //	this.fillHandleL = this.cols[cr.c1].left - offsetX + this.cols[cr.c1].width - this.width_1px - this.width_2px;
-            //	this.fillHandleR = this.fillHandleL + fillHandleWidth;
-            //	this.fillHandleT = this.rows[cr.r1].top - offsetY + this.rows[cr.r1].height - this.height_1px - this.height_2px;
-            //	this.fillHandleB = this.fillHandleT + fillHandleHeight;
-            //
-            //	ctx.setFillStyle(opt.activeCellBorderColor).fillRect(this.fillHandleL, this.fillHandleT, this.fillHandleR - this.fillHandleL, this.fillHandleB - this.fillHandleT);
-            //
-            //	ctx.setStrokeStyle(opt.activeCellBorderColor2).setLineWidth(1).beginPath();
-            //	ctx.lineHorPrevPx(this.fillHandleL, this.fillHandleT, this.fillHandleR);
-            //	ctx.lineVerPrevPx(this.fillHandleL, this.fillHandleT, this.fillHandleB);
-            //	ctx.stroke();
-            //}
+        // Рисуем "квадрат" для автозаполнения (располагается "квадрат" в правом нижнем углу последней ячейки выделения)
+        //cr = range.intersection(new asc_Range(range.c2, range.r2, range.c2, range.r2));
+        //if (cr !== null) {
+        //	this.fillHandleL = this.cols[cr.c1].left - offsetX + this.cols[cr.c1].width - this.width_1px - this.width_2px;
+        //	this.fillHandleR = this.fillHandleL + fillHandleWidth;
+        //	this.fillHandleT = this.rows[cr.r1].top - offsetY + this.rows[cr.r1].height - this.height_1px - this.height_2px;
+        //	this.fillHandleB = this.fillHandleT + fillHandleHeight;
+        //
+        //	ctx.setFillStyle(opt.activeCellBorderColor).fillRect(this.fillHandleL, this.fillHandleT, this.fillHandleR - this.fillHandleL, this.fillHandleB - this.fillHandleT);
+        //
+        //	ctx.setStrokeStyle(opt.activeCellBorderColor2).setLineWidth(1).beginPath();
+        //	ctx.lineHorPrevPx(this.fillHandleL, this.fillHandleT, this.fillHandleR);
+        //	ctx.lineVerPrevPx(this.fillHandleL, this.fillHandleT, this.fillHandleB);
+        //	ctx.stroke();
+        //}
         //}
     }
-
-    return native_selection;
 
     // draw fill handle select
     if (this.activeFillHandle !== null) {
@@ -531,9 +529,13 @@ WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFr
         //ctx.stroke();
     }
 
+    var formulaRanges = [];
+
     if (!isFrozen && this.isFormulaEditMode) {
-        //	this._drawFormulaRanges(this.arrActiveFormulaRanges);
+        formulaRanges = this.__drawFormulaRanges(this.arrActiveFormulaRanges, offsetX, offsetY);
     }
+
+    return {'selection':native_selection, 'formulaRanges': formulaRanges};
 
     if (!isFrozen && this.isChartAreaEditMode) {
         //	this._drawFormulaRanges(this.arrActiveChartsRanges);
@@ -648,5 +650,48 @@ WorksheetView.prototype._changeSelectionTopLeft = function (x, y, isCoord, isSel
 
     return this._calcActiveRangeOffset(x,y);
 };
+
+WorksheetView.prototype.__drawFormulaRanges = function (arrRanges, offsetX, offsetY) {
+    var ranges = [];
+
+    var i;//, lineWidth = 1, isDashLine = false, length = c_oAscFormulaRangeBorderColor.length;
+    // var strokeColor, fillColor, colorIndex, uniqueColorIndex = 0, tmpColors = [];
+    for (i = 0; i < arrRanges.length; ++i) {
+        //var oFormulaRange = arrRanges[i].clone(true);
+
+        ranges.push(arrRanges[i].c1);
+        ranges.push(arrRanges[i].c2);
+        ranges.push(arrRanges[i].r1);
+        ranges.push(arrRanges[i].r2);
+
+        var _l = this.cols[arrRanges[i].c1].left - offsetX,
+            _r = this.cols[arrRanges[i].c2].left + this.cols[arrRanges[i].c2].width - offsetX,
+            _t = this.rows[arrRanges[i].r1].top - offsetY,
+            _b = this.rows[arrRanges[i].r2].top + this.rows[arrRanges[i].r2].height - offsetY;
+
+        ranges.push(_l);
+        ranges.push(_t);
+        ranges.push(_r);
+        ranges.push(_b);
+
+       // console.log('FormulaRange ('+ i +') ' + JSON.stringify(arrRanges[i]));
+
+
+//        colorIndex = asc.getUniqueRangeColor(arrRanges, i, tmpColors);
+//        if (null == colorIndex)
+//            colorIndex = uniqueColorIndex++;
+//        tmpColors.push(colorIndex);
+//
+//        strokeColor = fillColor = c_oAscFormulaRangeBorderColor[colorIndex % length];
+//        this._drawElements(this, this._drawSelectionElement, oFormulaRange, isDashLine, lineWidth,
+//            strokeColor, fillColor);
+    }
+
+    return ranges;
+};
+
+WorksheetView.prototype.__getFormulaRanges = function() {
+    this.__drawFormulaRanges(this.arrActiveFormulaRanges, offsetX, offsetY);
+}
 
 
