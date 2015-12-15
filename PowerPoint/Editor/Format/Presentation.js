@@ -556,6 +556,11 @@ CPresentation.prototype =
         return true;
     },
 
+
+    Is_OnRecalculate: function()
+    {
+        return true;
+    },
     Continue_FastCollaborativeEditing: function()
     {
         if (true !== CollaborativeEditing.Is_Fast())
