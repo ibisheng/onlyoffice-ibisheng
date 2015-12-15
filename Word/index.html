@@ -29,7 +29,7 @@
             width: 100%;
             height: 170px;
             bottom: 42%;
-            margin-bottom: 50px;
+            margin-bottom: 20px;
             position: absolute;
             text-align: center;
         }
@@ -51,11 +51,6 @@
 
         .loader-page-text-loading {
             font-size: 14px;
-        }
-
-        .loader-page-text-customer {
-            font-size: 16px;
-            margin-bottom: 5px;
         }
 
         .romb {
@@ -200,7 +195,6 @@
 
         var params = getUrlParams(),
             lang = (params["lang"] || 'en').split("-")[0],
-            customer = encodeUrlParam(params["customer"] || 'ONLYOFFICE'),
             loading = 'Loading...';
         
         if ( lang == 'de')      loading = 'Ladevorgang...';
@@ -221,7 +215,6 @@
                     '<div class="romb" id="red"></div>' +
                 '</div></div>' +
                 '<div class="loader-page-text">' +
-                '<div class="loader-page-text-customer">' + customer + '</div>' +
                 '<div class="loader-page-text-loading">' + loading + '</div>' +
                 '</div>' +
             '</div>');
