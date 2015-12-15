@@ -1352,8 +1352,7 @@
 				x += this.cols[i].width;
 			}
 
-			if (1 === fullRecalc)
-				this.nColsCount = Math.min(Math.max(this.nColsCount, i), gc_nMaxCol);
+			this.nColsCount = Math.min(Math.max(this.nColsCount, i), gc_nMaxCol);
 		};
 
 		/**
@@ -1404,8 +1403,7 @@
 				y += this.rows[i].height;
 			}
 
-			if (1 === fullRecalc)
-				this.nRowsCount = Math.min(Math.max(this.nRowsCount, i), gc_nMaxRow);
+			this.nRowsCount = Math.min(Math.max(this.nRowsCount, i), gc_nMaxRow);
 		};
 
 		/** Вычисляет диапазон индексов видимых колонок */
