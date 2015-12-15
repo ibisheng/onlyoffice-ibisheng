@@ -4831,7 +4831,7 @@ var maxIndividualValues = 10000;
 			{
 				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
-				var oldFilter = autoFilterElement.clone(aWs);
+				var oldFilter = autoFilterElement.clone(null);
 				
 				if(autoFilterElement.SortState)
 					autoFilterElement.SortState = null;
