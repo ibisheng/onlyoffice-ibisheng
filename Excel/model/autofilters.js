@@ -4014,6 +4014,10 @@ var maxIndividualValues = 10000;
 			
 			_getTrueColId: function(filter, colId)
 			{
+				//TODO - добавил условие, чтобы не было ошибки(bug 30007). возможно, второму пользователю нужно запретить все действия с измененной таблицей.
+				if(filter === null)
+					return null;
+				
 				var res = colId;
 				if(filter.getType() !== g_nFiltersType.autoFilter)
 					return res;
@@ -4103,6 +4107,9 @@ var maxIndividualValues = 10000;
 				var aWs = this._getCurrentWS();
 				
 				colId = this._getTrueColId(autoFilter, colId);
+				
+				if(colId === null)
+					return;
 				
 				for(var i = ref.r1 + 1; i <= ref.r2; i++)
 				{
