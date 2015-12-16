@@ -3252,16 +3252,18 @@ CCellValue.prototype =
 				}
 			}
 		}
-    // Удаляем концевые пробелы и переводы строки перед проверкой гиперссылок
-    val = val.replace(/\s+$/, '');
-    var typeHyp = getUrlType(val);
-    if (c_oAscUrlType.Invalid != typeHyp) {
-      val = prepareUrl(val, typeHyp);
+    if (/(^(((http|https|ftp):\/\/)|(mailto:)|(www.)))|@/i.test(val)) {
+      // Удаляем концевые пробелы и переводы строки перед проверкой гиперссылок
+      val = val.replace(/\s+$/, '');
+      var typeHyp = getUrlType(val);
+      if (c_oAscUrlType.Invalid != typeHyp) {
+        val = prepareUrl(val, typeHyp);
 
-      var oNewHyperlink = new Hyperlink();
-      oNewHyperlink.Ref = cell.ws.getCell3(cell.nRow, cell.nCol);
-      oNewHyperlink.Hyperlink = val;
-      oNewHyperlink.Ref.setHyperlink(oNewHyperlink);
+        var oNewHyperlink = new Hyperlink();
+        oNewHyperlink.Ref = cell.ws.getCell3(cell.nRow, cell.nCol);
+        oNewHyperlink.Hyperlink = val;
+        oNewHyperlink.Ref.setHyperlink(oNewHyperlink);
+      }
     }
 	},
 	setValue2 : function(cell, aVal)
