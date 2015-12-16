@@ -225,7 +225,16 @@ CBorderBox.prototype.Draw_Elements = function(PDSE)
     var X = this.pos.x + PosLine.x + this.GapLeft,
         Y = this.pos.y + PosLine.y;
 
-    this.Make_ShdColor(PDSE, this.Get_CompiledCtrPrp());
+    var oCompiledPr = this.Get_CompiledCtrPrp();
+
+    this.Make_ShdColor(PDSE, oCompiledPr);
+    var oTextOutline = oCompiledPr.TextOutline;
+
+    if(PDSE.Graphics.Start_Command)  // textArt
+    {
+        oCompiledPr.TextOutline  = null;
+        PDSE.Graphics.SetTextPr(oCompiledPr, PDSE.Theme);
+    }
 
     if(!this.Pr.hideTop)
     {
@@ -365,6 +374,8 @@ CBorderBox.prototype.Draw_Elements = function(PDSE)
     }
 
     PDSE.X = _X + this.size.width;
+
+    oCompiledPr.TextOutline = oTextOutline; // меняем обратно, чтобы не изменились скомпилированные текстовые настройки
 
 };
 CBorderBox.prototype.setPosition = function(pos, PosInfo)
