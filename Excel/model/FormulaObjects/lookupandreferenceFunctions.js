@@ -777,9 +777,9 @@ cLOOKUP.prototype.Calculate = function ( arg ) {
 
         if ( index < 0 ) return this.value = new cError( cErrorType.not_available );
         if ( this.argumentsCurrent == 2 ) {
-            var b = arg1.getBBox();
+            var b = arg2.getBBox();
             if ( arg1Range[0].length >= 2 ) {
-                return this.value = new cRef( arg1.ws.getCell3( (b.r1 - 1) + index, (b.c1 - 1) + 1 ).getName(), arg1.ws );
+                return this.value = new cRef( arg1.ws.getCell3( (b.r1 - 1) + index, (b.c2 - 1) + 0 ).getName(), arg1.ws );
             }
             else
                 return this.value = new cRef( arg1.ws.getCell3( (b.r1 - 1) + 0, (b.c1 - 1) + index ).getName(), arg1.ws );

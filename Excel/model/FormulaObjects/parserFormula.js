@@ -3078,10 +3078,10 @@ _func.binarySearch = function ( sElem, arrTagert, regExp ) {
         if ( (arrTagert[i] instanceof cString || sElem instanceof cString) && !isString ) {
             i = 0;
             isString = true;
-            sElem = new cString( sElem.value.toLowerCase() );
+            sElem = new cString( sElem.toString().toLowerCase() );
         }
         if ( isString ) {
-            arrTagertOneType[i] = new cString( arrTagert[i].getValue().toLowerCase() );
+            arrTagertOneType[i] = new cString( arrTagert[i].toString().toLowerCase() );
         }
         else {
             arrTagertOneType[i] = arrTagert[i].tocNumber();
@@ -3592,14 +3592,6 @@ parserFormula.prototype = {
 
             /*Comma & arguments union*/
             else if ( parserHelp.isComma.call( this, this.Formula, this.pCurrPos ) ) {
-
-                if ( operand_expected ) {
-                    this.error.push( c_oAscError.ID.FrmlWrongOperator );
-                    this.outStack = [];
-                    this.elemArr = [];
-                    return false;
-                }
-
                 wasLeftParentheses = false;
                 wasRigthParentheses = false;
                 /* if( operand_expected ){
@@ -3615,6 +3607,7 @@ parserFormula.prototype = {
                     this.outStack.push( new cEmpty() );
                     top_elem = this.elemArr[stackLength - 1];
                     wasLeftParentheses = true;
+                    operand_expected = false;
                 }
                 else {
                     while ( stackLength != 0 ) {
@@ -3629,6 +3622,14 @@ parserFormula.prototype = {
                         }
                     }
                 }
+
+                if ( operand_expected ) {
+                    this.error.push( c_oAscError.ID.FrmlWrongOperator );
+                    this.outStack = [];
+                    this.elemArr = [];
+                    return false;
+                }
+
                 if ( !wasLeftParentheses ) {
                     this.error.push( c_oAscError.ID.FrmlWrongCountParentheses );
                     this.outStack = [];
