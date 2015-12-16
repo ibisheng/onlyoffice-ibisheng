@@ -4029,7 +4029,7 @@ var maxIndividualValues = 10000;
 				var hasMerged = cell.hasMerged();
 				if(hasMerged)
 				{
-					res = hasMerged.c1 - ref.c1;
+					res = hasMerged.c1 - ref.c1 >= 0 ? hasMerged.c1 - ref.c1 : res;
 				}
 				
 				return res;
