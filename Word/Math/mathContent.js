@@ -1651,6 +1651,12 @@ CMathContent.prototype.private_CorrectSelectionPos = function()
 };
 CMathContent.prototype.private_CorrectCurPos = function()
 {
+    if (this.Content.length <= 0)
+    {
+        this.CurPos = 0;
+        return;
+    }
+
     if (this.CurPos > this.Content.length - 1)
     {
         this.CurPos = this.Content.length - 1;
