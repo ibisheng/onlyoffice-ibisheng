@@ -1831,7 +1831,6 @@ CTextDrawer.prototype =
         this._l(_x, b);
 
         this.ds();
-        this.df();
         if(nLastCommand === DRAW_COMMAND_TABLE)
         {
             this.bCheckLines = bOldVal;
