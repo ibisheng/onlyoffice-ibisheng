@@ -6762,7 +6762,7 @@ function Binary_rPrReader(doc, oReadResult, stream)
                 });
 				break;
             case c_oSerProp_rPrType.rPrChange:
-                var rPrChange = new CParaPr();
+                var rPrChange = new CTextPr();
                 var reviewInfo = new CReviewInfo();
                 var brPrr = new Binary_rPrReader(this.Document, this.oReadResult, this.stream);
                 res = this.bcr.Read1(length, function(t, l){
