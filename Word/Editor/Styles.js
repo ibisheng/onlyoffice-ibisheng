@@ -3856,9 +3856,34 @@ CStyle.prototype =
     {
         if (true === LinkData.StyleUpdate)
         {
-            // TODO: Делаем это, чтобы обновились найстройки у параграфов, использующих данный стиль.
-            //       Надо бы переделать на нормальную функцию.
-            this.Refresh_RecalcData2();
+            var LogicDocument = editor.WordControl.m_oLogicDocument;
+            if (!LogicDocument)
+                return;
+
+            var Styles = LogicDocument.Get_Styles();
+            if (!Styles)
+                return;
+
+            var AllParagraphs = [];
+            if (this.Id != Styles.Default.Paragraph)
+            {
+                var AllStylesId = Styles.private_GetAllBasedStylesId(this.Id);
+                AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(AllStylesId);
+                LogicDocument.Add_ChangedStyle(AllStylesId);
+            }
+            else
+            {
+                AllParagraphs = LogicDocument.Get_AllParagraphs({All : true});
+                LogicDocument.Add_ChangedStyle([this.Id]);
+            }
+
+            var Count = AllParagraphs.length;
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                var Para = AllParagraphs[Index];
+                Para.Recalc_CompiledPr();
+                Para.Recalc_RunsCompiledPr();
+            }
         }
     }
 };
@@ -4966,7 +4991,31 @@ CStyles.prototype =
     {
         if (undefined !== LinkData.UpdateStyleId)
         {
-            this.Refresh_RecalcData2(LinkData.UpdateStyleId);
+            var StyleId = LinkData.UpdateStyleId;
+
+            var LogicDocument = editor.WordControl.m_oLogicDocument;
+            if (!LogicDocument)
+                return;
+
+            var AllParagraphs = [];
+
+            if (StyleId != this.Default.Paragraph)
+            {
+                var AllStylesId = this.private_GetAllBasedStylesId(StyleId);
+                AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(AllStylesId);
+            }
+            else
+            {
+                AllParagraphs = LogicDocument.Get_AllParagraphs({All : true});
+            }
+
+            var Count = AllParagraphs.length;
+            for (var Index = 0; Index < Count; Index++)
+            {
+                var Para = AllParagraphs[Index];
+                Para.Recalc_CompiledPr();
+                Para.Recalc_RunsCompiledPr();
+            }
         }
     }
 };
