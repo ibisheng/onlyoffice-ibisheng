@@ -209,7 +209,7 @@ window["DesktopOfflineAppDocumentAddImageEnd"] = function(url)
     }
 };
 
-window["window.on_editor_native_message"] = function(sCommand, sParam)
+window["on_editor_native_message"] = function(sCommand, sParam)
 {
 	if (!window["Asc"]["editor"])
 		return;

@@ -192,7 +192,7 @@ window["DesktopOfflineAppDocumentAddImageEnd"] = function(url)
 	editor.AddImageUrlAction(g_oDocumentUrls.getImageUrl(_url));
 };
 
-window["window.on_editor_native_message"] = function(sCommand, sParam)
+window["on_editor_native_message"] = function(sCommand, sParam)
 {
 	if (!window.editor)
 		return;
