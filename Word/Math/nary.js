@@ -971,7 +971,6 @@ CNaryOperator.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
     var XX = [],
         YY = [];
 
-    //var textScale = this.getTxtPrp().FontSize/850; // 1000 pt
     var textScale = this.Get_TxtPrControlLetter().FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
     // g_dKoef_px_to_mm = 25.4/96
@@ -997,10 +996,8 @@ CNaryOperator.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
     var intGrid = pGraphics.GetIntegerGrid();
     pGraphics.SetIntegerGrid(false);
 
-    pGraphics.p_width(1000);
+    pGraphics.p_width(0);
 
-    //pGraphics.b_color1(0,0,0, 255);
-    //pGraphics.p_color(0,0,0, 255);
     pGraphics._s();
 
     this.drawPath(pGraphics, XX,YY);

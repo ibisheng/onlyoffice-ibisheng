@@ -310,7 +310,6 @@ CBorderBox.prototype.Draw_Elements = function(PDSE)
             PDSE.Graphics._l(x7, y7);
             PDSE.Graphics.df();
         }
-
     }
 
     if(this.Pr.strikeBLTR) // right diagonal
@@ -352,7 +351,6 @@ CBorderBox.prototype.Draw_Elements = function(PDSE)
             PDSE.Graphics._l(x7, y7);
             PDSE.Graphics.df();
         }
-
     }
 
     if(this.Pr.strikeH)
