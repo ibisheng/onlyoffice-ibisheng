@@ -1841,7 +1841,7 @@ parentRight.prototype.toString = function () {
 
 /** @constructor */
 function cUnionOperator() {
-    cBaseOperator.apply( this, [':', 50] );
+    cBaseOperator.apply( this, [':', 50, 2] );
 }
 
 cUnionOperator.prototype = Object.create( cBaseOperator.prototype );
@@ -3592,6 +3592,14 @@ parserFormula.prototype = {
 
             /*Comma & arguments union*/
             else if ( parserHelp.isComma.call( this, this.Formula, this.pCurrPos ) ) {
+
+                if ( operand_expected ) {
+                    this.error.push( c_oAscError.ID.FrmlWrongOperator );
+                    this.outStack = [];
+                    this.elemArr = [];
+                    return false;
+                }
+
                 wasLeftParentheses = false;
                 wasRigthParentheses = false;
                 /* if( operand_expected ){

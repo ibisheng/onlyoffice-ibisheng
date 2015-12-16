@@ -705,7 +705,7 @@ cLOOKUP.prototype.Calculate = function ( arg ) {
         }
     }
 
-    if ( !( arg1 instanceof cArea || arg1 instanceof cArea3D || arg1 instanceof cArray || arg2 instanceof cArea || arg2 instanceof cArea3D || arg2 instanceof cArray) ) {
+    if ( !( (arg1 instanceof cArea || arg1 instanceof cArea3D || arg1 instanceof cArray) && (arg2 instanceof cArea || arg2 instanceof cArea3D || arg2 instanceof cArray) )) {
         return this.value = new cError( cErrorType.not_available );
     }
 
@@ -777,8 +777,8 @@ cLOOKUP.prototype.Calculate = function ( arg ) {
 
         if ( index < 0 ) return this.value = new cError( cErrorType.not_available );
         if ( this.argumentsCurrent == 2 ) {
+            var b = arg1.getBBox();
             if ( arg1Range[0].length >= 2 ) {
-                var b = arg1.getBBox();
                 return this.value = new cRef( arg1.ws.getCell3( (b.r1 - 1) + index, (b.c1 - 1) + 1 ).getName(), arg1.ws );
             }
             else
