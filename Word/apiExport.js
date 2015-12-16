@@ -725,6 +725,7 @@ CRevisionsChange.prototype['get_UserName'] = CRevisionsChange.prototype.get_User
 CRevisionsChange.prototype['put_UserName'] = CRevisionsChange.prototype.put_UserName;
 CRevisionsChange.prototype['get_DateTime'] = CRevisionsChange.prototype.get_DateTime;
 CRevisionsChange.prototype['put_DateTime'] = CRevisionsChange.prototype.put_DateTime;
+CRevisionsChange.prototype['get_UserColor'] = CRevisionsChange.prototype.get_UserColor;
 CRevisionsChange.prototype['get_StartPos'] = CRevisionsChange.prototype.get_StartPos;
 CRevisionsChange.prototype['put_StartPos'] = CRevisionsChange.prototype.put_StartPos;
 CRevisionsChange.prototype['get_EndPos'] = CRevisionsChange.prototype.get_EndPos;

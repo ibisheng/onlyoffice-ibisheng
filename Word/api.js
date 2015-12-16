@@ -6526,6 +6526,7 @@ function CRevisionsChange()
     this.UserName  = "";
     this.UserId    = "";
     this.DateTime  = "";
+    this.UserColor = new CColor(0, 0, 0, 255);
 
     this.Paragraph = null;
     this.StartPos  = null;
@@ -6537,11 +6538,20 @@ function CRevisionsChange()
     this._PosChanged = false;
 }
 CRevisionsChange.prototype.get_UserId = function(){return this.UserId;};
-CRevisionsChange.prototype.put_UserId = function(UserId){this.UserId = UserId;};
+CRevisionsChange.prototype.put_UserId = function(UserId)
+{
+    this.UserId = UserId;
+    this.private_UpdateUserColor();
+};
 CRevisionsChange.prototype.get_UserName = function(){return this.UserName;};
-CRevisionsChange.prototype.put_UserName = function(UserName){this.UserName = UserName;};
+CRevisionsChange.prototype.put_UserName = function(UserName)
+{
+    this.UserName = UserName;
+    this.private_UpdateUserColor();
+};
 CRevisionsChange.prototype.get_DateTime = function(){return this.DateTime};
 CRevisionsChange.prototype.put_DateTime = function(DateTime){this.DateTime = DateTime};
+CRevisionsChange.prototype.get_UserColor = function(){return this.UserColor;};
 CRevisionsChange.prototype.get_StartPos = function(){return this.StartPos};
 CRevisionsChange.prototype.put_StartPos = function(StartPos){this.StartPos = StartPos;};
 CRevisionsChange.prototype.get_EndPos = function(){return this.EndPos};
@@ -6605,6 +6615,10 @@ CRevisionsChange.prototype.ComparePrevPosition = function()
         return false;
 
     return true;
+};
+CRevisionsChange.prototype.private_UpdateUserColor = function()
+{
+    this.UserColor = getUserColorById(this.UserId, this.UserName, true, false);
 };
 
 asc_docs_api.prototype.asc_undoAllChanges = function ()
