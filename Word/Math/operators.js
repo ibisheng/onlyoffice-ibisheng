@@ -1806,6 +1806,7 @@ CLR_DoubleArrow.prototype.calcCoord = function(stretch)
     X[21] = 64238; Y[21] = 19532;
     X[22] = 59925; Y[22] = 14213;
     X[23] = 59925; Y[23] = 14213;
+    X[24] = 10950; Y[24] = 14213;
 
     var textScale = this.getCtrPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64;
@@ -1854,13 +1855,8 @@ CLR_DoubleArrow.prototype.drawPath = function(pGraphics, XX, YY, PDSE)
     pGraphics._l(XX[14], YY[14]);
     pGraphics._l(XX[15], YY[15]);
     pGraphics._l(XX[16], YY[16]);
-    pGraphics.df();
+    pGraphics._z();
 
-    var BgColor = this.Parent.Make_ShdColor(PDSE);
-    //pGraphics.b_color1(255,255,255, 255);
-    pGraphics.b_color1(BgColor.r , BgColor.g , BgColor.b , 255);
-
-    pGraphics._s();
     pGraphics._m(XX[17], YY[17]);
     pGraphics._l(XX[18], YY[18]);
     pGraphics._l(XX[19], YY[19]);
@@ -1868,6 +1864,10 @@ CLR_DoubleArrow.prototype.drawPath = function(pGraphics, XX, YY, PDSE)
     pGraphics._l(XX[21], YY[21]);
     pGraphics._l(XX[22], YY[22]);
     pGraphics._l(XX[23], YY[23]);
+	pGraphics._l(XX[24], YY[24]);
+
+    pGraphics._z();
+    pGraphics.ds();
 };
 
 /**
