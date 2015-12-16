@@ -4109,7 +4109,7 @@
 			}
 
 			firstUpdateRow = asc.getMinValueOrNull(firstUpdateRow, this._prepareCellTextMetricsCache2(range));
-			if (null !== firstUpdateRow) {
+			if (null !== firstUpdateRow || this.isChanged) {
 				// Убрал это из _calcCellsTextMetrics, т.к. вызов был для каждого сектора(добавляло тормоза: баг 20388)
 				// Код нужен для бага http://bugzserver/show_bug.cgi?id=13875
 				this._updateRowPositions();
@@ -5217,24 +5217,40 @@
 				diffHeight = this.rows[rFrozen].top - this.rows[0].top;
 			}
 			var oldVRE_isPartial = this._isRowDrawnPartially(vr.r2, vr.r1, diffHeight);
+      var oldVR = vr.clone();
+      var oldStart = vr.r1;
+      var oldEnd = vr.r2;
 
-			var oldEnd = vr.r2;
+      // ToDo стоит тут переделать весь scroll
+      vr.r1 = start;
+      this._updateVisibleRowsCount();
+      // Это необходимо для того, чтобы строки, у которых высота по тексту, рассчитались
+      if (!oldVR.intersectionSimple(vr)) {
+        // Полностью обновилась область
+        this._prepareCellTextMetricsCache(vr);
+      } else {
+        if (0 > delta) {
+         // Идем вверх
+          this._prepareCellTextMetricsCache(new asc_Range(vr.c1, start, vr.c2, oldStart - 1));
+        } else {
+          // Идем вниз
+          this._prepareCellTextMetricsCache(new asc_Range(vr.c1, oldEnd + 1, vr.c2, vr.r2));
+        }
+      }
+
 			var oldDec = Math.max(calcDecades(oldEnd + 1), 3);
 			var oldW, x, dx;
-			var dy   = this.rows[start].top - this.rows[vr.r1].top;
+			var dy   = this.rows[start].top - this.rows[oldStart].top;
 			var oldH = ctxH - this.cellsTop - Math.abs(dy) - diffHeight;
 			var scrollDown = (dy > 0 && oldH > 0);
 			var y    = this.cellsTop + (scrollDown ? dy : 0) + diffHeight;
 			var lastRowHeight = (scrollDown && oldVRE_isPartial) ?
-				ctxH - (this.rows[oldEnd].top - this.rows[vr.r1].top + this.cellsTop + diffHeight) : 0;
+				ctxH - (this.rows[oldEnd].top - this.rows[oldStart].top + this.cellsTop + diffHeight) : 0;
 
 			if (this.isCellEditMode && editor && this.activeRange.r1 >= rFrozen) {
 				editor.move(0, -dy, this.cellsLeft + (this.activeRange.c1 >= cFrozen ? diffWidth : 0),
 						this.cellsTop + diffHeight, ctxW, ctxH);
 			}
-
-			vr.r1 = start;
-			this._updateVisibleRowsCount();
 
 			var widthChanged = Math.max(calcDecades(vr.r2 + 1), 3) !== oldDec;
 			if (widthChanged) {
@@ -5298,8 +5314,6 @@
 					r2 = vr.r2;
 				}
 				var range = new asc_Range(vr.c1, r1, vr.c2, r2);
-				// Это необходимо для того, чтобы строки, у которых высота по тексту, рассчитались (баг http://bugzserver/show_bug.cgi?id=21552)
-				this._prepareCellTextMetricsCache(range);
 				if (dx === 0) {
 					this._drawRowHeaders(/*drawingCtx*/ undefined, r1, r2);
 				} else {
@@ -5384,6 +5398,7 @@
 			var ctxW    = ctx.getWidth();
 			var ctxH    = ctx.getHeight();
 			var dx      = this.cols[start].left - this.cols[vr.c1].left;
+      var oldStart  = vr.c1;
 			var oldEnd  = vr.c2;
 			var offsetX, offsetY, diffWidth = 0, diffHeight = 0;
 			var oldW = ctxW - this.cellsLeft - Math.abs(dx);
@@ -5400,17 +5415,32 @@
 				oldW -= diffWidth;
 			}
 			var oldVCE_isPartial = this._isColDrawnPartially(vr.c2, vr.c1, diffWidth);
+      var oldVR = vr.clone();
+
+      // ToDo стоит тут переделать весь scroll
+      vr.c1 = start;
+      this._updateVisibleColsCount();
+      // Это необходимо для того, чтобы строки, у которых высота по тексту, рассчитались
+      if (!oldVR.intersectionSimple(vr)) {
+        // Полностью обновилась область
+        this._prepareCellTextMetricsCache(vr);
+      } else {
+        if (0 > delta) {
+          // Идем влево
+          this._prepareCellTextMetricsCache(new asc_Range(start, vr.r1, oldStart - 1, vr.r2));
+        } else {
+          // Идем вправо
+          this._prepareCellTextMetricsCache(new asc_Range(oldEnd + 1, vr.r1, vr.c2, vr.r2));
+        }
+      }
 
 			var lastColWidth = (scrollRight && oldVCE_isPartial) ?
-				ctxW - (this.cols[oldEnd].left - this.cols[vr.c1].left + this.cellsLeft + diffWidth) : 0;
+				ctxW - (this.cols[oldEnd].left - this.cols[oldStart].left + this.cellsLeft + diffWidth) : 0;
 
 			if (this.isCellEditMode && editor && this.activeRange.c1 >= cFrozen) {
 				editor.move(-dx, 0, this.cellsLeft + diffWidth,
 						this.cellsTop + (this.activeRange.r1 >= rFrozen ? diffHeight : 0), ctxW, ctxH);
 			}
-
-			vr.c1 = start;
-            this._updateVisibleColsCount();
 
 			// Перемещаем область
 			var moveWidth = oldW - lastColWidth;
