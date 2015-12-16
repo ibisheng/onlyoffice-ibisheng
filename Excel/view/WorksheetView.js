@@ -8237,7 +8237,7 @@
 						break;
 					case "paste":
 						// Вставляем текст из локального буфера или нет
-						isLocal ? t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth, onlyActive) : t._pasteFromGlobalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
+						isLocal ? t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth) : t._pasteFromGlobalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
 						bIsUpdate = false;
 						break;
 					case "hyperlink":
@@ -8285,7 +8285,7 @@
 				if(isLocal === "binary")
 					checkRange = t._pasteFromBinary(val, true);
 				else
-					checkRange = t._setInfoAfterPaste(val, onlyActive, true);
+					checkRange = t._setInfoAfterPaste(val, true);
 			}
 			if("paste" === prop && val.onlyImages === true)
 				onSelectionCallback();
@@ -8293,7 +8293,7 @@
 				this._isLockedCells(checkRange, /*subType*/null, onSelectionCallback);
 		};
 		
-		WorksheetView.prototype._pasteFromLocalBuff = function (isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth, onlyActive) {
+		WorksheetView.prototype._pasteFromLocalBuff = function (isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth) {
 			var t = this;
 			var callTrigger = false;
 			if (isLargeRange) { callTrigger = true; t.handlers.trigger("slowOperation", true); }
@@ -8303,7 +8303,7 @@
 			if(isLocal === 'binary')
 				selectData = t._pasteFromBinary(val);
 			else
-				selectData = t._setInfoAfterPaste(val,onlyActive);
+				selectData = t._setInfoAfterPaste(val);
 			
 			t.autoFilters.renameTableColumn(t.activeRange);
 			
@@ -8439,13 +8439,10 @@
 			});
 		};
 		
-		WorksheetView.prototype._setInfoAfterPaste = function (values,clipboard,isCheckSelection) {
+		WorksheetView.prototype._setInfoAfterPaste = function (values, isCheckSelection) {
 			var t = this;
 			var wb = window["Asc"]["editor"].wb;
 			var arn = wb && wb.clipboard && wb.clipboard.activeRange ? wb.clipboard.activeRange : t.activeRange.clone(true);
-			
-			if(!clipboard)
-				clipboard = wb && wb.clipboard ? wb.clipboard : null;
 			
 			var arrFormula = [];
 			var numFor = 0;
