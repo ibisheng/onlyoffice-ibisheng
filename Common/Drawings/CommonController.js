@@ -460,11 +460,13 @@ DrawingObjectsController.prototype =
                     if(!isRealObject(group))
                     {
                         this.resetInternalSelection();
+                        this.updateOverlay();
                         this.changeCurrentState(new PreRotateState(this, selectedObject));
                     }
                     else
                     {
                         group.resetInternalSelection();
+                        this.updateOverlay();
                         this.changeCurrentState(new PreRotateInGroupState(this, group, selectedObject));
                     }
                 }
@@ -482,11 +484,15 @@ DrawingObjectsController.prototype =
                     if(!isRealObject(group))
                     {
                         this.resetInternalSelection();
+                        this.updateOverlay();
+
                         this.changeCurrentState(new PreResizeState(this, selectedObject, card_direction));
                     }
                     else
                     {
                         group.resetInternalSelection();
+                        this.updateOverlay();
+
                         this.changeCurrentState(new PreResizeInGroupState(this, group, selectedObject, card_direction));
                     }
                 }
