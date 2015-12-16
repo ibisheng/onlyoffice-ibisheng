@@ -1437,6 +1437,10 @@ ParaComment.prototype.Get_CurrentParaPos = function()
 {
     return new CParaPos(this.StartRange, this.StartLine, 0, 0);
 };
+ParaComment.prototype.Get_TextPr = function(ContentPos, Depth)
+{
+    return new CTextPr();
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Разное
 //----------------------------------------------------------------------------------------------------------------------
