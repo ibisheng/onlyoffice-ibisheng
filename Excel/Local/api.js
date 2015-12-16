@@ -208,3 +208,16 @@ window["DesktopOfflineAppDocumentAddImageEnd"] = function(url)
         ws.objectRender.addImageDrawingObject(g_oDocumentUrls.getImageUrl(_url) , null);
     }
 };
+
+window["window.on_editor_native_message"] = function(sCommand, sParam)
+{
+	if (!window["Asc"]["editor"])
+		return;
+	
+	if (sCommand == "save")
+		window["Asc"]["editor"].asc_Save();
+	else if (sCommand == "saveAs")
+		window["Asc"]["editor"].asc_Save(false, true);
+	else if (sCommand == "print")
+		window["Asc"]["editor"].asc_Print();
+};

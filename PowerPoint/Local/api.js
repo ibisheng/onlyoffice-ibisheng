@@ -174,3 +174,16 @@ window["DesktopOfflineAppDocumentAddImageEnd"] = function(url)
 	var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
 	editor.AddImageUrlAction(g_oDocumentUrls.getImageUrl(_url));
 };
+
+window["window.on_editor_native_message"] = function(sCommand, sParam)
+{
+	if (!window.editor)
+		return;
+	
+	if (sCommand == "save")
+		editor.asc_Save();
+	else if (sCommand == "saveAs")
+		editor.asc_Save(false, true);
+	else if (sCommand == "print")
+		editor.asc_Print();
+};
