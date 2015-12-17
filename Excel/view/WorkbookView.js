@@ -692,6 +692,9 @@
 
 		// Окончание выделения
 		WorkbookView.prototype._onChangeSelectionDone = function (x, y) {
+      if (c_oAscSelectionDialogType.None !== this.selectionDialogType) {
+        return;
+      }
 			var ws = this.getWorksheet();
 			ws.changeSelectionDone();
 			this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
