@@ -2273,7 +2273,7 @@ CGs.prototype =
         }
         var ret = new CGs();
         ret.color = compare_unicolor;
-        ret.pos = gs.pos === this.pos ? this.pos : undefined;
+        ret.pos = gs.pos === this.pos ? this.pos : 0;
         return ret;
     }
 };
