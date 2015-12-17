@@ -916,7 +916,7 @@ var str_namedRanges = "A-Za-z\u005F\u0080-\u0081\u0083\u0085-\u0087\u0089-\u008A
     rx_arrayDef = /^\{(([+-]?\d*(\d|\.)\d*([eE][+-]?\d+)?)?(\"((\"\"|[^\"])*)\")?(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|FALSE|TRUE)?[,;]?)*\}/i,
     rx_ControlSymbols = /^ *[\u0000-\u001F\u007F-\u009F] */,
     rx_sFuncPref = /_xlfn\./i,
-    emailRe = /^(mailto:)?([a-z0-9\._-]+@[a-z0-9\.-]+\.[a-z]{2,4})([a-яё0-9\._%+-=\? :&]*)/i,
+    emailRe = /^(mailto:)?([a-z0-9'\._-]+@[a-z0-9\.-]+\.[a-z0-9]{2,4})([a-яё0-9\._%+-=\? :&]*)/i,
     ipRe = /^(((https?)|(ftps?)):\/\/)?([\-\wа-яё]*:?[\-\wа-яё]*@)?(((1[0-9]{2}|2[0-4][0-9]|25[0-5]|[1-9][0-9]|[0-9])\.){3}(1[0-9]{2}|2[0-4][0-9]|25[0-5]|[1-9][0-9]|[0-9]))(:\d+)?(\/[%\-\wа-яё]*(\.[\wа-яё]{2,})?(([\wа-яё\-\.\?\\\/+@&#;`~=%!,]*)(\.[\wа-яё]{2,})?)*)*\/?/i,
     hostnameRe = /^(((https?)|(ftps?)):\/\/)?([\-\wа-яё]*:?[\-\wа-яё]*@)?(([\-\wа-яё]+\.)+[\wа-яё\-]{2,}(:\d+)?(\/[%\-\wа-яё]*(\.[\wа-яё]{2,})?(([\wа-яё\-\.\?\\\/+@&#;`~=%!,]*)(\.[\wа-яё]{2,})?)*)*\/?)/i,
     localRe = /^(((https?)|(ftps?)):\/\/)([\-\wа-яё]*:?[\-\wа-яё]*@)?(([\-\wа-яё]+)(:\d+)?(\/[%\-\wа-яё]*(\.[\wа-яё]{2,})?(([\wа-яё\-\.\?\\\/+@&#;`~=%!,]*)(\.[\wа-яё]{2,})?)*)*\/?)/i;
@@ -925,9 +925,10 @@ function getUrlType(url) {
   var checkvalue = url.replace(new RegExp(' ', 'g'), '%20');
   var isEmail = false;
   var isvalid = checkvalue.strongMatch(hostnameRe);
-  !isvalid && (isEmail = isvalid = checkvalue.strongMatch(emailRe));
   !isvalid && (isvalid = checkvalue.strongMatch(ipRe));
   !isvalid && (isvalid = checkvalue.strongMatch(localRe));
+  isEmail = checkvalue.strongMatch(emailRe);
+  !isvalid && (isvalid = isEmail);
 
   return isvalid ? (isEmail ? c_oAscUrlType.Email : c_oAscUrlType.Http) : c_oAscUrlType.Invalid;
 }
