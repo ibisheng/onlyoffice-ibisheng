@@ -2938,7 +2938,7 @@ function CreateAscFill(unifill)
                 ret.fill.LinearAngle = _fill.lin.angle;
                 ret.fill.LinearScale = _fill.lin.scale;
             }
-            else
+            else if(_fill.path)
             {
                 ret.fill.GradType = c_oAscFillGradType.GRAD_PATH;
                 ret.fill.PathType = 0;
@@ -3099,15 +3099,22 @@ function CorrectUniFill(asc_fill, unifill, editorId)
                 {
                     if (_colors.length == _positions.length)
                     {
-                        ret.fill.colors.splice(0, ret.fill.colors.length);
+                        if(ret.fill.colors.length === _colors.length){
+                            for (var i = 0; i < _colors.length; i++){
+                                var _gs = ret.fill.colors[i] ? ret.fill.colors[i] : new CGs();
+                                _gs.color = CorrectUniColor(_colors[i], _gs.color, editorId);
+                                _gs.pos = _positions[i];
+                                ret.fill.colors[i] = _gs;
+                            }
+                        }
+                        else{
+                            for (var i = 0; i < _colors.length; i++){
+                                var _gs = new CGs();
+                                _gs.color = CorrectUniColor(_colors[i], _gs.color, editorId);
+                                _gs.pos = _positions[i];
 
-                        for (var i = 0; i < _colors.length; i++)
-                        {
-                            var _gs = new CGs();
-                            _gs.color = CorrectUniColor(_colors[i], _gs.color, editorId);
-                            _gs.pos = _positions[i];
-
-                            ret.fill.colors.push(_gs);
+                                ret.fill.colors.push(_gs);
+                            }
                         }
                     }
                 }

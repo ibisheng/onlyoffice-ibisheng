@@ -2263,6 +2263,9 @@ CGs.prototype =
 
     compare: function(gs)
     {
+        if( gs.pos === this.pos){
+            return null;
+        }
         var compare_unicolor = this.color.compare(gs.color);
         if(!isRealObject(compare_unicolor))
         {
@@ -2270,7 +2273,7 @@ CGs.prototype =
         }
         var ret = new CGs();
         ret.color = compare_unicolor;
-        ret.pos = gs.pos === this.pos ? this.pos : 0;
+        ret.pos = gs.pos === this.pos ? this.pos : undefined;
         return ret;
     }
 };
