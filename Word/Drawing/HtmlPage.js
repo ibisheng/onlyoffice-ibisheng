@@ -62,8 +62,8 @@ var GlobalSkinFlat = {
     RulerOutline : "#BBBEC2",
     RulerMarkersFillColor : "#FFFFFF",
     PageOutline : "#BBBEC2",
-    STYLE_THUMBNAIL_WIDTH : 109,
-    STYLE_THUMBNAIL_HEIGHT : 45,
+    STYLE_THUMBNAIL_WIDTH : 104,
+    STYLE_THUMBNAIL_HEIGHT : 38,
     isNeedInvertOnActive: false
 };
 
