@@ -2184,12 +2184,15 @@ CClosedPathIntegral.prototype.drawGlyph = function(parameters)
 
         // делаем заливку уже обводки
 
-        var WidthTextOutline = pGraphics.m_oTextPr.TextOutline.w;
-
-        if(WidthTextOutline == undefined)
-            WidthTextOutline = 0;
-
-        var WidthLine = (WidthTextOutline/36000) *0.6; // сместим заливку на половину толщины линии , чтобы не было зазоров м/ду обводкой и заливкой
+        var WidthLine;
+        if(pGraphics.m_oTextPr.TextOutline && isRealNumber(pGraphics.m_oTextPr.TextOutline.w))
+        {
+            WidthLine = (pGraphics.m_oTextPr.TextOutline.w/36000) *0.6; // сместим заливку на половину толщины линии , чтобы не было зазоров м/ду обводкой и заливкой
+        }
+        else
+        {
+            WidthLine = 0;
+        }
 
         // последняя точка совпадает в пути с первой, поэтому берем предпоследнюю
 
