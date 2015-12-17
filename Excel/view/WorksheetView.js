@@ -2942,7 +2942,7 @@
 //						}
 					}
 					// draw right border
-					if ((!mc || col === mc.c2 || isLastCol) && !t._isRightBorderErased(col, rowCache)) {
+					if ((!mc || col === mc.c2) && !t._isRightBorderErased(col, rowCache)) {
 						drawVerticalBorder(bCur, bNext, x2, y1, y2);
 					}
 					// draw top border
@@ -2954,7 +2954,7 @@
 //							drawHorizontalBorder.call(this, tb, lb, lbPrev, rb, rbPrev, x1, y1, x2);
 //						}
 					}
-					if (!mc || row === mc.r2 || isLastRow) {
+					if (!mc || row === mc.r2) {
 						// draw bottom border
 						drawHorizontalBorder(bCur, bBotCur, x1, y2, x2);
 					}
