@@ -1933,7 +1933,7 @@ var editor;
 
   spreadsheet_api.prototype.asc_getColumnWidth = function() {
     var ws = this.wb.getWorksheet();
-    return ws.getColumnWidthInSymbols(ws.getSelectedColumnIndex());
+    return ws.getSelectedColumnWidthInSymbols();
   };
 
   spreadsheet_api.prototype.asc_setColumnWidth = function(width) {
@@ -1950,7 +1950,7 @@ var editor;
 
   spreadsheet_api.prototype.asc_getRowHeight = function() {
     var ws = this.wb.getWorksheet();
-    return ws.getRowHeight(ws.getSelectedRowIndex(), 1/*pt*/, /*isHeightReal*/true);
+    return ws.getSelectedRowHeight();
   };
 
   spreadsheet_api.prototype.asc_setRowHeight = function(height) {

@@ -513,18 +513,36 @@
 			return null;
 		};
 
-		WorksheetView.prototype.getColumnWidthInSymbols = function (index) {
-			if (index >= 0 && index < this.cols.length) {
-				return this.cols[index].charCount;
-			}
-			return null;
+		WorksheetView.prototype.getSelectedColumnWidthInSymbols = function () {
+      var c, res = null;
+      for (c = this.activeRange.c1; c <= this.activeRange.c2 && c < this.cols.length; ++c) {
+        if (null === res) {
+          res = this.cols[c].charCount;
+        } else if (res !== this.cols[c].charCount) {
+          return null;
+        }
+      }
+      // ToDo сравнить с default для проверки выделения всего
+      return res;
 		};
 
-		WorksheetView.prototype.getRowHeight = function (index, units, isHeightReal) {
+    WorksheetView.prototype.getSelectedRowHeight = function () {
+      var r, res = null;
+      for (r = this.activeRange.r1; r <= this.activeRange.r2 && r < this.rows.length; ++r) {
+        if (null === res) {
+          res = this.rows[r].heightReal;
+        } else if (res !== this.rows[r].heightReal) {
+          return null;
+        }
+      }
+      // ToDo сравнить с default для проверки выделения всего
+      return res;
+    };
+
+		WorksheetView.prototype.getRowHeight = function (index, units) {
 			if (index >= 0 && index < this.rows.length) {
 				var u = units >= 0 && units <= 3 ? units : 0;
-				var h = isHeightReal ? this.rows[index].heightReal : this.rows[index].height;
-				return h * asc_getcvt(1/*pt*/, u, this._getPPIY());
+				return this.rows[index].height * asc_getcvt(1/*pt*/, u, this._getPPIY());
 			}
 			return null;
 		};
