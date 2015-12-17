@@ -385,6 +385,10 @@ DrawingObjectsController.prototype =
     {
         if(bStart)
         {
+            if(this.selectedObjects.length === 0){
+                this.chartForProps = null;
+                return;
+            }
             this.chartForProps = this.getSelectionState();
             this.resetSelection();
             this.drawingObjects.getWorksheet().arrActiveChartsRanges = [];
@@ -395,6 +399,9 @@ DrawingObjectsController.prototype =
         }
         else
         {
+            if(this.chartForProps === null){
+                return;
+            }
             this.setSelectionState(this.chartForProps, this.chartForProps.length - 1);
             this.updateOverlay();
             this.drawingObjects.getWorksheet().setSelectionShape(true);
