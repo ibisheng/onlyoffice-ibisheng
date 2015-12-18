@@ -5653,6 +5653,8 @@ function BinaryFileReader(doc, openParams)
 				oCommentObj.m_sUserId = comment.UserId;
 			if(null != comment.Date)
 				oCommentObj.m_sTime = comment.Date;
+			if(null != comment.m_sQuoteText)
+				oCommentObj.m_sQuoteText = comment.m_sQuoteText;
 			if(null != comment.Text)
 				oCommentObj.m_sText = comment.Text;
 			if(null != comment.Solved)
@@ -5675,6 +5677,11 @@ function BinaryFileReader(doc, openParams)
 			if(this.oReadResult.oCommentsPlaces && this.oReadResult.oCommentsPlaces[i] && this.oReadResult.oCommentsPlaces[i].Start != null && this.oReadResult.oCommentsPlaces[i].End != null && document && document.Comments && isCopyPaste === true)
 			{
 				var oOldComment = this.oReadResult.oComments[i];
+				
+				var m_sQuoteText = this.oReadResult.oCommentsPlaces[i].QuoteText;
+				if(m_sQuoteText)
+					oOldComment.m_sQuoteText = m_sQuoteText;
+				
 				var oNewComment = new CComment(document.Comments, fInitCommentData(oOldComment))
 				document.Comments.Add(oNewComment);
 				oCommentsNewId[oOldComment.Id] = oNewComment;
@@ -5689,8 +5696,6 @@ function BinaryFileReader(doc, openParams)
 				if(oCommentObj)
 				{
 					bToDelete = false;
-					if(null != item.QuoteText)
-						oCommentObj.Data.m_sQuoteText = item.QuoteText;
 					item.Start.oParaComment.Set_CommentId(oCommentObj.Get_Id());
 					item.End.oParaComment.Set_CommentId(oCommentObj.Get_Id());
 				}
