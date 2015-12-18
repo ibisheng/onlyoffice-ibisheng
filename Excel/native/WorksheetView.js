@@ -654,25 +654,49 @@ WorksheetView.prototype._changeSelectionTopLeft = function (x, y, isCoord, isSel
 WorksheetView.prototype.__drawFormulaRanges = function (arrRanges, offsetX, offsetY) {
     var ranges = [];
 
-    var i;//, lineWidth = 1, isDashLine = false, length = c_oAscFormulaRangeBorderColor.length;
+    var i = 0, type = 0, left = 0, right  = 0, top = 0, bottom = 0 ////, lineWidth = 1, isDashLine = false, length = c_oAscFormulaRangeBorderColor.length;
     // var strokeColor, fillColor, colorIndex, uniqueColorIndex = 0, tmpColors = [];
     for (i = 0; i < arrRanges.length; ++i) {
         //var oFormulaRange = arrRanges[i].clone(true);
+
+        ranges.push(arrRanges[i].type);
 
         ranges.push(arrRanges[i].c1);
         ranges.push(arrRanges[i].c2);
         ranges.push(arrRanges[i].r1);
         ranges.push(arrRanges[i].r2);
 
-        var _l = this.cols[arrRanges[i].c1].left - offsetX,
-            _r = this.cols[arrRanges[i].c2].left + this.cols[arrRanges[i].c2].width - offsetX,
-            _t = this.rows[arrRanges[i].r1].top - offsetY,
-            _b = this.rows[arrRanges[i].r2].top + this.rows[arrRanges[i].r2].height - offsetY;
+        type = arrRanges[i].type;
 
-        ranges.push(_l);
-        ranges.push(_t);
-        ranges.push(_r);
-        ranges.push(_b);
+        if (1 == type) {            // cells
+            left    = this.cols[arrRanges[i].c1].left - offsetX;
+            top     = this.rows[arrRanges[i].r1].top - offsetY;
+            right   = this.cols[arrRanges[i].c2].left + this.cols[arrRanges[i].c2].width - offsetX;
+            bottom  = this.rows[arrRanges[i].r2].top + this.rows[arrRanges[i].r2].height - offsetY;
+        }
+        else if (2 == type) {       // column range
+            left    = this.cols[arrRanges[i].c1].left - offsetX;
+            top     = this.rows[arrRanges[i].r1].top - offsetY;
+            right   = this.cols[arrRanges[i].c2].left + this.cols[arrRanges[i].c2].width - offsetX;
+            bottom  = 0;
+        }
+        else if (3 == type) {       // row range
+            left    = this.cols[arrRanges[i].c1].left - offsetX;
+            top     = this.rows[arrRanges[i].r1].top - offsetY;
+            right   = 0;
+            bottom  = this.rows[arrRanges[i].r2].top + this.rows[arrRanges[i].r2].height - offsetY;
+        }
+        else if (4 == type) {       // max
+            left    = this.cols[arrRanges[i].c1].left - offsetX;
+            top     = this.rows[arrRanges[i].r1].top - offsetY;
+            right   = 0;
+            bottom  = 0;
+        }
+
+        ranges.push(left);
+        ranges.push(top);
+        ranges.push(right);
+        ranges.push(bottom);
 
        // console.log('FormulaRange ('+ i +') ' + JSON.stringify(arrRanges[i]));
 

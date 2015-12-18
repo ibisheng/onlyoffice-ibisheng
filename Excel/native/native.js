@@ -4237,15 +4237,23 @@ function offline_mouse_down(x, y, pin, isViewer, isFormulaEditMode) {
         ws.leftTopRange = ws.activeRange.clone();
     } else {
 
+        var ret = false;
         if (isFormulaEditMode) {
-            var ret = wb.cellEditor.canEnterCellRange();
+            ret = wb.cellEditor.canEnterCellRange();
             ret ? wb.cellEditor.activateCellRange() : true;
+        }
+
+        if (isFormulaEditMode && !ret) {
+            _s.isFormulaEditMode = false;
+            return {'action':'closeCellEditor'};
         }
 
         ws.changeSelectionStartPoint(x, y, true, true);
 
         if (isFormulaEditMode) {
-            ws.enterCellRange(wb.cellEditor);
+            if (ret) {
+                ws.enterCellRange(wb.cellEditor);
+            }
         }
     }
 
@@ -4540,6 +4548,10 @@ function offline_get_selected_object() {
     }
 
     return null;
+}
+function offline_can_enter_cell_range() {
+    var wb = _api.wb;
+    return wb.cellEditor.canEnterCellRange();
 }
 
 function offline_copy() {
