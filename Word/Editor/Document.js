@@ -9997,6 +9997,7 @@ CDocument.prototype =
             if ( true != e.ShiftKey )
                 this.DrawingDocument.TargetStart();
 
+            this.DrawingDocument.UpdateTargetFromPaint = true;
             this.Cursor_MoveLeft( true === e.ShiftKey, true === e.CtrlKey );
             bRetValue = keydownresult_PreventAll;
         }
@@ -10007,6 +10008,7 @@ CDocument.prototype =
             if ( true != e.ShiftKey )
                 this.DrawingDocument.TargetStart();
 
+            this.DrawingDocument.UpdateTargetFromPaint = true;
             this.Cursor_MoveUp( true === e.ShiftKey );
             bRetValue = keydownresult_PreventAll;
         }
@@ -10016,6 +10018,7 @@ CDocument.prototype =
             if ( true != e.ShiftKey )
                 this.DrawingDocument.TargetStart();
 
+            this.DrawingDocument.UpdateTargetFromPaint = true;
             this.Cursor_MoveRight( true === e.ShiftKey, true === e.CtrlKey );
             bRetValue = keydownresult_PreventAll;
         }
@@ -10026,6 +10029,7 @@ CDocument.prototype =
             if ( true != e.ShiftKey )
                 this.DrawingDocument.TargetStart();
 
+            this.DrawingDocument.UpdateTargetFromPaint = true;
             this.Cursor_MoveDown( true === e.ShiftKey );
             bRetValue = keydownresult_PreventAll;
         }
