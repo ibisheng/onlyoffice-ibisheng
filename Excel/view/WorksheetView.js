@@ -7113,7 +7113,7 @@
 			this.model.workbook.handlers.trigger("asc_onHideComment");
 
             return isCoord ? this._calcActiveRangeOffsetIsCoord( x, y ) :
-                             this._calcActiveRangeOffsetIsCoord( this.getCellLeftRelative(x<0?this.activeRange.c1:this.activeRange.c2, /*pt*/0 ),
+                             this._calcActiveRangeOffset( this.getCellLeftRelative(x<0?this.activeRange.c1:this.activeRange.c2, /*pt*/0 ),
                                                                  this.getCellTopRelative(y<0?this.activeRange.r1:this.activeRange.r2, /*pt*/0) );
 		};
 
