@@ -29,7 +29,7 @@
                 "../../Common/FontsFreeType/FontManager.js",
                 "../../Common/FontsFreeType/font_map.js",
                 "../../Word/Drawing/Externals.js",
-                "../../Word/Drawing/GlobalLoaders.js",
+                "../../Common/GlobalLoaders.js",
                 "../../Word/Drawing/translations.js",
 
 
@@ -107,6 +107,7 @@
                 "../../Word/Drawing/HatchPattern.js",
                 "../../Word/Drawing/ShapeDrawer.js",
                 "../../Word/Drawing/Metafile.js",
+				"../../Common/CollaborativeEditingBase.js",
                 "../../Word/Drawing/DrawingDocument.js",
                 "../../Word/Drawing/GraphicsEvents.js",
                 "../../Common/Scrolls/iscroll.js",
@@ -118,6 +119,7 @@
                 "../../Common/scroll.js",
                 "../../Word/Editor/SerializeCommon.js",
                 "../../Word/apiDefines.js",
+                "../../Common/apiBase.js",
                 "../../Word/api.js",
                 "../../Word/apiCommon.js",
                 "../../Word/document/empty.js",
@@ -142,7 +144,6 @@
 				"../../Excel/model/Workbook.js",
 				"../../Excel/model/CellInfo.js",
 				"../../Common/AdvancedOptions.js",
-				"../../Common/Locks.js",
 				"../../Common/Shapes/EditorSettings.js"
             ],
             "dst": "../../Word/sdk-all.js"

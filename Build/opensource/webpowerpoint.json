@@ -13,7 +13,7 @@
                 "../../Common/FontsFreeType/FontManager.js",
                 "../../Common/FontsFreeType/font_map.js",
                 "../../Word/Drawing/Externals.js",
-                "../../Word/Drawing/GlobalLoaders.js",
+                "../../Common/GlobalLoaders.js",
                 "../../Common/commonDefines.js",
                 "../../Common/apiCommon.js",
                 "../../Common/downloaderfiles.js",
@@ -34,6 +34,7 @@
                 "../../Word/Editor/Styles.js",
                 "../../Word/Editor/Numbering.js",
                 "../../Word/Drawing/Metafile.js",
+				"../../Common/CollaborativeEditingBase.js",
                 "../../PowerPoint/Editor/CollaborativeEditing.js",
 
                 "../../Word/Drawing/GraphicsEvents.js",
@@ -136,6 +137,7 @@
                 "../../PowerPoint/Editor/Format/GroupPrototype.js",
                 "../../PowerPoint/Editor/Format/ChartSpacePrototype.js",
                 "../../PowerPoint/Editor/Format/GraphicFrame.js",
+                "../../Common/apiBase.js",
                 "../../PowerPoint/api.js",
                 "../../PowerPoint/apiCommon.js",
                 "../../Word/apiCommon.js",
@@ -145,7 +147,6 @@
 				"../../Excel/model/Workbook.js",
 				"../../Excel/model/CellInfo.js",
 				"../../Common/AdvancedOptions.js",
-                "../../Common/Locks.js",
                 "../../Common/Shapes/EditorSettings.js",
                 "../../PowerPoint/themes/Themes.js"
             ],

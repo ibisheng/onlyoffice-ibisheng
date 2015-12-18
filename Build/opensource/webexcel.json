@@ -27,7 +27,7 @@
                 "../../Word/Drawing/WorkEvents.js",
                 "../../Word/Drawing/Externals.js",
                 "../../Word/Drawing/Metafile.js",
-				"../../Excel/model/DrawingObjects/GlobalLoaders.js",
+                "../../Common/GlobalLoaders.js",
 				"../../Excel/apiDefines.js",
                 "../../Excel/document/empty-workbook.js",
                 "../../Excel/utils/utils.js",
@@ -38,6 +38,7 @@
                 "../../Excel/model/CollaborativeEditing.js",
                 "../../Excel/model/ConditionalFormatting.js",
                 "../../Excel/model/FormulaObjects/parserFormula.js",
+                "../../Excel/model/FormulaObjects/_xlfnFunctions.js",
                 "../../Excel/model/FormulaObjects/dateandtimeFunctions.js",
                 "../../Excel/model/FormulaObjects/engineeringFunctions.js",
                 "../../Excel/model/FormulaObjects/cubeFunctions.js",
@@ -156,10 +157,11 @@
 				"../../Word/Math/operators.js",
 				"../../Word/Math/accent.js",
 				"../../Word/Math/borderBox.js",
-				
+				"../../Common/CollaborativeEditingBase.js",
                 "../../Excel/model/DrawingObjects/GlobalCounters.js",
 
                 "../../Word/apiCommon.js",
+                "../../Common/apiBase.js",
                 "../../Excel/api.js",
                 "../../Common/Shapes/EditorSettings.js"
             ],
