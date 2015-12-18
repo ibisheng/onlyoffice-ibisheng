@@ -5266,8 +5266,7 @@
 				ctxH - (this.rows[oldEnd].top - this.rows[oldStart].top + this.cellsTop + diffHeight) : 0;
 
 			if (this.isCellEditMode && editor && this.activeRange.r1 >= rFrozen) {
-				editor.move(0, -dy, this.cellsLeft + (this.activeRange.c1 >= cFrozen ? diffWidth : 0),
-						this.cellsTop + diffHeight, ctxW, ctxH);
+				editor.move(this.cellsLeft + (this.activeRange.c1 >= cFrozen ? diffWidth : 0), this.cellsTop + diffHeight, ctxW, ctxH);
 			}
 
 			var widthChanged = Math.max(calcDecades(vr.r2 + 1), 3) !== oldDec;
@@ -5456,8 +5455,7 @@
 				ctxW - (this.cols[oldEnd].left - this.cols[oldStart].left + this.cellsLeft + diffWidth) : 0;
 
 			if (this.isCellEditMode && editor && this.activeRange.c1 >= cFrozen) {
-				editor.move(-dx, 0, this.cellsLeft + diffWidth,
-						this.cellsTop + (this.activeRange.r1 >= rFrozen ? diffHeight : 0), ctxW, ctxH);
+				editor.move(this.cellsLeft + diffWidth, this.cellsTop + (this.activeRange.r1 >= rFrozen ? diffHeight : 0), ctxW, ctxH);
 			}
 
 			// Перемещаем область
@@ -10365,70 +10363,50 @@
 			return true;
 		};
 
-		WorksheetView.prototype.openCellEditor = function (editor, x, y, isCoord, fragments, cursorPos,
-														   isFocus, isClearCell, isHideCursor, isQuickInput, activeRange) {
-			var t = this, vr, tc = this.cols, tr = this.rows, col, row, c, fl, mc, bg, isMerged;
-			var offsetX = 0, offsetY = 0;
+		WorksheetView.prototype.openCellEditor = function(editor, x, y, isCoord, fragments, cursorPos, isFocus, isClearCell, isHideCursor, isQuickInput, activeRange) {
+			var t = this, tc = this.cols, tr = this.rows, col, row, c, fl, mc, bg, isMerged;
 			var ar = this.activeRange;
-			if (activeRange)
+			if (activeRange) {
 				this.activeRange = activeRange.clone();
+			}
 
-			if (this.objectRender.checkCursorDrawingObject(x, y))
+			if (this.objectRender.checkCursorDrawingObject(x, y)) {
 				return false;
-
-			function getLeftSide(col) {
-				var i, res = [], offs = t.cols[vr.c1].left - t.cols[0].left - offsetX;
-				for (i = col; i >= vr.c1; --i) {
-					if (t.width_1px < t.cols[i].width)
-						res.push(t.cols[i].left - offs);
-				}
-				return res;
 			}
 
-			function getRightSide(col) {
-				var i, w, res = [], offs = t.cols[vr.c1].left - t.cols[0].left - offsetX;
-
-				// Для замерженных ячеек, можем уйти за границу
-				if (isMerged && col > vr.c2)
-					col = vr.c2;
-
-				for (i = col; i <= vr.c2; ++i) {
-					w = t.cols[i].width;
-					if (t.width_1px < w)
-						res.push(t.cols[i].left + w - offs);
+			function getVisibleRangeObject() {
+				var vr = t.visibleRange.clone(), offsetX = 0, offsetY = 0;
+				if (t.topLeftFrozenCell) {
+					var cFrozen = t.topLeftFrozenCell.getCol0();
+					var rFrozen = t.topLeftFrozenCell.getRow0();
+					if (0 < cFrozen) {
+						if (col >= cFrozen) {
+							offsetX = tc[cFrozen].left - tc[0].left;
+						} else {
+							vr.c1 = 0;
+							vr.c2 = cFrozen - 1;
+						}
+					}
+					if (0 < rFrozen) {
+						if (row >= rFrozen) {
+							offsetY = tr[rFrozen].top - tr[0].top;
+						} else {
+							vr.r1 = 0;
+							vr.r2 = rFrozen - 1;
+						}
+					}
 				}
-				w = t.drawingCtx.getWidth();
-				if (res[res.length - 1] > w) {
-					res[res.length - 1] = w;
-				}
-				return res;
-			}
-
-			function getBottomSide(row) {
-				var i, h, res = [], offs = t.rows[vr.r1].top - t.rows[0].top - offsetY;
-
-				// Для замерженных ячеек, можем уйти за границу
-				if (isMerged && row > vr.r2)
-					row = vr.r2;
-
-				for (i = row; i <= vr.r2; ++i) {
-					h = t.rows[i].height;
-					if (t.height_1px < h)
-						res.push(t.rows[i].top + h - offs);
-				}
-				h = t.drawingCtx.getHeight();
-				if (res[res.length - 1] > h) {
-					res[res.length - 1] = h;
-				}
-				return res;
+				return {vr: vr, offsetX: offsetX, offsetY: offsetY};
 			}
 
 			if (isCoord) {
-				x *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
-				y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
+				x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
+				y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
 				col = this._findColUnderCursor(x, true);
 				row = this._findRowUnderCursor(y, true);
-				if (!col || !row) {return false;}
+				if (!col || !row) {
+					return false;
+				}
 				col = col.col;
 				row = row.row;
 			} else {
@@ -10438,14 +10416,18 @@
 
 			// Возможно стоит заменить на ячейку из кеша
 			c = this._getVisibleCell(col, row);
-			if (!c) {throw "Can not get cell data (col=" + col + ", row=" + row + ")";}
+			if (!c) {
+				throw "Can not get cell data (col=" + col + ", row=" + row + ")";
+			}
 
 			fl = this._getCellFlags(c);
 			isMerged = fl.isMerged();
 			if (isMerged) {
 				mc = fl.merged;
 				c = this._getVisibleCell(mc.c1, mc.r1);
-				if (!c) {throw "Can not get merged cell data (col=" + mc.c1 + ", row=" + mc.r1 + ")";}
+				if (!c) {
+					throw "Can not get merged cell data (col=" + mc.c1 + ", row=" + mc.r1 + ")";
+				}
 				fl = this._getCellFlags(c);
 			}
 
@@ -10453,28 +10435,6 @@
 			this.isCellEditMode = false;
 			this.handlers.trigger("onScroll", this._calcActiveCellOffset());
 			this.isCellEditMode = true;
-
-			vr = this.visibleRange.clone();
-			if (this.topLeftFrozenCell) {
-				var cFrozen = this.topLeftFrozenCell.getCol0();
-				var rFrozen = this.topLeftFrozenCell.getRow0();
-				if (0 < cFrozen) {
-					if (col >= cFrozen)
-						offsetX = tc[cFrozen].left - tc[0].left;
-					else {
-						vr.c1 = 0;
-						vr.c2 = cFrozen - 1;
-					}
-				}
-				if (0 < rFrozen) {
-					if (row >= rFrozen)
-						offsetY = tr[rFrozen].top - tr[0].top;
-					else {
-						vr.r1 = 0;
-						vr.r2 = rFrozen - 1;
-					}
-				}
-			}
 
 			bg = c.getFill();
 			this.isFormulaEditMode = false;
@@ -10496,11 +10456,6 @@
 			var arrAutoCompleteLC = asc.arrayToLowerCase(arrAutoComplete);
 
 			editor.open({
-				cellX: this.cellsLeft + tc[!isMerged ? col : mc.c1].left - tc[vr.c1].left + offsetX,
-				cellY: this.cellsTop + tr[!isMerged ? row : mc.r1].top - tr[vr.r1].top + offsetY,
-				leftSide: getLeftSide(!isMerged ? col : mc.c1),
-				rightSide: getRightSide(!isMerged ? col : mc.c2),
-				bottomSide: getBottomSide(!isMerged ? row : mc.r2),
 				fragments: fragments,
 				flags: fl,
 				font: new asc.FontProperties(c.getFontname(), c.getFontsize()),
@@ -10515,10 +10470,57 @@
 				isAddPersentFormat: isQuickInput && c_oAscNumFormatType.Percent === c.getNumFormat().getType(),
 				autoComplete: arrAutoComplete,
 				autoCompleteLC: arrAutoCompleteLC,
-				saveValueCallback: function (val, flags, skipNLCheck) {
+				saveValueCallback: function(val, flags, skipNLCheck) {
 					var oCellEdit = isMerged ? new asc_Range(mc.c1, mc.r1, mc.c1, mc.r1) : new asc_Range(col, row, col, row);
-					return t._saveCellValueAfterEdit(oCellEdit, c, val, flags,
-						skipNLCheck, /*isNotHistory*/false, /*lockDraw*/false);
+					return t._saveCellValueAfterEdit(oCellEdit, c, val, flags, skipNLCheck, /*isNotHistory*/false, /*lockDraw*/false);
+				},
+				getSides: function() {
+					var _col = !isMerged ? col : mc.c1;
+					var _row = !isMerged ? row : mc.r2;
+					var vro = getVisibleRangeObject();
+					var i, w, h, arrLeftS = [], arrRightS = [], arrBottomS = [];
+					var offsX = tc[vro.vr.c1].left - tc[0].left - vro.offsetX;
+					var offsY = tr[vro.vr.r1].top - tr[0].top - vro.offsetY;
+					var cellX = tc[_col].left - offsX, cellY = tr[!isMerged ? row : mc.r1].top - offsY;
+					for (i = _col; i >= vro.vr.c1; --i) {
+						if (t.width_1px < tc[i].width) {
+							arrLeftS.push(tc[i].left - offsX);
+						}
+					}
+					arrLeftS.sort(fSortDescending);
+
+					// Для замерженных ячеек, можем уйти за границу
+					if (isMerged && _col > vro.vr.c2) {
+						_col = vro.vr.c2;
+					}
+					for (i = _col; i <= vro.vr.c2; ++i) {
+						w = tc[i].width;
+						if (t.width_1px < w) {
+							arrRightS.push(tc[i].left + w - offsX);
+						}
+					}
+					w = t.drawingCtx.getWidth();
+					if (arrRightS[arrRightS.length - 1] > w) {
+						arrRightS[arrRightS.length - 1] = w;
+					}
+					arrRightS.sort(fSortAscending);
+
+					// Для замерженных ячеек, можем уйти за границу
+					if (isMerged && _row > vro.vr.r2) {
+						_row = vro.vr.r2;
+					}
+					for (i = _row; i <= vro.vr.r2; ++i) {
+						h = tr[i].height;
+						if (t.height_1px < h) {
+							arrBottomS.push(tr[i].top + h - offsY);
+						}
+					}
+					h = t.drawingCtx.getHeight();
+					if (arrBottomS[arrBottomS.length - 1] > h) {
+						arrBottomS[arrBottomS.length - 1] = h;
+					}
+					arrBottomS.sort(fSortAscending);
+					return {l: arrLeftS, r: arrRightS, b: arrBottomS, cellX: cellX, cellY: cellY};
 				}
 			});
 			return true;

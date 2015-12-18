@@ -82,6 +82,7 @@
 			this.input = input;
 			this.handlers = new asc_HL(handlers);
 			this.options = {};
+			this.sides = undefined;
 
 			//---declaration---
 			this.canvasOuter = undefined;
@@ -223,11 +224,6 @@
 
 		/**
 		 * @param {Object} options
-		 *   cellX - cell x coord (pt)
-		 *   cellY - cell y coord (pt)
-		 *   leftSide   - array
-		 *   rightSide  - array
-		 *   bottomSide - array
 		 *   fragments  - text fragments
 		 *   flags      - text flags (wrapText, textAlign)
 		 *   font
@@ -440,23 +436,44 @@
 			t._moveCursor(kEndOfText);
 		};
 
-		CellEditor.prototype.move = function (dx, dy, l, t, r, b) {
-			var opt = this.options;
+		CellEditor.prototype.move = function (l, t, r, b) {
+			this.sides = this.options.getSides();
+			this.left = this.sides.cellX;
+			this.top = this.sides.cellY;
+			this.right = this.sides.r[0];
+			this.bottom = this.sides.b[0];
+			// Обновляем флаги, т.к. мы уже могли выставить wrap
+			this.textFlags.wrapText = this.options.flags.wrapText;
+			if (this.textFlags.wrapText) {
+				this.textFlags.wrapOnlyNL = true;
+				this.textFlags.wrapText = false;
+			}
+			// ToDo вынести в отдельную функцию
+			var canExpW = true, canExpH = true, tm, expW, expH, fragments = this._getRenderFragments();
+			if (0 < fragments.length) {
+				tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
+				expW = tm.width > this._getContentWidth();
+				expH  = tm.height > this._getContentHeight();
 
-			this.left += dx;
-			this.right += dx;
-			this.top += dy;
-			this.bottom += dy;
+				while (expW && canExpW || expH && canExpH) {
+					if (expW) { canExpW = this._expandWidth(); }
+					if (expH) { canExpH = this._expandHeight(); }
 
-			opt.leftSide.forEach(function (e,i,a) {a[i] = e + dx;});
-			opt.rightSide.forEach(function (e,i,a) {a[i] = e + dx;});
-			opt.bottomSide.forEach(function (e,i,a) {a[i] = e + dy;});
+					if (!canExpW) {
+						this.textFlags.wrapText = true;
+						tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
+					} else {
+						tm = this.textRender.measure(this._getContentWidth());
+					}
+					expW = tm.width > this._getContentWidth();
+					expH  = tm.height > this._getContentHeight();
+				}
+			}
 
 			if (this.left < l || this.top < t || this.left > r || this.top > b) {
 				// hide
 				this._hideCanvas();
 			} else {
-				// ToDo выставлять опции (т.к. при scroll редактор должен пересчитываться и уменьшаться размеры)
 				this._adjustCanvas();
 				this._showCanvas();
 				this._renderText();
@@ -640,7 +657,7 @@
 			var ctx = this.drawingCtx;
 			var u = ctx.getUnits();
 
-			this.textFlags = opt.flags;
+			this.textFlags = opt.flags.clone();
 			if (this.textFlags.textAlign.toLowerCase() === "justify" || this.isFormula()) {
 				this.textFlags.textAlign = "left";
 			}
@@ -661,14 +678,12 @@
 			this.kx = asc_getcvt(u, 0/*px*/, ctx.getPPIX());
 			this.ky = asc_getcvt(u, 0/*px*/, ctx.getPPIY());
 
-			opt.leftSide.sort(fSortDescending);
-			opt.rightSide.sort(fSortAscending);
-			opt.bottomSide.sort(fSortAscending);
+			this.sides = opt.getSides();
 
-			this.left = opt.cellX;
-			this.top = opt.cellY;
-			this.right = opt.rightSide[0];
-			this.bottom = opt.bottomSide[0];
+			this.left = this.sides.cellX;
+			this.top = this.sides.cellY;
+			this.right = this.sides.r[0];
+			this.bottom = this.sides.b[0];
 
 			this.cursorPos = opt.cursorPos !== undefined ? opt.cursorPos : 0;
 			this.topLineIndex = 0;
@@ -1026,15 +1041,15 @@
 		};
 
 		CellEditor.prototype._expandWidth = function () {
-			var t = this, opt = t.options, l = false, r = false;
+			var t = this, l = false, r = false, leftSide = this.sides.l, rightSide = this.sides.r;
 
 			function expandLeftSide() {
-				var i = asc_search(opt.leftSide, function (v) {return v < t.left;});
+				var i = asc_search(leftSide, function (v) {return v < t.left;});
 				if (i >= 0) {
-					t.left = opt.leftSide[i];
+					t.left = leftSide[i];
 					return true;
 				}
-				var val = opt.leftSide[opt.leftSide.length - 1];
+				var val = leftSide[leftSide.length - 1];
 				if (Math.abs(t.left - val) > 0.000001) { // left !== leftSide[len-1]
 					t.left = val;
 				}
@@ -1042,12 +1057,12 @@
 			}
 
 			function expandRightSide() {
-				var i = asc_search(opt.rightSide, function (v) {return v > t.right;});
+				var i = asc_search(rightSide, function (v) {return v > t.right;});
 				if (i >= 0) {
-					t.right = opt.rightSide[i];
+					t.right = rightSide[i];
 					return true;
 				}
-				var val = opt.rightSide[opt.rightSide.length - 1];
+				var val = rightSide[rightSide.length - 1];
 				if (Math.abs(t.right - val) > 0.000001) { // right !== rightSide[len-1]
 					t.right = val;
 				}
@@ -1064,12 +1079,12 @@
 		};
 
 		CellEditor.prototype._expandHeight = function () {
-			var t = this, opt = t.options, i = asc_search(opt.bottomSide, function (v) {return v > t.bottom;});
+			var t = this, bottomSide = this.sides.b, i = asc_search(bottomSide, function (v) {return v > t.bottom;});
 			if (i >= 0) {
-				t.bottom = opt.bottomSide[i];
+				t.bottom = bottomSide[i];
 				return true;
 			}
-			var val = opt.bottomSide[opt.bottomSide.length - 1];
+			var val = bottomSide[bottomSide.length - 1];
 			if (Math.abs(t.bottom - val) > 0.000001) { // bottom !== bottomSide[len-1]
 				t.bottom = val;
 			}
