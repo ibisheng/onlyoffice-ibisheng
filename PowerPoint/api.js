@@ -1140,7 +1140,7 @@ function OnSave_Callback(e) {
           CursorInfo = History.Get_DocumentPositionBinary();
       }
       // Пересылаем свои изменения
-    CollaborativeEditing.Send_Changes(editor.IsUserSave, {UserId: editor.CoAuthoringApi.getUserConnectionId(), CursorInfo: CursorInfo});
+    CollaborativeEditing.Send_Changes(editor.IsUserSave, {UserId: editor.CoAuthoringApi.getUserConnectionId(), UserShortId : editor.DocInfo.get_UserId(), CursorInfo: CursorInfo});
   } else {
     var nState = editor.CoAuthoringApi.get_state();
     if (ConnectionState.Close === nState) {
