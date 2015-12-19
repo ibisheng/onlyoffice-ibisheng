@@ -105,7 +105,7 @@ CHistory.prototype.Reset_SavedIndex = function(IsUserSave)
 	}
 };
 
-CHistory.prototype.Is_Modified = function(IsUserSave) 
+CHistory.prototype.Is_Modified = function(IsUserSave, IsNoSavedNoModifyed) 
 {
 	var checkIndex = (this.Is_UserSaveMode() && IsUserSave) ? this.UserSavedIndex : this.SavedIndex;
 	if (-1 === this.Index && null === checkIndex && false === this.ForceSave) 
@@ -114,7 +114,7 @@ CHistory.prototype.Is_Modified = function(IsUserSave)
 		{
 			if (0 != window["AscDesktopEditor"]["LocalFileGetOpenChangesCount"]())
 				return true;
-			if (!window["AscDesktopEditor"]["LocalFileGetSaved"]())
+			if (!window["AscDesktopEditor"]["LocalFileGetSaved"]() && IsNoSavedNoModifyed !== true)
 				return true;
 		}
 		return false;
@@ -133,6 +133,19 @@ window["DesktopOfflineAppDocumentApplyChanges"] = function(_changes)
 /////////////////////////////////////////////////////////
 ////////////////        SAVE       //////////////////////
 /////////////////////////////////////////////////////////
+window["Asc"]['spreadsheet_api'].prototype.onUpdateDocumentModified = function(bIsModified) 
+{
+    // Обновляем только после окончания сохранения
+    if (this.canSave) {
+      this.handlers.trigger("asc_onDocumentModifiedChanged", bIsModified);
+      this._onUpdateDocumentCanSave();
+
+      if (undefined !== window["AscDesktopEditor"]) {
+        window["AscDesktopEditor"]["onDocumentModifiedChanged"](History ? History.Is_Modified(undefined, true) : bValue);
+      }
+    }
+};
+  
 window["Asc"]['spreadsheet_api'].prototype.asc_Save = function (isNoUserSave, isSaveAs)
 {
 	var t = this;

@@ -50,7 +50,7 @@ CHistory.prototype.Reset_SavedIndex = function(IsUserSave)
 		this.ForceSave  = false;
 	}
 };
-CHistory.prototype.Have_Changes = function(IsUserSave)
+CHistory.prototype.Have_Changes = function(IsUserSave, IsNoSavedNoModifyed)
 {
 	if (true === this.Is_UserSaveMode() && false !== IsUserSave)
 	{
@@ -60,7 +60,7 @@ CHistory.prototype.Have_Changes = function(IsUserSave)
 			{
 				if (0 != window["AscDesktopEditor"]["LocalFileGetOpenChangesCount"]())
 					return true;
-				if (!window["AscDesktopEditor"]["LocalFileGetSaved"]())
+				if (!window["AscDesktopEditor"]["LocalFileGetSaved"]() && IsNoSavedNoModifyed !== true)
 					return true;
 			}
 			return false;
@@ -93,6 +93,17 @@ window["DesktopOfflineAppDocumentApplyChanges"] = function(_changes)
 /////////////////////////////////////////////////////////
 ////////////////        SAVE       //////////////////////
 /////////////////////////////////////////////////////////
+asc_docs_api.prototype.SetDocumentModified = function(bValue)
+{
+    this.isDocumentModify = bValue;
+    this.asc_fireCallback("asc_onDocumentModifiedChanged");
+
+    if (undefined !== window["AscDesktopEditor"])
+    {
+        window["AscDesktopEditor"]["onDocumentModifiedChanged"](History ? History.Have_Changes(undefined, true) : bValue);
+    }
+};
+
 asc_docs_api.prototype.asc_Save = function (isNoUserSave, isSaveAs)
 {
     if (true !== isNoUserSave)
@@ -166,6 +177,7 @@ asc_docs_api.prototype["AddImage"] = asc_docs_api.prototype.AddImage;
 asc_docs_api.prototype["asc_Save"] = asc_docs_api.prototype.asc_Save;
 asc_docs_api.prototype["asc_DownloadAs"] = asc_docs_api.prototype.asc_DownloadAs;
 asc_docs_api.prototype["asc_isOffline"] = asc_docs_api.prototype.asc_isOffline;
+asc_docs_api.prototype["SetDocumentModified"] = asc_docs_api.prototype.SetDocumentModified;
 
 window["DesktopOfflineAppDocumentAddImageEnd"] = function(url)
 {
