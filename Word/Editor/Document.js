@@ -2779,7 +2779,7 @@ CDocument.prototype =
                             if ( NextId === this.Styles.Get_Default_Paragraph() )
                                 NewParagraph.Style_Remove();
                             else
-                                NewParagraph.Style_Add_Open( NextId );
+                                NewParagraph.Style_Add(NextId, true);
                         }
 
                         var SectPr = Item.Get_SectionPr();
@@ -2887,7 +2887,7 @@ CDocument.prototype =
             if ( NextId === this.Styles.Get_Default_Paragraph() || NextId === this.Styles.Get_Default_ParaList() )
                 NewParagraph.Style_Remove();
             else
-                NewParagraph.Style_Add_Open( NextId );
+                NewParagraph.Style_Add(NextId, true);
 
             if ( undefined != LastPara.TextPr.Value.FontSize || undefined !== LastPara.TextPr.Value.RFonts.Ascii )
             {
