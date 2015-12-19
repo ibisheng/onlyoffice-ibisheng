@@ -7436,6 +7436,7 @@ CDocument.prototype =
                 else
                     this.Paragraph_Add( new ParaTextPr( { HighLight : new CDocumentColor( r, g, b )  } ) );
 
+                this.Document_UpdateInterfaceState();
                 editor.sync_MarkerFormatCallback( false );
             }
         }
