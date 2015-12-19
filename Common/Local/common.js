@@ -190,6 +190,7 @@ function InitDragAndDrop(oHtmlElement, callback) {
 				if (window["AscDesktopEditor"]["IsImageFile"](_files[i]))
 				{
 					window["DesktopOfflineAppDocumentAddImageEnd"](_files[i]);
+					break;
 				}
 			}
 		};
