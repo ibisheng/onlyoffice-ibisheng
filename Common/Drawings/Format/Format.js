@@ -2263,7 +2263,7 @@ CGs.prototype =
 
     compare: function(gs)
     {
-        if( gs.pos === this.pos){
+        if( gs.pos !== this.pos){
             return null;
         }
         var compare_unicolor = this.color.compare(gs.color);
@@ -2636,7 +2636,7 @@ CGradFill.prototype =
                 var compare_unicolor = this.colors[i].compare(fill.colors[i]);
                 if(!isRealObject(compare_unicolor))
                 {
-                    break;
+                    return null;
                 }
                 _ret.colors[i] = compare_unicolor;
             }
