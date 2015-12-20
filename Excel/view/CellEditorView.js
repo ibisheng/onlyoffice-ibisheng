@@ -1117,6 +1117,9 @@
 
 				widthStyle >>= 1;
 				heightStyle >>= 1;
+				
+				width = widthStyle << 1;
+				height = heightStyle << 1;
 			}
 
 			this.canvasOuterStyle.left = left + 'px';
