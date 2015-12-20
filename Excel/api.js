@@ -421,7 +421,9 @@ var editor;
       _e.shiftKey = false;
       _e.which = 67;
 
+	  window["AscDesktopEditorButtonMode"] = true;
       this.controller._onWindowKeyDown(_e);
+	  window["AscDesktopEditorButtonMode"] = false;
 
       return;
     }
@@ -439,7 +441,9 @@ var editor;
       _e.shiftKey = false;
       _e.which = 86;
 
+	  window["AscDesktopEditorButtonMode"] = true;
       this.controller._onWindowKeyDown(_e);
+	  window["AscDesktopEditorButtonMode"] = false;
 
       return;
     }
@@ -457,7 +461,9 @@ var editor;
       _e.shiftKey = false;
       _e.which = 88;
 
+	  window["AscDesktopEditorButtonMode"] = true;
       this.controller._onWindowKeyDown(_e);
+	  window["AscDesktopEditorButtonMode"] = false;
 
       return;
     }

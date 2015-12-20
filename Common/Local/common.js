@@ -198,8 +198,6 @@ function InitDragAndDrop(oHtmlElement, callback) {
 }
 
 // меняем среду
-AscBrowser.isSafari = false;
-AscBrowser.isSafariMacOs = false;
-window.USER_AGENT_SAFARI_MACOS = false;
-
-window["AscDesktopEditorButtonMode"] = true;
+//AscBrowser.isSafari = false;
+//AscBrowser.isSafariMacOs = false;
+//window.USER_AGENT_SAFARI_MACOS = false;

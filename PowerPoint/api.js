@@ -1037,7 +1037,9 @@ asc_docs_api.prototype.Copy = function()
         _e.CtrlKey = true;
         _e.KeyCode = 67;
 
+		window["AscDesktopEditorButtonMode"] = true;
         this.WordControl.m_oLogicDocument.OnKeyDown(_e);
+		window["AscDesktopEditorButtonMode"] = false;
 
         return;
     }
@@ -1054,7 +1056,9 @@ asc_docs_api.prototype.Cut = function()
         _e.CtrlKey = true;
         _e.KeyCode = 88;
 
+		window["AscDesktopEditorButtonMode"] = true;
         this.WordControl.m_oLogicDocument.OnKeyDown(_e);
+		window["AscDesktopEditorButtonMode"] = false;
 
         return;
     }
@@ -1068,7 +1072,9 @@ asc_docs_api.prototype.Paste = function()
         _e.CtrlKey = true;
         _e.KeyCode = 86;
 
-        this.WordControl.m_oLogicDocument.OnKeyDown(_e);
+		window["AscDesktopEditorButtonMode"] = true;
+        this.WordControl.m_oLogicDocument.OnKeyDown(_e);		
+		window["AscDesktopEditorButtonMode"] = false;
 
         return;
     }
