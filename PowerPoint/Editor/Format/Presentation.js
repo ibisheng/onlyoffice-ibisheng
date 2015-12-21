@@ -3839,6 +3839,10 @@ CPresentation.prototype =
             case historyitem_Presentation_RemoveSlide:
             {
                 this.Slides.splice(Data.Pos, 0, g_oTableId.Get_ById(Data.Id));
+                if(this.Slides[Data.Pos])
+                {
+                    this.Slides[Data.Pos].addAllCommentsToInterface();
+                }
                 for(var i = 0; i < this.Slides.length; ++i)
                 {
                     this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
@@ -3887,6 +3891,10 @@ CPresentation.prototype =
             }
             case historyitem_Presentation_RemoveSlide:
             {
+                if(this.Slides[Data.Pos])
+                {
+                    this.Slides[Data.Pos].removeAllCommentsToInterface();
+                }
                 this.Slides.splice(Data.Pos, 1);
                 for(var i = 0; i < this.Slides.length; ++i)
                 {
@@ -4528,6 +4536,7 @@ CPresentation.prototype =
         if(isRealNumber(pos) && pos > -1 && pos < this.Slides.length)
         {
             History.Add(this, {Type: historyitem_Presentation_RemoveSlide, Pos: pos, Id: this.Slides[pos].Get_Id()});
+            this.Slides[pos].removeAllCommentsToInterface();
             return this.Slides.splice(pos, 1)[0];
         }
         return null;
@@ -4688,6 +4697,10 @@ CPresentation.prototype =
                 if ( false === ChangesPos )
                     break;
                 this.slidesToUnlock.push(ChangesPos);
+                if(this.Slides[ChangesPos])
+                {
+                    this.Slides[ChangesPos].removeAllCommentsToInterface();
+                }
                 this.Slides.splice(ChangesPos, 1);
                 break;
             }

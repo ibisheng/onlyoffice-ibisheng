@@ -1104,6 +1104,31 @@ Slide.prototype =
             this.graphicObjects.drawSelect(0, this.presentation.DrawingDocument);
     },
 
+
+    addAllCommentsToInterface: function()
+    {
+        if(this.slideComments)
+        {
+            var aComments = this.slideComments.comments;
+            for(var i = aComments.length - 1; i > -1; --i )
+            {
+                editor.sync_AddComment( aComments[i].Get_Id(), aComments[i].Data);
+            }
+        }
+    },
+
+    removeAllCommentsToInterface: function()
+    {
+        if(this.slideComments)
+        {
+            var aComments = this.slideComments.comments;
+            for(var i = aComments.length - 1; i > -1; --i )
+            {
+                editor.sync_RemoveComment(aComments[i].Get_Id());
+            }
+        }
+    },
+
     getDrawingObjects: function()
     {
         return this.cSld.spTree;
