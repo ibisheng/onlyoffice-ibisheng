@@ -3916,7 +3916,7 @@ Woorksheet.prototype.getRowHeight=function(index){
 	else
 		return -1;
 };
-Woorksheet.prototype.setRowHeight=function(height, start, stop){
+Woorksheet.prototype.setRowHeight=function(height, start, stop, isNoCustom){
 	if(0 == height)
 		return this.setRowHidden(true, start, stop);
 	//start, stop 0 based
@@ -3940,7 +3940,9 @@ Woorksheet.prototype.setRowHeight=function(height, start, stop){
 		{
 			var oOldProps = row.getHeightProp();
 			row.h = height;
-			row.flags |= g_nRowFlag_CustomHeight;
+            if (!isNoCustom) {
+              row.flags |= g_nRowFlag_CustomHeight;
+            }
 			row.flags &= ~g_nRowFlag_hd;
 			var oNewProps = row.getHeightProp();
 			if(false === oOldProps.isEqual(oNewProps))
