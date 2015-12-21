@@ -198,4 +198,6 @@ window["on_editor_native_message"] = function(sCommand, sParam)
 		editor.asc_Save(false, true);
 	else if (sCommand == "print")
 		editor.asc_Print();
+	else if (sCommand == "editor:stopDemonstration")
+		editor.EndDemonstration();
 };
