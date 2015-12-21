@@ -273,6 +273,8 @@ var native = CreateNativeEngine();
 window.native = native;
 window["native"] = native;
 
+var asc_mobile = null;
+
 function GetNativeEngine() {
     return window.native;
 }
@@ -4480,7 +4482,8 @@ function offline_cell_editor_mouse_event(events, width, height, ratio) {
         cellEditor.curLeft, cellEditor.curTop, cellEditor.curHeight];
 }
 function offline_cell_editor_close(x, y, width, height, ratio) {
-    _api.wb.cellEditor._tryCloseEditor();
+    var e = {which: 13, shiftKey: false, metaKey: false, ctrlKey: false};
+    _api.wb.cellEditor._tryCloseEditor(e);
 }
 function offline_cell_editor_selection() {
     return _api.wb.cellEditor._drawSelection();
