@@ -1162,14 +1162,14 @@
 
 			var defaultFontSize = this.model.getDefaultFontSize();
 			// ToDo разобраться со значениями
-			this.maxRowHeight = asc_calcnpt(c_oAscMaxRowHeight, this._getPPIY());
-			this.defaultRowDescender = this._calcRowDescender(defaultFontSize);
-			gc_dDefaultRowHeightAttribute = this.defaultRowHeight = this.model.getDefaultHeight() ||
-				asc_calcnpt(defaultFontSize * this.vspRatio, this._getPPIY()) + this.height_1px;
-
 			this._setFont(undefined, this.model.getDefaultFontName(), defaultFontSize);
 			var tm = this._roundTextMetrics(this.stringRender.measureString("A"));
 			this.headersHeightByFont = tm.height;
+
+			this.maxRowHeight = asc_calcnpt(c_oAscMaxRowHeight, this._getPPIY());
+			this.defaultRowDescender = this._calcRowDescender(defaultFontSize);
+			gc_dDefaultRowHeightAttribute = this.defaultRowHeight = this.model.getDefaultHeight() ||
+				Math.max(asc_calcnpt(defaultFontSize * this.vspRatio, this._getPPIY()) + this.height_1px, this.headersHeightByFont);
 
 			// Инициализируем число колонок и строк (при открытии). Причем нужно поставить на 1 больше,
 			// чтобы могли показать последнюю строку/столбец (http://bugzserver/show_bug.cgi?id=23513)
