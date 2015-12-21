@@ -332,7 +332,7 @@ function asc_docs_api(name)
 
     this.SelectedObjectsStack = [];
 
-    this.nCurPointItemsLength = 0;
+    this.nCurPointItemsLength = -1;
 	this.isDocumentEditor = true;
 
     this.CurrentTranslate = translations_map["en"];
@@ -4487,10 +4487,17 @@ asc_docs_api.prototype.ImgApply = function(obj)
             {
                 if( !this.noCreatePoint && !this.exucuteHistory && this.exucuteHistoryEnd)
                 {
-                    History.UndoLastPoint(this.nCurPointItemsLength);
+                    if(-1 !== this.nCurPointItemsLength)
+                    {
+                        History.UndoLastPoint();
+                    }
+                    else
+                    {
+                        History.Create_NewPoint(historydescription_Document_ApplyImagePr);
+                    }
                     this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
                     this.exucuteHistoryEnd = false;
-                    this.nCurPointItemsLength = 0;
+                    this.nCurPointItemsLength = -1;
                 }
                 else
                 {
@@ -4509,10 +4516,25 @@ asc_docs_api.prototype.ImgApply = function(obj)
             }
             else
             {
-                //ExecuteNoHistory(function(){
-                    History.UndoLastPoint(this.nCurPointItemsLength);
-                    this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
-                //}, this, []);
+                var bNeedCheckChangesCount = false;
+                if(-1 !== this.nCurPointItemsLength)
+                {
+                    History.UndoLastPoint();
+                }
+                else
+                {
+                    bNeedCheckChangesCount = true;
+                    History.Create_NewPoint(historydescription_Document_ApplyImagePr);
+                }
+                this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+                if(bNeedCheckChangesCount)
+                {
+                    var oPoint = History.Points[History.Index];
+                    if(oPoint)
+                    {
+                        this.nCurPointItemsLength = oPoint.Items.length;
+                    }
+                }
             }
         }
     }

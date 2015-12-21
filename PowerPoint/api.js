@@ -62,7 +62,7 @@ function asc_docs_api(name)
 
     this.isLoadNoCutFonts = false;
 
-    this.nCurPointItemsLength = 0;
+    this.nCurPointItemsLength = -1;
 
     this.pasteCallback = null;
     this.pasteImageMap = null;
@@ -1806,16 +1806,23 @@ asc_docs_api.prototype.ShapeApply = function(prop)
     {
         if(!this.noCreatePoint || this.exucuteHistory)
         {
-            if( !this.noCreatePoint && !this.exucuteHistory && this.exucuteHistoryEnd)
+            if(!this.noCreatePoint && !this.exucuteHistory && this.exucuteHistoryEnd)
             {
-                History.UndoLastPoint(this.nCurPointItemsLength);
-                var slide = this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage];
-                slide.graphicObjects.applyDrawingProps(prop);
-                slide.graphicObjects.recalculate();
-                this.WordControl.m_oDrawingDocument.OnRecalculatePage(this.WordControl.m_oLogicDocument.CurPage, slide);
-                this.WordControl.m_oDrawingDocument.OnEndRecalculate();
+                if(-1 !== this.nCurPointItemsLength)
+                {
+                    History.UndoLastPoint();
+                    var slide = this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage];
+                    slide.graphicObjects.applyDrawingProps(prop);
+                    slide.graphicObjects.recalculate();
+                    this.WordControl.m_oDrawingDocument.OnRecalculatePage(this.WordControl.m_oLogicDocument.CurPage, slide);
+                    this.WordControl.m_oDrawingDocument.OnEndRecalculate();
+                }
+                else
+                {
+                    this.WordControl.m_oLogicDocument.ShapeApply(prop);
+                }
                 this.exucuteHistoryEnd = false;
-                this.nCurPointItemsLength = 0;
+                this.nCurPointItemsLength = -1;
             }
             else
             {
@@ -1828,6 +1835,10 @@ asc_docs_api.prototype.ShapeApply = function(prop)
                 {
                     this.nCurPointItemsLength = oPoint.Items.length;
                 }
+                else
+                {
+                    this.nCurPointItemsLength = -1;
+                }
                 this.exucuteHistory = false;
             }
         }
@@ -1835,12 +1846,28 @@ asc_docs_api.prototype.ShapeApply = function(prop)
         {
             if(this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage])
             {
-                History.UndoLastPoint(this.nCurPointItemsLength);
-                var slide = this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage];
-                slide.graphicObjects.applyDrawingProps(prop);
-                slide.graphicObjects.recalculate();
-                this.WordControl.m_oDrawingDocument.OnRecalculatePage(this.WordControl.m_oLogicDocument.CurPage, slide);
-                this.WordControl.m_oDrawingDocument.OnEndRecalculate();
+                if(-1 !== this.nCurPointItemsLength)
+                {
+                    History.UndoLastPoint();
+                    var slide = this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage];
+                    slide.graphicObjects.applyDrawingProps(prop);
+                    slide.graphicObjects.recalculate();
+                    this.WordControl.m_oDrawingDocument.OnRecalculatePage(this.WordControl.m_oLogicDocument.CurPage, slide);
+                    this.WordControl.m_oDrawingDocument.OnEndRecalculate();
+                }
+                else
+                {
+                    this.WordControl.m_oLogicDocument.ShapeApply(prop);
+                    var oPoint = History.Points[History.Index];
+                    if(oPoint)
+                    {
+                        this.nCurPointItemsLength = oPoint.Items.length;
+                    }
+                    else
+                    {
+                        this.nCurPointItemsLength = -1;
+                    }
+                }
             }
         }
     }

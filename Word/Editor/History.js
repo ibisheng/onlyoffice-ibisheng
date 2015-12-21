@@ -178,6 +178,7 @@ CHistory.prototype =
                 oItem.Class.Undo(oItem.Data);
             }
             oPoint.Items.length = _bottomIndex + 1;
+            this.Document.Set_SelectionState( oPoint.State );
         }
     },
 

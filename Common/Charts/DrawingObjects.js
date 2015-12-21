@@ -390,7 +390,7 @@ function DrawingObjects() {
     _this.asyncImagesDocumentEndLoaded = null;
 
 
-    _this.nCurPointItemsLength = 0;
+    _this.nCurPointItemsLength = -1;
     // Task timer
     var aDrawTasks = [];
 
@@ -2690,11 +2690,16 @@ function DrawingObjects() {
             {
                 if( !api.noCreatePoint && !api.exucuteHistory && api.exucuteHistoryEnd)
                 {
-                    _this.controller.setGraphicObjectPropsCallBack(props);
-                    _this.controller.startRecalculate();
-                    _this.sendGraphicObjectProps();
+                    if(_this.nCurPointItemsLength === -1){
+                        _this.controller.setGraphicObjectProps( props );
+                    }
+                    else{
+                        _this.controller.setGraphicObjectPropsCallBack(props);
+                        _this.controller.startRecalculate();
+                        _this.sendGraphicObjectProps();
+                    }
                     api.exucuteHistoryEnd = false;
-                    _this.nCurPointItemsLength = 0;
+                    _this.nCurPointItemsLength = -1;
                 }
                 else
                 {
@@ -2702,38 +2707,55 @@ function DrawingObjects() {
                 }
                 if(api.exucuteHistory)
                 {
-                    if(History.CurPoint)
+
+                    var Point =  History.Points[History.Index];
+                    if(Point)
                     {
-                        _this.nCurPointItemsLength = History.CurPoint.Items.length;
+                        _this.nCurPointItemsLength = Point.Items.length;
                     }
                     else
                     {
-                        _this.nCurPointItemsLength = 0;
+                        _this.nCurPointItemsLength = -1;
                     }
                     api.exucuteHistory = false;
                 }
             }
             else
             {
-                if(History.CurPoint && History.CurPoint.Items.length > 0)
+
+                var Point =  History.Points[History.Index];
+                if(Point && Point.Items.length > 0)
                 {
-                    var Point = History.CurPoint;
-                    var nBottomIndex = this.nCurPointItemsLength - 1;
-                    for ( var Index = Point.Items.length - 1; Index > nBottomIndex; Index-- )
-                    {
-                        var Item = Point.Items[Index];
-                        if(!Item.Class.Read_FromBinary2)
-                            Item.Class.Undo( Item.Type, Item.Data, Item.SheetId );
-                        else
-                            Item.Class.Undo(Item.Data);
+                    if(this.nCurPointItemsLength > -1){
+                        var nBottomIndex = - 1;
+                        for ( var Index = Point.Items.length - 1; Index > nBottomIndex; Index-- )
+                        {
+                            var Item = Point.Items[Index];
+                            if(!Item.Class.Read_FromBinary2)
+                                Item.Class.Undo( Item.Type, Item.Data, Item.SheetId );
+                            else
+                                Item.Class.Undo(Item.Data);
+                        }
+                        _this.controller.setSelectionState(Point.SelectionState);
+                        Point.Items.length = 0;
+
+                        _this.controller.setGraphicObjectPropsCallBack(props);
+                        _this.controller.startRecalculate();
                     }
-                    Point.Items.length = this.nCurPointItemsLength;
-                    _this.controller.setGraphicObjectPropsCallBack(props);
-                    _this.controller.startRecalculate();
+                    else{
+                        _this.controller.setGraphicObjectProps( props );
+                        var Point =  History.Points[History.Index];
+                        if(Point)
+                        {
+                            _this.nCurPointItemsLength = Point.Items.length;
+                        }
+                        else
+                        {
+                            _this.nCurPointItemsLength = -1;
+                        }
+                    }
                 }
             }
-
-           // _this.controller.setGraphicObjectProps( objectProperties );
         }
 
     };

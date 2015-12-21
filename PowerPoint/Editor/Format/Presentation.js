@@ -1759,10 +1759,6 @@ CPresentation.prototype =
         if(this.Slides[this.CurPage])
         {
             this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [shapeProps], false, historydescription_Presentation_SetShapeProps);
-            if(shapeProps.textArtProperties && typeof shapeProps.textArtProperties.asc_getForm() === "string")
-            {
-                this
-            }
         }
 
         this.Document_UpdateInterfaceState();
