@@ -3858,7 +3858,7 @@ parserFormula.prototype = {
                      this.outStack = [];
                      this.elemArr = [];
                      return false;*/
-                    if ( this.operand_str == null ) {
+                    if ( this.operand_str == null || this.operand_str == "'" ) {
                         this.outStack.push( new cError( cErrorType.wrong_name ) );
                         this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
                         return this.isParsed = false;
