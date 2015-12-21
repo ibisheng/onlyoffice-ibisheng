@@ -503,7 +503,7 @@ CCellCommentator.prototype.moveRangeComments = function(rangeFrom, rangeTo) {
 		for (var i = 0; i < this.aComments.length; i++) {
 			var comment = this.aComments[i];
 
-			if ( (comment.nCol >= rangeFrom.c1) && (comment.nCol <= rangeFrom.c2) && (comment.nRow >= rangeFrom.r1) && (comment.nRow <= rangeFrom.r2) ) {
+			if (rangeFrom.contains(comment.nCol, comment.nRow)) {
 
 				var commentBefore = new asc_CCommentData(comment);
 
@@ -531,7 +531,7 @@ CCellCommentator.prototype.deleteCommentsRange = function(range) {
 		var aCommentId = [], i;
 		for (i = 0; i < this.aComments.length; ++i) {
 			var comment = this.aComments[i];
-			if ( (comment.nCol >= range.c1) && (comment.nCol <= range.c2) && (comment.nRow >= range.r1) && (comment.nRow <= range.r2) ) {
+			if (range.contains(comment.nCol, comment.nRow)) {
 				aCommentId.push(comment.asc_getId());
 			}
 		}
@@ -724,7 +724,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 					if ((comment.nRow > updateRange.r1) && (comment.nCol >= updateRange.c1) && (comment.nCol <= updateRange.c2)) {
 						comment.nRow -= updateRange.r2 - updateRange.r1 + 1;
 						aChangedComments.push(new UpdatePair(comment, true));
-					} else if ((updateRange.c1 <= comment.nCol) && (updateRange.c2 >= comment.nCol) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2)) {
+					} else if (updateRange.contains(comment.nCol, comment.nRow)) {
 						aChangedComments.push(new UpdatePair(comment, false));
 					}
 				}
@@ -736,7 +736,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 					if ((comment.nCol > updateRange.c2) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2)) {
 						comment.nCol -= updateRange.c2 - updateRange.c1 + 1;
 						aChangedComments.push(new UpdatePair(comment, true));
-					} else if ((updateRange.c1 <= comment.nCol) && (updateRange.c2 >= comment.nCol) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2)) {
+					} else if (updateRange.contains(comment.nCol, comment.nRow)) {
 						aChangedComments.push(new UpdatePair(comment, false));
 					}
 				}
@@ -773,7 +773,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 CCellCommentator.prototype.sortComments = function(sortData) {
 	if (null === sortData)
 		return;
-	var comment, isChangeComment = false, places = sortData.places, i = 0, l = places.length, j, row, line;
+	var comment, places = sortData.places, i = 0, l = places.length, j, row, line;
 	var range = sortData.bbox, oComments = this.getRangeComments(new Asc.Range(range.c1, range.r1, range.c2, range.r2));
 	if (null === oComments)
 		return;
@@ -785,15 +785,12 @@ CCellCommentator.prototype.sortComments = function(sortData) {
 			for (j = 0, line = oComments[row]; j < line.length; ++j) {
 				comment = new asc_CCommentData(line[j]);
 				comment.nRow = places[i].to;
-				this.changeComment(comment.asc_getId(), comment, true);
-        isChangeComment = true;
+				this.changeComment(comment.asc_getId(), comment, true, false, true, true);
 			}
 		}
 	}
 
 	History.EndTransaction();
-	if (isChangeComment)
-		this.drawCommentCells();
 };
 
 CCellCommentator.prototype.resetLastSelectedId = function() {
@@ -1259,7 +1256,7 @@ CCellCommentator.prototype.getComments = function(col, row) {
 						comments.push(commentCell);
 				}
 				else {
-					if ( (commentCell.nCol >= mergedRange.c1) && (commentCell.nRow >= mergedRange.r1) && (commentCell.nCol <= mergedRange.c2) && (commentCell.nRow <= mergedRange.r2) )
+					if (mergedRange.contains(commentCell.nCol, commentCell.nRow))
 						comments.push(commentCell);
 				}
 			}
