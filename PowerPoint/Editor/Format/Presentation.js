@@ -306,8 +306,9 @@ CShowPr.prototype.Copy = function(){
     oCopy.browse = this.browse;
     if(isRealObject(this.kiosk)){
         oCopy.kiosk = {};
-        if(isRealBool)
-        oCopy.kiosk = {resetart: this.kiosk.restart};
+        if(isRealBool(this.kiosk.restart)){
+            oCopy.kiosk.restart = this.kiosk.restart;
+        }
     }
     if(this.penClr){
         oCopy.penClr = this.penClr.createDuplicate();
