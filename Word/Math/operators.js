@@ -1867,7 +1867,7 @@ CLR_DoubleArrow.prototype.drawPath = function(pGraphics, XX, YY, PDSE)
 	pGraphics._l(XX[24], YY[24]);
 
     pGraphics._z();
-    pGraphics.ds();
+    //pGraphics.ds();
 };
 
 /**
