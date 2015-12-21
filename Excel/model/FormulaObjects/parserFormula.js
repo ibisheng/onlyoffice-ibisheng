@@ -680,6 +680,15 @@ cArea.prototype.getMatrix = function () {
     } );
     return arr;
 };
+cArea.prototype.getRefMatrix = function () {
+    var t = this, arr = [], r = this.getRange();
+    r._foreach2( function ( cell, i, j, r1, c1 ) {
+        if ( !arr[i - r1] )
+            arr[i - r1] = [];
+        arr[i - r1][j - c1] = new cRef( cell.getName(), t.ws );
+    } );
+    return arr;
+};
 cArea.prototype.index = function ( r, c, n ) {
     var bbox = this.getBBox0();
     bbox.normalize();

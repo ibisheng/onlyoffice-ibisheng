@@ -499,13 +499,27 @@ cINDEX.prototype.Calculate = function ( arg ) {
         return this.value = new cError( cErrorType.wrong_value_type );
     }
 
-    if ( arg0 instanceof cArray || arg0 instanceof cArea ) {
+    if ( arg0 instanceof cArray ) {
         var _a_ = arg0.getMatrix();
         if ( _a_.length == 1 ) {/*одна строка*/
             res = arg0.getValue2( 0, arg1 - 1 );
         }
         else {
-            res = arg0.getValue2( arg1 - 1, arg2 - 1 );
+            res = arg0.getValue2( arg1 == 0 ? 0 : arg1 - 1, arg2 == 0 ? 0 : arg2 - 1 );
+        }
+    }
+    else if( arg0 instanceof cArea ){
+        var _a_ = arg0.getRefMatrix();
+        if ( _a_.length == 1 ) {/*одна строка*/
+            res = _a_[0][arg1 - 1];
+        }
+        else {
+            if ( arg1 == 0 && arg2 > 0 ) {
+                var _a1 = _a_[0][arg2 - 1], _a2 = _a_[_a_.length - 1][arg2 - 1];
+                res = new cArea( _a1.toString() + ":" + _a2.toString(), _a1.ws );
+            }
+            else
+                res = _a_[arg1 - 1][arg2 - 1];
         }
     }
     else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
