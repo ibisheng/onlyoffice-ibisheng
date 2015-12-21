@@ -55,7 +55,8 @@
 					{
 						found = false; 
 						
-						if(AscBrowser.isIE)
+						//TODO - review later(commented for edge)
+						/*if(AscBrowser.isIE)
 						{
 							var iframe = doc.createElement("iframe");
 							iframe.id = "ieCopyFrame";
@@ -65,7 +66,7 @@
 								temp.contentDocument.write("<body></body>");
 							t.element = temp.contentDocument.body.appendChild(doc.createElement("div"));
 						}
-						else
+						else*/
 							t.element = doc.createElement("DIV");
 					}
 				}
@@ -88,8 +89,9 @@
 				t.element.style.zIndex = -1000;
 				t.element.style.display = ELEMENT_DISPAY_STYLE;
 				t.element.setAttribute("contentEditable", true);
-
-				if (!found && !AscBrowser.isIE) {doc.body.appendChild(t.element);}
+				
+				//TODO - review later(commented for edge)
+				if (!found /*&& !AscBrowser.isIE*/) {doc.body.appendChild(t.element);}
 				
 				//fix for ipad
 				if(!AscBrowser.isMobileVersion)
@@ -1024,13 +1026,17 @@
                     pastebin.style.lineHeight = "1px";//todo FF всегда возвращает computedStyle в px, поэтому лучше явно указать default значнение
                     pastebin.setAttribute("contentEditable", true);
                     
-                    pastebin.onpaste = function(e){
-						if (!window.GlobalPasteFlag)
-							return;
-						
-						t._bodyPaste(worksheet,e);
-						pastebin.onpaste = null;
-					};
+					if(!AscBrowser.isIE)//edge insert on event only text
+					{
+						 pastebin.onpaste = function(e){
+							if (!window.GlobalPasteFlag)
+								return;
+							
+							t._bodyPaste(worksheet,e);
+							pastebin.onpaste = null;
+						};
+					}
+                   
                     document.body.appendChild( pastebin );
                 }
                 else if(bClean){
@@ -1040,13 +1046,17 @@
                     {
                         pastebin.removeChild(aChildNodes[i]);
                     }
-					 pastebin.onpaste = function(e){
-						if (!window.GlobalPasteFlag)
-							return;
+					
+					if(!AscBrowser.isIE)//edge insert on event only text
+					{
+						pastebin.onpaste = function(e){
+							if (!window.GlobalPasteFlag)
+								return;
 
-						t._bodyPaste(worksheet,e);
-						pastebin.onpaste = null;
-					};
+							t._bodyPaste(worksheet,e);
+							pastebin.onpaste = null;
+						};
+					}
                 }
                 return pastebin;
             },
