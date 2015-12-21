@@ -3359,9 +3359,7 @@ function CEditorPage(api)
 
         if (true !== isFromZoom)
         {
-            this.m_oApi.sync_BeginCatchSelectedElements();
-            this.m_oApi.sync_slidePropCallback(this.m_oLogicDocument.Slides[drDoc.SlideCurrent]);
-            this.m_oApi.sync_EndCatchSelectedElements();
+            this.m_oLogicDocument.Document_UpdateInterfaceState();
         }
 
         this.CalculateDocumentSize(false);
