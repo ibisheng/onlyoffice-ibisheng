@@ -2129,7 +2129,7 @@ function CPresentationBullet()
 
     this.Draw = function(X, Y, Context, FirstTextPr, PDSE)
     {
-        if ( null === this.m_oTextPr || null === this.m_nNum )
+        if ( null === this.m_oTextPr || null === this.m_nNum || null == this.m_sString || this.m_sString.length == 0)
             return;
 
         var oColor = { r : this.m_oColor.r, g : this.m_oColor.g, b : this.m_oColor.b };
