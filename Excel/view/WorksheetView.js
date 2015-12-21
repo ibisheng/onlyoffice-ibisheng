@@ -57,7 +57,6 @@
 		var kHeaderDefault     = 0;
 		var kHeaderActive      = 1;
 		var kHeaderHighlighted = 2;
-		var kHeaderSelected    = 3;
 
 		/**
 		 * text alignment style
@@ -2085,7 +2084,7 @@
 		* @param {Number} y  Координата левого угла в pt
 		* @param {Number} w  Ширина в pt
 		* @param {Number} h  Высота в pt
-		* @param {Number} style  Стиль заголовка (kHeaderDefault, kHeaderActive, kHeaderHighlighted, kHeaderSelected)
+		* @param {Number} style  Стиль заголовка (kHeaderDefault, kHeaderActive, kHeaderHighlighted)
 		* @param {Boolean} isColHeader  Тип заголовка: true - колонка, false - строка
 		* @param {Number} index  Индекс столбца/строки или -1
 		*/
@@ -2095,6 +2094,9 @@
 			if (-1 !== index) {
 				if (isColHeader) {
 					if (w < this.width_1px) {
+						if (style !== kHeaderDefault) {
+							return;
+						}
 						// Это невидимый столбец
 						isZeroHeader = true;
 						// Отрисуем только границу
@@ -2111,6 +2113,9 @@
 					}
 				} else {
 					if (h < this.height_1px) {
+						if (style !== kHeaderDefault) {
+							return;
+						}
 						// Это невидимая строка
 						isZeroHeader = true;
 						// Отрисуем только границу
@@ -3463,9 +3468,9 @@
 			var y1 = (range) ? (this.rows[range.r1].top - offsetY) : 0;
 			var y2 = (range) ? (this.rows[range.r2].top + this.rows[range.r2].height - offsetY - this.height_1px) : 0;
 			var drawLeftSide   = (range) ? (range.c1 === arn.c1) : false;
-			var drawRightSide  = (range) ? (range.c2 === arn.c2) : false;
+			var drawRightSide  = (range) ? (range.c2 === arn.c2 && y2 >= y1) : false;
 			var drawTopSide    = (range) ? (range.r1 === arn.r1) : false;
-			var drawBottomSide = (range) ? (range.r2 === arn.r2) : false;
+			var drawBottomSide = (range) ? (range.r2 === arn.r2 && y2 >= y1) : false;
 			var l, t, r, b, cr;
 			// Размеры "квадрата" автозаполнения
 			var fillHandleWidth = 2 * this.width_2px + this.width_1px;
@@ -3576,49 +3581,45 @@
 
 			// draw cells overlay
 			if (range) {
-				var lRect = x1 + (drawLeftSide ? this.width_3px : this.width_1px),
-					rRect = x2 - (drawRightSide ? this.width_2px : 0),
-					tRect = y1 + (drawTopSide ? this.height_2px : 0),
-					bRect = y2 - (drawBottomSide ? this.width_2px : 0);
-				ctx.setFillStyle( opt.activeCellBackground )
+				if (y2 >= y1) {
+					var lRect = x1 + (drawLeftSide ? this.width_3px : this.width_1px), rRect = x2 - (drawRightSide ? this.width_2px : 0), tRect = y1 + (drawTopSide ? this.height_2px : 0), bRect = y2 - (drawBottomSide ? this.width_2px : 0);
+					ctx.setFillStyle(opt.activeCellBackground)
 						.fillRect(lRect, tRect, rRect - lRect, bRect - tRect);
 
-				var lRect2 = x1 + (drawLeftSide ? this.width_2px : this.width_1px),
-					rRect2 = x2 - (drawRightSide ? this.width_2px : 0),
-					tRect2 = y1 + (drawTopSide ? this.height_1px : 0),
-					bRect2 = y2 - (drawBottomSide ? this.width_2px : 0);
-				ctx.setStrokeStyle(opt.activeCellBorderColor2).setLineWidth(1).beginPath()
-					.strokeRect(lRect2, tRect2, rRect2 - lRect2, bRect2 - tRect2);
+					var lRect2 = x1 + (drawLeftSide ? this.width_2px : this.width_1px), rRect2 = x2 - (drawRightSide ? this.width_2px : 0), tRect2 = y1 + (drawTopSide ? this.height_1px : 0), bRect2 = y2 - (drawBottomSide ? this.width_2px : 0);
+					ctx.setStrokeStyle(opt.activeCellBorderColor2).setLineWidth(1).beginPath()
+						.strokeRect(lRect2, tRect2, rRect2 - lRect2, bRect2 - tRect2);
 
-				var firstCell = (!this.isSelectionDialogMode) ? this.activeRange : this.copyActiveRange;
-				cr = this.model.getMergedByCell(firstCell.startRow, firstCell.startCol);
-				// Получаем активную ячейку в выделении
-				cr = range.intersection(null !== cr ? cr : new asc_Range(firstCell.startCol, firstCell.startRow, firstCell.startCol, firstCell.startRow));
-				if (cr !== null) {
-					ctx.save().beginPath().rect(lRect, tRect, rRect - lRect, bRect - tRect).clip();
-					var _l = this.cols[cr.c1].left - offsetX - this.width_1px,
-					_r = this.cols[cr.c2].left + this.cols[cr.c2].width - offsetX,
-					_t = this.rows[cr.r1].top - offsetY - this.height_1px,
-					_b = this.rows[cr.r2].top + this.rows[cr.r2].height - offsetY;
-					ctx.clearRect(_l, _t, _r - _l, _b - _t).restore();
-				}
-
-				if (!(isFrozen && (!drawRightSide || !drawBottomSide))) {
-					// Рисуем "квадрат" для автозаполнения (располагается "квадрат" в правом нижнем углу последней ячейки выделения)
-					cr = range.intersection(new asc_Range(range.c2, range.r2, range.c2, range.r2));
+					var firstCell = (!this.isSelectionDialogMode) ? this.activeRange : this.copyActiveRange;
+					cr = this.model.getMergedByCell(firstCell.startRow, firstCell.startCol);
+					// Проверяем скрыта ли ячейка выделения
+					// Получаем активную ячейку в выделении
+					cr = range.intersection(null !== cr ? cr : new asc_Range(firstCell.startCol, firstCell.startRow, firstCell.startCol, firstCell.startRow));
 					if (cr !== null) {
-						this.fillHandleL = this.cols[cr.c1].left - offsetX + this.cols[cr.c1].width - this.width_1px - this.width_2px;
-						this.fillHandleR = this.fillHandleL + fillHandleWidth;
-						this.fillHandleT = this.rows[cr.r1].top - offsetY + this.rows[cr.r1].height - this.height_1px - this.height_2px;
-						this.fillHandleB = this.fillHandleT + fillHandleHeight;
-
-						ctx.setFillStyle(opt.activeCellBorderColor).fillRect(this.fillHandleL, this.fillHandleT, this.fillHandleR - this.fillHandleL, this.fillHandleB - this.fillHandleT);
-
-						ctx.setStrokeStyle(opt.activeCellBorderColor2).setLineWidth(1).beginPath();
-						ctx.lineHorPrevPx(this.fillHandleL, this.fillHandleT, this.fillHandleR);
-						ctx.lineVerPrevPx(this.fillHandleL, this.fillHandleT, this.fillHandleB);
-						ctx.stroke();
+						ctx.save().beginPath().rect(lRect, tRect, rRect - lRect, bRect - tRect).clip();
+						var _l = this.cols[cr.c1].left - offsetX - this.width_1px, _r = this.cols[cr.c2].left + this.cols[cr.c2].width - offsetX, _t = this.rows[cr.r1].top - offsetY - this.height_1px, _b = this.rows[cr.r2].top + this.rows[cr.r2].height - offsetY;
+						ctx.clearRect(_l, _t, _r - _l, _b - _t).restore();
 					}
+
+					if (!(isFrozen && (!drawRightSide || !drawBottomSide))) {
+						// Рисуем "квадрат" для автозаполнения (располагается "квадрат" в правом нижнем углу последней ячейки выделения)
+						cr = range.intersection(new asc_Range(range.c2, range.r2, range.c2, range.r2));
+						if (cr !== null) {
+							this.fillHandleL = this.cols[cr.c1].left - offsetX + this.cols[cr.c1].width - this.width_1px - this.width_2px;
+							this.fillHandleR = this.fillHandleL + fillHandleWidth;
+							this.fillHandleT = this.rows[cr.r1].top - offsetY + this.rows[cr.r1].height - this.height_1px - this.height_2px;
+							this.fillHandleB = this.fillHandleT + fillHandleHeight;
+
+							ctx.setFillStyle(opt.activeCellBorderColor).fillRect(this.fillHandleL, this.fillHandleT, this.fillHandleR - this.fillHandleL, this.fillHandleB - this.fillHandleT);
+
+							ctx.setStrokeStyle(opt.activeCellBorderColor2).setLineWidth(1).beginPath();
+							ctx.lineHorPrevPx(this.fillHandleL, this.fillHandleT, this.fillHandleR);
+							ctx.lineVerPrevPx(this.fillHandleL, this.fillHandleT, this.fillHandleB);
+							ctx.stroke();
+						}
+					}
+				} else {
+					this.fillHandleL = this.fillHandleR = this.fillHandleT = this.fillHandleB = -1;
 				}
 			}
 
