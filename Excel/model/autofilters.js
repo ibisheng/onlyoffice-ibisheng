@@ -380,15 +380,20 @@ var maxIndividualValues = 10000;
 				
 				//expand range
 				var tablePartsContainsRange = this._isTablePartsContainsRange(activeRange);
-				if(tablePartsContainsRange)
+				if(tablePartsContainsRange && tablePartsContainsRange.Ref)
 					filterRange = tablePartsContainsRange.Ref.clone();
-				else
+				else if(aWs.AutoFilter)
 					filterRange = aWs.AutoFilter.Ref;
-					
+				
+				if(!filterRange)
+					return;
 					
 				//*****callBack on delete filter
 				var addFilterCallBack = function()
 				{	
+					if(!tablePartsContainsRange && !aWs.AutoFilter)
+						return;
+					
 					History.Create_NewPoint();
 					History.StartTransaction();
 					
