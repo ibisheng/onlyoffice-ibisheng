@@ -645,10 +645,21 @@ RotateState.prototype =
                             {
                                 // На удалении включаем пересчет из-за бага (28015), чтобы во время добавления автофигуры на эту же страницу
                                 // расположение всех элементов было рассчитано с уже удаленной автофигурой.
+
+                                var bTrackRevisions = false;
+                                if(this.drawingObjects.document.TrackRevisions){
+                                    bTrackRevisions = true;
+                                    this.drawingObjects.document.TrackRevisions = false;
+                                }
+
                                 original.Remove_FromDocument(false);
                                 aNearestPos[i].Paragraph.Check_NearestPos(aNearestPos[i]);
                                 original.Set_XYForAdd(bounds.posX, bounds.posY, aNearestPos[i], pageIndex);
                                 aDrawings[i].Add_ToDocument(aNearestPos[i], false);
+
+                                if(bTrackRevisions){
+                                    this.drawingObjects.document.TrackRevisions = true;
+                                }
                             }
                             else
                             {
