@@ -2978,6 +2978,25 @@ CShape.prototype =
             while ( recalcresult2_End !== RecalcResult  )
                 RecalcResult = oDocContent.Recalculate_Page( CurPage++, true );
             oRet.contentH = oDocContent.Get_SummaryHeight();
+
+            if(this.bWordShape)
+            {
+                this.m_oSectPr = null;
+                var oParaDrawing = getParaDrawing(this);
+                if(oParaDrawing)
+                {
+                    var oParentParagraph = oParaDrawing.Get_ParentParagraph();
+                    if(oParentParagraph)
+                    {
+                        var oSectPr = oParentParagraph.Get_SectPr();
+                        if(oSectPr)
+                        {
+                            this.m_oSectPr = new CSectionPr();
+                            this.m_oSectPr.Copy(oSectPr);
+                        }
+                    }
+                }
+            }
         }
         return oRet;
     },
