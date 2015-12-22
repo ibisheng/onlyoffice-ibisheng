@@ -228,13 +228,7 @@ CBorderBox.prototype.Draw_Elements = function(PDSE)
     var oCompiledPr = this.Get_CompiledCtrPrp();
 
     this.Make_ShdColor(PDSE, oCompiledPr);
-    var oTextOutline = oCompiledPr.TextOutline;
 
-    if(PDSE.Graphics.Start_Command)  // textArt
-    {
-        oCompiledPr.TextOutline  = null;
-        PDSE.Graphics.SetTextPr(oCompiledPr, PDSE.Theme);
-    }
 
     if(!this.Pr.hideTop)
     {
@@ -242,7 +236,7 @@ CBorderBox.prototype.Draw_Elements = function(PDSE)
             x2 = X + Width,
             y1 = Y;
 
-        PDSE.Graphics.drawHorLine(0, y1, x1, x2, penW);
+        PDSE.Graphics.drawHorLine(0, y1, x1, x2, penW, true);
     }
 
     if(!this.Pr.hideBot)
@@ -251,7 +245,7 @@ CBorderBox.prototype.Draw_Elements = function(PDSE)
             x2 = X + Width,
             y1 = Y + Height;
 
-        PDSE.Graphics.drawHorLine(2, y1, x1, x2, penW);
+        PDSE.Graphics.drawHorLine(2, y1, x1, x2, penW, true);
     }
 
     if(!this.Pr.hideLeft)
@@ -260,7 +254,7 @@ CBorderBox.prototype.Draw_Elements = function(PDSE)
             y1 = Y,
             y2 = Y + Height;
 
-        PDSE.Graphics.drawVerLine(0, x1, y1, y2, penW);
+        PDSE.Graphics.drawVerLine(0, x1, y1, y2, penW, true);
     }
 
     if(!this.Pr.hideRight)
@@ -269,7 +263,7 @@ CBorderBox.prototype.Draw_Elements = function(PDSE)
             y1 = Y,
             y2 = Y + Height;
 
-        PDSE.Graphics.drawVerLine(2, x1, y1, y2, penW);
+        PDSE.Graphics.drawVerLine(2, x1, y1, y2, penW, true);
     }
 
     if(this.Pr.strikeTLBR)  // left diagonal
@@ -368,13 +362,10 @@ CBorderBox.prototype.Draw_Elements = function(PDSE)
             y1 = Y,
             y2 = Y + Height;
 
-        PDSE.Graphics.drawVerLine(0, x1, y1, y2, penW);
+        PDSE.Graphics.drawVerLine(0, x1, y1, y2, penW, true);
     }
 
     PDSE.X = _X + this.size.width;
-
-    oCompiledPr.TextOutline = oTextOutline; // меняем обратно, чтобы не изменились скомпилированные текстовые настройки
-
 };
 CBorderBox.prototype.setPosition = function(pos, PosInfo)
 {

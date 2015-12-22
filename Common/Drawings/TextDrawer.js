@@ -1720,8 +1720,25 @@ CTextDrawer.prototype =
         }
     },
     // smart methods for horizontal / vertical lines
-    drawHorLine : function(align, y, x, r, penW)
+    drawHorLine : function(align, y, x, r, penW, bMath)
     {
+        if(bMath)
+        {
+           // this.p_width(penW * 1000);
+            var oTextPr = this.GetTextPr();
+            var bResetTextPr = false, dW = null;
+            if(oTextPr && oTextPr.TextOutline && isRealNumber(oTextPr.TextOutline.w))
+            {
+                bResetTextPr = true;
+                dW = oTextPr.TextOutline.w;
+                oTextPr.TextOutline.w = 36000.0 * penW >> 0;
+            }
+            this._s();
+            this._m(x, y);
+            this._l(r, y);
+            this.ds();
+            return;
+        }
 
         this._s();
         this._m(x, y);
