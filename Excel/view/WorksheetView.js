@@ -6400,20 +6400,20 @@
 		WorksheetView.prototype._calcActiveCellOffset = function (range) {
 			var vr = this.visibleRange;
 			var ar = range ? range : this.activeRange;
-			var arn = ar.clone(true);
-			var isMC = this._isMergedCells(arn);
-			var adjustRight = ar.startCol >= vr.c2 || ar.startCol >= vr.c2 && isMC;
-			var adjustBottom = ar.startRow >= vr.r2 || ar.startRow >= vr.r2 && isMC;
-			var incX = ar.startCol < vr.c1 && isMC ? arn.startCol - vr.c1 : ar.startCol < vr.c1 ? ar.startCol - vr.c1 : 0;
-			var incY = ar.startRow < vr.r1 && isMC ? arn.startRow - vr.r1 : ar.startRow < vr.r1 ? ar.startRow - vr.r1 : 0;
+			var mc = this.model.getMergedByCell(ar.startRow, ar.startCol);
+			var startCol = mc ? mc.c1 : ar.startCol;
+			var startRow = mc ? mc.r1 : ar.startRow;
+			var incX = startCol < vr.c1 ? startCol - vr.c1 : 0;
+			var incY = startRow < vr.r1 ? startRow - vr.r1 : 0;
 
 			var offsetFrozen = this.getFrozenPaneOffset();
-
-			if (adjustRight) {
-				while (this._isColDrawnPartially(isMC ? arn.startCol : ar.startCol, vr.c1 + incX, offsetFrozen.offsetX)) {++incX;}
+			// adjustRight
+			if (startCol >= vr.c2) {
+				while (this._isColDrawnPartially(startCol, vr.c1 + incX, offsetFrozen.offsetX)) {++incX;}
 			}
-			if (adjustBottom) {
-				while (this._isRowDrawnPartially(isMC ? arn.startRow : ar.startRow, vr.r1 + incY, offsetFrozen.offsetY)) {++incY;}
+			// adjustBottom
+			if (startRow >= vr.r2) {
+				while (this._isRowDrawnPartially(startRow, vr.r1 + incY, offsetFrozen.offsetY)) {++incY;}
 			}
 			return {
 				deltaX: ar.type === c_oAscSelectionType.RangeCol || ar.type === c_oAscSelectionType.RangeCells ? incX : 0,
