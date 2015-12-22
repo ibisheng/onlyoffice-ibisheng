@@ -709,7 +709,7 @@
 				if (false === isSuccess)
 					return;
 
-				t.model.setRowHeight(newHeight, row, row);
+				t.model.setRowHeight(newHeight, row, row, true);
 				t.autoFilters.reDrawFilter(null, row);
 				t._cleanCache(new asc_Range(0, row, t.cols.length - 1, row));
 				t.changeWorksheet("update", {reinitRanges: true});
@@ -4475,8 +4475,9 @@
 					rowInfo.heightReal = rowInfo.height = Math.min(this.maxRowHeight,
 						Math.max(rowInfo.height, newHeight));
 					if (rowHeight !== rowInfo.height) {
+						// ToDo нужно по идее всегда выставлять, но тут проблема с тем, что не всегда можно это в историю заносить (открытие, например). А если не заносить в историю, то при сборке ничего не изменится...
 						if (!rowInfo.isDefaultHeight)
-							this.model.setRowHeight(rowInfo.height + this.height_1px, row, row);
+							this.model.setRowHeight(rowInfo.height + this.height_1px, row, row, false);
 
 						if (angle) {
 							this._fetchCellCache(col, row).text.textBound   =
@@ -9386,7 +9387,7 @@
 					functionModelAction = function () {
 						// Приводим к px (чтобы было ровно)
 						val = val / 0.75; val = (val | val) * 0.75;		// 0.75 - это размер 1px в pt (можно было 96/72)
-						t.model.setRowHeight(Math.min(val, t.maxRowHeight), checkRange.r1, checkRange.r2);
+						t.model.setRowHeight(Math.min(val, t.maxRowHeight), checkRange.r1, checkRange.r2, true);
 						isUpdateRows = true;
 						fullRecalc = true;
 						reinitRanges = true;
@@ -10689,9 +10690,9 @@
 				if (Math.abs(h - this.rows[r].height) > 0.000001 && !this.rows[r].isCustomHeight) {
 					if (!this.rows[r].isDefaultHeight) {
 						this.rows[r].heightReal = this.rows[r].height = Math.min(h, this.maxRowHeight);
-						this.model.setRowHeight(this.rows[r].height + this.height_1px, r, r);
-						this.isChanged = true;
+						this.model.setRowHeight(this.rows[r].height + this.height_1px, r, r, false);
 					}
+					this.isChanged = true;
 				}
 				if (Math.abs(d - this.rows[r].descender) > 0.000001) {
 					this.rows[r].descender = d;
