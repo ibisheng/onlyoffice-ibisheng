@@ -10,6 +10,12 @@ asc_docs_api.prototype._OfflineAppDocumentStartLoad = function()
 };
 asc_docs_api.prototype._OfflineAppDocumentEndLoad = function(_url, _data)
 {
+	if (_data == "")
+	{
+		this.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
+		return;
+	}
+	
     this.OpenDocument2(_url, _data);
 	this.WordControl.m_oLogicDocument.Set_FastCollaborativeEditing(false);
 	this.DocumentOrientation = (null == this.WordControl.m_oLogicDocument) ? true : !this.WordControl.m_oLogicDocument.Orientation;
