@@ -10,6 +10,7 @@ asc_docs_api.prototype._OfflineAppDocumentStartLoad = function()
 };
 asc_docs_api.prototype._OfflineAppDocumentEndLoad = function(_url, _data)
 {
+	g_oIdCounter.m_sUserId = window["AscDesktopEditor"]["CheckUserId"]();
 	if (_data == "")
 	{
 		this.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);

@@ -21,6 +21,7 @@
 	
 	asc['spreadsheet_api'].prototype._OfflineAppDocumentEndLoad = function(_data)
 	{
+		g_oIdCounter.m_sUserId = window["AscDesktopEditor"]["CheckUserId"]();
 		if (_data == "")
 		{
 			this.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
