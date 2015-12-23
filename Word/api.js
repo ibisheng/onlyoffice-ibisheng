@@ -947,6 +947,51 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
 
         // Теперь обновлять состояние необходимо, чтобы обновить локи в режиме рецензирования.
         editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+
+          if (Class instanceof CHeaderFooterController)
+          {
+              if (NewType !== locktype_Mine && NewType !== locktype_None)
+              {
+                  editor.sync_LockHeaderFooters();
+              }
+              else
+              {
+                  editor.sync_UnLockHeaderFooters();
+              }
+          }
+          else if (Class instanceof CDocument)
+          {
+              if (NewType !== locktype_Mine && NewType !== locktype_None)
+              {
+                  editor.sync_LockDocumentProps();
+              }
+              else
+              {
+                  editor.sync_UnLockDocumentProps();
+              }
+          }
+          else if (Class instanceof CComment)
+          {
+              if (NewType !== locktype_Mine && NewType !== locktype_None)
+              {
+                  editor.sync_LockComment(Class.Get_Id(), e["user"]);
+              }
+              else
+              {
+                  editor.sync_UnLockComment(Class.Get_Id());
+              }
+          }
+          else if (Class instanceof CGraphicObjects)
+          {
+              if (NewType !== locktype_Mine && NewType !== locktype_None)
+              {
+                  editor.sync_LockDocumentSchema();
+              }
+              else
+              {
+                  editor.sync_UnLockDocumentSchema();
+              }
+          }
       }
     } else {
       CollaborativeEditing.Remove_NeedLock(Id);
