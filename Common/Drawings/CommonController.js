@@ -2089,7 +2089,18 @@ DrawingObjectsController.prototype =
             if(oParaTextPr)
             {
                 bRecalcText = true;
+
+                if(this.document && this.document.TurnOff_Recalculate)
+                {
+                    this.document.TurnOff_Recalculate();
+                }
+
                 this.paragraphAdd(oParaTextPr);
+
+                if(this.document && this.document.TurnOn_Recalculate)
+                {
+                    this.document.TurnOn_Recalculate();
+                }
             }
             var oPreset = oAscTextArtProperties.asc_getForm();
             if(typeof oPreset === "string")
