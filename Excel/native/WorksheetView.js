@@ -37,6 +37,7 @@ WorksheetView.prototype._drawColumnHeaders_Local = function (drawingCtx, start, 
             c[i].width, this.headersHeight, style, true, i);
     }
 };
+
 WorksheetView.prototype._drawHeader_Local = function (drawingCtx, x, y, w, h, style, isColHeader, index) {
     // Для отрисовки невидимого столбца/строки
     var isZeroHeader = false;
@@ -537,39 +538,39 @@ WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFr
 
     return {'selection':native_selection, 'formulaRanges': formulaRanges};
 
-    if (!isFrozen && this.isChartAreaEditMode) {
-        //	this._drawFormulaRanges(this.arrActiveChartsRanges);
-    }
+    //if (!isFrozen && this.isChartAreaEditMode) {
+    //	this._drawFormulaRanges(this.arrActiveChartsRanges);
+    //}
 
-    if (!isFrozen && this.isSelectionDialogMode) {
-        //	this._drawSelectRange(this.activeRange.clone(true));
-    }
-    if (!isFrozen && this.stateFormatPainter) {
-        //	this._drawFormatPainterRange();
-    }
-    if (null !== this.activeMoveRange) {
-        //	ctx.setStrokeStyle(new CColor(0, 0, 0))
-        //		.setLineWidth(1)
-        //		.beginPath();
-        //	var aActiveMoveRangeIntersection = this.activeMoveRange.intersection(tmpRange !== undefined ? tmpRange : this.visibleRange);
-        //	if (aActiveMoveRangeIntersection) {
-        //		var drawLeftSideMoveRange   = aActiveMoveRangeIntersection.c1 === this.activeMoveRange.c1;
-        //		var drawRightSideMoveRange  = aActiveMoveRangeIntersection.c2 === this.activeMoveRange.c2;
-        //		var drawTopSideMoveRange    = aActiveMoveRangeIntersection.r1 === this.activeMoveRange.r1;
-        //		var drawBottomSideMoveRange = aActiveMoveRangeIntersection.r2 === this.activeMoveRange.r2;
-        //
-        //		var xMoveRange1 = this.cols[aActiveMoveRangeIntersection.c1].left - offsetX - this.width_1px;
-        //		var xMoveRange2 = this.cols[aActiveMoveRangeIntersection.c2].left + this.cols[aActiveMoveRangeIntersection.c2].width - offsetX - this.width_1px;
-        //		var yMoveRange1 = this.rows[aActiveMoveRangeIntersection.r1].top - offsetY;
-        //		var yMoveRange2 = this.rows[aActiveMoveRangeIntersection.r2].top + this.rows[aActiveMoveRangeIntersection.r2].height - offsetY - this.height_1px;
-        //
-        //		if (drawTopSideMoveRange)    {ctx.lineHor(xMoveRange1, yMoveRange1 - this.height_1px, xMoveRange2 + this.width_1px);}
-        //		if (drawBottomSideMoveRange) {ctx.lineHor(xMoveRange1, yMoveRange2, xMoveRange2 + this.width_1px);}
-        //		if (drawLeftSideMoveRange)   {ctx.lineVer(xMoveRange1, yMoveRange1, yMoveRange2);}
-        //		if (drawRightSideMoveRange)  {ctx.lineVer(xMoveRange2, yMoveRange1, yMoveRange2);}
-        //	}
-        //	ctx.stroke();
-    }
+    //if (!isFrozen && this.isSelectionDialogMode) {
+    //	this._drawSelectRange(this.activeRange.clone(true));
+    //}
+    //if (!isFrozen && this.stateFormatPainter) {
+    //	this._drawFormatPainterRange();
+    //}
+    //if (null !== this.activeMoveRange) {
+    //	ctx.setStrokeStyle(new CColor(0, 0, 0))
+    //		.setLineWidth(1)
+    //		.beginPath();
+    //	var aActiveMoveRangeIntersection = this.activeMoveRange.intersection(tmpRange !== undefined ? tmpRange : this.visibleRange);
+    //	if (aActiveMoveRangeIntersection) {
+    //		var drawLeftSideMoveRange   = aActiveMoveRangeIntersection.c1 === this.activeMoveRange.c1;
+    //		var drawRightSideMoveRange  = aActiveMoveRangeIntersection.c2 === this.activeMoveRange.c2;
+    //		var drawTopSideMoveRange    = aActiveMoveRangeIntersection.r1 === this.activeMoveRange.r1;
+    //		var drawBottomSideMoveRange = aActiveMoveRangeIntersection.r2 === this.activeMoveRange.r2;
+    //
+    //		var xMoveRange1 = this.cols[aActiveMoveRangeIntersection.c1].left - offsetX - this.width_1px;
+    //		var xMoveRange2 = this.cols[aActiveMoveRangeIntersection.c2].left + this.cols[aActiveMoveRangeIntersection.c2].width - offsetX - this.width_1px;
+    //		var yMoveRange1 = this.rows[aActiveMoveRangeIntersection.r1].top - offsetY;
+    //		var yMoveRange2 = this.rows[aActiveMoveRangeIntersection.r2].top + this.rows[aActiveMoveRangeIntersection.r2].height - offsetY - this.height_1px;
+    //
+    //		if (drawTopSideMoveRange)    {ctx.lineHor(xMoveRange1, yMoveRange1 - this.height_1px, xMoveRange2 + this.width_1px);}
+    //		if (drawBottomSideMoveRange) {ctx.lineHor(xMoveRange1, yMoveRange2, xMoveRange2 + this.width_1px);}
+    //		if (drawLeftSideMoveRange)   {ctx.lineVer(xMoveRange1, yMoveRange1, yMoveRange2);}
+    //		if (drawRightSideMoveRange)  {ctx.lineVer(xMoveRange2, yMoveRange1, yMoveRange2);}
+    //	}
+    //	ctx.stroke();
+    //}
 
     // restore canvas' original clipping range
     //ctx.restore();
@@ -652,15 +653,10 @@ WorksheetView.prototype._changeSelectionTopLeft = function (x, y, isCoord, isSel
 };
 
 WorksheetView.prototype.__drawFormulaRanges = function (arrRanges, offsetX, offsetY) {
-    var ranges = [];
+    var ranges = [],i = 0, type = 0, left = 0, right  = 0, top = 0, bottom = 0;
 
-    var i = 0, type = 0, left = 0, right  = 0, top = 0, bottom = 0 ////, lineWidth = 1, isDashLine = false, length = c_oAscFormulaRangeBorderColor.length;
-    // var strokeColor, fillColor, colorIndex, uniqueColorIndex = 0, tmpColors = [];
     for (i = 0; i < arrRanges.length; ++i) {
-        //var oFormulaRange = arrRanges[i].clone(true);
-
         ranges.push(arrRanges[i].type);
-
         ranges.push(arrRanges[i].c1);
         ranges.push(arrRanges[i].c2);
         ranges.push(arrRanges[i].r1);
@@ -697,18 +693,6 @@ WorksheetView.prototype.__drawFormulaRanges = function (arrRanges, offsetX, offs
         ranges.push(top);
         ranges.push(right);
         ranges.push(bottom);
-
-       // console.log('FormulaRange ('+ i +') ' + JSON.stringify(arrRanges[i]));
-
-
-//        colorIndex = asc.getUniqueRangeColor(arrRanges, i, tmpColors);
-//        if (null == colorIndex)
-//            colorIndex = uniqueColorIndex++;
-//        tmpColors.push(colorIndex);
-//
-//        strokeColor = fillColor = c_oAscFormulaRangeBorderColor[colorIndex % length];
-//        this._drawElements(this, this._drawSelectionElement, oFormulaRange, isDashLine, lineWidth,
-//            strokeColor, fillColor);
     }
 
     return ranges;
@@ -716,6 +700,6 @@ WorksheetView.prototype.__drawFormulaRanges = function (arrRanges, offsetX, offs
 
 WorksheetView.prototype.__getFormulaRanges = function() {
     this.__drawFormulaRanges(this.arrActiveFormulaRanges, offsetX, offsetY);
-}
+};
 
 

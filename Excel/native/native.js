@@ -273,8 +273,6 @@ var native = CreateNativeEngine();
 window.native = native;
 window["native"] = native;
 
-var asc_mobile = null;
-
 function GetNativeEngine() {
     return window.native;
 }
