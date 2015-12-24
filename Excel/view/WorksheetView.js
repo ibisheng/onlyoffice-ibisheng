@@ -1144,7 +1144,7 @@
 
 		WorksheetView.prototype._prepareDrawingObjects = function () {
 			this.objectRender = new DrawingObjects();
-			if (!window["NATIVE_EDITOR_ENJINE"])
+			if (!window["NATIVE_EDITOR_ENJINE"] || window['IS_NATIVE_EDITOR'])
 				this.objectRender.init(this);
 		};
 
@@ -1877,7 +1877,7 @@
 		// ----- Drawing -----
 
 		WorksheetView.prototype.draw = function (lockDraw) {
-			if (lockDraw || this.model.workbook.bCollaborativeChanges)
+			if (lockDraw || this.model.workbook.bCollaborativeChanges || window['IS_NATIVE_EDITOR'])
 				return this;
 			this._clean();
 			this._drawCorner();
@@ -2328,7 +2328,7 @@
 				}
 			}
 
-			if (!drawingCtx) {
+			if (!drawingCtx && !window['IS_NATIVE_EDITOR']) {
 				left = this.cols[range.c1].left;
 				top = this.rows[range.r1].top;
 				// set clipping rect to cells area
@@ -2338,12 +2338,12 @@
 					Math.min(this.cols[range.c2].left - left + this.cols[range.c2].width, this.drawingCtx.getWidth() - this.cellsLeft),
 					Math.min(this.rows[range.r2].top - top + this.rows[range.r2].height, this.drawingCtx.getHeight() - this.cellsTop))
 					.clip();
-			}
+            }
 
 			var mergedCells = this._drawCells(drawingCtx, range, offsetX, offsetY);
 			this._drawCellsBorders(drawingCtx, range, offsetX, offsetY, mergedCells);
 
-			if (!drawingCtx) {
+			if (!drawingCtx && !window['IS_NATIVE_EDITOR']) {
 				// restore canvas' original clipping range
 				this.drawingCtx.restore();
 			}
@@ -3370,6 +3370,9 @@
 		 * @param {Asc.Range} [range]
 		 */
 		WorksheetView.prototype._drawSelection = function (range) {
+            if (window['IS_NATIVE_EDITOR'])
+                return;
+
 			if (!this.isSelectionDialogMode) {
 				this._drawCollaborativeElements(/*bIsDrawObjects*/true);
 				this._drawSelectionRange(range);
@@ -3778,6 +3781,9 @@
 		};
 
 		WorksheetView.prototype.cleanSelection = function (range, isFrozen) {
+            if (window['IS_NATIVE_EDITOR'])
+                return;
+
 			isFrozen = !!isFrozen;
 			if (range === undefined)
 				range = this.visibleRange;
@@ -4996,6 +5002,7 @@
 			tm.width    = asc_calcnpt( tm.width, this._getPPIX() );
 			tm.height   = asc_calcnpt(tm.height, 96);
 			tm.baseline = asc_calcnpt(tm.baseline, 96);
+
 			if (tm.centerline !== undefined) {
 				tm.centerline = asc_calcnpt(tm.centerline, 96);
 			}
@@ -7091,9 +7098,10 @@
 				// При движении стрелками можем попасть на замерженную ячейку
 			}
 			if (!isEqual || isChangeSelectionShape) {
-				this.cleanSelection();
-				ar.assign2(newRange);
-				this._drawSelection();
+                this.cleanSelection();
+                ar.assign2(newRange);
+                this._drawSelection();
+
 				//ToDo this.drawDepCells();
 
 				if (!this.isCellEditMode) {
@@ -10415,7 +10423,7 @@
 				row = ar.startRow;
 			}
 
-			// Возможно стоит заменить на ячейку из кеша
+            // Возможно стоит заменить на ячейку из кеша
 			c = this._getVisibleCell(col, row);
 			if (!c) {
 				throw "Can not get cell data (col=" + col + ", row=" + row + ")";

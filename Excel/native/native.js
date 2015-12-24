@@ -4314,7 +4314,7 @@ function offline_mouse_down(x, y, pin, isViewer, isFormulaEditMode) {
     var ws = _api.wb.getWorksheet();
     var wb = _api.wb;
 
-    _s._resizeWorkRegion(ws, x, y, true);
+   _s._resizeWorkRegion(ws, x, y, true);
 
     var range =  ws.visibleRange.clone();
     range.c1 = _s.col0;
