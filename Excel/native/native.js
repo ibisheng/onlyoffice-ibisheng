@@ -3663,6 +3663,109 @@ function OfflineEditor () {
 
     this.offline_beforeInit = function () {
 
+        // STYLE MANAGER
+
+        asc.asc_CStylesPainter.prototype.generateStylesAll = function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
+
+            var pxTomm = 1.0; // 72.0 / 96.0;
+
+            this.styleThumbnailWidth = 92;// * pxTomm;
+            this.styleThumbnailHeight = 48;// * pxTomm;
+
+            this.styleThumbnailWidthPt = Math.floor(this.styleThumbnailWidth * pxTomm);
+            this.styleThumbnailHeightPt = Math.floor(this.styleThumbnailHeight * pxTomm);
+
+            this.styleThumbnailWidthWithRetina	= this.styleThumbnailWidth;
+            this.styleThumbnailHeightWithRetina	= this.styleThumbnailHeight;
+
+
+            window['native'].SetStylesType(0);
+
+            this.generateDefaultStyles(cellStylesAll, fmgrGraphics, oFont, stringRenderer);
+            this.generateDocumentStyles(cellStylesAll, fmgrGraphics, oFont, stringRenderer);
+        };
+        asc.asc_CStylesPainter.prototype.generateDefaultStyles = function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
+            var cellStyles = cellStylesAll.DefaultStyles;
+            var oGraphics = new asc.DrawingContext({canvas: null, units: 0/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+
+            var oStyle, oCustomStyle; var styleIndex = 0;
+            for (var i = 0; i < cellStyles.length; ++i) {
+                oStyle = cellStyles[i];
+                if (oStyle.Hidden) {
+                    continue;
+                }
+
+                // ToDo Возможно стоит переписать немного, чтобы не пробегать каждый раз по массиву custom-стилей (нужно генерировать AllStyles)
+                oCustomStyle = cellStylesAll.getCustomStyleByBuiltinId(oStyle.BuiltinId);
+
+                window['native'].BeginDrawDefaultStyle(oStyle.Name, styleIndex);
+                this.drawStyle(oGraphics, stringRenderer, oCustomStyle || oStyle, oStyle.Name, styleIndex);
+                window['native'].EndDrawStyle();
+                ++styleIndex;
+            }
+        };
+        asc.asc_CStylesPainter.prototype.generateDocumentStyles = function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
+            var cellStyles = cellStylesAll.CustomStyles;
+            var oGraphics = new asc.DrawingContext({canvas: null, units: 0/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+
+            var oStyle; var styleIndex = 10000;
+            for (var i = 0; i < cellStyles.length; ++i) {
+                oStyle = cellStyles[i];
+                if (oStyle.Hidden || null != oStyle.BuiltinId) {
+                    continue;
+                }
+
+                window['native'].BeginDrawDocumentStyle(oStyle.Name, styleIndex);
+                this.drawStyle(oGraphics, stringRenderer, oStyle, oStyle.Name, styleIndex);
+                window['native'].EndDrawStyle();
+                ++styleIndex;
+            }
+        };
+        asc.asc_CStylesPainter.prototype.drawStyle = function (oGraphics, stringRenderer, oStyle, sStyleName, nIndex) {
+
+            var oColor = oStyle.getFill();
+            if (null !== oColor) {
+                oGraphics.setFillStyle(oColor);
+                oGraphics.fillRect(0, 0, this.styleThumbnailWidthPt, this.styleThumbnailHeightPt);
+            }
+
+            var drawBorder = function (b, x1, y1, x2, y2) {
+                if (null != b && c_oAscBorderStyles.None !== b.s) {
+                    oGraphics.setStrokeStyle(b.c);
+                    oGraphics.setLineWidth(b.w).beginPath();
+
+                    window["native"]["PD_PathMoveTo"](x1, y1);
+                    window["native"]["PD_PathLineTo"](x2, y2);
+
+                    oGraphics.stroke();
+                }
+            };
+
+            var oBorders = oStyle.getBorder();
+            drawBorder(oBorders.l, 0, 0, 0, this.styleThumbnailHeightPt); // left
+            drawBorder(oBorders.r, this.styleThumbnailWidthPt - 0.25, 0, this.styleThumbnailWidthPt - 0.25, this.styleThumbnailHeightPt);     // right
+            drawBorder(oBorders.t, 0, 0, this.styleThumbnailWidthPt, 0); // up
+            drawBorder(oBorders.b, 0, this.styleThumbnailHeightPt - 0.25, this.styleThumbnailWidthPt,  this.styleThumbnailHeightPt - 0.25);   // down
+
+            // Draw text
+            var fc = oStyle.getFontColor();
+            var oFontColor = fc !== null ? fc : new CColor(0, 0, 0);
+            var format = oStyle.getFont();
+            // Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
+            var oFont = new asc.FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs, format.b, format.i, format.u, format.s);
+
+            var width_padding = 3; // 4 * 72 / 96
+
+            var tm = stringRenderer.measureString(sStyleName);
+            // Текст будем рисовать по центру (в Excel чуть по другому реализовано, у них постоянный отступ снизу)
+            var textY = 0.5 * (this.styleThumbnailHeightPt - tm.height);
+            oGraphics.setFont(oFont);
+            oGraphics.setFillStyle(oFontColor);
+            oGraphics.fillText(sStyleName, width_padding, textY + tm.baseline);
+        };
+
+        // AUTOFILTERS
+
         var pxToMM = 1;//72 / 96;
         //var styleThumbnailWidth = 61 * pxToMM;
         //var styleThumbnailHeight = 46 * pxToMM;
