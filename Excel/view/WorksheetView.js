@@ -8410,7 +8410,6 @@
 				if (callTrigger) { t.handlers.trigger("slowOperation", false); }
 				t.isChanged = true;
 				t._updateCellsRange(arn, canChangeColWidth);
-				t._prepareCellTextMetricsCache(arn);
 			}
 
 			History.EndTransaction();
