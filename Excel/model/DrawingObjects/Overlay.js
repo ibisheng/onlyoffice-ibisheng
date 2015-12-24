@@ -755,8 +755,8 @@ CAutoshapeTrack.prototype =
 		var wDst = drPage.right - drPage.left;
 		var hDst = drPage.bottom - drPage.top;
 
-		var dKoefX = wDst / this.CurrentPageInfo.width_mm;
-		var dKoefY = hDst / this.CurrentPageInfo.height_mm;
+		var dKoefX = (this.Graphics ? this.Graphics.m_oCoordTransform.sx :  wDst / this.CurrentPageInfo.width_mm);
+		var dKoefY = (this.Graphics ? this.Graphics.m_oCoordTransform.sy : hDst / this.CurrentPageInfo.height_mm);
 
 		var r = left + width;
 		var b = top + height;

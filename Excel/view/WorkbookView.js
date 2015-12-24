@@ -261,12 +261,19 @@
 			this._canResize();
 
 			// Shapes
+
+
+            var canvasWidth = this.drawingGraphicCtx.canvas.width;
+            var canvasHeight = this.drawingGraphicCtx.canvas.height;
 			this.buffers.shapeCtx = new CGraphics();
-			this.buffers.shapeCtx.init(this.drawingGraphicCtx.ctx, this.drawingGraphicCtx.getWidth(0), this.drawingGraphicCtx.getHeight(0), this.drawingGraphicCtx.getWidth(3), this.drawingGraphicCtx.getHeight(3));
+			this.buffers.shapeCtx.init(this.drawingGraphicCtx.ctx, canvasWidth, canvasHeight, (canvasWidth*25.4/this.drawingGraphicCtx.ppiX), (canvasHeight*25.4/this.drawingGraphicCtx.ppiY));
 			this.buffers.shapeCtx.m_oFontManager = this.fmgrGraphics[2];
 
+
+            var overlayWidth = this.overlayGraphicCtx.canvas.width;
+            var overlayHeight = this.overlayGraphicCtx.canvas.height;
 			this.buffers.shapeOverlayCtx = new CGraphics();
-			this.buffers.shapeOverlayCtx.init(this.overlayGraphicCtx.ctx, this.overlayGraphicCtx.getWidth(0), this.overlayGraphicCtx.getHeight(0), this.overlayGraphicCtx.getWidth(3), this.overlayGraphicCtx.getHeight(3));
+			this.buffers.shapeOverlayCtx.init(this.overlayGraphicCtx.ctx, overlayWidth, overlayHeight,  (overlayWidth*25.4/this.overlayGraphicCtx.ppiX), (overlayHeight*25.4/this.overlayGraphicCtx.ppiY));
 			this.buffers.shapeOverlayCtx.m_oFontManager = this.fmgrGraphics[2];
 
 			this.stringRender = new asc.StringRender(this.buffers.main);
