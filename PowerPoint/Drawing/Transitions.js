@@ -3047,10 +3047,13 @@ function CDemonstrationManager(htmlpage)
         }
     }
 
-    this.End = function()
+    this.End = function(isNoUseFullScreen)
     {
-        if (undefined !== window["AscDesktopEditor"])
-            window["AscDesktopEditor"]["SetFullscreen"](false);
+		if (true !== isNoUseFullScreen)
+		{
+			if (undefined !== window["AscDesktopEditor"])
+				window["AscDesktopEditor"]["SetFullscreen"](false);
+		}
 
         if (!this.Mode)
             return;

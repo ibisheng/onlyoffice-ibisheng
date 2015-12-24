@@ -4477,9 +4477,9 @@ asc_docs_api.prototype.StartDemonstration = function(div_id, slidestart_num)
     this.WordControl.DemonstrationManager.Start(div_id, slidestart_num, true);
 };
 
-asc_docs_api.prototype.EndDemonstration = function()
+asc_docs_api.prototype.EndDemonstration = function(isNoUseFullScreen)
 {
-    this.WordControl.DemonstrationManager.End();
+    this.WordControl.DemonstrationManager.End(isNoUseFullScreen);
 };
 
 asc_docs_api.prototype.DemonstrationPlay = function()

@@ -206,5 +206,5 @@ window["on_editor_native_message"] = function(sCommand, sParam)
 	else if (sCommand == "print")
 		editor.asc_Print();
 	else if (sCommand == "editor:stopDemonstration")
-		editor.EndDemonstration();
+		editor.EndDemonstration(true);
 };
