@@ -155,6 +155,9 @@ window["Asc"]['spreadsheet_api'].prototype.onUpdateDocumentModified = function(b
   
 window["Asc"]['spreadsheet_api'].prototype.asc_Save = function (isNoUserSave, isSaveAs)
 {
+	if (this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction)
+		return;
+    	
 	var t = this;
     if (true !== isNoUserSave)
         this.IsUserSave = true;
