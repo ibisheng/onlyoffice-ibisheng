@@ -1202,7 +1202,7 @@ CGraphics.prototype =
 
     SetFontSlot : function(slot, fontSizeKoef)
     {
-        var _rfonts = this.m_oGrFonts;
+        var _rfonts = this.m_oTextPr.RFonts;
         var _lastFont = this.IsUseFonts2 ? this.m_oLastFont2 : this.m_oLastFont;
 
         switch (slot)
