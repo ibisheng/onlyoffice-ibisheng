@@ -4510,12 +4510,7 @@ function offline_cell_editor_key_event(keys, width, height, ratio) {
     return [cellEditor.left, cellEditor.top, cellEditor.right, cellEditor.bottom,
         cellEditor.curLeft, cellEditor.curTop, cellEditor.curHeight];
 }
-function offline_cell_editor_mouse_event(events, width, height, ratio) {
-
-    if (events.length) {
-        _null_object.width = width * ratio;
-        _null_object.height = height * ratio;
-    }
+function offline_cell_editor_mouse_event(events) {
 
     var left, right;
     var cellEditor =  _api.wb.cellEditor;
