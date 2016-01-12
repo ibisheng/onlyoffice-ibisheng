@@ -906,8 +906,11 @@ cArea3D.prototype.tocArea = function () {
 cArea3D.prototype.getWS = function () {
     return this.wsRange()[0];
 };
-cArea3D.prototype.cross = function ( arg ) {
+cArea3D.prototype.cross = function ( arg, wsID ) {
     if ( this.wsFrom !== this.wsTo ) {
+        return new cError( cErrorType.wrong_value_type );
+    }
+    if ( this.wsFrom !== wsID ) {
         return new cError( cErrorType.wrong_value_type );
     }
     var r = this.getRange();

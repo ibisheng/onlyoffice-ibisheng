@@ -4916,9 +4916,9 @@ Woorksheet.prototype._RecalculatedFunctions=function(cell,bad,setCellFormat){
 			res = res.getElement(0);
 			res.numFormat = nF;
 		}
-		else if( res.type == cElementType.cellsRange ){
+		else if( res.type == cElementType.cellsRange || res.type == cElementType.cellsRange3D ){
 			var nF = res.numFormat;
-			res = res.cross(new CellAddress(cell));
+			res = res.cross( new CellAddress(cell), this.Id );
 //			res = res.getElementByCell(new CellAddress(cell));
 			res.numFormat = nF;
 		}
