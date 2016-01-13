@@ -16,6 +16,10 @@
 
 	asc['spreadsheet_api'].prototype._OfflineAppDocumentStartLoad = function()
 	{
+		this.asc_registerCallback('asc_onDocumentContentReady', function(){
+			DesktopOfflineUpdateLocalName(window["Asc"]["editor"]);
+		});
+	
 		window["AscDesktopEditor"]["LocalStartOpen"]();
 	};
 	

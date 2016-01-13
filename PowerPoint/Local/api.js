@@ -5,6 +5,10 @@
 /////////////////////////////////////////////////////////
 asc_docs_api.prototype._OfflineAppDocumentStartLoad = function()
 {
+	this.asc_registerCallback('asc_onDocumentContentReady', function(){
+		DesktopOfflineUpdateLocalName(editor);
+	});
+	
 	History.UserSaveMode = true;
     window["AscDesktopEditor"]["LocalStartOpen"]();
 };
