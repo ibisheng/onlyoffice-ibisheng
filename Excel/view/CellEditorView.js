@@ -876,9 +876,8 @@
             if (!bIsOpen)
                 this._updateEditorState(isFormula);
             this.handlers.trigger("updateFormulaEditMod", isFormula);
-            var ret1 = this._parseFormulaRanges();
-            var ret2 = this.canEnterCellRange();
-            this.handlers.trigger("updateFormulaEditModEnd", ret1 || ret2);
+            this._parseFormulaRanges();
+            this.handlers.trigger("updateFormulaEditModEnd");
         };
 
         // Обновляем состояние Undo/Redo

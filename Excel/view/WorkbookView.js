@@ -146,6 +146,7 @@
 			this.wsViews = [];
 			this.cellEditor = undefined;
 			this.fontRenderingMode = null;
+			this.lockDraw = false;		// Lock отрисовки на некоторое время
 
 			this.popUpSelector = null;
 			this.formulasList = null;		// Список всех формул
@@ -196,14 +197,14 @@
 			this.defaultFont = new asc.FontProperties(this.model.getDefaultFont(), this.model.getDefaultSize());
 			//-----------------------
 
-            this.m_dScrollY         = 0;
-            this.m_dScrollX         = 0;
-            this.m_dScrollY_max     = 1;
-            this.m_dScrollX_max     = 1;
+			this.m_dScrollY = 0;
+			this.m_dScrollX = 0;
+			this.m_dScrollY_max = 1;
+			this.m_dScrollX_max = 1;
 
-            this.MobileTouchManager = null;
+			this.MobileTouchManager = null;
 
-            this.defNameAllowCreate = true;
+			this.defNameAllowCreate = true;
 
 			this._init(fontRenderingMode);
 
@@ -305,13 +306,18 @@
 				    "editCell":          		function () {self._onEditCell.apply(self, arguments);},
 				    "stopCellEditing":   		function () {return self._onStopCellEditing.apply(self, arguments);},
 				    "empty":					function () {self._onEmpty.apply(self, arguments);},
-				    "canEnterCellRange":		function () {
-															    self.cellEditor.setFocus(false);
-															    var ret = self.cellEditor.canEnterCellRange();
-															    ret ? self.cellEditor.activateCellRange() : true;
-															    return ret;
-														    },
-				    "enterCellRange":			function () {self.cellEditor.setFocus(false); self.getWorksheet().enterCellRange(self.cellEditor);},
+						"canEnterCellRange": function() {
+							self.cellEditor.setFocus(false);
+							var ret = self.cellEditor.canEnterCellRange();
+							ret ? self.cellEditor.activateCellRange() : true;
+							return ret;
+						},
+				    "enterCellRange":			function () {
+							self.lockDraw = true;
+							self.cellEditor.setFocus(false);
+							self.getWorksheet().enterCellRange(self.cellEditor);
+							self.lockDraw = false;
+						},
 				    "copy":						function () {self.copyToClipboard.apply(self, arguments);},
 				    "paste":					function () {self.pasteFromClipboard.apply(self, arguments);},
 				    "cut":						function () {self.cutToClipboard.apply(self, arguments);},
@@ -388,14 +394,20 @@
 							self.controller.setFormulaEditMode.apply(self.controller, arguments);
 							var ws = self.getWorksheet();
 							if (ws) {
-								ws.cleanSelection();
+								if (!self.lockDraw) {
+									ws.cleanSelection();
+								}
 								ws.cleanFormulaRanges();
 								ws.setFormulaEditMode.apply(ws, arguments);
 							}
 						},
 						"updateEditorState"			: function (state) {self.handlers.trigger("asc_onEditCell", state);},
 						"isGlobalLockEditCell"		: function () {return self.collaborativeEditing.getGlobalLockEditCell();},
-						"updateFormulaEditModEnd"	: function (rangeUpdated) {self.getWorksheet().updateSelection();},
+						"updateFormulaEditModEnd"	: function () {
+							if (!self.lockDraw) {
+								self.getWorksheet().updateSelection();
+							}
+						},
 						"newRange"     				: function (range) { self.getWorksheet().addFormulaRange(range); },
 						"existedRange" 				: function (range) { self.getWorksheet().activeFormulaRange(range); },
 						"updateUndoRedoChanged"		: function (bCanUndo, bCanRedo) {
