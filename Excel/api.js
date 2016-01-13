@@ -822,6 +822,7 @@ var editor;
    * asc_onDocumentCanSaveChanged	(bIsCanSave)										- эвент об обновлении статуса "можно ли сохранять файл"
    * asc_onDocumentUpdateVersion	(callback)											- эвент о том, что файл собрался и не может больше редактироваться
    * asc_onContextMenu			(event)												- эвент на контекстное меню
+   * asc_onDocumentContentReady ()                        - эвент об окончании загрузки документа
    */
 
   spreadsheet_api.prototype.asc_registerCallback = function(name, callback, replaceOldCallback) {
@@ -964,6 +965,7 @@ var editor;
       // Изменений не было
       this.IsSendDocumentLoadCompleate = true;
       this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+      this.handlers.trigger('asc_onDocumentContentReady');
     }
   };
 
@@ -1231,6 +1233,7 @@ var editor;
       this.collaborativeEditing.clearRecalcIndex();
       this.IsSendDocumentLoadCompleate = true;
       this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+      this.handlers.trigger('asc_onDocumentContentReady');
     } else if (this.wb && !window["NATIVE_EDITOR_ENJINE"]) {
       // Нужно послать 'обновить свойства' (иначе для удаления данных не обновится строка формул).
       // ToDo Возможно стоит обновлять только строку формул
