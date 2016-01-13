@@ -1,9 +1,10 @@
 ﻿"use strict";
 
 var g_oLicenseResult = {
-  Error   : 1,
-  Expired : 2,
-  Success : 3
+  Error       : 1,
+  Expired     : 2,
+  Success     : 3,
+  UnknownUser : 4
 };
 
 var g_sLicenseDefaultUrl = "/license";
@@ -59,6 +60,7 @@ function CheckUserInLicense(customerId, userId, userFirstName, userLastName, oLi
       if (customerId === oLicense['customer_id'] || oLicense['customer_id'] === (sUserHash = superuser)) {
         // users для новой версии - массив
         checkUserHash = (-1 !== oLicense['users'].indexOf(sUserHash));
+        res = g_oLicenseResult.UnknownUser;
       }
       if (checkUserHash) {
         var endDate = new Date(oLicense['end_date']);
