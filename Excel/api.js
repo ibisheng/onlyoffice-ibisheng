@@ -2845,7 +2845,7 @@ var editor;
       !History.IsEndTransaction() || !this.canSave) {
       return;
     }
-    if (!History.Is_Modified() && !(this.collaborativeEditing.getCollaborativeEditing() && 0 !== this.collaborativeEditing.getOwnLocksLength())) {
+    if (!History.Is_Modified(true) && !(this.collaborativeEditing.getCollaborativeEditing() && 0 !== this.collaborativeEditing.getOwnLocksLength())) {
       if (this.collaborativeEditing.getFast() && this.collaborativeEditing.haveOtherChanges()) {
         CollaborativeEditing.Clear_CollaborativeMarks();
 
