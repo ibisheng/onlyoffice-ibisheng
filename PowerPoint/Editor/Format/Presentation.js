@@ -573,7 +573,7 @@ CPresentation.prototype =
             }
         }
 
-        var bHaveChanges = History.Have_Changes(false);
+        var bHaveChanges = History.Have_Changes(true);
         if (true !== bHaveChanges && true === CollaborativeEditing.Have_OtherChanges())
         {
             // Принимаем чужие изменение. Своих нет, но функцию отсылки надо вызвать, чтобы снялить локи.

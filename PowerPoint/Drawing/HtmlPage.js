@@ -3108,7 +3108,7 @@ function CEditorPage(api)
 
                 if ((_curTime - oWordControl.m_nLastAutosaveTime) > _interval && !oWordControl.m_oDrawingDocument.TransitionSlide.IsPlaying() && !oWordControl.m_oApi.isLongAction())
                 {
-                    if (History.Have_Changes(false) == true)
+                    if (History.Have_Changes(true) == true)
                     {
                         oWordControl.m_oApi.asc_Save(true);
                     }

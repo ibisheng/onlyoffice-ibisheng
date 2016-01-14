@@ -14706,7 +14706,7 @@ CDocument.prototype.Continue_FastCollaborativeEditing = function()
     if (true === this.Selection_Is_TableBorderMove() || true === this.Api.isStartAddShape || this.DrawingObjects.checkTrackDrawings())
         return;
 
-    var HaveChanges = this.History.Have_Changes(false);
+    var HaveChanges = this.History.Have_Changes(true);
     if (true !== HaveChanges && true === this.CollaborativeEditing.Have_OtherChanges())
     {
         // Принимаем чужие изменения. Своих нет, но функцию отсылки надо вызвать, чтобы снять локи.

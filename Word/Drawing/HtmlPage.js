@@ -3776,7 +3776,7 @@ function CEditorPage(api)
 
                 if ((_curTime - oWordControl.m_nLastAutosaveTime) > _interval)
                 {
-                    if (History.Have_Changes(false) == true)
+                    if (History.Have_Changes(true) == true)
                     {
                         oWordControl.m_oApi.asc_Save(true);
                     }
