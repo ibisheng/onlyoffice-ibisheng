@@ -2954,6 +2954,8 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_nativeCalculateFile = function() {
+    window['DoctRendererMode'] = true;	
+    this.wb._nativeCalculate();
   };
 
   spreadsheet_api.prototype.asc_nativeApplyChanges = function(changes) {
@@ -3018,7 +3020,6 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_nativeCalculate = function() {
-    this.wb._nativeCalculate();
   };
 
   spreadsheet_api.prototype.asc_nativePrint = function(_printer, _page) {
@@ -3048,7 +3049,7 @@ var editor;
 
         window["AscDesktopEditor"]["Print_End"]();
       }
-      return;
+	  return pdf_writer.DocumentRenderer.Memory;      
     }
 
     var isEndPrint = this.wb.printSheet(_printer, _printPagesData);

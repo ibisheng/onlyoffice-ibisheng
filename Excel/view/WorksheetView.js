@@ -1144,7 +1144,7 @@
 
 		WorksheetView.prototype._prepareDrawingObjects = function () {
 			this.objectRender = new DrawingObjects();
-			if (!window["NATIVE_EDITOR_ENJINE"] || window['IS_NATIVE_EDITOR'])
+			if (!window["NATIVE_EDITOR_ENJINE"] || window['IS_NATIVE_EDITOR'] || window['DoctRendererMode'])
 				this.objectRender.init(this);
 		};
 
