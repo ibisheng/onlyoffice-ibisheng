@@ -2841,7 +2841,8 @@ var editor;
   ////////////////////////////AutoSave api/////////////////////////////////
   /////////////////////////////////////////////////////////////////////////
   spreadsheet_api.prototype._autoSave = function() {
-    if ((0 === this.autoSaveGap && !this.collaborativeEditing.getFast()) || this.asc_getCellEditMode() || this.asc_getIsTrackShape() || this.isOpenedChartFrame ||
+    if ((0 === this.autoSaveGap && (!this.collaborativeEditing.getFast() || !this.collaborativeEditing.getCollaborativeEditing()))
+      || this.asc_getCellEditMode() || this.asc_getIsTrackShape() || this.isOpenedChartFrame ||
       !History.IsEndTransaction() || !this.canSave) {
       return;
     }
