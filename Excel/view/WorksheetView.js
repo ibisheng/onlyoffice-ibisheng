@@ -8447,15 +8447,55 @@
 				else if(val.addImagesFromWord && val.addImagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 				{
 					var oObjectsForDownload = GetObjectsForImageDownload(val._aPastedImages);
+					
+					//if already load images on server
+					if(api.wb.clipboard.alreadyLoadImagesOnServer === true)
+					{
+						var oImageMap = {};
+						for (var i = 0, length = oObjectsForDownload.aBuilderImagesByUrl.length; i < length; ++i)
+						{
+							var url = oObjectsForDownload.aUrls[i];
+							
+							//get name from array already load on server urls
+							var name = api.wb.clipboard.oImages[url];
+							var aImageElem = oObjectsForDownload.aBuilderImagesByUrl[i];
+							if(name)
+							{
+								if(Array.isArray(aImageElem))
+								{
+									for(var j = 0; j < aImageElem.length; ++j)
+									{
+										var imageElem = aImageElem[j];
+										if (null != imageElem)
+										{
+											imageElem.SetUrl(name);
+										}
+									}
+								}
+								oImageMap[i] = name;
+							}
+							else
+							{
+								oImageMap[i] = url;
+							}
+						}
 
-                    sendImgUrls(api, oObjectsForDownload.aUrls, function (data) {
-                        var oImageMap = {};
-                        ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
+						if(val.onlyImages !== true)
+							t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
+						api.wb.clipboard._insertImagesFromBinaryWord(t, val, oImageMap);
+					}
+					else
+					{
+						sendImgUrls(api, oObjectsForDownload.aUrls, function (data) {
+							var oImageMap = {};
+							ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
 
-                        if(val.onlyImages !== true)
-                            t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
-                        api.wb.clipboard._insertImagesFromBinaryWord(t, val, oImageMap);
-                    }, true);
+							if(val.onlyImages !== true)
+								t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
+							api.wb.clipboard._insertImagesFromBinaryWord(t, val, oImageMap);
+						}, true);
+					}
+					
 				}
 				else if(val.onlyImages !== true)
 						t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);

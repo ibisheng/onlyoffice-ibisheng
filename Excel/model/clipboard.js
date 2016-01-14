@@ -37,6 +37,9 @@
 			this.lStorage = {};
 
 			this.fontsNew = {};
+			
+			this.oImages = {};
+			this.alreadyLoadImagesOnServer = false;
 
 			return this;
 		}
@@ -2121,6 +2124,8 @@
 				if(isOnlyLocalBufferSafari && navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac'))
 					onlyFromLocalStorage = true;
 				
+				t.alreadyLoadImagesOnServer = false;
+				
 				//****binary****
 				if(onlyFromLocalStorage)
 				{
@@ -2164,35 +2169,99 @@
 				}
 
 				this.activeRange = worksheet.activeRange.clone(true);
-
-				History.TurnOff();
 				
-				var t = this;
-				var oPasteProcessor;
-				var oTempDrawingDocument = worksheet.model.DrawingDocument;
-			    var newCDocument = new CDocument(oTempDrawingDocument, false);
-				newCDocument.bFromDocument = true;
-				//TODo!!!!!!
-				newCDocument.Content[0].bFromDocument = true;
-				newCDocument.theme = this.Api.wbModel.theme;
 				
-			    oTempDrawingDocument.m_oLogicDocument = newCDocument;
-				var oOldEditor = undefined;
-			    if ("undefined" != typeof editor)
-			        oOldEditor = editor;
-				editor = {WordControl: oTempDrawingDocument, isDocumentEditor: true};
-				var oPasteProcessor = new PasteProcessor({WordControl:{m_oLogicDocument: newCDocument}, FontLoader: {}}, false, false);
-				oPasteProcessor._Prepeare_recursive(node, true, true)
-				oPasteProcessor._Execute(node, {}, true, true, false);
-				editor = oOldEditor;
+				var callBackAfterLoadImages = function()
+				{
+					History.TurnOff();
 				
-				History.TurnOn();
+					var oPasteProcessor;
+					var oTempDrawingDocument = worksheet.model.DrawingDocument;
+					var newCDocument = new CDocument(oTempDrawingDocument, false);
+					newCDocument.bFromDocument = true;
+					//TODo!!!!!!
+					newCDocument.Content[0].bFromDocument = true;
+					newCDocument.theme = t.Api.wbModel.theme;
+					
+					oTempDrawingDocument.m_oLogicDocument = newCDocument;
+					var oOldEditor = undefined;
+					if ("undefined" != typeof editor)
+						oOldEditor = editor;
+					editor = {WordControl: oTempDrawingDocument, isDocumentEditor: true};
+					var oPasteProcessor = new PasteProcessor({WordControl:{m_oLogicDocument: newCDocument}, FontLoader: {}}, false, false);
+					oPasteProcessor._Prepeare_recursive(node, true, true)
+					oPasteProcessor._Execute(node, {}, true, true, false);
+					editor = oOldEditor;
+					
+					History.TurnOn();
+					
+					var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(t, worksheet);
+					pasteFromBinaryWord._paste(worksheet, {content: oPasteProcessor.aContent});
+					window.GlobalPasteFlagCounter = 0;
+					window.GlobalPasteFlag = false;
+				};
 				
-				var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(t, worksheet);
-				pasteFromBinaryWord._paste(worksheet, {content: oPasteProcessor.aContent});
-				window.GlobalPasteFlagCounter = 0;
-				window.GlobalPasteFlag = false;
+				var aImagesToDownload = this._getImageFromHtml(node, true);
+				if(aImagesToDownload !== null)//load to server
+				{
+                    var api = asc["editor"];
+					sendImgUrls(api, aImagesToDownload, function (data) {
+                       for (var i = 0, length = Math.min(data.length, aImagesToDownload.length); i < length; ++i) 
+					   {
+							var elem = data[i];
+							var sFrom = aImagesToDownload[i];
+							if (null != elem.url) 
+							{
+								var name = g_oDocumentUrls.imagePath2Local(elem.path);
+								t.oImages[sFrom] = name;
+							} 
+							else 
+							{
+								t.oImages[sFrom] = sFrom;
+							}
+						}
+						
+						t.alreadyLoadImagesOnServer = true;
+                        callBackAfterLoadImages();
+						
+                    }, true);
+					
+				}
+				else
+				{
+					callBackAfterLoadImages();
+				}
             },
+			
+			_getImageFromHtml: function(html, isGetUrlsArray)
+			{
+				var res = null;
+				
+				if(html)
+				{
+					var allImages = html.getElementsByTagName('img');
+					
+					if(allImages && allImages.length)
+					{
+						if(isGetUrlsArray)
+						{
+							var arrayImages = [];
+							for(var i = 0; i < allImages.length; i++)
+							{
+								arrayImages[i] = allImages[i].src;
+							}
+							
+							res = arrayImages;
+						}
+						else
+						{
+							res = allImages;
+						}
+					}
+				}
+				
+				return res;
+			},
 			
 			_pasteResult: function(aResult, worksheet)
 			{
