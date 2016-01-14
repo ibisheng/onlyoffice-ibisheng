@@ -3018,6 +3018,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_nativeCalculate = function() {
+    this.wb._nativeCalculate();
   };
 
   spreadsheet_api.prototype.asc_nativePrint = function(_printer, _page) {

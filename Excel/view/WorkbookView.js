@@ -2133,6 +2133,15 @@
 			return printPagesData;
 		};
 
+		// Вызывать только для нативной печати
+		WorkbookView.prototype._nativeCalculate = function() {
+			var item;
+			for(var i in this.wsViews) {
+				item = this.wsViews[i];
+				item._prepareDrawingObjects();
+			}
+		};
+
 		WorkbookView.prototype._initCommentsToSave  = function () {
 			var isFirst = true;
 			for (var wsKey in this.wsViews) {
