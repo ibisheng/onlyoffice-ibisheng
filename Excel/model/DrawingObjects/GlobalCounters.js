@@ -94,7 +94,7 @@ CCollaborativeEditing.prototype.Apply_LinkData = function()
         Item.Class.Load_LinkData( Item.LinkData );
     }
     this.Clear_LinkData();
-
+    this.Load_Images();
 };
 CCollaborativeEditing.prototype.Load_Images = function(){
     if(this.m_aNewImages.length > 0)
