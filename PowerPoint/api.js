@@ -422,6 +422,21 @@ asc_docs_api.prototype._onUpdateDocumentCanSave = function () {
 };
 
 ///////////////////////////////////////////
+asc_docs_api.prototype.CheckChangedDocument = function()
+{
+    if (true === History.Have_Changes())
+    {
+        // дублирование евента. когда будет undo-redo - тогда
+        // эти евенты начнут отличаться
+        this.SetDocumentModified(true);
+    }
+    else
+    {
+        this.SetDocumentModified(false);
+    }
+
+    this._onUpdateDocumentCanSave();
+};
 asc_docs_api.prototype.SetUnchangedDocument = function()
 {
     this.SetDocumentModified(false);
@@ -1129,7 +1144,7 @@ function OnSave_Callback(e) {
       editor.CoAuthoringApi.onUnSaveLock = null;
 
       // Выставляем, что документ не модифицирован
-      editor.SetUnchangedDocument();
+      editor.CheckChangedDocument();
       editor.canSave = true;
       editor.IsUserSave = false;
       editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
