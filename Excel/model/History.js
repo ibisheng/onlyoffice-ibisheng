@@ -779,8 +779,8 @@ CHistory.prototype.Get_DeleteIndex = function () {
 	return DeleteIndex;
 };
 /** @returns {boolean} */
-CHistory.prototype.Is_Modified = function(IsUserSave) {
-  var checkIndex = (this.Is_UserSaveMode() && IsUserSave) ? this.UserSavedIndex : this.SavedIndex;
+CHistory.prototype.Is_Modified = function(IsNotUserSave) {
+  var checkIndex = (this.Is_UserSaveMode() && !IsNotUserSave) ? this.UserSavedIndex : this.SavedIndex;
   if (-1 === this.Index && null === checkIndex && false === this.ForceSave) {
     return false;
   }
