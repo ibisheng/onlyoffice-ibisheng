@@ -163,7 +163,7 @@ window["CDocsCoApi"].prototype.askSaveChanges = function(callback)
 window["CDocsCoApi"].prototype.saveChanges = function(arrayChanges, deleteIndex, excelAdditionalInfo)
 {
 	window["AscDesktopEditor"]["LocalFileSaveChanges"](arrayChanges.join("\",\""), deleteIndex, arrayChanges.length);
-	this.onUnSaveLock();
+	//this.onUnSaveLock();
 };
 
 window["NativeCorrectImageUrlOnCopy"] = function(url)

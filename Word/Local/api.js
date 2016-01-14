@@ -77,9 +77,9 @@ CHistory.prototype.Reset_SavedIndex = function(IsUserSave)
 		this.ForceSave  = false;
 	}
 };
-CHistory.prototype.Have_Changes = function(IsUserSave, IsNoSavedNoModifyed)
+CHistory.prototype.Have_Changes = function(IsNotUserSave, IsNoSavedNoModifyed)
 {
-	if (true === this.Is_UserSaveMode() && false !== IsUserSave)
+	if (true === this.Is_UserSaveMode() && true !== IsNotUserSave)
 	{
 		if (-1 === this.Index && null === this.UserSavedIndex && false === this.ForceSave)
 		{

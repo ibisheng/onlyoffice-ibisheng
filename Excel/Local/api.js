@@ -39,6 +39,8 @@
 		}
 		
 		DesktopOfflineUpdateLocalName(this);
+		
+		this.onUpdateDocumentModified(History.Is_Modified());
 	};
 	
 	asc['spreadsheet_api'].prototype._onNeedParams = function(data) 
@@ -116,9 +118,9 @@ CHistory.prototype.Reset_SavedIndex = function(IsUserSave)
 	}
 };
 
-CHistory.prototype.Is_Modified = function(IsUserSave, IsNoSavedNoModifyed) 
+CHistory.prototype.Is_Modified = function(IsNotUserSave, IsNoSavedNoModifyed) 
 {
-	var checkIndex = (this.Is_UserSaveMode() && IsUserSave) ? this.UserSavedIndex : this.SavedIndex;
+	var checkIndex = (this.Is_UserSaveMode() && !IsNotUserSave) ? this.UserSavedIndex : this.SavedIndex;
 	if (-1 === this.Index && null === checkIndex && false === this.ForceSave) 
 	{
 		if (window["AscDesktopEditor"])
@@ -209,9 +211,8 @@ window["DesktopOfflineAppDocumentEndSave"] = function(isCancel)
 		DesktopOfflineUpdateLocalName(window["Asc"]["editor"]);
 	else
 	{
-		History.UserSavedIndex = window["Asc"]["editor"].LastUserSavedIndex;
-		
-		window["Asc"]["editor"].onUpdateDocumentModified(History.Is_Modified(true));
+		History.UserSavedIndex = window["Asc"]["editor"].LastUserSavedIndex;		
+		window["Asc"]["editor"].onUpdateDocumentModified(History.Is_Modified());
 	}
 	
 	window["Asc"]["editor"].LastUserSavedIndex = undefined;
