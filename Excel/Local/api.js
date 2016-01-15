@@ -199,10 +199,14 @@ window["Asc"]['spreadsheet_api'].prototype.asc_isOffline = function()
 window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs)
 {
 	window["Asc"]["editor"].sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+	
+	var _param = "";
 	if (isSaveAs === true)
-		window["AscDesktopEditor"]["LocalFileSave"](true);
-	else
-		window["AscDesktopEditor"]["LocalFileSave"]();
+		_param += "saveas=true;";
+	if (AscBrowser.isRetina)
+		_param += "retina=true;";
+	
+	window["AscDesktopEditor"]["LocalFileSave"](_param);
 };
 window["DesktopOfflineAppDocumentEndSave"] = function(isCancel)
 {

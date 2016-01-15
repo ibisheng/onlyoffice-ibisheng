@@ -145,10 +145,18 @@ asc_docs_api.prototype.asc_Save = function (isNoUserSave, isSaveAs)
 	{
 		var _isNaturalSave = this.IsUserSave;
 		this.canSave = false;
-		this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
 		
-		if (this.CoAuthoringApi.onUnSaveLock)
-			this.CoAuthoringApi.onUnSaveLock();
+		if (this.WordControl.m_oLogicDocument != null)
+		{
+			this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
+			
+			if (this.CoAuthoringApi.onUnSaveLock)
+				this.CoAuthoringApi.onUnSaveLock();
+		}
+		else
+		{
+			this.canSave = true;
+		}
 		
 		if (_isNaturalSave === true)
 			window["DesktopOfflineAppDocumentStartSave"](isSaveAs);
@@ -157,10 +165,14 @@ asc_docs_api.prototype.asc_Save = function (isNoUserSave, isSaveAs)
 window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs)
 {
     editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+	
+	var _param = "";
 	if (isSaveAs === true)
-		window["AscDesktopEditor"]["LocalFileSave"](true);
-	else
-		window["AscDesktopEditor"]["LocalFileSave"]();
+		_param += "saveas=true;";
+	if (AscBrowser.isRetina)
+		_param += "retina=true;";
+	
+	window["AscDesktopEditor"]["LocalFileSave"](_param);
 };
 window["DesktopOfflineAppDocumentEndSave"] = function(isCancel)
 {
