@@ -156,11 +156,9 @@ window["DesktopOfflineAppDocumentEndSave"] = function(isCancel)
 	if (isCancel !== true)
 		DesktopOfflineUpdateLocalName(editor);
 	else
-	{
 		History.UserSavedIndex = editor.LastUserSavedIndex;
-		editor.UpdateInterfaceState();
-	}
 	
+	editor.UpdateInterfaceState();
 	editor.LastUserSavedIndex = undefined;
 };
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) 

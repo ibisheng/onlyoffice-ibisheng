@@ -214,11 +214,9 @@ window["DesktopOfflineAppDocumentEndSave"] = function(isCancel)
 	if (isCancel !== true)
 		DesktopOfflineUpdateLocalName(window["Asc"]["editor"]);
 	else
-	{
 		History.UserSavedIndex = window["Asc"]["editor"].LastUserSavedIndex;		
-		window["Asc"]["editor"].onUpdateDocumentModified(History.Is_Modified());
-	}
 	
+	window["Asc"]["editor"].onUpdateDocumentModified(History.Is_Modified());
 	window["Asc"]["editor"].LastUserSavedIndex = undefined;
 };
 
