@@ -46,8 +46,6 @@ CHistory.prototype.Reset_SavedIndex = function(IsUserSave)
 {
 	if (true === this.Is_UserSaveMode())
 	{
-		if (this.Index == -1)
-			return;
 		this.SavedIndex = this.Index;
 		if (true === IsUserSave)
 		{
