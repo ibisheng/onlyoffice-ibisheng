@@ -589,6 +589,7 @@
 				this._shiftVisibleRange();
 				this.cellCommentator.updateCommentPosition();
 				this.handlers.trigger("onDocumentPlaceChanged");
+				this.objectRender.drawingArea.reinitRanges();
 				this.updateZoom = false;
 				this.notUpdateRowHeight = false;
 			} else {
@@ -606,6 +607,7 @@
 			this._shiftVisibleRange();
 			this.cellCommentator.updateCommentPosition();
 			this.handlers.trigger("onDocumentPlaceChanged");
+			this.objectRender.drawingArea.reinitRanges();
 
 			this.updateResize = false;
 			this.updateZoom = false;
