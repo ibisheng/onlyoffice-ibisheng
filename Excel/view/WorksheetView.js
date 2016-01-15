@@ -676,6 +676,10 @@
 				t._cleanCache(new asc_Range(0, 0, t.cols.length - 1, t.rows.length - 1));
 				t.changeWorksheet("update", {reinitRanges: true});
 				t._updateVisibleColsCount();
+                if(t.objectRender)
+                {
+                    t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.ColumnResize, col: col});
+                }
 			};
 			this._isLockedAll(onChangeWidthCallback);
 		};
@@ -716,6 +720,10 @@
 				t._cleanCache(new asc_Range(0, row, t.cols.length - 1, row));
 				t.changeWorksheet("update", {reinitRanges: true});
 				t._updateVisibleRowsCount();
+                if(t.objectRender)
+                {
+                    t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: row});
+                }
 			};
 
 			this._isLockedAll (onChangeHeightCallback);
