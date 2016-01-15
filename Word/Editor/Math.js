@@ -1310,6 +1310,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     }
 
     PRS.MathNotInline = this.ParaMathRPI.bInline  == false; // если неинлайновая формула, то рассчитываем Ranges по максимальному измерению
+    PRS.bPriorityOper = this.ParaMathRPI.bInline == false;
 
     if(this.ParaMathRPI.bInline == false)
     {
@@ -1726,7 +1727,6 @@ ParaMath.prototype.private_UpdateXLimits = function(PRS)
 
 
     PRS.WrapIndent = MathSettings.Get_WrapIndent(WrapState);
-    PRS.bPriorityOper = this.ParaMathRPI.bInline == false;
 
     var bFirstLine = this.Root.IsStartLine(PRS.Line);
     PRS.bFirstLine = bFirstLine;

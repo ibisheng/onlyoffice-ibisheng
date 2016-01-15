@@ -260,14 +260,16 @@ CCoeffGaps.prototype =
 
         return coeff;
     },
-    checkOperSign: function(code) // "+", "-", "±", "∓"
+    checkOperSign: function(code) // "+", "-", "±", "∓", "×", "÷"
     {
-        var PLUS       = 0x2B,
-            MINUS      = 0x2D,
-            PLUS_MINUS = 0xB1,
-            MINUS_PLUS = 0x2213;
+        var PLUS            = 0x2B,
+            MINUS           = 0x2D,
+            PLUS_MINUS      = 0xB1,
+            MINUS_PLUS      = 0x2213,
+            MULTIPLICATION  = 0xD7,
+            DIVISION        = 0xF7;
 
-        return code == PLUS || code == MINUS || code == PLUS_MINUS || code == MINUS_PLUS;
+        return code == PLUS || code == MINUS || code == PLUS_MINUS || code == MINUS_PLUS || code == MULTIPLICATION || code == DIVISION;
     },
     checkEqualSign: function(code)
     {
@@ -332,7 +334,7 @@ CMathArgSize.prototype =
     SetValue: function(val)
     {
         if(val === null || val === undefined)
-            val = undefined;
+            this.value = undefined;
         else if(val < - 2)
             this.value = -2;
         else if(val > 2)
