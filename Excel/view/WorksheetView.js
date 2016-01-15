@@ -8303,7 +8303,8 @@
 					t._updateCellsRange(arn, canChangeColWidth);
 				}
 				
-				if(!(prop === "paste" && !isLocal))
+				//в случае, если вставляем из глобального буфера, транзакцию закрываем внутри функции _pasteFromGlobalBuff на callbacks от загрузки шрифтов и картинок
+				if(prop !== "paste" || (prop === "paste" && isLocal))
 					History.EndTransaction();
 			};
 			if ("paste" === prop && val.onlyImages !== true) {
@@ -8335,7 +8336,6 @@
 			
 			if (!selectData) {
 				bIsUpdate = false;
-				History.EndTransaction();
 				buildRecalc(t.model.workbook);
 				unLockDraw(t.model.workbook);
 				return;
@@ -8420,7 +8420,6 @@
 				t._updateCellsRange(arn, canChangeColWidth);
 			}
 
-			History.EndTransaction();
 			var oSelection = History.GetSelection();
 			if(null != oSelection)
 			{
@@ -8438,11 +8437,13 @@
 			t._loadFonts(val.fontsNew, function () {
 
 				var api = asc["editor"];
+				var isEndTransaction = false;
 				if (val.addImages && val.addImages.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor)) 
 				{	
 					if(val.onlyImages !== true)
 						t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
 					api.wb.clipboard._insertImagesFromHTML(t, val);
+					isEndTransaction = true;
 				}
 				else if(val.addImagesFromWord && val.addImagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 				{
@@ -8483,6 +8484,7 @@
 						if(val.onlyImages !== true)
 							t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
 						api.wb.clipboard._insertImagesFromBinaryWord(t, val, oImageMap);
+						isEndTransaction = true;
 					}
 					else
 					{
@@ -8493,14 +8495,21 @@
 							if(val.onlyImages !== true)
 								t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
 							api.wb.clipboard._insertImagesFromBinaryWord(t, val, oImageMap);
+							//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
+							History.EndTransaction();
 						}, true);
 					}
 					
 				}
 				else if(val.onlyImages !== true)
-						t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
+				{
+					t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
+					isEndTransaction = true;
+				}
 				
-				History.EndTransaction();
+				//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
+				if(isEndTransaction)
+					History.EndTransaction();
 			});
 		};
 		
@@ -8531,8 +8540,8 @@
 			{
 				if(!isCheckSelection)
 				{
-				values[arn.r1][arn.c1][0].colSpan = isMergedFirstCell.c2 -isMergedFirstCell.c1 + 1;
-				values[arn.r1][arn.c1][0].rowSpan = isMergedFirstCell.r2 -isMergedFirstCell.r1 + 1;
+					values[arn.r1][arn.c1][0].colSpan = isMergedFirstCell.c2 -isMergedFirstCell.c1 + 1;
+					values[arn.r1][arn.c1][0].rowSpan = isMergedFirstCell.r2 -isMergedFirstCell.r1 + 1;
 				}
 				isOneMerge = true;
 			}
