@@ -393,18 +393,13 @@
 
 		this.setCanvas(settings.canvas);
 
-		var ppiTest =
-				$('<div style="position: absolute; width: 10in; height:10in; visibility:hidden; padding:0;"/>')
-				.appendTo("body");
-		this.ppiX = asc_round(ppiTest[0] ? (ppiTest[0].offsetWidth * 0.1) : 96);
-		this.ppiY = asc_round(ppiTest[0] ? (ppiTest[0].offsetHeight * 0.1) : 96);
+		this.ppiX = 96;
+		this.ppiY = 96;
 
 		if (AscBrowser.isRetina) {
 			this.ppiX <<= 1;
 			this.ppiY <<= 1;
 		}
-
-		ppiTest.remove();
 
 		this._mct  = new Matrix();  // units transform
 		this._mt   = new Matrix();  // user transform
