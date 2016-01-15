@@ -2224,3 +2224,9 @@ CUserCacheColor.prototype.init = function(nColor) {
 
 var g_oIdCounter = new CIdCounter();
 var g_oTableId = null;
+
+window["SetDoctRendererParams"] = function(_params)
+{
+	if (_params["retina"] === true)
+		AscBrowser.isRetina = true;
+};
