@@ -49,7 +49,7 @@ var c_oAscAsyncAction = {
 	UploadImage			: 8,  // загрузка картинки
 
 	ApplyChanges		: 9,  // применение изменений от другого пользователя.
-	Recalc				: 10, // пересчет формул
+
 	SlowOperation		: 11, // медленная операция
 	LoadTheme			: 12, // загрузка темы
 	MailMergeLoadFile	: 13, // загрузка файла для mail merge

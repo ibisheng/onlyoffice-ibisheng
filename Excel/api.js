@@ -1359,14 +1359,6 @@ var editor;
     this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 
     //this.asc_Resize(); // Убрал, т.к. сверху приходит resize (http://bugzserver/show_bug.cgi?id=14680)
-    if (this.wbModel.startActionOn == false) {
-      this.wbModel.startActionOn = true;
-    } else {
-      var t = this;
-      setTimeout(function() {
-        t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Recalc)
-      }, 500);
-    }
   };
 
   // Переход на диапазон в листе

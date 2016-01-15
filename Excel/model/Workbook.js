@@ -1924,7 +1924,6 @@ function Workbook(eventsHandlers, oApi){
 	this.aWorksheetsById = {};
 	this.cwf = {};
 	this.isNeedCacheClean = true;
-	this.startActionOn = false;
 	this.aCollaborativeActions = [];
 	this.bCollaborativeChanges = false;
 	this.bUndoChanges = false;
