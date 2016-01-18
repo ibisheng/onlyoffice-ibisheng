@@ -1724,19 +1724,40 @@ CTextDrawer.prototype =
     {
         if(bMath)
         {
-           // this.p_width(penW * 1000);
             var oTextPr = this.GetTextPr();
-            var bResetTextPr = false, dW = null;
-            if(oTextPr && oTextPr.TextOutline && isRealNumber(oTextPr.TextOutline.w))
+            var oCopyTextPr;
+            if(oTextPr)
             {
-                bResetTextPr = true;
-                dW = oTextPr.TextOutline.w;
-                oTextPr.TextOutline.w = 36000.0 * penW >> 0;
+                oCopyTextPr = oTextPr.Copy();
+                oCopyTextPr.TextOutline = new CLn();
+                oCopyTextPr.TextOutline.w = 36000.0 * penW >> 0;
+                var oUnifill = oCopyTextPr.TextFill ? oCopyTextPr.TextFill : oCopyTextPr.Unifill;
+                if((!oUnifill || !oUnifill.fill ||!oUnifill.fill.type === FILL_TYPE_SOLID || !oUnifill.fill.color) && oCopyTextPr.Color)
+                {
+                    oUnifill = CreateUniFillByUniColor(CreateUniColorRGB(oCopyTextPr.Color.r, oCopyTextPr.Color.g, oCopyTextPr.Color.b))
+                }
+                if(oUnifill)
+                {
+                    if(!oUnifill.fill.color.Mods)
+                    {
+                        oUnifill.fill.color.Mods = new CColorModifiers();
+                    }
+                    var mod = new CColorMod();
+                    mod.name = "lumMod";
+                    mod.val = 70000;
+                    oUnifill.fill.color.Mods.addMod(mod);
+                    oCopyTextPr.TextOutline.Fill = oUnifill;
+                }
+                this.SetTextPr(oCopyTextPr, this.m_oTheme);
             }
             this._s();
             this._m(x, y);
             this._l(r, y);
             this.ds();
+            if(oCopyTextPr)
+            {
+                this.SetTextPr(oTextPr, this.m_oTheme);
+            }
             return;
         }
 
@@ -1816,8 +1837,66 @@ CTextDrawer.prototype =
         }
     },
 
-    drawVerLine : function(align, x, y, b, penW)
+    drawVerLine : function(align, x, y, b, penW, bMath)
     {
+        if(bMath)
+        {
+            var oTextPr = this.GetTextPr();
+            var oCopyTextPr;
+            if(oTextPr)
+            {
+                oCopyTextPr = oTextPr.Copy();
+                oCopyTextPr.TextOutline = new CLn();
+                oCopyTextPr.TextOutline.w = 36000.0 * penW >> 0;
+                var oUnifill = oCopyTextPr.TextFill ? oCopyTextPr.TextFill : oCopyTextPr.Unifill;
+                if((!oUnifill || !oUnifill.fill ||!oUnifill.fill.type === FILL_TYPE_SOLID || !oUnifill.fill.color) && oCopyTextPr.Color)
+                {
+                    oUnifill = CreateUniFillByUniColor(CreateUniColorRGB(oCopyTextPr.Color.r, oCopyTextPr.Color.g, oCopyTextPr.Color.b))
+                }
+                if(oUnifill)
+                {
+                    if(!oUnifill.fill.color.Mods)
+                    {
+                        oUnifill.fill.color.Mods = new CColorModifiers();
+                    }
+                    var mod = new CColorMod();
+                    mod.name = "lumMod";
+                    mod.val = 70000;
+                    oUnifill.fill.color.Mods.addMod(mod);
+                    oCopyTextPr.TextOutline.Fill = oUnifill;
+                }
+                this.SetTextPr(oCopyTextPr, this.m_oTheme);
+            }
+            this._s();
+
+            var _x = x;
+            switch (align)
+            {
+                case 0:
+                {
+                    _x = x + penW / 2;
+                    break;
+                }
+                case 1:
+                {
+                    break;
+                }
+                case 2:
+                {
+                    _x = x - penW / 2;
+                }
+            }
+            this._m(_x, y);
+            this._l(_x, b);
+
+            this.ds();
+            if(oCopyTextPr)
+            {
+                this.SetTextPr(oTextPr, this.m_oTheme);
+            }
+            return;
+        }
+
         var nLastCommand = this.m_aCommands[this.m_aCommands.length -1], bOldVal;
         if(nLastCommand === DRAW_COMMAND_TABLE)
         {
