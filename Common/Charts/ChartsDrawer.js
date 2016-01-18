@@ -1323,6 +1323,14 @@ CChartsDrawer.prototype =
 				arrayValues[i] = arrayValues[i] / 100;
 				
 		}
+		
+		if(this.calcProp.subType == 'stackedPer')
+		{
+			//TODO пересмотреть все ситуации, когда заданы фиксированные максимальные и минимальные значение выше 100%
+			if(step > axisMax)
+				arrayValues = [axisMin, axisMax];
+		}
+		
 		if(!arrayValues.length)
 			arrayValues = [0.2, 0.4, 0.6, 0.8, 1, 1.2];
 			
