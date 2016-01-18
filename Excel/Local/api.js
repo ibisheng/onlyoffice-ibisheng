@@ -206,16 +206,19 @@ window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs)
 	
 	window["AscDesktopEditor"]["LocalFileSave"](_param);
 };
-window["DesktopOfflineAppDocumentEndSave"] = function(isCancel)
+window["DesktopOfflineAppDocumentEndSave"] = function(error)
 {
 	window["Asc"]["editor"].sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
-	if (isCancel !== true)
+	if (0 == error)
 		DesktopOfflineUpdateLocalName(window["Asc"]["editor"]);
 	else
 		History.UserSavedIndex = window["Asc"]["editor"].LastUserSavedIndex;		
 	
 	window["Asc"]["editor"].onUpdateDocumentModified(History.Is_Modified());
 	window["Asc"]["editor"].LastUserSavedIndex = undefined;
+	
+	if (2 == error)
+		window["Asc"]["editor"].sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.NoCritical);
 };
 
 window["Asc"]['spreadsheet_api'].prototype["asc_addImageDrawingObject"] = window["Asc"]['spreadsheet_api'].prototype.asc_addImageDrawingObject;

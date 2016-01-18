@@ -148,16 +148,19 @@ window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs)
 	
 	window["AscDesktopEditor"]["LocalFileSave"](_param);
 };
-window["DesktopOfflineAppDocumentEndSave"] = function(isCancel)
+window["DesktopOfflineAppDocumentEndSave"] = function(error)
 {
 	editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
-	if (isCancel !== true)
+	if (0 == error)
 		DesktopOfflineUpdateLocalName(editor);
 	else
 		History.UserSavedIndex = editor.LastUserSavedIndex;
 	
 	editor.UpdateInterfaceState();
 	editor.LastUserSavedIndex = undefined;
+	
+	if (2 == error)
+		editor.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
 };
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) 
 {
