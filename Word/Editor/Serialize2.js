@@ -256,7 +256,8 @@ var c_oSerProp_secPrType = {
 	footers: 4,
 	hdrftrelem: 5,
 	pageNumType: 6,
-	sectPrChange: 7
+	sectPrChange: 7,
+	cols: 8
 };
 var c_oSerProp_secPrSettingsType = {
     titlePg: 0,
@@ -265,6 +266,15 @@ var c_oSerProp_secPrSettingsType = {
 };
 var c_oSerProp_secPrPageNumType = {
 	start: 0
+};
+var c_oSerProp_Columns = {
+	EqualWidth: 0,
+	Num: 1,
+	Sep: 2,
+	Space: 3,
+	Column: 4,
+	ColumnSpace: 5,
+	ColumnW: 6
 };
 var c_oSerParType = {
     Par:0,
@@ -1616,6 +1626,8 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter, sav
 		var PageNumType = sectPr.Get_PageNum_Start();
 		if(-1 != PageNumType)
 			this.bs.WriteItem(c_oSerProp_secPrType.pageNumType, function(){oThis.WritePageNumType(PageNumType);});
+		// if(null != sectPr.Columns)
+			// this.bs.WriteItem(c_oSerProp_secPrType.cols, function(){oThis.WriteColumns(sectPr.Columns);});
     };
     this.WritePageSize = function(sectPr, oDocument)
     {
@@ -1743,6 +1755,35 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter, sav
 		var oThis = this;
 		this.bs.WriteItem(c_oSerProp_secPrPageNumType.start, function(){oThis.memory.WriteLong(PageNumType);});
 	}
+    this.WriteColumns = function(cols)
+    {
+        var oThis = this;
+        if (null != cols.EqualWidth) {
+            this.bs.WriteItem(c_oSerProp_Columns.EqualWidth, function(){oThis.memory.WriteBool(cols.EqualWidth);});
+        }
+        if (null != cols.Num) {
+            this.bs.WriteItem(c_oSerProp_Columns.Num, function(){oThis.memory.WriteLong(cols.Num);});
+        }
+        if (null != cols.Sep) {
+            this.bs.WriteItem(c_oSerProp_Columns.Sep, function(){oThis.memory.WriteBool(cols.Sep);});
+        }
+        if (null != cols.Space) {
+            this.bs.WriteItem(c_oSerProp_Columns.Space, function(){oThis.memory.WriteLong(g_dKoef_mm_to_twips * cols.Space);});
+        }
+        for (var i = 0; i < cols.Cols.length; ++i) {
+            this.bs.WriteItem(c_oSerProp_Columns.Column, function(){oThis.WriteColumn(cols.Cols[i]);});
+        }
+	}
+    this.WriteColumn = function(col)
+    {
+        var oThis = this;
+        if (null != col.Space) {
+            this.bs.WriteItem(c_oSerProp_Columns.ColumnSpace, function(){oThis.memory.WriteLong(g_dKoef_mm_to_twips * col.Space);});
+        }
+        if (null != col.W) {
+            this.bs.WriteItem(c_oSerProp_Columns.ColumnW, function(){oThis.memory.WriteLong(g_dKoef_mm_to_twips * col.W);});
+        }
+    }
 };
 function Binary_rPrWriter(memory, saveParams)
 {
@@ -6432,6 +6473,12 @@ function Binary_pPrReader(doc, oReadResult, stream)
         }
         else if( c_oSerProp_secPrType.sectPrChange === type )
             res = c_oSerConstants.ReadUnknown;//todo
+        else if( c_oSerProp_secPrType.cols === type ) {
+            //todo clear;
+            res = this.bcr.Read1(length, function(t, l){
+                return oThis.Read_cols(t, l, oSectPr);
+            });
+        }
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
@@ -6559,6 +6606,40 @@ function Binary_pPrReader(doc, oReadResult, stream)
             oSectPr.Set_PageNum_Start(this.stream.GetULongLE());
         }
         else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
+    }
+    this.Read_cols = function(type, length, oSectPr)
+    {
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+        if (c_oSerProp_Columns.EqualWidth === type) {
+            oSectPr.Set_Columns_EqualWidth(this.stream.GetBool());
+        } else if (c_oSerProp_Columns.Num === type) {
+            oSectPr.Set_Columns_Num(this.stream.GetULongLE());
+        } else if (c_oSerProp_Columns.Sep === type) {
+            oSectPr.Set_Columns_Sep(this.stream.GetBool());
+        } else if (c_oSerProp_Columns.Space === type) {
+            oSectPr.Set_Columns_Space(g_dKoef_twips_to_mm * this.stream.GetULongLE());
+        } else if (c_oSerProp_Columns.Column === type) {
+            var col = new CSectionColumn();
+            res = this.bcr.Read1(length, function(t, l){
+                return oThis.Read_col(t, l, col);
+            });
+            oSectPr.Set_Columns_Col(oSectPr.Columns.Cols.length, col.W, col.Space);
+        } else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
+    }
+    this.Read_col = function(type, length, col)
+    {
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+        if (c_oSerProp_Columns.ColumnSpace === type) {
+            col.Space = g_dKoef_twips_to_mm * this.stream.GetULongLE();
+        } else if (c_oSerProp_Columns.ColumnW === type) {
+            col.W = g_dKoef_twips_to_mm * this.stream.GetULongLE();
+        } else
             res = c_oSerConstants.ReadUnknown;
         return res;
     }
