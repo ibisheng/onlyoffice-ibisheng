@@ -254,7 +254,7 @@ function checkFiniteNumber(num)
     {
         return num;
     }
-    return num;
+    return 0;
 }
 
 var G_O_VISITED_HLINK_COLOR = CreateUniFillSolidFillWidthTintOrShade(CreateUnifillSolidFillSchemeColorByIndex(10), 0);
