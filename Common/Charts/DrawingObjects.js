@@ -2228,7 +2228,7 @@ function DrawingObjects() {
                             metrics.to.rowOff = 0;
                         }
 
-                        obj.from.col = metrics.from.col;
+                        /*obj.from.col = metrics.from.col;
                         obj.from.colOff = metrics.from.colOff;
                         obj.from.row = metrics.from.row;
                         obj.from.rowOff = metrics.from.rowOff;
@@ -2237,9 +2237,9 @@ function DrawingObjects() {
                         obj.to.colOff = metrics.to.colOff;
                         obj.to.row = metrics.to.row;
                         obj.to.rowOff = metrics.to.rowOff;
+                        */
 
-
-                        var coords = _this.coordsManager.calculateCoords(obj.from);
+                        var coords = _this.coordsManager.calculateCoords(metrics.from);
 
 
                         var rot = isRealNumber(obj.graphicObject.spPr.xfrm.rot) ? obj.graphicObject.spPr.xfrm.rot : 0;
