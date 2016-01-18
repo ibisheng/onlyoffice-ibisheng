@@ -8829,6 +8829,12 @@
       var range;
       for (var aF = 0; aF < aFilters.length; aF++) {
         range = t.model.getRange3(aFilters[aF].range.r1 + selectionRange.r1, aFilters[aF].range.c1 + selectionRange.c1, aFilters[aF].range.r2 + selectionRange.r1, aFilters[aF].range.c2 + selectionRange.c1);
+
+        //если область вставки содержит форматированную таблицу, которая пересекается с вставляемой форматированной таблицей
+        var intersectionRangeWithTableParts = t.autoFilters._intersectionRangeWithTableParts(range.bbox, this.model);
+        if(intersectionRangeWithTableParts)
+           continue;
+
         if (aFilters[aF].style) {
           range.cleanFormat();
         }
@@ -8850,6 +8856,12 @@
         diffRow = tablePartRange.r1 - refInsertBinary.r1;
         diffCol = tablePartRange.c1 - refInsertBinary.c1;
         range = t.model.getRange3(diffRow + selectionRange.r1, diffCol + selectionRange.c1, diffRow + selectionRange.r1 + (tablePartRange.r2 - tablePartRange.r1), diffCol + selectionRange.c1 + (tablePartRange.c2 - tablePartRange.c1));
+
+        //если область вставки содержит форматированную таблицу, которая пересекается с вставляемой форматированной таблицей
+        var intersectionRangeWithTableParts = t.autoFilters._intersectionRangeWithTableParts(range.bbox, this.model);
+        if(intersectionRangeWithTableParts)
+           continue;
+
         if (aFilters[aF].style) {
           range.cleanFormat();
         }
