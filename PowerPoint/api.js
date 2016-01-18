@@ -412,13 +412,19 @@ asc_docs_api.prototype.Clear_CollaborativeMarks = function()
 };
 
 asc_docs_api.prototype._onUpdateDocumentCanSave = function () {
-	// Можно модифицировать это условие на более быстрое (менять самим состояние в аргументах, а не запрашивать каждый раз)
-	var tmp = this.isDocumentModified() || (0 >= CollaborativeEditing.m_nUseType &&
-		0 !== CollaborativeEditing.getOwnLocksLength());
-	if (tmp !== this.isDocumentCanSave) {
-		this.isDocumentCanSave = tmp;
-		this.asc_fireCallback('asc_onDocumentCanSaveChanged', this.isDocumentCanSave);
-	}
+    var CollEditing = CollaborativeEditing;
+
+    // Можно модифицировать это условие на более быстрое (менять самим состояние в аргументах, а не запрашивать каждый раз)
+    var isCanSave = this.isDocumentModified() || (true !== CollEditing.Is_SingleUser() && 0 !== CollEditing.getOwnLocksLength());
+
+    if (true === CollEditing.Is_Fast() && true !== CollEditing.Is_SingleUser())
+        isCanSave = false;
+
+    if (isCanSave !== this.isDocumentCanSave)
+    {
+        this.isDocumentCanSave = isCanSave;
+        this.asc_fireCallback('asc_onDocumentCanSaveChanged', this.isDocumentCanSave);
+    }
 };
 
 ///////////////////////////////////////////
@@ -1232,10 +1238,16 @@ asc_docs_api.prototype.sync_GetDocInfoEndCallback = function(){
 };
 asc_docs_api.prototype.sync_CanUndoCallback = function(bCanUndo)
 {
+    if (true === CollaborativeEditing.Is_Fast() && true !== CollaborativeEditing.Is_SingleUser())
+        bCanUndo = false;
+
     this.asc_fireCallback("asc_onCanUndo", bCanUndo);
 };
 asc_docs_api.prototype.sync_CanRedoCallback = function(bCanRedo)
 {
+    if (true === CollaborativeEditing.Is_Fast() && true !== CollaborativeEditing.Is_SingleUser())
+        bCanRedo = false;
+
     this.asc_fireCallback("asc_onCanRedo", bCanRedo);
 };
 

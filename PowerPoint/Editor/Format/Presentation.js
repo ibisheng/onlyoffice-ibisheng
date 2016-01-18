@@ -564,7 +564,7 @@ CPresentation.prototype =
     },
     Continue_FastCollaborativeEditing: function()
     {
-        if (true !== CollaborativeEditing.Is_Fast())
+        if (true !== CollaborativeEditing.Is_Fast() || true === this.CollaborativeEditing.Is_SingleUser())
             return;
 
         if(this.Slides[this.CurPage]){
