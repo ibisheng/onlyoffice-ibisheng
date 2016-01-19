@@ -509,6 +509,8 @@ var maxIndividualValues = 10000;
 				var bUndoChanges = aWs.workbook.bUndoChanges;
 				var bRedoChanges = aWs.workbook.bRedoChanges;
 				
+				var minChangeRow = null;
+				
 				//**get filter**
 				var filterObj = this._getPressedFilter(ar, autoFiltersObject.cellId)
 				var currentFilter = filterObj.filter;
@@ -577,6 +579,9 @@ var maxIndividualValues = 10000;
 							
 							var isSetHidden = newFilterColumn.isHideValue(currentValue, isDateTimeFormat);
 							
+							if(isSetHidden !== aWs.getRowHidden(i) && minChangeRow === null)
+								minChangeRow = i;
+							
 							//скрываем строки
 							if(hiddenObj.h === null)
 							{
@@ -613,6 +618,8 @@ var maxIndividualValues = 10000;
 				this._reDrawFilters();
 				if(!aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
 					ws._onUpdateFormatTable(oldFilter.Ref, false, true);
+				
+				return minChangeRow;
 			},
 			
 			checkAddAutoFilter: function(activeRange, styleName, addFormatTableOptionsObj)
