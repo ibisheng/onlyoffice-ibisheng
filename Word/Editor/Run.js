@@ -10515,6 +10515,39 @@ ParaRun.prototype.Is_UseInParagraph = function()
 
     return true;
 };
+ParaRun.prototype.Math_UpdateLineMetrics = function(PRS, ParaPr)
+{
+    var LineRule = ParaPr.Spacing.LineRule;
+
+    // Пересчитаем метрику строки относительно размера данного текста
+    if ( PRS.LineTextAscent < this.TextAscent )
+        PRS.LineTextAscent = this.TextAscent;
+
+    if ( PRS.LineTextAscent2 < this.TextAscent2 )
+        PRS.LineTextAscent2 = this.TextAscent2;
+
+    if ( PRS.LineTextDescent < this.TextDescent )
+        PRS.LineTextDescent = this.TextDescent;
+
+    if ( linerule_Exact === LineRule )
+    {
+        // Смещение не учитывается в метриках строки, когда расстояние между строк точное
+        if ( PRS.LineAscent < this.TextAscent )
+            PRS.LineAscent = this.TextAscent;
+
+        if ( PRS.LineDescent < this.TextDescent )
+            PRS.LineDescent = this.TextDescent;
+    }
+    else
+    {
+        if ( PRS.LineAscent < this.TextAscent + this.YOffset  )
+            PRS.LineAscent = this.TextAscent + this.YOffset;
+
+        if ( PRS.LineDescent < this.TextDescent - this.YOffset )
+            PRS.LineDescent = this.TextDescent - this.YOffset;
+    }
+
+};
 
 function CParaRunStartState(Run)
 {

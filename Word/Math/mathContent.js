@@ -4326,6 +4326,10 @@ CMathContent.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine,
 
     ContentMetrics.UpdateMetrics(NewContentMetrics);
 };
+CMathContent.prototype.Math_UpdateLineMetrics = function(PRS, ParaPr)
+{
+    this.Content[0].Math_UpdateLineMetrics(PRS, ParaPr); // this.Content[0] - Run
+};
 CMathContent.prototype.UpdateOperators = function(_CurLine, _CurRange, bEmptyGapLeft, bEmptyGapRight)
 {
     var CurLine  = _CurLine - this.StartLine;

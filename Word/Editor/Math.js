@@ -1792,6 +1792,7 @@ ParaMath.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cu
     if(PRS.LineDescent < RootDescent)
         PRS.LineDescent = RootDescent;
 
+    this.Root.Math_UpdateLineMetrics(PRS, ParaPr);
 };
 ParaMath.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 {
