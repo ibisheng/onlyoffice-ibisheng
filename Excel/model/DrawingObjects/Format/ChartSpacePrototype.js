@@ -182,7 +182,7 @@ CChartSpace.prototype.getCanvasContext = CShape.prototype.getCanvasContext;
 CChartSpace.prototype.getHierarchy = CShape.prototype.getHierarchy;
 CChartSpace.prototype.getParentObjects = function()
 {
-    var parents = { slide: null, layout: null, master: null, theme: window["Asc"]["editor"].wbModel.theme };
+    var parents = { slide: null, layout: null, master: null, theme: this.themeOverride ? this.themeOverride : window["Asc"]["editor"].wbModel.theme };
     if(this.clrMapOvr)
     {
         parents.slide = {clrMap: this.clrMapOvr};
