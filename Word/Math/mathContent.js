@@ -4692,19 +4692,6 @@ CMathContent.prototype.private_NeedAutoCorrect = function(ActionElement)
 
     return false;
 };
-CMathContent.prototype.private_CanAutoCorrect = function(AutoCorrectionEngine, bSkipLast)
-{
-	var CanMakeAutoCorrect = false;
-	var ActionElement = AutoCorrectionEngine.Element;
-	var ElementsCount = AutoCorrectionEngine.Elements.length;
-	
-	for (var i=ElementsCount-1; i>=0; i--)
-	{
-		
-	}
-	
-	
-};
 CMathContent.prototype.private_CanAutoCorrectText = function(AutoCorrectionEngine, bSkipLast)
 {
     var IndexAdd = (true === bSkipLast ? 1 : 0);
