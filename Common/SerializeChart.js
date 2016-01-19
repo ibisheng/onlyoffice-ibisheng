@@ -10294,11 +10294,11 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         });
         oNewVal.set3D(true);
         //3d->2d
-        if (BAR_GROUPING_STANDARD == oNewVal.grouping)
+        /*if (BAR_GROUPING_STANDARD == oNewVal.grouping)
             oNewVal.setGrouping(BAR_GROUPING_CLUSTERED);
         else if(BAR_GROUPING_CLUSTERED != oNewVal.grouping){
             oNewVal.setOverlap(100);
-        }
+        }*/
         val.addChart(oNewVal);
     }
     else if (c_oserct_plotareaBARCHART === type) {

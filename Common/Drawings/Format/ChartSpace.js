@@ -2652,6 +2652,10 @@ CChartSpace.prototype =
                         cat_ax.yPoints  = null;
                         val_ax.yPoints  = null;
                         cat_ax.xPoints  = null;
+                        val_ax.transformYPoints  = null;
+                        cat_ax.transformXPoints  = null;
+                        val_ax.transformXPoints  = null;
+                        cat_ax.transformYPoints  = null;
                     }
                 }
                 else if(chart_type === historyitem_type_BarChart && chart_object.barDir === BAR_DIR_BAR)
@@ -2674,6 +2678,10 @@ CChartSpace.prototype =
                         cat_ax.yPoints  = null;
                         val_ax.yPoints  = null;
                         cat_ax.xPoints  = null;
+                        val_ax.transformYPoints  = null;
+                        cat_ax.transformXPoints  = null;
+                        val_ax.transformXPoints  = null;
+                        cat_ax.transformYPoints  = null;
                     }
                 }
                 return;
@@ -4454,6 +4462,12 @@ CChartSpace.prototype =
                     cat_ax.yPoints  = null;
                     val_ax.yPoints  = null;
                     cat_ax.xPoints  = null;
+
+
+                    val_ax.transformYPoints  = null;
+                    cat_ax.transformXPoints  = null;
+                    val_ax.transformXPoints  = null;
+                    cat_ax.transformYPoints  = null;
                     var sizes = this.getChartSizes();
                     var rect = {x: sizes.startX, y:sizes.startY, w:sizes.w, h: sizes.h};
                     var arr_val =  this.getValAxisValues();
@@ -5355,6 +5369,82 @@ CChartSpace.prototype =
 
                     cat_ax.yPoints.sort(function(a, b){return a.val - b.val});
                     val_ax.xPoints.sort(function(a, b){return a.val - b.val});
+                }
+            }
+        }
+    },
+
+    checkAxisLabelsTransform: function()
+    {
+        if(this.chart && this.chart.plotArea && this.chart.plotArea.chart && this.chart.plotArea.chart.getAxisByTypes)
+        {
+            var oAxisByTypes = this.chart.plotArea.chart.getAxisByTypes();
+            var oCatAx = oAxisByTypes.catAx[0], oValAx = oAxisByTypes.valAx[0], deltaX, deltaY, i, oAxisLabels, oLabel, oNewPos;
+            if(oCatAx && oValAx)
+            {
+                if(( (oCatAx.axPos === AX_POS_B || oCatAx.axPos === AX_POS_T) && oCatAx.transformXPoints && oCatAx.xPoints) &&
+                    ((oValAx.axPos === AX_POS_L || oValAx.axPos === AX_POS_R) && oValAx.transformYPoints && oValAx.yPoints))
+                {
+                    oAxisLabels = oCatAx.labels;
+					
+					if(oAxisLabels)
+					{
+						 for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
+						{
+							oLabel = oAxisLabels.arrLabels[i];
+							deltaX = oLabel.transformText.tx - oCatAx.xPoints[i].pos;
+							deltaY = oLabel.transformText.ty - oAxisLabels.y;
+							oNewPos = oCatAx.transformXPoints[i];
+							oLabel.setPosition(oNewPos.x + deltaX, oNewPos.y + deltaY);
+						}
+					}
+                   
+
+                    oAxisLabels = oValAx.labels;
+					if(oAxisLabels)
+					{
+						for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
+						{
+							oLabel = oAxisLabels.arrLabels[i];
+							deltaX = oLabel.transformText.tx - oAxisLabels.x;
+							deltaY = oLabel.transformText.ty - oValAx.yPoints[i].pos;
+							oNewPos = oValAx.transformYPoints[i];
+							oLabel.setPosition(oNewPos.x + deltaX, oNewPos.y + deltaY);
+						}
+					}
+                    
+                }
+                else if(((oCatAx.axPos === AX_POS_L || oCatAx.axPos === AX_POS_R) && oCatAx.transformYPoints && oCatAx.yPoints) &&
+                    ((oValAx.axPos === AX_POS_T || oValAx.axPos === AX_POS_B) && oValAx.transformXPoints && oValAx.xPoints))
+                {
+                    oAxisLabels = oValAx.labels;
+
+                    if(oAxisLabels)
+                    {
+                        for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
+                        {
+                            oLabel = oAxisLabels.arrLabels[i];
+                            deltaX = oLabel.transformText.tx - oValAx.xPoints[i].pos;
+                            deltaY = oLabel.transformText.ty - oAxisLabels.y;
+                            oNewPos = oValAx.transformXPoints[i];
+                            oLabel.setPosition(oNewPos.x + deltaX, oNewPos.y + deltaY);
+                        }
+                    }
+
+
+                    oAxisLabels = oCatAx.labels;
+
+                    if(oAxisLabels)
+                    {
+                        for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
+                        {
+                            oLabel = oAxisLabels.arrLabels[i];
+                            deltaX = oLabel.transformText.tx - oAxisLabels.x;
+                            deltaY = oLabel.transformText.ty - oCatAx.yPoints[i].pos;
+                            oNewPos = oCatAx.transformYPoints[i];
+                            oLabel.setPosition(oNewPos.x + deltaX, oNewPos.y + deltaY);
+                        }
+                    }
                 }
             }
         }

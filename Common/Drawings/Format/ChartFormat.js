@@ -1864,6 +1864,8 @@ CPlotArea.prototype =
             this.catAx = axis;
         if(axis instanceof CValAx)
             this.valAx = axis;
+        if(axis instanceof CSerAx)
+            this.serAx = axis;
     },
 
     addChart: function(pr, idx)
