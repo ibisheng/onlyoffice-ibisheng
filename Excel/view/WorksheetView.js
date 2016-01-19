@@ -11404,7 +11404,10 @@
         return;
       }
 
-      t.autoFilters.applyAutoFilter(autoFilterObject, ar);
+      var rowChange = t.autoFilters.applyAutoFilter(autoFilterObject, ar);
+      if (null !== rowChange) {
+        t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: rowChange});
+      }
     };
     this._isLockedAll(onChangeAutoFilterCallback);
   };
