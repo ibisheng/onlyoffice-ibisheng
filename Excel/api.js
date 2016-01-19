@@ -325,6 +325,9 @@ var editor;
     }
     return res;
   };
+  spreadsheet_api.prototype.asc_getLocaleCurrency = function(val) {
+    // ToDo add code here
+  };
   spreadsheet_api.prototype.asc_setLocale = function(val) {
     g_oDefaultCultureInfo = g_aCultureInfos[val];
     if (this.wbModel) {
@@ -3074,6 +3077,7 @@ var editor;
   prot["asc_SetFontsPath"] = prot.asc_SetFontsPath;
   prot["asc_setDocInfo"] = prot.asc_setDocInfo;
   prot["asc_getLocaleExample"] = prot.asc_getLocaleExample;
+  prot["asc_getLocaleCurrency"] = prot.asc_getLocaleCurrency;
   prot["asc_setLocale"] = prot.asc_setLocale;
   prot["asc_getEditorPermissions"] = prot.asc_getEditorPermissions;
   prot["asc_LoadDocument"] = prot.asc_LoadDocument;
