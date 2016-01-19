@@ -9925,7 +9925,7 @@ serAxisChart.prototype =
 		}
 	},
 	
-	_getTickmarksProps()
+	_getTickmarksProps: function()
 	{
 		var widthLine = 0;
 		var crossMajorStep = 0;
