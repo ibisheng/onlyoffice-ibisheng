@@ -23,6 +23,7 @@
                 "../../Common/Charts/DrawingArea.js",
                 "../../Common/Charts/DrawingObjects.js",
                 "../../Common/Charts/ChartsDrawer.js",
+				"../../Common/Charts/3DTransformation.js",
                 "../../Common/FontsFreeType/font_engine.js",
                 "../../Common/FontsFreeType/FontFile.js",
                 "../../Common/FontsFreeType/FontManager.js",
