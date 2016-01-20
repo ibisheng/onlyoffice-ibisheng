@@ -2208,29 +2208,22 @@ CellFormat.prototype =
 		}
 		return oRes;
 	},
-    format : function(number, nValType, dDigitsCount, oAdditionalResult, bChart)
+    format : function(number, nValType, dDigitsCount, oAdditionalResult, bChart, cultureInfo)
     {
         var res = null;
         if (null == bChart)
             bChart = false;
-        var cacheVal = this.formatCache[number];
-        var cacheType = null;
-        var cacheRes = null;
+        var lcid = cultureInfo ? cultureInfo.LCID : 0;
+        var cacheKey = number + '-' + nValType + '-' + dDigitsCount + '-' + lcid;
+        var cacheVal = this.formatCache[cacheKey];
         if(null != cacheVal)
         {
-            cacheType = cacheVal[nValType];
-            if (null != cacheType)
-            {
-                cacheRes = cacheType[dDigitsCount];
-                if (null != cacheRes) {
-                    if (bChart)
-                        res = cacheRes.chart;
-                    else
-                        res = cacheRes.nochart;
-                    if (null != res)
-                        return res;
-                }
-            }
+            if (bChart)
+                res = cacheVal.chart;
+            else
+                res = cacheVal.nochart;
+            if (null != res)
+                return res;
         }
         res = [{text: number.toString()}];
         var dNumber = number - 0;
@@ -2239,7 +2232,7 @@ CellFormat.prototype =
 		{
 			oFormat = this.getFormatByValue(dNumber);
 			if(null != oFormat)
-			    res = oFormat.format(number, nValType, dDigitsCount, oAdditionalResult, null, bChart);
+			    res = oFormat.format(number, nValType, dDigitsCount, oAdditionalResult, cultureInfo, bChart);
 			else if(null != this.aComporationFormats)
 			{
 			    var oNewFont = new NumFormatFont();
@@ -2252,32 +2245,23 @@ CellFormat.prototype =
 			//text
 		    if (null != this.oTextFormat) {
 		        oFormat = this.oTextFormat;
-		        res = oFormat.format(number, nValType, dDigitsCount, oAdditionalResult, null, bChart);
+		        res = oFormat.format(number, nValType, dDigitsCount, oAdditionalResult, cultureInfo, bChart);
 		    }
 		}
         if(null == cacheVal)
         {
-            cacheVal = {};
-            this.formatCache[number] = cacheVal;
-        }
-        if(null == cacheType)
-        {
-            cacheType = {};
-            cacheVal[nValType] = cacheType;
-        }
-        if (null == cacheRes) {
-            cacheRes = { chart: null, nochart: null };
-        cacheType[dDigitsCount] = cacheRes;
+            cacheVal = { chart: null, nochart: null };
+            this.formatCache[cacheKey] = cacheVal;
         }
         if (null != oFormat && oFormat.bGeneralChart) {
             if (bChart)
-                cacheRes.chart = res;
+                cacheVal.chart = res;
             else
-                cacheRes.nochart = res;
+                cacheVal.nochart = res;
         }
         else {
-            cacheRes.chart = res;
-            cacheRes.nochart = res;
+            cacheVal.chart = res;
+            cacheVal.nochart = res;
         }
         return res;
     },
@@ -2346,14 +2330,14 @@ CellFormat.prototype =
 	{
 		return this._formatToText(number, nValType, dDigitsCount, false);
 	},
-	formatToChart : function(number)
+	formatToChart : function(number, cultureInfo)
 	{
-		return this._formatToText(number, CellValueType.Number, gc_nMaxDigCount, true);
+		return this._formatToText(number, CellValueType.Number, gc_nMaxDigCount, true, cultureInfo);
 	},
-	_formatToText : function(number, nValType, dDigitsCount, bChart)
+	_formatToText : function(number, nValType, dDigitsCount, bChart, cultureInfo)
 	{
 		var result = "";
-		var arrFormat = this.format(number, nValType, dDigitsCount, null, bChart);
+		var arrFormat = this.format(number, nValType, dDigitsCount, null, bChart, cultureInfo);
 		for (var i = 0, item; i < arrFormat.length; ++i) {
 			item = arrFormat[i];
 			if (item.format) {

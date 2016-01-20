@@ -287,16 +287,7 @@ var editor;
     var res = '';
     var cultureInfo = g_aCultureInfos[val];
     if (cultureInfo) {
-      var prefixIndex = [0, 1, 2, 3, 9, 11, 12, 14];
-      var formatCurrency;
-      var formatCurrencyNumber = '#,##0.00';
-      var formatCurrencySymbol = '\"' + cultureInfo.CurrencySymbol + '\"';
-      if (-1 != prefixIndex.indexOf(cultureInfo.CurrencyNegativePattern)) {
-        formatCurrency = formatCurrencySymbol + formatCurrencyNumber;
-      } else {
-        formatCurrency = formatCurrencyNumber + formatCurrencySymbol;
-      }
-      var numFormatCurrency = oNumFormatCache.get(formatCurrency);
+      var numFormatDigit = oNumFormatCache.get('#,##0.00');
 
       var dateElems = [];
       for (var i = 0; i < cultureInfo.ShortDatePattern.length; ++i) {
@@ -319,9 +310,9 @@ var editor;
       }
       var numFormatDate = oNumFormatCache.get(formatDate);
 
-      res += numFormatCurrency.formatToChart(number);
+      res += numFormatDigit.formatToChart(number, cultureInfo);
       res += '; ';
-      res += numFormatDate.formatToChart(date.getExcelDateWithTime());
+      res += numFormatDate.formatToChart(date.getExcelDateWithTime(), cultureInfo);
     }
     return res;
   };
