@@ -10090,6 +10090,7 @@
             this._isLockedCells(oChangeData.removed, c_oAscLockTypeElemSubType.DeleteRows, onChangeWorksheetCallback);
             break;
         }
+        this.handlers.trigger("selectionNameChanged", t.getSelectionName(/*bRangeText*/false));
         break;
       case "sheetViewSettings":
         functionModelAction = function() {
