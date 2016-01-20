@@ -1842,7 +1842,18 @@ CShape.prototype =
             }
             if (this.spPr && isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect)) {
                 var rect = this.spPr.geometry.rect;
-                oClipRect = {x: rect.l - 1.6, y: rect.t - 1.6, w: rect.r  - rect.l + 3.2, h: rect.b - rect.t + 3.2};
+                var Diff = 1.6;
+                var clipW = rect.r - rect.l + Diff - l_ins - r_ins;
+                if(clipW <= 0)
+                {
+                    clipW = 0.01;
+                }
+                var clipH = rect.b - rect.t + Diff - b_ins - t_ins;
+                if(clipH < 0)
+                {
+                    clipH = 0.01;
+                }
+                oClipRect = {x: rect.l + l_ins - Diff, y: rect.t - Diff + t_ins, w: clipW, h: clipH};
             }
             else {
                 oClipRect = {x: -1.6, y: t_ins, w: this.extX + 3.2, h: this.extY - b_ins};
