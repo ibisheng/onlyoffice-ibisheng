@@ -2484,7 +2484,7 @@ CShape.prototype =
             if (this.bWordShape) {
                 if (this.recalcInfo.recalculateTxBoxContent) {
                     this.recalcInfo.oContentMetrics = this.recalculateTxBoxContent();
-                    this.recalcInfo.recalculateTxBoxContent = false;
+                    //this.recalcInfo.recalculateTxBoxContent = false;
                     this.recalcInfo.AllDrawings = [];
                     var oContent = this.getDocContent();
                     if(oContent)
