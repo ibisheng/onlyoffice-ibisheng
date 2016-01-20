@@ -518,8 +518,13 @@ cINDEX.prototype.Calculate = function ( arg ) {
                 var _a1 = _a_[0][arg2 - 1], _a2 = _a_[_a_.length - 1][arg2 - 1];
                 res = new cArea( _a1.toString() + ":" + _a2.toString(), _a1.ws );
             }
-            else
-                res = _a_[arg1 - 1][arg2 - 1];
+            else{
+                if( arg1 > _a_.length || arg2 > _a_[0].length ){
+                    res = new cError( cErrorType.bad_reference );
+                }
+                else
+                    res = _a_[arg1 - 1][arg2 - 1];
+            }
         }
     }
     else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {

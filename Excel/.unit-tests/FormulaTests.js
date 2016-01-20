@@ -3294,11 +3294,11 @@
 
         oParser = new parserFormula( "INDEX(A651:C655,,2)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 6 );
+        strictEqual( oParser.calculate().getValue().getValue(), 6 );
 
         oParser = new parserFormula( "INDEX(A651:C655,3,2)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 8 );
+        strictEqual( oParser.calculate().getValue().getValue(), 8 );
 
         oParser = new parserFormula( "INDEX(A651:C655,10,2)", "A2", ws );
         ok( oParser.parse() );

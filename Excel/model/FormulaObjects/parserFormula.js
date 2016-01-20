@@ -682,7 +682,7 @@ cArea.prototype.getMatrix = function () {
 };
 cArea.prototype.getRefMatrix = function () {
     var t = this, arr = [], r = this.getRange();
-    r._foreach2( function ( cell, i, j, r1, c1 ) {
+    r._foreach( function ( cell, i, j, r1, c1 ) {
         if ( !arr[i - r1] )
             arr[i - r1] = [];
         arr[i - r1][j - c1] = new cRef( cell.getName(), t.ws );
