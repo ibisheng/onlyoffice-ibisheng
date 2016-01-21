@@ -2661,7 +2661,18 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
     {
         this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
         this.memory.WriteByte(c_oSerPropLenType.Byte);
-        this.memory.WriteByte(MJc);
+		
+		var val = c_oAscXAlign.Center;
+		switch (MJc)
+		{
+			case MCJC_CENTER: 	val = c_oAscXAlign.Center; 	break;
+			case MCJC_INSIDE: 	val = c_oAscXAlign.Inside; 	break;
+			case MCJC_LEFT: 	val = c_oAscXAlign.Left; 	break;
+			case MCJC_OUTSIDE: 	val = c_oAscXAlign.Outside; break;
+			case MCJC_RIGHT: 	val = c_oAscXAlign.Right; 	break;
+		}
+		this.memory.WriteByte(val);
+		
     }
 	this.WriteMcs = function(props)
 	{
