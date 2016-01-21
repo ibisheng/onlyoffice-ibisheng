@@ -317,7 +317,106 @@ var editor;
     return res;
   };
   spreadsheet_api.prototype.asc_getLocaleCurrency = function(val) {
-    // ToDo add code here
+    var res = '';
+    var cultureInfo = g_aCultureInfos[val];
+    if (!cultureInfo) {
+      cultureInfo = g_aCultureInfos[1033];
+    }
+    var prefixs = ['_ ', '_-', '_(', '_)'];
+    var prefix = prefixs[0];
+    var postfix = prefixs[0];
+    var numberFormat = '#,##0.00';
+    var nullSignFormat = '* "-"??';
+    var positiveNumberFormat = '* ' + numberFormat;
+    var signCurrencyFormat = '[$' + cultureInfo.CurrencySymbol + '-' + cultureInfo.LCID.toString(16).toUpperCase() + ']';
+    var positiveFormat;
+    var negativeFormat;
+    var nullFormat;
+    switch (cultureInfo.CurrencyNegativePattern) {
+      case 0:
+        prefix = prefixs[2];
+        postfix = prefixs[3];
+        negativeFormat = prefix + signCurrencyFormat + '* \\(' + numberFormat + '\\)';
+        break;
+      case 1:
+        prefix = postfix = prefixs[1];
+        negativeFormat = '\\-' + signCurrencyFormat + '* ' + numberFormat + postfix;
+        break;
+      case 2:
+        negativeFormat = prefix + signCurrencyFormat + '\\ * \\-' + numberFormat + postfix;
+        break;
+      case 3:
+        prefix = postfix = prefixs[1];
+        negativeFormat = prefix + signCurrencyFormat + '\\ * ' + numberFormat + '\\-';
+        break;
+      case 4:
+        prefix = prefixs[2];
+        postfix = prefixs[3];
+        negativeFormat = prefix + '* \\(' + numberFormat + '\\)' + signCurrencyFormat + postfix;
+        break;
+      case 5:
+        prefix = postfix = prefixs[1];
+        negativeFormat = '\\-* ' + numberFormat + signCurrencyFormat + postfix;
+        break;
+      case 6:
+        negativeFormat = prefix + '* ' + numberFormat + '\\-' + signCurrencyFormat + postfix;
+        break;
+      case 7:
+        negativeFormat = prefix + '* ' + numberFormat + signCurrencyFormat + '\\-';
+        break;
+      case 8:
+        prefix = postfix = prefixs[1];
+        negativeFormat = '\\-* ' + numberFormat + '\\ ' + signCurrencyFormat + postfix;
+        break;
+      case 9:
+        prefix = postfix = prefixs[1];
+        negativeFormat = '\\-' + signCurrencyFormat + '\\ * ' + numberFormat + postfix;
+        break;
+      case 10:
+        negativeFormat = prefix + '* ' + numberFormat + '\\ ' + signCurrencyFormat + '\\-';
+        break;
+      case 11:
+        negativeFormat = prefix + signCurrencyFormat + '\\ * ' + numberFormat + '\\-';
+        break;
+      case 12:
+        negativeFormat = prefix + signCurrencyFormat + '\\ * \\-' + numberFormat + postfix;
+        break;
+      case 13:
+        negativeFormat = prefix + '* ' + numberFormat + '\\-\\ ' + signCurrencyFormat + postfix;
+        break;
+      case 14:
+        prefix = prefixs[2];
+        postfix = prefixs[3];
+        negativeFormat = prefix + signCurrencyFormat + '\\ * \\(' + numberFormat + '\\)';
+        break;
+      case 15:
+        prefix = prefixs[2];
+        postfix = prefixs[3];
+        negativeFormat = prefix + '* \\(' + numberFormat + '\\)\\ ' + signCurrencyFormat + postfix;
+        break;
+    }
+    switch (cultureInfo.CurrencyPositivePattern) {
+      case 0:
+        positiveFormat = signCurrencyFormat + positiveNumberFormat;
+        nullFormat = signCurrencyFormat + nullSignFormat;
+        break;
+      case 1:
+        positiveFormat = positiveNumberFormat + signCurrencyFormat;
+        nullFormat = nullSignFormat + signCurrencyFormat;
+        break;
+      case 2:
+        positiveFormat = signCurrencyFormat + '\\ ' + positiveNumberFormat;
+        nullFormat = signCurrencyFormat + '\\ ' + nullSignFormat;
+        break;
+      case 3:
+        positiveFormat = positiveNumberFormat + '\\ ' + signCurrencyFormat;
+        nullFormat = nullSignFormat + '\\ ' + signCurrencyFormat;
+        break;
+    }
+    positiveFormat = prefix + positiveFormat + postfix;
+    nullFormat = prefix + nullFormat + postfix;
+    var textFormat = prefix + '@' + postfix;
+    return positiveFormat + ';' + negativeFormat + ';' + nullFormat + ';' + textFormat;
   };
   spreadsheet_api.prototype.asc_setLocale = function(val) {
     g_oDefaultCultureInfo = g_aCultureInfos[val];
