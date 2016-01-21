@@ -649,6 +649,17 @@ WorksheetView.prototype._changeSelectionTopLeft = function (x, y, isCoord, isSel
     return this._calcActiveRangeOffset(x,y);
 };
 
+WorksheetView.prototype.__chartsRanges = function() {
+
+    if (asc["editor"].isStartAddShape || this.objectRender.selectedGraphicObjectsExists()) {
+        if (this.isChartAreaEditMode) {
+            return this.__drawFormulaRanges(this.arrActiveChartsRanges, 0, 0);
+        }
+    }
+
+    return null;
+};
+
 WorksheetView.prototype.__drawFormulaRanges = function (arrRanges, offsetX, offsetY) {
     var ranges = [],i = 0, type = 0, left = 0, right  = 0, top = 0, bottom = 0;
 
@@ -693,10 +704,6 @@ WorksheetView.prototype.__drawFormulaRanges = function (arrRanges, offsetX, offs
     }
 
     return ranges;
-};
-
-WorksheetView.prototype.__getFormulaRanges = function() {
-    this.__drawFormulaRanges(this.arrActiveFormulaRanges, offsetX, offsetY);
 };
 
 

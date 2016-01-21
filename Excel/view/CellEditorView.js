@@ -1011,12 +1011,10 @@
             }
             if (doAjust) {this._adjustCanvas();}
 
-            if (!window['IS_NATIVE_EDITOR']) {
-                this._renderText();  // вызов нужен для пересчета поля line.startX, которое используется в _updateCursorPosition
-                this._fireUpdated(); // вызов нужен для обновление текста верхней строки, перед обновлением позиции курсора
-                this._updateCursorPosition(true);
-                this._showCursor();
-            }
+            this._renderText();  // вызов нужен для пересчета поля line.startX, которое используется в _updateCursorPosition
+            this._fireUpdated(); // вызов нужен для обновление текста верхней строки, перед обновлением позиции курсора
+            this._updateCursorPosition(true);
+            this._showCursor();
 
             this._updateUndoRedoChanged();
 
@@ -1150,8 +1148,10 @@
         CellEditor.prototype._renderText = function (dy) {
             var t = this, opt = t.options, ctx = t.drawingCtx;
 
-            ctx.setFillStyle(opt.background)
-                .fillRect(0, 0, ctx.getWidth(), ctx.getHeight());
+            if (!window['IS_NATIVE_EDITOR']) {
+                ctx.setFillStyle(opt.background)
+                    .fillRect(0, 0, ctx.getWidth(), ctx.getHeight());
+            }
 
             if (opt.fragments.length > 0) {
                 t.textRender.render(t._getContentLeft(), (dy === undefined ? 0 : dy), t._getContentWidth(), opt.textColor);
@@ -1797,9 +1797,7 @@
 
         CellEditor.prototype._tryCloseEditor = function (event) {
             if (this.close(true)) {
-                if (!window['IS_NATIVE_EDITOR']) {
-                    this.handlers.trigger("applyCloseEvent", event);
-                }
+                this.handlers.trigger("applyCloseEvent", event);
             }
         };
 

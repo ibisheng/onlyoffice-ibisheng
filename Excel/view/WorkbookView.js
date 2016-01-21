@@ -432,6 +432,47 @@
 				});
 			}
 
+            if (window['IS_NATIVE_EDITOR']) {
+                this.cellEditor = new asc.CellEditor(this.element, this.input, this.fmgrGraphics, this.m_oFont,
+                    /*handlers*/{
+                        "closed"   : function () {self._onCloseCellEditor.apply(self, arguments);},
+                        "updated"  : function () {self._onUpdateCellEditor.apply(self, arguments);},
+                        "gotFocus" : function (hasFocus) {self.controller.setFocus(!hasFocus);},
+                        "copy"     : function () {self.copyToClipboard.apply(self, arguments);},
+                        "paste"    : function () {self.pasteFromClipboard.apply(self, arguments);},
+                        "cut"      : function () {self.cutToClipboard.apply(self, arguments);},
+                        "updateFormulaEditMod": function () {
+                            self.controller.setFormulaEditMode.apply(self.controller, arguments);
+                            var ws = self.getWorksheet();
+                            if (ws) {
+                                ws.cleanSelection();
+                                ws.cleanFormulaRanges();
+                                ws.setFormulaEditMode.apply(ws, arguments);
+                            }
+                        },
+                        "updateEditorState"			: function (state) {self.handlers.trigger("asc_onEditCell", state);},
+                        "isGlobalLockEditCell"		: function () {return self.collaborativeEditing.getGlobalLockEditCell();},
+                        "updateFormulaEditModEnd"	: function (rangeUpdated) {self.getWorksheet().updateSelection();},
+                        "newRange"     				: function (range) { self.getWorksheet().addFormulaRange(range); },
+                        "existedRange" 				: function (range) { self.getWorksheet().activeFormulaRange(range); },
+                        "updateUndoRedoChanged"		: function (bCanUndo, bCanRedo) {
+                            self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
+                            self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
+                        },
+                        "applyCloseEvent"			: function () {self.controller._onWindowKeyDown.apply(self.controller, arguments);},
+                        "isViewerMode"				: function () {return self.controller.settings.isViewerMode;},
+                        "popUpSelectorKeyDown"		: function (event) {return self._onPopUpSelectorKeyDown(event);},
+                        "getFormulaRanges"			: function () {return self.getWorksheet().getFormulaRanges();},
+                        "setStrictClose"			: function (val) {self.controller.setStrictClose(val);},
+                        "updateEditorSelectionInfo"	: function (info) {self.handlers.trigger("asc_onEditorSelectionChanged", info);},
+                        "onContextMenu"				: function (event) {self.handlers.trigger("asc_onContextMenu", event);}
+                    },
+                    /*settings*/{
+                        font: this.defaultFont,
+                        padding: this.defaults.worksheetView.cells.padding
+                    });
+            }
+
 			this.wsViewHandlers = new asc.asc_CHandlersList(/*handlers*/{
 				"getViewerMode"				: function () { return self.controller.getViewerMode ? self.controller.getViewerMode() : true; },
 				"reinitializeScroll"		: function () {self.controller.reinitializeScroll(/*All*/);},
@@ -941,8 +982,10 @@
 		WorkbookView.prototype._onShowAutoComplete = function () {
 			var ws = this.getWorksheet();
 			var arrValues = ws.getCellAutoCompleteValues(ws.activeRange.startCol, ws.activeRange.startRow);
-			this.popUpSelector.show(false, arrValues, this.getWorksheet().getActiveCellCoord());
-		};
+
+            if (!window['IS_NATIVE_EDITOR'])
+                this.popUpSelector.show(false, arrValues, this.getWorksheet().getActiveCellCoord());
+        };
 
 		WorkbookView.prototype._onAutoFiltersClick = function (idFilter) {
 			this.getWorksheet().autoFilters.onAutoFilterClick(idFilter);
@@ -1539,6 +1582,9 @@
 		};
 
 		WorkbookView.prototype.restoreFocus = function () {
+			if (window["NATIVE_EDITOR_ENJINE"])
+                return;
+			
 			if (this.cellEditor.hasFocus) {
 				this.cellEditor.restoreFocus();
 			}
@@ -1570,12 +1616,16 @@
                 }
             }
             if ( 0 < arrResult.length ) {
-                this.popUpSelector.show( true, arrResult, this.getWorksheet().getActiveCellCoord() );
+                if (!window['IS_NATIVE_EDITOR'])
+                    this.popUpSelector.show( true, arrResult, this.getWorksheet().getActiveCellCoord() );
+
                 this.lastFormulaPos = formulaPos;
                 this.lastFormulaName = formulaName;
             }
             else {
-                this.popUpSelector.hide();
+                if (!window['IS_NATIVE_EDITOR'])
+                    this.popUpSelector.hide();
+
                 this.lastFormulaPos = -1;
                 this.lastFormulaName = '';
             }

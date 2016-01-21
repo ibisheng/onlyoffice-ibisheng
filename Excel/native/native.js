@@ -4379,20 +4379,34 @@ function offline_mouse_move(x, y, isViewer) {
             ws.objectRender.graphicObjectMouseMove(e, x, y);
         }
     } else {
-        if (-1 == _s.cellPin)
-            ws._changeSelectionTopLeft(x, y, true, true, true);
-        else if (1 === _s.cellPin)
-            ws._changeSelectionTopLeft(x, y, true, true, false);
-        else {
-            ws.changeSelectionEndPoint(x, y, true, true);
+        if (_s.isFormulaEditMode) {
 
-            if (_s.isFormulaEditMode) {
-                ws.enterCellRange(wb.cellEditor);
+            var ret = false;
+            ret = wb.cellEditor.canEnterCellRange();
+            ret ? wb.cellEditor.activateCellRange() : true;
+
+            if (!ret) {
+                _s.isFormulaEditMode = false;
+                ws.visibleRange = range;
+                return {'action':'closeCellEditor'};
+            }
+
+            ws.changeSelectionEndPoint(x, y, true, true);
+            ws.enterCellRange(wb.cellEditor);
+        } else {
+            if (-1 == _s.cellPin)
+                ws._changeSelectionTopLeft(x, y, true, true, true);
+            else if (1 === _s.cellPin)
+                ws._changeSelectionTopLeft(x, y, true, true, false);
+            else {
+                ws.changeSelectionEndPoint(x, y, true, true);
             }
         }
     }
 
     ws.visibleRange = range;
+
+    return null;
 }
 function offline_mouse_up(x, y, isViewer) {
     var ws = _api.wb.getWorksheet();
@@ -4418,6 +4432,9 @@ function offline_mouse_up(x, y, isViewer) {
 }
 function offline_get_selection(x, y, width, height, autocorrection) {
     return _s.getSelection(x, y, width, height, autocorrection);
+}
+function offline_get_charts_ranges() {
+   return _api.wb.getWorksheet().__chartsRanges();
 }
 function offline_get_worksheet_bounds() {
     return _s.getMaxBounds();
@@ -4579,7 +4596,14 @@ function offline_cell_editor_mouse_event(events) {
 }
 function offline_cell_editor_close(x, y, width, height, ratio) {
     var e = {which: 13, shiftKey: false, metaKey: false, ctrlKey: false};
-    _api.wb.cellEditor._tryCloseEditor(e);
+
+    //_api.wb.cellEditor._tryCloseEditor(e);
+
+    if (_api.wb.cellEditor.close(true)) {
+        _api.wb.getWorksheet().handlers.trigger('applyCloseEvent', e);
+    }
+
+    _api.wb._onWSSelectionChanged(/*info*/null);
 }
 function offline_cell_editor_selection() {
     return _api.wb.cellEditor._drawSelection();
