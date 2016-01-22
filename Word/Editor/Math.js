@@ -2815,7 +2815,7 @@ ParaMath.prototype.Get_Bounds = function()
 {
     if (undefined === this.Paragraph || null === this.Paragraph)
     {
-        return [{X : 0, Y : 0, W : 0, H : 0, Page : 0}];
+        return [ [{X : 0, Y : 0, W : 0, H : 0, Page : 0}] ];
     }
     else
     {
@@ -2824,7 +2824,8 @@ ParaMath.prototype.Get_Bounds = function()
 };
 ParaMath.prototype.private_GetBounds = function(Content)
 {
-    var Bounds = [];
+    var Bounds = [ [{X : 0, Y : 0, W : 0, H : 0, Page : 0}] ];
+
     var StartParaPage = this.Paragraph.Get_StartPage_Absolute();
 
     var ContentBounds = Content.Get_Bounds();
