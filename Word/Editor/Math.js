@@ -559,7 +559,8 @@ function ParaMath()
 
     this.DispositionOpers   = [];
 
-    this.DefaultTextPr     = new CTextPr();
+    this.bFirstRecalculate  = false;
+    this.DefaultTextPr      = new CTextPr();
 
     this.DefaultTextPr.FontFamily = {Name  : "Cambria Math", Index : -1 };
     this.DefaultTextPr.RFonts.Set_All("Cambria Math", -1);
@@ -1425,6 +1426,9 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         PRS.RestartPageRecalcInfo.Object = PrevObject; // возвращаем формулу, которая инициировала пересчет (если это была текущая формула, то null)
     }
 
+    if(PRS.NewRange == false)
+        this.bFirstRecalculate = true;
+
 };
 ParaMath.prototype.private_UpdateWrapSettings = function(PRS)
 {
@@ -2073,7 +2077,10 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
     _sp.AfterAutoSpacing  = false;
     par.Set_Spacing(_sp, false);
 
-    _dc.Reset(0, 0, 10000, 10000);
+    // берем Default настройки, т.к. функция MathToImageConverter вызывается для новой формулы (созданной при копировании)
+    var XLimit = 210, YLimit = 10000;
+
+    _dc.Reset(0, 0, XLimit, YLimit);
     _dc.Recalculate_Page(0, true);
 
     _dc.Reset(0, 0, par.Lines[0].Ranges[0].W + 0.001, 10000);
@@ -2089,9 +2096,14 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
     window.IsShapeToImageConverter = true;
 
     var dKoef = g_dKoef_mm_to_pix;
-    var _bounds = this.Get_Bounds()[0][0];
-    var w_mm = _bounds.W;
-    var h_mm = _bounds.H;
+
+    var JointSize = this.Get_JointSize();
+
+    var W = JointSize.W,
+        H = JointSize.H;
+
+    var w_mm = W;
+    var h_mm = H;
     var w_px = (w_mm * dKoef) >> 0;
     var h_px = (h_mm * dKoef) >> 0;
 
@@ -2127,6 +2139,11 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
     }
 
     g.transform(1,0,0,1,0,0);
+
+    if(true == par.LogicDocument.Is_ShowParagraphMarks())
+    {
+        par.LogicDocument.Set_ShowParagraphMarks(false, false);
+    }
 
     par.Draw(0, g);
 
@@ -2821,6 +2838,28 @@ ParaMath.prototype.Get_Bounds = function()
     {
         return this.private_GetBounds(this.Root);
     }
+};
+ParaMath.prototype.Get_JointSize = function()
+{
+    var W = 0, H = 0;
+    if(this.bFirstRecalculate == true)
+    {
+        var _bounds = this.Get_Bounds();
+
+        for(var Line = 0; Line < _bounds.length; Line++)
+        {
+            if(_bounds[Line] == undefined)
+                break;
+
+            for(var Range = 0; Range < _bounds[Line].length; Range++)
+            {
+                W += _bounds[Line][Range].W;
+                H += _bounds[Line][Range].H;
+            }
+        }
+    }
+
+    return {W: W, H: H};
 };
 ParaMath.prototype.private_GetBounds = function(Content)
 {
