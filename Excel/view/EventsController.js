@@ -1195,8 +1195,8 @@
 
 				t.clickCounter.mouseDownEvent(coord.x, coord.y, event.button);
 				event.ClickCount = t.clickCounter.clickCount;
-				if (event.ClickCount == 2)
-					t.isDblClickInMouseDown = true;
+				if (0 === event.ClickCount % 2)
+					t.isDblClickInMouseDown = true;;
 				
 				t.handlers.trigger("graphicObjectMouseDown", event, coord.x, coord.y);
 				t.handlers.trigger("updateSelectionShape", /*isSelectOnShape*/true);

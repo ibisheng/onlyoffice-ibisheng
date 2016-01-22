@@ -3222,51 +3222,45 @@ function ObjectLocker(ws) {
 }
 
 function ClickCounter() {
-
-    var _this = this;
-    _this.x = 0;
-    _this.y = 0;
-    _this.button = 0;
-    _this.time = 0;
-    _this.clickCount = 0;
-    _this.log = false;
-
-    _this.mouseDownEvent = function(x, y, button) {
-
-        var currTime = getCurrentTime();
-        if ( (_this.button === button) && (_this.x === x) && (_this.y === y) && (currTime - _this.time < 500) ) {
-            _this.clickCount = _this.clickCount + 1;
-            _this.clickCount = Math.min(_this.clickCount, 3);
-        }
-        else
-            _this.clickCount = 1;
-
-        if ( _this.log ) {
-            console.log("-----");
-            console.log("x-> " + _this.x + " : " + x);
-            console.log("y-> " + _this.y + " : " + y);
-            console.log("Time: " + (currTime - _this.time));
-            console.log("Count: " + _this.clickCount);
-            console.log("");
-        }
-        _this.time = currTime;
-    };
-
-    _this.mouseMoveEvent = function(x, y) {
-        if ( (_this.x != x) || (_this.y != y) ) {
-            _this.x = x;
-            _this.y = y;
-            _this.clickCount = 0;
-
-            if ( _this.log )
-                console.log("Reset counter");
-        }
-    };
-
-    _this.getClickCount = function() {
-        return _this.clickCount;
-    }
+    this.x = 0;
+    this.y = 0;
+    this.button = 0;
+    this.time = 0;
+    this.clickCount = 0;
+    this.log = false;
 }
+ClickCounter.prototype.mouseDownEvent = function(x, y, button) {
+    var currTime = getCurrentTime();
+    if (this.button === button && this.x === x && this.y === y && (currTime - this.time < 500)) {
+        ++this.clickCount;
+    } else {
+        this.clickCount = 1;
+    }
+
+    if (this.log) {
+        console.log("-----");
+        console.log("x-> " + this.x + " : " + x);
+        console.log("y-> " + this.y + " : " + y);
+        console.log("Time: " + (currTime - this.time));
+        console.log("Count: " + this.clickCount);
+        console.log("");
+    }
+    this.time = currTime;
+};
+ClickCounter.prototype.mouseMoveEvent = function(x, y) {
+    if (this.x !== x || this.y !== y) {
+        this.x = x;
+        this.y = y;
+        this.clickCount = 0;
+
+        if (this.log) {
+            console.log("Reset counter");
+        }
+    }
+};
+ClickCounter.prototype.getClickCount = function() {
+    return this.clickCount;
+};
 
 function CoordsManager(ws) {
 
