@@ -2089,8 +2089,9 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
     window.IsShapeToImageConverter = true;
 
     var dKoef = g_dKoef_mm_to_pix;
-    var w_mm = this.Width;
-    var h_mm = this.Height;
+    var _bounds = this.Get_Bounds()[0][0];
+    var w_mm = _bounds.W;
+    var h_mm = _bounds.H;
     var w_px = (w_mm * dKoef) >> 0;
     var h_px = (h_mm * dKoef) >> 0;
 
