@@ -11305,6 +11305,7 @@
   WorksheetView.prototype.addFormulaRange = function(range) {
     var r = range !== undefined ? range : new asc_ActiveRange(this.activeRange.c1, this.activeRange.r1, this.activeRange.c2, this.activeRange.r2);
     this.arrActiveFormulaRanges.push(r);
+    this.arrActiveFormulaRangesPosition = this.arrActiveFormulaRanges.length - 1;
     this._fixSelectionOfMergedCells();
   };
 
@@ -11313,9 +11314,6 @@
      for (var i = 0; i < this.arrActiveFormulaRanges.length; ++i) {
       if (this.arrActiveFormulaRanges[i].isEqual(range)) {
         this.arrActiveFormulaRangesPosition = i;
-        /*var r = this.arrActiveFormulaRanges[i];
-        this.arrActiveFormulaRanges.splice(i, 1);
-        this.arrActiveFormulaRanges.push(r);*/
         return;
       }
     }
