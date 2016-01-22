@@ -260,6 +260,13 @@ var c_oAscCellEditorState = {
   editFormula: 4				// Редактирование формулы
 };
 
+// Состояние select-а
+var c_oAscCellEditorSelectState = {
+  no    : 0,
+  char  : 1,
+  word  : 2
+};
+
 // Пересчитывать ли ширину столбца
 var c_oAscCanChangeColWidth = {
   none: 0,	// not recalc

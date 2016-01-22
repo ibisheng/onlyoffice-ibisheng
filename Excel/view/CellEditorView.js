@@ -108,7 +108,7 @@
     this.undoAllMode = false;
     this.selectionBegin = -1;
     this.selectionEnd = -1;
-    this.isSelectMode = false;
+    this.isSelectMode = c_oAscCellEditorSelectState.no;
     this.hasCursor = false;
     this.hasFocus = false;
     this.newTextFormat = undefined;
@@ -746,7 +746,7 @@
     this.topLineIndex = 0;
     this.selectionBegin = -1;
     this.selectionEnd = -1;
-    this.isSelectMode = false;
+    this.isSelectMode = c_oAscCellEditorSelectState.no;
     this.hasCursor = false;
 
     this.undoList = [];
@@ -1698,11 +1698,15 @@
     var t = this;
 
     function doChangeSelection(coord) {
+      // ToDo реализовать для слова.
+      if (c_oAscCellEditorSelectState.word === t.isSelectMode) {
+        return;
+      }
       var pos = t._findCursorPosition(coord);
       if (pos !== undefined) {
         pos >= 0 ? t._selectChars(kPosition, pos) : t._selectChars(pos);
       }
-      if (t.isSelectMode && !window['IS_NATIVE_EDITOR']) {
+      if (c_oAscCellEditorSelectState.no !== t.isSelectMode && !window['IS_NATIVE_EDITOR']) {
         t.selectionTimer = window.setTimeout(function() {
           doChangeSelection(coord);
         }, t.defaults.selectionTimeout);
@@ -2445,7 +2449,7 @@
 
   /** @param event {MouseEvent} */
   CellEditor.prototype._onWindowMouseUp = function(event) {
-    this.isSelectMode = false;
+    this.isSelectMode = c_oAscCellEditorSelectState.no;
     if (this.callTopLineMouseup) {
       this._topLineMouseUp();
     }
@@ -2454,7 +2458,7 @@
 
   /** @param event {MouseEvent} */
   CellEditor.prototype._onWindowMouseMove = function(event) {
-    if (this.isSelectMode && !this.hasCursor) {
+    if (c_oAscCellEditorSelectState.no !== this.isSelectMode && !this.hasCursor) {
       this._changeSelection(this._getCoordinates(event));
     }
     return true;
@@ -2472,8 +2476,8 @@
     this.input.isFocused = false;
 
     if (0 === event.button) {
-      this.isSelectMode = true;
       if (1 === this.clickCounter.getClickCount() % 2) {
+        this.isSelectMode = c_oAscCellEditorSelectState.char;
         if (!event.shiftKey) {
           this._showCursor();
           pos = this._findCursorPosition(coord);
@@ -2485,6 +2489,7 @@
         }
       } else {
         // Dbl click
+        this.isSelectMode = c_oAscCellEditorSelectState.word;
         // Окончание слова
         var endWord = this.textRender.getNextWord(this.cursorPos);
         // Начало слова (ищем по окончанию, т.к. могли попасть в пробел)
@@ -2503,7 +2508,7 @@
       this.handlers.trigger('onContextMenu', event);
       return true;
     }
-    this.isSelectMode = false;
+    this.isSelectMode = c_oAscCellEditorSelectState.no;
     return true;
   };
 
@@ -2512,7 +2517,7 @@
     var coord = this._getCoordinates(event);
     this.clickCounter.mouseMoveEvent(coord.x, coord.y);
     this.hasCursor = true;
-    if (this.isSelectMode) {
+    if (c_oAscCellEditorSelectState.no !== this.isSelectMode) {
       this._changeSelection(coord);
     }
     return true;
