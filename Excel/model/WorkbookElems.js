@@ -3086,10 +3086,14 @@ CCellValue.prototype =
 											            sDateFormat += "yyyy";
 											    }
 											}
+                                            var sTimeFormat = 'h:mm:ss';
+                                            if (cultureInfo.AMDesignator.length > 0 && cultureInfo.PMDesignator.length > 0){
+                                                sTimeFormat += ' AM/PM';
+                                            }
 											if(bDate && bTime)
-											    oNumFormat = oNumFormatCache.get(sDateFormat + " h:mm:ss AM/PM");
+											    oNumFormat = oNumFormatCache.get(sDateFormat + ' ' + sTimeFormat);
 											else if(bTime)
-												oNumFormat = oNumFormatCache.get("h:mm:ss AM/PM");
+												oNumFormat = oNumFormatCache.get(sTimeFormat);
 											else
 											    oNumFormat = oNumFormatCache.get(sDateFormat);
 											
