@@ -145,9 +145,7 @@
     this.defaults = {
       padding: -1, selectColor: new CColor(190, 190, 255, 0.5),
 
-      canvasZIndex: 500, blinkInterval: 500, cursorShape: "text",
-
-      selectionTimeout: 20
+      canvasZIndex: 500, blinkInterval: 500, cursorShape: "text"
     };
 
     this.dontUpdateText = false;
@@ -1705,11 +1703,6 @@
       var pos = t._findCursorPosition(coord);
       if (pos !== undefined) {
         pos >= 0 ? t._selectChars(kPosition, pos) : t._selectChars(pos);
-      }
-      if (c_oAscCellEditorSelectState.no !== t.isSelectMode && !window['IS_NATIVE_EDITOR']) {
-        t.selectionTimer = window.setTimeout(function() {
-          doChangeSelection(coord);
-        }, t.defaults.selectionTimeout);
       }
     }
 
