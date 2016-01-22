@@ -9249,8 +9249,9 @@ function Binary_oMathReader(stream, oReadResult)
 			var oMatrix = {};
 			var arrContent = [];
 			props.mcs = [];
+			var oMatrCounter = {row:0, column:0};
             res = this.bcr.Read1(length, function(t, l){				
-                return oThis.ReadMathMatrix(t,l,props,oElem,oMatrix,arrContent);
+                return oThis.ReadMathMatrix(t,l,props,oElem,oMatrix,arrContent,oMatrCounter);
             });			
         }			
 		else if (c_oSer_OMathContentType.Nary === type)
@@ -10231,7 +10232,7 @@ function Binary_oMathReader(stream, oReadResult)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathMatrix = function(type, length, props, oParent, oMatr, arrContent)
+	this.ReadMathMatrix = function(type, length, props, oParent, oMatr, arrContent, oMatrCounter)
     {		
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -10245,9 +10246,6 @@ function Binary_oMathReader(stream, oReadResult)
 			if (oParent)
 				oParent.addElementToContent(oMatrix);
 			oMatr.content = oMatrix;
-			
-			oMatr.content.row = 0;
-			oMatr.content.column = 0;
 			
 			var column = 0;
 			for (var i=0; i<props.mcs.length; i++)
@@ -10265,9 +10263,9 @@ function Binary_oMathReader(stream, oReadResult)
 		else if (c_oSer_OMathContentType.Mr === type)
         {
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadMathMr(t,l,oMatr.content, arrContent);
-            });			
-			oMatr.content.row++;
+                return oThis.ReadMathMr(t,l,oMatr.content, arrContent, oMatrCounter);
+            });
+			oMatrCounter.row++;
         }
         else
             res = c_oSerConstants.ReadUnknown;
@@ -10432,21 +10430,21 @@ function Binary_oMathReader(stream, oReadResult)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };	
-	this.ReadMathMr = function(type, length, oMatrix, arrContent)
+	this.ReadMathMr = function(type, length, oMatrix, arrContent, oMatrCounter)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
 		if (c_oSer_OMathContentType.Element === type)
         {
-			var lRow = oMatrix.row;
-			var lColumn = oMatrix.column;
+			var lRow = oMatrCounter.row;
+			var lColumn = oMatrCounter.column;
 
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,arrContent[lRow][lColumn]);
             });			
-			oMatrix.column++;
-			if ( oMatrix.nCol == oMatrix.column)
-				oMatrix.column = 0;
+			oMatrCounter.column++;
+			if ( oMatrix.nCol == oMatrCounter.column)
+				oMatrCounter.column = 0;
         }
         else
             res = c_oSerConstants.ReadUnknown;
