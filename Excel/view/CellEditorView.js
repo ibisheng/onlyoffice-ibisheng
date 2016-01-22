@@ -192,17 +192,17 @@
     t.textRender.setDefaultFont(settings.font.clone());
 
     // bind event handlers
-    if (t.canvasOverlay && t.canvasOverlay.addEventListener) {
-      t.canvasOverlay.addEventListener("mousedown", function() {
+    if (t.canvasOuter && t.canvasOuter.addEventListener) {
+      t.canvasOuter.addEventListener("mousedown", function() {
         return t._onMouseDown.apply(t, arguments);
       }, false);
-      t.canvasOverlay.addEventListener("mouseup", function() {
+      t.canvasOuter.addEventListener("mouseup", function() {
         return t._onMouseUp.apply(t, arguments);
       }, false);
-      t.canvasOverlay.addEventListener("mousemove", function() {
+      t.canvasOuter.addEventListener("mousemove", function() {
         return t._onMouseMove.apply(t, arguments);
       }, false);
-      t.canvasOverlay.addEventListener("mouseleave", function() {
+      t.canvasOuter.addEventListener("mouseleave", function() {
         return t._onMouseLeave.apply(t, arguments);
       }, false);
     }
