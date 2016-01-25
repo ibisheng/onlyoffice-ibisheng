@@ -1706,7 +1706,9 @@
       }
     }
 
-    if (!window['IS_NATIVE_EDITOR']) {
+    if (window['IS_NATIVE_EDITOR']) {
+        doChangeSelection(coord);
+    } else {
       window.clearTimeout(t.selectionTimer);
       t.selectionTimer = window.setTimeout(function() {
         doChangeSelection(coord);
@@ -2461,7 +2463,9 @@
   CellEditor.prototype._onMouseDown = function(event) {
     var pos;
     var coord = this._getCoordinates(event);
-    this.clickCounter.mouseDownEvent(coord.x, coord.y, event.button);
+    if (!window['IS_NATIVE_EDITOR']) {
+        this.clickCounter.mouseDownEvent(coord.x, coord.y, event.button);
+    }
 
     this.setFocus(true);
 

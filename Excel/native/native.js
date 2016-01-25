@@ -4330,7 +4330,15 @@ function offline_mouse_down(x, y, pin, isViewer, isFormulaEditMode) {
 
         _s.isShapeAction = true;
         ws.visibleRange = range;
-        return {id:graphicsInfo.id};
+
+        if (!graphicsInfo.object.graphicObject instanceof CChartSpace) {
+            ws.isChartAreaEditMode = false;
+        }
+
+        return {
+            id:graphicsInfo.id//,
+            //ischart: graphicsInfo.object.graphicObject instanceof CChartSpace
+        };
     }
 
     _s.cellPin = pin;
@@ -4466,19 +4474,22 @@ function offline_cell_editor_draw(width, height, ratio) {
     var wb = _api.wb;
     var cellEditor = _api.wb.cellEditor;
     cellEditor._draw();
+
+    return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom,
+        wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
 }
-function offline_cell_editor_open(isSelectAll, x, y, width, height, ratio) {
+function offline_cell_editor_open(x, y, width, height, ratio, isSelectAll, isFormulaInsertMode)  {
     _null_object.width = width * ratio;
     _null_object.height = height * ratio;
 
     var wb = _api.wb;
 
     wb.cellEditor.isSelectAll = isSelectAll;
-
-    wb._onEditCell(x, y, true, undefined, undefined, true, false);
-
-    return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom,
-        wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
+    if (! isFormulaInsertMode) {
+        wb._onEditCell(x, y, true, undefined, undefined, true, false);
+    } else {
+       // wb.cellEditor._draw();
+    }
 }
 function offline_cell_editor_key_event(keys, width, height, ratio) {
     _null_object.width = width * ratio;
@@ -4537,7 +4548,8 @@ function offline_cell_editor_mouse_event(events) {
             pageX:events[i][1],
             pageY:events[i][2],
             which: 1,
-            shiftKey:events[i][3]
+            shiftKey:events[i][3],
+            button:0
         };
 
         if (events[i][3]) {
@@ -4567,6 +4579,8 @@ function offline_cell_editor_mouse_event(events) {
             left = cellEditor.selectionBegin;
             right = cellEditor.selectionEnd;
 
+            cellEditor.clickCounter.clickCount = 1;
+
             cellEditor._onMouseDown(event);
 
             if (-1 === _s.textSelection) {
@@ -4586,7 +4600,11 @@ function offline_cell_editor_mouse_event(events) {
         } else if (2 == events[i][0]) {
             cellEditor._onMouseMove(event);
         } else if (3 == events[i][0]) {
-            cellEditor._onMouseDblClick(event);
+            cellEditor.clickCounter.clickCount = 2;
+            cellEditor._onMouseDown(event);
+            cellEditor._onMouseUp(event);
+            cellEditor.clickCounter.clickCount = 0;
+
             _s.textSelection = 0;
         }
     }
@@ -4597,13 +4615,16 @@ function offline_cell_editor_mouse_event(events) {
 function offline_cell_editor_close(x, y, width, height, ratio) {
     var e = {which: 13, shiftKey: false, metaKey: false, ctrlKey: false};
 
-    //_api.wb.cellEditor._tryCloseEditor(e);
+    // TODO: SHOW POPUP
 
     if (_api.wb.cellEditor.close(true)) {
         _api.wb.getWorksheet().handlers.trigger('applyCloseEvent', e);
+    } else {
+        _api.wb.cellEditor.undoAll();
+        _api.wb.cellEditor.close();
     }
 
-    _api.wb._onWSSelectionChanged(/*info*/null);
+    _api.wb._onWSSelectionChanged(null);
 }
 function offline_cell_editor_selection() {
     return _api.wb.cellEditor._drawSelection();
@@ -4675,6 +4696,73 @@ function offline_get_selected_object() {
 function offline_can_enter_cell_range() {
     var wb = _api.wb;
     return wb.cellEditor.canEnterCellRange();
+}
+function offline_insertFormula(functionName, autoComplete, isDefName) {
+    var ws = _api.wb.getWorksheet();
+    var wb = _api.wb;
+    var t = ws, cursorPos;
+
+    var cellRange = null;
+    // Если нужно сделать автозаполнение формулы, то ищем ячейки)
+    if (autoComplete) {
+        cellRange = ws.autoCompleteFormula(functionName);
+    }
+
+    if (isDefName) {
+        functionName = "=" + functionName;
+    } else{
+        if (cellRange) {
+            if (cellRange.notEditCell) {
+                // Мы уже ввели все что нужно, редактор открывать не нужно
+                return null;
+            }
+            // Меняем значение ячейки
+            functionName = "=" + functionName + "(" + cellRange.text + ")";
+        } else {
+            // Меняем значение ячейки
+            functionName = "=" + functionName + "()";
+        }
+        // Вычисляем позицию курсора (он должен быть в функции)
+        cursorPos = functionName.length - 1;
+    }
+
+    var arn = ws.activeRange.clone(true);
+
+    var openEditor = function (res) {
+        if (res) {
+            // Выставляем переменные, что мы редактируем
+           // t.controller.setCellEditMode(true);
+            ws.setCellEditMode(true);
+
+            ws.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
+            if (isDefName)
+                ws.skipHelpSelector = true;
+            // Открываем, с выставлением позиции курсора
+            if (!ws.openCellEditorWithText(wb.cellEditor, functionName, cursorPos, /*isFocus*/false,
+                /*activeRange*/arn)) {
+                ws.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
+               // t.controller.setCellEditMode(false);
+               // t.controller.setStrictClose(false);
+               // t.controller.setFormulaEditMode(false);
+                ws.setCellEditMode(false);
+                ws.setFormulaEditMode(false);
+            }
+            if (isDefName)
+                ws.skipHelpSelector = false;
+
+            return  [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom,
+                wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
+
+        } else {
+            //t.controller.setCellEditMode(false);
+            //t.controller.setStrictClose(false);
+            //t.controller.setFormulaEditMode(false);
+            ws.setCellEditMode(false);
+            ws.setFormulaEditMode(false);
+        }
+    };
+
+    return openEditor(true);
 }
 
 function offline_copy() {
@@ -5558,40 +5646,6 @@ function offline_apply_event(type,params) {
             break;
         }
 
-        case 2410: // ASC_SPREADSHEETS_EVENT_TYPE_GET_FORMULAS
-        {
-            _stream = global_memory_stream_menu;
-            _stream["ClearNoAttack"]();
-
-            var info = _api.asc_getFormulasInfo();
-            if (info) {
-                _stream["WriteLong"](info.length);
-
-                for (var i = 0; i < info.length; ++i) {
-                    _stream["WriteString2"](info[i].asc_getGroupName());
-
-                    var ascFunctions = info[i].asc_getFormulasArray();
-                    _stream["WriteLong"](ascFunctions.length);
-
-                    for (var j = 0; j < ascFunctions.length; ++j) {
-                        _stream["WriteString2"](ascFunctions[j].asc_getName());
-                        _stream["WriteString2"](ascFunctions[j].asc_getArguments());
-                    }
-                }
-            } else {
-                _stream["WriteLong"](0);
-            }
-
-            if (undefined !== params) {
-                var localizeData = JSON.parse(params);
-                _api.asc_setLocalization(localizeData);
-            }
-
-            _return = _stream;
-
-            break;
-        }
-
         case 2415: // ASC_SPREADSHEETS_EVENT_TYPE_CHANGE_COLOR_SCHEME
         {
             if (undefined !== params) {
@@ -5630,6 +5684,48 @@ function offline_apply_event(type,params) {
         case 3050: // ASC_SPREADSHEETS_EVENT_TYPE_FILTER_CLEAR
         {
             _api.asc_clearFilter();
+            break;
+        }
+
+        case 4010: // ASC_SPREADSHEETS_EVENT_TYPE_INSERT_FORMULA
+        {
+            if (params && params.length && params[0]) {
+                _return = offline_insertFormula(params[0], params[1] ? true : undefined, params[2] ? true : undefined);
+            }
+            break;
+        }
+
+        case 4020: // ASC_SPREADSHEETS_EVENT_TYPE_GET_FORMULAS
+        {
+            _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+
+            var info = _api.asc_getFormulasInfo();
+            if (info) {
+                _stream["WriteLong"](info.length);
+
+                for (var i = 0; i < info.length; ++i) {
+                    _stream["WriteString2"](info[i].asc_getGroupName());
+
+                    var ascFunctions = info[i].asc_getFormulasArray();
+                    _stream["WriteLong"](ascFunctions.length);
+
+                    for (var j = 0; j < ascFunctions.length; ++j) {
+                        _stream["WriteString2"](ascFunctions[j].asc_getName());
+                        _stream["WriteString2"](ascFunctions[j].asc_getArguments());
+                    }
+                }
+            } else {
+                _stream["WriteLong"](0);
+            }
+
+            if (undefined !== params) {
+                var localizeData = JSON.parse(params);
+                _api.asc_setLocalization(localizeData);
+            }
+
+            _return = _stream;
+
             break;
         }
 
