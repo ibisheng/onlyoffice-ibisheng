@@ -5806,9 +5806,11 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
             // скопируем текстовые настройки прежде чем подменим на пустые
 
             var StyleDefaultTextPr = Styles.Default.TextPr.Copy();
-            var DefaultTextPr = new CTextPr();
-            DefaultTextPr.RFonts.Set_All("Cambria Math", -1);
-            Styles.Default.TextPr = DefaultTextPr;
+            var MathFont = {Name : "Cambria Math", Index : -1};
+
+
+            // hAnsi, eastAsia, cs - по умолчанию шрифты не Cambria Math, а те, которые компилируются в документе
+            Styles.Default.TextPr.RFonts.Merge({Ascii: MathFont});
 
             var StyleId    = this.Paragraph.Style_Get();
 
@@ -5820,10 +5822,6 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
             Styles.Default.TextPr = StyleDefaultTextPr;
         }
 
-
-        // Not Apply ArgSize !
-        //var oWPrp = this.Parent.Get_Default_TPrp();
-        //TextPr.Merge(oWPrp);
 
         if(this.IsPlaceholder())
         {
