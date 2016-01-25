@@ -4745,16 +4745,17 @@ BinaryChartWriter.prototype.WriteCT_PlotArea = function (oVal) {
         // });
         // }
         else if (chart instanceof CBarChart) {
-            this.bs.WriteItem(c_oserct_plotareaBARCHART, function () {
-                oThis.WriteCT_BarChart(chart);
-            });
+            if(chart.b3D){
+                this.bs.WriteItem(c_oserct_plotareaBAR3DCHART, function () {
+                    oThis.WriteCT_Bar3DChart(chart);
+                });
+            }
+            else{
+                this.bs.WriteItem(c_oserct_plotareaBARCHART, function () {
+                    oThis.WriteCT_BarChart(chart);
+                });
+            }
         }
-        // else if(chart instanceof CBar3DChart)
-        // {
-        // this.bs.WriteItem(c_oserct_plotareaBAR3DCHART, function () {
-        // oThis.WriteCT_Bar3DChart(chart);
-        // });
-        // }
         else if (chart instanceof CBubbleChart) {
             this.bs.WriteItem(c_oserct_plotareaBUBBLECHART, function () {
                 oThis.WriteCT_BubbleChart(chart);
