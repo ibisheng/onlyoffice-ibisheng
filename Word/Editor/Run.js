@@ -5796,10 +5796,6 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
             return TextPr;
         }
 
-        // var Styles = this.Paragraph.Parent.Get_Styles();
-        // this.Paragraph.Parent.Styles (rPrDefault, pPrDefault) не влияют на Font Name в мат тексте, поэтому выставляем в Default в текстовых настройках RFonts "Cambria Math" (дефолтовый Font)
-        //
-
         if(!this.IsNormalText()) // math text
         {
             var Styles = this.Paragraph.Parent.Get_Styles();
@@ -5808,7 +5804,7 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
             var StyleDefaultTextPr = Styles.Default.TextPr.Copy();
             var MathFont = {Name : "Cambria Math", Index : -1};
 
-
+            // Ascii - по умолчанию шрифт Cambria Math
             // hAnsi, eastAsia, cs - по умолчанию шрифты не Cambria Math, а те, которые компилируются в документе
             Styles.Default.TextPr.RFonts.Merge({Ascii: MathFont});
 
