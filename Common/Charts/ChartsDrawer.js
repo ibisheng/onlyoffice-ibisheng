@@ -267,7 +267,7 @@ CChartsDrawer.prototype =
 	{
 		var heightTitle = chartSpace.chart.plotArea.valAx.title.extY;
 		
-		var y = (this.calcProp.chartGutter._top + this.calcProp.trueHeight / 2) / this.calcProp.pxToMM + heightTitle / 2;
+		var y = (this.calcProp.chartGutter._top + this.calcProp.trueHeight / 2) / this.calcProp.pxToMM - heightTitle / 2;
 		var x = standartMarginForCharts / this.calcProp.pxToMM;
 		
 		if(chartSpace.chart.legend && !chartSpace.chart.legend.overlay && chartSpace.chart.legend.legendPos == LEGEND_POS_L)
