@@ -1080,6 +1080,7 @@ cArea3D.prototype.foreach2 = function ( action ) {
         }
     }
 };
+cArea3D.prototype.isSingleSheet = function(){return this.wsFrom == this.wsTo;};
 
 /** @constructor */
 function cRef( val, ws ) {/*Ref means A1 for example*/
@@ -1950,6 +1951,9 @@ cUnarMinusOperator.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
     }
+    else if ( arg0 instanceof cArea3D){
+        arg0 = arg0.cross( arguments[1].first, arguments[3] );
+    }
     else if ( arg0 instanceof cArray ) {
         arg0.foreach(
             function ( arrElem, r, c ) {
@@ -1987,7 +1991,10 @@ cUnarPlusOperator.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    arg0 = arg[0].tryConvert();
+    else if ( arg0 instanceof cArea3D){
+        arg0 = arg0.cross( arguments[1].first, arguments[3] );
+    }
+    arg0 = arg0.tryConvert();
     return this.value = arg0;
 };
 cUnarPlusOperator.prototype.toString = function () {
@@ -2016,8 +2023,14 @@ cAddOperator.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
     }
+    else if ( arg0 instanceof cArea3D){
+        arg0 = arg0.cross( arguments[1].first, arguments[3] );
+    }
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArea3D){
+        arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tocNumber(), arg1 = arg1.tocNumber();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "+", arguments[1].first );
@@ -2054,6 +2067,9 @@ cPercentOperator.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
     }
+    else if ( arg0 instanceof cArea3D){
+        arg0 = arg0.cross( arguments[1].first, arguments[3] );
+    }
     else if ( arg0 instanceof cArray ) {
         arg0.foreach(
             function ( arrElem, r, c ) {
@@ -2089,9 +2105,15 @@ cPowOperator.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
     }
+    else if ( arg0 instanceof cArea3D){
+        arg0 = arg0.cross( arguments[1].first, arguments[3] );
+    }
     arg0 = arg0.tocNumber();
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArea3D){
+        arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg1 = arg1.tocNumber();
     if ( arg0 instanceof cError ) {
@@ -2123,8 +2145,14 @@ cMultOperator.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
     }
+    else if ( arg0 instanceof cArea3D){
+        arg0 = arg0.cross( arguments[1].first, arguments[3] );
+    }
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArea3D){
+        arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tocNumber(), arg1 = arg1.tocNumber();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "*", arguments[1].first );
@@ -2142,8 +2170,14 @@ cDivOperator.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
     }
+    else if ( arg0 instanceof cArea3D){
+        arg0 = arg0.cross( arguments[1].first, arguments[3] );
+    }
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArea3D){
+        arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tocNumber(), arg1 = arg1.tocNumber();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "/", arguments[1].first );
@@ -2160,9 +2194,15 @@ cConcatSTROperator.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
     }
+    else if ( arg0 instanceof cArea3D){
+        arg0 = arg0.cross( arguments[1].first, arguments[3] );
+    }
     arg0 = arg0.tocString();
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArea3D){
+        arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg1 = arg1.tocString();
 
@@ -2183,8 +2223,14 @@ cEqualsOperator.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
     }
+    else if ( arg0 instanceof cArea3D){
+        arg0 = arg0.cross( arguments[1].first, arguments[3] );
+    }
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArea3D){
+        arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "=", arguments[1].first );
@@ -2202,8 +2248,15 @@ cNotEqualsOperator.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-    if ( arg1 instanceof cArea ) {
+    else if ( arg0 instanceof cArea3D ){
+        arg0 = arg0.cross( arguments[1].first, arguments[3] );
+    }
+
+    if ( arg1.type == cElementType.cellsRange ) {
         arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArea3D ){
+        arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "<>", arguments[1].first );
@@ -2221,8 +2274,15 @@ cLessOperator.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
     }
+    else if ( arg0 instanceof cArea3D ){
+        arg0 = arg0.cross( arguments[1].first, arguments[3] );
+    }
+
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArea3D ){
+        arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "<", arguments[1].first );
@@ -2240,8 +2300,14 @@ cLessOrEqualOperator.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
     }
+    else if ( arg0 instanceof cArea3D ){
+        arg0 = arg0.cross( arguments[1].first, arguments[3] );
+    }
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArea3D ){
+        arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "<=", arguments[1].first );
@@ -2259,8 +2325,14 @@ cGreaterOperator.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
     }
+    else if ( arg0 instanceof cArea3D ){
+        arg0 = arg0.cross( arguments[1].first, arguments[3] );
+    }
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArea3D ){
+        arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, ">", arguments[1].first );
@@ -2278,8 +2350,14 @@ cGreaterOrEqualOperator.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
     }
+    else if ( arg0 instanceof cArea3D ){
+        arg0 = arg0.cross( arguments[1].first, arguments[3] );
+    }
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
+    }
+    else if ( arg1 instanceof cArea3D ){
+        arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, ">=", arguments[1].first );
@@ -3300,6 +3378,10 @@ _func[cElementType.cell][cElementType.cell] = function ( arg0, arg1, what, cellA
     }
 };
 
+_func[cElementType.cellsRange3D] = _func[cElementType.cellsRange];
+_func[cElementType.cell3D] = _func[cElementType.cell]
+
+
 /** класс отвечающий за парсинг строки с формулой, подсчета формулы, перестройки формулы при манипуляции с ячейкой*/
 /** @constructor */
 function parserFormula( formula, _cellId, _ws ) {
@@ -3764,13 +3846,15 @@ parserFormula.prototype = {
                     }
                     else if ( parserHelp.isRef.call( this, this.Formula, this.pCurrPos ) ) {
                         pos.end = this.pCurrPos;
-                        this.RefPos.push( pos );
                         if ( _wsTo != _wsFrom ) {
                             found_operand = new cArea3D( this.operand_str.toUpperCase(), _wsFrom, _wsTo, this.wb );
+                            pos.oper = found_operand;
                         }
                         else {
                             found_operand = new cRef3D( this.operand_str.toUpperCase(), _wsFrom, this.wb );
+                            pos.oper = found_operand;
                         }
+                        this.RefPos.push( pos );
                         if ( this.operand_str.indexOf( "$" ) > -1 ) {
                             checkAbsRef( this.operand_str, found_operand );
                         }
@@ -3783,8 +3867,8 @@ parserFormula.prototype = {
 
                 /* Referens to cells area A1:A10 */
                 else if ( parserHelp.isArea.call( this, this.Formula, this.pCurrPos ) ) {
-                    this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length} );
                     found_operand = new cArea( this.operand_str.toUpperCase(), this.ws );
+                    this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length, oper:found_operand } );
                     if ( this.operand_str.indexOf( "$" ) > -1 ) {
                         checkAbsArea( this.operand_str, found_operand );
                     }
@@ -3792,8 +3876,9 @@ parserFormula.prototype = {
                 }
                 /* Referens to cell A4 */
                 else if ( parserHelp.isRef.call( this, this.Formula, this.pCurrPos, true ) ) {
-                    this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length} );
+//                    this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length} );
                     found_operand = new cRef( this.operand_str.toUpperCase(), this.ws );
+                    this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length, oper:found_operand } );
                     if ( this.operand_str.indexOf( "$" ) > -1 ) {
                         checkAbsRef( this.operand_str, found_operand )
                     }
@@ -3803,7 +3888,8 @@ parserFormula.prototype = {
                 /* Referens to DefinedNames */
                 else if ( parserHelp.isName.call( this, this.Formula, this.pCurrPos, this.wb, this.ws )[0] ) { // Shall be placed strongly before Area and Ref
                     found_operand = new cName( this.operand_str, this.wb, this.ws );
-                    this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length, isName: true} );
+//                    this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length, isName: true} );
+                    this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length, isName: true, oper:found_operand } );
                     this.countRef++;
                 }
 
@@ -3950,7 +4036,7 @@ parserFormula.prototype = {
                     for ( var ind = 0; ind < currentElement.getArguments(); ind++ ) {
                         arg.unshift( elemArr.pop() );
                     }
-                    _tmp = currentElement.Calculate( arg, this.ws.getCell( this.cellAddress ), isDefName );
+                    _tmp = currentElement.Calculate( arg, this.ws.getCell( this.cellAddress ), isDefName, this.ws?this.ws.getId():undefined );
                     if ( _tmp.numFormat !== undefined && _tmp.numFormat !== null ) {
                         numFormat = _tmp.numFormat; //> numFormat ? _tmp.numFormat : numFormat;
                     }

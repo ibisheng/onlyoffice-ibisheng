@@ -182,11 +182,11 @@ cCHOOSE.prototype.Calculate = function ( arg ) {
     }
 
     if ( arg0 instanceof cNumber ) {
-        if ( arg0.getValue() < 1 || arg0.getValue() > this.getArguments() ) {
+        if ( arg0.getValue() < 1 || arg0.getValue() > this.getArguments() - 1 ) {
             return this.value = new cError( cErrorType.wrong_value_type );
         }
 
-        return this.value = arg[arg0.getValue()];
+        return this.value = arg[Math.floor(arg0.getValue())];
     }
 
     return this.value = new cError( cErrorType.wrong_value_type );
@@ -795,21 +795,37 @@ cLOOKUP.prototype.Calculate = function ( arg ) {
 
 
         if ( index < 0 ) return this.value = new cError( cErrorType.not_available );
+
+        var ws = arg1 instanceof cArea3D && arg1.isSingleSheet() ? arg1.getWS() : arg1.ws;
+
+        if( arg1 instanceof cArea3D ){
+            if( arg1.isSingleSheet() ){
+                ws = arg1.getWS();
+            }
+            else
+                return this.value = new cError( cErrorType.bad_reference );
+        }
+        else if( arg1 instanceof cArea ){
+            ws = arg1.getWS();
+        }
+        else
+            return this.value = new cError( cErrorType.bad_reference );
+
         if ( this.argumentsCurrent == 2 ) {
             var b = arg2.getBBox();
             if ( arg1Range[0].length >= 2 ) {
-                return this.value = new cRef( arg1.ws.getCell3( (b.r1 - 1) + index, (b.c2 - 1) + 0 ).getName(), arg1.ws );
+                return this.value = new cRef( ws.getCell3( (b.r1 - 1) + index, (b.c2 - 1) + 0 ).getName(), ws );
             }
             else
-                return this.value = new cRef( arg1.ws.getCell3( (b.r1 - 1) + 0, (b.c1 - 1) + index ).getName(), arg1.ws );
+                return this.value = new cRef( ws.getCell3( (b.r1 - 1) + 0, (b.c1 - 1) + index ).getName(), ws );
         }
         else {
             var b = arg2.getBBox();
             if ( arg2Range.length == 1 ) {
-                return this.value = new cRef( arg1.ws.getCell3( (b.r1 - 1) + 0, (b.c1 - 1) + index ).getName(), arg1.ws );
+                return this.value = new cRef( ws.getCell3( (b.r1 - 1) + 0, (b.c1 - 1) + index ).getName(), ws );
             }
             else
-                return this.value = new cRef( arg1.ws.getCell3( (b.r1 - 1) + index, (b.c1 - 1) + 0 ).getName(), arg1.ws );
+                return this.value = new cRef( ws.getCell3( (b.r1 - 1) + index, (b.c1 - 1) + 0 ).getName(), ws );
         }
     }
 };
