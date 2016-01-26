@@ -508,22 +508,26 @@ cINDEX.prototype.Calculate = function ( arg ) {
             res = arg0.getValue2( arg1 == 0 ? 0 : arg1 - 1, arg2 == 0 ? 0 : arg2 - 1 );
         }
     }
-    else if( arg0 instanceof cArea ){
-        var _a_ = arg0.getRefMatrix();
-        if ( _a_.length == 1 ) {/*одна строка*/
-            res = _a_[0][arg1 - 1];
+    else if ( arg0 instanceof cArea ) {
+        var ws = arg0.getWS(),
+            bbox = arg0.getBBox0();
+
+        if ( bbox.r1 == bbox.r2 ) {/*одна строка*/
+            res = ws.getRange3( bbox.r1, bbox.c1 + arg1 - 1, bbox.r1, bbox.c1 + arg1 - 1 ).getCells()[0].getName();
+            res = new cRef( res, ws );
         }
         else {
             if ( arg1 == 0 && arg2 > 0 ) {
-                var _a1 = _a_[0][arg2 - 1], _a2 = _a_[_a_.length - 1][arg2 - 1];
-                res = new cArea( _a1.toString() + ":" + _a2.toString(), _a1.ws );
+                var _a1 = ws.getRange3( bbox.r1, bbox.c1 + arg2 - 1, bbox.r1, bbox.c2 + arg2 - 1 ).getCells()[0].getName(),
+                    _a2 = ws.getRange3( bbox.r2, bbox.c1 + arg2 - 1, bbox.r2, bbox.c2 + arg2 - 1 ).getCells()[0].getName();
+                res = new cArea( _a1.toString() + ":" + _a2.toString(), ws );
             }
-            else{
-                if( arg1 > _a_.length || arg2 > _a_[0].length ){
+            else {
+                if ( arg1 > Math.abs( bbox.r1 - bbox.r2 ) + 1 || arg2 > Math.abs( bbox.c1 - bbox.c2 ) + 1 ) {
                     res = new cError( cErrorType.bad_reference );
                 }
                 else
-                    res = _a_[arg1 - 1][arg2 - 1];
+                    res = new cRef( ws.getRange3( bbox.r1 + arg1 - 1, bbox.c1 + arg2 - 1, bbox.r1 + arg1 - 1, bbox.c1 + arg2 - 1 ).getCells()[0].getName(), ws );
             }
         }
     }
