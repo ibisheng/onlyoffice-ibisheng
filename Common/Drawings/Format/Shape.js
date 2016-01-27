@@ -1971,12 +1971,18 @@ CShape.prototype =
             }
             global_MatrixTransformer.TranslateAppend(oMatrix, _transformed_text_xc - _content_width * 0.5, _transformed_text_yc - content_height2 * 0.5);
 
-            oClipRect = {
-                x: -1,
-                y: - 1,
-                w: Math.max(this.extX, this.extY) + 2,
-                h: this.contentHeight + (b_ins + t_ins) + 2
-            };
+            var Diff = 1.6;
+            var clipW = oRect.r - oRect.l + Diff - l_ins - r_ins;
+            if(clipW <= 0)
+            {
+                clipW = 0.01;
+            }
+            var clipH = oRect.b - oRect.t + Diff - b_ins - t_ins;
+            if(clipH < 0)
+            {
+                clipH = 0.01;
+            }
+            oClipRect = {x: oRect.l + l_ins - Diff, y: oRect.t - Diff + t_ins, w: clipW, h: clipH};
         }
         return oClipRect;
     },
@@ -3843,8 +3849,26 @@ CShape.prototype =
                 {
                     graphics.SaveGrState();
                     graphics.SetIntegerGrid(false);
-                    graphics.transform3(this.transformText, true);
+                    var oTransform = new CMatrix();
+                    var cX = this.transform.TransformPointX(this.extX/2, this.extY/2);
+                    var cY = this.transform.TransformPointY(this.extX/2, this.extY/2);
+
+                    if(checkNormalRotate(this.rot))
+                    {
+                        oTransform.tx = cX - this.extX/2;
+                        oTransform.ty = cY - this.extY/2;
+                    }
+                    else
+                    {
+                        global_MatrixTransformer.TranslateAppend(oTransform, - this.extX/2, -this.extY/2);
+                        global_MatrixTransformer.RotateRadAppend(oTransform, Math.PI/2);
+                        global_MatrixTransformer.TranslateAppend(oTransform, cX, cY);
+                    }
+                    graphics.transform3(oTransform, true);
                     graphics.AddClipRect(clip_rect.x, clip_rect.y, clip_rect.w, clip_rect.h);
+
+                    graphics.SetIntegerGrid(false);
+                    graphics.transform3(this.transformText, true);
                 }
                 var result_page_index = isRealNumber(graphics.shapePageIndex) ? graphics.shapePageIndex : old_start_page;
 
@@ -5246,6 +5270,7 @@ CShape.prototype =
     checkTextWarp: function(oContent, oBodyPr, dWidth, dHeight, bNeedNoTransform, bNeedWarp)
     {
         var oRet = {oTxWarpStruct: null, oTxWarpStructParamarks: null, oTxWarpStructNoTransform: null, oTxWarpStructParamarksNoTransform: null};
+        //return oRet;
         var bTransform = this.chekBodyPrTransform(oBodyPr) && bNeedWarp;
 		var warpGeometry = oBodyPr.prstTxWarp;
 		warpGeometry && warpGeometry.Recalculate(dWidth, dHeight);

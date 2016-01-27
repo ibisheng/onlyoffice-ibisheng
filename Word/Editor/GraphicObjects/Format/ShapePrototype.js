@@ -167,7 +167,7 @@ CShape.prototype.handleUpdateExtents = function()
 CShape.prototype.handleUpdateRot = function()
 {
     this.recalcTransform();
-    if(this.txBody && this.txBody.bodyPr && this.txBody.bodyPr.upright)
+    if(this.bodyPr && this.bodyPr.upright)
     {
         this.recalcContent();
     }

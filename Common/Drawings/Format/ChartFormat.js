@@ -597,11 +597,10 @@ CDLbl.prototype =
             }
             global_MatrixTransformer.TranslateAppend(_text_transform, _transformed_text_xc - _content_width * 0.5, _transformed_text_yc - content_height2 * 0.5);
 
-            var body_pr = this.bodyPr;
-            var l_ins = typeof body_pr.lIns === "number" ? body_pr.lIns : 2.54;
-            var t_ins = typeof body_pr.tIns === "number" ? body_pr.tIns : 1.27;
-            var r_ins = typeof body_pr.rIns === "number" ? body_pr.rIns : 2.54;
-            var b_ins = typeof body_pr.bIns === "number" ? body_pr.bIns : 1.27;
+            var l_ins = typeof _body_pr.lIns === "number" ? _body_pr.lIns : 2.54;
+            var t_ins = typeof _body_pr.tIns === "number" ? _body_pr.tIns : 1.27;
+            var r_ins = typeof _body_pr.rIns === "number" ? _body_pr.rIns : 2.54;
+            var b_ins = typeof _body_pr.bIns === "number" ? _body_pr.bIns : 1.27;
             this.clipRect = {
                 x: -l_ins,
                 y: -_vertical_shift - t_ins,
