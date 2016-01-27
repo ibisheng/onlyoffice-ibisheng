@@ -1708,15 +1708,26 @@ CGraphics.prototype =
         _ctx.fillStyle = "#E1E1E1";
         _ctx.strokeStyle = GlobalSkin.RulerOutline;
 
+        var _xPxOffset = 10;
+        var _yPxOffset = 5;
+        if (AscBrowser.isRetina)
+        {
+            _xPxOffset <<= 1;
+            _yPxOffset <<= 1;
+        }
+
         var __x = this.m_oFullTransform.TransformPointX(x, y) >> 0;
         var __y = this.m_oFullTransform.TransformPointY(x, y) >> 0;
-        var __w = (measure.fWidth >> 0) + 20;
-        var __h = (measure.fHeight >> 0) + 10;
+        var __w = (measure.fWidth >> 0) + 2 * _xPxOffset;
+        var __h = (Math.abs(measure.fY) >> 0) + 2 * _yPxOffset;
 
         if (!bIsHeader)
             __y -= __h;
 
-        _ctx.rect(__x + 0.5, __y + 0.5, __w, __h);
+        if (!AscBrowser.isRetina)
+            _ctx.rect(__x + 0.5, __y + 0.5, __w, __h);
+        else
+            _ctx.rect(__x, __y, __w, __h);
 
         _ctx.fill();
         _ctx.stroke();
@@ -1727,9 +1738,9 @@ CGraphics.prototype =
         var _koef_px_to_mm = 25.4 / this.m_dDpiY;
 
         if (bIsHeader)
-            this.t(text, x + 10 * _koef_px_to_mm, y + (__h - 5) * _koef_px_to_mm);
+            this.t(text, x + _xPxOffset * _koef_px_to_mm, y + (__h - _yPxOffset) * _koef_px_to_mm);
         else
-            this.t(text, x + 10 * _koef_px_to_mm, y - 5 * _koef_px_to_mm);
+            this.t(text, x + _xPxOffset * _koef_px_to_mm, y - _yPxOffset * _koef_px_to_mm);
     },
 
     DrawStringASCII2 : function(name, size, bold, italic, text, x, y, bIsHeader)
@@ -1755,16 +1766,27 @@ CGraphics.prototype =
         _ctx.fillStyle = "#E1E1E1";
         _ctx.strokeStyle = GlobalSkin.RulerOutline;
 
+        var _xPxOffset = 10;
+        var _yPxOffset = 5;
+        if (AscBrowser.isRetina)
+        {
+            _xPxOffset <<= 1;
+            _yPxOffset <<= 1;
+        }
+
         var __x = this.m_oFullTransform.TransformPointX(this.m_dWidthMM - x, y) >> 0;
         var __y = this.m_oFullTransform.TransformPointY(this.m_dWidthMM - x, y) >> 0;
-        var __w = (measure.fWidth >> 0) + 20;
-        var __h = (measure.fHeight >> 0) + 10;
+        var __w = (measure.fWidth >> 0) + 2 * _xPxOffset;
+        var __h = (Math.abs(measure.fY) >> 0) + 2 * _yPxOffset;
         __x -= __w;
 
         if (!bIsHeader)
             __y -= __h;
 
-        _ctx.rect(__x + 0.5, __y + 0.5, __w, __h);
+        if (!AscBrowser.isRetina)
+            _ctx.rect(__x + 0.5, __y + 0.5, __w, __h);
+        else
+            _ctx.rect(__x, __y, __w, __h);
 
         _ctx.fill();
         _ctx.stroke();
@@ -1774,12 +1796,12 @@ CGraphics.prototype =
 
         var _koef_px_to_mm = 25.4 / this.m_dDpiY;
 
-        var xPos = this.m_dWidthMM - x - (__w - 10) * _koef_px_to_mm;
+        var xPos = this.m_dWidthMM - x - (__w - _xPxOffset) * _koef_px_to_mm;
 
         if (bIsHeader)
-            this.t(text, xPos, y + (__h - 5) * _koef_px_to_mm);
+            this.t(text, xPos, y + (__h - _yPxOffset) * _koef_px_to_mm);
         else
-            this.t(text, xPos, y - 5 * _koef_px_to_mm);
+            this.t(text, xPos, y - _yPxOffset * _koef_px_to_mm);
     },
 
     DrawHeaderEdit : function(yPos, lock_type, sectionNum, bIsRepeat, type)
@@ -1792,6 +1814,14 @@ CGraphics.prototype =
         var _w1 = 6;
         var _w2 = 3;
 
+        var _lineWidth = 1;
+        if (AscBrowser.isRetina)
+        {
+            _y >>= 0;
+            _lineWidth = 2;
+        }
+
+
         var ctx = this.m_oContext;
 
         switch (lock_type)
@@ -1803,14 +1833,14 @@ CGraphics.prototype =
                 //ctx.lineWidth = 2;
                 // GlobalSkin.RulerOutline
                 this.p_color(0xBB, 0xBE, 0xC2, 255);
-                ctx.lineWidth = 1;
+                ctx.lineWidth = _lineWidth;
                 break;
             }
             case locktype_Other:
             case locktype_Other2:
             {
                 this.p_color(238, 53, 37, 255);
-                ctx.lineWidth = 1;
+                ctx.lineWidth = _lineWidth;
                 _w1 = 2;
                 _w2 = 1;
                 break;
@@ -1818,10 +1848,16 @@ CGraphics.prototype =
             default:
             {
                 this.p_color(155, 187, 277, 255);
-                ctx.lineWidth = 2;
+                ctx.lineWidth = _lineWidth;
                 _w1 = 2;
                 _w2 = 1;
             }
+        }
+
+        if (AscBrowser.isRetina)
+        {
+            _w1 <<= 1;
+            _w2 <<= 1;
         }
 
         var bIsNoIntGrid = this.m_bIntegerGrid;
@@ -1858,10 +1894,10 @@ CGraphics.prototype =
             }
         }
 
-        this.DrawStringASCII("Courier New", 9, false, false, _header_text, 2, yPos, true);
+        this.DrawStringASCII("Courier New", AscBrowser.isRetina ? 18 : 9, false, false, _header_text, 2, yPos, true);
 
         if (bIsRepeat)
-            this.DrawStringASCII2("Courier New", 9, false, false, "Same as Previous", 2, yPos, true);
+            this.DrawStringASCII2("Courier New", AscBrowser.isRetina ? 18 : 9, false, false, "Same as Previous", 2, yPos, true);
 
         if (false == bIsNoIntGrid)
             this.SetIntegerGrid(false);
@@ -1875,6 +1911,13 @@ CGraphics.prototype =
         var _w1 = 6;
         var _w2 = 3;
 
+        var _lineWidth = 1;
+        if (AscBrowser.isRetina)
+        {
+            _y >>= 0;
+            _lineWidth = 2;
+        }
+
         var ctx = this.m_oContext;
 
         switch (lock_type)
@@ -1886,14 +1929,14 @@ CGraphics.prototype =
                 //ctx.lineWidth = 2;
                 // GlobalSkin.RulerOutline
                 this.p_color(0xBB, 0xBE, 0xC2, 255);
-                ctx.lineWidth = 1;
+                ctx.lineWidth = _lineWidth;
                 break;
             }
             case locktype_Other:
             case locktype_Other2:
             {
                 this.p_color(238, 53, 37, 255);
-                ctx.lineWidth = 1;
+                ctx.lineWidth = _lineWidth;
                 _w1 = 2;
                 _w2 = 1;
                 break;
@@ -1901,10 +1944,16 @@ CGraphics.prototype =
             default:
             {
                 this.p_color(155, 187, 277, 255);
-                ctx.lineWidth = 2;
+                ctx.lineWidth = _lineWidth;
                 _w1 = 2;
                 _w2 = 1;
             }
+        }
+
+        if (AscBrowser.isRetina)
+        {
+            _w1 <<= 1;
+            _w2 <<= 1;
         }
 
         var _wmax = this.m_lWidthPix;
@@ -1943,10 +1992,10 @@ CGraphics.prototype =
             }
         }
 
-        this.DrawStringASCII("Courier New", 9, false, false, _header_text, 2, yPos, false);
+        this.DrawStringASCII("Courier New", AscBrowser.isRetina ? 18 : 9, false, false, _header_text, 2, yPos, false);
 
         if (bIsRepeat)
-            this.DrawStringASCII2("Courier New", 9, false, false, "Same as Previous", 2, yPos, false);
+            this.DrawStringASCII2("Courier New", AscBrowser.isRetina ? 18 : 9, false, false, "Same as Previous", 2, yPos, false);
 
         if (false == bIsNoIntGrid)
             this.SetIntegerGrid(false);
