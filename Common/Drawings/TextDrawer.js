@@ -1738,14 +1738,6 @@ CTextDrawer.prototype =
                 }
                 if(oUnifill)
                 {
-                    if(!oUnifill.fill.color.Mods)
-                    {
-                        oUnifill.fill.color.Mods = new CColorModifiers();
-                    }
-                    var mod = new CColorMod();
-                    mod.name = "lumMod";
-                    mod.val = 70000;
-                    oUnifill.fill.color.Mods.addMod(mod);
                     oCopyTextPr.TextOutline.Fill = oUnifill;
                 }
                 this.SetTextPr(oCopyTextPr, this.m_oTheme);
@@ -1855,14 +1847,6 @@ CTextDrawer.prototype =
                 }
                 if(oUnifill)
                 {
-                    if(!oUnifill.fill.color.Mods)
-                    {
-                        oUnifill.fill.color.Mods = new CColorModifiers();
-                    }
-                    var mod = new CColorMod();
-                    mod.name = "lumMod";
-                    mod.val = 70000;
-                    oUnifill.fill.color.Mods.addMod(mod);
                     oCopyTextPr.TextOutline.Fill = oUnifill;
                 }
                 this.SetTextPr(oCopyTextPr, this.m_oTheme);
