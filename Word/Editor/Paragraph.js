@@ -7781,6 +7781,8 @@ Paragraph.prototype =
 
             if ( -1 != Lvl && undefined != Pr.ParaPr.NumPr )
                 Pr.ParaPr.NumPr.Lvl = Lvl;
+            else
+                Pr.ParaPr.NumPr = undefined;
 
             // Настройки рамки не наследуются
             if ( undefined === this.Pr.FramePr )

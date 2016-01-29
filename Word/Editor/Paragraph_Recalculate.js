@@ -682,7 +682,11 @@ Paragraph.prototype.private_RecalculatePageXY          = function(CurLine, CurPa
 
 Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPage, PRS, ParaPr)
 {
-    if ( this.Parent instanceof CDocument )
+    // Для пустых параграфов с разрывом секции не делаем переноса страницы
+    if (undefined !== this.Get_SectionPr() && true === this.IsEmpty())
+        return true;
+
+    if (this.Parent instanceof CDocument)
     {
         // Начинаем параграф с новой страницы
         var PageRelative = this.private_GetRelativePageIndex(CurPage) - this.Get_StartPage_Relative();

@@ -1523,6 +1523,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
     var FirstRow = 0;
     var LastRow  = 0;
 
+    var ResetStartElement = false;
     if ( 0 === CurPage )
     {
         // Обнуляем таблицу суммарных высот ячеек
@@ -1535,9 +1536,20 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
     else
     {
         if (true === this.Is_EmptyPage(CurPage - 1))
+        {
+            ResetStartElement = false;
             FirstRow = this.Pages[CurPage - 1].FirstRow;
-        else
+        }
+        else if (true === this.Pages[CurPage - 1].LastRowSplit)
+        {
+            ResetStartElement = false;
             FirstRow = this.Pages[CurPage - 1].LastRow;
+        }
+        else
+        {
+            ResetStartElement = true;
+            FirstRow = Math.min(this.Pages[CurPage - 1].LastRow + 1, this.Content.length - 1);
+        }
 
         LastRow = FirstRow;
     }
@@ -1894,7 +1906,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
     var bNextPage = false;
     for (var CurRow = FirstRow; CurRow < this.Content.length; ++CurRow)
     {
-        if ((0 === CurRow && true === this.Check_EmptyPages(CurPage - 1)) || CurRow != FirstRow)
+        if ((0 === CurRow && true === this.Check_EmptyPages(CurPage - 1)) || CurRow != FirstRow || (CurRow === FirstRow && true === ResetStartElement))
         {
             this.RowsInfo[CurRow] = {};
             this.RowsInfo[CurRow].Pages        = 1;
@@ -2048,7 +2060,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             var ShiftDy   = 0;
             var ShiftDx   = 0;
 
-            if ((0 === Cell.Row.Index && true === this.Check_EmptyPages(CurPage - 1)) || Cell.Row.Index > FirstRow)
+            if ((0 === Cell.Row.Index && true === this.Check_EmptyPages(CurPage - 1)) || Cell.Row.Index > FirstRow || (Cell.Row.Index === FirstRow && true === ResetStartElement))
             {
                 Cell.Content.Set_StartPage( CurPage );
 
@@ -2546,6 +2558,8 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         var LastRow = this.Pages[CurPage].LastRow;
         if (false === this.RowsInfo[LastRow].FirstPage)
             this.Pages[CurPage].LastRow = LastRow - 1;
+        else
+            this.Pages[CurPage].LastRowSplit = true;
     }
 
     this.TurnOffRecalc = false;
@@ -2647,6 +2661,7 @@ function CTablePage(X, Y, XLimit, YLimit, FirstRow, MaxTopBorder)
     this.FirstRow     = FirstRow;
     this.LastRow      = FirstRow;
     this.Height       = 0;
+    this.LastRowSplit = false;
 }
 CTablePage.prototype.Shift = function(Dx, Dy)
 {
