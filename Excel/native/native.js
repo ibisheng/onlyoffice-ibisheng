@@ -4308,7 +4308,8 @@ function offline_of() {_s.openFile();}
 function offline_stz(v) {_s.zoom = v; _api.asc_setZoom(v);}
 function offline_ds(x, y, width, height, ratio) {_s.drawSheet(x, y, width, height, ratio);}
 function offline_dh(x, y, width, height, type, ratio) {_s.drawHeader(x, y, width, height, type, ratio);}
-function offline_mouse_down(x, y, pin, isViewer, isFormulaEditMode) {
+
+function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeResize, chartRange) {
     _s.isShapeAction = false;
 
     var ws = _api.wb.getWorksheet();
@@ -4325,6 +4326,9 @@ function offline_mouse_down(x, y, pin, isViewer, isFormulaEditMode) {
     var graphicsInfo = wb._onGetGraphicsInfo(x, y);
     if (graphicsInfo) {
         var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
+
+        ws.arrActiveChartsRanges = [];
+
         wb._onGraphicObjectMouseDown(e, x, y);
         wb._onUpdateSelectionShape(true);
 
@@ -4344,26 +4348,45 @@ function offline_mouse_down(x, y, pin, isViewer, isFormulaEditMode) {
     _s.cellPin = pin;
     _s.isFormulaEditMode = isFormulaEditMode;
 
-    if (0 != _s.cellPin) {
-        ws.leftTopRange = ws.activeRange.clone();
-    } else {
+    if (isRangeResize) {
 
-        var ret = false;
-        if (isFormulaEditMode) {
-            ret = wb.cellEditor.canEnterCellRange();
-            ret ? wb.cellEditor.activateCellRange() : true;
-        }
+        var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
 
-        if (isFormulaEditMode && !ret) {
-            _s.isFormulaEditMode = false;
-            return {'action':'closeCellEditor'};
-        }
+        var rangeChange = new asc.Range(chartRange[0], chartRange[1], chartRange[2], chartRange[3]);
+        var target = {
+            formulaRange: rangeChange,
+            row: ct.row,
+            target: ct.target,
+            targetArr: -1,
+            col: ct.col,
+            cursor: "se-resize",
+            indexFormulaRange: 0
+        };
+        ws.changeSelectionMoveResizeRangeHandle(x, y, target);
 
-        ws.changeSelectionStartPoint(x, y, true, true);
+   } else {
 
-        if (isFormulaEditMode) {
-            if (ret) {
-                ws.enterCellRange(wb.cellEditor);
+        if (0 != _s.cellPin) {
+            ws.leftTopRange = ws.activeRange.clone();
+        } else {
+
+            var ret = false;
+            if (isFormulaEditMode) {
+                ret = wb.cellEditor.canEnterCellRange();
+                ret ? wb.cellEditor.activateCellRange() : true;
+            }
+
+            if (isFormulaEditMode && !ret) {
+                _s.isFormulaEditMode = false;
+                return {'action':'closeCellEditor'};
+            }
+
+            ws.changeSelectionStartPoint(x, y, true, true);
+
+            if (isFormulaEditMode) {
+                if (ret) {
+                    ws.enterCellRange(wb.cellEditor);
+                }
             }
         }
     }
@@ -4372,7 +4395,7 @@ function offline_mouse_down(x, y, pin, isViewer, isFormulaEditMode) {
 
     return null;
 }
-function offline_mouse_move(x, y, isViewer) {
+function offline_mouse_move(x, y, isViewerMode, isRangeResize, chartRange) {
     var ws = _api.wb.getWorksheet();
     var wb = _api.wb;
 
@@ -4381,33 +4404,50 @@ function offline_mouse_move(x, y, isViewer) {
     range.r1 = _s.row0;
     ws.visibleRange = range;
 
-    if (_s.isShapeAction) {
-        if (!isViewer) {
-            var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
-            ws.objectRender.graphicObjectMouseMove(e, x, y);
-        }
+    if (isRangeResize) {
+        var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
+
+        var rangeChange = new asc.Range(chartRange[0], chartRange[1], chartRange[2], chartRange[3]);
+        var target = {
+            formulaRange: rangeChange,
+            row: ct.row,
+            target: ct.target,
+            targetArr: -1,
+            col: ct.col,
+            cursor: "se-resize",
+            indexFormulaRange: 0
+        };
+        ws.changeSelectionMoveResizeRangeHandle(x, y, target);
     } else {
-        if (_s.isFormulaEditMode) {
 
-            var ret = false;
-            ret = wb.cellEditor.canEnterCellRange();
-            ret ? wb.cellEditor.activateCellRange() : true;
-
-            if (!ret) {
-                _s.isFormulaEditMode = false;
-                ws.visibleRange = range;
-                return {'action':'closeCellEditor'};
+        if (_s.isShapeAction) {
+            if (!isViewerMode) {
+                var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
+                ws.objectRender.graphicObjectMouseMove(e, x, y);
             }
-
-            ws.changeSelectionEndPoint(x, y, true, true);
-            ws.enterCellRange(wb.cellEditor);
         } else {
-            if (-1 == _s.cellPin)
-                ws._changeSelectionTopLeft(x, y, true, true, true);
-            else if (1 === _s.cellPin)
-                ws._changeSelectionTopLeft(x, y, true, true, false);
-            else {
+            if (_s.isFormulaEditMode) {
+
+                var ret = false;
+                ret = wb.cellEditor.canEnterCellRange();
+                ret ? wb.cellEditor.activateCellRange() : true;
+
+                if (!ret) {
+                    _s.isFormulaEditMode = false;
+                    ws.visibleRange = range;
+                    return {'action':'closeCellEditor'};
+                }
+
                 ws.changeSelectionEndPoint(x, y, true, true);
+                ws.enterCellRange(wb.cellEditor);
+            } else {
+                if (-1 == _s.cellPin)
+                    ws._changeSelectionTopLeft(x, y, true, true, true);
+                else if (1 === _s.cellPin)
+                    ws._changeSelectionTopLeft(x, y, true, true, false);
+                else {
+                    ws.changeSelectionEndPoint(x, y, true, true);
+                }
             }
         }
     }
@@ -4416,7 +4456,8 @@ function offline_mouse_move(x, y, isViewer) {
 
     return null;
 }
-function offline_mouse_up(x, y, isViewer) {
+function offline_mouse_up(x, y, isViewerMode, isRangeResize, chartRange) {
+    var ret = null;
     var ws = _api.wb.getWorksheet();
     var wb = _api.wb;
 
@@ -4430,14 +4471,43 @@ function offline_mouse_up(x, y, isViewer) {
         wb._onGraphicObjectMouseUp(e, x, y);
         wb._onChangeSelectionDone(x, y);
         _s.isShapeAction = false;
+
+        ret = {'isShapeAction': true};
+
     } else {
-        wb._onChangeSelectionDone(-1, -1);
-        _s.cellPin = 0;
-        wb.getWorksheet().leftTopRange = undefined;
+
+        if (isRangeResize) {
+
+            var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
+
+            var target = {
+                target: 5,
+                targetArr: -1,
+                cursor: "se-resize",
+                indexFormulaRange: 0
+            };
+
+            if (ws.moveRangeDrawingObjectTo) {
+                ws.moveRangeDrawingObjectTo.c1 = Math.max(0, ws.moveRangeDrawingObjectTo.c1);
+                ws.moveRangeDrawingObjectTo.c2 = Math.max(0, ws.moveRangeDrawingObjectTo.c2);
+                ws.moveRangeDrawingObjectTo.r1 = Math.max(0, ws.moveRangeDrawingObjectTo.r1);
+                ws.moveRangeDrawingObjectTo.r2 = Math.max(0, ws.moveRangeDrawingObjectTo.r2);
+            }
+
+            ws.applyMoveResizeRangeHandle(target);
+        } else {
+
+            wb._onChangeSelectionDone(-1, -1);
+            _s.cellPin = 0;
+            wb.getWorksheet().leftTopRange = undefined;
+        }
     }
 
     ws.visibleRange = range;
+
+    return ret;
 }
+
 function offline_get_selection(x, y, width, height, autocorrection) {
     return _s.getSelection(x, y, width, height, autocorrection);
 }
@@ -4467,6 +4537,7 @@ function offline_keyboard_down(keys) {
             wb._onChangeSelection(true, 0, 1, false, false, undefined);
     }
 }
+
 function offline_cell_editor_draw(width, height, ratio) {
     _null_object.width = width * ratio;
     _null_object.height = height * ratio;
@@ -4598,7 +4669,9 @@ function offline_cell_editor_mouse_event(events) {
             cellEditor._onMouseUp(event);
             _s.textSelection = 0;
         } else if (2 == events[i][0]) {
+
             cellEditor._onMouseMove(event);
+
         } else if (3 == events[i][0]) {
             cellEditor.clickCounter.clickCount = 2;
             cellEditor._onMouseDown(event);
@@ -4645,6 +4718,7 @@ function offline_cell_editor_select_range(from, to) {
     cellEditor.selectionBegin = from;
     cellEditor.selectionEnd = to;
 }
+
 function offline_get_cell_in_coord (x, y) {
     var worksheet = _api.wb.getWorksheet(),
         activeCell = worksheet.getActiveCell(x, y, true);

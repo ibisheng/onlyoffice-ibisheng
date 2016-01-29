@@ -754,22 +754,22 @@ WorksheetView.prototype.__drawFormulaRanges = function (arrRanges, offsetX, offs
             if (addl > 0)
                 left = this.cols[colsCount - 1].left + this.defaultColWidth * addl - offsetX;
             else
-                left = this.cols[arrRanges[i].c1].left - offsetX;
+                left = this.cols[Math.max(0,arrRanges[i].c1)].left - offsetX;
 
             if (addt > 0)
                 top = this.rows[rowsCount - 1].top + addt * gc_dDefaultRowHeightAttribute - offsetY;
             else
-                top = this.rows[arrRanges[i].r1].top - offsetY;
+                top = this.rows[Math.max(0,arrRanges[i].r1)].top - offsetY;
 
             if (addr > 0)
                 right = this.cols[colsCount - 1].left + this.defaultColWidth * addr - offsetX;
             else
-                right = this.cols[arrRanges[i].c2].left + this.cols[arrRanges[i].c2].width - offsetX;
+                right = this.cols[Math.max(0,arrRanges[i].c2)].left + this.cols[Math.max(0,arrRanges[i].c2)].width - offsetX;
 
             if (addb > 0)
                 bottom = this.rows[rowsCount - 1].top + addb * gc_dDefaultRowHeightAttribute - offsetY;
             else
-                bottom = this.rows[arrRanges[i].r2].top + this.rows[arrRanges[i].r2].height - offsetY;
+                bottom = this.rows[Math.max(0,arrRanges[i].r2)].top + this.rows[Math.max(0,arrRanges[i].r2)].height - offsetY;
         }
 
        // else if (5 === type) { // range image
