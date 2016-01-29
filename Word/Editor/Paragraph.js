@@ -6232,7 +6232,7 @@ Paragraph.prototype =
                     }
                 }
 
-                this.DrawingDocument.AddPageSelection( Page_abs, SelectX, SelectY, SelectW, SelectH );
+                this.DrawingDocument.AddPageSelection(PageAbs, SelectX, SelectY, SelectW, SelectH);
 
                 break;
             }

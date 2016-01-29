@@ -2458,13 +2458,23 @@ ParaMath.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine,
 
     var CurX = SearchPos.CurX;
 
-    if(SearchPos.X > SearchPos.CurX) // еобходимая проверка, если случайно пришла ф-ия поиска позиции, без этой проверки будет некорректно выполнен поиск (если внутри формулы есть мат объекты => позиции поиска перетрутся в CMathBase)
+
+    if(SearchPos.X > SearchPos.CurX || SearchPos.DiffX > 1000000 - 1) // Необходимая проверка, если случайно пришла ф-ия поиска позиции, без этой проверки будет некорректно выполнен поиск (если внутри формулы есть мат объекты => позиции поиска перетрутся в CMathBase)
     {
         Result = this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
 
         if(SearchPos.InText)
             SearchPos.DiffX  = 0.001; // чтобы всегда встать в формулу, если попали в текст
     }
+
+    // Такое возможно, если все элементы до этого (в том числе и этот) были пустыми, тогда, чтобы не возвращать
+    // неправильную позицию вернем позицию начала данного элемента.
+    if (SearchPos.DiffX > 1000000 - 1)
+    {
+        this.Get_StartPos(SearchPos.Pos, Depth);
+        Result = true;
+    }
+
 
     SearchPos.CurX = CurX + this.Root.Get_Width(_CurLine, _CurRange);
 
