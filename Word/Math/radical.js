@@ -600,6 +600,25 @@ CRadical.prototype.setPosition = function(pos, PosInfo)
 
     pos.x += this.size.width;
 };
+CRadical.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+{
+    var bResult;
+
+    if(this.Pr.type == DEGREE_RADICAL)
+    {
+        bResult = CRadical.superclass.Get_ParaContentPosByXY.call(this, SearchPos, Depth, _CurLine, _CurRange, StepEnd);
+    }
+    else
+    {
+        if(true === this.Content[1].Get_ParaContentPosByXY(SearchPos, Depth + 1, _CurLine, _CurRange, StepEnd))
+        {
+            SearchPos.Pos.Update2(1, Depth);
+            bResult = true;
+        }
+    }
+
+    return bResult;
+};
 CRadical.prototype.Draw_LinesForContent = function(PDSL)
 {
     if(this.Pr.type == SQUARE_RADICAL)
