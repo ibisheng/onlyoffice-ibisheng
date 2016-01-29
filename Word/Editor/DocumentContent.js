@@ -81,11 +81,7 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
         Data     : null
     };
 
-    this.ClipInfo =
-    {
-        X0 : null,
-        X1 : null
-    };
+    this.ClipInfo = [];
 
     this.ApplyToAll = false; // Специальный параметр, используемый в ячейках таблицы.
                              // True, если ячейка попадает в выделение по ячейкам.
@@ -195,6 +191,11 @@ CDocumentContent.prototype =
     Get_PageContentStartPos : function (PageNum)
     {
         return this.Parent.Get_PageContentStartPos(PageNum);
+    },
+
+    Get_PageContentStartPos2 : function(StartPageIndex, StartColumnIndex, ElementPageIndex, ElementIndex)
+    {
+        return this.Get_PageContentStartPos(StartPageIndex + ElementPageIndex);
     },
 
     Get_Theme : function()
@@ -464,31 +465,44 @@ CDocumentContent.prototype =
     },
 
     // Получем ближающую возможную позицию курсора
-    Get_NearestPos : function(Page_Abs, X, Y, bAnchor, Drawing)
+    Get_NearestPos : function(CurPage, X, Y, bAnchor, Drawing)
     {
-        var Page_Rel = this.Get_Page_Relative( Page_Abs );
+        // TODO: Возможно лучше вернуть null, и разобраться с ситуациями, когда Get_NearestPos возвращает null
+        if (CurPage < 0)
+        {
+            Y = 0;
+            CurPage = 0;
+        }
+        else if (CurPage >= this.Pages.length)
+        {
+            CurPage = this.Pages.length - 1;
+            Y = 10000;
+        }
+
+        var PageAbs = this.Get_AbsolutePage(CurPage);
 
         if (this.Parent && this.Parent instanceof CHeaderFooter)
         {
-            var bInText = (null === this.Is_InText(X, Y, Page_Rel) ? false : true);
-            var nInDrawing = this.LogicDocument.DrawingObjects.isPointInDrawingObjects(X, Y, Page_Abs, this);
+            var bInText = (null === this.Is_InText(X, Y, CurPage) ? false : true);
+            var nInDrawing = this.LogicDocument.DrawingObjects.isPointInDrawingObjects(X, Y, PageAbs, this);
 
             if (true != bAnchor)
             {
                 // Проверяем попадание в графические объекты
-                var NearestPos = this.LogicDocument.DrawingObjects.getNearestPos(X, Y, Page_Abs, Drawing);
+                var NearestPos = this.LogicDocument.DrawingObjects.getNearestPos(X, Y, PageAbs, Drawing);
                 if (( nInDrawing === DRAWING_ARRAY_TYPE_BEFORE || nInDrawing === DRAWING_ARRAY_TYPE_INLINE || ( false === bInText && nInDrawing >= 0 ) ) && null != NearestPos)
                     return NearestPos;
             }
         }
 
-        var ContentPos = this.Internal_GetContentPosByXY( X, Y, Page_Rel );
+        var ContentPos = this.Internal_GetContentPosByXY(X, Y, CurPage);
 
         // Делаем логику как в ворде
-        if ( true != bAnchor && (0 < ContentPos || Page_Rel > 0 ) && ContentPos === this.Pages[Page_Rel].Pos && this.Pages[Page_Rel].EndPos > this.Pages[Page_Rel].Pos && type_Paragraph === this.Content[ContentPos].GetType() && true === this.Content[ContentPos].Is_ContentOnFirstPage() )
+        if (true != bAnchor && (0 < ContentPos || CurPage > 0) && ContentPos === this.Pages[CurPage].Pos && this.Pages[CurPage].EndPos > this.Pages[CurPage].Pos && type_Paragraph === this.Content[ContentPos].GetType() && true === this.Content[ContentPos].Is_ContentOnFirstPage())
             ContentPos++;
 
-        return this.Content[ContentPos].Get_NearestPos( Page_Rel, X, Y, bAnchor, Drawing );
+        var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, CurPage);
+        return this.Content[ContentPos].Get_NearestPos(ElementPageIndex, X, Y, bAnchor, Drawing);
     },
 
     // Проверяем, описывает ли данный класс содержимое ячейки
@@ -623,7 +637,7 @@ CDocumentContent.prototype =
     {
         if ( 0 === PageIndex && true === bStart )
         {
-            this.RecalcInfo.FlowObject = null;
+            this.RecalcInfo.FlowObject                = null;
             this.RecalcInfo.FlowObjectPageBreakBefore = false;
         }
 
@@ -633,11 +647,11 @@ CDocumentContent.prototype =
 
         if ( true === bStart )
         {
-            this.Pages.length = PageIndex;
-            this.Pages[PageIndex] = new CDocumentPage();
+            this.Pages.length         = PageIndex;
+            this.Pages[PageIndex]     = new CDocumentPage();
             this.Pages[PageIndex].Pos = StartIndex;
-			if(this.LogicDocument)
-				this.LogicDocument.DrawingObjects.resetDrawingArrays( this.Get_StartPage_Absolute() + PageIndex, this);
+            if (this.LogicDocument)
+                this.LogicDocument.DrawingObjects.resetDrawingArrays(this.Get_AbsolutePage(PageIndex), this);
         }
 
         var Count = this.Content.length;
@@ -654,7 +668,9 @@ CDocumentContent.prototype =
             }
         }
         else
-            StartPos = this.Get_PageContentStartPos( PageIndex );
+        {
+            StartPos = this.Get_PageContentStartPos(PageIndex);
+        }
 
         this.Pages[PageIndex].Update_Limits( StartPos );
 
@@ -730,7 +746,7 @@ CDocumentContent.prototype =
                             {
                                 this.RecalcInfo.FlowObjectPage++;
 
-                                if ( recalcresult_NextElement === RecalcResult )
+                                if (RecalcResult & recalcresult_NextElement)
                                 {
                                     this.RecalcInfo.FlowObject                = null;
                                     this.RecalcInfo.FlowObjectPageBreakBefore = false;
@@ -747,7 +763,7 @@ CDocumentContent.prototype =
                         if(this.DrawingObjects)
                             this.DrawingObjects.addFloatTable(new CFlowTable(Element, PageIndex));
 
-                        if ( recalcresult_NextElement === RecalcResult )
+                        if (RecalcResult & recalcresult_NextElement)
                         {
                             this.RecalcInfo.FlowObject                = null;
                             this.RecalcInfo.FlowObjectPageBreakBefore = false;
@@ -1048,32 +1064,33 @@ CDocumentContent.prototype =
             }
             else
             {
-                if ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex )
+                if (( 0 === Index && 0 === PageIndex ) || Index != StartIndex)
                 {
-                    Element.Set_DocumentIndex( Index );
-                    Element.Reset( X, Y, XLimit, YLimit, PageIndex );
+                    Element.Set_DocumentIndex(Index);
+                    Element.Reset(X, Y, XLimit, YLimit, PageIndex, 0, 1);
                 }
 
-                RecalcResult = Element.Recalculate_Page( PageIndex );
+                var ElementPageIndex = this.private_GetElementPageIndex(Index, PageIndex, 0, 1);
+                RecalcResult = Element.Recalculate_Page(ElementPageIndex);
             }
 
             Element.TurnOn_RecalcEvent();
 
             if ( true != bFlow )
             {
-                var Bounds = Element.Get_PageBounds( PageIndex - Element.Get_StartPage_Relative() );
-                Y = Bounds.Bottom;
+                var ElementPageIndex = this.private_GetElementPageIndex(Index, PageIndex, 0, 1);
+                Y                    = Element.Get_PageBounds(ElementPageIndex).Bottom;
             }
 
-            if ( recalcresult_CurPage === RecalcResult )
+            if (RecalcResult & recalcresult_CurPage)
             {
                 return this.Recalculate_Page( PageIndex, false );
             }
-            else if ( recalcresult_NextElement === RecalcResult )
+            else if (RecalcResult & recalcresult_NextElement)
             {
                 // Ничего не делаем
             }
-            else if ( recalcresult_NextPage === RecalcResult )
+            else if (RecalcResult & recalcresult_NextPage)
             {
                 this.Pages[PageIndex].EndPos = Index;
                 Result = recalcresult2_NextPage;
@@ -1145,6 +1162,7 @@ CDocumentContent.prototype =
     
     Prepare_RecalculateObject : function()
     {
+        this.ClipInfo = [];
         this.Pages = [];
         var Count = this.Content.length;
         for ( var Index = 0; Index < Count; Index++ )
@@ -1183,45 +1201,45 @@ CDocumentContent.prototype =
 
     Draw : function(nPageIndex, pGraphics)
     {
-        var PageNum = nPageIndex - this.StartPage;
-        if ( PageNum < 0 || PageNum >= this.Pages.length )
+        var CurPage = nPageIndex - this.StartPage;
+        if (CurPage < 0 || CurPage >= this.Pages.length)
             return;
 
-
-        if(pGraphics.Start_Command)
+        if (pGraphics.Start_Command)
         {
             pGraphics.Start_Command(DRAW_COMMAND_CONTENT);
         }
 
-        var bClip = false;
-        if ( null != this.ClipInfo.X0 && null != this.ClipInfo.X1 )
+        var ClipInfo = this.ClipInfo[CurPage];
+        if (ClipInfo)
         {
             // TODO: При клипе, как правило, обрезается сверху и снизу по 1px, поэтому введем небольшую коррекцию
             var Correction = 0;
-            if ( null !== this.DrawingDocument )
+            if (null !== this.DrawingDocument)
                 Correction = this.DrawingDocument.GetMMPerDot(1);
 
-            var Bounds = this.Pages[PageNum].Bounds;
+            var Bounds = this.Pages[CurPage].Bounds;
             pGraphics.SaveGrState();
-            pGraphics.AddClipRect( this.ClipInfo.X0, Bounds.Top - Correction, Math.abs(this.ClipInfo.X1 - this.ClipInfo.X0), Bounds.Bottom - Bounds.Top + Correction);
-            bClip = true;
+            pGraphics.AddClipRect(ClipInfo.X0, Bounds.Top - Correction, Math.abs(ClipInfo.X1 - ClipInfo.X0), Bounds.Bottom - Bounds.Top + Correction);
         }
-        
-        if ( this.LogicDocument )
-            this.LogicDocument.DrawingObjects.drawWrappingObjectsInContent(this.Get_StartPage_Absolute() + PageNum, pGraphics, this);
 
-        var Page_StartPos = this.Pages[PageNum].Pos;
-        var Page_EndPos   = this.Pages[PageNum].EndPos;
-        for ( var Index = Page_StartPos; Index <= Page_EndPos; Index++ )
+        if (this.LogicDocument)
+            this.LogicDocument.DrawingObjects.drawWrappingObjectsInContent(this.Get_AbsolutePage(CurPage), pGraphics, this);
+
+        var Page_StartPos = this.Pages[CurPage].Pos;
+        var Page_EndPos   = this.Pages[CurPage].EndPos;
+        for (var Index = Page_StartPos; Index <= Page_EndPos; Index++)
         {
-            this.Content[Index].Draw(PageNum, pGraphics);
+            var ElementPageIndex = this.private_GetElementPageIndex(Index, CurPage, 0, 1);
+            this.Content[Index].Draw(ElementPageIndex, pGraphics);
         }
 
-        if ( true === bClip )
+        if (ClipInfo)
         {
             pGraphics.RestoreGrState();
         }
-        if(pGraphics.End_Command)
+
+        if (pGraphics.End_Command)
         {
             pGraphics.End_Command();
         }
@@ -1297,11 +1315,11 @@ CDocumentContent.prototype =
     {
         this.Pages[PageIndex].Shift( Dx, Dy );
 
-        if ( null != this.ClipInfo.X0 )
-            this.ClipInfo.X0 += Dx;
-
-        if ( null != this.ClipInfo.X1 )
-            this.ClipInfo.X1 += Dx;
+        if (this.ClipInfo[PageIndex])
+        {
+            this.ClipInfo[PageIndex].X0 += Dx;
+            this.ClipInfo[PageIndex].X1 += Dx;
+        }
 
         var StartPos = this.Pages[PageIndex].Pos;
         var EndPos   = this.Pages[PageIndex].EndPos;
@@ -1605,46 +1623,51 @@ CDocumentContent.prototype =
         Element.Start_FromNewPage();
     },
 
-    Is_TableBorder : function(X,Y, PageNum_Abs)
+    Is_TableBorder : function(X, Y, CurPage)
     {
-        var TempPNum = PageNum_Abs - this.Get_StartPage_Absolute();
-        if ( TempPNum < 0 || TempPNum >= this.Pages.length )
-            TempPNum = 0;
+        CurPage = Math.max(0, Math.min(this.Pages.length - 1, CurPage));
 
-        var ContentPos = this.Internal_GetContentPosByXY( X, Y, TempPNum );
-        var Item = this.Content[ContentPos];
-        if ( type_Table == Item.GetType() )
-            return Item.Is_TableBorder( X, Y, PageNum_Abs );
+        var ElementPos = this.Internal_GetContentPosByXY(X, Y, CurPage);
+        var Element    = this.Content[ElementPos];
+        if (type_Table === Element.GetType())
+        {
+            var ElementPageIndex = this.private_GetElementPageIndex(ElementPos, CurPage, 0, 1);
+            return Element.Is_TableBorder(X, Y, ElementPageIndex);
+        }
 
         return null;
     },
 
-    Is_InText : function(X, Y, PageNum_Abs)
+    Is_InText : function(X, Y, CurPage)
     {
-        var TempPNum = PageNum_Abs - this.Get_StartPage_Absolute();
-        if ( TempPNum < 0 || TempPNum >= this.Pages.length )
-            TempPNum = 0;
+        if (CurPage < 0 || CurPage >= this.Pages.length)
+            CurPage = 0;
 
-        var ContentPos = this.Internal_GetContentPosByXY( X, Y, TempPNum );
-        var Item = this.Content[ContentPos];
-        return Item.Is_InText( X, Y, PageNum_Abs );
+        var ContentPos       = this.Internal_GetContentPosByXY(X, Y, CurPage);
+        var Item             = this.Content[ContentPos];
+        var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, CurPage);
+        return Item.Is_InText(X, Y, ElementPageIndex);
     },
 
     // Проверяем, попали ли мы в автофигуру данного DocumentContent
-    Is_InDrawing : function(X, Y, Page_Abs)
+    Is_InDrawing : function(X, Y, CurPage)
     {
-        if ( -1 != this.DrawingObjects.isPointInDrawingObjects( X, Y, Page_Abs, this ) )
+        if (-1 != this.DrawingObjects.isPointInDrawingObjects(X, Y, this.Get_AbsolutePage(CurPage), this))
+        {
             return true;
+        }
         else
         {
-            var TempPNum = Page_Abs - this.Get_StartPage_Absolute();
-            if ( TempPNum < 0 || TempPNum >= this.Pages.length )
-                TempPNum = 0;
+            if (CurPage < 0 || CurPage >= this.Pages.length)
+                CurPage = 0;
 
-            var ContentPos = this.Internal_GetContentPosByXY( X, Y, TempPNum );
-            var Item = this.Content[ContentPos];
-            if ( type_Table == Item.GetType() )
-                return Item.Is_InDrawing( X, Y, Page_Abs );
+            var ContentPos = this.Internal_GetContentPosByXY(X, Y, CurPage);
+            var Item       = this.Content[ContentPos];
+            if (type_Table == Item.GetType())
+            {
+                var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, CurPage);
+                return Item.Is_InDrawing(X, Y, ElementPageIndex);
+            }
 
             return false;
         }
@@ -1761,7 +1784,12 @@ CDocumentContent.prototype =
             if ( true === this.Selection.Use )
             {
                 if ( this.Selection.StartPos == this.Selection.EndPos && type_Table === this.Content[this.Selection.StartPos].GetType() )
-                    this.Content[this.Selection.StartPos].Document_UpdateRulersState(CurPage);
+                {
+                    var ElementPos       = this.Selection.StartPos;
+                    var Element          = this.Content[ElementPos];
+                    var ElementPageIndex = this.private_GetElementPageIndex(ElementPos, this.CurPage, Element.Get_StartColumn(), Element.Get_ColumnsCount());
+                    Element.Document_UpdateRulersState(ElementPageIndex);
+                }
                 else
                 {
                     var StartPos = ( this.Selection.EndPos <= this.Selection.StartPos ? this.Selection.EndPos   : this.Selection.StartPos );
@@ -1801,11 +1829,10 @@ CDocumentContent.prototype =
             }
             else
             {
-                var Item = this.Content[this.CurPos.ContentPos];
-                if ( type_Table === Item.GetType() )
-                    Item.Document_UpdateRulersState(CurPage);
-                else
-                    Item.Document_UpdateRulersState();
+                var ElementPos       = this.CurPos.ContentPos;
+                var Element          = this.Content[ElementPos];
+                var ElementPageIndex = this.private_GetElementPageIndex(ElementPos, this.CurPage, Element.Get_StartColumn(), Element.Get_ColumnsCount());
+                Element.Document_UpdateRulersState(ElementPageIndex);
             }
         }
     },
@@ -2032,10 +2059,9 @@ CDocumentContent.prototype =
         }
     },
 
-    Set_ClipInfo : function(X0, X1)
+    Set_ClipInfo : function(CurPage, X0, X1)
     {
-        this.ClipInfo.X0 = X0;
-        this.ClipInfo.X1 = X1;
+        this.ClipInfo[CurPage] = {X0 : X0, X1 : X1};
     },
 
     Set_ApplyToAll : function(bValue)
@@ -2048,22 +2074,22 @@ CDocumentContent.prototype =
         return this.ApplyToAll;
     },
 
-    Update_CursorType : function( X, Y, PageNum_Abs)
+    Update_CursorType : function(X, Y, CurPage)
     {
-        var PageNum = PageNum_Abs - this.Get_StartPage_Absolute();
-        if ( PageNum < 0 || PageNum >= this.Pages.length )
-            return this.DrawingDocument.SetCursorType( "default", new CMouseMoveData());
+        if (CurPage < 0 || CurPage >= this.Pages.length)
+            return this.DrawingDocument.SetCursorType("default", new CMouseMoveData());
 
-        var bInText      = (null === this.Is_InText(X, Y, PageNum_Abs)      ? false : true);
-        var bTableBorder = (null === this.Is_TableBorder(X, Y, PageNum_Abs) ? false : true);
+        var bInText      = (null === this.Is_InText(X, Y, CurPage)      ? false : true);
+        var bTableBorder = (null === this.Is_TableBorder(X, Y, CurPage) ? false : true);
 
         // Ничего не делаем
-        if ( this.Parent instanceof CHeaderFooter && true === this.LogicDocument.DrawingObjects.updateCursorType(PageNum_Abs, X, Y, {}, ( true === bInText || true === bTableBorder ? true : false )) )
+        if (this.Parent instanceof CHeaderFooter && true === this.LogicDocument.DrawingObjects.updateCursorType(this.Get_AbsolutePage(CurPage), X, Y, {}, ( true === bInText || true === bTableBorder ? true : false )) )
             return;
 
-        var ContentPos = this.Internal_GetContentPosByXY( X, Y, PageNum);
+        var ContentPos = this.Internal_GetContentPosByXY(X, Y, CurPage);
         var Item = this.Content[ContentPos];
-        Item.Update_CursorType( X, Y, PageNum );
+        var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, CurPage);
+        Item.Update_CursorType(X, Y, ElementPageIndex);
     },
 
 //-----------------------------------------------------------------------------------
@@ -2243,7 +2269,7 @@ CDocumentContent.prototype =
             NewParagraph.Reset( X0, Y0, XLimit, YLimit, PageNum );
             var RecalcResult = NewParagraph.Recalculate_Page( PageNum );
 
-            if ( recalcresult_NextElement != RecalcResult )
+            if (!(RecalcResult & recalcresult_NextElement))
             {
                 LastPara.Next = null;
                 break;
@@ -2569,7 +2595,7 @@ CDocumentContent.prototype =
             var Item = this.Content[this.CurPos.ContentPos];
             var ItemType = Item.GetType();
 
-            if ( para_NewLine === ParaItem.Type && break_Page === ParaItem.BreakType )
+            if (para_NewLine === ParaItem.Type && true === ParaItem.Is_PageOrColumnBreak())
             {
                 if ( type_Paragraph === ItemType )
                 {
@@ -3934,10 +3960,10 @@ CDocumentContent.prototype =
         }
     },
 
-    Cursor_MoveAt : function( X, Y, AddToSelect, bRemoveOldSelection, PageNum_Abs )
+    Cursor_MoveAt : function(X, Y, AddToSelect, bRemoveOldSelection, CurPage)
     {
-        if ( undefined != PageNum_Abs )
-            this.CurPage = PageNum_Abs - this.Get_StartPage_Absolute();
+        if (undefined != CurPage)
+            this.CurPage = CurPage;
 
         if ( false != bRemoveOldSelection )
         {
@@ -3948,7 +3974,7 @@ CDocumentContent.prototype =
         {
             if ( true === AddToSelect )
             {
-                this.Selection_SetEnd(X, Y, this.CurPage + this.StartPage, true);
+                this.Selection_SetEnd(X, Y, this.CurPage, true);
             }
             else
             {
@@ -3956,7 +3982,8 @@ CDocumentContent.prototype =
 
                 var ContentPos = this.Internal_GetContentPosByXY(X,Y);
                 this.CurPos.ContentPos = ContentPos;
-                this.Content[ContentPos].Cursor_MoveAt(X,Y, false, false, this.CurPage);
+                var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, this.CurPage);
+                this.Content[ContentPos].Cursor_MoveAt(X,Y, false, false, ElementPageIndex);
 
                 this.Interface_Update_ParaPr();
                 this.Interface_Update_TextPr();
@@ -3971,13 +3998,14 @@ CDocumentContent.prototype =
                 this.Content[this.CurPos.ContentPos].Selection.Use = true;
                 this.Content[this.CurPos.ContentPos].Selection.StartPos = this.Content[this.CurPos.ContentPos].CurPos.ContentPos;
 
-                this.Selection_SetEnd( X, Y, true );
+                this.Selection_SetEnd(X, Y, this.CurPage);
             }
             else
             {
                 var ContentPos = this.Internal_GetContentPosByXY(X,Y);
                 this.CurPos.ContentPos = ContentPos;
-                this.Content[ContentPos].Cursor_MoveAt(X,Y, false, false, this.CurPage);
+                var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, this.CurPage);
+                this.Content[ContentPos].Cursor_MoveAt(X,Y, false, false, ElementPageIndex);
 
                 this.Interface_Update_ParaPr();
                 this.Interface_Update_TextPr();
@@ -7289,57 +7317,62 @@ CDocumentContent.prototype =
     },
 
     // Рисуем селект
-    Selection_Draw_Page : function(Page_abs)
+    Selection_Draw_Page : function(PageIndex)
     {
-        if ( docpostype_DrawingObjects === this.CurPos.Type )
+        var CurPage = PageIndex;
+        if (CurPage < 0 || CurPage >= this.Pages.length)
+            return;
+
+        if (docpostype_DrawingObjects === this.CurPos.Type)
         {
-            this.LogicDocument.DrawingObjects.drawSelectionPage(Page_abs);
+            var PageAbs = CurPage + this.Get_StartPage_Absolute();
+            this.LogicDocument.DrawingObjects.drawSelectionPage(PageAbs);
         }
         else
         {
-            var CurPage = Page_abs - this.Get_StartPage_Absolute();
-            if ( CurPage < 0 || CurPage >= this.Pages.length )
-                return;
-
             var Pos_start = this.Pages[CurPage].Pos;
             var Pos_end   = this.Pages[CurPage].EndPos;
 
-            if ( true === this.Selection.Use )
+            if (true === this.Selection.Use)
             {
-                switch( this.Selection.Flag )
+                switch (this.Selection.Flag)
                 {
                     case selectionflag_Common:
                     {
                         var Start = this.Selection.StartPos;
                         var End   = this.Selection.EndPos;
 
-                        if ( Start > End )
+                        if (Start > End)
                         {
                             Start = this.Selection.EndPos;
                             End   = this.Selection.StartPos;
                         }
 
-                        var Start = Math.max( Start, Pos_start );
-                        var End   = Math.min( End,   Pos_end   );
+                        var Start = Math.max(Start, Pos_start);
+                        var End   = Math.min(End, Pos_end);
 
-                        for ( var Index = Start; Index <= End; Index++ )
+                        for (var Index = Start; Index <= End; Index++)
                         {
-                            this.Content[Index].Selection_Draw_Page(Page_abs);
+                            var ElementPageIndex = this.private_GetElementPageIndex(Index, CurPage, 0, 1);
+                            this.Content[Index].Selection_Draw_Page(ElementPageIndex);
                         }
 
                         break;
                     }
                     case selectionflag_Numbering:
                     {
-                        if ( null == this.Selection.Data )
+                        if (null == this.Selection.Data)
                             break;
 
                         var Count = this.Selection.Data.length;
 
-                        for ( var Index = 0; Index < Count; Index++ )
+                        for (var Index = 0; Index < Count; Index++)
                         {
-                            if ( this.Selection.Data[Index] <= Pos_end && this.Selection.Data[Index] >= Pos_start )
-                                this.Content[this.Selection.Data[Index]].Selection_Draw_Page(Page_abs);
+                            if (this.Selection.Data[Index] <= Pos_end && this.Selection.Data[Index] >= Pos_start)
+                            {
+                                var ElementPageIndex = this.private_GetElementPageIndex(this.Selection.Data[Index], CurPage, 0, 1);
+                                this.Content[this.Selection.Data[Index]].Selection_Draw_Page(ElementPageIndex);
+                            }
                         }
 
                         break;
@@ -7399,12 +7432,12 @@ CDocumentContent.prototype =
         }
     },
 
-    Selection_SetStart : function(X,Y, PageIndex, MouseEvent)
+    Selection_SetStart : function(X, Y, CurPage, MouseEvent)
     {
-        if ( PageIndex - this.StartPage >= this.Pages.length )
-            return;
+        if (CurPage < 0 || CurPage >= this.Pages.length)
+            CurPage = 0;
 
-        this.CurPage = PageIndex - this.StartPage;
+        this.CurPage = CurPage;
 
         // Сначала проверим, не попали ли мы в один из "плавающих" объектов
         var bInText      = (null === this.Is_InText(X, Y, this.CurPage + this.Get_StartPage_Absolute())      ? false : true);
@@ -7526,31 +7559,28 @@ CDocumentContent.prototype =
 
     // Данная функция может использоваться как при движении, так и при окончательном выставлении селекта.
     // Если bEnd = true, тогда это конец селекта.
-    Selection_SetEnd : function(X, Y, PageIndex, MouseEvent)
+    Selection_SetEnd : function(X, Y, CurPage, MouseEvent)
     {
         if (docpostype_DrawingObjects === this.CurPos.Type)
         {
-            var CurPage = PageIndex - this.StartPage + this.Get_StartPage_Absolute();
-            if (this.Parent instanceof CHeaderFooter)
-                CurPage = PageIndex;
-
+            var PageAbs = (this.Parent instanceof CHeaderFooter ? CurPage : this.Get_StartPage_Absolute(CurPage));
             if (g_mouse_event_type_up == MouseEvent.Type)
             {
-                this.LogicDocument.DrawingObjects.OnMouseUp(MouseEvent, X, Y, CurPage);
+                this.LogicDocument.DrawingObjects.OnMouseUp(MouseEvent, X, Y, PageAbs);
                 this.Selection.Start = false;
                 this.Selection.Use = true;
             }
             else
             {
-                this.LogicDocument.DrawingObjects.OnMouseMove(MouseEvent, X, Y, CurPage);
+                this.LogicDocument.DrawingObjects.OnMouseMove(MouseEvent, X, Y, PageAbs);
             }
             return;
         }
 
-        if (PageIndex - this.StartPage >= this.Pages.length)
-            return;
+        if (CurPage < 0 || CurPage >= this.Pages.length)
+            CurPage = 0;
 
-        this.CurPage = PageIndex - this.StartPage;
+        this.CurPage = CurPage;
 
         if ( selectionflag_Numbering === this.Selection.Flag )
             return;
@@ -7768,100 +7798,107 @@ CDocumentContent.prototype =
         }
     },
 
-    Selection_Stop : function(X, Y, PageIndex, MouseEvent)
+    Selection_Stop : function(X, Y, CurPage, MouseEvent)
     {
-        if ( true != this.Selection.Use )
+        if (true != this.Selection.Use)
             return;
 
-        var PageNum = PageIndex;
         var _Y = Y;
         var _X = X;
-        if ( PageNum < 0 )
+        if (CurPage < 0)
         {
-            PageNum = 0;
+            CurPage = 0;
             _Y      = -1; // -1, чтобы избежать погрешностей
             _X      = -1; // -1, чтобы избежать погрешностей
         }
-        else if ( PageNum >= this.Pages.length )
+        else if (CurPage >= this.Pages.length)
         {
-            PageNum = this.Pages.length - 1;
-            _Y      = this.Pages[PageNum].YLimit + 1; // +1, чтобы избежать погрешностей
-            _X      = this.Pages[PageNum].XLimit + 1; // +1, чтобы избежать погрешностей/
+            CurPage = this.Pages.length - 1;
+            _Y      = this.Pages[CurPage].YLimit + 1; // +1, чтобы избежать погрешностей
+            _X      = this.Pages[CurPage].XLimit + 1; // +1, чтобы избежать погрешностей
         }
         else
         {
-            if ( 0 === PageNum && Y < this.Pages[0].Bounds.Top )
+            if (0 === CurPage && Y < this.Pages[0].Bounds.Top)
                 _X = -1;
-            else if ( this.Pages.length - 1 === PageNum && Y > this.Pages[this.Pages.length - 1].Bounds.Bottom )
+            else if (this.Pages.length - 1 === CurPage && Y > this.Pages[this.Pages.length - 1].Bounds.Bottom)
                 _X = this.Pages[this.Pages.length - 1].XLimit + 1;
         }
 
-        var _MouseEvent = { ClickCount : 1, Type : g_mouse_event_type_up };
-        this.Selection_SetEnd( _X, _Y, PageNum + this.StartPage, _MouseEvent );
+        var _MouseEvent = {ClickCount : 1, Type : g_mouse_event_type_up};
+        this.Selection_SetEnd(_X, _Y, CurPage, _MouseEvent);
     },
 
-    Selection_Check : function( X, Y, Page_Abs, NearPos )
+    Selection_Check : function(X, Y, CurPage, NearPos)
     {
-        if ( docpostype_DrawingObjects === this.CurPos.Type )
-            return this.DrawingObjects.selectionCheck( X, Y, Page_Abs, NearPos );
+        if (docpostype_DrawingObjects === this.CurPos.Type)
+            return this.DrawingObjects.selectionCheck(X, Y, this.Get_AbsolutePage(CurPage), NearPos);
         else //if ( docpostype_Content === this.CurPos.Type )
         {
-            if ( true === this.Selection.Use || true === this.ApplyToAll )
+            if (true === this.Selection.Use || true === this.ApplyToAll)
             {
-                switch( this.Selection.Flag )
+                switch (this.Selection.Flag)
                 {
                     case selectionflag_Common:
                     {
                         var Start = this.Selection.StartPos;
                         var End   = this.Selection.EndPos;
 
-                        if ( Start > End )
+                        if (Start > End)
                         {
                             Start = this.Selection.EndPos;
                             End   = this.Selection.StartPos;
                         }
 
-                        if ( undefined !== NearPos )
+                        if (undefined !== NearPos)
                         {
-                            if ( true === this.ApplyToAll )
+                            if (true === this.ApplyToAll)
                             {
                                 Start = 0;
                                 End   = this.Content.length - 1;
                             }
 
-                            for ( var Index = Start; Index <= End; Index++ )
+                            for (var Index = Start; Index <= End; Index++)
                             {
-                                if ( true === this.ApplyToAll )
-                                    this.Content[Index].Set_ApplyToAll( true );
+                                if (true === this.ApplyToAll)
+                                    this.Content[Index].Set_ApplyToAll(true);
 
-                                if ( true === this.Content[Index].Selection_Check( 0, 0, 0, NearPos ) )
+                                if (true === this.Content[Index].Selection_Check(0, 0, 0, NearPos))
                                 {
-                                    if ( true === this.ApplyToAll )
-                                        this.Content[Index].Set_ApplyToAll( false );
+                                    if (true === this.ApplyToAll)
+                                        this.Content[Index].Set_ApplyToAll(false);
 
                                     return true;
                                 }
 
-                                if ( true === this.ApplyToAll )
-                                    this.Content[Index].Set_ApplyToAll( false );
+                                if (true === this.ApplyToAll)
+                                    this.Content[Index].Set_ApplyToAll(false);
                             }
 
                             return false;
                         }
                         else
                         {
-                            var ContentPos = this.Internal_GetContentPosByXY( X, Y, Page_Abs );
-                            if ( ContentPos > Start && ContentPos < End )
+                            var ContentPos = this.Internal_GetContentPosByXY(X, Y, CurPage);
+                            if (ContentPos > Start && ContentPos < End)
+                            {
                                 return true;
-                            else if ( ContentPos < Start || ContentPos > End )
+                            }
+                            else if (ContentPos < Start || ContentPos > End)
+                            {
                                 return false;
+                            }
                             else
-                                return this.Content[ContentPos].Selection_Check( X, Y, Page_Abs, NearPos );
+                            {
+                                var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, CurPage);
+                                return this.Content[ContentPos].Selection_Check(X, Y, ElementPageIndex, NearPos);
+                            }
 
                             return false;
                         }
                     }
-                    case selectionflag_Numbering : return false;
+                    case selectionflag_Numbering :
+                        return false;
                 }
 
                 return false;
@@ -8439,12 +8476,22 @@ CDocumentContent.prototype =
 //-----------------------------------------------------------------------------------
     Get_StartPage_Absolute : function()
     {
-        return this.Parent.Get_StartPage_Absolute() + this.Get_StartPage_Relative();
+        return this.Get_AbsolutePage(0);
     },
 
     Get_StartPage_Relative : function()
     {
         return this.StartPage;
+    },
+
+    Get_AbsolutePage : function(CurPage)
+    {
+        return this.Parent.Get_AbsolutePage(this.StartPage + CurPage);
+    },
+
+    Get_AbsoluteColumn : function(CurPage)
+    {
+        return this.Parent.Get_AbsoluteColumn(this.StartPage + CurPage);
     },
 
     Set_StartPage : function(StartPage)
@@ -9729,6 +9776,21 @@ CDocumentContent.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
     this.CurPos.ContentPos = Pos;
     this.Content[Pos].Set_ContentPosition(_DocPos, Depth + 1, _Flag);
 };
+CDocumentContent.prototype.private_GetElementPageIndex = function(ElementPos, PageIndex, ColumnIndex, ColumnsCount)
+{
+    var Element = this.Content[ElementPos];
+    if (!Element)
+        return 0;
+
+    var StartPage   = Element.Get_StartPage_Relative();
+    var StartColumn = Element.Get_StartColumn();
+
+    return ColumnIndex - StartColumn + (PageIndex - StartPage) * ColumnsCount;
+};
+CDocumentContent.prototype.private_GetElementPageIndexByXY = function(ElementPos, X, Y, PageIndex)
+{
+    return this.private_GetElementPageIndex(ElementPos, PageIndex, 0, 1);
+};
 
 function CDocumentContentStartState(DocContent)
 {
@@ -9743,8 +9805,9 @@ function CDocumentRecalculateObject()
 {
     this.StartPage = 0;
     
-    this.Pages   = [];    
-    this.Content = [];    
+    this.Pages    = [];
+    this.Content  = [];
+    this.ClipInfo = [];
 }
 
 CDocumentRecalculateObject.prototype = 
@@ -9753,7 +9816,8 @@ CDocumentRecalculateObject.prototype =
     {
         this.StartPage = Doc.StartPage;        
         this.Pages     = Doc.Pages;
-        
+        this.ClipInfo  = Doc.ClipInfo;
+
         var Content = Doc.Content;
         var Count = Content.length;
         for ( var Index = 0; Index < Count; Index++ )
@@ -9766,6 +9830,7 @@ CDocumentRecalculateObject.prototype =
     {
         Doc.StartPage = this.StartPage;
         Doc.Pages     = this.Pages;
+        Doc.ClipInfo  = this.ClipInfo;
         
         var Count = Doc.Content.length;
         for ( var Index = 0; Index < Count; Index++ )

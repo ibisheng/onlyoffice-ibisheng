@@ -1396,7 +1396,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     }
 
     // обновляем LDRecalcInfo здесь, т.к. формула - многострочный мат объект, нельзя каждый раз изменять LDRecalcInfo => иначе для четных/нечетных сток будет чередование ParaMath = this/null
-    if (PRS.RecalcResult == recalcresult_PrevLine && (true === LDRecalcInfo.Can_RecalcObject() || true === LDRecalcInfo.Check_ParaMath(this)))
+    if (PRS.RecalcResult & recalcresult_PrevLine && (true === LDRecalcInfo.Can_RecalcObject() || true === LDRecalcInfo.Check_ParaMath(this)))
     {
         LDRecalcInfo.Set_ParaMath(this);
     }
@@ -1585,7 +1585,7 @@ ParaMath.prototype.private_RecalculateRangeInsideInterval = function(PRS, ParaPr
 
         PRS.RestartPageRecalcInfo.Object = this;
 
-        if(PRS.NewRange == true && PRS.RecalcResult !== recalcresult_PrevLine)
+        if(PRS.NewRange == true && !(PRS.RecalcResult & recalcresult_PrevLine))
             PRS.ForceNewLine = true;
     }
 };

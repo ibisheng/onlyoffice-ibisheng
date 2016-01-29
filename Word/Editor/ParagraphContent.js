@@ -57,8 +57,9 @@ var para_Math_Content              = 0x0038; // math content
 
 
 
-var break_Line = 0x01;
-var break_Page = 0x02;
+var break_Line   = 0x01;
+var break_Page   = 0x02;
+var break_Column = 0x03;
 
 var nbsp_charcode = 0x00A0;
 
@@ -2795,10 +2796,8 @@ function ParaNewLine(BreakType)
     this.Flags = {}; // специальные флаги для разных break
     this.Flags.Use = true;
 
-    if ( break_Page === this.BreakType )
-    {
-        this.Flags.NewLine = true;        
-    }
+    if (break_Page === this.BreakType || break_Column === this.BreakType)
+        this.Flags.NewLine = true;
 
     this.Height       = 0;
     this.Width        = 0;
@@ -2834,6 +2833,7 @@ ParaNewLine.prototype =
                     break;
                 }
                 case break_Page:
+                case break_Column:
                 {
                     var strPageBreak = this.Flags.BreakPageInfo.Str;
                     var Widths       = this.Flags.BreakPageInfo.Widths;
@@ -2881,6 +2881,7 @@ ParaNewLine.prototype =
                 break;
             }
             case break_Page:
+            case break_Column:
             {
                 this.Width  = 0;
                 this.Height = 0;
@@ -2915,7 +2916,7 @@ ParaNewLine.prototype =
             return;
         }
         
-        if ( break_Page === this.BreakType )
+        if (break_Page === this.BreakType || break_Column === this.BreakType)
         {
             var W = ( false === this.Flags.NewLine ? 50 : _W );
 
@@ -2924,7 +2925,7 @@ ParaNewLine.prototype =
             var Widths = [];
 
             var nStrWidth = 0;
-            var strBreakPage = " Page Break ";
+            var strBreakPage = break_Page === this.BreakType ? " Page Break " : " Column Break ";
             var Len = strBreakPage.length;
             for (var Index = 0; Index < Len; Index++)
             {
@@ -3006,7 +3007,7 @@ ParaNewLine.prototype =
     // Функция проверяет особый случай, когда у нас PageBreak, после которого в параграфе ничего не идет
     Is_NewLine : function()
     {
-        if ( break_Line === this.BreakType || ( break_Page === this.BreakType && true === this.Flags.NewLine ) )
+        if (break_Line === this.BreakType || ((break_Page === this.BreakType || break_Column === this.BreakType) && true === this.Flags.NewLine))
             return true;
 
         return false;
@@ -3021,7 +3022,7 @@ ParaNewLine.prototype =
         Writer.WriteLong( para_NewLine );
         Writer.WriteLong( this.BreakType );
 
-        if ( break_Page === this.BreakType )
+        if (break_Page === this.BreakType || break_Column === this.BreakType)
         {
             Writer.WriteBool( this.Flags.NewLine );
         }
@@ -3031,8 +3032,16 @@ ParaNewLine.prototype =
     {
         this.BreakType = Reader.GetLong();
 
-        if ( break_Page === this.BreakType )
+        if (break_Page === this.BreakType || break_Column === this.BreakType)
             this.Flags = { NewLine : Reader.GetBool() };
+    },
+
+    Is_PageOrColumnBreak : function()
+    {
+        if (break_Page === this.BreakType || break_Column === this.BreakType)
+            return true;
+
+        return false;
     }
 };
 
@@ -5079,6 +5088,8 @@ ParaDrawing.prototype =
         SelectedContent.Set_MoveDrawing( true );        
 
         NearPos.Paragraph.Parent.Insert_Content( SelectedContent, NearPos );
+        NearPos.Paragraph.Clear_NearestPosArray();
+        NearPos.Paragraph.Correct_Content();
 
         if ( false != bRecalculate )
             LogicDocument.Recalculate();

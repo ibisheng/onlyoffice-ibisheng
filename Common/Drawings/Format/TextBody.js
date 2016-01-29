@@ -546,6 +546,20 @@ CTextBody.prototype =
         return 0;//TODO;
     },
 
+    Get_AbsolutePage : function(CurPage)
+    {
+        if(this.parent && this.parent.Get_AbsolutePage)
+        {
+            return this.parent.Get_AbsolutePage();
+        }
+        return 0;//TODO;
+    },
+
+    Get_AbsoluteColumn : function(CurPage)
+    {
+        return 0;//TODO;
+    },
+
     Get_TextBackGroundColor: function()
     {
         return undefined;

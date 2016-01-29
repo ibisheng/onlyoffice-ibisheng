@@ -1210,6 +1210,7 @@ var historyitem_Section_Columns_Space      = 23;
 var historyitem_Section_Columns_Num        = 24;
 var historyitem_Section_Columns_Sep        = 25;
 var historyitem_Section_Columns_Col        = 26;
+var historyitem_Section_Columns_SetCols    = 27;
 
 // Тип класса, к которому относится данный элемент истории
 var historyitem_State_Unknown         = 0;
@@ -1587,6 +1588,8 @@ var historydescription_Document_AcceptRevisionChangesBySelection   = 0x012b;
 var historydescription_Document_RejectRevisionChangesBySelection   = 0x012c;
 var historydescription_Document_AddLetterUnion                     = 0x012d;
 var historydescription_Presentation_ApplyTimingToAll               = 0x012e;
+var historydescription_Document_SetColumnsFromRuler                = 0x012f;
+var historydescription_Document_SetColumnsProps                    = 0x0130;
 
 
 
@@ -1900,7 +1903,8 @@ function Get_HistoryPointStringDescription(nDescription)
         case historydescription_Document_AcceptRevisionChangesBySelection   : sString = "Document_AcceptRevisionChangesBySelection  "; break;
         case historydescription_Document_RejectRevisionChangesBySelection   : sString = "Document_RejectRevisionChangesBySelection  "; break;
         case historydescription_Document_AddLetterUnion                     : sString = "Document_AddLetterUnion                    "; break;
-
+        case historydescription_Document_SetColumnsFromRuler                : sString = "Document_SetColumnsFromRuler               "; break;
+        case historydescription_Document_SetColumnsProps                    : sString = "Document_SetColumnsProps                   "; break;
     }
     return sString;
 }

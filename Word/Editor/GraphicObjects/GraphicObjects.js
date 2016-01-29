@@ -2915,19 +2915,19 @@ CGraphicObjects.prototype =
             if(this.selection.textSelection.selectStartPage === pageIndex)
             {
                 this.drawingDocument.UpdateTargetTransform(this.selection.textSelection.transformText);
-                this.selection.textSelection.getDocContent().Selection_Draw_Page(pageIndex);
+                this.selection.textSelection.getDocContent().Selection_Draw_Page(0);
             }
         }
         else if(this.selection.groupSelection)
         {
             if(this.selection.groupSelection.selectStartPage === pageIndex)
             {
-                this.selection.groupSelection.drawSelectionPage(pageIndex);
+                this.selection.groupSelection.drawSelectionPage(0);
             }
         }
         else if(this.selection.chartSelection && this.selection.chartSelection.selectStartPage === pageIndex && this.selection.chartSelection.selection.textSelection)
         {
-            this.selection.chartSelection.selection.textSelection.getDocContent().Selection_Draw_Page(pageIndex);
+            this.selection.chartSelection.selection.textSelection.getDocContent().Selection_Draw_Page(0);
         }
     },
     getAllRasterImagesOnPage: function(pageIndex)

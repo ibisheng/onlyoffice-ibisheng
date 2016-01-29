@@ -358,7 +358,7 @@ CHeaderFooter.prototype =
 
     Get_NearestPos : function(X, Y, bAnchor, Drawing)
     {
-        return this.Content.Get_NearestPos( this.Content.StartPage, X, Y, bAnchor, Drawing );
+        return this.Content.Get_NearestPos(0, X, Y, bAnchor, Drawing);
     },
 
     Get_Numbering : function()
@@ -494,30 +494,30 @@ CHeaderFooter.prototype =
         this.Content.Get_SelectedContent( SelectedContent );
     },
 
-    Update_CursorType : function(X, Y, PageNum_Abs)
+    Update_CursorType : function(X, Y, PageAbs)
     {
-        if ( PageNum_Abs != this.Content.Get_StartPage_Absolute() )
-            this.DrawingDocument.SetCursorType( "default", new CMouseMoveData() );
+        if (PageAbs != this.Content.Get_StartPage_Absolute())
+            this.DrawingDocument.SetCursorType("default", new CMouseMoveData());
         else
-            return this.Content.Update_CursorType( X, Y, PageNum_Abs );
+            return this.Content.Update_CursorType(X, Y, 0);
     },
 
-    Is_TableBorder : function(X, Y, PageNum_Abs)
+    Is_TableBorder : function(X, Y, PageAbs)
     {
-        this.Set_Page( PageNum_Abs );
-        return this.Content.Is_TableBorder( X, Y, PageNum_Abs );
+        this.Set_Page(PageAbs);
+        return this.Content.Is_TableBorder(X, Y, 0);
     },
 
-    Is_InText : function(X, Y, PageNum_Abs)
+    Is_InText : function(X, Y, PageAbs)
     {
-        this.Set_Page( PageNum_Abs );
-        return this.Content.Is_InText( X, Y, PageNum_Abs );
+        this.Set_Page(PageAbs);
+        return this.Content.Is_InText(X, Y, 0);
     },
 
-    Is_InDrawing : function(X, Y, PageNum_Abs)
+    Is_InDrawing : function(X, Y, PageAbs)
     {
-        this.Set_Page( PageNum_Abs );
-        return this.Content.Is_InDrawing( X, Y, PageNum_Abs );
+        this.Set_Page(PageAbs);
+        return this.Content.Is_InDrawing(X, Y, 0);
     },
 
     Document_UpdateInterfaceState : function()
@@ -883,7 +883,7 @@ CHeaderFooter.prototype =
     // Рисуем селект
     Selection_Draw_Page : function(Page_abs)
     {
-        return this.Content.Selection_Draw_Page(Page_abs, true, true);
+        return this.Content.Selection_Draw_Page(0, true, true);
     },
 
     Selection_Clear : function()
@@ -957,6 +957,16 @@ CHeaderFooter.prototype =
     },
 
     Get_StartPage_Relative : function()
+    {
+        return 0;
+    },
+
+    Get_AbsolutePage : function(CurPage)
+    {
+        return CurPage;
+    },
+
+    Get_AbsoluteColumn : function(CurPage)
     {
         return 0;
     },
@@ -1719,8 +1729,7 @@ CHeaderFooterController.prototype =
 
     Paragraph_Add : function( ParaItem, bRecalculate )
     {
-        // PageBreak убираем из колонтитула
-        if ( para_NewLine === ParaItem.Type && break_Page === ParaItem.BreakType )
+        if (para_NewLine === ParaItem.Type && true === ParaItem.Is_PageOrColumnBreak())
             return;
 
         if ( null != this.CurHdrFtr )
@@ -2126,8 +2135,8 @@ CHeaderFooterController.prototype =
 
     Selection_Check : function(X, Y, Page_Abs, NearPos)
     {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Selection_Check( X, Y, Page_Abs, NearPos );
+        if (null != this.CurHdrFtr)
+            return this.CurHdrFtr.Selection_Check(X, Y, 0, NearPos);
     },
 
     Selection_IsEmpty : function(bCheckHidden)

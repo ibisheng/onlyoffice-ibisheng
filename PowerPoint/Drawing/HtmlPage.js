@@ -17,9 +17,6 @@ var X_Right_Margin  = 15;  // 1.5 cm
 var Y_Bottom_Margin = 20;  // 2   cm
 var Y_Top_Margin    = 20;  // 2   cm
 
-var Y_Default_Header = 12.5; // 1.25 cm
-var Y_Default_Footer = 12.5; // 1.25 cm
-
 var X_Left_Field   = X_Left_Margin;
 var X_Right_Field  = Page_Width  - X_Right_Margin;
 var Y_Bottom_Field = Page_Height - Y_Bottom_Margin;

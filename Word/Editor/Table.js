@@ -31,549 +31,9 @@ var table_Selection_Border_InnerTable = 0x02;
 
 var type_Table = 0x0002;
 
-function CTableAnchorPosition()
-{
-    // Рассчитанные координаты
-    this.CalcX         = 0;
-    this.CalcY         = 0;
-
-    // Данные для Flow-объектов
-    this.W             = 0;
-    this.H             = 0;
-    this.X             = 0;
-    this.Y             = 0;
-    this.Left_Margin   = 0;
-    this.Right_Margin  = 0;
-    this.Top_Margin    = 0;
-    this.Bottom_Margin = 0;
-    this.Page_W        = 0;
-    this.Page_H        = 0;
-
-    this.Page_Top      = 0;
-    this.Page_Bottom   = 0;
-
-    this.X_min         = 0;
-    this.Y_min         = 0;
-    this.X_max         = 0;
-    this.Y_max         = 0;
-}
-
-CTableAnchorPosition.prototype =
-{
-    Set_X : function(W, X, Left_Margin, Right_Margin, Page_W, X_min, X_max)
-    {
-        this.W             = W;
-        this.X             = X;
-        this.Left_Margin   = Left_Margin;
-        this.Right_Margin  = Right_Margin;
-        this.Page_W        = Page_W;
-        this.X_min         = X_min;
-        this.X_max         = X_max;
-    },
-
-    Set_Y : function(H, Y, Top_Margin, Bottom_Margin, Page_H, Y_min, Y_max, Page_Top, Page_Bottom)
-    {
-        this.H             = H;
-        this.Y             = Y;
-        this.Top_Margin    = Top_Margin;
-        this.Bottom_Margin = Bottom_Margin;
-        this.Page_H        = Page_H;
-        this.Y_min         = Y_min;
-        this.Y_max         = Y_max;
-        this.Page_Top      = Page_Top;
-        this.Page_Bottom   = Page_Bottom;
-    },
-
-    Calculate_X : function(RelativeFrom, bAlign, Value)
-    {
-        // Вычисляем координату по X
-        switch(RelativeFrom)
-        {
-            // TODO: пока нет колонок варианты Text и Margin ничем не отличаются,
-            //       когда появятся колонки доделать тут
-            case c_oAscHAnchor.Text:
-            case c_oAscHAnchor.Margin:
-            {
-                if ( true === bAlign )
-                {
-                    switch ( Value )
-                    {
-                        case c_oAscXAlign.Center:
-                        {
-                            this.CalcX = (this.Left_Margin + this.Right_Margin - this.W) / 2;
-                            break;
-                        }
-
-                        case c_oAscXAlign.Inside:
-                        case c_oAscXAlign.Outside:
-                        case c_oAscXAlign.Left:
-                        {
-                            this.CalcX = this.Left_Margin;
-                            break;
-                        }
-
-                        case c_oAscXAlign.Right:
-                        {
-                            this.CalcX = this.Right_Margin - this.W;
-                            break;
-                        }
-                    }
-                }
-                else
-                    this.CalcX = this.Left_Margin + Value;
-
-                break;
-            }
-
-            case c_oAscHAnchor.Page:
-            {
-                var W = this.X_max - this.X_min;
-                if ( true === bAlign )
-                {
-                    switch ( Value )
-                    {
-                        case c_oAscXAlign.Center:
-                        {
-                            this.CalcX = this.X_min + (W - this.W) / 2;
-                            break;
-                        }
-
-                        case c_oAscXAlign.Inside:
-                        case c_oAscXAlign.Outside:
-                        case c_oAscXAlign.Left:
-                        {
-                            this.CalcX = this.X_min;
-                            break;
-                        }
-
-                        case c_oAscXAlign.Right:
-                        {
-                            this.CalcX = this.X_max - this.W;
-                            break;
-                        }
-                    }
-                }
-                else
-                    this.CalcX = this.X_min + Value;
-
-                break;
-            }
-
-            case c_oAscHAnchor.PageInternal:
-            {
-                if ( true === bAlign )
-                {
-                    switch ( Value )
-                    {
-                        case c_oAscXAlign.Center:
-                        {
-                            this.CalcX = (this.Page_W - this.W) / 2;
-                            break;
-                        }
-
-                        case c_oAscXAlign.Inside:
-                        case c_oAscXAlign.Outside:
-                        case c_oAscXAlign.Left:
-                        {
-                            this.CalcX = 0;
-                            break;
-                        }
-
-                        case c_oAscXAlign.Right:
-                        {
-                            this.CalcX = this.Page_W - this.W;
-                            break;
-                        }
-                    }
-                }
-                else
-                    this.CalcX = Value;
-
-                break;
-            }
-        }
-
-        return this.CalcX;
-    },
-
-    Calculate_Y : function(RelativeFrom, bAlign, Value)
-    {
-        // Вычисляем координату по Y
-        switch(RelativeFrom)
-        {
-            case c_oAscVAnchor.Margin:
-            {
-                if ( true === bAlign )
-                {
-                    switch(Value)
-                    {
-                        case c_oAscYAlign.Bottom:
-                        {
-                            this.CalcY = this.Bottom_Margin - this.H;
-                            break;
-                        }
-                        case c_oAscYAlign.Center:
-                        {
-                            this.CalcY = (this.Bottom_Margin + this.Top_Margin - this.H) / 2;
-                            break;
-                        }
-                        case c_oAscYAlign.Inline:
-                        case c_oAscYAlign.Inside:
-                        case c_oAscYAlign.Outside:
-                        case c_oAscYAlign.Top:
-                        {
-                            this.CalcY = this.Top_Margin;
-                            break;
-                        }
-                    }
-                }
-                else
-                    this.CalcY = this.Top_Margin + Value;
-
-                break;
-            }
-
-            case c_oAscVAnchor.Page:
-            {
-                if ( true === bAlign )
-                {
-                    switch(Value)
-                    {
-                        case c_oAscYAlign.Bottom:
-                        {
-                            this.CalcY = this.Page_Bottom - this.H;
-                            break;
-                        }
-                        case c_oAscYAlign.Center:
-                        {
-                            this.CalcY = (this.Page_Bottom - this.H) / 2;
-                            break;
-                        }
-                        case c_oAscYAlign.Inline:
-                        case c_oAscYAlign.Inside:
-                        case c_oAscYAlign.Outside:
-                        case c_oAscYAlign.Top:
-                        {
-                            this.CalcY = this.Page_Top;
-                            break;
-                        }
-                    }
-                }
-                else
-                    this.CalcY = this.Page_Top + Value;
-
-                break;
-            }
-
-            case c_oAscVAnchor.Text:
-            {
-                if ( true === bAlign )
-                {
-                    // Word не дает делать прилегания в данном случае
-                    this.CalcY = this.Y;
-                }
-                else
-                    this.CalcY = this.Y + Value;
-
-                break;
-            }
-        }
-
-        return this.CalcY;
-    },
-
-    Correct_Values : function(X_min, Y_min, X_max, Y_max, AllowOverlap, OtherFlowTables, CurTable)
-    {
-        var W = this.W;
-        var H = this.H;
-
-        var CurX = this.CalcX;
-        var CurY = this.CalcY;
-
-        var bBreak = false;
-        while ( true != bBreak )
-        {
-            bBreak = true;
-            for ( var Index = 0; Index < OtherFlowTables.length; Index++ )
-            {
-                var FlowTable = OtherFlowTables[Index];
-
-                if ( FlowTable.Table != CurTable && ( false === AllowOverlap || false === FlowTable.Table.Get_AllowOverlap() ) && ( CurX <= FlowTable.X + FlowTable.W && CurX + W >= FlowTable.X && CurY <= FlowTable.Y + FlowTable.H && CurY + H >= FlowTable.Y ) )
-                {
-                    /*
-                    // Если убирается справа, размещаем справа от картинки
-                    if ( FlowTable.X + FlowTable.W < X_max - W - 0.001 )
-                        CurX = FlowTable.X + FlowTable.W + 0.001;
-                    else
-                    {
-                        CurX = this.CalcX;
-                        CurY = FlowTable.Y + FlowTable.H + 0.001;
-                    }
-                    */
-
-                    // TODO: Пока у нас смещение по X плохо работает(смотри CTable.Shift), поэтому смещаем таблицу сразу по Y
-                    CurY = FlowTable.Y + FlowTable.H + 0.001;
-
-                    bBreak = false;
-                }
-            }
-        }
-
-        // TODO: Пока у нас смещение по X плохо работает(смотри CTable.Shift), поэтому смещаем таблицу сразу по Y
-        /*
-        // Скорректируем рассчитанную позицию, так чтобы объект не выходил за заданные пределы
-        if ( CurX + W > X_max )
-            CurX = X_max - W;
-
-        if ( CurX < X_min )
-            CurX = X_min;
-        */
-
-        // Скорректируем рассчитанную позицию, так чтобы объект не выходил за заданные пределы
-        if ( CurY + H > Y_max )
-            CurY = Y_max - H;
-
-        if ( CurY < this.Y_min )
-            CurY = this.Y_min;
-
-        this.CalcY = CurY;
-        this.CalcX = CurX;
-    },
-
-    // По значению CalcX получем Value
-    Calculate_X_Value : function(RelativeFrom)
-    {
-        var Value = 0;
-
-        switch(RelativeFrom)
-        {
-            case c_oAscHAnchor.Text:
-            case c_oAscHAnchor.Margin:
-            {
-                Value = this.CalcX - this.Left_Margin;
-
-                break;
-            }
-
-            case c_oAscHAnchor.Page:
-            {
-                Value = this.CalcX - this.X_min;
-
-                break;
-            }
-
-            case c_oAscHAnchor.PageInternal:
-            {
-                Value = this.CalcX;
-                break;
-            }
-        }
-
-        return Value;
-    },
-
-    // По значению CalcY и заданному RelativeFrom получем Value
-    Calculate_Y_Value : function(RelativeFrom)
-    {
-        var Value = 0;
-
-        switch(RelativeFrom)
-        {
-            case c_oAscVAnchor.Margin:
-            {
-                Value = this.CalcY - this.Top_Margin;
-
-                break;
-            }
-
-            case c_oAscVAnchor.Page:
-            {
-                Value = this.CalcY - this.Page_Top;
-
-                break;
-            }
-
-            case c_oAscVAnchor.Text:
-            {
-                Value = this.CalcY - this.Y;
-
-                break;
-            }
-        }
-
-        return Value;
-    }
-};
-
-function CTablePage(X, Y, XLimit, YLimit, FirstRow, MaxTopBorder)
-{
-    this.X            = X;
-    this.Y            = Y;
-    this.XLimit       = XLimit;
-    this.YLimit       = YLimit;
-    this.Bounds       = new CDocumentBounds( X, Y, XLimit, Y );
-
-    this.MaxTopBorder = MaxTopBorder;
-    this.FirstRow     = FirstRow;
-    this.LastRow      = FirstRow;
-    this.Height       = 0;
-}
-
-CTablePage.prototype =
-{
-    Shift : function(Dx, Dy)
-    {
-        this.X      += Dx;
-        this.Y      += Dy;
-        this.XLimit += Dx;
-        this.YLimit += Dy;
-        this.Bounds.Shift( Dx, Dy );
-    }
-};
-
-function CTableRecalcInfo()
-{
-    this.TableGridOpen = true;
-    this.TableGrid     = true;
-    this.TableBorders  = true;
-
-    this.CellsToRecalc = {};
-    this.CellsAll      = true;
-}
-
-CTableRecalcInfo.prototype =
-{
-    Set_Type_0 : function(Type)
-    {
-        this.Recalc_0_Type = Type;
-    },
-
-    Recalc_Borders : function()
-    {
-        this.TableBorders = true;
-    },
-
-    Add_Cell : function(Cell)
-    {
-        this.CellsToRecalc[Cell.Get_Id()] = Cell;
-    },
-
-    Check_Cell : function(Cell)
-    {
-        if ( true === this.CellsAll || undefined != this.CellsToRecalc[Cell.Get_Id()] )
-            return true;
-
-        return false;
-    },
-
-    Recalc_AllCells : function()
-    {
-        this.CellsAll = true;
-    },
-
-    Reset : function(bCellsAll)
-    {
-        this.TableGrid     = true;
-        this.TableBorders  = true;
-        this.CellsAll      = bCellsAll;
-        this.CellsToRecalc = {};
-    }
-};
-
-function CTableLook(bFC, bFR, bLC, bLR, bBH, bBV)
-{
-    this.m_bFirst_Col = ( true === bFC ? true : false );
-    this.m_bFirst_Row = ( true === bFR ? true : false );
-    this.m_bLast_Col  = ( true === bLC ? true : false );
-    this.m_bLast_Row  = ( true === bLR ? true : false );
-    this.m_bBand_Hor  = ( true === bBH ? true : false );
-    this.m_bBand_Ver  = ( true === bBV ? true : false );
-}
-
-CTableLook.prototype =
-{
-
-    Set : function(bFC, bFR, bLC, bLR, bBH, bBV)
-    {
-        this.m_bFirst_Col = ( true === bFC ? true : false );
-        this.m_bFirst_Row = ( true === bFR ? true : false );
-        this.m_bLast_Col  = ( true === bLC ? true : false );
-        this.m_bLast_Row  = ( true === bLR ? true : false );
-        this.m_bBand_Hor  = ( true === bBH ? true : false );
-        this.m_bBand_Ver  = ( true === bBV ? true : false );
-    },
-
-    Copy : function()
-    {
-        return new CTableLook( this.m_bFirst_Col, this.m_bFirst_Row, this.m_bLast_Col, this.m_bLast_Row, this.m_bBand_Hor, this.m_bBand_Ver );
-    },
-
-    Is_FirstCol : function()
-    {
-        return this.m_bFirst_Col;
-    },
-
-    Is_FirstRow : function()
-    {
-        return this.m_bFirst_Row;
-    },
-
-    Is_LastCol : function()
-    {
-        return this.m_bLast_Col;
-    },
-
-    Is_LastRow : function()
-    {
-        return this.m_bLast_Row;
-    },
-
-    Is_BandHor : function()
-    {
-        return this.m_bBand_Hor;
-    },
-
-    Is_BandVer : function()
-    {
-        return this.m_bBand_Ver;
-    },
-
-    Write_ToBinary : function(Writer)
-    {
-        // Bool : m_bFirst_Col
-        // Bool : m_bFirst_Row
-        // Bool : m_bLast_Col
-        // Bool : m_bLast_Row
-        // Bool : m_bBand_Hor
-        // Bool : m_bBand_Ver
-
-        Writer.WriteBool( this.m_bFirst_Col );
-        Writer.WriteBool( this.m_bFirst_Row );
-        Writer.WriteBool( this.m_bLast_Col );
-        Writer.WriteBool( this.m_bLast_Row );
-        Writer.WriteBool( this.m_bBand_Hor );
-        Writer.WriteBool( this.m_bBand_Ver );
-    },
-
-    Read_FromBinary : function(Reader)
-    {
-        // Bool : m_bFirst_Col
-        // Bool : m_bFirst_Row
-        // Bool : m_bLast_Col
-        // Bool : m_bLast_Row
-        // Bool : m_bBand_Hor
-        // Bool : m_bBand_Ver
-
-        this.m_bFirst_Col = Reader.GetBool();
-        this.m_bFirst_Row = Reader.GetBool();
-        this.m_bLast_Col  = Reader.GetBool();
-        this.m_bLast_Row  = Reader.GetBool();
-        this.m_bBand_Hor  = Reader.GetBool();
-        this.m_bBand_Ver  = Reader.GetBool();
-    }
-};
-
-// Класс CDocTable
+//----------------------------------------------------------------------------------------------------------------------
+// Класс  CTable
+//----------------------------------------------------------------------------------------------------------------------
 function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, Rows, Cols, TableGrid, bPresentation)
 {
     this.Id = g_oIdCounter.Get_NewId();
@@ -604,8 +64,10 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
         this.LogicDocument   = this.DrawingDocument.m_oLogicDocument;
     }
     
-    this.Parent          = Parent;
-    this.PageNum         = PageNum;
+    this.Parent       = Parent;
+    this.PageNum      = PageNum;
+    this.ColumnNum    = 0;
+    this.ColumnsCount = 1;
 
     this.CompiledPr =
     {
@@ -622,7 +84,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     this.TableStyle = (undefined !== this.DrawingDocument && null !== this.DrawingDocument && this.DrawingDocument.m_oLogicDocument && this.DrawingDocument.m_oLogicDocument.Styles ? this.DrawingDocument.m_oLogicDocument.Styles.Get_Default_TableGrid() : null);
     this.TableLook  = new CTableLook(true, true, false, false, true, false);
 
-    this.TableSumGrid  = []; // данный массив будет заполнен после Internal_RecalculateGrid
+    this.TableSumGrid  = []; // данный массив будет заполнен после private_RecalculateGrid
     this.TableGrid     = TableGrid;
     this.TableGridCalc = this.Internal_Copy_Grid(TableGrid);
 
@@ -2393,9 +1855,9 @@ CTable.prototype =
         return this.Parent.Get_Numbering();
     },
 
-    Get_PageBounds : function(Index)
+    Get_PageBounds : function(CurPage)
     {
-        return this.Pages[Index].Bounds;
+        return this.Pages[CurPage].Bounds;
     },
 
     Get_PagesCount : function()
@@ -2484,7 +1946,7 @@ CTable.prototype =
     },
 
     // Данная функция запрашивает новую позицию для содержимого у ячейки, разбивающейся на несколько страниц
-    Get_PageContentStartPos : function(PageNum, RowIndex, CellIndex)
+    Get_PageContentStartPos : function(CurPage, RowIndex, CellIndex)
     {
         var Row      = this.Content[RowIndex];
         var Cell     = Row.Get_Cell( CellIndex );
@@ -2499,18 +1961,16 @@ CTable.prototype =
         RowIndex = RowIndex + VMerge_count - 1;
         Row = this.Content[RowIndex];
 
-        // Из полученной позиции нас интересуют только Y и YLimit, потому что
-        // позиция по X у нас не должна меняться от страницы к странице
-        var Pos = this.Parent.Get_PageContentStartPos(PageNum + this.PageNum);
+        var Pos = this.Parent.Get_PageContentStartPos2(this.PageNum, this.ColumnNum, CurPage, this.Index);
 
         // На момент обращения к данной функции, у всех ячеек всех строк до текущей (включительно) должны быть
         // просчитаны верхние границы. И также должен быть просчитан заголовок на данной странице, если он есть.
 
         var bHeader = false;
         var Y = Pos.Y;
-        if ( -1 != this.HeaderInfo.PageIndex && this.HeaderInfo.Count > 0 && PageNum > this.HeaderInfo.PageIndex && true === this.HeaderInfo.Pages[PageNum].Draw )
+        if ( -1 != this.HeaderInfo.PageIndex && this.HeaderInfo.Count > 0 && CurPage > this.HeaderInfo.PageIndex && true === this.HeaderInfo.Pages[CurPage].Draw )
         {
-            Y = this.HeaderInfo.Pages[PageNum].RowsInfo[this.HeaderInfo.Count - 1].TableRowsBottom;
+            Y = this.HeaderInfo.Pages[CurPage].RowsInfo[this.HeaderInfo.Count - 1].TableRowsBottom;
             bHeader = true;
         }
 
@@ -2521,7 +1981,7 @@ CTable.prototype =
             if ( border_Single === Table_Border_Top.Value )
                 Y += Table_Border_Top.Size;
 
-            if ( true === bHeader || 0 === PageNum || ( 1 === PageNum && true != this.RowsInfo[0].FirstPage ) )
+            if ( true === bHeader || 0 === CurPage || ( 1 === CurPage && true != this.RowsInfo[0].FirstPage ) )
                 Y += CellSpacing;
             else
                 Y += CellSpacing / 2;
@@ -2561,8 +2021,10 @@ CTable.prototype =
         // Учтем верхнее поле ячейки
         Y += CellMar.Top.W;
 
+        var XOffset = Pos.X + this.Get_TableOffsetCorrection();
+
         // TODO: Здесь надо учитывать нижнюю границу ячейки и вычесть ее ширину из YLimit
-        return { X : CellInfo.X_content_start, XLimit : CellInfo.X_content_end, Y : Y, YLimit : Pos.YLimit, MaxTopBorder : MaxTopBorder };
+        return { X : XOffset + CellInfo.X_content_start, XLimit : XOffset + CellInfo.X_content_end, Y : Y, YLimit : Pos.YLimit, MaxTopBorder : MaxTopBorder };
     },
 
     Get_MaxTopBorder : function(RowIndex)
@@ -2715,7 +2177,7 @@ CTable.prototype =
 //-----------------------------------------------------------------------------------
     Get_StartPage_Absolute : function()
     {
-        return this.Parent.Get_StartPage_Absolute() + this.Get_StartPage_Relative();
+        return this.Get_AbsolutePage(0);
     },
 
     Get_StartPage_Relative : function()
@@ -2723,6 +2185,46 @@ CTable.prototype =
         return this.PageNum;
     },
 
+    Get_StartColumn : function()
+    {
+        return this.ColumnNum;
+    },
+
+    Get_ColumnsCount : function()
+    {
+        return this.ColumnsCount;
+    },
+
+    private_GetRelativePageIndex : function(CurPage)
+    {
+        if (!this.ColumnsCount || 0 === this.ColumnsCount)
+            return this.PageNum + CurPage;
+
+        return this.PageNum + ((this.ColumnNum + CurPage) / this.ColumnsCount | 0);
+    },
+
+    private_GetAbsolutePageIndex : function(CurPage)
+    {
+        return this.Parent.Get_AbsolutePage(this.private_GetRelativePageIndex(CurPage));
+    },
+
+    Get_AbsolutePage : function(CurPage)
+    {
+        return this.private_GetAbsolutePageIndex(CurPage);
+    },
+
+    Get_AbsoluteColumn : function(CurPage)
+    {
+        if (this.Parent instanceof CDocument)
+            return this.private_GetColumnIndex(CurPage);
+
+        return this.Parent.Get_AbsoluteColumn(this.private_GetRelativePageIndex(CurPage));
+    },
+
+    private_GetColumnIndex : function(CurPage)
+    {
+        return (this.ColumnNum + CurPage) - (((this.ColumnNum + CurPage) / this.ColumnsCount | 0) * this.ColumnsCount);
+    },
 //-----------------------------------------------------------------------------------
 // Функции к которым идет обращение из родительского класса
 //-----------------------------------------------------------------------------------
@@ -2790,35 +2292,31 @@ CTable.prototype =
         return Table;
     },
 
-    Shift : function(PageIndex, Dx, Dy)
+    Shift : function(CurPage, Dx, Dy)
     {
-        var CurPage = PageIndex;
-        this.Pages[PageIndex].Shift( Dx, Dy );
+        this.Pages[CurPage].Shift(Dx, Dy);
 
-        if ( 0 === PageIndex )
+        if (0 === CurPage)
         {
             this.X_origin += Dx;
-            this.X        += Dx;
-            this.Y        += Dy;
-            this.XLimit   += Dx;
-            this.YLimit   += Dy;
+            this.X += Dx;
+            this.Y += Dy;
+            this.XLimit += Dx;
+            this.YLimit += Dy;
         }
 
-        var StartRow = this.Pages[PageIndex].FirstRow;
-        var LastRow  = this.Pages[PageIndex].LastRow;
-        for ( var CurRow = StartRow; CurRow <= LastRow; CurRow++ )
+        var StartRow = this.Pages[CurPage].FirstRow;
+        var LastRow  = this.Pages[CurPage].LastRow;
+        for (var CurRow = StartRow; CurRow <= LastRow; CurRow++)
         {
-            // TODO: Сдвиг по X работает неправильно, потому что не сдвигаются Row.CellInfo, но чтобы
-            //       их можно было двигать, нужно сделать к ним обращение по страничное, иначе будет
-            //       плохо ячейкам, которые разбиты на несколько страниц.
-            var Row = this.Content[CurRow];
+            var Row        = this.Content[CurRow];
             var CellsCount = Row.Get_CellsCount();
-            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
+            for (var CurCell = 0; CurCell < CellsCount; CurCell++)
             {
-                var Cell = Row.Get_Cell( CurCell );
+                var Cell          = Row.Get_Cell(CurCell);
                 var CellPageIndex = CurPage - Cell.Content.Get_StartPage_Relative();
-                if ( vmerge_Restart === Cell.Get_VMerge() )
-                    Cell.Content.Shift( CellPageIndex, Dx, Dy );
+                if (vmerge_Restart === Cell.Get_VMerge())
+                    Cell.Content.Shift(CellPageIndex, Dx, Dy);
             }
 
             this.RowsInfo[CurRow].Y[CurPage] += Dy;
@@ -2842,13 +2340,13 @@ CTable.prototype =
     Internal_UpdateFlowPosition : function(X, Y)
     {
         this.X_origin = X;
-        var Dx = this.Get_TableOffsetCorrection();
+        var Dx        = this.Get_TableOffsetCorrection();
 
         this.X = X + Dx;
         this.Y = Y;
 
-        this.Set_PositionH( c_oAscHAnchor.Page, false, this.X );
-        this.Set_PositionV( c_oAscVAnchor.Page, false, this.Y );
+        this.Set_PositionH(c_oAscHAnchor.Page, false, this.X);
+        this.Set_PositionV(c_oAscVAnchor.Page, false, this.Y);
     },
 
     Move : function(X, Y, PageNum, NearestPos)
@@ -3036,83 +2534,34 @@ CTable.prototype =
         editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
     },
 
-    Reset : function (X,Y, XLimit, YLimit, PageNum)
+    Reset : function (X, Y, XLimit, YLimit, PageNum, ColumnNum, ColumnsCount)
     {
-        if ( this.Parent.RecalcInfo.FlowObject === this && c_oAscVAnchor.Text === this.PositionV.RelativeFrom  )
+        if (this.Parent.RecalcInfo.FlowObject === this && c_oAscVAnchor.Text === this.PositionV.RelativeFrom)
         {
-            this.Y      -= this.PositionV.Value;
+            this.Y -= this.PositionV.Value;
             this.YLimit -= this.PositionV.Value;
             return;
         }
 
         this.X_origin = X;
-        var Dx = this.Get_TableOffsetCorrection();
+        this.X        = X;
+        this.Y        = Y + 0.001; // Погрешность для Flow-таблиц
+        this.XLimit = XLimit;
+        this.YLimit = YLimit;
 
-        this.X        = X + Dx;
-        this.Y        = Y + 0.001; // погрешность для Flow-таблиц
-        this.XLimit   = XLimit;
-        this.YLimit   = YLimit;
-
-        this.PageNum = PageNum;
+        this.PageNum      = PageNum;
+        this.ColumnNum    = ColumnNum ? ColumnNum : 0;
+        this.ColumnsCount = ColumnsCount ? ColumnsCount : 1;
 
         this.Pages.length = 1;
-        this.Pages[0] = new CTablePage( X, Y, XLimit, YLimit, 0, 0 );
+        this.Pages[0]     = new CTablePage(X, Y, XLimit, YLimit, 0, 0);
     },
 
     Recalculate : function()
     {
         // Пересчитываем сетку колонок
-        this.Internal_RecalculateGrid();
+        this.private_RecalculateGrid();
         this.Internal_Recalculate_1();
-    },
-
-    Start_FromNewPage : function()
-    {
-        this.Pages.length = 1;
-        this.Pages[0] = new CTablePage( 0, 0, 0, 0, 0, 0 );
-
-        this.HeaderInfo.Pages[0] = {};
-        this.HeaderInfo.Pages[0].Draw = false;
-
-        this.RowsInfo[0] = {};
-        this.RowsInfo[0].Pages        = 1;
-        this.RowsInfo[0].Y            = [];
-        this.RowsInfo[0].H            = [];
-        this.RowsInfo[0].TopDy        = [];
-        this.RowsInfo[0].MaxTopBorder = [];
-        this.RowsInfo[0].FirstPage    = false;
-        this.RowsInfo[0].StartPage    = 0;
-
-
-        this.RowsInfo[0].X0           = 0;
-        this.RowsInfo[0].X1           = 0;
-        this.RowsInfo[0].MaxBotBorder = 0;
-
-        this.RowsInfo[0].Y[0]            = 0.0;
-        this.RowsInfo[0].H[0]            = 0.0;
-        this.RowsInfo[0].TopDy[0]        = 0.0;
-        this.RowsInfo[0].MaxTopBorder[0] = 0.0;
-
-        // Обнуляем таблицу суммарных высот ячеек
-        for ( var Index = -1; Index < this.Content.length; Index++ )
-        {
-            this.TableRowsBottom[Index] = [];
-            this.TableRowsBottom[Index][0] = 0;
-        }
-
-        this.Pages[0].MaxBotBorder = 0;
-        this.Pages[0].BotBorders   = [];
-
-        if ( this.Content.length > 0 )
-        {
-            var CellsCount = this.Content[0].Get_CellsCount();
-            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-            {
-                var Cell = this.Content[0].Get_Cell( CurCell );
-                Cell.Content.Start_FromNewPage();
-                Cell.PagesCount = 2;
-            }
-        }
     },
 
     Reset_RecalculateCache : function()
@@ -3130,35 +2579,6 @@ CTable.prototype =
                 Cell.Content.Reset_RecalculateCache();
             }
         }
-    },
-
-    Recalculate_Page : function(_PageIndex)
-    {
-        var PageIndex = _PageIndex - this.PageNum;
-
-        if ( 0 === PageIndex )
-        {
-            // TODO: Внутри функции Internal_Recalculate_Borders происходит персчет метрик каждой ячейки, это надо бы
-            //       вынести в отдельную функцию. Из-за этого функцию Internal_Recalculate_Header приходится запускать позже.
-
-            this.Internal_RecalculateGrid();
-            this.Internal_Recalculate_Borders();
-            this.Internal_Recalculate_Header();
-            this.Internal_Recalculate_Position_1();
-
-            // TODO: Пока оставим эту заглушку на случай загрузки плохих таблиц. В будущем надо будет
-            //       сделать нормальный обсчет для случая, когда у нас есть "пустые" строки (составленные
-            //       из вертикально объединенных ячеек).
-            this.Internal_Check_TableRows(false);
-        }
-
-        var Result = this.Internal_Recalculate_1_(PageIndex);
-        this.Internal_Recalculate_Position_2(PageIndex);
-
-        if ( recalcresult_NextElement === Result )
-            this.RecalcInfo.Reset(false);
-
-        return Result;
     },
 
     RecalculateCurPos : function()
@@ -3283,8 +2703,8 @@ CTable.prototype =
 
     Recalculate_AllTables : function()
     {
-        this.Internal_RecalculateGrid();
-        this.Internal_Recalculate_Borders();
+        this.private_RecalculateGrid();
+        this.private_RecalculateBorders();
 
         var RowsCount = this.Content.length;
         for ( var CurRow = 0; CurRow < RowsCount; CurRow++ )
@@ -3299,1676 +2719,45 @@ CTable.prototype =
         }
     },
 
-    ReDraw : function()
-    {
-        this.Parent.OnContentReDraw( this.Get_StartPage_Absolute(), this.Get_StartPage_Absolute() + this.Pages.length - 1 );
-    },
-
-    Draw : function(nPageIndex, pGraphics)
-    {
-        var PNum = nPageIndex - this.PageNum;
-        if ( PNum < 0 || PNum >= this.Pages.length )
-            return 0;
-
-        // Определим какие строки попадают на данную страницу
-        var Row_start = this.Pages[PNum].FirstRow;
-        var Row_last  = this.Pages[PNum].LastRow;
-
-        // Возможно, на данной странице строку, с которой началось разбиение на странице,
-        // не надо рисовать. (Если начальная и конечная строки совпадают, тогда это 2
-        // или более страница данной строки)
-        if ( (Row_start != Row_last || ( 0 === Row_start && 0 === Row_last && 0 === PNum ) ) && false === this.RowsInfo[Row_last].FirstPage )
-            Row_last--;
-
-        if ( Row_last < Row_start )
-            return -1;
-
-        var bIsSmartGrForcing = false;
-        if (pGraphics.StartCheckTableDraw)
-            bIsSmartGrForcing = pGraphics.StartCheckTableDraw();
-
-        //-------------------------------------------------------------------------------------
-        // 1. Сначала заливаем таблицу и если есть Spacing, тогда обводим внешнюю рамку таблицы
-        //-------------------------------------------------------------------------------------
-        this.Internal_Draw_1( pGraphics, PNum, Row_start, Row_last );
-        //-------------------------------------------------------------------------------------
-        // 2. Рисуем заливку всех ячеек таблицы
-        //-------------------------------------------------------------------------------------
-        this.Internal_Draw_2( pGraphics, PNum, Row_start, Row_last );
-
-        //-------------------------------------------------------------------------------------
-        // 3. Рисуем содержимое ячеек
-        //-------------------------------------------------------------------------------------
-        this.Internal_Draw_3( pGraphics, PNum, Row_start, Row_last );
-
-        //-------------------------------------------------------------------------------------
-        // 4. Рисуем границы всех ячеек таблицы
-        //-------------------------------------------------------------------------------------
-        this.Internal_Draw_4( pGraphics, PNum, Row_start, Row_last );
-
-        if (pGraphics.EndCheckTableDraw)
-            pGraphics.EndCheckTableDraw(bIsSmartGrForcing);
-
-        if ( PNum < this.Pages.length - 1 )
-            return -1;
-
-        return 0;
-    },
-
-    Internal_Draw_1 : function(pGraphics, PNum, Row_start, Row_last)
-    {
-        var TableShd = this.Get_Shd();
-
-        var X_left_old  = null;
-        var X_right_old = null;
-
-        var Y_top    = this.Pages[PNum].Bounds.Top;
-        var Y_bottom = this.Pages[PNum].Bounds.Top;
-
-        var LockType = this.Lock.Get_Type();
-        if ( locktype_None != LockType )
-        {
-            pGraphics.DrawLockObjectRect(this.Lock.Get_Type(), this.Pages[PNum].Bounds.Left, this.Pages[PNum].Bounds.Top, this.Pages[PNum].Bounds.Right - this.Pages[PNum].Bounds.Left, this.Pages[PNum].Bounds.Bottom - this.Pages[PNum].Bounds.Top );
-        }
-
-        var TableBorders = this.Get_Borders();
-
-        // Заголовок
-        var bHeader = false;
-        if(this.bPresentation)
-        {
-            var Row         = this.Content[0];
-            var CellSpacing = Row.Get_CellSpacing();
-            var CellsCount  = Row.Get_CellsCount();
-            var X_left_new  = Row.Get_CellInfo( 0 ).X_grid_start;
-            var X_right_new = Row.Get_CellInfo( CellsCount - 1 ).X_grid_end;
-            pGraphics.SaveGrState();
-            pGraphics.SetIntegerGrid(false);
-            var ShapeDrawer = new CShapeDrawer();
-            TableShd.Unifill && TableShd.Unifill.check(this.Get_Theme(), this.Get_ColorMap());
-            var Transform = this.Parent.transform.CreateDublicate();
-            global_MatrixTransformer.TranslateAppend(Transform, Math.min(X_left_new, X_right_new), Math.min(Y_top, Y_bottom));
-            pGraphics.transform3(Transform, false);
-            ShapeDrawer.fromShape2(new ObjectToDraw(TableShd.Unifill, null, Math.abs(X_right_new - X_left_new), Math.abs(this.Pages[0].Bounds.Bottom - Y_top), null, Transform), pGraphics, null);
-            ShapeDrawer.draw(null);
-            pGraphics.RestoreGrState();
-        }
-        if ( this.HeaderInfo.Count > 0 && PNum > this.HeaderInfo.PageIndex && true === this.HeaderInfo.Pages[PNum].Draw )
-        {
-            bHeader = true;
-
-            var HeaderPage = this.HeaderInfo.Pages[PNum];
-            for ( var CurRow = 0; CurRow < this.HeaderInfo.Count; CurRow++ )
-            {
-                var Row         = HeaderPage.Rows[CurRow];
-                var CellSpacing = Row.Get_CellSpacing();
-                var CellsCount  = Row.Get_CellsCount();
-                var X_left_new  = Row.Get_CellInfo( 0 ).X_grid_start;
-                var X_right_new = Row.Get_CellInfo( CellsCount - 1 ).X_grid_end;
-
-                Y_bottom = HeaderPage.RowsInfo[CurRow].Y + HeaderPage.RowsInfo[CurRow].H;
-
-                var PrevCellSpacing = ( CurRow < this.HeaderInfo.Count - 1 ? HeaderPage.Rows[CurRow + 1].Get_CellSpacing() : this.Content[Row_start].Get_CellSpacing() );
-                Y_bottom += (PrevCellSpacing + CellSpacing) / 4;
-
-                this.Internal_Draw_1_(pGraphics, TableShd, (null != CellSpacing ? true : false), TableBorders, X_left_new, X_left_old, X_right_new, X_right_old, Y_top, Y_bottom, ( 0 === CurRow ? true : false), false );
-
-                X_left_old  = X_left_new;
-                X_right_old = X_right_new;
-
-                Y_top = Y_bottom;
-            }
-        }
-
-        for ( var CurRow = Row_start; CurRow <= Row_last; CurRow++ )
-        {
-            var Row         = this.Content[CurRow];
-            var CellSpacing = Row.Get_CellSpacing();
-            var CellsCount  = Row.Get_CellsCount();
-            var X_left_new  = Row.Get_CellInfo( 0 ).X_grid_start;
-            var X_right_new = Row.Get_CellInfo( CellsCount - 1 ).X_grid_end;
-
-            Y_bottom = this.RowsInfo[CurRow].Y[PNum] + this.RowsInfo[CurRow].H[PNum];
-            if ( this.Content.length - 1 === CurRow )
-            {
-                Y_bottom += Row.Get_CellSpacing();
-            }
-            else
-            {
-                var CellSpacing = Row.Get_CellSpacing();
-                var PrevCellSpacing = this.Content[CurRow + 1].Get_CellSpacing();
-                Y_bottom += (PrevCellSpacing + CellSpacing) / 4;
-            }
-
-            if ( null != CellSpacing && PNum != this.Pages.length - 1 && CurRow === Row_last )
-                Y_bottom += this.Pages[PNum].MaxBotBorder;
-
-            this.Internal_Draw_1_(pGraphics, TableShd, (null != CellSpacing ? true : false), TableBorders, X_left_new, X_left_old, X_right_new, X_right_old, Y_top, Y_bottom, ( true != bHeader && Row_start === CurRow ? true : false), (Row_last === CurRow ? true : false) );
-
-            X_left_old  = X_left_new;
-            X_right_old = X_right_new;
-
-            Y_top = Y_bottom;
-        }
-    },
-
-    Internal_Draw_1_ : function(pGraphics, TableShd, bBorder, TableBorders, X_left_new, X_left_old, X_right_new, X_right_old, Y_top, Y_bottom, bStartRow, bLastRow)
-    {
-        var Theme = this.Get_Theme();
-        var ColorMap = this.Get_ColorMap();
-        var RGBA;
-        // Рисуем рамку и заливку самой таблицы
-        if ( shd_Nil != TableShd.Value )
-        {
-           if(!this.bPresentation)
-           {
-                RGBA = TableShd.Get_Color2(Theme, ColorMap);
-               if(pGraphics.SetShd)
-               {
-                   pGraphics.SetShd(TableShd);
-
-               }
-                pGraphics.b_color1( RGBA.r, RGBA.g, RGBA.b, 255 );
-                pGraphics.TableRect(Math.min(X_left_new, X_right_new), Math.min(Y_top, Y_bottom), Math.abs(X_right_new - X_left_new), Math.abs(Y_bottom - Y_top));
-           }
-          // else
-          // {
-          //     pGraphics.SaveGrState();
-          //     pGraphics.SetIntegerGrid(false);
-          //     var ShapeDrawer = new CShapeDrawer();
-          //     TableShd.Unifill && TableShd.Unifill.check(Theme, ColorMap);
-          //     var Transform = this.Parent.transform.CreateDublicate();
-          //     global_MatrixTransformer.TranslateAppend(Transform, Math.min(X_left_new, X_right_new), Math.min(Y_top, Y_bottom));
-          //     pGraphics.transform3(Transform, false);
-          //     ShapeDrawer.fromShape2(new ObjectToDraw(TableShd.Unifill, null, Math.abs(X_right_new - X_left_new), Math.abs(Y_bottom - Y_top), null, Transform), pGraphics, null);
-          //     ShapeDrawer.draw(null);
-          //     pGraphics.RestoreGrState();
-          // }
-        }
-
-        if ( true === bBorder )
-        {
-            // Левая граница
-            if ( border_Single === TableBorders.Left.Value )
-            {
-                RGBA = TableBorders.Left.Get_Color2(Theme, ColorMap);
-                pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                if(pGraphics.SetBorder)
-                {
-                    pGraphics.SetBorder(TableBorders.Left);
-                }
-                if ( null === X_left_old || Math.abs( X_left_new - X_left_old ) < 0.001 )
-                {
-                    pGraphics.drawVerLine( c_oAscLineDrawingRule.Center, X_left_new, Y_top, Y_bottom, TableBorders.Left.Size );
-                }
-                else
-                {
-                    if ( X_left_new > X_left_old )
-                    {
-                        pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top,    Y_top, X_left_old, X_left_new, TableBorders.Left.Size, -TableBorders.Left.Size / 2, 0 );
-                    }
-                    else
-                    {
-                        pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Bottom, Y_top, X_left_old, X_left_new, TableBorders.Left.Size, +TableBorders.Left.Size / 2, -TableBorders.Left.Size / 2 );
-                    }
-
-                    pGraphics.drawVerLine( c_oAscLineDrawingRule.Center, X_left_new, Y_top, Y_bottom, TableBorders.Left.Size );
-                }
-            }
-            else //if ( border_None === TableBorders.Left.Value )
-            {
-                if ( null === X_left_old || Math.abs( X_left_new - X_left_old ) < 0.001 )
-                {
-                    pGraphics.DrawEmptyTableLine( X_left_new, Y_top, X_left_new, Y_bottom );
-                }
-                else
-                {
-                    pGraphics.DrawEmptyTableLine( X_left_old, Y_top, X_left_new, Y_top    );
-                    pGraphics.DrawEmptyTableLine( X_left_new, Y_top, X_left_new, Y_bottom );
-                }
-            }
-
-            // Правая граница
-            if ( border_Single === TableBorders.Right.Value )
-            {
-                RGBA =  TableBorders.Right.Get_Color2(Theme, ColorMap);
-                pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                if(pGraphics.SetBorder)
-                {
-                    pGraphics.SetBorder(TableBorders.Right);
-                }
-                if ( null === X_right_old || Math.abs( X_right_new - X_right_old ) < 0.001 )
-                {
-                    pGraphics.drawVerLine( c_oAscLineDrawingRule.Center, X_right_new, Y_top, Y_bottom, TableBorders.Right.Size );
-                }
-                else
-                {
-                    if ( X_right_new > X_right_old )
-                    {
-                        pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Bottom, Y_top, X_right_old, X_right_new, TableBorders.Right.Size, - TableBorders.Right.Size / 2, +TableBorders.Right.Size / 2 );
-                    }
-                    else
-                    {
-                        pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y_top, X_right_old, X_right_new, TableBorders.Right.Size, + TableBorders.Right.Size / 2, 0 );
-                    }
-
-                    pGraphics.drawVerLine( c_oAscLineDrawingRule.Center, X_right_new, Y_top, Y_bottom, TableBorders.Right.Size );
-                }
-            }
-            else //if ( border_None === TableBorders.Right.Value )
-            {
-                if ( null === X_right_old || Math.abs( X_right_new - X_right_old ) < 0.001 )
-                {
-                    pGraphics.DrawEmptyTableLine( X_right_new, Y_top, X_right_new, Y_bottom );
-                }
-                else
-                {
-                    pGraphics.DrawEmptyTableLine( X_right_old, Y_top, X_right_new, Y_top    );
-                    pGraphics.DrawEmptyTableLine( X_right_new, Y_top, X_right_new, Y_bottom );
-                }
-            }
-
-            if ( true === bStartRow )
-            {
-                // Верхняя граница
-                if ( border_Single === TableBorders.Top.Value )
-                {
-                    RGBA =  TableBorders.Top.Get_Color2(Theme, ColorMap);
-                    pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                    if(pGraphics.SetBorder)
-                    {
-                        pGraphics.SetBorder(TableBorders.Top);
-                    }
-                    // Добавочные значения толщины правой и левой границ
-                    var LeftMW = 0;
-                    if ( border_Single === TableBorders.Left.Value )
-                        LeftMW = - TableBorders.Left.Size / 2;
-
-                    var RightMW = 0;
-                    if ( border_Single === TableBorders.Right.Value )
-                        RightMW = + TableBorders.Right.Size / 2;
-
-                    pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y_top, X_left_new, X_right_new, TableBorders.Top.Size, LeftMW, RightMW );
-                }
-                else //if ( border_None === TableBorders.Top.Value )
-                {
-                    pGraphics.DrawEmptyTableLine( X_left_new, Y_top, X_right_new, Y_top );
-                }
-            }
-
-            if ( true === bLastRow )
-            {
-                // Нижняя граница
-                if ( border_Single === TableBorders.Bottom.Value )
-                {
-                    RGBA =  TableBorders.Bottom.Get_Color2(Theme, ColorMap);
-                    pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                    if(pGraphics.SetBorder)
-                    {
-                        pGraphics.SetBorder(TableBorders.Bottom);
-                    }
-                    // Добавочные значения толщины правой и левой границ
-                    var LeftMW = 0;
-                    if ( border_Single === TableBorders.Left.Value )
-                        LeftMW = - TableBorders.Left.Size / 2;
-
-                    var RightMW = 0;
-                    if ( border_Single === TableBorders.Right.Value )
-                        RightMW = + TableBorders.Right.Size / 2;
-
-                    pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y_bottom, X_left_new, X_right_new, TableBorders.Bottom.Size, LeftMW, RightMW );
-                }
-                else //if ( border_None === TableBorders.Bottom.Value )
-                {
-                    pGraphics.DrawEmptyTableLine( X_left_new, Y_bottom, X_right_new, Y_bottom );
-                }
-            }
-        }
-
-    },
-
-    Internal_Draw_2 : function(pGraphics, PNum, Row_start, Row_last)
-    {
-        // Рисуем заливку всех ячеек на странице
-        var Theme = this.Get_Theme();
-        var ColorMap = this.Get_ColorMap();
-        if(this.bPresentation)
-        {
-            pGraphics.SaveGrState();
-            pGraphics.SetIntegerGrid(false);
-        }
-        if ( this.HeaderInfo.Count > 0 && PNum > this.HeaderInfo.PageIndex && true === this.HeaderInfo.Pages[PNum].Draw )
-        {
-            var HeaderPage = this.HeaderInfo.Pages[PNum];
-            // Рисуем заливку всех ячеек на странице
-            for ( var CurRow = 0; CurRow < this.HeaderInfo.Count; CurRow++ )
-            {
-                var Row        = HeaderPage.Rows[CurRow];
-                var CellsCount = Row.Get_CellsCount();
-                var Y          = HeaderPage.RowsInfo[CurRow].Y;
-
-                // Рисуем ячейки начиная с последней, потому что левая ячейка
-                // должна рисоваться поверх правой при конфликте границ.
-                for ( var CurCell = CellsCount - 1; CurCell >= 0; CurCell-- )
-                {
-                    var Cell       = Row.Get_Cell( CurCell );
-                    var GridSpan   = Cell.Get_GridSpan();
-                    var VMerge     = Cell.Get_VMerge();
-                    var CurGridCol = Row.Get_CellInfo( CurCell ).StartGridCol;
-
-                    if ( vmerge_Continue === VMerge )
-                        continue;
-
-                    var CellInfo     = Row.Get_CellInfo( CurCell );
-                    var X_cell_start = CellInfo.X_cell_start;
-                    var X_cell_end   = CellInfo.X_cell_end;
-
-                    var VMergeCount  = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
-                    var RealHeight   = HeaderPage.RowsInfo[CurRow + VMergeCount - 1].Y + HeaderPage.RowsInfo[CurRow + VMergeCount - 1].H - Y;
-
-                    // Заливаем ячейку
-                    var CellShd = Cell.Get_Shd();
-                    if(!this.bPresentation)
-                    {
-                        var RGBA = CellShd.Get_Color2(Theme, ColorMap);
-                        if (true !== RGBA.Auto)
-                        {
-                            pGraphics.b_color1(RGBA.r, RGBA.g, RGBA.b, 255);
-                            if(pGraphics.SetShd)
-                            {
-                                pGraphics.SetShd(CellShd);
-
-                            }
-                            pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
-                        }
-                    }
-                    else
-                    {
-                        if(CellShd.Unifill && CellShd.Unifill.fill)
-                        {
-                           //if(CellShd.Unifill.fill.type === FILL_TYPE_SOLID)
-                           //{
-                           //    var Alpha, RGBA = CellShd.Get_Color3(Theme, ColorMap);
-                           //    if(isRealNumber(CellShd.Unifill.transparent))
-                           //    {
-                           //        Alpha = CellShd.Unifill.transparent;
-                           //    }
-                           //    else
-                           //    {
-                           //        Alpha = 255;
-                           //    }
-                           //    pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, Alpha );
-                           //    pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
-                           //}
-                           //else TODO: Сделать нормальную отрисовку.
-                            {
-                                var ShapeDrawer = new CShapeDrawer();
-                                CellShd.Unifill.check(Theme, ColorMap);
-                                var Transform = this.Parent.transform.CreateDublicate();
-                                global_MatrixTransformer.TranslateAppend(Transform, Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight));
-
-                                pGraphics.transform3(Transform, false);
-                                ShapeDrawer.fromShape2(new ObjectToDraw(CellShd.Unifill, null, Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight), null, Transform), pGraphics, null);
-                                ShapeDrawer.draw(null);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-
-        // Рисуем заливку всех ячеек на странице
-        for ( var CurRow = Row_start; CurRow <= Row_last; CurRow++ )
-        {
-            var Row = this.Content[CurRow];
-            var CellsCount = Row.Get_CellsCount();
-            var Y = this.RowsInfo[CurRow].Y[PNum];
-
-            // Рисуем ячейки начиная с последней, потому что левая ячейка
-            // должна рисоваться поверх правой при конфликте границ.
-            for ( var CurCell = CellsCount - 1; CurCell >= 0; CurCell-- )
-            {
-                var Cell = Row.Get_Cell( CurCell );
-                var GridSpan = Cell.Get_GridSpan();
-                var VMerge = Cell.Get_VMerge();
-                var CurGridCol = Row.Get_CellInfo( CurCell ).StartGridCol;
-
-                if ( vmerge_Continue === VMerge )
-                {
-                    if ( Row_start === CurRow  )
-                    {
-                        Cell = this.Internal_Get_StartMergedCell( CurRow, CurGridCol, GridSpan );
-                        if ( null === Cell )
-                            continue;
-
-                        // Параметры GridSpan и CurGridCol должны остаться такими же
-                    }
-                    else
-                        continue;
-                }
-
-                var CellInfo = Row.Get_CellInfo( CurCell );
-                var X_cell_start    = CellInfo.X_cell_start;
-                var X_cell_end      = CellInfo.X_cell_end;
-
-                var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
-                // Мы должны найти сколько объединено вертикально ячеек на данной странице
-                if ( PNum + 1 < this.Pages.length )
-                {
-                    if ( CurRow + VMergeCount - 1 >= this.Pages[PNum + 1].FirstRow )
-                    {
-                        VMergeCount = this.Pages[PNum + 1].FirstRow + 1 - CurRow;
-                        if ( /*Row_start != Row_last &&*/ false === this.RowsInfo[CurRow + VMergeCount - 1].FirstPage && PNum === this.RowsInfo[CurRow + VMergeCount - 1].StartPage )
-                            VMergeCount--;
-
-                        if ( VMergeCount <= 0 )
-                        {
-                            continue;
-                        }
-                    }
-                }
-
-
-                var RealHeight  = this.RowsInfo[CurRow + VMergeCount - 1].Y[PNum] + this.RowsInfo[CurRow + VMergeCount - 1].H[PNum] - Y;
-
-                // Заливаем ячейку
-                var CellShd = Cell.Get_Shd();
-                if ( shd_Nil != CellShd.Value )
-                {
-                    if(!this.bPresentation)
-                    {
-                        var RGBA = CellShd.Get_Color2(Theme, ColorMap);
-                        if (true !== RGBA.Auto)
-                        {
-                            pGraphics.b_color1(RGBA.r, RGBA.g, RGBA.b, 255);
-                            if(pGraphics.SetShd)
-                            {
-                                pGraphics.SetShd(CellShd);
-
-                            }
-                            pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
-                        }
-                    }
-                    else
-                    {
-                        if(CellShd.Unifill && CellShd.Unifill.fill)
-                        {
-                            //if(CellShd.Unifill.fill.type === FILL_TYPE_SOLID)
-                            //{
-                            //    var Alpha, RGBA = CellShd.Get_Color3(Theme, ColorMap);
-                            //    if(isRealNumber(CellShd.Unifill.transparent))
-                            //    {
-                            //        Alpha = CellShd.Unifill.transparent;
-                            //    }
-                            //    else
-                            //    {
-                            //        Alpha = 255;
-                            //    }
-                            //    pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, Alpha );
-                            //    pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
-                            //}
-                            //else TODO: Сделать нормальную отрисовку.
-                            {
-                                var ShapeDrawer = new CShapeDrawer();
-                                CellShd.Unifill.check(Theme, ColorMap);
-                                var Transform = this.Parent.transform.CreateDublicate();
-                                global_MatrixTransformer.TranslateAppend(Transform, Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight));
-                                pGraphics.transform3(Transform, false);
-                                ShapeDrawer.fromShape2(new ObjectToDraw(CellShd.Unifill, null, Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight), null, Transform), pGraphics, null);
-                                ShapeDrawer.draw(null);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if(this.bPresentation)
-        {
-            pGraphics.RestoreGrState();
-        }
-    },
-
-    Internal_Draw_3 : function(pGraphics, PNum, Row_start, Row_last)
-    {
-        if ( this.HeaderInfo.Count > 0 && PNum > this.HeaderInfo.PageIndex && true === this.HeaderInfo.Pages[PNum].Draw )
-        {
-            if(pGraphics.Start_Command)
-            {
-                pGraphics.Start_Command(DRAW_COMMAND_TABLE_ROW);
-            }
-            var HeaderPage = this.HeaderInfo.Pages[PNum];
-            for ( var CurRow = 0; CurRow < this.HeaderInfo.Count; CurRow++ )
-            {
-                var Row        = HeaderPage.Rows[CurRow];
-                var CellsCount = Row.Get_CellsCount();
-
-                for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                {
-                    var Cell   = Row.Get_Cell( CurCell );
-                    var VMerge = Cell.Get_VMerge();
-
-                    if ( vmerge_Continue === VMerge )
-                        continue;
-
-                    // Выводим содержимое таблицы
-                    Cell.Content_Draw(PNum, pGraphics);
-                }
-            }
-            if(pGraphics.End_Command)
-            {
-                pGraphics.End_Command();
-            }
-        }
-
-        // Рисуем содержимое всех ячеек. Его рисуем в нормальном порядке, потому что некоторые элементы
-        // могут начинаться внутри одной ячейки, а заканчиваться в другой
-        for ( var CurRow = Row_start; CurRow <= Row_last; CurRow++ )
-        {
-            var Row = this.Content[CurRow];
-            var CellsCount = Row.Get_CellsCount();
-
-            if(pGraphics.Start_Command)
-            {
-                pGraphics.Start_Command(DRAW_COMMAND_TABLE_ROW);
-            }
-            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-            {
-                var Cell = Row.Get_Cell( CurCell );
-                var GridSpan = Cell.Get_GridSpan();
-                var VMerge = Cell.Get_VMerge();
-                var CurGridCol = Row.Get_CellInfo( CurCell ).StartGridCol;
-
-                if ( vmerge_Continue === VMerge )
-                {
-                    if ( Row_start === CurRow  )
-                    {
-                        Cell = this.Internal_Get_StartMergedCell( CurRow, CurGridCol, GridSpan );
-                        if ( null === Cell )
-                            continue;
-
-                        // Параметры GridSpan и CurGridCol должны остаться такими же
-                    }
-                    else
-                        continue;
-                }
-
-                var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
-                // Мы должны найти сколько объединено вертикально ячеек на данной странице
-                if ( PNum + 1 < this.Pages.length )
-                {
-                    if ( CurRow + VMergeCount - 1 >= this.Pages[PNum + 1].FirstRow )
-                    {
-                        VMergeCount = this.Pages[PNum + 1].FirstRow + 1 - CurRow;
-                        if ( /*Row_start != Row_last &&*/ false === this.RowsInfo[CurRow + VMergeCount - 1].FirstPage && PNum === this.RowsInfo[CurRow + VMergeCount - 1].StartPage )
-                            VMergeCount--;
-
-                        if ( VMergeCount <= 0 )
-                            continue;
-                    }
-                }
-
-                // Выводим содержимое таблицы
-                Cell.Content_Draw(PNum, pGraphics);
-            }
-
-            if(pGraphics.End_Command)
-            {
-                pGraphics.End_Command();
-            }
-        }
-    },
-
-    Internal_Draw_4 : function(pGraphics, PNum, Row_start, Row_last)
-    {
-        var TableBorders = this.Get_Borders();
-        var Theme = this.Get_Theme();
-        var ColorMap = this.Get_ColorMap();
-        var RGBA;
-        if ( this.HeaderInfo.Count > 0 && PNum > this.HeaderInfo.PageIndex && true === this.HeaderInfo.Pages[PNum].Draw )
-        {
-            var Y = this.Y;
-            var HeaderPage = this.HeaderInfo.Pages[PNum];
-            for ( var CurRow = 0; CurRow < this.HeaderInfo.Count; CurRow++ )
-            {
-                var Row         = HeaderPage.Rows[CurRow];
-                var CellsCount  = Row.Get_CellsCount();
-                var CellSpacing = Row.Get_CellSpacing();
-
-                Y = HeaderPage.RowsInfo[CurRow].Y;
-
-                var LastBorderTop = { W : 0, L : 0 };
-
-                // Рисуем ячейки начиная с последней, потому что левая ячейка
-                // должна рисоваться поверх правой при конфликте границ.
-                for ( var CurCell = CellsCount - 1; CurCell >= 0; CurCell-- )
-                {
-                    var Cell = Row.Get_Cell( CurCell );
-                    var GridSpan = Cell.Get_GridSpan();
-                    var VMerge = Cell.Get_VMerge();
-                    var CurGridCol = Row.Get_CellInfo( CurCell ).StartGridCol;
-
-                    if ( vmerge_Continue === VMerge )
-                    {
-                        LastBorderTop = { W : 0, L : 0 };
-                        continue;
-                    }
-
-                    var CellInfo     = Row.Get_CellInfo( CurCell );
-                    var X_cell_start = CellInfo.X_cell_start;
-                    var X_cell_end   = CellInfo.X_cell_end;
-                    var VMergeCount  = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
-                    var RealHeight   = HeaderPage.RowsInfo[CurRow + VMergeCount - 1].Y + HeaderPage.RowsInfo[CurRow + VMergeCount - 1].H - Y;
-
-                    // Обводим ячейку
-                    var CellBorders = Cell.Get_Borders();
-
-                    if ( null != CellSpacing )
-                    {
-                        // Левая граница
-                        if ( border_Single === CellBorders.Left.Value )
-                        {
-                            RGBA = CellBorders.Left.Get_Color2(Theme, ColorMap);
-                            pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                            if(pGraphics.SetBorder)
-                            {
-                                pGraphics.SetBorder(CellBorders.Left);
-                            }
-                            pGraphics.drawVerLine( c_oAscLineDrawingRule.Left, X_cell_start, Y, Y + RealHeight, CellBorders.Left.Size );
-                        }
-                        else //if ( border_None === CellBorders.Left.Value )
-                        {
-                            pGraphics.DrawEmptyTableLine( X_cell_start, Y, X_cell_start, Y + RealHeight );
-                        }
-
-                        // Правая граница
-                        if ( border_Single === CellBorders.Right.Value )
-                        {
-                            RGBA = CellBorders.Right.Get_Color2(Theme, ColorMap);
-                            pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                            if(pGraphics.SetBorder)
-                            {
-                                pGraphics.SetBorder(CellBorders.Right);
-                            }
-                            pGraphics.drawVerLine( c_oAscLineDrawingRule.Right, X_cell_end, Y, Y + RealHeight, CellBorders.Right.Size );
-                        }
-                        else //if ( border_None === CellBorders.Right.Value )
-                        {
-                            pGraphics.DrawEmptyTableLine( X_cell_end, Y, X_cell_end, Y + RealHeight );
-                        }
-
-                        // Верхняя граница
-                        if ( border_Single === CellBorders.Top.Value )
-                        {
-                            RGBA = CellBorders.Top.Get_Color2(Theme, ColorMap);
-                            pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                            if(pGraphics.SetBorder)
-                            {
-                                pGraphics.SetBorder(CellBorders.Top);
-                            }
-                            pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y - CellBorders.Top.Size, X_cell_start, X_cell_end, CellBorders.Top.Size, 0, 0 );
-                        }
-                        else //if ( border_None === CellBorders.Top.Value )
-                        {
-                            pGraphics.DrawEmptyTableLine( X_cell_start, Y, X_cell_end, Y );
-                        }
-
-                        // Нижняя граница
-                        if ( border_Single === CellBorders.Bottom.Value )
-                        {
-                            RGBA = CellBorders.Bottom.Get_Color2(Theme, ColorMap);
-                            pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                            if(pGraphics.SetBorder)
-                            {
-                                pGraphics.SetBorder(CellBorders.Bottom);
-                            }
-                            pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Bottom, Y + RealHeight + CellBorders.Bottom.Size, X_cell_start, X_cell_end, CellBorders.Bottom.Size, 0, 0 );
-                        }
-                        else //if ( border_None === CellBorders.Bottom.Value )
-                        {
-                            pGraphics.DrawEmptyTableLine( X_cell_start, Y + RealHeight, X_cell_end, Y + RealHeight );
-                        }
-                    }
-                    else
-                    {
-                        var CellBordersInfo = Cell.Get_BorderInfo();
-
-                        // Левая граница
-                        var BorderInfo_Left = CellBordersInfo.Left;
-                        // Это значение может не совпадать с CurRow
-                        var TempCurRow = Cell.Row.Index;
-
-                        var Row_side_border_start = 0;
-                        var Row_side_border_end   = BorderInfo_Left.length - 1;
-
-                        for ( var Index = Row_side_border_start; Index <= Row_side_border_end; Index++ )
-                        {
-                            var CurBorderInfo = BorderInfo_Left[Index];
-                            var Y0 = HeaderPage.RowsInfo[TempCurRow + Index].Y;
-                            var Y1 = HeaderPage.RowsInfo[TempCurRow + Index].Y + HeaderPage.RowsInfo[TempCurRow + Index].H;
-
-                            if ( border_Single === CurBorderInfo.Value )
-                            {
-                                RGBA = CurBorderInfo.Get_Color2(Theme, ColorMap);
-                                pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                                if(pGraphics.SetBorder)
-                                {
-                                    pGraphics.SetBorder(CurBorderInfo);
-                                }
-                                pGraphics.drawVerLine( c_oAscLineDrawingRule.Center, X_cell_start, Y0, Y1, CurBorderInfo.Size );
-                            }
-                            else //if ( border_None === CurBorderInfo.Value )
-                            {
-                                if ( 0 === CurCell )
-                                {
-                                    pGraphics.DrawEmptyTableLine( X_cell_start, Y0, X_cell_start, Y1 );
-                                }
-
-                                // Для остальных ячеек невидимые границы мы рисуем как правые
-                            }
-                        }
-
-                        // Правая граница
-                        var BorderInfo_Right = CellBordersInfo.Right;
-                        for ( var Index = Row_side_border_start; Index <= Row_side_border_end; Index++ )
-                        {
-                            var CurBorderInfo = BorderInfo_Right[Index];
-                            var Y0 = HeaderPage.RowsInfo[TempCurRow + Index].Y;
-                            var Y1 = HeaderPage.RowsInfo[TempCurRow + Index].Y + HeaderPage.RowsInfo[TempCurRow + Index].H;
-
-                            // Мы должны проверить последняя ли данная ячейка в строке
-                            var TempCellIndex  = this.Internal_Get_Cell_ByStartGridCol( TempCurRow + Index, CellInfo.StartGridCol );
-                            var TempCellsCount = HeaderPage.Rows[TempCurRow + Index].Get_CellsCount();
-
-                            if ( TempCellsCount - 1 === TempCellIndex )
-                            {
-                                if ( border_Single === CurBorderInfo.Value )
-                                {
-                                    RGBA = CurBorderInfo.Get_Color2(Theme, ColorMap);
-                                    pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                                    if(pGraphics.SetBorder)
-                                    {
-                                        pGraphics.SetBorder(CurBorderInfo);
-                                    }
-                                    pGraphics.drawVerLine( c_oAscLineDrawingRule.Center, X_cell_end, Y0, Y1, CurBorderInfo.Size );
-                                }
-                                else //if ( border_None === CurBorderInfo.Value )
-                                {
-                                    pGraphics.DrawEmptyTableLine( X_cell_end, Y0, X_cell_end, Y1 );
-                                }
-                            }
-                            else if ( border_None === CurBorderInfo.Value )
-                            {
-                                pGraphics.DrawEmptyTableLine( X_cell_end, Y0, X_cell_end, Y1 );
-                            }
-                        }
-
-                        // Верхняя граница
-                        var LastBorderTop_prev = { W : LastBorderTop.W, H : LastBorderTop.H };
-                        var BorderInfo_Top = CellBordersInfo.Top;
-                        for ( var Index = 0; Index < BorderInfo_Top.length; Index++ )
-                        {
-                            var CurBorderInfo = BorderInfo_Top[Index];
-
-                            // Верхняя граница первой строки на новой странице должна рисоваться, либо
-                            // как задано в ячейке, либо как задано в таблице.
-                            if ( 0 != PNum && CurRow === Row_start )
-                                CurBorderInfo = this.Internal_CompareBorders( TableBorders.Top, CurBorderInfo, true, false );
-
-                            var X0 = this.X + this.TableSumGrid[Index + CurGridCol - 1];
-                            var X1 = this.X + this.TableSumGrid[Index + CurGridCol];
-
-                            var LeftMW = 0;
-                            var RightMW = 0;
-                            if ( BorderInfo_Top.length - 1 === Index )
-                            {
-                                var Max_r = 0;
-                                if ( 0 != CurRow )
-                                {
-                                    var Prev_Row = HeaderPage.Rows[CurRow - 1];
-                                    var Prev_CellsCount = Prev_Row.Get_CellsCount();
-                                    for ( var TempIndex = 0; TempIndex < Prev_CellsCount; TempIndex++ )
-                                    {
-                                        var Prev_Cell = Prev_Row.Get_Cell( TempIndex );
-                                        var Prev_GridCol = Prev_Row.Get_CellInfo( TempIndex ).StartGridCol;
-                                        var Prev_GridSpan = Prev_Cell.Get_GridSpan();
-
-                                        var bLeft = null;
-                                        if ( Prev_GridCol === Index + CurGridCol + 1 )
-                                        {
-                                            bLeft = true;
-                                        }
-                                        else if ( Prev_GridCol + Prev_GridSpan === Index + CurGridCol + 1 )
-                                        {
-                                            bLeft = false;
-                                        }
-                                        else if ( Prev_GridCol > CurGridCol )
-                                            break;
-
-                                        if ( null != bLeft )
-                                        {
-                                            var Prev_VMerge = Prev_Cell.Get_VMerge();
-                                            if ( vmerge_Continue === Prev_VMerge )
-                                                Prev_Cell = this.Internal_Get_StartMergedCell( CurRow - 1, Prev_GridCol, Prev_GridSpan );
-
-                                            if ( null === Prev_Cell )
-                                                break;
-
-                                            var Num = CurRow - 1 - Prev_Cell.Row.Index;
-                                            if ( Num < 0 )
-                                                break;
-
-                                            if ( true === bLeft )
-                                            {
-                                                var Prev_Cell_BorderInfo_Left = Prev_Cell.Get_BorderInfo().Left;
-                                                if( null != Prev_Cell_BorderInfo_Left && Prev_Cell_BorderInfo_Left.length > Num && border_Single === Prev_Cell_BorderInfo_Left[Num].Value )
-                                                    Max_r = Prev_Cell_BorderInfo_Left[Num].Size / 2;
-                                            }
-                                            else
-                                            {
-                                                var Prev_Cell_BorderInfo_Right = Prev_Cell.Get_BorderInfo().Right;
-                                                if( null != Prev_Cell_BorderInfo_Right && Prev_Cell_BorderInfo_Right.length > Num && border_Single === Prev_Cell_BorderInfo_Right[Num].Value )
-                                                    Max_r = Prev_Cell_BorderInfo_Right[Num].Size / 2;
-                                            }
-
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                if ( BorderInfo_Right.length > 0 && border_Single === BorderInfo_Right[0].Value && BorderInfo_Right[0].Size / 2 > Max_r )
-                                    Max_r = BorderInfo_Right[0].Size / 2;
-
-                                // Отдаем предпочтение более широкой границе
-                                if ( border_Single === CurBorderInfo.Value && CurBorderInfo.Size > LastBorderTop_prev.W )
-                                    RightMW = Max_r;
-                                else
-                                    RightMW = -Max_r;
-                            }
-
-                            if ( 0 === Index )
-                            {
-                                var Max_l = 0;
-                                if ( 0 != CurRow )
-                                {
-                                    var Prev_Row = this.Content[CurRow - 1];
-                                    var Prev_CellsCount = Prev_Row.Get_CellsCount();
-                                    for ( var TempIndex = 0; TempIndex < Prev_CellsCount; TempIndex++ )
-                                    {
-                                        var Prev_Cell = Prev_Row.Get_Cell( TempIndex );
-                                        var Prev_GridCol = Prev_Row.Get_CellInfo( TempIndex ).StartGridCol;
-                                        var Prev_GridSpan = Prev_Cell.Get_GridSpan();
-
-                                        var bLeft = null;
-                                        if ( Prev_GridCol === CurGridCol )
-                                        {
-                                            bLeft = true;
-                                        }
-                                        else if ( Prev_GridCol + Prev_GridSpan === CurGridCol )
-                                        {
-                                            bLeft = false;
-                                        }
-                                        else if ( Prev_GridCol > CurGridCol )
-                                            break;
-
-                                        if ( null != bLeft )
-                                        {
-                                            var Prev_VMerge = Prev_Cell.Get_VMerge();
-                                            if ( vmerge_Continue === Prev_VMerge )
-                                                Prev_Cell = this.Internal_Get_StartMergedCell( CurRow - 1, Prev_GridCol, Prev_GridSpan );
-
-                                            if ( null === Prev_Cell )
-                                                break;
-
-                                            var Num = CurRow - 1 - Prev_Cell.Row.Index;
-                                            if ( Num < 0 )
-                                                break;
-
-                                            if ( true === bLeft )
-                                            {
-                                                var Prev_Cell_BorderInfo_Left = Prev_Cell.Get_BorderInfo().Left;
-                                                if( null != Prev_Cell_BorderInfo_Left && Prev_Cell_BorderInfo_Left.length > Num && border_Single === Prev_Cell_BorderInfo_Left[Num].Value )
-                                                    Max_l = Prev_Cell_BorderInfo_Left[Num].Size / 2;
-
-                                            }
-                                            else
-                                            {
-                                                var Prev_Cell_BorderInfo_Right = Prev_Cell.Get_BorderInfo().Right;
-                                                if( null != Prev_Cell_BorderInfo_Right && Prev_Cell_BorderInfo_Right.length > Num && border_Single === Prev_Cell_BorderInfo_Right[Num].Value )
-                                                    Max_l = Prev_Cell_BorderInfo_Right[Num].Size / 2;
-                                            }
-
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                if( BorderInfo_Left.length > 0 && border_Single === BorderInfo_Left[0].Value && BorderInfo_Left[0].Size / 2 > Max_l )
-                                    Max_l = BorderInfo_Left[0].Size / 2;
-
-                                LastBorderTop.L = Max_l;
-                                LastBorderTop.W = 0;
-
-                                if ( border_Single === CurBorderInfo.Value )
-                                    LastBorderTop.W = CurBorderInfo.Size;
-                            }
-
-                            if ( border_Single === CurBorderInfo.Value )
-                            {
-                                RGBA = CurBorderInfo.Get_Color2(Theme, ColorMap);
-                                pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                                if(pGraphics.SetBorder)
-                                {
-                                    pGraphics.SetBorder(CurBorderInfo);
-                                }
-                                pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y, X0, X1, CurBorderInfo.Size, LeftMW, RightMW );
-                            }
-                            else //if ( border_None === CurBorderInfo.Value )
-                            {
-                                pGraphics.DrawEmptyTableLine( X0 + LeftMW, Y, X1 + RightMW , Y );
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        var Y = this.Y;
-        for ( var CurRow = Row_start; CurRow <= Row_last; CurRow++ )
-        {
-            var Row = this.Content[CurRow];
-            var CellsCount = Row.Get_CellsCount();
-            Y = this.RowsInfo[CurRow].Y[PNum];
-            var CellSpacing = Row.Get_CellSpacing();
-
-            var LastBorderTop = { W : 0, L : 0 };
-
-            // Рисуем ячейки начиная с последней, потому что левая ячейка
-            // должна рисоваться поверх правой при конфликте границ.
-            for ( var CurCell = CellsCount - 1; CurCell >= 0; CurCell-- )
-            {
-                var Cell = Row.Get_Cell( CurCell );
-                var GridSpan = Cell.Get_GridSpan();
-                var VMerge = Cell.Get_VMerge();
-                var CurGridCol = Row.Get_CellInfo( CurCell ).StartGridCol;
-
-                if ( vmerge_Continue === VMerge )
-                {
-                    if ( Row_start === CurRow  )
-                    {
-                        Cell = this.Internal_Get_StartMergedCell( CurRow, CurGridCol, GridSpan );
-                        if ( null === Cell )
-                        {
-                            LastBorderTop = { W : 0, L : 0 };
-                            continue;
-                        }
-
-                        // Параметры GridSpan и CurGridCol должны остаться такими же
-                    }
-                    else
-                    {
-                        LastBorderTop = { W : 0, L : 0 };
-                        continue;
-                    }
-                }
-
-                var CellInfo = Row.Get_CellInfo( CurCell );
-                var X_cell_start    = CellInfo.X_cell_start;
-                var X_cell_end      = CellInfo.X_cell_end;
-
-                var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
-                // Мы должны найти сколько объединено вертикально ячеек на данной странице
-                if ( PNum + 1 < this.Pages.length )
-                {
-                    if ( CurRow + VMergeCount - 1 >= this.Pages[PNum + 1].FirstRow )
-                    {
-                        VMergeCount = this.Pages[PNum + 1].FirstRow + 1 - CurRow;
-                        if ( /*Row_start != Row_last &&*/ false === this.RowsInfo[CurRow + VMergeCount - 1].FirstPage && PNum === this.RowsInfo[CurRow + VMergeCount - 1].StartPage  )
-                            VMergeCount--;
-
-                        if ( VMergeCount <= 0 )
-                        {
-                            LastBorderTop = { W : 0, L : 0 };
-                            continue;
-                        }
-                    }
-                }
-
-
-                var RealHeight  = this.RowsInfo[CurRow + VMergeCount - 1].Y[PNum] + this.RowsInfo[CurRow + VMergeCount - 1].H[PNum] - Y;
-
-                // Обводим ячейку
-                var CellBorders = Cell.Get_Borders();
-
-                if ( null != CellSpacing )
-                {
-                    // Левая граница
-                    if ( border_Single === CellBorders.Left.Value )
-                    {
-                        RGBA =  CellBorders.Left.Get_Color2(Theme, ColorMap);
-                        pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                        if(pGraphics.SetBorder)
-                        {
-                            pGraphics.SetBorder(CellBorders.Left);
-                        }
-                        pGraphics.drawVerLine( c_oAscLineDrawingRule.Left, X_cell_start, Y, Y + RealHeight, CellBorders.Left.Size );
-                    }
-                    else //if ( border_None === CellBorders.Left.Value )
-                    {
-                        pGraphics.DrawEmptyTableLine( X_cell_start, Y, X_cell_start, Y + RealHeight );
-                    }
-
-                    // Правая граница
-                    if ( border_Single === CellBorders.Right.Value )
-                    {
-                        RGBA =  CellBorders.Right.Get_Color2(Theme, ColorMap);
-                        pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                        if(pGraphics.SetBorder)
-                        {
-                            pGraphics.SetBorder(CellBorders.Right);
-                        }
-                        pGraphics.drawVerLine( c_oAscLineDrawingRule.Right, X_cell_end, Y, Y + RealHeight, CellBorders.Right.Size );
-                    }
-                    else //if ( border_None === CellBorders.Right.Value )
-                    {
-                        pGraphics.DrawEmptyTableLine( X_cell_end, Y, X_cell_end, Y + RealHeight );
-                    }
-
-                    // Верхняя граница
-                    if ( border_Single === CellBorders.Top.Value )
-                    {
-
-                        RGBA =  CellBorders.Top.Get_Color2(Theme, ColorMap);
-                        pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                        if(pGraphics.SetBorder)
-                        {
-                            pGraphics.SetBorder(CellBorders.Top);
-                        }
-                        pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y - CellBorders.Top.Size, X_cell_start, X_cell_end, CellBorders.Top.Size, 0, 0 );
-                    }
-                    else //if ( border_None === CellBorders.Top.Value )
-                    {
-                        pGraphics.DrawEmptyTableLine( X_cell_start, Y, X_cell_end, Y );
-                    }
-
-                    // Нижняя граница
-                    if ( border_Single === CellBorders.Bottom.Value )
-                    {
-                        RGBA =  CellBorders.Bottom.Get_Color2(Theme, ColorMap);
-                        pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                        if(pGraphics.SetBorder)
-                        {
-                            pGraphics.SetBorder(CellBorders.Bottom);
-                        }
-                        pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Bottom, Y + RealHeight + CellBorders.Bottom.Size, X_cell_start, X_cell_end, CellBorders.Bottom.Size, 0, 0 );
-                    }
-                    else //if ( border_None === CellBorders.Bottom.Value )
-                    {
-                        pGraphics.DrawEmptyTableLine( X_cell_start, Y + RealHeight, X_cell_end, Y + RealHeight );
-                    }
-                }
-                else
-                {
-                    var CellBordersInfo = Cell.Get_BorderInfo();
-
-                    // Левая граница
-                    var BorderInfo_Left  = CellBordersInfo.Left;
-
-                    // Это значение может не совпадать с CurRow
-                    var TempCurRow = Cell.Row.Index;
-
-                    var Row_side_border_start = ( TempCurRow < Row_start ? Row_start - TempCurRow : 0 );
-                    var Row_side_border_end   = ( BorderInfo_Left.length - 1 + TempCurRow > Row_last ? Row_last - TempCurRow + 1 : BorderInfo_Left.length - 1 );
-                    for ( var Index = Row_side_border_start; Index <= Row_side_border_end; Index++ )
-                    {
-                        var CurBorderInfo = BorderInfo_Left[Index];
-                        var Y0 = this.RowsInfo[TempCurRow + Index].Y[PNum];
-                        var Y1 = this.RowsInfo[TempCurRow + Index].Y[PNum] + this.RowsInfo[TempCurRow + Index].H[PNum];
-
-                        if ( border_Single === CurBorderInfo.Value )
-                        {
-                            RGBA =  CurBorderInfo.Get_Color2(Theme, ColorMap);
-                            pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                            //pGraphics.p_width( CurBorderInfo.Size * 1000 );
-                            //pGraphics._s();
-                            if(pGraphics.SetBorder)
-                            {
-                                pGraphics.SetBorder(CurBorderInfo);
-                            }
-
-                            pGraphics.drawVerLine( c_oAscLineDrawingRule.Center, X_cell_start, Y0, Y1, CurBorderInfo.Size );
-                            //pGraphics._m( X_cell_start * 100, Y0 * 100 );
-                            //pGraphics._l( X_cell_start * 100, Y1 * 100 );
-
-                            //pGraphics.ds();
-                        }
-                        else //if ( border_None === CurBorderInfo.Value )
-                        {
-                            if ( 0 === CurCell )
-                            {
-                                pGraphics.DrawEmptyTableLine( X_cell_start, Y0, X_cell_start, Y1 );
-                            }
-
-                            // Для остальных ячеек невидимые границы мы рисуем как правые
-                        }
-                    }
-
-
-                    // Правая граница
-                    var BorderInfo_Right = CellBordersInfo.Right;
-                    for ( var Index = Row_side_border_start; Index <= Row_side_border_end; Index++ )
-                    {
-                        var CurBorderInfo = BorderInfo_Right[Index];
-                        var Y0 = this.RowsInfo[TempCurRow + Index].Y[PNum];
-                        var Y1 = this.RowsInfo[TempCurRow + Index].Y[PNum] + this.RowsInfo[TempCurRow + Index].H[PNum];
-
-                        // Мы должны проверить последняя ли данная ячейка в строке
-                        var TempCellIndex  = this.Internal_Get_Cell_ByStartGridCol( TempCurRow + Index, CellInfo.StartGridCol );
-                        var TempCellsCount = this.Content[TempCurRow + Index].Get_CellsCount();
-
-                        if ( TempCellsCount - 1 === TempCellIndex )
-                        {
-                            if ( border_Single === CurBorderInfo.Value )
-                            {
-
-                                RGBA =  CurBorderInfo.Get_Color2(Theme, ColorMap);
-                                pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                                //pGraphics.p_width( CurBorderInfo.Size * 1000 );
-                                //pGraphics._s();
-                                if(pGraphics.SetBorder)
-                                {
-                                    pGraphics.SetBorder(CurBorderInfo);
-                                }
-
-                                pGraphics.drawVerLine( c_oAscLineDrawingRule.Center, X_cell_end, Y0, Y1, CurBorderInfo.Size );
-                                //pGraphics._m( X_cell_end * 100, Y0 * 100 );
-                                //pGraphics._l( X_cell_end * 100, Y1 * 100 );
-
-                                //pGraphics.ds();
-                            }
-                            else //if ( border_None === CurBorderInfo.Value )
-                            {
-                                pGraphics.DrawEmptyTableLine( X_cell_end, Y0, X_cell_end, Y1 );
-                            }
-                        }
-                        else if ( border_None === CurBorderInfo.Value )
-                        {
-                            pGraphics.DrawEmptyTableLine( X_cell_end, Y0, X_cell_end, Y1 );
-                        }
-                    }
-
-
-                    // Верхняя граница
-                    var BorderInfo_Top   = CellBordersInfo.Top;
-                    var LastBorderTop_prev = { W : LastBorderTop.W, H : LastBorderTop.H };
-                    for ( var Index = 0; Index < BorderInfo_Top.length; Index++ )
-                    {
-                        var CurBorderInfo = BorderInfo_Top[Index];
-
-                        // Верхняя граница первой строки на новой странице должна рисоваться, либо
-                        // как задано в ячейке, либо как задано в таблице.
-                        if ( 0 != PNum && CurRow === Row_start )
-                            CurBorderInfo = this.Internal_CompareBorders( TableBorders.Top, CurBorderInfo, true, false );
-
-                        var X0 = this.X + this.TableSumGrid[Index + CurGridCol - 1];
-                        var X1 = this.X + this.TableSumGrid[Index + CurGridCol];
-
-                        var LeftMW = 0;
-                        var RightMW = 0;
-                        if ( BorderInfo_Top.length - 1 === Index )
-                        {
-                            var Max_r = 0;
-                            if ( 0 != CurRow )
-                            {
-                                var Prev_Row = this.Content[CurRow - 1];
-                                var Prev_CellsCount = Prev_Row.Get_CellsCount();
-                                for ( var TempIndex = 0; TempIndex < Prev_CellsCount; TempIndex++ )
-                                {
-                                    var Prev_Cell = Prev_Row.Get_Cell( TempIndex );
-                                    var Prev_GridCol = Prev_Row.Get_CellInfo( TempIndex ).StartGridCol;
-                                    var Prev_GridSpan = Prev_Cell.Get_GridSpan();
-
-                                    var bLeft = null;
-                                    if ( Prev_GridCol === Index + CurGridCol + 1 )
-                                    {
-                                        bLeft = true;
-                                    }
-                                    else if ( Prev_GridCol + Prev_GridSpan === Index + CurGridCol + 1 )
-                                    {
-                                        bLeft = false;
-                                    }
-                                    else if ( Prev_GridCol > CurGridCol )
-                                        break;
-
-                                    if ( null != bLeft )
-                                    {
-                                        var Prev_VMerge = Prev_Cell.Get_VMerge();
-                                        if ( vmerge_Continue === Prev_VMerge )
-                                            Prev_Cell = this.Internal_Get_StartMergedCell( CurRow - 1, Prev_GridCol, Prev_GridSpan );
-
-                                        if ( null === Prev_Cell )
-                                            break;
-
-                                        var Num = CurRow - 1 - Prev_Cell.Row.Index;
-                                        if ( Num < 0 )
-                                            break;
-
-                                        if ( true === bLeft )
-                                        {
-                                            var Prev_Cell_BorderInfo_Left = Prev_Cell.Get_BorderInfo().Left;
-                                            if( null != Prev_Cell_BorderInfo_Left && Prev_Cell_BorderInfo_Left.length > Num && border_Single === Prev_Cell_BorderInfo_Left[Num].Value )
-                                                Max_r = Prev_Cell_BorderInfo_Left[Num].Size / 2;
-                                        }
-                                        else
-                                        {
-                                            var Prev_Cell_BorderInfo_Right = Prev_Cell.Get_BorderInfo().Right;
-                                            if( null != Prev_Cell_BorderInfo_Right && Prev_Cell_BorderInfo_Right.length > Num && border_Single === Prev_Cell_BorderInfo_Right[Num].Value )
-                                                Max_r = Prev_Cell_BorderInfo_Right[Num].Size / 2;
-                                        }
-
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if ( BorderInfo_Right.length > 0 && border_Single === BorderInfo_Right[0].Value && BorderInfo_Right[0].Size / 2 > Max_r )
-                                Max_r = BorderInfo_Right[0].Size / 2;
-
-                            // Отдаем предпочтение более широкой границе
-                            if ( border_Single === CurBorderInfo.Value && CurBorderInfo.Size > LastBorderTop_prev.W )
-                                RightMW = Max_r;//X1 += Max_r;
-                            else
-                                RightMW = -Max_r;//X1 -= Max_r;
-
-                            if ( border_Single === CurBorderInfo.Value && CurBorderInfo.Size <= BorderInfo_Right[0].Size )
-                                RightMW = -BorderInfo_Right[0].Size / 2;
-                        }
-
-                        if ( 0 === Index )
-                        {
-                            var Max_l = 0;
-                            if ( 0 != CurRow )
-                            {
-                                var Prev_Row = this.Content[CurRow - 1];
-                                var Prev_CellsCount = Prev_Row.Get_CellsCount();
-                                for ( var TempIndex = 0; TempIndex < Prev_CellsCount; TempIndex++ )
-                                {
-                                    var Prev_Cell = Prev_Row.Get_Cell( TempIndex );
-                                    var Prev_GridCol = Prev_Row.Get_CellInfo( TempIndex ).StartGridCol;
-                                    var Prev_GridSpan = Prev_Cell.Get_GridSpan();
-
-                                    var bLeft = null;
-                                    if ( Prev_GridCol === CurGridCol )
-                                    {
-                                        bLeft = true;
-                                    }
-                                    else if ( Prev_GridCol + Prev_GridSpan === CurGridCol )
-                                    {
-                                        bLeft = false;
-                                    }
-                                    else if ( Prev_GridCol > CurGridCol )
-                                        break;
-
-                                    if ( null != bLeft )
-                                    {
-                                        var Prev_VMerge = Prev_Cell.Get_VMerge();
-                                        if ( vmerge_Continue === Prev_VMerge )
-                                            Prev_Cell = this.Internal_Get_StartMergedCell( CurRow - 1, Prev_GridCol, Prev_GridSpan );
-
-                                        if ( null === Prev_Cell )
-                                            break;
-
-                                        var Num = CurRow - 1 - Prev_Cell.Row.Index;
-                                        if ( Num < 0 )
-                                            break;
-
-                                        if ( true === bLeft )
-                                        {
-                                            var Prev_Cell_BorderInfo_Left = Prev_Cell.Get_BorderInfo().Left;
-                                            if( null != Prev_Cell_BorderInfo_Left && Prev_Cell_BorderInfo_Left.length > Num && border_Single === Prev_Cell_BorderInfo_Left[Num].Value )
-                                                Max_l = Prev_Cell_BorderInfo_Left[Num].Size / 2;
-
-                                        }
-                                        else
-                                        {
-                                            var Prev_Cell_BorderInfo_Right = Prev_Cell.Get_BorderInfo().Right;
-                                            if( null != Prev_Cell_BorderInfo_Right && Prev_Cell_BorderInfo_Right.length > Num && border_Single === Prev_Cell_BorderInfo_Right[Num].Value )
-                                                Max_l = Prev_Cell_BorderInfo_Right[Num].Size / 2;
-                                        }
-
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if( BorderInfo_Left.length > 0 && border_Single === BorderInfo_Left[0].Value && BorderInfo_Left[0].Size / 2 > Max_l )
-                                Max_l = BorderInfo_Left[0].Size / 2;
-
-                            //X0 -= Max_l;
-                            LeftMW = -Max_l;
-
-                            if ( border_Single === CurBorderInfo.Value && CurBorderInfo.Size <= BorderInfo_Left[0].Size )
-                                LeftMW = BorderInfo_Left[0].Size / 2;
-
-                            LastBorderTop.L = Max_l;
-                            LastBorderTop.W = 0;
-
-                            if ( border_Single === CurBorderInfo.Value )
-                                LastBorderTop.W = CurBorderInfo.Size;
-                        }
-
-                        if ( border_Single === CurBorderInfo.Value )
-                        {
-
-                            RGBA =  CurBorderInfo.Get_Color2(Theme, ColorMap);
-                            pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                            //pGraphics.p_width( CurBorderInfo.Size * 1000 );
-                            //pGraphics._s();
-                            if(pGraphics.SetBorder)
-                            {
-                                pGraphics.SetBorder(CurBorderInfo);
-                            }
-
-                            pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y, X0, X1, CurBorderInfo.Size, LeftMW, RightMW );
-                            //pGraphics._m( X0 * 100, ( Y + CurBorderInfo.Size / 2 ) * 100 );
-                            //pGraphics._l( X1 * 100, ( Y + CurBorderInfo.Size / 2 ) * 100 );
-
-                            //pGraphics.ds();
-                        }
-                        else //if ( border_None === CurBorderInfo.Value )
-                        {
-                            pGraphics.DrawEmptyTableLine( X0 + LeftMW, Y, X1 + RightMW , Y );
-                            //pGraphics.DrawEmptyTableLine( X0, Y, X1, Y );
-                        }
-                    }
-
-                    // Нижняя граница
-                    if ( PNum != this.Pages.length - 1 && CurRow + VMergeCount - 1 === Row_last )
-                    {
-                        var X0 = X_cell_start;
-                        var X1 = X_cell_end;
-
-                        var LowerCell = this.Internal_Get_Cell_ByStartGridCol( CurRow + VMergeCount - 1, Row.Get_CellInfo( CurCell ).StartGridCol );
-
-                        var BottomBorder = ( -1 === LowerCell ? this.Pages[PNum].BotBorders[0] : this.Pages[PNum].BotBorders[LowerCell] );
-                        if ( border_Single === BottomBorder.Value )
-                        {
-
-                            RGBA =  BottomBorder.Get_Color2(Theme, ColorMap);
-                            pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                            //pGraphics.p_width( BottomBorder.Size * 1000 );
-                            //pGraphics._s();
-                            if(pGraphics.SetBorder)
-                            {
-                                pGraphics.SetBorder(BottomBorder);
-                            }
-
-                            var X0 = X_cell_start;
-                            var X1 = X_cell_end;
-
-                            var LeftMW = 0;
-                            if ( BorderInfo_Left.length > 0 && border_Single === BorderInfo_Left[BorderInfo_Left.length - 1].Value )
-                                LeftMW = -BorderInfo_Left[BorderInfo_Left.length - 1].Size / 2;
-
-                            var RightMW = 0;
-                            if ( BorderInfo_Right.length > 0 && border_Single === BorderInfo_Right[BorderInfo_Right.length - 1].Value )
-                                RightMW = +BorderInfo_Right[BorderInfo_Right.length - 1].Size / 2;
-
-                            pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y + RealHeight, X0, X1, BottomBorder.Size, LeftMW, RightMW );
-
-                            //var X0 = X_cell_start;
-                            //var X1 = X_cell_end;
-
-                            //if ( BorderInfo_Left.length > 0 && border_Single === BorderInfo_Left[BorderInfo_Left.length - 1].Value )
-                            //    X0 -= BorderInfo_Left[BorderInfo_Left.length - 1].Size / 2;
-
-                            //if ( BorderInfo_Right.length > 0 && border_Single === BorderInfo_Right[BorderInfo_Right.length - 1].Value )
-                            //    X1 += BorderInfo_Right[BorderInfo_Right.length - 1].Size / 2;
-
-                            //pGraphics._m( X0 * 100, ( Y + RealHeight + BottomBorder.Size / 2 ) * 100 );
-                            //pGraphics._l( X1 * 100, ( Y + RealHeight + BottomBorder.Size / 2 ) * 100 );
-
-                            //pGraphics.ds();
-                        }
-                        else //if ( border_None === CellBorders.Bottom.Value )
-                        {
-                            pGraphics.DrawEmptyTableLine( X_cell_start, Y + RealHeight, X_cell_end, Y + RealHeight );
-                        }
-                    }
-                    else
-                    {
-                        var BorderInfo_Bottom = CellBordersInfo.Bottom;
-                        var BorderInfo_Bottom_BeforeCount = CellBordersInfo.Bottom_BeforeCount;
-                        var BorderInfo_Bottom_AfterCount  = CellBordersInfo.Bottom_AfterCount;
-
-                        if ( null != BorderInfo_Bottom && BorderInfo_Bottom.length > 0 )
-                        {
-                            // Значит это последняя строка
-                            if ( -1 === BorderInfo_Bottom_BeforeCount && -1 === BorderInfo_Bottom_AfterCount )
-                            {
-                                var BottomBorder = BorderInfo_Bottom[0];
-                                if ( border_Single === BottomBorder.Value )
-                                {
-
-                                    RGBA =  BottomBorder.Get_Color2(Theme, ColorMap);
-                                    pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                                    //pGraphics.p_width( BottomBorder.Size * 1000 );
-                                    //pGraphics._s();
-                                    if(pGraphics.SetBorder)
-                                    {
-                                        pGraphics.SetBorder(BottomBorder);
-                                    }
-
-                                    var X0 = X_cell_start;
-                                    var X1 = X_cell_end;
-
-                                    var LeftMW = 0;
-                                    if ( BorderInfo_Left.length > 0 && border_Single === BorderInfo_Left[BorderInfo_Left.length - 1].Value )
-                                        LeftMW = -BorderInfo_Left[BorderInfo_Left.length - 1].Size / 2;
-
-                                    var RightMW = 0;
-                                    if ( BorderInfo_Right.length > 0 && border_Single === BorderInfo_Right[BorderInfo_Right.length - 1].Value )
-                                        RightMW = +BorderInfo_Right[BorderInfo_Right.length - 1].Size / 2;
-
-                                    pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y + RealHeight, X0, X1, BottomBorder.Size, LeftMW, RightMW );
-
-                                    //var X0 = X_cell_start;
-                                    //var X1 = X_cell_end;
-
-                                    //if ( BorderInfo_Left.length > 0 && border_Single === BorderInfo_Left[BorderInfo_Left.length - 1].Value )
-                                    //    X0 -= BorderInfo_Left[BorderInfo_Left.length - 1].Size / 2;
-
-                                    //if ( BorderInfo_Right.length > 0 && border_Single === BorderInfo_Right[BorderInfo_Right.length - 1].Value )
-                                    //    X1 += BorderInfo_Right[BorderInfo_Right.length - 1].Size / 2;
-
-                                    //pGraphics._m( X0 * 100, ( Y + RealHeight + BottomBorder.Size / 2 ) * 100 );
-                                    //pGraphics._l( X1 * 100, ( Y + RealHeight + BottomBorder.Size / 2 ) * 100 );
-
-                                    //pGraphics.ds();
-                                }
-                                else //if ( border_None === CellBorders.Bottom.Value )
-                                {
-                                    pGraphics.DrawEmptyTableLine( X_cell_start, Y + RealHeight, X_cell_end, Y + RealHeight );
-                                }
-                            }
-                            else
-                            {
-                                for ( var Index = 0; Index < BorderInfo_Bottom_BeforeCount; Index++ )
-                                {
-                                    var BottomBorder = BorderInfo_Bottom[Index];
-
-                                    if ( border_Single === BottomBorder.Value )
-                                    {
-
-                                        RGBA =  BottomBorder.Get_Color2(Theme, ColorMap);
-                                        pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                                        if(pGraphics.SetBorder)
-                                        {
-                                            pGraphics.SetBorder(BottomBorder);
-                                        }
-
-                                        pGraphics.p_width( BottomBorder.Size * 1000 );
-                                        pGraphics._s();
-
-                                        var X0 = this.X + this.TableSumGrid[Index + CurGridCol - 1];
-                                        var X1 = this.X + this.TableSumGrid[Index + CurGridCol];
-
-                                        var LeftMW = 0;
-                                        if ( 0 === Index && BorderInfo_Left.length > 0 && border_Single === BorderInfo_Left[BorderInfo_Left.length - 1].Value )
-                                            LeftMW = -BorderInfo_Left[BorderInfo_Left.length - 1].Size / 2;
-
-                                        pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y + RealHeight, X0, X1, BottomBorder.Size, LeftMW, 0 );
-
-                                        //var X0 = this.X + this.TableSumGrid[Index + CurGridCol - 1];
-                                        //var X1 = this.X + this.TableSumGrid[Index + CurGridCol];
-
-                                        //if ( 0 === Index && BorderInfo_Left.length > 0 && border_Single === BorderInfo_Left[BorderInfo_Left.length - 1].Value )
-                                        //    X0 -= BorderInfo_Left[BorderInfo_Left.length - 1].Size / 2;
-
-                                        //pGraphics._m( X0 * 100, ( Y + RealHeight + BottomBorder.Size / 2 ) * 100 );
-                                        //pGraphics._l( X1 * 100, ( Y + RealHeight + BottomBorder.Size / 2 ) * 100 );
-
-                                        //pGraphics.ds();
-                                    }
-                                    else //if ( border_None === CellBorders.Bottom.Value )
-                                    {
-                                        pGraphics.DrawEmptyTableLine( X_cell_start, Y + RealHeight, X_cell_end, Y + RealHeight );
-                                    }
-                                }
-
-                                for ( var Index = 0; Index < BorderInfo_Bottom_AfterCount; Index++ )
-                                {
-                                    var BottomBorder = BorderInfo_Bottom[BorderInfo_Bottom.length - 1 - Index];
-
-                                    if ( border_Single === BottomBorder.Value )
-                                    {
-                                        RGBA =  BottomBorder.Get_Color2(Theme, ColorMap);
-                                        pGraphics.p_color( RGBA.r, RGBA.g, RGBA.b, 255 );
-                                        if(pGraphics.SetBorder)
-                                        {
-                                            pGraphics.SetBorder(BottomBorder);
-                                        }
-
-                                        pGraphics.p_width( BottomBorder.Size * 1000 );
-                                        pGraphics._s();
-
-                                        var X0 = this.X + this.TableSumGrid[CurGridCol + GridSpan - 2 - Index];
-                                        var X1 = this.X + this.TableSumGrid[CurGridCol + GridSpan - 1 - Index];
-
-                                        var RightMW = 0;
-                                        if ( 0 === Index && BorderInfo_Right.length > 0 && border_Single === BorderInfo_Right[BorderInfo_Right.length - 1].Value )
-                                            RightMW = +BorderInfo_Right[BorderInfo_Right.length - 1].Size / 2;
-
-                                        pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y + RealHeight, X0, X1, BottomBorder.Size, 0, RightMW );
-
-                                        //var X0 = this.X + this.TableSumGrid[CurGridCol + GridSpan - 2 - Index];
-                                        //var X1 = this.X + this.TableSumGrid[CurGridCol + GridSpan - 1 - Index];
-
-                                        //if ( 0 === Index && BorderInfo_Right.length > 0 && border_Single === BorderInfo_Right[BorderInfo_Right.length - 1].Value )
-                                        //    X1 += BorderInfo_Right[BorderInfo_Right.length - 1].Size / 2;
-
-                                        //pGraphics._m( X0 * 100, ( Y + RealHeight + BottomBorder.Size / 2 ) * 100 );
-                                        //pGraphics._l( X1 * 100, ( Y + RealHeight + BottomBorder.Size / 2 ) * 100 );
-
-                                        //pGraphics.ds();
-                                    }
-                                    else //if ( border_None === CellBorders.Bottom.Value )
-                                    {
-                                        pGraphics.DrawEmptyTableLine( X_cell_start, Y + RealHeight, X_cell_end, Y + RealHeight );
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    },
-    
-    Save_RecalculateObject : function()
-    {
-        var RecalcObj = new CTableRecalculateObject();
-        RecalcObj.Save( this );
-        return RecalcObj;
-    }, 
-    
-    Load_RecalculateObject : function(RecalcObj)
-    {
-        RecalcObj.Load(this);
-    },
-    
-    Prepare_RecalculateObject : function()
-    {
-        this.TableSumGrid    = [];
-        this.TableGridCalc   = [];
-
-        this.TableRowsBottom = [];
-        this.RowsInfo        = [];
-
-        this.HeaderInfo =
-        {
-            Count     : 0,
-            H         : 0,
-            PageIndex : 0,
-            Pages     : []
-        };
-
-        this.Pages           = [];
-
-        this.MaxTopBorder    = [];
-        this.MaxBotBorder    = [];
-        this.MaxBotMargin    = [];
-        
-        this.RecalcInfo.Reset( true );
-
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            this.Content[Index].Prepare_RecalculateObject();
-        }
-    },
-
     Get_LastRangeVisibleBounds : function()
     {
         var CurPage = this.Pages.length - 1;
-        var Page_abs = this.Get_StartPage_Absolute() + CurPage;
-
-        var CurRow = this.Content.length - 1;
-        var Row = this.Content[CurRow];
+        var Page    = this.Pages[CurPage];
+        var CurRow  = this.Content.length - 1;
+        var Row     = this.Content[CurRow];
 
         // Ищем границы по горизонтали для последней ячейки
         var CurCell = Row.Get_CellsCount() - 1;
 
-        var Cell     = Row.Get_Cell( CurCell );
-        var CellInfo = Row.Get_CellInfo( CurCell );
+        var Cell     = Row.Get_Cell(CurCell);
+        var CellInfo = Row.Get_CellInfo(CurCell);
         var CellMar  = Cell.Get_Margins();
 
-        var X_start = CellInfo.X_cell_start;
-        var X_end   = CellInfo.X_cell_end;
+        var X_start = Page.X + CellInfo.X_cell_start;
+        var X_end   = Page.X + CellInfo.X_cell_end;
 
-        var Cell_PageRel = Page_abs - Cell.Content.Get_StartPage_Absolute();
-        
+        var Cell_PageRel = CurPage - Cell.Content.Get_StartPage_Relative();
+
         // Не все ячейки могут иметь страницу с номером Cell_PageRel, но хотя бы одна такая должна быть (иначе переноса
         // на новую страницу не было бы)        
         var CellsCount = Row.Get_CellsCount();
-        for ( CurCell = 0; CurCell < CellsCount; CurCell++ )
+        for (CurCell = 0; CurCell < CellsCount; CurCell++)
         {
-            Cell = Row.Get_Cell( CurCell );
-            
-            if ( Cell_PageRel <= Cell.PagesCount - 1 )
+            Cell = Row.Get_Cell(CurCell);
+
+            if (Cell_PageRel <= Cell.PagesCount - 1)
                 break;
         }
-        
-        if ( CurCell >= CellsCount )
-            return { X : X_start, Y : 0, W : X_end - X_start, H : 0, BaseLine : 0, XLimit : this.XLimit };
 
-        var Bounds = Cell.Content_Get_PageBounds( Cell_PageRel );
+        if (CurCell >= CellsCount)
+            return {X : X_start, Y : 0, W : X_end - X_start, H : 0, BaseLine : 0, XLimit : Page.XLimit};
+
+        var Bounds   = Cell.Content_Get_PageBounds(Cell_PageRel);
         var Y_offset = Cell.Temp.Y_VAlign_offset[Cell_PageRel];
 
         var Y = 0;
         var H = 0;
-        if ( 0 != Cell_PageRel )
+        if (0 != Cell_PageRel)
         {
             // мы должны определить ряд, на котором случился перенос на новую страницу
             var TempRowIndex = this.Pages[CurPage].FirstRow;
@@ -4982,19 +2771,15 @@ CTable.prototype =
             H = this.RowsInfo[CurRow].H[CurPage];
         }
 
-        return { X : X_start, Y : Y, W : X_end - X_start, H : H, BaseLine : H, XLimit : this.XLimit };
+        return {X : X_start, Y : Y, W : X_end - X_start, H : H, BaseLine : H, XLimit : Page.XLimit};
     },
 
-    Get_NearestPos : function( PageNum, X, Y, bAnchor, Drawing )
+    Get_NearestPos : function(CurPage, X, Y, bAnchor, Drawing )
     {
-        var PNum = PageNum - this.PageNum;
-        if ( PNum < 0 || PNum >= this.Pages.length )
-            PNum = 0;
+        var Pos = this.Internal_GetCellByXY(X, Y, CurPage);
+        var Cell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
 
-        var Pos = this.Internal_GetCellByXY( X, Y, PNum );
-        var Cell = this.Content[Pos.Row].Get_Cell( Pos.Cell );
-
-        return Cell.Content.Get_NearestPos( PNum, X, Y, bAnchor, Drawing );
+        return Cell.Content.Get_NearestPos(CurPage - Cell.Content.Get_StartPage_Relative(), X, Y, bAnchor, Drawing);
     },
 
     Set_Parent : function(ParentObject)
@@ -5016,7 +2801,7 @@ CTable.prototype =
     // Проверяем начинается ли текущий параграф с новой страницы.
     Is_StartFromNewPage : function()
     {
-        if ( ( this.Pages.length > 1 && 0 === this.Pages[1].FirstRow && false === this.RowsInfo[0].FirstPage ) || ( null === this.Get_DocumentPrev() && true === this.Parent.Is_TopDocument() ) )
+        if ((this.Pages.length > 1 && true === this.Is_EmptyPage(0)) || (null === this.Get_DocumentPrev() && true === this.Parent.Is_TopDocument()))
             return true;
 
         return false;
@@ -5030,46 +2815,57 @@ CTable.prototype =
         return false;
     },
 
-    Is_TableBorder : function(X,Y, PageNum_Abs)
+    Is_TableBorder : function(X, Y, CurPage)
     {
-        if ( true === this.DrawingDocument.IsMobileVersion() )
+        if (true === this.DrawingDocument.IsMobileVersion())
             return null;
 
-        var TempPNum = PageNum_Abs - this.Get_StartPage_Absolute();
-        if ( TempPNum < 0 || TempPNum >= this.Pages.length )
-            TempPNum = 0;
+        CurPage = Math.max(0, Math.min(this.Pages.length - 1, CurPage));
 
-        var Result = this.Internal_CheckBorders( X, Y, TempPNum );
-        if ( Result.Border != -1 )
+        var Result = this.Internal_CheckBorders(X, Y, CurPage);
+        if (Result.Border != -1)
+        {
             return this;
+        }
         else
-            return this.Content[Result.Pos.Row].Get_Cell( Result.Pos.Cell ).Content.Is_TableBorder(X, Y, PageNum_Abs);
+        {
+            var Cell = this.Content[Result.Pos.Row].Get_Cell(Result.Pos.Cell);
+            return Cell.Content.Is_TableBorder(X, Y, CurPage - Cell.Content.Get_StartPage_Relative());
+        }
     },
 
-    Is_InText : function(X, Y, PageNum_Abs)
+    Is_InText : function(X, Y, CurPage)
     {
-        var TempPNum = PageNum_Abs - this.Get_StartPage_Absolute();
-        if ( TempPNum < 0 || TempPNum >= this.Pages.length )
-            TempPNum = 0;
+        if (CurPage < 0 || CurPage >= this.Pages.length)
+            CurPage = 0;
 
-        var Result = this.Internal_CheckBorders( X, Y, TempPNum );
-        if ( Result.Border != -1 )
+        var Result = this.Internal_CheckBorders(X, Y, CurPage);
+        if (Result.Border != -1)
+        {
             return null;
+        }
         else
-            return this.Content[Result.Pos.Row].Get_Cell( Result.Pos.Cell ).Content.Is_InText(X, Y, PageNum_Abs);
+        {
+            var Cell = this.Content[Result.Pos.Row].Get_Cell(Result.Pos.Cell);
+            return Cell.Content.Is_InText(X, Y, CurPage - Cell.Content.Get_StartPage_Relative());
+        }
     },
 
-    Is_InDrawing : function(X, Y, PageNum_Abs)
+    Is_InDrawing : function(X, Y, CurPage)
     {
-        var TempPNum = PageNum_Abs - this.Get_StartPage_Absolute();
-        if ( TempPNum < 0 || TempPNum >= this.Pages.length )
-            TempPNum = 0;
+        if (CurPage < 0 || CurPage >= this.Pages.length)
+            CurPage = 0;
 
-        var Result = this.Internal_CheckBorders( X, Y, TempPNum );
+        var Result = this.Internal_CheckBorders(X, Y, CurPage);
         if ( Result.Border != -1 )
+        {
             return null;
+        }
         else
-            return this.Content[Result.Pos.Row].Get_Cell( Result.Pos.Cell ).Content.Is_InDrawing(X, Y, PageNum_Abs);
+        {
+            var Cell = this.Content[Result.Pos.Row].Get_Cell(Result.Pos.Cell);
+            return Cell.Content.Is_InDrawing(X, Y, CurPage - Cell.Content.Get_StartPage_Relative());
+        }
     },
 
     Is_InnerTable : function()
@@ -5126,20 +2922,18 @@ CTable.prototype =
         return this.CurCell.Content.Get_CurrentPage_Absolute() - this.Get_StartPage_Absolute();
     },
 
-    Update_CursorType : function(X, Y, PageIndex)
+    Update_CursorType : function(X, Y, CurPage)
     {
-        var PageNum = PageIndex - this.PageNum;
-        if ( PageNum < 0 || PageNum >= this.Pages.length )
-            PageNum = 0;
+        if (CurPage < 0 || CurPage >= this.Pages.length)
+            CurPage = 0;
 
         if ( true === this.Lock.Is_Locked() )
         {
-            var PNum = PageNum;
-            var _X = this.Pages[PNum].Bounds.Left;
-            var _Y = this.Pages[PNum].Bounds.Top;
+            var _X = this.Pages[CurPage].Bounds.Left;
+            var _Y = this.Pages[CurPage].Bounds.Top;
 
             var MMData = new CMouseMoveData();
-            var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( _X, _Y, this.Get_StartPage_Absolute() + ( PageIndex - this.PageNum ) );
+            var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, this.Get_AbsolutePage(CurPage));
             MMData.X_abs            = Coords.X - 5;
             MMData.Y_abs            = Coords.Y - 5;
             MMData.Type             = c_oAscMouseMoveDataTypes.LockedObject;
@@ -5154,32 +2948,12 @@ CTable.prototype =
             return;
 
         var NewOutline = null;
-        if ( 1 === this.Pages.length || ( this.Pages.length > 1 && ( 0 != this.Pages[1].FirstRow || true === this.RowsInfo[0].FirstPage ) ) )
+        if (true === this.Check_EmptyPages(CurPage - 1) && true !== this.Is_EmptyPage(CurPage))
         {
-            var Bounds = this.Get_PageBounds(0);
-            NewOutline = new CTableOutline( this, this.Get_StartPage_Absolute(), Bounds.Left, Bounds.Top, Bounds.Right - Bounds.Left, Bounds.Bottom - Bounds.Top );
+            this.private_StartTrackTable(CurPage);
         }
-        else
-        {
-            var Bounds = this.Get_PageBounds(1);
-            NewOutline = new CTableOutline( this, this.Get_StartPage_Absolute() + 1, Bounds.Left, Bounds.Top, Bounds.Right - Bounds.Left, Bounds.Bottom - Bounds.Top );
-        }
-        var transform = null;
-        var cur_doc_content = this.Parent;
-        if(cur_doc_content instanceof  CDocumentContent)
-        {
-            while(cur_doc_content.Is_TableCellContent())
-            {
-                cur_doc_content = cur_doc_content.Parent.Row.Table.Parent;
-            }
-            if(cur_doc_content.Parent && cur_doc_content.Parent instanceof CShape)
-            {
-                transform = cur_doc_content.Parent.transformText;
-            }
-        }
-        this.DrawingDocument.StartTrackTable( NewOutline , transform);
 
-        var Result = this.Internal_CheckBorders( X, Y, PageNum );
+        var Result = this.Internal_CheckBorders(X, Y, CurPage);
         switch ( Result.Border )
         {
             case 0:
@@ -5190,38 +2964,21 @@ CTable.prototype =
                 return this.DrawingDocument.SetCursorType( "w-resize", new CMouseMoveData() );
         }
 
-        var Cell_Pos = this.Internal_GetCellByXY( X, Y, PageNum );
+        var Cell_Pos = this.Internal_GetCellByXY( X, Y, CurPage );
         var Cell = this.Content[Cell_Pos.Row].Get_Cell( Cell_Pos.Cell );
-        Cell.Content.Update_CursorType( X, Y, PageNum + this.Get_StartPage_Absolute() );
+        Cell.Content.Update_CursorType(X, Y, CurPage - Cell.Content.Get_StartPage_Relative());
     },
 
     Start_TrackTable : function()
     {
-        var NewOutline = null;
-        if ( 1 === this.Pages.length || ( this.Pages.length > 1 && ( 0 != this.Pages[1].FirstRow || true === this.RowsInfo[0].FirstPage ) ) )
+        var CurPage = 0;
+        while (CurPage < this.Pages.length)
         {
-            var Bounds = this.Get_PageBounds(0);
-            NewOutline = new CTableOutline( this, this.Get_StartPage_Absolute(), Bounds.Left, Bounds.Top, Bounds.Right - Bounds.Left, Bounds.Bottom - Bounds.Top );
+            if (true != this.Is_EmptyPage(CurPage))
+                break;
         }
-        else
-        {
-            var Bounds = this.Get_PageBounds(1);
-            NewOutline = new CTableOutline( this, this.Get_StartPage_Absolute() + 1, Bounds.Left, Bounds.Top, Bounds.Right - Bounds.Left, Bounds.Bottom - Bounds.Top );
-        }
-        var transform = null;
-        var cur_doc_content = this.Parent;
-        if(cur_doc_content instanceof  CDocumentContent)
-        {
-            while(cur_doc_content.Is_TableCellContent())
-            {
-                cur_doc_content = cur_doc_content.Parent.Row.Table.Parent;
-            }
-            if(cur_doc_content.Parent && cur_doc_content.Parent instanceof CShape)
-            {
-                transform = cur_doc_content.Parent.transformText;
-            }
-        }
-        this.DrawingDocument.StartTrackTable( NewOutline , transform);
+
+        this.private_StartTrackTable(CurPage);
     },
 
     DocumentStatistics : function(Stats)
@@ -5321,20 +3078,19 @@ CTable.prototype =
         }
     },
 
-    Document_UpdateRulersState : function(PageIndex)
+    Document_UpdateRulersState : function(CurPage)
     {
-        var PageNum = PageIndex - this.Get_StartPage_Absolute();
-        if ( PageNum < 0 || PageNum >= this.Pages.length )
-            PageNum = 0;
+        if (CurPage < 0 || CurPage >= this.Pages.length)
+            CurPage = 0;
 
-        if ( true == this.Selection.Use && table_Selection_Cell == this.Selection.Type )
+        if (true == this.Selection.Use && table_Selection_Cell == this.Selection.Type)
         {
-            this.Internal_Update_TableMarkup( this.Selection.EndPos.Pos.Row, this.Selection.EndPos.Pos.Cell, PageNum );
+            this.Internal_Update_TableMarkup(this.Selection.EndPos.Pos.Row, this.Selection.EndPos.Pos.Cell, CurPage);
         }
         else
         {
-            this.Internal_Update_TableMarkup( this.CurCell.Row.Index, this.CurCell.Index, PageNum );
-            this.CurCell.Content.Document_UpdateRulersState( this.Get_StartPage_Absolute() + PageNum );
+            this.Internal_Update_TableMarkup(this.CurCell.Row.Index, this.CurCell.Index, CurPage);
+            this.CurCell.Content.Document_UpdateRulersState(CurPage - this.CurCell.Content.Get_StartPage_Relative());
         }
     },
 
@@ -7748,45 +5504,44 @@ CTable.prototype =
 //-----------------------------------------------------------------------------------
 // Работаем с текущей позицией и селектом таблицы
 //-----------------------------------------------------------------------------------
-    Cursor_MoveAt : function(X, Y, bLine, bDontChangeRealPos, PageNum)
+    Cursor_MoveAt : function(X, Y, bLine, bDontChangeRealPos, CurPage)
     {
-        var PageIndex = PageNum - this.PageNum;
+        var Pos  = this.Internal_GetCellByXY(X, Y, CurPage);
+        var Row  = this.Content[Pos.Row];
+        var Cell = Row.Get_Cell(Pos.Cell);
 
-        var Pos = this.Internal_GetCellByXY( X, Y, PageIndex );
-        var Row = this.Content[Pos.Row];
-        var Cell = Row.Get_Cell( Pos.Cell );
-
-        this.Selection.Type  = table_Selection_Text;
-        this.Selection.Type2 = table_Selection_Common;
-        this.Selection.StartPos.Pos = { Row : Pos.Row, Cell : Pos.Cell };
-        this.Selection.EndPos.Pos   = { Row : Pos.Row, Cell : Pos.Cell };
-        this.Selection.CurRow = Pos.Row;
+        this.Selection.Type         = table_Selection_Text;
+        this.Selection.Type2        = table_Selection_Common;
+        this.Selection.StartPos.Pos = {Row : Pos.Row, Cell : Pos.Cell};
+        this.Selection.EndPos.Pos   = {Row : Pos.Row, Cell : Pos.Cell};
+        this.Selection.CurRow       = Pos.Row;
 
         // Устанавливаем найденную ячейку текущей и перемещаемся в контент ячейки по координатам X,Y
         this.CurCell = Cell;
         this.DrawingDocument.TargetStart();
         this.DrawingDocument.TargetShow();
-        this.CurCell.Content.Cursor_MoveAt( X, Y, false, true, PageIndex + this.Get_StartPage_Absolute() );
+        this.CurCell.Content.Cursor_MoveAt(X, Y, false, true, CurPage - this.CurCell.Content.Get_StartPage_Relative());
         this.RecalculateCurPos();
     },
 
-    Selection_SetStart : function( X, Y, PageIndex, MouseEvent )
+    Selection_SetStart : function(X, Y, CurPage, MouseEvent)
     {
-        var PageNum = PageIndex - this.PageNum;
-        if ( PageNum < 0 || PageNum >= this.Pages.length )
-            PageNum = 0;
+        if (CurPage < 0 || CurPage >= this.Pages.length)
+            CurPage = 0;
 
-        var Result = this.Internal_CheckBorders( X, Y, PageNum );
+        var Page = this.Pages[CurPage];
+
+        var Result = this.Internal_CheckBorders(X, Y, CurPage);
 
         var Pos = Result.Pos;
-        if ( - 1 === Result.Border )
+        if (-1 === Result.Border)
         {
-            var bInnerTableBorder = ( null != this.Is_TableBorder( X, Y, PageNum + this.Get_StartPage_Absolute() ) ? true : false );
-            if ( true === bInnerTableBorder )
+            var bInnerTableBorder = ( null != this.Is_TableBorder(X, Y, CurPage) ? true : false );
+            if (true === bInnerTableBorder)
             {
                 // Значит двигается граница внутренней таблицы, мы не должны отменять селект
-                var Cell = this.Content[Pos.Row].Get_Cell( Pos.Cell );
-                Cell.Content.Selection_SetStart( X, Y, PageNum, MouseEvent );
+                var Cell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
+                Cell.Content.Selection_SetStart(X, Y, CurPage - Cell.Content.Get_StartPage_Relative(), MouseEvent);
 
                 this.Selection.Type2 = table_Selection_Border_InnerTable;
                 this.Selection.Data2 = Cell;
@@ -7795,8 +5550,8 @@ CTable.prototype =
             {
                 this.Selection_Remove();
 
-                this.CurCell = this.Content[Pos.Row].Get_Cell( Pos.Cell );
-                this.CurCell.Content.Selection_SetStart( X, Y, PageNum, MouseEvent );
+                this.CurCell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
+                this.CurCell.Content.Selection_SetStart(X, Y, CurPage - this.CurCell.Content.Get_StartPage_Relative(), MouseEvent);
 
                 this.Selection.Use   = true;
                 this.Selection.Start = true;
@@ -7807,7 +5562,7 @@ CTable.prototype =
                 this.Selection.StartPos.Pos        = Pos;
                 this.Selection.StartPos.X          = X;
                 this.Selection.StartPos.Y          = Y;
-                this.Selection.StartPos.PageIndex  = PageNum;
+                this.Selection.StartPos.PageIndex  = CurPage;
                 this.Selection.StartPos.MouseEvent =
                 {
                     // TODO : Если в MouseEvent будет использоваться что-то кроме ClickCount, Type и CtrlKey, добавить здесь
@@ -7819,43 +5574,43 @@ CTable.prototype =
         }
         else
         {
-            this.Internal_Update_TableMarkup( Pos.Row, Pos.Cell, PageNum );
-            this.Selection.Type2 = table_Selection_Border;
-            this.Selection.Data2 = {};
-            this.Selection.Data2.PageNum = PageNum;
+            this.Internal_Update_TableMarkup(Pos.Row, Pos.Cell, CurPage);
+            this.Selection.Type2         = table_Selection_Border;
+            this.Selection.Data2         = {};
+            this.Selection.Data2.PageNum = CurPage;
 
             var Row = this.Content[Pos.Row];
 
             var _X = X;
             var _Y = Y;
-            
-            if ( 0 === Result.Border || 2 === Result.Border )
+
+            if (0 === Result.Border || 2 === Result.Border)
             {
-                var PageH = this.LogicDocument.Get_PageLimits( this.Get_StartPage_Absolute()).YLimit;
-                
+                var PageH = this.LogicDocument.Get_PageLimits(this.Get_StartPage_Absolute()).YLimit;
+
                 var Y_min = 0;
                 var Y_max = PageH;
 
                 this.Selection.Data2.bCol = false;
 
-                var Row_start = this.Pages[PageNum].FirstRow;
-                var Row_end   = this.Pages[PageNum].LastRow;
-                if ( 0 === Result.Border )
+                var Row_start = this.Pages[CurPage].FirstRow;
+                var Row_end   = this.Pages[CurPage].LastRow;
+                if (0 === Result.Border)
                     this.Selection.Data2.Index = Pos.Row - Row_start;
                 else
                     this.Selection.Data2.Index = Result.Row - Row_start + 1;
 
-                if ( 0 != this.Selection.Data2.Index )
+                if (0 != this.Selection.Data2.Index)
                 {
                     var TempRow = this.Selection.Data2.Index + Row_start - 1;
-                    Y_min = this.RowsInfo[TempRow].Y[PageNum];
+                    Y_min       = this.RowsInfo[TempRow].Y[CurPage];
                 }
-                
+
                 // Подправим Y, чтобы первоначально точно по границе проходила линия
-                if ( this.Selection.Data2.Index !== Row_end - Row_start + 1 )
-                    _Y = this.RowsInfo[this.Selection.Data2.Index + Row_start].Y[PageNum];
+                if (this.Selection.Data2.Index !== Row_end - Row_start + 1)
+                    _Y = this.RowsInfo[this.Selection.Data2.Index + Row_start].Y[CurPage];
                 else
-                    _Y = this.RowsInfo[this.Selection.Data2.Index + Row_start - 1].Y[PageNum] + this.RowsInfo[this.Selection.Data2.Index + Row_start - 1].H[PageNum];
+                    _Y = this.RowsInfo[this.Selection.Data2.Index + Row_start - 1].Y[CurPage] + this.RowsInfo[this.Selection.Data2.Index + Row_start - 1].H[CurPage];
 
                 this.Selection.Data2.Min = Y_min;
                 this.Selection.Data2.Max = Y_max;
@@ -7866,48 +5621,48 @@ CTable.prototype =
                     Cell : Pos.Cell
                 };
 
-                if ( null != this.Selection.Data2.Min )
-                    _Y = Math.max( _Y, this.Selection.Data2.Min );
+                if (null != this.Selection.Data2.Min)
+                    _Y = Math.max(_Y, this.Selection.Data2.Min);
 
-                if ( null != this.Selection.Data2.Max )
-                    _Y = Math.min( _Y, this.Selection.Data2.Max );
+                if (null != this.Selection.Data2.Max)
+                    _Y = Math.min(_Y, this.Selection.Data2.Max);
             }
             else
             {
-                var CellsCount = Row.Get_CellsCount();
+                var CellsCount  = Row.Get_CellsCount();
                 var CellSpacing = ( null === Row.Get_CellSpacing() ? 0 : Row.Get_CellSpacing() );
-                var X_min = null;
-                var X_max = null;
+                var X_min       = null;
+                var X_max       = null;
 
                 this.Selection.Data2.bCol = true;
-                if ( 3 === Result.Border )
+                if (3 === Result.Border)
                     this.Selection.Data2.Index = Pos.Cell;
                 else
                     this.Selection.Data2.Index = Pos.Cell + 1;
 
-                if ( 0 != this.Selection.Data2.Index )
+                if (0 != this.Selection.Data2.Index)
                 {
-                    var Margins = Row.Get_Cell( this.Selection.Data2.Index - 1 ).Get_Margins();
-                    if ( 0 != this.Selection.Data2.Index - 1 && this.Selection.Data2.Index != CellsCount )
-                        X_min = Row.Get_CellInfo( this.Selection.Data2.Index - 1 ).X_grid_start + Margins.Left.W + Margins.Right.W + CellSpacing;
+                    var Margins = Row.Get_Cell(this.Selection.Data2.Index - 1).Get_Margins();
+                    if (0 != this.Selection.Data2.Index - 1 && this.Selection.Data2.Index != CellsCount)
+                        X_min = Page.X + Row.Get_CellInfo(this.Selection.Data2.Index - 1).X_grid_start + Margins.Left.W + Margins.Right.W + CellSpacing;
                     else
-                        X_min = Row.Get_CellInfo( this.Selection.Data2.Index - 1 ).X_grid_start + Margins.Left.W + Margins.Right.W + 1.5 * CellSpacing;
+                        X_min = Page.X + Row.Get_CellInfo(this.Selection.Data2.Index - 1).X_grid_start + Margins.Left.W + Margins.Right.W + 1.5 * CellSpacing;
                 }
 
-                if ( CellsCount != this.Selection.Data2.Index )
+                if (CellsCount != this.Selection.Data2.Index)
                 {
-                    var Margins = Row.Get_Cell( this.Selection.Data2.Index ).Get_Margins();
-                    if ( CellsCount - 1 != this.Selection.Data2.Index )
-                        X_max = Row.Get_CellInfo( this.Selection.Data2.Index ).X_grid_end - ( Margins.Left.W + Margins.Right.W + CellSpacing);
+                    var Margins = Row.Get_Cell(this.Selection.Data2.Index).Get_Margins();
+                    if (CellsCount - 1 != this.Selection.Data2.Index)
+                        X_max = Page.X + Row.Get_CellInfo(this.Selection.Data2.Index).X_grid_end - (Margins.Left.W + Margins.Right.W + CellSpacing);
                     else
-                        X_max = Row.Get_CellInfo( this.Selection.Data2.Index ).X_grid_end - ( Margins.Left.W + Margins.Right.W + 1.5 * CellSpacing);
+                        X_max = Page.X + Row.Get_CellInfo(this.Selection.Data2.Index).X_grid_end - (Margins.Left.W + Margins.Right.W + 1.5 * CellSpacing);
                 }
-                                
+
                 // Подправим значение по X, чтобы первоначально точно по границе проходила линия
-                if ( CellsCount != this.Selection.Data2.Index )
-                    _X = Row.Get_CellInfo( this.Selection.Data2.Index ).X_grid_start;
+                if (CellsCount != this.Selection.Data2.Index)
+                    _X = Page.X + Row.Get_CellInfo(this.Selection.Data2.Index).X_grid_start;
                 else
-                    _X = Row.Get_CellInfo( this.Selection.Data2.Index - 1 ).X_grid_end;
+                    _X = Page.X + Row.Get_CellInfo(this.Selection.Data2.Index - 1).X_grid_end;
 
                 this.Selection.Data2.Min = X_min;
                 this.Selection.Data2.Max = X_max;
@@ -7918,46 +5673,46 @@ CTable.prototype =
                     Cell : Pos.Cell
                 };
 
-                if ( null != this.Selection.Data2.Min )
-                    _X = Math.max( _X, this.Selection.Data2.Min );
+                if (null != this.Selection.Data2.Min)
+                    _X = Math.max(_X, this.Selection.Data2.Min);
 
-                if ( null != this.Selection.Data2.Max )
-                    _X = Math.min( _X, this.Selection.Data2.Max );
+                if (null != this.Selection.Data2.Max)
+                    _X = Math.min(_X, this.Selection.Data2.Max);
             }
 
             this.Selection.Data2.X = _X;
             this.Selection.Data2.Y = _Y;
-            
+
             this.Selection.Data2.StartCX = _X; // Начальная позиция скорректированная относительно положения границы
             this.Selection.Data2.StartCY = _Y;
-            this.Selection.Data2.StartX  =  X; // Начальная позиция нажатия мыши (без корректировки)
-            this.Selection.Data2.StartY  =  Y;
-            this.Selection.Data2.Start   = true;
+            this.Selection.Data2.StartX  = X; // Начальная позиция нажатия мыши (без корректировки)
+            this.Selection.Data2.StartY = Y;
+            this.Selection.Data2.Start  = true;
 
             this.DrawingDocument.LockCursorTypeCur();
         }
     },
 
-    Selection_SetEnd : function( X, Y, PageIndex, MouseEvent )
+    Selection_SetEnd : function(X, Y, CurPage, MouseEvent)
     {
         var TablePr = this.Get_CompiledPr(false).TablePr;
-        var PageNum = PageIndex - this.PageNum;
-        if ( PageNum < 0 || PageNum >= this.Pages.length )
-            PageNum = 0;
+        if (CurPage < 0 || CurPage >= this.Pages.length)
+            CurPage = 0;
 
-        if ( this.Selection.Type2 === table_Selection_Border )
+        var Page = this.Pages[CurPage];
+        if (this.Selection.Type2 === table_Selection_Border)
         {
-            if ( true === editor.isViewMode || this.Selection.Data2.PageNum != PageIndex - this.PageNum )
+            if (true === editor.isViewMode || this.Selection.Data2.PageNum != CurPage)
                 return;
-            
+
             var _X = X;
             var _Y = Y;
-                        
+
             // Проверяем, случайное нажатие на границу. (т.е. случайное однократное нажатие или с малым смещением)
-            if ( true !== this.Selection.Data2.Start || Math.abs( X - this.Selection.Data2.StartX ) > 0.05 || Math.abs( Y - this.Selection.Data2.StartY ) > 0.05 )
+            if (true !== this.Selection.Data2.Start || Math.abs(X - this.Selection.Data2.StartX) > 0.05 || Math.abs(Y - this.Selection.Data2.StartY) > 0.05)
             {
-                _X = this.DrawingDocument.CorrectRulerPosition(X);
-                _Y = this.DrawingDocument.CorrectRulerPosition(Y);
+                _X                         = this.DrawingDocument.CorrectRulerPosition(X);
+                _Y                         = this.DrawingDocument.CorrectRulerPosition(Y);
                 this.Selection.Data2.Start = false;
             }
             else
@@ -7966,7 +5721,7 @@ CTable.prototype =
                 _Y = this.Selection.Data2.Y;
             }
 
-            if ( true === this.Selection.Data2.bCol )
+            if (true === this.Selection.Data2.bCol)
                 _X = this.private_UpdateTableRulerOnBorderMove(_X);
             else
                 _Y = this.private_UpdateTableRulerOnBorderMove(_Y);
@@ -7974,28 +5729,32 @@ CTable.prototype =
             this.Selection.Data2.X = _X;
             this.Selection.Data2.Y = _Y;
 
-            if ( MouseEvent.Type === g_mouse_event_type_up )
+            if (MouseEvent.Type === g_mouse_event_type_up)
             {
                 // Обрабатываем случай, когда граница не изменила своего первоначального положения
-                if ( Math.abs( _X - this.Selection.Data2.StartCX ) < 0.001 && Math.abs( _Y - this.Selection.Data2.StartCY ) < 0.001 )
+                if (Math.abs(_X - this.Selection.Data2.StartCX) < 0.001 && Math.abs(_Y - this.Selection.Data2.StartCY) < 0.001)
                 {
                     this.Selection.Type2 = table_Selection_Common;
                     this.Selection.Data2 = null;
-                    
+
                     return;
                 }
 
                 var LogicDocument = (editor && true !== editor.isViewMode ? editor.WordControl.m_oLogicDocument : null);
-                if (LogicDocument && false === LogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : this, CheckType : changestype_Table_Properties }))
+                if (LogicDocument && false === LogicDocument.Document_Is_SelectionLocked(changestype_None, {
+                        Type      : changestype_2_Element_and_Type,
+                        Element   : this,
+                        CheckType : changestype_Table_Properties
+                    }))
                 {
                     History.Create_NewPoint(historydescription_Document_MoveTableBorder);
 
                     if (true === this.Selection.Data2.bCol)
                     {
                         // Найдем колонку в TableGrid, с которой мы работаем
-                        var Index = this.Selection.Data2.Index;
+                        var Index  = this.Selection.Data2.Index;
                         var CurRow = this.Selection.Data2.Pos.Row;
-                        var Row = this.Content[CurRow];
+                        var Row    = this.Content[CurRow];
 
                         var Col = 0;
 
@@ -8005,7 +5764,7 @@ CTable.prototype =
                         else
                             Col = Row.Get_CellInfo(Index).StartGridCol;
 
-                        var Dx = _X - (this.X + this.TableSumGrid[Col - 1]);
+                        var Dx = _X - (Page.X + this.TableSumGrid[Col - 1]);
 
                         // Строим новую секту для таблицы
                         var Rows_info = [];
@@ -8018,19 +5777,19 @@ CTable.prototype =
                             for (CurRow = 0; CurRow < this.Content.length; CurRow++)
                             {
                                 CellsFlag[CurRow] = [];
-                                Row = this.Content[CurRow];
-                                var CellsCount = Row.Get_CellsCount();
+                                Row               = this.Content[CurRow];
+                                var CellsCount    = Row.Get_CellsCount();
                                 for (var CurCell = 0; CurCell < CellsCount; CurCell++)
                                 {
                                     CellsFlag[CurRow][CurCell] = 0;
                                 }
                             }
 
-                            var CurSelectedCell = this.Selection.Data[0];
+                            var CurSelectedCell  = this.Selection.Data[0];
                             var CurSelectedIndex = 0;
                             for (CurRow = 0; CurRow < this.Content.length; CurRow++)
                             {
-                                Row = this.Content[CurRow];
+                                Row            = this.Content[CurRow];
                                 var CellsCount = Row.Get_CellsCount();
                                 for (var CurCell = 0; CurCell < CellsCount; CurCell++)
                                 {
@@ -8039,8 +5798,8 @@ CTable.prototype =
                                         CellsFlag[CurRow][CurCell] = 1;
 
                                         var StartGridCol = Row.Get_CellInfo(CurCell).StartGridCol;
-                                        var GridSpan = Row.Get_Cell(CurCell).Get_GridSpan();
-                                        var VMergeCount = this.Internal_GetVertMergeCount(CurRow, StartGridCol, GridSpan);
+                                        var GridSpan     = Row.Get_Cell(CurCell).Get_GridSpan();
+                                        var VMergeCount  = this.Internal_GetVertMergeCount(CurRow, StartGridCol, GridSpan);
 
                                         if (CurRow === this.Selection.Data2.Pos.Row && Col >= StartGridCol && Col <= StartGridCol + GridSpan)
                                             bBorderInSelection = true;
@@ -8060,7 +5819,7 @@ CTable.prototype =
                                         if (CurSelectedIndex < this.Selection.Data.length - 1)
                                             CurSelectedCell = this.Selection.Data[++CurSelectedIndex];
                                         else
-                                            CurSelectedCell = { Row : -1, Cell : -1 };
+                                            CurSelectedCell = {Row : -1, Cell : -1};
                                     }
                                 }
                             }
@@ -8071,35 +5830,35 @@ CTable.prototype =
                         var NewTableInd = TablePr.TableInd;
                         if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && true === bBorderInSelection && !this.bPresentation)
                         {
-                            var BeforeFlag = false;
+                            var BeforeFlag   = false;
                             var BeforeSpace2 = null;
                             if (0 === Col)
                             {
-                                BeforeSpace2 = _X - this.X;
+                                BeforeSpace2 = _X - Page.X;
 
                                 if (BeforeSpace2 < 0)
                                 {
                                     this.Set_TableW(tblwidth_Auto, 0);
-                                    this.X += BeforeSpace2;
+                                    Page.X += BeforeSpace2;
 
                                     if (true === this.Is_Inline())
                                         NewTableInd = NewTableInd + BeforeSpace2;
                                     else
-                                        this.Internal_UpdateFlowPosition(this.X, this.Y);
+                                        this.Internal_UpdateFlowPosition(Page.X, Page.Y);
                                 }
                             }
 
                             var BeforeSpace = null;
-                            if (0 === Index && 0 != Col && _X < this.X)
+                            if (0 === Index && 0 != Col && _X < Page.X)
                             {
-                                BeforeSpace = this.X - _X;
-                                this.X -= BeforeSpace;
+                                BeforeSpace = Page.X - _X;
+                                Page.X -= BeforeSpace;
                                 this.Set_TableW(tblwidth_Auto, 0);
 
                                 if (true === this.Is_Inline())
                                     NewTableInd = NewTableInd - BeforeSpace;
                                 else
-                                    this.Internal_UpdateFlowPosition(this.X, this.Y);
+                                    this.Internal_UpdateFlowPosition(Page.X, Page.Y);
                             }
 
                             if (Index === this.Markup.Cols.length)
@@ -8108,8 +5867,8 @@ CTable.prototype =
                             for (CurRow = 0; CurRow < this.Content.length; CurRow++)
                             {
                                 Rows_info[CurRow] = [];
-                                Row = this.Content[CurRow];
-                                var Before_Info = Row.Get_Before();
+                                Row               = this.Content[CurRow];
+                                var Before_Info   = Row.Get_Before();
 
                                 var WBefore = 0;
 
@@ -8144,17 +5903,17 @@ CTable.prototype =
                                 }
 
                                 if (WBefore > 0.001)
-                                    Rows_info[CurRow].push({ W : WBefore, Type : -1, GridSpan : 1 });
+                                    Rows_info[CurRow].push({W : WBefore, Type : -1, GridSpan : 1});
 
 
                                 var CellsCount = Row.Get_CellsCount();
-                                var TempDx = Dx;
+                                var TempDx     = Dx;
                                 for (var CurCell = 0; CurCell < CellsCount; CurCell++)
                                 {
-                                    var Cell = Row.Get_Cell(CurCell);
-                                    var CellMargins = Cell.Get_Margins();
+                                    var Cell           = Row.Get_Cell(CurCell);
+                                    var CellMargins    = Cell.Get_Margins();
                                     var Cur_Grid_start = Row.Get_CellInfo(CurCell).StartGridCol;
-                                    var Cur_Grid_end = Cur_Grid_start + Cell.Get_GridSpan() - 1;
+                                    var Cur_Grid_end   = Cur_Grid_start + Cell.Get_GridSpan() - 1;
 
                                     var W = 0;
                                     if (Cur_Grid_end + 1 === Col && ( 1 === CellsFlag[CurRow][CurCell] || ( CurCell + 1 < CellsCount && 1 === CellsFlag[CurRow][CurCell + 1] ) ))
@@ -8168,7 +5927,7 @@ CTable.prototype =
                                     if (Cur_Grid_end + 1 === Col && ( 1 === CellsFlag[CurRow][CurCell] || ( CurCell + 1 < CellsCount && 1 === CellsFlag[CurRow][CurCell + 1] ) ))
                                         TempDx = W - (this.TableSumGrid[Cur_Grid_end] - this.TableSumGrid[Cur_Grid_start - 1]);
 
-                                    Rows_info[CurRow].push({ W : W, Type : 0, GridSpan : 1 });
+                                    Rows_info[CurRow].push({W : W, Type : 0, GridSpan : 1});
                                 }
                             }
 
@@ -8196,28 +5955,28 @@ CTable.prototype =
                                         Rows_info[CurRow][0].W -= MinBefore;
                                 }
 
-                                this.X += MinBefore;
+                                Page.X += MinBefore;
                                 if (true === this.Is_Inline())
                                     NewTableInd = NewTableInd + MinBefore;
                                 else
-                                    this.Internal_UpdateFlowPosition(this.X, this.Y);
+                                    this.Internal_UpdateFlowPosition(Page.X, Page.Y);
                             }
                         }
                         else
                         {
-                            var BeforeFlag = false;
+                            var BeforeFlag   = false;
                             var BeforeSpace2 = null;
                             if (0 === Col)
                             {
-                                BeforeSpace2 = this.X - _X;
+                                BeforeSpace2 = Page.X - _X;
 
                                 if (-BeforeSpace2 > this.TableSumGrid[0])
                                 {
                                     BeforeFlag = true;
-                                    this.X += this.TableSumGrid[0];
+                                    Page.X += this.TableSumGrid[0];
                                 }
                                 else
-                                    this.X += Dx;
+                                    Page.X += Dx;
 
                                 this.Set_TableW(tblwidth_Auto, 0);
 
@@ -8229,28 +5988,28 @@ CTable.prototype =
                                         NewTableInd = NewTableInd + Dx;
                                 }
                                 else
-                                    this.Internal_UpdateFlowPosition(this.X, this.Y);
+                                    this.Internal_UpdateFlowPosition(Page.X, Page.Y);
                             }
 
                             if (Index === this.Markup.Cols.length)
                                 this.Set_TableW(tblwidth_Auto, 0);
 
                             var BeforeSpace = null;
-                            if (0 === Index && 0 != Col && _X < this.X)
+                            if (0 === Index && 0 != Col && _X < Page.X)
                             {
-                                BeforeSpace = this.X - _X;
-                                this.X -= BeforeSpace;
+                                BeforeSpace = Page.X - _X;
+                                Page.X -= BeforeSpace;
                                 if (true === this.Is_Inline())
                                     NewTableInd = NewTableInd - BeforeSpace;
                                 else
-                                    this.Internal_UpdateFlowPosition(this.X, this.Y);
+                                    this.Internal_UpdateFlowPosition(Page.X, Page.Y);
                             }
 
                             for (CurRow = 0; CurRow < this.Content.length; CurRow++)
                             {
                                 Rows_info[CurRow] = [];
-                                Row = this.Content[CurRow];
-                                var Before_Info = Row.Get_Before();
+                                Row               = this.Content[CurRow];
+                                var Before_Info   = Row.Get_Before();
 
                                 var WBefore = 0;
 
@@ -8279,16 +6038,16 @@ CTable.prototype =
                                 }
 
                                 if (WBefore > 0.001)
-                                    Rows_info[CurRow].push({ W : WBefore, Type : -1, GridSpan : 1 });
+                                    Rows_info[CurRow].push({W : WBefore, Type : -1, GridSpan : 1});
 
                                 var CellsCount = Row.Get_CellsCount();
-                                var TempDx = Dx;
+                                var TempDx     = Dx;
                                 for (var CurCell = 0; CurCell < CellsCount; CurCell++)
                                 {
-                                    var Cell = Row.Get_Cell(CurCell);
-                                    var CellMargins = Cell.Get_Margins();
+                                    var Cell           = Row.Get_Cell(CurCell);
+                                    var CellMargins    = Cell.Get_Margins();
                                     var Cur_Grid_start = Row.Get_CellInfo(CurCell).StartGridCol;
-                                    var Cur_Grid_end = Cur_Grid_start + Cell.Get_GridSpan() - 1;
+                                    var Cur_Grid_end   = Cur_Grid_start + Cell.Get_GridSpan() - 1;
 
                                     var W = 0;
                                     if (Cur_Grid_end + 1 === Col)
@@ -8302,7 +6061,7 @@ CTable.prototype =
                                     if (Cur_Grid_end + 1 === Col)
                                         TempDx = W - (this.TableSumGrid[Cur_Grid_end] - this.TableSumGrid[Cur_Grid_start - 1]);
 
-                                    Rows_info[CurRow].push({ W : W, Type : 0, GridSpan : 1 });
+                                    Rows_info[CurRow].push({W : W, Type : 0, GridSpan : 1});
                                 }
                             }
                         }
@@ -8314,7 +6073,7 @@ CTable.prototype =
                             this.Set_TableLayout(tbllayout_Fixed);
 
                         this.Internal_CreateNewGrid(Rows_info);
-                        this.Internal_RecalculateGrid();
+                        this.private_RecalculateGrid();
                     }
                     else
                     {
@@ -8328,8 +6087,8 @@ CTable.prototype =
                             else
                             {
                                 var Dy = _Y - this.Markup.Rows[0].Y;
-                                this.Y += Dy;
-                                this.Internal_UpdateFlowPosition(this.X, this.Y);
+                                Page.Y += Dy;
+                                this.Internal_UpdateFlowPosition(Page.X, Page.Y);
 
                                 //var NewH = this.Markup.Rows[0].H + Dy;
                                 //this.Content[0].Set_Height( NewH, heightrule_AtLeast );
@@ -8344,8 +6103,8 @@ CTable.prototype =
                             else
                             {
                                 var _Y_old = this.Markup.Rows[this.Selection.Data2.Index - 1].Y + this.Markup.Rows[this.Selection.Data2.Index - 1].H;
-                                var Dy = _Y - _Y_old;
-                                var NewH = this.Markup.Rows[this.Selection.Data2.Index - 1].H + Dy;
+                                var Dy     = _Y - _Y_old;
+                                var NewH   = this.Markup.Rows[this.Selection.Data2.Index - 1].H + Dy;
                                 this.Content[RowIndex - 1].Set_Height(NewH, heightrule_AtLeast);
                             }
                         }
@@ -8358,15 +6117,15 @@ CTable.prototype =
                 this.Selection.Type2 = table_Selection_Common;
                 this.Selection.Data2 = null;
             }
-            
+
             return;
         }
-        else if ( table_Selection_Border_InnerTable === this.Selection.Type2 )
+        else if (table_Selection_Border_InnerTable === this.Selection.Type2)
         {
             var Cell = this.Selection.Data2;
-            Cell.Content.Selection_SetEnd( X, Y, PageNum, MouseEvent );
+            Cell.Content.Selection_SetEnd(X, Y, CurPage - Cell.Content.Get_StartPage_Relative(), MouseEvent);
 
-            if ( MouseEvent.Type === g_mouse_event_type_up )
+            if (MouseEvent.Type === g_mouse_event_type_up)
             {
                 this.Selection.Type2 = table_Selection_Common;
                 this.Selection.Data2 = null;
@@ -8375,39 +6134,39 @@ CTable.prototype =
             return;
         }
 
-        var Pos = this.Internal_GetCellByXY( X, Y, PageNum );
-        this.Content[Pos.Row].Get_Cell( Pos.Cell ).Content.Set_CurPosXY( X, Y );
-        this.Selection.Data = null;
+        var Pos = this.Internal_GetCellByXY(X, Y, CurPage);
+        this.Content[Pos.Row].Get_Cell(Pos.Cell).Content.Set_CurPosXY(X, Y);
+        this.Selection.Data              = null;
         this.Selection.EndPos.Pos        = Pos;
         this.Selection.EndPos.X          = X;
         this.Selection.EndPos.Y          = Y;
-        this.Selection.EndPos.PageIndex  = PageNum;
+        this.Selection.EndPos.PageIndex  = CurPage;
         this.Selection.EndPos.MouseEvent = MouseEvent;
         this.Selection.CurRow            = Pos.Row;
 
         // При селекте внутри ячейки мы селектим содержимое ячейки
-        if ( 0 === this.Parent.Selection_Is_OneElement() && this.Selection.StartPos.Pos.Row === this.Selection.EndPos.Pos.Row && this.Selection.StartPos.Pos.Cell === this.Selection.EndPos.Pos.Cell )
+        if (0 === this.Parent.Selection_Is_OneElement() && this.Selection.StartPos.Pos.Row === this.Selection.EndPos.Pos.Row && this.Selection.StartPos.Pos.Cell === this.Selection.EndPos.Pos.Cell)
         {
-            this.CurCell.Content.Selection_SetStart( this.Selection.StartPos.X, this.Selection.StartPos.Y, this.Selection.StartPos.PageIndex, this.Selection.StartPos.MouseEvent );
+            this.CurCell.Content.Selection_SetStart(this.Selection.StartPos.X, this.Selection.StartPos.Y, this.Selection.StartPos.PageIndex, this.Selection.StartPos.MouseEvent);
 
             this.Selection.Type = table_Selection_Text;
 
-            this.CurCell.Content.Selection_SetEnd( X, Y, PageNum, MouseEvent );
+            this.CurCell.Content.Selection_SetEnd(X, Y, CurPage - this.CurCell.Content.Get_StartPage_Relative(), MouseEvent);
 
-            if ( g_mouse_event_type_up == MouseEvent.Type )
+            if (g_mouse_event_type_up == MouseEvent.Type)
                 this.Selection.Start = false;
 
-            if ( false === this.CurCell.Content.Selection.Use )
+            if (false === this.CurCell.Content.Selection.Use)
             {
                 this.Selection.Use   = false;
                 this.Selection.Start = false;
-                this.Cursor_MoveAt( X, Y, false, false, this.PageNum + PageNum );
+                this.Cursor_MoveAt(X, Y, false, false, CurPage);
                 return;
             }
         }
         else
         {
-            if ( g_mouse_event_type_up == MouseEvent.Type )
+            if (g_mouse_event_type_up == MouseEvent.Type)
                 this.Selection.Start = false;
 
             this.Selection.Type = table_Selection_Cell;
@@ -8415,69 +6174,68 @@ CTable.prototype =
         }
     },
 
-    Selection_Stop : function( X, Y, PageIndex, MouseEvent )
+    Selection_Stop : function(X, Y, CurPage, MouseEvent)
     {
-        if ( true != this.Selection.Use )
+        if (true != this.Selection.Use)
             return;
-        
+
         this.Selection.Start = false;
-        this.Content[this.Selection.StartPos.Pos.Row].Get_Cell( this.Selection.StartPos.Pos.Cell ).Content.Selection_Stop( X, Y, PageIndex - this.PageNum, MouseEvent );
+        var Cell             = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell(this.Selection.StartPos.Pos.Cell);
+        Cell.Content.Selection_Stop(X, Y, CurPage - Cell.Content.Get_StartPage_Relative(), MouseEvent);
     },
 
-    Selection_Draw_Page : function(Page_abs)
+    Selection_Draw_Page : function(CurPage)
     {
-        if ( false === this.Selection.Use )
+        if (false === this.Selection.Use)
             return;
 
-        var CurPage = Page_abs - this.Get_StartPage_Absolute();
-        if ( CurPage < 0 || CurPage >= this.Pages.length )
+        if (CurPage < 0 || CurPage >= this.Pages.length)
             return;
 
-        switch( this.Selection.Type )
+        var Page    = this.Pages[CurPage];
+        var PageAbs = this.private_GetAbsolutePageIndex(CurPage);
+
+        switch (this.Selection.Type)
         {
             case table_Selection_Cell:
             {
-                var Row_prev_index = -1;
-                for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
+                for (var Index = 0; Index < this.Selection.Data.length; ++Index)
                 {
-                    var Pos = this.Selection.Data[Index];
-                    var Row = this.Content[Pos.Row];
-                    var Cell = Row.Get_Cell( Pos.Cell );
-                    var CellInfo = Row.Get_CellInfo( Pos.Cell );
-                    var CellMar = Cell.Get_Margins();
+                    var Pos      = this.Selection.Data[Index];
+                    var Row      = this.Content[Pos.Row];
+                    var Cell     = Row.Get_Cell(Pos.Cell);
+                    var CellInfo = Row.Get_CellInfo(Pos.Cell);
+                    var CellMar  = Cell.Get_Margins();
 
-                    if ( -1 === Row_prev_index || Row_prev_index != Pos.Row )
-                        Row_prev_index = Pos.Row;
-
-                    var X_start = ( 0 === Pos.Cell ? CellInfo.X_content_start : CellInfo.X_cell_start );
-                    var X_end   = CellInfo.X_cell_end;
+                    var X_start = (0 === Pos.Cell ? Page.X + CellInfo.X_content_start : Page.X + CellInfo.X_cell_start);
+                    var X_end   = Page.X + CellInfo.X_cell_end;
 
                     var Cell_Pages   = Cell.Content_Get_PagesCount();
-                    var Cell_PageRel = Page_abs - Cell.Content.Get_StartPage_Absolute();
-                    if ( Cell_PageRel < 0 || Cell_PageRel >= Cell_Pages )
+                    var Cell_PageRel = CurPage - Cell.Content.Get_StartPage_Relative();
+                    if (Cell_PageRel < 0 || Cell_PageRel >= Cell_Pages)
                         continue;
 
-                    var Bounds = Cell.Content_Get_PageBounds( Cell_PageRel );
+                    var Bounds   = Cell.Content_Get_PageBounds(Cell_PageRel);
                     var Y_offset = Cell.Temp.Y_VAlign_offset[Cell_PageRel];
 
-                    if ( 0 != Cell_PageRel )
+                    if (0 != Cell_PageRel)
                     {
                         // мы должны определить ряд, на котором случился перенос на новую страницу
                         var TempRowIndex = this.Pages[CurPage].FirstRow;
-                        this.DrawingDocument.AddPageSelection( Page_abs, X_start, this.RowsInfo[TempRowIndex].Y[CurPage] + this.RowsInfo[TempRowIndex].TopDy[CurPage] + CellMar.Top.W + Y_offset, X_end - X_start, Bounds.Bottom - Bounds.Top );
+                        this.DrawingDocument.AddPageSelection(PageAbs, X_start, this.RowsInfo[TempRowIndex].Y[CurPage] + this.RowsInfo[TempRowIndex].TopDy[CurPage] + CellMar.Top.W + Y_offset, X_end - X_start, Bounds.Bottom - Bounds.Top);
                     }
                     else
                     {
-                        this.DrawingDocument.AddPageSelection( Page_abs, X_start, this.RowsInfo[Pos.Row].Y[CurPage] + this.RowsInfo[Pos.Row].TopDy[CurPage] + CellMar.Top.W + Y_offset, X_end - X_start, Bounds.Bottom - Bounds.Top );
+                        this.DrawingDocument.AddPageSelection(PageAbs, X_start, this.RowsInfo[Pos.Row].Y[CurPage] + this.RowsInfo[Pos.Row].TopDy[CurPage] + CellMar.Top.W + Y_offset, X_end - X_start, Bounds.Bottom - Bounds.Top);
                     }
                 }
                 break;
             }
             case table_Selection_Text:
             {
-                var Cell = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell( this.Selection.StartPos.Pos.Cell );
-                Cell.Content.Selection_Draw_Page(Page_abs);
-
+                var Cell = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell(this.Selection.StartPos.Pos.Cell);
+                var Cell_PageRel = CurPage - Cell.Content.Get_StartPage_Relative();
+                Cell.Content.Selection_Draw_Page(Cell_PageRel);
                 break;
             }
         }
@@ -8515,57 +6273,55 @@ CTable.prototype =
 
     },
 
-    Selection_Check : function(X, Y, Page_Abs, NearPos)
+    Selection_Check : function(X, Y, CurPage, NearPos)
     {
-        if ( undefined != NearPos  )
+        if (undefined != NearPos)
         {
-            if ( ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type ) || true === this.ApplyToAll )
+            if ((true === this.Selection.Use && table_Selection_Cell === this.Selection.Type) || true === this.ApplyToAll)
             {
                 var Cells_array = this.Internal_Get_SelectionArray();
-                for (var Index = 0; Index < Cells_array.length; Index++ )
+                for (var Index = 0; Index < Cells_array.length; Index++)
                 {
-                    var CurPos = Cells_array[Index];
-                    var CurCell = this.Content[CurPos.Row].Get_Cell( CurPos.Cell );
+                    var CurPos      = Cells_array[Index];
+                    var CurCell     = this.Content[CurPos.Row].Get_Cell(CurPos.Cell);
                     var CellContent = CurCell.Content;
 
                     CellContent.Set_ApplyToAll(true);
 
-                    if ( true === CellContent.Selection_Check( 0, 0, 0, NearPos ) )
+                    if (true === CellContent.Selection_Check(0, 0, 0, NearPos))
                     {
-                        CellContent.Set_ApplyToAll( false );
+                        CellContent.Set_ApplyToAll(false);
                         return true;
                     }
 
-                    CellContent.Set_ApplyToAll( false );
+                    CellContent.Set_ApplyToAll(false);
                 }
             }
             else
-                return this.CurCell.Content.Selection_Check( 0, 0, 0, NearPos );
+                return this.CurCell.Content.Selection_Check(0, 0, 0, NearPos);
 
             return false;
         }
         else
         {
-            var PageIndex = Page_Abs - this.Get_StartPage_Absolute();
-
-            if ( PageIndex < 0 || PageIndex >= this.Pages.length )
+            if (CurPage < 0 || CurPage >= this.Pages.length)
                 return false;
 
-            var CellPos = this.Internal_GetCellByXY( X, Y, PageIndex );
-            if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
+            var CellPos = this.Internal_GetCellByXY(X, Y, CurPage);
+            if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type)
             {
-                for (var Index = 0; Index < this.Selection.Data.length; Index++ )
+                for (var Index = 0; Index < this.Selection.Data.length; Index++)
                 {
                     var CurPos = this.Selection.Data[Index];
 
-                    if ( CurPos.Cell === CellPos.Cell && CurPos.Row === CellPos.Row )
+                    if (CurPos.Cell === CellPos.Cell && CurPos.Row === CellPos.Row)
                         return true;
                 }
 
                 return false;
             }
-            else if ( CellPos.Cell === this.CurCell.Index && CellPos.Row === this.CurCell.Row.Index )
-                return this.CurCell.Content.Selection_Check( X, Y, Page_Abs, undefined );
+            else if (CellPos.Cell === this.CurCell.Index && CellPos.Row === this.CurCell.Row.Index)
+                return this.CurCell.Content.Selection_Check(X, Y, CurPage - this.CurCell.Content.Get_StartPage_Relative(), undefined);
 
             return false;
         }
@@ -8767,7 +6523,7 @@ CTable.prototype =
             }
             else
             {
-                this.Parent.OnContentReDraw( this.Get_StartPage_Absolute(), this.Get_StartPage_Absolute() + this.Pages.length - 1 );
+                this.Parent.OnContentReDraw(this.Get_AbsolutePage(0), this.Get_AbsolutePage(this.Pages.length - 1));
             }
         }
         else
@@ -12141,7 +9897,7 @@ CTable.prototype =
 
         this.ReIndexing();
         this.Recalc_CompiledPr2();
-        this.Internal_RecalculateGrid();
+        this.private_RecalculateGrid();
         this.Internal_Recalculate_1();
 
         return true;
@@ -12623,7 +10379,7 @@ CTable.prototype =
         this.Selection.EndPos.Pos   = { Row : CurRow, Cell: CurCell };
         this.Selection.CurRow       = CurRow;
 
-        this.Internal_RecalculateGrid();
+        this.private_RecalculateGrid();
         this.Internal_Recalculate_1();
 
         return true;
@@ -12895,7 +10651,7 @@ CTable.prototype =
             }
         }
 
-        this.Internal_RecalculateGrid();
+        this.private_RecalculateGrid();
         this.Internal_Recalculate_1();
     },
 
@@ -12961,7 +10717,9 @@ CTable.prototype =
                     this.private_SetTableLayoutFixedAndUpdateGrid(-1);
                 }
                 else
-                    this.Internal_UpdateFlowPosition( this.X, this.Y );
+                {
+                    this.Internal_UpdateFlowPosition(Page.X, Page.Y);
+                }
             }
             else
             {
@@ -13057,7 +10815,7 @@ CTable.prototype =
                     }
                 }
 
-                this.Internal_RecalculateGrid();
+                this.private_RecalculateGrid();
             }
 
             History.Add( this, { Type : historyitem_Table_TableGrid, Old : TableGrid_old, New : this.TableGrid } );
@@ -13074,8 +10832,8 @@ CTable.prototype =
                 else
                 {
                     var Dy = this.Markup.Rows[0].Y - NewMarkup.Rows[0].Y;
-                    this.Y -= Dy;
-                    this.Internal_UpdateFlowPosition( this.X, this.Y );
+                    Page.Y -= Dy;
+                    this.Internal_UpdateFlowPosition(Page.X, Page.Y);
                     var NewH = NewMarkup.Rows[0].H;
                     this.Content[0].Set_Height( NewH, heightrule_AtLeast );
                 }
@@ -13102,4921 +10860,34 @@ CTable.prototype =
 //-----------------------------------------------------------------------------------
 // Внутренние функции
 //-----------------------------------------------------------------------------------
-
-    Internal_RecalculateGrid : function()
-    {
-        //if ( true != this.RecalcInfo.TableGrid )
-        //    return;
-
-        if ( this.Content.length <= 0 )
-            return;
-
-        this.Internal_Recalculate_Grid_Open();
-
-        //---------------------------------------------------------------------------
-        // 1 часть пересчета ширины таблицы : Рассчитываем фиксированную ширину
-        //---------------------------------------------------------------------------
-        var TablePr = this.Get_CompiledPr(false).TablePr;
-
-        var Grid   = this.TableGrid;
-        var SumGrid = [];
-
-        var TempSum = 0;
-        SumGrid[-1] = 0;
-        for ( var Index = 0; Index < Grid.length; Index++ )
-        {
-            TempSum += Grid[Index];
-            SumGrid[Index] = TempSum;
-        }
-
-        var MinWidth = this.Internal_Get_TableMinWidth();
-        var TableW = TablePr.TableW.W;
-        if ( tblwidth_Auto === TablePr.TableW.Type )
-            TableW = 0;
-        else
-        {
-            if ( TableW < MinWidth )
-                TableW = MinWidth;
-        }
-
-        var CurGridCol = 0;
-        for ( var Index = 0; Index < this.Content.length; Index++ )
-        {
-            var Row = this.Content[Index];
-            Row.Set_Index( Index );
-
-            // Смотрим на ширину пропущенных колонок сетки в начале строки
-            var BeforeInfo = Row.Get_Before();
-            CurGridCol = BeforeInfo.GridBefore;
-            if ( CurGridCol > 0 && SumGrid[CurGridCol - 1] < BeforeInfo.WBefore.W )
-                SumGrid[CurGridCol - 1] = BeforeInfo.WBefore.W;
-
-            var CellsCount = Row.Get_CellsCount();
-            for ( var CellIndex = 0; CellIndex < CellsCount; CellIndex++ )
-            {
-                var Cell = Row.Get_Cell( CellIndex );
-                Cell.Set_Index( CellIndex );
-                var CellW = Cell.Get_W();
-                var GridSpan = Cell.Get_GridSpan();
-
-                if ( CurGridCol + GridSpan - 1 > SumGrid.length )
-                {
-                    for ( var AddIndex = SumGrid.length; AddIndex <= CurGridCol + GridSpan - 1; AddIndex++ )
-                        SumGrid[AddIndex] = SumGrid[AddIndex - 1] + 20; // Добавляем столбик шириной в 2 см
-                }
-
-                if ( tblwidth_Auto != CellW.Type && CellW.W + SumGrid[CurGridCol - 1] > SumGrid[CurGridCol + GridSpan - 1]  )
-                    SumGrid[CurGridCol + GridSpan - 1] = CellW.W + SumGrid[CurGridCol - 1];
-
-                CurGridCol += GridSpan;
-            }
-
-            // Смотрим на ширину пропущенных колонок сетки в конце строки
-            var AfterInfo = Row.Get_After();
-            if ( CurGridCol + AfterInfo.GridAfter - 1 > SumGrid.length )
-            {
-                for ( var AddIndex = SumGrid.length; AddIndex <= CurGridCol + AfterInfo.GridAfter - 1; AddIndex++ )
-                    SumGrid[AddIndex] = SumGrid[AddIndex - 1] + 20; // Добавляем столбик шириной в 2 см
-            }
-            if ( SumGrid[CurGridCol + AfterInfo.GridAfter - 1] < AfterInfo.WAfter + SumGrid[CurGridCol - 1] )
-                SumGrid[CurGridCol + AfterInfo.GridAfter - 1] = AfterInfo.WAfter + SumGrid[CurGridCol - 1];
-        }
-
-        // TODO: разобраться с минимальной шириной таблицы и ячеек
-
-        // Задана общая ширина таблицы и последняя ячейка вышла за пределы
-        // данной ширины. Уменьшаем все столбцы сетки пропорционально, чтобы
-        // суммарная ширина стала равной заданной ширине таблицы.
-        if ( TableW > 0 && Math.abs( SumGrid[SumGrid.length - 1] - TableW ) > 0.01 )
-        {
-            SumGrid = this.Internal_ScaleTableWidth( SumGrid, TableW );
-        }
-        else if ( MinWidth > SumGrid[SumGrid.length - 1] )
-            SumGrid = this.Internal_ScaleTableWidth( SumGrid, SumGrid[SumGrid.length - 1] );
-
-        var TableGrid_old = [];
-        for ( var Index = 0; Index < this.TableGrid.length; Index++ )
-            TableGrid_old[Index] = this.TableGrid[Index];
-
-        // По массиву SumGrid восстанавливаем ширины самих колонок
-        this.TableGrid[0] = SumGrid[0];
-        for ( var Index = 1; Index < SumGrid.length; Index++ )
-            this.TableGrid[Index] = SumGrid[Index] - SumGrid[Index - 1];
-
-        this.Internal_SaveTableGridInHistory( this.TableGrid, TableGrid_old );
-
-        this.TableGridCalc = this.Internal_Copy_Grid(this.TableGrid);
-
-        this.TableSumGrid = SumGrid;
-
-        var TopTable = this.Parent.Is_InTable(true);
-        if ( ( null === TopTable && tbllayout_AutoFit === TablePr.TableLayout) || ( null != TopTable && tbllayout_AutoFit === TopTable.Get_CompiledPr(false).TablePr.TableLayout ) )
-        {
-            //---------------------------------------------------------------------------
-            // 2 часть пересчета ширины таблицы : Рассчитываем ширину по содержимому
-            //---------------------------------------------------------------------------
-            var MinMargin = [], MinContent = [], MaxContent = [], MaxFlags = [];
-
-            var GridCount = this.TableGridCalc.length;
-            for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
-            {
-                MinMargin[CurCol]  = 0;
-                MinContent[CurCol] = 0;
-                MaxContent[CurCol] = 0;
-                MaxFlags[CurCol]   = false; // false - ориентируемся на содержимое ячеек, true - ориентируемся только на ширину ячеек записанную в свойствах
-            }
-
-            // 1. Рассчитаем MinContent и MinMargin для всех колонок таблицы, причем, если
-            //    у ячейки GridSpan > 1, тогда MinMargin учитывается только в первую колнонку,
-            //    а MinContent распределяется равномерно по всем колонкам.
-
-            var LeftMargin = 0, RightMargin = 0;
-            var RowsCount = this.Content.length;
-            for ( var CurRow = 0; CurRow < RowsCount; CurRow++ )
-            {
-                var Row = this.Content[CurRow];
-
-                var Spacing  = Row.Get_CellSpacing();
-                var SpacingW = ( null != Spacing ? Spacing : 0 );
-
-                var CurGridCol = 0;
-
-                // Смотрим на ширину пропущенных колонок сетки в начале строки
-                var BeforeInfo = Row.Get_Before();
-                var GridBefore = BeforeInfo.GridBefore;
-                var WBefore    = BeforeInfo.WBefore;
-
-                if ( 1 === GridBefore )
-                {
-                    if ( WBefore.Type === tblwidth_Mm )
-                    {
-                        if ( MinContent[CurGridCol] < WBefore.W )
-                            MinContent[CurGridCol] = WBefore.W;
-
-                        if ( false === MaxFlags[CurGridCol] )
-                        {
-                            MaxFlags[CurGridCol] = true;
-                            MaxContent[CurGridCol] = WBefore.W;
-                        }
-                        else if ( MaxContent[CurGridCol] < WBefore.W )
-                            MaxContent[CurGridCol] = WBefore.W;
-                    }
-                }
-                else if ( GridBefore > 1 )
-                {
-                    var SumSpanMinContent = 0;
-                    var SumSpanMaxContent = 0;
-                    var SumSpanCurContent = 0;
-                    for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridBefore; CurSpan++ )
-                    {
-                        SumSpanMinContent += MinContent[CurSpan];
-                        SumSpanMaxContent += MaxContent[CurSpan];
-                        SumSpanCurContent += this.TableGrid[CurSpan];
-                    }
-
-                    if ( SumSpanMinContent < WBefore.W )
-                    {
-                        for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
-                            MinContent[CurSpan] = WBefore.W * this.TableGrid[CurSpan] / SumSpanCurContent;
-                    }
-
-                    // Если у нас в объединении несколько колонок, тогда явно записанная ширина ячейки не
-                    // перекрывает ширину ни одной из колонок, она всего лишь учавствует в определении
-                    // максимальной ширины.
-                    if ( WBefore.Type === tblwidth_Mm && WBefore.W > SumSpanMaxContent )
-                    {
-                        // TODO: На самом деле, распределение здесь идет в каком-то отношении.
-                        //       Неплохо было бы выяснить как именно.
-                        var TempAdd = (WBefore.W - SumSpanMaxContent) / GridBefore;
-                        for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridBefore; CurSpan++ )
-                            MaxContent[CurSpan] = WBefore.W * this.TableGrid[CurSpan] / SumSpanCurContent;
-                    }
-                }
-
-
-                CurGridCol = BeforeInfo.GridBefore;
-
-                var CellsCount = Row.Get_CellsCount();
-                for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                {
-                    var Cell         = Row.Get_Cell( CurCell );
-                    var CellMinMax   = Cell.Content.Recalculate_MinMaxContentWidth();
-                    var CellMin      = CellMinMax.Min;
-                    var CellMax      = CellMinMax.Max;
-                    var GridSpan     = Cell.Get_GridSpan();
-                    var CellMargins  = Cell.Get_Margins();
-                    var CellW        = Cell.Get_W();
-                    var CellRBorder  = Cell.Get_Border(1);
-                    var CellLBorder  = Cell.Get_Border(3);
-					var CellWW;
-
-                    var Add = ( ( 0 === CurCell || CellsCount - 1 === CurCell ) ? 3 / 2 * SpacingW : SpacingW );
-
-                    CellMin += Add;
-                    CellMax += Add;
-                    CellWW  = CellW.W + Add;
-
-                    // Если GridSpan > 1, тогда все равно маргины учитываются в первую колоноку спана
-
-                    var CellMarginsW = 0;
-                    if ( null !== Spacing )
-                    {
-                        CellMarginsW = CellMargins.Left.W + CellMargins.Right.W;
-                        
-                        if ( border_None !== CellRBorder.Value )
-                            CellMarginsW += CellRBorder.Size;
-
-                        if ( border_None !== CellLBorder.Value )
-                            CellMarginsW += CellLBorder.Size;
-                    }
-                    else
-                    {
-                        if ( border_None !== CellRBorder.Value )
-                            CellMarginsW += Math.max( CellRBorder.Size / 2, CellMargins.Right.W );
-                        else
-                            CellMarginsW += CellMargins.Right.W;
-
-                        if ( border_None !== CellLBorder.Value )
-                            CellMarginsW += Math.max( CellLBorder.Size / 2, CellMargins.Left.W );
-                        else
-                            CellMarginsW += CellMargins.Left.W;
-                    }
-
-                    if ( MinMargin[CurGridCol] < CellMarginsW )
-                        MinMargin[CurGridCol] = CellMarginsW;
-
-                    // На самом деле, случай 1 === GridSpan нормально обработается и как случай GridSpan > 1,
-                    // но поскольку он наиболее распространен, делаем его обработку максимально быстрой (без циклов)
-                    if ( 1 === GridSpan )
-                    {
-                        if ( MinContent[CurGridCol] < CellMin )
-                            MinContent[CurGridCol] = CellMin;
-
-                        if ( false === MaxFlags[CurGridCol] && MaxContent[CurGridCol] < CellMax )
-                            MaxContent[CurGridCol] = CellMax;
-
-                        if ( CellW.Type === tblwidth_Mm )
-                        {
-                            if ( false === MaxFlags[CurGridCol] )
-                            {
-                                MaxFlags[CurGridCol] = true;
-                                MaxContent[CurGridCol] = CellWW;
-                            }
-                            else if ( MaxContent[CurGridCol] < CellWW )
-                                MaxContent[CurGridCol] = CellWW;
-                        }
-                    }
-                    else
-                    {
-                        var SumSpanMinContent = 0;
-                        var SumSpanMaxContent = 0;
-                        var SumSpanCurContent = 0;
-                        for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
-                        {
-                            SumSpanMinContent += MinContent[CurSpan];
-                            SumSpanMaxContent += MaxContent[CurSpan];
-                            SumSpanCurContent += this.TableGrid[CurSpan];
-                        }
-
-                        if ( SumSpanMinContent < CellMin )
-                        {
-                            for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
-                                MinContent[CurSpan] = CellMin * this.TableGrid[CurSpan] / SumSpanCurContent;
-                        }
-
-                        // Если у нас в объединении несколько колонок, тогда явно записанная ширина ячейки не
-                        // перекрывает ширину ни одной из колонок, она всего лишь учавствует в определении
-                        // максимальной ширины.
-                        if ( CellW.Type === tblwidth_Mm && CellWW > CellMax )
-                            CellMax = CellWW;
-
-                        if ( SumSpanMaxContent < CellMax )
-                        {
-                            // TODO: На самом деле, распределение здесь идет в каком-то отношении.
-                            //       Неплохо было бы выяснить как именно.
-                            var TempAdd = (CellMax - SumSpanMaxContent) / GridSpan;
-                            for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
-                                MaxContent[CurSpan] = CellMax * this.TableGrid[CurSpan] / SumSpanCurContent;
-                        }
-                    }
-
-                    if ( 0 === CurRow && 0 === CurCell )
-                        LeftMargin = CellMargins.Left.W;
-
-                    if ( 0 === CurRow && CellsCount - 1 === CurCell )
-                        RightMargin = CellMargins.Right.W;
-
-                    CurGridCol += GridSpan;
-                }
-
-                var AfterInfo = Row.Get_After();
-                var GridAfter = AfterInfo.GridAfter;
-                var WAfter    = AfterInfo.WAfter;
-
-                if ( 1 === GridAfter )
-                {
-                    if ( WAfter.Type === tblwidth_Mm )
-                    {
-                        if ( MinContent[CurGridCol] < WAfter.W )
-                            MinContent[CurGridCol] = WAfter.W;
-
-                        if ( false === MaxFlags[CurGridCol] )
-                        {
-                            MaxFlags[CurGridCol] = true;
-                            MaxContent[CurGridCol] = WAfter.W;
-                        }
-                        else if ( MaxContent[CurGridCol] < WAfter.W )
-                            MaxContent[CurGridCol] = WAfter.W;
-                    }
-                }
-                else if ( GridAfter > 1 )
-                {
-                    var SumSpanMinContent = 0;
-                    var SumSpanMaxContent = 0;
-                    var SumSpanCurContent = 0;
-                    for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridAfter; CurSpan++ )
-                    {
-                        SumSpanMinContent += MinContent[CurSpan];
-                        SumSpanMaxContent += MaxContent[CurSpan];
-                        SumSpanCurContent += this.TableGrid[CurSpan];
-                    }
-
-                    if ( SumSpanMinContent < WAfter.W )
-                    {
-                        for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
-                            MinContent[CurSpan] = WAfter.W * this.TableGrid[CurSpan] / SumSpanCurContent;
-                    }
-
-                    // Если у нас в объединении несколько колонок, тогда явно записанная ширина ячейки не
-                    // перекрывает ширину ни одной из колонок, она всего лишь учавствует в определении
-                    // максимальной ширины.
-                    if ( WAfter.Type === tblwidth_Mm && WAfter.W > SumSpanMaxContent )
-                    {
-                        // TODO: На самом деле, распределение здесь идет в каком-то отношении.
-                        //       Неплохо было бы выяснить как именно.
-                        var TempAdd = (WAfter.W - SumSpanMaxContent) / GridAfter;
-                        for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridAfter; CurSpan++ )
-                            MaxContent[CurSpan] = WAfter.W * this.TableGrid[CurSpan] / SumSpanCurContent;
-                    }
-                }
-            }
-
-            for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
-            {               
-                if ( true === MaxFlags[CurCol] )
-                    MaxContent[CurCol] = Math.max( 0, MaxContent[CurCol] - MinMargin[CurCol] );
-            }
-
-            // 2. Проследим, чтобы значения MinContent + MinMargin и MaxContent + MinMargin не превосходили
-            //    значение 55,87см(так работает Word)
-            for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
-            {
-                if ( MinMargin[CurCol] + MinContent[CurCol] > 558.7 )
-                    MinContent[CurCol] = Math.max(558.7 - MinMargin[CurCol] , 0);
-
-                if ( MinMargin[CurCol] + MaxContent[CurCol] > 558.7 )
-                    MaxContent[CurCol] = Math.max(558.7 - MinMargin[CurCol] , 0);
-            }
-
-            // 3. Рассчитаем максимально допустимую ширину под всю таблицу
-            var PageFields = this.Parent.Get_PageFields( this.PageNum );
-            var MaxTableW = PageFields.XLimit - PageFields.X - TablePr.TableInd;
-            if ( null === TopTable )
-                MaxTableW += LeftMargin + RightMargin; // Добавляем левый маргин первой ячейки + правый маргин правой ячейки для верхних таблиц
-
-            var TableSpacing = this.Content[0].Get_CellSpacing();
-            if ( null != TableSpacing )
-                MaxTableW += 2 * TableSpacing;
-
-            // 4. Рассчитаем желаемую ширину таблицы таблицы
-            var MaxContent2 = [];
-            var SumMin = 0, SumMinMargin = 0, SumMinContent = 0, SumMax = 0, SumMaxContent2 = 0;
-            var TableGrid2 = [];
-            for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
-            {
-                var Temp = MinMargin[CurCol] + MinContent[CurCol];
-                TableGrid2[CurCol] = this.TableGridCalc[CurCol];
-                if ( Temp < this.TableGridCalc[CurCol] )
-                {
-                    TableGrid2[CurCol] = this.TableGridCalc[CurCol];
-                }
-                else
-                {
-                    TableGrid2[CurCol] = Temp;
-                }
-
-                MaxContent2[CurCol] = Math.max( 0, MaxContent[CurCol] - MinContent[CurCol] );
-
-                SumMin         += Temp;
-                SumMaxContent2 += MaxContent2[CurCol];
-                SumMinMargin   += MinMargin[CurCol];
-                SumMinContent  += MinContent[CurCol];
-                SumMax         += MinMargin[CurCol] + MinContent[CurCol] + MaxContent2[CurCol];
-            }
-
-            if ( SumMin < MaxTableW )
-            {
-                // SumMin < MaxTableW, значит у нас есть свободное пространство для распределения
-                // Если SumMax < MaxTableW, тогда все колонки делаем по ширине MaxContent[CurCol] + MinMargin[CurCol],
-                // в противном случаем значение (MaxTableW - SumMin) распределяем между колонками в отношении
-                // MaxContent[CurCol] / SumMaxContent
-
-                if ( SumMax <= MaxTableW || SumMaxContent2 < 0.001 )
-                {
-                    for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
-                    {
-                        this.TableGridCalc[CurCol] = MinMargin[CurCol] + Math.max(MinContent[CurCol], MaxContent[CurCol]);
-                    }
-                }
-                else
-                {
-                    for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
-                    {
-                        this.TableGridCalc[CurCol] = MinMargin[CurCol] + MinContent[CurCol] + (MaxTableW - SumMin) * MaxContent2[CurCol] / SumMaxContent2;
-                    }
-                }
-
-                // Если у таблицы задана ширина, тогда ориентируемся по ширине, а если нет, тогда ориентируемся по
-                // максимальным значениям.
-                if ( tblwidth_Mm === TablePr.TableW.Type )
-                {
-                    var TableW = Math.max( SumMin, TablePr.TableW.W );
-                    var TableW2 = Math.min( SumMax, MaxTableW );
-
-                    // Если TableW > SumMax, тогда меням в соотношении максимумов, в противном случае меняем в соотношении минимумов
-                    for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
-                    {
-                        this.TableGridCalc[CurCol] *= TableW / TableW2;
-                    }
-                }
-            }
-            else
-            {
-                // 5. Если в таблице сделать все ячейки нулевой ширины (для контента), и все равно она получается шире
-                //    максимальной допустимой ширины, тогда выставляем ширины всех колоно по минимальному значению
-                //    маргинов и оставляем так как есть
-                if (MaxTableW - SumMinMargin < 0.001)
-                {
-                    for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
-                    {
-                        this.TableGridCalc[CurCol] = MinMargin[CurCol];
-                    }
-                }
-                else
-                {
-                    // 6. Равномерно уменьшаем все колонки до достижения суммарного значения MaxTableW
-                    var ColsDiff = [];
-                    var SumColsDiff = 0;
-                    for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
-                    {
-                        var Temp = TableGrid2[CurCol] - MinMargin[CurCol];
-                        ColsDiff[CurCol] = Temp;
-                        SumColsDiff += Temp;
-                    }
-
-                    for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
-                    {
-                        TableGrid2[CurCol] = MinMargin[CurCol] + (MaxTableW - SumMinMargin) * ColsDiff[CurCol] / SumColsDiff;
-                    }
-
-                    // 7. Ищем колонки, у которых текущая ширина меньше MinContent (заодно ищем недостоющую сумму).
-                    //    Также запоминаем остальные колонки и находим у них избыточную сумму.
-                    var SumN = 0, SumI = 0;
-                    var GridCols = [];
-                    for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
-                    {
-                        var Temp = TableGrid2[CurCol] - (MinMargin[CurCol] + MinContent[CurCol]);
-                        if ( Temp >= 0 )
-                        {
-                            GridCols[CurCol] = Temp;
-                            SumI += Temp;
-                        }
-                        else
-                        {
-                            GridCols[CurCol] = -1;
-                            SumN -= Temp;
-                        }
-                    }
-
-                    // 8. Если недостающего пространста больше, чем избыточного, тогда ищем разницу
-                    //    (MaxTableW - SumMinMargin) и распределяем ее в отношении, как соотносятся
-                    //    значения MinContent между собой.
-                    if (SumN > SumI || SumI < 0.001)
-                    {
-                        if (SumMinContent > 0.001)
-                        {
-                            var SumDiff = MaxTableW - SumMinMargin;
-                            for (var CurCol = 0; CurCol < GridCount; CurCol++)
-                            {
-                                this.TableGridCalc[CurCol] = MinMargin[CurCol] + SumDiff * MinContent[CurCol] / SumMinContent;
-                            }
-                        }
-                        else
-                        {
-                            for (var CurCol = 0; CurCol < GridCount; CurCol++)
-                            {
-                                this.TableGridCalc[CurCol] = MinMargin[CurCol];
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
-                        {
-                            if ( GridCols[CurCol] < 0 )
-                            {
-                                this.TableGridCalc[CurCol] = MinMargin[CurCol] + MinContent[CurCol];
-                            }
-                            else
-                            {
-                                this.TableGridCalc[CurCol] = TableGrid2[CurCol] - SumN * GridCols[CurCol] / SumI;
-                            }
-                        }
-                    }
-                }
-            }
-
-
-            this.TableSumGrid[-1] = 0;
-            for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
-                this.TableSumGrid[CurCol] = this.TableSumGrid[CurCol - 1] + this.TableGridCalc[CurCol];
-        }
-
-        this.RecalcInfo.TableGrid = false;
-    },
-
-    Internal_Recalculate_Grid_Open : function()
-    {
-        if ( true != this.RecalcInfo.TableGridOpen )
-            return;
-
-        // Сначала пробежимся по всем ячейкам и посмотрим, чтобы у них были корректные GridSpan (т.е. >= 1)
-        for ( var Index = 0; Index < this.Content.length; Index++ )
-        {
-            var Row = this.Content[Index];
-            var CellsCount = Row.Get_CellsCount();
-            for ( var CellIndex = 0; CellIndex < CellsCount; CellIndex++ )
-            {
-                var Cell = Row.Get_Cell( CellIndex );
-                var GridSpan = Cell.Get_GridSpan();
-                if ( GridSpan <= 0 )
-                    Cell.Set_GridSpan( 1 );
-            }
-        }
-
-        var RowGrid = [];
-        var GridCount = 0;
-        for ( var Index = 0; Index < this.Content.length; Index++ )
-        {
-            var Row = this.Content[Index];
-            Row.Set_Index( Index );
-
-            // Смотрим на ширину пропущенных колонок сетки в начале строки
-            var BeforeInfo = Row.Get_Before();
-            var CurGridCol = BeforeInfo.GridBefore;
-
-            var CellsCount = Row.Get_CellsCount();
-            for ( var CellIndex = 0; CellIndex < CellsCount; CellIndex++ )
-            {
-                var Cell = Row.Get_Cell( CellIndex );
-                var GridSpan = Cell.Get_GridSpan();
-                CurGridCol += GridSpan;
-            }
-
-            // Смотрим на ширину пропущенных колонок сетки в конце строки
-            var AfterInfo = Row.Get_After();
-            CurGridCol += AfterInfo.GridAfter;
-
-            if ( GridCount < CurGridCol )
-                GridCount = CurGridCol;
-
-            RowGrid[Index] = CurGridCol;
-        }
-
-        for ( var Index = 0; Index < this.Content.length; Index++ )
-        {
-            var Row = this.Content[Index];
-            var AfterInfo = Row.Get_After();
-
-            if ( RowGrid[Index] < GridCount )
-            {
-                Row.Set_After( AfterInfo.GridAfter + GridCount - RowGrid[Index],  AfterInfo.WAfter );
-            }
-        }
-
-        if ( this.TableGrid.length != GridCount )
-        {
-            if (this.TableGrid.length < GridCount)
-            {
-                for (var Index = 0; Index < GridCount; Index++)
-                    this.TableGrid[Index] = 20;
-            }
-            else
-            {
-                this.TableGrid.splice(GridCount, this.TableGrid.length - GridCount);
-            }
-        }
-
-        this.RecalcInfo.TableGridOpen = false;
-    },
-
     Internal_Recalculate_1 : function()
     {
         return editor.WordControl.m_oLogicDocument.Recalculate();
-        if ( true === this.TurnOffRecalc )
-            return;
-
-        this.TurnOffRecalc = true;
-        var TablePr = this.Get_CompiledPr(false).TablePr;
-        if ( true === this.Is_Inline() )
-        {
-            switch ( TablePr.Jc )
-            {
-                case align_Left :
-                {
-                    this.X = this.X_origin + this.Get_TableOffsetCorrection() + TablePr.TableInd;
-                    break;
-                }
-                case align_Right :
-                {
-                    var TableWidth = this.TableSumGrid[ this.TableSumGrid.length - 1 ];
-
-                    if ( false === this.Parent.Is_TableCellContent() )
-                        this.X = this.XLimit - TableWidth + 1.9; // 1.9мм всегда добавляется справа от таблицы
-                    else
-                        this.X = this.XLimit - TableWidth;
-                    break;
-                }
-                case align_Center :
-                {
-                    var TableWidth = this.TableSumGrid[ this.TableSumGrid.length - 1 ];
-                    var RangeWidth = this.XLimit - this.X_origin;
-
-                    this.X = this.X_origin + ( RangeWidth - TableWidth ) / 2; // 1.9мм всегда добавляется справа от таблицы
-                    break;
-                }
-            }
-        }
-
-        this.Pages.length = 0;
-        this.Pages[0] =
-        {
-            Bounds :
-            {
-                Top    : this.Y,
-                Left   : this.X,
-                Right  : this.X + this.TableSumGrid[this.TableSumGrid.length - 1],
-                Bottom : this.Y
-            },
-            FirstRow  : 0,
-            Height    : 0,
-
-            Y            : this.Y,
-            YLimit       : this.YLimit,
-            MaxTopBorder : 0
-        };
-
-        var Y = this.Y;
-        var TableHeight = 0;
-
-        // Обнуляем таблицу суммарных высот ячеек
-        for ( var Index = -1; Index < this.Content.length; Index++ )
-        {
-            this.TableRowsBottom[Index] = [];
-            this.TableRowsBottom[Index][0] = 0;
-        }
-
-        // Изначально найдем верхние границы и (если нужно) нижние границы
-        // для каждой ячейки.
-        var MaxTopBorder = [];
-        var MaxBotBorder = [];
-        var MaxBotMargin = [];
-
-        for ( var Index = 0; Index < this.Content.length; Index++ )
-        {
-            MaxBotBorder[Index] = 0;
-            MaxTopBorder[Index] = 0;
-            MaxBotMargin[Index] = 0;
-        }
-
-        var TableBorders = this.Get_Borders();
-
-        for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
-        {
-            var Row = this.Content[CurRow];
-            var CellsCount = Row.Get_CellsCount();
-            var CellSpacing = Row.Get_CellSpacing();
-
-            var BeforeInfo = Row.Get_Before();
-            var AfterInfo  = Row.Get_After();
-            var CurGridCol = BeforeInfo.GridBefore;
-
-            CurGridCol = BeforeInfo.GridBefore;
-
-            // Нам нужно пробежаться по текущей строке и выяснить максимальное значение
-            // ширины верхней границы и ширины нижней границы, заодно рассчитаем вид
-            // границы у каждой ячейки, также надо рассчитать максимальное значение нижнего
-            // всей строки.
-
-            var bSpacing_Top = false;
-            var bSpacing_Bot = false;
-
-            if ( null != CellSpacing )
-            {
-                bSpacing_Bot = true;
-                bSpacing_Top = true;
-            }
-            else
-            {
-                if ( 0 != CurRow )
-                {
-                    var PrevCellSpacing = this.Content[CurRow - 1].Get_CellSpacing();
-                    if ( null != PrevCellSpacing )
-                        bSpacing_Top = true;
-                }
-
-                if ( this.Content.length - 1 != CurRow )
-                {
-                    var NextCellSpacing = this.Content[CurRow + 1].Get_CellSpacing();
-                    if ( null != NextCellSpacing )
-                        bSpacing_Bot = true;
-                }
-            }
-
-            Row.Set_SpacingInfo( bSpacing_Top, bSpacing_Bot );
-
-            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-            {
-                var Cell = Row.Get_Cell( CurCell );
-                var GridSpan = Cell.Get_GridSpan();
-                var Vmerge = Cell.Get_VMerge();
-
-                Row.Set_CellInfo( CurCell, CurGridCol, 0, 0, 0, 0, 0, 0 );
-
-                // Обсчет такик ячеек произошел ранее
-                if ( vmerge_Continue === Vmerge )
-                {
-                    var VMergeCount2 = this.Internal_GetVertMergeCount2( CurRow, CurGridCol, GridSpan );
-                    if ( VMergeCount2 > 1 )
-                    {
-                        CurGridCol += GridSpan;
-                        continue;
-                    }
-                    else
-                    {
-                        Cell.Set_VMerge( vmerge_Restart );
-                    }
-                }
-
-                var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
-
-                var CellMargins = Cell.Get_Margins();
-                if ( CellMargins.Bottom.W > MaxBotMargin[CurRow + VMergeCount - 1] )
-                    MaxBotMargin[CurRow + VMergeCount - 1] = CellMargins.Bottom.W;
-
-                var CellBorders = Cell.Get_Borders();
-                if ( true === bSpacing_Top )
-                {
-                    if ( border_Single === CellBorders.Top.Value && MaxTopBorder[CurRow] < CellBorders.Top.Size )
-                        MaxTopBorder[CurRow] = CellBorders.Top.Size;
-
-                    Cell.Set_BorderInfo_Top( [ CellBorders.Top ] );
-                }
-                else
-                {
-                    if ( 0 === CurRow )
-                    {
-                        // Сравним границы
-                        var Result_Border = this.Internal_CompareBorders( TableBorders.Top, CellBorders.Top, true, false );
-                        if ( border_Single === Result_Border.Value && MaxTopBorder[CurRow] < Result_Border.Size )
-                            MaxTopBorder[CurRow] = Result_Border.Size;
-
-                        var BorderInfo_Top = [];
-                        for ( var TempIndex = 0; TempIndex < GridSpan; TempIndex++ )
-                            BorderInfo_Top.push( Result_Border );
-
-                        Cell.Set_BorderInfo_Top( BorderInfo_Top );
-                    }
-                    else
-                    {
-                        // Ищем в предыдущей строке первую ячейку, пересекающуюся с [CurGridCol, CurGridCol + GridSpan]
-                        var Prev_Row = this.Content[CurRow - 1];
-                        var Prev_CellsCount = Prev_Row.Get_CellsCount();
-                        var Prev_BeforeInfo = Prev_Row.Get_Before();
-                        var Prev_AfterInfo  = Prev_Row.Get_After();
-
-                        var Prev_Pos = -1;
-
-                        var Prev_GridCol = Prev_BeforeInfo.GridBefore;
-                        for ( var PrevCell = 0; PrevCell < Prev_CellsCount; PrevCell++ )
-                        {
-                            var Prev_Cell      = Prev_Row.Get_Cell( PrevCell );
-                            var Prev_GridSpan  = Prev_Cell.Get_GridSpan();
-
-                            if ( Prev_GridCol <= CurGridCol + GridSpan - 1 && Prev_GridCol + Prev_GridSpan - 1 >= CurGridCol )
-                            {
-                                Prev_Pos = PrevCell;
-                                break;
-                            }
-
-                            Prev_GridCol += Prev_GridSpan;
-                        }
-
-                        var Border_Top_Info = [];
-
-                        // Сначала посмотрим пересечение с GridBefore предыдущей строки
-                        if ( CurGridCol <= Prev_BeforeInfo.GridBefore - 1 )
-                        {
-                            var Result_Border = this.Internal_CompareBorders( TableBorders.Left, CellBorders.Top, true, false );
-                            if ( border_Single === Result_Border.Value && MaxTopBorder[CurRow] < Result_Border.Size )
-                                MaxTopBorder[CurRow] = Result_Border.Size;
-
-                            var AddCount = Math.min( Prev_BeforeInfo.GridBefore - CurGridCol, GridSpan );
-                            for ( var TempIndex = 0; TempIndex < AddCount; TempIndex++ )
-                                Border_Top_Info.push( Result_Border );
-                        }
-
-                        if ( -1 != Prev_Pos )
-                        {
-                            while ( Prev_GridCol <= CurGridCol + GridSpan - 1 && Prev_Pos < Prev_CellsCount )
-                            {
-                                var Prev_Cell      = Prev_Row.Get_Cell( Prev_Pos );
-                                var Prev_GridSpan  = Prev_Cell.Get_GridSpan();
-
-                                // Если данная ячейка учавствует в вертикальном объединении,
-                                // тогда найдем левую верхнюю ячейку.
-
-                                var Prev_VMerge = Prev_Cell.Get_VMerge();
-                                if ( vmerge_Continue === Prev_VMerge )
-                                    Prev_Cell = this.Internal_Get_StartMergedCell( CurRow - 1, Prev_GridCol, Prev_GridSpan );
-
-                                var PrevBorders = Prev_Cell.Get_Borders();
-
-                                // Сравним границы
-                                var Result_Border = this.Internal_CompareBorders( PrevBorders.Bottom, CellBorders.Top, false, false );
-                                if ( border_Single === Result_Border.Value && MaxTopBorder[CurRow] < Result_Border.Size )
-                                    MaxTopBorder[CurRow] = Result_Border.Size;
-
-                                // Надо добавить столько раз, сколько колонок находится в пересечении этих двух ячееки
-                                var AddCount = 0;
-                                if ( Prev_GridCol >= CurGridCol )
-                                {
-                                    if ( Prev_GridCol + Prev_GridSpan - 1 > CurGridCol + GridSpan - 1 )
-                                        AddCount = CurGridCol + GridSpan - Prev_GridCol;
-                                    else
-                                        AddCount = Prev_GridSpan;
-                                }
-                                else if ( Prev_GridCol + Prev_GridSpan - 1 > CurGridCol + GridSpan - 1 )
-                                    AddCount = GridSpan;
-                                else
-                                    AddCount = Prev_GridCol + Prev_GridSpan - CurGridCol;
-
-                                for ( var TempIndex = 0; TempIndex < AddCount; TempIndex++ )
-                                    Border_Top_Info.push( Result_Border );
-
-                                Prev_Pos++;
-                                Prev_GridCol += Prev_GridSpan;
-                            }
-                        }
-
-                        // Посмотрим пересечение с GridAfter предыдущей строки
-                        if ( Prev_AfterInfo.GridAfter > 0 )
-                        {
-                            var StartAfterGrid = Prev_Row.Get_CellInfo( Prev_CellsCount - 1 ).StartGridCol + Prev_Row.Get_Cell( Prev_CellsCount - 1 ).Get_GridSpan();
-
-                            if ( CurGridCol + GridSpan - 1 >= StartAfterGrid )
-                            {
-                                var Result_Border = this.Internal_CompareBorders( TableBorders.Right, CellBorders.Top, true, false );
-                                if ( border_Single === Result_Border.Value && MaxTopBorder[CurRow] < Result_Border.Size )
-                                    MaxTopBorder[CurRow] = Result_Border.Size;
-
-                                var AddCount = Math.min( CurGridCol + GridSpan - StartAfterGrid, GridSpan );
-                                for ( var TempIndex = 0; TempIndex < AddCount; TempIndex++ )
-                                    Border_Top_Info.push( Result_Border );
-                            }
-                        }
-
-                        Cell.Set_BorderInfo_Top( Border_Top_Info );
-                    }
-                }
-
-                if ( true === bSpacing_Bot )
-                {
-                    Cell.Set_BorderInfo_Bottom( [ CellBorders.Bottom ], -1, -1 );
-
-                    if ( border_Single === CellBorders.Bottom.Value && CellBorders.Bottom.Size > MaxBotBorder[CurRow + VMergeCount - 1] )
-                        MaxBotBorder[CurRow + VMergeCount - 1] = CellBorders.Bottom.Size;
-                }
-                else
-                {
-                    if ( this.Content.length - 1 === CurRow + VMergeCount - 1 )
-                    {
-                        // Сравним границы
-                        var Result_Border = this.Internal_CompareBorders( TableBorders.Bottom, CellBorders.Bottom, true, false );
-
-                        if ( border_Single === Result_Border.Value && Result_Border.Size > MaxBotBorder[CurRow + VMergeCount - 1] )
-                            MaxBotBorder[CurRow + VMergeCount - 1] = Result_Border.Size;
-
-                        if ( GridSpan > 0 )
-                        {
-                        for ( var TempIndex = 0; TempIndex < GridSpan; TempIndex++ )
-                            Cell.Set_BorderInfo_Bottom( [ Result_Border ], -1, -1 );
-                        }
-                        else
-                            Cell.Set_BorderInfo_Bottom( [], -1, -1 );
-                    }
-                    else
-                    {
-                        // Мы должны проверить нижнюю границу ячейки, на предмет того, что со следующей строкой
-                        // она может пересекаться по GridBefore и/или GridAfter. Везде в таких местах мы должны
-                        // нарисовать нижнюю границу. Пересечение с ячейками нам неинтересено, потому что этот
-                        // случай будет учтен при обсчете следующей строки (там будет случай bSpacing_Top = false
-                        // и 0 != CurRow )
-
-                        var Next_Row = this.Content[CurRow + VMergeCount];
-                        var Next_CellsCount = Next_Row.Get_CellsCount();
-                        var Next_BeforeInfo = Next_Row.Get_Before();
-                        var Next_AfterInfo  = Next_Row.Get_After();
-
-                        var Border_Bottom_Info = [];
-
-                        // Сначала посмотрим пересечение с GridBefore предыдущей строки
-                        var BeforeCount = 0;
-                        if ( CurGridCol <= Next_BeforeInfo.GridBefore - 1 )
-                        {
-                            var Result_Border = this.Internal_CompareBorders( TableBorders.Left, CellBorders.Bottom, true, false );
-                            BeforeCount = Math.min( Next_BeforeInfo.GridBefore - CurGridCol, GridSpan );
-
-                            for ( var TempIndex = 0; TempIndex < BeforeCount; TempIndex++ )
-                                Border_Bottom_Info.push( Result_Border );
-                        }
-
-                        var Next_GridCol = Next_BeforeInfo.GridBefore;
-                        for ( var NextCell = 0; NextCell < Next_CellsCount; NextCell++ )
-                        {
-                            var Next_Cell     = Next_Row.Get_Cell( NextCell );
-                            var Next_GridSpan = Next_Cell.Get_GridSpan();
-                            Next_GridCol += Next_GridSpan;
-                        }
-
-                        // Посмотрим пересечение с GridAfter предыдущей строки
-                        var AfterCount = 0;
-                        if ( Next_AfterInfo.GridAfter > 0 )
-                        {
-                            var StartAfterGrid = Next_GridCol;
-
-                            if ( CurGridCol + GridSpan - 1 >= StartAfterGrid )
-                            {
-                                var Result_Border = this.Internal_CompareBorders( TableBorders.Right, CellBorders.Bottom, true, false );
-                                AfterCount = Math.min( CurGridCol + GridSpan - StartAfterGrid, GridSpan );
-                                for ( var TempIndex = 0; TempIndex < AfterCount; TempIndex++ )
-                                    Border_Bottom_Info.push( Result_Border );
-                            }
-                        }
-
-                        Cell.Set_BorderInfo_Bottom( Border_Bottom_Info, BeforeCount, AfterCount );
-                    }
-                }
-
-                CurGridCol += GridSpan;
-            }
-        }
-
-        this.MaxTopBorder = MaxTopBorder;
-        this.MaxBotBorder = MaxBotBorder;
-        this.MaxBotMargin = MaxBotMargin;
-
-        var X_max = -1;
-        var X_min = -1;
-
-
-        var CurPage = 0;
-
-        for ( var CurRow = 0; CurRow < this.Content.length; CurRow++  )
-        {
-            var Row = this.Content[CurRow];
-            var CellsCount = Row.Get_CellsCount();
-            var CellSpacing = Row.Get_CellSpacing();
-
-            var BeforeInfo = Row.Get_Before();
-            var AfterInfo  = Row.Get_After();
-            var CurGridCol = BeforeInfo.GridBefore;
-
-            if ( 0 === CurRow )
-            {
-                if ( null != CellSpacing )
-                {
-                    var TableBorder_Top = this.Get_Borders().Top;
-                    if ( border_Single === TableBorder_Top.Value )
-                    {
-                        Y           += TableBorder_Top.Size;
-                        TableHeight += TableBorder_Top.Size;
-                    }
-
-                    Y           += CellSpacing;
-                    TableHeight += CellSpacing;
-                }
-            }
-            else
-            {
-                var PrevCellSpacing = this.Content[CurRow - 1].Get_CellSpacing();
-
-                if ( null != CellSpacing && null != PrevCellSpacing )
-                {
-                    Y           += (PrevCellSpacing + CellSpacing) / 2;
-                    TableHeight += (PrevCellSpacing + CellSpacing) / 2;
-                }
-                else if ( null != CellSpacing )
-                {
-                    Y           += CellSpacing / 2;
-                    TableHeight += CellSpacing / 2;
-                }
-                else if ( null != PrevCellSpacing )
-                {
-                    Y           += PrevCellSpacing / 2;
-                    TableHeight += PrevCellSpacing / 2;
-                }
-            }
-
-            Y           += MaxTopBorder[CurRow];
-            TableHeight += MaxTopBorder[CurRow];
-
-            var Row_x_max = 0;
-            var Row_x_min = 0;
-
-            // Разбивается ли данная строка на несколько страниц
-            var LastPage = CurPage;
-            var Pages_Y_Pos = [];
-            var Pages_Max_Top_Border = [];
-
-            // Дополнительный параметр для случая, если данная строка начнется с новой страницы.
-            // Мы запоминаем максимальное значение нижней границы(первой страницы (текущей)) у ячеек,
-            // объединенных вертикально так, чтобы это объединение заканчивалось на данной строке.
-            // И если данная строка начнется сразу с новой страницы (Pages > 0, FirstPage = false), тогда
-            // мы должны данный параметр сравнить со значением нижней границы предыдущей строки.
-            var MaxBotValue_vmerge = -1;
-
-            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-            {
-                var Cell = Row.Get_Cell( CurCell );
-                var GridSpan = Cell.Get_GridSpan();
-                var Vmerge = Cell.Get_VMerge();
-
-                // начальная и конечная точки данного GridSpan'a
-                var X_grid_start = this.X + this.TableSumGrid[CurGridCol - 1];
-                var X_grid_end   = this.X + this.TableSumGrid[CurGridCol + GridSpan - 1];
-
-                // границы самой ячейки
-                var X_cell_start = X_grid_start;
-                var X_cell_end   = X_grid_end;
-
-                if ( null != CellSpacing )
-                {
-
-                    if ( 0 === CurCell )
-                    {
-                        if ( 0 === BeforeInfo.GridBefore )
-                        {
-                            if ( border_None === TableBorders.Left.Value || CellSpacing > TableBorders.Left.Size / 2 )
-                                X_cell_start += CellSpacing;
-                            else
-                                X_cell_start += TableBorders.Left.Size / 2;
-                        }
-                        else
-                        {
-                            if ( border_None === TableBorders.Left.Value || CellSpacing > TableBorders.Left.Size ) // CellSpacing / 2 > TableBorders.Left.Size / 2
-                                X_cell_start += CellSpacing / 2;
-                            else
-                                X_cell_start += TableBorders.Left.Size / 2;
-                        }
-                    }
-                    else
-                        X_cell_start += CellSpacing / 2;
-
-                    if ( CellsCount - 1 === CurCell )
-                    {
-                        if ( 0 === AfterInfo.GridAfter )
-                        {
-                            if ( border_None === TableBorders.Right.Value || CellSpacing > TableBorders.Right.Size / 2 )
-                                X_cell_end -= CellSpacing;
-                            else
-                                X_cell_end -= TableBorders.Right.Size / 2;
-                        }
-                        else
-                        {
-                            if ( border_None === TableBorders.Right.Value || CellSpacing > TableBorders.Right.Size ) // CellSpacing / 2 > TableBorders.Right.Size / 2
-                                X_cell_end -= CellSpacing / 2;
-                            else
-                                X_cell_end -= TableBorders.Right.Size / 2;
-                        }
-                    }
-                    else
-                        X_cell_end -= CellSpacing / 2;
-                }
-
-                var CellMar = Cell.Get_Margins();
-
-                var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
-
-                // начальная и конечная точка для содержимого данной ячейки
-                var X_content_start = X_cell_start;
-                var X_content_end   = X_cell_end;
-
-                // Левая и правая границы ячейки рисуются вовнутрь ячейки, если Spacing != null.
-                var CellBorders = Cell.Get_Borders();
-                if ( null != CellSpacing )
-                {
-                    X_content_start += CellMar.Left.W;
-                    X_content_end   -= CellMar.Right.W;
-
-                    if ( border_Single === CellBorders.Left.Value )
-                        X_content_start += CellBorders.Left.Size;
-
-                    if ( border_Single === CellBorders.Right.Value )
-                        X_content_end -= CellBorders.Right.Size;
-                }
-                else
-                {
-                    if ( vmerge_Continue === Vmerge )
-                    {
-                        X_content_start += CellMar.Left.W;
-                        X_content_end   -= CellMar.Right.W;
-                    }
-                    else
-                    {
-                        // Линии правой и левой границы рисуются ровно по сетке
-                        // (середина линии(всмысле толщины линии) совпадает с линией сетки).
-                        // Мы должны найти максимальную толщину линии, учавствущую в правой/левой
-                        // границах. Если данная толщина меньше соответствующего отступа, тогда
-                        // она не влияет на расположение содержимого ячейки, в противном случае,
-                        // максимальная толщина линии и задает отступ для содержимого.
-
-                        // Поэтому первым шагом определим максимальную толщину правой и левой границ.
-
-                        var Max_r_w = 0;
-                        var Max_l_w = 0;
-                        var Borders_Info =
-                        {
-                            Right     : [],
-                            Left      : [],
-
-                            Right_Max : 0,
-                            Left_Max  : 0
-                        };
-
-                        for ( var Temp_CurRow = 0; Temp_CurRow < VMergeCount; Temp_CurRow++ )
-                        {
-                            var Temp_Row = this.Content[CurRow + Temp_CurRow];
-                            var Temp_CellsCount = Temp_Row.Get_CellsCount();
-
-                            // ищем ячейку текущего объединения
-                            var Temp_CurCell = this.Internal_Get_Cell_ByStartGridCol( CurRow + Temp_CurRow, CurGridCol );
-                            if ( Temp_CurCell < 0 )
-                                continue;
-
-                            // левая граница
-                            if ( 0 === Temp_CurCell )
-                            {
-                                var LeftBorder = this.Internal_CompareBorders( TableBorders.Left, CellBorders.Left, true, false );
-                                if ( border_Single === LeftBorder.Value && LeftBorder.Size > Max_l_w )
-                                    Max_l_w = LeftBorder.Size;
-
-                                Borders_Info.Left.push( LeftBorder );
-                            }
-                            else
-                            {
-                                var Temp_Prev_Cell = Temp_Row.Get_Cell( Temp_CurCell - 1 );
-                                var Temp_Prev_VMerge = Temp_Prev_Cell.Get_VMerge();
-                                if ( 0 != Temp_CurRow && vmerge_Continue === Temp_Prev_VMerge )
-                                {
-                                    Borders_Info.Left.push( Borders_Info.Left[Borders_Info.Left.length - 1] );
-                                }
-                                else
-                                {
-                                    var Temp_Prev_Main_Cell = this.Internal_Get_StartMergedCell( CurRow + Temp_CurRow, CurGridCol - Temp_Prev_Cell.Get_GridSpan(), Temp_Prev_Cell.Get_GridSpan() );
-                                    var Temp_Prev_Main_Cell_Borders = Temp_Prev_Main_Cell.Get_Borders();
-
-                                    var LeftBorder = this.Internal_CompareBorders( Temp_Prev_Main_Cell_Borders.Right, CellBorders.Left, false, false );
-                                    if ( border_Single === LeftBorder.Value && LeftBorder.Size > Max_l_w )
-                                        Max_l_w = LeftBorder.Size;
-
-                                    Borders_Info.Left.push( LeftBorder );
-                                }
-                            }
-
-                            if ( Temp_CellsCount - 1 === Temp_CurCell )
-                            {
-                                var RightBorder = this.Internal_CompareBorders( TableBorders.Right, CellBorders.Right, true, false );
-                                if ( border_Single === RightBorder.Value && RightBorder.Size > Max_r_w )
-                                    Max_r_w = RightBorder.Size;
-
-                                Borders_Info.Right.push( RightBorder );
-                            }
-                            else
-                            {
-                                var Temp_Next_Cell = Temp_Row.Get_Cell( Temp_CurCell + 1 );
-                                var Temp_Next_VMerge = Temp_Next_Cell.Get_VMerge();
-                                if ( 0 != Temp_CurRow && vmerge_Continue === Temp_Next_VMerge )
-                                {
-                                    Borders_Info.Right.push( Borders_Info.Right[Borders_Info.Right.length - 1] );
-                                }
-                                else
-                                {
-                                    var Temp_Next_Main_Cell = this.Internal_Get_StartMergedCell( CurRow + Temp_CurRow, CurGridCol + GridSpan, Temp_Next_Cell.Get_GridSpan() );
-                                    var Temp_Next_Main_Cell_Borders = Temp_Next_Main_Cell.Get_Borders();
-
-                                    var RightBorder = this.Internal_CompareBorders( Temp_Next_Main_Cell_Borders.Left, CellBorders.Right, false, false );
-                                    if ( border_Single === RightBorder.Value && RightBorder.Size > Max_r_w )
-                                        Max_r_w = RightBorder.Size;
-
-                                    Borders_Info.Right.push( RightBorder );
-                                }
-                            }
-                        }
-
-                        Borders_Info.Right_Max = Max_r_w;
-                        Borders_Info.Left_Max  = Max_l_w;
-
-                        if ( Max_l_w / 2 > CellMar.Left.W )
-                            X_content_start += Max_l_w / 2;
-                        else
-                            X_content_start += CellMar.Left.W;
-
-                        if ( Max_r_w / 2 > CellMar.Right.W )
-                            X_content_end -= Max_r_w / 2;
-                        else
-                            X_content_end -= CellMar.Right.W;
-
-                        Cell.Set_BorderInfo_Left ( Borders_Info.Left,  Max_l_w );
-                        Cell.Set_BorderInfo_Right( Borders_Info.Right, Max_r_w );
-                    }
-                }
-
-                if ( 0 === CurCell )
-                {
-                    if ( null != CellSpacing )
-                    {
-                        Row_x_min = X_grid_start;
-                        if ( border_Single === TableBorders.Left.Value )
-                            Row_x_min -= TableBorders.Left.Size / 2;
-                    }
-                    else
-                    {
-                        var BorderInfo = Cell.Get_BorderInfo();
-                        Row_x_min = X_grid_start - BorderInfo.MaxLeft / 2;
-                    }
-                }
-
-                if ( CellsCount - 1 === CurCell )
-                {
-                    if ( null != CellSpacing )
-                    {
-                        Row_x_max = X_grid_end;
-                        if ( border_Single === TableBorders.Right.Value )
-                            Row_x_max += TableBorders.Right.Size / 2;
-                    }
-                    else
-                    {
-                        var BorderInfo = Cell.Get_BorderInfo();
-                        Row_x_max = X_grid_end + BorderInfo.MaxRight / 2;
-                    }
-                }
-
-                Row.Set_CellInfo( CurCell, CurGridCol, X_grid_start, X_grid_end, X_cell_start, X_cell_end, X_content_start, X_content_end );
-
-
-                /*
-                // Обсчет такик ячеек произошел ранее
-                if ( vmerge_Continue === Vmerge )
-                {
-                    CurGridCol += GridSpan;
-                    continue;
-                }
-                */
-
-                var Y_content_start = Y + CellMar.Top.W;
-                var CurPage_old = CurPage;
-
-                Cell.Temp =
-                {
-                    CurPage : CurPage,
-                    Y       : Y
-                };
-
-                if ( VMergeCount > 1 )
-                {
-                    CurGridCol += GridSpan;
-                    continue;
-                }
-                else
-                {
-                    // Возьмем верхнюю ячейку теккущего объединения
-                    if ( vmerge_Restart != Vmerge )
-                    {
-                        Cell = this.Internal_Get_StartMergedCell( CurRow, CurGridCol, GridSpan );
-                        CellMar = Cell.Get_Margins();
-
-                        Y_content_start = Cell.Temp.Y + CellMar.Top.W;
-                        CurPage         = Cell.Temp.CurPage;
-                    }
-                }
-
-                // TODO: При расчете YLimit для ячейки сделать учет толщины нижних
-                //       границ ячейки и таблицы
-                var Y_content_end = this.Pages[CurPage].YLimit;
-                if ( null != CellSpacing )
-                {
-                    if ( this.Content.length - 1 === CurRow )
-                        Y_content_end -= CellSpacing;
-                    else
-                        Y_content_end -= CellSpacing / 2;
-                }
-
-                var BottomMargin = this.MaxBotMargin[CurRow + VMergeCount - 1];
-                Y_content_end -= BottomMargin;
-
-                Cell.Content_Set_StartPage( CurPage );
-                Cell.Content_Reset( X_content_start, Y_content_start, X_content_end, Y_content_end );
-                Cell.Recalculate();
-
-                var PagesCount = Cell.Content_Get_PagesCount();
-                for ( var PageIndex = 0; PageIndex < PagesCount; PageIndex++ )
-                {
-                    var CellContentBounds = Cell.Content_Get_PageBounds(PageIndex);
-                    var CellContentBounds_Bottom = CellContentBounds.Bottom + BottomMargin;
-
-                    if ( CurPage + PageIndex >= CurPage_old )
-                    {
-                        if ( vmerge_Continue === Vmerge && CurPage + PageIndex === CurPage_old )
-                        {
-                            if ( -1 === MaxBotValue_vmerge || MaxBotValue_vmerge < CellContentBounds_Bottom )
-                                MaxBotValue_vmerge = CellContentBounds_Bottom;
-                        }
-
-                        if ( "undefined" === typeof(this.TableRowsBottom[CurRow]) || "undefined" === typeof(this.TableRowsBottom[CurRow][CurPage + PageIndex]) || this.TableRowsBottom[CurRow][CurPage + PageIndex] < CellContentBounds_Bottom )
-                        {
-                            if ( "undefined" === typeof(this.TableRowsBottom[CurRow]) )
-                                this.TableRowsBottom[CurRow] = [];
-
-                            this.TableRowsBottom[CurRow][CurPage + PageIndex] = CellContentBounds_Bottom;
-                        }
-
-                        if ( 0 != PageIndex )
-                        {
-                            if ( "undefined" === typeof(this.Pages[CurPage + PageIndex]) )
-                            {
-                                var StartPos = this.Parent.Get_PageContentStartPos( CurPage + PageIndex );
-                                var StartRowPos = this.Get_PageContentStartPos( CurPage + PageIndex, CurRow, CurCell );
-
-                                this.Pages[CurPage + PageIndex] =
-                                {
-                                    Bounds :
-                                    {
-                                        Top    : StartPos.Y,
-                                        Left   : this.X,
-                                        Right  : this.X + this.TableSumGrid[this.TableSumGrid.length - 1],
-                                        Bottom : StartPos.Y
-                                    },
-                                    FirstRow  : CurRow,
-                                    Height    : 0,
-                                    Y            : StartRowPos.Y,
-                                    YLimit       : StartRowPos.YLimit,
-                                    MaxTopBorder : StartRowPos.MaxTopBorder
-                                };
-
-                                Pages_Y_Pos[CurPage + PageIndex]          = StartRowPos.Y;
-                                Pages_Max_Top_Border[CurPage + PageIndex] = StartRowPos.MaxTopBorder;
-
-                            }
-                        }
-
-                        if ( LastPage < CurPage + PageIndex )
-                            LastPage = CurPage + PageIndex;
-                    }
-                    else
-                    {
-                        // Такое может случится, если текущая ячейка попала в вертикальное объединение,
-                        // такое что по одному из промежуточных рядов данного объединения произошли
-                        // переносы страниц. Тогда находим ряд, на котором произошел перенос страницы
-                        // и сравниваем нижние границы ячеек.
-
-                        var TempRow = this.Pages[CurPage + PageIndex + 1].FirstRow;
-
-                        // Часть строки расположена на первой странице
-                        if ( true === this.RowsInfo[TempRow].FirstPage )
-                        {
-                            if ( "undefined" === typeof(this.TableRowsBottom[TempRow]) || "undefined" === typeof(this.TableRowsBottom[TempRow][CurPage + PageIndex]) || this.TableRowsBottom[TempRow][CurPage + PageIndex] < CellContentBounds_Bottom )
-                            {
-                                if ( "undefined" === typeof(this.TableRowsBottom[TempRow]) )
-                                    this.TableRowsBottom[TempRow] = [];
-
-                                this.TableRowsBottom[TempRow][CurPage + PageIndex] = CellContentBounds_Bottom;
-                            }
-                        }
-                        // Строка начинается сразу с новой страницы. В этом случае, мы должны сравнить
-                        // нижние границы предыдущей строки и содержимого у данной ячейки на этой странице.
-                        else if ( TempRow > 0 )
-                        {
-                            if ( "undefined" === typeof(this.TableRowsBottom[TempRow - 1]) || "undefined" === typeof(this.TableRowsBottom[TempRow - 1][CurPage + PageIndex]) || this.TableRowsBottom[TempRow - 1][CurPage + PageIndex] < CellContentBounds_Bottom )
-                            {
-                                if ( "undefined" === typeof(this.TableRowsBottom[TempRow - 1]) )
-                                    this.TableRowsBottom[TempRow - 1] = [];
-
-                                this.TableRowsBottom[TempRow - 1][CurPage + PageIndex] = CellContentBounds_Bottom;
-                            }
-                        }
-                    }
-                }
-
-                CurPage = CurPage_old;
-
-                CurGridCol += GridSpan;
-            }
-
-            if ( -1 === X_min || Row_x_min < X_min )
-                X_min = Row_x_min;
-
-            if ( -1 === X_max || Row_x_max > X_max )
-                X_max = Row_x_max;
-
-            var RowH = Row.Get_Height();
-
-            this.RowsInfo[CurRow] = {};
-            this.RowsInfo[CurRow].Pages = LastPage - CurPage + 1;
-            this.RowsInfo[CurRow].Y            = [];
-            this.RowsInfo[CurRow].H            = [];
-            this.RowsInfo[CurRow].TopDy        = [];
-            this.RowsInfo[CurRow].MaxTopBorder = [];
-            this.RowsInfo[CurRow].FirstPage    = true;
-            this.RowsInfo[CurRow].StartPage    = CurPage;
-
-            // Здесь мы выставляем только начальную координату строки (для каждой страницы)
-            // высоту строки(для каждой страницы) мы должны обсчитать после общего цикла, т.к.
-            // в одной из следйющих строк может оказаться ячейка с вертикальным объединением,
-            // захватытвающим данную строку. Значит, ее содержимое может изменить высоту нашей строки.
-            for ( var PageIndex = 0; PageIndex < this.RowsInfo[CurRow].Pages; PageIndex++ )
-            {
-                var TempY = Y;
-                var TempMaxTopBorder = MaxTopBorder[CurRow];
-
-                if ( 0 != PageIndex )
-                {
-                    TempY            = Pages_Y_Pos[CurPage + PageIndex];
-                    TempMaxTopBorder = Pages_Max_Top_Border[CurPage + PageIndex];
-
-                    if ( 1 === PageIndex )
-                    {
-                        // Проверяем есть ли хоть какой-либо контент данной строки на первой страницы,
-                        // т.е. реально данная строка начинается со 2-ой страницы.
-
-                        var bContentOnFirstPage = false;
-                        for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                        {
-                            var Cell = Row.Get_Cell( CurCell );
-                            var Vmerge = Cell.Get_VMerge();
-
-                            // Проверяем только начальные ячейки вертикального объединения, т.к.
-                            // не начальные ячейки объединения относятся к другим строкам, и ячейки
-                            // у которых Vmerge_count = 1, поскольку обсчитаны только они. Ячейки,
-                            // у которыз Vmerge_count > 1 внесут поправки позже (во время своего обсчета).
-                            var VMergeCount = this.Internal_GetVertMergeCount( CurRow, Row.Get_CellInfo( CurCell ).StartGridCol, Cell.Get_GridSpan() );
-
-                            if ( vmerge_Continue === Vmerge || VMergeCount > 1 )
-                                continue;
-
-                            if ( true === Cell.Content_Is_ContentOnFirstPage() )
-                            {
-                                bContentOnFirstPage = true;
-                                break;
-                            }
-                        }
-
-                        this.RowsInfo[CurRow].FirstPage = bContentOnFirstPage;
-
-                        if ( 0 != CurRow && false === this.RowsInfo[CurRow].FirstPage )
-                        {
-                            if ( this.TableRowsBottom[CurRow - 1][CurPage] < MaxBotValue_vmerge )
-                                this.TableRowsBottom[CurRow - 1][CurPage] = MaxBotValue_vmerge;
-                        }
-                    }
-                }
-
-                if ( null != CellSpacing )
-                {
-                    this.RowsInfo[CurRow].Y[CurPage + PageIndex]            = TempY;
-                    this.RowsInfo[CurRow].TopDy[CurPage + PageIndex]        = 0;
-                    this.RowsInfo[CurRow].X0                                = Row_x_min;
-                    this.RowsInfo[CurRow].X1                                = Row_x_max;
-                    this.RowsInfo[CurRow].MaxTopBorder[CurPage + PageIndex] = TempMaxTopBorder;
-                    this.RowsInfo[CurRow].MaxBotBorder                      = MaxBotBorder[CurRow];
-                }
-                else
-                {
-                    this.RowsInfo[CurRow].Y[CurPage + PageIndex]            = TempY - TempMaxTopBorder;
-                    this.RowsInfo[CurRow].TopDy[CurPage + PageIndex]        = TempMaxTopBorder;
-                    this.RowsInfo[CurRow].X0                                = Row_x_min;
-                    this.RowsInfo[CurRow].X1                                = Row_x_max;
-                    this.RowsInfo[CurRow].MaxTopBorder[CurPage + PageIndex] = TempMaxTopBorder;
-                    this.RowsInfo[CurRow].MaxBotBorder                      = MaxBotBorder[CurRow];
-                }
-            }
-
-
-            if ( LastPage != CurPage )
-            {
-                // TODO: Надо вынести из общего цеикла пересчет границы для каждой страницы,
-                //       потому что значения this.TableRowsBottom[CurRow][CurPage] могут измениться
-                //       в следующих строках.
-
-                // Сначала обсчитаем границы первой страницы данной строки
-                var TempCellHeight = this.TableRowsBottom[CurRow][CurPage] - Y;
-                TableHeight += TempCellHeight + MaxBotBorder[CurRow];
-
-                if ( null != CellSpacing )
-                    TableHeight += CellSpacing / 2;
-
-                if ( border_Single === TableBorders.Bottom.Value )
-                    TableHeight += TableBorders.Bottom.Size;
-
-                this.Pages[CurPage].Bounds.Bottom = this.Pages[CurPage].YLimit;//this.Pages[CurPage].Bounds.Top + TableHeight;
-                this.Pages[CurPage].Bounds.Left   = X_min;
-                this.Pages[CurPage].Bounds.Right  = X_max;
-                this.Pages[CurPage].Height        = TableHeight;
-
-                // Обсчитаем границы промежуточных страницу данной строки
-                for ( var PageId = CurPage + 1; PageId < LastPage; PageId++ )
-                {
-                    Y           = this.Parent.Get_PageContentStartPos( CurPage + PageId, CurRow, 0 ).Y;
-                    TableHeight = 0;
-
-                    if ( null != CellSpacing )
-                    {
-                        if ( border_Single === TableBorders.Top.Value )
-                        {
-                            Y           += TableBorders.Top.Size;
-                            TableHeight += TableBorders.Top.Size;
-                        }
-
-                        if ( 0 === CurRow )
-                        {
-                            Y           += CellSpacing;
-                            TableHeight += CellSpacing;
-                        }
-                        else
-                        {
-                            Y           += CellSpacing / 2;
-                            TableHeight += CellSpacing / 2;
-                        }
-                    }
-
-                    Y           += Pages_Max_Top_Border[LastPage];
-                    TableHeight += Pages_Max_Top_Border[LastPage];
-
-                    TempCellHeight = this.TableRowsBottom[CurRow][PageId] - Y;
-                    TableHeight += TempCellHeight + MaxBotBorder[CurRow];
-
-                    if ( null != CellSpacing )
-                        TableHeight += CellSpacing / 2;
-
-                    if ( border_Single === TableBorders.Bottom.Value )
-                        TableHeight += TableBorders.Bottom.Size;
-
-                    this.Pages[PageId].Bounds.Bottom = this.Pages[PageId].YLimit;//this.Pages[PageId].Bounds.Top + TableHeight;
-                    this.Pages[PageId].Bounds.Left   = X_min;
-                    this.Pages[PageId].Bounds.Right  = X_max;
-                    this.Pages[PageId].Height        = TableHeight;
-                }
-
-
-                // Обсчитаем текущие координату по Y и высоту таблицы для последнй страницы данной строки
-                TableHeight = 0;
-                Y           = this.Parent.Get_PageContentStartPos( LastPage ).Y;
-
-                if ( null != CellSpacing )
-                {
-                    if ( border_Single === TableBorders.Top.Value )
-                    {
-                        Y           += TableBorders.Top.Size;
-                        TableHeight += TableBorders.Top.Size;
-                    }
-
-                    if ( 0 === CurRow )
-                    {
-                        Y           += CellSpacing;
-                        TableHeight += CellSpacing;
-                    }
-                    else
-                    {
-                        Y           += CellSpacing / 2;
-                        TableHeight += CellSpacing / 2;
-                    }
-                }
-
-                Y           += Pages_Max_Top_Border[LastPage];
-                TableHeight += Pages_Max_Top_Border[LastPage];
-            }
-
-            var CellHeight = this.TableRowsBottom[CurRow][LastPage] - Y;
-            // TODO: улучшить проверку на высоту строки (для строк разбитых на страницы)
-            if ( LastPage === CurPage && heightrule_AtLeast === RowH.HRule && CellHeight < RowH.Value )
-            {
-                CellHeight = RowH.Value;
-                this.TableRowsBottom[CurRow][CurPage] = Y + CellHeight;
-            }
-
-            Y           += CellHeight;
-            TableHeight += CellHeight;
-
-            Row.Height     = CellHeight;
-            Row.PagesCount = LastPage - CurPage + 1;
-
-            Y           += MaxBotBorder[CurRow];
-            TableHeight += MaxBotBorder[CurRow];
-
-            if ( this.Content.length - 1 === CurRow )
-            {
-                if ( null != CellSpacing )
-                {
-                    TableHeight += CellSpacing;
-
-                    var TableBorder_Bottom = this.Get_Borders().Bottom;
-                    if ( border_Single === TableBorder_Bottom.Value )
-                        TableHeight += TableBorder_Bottom.Size;
-                }
-            }
-
-            CurPage = LastPage;
-        }
-
-
-        for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
-        {
-            var Row         = this.Content[CurRow];
-            var CellSpacing = Row.Get_CellSpacing();
-            var StartPage   = this.RowsInfo[CurRow].StartPage;
-            var RowH        = Row.Get_Height();
-
-            for ( var PageIndex = 0; PageIndex < this.RowsInfo[CurRow].Pages; PageIndex++ )
-            {
-                var TempMaxTopBorder = this.RowsInfo[CurRow].MaxTopBorder[StartPage + PageIndex];
-                var TempY = 0;
-                if ( null != CellSpacing )
-                    TempY = this.RowsInfo[CurRow].Y[StartPage + PageIndex];
-                else
-                    TempY = this.RowsInfo[CurRow].Y[StartPage + PageIndex] + TempMaxTopBorder;
-
-                var TempCellHeight = this.TableRowsBottom[CurRow][StartPage + PageIndex] - TempY;
-
-                // TODO: улучшить проверку на высоту строки (для строк разбитых на страницы)
-                if ( 1 === this.RowsInfo[CurRow].Pages && heightrule_AtLeast === RowH.HRule && TempCellHeight < RowH.Value )
-                    TempCellHeight = RowH.Value;
-
-                if ( null != CellSpacing )
-                    this.RowsInfo[CurRow].H[StartPage + PageIndex] = TempCellHeight;
-                else
-                    this.RowsInfo[CurRow].H[StartPage + PageIndex] = TempCellHeight + TempMaxTopBorder;
-            }
-        }
-
-        // Просчитаем нижние границы таблицы на каждой странице
-        for ( var Index = 0; Index < this.Pages.length - 1; Index++ )
-        {
-            var CurRow = this.Pages[Index + 1].FirstRow;
-            if ( 0 === CurRow && false === this.RowsInfo[CurRow].FirstPage )
-            {
-                // Если таблица сразу переносится на следующую страницу, то на первой
-                // мы и рисовать ничего не будем.
-                this.Pages[Index].MaxBotBorder = 0;
-                this.Pages[Index].BotBorders   = [];
-                continue;
-            }
-            else if ( false === this.RowsInfo[CurRow].FirstPage )
-                CurRow--;
-
-            var MaxBotBorder = 0;
-            var BotBorders   = [];
-
-            // Для ряда CurRow вычисляем нижнюю границу
-            if ( this.Content.length - 1 === CurRow )
-            {
-                // Для последнего ряда уже есть готовые нижние границы
-                var Row = this.Content[CurRow];
-                var CellsCount = Row.Get_CellsCount();
-                for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                {
-                    var Cell = Row.Get_Cell( CurCell );
-                    if ( vmerge_Continue === Cell.Get_VMerge() )
-                        Cell = this.Internal_Get_StartMergedCell( CurRow, Row.Get_CellInfo( CurCell ).StartGridCol, Cell.Get_GridSpan() );
-
-                    var Border_Info = Cell.Get_BorderInfo().Bottom;
-
-                    for ( var BorderId = 0; BorderId < Border_Info.length; BorderId++ )
-                    {
-                        var Border = Border_Info[BorderId];
-                        if ( border_Single === Border.Value && MaxBotBorder < Border.Size )
-                            MaxBotBorder = Border.Size;
-
-                        BotBorders.push( Border);
-                    }
-                }
-            }
-            else
-            {
-                var Row = this.Content[CurRow];
-                var CellSpacing = Row.Get_CellSpacing();
-                var CellsCount  = Row.Get_CellsCount();
-
-                if ( null != CellSpacing )
-                {
-                    // BotBorders можно не заполнять, т.к. у каждой ячейки своя граница,
-                    // нам надо только посчитать максимальную толщину.
-                    for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                    {
-                        var Cell = Row.Get_Cell( CurCell );
-                        var Border = Cell.Get_Borders().Bottom;
-
-                        if ( border_Single === Border.Value && MaxBotBorder < Border.Size )
-                            MaxBotBorder = Border.Size;
-                    }
-                }
-                else
-                {
-                    // Сравниваем нижнюю границу ячейки и нижнюю границу таблицы
-                    for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                    {
-                        var Cell = Row.Get_Cell( CurCell );
-
-                        if ( vmerge_Continue === Cell.Get_VMerge() )
-                        {
-                            Cell = this.Internal_Get_StartMergedCell( CurRow, Row.Get_CellInfo( CurCell ).StartGridCol, Cell.Get_GridSpan() );
-                            if ( null === Cell )
-                            {
-                                BotBorders.push( TableBorders.Bottom );
-                                continue;
-                            }
-                        }
-
-                        var Border = Cell.Get_Borders().Bottom;
-
-                        // Сравним границы
-                        var Result_Border = this.Internal_CompareBorders( Border, TableBorders.Bottom, false, true );
-                        if ( border_Single === Result_Border.Value && MaxBotBorder < Result_Border.Size )
-                            MaxBotBorder = Result_Border.Size;
-
-                        BotBorders.push( Result_Border );
-                    }
-                }
-            }
-
-            this.Pages[Index].MaxBotBorder = MaxBotBorder;
-            this.Pages[Index].BotBorders   = BotBorders;
-        }
-
-        this.Pages[CurPage].Bounds.Bottom = this.Pages[CurPage].Bounds.Top + TableHeight;
-        this.Pages[CurPage].Bounds.Left   = X_min;
-        this.Pages[CurPage].Bounds.Right  = X_max;
-        this.Pages[CurPage].Height        = TableHeight;
-        this.Pages[CurPage].MaxBotBorder  = 0;           // можно не заполнять, т.к. на последней странице
-        this.Pages[CurPage].BotBorders    = []; // нижняя граница обрабатывается у последней строки
-
-        this.TurnOffRecalc = false;
-
-        this.Bounds = this.Pages[this.Pages.length - 1].Bounds;
-    },
-
-    Internal_Recalculate_Header : function()
-    {
-        // Если у нас таблица внутри таблицы, тогда в ней заголовочных строк не должно быть,
-        // потому что так делает Word.
-        if ( true === this.Parent.Is_TableCellContent() )
-        {
-            this.HeaderInfo.Count = 0;
-            return;
-        }
-
-        // Здесь мы подготавливаем информацию для пересчета заголовка таблицы
-        var Header_RowsCount = 0;
-        var Rows_Count = this.Content.length;
-        for ( var Index = 0; Index < Rows_Count; Index++ )
-        {
-            var Row = this.Content[Index];
-            if ( true != Row.Is_Header() )
-                break;
-
-            Header_RowsCount++;
-        }
-
-        // Избавимся от строк, в которых есть вертикально объединенные ячейки, которые одновременно есть в заголовке
-        // и не в заголовке
-        for ( var CurRow = Header_RowsCount - 1; CurRow >= 0; CurRow-- )
-        {
-            var Row = this.Content[CurRow];
-            var Cells_Count = Row.Get_CellsCount();
-
-            var bContinue = false;
-            for ( var CurCell = 0; CurCell < Cells_Count; CurCell++ )
-            {
-                var Cell        = Row.Get_Cell( CurCell );
-                var GridSpan    = Cell.Get_GridSpan();
-                var CurGridCol  = Cell.Metrics.StartGridCol;
-                var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
-
-                // В данной строке нашли вертикально объединенную ячейку с ячейкой не из заголовка
-                // Поэтому выкидываем данную строку и проверяем предыдущую
-                if ( VMergeCount > 1 )
-                {
-                    Header_RowsCount--;
-                    bContinue = true;
-                    break;
-                }
-            }
-
-            if ( true != bContinue )
-            {
-                // Если дошли до этого места, значит данная строка, а, следовательно, и все строки выше
-                // нормальные в плане объединенных вертикально ячеек.
-                break;
-            }
-        }
-
-        this.HeaderInfo.Count = Header_RowsCount;
-    },
-
-    Internal_Recalculate_Borders : function()
-    {
-        if ( true != this.RecalcInfo.TableBorders )
-            return;
-
-        // Обнуляем таблицу суммарных высот ячеек
-        for ( var Index = -1; Index < this.Content.length; Index++ )
-        {
-            this.TableRowsBottom[Index] = [];
-            this.TableRowsBottom[Index][0] = 0;
-        }
-
-        // Изначально найдем верхние границы и (если нужно) нижние границы
-        // для каждой ячейки.
-        var MaxTopBorder = [];
-        var MaxBotBorder = [];
-        var MaxBotMargin = [];
-
-        for ( var Index = 0; Index < this.Content.length; Index++ )
-        {
-            MaxBotBorder[Index] = 0;
-            MaxTopBorder[Index] = 0;
-            MaxBotMargin[Index] = 0;
-        }
-
-        var TablePr = this.Get_CompiledPr(false).TablePr;
-        var TableBorders = this.Get_Borders();
-
-        for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
-        {
-            var Row         = this.Content[CurRow];
-            var CellsCount  = Row.Get_CellsCount();
-            var CellSpacing = Row.Get_CellSpacing();
-
-            var BeforeInfo = Row.Get_Before();
-            var AfterInfo  = Row.Get_After();
-            var CurGridCol = BeforeInfo.GridBefore;
-
-            // Нам нужно пробежаться по текущей строке и выяснить максимальное значение ширины верхней
-            // границы и ширины нижней границы, заодно рассчитаем вид границы у каждой ячейки,
-            // также надо рассчитать максимальное значение нижнего отступа всей строки.
-
-            var bSpacing_Top = false;
-            var bSpacing_Bot = false;
-
-            if ( null != CellSpacing )
-            {
-                bSpacing_Bot = true;
-                bSpacing_Top = true;
-            }
-            else
-            {
-                if ( 0 != CurRow )
-                {
-                    var PrevCellSpacing = this.Content[CurRow - 1].Get_CellSpacing();
-                    if ( null != PrevCellSpacing )
-                        bSpacing_Top = true;
-                }
-
-                if ( this.Content.length - 1 != CurRow )
-                {
-                    var NextCellSpacing = this.Content[CurRow + 1].Get_CellSpacing();
-                    if ( null != NextCellSpacing )
-                        bSpacing_Bot = true;
-                }
-            }
-
-            Row.Set_SpacingInfo( bSpacing_Top, bSpacing_Bot );
-
-            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-            {
-                var Cell     = Row.Get_Cell( CurCell );
-                var GridSpan = Cell.Get_GridSpan();
-                var Vmerge   = Cell.Get_VMerge();
-
-                Row.Set_CellInfo( CurCell, CurGridCol, 0, 0, 0, 0, 0, 0 );
-
-                // Обсчет такик ячеек произошел ранее
-                if ( vmerge_Continue === Vmerge )
-                {
-                    var VMergeCount2 = this.Internal_GetVertMergeCount2( CurRow, CurGridCol, GridSpan );
-                    if ( VMergeCount2 > 1 )
-                    {
-                        CurGridCol += GridSpan;
-                        continue;
-                    }
-                    else
-                    {
-                        Cell.Set_VMerge( vmerge_Restart );
-                    }
-                }
-
-                var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
-
-                var CellMargins = Cell.Get_Margins();
-                if ( CellMargins.Bottom.W > MaxBotMargin[CurRow + VMergeCount - 1] )
-                    MaxBotMargin[CurRow + VMergeCount - 1] = CellMargins.Bottom.W;
-
-                var CellBorders = Cell.Get_Borders();
-                if ( true === bSpacing_Top )
-                {
-                    if ( border_Single === CellBorders.Top.Value && MaxTopBorder[CurRow] < CellBorders.Top.Size )
-                        MaxTopBorder[CurRow] = CellBorders.Top.Size;
-
-                    Cell.Set_BorderInfo_Top( [ CellBorders.Top ] );
-                }
-                else
-                {
-                    if ( 0 === CurRow )
-                    {
-                        // Сравним границы
-                        var Result_Border = this.Internal_CompareBorders( TableBorders.Top, CellBorders.Top, true, false );
-                        if ( border_Single === Result_Border.Value && MaxTopBorder[CurRow] < Result_Border.Size )
-                            MaxTopBorder[CurRow] = Result_Border.Size;
-
-                        var BorderInfo_Top = [];
-                        for ( var TempIndex = 0; TempIndex < GridSpan; TempIndex++ )
-                            BorderInfo_Top.push( Result_Border );
-
-                        Cell.Set_BorderInfo_Top( BorderInfo_Top );
-                    }
-                    else
-                    {
-                        // Ищем в предыдущей строке первую ячейку, пересекающуюся с [CurGridCol, CurGridCol + GridSpan]
-                        var Prev_Row = this.Content[CurRow - 1];
-                        var Prev_CellsCount = Prev_Row.Get_CellsCount();
-                        var Prev_BeforeInfo = Prev_Row.Get_Before();
-                        var Prev_AfterInfo  = Prev_Row.Get_After();
-
-                        var Prev_Pos = -1;
-
-                        var Prev_GridCol = Prev_BeforeInfo.GridBefore;
-                        for ( var PrevCell = 0; PrevCell < Prev_CellsCount; PrevCell++ )
-                        {
-                            var Prev_Cell      = Prev_Row.Get_Cell( PrevCell );
-                            var Prev_GridSpan  = Prev_Cell.Get_GridSpan();
-
-                            if ( Prev_GridCol <= CurGridCol + GridSpan - 1 && Prev_GridCol + Prev_GridSpan - 1 >= CurGridCol )
-                            {
-                                Prev_Pos = PrevCell;
-                                break;
-                            }
-
-                            Prev_GridCol += Prev_GridSpan;
-                        }
-
-                        var Border_Top_Info = [];
-
-                        // Сначала посмотрим пересечение с GridBefore предыдущей строки
-                        if ( CurGridCol <= Prev_BeforeInfo.GridBefore - 1 )
-                        {
-                            var Result_Border = this.Internal_CompareBorders( TableBorders.Left, CellBorders.Top, true, false );
-                            if ( border_Single === Result_Border.Value && MaxTopBorder[CurRow] < Result_Border.Size )
-                                MaxTopBorder[CurRow] = Result_Border.Size;
-
-                            var AddCount = Math.min( Prev_BeforeInfo.GridBefore - CurGridCol, GridSpan );
-                            for ( var TempIndex = 0; TempIndex < AddCount; TempIndex++ )
-                                Border_Top_Info.push( Result_Border );
-                        }
-
-                        if ( -1 != Prev_Pos )
-                        {
-                            while ( Prev_GridCol <= CurGridCol + GridSpan - 1 && Prev_Pos < Prev_CellsCount )
-                            {
-                                var Prev_Cell      = Prev_Row.Get_Cell( Prev_Pos );
-                                var Prev_GridSpan  = Prev_Cell.Get_GridSpan();
-
-                                // Если данная ячейка учавствует в вертикальном объединении,
-                                // тогда найдем нижнюю ячейку.
-
-                                var Prev_VMerge = Prev_Cell.Get_VMerge();
-                                if ( vmerge_Continue === Prev_VMerge )
-                                    Prev_Cell = this.Internal_Get_EndMergedCell(CurRow - 1, Prev_GridCol, Prev_GridSpan);
-
-                                var PrevBorders = Prev_Cell.Get_Borders();
-
-                                // Сравним границы
-                                var Result_Border = this.Internal_CompareBorders( PrevBorders.Bottom, CellBorders.Top, false, false );
-                                if ( border_Single === Result_Border.Value && MaxTopBorder[CurRow] < Result_Border.Size )
-                                    MaxTopBorder[CurRow] = Result_Border.Size;
-
-                                // Надо добавить столько раз, сколько колонок находится в пересечении этих двух ячееки
-                                var AddCount = 0;
-                                if ( Prev_GridCol >= CurGridCol )
-                                {
-                                    if ( Prev_GridCol + Prev_GridSpan - 1 > CurGridCol + GridSpan - 1 )
-                                        AddCount = CurGridCol + GridSpan - Prev_GridCol;
-                                    else
-                                        AddCount = Prev_GridSpan;
-                                }
-                                else if ( Prev_GridCol + Prev_GridSpan - 1 > CurGridCol + GridSpan - 1 )
-                                    AddCount = GridSpan;
-                                else
-                                    AddCount = Prev_GridCol + Prev_GridSpan - CurGridCol;
-
-                                for ( var TempIndex = 0; TempIndex < AddCount; TempIndex++ )
-                                    Border_Top_Info.push( Result_Border );
-
-                                Prev_Pos++;
-                                Prev_GridCol += Prev_GridSpan;
-                            }
-                        }
-
-                        // Посмотрим пересечение с GridAfter предыдущей строки
-                        if ( Prev_AfterInfo.GridAfter > 0 )
-                        {
-                            var StartAfterGrid = Prev_Row.Get_CellInfo( Prev_CellsCount - 1 ).StartGridCol + Prev_Row.Get_Cell( Prev_CellsCount - 1 ).Get_GridSpan();
-
-                            if ( CurGridCol + GridSpan - 1 >= StartAfterGrid )
-                            {
-                                var Result_Border = this.Internal_CompareBorders( TableBorders.Right, CellBorders.Top, true, false );
-                                if ( border_Single === Result_Border.Value && MaxTopBorder[CurRow] < Result_Border.Size )
-                                    MaxTopBorder[CurRow] = Result_Border.Size;
-
-                                var AddCount = Math.min( CurGridCol + GridSpan - StartAfterGrid, GridSpan );
-                                for ( var TempIndex = 0; TempIndex < AddCount; TempIndex++ )
-                                    Border_Top_Info.push( Result_Border );
-                            }
-                        }
-
-                        Cell.Set_BorderInfo_Top( Border_Top_Info );
-                    }
-                }
-
-                var CellBordersBottom = CellBorders.Bottom;
-                if (VMergeCount > 1)
-                {
-                    // Берем нижнюю границу нижней ячейки вертикального объединения.
-                    var BottomCell = this.Internal_Get_EndMergedCell(CurRow, CurGridCol, GridSpan);
-                    if (null !== BottomCell)
-                        CellBordersBottom = BottomCell.Get_Borders().Bottom;
-                }
-
-                if ( true === bSpacing_Bot )
-                {
-                    Cell.Set_BorderInfo_Bottom( [CellBordersBottom], -1, -1 );
-
-                    if ( border_Single === CellBordersBottom.Value && CellBordersBottom.Size > MaxBotBorder[CurRow + VMergeCount - 1] )
-                        MaxBotBorder[CurRow + VMergeCount - 1] = CellBordersBottom.Size;
-                }
-                else
-                {
-                    if ( this.Content.length - 1 === CurRow + VMergeCount - 1 )
-                    {
-                        // Сравним границы
-                        var Result_Border = this.Internal_CompareBorders( TableBorders.Bottom, CellBordersBottom, true, false );
-
-                        if ( border_Single === Result_Border.Value && Result_Border.Size > MaxBotBorder[CurRow + VMergeCount - 1] )
-                            MaxBotBorder[CurRow + VMergeCount - 1] = Result_Border.Size;
-
-                        if ( GridSpan > 0 )
-                        {
-                            for ( var TempIndex = 0; TempIndex < GridSpan; TempIndex++ )
-                                Cell.Set_BorderInfo_Bottom( [ Result_Border ], -1, -1 );
-                        }
-                        else
-                            Cell.Set_BorderInfo_Bottom( [ ], -1, -1 );
-                    }
-                    else
-                    {
-                        // Мы должны проверить нижнюю границу ячейки, на предмет того, что со следующей строкой
-                        // она может пересекаться по GridBefore и/или GridAfter. Везде в таких местах мы должны
-                        // нарисовать нижнюю границу. Пересечение с ячейками нам неинтересено, потому что этот
-                        // случай будет учтен при обсчете следующей строки (там будет случай bSpacing_Top = false
-                        // и 0 != CurRow )
-
-                        var Next_Row = this.Content[CurRow + VMergeCount];
-                        var Next_CellsCount = Next_Row.Get_CellsCount();
-                        var Next_BeforeInfo = Next_Row.Get_Before();
-                        var Next_AfterInfo  = Next_Row.Get_After();
-
-                        var Border_Bottom_Info = [];
-
-                        // Сначала посмотрим пересечение с GridBefore предыдущей строки
-                        var BeforeCount = 0;
-                        if ( CurGridCol <= Next_BeforeInfo.GridBefore - 1 )
-                        {
-                            var Result_Border = this.Internal_CompareBorders( TableBorders.Left, CellBordersBottom, true, false );
-                            BeforeCount = Math.min( Next_BeforeInfo.GridBefore - CurGridCol, GridSpan );
-
-                            for ( var TempIndex = 0; TempIndex < BeforeCount; TempIndex++ )
-                                Border_Bottom_Info.push( Result_Border );
-                        }
-
-                        var Next_GridCol = Next_BeforeInfo.GridBefore;
-                        for ( var NextCell = 0; NextCell < Next_CellsCount; NextCell++ )
-                        {
-                            var Next_Cell     = Next_Row.Get_Cell( NextCell );
-                            var Next_GridSpan = Next_Cell.Get_GridSpan();
-                            Next_GridCol += Next_GridSpan;
-                        }
-
-                        // Посмотрим пересечение с GridAfter предыдущей строки
-                        var AfterCount = 0;
-                        if ( Next_AfterInfo.GridAfter > 0 )
-                        {
-                            var StartAfterGrid = Next_GridCol;
-
-                            if ( CurGridCol + GridSpan - 1 >= StartAfterGrid )
-                            {
-                                var Result_Border = this.Internal_CompareBorders( TableBorders.Right, CellBordersBottom, true, false );
-                                AfterCount = Math.min( CurGridCol + GridSpan - StartAfterGrid, GridSpan );
-                                for ( var TempIndex = 0; TempIndex < AfterCount; TempIndex++ )
-                                    Border_Bottom_Info.push( Result_Border );
-                            }
-                        }
-
-                        Cell.Set_BorderInfo_Bottom( Border_Bottom_Info, BeforeCount, AfterCount );
-                    }
-                }
-
-                CurGridCol += GridSpan;
-            }
-        }
-
-        this.MaxTopBorder = MaxTopBorder;
-        this.MaxBotBorder = MaxBotBorder;
-        this.MaxBotMargin = MaxBotMargin;
-
-        // Также для каждой ячейки обсчитаем ее метрики и левую и правую границы
-        for ( var CurRow = 0; CurRow < this.Content.length; CurRow++  )
-        {
-            var Row         = this.Content[CurRow];
-            var CellsCount  = Row.Get_CellsCount();
-            var CellSpacing = Row.Get_CellSpacing();
-
-            var BeforeInfo  = Row.Get_Before();
-            var AfterInfo   = Row.Get_After();
-            var CurGridCol  = BeforeInfo.GridBefore;
-
-            var Row_x_max = 0;
-            var Row_x_min = 0;
-
-            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-            {
-                var Cell     = Row.Get_Cell( CurCell );
-                var GridSpan = Cell.Get_GridSpan();
-                var Vmerge   = Cell.Get_VMerge();
-
-                // начальная и конечная точки данного GridSpan'a
-                var X_grid_start = this.TableSumGrid[CurGridCol - 1];
-                var X_grid_end   = this.TableSumGrid[CurGridCol + GridSpan - 1];
-
-                // границы самой ячейки
-                var X_cell_start = X_grid_start;
-                var X_cell_end   = X_grid_end;
-
-                if ( null != CellSpacing )
-                {
-
-                    if ( 0 === CurCell )
-                    {
-                        if ( 0 === BeforeInfo.GridBefore )
-                        {
-                            if ( border_None === TableBorders.Left.Value || CellSpacing > TableBorders.Left.Size / 2 )
-                                X_cell_start += CellSpacing;
-                            else
-                                X_cell_start += TableBorders.Left.Size / 2;
-                        }
-                        else
-                        {
-                            if ( border_None === TableBorders.Left.Value || CellSpacing > TableBorders.Left.Size ) // CellSpacing / 2 > TableBorders.Left.Size / 2
-                                X_cell_start += CellSpacing / 2;
-                            else
-                                X_cell_start += TableBorders.Left.Size / 2;
-                        }
-                    }
-                    else
-                        X_cell_start += CellSpacing / 2;
-
-                    if ( CellsCount - 1 === CurCell )
-                    {
-                        if ( 0 === AfterInfo.GridAfter )
-                        {
-                            if ( border_None === TableBorders.Right.Value || CellSpacing > TableBorders.Right.Size / 2 )
-                                X_cell_end -= CellSpacing;
-                            else
-                                X_cell_end -= TableBorders.Right.Size / 2;
-                        }
-                        else
-                        {
-                            if ( border_None === TableBorders.Right.Value || CellSpacing > TableBorders.Right.Size ) // CellSpacing / 2 > TableBorders.Right.Size / 2
-                                X_cell_end -= CellSpacing / 2;
-                            else
-                                X_cell_end -= TableBorders.Right.Size / 2;
-                        }
-                    }
-                    else
-                        X_cell_end -= CellSpacing / 2;
-                }
-
-                var CellMar = Cell.Get_Margins();
-
-                var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
-
-                // начальная и конечная точка для содержимого данной ячейки
-                var X_content_start = X_cell_start;
-                var X_content_end   = X_cell_end;
-
-                // Левая и правая границы ячейки рисуются вовнутрь ячейки, если Spacing != null.
-                var CellBorders = Cell.Get_Borders();
-                if ( null != CellSpacing )
-                {
-                    X_content_start += CellMar.Left.W;
-                    X_content_end   -= CellMar.Right.W;
-
-                    if ( border_Single === CellBorders.Left.Value )
-                        X_content_start += CellBorders.Left.Size;
-
-                    if ( border_Single === CellBorders.Right.Value )
-                        X_content_end -= CellBorders.Right.Size;
-                }
-                else
-                {
-                    if ( vmerge_Continue === Vmerge )
-                    {
-                        X_content_start += CellMar.Left.W;
-                        X_content_end   -= CellMar.Right.W;
-                    }
-                    else
-                    {
-                        // Линии правой и левой границы рисуются ровно по сетке
-                        // (середина линии(всмысле толщины линии) совпадает с линией сетки).
-                        // Мы должны найти максимальную толщину линии, учавствущую в правой/левой
-                        // границах. Если данная толщина меньше соответствующего отступа, тогда
-                        // она не влияет на расположение содержимого ячейки, в противном случае,
-                        // максимальная толщина линии и задает отступ для содержимого.
-
-                        // Поэтому первым шагом определим максимальную толщину правой и левой границ.
-
-                        var Max_r_w = 0;
-                        var Max_l_w = 0;
-                        var Borders_Info =
-                        {
-                            Right     : [],
-                            Left      : [],
-
-                            Right_Max : 0,
-                            Left_Max  : 0
-                        };
-
-                        for ( var Temp_CurRow = 0; Temp_CurRow < VMergeCount; Temp_CurRow++ )
-                        {
-                            var Temp_Row = this.Content[CurRow + Temp_CurRow];
-                            var Temp_CellsCount = Temp_Row.Get_CellsCount();
-
-                            // ищем ячейку текущего объединения
-                            var Temp_CurCell = this.Internal_Get_Cell_ByStartGridCol( CurRow + Temp_CurRow, CurGridCol );
-                            if ( Temp_CurCell < 0 )
-                                continue;
-
-                            // левая граница
-                            if ( 0 === Temp_CurCell )
-                            {
-                                var LeftBorder = this.Internal_CompareBorders( TableBorders.Left, CellBorders.Left, true, false );
-                                if ( border_Single === LeftBorder.Value && LeftBorder.Size > Max_l_w )
-                                    Max_l_w = LeftBorder.Size;
-
-                                Borders_Info.Left.push( LeftBorder );
-                            }
-                            else
-                            {
-                                var Temp_Prev_Cell = Temp_Row.Get_Cell( Temp_CurCell - 1 );
-                                var Temp_Prev_VMerge = Temp_Prev_Cell.Get_VMerge();
-                                if ( 0 != Temp_CurRow && vmerge_Continue === Temp_Prev_VMerge )
-                                {
-                                    Borders_Info.Left.push( Borders_Info.Left[Borders_Info.Left.length - 1] );
-                                }
-                                else
-                                {
-                                    var Temp_Prev_Main_Cell = this.Internal_Get_StartMergedCell( CurRow + Temp_CurRow, CurGridCol - Temp_Prev_Cell.Get_GridSpan(), Temp_Prev_Cell.Get_GridSpan() );
-                                    var Temp_Prev_Main_Cell_Borders = Temp_Prev_Main_Cell.Get_Borders();
-
-                                    var LeftBorder = this.Internal_CompareBorders( Temp_Prev_Main_Cell_Borders.Right, CellBorders.Left, false, false );
-                                    if ( border_Single === LeftBorder.Value && LeftBorder.Size > Max_l_w )
-                                        Max_l_w = LeftBorder.Size;
-
-                                    Borders_Info.Left.push( LeftBorder );
-                                }
-                            }
-
-                            if ( Temp_CellsCount - 1 === Temp_CurCell )
-                            {
-                                var RightBorder = this.Internal_CompareBorders( TableBorders.Right, CellBorders.Right, true, false );
-                                if ( border_Single === RightBorder.Value && RightBorder.Size > Max_r_w )
-                                    Max_r_w = RightBorder.Size;
-
-                                Borders_Info.Right.push( RightBorder );
-                            }
-                            else
-                            {
-                                var Temp_Next_Cell = Temp_Row.Get_Cell( Temp_CurCell + 1 );
-                                var Temp_Next_VMerge = Temp_Next_Cell.Get_VMerge();
-                                if ( 0 != Temp_CurRow && vmerge_Continue === Temp_Next_VMerge )
-                                {
-                                    Borders_Info.Right.push( Borders_Info.Right[Borders_Info.Right.length - 1] );
-                                }
-                                else
-                                {
-                                    var Temp_Next_Main_Cell = this.Internal_Get_StartMergedCell( CurRow + Temp_CurRow, CurGridCol + GridSpan, Temp_Next_Cell.Get_GridSpan() );
-                                    var Temp_Next_Main_Cell_Borders = Temp_Next_Main_Cell.Get_Borders();
-
-                                    var RightBorder = this.Internal_CompareBorders( Temp_Next_Main_Cell_Borders.Left, CellBorders.Right, false, false );
-                                    if ( border_Single === RightBorder.Value && RightBorder.Size > Max_r_w )
-                                        Max_r_w = RightBorder.Size;
-
-                                    Borders_Info.Right.push( RightBorder );
-                                }
-                            }
-                        }
-
-                        Borders_Info.Right_Max = Max_r_w;
-                        Borders_Info.Left_Max  = Max_l_w;
-
-                        if ( Max_l_w / 2 > CellMar.Left.W )
-                            X_content_start += Max_l_w / 2;
-                        else
-                            X_content_start += CellMar.Left.W;
-
-                        if ( Max_r_w / 2 > CellMar.Right.W )
-                            X_content_end -= Max_r_w / 2;
-                        else
-                            X_content_end -= CellMar.Right.W;
-
-                        Cell.Set_BorderInfo_Left ( Borders_Info.Left,  Max_l_w );
-                        Cell.Set_BorderInfo_Right( Borders_Info.Right, Max_r_w );
-                    }
-                }
-
-                if ( 0 === CurCell )
-                {
-                    if ( null != CellSpacing )
-                    {
-                        Row_x_min = X_grid_start;
-                        if ( border_Single === TableBorders.Left.Value )
-                            Row_x_min -= TableBorders.Left.Size / 2;
-                    }
-                    else
-                    {
-                        var BorderInfo = Cell.Get_BorderInfo();
-                        Row_x_min = X_grid_start - BorderInfo.MaxLeft / 2;
-                    }
-                }
-
-                if ( CellsCount - 1 === CurCell )
-                {
-                    if ( null != CellSpacing )
-                    {
-                        Row_x_max = X_grid_end;
-                        if ( border_Single === TableBorders.Right.Value )
-                            Row_x_max += TableBorders.Right.Size / 2;
-                    }
-                    else
-                    {
-                        var BorderInfo = Cell.Get_BorderInfo();
-                        Row_x_max = X_grid_end + BorderInfo.MaxRight / 2;
-                    }
-                }
-
-                Cell.Set_Metrics( CurGridCol, X_grid_start, X_grid_end, X_cell_start, X_cell_end, X_content_start, X_content_end );
-
-                CurGridCol += GridSpan;
-            }
-
-            Row.Set_Metrics_X( Row_x_min, Row_x_max );
-        }
-
-        this.RecalcInfo.TableBorders = false;
-    },
-
-    Internal_Recalculate_Position_1 : function()
-    {
-        var TablePr = this.Get_CompiledPr(false).TablePr;
-        var PageLimits = this.Parent.Get_PageLimits(this.PageNum);
-        var PageFields = this.Parent.Get_PageFields(this.PageNum);
-        
-        var LD_PageLimits = this.LogicDocument.Get_PageLimits( this.Get_StartPage_Absolute() );
-        var LD_PageFields = this.LogicDocument.Get_PageFields( this.Get_StartPage_Absolute() );
-        
-        if ( true === this.Is_Inline() )
-        {
-            switch ( TablePr.Jc )
-            {
-                case align_Left :
-                {
-                    this.X = this.X_origin + this.Get_TableOffsetCorrection() + TablePr.TableInd;
-                    break;
-                }
-                case align_Right :
-                {
-                    var TableWidth = this.TableSumGrid[ this.TableSumGrid.length - 1 ];
-
-                    if ( false === this.Parent.Is_TableCellContent() )
-                        this.X = this.XLimit - TableWidth + 1.9; // 1.9мм всегда добавляется справа от таблицы
-                    else
-                        this.X = this.XLimit - TableWidth;
-                    break;
-                }
-                case align_Center :
-                {
-                    var TableWidth = this.TableSumGrid[ this.TableSumGrid.length - 1 ];
-                    var RangeWidth = this.XLimit - this.X_origin;
-
-                    this.X = this.X_origin + ( RangeWidth - TableWidth ) / 2; // 1.9мм всегда добавляется справа от таблицы
-                    break;
-                }
-            }
-
-            this.AnchorPosition.CalcX = this.X_origin + TablePr.TableInd;
-            this.AnchorPosition.Set_X( this.TableSumGrid[this.TableSumGrid.length - 1], this.X_origin, LD_PageFields.X, LD_PageFields.XLimit, LD_PageLimits.XLimit, PageLimits.X, PageLimits.XLimit );
-        }
-        else
-        {
-            var OffsetCorrection_Left  = 0;
-            var OffsetCorrection_Right = 0;
-
-            if ( this.Content.length > 0 && this.Content[0].Get_CellsCount() > 0  && !(this.bPresentation === true))
-            {
-                var FirstRow   = this.Content[0];
-                var Cell_Left  = FirstRow.Get_Cell( 0 );
-                var Cell_Right = FirstRow.Get_Cell( FirstRow.Get_CellsCount() - 1 );
-
-                OffsetCorrection_Left  = Cell_Left.Get_Margins().Left.W;
-                OffsetCorrection_Right = Cell_Right.Get_Margins().Right.W;
-            }
-
-            this.X = this.X_origin + this.Get_TableOffsetCorrection();
-            this.AnchorPosition.Set_X( this.TableSumGrid[this.TableSumGrid.length - 1], this.X_origin, PageFields.X - OffsetCorrection_Left, PageFields.XLimit + OffsetCorrection_Right, LD_PageLimits.XLimit, PageLimits.X - OffsetCorrection_Left, PageLimits.XLimit + OffsetCorrection_Right );
-
-            this.X = this.AnchorPosition.Calculate_X(this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
-            this.X_origin = this.X - this.Get_TableOffsetCorrection();
-
-            if ( undefined != this.PositionH_Old )
-            {
-                // Восстанови старые значения, чтобы в историю изменений все нормально записалось
-                this.PositionH.RelativeFrom = this.PositionH_Old.RelativeFrom;
-                this.PositionH.Align        = this.PositionH_Old.Align;
-                this.PositionH.Value        = this.PositionH_Old.Value;
-
-                // Рассчитаем сдвиг с учетом старой привязки
-                var Value = this.AnchorPosition.Calculate_X_Value(this.PositionH_Old.RelativeFrom);
-                this.Set_PositionH( this.PositionH_Old.RelativeFrom, false, Value );
-                // На всякий случай пересчитаем заново координату
-                this.X = this.AnchorPosition.Calculate_X(this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
-                this.X_origin = this.X - this.Get_TableOffsetCorrection();
-
-                this.PositionH_Old = undefined;
-            }
-        }
-    },
-
-    Internal_Recalculate_Position_2 : function(CurPage)
-    {
-        var PageLimits = this.Parent.Get_PageLimits(this.PageNum + CurPage);
-        var PageFields = this.Parent.Get_PageFields(this.PageNum + CurPage);
-        var LD_PageFields = this.LogicDocument.Get_PageFields(this.Get_StartPage_Absolute() + CurPage);
-        var LD_PageLimits = this.LogicDocument.Get_PageLimits(this.Get_StartPage_Absolute() + CurPage);
-        
-        if ( true === this.Is_Inline() && 0 === CurPage )
-        {
-            this.AnchorPosition.CalcY = this.Y;
-            this.AnchorPosition.Set_Y(this.Pages[CurPage].Height, this.Y, LD_PageFields.Y, LD_PageFields.YLimit, LD_PageLimits.YLimit, PageLimits.Y, PageLimits.YLimit, PageLimits.Y, PageLimits.YLimit);
-        }
-        else if ( true != this.Is_Inline() && ( 0 === CurPage || ( 1 === CurPage && false === this.RowsInfo[0].FirstPage ) ) )
-        {
-            this.AnchorPosition.Set_Y(this.Pages[CurPage].Height, this.Pages[CurPage].Y, PageFields.Y, PageFields.YLimit, LD_PageLimits.YLimit, PageLimits.Y, PageLimits.YLimit, PageLimits.Y, PageLimits.YLimit);
-
-            var OtherFlowTables = !this.bPresentation ? editor.WordControl.m_oLogicDocument.DrawingObjects.getAllFloatTablesOnPage( this.Get_StartPage_Absolute() ) : [];
-            this.AnchorPosition.Calculate_Y(this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
-            this.AnchorPosition.Correct_Values( PageLimits.X, PageLimits.Y, PageLimits.XLimit, PageLimits.YLimit, this.AllowOverlap, OtherFlowTables, this );
-
-            if ( undefined != this.PositionV_Old )
-            {
-                // Восстанови старые значения, чтобы в историю изменений все нормально записалось
-                this.PositionV.RelativeFrom = this.PositionV_Old.RelativeFrom;
-                this.PositionV.Align        = this.PositionV_Old.Align;
-                this.PositionV.Value        = this.PositionV_Old.Value;
-
-                // Рассчитаем сдвиг с учетом старой привязки
-                var Value = this.AnchorPosition.Calculate_Y_Value(this.PositionV_Old.RelativeFrom);
-                this.Set_PositionV( this.PositionV_Old.RelativeFrom, false, Value );
-                // На всякий случай пересчитаем заново координату
-                this.AnchorPosition.Calculate_Y(this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
-
-                this.PositionV_Old = undefined;
-            }
-
-            var NewX = this.AnchorPosition.CalcX;
-            var NewY = this.AnchorPosition.CalcY;
-
-            this.Shift( CurPage, NewX - this.Pages[CurPage].X, NewY - this.Pages[CurPage].Y );
-        }
-    },
-
-    Internal_Recalculate_1_ : function(CurPage)
-    {
-        if ( true === this.TurnOffRecalc )
-            return;
-
-        this.TurnOffRecalc = true;
-
-        var FirstRow = 0;
-        var LastRow  = 0;
-
-        if ( 0 === CurPage )
-        {
-            // Обнуляем таблицу суммарных высот ячеек
-            for ( var Index = -1; Index < this.Content.length; Index++ )
-            {
-                this.TableRowsBottom[Index] = [];
-                this.TableRowsBottom[Index][0] = 0;
-            }
-        }
-        else
-        {
-            FirstRow = this.Pages[CurPage - 1].LastRow;
-            LastRow  = FirstRow;
-        }
-
-        var MaxTopBorder = this.MaxTopBorder;
-        var MaxBotBorder = this.MaxBotBorder;
-        var MaxBotMargin = this.MaxBotMargin;
-        var TempMaxTopBorder = this.Get_MaxTopBorder( FirstRow );
-
-        var StartPos;
-
-        if ( 0 === CurPage )
-        {
-            StartPos =
-            {
-                X            : this.X,
-                XLimit       : this.XLimit,
-                Y            : this.Y,
-                YLimit       : this.YLimit,
-                MaxTopBorder : TempMaxTopBorder
-            };
-
-            this.HeaderInfo.PageIndex = -1;
-        }
-        else
-        {
-            StartPos = this.Parent.Get_PageContentStartPos( this.PageNum + CurPage );
-
-            // Правая и левая границы переходят с первой страницы
-            StartPos.X      = this.X;
-            StartPos.XLimit = this.XLimit;
-        }
-
-        this.Pages[CurPage] = new CTablePage( StartPos.X, StartPos.Y, StartPos.XLimit, StartPos.YLimit, FirstRow, TempMaxTopBorder );
-
-        var Y = StartPos.Y;
-        var TableHeight = 0;
-
-        var TableBorders = this.Get_Borders();
-
-        var X_max = -1;
-        var X_min = -1;
-
-
-        if ( this.HeaderInfo.Count > 0 && this.HeaderInfo.PageIndex != -1 && CurPage > this.HeaderInfo.PageIndex )
-        {
-            this.HeaderInfo.Pages[CurPage] = {};
-            this.HeaderInfo.Pages[CurPage].RowsInfo = [];
-            var HeaderPage = this.HeaderInfo.Pages[CurPage];
-
-            // Рисуем ли заголовок на данной странице
-            HeaderPage.Draw = true;
-
-            // Скопируем целиком строки
-            HeaderPage.Rows = [];
-
-            // Временно отключаем регистрацию новых классов
-            g_oTableId.m_bTurnOff = true;
-            History.TurnOff();
-
-            for ( var Index = 0; Index < this.HeaderInfo.Count; Index++ )
-            {
-                HeaderPage.Rows[Index] = this.Content[Index].Copy(this);
-                HeaderPage.Rows[Index].Index = Index;
-            }
-            g_oTableId.m_bTurnOff = false;
-            History.TurnOn();
-
-            var bHeaderNextPage = false;
-            for ( var CurRow = 0; CurRow < this.HeaderInfo.Count; CurRow++  )
-            {
-                HeaderPage.RowsInfo[CurRow] = {};
-                HeaderPage.RowsInfo[CurRow].Y               = 0;
-                HeaderPage.RowsInfo[CurRow].H               = 0;
-                HeaderPage.RowsInfo[CurRow].TopDy           = 0;
-                HeaderPage.RowsInfo[CurRow].MaxTopBorder    = 0;
-                HeaderPage.RowsInfo[CurRow].TableRowsBottom = 0;
-
-                var Row         = HeaderPage.Rows[CurRow];
-                var CellsCount  = Row.Get_CellsCount();
-                var CellSpacing = Row.Get_CellSpacing();
-
-                var BeforeInfo  = Row.Get_Before();
-                var CurGridCol  = BeforeInfo.GridBefore;
-
-                // Добавляем ширину верхней границы у текущей строки (используем MaxTopBorder самой таблицы)
-                Y           += MaxTopBorder[CurRow];
-                TableHeight += MaxTopBorder[CurRow];
-
-                // Если таблица с расстоянием между ячейками, тогда добавляем его
-                if ( 0 === CurRow )
-                {
-                    if ( null != CellSpacing )
-                    {
-                        var TableBorder_Top = this.Get_Borders().Top;
-                        if ( border_Single === TableBorder_Top.Value )
-                        {
-                            Y           += TableBorder_Top.Size;
-                            TableHeight += TableBorder_Top.Size;
-                        }
-
-                        Y           += CellSpacing;
-                        TableHeight += CellSpacing;
-                    }
-                }
-                else
-                {
-                    var PrevCellSpacing = HeaderPage.Rows[CurRow - 1].Get_CellSpacing();
-
-                    if ( null != CellSpacing && null != PrevCellSpacing )
-                    {
-                        Y           += (PrevCellSpacing + CellSpacing) / 2;
-                        TableHeight += (PrevCellSpacing + CellSpacing) / 2;
-                    }
-                    else if ( null != CellSpacing )
-                    {
-                        Y           += CellSpacing / 2;
-                        TableHeight += CellSpacing / 2;
-                    }
-                    else if ( null != PrevCellSpacing )
-                    {
-                        Y           += PrevCellSpacing / 2;
-                        TableHeight += PrevCellSpacing / 2;
-                    }
-                }
-
-                var Row_x_max = Row.Metrics.X_max;
-                var Row_x_min = Row.Metrics.X_min;
-
-                if ( -1 === X_min || Row_x_min < X_min )
-                    X_min = Row_x_min;
-
-                if ( -1 === X_max || Row_x_max > X_max )
-                    X_max = Row_x_max;
-
-                // Дополнительный параметр для случая, если данная строка начнется с новой страницы.
-                // Мы запоминаем максимальное значение нижней границы(первой страницы (текущей)) у ячеек,
-                // объединенных вертикально так, чтобы это объединение заканчивалось на данной строке.
-                // И если данная строка начнется сразу с новой страницы (Pages > 0, FirstPage = false), тогда
-                // мы должны данный параметр сравнить со значением нижней границы предыдущей строки.
-                var MaxBotValue_vmerge = -1;
-
-                var RowH = Row.Get_Height();
-
-                for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                {
-                    var Cell     = Row.Get_Cell( CurCell );
-                    var GridSpan = Cell.Get_GridSpan();
-                    var Vmerge   = Cell.Get_VMerge();
-                    var CellMar  = Cell.Get_Margins();
-
-                    Row.Update_CellInfo( CurCell, this.X );
-
-                    var CellMetrics = Row.Get_CellInfo( CurCell );
-
-                    var X_content_start = CellMetrics.X_content_start;
-                    var X_content_end   = CellMetrics.X_content_end;
-
-                    var Y_content_start = Y + CellMar.Top.W;
-                    var Y_content_end   = this.Pages[CurPage].YLimit;
-
-                    // TODO: При расчете YLimit для ячейки сделать учет толщины нижних
-                    //       границ ячейки и таблицы
-                    if ( null != CellSpacing )
-                    {
-                        if ( this.Content.length - 1 === CurRow )
-                            Y_content_end -= CellSpacing;
-                        else
-                            Y_content_end -= CellSpacing / 2;
-                    }
-
-                    var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
-                    var BottomMargin = this.MaxBotMargin[CurRow + VMergeCount - 1];
-                    Y_content_end -= BottomMargin;
-
-                    // Такие ячейки мы обсчитываем, если либо сейчас происходит переход на новую страницу, либо
-                    // это последняя ячейка в объединении.
-                    // Обсчет такик ячеек произошел ранее
-
-                    Cell.Temp.Y = Y_content_start;
-
-                    if ( VMergeCount > 1 )
-                    {
-                        CurGridCol += GridSpan;
-                        continue;
-                    }
-                    else
-                    {
-                        // Возьмем верхнюю ячейку теккущего объединения
-                        if ( vmerge_Restart != Vmerge )
-                        {
-                            // Найдем ячейку в самой таблице, а дальше по индексам ячейки и строки получим ее в скопированном заголовке
-                            Cell    = this.Internal_Get_StartMergedCell( CurRow, CurGridCol, GridSpan );
-                            var cIndex = Cell.Index;
-                            var rIndex = Cell.Row.Index;
-
-                            Cell = HeaderPage.Rows[rIndex].Get_Cell( cIndex );
-
-                            CellMar = Cell.Get_Margins();
-
-                            Y_content_start = Cell.Temp.Y + CellMar.Top.W;
-                        }
-                    }
-
-                    Cell.Content.Set_StartPage( CurPage );
-                    Cell.Content.Reset( X_content_start, Y_content_start, X_content_end, Y_content_end );
-
-                    if ( recalcresult2_NextPage === Cell.Content.Recalculate_Page( 0, true ) )
-                    {
-                        bHeaderNextPage = true;
-                        break;
-                    }
-
-                    var CellContentBounds = Cell.Content.Get_PageBounds( 0, undefined, true );
-                    var CellContentBounds_Bottom = CellContentBounds.Bottom + BottomMargin;
-
-                    if ( undefined === HeaderPage.RowsInfo[CurRow].TableRowsBottom || HeaderPage.RowsInfo[CurRow].TableRowsBottom < CellContentBounds_Bottom )
-                        HeaderPage.RowsInfo[CurRow].TableRowsBottom = CellContentBounds_Bottom;
-
-                    if ( vmerge_Continue === Vmerge )
-                    {
-                        if ( -1 === MaxBotValue_vmerge || MaxBotValue_vmerge < CellContentBounds_Bottom )
-                            MaxBotValue_vmerge = CellContentBounds_Bottom;
-                    }
-
-                    CurGridCol += GridSpan;
-                }
-
-                // Если заголовок целииком на странице не убирается, тогда мы его попросту не рисуем на данной странице
-                if ( true === bHeaderNextPage )
-                {
-                    Y = StartPos.Y;
-                    TableHeight = 0;
-                    HeaderPage.Draw = false;
-
-                    break;
-                }
-
-
-                // Здесь мы выставляем только начальную координату строки (для каждой страницы)
-                // высоту строки(для каждой страницы) мы должны обсчитать после общего цикла, т.к.
-                // в одной из следйющих строк может оказаться ячейка с вертикальным объединением,
-                // захватывающим данную строку. Значит, ее содержимое может изменить высоту нашей строки.
-                var TempY            = Y;
-                var TempMaxTopBorder = MaxTopBorder[CurRow];
-
-                if ( null != CellSpacing )
-                {
-                    HeaderPage.RowsInfo[CurRow].Y            = TempY;
-                    HeaderPage.RowsInfo[CurRow].TopDy        = 0;
-                    HeaderPage.RowsInfo[CurRow].X0           = Row_x_min;
-                    HeaderPage.RowsInfo[CurRow].X1           = Row_x_max;
-                    HeaderPage.RowsInfo[CurRow].MaxTopBorder = TempMaxTopBorder;
-                    HeaderPage.RowsInfo[CurRow].MaxBotBorder = MaxBotBorder[CurRow];
-                }
-                else
-                {
-                    HeaderPage.RowsInfo[CurRow].Y            = TempY - TempMaxTopBorder;
-                    HeaderPage.RowsInfo[CurRow].TopDy        = TempMaxTopBorder;
-                    HeaderPage.RowsInfo[CurRow].X0           = Row_x_min;
-                    HeaderPage.RowsInfo[CurRow].X1           = Row_x_max;
-                    HeaderPage.RowsInfo[CurRow].MaxTopBorder = TempMaxTopBorder;
-                    HeaderPage.RowsInfo[CurRow].MaxBotBorder = MaxBotBorder[CurRow];
-                }
-
-                var CellHeight = HeaderPage.RowsInfo[CurRow].TableRowsBottom - Y;
-
-                // TODO: улучшить проверку на высоту строки (для строк разбитых на страницы)
-                if ( false === bNextPage && heightrule_AtLeast === RowH.HRule && CellHeight < RowH.Value - MaxTopBorder[CurRow] )
-                {
-                    CellHeight = RowH.Value - MaxTopBorder[CurRow];
-                    HeaderPage.RowsInfo[CurRow].TableRowsBottom = Y + CellHeight;
-                }
-
-                if ( null != CellSpacing )
-                    HeaderPage.RowsInfo[CurRow].H = CellHeight;
-                else
-                    HeaderPage.RowsInfo[CurRow].H = CellHeight + TempMaxTopBorder;
-
-                Y           += CellHeight;
-                TableHeight += CellHeight;
-
-                Row.Height   = CellHeight;
-
-                Y           += MaxBotBorder[CurRow];
-                TableHeight += MaxBotBorder[CurRow];
-
-                // Сделаем вертикальное выравнивание ячеек в таблице. Делаем как Word, если ячейка разбилась на несколько
-                // страниц, тогда вертикальное выравнивание применяем только к первой странице.
-            }
-
-            if ( false === bHeaderNextPage )
-            {
-                // Сделаем вертикальное выравнивание ячеек в таблице. Делаем как Word, если ячейка разбилась на несколько
-                // страниц, тогда вертикальное выравнивание применяем только к первой странице.
-                // Делаем это не в общем цикле, потому что объединенные вертикально ячейки могут вносить поправки в значения
-                // this.TableRowsBottom, в последней строке.
-                for ( var CurRow = 0; CurRow < this.HeaderInfo.Count; CurRow++ )
-                {
-                    var Row = HeaderPage.Rows[CurRow];
-                    var CellsCount = Row.Get_CellsCount();
-                    for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                    {
-                        var Cell = Row.Get_Cell( CurCell );
-                        var VMergeCount = this.Internal_GetVertMergeCount( CurRow, Cell.Metrics.StartGridCol, Cell.Get_GridSpan() );
-
-                        if ( VMergeCount > 1 )
-                            continue;
-                        else
-                        {
-                            var Vmerge = Cell.Get_VMerge();
-                            // Возьмем верхнюю ячейку теккущего объединения
-                            if ( vmerge_Restart != Vmerge )
-                            {
-                                Cell = this.Internal_Get_StartMergedCell( CurRow, Cell.Metrics.StartGridCol, Cell.Get_GridSpan() );
-                                var cIndex = Cell.Index;
-                                var rIndex = Cell.Row.Index;
-
-                                Cell = HeaderPage.Rows[rIndex].Get_Cell( cIndex );
-                            }
-                        }
-
-                        var CellMar       = Cell.Get_Margins();
-                        var VAlign        = Cell.Get_VAlign();
-                        var CellPageIndex = CurPage - Cell.Content.Get_StartPage_Relative();
-
-                        if ( CellPageIndex >= Cell.PagesCount )
-                            continue;
-
-                        // Для прилегания к верху или для второй страницы ничего не делаем (так изначально рассчитывалось)
-                        if ( vertalignjc_Top === VAlign || CellPageIndex > 1 )
-                        {
-                            Cell.Temp.Y_VAlign_offset[CellPageIndex] = 0;
-                            continue;
-                        }
-
-                        // Рассчитаем имеющуюся в распоряжении высоту ячейки
-                        var TempCurRow = Cell.Row.Index;
-                        var TempCellSpacing = HeaderPage.Rows[TempCurRow].Get_CellSpacing();
-                        var Y_0 = HeaderPage.RowsInfo[TempCurRow].Y;
-
-                        if ( null === TempCellSpacing )
-                            Y_0 += MaxTopBorder[TempCurRow];
-
-                        Y_0 += CellMar.Top.W;
-
-                        var Y_1 = HeaderPage.RowsInfo[CurRow].TableRowsBottom - CellMar.Bottom.W;
-                        var CellHeight = Y_1 - Y_0;
-
-                        var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex, CellHeight, true );
-                        var ContentHeight = CellContentBounds.Bottom - CellContentBounds.Top;
-
-                        var Dy = 0;
-                        if ( CellHeight - ContentHeight > 0.001 )
-                        {
-                            if ( vertalignjc_Bottom === VAlign )
-                                Dy = CellHeight - ContentHeight;
-                            else if ( vertalignjc_Center === VAlign )
-                                Dy = (CellHeight - ContentHeight) / 2;
-
-                            Cell.Content.Shift( CellPageIndex, 0, Dy );
-                        }
-
-                        Cell.Temp.Y_VAlign_offset[CellPageIndex] = Dy;
-                    }
-                }
-            }
-        }
-        else
-        {
-            this.HeaderInfo.Pages[CurPage] = {};
-            this.HeaderInfo.Pages[CurPage].Draw = false;
-        }
-
-        var bNextPage = false;
-        for ( var CurRow = FirstRow; CurRow < this.Content.length; CurRow++  )
-        {
-            if ( (0 === CurRow && 0 === CurPage) || CurRow != FirstRow  )
-            {
-                this.RowsInfo[CurRow] = {};
-                this.RowsInfo[CurRow].Pages        = 1;
-                this.RowsInfo[CurRow].Y            = [];
-                this.RowsInfo[CurRow].H            = [];
-                this.RowsInfo[CurRow].TopDy        = [];
-                this.RowsInfo[CurRow].MaxTopBorder = [];
-                this.RowsInfo[CurRow].FirstPage    = true;
-                this.RowsInfo[CurRow].StartPage    = CurPage;
-            }
-            else
-                this.RowsInfo[CurRow].Pages++;
-
-            this.TableRowsBottom[CurRow] = [];
-
-            var Row         = this.Content[CurRow];
-            var CellsCount  = Row.Get_CellsCount();
-            var CellSpacing = Row.Get_CellSpacing();
-
-            var BeforeInfo  = Row.Get_Before();
-            var AfterInfo   = Row.Get_After();
-            var CurGridCol  = BeforeInfo.GridBefore;
-
-            // Добавляем ширину верхней границы у текущей строки
-            Y           += MaxTopBorder[CurRow];
-            TableHeight += MaxTopBorder[CurRow];
-
-            // Если таблица с расстоянием между ячейками, тогда добавляем его
-            if ( FirstRow === CurRow )
-            {
-                if ( null != CellSpacing )
-                {
-                    var TableBorder_Top = this.Get_Borders().Top;
-                    if ( border_Single === TableBorder_Top.Value )
-                    {
-                        Y           += TableBorder_Top.Size;
-                        TableHeight += TableBorder_Top.Size;
-                    }
-
-                    if ( true === this.HeaderInfo.Pages[CurPage].Draw || ( 0 === CurRow && ( 0 === CurPage || ( 1 === CurPage && false === this.RowsInfo[0].FirstPage  ) ) ) )
-                    {
-                        Y           += CellSpacing;
-                        TableHeight += CellSpacing;
-                    }
-                    else
-                    {
-                        Y           += CellSpacing / 2;
-                        TableHeight += CellSpacing / 2;
-                    }
-                }
-            }
-            else
-            {
-                var PrevCellSpacing = this.Content[CurRow - 1].Get_CellSpacing();
-
-                if ( null != CellSpacing && null != PrevCellSpacing )
-                {
-                    Y           += (PrevCellSpacing + CellSpacing) / 2;
-                    TableHeight += (PrevCellSpacing + CellSpacing) / 2;
-                }
-                else if ( null != CellSpacing )
-                {
-                    Y           += CellSpacing / 2;
-                    TableHeight += CellSpacing / 2;
-                }
-                else if ( null != PrevCellSpacing )
-                {
-                    Y           += PrevCellSpacing / 2;
-                    TableHeight += PrevCellSpacing / 2;
-                }
-            }
-
-            var Row_x_max = Row.Metrics.X_max;
-            var Row_x_min = Row.Metrics.X_min;
-
-            if ( -1 === X_min || Row_x_min < X_min )
-                X_min = Row_x_min;
-
-            if ( -1 === X_max || Row_x_max > X_max )
-                X_max = Row_x_max;
-
-            // Дополнительный параметр для случая, если данная строка начнется с новой страницы.
-            // Мы запоминаем максимальное значение нижней границы(первой страницы (текущей)) у ячеек,
-            // объединенных вертикально так, чтобы это объединение заканчивалось на данной строке.
-            // И если данная строка начнется сразу с новой страницы (Pages > 0, FirstPage = false), тогда
-            // мы должны данный параметр сравнить со значением нижней границы предыдущей строки.
-            var MaxBotValue_vmerge = -1;
-
-            var RowH = Row.Get_Height();
-
-            var Merged_Cell  = [];
-
-            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-            {
-                var Cell     = Row.Get_Cell( CurCell );
-                var GridSpan = Cell.Get_GridSpan();
-                var Vmerge   = Cell.Get_VMerge();
-                var CellMar  = Cell.Get_Margins();
-
-                Row.Update_CellInfo( CurCell, this.X );
-
-                var CellMetrics = Row.Get_CellInfo( CurCell );
-
-                var X_content_start = CellMetrics.X_content_start;
-                var X_content_end   = CellMetrics.X_content_end;
-
-                var Y_content_start = Y + CellMar.Top.W;
-                var Y_content_end   = this.Pages[CurPage].YLimit;
-
-                // TODO: При расчете YLimit для ячейки сделать учет толщины нижних
-                //       границ ячейки и таблицы
-                if ( null != CellSpacing )
-                {
-                    if ( this.Content.length - 1 === CurRow )
-                        Y_content_end -= CellSpacing;
-                    else
-                        Y_content_end -= CellSpacing / 2;
-                }
-
-                var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
-                var BottomMargin = this.MaxBotMargin[CurRow + VMergeCount - 1];
-                Y_content_end -= BottomMargin;
-
-                // Такие ячейки мы обсчитываем, если либо сейчас происходит переход на новую страницу, либо
-                // это последняя ячейка в объединении.
-                // Обсчет такик ячеек произошел ранее
-
-                Cell.Temp.Y = Y_content_start;
-
-                if ( VMergeCount > 1 )
-                {
-                    CurGridCol += GridSpan;
-                    Merged_Cell.push( Cell );
-                    continue;
-                }
-                else
-                {
-                    // Возьмем верхнюю ячейку теккущего объединения
-                    if ( vmerge_Restart != Vmerge )
-                    {
-                        Cell = this.Internal_Get_StartMergedCell( CurRow, CurGridCol, GridSpan );
-                        CellMar = Cell.Get_Margins();
-
-                        Y_content_start = Cell.Temp.Y + CellMar.Top.W;
-                    }
-                }
-
-                var bCanShift = false;
-                var ShiftDy   = 0;
-                var ShiftDx   = 0;
-
-                if ( (0 === Cell.Row.Index && 0 === CurPage) || Cell.Row.Index > FirstRow  )
-                {
-                    Cell.Content.Set_StartPage( CurPage );
-
-                    if (  true === this.Is_Inline() && 1 === Cell.PagesCount && 1 === Cell.Content.Pages.length && true != this.RecalcInfo.Check_Cell( Cell ) )
-                    {
-                        var X_content_start_old  = Cell.Content.Pages[0].X;
-                        var X_content_end_old    = Cell.Content.Pages[0].XLimit;
-                        var Y_content_height_old = Cell.Content.Pages[0].Bounds.Bottom - Cell.Content.Pages[0].Bounds.Top;
-
-                        // Проверим по X, Y
-                        if ( Math.abs( X_content_start - X_content_start_old ) < 0.001 && Math.abs( X_content_end_old - X_content_end ) < 0.001 && Y_content_start + Y_content_height_old < Y_content_end )
-                        {
-                            bCanShift = true;
-                            ShiftDy   = -Cell.Content.Pages[0].Y + Y_content_start;
-                        }
-                    }
-
-                    Cell.PagesCount = 1;
-                    Cell.Content.Reset( X_content_start, Y_content_start, X_content_end, Y_content_end );
-                }
-
-                // Какие-то ячейки в строке могут быть не разбиты на строки, а какие то разбиты.
-                // Здесь контролируем этот момент, чтобы у тех, которые не разбиты не вызывать
-                // Recalculate_Page от несуществующих страниц.
-                var CellPageIndex = CurPage - Cell.Content.Get_StartPage_Relative();
-                if ( CellPageIndex < Cell.PagesCount )
-                {
-                    if ( true === bCanShift )
-                    {
-                        Cell.Content.Shift( 0, ShiftDx, ShiftDy );
-                        Cell.Content.Update_EndInfo();
-                    }
-                    else if ( recalcresult2_NextPage === Cell.Content.Recalculate_Page( CellPageIndex, true ) )
-                    {
-                        Cell.PagesCount = Cell.Content.Pages.length + 1;
-                        bNextPage = true;
-                    }
-
-                    var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex, undefined, true );
-                    var CellContentBounds_Bottom = CellContentBounds.Bottom + BottomMargin;
-
-                    if ( undefined === this.TableRowsBottom[CurRow][CurPage] || this.TableRowsBottom[CurRow][CurPage] < CellContentBounds_Bottom )
-                        this.TableRowsBottom[CurRow][CurPage] = CellContentBounds_Bottom;
-
-                    if ( vmerge_Continue === Vmerge )
-                    {
-                        if ( -1 === MaxBotValue_vmerge || MaxBotValue_vmerge < CellContentBounds_Bottom )
-                            MaxBotValue_vmerge = CellContentBounds_Bottom;
-                    }
-                }
-
-                CurGridCol += GridSpan;
-            }
-
-            if ((heightrule_AtLeast === RowH.HRule || heightrule_Exact == RowH.HRule) && Y + RowH.Value > Y_content_end && ((0 === CurRow && 0 === CurPage) || CurRow != FirstRow))
-            {
-                bNextPage = true;
-
-                for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                {
-                    var Cell   = Row.Get_Cell( CurCell );
-                    var Vmerge = Cell.Get_VMerge();
-
-                    var VMergeCount = this.Internal_GetVertMergeCount( CurRow, Cell.Metrics.StartGridCol, Cell.Get_GridSpan() );
-
-                    // Проверяем только начальные ячейки вертикального объединения..
-                    if ( vmerge_Continue === Vmerge || VMergeCount > 1 )
-                        continue;
-
-                    Cell.Content.Start_FromNewPage();
-                    Cell.PagesCount = 2;
-                }
-            }
-
-            // Данная строка разбилась на несколько страниц. Нам нужно сделать несколько дополнительных действий:
-            // 1. Проверяем есть ли хоть какой-либо контент данной строки на первой странице, т.е. реально данная
-            //    строка начинается со 2-ой страницы.
-            // 2. Пересчитать все смерженные вертикально ячейки, которые также разбиваются на несколько страниц,
-            //    но у которых вертикальное объединение не заканчивается на данной странице.
-            if ( true === bNextPage )
-            {
-                var bContentOnFirstPage   = false;
-                var bNoContentOnFirstPage = false;
-                for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                {
-                    var Cell   = Row.Get_Cell( CurCell );
-                    var Vmerge = Cell.Get_VMerge();
-
-                    var VMergeCount = this.Internal_GetVertMergeCount( CurRow, Cell.Metrics.StartGridCol, Cell.Get_GridSpan() );
-
-                    // Проверяем только начальные ячейки вертикального объединения..
-                    if ( vmerge_Continue === Vmerge || VMergeCount > 1 )
-                        continue;
-
-                    if ( true === Cell.Content_Is_ContentOnFirstPage() )
-                    {
-                        bContentOnFirstPage = true;
-                    }
-                    else
-                        bNoContentOnFirstPage = true;
-                }
-
-                if ( true === bContentOnFirstPage && true === bNoContentOnFirstPage )
-                {
-                    for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                    {
-                        var Cell   = Row.Get_Cell( CurCell );
-                        var Vmerge = Cell.Get_VMerge();
-
-                        var VMergeCount = this.Internal_GetVertMergeCount( CurRow, Cell.Metrics.StartGridCol, Cell.Get_GridSpan() );
-
-                        // Проверяем только начальные ячейки вертикального объединения..
-                        if ( vmerge_Continue === Vmerge || VMergeCount > 1 )
-                            continue;
-
-                        Cell.Content.Start_FromNewPage();
-                        Cell.PagesCount = 2;
-                    }
-
-                    bContentOnFirstPage = false;
-                }
-
-                this.RowsInfo[CurRow].FirstPage = bContentOnFirstPage;
-
-                // Не сраниваем MaxBotValue_vmerge с -1, т.к. значения в this.TableRowsBottom в любом случае неотрицательные
-                if ( 0 != CurRow && false === this.RowsInfo[CurRow].FirstPage )
-                {
-                    if ( this.TableRowsBottom[CurRow - 1][CurPage] < MaxBotValue_vmerge )
-                    {
-                        // Поскольку мы правим настройку не текущей строки, надо подправить и
-                        // запись о рассчитанной высоте строки
-                        var Diff = MaxBotValue_vmerge - this.TableRowsBottom[CurRow - 1][CurPage];
-                        this.TableRowsBottom[CurRow - 1][CurPage] = MaxBotValue_vmerge;
-                        this.RowsInfo[CurRow - 1].H[CurPage] += Diff;
-                    }
-                }
-
-                // Здесь мы должны рассчитать ячейки, которые попали в вертикальное объединение и из-за этого не были рассчитаны
-                var CellsCount2 = Merged_Cell.length;
-                for (var TempCellIndex = 0; TempCellIndex < CellsCount2; TempCellIndex++)
-                {
-                    var Cell = Merged_Cell[TempCellIndex];
-                    var CurCell = Cell.Index;
-                    var GridSpan = Cell.Get_GridSpan();
-                    var CurGridCol = Cell.Metrics.StartGridCol;
-
-                    // Возьмем верхнюю ячейку теккущего объединения
-                    Cell = this.Internal_Get_StartMergedCell(CurRow, CurGridCol, GridSpan);
-
-                    var CellMar = Cell.Get_Margins();
-                    var CellMetrics = Row.Get_CellInfo(CurCell);
-
-                    var X_content_start = CellMetrics.X_content_start;
-                    var X_content_end = CellMetrics.X_content_end;
-
-                    // Если в текущей строке на данной странице не убралось ничего из других ячеек, тогда
-                    // рассчитываем вертикально объединенные ячейки до начала данной строки.
-                    var Y_content_start = Cell.Temp.Y;
-                    var Y_content_end   = false === bContentOnFirstPage ? Y : this.Pages[CurPage].YLimit;
-
-                    // TODO: При расчете YLimit для ячейки сделать учет толщины нижних
-                    //       границ ячейки и таблицы
-                    if (null != CellSpacing)
-                    {
-                        if (this.Content.length - 1 === CurRow)
-                            Y_content_end -= CellSpacing;
-                        else
-                            Y_content_end -= CellSpacing / 2;
-                    }
-
-                    var VMergeCount = this.Internal_GetVertMergeCount(CurRow, CurGridCol, GridSpan);
-                    var BottomMargin = this.MaxBotMargin[CurRow + VMergeCount - 1];
-                    Y_content_end -= BottomMargin;
-
-                    if ((0 === Cell.Row.Index && 0 === CurPage) || Cell.Row.Index > FirstRow)
-                    {
-                        Cell.PagesCount = 1;
-                        Cell.Content.Set_StartPage(CurPage);
-                        Cell.Content.Reset(X_content_start, Y_content_start, X_content_end, Y_content_end);
-                    }
-
-                    // Какие-то ячейки в строке могут быть не разбиты на строки, а какие то разбиты.
-                    // Здесь контролируем этот момент, чтобы у тех, которые не разбиты не вызывать
-                    // Recalculate_Page от несуществующих страниц.
-                    var CellPageIndex = CurPage - Cell.Content.Get_StartPage_Relative();
-                    if (CellPageIndex < Cell.PagesCount)
-                    {
-                        if (recalcresult2_NextPage === Cell.Content.Recalculate_Page(CellPageIndex, true))
-                        {
-                            Cell.PagesCount = Cell.Content.Pages.length + 1;
-                            bNextPage = true;
-                        }
-
-                        var CellContentBounds = Cell.Content.Get_PageBounds(CellPageIndex, undefined, true);
-                        var CellContentBounds_Bottom = CellContentBounds.Bottom + BottomMargin;
-
-                        if (0 != CurRow && false === this.RowsInfo[CurRow].FirstPage)
-                        {
-                            if (this.TableRowsBottom[CurRow - 1][CurPage] < CellContentBounds_Bottom)
-                            {
-                                // Поскольку мы правим настройку не текущей строки, надо подправить и
-                                // запись о рассчитанной высоте строки
-                                var Diff = CellContentBounds_Bottom - this.TableRowsBottom[CurRow - 1][CurPage];
-                                this.TableRowsBottom[CurRow - 1][CurPage] = CellContentBounds_Bottom;
-                                this.RowsInfo[CurRow - 1].H[CurPage] += Diff;
-                            }
-                        }
-                        else
-                        {
-                            if (undefined === this.TableRowsBottom[CurRow][CurPage] || this.TableRowsBottom[CurRow][CurPage] < CellContentBounds_Bottom)
-                                this.TableRowsBottom[CurRow][CurPage] = CellContentBounds_Bottom;
-                        }
-                    }
-
-                    CurGridCol += GridSpan;
-                }
-
-
-                // Еще раз обновляем параметр, есть ли текст на первой странице
-                bContentOnFirstPage = false;
-                for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                {
-                    var Cell   = Row.Get_Cell( CurCell );
-                    var Vmerge = Cell.Get_VMerge();
-
-                    // Проверяем только начальные ячейки вертикального объединения..
-                    if ( vmerge_Continue === Vmerge )
-                        continue;
-
-                    if ( true === Cell.Content_Is_ContentOnFirstPage() )
-                    {
-                        bContentOnFirstPage = true;
-                        break;
-                    }
-                }
-
-                this.RowsInfo[CurRow].FirstPage = bContentOnFirstPage;
-            }
-
-            // Выставляем так, чтобы высота была равна 0
-            if (true !== this.RowsInfo[CurRow].FirstPage && CurPage === this.RowsInfo[CurRow].StartPage)
-                this.TableRowsBottom[CurRow][CurPage] = Y;
-
-            // Здесь мы выставляем только начальную координату строки (для каждой страницы)
-            // высоту строки(для каждой страницы) мы должны обсчитать после общего цикла, т.к.
-            // в одной из следйющих строк может оказаться ячейка с вертикальным объединением,
-            // захватывающим данную строку. Значит, ее содержимое может изменить высоту нашей строки.
-            var TempY            = Y;
-            var TempMaxTopBorder = MaxTopBorder[CurRow];
-
-            if ( null != CellSpacing )
-            {
-                this.RowsInfo[CurRow].Y[CurPage]            = TempY;
-                this.RowsInfo[CurRow].TopDy[CurPage]        = 0;
-                this.RowsInfo[CurRow].X0                    = Row_x_min;
-                this.RowsInfo[CurRow].X1                    = Row_x_max;
-                this.RowsInfo[CurRow].MaxTopBorder[CurPage] = TempMaxTopBorder;
-                this.RowsInfo[CurRow].MaxBotBorder          = MaxBotBorder[CurRow];
-            }
-            else
-            {
-                this.RowsInfo[CurRow].Y[CurPage]            = TempY - TempMaxTopBorder;
-                this.RowsInfo[CurRow].TopDy[CurPage]        = TempMaxTopBorder;
-                this.RowsInfo[CurRow].X0                    = Row_x_min;
-                this.RowsInfo[CurRow].X1                    = Row_x_max;
-                this.RowsInfo[CurRow].MaxTopBorder[CurPage] = TempMaxTopBorder;
-                this.RowsInfo[CurRow].MaxBotBorder          = MaxBotBorder[CurRow];
-            }
-
-            var CellHeight = this.TableRowsBottom[CurRow][CurPage] - Y;
-
-            // TODO: улучшить проверку на высоту строки (для строк разбитых на страницы)
-            if ( false === bNextPage && heightrule_AtLeast === RowH.HRule && CellHeight < RowH.Value )
-            {
-                CellHeight = RowH.Value;
-                this.TableRowsBottom[CurRow][CurPage] = Y + CellHeight;
-            }
-
-            if ( null != CellSpacing )
-                this.RowsInfo[CurRow].H[CurPage] = CellHeight;
-            else
-                this.RowsInfo[CurRow].H[CurPage] = CellHeight + TempMaxTopBorder;
-
-            Y           += CellHeight;
-            TableHeight += CellHeight;
-
-            Row.Height   = CellHeight;
-
-            Y           += MaxBotBorder[CurRow];
-            TableHeight += MaxBotBorder[CurRow];
-
-            if ( this.Content.length - 1 === CurRow )
-            {
-                if ( null != CellSpacing )
-                {
-                    TableHeight += CellSpacing;
-
-                    var TableBorder_Bottom = this.Get_Borders().Bottom;
-                    if ( border_Single === TableBorder_Bottom.Value )
-                        TableHeight += TableBorder_Bottom.Size;
-                }
-            }
-
-            if ( true === bNextPage )
-            {
-                LastRow = CurRow;
-                this.Pages[CurPage].LastRow = CurRow;
-
-                if  ( -1 === this.HeaderInfo.PageIndex && this.HeaderInfo.Count > 0 && CurRow >= this.HeaderInfo.Count )
-                    this.HeaderInfo.PageIndex = CurPage;
-
-                break;
-            }
-            else if ( this.Content.length - 1 === CurRow )
-            {
-                LastRow = this.Content.length - 1;
-                this.Pages[CurPage].LastRow = this.Content.length - 1;
-            }
-        }
-
-        // Сделаем вертикальное выравнивание ячеек в таблице. Делаем как Word, если ячейка разбилась на несколько
-        // страниц, тогда вертикальное выравнивание применяем только к первой странице.
-        // Делаем это не в общем цикле, потому что объединенные вертикально ячейки могут вносить поправки в значения
-        // this.TableRowsBottom, в последней строке.
-        for ( var CurRow = FirstRow; CurRow <= LastRow; CurRow++ )
-        {
-            var Row = this.Content[CurRow];
-            var CellsCount = Row.Get_CellsCount();
-            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-            {
-                var Cell = Row.Get_Cell( CurCell );
-                var VMergeCount = this.Internal_GetVertMergeCount( CurRow, Cell.Metrics.StartGridCol, Cell.Get_GridSpan() );
-
-                if ( VMergeCount > 1 && CurRow != LastRow )
-                    continue;
-                else
-                {
-                    var Vmerge = Cell.Get_VMerge();
-                    // Возьмем верхнюю ячейку теккущего объединения
-                    if ( vmerge_Restart != Vmerge )
-                    {
-                        Cell = this.Internal_Get_StartMergedCell( CurRow, Cell.Metrics.StartGridCol, Cell.Get_GridSpan() );
-                    }
-                }
-
-                var CellMar       = Cell.Get_Margins();
-                var VAlign        = Cell.Get_VAlign();
-                var CellPageIndex = CurPage - Cell.Content.Get_StartPage_Relative();
-
-                if ( CellPageIndex >= Cell.PagesCount )
-                    continue;
-
-                // Рассчитаем имеющуюся в распоряжении высоту ячейки
-                var TempCurRow = Cell.Row.Index;
-
-                // Для прилегания к верху или для второй страницы ничего не делаем (так изначально рассчитывалось)
-                if ( vertalignjc_Top === VAlign || CellPageIndex > 1 || (1 === CellPageIndex && true === this.RowsInfo[TempCurRow].FirstPage ) )
-                {
-                    Cell.Temp.Y_VAlign_offset[CellPageIndex] = 0;
-                    continue;
-                }
-
-                var TempCellSpacing = this.Content[TempCurRow].Get_CellSpacing();
-                var Y_0 = this.RowsInfo[TempCurRow].Y[CurPage];
-
-                if ( null === TempCellSpacing )
-                    Y_0 += MaxTopBorder[TempCurRow];
-
-                Y_0 += CellMar.Top.W;
-
-                var Y_1 = this.TableRowsBottom[CurRow][CurPage] - CellMar.Bottom.W;
-                var CellHeight = Y_1 - Y_0;
-
-                var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex, CellHeight, true );
-                var ContentHeight = CellContentBounds.Bottom - CellContentBounds.Top;
-
-                var Dy = 0;
-                if ( CellHeight - ContentHeight > 0.001 )
-                {
-                    if ( vertalignjc_Bottom === VAlign )
-                        Dy = CellHeight - ContentHeight;
-                    else if ( vertalignjc_Center === VAlign )
-                        Dy = (CellHeight - ContentHeight) / 2;
-
-                    Cell.Content.Shift( CellPageIndex, 0, Dy );
-                }
-
-                Cell.Temp.Y_VAlign_offset[CellPageIndex] = Dy;
-            }
-        }
-
-
-        // Просчитаем нижнюю границу таблицы на данной странице
-        var CurRow = LastRow;
-        if ( 0 === CurRow && false === this.RowsInfo[CurRow].FirstPage && 0 === CurPage )
-        {
-            // Таблица сразу переносится на следующую страницу
-            this.Pages[0].MaxBotBorder = 0;
-            this.Pages[0].BotBorders   = [];
-        }
-        else
-        {
-            // Если последняя строка на данной странице не имеет контента, тогда рассчитываем
-            // границу у предыдущей строки.
-            if ( false === this.RowsInfo[CurRow].FirstPage && CurPage === this.RowsInfo[CurRow].StartPage )
-                CurRow--;
-
-            var MaxBotBorder = 0;
-            var BotBorders   = [];
-
-            // Для ряда CurRow вычисляем нижнюю границу
-            if ( this.Content.length - 1 === CurRow )
-            {
-                // Для последнего ряда уже есть готовые нижние границы
-                var Row = this.Content[CurRow];
-                var CellsCount = Row.Get_CellsCount();
-                for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                {
-                    var Cell = Row.Get_Cell( CurCell );
-                    if ( vmerge_Continue === Cell.Get_VMerge() )
-                        Cell = this.Internal_Get_StartMergedCell( CurRow, Row.Get_CellInfo( CurCell ).StartGridCol, Cell.Get_GridSpan() );
-
-                    var Border_Info = Cell.Get_BorderInfo().Bottom;
-
-                    for ( var BorderId = 0; BorderId < Border_Info.length; BorderId++ )
-                    {
-                        var Border = Border_Info[BorderId];
-                        if ( border_Single === Border.Value && MaxBotBorder < Border.Size )
-                            MaxBotBorder = Border.Size;
-
-                        BotBorders.push( Border);
-                    }
-                }
-            }
-            else
-            {
-                var Row = this.Content[CurRow];
-                var CellSpacing = Row.Get_CellSpacing();
-                var CellsCount  = Row.Get_CellsCount();
-
-                if ( null != CellSpacing )
-                {
-                    // BotBorders можно не заполнять, т.к. у каждой ячейки своя граница,
-                    // нам надо только посчитать максимальную толщину.
-                    for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                    {
-                        var Cell = Row.Get_Cell( CurCell );
-                        var Border = Cell.Get_Borders().Bottom;
-
-                        if ( border_Single === Border.Value && MaxBotBorder < Border.Size )
-                            MaxBotBorder = Border.Size;
-                    }
-                }
-                else
-                {
-                    // Сравниваем нижнюю границу ячейки и нижнюю границу таблицы
-                    for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                    {
-                        var Cell = Row.Get_Cell( CurCell );
-
-                        if ( vmerge_Continue === Cell.Get_VMerge() )
-                        {
-                            Cell = this.Internal_Get_StartMergedCell( CurRow, Row.Get_CellInfo( CurCell ).StartGridCol, Cell.Get_GridSpan() );
-                            if ( null === Cell )
-                            {
-                                BotBorders.push( TableBorders.Bottom );
-                                continue;
-                            }
-                        }
-
-                        var Border = Cell.Get_Borders().Bottom;
-
-                        // Сравним границы
-                        var Result_Border = this.Internal_CompareBorders( Border, TableBorders.Bottom, false, true );
-                        if ( border_Single === Result_Border.Value && MaxBotBorder < Result_Border.Size )
-                            MaxBotBorder = Result_Border.Size;
-
-                        BotBorders.push( Result_Border );
-                    }
-                }
-            }
-
-            this.Pages[CurPage].MaxBotBorder = MaxBotBorder;
-            this.Pages[CurPage].BotBorders   = BotBorders;
-        }
-
-        this.Pages[CurPage].Bounds.Bottom = this.Pages[CurPage].Bounds.Top + TableHeight;
-        this.Pages[CurPage].Bounds.Left   = X_min + this.X;
-        this.Pages[CurPage].Bounds.Right  = X_max + this.X;
-        this.Pages[CurPage].Height        = TableHeight;
-
-        this.TurnOffRecalc = false;
-
-        this.Bounds = this.Pages[this.Pages.length - 1].Bounds;
-
-        if ( true == bNextPage )
-            return recalcresult_NextPage;
-        else
-            return recalcresult_NextElement;
     },
 
     // Данная функция вызывается после изменений внутри ячейки, а это означает, что с момента
     // последнего пересчета не изменилась ни сетка, ни границы, и ни расстояние между ячейками в таблицу.
     // Следовательно, нам надо пересчитать высоту ячейки, в которой произошли изменения,  и если
     // это приведет к изменению высоты строки, то пересчитываем все строки дальше.
+
     Internal_RecalculateFrom : function(RowIndex, CellIndex, bChange, bForceRecalc)
     {
         return editor.WordControl.m_oLogicDocument.Recalculate();
-
-        if ( true === this.TurnOffRecalc )
-            return;
-
-        /*
-        // TODO: временно
-        this.Internal_Recalculate_1();
-        this.Internal_OnContentRecalculate( true, 0, this.Index );
-        return;
-        */
-
-        this.TurnOffRecalc = true;
-
-        if ( false === bChange )
-        {
-            this.Internal_OnContentRecalculate( false, 0, this.Index );
-            this.TurnOffRecalc = false;
-            return;
-        }
-
-        var bNeedDocumentRecalculate = false;
-        var TableBorders = this.Get_Borders();
-
-        var Pages_new = [];
-        var TableRowsBottom_new = [];
-        var RowsInfo_new = [];
-
-        var Pages_old = this.Pages;
-        this.Pages = Pages_new;
-
-        Pages_new.length = 0;
-        Pages_new[0] =
-        {
-            Bounds :
-            {
-                Top    : this.Y,
-                Left   : this.X,
-                Right  : this.X + this.TableSumGrid[this.TableSumGrid.length - 1],
-                Bottom : this.Y
-            },
-            FirstRow  : 0,
-            Height    : 0,
-
-            Y            : this.Y,
-            YLimit       : this.YLimit,
-            MaxTopBorder : 0
-        };
-
-        var Y = this.Y;
-        var TableHeight = 0;
-
-        // Обнуляем таблицу суммарных высот ячеек
-        for ( var Index = -1; Index < this.Content.length; Index++ )
-        {
-            TableRowsBottom_new[Index] = [];
-            TableRowsBottom_new[Index][0] = 0;
-        }
-
-        var MaxTopBorder = this.MaxTopBorder;
-        var MaxBotBorder = this.MaxBotBorder;
-
-        // Изменение в ячейке приводят к изменению низа соответствующего ряда.
-        // Этот ряд может отличаться от ряда текущей ячейки (зависит от вертикального
-        // объединения ячеек).
-        var ChangeCell = this.Content[RowIndex].Get_Cell( CellIndex );
-        var ChangeVertAlign = this.Internal_GetVertMergeCount( RowIndex, this.Content[RowIndex].Get_CellInfo( CellIndex ).StartGridCol, ChangeCell.Get_GridSpan() );
-        var RowChange = RowIndex + ChangeVertAlign - 1;
-
-        var CurRow = 0;
-        var bNeedRecalc = false;
-
-        // Правые и левые границы на всех страницах одинаковы и не меняются в данной функции
-        var X_max = this.Pages[0].Bounds.Right;
-        var X_min = this.Pages[0].Bounds.Left;
-
-        var CurPage = 0;
-        for ( CurRow = 0; CurRow <= RowChange; CurRow++  )
-        {
-            var Row = this.Content[CurRow];
-            var CellsCount = Row.Get_CellsCount();
-            var CellSpacing = Row.Get_CellSpacing();
-
-            var BeforeInfo = Row.Get_Before();
-            var AfterInfo  = Row.Get_After();
-            var CurGridCol = BeforeInfo.GridBefore;
-
-            if ( 0 === CurRow )
-            {
-                if ( null != CellSpacing )
-                {
-                    var TableBorder_Top = this.Get_Borders().Top;
-                    if ( border_Single === TableBorder_Top.Value )
-                    {
-                        Y           += TableBorder_Top.Size;
-                        TableHeight += TableBorder_Top.Size;
-                    }
-
-                    Y           += CellSpacing;
-                    TableHeight += CellSpacing;
-                }
-            }
-            else
-            {
-                var PrevCellSpacing = this.Content[CurRow - 1].Get_CellSpacing();
-
-                if ( null != CellSpacing && null != PrevCellSpacing )
-                {
-                    Y           += (PrevCellSpacing + CellSpacing) / 2;
-                    TableHeight += (PrevCellSpacing + CellSpacing) / 2;
-                }
-                else if ( null != CellSpacing )
-                {
-                    Y           += CellSpacing / 2;
-                    TableHeight += CellSpacing / 2;
-                }
-                else if ( null != PrevCellSpacing )
-                {
-                    Y           += PrevCellSpacing / 2;
-                    TableHeight += PrevCellSpacing / 2;
-                }
-            }
-
-            Y           += MaxTopBorder[CurRow];
-            TableHeight += MaxTopBorder[CurRow];
-
-            // Разбивается ли данная строка на несколько страниц
-            var LastPage = CurPage;
-            var Pages_Y_Pos = [];
-            var Pages_Max_Top_Border = [];
-
-            // Дополнительный параметр для случая, если данная строка начнется с новой страницы.
-            // Мы запоминаем максимальное значение нижней границы(первой страницы (текущей)) у ячеек,
-            // объединенных вертикально так, чтобы это объединение заканчивалось на данной строке.
-            // И если данная строка начнется сразу с новой страницы (Pages > 0, FirstPage = false), тогда
-            // мы должны данный параметр сравнить со значением нижней границы предыдущей строки.
-            var MaxBotValue_vmerge = -1;
-
-            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-            {
-                var Cell = Row.Get_Cell( CurCell );
-                var GridSpan = Cell.Get_GridSpan();
-                var Vmerge = Cell.Get_VMerge();
-                var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
-
-                var CurPage_old = CurPage;
-                Cell.Temp.CurPage = CurPage;
-
-                if ( VMergeCount > 1 )
-                {
-                    CurGridCol += GridSpan;
-                    continue;
-                }
-                else
-                {
-                    // Возьмем верхнюю ячейку теккущего объединения
-                    if ( vmerge_Restart != Vmerge )
-                    {
-                        Cell = this.Internal_Get_StartMergedCell( CurRow, CurGridCol, GridSpan );
-                        CurPage = Cell.Temp.CurPage;
-                    }
-                }
-                var BottomMargin = this.MaxBotMargin[CurRow + VMergeCount - 1];
-
-                var PagesCount = Cell.Content_Get_PagesCount();
-                for ( var PageIndex = 0; PageIndex < PagesCount; PageIndex++ )
-                {
-                    var CellContentBounds = Cell.Content_Get_PageBounds(PageIndex);
-                    var CellContentBounds_Bottom = CellContentBounds.Bottom + BottomMargin;
-
-                    if ( CurPage + PageIndex >= CurPage_old )
-                    {
-                        if ( vmerge_Continue === Vmerge && CurPage + PageIndex === CurPage_old )
-                        {
-                            if ( -1 === MaxBotValue_vmerge || MaxBotValue_vmerge < CellContentBounds_Bottom )
-                                MaxBotValue_vmerge = CellContentBounds_Bottom;
-                        }
-
-                        if ( "undefined" === typeof(TableRowsBottom_new[CurRow]) || "undefined" === typeof(TableRowsBottom_new[CurRow][CurPage + PageIndex]) || TableRowsBottom_new[CurRow][CurPage + PageIndex] < CellContentBounds_Bottom )
-                        {
-                            if ( "undefined" === typeof(TableRowsBottom_new[CurRow]) )
-                                TableRowsBottom_new[CurRow] = [];
-
-                            TableRowsBottom_new[CurRow][CurPage + PageIndex] = CellContentBounds_Bottom;
-                        }
-
-                        if ( 0 != PageIndex )
-                        {
-                            if ( "undefined" === typeof(Pages_new[CurPage + PageIndex]) )
-                            {
-                                var StartPos    = this.Parent.Get_PageContentStartPos( CurPage + PageIndex );
-                                var StartRowPos = this.Get_PageContentStartPos( CurPage + PageIndex, CurRow, CurCell );
-
-                                Pages_new[CurPage + PageIndex] =
-                                {
-                                    Bounds :
-                                    {
-                                        Top    : StartPos.Y,
-                                        Left   : this.X,
-                                        Right  : this.X + this.TableSumGrid[this.TableSumGrid.length - 1],
-                                        Bottom : StartPos.Y
-                                    },
-                                    FirstRow  : CurRow,
-                                    Height    : 0,
-                                    Y            : StartRowPos.Y,
-                                    YLimit       : StartRowPos.YLimit,
-                                    MaxTopBorder : StartRowPos.MaxTopBorder
-                                };
-
-                                Pages_Y_Pos[CurPage + PageIndex]          = StartRowPos.Y;
-                                Pages_Max_Top_Border[CurPage + PageIndex] = StartRowPos.MaxTopBorder;
-
-                            }
-                        }
-
-                        if ( LastPage < CurPage + PageIndex )
-                            LastPage = CurPage + PageIndex;
-                    }
-                    else
-                    {
-                        // Такое может случится, если текущая ячейка попала в вертикальное объединение,
-                        // такое что по одному из промежуточных рядов данного объединения произошли
-                        // переносы страниц. Тогда находим ряд, на котором произошел перенос страницы
-                        // и сравниваем нижние границы ячеек.
-
-                        var TempRow = Pages_new[CurPage + PageIndex + 1].FirstRow;
-
-                        // Часть строки расположена на первой странице
-                        if ( true === this.RowsInfo[TempRow].FirstPage )
-                        {
-                            if ( "undefined" === typeof(TableRowsBottom_new[TempRow]) || "undefined" === typeof(TableRowsBottom_new[TempRow][CurPage + PageIndex]) || TableRowsBottom_new[TempRow][CurPage + PageIndex] < CellContentBounds_Bottom )
-                            {
-                                if ( "undefined" === typeof(TableRowsBottom_new[TempRow]) )
-                                    TableRowsBottom_new[TempRow] = [];
-
-                                TableRowsBottom_new[TempRow][CurPage + PageIndex] = CellContentBounds_Bottom;
-                            }
-                        }
-                        // Строка начинается сразу с новой страницы. В этом случае, мы должны сравнить
-                        // нижние границы предыдущей строки и содержимого у данной ячейки на этой странице.
-                        else if ( TempRow > 0 )
-                        {
-                            if ( "undefined" === typeof(TableRowsBottom_new[TempRow - 1]) || "undefined" === typeof(TableRowsBottom_new[TempRow - 1][CurPage + PageIndex]) || TableRowsBottom_new[TempRow - 1][CurPage + PageIndex] < CellContentBounds_Bottom )
-                            {
-                                if ( "undefined" === typeof(TableRowsBottom_new[TempRow - 1]) )
-                                    TableRowsBottom_new[TempRow - 1] = [];
-
-                                TableRowsBottom_new[TempRow - 1][CurPage + PageIndex] = CellContentBounds_Bottom;
-                            }
-                        }
-                    }
-                }
-
-                CurPage = CurPage_old;
-
-                CurGridCol += GridSpan;
-            }
-
-            var RowH = Row.Get_Height();
-
-            RowsInfo_new[CurRow] = {};
-            RowsInfo_new[CurRow].Pages = LastPage - CurPage + 1;
-            RowsInfo_new[CurRow].Y            = [];
-            RowsInfo_new[CurRow].H            = [];
-            RowsInfo_new[CurRow].TopDy        = [];
-            RowsInfo_new[CurRow].MaxTopBorder = [];
-            RowsInfo_new[CurRow].FirstPage    = true;
-            RowsInfo_new[CurRow].StartPage    = CurPage;
-
-            // Здесь мы выставляем только начальную координату строки (для каждой страницы)
-            // высоту строки(для каждой страницы) мы должны обсчитать после общего цикла, т.к.
-            // в одной из следйющих строк может оказаться ячейка с вертикальным объединением,
-            // захватытвающим данную строку. Значит, ее содержимое может изменить высоту нашей строки.
-            for ( var PageIndex = 0; PageIndex < RowsInfo_new[CurRow].Pages; PageIndex++ )
-            {
-                var TempY = Y;
-                var TempMaxTopBorder = MaxTopBorder[CurRow];
-
-                if ( 0 != PageIndex )
-                {
-                    TempY            = Pages_Y_Pos[CurPage + PageIndex];
-                    TempMaxTopBorder = Pages_Max_Top_Border[CurPage + PageIndex];
-
-                    if ( 1 === PageIndex )
-                    {
-                        // Проверяем есть ли хоть какой-либо контент данной строки на первой страницы,
-                        // т.е. реально данная строка начинается со 2-ой страницы.
-
-                        var bContentOnFirstPage = false;
-                        for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                        {
-                            var Cell = Row.Get_Cell( CurCell );
-                            var Vmerge = Cell.Get_VMerge();
-
-                            // Проверяем только начальные ячейки вертикального объединения, т.к.
-                            // не начальные ячейки объединения относятся к другим строкам, и ячейки
-                            // у которых Vmerge_count = 1, поскольку обсчитаны только они. Ячейки,
-                            // у которыз Vmerge_count > 1 внесут поправки позже (во время своего обсчета).
-                            var VMergeCount = this.Internal_GetVertMergeCount( CurRow, Row.Get_CellInfo( CurCell ).StartGridCol, Cell.Get_GridSpan() );
-
-                            if ( vmerge_Continue === Vmerge || VMergeCount > 1 )
-                                continue;
-
-                            if ( true === Cell.Content_Is_ContentOnFirstPage() )
-                            {
-                                bContentOnFirstPage = true;
-                                break;
-                            }
-                        }
-
-                        RowsInfo_new[CurRow].FirstPage = bContentOnFirstPage;
-
-                        if ( 0 != CurRow && false === RowsInfo_new[CurRow].FirstPage )
-                        {
-                            if ( TableRowsBottom_new[CurRow - 1][CurPage] < MaxBotValue_vmerge )
-                                TableRowsBottom_new[CurRow - 1][CurPage] = MaxBotValue_vmerge;
-                        }
-                    }
-                }
-
-                if ( null != CellSpacing )
-                {
-                    RowsInfo_new[CurRow].Y[CurPage + PageIndex]            = TempY;
-                    RowsInfo_new[CurRow].TopDy[CurPage + PageIndex]        = 0;
-                    RowsInfo_new[CurRow].X0                                = this.RowsInfo[CurRow].X0;
-                    RowsInfo_new[CurRow].X1                                = this.RowsInfo[CurRow].X1;
-                    RowsInfo_new[CurRow].MaxTopBorder[CurPage + PageIndex] = TempMaxTopBorder;
-                    RowsInfo_new[CurRow].MaxBotBorder                      = MaxBotBorder[CurRow];
-                }
-                else
-                {
-                    RowsInfo_new[CurRow].Y[CurPage + PageIndex]            = TempY - TempMaxTopBorder;
-                    RowsInfo_new[CurRow].TopDy[CurPage + PageIndex]        = TempMaxTopBorder;
-                    RowsInfo_new[CurRow].X0                                = this.RowsInfo[CurRow].X0;
-                    RowsInfo_new[CurRow].X1                                = this.RowsInfo[CurRow].X1;
-                    RowsInfo_new[CurRow].MaxTopBorder[CurPage + PageIndex] = TempMaxTopBorder;
-                    RowsInfo_new[CurRow].MaxBotBorder                      = MaxBotBorder[CurRow];
-                }
-            }
-
-
-            if ( LastPage != CurPage )
-            {
-                // TODO: Надо вынести из общего цеикла пересчет границы для каждой страницы,
-                //       потому что значения TableRowsBottom_new[CurRow][CurPage] могут измениться
-                //       в следующих строках.
-
-                // Сначала обсчитаем границы первой страницы данной строки
-                var TempCellHeight = TableRowsBottom_new[CurRow][CurPage] - Y;
-                TableHeight += TempCellHeight + MaxBotBorder[CurRow];
-
-                if ( null != CellSpacing )
-                    TableHeight += CellSpacing / 2;
-
-                if ( border_Single === TableBorders.Bottom.Value )
-                    TableHeight += TableBorders.Bottom.Size;
-
-                Pages_new[CurPage].Bounds.Bottom = Pages_new[CurPage].YLimit;//Pages_new[CurPage].Bounds.Top + TableHeight;
-                Pages_new[CurPage].Bounds.Left   = X_min;
-                Pages_new[CurPage].Bounds.Right  = X_max;
-                Pages_new[CurPage].Height        = TableHeight;
-
-                // Обсчитаем границы промежуточных страницу данной строки
-                for ( var PageId = CurPage + 1; PageId < LastPage; PageId++ )
-                {
-                    Y           = this.Parent.Get_PageContentStartPos( CurPage + PageId, CurRow, 0 ).Y;
-                    TableHeight = 0;
-
-                    if ( null != CellSpacing )
-                    {
-                        if ( border_Single === TableBorders.Top.Value )
-                        {
-                            Y           += TableBorders.Top.Size;
-                            TableHeight += TableBorders.Top.Size;
-                        }
-
-                        if ( 0 === CurRow )
-                        {
-                            Y           += CellSpacing;
-                            TableHeight += CellSpacing;
-                        }
-                        else
-                        {
-                            Y           += CellSpacing / 2;
-                            TableHeight += CellSpacing / 2;
-                        }
-                    }
-
-                    Y           += Pages_Max_Top_Border[LastPage];
-                    TableHeight += Pages_Max_Top_Border[LastPage];
-
-                    TempCellHeight = TableRowsBottom_new[CurRow][PageId] - Y;
-                    TableHeight += TempCellHeight + MaxBotBorder[CurRow];
-
-                    if ( null != CellSpacing )
-                        TableHeight += CellSpacing / 2;
-
-                    if ( border_Single === TableBorders.Bottom.Value )
-                        TableHeight += TableBorders.Bottom.Size;
-
-                    Pages_new[PageId].Bounds.Bottom = Pages_new[PageId].YLimit;//Pages_new[PageId].Bounds.Top + TableHeight;
-                    Pages_new[PageId].Bounds.Left   = X_min;
-                    Pages_new[PageId].Bounds.Right  = X_max;
-                    Pages_new[PageId].Height        = TableHeight;
-                }
-
-
-                // Обсчитаем текущие координату по Y и высоту таблицы для последнй страницы данной строки
-                TableHeight = 0;
-                Y           = this.Parent.Get_PageContentStartPos( LastPage ).Y;
-
-                if ( null != CellSpacing )
-                {
-                    if ( border_Single === TableBorders.Top.Value )
-                    {
-                        Y           += TableBorders.Top.Size;
-                        TableHeight += TableBorders.Top.Size;
-                    }
-
-                    if ( 0 === CurRow )
-                    {
-                        Y           += CellSpacing;
-                        TableHeight += CellSpacing;
-                    }
-                    else
-                    {
-                        Y           += CellSpacing / 2;
-                        TableHeight += CellSpacing / 2;
-                    }
-                }
-
-                Y           += Pages_Max_Top_Border[LastPage];
-                TableHeight += Pages_Max_Top_Border[LastPage];
-            }
-
-            var CellHeight = TableRowsBottom_new[CurRow][LastPage] - Y;
-            // TODO: улучшить проверку на высоту строки (для строк разбитых на страницы)
-            if ( LastPage === CurPage && heightrule_AtLeast === RowH.HRule && CellHeight < RowH.Value )
-            {
-                CellHeight = RowH.Value;
-                TableRowsBottom_new[CurRow][CurPage] = Y + CellHeight;
-            }
-
-            Y           += CellHeight;
-            TableHeight += CellHeight;
-
-            if ( RowChange === CurRow && ( Math.abs( Row.Height - CellHeight ) > 0.01 || Row.PagesCount != LastPage - CurPage + 1 ) )
-            {
-                Row.Height     = CellHeight;
-                Row.PagesCount = LastPage - CurPage + 1;
-
-                bNeedRecalc = true;
-            }
-
-            Y           += MaxBotBorder[CurRow];
-            TableHeight += MaxBotBorder[CurRow];
-
-            if ( this.Content.length - 1 === CurRow )
-            {
-                if ( null != CellSpacing )
-                {
-                    TableHeight += CellSpacing;
-
-                    var TableBorder_Bottom = this.Get_Borders().Bottom;
-                    if ( border_Single === TableBorder_Bottom.Value )
-                        TableHeight += TableBorder_Bottom.Size;
-                }
-            }
-
-            CurPage = LastPage;
-        }
-
-        if ( true === bNeedRecalc || true === bForceRecalc )
-        {
-            for ( CurRow = RowChange + 1; CurRow < this.Content.length; CurRow++  )
-            {
-                var Row = this.Content[CurRow];
-                var CellsCount = Row.Get_CellsCount();
-                var CellSpacing = Row.Get_CellSpacing();
-
-                var BeforeInfo = Row.Get_Before();
-                var AfterInfo  = Row.Get_After();
-                var CurGridCol = BeforeInfo.GridBefore;
-
-                if ( 0 === CurRow )
-                {
-                    if ( null != CellSpacing )
-                    {
-                        var TableBorder_Top = this.Get_Borders().Top;
-                        if ( border_Single === TableBorder_Top.Value )
-                        {
-                            Y           += TableBorder_Top.Size;
-                            TableHeight += TableBorder_Top.Size;
-                        }
-
-                        Y           += CellSpacing;
-                        TableHeight += CellSpacing;
-                    }
-                }
-                else
-                {
-                    var PrevCellSpacing = this.Content[CurRow - 1].Get_CellSpacing();
-
-                    if ( null != CellSpacing && null != PrevCellSpacing )
-                    {
-                        Y           += (PrevCellSpacing + CellSpacing) / 2;
-                        TableHeight += (PrevCellSpacing + CellSpacing) / 2;
-                    }
-                    else if ( null != CellSpacing )
-                    {
-                        Y           += CellSpacing / 2;
-                        TableHeight += CellSpacing / 2;
-                    }
-                    else if ( null != PrevCellSpacing )
-                    {
-                        Y           += PrevCellSpacing / 2;
-                        TableHeight += PrevCellSpacing / 2;
-                    }
-                }
-
-                Y           += MaxTopBorder[CurRow];
-                TableHeight += MaxTopBorder[CurRow];
-
-                var Row_x_max = 0;
-                var Row_x_min = 0;
-
-                // Разбивается ли данная строка на несколько страниц
-                var LastPage = CurPage;
-                var Pages_Y_Pos = [];
-                var Pages_Max_Top_Border = [];
-
-                // Дополнительный параметр для случая, если данная строка начнется с новой страницы.
-                // Мы запоминаем максимальное значение нижней границы(первой страницы (текущей)) у ячеек,
-                // объединенных вертикально так, чтобы это объединение заканчивалось на данной строке.
-                // И если данная строка начнется сразу с новой страницы (Pages > 0, FirstPage = false), тогда
-                // мы должны данный параметр сравнить со значением нижней границы предыдущей строки.
-                var MaxBotValue_vmerge = -1;
-
-                for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                {
-                    var Cell = Row.Get_Cell( CurCell );
-                    var GridSpan = Cell.Get_GridSpan();
-                    var Vmerge = Cell.Get_VMerge();
-
-                    // начальная и конечная точки данного GridSpan'a
-                    var X_grid_start = this.X + this.TableSumGrid[CurGridCol - 1];
-                    var X_grid_end   = this.X + this.TableSumGrid[CurGridCol + GridSpan - 1];
-
-                    // границы самой ячейки
-                    var X_cell_start = X_grid_start;
-                    var X_cell_end   = X_grid_end;
-
-                    if ( null != CellSpacing )
-                    {
-
-                        if ( 0 === CurCell )
-                        {
-                            if ( 0 === BeforeInfo.GridBefore )
-                            {
-                                if ( border_None === TableBorders.Left.Value || CellSpacing > TableBorders.Left.Size / 2 )
-                                    X_cell_start += CellSpacing;
-                                else
-                                    X_cell_start += TableBorders.Left.Size / 2;
-                            }
-                            else
-                            {
-                                if ( border_None === TableBorders.Left.Value || CellSpacing > TableBorders.Left.Size ) // CellSpacing / 2 > TableBorders.Left.Size / 2
-                                    X_cell_start += CellSpacing / 2;
-                                else
-                                    X_cell_start += TableBorders.Left.Size / 2;
-                            }
-                        }
-                        else
-                            X_cell_start += CellSpacing / 2;
-
-                        if ( CellsCount - 1 === CurCell )
-                        {
-                            if ( 0 === AfterInfo.GridAfter )
-                            {
-                                if ( border_None === TableBorders.Right.Value || CellSpacing > TableBorders.Right.Size / 2 )
-                                    X_cell_end -= CellSpacing;
-                                else
-                                    X_cell_end -= TableBorders.Right.Size / 2;
-                            }
-                            else
-                            {
-                                if ( border_None === TableBorders.Right.Value || CellSpacing > TableBorders.Right.Size ) // CellSpacing / 2 > TableBorders.Right.Size / 2
-                                    X_cell_end -= CellSpacing / 2;
-                                else
-                                    X_cell_end -= TableBorders.Right.Size / 2;
-                            }
-                        }
-                        else
-                            X_cell_end -= CellSpacing / 2;
-                    }
-
-                    var CellMar = Cell.Get_Margins();
-
-                    var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
-
-                    // начальная и конечная точка для содержимого данной ячейки
-                    var X_content_start = X_cell_start;
-                    var X_content_end   = X_cell_end;
-
-                    // Левая и правая границы ячейки рисуются вовнутрь ячейки, если Spacing != null.
-                    var CellBorders = Cell.Get_Borders();
-                    if ( null != CellSpacing )
-                    {
-                        X_content_start += CellMar.Left.W;
-                        X_content_end   -= CellMar.Right.W;
-
-                        if ( border_Single === CellBorders.Left.Value )
-                            X_content_start += CellBorders.Left.Size;
-
-                        if ( border_Single === CellBorders.Right.Value )
-                            X_content_end -= CellBorders.Right.Size;
-                    }
-                    else
-                    {
-                        if ( vmerge_Continue === Vmerge )
-                        {
-                            X_content_start += CellMar.Left.W;
-                            X_content_end   -= CellMar.Right.W;
-                        }
-                        else
-                        {
-                            var BorderInfo = Cell.Get_BorderInfo();
-
-                            var Max_r_w = BorderInfo.MaxRight;
-                            var Max_l_w = BorderInfo.MaxLeft;
-
-                            if ( Max_l_w / 2 > CellMar.Left.W )
-                                X_content_start += Max_l_w / 2;
-                            else
-                                X_content_start += CellMar.Left.W;
-
-                            if ( Max_r_w / 2 > CellMar.Right.W )
-                                X_content_end -= Max_r_w / 2;
-                            else
-                                X_content_end -= CellMar.Right.W;
-                        }
-                    }
-
-                    if ( 0 === CurCell )
-                    {
-                        if ( null != CellSpacing )
-                        {
-                            Row_x_min = X_grid_start;
-                            if ( border_Single === TableBorders.Left.Value )
-                                Row_x_min -= TableBorders.Left.Size / 2;
-                        }
-                        else
-                        {
-                            var BorderInfo = Cell.Get_BorderInfo();
-                            Row_x_min = X_grid_start - BorderInfo.MaxLeft / 2;
-                        }
-                    }
-
-                    if ( CellsCount - 1 === CurCell )
-                    {
-                        if ( null != CellSpacing )
-                        {
-                            Row_x_max = X_grid_end;
-                            if ( border_Single === TableBorders.Right.Value )
-                                Row_x_max += TableBorders.Right.Size / 2;
-                        }
-                        else
-                        {
-                            var BorderInfo = Cell.Get_BorderInfo();
-                            Row_x_max = X_grid_end + BorderInfo.MaxRight / 2;
-                        }
-                    }
-
-                    Row.Set_CellInfo( CurCell, CurGridCol, X_grid_start, X_grid_end, X_cell_start, X_cell_end, X_content_start, X_content_end );
-
-                    var Y_content_start = Y + CellMar.Top.W;
-                    var CurPage_old = CurPage;
-
-                    Cell.Temp =
-                    {
-                        CurPage : CurPage,
-                        Y       : Y
-                    };
-
-                    if ( VMergeCount > 1 )
-                    {
-                        CurGridCol += GridSpan;
-                        continue;
-                    }
-                    else
-                    {
-                        // Возьмем верхнюю ячейку теккущего объединения
-                        if ( vmerge_Restart != Vmerge )
-                        {
-                            Cell = this.Internal_Get_StartMergedCell( CurRow, CurGridCol, GridSpan );
-                            CellMar = Cell.Get_Margins();
-
-                            Y_content_start = Cell.Temp.Y + CellMar.Top.W;
-                            CurPage         = Cell.Temp.CurPage;
-                        }
-                    }
-
-                    // TODO: При расчете YLimit для ячейки сделать учет толщины нижних
-                    //       границ ячейки и таблицы
-                    var Y_content_end = Pages_new[CurPage].YLimit;
-                    if ( null != CellSpacing )
-                    {
-                        if ( this.Content.length - 1 === CurRow )
-                            Y_content_end -= CellSpacing;
-                        else
-                            Y_content_end -= CellSpacing / 2;
-                    }
-
-                    var BottomMargin = this.MaxBotMargin[CurRow + VMergeCount - 1];
-                    Y_content_end -= BottomMargin;
-
-                    Cell.Content_Set_StartPage( CurPage );
-                    Cell.Content_Reset( X_content_start, Y_content_start, X_content_end, Y_content_end );
-                    Cell.Recalculate();
-
-                    var PagesCount = Cell.Content_Get_PagesCount();
-                    for ( var PageIndex = 0; PageIndex < PagesCount; PageIndex++ )
-                    {
-                        var CellContentBounds = Cell.Content_Get_PageBounds(PageIndex);
-                        var CellContentBounds_Bottom = CellContentBounds.Bottom + BottomMargin;
-
-                        if ( CurPage + PageIndex >= CurPage_old )
-                        {
-                            if ( vmerge_Continue === Vmerge && CurPage + PageIndex === CurPage_old )
-                            {
-                                if ( -1 === MaxBotValue_vmerge || MaxBotValue_vmerge < CellContentBounds_Bottom )
-                                    MaxBotValue_vmerge = CellContentBounds_Bottom;
-                            }
-
-                            if ( "undefined" === typeof(TableRowsBottom_new[CurRow]) || "undefined" === typeof(TableRowsBottom_new[CurRow][CurPage + PageIndex]) || TableRowsBottom_new[CurRow][CurPage + PageIndex] < CellContentBounds_Bottom )
-                            {
-                                if ( "undefined" === typeof(TableRowsBottom_new[CurRow]) )
-                                    TableRowsBottom_new[CurRow] = [];
-
-                                TableRowsBottom_new[CurRow][CurPage + PageIndex] = CellContentBounds_Bottom;
-                            }
-
-                            if ( 0 != PageIndex )
-                            {
-                                if ( "undefined" === typeof(Pages_new[CurPage + PageIndex]) )
-                                {
-                                    var StartPos = this.Parent.Get_PageContentStartPos( CurPage + PageIndex );
-                                    var StartRowPos = this.Get_PageContentStartPos( CurPage + PageIndex, CurRow, CurCell );
-
-                                    Pages_new[CurPage + PageIndex] =
-                                    {
-                                        Bounds :
-                                        {
-                                            Top    : StartPos.Y,
-                                            Left   : this.X,
-                                            Right  : this.X + this.TableSumGrid[this.TableSumGrid.length - 1],
-                                            Bottom : StartPos.Y
-                                        },
-                                        FirstRow  : CurRow,
-                                        Height    : 0,
-                                        Y            : StartRowPos.Y,
-                                        YLimit       : StartRowPos.YLimit,
-                                        MaxTopBorder : StartRowPos.MaxTopBorder
-                                    };
-
-                                    Pages_Y_Pos[CurPage + PageIndex]          = StartRowPos.Y;
-                                    Pages_Max_Top_Border[CurPage + PageIndex] = StartRowPos.MaxTopBorder;
-
-                                }
-                            }
-
-                            if ( LastPage < CurPage + PageIndex )
-                                LastPage = CurPage + PageIndex;
-                        }
-                        else
-                        {
-                            // Такое может случится, если текущая ячейка попала в вертикальное объединение,
-                            // такое что по одному из промежуточных рядов данного объединения произошли
-                            // переносы страниц. Тогда находим ряд, на котором произошел перенос страницы
-                            // и сравниваем нижние границы ячеек.
-
-                            var TempRow = Pages_new[CurPage + PageIndex + 1].FirstRow;
-
-                            // Часть строки расположена на первой странице
-                            if ( true === RowsInfo_new[TempRow].FirstPage )
-                            {
-                                if ( "undefined" === typeof(TableRowsBottom_new[TempRow]) || "undefined" === typeof(TableRowsBottom_new[TempRow][CurPage + PageIndex]) || TableRowsBottom_new[TempRow][CurPage + PageIndex] < CellContentBounds_Bottom )
-                                {
-                                    if ( "undefined" === typeof(TableRowsBottom_new[TempRow]) )
-                                        TableRowsBottom_new[TempRow] = [];
-
-                                    TableRowsBottom_new[TempRow][CurPage + PageIndex] = CellContentBounds_Bottom;
-                                }
-                            }
-                            // Строка начинается сразу с новой страницы. В этом случае, мы должны сравнить
-                            // нижние границы предыдущей строки и содержимого у данной ячейки на этой странице.
-                            else if ( TempRow > 0 )
-                            {
-                                if ( "undefined" === typeof(TableRowsBottom_new[TempRow - 1]) || "undefined" === typeof(TableRowsBottom_new[TempRow - 1][CurPage + PageIndex]) || TableRowsBottom_new[TempRow - 1][CurPage + PageIndex] < CellContentBounds_Bottom )
-                                {
-                                    if ( "undefined" === typeof(TableRowsBottom_new[TempRow - 1]) )
-                                        TableRowsBottom_new[TempRow - 1] = [];
-
-                                    TableRowsBottom_new[TempRow - 1][CurPage + PageIndex] = CellContentBounds_Bottom;
-                                }
-                            }
-                        }
-                    }
-
-                    CurPage = CurPage_old;
-
-                    CurGridCol += GridSpan;
-                }
-
-                var RowH = Row.Get_Height();
-
-                RowsInfo_new[CurRow] = {};
-                RowsInfo_new[CurRow].Pages = LastPage - CurPage + 1;
-                RowsInfo_new[CurRow].Y            = [];
-                RowsInfo_new[CurRow].H            = [];
-                RowsInfo_new[CurRow].TopDy        = [];
-                RowsInfo_new[CurRow].MaxTopBorder = [];
-                RowsInfo_new[CurRow].FirstPage    = true;
-                RowsInfo_new[CurRow].StartPage    = CurPage;
-
-                // Здесь мы выставляем только начальную координату строки (для каждой страницы)
-                // высоту строки(для каждой страницы) мы должны обсчитать после общего цикла, т.к.
-                // в одной из следйющих строк может оказаться ячейка с вертикальным объединением,
-                // захватытвающим данную строку. Значит, ее содержимое может изменить высоту нашей строки.
-                for ( var PageIndex = 0; PageIndex < RowsInfo_new[CurRow].Pages; PageIndex++ )
-                {
-                    var TempY = Y;
-                    var TempMaxTopBorder = MaxTopBorder[CurRow];
-
-                    if ( 0 != PageIndex )
-                    {
-                        TempY            = Pages_Y_Pos[CurPage + PageIndex];
-                        TempMaxTopBorder = Pages_Max_Top_Border[CurPage + PageIndex];
-
-                        if ( 1 === PageIndex )
-                        {
-                            // Проверяем есть ли хоть какой-либо контент данной строки на первой страницы,
-                            // т.е. реально данная строка начинается со 2-ой страницы.
-
-                            var bContentOnFirstPage = false;
-                            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                            {
-                                var Cell = Row.Get_Cell( CurCell );
-                                var Vmerge = Cell.Get_VMerge();
-
-                                // Проверяем только начальные ячейки вертикального объединения, т.к.
-                                // не начальные ячейки объединения относятся к другим строкам, и ячейки
-                                // у которых Vmerge_count = 1, поскольку обсчитаны только они. Ячейки,
-                                // у которыз Vmerge_count > 1 внесут поправки позже (во время своего обсчета).
-                                var VMergeCount = this.Internal_GetVertMergeCount( CurRow, Row.Get_CellInfo( CurCell ).StartGridCol, Cell.Get_GridSpan() );
-
-                                if ( vmerge_Continue === Vmerge || VMergeCount > 1 )
-                                    continue;
-
-                                if ( true === Cell.Content_Is_ContentOnFirstPage() )
-                                {
-                                    bContentOnFirstPage = true;
-                                    break;
-                                }
-                            }
-
-                            RowsInfo_new[CurRow].FirstPage = bContentOnFirstPage;
-
-                            if ( 0 != CurRow && false === RowsInfo_new[CurRow].FirstPage )
-                            {
-                                if ( TableRowsBottom_new[CurRow - 1][CurPage] < MaxBotValue_vmerge )
-                                    TableRowsBottom_new[CurRow - 1][CurPage] = MaxBotValue_vmerge;
-                            }
-                        }
-                    }
-
-                    if ( null != CellSpacing )
-                    {
-                        RowsInfo_new[CurRow].Y[CurPage + PageIndex]            = TempY;
-                        RowsInfo_new[CurRow].TopDy[CurPage + PageIndex]        = 0;
-                        RowsInfo_new[CurRow].X0                                = Row_x_min;
-                        RowsInfo_new[CurRow].X1                                = Row_x_max;
-                        RowsInfo_new[CurRow].MaxTopBorder[CurPage + PageIndex] = TempMaxTopBorder;
-                        RowsInfo_new[CurRow].MaxBotBorder                      = MaxBotBorder[CurRow];
-                    }
-                    else
-                    {
-                        RowsInfo_new[CurRow].Y[CurPage + PageIndex]            = TempY - TempMaxTopBorder;
-                        RowsInfo_new[CurRow].TopDy[CurPage + PageIndex]        = TempMaxTopBorder;
-                        RowsInfo_new[CurRow].X0                                = Row_x_min;
-                        RowsInfo_new[CurRow].X1                                = Row_x_max;
-                        RowsInfo_new[CurRow].MaxTopBorder[CurPage + PageIndex] = TempMaxTopBorder;
-                        RowsInfo_new[CurRow].MaxBotBorder                      = MaxBotBorder[CurRow];
-                    }
-                }
-
-
-                if ( LastPage != CurPage )
-                {
-                    // TODO: Надо вынести из общего цеикла пересчет границы для каждой страницы,
-                    //       потому что значения TableRowsBottom_new[CurRow][CurPage] могут измениться
-                    //       в следующих строках.
-
-                    // Сначала обсчитаем границы первой страницы данной строки
-                    var TempCellHeight = TableRowsBottom_new[CurRow][CurPage] - Y;
-                    TableHeight += TempCellHeight + MaxBotBorder[CurRow];
-
-                    if ( null != CellSpacing )
-                        TableHeight += CellSpacing / 2;
-
-                    if ( border_Single === TableBorders.Bottom.Value )
-                        TableHeight += TableBorders.Bottom.Size;
-
-                    Pages_new[CurPage].Bounds.Bottom = Pages_new[CurPage].YLimit;//Pages_new[CurPage].Bounds.Top + TableHeight;
-                    Pages_new[CurPage].Bounds.Left   = X_min;
-                    Pages_new[CurPage].Bounds.Right  = X_max;
-                    Pages_new[CurPage].Height        = TableHeight;
-
-                    // Обсчитаем границы промежуточных страницу данной строки
-                    for ( var PageId = CurPage + 1; PageId < LastPage; PageId++ )
-                    {
-                        Y           = this.Parent.Get_PageContentStartPos( CurPage + PageId, CurRow, 0 ).Y;
-                        TableHeight = 0;
-
-                        if ( null != CellSpacing )
-                        {
-                            if ( border_Single === TableBorders.Top.Value )
-                            {
-                                Y           += TableBorders.Top.Size;
-                                TableHeight += TableBorders.Top.Size;
-                            }
-
-                            if ( 0 === CurRow )
-                            {
-                                Y           += CellSpacing;
-                                TableHeight += CellSpacing;
-                            }
-                            else
-                            {
-                                Y           += CellSpacing / 2;
-                                TableHeight += CellSpacing / 2;
-                            }
-                        }
-
-                        Y           += Pages_Max_Top_Border[LastPage];
-                        TableHeight += Pages_Max_Top_Border[LastPage];
-
-                        TempCellHeight = TableRowsBottom_new[CurRow][PageId] - Y;
-                        TableHeight += TempCellHeight + MaxBotBorder[CurRow];
-
-                        if ( null != CellSpacing )
-                            TableHeight += CellSpacing / 2;
-
-                        if ( border_Single === TableBorders.Bottom.Value )
-                            TableHeight += TableBorders.Bottom.Size;
-
-                        Pages_new[PageId].Bounds.Bottom = Pages_new[PageId].YLimit;//Pages_new[PageId].Bounds.Top + TableHeight;
-                        Pages_new[PageId].Bounds.Left   = X_min;
-                        Pages_new[PageId].Bounds.Right  = X_max;
-                        Pages_new[PageId].Height        = TableHeight;
-                    }
-
-
-                    // Обсчитаем текущие координату по Y и высоту таблицы для последнй страницы данной строки
-                    TableHeight = 0;
-                    Y           = this.Parent.Get_PageContentStartPos( LastPage ).Y;
-
-                    if ( null != CellSpacing )
-                    {
-                        if ( border_Single === TableBorders.Top.Value )
-                        {
-                            Y           += TableBorders.Top.Size;
-                            TableHeight += TableBorders.Top.Size;
-                        }
-
-                        if ( 0 === CurRow )
-                        {
-                            Y           += CellSpacing;
-                            TableHeight += CellSpacing;
-                        }
-                        else
-                        {
-                            Y           += CellSpacing / 2;
-                            TableHeight += CellSpacing / 2;
-                        }
-                    }
-
-                    Y           += Pages_Max_Top_Border[LastPage];
-                    TableHeight += Pages_Max_Top_Border[LastPage];
-                }
-
-                var CellHeight = TableRowsBottom_new[CurRow][LastPage] - Y;
-                // TODO: улучшить проверку на высоту строки (для строк разбитых на страницы)
-                if ( LastPage === CurPage && heightrule_AtLeast === RowH.HRule && CellHeight < RowH.Value )
-                {
-                    CellHeight = RowH.Value;
-                    TableRowsBottom_new[CurRow][CurPage] = Y + CellHeight;
-                }
-
-                Y           += CellHeight;
-                TableHeight += CellHeight;
-
-                Row.Height     = CellHeight;
-                Row.PagesCount = LastPage - CurPage + 1;
-
-                Y           += MaxBotBorder[CurRow];
-                TableHeight += MaxBotBorder[CurRow];
-
-                if ( this.Content.length - 1 === CurRow )
-                {
-                    if ( null != CellSpacing )
-                    {
-                        TableHeight += CellSpacing;
-
-                        var TableBorder_Bottom = this.Get_Borders().Bottom;
-                        if ( border_Single === TableBorder_Bottom.Value )
-                            TableHeight += TableBorder_Bottom.Size;
-                    }
-                }
-
-                CurPage = LastPage;
-            }
-
-            this.TableRowsBottom = TableRowsBottom_new;
-            this.Pages           = Pages_new;
-            this.RowsInfo        = RowsInfo_new;
-
-            for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
-            {
-                var Row         = this.Content[CurRow];
-                var CellSpacing = Row.Get_CellSpacing();
-                var StartPage   = this.RowsInfo[CurRow].StartPage;
-                var RowH        = Row.Get_Height();
-
-                for ( var PageIndex = 0; PageIndex < this.RowsInfo[CurRow].Pages; PageIndex++ )
-                {
-                    var TempMaxTopBorder = this.RowsInfo[CurRow].MaxTopBorder[StartPage + PageIndex];
-                    var TempY = 0;
-                    if ( null != CellSpacing )
-                        TempY = this.RowsInfo[CurRow].Y[StartPage + PageIndex];
-                    else
-                        TempY = this.RowsInfo[CurRow].Y[StartPage + PageIndex] + TempMaxTopBorder;
-
-                    var TempCellHeight = this.TableRowsBottom[CurRow][StartPage + PageIndex] - TempY;
-
-                    // TODO: улучшить проверку на высоту строки (для строк разбитых на страницы)
-                    if ( 1 === this.RowsInfo[CurRow].Pages && heightrule_AtLeast === RowH.HRule && TempCellHeight < RowH.Value )
-                        TempCellHeight = RowH.Value;
-
-                    if ( null != CellSpacing )
-                        this.RowsInfo[CurRow].H[StartPage + PageIndex] = TempCellHeight;
-                    else
-                        this.RowsInfo[CurRow].H[StartPage + PageIndex] = TempCellHeight + TempMaxTopBorder;
-                }
-            }
-
-            // Просчитаем нижние границы таблицы на каждой странице
-            for ( var Index = 0; Index < this.Pages.length - 1; Index++ )
-            {
-                var CurRow = this.Pages[Index + 1].FirstRow;
-                if ( 0 === CurRow && false === this.RowsInfo[CurRow].FirstPage )
-                {
-                    // Если таблица сразу переносится на следующую страницу, то на первой
-                    // мы и рисовать ничего не будем.
-                    this.Pages[Index].MaxBotBorder = 0;
-                    this.Pages[Index].BotBorders   = [];
-                    continue;
-                }
-                else if ( false === this.RowsInfo[CurRow].FirstPage )
-                    CurRow--;
-
-                var MaxBotBorder = 0;
-                var BotBorders   = [];
-
-                // Для ряда CurRow вычисляем нижнюю границу
-                if ( this.Content.length - 1 === CurRow )
-                {
-                    // Для последнего ряда уже есть готовые нижние границы
-                    var Row = this.Content[CurRow];
-                    var CellsCount = Row.Get_CellsCount();
-                    for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                    {
-                        var Cell = Row.Get_Cell( CurCell );
-
-                        if ( vmerge_Continue === Cell.Get_VMerge() )
-                            Cell = this.Internal_Get_StartMergedCell( CurRow, Row.Get_CellInfo( CurCell ).StartGridCol, Cell.Get_GridSpan() );
-
-                        var Border_Info = Cell.Get_BorderInfo().Bottom;
-
-                        for ( var BorderId = 0; BorderId < Border_Info.length; BorderId++ )
-                        {
-                            var Border = Border_Info[BorderId];
-                            if ( border_Single === Border.Value && MaxBotBorder < Border.Size )
-                                MaxBotBorder = Border.Size;
-
-                            BotBorders.push( Border);
-                        }
-                    }
-                }
-                else
-                {
-                    var Row = this.Content[CurRow];
-                    var CellSpacing = Row.Get_CellSpacing();
-                    var CellsCount  = Row.Get_CellsCount();
-
-                    if ( null != CellSpacing )
-                    {
-                        // BotBorders можно не заполнять, т.к. у каждой ячейки своя граница,
-                        // нам надо только посчитать максимальную толщину.
-                        for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                        {
-                            var Cell = Row.Get_Cell( CurCell );
-                            var Border = Cell.Get_Borders().Bottom;
-
-                            if ( border_Single === Border.Value && MaxBotBorder < Border.Size )
-                                MaxBotBorder = Border.Size;
-                        }
-                    }
-                    else
-                    {
-                        // Сравниваем нижнюю границу ячейки и нижнюю границу таблицы
-                        for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                        {
-                            var Cell = Row.Get_Cell( CurCell );
-
-                            if ( vmerge_Continue === Cell.Get_VMerge() )
-                            {
-                                Cell = this.Internal_Get_StartMergedCell( CurRow, Row.Get_CellInfo( CurCell ).StartGridCol, Cell.Get_GridSpan() );
-                                if ( null === Cell )
-                                {
-                                    BotBorders.push( TableBorders.Bottom );
-                                    continue;
-                                }
-                            }
-
-                            var Border = Cell.Get_Borders().Bottom;
-
-                            // Сравним границы
-                            var Result_Border = this.Internal_CompareBorders( Border, TableBorders.Bottom, false, true );
-                            if ( border_Single === Result_Border.Value && MaxBotBorder < Result_Border.Size )
-                                MaxBotBorder = Result_Border.Size;
-
-                            BotBorders.push( Result_Border );
-                        }
-                    }
-                }
-
-                this.Pages[Index].MaxBotBorder = MaxBotBorder;
-                this.Pages[Index].BotBorders   = BotBorders;
-            }
-
-            this.Pages[CurPage].Bounds.Bottom = this.Pages[CurPage].Bounds.Top + TableHeight;
-            this.Pages[CurPage].Bounds.Left   = X_min;
-            this.Pages[CurPage].Bounds.Right  = X_max;
-            this.Pages[CurPage].Height        = TableHeight;
-            this.Pages[CurPage].MaxBotBorder  = 0;           // можно не заполнять, т.к. на последней странице
-            this.Pages[CurPage].BotBorders    = []; // нижняя граница обрабатывается у последней строки
-
-            bNeedDocumentRecalculate = true;
-        }
-        else
-        {
-            // Не смотря на то, что таблицу нам пересчитывать не надо, некоторые изменения
-            // могли произойти. Например, если мы сделали изменения в строке, разбитой на несколько
-            // страниц и данные изменения не передвинули нижнюю границу ячейки на последней странице,
-            // но изменили нижнюю границу ячейки на предыдущих страницах.
-            // Т.е. нам надо скопировать все текущие рассчеты до строки CurRow и последней страницы
-
-            for ( var CurRow = 0; CurRow <= RowChange; CurRow++ )
-            {
-                this.TableRowsBottom[CurRow] = TableRowsBottom_new[CurRow];
-                this.RowsInfo[CurRow]        = RowsInfo_new[CurRow];
-            }
-
-            var Pages_new = this.Pages;
-            this.Pages = Pages_old;
-
-            for ( var PageId = 0; PageId < CurPage; PageId++ )
-                this.Pages[PageId] = Pages_new[PageId];
-
-
-            for ( var CurRow = 0; CurRow <= RowChange; CurRow++ )
-            {
-                var Row         = this.Content[CurRow];
-                var CellSpacing = Row.Get_CellSpacing();
-                var StartPage   = this.RowsInfo[CurRow].StartPage;
-                var RowH        = Row.Get_Height();
-
-                for ( var PageIndex = 0; PageIndex < this.RowsInfo[CurRow].Pages; PageIndex++ )
-                {
-                    var TempMaxTopBorder = this.RowsInfo[CurRow].MaxTopBorder[StartPage + PageIndex];
-                    var TempY = 0;
-                    if ( null != CellSpacing )
-                        TempY = this.RowsInfo[CurRow].Y[StartPage + PageIndex];
-                    else
-                        TempY = this.RowsInfo[CurRow].Y[StartPage + PageIndex] + TempMaxTopBorder;
-
-                    var TempCellHeight = this.TableRowsBottom[CurRow][StartPage + PageIndex] - TempY;
-
-                    // TODO: улучшить проверку на высоту строки (для строк разбитых на страницы)
-                    if ( 1 === this.RowsInfo[CurRow].Pages && heightrule_AtLeast === RowH.HRule && TempCellHeight < RowH.Value )
-                        TempCellHeight = RowH.Value;
-
-                    if ( null != CellSpacing )
-                        this.RowsInfo[CurRow].H[StartPage + PageIndex] = TempCellHeight;
-                    else
-                        this.RowsInfo[CurRow].H[StartPage + PageIndex] = TempCellHeight + TempMaxTopBorder;
-                }
-            }
-
-            // Просчитаем нижние границы таблицы на каждой странице
-            for ( var Index = 0; Index < CurPage; Index++ )
-            {
-                var CurRow = this.Pages[Index + 1].FirstRow;
-                if ( 0 === CurRow && false === this.RowsInfo[CurRow].FirstPage )
-                {
-                    // Если таблица сразу переносится на следующую страницу, то на первой
-                    // мы и рисовать ничего не будем.
-                    this.Pages[Index].MaxBotBorder = 0;
-                    this.Pages[Index].BotBorders   = [];
-                    continue;
-                }
-                else if ( false === this.RowsInfo[CurRow].FirstPage )
-                    CurRow--;
-
-                var MaxBotBorder = 0;
-                var BotBorders   = [];
-
-                // Для ряда CurRow вычисляем нижнюю границу
-                if ( this.Content.length - 1 === CurRow )
-                {
-                    // Для последнего ряда уже есть готовые нижние границы
-                    var Row = this.Content[CurRow];
-                    var CellsCount = Row.Get_CellsCount();
-                    for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                    {
-                        var Cell = Row.Get_Cell( CurCell );
-                        if ( vmerge_Continue === Cell.Get_VMerge() )
-                            Cell = this.Internal_Get_StartMergedCell( CurRow, Row.Get_CellInfo( CurCell ).StartGridCol, Cell.Get_GridSpan() );
-
-                        var Border_Info = Cell.Get_BorderInfo().Bottom;
-
-                        for ( var BorderId = 0; BorderId < Border_Info.length; BorderId++ )
-                        {
-                            var Border = Border_Info[BorderId];
-                            if ( border_Single === Border.Value && MaxBotBorder < Border.Size )
-                                MaxBotBorder = Border.Size;
-
-                            BotBorders.push( Border);
-                        }
-                    }
-                }
-                else
-                {
-                    var Row = this.Content[CurRow];
-                    var CellSpacing = Row.Get_CellSpacing();
-                    var CellsCount  = Row.Get_CellsCount();
-
-                    if ( null != CellSpacing )
-                    {
-                        // BotBorders можно не заполнять, т.к. у каждой ячейки своя граница,
-                        // нам надо только посчитать максимальную толщину.
-                        for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                        {
-                            var Cell = Row.Get_Cell( CurCell );
-                            var Border = Cell.Get_Borders().Bottom;
-
-                            if ( border_Single === Border.Value && MaxBotBorder < Border.Size )
-                                MaxBotBorder = Border.Size;
-                        }
-                    }
-                    else
-                    {
-                        // Сравниваем нижнюю границу ячейки и нижнюю границу таблицы
-                        for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                        {
-                            var Cell = Row.Get_Cell( CurCell );
-
-                            if ( vmerge_Continue === Cell.Get_VMerge() )
-                            {
-                                Cell = this.Internal_Get_StartMergedCell( CurRow, Row.Get_CellInfo( CurCell ).StartGridCol, Cell.Get_GridSpan() );
-                                if ( null === Cell )
-                                {
-                                    BotBorders.push( TableBorders.Bottom );
-                                    continue;
-                                }
-                            }
-
-                            var Border = Cell.Get_Borders().Bottom;
-
-                            // Сравним границы
-                            var Result_Border = this.Internal_CompareBorders( Border, TableBorders.Bottom, false, true );
-                            if ( border_Single === Result_Border.Value && MaxBotBorder < Result_Border.Size )
-                                MaxBotBorder = Result_Border.Size;
-
-                            BotBorders.push( Result_Border );
-                        }
-                    }
-                }
-
-                this.Pages[Index].MaxBotBorder = MaxBotBorder;
-                this.Pages[Index].BotBorders   = BotBorders;
-            }
-
-            bNeedDocumentRecalculate = false;
-        }
-        this.Bounds = this.Pages[this.Pages.length - 1].Bounds;
-
-        this.TurnOffRecalc = false;
-        this.Internal_OnContentRecalculate( bNeedDocumentRecalculate, 0, this.Index );
     },
 
-    Internal_GetCellByXY : function( X, Y, PageIndex)
+    Internal_GetCellByXY : function(X, Y, PageIndex)
     {
         // Сначала определяем колонку в которую мы попали
         var CurGrid = 0;
 
+        var CurPage = Math.min(this.Pages.length - 1, Math.max(0, PageIndex));
+        var Page = this.Pages[CurPage];
         var ColsCount = this.TableGrid.length;
-        if ( X >= this.X )
+        if (X >= Page.X)
         {
-            for ( CurGrid = 0; CurGrid < ColsCount; CurGrid++ )
+            for (CurGrid = 0; CurGrid < ColsCount; CurGrid++)
             {
-                if ( X >= this.X + this.TableSumGrid[CurGrid - 1] && X <= this.X + this.TableSumGrid[CurGrid] )
+                if (X >= Page.X + this.TableSumGrid[CurGrid - 1] && X <= Page.X + this.TableSumGrid[CurGrid])
                     break;
             }
         }
@@ -18025,7 +10896,7 @@ CTable.prototype =
             CurGrid = ColsCount - 1;
 
         // Найдем промежуток строк по PageIndex среди которых нам надо искать
-        var PNum = PageIndex;// - this.PageNum;
+        var PNum = PageIndex;
 
         var Row_start, Row_last;
 
@@ -18894,7 +11765,8 @@ CTable.prototype =
             PageNum :   PageNum
         };
 
-        this.Markup.X = this.X;
+        var Page = this.Pages[PageNum];
+        this.Markup.X = Page.X;
 
         var Row = this.Content[RowIndex];
         var CellSpacing = ( null === Row.Get_CellSpacing() ? 0 : Row.Get_CellSpacing() );
@@ -18985,6 +11857,9 @@ CTable.prototype =
 
     Internal_CheckBorders : function(X, Y, PageNum)
     {
+        var CurPage = PageNum;
+        var Page = this.Pages[CurPage];
+
         // Сначала определим ячейку, у которой границы мы будем проверять
         var CellPos = this.Internal_GetCellByXY( X, Y, PageNum);
 
@@ -19012,8 +11887,8 @@ CTable.prototype =
         var Cell_end = this.Internal_Get_Cell_ByStartGridCol( CellPos.Row + VMerge_count - 1, CellInfo.StartGridCol );
         var CellInfo_end =  Row_end.Get_CellInfo( Cell_end.Index );
 
-        var X_cell_start = CellInfo.X_grid_start;
-        var X_cell_end   = CellInfo.X_grid_end;
+        var X_cell_start = Page.X + CellInfo.X_grid_start;
+        var X_cell_end   = Page.X + CellInfo.X_grid_end;
 
         var Y_cell_start = this.RowsInfo[CellPos.Row].Y[PageNum];
         var Y_cell_end   = this.RowsInfo[CellPos.Row + VMerge_count - 1].Y[PageNum] + this.RowsInfo[CellPos.Row + VMerge_count - 1].H[PageNum];
@@ -19764,7 +12639,7 @@ CTable.prototype.private_GetPrevCell = function(RowIndex, CellIndex)
 CTable.prototype.Check_ChangedTableGrid = function()
 {
     var TableGrid_old = this.Internal_Copy_Grid(this.TableGridCalc);
-    this.Internal_RecalculateGrid();
+    this.private_RecalculateGrid();
     var TableGrid_new = this.TableGridCalc;
     for (var CurCol = 0, ColsCount = this.TableGridCalc.length; CurCol < ColsCount; CurCol++)
     {
@@ -20041,3688 +12916,515 @@ CTable.prototype.Set_CurCell = function(Cell)
 
     this.CurCell = Cell;
 };
-
-// Класс CTableRow
-function CTableRow(Table, Cols, TableGrid)
+CTable.prototype.Is_EmptyPage = function(CurPage)
 {
-    this.Id = g_oIdCounter.Get_NewId();
-
-    this.Table = Table; // Родительский класс таблицы
-
-    this.Next = null;
-    this.Prev = null;
-
-    this.Content = [];
-    for ( var Index = 0; Index < Cols; Index++ )
-    {
-        var ColW = ( undefined != TableGrid && undefined != TableGrid[Index] ? TableGrid[Index] : undefined );
-        this.Content[Index] = new CTableCell( this, ColW );
-    }
-
-    this.Internal_ReIndexing();
-
-    // Информация о рассчитанных метриках ячеек
-    this.CellsInfo = [];
-
-    // Метрика строки
-    this.Metrics =
-    {
-        X_min : 0,
-        X_max : 0
-    };
-
-    // Информация о spacing до и после текущей строки
-    this.SpacingInfo = { Top : false, Bottom : false };
-
-    this.CompiledPr =
-    {
-        Pr         : null,
-        NeedRecalc : true
-    };
-
-    this.Pr = new CTableRowPr();
-
-    // Данные два параметра нужны для контроля кардинальности изменений, которые
-    // происходят внутри ячеек данной строки.
-    this.Height     = 0;
-    this.PagesCount = 1;
-
-    // Добавляем данный класс в список DocumentContent'ов
-    if (typeof CollaborativeEditing !== "undefined")
-        CollaborativeEditing.Add_NewDC(this);
-    this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
-    
-    this.Index = 0;
-
-    // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-    g_oTableId.Add( this, this.Id );
-}
-
-CTableRow.prototype =
-{
-    Set_Id : function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
-    },
-
-    Get_Id : function()
-    {
-        return this.Id;
-    },
-
-    // Создаем копию данного объекта
-    Copy : function(Table)
-    {
-        var Row = new CTableRow(Table, 0);
-
-        // Копируем настройки строки
-        Row.Set_Pr( this.Pr.Copy() );
-
-        // Копируем ячейки
-        var CellsCount = this.Content.length;
-        for ( var Index = 0; Index < CellsCount; Index++ )
-        {
-            Row.Content[Index] = this.Content[Index].Copy(Row);
-            History.Add( Row, { Type : historyitem_TableRow_AddCell, Pos : Index, Item : { Cell : Row.Content[Index], CellInfo : {}  } } );
-        }
-
-        Row.Internal_ReIndexing();
-
-        return Row;
-    },
-
-    Is_UseInDocument : function(Id)
-    {
-        var bUse = false;
-        if ( null != Id )
-        {
-            var Count = this.Content.length;
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                if ( Id === this.Content[Index].Get_Id() )
-                {
-                    bUse = true;
-                    break;
-                }
-            }
-        }
-        else
-            bUse = true;
-
-        if ( true === bUse && null != this.Table )
-            return this.Table.Is_UseInDocument(this.Get_Id());
-
-        return false;
-    },
-
-    Set_Index : function(Index)
-    {
-        if ( Index != this.Index )
-        {
-            this.Index = Index;
-            this.Recalc_CompiledPr();
-        }
-    },
-
-    Set_Metrics_X : function(x_min, x_max)
-    {
-        this.Metrics.X_min = x_min;
-        this.Metrics.X_max = x_max;
-    },
-
-    Get_EndInfo : function()
-    {
-        var CellsCount = this.Content.length;
-        if ( CellsCount > 0 )
-            return this.Content[CellsCount - 1].Get_EndInfo();
-        else
-            return null;
-    },
-
-    Get_PrevElementEndInfo : function(CellIndex)
-    {
-        if ( 0 === CellIndex )
-            return this.Table.Get_PrevElementEndInfo( this.Index );
-        else
-            return this.Content[CellIndex - 1].Get_EndInfo();
-    },
-
-    Save_RecalculateObject : function()
-    {
-        var RecalcObj = new CTableRowRecalculateObject();
-        RecalcObj.Save( this );
-        return RecalcObj;
-    },
-
-    Load_RecalculateObject : function(RecalcObj)
-    {
-        RecalcObj.Load(this);
-    },
-
-    Prepare_RecalculateObject : function()
-    {
-        this.CellsInfo   = [];
-        this.Metrics     = { X_min : 0, X_max : 0 };
-        this.SpacingInfo = { Top : false, Bottom : false };
-
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            this.Content[Index].Prepare_RecalculateObject();
-        }
-    },
-    
-    PreDelete : function()
-    {
-        var CellsCount = this.Get_CellsCount();
-        for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-        {
-            var Cell = this.Get_Cell( CurCell );
-
-            var CellContent = Cell.Content.Content;
-            var ContentCount = CellContent.length;
-            for ( var Pos = 0; Pos < ContentCount; Pos++ )
-            {
-                CellContent[Pos].PreDelete();
-            }
-        }
-    },
-//-----------------------------------------------------------------------------------
-// Работаем с стилем строки
-//-----------------------------------------------------------------------------------
-    Recalc_CompiledPr : function()
-    {
-        this.CompiledPr.NeedRecalc = true;
-    },
-
-    // Формируем конечные свойства параграфа на основе стиля и прямых настроек.
-    Get_CompiledPr : function(bCopy)
-    {
-        if ( true === this.CompiledPr.NeedRecalc )
-        {
-            this.CompiledPr.Pr = this.Internal_Compile_Pr();
-            this.CompiledPr.NeedRecalc = false;
-        }
-
-        if ( false === bCopy )
-            return this.CompiledPr.Pr;
-        else
-            return this.CompiledPr.Pr.Copy(); // Отдаем копию объекта, чтобы никто не поменял извне настройки стиля
-    },
-
-    Internal_Compile_Pr : function()
-    {
-        var TablePr   = this.Table.Get_CompiledPr(false);
-        var TableLook = this.Table.Get_TableLook();
-        var CurIndex  = this.Index;
-
-        // Сначала возьмем настройки по умолчанию для строки
-        var RowPr = TablePr.TableRowPr.Copy();
-
-        // Совместим настройки с настройками для групп строк
-        if ( true === TableLook.Is_BandHor() )
-        {
-            var RowBandSize = TablePr.TablePr.TableStyleRowBandSize;
-            var _CurIndex   = ( true != TableLook.Is_FirstRow() ? CurIndex : CurIndex - 1 )
-            var GroupIndex = ( 1 != RowBandSize ? Math.floor( _CurIndex / RowBandSize ) : _CurIndex );
-            if ( 0 === GroupIndex % 2 )
-                RowPr.Merge(TablePr.TableBand1Horz.TableRowPr);
-            else
-                RowPr.Merge(TablePr.TableBand2Horz.TableRowPr);
-        }
-
-        // Совместим настройки с настройками для последней строки
-        if ( true === TableLook.Is_LastRow() && this.Table.Content.length - 1 === CurIndex )
-        {
-            RowPr.Merge(TablePr.TableLastRow.TableRowPr);
-        }
-
-        // Совместим настройки с настройками для первой строки
-        if ( true === TableLook.Is_FirstRow() && ( 0 === CurIndex || true === this.Pr.TableHeader )  )
-        {
-            RowPr.Merge(TablePr.TableFirstRow.TableRowPr);
-        }
-
-        // Полученные настройки совместим с прямыми настройками
-        RowPr.Merge(this.Pr);
-
-        return RowPr;
-    },
-//-----------------------------------------------------------------------------------
-// Работаем с настройками строки
-//-----------------------------------------------------------------------------------
-    Clear_DirectFormatting : function(bClearMerge)
-    {
-        // Очищаем все строки и всех ее ячеек
-        if (true === bClearMerge)
-        {
-            this.Set_After(undefined, undefined);
-            this.Set_Before(undefined, undefined);
-            this.Set_Height(undefined, undefined);
-        }
-
-        this.Set_CellSpacing(undefined);
-
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            this.Content[Index].Clear_DirectFormatting(bClearMerge);
-        }
-    },
-
-    Set_Pr : function(RowPr)
-    {
-        History.Add( this, { Type : historyitem_TableRow_Pr, Old : this.Pr, New : RowPr } );
-        this.Pr = RowPr;
-    },
-
-    Get_Before : function()
-    {
-        var RowPr = this.Get_CompiledPr( false );
-
-        var Before =
-        {
-            WBefore    : RowPr.WBefore.Copy(),
-            GridBefore : RowPr.GridBefore
-        };
-
-        return Before;
-    },
-
-    Set_Before : function(GridBefore, WBefore)
-    {
-        // Если парметр WBefore === false, значит значение WBefore мы не меняем
-        if ( this.Pr.GridBefore !== GridBefore || this.Pr.WBefore !== WBefore )
-        {
-            var OldBefore =
-            {
-                GridBefore : ( undefined != this.Pr.GridBefore ? this.Pr.GridBefore : undefined ),
-                WBefore    : ( undefined != this.Pr.WBefore    ? this.Pr.WBefore    : undefined )
-            };
-
-            var NewBefore =
-            {
-                GridBefore : ( undefined != GridBefore ? GridBefore : undefined ),
-                WBefore    : ( undefined != WBefore    ? WBefore    : undefined )
-            };
-
-            if ( false === WBefore )
-                NewBefore.WBefore = OldBefore.WBefore;
-            else if ( undefined != WBefore )
-            {
-                NewBefore.WBefore = new CTableMeasurement(tblwidth_Auto, 0);
-                NewBefore.WBefore.Set_FromObject(WBefore);
-            }
-
-            History.Add( this, { Type : historyitem_TableRow_Before, Old : OldBefore, New : NewBefore } );
-
-            if ( undefined != NewBefore.GridBefore )
-                this.Pr.GridBefore = GridBefore;
-            else
-                this.Pr.GridBefore = undefined;
-
-            if ( undefined != NewBefore.WBefore )
-                this.Pr.WBefore = NewBefore.WBefore;
-            else
-                this.Pr.WBefore = undefined;
-
-            this.Recalc_CompiledPr();
-        }
-    },
-
-    Get_After : function()
-    {
-        var RowPr = this.Get_CompiledPr( false );
-
-        var After =
-        {
-            WAfter    : RowPr.WAfter.Copy(),
-            GridAfter : RowPr.GridAfter
-        };
-
-        return After;
-    },
-
-    Set_After : function(GridAfter, WAfter)
-    {
-        // Если парметр WAfter === false, значит значение WAfter мы не меняем
-        if ( this.Pr.GridAfter !== GridAfter || this.Pr.WAfter !== WAfter )
-        {
-            var OldAfter =
-            {
-                GridAfter : ( undefined != this.Pr.GridAfter ? this.Pr.GridAfter : undefined ),
-                WAfter    : ( undefined != this.Pr.WAfter    ? this.Pr.WAfter    : undefined )
-            };
-
-            var NewAfter =
-            {
-                GridAfter : ( undefined != GridAfter ? GridAfter : undefined ),
-                WAfter    : ( undefined != WAfter    ? WAfter    : undefined )
-            };
-
-            if ( false === WAfter )
-                NewAfter.WAfter = OldAfter.WAfter;
-            else if ( undefined != WAfter )
-            {
-                NewAfter.WAfter = new CTableMeasurement(tblwidth_Auto, 0);
-                NewAfter.WAfter.Set_FromObject(WAfter);
-            }
-
-            History.Add( this, { Type : historyitem_TableRow_After, Old : OldAfter, New : NewAfter } );
-
-            if ( undefined != NewAfter.GridAfter )
-                this.Pr.GridAfter = GridAfter;
-            else
-                this.Pr.GridAfter = undefined;
-
-            if ( undefined != NewAfter.WAfter )
-                this.Pr.WAfter = NewAfter.WAfter;
-            else
-                this.Pr.WAfter = undefined;
-
-            this.Recalc_CompiledPr();
-        }
-    },
-
-    Get_CellSpacing : function()
-    {
-        var RowPr = this.Get_CompiledPr( false );
-        return RowPr.TableCellSpacing;
-    },
-
-    Set_CellSpacing : function(Value)
-    {
-        if ( undefined === Value )
-        {
-            if ( undefined === this.Pr.TableCellSpacing )
-                return;
-
-            History.Add( this, { Type : historyitem_TableRow_CellSpacing, Old : this.Pr.TableCellSpacing, New : undefined } );
-            this.Pr.TableCellSpacing = undefined;
-
-            this.Recalc_CompiledPr();
-        }
-        else if ( undefined === this.Pr.TableCellSpacing )
-        {
-            History.Add( this, { Type : historyitem_TableRow_CellSpacing, Old : undefined, New : Value } );
-            this.Pr.TableCellSpacing = Value;
-
-            this.Recalc_CompiledPr();
-        }
-        else if ( Value != this.Pr.TableCellSpacing )
-        {
-            History.Add( this, { Type : historyitem_TableRow_CellSpacing, Old : this.Pr.TableCellSpacing, New : Value } );
-            this.Pr.TableCellSpacing = Value;
-
-            this.Recalc_CompiledPr();
-        }
-    },
-
-    Get_Height : function()
-    {
-        var RowPr = this.Get_CompiledPr( false );
-        return RowPr.Height;
-    },
-
-    Set_Height : function( Value, HRule )
-    {
-        if ( (undefined === this.Pr.Height && undefined === Value) || (undefined != this.Pr.Height && HRule === this.Pr.Height.HRule && Math.abs(Value - this.Pr.Height.Value) < 0.001 ) )
-            return;
-
-        var OldHeight = undefined != this.Pr.Height ? this.Pr.Height : undefined;
-        var NewHeight = undefined != Value  ? new CTableRowHeight( Value, HRule ): undefined;
-
-        History.Add( this, { Type : historyitem_TableRow_Height, Old : OldHeight, New : NewHeight } );
-
-        if ( undefined === NewHeight )
-            this.Pr.Height = undefined;
-        else
-            this.Pr.Height = NewHeight;
-
-        this.Recalc_CompiledPr();
-    },
-
-    Is_Header : function()
-    {
-        var RowPr = this.Get_CompiledPr(false);
-        return RowPr.TableHeader;
-    },
-
-    Set_Header : function(Value)
-    {
-        if ( (undefined === this.Pr.TableHeader && undefined === Value) || (undefined != this.Pr.TableHeader && Value === this.Pr.TableHeader ) )
-            return;
-
-        var OldHeader = undefined != this.Pr.TableHeader ? this.Pr.TableHeader : undefined;
-        var NewHeader = undefined != Value  ? Value : undefined;
-
-        History.Add( this, { Type : historyitem_TableRow_TableHeader, Old : OldHeader, New : NewHeader } );
-
-        if ( undefined === Value )
-            this.Pr.TableHeader = undefined;
-        else
-            this.Pr.TableHeader = Value;
-
-        this.Recalc_CompiledPr();
-    },
-
-    Copy_Pr : function(OtherPr)
-    {
-        // Before
-        if ( undefined === OtherPr.WBefore )
-            this.Set_Before( OtherPr.GridBefore, undefined );
-        else
-            this.Set_Before( OtherPr.GridBefore, { W : OtherPr.WBefore.W, Type : OtherPr.WBefore.Type } );
-
-        // After
-        if ( undefined === OtherPr.WAfter )
-            this.Set_After( OtherPr.GridAfter, undefined );
-        else
-            this.Set_After( OtherPr.GridAfter, { W : OtherPr.WAfter.W, Type : OtherPr.WAfter.Type } );
-
-        // Height
-        if ( undefined === OtherPr.Height )
-            this.Set_Height( undefined, undefined );
-        else
-            this.Set_Height( OtherPr.Height.Value, OtherPr.Height.HRule );
-
-        // CellSpacing
-        if ( undefined != OtherPr.TableCellSpacing )
-            this.Set_CellSpacing( OtherPr.TableCellSpacing );
-        else
-            this.Set_CellSpacing( undefined );
-
-        // TableHeader
-        if ( undefined != OtherPr.TableHeader )
-            this.Set_Header( OtherPr.TableHeader );
-        else
-            this.Set_Header( undefined );
-    },
-
-    Set_SpacingInfo : function(bSpacingTop, bSpacingBot)
-    {
-        this.SpacingInfo =
-        {
-            Top    : bSpacingTop,
-            Bottom : bSpacingBot
-        };
-    },
-
-    Get_SpacingInfo : function()
-    {
-        return this.SpacingInfo;
-    },
-
-//-----------------------------------------------------------------------------------
-// Работаем с ячейками строки
-//-----------------------------------------------------------------------------------
-    Get_Cell : function(Index)
-    {
-        if ( Index < 0 || Index >= this.Content.length )
-            return null;
-
-        return this.Content[Index];
-    },
-
-    Get_CellsCount : function()
-    {
-        return this.Content.length;
-    },
-
-    Set_CellInfo : function(Index,  StartGridCol, X_grid_start, X_grid_end, X_cell_start, X_cell_end, X_content_start, X_content_end )
-    {
-        this.CellsInfo[Index] =
-        {
-            StartGridCol    : StartGridCol,
-            X_grid_start    : X_grid_start,
-            X_grid_end      : X_grid_end,
-            X_cell_start    : X_cell_start,
-            X_cell_end      : X_cell_end,
-            X_content_start : X_content_start,
-            X_content_end   : X_content_end
-        };
-
-        this.Content[Index].Content.Set_ClipInfo( X_cell_start, X_cell_end );
-    },
-
-    Update_CellInfo : function(Index, X_start)
-    {
-        var Cell = this.Content[Index];
-
-        var StartGridCol    = Cell.Metrics.StartGridCol;
-        var X_grid_start    = X_start + Cell.Metrics.X_grid_start;
-        var X_grid_end      = X_start + Cell.Metrics.X_grid_end;
-        var X_cell_start    = X_start + Cell.Metrics.X_cell_start;
-        var X_cell_end      = X_start + Cell.Metrics.X_cell_end;
-        var X_content_start = X_start + Cell.Metrics.X_content_start;
-        var X_content_end   = X_start + Cell.Metrics.X_content_end;
-
-        this.Set_CellInfo( Index, StartGridCol, X_grid_start, X_grid_end, X_cell_start, X_cell_end, X_content_start, X_content_end );
-    },
-
-    Get_CellInfo : function(Index)
-    {
-        return this.CellsInfo[Index];
-    },
-
-    Get_StartGridCol : function(Index)
-    {
-        var Max = Math.min( this.Content.length - 1, Index - 1);
-        var CurGridCol = this.Get_Before().GridBefore;
-        for ( var CurCell = 0; CurCell <= Max; CurCell++ )
-        {
-            var Cell = this.Get_Cell( CurCell );
-            var GridSpan = Cell.Get_GridSpan();
-
-            CurGridCol += GridSpan;
-        }
-
-        return CurGridCol;
-    },
-
-    Remove_Cell : function(Index)
-    {
-        History.Add( this, { Type : historyitem_TableRow_RemoveCell, Pos : Index, Item : { Cell : this.Content[Index], CellInfo : this.CellsInfo[Index] } } );
-
-        this.Content.splice( Index, 1 );
-        this.CellsInfo.splice( Index, 1 );
-
-        this.Internal_ReIndexing( Index );
-    },
-
-    Add_Cell : function(Index, Row, Cell, bReIndexing)
-    {
-        if ( "undefined" === typeof(Cell) || null === Cell )
-            Cell = new CTableCell( Row );
-
-        History.Add( this, { Type : historyitem_TableRow_AddCell, Pos : Index, Item : { Cell : Cell, CellInfo : {}  } } );
-
-        this.Content.splice( Index, 0, Cell );
-        this.CellsInfo.splice( Index, 0, {} );
-
-        if ( true === bReIndexing )
-        {
-            this.Internal_ReIndexing(Index);
-        }
-        else
-        {
-            if ( Index > 0 )
-            {
-                this.Content[Index - 1].Next = Cell;
-                Cell.Prev = this.Content[Index - 1];
-            }
-            else
-                Cell.Prev = null;
-
-            if ( Index < this.Content.length - 1 )
-            {
-                this.Content[Index + 1].Prev = Cell;
-                Cell.Next = this.Content[Index + 1];
-            }
-            else
-                Cell.Next = null;
-        }
-
-        return Cell;
-    },
-
-    Clear_ContentChanges : function()
-    {
-        this.m_oContentChanges.Clear();
-    },
-
-    Add_ContentChanges : function(Changes)
-    {
-        this.m_oContentChanges.Add( Changes );
-    },
-
-    Refresh_ContentChanges : function()
-    {
-        this.m_oContentChanges.Refresh();
-    },
-//-----------------------------------------------------------------------------------
-// Внутренние функции
-//-----------------------------------------------------------------------------------
-    Internal_ReIndexing : function(StartIndex)
-    {
-        if ( "undefined" === typeof(StartIndex) )
-            StartIndex = 0;
-
-        for ( var Ind = StartIndex; Ind < this.Content.length; Ind++ )
-        {
-            this.Content[Ind].Set_Index( Ind );
-            this.Content[Ind].Prev = ( Ind > 0 ? this.Content[Ind - 1] : null );
-            this.Content[Ind].Next = ( Ind < this.Content.length - 1 ? this.Content[Ind + 1] : null );
-            this.Content[Ind].Row  = this;
-        }
-    },
-
-//-----------------------------------------------------------------------------------
-// Undo/Redo функции
-//-----------------------------------------------------------------------------------
-    Undo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case historyitem_TableRow_Before:
-            {
-                if ( undefined != Data.Old.GridBefore )
-                    this.Pr.GridBefore = Data.Old.GridBefore;
-                else
-                    this.Pr.GridBefore = undefined;
-
-                if ( undefined != Data.Old.WBefore )
-                    this.Pr.WBefore = Data.Old.WBefore;
-                else
-                    this.Pr.WBefore = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableRow_After:
-            {
-                if ( undefined != Data.Old.GridAfter )
-                    this.Pr.GridAfter = Data.Old.GridAfter;
-                else
-                    this.Pr.GridAfter = undefined;
-
-                if ( undefined != Data.Old.WAfter )
-                    this.Pr.WAfter = Data.Old.WAfter;
-                else
-                    this.Pr.WAfter = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableRow_CellSpacing:
-            {
-                if ( undefined != Data.Old )
-                    this.Pr.TableCellSpacing = Data.Old;
-                else
-                    this.Pr.TableCellSpacing = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableRow_Height:
-            {
-                if ( undefined != Data.Old )
-                    this.Pr.Height = Data.Old;
-                else
-                    this.Pr.Height = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableRow_AddCell:
-            {
-                this.Content.splice( Data.Pos, 1 );
-                this.CellsInfo.splice( Data.Pos, 1 );
-
-                this.Internal_ReIndexing( Data.Pos );
-
-                break;
-            }
-
-            case historyitem_TableRow_RemoveCell:
-            {
-                this.Content.splice( Data.Pos, 0, Data.Item.Cell );
-                this.CellsInfo.splice( Data.Pos, 0, Data.Item.CellInfo );
-
-                this.Internal_ReIndexing( Data.Pos );
-
-                break;
-            }
-
-            case historyitem_TableRow_TableHeader:
-            {
-                if ( undefined != Data.Old )
-                    this.Pr.TableHeader = Data.Old;
-                else
-                    this.Pr.TableHeader = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableRow_Pr:
-            {
-                this.Pr = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-        }
-    },
-
-    Redo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case historyitem_TableRow_Before:
-            {
-                if ( undefined != Data.New.GridBefore )
-                    this.Pr.GridBefore = Data.New.GridBefore;
-                else
-                    this.Pr.GridBefore = undefined;
-
-                if ( undefined != Data.New.WBefore )
-                    this.Pr.WBefore = Data.New.WBefore;
-                else
-                    this.Pr.WBefore = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableRow_After:
-            {
-                if ( undefined != Data.New.GridAfter )
-                    this.Pr.GridAfter = Data.New.GridAfter;
-                else
-                    this.Pr.GridAfter = undefined;
-
-                if ( undefined != Data.New.WAfter )
-                    this.Pr.WAfter = Data.New.WAfter;
-                else
-                    this.Pr.WAfter = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableRow_CellSpacing:
-            {
-                if ( undefined != Data.New )
-                    this.Pr.TableCellSpacing = Data.New;
-                else
-                    this.Pr.TableCellSpacing = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableRow_Height:
-            {
-                if ( undefined != Data.New )
-                    this.Pr.Height = Data.New;
-                else
-                    this.Pr.Height = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableRow_AddCell:
-            {
-                this.Content.splice( Data.Pos, 0, Data.Item.Cell );
-                this.CellsInfo.splice( Data.Pos, 0, Data.Item.CellInfo );
-
-                this.Internal_ReIndexing( Data.Pos );
-
-                break;
-            }
-
-            case historyitem_TableRow_RemoveCell:
-            {
-                this.Content.splice( Data.Pos, 1 );
-                this.CellsInfo.splice( Data.Pos, 1 );
-
-                this.Internal_ReIndexing( Data.Pos );
-
-                break;
-            }
-
-            case historyitem_TableRow_TableHeader:
-            {
-                if ( undefined != Data.New )
-                    this.Pr.TableHeader = Data.New;
-                else
-                    this.Pr.TableHeader = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableRow_Pr:
-            {
-                this.Pr = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-        }
-    },
-
-    Get_ParentObject_or_DocumentPos : function()
-    {
-        return this.Table.Get_ParentObject_or_DocumentPos(this.Table.Index);
-    },
-
-    Refresh_RecalcData : function(Data)
-    {
-        var bNeedRecalc = false;
-
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case historyitem_TableRow_Before:
-            case historyitem_TableRow_After:
-            case historyitem_TableRow_CellSpacing:
-            case historyitem_TableRow_Height:
-            case historyitem_TableRow_AddCell:
-            case historyitem_TableRow_RemoveCell:
-            case historyitem_TableRow_TableHeader:
-            case historyitem_TableRow_Pr:
-            {
-                bNeedRecalc = true;
-                break;
-            }
-        }
-
-        // Добавляем все ячейки для пересчета
-        var CellsCount = this.Get_CellsCount();
-        for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-        {
-            this.Table.RecalcInfo.Add_Cell( this.Get_Cell(CurCell) );
-        }
-
-        this.Table.RecalcInfo.Recalc_Borders();
-
-        if ( true === bNeedRecalc )
-            this.Refresh_RecalcData2( 0, 0 );
-    },
-
-    Refresh_RecalcData2 : function(CellIndex, Page_rel)
-    {
-        this.Table.Refresh_RecalcData2( this.Index, Page_rel );
-    },
-//-----------------------------------------------------------------------------------
-// Функции для работы с совместным редактирования
-//-----------------------------------------------------------------------------------
-    Save_Changes : function(Data, Writer)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        Writer.WriteLong( historyitem_type_TableRow );
-
-        var Type = Data.Type;
-
-        // Пишем тип
-        Writer.WriteLong( Type );
-
-        switch ( Type )
-        {
-            case historyitem_TableRow_Before:
-            {
-                // Bool : IsUndefined
-                //   Если предыдущее значение false
-                //   Long   : GridBefore
-                // Bool : IsUndefined
-                //   Если предыдущее значение false
-                //   Variable : WBefore (CTableMeasurement)
-
-                if ( undefined === Data.New.GridBefore )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Writer.WriteLong( Data.New.GridBefore );
-                }
-
-                if ( undefined === Data.New.WBefore )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Data.New.WBefore.Write_ToBinary( Writer );
-                }
-
-                break;
-            }
-
-            case historyitem_TableRow_After:
-            {
-                // Bool : IsUndefined
-                //   Если предыдущее значение false
-                //   Long   : GridAfter
-                // Bool : IsUndefined
-                //   Если предыдущее значение false
-                //   Variable : WAfter (CTableMeasurement)
-
-                if ( undefined === Data.New.GridAfter )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Writer.WriteLong( Data.New.GridAfter );
-                }
-
-                if ( undefined === Data.New.WAfter )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Data.New.WAfter.Write_ToBinary( Writer );
-                }
-
-                break;
-            }
-
-            case historyitem_TableRow_CellSpacing:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Bool : IsNull
-                //   Если false
-                //     Double : значение
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-
-                    if ( null === Data.New )
-                        Writer.WriteBool( true );
-                    else
-                    {
-                        Writer.WriteBool( false );
-                        Writer.WriteDouble( Data.New );
-                    }
-                }
-
-                break;
-            }
-
-            case historyitem_TableRow_Height:
-            {
-                // Bool   : IsUndefined
-                // Если предыдущее значение false
-                //   Variable : Height (CTableRowHeight)
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Data.New.Write_ToBinary( Writer );
-                }
-
-                break;
-            }
-
-            case historyitem_TableRow_AddCell:
-            {
-                // Long     : Количество элементов
-                // Array of :
-                //  {
-                //    Long   : Позиция
-                //    String : Id элемента
-                //  }
-
-                var bArray = Data.UseArray;
-                var Count  = 1;
-
-                Writer.WriteLong( Count );
-
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    if ( true === bArray )
-                        Writer.WriteLong( Data.PosArray[Index] );
-                    else
-                        Writer.WriteLong( Data.Pos + Index );
-
-                    Writer.WriteString2( Data.Item.Cell.Get_Id() );
-                }
-
-                break;
-            }
-
-            case historyitem_TableRow_RemoveCell:
-            {
-                // Long          : Количество удаляемых элементов
-                // Array of Long : позиции удаляемых элементов
-
-                var bArray = Data.UseArray;
-                var Count  = 1;
-
-                var StartPos = Writer.GetCurPosition();
-                Writer.Skip(4);
-                var RealCount = Count;
-
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    if ( true === bArray )
-                    {
-                        if ( false === Data.PosArray[Index] )
-                            RealCount--;
-                        else
-                            Writer.WriteLong( Data.PosArray[Index] );
-                    }
-                    else
-                        Writer.WriteLong( Data.Pos );
-                }
-
-                var EndPos = Writer.GetCurPosition();
-                Writer.Seek( StartPos );
-                Writer.WriteLong( RealCount );
-                Writer.Seek( EndPos );
-
-                break;
-            }
-
-            case historyitem_TableRow_TableHeader:
-            {
-                // Bool   : IsUndefined
-                // Если предыдущее значение false
-                //   Bool : TableHeader
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Writer.WriteBool( Data.New )
-                }
-
-                break;
-            }
-
-            case historyitem_TableRow_Pr:
-            {
-                // CTableRowPr
-                Data.New.Write_ToBinary( Writer );
-
-                break;
-            }
-        }
-
-        return Writer;
-    },
-
-    Save_Changes2 : function(Data, Writer)
-    {
-        var bRetValue = false;
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case historyitem_TableRow_Before:
-            case historyitem_TableRow_After:
-            case historyitem_TableRow_CellSpacing:
-            case historyitem_TableRow_Height:
-            {
-                break;
-            }
-
-            case historyitem_TableRow_AddCell:
-            {
-                break;
-            }
-
-            case historyitem_TableRow_RemoveCell:
-            {
-                break;
-            }
-        }
-
-        return bRetValue;
-    },
-
-    Load_Changes : function(Reader, Reader2)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        var ClassType = Reader.GetLong();
-        if ( historyitem_type_TableRow != ClassType )
-            return;
-
-        var Type = Reader.GetLong();
-
-        switch ( Type )
-        {
-            case historyitem_TableRow_Before:
-            {
-                // Bool : IsUndefined
-                //   Если предыдущее значение false
-                //   Long   : GridBefore
-                // Bool : IsUndefined
-                //   Если предыдущее значение false
-                //   Variable : WBefore (CTableMeasurement)
-
-                var bUndefinedGB = Reader.GetBool();
-                if ( true === bUndefinedGB )
-                    this.Pr.GridBefore = undefined;
-                else
-                    this.Pr.GridBefore = Reader.GetLong();
-
-                var bUndefinedWB = Reader.GetBool();
-                if ( true === bUndefinedWB )
-                    this.Pr.WBefore = undefined;
-                else
-                {
-                    this.Pr.WBefore = new CTableMeasurement(tblwidth_Auto, 0);
-                    this.Pr.WBefore.Read_FromBinary( Reader );
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableRow_After:
-            {
-                // Bool : IsUndefined
-                //   Если предыдущее значение false
-                //   Long   : GridAfter
-                // Bool : IsUndefined
-                //   Если предыдущее значение false
-                //   Variable : WAfter (CTableMeasurement)
-
-                var bUndefinedGA = Reader.GetBool();
-                if ( true === bUndefinedGA )
-                    this.Pr.GridAfter = undefined;
-                else
-                    this.Pr.GridAfter = Reader.GetLong();
-
-                var bUndefinedWA = Reader.GetBool();
-                if ( true === bUndefinedWA )
-                    this.Pr.WAfter = undefined;
-                else
-                {
-                    this.Pr.WAfter = new CTableMeasurement(tblwidth_Auto, 0);
-                    this.Pr.WAfter.Read_FromBinary( Reader );
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableRow_CellSpacing:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Bool : IsNull
-                //   Если false
-                //     Double : значение
-
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    this.Pr.TableCellSpacing = undefined;
-                else
-                {
-                    var bNull = Reader.GetBool();
-                    if ( true === bNull )
-                        this.Pr.TableCellSpacing = null;
-                    else
-                        this.Pr.TableCellSpacing = Reader.GetDouble();;
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableRow_Height:
-            {
-                // Bool : IsUndefined
-                // Если предыдущее значение false
-                //   Variable : Height (CTableRowHeight)
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    this.Pr.Height = undefined;
-                else
-                {
-                    this.Pr.Height = new CTableRowHeight(0, heightrule_Auto);
-                    this.Pr.Height.Read_FromBinary( Reader );
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableRow_AddCell:
-            {
-                // Long     : Количество элементов
-                // Array of :
-                //  {
-                //    Long   : Позиция
-                //    String : Id элемента
-                //  }
-
-                var Count = Reader.GetLong();
-
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    var Pos     = this.m_oContentChanges.Check(contentchanges_Add, Reader.GetLong());
-                    var Element = g_oTableId.Get_ById(Reader.GetString2());
-
-                    if (null != Element)
-                    {
-                        this.Content.splice(Pos, 0, Element);
-                        CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
-                    }
-                }
-
-                this.Internal_ReIndexing();
-
-                break;
-            }
-
-            case historyitem_TableRow_RemoveCell:
-            {
-                // Long          : Количество удаляемых элементов
-                // Array of Long : позиции удаляемых элементов
-
-                var Count = Reader.GetLong();
-
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    var Pos = this.m_oContentChanges.Check(contentchanges_Remove, Reader.GetLong());
-
-                    // действие совпало, не делаем его
-                    if (false === Pos)
-                        continue;
-
-                    this.Content.splice(Pos, 1);
-                    CollaborativeEditing.Update_DocumentPositionsOnRemove(this, Pos, 1);
-                }
-
-                this.Internal_ReIndexing();
-
-                break;
-            }
-
-            case historyitem_TableRow_TableHeader:
-            {
-                // Bool : IsUndefined
-                // Если предыдущее значение false
-                //   Bool : Height (TableHeader)
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    this.Pr.TableHeader = undefined;
-                else
-                    this.Pr.TableHeader = Reader.GetBool();
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableRow_Pr:
-            {
-                // CTableRowPr
-                this.Pr = new CTableRowPr();
-                this.Pr.Read_FromBinary( Reader );
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-        }
-
-        return true;
-    },
-
-    Write_ToBinary2 : function(Writer)
-    {
-        Writer.WriteLong( historyitem_type_TableRow );
-
-        // String          : Id строки
-        // Variable        : свойства строки
-        // Long            : количество ячеек
-        // Array strings   : Id ячеек
-
-        Writer.WriteString2(this.Id);
-        this.Pr.Write_ToBinary( Writer );
-
-        var Count = this.Content.length;
-        Writer.WriteLong( Count );
-        for ( var Index = 0; Index < Count; Index++ )
-            Writer.WriteString2( this.Content[Index].Get_Id() );
-    },
-
-    Read_FromBinary2 : function(Reader)
-    {
-        // String          : Id строки
-        // Variable        : свойства строки
-        // Long            : количество ячеек
-        // Array variables : сами ячейки
-
-        this.Id = Reader.GetString2();
-        this.Pr = new CTableRowPr()
-        this.Pr.Read_FromBinary( Reader );
-        this.Recalc_CompiledPr();
-
-        var Count = Reader.GetLong();
-        this.Content = [];
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var Cell = g_oTableId.Get_ById( Reader.GetString2() );
-            this.Content.push(Cell);
-        }
-
-        this.Internal_ReIndexing();
-
-        CollaborativeEditing.Add_NewObject(this);
-    },
-
-    Load_LinkData : function(LinkData)
-    {
-    }
-};
-CTableRow.prototype.Get_DocumentPositionFromObject = function(PosArray)
-{
-    if (!PosArray)
-        PosArray = [];
-
-    if (this.Table)
-    {
-        PosArray.splice(0, 0, {Class : this.Table, Position : this.Index});
-        this.Table.Get_DocumentPositionFromObject(PosArray);
-    }
-
-    return PosArray;
-};
-
-// Класс CTableCell
-function CTableCell(Row, ColW)
-{
-    this.Id = g_oIdCounter.Get_NewId();
-
-    this.Row = Row;
-
-    this.Prev = null;
-    this.Next = null;
-    this.Content = new CDocumentContent(this, (undefined !== this.Row ? this.Row.Table.DrawingDocument : undefined), 0, 0, 0, 0, false, false, undefined !== this.Row ? this.Row.Table.bPresentation : undefined);
-    this.Content.Set_StartPage( ( Row ? this.Row.Table.PageNum : 0 ) );
-
-    this.CompiledPr =
-    {
-        Pr         : null, // настройки ячейки
-        TextPr     : null, // настройки текста
-        ParaPr     : null, // настройки параграфа
-        NeedRecalc : true
-    };
-    this.Pr = new CTableCellPr();
-
-    if ( undefined != ColW )
-        this.Pr.TableCellW = new CTableMeasurement(tblwidth_Mm, ColW);
-
-    // Массивы с рассчитанными стилями для границ данной ячейки.
-    // В каждом элементе лежит массив стилей.
-    this.BorderInfo =
-    {
-        Top    : null,
-        Left   : null,
-        Right  : null,
-        Bottom : null,            // Используется для последней строки таблицы,
-        Bottom_BeforeCount : -1,  // когда Spacing = null(у последней строки) или когда в следущей строке
-        Bottom_AfterCount  : -1,  // GridBefore и/или GridAfter отлично от 0.
-        MaxLeft  : 0,
-        MaxRight : 0
-    };
-
-    // Метрики данной ячейки(они все относительные, а не абсолютные). Абсолютные хранятся в строке
-    this.Metrics =
-    {
-        StartGridCol    : 0,
-        X_grid_start    : 0,
-        X_grid_end      : 0,
-        X_cell_start    : 0,
-        X_cell_end      : 0,
-        X_content_start : 0,
-        X_content_end   : 0
-    };
-
-
-    this.Temp =
-    {
-        Y       : 0,
-        CurPage : 0,
-        Y_VAlign_offset : [] // Сдвиг, который нужно сделать из-за VAlign (массив по страницам)
-    };
-
-    this.Index = 0;
-
-    // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-    g_oTableId.Add( this, this.Id );
-}
-
-CTableCell.prototype =
-{
-    Set_Id : function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
-    },
-
-    Get_Id : function()
-    {
-        return this.Id;
-    },
-
-
-    Get_Theme : function()
-    {
-        return this.Row.Table.Get_Theme();
-    },
-
-    Get_ColorMap: function()
-    {
-        return this.Row.Table.Get_ColorMap();
-    },
-
-
-    Copy : function(Row)
-    {
-        var Cell = new CTableCell(Row);
-
-        // Копируем настройки ячейки
-        Cell.Copy_Pr( this.Pr.Copy(), false );
-
-        // Копируем содержимое ячейки
-        Cell.Content.Copy2( this.Content );
-
-        // Скопируем BorderInfo и метрики, чтобы при копировании строки целиком не надо было их пересчитывать
-        Cell.BorderInfo.Top                = this.BorderInfo.Top;
-        Cell.BorderInfo.Left               = this.BorderInfo.Left;
-        Cell.BorderInfo.Right              = this.BorderInfo.Right;
-        Cell.BorderInfo.Bottom             = this.BorderInfo.Bottom;
-        Cell.BorderInfo.Bottom_BeforeCount = this.BorderInfo.Bottom_BeforeCount;
-        Cell.BorderInfo.Bottom_AfterCount  = this.BorderInfo.Bottom_AfterCount;
-        Cell.BorderInfo.MaxLeft            = this.BorderInfo.MaxLeft;
-        Cell.BorderInfo.MaxRight           = this.BorderInfo.MaxRight;
-
-        Cell.Metrics.StartGridCol    = this.Metrics.StartGridCol;
-        Cell.Metrics.X_grid_start    = this.Metrics.X_grid_start;
-        Cell.Metrics.X_grid_end      = this.Metrics.X_grid_end;
-        Cell.Metrics.X_cell_start    = this.Metrics.X_cell_start;
-        Cell.Metrics.X_cell_end      = this.Metrics.X_cell_end;
-        Cell.Metrics.X_content_start = this.Metrics.X_content_start;
-        Cell.Metrics.X_content_end   = this.Metrics.X_content_end;
-
-        return Cell;
-    },
-
-    Set_Index : function(Index)
-    {
-        if ( Index != this.Index )
-        {
-            this.Index = Index;
-            this.Recalc_CompiledPr();
-        }
-    },
-
-    Set_Metrics : function(StartGridCol, X_grid_start, X_grid_end, X_cell_start, X_cell_end, X_content_start, X_content_end )
-    {
-        this.Metrics.StartGridCol    = StartGridCol;
-        this.Metrics.X_grid_start    = X_grid_start;
-        this.Metrics.X_grid_end      = X_grid_end;
-        this.Metrics.X_cell_start    = X_cell_start;
-        this.Metrics.X_cell_end      = X_cell_end;
-        this.Metrics.X_content_start = X_content_start;
-        this.Metrics.X_content_end   = X_content_end;
-    },
-
-    Get_EndInfo : function()
-    {
-        return this.Content.Get_EndInfo();
-    },
-
-    Get_PrevElementEndInfo : function(CurElement)
-    {
-        return this.Row.Get_PrevElementEndInfo( this.Index );
-    },
-
-    Save_RecalculateObject : function()
-    {
-        var RecalcObj = new CTableCellRecalculateObject();
-        RecalcObj.Save( this );
-        return RecalcObj;
-    },
-
-    Load_RecalculateObject : function(RecalcObj)
-    {
-        RecalcObj.Load(this);
-    },
-
-    Prepare_RecalculateObject : function()
-    {
-        this.BorderInfo =
-        {
-            Top    : null,
-            Left   : null,
-            Right  : null,
-            Bottom : null,            // Используется для последней строки таблицы,
-            Bottom_BeforeCount : -1,  // когда Spacing = null(у последней строки) или когда в следущей строке
-            Bottom_AfterCount  : -1,  // GridBefore и/или GridAfter отлично от 0.
-            MaxLeft  : 0,
-            MaxRight : 0
-        };
-
-        // Метрики данной ячейки(они все относительные, а не абсолютные). Абсолютные хранятся в строке
-        this.Metrics =
-        {
-            StartGridCol    : 0,
-            X_grid_start    : 0,
-            X_grid_end      : 0,
-            X_cell_start    : 0,
-            X_cell_end      : 0,
-            X_content_start : 0,
-            X_content_end   : 0
-        };
-
-        this.Temp =
-        {
-            Y       : 0,
-            CurPage : 0,
-            Y_VAlign_offset : [] // Сдвиг, который нужно сделать из-за VAlign (массив по страницам)
-        };
-        
-        this.Content.Prepare_RecalculateObject();
-    },
-//-----------------------------------------------------------------------------------
-// Работаем с стилем ячейки
-//-----------------------------------------------------------------------------------
-    Recalc_CompiledPr : function()
-    {
-        this.CompiledPr.NeedRecalc = true;
-        this.Content.Recalc_AllParagraphs_CompiledPr();
-    },
-
-    // Формируем конечные свойства параграфа на основе стиля и прямых настроек.
-    Get_CompiledPr : function(bCopy)
-    {
-        if ( true === this.CompiledPr.NeedRecalc )
-        {
-            // TODO: Возможно стоит разделить рассчет стиля для ячейки и для текста
-            var FullPr = this.Internal_Compile_Pr();
-            this.CompiledPr.Pr         = FullPr.CellPr;
-            this.CompiledPr.ParaPr     = FullPr.ParaPr;
-            this.CompiledPr.TextPr     = FullPr.TextPr;
-            this.CompiledPr.NeedRecalc = false;
-        }
-
-        if ( false === bCopy )
-            return this.CompiledPr.Pr;
-        else
-            return this.CompiledPr.Pr.Copy(); // Отдаем копию объекта, чтобы никто не поменял извне настройки стиля
-    },
-
-    Internal_Compile_Pr : function()
-    {
-        var Table     = this.Row.Table;
-        var TablePr   = Table.Get_CompiledPr(false);
-        var TableLook = Table.Get_TableLook();
-        var CellIndex = this.Index;
-        var RowIndex  = this.Row.Index;
-
-        // Сначала возьмем настройки по умолчанию для всей таблицы
-        var CellPr = TablePr.TableCellPr.Copy();
-        var ParaPr = TablePr.ParaPr.Copy();
-        var TextPr;
-        if(!Table.bPresentation)
-        {
-            TextPr = TablePr.TextPr.Copy();
-        }
-        else
-        {
-            TextPr = TablePr.TableWholeTable.TextPr.Copy();
-        }
-
-        // Совместим настройки с настройками для групп строк. Сначала группы строк, потом группы колонок.
-        if ( true === TableLook.Is_BandHor() )
-        {
-            var RowBandSize = TablePr.TablePr.TableStyleRowBandSize;
-            var __RowIndex  = ( true != TableLook.Is_FirstRow() ? RowIndex : RowIndex - 1 )
-            var _RowIndex = ( 1 != RowBandSize ? Math.floor( __RowIndex / RowBandSize ) : __RowIndex );
-            var TableBandStyle = null;
-            if ( 0 === _RowIndex % 2 )
-                TableBandStyle = TablePr.TableBand1Horz;
-            else
-                TableBandStyle = TablePr.TableBand2Horz;
-
-            CellPr.Merge( TableBandStyle.TableCellPr );
-            TextPr.Merge( TableBandStyle.TextPr );
-            ParaPr.Merge( TableBandStyle.ParaPr );
-        }
-
-        // Совместим с настройками для групп колонок
-        // Согласно спецификации DOCX, совмещать надо всегда, но для первой и последней колонок Word
-        // не совмещает, поэтому делаем также.
-        if ( true === TableLook.Is_BandVer() && !( (true === TableLook.Is_LastCol() && this.Row.Get_CellsCount() - 1 === CellIndex) || (true === TableLook.Is_FirstCol() && 0 === CellIndex) ) )
-        {
-            var ColBandSize = TablePr.TablePr.TableStyleColBandSize;
-            var _ColIndex   = ( true != TableLook.Is_FirstCol() ? CellIndex : CellIndex - 1 )
-            var ColIndex = ( 1 != ColBandSize ? Math.floor( _ColIndex / ColBandSize ) : _ColIndex );
-            var TableBandStyle = null;
-            if ( 0 === ColIndex % 2 )
-                TableBandStyle = TablePr.TableBand1Vert;
-            else
-                TableBandStyle = TablePr.TableBand2Vert;
-
-            CellPr.Merge( TableBandStyle.TableCellPr );
-            TextPr.Merge( TableBandStyle.TextPr );
-            ParaPr.Merge( TableBandStyle.ParaPr );
-        }
-
-
-        // Совместим настройки с настройками для последней колонки
-        if ( true === TableLook.Is_LastCol() && this.Row.Get_CellsCount() - 1 === CellIndex )
-        {
-            CellPr.Merge( TablePr.TableLastCol.TableCellPr );
-            TextPr.Merge( TablePr.TableLastCol.TextPr );
-            ParaPr.Merge( TablePr.TableLastCol.ParaPr );
-        }
-
-        // Совместим настройки с настройками для первой колонки
-        if ( true === TableLook.Is_FirstCol() && 0 === CellIndex )
-        {
-            CellPr.Merge( TablePr.TableFirstCol.TableCellPr );
-            TextPr.Merge( TablePr.TableFirstCol.TextPr );
-            ParaPr.Merge( TablePr.TableFirstCol.ParaPr );
-        }
-
-        // Совместим настройки с настройками для последней строки
-        if ( true === TableLook.Is_LastRow() && Table.Content.length - 1 === RowIndex )
-        {
-            CellPr.Merge( TablePr.TableLastRow.TableCellPr );
-            TextPr.Merge( TablePr.TableLastRow.TextPr );
-            ParaPr.Merge( TablePr.TableLastRow.ParaPr );
-        }
-
-        // Совместим настройки с настройками для первой строки
-        if ( true === TableLook.Is_FirstRow() && ( 0 === RowIndex || true === this.Row.Pr.TableHeader )  )
-        {
-            CellPr.Merge( TablePr.TableFirstRow.TableCellPr );
-            TextPr.Merge( TablePr.TableFirstRow.TextPr );
-            ParaPr.Merge( TablePr.TableFirstRow.ParaPr );
-        }
-
-        // Совместим настройки с настройками для правой нижней ячейки
-        if ( this.Row.Get_CellsCount() - 1 === CellIndex && Table.Content.length - 1 === RowIndex && (!Table.bPresentation || true === TableLook.Is_LastRow() && true === TableLook.Is_LastCol()))
-        {
-            CellPr.Merge( TablePr.TableBRCell.TableCellPr );
-            TextPr.Merge( TablePr.TableBRCell.TextPr );
-            ParaPr.Merge( TablePr.TableBRCell.ParaPr );
-        }
-
-        // Совместим настройки с настройками для левой нижней ячейки
-        if ( 0 === CellIndex && Table.Content.length - 1 === RowIndex && (!Table.bPresentation || true === TableLook.Is_LastRow() && true === TableLook.Is_FirstCol()))
-        {
-            CellPr.Merge( TablePr.TableBLCell.TableCellPr );
-            TextPr.Merge( TablePr.TableBLCell.TextPr );
-            ParaPr.Merge( TablePr.TableBLCell.ParaPr );
-        }
-
-        // Совместим настройки с настройками для правой верхней ячейки
-        if ( this.Row.Get_CellsCount() - 1 === CellIndex && 0 === RowIndex && (!Table.bPresentation || true === TableLook.Is_FirstRow() && true === TableLook.Is_LastCol()) )
-        {
-            CellPr.Merge( TablePr.TableTRCell.TableCellPr );
-            TextPr.Merge( TablePr.TableTRCell.TextPr );
-            ParaPr.Merge( TablePr.TableTRCell.ParaPr );
-        }
-
-        // Совместим настройки с настройками для левой верхней ячейки
-        if ( 0 === CellIndex && 0 === RowIndex && (!Table.bPresentation || true === TableLook.Is_FirstRow() && true === TableLook.Is_FirstCol()))
-        {
-            CellPr.Merge( TablePr.TableTLCell.TableCellPr );
-            TextPr.Merge( TablePr.TableTLCell.TextPr );
-            ParaPr.Merge( TablePr.TableTLCell.ParaPr );
-        }
-
-        if ( null === CellPr.TableCellMar && undefined != this.Pr.TableCellMar && null != this.Pr.TableCellMar )
-            CellPr.TableCellMar = {};
-        // Полученные настройки совместим с прямыми настройками ячейки
-        CellPr.Merge( this.Pr );
-
-        if(Table.bPresentation)
-        {
-            CellPr.Check_PresentationPr(Table.Get_Theme())
-        }
-
-        return { CellPr : CellPr, ParaPr : ParaPr, TextPr : TextPr };
-    },
-
-//-----------------------------------------------------------------------------------
-// Функции, к которым идет обращение из контента
-//-----------------------------------------------------------------------------------
-    OnContentRecalculate : function(bChange, bForceRecalc)
-    {
-        this.Row.Table.Internal_RecalculateFrom( this.Row.Index, this.Index, bChange, false );
-    },
-
-    OnContentReDraw : function(StartPage, EndPage)
-    {
-        this.Row.Table.Parent.OnContentReDraw( StartPage, EndPage );
-    },
-
-    Get_Styles : function(Lvl)
-    {
-        return this.Row.Table.Get_Styles(Lvl);
-    },
-
-    Get_TableStyleForPara : function()
-    {
-        this.Get_CompiledPr(false);
-
-        var TextPr = this.CompiledPr.TextPr.Copy();
-        var ParaPr = this.CompiledPr.ParaPr.Copy();
-
-        return { TextPr : TextPr, ParaPr : ParaPr };
-    },
-
-
-    Get_ShapeStyleForPara: function()
-    {
-        return this.Row.Table.Get_ShapeStyleForPara();
-    },
-
-
-    Get_TextBackGroundColor : function()
-    {
-        // Сначала проверим заливку данной ячейки, если ее нет, тогда спрашиваем у таблицы
-        var Shd = this.Get_Shd();
-
-        if ( shd_Nil !== Shd.Value )
-            return Shd.Get_Color2(this.Get_Theme(), this.Get_ColorMap());
-
-        return this.Row.Table.Get_TextBackGroundColor();
-    },
-
-    Get_Numbering : function()
-    {
-        return this.Row.Table.Get_Numbering();
-    },
-
-    Is_Cell : function()
-    {
-        return true;
-    },
-
-    Check_AutoFit : function()
-    {
-        return false;
-    },
-
-    Is_DrawingShape : function(bRetShape)
-    {
-        return this.Row.Table.Parent.Is_DrawingShape(bRetShape);
-    },
-
-    Is_HdrFtr : function(bReturnHdrFtr)
-    {
-        return this.Row.Table.Parent.Is_HdrFtr(bReturnHdrFtr);
-    },
-
-    Is_TopDocument : function(bReturnTopDocument)
-    {
-        if ( true === bReturnTopDocument )
-            return this.Row.Table.Parent.Is_TopDocument( bReturnTopDocument );
-
-        return false;
-    },
-
-    Is_InTable : function(bReturnTopTable)
-    {
-        if ( true === bReturnTopTable )
-        {
-            var CurTable = this.Row.Table;
-            var TopTable = CurTable.Parent.Is_InTable(true);
-            if ( null === TopTable )
-                return CurTable;
-            else
-                return TopTable;
-        }
-
-        return true;
-    },
-
-    Is_UseInDocument : function(Id)
-    {
-        if ( null != this.Row )
-            return this.Row.Is_UseInDocument(this.Get_Id());
-
-        return false;
-    },
-
-    Get_PageContentStartPos : function(PageNum)
-    {
-        return this.Row.Table.Get_PageContentStartPos(PageNum + this.Content.StartPage, this.Row.Index, this.Index, true );
-    },
-
-    Set_CurrentElement : function(bUpdateStates)
-    {
-        var Table = this.Row.Table;
-
-        // Делаем данную ячейку текущей в таблице
-        Table.Selection.Start = false;
-        Table.Selection.Type  = table_Selection_Text;
-        Table.Selection.Use   = this.Content.Is_SelectionUse();
-
-        Table.Selection.StartPos.Pos = { Row : this.Row.Index, Cell : this.Index };
-        Table.Selection.EndPos.Pos   = { Row : this.Row.Index, Cell : this.Index };
-
-        Table.Markup.Internal.RowIndex  = 0;
-        Table.Markup.Internal.CellIndex = 0;
-        Table.Markup.Internal.PageNum   = 0;
-
-        Table.CurCell = this;
-
-        // Делаем таблицу текущим элементом в документе
-        Table.Document_SetThisElementCurrent(bUpdateStates);
-    },
-
-    Is_ThisElementCurrent : function()
-    {
-        var Table = this.Row.Table;
-        if ( false === Table.Selection.Use && this === Table.CurCell )
-        {
-            var Parent = Table.Parent;
-            if ( docpostype_Content === Parent.CurPos.Type && false === Parent.Selection.Use && this.Index === Parent.CurPos.ContentPos )
-                return Table.Parent.Is_ThisElementCurrent();
-        }
-
-        return false;
-    },
-
-    Check_TableCoincidence : function(Table)
-    {
-        var CurTable = this.Row.Table;
-        if ( Table === CurTable )
-            return true;
-        else
-            return CurTable.Parent.Check_TableCoincidence(Table);
-    },
-    
-    Get_LastParagraphPrevCell : function()
-    {
-        if ( undefined === this.Row || null === this.Row )
-            return null;
-        
-        var CellIndex = this.Index;        
-        var Row = this.Row;
-        
-        // TODO: Разобраться, что делать в данном случае
-        if ( 0 === CellIndex )
-        {
-            if ( 0 === this.Row.Index && undefined !== this.Row.Table && null !== this.Row.Table )
-            {
-                var Prev = this.Row.Table.Get_DocumentPrev();
-                if ( null !== Prev && type_Paragraph === Prev.GetType() )
-                    return Prev;
-            }
-            
-            return null;
-        }
-        
-        var PrevCell = Row.Get_Cell( CellIndex );
-        
-        var Count = PrevCell.Content.Content.length;
-        if ( Count <= 0 )
-            return null;
-                
-        var Element = PrevCell.Content.Content[Count - 1];
-        if ( type_Paragraph !== Element.GetType() )
-            return null;
-        
-        return Element;
-    },
-    
-    Get_FirstParagraphNextCell : function()
-    {
-        if ( undefined === this.Row || null === this.Row )
-            return null;
-
-        var CellIndex = this.Index;
-        var Row = this.Row;
-
-        // TODO: Разобраться, что делать в данном случае
-        if ( CellIndex >= this.Row.Get_CellsCount() - 1 )
-            return null;
-
-        var NextCell = Row.Get_Cell( CellIndex );
-        
-        return NextCell.Content.Get_FirstParagraph();
-    },
-//-----------------------------------------------------------------------------------
-// Функции для работы с номерами страниц
-//-----------------------------------------------------------------------------------
-    Get_StartPage_Absolute : function()
-    {
-        return this.Row.Table.Get_StartPage_Absolute();
-    },
-
-    Get_StartPage_Relative : function()
-    {
-        return this.Row.Table.Get_StartPage_Relative();
-    },
-
-//-----------------------------------------------------------------------------------
-// Работаем с содержимым ячейки
-//-----------------------------------------------------------------------------------
-    Content_Reset : function(X, Y, XLimit, YLimit)
-    {
-        this.Content.Reset( X, Y, XLimit, YLimit );
-        this.Content.Set_CurPosXY( X, Y );
-    },
-
-    Content_Get_PageBounds : function(PageIndex)
-    {
-        return this.Content.Get_PageBounds(PageIndex);
-    },
-
-    Content_Get_PagesCount : function()
-    {
-        return this.Content.Get_PagesCount();
-    },
-
-    Content_Draw : function(PageIndex, pGraphics)
-    {
-        this.Content.Draw(PageIndex, pGraphics);
-    },
-
-    Recalculate : function()
-    {
-        this.Content.Recalculate(false);
-    },
-
-    Content_Merge : function(OtherContent)
-    {
-        this.Content.Add_Content( OtherContent );
-    },
-
-    Content_Is_ContentOnFirstPage : function()
-    {
-        return this.Content.Is_ContentOnFirstPage();
-    },
-
-    Content_Set_StartPage : function(PageNum)
-    {
-        this.Content.Set_StartPage(PageNum);
-    },
-
-    Content_Document_CreateFontMap : function(FontMap)
-    {
-        this.Content.Document_CreateFontMap( FontMap );
-    },
-
-    Content_Cursor_MoveToStartPos : function()
-    {
-        this.Content.Cursor_MoveToStartPos();
-    },
-
-    Content_Cursor_MoveToEndPos : function()
-    {
-        this.Content.Cursor_MoveToEndPos();
-    },
-//-----------------------------------------------------------------------------------
-// Работаем с настройками ячейки
-//-----------------------------------------------------------------------------------
-    Clear_DirectFormatting : function(bClearMerge)
-    {
-        // Очищаем все строки и всех ее ячеек
-
-        this.Set_Shd( undefined );
-        this.Set_Margins( undefined );
-        this.Set_Border( undefined, 0 );
-        this.Set_Border( undefined, 1 );
-        this.Set_Border( undefined, 2 );
-        this.Set_Border( undefined, 3 );
-
-        if ( true === bClearMerge )
-        {
-            this.Set_GridSpan( undefined );
-            this.Set_VMerge( undefined );
-        }
-    },
-
-    Set_Pr : function(CellPr)
-    {
-        History.Add( this, { Type : historyitem_TableCell_Pr, Old : this.Pr, New : CellPr } );
-        this.Pr = CellPr;
-        this.Recalc_CompiledPr();
-    },
-
-    Copy_Pr : function(OtherPr, bCopyOnlyVisualProps)
-    {
-        if ( true != bCopyOnlyVisualProps )
-        {
-            // GridSpan
-            if ( undefined === OtherPr.GridSpan )
-                this.Set_GridSpan( undefined );
-            else
-                this.Set_GridSpan( OtherPr.GridSpan );
-        }
-
-        // Shd
-        if ( undefined === OtherPr.Shd )
-            this.Set_Shd( undefined );
-        else
-        {
-            var Shd_new =
-            {
-                Value : OtherPr.Shd.Value,
-                Color : { r : OtherPr.Shd.Color.r, g : OtherPr.Shd.Color.g, b : OtherPr.Shd.Color.b },
-                Unifill : OtherPr.Shd.Unifill ? OtherPr.Shd.Unifill.createDuplicate() : undefined
-            };
-
-            this.Set_Shd( Shd_new );
-        }
-
-        if ( true != bCopyOnlyVisualProps )
-        {
-            // VMerge
-            if ( undefined === OtherPr.VMerge )
-                this.Set_VMerge( OtherPr.VMerge );
-            else
-                this.Set_VMerge( OtherPr.VMerge );
-        }
-
-        // Border Top
-        if ( undefined === OtherPr.TableCellBorders.Top )
-            this.Set_Border( undefined, 0 );
-        else
-        {
-            var Border_top_new = ( null === OtherPr.TableCellBorders.Top ? null : OtherPr.TableCellBorders.Top.Copy() );
-
-            this.Set_Border( Border_top_new, 0 );
-        }
-
-        // Border bottom
-        if ( undefined === OtherPr.TableCellBorders.Bottom )
-            this.Set_Border( undefined, 2 );
-        else
-        {
-            var Border_bottom_new = ( null === OtherPr.TableCellBorders.Bottom ? null : OtherPr.TableCellBorders.Bottom.Copy() );
-
-            this.Set_Border( Border_bottom_new, 2 );
-        }
-
-        // Border left
-        if ( undefined === OtherPr.TableCellBorders.Left )
-            this.Set_Border( undefined, 3 );
-        else
-        {
-            var Border_left_new = ( null === OtherPr.TableCellBorders.Left ? null : OtherPr.TableCellBorders.Left.Copy() );
-
-            this.Set_Border( Border_left_new, 3 );
-        }
-
-        // Border right
-        if ( undefined === OtherPr.TableCellBorders.Right )
-            this.Set_Border( undefined, 1 );
-        else
-        {
-            var Border_right_new = ( null === OtherPr.TableCellBorders.Right ? null : OtherPr.TableCellBorders.Right.Copy() );
-
-            this.Set_Border( Border_right_new, 1 );
-        }
-
-        // Margins
-        if ( undefined === OtherPr.TableCellMar )
-            this.Set_Margins( undefined );
-        else
-        {
-            var Margins_new = ( null === OtherPr.TableCellMar ? null :
-            {
-                Top :
-                {
-                    W    : OtherPr.TableCellMar.Top.W,
-                    Type : OtherPr.TableCellMar.Top.Type
-                },
-                Left :
-                {
-                    W    : OtherPr.TableCellMar.Left.W,
-                    Type : OtherPr.TableCellMar.Left.Type
-                },
-
-                Bottom :
-                {
-                    W    : OtherPr.TableCellMar.Bottom.W,
-                    Type : OtherPr.TableCellMar.Bottom.Type
-                },
-
-                Right :
-                {
-                    W    : OtherPr.TableCellMar.Right.W,
-                    Type : OtherPr.TableCellMar.Right.Type
-                }
-            } );
-
-            this.Set_Margins( Margins_new, -1 );
-        }
-
-        // W
-        if ( undefined === OtherPr.TableCellW )
-            this.Set_W( undefined );
-        else
-            this.Set_W( OtherPr.TableCellW.Copy() );
-    },
-
-    Get_W : function()
-    {
-        var W = this.Get_CompiledPr(false).TableCellW;
-        return W.Copy();
-    },
-
-    Set_W : function(CellW)
-    {
-        if ( undefined === CellW )
-        {
-            History.Add( this, { Type : historyitem_TableCell_W, Old : this.Pr.TableCellW, New : undefined } );
-            this.Pr.TableCellW = undefined;
-        }
-        else
-        {
-            History.Add( this, { Type : historyitem_TableCell_W, Old : this.Pr.TableCellW, New : CellW } );
-            this.Pr.TableCellW = CellW;
-        }
-
-        this.Recalc_CompiledPr();
-    },
-
-    Get_GridSpan : function()
-    {
-        var GridSpan = this.Get_CompiledPr(false).GridSpan;
-        return GridSpan;
-    },
-
-    Set_GridSpan : function(Value)
-    {
-        if ( undefined === Value && undefined === this.Pr.GridSpan )
-            return;
-
-        if ( undefined === Value && undefined != this.Pr.GridSpan )
-        {
-            History.Add( this, { Type : historyitem_TableCell_GridSpan, Old : this.Pr.GridSpan, New : undefined } );
-            this.Pr.GridSpan = undefined;
-
-            this.Recalc_CompiledPr();
-        }
-        else if ( Value != this.Pr.GridSpan )
-        {
-            History.Add( this, { Type : historyitem_TableCell_GridSpan, Old : ( undefined === this.Pr.GridSpan ? undefined : this.Pr.GridSpan ), New : Value } );
-            this.Pr.GridSpan = Value;
-
-            this.Recalc_CompiledPr();
-        }
-    },
-
-    Get_Margins : function()
-    {
-        var TableCellMar = this.Get_CompiledPr(false).TableCellMar;
-
-        if ( null === TableCellMar )
-        {
-            return this.Row.Table.Get_TableCellMar();
-        }
-        else
-        {
-            var TableCellDefMargins = this.Row.Table.Get_TableCellMar();
-
-            var Margins =
-            {
-                Top    : undefined != TableCellMar.Top    ? TableCellMar.Top    : TableCellDefMargins.Top,
-                Bottom : undefined != TableCellMar.Bottom ? TableCellMar.Bottom : TableCellDefMargins.Bottom,
-                Left   : undefined != TableCellMar.Left   ? TableCellMar.Left   : TableCellDefMargins.Left,
-                Right  : undefined != TableCellMar.Right  ? TableCellMar.Right  : TableCellDefMargins.Right
-            };
-
-            return Margins;
-        }
-    },
-
-    Is_TableMargins : function()
-    {
-        var TableCellMar = this.Get_CompiledPr(false).TableCellMar;
-
-        if ( null === TableCellMar )
-            return true;
-        else
-            return false;
-    },
-
-    Set_Margins : function(Margin, Type)
-    {
-        var OldValue = ( undefined === this.Pr.TableCellMar ? undefined : this.Pr.TableCellMar );
-
-        if ( undefined === Margin )
-        {
-            if ( undefined != this.Pr.TableCellMar )
-            {
-                History.Add( this, { Type : historyitem_TableCell_Margins, Old : OldValue, New : undefined } );
-                this.Pr.TableCellMar = undefined;
-
-                this.Recalc_CompiledPr();
-            }
-
-            return;
-        }
-
-        if ( null === Margin )
-        {
-            if ( null != this.Pr.TableCellMar )
-            {
-                History.Add( this, { Type : historyitem_TableCell_Margins, Old : OldValue, New : null } );
-                this.Pr.TableCellMar = null;
-
-                this.Recalc_CompiledPr();
-            }
-
-            return;
-        }
-
-        var Margins_new = this.Pr.TableCellMar;
-
-        var bNeedChange  = false;
-        var TableMargins = this.Row.Table.Get_TableCellMar();
-        if ( null === Margins_new || undefined === Margins_new )
-        {
-            Margins_new =
-            {
-                Left   : TableMargins.Left.Copy(),
-                Right  : TableMargins.Right.Copy(),
-                Top    : TableMargins.Top.Copy(),
-                Bottom : TableMargins.Bottom.Copy()
-            };
-
-            bNeedChange = true;
-        }
-
-        switch ( Type )
-        {
-            case -1 :
-            {
-                bNeedChange = true;
-
-                Margins_new.Top.W       = Margin.Top.W;
-                Margins_new.Top.Type    = Margin.Top.Type;
-                Margins_new.Right.W     = Margin.Right.W;
-                Margins_new.Right.Type  = Margin.Right.Type;
-                Margins_new.Bottom.W    = Margin.Bottom.W;
-                Margins_new.Bottom.Type = Margin.Bottom.Type;
-                Margins_new.Left.W      = Margin.Left.W;
-                Margins_new.Left.Type   = Margin.Left.Type;
-
-                break;
-            }
-            case 0:
-            {
-                if ( true != bNeedChange && Margins_new.Top.W != Margin.W || Margins_new.Top.Type != Margin.Type )
-                    bNeedChange = true;
-
-                Margins_new.Top.W    = Margin.W;
-                Margins_new.Top.Type = Margin.Type;
-                break;
-            }
-            case 1:
-            {
-                if ( true != bNeedChange && Margins_new.Right.W != Margin.W || Margins_new.Right.Type != Margin.Type )
-                    bNeedChange = true;
-
-                Margins_new.Right.W    = Margin.W;
-                Margins_new.Right.Type = Margin.Type;
-                break;
-            }
-            case 2:
-            {
-                if ( true != bNeedChange && Margins_new.Bottom.W != Margin.W || Margins_new.Bottom.Type != Margin.Type )
-                    bNeedChange = true;
-
-                Margins_new.Bottom.W    = Margin.W;
-                Margins_new.Bottom.Type = Margin.Type;
-                break;
-            }
-            case 3:
-            {
-                if ( true != bNeedChange && Margins_new.Left.W != Margin.W || Margins_new.Left.Type != Margin.Type )
-                    bNeedChange = true;
-
-                Margins_new.Left.W    = Margin.W;
-                Margins_new.Left.Type = Margin.Type;
-                break;
-            }
-        }
-
-        if ( true === bNeedChange )
-        {
-            History.Add( this, { Type : historyitem_TableCell_Margins, Old : OldValue, New : Margins_new } );
-            this.Pr.TableCellMar = Margins_new;
-
-            this.Recalc_CompiledPr();
-        }
-    },
-
-    Get_Shd : function()
-    {
-        var Shd = this.Get_CompiledPr(false).Shd;
-        return Shd;
-    },
-
-    Set_Shd : function(Shd)
-    {
-        if ( undefined === Shd && undefined === this.Pr.Shd )
-            return;
-
-        if ( undefined === Shd )
-        {
-            History.Add( this, { Type : historyitem_TableCell_Shd, Old : this.Pr.Shd, New : undefined } );
-            this.Pr.Shd = undefined;
-
-            this.Recalc_CompiledPr();
-        }
-        else if ( undefined === this.Pr.Shd || false === this.Pr.Shd.Compare(Shd) )
-        {
-            var _Shd = new CDocumentShd();
-            _Shd.Set_FromObject( Shd );
-            History.Add( this, { Type : historyitem_TableCell_Shd, Old : ( undefined === this.Pr.Shd ? undefined : this.Pr.Shd ), New : _Shd } );
-            this.Pr.Shd = _Shd;
-
-            this.Recalc_CompiledPr();
-        }
-    },
-
-    Get_VMerge : function()
-    {
-        var VMerge = this.Get_CompiledPr(false).VMerge;
-        return VMerge;
-    },
-
-    Set_VMerge : function(Value)
-    {
-        if ( undefined === Value && undefined === this.Pr.VMerge )
-            return;
-
-        if ( undefined === Value )
-        {
-            History.Add( this, { Type : historyitem_TableCell_VMerge, Old : this.Pr.VMerge, New : undefined } );
-            this.Pr.VMerge = undefined;
-            this.Recalc_CompiledPr();
-        }
-        else if ( Value != this.Pr.VMerge )
-        {
-            History.Add( this, { Type : historyitem_TableCell_VMerge, Old : ( undefined === this.Pr.VMerge ? undefined : this.Pr.VMerge ), New : Value } );
-            this.Pr.VMerge = Value;
-            this.Recalc_CompiledPr();
-        }
-    },
-
-    Get_VAlign : function()
-    {
-        var VAlign = this.Get_CompiledPr(false).VAlign;
-        return VAlign;
-    },
-
-    Set_VAlign : function(Value)
-    {
-        if ( undefined === Value && undefined === this.Pr.VAlign )
-            return;
-
-        if ( undefined === Value )
-        {
-            History.Add( this, { Type : historyitem_TableCell_VAlign, Old : this.Pr.VAlign, New : undefined } );
-            this.Pr.VMerge = undefined;
-            this.Recalc_CompiledPr();
-        }
-        else if ( Value != this.Pr.VAlign )
-        {
-            History.Add( this, { Type : historyitem_TableCell_VAlign, Old : ( undefined === this.Pr.VAlign ? undefined : this.Pr.VAlign ), New : Value } );
-            this.Pr.VAlign = Value;
-            this.Recalc_CompiledPr();
-        }
-    },
-
-    Get_Borders : function()
-    {
-        var CellBorders =
-        {
-            Top    : this.Get_Border( 0 ),
-            Right  : this.Get_Border( 1 ),
-            Bottom : this.Get_Border( 2 ),
-            Left   : this.Get_Border( 3 )
-        };
-
-        return CellBorders;
-    },
-
-    // 0 - Top, 1 - Right, 2- Bottom, 3- Left
-    Get_Border : function(Type)
-    {
-        var TableBorders = this.Row.Table.Get_TableBorders();
-        var Borders = this.Get_CompiledPr(false).TableCellBorders;
-        var Border = null;
-        switch (Type)
-        {
-            case 0 :
-            {
-                if ( null != Borders.Top )
-                    Border = Borders.Top;
-                else
-                {
-                    if ( 0 != this.Row.Index || null != this.Row.Get_CellSpacing() )
-                        Border = TableBorders.InsideH;
-                    else
-                        Border = TableBorders.Top;
-                }
-
-                break;
-            }
-            case 1 :
-            {
-                if ( null != Borders.Right )
-                    Border = Borders.Right;
-                else
-                {
-                    if ( this.Row.Content.length - 1 != this.Index || null != this.Row.Get_CellSpacing() )
-                        Border = TableBorders.InsideV;
-                    else
-                        Border = TableBorders.Right;
-                }
-
-                break;
-            }
-            case 2 :
-            {
-                if ( null != Borders.Bottom )
-                    Border = Borders.Bottom;
-                else
-                {
-                    if ( this.Row.Table.Content.length - 1 != this.Row.Index || null != this.Row.Get_CellSpacing() )
-                        Border = TableBorders.InsideH;
-                    else
-                        Border = TableBorders.Bottom;
-                }
-
-                break;
-            }
-            case 3 :
-            {
-                if ( null != Borders.Left )
-                    Border = Borders.Left;
-                else
-                {
-                    if ( 0 != this.Index || null != this.Row.Get_CellSpacing() )
-                        Border = TableBorders.InsideV;
-                    else
-                        Border = TableBorders.Left;
-                }
-
-                break;
-            }
-        }
-
-        return Border;
-    },
-
-    // 0 - Top, 1 - Right, 2- Bottom, 3- Left
-    Set_Border : function(Border, Type)
-    {
-        var DstBorder   = this.Pr.TableCellBorders.Top;
-        var HistoryType = historyitem_TableCell_Border_Left;
-        switch (Type)
-        {
-            case 0 : DstBorder = this.Pr.TableCellBorders.Top;    HistoryType = historyitem_TableCell_Border_Top;    break;
-            case 1 : DstBorder = this.Pr.TableCellBorders.Right;  HistoryType = historyitem_TableCell_Border_Right;  break;
-            case 2 : DstBorder = this.Pr.TableCellBorders.Bottom; HistoryType = historyitem_TableCell_Border_Bottom; break;
-            case 3 : DstBorder = this.Pr.TableCellBorders.Left;   HistoryType = historyitem_TableCell_Border_Left;   break;
-        }
-
-        if ( undefined === Border )
-        {
-            if ( undefined === DstBorder )
-                return;
-            else
-            {
-                History.Add( this, { Type : HistoryType, Old : DstBorder, New : undefined } );
-
-                switch (Type)
-                {
-                    case 0 : this.Pr.TableCellBorders.Top    = undefined; break;
-                    case 1 : this.Pr.TableCellBorders.Right  = undefined; break;
-                    case 2 : this.Pr.TableCellBorders.Bottom = undefined; break;
-                    case 3 : this.Pr.TableCellBorders.Left   = undefined; break;
-                }
-
-                this.Recalc_CompiledPr();
-            }
-        }
-        else if ( null === Border )
-        {
-            if ( null === DstBorder )
-                return;
-            else
-            {
-                History.Add( this, { Type : HistoryType, Old : DstBorder, New : null } );
-
-                switch (Type)
-                {
-                    case 0 : this.Pr.TableCellBorders.Top    = null; break;
-                    case 1 : this.Pr.TableCellBorders.Right  = null; break;
-                    case 2 : this.Pr.TableCellBorders.Bottom = null; break;
-                    case 3 : this.Pr.TableCellBorders.Left   = null; break;
-                }
-
-                this.Recalc_CompiledPr();
-            }
-        }
-        else if ( null === DstBorder )
-        {
-            // Нам вернется граница из таблицы
-            var NewBorder = this.Get_Border(Type).Copy();
-            NewBorder.Value   = ( null != Border.Value ? Border.Value   : NewBorder.Value );
-            NewBorder.Size    = ( null != Border.Size  ? Border.Size    : NewBorder.Size  );
-            NewBorder.Color.r = ( null != Border.Color ? Border.Color.r : NewBorder.Color.r );
-            NewBorder.Color.g = ( null != Border.Color ? Border.Color.g : NewBorder.Color.g );
-            NewBorder.Color.b = ( null != Border.Color ? Border.Color.b : NewBorder.Color.b );
-            NewBorder.Unifill = ( null != Border.Unifill ? Border.Unifill : NewBorder.Unifill);
-            History.Add( this, { Type : HistoryType, Old : null, New : NewBorder } );
-
-            switch (Type)
-            {
-                case 0 : this.Pr.TableCellBorders.Top    = NewBorder; break;
-                case 1 : this.Pr.TableCellBorders.Right  = NewBorder; break;
-                case 2 : this.Pr.TableCellBorders.Bottom = NewBorder; break;
-                case 3 : this.Pr.TableCellBorders.Left   = NewBorder; break;
-            }
-
-            this.Recalc_CompiledPr();
-        }
-        else
-        {
-            var NewBorder = new CDocumentBorder();
-
-            var DefBorder = DstBorder;
-            if ( undefined === DefBorder )
-                DefBorder = new CDocumentBorder();
-            
-            NewBorder.Value   = ( null != Border.Value   ? Border.Value   : DefBorder.Value );
-            NewBorder.Size    = ( null != Border.Size    ? Border.Size    : DefBorder.Size  );
-            NewBorder.Color.r = ( null != Border.Color   ? Border.Color.r : DefBorder.Color.r );
-            NewBorder.Color.g = ( null != Border.Color   ? Border.Color.g : DefBorder.Color.g );
-            NewBorder.Color.b = ( null != Border.Color   ? Border.Color.b : DefBorder.Color.b );
-            NewBorder.Unifill = ( null != Border.Unifill ? Border.Unifill : DefBorder.Unifill);
-
-            History.Add( this, { Type : HistoryType, Old : DstBorder, New : NewBorder } );
-
-            switch (Type)
-            {
-                case 0 : this.Pr.TableCellBorders.Top    = NewBorder; break;
-                case 1 : this.Pr.TableCellBorders.Right  = NewBorder; break;
-                case 2 : this.Pr.TableCellBorders.Bottom = NewBorder; break;
-                case 3 : this.Pr.TableCellBorders.Left   = NewBorder; break;
-            }
-
-            this.Recalc_CompiledPr();
-        }
-    },
-
-    Set_BorderInfo_Top : function( TopInfo )
-    {
-        this.BorderInfo.Top = TopInfo;
-    },
-
-    Set_BorderInfo_Bottom : function(BottomInfo, BeforeCount, AfterCount)
-    {
-        this.BorderInfo.Bottom = BottomInfo;
-        this.BorderInfo.Bottom_BeforeCount = BeforeCount;
-        this.BorderInfo.Bottom_AfterCount  = AfterCount;
-    },
-
-    Set_BorderInfo_Left : function(LeftInfo, Max)
-    {
-        this.BorderInfo.Left = LeftInfo;
-        this.BorderInfo.MaxLeft = Max;
-    },
-
-    Set_BorderInfo_Right : function(RightInfo, Max)
-    {
-        this.BorderInfo.Right = RightInfo;
-        this.BorderInfo.MaxRight = Max;
-    },
-
-    Get_BorderInfo : function()
-    {
-        return this.BorderInfo;
-    },
-
-//-----------------------------------------------------------------------------------
-// Undo/Redo функции
-//-----------------------------------------------------------------------------------
-    Undo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case historyitem_TableCell_GridSpan:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.GridSpan = undefined;
-                else
-                    this.Pr.GridSpan = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Margins:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.TableCellMar = undefined;
-                else
-                    this.Pr.TableCellMar = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Shd:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.Shd = undefined;
-                else
-                    this.Pr.Shd = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_VMerge:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.VMerge = undefined;
-                else
-                    this.Pr.VMerge = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Border_Left:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.TableCellBorders.Left = undefined;
-                else
-                    this.Pr.TableCellBorders.Left = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Border_Right:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.TableCellBorders.Right = undefined;
-                else
-                    this.Pr.TableCellBorders.Right = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Border_Top:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.TableCellBorders.Top = undefined;
-                else
-                    this.Pr.TableCellBorders.Top = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Border_Bottom:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.TableCellBorders.Bottom = undefined;
-                else
-                    this.Pr.TableCellBorders.Bottom = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_VAlign:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.VAlign = undefined;
-                else
-                    this.Pr.VAlign = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_W:
-            {
-                if ( undefined === Data.Old )
-                    this.Pr.TableCellW = undefined;
-                else
-                    this.Pr.TableCellW = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Pr:
-            {
-                this.Pr = Data.Old;
-                this.Recalc_CompiledPr();
-                break;
-            }
-        }
-    },
-
-    Redo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case historyitem_TableCell_GridSpan:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.GridSpan = undefined;
-                else
-                    this.Pr.GridSpan = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Margins:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.TableCellMar = undefined;
-                else
-                    this.Pr.TableCellMar = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Shd:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.Shd = undefined;
-                else
-                    this.Pr.Shd = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_VMerge:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.VMerge = undefined;
-                else
-                    this.Pr.VMerge = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Border_Left:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.TableCellBorders.Left = undefined;
-                else
-                    this.Pr.TableCellBorders.Left = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Border_Right:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.TableCellBorders.Right = undefined;
-                else
-                    this.Pr.TableCellBorders.Right = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Border_Top:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.TableCellBorders.Top = undefined;
-                else
-                    this.Pr.TableCellBorders.Top = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Border_Bottom:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.TableCellBorders.Bottom = undefined;
-                else
-                    this.Pr.TableCellBorders.Bottom = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_VAlign:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.VAlign = undefined;
-                else
-                    this.Pr.VAlign = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_W:
-            {
-                if ( undefined === Data.New )
-                    this.Pr.TableCellW = undefined;
-                else
-                    this.Pr.TableCellW = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Pr:
-            {
-                this.Pr = Data.New;
-                this.Recalc_CompiledPr();
-                break;
-            }
-        }
-    },
-
-    Get_ParentObject_or_DocumentPos : function()
-    {
-        return this.Row.Table.Get_ParentObject_or_DocumentPos(this.Row.Table.Index);
-    },
-
-    Refresh_RecalcData : function(Data)
-    {
-        var bNeedRecalc = false;
-
-        var Type = Data.Type;
-        switch ( Type )
-        {
-            case historyitem_TableCell_GridSpan:
-            case historyitem_TableCell_Margins:
-            case historyitem_TableCell_VMerge:
-            case historyitem_TableCell_Border_Left:
-            case historyitem_TableCell_Border_Right:
-            case historyitem_TableCell_Border_Top:
-            case historyitem_TableCell_Border_Bottom:
-            case historyitem_TableCell_VAlign:
-            case historyitem_TableCell_W:
-            case historyitem_TableCell_Pr:
-            {
-                bNeedRecalc = true;
-                break;
-            }
-            case historyitem_TableCell_Shd:
-            {
-                // Пересчитывать этот элемент не надо при таких изменениях
-                break;
-            }
-        }
-
-        this.Row.Table.RecalcInfo.Recalc_Borders();
-
-        this.Refresh_RecalcData2( 0, 0 );
-    },
-
-    Refresh_RecalcData2 : function(Page_Rel)
-    {
-        this.Row.Table.RecalcInfo.Add_Cell( this );
-
-        var Table   = this.Row.Table;
-        var TablePr = Table.Get_CompiledPr(false).TablePr;
-        if (tbllayout_AutoFit === TablePr.TableLayout)
-        {
-            if (this.Row.Table.Parent.Pages.length > 0)
-            {
-                // Если изменение внутри ячейки влечет за собой изменение сетки таблицы, тогда
-                // пересчитывать таблицу надо с самого начала.
-                History.Add_RecalcTableGrid(Table.Get_Id());
-            }
-            else
-                return Table.Refresh_RecalcData2(0, 0);
-        }
-
-        this.Row.Refresh_RecalcData2( this.Index, Page_Rel );
-    },
-//-----------------------------------------------------------------------------------
-// Функции для работы с совместным редактирования
-//-----------------------------------------------------------------------------------
-    Save_Changes : function(Data, Writer)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        Writer.WriteLong( historyitem_type_TableCell );
-
-        var Type = Data.Type;
-
-        // Пишем тип
-        Writer.WriteLong( Type );
-
-        switch ( Type )
-        {
-            case historyitem_TableCell_GridSpan:
-            {
-                // Bool : Is undefined
-                // Если false
-                //   Long : GridSpan
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Writer.WriteLong( Data.New );
-                }
-
-                break;
-            }
-
-            case historyitem_TableCell_Margins:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //
-                //   Bool : IsNull
-                //   Если false
-                //
-                //     Variable : Top    (CTableMeasure)
-                //     Variable : Left   (CTableMeasure)
-                //     Variable : Bottom (CTableMeasure)
-                //     Variable : Right  (CTableMeasure)
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-
-                    if ( null === Data.New )
-                        Writer.WriteBool( true );
-                    else
-                    {
-                        Writer.WriteBool( false );
-                        Data.New.Top.Write_ToBinary( Writer );
-                        Data.New.Left.Write_ToBinary( Writer );
-                        Data.New.Bottom.Write_ToBinary( Writer );
-                        Data.New.Right.Write_ToBinary( Writer );
-                    }
-                }
-
-                break;
-            }
-
-            case historyitem_TableCell_Shd:
-            {
-                // Bool : IsUndefined
-                // Если  false
-                //   Variable : Shd (CDocumentShd)
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Data.New.Write_ToBinary( Writer );
-                }
-
-                break;
-            }
-
-            case historyitem_TableCell_VMerge:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Long : VMerge
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Writer.WriteLong( Data.New );
-                }
-
-
-                break;
-            }
-
-            case historyitem_TableCell_Border_Left:
-            case historyitem_TableCell_Border_Right:
-            case historyitem_TableCell_Border_Top:
-            case historyitem_TableCell_Border_Bottom:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Bool : IsNull
-                //   Если false
-                //     Variable : Border (CDocumentBorder)
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-
-                    if ( null === Data.New )
-                        Writer.WriteBool( true );
-                    else
-                    {
-                        Writer.WriteBool( false );
-                        Data.New.Write_ToBinary( Writer );
-                    }
-                }
-
-                break;
-            }
-
-            case historyitem_TableCell_VAlign:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Long : VAlign
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Writer.WriteLong( Data.New );
-                }
-
-
-                break;
-            }
-
-            case historyitem_TableCell_W:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Variable : TableCellW
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Data.New.Write_ToBinary(Writer);
-                }
-
-                break;
-            }
-
-            case historyitem_TableCell_Pr:
-            {
-                // CTableCellPr
-                Data.New.Write_ToBinary( Writer );
-                break;
-            }
-        }
-
-        return Writer;
-    },
-
-    Save_Changes2 : function(Data, Writer)
-    {
-        return false;
-    },
-
-    Load_Changes : function(Reader, Reader2)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        var ClassType = Reader.GetLong();
-        if ( historyitem_type_TableCell != ClassType )
-            return;
-
-        var Type = Reader.GetLong();
-
-        switch ( Type )
-        {
-            case historyitem_TableCell_GridSpan:
-            {
-                // Bool : Is undefined
-                // Если false
-                //   Long : GridSpan
-
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    this.Pr.GridSpan = undefined;
-                else
-                    this.Pr.GridSpan = Reader.GetLong();
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Margins:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //
-                //   Bool : IsNull
-                //   Если false
-                //
-                //     Variable : Top    (CTableMeasure)
-                //     Variable : Left   (CTableMeasure)
-                //     Variable : Bottom (CTableMeasure)
-                //     Variable : Right  (CTableMeasure)
-
-                var bUndefined = Reader.GetBool();
-
-                if ( true === bUndefined )
-                    this.Pr.TableCellMar = undefined;
-                else
-                {
-                    var bNull = Reader.GetBool();
-
-                    if ( true === bNull )
-                        this.Pr.TableCellMar = null;
-                    else
-                    {
-                        this.Pr.TableCellMar =
-                        {
-                            Top    : new CTableMeasurement(tblwidth_Auto, 0),
-                            Left   : new CTableMeasurement(tblwidth_Auto, 0),
-                            Bottom : new CTableMeasurement(tblwidth_Auto, 0),
-                            Right  : new CTableMeasurement(tblwidth_Auto, 0)
-                        };
-
-                        this.Pr.TableCellMar.Top.Read_FromBinary( Reader );
-                        this.Pr.TableCellMar.Left.Read_FromBinary( Reader );
-                        this.Pr.TableCellMar.Bottom.Read_FromBinary( Reader );
-                        this.Pr.TableCellMar.Right.Read_FromBinary( Reader );
-                    }
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Shd:
-            {
-                // Bool : IsUndefined
-                // Если  false
-                //   Variable : Shd (CDocumentShd)
-
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    this.Pr.Shd = undefined;
-                else
-                {
-                    this.Pr.Shd = new CDocumentShd();
-                    this.Pr.Shd.Read_FromBinary( Reader );
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_VMerge:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Long : VMerge
-
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    delete this.Pr.VMerge;
-                else
-                    this.Pr.VMerge = Reader.GetLong();
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Border_Left:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Bool : IsNull
-                //   Если false
-                //     Variable : Border (CDocumentBorder)
-
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    this.Pr.TableCellBorders.Left = undefined;
-                else
-                {
-                    var bNull = Reader.GetBool();
-
-                    if ( true === bNull )
-                        this.Pr.TableCellBorders.Left = null;
-                    else
-                    {
-                        this.Pr.TableCellBorders.Left = new CDocumentBorder();
-                        this.Pr.TableCellBorders.Left.Read_FromBinary( Reader );
-                    }
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Border_Right:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Bool : IsNull
-                //   Если false
-                //     Variable : Border (CDocumentBorder)
-
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    this.Pr.TableCellBorders.Right = undefined;
-                else
-                {
-                    var bNull = Reader.GetBool();
-
-                    if ( true === bNull )
-                        this.Pr.TableCellBorders.Right = null;
-                    else
-                    {
-                        this.Pr.TableCellBorders.Right = new CDocumentBorder();
-                        this.Pr.TableCellBorders.Right.Read_FromBinary( Reader );
-                    }
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Border_Top:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Bool : IsNull
-                //   Если false
-                //     Variable : Border (CDocumentBorder)
-
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    this.Pr.TableCellBorders.Top = undefined;
-                else
-                {
-                    var bNull = Reader.GetBool();
-
-                    if ( true === bNull )
-                        this.Pr.TableCellBorders.Top = null;
-                    else
-                    {
-                        this.Pr.TableCellBorders.Top = new CDocumentBorder();
-                        this.Pr.TableCellBorders.Top.Read_FromBinary( Reader );
-                    }
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Border_Bottom:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Bool : IsNull
-                //   Если false
-                //     Variable : Border (CDocumentBorder)
-
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    this.Pr.TableCellBorders.Bottom = undefined;
-                else
-                {
-                    var bNull = Reader.GetBool();
-
-                    if ( true === bNull )
-                        this.Pr.TableCellBorders.Bottom = null;
-                    else
-                    {
-                        this.Pr.TableCellBorders.Bottom = new CDocumentBorder();
-                        this.Pr.TableCellBorders.Bottom.Read_FromBinary( Reader );
-                    }
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_VAlign:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Long : VAlign
-
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    delete this.Pr.VAlign;
-                else
-                    this.Pr.VAlign = Reader.GetLong();
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_W:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Variable : TableCellW
-
-                if ( true === Reader.GetBool() )
-                    delete this.Pr.TableCellW;
-                else
-                {
-                    this.Pr.TableCellW = new CTableMeasurement(tblwidth_Auto, 0);
-                    this.Pr.TableCellW.Read_FromBinary( Reader );
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case historyitem_TableCell_Pr:
-            {
-                // CTableCellPr
-
-                this.Pr = new CTableCellPr();
-                this.Pr.Read_FromBinary( Reader );
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-        }
-    },
-
-    Write_ToBinary2 : function(Writer)
-    {
-        Writer.WriteLong( historyitem_type_TableCell );
-
-        // String   : Id ячейки
-        // Variable : TableCell.Pr
-        // String   : Id DocumentContent
-
-        Writer.WriteString2( this.Id );
-        this.Pr.Write_ToBinary( Writer );
-        Writer.WriteString2( this.Content.Get_Id() );
-    },
-
-    Read_FromBinary2 : function(Reader)
-    {
-        // String   : Id ячейки
-        // Variable : TableCell.Pr
-        // String   : Id DocumentContent
-
-        this.Id = Reader.GetString2();
-        this.Pr = new CTableCellPr();
-        this.Pr.Read_FromBinary( Reader );
-        this.Recalc_CompiledPr();
-
-        this.Content = g_oTableId.Get_ById( Reader.GetString2() );
-
-        CollaborativeEditing.Add_NewObject( this );
-    },
-
-    Load_LinkData : function(LinkData)
-    {
-    }
-};
-
-CTableCell.prototype.Get_TopElement = function()
-{
-    if (this.Row && this.Row.Table)
-        return this.Row.Table.Get_TopElement();
-
-    return null;
-};
-CTableCell.prototype.Is_EmptyFirstPage = function()
-{
-    if (!this.Row || !this.Row.Table || !this.Row.Table.RowsInfo[this.Row.Index] || true === this.Row.Table.RowsInfo[this.Row.Index].FirstPage)
+    if (!this.Pages[CurPage]
+        || (this.Pages[CurPage].LastRow < this.Pages[CurPage].FirstRow)
+        || (0 === CurPage && true !== this.RowsInfo[0].FirstPage))
         return true;
 
     return false;
 };
-CTableCell.prototype.Get_SectPr = function()
+CTable.prototype.Check_EmptyPages = function(CurPage)
 {
-    if (this.Row && this.Row.Table && this.Row.Table)
-        return this.Row.Table.Get_SectPr();
-
-    return null;
-};
-CTableCell.prototype.Get_DocumentPositionFromObject = function(PosArray)
-{
-    if (!PosArray)
-        PosArray = [];
-
-    if (this.Row)
+    for (var _CurPage = CurPage; _CurPage >= 0; --_CurPage)
     {
-        PosArray.splice(0, 0, {Class : this.Row, Position : this.Index});
-        this.Row.Get_DocumentPositionFromObject(PosArray);
+        if (true !== this.Is_EmptyPage(_CurPage))
+            return false;
     }
 
-    return PosArray;
+    return true;
 };
-CTableCell.prototype.Get_Table = function()
+CTable.prototype.private_StartTrackTable = function(CurPage)
 {
-    var Row = this.Row;
-    if (!Row)
-        return null;
+    if (CurPage < 0 || CurPage >= this.Pages.length)
+        return;
 
-    var Table = Row.Table;
-    if (!Table)
-        return null;
+    var Bounds     = this.Get_PageBounds(CurPage);
+    var NewOutline = new CTableOutline(this, this.Get_AbsolutePage(CurPage), Bounds.Left, Bounds.Top, Bounds.Right - Bounds.Left, Bounds.Bottom - Bounds.Top);
 
-    return Table;
+    // TODO: Здесь надо заменить на нормальное определение находимся ли мы в автофигуре
+    var Transform       = null;
+    var cur_doc_content = this.Parent;
+    if (cur_doc_content instanceof CDocumentContent)
+    {
+        while (cur_doc_content.Is_TableCellContent())
+        {
+            cur_doc_content = cur_doc_content.Parent.Row.Table.Parent;
+        }
+        if (cur_doc_content.Parent && cur_doc_content.Parent instanceof CShape)
+        {
+            Transform = cur_doc_content.Parent.transformText;
+        }
+    }
+    this.DrawingDocument.StartTrackTable(NewOutline, Transform);
 };
-
-
-function CTableRecalculateObject()
+//----------------------------------------------------------------------------------------------------------------------
+// Класс  CTableLook
+//----------------------------------------------------------------------------------------------------------------------
+function CTableLook(bFC, bFR, bLC, bLR, bBH, bBV)
 {
-    this.TableSumGrid    = [];
-    this.TableGridCalc   = [];
-
-    this.TableRowsBottom = [];
-    this.HeaderInfo      = {};
-    this.RowsInfo        = [];
-   
-    this.X_origin = 0;
-    this.X        = 0;
-    this.Y        = 0;
-    this.XLimit   = 0;
-    this.YLimit   = 0;
-
-    this.Pages    = [];
-
-    this.MaxTopBorder = [];
-    this.MaxBotBorder = [];
-    this.MaxBotMargin = [];
-
-    this.Content = [];
+    this.m_bFirst_Col = ( true === bFC ? true : false );
+    this.m_bFirst_Row = ( true === bFR ? true : false );
+    this.m_bLast_Col  = ( true === bLC ? true : false );
+    this.m_bLast_Row  = ( true === bLR ? true : false );
+    this.m_bBand_Hor  = ( true === bBH ? true : false );
+    this.m_bBand_Ver  = ( true === bBV ? true : false );
 }
-
-CTableRecalculateObject.prototype = 
+CTableLook.prototype =
 {
-    Save : function(Table)
-    {
-        this.TableSumGrid    = Table.TableSumGrid;
-        this.TableGridCalc   = Table.TableGridCalc;
 
-        this.TableRowsBottom = Table.TableRowsBottom;
-        this.HeaderInfo      = Table.HeaderInfo;        
-        this.RowsInfo        = Table.RowsInfo;
-        
-        this.X_origin        = Table.X_origin;
-        this.X               = Table.X;
-        this.Y               = Table.Y;
-        this.XLimit          = Table.XLimit;
-        this.YLimit          = Table.YLimit;
-        
-        this.Pages           = Table.Pages;
-        
-        this.MaxTopBorder    = Table.MaxTopBorder;
-        this.MaxBotBorder    = Table.MaxBotBorder;
-        this.MaxBotMargin    = Table.MaxBotBorder;
-        
-        var Count = Table.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            this.Content[Index] = Table.Content[Index].Save_RecalculateObject();
-        }
+    Set : function(bFC, bFR, bLC, bLR, bBH, bBV)
+    {
+        this.m_bFirst_Col = ( true === bFC ? true : false );
+        this.m_bFirst_Row = ( true === bFR ? true : false );
+        this.m_bLast_Col  = ( true === bLC ? true : false );
+        this.m_bLast_Row  = ( true === bLR ? true : false );
+        this.m_bBand_Hor  = ( true === bBH ? true : false );
+        this.m_bBand_Ver  = ( true === bBV ? true : false );
     },
-    
-    Load : function(Table)
+
+    Copy : function()
     {
-        Table.TableSumGrid    = this.TableSumGrid;
-        Table.TableGridCalc   = this.TableGridCalc;
-
-        Table.TableRowsBottom = this.TableRowsBottom;
-        Table.HeaderInfo      = this.HeaderInfo;
-        Table.RowsInfo        = this.RowsInfo;
-
-        Table.X_origin        = this.X_origin;
-        Table.X               = this.X;
-        Table.Y               = this.Y;
-        Table.XLimit          = this.XLimit;
-        Table.YLimit          = this.YLimit;
-
-        Table.Pages           = this.Pages;
-
-        Table.MaxTopBorder    = this.MaxTopBorder;
-        Table.MaxBotBorder    = this.MaxBotBorder;
-        Table.MaxBotMargin    = this.MaxBotBorder;
-
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            Table.Content[Index].Load_RecalculateObject( this.Content[Index] );
-        }
+        return new CTableLook( this.m_bFirst_Col, this.m_bFirst_Row, this.m_bLast_Col, this.m_bLast_Row, this.m_bBand_Hor, this.m_bBand_Ver );
     },
-    
-    Get_DrawingFlowPos : function(FlowPos)
+
+    Is_FirstCol : function()
     {
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            this.Content[Index].Get_DrawingFlowPos( FlowPos );
-        }
+        return this.m_bFirst_Col;
+    },
+
+    Is_FirstRow : function()
+    {
+        return this.m_bFirst_Row;
+    },
+
+    Is_LastCol : function()
+    {
+        return this.m_bLast_Col;
+    },
+
+    Is_LastRow : function()
+    {
+        return this.m_bLast_Row;
+    },
+
+    Is_BandHor : function()
+    {
+        return this.m_bBand_Hor;
+    },
+
+    Is_BandVer : function()
+    {
+        return this.m_bBand_Ver;
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        // Bool : m_bFirst_Col
+        // Bool : m_bFirst_Row
+        // Bool : m_bLast_Col
+        // Bool : m_bLast_Row
+        // Bool : m_bBand_Hor
+        // Bool : m_bBand_Ver
+
+        Writer.WriteBool( this.m_bFirst_Col );
+        Writer.WriteBool( this.m_bFirst_Row );
+        Writer.WriteBool( this.m_bLast_Col );
+        Writer.WriteBool( this.m_bLast_Row );
+        Writer.WriteBool( this.m_bBand_Hor );
+        Writer.WriteBool( this.m_bBand_Ver );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        // Bool : m_bFirst_Col
+        // Bool : m_bFirst_Row
+        // Bool : m_bLast_Col
+        // Bool : m_bLast_Row
+        // Bool : m_bBand_Hor
+        // Bool : m_bBand_Ver
+
+        this.m_bFirst_Col = Reader.GetBool();
+        this.m_bFirst_Row = Reader.GetBool();
+        this.m_bLast_Col  = Reader.GetBool();
+        this.m_bLast_Row  = Reader.GetBool();
+        this.m_bBand_Hor  = Reader.GetBool();
+        this.m_bBand_Ver  = Reader.GetBool();
     }
 };
-
-function CTableRowRecalculateObject()
+//----------------------------------------------------------------------------------------------------------------------
+// Класс  CTableAnchorPosition
+//----------------------------------------------------------------------------------------------------------------------
+function CTableAnchorPosition()
 {
-    this.CellsInfo   = [];
-    this.Metrics     = {};
-    this.SpacingInfo = {};
+    // Рассчитанные координаты
+    this.CalcX         = 0;
+    this.CalcY         = 0;
 
-    this.Height      = 0;
-    this.PagesCount  = 0;
-    
-    this.Content = [];
+    // Данные для Flow-объектов
+    this.W             = 0;
+    this.H             = 0;
+    this.X             = 0;
+    this.Y             = 0;
+    this.Left_Margin   = 0;
+    this.Right_Margin  = 0;
+    this.Top_Margin    = 0;
+    this.Bottom_Margin = 0;
+    this.Page_W        = 0;
+    this.Page_H        = 0;
+
+    this.Page_Top      = 0;
+    this.Page_Bottom   = 0;
+
+    this.X_min         = 0;
+    this.Y_min         = 0;
+    this.X_max         = 0;
+    this.Y_max         = 0;
 }
-
-CTableRowRecalculateObject.prototype = 
+CTableAnchorPosition.prototype =
 {
-    Save : function(Row)
+    Set_X : function(W, X, Left_Margin, Right_Margin, Page_W, X_min, X_max)
     {
-        this.CellsInfo   = Row.CellsInfo;
-        this.Metrics     = Row.Metrics;
-        this.SpacingInfo = Row.SpacingInfo;
-        
-        this.Height      = Row.Height;
-        this.PagesCount  = Row.PagesCount;
-        
-        var Count = Row.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            this.Content[Index] = Row.Content[Index].Save_RecalculateObject();
-        }
+        this.W             = W;
+        this.X             = X;
+        this.Left_Margin   = Left_Margin;
+        this.Right_Margin  = Right_Margin;
+        this.Page_W        = Page_W;
+        this.X_min         = X_min;
+        this.X_max         = X_max;
     },
-    
-    Load : function(Row)
+
+    Set_Y : function(H, Y, Top_Margin, Bottom_Margin, Page_H, Y_min, Y_max, Page_Top, Page_Bottom)
     {
-        Row.CellsInfo   = this.CellsInfo;
-        Row.Metrics     = this.Metrics;
-        Row.SpacingInfo = this.SpacingInfo;
-
-        Row.Height      = this.Height;
-        Row.PagesCount  = this.PagesCount;
-
-        var Count = Row.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            Row.Content[Index].Load_RecalculateObject( this.Content[Index] );
-        }
+        this.H             = H;
+        this.Y             = Y;
+        this.Top_Margin    = Top_Margin;
+        this.Bottom_Margin = Bottom_Margin;
+        this.Page_H        = Page_H;
+        this.Y_min         = Y_min;
+        this.Y_max         = Y_max;
+        this.Page_Top      = Page_Top;
+        this.Page_Bottom   = Page_Bottom;
     },
-    
-    Get_DrawingFlowPos : function(FlowPos)
+
+    Calculate_X : function(RelativeFrom, bAlign, Value)
     {
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
+        // Вычисляем координату по X
+        switch(RelativeFrom)
         {
-            this.Content[Index].Get_DrawingFlowPos( FlowPos );
+            // TODO: пока нет колонок варианты Text и Margin ничем не отличаются,
+            //       когда появятся колонки доделать тут
+            case c_oAscHAnchor.Text:
+            case c_oAscHAnchor.Margin:
+            {
+                if ( true === bAlign )
+                {
+                    switch ( Value )
+                    {
+                        case c_oAscXAlign.Center:
+                        {
+                            this.CalcX = (this.Left_Margin + this.Right_Margin - this.W) / 2;
+                            break;
+                        }
+
+                        case c_oAscXAlign.Inside:
+                        case c_oAscXAlign.Outside:
+                        case c_oAscXAlign.Left:
+                        {
+                            this.CalcX = this.Left_Margin;
+                            break;
+                        }
+
+                        case c_oAscXAlign.Right:
+                        {
+                            this.CalcX = this.Right_Margin - this.W;
+                            break;
+                        }
+                    }
+                }
+                else
+                    this.CalcX = this.Left_Margin + Value;
+
+                break;
+            }
+
+            case c_oAscHAnchor.Page:
+            {
+                var W = this.X_max - this.X_min;
+                if ( true === bAlign )
+                {
+                    switch ( Value )
+                    {
+                        case c_oAscXAlign.Center:
+                        {
+                            this.CalcX = this.X_min + (W - this.W) / 2;
+                            break;
+                        }
+
+                        case c_oAscXAlign.Inside:
+                        case c_oAscXAlign.Outside:
+                        case c_oAscXAlign.Left:
+                        {
+                            this.CalcX = this.X_min;
+                            break;
+                        }
+
+                        case c_oAscXAlign.Right:
+                        {
+                            this.CalcX = this.X_max - this.W;
+                            break;
+                        }
+                    }
+                }
+                else
+                    this.CalcX = this.X_min + Value;
+
+                break;
+            }
+
+            case c_oAscHAnchor.PageInternal:
+            {
+                if ( true === bAlign )
+                {
+                    switch ( Value )
+                    {
+                        case c_oAscXAlign.Center:
+                        {
+                            this.CalcX = (this.Page_W - this.W) / 2;
+                            break;
+                        }
+
+                        case c_oAscXAlign.Inside:
+                        case c_oAscXAlign.Outside:
+                        case c_oAscXAlign.Left:
+                        {
+                            this.CalcX = 0;
+                            break;
+                        }
+
+                        case c_oAscXAlign.Right:
+                        {
+                            this.CalcX = this.Page_W - this.W;
+                            break;
+                        }
+                    }
+                }
+                else
+                    this.CalcX = Value;
+
+                break;
+            }
         }
+
+        return this.CalcX;
+    },
+
+    Calculate_Y : function(RelativeFrom, bAlign, Value)
+    {
+        // Вычисляем координату по Y
+        switch(RelativeFrom)
+        {
+            case c_oAscVAnchor.Margin:
+            {
+                if ( true === bAlign )
+                {
+                    switch(Value)
+                    {
+                        case c_oAscYAlign.Bottom:
+                        {
+                            this.CalcY = this.Bottom_Margin - this.H;
+                            break;
+                        }
+                        case c_oAscYAlign.Center:
+                        {
+                            this.CalcY = (this.Bottom_Margin + this.Top_Margin - this.H) / 2;
+                            break;
+                        }
+                        case c_oAscYAlign.Inline:
+                        case c_oAscYAlign.Inside:
+                        case c_oAscYAlign.Outside:
+                        case c_oAscYAlign.Top:
+                        {
+                            this.CalcY = this.Top_Margin;
+                            break;
+                        }
+                    }
+                }
+                else
+                    this.CalcY = this.Top_Margin + Value;
+
+                break;
+            }
+
+            case c_oAscVAnchor.Page:
+            {
+                if ( true === bAlign )
+                {
+                    switch(Value)
+                    {
+                        case c_oAscYAlign.Bottom:
+                        {
+                            this.CalcY = this.Page_Bottom - this.H;
+                            break;
+                        }
+                        case c_oAscYAlign.Center:
+                        {
+                            this.CalcY = (this.Page_Bottom - this.H) / 2;
+                            break;
+                        }
+                        case c_oAscYAlign.Inline:
+                        case c_oAscYAlign.Inside:
+                        case c_oAscYAlign.Outside:
+                        case c_oAscYAlign.Top:
+                        {
+                            this.CalcY = this.Page_Top;
+                            break;
+                        }
+                    }
+                }
+                else
+                    this.CalcY = this.Page_Top + Value;
+
+                break;
+            }
+
+            case c_oAscVAnchor.Text:
+            {
+                if ( true === bAlign )
+                {
+                    // Word не дает делать прилегания в данном случае
+                    this.CalcY = this.Y;
+                }
+                else
+                    this.CalcY = this.Y + Value;
+
+                break;
+            }
+        }
+
+        return this.CalcY;
+    },
+
+    Correct_Values : function(X_min, Y_min, X_max, Y_max, AllowOverlap, OtherFlowTables, CurTable)
+    {
+        var W = this.W;
+        var H = this.H;
+
+        var CurX = this.CalcX;
+        var CurY = this.CalcY;
+
+        var bBreak = false;
+        while ( true != bBreak )
+        {
+            bBreak = true;
+            for ( var Index = 0; Index < OtherFlowTables.length; Index++ )
+            {
+                var FlowTable = OtherFlowTables[Index];
+
+                if ( FlowTable.Table != CurTable && ( false === AllowOverlap || false === FlowTable.Table.Get_AllowOverlap() ) && ( CurX <= FlowTable.X + FlowTable.W && CurX + W >= FlowTable.X && CurY <= FlowTable.Y + FlowTable.H && CurY + H >= FlowTable.Y ) )
+                {
+                    /*
+                     // Если убирается справа, размещаем справа от картинки
+                     if ( FlowTable.X + FlowTable.W < X_max - W - 0.001 )
+                     CurX = FlowTable.X + FlowTable.W + 0.001;
+                     else
+                     {
+                     CurX = this.CalcX;
+                     CurY = FlowTable.Y + FlowTable.H + 0.001;
+                     }
+                     */
+
+                    // TODO: Пока у нас смещение по X плохо работает(смотри CTable.Shift), поэтому смещаем таблицу сразу по Y
+                    CurY = FlowTable.Y + FlowTable.H + 0.001;
+
+                    bBreak = false;
+                }
+            }
+        }
+
+        // TODO: Пока у нас смещение по X плохо работает(смотри CTable.Shift), поэтому смещаем таблицу сразу по Y
+        /*
+         // Скорректируем рассчитанную позицию, так чтобы объект не выходил за заданные пределы
+         if ( CurX + W > X_max )
+         CurX = X_max - W;
+
+         if ( CurX < X_min )
+         CurX = X_min;
+         */
+
+        // Скорректируем рассчитанную позицию, так чтобы объект не выходил за заданные пределы
+        if ( CurY + H > Y_max )
+            CurY = Y_max - H;
+
+        if ( CurY < this.Y_min )
+            CurY = this.Y_min;
+
+        this.CalcY = CurY;
+        this.CalcX = CurX;
+    },
+
+    // По значению CalcX получем Value
+    Calculate_X_Value : function(RelativeFrom)
+    {
+        var Value = 0;
+
+        switch(RelativeFrom)
+        {
+            case c_oAscHAnchor.Text:
+            case c_oAscHAnchor.Margin:
+            {
+                Value = this.CalcX - this.Left_Margin;
+
+                break;
+            }
+
+            case c_oAscHAnchor.Page:
+            {
+                Value = this.CalcX - this.X_min;
+
+                break;
+            }
+
+            case c_oAscHAnchor.PageInternal:
+            {
+                Value = this.CalcX;
+                break;
+            }
+        }
+
+        return Value;
+    },
+
+    // По значению CalcY и заданному RelativeFrom получем Value
+    Calculate_Y_Value : function(RelativeFrom)
+    {
+        var Value = 0;
+
+        switch(RelativeFrom)
+        {
+            case c_oAscVAnchor.Margin:
+            {
+                Value = this.CalcY - this.Top_Margin;
+
+                break;
+            }
+
+            case c_oAscVAnchor.Page:
+            {
+                Value = this.CalcY - this.Page_Top;
+
+                break;
+            }
+
+            case c_oAscVAnchor.Text:
+            {
+                Value = this.CalcY - this.Y;
+
+                break;
+            }
+        }
+
+        return Value;
     }
-};
-
-function CTableCellRecalculateObject()
-{
-    this.BorderInfo = null;
-    this.Metrics    = null;
-    this.Temp       = null;
-    
-    this.Content    = null;
-}
-
-CTableCellRecalculateObject.prototype = 
-{
-    Save : function(Cell)
-    {
-        this.BorderInfo = Cell.BorderInfo;
-        this.Metrics    = Cell.Metrics;
-        this.Temp       = Cell.Temp;
-
-        this.Content = Cell.Content.Save_RecalculateObject();
-    },
-    
-    Load : function(Cell)
-    {
-        Cell.BorderInfo = this.BorderInfo;
-        Cell.Metrics    = this.Metrics;
-        Cell.Temp       = this.Temp;
-
-        Cell.Content.Load_RecalculateObject( this.Content );
-    },
-
-    Get_DrawingFlowPos : function(FlowPos)
-    {
-        this.Content.Get_DrawingFlowPos( FlowPos );
-    }
-        
 };

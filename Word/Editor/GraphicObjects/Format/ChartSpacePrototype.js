@@ -50,6 +50,8 @@ CChartSpace.prototype.getFullFlipH = CShape.prototype.getFullFlipH;
 CChartSpace.prototype.getFullFlipV = CShape.prototype.getFullFlipV;
 CChartSpace.prototype.Get_Theme = CShape.prototype.Get_Theme;
 CChartSpace.prototype.Get_ColorMap = CShape.prototype.Get_ColorMap;
+CChartSpace.prototype.Get_AbsolutePage = CShape.prototype.Get_AbsolutePage;
+CChartSpace.prototype.GetParaDrawing = CShape.prototype.GetParaDrawing;
 
 CChartSpace.prototype.handleUpdateFill = function()
 {

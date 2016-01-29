@@ -732,6 +732,15 @@ CDLbl.prototype =
         return this.chart.Get_ColorMap();
     },
 
+    Get_AbsolutePage: function()
+    {
+        if(this.chart && this.chart.Get_AbsolutePage)
+        {
+            return this.chart.Get_AbsolutePage();
+        }
+        return 0;
+    },
+
     recalculateStyle: function()
     {
         ExecuteNoHistory(function()
@@ -23003,6 +23012,16 @@ CTitle.prototype =
     checkContentWordArt: function()
     {
         return false;
+    },
+
+
+    Get_AbsolutePage: function()
+    {
+        if(this.chart && this.chart.Get_AbsolutePage)
+        {
+            return this.chart.Get_AbsolutePage();
+        }
+        return 0;
     },
 
     Refresh_RecalcData2: function(pageIndex)

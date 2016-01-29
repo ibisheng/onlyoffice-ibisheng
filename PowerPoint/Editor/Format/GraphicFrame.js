@@ -1029,6 +1029,16 @@ CGraphicFrame.prototype =
 
     },
 
+    Get_AbsolutePage : function(CurPage)
+    {
+        return this.parent.num;
+    },
+
+    Get_AbsoluteColumn : function(CurPage)
+    {
+        return 0;//TODO;
+    },
+
     hitToHandles: function()
     {
         return -1;

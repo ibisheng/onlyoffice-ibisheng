@@ -125,9 +125,79 @@ CTableMarkup.prototype =
     }
 };
 
+function CColumnsMarkupColumn()
+{
+    this.W     = 0;
+    this.Space = 0;
+}
+
+function CColumnsMarkup()
+{
+    this.CurCol = 0;
+    this.X      = 0; // левое поле
+    this.R      = 0; // правое поле
+
+    this.EqualWidth = true;
+    this.Num        = 1;
+    this.Space      = 30;
+    this.Cols       = [];
+
+    this.SectPr     = null;
+}
+CColumnsMarkup.prototype.Update_FromSectPr = function(SectPr)
+{
+    if (!SectPr)
+        return;
+
+    this.SectPr = SectPr;
+
+    var Columns = SectPr.Columns;
+
+    this.X          = SectPr.Get_PageMargin_Left();
+    this.R          = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
+    this.EqualWidth = Columns.EqualWidth;
+    this.Num        = Columns.Num;
+    this.Space      = Columns.Space;
+
+    this.Cols = [];
+    for (var Index = 0, Count = Columns.Cols.length; Index < Count; ++Index)
+    {
+        this.Cols[Index]       = new CColumnsMarkupColumn();
+        this.Cols[Index].W     = Columns.Cols[Index].W;
+        this.Cols[Index].Space = Columns.Cols[Index].Space;
+    }
+};
+CColumnsMarkup.prototype.Set_CurCol = function(CurCol)
+{
+    this.CurCol = CurCol;
+};
+CColumnsMarkup.prototype.CreateDuplicate = function()
+{
+    var _ret = new CColumnsMarkup();
+    _ret.SectPr = this.SectPr;
+    _ret.CurCol = this.CurCol;
+    _ret.X      = this.X;
+    _ret.R      = this.R;
+
+    _ret.EqualWidth = this.EqualWidth;
+    _ret.Num        = this.Num;
+    _ret.Space      = this.Space;
+
+    _ret.Cols = [];
+
+    for (var i = 0; i < this.Cols.length; i++)
+    {
+        var _col = new CColumnsMarkupColumn();
+        _col.W = this.Cols[i].W;
+        _col.Space = this.Cols[i].Space;
+        _ret.Cols.push(_col);
+    }
+    return _ret;
+};
+
 function CTableOutline(Table, PageNum, X, Y, W, H)
 {
-    this.Table = Table;
+    this.Table   = Table;
     this.PageNum = PageNum;
 
     this.X = X;
@@ -5009,6 +5079,11 @@ function CDrawingDocument()
                             this.UpdateRulerStateParams[3]);
                         break;
                     }
+                    case 3:
+                    {
+                        this.Set_RulerState_Columns(this.UpdateRulerStateParams[1]);
+                        break;
+                    }
                     default:
                         break;
                 }
@@ -5161,6 +5236,7 @@ function CDrawingDocument()
 
         hor_ruler.CurrentObjectType = RULER_OBJECT_TYPE_PARAGRAPH;
         hor_ruler.m_oTableMarkup = null;
+        hor_ruler.m_oColumnMarkup = null;
 
         ver_ruler.CurrentObjectType = RULER_OBJECT_TYPE_PARAGRAPH;
         ver_ruler.m_oTableMarkup = null;
@@ -5218,6 +5294,43 @@ function CDrawingDocument()
         this.m_oWordControl.UpdateVerRuler();
     }
 
+    this.Set_RulerState_Columns = function(markup)
+    {
+        if (this.UpdateRulerStateFlag)
+        {
+            this.UpdateRulerStateParams.splice(0, this.UpdateRulerStateParams.length);
+            this.UpdateRulerStateParams.push(3);
+            this.UpdateRulerStateParams.push(markup);
+            return;
+        }
+
+        this.FrameRect.IsActive = false;
+
+        var hor_ruler = this.m_oWordControl.m_oHorRuler;
+        var ver_ruler = this.m_oWordControl.m_oVerRuler;
+
+        hor_ruler.CurrentObjectType = RULER_OBJECT_TYPE_COLUMNS;
+        hor_ruler.m_oTableMarkup = null;
+        hor_ruler.m_oColumnMarkup = markup.CreateDuplicate();
+
+        ver_ruler.CurrentObjectType = RULER_OBJECT_TYPE_PARAGRAPH;
+        ver_ruler.m_oTableMarkup = null;
+
+        this.TableOutlineDr.TableMatrix         = null;
+        this.TableOutlineDr.CurrentPageIndex    = this.m_lCurrentPage;
+
+        hor_ruler.CalculateMargins();
+
+        if (0 <= this.m_lCurrentPage && this.m_lCurrentPage < this.m_lPagesCount)
+        {
+            hor_ruler.CreateBackground(this.m_arrPages[this.m_lCurrentPage]);
+            ver_ruler.CreateBackground(this.m_arrPages[this.m_lCurrentPage]);
+        }
+
+        this.m_oWordControl.UpdateHorRuler();
+        this.m_oWordControl.UpdateVerRuler();
+    };
+
     this.Set_RulerState_HdrFtr = function(bHeader, Y0, Y1)
     {
         if (this.UpdateRulerStateFlag)
@@ -5237,6 +5350,7 @@ function CDrawingDocument()
 
         hor_ruler.CurrentObjectType = RULER_OBJECT_TYPE_PARAGRAPH;
         hor_ruler.m_oTableMarkup = null;
+        hor_ruler.m_oColumnMarkup = null;
 
         ver_ruler.CurrentObjectType = (true === bHeader) ? RULER_OBJECT_TYPE_HEADER : RULER_OBJECT_TYPE_FOOTER;
         ver_ruler.header_top = Y0;

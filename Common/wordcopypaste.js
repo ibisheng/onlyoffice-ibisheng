@@ -1177,7 +1177,7 @@ CopyProcessor.prototype =
 			elems = {gridStart: 0, gridEnd: table.TableGrid.length - 1, indexStart: null, indexEnd: null, after: null, before: null, cells: row.Content};
         var tr = new CopyElement("tr");
         //Pr
-		table.Internal_RecalculateGrid();
+		table.Recalculate_Grid();
 		var gridSum = table.TableSumGrid;
         var trStyle = "";
         var nGridBefore = 0;

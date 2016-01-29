@@ -3251,8 +3251,9 @@ asc_docs_api.prototype.SetDrawingFreeze = function(bIsFreeze)
         this.WordControl.OnScroll();
 };
 
-/*----------------------------------------------------------------*/
-/*functions for working with page*/
+//----------------------------------------------------------------------------------------------------------------------
+// Работаем с настройками секции
+//----------------------------------------------------------------------------------------------------------------------
 asc_docs_api.prototype.change_PageOrient = function(isPortrait)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Document_SectPr) )
@@ -3297,6 +3298,122 @@ asc_docs_api.prototype.get_DocumentWidth = function()
 asc_docs_api.prototype.get_DocumentHeight = function()
 {
     return Page_Height;
+};
+
+function CDocumentColumnProps()
+{
+    this.W     = 0;
+    this.Space = 0;
+}
+CDocumentColumnProps.prototype.put_W = function(W)
+{
+    this.W = W;
+};
+CDocumentColumnProps.prototype.get_W = function()
+{
+    return this.W;
+};
+CDocumentColumnProps.prototype.put_Space = function(Space)
+{
+    this.Space = Space;
+};
+CDocumentColumnProps.prototype.get_Space = function()
+{
+    return this.Space;
+};
+
+function CDocumentColumnsProps()
+{
+    this.EqualWidth = true;
+    this.Num        = 1;
+    this.Sep        = false;
+    this.Space      = 30;
+
+    this.Cols       = [];
+
+    this.TotalWidth = 230;
+}
+CDocumentColumnsProps.prototype.From_SectPr = function(SectPr)
+{
+    var Columns = SectPr.Columns;
+
+    this.TotalWidth = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Left() - SectPr.Get_PageMargin_Right();
+    this.EqualWidth = Columns.EqualWidth;
+    this.Num        = Columns.Num;
+    this.Sep        = Columns.Sep;
+    this.Space      = Columns.Space;
+
+    for (var Index = 0, Count = Columns.Cols.length; Index < Count; ++Index)
+    {
+        var Col = new CDocumentColumnProps();
+        Col.put_W(Columns.Cols[Index].W);
+        Col.put_Space(Columns.Cols[Index].Space);
+        this.Cols[Index] = Col;
+    }
+};
+CDocumentColumnsProps.prototype.get_EqualWidth = function()
+{
+    return this.EqualWidth;
+};
+CDocumentColumnsProps.prototype.put_EqualWidth = function(EqualWidth)
+{
+    this.EqualWidth = EqualWidth;
+};
+CDocumentColumnsProps.prototype.get_Num = function()
+{
+    return this.Num;
+};
+CDocumentColumnsProps.prototype.put_Num = function(Num)
+{
+    this.Num = Num;
+};
+CDocumentColumnsProps.prototype.get_Sep = function()
+{
+    return this.Sep;
+};
+CDocumentColumnsProps.prototype.put_Sep = function(Sep)
+{
+    this.Sep = Sep;
+};
+CDocumentColumnsProps.prototype.get_Space = function()
+{
+    return this.Space;
+};
+CDocumentColumnsProps.prototype.put_Space = function(Space)
+{
+    this.Space = Space;
+};
+CDocumentColumnsProps.prototype.get_ColsCount = function()
+{
+    return this.Cols.length;
+};
+CDocumentColumnsProps.prototype.get_Col = function(Index)
+{
+    return this.Cols[Index];
+};
+CDocumentColumnsProps.prototype.put_Col = function(Index, Col)
+{
+    this.Cols[Index] = Col;
+};
+CDocumentColumnsProps.prototype.put_ColByValue = function(Index, W, Space)
+{
+    var Col = new CDocumentColumnProps();
+    Col.put_W(W);
+    Col.put_Space(Space);
+    this.Cols[Index] = Col;
+};
+CDocumentColumnsProps.prototype.get_TotalWidth = function()
+{
+    return this.TotalWidth;
+};
+
+asc_docs_api.prototype.asc_SetColumnsProps = function(ColumnsProps)
+{
+    this.WordControl.m_oLogicDocument.Set_ColumnsProps(ColumnsProps);
+};
+asc_docs_api.prototype.sync_ColumnsPropsCallback = function(ColumnsProps)
+{
+    this.asc_fireCallback("asc_onColumnsProps", ColumnsProps);
 };
 
 asc_docs_api.prototype.put_AddPageBreak = function()
@@ -6693,6 +6810,8 @@ CRevisionsChange.prototype.private_UpdateUserColor = function()
 {
     this.UserColor = getUserColorById(this.UserId, this.UserName, true, false);
 };
+
+
 
 asc_docs_api.prototype.asc_undoAllChanges = function ()
 {

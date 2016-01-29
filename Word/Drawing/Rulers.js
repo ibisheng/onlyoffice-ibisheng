@@ -12,6 +12,7 @@ var RULER_OBJECT_TYPE_PARAGRAPH = 1;
 var RULER_OBJECT_TYPE_HEADER    = 2;
 var RULER_OBJECT_TYPE_FOOTER    = 4;
 var RULER_OBJECT_TYPE_TABLE     = 8;
+var RULER_OBJECT_TYPE_COLUMNS   = 16;
 
 function CHorRulerRepaintChecker()
 {
@@ -30,6 +31,8 @@ function CHorRulerRepaintChecker()
     this.tableCols = [];
     this.marginsLeft = [];
     this.marginsRight = [];
+
+    this.columns = null; // CColumnsMarkup
 
     // blit to main params
     this.BlitAttack = false;
@@ -153,6 +156,8 @@ function CHorRuler()
                         // 3 - indent left + indent left first, 4 - indent left // 5 - indent left first, 6 - indent right
                         // 7 - tabs
                         // 8 - table
+                        // 9 - column size
+                        // 10 - column move
 
     this.m_dIndentLeft_old      = -10000;
     this.m_dIndentLeftFirst_old = -10000;
@@ -161,6 +166,7 @@ function CHorRuler()
     // отдельные настройки для текущего объекта линейки
     this.CurrentObjectType  = RULER_OBJECT_TYPE_PARAGRAPH;
     this.m_oTableMarkup     = null;
+    this.m_oColumnMarkup    = null;
     this.DragTablePos       = -1;
 
     this.TableMarginLeft = 0;
@@ -229,18 +235,19 @@ function CHorRuler()
 
     this.InitTablePict2 = function()
     {
-        var _data = g_memory.ctx.createImageData(7, 8);
+        var _data = g_memory.ctx.createImageData(14, 16);
         var _px = _data.data;
-        var is2 = false;
 
         var black_level = 100;
 
-        for (var j = 0; j < 8; j++)
+        for (var j = 0; j < 16; j++)
         {
-            var ind = j * 4 * 7;
-            if (is2)
+            var ind = j * 4 * 14;
+            var is2 = j - ((j >> 2) << 2);
+
+            if (is2 >= 2)
             {
-                for (i = 0; i < 7; i++)
+                for (i = 0; i < 14; i++)
                 {
                     _px[ind++] = black_level;
                     _px[ind++] = black_level;
@@ -259,9 +266,17 @@ function CHorRuler()
                         _px[ind++] = black_level;
                         _px[ind++] = black_level;
                         _px[ind++] = 255;
+                        _px[ind++] = black_level;
+                        _px[ind++] = black_level;
+                        _px[ind++] = black_level;
+                        _px[ind++] = 255;
                     }
                     else
                     {
+                        _px[ind++] = 255;
+                        _px[ind++] = 255;
+                        _px[ind++] = 255;
+                        _px[ind++] = 255;
                         _px[ind++] = 255;
                         _px[ind++] = 255;
                         _px[ind++] = 255;
@@ -270,45 +285,8 @@ function CHorRuler()
                     is22 = !is22;
                 }
             }
-            is2 = !is2;
         }
-
-        var _data2 = g_memory.ctx.createImageData(14, 16);
-        var _px2 = _data2.data;
-
-        var _sI = 0;
-        var _sI2 = 0;
-        for (var j = 0; j < 8; j++)
-        {
-            var _oldsI = _sI;
-            for (var i = 0; i < 7; i++)
-            {
-                _px2[_sI2++] = _px[_sI];
-                _px2[_sI2++] = _px[_sI];
-                _px2[_sI2++] = _px[_sI];
-                _px2[_sI2++] = _px[_sI];
-
-                _px2[_sI2++] = _px[_sI++];
-                _px2[_sI2++] = _px[_sI++];
-                _px2[_sI2++] = _px[_sI++];
-                _px2[_sI2++] = _px[_sI++];
-            }
-            _sI = _oldsI;
-            for (var i = 0; i < 7; i++)
-            {
-                _px2[_sI2++] = _px[_sI];
-                _px2[_sI2++] = _px[_sI];
-                _px2[_sI2++] = _px[_sI];
-                _px2[_sI2++] = _px[_sI];
-
-                _px2[_sI2++] = _px[_sI++];
-                _px2[_sI2++] = _px[_sI++];
-                _px2[_sI2++] = _px[_sI++];
-                _px2[_sI2++] = _px[_sI++];
-            }
-        }
-
-        return _data2;
+        return _data;
     }
 
     this.CheckTableSprite = function(is_retina)
@@ -397,6 +375,8 @@ function CHorRuler()
         // check old state
         var checker = this.RepaintChecker;
         var markup = this.m_oTableMarkup;
+        if (this.CurrentObjectType == RULER_OBJECT_TYPE_COLUMNS)
+            markup = this.m_oColumnMarkup;
 
         if (this.CurrentObjectType == checker.Type && width == checker.Width)
         {
@@ -447,6 +427,38 @@ function CHorRuler()
                     }
                 }
             }
+            else if (this.CurrentObjectType == RULER_OBJECT_TYPE_COLUMNS)
+            {
+                if (this.m_oColumnMarkup.X == checker.columns.X)
+                {
+                    if (markup.EqualWidth == checker.columns.EqualWidth)
+                    {
+                        if (markup.EqualWidth)
+                        {
+                            if (markup.Num == checker.columns.Num && markup.Space == checker.columns.Space && markup.R == checker.columns.R)
+                                return;
+                        }
+                        else
+                        {
+                            var _arr1 = markup.Cols;
+                            var _arr2 = checker.columns.Cols;
+                            if (_arr1 && _arr2 && _arr1.length == _arr2.length)
+                            {
+                                var _len = _arr1.length;
+                                var _index = 0;
+                                for (_index = 0; _index < _len; _index++)
+                                {
+                                    if (_arr1[_index].W != _arr2[_index].W || _arr1[_index].Space != _arr2[_index].Space)
+                                        break;
+                                }
+
+                                if (_index == _len)
+                                    return;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         //console.log("horizontal");
@@ -470,7 +482,6 @@ function CHorRuler()
         context.fillStyle = GlobalSkin.BackgroundColor;
         context.fillRect(0, 0, this.m_oCanvas.width, this.m_oCanvas.height);
 
-        // ���������� ����� ���������
         var left_margin  = 0;
         var right_margin = 0;
 
@@ -518,6 +529,16 @@ function CHorRuler()
                 right_margin = ((markup.X + _start - markup.Margins[markup.Margins.length - 1].Right) * dKoef_mm_to_pix) >> 0;
             }
         }
+        else if (this.CurrentObjectType == RULER_OBJECT_TYPE_COLUMNS && null != markup)
+        {
+            left_margin  = (markup.X * dKoef_mm_to_pix) >> 0;
+            right_margin = (markup.R * dKoef_mm_to_pix) >> 0;
+
+            checker.MarginLeft = this.m_dMarginLeft;
+            checker.MarginRight = this.m_dMarginRight;
+
+            checker.columns = this.m_oColumnMarkup.CreateDuplicate();
+        }
 
         context.fillStyle = GlobalSkin.RulerLight;
         context.fillRect(left_margin + 0.5, this.m_nTop + 0.5, right_margin - left_margin, this.m_nBottom - this.m_nTop);
@@ -534,7 +555,6 @@ function CHorRuler()
             context.beginPath();
         }
 
-        // �����
         //context.shadowBlur = 0;
         //context.shadowColor = "#81878F";
 
@@ -655,7 +675,7 @@ function CHorRuler()
             }
         }
 
-        if (null != markup)
+        if (null != markup && this.CurrentObjectType == RULER_OBJECT_TYPE_TABLE)
         {
             var _count = markup.Cols.length;
             if (0 != _count)
@@ -703,6 +723,75 @@ function CHorRuler()
                 }
             }
         }
+
+        if (null != markup && this.CurrentObjectType == RULER_OBJECT_TYPE_COLUMNS)
+        {
+            var _array = markup.EqualWidth ? [] : markup.Cols;
+            if (markup.EqualWidth)
+            {
+                var _w = ((markup.R - markup.X) - markup.Space * (markup.Num - 1)) / markup.Num;
+
+                for (var i = 0; i < markup.Num; i++)
+                {
+                    var _cur = new CColumnsMarkupColumn();
+                    _cur.W = _w;
+                    _cur.Space = markup.Space;
+                    _array.push(_cur);
+                }
+            }
+
+            var _count = _array.length;
+            if (0 != _count)
+            {
+                context.fillStyle = GlobalSkin.RulerDark;
+                context.strokeStyle = GlobalSkin.RulerOutline;
+
+                var _offsetX = markup.X;
+                for (var i = 0; i < _count; i++)
+                {
+                    var __xTmp = _offsetX + _array[i].W;
+                    var __rTmp = __xTmp + _array[i].Space;
+
+                    var _offset = (__xTmp + __rTmp) / 2;
+
+                    if (i == (_count - 1))
+                        continue;
+
+                    var __xID = 0;
+                    if (!this.IsRetina)
+                        __xID = (2.5 + _offset * dKoef_mm_to_pix) >> 0;
+                    else
+                        __xID = (5 + _offset * dKoef_mm_to_pix * 2) >> 0;
+
+                    var __yID = this.m_nBottom - 10;
+                    if (this.IsRetina)
+                        __yID <<= 1;
+
+                    var __x = ((__xTmp * dKoef_mm_to_pix) >> 0) + 0.5;
+                    var __r = ((__rTmp * dKoef_mm_to_pix) >> 0) + 0.5;
+
+                    context.fillRect(__x, this.m_nTop + 0.5, __r - __x, this.m_nBottom - this.m_nTop);
+                    context.strokeRect(__x, this.m_nTop + 0.5, __r - __x, this.m_nBottom - this.m_nTop);
+
+                    if (!markup.EqualWidth)
+                        context.putImageData(this.tableSprite, __xID, __yID);
+
+                    if ((__r - __x) > 10)
+                    {
+                        context.fillStyle = GlobalSkin.RulerLight;
+                        context.strokeStyle = "#81878F";
+                        context.fillRect(__x + 3, this.m_nTop + 0.5 + 3, 3, this.m_nBottom - this.m_nTop - 6);
+                        context.fillRect(__r - 6, this.m_nTop + 0.5 + 3, 3, this.m_nBottom - this.m_nTop - 6);
+                        context.strokeRect(__x + 3, this.m_nTop + 0.5 + 3, 3, this.m_nBottom - this.m_nTop - 6);
+                        context.strokeRect(__r - 6, this.m_nTop + 0.5 + 3, 3, this.m_nBottom - this.m_nTop - 6);
+                        context.fillStyle = GlobalSkin.RulerDark;
+                        context.strokeStyle = GlobalSkin.RulerOutline;
+                    }
+
+                    _offsetX += (_array[i].W + _array[i].Space);
+                }
+            }
+        }
     }
 
     this.CorrectTabs = function()
@@ -743,18 +832,59 @@ function CHorRuler()
 
     this.CalculateMargins = function()
     {
-        this.TableMarginLeft = 0;
-        this.TableMarginRight = 0;
+        if (this.CurrentObjectType == RULER_OBJECT_TYPE_TABLE)
+        {
+            this.TableMarginLeft = 0;
+            this.TableMarginRight = 0;
 
-        var markup = this.m_oTableMarkup;
-        var margin_left = markup.X;
+            var markup = this.m_oTableMarkup;
+            var margin_left = markup.X;
 
-        var _col = markup.CurCol;
-        for (var i = 0; i < _col; i++)
-            margin_left += markup.Cols[i];
+            var _col = markup.CurCol;
+            for (var i = 0; i < _col; i++)
+                margin_left += markup.Cols[i];
 
-        this.TableMarginLeft = margin_left + markup.Margins[_col].Left;
-        this.TableMarginRight = margin_left + markup.Cols[_col] - markup.Margins[_col].Right;
+            this.TableMarginLeft = margin_left + markup.Margins[_col].Left;
+            this.TableMarginRight = margin_left + markup.Cols[_col] - markup.Margins[_col].Right;
+        }
+        else if (this.CurrentObjectType == RULER_OBJECT_TYPE_COLUMNS)
+        {
+            this.TableMarginLeft = 0;
+            this.TableMarginRight = 0;
+
+            var markup = this.m_oColumnMarkup;
+
+            if (markup.EqualWidth)
+            {
+                var _w = ((markup.R - markup.X) - markup.Space * (markup.Num - 1)) / markup.Num;
+
+                this.TableMarginLeft = markup.X + (_w  + markup.Space) * markup.CurCol;
+                this.TableMarginRight = this.TableMarginLeft + _w;
+            }
+            else
+            {
+                var margin_left = markup.X;
+                var _col = markup.CurCol;
+                for (var i = 0; i < _col; i++)
+                    margin_left += (markup.Cols[i].W + markup.Cols[i].Space);
+
+                this.TableMarginLeft = margin_left;
+                this.TableMarginRight = margin_left + markup.Cols[_col].W;
+
+                var _x = markup.X;
+
+                var _len = markup.Cols.length;
+                for (var i = 0; i < _len; i++)
+                {
+                    _x += markup.Cols[i].W;
+
+                    if (i != (_len - 1))
+                        _x += markup.Cols[i].Space;
+                }
+
+                markup.R = _x;
+            }
+        }
     }
 
     this.OnMouseMove = function(left, top, e)
@@ -778,7 +908,7 @@ function CHorRuler()
 
         var _margin_left = this.m_dMarginLeft;
         var _margin_right = this.m_dMarginRight;
-        if (this.CurrentObjectType == RULER_OBJECT_TYPE_TABLE)
+        if (this.CurrentObjectType == RULER_OBJECT_TYPE_TABLE || this.CurrentObjectType == RULER_OBJECT_TYPE_COLUMNS)
         {
             _margin_left = this.TableMarginLeft;
             _margin_right = this.TableMarginRight;
@@ -793,7 +923,7 @@ function CHorRuler()
             case 0:
             {
                 var position = this.CheckMouseType(_x, _y);
-                if ((1 == position) || (2 == position) || (8 == position))
+                if ((1 == position) || (2 == position) || (8 == position) || (9 == position) || (10 == position))
                     word_control.m_oDrawingDocument.SetCursorType("w-resize");
                 else
                     word_control.m_oDrawingDocument.SetCursorType("default");
@@ -1052,6 +1182,192 @@ function CHorRuler()
                 word_control.m_oOverlayApi.VertLine(pos);
                 break;
             }
+            case 9:
+            {
+                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, this.TableMarginLeftTrackStart);
+
+                // сначала определим граничные условия
+                var markup = this.m_oColumnMarkup;
+
+                if (markup.EqualWidth)
+                {
+                    if (0 == this.DragTablePos)
+                    {
+                        var _min = 0;
+                        var _max = markup.R - markup.Num * 10 - (markup.Num - 1) * markup.Space;
+
+                        if (newVal < _min)
+                            newVal = _min;
+                        if (newVal > _max)
+                            newVal = _max;
+
+                        markup.X = newVal;
+                    }
+                    else if ((2 * markup.Num - 1) == this.DragTablePos)
+                    {
+                        var _min = markup.X + markup.Num * 10 + (markup.Num - 1) * markup.Space;
+                        var _max = this.m_oPage.width_mm;
+
+                        if (newVal < _min)
+                            newVal = _min;
+                        if (newVal > _max)
+                            newVal = _max;
+
+                        markup.R = newVal;
+                    }
+                    else
+                    {
+                        var bIsLeftSpace = ((this.DragTablePos & 1) == 1);
+                        var _spaceMax = (markup.R - markup.X - 10 * markup.Num) / (markup.Num - 1);
+
+                        var _col = ((this.DragTablePos + 1) >> 1);
+                        var _center = _col * (markup.R - markup.X + markup.Space) / markup.Num - markup.Space / 2;
+
+                        newVal -= markup.X;
+
+                        if (bIsLeftSpace)
+                        {
+                            var _min = _center - _spaceMax / 2;
+                            var _max = _center;
+
+                            if (newVal < _min)
+                                newVal = _min;
+                            if (newVal > _max)
+                                newVal = _max;
+
+                            markup.Space = Math.abs((newVal - _center) * 2);
+                        }
+                        else
+                        {
+                            var _min = _center;
+                            var _max = _center + _spaceMax / 2;
+
+                            if (newVal < _min)
+                                newVal = _min;
+                            if (newVal > _max)
+                                newVal = _max;
+
+                            markup.Space = Math.abs((newVal - _center) * 2);
+                        }
+
+                        newVal += markup.X;
+                    }
+                }
+                else
+                {
+                    var bIsLeftSpace = ((this.DragTablePos & 1) == 1);
+                    var nSpaceNumber = ((this.DragTablePos + 1) >> 1);
+                    var _min = 0;
+                    var _max = this.m_oPage.width_mm;
+
+                    if (0 == nSpaceNumber)
+                    {
+                        _max = markup.X + markup.Cols[0].W - 10;
+
+                        if (newVal < _min)
+                            newVal = _min;
+                        if (newVal > _max)
+                            newVal = _max;
+
+                        var _delta = markup.X - newVal;
+                        markup.X -= _delta;
+                        markup.Cols[0].W += _delta;
+                    }
+                    else
+                    {
+                        var _offsetX = markup.X;
+                        for (var i = 0; i < nSpaceNumber; i++)
+                        {
+                            _min = _offsetX;
+
+                            _offsetX += markup.Cols[i].W;
+                            if (!bIsLeftSpace || i != (nSpaceNumber - 1))
+                            {
+                                _min = _offsetX;
+                                _offsetX += markup.Cols[i].Space;
+                            }
+                        }
+
+                        if (bIsLeftSpace)
+                        {
+                            if (nSpaceNumber != markup.Num)
+                                _max = _min + markup.Cols[nSpaceNumber - 1].W + markup.Cols[nSpaceNumber - 1].Space;
+
+                            var _natMin = _min + 10;
+
+                            if (newVal < _natMin)
+                                newVal = _natMin;
+                            if (newVal > _max)
+                                newVal = _max;
+
+                            markup.Cols[nSpaceNumber - 1].W = newVal - _min;
+                            markup.Cols[nSpaceNumber - 1].Space = _max - newVal;
+
+                            if (nSpaceNumber == markup.Num)
+                            {
+                                markup.R = newVal;
+                            }
+                        }
+                        else
+                        {
+                            _max = _min + markup.Cols[nSpaceNumber - 1].Space + markup.Cols[nSpaceNumber].W;
+                            var _natMax = _max - 10;
+
+                            if (newVal < _min)
+                                newVal = _min;
+                            if (newVal > _natMax)
+                                newVal = _natMax;
+
+                            markup.Cols[nSpaceNumber - 1].Space = newVal - _min;
+                            markup.Cols[nSpaceNumber].W = _max - newVal;
+                        }
+                    }
+                }
+
+                this.CalculateMargins();
+                word_control.UpdateHorRulerBack();
+
+                var pos = left + newVal * dKoef_mm_to_pix;
+                word_control.m_oOverlayApi.VertLine(pos);
+                break;
+            }
+            case 10:
+            {
+                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, this.TableMarginLeftTrackStart);
+
+                // сначала определим граничные условия
+                var markup = this.m_oColumnMarkup;
+
+                var _min = markup.X;
+                for (var i = 0; i < this.DragTablePos; i++)
+                {
+                    _min += (markup.Cols[i].W + markup.Cols[i].Space);
+                }
+
+                var _max = _min + markup.Cols[this.DragTablePos].W + markup.Cols[this.DragTablePos].Space;
+                _max += markup.Cols[this.DragTablePos + 1].W;
+
+                var _space = markup.Cols[this.DragTablePos].Space;
+
+                var _natMin = _min + _space / 2 + 10;
+                var _natMax = _max - _space / 2 - 10;
+
+                if (newVal < _natMin)
+                    newVal = _natMin;
+                if (newVal > _natMax)
+                    newVal = _natMax;
+
+                var _delta = newVal - (_min + markup.Cols[this.DragTablePos].W + markup.Cols[this.DragTablePos].Space / 2);
+                markup.Cols[this.DragTablePos].W += _delta;
+                markup.Cols[this.DragTablePos + 1].W -= _delta;
+
+                this.CalculateMargins();
+                word_control.UpdateHorRulerBack();
+
+                var pos = left + newVal * dKoef_mm_to_pix;
+                word_control.m_oOverlayApi.VertLine(pos);
+                break;
+            }
         }
     }
 
@@ -1062,7 +1378,7 @@ function CHorRuler()
 
         var _margin_left = this.m_dMarginLeft;
         var _margin_right = this.m_dMarginRight;
-        if (this.CurrentObjectType == RULER_OBJECT_TYPE_TABLE)
+        if (this.CurrentObjectType == RULER_OBJECT_TYPE_TABLE || this.CurrentObjectType == RULER_OBJECT_TYPE_COLUMNS)
         {
             _margin_left = this.TableMarginLeft;
             _margin_right = this.TableMarginRight;
@@ -1180,6 +1496,119 @@ function CHorRuler()
                 }
             }
         }
+        else if (this.CurrentObjectType == RULER_OBJECT_TYPE_COLUMNS)
+        {
+            if (y >= _top && y <= _bottom)
+            {
+                var markup = this.m_oColumnMarkup;
+                if (markup.EqualWidth)
+                {
+                    var _w = ((markup.R - markup.X) - markup.Space * (markup.Num - 1)) / markup.Num;
+                    var _x = markup.X;
+
+                    var _index = 0;
+                    for (var i = 0; i < markup.Num; i++)
+                    {
+                        if (0 == i)
+                        {
+                            if (Math.abs(x - _x) < 1)
+                            {
+                                this.DragTablePos = _index;
+                                return 9;
+                            }
+                        }
+                        else
+                        {
+                            if (x < _x + 1 && x > _x - 2)
+                            {
+                                this.DragTablePos = _index;
+                                return 9;
+                            }
+                        }
+
+                        ++_index;
+                        _x += _w;
+
+                        if (i == markup.Num - 1)
+                        {
+                            if (Math.abs(x - _x) < 1)
+                            {
+                                this.DragTablePos = _index;
+                                return 9;
+                            }
+                        }
+                        else
+                        {
+                            if (x < _x + 2 && x > _x - 1)
+                            {
+                                this.DragTablePos = _index;
+                                return 9;
+                            }
+                        }
+
+                        ++_index;
+                        _x += markup.Space;
+                    }
+                }
+                else
+                {
+                    var _x = markup.X;
+
+                    var _index = 0;
+                    for (var i = 0; i < markup.Cols.length; i++)
+                    {
+                        if (0 == i)
+                        {
+                            if (Math.abs(x - _x) < 1)
+                            {
+                                this.DragTablePos = _index;
+                                return 9;
+                            }
+                        }
+                        else
+                        {
+                            if (x < _x + 1 && x > _x - 2)
+                            {
+                                this.DragTablePos = _index;
+                                return 9;
+                            }
+                        }
+
+                        ++_index;
+                        _x += markup.Cols[i].W;
+
+                        if (i == markup.Num - 1)
+                        {
+                            if (Math.abs(x - _x) < 1)
+                            {
+                                this.DragTablePos = _index;
+                                return 9;
+                            }
+                        }
+                        else
+                        {
+                            if (x < _x + 2 && x > _x - 1)
+                            {
+                                this.DragTablePos = _index;
+                                return 9;
+                            }
+                        }
+
+                        if (i != markup.Cols.length - 1)
+                        {
+                            if (Math.abs(x - (_x + markup.Cols[i].Space / 2)) < 1)
+                            {
+                                this.DragTablePos = i;
+                                return 10;
+                            }
+                        }
+
+                        ++_index;
+                        _x += markup.Cols[i].Space;
+                    }
+                }
+            }
+        }
         return 0;
     }
 
@@ -1202,7 +1631,7 @@ function CHorRuler()
 
         var _margin_left = this.m_dMarginLeft;
         var _margin_right = this.m_dMarginRight;
-        if (this.CurrentObjectType == RULER_OBJECT_TYPE_TABLE)
+        if (this.CurrentObjectType == RULER_OBJECT_TYPE_TABLE || this.CurrentObjectType == RULER_OBJECT_TYPE_COLUMNS)
         {
             _margin_left = this.TableMarginLeft;
             _margin_right = this.TableMarginRight;
@@ -1278,6 +1707,74 @@ function CHorRuler()
                 this.TableMarginLeftTrackStart = this.TableMarginLeft;
                 break;
             }
+            case 9:
+            {
+                var markup = this.m_oColumnMarkup;
+                var pos = 0;
+                if (markup.EqualWidth)
+                {
+                    var _w = ((markup.R - markup.X) - markup.Space * (markup.Num - 1)) / markup.Num;
+                    var _x = markup.X + (this.DragTablePos >> 1) * (_w + markup.Space);
+                    if (this.DragTablePos & 1 == 1)
+                        _x += _w;
+
+                    pos = _x;
+                }
+                else
+                {
+                    var _x = markup.X;
+
+                    var _index = 0;
+                    for (var i = 0; i < markup.Cols.length && _index < this.DragTablePos; i++)
+                    {
+                        if (_index == this.DragTablePos)
+                            break;
+
+                        ++_index;
+                        _x += markup.Cols[i].W;
+
+                        if (_index == this.DragTablePos)
+                            break;
+
+                        ++_index;
+                        _x += markup.Cols[i].Space;
+                    }
+
+                    pos = _x;
+                }
+
+                pos = left + pos * dKoef_mm_to_pix;
+                word_control.m_oOverlayApi.VertLine(pos);
+
+                this.TableMarginLeftTrackStart = markup.X;
+                break;
+            }
+            case 10:
+            {
+                var markup = this.m_oColumnMarkup;
+                var pos = markup.X;
+
+                var _index = 0;
+                for (var i = 0; i < markup.Cols.length && i < this.DragTablePos; i++)
+                {
+                    if (_index == this.DragTablePos)
+                        break;
+
+                    pos += markup.Cols[i].W;
+                    pos += markup.Cols[i].Space;
+                }
+
+                if (this.DragTablePos < markup.Cols.length)
+                {
+                    pos += markup.Cols[this.DragTablePos].W;
+                    pos += markup.Cols[this.DragTablePos].Space / 2;
+                }
+
+                pos = left + pos * dKoef_mm_to_pix;
+                word_control.m_oOverlayApi.VertLine(pos);
+                this.TableMarginLeftTrackStart = markup.X;
+                break;
+            }
         }
 
         if (0 == this.DragType)
@@ -1340,7 +1837,7 @@ function CHorRuler()
 
         var _margin_left = this.m_dMarginLeft;
         var _margin_right = this.m_dMarginRight;
-        if (this.CurrentObjectType == RULER_OBJECT_TYPE_TABLE)
+        if (this.CurrentObjectType == RULER_OBJECT_TYPE_TABLE || this.CurrentObjectType == RULER_OBJECT_TYPE_COLUMNS)
         {
             _margin_left = this.TableMarginLeft;
             _margin_right = this.TableMarginRight;
@@ -1394,6 +1891,14 @@ function CHorRuler()
                 this.DragTablePos = -1;
                 break;
             }
+            case 9:
+            case 10:
+            {
+                if (!this.SimpleChanges.IsSimple)
+                    this.SetColumnsProperties();
+                this.DragTablePos = -1;
+                break;
+            }
         }
 
         if (7 == this.DragType)
@@ -1427,7 +1932,7 @@ function CHorRuler()
 
         var _margin_left = this.m_dMarginLeft;
         var _margin_right = this.m_dMarginRight;
-        if (this.CurrentObjectType == RULER_OBJECT_TYPE_TABLE)
+        if (this.CurrentObjectType == RULER_OBJECT_TYPE_TABLE || this.CurrentObjectType == RULER_OBJECT_TYPE_COLUMNS)
         {
             _margin_left = this.TableMarginLeft;
             _margin_right = this.TableMarginRight;
@@ -1475,6 +1980,14 @@ function CHorRuler()
             {
                 if (!this.SimpleChanges.IsSimple)
                     this.SetTableProperties();
+                this.DragTablePos = -1;
+                break;
+            }
+            case 9:
+            case 10:
+            {
+                if (!this.SimpleChanges.IsSimple)
+                    this.SetColumnsProperties();
                 this.DragTablePos = -1;
                 break;
             }
@@ -1552,11 +2065,16 @@ function CHorRuler()
         }
     }
 
+    this.SetColumnsProperties = function()
+    {
+        this.m_oWordControl.m_oLogicDocument.Update_ColumnsMarkupFromRuler(this.m_oColumnMarkup);
+    }
+
     this.BlitToMain = function(left, top, htmlElement)
     {
         var _margin_left = this.m_dMarginLeft;
         var _margin_right = this.m_dMarginRight;
-        if (this.CurrentObjectType == RULER_OBJECT_TYPE_TABLE)
+        if (this.CurrentObjectType == RULER_OBJECT_TYPE_TABLE || this.CurrentObjectType == RULER_OBJECT_TYPE_COLUMNS)
         {
             _margin_left = this.TableMarginLeft;
             _margin_right = this.TableMarginRight;

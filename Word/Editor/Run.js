@@ -1230,8 +1230,8 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
                     }
                 }
 
-                var Page_Abs = Para.Get_StartPage_Absolute() + CurPage;
-                Para.DrawingDocument.UpdateTarget( X, TargetY, Page_Abs );
+                var PageAbs = Para.Get_AbsolutePage(CurPage)
+                Para.DrawingDocument.UpdateTarget(X, TargetY, PageAbs);
 
                 // TODO: Тут делаем, чтобы курсор не выходил за границы буквицы. На самом деле, надо делать, чтобы
                 //       курсор не выходил за границы строки, но для этого надо делать обрезку по строкам, а без нее
@@ -1246,7 +1246,7 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
                     __Y1 = Math.min( __Y1, ___Y1 );
 
                     Para.DrawingDocument.SetTargetSize( __Y1 - __Y0 );
-                    Para.DrawingDocument.UpdateTarget( X, __Y0, Page_Abs );
+                    Para.DrawingDocument.UpdateTarget( X, __Y0, PageAbs );
                 }
 
                 if (para_Math_Run === this.Type && null !== this.Parent && true !== this.Parent.bRoot && this.Parent.bMath_OneLine)
@@ -1270,16 +1270,14 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
                     __Y1 = Math.min( __Y1, ___Y1 );
 
                     Para.DrawingDocument.SetTargetSize( __Y1 - __Y0 );
-                    Para.DrawingDocument.UpdateTarget( X, __Y0, Page_Abs );
+                    Para.DrawingDocument.UpdateTarget( X, __Y0, PageAbs );
                 }
             }
         }
 
         if ( true === ReturnTarget )
         {
-
             var CurTextPr = this.Get_CompiledPr(false);
-
 
             g_oTextMeasurer.SetTextPr( CurTextPr, this.Paragraph.Get_Theme() );
             g_oTextMeasurer.SetFontSlot( fontslot_ASCII, CurTextPr.Get_FontKoef() );
@@ -1306,14 +1304,14 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
             }
 
 
-            return { X : X, Y : TargetY, Height : Height, PageNum : CurPage + Para.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
+            return { X : X, Y : TargetY, Height : Height, PageNum : Para.Get_AbsolutePage(CurPage), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
         }
         else
-            return { X : X, Y : Y, PageNum : CurPage + Para.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
+            return { X : X, Y : Y, PageNum : Para.Get_AbsolutePage(CurPage), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
 
     }
 
-    return { X : X, Y: Y,  PageNum : CurPage + Para.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
+    return { X : X, Y: Y,  PageNum : Para.Get_AbsolutePage(CurPage), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
 };
 
 // Проверяем, произошло ли простейшее изменение (набор или удаление текста)
@@ -2200,7 +2198,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var NewRange        = PRS.NewRange;
     var ForceNewPage    = PRS.ForceNewPage;
     var NewPage         = PRS.NewPage;
-    var BreakPageLine   = PRS.BreakPageLine;
     var End             = PRS.End;
 
     var Word            = PRS.Word;
@@ -2763,7 +2760,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     // Выставляем номер страницы
 
                     var LogicDocument = Para.LogicDocument;
-                    var SectionPage = LogicDocument.Get_SectionPageNumInfo2(PRS.Page + Para.Get_StartPage_Absolute()).CurPage;
+                    var SectionPage = LogicDocument.Get_SectionPageNumInfo2(Para.Get_AbsolutePage(PRS.Page)).CurPage;
 
                     Item.Set_Page(SectionPage);
 
@@ -2820,7 +2817,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     SpaceLen = 0;
                     WordLen = 0;
 
-                    var TabPos = Para.Internal_GetTabPos(X, ParaPr, PRS.Page);
+                    var TabPos = Para.private_RecalculateGetTabPos(X, ParaPr, PRS.Page);
                     var NewX = TabPos.NewX;
                     var TabValue = TabPos.TabValue;
 
@@ -2838,6 +2835,13 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     }
                     else
                     {
+                        if (NewX > XEnd - 0.001 && XEnd < 558.7 && PRS.Range >= PRS.RangesCount - 1)
+                        {
+                            Para.Lines[PRS.Line].Ranges[PRS.Range].XEnd = 558.7;
+                            XEnd = 558.7;
+                            PRS.BadLeftTab = true;
+                        }
+
                         if (NewX > XEnd && ( false === FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange) ))
                         {
                             WordLen = NewX - X;
@@ -2888,9 +2892,13 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         SpaceLen = 0;
                     }
 
-                    if (break_Page === Item.BreakType)
+                    if (break_Page === Item.BreakType || break_Column === Item.BreakType)
                     {
-                        if (true === PRS.SkipPageBreak && Item === PRS.PageBreak)
+                        PRS.BreakPageLine = true;
+                        if (break_Page === Item.BreakType)
+                            PRS.BreakRealPageLine = true;
+
+                        if (true === Para.Check_BreakPageEnd(Item))
                             continue;
 
                         Item.Flags.NewLine = true;
@@ -2905,11 +2913,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             continue;
                         }
 
-                        NewPage = true;
-                        NewRange = true;
-                        BreakPageLine = true;
-
-                        PRS.PageBreak = Item;
+                        NewPage       = true;
+                        NewRange      = true;
                     }
                     else
                     {
@@ -2930,26 +2935,22 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     if (true === Word)
                     {
                         FirstItemOnLine = false;
-                        EmptyLine = false;
+                        EmptyLine       = false;
                     }
 
-                    // false === PRS.ExtendBoundToBottom, потому что это уже делалось для PageBreak
-                    if (false === PRS.ExtendBoundToBottom)
+                    X += WordLen;
+
+                    if (true === Word)
                     {
-                        X += WordLen;
-
-                        if (true === Word)
-                        {
-                            X += SpaceLen;
-                            SpaceLen = 0;
-                            WordLen = 0;
-                        }
-
-                        X = this.Internal_Recalculate_LastTab(PRS.LastTab, X, XEnd, Word, WordLen, SpaceLen);
+                        X += SpaceLen;
+                        SpaceLen = 0;
+                        WordLen  = 0;
                     }
+
+                    X = this.Internal_Recalculate_LastTab(PRS.LastTab, X, XEnd, Word, WordLen, SpaceLen);
 
                     NewRange = true;
-                    End = true;
+                    End      = true;
 
                     RangeEndPos = Pos + 1;
 
@@ -2968,7 +2969,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     PRS.NewRange        = NewRange;
     PRS.ForceNewPage    = ForceNewPage;
     PRS.NewPage         = NewPage;
-    PRS.BreakPageLine   = BreakPageLine;
     PRS.End             = End;
 
     PRS.Word            = Word;
@@ -3370,10 +3370,12 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
             case para_Drawing:
             {
                 var Para = PRSA.Paragraph;
+                var PageAbs = Para.private_GetAbsolutePageIndex(CurPage);
+                var PageRel = Para.private_GetRelativePageIndex(CurPage);
 
                 var LogicDocument = this.Paragraph.LogicDocument;
-                var LD_PageLimits = LogicDocument.Get_PageLimits( CurPage );
-                var LD_PageFields = LogicDocument.Get_PageFields( CurPage );
+                var LD_PageLimits = LogicDocument.Get_PageLimits(PageAbs);
+                var LD_PageFields = LogicDocument.Get_PageFields(PageAbs);
 
                 var Page_Width  = LD_PageLimits.XLimit;
                 var Page_Height = LD_PageLimits.YLimit;
@@ -3389,8 +3391,8 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                 var Y_Top_Margin    = Y_Top_Field;
 
                 var DrawingObjects = Para.Parent.DrawingObjects;
-                var PageLimits     = Para.Parent.Get_PageLimits(Para.PageNum + CurPage);
-                var PageFields     = Para.Parent.Get_PageFields(Para.PageNum + CurPage);
+                var PageLimits     = Para.Parent.Get_PageLimits(PageRel);
+                var PageFields     = Para.Parent.Get_PageFields(PageRel);
 
                 var ColumnStartX = (0 === CurPage ? Para.X_ColumnStart : Para.Pages[CurPage].X     );
                 var ColumnEndX   = (0 === CurPage ? Para.X_ColumnEnd   : Para.Pages[CurPage].XLimit);
@@ -3419,11 +3421,10 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                     PageLimits.YLimit = Page_Height;
                 }
 
-                var PageLimitsOrigin = Para.Parent.Get_PageLimits(Para.PageNum + CurPage);
-
+                var PageLimitsOrigin = Para.Parent.Get_PageLimits(PageRel);
                 if ( true === Item.Is_Inline() || true === Para.Parent.Is_DrawingShape() )
                 {
-                    Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y , Para.Get_StartPage_Absolute() + CurPage, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
+                    Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y , PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
                     Item.Reset_SavedPosition();
 
                     PRSA.X    += Item.WidthVisible;
@@ -3443,15 +3444,13 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                     if (true === PRSA.RecalcFast2)
                     {
                         // Тут мы должны сравнить положение картинок
-
                         var oRecalcObj = Item.Save_RecalculateObject();
-                        var Page_abs   = Para.Get_StartPage_Absolute() + CurPage;
-                        Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y , Page_abs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
+                        Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y , PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
 
                         if (Math.abs(Item.X - oRecalcObj.X) > 0.001 || Math.abs(Item.Y - oRecalcObj.Y) > 0.001 || Item.PageNum !== oRecalcObj.PageNum)
                         {
                             // Положение картинок не совпало, отправляем пересчет текущей страницы.
-                            PRSA.RecalcResult = recalcresult_CurPage;
+                            PRSA.RecalcResult = recalcresult_CurPage | recalcresultflags_Page;
                             return;
                         }
 
@@ -3466,18 +3465,17 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                     {
                         var LogicDocument = Para.Parent;
                         var LDRecalcInfo  = Para.Parent.RecalcInfo;
-                        var Page_abs      = Para.Get_StartPage_Absolute() + CurPage;
-
                         if ( true === LDRecalcInfo.Can_RecalcObject() )
                         {
                             // Обновляем позицию объекта
-                            Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y , Page_abs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
+                            Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y , PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
                             LDRecalcInfo.Set_FlowObject( Item, 0, recalcresult_NextElement, -1 );
 
-                            if (0 === PRSA.CurPage && Item.wrappingPolygon.top > PRSA.PageY + 0.001)
+                            // TODO: Добавить проверку на не попадание в предыдущие колонки
+                            if (0 === PRSA.CurPage && Item.wrappingPolygon.top > PRSA.PageY + 0.001 && Item.wrappingPolygon.left > PRSA.PageX + 0.001)
                                 PRSA.RecalcResult = recalcresult_CurPagePara;
                             else
-                                PRSA.RecalcResult = recalcresult_CurPage;
+                                PRSA.RecalcResult = recalcresult_CurPage | recalcresultflags_Page;
 
                             return;
                         }
@@ -3488,8 +3486,11 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                             // данная страница окончательно или нет. Если у нас будет ветка с переходом на предыдущую страницу,
                             // тогда не рассчитав следующую страницу мы о конечном рассчете текущей страницы не узнаем.
 
-                            // Если данный объект нашли, значит он уже был рассчитан и нам надо проверить номер страницы
-                            if ( Item.PageNum === Page_abs )
+                            // Если данный объект нашли, значит он уже был рассчитан и нам надо проверить номер страницы.
+                            // Заметим, что даже если картинка привязана к колонке, и после пересчета место привязки картинки
+                            // сдвигается в следующую колонку, мы проверяем все равно только реальную страницу (без
+                            // учета колонок, так делает и Word).
+                            if ( Item.PageNum === PageAbs )
                             {
                                 // Все нормально, можно продолжить пересчет
                                 LDRecalcInfo.Reset();
@@ -3501,18 +3502,18 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                                 // мы пересчитываем заново текущую страницу, а не предыдущую
 
                                 // Обновляем позицию объекта
-                                Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y, Page_abs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
+                                Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y, PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
 
                                 LDRecalcInfo.Set_FlowObject( Item, 0, recalcresult_NextElement, -1 );
                                 LDRecalcInfo.Set_PageBreakBefore( false );
-                                PRSA.RecalcResult = recalcresult_CurPage;
+                                PRSA.RecalcResult = recalcresult_CurPage | recalcresultflags_Page;
                                 return;
                             }
                             else
                             {
                                 LDRecalcInfo.Set_PageBreakBefore( true );
                                 DrawingObjects.removeById( Item.PageNum, Item.Get_Id() );
-                                PRSA.RecalcResult = recalcresult_PrevPage;
+                                PRSA.RecalcResult = recalcresult_PrevPage | recalcresultflags_Page;
                                 return;
                             }
                         }
@@ -3528,7 +3529,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                         // Картинка ложится на или под текст, в данном случае пересчет можно спокойно продолжать
                         // Здесь под верхом параграфа понимаем верх первой строки, а не значение, с которого начинается пересчет.
                         var ParagraphTop = Para.Lines[Para.Pages[CurPage].StartLine].Top + Para.Pages[CurPage].Y;
-                        Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y , Para.Get_StartPage_Absolute() + CurPage, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, ParagraphTop), PageLimits, PageLimitsOrigin, _CurLine);
+                        Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y , PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, ParagraphTop), PageLimits, PageLimitsOrigin, _CurLine);
                         Item.Reset_SavedPosition();
                     }
                 }
@@ -3572,7 +3573,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
             }
             case para_NewLine:
             {
-                if ( break_Page === Item.BreakType )
+                if (break_Page === Item.BreakType || break_Column === Item.BreakType)
                     Item.Update_String( PRSA.XEnd - PRSA.X );
 
                 PRSA.X += Item.WidthVisible;
@@ -3755,7 +3756,7 @@ ParaRun.prototype.Check_PageBreak = function()
     for (var Pos = 0; Pos < Count; Pos++)
     {
         var Item = this.Content[Pos];
-        if (para_NewLine === Item.Type && break_Page === Item.BreakType)
+        if (para_NewLine === Item.Type && (break_Page === Item.BreakType || break_Column === Item.BreakType))
             return true;
     }
 
@@ -4360,9 +4361,9 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
                     pGraphics.b_color1(0, 0, 0, 255);
                 }
 
-                if ( para_Drawing != ItemType || drawing_Anchor != Item.DrawingType )
+                if (para_Drawing != ItemType || drawing_Anchor != Item.DrawingType)
                 {
-                    Item.Draw( X, Y - this.YOffset, pGraphics );
+                    Item.Draw(X, Y - this.YOffset, pGraphics);
                     X += Item.Get_WidthVisible();
                 }
 
@@ -7896,18 +7897,23 @@ ParaRun.prototype.Save_Changes = function(Data, Writer)
             var StartPos = Writer.GetCurPosition();
             Writer.Skip(4);
             var RealCount = Count;
-
             for ( var Index = 0; Index < Count; Index++ )
             {
                 if ( true === bArray )
                 {
                     if ( false === Data.PosArray[Index] )
+                    {
                         RealCount--;
+                    }
                     else
-                        Writer.WriteLong( Data.PosArray[Index] );
+                    {
+                        Writer.WriteLong(Data.PosArray[Index]);
+                    }
                 }
                 else
-                    Writer.WriteLong( Data.Pos );
+                {
+                    Writer.WriteLong(Data.Pos);
+                }
             }
 
             var EndPos = Writer.GetCurPosition();
@@ -8473,7 +8479,6 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             // Array of Long : позиции удаляемых элементов
 
             var Count = Reader.GetLong();
-
             for ( var Index = 0; Index < Count; Index++ )
             {
                 var ChangesPos = this.m_oContentChanges.Check(contentchanges_Remove, Reader.GetLong());

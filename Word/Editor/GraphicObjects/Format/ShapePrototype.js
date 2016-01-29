@@ -561,6 +561,19 @@ CShape.prototype.Get_StartPage_Absolute = function()
 {
     return 0;
 };
+CShape.prototype.Get_AbsolutePage = function(CurPage)
+{
+    var oDrawing = this.GetParaDrawing();
+    if(oDrawing)
+    {
+        return oDrawing.PageNum;
+    }
+    return 0;
+};
+CShape.prototype.Get_AbsoluteColumn = function(CurPage)
+{
+    return 0;
+};
 CShape.prototype.Get_Numbering = function()
 {
     return editor.WordControl.m_oLogicDocument.Numbering;

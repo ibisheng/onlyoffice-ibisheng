@@ -46,7 +46,7 @@ function CSectionPr(LogicDocument)
     
     this.TitlePage     = false;
     
-    this.Columns       = new CSectionColumns();
+    this.Columns       = new CSectionColumns(this);
        
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
@@ -80,7 +80,7 @@ CSectionPr.prototype =
         this.Set_Borders_Display( Other.Borders.Display );
         this.Set_Borders_OffsetFrom( Other.Borders.OffsetFrom );
         this.Set_Borders_ZOrder( Other.Borders.ZOrder );
-        
+
         // Колонтитулы
         if (true === CopyHdrFtr)
         {
@@ -123,8 +123,18 @@ CSectionPr.prototype =
             this.Set_Footer_Even(Other.FooterEven);
             this.Set_Footer_Default(Other.FooterDefault);
         }
-        
+
         this.Set_PageNum_Start( Other.PageNumType.Start );
+
+        this.Set_Columns_EqualWidth(Other.Columns.EqualWidth);
+        this.Set_Columns_Num(Other.Columns.Num);
+        this.Set_Columns_Sep(Other.Columns.Sep);
+        this.Set_Columns_Space(Other.Columns.Space);
+        for (var ColumnIndex = 0, ColumnsCount = Other.Columns.Cols.length; ColumnIndex < ColumnsCount; ++ColumnIndex)
+        {
+            var Column = Other.Columns.Cols[ColumnIndex];
+            this.Set_Columns_Col(ColumnIndex, Column.W, Column.Space);
+        }
     },
     
     Clear_AllHdrFtr : function()
@@ -584,7 +594,22 @@ CSectionPr.prototype =
     {
         return this.PageNumType.Start;
     },
-    
+
+    Get_ColumnsCount : function()
+    {
+        return this.Columns.Get_Count();
+    },
+
+    Get_ColumnWidth : function(ColIndex)
+    {
+        return this.Columns.Get_ColumnWidth(ColIndex);
+    },
+
+    Get_ColumnSpace : function(ColIndex)
+    {
+        return this.Columns.Get_ColumnSpace(ColIndex);
+    },
+
     Set_Columns_EqualWidth : function(Equal)
     {
         if ( Equal !== this.Columns.Equal )
@@ -621,6 +646,12 @@ CSectionPr.prototype =
             History.Add( this, { Type : historyitem_Section_Columns_Sep, Old : this.Columns.Sep, New : Sep } );
             this.Columns.Sep = Sep;
         }
+    },
+
+    Set_Columns_Cols : function(Cols)
+    {
+        History.Add(this, {Type : historyitem_Section_Columns_SetCols, Old : this.Columns.Cols, New : Cols});
+        this.Columns.Cols = Cols;
     },
 
     Set_Columns_Col : function(Index, W, Space)
@@ -890,6 +921,12 @@ CSectionPr.prototype =
                 this.Columns.Cols[Data.Index] = Data.Old;
                 break;
             }
+
+            case historyitem_Section_Columns_SetCols:
+            {
+                this.Columns.Cols = Data.Old;
+                break;
+            }
         }
     },
 
@@ -1061,7 +1098,13 @@ CSectionPr.prototype =
             {
                 this.Columns.Cols[Data.Index] = Data.New;
                 break;
-            }                
+            }
+
+            case historyitem_Section_Columns_SetCols:
+            {
+                this.Columns.Cols = Data.New;
+                break;
+            }
         }
     },
 
@@ -1296,6 +1339,20 @@ CSectionPr.prototype =
                     Data.New.Write_ToBinary( Writer );
                 }
 
+                break;
+            }
+
+            case historyitem_Section_Columns_SetCols:
+            {
+                // Long : Count
+                // Array of variable : array of CSectionColumn
+
+                var Count = Data.New.length;
+                Writer.WriteLong(Count);
+                for (var Index = 0; Index < Count; ++Index)
+                {
+                    Data.New[Index].Write_ToBinary(Writer);
+                }
                 break;
             }
         }
@@ -1536,7 +1593,7 @@ CSectionPr.prototype =
             case historyitem_Section_Columns_Space:
             {
                 // Double : Space
-                this.Columns.Space = Redaer.GetDouble();
+                this.Columns.Space = Reader.GetDouble();
                 break;
             }
 
@@ -1572,7 +1629,22 @@ CSectionPr.prototype =
                 }
 
                 break;
-            }                
+            }
+
+            case historyitem_Section_Columns_SetCols:
+            {
+                // Long : Count
+                // Array of variable : array of CSectionColumn
+
+                var Count = Reader.GetLong();
+                this.Columns.Cols = [];
+                for (var Index = 0; Index < Count; ++Index)
+                {
+                    this.Columns.Cols[Index] = new CSectionColumn();
+                    this.Columns.Cols[Index].Read_FromBinary(Reader);
+                }
+                break;
+            }
         }
     },
 
@@ -1807,95 +1879,120 @@ function CSectionColumn()
     this.Space = 0;
 }
 
-CSectionColumn.prototype = 
+CSectionColumn.prototype.Write_ToBinary = function(Writer)
 {
-    Write_ToBinary : function(Writer)
-    {
-        // Double : W
-        // Double : Space
+    // Double : W
+    // Double : Space
 
-        Writer.WriteDouble( this.W );
-        Writer.WriteDouble( this.Space );
-    },
-    
-    Read_FromBinary : function(Reader)
-    {
-        // Double : W
-        // Double : Space
+    Writer.WriteDouble( this.W );
+    Writer.WriteDouble( this.Space );
+};
+CSectionColumn.prototype.Read_FromBinary = function(Reader)
+{
+    // Double : W
+    // Double : Space
 
-        this.W     = Reader.GetDouble();
-        this.Space = Reader.GetDouble();
-    }
+    this.W     = Reader.GetDouble();
+    this.Space = Reader.GetDouble();
 };
 
-function CSectionColumns()
+function CSectionColumns(SectPr)
 {
+    this.SectPr     = SectPr;
     this.EqualWidth = true;
-    this.Num        = 3;
+    this.Num        = 1;
     this.Sep        = false;
     this.Space      = 30;
     
     this.Cols       = [];
-    
-    this.Cols[0] = new CSectionColumn();
-    this.Cols[0].W = 100;
-    this.Cols[0].Space = 20;
-    this.Cols[1] = new CSectionColumn();
-    this.Cols[1].W = 50;
-    
 }
 
-CSectionColumns.prototype = 
+CSectionColumns.prototype.Write_ToBinary = function(Writer)
 {
-    Write_ToBinary : function(Writer)
+    // Bool   : Equal
+    // Long   : Num
+    // Bool   : Sep
+    // Double : Space
+
+    // Long   : Количество колонок
+    // Variable : Сами колонки
+
+    Writer.WriteBool( this.EqualWidth );
+    Writer.WriteLong( this.Num );
+    Writer.WriteBool( this.Sep );
+    Writer.WriteDouble( this.Space );
+
+    var Count = this.Cols.length;
+    Writer.WriteLong( Count );
+
+    for ( var Pos = 0; Pos < Count; Pos++ )
     {
-        // Bool   : Equal
-        // Long   : Num
-        // Bool   : Sep
-        // Double : Space
-        
-        // Long   : Количество колонок
-        // Variable : Сами колонки
-        
-        Writer.WriteBool( this.EqualWidth );
-        Writer.WriteLong( this.Num );
-        Writer.WriteBool( this.Sep );
-        Writer.WriteDouble( this.Space );
-        
-        var Count = this.Cols.length;
-        Writer.WriteLong( Count );
-        
-        for ( var Pos = 0; Pos < Count; Pos++ )
-        {
-            this.Cols[Pos].Write_ToBinary(Writer);
-        }
-    },
-    
-    Read_FromBinary : function(Reader)
-    {
-        // Bool   : Equal
-        // Long   : Num
-        // Bool   : Sep
-        // Double : Space
-
-        // Long   : Количество колонок
-        // Variable : Сами колонки
-
-        this.EqualWidth = Reader.GetBool();
-        this.Num        = Reader.GetLong();
-        this.Sep        = Reader.GetBool();        
-        this.Space      = Reader.GetDouble();
-
-        var Count = Reader.GetLong();
-        this.Cols = [];
-
-        for ( var Pos = 0; Pos < Count; Pos++ )
-        {
-            this.Cols[Pos] = new CSectionColumn();
-            this.Cols[Pos].Read_FromBinary( Reader );
-        }
+        this.Cols[Pos].Write_ToBinary(Writer);
     }
-    
+};
+CSectionColumns.prototype.Read_FromBinary = function(Reader)
+{
+    // Bool   : Equal
+    // Long   : Num
+    // Bool   : Sep
+    // Double : Space
+
+    // Long   : Количество колонок
+    // Variable : Сами колонки
+
+    this.EqualWidth = Reader.GetBool();
+    this.Num        = Reader.GetLong();
+    this.Sep        = Reader.GetBool();
+    this.Space      = Reader.GetDouble();
+
+    var Count = Reader.GetLong();
+    this.Cols = [];
+
+    for ( var Pos = 0; Pos < Count; Pos++ )
+    {
+        this.Cols[Pos] = new CSectionColumn();
+        this.Cols[Pos].Read_FromBinary( Reader );
+    }
+};
+CSectionColumns.prototype.Get_Count = function()
+{
+    if (true === this.EqualWidth)
+        return this.Num;
+    else
+        return this.Cols.length;
+};
+CSectionColumns.prototype.Get_ColumnWidth = function(ColIndex)
+{
+    if (true === this.EqualWidth)
+    {
+        var PageW   = this.SectPr.Get_PageWidth();
+        var MarginL = this.SectPr.Get_PageMargin_Left();
+        var MarginR = this.SectPr.Get_PageMargin_Right();
+        return this.Num > 0 ? (PageW - MarginL - MarginR - this.Space * (this.Num - 1)) / this.Num : (PageW - MarginL - MarginR);
+    }
+    else
+    {
+        ColIndex = Math.max(0, Math.min(this.Cols.length - 1, ColIndex));
+        if (ColIndex < 0)
+            return 0;
+
+        return this.Cols[ColIndex].W;
+    }
+};
+CSectionColumns.prototype.Get_ColumnSpace = function(ColIndex)
+{
+    if (true === this.EqualWidth)
+    {
+        return this.Space;
+    }
+    else
+    {
+        ColIndex = Math.max(0, Math.min(this.Cols.length - 1, ColIndex));
+        if (ColIndex < 0)
+            return this.Space;
+
+        return this.Cols[ColIndex].Space;
+    }
 };
 
 function CSectionLayoutColumnInfo(X, XLimit)
