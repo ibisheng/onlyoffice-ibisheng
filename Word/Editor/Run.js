@@ -2509,7 +2509,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     {
                         var WorLenCompareOper = WordLen + X - XRange + (bOperBefore  ? SpaceLen : BrkLen);
 
-                        var bOverXEnd;
+                        var bOverXEnd, bOverXEndMWordLarge;
                         var bNotUpdBreakOper = false;
 
                         var bCompareWrapIndent = PRS.bFirstLine == true ? WorLenCompareOper > PRS.WrapIndent : true;
@@ -2520,6 +2520,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         if(bOperBefore)  // оператор "до" => оператор находится в начале строки
                         {
                             bOverXEnd = X + WordLen + SpaceLen + BrkLen > XEnd; // BrkLen прибавляем дла случая, если идут подряд Brk Operators в конце
+                            bOverXEndMWordLarge = X + WordLen + SpaceLen > XEnd; // ширину самого оператора не учитываем при расчете bMathWordLarge, т.к. он будет находится на следующей строке
+
 
                             if(bOverXEnd)
                             {
@@ -2533,7 +2535,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 }
                                 else
                                 {
-                                    if(Word == true)
+                                    if(Word == true && bOverXEndMWordLarge == true)
                                     {
                                         bMathWordLarge = true;
                                     }
@@ -2592,6 +2594,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         else   // оператор "после" => оператор находится в конце строки
                         {
                             bOverXEnd = X + WordLen + BrkLen - Item.GapRight > XEnd;
+                            bOverXEndMWordLarge = bOverXEnd;
 
                             if(bOverXEnd && FirstItemOnLine === false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                             {
@@ -2608,7 +2611,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 // осуществляем здесь, чтобы не изменить GapRight в случае, когда новое слово не убирается на break_Operator
                                 OperGapRight = Item.GapRight;
 
-                                if(bOverXEnd) // FirstItemOnLine == true
+                                if(bOverXEndMWordLarge == true) // FirstItemOnLine == true
                                 {
                                     bMathWordLarge = true;
 
