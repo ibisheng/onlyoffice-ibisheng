@@ -2852,20 +2852,18 @@ ParaMath.prototype.Get_Bounds = function()
 ParaMath.prototype.Get_JointSize = function()
 {
     var W = 0, H = 0;
-    if(this.bFirstRecalculate == true)
+
+    var _bounds = this.Get_Bounds();
+
+    for(var Line = 0; Line < _bounds.length; Line++)
     {
-        var _bounds = this.Get_Bounds();
+        if(_bounds[Line] === undefined)
+            break;
 
-        for(var Line = 0; Line < _bounds.length; Line++)
+        for(var Range = 0; Range < _bounds[Line].length; Range++)
         {
-            if(_bounds[Line] == undefined)
-                break;
-
-            for(var Range = 0; Range < _bounds[Line].length; Range++)
-            {
-                W += _bounds[Line][Range].W;
-                H += _bounds[Line][Range].H;
-            }
+            W += _bounds[Line][Range].W;
+            H += _bounds[Line][Range].H;
         }
     }
 

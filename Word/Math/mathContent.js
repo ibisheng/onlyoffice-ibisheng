@@ -3749,10 +3749,27 @@ CMathContent.prototype.Selection_CheckParaContentPos = function(ContentPos, Dept
 {
     var CurPos = ContentPos.Get(Depth);
 
-    if (this.Selection.StartPos <= CurPos && CurPos <= this.Selection.EndPos)
-        return this.Content[CurPos].Selection_CheckParaContentPos(ContentPos, Depth + 1, bStart && this.Selection.StartPos === CurPos, bEnd && CurPos === this.Selection.EndPos);
-    else if (this.Selection.EndPos <= CurPos && CurPos <= this.Selection.StartPos)
-        return this.Content[CurPos].Selection_CheckParaContentPos(ContentPos, Depth + 1, bStart && this.Selection.EndPos === CurPos, bEnd && CurPos === this.Selection.StartPos);
+    var bStartPos = this.Selection.StartPos,
+        bEndPos   = this.Selection.EndPos;
+
+    if(bStartPos > bEndPos)
+    {
+        var temp = bStartPos;
+        bStartPos = bEndPos;
+        bEndPos = temp;
+    }
+
+    if(bStartPos < CurPos)
+        bStart = false;
+
+    if(CurPos < bEndPos)
+        bEnd = false;
+
+
+    if(bStart === false && bEnd === false)
+        return true;
+    else if((bStartPos <= CurPos || bStart === false) && (CurPos <= bEndPos || bEnd === false))
+        return this.Content[CurPos].Selection_CheckParaContentPos(ContentPos, Depth + 1, bStart, bEnd);
 
     return false;
 };
