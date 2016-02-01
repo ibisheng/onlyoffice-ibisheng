@@ -1640,7 +1640,7 @@
   };
 
   // ----- Drawing for print -----
-  WorksheetView.prototype.calcPagesPrint = function(pageOptions, printOnlySelection, indexWorksheet, layoutPageType) {
+  WorksheetView.prototype.calcPagesPrint = function(pageOptions, printOnlySelection, indexWorksheet, bFitToWidth, bFitToHeight) {
     var range;
     var maxCols = this.model.getColsCount();
     var maxRows = this.model.getRowsCount();
@@ -1796,7 +1796,7 @@
 
         for (rowIndex = currentRowIndex; rowIndex < maxRows; ++rowIndex) {
           var currentRowHeight = this.rows[rowIndex].height;
-          if (currentHeight + currentRowHeight > pageHeightWithFieldsHeadings) {
+          if (!bFitToHeight && currentHeight + currentRowHeight > pageHeightWithFieldsHeadings) {
             // Закончили рисовать страницу
             break;
           }
@@ -1809,13 +1809,13 @@
                 currentColWidth -= newPagePrint.startOffsetPt;
               }
 
-              if (c_oAscLayoutPageType.FitToWidth !== layoutPageType && currentWidth + currentColWidth > pageWidthWithFieldsHeadings && colIndex !== currentColIndex) {
+              if (!bFitToWidth && currentWidth + currentColWidth > pageWidthWithFieldsHeadings && colIndex !== currentColIndex) {
                 break;
               }
 
               currentWidth += currentColWidth;
 
-              if (c_oAscLayoutPageType.FitToWidth !== layoutPageType && currentWidth > pageWidthWithFieldsHeadings && colIndex === currentColIndex) {
+              if (!bFitToWidth && currentWidth > pageWidthWithFieldsHeadings && colIndex === currentColIndex) {
                 // Смещаем в селедующий раз ячейку
                 bIsAddOffset = true;
                 ++colIndex;
@@ -1829,7 +1829,7 @@
               currentWidth += this.cellsLeft;
             }
 
-            if (c_oAscLayoutPageType.FitToWidth === layoutPageType) {
+            if (bFitToWidth) {
               newPagePrint.pageClipRectWidth = Math.max(currentWidth, newPagePrint.pageClipRectWidth);
               newPagePrint.pageWidth = newPagePrint.pageClipRectWidth * vector_koef + (pageLeftField + pageRightField);
             } else {
@@ -1839,6 +1839,11 @@
 
           currentHeight += currentRowHeight;
           currentWidth = 0;
+        }
+
+        if (bFitToHeight) {
+          newPagePrint.pageClipRectHeight = Math.max(currentHeight, newPagePrint.pageClipRectHeight);
+          newPagePrint.pageHeight = newPagePrint.pageClipRectHeight * vector_koef + (pageTopField + pageBottomField);
         }
 
         // Нужно будет пересчитывать колонки

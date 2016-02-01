@@ -1170,12 +1170,22 @@
 			// Вид печати
 			this.layoutPageType = c_oAscLayoutPageType.ActualSize;
 
+			// По ширине
+			this.fitToWidth = false;
+			// По высоте
+			this.fitToHeight = false;
+
 			return this;
 		}
 		asc_CAdjustPrint.prototype.asc_getPrintType = function () { return this.printType; };
 		asc_CAdjustPrint.prototype.asc_getLayoutPageType = function () { return this.layoutPageType; };
 		asc_CAdjustPrint.prototype.asc_setPrintType = function (val) { this.printType = val; };
 		asc_CAdjustPrint.prototype.asc_setLayoutPageType = function (val) { this.layoutPageType = val; };
+
+		asc_CAdjustPrint.prototype.getFitToWidth = function () { return this.fitToWidth; };
+		asc_CAdjustPrint.prototype.getFitToHeight = function () { this.fitToHeight; };
+		asc_CAdjustPrint.prototype.asc_setFitToWidth = function (val) { this.fitToWidth = val; };
+		asc_CAdjustPrint.prototype.asc_setFitToHeight = function (val) { this.fitToHeight = val; };
 
 		/** @constructor */
 		function asc_CLockInfo () {
@@ -1667,6 +1677,8 @@
 		prot["asc_getLayoutPageType"] = prot.asc_getLayoutPageType;
 		prot["asc_setPrintType"] = prot.asc_setPrintType;
 		prot["asc_setLayoutPageType"] = prot.asc_setLayoutPageType;
+		prot["asc_setFitToWidth"] = prot.asc_setFitToWidth;
+		prot["asc_setFitToHeight"] = prot.asc_setFitToHeight;
 
 		window["Asc"].asc_CLockInfo = asc_CLockInfo;
 

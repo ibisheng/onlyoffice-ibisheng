@@ -2153,17 +2153,19 @@
 			var activeWs;
 			var printPagesData = new asc_CPrintPagesData();
 			var printType = adjustPrint.asc_getPrintType();
-			var layoutPageType = adjustPrint.asc_getLayoutPageType();
+//			var layoutPageType = adjustPrint.asc_getLayoutPageType();
+			var bFitToWidth = adjustPrint.getFitToWidth();
+			var bFitToHeight = adjustPrint.getFitToHeight();
 			if (printType == c_oAscPrintType.ActiveSheets) {
 				activeWs = wb.getActive();
 				ws = this.getWorksheet();
-				printPagesData.arrPages = ws.calcPagesPrint (wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/false, /*indexWorksheet*/activeWs, layoutPageType);
+				printPagesData.arrPages = ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/false, /*indexWorksheet*/activeWs, bFitToWidth, bFitToHeight);
 			} else if (printType == c_oAscPrintType.EntireWorkbook) {
 				// Колличество листов
 				var countWorksheets = this.model.getWorksheetCount();
 				for (var i = 0; i < countWorksheets; ++i) {
 					ws = this.getWorksheet(i);
-					var arrPages = ws.calcPagesPrint (wb.getWorksheet(i).PagePrintOptions, /*printOnlySelection*/false, /*indexWorksheet*/i, layoutPageType);
+					var arrPages = ws.calcPagesPrint(wb.getWorksheet(i).PagePrintOptions, /*printOnlySelection*/false, /*indexWorksheet*/i, bFitToWidth, bFitToHeight);
 					if (null !== arrPages) {
 						if (null === printPagesData.arrPages)
 							printPagesData.arrPages = [];
@@ -2173,7 +2175,7 @@
 			} else if (printType == c_oAscPrintType.Selection) {
 				activeWs = wb.getActive();
 				ws = this.getWorksheet();
-				printPagesData.arrPages = ws.calcPagesPrint (wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/true, /*indexWorksheet*/activeWs, layoutPageType);
+				printPagesData.arrPages = ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/true, /*indexWorksheet*/activeWs, bFitToWidth, bFitToHeight);
 			}
 
 			return printPagesData;
