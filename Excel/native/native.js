@@ -4562,7 +4562,8 @@ function offline_cell_editor_open(x, y, width, height, ratio, isSelectAll, isFor
        // wb.cellEditor._draw();
     }
 }
-function offline_cell_editor_key_event(keys, width, height, ratio) {
+
+function offline_cell_editor_process_input_commands(commands, width, height, ratio) {
     _null_object.width = width * ratio;
     _null_object.height = height * ratio;
 
@@ -4570,37 +4571,80 @@ function offline_cell_editor_key_event(keys, width, height, ratio) {
     var cellEditor =  _api.wb.cellEditor;
     var operationCode, left,right, position, value, value2;
 
-    for (var i = 0; i < keys.length; ++i) {
-        operationCode = keys[i][0];
-        value = keys[i][1];
-        value2 = keys[i][2];
+    for (var i = 0; i < commands.length; ++i) {
+        operationCode = commands[i][0];
+        value = commands[i][1];
+        value2 = commands[i][2];
 
-        var event = {
-            which:value,
-            metaKey:undefined,
-            ctrlKey:undefined
-        };
+        var event = {which:value,metaKey:undefined,ctrlKey:undefined};
 
-        if (1 === operationCode) {
-            cellEditor._onWindowKeyPress(event);
-        }
-        else if (0 === operationCode) {
-            cellEditor._onWindowKeyDown(event);
-        }
-        else if (2 === operationCode) {
-            position = value;
-            cellEditor._moveCursor(-11, position);
-        }
-        else if (3 === operationCode) {
-            left = value;
-            right = value2;
+        switch (operationCode) {
 
-            cellEditor.cursorPos = left;
-            cellEditor.selectionBegin = left;
-            cellEditor.selectionEnd = right;
-        }
-        else if (4 == operationCode) {
-            cellEditor.pasteText(keys[i][3]);
+            // KEY_DOWN
+            case 0: {
+                cellEditor._onWindowKeyDown(event);
+                break;
+            }
+
+            // KEY_PRESS
+            case 1: {
+                cellEditor._onWindowKeyPress(event);
+                break;
+            }
+
+            // MOVE
+            case 2: {
+                position = value;
+                cellEditor._moveCursor(-11, position);
+                break;
+            }
+
+            // SELECT
+            case 3: {
+                left = value;
+                right = value2;
+
+                cellEditor.cursorPos = left;
+                cellEditor.selectionBegin = left;
+                cellEditor.selectionEnd = right;
+                break;
+            }
+
+            // PASTE
+            case 4: {
+                cellEditor.pasteText(commands[i][3]);
+                break;
+            }
+
+            // 5 - REFRESH - noop command
+
+            // SELECT_ALL
+            case 6: {
+                cellEditor._moveCursor(-2);    // var kBeginOfText = -2;
+                cellEditor._selectChars(-4);   // var kEndOfText = -4;
+                break;
+            }
+
+            // SELECT_WORD
+            case 7: {
+
+                cellEditor.isSelectMode = c_oAscCellEditorSelectState.word;
+                // Окончание слова
+                var endWord = cellEditor.textRender.getNextWord(cellEditor.cursorPos);
+                // Начало слова (ищем по окончанию, т.к. могли попасть в пробел)
+                var startWord = cellEditor.textRender.getPrevWord(endWord);
+
+                cellEditor._moveCursor(-11, startWord);  // var kPosition = -11;
+                cellEditor._selectChars(-11, endWord);
+
+                break;
+            }
+
+            // DELETE_TEXT
+            case 8: {
+                cellEditor._removeChars(-8);  // var kPrevChar = -8;
+                break;
+            }
         }
     }
 
@@ -4609,6 +4653,7 @@ function offline_cell_editor_key_event(keys, width, height, ratio) {
     return [cellEditor.left, cellEditor.top, cellEditor.right, cellEditor.bottom,
         cellEditor.curLeft, cellEditor.curTop, cellEditor.curHeight];
 }
+
 function offline_cell_editor_mouse_event(events) {
 
     var left, right;
