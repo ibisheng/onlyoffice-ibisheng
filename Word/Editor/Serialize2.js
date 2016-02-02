@@ -4186,12 +4186,12 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				this.memory.WriteByte(c_oSerPropLenType.Double);
 				this.memory.WriteDouble(img.Distance.B);
 			}
-			// if(null != img.LayoutInCell)
-			// {
-				// this.memory.WriteByte(c_oSerImageType2.LayoutInCell);
-				// this.memory.WriteByte(c_oSerPropLenType.Byte);
-				// this.memory.WriteBool(img.LayoutInCell);
-			// }
+            if(null != img.LayoutInCell)
+            {
+                this.memory.WriteByte(c_oSerImageType2.LayoutInCell);
+                this.memory.WriteByte(c_oSerPropLenType.Byte);
+                this.memory.WriteBool(img.LayoutInCell);
+            }
 			if(null != img.RelativeHeight)
 			{
 				this.memory.WriteByte(c_oSerImageType2.RelativeHeight);
@@ -8549,11 +8549,13 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             oParaDrawing.Set_Distance(null, null, null, Math.abs(this.bcr.ReadDouble()));
         }
 		else if( c_oSerImageType2.Hidden === type )
-			var Hidden = this.stream.GetBool();
-		// else if( c_oSerImageType2.LayoutInCell === type )
-		// {
-			// oParaDrawing.LayoutInCell = this.stream.GetBool();
-		// }
+        {
+            var Hidden = this.stream.GetBool();
+        }
+        else if( c_oSerImageType2.LayoutInCell === type )
+        {
+            oParaDrawing.Set_LayoutInCell(this.stream.GetBool());
+        }
 		else if( c_oSerImageType2.Locked === type )
             oParaDrawing.Set_Locked(this.stream.GetBool());
 		else if( c_oSerImageType2.RelativeHeight === type )

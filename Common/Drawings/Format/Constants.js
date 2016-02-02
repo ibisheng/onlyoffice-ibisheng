@@ -1006,6 +1006,7 @@ var historyitem_Drawing_SetRelativeHeight = 16;// Устанавливаем Z-I
 var historyitem_Drawing_SetEffectExtent   = 17;// Устанавливаем EffectExtent
 var historyitem_Drawing_SetParent         = 18;// Устанавливаем Parent
 var historyitem_Drawing_SetParaMath       = 19; // Добавляем новую формулу для конвертации старого формата в новый
+var historyitem_Drawing_LayoutInCell      = 20; // Устанавливаем параметр расположения в таблице
 
 
 

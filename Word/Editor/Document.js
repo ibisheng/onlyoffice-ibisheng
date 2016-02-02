@@ -15406,12 +15406,12 @@ CDocument.prototype.Continue_FastCollaborativeEditing = function()
             {
                 this.Api.CoAuthoringApi.sendCursor(CursorInfo);
                 this.LastUpdateTargetTime = CurTime;
-    }
+            }
         }
         else
-    {
+        {
             this.LastUpdateTargetTime = CurTime;
-    }
+        }
     }
 };
 CDocument.prototype.Save_DocumentStateBeforeLoadChanges = function()

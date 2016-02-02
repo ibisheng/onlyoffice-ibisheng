@@ -4879,6 +4879,15 @@ ParaDrawing.prototype =
         this.Distance.B = B;
     },
 
+    Set_LayoutInCell : function(LayoutInCell)
+    {
+        if (this.LayoutInCell === LayoutInCell)
+            return;
+
+        History.Add(this, {Type : historyitem_Drawing_LayoutInCell, Old : this.LayoutInCell, New : LayoutInCell});
+        this.LayoutInCell = LayoutInCell;
+    },
+
     Get_Distance : function()
     {
         var oDist = this.Distance;
@@ -5203,6 +5212,12 @@ ParaDrawing.prototype =
                 break;
             }
 
+            case historyitem_Drawing_LayoutInCell:
+            {
+                this.LayoutInCell = Data.Old;
+                break;
+            }
+
             case historyitem_Drawing_AllowOverlap:
             {
                 this.AllowOverlap = Data.Old;
@@ -5338,6 +5353,12 @@ ParaDrawing.prototype =
                 this.Distance.R = Data.New.Right;
                 this.Distance.B = Data.New.Bottom;
                 this.GraphicObj && this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
+                break;
+            }
+
+            case historyitem_Drawing_LayoutInCell:
+            {
+                this.LayoutInCell = Data.New;
                 break;
             }
 
@@ -5723,6 +5744,13 @@ ParaDrawing.prototype =
                 break;
             }
 
+            case historyitem_Drawing_LayoutInCell:
+            {
+                // Bool : LayoutInCell
+                Writer.WriteBool(Data.New);
+                break;
+            }
+
             case historyitem_Drawing_AllowOverlap:
             {
                 // Bool : AllowOverlap
@@ -5892,6 +5920,13 @@ ParaDrawing.prototype =
                 this.Distance.B = Reader.GetDouble();
 
                 this.GraphicObj && this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
+                break;
+            }
+
+            case historyitem_Drawing_LayoutInCell:
+            {
+                // Bool : LayoutInCell
+                this.LayoutInCell = Reader.GetBool();
                 break;
             }
 
