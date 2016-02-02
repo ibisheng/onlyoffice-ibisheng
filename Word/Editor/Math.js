@@ -2140,12 +2140,17 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
 
     g.transform(1,0,0,1,0,0);
 
-    if(true == par.LogicDocument.Is_ShowParagraphMarks())
+    var isShowParaMarks = par.LogicDocument.Is_ShowParagraphMarks();
+
+    if(true == isShowParaMarks)
     {
         par.LogicDocument.Set_ShowParagraphMarks(false, false);
     }
 
     par.Draw(0, g);
+
+    if (true === isShowParaMarks)
+        par.LogicDocument.Set_ShowParagraphMarks(true, false);
 
     window.IsShapeToImageConverter = false;
 
