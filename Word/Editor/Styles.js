@@ -4262,20 +4262,20 @@ CStyles.prototype =
 
     Get_Pr : function(StyleId, Type, TableStyle, ShapeStyle)
     {
-        var Pr = {TextPr: new CTextPr(), ParaPr: new CParaPr()};
+        var Pr = {TextPr : new CTextPr(), ParaPr : new CParaPr()};
         // Сначала копируем параметры заданные в табличном стиле
-        switch ( Type )
+        switch (Type)
         {
             case styletype_Paragraph:
             {
-                if(TableStyle != null || ShapeStyle != null)
+                if (TableStyle != null || ShapeStyle != null)
                 {
-                    if(ShapeStyle != null)
+                    if (ShapeStyle != null)
                     {
                         Pr.TextPr.Merge(ShapeStyle.TextPr);
                         Pr.ParaPr.Merge(ShapeStyle.ParaPr);
                     }
-                    if(TableStyle != null)
+                    if (TableStyle != null)
                     {
                         Pr.TextPr.Merge(TableStyle.TextPr);
                         Pr.ParaPr.Merge(TableStyle.ParaPr);
@@ -4291,16 +4291,10 @@ CStyles.prototype =
             case styletype_Table:
             {
                 // Сначала копируем параметры по умолчанию
-                Pr.TextPr      = this.Default.TextPr.Copy();
-                Pr.ParaPr      = this.Default.ParaPr.Copy();
+                Pr.TextPr = this.Default.TextPr.Copy();
+                Pr.ParaPr = this.Default.ParaPr.Copy();
 
-                // Наложим настройки по умолчанию для параграфа
-                var DefId = this.Default.Paragraph;
-                if ( undefined != DefId && null != DefId )
-                {
-                    Pr.ParaPr.Merge( this.Style[DefId].ParaPr );
-                    Pr.TextPr.Merge( this.Style[DefId].TextPr );
-                }
+                // В таблицах мы не учитываем настройки дефолтового параграфа, т.е. стиля Normal (баг 31469)
 
                 Pr.TablePr     = this.Default.TablePr.Copy();
                 Pr.TableRowPr  = this.Default.TableRowPr.Copy();
@@ -4325,33 +4319,23 @@ CStyles.prototype =
             case styletype_Character:
             {
                 Pr.TextPr = new CTextPr();
-                /*
-                 if ( null != TableStyle )
-                 Pr.TextPr = TableStyle.TextPr.Copy();
-                 else
-                 Pr.TextPr = this.Default.TextPr.Copy();
-                 */
-
                 break;
             }
         }
 
         // Рассчитываем стиль
-        this.Internal_Get_Pr( Pr, StyleId, Type, ( null === TableStyle && null == ShapeStyle  ? true : false ), [] );
+        this.Internal_Get_Pr(Pr, StyleId, Type, ( null === TableStyle && null == ShapeStyle ? true : false ), []);
 
-        if ( styletype_Table === Type )
+        if (styletype_Table === Type)
         {
-            // Кроме того настройки для параграфа и текста, дополняются дефолтовыми настройками параграфа
-            var DefParaId = this.Default.Paragraph;
-            Pr.ParaPr.Merge( this.Style[DefParaId].ParaPr );
-            Pr.TextPr.Merge( this.Style[DefParaId].TextPr );
+            // В таблицах мы не учитываем настройки дефолтового параграфа, т.е. стиля Normal (баг 31469)
 
             // Соединим настройки для всей таблицы в одну общую настройку и удалим одну из них за ненадобностью
-            Pr.ParaPr.Merge( Pr.TableWholeTable.ParaPr );
-            Pr.TextPr.Merge( Pr.TableWholeTable.TextPr );
-            Pr.TablePr.Merge( Pr.TableWholeTable.TablePr );
-            Pr.TableRowPr.Merge( Pr.TableWholeTable.TableRowPr );
-            Pr.TableCellPr.Merge( Pr.TableWholeTable.TableCellPr );
+            Pr.ParaPr.Merge(Pr.TableWholeTable.ParaPr);
+            Pr.TextPr.Merge(Pr.TableWholeTable.TextPr);
+            Pr.TablePr.Merge(Pr.TableWholeTable.TablePr);
+            Pr.TableRowPr.Merge(Pr.TableWholeTable.TableRowPr);
+            Pr.TableCellPr.Merge(Pr.TableWholeTable.TableCellPr);
         }
 
         return Pr;
