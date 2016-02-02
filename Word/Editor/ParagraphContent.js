@@ -4888,6 +4888,11 @@ ParaDrawing.prototype =
         this.LayoutInCell = LayoutInCell;
     },
 
+    Is_LayoutInCell : function()
+    {
+        return this.LayoutInCell;
+    },
+
     Get_Distance : function()
     {
         var oDist = this.Distance;

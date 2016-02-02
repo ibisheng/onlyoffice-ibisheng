@@ -3411,6 +3411,12 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                     Page_H        = 0;
                 }
 
+                var PageLimitsOrigin = Para.Parent.Get_PageLimits(PageRel);
+                if (true === Para.Parent.Is_TableCellContent() && false === Item.Is_LayoutInCell())
+                {
+                    PageLimitsOrigin = LogicDocument.Get_PageLimits(PageAbs);
+                }
+
                 if ( true != Item.Use_TextWrap() )
                 {
                     PageFields.X      = X_Left_Field;
@@ -3424,7 +3430,6 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                     PageLimits.YLimit = Page_Height;
                 }
 
-                var PageLimitsOrigin = Para.Parent.Get_PageLimits(PageRel);
                 if ( true === Item.Is_Inline() || true === Para.Parent.Is_DrawingShape() )
                 {
                     Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y , PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
