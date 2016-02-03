@@ -584,7 +584,7 @@ CTable.prototype.Selection_Draw_Page = function(CurPage)
                 var CellInfo = Row.Get_CellInfo(Pos.Cell);
                 var CellMar  = Cell.Get_Margins();
 
-                var X_start = (0 === Pos.Cell ? Page.X + CellInfo.X_content_start : Page.X + CellInfo.X_cell_start);
+                var X_start = Page.X + CellInfo.X_cell_start;
                 var X_end   = Page.X + CellInfo.X_cell_end;
 
                 var Cell_Pages   = Cell.Content_Get_PagesCount();
