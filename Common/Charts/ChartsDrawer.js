@@ -3546,11 +3546,12 @@ drawLineChart.prototype =
 	{
 		//затемнение боковых сторон
 		//в excel всегда темные боковые стороны, лицевая и задняя стороны светлые
-		//pen = this.cChartSpace.chart.plotArea.valAx.compiledMajorGridLines;
-		//pen.setFill(brush);
+		
+		//todo возможно стоит проверить fill.type на FILL_TYPE_NOFILL и рисовать отдельно границы, если они заданы!
 		brush = pen.Fill;
-		//pen = null;
-		pen = CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
+		if(brush.fill.color === undefined)
+			return;
+		
 		if(k !== 2)
 		{
 			var props = this.cChartSpace.getParentObjects();
@@ -3568,7 +3569,10 @@ drawLineChart.prototype =
 			this.cChartDrawer.drawPath(path, pen, duplicateBrush);
 		}
 		else
+		{
+			pen = CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
 			this.cChartDrawer.drawPath(path, pen, brush);
+		}
 	}
 };
 
