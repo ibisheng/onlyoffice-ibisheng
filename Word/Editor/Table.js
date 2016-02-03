@@ -10718,7 +10718,7 @@ CTable.prototype =
                 }
                 else
                 {
-                    this.Internal_UpdateFlowPosition(Page.X, Page.Y);
+                    this.Internal_UpdateFlowPosition(this.X, this.Y);
                 }
             }
             else
