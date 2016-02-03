@@ -1963,30 +1963,56 @@ CDocument.prototype =
             {
                 bFlow = true;
 
-                var RecalcInfo =
-                    {
-                        Element           : Element,
-                        X                 : X,
-                        Y                 : Y,
-                        XLimit            : XLimit,
-                        YLimit            : YLimit,
-                        PageIndex         : PageIndex,
-                        SectionIndex      : SectionIndex,
-                        ColumnIndex       : ColumnIndex,
-                        Index             : Index,
-                        StartIndex        : StartIndex,
-                        ColumnsCount      : ColumnsCount,
-                        ResetStartElement : bResetStartElement,
-                        RecalcResult      : RecalcResult
-                    };
+                // Проверяем PageBreak и ColumnBreak в предыдущей строке
+                var isPageBreakOnPrevLine   = false;
+                var isColumnBreakOnPrevLine = false;
 
-                if (type_Table === Element.GetType())
-                    this.private_RecalculateFlowTable(RecalcInfo)
-                else if (type_Paragraph === Element.Get_Type())
-                    this.private_RecalculateFlowParagraph(RecalcInfo);
+                var PrevElement = Element.Get_DocumentPrev();
+                if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && Index !== StartIndex)
+                {
+                    var EndLine = PrevElement.Pages[PrevElement.Pages.length - 1].EndLine;
+                    if (-1 !== EndLine && PrevElement.Lines[EndLine].Info & paralineinfo_BreakRealPage)
+                        isPageBreakOnPrevLine = true;
 
-                Index        = RecalcInfo.Index;
-                RecalcResult = RecalcInfo.RecalcResult;
+                    if (-1 !== EndLine && !(PrevElement.Lines[EndLine].Info & paralineinfo_BreakRealPage) && PrevElement.Lines[EndLine].Info & paralineinfo_BreakPage)
+                        isColumnBreakOnPrevLine = true;
+                }
+
+                if (true === isColumnBreakOnPrevLine)
+                {
+                    RecalcResult = recalcresult_NextPage | recalcresultflags_LastFromNewColumn;
+                }
+                else if (true === isPageBreakOnPrevLine)
+                {
+                    RecalcResult = recalcresult_NextPage | recalcresultflags_LastFromNewPage;
+                }
+                else
+                {
+                    var RecalcInfo =
+                        {
+                            Element           : Element,
+                            X                 : X,
+                            Y                 : Y,
+                            XLimit            : XLimit,
+                            YLimit            : YLimit,
+                            PageIndex         : PageIndex,
+                            SectionIndex      : SectionIndex,
+                            ColumnIndex       : ColumnIndex,
+                            Index             : Index,
+                            StartIndex        : StartIndex,
+                            ColumnsCount      : ColumnsCount,
+                            ResetStartElement : bResetStartElement,
+                            RecalcResult      : RecalcResult
+                        };
+
+                    if (type_Table === Element.GetType())
+                        this.private_RecalculateFlowTable(RecalcInfo)
+                    else if (type_Paragraph === Element.Get_Type())
+                        this.private_RecalculateFlowParagraph(RecalcInfo);
+
+                    Index        = RecalcInfo.Index;
+                    RecalcResult = RecalcInfo.RecalcResult;
+                }
             }
             else
             {

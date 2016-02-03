@@ -134,6 +134,9 @@ CTable.prototype.Start_FromNewPage = function()
 //----------------------------------------------------------------------------------------------------------------------
 CTable.prototype.private_RecalculateCheckPageColumnBreak = function(CurPage)
 {
+    if (true !== this.Is_Inline()) // Случай Flow разбирается в Document.js
+        return true;
+
     var isPageBreakOnPrevLine   = false;
     var isColumnBreakOnPrevLine = false;
 

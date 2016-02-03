@@ -739,7 +739,7 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
             PRS.RecalcResult = recalcresult_NextPage;
             return false;
         }
-        else
+        else if (true === this.Is_Inline()) // Случай Flow разбирается в Document.js
         {
             // Проверяем PageBreak и ColumnBreak в предыдущей строке
             var isPageBreakOnPrevLine   = false;
@@ -782,16 +782,16 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
         }
     }
 
-    // Эта проверка на случай, если предыдущий параграф закончился PageBreak
-    if (PRS.YStart > PRS.YLimit - 0.001 && (CurLine != this.Pages[CurPage].FirstLine || (0 === CurPage && (null != this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent()))) && true === this.Use_YLimit())
-    {
-        this.Pages[CurPage].Set_EndLine(CurLine - 1);
-        if ( 0 === CurLine )
-            this.Lines[-1] = new CParaLine( 0 );
-
-        PRS.RecalcResult = recalcresult_NextPage;
-        return false;
-    }
+    //// Эта проверка на случай, если предыдущий параграф закончился PageBreak
+    //if (PRS.YStart > PRS.YLimit - 0.001 && (CurLine != this.Pages[CurPage].FirstLine || (0 === CurPage && (null != this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent()))) && true === this.Use_YLimit())
+    //{
+    //    this.Pages[CurPage].Set_EndLine(CurLine - 1);
+    //    if ( 0 === CurLine )
+    //        this.Lines[-1] = new CParaLine( 0 );
+    //
+    //    PRS.RecalcResult = recalcresult_NextPage;
+    //    return false;
+    //}
 
     return true;
 };
