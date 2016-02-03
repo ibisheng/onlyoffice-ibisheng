@@ -1265,8 +1265,12 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
     // Перенос не делаем, если это первая строка на новой странице
     if (true === this.Use_YLimit() && (Top > this.YLimit || Bottom2 > this.YLimit) && (CurLine != this.Pages[CurPage].FirstLine || (0 === RealCurPage && (null != this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent()))) && false === BreakPageLineEmpty)
     {
+        // TODO: Неразрывные абзацы и висячие строки внутри колонок вместе с плавающими объектами пока не обсчитываем
+        var bSkipWidowAndKeepLines = this.private_CheckSkipKeepLinesAndWidowControl(CurPage);
+
         // Проверим висячую строку
         if (this.Parent instanceof CDocument
+            && false === bSkipWidowAndKeepLines
             && true === this.Parent.RecalcInfo.Can_RecalcWidowControl()
             && true === ParaPr.WidowControl
             && CurLine - this.Pages[CurPage].StartLine <= 1
@@ -1290,7 +1294,7 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
             //      страницу параграфа разместить в какой либо колонке (пересчитывая их по очереди), если параграф
             //      все равно не рассчитан до конца, тогда размещаем его в первой колонке и делаем перенос на следующую
             //      страницу.
-            if (true === ParaPr.KeepLines && this.LogicDocument)
+            if (true === ParaPr.KeepLines && this.LogicDocument && false === bSkipWidowAndKeepLines)
             {
                 var CompatibilityMode = this.LogicDocument.Get_CompatibilityMode();
                 if (CompatibilityMode <= document_compatibility_mode_Word14)
@@ -1482,7 +1486,7 @@ Paragraph.prototype.private_RecalculateLineEnd         = function(CurLine, CurPa
             this.Lines[CurLine].Ranges.length = PRS.Range + 1;
 
         // Проверим висячую строку
-        if ( true === ParaPr.WidowControl && CurLine === this.Pages[CurPage].StartLine && CurLine >= 1 )
+        if (true === ParaPr.WidowControl && CurLine === this.Pages[CurPage].StartLine && CurLine >= 1 && false === this.private_CheckSkipKeepLinesAndWidowControl(CurPage))
         {
             // Проверим не встречается ли в предыдущей строке BreakPage, если да, тогда не учитываем WidowControl
             var BreakPagePrevLine = (this.Lines[CurLine - 1].Info & paralineinfo_BreakPage) | 0;
@@ -1906,6 +1910,33 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage)
     }
 
     return { NewX : NewX, TabValue : ( null === Tab ? tab_Left : Tab.Value ) };
+};
+
+Paragraph.prototype.private_CheckSkipKeepLinesAndWidowControl = function(CurPage)
+{
+    var bSkipWidowAndKeepLines = false;
+    if (this.ColumnsCount > 1)
+    {
+        var bWrapDrawing = false;
+        for (var TempPage = 0; TempPage <= CurPage; ++TempPage)
+        {
+            for (var DrawingIndex = 0, DrawingsCount = this.Pages[TempPage].Drawings.length; DrawingIndex < DrawingsCount; ++DrawingIndex)
+            {
+                if (this.Pages[TempPage].Drawings[DrawingIndex].Use_TextWrap())
+                {
+                    bWrapDrawing = true;
+                    break;
+                }
+            }
+
+            if (bWrapDrawing)
+                break;
+        }
+
+        bSkipWidowAndKeepLines = bWrapDrawing;
+    }
+
+    return bSkipWidowAndKeepLines;
 };
 
 var ERecalcPageType =
