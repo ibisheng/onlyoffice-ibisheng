@@ -266,7 +266,7 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
                                     {
                                         tx = invert_transform_text.TransformPointX(x, y);
                                         ty = invert_transform_text.TransformPointY(x, y);
-                                        content.Update_CursorType(tx, ty, pageIndex);
+                                        content.Update_CursorType(tx, ty, 0);
                                     }
                                 }
                                 return {objectId: drawing.Get_Id(), cursorType: "text"};
@@ -347,7 +347,7 @@ function handleChart(drawing, drawingObjectsController, e, x, y, group, pageInde
                         {
                             tx = invert_transform_text.TransformPointX(x, y);
                             ty = invert_transform_text.TransformPointY(x, y);
-                            content.Update_CursorType(tx, ty, pageIndex);
+                            content.Update_CursorType(tx, ty, 0);
                         }
                     }
                     return {objectId: drawing.Get_Id(), cursorType: "text", title: title};
@@ -449,7 +449,7 @@ function handleInlineChart(drawing, drawingObjectsController, e, x, y, pageIndex
                         {
                             tx = invert_transform_text.TransformPointX(x, y);
                             ty = invert_transform_text.TransformPointY(x, y);
-                            content.Update_CursorType(tx, ty, pageIndex);
+                            content.Update_CursorType(tx, ty, 0);
                         }
                     }
                     return {objectId: drawing.Get_Id(), cursorType: "text", title: title};

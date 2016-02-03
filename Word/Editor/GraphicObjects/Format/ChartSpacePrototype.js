@@ -377,6 +377,7 @@ CChartSpace.prototype.recalculate = function()
         {
             this.recalculateChart();
             this.recalcInfo.recalculateChart = false;
+            this.checkAxisLabelsTransform();
         }
 
         for(var i = 0; i < this.recalcInfo.dataLbls.length; ++i)

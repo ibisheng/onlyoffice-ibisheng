@@ -464,6 +464,7 @@ CChartSpace.prototype.recalculate = function()
         {
             this.recalculateChart();
             this.recalcInfo.recalculateChart = false;
+            this.checkAxisLabelsTransform();
         }
 
 
