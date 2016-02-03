@@ -4522,6 +4522,11 @@ function offline_complete_cell(x, y) {
 }
 function offline_keyboard_down(keys) {
     var wb = _api.wb;
+    var ws = _api.wb.getWorksheet();
+
+    var isFormulaEditMode = ws.isFormulaEditMode;
+    ws.isFormulaEditMode = false;
+
     for (var i = 0; i < keys.length; ++i) {
         if (37 === keys[i][2])          // LEFT
             wb._onChangeSelection(true, -1, 0, false, false, undefined);
@@ -4536,6 +4541,8 @@ function offline_keyboard_down(keys) {
         else if (13 === keys[i][2])     // ENTER
             wb._onChangeSelection(true, 0, 1, false, false, undefined);
     }
+
+    ws.isFormulaEditMode = isFormulaEditMode;
 }
 
 function offline_cell_editor_draw(width, height, ratio) {
@@ -4732,17 +4739,23 @@ function offline_cell_editor_mouse_event(events) {
 }
 function offline_cell_editor_close(x, y, width, height, ratio) {
     var e = {which: 13, shiftKey: false, metaKey: false, ctrlKey: false};
+    var cellEditor =  _api.wb.cellEditor;
 
     // TODO: SHOW POPUP
 
-    if (_api.wb.cellEditor.close(true)) {
+    var length = cellEditor.undoList.length;
+
+    if (cellEditor.close(true)) {
         _api.wb.getWorksheet().handlers.trigger('applyCloseEvent', e);
     } else {
-        _api.wb.cellEditor.undoAll();
-        _api.wb.cellEditor.close();
+        cellEditor.undoAll();
+        cellEditor.close();
+        length = 0;
     }
 
     _api.wb._onWSSelectionChanged(null);
+
+    return {'undo': length};
 }
 function offline_cell_editor_selection() {
     return _api.wb.cellEditor._drawSelection();
