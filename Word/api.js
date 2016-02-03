@@ -3429,6 +3429,18 @@ asc_docs_api.prototype.put_AddPageBreak = function()
         }
     }
 };
+asc_docs_api.prototype.put_AddColumnBreak = function()
+{
+    var Document = this.WordControl.m_oLogicDocument;
+    if (false === Document.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+    {
+        if (null === Document.Hyperlink_Check(false))
+        {
+            this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_AddPageBreak);
+            this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaNewLine(break_Column));
+        }
+    }
+};
 asc_docs_api.prototype.Update_ParaInd = function( Ind ){
 	var FirstLine = 0,
 		Left = 0,

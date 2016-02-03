@@ -1591,6 +1591,7 @@ var historydescription_Document_AddLetterUnion                     = 0x012d;
 var historydescription_Presentation_ApplyTimingToAll               = 0x012e;
 var historydescription_Document_SetColumnsFromRuler                = 0x012f;
 var historydescription_Document_SetColumnsProps                    = 0x0130;
+var historydescription_Document_AddColumnBreak                     = 0x0131;
 
 
 
@@ -1906,6 +1907,7 @@ function Get_HistoryPointStringDescription(nDescription)
         case historydescription_Document_AddLetterUnion                     : sString = "Document_AddLetterUnion                    "; break;
         case historydescription_Document_SetColumnsFromRuler                : sString = "Document_SetColumnsFromRuler               "; break;
         case historydescription_Document_SetColumnsProps                    : sString = "Document_SetColumnsProps                   "; break;
+        case historydescription_Document_AddColumnBreak                     : sString = "Document_AddColumnBreak                    "; break;
     }
     return sString;
 }

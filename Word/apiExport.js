@@ -279,6 +279,7 @@ asc_docs_api.prototype['change_DocSize'] = asc_docs_api.prototype.change_DocSize
 asc_docs_api.prototype['get_DocumentWidth'] = asc_docs_api.prototype.get_DocumentWidth;
 asc_docs_api.prototype['get_DocumentHeight'] = asc_docs_api.prototype.get_DocumentHeight;
 asc_docs_api.prototype['put_AddPageBreak'] = asc_docs_api.prototype.put_AddPageBreak;
+asc_docs_api.prototype['put_AddColumnBreak'] = asc_docs_api.prototype.put_AddColumnBreak;
 asc_docs_api.prototype['Update_ParaInd'] = asc_docs_api.prototype.Update_ParaInd;
 asc_docs_api.prototype['Internal_Update_Ind_FirstLine'] = asc_docs_api.prototype.Internal_Update_Ind_FirstLine;
 asc_docs_api.prototype['Internal_Update_Ind_Left'] = asc_docs_api.prototype.Internal_Update_Ind_Left;
@@ -744,3 +745,25 @@ CAscTableStyle.prototype['get_Id'] = CAscTableStyle.prototype.get_Id;
 CAscTableStyle.prototype['get_Image'] = CAscTableStyle.prototype.get_Image;
 CAscTableStyle.prototype['get_Type'] = CAscTableStyle.prototype.get_Type;
 window['GenerateTableStyles'] = GenerateTableStyles;
+
+window['CDocumentColumnProps'] = CDocumentColumnProps;
+CDocumentColumnProps.prototype['put_W']     = CDocumentColumnProps.prototype.put_W;
+CDocumentColumnProps.prototype['get_W']     = CDocumentColumnProps.prototype.get_W;
+CDocumentColumnProps.prototype['put_Space'] = CDocumentColumnProps.prototype.put_Space;
+CDocumentColumnProps.prototype['get_Space'] = CDocumentColumnProps.prototype.get_Space;
+
+window['CDocumentColumnsProps'] = CDocumentColumnsProps;
+CDocumentColumnsProps.prototype['get_EqualWidth'] = CDocumentColumnsProps.prototype.get_EqualWidth;
+CDocumentColumnsProps.prototype['put_EqualWidth'] = CDocumentColumnsProps.prototype.put_EqualWidth;
+CDocumentColumnsProps.prototype['get_Num']        = CDocumentColumnsProps.prototype.get_Num       ;
+CDocumentColumnsProps.prototype['put_Num']        = CDocumentColumnsProps.prototype.put_Num       ;
+CDocumentColumnsProps.prototype['get_Sep']        = CDocumentColumnsProps.prototype.get_Sep       ;
+CDocumentColumnsProps.prototype['put_Sep']        = CDocumentColumnsProps.prototype.put_Sep       ;
+CDocumentColumnsProps.prototype['get_Space']      = CDocumentColumnsProps.prototype.get_Space     ;
+CDocumentColumnsProps.prototype['put_Space']      = CDocumentColumnsProps.prototype.put_Space     ;
+CDocumentColumnsProps.prototype['get_ColsCount']  = CDocumentColumnsProps.prototype.get_ColsCount ;
+CDocumentColumnsProps.prototype['get_Col']        = CDocumentColumnsProps.prototype.get_Col       ;
+CDocumentColumnsProps.prototype['put_Col']        = CDocumentColumnsProps.prototype.put_Col       ;
+CDocumentColumnsProps.prototype['put_ColByValue'] = CDocumentColumnsProps.prototype.put_ColByValue;
+CDocumentColumnsProps.prototype['get_TotalWidth'] = CDocumentColumnsProps.prototype.get_TotalWidth;
+
