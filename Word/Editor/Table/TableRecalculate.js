@@ -160,7 +160,6 @@ CTable.prototype.private_RecalculateCheckPageColumnBreak = function(CurPage)
         || (true === isColumnBreakOnPrevLine && 0 === CurPage))
     {
         this.private_RecalculateSkipPage(CurPage);
-        this.Parent.OnColumnBreak_WhileRecalculate();
         return false;
     }
 

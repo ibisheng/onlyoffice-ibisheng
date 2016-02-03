@@ -327,6 +327,8 @@ Paragraph.prototype.Recalculate_Page = function(PageIndex)
     var CurPage = PageIndex;
     var RecalcResult = this.private_RecalculatePage( CurPage );
 
+    this.private_CheckColumnBreak(CurPage);
+
     this.Parent.RecalcInfo.Reset_WidowControl();
 
     return RecalcResult;
@@ -776,7 +778,6 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
                     this.Lines[-1] = new CParaLine();
 
                 PRS.RecalcResult = recalcresult_NextPage | recalcresultflags_Column;
-                this.Parent.OnColumnBreak_WhileRecalculate();
                 return false;
             }
         }
@@ -1937,6 +1938,23 @@ Paragraph.prototype.private_CheckSkipKeepLinesAndWidowControl = function(CurPage
     }
 
     return bSkipWidowAndKeepLines;
+};
+
+Paragraph.prototype.private_CheckColumnBreak = function(CurPage)
+{
+    if (this.Is_EmptyPage(CurPage))
+        return;
+
+    var Page = this.Pages[CurPage];
+    var Line = this.Lines[Page.EndLine];
+
+    if (!Line)
+        return;
+
+    if (Line.Info & paralineinfo_BreakPage && !(Line.Info & paralineinfo_BreakRealPage))
+    {
+        this.Parent.OnColumnBreak_WhileRecalculate();
+    }
 };
 
 var ERecalcPageType =

@@ -12857,7 +12857,7 @@ Paragraph.prototype =
         var X = this.Lines[CurLine].Ranges[CurRange].XVisible;
         var W = RangeW.W;
         var B = this.Lines[CurLine].Y      - this.Lines[CurLine].Top;
-        var XLimit = this.XLimit - this.Get_CompiledPr2(false).ParaPr.Ind.Right
+        var XLimit = this.Pages[CurPage].XLimit - this.Get_CompiledPr2(false).ParaPr.Ind.Right
 
         return { X : X, Y : Y, W : W, H : H, BaseLine : B, XLimit : XLimit };
     }

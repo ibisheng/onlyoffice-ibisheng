@@ -1491,7 +1491,7 @@ CDocument.prototype =
                     // Если за данным параграфом следовал пустой параграф с новой секцией, тогда его тоже надо пересчитать.
                     var NextElement = Para.Get_DocumentNext();
                     if (null !== NextElement && true === this.Pages[PageIndex].Check_EndSectionPara(NextElement))
-                        this.private_RecalculateEmptySectionParagraph(NextElement, Para, PageIndex, Para.Get_StartColumn(), Para.Get_ColumnsCount());
+                        this.private_RecalculateEmptySectionParagraph(NextElement, Para, PageIndex, Para.Get_AbsoluteColumn(Para.Get_PagesCount() - 1), Para.Get_ColumnsCount());
 
                     // Перерисуем страницу, на которой произошли изменения
                     this.DrawingDocument.OnRecalculatePage(PageIndex, this.Pages[PageIndex]);
@@ -1517,7 +1517,7 @@ CDocument.prototype =
                     var NextElement = SimplePara.Get_DocumentNext();
                     var LastFastPage = FastPages[FastPagesCount - 1];
                     if (null !== NextElement && true === this.Pages[LastFastPage].Check_EndSectionPara(NextElement))
-                        this.private_RecalculateEmptySectionParagraph(NextElement, SimplePara, LastFastPage, SimplePara.Get_StartColumn(), SimplePara.Get_ColumnsCount());
+                        this.private_RecalculateEmptySectionParagraph(NextElement, SimplePara, LastFastPage, SimplePara.Get_AbsoluteColumn(SimplePara.Get_PagesCount() - 1), SimplePara.Get_ColumnsCount());
 
                     for (var Index = 0; Index < FastPagesCount; Index++)
                     {
