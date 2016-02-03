@@ -5782,7 +5782,8 @@ DrawingObjectsController.prototype =
         if(content)
         {
             this.drawingObjects.getDrawingDocument().UpdateTargetTransform(this.getTargetTransform());
-            content.Selection_Draw_Page(isRealNumber(num) ? num : 0);
+
+            content.Selection_Draw_Page(0);
         }
     },
 

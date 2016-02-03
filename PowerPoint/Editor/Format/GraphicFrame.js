@@ -675,7 +675,7 @@ CGraphicFrame.prototype =
                     }
                 }
             }
-            this.graphicObject.Selection_SetStart(tx, ty, 0, e);
+            this.graphicObject.Selection_SetStart(tx, ty, this.parent.num, e);
             this.graphicObject.RecalculateCurPos();
             return;
         }
@@ -715,7 +715,7 @@ CGraphicFrame.prototype =
                 drawingDocument.TargetEnd();
                 drawingDocument.SelectEnabled(true);
                 drawingDocument.SelectClear();
-                Doc.Selection_Draw_Page(this.parent.num);
+                Doc.Selection_Draw_Page(0);
                 drawingDocument.SelectShow();
             }
             else
@@ -735,6 +735,17 @@ CGraphicFrame.prototype =
             this.parent.presentation.DrawingDocument.SelectShow();
         }
     },
+
+    Get_AbsolutePage : function(CurPage)
+    {
+        return this.Get_StartPage_Absolute();
+    },
+
+    Get_AbsoluteColumn : function(CurPage)
+    {
+        return 0;
+    },
+
 
     Is_TopDocument: function()
     {
@@ -1027,16 +1038,6 @@ CGraphicFrame.prototype =
         };
 
 
-    },
-
-    Get_AbsolutePage : function(CurPage)
-    {
-        return this.parent.num;
-    },
-
-    Get_AbsoluteColumn : function(CurPage)
-    {
-        return 0;//TODO;
     },
 
     hitToHandles: function()
