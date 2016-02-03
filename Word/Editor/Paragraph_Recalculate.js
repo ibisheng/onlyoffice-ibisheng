@@ -628,7 +628,7 @@ Paragraph.prototype.private_RecalculatePageKeepNext    = function(CurLine, CurPa
                 {
                     if (true === this.Parent.RecalcInfo.Can_RecalcObject())
                     {
-                        this.Parent.RecalcInfo.Set_KeepNext(Curr);
+                        this.Parent.RecalcInfo.Set_KeepNext(Curr, this);
                         PRS.RecalcResult = recalcresult_PrevPage | recalcresultflags_Column;
                         return false;
                     }
@@ -639,6 +639,13 @@ Paragraph.prototype.private_RecalculatePageKeepNext    = function(CurLine, CurPa
                     Curr = Prev;
             }
         }
+    }
+
+    if (true === this.Parent.RecalcInfo.Check_KeepNextEnd(this))
+    {
+        // Дошли до сюда, значит уже пересчитали данную ситуацию.
+        // Делаем Reset здесь, потому что Reset надо делать в том же месте, гды мы запросили пересчет заново.
+        this.Parent.RecalcInfo.Reset();
     }
 
     return true;
@@ -725,8 +732,6 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
         }
         else if ( true === this.Parent.RecalcInfo.Check_KeepNext(this) && 0 === CurPage && null != this.Get_DocumentPrev() )
         {
-            this.Parent.RecalcInfo.Reset();
-
             this.Pages[CurPage].Set_EndLine( CurLine - 1 );
             if ( 0 === CurLine )
                 this.Lines[-1] = new CParaLine( 0 );

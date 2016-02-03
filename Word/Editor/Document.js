@@ -600,6 +600,7 @@ function CDocumentRecalcInfo()
     this.WidowControlReset         = false;  //
 
     this.KeepNextParagraph         = null;    // Параграф, который надо пересчитать из-за того, что следующий начался с новой страницы
+    this.KeepNextEndParagraph      = null;    // Параграф, на котором определилось, что нужно делать пересчет предыдущих
 
     this.FrameRecalc               = false;  // Пересчитываем ли рамку
     this.ParaMath                  = null;
@@ -620,6 +621,7 @@ CDocumentRecalcInfo.prototype =
         this.WidowControlReset         = false;
 
         this.KeepNextParagraph         = null;
+        this.KeepNextEndParagraph      = null;
 
         this.ParaMath                  = null;
     },
@@ -678,14 +680,23 @@ CDocumentRecalcInfo.prototype =
         return this.FlowObjectPageBreakBefore;
     },
 
-    Set_KeepNext : function(Paragraph)
+    Set_KeepNext : function(Paragraph, EndParagraph)
     {
-        this.KeepNextParagraph = Paragraph;
+        this.KeepNextParagraph    = Paragraph;
+        this.KeepNextEndParagraph = EndParagraph;
     },
 
     Check_KeepNext : function(Paragraph)
     {
         if ( Paragraph === this.KeepNextParagraph )
+            return true;
+
+        return false;
+    },
+
+    Check_KeepNextEnd : function(Paragraph)
+    {
+        if (Paragraph === this.KeepNextEndParagraph)
             return true;
 
         return false;
@@ -925,7 +936,8 @@ function CDocument(DrawingDocument, isMainLogicDocument)
         DragDrop : { Flag : 0, Data : null }  // 0 - не drag-n-drop, и мы его проверяем, 1 - drag-n-drop, -1 - не проверять drag-n-drop 
     };
 
-    this.ColumnsMarkup = new CColumnsMarkup();
+    if (false !== isMainLogicDocument)
+        this.ColumnsMarkup = new CColumnsMarkup();
 
     // Здесь мы храним инфрмацию, связанную с разбивкой на страницы и самими страницами
     this.Pages = [];
