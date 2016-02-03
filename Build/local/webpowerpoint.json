@@ -1,6 +1,6 @@
 {
     "info": {
-        "version": "3.6.0",
+        "version": "3.7.0",
         "build": 158
     },
     "update_src": {
@@ -44,6 +44,10 @@
                 "../../Common/Controls.js",
                 "../../Word/Drawing/Rulers.js",
                 "../../Word/Editor/Table.js",
+				"../../Word/Editor/Table/TableRecalculate.js",
+				"../../Word/Editor/Table/TableDraw.js",				
+				"../../Word/Editor/Table/TableRow.js",
+				"../../Word/Editor/Table/TableCell.js",				
                 "../../Word/Editor/Common.js",
                 "../../Word/Editor/Sections.js",
                 "../../Common/scroll.js",
@@ -118,7 +122,6 @@
                 "../../Word/Editor/Document.js",
                 "../../Word/Editor/DocumentContent.js",
                 "../../Word/Editor/HeaderFooter.js",
-                "../../Word/Editor/Table.js",
                 "../../Word/Editor/Math.js",
                 "../../Word/Editor/Spelling.js",
                 "../../Word/Editor/Search.js",
