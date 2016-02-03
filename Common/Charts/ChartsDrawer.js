@@ -2493,7 +2493,7 @@ CChartsDrawer.prototype =
 		var chart = chartSpace && chartSpace.chart ? chartSpace.chart.plotArea.chart: null;
 		var typeChart = chart ? chart.getObjectType() : null;
 		
-		if(isTurnOn3DCharts && excelApi && chartSpace && chartSpace.chart.view3D && chartSpace.chart.view3D.rAngAx && ((typeChart === historyitem_type_BarChart && chart && chart.barDir !== BAR_DIR_BAR) /*|| (typeChart === historyitem_type_LineChart) || (typeChart === historyitem_type_BarChart && chart.barDir === BAR_DIR_BAR) || (typeChart === historyitem_type_AreaChart) || (typeChart === historyitem_type_PieChart)*/))
+		if(isTurnOn3DCharts && chartSpace && chartSpace.chart.view3D && chartSpace.chart.view3D.rAngAx && ((typeChart === historyitem_type_BarChart && chart && chart.barDir !== BAR_DIR_BAR) /*|| (typeChart === historyitem_type_LineChart) || (typeChart === historyitem_type_BarChart && chart.barDir === BAR_DIR_BAR) || (typeChart === historyitem_type_AreaChart) || (typeChart === historyitem_type_PieChart)*/))
 		{
 			res = true;
 		}

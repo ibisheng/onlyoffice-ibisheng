@@ -37,6 +37,7 @@
                 "../../Word/Drawing/translations.js",
                 "../../Common/Charts/charts.js",
                 "../../Common/Charts/ChartsDrawer.js",
+				"../../Common/Charts/3DTransformation.js",
                 "../../Common/Charts/DrawingArea.js",
                 "../../Common/Charts/DrawingObjects.js",
                 "../../Common/NumFormat.js",
