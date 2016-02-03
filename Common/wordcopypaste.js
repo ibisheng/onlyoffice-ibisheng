@@ -3718,7 +3718,7 @@ PasteProcessor.prototype =
 					
 					var tempCDocument = function()
 					{
-						return new CDocument( this.oDocument.DrawingDocument);
+						return new CDocument( this.oDocument.DrawingDocument, false);
 					}
 					//создаём темповый CDocument
 					this.oDocument = ExecuteNoHistory(tempCDocument , this, []);
