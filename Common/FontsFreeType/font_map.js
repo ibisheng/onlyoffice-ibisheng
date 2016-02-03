@@ -1375,26 +1375,29 @@ CFontSelectList.prototype =
 
         this.IsInit = true;
 
-        // read from stream
-        var _ft_stream = CreateFontData2(window["g_fonts_selection_bin"]);
-        var _file_stream = new FileStream(_ft_stream.data, _ft_stream.size);
+		if (window["g_fonts_selection_bin"] != "")
+		{
+			// read from stream
+			var _ft_stream = CreateFontData2(window["g_fonts_selection_bin"]);
+			var _file_stream = new FileStream(_ft_stream.data, _ft_stream.size);
 
-        var count = _file_stream.GetLong();
-        for (var i = 0; i < count; i++)
-        {
-            var _fs = new CFontSelect();
-            _fs.fromStream(_file_stream);
-			
-			// корректируем плохие популярные шрифты
-			if (_fs.m_wsFontName == "Droid Sans Fallback")
-			{	
-				if ((_fs.m_ulCodePageRange1 & (1 << 19)) == (1 << 19))
-					_fs.m_ulCodePageRange1 -= (1 << 19);
+			var count = _file_stream.GetLong();
+			for (var i = 0; i < count; i++)
+			{
+				var _fs = new CFontSelect();
+				_fs.fromStream(_file_stream);
+				
+				// корректируем плохие популярные шрифты
+				if (_fs.m_wsFontName == "Droid Sans Fallback")
+				{	
+					if ((_fs.m_ulCodePageRange1 & (1 << 19)) == (1 << 19))
+						_fs.m_ulCodePageRange1 -= (1 << 19);
+				}
+						
+				this.List.push(_fs);
+				this.ListMap[_fs.m_wsFontPath] = this.List.length - 1;
 			}
-					
-            this.List.push(_fs);
-            this.ListMap[_fs.m_wsFontPath] = this.List.length - 1;
-        }
+		}
 
         // add languages
         // 1) arabic
