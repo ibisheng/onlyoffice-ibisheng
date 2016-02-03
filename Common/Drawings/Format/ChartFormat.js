@@ -7395,7 +7395,7 @@ CSerAx.prototype =
             }
             case historyitem_SerAxSetTickLblPos:
             {
-                writeLong(w, daya.newPr);
+                writeLong(w, data.newPr);
                 break;
             }
             case historyitem_SerAxSetTickLblSkip:
