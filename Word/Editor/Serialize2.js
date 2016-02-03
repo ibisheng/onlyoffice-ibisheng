@@ -323,7 +323,8 @@ var c_oSerRunType = {
 	object: 14,
 	delText: 15,
     del: 16,
-    ins: 17
+    ins: 17,
+    columnbreak: 18
 };
 var c_oSerImageType = {
     MediaId:0,
@@ -642,7 +643,8 @@ var c_oSer_OMathContentType = {
 	linebreak: 60,
 	Run: 61,
     Ins: 62,
-	Del: 63
+	Del: 63,
+    columnbreak: 64
 };
 var c_oSer_HyperlinkType = {
     Content: 0,
@@ -4092,10 +4094,17 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                     break;
                 case para_NewLine:
                     sCurText = this.WriteText(sCurText, delText);
-                    if (break_Page == item.BreakType)
-                        oThis.memory.WriteByte(c_oSerRunType.pagebreak);
-                    else
-                        oThis.memory.WriteByte(c_oSerRunType.linebreak);
+                    switch (item.BreakType) {
+                        case break_Column:
+                            oThis.memory.WriteByte(c_oSerRunType.columnbreak);
+                            break;
+                        case break_Page:
+                            oThis.memory.WriteByte(c_oSerRunType.pagebreak);
+                            break;
+                        default:
+                            oThis.memory.WriteByte(c_oSerRunType.linebreak);
+                            break;
+                    }
                     oThis.memory.WriteLong(c_oSerPropLenType.Null);
                     break;
                 case para_Drawing:
@@ -8188,6 +8197,10 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         {
             oNewElem = new ParaNewLine( break_Line );
         }
+        else if (c_oSerRunType.columnbreak === type)
+        {
+            oNewElem = new ParaNewLine( break_Column );
+        }
         else if(c_oSerRunType.image === type)
         {
             var oThis = this;
@@ -9050,6 +9063,10 @@ function Binary_oMathReader(stream, oReadResult)
         else if (c_oSerRunType.linebreak === type)
         {
             oNewElem = new ParaNewLine( break_Line );
+        }
+        else if (c_oSerRunType.columnbreak === type)
+        {
+            oNewElem = new ParaNewLine( break_Column );
         }
         else if (c_oSerRunType._LastRun === type)
             this.oReadResult.bLastRun = true;
@@ -10529,6 +10546,10 @@ function Binary_oMathReader(stream, oReadResult)
         else if (c_oSer_OMathContentType.linebreak === type)
         {
             oNewElem = new ParaNewLine();
+        }
+        else if (c_oSer_OMathContentType.columnbreak === type)
+        {
+            oNewElem = new ParaNewLine( break_Column );
         } else if (c_oSer_OMathContentType.Del === type) {
             var reviewInfo = new CReviewInfo();
 			res = this.bcr.Read1(length, function(t, l){
