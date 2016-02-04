@@ -2000,7 +2000,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         var MaxBotValue_vmerge = -1;
 
         var RowH = Row.Get_Height();
-
+        var MaxTopMargin = 0;
         var Merged_Cell  = [];
 
         for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
@@ -2033,6 +2033,9 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
             var BottomMargin = this.MaxBotMargin[CurRow + VMergeCount - 1];
             Y_content_end -= BottomMargin;
+
+            if (vmerge_Restart === Vmerge && CellMar.Top.W > MaxTopMargin)
+                MaxTopMargin = CellMar.Top.W;
 
             // Такие ячейки мы обсчитываем, если либо сейчас происходит переход на новую страницу, либо
             // это последняя ячейка в объединении.
@@ -2118,7 +2121,11 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             CurGridCol += GridSpan;
         }
 
-        if ((heightrule_AtLeast === RowH.HRule || heightrule_Exact == RowH.HRule) && Y + RowH.Value > Y_content_end && ((0 === CurRow && 0 === CurPage) || CurRow != FirstRow))
+        var RowHValue = RowH.Value;
+        // В данном значении не учитываются маргины
+        RowHValue = RowH.Value + this.MaxBotMargin[CurRow] + MaxTopMargin;
+
+        if ((heightrule_AtLeast === RowH.HRule || heightrule_Exact == RowH.HRule) && Y + RowHValue > Y_content_end && ((0 === CurRow && 0 === CurPage) || CurRow != FirstRow))
         {
             bNextPage = true;
 
@@ -2336,9 +2343,9 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         var CellHeight = this.TableRowsBottom[CurRow][CurPage] - Y;
 
         // TODO: улучшить проверку на высоту строки (для строк разбитых на страницы)
-        if ( false === bNextPage && heightrule_AtLeast === RowH.HRule && CellHeight < RowH.Value )
+        if ( false === bNextPage && heightrule_AtLeast === RowH.HRule && CellHeight < RowHValue )
         {
-            CellHeight = RowH.Value;
+            CellHeight = RowHValue;
             this.TableRowsBottom[CurRow][CurPage] = Y + CellHeight;
         }
 
