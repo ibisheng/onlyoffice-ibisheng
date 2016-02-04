@@ -5539,6 +5539,7 @@ Paragraph.prototype =
             this.Selection.StartPos = StartPos + 1;
             this.Selection.EndPos   = StartPos + 1;
 
+            Hyperlink.Cursor_MoveToStartPos();
             Hyperlink.Select_All();
 
             // Выставляем специальную текстовую настройку
