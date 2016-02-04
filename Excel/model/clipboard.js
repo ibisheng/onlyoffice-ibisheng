@@ -2262,6 +2262,27 @@
 				}
             },
 			
+			_pasteTextOnSheet: function(text, worksheet)
+			{
+				//TODO сделать вставку текста всегда через эту функцию
+				this.activeRange = worksheet.activeRange.clone(true);
+				var aResult = [];
+				aResult[this.activeRange.r1] = [];
+				
+				var oNewItem = [];
+				oNewItem[0] = this._getDefaultCell();
+				aResult[this.activeRange.r1][this.activeRange.c1] = oNewItem;
+				oNewItem[0][0].text = text;
+				
+				aResult.fontsNew = [];
+				aResult.rowSpanSpCount = 0;
+				aResult.cellCount = 1;
+				aResult._images = undefined;
+				aResult._aPastedImages = undefined;
+				
+				this._pasteResult(aResult, worksheet);
+			},
+			
 			_getImageFromHtml: function(html, isGetUrlsArray)
 			{
 				var res = null;
