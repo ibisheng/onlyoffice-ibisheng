@@ -6556,7 +6556,8 @@ PasteProcessor.prototype =
                 }
             }
 
-            if(!(Node.ELEMENT_NODE == nodeType || Node.TEXT_NODE == nodeType))
+			var sChildNodeName = child.nodeName.toLowerCase();
+            if(!(Node.ELEMENT_NODE == nodeType || Node.TEXT_NODE == nodeType) || sChildNodeName === "style" || sChildNodeName === "#comment" || sChildNodeName === "script")
                 continue;
             //�������� ������� ��������� ������ �� \t,\n,\r
             if( Node.TEXT_NODE == child.nodeType)
@@ -6568,7 +6569,6 @@ PasteProcessor.prototype =
                 if("" == value)
                     continue;
             }
-            var sChildNodeName = child.nodeName.toLowerCase();
             var bIsBlockChild = this._IsBlockElem(sChildNodeName);
             if(bRoot)
                 this.bInBlock = false;
