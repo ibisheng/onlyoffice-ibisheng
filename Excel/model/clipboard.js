@@ -202,6 +202,16 @@
 			
 			pasteDesktopEditorButton: function(ElemToSelect)
 			{
+				window.GlobalPasteFlagCounter = 1;
+                document.body.style.MozUserSelect = "text";
+                delete document.body.style["-khtml-user-select"];
+                delete document.body.style["-o-user-select"];
+                delete document.body.style["user-select"];
+                document.body.style["-webkit-user-select"] = "text";
+				
+				var overflowBody = document.body.style.overflow;
+				document.body.style.overflow = 'hidden';
+				
 				var __onpaste = ElemToSelect.onpaste;
 				
 				var selection = window.getSelection();
@@ -222,9 +232,18 @@
 					var ws = wb.getWorksheet();
 				
 					wb.clipboard._bodyPaste(ws, e);
+					
+					ElemToSelect.style.display = ELEMENT_DISPAY_STYLE;
+					document.body.style.MozUserSelect = "none";
+					document.body.style["-khtml-user-select"] = "none";
+					document.body.style["-o-user-select"] = "none";
+					document.body.style["user-select"] = "none";
+					document.body.style["-webkit-user-select"] = "none";				
 				};
 
-				ElemToSelect.focus();
+				ElemToSelect.style.display = "block";
+				ElemToSelect.focus();		
+				
 				window["AscDesktopEditor"]["Paste"]();
 			},
 			
@@ -685,6 +704,11 @@
 					t._selectElement(t._getStylesSelect, true);
 				else
 					t._selectElement();
+				
+				if (window["AscDesktopEditorButtonMode"] === true && window["AscDesktopEditor"]) 
+				{
+					window["AscDesktopEditor"]["Copy"]();
+				}
 			},
 			
 			copyCellValueButton: function (value) {
@@ -817,6 +841,11 @@
 								t._getStylesSelect();
 						},
 						_interval_time);
+						
+				if (window["AscDesktopEditorButtonMode"] === true && window["AscDesktopEditor"]) 
+				{
+					window["AscDesktopEditor"]["Paste"]();
+				}
 			},
 			
 			pasteAsTextButton: function (callback) {

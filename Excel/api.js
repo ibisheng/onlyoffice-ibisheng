@@ -515,7 +515,12 @@ var editor;
       _e.which = 67;
 
 	  window["AscDesktopEditorButtonMode"] = true;
-      this.controller._onWindowKeyDown(_e);
+	  
+	  if (!this.asc_getCellEditMode())
+		this.controller._onWindowKeyDown(_e);
+	  else
+		this.wb.cellEditor._onWindowKeyDown(_e);
+	  
 	  window["AscDesktopEditorButtonMode"] = false;
 
       return;
@@ -535,7 +540,12 @@ var editor;
       _e.which = 86;
 
 	  window["AscDesktopEditorButtonMode"] = true;
-      this.controller._onWindowKeyDown(_e);
+      
+	  if (!this.asc_getCellEditMode())
+		this.controller._onWindowKeyDown(_e);
+	  else
+		this.wb.cellEditor._onWindowKeyDown(_e);
+	
 	  window["AscDesktopEditorButtonMode"] = false;
 
       return;
@@ -555,7 +565,12 @@ var editor;
       _e.which = 88;
 
 	  window["AscDesktopEditorButtonMode"] = true;
-      this.controller._onWindowKeyDown(_e);
+      
+	  if (!this.asc_getCellEditMode())
+		this.controller._onWindowKeyDown(_e);
+	  else
+		this.wb.cellEditor._onWindowKeyDown(_e);	  
+	  
 	  window["AscDesktopEditorButtonMode"] = false;
 
       return;
