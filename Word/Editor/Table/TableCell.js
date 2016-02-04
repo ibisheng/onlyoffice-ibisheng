@@ -705,10 +705,7 @@ CTableCell.prototype =
         if ( true != bCopyOnlyVisualProps )
         {
             // VMerge
-            if ( undefined === OtherPr.VMerge )
-                this.Set_VMerge( OtherPr.VMerge );
-            else
-                this.Set_VMerge( OtherPr.VMerge );
+            this.Set_VMerge(OtherPr.VMerge);
         }
 
         // Border Top
@@ -790,6 +787,9 @@ CTableCell.prototype =
             this.Set_W( undefined );
         else
             this.Set_W( OtherPr.TableCellW.Copy() );
+
+        // VAlign
+        this.Set_VAlign(OtherPr.VAlign);
     },
 
     Get_W : function()

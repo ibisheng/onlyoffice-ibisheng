@@ -4268,6 +4268,9 @@ CStyles.prototype =
         {
             case styletype_Paragraph:
             {
+                if (undefined === StyleId)
+                    StyleId = this.Default.Paragraph;
+
                 if (TableStyle != null || ShapeStyle != null)
                 {
                     if (ShapeStyle != null)
@@ -4290,6 +4293,9 @@ CStyles.prototype =
             }
             case styletype_Table:
             {
+                if (undefined === StyleId)
+                    StyleId = this.Default.Table;
+
                 // Сначала копируем параметры по умолчанию
                 Pr.TextPr = this.Default.TextPr.Copy();
                 Pr.ParaPr = this.Default.ParaPr.Copy();
@@ -4318,6 +4324,9 @@ CStyles.prototype =
             }
             case styletype_Character:
             {
+                if (undefined === StyleId)
+                    StyleId = this.Default.Character;
+
                 Pr.TextPr = new CTextPr();
                 break;
             }
