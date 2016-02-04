@@ -6584,9 +6584,6 @@ drawPieChart.prototype =
 	
 	_changeAngle: function(radius, stAng, swAng, xCenter, yCenter, properties)
 	{
-		if(swAng > Math.PI)
-			return swAng;
-		
 		var depth = properties.depth;
 		var radius1 = properties.radius1;
 		var radius2 = properties.radius2;
@@ -6660,8 +6657,13 @@ drawPieChart.prototype =
 		if(cosNewAngle < -1)
 			cosNewAngle = - 1;
 		
-		return Math.acos(cosNewAngle);
-		
+		var res;
+		if(swAng > Math.PI)
+			res = 2*Math.PI - Math.acos(cosNewAngle);
+		else
+			res = Math.acos(cosNewAngle);
+			
+		return res;
 	},
 	
 	_calculateArc3D2 : function(radius, stAng, swAng, xCenter, yCenter)
