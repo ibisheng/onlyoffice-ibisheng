@@ -9370,6 +9370,11 @@ Paragraph.prototype =
 
     Is_Inline : function()
     {
+        // Пустой элемент с разрывом секции мы считаем Inline параграфом.
+        var PrevElement = this.Get_DocumentPrev();
+        if (true === this.Is_Empty() && undefined !== this.Get_SectionPr() && null !== PrevElement && (type_Paragraph !== PrevElement.Get_Type() || undefined === PrevElement.Get_SectionPr()))
+            return true;
+
         if (undefined === this.Parent || (!(this.Parent instanceof CDocument) && (undefined === this.Parent.Parent || !(this.Parent.Parent instanceof CHeaderFooter))))
             return true;
 
