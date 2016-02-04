@@ -133,7 +133,7 @@ ParaHyperlink.prototype.Add = function(Item)
                     this.Add_ToContent(CurPos + 1, NewElement, true);
 
                 var Elem = new ParaMath();
-                Elem.Root.Load_FromMenu(Item.Menu, this);
+                Elem.Root.Load_FromMenu(Item.Menu, this.Get_Paragraph());
                 Elem.Root.Correct_Content(true);
                 this.Add_ToContent(CurPos + 1, Elem, true);
 
