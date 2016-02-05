@@ -618,7 +618,7 @@ Complex.prototype = {
         return c == 'i' || c == 'j';
     },
     parseComplexStr:function ( s ) {
-        var match = rg_complex_number.xexec( s ), r, i, suf;
+        var match = XRegExp.exec( s, rg_complex_number ), r, i, suf;
         if ( match ) {
             r = match["real"];
             i = match["img"];

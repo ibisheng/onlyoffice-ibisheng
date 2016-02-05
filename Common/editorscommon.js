@@ -1045,8 +1045,8 @@ parserHelper.prototype.is3DRef = function ( formula, start_pos ) {
 		this._reset();
 	}
 
-	var subSTR = formula.substring( start_pos );
-	var match = rx_ref3D_quoted.xexec( subSTR ) || rx_ref3D_non_quoted.xexec( subSTR );
+    var subSTR = formula.substring( start_pos ),
+        match = XRegExp.exec( subSTR, rx_ref3D_quoted ) || XRegExp.exec( subSTR, rx_ref3D_non_quoted );
 
 	if (match != null) {
 		this.pCurrPos += match[0].length;
@@ -1175,8 +1175,8 @@ parserHelper.prototype.isName = function ( formula, start_pos, wb, ws ) {
 		this._reset();
 	}
 
-	var subSTR = formula.substring( start_pos );
-	var match = rx_name.xexec( subSTR );
+    var subSTR = formula.substring( start_pos ),
+        match = XRegExp.exec( subSTR, rx_name );
 
 	if (match != null) {
 		var name = match["name"];
