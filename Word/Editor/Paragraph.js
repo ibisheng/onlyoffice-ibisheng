@@ -1023,6 +1023,10 @@ Paragraph.prototype =
 
     Check_BreakPageEnd : function(Item)
     {
+        // Последний параграф с разрывом страницы не проверяем. Так делает Word.
+        if (null === this.Get_DocumentNext())
+            return false;
+
         var PBChecker = new CParagraphCheckPageBreakEnd( Item );
 
         var ContentLen = this.Content.length;
