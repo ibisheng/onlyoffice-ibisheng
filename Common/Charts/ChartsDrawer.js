@@ -6352,8 +6352,11 @@ drawPieChart.prototype =
 		var xCenter = this.chartProp.chartGutter._left + trueWidth/2;
 		var yCenter = this.chartProp.chartGutter._top + trueHeight/2;
 		
-		this.tempAngle = Math.PI/2;
-		this.angleFor3D = Math.PI/2;
+		var startAngle = this.cChartDrawer.processor3D.angleOy ? this.cChartDrawer.processor3D.angleOy : 0;
+		var startAngle3D = startAngle !== 0 && startAngle !== undefined ? this._changeAngle(radius, Math.PI/2, startAngle, xCenter, yCenter, this.properties3d) : 0;
+		
+		this.tempAngle = Math.PI/2  + startAngle;
+		this.angleFor3D = Math.PI/2 - startAngle3D;
 		
 		//рисуем против часовой стрелки, поэтому цикл с конца
 		var depth = this.properties3d.depth;
@@ -6389,7 +6392,8 @@ drawPieChart.prototype =
 		var xCenter = this.chartProp.chartGutter._left + trueWidth/2;
 		var yCenter = this.chartProp.chartGutter._top + trueHeight/2;
 		
-		this.tempAngle = Math.PI/2;
+		var firstSliceAng = this.cChartSpace.chart.plotArea.chart &&  this.cChartSpace.chart.plotArea.chart.firstSliceAng ? this.cChartSpace.chart.plotArea.chart.firstSliceAng : 0;
+		this.tempAngle = Math.PI/2 - (firstSliceAng / 180) * Math.PI ;
 		//рисуем против часовой стрелки, поэтому цикл с конца
 		var angle;
         for (var i = numCache.length - 1; i >= 0; i--) 
