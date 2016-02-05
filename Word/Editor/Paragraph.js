@@ -12356,11 +12356,19 @@ Paragraph.prototype =
                     this.Pr.PrChange = new CParaPr();
                     this.Pr.PrChange.Read_FromBinary(Reader);
                 }
+                else
+                {
+                    this.Pr.PrChange = undefined;
+                }
 
                 if (false === Reader.GetBool())
                 {
                     this.Pr.ReviewInfo = new CReviewInfo();
                     this.Pr.ReviewInfo.Read_FromBinary(Reader);
+                }
+                else
+                {
+                    this.Pr.ReviewInfo = undefined;
                 }
 
                 this.private_UpdateTrackRevisions();

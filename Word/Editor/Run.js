@@ -9084,11 +9084,19 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.PrChange = new CTextPr();
                 this.Pr.PrChange.Read_FromBinary(Reader);
             }
+            else
+            {
+                this.Pr.PrChange = undefined;
+            }
 
             if (false === Reader.GetBool())
             {
                 this.Pr.ReviewInfo = new CReviewInfo();
                 this.Pr.ReviewInfo.Read_FromBinary(Reader);
+            }
+            else
+            {
+                this.Pr.ReviewInfo = undefined;
             }
 
             this.private_UpdateTrackRevisions();
