@@ -10651,6 +10651,9 @@ CDocument.prototype =
                 this.Cursor_MoveEndOfLine( true === e.ShiftKey );
             }
 
+            this.Document_UpdateInterfaceState();
+            this.Document_UpdateRulersState();
+
             bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 36 ) // клавиша Home
@@ -10663,6 +10666,9 @@ CDocument.prototype =
             {
                 this.Cursor_MoveStartOfLine( true === e.ShiftKey );
             }
+
+            this.Document_UpdateInterfaceState();
+            this.Document_UpdateRulersState();
 
             bRetValue = keydownresult_PreventAll;
         }
