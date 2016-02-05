@@ -7548,7 +7548,13 @@ Paragraph.prototype =
                     Cur_Before = this.Internal_CalculateAutoSpacing( Cur_Before, Cur_BeforeAuto, this );
                     Prev_After = this.Internal_CalculateAutoSpacing( Prev_After, Prev_AfterAuto, this );
 
-                    if ( true === Prev_Pr.ContextualSpacing && PrevStyle === StyleId )
+                    if ((true === Prev_Pr.ContextualSpacing
+                            && PrevStyle === StyleId)
+                        || (true === Prev_AfterAuto
+                            && PrevStyle === StyleId
+                            && undefined != Prev_NumPr
+                            && undefined != NumPr
+                            && Prev_NumPr.NumId === NumPr.NumId))
                         Prev_After = 0;
 
                     Pr.ParaPr.Spacing.Before = Math.max( Prev_After, Cur_Before ) - Prev_After;

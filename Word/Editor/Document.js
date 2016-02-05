@@ -604,6 +604,8 @@ function CDocumentRecalcInfo()
 
     this.FrameRecalc               = false;  // Пересчитываем ли рамку
     this.ParaMath                  = null;
+
+    this.AdditionalInfo            = null;
 }
 
 CDocumentRecalcInfo.prototype =
@@ -641,12 +643,13 @@ CDocumentRecalcInfo.prototype =
         return this.Can_RecalcObject();
     },
 
-    Set_FlowObject : function(Object, RelPage, RecalcResult, ElementsCount)
+    Set_FlowObject : function(Object, RelPage, RecalcResult, ElementsCount, AdditionalInfo)
     {
         this.FlowObject              = Object;
         this.FlowObjectPage          = RelPage;
         this.FlowObjectElementsCount = ElementsCount;
         this.RecalcResult            = RecalcResult;
+        this.AdditionalInfo          = AdditionalInfo;
     },
 
     Set_ParaMath : function(Object)
@@ -2419,7 +2422,7 @@ CDocument.prototype =
             Element.Reset(X, Y, XLimit, YLimit, PageIndex, ColumnIndex, ColumnsCount);
 
             var TempRecalcResult = Element.Recalculate_Page(0);
-            this.RecalcInfo.Set_FlowObject(Element, 0, TempRecalcResult, -1);
+            this.RecalcInfo.Set_FlowObject(Element, 0, TempRecalcResult, -1, {X : X, Y : Y, XLimit: XLimit, YLimit : YLimit});
 
             if (((0 === Index && 0 === PageIndex) || Index != StartIndex) && true != Element.Is_ContentOnFirstPage() && true !== isColumns)
             {
@@ -2444,8 +2447,13 @@ CDocument.prototype =
                 }
                 else
                 {
+                    X      = this.RecalcInfo.AdditionalInfo.X;
+                    Y      = this.RecalcInfo.AdditionalInfo.Y;
+                    XLimit = this.RecalcInfo.AdditionalInfo.XLimit;
+                    YLimit = this.RecalcInfo.AdditionalInfo.YLimit;
+
                     // Пересчет нужнен для обновления номеров колонок и страниц
-                    Element.Reset(Element.X, Element.Y, Element.XLimit, Element.YLimit, PageIndex, ColumnIndex, ColumnsCount);
+                    Element.Reset(X, Y, XLimit, YLimit, PageIndex, ColumnIndex, ColumnsCount);
                     RecalcResult = Element.Recalculate_Page(0);
                     this.RecalcInfo.FlowObjectPage++;
 

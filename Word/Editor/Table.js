@@ -2021,10 +2021,8 @@ CTable.prototype =
         // Учтем верхнее поле ячейки
         Y += CellMar.Top.W;
 
-        var XOffset = Pos.X + this.Get_TableOffsetCorrection();
-
         // TODO: Здесь надо учитывать нижнюю границу ячейки и вычесть ее ширину из YLimit
-        return { X : XOffset + CellInfo.X_content_start, XLimit : XOffset + CellInfo.X_content_end, Y : Y, YLimit : Pos.YLimit, MaxTopBorder : MaxTopBorder };
+        return { X : Pos.X + CellInfo.X_content_start, XLimit : Pos.X + CellInfo.X_content_end, Y : Y, YLimit : Pos.YLimit, MaxTopBorder : MaxTopBorder };
     },
 
     Get_MaxTopBorder : function(RowIndex)
