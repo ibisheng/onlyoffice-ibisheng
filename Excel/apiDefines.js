@@ -346,7 +346,8 @@ var c_oAscDefinedNameReason = {
 };
 
 var c_oAscPopUpSelectorType = {
-  Func: 0,
-  Range: 1,
-  Table: 2
+  None: 0,
+  Func: 1,
+  Range: 2,
+  Table: 3
 };

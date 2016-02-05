@@ -2768,7 +2768,6 @@ var editor;
     this.controller._onWindowMouseUpExternal(event, x, y);
   };
 
-
   //
 
   spreadsheet_api.prototype.asc_selectFunction = function() {
@@ -2783,8 +2782,8 @@ var editor;
     this.wb.removeHyperlink();
   };
 
-  spreadsheet_api.prototype.asc_insertFormula = function(functionName, autoComplet, isDefName) {
-    this.wb.insertFormulaInEditor(functionName, autoComplet, isDefName);
+  spreadsheet_api.prototype.asc_insertFormula = function(functionName, type, autoComplete) {
+    this.wb.insertFormulaInEditor(functionName, type, autoComplete);
     this.wb.restoreFocus();
   };
 

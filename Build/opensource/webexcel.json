@@ -60,7 +60,6 @@
                 "../../Excel/model/CellComment.js",
 				"../../Excel/view/mobileTouch.js",
 				"../../Excel/view/iscroll.js",
-				"../../Excel/view/PopUpSelector.js",
                 "../../Excel/view/StringRender.js",
                 "../../Excel/view/CellTextRender.js",
                 "../../Excel/view/CellEditorView.js",

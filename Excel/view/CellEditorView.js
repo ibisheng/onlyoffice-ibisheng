@@ -230,10 +230,7 @@
     }
 
     this.fKeyDown = function(event) {
-      if (t.handlers.trigger("popUpSelectorKeyDown", event)) {
-        return t._onWindowKeyDown(event);
-      }
-      return false;
+      return t._onWindowKeyDown(event);
     };
     this.fKeyPress = function() {
       return t._onWindowKeyPress.apply(t, arguments);

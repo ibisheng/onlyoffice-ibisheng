@@ -1573,6 +1573,14 @@
 		asc_CFindOptions.prototype.asc_setReplaceWith = function (val) {this.replaceWith = val;};
 		asc_CFindOptions.prototype.asc_setIsReplaceAll = function (val) {this.isReplaceAll = val;};
 
+		/** @constructor */
+		function asc_CCompleteMenu(name, type) {
+			this.name = name;
+			this.type = type;
+		}
+		asc_CCompleteMenu.prototype.asc_getName = function () {return this.name;};
+		asc_CCompleteMenu.prototype.asc_getType = function () {return this.type;};
+
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------
@@ -1723,5 +1731,10 @@
 		prot["asc_setLookIn"] = prot.asc_setLookIn;
 		prot["asc_setReplaceWith"] = prot.asc_setReplaceWith;
 		prot["asc_setIsReplaceAll"] = prot.asc_setIsReplaceAll;
+
+		window["Asc"]["asc_CCompleteMenu"] = window["Asc"].asc_CCompleteMenu = asc_CCompleteMenu;
+		prot = asc_CCompleteMenu.prototype;
+		prot["asc_getName"] = prot.asc_getName;
+		prot["asc_getType"] = prot.asc_getType;
 }
 )(jQuery, window);
