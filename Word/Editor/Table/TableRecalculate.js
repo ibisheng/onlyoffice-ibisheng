@@ -15,11 +15,6 @@ CTable.prototype.Recalculate_Page = function(PageIndex)
         this.private_RecalculateGrid();
         this.private_RecalculateBorders();
         this.private_RecalculateHeader();
-
-        // TODO: Пока оставим эту заглушку на случай загрузки плохих таблиц. В будущем надо будет
-        //       сделать нормальный обсчет для случая, когда у нас есть "пустые" строки (составленные
-        //       из вертикально объединенных ячеек).
-        this.Internal_Check_TableRows(false);
     }
 
     this.private_RecalculatePageXY(PageIndex);
@@ -2120,6 +2115,9 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
 
             CurGridCol += GridSpan;
         }
+
+        if (undefined === this.TableRowsBottom[CurRow][CurPage])
+            this.TableRowsBottom[CurRow][CurPage] = Y;
 
         var RowHValue = RowH.Value;
         // В данном значении не учитываются маргины

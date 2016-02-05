@@ -9504,8 +9504,6 @@ CTable.prototype =
 
         // Удаляем лишние строки
         this.Internal_Check_TableRows(true);
-        //if ( true === this.Internal_Check_TableRows(true) )
-        //this.Content[Pos_tl.Row].Pr.Height = { Value : Summary_Height, HRule : heightrule_AtLeast };
 
         var PageNum = 0;
         for ( PageNum = 0; PageNum < this.Pages.length - 1; PageNum++ )
@@ -12956,6 +12954,14 @@ CTable.prototype.private_StartTrackTable = function(CurPage)
         }
     }
     this.DrawingDocument.StartTrackTable(NewOutline, Transform);
+};
+CTable.prototype.Correct_BadTable = function()
+{
+    // TODO: Пока оставим эту заглушку на случай загрузки плохих таблиц. В будущем надо будет
+    //       сделать нормальный обсчет для случая, когда у нас есть "пустые" строки (составленные
+    //       из вертикально объединенных ячеек).
+    this.Internal_Check_TableRows(false);
+
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook

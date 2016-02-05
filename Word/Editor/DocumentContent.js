@@ -696,15 +696,10 @@ CDocumentContent.prototype =
                 bFlow = true;
                 if ( true === this.RecalcInfo.Can_RecalcObject() )
                 {
-                    if ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex || (1 == PageIndex && true === this.Is_TableCellContent() && false === this.Parent.Is_EmptyFirstPage()) )
-                    {
-                        Element.Set_DocumentIndex( Index );
-                        Element.Reset( X, Y, XLimit, YLimit, PageIndex );
-                    }
-
-                    this.RecalcInfo.FlowObjectPage = 0;
-                    this.RecalcInfo.FlowObject   = Element;
-                    this.RecalcInfo.RecalcResult = Element.Recalculate_Page( PageIndex );
+                    Element.Set_DocumentIndex( Index );
+                    Element.Reset(X, Y, XLimit, YLimit, PageIndex, 0, 1);
+                    var TempRecalcResult = Element.Recalculate_Page(0);
+                    this.RecalcInfo.Set_FlowObject(Element, 0, TempRecalcResult, -1, {X : X, Y : Y, XLimit: XLimit, YLimit : YLimit});
 
                     if(this.DrawingObjects)
 						this.DrawingObjects.addFloatTable(new CFlowTable(Element, PageIndex));
@@ -719,61 +714,43 @@ CDocumentContent.prototype =
                         if ( true === this.RecalcInfo.FlowObjectPageBreakBefore )
                         {
                             // Добавляем начало таблицы в конец страницы так, чтобы не убралось ничего
-                            Element.Set_DocumentIndex( Index );
-                            Element.Reset( X, YLimit, XLimit, YLimit, PageIndex );
-                            Element.Recalculate_Page( PageIndex );
+                            Element.Set_DocumentIndex(Index);
+                            Element.Reset(X, YLimit, XLimit, YLimit, PageIndex, 0, 1);
+                            Element.Recalculate_Page(0);
 
                             this.RecalcInfo.FlowObjectPage++;
                             RecalcResult = recalcresult_NextPage;
                         }
                         else
                         {
-                            if ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex )
-                            {
-                                Element.Set_DocumentIndex( Index );
-                                Element.Reset( X, Y, XLimit, YLimit, PageIndex );
-                            }
+                            X      = this.RecalcInfo.AdditionalInfo.X;
+                            Y      = this.RecalcInfo.AdditionalInfo.Y;
+                            XLimit = this.RecalcInfo.AdditionalInfo.XLimit;
+                            YLimit = this.RecalcInfo.AdditionalInfo.YLimit;
 
-                            RecalcResult = Element.Recalculate_Page( PageIndex );
-                            if ( (( 0 === Index && 0 === PageIndex ) || Index != StartIndex) && true != Element.Is_ContentOnFirstPage()  )
-                            {
-								if(this.DrawingObjects)
-									this.DrawingObjects.removeFloatTableById(PageIndex, Element.Get_Id());
-                                this.RecalcInfo.FlowObjectPageBreakBefore = true;
-                                RecalcResult = recalcresult_CurPage;
-                            }
-                            else
-                            {
-                                this.RecalcInfo.FlowObjectPage++;
+                            // Пересчет нужнен для обновления номеров колонок и страниц
+                            Element.Reset(X, Y, XLimit, YLimit, PageIndex, 0, 1);
+                            RecalcResult = Element.Recalculate_Page(0);
+                            this.RecalcInfo.FlowObjectPage++;
 
-                                if (RecalcResult & recalcresult_NextElement)
-                                {
-                                    this.RecalcInfo.FlowObject                = null;
-                                    this.RecalcInfo.FlowObjectPageBreakBefore = false;
-                                    this.RecalcInfo.FlowObjectPage            = 0;
-                                    this.RecalcInfo.RecalcResult              = recalcresult_NextElement;
-                                }
-                            }
+                            if (RecalcResult & recalcresult_NextElement)
+                                this.RecalcInfo.Reset();
                         }
                     }
                     else
                     {
-                        RecalcResult = Element.Recalculate_Page( PageIndex );
+                        RecalcResult = Element.Recalculate_Page(PageIndex - Element.PageNum);
+                        this.RecalcInfo.FlowObjectPage++;
 
                         if(this.DrawingObjects)
                             this.DrawingObjects.addFloatTable(new CFlowTable(Element, PageIndex));
 
                         if (RecalcResult & recalcresult_NextElement)
-                        {
-                            this.RecalcInfo.FlowObject                = null;
-                            this.RecalcInfo.FlowObjectPageBreakBefore = false;
-                            this.RecalcInfo.RecalcResult              = recalcresult_NextElement;
-                        }
+                            this.RecalcInfo.Reset();
                     }
                 }
                 else
                 {
-                    // Пропускаем
                     RecalcResult = recalcresult_NextElement;
                 }
             }

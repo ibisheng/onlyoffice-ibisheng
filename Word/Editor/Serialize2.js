@@ -7790,6 +7790,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
                 return oThis.ReadDocTable(t, l, oNewTable);
             });
             oNewTable.ReIndexing(0);
+            oNewTable.Correct_BadTable();
 			if(2 == g_nCurFileVersion && false == oNewTable.Inline)
 			{
 				//делаем смещение левой границы
@@ -8249,6 +8250,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
                 return oThis.ReadDocTable(t, l, oNewTable);
             });
             oNewTable.ReIndexing(0);
+            oNewTable.Correct_BadTable();
             if(2 == g_nCurFileVersion && false == oNewTable.Inline)
             {
                 //делаем смещение левой границы
