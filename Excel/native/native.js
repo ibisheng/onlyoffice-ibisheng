@@ -4554,7 +4554,8 @@ function offline_cell_editor_draw(width, height, ratio) {
     cellEditor._draw();
 
     return [wb.cellEditor.left, wb.cellEditor.top, wb.cellEditor.right, wb.cellEditor.bottom,
-        wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
+        wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight,
+        cellEditor.textRender.chars.length];
 }
 function offline_cell_editor_open(x, y, width, height, ratio, isSelectAll, isFormulaInsertMode)  {
     _null_object.width = width * ratio;
@@ -4658,7 +4659,8 @@ function offline_cell_editor_process_input_commands(commands, width, height, rat
     cellEditor._draw();
 
     return [cellEditor.left, cellEditor.top, cellEditor.right, cellEditor.bottom,
-        cellEditor.curLeft, cellEditor.curTop, cellEditor.curHeight];
+        cellEditor.curLeft, cellEditor.curTop, cellEditor.curHeight,
+        cellEditor.textRender.chars.length];
 }
 
 function offline_cell_editor_mouse_event(events) {
@@ -4735,7 +4737,8 @@ function offline_cell_editor_mouse_event(events) {
     }
 
     return [cellEditor.left, cellEditor.top, cellEditor.right, cellEditor.bottom,
-        cellEditor.curLeft, cellEditor.curTop, cellEditor.curHeight];
+        cellEditor.curLeft, cellEditor.curTop, cellEditor.curHeight,
+        cellEditor.textRender.chars.length];
 }
 function offline_cell_editor_close(x, y, width, height, ratio) {
     var e = {which: 13, shiftKey: false, metaKey: false, ctrlKey: false};
@@ -4900,7 +4903,20 @@ function offline_insertFormula(functionName, autoComplete, isDefName) {
 function offline_copy() {
 
     var worksheet = _api.wb.getWorksheet();
-    var sBase64 = _api.wb.clipboard.getSelectedBinary(false);
+    var sBase64 = {};
+
+    if (_api.wb.cellEditor.isOpened) {
+        var v = _api.wb.cellEditor.copySelection();
+        if (v) {
+            //if (v) { _api.wb.clipboard.copyCellValue(v);}
+            sBase64.text = _api.wb.cellEditor._getFragmentsText(v);
+            sBase64.sBase64 = '';
+            sBase64.drawingUrls = null;
+        }
+    }
+    else {
+        sBase64 = _api.wb.clipboard.getSelectedBinary(false);
+    }
 
     var _stream = global_memory_stream_menu;
     _stream["ClearNoAttack"]();
@@ -4937,9 +4953,11 @@ function offline_copy() {
 }
 function offline_paste(params) {
     var type = params[0];
+    var worksheet = _api.wb.getWorksheet();
+
     if (0 == type)
     {
-        // TEXT
+        _api.wb.clipboard._pasteTextOnSheet(params[1],worksheet);
     }
     else if (1 == type)
     {
@@ -4947,7 +4965,6 @@ function offline_paste(params) {
     }
     else if (2 == type)
     {
-        var worksheet = _api.wb.getWorksheet();
         _api.wb.clipboard._pasteFromBinaryExcel(worksheet, params[1]);
     }
 }
@@ -5017,7 +5034,8 @@ function offline_delete() {
 
     stream["WriteString"](0);
 
-    // delete cell content
+    var worksheet = _api.wb.getWorksheet();
+    worksheet.emptySelection(c_oAscCleanOptions.Text);
 
     return stream;
 }
