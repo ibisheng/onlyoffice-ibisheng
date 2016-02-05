@@ -64,6 +64,8 @@ String.prototype.strongMatch = function(regExp){
     return false;
 };
 
+if(!window["XRegExp"]){XRegExp = require("xregexp");}
+
 var g_oZipChanges = null;
 var g_sDownloadServiceLocalUrl = "/downloadas";
 var g_sUploadServiceLocalUrl = "/upload";
