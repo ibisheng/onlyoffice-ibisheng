@@ -1922,6 +1922,7 @@ var editor;
         t.wb._initCommentsToSave();
         // ToDo перейти от wsViews на wsViewsId (сейчас вызываем раньше, чем в модели, т.к. там будет sortDependency
         // и cleanCellCache, который создаст уже скопированный лист(и splice сработает неправильно))
+        History.Create_NewPoint();
         t.wb.copyWorksheet(i, where);
         t.wbModel.copyWorksheet(i, where, newName);
         // Делаем активным скопированный

@@ -2041,7 +2041,7 @@ Workbook.prototype.createWorksheet=function(indexBefore, sName, sId){
 Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFromRedo){
 	//insertBefore - optional
 	if(index >= 0 && index < this.aWorksheets.length){
-		History.Create_NewPoint();
+
 		History.TurnOff();
 		var wsActive = this.getActiveWs();
 		var wsFrom = this.aWorksheets[index];
