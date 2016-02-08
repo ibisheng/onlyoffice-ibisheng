@@ -68,7 +68,7 @@ AscBrowser.zoom = 1;
 
 AscBrowser.checkZoom = function()
 {
-    if (AscBrowser.isChrome)
+    if (AscBrowser.isChrome && document && document.firstElementChild)
     {
         document.firstElementChild.style.zoom = "reset";
         AscBrowser.zoom = window.outerWidth / window.innerWidth;
