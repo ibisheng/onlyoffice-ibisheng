@@ -10108,8 +10108,8 @@ floor3DChart.prototype =
 	_draw: function()
 	{
 		//TODO цвет заливки неправильно выставляется при чтении. поэтому использую пока цвет сетки
-		var brush = this.cChartSpace.chart.floor && this.cChartSpace.chart.floor.spPr ? this.cChartSpace.chart.floor.spPr.Fill : null;
-		var pen = this.cChartSpace.chart.floor && this.cChartSpace.chart.floor.spPr ? this.cChartSpace.chart.floor.spPr.ln : null;		
+		var brush = this.cChartSpace.chart.floor ? this.cChartSpace.chart.floor.brush : null;
+		var pen = this.cChartSpace.chart.floor ? this.cChartSpace.chart.floor.pen : null;
 		var path = this.paths.chartFloor;
 		
 		this.cChartDrawer.drawPath(path, pen, brush);
@@ -10200,8 +10200,8 @@ sideWall3DChart.prototype =
 	_draw: function()
 	{
 		//TODO цвет заливки неправильно выставляется при чтении. поэтому использую пока цвет сетки
-		var brush = this.cChartSpace.chart.sideWall && this.cChartSpace.chart.sideWall.spPr ? this.cChartSpace.chart.sideWall.spPr.Fill : null;
-		var pen = this.cChartSpace.chart.sideWall && this.cChartSpace.chart.sideWall.spPr ? this.cChartSpace.chart.sideWall.spPr.ln : null;		
+		var brush = this.cChartSpace.chart.sideWall ? this.cChartSpace.chart.sideWall.brush : null;
+		var pen = this.cChartSpace.chart.sideWall ? this.cChartSpace.chart.sideWall.pen : null;
 		var path = this.paths;
 		
 		this.cChartDrawer.drawPath(path, pen, brush);
@@ -10291,8 +10291,8 @@ backWall3DChart.prototype =
 	_draw: function()
 	{
 		//TODO цвет заливки неправильно выставляется при чтении. поэтому использую пока цвет сетки
-		var brush = this.cChartSpace.chart.backWall && this.cChartSpace.chart.backWall.spPr ? this.cChartSpace.chart.backWall.spPr.Fill : null;
-		var pen = this.cChartSpace.chart.backWall && this.cChartSpace.chart.backWall.spPr ? this.cChartSpace.chart.backWall.spPr.ln : null;		
+		var brush = this.cChartSpace.chart.backWall ? this.cChartSpace.chart.backWall.brush : null;
+		var pen = this.cChartSpace.chart.backWall ? this.cChartSpace.chart.backWall.pen : null;
 		var path = this.paths;
 		
 		this.cChartDrawer.drawPath(path, pen, brush);

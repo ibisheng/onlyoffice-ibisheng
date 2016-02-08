@@ -330,6 +330,7 @@ CChartSpace.prototype.recalculate = function()
         if(this.recalcInfo.recalculatePlotAreaBrush)
         {
             this.recalculatePlotAreaChartBrush();
+            this.recalculateWalls();
             this.recalcInfo.recalculatePlotAreaBrush = false;
         }
         if(this.recalcInfo.recalculatePlotAreaPen)

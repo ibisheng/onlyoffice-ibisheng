@@ -6231,6 +6231,91 @@ CChartSpace.prototype =
     },
 
 
+    internalCalculatePenBrushFloorWall: function(oSide, nSideType)
+    {
+        if(!oSide)
+        {
+            return;
+        }
+        if(oSide.spPr && oSide.spPr.ln)
+        {
+            oSide.pen = oSide.spPr.ln.createDuplicate();
+        }
+        else
+        {
+            oSide.pen = null;
+        }
+        if(this.style >= 1 && this.style <= 32)
+        {
+            if(oSide.spPr && oSide.spPr.Fill)
+            {
+                oSide.brush = oSide.spPr.Fill.createDuplicate();
+                if( oSide.brush.fill && oSide.brush.fill.color && (nSideType === 0 || nSideType === 2))
+                {
+                    var cColorMod = new CColorMod;
+                    if(nSideType === 2)
+                        cColorMod.val = 45000;
+                    else
+                        cColorMod.val = 35000;
+                    cColorMod.name = "shade";
+                    oSide.brush.fill.color.Mods.addMod(cColorMod);
+                }
+            }
+            else
+            {
+                oSide.brush = null;
+            }
+            return;
+        }
+        else
+        {
+            var oSubtleFill;
+            var parent_objects = this.getParentObjects();
+            if(parent_objects.theme  && parent_objects.theme.themeElements
+                && parent_objects.theme.themeElements.fmtScheme
+                && parent_objects.theme.themeElements.fmtScheme.fillStyleLst)
+            {
+                oSubtleFill = parent_objects.theme.themeElements.fmtScheme.fillStyleLst[0];
+            }
+
+            var oDefaultBrush;
+            var tint = 0.20000;
+            if(this.style >=33 && this.style <= 34)
+                oDefaultBrush = CreateUnifillSolidFillSchemeColor(8, 0.20000);
+            else if(this.style >=35 && this.style <=40)
+                oDefaultBrush = CreateUnifillSolidFillSchemeColor(this.style - 35, tint);
+            else
+                oDefaultBrush = CreateUnifillSolidFillSchemeColor(8, 0.95000);
+
+            if(oSide.spPr)
+            {
+                oDefaultBrush.merge(oSide.spPr.Fill);
+            }
+
+            if( oDefaultBrush.fill && oDefaultBrush.fill.color && (nSideType === 0 || nSideType === 2))
+            {
+                var cColorMod = new CColorMod;
+                if(nSideType === 0)
+                    cColorMod.val = 45000;
+                else
+                    cColorMod.val = 35000;
+                cColorMod.name = "shade";
+                oDefaultBrush.fill.color.Mods.addMod(cColorMod);
+            }
+            oSide.brush = oDefaultBrush;
+        }
+    },
+
+    recalculateWalls: function()
+    {
+        if(this.chart)
+        {
+            this.internalCalculatePenBrushFloorWall(this.chart.sideWall, 0);
+            this.internalCalculatePenBrushFloorWall(this.chart.backWall, 1);
+            this.internalCalculatePenBrushFloorWall(this.chart.floor, 2);
+        }
+    },
+
     recalculateUpDownBars: function()
     {
         if(this.chart && this.chart.plotArea && this.chart.plotArea.chart && this.chart.plotArea.chart.upDownBars)
@@ -6586,6 +6671,39 @@ CChartSpace.prototype =
                             }
                         }
                     }
+                }
+            }
+            if(this.chart.floor)
+            {
+                if(this.chart.floor.brush)
+                {
+                    this.chart.floor.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                }
+                if(this.chart.floor.pen)
+                {
+                    this.chart.floor.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                }
+            }
+            if(this.chart.sideWall)
+            {
+                if(this.chart.sideWall.brush)
+                {
+                    this.chart.sideWall.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                }
+                if(this.chart.sideWall.pen)
+                {
+                    this.chart.sideWall.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                }
+            }
+            if(this.chart.backWall)
+            {
+                if(this.chart.backWall.brush)
+                {
+                    this.chart.backWall.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                }
+                if(this.chart.backWall.pen)
+                {
+                    this.chart.backWall.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                 }
             }
         }
