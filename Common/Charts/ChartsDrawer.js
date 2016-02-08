@@ -73,6 +73,8 @@ CChartsDrawer.prototype =
 		this.serAxisChart = new serAxisChart();
 		//Floor This element specifies the floor of a 3D chart.   
 		this.floor3DChart = new floor3DChart();
+		this.sideWall3DChart = new sideWall3DChart();
+		this.backWall3DChart = new backWall3DChart();
 		
 		//draw chart
 		var newChart;
@@ -153,6 +155,8 @@ CChartsDrawer.prototype =
 			{
 				this.floor3DChart.recalculate(this);
 				this.serAxisChart.reCalculate(this);
+				this.sideWall3DChart.recalculate(this);
+				this.backWall3DChart.recalculate(this);
 			}
 				
 		}
@@ -184,6 +188,8 @@ CChartsDrawer.prototype =
 				if(this.nDimensionCount === 3)
 				{
 					this.floor3DChart.draw(this);
+					this.sideWall3DChart.draw(this);
+					this.backWall3DChart.draw(this);
 				}
 			}
 			
@@ -10102,8 +10108,8 @@ floor3DChart.prototype =
 	_draw: function()
 	{
 		//TODO цвет заливки неправильно выставляется при чтении. поэтому использую пока цвет сетки
-		var brush = null/*this.cChartSpace.chart.floor && this.cChartSpace.chart.floor.spPr ? this.cChartSpace.chart.floor.spPr.Fill : null*/;
-		var pen = this.cChartSpace.chart.plotArea.valAx.compiledMajorGridLines;		
+		var brush = this.cChartSpace.chart.floor && this.cChartSpace.chart.floor.spPr ? this.cChartSpace.chart.floor.spPr.Fill : null;
+		var pen = this.cChartSpace.chart.floor && this.cChartSpace.chart.floor.spPr ? this.cChartSpace.chart.floor.spPr.ln : null;		
 		var path = this.paths.chartFloor;
 		
 		this.cChartDrawer.drawPath(path, pen, brush);
@@ -10112,9 +10118,188 @@ floor3DChart.prototype =
 };
 
 
-
-
+function sideWall3DChart()
+{
+	this.chartProp = null;
+	this.cChartSpace = null;
+	this.cChartDrawer = null;
 	
+	this.paths = {};
+}
+
+sideWall3DChart.prototype =
+{
+	constructor: sideWall3DChart,
+	
+	draw : function(chartsDrawer)
+    {
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		this.cChartDrawer = chartsDrawer;
+		
+		this._draw();
+	},
+	
+	recalculate : function(chartsDrawer)
+	{
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		this.cChartDrawer = chartsDrawer;
+		
+		this.paths = {};
+		this._calculate();
+	},
+	
+	_calculate : function()
+	{
+		var nullPositionOy = this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom;	
+		var maxPositionOy = this.chartProp.chartGutter._top;
+		var yPoints = this.cChartSpace.chart.plotArea.valAx ? this.cChartSpace.chart.plotArea.valAx.yPoints : null;
+		if(yPoints && yPoints[0] && yPoints[yPoints.length - 1])
+		{
+			nullPositionOy = yPoints[0].pos > yPoints[yPoints.length - 1].pos ? yPoints[0].pos * this.chartProp.pxToMM : yPoints[yPoints.length - 1].pos * this.chartProp.pxToMM;
+			maxPositionOy = yPoints[0].pos < yPoints[yPoints.length - 1].pos ? yPoints[0].pos * this.chartProp.pxToMM : yPoints[yPoints.length - 1].pos * this.chartProp.pxToMM;
+		}
+		
+		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
+		var convertResult, x1n, y1n, x2n, y2n, x3n, y3n, x4n, y4n;
+		if(this.chartProp.type == "HBar")
+		{
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, nullPositionOy, 0);
+			x1n = convertResult.x / this.chartProp.pxToMM;
+			y1n = convertResult.y / this.chartProp.pxToMM;
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, maxPositionOy, 0);
+			x2n = convertResult.x / this.chartProp.pxToMM;
+			y2n = convertResult.y / this.chartProp.pxToMM;
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, maxPositionOy, perspectiveDepth);
+			x3n = convertResult.x / this.chartProp.pxToMM;
+			y3n = convertResult.y / this.chartProp.pxToMM;
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, nullPositionOy, perspectiveDepth);
+			x4n = convertResult.x / this.chartProp.pxToMM;
+			y4n = convertResult.y / this.chartProp.pxToMM;
+		}
+		else
+		{
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, nullPositionOy, 0);
+			x1n = convertResult.x / this.chartProp.pxToMM;
+			y1n = convertResult.y / this.chartProp.pxToMM;
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, this.chartProp.chartGutter._top, 0);
+			x2n = convertResult.x / this.chartProp.pxToMM;
+			y2n = convertResult.y / this.chartProp.pxToMM;
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, this.chartProp.chartGutter._top, perspectiveDepth);
+			x3n = convertResult.x / this.chartProp.pxToMM;
+			y3n = convertResult.y / this.chartProp.pxToMM;
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, nullPositionOy, perspectiveDepth);
+			x4n = convertResult.x / this.chartProp.pxToMM;
+			y4n = convertResult.y / this.chartProp.pxToMM;
+		}
+		
+		this.paths = this.cChartDrawer.calculatePolygon([{x: x1n, y: y1n}, {x: x2n, y: y2n}, {x: x3n, y: y3n}, {x: x4n, y: y4n}]);
+	},
+		
+	_draw: function()
+	{
+		//TODO цвет заливки неправильно выставляется при чтении. поэтому использую пока цвет сетки
+		var brush = this.cChartSpace.chart.sideWall && this.cChartSpace.chart.sideWall.spPr ? this.cChartSpace.chart.sideWall.spPr.Fill : null;
+		var pen = this.cChartSpace.chart.sideWall && this.cChartSpace.chart.sideWall.spPr ? this.cChartSpace.chart.sideWall.spPr.ln : null;		
+		var path = this.paths;
+		
+		this.cChartDrawer.drawPath(path, pen, brush);
+	}
+};
+
+
+function backWall3DChart()
+{
+	this.chartProp = null;
+	this.cChartSpace = null;
+	this.cChartDrawer = null;
+	
+	this.paths = {};
+}
+
+backWall3DChart.prototype =
+{
+	constructor: backWall3DChart,
+	
+	draw : function(chartsDrawer)
+    {
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		this.cChartDrawer = chartsDrawer;
+		
+		this._draw();
+	},
+	
+	recalculate : function(chartsDrawer)
+	{
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		this.cChartDrawer = chartsDrawer;
+		
+		this.paths = {};
+		this._calculate();
+	},
+	
+	_calculate : function()
+	{
+		var nullPositionOy = this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom;	
+		var maxPositionOy = this.chartProp.chartGutter._top;
+		var yPoints = this.cChartSpace.chart.plotArea.valAx ? this.cChartSpace.chart.plotArea.valAx.yPoints : null;
+		if(yPoints && yPoints[0] && yPoints[yPoints.length - 1])
+		{
+			nullPositionOy = yPoints[0].pos > yPoints[yPoints.length - 1].pos ? yPoints[0].pos * this.chartProp.pxToMM : yPoints[yPoints.length - 1].pos * this.chartProp.pxToMM;
+			maxPositionOy = yPoints[0].pos < yPoints[yPoints.length - 1].pos ? yPoints[0].pos * this.chartProp.pxToMM : yPoints[yPoints.length - 1].pos * this.chartProp.pxToMM;
+		}
+		
+		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
+		var convertResult, x1n, y1n, x2n, y2n, x3n, y3n, x4n, y4n;
+		if(this.chartProp.type == "HBar")
+		{
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, nullPositionOy, 0);
+			x1n = convertResult.x / this.chartProp.pxToMM;
+			y1n = convertResult.y / this.chartProp.pxToMM;
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, maxPositionOy, 0);
+			x2n = convertResult.x / this.chartProp.pxToMM;
+			y2n = convertResult.y / this.chartProp.pxToMM;
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, maxPositionOy, perspectiveDepth);
+			x3n = convertResult.x / this.chartProp.pxToMM;
+			y3n = convertResult.y / this.chartProp.pxToMM;
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, nullPositionOy, perspectiveDepth);
+			x4n = convertResult.x / this.chartProp.pxToMM;
+			y4n = convertResult.y / this.chartProp.pxToMM;
+		}
+		else
+		{
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, nullPositionOy, perspectiveDepth);
+			x1n = convertResult.x / this.chartProp.pxToMM;
+			y1n = convertResult.y / this.chartProp.pxToMM;
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, this.chartProp.chartGutter._top, perspectiveDepth);
+			x2n = convertResult.x / this.chartProp.pxToMM;
+			y2n = convertResult.y / this.chartProp.pxToMM;
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.widthCanvas - this.chartProp.chartGutter._right, this.chartProp.chartGutter._top, perspectiveDepth);
+			x3n = convertResult.x / this.chartProp.pxToMM;
+			y3n = convertResult.y / this.chartProp.pxToMM;
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.widthCanvas - this.chartProp.chartGutter._right, nullPositionOy, perspectiveDepth);
+			x4n = convertResult.x / this.chartProp.pxToMM;
+			y4n = convertResult.y / this.chartProp.pxToMM;
+		}
+		
+		this.paths = this.cChartDrawer.calculatePolygon([{x: x1n, y: y1n}, {x: x2n, y: y2n}, {x: x3n, y: y3n}, {x: x4n, y: y4n}]);
+	},
+		
+	_draw: function()
+	{
+		//TODO цвет заливки неправильно выставляется при чтении. поэтому использую пока цвет сетки
+		var brush = this.cChartSpace.chart.backWall && this.cChartSpace.chart.backWall.spPr ? this.cChartSpace.chart.backWall.spPr.Fill : null;
+		var pen = this.cChartSpace.chart.backWall && this.cChartSpace.chart.backWall.spPr ? this.cChartSpace.chart.backWall.spPr.ln : null;		
+		var path = this.paths;
+		
+		this.cChartDrawer.drawPath(path, pen, brush);
+	}
+};
+
+
 //*****all area of chart*****
 function allAreaChart()
 {
