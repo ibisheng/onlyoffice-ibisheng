@@ -105,7 +105,7 @@
     this.undoList = [];
     this.redoList = [];
     this.undoMode = false;
-    this.undoAllMode = false;
+    this.noUpdateMode = false;
     this.selectionBegin = -1;
     this.selectionEnd = -1;
     this.isSelectMode = c_oAscCellEditorSelectState.no;
@@ -313,9 +313,9 @@
             var newValue = arrAutoComplete[0];
             this.selectionBegin = this.textRender.getBeginOfText();
             this.cursorPos = this.selectionEnd = this.textRender.getEndOfText();
-            this.undoAllMode = true;
+            this.noUpdateMode = true;
             this._addChars(newValue);
-            this.undoAllMode = false;
+            this.noUpdateMode = false;
           }
         }
       }
@@ -420,16 +420,6 @@
 
   CellEditor.prototype.undo = function() {
     this._performAction(this.undoList, this.redoList);
-  };
-
-  CellEditor.prototype.undoAll = function() {
-    this.isUpdateValue = false;
-    this.undoAllMode = true;
-    while (this.undoList.length > 0) {
-      this.undo();
-    }
-    this._update();
-    this.undoAllMode = false;
   };
 
   CellEditor.prototype.redo = function() {
@@ -1114,9 +1104,7 @@
       }
     }
 
-    if (!t.undoAllMode) {
-      t.handlers.trigger("updated", s, t.cursorPos, isFormula, funcPos, funcName);
-    }
+    t.handlers.trigger("updated", s, t.cursorPos, isFormula, funcPos, funcName);
   };
 
   CellEditor.prototype._expandWidth = function() {
@@ -1604,7 +1592,7 @@
     }
 
     this.cursorPos = pos + str.length;
-    if (!this.undoAllMode) {
+    if (!this.noUpdateMode) {
       this._update();
     }
   };
@@ -1684,7 +1672,7 @@
     }
 
     t.cursorPos = b;
-    if (!t.undoAllMode) {
+    if (!t.noUpdateMode) {
       t._update();
     }
   };
@@ -1842,7 +1830,7 @@
     t._mergeFragments();
 
     t.cursorPos = pos + t._getFragmentsLength(f);
-    if (!t.undoAllMode) {
+    if (!t.noUpdateMode) {
       t._update();
     }
   };
