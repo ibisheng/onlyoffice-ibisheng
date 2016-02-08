@@ -4751,7 +4751,6 @@ function offline_cell_editor_close(x, y, width, height, ratio) {
     if (cellEditor.close(true)) {
         _api.wb.getWorksheet().handlers.trigger('applyCloseEvent', e);
     } else {
-        cellEditor.undoAll();
         cellEditor.close();
         length = 0;
     }

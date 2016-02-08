@@ -2073,7 +2073,6 @@
         if (t.handlers.trigger("isGlobalLockEditCell")) {
           return false;
         }
-        t.undoAll();
         t.close();
         return false;
 
