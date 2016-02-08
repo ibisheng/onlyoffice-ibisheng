@@ -1856,12 +1856,12 @@ parentRight.prototype.toString = function () {
 };
 
 /** @constructor */
-function cUnionOperator() {
+function cRangeUnionOperator() {
     cBaseOperator.apply( this, [':', 50, 2] );
 }
 
-cUnionOperator.prototype = Object.create( cBaseOperator.prototype );
-cUnionOperator.prototype.Calculate = function ( arg ) {
+cRangeUnionOperator.prototype = Object.create( cBaseOperator.prototype );
+cRangeUnionOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], wsId0, wsId1, wb, ws;
     if ( ( arg0 instanceof cRef || arg0 instanceof cArea || arg0 instanceof cRef3D || arg0 instanceof cArea3D && (wsId0=arg0.wsFrom) == arg0.wsTo ) &&
          ( arg1 instanceof cRef || arg1 instanceof cArea || arg1 instanceof cRef3D || arg1 instanceof cArea3D && (wsId1=arg1.wsFrom) == arg1.wsTo ) ){
@@ -2384,7 +2384,7 @@ var cFormulaOperators = {
         return r;
     },
     /* 50 is highest priority */
-    ':'       :cUnionOperator,
+    ':'       :cRangeUnionOperator,
     'un_minus':cUnarMinusOperator,
     'un_plus' :cUnarPlusOperator,
     '%'       :cPercentOperator,
@@ -3441,14 +3441,20 @@ parserFormula.prototype = {
 
     setFormula:function ( formula ) {
         this.Formula = formula;
+        this.is3D = false;
         this.value = null;
-        this.pCurrPos = 0;
+        this.outStack = [];
+        this.error = [];
+        this.FormulaLocale = null;
+        this.isParsed = false;
+        //для функции parse и parseDiagramRef
         this.pCurrPos = 0;
         this.elemArr = [];
-        this.outStack = [];
         this.RefPos = [];
         this.operand_str = null;
-        this.isParsed = false;
+        this.parenthesesNotEnough = false;
+        this.f = [];
+        this.countRef = 0;
     },
 
     setCellId:function ( cellId ) {
@@ -3528,7 +3534,8 @@ parserFormula.prototype = {
          Что упрощает вычисление результата формулы.
          При разборе формулы важен порядок проверки очередной части выражения на принадлежность тому или иному типу.
          */
-        var operand_expected = true, wasLeftParentheses = false, wasRigthParentheses = false,
+        this.operand_expected = true;
+        var wasLeftParentheses = false, wasRigthParentheses = false,
             found_operand = null, _3DRefTmp = null;
         var cFormulaList = (local && cFormulaFunctionLocalized) ? cFormulaFunctionLocalized : cFormulaFunction;
         while ( this.pCurrPos < this.Formula.length ) {
@@ -3544,13 +3551,13 @@ parserFormula.prototype = {
                 wasRigthParentheses = false;
                 found_operator = null;
 
-                if ( operand_expected ) {
+                if ( this.operand_expected ) {
                     if ( this.operand_str == "-" ) {
-                        operand_expected = true;
+                        this.operand_expected = true;
                         found_operator = new cFormulaOperators['un_minus']();
                     }
                     else if ( this.operand_str == "+" ) {
-                        operand_expected = true;
+                        this.operand_expected = true;
                         found_operator = new cFormulaOperators['un_plus']();
                     }
                     else {
@@ -3560,27 +3567,27 @@ parserFormula.prototype = {
                         return false;
                     }
                 }
-                else if ( !operand_expected ) {
+                else if ( !this.operand_expected ) {
                     if ( this.operand_str == "-" ) {
-                        operand_expected = true;
+                        this.operand_expected = true;
                         found_operator = new cFormulaOperators['-']();
                     }
                     else if ( this.operand_str == "+" ) {
-                        operand_expected = true;
+                        this.operand_expected = true;
                         found_operator = new cFormulaOperators['+']();
                     }
                     else if ( this.operand_str == ":" ) {
-                        operand_expected = true;
+                        this.operand_expected = true;
                         found_operator = new cFormulaOperators[':']();
                     }
                     else if ( this.operand_str == "%" ) {
-                        operand_expected = false;
+                        this.operand_expected = false;
                         found_operator = new cFormulaOperators['%']();
                     }
                     else {
                         if ( this.operand_str in cFormulaOperators ) {
                             found_operator = new cFormulaOperators[this.operand_str]();
-                            operand_expected = true;
+                            this.operand_expected = true;
                         }
                         else {
                             this.error.push( c_oAscError.ID.FrmlWrongOperator );
@@ -3609,7 +3616,7 @@ parserFormula.prototype = {
                 if ( wasRigthParentheses || found_operand ) {
                     this.elemArr.push( new cMultOperator() );
                 }
-                operand_expected = true;
+                this.operand_expected = true;
                 wasLeftParentheses = true;
                 wasRigthParentheses = false;
                 found_operand = null;
@@ -3621,7 +3628,7 @@ parserFormula.prototype = {
                 this.f.push( new cFormulaOperators[this.operand_str]() );
                 wasRigthParentheses = true;
                 var top_elem = null;
-                if ( this.elemArr.length != 0 && ( (top_elem = this.elemArr[this.elemArr.length - 1]).name == "(" ) && operand_expected ) {
+                if ( this.elemArr.length != 0 && ( (top_elem = this.elemArr[this.elemArr.length - 1]).name == "(" ) && this.operand_expected ) {
                     if ( top_elem.getArguments() > 1 ) {
                         this.outStack.push( new cEmpty() );
                     }
@@ -3631,7 +3638,7 @@ parserFormula.prototype = {
                 }
                 else {
                     while ( this.elemArr.length != 0 && !((top_elem = this.elemArr[this.elemArr.length - 1]).name == "(" ) ) {
-                        if ( top_elem.name in cFormulaOperators && operand_expected ) {
+                        if ( top_elem.name in cFormulaOperators && this.operand_expected ) {
                             this.error.push( c_oAscError.ID.FrmlOperandExpected );
                             this.outStack = [];
                             this.elemArr = [];
@@ -3683,7 +3690,7 @@ parserFormula.prototype = {
                     // }
                 }
                 this.outStack.push( p );
-                operand_expected = false;
+                this.operand_expected = false;
                 wasLeftParentheses = false;
             }
 
@@ -3691,7 +3698,7 @@ parserFormula.prototype = {
             else if ( parserHelp.isComma.call( this, this.Formula, this.pCurrPos ) ) {
                 wasLeftParentheses = false;
                 wasRigthParentheses = false;
-                /* if( operand_expected ){
+                /* if( this.operand_expected ){
                  this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
                  this.outStack = [];
                  this.elemArr = [];
@@ -3700,11 +3707,11 @@ parserFormula.prototype = {
                 var wasLeftParentheses = false;
                 var stackLength = this.elemArr.length;
                 var top_elem = null;
-                if ( this.elemArr.length != 0 && this.elemArr[stackLength - 1].name == "(" && operand_expected ) {
+                if ( this.elemArr.length != 0 && this.elemArr[stackLength - 1].name == "(" && this.operand_expected ) {
                     this.outStack.push( new cEmpty() );
                     top_elem = this.elemArr[stackLength - 1];
                     wasLeftParentheses = true;
-                    operand_expected = false;
+                    this.operand_expected = false;
                 }
                 else {
                     while ( stackLength != 0 ) {
@@ -3720,7 +3727,7 @@ parserFormula.prototype = {
                     }
                 }
 
-                if ( operand_expected ) {
+                if ( this.operand_expected ) {
                     this.error.push( c_oAscError.ID.FrmlWrongOperator );
                     this.outStack = [];
                     this.elemArr = [];
@@ -3734,7 +3741,7 @@ parserFormula.prototype = {
                     return false;
                 }
                 top_elem.IncrementArguments();
-                operand_expected = true;
+                this.operand_expected = true;
             }
 
             /* Array */
@@ -3786,7 +3793,7 @@ parserFormula.prototype = {
                     return false;
                 }
                 this.outStack.push( arr );
-                operand_expected = false;
+                this.operand_expected = false;
             }
 
             /* Operands*/
@@ -3795,10 +3802,10 @@ parserFormula.prototype = {
                 found_operand = null;
 
                 if ( wasRigthParentheses ) {
-                    operand_expected = true;
+                    this.operand_expected = true;
                 }
 
-                if ( !operand_expected ) {
+                if ( !this.operand_expected ) {
                     this.error.push( c_oAscError.ID.FrmlWrongOperator );
                     this.outStack = [];
                     this.elemArr = [];
@@ -3840,8 +3847,9 @@ parserFormula.prototype = {
                     }
                     if ( parserHelp.isArea.call( this, this.Formula, this.pCurrPos ) ) {
                         pos.end = this.pCurrPos;
-                        this.RefPos.push( pos );
                         found_operand = new cArea3D( this.operand_str.toUpperCase(), _wsFrom, _wsTo, this.wb );
+                        pos.oper = found_operand;
+                        this.RefPos.push( pos );
                         checkAbsArea( this.operand_str, found_operand );
                     }
                     else if ( parserHelp.isRef.call( this, this.Formula, this.pCurrPos ) ) {
@@ -3909,7 +3917,7 @@ parserFormula.prototype = {
                 /* Function*/
                 else if ( parserHelp.isFunc.call( this, this.Formula, this.pCurrPos ) ) {
 
-                    if ( wasRigthParentheses && operand_expected ) {
+                    if ( wasRigthParentheses && this.operand_expected ) {
                         this.elemArr.push( new cMultOperator() );
                     }
 
@@ -3934,7 +3942,7 @@ parserFormula.prototype = {
                         this.elemArr = [];
                         return false;
                     }
-                    operand_expected = false;
+                    this.operand_expected = false;
                     wasRigthParentheses = false;
                     continue;
                 }
@@ -3942,7 +3950,7 @@ parserFormula.prototype = {
                 if ( found_operand != null && found_operand != undefined ) {
                     this.outStack.push( found_operand );
                     this.f.push( found_operand );
-                    operand_expected = false;
+                    this.operand_expected = false;
                     found_operand = null
                 }
                 else {
@@ -3959,7 +3967,7 @@ parserFormula.prototype = {
                         this.outStack.push( new cName( this.operand_str, this.wb ) );
                     }
 
-                    operand_expected = false;
+                    this.operand_expected = false;
                     if ( this.operand_str != null ) {
                         if ( this.operand_str == '"' ) {
                             //this.Formula = this.Formula.substr(0,this.pCurrPos) + '"' + this.Formula.substr(this.pCurrPos);
@@ -3979,7 +3987,7 @@ parserFormula.prototype = {
             }
 
         }
-        if ( operand_expected ) {
+        if ( this.operand_expected ) {
             this.outStack = [];
             this.elemArr = [];
             this.error.push( c_oAscError.ID.FrmlOperandExpected );
