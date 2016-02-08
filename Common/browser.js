@@ -64,5 +64,17 @@ AscBrowser.isArm = (AscBrowser.userAgent.indexOf("arm") > -1);
 
 AscBrowser.isMozilla = !AscBrowser.isIE && (AscBrowser.userAgent.indexOf("firefox") > -1);
 
+AscBrowser.zoom = 1;
+
+AscBrowser.checkZoom = function()
+{
+    if (AscBrowser.isChrome)
+    {
+        document.firstElementChild.style.zoom = "reset";
+        AscBrowser.zoom = window.outerWidth / window.innerWidth;
+    }
+};
+
+AscBrowser.checkZoom();
 // detect retina (http://habrahabr.ru/post/159419/)
-AscBrowser.isRetina = 2 === window.devicePixelRatio;
+AscBrowser.isRetina = (Math.abs(2 - (window.devicePixelRatio / AscBrowser.zoom)) < 0.01);

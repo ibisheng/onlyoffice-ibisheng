@@ -2819,6 +2819,8 @@ function CEditorPage(api)
 
     this.OnResize = function(isAttack)
     {
+        AscBrowser.checkZoom();
+
         var isNewSize = this.checkBodySize();
         if (!isNewSize && false === isAttack)
             return;

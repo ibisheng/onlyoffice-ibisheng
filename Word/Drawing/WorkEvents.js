@@ -184,6 +184,10 @@ function check_MouseMoveEvent(e)
         global_mouseEvent.X = e.clientX;
         global_mouseEvent.Y = e.clientY;
     }
+	
+	global_mouseEvent.X = (global_mouseEvent.X * AscBrowser.zoom) >> 0;
+	global_mouseEvent.Y = (global_mouseEvent.Y * AscBrowser.zoom) >> 0;
+	
     global_mouseEvent.AltKey = e.altKey;
     global_mouseEvent.ShiftKey = e.shiftKey;
     global_mouseEvent.CtrlKey = e.ctrlKey || e.metaKey;
@@ -229,6 +233,9 @@ function check_MouseUpEvent(e)
         global_mouseEvent.X = e.clientX;
         global_mouseEvent.Y = e.clientY;
     }
+	
+	global_mouseEvent.X = (global_mouseEvent.X * AscBrowser.zoom) >> 0;
+	global_mouseEvent.Y = (global_mouseEvent.Y * AscBrowser.zoom) >> 0;
 
     global_mouseEvent.AltKey = e.altKey;
     global_mouseEvent.ShiftKey = e.shiftKey;
@@ -276,6 +283,9 @@ function check_MouseDownEvent(e, isClicks)
         global_mouseEvent.X = e.clientX;
         global_mouseEvent.Y = e.clientY;
     }
+	
+	global_mouseEvent.X = (global_mouseEvent.X * AscBrowser.zoom) >> 0;
+	global_mouseEvent.Y = (global_mouseEvent.Y * AscBrowser.zoom) >> 0;
 
     global_mouseEvent.LastX = global_mouseEvent.X;
     global_mouseEvent.LastY = global_mouseEvent.Y;
