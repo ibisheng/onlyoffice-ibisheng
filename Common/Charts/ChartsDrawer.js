@@ -10168,13 +10168,13 @@ sideWall3DChart.prototype =
 			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, nullPositionOy, 0);
 			x1n = convertResult.x / this.chartProp.pxToMM;
 			y1n = convertResult.y / this.chartProp.pxToMM;
-			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, maxPositionOy, 0);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, nullPositionOy, perspectiveDepth);
 			x2n = convertResult.x / this.chartProp.pxToMM;
 			y2n = convertResult.y / this.chartProp.pxToMM;
-			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, maxPositionOy, perspectiveDepth);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.widthCanvas - this.chartProp.chartGutter._right, nullPositionOy, perspectiveDepth);
 			x3n = convertResult.x / this.chartProp.pxToMM;
 			y3n = convertResult.y / this.chartProp.pxToMM;
-			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, nullPositionOy, perspectiveDepth);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.widthCanvas - this.chartProp.chartGutter._right, nullPositionOy, 0);
 			x4n = convertResult.x / this.chartProp.pxToMM;
 			y4n = convertResult.y / this.chartProp.pxToMM;
 		}
@@ -10256,16 +10256,16 @@ backWall3DChart.prototype =
 		var convertResult, x1n, y1n, x2n, y2n, x3n, y3n, x4n, y4n;
 		if(this.chartProp.type == "HBar")
 		{
-			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, nullPositionOy, 0);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, nullPositionOy, perspectiveDepth);
 			x1n = convertResult.x / this.chartProp.pxToMM;
 			y1n = convertResult.y / this.chartProp.pxToMM;
-			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, maxPositionOy, 0);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, this.chartProp.chartGutter._top, perspectiveDepth);
 			x2n = convertResult.x / this.chartProp.pxToMM;
 			y2n = convertResult.y / this.chartProp.pxToMM;
-			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, maxPositionOy, perspectiveDepth);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.widthCanvas - this.chartProp.chartGutter._right, this.chartProp.chartGutter._top, perspectiveDepth);
 			x3n = convertResult.x / this.chartProp.pxToMM;
 			y3n = convertResult.y / this.chartProp.pxToMM;
-			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.chartGutter._left, nullPositionOy, perspectiveDepth);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(this.chartProp.widthCanvas - this.chartProp.chartGutter._right, nullPositionOy, perspectiveDepth);
 			x4n = convertResult.x / this.chartProp.pxToMM;
 			y4n = convertResult.y / this.chartProp.pxToMM;
 		}
