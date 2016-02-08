@@ -4527,6 +4527,10 @@
     var fMergedRows = false;	// Замержены ли строки (если да, то автоподбор высоты не должен работать)
     if (null !== mc) {
       if (col !== mc.c1 || row !== mc.r1) {
+        // Проверим внесена ли первая ячейка в cache (иначе если была скрыта первая строка или первый столбец, то мы не внесем)
+        if (undefined === this._getCellTextCache(mc.c1, mc.r1, true)) {
+          return this._addCellTextToCache(mc.c1, mc.r1, canChangeColWidth);
+        }
         return mc.c2;
       } // skip other merged cell from range
       if (mc.c1 !== mc.c2) {
