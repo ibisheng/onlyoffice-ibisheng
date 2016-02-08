@@ -777,6 +777,7 @@ var FT_Common = new _FT_Common();
 
 var global_memory_stream_menu = CreateNativeMemoryStream();
 
+
 function asc_menu_ReadColor(_params, _cursor) {
     var _color = new asc_CColor();
     var _continue = true;
@@ -5082,128 +5083,133 @@ function offline_apply_event(type,params) {
 
         case 9 : // ASC_MENU_EVENT_TYPE_IMAGE
         {
-            var _imagePr = new asc_CImgProperty();
-            while (_continue)
-            {
-                _attr = params[_current.pos++];
-                switch (_attr)
+            var ws = _api.wb.getWorksheet();
+            if (ws && ws.objectRender && ws.objectRender.controller) {
+                var selectedImageProp =  ws.objectRender.controller.getGraphicObjectProps();
+
+                var _imagePr =  new asc_CImgProperty();
+                while (_continue)
                 {
-                    case 0:
+                    _attr = params[_current.pos++];
+                    switch (_attr)
                     {
-                        _imagePr.CanBeFlow = params[_current.pos++];
-                        break;
-                    }
-                    case 1:
-                    {
-                        _imagePr.Width = params[_current.pos++];
-                        break;
-                    }
-                    case 2:
-                    {
-                        _imagePr.Height = params[_current.pos++];
-                        break;
-                    }
-                    case 3:
-                    {
-                        _imagePr.WrappingStyle = params[_current.pos++];
-                        break;
-                    }
-                    case 4:
-                    {
-                        _imagePr.Paddings = asc_menu_ReadPaddings(params, _current);
-                        break;
-                    }
-                    case 5:
-                    {
-                        _imagePr.Position = asc_menu_ReadPosition(params, _current);
-                        break;
-                    }
-                    case 6:
-                    {
-                        _imagePr.AllowOverlap = params[_current.pos++];
-                        break;
-                    }
-                    case 7:
-                    {
-                        _imagePr.PositionH = asc_menu_ReadImagePosition(params, _current);
-                        break;
-                    }
-                    case 8:
-                    {
-                        _imagePr.PositionV = asc_menu_ReadImagePosition(params, _current);
-                        break;
-                    }
-                    case 9:
-                    {
-                        _imagePr.Internal_Position = params[_current.pos++];
-                        break;
-                    }
-                    case 10:
-                    {
-                        _imagePr.ImageUrl = params[_current.pos++];
-                        break;
-                    }
-                    case 11:
-                    {
-                        _imagePr.Locked = params[_current.pos++];
-                        break;
-                    }
-                    case 12:
-                    {
-                        _imagePr.ChartProperties = asc_menu_ReadChartPr(params, _current);
-                        break;
-                    }
-                    case 13:
-                    {
-                        _imagePr.ShapeProperties = asc_menu_ReadShapePr(params, _current);
-                        break;
-                    }
-                    case 14:
-                    {
-                        _imagePr.ChangeLevel = params[_current.pos++];
-                        break;
-                    }
-                    case 15:
-                    {
-                        _imagePr.Group = params[_current.pos++];
-                        break;
-                    }
-                    case 16:
-                    {
-                        _imagePr.fromGroup = params[_current.pos++];
-                        break;
-                    }
-                    case 17:
-                    {
-                        _imagePr.severalCharts = params[_current.pos++];
-                        break;
-                    }
-                    case 18:
-                    {
-                        _imagePr.severalChartTypes = params[_current.pos++];
-                        break;
-                    }
-                    case 19:
-                    {
-                        _imagePr.severalChartStyles = params[_current.pos++];
-                        break;
-                    }
-                    case 20:
-                    {
-                        _imagePr.verticalTextAlign = params[_current.pos++];
-                        break;
-                    }
-                    case 21:
-                    {
-                        var bIsNeed = params[_current.pos++];
-
-                        if (bIsNeed)
+                        case 0:
                         {
-                            var _originSize = this.Native["GetOriginalImageSize"](_imagePr.ImageUrl);
-                            var _w = _originSize[0] * 25.4 / 96.0;
-                            var _h = _originSize[1] * 25.4 / 96.0;
+                            _imagePr.CanBeFlow = params[_current.pos++];
+                            break;
+                        }
+                        case 1:
+                        {
+                            _imagePr.Width = params[_current.pos++];
+                            break;
+                        }
+                        case 2:
+                        {
+                            _imagePr.Height = params[_current.pos++];
+                            break;
+                        }
+                        case 3:
+                        {
+                            _imagePr.WrappingStyle = params[_current.pos++];
+                            break;
+                        }
+                        case 4:
+                        {
+                            _imagePr.Paddings = asc_menu_ReadPaddings(params, _current);
+                            break;
+                        }
+                        case 5:
+                        {
+                            _imagePr.Position = asc_menu_ReadPosition(params, _current);
+                            break;
+                        }
+                        case 6:
+                        {
+                            _imagePr.AllowOverlap = params[_current.pos++];
+                            break;
+                        }
+                        case 7:
+                        {
+                            _imagePr.PositionH = asc_menu_ReadImagePosition(params, _current);
+                            break;
+                        }
+                        case 8:
+                        {
+                            _imagePr.PositionV = asc_menu_ReadImagePosition(params, _current);
+                            break;
+                        }
+                        case 9:
+                        {
+                            _imagePr.Internal_Position = params[_current.pos++];
+                            break;
+                        }
+                        case 10:
+                        {
+                            _imagePr.ImageUrl = params[_current.pos++];
+                            break;
+                        }
+                        case 11:
+                        {
+                            _imagePr.Locked = params[_current.pos++];
+                            break;
+                        }
+                        case 12:
+                        {
+                            _imagePr.ChartProperties = asc_menu_ReadChartPr(params, _current);
+                            break;
+                        }
+                        case 13:
+                        {
+                            _imagePr.ShapeProperties = asc_menu_ReadShapePr(params, _current);
+                            break;
+                        }
+                        case 14:
+                        {
+                            _imagePr.ChangeLevel = params[_current.pos++];
+                            break;
+                        }
+                        case 15:
+                        {
+                            _imagePr.Group = params[_current.pos++];
+                            break;
+                        }
+                        case 16:
+                        {
+                            _imagePr.fromGroup = params[_current.pos++];
+                            break;
+                        }
+                        case 17:
+                        {
+                            _imagePr.severalCharts = params[_current.pos++];
+                            break;
+                        }
+                        case 18:
+                        {
+                            _imagePr.severalChartTypes = params[_current.pos++];
+                            break;
+                        }
+                        case 19:
+                        {
+                            _imagePr.severalChartStyles = params[_current.pos++];
+                            break;
+                        }
+                        case 20:
+                        {
+                            _imagePr.verticalTextAlign = params[_current.pos++];
+                            break;
+                        }
+                        case 21:
+                        {
+                            var urlSource = selectedImageProp[0].Value.ImageUrl;
+                            if (urlSource) {
+                                var bIsNeed = params[_current.pos++];
+                                if (bIsNeed)
+                                {
+                                    var _originSize = window["native"]["GetOriginalImageSize"](urlSource);
+                                    var _w = _originSize[0] * 25.4 / 96.0;
+                                    var _h = _originSize[1] * 25.4 / 96.0;
 
-                            _imagePr.ImageUrl = undefined;
+                                    _imagePr.ImageUrl = undefined;
 
 //                            var Page_Width     = 210;
 //                            var Page_Height    = 297;
@@ -5233,32 +5239,32 @@ function offline_apply_event(type,params) {
 //                            var __w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
 //                            var __h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
 //
-                            var wI = (undefined !== _w) ? Math.max(_w * 25.4 / 96.0, 1) : 1;
-                            var hI = (undefined !== _h) ? Math.max(_h * 25.4 / 96.0, 1) : 1;
+                                    // var wI = (undefined !== _w) ? Math.max(_w * 25.4 / 96.0, 1) : 1;
+                                    //var hI = (undefined !== _h) ? Math.max(_h * 25.4 / 96.0, 1) : 1;
 
-                            wI = Math.max(5, Math.min(wI, __w));
-                            hI = Math.max(5, Math.min(hI, __h));
+                                    // wI = Math.max(5, Math.min(wI, _w));
+                                    //hI = Math.max(5, Math.min(hI, _h));
 
-                            _imagePr.Width = wI;
-                            _imagePr.Height = hI;
+                                    _imagePr.Width = _w;
+                                    _imagePr.Height = _h;
+                                }
+                            }
+
+                            break;
                         }
-
-                        break;
-                    }
-                    case 255:
-                    default:
-                    {
-                        _continue = false;
-                        break;
+                        case 255:
+                        default:
+                        {
+                            _continue = false;
+                            break;
+                        }
                     }
                 }
+
+                ws.objectRender.controller.setGraphicObjectProps(_imagePr);
+
+               // _api.asc_setGraphicObjectProps(_imagePr);
             }
-
-            var ws = _api.wb.getWorksheet();
-            var objectRender = ws.objectRender;
-            ws.objectRender.setGraphicObjectProps(_imagePr);
-
-           // _api.asc_setGraphicObjectProps(_imagePr);
             break;
         }
 
