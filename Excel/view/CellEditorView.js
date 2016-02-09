@@ -807,8 +807,9 @@
          var parres = parserTest.parse(s,cb);
          var __e__ = new Date().getTime();
          console.log("e-s "+ (__e__ - __s__));*/
+        var ws = this.handlers.trigger("getCellFormulaEnterWSOpen" ).model || this.handlers.trigger("getActiveWS");
 
-        this._formula = new parserFormula( s.substr( 1 ), "A1", Asc.editor.wbModel.getActiveWs() );
+        this._formula = new parserFormula( s.substr( 1 ), "A1", ws );
         this._formula.parse();
 
         var r, offset, _e, _s, wsName = null;
@@ -852,6 +853,23 @@
                         _s = _e - r.oper.value.length;
                         break;
                     }
+                    /*case cElementType.name          :{
+                        continue;
+                        var nameRef = r.oper.toRef();
+                        switch( nameRef.type ){
+                            case cElementType.cellsRange          :{
+                                break;
+                            }
+                            case cElementType.cellsRange3D          :{
+                                break;
+                            }
+                            case cElementType.cell3D        :{
+                                break;
+                            }
+                        }
+                        wsName = nameRef.getWS().getName();
+                        break;
+                    }*/
                     default                         : continue;
                 }
 
@@ -884,9 +902,10 @@
         }
 
         /*не нашли диапазонов под курсором, парсим формулу*/
-        var r, offset, _e, _s, wsName = null, ret = false;
+        var r, offset, _e, _s, wsName = null, ret = false,
+            ws = this.handlers.trigger("getCellFormulaEnterWSOpen" ).model || this.handlers.trigger("getActiveWS");
 
-        this._formula = new parserFormula( s.substr( 1 ), "A1", Asc.editor.wbModel.getActiveWs() );
+        this._formula = new parserFormula( s.substr( 1 ), "A1", ws );
         this._formula.parse();
 
         if ( this._formula.RefPos && this._formula.RefPos.length > 0 ) {

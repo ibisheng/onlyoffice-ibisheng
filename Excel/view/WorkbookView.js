@@ -499,6 +499,8 @@
 						return self.cellFormulaEnterWSOpen ? self.cellFormulaEnterWSOpen.getFormulaRanges() : self.getWorksheet().getFormulaRanges();
 					}, "getCellFormulaEnterWSOpen": function() {
 						return self.cellFormulaEnterWSOpen;
+					}, "getActiveWS": function() {
+						return self.getWorksheet().model;
 					}, "setStrictClose": function(val) {
 						self.controller.setStrictClose(val);
 					}, "updateEditorSelectionInfo": function(info) {
