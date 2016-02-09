@@ -807,7 +807,7 @@
          var parres = parserTest.parse(s,cb);
          var __e__ = new Date().getTime();
          console.log("e-s "+ (__e__ - __s__));*/
-        var ws = this.handlers.trigger("getCellFormulaEnterWSOpen" ).model || this.handlers.trigger("getActiveWS");
+        var ws = this.handlers.trigger("getCellFormulaEnterWSOpen" ) ? this.handlers.trigger("getCellFormulaEnterWSOpen" ).model : this.handlers.trigger("getActiveWS");
 
         this._formula = new parserFormula( s.substr( 1 ), "A1", ws );
         this._formula.parse();
@@ -903,7 +903,7 @@
 
         /*не нашли диапазонов под курсором, парсим формулу*/
         var r, offset, _e, _s, wsName = null, ret = false,
-            ws = this.handlers.trigger("getCellFormulaEnterWSOpen" ).model || this.handlers.trigger("getActiveWS");
+            ws = this.handlers.trigger("getCellFormulaEnterWSOpen" ) ? this.handlers.trigger("getCellFormulaEnterWSOpen" ).model : this.handlers.trigger("getActiveWS");
 
         this._formula = new parserFormula( s.substr( 1 ), "A1", ws );
         this._formula.parse();
