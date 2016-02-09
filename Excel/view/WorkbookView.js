@@ -1468,7 +1468,7 @@
 				var ws = this.getWorksheet();
 				// Останавливаем ввод данных в редакторе ввода. Если в режиме ввода формул, то продолжаем работать с cellEditor'ом, чтобы можно было
                 // выбирать ячейки для формулы
-				if (ws.getCellEditMode() && !this.cellEditor.isFormula() && !isResized)
+				if (ws.getCellEditMode() && !(this.cellEditor && this.cellEditor.isFormula()) && !isResized)
 					this._onStopCellEditing();
 				// Делаем очистку селекта
 				ws.cleanSelection();
@@ -1478,18 +1478,20 @@
 
 //            if( ws && ws.getCellEditMode() && this.cellEditor.isFormula() ){
             /*запоминаем лист, на котором был открыт редактор ячейки, для работы cellEditor в режиме ввода ячеек с другого листа*/
-            if( this.cellEditor.formulaIsOperator() ){
-                var _ws = this.getWorksheet()
-                if( !this.cellFormulaEnterWSOpen )
-                    this.cellFormulaEnterWSOpen = tmpWorksheet = _ws;
-                else{
-                    this.cellEditor._showCanvas();
-                    _ws.setFormulaEditMode(false);
+            if (this.cellEditor) {
+                if( this.cellEditor.formulaIsOperator() ){
+                    var _ws = this.getWorksheet()
+                    if( !this.cellFormulaEnterWSOpen )
+                        this.cellFormulaEnterWSOpen = tmpWorksheet = _ws;
+                    else{
+                        this.cellEditor._showCanvas();
+                        _ws.setFormulaEditMode(false);
+                    }
                 }
-            }
-            else{
-                if (this.getWorksheet().getCellEditMode() && !isResized)
-                    this._onStopCellEditing();
+                else{
+                    if (this.getWorksheet().getCellEditMode() && !isResized)
+                        this._onStopCellEditing();
+                }
             }
 //            }
 
@@ -1531,18 +1533,19 @@
                 ws.objectRender.controller.updateSelectionState();
                 ws.objectRender.controller.updateOverlay();
             }
+            if (this.cellEditor) {
+                if( this.cellFormulaEnterWSOpen && ws.model.getId() == this.cellFormulaEnterWSOpen.model.getId() ){
+                    this.cellFormulaEnterWSOpen = null;
+                    this.cellEditor._showCanvas();
+                }
 
-            if( this.cellFormulaEnterWSOpen && ws.model.getId() == this.cellFormulaEnterWSOpen.model.getId() ){
-                this.cellFormulaEnterWSOpen = null;
-                this.cellEditor._showCanvas();
-            }
-
-            if ( this.cellFormulaEnterWSOpen && this.cellFormulaEnterWSOpen.getCellEditMode() && this.cellEditor.isFormula() && ws.model.getId() != this.cellFormulaEnterWSOpen.model.getId() ) {
-                /*скрываем cellEditor, в редактор добавляем %selected sheet name%+"!" */
-                this.cellFormulaEnterWSOpen.setFormulaEditMode( true );
-                this.cellEditor._hideCanvas();
-                ws.cleanSelection();
-                ws.setFormulaEditMode(true);
+                if ( this.cellFormulaEnterWSOpen && this.cellFormulaEnterWSOpen.getCellEditMode() && this.cellEditor.isFormula() && ws.model.getId() != this.cellFormulaEnterWSOpen.model.getId() ) {
+                    /*скрываем cellEditor, в редактор добавляем %selected sheet name%+"!" */
+                    this.cellFormulaEnterWSOpen.setFormulaEditMode( true );
+                    this.cellEditor._hideCanvas();
+                    ws.cleanSelection();
+                    ws.setFormulaEditMode(true);
+                }
             }
 
 			if (isSendInfo) {
