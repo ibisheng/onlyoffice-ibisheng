@@ -263,6 +263,8 @@ CChartSpace.prototype.recalculate = function()
         }
         this.updateLinks();
 
+
+        var bCheckLabels = false;
         if(this.recalcInfo.recalcTitle)
         {
             this.recalculateChartTitleEditMode(true);
@@ -366,6 +368,7 @@ CChartSpace.prototype.recalculate = function()
         {
             this.recalculateAxis();
             this.recalcInfo.recalculateAxisVal = false;
+            bCheckLabels = true;
         }
 
         if(this.recalcInfo.recalculatePenBrush)
@@ -378,7 +381,10 @@ CChartSpace.prototype.recalculate = function()
         {
             this.recalculateChart();
             this.recalcInfo.recalculateChart = false;
-            this.checkAxisLabelsTransform();
+            if(bCheckLabels)
+            {
+                this.checkAxisLabelsTransform();
+            }
         }
 
         for(var i = 0; i < this.recalcInfo.dataLbls.length; ++i)

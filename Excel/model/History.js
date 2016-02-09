@@ -467,7 +467,7 @@ CHistory.prototype.Get_RecalcData = function(Point2)
 
 					if ( /*true === Item.NeedRecalc*/ Item.Class && Item.Class.Refresh_RecalcData )
 						Item.Class.Refresh_RecalcData( Item.Data );
-					if(Item.Type === historyitem_Workbook_ChangeColorScheme)
+					if(Item.Type === historyitem_Workbook_ChangeColorScheme && Item.Class === g_oUndoRedoWorkbook)
 					{
 						var wsViews = Asc["editor"].wb.wsViews;
 						for(var i = 0; i < wsViews.length; ++i)

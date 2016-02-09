@@ -5392,8 +5392,8 @@ CChartSpace.prototype =
 						 for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
 						{
 							oLabel = oAxisLabels.arrLabels[i];
-							deltaX = oLabel.transformText.tx - oCatAx.xPoints[i].pos;
-							deltaY = oLabel.transformText.ty - oAxisLabels.y;
+							deltaX = oLabel.localTransformText.tx - oCatAx.xPoints[i].pos;
+							deltaY = oLabel.localTransformText.ty - oAxisLabels.y;
 							oNewPos = oCatAx.transformXPoints[i];
 							oLabel.setPosition(oNewPos.x + deltaX, oNewPos.y + deltaY);
 						}
@@ -5406,8 +5406,8 @@ CChartSpace.prototype =
 						for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
 						{
 							oLabel = oAxisLabels.arrLabels[i];
-							deltaX = oLabel.transformText.tx - oAxisLabels.x;
-							deltaY = oLabel.transformText.ty - oValAx.yPoints[i].pos;
+							deltaX = oLabel.localTransformText.tx - oAxisLabels.x;
+							deltaY = oLabel.localTransformText.ty - oValAx.yPoints[i].pos;
 							oNewPos = oValAx.transformYPoints[i];
 							oLabel.setPosition(oNewPos.x + deltaX, oNewPos.y + deltaY);
 						}
@@ -5424,8 +5424,8 @@ CChartSpace.prototype =
                         for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
                         {
                             oLabel = oAxisLabels.arrLabels[i];
-                            deltaX = oLabel.transformText.tx - oValAx.xPoints[i].pos;
-                            deltaY = oLabel.transformText.ty - oAxisLabels.y;
+                            deltaX = oLabel.localTransformText.tx - oValAx.xPoints[i].pos;
+                            deltaY = oLabel.localTransformText.ty - oAxisLabels.y;
                             oNewPos = oValAx.transformXPoints[i];
                             oLabel.setPosition(oNewPos.x + deltaX, oNewPos.y + deltaY);
                         }
@@ -5439,8 +5439,8 @@ CChartSpace.prototype =
                         for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
                         {
                             oLabel = oAxisLabels.arrLabels[i];
-                            deltaX = oLabel.transformText.tx - oAxisLabels.x;
-                            deltaY = oLabel.transformText.ty - oCatAx.yPoints[i].pos;
+                            deltaX = oLabel.localTransformText.tx - oAxisLabels.x;
+                            deltaY = oLabel.localTransformText.ty - oCatAx.yPoints[i].pos;
                             oNewPos = oCatAx.transformYPoints[i];
                             oLabel.setPosition(oNewPos.x + deltaX, oNewPos.y + deltaY);
                         }

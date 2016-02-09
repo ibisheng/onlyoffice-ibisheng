@@ -255,6 +255,7 @@ CChartSpace.prototype.recalculate = function()
             this.recalcInfo.bRecalculatedTitle = true;
         }
         var b_transform = false;
+        var bCheckLabels = false;
         if(this.recalcInfo.recalculateTransform)
         {
             this.recalculateTransform();
@@ -359,6 +360,7 @@ CChartSpace.prototype.recalculate = function()
         {
             this.recalculateAxis();
             this.recalcInfo.recalculateAxisVal = false;
+            bCheckLabels = true;
         }
 
 
@@ -373,7 +375,10 @@ CChartSpace.prototype.recalculate = function()
         {
             this.recalculateChart();
             this.recalcInfo.recalculateChart = false;
-            this.checkAxisLabelsTransform();
+            if(bCheckLabels)
+            {
+                this.checkAxisLabelsTransform();
+            }
         }
 
 
