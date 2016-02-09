@@ -1196,7 +1196,7 @@
 				// Порядок эвентов для dblClick - http://javascript.ru/tutorial/events/mouse#dvoynoy-levyy-klik
 
 				// Проверка для IE, т.к. он присылает DblClick при сдвиге мыши...
-				if (this.mouseDownLastCord && coord.x === this.mouseDownLastCord.x && coord.y === this.mouseDownLastCord.y && 0 === event.button) {
+				if (this.mouseDownLastCord && coord.x === this.mouseDownLastCord.x && coord.y === this.mouseDownLastCord.y && 0 === event.button && !this.handlers.trigger('isFormatPainter')) {
 					// Выставляем, что мы уже сделали dblClick (иначе вдруг браузер не поддерживает свойство detail)
 					this.isDblClickInMouseDown = true;
 					// Нам нужно обработать эвент браузера о dblClick (если мы редактируем ячейку, то покажем курсор, если нет - то просто ничего не произойдет)
@@ -1491,13 +1491,15 @@
 		};
 
 		/** @param event {KeyboardEvent} */
-		asc_CEventsController.prototype._onMouseDblClick = function (event) {
-			if (this.handlers.trigger("isGlobalLockEditCell"))
+		asc_CEventsController.prototype._onMouseDblClick = function(event) {
+			if (this.handlers.trigger('isGlobalLockEditCell') || this.handlers.trigger('isFormatPainter')) {
 				return false;
+			}
 
 			// Браузер не поддерживает свойство detail (будем делать по координатам)
-			if (false === this.isDblClickInMouseDown)
+			if (false === this.isDblClickInMouseDown) {
 				return this.doMouseDblClick(event, /*isHideCursor*/false);
+			}
 
 			this.isDblClickInMouseDown = false;
 
