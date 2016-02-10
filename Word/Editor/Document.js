@@ -13059,6 +13059,22 @@ CDocument.prototype =
         }
     },
 
+    Get_ColumnsProps : function()
+    {
+        // Обновляем настройки колонок
+        var CurPos = this.CurPos.ContentPos;
+        var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
+
+        var ColumnsPr = new CDocumentColumnsProps();
+        if (SectPr)
+        {
+            ColumnsPr.From_SectPr(SectPr);
+            this.Api.sync_ColumnsPropsCallback(ColumnsPr);
+        }
+
+        return ColumnsPr;
+    },
+
     /**
      * Отключаем отсылку сообщений в интерфейс.
      */
@@ -16194,6 +16210,9 @@ CDocument.prototype.Get_NumberingInfo = function(NumberingEngine, ParaId, NumPr)
 };
 CDocument.prototype.private_RecalculateNumbering = function(Elements)
 {
+    if (true === g_oIdCounter.m_bLoad)
+        return;
+
     for (var Index = 0, Count = Elements.length; Index < Count; ++Index)
     {
         var Element = Elements[Index];

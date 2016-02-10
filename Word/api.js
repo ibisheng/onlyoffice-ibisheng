@@ -3411,7 +3411,12 @@ asc_docs_api.prototype.asc_SetColumnsProps = function(ColumnsProps)
 {
     this.WordControl.m_oLogicDocument.Set_ColumnsProps(ColumnsProps);
 };
+asc_docs_api.prototype.asc_GetColumnsProps = function()
+{
+    return this.WordControl.m_oLogicDocument.Get_ColumnsProps();
+};
 asc_docs_api.prototype["asc_SetColumnsProps"] = asc_docs_api.prototype.asc_SetColumnsProps;
+asc_docs_api.prototype["asc_GetColumnsProps"] = asc_docs_api.prototype.asc_GetColumnsProps;
 asc_docs_api.prototype.sync_ColumnsPropsCallback = function(ColumnsProps)
 {
     this.asc_fireCallback("asc_onColumnsProps", ColumnsProps);
