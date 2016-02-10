@@ -5206,8 +5206,8 @@ function offline_apply_event(type,params) {
                                 if (bIsNeed)
                                 {
                                     var _originSize = window["native"]["GetOriginalImageSize"](urlSource);
-                                    var _w = _originSize[0] * 25.4 / 96.0;
-                                    var _h = _originSize[1] * 25.4 / 96.0;
+                                    var _w = _originSize[0] * 25.4 / 96.0 / window.native["GetDeviceScale"]();
+                                    var _h = _originSize[1] * 25.4 / 96.0 / window.native["GetDeviceScale"]();
 
                                     _imagePr.ImageUrl = undefined;
 
