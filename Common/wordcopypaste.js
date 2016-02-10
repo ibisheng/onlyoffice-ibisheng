@@ -1479,7 +1479,8 @@ CopyProcessor.prototype =
 				//пишем метку и длины
 				this.oPresentationWriter.WriteString2("Drawings");
 				this.oPresentationWriter.WriteULong(elements.length);
-
+				
+				window.global_pptx_content_writer.Start_UseFullUrl();
 				for(var i = 0; i < elements.length; ++i)
 				{
 					if(!(elements[i].Drawing instanceof CGraphicFrame))
@@ -1504,6 +1505,7 @@ CopyProcessor.prototype =
 						this.oPresentationWriter.WriteString2(elements[i].ImageUrl);
 					}
 				}
+				window.global_pptx_content_writer.End_UseFullUrl();
 			}
 			else if(elementsContent.SlideObjects && elementsContent.SlideObjects.length)//пишем слайды целиком
 			{
@@ -4568,6 +4570,9 @@ PasteProcessor.prototype =
     {
         var loader = new BinaryPPTYLoader();
         loader.Start_UseFullUrl();
+		
+		window.global_pptx_content_loader.Reader.Start_UseFullUrl();
+		
         loader.stream = stream;
         loader.presentation = editor.WordControl.m_oLogicDocument;
         var presentation = editor.WordControl.m_oLogicDocument;
@@ -4634,8 +4639,12 @@ PasteProcessor.prototype =
 				}
 			}
         }
-
-        return {arrShapes: arr_shapes, arrImages: loader.End_UseFullUrl(), arrTransforms: arr_transforms};
+		
+		var chartImages = window.global_pptx_content_loader.Reader.End_UseFullUrl();
+		var images = loader.End_UseFullUrl();
+		var allImages = chartImages.concat(images);
+		
+        return {arrShapes: arr_shapes, arrImages: allImages, arrTransforms: arr_transforms};
     },
 
     ReadPresentationSlides: function(stream)
