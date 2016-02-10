@@ -7728,7 +7728,7 @@ Paragraph.prototype =
     {
         if ( true === this.CompiledPr.NeedRecalc )
         {
-            if ( undefined !== this.Parent && null !== this.Parent )
+            if (undefined !== this.Parent && null !== this.Parent && true !== g_oIdCounter.m_bLoad)
             {
                 this.CompiledPr.Pr = this.Internal_CompileParaPr2();
                 if(!this.bFromDocument)
@@ -7737,9 +7737,6 @@ Paragraph.prototype =
                     this.PresentationPr.Bullet =  this.CompiledPr.Pr.ParaPr.Get_PresentationBullet();
                     this.Numbering.Bullet = this.PresentationPr.Bullet;
                 }
-
-                if (true !== g_oIdCounter.m_bLoad)
-                    this.CompiledPr.NeedRecalc = false;
             }
             else
             {
@@ -7752,6 +7749,9 @@ Paragraph.prototype =
                     };
                     this.CompiledPr.Pr.ParaPr.Init_Default();
                     this.CompiledPr.Pr.TextPr.Init_Default();
+
+                    this.CompiledPr.Pr.ParaPr.StyleTabs  = new CParaTabs();
+                    this.CompiledPr.Pr.ParaPr.StyleNumPr = undefined;
                 }
 
                 this.CompiledPr.NeedRecalc = true;
