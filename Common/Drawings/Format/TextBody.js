@@ -663,7 +663,17 @@ CTextBody.prototype =
 
     Get_Styles: function(level)
     {
-        return this.parent.getStyles(level);
+        if(this.parent)
+        {
+            return this.parent.getStyles(level);
+        }
+        return ExecuteNoHistory(function(){
+            var oStyles = new CStyles(false);
+            var Style_Para_Def = new CStyle( "Normal", null, null, styletype_Paragraph );
+            Style_Para_Def.Create_Default_Paragraph();
+            oStyles.Default.Paragraph = oStyles.Add( Style_Para_Def );
+            return {styles: oStyles, lastId: oStyles.Default.Paragraph};
+        }, this, []);
     },
 
     Is_Cell: function()

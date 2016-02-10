@@ -489,6 +489,8 @@ CHistory.prototype.Reset_RecalcIndex = function()
 	this.RecIndex = this.Index;
 };
 
+CHistory.prototype.Add_RecalcNumPr = function()
+{};
 
 CHistory.prototype.Set_Additional_ExtendDocumentToPos = function()
 {
