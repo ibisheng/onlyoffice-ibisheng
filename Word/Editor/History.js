@@ -19,15 +19,19 @@ function CHistory(Document)
 
     this.RecalculateData =
     {
-        Inline : { Pos : -1, PageNum : 0 },
-        Flow   : [],
-        HdrFtr : [],
-        Drawings:
-        {
-            All:      false,
-            Map:      {},
-            ThemeInfo: null
-        }
+        Inline   : {Pos : -1, PageNum : 0},
+        Flow     : [],
+        HdrFtr   : [],
+        Drawings : {
+            All       : false,
+            Map       : {},
+            ThemeInfo : null
+        },
+
+        Tables : [],
+        NumPr  : [],
+
+        Update : true
     };
 
 	this.TurnOffHistory = 0;
@@ -432,24 +436,31 @@ CHistory.prototype =
 
     Internal_RecalcData_Clear : function()
     {
+        // NumPr здесь не обнуляем
+        var NumPr = this.RecalculateData.NumPr;
         this.RecalculateData =
         {
-            Inline : { Pos : -1, PageNum : 0 },
-            Flow   : [],
-            HdrFtr : [],
-            Drawings:
-            {
-                All: false,
-                Map: {},
-                ThemeInfo: null
+            Inline   : {Pos : -1, PageNum : 0},
+            Flow     : [],
+            HdrFtr   : [],
+            Drawings : {
+                All       : false,
+                Map       : {},
+                ThemeInfo : null
             },
 
-            Tables : []
+            Tables : [],
+            NumPr  : NumPr,
+
+            Update : true
         };
     },
 
     RecalcData_Add : function(Data)
     {
+        if (true !== this.RecalculateData.Update)
+            return;
+
         if ( "undefined" === typeof(Data) || null === Data )
             return;
 
@@ -541,6 +552,12 @@ CHistory.prototype =
         }
     },
 
+    Add_RecalcNumPr : function(NumPr)
+    {
+        if (undefined !== NumPr && null !== NumPr && undefined !== NumPr.NumId)
+            this.RecalculateData.NumPr[NumPr.NumId] = true;
+    },
+
     Add_RecalcTableGrid : function(TableId)
     {
         this.RecalculateData.Tables[TableId] = true;
@@ -560,6 +577,28 @@ CHistory.prototype =
                 }
             }
         }
+
+        // Делаем это, чтобы пересчитались ячейки таблиц, в которых есть заданная нумерация. Но нам не нужно менять
+        // начальную точку пересчета здесь, т.к. начальная точка уже рассчитана правильно.
+        this.RecalculateData.Update = false;
+        for (var NumId in this.RecalculateData.NumPr)
+        {
+            var NumPr = new CNumPr();
+            NumPr.NumId = NumId;
+            for (var Lvl = 0; Lvl < 9; ++Lvl)
+            {
+                NumPr.Lvl = Lvl;
+                var AllParagraphs = this.Document.Get_AllParagraphsByNumbering(NumPr);
+                var Count = AllParagraphs.length;
+                for (var Index = 0; Index < Count; ++Index)
+                {
+                    var Para = AllParagraphs[Index];
+                    Para.Refresh_RecalcData2(0);
+                }
+            }
+        }
+        this.RecalculateData.NumPr = [];
+        this.RecalculateData.Update = true;
     },
 
     Check_UninonLastPoints : function()
@@ -697,24 +736,31 @@ CHistory.prototype =
       return false;
     },
 
-    Get_RecalcData : function()
+    Get_RecalcData : function(RecalcData)
     {
-        if ( this.Index >= 0 )
+        if (RecalcData)
         {
-            this.Internal_RecalcData_Clear();
-
-            for ( var Pos = this.RecIndex + 1; Pos <= this.Index; Pos++ )
+            this.RecalculateData = RecalcData;
+        }
+        else
+        {
+            if (this.Index >= 0)
             {
-                // Считываем изменения, начиная с последней точки, и смотрим что надо пересчитать.
-                var Point = this.Points[Pos];
+                this.Internal_RecalcData_Clear();
 
-                // Выполняем все действия в прямом порядке
-                for ( var Index = 0; Index < Point.Items.length; Index++ )
+                for (var Pos = this.RecIndex + 1; Pos <= this.Index; Pos++)
                 {
-                    var Item = Point.Items[Index];
+                    // Считываем изменения, начиная с последней точки, и смотрим что надо пересчитать.
+                    var Point = this.Points[Pos];
 
-                    if ( true === Item.NeedRecalc )
-                        Item.Class.Refresh_RecalcData( Item.Data );
+                    // Выполняем все действия в прямом порядке
+                    for (var Index = 0; Index < Point.Items.length; Index++)
+                    {
+                        var Item = Point.Items[Index];
+
+                        if (true === Item.NeedRecalc)
+                            Item.Class.Refresh_RecalcData(Item.Data);
+                    }
                 }
             }
         }

@@ -6193,6 +6193,21 @@ CTable.prototype =
         var Page    = this.Pages[CurPage];
         var PageAbs = this.private_GetAbsolutePageIndex(CurPage);
 
+        if (this.Parent && selectionflag_Numbering === this.Parent.Selection.Flag)
+        {
+            for (var CurRow = 0, RowsCount = this.Get_RowsCount(); CurRow < RowsCount; ++CurRow)
+            {
+                var Row = this.Get_Row(CurRow);
+                for (var CurCell = 0, CellsCount = Row.Get_CellsCount(); CurCell < CellsCount; ++CurCell)
+                {
+                    var Cell = Row.Get_Cell(CurCell);
+                    var Cell_PageRel = CurPage - Cell.Content.Get_StartPage_Relative();
+                    Cell.Content.Selection_Draw_Page(Cell_PageRel);
+                }
+            }
+            return;
+        }
+
         switch (this.Selection.Type)
         {
             case table_Selection_Cell:
@@ -8625,7 +8640,9 @@ CTable.prototype =
         if ( true === this.CompiledPr.NeedRecalc )
         {
             this.CompiledPr.Pr = this.Internal_Compile_Pr();
-            this.CompiledPr.NeedRecalc = false;
+
+            if (true !== g_oIdCounter.m_bLoad)
+                this.CompiledPr.NeedRecalc = false;
         }
 
         if ( false === bCopy )
@@ -12961,7 +12978,24 @@ CTable.prototype.Correct_BadTable = function()
     //       сделать нормальный обсчет для случая, когда у нас есть "пустые" строки (составленные
     //       из вертикально объединенных ячеек).
     this.Internal_Check_TableRows(false);
+};
+CTable.prototype.Get_NumberingInfo = function(NumberingEngine)
+{
+    if (NumberingEngine.Is_Found())
+        return;
 
+    for (var CurRow = 0, RowsCount = this.Get_RowsCount(); CurRow < RowsCount; ++CurRow)
+    {
+        var Row = this.Get_Row(CurRow);
+        for (var CurCell = 0, CellsCount = Row.Get_CellsCount(); CurCell < CellsCount; ++CurCell)
+        {
+            var Cell = Row.Get_Cell(CurCell);
+            Cell.Content.Get_NumberingInfo(NumberingEngine);
+
+            if (NumberingEngine.Is_Found())
+                return;
+        }
+    }
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook

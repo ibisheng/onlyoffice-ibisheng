@@ -1545,7 +1545,7 @@ CDocument.prototype =
         var MainChange = false;  
 
         // Получаем данные об произошедших изменениях
-        var RecalcData = ( undefined === _RecalcData ? History.Get_RecalcData() : _RecalcData );
+        var RecalcData = History.Get_RecalcData(_RecalcData);
 
         History.Reset_RecalcIndex();
 
@@ -10060,11 +10060,13 @@ CDocument.prototype =
 
         this.Selection_Remove();
 
-        this.Selection.Use  = true;
-        this.Selection.Flag = selectionflag_Numbering;
-        this.Selection.Data = [];
+        this.Selection.Use      = true;
+        this.Selection.Flag     = selectionflag_Numbering;
+        this.Selection.Data     = [];
         this.Selection.StartPos = Index;
         this.Selection.EndPos   = Index;
+
+        //var
 
         for ( var Index = 0; Index < this.Content.length; Index++ )
         {
@@ -11512,57 +11514,8 @@ CDocument.prototype =
 
     Internal_GetNumInfo : function(ParaId, NumPr)
     {
-        this.NumInfoCounter++;
-        var NumInfo = new Array(NumPr.Lvl + 1);
-        for ( var Index = 0; Index < NumInfo.length; Index++ )
-            NumInfo[Index] = 0;
-
-        // Этот параметр контролирует уровень, начиная с которого делаем рестарт для текущего уровня
-        var Restart = [-1,-1,-1,-1,-1,-1,-1,-1,-1];
-        var AbstractNum = null;
-        if ( "undefined" != typeof(this.Numbering) && null != ( AbstractNum = this.Numbering.Get_AbstractNum(NumPr.NumId) ) )
-        {
-            for ( var LvlIndex = 0; LvlIndex < 9; LvlIndex++ )
-                Restart[LvlIndex] = AbstractNum.Lvl[LvlIndex].Restart;
-        }
-
-        var PrevLvl = -1;
-        for ( var Index = 0; Index < this.Content.length; Index++ )
-        {
-            var Item = this.Content[Index];
-
-            var ItemNumPr = null;
-            if ( type_Paragraph == Item.GetType() && undefined != ( ItemNumPr = Item.Numbering_Get() ) && ItemNumPr.NumId == NumPr.NumId && ( undefined === Item.Get_SectionPr() || true !== Item.IsEmpty() ) )
-            {
-                // Делаем рестарты, если они нужны
-                if ( -1 != PrevLvl && PrevLvl < ItemNumPr.Lvl )
-                {
-                    for ( var Index2 = PrevLvl + 1; Index2 < 9; Index2++ )
-                    {
-                        if ( 0 != Restart[Index2] && ( -1 == Restart[Index2] || PrevLvl <= (Restart[Index2] - 1 ) ) )
-                            NumInfo[Index2] = 0;
-                    }
-                }
-
-                if ( "undefined" == typeof(NumInfo[ItemNumPr.Lvl]) )
-                    NumInfo[ItemNumPr.Lvl] = 0;
-                else
-                    NumInfo[ItemNumPr.Lvl]++;
-
-                for ( var Index2 = ItemNumPr.Lvl - 1; Index2 >= 0; Index2-- )
-                {
-                    if ( "undefined" == typeof(NumInfo[Index2]) || 0 == NumInfo[Index2] )
-                        NumInfo[Index2] = 1;
-                }
-
-                PrevLvl = ItemNumPr.Lvl;
-            }
-
-            if ( ParaId == Item.GetId() )
-                break;
-        }
-
-        return NumInfo;
+        var TopDocument = this.Get_TopDocumentContent();
+        return TopDocument.Get_NumberingInfo(null, ParaId, NumPr);
     },
 
     Get_Styles : function()
@@ -11683,7 +11636,7 @@ CDocument.prototype =
         if ( "undefined" == typeof(NextObj) )
             NextObj = null;
 
-
+        this.private_RecalculateNumbering([NewObject]);
         this.History.Add( this, { Type : historyitem_Document_AddItem, Pos : Position, Item : NewObject } );
         this.Content.splice( Position, 0, NewObject );
         NewObject.Set_Parent( this );
@@ -11732,7 +11685,8 @@ CDocument.prototype =
         }
 
         this.History.Add( this, { Type : historyitem_Document_RemoveItem, Pos : Position, Items : this.Content.slice( Position, Position + Count ) } );
-        this.Content.splice( Position, Count );
+        var Elements = this.Content.splice( Position, Count );
+        this.private_RecalculateNumbering(Elements);
 
         if ( null != PrevObj )
             PrevObj.Set_DocumentNext( NextObj );
@@ -13436,10 +13390,12 @@ CDocument.prototype =
         {
             case  historyitem_Document_AddItem:
             {
-                this.Content.splice( Data.Pos, 1 );
+                var Pos = Data.Pos;
+                var Elements = this.Content.splice(Pos, 1);
+                this.private_RecalculateNumbering(Elements);
 
                 // Обновим информацию о секциях
-                this.SectionsInfo.Update_OnRemove( Data.Pos, 1 );
+                this.SectionsInfo.Update_OnRemove(Pos, 1);
 
                 break;
             }
@@ -13451,6 +13407,7 @@ CDocument.prototype =
                 var Array_start = this.Content.slice( 0, Pos );
                 var Array_end   = this.Content.slice( Pos );
 
+                this.private_RecalculateNumbering(Data.Items);
                 this.Content = Array_start.concat( Data.Items, Array_end );
 
                 // Обновим информацию о секциях
@@ -13492,6 +13449,8 @@ CDocument.prototype =
                 var Pos = Data.Pos;
                 this.Content.splice( Pos, 0, Data.Item );
 
+                this.private_RecalculateNumbering([Data.Item]);
+
                 // Обновим информацию о секциях
                 this.SectionsInfo.Update_OnAdd( Data.Pos, [ Data.Item ] );
 
@@ -13500,7 +13459,8 @@ CDocument.prototype =
 
             case historyitem_Document_RemoveItem:
             {
-                this.Content.splice( Data.Pos, Data.Items.length );
+                var Elements = this.Content.splice(Data.Pos, Data.Items.length);
+                this.private_RecalculateNumbering(Elements);
 
                 // Обновим информацию о секциях
                 this.SectionsInfo.Update_OnRemove( Data.Pos, Data.Items.length );
@@ -13959,6 +13919,8 @@ CDocument.prototype =
                         Element.Parent = this;
 
                         this.Content.splice(Pos, 0, Element);
+                        this.private_RecalculateNumbering([Element]);
+
                         CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
 
                         // Обновим информацию о секциях
@@ -13987,7 +13949,8 @@ CDocument.prototype =
 
                     //Pos = Math.min(Pos, this.Content.length - 1);
 
-                    this.Content.splice(Pos, 1);
+                    var Elements = this.Content.splice(Pos, 1);
+                    this.private_RecalculateNumbering(Elements);
                     CollaborativeEditing.Update_DocumentPositionsOnRemove(this, Pos, 1);
 
                     if ( Pos > 0 )
@@ -16204,6 +16167,51 @@ CDocument.prototype.Set_ColumnsProps = function(ColumnsProps)
         this.Document_UpdateRulersState();
     }
 };
+CDocument.prototype.Get_TopDocumentContent = function()
+{
+    return this;
+};
+CDocument.prototype.Get_NumberingInfo = function(NumberingEngine, ParaId, NumPr)
+{
+    if (undefined === NumberingEngine || null === NumberingEngine)
+        NumberingEngine = new CDocumentNumberingInfoEngine(ParaId, NumPr, this.Get_Numbering());
+
+    for (var Index = 0; Index < this.Content.length; ++Index)
+    {
+        var Item = this.Content[Index];
+        var ItemType = Item.Get_Type();
+
+        if (type_Paragraph === ItemType)
+            NumberingEngine.Check_Paragraph(Item);
+        else if (type_Table === ItemType)
+            Item.Get_NumberingInfo(NumberingEngine);
+
+        if (true === NumberingEngine.Is_Found())
+            break;
+    }
+
+    return NumberingEngine.Get_NumInfo();
+};
+CDocument.prototype.private_RecalculateNumbering = function(Elements)
+{
+    for (var Index = 0, Count = Elements.length; Index < Count; ++Index)
+    {
+        var Element = Elements[Index];
+        if (type_Paragraph === Element.Get_Type())
+            History.Add_RecalcNumPr(Element.Numbering_Get());
+        else if (type_Paragraph === Element.Get_Type())
+        {
+            var ParaArray = [];
+            Element.Get_AllParagraphs({All : true}, ParaArray);
+
+            for (var ParaIndex = 0, ParasCount = ParaArray.length; ParaIndex < ParasCount; ++ParaIndex)
+            {
+                var Para = ParaArray[ParaIndex];
+                History.Add_RecalcNumPr(Element.Numbering_Get());
+            }
+        }
+    }
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Settings
 //----------------------------------------------------------------------------------------------------------------------
@@ -17052,3 +17060,70 @@ function CDocumentPagePosition()
     this.Page   = 0;
     this.Column = 0;
 }
+
+function CDocumentNumberingInfoEngine(ParaId, NumPr, Numbering)
+{
+    this.ParaId    = ParaId;
+    this.NumId     = NumPr.NumId;
+    this.Lvl       = NumPr.Lvl;
+    this.Numbering = Numbering;
+    this.NumInfo   = new Array(this.Lvl + 1);
+    this.Restart   = [-1, -1, -1, -1, -1, -1, -1, -1, -1]; // Этот параметр контролирует уровень, начиная с которого делаем рестарт для текущего уровня
+    this.PrevLvl   = -1;
+    this.Found     = false;
+
+    this.Init();
+}
+
+CDocumentNumberingInfoEngine.prototype.Init = function()
+{
+    for (var Index = 0; Index < this.NumInfo.length; ++Index)
+        this.NumInfo[Index] = 0;
+
+    var AbstractNum = null;
+    if (undefined !== this.Numbering && null !== (AbstractNum = this.Numbering.Get_AbstractNum(this.NumId)))
+    {
+        for (var LvlIndex = 0; LvlIndex < 9; LvlIndex++)
+            this.Restart[LvlIndex] = AbstractNum.Lvl[LvlIndex].Restart;
+    }
+};
+CDocumentNumberingInfoEngine.prototype.Is_Found = function()
+{
+    return this.Found;
+};
+CDocumentNumberingInfoEngine.prototype.Check_Paragraph = function(Para)
+{
+    var ParaNumPr = Para.Numbering_Get();
+    if (undefined !== ParaNumPr && ParaNumPr.NumId === this.NumId && (undefined === Para.Get_SectionPr() || true !== Para.IsEmpty()))
+    {
+        // Делаем рестарты, если они нужны
+        if (-1 !== this.PrevLvl && this.PrevLvl < ParaNumPr.Lvl)
+        {
+            for ( var Index2 = this.PrevLvl + 1; Index2 < 9; ++Index2)
+            {
+                if (0 != this.Restart[Index2] && (-1 == this.Restart[Index2] || this.PrevLvl <= (this.Restart[Index2] - 1)))
+                    this.NumInfo[Index2] = 0;
+            }
+        }
+
+        if (undefined === this.NumInfo[ParaNumPr.Lvl])
+            this.NumInfo[ParaNumPr.Lvl] = 0;
+        else
+            this.NumInfo[ParaNumPr.Lvl]++;
+
+        for (var Index2 = ParaNumPr.Lvl - 1; Index2 >= 0; --Index2)
+        {
+            if (undefined === this.NumInfo[Index2] || 0 === this.NumInfo[Index2])
+                this.NumInfo[Index2] = 1;
+        }
+
+        this.PrevLvl = ParaNumPr.Lvl;
+    }
+
+    if (this.ParaId === Para.Get_Id())
+        this.Found = true;
+};
+CDocumentNumberingInfoEngine.prototype.Get_NumInfo = function()
+{
+    return this.NumInfo;
+};

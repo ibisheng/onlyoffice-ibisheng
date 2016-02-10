@@ -7144,6 +7144,8 @@ Paragraph.prototype =
                 this.Pr.NumPr = new CNumPr();
                 this.Pr.NumPr.Set( NumId, Lvl );
                 History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : NumPr_old, New : this.Pr.NumPr } );
+                this.private_RefreshNumbering(NumPr_old);
+                this.private_RefreshNumbering(this.Pr.NumPr);
             }
             else
             {
@@ -7179,6 +7181,8 @@ Paragraph.prototype =
                 this.Pr.NumPr = new CNumPr();
                 this.Pr.NumPr.Set( NumId, LvlFound );
                 History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : NumPr_old, New : this.Pr.NumPr } );
+                this.private_RefreshNumbering(NumPr_old);
+                this.private_RefreshNumbering(this.Pr.NumPr);
             }
 
             // Удалим все табы идущие в начале параграфа
@@ -7192,6 +7196,8 @@ Paragraph.prototype =
             this.Pr.NumPr.Set( NumId, Lvl );
 
             History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : NumPr_old, New : this.Pr.NumPr } );
+            this.private_RefreshNumbering(NumPr_old);
+            this.private_RefreshNumbering(this.Pr.NumPr);
 
             var Left      = ( NumPr_old.Lvl === Lvl ? undefined : ParaPr.Ind.Left );
             var FirstLine = ( NumPr_old.Lvl === Lvl ? undefined : ParaPr.Ind.FirstLine );
@@ -7225,6 +7231,8 @@ Paragraph.prototype =
 
         this.private_AddPrChange();
         History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : NumPr_old, New : this.Pr.NumPr } );
+        this.private_RefreshNumbering(NumPr_old);
+        this.private_RefreshNumbering(this.Pr.NumPr);
 
         // Надо пересчитать конечный стиль
         this.CompiledPr.NeedRecalc = true;
@@ -7248,6 +7256,8 @@ Paragraph.prototype =
 
             this.private_AddPrChange();
             History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : NumPr, New : this.Pr.NumPr } );
+            this.private_RefreshNumbering(NumPr);
+            this.private_RefreshNumbering(this.Pr.NumPr);
 
             // Надо пересчитать конечный стиль
             this.CompiledPr.NeedRecalc = true;
@@ -7288,7 +7298,13 @@ Paragraph.prototype =
         }
 
         this.private_AddPrChange();
-        History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : undefined != this.Pr.NumPr ? this.Pr.NumPr : undefined, New : NewNumPr } );
+
+        var OldNumPr = undefined != this.Pr.NumPr ? this.Pr.NumPr : undefined;
+
+        History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : OldNumPr, New : NewNumPr } );
+        this.private_RefreshNumbering(OldNumPr);
+        this.private_RefreshNumbering(NewNumPr);
+
         this.Pr.NumPr = NewNumPr;
 
         if ( undefined != this.Pr.Ind && undefined != OldNumPr )
@@ -7721,7 +7737,9 @@ Paragraph.prototype =
                     this.PresentationPr.Bullet =  this.CompiledPr.Pr.ParaPr.Get_PresentationBullet();
                     this.Numbering.Bullet = this.PresentationPr.Bullet;
                 }
-                this.CompiledPr.NeedRecalc = false;
+
+                if (true !== g_oIdCounter.m_bLoad)
+                    this.CompiledPr.NeedRecalc = false;
             }
             else
             {
@@ -10262,6 +10280,8 @@ Paragraph.prototype =
                 else
                     this.Pr.NumPr = undefined;
 
+                this.private_RefreshNumbering(this.Pr.NumPr);
+
                 this.CompiledPr.NeedRecalc = true;
                 this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
@@ -10664,6 +10684,8 @@ Paragraph.prototype =
                     this.Pr.NumPr = New;
                 else
                     this.Pr.NumPr = undefined;
+
+                this.private_RefreshNumbering(this.Pr.NumPr);
 
                 this.CompiledPr.NeedRecalc = true;
                 this.private_UpdateTrackRevisionOnChangeParaPr(false);
@@ -11718,7 +11740,7 @@ Paragraph.prototype =
                     this.Pr.NumPr = new CNumPr();
                     this.Pr.NumPr.Read_FromBinary(Reader);
                 }
-
+                this.private_RefreshNumbering(this.Pr.NumPr);
                 this.CompiledPr.NeedRecalc = true;
                 bPrChanged = true;
                 this.private_UpdateTrackRevisionOnChangeParaPr(false);
@@ -13753,6 +13775,30 @@ Paragraph.prototype.Get_CurrentColumn = function(CurPage)
 {
     this.Internal_Recalculate_CurPos(this.CurPos.ContentPos, true, false, false);
     return this.Get_AbsoluteColumn(this.CurPos.PagesPos);
+};
+Paragraph.prototype.private_RefreshNumbering = function(NumPr)
+{
+    if (undefined === NumPr || null === NumPr)
+        return;
+
+    History.Add_RecalcNumPr(NumPr);
+};
+Paragraph.prototype.Get_NumberingPage = function()
+{
+    var ParaNum = this.Numbering;
+    var NumberingRun = ParaNum.Run;
+
+    if (null === NumberingRun)
+        return -1;
+
+    var NumLine = ParaNum.Line;
+    for (var CurPage = 0, PagesCount = this.Pages.length; CurPage < PagesCount; ++CurPage)
+    {
+        if (NumLine >= this.Pages[CurPage].StartLine && NumLine <= this.Pages[CurPage].EndLine)
+            return CurPage;
+    }
+
+    return -1;
 };
 
 var pararecalc_0_All  = 0;

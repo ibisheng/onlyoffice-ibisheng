@@ -207,7 +207,9 @@ CTableRow.prototype =
         if ( true === this.CompiledPr.NeedRecalc )
         {
             this.CompiledPr.Pr = this.Internal_Compile_Pr();
-            this.CompiledPr.NeedRecalc = false;
+
+            if (true !== g_oIdCounter.m_bLoad)
+                this.CompiledPr.NeedRecalc = false;
         }
 
         if ( false === bCopy )

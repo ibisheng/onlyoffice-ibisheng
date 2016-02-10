@@ -223,7 +223,9 @@ CTableCell.prototype =
             this.CompiledPr.Pr         = FullPr.CellPr;
             this.CompiledPr.ParaPr     = FullPr.ParaPr;
             this.CompiledPr.TextPr     = FullPr.TextPr;
-            this.CompiledPr.NeedRecalc = false;
+
+            if (true !== g_oIdCounter.m_bLoad)
+                this.CompiledPr.NeedRecalc = false;
         }
 
         if ( false === bCopy )
@@ -467,6 +469,15 @@ CTableCell.prototype =
             return this.Row.Is_UseInDocument(this.Get_Id());
 
         return false;
+    },
+
+    Get_NumberingInfo : function(NumPr)
+    {
+        var Parent = this.Row.Table.Parent;
+        if (Parent && Parent.Internal_GetNumInfo)
+            return Parent.Internal_GetNumInfo(this.Row.Table.Get_Id(), NumPr);
+
+        return null;
     },
 
     Get_PageContentStartPos : function(PageNum)
@@ -2120,6 +2131,13 @@ CTableCell.prototype.Get_Table = function()
         return null;
 
     return Table;
+};
+CTableCell.prototype.Get_TopDocumentContent = function()
+{
+    if (this.Row && this.Row.Table && this.Row.Table.Parent)
+        return this.Row.Table.Parent.Get_TopDocumentContent();
+
+    return null;
 };
 
 function CTableCellRecalculateObject()
