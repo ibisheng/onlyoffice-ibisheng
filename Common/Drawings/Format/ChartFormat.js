@@ -25484,17 +25484,17 @@ CView3d.prototype =
         {
             case historyitem_View3d_SetDepthPercent:
             {
-                this.depthPercent = readObject(r);
+                this.depthPercent = readLong(r);
                 break;
             }
             case historyitem_View3d_SetHPercent:
             {
-                this.hPercent = readObject(r);
+                this.hPercent = readLong(r);
                 break;
             }
             case historyitem_View3d_SetPerspective:
             {
-                this.perspective = readObject(r);
+                this.perspective = readLong(r);
                 break;
             }
             case historyitem_View3d_SetRAngAx:
@@ -25504,12 +25504,12 @@ CView3d.prototype =
             }
             case historyitem_View3d_SetRotX:
             {
-                this.rotX = readObject(r);
+                this.rotX = readLong(r);
                 break;
             }
             case historyitem_View3d_SetRotY:
             {
-                this.rotY = readObject(r);
+                this.rotY = readLong(r);
                 break;
             }
         }
