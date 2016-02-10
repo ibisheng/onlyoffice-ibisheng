@@ -340,7 +340,7 @@
         this.nColsCount = 0;
         // Массив ячеек для текущей формулы
         this.arrActiveFormulaRanges = [];
-        this.arrActiveFormulaRangesPosition = 0;
+        this.arrActiveFormulaRangesPosition = -1;
         this.arrActiveChartsRanges = [];
         //------------------------
 
@@ -11614,7 +11614,7 @@
     };
 
     WorksheetView.prototype.activeFormulaRange = function ( range ) {
-        this.arrActiveFormulaRangesPosition = 0;
+        this.arrActiveFormulaRangesPosition = -1;
         for ( var i = 0; i < this.arrActiveFormulaRanges.length; ++i ) {
             if ( this.arrActiveFormulaRanges[i].isEqual( range ) ) {
                 this.arrActiveFormulaRangesPosition = i;

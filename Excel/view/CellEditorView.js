@@ -453,7 +453,7 @@
     CellEditor.prototype.activateCellRange = function () {
         var res = this._findRangeUnderCursor();
 
-        res.range ? this.handlers.trigger( "existedRange", res.range ) : this.handlers.trigger( "newRange" );
+        res.range ? this.handlers.trigger( "existedRange", res.range, res.wsName ) : this.handlers.trigger( "newRange" );
     };
 
     CellEditor.prototype.enterCellRange = function ( rangeStr ) {
@@ -826,7 +826,7 @@
                 switch( r.oper.type ){
                     case cElementType.cell          :{
                         if( this.handlers.trigger("getCellFormulaEnterWSOpen") ){
-                            continue;
+                            wsName = this.handlers.trigger("getCellFormulaEnterWSOpen").model.getName();
                         }
                         ret = true;
                         break;
@@ -839,7 +839,7 @@
                     }
                     case cElementType.cellsRange    :{
                         if( this.handlers.trigger("getCellFormulaEnterWSOpen") ){
-                            continue;
+                            wsName = this.handlers.trigger("getCellFormulaEnterWSOpen").model.getName();
                         }
                         ret = true;
                         break;
@@ -920,7 +920,7 @@
                 switch( r.oper.type ){
                     case cElementType.cell          :{
                         if( this.handlers.trigger("getCellFormulaEnterWSOpen") ){
-                            continue;
+                            wsName = this.handlers.trigger("getCellFormulaEnterWSOpen").model.getName();
                         }
                         ret = true;
                         break;
@@ -933,7 +933,7 @@
                     }
                     case cElementType.cellsRange    :{
                         if( this.handlers.trigger("getCellFormulaEnterWSOpen") ){
-                            continue;
+                            wsName = this.handlers.trigger("getCellFormulaEnterWSOpen").model.getName();
                         }
                         ret = true;
                         break;
@@ -953,14 +953,17 @@
                 if ( ret && t.cursorPos > _s && t.cursorPos <= _s + r.oper.value.length ) {
                     range = t._parseRangeStr( r.oper.value );
                     if( range ){
-                        return {index: _s, length: r.oper.value.length, range: range};
+                        if( this.handlers.trigger("getActiveWS") && this.handlers.trigger("getActiveWS").getName() != wsName ){
+                            return {index: -1, length: 0, range: null};
+                        }
+                        return {index: _s, length: r.oper.value.length, range: range, wsName: wsName};
                     }
                 }
             }
         }
         return !range ?
                 {index: -1, length: 0, range: null} :
-                {index: _s, length: r.oper.value.length, range: range};
+                {index: _s, length: r.oper.value.length, range: range, wsName: wsName};
 
     };
 
