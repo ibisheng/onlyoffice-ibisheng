@@ -819,7 +819,7 @@ function CBinaryFileWriter()
                 this.StartRecord(5);
                 this.EndRecord();
             }
-            if (showPr.show.range && null != showPr.show.range.start && null != showPr.show.range.end) {
+            if (showPr.show && showPr.show.range && null != showPr.show.range.start && null != showPr.show.range.end) {
                 this.StartRecord(6);
                 this.WriteUChar(g_nodeAttributeStart);
                 this._WriteInt2(0, showPr.show.range.start);
