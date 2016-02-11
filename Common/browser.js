@@ -71,7 +71,7 @@ AscBrowser.checkZoom = function()
     if (AscBrowser.isChrome && document && document.firstElementChild)
     {
         document.firstElementChild.style.zoom = "reset";
-        AscBrowser.zoom = window.outerWidth / window.innerWidth;
+        AscBrowser.zoom = document.body.clientWidth / window.innerWidth;
     }
 };
 
