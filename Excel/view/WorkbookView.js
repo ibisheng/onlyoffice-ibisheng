@@ -540,7 +540,9 @@
       }, "onScroll": function(d) {
         self.controller.scroll(d);
       }, "getLockDefNameManagerStatus": function() {
-        return self.defNameAllowCreate
+        return self.defNameAllowCreate;
+      }, 'isActive': function() {
+        return (-1 === self.copyActiveSheet || self.wsActive === self.copyActiveSheet);
       },
 		"getCellEditMode": function() {
 			return self.isCellEditMode;
@@ -1431,7 +1433,7 @@
 
                 this.copyActiveSheet = this.wsActive;
                 if( !this.cellFormulaEnterWSOpen ){
-                    this.cellFormulaEnterWSOpen = tmpWorksheet = ws;
+                    this.cellFormulaEnterWSOpen = ws;
                 } else {
                     ws.setFormulaEditMode(false);
                 }

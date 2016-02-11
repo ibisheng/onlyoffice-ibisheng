@@ -3607,10 +3607,15 @@
 
         if ( !this.isSelectionDialogMode ) {
             this._drawCollaborativeElements( /*bIsDrawObjects*/true );
-            this._drawSelectionRange( range );
         }
-        else {
-            this._drawSelectionRange( range );
+        if ((this.isSelectionDialogMode || this.isFormulaEditMode) && !this.handlers.trigger('isActive')) {
+            if (this.isSelectionDialogMode) {
+                this._drawSelectRange(this.activeRange.clone(true));
+            } else if (this.isFormulaEditMode) {
+                this._drawFormulaRanges(this.arrActiveFormulaRanges);
+            }
+        } else {
+            this._drawSelectionRange(range);
         }
     };
 

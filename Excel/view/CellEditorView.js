@@ -1751,12 +1751,12 @@
     CellEditor.prototype._changeSelection = function ( coord ) {
         var t = this;
 
-        function doChangeSelection( coord ) {
+        function doChangeSelection( coordTmp ) {
             // ToDo реализовать для слова.
             if ( c_oAscCellEditorSelectState.word === t.isSelectMode ) {
                 return;
             }
-            var pos = t._findCursorPosition( coord );
+            var pos = t._findCursorPosition( coordTmp );
             if ( pos !== undefined ) {
                 pos >= 0 ? t._selectChars( kPosition, pos ) : t._selectChars( pos );
             }
