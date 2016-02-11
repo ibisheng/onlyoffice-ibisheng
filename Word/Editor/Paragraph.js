@@ -1210,6 +1210,12 @@ Paragraph.prototype =
             Item.Recalculate_MinMaxContentWidth(MinMax);
         }
 
+        var ParaPr = this.Get_CompiledPr2(false).ParaPr;
+        var MinInd = ParaPr.Ind.Left + ParaPr.Ind.Right + ParaPr.Ind.FirstLine;
+
+        MinMax.nMinWidth += MinInd;
+        MinMax.nMaxWidth += MinInd;
+
         // добавляем 0.001, чтобы избавиться от погрешностей
         return { Min : ( MinMax.nMinWidth > 0 ?  MinMax.nMinWidth + 0.001 : 0 ), Max : ( MinMax.nMaxWidth > 0 ?  MinMax.nMaxWidth + 0.001 : 0 ) };
     },

@@ -419,8 +419,10 @@ CTable.prototype.private_RecalculateGrid = function()
                             MaxFlags[CurGridCol] = true;
                             MaxContent[CurGridCol] = CellWW;
                         }
-                        else if ( MaxContent[CurGridCol] < CellWW )
+                        else if (MaxContent[CurGridCol] < CellWW)
+                        {
                             MaxContent[CurGridCol] = CellWW;
+                        }
                     }
                 }
                 else
@@ -522,6 +524,9 @@ CTable.prototype.private_RecalculateGrid = function()
         {
             if ( true === MaxFlags[CurCol] )
                 MaxContent[CurCol] = Math.max( 0, MaxContent[CurCol] - MinMargin[CurCol] );
+
+            if (MaxContent[CurCol] < MinContent[CurCol])
+                MaxContent[CurCol] = MinContent[CurCol];
         }
 
         // 2. Проследим, чтобы значения MinContent + MinMargin и MaxContent + MinMargin не превосходили
@@ -595,15 +600,21 @@ CTable.prototype.private_RecalculateGrid = function()
 
             // Если у таблицы задана ширина, тогда ориентируемся по ширине, а если нет, тогда ориентируемся по
             // максимальным значениям.
-            if ( tblwidth_Mm === TablePr.TableW.Type )
+            if (tblwidth_Mm === TablePr.TableW.Type && TablePr.TableW.W < MaxTableW && TablePr.TableW.W < MaxTableW)
             {
-                var TableW = Math.max( SumMin, TablePr.TableW.W );
-                var TableW2 = Math.min( SumMax, MaxTableW );
-
-                // Если TableW > SumMax, тогда меням в соотношении максимумов, в противном случае меняем в соотношении минимумов
-                for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
+                if (SumMin < TablePr.TableW.W)
                 {
-                    this.TableGridCalc[CurCol] *= TableW / TableW2;
+                    for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
+                    {
+                        this.TableGridCalc[CurCol] = MinMargin[CurCol] + MinContent[CurCol] + (TablePr.TableW.W - SumMin) * MaxContent2[CurCol] / SumMaxContent2;
+                    }
+                }
+                else
+                {
+                    for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
+                    {
+                        this.TableGridCalc[CurCol] = MinMargin[CurCol] + MinContent[CurCol];
+                    }
                 }
             }
         }

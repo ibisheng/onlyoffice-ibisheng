@@ -2640,12 +2640,13 @@ CTable.prototype =
                         if ( false === MaxFlags[CurGridCol] )
                         {
                             MaxFlags[CurGridCol] = true;
-                            MaxContent[CurGridCol] = CellW.W;
+                            MaxContent[CurGridCol] = Math.max(CellW.W, CellMin);
                         }
-                        else if ( MaxContent[CurGridCol] < CellW.W )
-                            MaxContent[CurGridCol] = CellW.W;
+                        else
+                        {
+                            MaxContent[CurGridCol] = Math.max(MaxContent[CurGridCol], CellW.W, CellMin);
+                        }
                     }
-
                 }
                 else
                 {
@@ -2665,7 +2666,7 @@ CTable.prototype =
                     }
 
                     // Если у нас в объединении несколько колонок, тогда явно записанная ширина ячейки не
-                    // перекрывает ширину ни одной из колонок, она всего лишь учавствует в определении
+                    // перекрывает ширину ни одной из колонок, она всего лишь участвует в определении
                     // максимальной ширины.
                     if ( CellW.Type === tblwidth_Mm && CellW.W > CellMax )
                         CellMax = CellW.W;
