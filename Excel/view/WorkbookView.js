@@ -129,6 +129,8 @@
     this.fontRenderingMode = null;
     this.lockDraw = false;		// Lock отрисовки на некоторое время
 
+	this.isCellEditMode = false;
+
     this.formulasList = null;		// Список всех формул
     this.lastFormulaPos = -1; 		// Последняя позиция формулы
     this.lastFormulaNameLength = '';		// Последний кусок формулы
@@ -310,11 +312,17 @@
           self._onMoveResizeRangeHandleDone.apply(self, arguments);
         }, "editCell": function() {
           self._onEditCell.apply(self, arguments);
-        }, "stopCellEditing": function() {
+        },
+		  "stopCellEditing": function() {
           return self._onStopCellEditing.apply(self, arguments);
-        }, "empty": function() {
+        },
+		  "getCellEditMode": function() {
+          return self.isCellEditMode;
+        },
+		  "empty": function() {
           self._onEmpty.apply(self, arguments);
-        }, "canEnterCellRange": function() {
+        },
+		  "canEnterCellRange": function() {
           self.cellEditor.setFocus(false);
           var ret = self.cellEditor.canEnterCellRange();
           ret ? self.cellEditor.activateCellRange() : true;
@@ -424,7 +432,7 @@
           self._onStopFormatPainter();
           self.controller.setStrictClose(true);
           self.cellEditor.callTopLineMouseup = true;
-          if (!self.controller.isCellEditMode && !self.controller.isFillHandleMode) {
+          if (!self.getCellEditMode() && !self.controller.isFillHandleMode) {
             self._onEditCell(0, 0, /*isCoord*/false, /*isFocus*/true);
           }
         }, false);
@@ -533,7 +541,10 @@
         self.controller.scroll(d);
       }, "getLockDefNameManagerStatus": function() {
         return self.defNameAllowCreate
-      }
+      },
+		"getCellEditMode": function() {
+			return self.isCellEditMode;
+		}
     });
 
     this.model.handlers.add("cleanCellCache", function(wsId, oRanges, canChangeColWidth, bLockDraw, updateHeight) {
@@ -878,7 +889,7 @@
     var arrMouseMoveObjects = [];					// Теперь это массив из объектов, над которыми курсор
 
     //ToDo: включить определение target, если находимся в режиме редактирования ячейки.
-    if (this.controller.isCellEditMode && !this.controller.isFormulaEditMode) {
+    if (this.getCellEditMode() && !this.controller.isFormulaEditMode) {
       canvasElem.style.cursor = "";
     } else if (x === undefined && y === undefined) {
       ws.cleanHighlightedHeaders();
@@ -1175,10 +1186,10 @@
     var arn = ws.activeRange.clone(true);
 
     var editFunction = function() {
-      t.controller.setCellEditMode(true);
+      t.setCellEditMode(true);
       ws.setCellEditMode(true);
       if (!ws.openCellEditor(t.cellEditor, x, y, isCoord, /*fragments*/undefined, /*cursorPos*/undefined, isFocus, isClearCell, /*isHideCursor*/isHideCursor, /*isQuickInput*/isQuickInput, /*activeRange*/arn)) {
-        t.controller.setCellEditMode(false);
+        t.setCellEditMode(false);
         t.controller.setStrictClose(false);
         t.controller.setFormulaEditMode(false);
         ws.setCellEditMode(false);
@@ -1206,7 +1217,7 @@
 
     var editLockCallback = function(res) {
       if (!res) {
-        t.controller.setCellEditMode(false);
+        t.setCellEditMode(false);
         t.controller.setStrictClose(false);
         t.controller.setFormulaEditMode(false);
         ws.setCellEditMode(false);
@@ -1232,20 +1243,21 @@
   };
 
   WorkbookView.prototype._onCloseCellEditor = function() {
-    this.controller.setCellEditMode(false);
+    this.setCellEditMode(false);
     this.controller.setStrictClose(false);
     this.controller.setFormulaEditMode(false);
       var ws = this.getWorksheet(), isCellEditMode;
+	  isCellEditMode = ws.getCellEditMode();
       ws.setCellEditMode(false);
       ws.setFormulaEditMode(false);
 
       if( this.cellFormulaEnterWSOpen ){
-          ws = this.cellFormulaEnterWSOpen;
-          ws.setCellEditMode(false);
-          ws.setFormulaEditMode(false);
+		  ws = this.cellFormulaEnterWSOpen;
+		  isCellEditMode = isCellEditMode ? isCellEditMode : ws.getCellEditMode();
+		  ws.setCellEditMode(false);
+		  ws.setFormulaEditMode(false);
       }
 
-      isCellEditMode = ws.getCellEditMode();
     if (this.cellFormulaEnterWSOpen) {
       this.cellFormulaEnterWSOpen = null;
       var index = ws.model.getIndex();
@@ -1657,8 +1669,12 @@
 
   // Получаем свойство: редактируем мы сейчас или нет
   WorkbookView.prototype.getCellEditMode = function() {
-    return this.controller.isCellEditMode;
+	  return this.isCellEditMode;
   };
+
+	WorkbookView.prototype.setCellEditMode = function(flag) {
+		this.isCellEditMode = !!flag;
+	};
 
   WorkbookView.prototype.getIsTrackShape = function() {
     var ws = this.getWorksheet();
@@ -1829,7 +1845,7 @@
       var openEditor = function(res) {
         if (res) {
           // Выставляем переменные, что мы редактируем
-          t.controller.setCellEditMode(true);
+          t.setCellEditMode(true);
           ws.setCellEditMode(true);
 
           t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
@@ -1839,7 +1855,7 @@
           // Открываем, с выставлением позиции курсора
           if (!ws.openCellEditorWithText(t.cellEditor, name, cursorPos, /*isFocus*/false, /*activeRange*/arn)) {
             t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
-            t.controller.setCellEditMode(false);
+            t.setCellEditMode(false);
             t.controller.setStrictClose(false);
             t.controller.setFormulaEditMode(false);
             ws.setCellEditMode(false);
@@ -1849,7 +1865,7 @@
             t.skipHelpSelector = false;
           }
         } else {
-          t.controller.setCellEditMode(false);
+          t.setCellEditMode(false);
           t.controller.setStrictClose(false);
           t.controller.setFormulaEditMode(false);
           ws.setCellEditMode(false);
@@ -1865,7 +1881,7 @@
 
   WorkbookView.prototype.copyToClipboard = function() {
     var t = this, ws, v;
-    if (!t.controller.isCellEditMode) {
+    if (!t.getCellEditMode()) {
       ws = t.getWorksheet();
       t.clipboard.copyRange(ws.getSelectedRange(), ws);
     } else {
@@ -1878,7 +1894,7 @@
 
   WorkbookView.prototype.copyToClipboardButton = function() {
     var t = this, ws, v;
-    if (!t.controller.isCellEditMode) {
+    if (!t.getCellEditMode()) {
       ws = t.getWorksheet();
       return t.clipboard.copyRangeButton(ws.getSelectedRange(), ws);
     } else {
@@ -1893,7 +1909,7 @@
 
   WorkbookView.prototype.pasteFromClipboard = function() {
     var t = this;
-    if (!t.controller.isCellEditMode) {
+    if (!t.getCellEditMode()) {
       var ws = t.getWorksheet();
       t.clipboard.pasteRange(ws);
     } else {
@@ -1905,7 +1921,7 @@
 
   WorkbookView.prototype.pasteFromClipboardButton = function() {
     var t = this;
-    if (!t.controller.isCellEditMode) {
+    if (!t.getCellEditMode()) {
       var ws = t.getWorksheet();
       return t.clipboard.pasteRangeButton(ws);
     } else {
@@ -1917,7 +1933,7 @@
 
   WorkbookView.prototype.cutToClipboard = function() {
     var t = this, ws, v;
-    if (!t.controller.isCellEditMode && !window.USER_AGENT_SAFARI_MACOS) {
+    if (!t.getCellEditMode() && !window.USER_AGENT_SAFARI_MACOS) {
       ws = t.getWorksheet();
 
       // Запрещаем копирование диаграмм в iframe
@@ -1935,12 +1951,12 @@
   };
 
   WorkbookView.prototype.bIsEmptyClipboard = function() {
-    return this.clipboard.bIsEmptyClipboard(this.controller.isCellEditMode);
+    return this.clipboard.bIsEmptyClipboard(this.getCellEditMode());
   };
 
   WorkbookView.prototype.cutToClipboardButton = function() {
     var t = this, ws, v;
-    if (!t.controller.isCellEditMode) {
+    if (!t.getCellEditMode()) {
       ws = t.getWorksheet();
       var result = t.clipboard.copyRangeButton(ws.getSelectedRange(), ws, true);
       if (result) {
@@ -1958,7 +1974,7 @@
   };
 
   WorkbookView.prototype.undo = function() {
-    if (!this.controller.isCellEditMode) {
+    if (!this.getCellEditMode()) {
       if (!History.Undo() && this.collaborativeEditing.getFast() && this.collaborativeEditing.getCollaborativeEditing()) {
         this.Api.sync_TryUndoInFastCollaborative();
       }
@@ -1968,7 +1984,7 @@
   };
 
   WorkbookView.prototype.redo = function() {
-    if (!this.controller.isCellEditMode) {
+    if (!this.getCellEditMode()) {
       History.Redo();
     } else {
       this.cellEditor.redo();
@@ -1976,7 +1992,7 @@
   };
 
   WorkbookView.prototype.setFontAttributes = function(prop, val) {
-    if (!this.controller.isCellEditMode) {
+    if (!this.getCellEditMode()) {
       this.getWorksheet().setSelectionInfo(prop, val);
     } else {
       this.cellEditor.setTextStyle(prop, val);
@@ -1984,7 +2000,7 @@
   };
 
   WorkbookView.prototype.changeFontSize = function(prop, val) {
-    if (!this.controller.isCellEditMode) {
+    if (!this.getCellEditMode()) {
       this.getWorksheet().setSelectionInfo(prop, val);
     } else {
       this.cellEditor.setTextStyle(prop, val);
@@ -1992,7 +2008,7 @@
   };
 
   WorkbookView.prototype.emptyCells = function(options) {
-    if (!this.controller.isCellEditMode) {
+    if (!this.getCellEditMode()) {
       this.getWorksheet().emptySelection(options);
       this.restoreFocus();
     } else {
