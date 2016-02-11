@@ -748,6 +748,10 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
             var isColumnBreakOnPrevLine = false;
 
             var PrevElement = this.Get_DocumentPrev();
+
+            if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Is_Empty() && undefined !== PrevElement.Get_SectionPr())
+                PrevElement = PrevElement.Get_DocumentPrev();
+
             if (0 !== CurPage && true !== this.Check_EmptyPages(CurPage - 1))
             {
                 var EndLine = this.Pages[CurPage - 1].EndLine;

@@ -1971,6 +1971,10 @@ CDocument.prototype =
                 var isColumnBreakOnPrevLine = false;
 
                 var PrevElement = Element.Get_DocumentPrev();
+
+                if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Is_Empty() && undefined !== PrevElement.Get_SectionPr())
+                    PrevElement = PrevElement.Get_DocumentPrev();
+
                 if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && Index !== StartIndex)
                 {
                     var EndLine = PrevElement.Pages[PrevElement.Pages.length - 1].EndLine;

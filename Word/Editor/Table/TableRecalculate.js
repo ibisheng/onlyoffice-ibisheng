@@ -136,6 +136,10 @@ CTable.prototype.private_RecalculateCheckPageColumnBreak = function(CurPage)
     var isColumnBreakOnPrevLine = false;
 
     var PrevElement = this.Get_DocumentPrev();
+
+    if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Is_Empty() && undefined !== PrevElement.Get_SectionPr())
+        PrevElement = PrevElement.Get_DocumentPrev();
+
     if ((0 === CurPage || true === this.Check_EmptyPages(CurPage - 1)) && null !== PrevElement && type_Paragraph === PrevElement.Get_Type())
     {
         var EndLine = PrevElement.Pages[PrevElement.Pages.length - 1].EndLine;
