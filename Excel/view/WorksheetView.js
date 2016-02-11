@@ -6266,24 +6266,6 @@
         x *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
         y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
 
-        if ( this.stateFormatPainter ) {
-            if ( x <= this.cellsLeft && y >= this.cellsTop ) {
-                r = this._findRowUnderCursor( y, true );
-                if ( r !== null ) {
-                    target = c_oTargetType.RowHeader;
-                    row = r.row;
-                }
-            }
-            if ( y <= this.cellsTop && x >= this.cellsLeft ) {
-                c = this._findColUnderCursor( x, true );
-                if ( c !== null ) {
-                    target = c_oTargetType.ColumnHeader;
-                    col = c.col;
-                }
-            }
-            return {cursor: kCurFormatPainterExcel, target: target, col: col, row: row};
-        }
-
         var oResDefault = {cursor: kCurDefault, target: c_oTargetType.None, col: -1, row: -1};
         if ( x < this.cellsLeft && y < this.cellsTop ) {
             return {cursor: kCurCorner, target: c_oTargetType.Corner, col: -1, row: -1};
@@ -6333,6 +6315,24 @@
                 row   : -1,
                 mouseX: f ? ((x < c.left + 3) ? (c.left - x - this.width_1px) : (c.right - x - this.width_1px)) : null
             };
+        }
+
+        if ( this.stateFormatPainter ) {
+            if ( x <= this.cellsLeft && y >= this.cellsTop ) {
+                r = this._findRowUnderCursor( y, true );
+                if ( r !== null ) {
+                    target = c_oTargetType.RowHeader;
+                    row = r.row;
+                }
+            }
+            if ( y <= this.cellsTop && x >= this.cellsLeft ) {
+                c = this._findColUnderCursor( x, true );
+                if ( c !== null ) {
+                    target = c_oTargetType.ColumnHeader;
+                    col = c.col;
+                }
+            }
+            return {cursor: kCurFormatPainterExcel, target: target, col: col, row: row};
         }
 
         if ( this.isFormulaEditMode || this.isChartAreaEditMode ) {
