@@ -7730,13 +7730,12 @@
     WorksheetView.prototype.applyFormatPainter = function () {
         var t = this;
         var from = t.handlers.trigger('getRangeFormatPainter'), to = t.activeRange.getAllRange();
-        var oTmpRange = this._getRange( 0, 0, 0, 0 );
         var onApplyFormatPainterCallback = function ( isSuccess ) {
             // Очищаем выделение
             t.cleanSelection();
 
             if ( true === isSuccess ) {
-                oTmpRange.promoteFromTo( from, to );
+                promoteFromTo(from, t.model, to, t.model);
             }
 
             t.expandColsOnScroll( false, true, to.c2 + 1 );
@@ -7751,7 +7750,7 @@
             t._recalculateAfterUpdate( [to] );
         };
 
-        var result = oTmpRange.preparePromoteFromTo( from, to );
+        var result = preparePromoteFromTo( from, to );
         if ( !result ) {
             // ToDo вывести ошибку
             onApplyFormatPainterCallback( false );
