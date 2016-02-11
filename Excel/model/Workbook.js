@@ -8826,7 +8826,8 @@ Range.prototype._promoteFromTo=function(from, to, bIsPromote, oCanPromote, bCtrl
 							var sVal = "";
 							if(null != data.sPrefix)
 								sVal += data.sPrefix;
-							sVal += data.nCurValue;
+							//change javascript NumberDecimalSeparator '.' , to cultural NumberDecimalSeparator
+							sVal += data.nCurValue.toString().replace(/\./g, g_oDefaultCultureInfo.NumberDecimalSeparator);
 							oCopyCell.setValue(sVal);
 						}
 						else if(null != oFromCell)
