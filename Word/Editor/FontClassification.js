@@ -1260,7 +1260,23 @@ var g_oLcidIdToNameMap = {};
         this.Get_FontClass = function(nUnicode, nHint, nEastAsia_lcid, bCS, bRTL)
         {
             var _glyph_slot = fontslot_ASCII;
-            if (nHint != fonthint_EastAsia)
+			if (nUnicode > 0xFFFF)
+			{
+				if ((nUnicode >= 0x20000 && nUnicode <= 0x2A6DF) ||
+					(nUnicode >= 0x2F800 && nUnicode <= 0x2FA1F))
+				{
+					_glyph_slot = fontslot_EastAsia;
+				}
+				else if (nUnicode >= 0x1D400 && nUnicode <= 0x1D7FF)
+				{
+					_glyph_slot = fontslot_ASCII;
+				}
+				else
+				{
+					_glyph_slot = fontslot_HAnsi;
+				}
+			}			
+            else if (nHint != fonthint_EastAsia)
             {
                 _glyph_slot = this.DetectData.data[nUnicode];
             }
