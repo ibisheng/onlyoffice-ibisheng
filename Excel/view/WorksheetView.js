@@ -3961,7 +3961,7 @@
         if ( !isFrozen && this.isSelectionDialogMode ) {
             this._drawSelectRange( this.activeRange.clone( true ) );
         }
-        if ( !isFrozen && this.stateFormatPainter ) {
+        if ( !isFrozen && this.stateFormatPainter && this.handlers.trigger('isActive') ) {
             this._drawFormatPainterRange();
         }
 
@@ -7729,7 +7729,7 @@
 
     WorksheetView.prototype.applyFormatPainter = function () {
         var t = this;
-        var from = t.copyActiveRange.getAllRange(), to = t.activeRange.getAllRange();
+        var from = t.handlers.trigger('getRangeFormatPainter'), to = t.activeRange.getAllRange();
         var oTmpRange = this._getRange( 0, 0, 0, 0 );
         var onApplyFormatPainterCallback = function ( isSuccess ) {
             // Очищаем выделение
@@ -7745,7 +7745,7 @@
             // Сбрасываем параметры
             t._updateCellsRange( to, /*canChangeColWidth*/c_oAscCanChangeColWidth.none, /*lockDraw*/true );
             if ( c_oAscFormatPainterState.kMultiple !== t.stateFormatPainter ) {
-                t.formatPainter();
+                t.handlers.trigger('onStopFormatPainter');
             }
             // Перерисовываем
             t._recalculateAfterUpdate( [to] );
@@ -7760,20 +7760,19 @@
 
         this._isLockedCells( to, null, onApplyFormatPainterCallback );
     };
-    WorksheetView.prototype.formatPainter = function ( stateFormatPainter ) {
+    WorksheetView.prototype.formatPainter = function(stateFormatPainter) {
         // Если передали состояние, то выставляем его. Если нет - то меняем на противоположное.
         this.stateFormatPainter = (null != stateFormatPainter) ? stateFormatPainter : ((c_oAscFormatPainterState.kOff !== this.stateFormatPainter) ? c_oAscFormatPainterState.kOff : c_oAscFormatPainterState.kOn);
 
-        if ( this.stateFormatPainter ) {
-            this.copyActiveRange = this.activeRange.clone( true );
+        if (this.stateFormatPainter) {
+            this.copyActiveRange = this.activeRange.clone(true);
             this._drawFormatPainterRange();
-        }
-        else {
+        } else {
             this.cleanSelection();
             this.copyActiveRange = null;
             this._drawSelection();
-            this.handlers.trigger( "onStopFormatPainter" );
         }
+        return this.copyActiveRange;
     };
 
     /* Функция для работы автозаполнения (selection). (x, y) - координаты точки мыши на области */

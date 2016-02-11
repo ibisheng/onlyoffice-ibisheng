@@ -162,6 +162,9 @@
     this.overlayGraphicCtx = undefined;
     this.stringRender = undefined;
 
+    this.stateFormatPainter = c_oAscFormatPainterState.kOff;
+    this.rangeFormatPainter = null;
+
     this.selectionDialogType = c_oAscSelectionDialogType.None;
     this.copyActiveSheet = -1;
 
@@ -419,7 +422,7 @@
 
         // FormatPainter
         'isFormatPainter': function() {
-          return self.getWorksheet().stateFormatPainter;
+          return self.stateFormatPainter;
         }
       });
 
@@ -531,9 +534,11 @@
         self.handlers.trigger("asc_onSelectionRangeChanged", val);
       }, "onRenameCellTextEnd": function(countFind, countReplace) {
         self.handlers.trigger("asc_onRenameCellTextEnd", countFind, countReplace);
-      }, "onStopFormatPainter": function() {
-        self.handlers.trigger("asc_onStopFormatPainter");
-      }, "onDocumentPlaceChanged": function() {
+      }, 'onStopFormatPainter': function() {
+        self._onStopFormatPainter();
+      }, 'getRangeFormatPainter': function() {
+        return self.rangeFormatPainter;
+      },"onDocumentPlaceChanged": function() {
         self._onDocumentPlaceChanged();
       }, "updateSheetViewSettings": function() {
         self.handlers.trigger("asc_onUpdateSheetViewSettings");
@@ -1094,9 +1099,8 @@
   };
 
   WorkbookView.prototype._onStopFormatPainter = function() {
-    var ws = this.getWorksheet();
-    if (ws.stateFormatPainter) {
-      ws.formatPainter();
+    if (this.stateFormatPainter) {
+      this.formatPainter(c_oAscFormatPainterState.kOff);
     }
   };
 
@@ -1455,6 +1459,10 @@
       selectionRange = tmpWorksheet.activeRange.clone(true);
       tmpWorksheet.setSelectionDialogMode(c_oAscSelectionDialogType.None);
     }
+    if (this.stateFormatPainter) {
+      // Должны отменить выбор на закрываемом листе
+      this.getWorksheet().formatPainter(c_oAscFormatPainterState.kOff);
+    }
 
     var wb = this.model;
     if (asc_typeof(index) === "number" && index >= 0) {
@@ -1501,6 +1509,10 @@
       // Когда идет выбор диапазона, то на показываемом листе должны выставить нужный режим
       ws.setSelectionDialogMode(this.selectionDialogType, selectionRange);
       this.handlers.trigger("asc_onSelectionRangeChanged", ws.getSelectionRangeValue());
+    }
+    if (this.stateFormatPainter) {
+      // Должны отменить выбор на закрываемом листе
+      this.getWorksheet().formatPainter(this.stateFormatPainter);
     }
     if (!bLockDraw) {
       ws.objectRender.controller.updateSelectionState();
@@ -2063,6 +2075,19 @@
       // Нужно выставить после, т.к. при смене листа не должны проставлять режим
       this.selectionDialogType = selectionDialogType;
       this.input.disabled = true;
+    }
+  };
+
+  WorkbookView.prototype.formatPainter = function(stateFormatPainter) {
+    // Если передали состояние, то выставляем его. Если нет - то меняем на противоположное.
+    this.stateFormatPainter = (null != stateFormatPainter) ? stateFormatPainter : ((c_oAscFormatPainterState.kOff !== this.stateFormatPainter) ? c_oAscFormatPainterState.kOff : c_oAscFormatPainterState.kOn);
+
+    this.rangeFormatPainter = this.getWorksheet().formatPainter(this.stateFormatPainter);
+    if (this.stateFormatPainter) {
+      this.copyActiveSheet = this.wsActive;
+    } else {
+      this.copyActiveSheet = -1;
+      this.handlers.trigger('asc_onStopFormatPainter');
     }
   };
 

@@ -2761,7 +2761,7 @@ var editor;
   // Формат по образцу
   spreadsheet_api.prototype.asc_formatPainter = function(stateFormatPainter) {
     if (this.wb) {
-      this.wb.getWorksheet().formatPainter(stateFormatPainter);
+      this.wb.formatPainter(stateFormatPainter);
     }
   };
 
