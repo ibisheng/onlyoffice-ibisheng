@@ -1255,13 +1255,11 @@
       var ws = this.getWorksheet(), isCellEditMode;
 	  isCellEditMode = ws.getCellEditMode();
       ws.setCellEditMode(false);
-      ws.setFormulaEditMode(false);
 
       if( this.cellFormulaEnterWSOpen ){
 		  ws = this.cellFormulaEnterWSOpen;
 		  isCellEditMode = isCellEditMode ? isCellEditMode : ws.getCellEditMode();
 		  ws.setCellEditMode(false);
-		  ws.setFormulaEditMode(false);
       }
 
     if (this.cellFormulaEnterWSOpen) {

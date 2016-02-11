@@ -11629,6 +11629,7 @@
 
     WorksheetView.prototype.cleanFormulaRanges = function () {
         // Очищаем массив ячеек для текущей формулы
+		this.arrActiveFormulaRangesPosition = -1;
         this.arrActiveFormulaRanges = [];
     };
 
