@@ -13056,6 +13056,7 @@ CDocument.prototype =
             var ColumnsPr = new CDocumentColumnsProps();
             ColumnsPr.From_SectPr(SectPr);
             this.Api.sync_ColumnsPropsCallback(ColumnsPr);
+            this.Api.sync_SectionPropsCallback(new CDocumentSectionProps(SectPr));
         }
     },
 
@@ -13069,7 +13070,6 @@ CDocument.prototype =
         if (SectPr)
         {
             ColumnsPr.From_SectPr(SectPr);
-            this.Api.sync_ColumnsPropsCallback(ColumnsPr);
         }
 
         return ColumnsPr;
@@ -16230,6 +16230,64 @@ CDocument.prototype.private_RecalculateNumbering = function(Elements)
             }
         }
     }
+};
+CDocument.prototype.Set_SectionProps = function(Props)
+{
+    var CurPos = this.CurPos.ContentPos;
+    var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
+
+    if (SectPr && false === this.Document_Is_SelectionLocked(changestype_Document_SectPr))
+    {
+        this.Create_NewHistoryPoint(historydescription_Document_SetSectionProps);
+
+        if (undefined !== Props.get_W() || undefined !== Props.get_H())
+        {
+            var PageW = undefined !== Props.get_W() ? Props.get_W() : SectPr.Get_PageWidth();
+            var PageH = undefined !== Props.get_H() ? Props.get_H() : SectPr.Get_PageHeight();
+            SectPr.Set_PageSize(PageW, PageH);
+        }
+
+        if (undefined !== Props.get_Orientation())
+        {
+            var Orient = Props.get_Orientation() === c_oAscPageOrientation.Portrait ? orientation_Portrait : orientation_Landscape;
+            SectPr.Set_Orientation(Orient, false);
+        }
+
+        if (undefined !== Props.get_LeftMargin() || undefined !== Props.get_TopMargin() || undefined !== Props.get_RightMargin() || undefined !== Props.get_BottomMargin())
+        {
+            // Внутри функции идет разруливания, если какое то значение undefined
+            SectPr.Set_PageMargins(Props.get_LeftMargin(), Props.get_TopMargin(), Props.get_RightMargin(), Props.get_BottomMargin());
+        }
+
+        if (undefined !== Props.get_HeaderDistance())
+        {
+            SectPr.Set_PageMargins_Header(Props.get_HeaderDistance());
+        }
+
+        if (undefined !== Props.get_FooterDistance())
+        {
+            SectPr.Set_PageMargins_Footer(Props.get_FooterDistance());
+        }
+
+        if (true === this.History.Is_LastPointEmpty())
+        {
+            this.History.Remove_LastPoint();
+        }
+        else
+        {
+            this.Recalculate();
+            this.Document_UpdateSelectionState();
+            this.Document_UpdateInterfaceState();
+            this.Document_UpdateRulersState();
+        }
+    }
+};
+CDocument.prototype.Get_SectionProps = function()
+{
+    var CurPos = this.CurPos.ContentPos;
+    var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
+
+    return new CDocumentSectionProps(SectPr);
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Settings

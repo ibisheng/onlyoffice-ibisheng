@@ -587,4 +587,9 @@ var c_oAscRevisionsObjectType =
   MathEquation : 3
 };
 
+var c_oAscPageOrientation = {
+  Portrait  : 0x00,
+  Landscape : 0x01
+};
+
 window["flat_desine"] = false;

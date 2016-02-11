@@ -1592,6 +1592,7 @@ var historydescription_Presentation_ApplyTimingToAll               = 0x012e;
 var historydescription_Document_SetColumnsFromRuler                = 0x012f;
 var historydescription_Document_SetColumnsProps                    = 0x0130;
 var historydescription_Document_AddColumnBreak                     = 0x0131;
+var historydescription_Document_SetSectionProps                    = 0x0132;
 
 
 
@@ -1908,6 +1909,7 @@ function Get_HistoryPointStringDescription(nDescription)
         case historydescription_Document_SetColumnsFromRuler                : sString = "Document_SetColumnsFromRuler               "; break;
         case historydescription_Document_SetColumnsProps                    : sString = "Document_SetColumnsProps                   "; break;
         case historydescription_Document_AddColumnBreak                     : sString = "Document_AddColumnBreak                    "; break;
+        case historydescription_Document_SetSectionProps                    : sString = "Document_SetColumnsProps                   "; break;
     }
     return sString;
 }

@@ -3300,6 +3300,145 @@ asc_docs_api.prototype.get_DocumentHeight = function()
     return Page_Height;
 };
 
+function CDocumentSectionProps(SectPr)
+{
+    if (SectPr)
+    {
+        this.W      = SectPr.Get_PageWidth();
+        this.H      = SectPr.Get_PageHeight();
+        this.Orient = orientation_Portrait === SectPr.Get_Orientation() ? c_oAscPageOrientation.Portrait : c_oAscPageOrientation.Landscape;
+
+        this.Left   = SectPr.Get_PageMargin_Left();
+        this.Top    = SectPr.Get_PageMargin_Top();
+        this.Right  = SectPr.Get_PageMargin_Right();
+        this.Bottom = SectPr.Get_PageMargin_Bottom();
+
+        this.Header = SectPr.Get_PageMargins_Header();
+        this.Footer = SectPr.Get_PageMargins_Footer();
+    }
+    else
+    {
+        this.W      = undefined;
+        this.H      = undefined;
+        this.Orient = undefined;
+
+        this.Left   = undefined;
+        this.Top    = undefined;
+        this.Right  = undefined;
+        this.Bottom = undefined;
+
+        this.Header = undefined;
+        this.Footer = undefined;
+    }
+}
+CDocumentSectionProps.prototype.get_W = function()
+{
+    return this.W;
+};
+CDocumentSectionProps.prototype.put_W = function(W)
+{
+    this.W = W;
+};
+CDocumentSectionProps.prototype.get_H = function()
+{
+    return this.H;
+};
+CDocumentSectionProps.prototype.put_H = function(H)
+{
+    this.H = H;
+};
+CDocumentSectionProps.prototype.get_Orientation = function()
+{
+    return this.Orient;
+};
+CDocumentSectionProps.prototype.put_Orientation = function(Orient)
+{
+    this.Orient = Orient;
+};
+CDocumentSectionProps.prototype.get_LeftMargin = function()
+{
+    return this.Left;
+};
+CDocumentSectionProps.prototype.put_LeftMargin = function(Left)
+{
+    this.Left = Left;
+};
+CDocumentSectionProps.prototype.get_TopMargin = function()
+{
+    return this.Top;
+};
+CDocumentSectionProps.prototype.put_TopMargin = function(Top)
+{
+    this.Top = Top;
+};
+CDocumentSectionProps.prototype.get_RightMargin = function()
+{
+    return this.Right;
+};
+CDocumentSectionProps.prototype.put_RightMargin = function(Right)
+{
+    this.Right = Right;
+};
+CDocumentSectionProps.prototype.get_BottomMargin = function()
+{
+    return this.Bottom;
+};
+CDocumentSectionProps.prototype.put_BottomMargin = function(Bottom)
+{
+    this.Bottom = Bottom;
+};
+CDocumentSectionProps.prototype.get_HeaderDistance = function()
+{
+    return this.Header;
+};
+CDocumentSectionProps.prototype.put_HeaderDistance = function(Header)
+{
+    this.Header = Header;
+};
+CDocumentSectionProps.prototype.get_FooterDistance = function()
+{
+    return this.Footer;
+};
+CDocumentSectionProps.prototype.put_FooterDistance = function(Footer)
+{
+    this.Footer = Footer;
+};
+
+window["CDocumentSectionProps"] = CDocumentSectionProps;
+CDocumentSectionProps.prototype["get_W"]              = CDocumentSectionProps.prototype.get_W;
+CDocumentSectionProps.prototype["put_W"]              = CDocumentSectionProps.prototype.put_W;
+CDocumentSectionProps.prototype["get_H"]              = CDocumentSectionProps.prototype.get_H;
+CDocumentSectionProps.prototype["put_H"]              = CDocumentSectionProps.prototype.put_H;
+CDocumentSectionProps.prototype["get_Orientation"]    = CDocumentSectionProps.prototype.get_Orientation;
+CDocumentSectionProps.prototype["put_Orientation"]    = CDocumentSectionProps.prototype.put_Orientation;
+CDocumentSectionProps.prototype["get_LeftMargin"]     = CDocumentSectionProps.prototype.get_LeftMargin;
+CDocumentSectionProps.prototype["put_LeftMargin"]     = CDocumentSectionProps.prototype.put_LeftMargin;
+CDocumentSectionProps.prototype["get_TopMargin"]      = CDocumentSectionProps.prototype.get_TopMargin;
+CDocumentSectionProps.prototype["put_TopMargin"]      = CDocumentSectionProps.prototype.put_TopMargin;
+CDocumentSectionProps.prototype["get_RightMargin"]    = CDocumentSectionProps.prototype.get_RightMargin;
+CDocumentSectionProps.prototype["put_RightMargin"]    = CDocumentSectionProps.prototype.put_RightMargin;
+CDocumentSectionProps.prototype["get_BottomMargin"]   = CDocumentSectionProps.prototype.get_BottomMargin;
+CDocumentSectionProps.prototype["put_BottomMargin"]   = CDocumentSectionProps.prototype.put_BottomMargin;
+CDocumentSectionProps.prototype["get_HeaderDistance"] = CDocumentSectionProps.prototype.get_HeaderDistance;
+CDocumentSectionProps.prototype["put_HeaderDistance"] = CDocumentSectionProps.prototype.put_HeaderDistance;
+CDocumentSectionProps.prototype["get_FooterDistance"] = CDocumentSectionProps.prototype.get_FooterDistance;
+CDocumentSectionProps.prototype["put_FooterDistance"] = CDocumentSectionProps.prototype.put_FooterDistance;
+
+asc_docs_api.prototype.asc_SetSectionProps = function(Props)
+{
+    this.WordControl.m_oLogicDocument.Set_SectionProps(Props);
+};
+asc_docs_api.prototype.asc_GetSectionProps = function()
+{
+    return this.WordControl.m_oLogicDocument.Get_SectionProps();
+};
+asc_docs_api.prototype.sync_SectionPropsCallback = function(Props)
+{
+    this.asc_fireCallback("asc_onSectionProps", Props);
+};
+asc_docs_api.prototype["asc_SetSectionProps"] = asc_docs_api.prototype.asc_SetSectionProps;
+asc_docs_api.prototype["asc_GetSectionProps"] = asc_docs_api.prototype.asc_GetSectionProps;
+
 function CDocumentColumnProps()
 {
     this.W     = 0;
