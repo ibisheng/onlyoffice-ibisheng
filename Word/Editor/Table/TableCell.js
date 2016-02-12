@@ -218,14 +218,22 @@ CTableCell.prototype =
     {
         if ( true === this.CompiledPr.NeedRecalc )
         {
-            // TODO: Возможно стоит разделить рассчет стиля для ячейки и для текста
-            var FullPr = this.Internal_Compile_Pr();
-            this.CompiledPr.Pr         = FullPr.CellPr;
-            this.CompiledPr.ParaPr     = FullPr.ParaPr;
-            this.CompiledPr.TextPr     = FullPr.TextPr;
-
-            if (true !== g_oIdCounter.m_bLoad)
+            if (true === g_oIdCounter.m_bLoad || true === g_oIdCounter.m_bRead)
+            {
+                this.CompiledPr.Pr     = g_oDocumentDefaultTableCellPr;
+                this.CompiledPr.ParaPr = g_oDocumentDefaultParaPr;
+                this.CompiledPr.TextPr = g_oDocumentDefaultTextPr;
+                this.CompiledPr.NeedRecalc = true;
+            }
+            else
+            {
+                // TODO: Возможно стоит разделить рассчет стиля для ячейки и для текста
+                var FullPr                 = this.Internal_Compile_Pr();
+                this.CompiledPr.Pr         = FullPr.CellPr;
+                this.CompiledPr.ParaPr     = FullPr.ParaPr;
+                this.CompiledPr.TextPr     = FullPr.TextPr;
                 this.CompiledPr.NeedRecalc = false;
+            }
         }
 
         if ( false === bCopy )

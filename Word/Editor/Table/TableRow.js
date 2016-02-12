@@ -206,10 +206,16 @@ CTableRow.prototype =
     {
         if ( true === this.CompiledPr.NeedRecalc )
         {
-            this.CompiledPr.Pr = this.Internal_Compile_Pr();
-
-            if (true !== g_oIdCounter.m_bLoad)
+            if (true === g_oIdCounter.m_bLoad || true === g_oIdCounter.m_bRead)
+            {
+                this.CompiledPr.Pr         = g_oDocumentDefaultTableRowPr;
+                this.CompiledPr.NeedRecalc = true;
+            }
+            else
+            {
+                this.CompiledPr.Pr         = this.Internal_Compile_Pr();
                 this.CompiledPr.NeedRecalc = false;
+            }
         }
 
         if ( false === bCopy )

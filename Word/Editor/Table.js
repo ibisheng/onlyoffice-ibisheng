@@ -8640,10 +8640,37 @@ CTable.prototype =
     {
         if ( true === this.CompiledPr.NeedRecalc )
         {
-            this.CompiledPr.Pr = this.Internal_Compile_Pr();
+            if (true !== g_oIdCounter.m_bLoad && true !== g_oIdCounter.m_bRead)
+            {
+                this.CompiledPr.Pr = {
+                    TextPr          : g_oDocumentDefaultTextPr,
+                    ParaPr          : g_oDocumentDefaultParaPr,
 
-            if (true !== g_oIdCounter.m_bLoad)
+                    TablePr         : g_oDocumentDefaultTablePr,
+                    TableRowPr      : g_oDocumentDefaultTableRowPr,
+                    TableCellPr     : g_oDocumentDefaultTableCellPr,
+
+                    TableFirstCol   : g_oDocumentDefaultTableStylePr,
+                    TableFirstRow   : g_oDocumentDefaultTableStylePr,
+                    TableLastCol    : g_oDocumentDefaultTableStylePr,
+                    TableLastRow    : g_oDocumentDefaultTableStylePr,
+                    TableBand1Horz  : g_oDocumentDefaultTableStylePr,
+                    TableBand1Vert  : g_oDocumentDefaultTableStylePr,
+                    TableBand2Horz  : g_oDocumentDefaultTableStylePr,
+                    TableBand2Vert  : g_oDocumentDefaultTableStylePr,
+                    TableTLCell     : g_oDocumentDefaultTableStylePr,
+                    TableTRCell     : g_oDocumentDefaultTableStylePr,
+                    TableBLCell     : g_oDocumentDefaultTableStylePr,
+                    TableBRCell     : g_oDocumentDefaultTableStylePr,
+                    TableWholeTable : g_oDocumentDefaultTableStylePr
+                };
+                this.CompiledPr.NeedRecalc = true;
+            }
+            else
+            {
+                this.CompiledPr.Pr = this.Internal_Compile_Pr();
                 this.CompiledPr.NeedRecalc = false;
+            }
         }
 
         if ( false === bCopy )

@@ -7746,15 +7746,13 @@ Paragraph.prototype =
             }
             else
             {
-                if ( undefined === this.CompiledPr.Pr || null === this.CompiledPr.Pr )
+                if (undefined === this.CompiledPr.Pr || null === this.CompiledPr.Pr)
                 {
                     this.CompiledPr.Pr =
                     {
-                        ParaPr : new CParaPr(),
-                        TextPr : new CTextPr()
+                        ParaPr : g_oDocumentDefaultParaPr,
+                        TextPr : g_oDocumentDefaultTextPr
                     };
-                    this.CompiledPr.Pr.ParaPr.Init_Default();
-                    this.CompiledPr.Pr.TextPr.Init_Default();
 
                     this.CompiledPr.Pr.ParaPr.StyleTabs  = new CParaTabs();
                     this.CompiledPr.Pr.ParaPr.StyleNumPr = undefined;

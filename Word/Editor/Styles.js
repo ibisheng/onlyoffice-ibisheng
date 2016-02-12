@@ -153,6 +153,15 @@ CTableStylePr.prototype =
         this.TablePr.Read_FromBinary( Reader );
         this.TableRowPr.Read_FromBinary( Reader );
         this.TableCellPr.Read_FromBinary( Reader );
+    },
+
+    Init_Default : function()
+    {
+        this.TextPr.Init_Default();
+        this.ParaPr.Init_Default();
+        this.TablePr.Init_Default();
+        this.TableRowPr.Init_Default();
+        this.TableCellPr.Init_Default();
     }
 };
 
@@ -10628,4 +10637,19 @@ asc_CStyle.prototype["get_Type"]    = asc_CStyle.prototype.get_Type;
 asc_CStyle.prototype["put_Type"]    = asc_CStyle.prototype.put_Type;
 asc_CStyle.prototype["get_Link"]    = asc_CStyle.prototype.get_Link;
 asc_CStyle.prototype["put_Link"]    = asc_CStyle.prototype.put_Link;
+
+// Создаем глобальные дефолтовые стили, чтобы быстро можно было отдать дефолтовые настройки
+var g_oDocumentDefaultTextPr       = new CTextPr();
+var g_oDocumentDefaultParaPr       = new CParaPr();
+var g_oDocumentDefaultTablePr      = new CTablePr();
+var g_oDocumentDefaultTableCellPr  = new CTableCellPr();
+var g_oDocumentDefaultTableRowPr   = new CTableRowPr();
+var g_oDocumentDefaultTableStylePr = new CTableStylePr();
+g_oDocumentDefaultTextPr.Init_Default();
+g_oDocumentDefaultParaPr.Init_Default();
+g_oDocumentDefaultTablePr.Init_Default();
+g_oDocumentDefaultTableCellPr.Init_Default();
+g_oDocumentDefaultTableRowPr.Init_Default();
+g_oDocumentDefaultTableStylePr.Init_Default();
+
 
