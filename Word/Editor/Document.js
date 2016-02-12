@@ -2182,7 +2182,7 @@ CDocument.prototype =
                     _ColumnIndex        = 0;
                     _StartIndex         = this.Pages[_PageIndex].Sections[_SectionIndex].Columns[0].Pos;
                     _bStart             = false;
-                    _bResetStartElement = false;
+                    _bResetStartElement = 0 === SectionIndex ? Page.ResetStartElement : true;
 
                     this.Pages[_PageIndex].Sections[_SectionIndex].Reset_Columns();
 
