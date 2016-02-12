@@ -1252,29 +1252,32 @@
     this.setCellEditMode(false);
     this.controller.setStrictClose(false);
     this.controller.setFormulaEditMode(false);
-      var ws = this.getWorksheet(), isCellEditMode;
+      var ws = this.getWorksheet(), isCellEditMode, index;
 	  isCellEditMode = ws.getCellEditMode();
       ws.setCellEditMode(false);
 
       if( this.cellFormulaEnterWSOpen ){
+		  index = this.cellFormulaEnterWSOpen.model.getIndex();
+		  isCellEditMode = isCellEditMode ? isCellEditMode : this.cellFormulaEnterWSOpen.getCellEditMode();
+		  this.cellFormulaEnterWSOpen.setCellEditMode(false);
+		  if( index != ws.model.getIndex() ){
+			  this.showWorksheet(index);
+			  this.handlers.trigger("asc_onActiveSheetChanged", index);
+		  }
 		  ws = this.cellFormulaEnterWSOpen;
-		  isCellEditMode = isCellEditMode ? isCellEditMode : ws.getCellEditMode();
-		  ws.setCellEditMode(false);
-      }
+		  this.cellFormulaEnterWSOpen = null;
+     }
 
-    if (this.cellFormulaEnterWSOpen) {
-      this.cellFormulaEnterWSOpen = null;
-      var index = ws.model.getIndex();
-      this.showWorksheet(index);
-      this.handlers.trigger("asc_onActiveSheetChanged", index);
-    }
-    if (this.getWorksheet().model.getId() == ws.model.getId()) {
+	  for (var i in this.wsViews) {
+		  this.wsViews[i].setFormulaEditMode(false);
+	  }
+
       ws.updateSelection();
-    }
-    for (var i in this.wsViews) {
-      this.wsViews[i].cleanFormulaRanges()
-      this.wsViews[i].setFormulaEditMode(false);
-    }
+
+	  for (var i in this.wsViews) {
+		  this.wsViews[i].cleanFormulaRanges();
+	  }
+
     if (isCellEditMode) {
       this.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
     }
