@@ -1183,7 +1183,7 @@
 		asc_CAdjustPrint.prototype.asc_setLayoutPageType = function (val) { this.layoutPageType = val; };
 
 		asc_CAdjustPrint.prototype.getFitToWidth = function () { return this.fitToWidth; };
-		asc_CAdjustPrint.prototype.getFitToHeight = function () { this.fitToHeight; };
+		asc_CAdjustPrint.prototype.getFitToHeight = function () { return this.fitToHeight; };
 		asc_CAdjustPrint.prototype.asc_setFitToWidth = function (val) { this.fitToWidth = val; };
 		asc_CAdjustPrint.prototype.asc_setFitToHeight = function (val) { this.fitToHeight = val; };
 
