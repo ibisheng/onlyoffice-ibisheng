@@ -3122,9 +3122,16 @@ var editor;
   spreadsheet_api.prototype.asc_nativeCalculate = function() {
   };
 
-  spreadsheet_api.prototype.asc_nativePrint = function(_printer, _page) {
+  spreadsheet_api.prototype.asc_nativePrint = function(_printer, _page, _param) {
     var _adjustPrint = window.AscDesktopEditor_PrintData ? window.AscDesktopEditor_PrintData : new asc_CAdjustPrint();
     window.AscDesktopEditor_PrintData = undefined;
+
+    if (1 == _param)
+    {
+      _adjustPrint.asc_setPrintType(c_oAscPrintType.EntireWorkbook);
+      _adjustPrint.asc_setFitToWidth(true);
+      _adjustPrint.asc_asc_setFitToHeight(true);
+    }
 
     var _printPagesData = this.wb.calcPagesPrint(_adjustPrint);
 
@@ -3160,8 +3167,8 @@ var editor;
     return 1;
   };
 
-  spreadsheet_api.prototype.asc_nativeGetPDF = function() {
-    var _ret = this.asc_nativePrint();
+  spreadsheet_api.prototype.asc_nativeGetPDF = function(_param) {
+    var _ret = this.asc_nativePrint(undefined, undefined, _param);
 
     window["native"]["Save_End"]("", _ret.GetCurPosition());
     return _ret.data;

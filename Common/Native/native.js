@@ -400,9 +400,9 @@ function GetNativeCountPages()
     return _api.asc_nativePrintPagesCount();
 }
 
-function GetNativeFileDataPDF()
+function GetNativeFileDataPDF(_param)
 {
-    return _api.asc_nativeGetPDF();
+    return _api.asc_nativeGetPDF(_param);
 }
 
 window.memory1 = null;
