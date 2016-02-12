@@ -2699,7 +2699,7 @@ CMathBase.prototype.Can_IncreaseArgumentSize = function()
 };
 CMathBase.prototype.Get_InterfaceProps = function()
 {
-    return {};
+    return new CMathMenuBase();
 };
 CMathBase.prototype.Can_ModifyArgSize = function()
 {
