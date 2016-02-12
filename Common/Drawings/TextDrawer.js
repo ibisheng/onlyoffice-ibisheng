@@ -871,6 +871,8 @@ function CTextDrawer(dWidth, dHeight, bDivByLInes, oTheme, bDivGlyphs)
 
     this.m_oObjectToDraw = null;
 
+    this.m_bTurnOff = false;
+
     this.bCheckLines = false;
     this.lastX = null;
     this.lastY = null;
@@ -1385,6 +1387,8 @@ CTextDrawer.prototype =
     // path commands
     _s : function()
     {
+        if(this.m_bTurnOff)
+            return;
         this.Get_PathToDraw(true);
     },
     _e : function()
@@ -1400,6 +1404,8 @@ CTextDrawer.prototype =
     },
     _m : function(x,y)
     {
+        if(this.m_bTurnOff)
+            return;
         var oPathToDraw = this.Get_PathToDraw();
         if(oPathToDraw)
         {
@@ -1410,6 +1416,9 @@ CTextDrawer.prototype =
     },
     _l : function(x,y)
     {
+
+        if(this.m_bTurnOff)
+            return;
         if(this.bCheckLines)
         {
             if(Math.abs(x - this.lastX) < EPSILON_TEXT_AUTOFIT && Math.abs(x - this.lastX) < Math.abs(y - this.lastY))
@@ -1947,6 +1956,8 @@ CTextDrawer.prototype =
 
     rect : function(x,y,w,h)
     {
+        if(this.m_bTurnOff)
+            return;
         var oLastCommand = this.m_aStack[this.m_aStack.length - 1];
         if(oLastCommand && (oLastCommand.m_nDrawType === 2 || oLastCommand.m_nDrawType === 4))
         {
@@ -2073,12 +2084,12 @@ CTextDrawer.prototype =
 
     StartClipPath : function()
     {
-        this.private_removeVectors();
+        this.m_bTurnOff = true;
     },
 
     EndClipPath : function()
     {
-        this.private_restoreVectors();
+        this.m_bTurnOff = false;
     },
 
     SetTextPr : function(textPr, theme)
