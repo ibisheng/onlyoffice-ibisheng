@@ -716,6 +716,10 @@ CShape.prototype.setParent2 = function(parent)
         }
     }
 };
+CShape.prototype.Get_Numbering =  function()
+{
+    return new CNumbering();
+};
 CShape.prototype.getIsSingleBody = function(x, y)
 {
     if(!this.isPlaceholder())

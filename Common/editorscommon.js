@@ -1491,6 +1491,7 @@ function CIdCounter ()
 {
     this.m_sUserId        = null;
     this.m_bLoad          = true;
+    this.m_bRead          = false;
     this.m_nIdCounterLoad = 0; // Счетчик Id для загрузки
     this.m_nIdCounterEdit = 0; // Счетчик Id для работы
 }

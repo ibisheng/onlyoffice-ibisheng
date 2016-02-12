@@ -2714,6 +2714,7 @@
 			ReadFromBinaryWord : function(sBase64, worksheet)
 			{
 			    History.TurnOff();
+                g_oIdCounter.m_bRead = true;
 				//передавать CDrawingDocument текущего worksheet
 				var oTempDrawingDocument = worksheet.model.DrawingDocument;
 				
@@ -2737,8 +2738,9 @@
 				
 				window.global_pptx_content_loader.End_UseFullUrl();
 				History.TurnOn();
+                g_oIdCounter.m_bRead = false;
 			    editor = oOldEditor;
-				
+
 			    return oRes;
 			},
 			

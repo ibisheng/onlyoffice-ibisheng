@@ -29,6 +29,11 @@ CShape.prototype.setDrawingBase = function(drawingBase)
     }
 };
 
+CShape.prototype.Get_Numbering =  function()
+{
+    return new CNumbering();
+};
+
 CShape.prototype.getTextArtTranslate = function()
 {
     return Asc["editor"].textArtTranslate;

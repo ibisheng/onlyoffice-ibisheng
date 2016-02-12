@@ -7734,7 +7734,7 @@ Paragraph.prototype =
     {
         if ( true === this.CompiledPr.NeedRecalc )
         {
-            if (undefined !== this.Parent && null !== this.Parent && true !== g_oIdCounter.m_bLoad)
+            if (undefined !== this.Parent && null !== this.Parent && true !== g_oIdCounter.m_bLoad && true !== g_oIdCounter.m_bRead)
             {
                 this.CompiledPr.Pr = this.Internal_CompileParaPr2();
                 if(!this.bFromDocument)

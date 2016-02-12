@@ -9780,7 +9780,7 @@ CDocumentContent.prototype.Get_NumberingInfo = function(NumberingEngine, ParaId,
 };
 CDocumentContent.prototype.private_RecalculateNumbering = function(Elements)
 {
-    if (true === g_oIdCounter.m_bLoad)
+    if (true === g_oIdCounter.m_bLoad || true === g_oIdCounter.m_bRead)
         return;
 
     for (var Index = 0, Count = Elements.length; Index < Count; ++Index)
