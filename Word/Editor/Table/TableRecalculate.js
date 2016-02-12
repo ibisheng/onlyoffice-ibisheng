@@ -2494,74 +2494,77 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         var MaxBotBorder = 0;
         var BotBorders   = [];
 
-        // Для ряда CurRow вычисляем нижнюю границу
-        if ( this.Content.length - 1 === CurRow )
+        if (CurRow >= this.Pages[CurPage].FirstRow)
         {
-            // Для последнего ряда уже есть готовые нижние границы
-            var Row = this.Content[CurRow];
-            var CellsCount = Row.Get_CellsCount();
-            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
+            // Для ряда CurRow вычисляем нижнюю границу
+            if (this.Content.length - 1 === CurRow)
             {
-                var Cell = Row.Get_Cell( CurCell );
-                if ( vmerge_Continue === Cell.Get_VMerge() )
-                    Cell = this.Internal_Get_StartMergedCell( CurRow, Row.Get_CellInfo( CurCell ).StartGridCol, Cell.Get_GridSpan() );
-
-                var Border_Info = Cell.Get_BorderInfo().Bottom;
-
-                for ( var BorderId = 0; BorderId < Border_Info.length; BorderId++ )
+                // Для последнего ряда уже есть готовые нижние границы
+                var Row        = this.Content[CurRow];
+                var CellsCount = Row.Get_CellsCount();
+                for (var CurCell = 0; CurCell < CellsCount; CurCell++)
                 {
-                    var Border = Border_Info[BorderId];
-                    if ( border_Single === Border.Value && MaxBotBorder < Border.Size )
-                        MaxBotBorder = Border.Size;
+                    var Cell = Row.Get_Cell(CurCell);
+                    if (vmerge_Continue === Cell.Get_VMerge())
+                        Cell = this.Internal_Get_StartMergedCell(CurRow, Row.Get_CellInfo(CurCell).StartGridCol, Cell.Get_GridSpan());
 
-                    BotBorders.push( Border);
-                }
-            }
-        }
-        else
-        {
-            var Row = this.Content[CurRow];
-            var CellSpacing = Row.Get_CellSpacing();
-            var CellsCount  = Row.Get_CellsCount();
+                    var Border_Info = Cell.Get_BorderInfo().Bottom;
 
-            if ( null != CellSpacing )
-            {
-                // BotBorders можно не заполнять, т.к. у каждой ячейки своя граница,
-                // нам надо только посчитать максимальную толщину.
-                for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
-                {
-                    var Cell = Row.Get_Cell( CurCell );
-                    var Border = Cell.Get_Borders().Bottom;
+                    for (var BorderId = 0; BorderId < Border_Info.length; BorderId++)
+                    {
+                        var Border = Border_Info[BorderId];
+                        if (border_Single === Border.Value && MaxBotBorder < Border.Size)
+                            MaxBotBorder = Border.Size;
 
-                    if ( border_Single === Border.Value && MaxBotBorder < Border.Size )
-                        MaxBotBorder = Border.Size;
+                        BotBorders.push(Border);
+                    }
                 }
             }
             else
             {
-                // Сравниваем нижнюю границу ячейки и нижнюю границу таблицы
-                for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
+                var Row         = this.Content[CurRow];
+                var CellSpacing = Row.Get_CellSpacing();
+                var CellsCount  = Row.Get_CellsCount();
+
+                if (null != CellSpacing)
                 {
-                    var Cell = Row.Get_Cell( CurCell );
-
-                    if ( vmerge_Continue === Cell.Get_VMerge() )
+                    // BotBorders можно не заполнять, т.к. у каждой ячейки своя граница,
+                    // нам надо только посчитать максимальную толщину.
+                    for (var CurCell = 0; CurCell < CellsCount; CurCell++)
                     {
-                        Cell = this.Internal_Get_StartMergedCell( CurRow, Row.Get_CellInfo( CurCell ).StartGridCol, Cell.Get_GridSpan() );
-                        if ( null === Cell )
-                        {
-                            BotBorders.push( TableBorders.Bottom );
-                            continue;
-                        }
+                        var Cell   = Row.Get_Cell(CurCell);
+                        var Border = Cell.Get_Borders().Bottom;
+
+                        if (border_Single === Border.Value && MaxBotBorder < Border.Size)
+                            MaxBotBorder = Border.Size;
                     }
+                }
+                else
+                {
+                    // Сравниваем нижнюю границу ячейки и нижнюю границу таблицы
+                    for (var CurCell = 0; CurCell < CellsCount; CurCell++)
+                    {
+                        var Cell = Row.Get_Cell(CurCell);
 
-                    var Border = Cell.Get_Borders().Bottom;
+                        if (vmerge_Continue === Cell.Get_VMerge())
+                        {
+                            Cell = this.Internal_Get_StartMergedCell(CurRow, Row.Get_CellInfo(CurCell).StartGridCol, Cell.Get_GridSpan());
+                            if (null === Cell)
+                            {
+                                BotBorders.push(TableBorders.Bottom);
+                                continue;
+                            }
+                        }
 
-                    // Сравним границы
-                    var Result_Border = this.Internal_CompareBorders( Border, TableBorders.Bottom, false, true );
-                    if ( border_Single === Result_Border.Value && MaxBotBorder < Result_Border.Size )
-                        MaxBotBorder = Result_Border.Size;
+                        var Border = Cell.Get_Borders().Bottom;
 
-                    BotBorders.push( Result_Border );
+                        // Сравним границы
+                        var Result_Border = this.Internal_CompareBorders(Border, TableBorders.Bottom, false, true);
+                        if (border_Single === Result_Border.Value && MaxBotBorder < Result_Border.Size)
+                            MaxBotBorder = Result_Border.Size;
+
+                        BotBorders.push(Result_Border);
+                    }
                 }
             }
         }

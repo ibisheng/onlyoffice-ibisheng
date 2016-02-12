@@ -425,6 +425,11 @@ CTableCell.prototype =
         return true;
     },
 
+    Is_TableFirstRowOnNewPage : function()
+    {
+        return this.Row.Table.Is_TableFirstRowOnNewPage(this.Row.Index);
+    },
+
     Check_AutoFit : function()
     {
         return false;

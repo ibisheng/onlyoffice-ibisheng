@@ -473,6 +473,14 @@ CDocumentContent.prototype =
         return this.Parent.Is_Cell();
     },
 
+    Is_TableFirstRowOnNewPage : function()
+    {
+        if (false === this.Parent.Is_Cell())
+            return false;
+
+        return this.Parent.Is_TableFirstRowOnNewPage();
+    },
+
     Check_AutoFit : function()
     {
         return this.Parent.Check_AutoFit();
@@ -8266,9 +8274,9 @@ CDocumentContent.prototype =
             if ( Y < Item.Pages[0].Bounds.Top )
                 return InlineElements[Pos];
 
-            if ( Item.Pages.length > 1 )
+            if (Item.Pages.length > 1)
             {
-                if ( ( type_Paragraph === Item.GetType() && Item.Pages[0].FirstLine != Item.Pages[1].FirstLine ) || ( type_Table === Item.GetType() && true === Item.RowsInfo[0].FirstPage ) )
+                if (true !== Item.Is_StartFromNewPage())
                     return InlineElements[Pos + 1];
 
                 return InlineElements[Pos];
