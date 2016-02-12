@@ -2322,7 +2322,12 @@ CMathContent.prototype.private_LoadFromMenuSymbol = function(Type, Pr)
     }
 
     if (-1 !== Code)
-        this.Add_Symbol(Code);
+    {
+        var bSimpleInsert = this.Content.length > 0 && this.Content[this.CurPos].Type == para_Math_Run && this.Selection_IsEmpty() == true; // находимся в Run, селект отсутствует
+        var TextPr = bSimpleInsert == false ? new CTextPr() : this.Content[this.CurPos].Get_TextPr();
+
+        this.Add_Symbol(Code, TextPr);
+    }
 };
 CMathContent.prototype.private_LoadFromMenuFraction = function(Type, Pr)
 {
@@ -2864,13 +2869,14 @@ CMathContent.prototype.Add_Text = function(sText, Paragraph, MathStyle)
         this.CurPos++;
     }
 };
-CMathContent.prototype.Add_Symbol = function(Code)
+CMathContent.prototype.Add_Symbol = function(Code, TextPr)
 {
     var MathRun = new ParaRun(this.Paragraph, true);
 
     var Symbol = new CMathText(false);
     Symbol.add(Code);
     MathRun.Add(Symbol, true);
+    MathRun.Apply_Pr(TextPr);
 
     this.Internal_Content_Add(this.CurPos, MathRun, false);
     this.CurPos++;
