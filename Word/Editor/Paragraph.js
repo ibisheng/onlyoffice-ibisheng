@@ -7283,6 +7283,9 @@ Paragraph.prototype =
 
     Numbering_Get : function()
     {
+        if (!this.bFromDocument)
+            return undefined;
+
         var NumPr = this.Get_CompiledPr2(false).ParaPr.NumPr;
         if ( undefined != NumPr && 0 != NumPr.NumId )
             return NumPr.Copy();
