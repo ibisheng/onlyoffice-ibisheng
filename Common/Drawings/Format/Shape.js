@@ -1843,7 +1843,7 @@ CShape.prototype =
             if (this.spPr && isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect)) {
                 var rect = this.spPr.geometry.rect;
                 var Diff = 1.6;
-                var clipW = rect.r - rect.l + Diff - l_ins - r_ins;
+                var clipW = rect.r - rect.l + Diff;
                 if(clipW <= 0)
                 {
                     clipW = 0.01;
@@ -1853,7 +1853,7 @@ CShape.prototype =
                 {
                     clipH = 0.01;
                 }
-                oClipRect = {x: rect.l + l_ins - Diff, y: rect.t - Diff + t_ins, w: clipW, h: clipH};
+                oClipRect = {x: rect.l - Diff, y: rect.t - Diff + t_ins, w: clipW, h: clipH};
             }
             else {
                 oClipRect = {x: -1.6, y: t_ins, w: this.extX + 3.2, h: this.extY - b_ins};
