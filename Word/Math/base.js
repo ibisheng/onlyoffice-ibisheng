@@ -2634,29 +2634,13 @@ CMathBase.prototype.Get_MenuProps = function()
     }
     else
     {
-        Pr = this.Get_ObjectPropsForMenu();
+        Pr = this.Get_InterfaceProps();
     }
 
     return Pr;
 };
 CMathBase.prototype.Apply_MenuProps = function()
 {};
-CMathBase.prototype.Can_Delete = function()
-{
-    return false;
-};
-CMathBase.prototype.Is_DeletedItem = function(Type)
-{
-    return Type == c_oAscMathMenuTypes.DeleteElement && true === this.Can_Delete();
-};
-CMathBase.prototype.Can_DeleteSubScript = function()
-{
-    return false;
-};
-CMathBase.prototype.Can_DeleteSuperScript = function()
-{
-    return false;
-};
 CMathBase.prototype.Get_DeletedItemsThroughInterface = function()
 {
     var DeletedItems = null;
@@ -2688,29 +2672,6 @@ CMathBase.prototype.Get_DeletedItemsThroughInterface = function()
     }
 
     return DeletedItems;
-};
-CMathBase.prototype.Get_ObjectPropsForMenu = function()
-{
-    var Pr = this.Get_InterfaceProps();
-
-    if(Pr == null)
-        Pr = {};
-
-    if(true === this.Can_ModifyArgSize())
-    {
-        var CompiledArgSize = this.Content[this.CurPos].Get_CompiledArgSize();
-        Pr.bCanDecrease = CompiledArgSize.Can_Decrease();
-        Pr.bCanIncrease = CompiledArgSize.Can_Increase();
-    }
-    else
-    {
-        Pr.bCanDecrease = false;
-        Pr.bCanIncrease = false;
-    }
-
-    Pr.bCanDelete            = this.Can_Delete();
-
-    return Pr;
 };
 CMathBase.prototype.Can_DecreaseArgumentSize = function()
 {

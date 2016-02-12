@@ -499,10 +499,6 @@ CDegree.prototype.setPosition = function(pos, PosInfo)
         CMathBase.prototype.setPosition.call(this, pos, PosInfo);
     }
 };
-CDegree.prototype.Can_Delete = function()
-{
-    return true;
-};
 CDegree.prototype.Is_SimpleDelete = function()
 {
     return true;
@@ -1124,18 +1120,6 @@ CDegreeSubSup.prototype.protected_GetRangeEndPos = function(CurLine, CurRange)
     var _CurRange = ( 0 === CurLine ? CurRange + this.StartRange : CurRange );
 
     return this.Need_Iters(_CurLine, _CurRange) ? 2 : 0;
-};
-CDegreeSubSup.prototype.Can_DeleteSubScript = function()
-{
-    return this.Pr.type == DEGREE_SubSup;
-};
-CDegreeSubSup.prototype.Can_DeleteSuperScript = function()
-{
-    return this.Pr.type == DEGREE_SubSup;
-};
-CDegreeSubSup.prototype.Can_Delete = function()
-{
-    return this.Pr.type == DEGREE_PreSubSup;
 };
 CDegreeSubSup.prototype.Is_SimpleDelete = function()
 {

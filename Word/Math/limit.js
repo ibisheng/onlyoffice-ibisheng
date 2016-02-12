@@ -285,10 +285,6 @@ CLimit.prototype.raw_SetType = function(Value)
         this.ApplyProperties();
     }
 };
-CLimit.prototype.Can_Delete = function()
-{
-    return true;
-};
 CLimit.prototype.Is_SimpleDelete = function()
 {
     return true;

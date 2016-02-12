@@ -1583,10 +1583,8 @@ ParaMath.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 
 };
 
-ParaMath.prototype.Load_PropsFromMenu_2 = function() //тестовая функция для контекстного меню
+ParaMath.prototype.Load_PropsFromMenu_2 = function(Pr) //тестовая функция для контекстного меню
 {
-    var Pr = this.Get_MenuProps();
-
     var PrevState = TEST_PREV_STATE_MENU;
     var TypeMathMenu, Gap;
 
@@ -1620,15 +1618,6 @@ ParaMath.prototype.Load_PropsFromMenu_2 = function() //тестовая функ
                 //Pr.Action |= c_oMathMenuAction.RemoveRadical;
                 TEST_PREV_STATE_MENU = c_oAscMathMenuTypes.DeleteElement;
             }
-
-            /*if(Pr.HideDegree !== undefined && PrevState !== c_oAscMathMenuTypes.RadicalHideDegree)
-                TypeMathMenu = c_oAscMathMenuTypes.RadicalHideDegree;
-            else if(PrevState !== c_oAscMathMenuTypes.IncreaseArgSize)
-                TypeMathMenu = c_oAscMathMenuTypes.IncreaseArgSize;
-            else
-                TypeMathMenu = c_oAscMathMenuTypes.DeleteElement;
-
-            this.Root.Load_PropsFromMenu(TypeMathMenu);*/
 
             break;
         }
@@ -1705,7 +1694,6 @@ ParaMath.prototype.Load_PropsFromMenu_2 = function() //тестовая функ
                 TypeMathMenu = c_oAscMathMenuTypes.DelimiterRemoveContent;
             }*/
 
-            this.Root.Load_PropsFromMenu(TypeMathMenu);
 
             break;
         }
@@ -1726,8 +1714,6 @@ ParaMath.prototype.Load_PropsFromMenu_2 = function() //тестовая функ
                     TypeMathMenu = c_oAscMathMenuTypes.GroupCharOver;
                 }
             }
-
-            this.Root.Load_PropsFromMenu(c_oAscMathMenuTypes.DeleteElement);
 
             break;
         }
@@ -1754,8 +1740,6 @@ ParaMath.prototype.Load_PropsFromMenu_2 = function() //тестовая функ
             {
                 TypeMathMenu = c_oAscMathMenuTypes.IncreaseArgSize;
             }
-
-            this.Root.Load_PropsFromMenu(TypeMathMenu);
 
             break;
         }
@@ -1793,8 +1777,6 @@ ParaMath.prototype.Load_PropsFromMenu_2 = function() //тестовая функ
             {
                 TypeMathMenu = c_oAscMathMenuTypes.BorderBoxHideTop;
             }
-
-            this.Root.Load_PropsFromMenu(TypeMathMenu);
 
             break;
         }
@@ -1932,8 +1914,6 @@ ParaMath.prototype.Load_PropsFromMenu_2 = function() //тестовая функ
                 TypeMathMenu = c_oAscMathMenuTypes.MatrixRemoveColumn;
             }
 
-            this.Root.Load_PropsFromMenu(TypeMathMenu, Gap);
-
             break;
         }
         case c_oAscMathInterfaceType.EqArray:
@@ -1996,8 +1976,6 @@ ParaMath.prototype.Load_PropsFromMenu_2 = function() //тестовая функ
                 TypeMathMenu = c_oAscMathMenuTypes.EqArrayRowOneAndHalfGap;
             }
 
-            this.Root.Load_PropsFromMenu(c_oAscMathMenuTypes.EqArrayRemoveRow);
-
             break;
         }
         case c_oAscMathInterfaceType.Script:
@@ -2018,16 +1996,31 @@ ParaMath.prototype.Load_PropsFromMenu_2 = function() //тестовая функ
                 TypeMathMenu = c_oAscMathMenuTypes.DeleteElement;
             }*/
 
-            if(PrevState == c_oAscMathMenuTypes.IncreaseArgSize)
+            /*if(PrevState == c_oAscMathMenuTypes.IncreaseArgSize)
             {
                 TypeMathMenu = c_oAscMathMenuTypes.DecreaseArgSize;
             }
             else
             {
                 TypeMathMenu = c_oAscMathMenuTypes.IncreaseArgSize;
+            }*/
+
+            if(Pr.ScriptType == c_oAscMathInterfaceScript.SubSup)
+            {
+                if(PrevState !== c_oAscMathMenuTypes.DeleteSuperScript)
+                {
+                    Pr.put_ScriptType(c_oAscMathInterfaceScript.Sup);
+                    TEST_PREV_STATE_MENU = c_oAscMathMenuTypes.DeleteSuperScript;
+                }
+                else
+                {
+                    Pr.put_ScriptType(c_oAscMathInterfaceScript.Sub);
+                    TEST_PREV_STATE_MENU = c_oAscMathMenuTypes.DeleteSubScript;
+                }
+
             }
 
-            this.Root.Load_PropsFromMenu(TypeMathMenu);
+
             break;
         }
         case c_oAscMathInterfaceType.Bar:
@@ -2045,12 +2038,10 @@ ParaMath.prototype.Load_PropsFromMenu_2 = function() //тестовая функ
                 TypeMathMenu = c_oAscMathMenuTypes.DeleteElement;
             }
 
-            this.Root.Load_PropsFromMenu(TypeMathMenu);
             break;
         }
         case c_oAscMathInterfaceType.Accent:
         {
-            this.Root.Load_PropsFromMenu(c_oAscMathMenuTypes.DeleteElement);
             break;
         }
         case c_oAscMathInterfaceType.Box:
@@ -2064,19 +2055,12 @@ ParaMath.prototype.Load_PropsFromMenu_2 = function() //тестовая функ
                 TypeMathMenu = c_oAscMathMenuTypes.IncreaseArgSize;
             }
 
-            this.Root.Load_PropsFromMenu(TypeMathMenu);
             break;
         }
     }
 
     this.Root.Set_MenuProps(Pr);
 
-};
-
-ParaMath.prototype.Load_PropsFromMenu = function(Props)
-{
-    if(Props != undefined)
-        this.Root.Load_PropsFromMenu(Props);
 };
 
 ParaMath.prototype.Get_MenuProps = function()

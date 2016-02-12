@@ -718,10 +718,6 @@ CRadical.prototype.raw_SetHideDegree = function(Value)
         }
     }
 };
-CRadical.prototype.Can_Delete = function()
-{
-    return true;
-};
 CRadical.prototype.Is_SimpleDelete = function()
 {
     return true;

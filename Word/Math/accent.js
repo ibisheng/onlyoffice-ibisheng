@@ -646,10 +646,6 @@ CAccent.prototype.GetLastElement = function()
 {
     return this.Content[0].GetLastElement();
 };
-CAccent.prototype.Can_Delete = function()
-{
-    return true;
-};
 CAccent.prototype.Is_SimpleDelete = function()
 {
     return true;

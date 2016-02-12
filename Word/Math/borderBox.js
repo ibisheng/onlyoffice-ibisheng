@@ -1017,10 +1017,6 @@ CBar.prototype.raw_SetLinePos = function(Value)
     this.RecalcInfo.bProps = true;
     this.ApplyProperties();
 };
-CBar.prototype.Can_Delete = function()
-{
-    return true;
-};
 CBar.prototype.Is_SimpleDelete = function()
 {
     return true;

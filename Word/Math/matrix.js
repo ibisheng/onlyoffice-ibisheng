@@ -1769,10 +1769,6 @@ CEqArray.prototype.Get_InterfaceProps = function()
 {
     return new CMathMenuEqArray(this);
 };
-CEqArray.prototype.Can_Delete = function()
-{
-    return true;
-};
 CEqArray.prototype.Is_SimpleDelete = function()
 {
     return false;

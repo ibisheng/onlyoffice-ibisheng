@@ -4012,10 +4012,6 @@ CDelimiter.prototype.raw_HideEndOperator = function(Value)
     this.RecalcInfo.bProps = true;
     this.ApplyProperties();
 };
-CDelimiter.prototype.Can_Delete = function()
-{
-    return true;
-};
 CDelimiter.prototype.Is_SimpleDelete = function()
 {
     return false;
@@ -4513,10 +4509,6 @@ CGroupCharacter.prototype.old_Apply_MenuProps = function(Type)
     {
         this.private_InversePr();
     }
-};
-CGroupCharacter.prototype.Can_Delete = function()
-{
-    return true;
 };
 CGroupCharacter.prototype.Is_SimpleDelete = function()
 {

@@ -4807,10 +4807,27 @@ CMathContent.prototype.Delete_ItemToContentThroughInterface = function(Props, Po
         bDelete = true;
     }*/
 
+
+    if(Item.kind == MATH_DEGREESubSup && Item.Pr.type == DEGREE_SubSup && Props.Type == c_oAscMathInterfaceType.Script)
+    {
+        if(Props.ScriptType == c_oAscMathInterfaceScript.Sup)
+        {
+            this.private_AddModifiedDegree(Pos, DEGREE_SUPERSCRIPT);
+            bDelete = true;
+        }
+        else if(Props.ScriptType == c_oAscMathInterfaceScript.Sub)
+        {
+            this.private_AddModifiedDegree(Pos, DEGREE_SUBSCRIPT);
+            bDelete = true;
+        }
+    }
+
     var RemoveChar      = Props.Action & c_oMathMenuAction.RemoveAccentCharacter && Item.kind == MATH_ACCENT,
         RemoveBar       = Props.Action & c_oMathMenuAction.RemoveBar && Item.kind == MATH_BAR,
+        RemoveScript    = Props.Type == c_oAscMathInterfaceType.Script && Props.ScriptType == c_oAscMathInterfaceScript.None && (Item.kind == MATH_DEGREESubSup || Item.kind == MATH_DEGREE),
+        RemoveLimit     = Props.Type == c_oAscMathInterfaceType.Limit && Props.Pos == c_oAscMathInterfaceLimitPos.None && Item.kind === MATH_LIMIT,
         //RemovePreSubSup = Props.Action & c_oMathMenuAction.RemoveScript && Item.kind == MATH_DEGREESubSup && Item.Pr.type == DEGREE_PreSubSup,
-       // RemoveDegree    = Props.Action & c_oMathMenuAction.RemoveScript && Item.kind == MATH_DEGREE,
+        //RemoveDegree   = Props.Action & c_oMathMenuAction.RemoveScript && Item.kind == MATH_DEGREE,
         //RemoveLimit     = Props.Action & c_oMathMenuAction.RemoveLimit && Item.kind == MATH_LIMIT,
         //RemoveEqArray   = Props.Action & c_oMathMenuAction.RemoveEqArray && Item.kind == MATH_EQ_ARRAY,
         RemoveDelimiter = Props.Action & c_oMathMenuAction.RemoveDelimiter && Item.kind == MATH_DELIMITER,
@@ -4819,7 +4836,7 @@ CMathContent.prototype.Delete_ItemToContentThroughInterface = function(Props, Po
         RemoveBox       = Props.Action & c_oMathMenuAction.RemoveBox && Item.kind == MATH_BOX;
 
 
-    if(RemoveChar || RemoveBar || RemoveDelimiter || RemoveGroupChar || RemoveRadical || RemoveBox)
+    if(RemoveChar || RemoveBar || RemoveScript || RemoveLimit || RemoveDelimiter || RemoveGroupChar || RemoveRadical || RemoveBox)
     {
         var Items = this.Content[Pos].Get_DeletedItemsThroughInterface();
 
@@ -4866,7 +4883,7 @@ CMathContent.prototype.Get_MenuProps = function()
 
         if(true === this.Selection.Use && StartPos !== EndPos)
         {
-            Pr = this.Content[Pos].Get_ObjectPropsForMenu();
+            Pr = this.Content[Pos].Get_InterfaceProps();
         }
         else if(this.Content[Pos].Type == para_Math_Composition)
         {
