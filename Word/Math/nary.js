@@ -144,6 +144,8 @@ function CNary(props)
     this.UpperIterator = null;
     this.Arg           = null;
 
+    this.CurrentLimLoc = null;
+
     if(props !== null && props !== undefined)
         this.init(props);
 
@@ -249,29 +251,21 @@ CNary.prototype.fillBase = function(PropsInfo)
 };
 CNary.prototype.ApplyProperties = function(RPI)
 {
-    if(this.RecalcInfo.bProps || RPI.bChangeInline == true)
+    var bSimpleNarySubSup = RPI.bInline == true || RPI.bDecreasedComp == true;
+    var limLoc = bSimpleNarySubSup == true ? NARY_SubSup : this.private_GetLimLoc();
+
+    if(this.RecalcInfo.bProps == true || RPI.bChangeInline == true || limLoc !== this.CurrentLimLoc)
     {
         var oSign = this.getSign(this.Pr.chr, this.Pr.chrType);
-        this.Sign = oSign.operator;
 
-        var limLoc         = this.Pr.limLoc;
-
-        if(RPI.bInline == true || RPI.bDecreasedComp == true)
+        if(bSimpleNarySubSup)
         {
-            limLoc = NARY_SubSup;
             this.Sign = new CMathText(true);
             this.Sign.add(oSign.chrCode);
         }
-
-        if(limLoc === null || limLoc === undefined)
+        else
         {
-            var bIntegral = oSign.chrCode > 0x222A && oSign.chrCode < 0x2231;
-
-            var oMathSettings = Get_WordDocumentDefaultMathSettings();
-            if(bIntegral)
-                limLoc = oMathSettings.Get_IntLim();
-            else
-                limLoc = oMathSettings.Get_NaryLim();
+            this.Sign = oSign.operator;
         }
 
         var PropsInfo =
@@ -289,6 +283,25 @@ CNary.prototype.ApplyProperties = function(RPI)
 
         this.RecalcInfo.bProps = false;
     }
+
+    this.CurrentLimLoc = limLoc;
+};
+CNary.prototype.private_GetLimLoc = function()
+{
+    var limLoc         = this.Pr.limLoc;
+
+    if(limLoc === null || limLoc === undefined)
+    {
+        var bIntegral = (this.Pr.chr > 0x222A && this.Pr.chr < 0x2231) || this.Pr.chr === null || this.Pr.chr === undefined;
+
+        var oMathSettings = Get_WordDocumentDefaultMathSettings();
+        if(bIntegral)
+            limLoc = oMathSettings.Get_IntLim();
+        else
+            limLoc = oMathSettings.Get_NaryLim();
+    }
+
+    return limLoc;
 };
 CNary.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 {
@@ -445,10 +458,109 @@ CNary.prototype.getSubMathContent = function()
 {
     return this.LowerIterator;
 };
-CNary.prototype.Document_UpdateInterfaceState = function(MathProps)
+CNary.prototype.Apply_MenuProps = function(Props)
 {
-    MathProps.Type = c_oAscMathInterfaceType.LargeOperator;
-    MathProps.Pr   = null;
+    if(Props.Type == c_oAscMathInterfaceType.LargeOperator)
+    {
+        if(Props.LimLoc !== undefined && false == this.Is_Inline() && this.Pr.limLoc !== Props.LimLoc)
+        {
+            var LimLoc = Props.LimLoc == c_oAscMathInterfaceNaryLimitLocation.SubSup ? NARY_SubSup : NARY_UndOvr;
+            History.Add(this, new CChangesMathNaryLimLoc(LimLoc, this.Pr.limLoc));
+            this.raw_SetLimLoc(LimLoc);
+        }
+
+        if(Props.HideUpper !== undefined && Props.HideUpper !== this.Pr.supHide)
+        {
+            History.Add(this, new CChangesMathNaryUpperLimit(!this.Pr.supHide, this.Pr.supHide));
+            this.raw_HideUpperIterator(!this.Pr.supHide);
+        }
+
+        if(Props.HideLower !== undefined && Props.HideLower !== this.Pr.subHide)
+        {
+            History.Add(this, new CChangesMathNaryLowerLimit(!this.Pr.subHide, this.Pr.subHide));
+            this.raw_HideLowerIterator(!this.Pr.subHide);
+        }
+    }
+};
+CNary.prototype.old_Apply_MenuProps = function(Type)
+{
+    if(Type == c_oAscMathMenuTypes.NaryLimLoc)
+    {
+        var NewLimLoc = this.private_GetLimLoc() == NARY_SubSup ? NARY_UndOvr : NARY_SubSup;
+        History.Add(this, new CChangesMathNaryLimLoc(NewLimLoc, this.Pr.limLoc));
+        this.raw_SetLimLoc(NewLimLoc);
+    }
+    else if(Type == c_oAscMathMenuTypes.NaryHideUpperIterator)
+    {
+        History.Add(this, new CChangesMathNaryUpperLimit(!this.Pr.supHide, this.Pr.supHide));
+        this.raw_HideUpperIterator(!this.Pr.supHide);
+    }
+    else if(Type == c_oAscMathMenuTypes.NaryHideLowerIterator)
+    {
+        History.Add(this, new CChangesMathNaryLowerLimit(!this.Pr.subHide, this.Pr.subHide));
+        this.raw_HideLowerIterator(!this.Pr.subHide);
+    }
+};
+CNary.prototype.Get_InterfaceProps = function()
+{
+    return new CMathMenuNary(this);
+};
+CNary.prototype.raw_SetLimLoc = function(Value)
+{
+    if(this.Pr.limLoc !== Value)
+    {
+        this.Pr.limLoc = Value;
+
+        var PropsInfo =
+        {
+            limLoc :    Value,
+            sign:       this.Sign,
+            supHide:    this.Pr.supHide,
+            subHide:    this.Pr.subHide
+        };
+
+        this.fillBase(PropsInfo);
+    }
+};
+CNary.prototype.raw_HideUpperIterator = function(Value)
+{
+    if(this.Pr.supHide !== Value)
+    {
+        this.Pr.supHide = Value;
+
+        var PropsInfo =
+        {
+            limLoc :    this.Pr.limLoc,
+            sign:       this.Sign,
+            supHide:    this.Pr.supHide,
+            subHide:    this.Pr.subHide
+        };
+
+        this.fillBase(PropsInfo);
+
+        this.CurPos = 2;
+        this.Arg.Cursor_MoveToStartPos();
+    }
+};
+CNary.prototype.raw_HideLowerIterator = function(Value)
+{
+    if(this.Pr.subHide !== Value)
+    {
+        this.Pr.subHide = Value;
+
+        var PropsInfo =
+        {
+            limLoc :    this.Pr.limLoc,
+            sign:       this.Sign,
+            supHide:    this.Pr.supHide,
+            subHide:    this.Pr.subHide
+        };
+
+        this.fillBase(PropsInfo);
+
+        this.CurPos = 2;
+        this.Arg.Cursor_MoveToStartPos();
+    }
 };
 CNary.prototype.Is_ContentUse = function(MathContent)
 {
@@ -710,6 +822,61 @@ CNary.prototype.setPosition = function(pos, PosInfo)
         }
     }
 };
+CNary.prototype.Can_ModifyArgSize = function()
+{
+    return this.CurPos !== 2 && false === this.Is_SelectInside();
+};
+
+/**
+ *
+ * @param CMathMenuNary
+ * @constructor
+ * @extends {CMathMenuBase}
+ */
+function CMathMenuNary(Nary)
+{
+    CMathMenuNary.superclass.constructor.call(this, Nary);
+
+    this.Type             = c_oAscMathInterfaceType.LargeOperator;
+
+    if (undefined !== Nary)
+    {
+        var HideUpper = undefined, HideLower = undefined;
+        if (true === Nary.UpperIterator.IsPlaceholder())
+            HideUpper = Nary.Pr.subHide == true;
+
+        if (true === Nary.LowerIterator.IsPlaceholder())
+            HideLower = Nary.Pr.supHide == true;
+
+        this.bCanChangeLimLoc = false == Nary.Is_Inline();
+        this.LimLoc           = Nary.Pr.limLoc === NARY_SubSup ? c_oAscMathInterfaceNaryLimitLocation.SubSup : c_oAscMathInterfaceNaryLimitLocation.UndOvr;
+        this.HideUpper        = HideUpper;
+        this.HideLower        = HideLower;
+    }
+    else
+    {
+        this.LimLoc    = undefined;
+        this.HideUpper = undefined;
+        this.HideLower = undefined;
+    }
+}
+Asc.extendClass(CMathMenuNary, CMathMenuBase);
+CMathMenuNary.prototype.can_ChangeLimitLocation = function(){ return this.bCanChangeLimLoc;};
+CMathMenuNary.prototype.get_LimitLocation       = function(){return this.LimLoc;};
+CMathMenuNary.prototype.put_LimitLocation       = function(LimLoc){this.LimLoc = LimLoc;};
+CMathMenuNary.prototype.get_HideUpper           = function(){return this.HideUpper;};
+CMathMenuNary.prototype.put_HideUpper           = function(Hide){this.HideUpper = Hide;};
+CMathMenuNary.prototype.get_HideLower           = function(){return this.HideLower;};
+CMathMenuNary.prototype.put_HideLower           = function(Hide){this.HideLower = Hide;};
+
+window["CMathMenuNary"] = CMathMenuNary;
+CMathMenuNary.prototype["can_ChangeLimitLocation"] = CMathMenuNary.prototype.can_ChangeLimitLocation;
+CMathMenuNary.prototype["get_LimitLocation"]       = CMathMenuNary.prototype.get_LimitLocation;
+CMathMenuNary.prototype["put_LimitLocation"]       = CMathMenuNary.prototype.put_LimitLocation;
+CMathMenuNary.prototype["get_HideUpper"]           = CMathMenuNary.prototype.get_HideUpper;
+CMathMenuNary.prototype["put_HideUpper"]           = CMathMenuNary.prototype.put_HideUpper;
+CMathMenuNary.prototype["get_HideLower"]           = CMathMenuNary.prototype.get_HideLower;
+CMathMenuNary.prototype["put_HideLower"]           = CMathMenuNary.prototype.put_HideLower;
 
 /**
  *
@@ -746,7 +913,7 @@ CNaryUnd.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
     this.Set_CompiledCtrPrp(Parent, ParaMath, RPI);
 
     var ArgSzUnd = ArgSize.Copy();
-    ArgSzUnd.decrease();
+    ArgSzUnd.Decrease();
 
     var RPIUnd = RPI.Copy();
     RPIUnd.bDecreasedComp = true;
@@ -784,7 +951,7 @@ CNaryOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
     this.Set_CompiledCtrPrp(Parent, ParaMath, RPI);
 
     var ArgSzOvr = ArgSize.Copy();
-    ArgSzOvr.decrease();
+    ArgSzOvr.Decrease();
 
     var RPIOvr = RPI.Copy();
     RPIOvr.bDecreasedComp = true;
@@ -851,7 +1018,7 @@ CNaryUndOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
     this.Set_CompiledCtrPrp(Parent, ParaMath, RPI);
 
     var ArgSzIter = ArgSize.Copy();
-    ArgSzIter.decrease();
+    ArgSzIter.Decrease();
 
     var RPI_Iter = RPI.Copy();
     RPI_Iter.bDecreasedComp = true;
@@ -915,9 +1082,10 @@ CNaryUndOvr.prototype.setPosition = function(pos, PosInfo)
     PosLowIter.x = pos.x + this.GapLeft + this.align(2,0).x;
     PosLowIter.y = PosSign.y + Sign.size.height + this.gapBottom + LowIter.size.ascent;
 
-    UpIter.setPosition(PosUpIter, PosInfo);
-    Sign.setPosition(PosSign, PosInfo);
+    // такой порядок нужен для выравнивания Box по операторам
     LowIter.setPosition(PosLowIter, PosInfo);
+    Sign.setPosition(PosSign, PosInfo);
+    UpIter.setPosition(PosUpIter, PosInfo);
 };
 CNaryUndOvr.prototype.setBase = function(base)
 {

@@ -52,12 +52,6 @@ var NARY_TEXT_OPER              = 13;
 var NARY_UndOvr             	=  0;
 var NARY_SubSup             	=  1;
 
-var BOX_DIFF                	=  0;
-var BOX_OpEmu               	=  1;
-var BOX_ALIGN               	=  2;
-var BOX_BREAK               	=  3;
-var BOX_NOBREAK             	=  4;
-
 ////////////////////////////////////////////////////
 
 //  operators:
@@ -164,13 +158,6 @@ var JC_CENTERGROUP              =  1;
 var JC_LEFT                     =  2;
 var JC_RIGHT                    =  3;
 
-var MATH_TEXT                   =  0;
-var MATH_RUN_PRP                =  1;
-var MATH_COMP                   =  2;
-var MATH_EMPTY                  =  3;
-var MATH_PLACEHOLDER            =  4;
-var MATH_PARA_RUN               =  5;
-
 var LOCATION_TOP                =  0;
 var LOCATION_BOT                =  1;
 var LOCATION_LEFT               =  2;
@@ -211,3 +198,81 @@ var MATH_UPDWRAP_UNDERFLOW      = 2;
 
 var MATH_SIZE                   = 0;
 var MATH_BOUNDS_MEASURES        = 1;
+
+var MATH_MATRIX_ROW             = 0;
+var MATH_MATRIX_COLUMN          = 1;
+
+var c_oAscMathMenuTypes =
+{
+    FractionBar:                0x001,
+    FractionSkewed:             0x002,
+    FractionLinear:             0x003,
+    FractionNoBar:              0x004,
+    RadicalHideDegree:          0x005,
+    NaryLimLoc:                 0x006,
+    NaryHideUpperIterator:      0x007,
+    NaryHideLowerIterator:      0x008,
+    DelimiterHideBegOper:       0x009,
+    DelimiterHideEndOper:       0x00A,
+    DelimiterAddToLeft:         0x00B,
+    DelimiterAddToRight:        0x00C,
+    DelimiterRemoveContent:     0x00D,
+    DelimiterGrow:              0x00E,
+    DelimiterShpCentred:        0x00F,
+    GroupCharOver:              0x010,
+    GroupCharUnder:             0x011,
+    LimitOver:                  0x012,
+    LimitUnder:                 0x013,
+    BorderBoxHideTop:           0x014,
+    BorderBoxHideBot:           0x015,
+    BorderBoxHideLeft:          0x016,
+    BorderBoxHideRight:         0x017,
+    BorderBoxStrikeHor:         0x018,
+    BorderBoxStrikeVer:         0x019,
+    BorderBoxStrikeTopLTR:      0x020,
+    BorderBoxStrikeTopRTL:      0x021,
+    MatrixAddRowUnder:          0x022,
+    MatrixAddRowOver:           0x023,
+    MatrixRemoveRow:            0x024,
+    MatrixAddColumnToLeft:      0x025,
+    MatrixAddColumnToRight:     0x026,
+    MatrixRemoveColumn:         0x027,
+    MatrixBaseJcCenter:         0x028,
+    MatrixBaseJcTop:            0x029,
+    MatrixBaseJcBottom:         0x030,
+    MatrixColumnJcCenter:       0x031,
+    MatrixColumnJcLeft:         0x032,
+    MatrixColumnJcRight:        0x033,
+    MatrixRowSingleGap:         0x034,
+    MatrixRowOneAndHalfGap:     0x035,
+    MatrixRowDoubleGap:         0x036,
+    MatrixRowExactlyGap:        0x037,
+    MatrixRowMultipleGap:       0x038,
+    MatrixColumnSingleGap:      0x039,
+    MatrixColumnOneAndHalfGap:  0x040,
+    MatrixColumnDoubleGap:      0x041,
+    MatrixColumnExactlyGap:     0x042,
+    MatrixColumnMultipleGap:    0x043,
+    MatrixHidePlaceholders:     0x044,
+    MatrixMinColumnWidth:       0x045,
+    EqArrayAddRowUnder:         0x046,
+    EqArrayAddRowOver:          0x047,
+    EqArrayRemoveRow:           0x048,
+    EqArrayBaseJcCenter:        0x049,
+    EqArrayBaseJcTop:           0x050,
+    EqArrayBaseJcBottom:        0x051,
+    EqArrayRowSingleGap:        0x052,
+    EqArrayRowOneAndHalfGap:    0x053,
+    EqArrayRowDoubleGap:        0x054,
+    EqArrayRowExactlyGap:       0x055,
+    EqArrayRowMultipleGap:      0x056,
+    BarLineOver:                0x057,
+    BarLineUnder:               0x058,
+    DeleteElement:              0x059,
+    DeleteSubScript:            0x060,
+    DeleteSuperScript:          0x061,
+    IncreaseArgSize:            0x062,
+    DecreaseArgSize:            0x063,
+    AddForcedBreak:             0x064,
+    DeleteForcedBreak:          0x065
+};

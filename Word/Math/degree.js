@@ -83,7 +83,7 @@ CDegreeBase.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsI
     this.baseContent.PreRecalc(this, ParaMath, ArgSize, RPI);
 
     var ArgSzDegr = ArgSize.Copy();
-    ArgSzDegr.decrease();
+    ArgSzDegr.Decrease();
 
     var RPIDegr = RPI.Copy();
     RPIDegr.bDecreasedComp = true;
@@ -437,11 +437,6 @@ CDegree.prototype.fillContent = function()
 
     CDegree.superclass.fillContent.call(this);
 };
-CDegree.prototype.Document_UpdateInterfaceState = function(MathProps)
-{
-    MathProps.Type = c_oAscMathInterfaceType.Script;
-    MathProps.Pr   = null;
-};
 CDegree.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
 {
     var CurLine = _CurLine - this.StartLine;
@@ -504,6 +499,23 @@ CDegree.prototype.setPosition = function(pos, PosInfo)
         CMathBase.prototype.setPosition.call(this, pos, PosInfo);
     }
 };
+CDegree.prototype.Can_Delete = function()
+{
+    return true;
+};
+CDegree.prototype.Is_SimpleDelete = function()
+{
+    return true;
+};
+CDegree.prototype.Get_InterfaceProps = function()
+{
+    var Type = this.Pr.type == DEGREE_SUBSCRIPT ? c_oAscMathInterfaceScript.Sub : c_oAscMathInterfaceScript.Sup;
+    return new CMathMenuScript(this, Type);
+};
+CDegree.prototype.Can_ModifyArgSize = function()
+{
+    return this.CurPos == 1 && false === this.Is_SelectInside(); // находимся в итераторе
+};
 
 /**
  *
@@ -515,10 +527,6 @@ CDegree.prototype.setPosition = function(pos, PosInfo)
 function CIterators(iterUp, iterDn)
 {
     CIterators.superclass.constructor.call(this, true);
-
-    this.lUp = 0;   // центр основания
-    this.lD = 0;    // высота - центр основания
-    this.upper = 0; // смещение сверху для позиции основания
 
     this.iterUp = iterUp;
     this.iterDn = iterDn;
@@ -579,6 +587,31 @@ CIterators.prototype.setLowerIterator = function(iterator)
 CIterators.prototype.alignIterators = function(mcJc)
 {
     this.alignment.wdt[0] = mcJc;
+};
+CIterators.prototype.setPosition = function(pos, PosInfo)
+{
+     this.pos.x = pos.x;
+     this.pos.y = pos.y;
+
+    var UpIterPos = new CMathPosition();
+    var al = this.align(0, 0);
+
+    UpIterPos.x = this.pos.x + this.GapLeft + al.x;
+    UpIterPos.y = this.pos.y + this.iterUp.size.ascent;
+
+    var DownIterPos = new CMathPosition();
+    al = this.align(1, 0);
+
+    DownIterPos.x = this.pos.x + this.GapLeft + al.x;
+    DownIterPos.y = this.pos.y + this.dH + this.iterUp.size.height + this.iterDn.size.ascent;
+
+    // сначала выставляем setPosition у верхнего итератора, потом у нижнего
+    // такой порядок нужен для выравнивания Box по операторам (так же как в Ворде)
+
+    this.iterDn.setPosition(DownIterPos, PosInfo);
+    this.iterUp.setPosition(UpIterPos, PosInfo);
+
+    pos.x += this.size.width;
 };
 
 function CMathDegreeSubSupPr()
@@ -661,9 +694,6 @@ CDegreeSubSupBase.prototype.fillContent = function()
     this.setDimension(1, 2);
 
     oIters.init();
-
-    oIters.lUp = 0;
-    oIters.lD = 0;
 
     if(this.Pr.type == DEGREE_SubSup)
     {
@@ -903,7 +933,7 @@ CDegreeSubSup.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine
     }
     else
     {
-        CDegreeBase.prototype.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
+        CDegreeSubSupBase.prototype.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
     }
 
 };
@@ -1095,8 +1125,54 @@ CDegreeSubSup.prototype.protected_GetRangeEndPos = function(CurLine, CurRange)
 
     return this.Need_Iters(_CurLine, _CurRange) ? 2 : 0;
 };
-CDegreeSubSup.prototype.Document_UpdateInterfaceState = function(MathProps)
+CDegreeSubSup.prototype.Can_DeleteSubScript = function()
 {
-    MathProps.Type = c_oAscMathInterfaceType.Script;
-    MathProps.Pr   = null;
+    return this.Pr.type == DEGREE_SubSup;
 };
+CDegreeSubSup.prototype.Can_DeleteSuperScript = function()
+{
+    return this.Pr.type == DEGREE_SubSup;
+};
+CDegreeSubSup.prototype.Can_Delete = function()
+{
+    return this.Pr.type == DEGREE_PreSubSup;
+};
+CDegreeSubSup.prototype.Is_SimpleDelete = function()
+{
+    return true;
+};
+CDegreeSubSup.prototype.Get_InterfaceProps = function()
+{
+    var Type = this.Pr.type == DEGREE_PreSubSup ? c_oAscMathInterfaceScript.PreSubSup : c_oAscMathInterfaceScript.SubSup;
+    return new CMathMenuScript(this, Type);
+};
+CDegreeSubSup.prototype.Can_ModifyArgSize = function()
+{
+    return this.CurPos !== 0 && false === this.Is_SelectInside(); // находимся в итераторе
+};
+
+/**
+ *
+ * @param CMathMenuScript
+ * @constructor
+ * @extends {CMathMenuBase}
+ */
+function CMathMenuScript(Script, Type)
+{
+    CMathMenuScript.superclass.constructor.call(this, Script);
+
+    this.Type       = c_oAscMathInterfaceType.Script;
+
+    if (undefined !== Type)
+        this.ScriptType = Type;
+    else
+        this.ScriptType = undefined;
+}
+Asc.extendClass(CMathMenuScript, CMathMenuBase);
+
+CMathMenuScript.prototype.get_ScriptType = function(){return this.ScriptType;};
+CMathMenuScript.prototype.put_ScriptType = function(Type){this.ScriptType = Type;};
+
+window["CMathMenuScript"] = CMathMenuScript;
+CMathMenuScript.prototype["get_ScriptType"] = CMathMenuScript.prototype.get_ScriptType;
+CMathMenuScript.prototype["put_ScriptType"] = CMathMenuScript.prototype.put_ScriptType;

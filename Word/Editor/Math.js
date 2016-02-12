@@ -7,6 +7,8 @@
 var g_dMathArgSizeKoeff_1 = 0.76;
 var g_dMathArgSizeKoeff_2 = 0.6498; // 0.76 * 0.855
 
+var TEST_PREV_STATE_MENU = 0;
+
 function CMathPropertiesSettings()
 {
     this.brkBin     = null;
@@ -30,6 +32,9 @@ function CMathPropertiesSettings()
     this.interSp    = null;
 
     this.intraSp    = null;
+
+    // mathFont: в качестве font поддерживается только Cambria Math
+    // остальные шрифты  возможно будут поддержаны MS Word в будущем
 
     this.mathFont   = null;
 
@@ -83,12 +88,202 @@ CMathPropertiesSettings.prototype.Merge = function(Pr)
     if(Pr.mathFont !== null && Pr.mathFont !== undefined)
         this.mathFont = Pr.mathFont;
 };
+CMathPropertiesSettings.prototype.Copy = function()
+{
+    var NewPr = new CMathPropertiesSettings();
+
+    NewPr.brkBin     = this.brkBin;
+    NewPr.defJc      = this.defJc;
+    NewPr.dispDef    = this.dispDef;
+    NewPr.intLim     = this.intLim;
+    NewPr.lMargin    = this.lMargin;
+    NewPr.naryLim    = this.naryLim;
+    NewPr.rMargin    = this.rMargin;
+    NewPr.wrapIndent = this.wrapIndent;
+    NewPr.brkBinSub  = this.brkBinSub;
+    NewPr.interSp    = this.interSp;
+    NewPr.intraSp    = this.intraSp;
+    NewPr.mathFont   = this.mathFont;
+    NewPr.postSp     = this.postSp;
+    NewPr.preSp      = this.preSp;
+    NewPr.smallFrac  = this.smallFrac;
+    NewPr.wrapRight  = this.wrapRight;
+
+    return NewPr;
+};
+CMathPropertiesSettings.prototype.Write_ToBinary = function(Writer)
+{
+    var StartPos = Writer.GetCurPosition();
+    Writer.Skip(4);
+    var Flags = 0;
+
+    if(undefined !== this.brkBin)
+    {
+        Writer.WriteLong( this.brkBin );
+        Flags |= 1;
+    }
+
+    if(undefined !== this.brkBinSub)
+    {
+        Writer.WriteLong( this.brkBinSub );
+        Flags |= 2;
+    }
+
+    if(undefined !== this.defJc)
+    {
+        Writer.WriteLong( this.defJc );
+        Flags |= 4;
+    }
+
+    if(undefined !== this.dispDef)
+    {
+        Writer.WriteBool( this.dispDef );
+        Flags |= 8;
+    }
+
+    if(undefined !== this.interSp)
+    {
+        Writer.WriteLong( this.interSp );
+        Flags |= 16;
+    }
+
+    if(undefined !== this.intLim)
+    {
+        Writer.WriteLong( this.intLim );
+        Flags |= 32;
+    }
+
+    if(undefined !== this.intraSp)
+    {
+        Writer.WriteLong( this.intraSp );
+        Flags |= 64;
+    }
+
+    if(undefined !== this.lMargin)
+    {
+        Writer.WriteLong( this.lMargin );
+        Flags |= 128;
+    }
+
+    if(undefined !== this.mathFont)
+    {
+        Writer.WriteString2( this.mathFont.Name );
+        Flags |= 256;
+    }
+
+    if(undefined !== this.naryLim)
+    {
+        Writer.WriteLong( this.naryLim );
+        Flags |= 512;
+    }
+
+    if(undefined !== this.postSp)
+    {
+        Writer.WriteLong( this.postSp );
+        Flags |= 1024;
+    }
+
+    if(undefined !== this.preSp)
+    {
+        Writer.WriteLong( this.preSp );
+        Flags |= 2048;
+    }
+
+    if(undefined !== this.rMargin)
+    {
+        Writer.WriteLong( this.rMargin );
+        Flags |= 4096;
+    }
+
+    if(undefined !== this.smallFrac)
+    {
+        Writer.WriteBool( this.smallFrac );
+        Flags |= 8192;
+    }
+
+    if(undefined !== this.wrapIndent)
+    {
+        Writer.WriteLong( this.wrapIndent );
+        Flags |= 16384;
+    }
+
+    if(undefined !== this.wrapRight)
+    {
+        Writer.WriteBool( this.wrapRight );
+        Flags |= 32768;
+    }
+
+    var EndPos = Writer.GetCurPosition();
+    Writer.Seek( StartPos );
+    Writer.WriteLong( Flags );
+    Writer.Seek( EndPos );
+};
+CMathPropertiesSettings.prototype.Read_FromBinary = function(Reader)
+{
+    var Flags = Reader.GetLong();
+
+    if ( Flags & 1 )
+        this.brkBin = Reader.GetLong();
+
+    if( Flags & 2 )
+        this.brkBinSub = Reader.GetLong();
+
+    if( Flags & 4 )
+        this.defJc = Reader.GetLong();
+
+    if( Flags & 8 )
+        this.dispDef = Reader.GetBool();
+
+    if( Flags & 16 )
+        this.interSp = Reader.GetLong();
+
+    if( Flags & 32 )
+        this.intLim = Reader.GetLong();
+
+    if( Flags & 64 )
+        this.intraSp = Reader.GetLong();
+
+    if( Flags & 128 )
+        this.lMargin = Reader.GetLong();
+
+    if( Flags & 256 )
+    {
+        this.mathFont =
+        {
+            Name  : Reader.GetString2(),
+            Index : -1
+        };
+    }
+
+    if( Flags & 512 )
+        this.naryLim = Reader.GetLong();
+
+    if( Flags & 1024 )
+        this.postSp = Reader.GetLong();
+
+    if( Flags & 2048 )
+        this.preSp = Reader.GetLong();
+
+    if( Flags & 4096 )
+        this.rMargin = Reader.GetLong();
+
+    if( Flags & 8192 )
+        this.smallFrac = Reader.GetBool();
+
+    if( Flags & 16384 )
+        this.wrapIndent = Reader.GetLong();
+
+    if( Flags & 32768 )
+        this.wrapRight = Reader.GetBool();
+
+
+};
 
 function CMathSettings()
 {
-    this.Pr        = new CMathPropertiesSettings();
-    this.CompiledPr= new CMathPropertiesSettings();
-    this.DefaultPr = new CMathPropertiesSettings();
+    this.Pr         = new CMathPropertiesSettings();
+    this.CompiledPr = new CMathPropertiesSettings();
+    this.DefaultPr  = new CMathPropertiesSettings();
 
     this.DefaultPr.SetDefaultPr();
 
@@ -182,6 +377,162 @@ CMathSettings.prototype.Get_BrkBin = function()
     this.SetCompiledPr();
     return this.CompiledPr.brkBin;
 };
+CMathSettings.prototype.Load_Settings = function()
+{
+    var Settings = {};
+
+    /*if(this.CompiledPr.brkBin !== BREAK_AFTER)
+        Settings.brkBin = BREAK_AFTER;
+    else if(this.CompiledPr.brkBin !== BREAK_BEFORE)
+        Settings.brkBin = BREAK_BEFORE;*/
+
+    /*if(this.CompiledPr.intLim !== NARY_SubSup)
+        Settings.intLim = NARY_SubSup;
+    else if(this.CompiledPr.intLim !== NARY_UndOvr)
+        Settings.intLim = NARY_UndOvr;
+
+    if(this.CompiledPr.naryLim !== NARY_SubSup)
+        Settings.naryLim = NARY_SubSup;
+    else if(this.CompiledPr.naryLim !== NARY_UndOvr)
+        Settings.naryLim = NARY_UndOvr;*/
+
+
+    /*if(this.CompiledPr.defJc == align_Justify)
+    {
+        Settings.defJc = align_Left;
+    }
+    else if(this.CompiledPr.defJc == align_Left)
+    {
+        Settings.defJc = align_Center;
+    }
+    else if(this.CompiledPr.defJc == align_Center)
+    {
+        Settings.defJc = align_Right;
+    }
+    else
+    {
+        Settings.defJc = align_Justify;
+    }*/
+
+    /*if(this.CompiledPr.wrapIndent >= 25 && this.CompiledPr.wrapIndent < 26)
+    {
+        Settings.wrapIndent = 26;
+    }
+
+    if(this.CompiledPr.wrapIndent >= 26 && this.CompiledPr.wrapIndent < 27)
+    {
+        Settings.wrapIndent = 27;
+    }
+
+    if(this.CompiledPr.wrapIndent >= 27 && this.CompiledPr.wrapIndent < 28)
+    {
+        Settings.wrapIndent = 28;
+    }
+
+    if(this.CompiledPr.wrapIndent >= 28 && this.CompiledPr.wrapIndent < 29)
+    {
+        Settings.wrapIndent = 29;
+    }
+
+    if(this.CompiledPr.wrapIndent >= 29 && this.CompiledPr.wrapIndent < 30)
+    {
+        Settings.wrapIndent = 30;
+    }*/
+
+    if(this.CompiledPr.rMargin < 15)
+    {
+        Settings.rMargin = 15;
+    }
+    else if(this.CompiledPr.rMargin < 20)
+    {
+        Settings.rMargin = 20;
+    }
+    else if(this.CompiledPr.rMargin < 26)
+    {
+        Settings.rMargin = 26;
+    }
+    else if(this.CompiledPr.rMargin < 31)
+    {
+        Settings.rMargin = 31;
+    }
+    else if(this.CompiledPr.rMargin < 37)
+    {
+        Settings.rMargin = 37;
+    }
+
+
+    this.Load_PropsFromMenu(Settings);
+
+};
+CMathSettings.prototype.Load_PropsFromMenu = function(Settings)
+{
+    this.Pr.Merge(Settings);
+    this.bNeedCompile = true;
+};
+CMathSettings.prototype.Load_Settings_2 = function()
+{
+     var PrevState = TEST_PREV_STATE_MENU;
+     var TypeMathMenu;
+
+     if(this.CompiledPr.brkBin !== BREAK_AFTER)
+     TypeMathMenu = c_oAscMathMenuTypes.BreakAfter;
+     else
+     TypeMathMenu =  c_oAscMathMenuTypes.BreakBefore;
+
+     this.Load_PropsFromMenu(TypeMathMenu);
+
+     TEST_PREV_STATE_MENU = TypeMathMenu;
+};
+CMathSettings.prototype.Load_PropsFromMenu_2 = function(Type)
+{
+    switch(Type)
+    {
+        case c_oAscMathMenuTypes.BreakBefore:
+        {
+            if(this.Pr.brkBin !== BREAK_BEFORE)
+            {
+                this.Pr.brkBin = BREAK_BEFORE;
+                this.bNeedCompile = true;
+            }
+            break;
+        }
+        case c_oAscMathMenuTypes.BreakAfter:
+        {
+            if(this.Pr.brkBin !== BREAK_AFTER)
+            {
+                this.Pr.brkBin = BREAK_AFTER;
+                this.bNeedCompile = true;
+            }
+            break;
+        }
+    }
+};
+CMathSettings.prototype.Get_CopyPr = function()
+{
+    return this.Pr.Copy();
+};
+CMathSettings.prototype.Get_MenuProps = function()
+{
+    return this.CompiledPr.Copy();
+};
+CMathSettings.prototype.Save_Changes = function(Data, Writer)
+{
+    WriteChanges_ToBinary(Data, Writer);
+};
+CMathSettings.prototype.Load_Changes = function(Reader)
+{
+    ReadChanges_FromBinary(Reader, this);
+};
+CMathSettings.prototype.Write_ToBinary = function(Writer)
+{
+    this.Pr.Write_ToBinary(Writer);
+};
+CMathSettings.prototype.Read_FromBinary = function(Reader)
+{
+    this.Pr.Read_FromBinary(Reader);
+    this.bNeedCompile = true;
+};
+
 
 function Get_WordDocumentDefaultMathSettings()
 {
@@ -559,7 +910,6 @@ function ParaMath()
 
     this.DispositionOpers   = [];
 
-    this.bFirstRecalculate  = false;
     this.DefaultTextPr      = new CTextPr();
 
     this.DefaultTextPr.FontFamily = {Name  : "Cambria Math", Index : -1 };
@@ -608,6 +958,10 @@ ParaMath.prototype.Set_Paragraph = function(Paragraph)
     this.Root.Set_Paragraph(Paragraph);
     this.Root.Set_ParaMath(this, null);
 };
+ParaMath.prototype.Get_Paragraph = function()
+{
+    return this.Paragraph;
+};
 
 ParaMath.prototype.Get_Text = function(Text)
 {
@@ -644,6 +998,7 @@ ParaMath.prototype.Get_TextPr = function(_ContentPos, Depth)
 
     return TextPr;
 };
+
 ParaMath.prototype.Get_CompiledTextPr = function(Copy)
 {
     var oContent = this.GetSelectContent();
@@ -807,7 +1162,7 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
 
     var W = this.PageInfo.GetMaxW(Page);
 
-    var alignBrk = this.Root.GetAlignBrk(_CurLine, _CurRange);
+    var alignBrk = this.Root.Get_AlignBrk(_CurLine, _CurRange);
     var DispLng = this.DispositionOpers.length;
 
     var bAlignAt = WrapState === ALIGN_MARGIN_WRAP && DispLng > 0 && bFirstLine === false && alignBrk > 0;
@@ -1227,6 +1582,512 @@ ParaMath.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 {
 
 };
+
+ParaMath.prototype.Load_PropsFromMenu_2 = function() //тестовая функция для контекстного меню
+{
+    var Pr = this.Get_MenuProps();
+
+    var PrevState = TEST_PREV_STATE_MENU;
+    var TypeMathMenu, Gap;
+
+    switch(Pr.Type)
+    {
+        case c_oAscMathInterfaceType.Fraction:
+        {
+            if(Pr.FractionType == c_oAscMathInterfaceFraction.NoBar)
+            {
+                Pr.FractionType = c_oAscMathInterfaceFraction.Bar;
+            }
+            else
+            {
+                Pr.FractionType++;
+            }
+
+            TEST_PREV_STATE_MENU = Pr.FractionType;
+
+            break;
+        }
+        case c_oAscMathInterfaceType.Radical:
+        {
+            if(Pr.HideDegree != undefined && PrevState !== c_oAscMathMenuTypes.RadicalHideDegree)
+            {
+                Pr.HideDegree = !Pr.HideDegree;
+                TEST_PREV_STATE_MENU = c_oAscMathMenuTypes.RadicalHideDegree;
+            }
+            else
+            {
+                Pr.remove_Radical();
+                //Pr.Action |= c_oMathMenuAction.RemoveRadical;
+                TEST_PREV_STATE_MENU = c_oAscMathMenuTypes.DeleteElement;
+            }
+
+            /*if(Pr.HideDegree !== undefined && PrevState !== c_oAscMathMenuTypes.RadicalHideDegree)
+                TypeMathMenu = c_oAscMathMenuTypes.RadicalHideDegree;
+            else if(PrevState !== c_oAscMathMenuTypes.IncreaseArgSize)
+                TypeMathMenu = c_oAscMathMenuTypes.IncreaseArgSize;
+            else
+                TypeMathMenu = c_oAscMathMenuTypes.DeleteElement;
+
+            this.Root.Load_PropsFromMenu(TypeMathMenu);*/
+
+            break;
+        }
+        case c_oAscMathInterfaceType.LargeOperator:
+        {
+            /*if(Pr.HideUpper !== true && Pr.HideLower !== true && PrevState !== c_oAscMathMenuTypes.NaryLimLoc)
+            {
+
+            }*/
+
+            /*if(PrevState !== c_oAscMathMenuTypes.NaryLimLoc && Pr.HideUpper !== true && Pr.HideLower !== true)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.NaryLimLoc;
+            }
+            else if(PrevState !== c_oAscMathMenuTypes.NaryHideUpperIterator && Pr.HideUpper !== undefined)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.NaryHideUpperIterator;
+            }
+            else if(PrevState !== c_oAscMathMenuTypes.NaryHideLowerIterator && Pr.HideLower !== undefined)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.NaryHideLowerIterator;
+            }
+
+            this.Root.Load_PropsFromMenu(c_oAscMathMenuTypes.IncreaseArgSize);*/
+
+            break;
+        }
+        case c_oAscMathInterfaceType.Delimiter:
+        {
+            if(PrevState == c_oAscMathMenuTypes.DelimiterAddToRight)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.DelimiterAddToLeft;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.DelimiterAddToLeft)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.DelimiterRemoveContent;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.DelimiterRemoveContent && Pr != undefined && Pr.Grow == true)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.DelimiterShpCentred;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.DelimiterRemoveContent || PrevState == c_oAscMathMenuTypes.DelimiterShpCentred)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.DelimiterGrow;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.DelimiterGrow)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.DelimiterHideBegOper;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.DelimiterHideBegOper)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.DelimiterHideEndOper;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.DelimiterHideEndOper)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.DeleteElement;
+            }
+            else
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.DelimiterAddToRight;
+            }
+
+
+            /*if(PrevState == c_oAscMathMenuTypes.DelimiterRemoveContent)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.DelimiterAddToRight;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.DelimiterAddToRight)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.DelimiterAddToLeft;
+            }
+            else
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.DelimiterRemoveContent;
+            }*/
+
+            this.Root.Load_PropsFromMenu(TypeMathMenu);
+
+            break;
+        }
+        case c_oAscMathInterfaceType.GroupChar:
+        {
+            if(PrevState == c_oAscMathMenuTypes.GroupCharOver || Pr.bCanChangePos == false)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.DeleteElement;
+            }
+            else if(Pr.bCanChangePos == true)
+            {
+                if(Pr.bUnder == false)
+                {
+                    TypeMathMenu = c_oAscMathMenuTypes.GroupCharUnder;
+                }
+                else
+                {
+                    TypeMathMenu = c_oAscMathMenuTypes.GroupCharOver;
+                }
+            }
+
+            this.Root.Load_PropsFromMenu(c_oAscMathMenuTypes.DeleteElement);
+
+            break;
+        }
+        case c_oAscMathInterfaceType.Limit:
+        {
+            /*if(Pr.bUnder)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.LimitOver;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.LimitOver)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.DeleteElement;
+            }
+            else
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.LimitUnder;
+            }*/
+
+            if(PrevState == c_oAscMathMenuTypes.IncreaseArgSize)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.DecreaseArgSize;
+            }
+            else
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.IncreaseArgSize;
+            }
+
+            this.Root.Load_PropsFromMenu(TypeMathMenu);
+
+            break;
+        }
+        case c_oAscMathInterfaceType.BorderBox:
+        {
+            if(PrevState == c_oAscMathMenuTypes.BorderBoxHideTop)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.BorderBoxHideBot;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.BorderBoxHideBot)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.BorderBoxHideLeft;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.BorderBoxHideLeft)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.BorderBoxHideRight;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.BorderBoxHideRight)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.BorderBoxStrikeHor;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.BorderBoxStrikeHor)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.BorderBoxStrikeVer;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.BorderBoxStrikeVer)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.BorderBoxStrikeTopLTR;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.BorderBoxStrikeTopLTR)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.BorderBoxStrikeTopRTL;
+            }
+            else
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.BorderBoxHideTop;
+            }
+
+            this.Root.Load_PropsFromMenu(TypeMathMenu);
+
+            break;
+        }
+        case c_oAscMathInterfaceType.Matrix:
+        {
+            /*if(PrevState == c_oAscMathMenuTypes.MatrixAddRowUnder)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixAddRowOver;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.MatrixAddRowOver)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixRemoveRow;
+            }
+            else
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixAddRowUnder;
+            }*/
+
+            /*if(PrevState == c_oAscMathMenuTypes.MatrixAddColumnToRight)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixAddColumnToLeft;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.MatrixAddColumnToLeft)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixRemoveColumn;
+            }
+            else
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixAddColumnToRight;
+            }*/
+
+            /*if(Pr.BaseJc == BASEJC_CENTER)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixBaseJcTop;
+            }
+            else if(Pr.BaseJc == BASEJC_TOP)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixBaseJcBottom;
+            }
+            else
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixBaseJcCenter;
+            }*/
+
+            /*if(Pr.ColumnJc == MCJC_CENTER)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixColumnJcLeft;
+            }
+            else if(Pr.ColumnJc == MCJC_LEFT)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixColumnJcRight;
+            }
+            else
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixColumnJcCenter;
+            }*/
+
+
+            /*if(PrevState == c_oAscMathMenuTypes.MatrixRowOneAndHalfGap)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixRowDoubleGap;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.MatrixRowDoubleGap)
+            {
+                // сделать проверку на то, что Gap - целое число
+                // Gap >> 0
+                // Gap * 20
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixRowExactlyGap;
+                Gap = 720;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.MatrixRowExactlyGap)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixRowSingleGap;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.MatrixRowSingleGap)
+            {
+                // кратно 0,5
+                // Gap >> 0
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixRowMultipleGap;
+                Gap = 5;
+            }
+            else
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixRowOneAndHalfGap;
+            }*/
+
+            /*if(PrevState == c_oAscMathMenuTypes.MatrixColumnOneAndHalfGap)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixColumnDoubleGap;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.MatrixColumnDoubleGap)
+            {
+                // Gap >> 0
+                // Gap*20
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixColumnExactlyGap;
+                Gap = 720;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.MatrixColumnExactlyGap)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixColumnSingleGap;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.MatrixColumnSingleGap)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixColumnMultipleGap;
+
+                // count = GapMenu / 0.21163
+                // count >> 0
+                // if(GapMenu < (((0.21163*count)* 100 + 0.5) >> 0 )/100 )
+                //     count--; // count передаем в качестве параметра Gap
+
+                Gap = 6;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.MatrixColumnMultipleGap)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixMinColumnWidth;
+                // Gap >> 0
+                // Gap*20
+                Gap = 1440;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.MatrixMinColumnWidth)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixHidePlaceholders;
+            }
+            else
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixColumnOneAndHalfGap;
+            }*/
+
+            if(PrevState == c_oAscMathMenuTypes.MatrixRemoveColumn)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixRemoveRow;
+            }
+            else
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.MatrixRemoveColumn;
+            }
+
+            this.Root.Load_PropsFromMenu(TypeMathMenu, Gap);
+
+            break;
+        }
+        case c_oAscMathInterfaceType.EqArray:
+        {
+            /*if(PrevState == c_oAscMathMenuTypes.EqArrayAddRowUnder)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.EqArrayAddRowOver;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.EqArrayAddRowOver)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.EqArrayRemoveRow;
+            }
+            else
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.EqArrayAddRowUnder;
+            }*/
+
+            /*if(Pr.BaseJc == BASEJC_CENTER)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.EqArrayBaseJcTop;
+            }
+            else if(Pr.BaseJc == BASEJC_TOP)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.EqArrayBaseJcBottom;
+            }
+            else
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.EqArrayBaseJcCenter;
+            }*/
+
+            if(PrevState == c_oAscMathMenuTypes.EqArrayRowOneAndHalfGap)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.EqArrayRowDoubleGap;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.EqArrayRowDoubleGap)
+            {
+                // сделать проверку на то, что Gap - целое число
+                // Gap >> 0
+                // Gap * 20
+                TypeMathMenu = c_oAscMathMenuTypes.EqArrayRowExactlyGap;
+                Gap = 720;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.EqArrayRowExactlyGap)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.EqArrayRowSingleGap;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.EqArrayRowSingleGap)
+            {
+                // кратно 0,5
+                // Gap >> 0
+                TypeMathMenu = c_oAscMathMenuTypes.EqArrayRowMultipleGap;
+                Gap = 5;
+            }
+            else if(PrevState == c_oAscMathMenuTypes.EqArrayRowMultipleGap )
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.DeleteElement;
+            }
+            else
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.EqArrayRowOneAndHalfGap;
+            }
+
+            this.Root.Load_PropsFromMenu(c_oAscMathMenuTypes.EqArrayRemoveRow);
+
+            break;
+        }
+        case c_oAscMathInterfaceType.Script:
+        {
+            /*if(Pr.Type == Math_Menu_DegreeType.SubSupScript )
+            {
+                if(PrevState == c_oAscMathMenuTypes.DeleteSubScript)
+                {
+                    TypeMathMenu = c_oAscMathMenuTypes.DeleteSuperScript;
+                }
+                else
+                {
+                    TypeMathMenu = c_oAscMathMenuTypes.DeleteSubScript;
+                }
+            }
+            else
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.DeleteElement;
+            }*/
+
+            if(PrevState == c_oAscMathMenuTypes.IncreaseArgSize)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.DecreaseArgSize;
+            }
+            else
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.IncreaseArgSize;
+            }
+
+            this.Root.Load_PropsFromMenu(TypeMathMenu);
+            break;
+        }
+        case c_oAscMathInterfaceType.Bar:
+        {
+            if(Pr.Pos == LOCATION_TOP && PrevState !== c_oAscMathMenuTypes.BarLineOver)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.BarLineUnder;
+            }
+            else if(PrevState !== c_oAscMathMenuTypes.BarLineOver)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.BarLineOver;
+            }
+            else
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.DeleteElement;
+            }
+
+            this.Root.Load_PropsFromMenu(TypeMathMenu);
+            break;
+        }
+        case c_oAscMathInterfaceType.Accent:
+        {
+            this.Root.Load_PropsFromMenu(c_oAscMathMenuTypes.DeleteElement);
+            break;
+        }
+        case c_oAscMathInterfaceType.Box:
+        {
+            if(PrevState == c_oAscMathMenuTypes.IncreaseArgSize)
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.DecreaseArgSize;
+            }
+            else
+            {
+                TypeMathMenu = c_oAscMathMenuTypes.IncreaseArgSize;
+            }
+
+            this.Root.Load_PropsFromMenu(TypeMathMenu);
+            break;
+        }
+    }
+
+    this.Root.Set_MenuProps(Pr);
+
+};
+
+ParaMath.prototype.Load_PropsFromMenu = function(Props)
+{
+    if(Props != undefined)
+        this.Root.Load_PropsFromMenu(Props);
+};
+
+ParaMath.prototype.Get_MenuProps = function()
+{
+    return this.Root.Get_MenuProps();
+};
+ParaMath.prototype.Set_MenuProps = function(Props)
+{
+    if(Props != undefined)
+        this.Root.Set_MenuProps(Props);
+};
 //-----------------------------------------------------------------------------------
 // Функции пересчета
 //-----------------------------------------------------------------------------------
@@ -1425,9 +2286,6 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     {
         PRS.RestartPageRecalcInfo.Object = PrevObject; // возвращаем формулу, которая инициировала пересчет (если это была текущая формула, то null)
     }
-
-    if(PRS.NewRange == false)
-        this.bFirstRecalculate = true;
 
 };
 ParaMath.prototype.private_UpdateWrapSettings = function(PRS)
@@ -2551,14 +3409,17 @@ ParaMath.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, UseCo
 {
     this.Root.Get_WordEndPos(SearchPos, ContentPos, Depth, UseContentPos, StepEnd, false);
 };
+
 ParaMath.prototype.Get_EndRangePos = function(_CurLine, _CurRange, SearchPos, Depth)
 {
     return this.Root.Get_EndRangePos(_CurLine, _CurRange, SearchPos, Depth);
 };
+
 ParaMath.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchPos, Depth)
 {
     return this.Root.Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth);
 };
+
 ParaMath.prototype.Get_StartRangePos2 = function(_CurLine, _CurRange, ContentPos, Depth)
 {
     return this.Root.Get_StartRangePos2(_CurLine, _CurRange, ContentPos, Depth);
@@ -2607,6 +3468,7 @@ ParaMath.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selection
 {
     this.Root.Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
 };
+
 ParaMath.prototype.Selection_IsEmpty = function(CheckEnd)
 {
     return this.Root.Selection_IsEmpty();
@@ -2640,7 +3502,6 @@ ParaMath.prototype.Selection_CheckParaContentPos = function(ContentPos, Depth, b
 
 ParaMath.prototype.Is_SelectedAll = function(Props)
 {
-    // TODO: ParaMath.Is_SelectedAll
     return this.Root.Is_SelectedAll(Props);
 };
 
@@ -2767,12 +3628,10 @@ ParaMath.prototype.Handle_AddNewLine = function()
 
     if(MATH_EQ_ARRAY === CurrContent.ParentElement.kind)
     {
-        var NewContent = CurrContent.Parent.addRow();
-        CurrContent.SplitContent(NewContent, ContentPos, 0);
-        NewContent.Correct_Content(true);
-        CurrContent.Correct_Content(true);
+        var oEqArray = CurrContent.Parent;
 
-        NewContent.Cursor_MoveToStartPos();
+        oEqArray.Add_Row(oEqArray.CurPos + 1);
+        oEqArray.CurPos++;
 
         NeedRecalculate = true;
     }
@@ -2936,21 +3795,7 @@ ParaMath.prototype.getPropsForWrite = function()
  */
 ParaMath.prototype.Document_UpdateInterfaceState = function()
 {
-    var SelectedContent = this.GetSelectContent();
-    var MathContent = SelectedContent.Content;
-
-    var MathProps = new CMathProp();
-
-    if (MathContent.bRoot)
-    {
-        MathProps.Type = c_oAscMathInterfaceType.Common;
-        MathProps.Pr   = null;
-    }
-    else if (undefined !== MathContent.ParentElement && null !== MathContent.ParentElement)
-    {
-        MathContent.ParentElement.Document_UpdateInterfaceState(MathProps);
-    }
-
+    var MathProps = this.Get_MenuProps();
     editor.sync_MathPropCallback(MathProps);
 };
 
@@ -2971,8 +3816,7 @@ ParaMath.prototype.Is_ContentUse  = function(MathContent)
  */
 ParaMath.prototype.Correct_AfterConvertFromEquation = function()
 {
-    this.ParaMathRPI.bCorrect_FontSize = true;
-    //this.Root.Correct_AfterConvertFromEquation();
+    this.ParaMathRPI.bCorrect_ConvertFontSize = true;
 };
 
 ParaMath.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth)
@@ -2991,6 +3835,16 @@ ParaMath.prototype.Set_ReviewType = function(ReviewType, RemovePrChange)
 {
     return this.Root.Set_ReviewType(ReviewType, RemovePrChange);
 };
+ParaMath.prototype.Handle_Tab = function(isForward)
+{
+    if(this.ParaMathRPI.bInline == false)
+    {
+        var ParaPos = this.Get_CurrentParaPos();
+        var CountOperators = this.DispositionOpers.length;
+        this.Root.Displace_BreakOperator(ParaPos.Line, ParaPos.Range, isForward, CountOperators);
+    }
+};
+
 ParaMath.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
     return this.Root.Set_ContentSelection(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag);
@@ -3008,24 +3862,56 @@ var historyitem_Math_CtrPrpFSize               =  3; // CtrPrp
 var historyitem_Math_ParaJc                    =  4; // ParaMath.Jc
 var historyitem_Math_CtrPrpShd                 =  5;
 var historyitem_Math_AddItems_ToMathBase       =  6;
-var historyitem_Math_EqArrayPr                 =  7; // Изменение настроек у CEqArray
-var historyitem_Math_CtrPrpColor               =  8;
-var historyitem_Math_CtrPrpUnifill             =  9;
-var historyitem_Math_CtrPrpUnderline           =  10;
-var historyitem_Math_CtrPrpStrikeout           =  11;
-var historyitem_Math_CtrPrpDoubleStrikeout     =  12;
-var historyitem_Math_CtrPrpItalic              =  13;
-var historyitem_Math_CtrPrpBold                =  14;
-var historyitem_Math_RFontsAscii               =  15;
-var historyitem_Math_RFontsHAnsi               =  16;
-var historyitem_Math_RFontsCS                  =  17;
-var historyitem_Math_RFontsEastAsia            =  18;
-var historyitem_Math_RFontsHint                =  19;
-var historyitem_Math_CtrPrpHighLight           =  20;
-var historyitem_Math_ArgSize                   =  21;
-var historyitem_Math_ReviewType                =  22;
-var historyitem_Math_CtrPrpTextFill            =  23;
-var historyitem_Math_CtrPrpTextOutline         =  24;
+var historyitem_Math_CtrPrpColor               =  7;
+var historyitem_Math_CtrPrpUnifill             =  8;
+var historyitem_Math_CtrPrpUnderline           =  9;
+var historyitem_Math_CtrPrpStrikeout           =  10;
+var historyitem_Math_CtrPrpDoubleStrikeout     =  11;
+var historyitem_Math_CtrPrpItalic              =  12;
+var historyitem_Math_CtrPrpBold                =  13;
+var historyitem_Math_RFontsAscii               =  14;
+var historyitem_Math_RFontsHAnsi               =  15;
+var historyitem_Math_RFontsCS                  =  16;
+var historyitem_Math_RFontsEastAsia            =  17;
+var historyitem_Math_RFontsHint                =  18;
+var historyitem_Math_CtrPrpHighLight           =  19;
+var historyitem_Math_ArgSize                   =  20;
+var historyitem_Math_ReviewType                =  21;
+var historyitem_Math_CtrPrpTextFill            =  22;
+var historyitem_Math_CtrPrpTextOutline         =  23;
+var historyitem_Math_BoxAlnAt                  =  24;
+var historyitem_Math_FractionType              =  25;
+var historyitem_Math_RadicalHideDegree         =  26;
+var historyitem_Math_NaryLimLoc                =  27;
+var historyitem_Math_NaryUpperLimit            =  28;
+var historyitem_Math_NaryLowerLimit            =  29;
+var historyitem_Math_DelimBegOper              =  30;
+var historyitem_Math_DelimEndOper              =  31;
+var historyitem_Math_BaseSetColumn             =  32;
+var historyitem_Math_BaseRemoveItems           =  33;
+var historyitem_Math_DelimiterGrow             =  34;
+var historyitem_Math_DelimiterShape            =  35;
+var historyitem_Math_GroupCharPr               =  36;
+var historyitem_Math_LimitType                 =  37;
+var historyitem_Math_BorderBoxTop              =  38;
+var historyitem_Math_BorderBoxBot              =  39;
+var historyitem_Math_BorderBoxLeft             =  40;
+var historyitem_Math_BorderBoxRight            =  41;
+var historyitem_Math_BorderBoxHor              =  42;
+var historyitem_Math_BorderBoxVer              =  43;
+var historyitem_Math_BorderBoxTopLTR           =  44;
+var historyitem_Math_BorderBoxTopRTL           =  45;
+var historyitem_Math_MatrixAddRow              =  46;
+var historyitem_Math_MatrixRemoveRow           =  47;
+var historyitem_Math_MatrixAddColumn           =  48;
+var historyitem_Math_MatrixRemoveColumn        =  49;
+var historyitem_Math_MatrixBaseJc              =  50;
+var historyitem_Math_MatrixColumnJc            =  51;
+var historyitem_Math_MatrixInterval            =  52;
+var historyitem_Math_MatrixPlh                 =  53;
+var historyitem_Math_MatrixMinColumnWidth      =  54;
+var historyitem_Math_BarLinePos                =  55;
+var historyitem_Math_BoxAddForcedBreak         =  56;
 
 
 function ReadChanges_FromBinary(Reader, Class)
@@ -3039,7 +3925,6 @@ function ReadChanges_FromBinary(Reader, Class)
         case historyitem_Math_ParaJc                : Changes = new CChangesMathParaJc(); break;
         case historyitem_Math_CtrPrpShd             : Changes = new CChangesMathShd(); break;
         case historyitem_Math_AddItems_ToMathBase   : Changes = new CChangesMathAddItems(); break;
-        case historyitem_Math_EqArrayPr             : Changes = new CChangesMathEqArrayPr(); break;
         case historyitem_Math_CtrPrpColor           : Changes = new CChangesMathColor(); break;
         case historyitem_Math_CtrPrpUnifill         : Changes = new CChangesMathUnifill(); break;
         case historyitem_Math_CtrPrpUnderline       : Changes = new CChangesMathUnderline(); break;
@@ -3056,6 +3941,38 @@ function ReadChanges_FromBinary(Reader, Class)
         case historyitem_Math_ReviewType            : Changes = new CChangesMathBaseReviewType(); break;
         case historyitem_Math_CtrPrpTextFill        : Changes = new CChangesMathTextFill(); break;
         case historyitem_Math_CtrPrpTextOutline     : Changes = new CChangesMathTextOutline(); break;
+		case historyitem_Math_BoxAlnAt              : Changes = new CChangesMathBoxAlnAt(); break;
+        case historyitem_Math_FractionType          : Changes = new CChangesMathFractionType(); break;
+        case historyitem_Math_RadicalHideDegree     : Changes = new CChangesMathRadicalHideDegree(); break;
+        case historyitem_Math_NaryLimLoc            : Changes = new CChangesMathNaryLimLoc(); break;
+        case historyitem_Math_NaryUpperLimit        : Changes = new CChangesMathNaryUpperLimit(); break;
+        case historyitem_Math_NaryLowerLimit        : Changes = new CChangesMathNaryLowerLimit(); break;
+        case historyitem_Math_DelimBegOper          : Changes = new CChangesMathDelimBegOper(); break;
+        case historyitem_Math_DelimEndOper          : Changes = new CChangesMathDelimEndOper(); break;
+        case historyitem_Math_BaseSetColumn         : Changes = new CChangesMathBaseSetColumn(); break;
+        case historyitem_Math_BaseRemoveItems       : Changes = new CChangesMathRemoveItems(); break;
+        case historyitem_Math_DelimiterGrow         : Changes = new CChangesMathDelimiterGrow(); break;
+        case historyitem_Math_DelimiterShape        : Changes = new CChangesMathDelimiterShape(); break;
+        case historyitem_Math_GroupCharPr           : Changes = new CChangesMathGroupCharPr(); break;
+        case historyitem_Math_LimitType             : Changes = new CChangesMathLimitType(); break;
+        case historyitem_Math_BorderBoxTop          : Changes = new CChangesMathBorderBoxTop(); break;         
+        case historyitem_Math_BorderBoxBot          : Changes = new CChangesMathBorderBoxBot(); break;
+        case historyitem_Math_BorderBoxLeft         : Changes = new CChangesMathBorderBoxLeft(); break;
+        case historyitem_Math_BorderBoxRight        : Changes = new CChangesMathBorderBoxRight(); break;
+        case historyitem_Math_BorderBoxHor          : Changes = new CChangesMathBorderBoxHor(); break;
+        case historyitem_Math_BorderBoxVer          : Changes = new CChangesMathBorderBoxVer(); break;
+        case historyitem_Math_BorderBoxTopLTR       : Changes = new CChangesMathBorderBoxTopLTR(); break;
+        case historyitem_Math_BorderBoxTopRTL       : Changes = new CChangesMathBorderBoxTopRTL(); break;
+        case historyitem_Math_MatrixAddRow          : Changes = new CChangesMathMatrixAddRow(); break;
+        case historyitem_Math_MatrixRemoveRow       : Changes = new CChangesMathMatrixRemoveRow(); break;
+        case historyitem_Math_MatrixAddColumn       : Changes = new CChangesMathMatrixAddColumn(); break;
+        case historyitem_Math_MatrixRemoveColumn    : Changes = new CChangesMathMatrixRemoveColumn(); break;
+        case historyitem_Math_MatrixBaseJc          : Changes = new CChangesMathMatrixBaseJc(); break;
+        case historyitem_Math_MatrixColumnJc        : Changes = new CChangesMathMatrixColumnJc(); break;
+        case historyitem_Math_MatrixInterval        : Changes = new CChangesMathMatrixInterval(); break;
+        case historyitem_Math_MatrixPlh             : Changes = new CChangesMathMatrixPlh(); break;
+        case historyitem_Math_MatrixMinColumnWidth  : Changes = new CChangesMathMatrixMinColumnWidth(); break;
+        case historyitem_Math_BarLinePos            : Changes = new CChangesMathBarLinePos(); break;
     }
 
     if (null !== Changes)
@@ -3909,46 +4826,6 @@ CChangesMathParaJc.prototype.Load_Changes = function(Reader, Class)
     this.Redo(Class);
 };
 
-function CChangesMathEqArrayPr(NewPr, OldPr)
-{
-    this.New = NewPr;
-    this.Old = OldPr;
-}
-CChangesMathEqArrayPr.prototype.Type = historyitem_Math_EqArrayPr;
-CChangesMathEqArrayPr.prototype.Undo = function(Class)
-{
-    Class.raw_SetPr(this.Old);
-};
-CChangesMathEqArrayPr.prototype.Redo = function(Class)
-{
-    Class.raw_SetPr(this.New);
-};
-CChangesMathEqArrayPr.prototype.Save_Changes = function(Writer)
-{
-    // Bool : undefined?
-    // Long : value
-    if (undefined === this.New)
-        Writer.WriteBool(true);
-    else
-    {
-        Writer.WriteBool(false);
-        this.New.Write_ToBinary(Writer);
-    }
-};
-CChangesMathEqArrayPr.prototype.Load_Changes = function(Reader, Class)
-{
-    if (true === Reader.GetBool())
-        this.New = undefined;
-    else
-    {
-        this.New = new CMathEqArrPr();
-        this.New.Read_FromBinary(Reader);
-    }
-
-    this.Redo(Class);
-};
-
-
 function CChangesMathBaseReviewType(NewType, NewInfo, OldType, OldInfo)
 {
     this.NewType = NewType;
@@ -4003,6 +4880,1295 @@ CChangesMathBaseReviewType.prototype.Load_Changes = function(Reader, Class)
     this.Redo(Class);
 };
 
+function CChangesMathBoxAlnAt(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBoxAlnAt.prototype.Type = historyitem_Math_BoxAlnAt;
+CChangesMathBoxAlnAt.prototype.Undo = function(Class)
+{
+    Class.raw_setAlnAt(this.Old);
+};
+CChangesMathBoxAlnAt.prototype.Redo = function(Class)
+{
+    Class.raw_setAlnAt(this.New);
+};
+CChangesMathBoxAlnAt.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathBoxAlnAt.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathFractionType(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathFractionType.prototype.Type = historyitem_Math_FractionType;
+CChangesMathFractionType.prototype.Undo = function(Class)
+{
+    Class.raw_SetFractionType(this.Old);
+};
+CChangesMathFractionType.prototype.Redo = function(Class)
+{
+    Class.raw_SetFractionType(this.New);
+};
+CChangesMathFractionType.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathFractionType.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathRadicalHideDegree(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathRadicalHideDegree.prototype.Type = historyitem_Math_RadicalHideDegree;
+CChangesMathRadicalHideDegree.prototype.Undo = function(Class)
+{
+    Class.raw_SetHideDegree(this.Old);
+};
+CChangesMathRadicalHideDegree.prototype.Redo = function(Class)
+{
+    Class.raw_SetHideDegree(this.New);
+};
+CChangesMathRadicalHideDegree.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathRadicalHideDegree.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+function CChangesMathNaryLimLoc(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathNaryLimLoc.prototype.Type = historyitem_Math_NaryLimLoc;
+CChangesMathNaryLimLoc.prototype.Undo = function(Class)
+{
+    Class.raw_SetLimLoc(this.Old);
+};
+CChangesMathNaryLimLoc.prototype.Redo = function(Class)
+{
+    Class.raw_SetLimLoc(this.New);
+};
+CChangesMathNaryLimLoc.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathNaryLimLoc.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathNaryUpperLimit(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathNaryUpperLimit.prototype.Type = historyitem_Math_NaryUpperLimit;
+CChangesMathNaryUpperLimit.prototype.Undo = function(Class)
+{
+    Class.raw_HideUpperIterator(this.Old);
+};
+CChangesMathNaryUpperLimit.prototype.Redo = function(Class)
+{
+    Class.raw_HideUpperIterator(this.New);
+};
+CChangesMathNaryUpperLimit.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathNaryUpperLimit.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathNaryLowerLimit(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathNaryLowerLimit.prototype.Type = historyitem_Math_NaryLowerLimit;
+CChangesMathNaryLowerLimit.prototype.Undo = function(Class)
+{
+    Class.raw_HideLowerIterator(this.Old);
+};
+CChangesMathNaryLowerLimit.prototype.Redo = function(Class)
+{
+    Class.raw_HideLowerIterator(this.New);
+};
+CChangesMathNaryLowerLimit.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathNaryLowerLimit.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathDelimBegOper(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathDelimBegOper.prototype.Type = historyitem_Math_DelimBegOper;
+CChangesMathDelimBegOper.prototype.Undo = function(Class)
+{
+    Class.raw_HideBegOperator(this.Old);
+};
+CChangesMathDelimBegOper.prototype.Redo = function(Class)
+{
+    Class.raw_HideBegOperator(this.New);
+};
+CChangesMathDelimBegOper.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong(this.New);
+    }
+};
+CChangesMathDelimBegOper.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathDelimEndOper(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathDelimEndOper.prototype.Type = historyitem_Math_DelimEndOper;
+CChangesMathDelimEndOper.prototype.Undo = function(Class)
+{
+    Class.raw_HideEndOperator(this.Old);
+};
+CChangesMathDelimEndOper.prototype.Redo = function(Class)
+{
+    Class.raw_HideEndOperator(this.New);
+};
+CChangesMathDelimEndOper.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong(this.New);
+    }
+};
+CChangesMathDelimEndOper.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBaseSetColumn(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBaseSetColumn.prototype.Type = historyitem_Math_BaseSetColumn;
+CChangesMathBaseSetColumn.prototype.Undo = function(Class)
+{
+    Class.raw_SetColumn(this.Old);
+};
+CChangesMathBaseSetColumn.prototype.Redo = function(Class)
+{
+    Class.raw_SetColumn(this.New);
+};
+CChangesMathBaseSetColumn.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathBaseSetColumn.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathRemoveItems(Pos, Items)
+{
+    this.Pos   = Pos;
+    this.Items = Items;
+}
+CChangesMathRemoveItems.prototype.Type = historyitem_Math_BaseRemoveItems;
+CChangesMathRemoveItems.prototype.Undo = function(Class)
+{
+    Class.raw_AddToContent(this.Pos, this.Items, false);
+};
+CChangesMathRemoveItems.prototype.Redo = function(Class)
+{
+    Class.raw_RemoveFromContent(this.Pos, this.Items.length);
+};
+CChangesMathRemoveItems.prototype.Save_Changes = function(Writer)
+{
+    // Long : Count
+    // Long : Pos
+    // Array of String : Id
+
+    var Count = this.Items.length;
+    Writer.WriteLong(Count);
+    Writer.WriteLong(this.Pos);
+
+    for(var Index = 0; Index < Count; Index++)
+    {
+        Writer.WriteString2(this.Items[Index].Get_Id());
+    }
+};
+CChangesMathRemoveItems.prototype.Load_Changes = function(Reader, Class)
+{
+    // Long : Count
+    // Long : Pos
+    // Array of String : Id
+
+    var Count = Reader.GetLong();
+    this.Pos   = Reader.GetLong();
+
+    this.Items = [];
+    for(var Index = 0; Index < Count; Index++)
+    {
+        var Element = g_oTableId.Get_ById(Reader.GetString2());
+
+        if (null !== Element)
+            this.Items.push(Element);
+    }
+
+    this.Redo(Class);
+
+    CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, this.Pos, Count);
+};
+
+function CChangesMathDelimiterGrow(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathDelimiterGrow.prototype.Type = historyitem_Math_DelimiterGrow;
+CChangesMathDelimiterGrow.prototype.Undo = function(Class)
+{
+    Class.raw_SetGrow(this.Old);
+};
+CChangesMathDelimiterGrow.prototype.Redo = function(Class)
+{
+    Class.raw_SetGrow(this.New);
+};
+CChangesMathDelimiterGrow.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathDelimiterGrow.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathDelimiterShape(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathDelimiterShape.prototype.Type = historyitem_Math_DelimiterShape;
+
+CChangesMathDelimiterShape.prototype.Undo = function(Class)
+{
+    Class.raw_SetShape(this.Old);
+};
+CChangesMathDelimiterShape.prototype.Redo = function(Class)
+{
+    Class.raw_SetShape(this.New);
+};
+CChangesMathDelimiterShape.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathDelimiterShape.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathGroupCharPr(NewPr, OldPr)
+{
+    this.New = NewPr;
+    this.Old = OldPr;
+}
+CChangesMathGroupCharPr.prototype.Type = historyitem_Math_GroupCharPr;
+CChangesMathGroupCharPr.prototype.Undo = function(Class)
+{
+    Class.raw_SetPr(this.Old);
+};
+CChangesMathGroupCharPr.prototype.Redo = function(Class)
+{
+    Class.raw_SetPr(this.New);
+};
+CChangesMathGroupCharPr.prototype.Save_Changes = function(Writer)
+{
+    // Bool : undefined?
+    // Long : value
+    if (undefined === this.New)
+        Writer.WriteBool(true);
+    else
+    {
+        Writer.WriteBool(false);
+        this.New.Write_ToBinary(Writer);
+    }
+};
+CChangesMathGroupCharPr.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+    {
+        this.New = new CMathGroupChrPr();
+        this.New.Read_FromBinary(Reader);
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMathLimitType(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathLimitType.prototype.Type = historyitem_Math_LimitType;
+
+CChangesMathLimitType.prototype.Undo = function(Class)
+{
+    Class.raw_SetType(this.Old);
+};
+CChangesMathLimitType.prototype.Redo = function(Class)
+{
+    Class.raw_SetType(this.New);
+};
+CChangesMathLimitType.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathLimitType.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBorderBoxTop(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBorderBoxTop.prototype.Type = historyitem_Math_BorderBoxTop;
+CChangesMathBorderBoxTop.prototype.Undo = function(Class)
+{
+    Class.raw_SetTop(this.Old);
+};
+CChangesMathBorderBoxTop.prototype.Redo = function(Class)
+{
+    Class.raw_SetTop(this.New);
+};
+CChangesMathBorderBoxTop.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathBorderBoxTop.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+
+function CChangesMathBorderBoxBot(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBorderBoxBot.prototype.Type = historyitem_Math_BorderBoxBot;
+CChangesMathBorderBoxBot.prototype.Undo = function(Class)
+{
+    Class.raw_SetBot(this.Old);
+};
+CChangesMathBorderBoxBot.prototype.Redo = function(Class)
+{
+    Class.raw_SetBot(this.New);
+};
+CChangesMathBorderBoxBot.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathBorderBoxBot.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBorderBoxLeft(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBorderBoxLeft.prototype.Type = historyitem_Math_BorderBoxLeft;
+CChangesMathBorderBoxLeft.prototype.Undo = function(Class)
+{
+    Class.raw_SetLeft(this.Old);
+};
+CChangesMathBorderBoxLeft.prototype.Redo = function(Class)
+{
+    Class.raw_SetLeft(this.New);
+};
+CChangesMathBorderBoxLeft.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathBorderBoxLeft.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBorderBoxRight(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBorderBoxRight.prototype.Type = historyitem_Math_BorderBoxRight;
+CChangesMathBorderBoxRight.prototype.Undo = function(Class)
+{
+    Class.raw_SetRight(this.Old);
+};
+CChangesMathBorderBoxRight.prototype.Redo = function(Class)
+{
+    Class.raw_SetRight(this.New);
+};
+CChangesMathBorderBoxRight.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathBorderBoxRight.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBorderBoxHor(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBorderBoxHor.prototype.Type = historyitem_Math_BorderBoxHor;
+CChangesMathBorderBoxHor.prototype.Undo = function(Class)
+{
+    Class.raw_SetHor(this.Old);
+};
+CChangesMathBorderBoxHor.prototype.Redo = function(Class)
+{
+    Class.raw_SetHor(this.New);
+};
+CChangesMathBorderBoxHor.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathBorderBoxHor.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBorderBoxVer(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBorderBoxVer.prototype.Type = historyitem_Math_BorderBoxVer;
+CChangesMathBorderBoxVer.prototype.Undo = function(Class)
+{
+    Class.raw_SetVer(this.Old);
+};
+CChangesMathBorderBoxVer.prototype.Redo = function(Class)
+{
+    Class.raw_SetVer(this.New);
+};
+CChangesMathBorderBoxVer.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathBorderBoxVer.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBorderBoxTopLTR(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBorderBoxTopLTR.prototype.Type = historyitem_Math_BorderBoxTopLTR;
+CChangesMathBorderBoxTopLTR.prototype.Undo = function(Class)
+{
+    Class.raw_SetTopLTR(this.Old);
+};
+CChangesMathBorderBoxTopLTR.prototype.Redo = function(Class)
+{
+    Class.raw_SetTopLTR(this.New);
+};
+CChangesMathBorderBoxTopLTR.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathBorderBoxTopLTR.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBorderBoxTopRTL(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBorderBoxTopRTL.prototype.Type = historyitem_Math_BorderBoxTopRTL;
+CChangesMathBorderBoxTopRTL.prototype.Undo = function(Class)
+{
+    Class.raw_SetTopRTL(this.Old);
+};
+CChangesMathBorderBoxTopRTL.prototype.Redo = function(Class)
+{
+    Class.raw_SetTopRTL(this.New);
+};
+CChangesMathBorderBoxTopRTL.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathBorderBoxTopRTL.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathMatrixAddRow(Pos, Items)
+{
+    this.Pos         = Pos;
+    this.Items       = Items;
+}
+CChangesMathMatrixAddRow.prototype.Type = historyitem_Math_MatrixAddRow;
+CChangesMathMatrixAddRow.prototype.Undo = function(Class)
+{
+    Class.raw_RemoveRow(this.Pos, this.Items.length);
+};
+CChangesMathMatrixAddRow.prototype.Redo = function(Class)
+{
+    Class.raw_AddRow(this.Pos, this.Items);
+};
+CChangesMathMatrixAddRow.prototype.Save_Changes = function(Writer)
+{
+    // Long : Count
+    // Long : Pos
+    // Array of String : Id
+
+    var Count = this.Items.length;
+    Writer.WriteLong(Count);
+    Writer.WriteLong(this.Pos);
+
+    for(var Index = 0; Index < Count; Index++)
+    {
+        Writer.WriteString2(this.Items[Index].Get_Id());
+    }
+};
+CChangesMathMatrixAddRow.prototype.Load_Changes = function(Reader, Class)
+{
+    // Long : Count
+    // Long : Pos
+    // Array of String : Id
+
+    var Count = Reader.GetLong();
+    this.Pos  = Reader.GetLong();
+
+    this.Items = [];
+    for(var Index = 0; Index < Count; Index++)
+    {
+        var Element = g_oTableId.Get_ById(Reader.GetString2());
+
+        if (null !== Element)
+            this.Items.push(Element);
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMathMatrixRemoveRow(Pos, Items)
+{
+    this.Pos         = Pos;
+    this.Items       = Items;
+}
+CChangesMathMatrixRemoveRow.prototype.Type = historyitem_Math_MatrixRemoveRow;
+CChangesMathMatrixRemoveRow.prototype.Undo = function(Class)
+{
+    Class.raw_AddRow(this.Pos, this.Items);
+};
+CChangesMathMatrixRemoveRow.prototype.Redo = function(Class)
+{
+    Class.raw_RemoveRow(this.Pos, this.Items.length);
+};
+CChangesMathMatrixRemoveRow.prototype.Save_Changes = function(Writer)
+{
+    // Long : Count
+    // Long : Pos
+    // Array of String : Id
+
+    var Count = this.Items.length;
+    Writer.WriteLong(Count);
+    Writer.WriteLong(this.Pos);
+
+    for(var Index = 0; Index < Count; Index++)
+    {
+        Writer.WriteString2(this.Items[Index].Get_Id());
+    }
+};
+CChangesMathMatrixRemoveRow.prototype.Load_Changes = function(Reader, Class)
+{
+    // Long : Count
+    // Long : Pos
+    // Array of String : Id
+
+    var Count = Reader.GetLong();
+    this.Pos  = Reader.GetLong();
+
+    this.Items = [];
+    for(var Index = 0; Index < Count; Index++)
+    {
+        var Element = g_oTableId.Get_ById(Reader.GetString2());
+
+        if (null !== Element)
+            this.Items.push(Element);
+    }
+
+    this.Redo(Class);
+
+    CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, this.Pos, Count);
+};
+
+function CChangesMathMatrixAddColumn(Pos, Items)
+{
+    this.Pos           = Pos;
+    this.Items         = Items;
+}
+CChangesMathMatrixAddColumn.prototype.Type = historyitem_Math_MatrixAddColumn;
+CChangesMathMatrixAddColumn.prototype.Undo = function(Class)
+{
+    Class.raw_RemoveColumn(this.Pos, this.Items.length);
+};
+CChangesMathMatrixAddColumn.prototype.Redo = function(Class)
+{
+    Class.raw_AddColumn(this.Pos, this.Items);
+};
+CChangesMathMatrixAddColumn.prototype.Save_Changes = function(Writer)
+{
+    // Long : CountItems
+    // Long : Pos
+    // Array of String : Id
+
+    var CountItems = this.Items.length;
+    Writer.WriteLong(CountItems);
+    Writer.WriteLong(this.Pos);
+
+    for(var Index = 0; Index < CountItems; Index++)
+    {
+        Writer.WriteString2(this.Items[Index].Get_Id());
+    }
+};
+CChangesMathMatrixAddColumn.prototype.Load_Changes = function(Reader, Class)
+{
+    // Long : CountItems
+    // Long : Pos
+    // Array of String : Id
+
+    var CountItems    = Reader.GetLong();
+    this.Pos          = Reader.GetLong();
+
+    this.Items = [];
+    for(var Index = 0; Index < CountItems; Index++)
+    {
+        var Element = g_oTableId.Get_ById(Reader.GetString2());
+
+        if (null !== Element)
+            this.Items.push(Element);
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMathMatrixRemoveColumn(Pos, Items)
+{
+    this.Pos           = Pos;
+    this.Items         = Items;
+}
+CChangesMathMatrixRemoveColumn.prototype.Type = historyitem_Math_MatrixRemoveColumn;
+CChangesMathMatrixRemoveColumn.prototype.Undo = function(Class)
+{
+    Class.raw_AddColumn(this.Pos, this.Items);
+};
+CChangesMathMatrixRemoveColumn.prototype.Redo = function(Class)
+{
+    Class.raw_RemoveColumn(this.Pos, this.Items.length);
+};
+CChangesMathMatrixRemoveColumn.prototype.Save_Changes = function(Writer)
+{
+    // Long : CountItems
+    // Long : Pos
+    // Long : CountColumn
+    // Array of String : Id
+
+    var CountItems = this.Items.length;
+    Writer.WriteLong(CountItems);
+    Writer.WriteLong(this.Pos);
+    //Writer.WriteLong(this.CountColumn);
+
+    for(var Index = 0; Index < CountItems; Index++)
+    {
+        Writer.WriteString2(this.Items[Index].Get_Id());
+    }
+};
+CChangesMathMatrixRemoveColumn.prototype.Load_Changes = function(Reader, Class)
+{
+    // Long : CountItems
+    // Long : Pos
+    // Long: CountColumn
+    // Array of String : Id
+
+    var CountItems    = Reader.GetLong();
+    this.Pos          = Reader.GetLong();
+    //this.CountColumn  = Reader.GetLong();
+
+    this.Items = [];
+    for(var Index = 0; Index < CountItems; Index++)
+    {
+        var Element = g_oTableId.Get_ById(Reader.GetString2());
+
+        if (null !== Element)
+            this.Items.push(Element);
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMathMatrixBaseJc(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathMatrixBaseJc.prototype.Type = historyitem_Math_MatrixBaseJc;
+CChangesMathMatrixBaseJc.prototype.Undo = function(Class)
+{
+    Class.raw_SetBaseJc(this.Old);
+};
+CChangesMathMatrixBaseJc.prototype.Redo = function(Class)
+{
+    Class.raw_SetBaseJc(this.New);
+};
+CChangesMathMatrixBaseJc.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathMatrixBaseJc.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathMatrixColumnJc(NewValue, OldValue, ColumnPos)
+{
+    this.New       = NewValue;
+    this.Old       = OldValue;
+    this.ColumnPos = ColumnPos;
+}
+CChangesMathMatrixColumnJc.prototype.Type = historyitem_Math_MatrixColumnJc;
+CChangesMathMatrixColumnJc.prototype.Undo = function(Class)
+{
+    Class.raw_SetColumnJc(this.Old, this.ColumnPos);
+};
+CChangesMathMatrixColumnJc.prototype.Redo = function(Class)
+{
+    Class.raw_SetColumnJc(this.New, this.ColumnPos);
+};
+CChangesMathMatrixColumnJc.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+
+    Writer.WriteLong( this.ColumnPos );
+};
+CChangesMathMatrixColumnJc.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+    {
+        this.New = undefined;
+    }
+    else
+    {
+        this.New = Reader.GetLong();
+    }
+
+    this.ColumnPos = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathMatrixInterval(Params)
+{
+    if(Params != undefined)
+    {
+        this.ItemType = Params.ItemType;
+        this.NewRule  = Params.NewRule;
+        this.NewGap   = Params.NewGap;
+        this.OldRule  = Params.OldRule;
+        this.OldGap   = Params.OldGap;
+    }
+}
+CChangesMathMatrixInterval.prototype.Type = historyitem_Math_MatrixInterval;
+CChangesMathMatrixInterval.prototype.Undo = function(Class)
+{
+    Class.raw_SetInterval(this.ItemType, this.OldRule, this.OldGap);
+};
+CChangesMathMatrixInterval.prototype.Redo = function(Class)
+{
+    Class.raw_SetInterval(this.ItemType, this.NewRule, this.NewGap);
+};
+CChangesMathMatrixInterval.prototype.Save_Changes = function(Writer)
+{
+    Writer.WriteLong(this.ItemType);
+
+    if(undefined === this.NewRule)
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.NewRule );
+    }
+
+    if(undefined === this.NewGap)
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.NewGap );
+    }
+};
+CChangesMathMatrixInterval.prototype.Load_Changes = function(Reader, Class)
+{
+    this.ItemType = Reader.GetLong();
+
+    if (true === Reader.GetBool())
+    {
+        this.NewRule = undefined;
+    }
+    else
+    {
+        this.NewRule = Reader.GetLong();
+    }
+
+    if (true === Reader.GetBool())
+    {
+        this.NewGap = undefined;
+    }
+    else
+    {
+        this.NewGap = Reader.GetLong();
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMathMatrixPlh(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathMatrixPlh.prototype.Type = historyitem_Math_MatrixPlh;
+CChangesMathMatrixPlh.prototype.Undo = function(Class)
+{
+    Class.raw_HidePlh(this.Old);
+};
+CChangesMathMatrixPlh.prototype.Redo = function(Class)
+{
+    Class.raw_HidePlh(this.New);
+};
+CChangesMathMatrixPlh.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathMatrixPlh.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMathMatrixMinColumnWidth(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathMatrixMinColumnWidth.prototype.Type = historyitem_Math_MatrixMinColumnWidth;
+CChangesMathMatrixMinColumnWidth.prototype.Undo = function(Class)
+{
+    Class.raw_Set_MinColumnWidth(this.Old);
+};
+CChangesMathMatrixMinColumnWidth.prototype.Redo = function(Class)
+{
+    Class.raw_Set_MinColumnWidth(this.New);
+};
+CChangesMathMatrixMinColumnWidth.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathMatrixMinColumnWidth.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBarLinePos(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBarLinePos.prototype.Type = historyitem_Math_BarLinePos;
+CChangesMathBarLinePos.prototype.Undo = function(Class)
+{
+    Class.raw_SetLinePos(this.Old);
+};
+CChangesMathBarLinePos.prototype.Redo = function(Class)
+{
+    Class.raw_SetLinePos(this.New);
+};
+CChangesMathBarLinePos.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathBarLinePos.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathBoxAddForcedBreak()
+{
+
+}
+CChangesMathBoxAddForcedBreak.prototype.Type = historyitem_Math_BoxAddForcedBreak;
+CChangesMathBoxAddForcedBreak.prototype.Undo = function(Class)
+{
+
+};
+
+
+
 function MatGetKoeffArgSize(FontSize, ArgSize)
 {
     var FontKoef = 1;
@@ -4026,21 +6192,21 @@ function MatGetKoeffArgSize(FontSize, ArgSize)
 
 function CMathRecalculateInfo()
 {
-    this.bInline                = false;
-    this.bChangeInline          = true;
-    this.bRecalcCtrPrp          = false; // необходимо для пересчета CtrPrp (когда изменились текстовые настройки у первого элемнента, ctrPrp нужно пересчитать заново для всей формулы)
-    this.bCorrect_FontSize      = false;
+    this.bInline                       = false;
+    this.bChangeInline                 = true;
+    this.bRecalcCtrPrp                 = false; // необходимо для пересчета CtrPrp (когда изменились текстовые настройки у первого элемнента, ctrPrp нужно пересчитать заново для всей формулы)
+    this.bCorrect_ConvertFontSize      = false;
 
-    this.IntervalState          = MATH_INTERVAL_EMPTY;
-    this.XStart                 = 0;
-    this.XEnd                   = 0;
-    this.XRange                 = 0;
-    this.XLimit                 = 0;
-    this.IndLeft                = 0;
-    this.bInternalRanges        = false;
+    this.IntervalState                  = MATH_INTERVAL_EMPTY;
+    this.XStart                         = 0;
+    this.XEnd                           = 0;
+    this.XRange                         = 0;
+    this.XLimit                         = 0;
+    this.IndLeft                        = 0;
+    this.bInternalRanges                = false;
 
-    this.RangeY                 = null; // max среди нижних границ плавающих объектов
-    this.ShiftY                 = 0;
+    this.RangeY                         = null; // max среди нижних границ плавающих объектов
+    this.ShiftY                         = 0;
 }
 CMathRecalculateInfo.prototype.Reset = function(PRS, ParaPr)
 {
@@ -4067,9 +6233,9 @@ CMathRecalculateInfo.prototype.UpdateShiftY = function(RY)
 };
 CMathRecalculateInfo.prototype.ClearRecalculate = function()
 {
-    this.bChangeInline     = false;
-    this.bRecalcCtrPrp     = false;
-    this.bCorrect_FontSize = false;
+    this.bChangeInline                  = false;
+    this.bRecalcCtrPrp                  = false;
+    this.bCorrect_ConvertFontSize       = false;
 };
 
 function CMathRecalculateObject()

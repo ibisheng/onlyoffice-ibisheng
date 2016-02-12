@@ -23,6 +23,38 @@ CMathBreak.prototype.Get_AlignBrk = function()
 {
     return this.alnAt !== undefined ? this.alnAt : 0;
 };
+CMathBreak.prototype.Get_AlnAt = function()
+{
+    return this.alnAt;
+};
+CMathBreak.prototype.Displace = function(isForward)
+{
+    if(isForward == false)
+    {
+        if(this.alnAt == 1)
+            this.alnAt = undefined;
+        else if(this.alnAt !== undefined)
+            this.alnAt--;
+    }
+    else
+    {
+        if(this.alnAt == undefined)
+            this.alnAt = 1;
+        else if(this.alnAt < 255)
+            this.alnAt++;
+    }
+};
+CMathBreak.prototype.Apply_AlnAt = function(alnAt)
+{
+    if(alnAt == undefined)
+    {
+        this.alnAt = undefined;
+    }
+    else if(alnAt >= 1 && alnAt <= 255)
+    {
+        this.alnAt = alnAt;
+    }
+};
 CMathBreak.prototype.Write_ToBinary = function(Writer)
 {
     if(this.alnAt !== undefined)
@@ -229,7 +261,6 @@ CBorderBox.prototype.Draw_Elements = function(PDSE)
 
     this.Make_ShdColor(PDSE, oCompiledPr);
 
-
     if(!this.Pr.hideTop)
     {
         var x1 = X,
@@ -393,6 +424,222 @@ CBorderBox.prototype.setPosition = function(pos, PosInfo)
 
     pos.x += this.size.width;
 };
+CBorderBox.prototype.Apply_MenuProps = function(Props)
+{
+    if(Props.Type == c_oAscMathInterfaceType.BorderBox)
+    {
+        if(Props.HideTop !== undefined && Props.HideTop !== this.Pr.hideTop)
+        {
+            History.Add(this, new CChangesMathBorderBoxTop(Props.HideTop, this.Pr.hideTop));
+            this.raw_SetTop(Props.HideTop);
+        }
+
+        if(Props.HideBottom !== undefined && Props.HideBottom !== this.Pr.hideBot)
+        {
+            History.Add(this, new CChangesMathBorderBoxBot(Props.HideBottom, this.Pr.hideBot));
+            this.raw_SetBot(Props.HideBottom);
+        }
+
+        if(Props.HideLeft !== undefined && Props.HideLeft !== this.Pr.hideLeft)
+        {
+            History.Add(this, new CChangesMathBorderBoxLeft(Props.HideLeft, this.Pr.hideLeft));
+            this.raw_SetLeft(Props.HideLeft);
+        }
+
+        if(Props.HideRight !== undefined && Props.HideRight !== this.Pr.hideRight)
+        {
+            History.Add(this, new CChangesMathBorderBoxRight(Props.HideRight, this.Pr.hideRight));
+            this.raw_SetRight(Props.HideRight);
+        }
+
+        if(Props.HideHor !== undefined && Props.HideHor == this.Pr.strikeH) // strikeH - нарисовать горизонтальную линию
+        {
+            History.Add(this, new CChangesMathBorderBoxHor(!Props.HideHor, this.Pr.strikeH));
+            this.raw_SetHor(!Props.HideHor);
+        }
+
+        if(Props.HideVer !== undefined && Props.HideVer == this.Pr.strikeV) // strikeV - нарисовать вертикальную линию
+        {
+            History.Add(this, new CChangesMathBorderBoxVer(!Props.HideVer, this.Pr.strikeV));
+            this.raw_SetVer(!Props.HideVer);
+        }
+
+        if(Props.HideTopLTR !== undefined && Props.HideTopLTR == this.Pr.strikeTLBR) // strikeTLBR - нарисовать диагональ из верхнего угла слева направо
+        {
+            History.Add(this, new CChangesMathBorderBoxTopLTR(!Props.HideTopLTR, this.Pr.strikeTLBR));
+            this.raw_SetTopLTR(!Props.HideTopLTR );
+        }
+
+        if(Props.HideTopRTL !== undefined && Props.HideTopRTL !== this.Pr.strikeBLTR)
+        {
+            History.Add(this, new CChangesMathBorderBoxTopRTL(!Props.HideTopRTL, this.Pr.strikeBLTR)); // strikeBLTR - нарисовать диагональ из нижнего угла слева направо
+            this.raw_SetTopRTL(!this.Pr.strikeBLTR);
+        }
+    }
+
+
+    /*switch(Type)
+    {
+        case c_oAscMathMenuTypes.BorderBoxHideTop:
+        {
+            History.Add(this, new CChangesMathBorderBoxTop(!this.Pr.hideTop, this.Pr.hideTop));
+            this.raw_SetTop(!this.Pr.hideTop);
+            break;
+        }
+        case c_oAscMathMenuTypes.BorderBoxHideBot:
+        {
+            History.Add(this, new CChangesMathBorderBoxBot(!this.Pr.hideBot, this.Pr.hideBot));
+            this.raw_SetBot(!this.Pr.hideBot);
+            break;
+        }
+        case c_oAscMathMenuTypes.BorderBoxHideLeft:
+        {
+            History.Add(this, new CChangesMathBorderBoxLeft(!this.Pr.hideLeft, this.Pr.hideLeft));
+            this.raw_SetLeft(!this.Pr.hideLeft);
+            break;
+        }
+        case c_oAscMathMenuTypes.BorderBoxHideRight:
+        {
+            History.Add(this, new CChangesMathBorderBoxRight(!this.Pr.hideRight, this.Pr.hideRight));
+            this.raw_SetRight(!this.Pr.hideRight);
+            break;
+        }
+        case c_oAscMathMenuTypes.BorderBoxStrikeHor:
+        {
+            History.Add(this, new CChangesMathBorderBoxHor(!this.Pr.strikeH, this.Pr.strikeH));
+            this.raw_SetHor(!this.Pr.strikeH);
+            break;
+        }
+        case c_oAscMathMenuTypes.BorderBoxStrikeVer:
+        {
+            History.Add(this, new CChangesMathBorderBoxVer(!this.Pr.strikeV, this.Pr.strikeV));
+            this.raw_SetVer(!this.Pr.strikeV);
+            break;
+        }
+        case c_oAscMathMenuTypes.BorderBoxStrikeTopLTR:
+        {
+            History.Add(this, new CChangesMathBorderBoxTopLTR(!this.Pr.strikeTLBR, this.Pr.strikeTLBR));
+            this.raw_SetTopLTR(!this.Pr.strikeTLBR);
+            break;
+        }
+        case c_oAscMathMenuTypes.BorderBoxStrikeTopRTL:
+        {
+            History.Add(this, new CChangesMathBorderBoxTopRTL(!this.Pr.strikeBLTR, this.Pr.strikeBLTR));
+            this.raw_SetTopRTL(!this.Pr.strikeBLTR);
+            break;
+        }
+
+    }*/
+};
+CBorderBox.prototype.raw_SetTop = function(Value)
+{
+    this.Pr.hideTop = Value;
+};
+CBorderBox.prototype.raw_SetBot = function(Value)
+{
+    this.Pr.hideBot = Value;
+};
+CBorderBox.prototype.raw_SetLeft = function(Value)
+{
+    this.Pr.hideLeft = Value;
+};
+CBorderBox.prototype.raw_SetRight = function(Value)
+{
+    this.Pr.hideRight = Value;
+};
+CBorderBox.prototype.raw_SetHor = function(Value)
+{
+    this.Pr.strikeH = Value;
+};
+CBorderBox.prototype.raw_SetVer = function(Value)
+{
+    this.Pr.strikeV = Value;
+};
+CBorderBox.prototype.raw_SetTopLTR = function(Value)
+{
+    this.Pr.strikeTLBR = Value;
+};
+CBorderBox.prototype.raw_SetTopRTL = function(Value)
+{
+    this.Pr.strikeBLTR = Value;
+};
+CBorderBox.prototype.Get_InterfaceProps = function()
+{
+    return new CMathMenuBorderBox(this);
+};
+
+/**
+ *
+ * @param CMathMenuBorderBox
+ * @constructor
+ * @extends {CMathMenuBase}
+ */
+function CMathMenuBorderBox(BorderBox)
+{
+    CMathMenuBorderBox.superclass.constructor.call(this, BorderBox);
+
+    this.Type = c_oAscMathInterfaceType.BorderBox;
+
+    if(undefined !== BorderBox)
+    {
+        this.HideTop    = BorderBox.Pr.hideTop;
+        this.HideBottom = BorderBox.Pr.hideBot;
+        this.HideLeft   = BorderBox.Pr.hideLeft;
+        this.HideRight  = BorderBox.Pr.hideRight;
+        this.HideHor    = BorderBox.Pr.strikeH == false;
+        this.HideVer    = BorderBox.Pr.strikeV == false;
+        this.HideTopLTR = BorderBox.Pr.strikeTLBR == false;
+        this.HideTopRTL = BorderBox.Pr.strikeBLTR == false;
+    }
+    else
+    {
+        this.HideTop    = undefined;
+        this.HideBottom = undefined;
+        this.HideLeft   = undefined;
+        this.HideRight  = undefined;
+        this.HideHor    = undefined;
+        this.HideVer    = undefined;
+        this.HideTopLTR = undefined;
+        this.HideTopRTL = undefined;
+    }
+}
+Asc.extendClass(CMathMenuBorderBox, CMathMenuBase);
+CMathMenuBorderBox.prototype.get_HideTop = function(){return this.HideTop;};
+CMathMenuBorderBox.prototype.put_HideTop = function(bHideTop){this.HideTop = bHideTop;};
+CMathMenuBorderBox.prototype.get_HideBottom = function(){return this.HideBottom;};
+CMathMenuBorderBox.prototype.put_HideBottom = function(bHideBottom){this.HideBottom = bHideBottom;};
+CMathMenuBorderBox.prototype.get_HideLeft = function(){return this.HideLeft;};
+CMathMenuBorderBox.prototype.put_HideLeft = function(bHideLeft){this.HideLeft = bHideLeft;};
+CMathMenuBorderBox.prototype.get_HideRight = function(){return this.HideRight;};
+CMathMenuBorderBox.prototype.put_HideRight = function(bHideRight){this.HideRight = bHideRight;};
+CMathMenuBorderBox.prototype.get_HideHor = function(){return this.HideHor;};
+CMathMenuBorderBox.prototype.put_HideHor = function(bHideHor){this.HideHor = bHideHor;};
+CMathMenuBorderBox.prototype.get_HideVer = function(){return this.HideVer;};
+CMathMenuBorderBox.prototype.put_HideVer = function(bHideVer){this.HideVer = bHideVer;};
+CMathMenuBorderBox.prototype.get_HideTopLTR = function(){return this.HideTopLTR;};
+CMathMenuBorderBox.prototype.put_HideTopLTR = function(bHideTopLTR){this.HideTopLTR = bHideTopLTR;};
+CMathMenuBorderBox.prototype.get_HideTopRTL = function(){return this.HideTopRTL;};
+CMathMenuBorderBox.prototype.put_HideTopRTL = function(bHideTopRTL){this.HideTopRTL = bHideTopRTL;};
+
+window["CMathMenuBorderBox"] = CMathMenuBorderBox;
+CMathMenuBorderBox.prototype["get_HideTop"]    = CMathMenuBorderBox.prototype.get_HideTop;
+CMathMenuBorderBox.prototype["put_HideTop"]    = CMathMenuBorderBox.prototype.put_HideTop;
+CMathMenuBorderBox.prototype["get_HideBottom"] = CMathMenuBorderBox.prototype.get_HideBottom;
+CMathMenuBorderBox.prototype["put_HideBottom"] = CMathMenuBorderBox.prototype.put_HideBottom;
+CMathMenuBorderBox.prototype["get_HideLeft"]   = CMathMenuBorderBox.prototype.get_HideLeft;
+CMathMenuBorderBox.prototype["put_HideLeft"]   = CMathMenuBorderBox.prototype.put_HideLeft;
+CMathMenuBorderBox.prototype["get_HideRight"]  = CMathMenuBorderBox.prototype.get_HideRight;
+CMathMenuBorderBox.prototype["put_HideRight"]  = CMathMenuBorderBox.prototype.put_HideRight;
+CMathMenuBorderBox.prototype["get_HideHor"]    = CMathMenuBorderBox.prototype.get_HideHor;
+CMathMenuBorderBox.prototype["put_HideHor"]    = CMathMenuBorderBox.prototype.put_HideHor;
+CMathMenuBorderBox.prototype["get_HideVer"]    = CMathMenuBorderBox.prototype.get_HideVer;
+CMathMenuBorderBox.prototype["put_HideVer"]    = CMathMenuBorderBox.prototype.put_HideVer;
+CMathMenuBorderBox.prototype["get_HideTopLTR"] = CMathMenuBorderBox.prototype.get_HideTopLTR;
+CMathMenuBorderBox.prototype["put_HideTopLTR"] = CMathMenuBorderBox.prototype.put_HideTopLTR;
+CMathMenuBorderBox.prototype["get_HideTopRTL"] = CMathMenuBorderBox.prototype.get_HideTopRTL;
+CMathMenuBorderBox.prototype["put_HideTopRTL"] = CMathMenuBorderBox.prototype.put_HideTopRTL;
+
+
 
 function CMathBoxPr()
 {
@@ -434,6 +681,24 @@ CMathBoxPr.prototype.Get_AlignBrk = function()
 {
     return this.brk !== undefined ? this.brk.Get_AlignBrk() : 0;
 };
+CMathBoxPr.prototype.Get_AlnAt = function()
+{
+    return this.brk != undefined ? this.brk.Get_AlnAt() : undefined;
+};
+CMathBoxPr.prototype.Displace_Break = function(isForward)
+{
+    if(this.brk !== undefined)
+    {
+        this.brk.Displace(isForward);
+    }
+};
+CMathBoxPr.prototype.Apply_AlnAt = function(alnAt)
+{
+    if(this.brk !== undefined)
+    {
+        this.brk.Apply_AlnAt(alnAt);
+    }
+};
 CMathBoxPr.prototype.Copy = function()
 {
     var NewPr = new CMathBoxPr();
@@ -457,7 +722,6 @@ CMathBoxPr.prototype.Write_ToBinary = function(Writer)
     // Bool : opEmu
 
     Writer.WriteBool(this.aln);
-    //Writer.WriteBool(this.brk);
     Writer.WriteBool(this.diff);
     Writer.WriteBool(this.noBreak);
     Writer.WriteBool(this.opEmu);
@@ -481,7 +745,6 @@ CMathBoxPr.prototype.Read_FromBinary = function(Reader)
     // Bool : opEmu
 
     this.aln     = Reader.GetBool();
-    //this.brk     = Reader.GetBool();
     this.diff    = Reader.GetBool();
     this.noBreak = Reader.GetBool();
     this.opEmu   = Reader.GetBool();
@@ -555,15 +818,74 @@ CBox.prototype.IsOperatorEmulator = function()
 {
     return this.Pr.opEmu == true;
 };
-CBox.prototype.IsBreak = function(bInline)
+CBox.prototype.IsForcedBreak = function()
 {
+    var bInline = this.ParaMath.Is_Inline();
+
     return bInline == false && this.Pr.opEmu == true && this.Pr.brk !== undefined;
 };
 CBox.prototype.Get_AlignBrk = function()
 {
     return this.Pr.Get_AlignBrk();
 };
+CBox.prototype.Displace_BreakOperator = function(_CurLine, _CurRange, isForward, CountOperators)
+{
+    if(this.Pr.brk !== undefined)
+    {
+        var AlnAt = this.Pr.Get_AlnAt();
 
+        var NotIncrease = AlnAt == CountOperators && isForward == true;
+
+        if(NotIncrease == false)
+        {
+            this.Pr.Displace_Break(isForward);
+
+            var NewAlnAt = this.Pr.Get_AlnAt();
+
+            if(AlnAt !== NewAlnAt)
+            {
+                History.Add(this, new CChangesMathBoxAlnAt(NewAlnAt, AlnAt));
+            }
+        }
+    }
+};
+CBox.prototype.raw_setAlnAt = function(Value)
+{
+    this.Pr.Apply_AlnAt(Value);
+};
+CBox.prototype.Can_ModifyArgSize = function()
+{
+    return false === this.Is_SelectInside();
+};
+CBox.prototype.Get_InterfaceProps = function()
+{
+    return new CMathMenuBox(this);
+};
+CBox.prototype.Can_AddManualBreak = function()
+{
+    var bInline = this.ParaMath.Is_Inline();
+
+    return false === bInline && true == this.Pr.opEmu;
+};
+CBox.prototype.Can_DeleteManualBreak = function()
+{
+    return this.IsForcedBreak();
+};
+
+/**
+ *
+ * @param CMathMenuBox
+ * @constructor
+ * @extends {CMathMenuBase}
+ */
+function CMathMenuBox(Box)
+{
+    CMathMenuBox.superclass.constructor.call(this, Box);
+
+    this.Type = c_oAscMathInterfaceType.Box;
+}
+Asc.extendClass(CMathMenuBox, CMathMenuBase);
+window["CMathMenuBox"] = CMathMenuBox;
 
 function CMathBarPr()
 {
@@ -661,6 +983,78 @@ CBar.prototype.getAscent = function()
 
     return ascent;
 };
+CBar.prototype.Apply_MenuProps = function(Props)
+{
+    if(Props.Type == c_oAscMathInterfaceType.Bar && Props.Pos !== undefined)
+    {
+        var Pos = Props.Pos == c_oAscMathInterfaceBarPos.Bottom ? LOCATION_BOT : LOCATION_TOP;
+
+        if(Pos !== this.Pr.pos)
+        {
+            History.Add(this, new CChangesMathBarLinePos(Pos, this.Pr.pos));
+            this.raw_SetLinePos(Pos);
+        }
+    }
+
+    /*if(Type == c_oAscMathMenuTypes.BarLineOver && this.Pr.pos == LOCATION_BOT)
+    {
+        History.Add(this, new CChangesMathBarLinePos(LOCATION_TOP, this.Pr.pos));
+        this.raw_SetLinePos(LOCATION_TOP);
+    }
+    else if(Type == c_oAscMathMenuTypes.BarLineUnder && this.Pr.pos == LOCATION_TOP)
+    {
+        History.Add(this, new CChangesMathBarLinePos(LOCATION_BOT, this.Pr.pos));
+        this.raw_SetLinePos(LOCATION_BOT);
+    }*/
+};
+CBar.prototype.Get_InterfaceProps = function()
+{
+    return new CMathMenuBar(this);
+};
+CBar.prototype.raw_SetLinePos = function(Value)
+{
+    this.Pr.pos = Value;
+    this.RecalcInfo.bProps = true;
+    this.ApplyProperties();
+};
+CBar.prototype.Can_Delete = function()
+{
+    return true;
+};
+CBar.prototype.Is_SimpleDelete = function()
+{
+    return true;
+};
+
+/**
+ *
+ * @param CMathMenuBar
+ * @constructor
+ * @extends {CMathMenuBase}
+ */
+function CMathMenuBar(Bar)
+{
+    CMathMenuBar.superclass.constructor.call(this, Bar);
+
+    this.Type   = c_oAscMathInterfaceType.Bar;
+
+    if (undefined !== Bar)
+    {
+        this.Pos = Bar.Pr.pos == LOCATION_BOT ? c_oAscMathInterfaceBarPos.Bottom : c_oAscMathInterfaceBarPos.Top;
+    }
+    else
+    {
+        this.Pos = undefined;
+    }
+}
+Asc.extendClass(CMathMenuBar, CMathMenuBase);
+
+CMathMenuBar.prototype.get_Pos = function(){return this.Pos};
+CMathMenuBar.prototype.put_Pos = function(Pos){this.Pos = Pos;};
+
+window["CMathMenuBar"] = CMathMenuBar;
+CMathMenuBar.prototype["get_Pos"] = CMathMenuBar.prototype.get_Pos;
+CMathMenuBar.prototype["put_Pos"] = CMathMenuBar.prototype.put_Pos;
 
 function CMathPhantomPr()
 {

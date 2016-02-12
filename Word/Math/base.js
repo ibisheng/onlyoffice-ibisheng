@@ -863,6 +863,29 @@ CMathBase.prototype.Get_CompiledPr = function(Copy)
 };
 CMathBase.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 {
+    this.Apply_TextPrToCtrPr(TextPr, IncFontSize, ApplyToAll);
+
+    // нужно пройтись по всем элементам  и вложенным формулам в том числе, чтобы пересчитать ctrPrp у всех мат объектов
+    // для некоторых формул (например, для итератора в Limit) важно учесть собственные настройки (ArgSize), а не только родительские, поэтому и нужно профтись по всем inline-формулам
+
+    for(var i=0; i < this.nRow; i++)
+        for(var j = 0; j < this.nCol; j++)
+            if(!this.elements[i][j].IsJustDraw())
+                this.elements[i][j].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
+
+    // такая ситуация может возникнуть при добавлении элементов из меню, и чтобы применились текстовые настройки при вставке нужно пройтись по контентам
+    // a Resize произойдет позже, после вставки = > массив this.elements заполнится позднее
+    if(this.nRow == 0 && this.nCol == 0)
+    {
+        for(var i = 0 ; i < this.Content.length; i++)
+        {
+            this.Content[i].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
+        }
+    }
+
+};
+CMathBase.prototype.Apply_TextPrToCtrPr = function(TextPr, IncFontSize, ApplyToAll)
+{
     if(ApplyToAll == true)
         this.RecalcInfo.bCtrPrp = true;
 
@@ -951,26 +974,6 @@ CMathBase.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
             this.raw_SetRFonts(RFonts);
         }
     }
-
-
-    // нужно пройтись по всем элементам  и вложенным формулам в том числе, чтобы пересчитать ctrPrp у всех мат объектов
-    // для некоторых формул (например, для итератора в Limit) важно учесть собственные настройки (ArgSize), а не только родительские, поэтому и нужно профтись по всем inline-формулам
-
-    for(var i=0; i < this.nRow; i++)
-        for(var j = 0; j < this.nCol; j++)
-            if(!this.elements[i][j].IsJustDraw())
-                this.elements[i][j].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
-
-    // такая ситуация может возникнуть при добавлении элементов из меню, и чтобы применились текстовые настройки при вставке нужно пройтись по контентам
-    // a Resize произойдет позже, после вставки = > массив this.elements заполнится позднее
-    if(this.nRow == 0 && this.nCol == 0)
-    {
-        for(var i = 0 ; i < this.Content.length; i++)
-        {
-            this.Content[i].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
-        }
-    }
-
 };
 CMathBase.prototype.GetMathTextPrForMenu = function(ContentPos, Depth)
 {
@@ -1931,6 +1934,22 @@ CMathBase.prototype.protected_AddToContent = function(Pos, Items, bUpdatePositio
     this.raw_AddToContent(Pos, Items, bUpdatePosition);
     this.private_UpdatePosOnAdd(Pos, bUpdatePosition);
 };
+CMathBase.prototype.protected_RemoveItems = function(Pos, Items, bUpdatePosition)
+{
+    History.Add(this, new CChangesMathRemoveItems(Pos, Items));
+
+    var Count = Items.length;
+    this.raw_RemoveFromContent(Pos, Count);
+
+    // Обновим текущую позицию
+    if (this.CurPos > Pos + Count)
+        this.CurPos -= Count;
+    else if (this.CurPos > Pos )
+        this.CurPos = Pos;
+
+    this.private_CorrectCurPos();
+    this.private_UpdatePosOnRemove(Pos, Count);
+};
 CMathBase.prototype.raw_AddToContent = function(Pos, Items, bUpdatePosition)
 {
     for(var Index = 0, Count = Items.length; Index < Count; Index++)
@@ -1948,10 +1967,22 @@ CMathBase.prototype.raw_RemoveFromContent = function(Pos, Count)
 
     this.fillContent();
 };
+CMathBase.prototype.raw_SetColumn = function(Value)
+{
+    if(Value > 0)
+        this.Pr.Set_Column(Value);
+};
 CMathBase.prototype.Recalc_RunsCompiledPr = function()
 {
     this.RecalcInfo.bCtrPrp = true;
-    CParagraphContentWithParagraphLikeContent.prototype.Recalc_RunsCompiledPr.call(this);
+
+    for(var i=0; i < this.nRow; i++)
+        for(var j = 0; j < this.nCol; j++)
+        {
+            var Item = this.elements[i][j];
+            if(!Item.IsJustDraw())
+                Item.Recalc_RunsCompiledPr();
+        }
 };
 CMathBase.prototype.GetLastElement = function()
 {
@@ -2386,6 +2417,14 @@ CMathBase.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRang
         }
     }
 };
+CMathBase.prototype.Displace_BreakOperator = function(_CurLine, _CurRange, isForward, CountOperators)
+{
+    this.Content[this.NumBreakContent].Displace_BreakOperator(_CurLine, _CurRange, isForward, CountOperators);
+};
+CMathBase.prototype.Get_AlignBrk = function(_CurLine, _CurRange)
+{
+    return this.Content[this.NumBreakContent].Get_AlignBrk(_CurLine, _CurRange);
+};
 CMathBase.prototype.raw_SetReviewType = function(Type, Info)
 {
     this.ReviewType = Type;
@@ -2547,13 +2586,183 @@ CMathBase.prototype.Reject_RevisionChanges = function(Type, bAll)
 
     CMathBase.superclass.Reject_RevisionChanges.apply(this, arguments);
 };
+CMathBase.prototype.Set_MenuProps = function(Props)
+{
+    if(this.Selection.Use == false)
+    {
+        this.Content[this.CurPos].Set_MenuProps(Props);
+    }
+    else if(this.Selection.Use == true && this.Selection.StartPos == this.Selection.EndPos)
+    {
+        var Pos = this.Selection.StartPos;
+        this.Content[Pos].Set_MenuProps(Props);
+    }
+};
+CMathBase.prototype.Can_ApplyMenuPropsToObject = function()
+{
+    var bApplyToCurrent = false;
 
+    if(this.Selection.Use == true && this.Selection.StartPos !== this.Selection.EndPos)
+    {
+        bApplyToCurrent = true;
+    }
+    else
+    {
+        var Pos = this.Selection.Use == false ? this.CurPos : this.Selection.StartPos;
+        bApplyToCurrent = true === this.Content[Pos].Is_CurrentContent();
+    }
+
+    return bApplyToCurrent;
+};
+CMathBase.prototype.Get_MenuProps = function()
+{
+    var Pr = {};
+    var Pos = null;
+
+    if(this.Selection.Use == false)
+    {
+        Pos = this.CurPos;
+    }
+    else if(this.Selection.StartPos == this.Selection.EndPos)
+    {
+        Pos = this.Selection.StartPos;
+    }
+
+    if(Pos !== null && true == this.Content[Pos].Check_Composition())
+    {
+        Pr = this.Content[Pos].Get_MenuProps();
+    }
+    else
+    {
+        Pr = this.Get_ObjectPropsForMenu();
+    }
+
+    return Pr;
+};
+CMathBase.prototype.Apply_MenuProps = function()
+{};
+CMathBase.prototype.Can_Delete = function()
+{
+    return false;
+};
+CMathBase.prototype.Is_DeletedItem = function(Type)
+{
+    return Type == c_oAscMathMenuTypes.DeleteElement && true === this.Can_Delete();
+};
+CMathBase.prototype.Can_DeleteSubScript = function()
+{
+    return false;
+};
+CMathBase.prototype.Can_DeleteSuperScript = function()
+{
+    return false;
+};
+CMathBase.prototype.Get_DeletedItemsThroughInterface = function()
+{
+    var DeletedItems = null;
+
+    if(true == this.Is_SimpleDelete())
+    {
+        var baseContent = this.getBase();
+        DeletedItems =  baseContent !==  null ? baseContent.Content : null;
+    }
+    else if(this.Content.length > 0)
+    {
+        DeletedItems = this.Content[0].Content;
+
+        for(var Pos = 1; Pos < this.Content.length; Pos++)
+        {
+            var NewSpace = new CMathText(false);
+            NewSpace.add(0x20);
+
+            var CtrPrp = this.Get_CtrPrp();
+            var NewRun = new ParaRun(this.ParaMath.Paragraph, true);
+            NewRun.Apply_Pr(CtrPrp);
+            NewRun.Concat_ToContent( [NewSpace] );
+
+            DeletedItems = DeletedItems.concat(NewRun);
+
+            var Items = this.Content[Pos].Content;
+            DeletedItems = DeletedItems.concat(Items);
+        }
+    }
+
+    return DeletedItems;
+};
+CMathBase.prototype.Get_ObjectPropsForMenu = function()
+{
+    var Pr = this.Get_InterfaceProps();
+
+    if(Pr == null)
+        Pr = {};
+
+    if(true === this.Can_ModifyArgSize())
+    {
+        var CompiledArgSize = this.Content[this.CurPos].Get_CompiledArgSize();
+        Pr.bCanDecrease = CompiledArgSize.Can_Decrease();
+        Pr.bCanIncrease = CompiledArgSize.Can_Increase();
+    }
+    else
+    {
+        Pr.bCanDecrease = false;
+        Pr.bCanIncrease = false;
+    }
+
+    Pr.bCanDelete            = this.Can_Delete();
+
+    return Pr;
+};
+CMathBase.prototype.Can_DecreaseArgumentSize = function()
+{
+    var bDecreaseArgSize = false;
+
+    if(true === this.Can_ModifyArgSize())
+    {
+        var CompiledArgSize = this.Content[this.CurPos].Get_CompiledArgSize();
+        bDecreaseArgSize = CompiledArgSize.Can_Decrease();
+    }
+
+    return bDecreaseArgSize;
+};
+CMathBase.prototype.Can_IncreaseArgumentSize = function()
+{
+    var bIncreaseArgSize = false;
+
+    if(true === this.Can_ModifyArgSize())
+    {
+        var CompiledArgSize = this.Content[this.CurPos].Get_CompiledArgSize();
+        bIncreaseArgSize = CompiledArgSize.Can_Increase();
+    }
+
+    return bIncreaseArgSize;
+};
+CMathBase.prototype.Get_InterfaceProps = function()
+{
+    return {};
+};
+CMathBase.prototype.Can_ModifyArgSize = function()
+{
+    return false;
+};
+CMathBase.prototype.Is_SelectInside = function()
+{
+    return this.Selection.Use == true && this.Selection.StartPos !== this.Selection.EndPos;
+};
+CMathBase.prototype.Can_AddManualBreak = function()
+{
+    return false;
+};
+CMathBase.prototype.Can_DeleteManualBreak = function()
+{
+    return false;
+};
 CMathBase.prototype.Math_Set_EmptyRange         = CMathContent.prototype.Math_Set_EmptyRange;
 CMathBase.prototype.Set_ParaMath                = CMathContent.prototype.Set_ParaMath;
 CMathBase.prototype.Recalculate_Reset           = CMathContent.prototype.Recalculate_Reset;
 CMathBase.prototype.Set_ParaContentPos          = CMathContent.prototype.Set_ParaContentPos;
 CMathBase.prototype.Get_CurrentParaPos          = CMathContent.prototype.Get_CurrentParaPos;
 CMathBase.prototype.private_UpdatePosOnAdd      = CMathContent.prototype.private_UpdatePosOnAdd;
+CMathBase.prototype.private_UpdatePosOnRemove   = CMathContent.prototype.private_UpdatePosOnRemove;
 CMathBase.prototype.private_CorrectSelectionPos = CMathContent.prototype.private_CorrectSelectionPos;
 
 CMathBase.prototype.private_CorrectCurPos = function()
@@ -2584,9 +2793,6 @@ CMathBase.prototype.Selection_CheckParaContentPos = function(ContentPos, Depth, 
         return true;
 
     return false;
-};
-CMathBase.prototype.Document_UpdateInterfaceState = function(MathProps)
-{
 };
 
 CMathBase.prototype.Is_ContentUse = function(MathContent)
@@ -2789,7 +2995,6 @@ CMathBoundsMeasures.prototype.ShiftPage = function(Dx)
     this.Page += Dx;
 };
 
-
 function CEmptyRunRecalculateObject(StartLine, StartRange)
 {
     this.StartLine   = StartLine;
@@ -2852,3 +3057,210 @@ CEmptyRunRecalculateObject.prototype =
     }
 
 };
+
+var c_oMathMenuAction = {
+    None                    : 0x00000000,
+    RemoveAccentCharacter   : 0x00000001,
+    RemoveBar               : 0x00000002,
+    InsertMatrixRow         : 0x00000004,
+    InsertMatrixColumn      : 0x00000008,
+    InsertBefore            : 0x00000010,
+    DeleteMatrixRow         : 0x00000020,
+    DeleteMatrixColumn      : 0x00000040,
+    InsertEquation          : 0x00000080,
+    DeleteEquation          : 0x00000100,
+    InsertDelimiterArgument : 0x00000200,
+    DeleteDelimiterArgument : 0x00000400,
+    IncreaseArgumentSize    : 0x00000800,
+    DecreaseArgumentSize    : 0x00001000,
+    InsertManualBreak       : 0x00002000,
+    DeleteManualBreak       : 0x00004000,
+    AlignToCharacter        : 0x00008000,
+    RemoveDelimiter         : 0x00010000,
+    RemoveGroupChar         : 0x00020000,
+    RemoveRadical           : 0x00040000,
+    RemoveBox               : 0x00080000
+
+};
+function CMathMenuBase(oMath)
+{
+    this.Type   = c_oAscMathInterfaceType.Common;
+    this.Action = c_oMathMenuAction.None;
+
+    if(oMath == undefined)
+    {
+        this.CanIncreaseArgumentSize = false;
+        this.CanDecreaseArgumentSize = false;
+        this.CanInsertManualBreak    = false;
+        this.CanDeleteManualBreak    = false;
+        this.CanAlignToCharacter     = false;
+
+    }
+    else
+    {
+        this.CanIncreaseArgumentSize = oMath.Can_IncreaseArgumentSize();
+        this.CanDecreaseArgumentSize = oMath.Can_DecreaseArgumentSize();
+        this.CanInsertManualBreak    = oMath.Can_AddManualBreak();
+        this.CanDeleteManualBreak    = oMath.Can_DeleteManualBreak();
+        this.CanAlignToCharacter     = false;
+    }
+}
+CMathMenuBase.prototype.get_Type = function()
+{
+    return this.Type;
+};
+CMathMenuBase.prototype.remove_AccentCharacter = function()
+{
+    this.Action |= c_oMathMenuAction.RemoveAccentCharacter;
+};
+CMathMenuBase.prototype.remove_Bar = function()
+{
+    this.Action |= c_oMathMenuAction.RemoveBar;
+};
+CMathMenuBase.prototype.insert_MatrixRow = function(bBefore)
+{
+    if (bBefore)
+        this.Action |= c_oMathMenuAction.InsertBefore;
+
+    this.Action |= c_oMathMenuAction.InsertMatrixRow;
+};
+CMathMenuBase.prototype.insert_MatrixColumn = function(bBefore)
+{
+    if (bBefore)
+        this.Action |= c_oMathMenuAction.InsertBefore;
+
+    this.Action |= c_oMathMenuAction.InsertMatrixColumn;
+};
+CMathMenuBase.prototype.delete_MatrixRow = function()
+{
+    this.Action |= c_oMathMenuAction.DeleteMatrixRow;
+};
+CMathMenuBase.prototype.delete_MatrixColumn = function()
+{
+    this.Action |= c_oMathMenuAction.DeleteMatrixColumn;
+};
+CMathMenuBase.prototype.insert_Equation = function(bBefore)
+{
+    if (bBefore)
+        this.Action |= c_oMathMenuAction.InsertBefore;
+
+    this.Action |= c_oMathMenuAction.InsertEquation;
+};
+CMathMenuBase.prototype.delete_Equation = function()
+{
+    this.Action |= c_oMathMenuAction.DeleteEquation;
+};
+CMathMenuBase.prototype.insert_DelimiterArgument = function(bBefore)
+{
+    if (bBefore)
+        this.Action |= c_oMathMenuAction.InsertBefore;
+
+    this.Action |= c_oMathMenuAction.InsertDelimiterArgument;
+};
+CMathMenuBase.prototype.delete_DelimiterArgument = function()
+{
+    this.Action |= c_oMathMenuAction.DeleteDelimiterArgument;
+};
+CMathMenuBase.prototype.can_IncreaseArgumentSize = function()
+{
+    return this.CanIncreaseArgumentSize;
+};
+CMathMenuBase.prototype.can_DecreaseArgumentSize = function()
+{
+    return this.CanDecreaseArgumentSize;
+};
+CMathMenuBase.prototype.increase_ArgumentSize = function()
+{
+    this.Action |= c_oMathMenuAction.IncreaseArgumentSize;
+};
+CMathMenuBase.prototype.decrease_ArgumentSize = function()
+{
+    this.Action |= c_oMathMenuAction.DecreaseArgumentSize;
+};
+CMathMenuBase.prototype.can_InsertManualBreak = function()
+{
+    return this.CanInsertManualBreak;
+};
+CMathMenuBase.prototype.can_DeleteManualBreak = function()
+{
+    return this.CanDeleteManualBreak;
+};
+CMathMenuBase.prototype.can_AlignToCharacter = function()
+{
+    return this.CanAlignToCharacter;
+};
+CMathMenuBase.prototype.insert_ManualBreak = function()
+{
+    this.Action |= c_oMathMenuAction.InsertManualBreak;
+};
+CMathMenuBase.prototype.delete_ManualBreak = function()
+{
+    this.Action |= c_oMathMenuAction.DeleteManualBreak;
+};
+CMathMenuBase.prototype.align_ToCharacter = function()
+{
+    this.Action |= c_oMathMenuAction.AlignToCharacter;
+};
+/*CMathMenuBase.prototype.remove_SubScript = function()
+{
+    this.Action |= c_oMathMenuAction.RemoveSubScript;
+};
+CMathMenuBase.prototype.remove_SuperScript = function()
+{
+    this.Action |= c_oMathMenuAction.RemoveSuperScript;
+};
+CMathMenuBase.prototype.remove_Script = function()
+{
+    this.Action |= c_oMathMenuAction.RemoveScript;
+};
+CMathMenuBase.prototype.remove_Limit = function()
+{
+    this.Action |= c_oMathMenuAction.RemoveLimit;
+};
+CMathMenuBase.prototype.remove_EqArray = function()
+{
+    this.Action |= c_oMathMenuAction.RemoveEqArray;
+};*/
+CMathMenuBase.prototype.remove_Delimiter = function()
+{
+    this.Action |= c_oMathMenuAction.RemoveDelimiter;
+};
+CMathMenuBase.prototype.remove_GroupCharacter = function()
+{
+    this.Action |= c_oMathMenuAction.RemoveGroupCharacter;
+};
+CMathMenuBase.prototype.remove_Radical = function()
+{
+    this.Action |= c_oMathMenuAction.RemoveRadical;
+};
+CMathMenuBase.prototype.remove_Box = function()
+{
+    this.Action |= c_oMathMenuAction.RemoveBox;
+};
+
+
+CMathMenuBase.prototype["get_Type"]                 = CMathMenuBase.prototype.get_Type;
+CMathMenuBase.prototype["remove_AccentCharacter"]   = CMathMenuBase.prototype.remove_AccentCharacter;
+CMathMenuBase.prototype["remove_Bar"]               = CMathMenuBase.prototype.remove_Bar;
+CMathMenuBase.prototype["insert_MatrixRow"]         = CMathMenuBase.prototype.insert_MatrixRow;
+CMathMenuBase.prototype["insert_MatrixColumn"]      = CMathMenuBase.prototype.insert_MatrixColumn;
+CMathMenuBase.prototype["delete_MatrixRow"]         = CMathMenuBase.prototype.delete_MatrixRow;
+CMathMenuBase.prototype["delete_MatrixColumn"]      = CMathMenuBase.prototype.delete_MatrixColumn;
+CMathMenuBase.prototype["insert_Equation"]          = CMathMenuBase.prototype.insert_Equation;
+CMathMenuBase.prototype["delete_Equation"]          = CMathMenuBase.prototype.delete_Equation;
+CMathMenuBase.prototype["insert_DelimiterArgument"] = CMathMenuBase.prototype.insert_DelimiterArgument;
+CMathMenuBase.prototype["delete_DelimiterArgument"] = CMathMenuBase.prototype.delete_DelimiterArgument;
+CMathMenuBase.prototype["can_IncreaseArgumentSize"] = CMathMenuBase.prototype.can_IncreaseArgumentSize;
+CMathMenuBase.prototype["can_DecreaseArgumentSize"] = CMathMenuBase.prototype.can_DecreaseArgumentSize;
+CMathMenuBase.prototype["increase_ArgumentSize"]    = CMathMenuBase.prototype.increase_ArgumentSize;
+CMathMenuBase.prototype["decrease_ArgumentSize"]    = CMathMenuBase.prototype.decrease_ArgumentSize;
+CMathMenuBase.prototype["can_InsertManualBreak"]    = CMathMenuBase.prototype.can_InsertManualBreak;
+CMathMenuBase.prototype["insert_ManualBreak"]       = CMathMenuBase.prototype.insert_ManualBreak;
+CMathMenuBase.prototype["can_DeleteManualBreak"]    = CMathMenuBase.prototype.can_DeleteManualBreak;
+CMathMenuBase.prototype["delete_ManualBreak"]       = CMathMenuBase.prototype.delete_ManualBreak;
+CMathMenuBase.prototype["can_AlignToCharacter"]     = CMathMenuBase.prototype.can_AlignToCharacter;
+CMathMenuBase.prototype["align_ToCharacter"]        = CMathMenuBase.prototype.align_ToCharacter;
+CMathMenuBase.prototype["remove_Delimiter"]         = CMathMenuBase.prototype.remove_Delimiter;
+CMathMenuBase.prototype["remove_GroupCharacter"]    = CMathMenuBase.prototype.remove_GroupCharacter;
+CMathMenuBase.prototype["remove_Radical"]           = CMathMenuBase.prototype.remove_Radical;
+CMathMenuBase.prototype["remove_Box"]               = CMathMenuBase.prototype.remove_Box;

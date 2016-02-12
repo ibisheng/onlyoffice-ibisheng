@@ -43,8 +43,6 @@ function CFraction(props)
 
     this.Pr = new CMathFractionPr();
 
-    this.bHideBar =   false;
-
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 
@@ -102,9 +100,9 @@ CFraction.prototype.drawBarFraction = function(PDSE)
 
     var x1 = this.pos.x + PosLine.x + this.GapLeft,
         x2 = this.pos.x + PosLine.x + this.GapLeft + width,
-        y1 = this.pos.y + PosLine.y + numHeight- penW;
+        y1 = this.pos.y + PosLine.y + numHeight - penW;
 
-    if( !this.bHideBar )
+    if(this.Pr.type == BAR_FRACTION)
     {
         PDSE.Graphics.SetFont(mgCtrPrp);
 
@@ -311,7 +309,7 @@ CFraction.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInf
 
     if(RPI.bInline == true && (this.Pr.type === BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)) // уменьшае размер числителя и знаменателя
     {
-        ArgSzNumDen.decrease();        // для контентов числителя и знаменателя
+        ArgSzNumDen.Decrease();        // для контентов числителя и знаменателя
         this.ArgSize.SetValue(-1);     // для CtrPrp
     }
     else if(RPI.bDecreasedComp == true)    // уменьшаем  расстояние между числителем и знаменателем (размер FontSize для TxtPr ControlLetter)
@@ -323,8 +321,6 @@ CFraction.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInf
     {
         this.ArgSize.SetValue(0);
     }
-
-    this.RecalcInfo.bCtrPrp = true;
 
     this.Set_CompiledCtrPrp(Parent, ParaMath, RPI);
 
@@ -466,9 +462,6 @@ CFraction.prototype.fillContent = function()
     {
         this.setDimension(2, 1);
 
-        if(this.Pr.type == NO_BAR_FRACTION)
-            this.bHideBar = true;
-
         this.elements[0][0] = this.Numerator;
         this.elements[1][0] = this.Denominator;
     }
@@ -485,11 +478,122 @@ CFraction.prototype.fillContent = function()
         this.elements[0][1] = this.Denominator.getElement();
     }
 };
-CFraction.prototype.Document_UpdateInterfaceState = function(MathProps)
+CFraction.prototype.Apply_MenuProps = function(Props)
 {
-    MathProps.Type = c_oAscMathInterfaceType.Fraction;
-    MathProps.Pr   = null;
+    if(Props.Type == c_oAscMathInterfaceType.Fraction && Props.FractionType !== undefined)
+    {
+        var FractionType = this.Pr.type;
+
+        switch (Props.FractionType)
+        {
+            case c_oAscMathInterfaceFraction.Bar:
+                FractionType = BAR_FRACTION;
+                break;
+            case c_oAscMathInterfaceFraction.Skewed:
+                FractionType = SKEWED_FRACTION;
+                break;
+            case c_oAscMathInterfaceFraction.Linear:
+                FractionType = LINEAR_FRACTION;
+                break;
+            case c_oAscMathInterfaceFraction.NoBar:
+                FractionType = NO_BAR_FRACTION;
+                break;
+        }
+
+        if(FractionType !== this.Pr.type)
+        {
+            History.Add(this, new CChangesMathFractionType(FractionType, this.Pr.type));
+            this.raw_SetFractionType(FractionType);
+        }
+    }
+
+    /*var FractionType;
+
+    switch(Type)
+    {
+        case c_oAscMathMenuTypes.FractionBar:
+        {
+            FractionType = BAR_FRACTION;
+            break;
+        }
+        case c_oAscMathMenuTypes.FractionSkewed:
+        {
+            FractionType = SKEWED_FRACTION;
+            break;
+        }
+        case c_oAscMathMenuTypes.FractionLinear:
+        {
+            FractionType = LINEAR_FRACTION;
+            break;
+        }
+        case c_oAscMathMenuTypes.FractionNoBar:
+        {
+            FractionType = NO_BAR_FRACTION;
+            break;
+        }
+    }
+
+    if(FractionType !== undefined && FractionType !== this.Pr.type)
+    {
+        History.Add(this, new CChangesMathFractionType(FractionType, this.Pr.type));
+        this.raw_SetFractionType(FractionType);
+    }*/
 };
+CFraction.prototype.Get_InterfaceProps = function()
+{
+    return new CMathMenuFraction(this);
+};
+CFraction.prototype.raw_SetFractionType = function(FractionType)
+{
+    this.Pr.type = FractionType;
+    this.fillContent();
+};
+
+/**
+ *
+ * @param CMathMenuFraction
+ * @constructor
+ * @extends {CMathMenuBase}
+ */
+function CMathMenuFraction(Fraction)
+{
+    CMathMenuFraction.superclass.constructor.call(this, Fraction);
+
+    this.Type         = c_oAscMathInterfaceType.Fraction;
+
+    if (undefined !== Fraction)
+    {
+        this.FractionType = c_oAscMathInterfaceFraction.Bar;
+
+        switch (Fraction.Pr.type)
+        {
+            case BAR_FRACTION:
+                this.FractionType = c_oAscMathInterfaceFraction.Bar;
+                break;
+            case SKEWED_FRACTION:
+                this.FractionType = c_oAscMathInterfaceFraction.Skewed;
+                break;
+            case LINEAR_FRACTION:
+                this.FractionType = c_oAscMathInterfaceFraction.Linear;
+                break;
+            case NO_BAR_FRACTION:
+                this.FractionType = c_oAscMathInterfaceFraction.NoBar;
+                break;
+        }
+    }
+    else
+    {
+        this.FractionType = undefined;
+    }
+}
+Asc.extendClass(CMathMenuFraction, CMathMenuBase);
+
+CMathMenuFraction.prototype.get_FractionType = function(){return this.FractionType;};
+CMathMenuFraction.prototype.put_FractionType = function(Type){this.FractionType = Type;};
+
+window["CMathMenuFraction"] = CMathMenuFraction;
+CMathMenuFraction.prototype["get_FractionType"] = CMathMenuFraction.prototype.get_FractionType;
+CMathMenuFraction.prototype["put_FractionType"] = CMathMenuFraction.prototype.put_FractionType;
 
 /**
  *

@@ -551,22 +551,101 @@ var c_oAscMathType = {
 };
 
 var c_oAscMathInterfaceType = {
-  Common: 0x00,
-  Fraction: 0x01,
-  Script: 0x02,
-  Radical: 0x03,
-  LargeOperator: 0x04,
-  Delimiter: 0x05,
-  Function: 0x06,
-  Accent: 0x07,
-  BorderBox: 0x08,
-  Bar: 0x09,
-  Box: 0x0a,
-  Limit: 0x0b,
-  GroupChar: 0x0c,
-  Matrix: 0x0d,
-  EqArray: 0x0e,
-  Phantom: 0x0f
+  Common        : 0x00,
+  Fraction      : 0x01,
+  Script        : 0x02,
+  Radical       : 0x03,
+  LargeOperator : 0x04,
+  Delimiter     : 0x05,
+  Function      : 0x06,
+  Accent        : 0x07,
+  BorderBox     : 0x08,
+  Bar           : 0x09,
+  Box           : 0x0a,
+  Limit         : 0x0b,
+  GroupChar     : 0x0c,
+  Matrix        : 0x0d,
+  EqArray       : 0x0e,
+  Phantom       : 0x0f
+};
+
+var c_oAscMathInterfaceBarPos = {
+  Top    : 0,
+  Bottom : 1
+};
+
+var c_oAscMathInterfaceScript = {
+  None      : 0x000,  // Удаление скрипта
+  Sup       : 0x001,
+  Sub       : 0x002,
+  SubSup    : 0x003,
+  PreSubSup : 0x004
+};
+
+var c_oAscMathInterfaceFraction = {
+  Bar    : 0x001,
+  Skewed : 0x002,
+  Linear : 0x003,
+  NoBar  : 0x004
+};
+
+var c_oAscMathInterfaceLimitPos = {
+  None   : -1,  // Удаление предела
+  Top    : 0,
+  Bottom : 1
+};
+
+var c_oAscMathInterfaceMatrixMatrixAlign = {
+  Top    : 0,
+  Center : 1,
+  Bottom : 2
+};
+
+var c_oAscMathInterfaceMatrixColumnAlign = {
+  Left   : 0,
+  Center : 1,
+  Right  : 2
+};
+
+var c_oAscMathInterfaceMatrixRowRule = {
+  Single      : 0x00,
+  OneAndHalf  : 0x01,
+  Double      : 0x02,
+  Exactly     : 0x03,
+  Multiple    : 0x04
+
+};
+
+var c_oAscMathInterfaceMatrixColumnRule = {
+   Single      : 0x00,
+   OneAndHalf  : 0x01,
+   Double      : 0x02,
+   Exactly     : 0x03,
+   Multiple    : 0x04
+};
+
+var c_oAscMathInterfaceEqArrayAlign = {
+  Top    : 0,
+  Center : 1,
+  Bottom : 2
+};
+
+var c_oAscMathInterfaceEqArrayLineRule = {
+  Single      : 0x00,
+  OneAndHalf  : 0x01,
+  Double      : 0x02,
+  Exactly     : 0x03,
+  Multiple    : 0x04
+};
+
+var c_oAscMathInterfaceNaryLimitLocation = {
+  UndOvr : 0,
+  SubSup : 1
+};
+
+var c_oAscMathInterfaceGroupCharPos = {
+  Top    : 0,
+  Bottom : 1
 };
 
 var c_oAscRevisionsChangeType = {

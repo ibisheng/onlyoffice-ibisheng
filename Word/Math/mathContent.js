@@ -2,36 +2,36 @@
 
 function CRPI()
 {
-    this.bDecreasedComp    = false;
-    this.bInline           = false;
-    this.bChangeInline     = false;
-    this.bNaryInline       = false; /*для CDegreeSupSub внутри N-арного оператора, этот флаг необходим, чтобы итераторы максимально близко друг к другу расположить*/
-    this.bEqArray          = false; /*для амперсанда*/
-    this.bMathFunc         = false;
-    this.bRecalcCtrPrp     = false; // пересчет ctrPrp нужен, когда на Undo и тп изменился размер первого Run, а ctrPrp уже для мат объектов пересчитались
-    this.bCorrect_FontSize = false;
+    this.bDecreasedComp            = false;
+    this.bInline                   = false;
+    this.bChangeInline             = false;
+    this.bNaryInline               = false; /*для CDegreeSupSub внутри N-арного оператора, этот флаг необходим, чтобы итераторы максимально близко друг к другу расположить*/
+    this.bEqArray                  = false; /*для амперсанда*/
+    this.bMathFunc                 = false;
+    this.bRecalcCtrPrp             = false; // пересчет ctrPrp нужен, когда на Undo и тп изменился размер первого Run, а ctrPrp уже для мат объектов пересчитались
+    this.bCorrect_ConvertFontSize  = false;
 }
 CRPI.prototype.Copy = function()
 {
     var RPI = new CRPI();
 
-    RPI.bInline           = this.bInline;
-    RPI.bDecreasedComp    = this.bDecreasedComp;
-    RPI.bChangeInline     = this.bChangeInline;
-    RPI.bNaryInline       = this.bNaryInline;
-    RPI.bEqArray          = this.bEqArray;
-    RPI.bMathFunc         = this.bMathFunc;
-    RPI.bRecalcCtrPrp     = this.bRecalcCtrPrp;
-    RPI.bCorrect_FontSize = this.bCorrect_FontSize;
+    RPI.bInline                   = this.bInline;
+    RPI.bDecreasedComp            = this.bDecreasedComp;
+    RPI.bChangeInline             = this.bChangeInline;
+    RPI.bNaryInline               = this.bNaryInline;
+    RPI.bEqArray                  = this.bEqArray;
+    RPI.bMathFunc                 = this.bMathFunc;
+    RPI.bRecalcCtrPrp             = this.bRecalcCtrPrp;
+    RPI.bCorrect_ConvertFontSize  = this.bCorrect_ConvertFontSize;
 
     return RPI;
 };
 CRPI.prototype.MergeMathInfo = function(MathInfo)
 {
-    this.bInline           = MathInfo.bInline || (MathInfo.bInternalRanges == true && MathInfo.bStartRanges == false);
-    this.bRecalcCtrPrp     = MathInfo.bRecalcCtrPrp;
-    this.bChangeInline     = MathInfo.bChangeInline;
-    this.bCorrect_FontSize = MathInfo.bCorrect_FontSize;
+    this.bInline                   = MathInfo.bInline || (MathInfo.bInternalRanges == true && MathInfo.bStartRanges == false);
+    this.bRecalcCtrPrp             = MathInfo.bRecalcCtrPrp;
+    this.bChangeInline             = MathInfo.bChangeInline;
+    this.bCorrect_ConvertFontSize  = MathInfo.bCorrect_ConvertFontSize;
 };
 
 function CMathPointInfo()
@@ -307,21 +307,25 @@ function CMathArgSize()
 }
 CMathArgSize.prototype =
 {
-    decrease: function()
+    Decrease: function()
     {
         if(this.value == undefined)
             this.value = 0;
 
         if( this.value > -2 )
             this.value--;
+
+        return this.value;
     },
-    increase: function()
+    Increase: function()
     {
         if(this.value == undefined)
             this.value = 0;
 
         if(this.value < 2)
             this.value++;
+
+        return this.value;
     },
     Set: function(ArgSize)
     {
@@ -358,6 +362,18 @@ CMathArgSize.prototype =
             ArgSize.value = 0;
 
         this.SetValue(this.value + ArgSize.value);
+    },
+    Can_Decrease: function()
+    {
+        return this.value !== -2;
+    },
+    Can_Increase: function()
+    {
+        return this.value == -1 || this.value == -2;
+    },
+    Can_SimpleIncrease: function()
+    {
+        return this.value !== 2;
     },
     Write_ToBinary: function(Writer)
     {
@@ -641,6 +657,10 @@ CMPrp.prototype =
     {
         return this.brk !== undefined ? this.brk.Get_AlignBrk() : 0;
     },
+    Get_AlnAt: function()
+    {
+        return this.brk != undefined ? this.brk.Get_AlnAt() : undefined;
+    },
     GetCompiled_ScrStyles : function()
     {
         var nor = this.nor == undefined ? false : this.nor;
@@ -682,6 +702,20 @@ CMPrp.prototype =
         }
 
         return Object;
+    },
+    Displace_Break: function(isForward)
+    {
+        if(this.brk !== undefined)
+        {
+            this.brk.Displace(isForward);
+        }
+    },
+    Apply_AlnAt: function(alnAt)
+    {
+        if(this.brk !== undefined)
+        {
+            this.brk.Apply_AlnAt(alnAt);
+        }
     }
 };
 
@@ -796,7 +830,6 @@ CMathContent.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
 
     if(GapsInfo.Current !== null)
         GapsInfo.Current.GapRight = 0;
-
 };
 CMathContent.prototype.Math_UpdateGaps = function(_CurLine, _CurRange)
 {
@@ -1256,7 +1289,7 @@ CMathContent.prototype.Correct_Content = function(bInnerCorrection)
 
         }
 
-        if(bEmptyContent)
+        if(bEmptyContent && this.bRoot == false)
         {
             this.Content[0].fillPlaceholders();
             this.Content[0].Recalc_CompiledPr(true);
@@ -1611,6 +1644,7 @@ CMathContent.prototype.Internal_Content_Add = function(Pos, Item, bUpdatePositio
 {
     Item.Set_ParaMath(this.ParaMath);
     Item.Parent = this;
+    Item.Recalc_RunsCompiledPr();
 
     History.Add( this, { Type : historyitem_Math_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
     this.Content.splice( Pos, 0, Item );
@@ -1687,22 +1721,39 @@ CMathContent.prototype.SplitContent = function(NewContent, ContentPos, Depth)
         var len = this.Content.length;
         if(Pos < len - 1)
         {
-            NewContent.Concat_ToContent( this.Content.slice(Pos + 1) );
+            NewContent.Concat_ToEnd( this.Content.slice(Pos + 1) );
             this.Remove_FromContent(Pos+1, len - Pos - 1);
         }
     }
-
 };
 CMathContent.prototype.Add_ToContent = function(Pos, Item)
 {
     this.Internal_Content_Add(Pos, Item);
 };
-CMathContent.prototype.Concat_ToContent = function(NewItems)
+CMathContent.prototype.Concat_ToEnd = function(NewItems)
 {
-    var StartPos = this.Content.length;
-    this.Content = this.Content.concat( NewItems );
+    this.Concat_ToContent(this.Content.length, NewItems);
+};
+CMathContent.prototype.Concat_ToContent = function(Pos, NewItems)
+{
+    if(NewItems != undefined && NewItems.length > 0)
+    {
+        var Count = NewItems.length;
 
-    History.Add( this, { Type : historyitem_Math_AddItem, Pos : StartPos, EndPos : this.Content.length - 1, Items : NewItems } );
+        for(var i = 0; i < Count; i++)
+        {
+            NewItems[i].Set_ParaMath(this.ParaMath);
+            NewItems[i].Parent = this;
+            NewItems[i].Recalc_RunsCompiledPr();
+        }
+
+        History.Add( this, { Type : historyitem_Math_AddItem, Pos : Pos, EndPos : Pos + Count - 1, Items : NewItems } );
+
+        var Array_start = this.Content.slice(0, Pos);
+        var Array_end   = this.Content.slice(Pos);
+
+        this.Content = Array_start.concat(NewItems, Array_end);
+    }
 };
 CMathContent.prototype.Remove_FromContent = function(Pos, Count)
 {
@@ -1872,11 +1923,15 @@ CMathContent.prototype.Undo = function(Data)
 
             this.Content = Array_start.concat(Data.Items, Array_end);
 
+            for(var i = 0; i < Data.Items.length; i++)
+                Data.Items[i].Recalc_RunsCompiledPr();
+
             break;
         }
         case historyitem_Math_ArgSize:
         {
             this.ArgSize.SetValue(Data.Old);
+            this.Recalc_RunsCompiledPr();
             break;
         }
     }
@@ -1896,6 +1951,9 @@ CMathContent.prototype.Redo = function(Data)
 
             this.Content = Array_start.concat(Data.Items, Array_end);
 
+            for(var i = 0; i < Data.Items.length; i++)
+                Data.Items[i].Recalc_RunsCompiledPr();
+
             break;
         }
         case historyitem_Math_RemoveItem:
@@ -1907,6 +1965,7 @@ CMathContent.prototype.Redo = function(Data)
         case historyitem_Math_ArgSize:
         {
             this.ArgSize.SetValue(Data.New);
+            this.Recalc_RunsCompiledPr();
             break;
         }
     }
@@ -2006,6 +2065,7 @@ CMathContent.prototype.Load_Changes = function(Reader)
                 if ( null != Element )
                 {
                     this.Content.splice(Pos, 0, Element);
+                    Element.Recalc_RunsCompiledPr();
                     CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
                 }
             }
@@ -2038,6 +2098,8 @@ CMathContent.prototype.Load_Changes = function(Reader)
             {
                 this.ArgSize.SetValue(undefined);
             }
+
+            this.Recalc_RunsCompiledPr();
 
             break;
         }
@@ -3833,8 +3895,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         }
     }
 
-    var bInternalOper    = false,
-        bCurInsideOper   = false;
+    var bCurInsideOper   = false;
 
     for(var Pos = RangeStartPos; Pos < ContentLen; Pos++)
     {
@@ -3871,36 +3932,32 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         {
             if(Type == para_Math_Run)
             {
-                Item.Recalculate_Range_OneLine(PRS, ParaPr, Depth + 1);
-                PRS.WordLen += Item.size.width;
+                if(true === Item.IsStartForcedBreakOperator())
+                {
+                    Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
+                }
+                else
+                {
+                    Item.Recalculate_Range_OneLine(PRS, ParaPr, Depth + 1);
+                    PRS.WordLen += Item.size.width;
+                }
             }
             else
             {
                 Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
 
-                var WidthItem = Item.size.width,
-                    GapRight  = Item.GapRight;
-
-                if(Item.kind == MATH_BOX)
+                if(Item.kind == MATH_BOX && true == Item.IsForcedBreak())
                 {
-                    if(true == Item.IsBreak(bInline))
-                    {
-                        this.private_ForceBreakBox(PRS, Item.size.width);
-                    }
-                    else
-                    {
-                        PRS.WordLen += WidthItem;
-                    }
-                }
-
-                var WWordLen = bOperBefore == true ?  PRS.X + PRS.WordLen + PRS.SpaceLen : PRS.X + PRS.SpaceLen + PRS.WordLen + WidthItem - GapRight;
-
-                if(PRS.NewRange == false && WWordLen > PRS.XEnd)
-                {
-                    PRS.NewRange = true;
-                    PRS.MoveToLBP = true;
+                    this.private_ForceBreakBox(PRS, Item.size.width);
                 }
             }
+
+            if(PRS.NewRange == false && PRS.X + PRS.WordLen + PRS.SpaceLen > PRS.XEnd)
+            {
+                PRS.NewRange = true;
+                PRS.MoveToLBP = true;
+            }
+
         }
         else // контент может занимать несколько строк
         {
@@ -3915,24 +3972,40 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
             Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
 
-            PRS.bBoxOperator = Type == para_Math_Composition && Item.kind == MATH_BOX;
-
             if(Type == para_Math_Composition)
             {
                 // перед мат объектом идет box break_operator и он не является первым элементом в строке
                 if(Item.kind == MATH_BOX)
                 {
-                    if(true == Item.IsBreak(bInline))
+                    if(true == Item.IsForcedBreak())
                     {
                         this.private_ForceBreakBox(PRS, Item, _Depth, PrevLastPos, LastPos); // _Depth, PrevLastPos, LastPos запоминаем до пересчета, поэтому передаем эти параметры в функцию
+                        PRS.bBreakBox = true;
                     }
                     else if(true == Item.IsOperatorEmulator())
                     {
                         this.private_BoxOperEmulator(PRS, Item, _Depth, PrevLastPos, LastPos); // _Depth, PrevLastPos, LastPos запоминаем до пересчета, поэтому передаем эти параметры в функцию
+                        PRS.bBreakBox = true;
                     }
                     else
                     {
                         PRS.WordLen += Item.size.width;
+                        PRS.Word = true;
+
+                        if(PRS.X + PRS.SpaceLen + PRS.WordLen > PRS.XEnd)
+                        {
+                            if (PRS.FirstItemOnLine == false)
+                            {
+                                PRS.MoveToLBP = true;
+                                PRS.NewRange = true;
+
+                                this.ParaMath.UpdateWidthLine(PRS, PRS.X - PRS.XRange);
+                            }
+                            else
+                            {
+                                PRS.bMathWordLarge = true;
+                            }
+                        }
                     }
 
                     PRS.MathFirstItem = false;
@@ -3940,8 +4013,6 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 }
                 else
                 {
-                    bInternalOper = bInternalOper || PRS.bInsideOper;
-
                     // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                     // FirstItemOnLine == false - слово оказалось не единственным элементом в промежутке, делаем перенос
                     if(PRS.X + PRS.SpaceLen + PRS.WordLen > PRS.XEnd)
@@ -4012,12 +4083,12 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             }
 
             bCurInsideOper = bCurInsideOper || PRS.bInsideOper;
+        }
 
-            if ( true === PRS.NewRange )
-            {
-                RangeEndPos = Pos;
-                break;
-            }
+        if ( true === PRS.NewRange )
+        {
+            RangeEndPos = Pos;
+            break;
         }
     }
 
@@ -4042,14 +4113,14 @@ CMathContent.prototype.Get_WrapToLine = function(_CurLine, _CurRange, WrapIndent
     var ContentLen = this.Content.length;
     var Wrap = 0;
 
-    if(false == this.IsStartLine(_CurLine, _CurRange))
+    if(this.bRoot == false || false == this.IsStartLine(_CurLine, _CurRange))
     {
         while(Pos < ContentLen)
         {
             var bInline = this.ParaMath.Is_Inline();
             var Item = this.Content[Pos];
             var bEmptyRun = Item.Type == para_Math_Run && true == Item.Math_EmptyRange(_CurLine, _CurRange);
-            var bBoxBreak = Item.Type == para_Math_Composition && Item.kind == MATH_BOX && true == Item.IsBreak(bInline);
+            var bBoxBreak = Item.Type == para_Math_Composition && Item.kind == MATH_BOX && true == Item.IsForcedBreak();
 
             if(Item.Type == para_Math_Composition)
             {
@@ -4066,7 +4137,7 @@ CMathContent.prototype.Get_WrapToLine = function(_CurLine, _CurRange, WrapIndent
             }
             else if(bEmptyRun == false)
             {
-                if(false === Item.IsBreak())
+                if(false === Item.IsForcedBreak())
                     Wrap = WrapIndent;
                 break;
             }
@@ -4100,8 +4171,9 @@ CMathContent.prototype.private_ForceBreakBox = function(PRS, Box, _Depth, PrevLa
         }
         else
         {
-            PRS.Word = false;
-            PRS.BreakBox = true;
+            PRS.Word         = false;
+            PRS.bForcedBreak = true;
+            PRS.WordLen     += BoxLen;
         }
     }
 };
@@ -4258,6 +4330,23 @@ CMathContent.prototype.IsEmptyLine = function(_CurLine)
     }
 
     return bEmpty;
+};
+CMathContent.prototype.Displace_BreakOperator = function(_CurLine, _CurRange, isForward, CountOperators)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    var bNextBox = true === this.Content[StartPos].IsEmptyRange(_CurLine, _CurRange) && StartPos != EndPos && this.Content[StartPos + 1].kind == MATH_BOX;
+
+    if(true === bNextBox) // Next element is Box
+    {
+        StartPos++;
+    }
+
+    this.Content[StartPos].Displace_BreakOperator(_CurLine, _CurRange, isForward, CountOperators);
 };
 CMathContent.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 {
@@ -4517,7 +4606,7 @@ CMathContent.prototype.Math_Is_End = function(_CurLine, _CurRange)
 
     return result;
 };
-CMathContent.prototype.GetAlignBrk = function(_CurLine, _CurRange)
+CMathContent.prototype.Get_AlignBrk = function(_CurLine, _CurRange)
 {
     var CurLine  = _CurLine - this.StartLine;
     var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
@@ -4536,27 +4625,29 @@ CMathContent.prototype.GetAlignBrk = function(_CurLine, _CurRange)
                 StartPos++;
             }
 
-            if(this.Content[StartPos].Type == para_Math_Run || this.Content[StartPos].kind == MATH_BOX)
-            {
-                AlnAt = this.Content[StartPos].Get_AlignBrk();
-            }
+            AlnAt = this.Content[StartPos].Get_AlignBrk(_CurLine, _CurRange);
         }
         else
         {
             var RangesCount = this.protected_GetRangesCount(CurLine - 1);
-            var EndtPos = this.protected_GetRangeEndPos(CurLine - 1, RangesCount - 1);
+            var EndPos = this.protected_GetRangeEndPos(CurLine - 1, RangesCount - 1);
 
             var Range = CurLine - 1 == 0 ? this.StartRange + RangesCount - 1 : RangesCount - 1;
 
-            while(EndtPos > 0 && this.Content[EndtPos].Type == para_Math_Run && true == this.Content[EndtPos].Is_EmptyRange(_CurLine - 1, Range))
+            if(EndPos == this.Content.length - 1) // сюда не должны зайти, т.к. ищем AlnAt для оператора из предыдущей строки, соответственно предыдущая строка не может заканчиваться последним элементом
             {
-                EndtPos--;
+                AlnAt = 0;
+            }
+            else
+            {
+                while(EndPos > 0 && this.Content[EndPos].Type == para_Math_Run && true == this.Content[EndPos].Is_EmptyRange(_CurLine - 1, Range))
+                {
+                    EndPos--;
+                }
+
+                AlnAt = this.Content[EndPos].Get_AlignBrk(_CurLine, _CurRange);
             }
 
-            if(this.Content[EndtPos].Type == para_Math_Run ||  this.Content[EndtPos].kind == MATH_BOX)
-            {
-                AlnAt = this.Content[EndtPos].Get_AlignBrk();
-            }
         }
     }
 
@@ -4591,6 +4682,205 @@ CMathContent.prototype.Cursor_MoveToEndPos = function(SelectFromEnd)
 {
     this.CurPos = this.Content.length - 1;
     this.Content[this.CurPos].Cursor_MoveToEndPos(SelectFromEnd);
+};
+CMathContent.prototype.Check_Composition = function()
+{
+    var Pos = this.private_FindCurrentPosInContent();
+
+    return Pos !== null && this.Content[Pos].Type == para_Math_Composition;
+};
+CMathContent.prototype.private_FindCurrentPosInContent = function()
+{
+    var Pos = null;
+
+    if(true === this.Selection.Use)
+    {
+        var StartPos = this.Selection.StartPos,
+            EndPos   = this.Selection.EndPos;
+
+        var bComposition = false;
+
+        for(var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+        {
+            var Item = this.Content[CurPos];
+
+            if(Item.Type == para_Math_Run && true !== Item.Selection_IsEmpty())
+            {
+                Pos = bComposition == true ? null : CurPos;
+                break;
+            }
+            else if(Item.Type ==  para_Math_Composition)
+            {
+                if(bComposition == true)
+                {
+                    Pos = null;
+                    break;
+                }
+                else
+                {
+                    Pos = CurPos;
+                    bComposition = true;
+                }
+            }
+        }
+    }
+    else
+    {
+        Pos = this.CurPos;
+    }
+
+    return Pos;
+};
+CMathContent.prototype.Is_CurrentContent = function()
+{
+    var Pos = this.private_FindCurrentPosInContent();
+
+    return Pos == null || this.Content[Pos].Type == para_Math_Run;
+};
+CMathContent.prototype.Set_MenuProps = function(Props)
+{
+    var Pos = this.private_FindCurrentPosInContent();
+
+    if(true == this.Is_CurrentContent())
+    {
+        this.Apply_MenuProps(Props);
+    }
+    else if(false == this.private_IsMenuPropsForContent(Props.Action) &&  true == this.Content[Pos].Can_ApplyMenuPropsToObject())
+    {
+        if(false === this.Delete_ItemToContentThroughInterface(Props, Pos)) // try to delete
+        {
+            this.Content[Pos].Apply_MenuProps(Props);
+        }
+    }
+    else
+    {
+        this.Content[Pos].Set_MenuProps(Props);
+    }
+};
+CMathContent.prototype.Apply_MenuProps = function(Props)
+{
+
+};
+CMathContent.prototype.old_Apply_MenuProps = function(Type, Data)
+{
+    var ArgSize, NewArgSize;
+    if(Type == c_oAscMathMenuTypes.DecreaseArgSize)
+    {
+        if(true === this.Parent.Can_ModifyArgSize() && true == this.Compiled_ArgSz.Can_Decrease() && true == this.ArgSize.Can_Decrease())
+        {
+            ArgSize = this.ArgSize.GetValue();
+            NewArgSize = this.ArgSize.Decrease();
+
+            History.Add( this, { Type : historyitem_Math_ArgSize, New: NewArgSize, Old: ArgSize});
+            this.Recalc_RunsCompiledPr();
+        }
+    }
+    else if(Type == c_oAscMathMenuTypes.IncreaseArgSize)
+    {
+        if(true === this.Parent.Can_ModifyArgSize() && true == this.Compiled_ArgSz.Can_Increase() && true == this.ArgSize.Can_SimpleIncrease())
+        {
+            ArgSize = this.ArgSize.GetValue();
+            NewArgSize = this.ArgSize.Increase();
+
+            History.Add( this, { Type : historyitem_Math_ArgSize, New: NewArgSize, Old: ArgSize});
+            this.Recalc_RunsCompiledPr();
+        }
+    }
+};
+CMathContent.prototype.Delete_ItemToContentThroughInterface = function(Props, Pos)
+{
+    var bDelete = false;
+    var Item = this.Content[Pos];
+
+    /*var RemoveSubScript   = Props.Action & c_oMathMenuAction.RemoveSubScript,
+        RemoveSuperScript = Props.Action & c_oMathMenuAction.RemoveSuperScript;
+
+
+    if(RemoveSubScript && Item.kind == MATH_DEGREESubSup && Item.Pr.type == DEGREE_SubSup)
+    {
+        this.private_AddModifiedDegree(Pos, DEGREE_SUPERSCRIPT);
+        bDelete = true;
+    }
+    else if(RemoveSuperScript && Item.kind == MATH_DEGREESubSup && Item.Pr.type == DEGREE_SubSup)
+    {
+        this.private_AddModifiedDegree(Pos, DEGREE_SUBSCRIPT);
+        bDelete = true;
+    }*/
+
+    var RemoveChar      = Props.Action & c_oMathMenuAction.RemoveAccentCharacter && Item.kind == MATH_ACCENT,
+        RemoveBar       = Props.Action & c_oMathMenuAction.RemoveBar && Item.kind == MATH_BAR,
+        //RemovePreSubSup = Props.Action & c_oMathMenuAction.RemoveScript && Item.kind == MATH_DEGREESubSup && Item.Pr.type == DEGREE_PreSubSup,
+       // RemoveDegree    = Props.Action & c_oMathMenuAction.RemoveScript && Item.kind == MATH_DEGREE,
+        //RemoveLimit     = Props.Action & c_oMathMenuAction.RemoveLimit && Item.kind == MATH_LIMIT,
+        //RemoveEqArray   = Props.Action & c_oMathMenuAction.RemoveEqArray && Item.kind == MATH_EQ_ARRAY,
+        RemoveDelimiter = Props.Action & c_oMathMenuAction.RemoveDelimiter && Item.kind == MATH_DELIMITER,
+        RemoveGroupChar = Props.Action & c_oMathMenuAction.RemoveGroupChar && Item.kind == MATH_GROUP_CHARACTER,
+        RemoveRadical   = Props.Action & c_oMathMenuAction.RemoveRadical && Item.kind == MATH_RADICAL,
+        RemoveBox       = Props.Action & c_oMathMenuAction.RemoveBox && Item.kind == MATH_BOX;
+
+
+    if(RemoveChar || RemoveBar || RemoveDelimiter || RemoveGroupChar || RemoveRadical || RemoveBox)
+    {
+        var Items = this.Content[Pos].Get_DeletedItemsThroughInterface();
+
+        if(Items == null) // такого не должно произойти
+            return;
+
+        this.Remove_FromContent(Pos, 1);
+
+        this.Concat_ToContent(Pos, Items);
+
+        this.Correct_Content();
+
+        bDelete = true;
+    }
+
+    return bDelete;
+};
+CMathContent.prototype.private_AddModifiedDegree = function(Pos, Type)
+{
+    var DegreeSubSup = this.Content[Pos];
+    var Base     = DegreeSubSup.getBase();
+    var Iterator = Type == DEGREE_SUBSCRIPT ? DegreeSubSup.getLowerIterator() : DegreeSubSup.getUpperIterator();
+
+    var Degree = new CDegree({type: Type}, false);
+
+    this.Remove_FromContent(Pos, 1);
+    this.Add_ToContent(Pos, Degree);
+
+    var oBase     = Degree.getBase(),
+        oIterator = Degree.getIterator();
+
+    oBase.Concat_ToEnd(Base.Content);
+    oIterator.Concat_ToEnd(Iterator.Content);
+};
+CMathContent.prototype.Get_MenuProps = function()
+{
+    var Pr = new CMathMenuBase();
+    var Pos = this.private_FindCurrentPosInContent();
+
+    if(Pos !== null)
+    {
+        var StartPos = this.Selection.StartPos,
+            EndPos   = this.Selection.EndPos;
+
+        if(true === this.Selection.Use && StartPos !== EndPos)
+        {
+            Pr = this.Content[Pos].Get_ObjectPropsForMenu();
+        }
+        else if(this.Content[Pos].Type == para_Math_Composition)
+        {
+            Pr = this.Content[Pos].Get_MenuProps();
+        }
+    }
+
+
+
+    return Pr;
+};
+CMathContent.prototype.private_IsMenuPropsForContent = function(Action)
+{
+    return Action & c_oMathMenuAction.IncreaseArgumentSize || Action & c_oMathMenuAction.DecreaseArgumentSize;
 };
 CMathContent.prototype.Process_AutoCorrect = function(ActionElement)
 {
@@ -5594,6 +5884,7 @@ CMathContent.prototype.ReplaceAutoCorrect = function(AutoCorrectEngine, bCursorS
             this.Content[this.CurPos].State.ContentPos = 1;
     }
 };
+
 function CMathBracketAcc()
 {
 	this.LBracket	= false;

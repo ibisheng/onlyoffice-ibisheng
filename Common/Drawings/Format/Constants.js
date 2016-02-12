@@ -868,6 +868,7 @@ var historyitem_Document_Orientation       = 5; // Меняем ориентац
 var historyitem_Document_DefaultTab        = 6; // Меняем таб по умолчанию
 var historyitem_Document_EvenAndOddHeaders = 7; // Меняем настройку различия четных/нечетных колонтитулов
 var historyitem_Document_DefaultLanguage   = 8; // Меняем язык по умолчанию для всего документа
+var historyitem_Document_MathSettings      = 9; // Меняем настройки формул
 
 // Типы изменений в классе Paragraph
 var historyitem_Paragraph_AddItem                   =  1; // Добавляем элемент в параграф
@@ -952,6 +953,7 @@ var historyitem_ParaRun_PrReviewInfo      = 38; // Изменение инфор
 var historyitem_ParaRun_ContentReviewInfo = 39; // Изменение информации о рецензировании содержимого рана
 var historyitem_ParaRun_OnStartSplit      = 40; // Специальное измненение для контролля позиции курсора и селекта
 var historyitem_ParaRun_OnEndSplit        = 41; // Специальное измненение для контролля позиции курсора и селекта
+var historyitem_ParaRun_MathAlnAt         = 42; // меняем alnAt в математических свойствах Run
 
 
 // Типы изменений в классе ParaTextPr
@@ -1593,9 +1595,9 @@ var historydescription_Document_SetColumnsFromRuler                = 0x012f;
 var historydescription_Document_SetColumnsProps                    = 0x0130;
 var historydescription_Document_AddColumnBreak                     = 0x0131;
 var historydescription_Document_SetSectionProps                    = 0x0132;
-
-
-
+var historydescription_Document_AddTabToMath                       = 0x0133;
+var historydescription_Document_SetMathProps                       = 0x0134;
+var historydescription_Document_ApplyPrToMath                      = 0x0135;
 function Get_HistoryPointStringDescription(nDescription)
 {
     var sString = "Unknown";
@@ -1909,6 +1911,9 @@ function Get_HistoryPointStringDescription(nDescription)
         case historydescription_Document_SetColumnsFromRuler                : sString = "Document_SetColumnsFromRuler               "; break;
         case historydescription_Document_SetColumnsProps                    : sString = "Document_SetColumnsProps                   "; break;
         case historydescription_Document_AddColumnBreak                     : sString = "Document_AddColumnBreak                    "; break;
+		case historydescription_Document_AddTabToMath                       : sString = "Document_AddTabToMath                      "; break;
+		case historydescription_Document_ApplyPrToMath						: sString = "Document_ApplyPrToMath						"; break;
+        case historydescription_Document_SetMathProps                       : sString = "Document_SetMathProps                      "; break;
         case historydescription_Document_SetSectionProps                    : sString = "Document_SetColumnsProps                   "; break;
     }
     return sString;

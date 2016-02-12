@@ -1229,21 +1229,6 @@ asc_docs_api.prototype.removeDropcap = function(bDropCap)
     this.WordControl.m_oLogicDocument.Remove_DropCap( bDropCap );
 };
 
-function CMathProp(obj)
-{
-    this.Type = c_oAscMathInterfaceType.Common;
-    this.Pr   = null;
-
-    if (obj)
-    {
-        this.Type = (undefined !== obj.Type ? obj.Type : this.Type);
-        this.Pr   = (undefined !== obj.Pr   ? obj.Pr   : this.Pr);
-    }
-}
-
-CMathProp.prototype.get_Type = function() {return this.Type;};
-
-
 // Paragraph properties
 function CParagraphPropEx (obj)
 {
@@ -3212,7 +3197,7 @@ asc_docs_api.prototype.sync_PrPropCallback = function(prProp){
 
 asc_docs_api.prototype.sync_MathPropCallback = function(MathProp)
 {
-    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(c_oAscTypeSelectElement.Math, new CMathProp(MathProp));
+    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(c_oAscTypeSelectElement.Math, MathProp);
 };
 
 asc_docs_api.prototype.sync_EndAddShape = function()
@@ -3251,6 +3236,15 @@ asc_docs_api.prototype.SetDrawingFreeze = function(bIsFreeze)
         this.WordControl.OnScroll();
 };
 
+//----------------------------------------------------------------------------------------------------------------------
+// Работаем с формулами
+//----------------------------------------------------------------------------------------------------------------------
+asc_docs_api.prototype.asc_SetMathProps = function(MathProps)
+{
+    this.WordControl.m_oLogicDocument.Set_MathProps(MathProps);
+};
+
+asc_docs_api.prototype["asc_SetMathProps"] = asc_docs_api.prototype.asc_SetMathProps;
 //----------------------------------------------------------------------------------------------------------------------
 // Работаем с настройками секции
 //----------------------------------------------------------------------------------------------------------------------

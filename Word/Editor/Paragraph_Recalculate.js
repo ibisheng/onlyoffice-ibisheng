@@ -2457,10 +2457,10 @@ function CParagraphRecalculateStateWrap(Para)
     this.bFirstLine          = false;
 
     this.bNoOneBreakOperator = true;  // прежде чем обновлять позицию в контент Run, учтем были ли до этого break-операторы (проверки на Word == false не достаточно, т.к. формула мб инлайновая и тогда не нужно обновлять позицию)
-    this.BreakBox            = false;
+    this.bForcedBreak        = false;
     this.bInsideOper         = false; // учитываем есть ли разбивка внутри мат объекта, чтобы случайно не вставить в конец пред оператора (при Brk_Before == false)
     this.bOnlyForcedBreak    = false; // учитывается, если возможна разбивка только по операторам выше уровням => в этом случае можно сделать принудительный разрыв во внутреннем контенте
-    this.bBoxOperator        = false;
+    this.bBreakBox           = false;
 
     //-----------------------------//
     this.bFastRecalculate    = false;
@@ -2506,10 +2506,10 @@ CParagraphRecalculateStateWrap.prototype =
         this.bContainCompareOper = true;
         this.bInsideOper         = false;
         this.bOnlyForcedBreak    = false;
+        this.bBreakBox           = false;
         this.bNoOneBreakOperator = true;
         this.bFastRecalculate    = false;
-        this.bBoxOperator        = false;
-        this.BreakBox            = false;
+        this.bForcedBreak        = false;
         this.bBreakPosInLWord    = true;
 
         this.MathNotInline      = null;
@@ -2546,10 +2546,10 @@ CParagraphRecalculateStateWrap.prototype =
         this.bContainCompareOper = true;
         this.bInsideOper         = false;
         this.bOnlyForcedBreak    = false;
+        this.bBreakBox           = false;
         this.bNoOneBreakOperator = true;
-        this.BreakBox            = false;
+        this.bForcedBreak        = false;
         this.bFastRecalculate    = false;
-        this.bBoxOperator        = false;
         this.bBreakPosInLWord    = true;
     },
 

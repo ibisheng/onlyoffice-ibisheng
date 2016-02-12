@@ -136,6 +136,17 @@ CSignRadical.prototype.draw = function(x, y, pGraphics, PDSE)
 
         PDSE.Graphics.p_width(penW3*1000);
 
+        if(PDSE.Graphics.m_oCoordTransform !== undefined)
+        {
+            var CoordTransform = PDSE.Graphics.m_oCoordTransform;
+            var diff = CoordTransform.TransformPointX(xx5, yy5) - CoordTransform.TransformPointX(xx4, yy4);
+
+            // чтобы реже перескакивали точки при незначительном изменении ширины формулы (из-за округления на отрисовке)
+            // на небольших размерах приравниваем две нижние точки друг другу
+            if( diff < 0.3 )
+                xx5 = xx4;
+        }
+
         PDSE.Graphics._m(xx2,  yy2);
         PDSE.Graphics._l(xx3,  yy3);
         PDSE.Graphics._l(xx4,  yy4);
@@ -296,7 +307,19 @@ CMathRadicalPr.prototype.Set_FromObject = function(Obj)
         this.type = DEGREE_RADICAL;
     }
 };
-
+CMathRadicalPr.prototype.ChangeType = function()
+{
+    if(this.type == DEGREE_RADICAL)
+    {
+        this.degHide = true;
+        this.type = SQUARE_RADICAL;
+    }
+    else
+    {
+        this.degHide = false;
+        this.type = DEGREE_RADICAL;
+    }
+};
 CMathRadicalPr.prototype.Copy = function()
 {
     var NewPr = new CMathRadicalPr();
@@ -650,10 +673,62 @@ CRadical.prototype.getDegree = function()
 {
     return this.Content[0];
 };
-CRadical.prototype.Document_UpdateInterfaceState = function(MathProps)
+CRadical.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 {
-    MathProps.Type = c_oAscMathInterfaceType.Radical;
-    MathProps.Pr   = null;
+    this.Apply_TextPrToCtrPr(TextPr, IncFontSize, ApplyToAll);
+
+    this.Iterator.Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
+    this.Base.Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
+};
+CRadical.prototype.Apply_MenuProps = function(Props)
+{
+    if(Props.Type == c_oAscMathInterfaceType.Radical && Props.HideDegree !== undefined)
+    {
+        if(true == this.Iterator.IsPlaceholder() && Props.HideDegree !== this.Pr.degHide)
+        {
+            History.Add(this, new CChangesMathRadicalHideDegree( Props.HideDegree, this.Pr.degHide ));
+            this.raw_SetHideDegree(Props.HideDegree);
+        }
+    }
+};
+CRadical.prototype.old_Apply_MenuProps = function(Type)
+{
+    if(Type == c_oAscMathMenuTypes.RadicalHideDegree)
+    {
+        History.Add(this, new CChangesMathRadicalHideDegree( !this.Pr.degHide, this.Pr.degHide ));
+        this.raw_SetHideDegree(!this.Pr.degHide);
+    }
+};
+CRadical.prototype.Get_InterfaceProps = function()
+{
+    return new CMathMenuRadical(this);
+};
+CRadical.prototype.raw_SetHideDegree = function(Value)
+{
+    if(this.Pr.degHide !== Value)
+    {
+        this.Pr.ChangeType();
+        this.RecalcInfo.bProps = true;
+        this.ApplyProperties();
+
+        if(this.Pr.type === SQUARE_RADICAL && this.CurPos == 0) // находимся в степени
+        {
+            this.CurPos = 1;
+            this.Base.Cursor_MoveToStartPos();
+        }
+    }
+};
+CRadical.prototype.Can_Delete = function()
+{
+    return true;
+};
+CRadical.prototype.Is_SimpleDelete = function()
+{
+    return true;
+};
+CRadical.prototype.Can_ModifyArgSize = function()
+{
+    return this.CurPos == 0 && false === this.Is_SelectInside();
 };
 CRadical.prototype.Is_ContentUse = function(MathContent)
 {
@@ -665,3 +740,36 @@ CRadical.prototype.Is_ContentUse = function(MathContent)
 
     return false;
 };
+
+/**
+ *
+ * @param CMathMenuRadical
+ * @constructor
+ * @extends {CMathMenuBase}
+ */
+function CMathMenuRadical(Radical)
+{
+    CMathMenuRadical.superclass.constructor.call(this, Radical);
+
+    if (undefined !== Radical)
+    {
+        var HideDegree = undefined;
+        if (Radical.Iterator.IsPlaceholder())
+            HideDegree = Radical.Pr.degHide == true;
+
+        this.Type       = c_oAscMathInterfaceType.Radical;
+        this.HideDegree = HideDegree;
+    }
+    else
+    {
+        this.Type       = c_oAscMathInterfaceType.Radical;
+        this.HideDegree = undefined;
+    }
+}
+Asc.extendClass(CMathMenuRadical, CMathMenuBase);
+CMathMenuRadical.prototype.get_HideDegree = function(){return this.HideDegree;};
+CMathMenuRadical.prototype.put_HideDegree = function(Hide){this.HideDegree = Hide;};
+
+window["CMathMenuRadical"] = CMathMenuRadical;
+CMathMenuRadical.prototype["get_HideDegree"] = CMathMenuRadical.prototype.get_HideDegree;
+CMathMenuRadical.prototype["put_HideDegree"] = CMathMenuRadical.prototype.put_HideDegree;

@@ -425,6 +425,17 @@ ParaRun.prototype.Add = function(Item, bMath)
 
         NewRun.Make_ThisElementCurrent();
     }
+    else if(this.Type == para_Math_Run && this.State.ContentPos == 0 && true === this.IsStartForcedBreakOperator()) // если в начле текущего Run идет принудительный перенос => создаем новый Run
+    {
+        var NewRun = new ParaRun(this.Paragraph, bMath);
+        NewRun.Set_Pr(this.Pr.Copy());
+        NewRun.Add_ToContent(0, Item, true);
+
+        // Ищем данный элемент в родительском классе
+        var RunPos = this.private_GetPosInParent(this.Parent);
+
+        this.Parent.Internal_Content_Add(RunPos, NewRun, true);
+    }
     else
         this.Add_ToContent(this.State.ContentPos, Item, true);
 };
@@ -2192,38 +2203,38 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var RangeStartPos = this.protected_AddRange(CurLine, CurRange);
     var RangeEndPos   = 0;
 
-    var Para = PRS.Paragraph;
+    var Para                = PRS.Paragraph;
 
-    var MoveToLBP       = PRS.MoveToLBP;
-    var NewRange        = PRS.NewRange;
-    var ForceNewPage    = PRS.ForceNewPage;
-    var NewPage         = PRS.NewPage;
-    var End             = PRS.End;
+    var MoveToLBP           = PRS.MoveToLBP;
+    var NewRange            = PRS.NewRange;
+    var ForceNewPage        = PRS.ForceNewPage;
+    var NewPage             = PRS.NewPage;
+    var End                 = PRS.End;
 
-    var Word            = PRS.Word;
-    var StartWord       = PRS.StartWord;
-    var FirstItemOnLine = PRS.FirstItemOnLine;
-    var EmptyLine       = PRS.EmptyLine;
+    var Word                = PRS.Word;
+    var StartWord           = PRS.StartWord;
+    var FirstItemOnLine     = PRS.FirstItemOnLine;
+    var EmptyLine           = PRS.EmptyLine;
 
-    var RangesCount     = PRS.RangesCount;
+    var RangesCount         = PRS.RangesCount;
 
-    var SpaceLen        = PRS.SpaceLen;
-    var WordLen         = PRS.WordLen;
+    var SpaceLen            = PRS.SpaceLen;
+    var WordLen             = PRS.WordLen;
 
-    var X               = PRS.X;
-    var XEnd            = PRS.XEnd;
+    var X                   = PRS.X;
+    var XEnd                = PRS.XEnd;
 
-    var ParaLine        = PRS.Line;
-    var ParaRange       = PRS.Range;
-    var bMathWordLarge  = PRS.bMathWordLarge;
-    var OperGapRight    = PRS.OperGapRight;
-    var OperGapLeft     = PRS.OperGapLeft;
+    var ParaLine            = PRS.Line;
+    var ParaRange           = PRS.Range;
+    var bMathWordLarge      = PRS.bMathWordLarge;
+    var OperGapRight        = PRS.OperGapRight;
+    var OperGapLeft         = PRS.OperGapLeft;
 
     var bInsideOper         = PRS.bInsideOper;
     var bContainCompareOper = PRS.bContainCompareOper;
     var bEndRunToContent    = PRS.bEndRunToContent;
     var bNoOneBreakOperator = PRS.bNoOneBreakOperator;
-    var BreakBox            = PRS.BreakBox;
+    var bForcedBreak        = PRS.bForcedBreak;
 
     var Pos = RangeStartPos;
 
@@ -2384,7 +2395,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 NewRange = true;
                                 RangeEndPos = Pos;
                             }
-                            else if(BreakBox == true)
+                            else if(bForcedBreak == true)
                             {
                                 MoveToLBP = true;
                                 NewRange = true;
@@ -2463,29 +2474,39 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     var bOperInEndContent = bOperBefore === false && bEndRunToContent === true && Pos == ContentLen - 1 && Word == true, // необходимо для того, чтобы у контентов мат объектов (к-ые могут разбиваться на строки) не было отметки Set_LineBreakPos, иначе скобка (или GapLeft), перед которой стоит break_Operator, перенесется на следующую строку (без текста !)
                         bLowPriority      = bCompareOper == false && bContainCompareOper == false;
 
-                    if(Pos == 0 && true === this.MathPrp.IsBreak()) // принудительный перенос
+                    if(Pos == 0 && true === this.IsForcedBreak()) // принудительный перенос срабатывает всегда
                     {
-                        if(FirstItemOnLine === true)
+                        if(FirstItemOnLine === true && Word == false && bNoOneBreakOperator == true) // первый оператор в строке
                         {
                             WordLen += BrkLen;
+                        }
+                        else if(bOperBefore)
+                        {
+                            X += SpaceLen + WordLen;
+                            WordLen = 0;
+                            SpaceLen = 0;
+                            NewRange = true;
+                            RangeEndPos = Pos;
 
                         }
                         else
                         {
-                            if(bOperBefore)
+                            if(FirstItemOnLine == false && X + SpaceLen + WordLen + BrkLen > XEnd)
                             {
-                                X += SpaceLen + WordLen;
+                                MoveToLBP = true;
                                 NewRange = true;
-                                RangeEndPos = Pos;
                             }
                             else
                             {
+                                X += SpaceLen + WordLen;
                                 Word = false;
-                                BreakBox = true;
+                                MoveToLBP = true;
+                                NewRange = true;
+                                PRS.Set_LineBreakPos(1);
                             }
                         }
                     }
-                    else if(bOperInEndContent || bLowPriority) // у этого break Operator приоритет низкий(находится во вложенном контенте) => по нему не разбиваем, обрабатываем как обычную букву
+                    else if(bOperInEndContent || bLowPriority) // у этого break Operator приоритет низкий(в контенте на данном уровне есть другие операторы с более высоким приоритетом) => по нему не разбиваем, обрабатываем как обычную букву
                     {
                         if(X + SpaceLen + WordLen + BrkLen > XEnd)
                         {
@@ -2992,7 +3013,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     PRS.bContainCompareOper = bContainCompareOper;
     PRS.bEndRunToContent    = bEndRunToContent;
     PRS.bNoOneBreakOperator = bNoOneBreakOperator;
-    PRS.BreakBox            = BreakBox;
+    PRS.bForcedBreak        = bForcedBreak;
 
 
     if(this.Type == para_Math_Run)
@@ -3009,11 +3030,20 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         else
         {
             // для пустого Run, обновляем LineBreakPos на случай, если пустой Run находится между break_operator (мат. объект) и мат объектом
-            if(this.Content.length == 0 && this.ParaMath.Is_BrkBinBefore() == false && Word == false && PRS.bBoxOperator == true)
+            if(this.Content.length == 0)
             {
-                PRS.Set_LineBreakPos(Pos);
-                PRS.X += SpaceLen;
-                PRS.SpaceLen = 0;
+                if(PRS.bForcedBreak == true)
+                {
+                    PRS.MoveToLBP = true;
+                    PRS.NewRange = true;
+                    PRS.Set_LineBreakPos(0);
+                }
+                else if(this.ParaMath.Is_BrkBinBefore() == false && Word == false && PRS.bBreakBox == true)
+                {
+                    PRS.Set_LineBreakPos(Pos);
+                    PRS.X += SpaceLen;
+                    PRS.SpaceLen = 0;
+                }
             }
 
             // запоминаем конец Run
@@ -5807,6 +5837,7 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
 
         if(!this.IsNormalText()) // math text
         {
+            // выставим дефолтные текстовые настройки  для математических Run
             var Styles = this.Paragraph.Parent.Get_Styles();
             // скопируем текстовые настройки прежде чем подменим на пустые
 
@@ -7405,6 +7436,11 @@ ParaRun.prototype.Undo = function(Data)
             this.Pr.ReviewInfo = Data.Old;
             break;
         }
+        case historyitem_ParaRun_MathAlnAt:
+        {
+            this.MathPrp.Apply_AlnAt(Data.Old);
+            break;
+        }
     }
 };
 
@@ -7825,6 +7861,12 @@ ParaRun.prototype.Redo = function(Data)
         case historyitem_ParaRun_PrReviewInfo:
         {
             this.Pr.ReviewInfo = Data.New;
+            break;
+        }
+
+        case historyitem_ParaRun_MathAlnAt:
+        {
+            this.MathPrp.Apply_AlnAt(Data.New);
             break;
         }
     }
@@ -8297,6 +8339,7 @@ ParaRun.prototype.Save_Changes = function(Data, Writer)
             }
             else
                 Writer.WriteBool( true );
+
             break;
         }
         case historyitem_ParaRun_MathPrp:
@@ -8420,6 +8463,20 @@ ParaRun.prototype.Save_Changes = function(Data, Writer)
         case historyitem_ParaRun_OnEndSplit:
         {
             Writer.WriteString2(Data.NewRun.Get_Id());
+            break;
+        }
+        case historyitem_ParaRun_MathAlnAt:
+        {
+            if ( undefined != Data.New )
+            {
+                Writer.WriteBool( false );
+                Writer.WriteLong( Data.New );
+            }
+            else
+            {
+                Writer.WriteBool( true );
+            }
+
             break;
         }
     }
@@ -9145,6 +9202,15 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             CollaborativeEditing.OnEnd_SplitRun(g_oTableId.Get_ById(RunId));
             break;
         }
+        case historyitem_ParaRun_MathAlnAt:
+        {
+            if ( false === Reader.GetBool() )
+                this.MathPrp.brk.Apply_AlnAt(Reader.GetLong());
+            else
+                this.MathPrp.brk.Apply_AlnAt(undefined);
+
+            break;
+        }
     }
 
     if (bColorPrChange && Color)
@@ -9847,7 +9913,7 @@ ParaRun.prototype.Math_PreRecalc = function(Parent, ParaMath, ArgSize, RPI, Gaps
     if(RPI.bChangeInline)
         this.RecalcInfo.Measure = true; // нужно сделать пересчет элементов, например для дроби, т.к. ArgSize у внутренних контентов будет другой => размер
 
-    if(RPI.bCorrect_FontSize)
+    if(RPI.bCorrect_ConvertFontSize) // изменение FontSize после конвертации из старого формата в новый
     {
         var ArgSize     = this.Parent.Compiled_ArgSz.value;
         var FontKoef;
@@ -9990,13 +10056,20 @@ ParaRun.prototype.IsEqArray = function()
 {
     return this.Parent.IsEqArray();
 };
-ParaRun.prototype.IsBreak = function()
+ParaRun.prototype.IsForcedBreak = function()
 {
     return this.MathPrp.IsBreak();
 };
+ParaRun.prototype.IsStartForcedBreakOperator = function()
+{
+    var BreakPr = true == this.IsForcedBreak();
+    var StartOperator = this.Content.length > 0 && this.Content[0].Type == para_Math_BreakOperator;
+
+    return BreakPr && StartOperator;
+};
 ParaRun.prototype.Get_AlignBrk = function()
 {
-    return this.MathPrp.Get_AlignBrk();
+    return true == this.IsStartForcedBreakOperator() ? this.MathPrp.Get_AlignBrk() : 0;
 };
 ParaRun.prototype.Math_Is_InclineLetter = function()
 {
@@ -10530,6 +10603,28 @@ ParaRun.prototype.Is_UseInParagraph = function()
 
     return true;
 };
+ParaRun.prototype.Displace_BreakOperator = function(_CurLine, _CurRange, isForward, CountOperators)
+{
+    if(true === this.IsStartForcedBreakOperator())
+    {
+        var AlnAt = this.MathPrp.Get_AlnAt();
+
+        var NotIncrease = AlnAt == CountOperators && isForward == true;
+
+        if(NotIncrease == false)
+        {
+            this.MathPrp.Displace_Break(isForward);
+
+            var NewAlnAt = this.MathPrp.Get_AlnAt();
+
+            if(AlnAt !== NewAlnAt)
+            {
+                History.Add(this, {Type: historyitem_ParaRun_MathAlnAt, New: NewAlnAt, Old: AlnAt});
+            }
+        }
+    }
+};
+
 ParaRun.prototype.Math_UpdateLineMetrics = function(PRS, ParaPr)
 {
     var LineRule = ParaPr.Spacing.LineRule;
@@ -10563,7 +10658,6 @@ ParaRun.prototype.Math_UpdateLineMetrics = function(PRS, ParaPr)
     }
 
 };
-
 function CParaRunStartState(Run)
 {
     this.Paragraph = Run.Paragraph;

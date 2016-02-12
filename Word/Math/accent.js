@@ -646,8 +646,31 @@ CAccent.prototype.GetLastElement = function()
 {
     return this.Content[0].GetLastElement();
 };
-CAccent.prototype.Document_UpdateInterfaceState = function(MathProps)
+CAccent.prototype.Can_Delete = function()
 {
-    MathProps.Type = c_oAscMathInterfaceType.Accent;
-    MathProps.Pr   = null;
+    return true;
 };
+CAccent.prototype.Is_SimpleDelete = function()
+{
+    return true;
+};
+CAccent.prototype.Get_InterfaceProps = function()
+{
+    return new CMathMenuAccent(this);
+};
+
+/**
+ *
+ * @param CMathMenuAccent
+ * @constructor
+ * @extends {CMathMenuBase}
+ */
+function CMathMenuAccent(Accent)
+{
+    CMathMenuAccent.superclass.constructor.call(this, Accent);
+
+    this.Type   = c_oAscMathInterfaceType.Accent;
+}
+Asc.extendClass(CMathMenuAccent, CMathMenuBase);
+window["CMathMenuAccent"] = CMathMenuAccent;
+

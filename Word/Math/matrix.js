@@ -7,7 +7,6 @@ function CMathMatrixColumnPr()
     this.count = 1;
     this.mcJc  = MCJC_CENTER;
 }
-
 CMathMatrixColumnPr.prototype.Set_FromObject = function(Obj)
 {
     if (undefined !== Obj.count && null !== Obj.count)
@@ -20,7 +19,6 @@ CMathMatrixColumnPr.prototype.Set_FromObject = function(Obj)
     else
         this.mcJc = MCJC_CENTER;
 };
-
 CMathMatrixColumnPr.prototype.Copy = function()
 {
     var NewPr = new CMathMatrixColumnPr();
@@ -30,7 +28,6 @@ CMathMatrixColumnPr.prototype.Copy = function()
 
     return NewPr;
 };
-
 CMathMatrixColumnPr.prototype.Write_ToBinary = function(Writer)
 {
     // Long : count
@@ -39,7 +36,6 @@ CMathMatrixColumnPr.prototype.Write_ToBinary = function(Writer)
     Writer.WriteLong(this.count);
     Writer.WriteLong(this.mcJc);
 };
-
 CMathMatrixColumnPr.prototype.Read_FromBinary = function(Reader)
 {
     // Long : count
@@ -143,6 +139,82 @@ CMathMatrixPr.prototype.Get_ColumnsCount = function()
     }
     return nColumnsCount;
 };
+CMathMatrixPr.prototype.Get_ColumnPrPos = function(PosColumn)
+{
+    var Count = 0;
+    for(var Pos = 0,  nMcsCount = this.mcs.length; Pos < nMcsCount - 1; Pos++)
+    {
+        if(PosColumn < Count + this.mcs[Pos].count)
+            break;
+
+        Count += this.mcs[Pos].count;
+    }
+
+    return Pos;
+};
+CMathMatrixPr.prototype.Modify_ColumnCount = function(PosColumn, DiffCount)
+{
+    var Pos = this.Get_ColumnPrPos(PosColumn);
+    this.mcs[Pos].count += DiffCount;
+};
+CMathMatrixPr.prototype.Get_ColumnMcJc = function(PosColumn)
+{
+    var Pos = this.Get_ColumnPrPos(PosColumn);
+    return this.mcs[Pos].mcJc;
+};
+CMathMatrixPr.prototype.Set_Row = function(Value)
+{
+    this.row = Value;
+};
+CMathMatrixPr.prototype.Set_BaseJc = function(Value)
+{
+    this.baseJc = Value;
+};
+CMathMatrixPr.prototype.Set_ColumnJc = function(Value, PosColumn)
+{
+    var Count = 0, nMcsCount = this.mcs.length;
+    var Pos, MColumnPr;
+
+    for(Pos = 0; Pos < nMcsCount - 1; Pos++)
+    {
+        if(PosColumn < Count + this.mcs[Pos].count)
+            break;
+
+        Count += this.mcs[Pos].count;
+    }
+
+    if(this.mcs[Pos].count == 1)
+    {
+        this.mcs[Pos].mcJc = Value;
+    }
+    else if(Count < PosColumn  && PosColumn < Count + this.mcs[Pos].count)
+    {
+        var CountRight = this.mcs[Pos].count + Count - PosColumn - 1,
+            CountLeft  = this.mcs[Pos].count - CountRight - 1;
+
+        this.mcs[Pos].count  = CountLeft;
+        var MColumnPrRight   = new CMathMatrixColumnPr();
+        MColumnPrRight.count = CountRight;
+        MColumnPrRight.mcJc  = this.mcs[Pos].mcJc;
+
+        this.mcs.splice(Pos + 1, 0, MColumnPrRight);
+
+        MColumnPr = new CMathMatrixColumnPr();
+        MColumnPr.count = 1;
+        MColumnPr.mcJc  = Value;
+        this.mcs.splice(Pos + 1, 0, MColumnPr);
+    }
+    else
+    {
+        this.mcs[Pos].count--;
+        var ColumnPos = PosColumn == Count ? Pos : Pos + 1;
+        MColumnPr = new CMathMatrixColumnPr();
+        MColumnPr.count = 1;
+        MColumnPr.mcJc  = Value;
+        this.mcs.splice(ColumnPos, 0, MColumnPr);
+    }
+
+};
 CMathMatrixPr.prototype.Write_ToBinary = function(Writer)
 {
     // Long  : row
@@ -199,6 +271,21 @@ CMathMatrixPr.prototype.Read_FromBinary = function(Reader)
     }
 };
 
+function CMathMatrixGapPr(Type)
+{
+    this.Type   = Type;
+    this.Rule   = 0;
+    this.Gap    = 0;
+    this.MinGap = 0;
+}
+CMathMatrixGapPr.prototype.Set_DefaultSpace = function(Rule, Gap, MinGap)
+{
+    this.Rule   = Rule;
+    this.Gap    = Gap;
+    this.MinGap = MinGap;
+};
+
+
 /**
  *
  * @constructor
@@ -207,6 +294,17 @@ CMathMatrixPr.prototype.Read_FromBinary = function(Reader)
 function CMatrixBase()
 {
     CMatrixBase.superclass.constructor.call(this);
+
+    this.SpaceRow       = new CMathMatrixGapPr(MATH_MATRIX_ROW);
+    this.SpaceColumn    = new CMathMatrixGapPr(MATH_MATRIX_COLUMN);
+
+    this.gaps =
+    {
+        row: [],
+        column: []
+    };
+
+    this.Set_DefaultSpace();
 }
 Asc.extendClass(CMatrixBase, CMathBase);
 CMatrixBase.prototype.recalculateSize = function(oMeasure, RPI)
@@ -214,11 +312,11 @@ CMatrixBase.prototype.recalculateSize = function(oMeasure, RPI)
     if(this.RecalcInfo.bProps)
     {
         if(this.nRow > 1)
-            this.setRuleGap(this.spaceRow, this.Pr.rSpRule, this.Pr.rSp);
+            this.Set_RuleGap(this.SpaceRow, this.Pr.rSpRule, this.Pr.rSp);
 
         if(this.nCol > 1)
         {
-            this.setRuleGap(this.spaceColumn, this.Pr.cGpRule, this.Pr.cGp, this.Pr.cSp);
+            this.Set_RuleGap(this.SpaceColumn, this.Pr.cGpRule, this.Pr.cGp, this.Pr.cSp);
         }
 
         if(this.kind == MATH_MATRIX)
@@ -257,7 +355,7 @@ CMatrixBase.prototype.recalculateSize = function(oMeasure, RPI)
 
     if(this.nCol > 1)
     {
-        var gapsCol = this.getLineGap(this.spaceColumn, FontSize);
+        var gapsCol = this.Get_ColumnGap(this.SpaceColumn, FontSize);
 
         for(var i = 0; i < this.nCol - 1; i++)
             this.gaps.column[i] = gapsCol;
@@ -267,12 +365,12 @@ CMatrixBase.prototype.recalculateSize = function(oMeasure, RPI)
 
     if(this.nRow > 1)
     {
-        var intervalRow = this.getRowSpace(this.spaceRow, FontSize);
+        var intervalRow = this.Get_RowSpace(this.SpaceRow, FontSize);
 
         var divCenter = 0;
 
         var plH = 0.2743827160493827*FontSize;
-        var minGp = this.spaceRow.minGap*FontSize*g_dKoef_pt_to_mm;
+        var minGp = this.SpaceRow.MinGap*FontSize*g_dKoef_pt_to_mm;
         minGp -= plH;
 
         for(var j = 0; j < this.nRow - 1; j++)
@@ -322,112 +420,184 @@ CMatrixBase.prototype.recalculateSize = function(oMeasure, RPI)
     this.size.width  = width;
     this.size.ascent = ascent;
 };
-CMatrixBase.prototype.baseJustification = function(type)
+CMatrixBase.prototype.Set_DefaultSpace = function()
 {
-    this.Pr.baseJc = type;
+    this.SpaceRow.Set_DefaultSpace(0, 0, 13/12); // MinGap - em
+    this.SpaceColumn.Set_DefaultSpace(0, 0, 0);  // MinGap / 20 pt
 };
-CMatrixBase.prototype.setDefaultSpace = function()
+CMatrixBase.prototype.Set_RuleGap = function(oSpace, Rule, Gap, MinGap)
 {
-    this.spaceRow =
-    {
-        rule: 0,
-        gap: 0,
-        minGap: 13/12    // em
-        // 780 /20 (pt) for font 36 pt
-        // minGap: 0
-    };
-    this.spaceColumn =
-    {
-        rule: 0,
-        gap: 0,
-        minGap: 0       // minGap / 20 pt
-    };
-
-    this.gaps =
-    {
-        row: [],
-        column: []
-    };
-};
-CMatrixBase.prototype.setRuleGap = function(oSpace, rule, gap, minGap)
-{
-    var bInt  =  rule == rule - 0 && rule == rule^0,
-        bRule =  rule >= 0 && rule <= 4;
+    var bInt  =  Rule == Rule - 0 && Rule == Rule^0,
+        bRule =  Rule >= 0 && Rule <= 4;
 
     if(bInt && bRule)
-        oSpace.rule = rule;
-    else
-        oSpace.rule = 0;
+        oSpace.Rule = Rule;
 
-    if(gap == gap - 0 && gap == gap^0)
-        oSpace.gap = gap;
-    else
-        oSpace.gap = 0;
+    if(Gap == Gap - 0 && Gap == Gap^0)
+        oSpace.Gap = Gap;
 
-    if(minGap == minGap - 0 && minGap == minGap^0)
-        oSpace.minGap = minGap;
+    if(MinGap == MinGap - 0 && MinGap == MinGap^0)
+        oSpace.MinGap = MinGap;
 };
-CMatrixBase.prototype.getLineGap = function(spaceColumn, FontSize)
+CMatrixBase.prototype.Get_ColumnGap = function(SpaceColumn, FontSize)
 {
-    var spLine;
+    var ColumnGap = this.Get_Gap(SpaceColumn, FontSize, 1);
 
-    if(spaceColumn.rule == 0)
-        spLine = 1;             //em
-    else if(spaceColumn.rule == 1)
-        spLine = 1.5;           //em
-    else if(spaceColumn.rule == 2)
-        spLine = 2;             //em
-    else if(spaceColumn.rule == 3)
-        spLine = spaceColumn.gap/20;  //pt
-    else if(spaceColumn.rule == 4)
-        spLine = spaceColumn.gap/2;   //em
-    else
-        spLine = 1;
+    var wPlh = 0.324*FontSize;
+    var MinGap = SpaceColumn.MinGap / 20 * g_dKoef_pt_to_mm - wPlh;
 
-    var lineGap;
-
-    if(spaceColumn.rule == 3)
-        lineGap = spLine*g_dKoef_pt_to_mm;                           //pt
-    else
-        lineGap = spLine*FontSize*g_dKoef_pt_to_mm;           //em
-
-    var wPlh = 0.3241834852430555*FontSize;
-
-    var min = spaceColumn.minGap / 20 * g_dKoef_pt_to_mm - wPlh;
-    lineGap = Math.max(lineGap, min);
-    //lineGap += this.params.font.metrics.Placeholder.Height; // для случая, когда gapRow - (аскент + дескент) > minGap, вычитаем из gap строки, а здесь прибавляем стандартный metrics.Height
-
-    return lineGap;
+    return ColumnGap > MinGap ? ColumnGap : MinGap;
 };
-CMatrixBase.prototype.getRowSpace = function(spaceRow, FontSize)
+CMatrixBase.prototype.Get_RowSpace = function(SpaceRow, FontSize)
 {
-    var spLine;
+    var LineGap = this.Get_Gap(SpaceRow, FontSize, 7/6);
 
-    if(spaceRow.rule == 0)
-        spLine = 7/6;                 //em
-    else if(spaceRow.rule == 1)
-        spLine = 7/6 *1.5;            //em
-    else if(spaceRow.rule == 2)
-        spLine = 7/6 *2;              //em
-    else if(spaceRow.rule == 3)
-        spLine = spaceRow.gap/20;         //pt
-    else if(spaceRow.rule == 4)
-        spLine = 7/6 * spaceRow.gap/2;    //em
+    var MinGap = SpaceRow.MinGap*FontSize*g_dKoef_pt_to_mm;
+
+    return LineGap > MinGap ? LineGap : MinGap;
+};
+CMatrixBase.prototype.Get_Gap = function(oSpace, FontSize, coeff)
+{
+    var Space, Gap;
+
+    if(oSpace.Rule == 0)
+        Space = coeff;                  //em
+    else if(oSpace.Rule == 1)
+        Space = coeff*1.5;              //em
+    else if(oSpace.Rule == 2)
+        Space = coeff*2;                //em
+    else if(oSpace.Rule == 3)
+        Space = oSpace.Gap/20;          //pt
+    else if(oSpace.Rule == 4)
+        Space = coeff * oSpace.Gap/2;   //em
     else
-        spLine = 7/6;
+        Space = coeff;
 
-    var lineGap;
 
-    if(spaceRow.rule == 3)
-        lineGap = spLine*g_dKoef_pt_to_mm;                           //pt
+    if(oSpace.Rule == 3)
+        Gap = Space*g_dKoef_pt_to_mm;          //pt
     else
-        lineGap = spLine*FontSize*g_dKoef_pt_to_mm; //em
+        Gap = Space*FontSize*g_dKoef_pt_to_mm; //em
 
 
-    var min = spaceRow.minGap*FontSize*g_dKoef_pt_to_mm;
-    lineGap = Math.max(lineGap, min);
+    return Gap;
+};
+CMatrixBase.prototype.getRowsCount = function()
+{
+    return this.Pr.row;
+};
+CMatrixBase.prototype.Add_Row = function(Pos)
+{
+    var Items = [],
+        CountColumn = this.getColsCount();
 
-    return lineGap;
+    for(var CurPos = 0; CurPos < CountColumn; CurPos++)
+    {
+        var NewContent = new CMathContent();
+        NewContent.Correct_Content(true);
+        Items.push(NewContent);
+    }
+
+    History.Add(this, new CChangesMathMatrixAddRow(Pos, Items));
+    this.raw_AddRow(Pos, Items);
+
+};
+CMatrixBase.prototype.raw_AddRow = function(Pos, Items)
+{
+    // изменить кол-во строк в матрицы и добавить элементы новой строки нужно в одной точке истории
+    // т.к. при добавлении, удалении элементов учитывается кол-во строк и столбцов для заполнения массива elements
+
+    this.Pr.Set_Row(this.Pr.row + 1);
+    this.raw_AddToContent(Pos, Items, true);
+
+    // чтобы корректно обновить NearPos пройдемся циклом еще раз по всем позициям добавленных контентов
+    for(var CurPos = Pos; CurPos < Pos + Items.length; CurPos++)
+    {
+        this.private_UpdatePosOnAdd( CurPos, true);
+    }
+};
+CMatrixBase.prototype.raw_RemoveRow = function(Pos, Count)
+{
+    this.Pr.Set_Row(this.Pr.row - 1);
+    this.raw_RemoveFromContent(Pos, Count);
+
+    // Обновим текущую позицию
+    if (this.CurPos > Pos + Count)
+        this.CurPos -= Count;
+    else if (this.CurPos > Pos )
+        this.CurPos = Pos;
+
+    this.private_CorrectCurPos();
+    this.private_UpdatePosOnRemove(Pos, Count);
+};
+CMatrixBase.prototype.Remove_Row = function(RowPos)
+{
+    if(this.Pr.row > 1)
+    {
+        var ColumnCount = this.getColsCount();
+        var NextPos     = RowPos*ColumnCount;
+        var Items = this.Content.slice(NextPos, NextPos + ColumnCount);
+
+        History.Add(this, new CChangesMathMatrixRemoveRow(NextPos, Items));
+        this.raw_RemoveRow(NextPos, Items.length);
+    }
+};
+CMatrixBase.prototype.SetBaseJc = function(Value)
+{
+    if(this.Pr.baseJc !== Value)
+    {
+        History.Add(this, new CChangesMathMatrixBaseJc(Value, this.Pr.baseJc));
+        this.raw_SetBaseJc(Value);
+    }
+};
+CMatrixBase.prototype.raw_SetBaseJc = function(Value)
+{
+    this.Pr.Set_BaseJc(Value);
+};
+CMatrixBase.prototype.Modify_Interval = function(Item, NewRule, NewGap)
+{
+    var OldRule, OldGap;
+
+    if(Item.Type == MATH_MATRIX_ROW)
+    {
+        OldRule = this.Pr.rSpRule;
+        OldGap  = this.Pr.rSp;
+    }
+    else
+    {
+        OldRule = this.Pr.cGpRule;
+        OldGap  = this.Pr.cGp;
+    }
+
+    if(NewRule !== OldRule || NewGap !== OldGap)
+    {
+        var ParamsInterval =
+        {
+            ItemType:       Item.Type,
+            NewRule:        NewRule,
+            NewGap:         NewGap,
+            OldRule:        OldRule,
+            OldGap:         OldGap
+        };
+
+        History.Add(this, new CChangesMathMatrixInterval(ParamsInterval));
+        this.raw_SetInterval(Item.Type, NewRule, NewGap);
+    }
+};
+CMatrixBase.prototype.raw_SetInterval = function(Item, Rule, Gap)
+{
+    if(Item == MATH_MATRIX_ROW)
+    {
+        this.Pr.rSpRule = Rule;
+        this.Pr.rSp     = Gap;
+        this.Set_RuleGap(this.SpaceRow, Rule, Gap);
+    }
+    else if(Item == MATH_MATRIX_COLUMN)
+    {
+        this.Pr.cGpRule = Rule;
+        this.Pr.cGp     = Gap;
+        this.Set_RuleGap(this.SpaceColumn, Rule, Gap, this.Pr.cSp);
+    }
 };
 
 /**
@@ -440,17 +610,10 @@ function CMathMatrix(props)
 {
     CMathMatrix.superclass.constructor.call(this);
 
-	this.Id = g_oIdCounter.Get_NewId();
+	this.Id             = g_oIdCounter.Get_NewId();
+    this.Pr             = new CMathMatrixPr();
 
-    this.Pr = new CMathMatrixPr();
-
-    this.spaceRow    = null;
-    this.spaceColumn = null;
-    this.gaps        = null;
-
-    this.column     = 0;
-
-    this.setDefaultSpace();
+    this.column         = 0;
 
     if(props !== null && props !== undefined)
         this.init(props);
@@ -461,7 +624,6 @@ Asc.extendClass(CMathMatrix, CMatrixBase);
 
 CMathMatrix.prototype.ClassType = historyitem_type_matrix;
 CMathMatrix.prototype.kind      = MATH_MATRIX;
-
 CMathMatrix.prototype.init = function(props)
 {
     this.setProperties(props);
@@ -533,18 +695,6 @@ CMathMatrix.prototype.getMetrics = function(RPI)
 
     return {ascents: Ascents, descents: Descents, widths: Widths}
 };
-CMathMatrix.prototype.setRowGapRule = function(rule, gap)
-{
-    this.spaceRow.rule = rule;
-    this.spaceRow.gap = gap;
-};
-CMathMatrix.prototype.setColumnGapRule = function(rule, gap, minGap)
-{
-    this.spaceColumn.rule = rule;
-    this.spaceColumn.gap = gap;
-    if(minGap !== null && minGap !== undefined)
-        this.spaceColumn.minGap = minGap;
-};
 CMathMatrix.prototype.getContentElement = function(nRowIndex, nColIndex)
 {
     return this.Content[nRowIndex * this.getColsCount() + nColIndex];
@@ -566,20 +716,599 @@ CMathMatrix.prototype.fillContent = function()
         }
     }
 };
-CMathMatrix.prototype.getRowsCount = function()
-{
-    return this.Pr.row;
-};
 CMathMatrix.prototype.getColsCount = function()
 {
     return this.column;
 };
-CMathMatrix.prototype.Document_UpdateInterfaceState = function(MathProps)
+CMathMatrix.prototype.Get_RowPos = function(Pos)
 {
-    MathProps.Type = c_oAscMathInterfaceType.Matrix;
-    MathProps.Pr   = null;
+    var ColumnCount = this.getColsCount();
+
+    return Pos/ColumnCount >> 0;
+};
+CMathMatrix.prototype.Get_ColumnPos = function(Pos)
+{
+    var ColumnCount = this.getColsCount();
+    var RowPos      = Pos/ColumnCount >> 0; // номер строки
+
+    return Pos - ColumnCount*RowPos;
+};
+CMathMatrix.prototype.Apply_MenuProps = function(Props)
+{
+    if(Props.Type == c_oAscMathInterfaceType.Matrix)
+    {
+        var ColumnCount = this.getColsCount(),
+            RowPos      = this.Get_RowPos(this.CurPos),
+            ColumnPos   = this.Get_ColumnPos(this.CurPos);
+
+        var bGapWholeNumber, bGapNumber;
+
+        if(Props.BaseJc !==  undefined)
+        {
+            var BaseJc = this.Pr.baseJc;
+
+            if(Props.BaseJc === c_oAscMathInterfaceMatrixMatrixAlign.Center)
+            {
+                BaseJc = BASEJC_CENTER;
+            }
+            else if(Props.BaseJc === c_oAscMathInterfaceMatrixMatrixAlign.Bottom)
+            {
+                BaseJc = BASEJC_BOTTOM;
+            }
+            else if(Props.BaseJc === c_oAscMathInterfaceMatrixMatrixAlign.Top)
+            {
+                BaseJc = BASEJC_TOP;
+            }
+
+            this.SetBaseJc(BaseJc);
+        }
+
+        if(Props.ColumnJc !== undefined)
+        {
+            var CurrentMcJc = this.Pr.Get_ColumnMcJc(ColumnPos);
+            var McJc = CurrentMcJc;
+
+            if(Props.ColumnJc === c_oAscMathInterfaceMatrixColumnAlign.Center)
+            {
+                McJc = MCJC_CENTER;
+            }
+            else if(Props.ColumnJc === c_oAscMathInterfaceMatrixColumnAlign.Left)
+            {
+                McJc = MCJC_LEFT;
+            }
+            else if(Props.ColumnJc === c_oAscMathInterfaceMatrixColumnAlign.Right)
+            {
+                McJc = MCJC_RIGHT;
+            }
+
+            if(CurrentMcJc !== McJc)
+            {
+                History.Add(this, new CChangesMathMatrixColumnJc(McJc, CurrentMcJc, ColumnPos));
+                this.raw_SetColumnJc(McJc, ColumnPos);
+            }
+        }
+
+        if(Props.RowRule !== undefined)
+        {
+            switch(Props.RowRule)
+            {
+                case c_oAscMathInterfaceMatrixRowRule.Single:
+                {
+                    this.Modify_Interval(this.SpaceRow, 0, 0);
+                    break;
+                }
+                case c_oAscMathInterfaceMatrixRowRule.OneAndHalf:
+                {
+                    this.Modify_Interval(this.SpaceRow, 1, 0);
+                    break;
+                }
+                case c_oAscMathInterfaceMatrixRowRule.Double:
+                {
+                    this.Modify_Interval(this.SpaceRow, 2, 0);
+                    break;
+                }
+                case c_oAscMathInterfaceMatrixRowRule.Exactly:
+                {
+                    bGapWholeNumber = Props.Gap !== undefined && Props.Gap + 0 == Props.Gap && Props.Gap >> 0 == Props.Gap;
+
+                    if(bGapWholeNumber == true && Props.Gap >= 0 && Props.Gap <= 31680)
+                    {
+                        this.Modify_Interval(this.SpaceRow, 3, Props.Gap*20);
+                    }
+
+                    break;
+                }
+                case c_oAscMathInterfaceMatrixRowRule.Multiple:
+                {
+                    bGapNumber = Props.Gap !== undefined && Props.Gap + 0 == Props.Gap;
+
+                    if(bGapNumber == true && Props.Gap >= 0 && Props.Gap <= 111)
+                    {
+                        var Gap = (Props.Gap*2 + 0.5) >> 0;
+
+                        this.Modify_Interval(this.SpaceRow, 4, Gap);
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        if(Props.ColumnRule !== undefined)
+        {
+            switch(Props.ColumnRule)
+            {
+                case c_oAscMathInterfaceMatrixColumnRule.Single:
+                {
+                    this.Modify_Interval(this.SpaceColumn, 0, 0);
+                    break;
+                }
+                case c_oAscMathInterfaceMatrixColumnRule.OneAndHalf:
+                {
+                    this.Modify_Interval(this.SpaceColumn, 1, 0);
+                    break;
+                }
+                case c_oAscMathInterfaceMatrixColumnRule.Double:
+                {
+                    this.Modify_Interval(this.SpaceColumn, 2, 0);
+                    break;
+                }
+                case c_oAscMathInterfaceMatrixColumnRule.Exactly:
+                {
+                    bGapWholeNumber = Props.Gap !== undefined && Props.Gap + 0 == Props.Gap && Props.Gap >> 0 == Props.Gap;
+
+                    if(bGapWholeNumber == true && Props.Gap >= 0 && Props.Gap <= 31680)
+                    {
+                        this.Modify_Interval(this.SpaceColumn, 3, Props.Gap*20);
+                    }
+
+                    break;
+                }
+                case c_oAscMathInterfaceMatrixColumnRule.Multiple:
+                {
+                    break;
+                }
+            }
+
+        }
+
+
+        if(Props.bHidePlh !== undefined)
+        {
+            if(Props.bHidePlh !== this.Pr.plcHide)
+            {
+                History.Add(this, new CChangesMathMatrixPlh(Props.bHidePlh, this.Pr.plcHide));
+                this.raw_HidePlh(Props.bHidePlh);
+            }
+        }
+    }
+};
+CMathMatrix.prototype.old_Apply_MenuProps = function(Type, Gap)
+{
+    var NextPos, McJc;
+
+    var ColumnCount = this.getColsCount(),
+        RowPos      = this.Get_RowPos(this.CurPos),
+        ColumnPos   = this.Get_ColumnPos(this.CurPos);
+
+    switch(Type)
+    {
+        case c_oAscMathMenuTypes.MatrixAddRowUnder:
+        {
+            NextPos     = (RowPos + 1)*ColumnCount;     // позиция для вставки массива контентов
+            this.Add_Row(NextPos);
+
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixAddRowOver:
+        {
+            NextPos     = RowPos*ColumnCount;
+            this.Add_Row(NextPos);
+
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixRemoveRow:
+        {
+            if(this.getRowsCount() > 1)
+            this.Remove_Row(RowPos);
+
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixAddColumnToLeft:
+        {
+            this.Add_Column(ColumnPos);
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixAddColumnToRight:
+        {
+            this.Add_Column(ColumnPos + 1);
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixRemoveColumn:
+        {
+            if(ColumnCount > 1)
+                this.Remove_Column(ColumnPos);
+
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixBaseJcCenter:
+        {
+            this.SetBaseJc(BASEJC_CENTER);
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixBaseJcTop:
+        {
+            this.SetBaseJc(BASEJC_TOP);
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixBaseJcBottom:
+        {
+            this.SetBaseJc(BASEJC_BOTTOM);
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixColumnJcCenter:
+        {
+            McJc = this.Pr.Get_ColumnMcJc(ColumnPos);
+            if(MCJC_CENTER !== McJc)
+            {
+                History.Add(this, new CChangesMathMatrixColumnJc(MCJC_CENTER, McJc, ColumnPos));
+                this.raw_SetColumnJc(MCJC_CENTER, ColumnPos);
+            }
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixColumnJcLeft:
+        {
+            McJc = this.Pr.Get_ColumnMcJc(ColumnPos);
+            if(MCJC_LEFT !== McJc)
+            {
+                History.Add(this, new CChangesMathMatrixColumnJc(MCJC_LEFT, McJc, ColumnPos));
+                this.raw_SetColumnJc(MCJC_LEFT, ColumnPos);
+            }
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixColumnJcRight:
+        {
+            McJc = this.Pr.Get_ColumnMcJc(ColumnPos);
+            if(MCJC_RIGHT !== McJc)
+            {
+                History.Add(this, new CChangesMathMatrixColumnJc(MCJC_RIGHT, McJc, ColumnPos));
+                this.raw_SetColumnJc(MCJC_RIGHT, ColumnPos);
+            }
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixRowSingleGap:
+        {
+            this.Modify_Interval(this.SpaceRow, 0, 0);
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixRowOneAndHalfGap:
+        {
+            this.Modify_Interval(this.SpaceRow, 1, 0);
+
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixRowDoubleGap:
+        {
+            this.Modify_Interval(this.SpaceRow, 2, 0);
+
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixRowExactlyGap:
+        {
+            if(Gap >= 0 && Gap <= 31680)
+            {
+                this.Modify_Interval(this.SpaceRow, 3, Gap);
+            }
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixRowMultipleGap:
+        {
+            if(Gap >= 0 && Gap <= 111)
+            {
+                this.Modify_Interval(this.SpaceRow, 4, Gap);
+            }
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixColumnSingleGap:
+        {
+            this.Modify_Interval(this.SpaceColumn, 0, 0);
+
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixColumnOneAndHalfGap:
+        {
+            this.Modify_Interval(this.SpaceColumn, 1, 0);
+
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixColumnDoubleGap:
+        {
+            this.Modify_Interval(this.SpaceColumn, 2, 0);
+
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixColumnExactlyGap:
+        {
+            if(Gap >= 0 && Gap <= 31680)
+            {
+                this.Modify_Interval(this.SpaceColumn, 3, Gap);
+            }
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixColumnMultipleGap:
+        {
+            if(Gap >= 0 && Gap <= 263)
+            {
+                this.Modify_Interval(this.SpaceColumn, 4, Gap);
+            }
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixHidePlaceholders:
+        {
+            History.Add(this, new CChangesMathMatrixPlh(!this.Pr.plcHide, this.Pr.plcHide));
+            this.raw_HidePlh(!this.Pr.plcHide);
+            break;
+        }
+        case c_oAscMathMenuTypes.MatrixMinColumnWidth:
+        {
+            if(this.Pr.cSp !== Gap)
+            {
+                History.Add(this, new CChangesMathMatrixMinColumnWidth(Gap, this.Pr.cSp));
+                this.raw_Set_MinColumnWidth(Gap);
+            }
+            break;
+        }
+    }
+};
+CMathMatrix.prototype.Get_InterfaceProps = function()
+{
+    return new CMathMenuMatrix(this);
+};
+CMathMatrix.prototype.Add_Column = function(ColumnPos)
+{
+    var Items = [],
+        CountRow    = this.getRowsCount();
+
+    for(var CurPos = 0; CurPos < CountRow; CurPos++)
+    {
+        var NewContent = new CMathContent();
+        NewContent.Correct_Content(true);
+        Items.push(NewContent);
+    }
+
+    History.Add(this, new CChangesMathMatrixAddColumn(ColumnPos, Items));
+    this.raw_AddColumn(ColumnPos, Items);
+};
+CMathMatrix.prototype.raw_AddColumn = function(Pos, Items)
+{
+    var CountColumn = this.getColsCount();
+
+    var RowPos  = this.CurPos/CountColumn >> 0; // номер строки
+
+    for(var CurPos = 0; CurPos < Items.length; CurPos++)
+    {
+        this.Content.splice((CountColumn + 1)*CurPos + Pos, 0, Items[CurPos]);
+        Items[CurPos].ParentElement = this;
+
+        this.private_UpdatePosOnAdd( (CountColumn + 1)*CurPos + Pos, true);
+    }
+
+    this.Modify_ColumnCount(this.CurPos - CountColumn*RowPos, 1);
+
+    this.fillContent();
+};
+CMathMatrix.prototype.Remove_Column = function(ColumnPos)
+{
+    var Items = [],
+        CountRow    = this.getRowsCount(),
+        CountColumn = this.getColsCount();
+
+    for(var CurPos = 0; CurPos < CountRow; CurPos++)
+    {
+        Items.push(this.Content[CountColumn*CurPos + ColumnPos]);
+    }
+
+    History.Add(this, new CChangesMathMatrixRemoveColumn(ColumnPos, Items));
+    this.raw_RemoveColumn(ColumnPos, Items.length);
+};
+CMathMatrix.prototype.raw_RemoveColumn = function(Pos, CountItems)
+{
+    var CountColumn = this.getColsCount();
+    var RowPos  = this.CurPos/CountColumn >> 0; // номер строки
+
+    for(var CurPos = 0; CurPos < CountItems; CurPos++)
+    {
+        this.Content.splice((CountColumn-1)*CurPos + Pos, 1);
+    }
+
+    this.Modify_ColumnCount(this.CurPos - CountColumn*RowPos, -1);
+
+    this.fillContent();
+
+    // Обновим текущую позицию
+    if (this.CurPos > Pos - RowPos)
+        this.CurPos -= RowPos;
+    else if (this.CurPos > Pos )
+        this.CurPos = Pos;
+
+    this.private_CorrectCurPos();
+    this.private_UpdatePosOnRemove(Pos, RowPos);
+};
+CMathMatrix.prototype.Modify_ColumnCount = function(Pos, Count)
+{
+    this.Pr.Modify_ColumnCount(Pos, Count);
+    this.column = this.Pr.Get_ColumnsCount();
+};
+CMathMatrix.prototype.raw_SetColumnJc = function(Value, ColumnPos)
+{
+    this.RecalcInfo.bProps = true;
+    this.Pr.Set_ColumnJc(Value, ColumnPos);
+};
+CMathMatrix.prototype.raw_HidePlh = function(Value)
+{
+    this.Pr.plcHide = Value;
+    this.hidePlaceholder(Value);
+};
+CMathMatrix.prototype.raw_Set_MinColumnWidth = function(Value)
+{
+    this.Pr.cSp = Value;
+    this.Set_RuleGap(this.SpaceColumn, this.Pr.cGpRule, this.Pr.cGp, Value);
+};
+CMathMatrix.prototype.Is_DeletedItem = function(Type)
+{
+    var bDeleteMatrix = false;
+
+    if( c_oAscMathMenuTypes.MatrixRemoveRow == Type && 1 == this.getRowsCount())
+        bDeleteMatrix = true;
+    else if(c_oAscMathMenuTypes.MatrixRemoveColumn == Type && 1 == this.getColsCount())
+        bDeleteMatrix = true;
+
+    return bDeleteMatrix;
+};
+CMathMatrix.prototype.Get_DeletedItemsThroughInterface = function()
+{
+    return [];
 };
 
+/**
+ *
+ * @param CMathMenuMatrix
+ * @constructor
+ * @extends {CMathMenuBase}
+ */
+function CMathMenuMatrix(MathMatrix)
+{
+    CMathMenuMatrix.superclass.constructor.call(this, MathMatrix);
+
+    this.Type           = c_oAscMathInterfaceType.Matrix;
+
+    if (undefined !== MathMatrix)
+    {
+        var ColumnPos = MathMatrix.Get_ColumnPos(MathMatrix.CurPos);
+
+        var RowRule, RowGap, ColumnRule, ColumnGap;
+        switch (MathMatrix.SpaceRow.Rule)
+        {
+            default:
+            case 0:
+            {
+                RowRule = c_oAscMathInterfaceMatrixRowRule.Single;
+                break;
+            }
+            case 1:
+            {
+                RowRule = c_oAscMathInterfaceMatrixRowRule.OneAndHalf;
+                break;
+            }
+            case 2:
+            {
+                RowRule = c_oAscMathInterfaceMatrixRowRule.Double;
+                break;
+            }
+            case 3:
+            {
+                RowRule = c_oAscMathInterfaceMatrixRowRule.Exactly;
+                RowGap  = MathMatrix.SpaceRow.Gap / 20;
+                break;
+            }
+            case 4:
+            {
+                RowRule = c_oAscMathInterfaceMatrixRowRule.Multiple;
+                RowGap  = MathMatrix.SpaceRow.Gap * 0.5;
+                break;
+            }
+        }
+
+        switch (MathMatrix.SpaceColumn.Rule)
+        {
+            default:
+            case 0:
+            {
+                ColumnRule = c_oAscMathInterfaceMatrixColumnRule.Single;
+                break;
+            }
+            case 1:
+            {
+                ColumnRule = c_oAscMathInterfaceMatrixColumnRule.OneAndHalf;
+                break;
+            }
+            case 2:
+            {
+                ColumnRule = c_oAscMathInterfaceMatrixColumnRule.Double;
+                break;
+            }
+            case 3:
+            {
+                ColumnRule = c_oAscMathInterfaceMatrixColumnRule.Exactly;
+                ColumnGap  = MathMatrix.SpaceColumn.Gap / 20;
+                break;
+            }
+            case 4:
+            {
+                ColumnRule = c_oAscMathInterfaceMatrixColumnRule.Multiple;
+                ColumnGap  = (((0.21163 * MathMatrix.SpaceColumn.Gap) * 100 + 0.5) >> 0 ) / 100;
+                break;
+            }
+        }
+
+        var ColumnJc = MathMatrix.Pr.Get_ColumnMcJc(ColumnPos);
+
+        this.BaseJc         = MathMatrix.Pr.baseJc === BASEJC_CENTER ? c_oAscMathInterfaceMatrixMatrixAlign.Center : (MathMatrix.Pr.baseJc === BASEJC_BOTTOM ? c_oAscMathInterfaceMatrixMatrixAlign.Bottom : c_oAscMathInterfaceMatrixMatrixAlign.Top);
+        this.ColumnJc       = ColumnJc === MCJC_CENTER ? c_oAscMathInterfaceMatrixColumnAlign.Center : (ColumnJc === MCJC_RIGHT ? c_oAscMathInterfaceMatrixColumnAlign.Right : c_oAscMathInterfaceMatrixColumnAlign.Left);
+        this.RowRule        = RowRule;
+        this.RowGap         = RowGap;
+        this.ColumnRule     = ColumnRule;
+        this.ColumnGap      = ColumnGap;
+        this.MinColumnWidth = MathMatrix.Pr.cSp / 20;
+        this.bHidePlh       = MathMatrix.Pr.plcHide;
+    }
+    else
+    {
+        this.BaseJc         = undefined;
+        this.ColumnJc       = undefined;
+        this.RowRule        = undefined;
+        this.RowGap         = undefined;
+        this.ColumnRule     = undefined;
+        this.ColumnGap      = undefined;
+        this.MinColumnWidth = undefined;
+        this.bHidePlh       = undefined;
+    }
+}
+Asc.extendClass(CMathMenuMatrix, CMathMenuBase);
+CMathMenuMatrix.prototype.get_MatrixAlign     = function(){return this.BaseJc;};
+CMathMenuMatrix.prototype.put_MatrixAlign     = function(Align){this.BaseJc = Align;};
+CMathMenuMatrix.prototype.get_ColumnAlign     = function(){return this.ColumnJc;};
+CMathMenuMatrix.prototype.put_ColumnAlign     = function(Align){this.ColumnJc = Align;};
+CMathMenuMatrix.prototype.get_RowRule         = function(){return this.RowRule;};
+CMathMenuMatrix.prototype.put_RowRule         = function(RowRule){this.RowRule = RowRule;};
+CMathMenuMatrix.prototype.get_RowGap          = function(){return this.RowGap;};
+CMathMenuMatrix.prototype.put_RowGap          = function(RowGap){this.RowGap = RowGap;};
+CMathMenuMatrix.prototype.get_ColumnRule      = function(){return this.ColumnRule;};
+CMathMenuMatrix.prototype.put_ColumnRule      = function(ColumnRule){this.ColumnRule = ColumnRule;};
+CMathMenuMatrix.prototype.get_ColumnGap       = function(){return this.ColumnGap;};
+CMathMenuMatrix.prototype.put_ColumnGap       = function(ColumnGap){this.ColumnGap = ColumnGap;};
+CMathMenuMatrix.prototype.get_MinColumnSpace  = function(){return this.MinColumnWidth;};
+CMathMenuMatrix.prototype.put_MinColumnSpace  = function(MinSpace){this.MinColumnWidth = MinSpace;};
+CMathMenuMatrix.prototype.get_HidePlaceholder = function(){return this.bHidePlh;};
+CMathMenuMatrix.prototype.put_HidePlaceholder = function(Hide){this.bHidePlh = Hide;};
+
+window["CMathMenuMatrix"] = CMathMenuMatrix;
+CMathMenuMatrix.prototype["get_MatrixAlign"]     = CMathMenuMatrix.prototype.get_MatrixAlign    ;
+CMathMenuMatrix.prototype["put_MatrixAlign"]     = CMathMenuMatrix.prototype.put_MatrixAlign    ;
+CMathMenuMatrix.prototype["get_ColumnAlign"]     = CMathMenuMatrix.prototype.get_ColumnAlign    ;
+CMathMenuMatrix.prototype["put_ColumnAlign"]     = CMathMenuMatrix.prototype.put_ColumnAlign    ;
+CMathMenuMatrix.prototype["get_RowRule"]         = CMathMenuMatrix.prototype.get_RowRule        ;
+CMathMenuMatrix.prototype["put_RowRule"]         = CMathMenuMatrix.prototype.put_RowRule        ;
+CMathMenuMatrix.prototype["get_RowGap"]          = CMathMenuMatrix.prototype.get_RowGap         ;
+CMathMenuMatrix.prototype["put_RowGap"]          = CMathMenuMatrix.prototype.put_RowGap         ;
+CMathMenuMatrix.prototype["get_ColumnRule"]      = CMathMenuMatrix.prototype.get_ColumnRule     ;
+CMathMenuMatrix.prototype["put_ColumnRule"]      = CMathMenuMatrix.prototype.put_ColumnRule     ;
+CMathMenuMatrix.prototype["get_ColumnGap"]       = CMathMenuMatrix.prototype.get_ColumnGap      ;
+CMathMenuMatrix.prototype["put_ColumnGap"]       = CMathMenuMatrix.prototype.put_ColumnGap      ;
+CMathMenuMatrix.prototype["get_MinColumnSpace"]  = CMathMenuMatrix.prototype.get_MinColumnSpace ;
+CMathMenuMatrix.prototype["put_MinColumnSpace"]  = CMathMenuMatrix.prototype.put_MinColumnSpace ;
+CMathMenuMatrix.prototype["get_HidePlaceholder"] = CMathMenuMatrix.prototype.get_HidePlaceholder;
+CMathMenuMatrix.prototype["put_HidePlaceholder"] = CMathMenuMatrix.prototype.put_HidePlaceholder;
 
 function CMathPoint()
 {
@@ -597,7 +1326,6 @@ function CMathEqArrPr()
 
     this.row     = 1;
 }
-
 CMathEqArrPr.prototype.Set_FromObject = function(Obj)
 {
     if(undefined !== Obj.maxDist && null !== Obj.maxDist)
@@ -617,7 +1345,6 @@ CMathEqArrPr.prototype.Set_FromObject = function(Obj)
 
     this.row = Obj.row;
 };
-
 CMathEqArrPr.prototype.Copy = function()
 {
     var NewPr = new CMathEqArrPr();
@@ -631,7 +1358,14 @@ CMathEqArrPr.prototype.Copy = function()
 
     return NewPr;
 };
-
+CMathEqArrPr.prototype.Set_Row = function(Value)
+{
+    this.row = Value;
+};
+CMathEqArrPr.prototype.Set_BaseJc = function(Value)
+{
+    this.baseJc = Value;
+};
 CMathEqArrPr.prototype.Write_ToBinary = function(Writer)
 {
     // Long : maxDist
@@ -648,7 +1382,6 @@ CMathEqArrPr.prototype.Write_ToBinary = function(Writer)
     Writer.WriteLong(this.baseJc);
     Writer.WriteLong(this.row);
 };
-
 CMathEqArrPr.prototype.Read_FromBinary = function(Reader)
 {
     // Long : maxDist
@@ -678,14 +1411,7 @@ function CEqArray(props)
     CEqArray.superclass.constructor.call(this);
 
 	this.Id = g_oIdCounter.Get_NewId();
-
     this.Pr = new CMathEqArrPr();
-
-    this.spaceRow    = null;
-    this.spaceColumn = null;
-    this.gaps        = null;
-
-    this.setDefaultSpace();
 
     // for ampersand in Run
     this.WidthsPoints = [];
@@ -712,27 +1438,6 @@ CEqArray.prototype.init = function(props)
     this.setProperties(props);
     this.fillContent();
 };
-CEqArray.prototype.addRow = function()
-{
-    var NewContent = new CMathContent();
-    this.protected_AddToContent(this.CurPos + 1, [NewContent], true);
-    this.CurPos++;
-
-    var NewPr = this.Pr.Copy();
-    NewPr.row = this.Content.length;
-    this.setPr(NewPr);
-
-    return NewContent;
-};
-CEqArray.prototype.setPr = function(NewPr)
-{
-    History.Add(this, new CChangesMathEqArrayPr(NewPr, this.Pr));
-    this.raw_SetPr(NewPr);
-};
-CEqArray.prototype.raw_SetPr = function(NewPr)
-{
-    this.Pr = NewPr;
-};
 CEqArray.prototype.fillContent = function()
 {
     var nRowsCount = this.Content.length;
@@ -740,6 +1445,10 @@ CEqArray.prototype.fillContent = function()
 
     for (var nIndex = 0; nIndex < nRowsCount; nIndex++)
         this.elements[nIndex][0] = this.Content[nIndex];
+};
+CEqArray.prototype.getColsCount = function()
+{
+    return 1;
 };
 CEqArray.prototype.Resize = function(oMeasure, RPI)
 {
@@ -916,13 +1625,241 @@ CEqArray.prototype.getElementMathContent = function(Index)
 {
     return this.Content[Index];
 };
-CEqArray.prototype.Document_UpdateInterfaceState = function(MathProps)
+CEqArray.prototype.Apply_MenuProps = function(Props)
 {
-    MathProps.Type = c_oAscMathInterfaceType.EqArray;
-    MathProps.Pr   = null;
+    if(Props.Type == c_oAscMathInterfaceType.EqArray)
+    {
+        if(Props.BaseJc !== undefined)
+        {
+            var BaseJc = this.Pr.baseJc;
+
+            if(Props.BaseJc === c_oAscMathInterfaceEqArrayAlign.Center)
+            {
+                BaseJc = BASEJC_CENTER;
+            }
+            else if(Props.BaseJc === c_oAscMathInterfaceEqArrayAlign.Bottom)
+            {
+                BaseJc = BASEJC_BOTTOM;
+            }
+            else if(Props.BaseJc === c_oAscMathInterfaceEqArrayAlign.Top)
+            {
+                BaseJc = BASEJC_TOP;
+            }
+
+            this.SetBaseJc(BaseJc);
+        }
+
+        if(Props.RowRule !== undefined)
+        {
+            switch(Props.RowRule)
+            {
+                case c_oAscMathInterfaceEqArrayLineRule.Single:
+                {
+                    this.Modify_Interval(this.SpaceRow, 0, 0);
+                    break;
+                }
+                case c_oAscMathInterfaceEqArrayLineRule.OneAndHalf:
+                {
+                    this.Modify_Interval(this.SpaceRow, 1, 0);
+                    break;
+                }
+                case c_oAscMathInterfaceEqArrayLineRule.Double:
+                {
+                    this.Modify_Interval(this.SpaceRow, 2, 0);
+                    break;
+                }
+                case c_oAscMathInterfaceEqArrayLineRule.Exactly:
+                {
+                    var bGapWholeNumber = Props.Gap !== undefined && Props.Gap + 0 == Props.Gap && Props.Gap >> 0 == Props.Gap;
+
+                    if(bGapWholeNumber == true && Props.Gap >= 0 && Props.Gap <= 31680)
+                    {
+                        this.Modify_Interval(this.SpaceRow, 3, Props.Gap*20);
+                    }
+
+                    break;
+                }
+                case c_oAscMathInterfaceEqArrayLineRule.Multiple:
+                {
+                    var bGapNumber = Props.Gap !== undefined && Props.Gap + 0 == Props.Gap;
+
+                    if(bGapNumber == true && Props.Gap >= 0 && Props.Gap <= 111)
+                    {
+                        var Gap = (Props.Gap*2 + 0.5) >> 0;
+
+                        this.Modify_Interval(this.SpaceRow, 4, Gap);
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
+
+};
+CEqArray.prototype.old_Apply_MenuProps = function(Type, Gap)
+{
+    switch(Type)
+    {
+        case c_oAscMathMenuTypes.EqArrayAddRowUnder:
+        {
+            this.Add_Row(this.CurPos + 1);
+            break;
+        }
+        case c_oAscMathMenuTypes.EqArrayAddRowOver:
+        {
+            this.Add_Row(this.CurPos);
+            break;
+        }
+        case c_oAscMathMenuTypes.EqArrayRemoveRow:
+        {
+            if(this.getRowsCount() > 1)
+            this.Remove_Row(this.CurPos);
+            break;
+        }
+        case c_oAscMathMenuTypes.EqArrayBaseJcCenter:
+        {
+            this.SetBaseJc(BASEJC_CENTER);
+            break;
+        }
+        case c_oAscMathMenuTypes.EqArrayBaseJcTop:
+        {
+            this.SetBaseJc(BASEJC_TOP);
+            break;
+        }
+        case c_oAscMathMenuTypes.EqArrayBaseJcBottom:
+        {
+            this.SetBaseJc(BASEJC_BOTTOM);
+            break;
+        }
+        case c_oAscMathMenuTypes.EqArrayRowSingleGap:
+        {
+            this.Modify_Interval(this.SpaceRow, 0, 0);
+            break;
+        }
+        case c_oAscMathMenuTypes.EqArrayRowOneAndHalfGap:
+        {
+            this.Modify_Interval(this.SpaceRow, 1, 0);
+            break;
+        }
+        case c_oAscMathMenuTypes.EqArrayRowDoubleGap:
+        {
+            this.Modify_Interval(this.SpaceRow, 2, 0);
+            break;
+        }
+        case c_oAscMathMenuTypes.EqArrayRowExactlyGap:
+        {
+            if(Gap >= 0 && Gap <= 31680)
+            {
+                this.Modify_Interval(this.SpaceRow, 3, Gap);
+            }
+            break;
+        }
+        case c_oAscMathMenuTypes.EqArrayRowMultipleGap:
+        {
+            if(Gap >= 0 && Gap <= 111)
+            {
+                this.Modify_Interval(this.SpaceRow, 4, Gap);
+            }
+            break;
+        }
+    }
+};
+CEqArray.prototype.Get_InterfaceProps = function()
+{
+    return new CMathMenuEqArray(this);
+};
+CEqArray.prototype.Can_Delete = function()
+{
+    return true;
+};
+CEqArray.prototype.Is_SimpleDelete = function()
+{
+    return false;
+};
+CEqArray.prototype.Is_DeletedItem = function(Type)
+{
+    return c_oAscMathMenuTypes.EqArrayRemoveRow == Type && 1 == this.getRowsCount();
+};
+CEqArray.prototype.Get_DeletedItemsThroughInterface = function()
+{
+    return [];
 };
 CEqArray.prototype.IsEqArray = function()
 {
     return true;
 };
 
+/**
+ *
+ * @param CMathMenuEqArray
+ * @constructor
+ * @extends {CMathMenuBase}
+ */
+function CMathMenuEqArray(EqArray)
+{
+    CMathMenuEqArray.superclass.constructor.call(this, EqArray);
+
+    this.Type    = c_oAscMathInterfaceType.EqArray;
+
+    if (undefined !== EqArray)
+    {
+        var RowRule, RowGap;
+        switch (EqArray.SpaceRow.Rule)
+        {
+            default:
+            case 0:
+            {
+                RowRule = c_oAscMathInterfaceEqArrayLineRule.Single;
+                break;
+            }
+            case 1:
+            {
+                RowRule = c_oAscMathInterfaceEqArrayLineRule.OneAndHalf;
+                break;
+            }
+            case 2:
+            {
+                RowRule = c_oAscMathInterfaceEqArrayLineRule.Double;
+                break;
+            }
+            case 3:
+            {
+                RowRule = c_oAscMathInterfaceEqArrayLineRule.Exactly;
+                RowGap  = EqArray.SpaceRow.Gap / 20;
+                break;
+            }
+            case 4:
+            {
+                RowRule = c_oAscMathInterfaceEqArrayLineRule.Multiple;
+                RowGap  = EqArray.SpaceRow.Gap * 0.5;
+                break;
+            }
+        }
+
+        this.BaseJc  = EqArray.Pr.baseJc === BASEJC_CENTER ? c_oAscMathInterfaceEqArrayAlign.Center : (EqArray.Pr.baseJc === BASEJC_BOTTOM ? c_oAscMathInterfaceEqArrayAlign.Bottom : c_oAscMathInterfaceEqArrayAlign.Top);
+        this.RowRule = RowRule;
+        this.RowGap  = RowGap;
+    }
+    else
+    {
+        this.BaseJc  = undefined;
+        this.RowRule = undefined;
+        this.RowGap  = undefined;
+    }
+}
+Asc.extendClass(CMathMenuEqArray, CMathMenuBase);
+CMathMenuEqArray.prototype.get_Align    = function(){return this.BaseJc;};
+CMathMenuEqArray.prototype.put_Align    = function(Align){this.BaseJc = Align;};
+CMathMenuEqArray.prototype.get_LineRule = function(){return this.RowRule;};
+CMathMenuEqArray.prototype.put_LineRule = function(Rule){this.RowRule = Rule;};
+CMathMenuEqArray.prototype.get_LineGap  = function(){return this.RowGap;};
+CMathMenuEqArray.prototype.put_LineGap  = function(Gap){this.RowGap = Gap;};
+
+window["CMathMenuEqArray"] = CMathMenuEqArray;
+CMathMenuEqArray.prototype["get_Align"]    = CMathMenuEqArray.prototype.get_Align;
+CMathMenuEqArray.prototype["put_Align"]    = CMathMenuEqArray.prototype.put_Align;
+CMathMenuEqArray.prototype["get_LineRule"] = CMathMenuEqArray.prototype.get_LineRule;
+CMathMenuEqArray.prototype["put_LineRule"] = CMathMenuEqArray.prototype.put_LineRule;
+CMathMenuEqArray.prototype["get_LineGap"]  = CMathMenuEqArray.prototype.get_LineGap ;
+CMathMenuEqArray.prototype["put_LineGap"]  = CMathMenuEqArray.prototype.put_LineGap ;

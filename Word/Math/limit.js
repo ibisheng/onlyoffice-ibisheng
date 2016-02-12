@@ -85,7 +85,7 @@ CLimitPrimary.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, Gap
     this.FName.PreRecalc(this, ParaMath, ArgSize, RPI);
 
     var ArgSzIter = ArgSize.Copy();
-    ArgSzIter.decrease();
+    ArgSzIter.Decrease();
 
     var NewRPI = RPI.Copy();
     NewRPI.bDecreasedComp = true;
@@ -116,7 +116,7 @@ CLimitPrimary.prototype.recalculateSize = function(oMeasure)
 
     if(this.Type == LIMIT_LOW)
         ascent = SizeFName.ascent;
-    else if(this.Type == LIMIT_UP)
+    else
         ascent = SizeIter.height + this.dH + SizeFName.ascent;
 
 
@@ -125,6 +125,42 @@ CLimitPrimary.prototype.recalculateSize = function(oMeasure)
     this.size.height = height;
     this.size.width  = width;
     this.size.ascent = ascent;
+};
+CLimitPrimary.prototype.setPosition = function(pos, PosInfo)
+{
+    this.pos.x = pos.x;
+    this.pos.y = pos.y;
+
+    var maxW = this.FName.size.width > this.Iterator.size.width ? this.FName.size.width : this.Iterator.size.width;
+
+    var alignFNameX = (maxW - this.FName.size.width)/2;
+    var alignIterX  = (maxW - this.Iterator.size.width)/2;
+
+    var FNamePos = new CMathPosition();
+    var IterPos = new CMathPosition();
+
+    if(this.Type == LIMIT_LOW)
+    {
+        FNamePos.x = this.pos.x + this.GapLeft + alignFNameX;
+        FNamePos.y = this.pos.y + this.FName.size.ascent;
+
+        IterPos.x = this.pos.x + this.GapLeft + alignIterX;
+        IterPos.y = this.pos.y + this.dH + this.FName.size.height;
+    }
+    else
+    {
+        IterPos.x = this.pos.x + this.GapLeft + alignIterX;
+        IterPos.y = this.pos.y + this.Iterator.size.ascent;
+
+        FNamePos.x = this.pos.x + this.GapLeft + alignFNameX;
+        FNamePos.y = this.pos.y + this.FName.size.ascent + this.dH + this.Iterator.size.height;
+    }
+
+    // такой порядок нужен для выравнивания Box по операторам
+    this.FName.setPosition(FNamePos, PosInfo);
+    this.Iterator.setPosition(IterPos, PosInfo);
+
+    pos.x += this.size.width;
 };
 
 /**
@@ -205,7 +241,7 @@ CLimit.prototype.ApplyProperties = function(RPI)
         this.RecalcInfo.bProps = false;
     }*/
 
-    if(this.RecalcInfo.bProps == true || RPI.bChangeInline == true)
+    if(this.RecalcInfo.bProps == true || (RPI != undefined && RPI.bChangeInline == true))
     {
         this.setDimension(1, 1);
         this.elements[0][0] = new CLimitPrimary(true, this.Pr.type, this.getFName(), this.getIterator());
@@ -213,11 +249,81 @@ CLimit.prototype.ApplyProperties = function(RPI)
     }
 
 };
-CLimit.prototype.Document_UpdateInterfaceState = function(MathProps)
+CLimit.prototype.Apply_MenuProps = function(Props)
 {
-    MathProps.Type = c_oAscMathInterfaceType.Limit;
-    MathProps.Pr   = null;
+    if(Props.Type == c_oAscMathInterfaceType.Limit && Props.Pos !== undefined)
+    {
+        var Type = Props.Pos == c_oAscMathInterfaceLimitPos.Bottom ? LIMIT_LOW : LIMIT_UP;
+
+        if(this.Pr.type !== Type)
+    {
+        History.Add(this, new CChangesMathLimitType(Type, this.Pr.type));
+        this.raw_SetType(Type);
+    }
+    }
+    /*if(Type == c_oAscMathMenuTypes.LimitOver && this.Pr.type == LIMIT_LOW)
+    {
+        History.Add(this, new CChangesMathLimitType(LIMIT_UP, this.Pr.type));
+        this.raw_SetType(LIMIT_UP);
+    }
+    else if(Type == c_oAscMathMenuTypes.LimitUnder && this.Pr.type == LIMIT_UP)
+    {
+        History.Add(this, new CChangesMathLimitType(LIMIT_LOW, this.Pr.type));
+        this.raw_SetType(LIMIT_LOW);
+    }*/
 };
+CLimit.prototype.Get_InterfaceProps = function()
+{
+    return new CMathMenuLimit(this);
+};
+CLimit.prototype.raw_SetType = function(Value)
+{
+    if(this.Pr.type !== Value)
+    {
+        this.Pr.type = Value;
+        this.RecalcInfo.bProps = true;
+        this.ApplyProperties();
+    }
+};
+CLimit.prototype.Can_Delete = function()
+{
+    return true;
+};
+CLimit.prototype.Is_SimpleDelete = function()
+{
+    return true;
+};
+CLimit.prototype.Can_ModifyArgSize = function()
+{
+    return this.CurPos == 1 && false === this.Is_SelectInside();
+};
+
+/**
+ *
+ * @param CMathMenuLimit
+ * @constructor
+ * @extends {CMathMenuBase}
+ */
+function CMathMenuLimit(Limit)
+{
+    CMathMenuLimit.superclass.constructor.call(this);
+
+    this.Type = c_oAscMathInterfaceType.Limit;
+
+    if (undefined !== Limit.Pr)
+        this.Pos  = (LIMIT_LOW === Limit.Pr.type) ? c_oAscMathInterfaceLimitPos.Bottom : c_oAscMathInterfaceLimitPos.Top;
+    else
+        this.Pos = undefined;
+
+}
+Asc.extendClass(CMathMenuLimit, CMathMenuBase);
+
+CMathMenuLimit.prototype.get_Pos = function(){return this.Pos;};
+CMathMenuLimit.prototype.put_Pos = function(Pos){this.Pos = Pos;};
+
+window["CMathMenuLimit"] = CMathMenuLimit;
+CMathMenuLimit.prototype["get_Pos"] = CMathMenuLimit.prototype.get_Pos;
+CMathMenuLimit.prototype["put_Pos"] = CMathMenuLimit.prototype.put_Pos;
 
 /**
  *
@@ -284,9 +390,4 @@ CMathFunc.prototype.fillContent = function()
     this.setDimension(1, 2);
     this.elements[0][0] = this.getFName();
     this.elements[0][1] = this.getArgument();
-};
-CMathFunc.prototype.Document_UpdateInterfaceState = function(MathProps)
-{
-    MathProps.Type = c_oAscMathInterfaceType.Function;
-    MathProps.Pr   = null;
 };

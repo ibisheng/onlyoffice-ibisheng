@@ -2849,9 +2849,9 @@ COperator.prototype.getProps = function(props, defaultProps)
 
     this.defaultType = defaultProps.type;
 
-    var bDelimiter = this.type == OPER_DELIMITER || this.type == OPER_SEPARATOR,
-        bNotType   = props.type === undefined ||  props.type === null,
-        bUnicodeChr    = props.chr !== null && props.chr+0 === props.chr;
+    var bDelimiter  = this.type == OPER_DELIMITER || this.type == OPER_SEPARATOR,
+        bNotType    = props.type === undefined ||  props.type === null,
+        bUnicodeChr = props.chr !== null && props.chr+0 === props.chr;
 
 
     if(bDelimiter && props.chr == -1) // empty operator
@@ -3073,16 +3073,24 @@ COperator.prototype.Get_TxtPrControlLetter = function()
 {
     return this.Parent.Get_TxtPrControlLetter();
 };
-COperator.prototype.getChr = function()
+COperator.prototype.Is_Empty = function()
 {
-    var chr = null; //если operator не определен, то this.code = null
+    return this.typeOper == OPERATOR_EMPTY;
+};
+COperator.prototype.Get_CodeChr = function()
+{
+    /*var chr = null; //если operator не определен, то this.code = null
 
     if(this.code !== null)
         chr = this.typeOper === this.defaultType ? null : String.fromCharCode(this.code);
 	if (this.operator == OPERATOR_EMPTY)
-		chr = "";
+		chr = "";*/
 
-    return chr;
+    return this.code;
+};
+COperator.prototype.Get_Type = function()
+{
+    return this.typeOper;
 };
 COperator.prototype.IsArrow = function()
 {
@@ -3108,6 +3116,11 @@ function CMathDelimiterPr()
 
     this.column     = 0;
 }
+
+CMathDelimiterPr.prototype.Set_Column = function(Value)
+{
+    this.column = Value;
+};
 
 CMathDelimiterPr.prototype.Set_FromObject = function(Obj)
 {
@@ -3311,7 +3324,7 @@ CDelimiter.prototype.fillContent = function()
 {
     this.NeedBreakContent(0);
 
-    var nColumnsCount = this.getColumnsCount();
+    var nColumnsCount = this.Content.length;
 
     this.setDimension(1, nColumnsCount);
 
@@ -3364,7 +3377,7 @@ CDelimiter.prototype.ApplyProperties = function(RPI)
             chr:  0x7C
         };
 
-        if(this.nCol == 1 )
+        if(this.Pr.column == 1 )
             sepPrp.type = OPERATOR_EMPTY;
 
         this.sepOper.mergeProperties(sepPrp, sepDefaultPrp);
@@ -3589,7 +3602,7 @@ CDelimiter.prototype.recalculateSize = function(oMeasure)
     var widthG = 0,
         ascentG = 0, descentG = 0;
 
-    for(var j = 0; j < this.nCol; j++)
+    for(var j = 0; j < this.Pr.column; j++)
     {
         var content = this.elements[0][j].size;
         widthG += content.width;
@@ -3600,7 +3613,7 @@ CDelimiter.prototype.recalculateSize = function(oMeasure)
     this.RecalculateGeneralSize(oMeasure, ascentG + descentG, ascentG);
 
     // Общая ширина
-    var width = widthG + this.begOper.size.width + this.endOper.size.width + (this.nCol - 1)*this.sepOper.size.width;
+    var width = widthG + this.begOper.size.width + this.endOper.size.width + (this.Pr.column - 1)*this.sepOper.size.width;
     width += this.GapLeft + this.GapRight;
 
 
@@ -3683,7 +3696,7 @@ CDelimiter.prototype.setPosition = function(pos, PosInfo)
 
         this.sepOper.setPosition(PosSep);
 
-        for(var j = 1 ; j < this.nCol; j++)
+        for(var j = 1 ; j < this.Pr.column; j++)
         {
             CurrPos.x += this.sepOper.size.width;
 
@@ -3725,7 +3738,7 @@ CDelimiter.prototype.Draw_Elements = function(PDSE)
 
         var X = PosLine.x;
 
-        for(var j = 1; j < this.nCol; j++)
+        for(var j = 1; j < this.Pr.column; j++)
         {
             this.sepOper.draw(X, PosLine.y, PDSE.Graphics, PDSE);
 
@@ -3772,10 +3785,240 @@ CDelimiter.prototype.getElementMathContent = function(Index)
 {
     return this.Content[Index];
 };
-CDelimiter.prototype.Document_UpdateInterfaceState = function(MathProps)
+CDelimiter.prototype.Apply_MenuProps = function(Props)
 {
-    MathProps.Type = c_oAscMathInterfaceType.Delimiter;
-    MathProps.Pr   = null;
+    if(Props.Type == c_oAscMathInterfaceType.Delimiter)
+    {
+        if(Props.HideBegOper !== undefined && Props.HideBegOper !== this.begOper.Is_Empty())
+        {
+            var BegOper = this.private_GetLeftOperator(Props.HideBegOper);
+
+            History.Add(this, new CChangesMathDelimBegOper(BegOper, this.Pr.begChr));
+            this.raw_HideBegOperator(BegOper);
+        }
+
+        if(Props.HideEndOper !== undefined && Props.HideEndOper !== this.endOper.Is_Empty())
+        {
+            var EndOper = this.private_GetRightOperator(Props.HideEndOper);
+
+            History.Add(this, new CChangesMathDelimEndOper(EndOper, this.Pr.endChr));
+            this.raw_HideEndOperator(EndOper);
+        }
+
+        if(Props.Grow !== undefined && Props.Grow !== this.Pr.grow)
+        {
+            History.Add(this, new CChangesMathDelimiterGrow(Props.Grow, this.Pr.grow));
+            this.raw_SetGrow(Props.Grow);
+        }
+
+        if(Props.ShapeCentred !== undefined && this.Pr.grow == true)
+        {
+            var Shp = this.ShapeCentred == true ? DELIMITER_SHAPE_CENTERED : DELIMITER_SHAPE_MATH;
+
+            if(Shp !== this.Pr.shp)
+            {
+                History.Add(this, new CChangesMathDelimiterShape(Shp, this.Pr.shp));
+                this.raw_SetShape(Shp);
+            }
+        }
+    }
+};
+CDelimiter.prototype.old_Apply_MenuProps = function(Type)
+{
+    var bSymmetricDiff, bSymmetricDiffTwo;
+
+    switch(Type)
+    {
+        case c_oAscMathMenuTypes.DelimiterHideBegOper:
+        {
+            var NewBegCode;
+
+            if(false == this.begOper.Is_Empty())
+            {
+                NewBegCode = -1;
+            }
+            else if(true == this.endOper.Is_Empty())
+            {
+                NewBegCode = 0x28; // PARENTHESIS_LEFT
+            }
+            else
+            {
+                var TypeEndOper = this.endOper.Get_Type();
+
+                bSymmetricDiffTwo = TypeEndOper == BRACKET_CURLY_RIGHT || TypeEndOper == BRACKET_SQUARE_RIGHT;
+                bSymmetricDiff    = TypeEndOper == PARENTHESIS_RIGHT || TypeEndOper == BRACKET_ANGLE_RIGHT || TypeEndOper == HALF_SQUARE_RIGHT || TypeEndOper == HALF_SQUARE_RIGHT_UPPER || TypeEndOper == WHITE_SQUARE_RIGHT;
+
+                var EndCodeChr = this.endOper.Get_CodeChr();
+
+                if(bSymmetricDiff)
+                {
+                    NewBegCode = EndCodeChr - 1;
+                }
+                else if(bSymmetricDiffTwo)
+                {
+                    NewBegCode = EndCodeChr - 2;
+                }
+                else
+                {
+                    NewBegCode = EndCodeChr;
+                }
+            }
+
+            History.Add(this, new CChangesMathDelimBegOper(NewBegCode, this.Pr.begChr));
+            this.raw_HideBegOperator(NewBegCode);
+
+            break;
+        }
+        case c_oAscMathMenuTypes.DelimiterHideEndOper:
+        {
+            var NewEndCode;
+
+            if(false == this.endOper.Is_Empty())
+            {
+                NewEndCode = -1;
+            }
+            else if(true == this.begOper.Is_Empty())
+            {
+                NewEndCode = 0x29; // PARENTHESIS_RIGHT
+            }
+            else
+            {
+                var TypeBegOper = this.begOper.Get_Type();
+
+                bSymmetricDiffTwo = TypeBegOper == BRACKET_CURLY_LEFT || TypeBegOper == BRACKET_SQUARE_LEFT;
+                bSymmetricDiff    = TypeBegOper == PARENTHESIS_LEFT || TypeBegOper == BRACKET_ANGLE_LEFT || TypeBegOper == HALF_SQUARE_LEFT || TypeBegOper == HALF_SQUARE_LEFT_UPPER || TypeBegOper == WHITE_SQUARE_LEFT;
+
+                var BegCodeChr = this.begOper.Get_CodeChr();
+
+                if(bSymmetricDiff)
+                {
+                    NewEndCode = BegCodeChr + 1;
+                }
+                else if(bSymmetricDiffTwo)
+                {
+                    NewEndCode = BegCodeChr + 2;
+                }
+                else
+                {
+                    NewEndCode = BegCodeChr;
+                }
+            }
+
+            History.Add(this, new CChangesMathDelimEndOper(NewEndCode, this.Pr.endChr));
+            this.raw_HideEndOperator(NewEndCode);
+
+            break;
+        }
+        case c_oAscMathMenuTypes.DelimiterAddToLeft:
+        {
+            History.Add(this, new CChangesMathBaseSetColumn(this.Pr.column + 1, this.Pr.column));
+            this.raw_SetColumn(this.Pr.column + 1);
+
+            var NewContent = new CMathContent();
+            NewContent.Correct_Content(true);
+            this.protected_AddToContent(this.CurPos, [NewContent], true);
+
+            break;
+        }
+        case c_oAscMathMenuTypes.DelimiterAddToRight:
+        {
+            History.Add(this, new CChangesMathBaseSetColumn(this.Pr.column + 1, this.Pr.column));
+            this.raw_SetColumn(this.Pr.column + 1);
+
+            var NewContent = new CMathContent();
+            NewContent.Correct_Content(true);
+            this.protected_AddToContent(this.CurPos + 1, [NewContent], true);
+            break;
+        }
+        case c_oAscMathMenuTypes.DelimiterRemoveContent:
+        {
+            if(this.Pr.column > 1)
+            {
+                History.Add(this, new CChangesMathBaseSetColumn(this.Pr.column - 1, this.Pr.column));
+                this.raw_SetColumn(this.Pr.column - 1);
+
+                this.protected_RemoveItems(this.CurPos, [ this.Content[this.CurPos] ], true);
+            }
+
+            break;
+        }
+        case c_oAscMathMenuTypes.DelimiterGrow:
+        {
+            History.Add(this, new CChangesMathDelimiterGrow(!this.Pr.grow,this.Pr.grow));
+            this.raw_SetGrow(!this.Pr.grow);
+            break;
+        }
+        case c_oAscMathMenuTypes.DelimiterShpCentred:
+        {
+            if(this.Pr.grow == true)
+            {
+                var NewShp;
+                if(this.Pr.shp == DELIMITER_SHAPE_MATH)
+                    NewShp = DELIMITER_SHAPE_CENTERED;
+                else
+                    NewShp = DELIMITER_SHAPE_MATH;
+
+                History.Add(this, new CChangesMathDelimiterShape(NewShp, this.Pr.shp));
+                this.raw_SetShape(NewShp);
+            }
+            break;
+        }
+    }
+};
+CDelimiter.prototype.Get_InterfaceProps = function()
+{
+    return new CMathMenuDelimiter(this);
+};
+CDelimiter.prototype.raw_SetGrow = function(Value)
+{
+    this.Pr.grow = Value;
+    this.RecalcInfo.bProps = true;
+    this.ApplyProperties();
+};
+CDelimiter.prototype.raw_SetShape = function(Value)
+{
+    if(this.Pr.grow == true && (Value == DELIMITER_SHAPE_MATH || Value == DELIMITER_SHAPE_CENTERED))
+    {
+        this.Pr.shp = Value;
+        this.RecalcInfo.bProps = true;
+        this.ApplyProperties();
+    }
+};
+CDelimiter.prototype.raw_SetColumn = function(Value)
+{
+    if((this.Pr.column == 1 && Value > 1) || (Value == 1 && this.Pr.column > 1)) // выставим сепаратор
+    {
+        this.Pr.Set_Column(Value);
+        this.sepOper = new COperator (OPER_SEPARATOR);
+        this.RecalcInfo.bProps = true;
+        this.ApplyProperties();
+    }
+    else
+    {
+        this.Pr.Set_Column(Value);
+    }
+};
+CDelimiter.prototype.raw_HideBegOperator = function(Value)
+{
+    this.Pr.begChr = Value;
+    this.begOper = new COperator (OPER_DELIMITER);
+    this.RecalcInfo.bProps = true;
+    this.ApplyProperties();
+};
+CDelimiter.prototype.raw_HideEndOperator = function(Value)
+{
+    this.Pr.endChr = Value;
+    this.endOper = new COperator (OPER_DELIMITER);
+    this.RecalcInfo.bProps = true;
+    this.ApplyProperties();
+};
+CDelimiter.prototype.Can_Delete = function()
+{
+    return true;
+};
+CDelimiter.prototype.Is_SimpleDelete = function()
+{
+    return false;
 };
 CDelimiter.prototype.GetLastElement = function()
 {
@@ -3811,6 +4054,127 @@ CDelimiter.prototype.GetFirstElement = function()
 
     return Result;
 };
+CDelimiter.prototype.private_GetLeftOperator = function(bHide)
+{
+    var NewBegCode = -1;
+
+    if(bHide == true)
+    {
+        NewBegCode = -1;
+    }
+    else if(true == this.endOper.Is_Empty())
+    {
+        NewBegCode = 0x28; // PARENTHESIS_LEFT
+    }
+    else
+    {
+        var TypeEndOper = this.endOper.Get_Type();
+
+        var bSymmetricDiffTwo = TypeEndOper == BRACKET_CURLY_RIGHT || TypeEndOper == BRACKET_SQUARE_RIGHT;
+        var bSymmetricDiff    = TypeEndOper == PARENTHESIS_RIGHT || TypeEndOper == BRACKET_ANGLE_RIGHT || TypeEndOper == HALF_SQUARE_RIGHT || TypeEndOper == HALF_SQUARE_RIGHT_UPPER || TypeEndOper == WHITE_SQUARE_RIGHT;
+
+        var EndCodeChr = this.endOper.Get_CodeChr();
+
+        if(bSymmetricDiff)
+        {
+            NewBegCode = EndCodeChr - 1;
+        }
+        else if(bSymmetricDiffTwo)
+        {
+            NewBegCode = EndCodeChr - 2;
+        }
+        else
+        {
+            NewBegCode = EndCodeChr;
+        }
+    }
+
+    return NewBegCode;
+};
+CDelimiter.prototype.private_GetRightOperator = function(bHide)
+{
+    var NewEndCode = -1;
+
+    if(bHide == true)
+    {
+        NewEndCode = -1;
+    }
+    else if(true == this.begOper.Is_Empty())
+    {
+        NewEndCode = 0x29; // PARENTHESIS_RIGHT
+    }
+    else
+    {
+        var TypeBegOper = this.begOper.Get_Type();
+
+        var bSymmetricDiffTwo = TypeBegOper == BRACKET_CURLY_LEFT || TypeBegOper == BRACKET_SQUARE_LEFT;
+        var bSymmetricDiff    = TypeBegOper == PARENTHESIS_LEFT || TypeBegOper == BRACKET_ANGLE_LEFT || TypeBegOper == HALF_SQUARE_LEFT || TypeBegOper == HALF_SQUARE_LEFT_UPPER || TypeBegOper == WHITE_SQUARE_LEFT;
+
+        var BegCodeChr = this.begOper.Get_CodeChr();
+
+        if(bSymmetricDiff)
+        {
+            NewEndCode = BegCodeChr + 1;
+        }
+        else if(bSymmetricDiffTwo)
+        {
+            NewEndCode = BegCodeChr + 2;
+        }
+        else
+        {
+            NewEndCode = BegCodeChr;
+        }
+    }
+
+    return NewEndCode;
+};
+
+/**
+ *
+ * @param CMathMenuDelimiter
+ * @constructor
+ * @extends {CMathMenuBase}
+ */
+function CMathMenuDelimiter(Delimiter)
+{
+    CMathMenuDelimiter.superclass.constructor.call(this, Delimiter);
+
+    this.Type         = c_oAscMathInterfaceType.Delimiter;
+
+    if (Delimiter)
+    {
+        this.HideBegOper  = Delimiter.begOper.Is_Empty();
+        this.HideEndOper  = Delimiter.endOper.Is_Empty();
+        this.Grow         = Delimiter.Pr.grow;
+        this.ShapeCentred = (Delimiter.Pr.shp !== DELIMITER_SHAPE_MATH ? true : false);
+    }
+    else
+    {
+        this.HideBegOper  = undefined;
+        this.HideEndOper  = undefined;
+        this.Grow         = undefined;
+        this.ShapeCentred = undefined;
+    }
+}
+Asc.extendClass(CMathMenuDelimiter, CMathMenuBase);
+CMathMenuDelimiter.prototype.get_HideOpeningBracket = function(){return this.HideBegOper;};
+CMathMenuDelimiter.prototype.put_HideOpeningBracket = function(Hide){this.HideBegOper = Hide;};
+CMathMenuDelimiter.prototype.get_HideClosingBracket = function(){return this.HideEndOper;};
+CMathMenuDelimiter.prototype.put_HideClosingBracket = function(Hide){this.HideEndOper = Hide;};
+CMathMenuDelimiter.prototype.get_StretchBrackets    = function(){return this.Grow;};
+CMathMenuDelimiter.prototype.put_StretchBrackets    = function(Stretch){this.Grow = Stretch;};
+CMathMenuDelimiter.prototype.get_MatchBrackets      = function(){return this.ShapeCentred;};
+CMathMenuDelimiter.prototype.put_MatchBrackets      = function(Match){this.ShapeCentred = Match;};
+
+window["CMathMenuDelimiter"] = CMathMenuDelimiter;
+CMathMenuDelimiter.prototype["get_HideOpeningBracket"] = CMathMenuDelimiter.prototype.get_HideOpeningBracket;
+CMathMenuDelimiter.prototype["put_HideOpeningBracket"] = CMathMenuDelimiter.prototype.put_HideOpeningBracket;
+CMathMenuDelimiter.prototype["get_HideClosingBracket"] = CMathMenuDelimiter.prototype.get_HideClosingBracket;
+CMathMenuDelimiter.prototype["put_HideClosingBracket"] = CMathMenuDelimiter.prototype.put_HideClosingBracket;
+CMathMenuDelimiter.prototype["get_StretchBrackets"]    = CMathMenuDelimiter.prototype.get_StretchBrackets   ;
+CMathMenuDelimiter.prototype["put_StretchBrackets"]    = CMathMenuDelimiter.prototype.put_StretchBrackets   ;
+CMathMenuDelimiter.prototype["get_MatchBrackets"]      = CMathMenuDelimiter.prototype.get_MatchBrackets     ;
+CMathMenuDelimiter.prototype["put_MatchBrackets"]      = CMathMenuDelimiter.prototype.put_MatchBrackets     ;
 
 /**
  *
@@ -3921,9 +4285,17 @@ function CMathGroupChrPr()
 {
     this.chr     = undefined;
     this.chrType = undefined;
-    this.vertJc  = VJUST_TOP;
     this.pos     = LOCATION_BOT;
+    this.vertJc  = VJUST_TOP;
+
 }
+CMathGroupChrPr.prototype.Set = function(Pr)
+{
+    this.chr     = Pr.chr;
+    this.chrType = Pr.chrType;
+    this.pos     = Pr.pos;
+    this.vertJc  = Pr.vertJc;
+};
 CMathGroupChrPr.prototype.Set_FromObject = function(Obj)
 {
     this.chr     = Obj.chr;
@@ -4082,7 +4454,7 @@ CGroupCharacter.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, G
     var ArgSz = ArgSize.Copy();
 
     if(this.Pr.pos == this.Pr.vertJc)
-        ArgSz.decrease();
+        ArgSz.Decrease();
 
     CGroupCharacter.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSz, RPI, GapsInfo);
 };
@@ -4118,8 +4490,136 @@ CGroupCharacter.prototype.getAscent = function(oMeasure)
 
     return ascent;
 };
-CGroupCharacter.prototype.Document_UpdateInterfaceState = function(MathProps)
+CGroupCharacter.prototype.Apply_MenuProps = function(Props)
 {
-    MathProps.Type = c_oAscMathInterfaceType.GroupChar;
-    MathProps.Pr   = null;
+    if(Props.Type == c_oAscMathInterfaceType.GroupChar)
+    {
+        if(Props.Pos !== undefined && true == this.Can_ChangePos())
+        {
+            var Pos = Props.Pos == c_oAscMathInterfaceGroupCharPos.Bottom ? LOCATION_BOT : LOCATION_TOP;
+
+            if(Pos !== this.Pr.pos)
+                this.private_InversePr();
+        }
+    }
 };
+CGroupCharacter.prototype.old_Apply_MenuProps = function(Type)
+{
+    if(Type == c_oAscMathMenuTypes.GroupCharOver && this.Pr.pos == LOCATION_BOT)
+    {
+        this.private_InversePr();
+    }
+    else if(Type == c_oAscMathMenuTypes.GroupCharUnder && this.Pr.pos == LOCATION_TOP)
+    {
+        this.private_InversePr();
+    }
+};
+CGroupCharacter.prototype.Can_Delete = function()
+{
+    return true;
+};
+CGroupCharacter.prototype.Is_SimpleDelete = function()
+{
+    return true;
+};
+CGroupCharacter.prototype.private_GetInversePr = function(Pr)
+{
+    var InversePr = new CMathGroupChrPr();
+    if(Pr.pos == LOCATION_TOP)
+    {
+        InversePr.pos     = LOCATION_BOT;
+        InversePr.vertJc  = VJUST_TOP;
+
+        if(Pr.chr == 0x23DC || Pr.chr == 0x23DD)
+        {
+            InversePr.chr = 0x23DD;
+        }
+        else if(Pr.chr == 0x23DE || Pr.chr == 0x23DF)
+        {
+            InversePr.chr = 0x23DF;
+        }
+        else
+        {
+            InversePr.chr = Pr.chr;
+        }
+    }
+    else
+    {
+        InversePr.pos     = LOCATION_TOP;
+        InversePr.vertJc  = VJUST_BOT;
+
+        if(Pr.chr == 0x23DC || Pr.chr == 0x23DD)
+        {
+            InversePr.chr = 0x23DC;
+        }
+        else if(Pr.chr == 0x23DE || Pr.chr == 0x23DF)
+        {
+            InversePr.chr = 0x23DE;
+        }
+        else
+        {
+            InversePr.chr = Pr.chr;
+        }
+    }
+
+    return InversePr;
+};
+CGroupCharacter.prototype.private_InversePr = function()
+{
+    var NewPr = this.private_GetInversePr(this.Pr);
+    var OldPr = this.Pr.Copy();
+    History.Add(this, new CChangesMathGroupCharPr(NewPr, OldPr));
+    this.raw_SetPr(NewPr);
+};
+CGroupCharacter.prototype.raw_SetPr = function(Pr)
+{
+    this.Pr.Set(Pr);
+
+    this.RecalcInfo.bProps = true;
+    this.ApplyProperties();
+};
+CGroupCharacter.prototype.Get_InterfaceProps = function()
+{
+    return new CMathMenuGroupCharacter(this);
+};
+CGroupCharacter.prototype.Can_ModifyArgSize = function()
+{
+    return false === this.Is_SelectInside();
+};
+CGroupCharacter.prototype.Can_ChangePos = function()
+{
+    return this.Pr.chr == 0x23DC || this.Pr.chr == 0x23DD || this.Pr.chr == 0x23DE || this.Pr.chr == 0x23DF;
+};
+
+/**
+ *
+ * @param CMathMenuGroupCharacter
+ * @constructor
+ * @extends {CMathMenuBase}
+ */
+function CMathMenuGroupCharacter(GroupChr)
+{
+    CMathMenuGroupCharacter.superclass.constructor.call(this, GroupChr);
+
+    this.Type          = c_oAscMathInterfaceType.GroupChar;
+
+    if (undefined !== GroupChr)
+    {
+        this.Pos           = GroupChr.Pr.pos == LOCATION_BOT ? c_oAscMathInterfaceGroupCharPos.Bottom : c_oAscMathInterfaceGroupCharPos.Top;
+        this.bCanChangePos = GroupChr.Can_ChangePos();
+    }
+    else
+    {
+        this.Pos           = undefined;
+        this.bCanChangePos = undefined;
+    }
+}
+Asc.extendClass(CMathMenuGroupCharacter, CMathMenuBase);
+CMathMenuGroupCharacter.prototype.get_Pos         = function(){return this.Pos;};
+CMathMenuGroupCharacter.prototype.put_Pos         = function(Pos){this.Pos = Pos;};
+CMathMenuGroupCharacter.prototype.can_ChangePos   = function(){return this.bCanChangePos;};
+
+window["CMathMenuGroupCharacter"] = CMathMenuGroupCharacter;
+CMathMenuGroupCharacter.prototype["get_Pos"]         = CMathMenuGroupCharacter.prototype.get_Pos;
+CMathMenuGroupCharacter.prototype["put_Pos"]         = CMathMenuGroupCharacter.prototype.put_Pos;
+CMathMenuGroupCharacter.prototype["can_ChangePos"]   = CMathMenuGroupCharacter.prototype.can_ChangePos;
