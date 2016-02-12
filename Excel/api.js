@@ -3130,7 +3130,7 @@ var editor;
     {
       _adjustPrint.asc_setPrintType(c_oAscPrintType.EntireWorkbook);
       _adjustPrint.asc_setFitToWidth(true);
-      _adjustPrint.asc_asc_setFitToHeight(true);
+      _adjustPrint.asc_setFitToHeight(true);
     }
 
     var _printPagesData = this.wb.calcPagesPrint(_adjustPrint);
