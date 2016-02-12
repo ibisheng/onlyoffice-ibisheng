@@ -3043,6 +3043,7 @@ var c_oMathMenuAction = {
     RemoveBox               : 0x00080000
 
 };
+
 function CMathMenuBase(oMath)
 {
     this.Type   = c_oAscMathInterfaceType.Common;
@@ -3162,26 +3163,6 @@ CMathMenuBase.prototype.align_ToCharacter = function()
 {
     this.Action |= c_oMathMenuAction.AlignToCharacter;
 };
-/*CMathMenuBase.prototype.remove_SubScript = function()
-{
-    this.Action |= c_oMathMenuAction.RemoveSubScript;
-};
-CMathMenuBase.prototype.remove_SuperScript = function()
-{
-    this.Action |= c_oMathMenuAction.RemoveSuperScript;
-};
-CMathMenuBase.prototype.remove_Script = function()
-{
-    this.Action |= c_oMathMenuAction.RemoveScript;
-};
-CMathMenuBase.prototype.remove_Limit = function()
-{
-    this.Action |= c_oMathMenuAction.RemoveLimit;
-};
-CMathMenuBase.prototype.remove_EqArray = function()
-{
-    this.Action |= c_oMathMenuAction.RemoveEqArray;
-};*/
 CMathMenuBase.prototype.remove_Delimiter = function()
 {
     this.Action |= c_oMathMenuAction.RemoveDelimiter;
@@ -3199,7 +3180,7 @@ CMathMenuBase.prototype.remove_Box = function()
     this.Action |= c_oMathMenuAction.RemoveBox;
 };
 
-
+window["CMathMenuBase"]                             = CMathMenuBase;
 CMathMenuBase.prototype["get_Type"]                 = CMathMenuBase.prototype.get_Type;
 CMathMenuBase.prototype["remove_AccentCharacter"]   = CMathMenuBase.prototype.remove_AccentCharacter;
 CMathMenuBase.prototype["remove_Bar"]               = CMathMenuBase.prototype.remove_Bar;
