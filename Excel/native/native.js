@@ -5262,8 +5262,6 @@ function offline_apply_event(type,params) {
                 }
 
                 ws.objectRender.controller.setGraphicObjectProps(_imagePr);
-
-               // _api.asc_setGraphicObjectProps(_imagePr);
             }
             break;
         }
@@ -5884,6 +5882,28 @@ function offline_apply_event(type,params) {
             break;
         }
 
+        case 5000: // ASC_SPREADSHEETS_EVENT_TYPE_GO_LINK_TYPE_INTERNAL_DATA_RANGE
+        {
+            var cellX = params[0];
+            var cellY = params[1];
+            var isViewerMode = false;
+            var ws = _api.wb.getWorksheet();
+            var ct = ws.getCursorTypeFromXY(cellX, cellY, isViewerMode);
+
+            var curIndex = _api.asc_getActiveWorksheetIndex();
+
+            if (c_oTargetType.Hyperlink === ct.target) {
+                _api._asc_setWorksheetRange(ct.hyperlink);
+            }
+
+            _stream = global_memory_stream_menu;
+
+            _stream["ClearNoAttack"]();
+            _stream["WriteBool"](!(curIndex === _api.asc_getActiveWorksheetIndex()));
+
+            _return = _stream;
+            break;
+        }
         default:
             break;
     }
