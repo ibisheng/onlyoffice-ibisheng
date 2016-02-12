@@ -677,9 +677,9 @@ CMathText.prototype.Measure = function(oMeasure, TextPr, InfoMathText)
     {
         var ascent, width, height, descent;
 
-        this.FontSlot = InfoMathText.GetFontSlot(this.value); // возвращает fontslot_ASCII || fontslot_EastAsia || fontslot_CS || fontslot_HAnsi
-
         letter = this.private_getCode();
+
+        this.FontSlot = InfoMathText.GetFontSlot(letter); // возвращает fontslot_ASCII || fontslot_EastAsia || fontslot_CS || fontslot_HAnsi
 
         // в не математическом тексте i и j не подменяются на i и j без точек
         var bAccentIJ = !InfoMathText.bNormalText && this.Parent.IsAccent() && (this.value == 0x69 || this.value == 0x6A);
