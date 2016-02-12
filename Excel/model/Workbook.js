@@ -2561,6 +2561,7 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
     }
 
     if ( oldName ) {
+		buildRecalc(this, true, true);
         retRes = this.dependencyFormulas.changeDefName( oldName, newName );
         rename = true;
     }
@@ -2571,14 +2572,6 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
     if ( retRes ) {
 
         History.Create_NewPoint();
-
-        if ( rename ) {
-            History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesChange, null, null, new UndoRedoData_DefinedNamesChange( oldName, newName ) );
-        }
-        else {
-            History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesAdd, null, null, new UndoRedoData_DefinedNamesChange( oldName, newName ) );
-        }
-
 
         /*  #1. поменяли название - перестроили формулу. нужно вызвать пересборку формул в ячейках, в которыйх есть эта именованная ссылка.
            для этого пробегаемся по всем slave, и вызываем пересборку. в результате должна получиться новая формула, где используется новый диапазон.
@@ -2608,6 +2601,13 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
                 }
             }
         }
+
+		if ( rename ) {
+			History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesChange, null, null, new UndoRedoData_DefinedNamesChange( oldName, newName ) );
+		}
+		else {
+			History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesAdd, null, null, new UndoRedoData_DefinedNamesChange( oldName, newName ) );
+		}
         /*if(retRes){
             retRes = retRes.getAscCDefName();
         }*/
