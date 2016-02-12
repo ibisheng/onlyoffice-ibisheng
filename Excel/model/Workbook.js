@@ -3196,17 +3196,17 @@ Woorksheet.prototype.initPostOpen = function(handlers){
 			if (oFormulaExt.t == Asc.ECellFormulaType.cellformulatypeShared) {
 				if(null != oFormulaExt.si){
 					if(null != oFormulaExt.ref){
-						formulaShared[oFormulaExt.si] = 	{
-																	fVal:new parserFormula(oFormulaExt.v,"",this),
-																	fRef:function(t){
-																			var r = t.getRange2(oFormulaExt.ref);
-																			return {
-																						c:r,
-																						first:r.first
-																					};
-																		}(this)
-																};
-							formulaShared[oFormulaExt.si].fVal.parse();
+            if (oFormulaExt.v.length <= c_oAscMaxFormulaLength) {
+              formulaShared[oFormulaExt.si] = {
+                fVal: new parserFormula(oFormulaExt.v, "", this), fRef: function(t) {
+                  var r = t.getRange2(oFormulaExt.ref);
+                  return {
+                    c: r, first: r.first
+                  };
+                }(this)
+              };
+              formulaShared[oFormulaExt.si].fVal.parse();
+            }
 					}
 					else{
 						if( formulaShared[oFormulaExt.si] ){
@@ -3226,11 +3226,12 @@ Woorksheet.prototype.initPostOpen = function(handlers){
 					}
 				}
 			}
-			if(oFormulaExt.v)
-				oCell.setFormula(oFormulaExt.v);
-				
-			if(oFormulaExt.ca)
-				oCell.sFormulaCA = true;
+			if(oFormulaExt.v && oFormulaExt.v.length <= c_oAscMaxFormulaLength) {
+        oCell.setFormula(oFormulaExt.v);
+        if(oFormulaExt.ca) {
+          oCell.sFormulaCA = true;
+        }
+      }
 			
 			/*
 				Если ячейка содержит в себе формулу, то добавляем ее в список ячеек с формулами.
