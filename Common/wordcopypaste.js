@@ -3724,8 +3724,10 @@ PasteProcessor.prototype =
 					}
 					//создаём темповый CDocument
 					this.oDocument = ExecuteNoHistory(tempCDocument , this, []);
-					
+
+                    g_oIdCounter.m_bRead = true;
 					var aContent = ExecuteNoHistory(this.ReadFromBinary, this, [base64FromWord]);
+                    g_oIdCounter.m_bRead = false;
 					//возврщаем обратно переменные и историю, документ которой заменяется при создании CDocument
 					this.oDocument = trueDocument;
 					History.Document = trueDocument;
