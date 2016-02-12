@@ -1148,3 +1148,17 @@ window.global_pptx_content_loader = new CPPTXContentLoader();
 window.global_pptx_content_loader;
 window.global_pptx_content_writer = new CPPTXContentWriter();
 window.global_pptx_content_writer;
+
+// Создаем глобальные дефолтовые стили, чтобы быстро можно было отдать дефолтовые настройки
+var g_oDocumentDefaultTextPr       = new CTextPr();
+var g_oDocumentDefaultParaPr       = new CParaPr();
+var g_oDocumentDefaultTablePr      = new CTablePr();
+var g_oDocumentDefaultTableCellPr  = new CTableCellPr();
+var g_oDocumentDefaultTableRowPr   = new CTableRowPr();
+var g_oDocumentDefaultTableStylePr = new CTableStylePr();
+g_oDocumentDefaultTextPr.Init_Default();
+g_oDocumentDefaultParaPr.Init_Default();
+g_oDocumentDefaultTablePr.Init_Default();
+g_oDocumentDefaultTableCellPr.Init_Default();
+g_oDocumentDefaultTableRowPr.Init_Default();
+g_oDocumentDefaultTableStylePr.Init_Default();

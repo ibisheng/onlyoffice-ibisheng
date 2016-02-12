@@ -8640,7 +8640,7 @@ CTable.prototype =
     {
         if ( true === this.CompiledPr.NeedRecalc )
         {
-            if (true !== g_oIdCounter.m_bLoad && true !== g_oIdCounter.m_bRead)
+            if (true === g_oIdCounter.m_bLoad && true === g_oIdCounter.m_bRead)
             {
                 this.CompiledPr.Pr = {
                     TextPr          : g_oDocumentDefaultTextPr,
