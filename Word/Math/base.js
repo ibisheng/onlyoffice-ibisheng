@@ -2717,6 +2717,13 @@ CMathBase.prototype.Can_DeleteManualBreak = function()
 {
     return false;
 };
+CMathBase.prototype.Correct_ContentCurPos = function()
+{
+    for(var Pos = 0; Pos < this.Content.length; Pos++)
+    {
+        this.Content[Pos].Correct_ContentCurPos();
+    }
+};
 CMathBase.prototype.Math_Set_EmptyRange         = CMathContent.prototype.Math_Set_EmptyRange;
 CMathBase.prototype.Set_ParaMath                = CMathContent.prototype.Set_ParaMath;
 CMathBase.prototype.Recalculate_Reset           = CMathContent.prototype.Recalculate_Reset;

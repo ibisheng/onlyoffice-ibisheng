@@ -1080,6 +1080,7 @@ ParaMath.prototype.Add = function(Item)
 
         var lng = oContent.Content.length;
         oContent.Load_FromMenu(Item.Menu, this.Paragraph);
+        oContent.Correct_ContentCurPos();
 
         var lng2 = oContent.Content.length;
         var Pos_ApplyTextPr =
@@ -3012,12 +3013,6 @@ ParaMath.prototype.GetPlh = function(oMeasure, font)
     oMeasure.SetFont(font);
 
     return oMeasure.Measure2Code(0x2B1A).Height;
-};
-ParaMath.prototype.GetA = function(oMeasure, font)
-{
-    oMeasure.SetFont(font);
-
-    return oMeasure.Measure2Code(0x61).Height;
 };
 
 ParaMath.prototype.SetMathProperties = function(props)

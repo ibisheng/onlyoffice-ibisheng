@@ -306,11 +306,14 @@ function CMathMenuLimit(Limit)
 
     this.Type = c_oAscMathInterfaceType.Limit;
 
-    if (undefined !== Limit.Pr)
+    if (undefined !== Limit)
+    {
         this.Pos  = (LIMIT_LOW === Limit.Pr.type) ? c_oAscMathInterfaceLimitPos.Bottom : c_oAscMathInterfaceLimitPos.Top;
+    }
     else
+    {
         this.Pos = undefined;
-
+    }
 }
 Asc.extendClass(CMathMenuLimit, CMathMenuBase);
 

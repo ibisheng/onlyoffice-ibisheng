@@ -1190,13 +1190,13 @@ CMathMatrix.prototype.raw_Set_MinColumnWidth = function(Value)
     this.Pr.cSp = Value;
     this.Set_RuleGap(this.SpaceColumn, this.Pr.cGpRule, this.Pr.cGp, Value);
 };
-CMathMatrix.prototype.Is_DeletedItem = function(Type)
+CMathMatrix.prototype.Is_DeletedItem = function(Action)
 {
     var bDeleteMatrix = false;
 
-    if( c_oAscMathMenuTypes.MatrixRemoveRow == Type && 1 == this.getRowsCount())
+    if( c_oMathMenuAction.DeleteMatrixRow == Action && 1 == this.getRowsCount())
         bDeleteMatrix = true;
-    else if(c_oAscMathMenuTypes.MatrixRemoveColumn == Type && 1 == this.getColsCount())
+    else if(c_oMathMenuAction.DeleteMatrixColumn == Action && 1 == this.getColsCount())
         bDeleteMatrix = true;
 
     return bDeleteMatrix;

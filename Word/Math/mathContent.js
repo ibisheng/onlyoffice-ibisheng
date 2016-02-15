@@ -1709,6 +1709,16 @@ CMathContent.prototype.private_CorrectCurPos = function()
             this.Content[this.CurPos].Cursor_MoveToStartPos();
     }
 };
+CMathContent.prototype.Correct_ContentCurPos = function()
+{
+    this.private_CorrectCurPos();
+
+    for(var Pos = 0; Pos < this.Content.length; Pos++)
+    {
+        if(this.Content[Pos].Type == para_Math_Composition)
+            this.Content[Pos].Correct_ContentCurPos();
+    }
+};
 CMathContent.prototype.SplitContent = function(NewContent, ContentPos, Depth)
 {
     var Pos = ContentPos.Get(Depth);
@@ -4832,6 +4842,7 @@ CMathContent.prototype.Delete_ItemToContentThroughInterface = function(Props, Po
         RemoveBar       = Props.Action & c_oMathMenuAction.RemoveBar && Item.kind == MATH_BAR,
         RemoveScript    = Props.Type == c_oAscMathInterfaceType.Script && Props.ScriptType == c_oAscMathInterfaceScript.None && (Item.kind == MATH_DEGREESubSup || Item.kind == MATH_DEGREE),
         RemoveLimit     = Props.Type == c_oAscMathInterfaceType.Limit && Props.Pos == c_oAscMathInterfaceLimitPos.None && Item.kind === MATH_LIMIT,
+        RemoveMatrix    = Props.Type == c_oAscMathInterfaceType.Matrix && this.Content[Pos].Is_DeletedItem(Props.Action),
         //RemovePreSubSup = Props.Action & c_oMathMenuAction.RemoveScript && Item.kind == MATH_DEGREESubSup && Item.Pr.type == DEGREE_PreSubSup,
         //RemoveDegree   = Props.Action & c_oMathMenuAction.RemoveScript && Item.kind == MATH_DEGREE,
         //RemoveLimit     = Props.Action & c_oMathMenuAction.RemoveLimit && Item.kind == MATH_LIMIT,
@@ -4842,7 +4853,7 @@ CMathContent.prototype.Delete_ItemToContentThroughInterface = function(Props, Po
         RemoveBox       = Props.Action & c_oMathMenuAction.RemoveBox && Item.kind == MATH_BOX;
 
 
-    if(RemoveChar || RemoveBar || RemoveScript || RemoveLimit || RemoveDelimiter || RemoveGroupChar || RemoveRadical || RemoveBox)
+    if(RemoveChar || RemoveBar || RemoveScript || RemoveLimit || RemoveMatrix || RemoveDelimiter || RemoveGroupChar || RemoveRadical || RemoveBox)
     {
         var Items = this.Content[Pos].Get_DeletedItemsThroughInterface();
 
