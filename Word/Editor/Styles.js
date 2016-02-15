@@ -59,6 +59,13 @@ var styletype_Numbering = 0x02;
 var styletype_Table     = 0x03;
 var styletype_Character = 0x04;
 
+var textdirection_LRTB  = 0x00;
+var textdirection_TBRL  = 0x01;
+var textdirection_BTLR  = 0x02;
+var textdirection_LRTBV = 0x03;
+var textdirection_TBRLV = 0x04;
+var textdirection_TBLRV = 0x05;
+
 function IsEqualStyleObjects(Object1, Object2)
 {
     if (undefined === Object1 && undefined === Object2)
@@ -6435,6 +6442,7 @@ function CTableCellPr()
     this.TableCellW       = undefined;
     this.VAlign           = undefined;
     this.VMerge           = undefined;
+    this.TextDirection    = undefined;
 }
 
 CTableCellPr.prototype =
@@ -6566,6 +6574,7 @@ CTableCellPr.prototype =
         this.TableCellW              = new CTableMeasurement(tblwidth_Auto, 0);
         this.VAlign                  = vertalignjc_Top;
         this.VMerge                  = vmerge_Restart;
+        this.TextDirection           = textdirection_LRTB;
     },
 
     Set_FromObject : function(CellPr)
@@ -6781,6 +6790,12 @@ CTableCellPr.prototype =
             Flags |= 16384;
         }
 
+        if (undefined !== this.TextDirection)
+        {
+            Writer.WriteLong( this.TextDirection );
+            Flags |= 32768;
+        }
+
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
         Writer.WriteLong( Flags );
@@ -6865,6 +6880,9 @@ CTableCellPr.prototype =
 
         if ( 16384 & Flags )
             this.VMerge = Reader.GetLong();
+
+        if (32768 & Flags)
+            this.TextDirection = Reader.GetLong();
     }
 };
 

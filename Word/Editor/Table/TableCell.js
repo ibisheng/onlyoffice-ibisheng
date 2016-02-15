@@ -635,7 +635,20 @@ CTableCell.prototype =
 
     Content_Draw : function(PageIndex, pGraphics)
     {
+        //pGraphics.SaveGrState();
+        //
+        //var PageBounds = this.Content.Get_PageBounds(0);
+        //
+        //var Transform = new CMatrix();
+        //global_MatrixTransformer.TranslateAppend(Transform, -this.Content.X, -this.Content.Y);
+        //global_MatrixTransformer.RotateRadAppend(Transform, 0.5 *  Math.PI);
+        //global_MatrixTransformer.TranslateAppend(Transform, this.Content.X, this.Content.Y);
+        //global_MatrixTransformer.TranslateAppend(Transform, 0, this.Content.XLimit - this.Content.X);
+        //pGraphics.transform3(Transform);
+
         this.Content.Draw(PageIndex, pGraphics);
+
+        //pGraphics.RestoreGrState();
     },
 
     Recalculate : function()
@@ -1089,6 +1102,21 @@ CTableCell.prototype =
         }
     },
 
+    Get_TextDirection : function()
+    {
+        return this.Get_CompiledPr(false).TextDirection;
+    },
+
+    Set_TextDirection : function(Value)
+    {
+        if (Value !== this.Pr.TextDirection)
+        {
+            History.Add(this, {Type : historyitem_TableCell_TextDirection, Old : this.Pr.TextDirection, New : Value});
+            this.Pr.TextDirection = Value;
+            this.Recalc_CompiledPr();
+        }
+    },
+
     Get_Borders : function()
     {
         var CellBorders =
@@ -1427,6 +1455,13 @@ CTableCell.prototype =
                 this.Recalc_CompiledPr();
                 break;
             }
+
+            case historyitem_TableCell_TextDirection:
+            {
+                this.Pr.TextDirection = Data.Old;
+                this.Recalc_CompiledPr();
+                break;
+            }
         }
     },
 
@@ -1552,6 +1587,12 @@ CTableCell.prototype =
                 this.Recalc_CompiledPr();
                 break;
             }
+            case historyitem_TableCell_TextDirection:
+            {
+                this.Pr.TextDirection = Data.New;
+                this.Recalc_CompiledPr();
+                break;
+            }
         }
     },
 
@@ -1577,6 +1618,7 @@ CTableCell.prototype =
             case historyitem_TableCell_VAlign:
             case historyitem_TableCell_W:
             case historyitem_TableCell_Pr:
+            case historyitem_TableCell_TextDirection:
             {
                 bNeedRecalc = true;
                 break;
@@ -1786,6 +1828,20 @@ CTableCell.prototype =
                 // CTableCellPr
                 Data.New.Write_ToBinary( Writer );
                 break;
+            }
+
+            case historyitem_TableCell_TextDirection:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   Long : textDirection
+                if (undefined === Data.New)
+                    Writer.WriteBool(true);
+                else
+                {
+                    Writer.WriteBool(false);
+                    Writer.WriteLong(Data.New);
+                }
             }
         }
 
@@ -2058,6 +2114,20 @@ CTableCell.prototype =
 
                 this.Pr = new CTableCellPr();
                 this.Pr.Read_FromBinary( Reader );
+
+                this.Recalc_CompiledPr();
+                break;
+            }
+
+            case historyitem_TableCell_TextDirection:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   Long : textDirection
+                if (true === Reader.GetBool())
+                    this.Pr.TextDirection = undefined;
+                else
+                    this.Pr.TextDirection = Reader.GetLong();
 
                 this.Recalc_CompiledPr();
                 break;
