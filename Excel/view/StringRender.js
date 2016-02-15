@@ -250,38 +250,45 @@
             this.angle          =   0;  //  angle;
             this.fontNeedUpdate =   true;
 
-            var dx = 0, dy = 0, sx = 0, sw = 0;
-            var tm = this._doMeasure(maxWidth);
+            var dx = 0, dy = 0, sx = 0, sw = 0,
+                tm = this._doMeasure(maxWidth),
 
-            var mul = (90 - (Math.abs(angle)) ) / 90;
-            var posh = (angle === 90 || angle === -90) ? textW : Math.abs(Math.sin(angle * Math.PI / 180.0) * textW);
-            var posv = (angle === 90 || angle === -90) ? 0 : Math.abs(Math.cos(angle * Math.PI / 180.0) * textW);
+                mul = (90 - (Math.abs(angle)) ) / 90,
+                posh = (angle === 90 || angle === -90) ? textW : Math.abs(Math.sin(angle * Math.PI / 180.0) * textW),
+                posv = (angle === 90 || angle === -90) ? 0 : Math.abs(Math.cos(angle * Math.PI / 180.0) * textW),
 
-            if ("bottom" === alignVertical) {
+                isHorzLeft      = ('left'   === alignHorizontal),
+                isHorzCenter    = ('center' === alignHorizontal),
+                isHorzRight     = ('right'  === alignHorizontal),
+                isVertBottom    = ('bottom' === alignVertical),
+                isVertCenter    = ('center' === alignVertical),
+                isVertTop       = ('top' === alignVertical);
+
+            if (isVertBottom) {
                 if (angle < 0) {
-                    if ("left" === alignHorizontal) {
+                    if (isHorzLeft) {
                         dx = (1 - mul) * tm.height;
                         sw = x + posv + (mul * 0.5) * tm.height;
                     }
-                    else if ("center" === alignHorizontal) {
+                    else if (isHorzCenter) {
                         dx = (w + tm.height - posv) * 0.5;
                         sx = x + (w - posv) * 0.5 - (mul * 0.5) * tm.height;
                         sw = x + (w + posv) * 0.5 + (mul * 0.5) * tm.height;
                     }
-                    else if ("right" === alignHorizontal) {
+                    else if (isHorzRight) {
                         dx = w -  posv;
                         sx = x + dx - (mul * 0.5) * tm.height;
                     }
                 } else {
-                    if ("left" === alignHorizontal) {
+                    if (isHorzLeft) {
                         sw = x + posv + (mul * 0.5) * tm.height;
                     }
-                    else if ("center" === alignHorizontal) {
+                    else if (isHorzCenter) {
                         dx = (w - tm.height - posv) * 0.5;
                         sx = x + (w - posv) * 0.5 - (mul * 0.5) * tm.height;
                         sw = x + (w + posv) * 0.5 + (mul * 0.5) * tm.height;
                     }
-                    else if ("right" === alignHorizontal) {
+                    else if (isHorzRight) {
                         dx = w - posv - (1 - mul) * tm.height;
                         sx = x + dx;
                     }
@@ -302,32 +309,32 @@
                     }
                 }
             }
-            else if ("center" === alignVertical) {
+            else if (isVertCenter) {
 
                 if (angle < 0) {
-                    if ("left" === alignHorizontal) {
+                    if (isHorzLeft) {
                         dx = (1 - mul * 0.5) * tm.height;
                         sw = x + posv + (mul * 0.5) * tm.height;
                     }
-                    else if ("center" === alignHorizontal) {
+                    else if (isHorzCenter) {
                         dx = (w + tm.height - posv) * 0.5;
                         sx = x + (w - posv) * 0.5 - (mul * 0.5) * tm.height;
                         sw = x + (w + posv) * 0.5 + (mul * 0.5) * tm.height;
                     }
-                    else if ("right" === alignHorizontal) {
+                    else if (isHorzRight) {
                         dx = w - (mul * 0.5) * tm.height - posv;
                         sx = x + dx - (mul * 0.5) * tm.height;
                     }
                 } else {
-                    if ("left" === alignHorizontal) {
+                    if (isHorzLeft) {
                         sw = x + posv + (mul * 0.5) * tm.height;
                     }
-                    else if ("center" == alignHorizontal)  {
+                    else if (isHorzCenter)  {
                         dx = (w - tm.height - posv) * 0.5;
                         sx = x + (w - posv) * 0.5 - (mul * 0.5) * tm.height;
                         sw = x + (w + posv) * 0.5 + (mul * 0.5) * tm.height;
                     }
-                    else if ("right" === alignHorizontal) {
+                    else if (isHorzRight) {
                         dx = w - posv - tm.height; sx = x + dx;
                         sx = x + dx - (mul * 0.5) * tm.height;
                     }
@@ -348,32 +355,32 @@
                     }
                 }
             }
-            else if ("top" === alignVertical) {
+            else if (isVertTop) {
 
                 if (angle < 0) {
-                    if ("left" === alignHorizontal) {
+                    if (isHorzLeft) {
                         dx = (1 - mul * 0.5) * tm.height;
                         sw = x + posv + (mul * 0.5) * tm.height;
                     }
-                    else if ('c' === alignHorizontal) {
+                    else if (isHorzCenter) {
                         dx = (w + tm.height - posv) * 0.5;
                         sx = x + (w - posv) * 0.5 - (mul * 0.5) * tm.height;
                         sw = x + (w + posv) * 0.5 + (mul * 0.5) * tm.height;
                     }
-                    else if ("right" === alignHorizontal) {
+                    else if (isHorzRight) {
                         dx = w - (mul * 0.5) * tm.height - posv;
                         sx = x + dx - (mul * 0.5) * tm.height;
                     }
                 } else {
-                    if ("left" === alignHorizontal) {
+                    if (isHorzLeft) {
                         sw = x + posv + (mul * 0.5) * tm.height;
                     }
-                    else if ('c' === alignHorizontal) {
+                    else if (isHorzCenter) {
                         dx = (w - tm.height - posv) * 0.5;
                         sx = x + (w - posv) * 0.5 - (mul * 0.5) * tm.height;
                         sw = x + (w + posv) * 0.5 + (mul * 0.5) * tm.height;
                     }
-                    else if ("right" === alignHorizontal) {
+                    else if (isHorzRight) {
                         dx = w - posv - tm.height; sx = x + dx;
                         sx = x + dx - (mul * 0.5) * tm.height;
                     }
@@ -392,8 +399,8 @@
             } else {
                 bound.height = Math.abs(Math.sin(angle / 180.0 * Math.PI) * textW) + (mul) * tm.height;
                 bound.width = Math.abs(Math.cos(angle / 180.0 * Math.PI) * textW) + Math.abs(Math.sin(angle / 180.0 * Math.PI) * tm.height);
-				// Делаем кратным 1pt
-				bound.height = asc_calcnpt(bound.height, 96);
+                // Делаем кратным 1pt
+                bound.height = asc_calcnpt(bound.height, 96);
             }
 
             return bound;
