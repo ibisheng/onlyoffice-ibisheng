@@ -887,12 +887,12 @@ CMathMatrix.prototype.Apply_MenuProps = function(Props)
         {
             if(Props.Action & c_oMathMenuAction.InsertBefore)
             {
-                NextPos     = (RowPos + 1)*ColumnCount;     // позиция для вставки массива контентов
+                NextPos     = RowPos*ColumnCount;
                 this.Add_Row(NextPos);
             }
             else
             {
-                NextPos     = RowPos*ColumnCount;
+                NextPos     = (RowPos + 1)*ColumnCount;     // позиция для вставки массива контентов
                 this.Add_Row(NextPos);
             }
         }
@@ -908,7 +908,6 @@ CMathMatrix.prototype.Apply_MenuProps = function(Props)
                 this.Add_Column(ColumnPos + 1);
             }
         }
-
 
         if(Props.bHidePlh !== undefined)
         {
