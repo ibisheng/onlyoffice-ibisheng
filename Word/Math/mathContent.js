@@ -4829,7 +4829,7 @@ CMathContent.prototype.Delete_ItemToContentThroughInterface = function(Props, Po
         RemoveMatrix    = Props.Type == c_oAscMathInterfaceType.Matrix && this.Content[Pos].Is_DeletedItem(Props.Action),
         RemoveEqArray   = Props.Type == c_oAscMathInterfaceType.EqArray && this.Content[Pos].Is_DeletedItem(Props.Action),
         RemoveDelimiter = Props.Action & c_oMathMenuAction.RemoveDelimiter && Item.kind == MATH_DELIMITER,
-        RemoveGroupChar = Props.Action & c_oMathMenuAction.RemoveGroupChar && Item.kind == MATH_GROUP_CHARACTER,
+        RemoveGroupChar = Props.Type == c_oAscMathInterfaceType.GroupChar && Props.Pos == c_oAscMathInterfaceGroupCharPos.None && Item.kind == MATH_GROUP_CHARACTER,
         RemoveRadical   = Props.Action & c_oMathMenuAction.RemoveRadical && Item.kind == MATH_RADICAL;
 
 

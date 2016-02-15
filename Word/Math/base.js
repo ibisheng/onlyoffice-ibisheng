@@ -3020,8 +3020,7 @@ var c_oMathMenuAction = {
     DeleteManualBreak       : 0x00004000,
     AlignToCharacter        : 0x00008000,
     RemoveDelimiter         : 0x00010000,
-    RemoveGroupChar         : 0x00020000,
-    RemoveRadical           : 0x00040000
+    RemoveRadical           : 0x00020000
 
 };
 
@@ -3147,10 +3146,6 @@ CMathMenuBase.prototype.remove_DelimiterCharacters = function()
 {
     this.Action |= c_oMathMenuAction.RemoveDelimiter;
 };
-CMathMenuBase.prototype.remove_GroupCharacter = function()
-{
-    this.Action |= c_oMathMenuAction.RemoveGroupChar;
-};
 CMathMenuBase.prototype.remove_Radical = function()
 {
     this.Action |= c_oMathMenuAction.RemoveRadical;
@@ -3179,5 +3174,4 @@ CMathMenuBase.prototype["delete_ManualBreak"]          = CMathMenuBase.prototype
 CMathMenuBase.prototype["can_AlignToCharacter"]        = CMathMenuBase.prototype.can_AlignToCharacter;
 CMathMenuBase.prototype["align_ToCharacter"]           = CMathMenuBase.prototype.align_ToCharacter;
 CMathMenuBase.prototype["remove_DelimiterCharacters"]  = CMathMenuBase.prototype.remove_DelimiterCharacters;
-CMathMenuBase.prototype["remove_GroupCharacter"]       = CMathMenuBase.prototype.remove_GroupCharacter;
 CMathMenuBase.prototype["remove_Radical"]              = CMathMenuBase.prototype.remove_Radical;

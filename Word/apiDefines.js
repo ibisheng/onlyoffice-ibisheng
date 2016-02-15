@@ -644,6 +644,7 @@ var c_oAscMathInterfaceNaryLimitLocation = {
 };
 
 var c_oAscMathInterfaceGroupCharPos = {
+  None   : -1,  // Удаление GroupChar
   Top    : 0,
   Bottom : 1
 };
