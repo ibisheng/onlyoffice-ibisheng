@@ -742,6 +742,7 @@ CMathMatrix.prototype.Apply_MenuProps = function(Props)
             ColumnPos   = this.Get_ColumnPos(this.CurPos);
 
         var bGapWholeNumber, bGapNumber;
+        var NextPos;
 
         if(Props.BaseJc !==  undefined)
         {
@@ -872,6 +873,42 @@ CMathMatrix.prototype.Apply_MenuProps = function(Props)
 
         }
 
+        if(Props.Action & c_oMathMenuAction.DeleteMatrixRow && this.getRowsCount() > 1)
+        {
+            this.Remove_Row(RowPos);
+        }
+
+        if(Props.Action & c_oMathMenuAction.DeleteMatrixColumn && ColumnCount > 1)
+        {
+            this.Remove_Column(ColumnPos);
+        }
+
+        if(Props.Action & c_oMathMenuAction.InsertMatrixRow)
+        {
+            if(Props.Action & c_oMathMenuAction.InsertBefore)
+            {
+                NextPos     = (RowPos + 1)*ColumnCount;     // позиция для вставки массива контентов
+                this.Add_Row(NextPos);
+            }
+            else
+            {
+                NextPos     = RowPos*ColumnCount;
+                this.Add_Row(NextPos);
+            }
+        }
+
+        if(Props.Action & c_oMathMenuAction.InsertMatrixColumn)
+        {
+            if(Props.Action & c_oMathMenuAction.InsertBefore)
+            {
+                this.Add_Column(ColumnPos);
+            }
+            else
+            {
+                this.Add_Column(ColumnPos + 1);
+            }
+        }
+
 
         if(Props.bHidePlh !== undefined)
         {
@@ -910,7 +947,7 @@ CMathMatrix.prototype.old_Apply_MenuProps = function(Type, Gap)
         case c_oAscMathMenuTypes.MatrixRemoveRow:
         {
             if(this.getRowsCount() > 1)
-            this.Remove_Row(RowPos);
+                this.Remove_Row(RowPos);
 
             break;
         }
