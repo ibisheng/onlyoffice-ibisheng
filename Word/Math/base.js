@@ -3149,7 +3149,7 @@ CMathMenuBase.prototype.remove_Delimiter = function()
 };
 CMathMenuBase.prototype.remove_GroupCharacter = function()
 {
-    this.Action |= c_oMathMenuAction.RemoveGroupCharacter;
+    this.Action |= c_oMathMenuAction.RemoveGroupChar;
 };
 CMathMenuBase.prototype.remove_Radical = function()
 {
