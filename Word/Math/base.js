@@ -3181,4 +3181,3 @@ CMathMenuBase.prototype["align_ToCharacter"]           = CMathMenuBase.prototype
 CMathMenuBase.prototype["remove_DelimiterCharacters"]  = CMathMenuBase.prototype.remove_DelimiterCharacters;
 CMathMenuBase.prototype["remove_GroupCharacter"]       = CMathMenuBase.prototype.remove_GroupCharacter;
 CMathMenuBase.prototype["remove_Radical"]              = CMathMenuBase.prototype.remove_Radical;
-CMathMenuBase.prototype["remove_Box"]                  = CMathMenuBase.prototype.remove_Box;
