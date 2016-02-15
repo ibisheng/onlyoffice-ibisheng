@@ -691,14 +691,6 @@ CRadical.prototype.Apply_MenuProps = function(Props)
         }
     }
 };
-CRadical.prototype.old_Apply_MenuProps = function(Type)
-{
-    if(Type == c_oAscMathMenuTypes.RadicalHideDegree)
-    {
-        History.Add(this, new CChangesMathRadicalHideDegree( !this.Pr.degHide, this.Pr.degHide ));
-        this.raw_SetHideDegree(!this.Pr.degHide);
-    }
-};
 CRadical.prototype.Get_InterfaceProps = function()
 {
     return new CMathMenuRadical(this);
@@ -717,10 +709,6 @@ CRadical.prototype.raw_SetHideDegree = function(Value)
             this.Base.Cursor_MoveToStartPos();
         }
     }
-};
-CRadical.prototype.Is_SimpleDelete = function()
-{
-    return true;
 };
 CRadical.prototype.Can_ModifyArgSize = function()
 {

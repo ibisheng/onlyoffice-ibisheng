@@ -506,38 +506,6 @@ CFraction.prototype.Apply_MenuProps = function(Props)
             this.raw_SetFractionType(FractionType);
         }
     }
-
-    /*var FractionType;
-
-    switch(Type)
-    {
-        case c_oAscMathMenuTypes.FractionBar:
-        {
-            FractionType = BAR_FRACTION;
-            break;
-        }
-        case c_oAscMathMenuTypes.FractionSkewed:
-        {
-            FractionType = SKEWED_FRACTION;
-            break;
-        }
-        case c_oAscMathMenuTypes.FractionLinear:
-        {
-            FractionType = LINEAR_FRACTION;
-            break;
-        }
-        case c_oAscMathMenuTypes.FractionNoBar:
-        {
-            FractionType = NO_BAR_FRACTION;
-            break;
-        }
-    }
-
-    if(FractionType !== undefined && FractionType !== this.Pr.type)
-    {
-        History.Add(this, new CChangesMathFractionType(FractionType, this.Pr.type));
-        this.raw_SetFractionType(FractionType);
-    }*/
 };
 CFraction.prototype.Get_InterfaceProps = function()
 {

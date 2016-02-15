@@ -470,66 +470,12 @@ CBorderBox.prototype.Apply_MenuProps = function(Props)
             this.raw_SetTopLTR(!Props.HideTopLTR );
         }
 
-        if(Props.HideTopRTL !== undefined && Props.HideTopRTL !== this.Pr.strikeBLTR)
+        if(Props.HideTopRTL !== undefined && Props.HideTopRTL == this.Pr.strikeBLTR)
         {
             History.Add(this, new CChangesMathBorderBoxTopRTL(!Props.HideTopRTL, this.Pr.strikeBLTR)); // strikeBLTR - нарисовать диагональ из нижнего угла слева направо
-            this.raw_SetTopRTL(!this.Pr.strikeBLTR);
+            this.raw_SetTopRTL(!Props.HideTopRTL);
         }
     }
-
-
-    /*switch(Type)
-    {
-        case c_oAscMathMenuTypes.BorderBoxHideTop:
-        {
-            History.Add(this, new CChangesMathBorderBoxTop(!this.Pr.hideTop, this.Pr.hideTop));
-            this.raw_SetTop(!this.Pr.hideTop);
-            break;
-        }
-        case c_oAscMathMenuTypes.BorderBoxHideBot:
-        {
-            History.Add(this, new CChangesMathBorderBoxBot(!this.Pr.hideBot, this.Pr.hideBot));
-            this.raw_SetBot(!this.Pr.hideBot);
-            break;
-        }
-        case c_oAscMathMenuTypes.BorderBoxHideLeft:
-        {
-            History.Add(this, new CChangesMathBorderBoxLeft(!this.Pr.hideLeft, this.Pr.hideLeft));
-            this.raw_SetLeft(!this.Pr.hideLeft);
-            break;
-        }
-        case c_oAscMathMenuTypes.BorderBoxHideRight:
-        {
-            History.Add(this, new CChangesMathBorderBoxRight(!this.Pr.hideRight, this.Pr.hideRight));
-            this.raw_SetRight(!this.Pr.hideRight);
-            break;
-        }
-        case c_oAscMathMenuTypes.BorderBoxStrikeHor:
-        {
-            History.Add(this, new CChangesMathBorderBoxHor(!this.Pr.strikeH, this.Pr.strikeH));
-            this.raw_SetHor(!this.Pr.strikeH);
-            break;
-        }
-        case c_oAscMathMenuTypes.BorderBoxStrikeVer:
-        {
-            History.Add(this, new CChangesMathBorderBoxVer(!this.Pr.strikeV, this.Pr.strikeV));
-            this.raw_SetVer(!this.Pr.strikeV);
-            break;
-        }
-        case c_oAscMathMenuTypes.BorderBoxStrikeTopLTR:
-        {
-            History.Add(this, new CChangesMathBorderBoxTopLTR(!this.Pr.strikeTLBR, this.Pr.strikeTLBR));
-            this.raw_SetTopLTR(!this.Pr.strikeTLBR);
-            break;
-        }
-        case c_oAscMathMenuTypes.BorderBoxStrikeTopRTL:
-        {
-            History.Add(this, new CChangesMathBorderBoxTopRTL(!this.Pr.strikeBLTR, this.Pr.strikeBLTR));
-            this.raw_SetTopRTL(!this.Pr.strikeBLTR);
-            break;
-        }
-
-    }*/
 };
 CBorderBox.prototype.raw_SetTop = function(Value)
 {
@@ -995,17 +941,6 @@ CBar.prototype.Apply_MenuProps = function(Props)
             this.raw_SetLinePos(Pos);
         }
     }
-
-    /*if(Type == c_oAscMathMenuTypes.BarLineOver && this.Pr.pos == LOCATION_BOT)
-    {
-        History.Add(this, new CChangesMathBarLinePos(LOCATION_TOP, this.Pr.pos));
-        this.raw_SetLinePos(LOCATION_TOP);
-    }
-    else if(Type == c_oAscMathMenuTypes.BarLineUnder && this.Pr.pos == LOCATION_TOP)
-    {
-        History.Add(this, new CChangesMathBarLinePos(LOCATION_BOT, this.Pr.pos));
-        this.raw_SetLinePos(LOCATION_BOT);
-    }*/
 };
 CBar.prototype.Get_InterfaceProps = function()
 {
@@ -1016,10 +951,6 @@ CBar.prototype.raw_SetLinePos = function(Value)
     this.Pr.pos = Value;
     this.RecalcInfo.bProps = true;
     this.ApplyProperties();
-};
-CBar.prototype.Is_SimpleDelete = function()
-{
-    return true;
 };
 
 /**

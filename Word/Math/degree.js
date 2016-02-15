@@ -499,10 +499,6 @@ CDegree.prototype.setPosition = function(pos, PosInfo)
         CMathBase.prototype.setPosition.call(this, pos, PosInfo);
     }
 };
-CDegree.prototype.Is_SimpleDelete = function()
-{
-    return true;
-};
 CDegree.prototype.Get_InterfaceProps = function()
 {
     var Type = this.Pr.type == DEGREE_SUBSCRIPT ? c_oAscMathInterfaceScript.Sub : c_oAscMathInterfaceScript.Sup;
@@ -1120,10 +1116,6 @@ CDegreeSubSup.prototype.protected_GetRangeEndPos = function(CurLine, CurRange)
     var _CurRange = ( 0 === CurLine ? CurRange + this.StartRange : CurRange );
 
     return this.Need_Iters(_CurLine, _CurRange) ? 2 : 0;
-};
-CDegreeSubSup.prototype.Is_SimpleDelete = function()
-{
-    return true;
 };
 CDegreeSubSup.prototype.Get_InterfaceProps = function()
 {

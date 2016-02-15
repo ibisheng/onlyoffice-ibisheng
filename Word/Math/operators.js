@@ -3858,148 +3858,6 @@ CDelimiter.prototype.Apply_MenuProps = function(Props)
         }
     }
 };
-CDelimiter.prototype.old_Apply_MenuProps = function(Type)
-{
-    var bSymmetricDiff, bSymmetricDiffTwo;
-
-    switch(Type)
-    {
-        case c_oAscMathMenuTypes.DelimiterHideBegOper:
-        {
-            var NewBegCode;
-
-            if(false == this.begOper.Is_Empty())
-            {
-                NewBegCode = -1;
-            }
-            else if(true == this.endOper.Is_Empty())
-            {
-                NewBegCode = 0x28; // PARENTHESIS_LEFT
-            }
-            else
-            {
-                var TypeEndOper = this.endOper.Get_Type();
-
-                bSymmetricDiffTwo = TypeEndOper == BRACKET_CURLY_RIGHT || TypeEndOper == BRACKET_SQUARE_RIGHT;
-                bSymmetricDiff    = TypeEndOper == PARENTHESIS_RIGHT || TypeEndOper == BRACKET_ANGLE_RIGHT || TypeEndOper == HALF_SQUARE_RIGHT || TypeEndOper == HALF_SQUARE_RIGHT_UPPER || TypeEndOper == WHITE_SQUARE_RIGHT;
-
-                var EndCodeChr = this.endOper.Get_CodeChr();
-
-                if(bSymmetricDiff)
-                {
-                    NewBegCode = EndCodeChr - 1;
-                }
-                else if(bSymmetricDiffTwo)
-                {
-                    NewBegCode = EndCodeChr - 2;
-                }
-                else
-                {
-                    NewBegCode = EndCodeChr;
-                }
-            }
-
-            History.Add(this, new CChangesMathDelimBegOper(NewBegCode, this.Pr.begChr));
-            this.raw_HideBegOperator(NewBegCode);
-
-            break;
-        }
-        case c_oAscMathMenuTypes.DelimiterHideEndOper:
-        {
-            var NewEndCode;
-
-            if(false == this.endOper.Is_Empty())
-            {
-                NewEndCode = -1;
-            }
-            else if(true == this.begOper.Is_Empty())
-            {
-                NewEndCode = 0x29; // PARENTHESIS_RIGHT
-            }
-            else
-            {
-                var TypeBegOper = this.begOper.Get_Type();
-
-                bSymmetricDiffTwo = TypeBegOper == BRACKET_CURLY_LEFT || TypeBegOper == BRACKET_SQUARE_LEFT;
-                bSymmetricDiff    = TypeBegOper == PARENTHESIS_LEFT || TypeBegOper == BRACKET_ANGLE_LEFT || TypeBegOper == HALF_SQUARE_LEFT || TypeBegOper == HALF_SQUARE_LEFT_UPPER || TypeBegOper == WHITE_SQUARE_LEFT;
-
-                var BegCodeChr = this.begOper.Get_CodeChr();
-
-                if(bSymmetricDiff)
-                {
-                    NewEndCode = BegCodeChr + 1;
-                }
-                else if(bSymmetricDiffTwo)
-                {
-                    NewEndCode = BegCodeChr + 2;
-                }
-                else
-                {
-                    NewEndCode = BegCodeChr;
-                }
-            }
-
-            History.Add(this, new CChangesMathDelimEndOper(NewEndCode, this.Pr.endChr));
-            this.raw_HideEndOperator(NewEndCode);
-
-            break;
-        }
-        case c_oAscMathMenuTypes.DelimiterAddToLeft:
-        {
-            History.Add(this, new CChangesMathBaseSetColumn(this.Pr.column + 1, this.Pr.column));
-            this.raw_SetColumn(this.Pr.column + 1);
-
-            var NewContent = new CMathContent();
-            NewContent.Correct_Content(true);
-            this.protected_AddToContent(this.CurPos, [NewContent], true);
-
-            break;
-        }
-        case c_oAscMathMenuTypes.DelimiterAddToRight:
-        {
-            History.Add(this, new CChangesMathBaseSetColumn(this.Pr.column + 1, this.Pr.column));
-            this.raw_SetColumn(this.Pr.column + 1);
-
-            var NewContent = new CMathContent();
-            NewContent.Correct_Content(true);
-            this.protected_AddToContent(this.CurPos + 1, [NewContent], true);
-            break;
-        }
-        case c_oAscMathMenuTypes.DelimiterRemoveContent:
-        {
-            if(this.Pr.column > 1)
-            {
-                History.Add(this, new CChangesMathBaseSetColumn(this.Pr.column - 1, this.Pr.column));
-                this.raw_SetColumn(this.Pr.column - 1);
-
-                this.protected_RemoveItems(this.CurPos, [ this.Content[this.CurPos] ], true);
-            }
-
-            break;
-        }
-        case c_oAscMathMenuTypes.DelimiterGrow:
-        {
-            History.Add(this, new CChangesMathDelimiterGrow(!this.Pr.grow,this.Pr.grow));
-            this.raw_SetGrow(!this.Pr.grow);
-            break;
-        }
-        case c_oAscMathMenuTypes.DelimiterShpCentred:
-        {
-            if(this.Pr.grow == true)
-            {
-                var NewShp;
-                if(this.Pr.shp == DELIMITER_SHAPE_MATH)
-                    NewShp = DELIMITER_SHAPE_CENTERED;
-                else
-                    NewShp = DELIMITER_SHAPE_MATH;
-
-                History.Add(this, new CChangesMathDelimiterShape(NewShp, this.Pr.shp));
-                this.raw_SetShape(NewShp);
-            }
-            break;
-        }
-    }
-};
 CDelimiter.prototype.Get_InterfaceProps = function()
 {
     return new CMathMenuDelimiter(this);
@@ -4047,9 +3905,32 @@ CDelimiter.prototype.raw_HideEndOperator = function(Value)
     this.RecalcInfo.bProps = true;
     this.ApplyProperties();
 };
-CDelimiter.prototype.Is_SimpleDelete = function()
+CDelimiter.prototype.Get_DeletedItemsThroughInterface = function()
 {
-    return false;
+    var DeletedItems = null;
+
+    if(this.Content.length > 0)
+    {
+        DeletedItems = this.Content[0].Content;
+
+        for(var Pos = 1; Pos < this.Content.length; Pos++)
+        {
+            var NewSpace = new CMathText(false);
+            NewSpace.add(0x20);
+
+            var CtrPrp = this.Get_CtrPrp();
+            var NewRun = new ParaRun(this.ParaMath.Paragraph, true);
+            NewRun.Apply_Pr(CtrPrp);
+            NewRun.Concat_ToContent( [NewSpace] );
+
+            DeletedItems = DeletedItems.concat(NewRun);
+
+            var Items = this.Content[Pos].Content;
+            DeletedItems = DeletedItems.concat(Items);
+        }
+    }
+
+    return DeletedItems;
 };
 CDelimiter.prototype.GetLastElement = function()
 {
@@ -4533,21 +4414,6 @@ CGroupCharacter.prototype.Apply_MenuProps = function(Props)
                 this.private_InversePr();
         }
     }
-};
-CGroupCharacter.prototype.old_Apply_MenuProps = function(Type)
-{
-    if(Type == c_oAscMathMenuTypes.GroupCharOver && this.Pr.pos == LOCATION_BOT)
-    {
-        this.private_InversePr();
-    }
-    else if(Type == c_oAscMathMenuTypes.GroupCharUnder && this.Pr.pos == LOCATION_TOP)
-    {
-        this.private_InversePr();
-    }
-};
-CGroupCharacter.prototype.Is_SimpleDelete = function()
-{
-    return true;
 };
 CGroupCharacter.prototype.private_GetInversePr = function(Pr)
 {

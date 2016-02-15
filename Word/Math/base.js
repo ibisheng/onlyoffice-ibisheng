@@ -2643,33 +2643,8 @@ CMathBase.prototype.Apply_MenuProps = function()
 {};
 CMathBase.prototype.Get_DeletedItemsThroughInterface = function()
 {
-    var DeletedItems = null;
-
-    if(true == this.Is_SimpleDelete())
-    {
-        var baseContent = this.getBase();
-        DeletedItems =  baseContent !==  null ? baseContent.Content : null;
-    }
-    else if(this.Content.length > 0)
-    {
-        DeletedItems = this.Content[0].Content;
-
-        for(var Pos = 1; Pos < this.Content.length; Pos++)
-        {
-            var NewSpace = new CMathText(false);
-            NewSpace.add(0x20);
-
-            var CtrPrp = this.Get_CtrPrp();
-            var NewRun = new ParaRun(this.ParaMath.Paragraph, true);
-            NewRun.Apply_Pr(CtrPrp);
-            NewRun.Concat_ToContent( [NewSpace] );
-
-            DeletedItems = DeletedItems.concat(NewRun);
-
-            var Items = this.Content[Pos].Content;
-            DeletedItems = DeletedItems.concat(Items);
-        }
-    }
+    var baseContent  = this.getBase();
+    var DeletedItems =  baseContent !==  null ? baseContent.Content : null;
 
     return DeletedItems;
 };
@@ -3046,8 +3021,7 @@ var c_oMathMenuAction = {
     AlignToCharacter        : 0x00008000,
     RemoveDelimiter         : 0x00010000,
     RemoveGroupChar         : 0x00020000,
-    RemoveRadical           : 0x00040000,
-    RemoveBox               : 0x00080000
+    RemoveRadical           : 0x00040000
 
 };
 
@@ -3180,10 +3154,6 @@ CMathMenuBase.prototype.remove_GroupCharacter = function()
 CMathMenuBase.prototype.remove_Radical = function()
 {
     this.Action |= c_oMathMenuAction.RemoveRadical;
-};
-CMathMenuBase.prototype.remove_Box = function()
-{
-    this.Action |= c_oMathMenuAction.RemoveBox;
 };
 
 window["CMathMenuBase"]                             = CMathMenuBase;

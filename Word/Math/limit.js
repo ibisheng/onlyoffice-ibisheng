@@ -256,21 +256,11 @@ CLimit.prototype.Apply_MenuProps = function(Props)
         var Type = Props.Pos == c_oAscMathInterfaceLimitPos.Bottom ? LIMIT_LOW : LIMIT_UP;
 
         if(this.Pr.type !== Type)
-    {
-        History.Add(this, new CChangesMathLimitType(Type, this.Pr.type));
-        this.raw_SetType(Type);
+        {
+            History.Add(this, new CChangesMathLimitType(Type, this.Pr.type));
+            this.raw_SetType(Type);
+        }
     }
-    }
-    /*if(Type == c_oAscMathMenuTypes.LimitOver && this.Pr.type == LIMIT_LOW)
-    {
-        History.Add(this, new CChangesMathLimitType(LIMIT_UP, this.Pr.type));
-        this.raw_SetType(LIMIT_UP);
-    }
-    else if(Type == c_oAscMathMenuTypes.LimitUnder && this.Pr.type == LIMIT_UP)
-    {
-        History.Add(this, new CChangesMathLimitType(LIMIT_LOW, this.Pr.type));
-        this.raw_SetType(LIMIT_LOW);
-    }*/
 };
 CLimit.prototype.Get_InterfaceProps = function()
 {
@@ -284,10 +274,6 @@ CLimit.prototype.raw_SetType = function(Value)
         this.RecalcInfo.bProps = true;
         this.ApplyProperties();
     }
-};
-CLimit.prototype.Is_SimpleDelete = function()
-{
-    return true;
 };
 CLimit.prototype.Can_ModifyArgSize = function()
 {

@@ -462,7 +462,7 @@ CNary.prototype.Apply_MenuProps = function(Props)
 {
     if(Props.Type == c_oAscMathInterfaceType.LargeOperator)
     {
-        if(Props.LimLoc !== undefined && false == this.Is_Inline() && this.Pr.limLoc !== Props.LimLoc)
+        if(Props.LimLoc !== undefined && false == this.ParaMath.Is_Inline() && this.Pr.limLoc !== Props.LimLoc)
         {
             var LimLoc = Props.LimLoc == c_oAscMathInterfaceNaryLimitLocation.SubSup ? NARY_SubSup : NARY_UndOvr;
             History.Add(this, new CChangesMathNaryLimLoc(LimLoc, this.Pr.limLoc));
@@ -480,25 +480,6 @@ CNary.prototype.Apply_MenuProps = function(Props)
             History.Add(this, new CChangesMathNaryLowerLimit(!this.Pr.subHide, this.Pr.subHide));
             this.raw_HideLowerIterator(!this.Pr.subHide);
         }
-    }
-};
-CNary.prototype.old_Apply_MenuProps = function(Type)
-{
-    if(Type == c_oAscMathMenuTypes.NaryLimLoc)
-    {
-        var NewLimLoc = this.private_GetLimLoc() == NARY_SubSup ? NARY_UndOvr : NARY_SubSup;
-        History.Add(this, new CChangesMathNaryLimLoc(NewLimLoc, this.Pr.limLoc));
-        this.raw_SetLimLoc(NewLimLoc);
-    }
-    else if(Type == c_oAscMathMenuTypes.NaryHideUpperIterator)
-    {
-        History.Add(this, new CChangesMathNaryUpperLimit(!this.Pr.supHide, this.Pr.supHide));
-        this.raw_HideUpperIterator(!this.Pr.supHide);
-    }
-    else if(Type == c_oAscMathMenuTypes.NaryHideLowerIterator)
-    {
-        History.Add(this, new CChangesMathNaryLowerLimit(!this.Pr.subHide, this.Pr.subHide));
-        this.raw_HideLowerIterator(!this.Pr.subHide);
     }
 };
 CNary.prototype.Get_InterfaceProps = function()
@@ -848,7 +829,7 @@ function CMathMenuNary(Nary)
         if (true === Nary.LowerIterator.IsPlaceholder())
             HideLower = Nary.Pr.supHide == true;
 
-        this.bCanChangeLimLoc = false == Nary.Is_Inline();
+        this.bCanChangeLimLoc = false == Nary.ParaMath.Is_Inline();
         this.LimLoc           = Nary.Pr.limLoc === NARY_SubSup ? c_oAscMathInterfaceNaryLimitLocation.SubSup : c_oAscMathInterfaceNaryLimitLocation.UndOvr;
         this.HideUpper        = HideUpper;
         this.HideLower        = HideLower;

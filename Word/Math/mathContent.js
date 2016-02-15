@@ -4808,22 +4808,6 @@ CMathContent.prototype.Delete_ItemToContentThroughInterface = function(Props, Po
     var bDelete = false;
     var Item = this.Content[Pos];
 
-    /*var RemoveSubScript   = Props.Action & c_oMathMenuAction.RemoveSubScript,
-        RemoveSuperScript = Props.Action & c_oMathMenuAction.RemoveSuperScript;
-
-
-    if(RemoveSubScript && Item.kind == MATH_DEGREESubSup && Item.Pr.type == DEGREE_SubSup)
-    {
-        this.private_AddModifiedDegree(Pos, DEGREE_SUPERSCRIPT);
-        bDelete = true;
-    }
-    else if(RemoveSuperScript && Item.kind == MATH_DEGREESubSup && Item.Pr.type == DEGREE_SubSup)
-    {
-        this.private_AddModifiedDegree(Pos, DEGREE_SUBSCRIPT);
-        bDelete = true;
-    }*/
-
-
     if(Item.kind == MATH_DEGREESubSup && Item.Pr.type == DEGREE_SubSup && Props.Type == c_oAscMathInterfaceType.Script)
     {
         if(Props.ScriptType == c_oAscMathInterfaceScript.Sup)
@@ -4844,17 +4828,12 @@ CMathContent.prototype.Delete_ItemToContentThroughInterface = function(Props, Po
         RemoveLimit     = Props.Type == c_oAscMathInterfaceType.Limit && Props.Pos == c_oAscMathInterfaceLimitPos.None && Item.kind === MATH_LIMIT,
         RemoveMatrix    = Props.Type == c_oAscMathInterfaceType.Matrix && this.Content[Pos].Is_DeletedItem(Props.Action),
         RemoveEqArray   = Props.Type == c_oAscMathInterfaceType.EqArray && this.Content[Pos].Is_DeletedItem(Props.Action),
-        //RemovePreSubSup = Props.Action & c_oMathMenuAction.RemoveScript && Item.kind == MATH_DEGREESubSup && Item.Pr.type == DEGREE_PreSubSup,
-        //RemoveDegree   = Props.Action & c_oMathMenuAction.RemoveScript && Item.kind == MATH_DEGREE,
-        //RemoveLimit     = Props.Action & c_oMathMenuAction.RemoveLimit && Item.kind == MATH_LIMIT,
-        //RemoveEqArray   = Props.Action & c_oMathMenuAction.RemoveEqArray && Item.kind == MATH_EQ_ARRAY,
         RemoveDelimiter = Props.Action & c_oMathMenuAction.RemoveDelimiter && Item.kind == MATH_DELIMITER,
         RemoveGroupChar = Props.Action & c_oMathMenuAction.RemoveGroupChar && Item.kind == MATH_GROUP_CHARACTER,
-        RemoveRadical   = Props.Action & c_oMathMenuAction.RemoveRadical && Item.kind == MATH_RADICAL,
-        RemoveBox       = Props.Action & c_oMathMenuAction.RemoveBox && Item.kind == MATH_BOX;
+        RemoveRadical   = Props.Action & c_oMathMenuAction.RemoveRadical && Item.kind == MATH_RADICAL;
 
 
-    if(RemoveChar || RemoveBar || RemoveScript || RemoveLimit || RemoveMatrix || RemoveEqArray || RemoveDelimiter || RemoveGroupChar || RemoveRadical || RemoveBox)
+    if(RemoveChar || RemoveBar || RemoveScript || RemoveLimit || RemoveMatrix || RemoveEqArray || RemoveDelimiter || RemoveGroupChar || RemoveRadical)
     {
         var Items = this.Content[Pos].Get_DeletedItemsThroughInterface();
 

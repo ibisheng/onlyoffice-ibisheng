@@ -1750,81 +1750,9 @@ CEqArray.prototype.Apply_MenuProps = function(Props)
     }
 
 };
-CEqArray.prototype.old_Apply_MenuProps = function(Type, Gap)
-{
-    switch(Type)
-    {
-        case c_oAscMathMenuTypes.EqArrayAddRowUnder:
-        {
-            this.Add_Row(this.CurPos + 1);
-            break;
-        }
-        case c_oAscMathMenuTypes.EqArrayAddRowOver:
-        {
-            this.Add_Row(this.CurPos);
-            break;
-        }
-        case c_oAscMathMenuTypes.EqArrayRemoveRow:
-        {
-            if(this.getRowsCount() > 1)
-                this.Remove_Row(this.CurPos);
-            break;
-        }
-        case c_oAscMathMenuTypes.EqArrayBaseJcCenter:
-        {
-            this.SetBaseJc(BASEJC_CENTER);
-            break;
-        }
-        case c_oAscMathMenuTypes.EqArrayBaseJcTop:
-        {
-            this.SetBaseJc(BASEJC_TOP);
-            break;
-        }
-        case c_oAscMathMenuTypes.EqArrayBaseJcBottom:
-        {
-            this.SetBaseJc(BASEJC_BOTTOM);
-            break;
-        }
-        case c_oAscMathMenuTypes.EqArrayRowSingleGap:
-        {
-            this.Modify_Interval(this.SpaceRow, 0, 0);
-            break;
-        }
-        case c_oAscMathMenuTypes.EqArrayRowOneAndHalfGap:
-        {
-            this.Modify_Interval(this.SpaceRow, 1, 0);
-            break;
-        }
-        case c_oAscMathMenuTypes.EqArrayRowDoubleGap:
-        {
-            this.Modify_Interval(this.SpaceRow, 2, 0);
-            break;
-        }
-        case c_oAscMathMenuTypes.EqArrayRowExactlyGap:
-        {
-            if(Gap >= 0 && Gap <= 31680)
-            {
-                this.Modify_Interval(this.SpaceRow, 3, Gap);
-            }
-            break;
-        }
-        case c_oAscMathMenuTypes.EqArrayRowMultipleGap:
-        {
-            if(Gap >= 0 && Gap <= 111)
-            {
-                this.Modify_Interval(this.SpaceRow, 4, Gap);
-            }
-            break;
-        }
-    }
-};
 CEqArray.prototype.Get_InterfaceProps = function()
 {
     return new CMathMenuEqArray(this);
-};
-CEqArray.prototype.Is_SimpleDelete = function()
-{
-    return false;
 };
 CEqArray.prototype.Is_DeletedItem = function(Action)
 {
