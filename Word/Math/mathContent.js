@@ -4775,23 +4775,9 @@ CMathContent.prototype.Set_MenuProps = function(Props)
 };
 CMathContent.prototype.Apply_MenuProps = function(Props)
 {
-
-};
-CMathContent.prototype.old_Apply_MenuProps = function(Type, Data)
-{
     var ArgSize, NewArgSize;
-    if(Type == c_oAscMathMenuTypes.DecreaseArgSize)
-    {
-        if(true === this.Parent.Can_ModifyArgSize() && true == this.Compiled_ArgSz.Can_Decrease() && true == this.ArgSize.Can_Decrease())
-        {
-            ArgSize = this.ArgSize.GetValue();
-            NewArgSize = this.ArgSize.Decrease();
 
-            History.Add( this, { Type : historyitem_Math_ArgSize, New: NewArgSize, Old: ArgSize});
-            this.Recalc_RunsCompiledPr();
-        }
-    }
-    else if(Type == c_oAscMathMenuTypes.IncreaseArgSize)
+    if(Props.Action & c_oMathMenuAction.IncreaseArgumentSize)
     {
         if(true === this.Parent.Can_ModifyArgSize() && true == this.Compiled_ArgSz.Can_Increase() && true == this.ArgSize.Can_SimpleIncrease())
         {
@@ -4800,6 +4786,19 @@ CMathContent.prototype.old_Apply_MenuProps = function(Type, Data)
 
             History.Add( this, { Type : historyitem_Math_ArgSize, New: NewArgSize, Old: ArgSize});
             this.Recalc_RunsCompiledPr();
+        }
+    }
+
+    if(Props.Action & c_oMathMenuAction.DecreaseArgumentSize)
+    {
+        if(true === this.Parent.Can_ModifyArgSize() && true == this.Compiled_ArgSz.Can_Decrease() && true == this.ArgSize.Can_Decrease())
+        {
+            ArgSize = this.ArgSize.GetValue();
+            NewArgSize = this.ArgSize.Decrease();
+
+            History.Add( this, { Type : historyitem_Math_ArgSize, New: NewArgSize, Old: ArgSize});
+            this.Recalc_RunsCompiledPr();
+
         }
     }
 };

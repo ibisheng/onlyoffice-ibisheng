@@ -288,7 +288,7 @@ CLimit.prototype.Can_ModifyArgSize = function()
  */
 function CMathMenuLimit(Limit)
 {
-    CMathMenuLimit.superclass.constructor.call(this);
+    CMathMenuLimit.superclass.constructor.call(this, Limit);
 
     this.Type = c_oAscMathInterfaceType.Limit;
 
