@@ -836,9 +836,10 @@ function CMathMenuNary(Nary)
     }
     else
     {
-        this.LimLoc    = undefined;
-        this.HideUpper = undefined;
-        this.HideLower = undefined;
+        this.LimLoc    			= undefined;
+        this.HideUpper 			= undefined;
+        this.HideLower 			= undefined;
+        this.bCanChangeLimLoc 	= false;
     }
 }
 Asc.extendClass(CMathMenuNary, CMathMenuBase);

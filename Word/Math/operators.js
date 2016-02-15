@@ -4055,17 +4055,19 @@ function CMathMenuDelimiter(Delimiter)
 
     if (Delimiter)
     {
-        this.HideBegOper  = Delimiter.begOper.Is_Empty();
-        this.HideEndOper  = Delimiter.endOper.Is_Empty();
-        this.Grow         = Delimiter.Pr.grow;
-        this.ShapeCentred = (Delimiter.Pr.shp !== DELIMITER_SHAPE_MATH ? true : false);
+        this.HideBegOper        = Delimiter.begOper.Is_Empty();
+        this.HideEndOper        = Delimiter.endOper.Is_Empty();
+        this.Grow               = Delimiter.Pr.grow;
+        this.ShapeCentred       = (Delimiter.Pr.shp !== DELIMITER_SHAPE_MATH ? true : false);
+        this.bCanDeleteArgument = Delimiter.Pr.column > 1;
     }
     else
     {
-        this.HideBegOper  = undefined;
-        this.HideEndOper  = undefined;
-        this.Grow         = undefined;
-        this.ShapeCentred = undefined;
+        this.HideBegOper        = undefined;
+        this.HideEndOper        = undefined;
+        this.Grow               = undefined;
+        this.ShapeCentred       = undefined;
+        this.bCanDeleteArgument = false;
     }
 }
 Asc.extendClass(CMathMenuDelimiter, CMathMenuBase);
@@ -4077,16 +4079,18 @@ CMathMenuDelimiter.prototype.get_StretchBrackets    = function(){return this.Gro
 CMathMenuDelimiter.prototype.put_StretchBrackets    = function(Stretch){this.Grow = Stretch;};
 CMathMenuDelimiter.prototype.get_MatchBrackets      = function(){return this.ShapeCentred;};
 CMathMenuDelimiter.prototype.put_MatchBrackets      = function(Match){this.ShapeCentred = Match;};
+CMathMenuDelimiter.prototype.can_DeleteArgument     = function(){return this.bCanDeleteArgument;};
 
 window["CMathMenuDelimiter"] = CMathMenuDelimiter;
 CMathMenuDelimiter.prototype["get_HideOpeningBracket"] = CMathMenuDelimiter.prototype.get_HideOpeningBracket;
 CMathMenuDelimiter.prototype["put_HideOpeningBracket"] = CMathMenuDelimiter.prototype.put_HideOpeningBracket;
 CMathMenuDelimiter.prototype["get_HideClosingBracket"] = CMathMenuDelimiter.prototype.get_HideClosingBracket;
 CMathMenuDelimiter.prototype["put_HideClosingBracket"] = CMathMenuDelimiter.prototype.put_HideClosingBracket;
-CMathMenuDelimiter.prototype["get_StretchBrackets"]    = CMathMenuDelimiter.prototype.get_StretchBrackets   ;
-CMathMenuDelimiter.prototype["put_StretchBrackets"]    = CMathMenuDelimiter.prototype.put_StretchBrackets   ;
-CMathMenuDelimiter.prototype["get_MatchBrackets"]      = CMathMenuDelimiter.prototype.get_MatchBrackets     ;
-CMathMenuDelimiter.prototype["put_MatchBrackets"]      = CMathMenuDelimiter.prototype.put_MatchBrackets     ;
+CMathMenuDelimiter.prototype["get_StretchBrackets"]    = CMathMenuDelimiter.prototype.get_StretchBrackets;
+CMathMenuDelimiter.prototype["put_StretchBrackets"]    = CMathMenuDelimiter.prototype.put_StretchBrackets;
+CMathMenuDelimiter.prototype["get_MatchBrackets"]      = CMathMenuDelimiter.prototype.get_MatchBrackets;
+CMathMenuDelimiter.prototype["put_MatchBrackets"]      = CMathMenuDelimiter.prototype.put_MatchBrackets;
+CMathMenuDelimiter.prototype["can_DeleteArgument"]     = CMathMenuDelimiter.prototype.can_DeleteArgument;
 
 /**
  *
