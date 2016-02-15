@@ -1730,6 +1730,23 @@ CEqArray.prototype.Apply_MenuProps = function(Props)
                 }
             }
         }
+
+        if(Props.Action & c_oMathMenuAction.DeleteEquation && this.getRowsCount() > 1)
+        {
+            this.Remove_Row(this.CurPos);
+        }
+
+        if(Props.Action & c_oMathMenuAction.InsertEquation)
+        {
+            if(Props.Action & c_oMathMenuAction.InsertBefore)
+            {
+                this.Add_Row(this.CurPos);
+            }
+            else
+            {
+                this.Add_Row(this.CurPos + 1);
+            }
+        }
     }
 
 };
@@ -1750,7 +1767,7 @@ CEqArray.prototype.old_Apply_MenuProps = function(Type, Gap)
         case c_oAscMathMenuTypes.EqArrayRemoveRow:
         {
             if(this.getRowsCount() > 1)
-            this.Remove_Row(this.CurPos);
+                this.Remove_Row(this.CurPos);
             break;
         }
         case c_oAscMathMenuTypes.EqArrayBaseJcCenter:
@@ -1809,9 +1826,9 @@ CEqArray.prototype.Is_SimpleDelete = function()
 {
     return false;
 };
-CEqArray.prototype.Is_DeletedItem = function(Type)
+CEqArray.prototype.Is_DeletedItem = function(Action)
 {
-    return c_oAscMathMenuTypes.EqArrayRemoveRow == Type && 1 == this.getRowsCount();
+    return Action & c_oMathMenuAction.DeleteEquation && 1 == this.getRowsCount();
 };
 CEqArray.prototype.Get_DeletedItemsThroughInterface = function()
 {

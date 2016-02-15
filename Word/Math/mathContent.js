@@ -4843,6 +4843,7 @@ CMathContent.prototype.Delete_ItemToContentThroughInterface = function(Props, Po
         RemoveScript    = Props.Type == c_oAscMathInterfaceType.Script && Props.ScriptType == c_oAscMathInterfaceScript.None && (Item.kind == MATH_DEGREESubSup || Item.kind == MATH_DEGREE),
         RemoveLimit     = Props.Type == c_oAscMathInterfaceType.Limit && Props.Pos == c_oAscMathInterfaceLimitPos.None && Item.kind === MATH_LIMIT,
         RemoveMatrix    = Props.Type == c_oAscMathInterfaceType.Matrix && this.Content[Pos].Is_DeletedItem(Props.Action),
+        RemoveEqArray   = Props.Type == c_oAscMathInterfaceType.EqArray && this.Content[Pos].Is_DeletedItem(Props.Action),
         //RemovePreSubSup = Props.Action & c_oMathMenuAction.RemoveScript && Item.kind == MATH_DEGREESubSup && Item.Pr.type == DEGREE_PreSubSup,
         //RemoveDegree   = Props.Action & c_oMathMenuAction.RemoveScript && Item.kind == MATH_DEGREE,
         //RemoveLimit     = Props.Action & c_oMathMenuAction.RemoveLimit && Item.kind == MATH_LIMIT,
@@ -4853,7 +4854,7 @@ CMathContent.prototype.Delete_ItemToContentThroughInterface = function(Props, Po
         RemoveBox       = Props.Action & c_oMathMenuAction.RemoveBox && Item.kind == MATH_BOX;
 
 
-    if(RemoveChar || RemoveBar || RemoveScript || RemoveLimit || RemoveMatrix || RemoveDelimiter || RemoveGroupChar || RemoveRadical || RemoveBox)
+    if(RemoveChar || RemoveBar || RemoveScript || RemoveLimit || RemoveMatrix || RemoveEqArray || RemoveDelimiter || RemoveGroupChar || RemoveRadical || RemoveBox)
     {
         var Items = this.Content[Pos].Get_DeletedItemsThroughInterface();
 
