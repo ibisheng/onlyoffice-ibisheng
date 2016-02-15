@@ -3143,7 +3143,7 @@ CMathMenuBase.prototype.align_ToCharacter = function()
 {
     this.Action |= c_oMathMenuAction.AlignToCharacter;
 };
-CMathMenuBase.prototype.remove_Delimiter = function()
+CMathMenuBase.prototype.remove_DelimiterCharacters = function()
 {
     this.Action |= c_oMathMenuAction.RemoveDelimiter;
 };
@@ -3156,29 +3156,29 @@ CMathMenuBase.prototype.remove_Radical = function()
     this.Action |= c_oMathMenuAction.RemoveRadical;
 };
 
-window["CMathMenuBase"]                             = CMathMenuBase;
-CMathMenuBase.prototype["get_Type"]                 = CMathMenuBase.prototype.get_Type;
-CMathMenuBase.prototype["remove_AccentCharacter"]   = CMathMenuBase.prototype.remove_AccentCharacter;
-CMathMenuBase.prototype["remove_Bar"]               = CMathMenuBase.prototype.remove_Bar;
-CMathMenuBase.prototype["insert_MatrixRow"]         = CMathMenuBase.prototype.insert_MatrixRow;
-CMathMenuBase.prototype["insert_MatrixColumn"]      = CMathMenuBase.prototype.insert_MatrixColumn;
-CMathMenuBase.prototype["delete_MatrixRow"]         = CMathMenuBase.prototype.delete_MatrixRow;
-CMathMenuBase.prototype["delete_MatrixColumn"]      = CMathMenuBase.prototype.delete_MatrixColumn;
-CMathMenuBase.prototype["insert_Equation"]          = CMathMenuBase.prototype.insert_Equation;
-CMathMenuBase.prototype["delete_Equation"]          = CMathMenuBase.prototype.delete_Equation;
-CMathMenuBase.prototype["insert_DelimiterArgument"] = CMathMenuBase.prototype.insert_DelimiterArgument;
-CMathMenuBase.prototype["delete_DelimiterArgument"] = CMathMenuBase.prototype.delete_DelimiterArgument;
-CMathMenuBase.prototype["can_IncreaseArgumentSize"] = CMathMenuBase.prototype.can_IncreaseArgumentSize;
-CMathMenuBase.prototype["can_DecreaseArgumentSize"] = CMathMenuBase.prototype.can_DecreaseArgumentSize;
-CMathMenuBase.prototype["increase_ArgumentSize"]    = CMathMenuBase.prototype.increase_ArgumentSize;
-CMathMenuBase.prototype["decrease_ArgumentSize"]    = CMathMenuBase.prototype.decrease_ArgumentSize;
-CMathMenuBase.prototype["can_InsertManualBreak"]    = CMathMenuBase.prototype.can_InsertManualBreak;
-CMathMenuBase.prototype["insert_ManualBreak"]       = CMathMenuBase.prototype.insert_ManualBreak;
-CMathMenuBase.prototype["can_DeleteManualBreak"]    = CMathMenuBase.prototype.can_DeleteManualBreak;
-CMathMenuBase.prototype["delete_ManualBreak"]       = CMathMenuBase.prototype.delete_ManualBreak;
-CMathMenuBase.prototype["can_AlignToCharacter"]     = CMathMenuBase.prototype.can_AlignToCharacter;
-CMathMenuBase.prototype["align_ToCharacter"]        = CMathMenuBase.prototype.align_ToCharacter;
-CMathMenuBase.prototype["remove_Delimiter"]         = CMathMenuBase.prototype.remove_Delimiter;
-CMathMenuBase.prototype["remove_GroupCharacter"]    = CMathMenuBase.prototype.remove_GroupCharacter;
-CMathMenuBase.prototype["remove_Radical"]           = CMathMenuBase.prototype.remove_Radical;
-CMathMenuBase.prototype["remove_Box"]               = CMathMenuBase.prototype.remove_Box;
+window["CMathMenuBase"]                                = CMathMenuBase;
+CMathMenuBase.prototype["get_Type"]                    = CMathMenuBase.prototype.get_Type;
+CMathMenuBase.prototype["remove_AccentCharacter"]      = CMathMenuBase.prototype.remove_AccentCharacter;
+CMathMenuBase.prototype["remove_Bar"]                  = CMathMenuBase.prototype.remove_Bar;
+CMathMenuBase.prototype["insert_MatrixRow"]            = CMathMenuBase.prototype.insert_MatrixRow;
+CMathMenuBase.prototype["insert_MatrixColumn"]         = CMathMenuBase.prototype.insert_MatrixColumn;
+CMathMenuBase.prototype["delete_MatrixRow"]            = CMathMenuBase.prototype.delete_MatrixRow;
+CMathMenuBase.prototype["delete_MatrixColumn"]         = CMathMenuBase.prototype.delete_MatrixColumn;
+CMathMenuBase.prototype["insert_Equation"]             = CMathMenuBase.prototype.insert_Equation;
+CMathMenuBase.prototype["delete_Equation"]             = CMathMenuBase.prototype.delete_Equation;
+CMathMenuBase.prototype["insert_DelimiterArgument"]    = CMathMenuBase.prototype.insert_DelimiterArgument;
+CMathMenuBase.prototype["delete_DelimiterArgument"]    = CMathMenuBase.prototype.delete_DelimiterArgument;
+CMathMenuBase.prototype["can_IncreaseArgumentSize"]    = CMathMenuBase.prototype.can_IncreaseArgumentSize;
+CMathMenuBase.prototype["can_DecreaseArgumentSize"]    = CMathMenuBase.prototype.can_DecreaseArgumentSize;
+CMathMenuBase.prototype["increase_ArgumentSize"]       = CMathMenuBase.prototype.increase_ArgumentSize;
+CMathMenuBase.prototype["decrease_ArgumentSize"]       = CMathMenuBase.prototype.decrease_ArgumentSize;
+CMathMenuBase.prototype["can_InsertManualBreak"]       = CMathMenuBase.prototype.can_InsertManualBreak;
+CMathMenuBase.prototype["insert_ManualBreak"]          = CMathMenuBase.prototype.insert_ManualBreak;
+CMathMenuBase.prototype["can_DeleteManualBreak"]       = CMathMenuBase.prototype.can_DeleteManualBreak;
+CMathMenuBase.prototype["delete_ManualBreak"]          = CMathMenuBase.prototype.delete_ManualBreak;
+CMathMenuBase.prototype["can_AlignToCharacter"]        = CMathMenuBase.prototype.can_AlignToCharacter;
+CMathMenuBase.prototype["align_ToCharacter"]           = CMathMenuBase.prototype.align_ToCharacter;
+CMathMenuBase.prototype["remove_DelimiterCharacters"]  = CMathMenuBase.prototype.remove_DelimiterCharacters;
+CMathMenuBase.prototype["remove_GroupCharacter"]       = CMathMenuBase.prototype.remove_GroupCharacter;
+CMathMenuBase.prototype["remove_Radical"]              = CMathMenuBase.prototype.remove_Radical;
+CMathMenuBase.prototype["remove_Box"]                  = CMathMenuBase.prototype.remove_Box;
