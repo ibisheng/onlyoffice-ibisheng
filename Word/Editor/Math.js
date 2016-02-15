@@ -898,8 +898,6 @@ function ParaMath()
     this.Paragraph          = null;
     this.bFastRecalculate   = true;
 
-    //this.AbsolutePage       = 0;
-
     this.NearPosArray       = [];
 
     this.Width              = 0;
@@ -1120,8 +1118,6 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
 
     var MathSettings = Get_WordDocumentDefaultMathSettings();
 
-    //var AbsolutePage = this.Paragraph == null ? 0 : this.Paragraph.Get_StartPage_Absolute();
-    //var Page = AbsolutePage + _Page;
     var Page      = this.Paragraph == null ? 0 : this.Paragraph.Get_AbsolutePage(_Page);
 
     var WrapState = this.PageInfo.GetWrapStateOnPage(Page);
@@ -2067,8 +2063,7 @@ ParaMath.prototype.Load_PropsFromMenu_2 = function(Pr) //тестовая фун
 
 ParaMath.prototype.Get_MenuProps = function()
 {
-    return new CMathMenuBase();
-    //return this.Root.Get_MenuProps();
+    return this.Root.Get_MenuProps();
 };
 ParaMath.prototype.Set_MenuProps = function(Props)
 {
@@ -2100,12 +2095,9 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.protected_UpdateSpellChecking();
     }
 
-    //this.AbsolutePage = this.Paragraph == null ? 0 : this.Paragraph.Get_AbsolutePage(PRS.Page);
-
     var Para      = PRS.Paragraph;
     var ParaLine  = PRS.Line;
     var ParaRange = PRS.Range;
-    //var Page    = this.AbsolutePage + PRS.Page;
     var Page      = this.Paragraph == null ? 0 : this.Paragraph.Get_AbsolutePage(PRS.Page);
 
     var bStartRange    = this.Root.IsStartRange(ParaLine, ParaRange);
@@ -2531,7 +2523,6 @@ ParaMath.prototype.private_RecalculateRoot = function(PRS, ParaPr, Depth)
 };
 ParaMath.prototype.private_SetRestartRecalcInfo = function(PRS)
 {
-    //var Page = this.AbsolutePage + PRS.Page;
     var Page = this.Paragraph == null ? 0 : this.Paragraph.Get_AbsolutePage(PRS.Page);
     var Line = this.PageInfo.GetFirstLineOnPage(Page);
     PRS.Set_RestartPageRecalcInfo(Line, this);
@@ -2670,7 +2661,6 @@ ParaMath.prototype.UpdateWidthLine = function(PRS, Width)
     {
         var MathSettings = Get_WordDocumentDefaultMathSettings(),
             Page         = this.Paragraph == null ? 0 : this.Paragraph.Get_AbsolutePage(PRS.Page);
-            //Page = this.AbsolutePage + PRS.Page;
 
         var WrapState = this.PageInfo.GetWrapStateOnPage(Page), // если впоследствии State будет изменен, то пересчитаем с первой строки текущей страницы
             WrapIndent = MathSettings.Get_WrapIndent(WrapState);
@@ -2693,13 +2683,8 @@ ParaMath.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange
 {
     // до пересчета Bounds для текущей строки ранее должны быть вызваны Recalculate_Range_Width (для ширины), Recalculate_LineMetrics(для высоты и аскента)
 
-    //var Page = 0;
-    //if ( this.Paragraph !== null)
-        //Page = this.Paragraph.Get_StartPage_Absolute();
-
     // для инлайновой формулы не вызывается ф-ия setPosition, поэтому необходимо вызвать здесь
     // для неилайновой setPosition вызывается на Get_AlignToLine
-
     var PosInfo = new CMathPosInfo();
 
     PosInfo.CurLine  = _CurLine;
@@ -2709,12 +2694,7 @@ ParaMath.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange
     this.Root.setPosition(pos, PosInfo);
 
     // страиницу для смещния параграфа относительно документа добавим на Get_Bounds, т.к. если формула находится в автофигуре, то для нее не прийдет Recalculate_Range_Spaces при перемещении автофигуры а другую страницу
-
-
-    // относительный номер страницы вычисляется именно таким образом :
-    var Page = this.Paragraph.Get_AbsolutePage(_CurPage) - this.Paragraph.Get_StartPage_Absolute();
-    this.Root.UpdateBoundsPosInfo(PRSA, _CurLine, _CurRange, Page);
-
+    this.Root.UpdateBoundsPosInfo(PRSA, _CurLine, _CurRange, _CurPage);
     this.Root.Recalculate_Range_Spaces(PRSA, _CurLine, _CurRange, _CurPage);
 };
 ParaMath.prototype.Recalculate_PageEndInfo = function(PRSI, _CurLine, _CurRange)
@@ -2810,14 +2790,6 @@ ParaMath.prototype.Is_BrkBinBefore = function()
 ParaMath.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 {
     this.Root.Shift_Range(Dx, Dy, _CurLine, _CurRange);
-    //var CurrentAbsolutePage = this.Paragraph.Get_StartPage_Absolute();
-
-    // такого не должно быть И.С.
-    /*if(this.Paragraph !== null && this.AbsolutePage !== CurrentAbsolutePage)
-    {
-        this.Root.ShiftPage(CurrentAbsolutePage - this.AbsolutePage);
-        this.AbsolutePage = CurrentAbsolutePage;
-    }*/
 };
 //-----------------------------------------------------------------------------------
 // Функция для работы с формулой
@@ -3563,7 +3535,6 @@ ParaMath.prototype.Get_ContentSelection = function()
             Bounds = [];
             Bounds[0] = [];
 
-            var StartParaPage = this.Paragraph.Get_StartPage_Absolute();
             var ContentBounds = oContent.Get_Bounds();
             var oBound = ContentBounds[0][0];
 
@@ -3573,7 +3544,7 @@ ParaMath.prototype.Get_ContentSelection = function()
                 Y:      oBound.Y,
                 W:      oBound.W,
                 H:      oBound.H,
-                Page:   oBound.Page + StartParaPage
+                Page:   this.Paragraph.Get_AbsolutePage(oBound.Page)
             };
         }
         else
@@ -3729,9 +3700,6 @@ ParaMath.prototype.Get_JointSize = function()
 ParaMath.prototype.private_GetBounds = function(Content)
 {
     var Bounds = [ [{X : 0, Y : 0, W : 0, H : 0, Page : 0}] ];
-
-    var StartParaPage = this.Paragraph.Get_StartPage_Absolute();
-
     var ContentBounds = Content.Get_Bounds();
 
     for(var Line = 0; Line < ContentBounds.length; Line++)
@@ -3770,7 +3738,7 @@ ParaMath.prototype.private_GetBounds = function(Content)
                 Y:      Y,
                 W:      oBound.W,
                 H:      Height,
-                Page:   oBound.Page + StartParaPage
+                Page:   this.Paragraph.Get_AbsolutePage(oBound.Page)
             };
         }
     }
