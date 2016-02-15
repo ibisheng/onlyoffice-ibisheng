@@ -1148,6 +1148,51 @@ CDLbl.prototype =
         this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
     },
 
+    setPosition2: function(x, y)
+    {
+        this.x = x;
+        this.y = y;
+
+        if(this.layout && this.layout.manualLayout)
+        {
+            if(typeof this.layout.manualLayout.x === "number")
+            {
+                this.calcX = this.chart.extX*this.layout.x + this.x;
+            }
+            else
+            {
+                this.calcX = this.x;
+            }
+            if(typeof this.layout.manualLayout.y === "number")
+            {
+                this.calcY = this.chart.extY*this.layout.y + this.y;
+            }
+            else
+            {
+                this.calcY = this.y;
+            }
+        }
+        else
+        {
+            this.calcX = this.x;
+            this.calcY = this.y;
+        }
+
+
+
+        this.localTransform.tx = x;
+        this.localTransform.ty = y;
+
+        this.transform = this.localTransform.CreateDublicate();
+        this.invertTransform = global_MatrixTransformer.Invert(this.transform);
+
+
+        this.localTransformText.tx = x;
+        this.localTransformText.ty = y;
+        this.transformText = this.localTransformText.CreateDublicate();
+        this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
+    },
+
     updateTransformMatrix: function()
     {
         this.transform = this.localTransform.CreateDublicate();

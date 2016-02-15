@@ -5395,7 +5395,7 @@ CChartSpace.prototype =
 							deltaX = oLabel.localTransformText.tx - oCatAx.xPoints[i].pos;
 							deltaY = oLabel.localTransformText.ty - oAxisLabels.y;
 							oNewPos = oCatAx.transformXPoints[i];
-							oLabel.setPosition(oNewPos.x + deltaX, oNewPos.y + deltaY);
+							oLabel.setPosition2(oNewPos.x + deltaX, oNewPos.y + deltaY);
 						}
 					}
                    
@@ -5409,7 +5409,7 @@ CChartSpace.prototype =
 							deltaX = oLabel.localTransformText.tx - oAxisLabels.x;
 							deltaY = oLabel.localTransformText.ty - oValAx.yPoints[i].pos;
 							oNewPos = oValAx.transformYPoints[i];
-							oLabel.setPosition(oNewPos.x + deltaX, oNewPos.y + deltaY);
+							oLabel.setPosition2(oNewPos.x + deltaX, oNewPos.y + deltaY);
 						}
 					}
                     
@@ -5427,7 +5427,7 @@ CChartSpace.prototype =
                             deltaX = oLabel.localTransformText.tx - oValAx.xPoints[i].pos;
                             deltaY = oLabel.localTransformText.ty - oAxisLabels.y;
                             oNewPos = oValAx.transformXPoints[i];
-                            oLabel.setPosition(oNewPos.x + deltaX, oNewPos.y + deltaY);
+                            oLabel.setPosition2(oNewPos.x + deltaX, oNewPos.y + deltaY);
                         }
                     }
 
@@ -5442,7 +5442,7 @@ CChartSpace.prototype =
                             deltaX = oLabel.localTransformText.tx - oAxisLabels.x;
                             deltaY = oLabel.localTransformText.ty - oCatAx.yPoints[i].pos;
                             oNewPos = oCatAx.transformYPoints[i];
-                            oLabel.setPosition(oNewPos.x + deltaX, oNewPos.y + deltaY);
+                            oLabel.setPosition2(oNewPos.x + deltaX, oNewPos.y + deltaY);
                         }
                     }
                 }
@@ -5968,7 +5968,7 @@ CChartSpace.prototype =
                             legend.extX = legend_width;
                             legend.extY = legend_height;
                             calc_entryes.splice(cut_index, calc_entryes.length - cut_index);
-                            for(i = 0; i <cut_index && i < calc_entryes.length; ++i)
+                            for(i = 0; i < cut_index && i < calc_entryes.length; ++i)
                             {
                                 calc_entry = calc_entryes[i];
                                 calc_entry.calcMarkerUnion.lineMarker.localX = (i - hor_count*((i/hor_count) >> 0))*(max_entry_width + line_marker_width + 2*distance_to_text)  + distance_to_text;
