@@ -3056,7 +3056,6 @@ function CMathMenuBase(oMath)
         this.CanInsertManualBreak    = false;
         this.CanDeleteManualBreak    = false;
         this.CanAlignToCharacter     = false;
-
     }
     else
     {
