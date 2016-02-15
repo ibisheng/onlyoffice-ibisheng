@@ -4880,24 +4880,16 @@ CMathContent.prototype.private_AddModifiedDegree = function(Pos, Type)
 CMathContent.prototype.Get_MenuProps = function()
 {
     var Pr = new CMathMenuBase();
+
     var Pos = this.private_FindCurrentPosInContent();
 
     if(Pos !== null)
     {
-        var StartPos = this.Selection.StartPos,
-            EndPos   = this.Selection.EndPos;
-
-        if(true === this.Selection.Use && StartPos !== EndPos)
-        {
-            Pr = this.Content[Pos].Get_InterfaceProps();
-        }
-        else if(this.Content[Pos].Type == para_Math_Composition)
+        if(this.Content[Pos].Type == para_Math_Composition)
         {
             Pr = this.Content[Pos].Get_MenuProps();
         }
     }
-
-
 
     return Pr;
 };

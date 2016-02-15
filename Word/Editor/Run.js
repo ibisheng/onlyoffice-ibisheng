@@ -425,7 +425,7 @@ ParaRun.prototype.Add = function(Item, bMath)
 
         NewRun.Make_ThisElementCurrent();
     }
-    else if(this.Type == para_Math_Run && this.State.ContentPos == 0 && true === this.IsStartForcedBreakOperator()) // если в начле текущего Run идет принудительный перенос => создаем новый Run
+    else if(this.Type == para_Math_Run && this.State.ContentPos == 0 && true === this.IsStartForcedBreakOperator()) // если в начале текущего Run идет принудительный перенос => создаем новый Run
     {
         var NewRun = new ParaRun(this.Paragraph, bMath);
         NewRun.Set_Pr(this.Pr.Copy());
