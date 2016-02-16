@@ -439,6 +439,41 @@ function Editor_Copy(api, bCut)
      }
      */
 }
+
+function Editor_CheckCopy(api, _clipboard, _formats)
+{   
+	var sBase64 = null, _data, oDocument;
+
+	//TEXT
+	if (c_oAscClipboardDataFormat.Text & _formats)
+	{
+		oDocument = api.WordControl.m_oLogicDocument
+		_data = oDocument.Get_SelectedText();
+		_clipboard.pushData(c_oAscClipboardDataFormat.Text, _data)
+	}
+	//HTML
+	if(c_oAscClipboardDataFormat.Html & _formats)
+	{	
+		var oCopyProcessor = new CopyProcessor(api);
+		sBase64 = oCopyProcessor.Start();
+		_data = oCopyProcessor.getInnerHtml();
+		
+		_clipboard.pushData(c_oAscClipboardDataFormat.Html, _data)
+	}
+	//INTERNAL
+	if(c_oAscClipboardDataFormat.Internal & _formats)
+	{
+		if(sBase64 === null)
+		{
+			var oCopyProcessor = new CopyProcessor(api);
+			sBase64 = oCopyProcessor.Start();
+		}
+		
+		_data = sBase64;
+		_clipboard.pushData(c_oAscClipboardDataFormat.Internal, _data)
+	}
+}
+
 function Editor_Copy_Event(e, ElemToSelect)
 {
 	var api = editor;

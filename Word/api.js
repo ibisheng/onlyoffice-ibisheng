@@ -1816,6 +1816,10 @@ asc_docs_api.prototype.Paste = function()
         }
     }
 };
+asc_docs_api.prototype.asc_CheckCopy = function(_clipboard /* CClipboardData */, _formats)
+{
+	Editor_CheckCopy(this, _clipboard, _formats);
+};
 asc_docs_api.prototype.Share = function(){
 
 };
