@@ -1722,7 +1722,7 @@ CShape.prototype =
                     _vertical_shift = 0;
                 }
                 else {
-                    if (!(this.bWordShape ) || _content_height < _text_rect_height) {
+                    if (!(this.bWordShape || this.worksheet ) || _content_height < _text_rect_height) {
                         switch (oBodyPr.anchor) {
                             case 0: //b
                             { // (Text Anchor Enum ( Bottom ))
@@ -1778,7 +1778,7 @@ CShape.prototype =
                     _vertical_shift = 0;
                 }
                 else {
-                    if (!(this.bWordShape) || _content_height < _text_rect_width) {
+                    if (!(this.bWordShape || this.worksheet) || _content_height < _text_rect_width) {
                         switch (oBodyPr.anchor) {
                             case 0: //b
                             { // (Text Anchor Enum ( Bottom ))
@@ -1896,7 +1896,7 @@ CShape.prototype =
                 _vertical_shift = 0;
             }
             else {
-                if (!(this.bWordShape) || _content_height < content_height2) {
+                if (!(this.bWordShape || this.worksheet) || _content_height < content_height2) {
                     switch (oBodyPr.anchor) {
                         case 0: //b
                         { // (Text Anchor Enum ( Bottom ))
