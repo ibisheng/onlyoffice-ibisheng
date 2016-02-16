@@ -7743,6 +7743,8 @@ Paragraph.prototype =
                     this.PresentationPr.Bullet =  this.CompiledPr.Pr.ParaPr.Get_PresentationBullet();
                     this.Numbering.Bullet = this.PresentationPr.Bullet;
                 }
+
+                this.CompiledPr.NeedRecalc = false;
             }
             else
             {
