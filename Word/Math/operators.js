@@ -4081,7 +4081,7 @@ CMathMenuDelimiter.prototype.get_MatchBrackets      = function(){return this.Sha
 CMathMenuDelimiter.prototype.put_MatchBrackets      = function(Match){this.ShapeCentred = Match;};
 CMathMenuDelimiter.prototype.can_DeleteArgument     = function(){return this.bCanDeleteArgument;};
 
-window["CMathMenuDelimiter"] = CMathMenuDelimiter;
+window["CMathMenuDelimiter"]                           = CMathMenuDelimiter;
 CMathMenuDelimiter.prototype["get_HideOpeningBracket"] = CMathMenuDelimiter.prototype.get_HideOpeningBracket;
 CMathMenuDelimiter.prototype["put_HideOpeningBracket"] = CMathMenuDelimiter.prototype.put_HideOpeningBracket;
 CMathMenuDelimiter.prototype["get_HideClosingBracket"] = CMathMenuDelimiter.prototype.get_HideClosingBracket;

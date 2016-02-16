@@ -824,10 +824,10 @@ function CMathMenuNary(Nary)
     {
         var HideUpper = undefined, HideLower = undefined;
         if (true === Nary.UpperIterator.IsPlaceholder())
-            HideUpper = Nary.Pr.subHide == true;
+            HideUpper = Nary.Pr.supHide == true;
 
         if (true === Nary.LowerIterator.IsPlaceholder())
-            HideLower = Nary.Pr.supHide == true;
+            HideLower = Nary.Pr.subHide == true;
 
         this.bCanChangeLimLoc = false == Nary.ParaMath.Is_Inline();
         this.LimLoc           = Nary.Pr.limLoc === NARY_SubSup ? c_oAscMathInterfaceNaryLimitLocation.SubSup : c_oAscMathInterfaceNaryLimitLocation.UndOvr;
