@@ -4059,7 +4059,7 @@ function CMathMenuDelimiter(Delimiter)
         this.HideEndOper        = Delimiter.endOper.Is_Empty();
         this.Grow               = Delimiter.Pr.grow;
         this.ShapeCentred       = (Delimiter.Pr.shp !== DELIMITER_SHAPE_MATH ? true : false);
-        this.bCanDeleteArgument = Delimiter.Pr.column > 1;
+        this.bSingleArgument    = Delimiter.Pr.column == 1;
     }
     else
     {
@@ -4067,7 +4067,7 @@ function CMathMenuDelimiter(Delimiter)
         this.HideEndOper        = undefined;
         this.Grow               = undefined;
         this.ShapeCentred       = undefined;
-        this.bCanDeleteArgument = false;
+        this.bSingleArgument    = true;
     }
 }
 Asc.extendClass(CMathMenuDelimiter, CMathMenuBase);
@@ -4079,7 +4079,8 @@ CMathMenuDelimiter.prototype.get_StretchBrackets    = function(){return this.Gro
 CMathMenuDelimiter.prototype.put_StretchBrackets    = function(Stretch){this.Grow = Stretch;};
 CMathMenuDelimiter.prototype.get_MatchBrackets      = function(){return this.ShapeCentred;};
 CMathMenuDelimiter.prototype.put_MatchBrackets      = function(Match){this.ShapeCentred = Match;};
-CMathMenuDelimiter.prototype.can_DeleteArgument     = function(){return this.bCanDeleteArgument;};
+CMathMenuDelimiter.prototype.can_DeleteArgument     = function(){return this.bSingleArgument == false;};
+CMathMenuDelimiter.prototype.has_Separators         = function(){return this.bSingleArgument == false;};
 
 window["CMathMenuDelimiter"]                           = CMathMenuDelimiter;
 CMathMenuDelimiter.prototype["get_HideOpeningBracket"] = CMathMenuDelimiter.prototype.get_HideOpeningBracket;
@@ -4091,6 +4092,7 @@ CMathMenuDelimiter.prototype["put_StretchBrackets"]    = CMathMenuDelimiter.prot
 CMathMenuDelimiter.prototype["get_MatchBrackets"]      = CMathMenuDelimiter.prototype.get_MatchBrackets;
 CMathMenuDelimiter.prototype["put_MatchBrackets"]      = CMathMenuDelimiter.prototype.put_MatchBrackets;
 CMathMenuDelimiter.prototype["can_DeleteArgument"]     = CMathMenuDelimiter.prototype.can_DeleteArgument;
+CMathMenuDelimiter.prototype["has_Separators"]         = CMathMenuDelimiter.prototype.has_Separators;
 
 /**
  *
