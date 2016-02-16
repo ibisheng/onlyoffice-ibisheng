@@ -1117,6 +1117,28 @@ CDegreeSubSup.prototype.protected_GetRangeEndPos = function(CurLine, CurRange)
 
     return this.Need_Iters(_CurLine, _CurRange) ? 2 : 0;
 };
+CDegreeSubSup.prototype.Apply_MenuProps = function(Props)
+{
+    if(Props.Type == c_oAscMathInterfaceType.Script)
+    {
+        if(Props.ScriptType == c_oAscMathInterfaceScript.PreSubSup && this.Pr.type == DEGREE_SubSup)
+        {
+            History.Add(this, new CChangesMathDegreeSubSupType(DEGREE_PreSubSup, this.Pr.type));
+            this.raw_SetType(DEGREE_PreSubSup);
+        }
+
+        if(Props.ScriptType == c_oAscMathInterfaceScript.SubSup && this.Pr.type == DEGREE_PreSubSup)
+        {
+            History.Add(this, new CChangesMathDegreeSubSupType(DEGREE_SubSup, this.Pr.type));
+            this.raw_SetType(DEGREE_SubSup);
+        }
+    }
+};
+CDegreeSubSup.prototype.raw_SetType = function(type)
+{
+    this.Pr.type = type;
+    this.fillContent();
+};
 CDegreeSubSup.prototype.Get_InterfaceProps = function()
 {
     var Type = this.Pr.type == DEGREE_PreSubSup ? c_oAscMathInterfaceScript.PreSubSup : c_oAscMathInterfaceScript.SubSup;

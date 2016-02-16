@@ -3868,6 +3868,7 @@ var historyitem_Math_MatrixPlh                 =  53;
 var historyitem_Math_MatrixMinColumnWidth      =  54;
 var historyitem_Math_BarLinePos                =  55;
 var historyitem_Math_BoxAddForcedBreak         =  56;
+var historyitem_Math_DegreeSubSupType          =  57;
 
 
 function ReadChanges_FromBinary(Reader, Class)
@@ -3929,6 +3930,8 @@ function ReadChanges_FromBinary(Reader, Class)
         case historyitem_Math_MatrixPlh             : Changes = new CChangesMathMatrixPlh(); break;
         case historyitem_Math_MatrixMinColumnWidth  : Changes = new CChangesMathMatrixMinColumnWidth(); break;
         case historyitem_Math_BarLinePos            : Changes = new CChangesMathBarLinePos(); break;
+        case historyitem_Math_BoxAddForcedBreak     : Changes = new CChangesMathBoxAddForcedBreak(); break;
+        case historyitem_Math_DegreeSubSupType      : Changes = new CChangesMathDegreeSubSupType(); break;
     }
 
     if (null !== Changes)
@@ -6123,6 +6126,42 @@ CChangesMathBoxAddForcedBreak.prototype.Undo = function(Class)
 
 };
 
+
+function CChangesMathDegreeSubSupType(NewType, OldType)
+{
+    this.New = NewType;
+    this.Old = OldType;
+}
+CChangesMathDegreeSubSupType.prototype.Type = historyitem_Math_DegreeSubSupType;
+CChangesMathDegreeSubSupType.prototype.Undo = function(Class)
+{
+    Class.raw_SetType(this.Old);
+};
+CChangesMathDegreeSubSupType.prototype.Redo = function(Class)
+{
+    Class.raw_SetType(this.New);
+};
+CChangesMathDegreeSubSupType.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteLong( this.New );
+    }
+};
+CChangesMathDegreeSubSupType.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
 
 
 function MatGetKoeffArgSize(FontSize, ArgSize)
