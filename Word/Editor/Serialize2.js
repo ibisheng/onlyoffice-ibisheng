@@ -2909,7 +2909,7 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
 			switch (Shp)
 			{
 				case DELIMITER_SHAPE_CENTERED: 	val = c_oAscShp.Centered; break;
-				case DELIMITER_SHAPE_MATH: 		val = c_oAscShp.Match;
+				case DELIMITER_SHAPE_MATCH: 	val = c_oAscShp.Match;
 			}
 			this.memory.WriteByte(val);
 		}
@@ -11034,7 +11034,7 @@ function Binary_oMathReader(stream, oReadResult)
 			switch (shp)
 			{
 				case c_oAscShp.Centered:	props.shp = DELIMITER_SHAPE_CENTERED; break;
-				case c_oAscShp.Match:		props.shp = DELIMITER_SHAPE_MATH; break;
+				case c_oAscShp.Match:		props.shp = DELIMITER_SHAPE_MATCH; break;
 				default: 					props.shp = DELIMITER_SHAPE_CENTERED;
 			}
         }

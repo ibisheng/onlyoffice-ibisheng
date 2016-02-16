@@ -3131,7 +3131,7 @@ CMathDelimiterPr.prototype.Set_FromObject = function(Obj)
     this.sepChr     = Obj.sepChr;
     this.sepChrType = Obj.sepChrType;
 
-    if(DELIMITER_SHAPE_MATH === Obj.shp || DELIMITER_SHAPE_CENTERED === Obj.shp)
+    if(DELIMITER_SHAPE_MATCH === Obj.shp || DELIMITER_SHAPE_CENTERED === Obj.shp)
         this.shp = Obj.shp;
 
     if(false === Obj.grow || 0 === Obj.grow)
@@ -3813,9 +3813,9 @@ CDelimiter.prototype.Apply_MenuProps = function(Props)
             this.raw_SetGrow(Props.Grow);
         }
 
-        if(Props.ShapeCentred !== undefined && this.Pr.grow == true)
+        if(Props.MatchBrackets !== undefined && this.Pr.grow == true)
         {
-            var Shp = Props.ShapeCentred == true ? DELIMITER_SHAPE_CENTERED : DELIMITER_SHAPE_MATH;
+            var Shp = Props.MatchBrackets == true ? DELIMITER_SHAPE_MATCH : DELIMITER_SHAPE_CENTERED ;
 
             if(Shp !== this.Pr.shp)
             {
@@ -3870,7 +3870,7 @@ CDelimiter.prototype.raw_SetGrow = function(Value)
 };
 CDelimiter.prototype.raw_SetShape = function(Value)
 {
-    if(this.Pr.grow == true && (Value == DELIMITER_SHAPE_MATH || Value == DELIMITER_SHAPE_CENTERED))
+    if(this.Pr.grow == true && (Value == DELIMITER_SHAPE_MATCH || Value == DELIMITER_SHAPE_CENTERED))
     {
         this.Pr.shp = Value;
         this.RecalcInfo.bProps = true;
@@ -4058,7 +4058,7 @@ function CMathMenuDelimiter(Delimiter)
         this.HideBegOper        = Delimiter.begOper.Is_Empty();
         this.HideEndOper        = Delimiter.endOper.Is_Empty();
         this.Grow               = Delimiter.Pr.grow;
-        this.ShapeCentred       = (Delimiter.Pr.shp !== DELIMITER_SHAPE_MATH ? true : false);
+        this.MatchBrackets      = Delimiter.Pr.shp == DELIMITER_SHAPE_MATCH;
         this.bSingleArgument    = Delimiter.Pr.column == 1;
     }
     else
@@ -4066,7 +4066,7 @@ function CMathMenuDelimiter(Delimiter)
         this.HideBegOper        = undefined;
         this.HideEndOper        = undefined;
         this.Grow               = undefined;
-        this.ShapeCentred       = undefined;
+        this.MatchBrackets       = undefined;
         this.bSingleArgument    = true;
     }
 }
@@ -4077,8 +4077,8 @@ CMathMenuDelimiter.prototype.get_HideClosingBracket = function(){return this.Hid
 CMathMenuDelimiter.prototype.put_HideClosingBracket = function(Hide){this.HideEndOper = Hide;};
 CMathMenuDelimiter.prototype.get_StretchBrackets    = function(){return this.Grow;};
 CMathMenuDelimiter.prototype.put_StretchBrackets    = function(Stretch){this.Grow = Stretch;};
-CMathMenuDelimiter.prototype.get_MatchBrackets      = function(){return this.ShapeCentred;};
-CMathMenuDelimiter.prototype.put_MatchBrackets      = function(Match){this.ShapeCentred = Match;};
+CMathMenuDelimiter.prototype.get_MatchBrackets      = function(){return this.MatchBrackets;};
+CMathMenuDelimiter.prototype.put_MatchBrackets      = function(Match){this.MatchBrackets = Match;};
 CMathMenuDelimiter.prototype.can_DeleteArgument     = function(){return this.bSingleArgument == false;};
 CMathMenuDelimiter.prototype.has_Separators         = function(){return this.bSingleArgument == false;};
 

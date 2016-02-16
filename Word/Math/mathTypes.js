@@ -132,7 +132,7 @@ var TURN_180                    =  1;
 var TURN_MIRROR_0               =  2;
 var TURN_MIRROR_180             =  3;
 
-var DELIMITER_SHAPE_MATH        =  0;
+var DELIMITER_SHAPE_MATCH       =  0;
 var DELIMITER_SHAPE_CENTERED    =  1;
 
 var LIMIT_LOW               	=  0;
