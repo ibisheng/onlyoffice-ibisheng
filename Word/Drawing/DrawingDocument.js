@@ -3471,6 +3471,16 @@ function CDrawingDocument()
         this.TextMatrix = matrix;
     }
 
+    this.MultiplyTargetTransform = function(matrix)
+    {
+        if (!this.TextMatrix)
+            this.TextMatrix = matrix;
+        else if (matrix)
+        {
+            this.TextMatrix.Multiply(matrix, MATRIX_ORDER_APPEND);
+        }
+    }
+
     this.UpdateTarget = function(x, y, pageIndex)
     {
         this.m_oWordControl.m_oLogicDocument.Set_TargetPos( x, y, pageIndex );
