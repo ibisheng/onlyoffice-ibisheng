@@ -2448,6 +2448,7 @@ function CDrawingDocument()
 
     this.Overlay = null;
     this.IsTextMatrixUse = false;
+    this.IsTextSelectionOutline = false;
 
     this.HorVerAnchors = [];
 
@@ -4700,6 +4701,11 @@ function CDrawingDocument()
         this.m_oWordControl.m_oApi.sync_SearchEndCallback();
     }
 
+    this.SetTextSelectionOutline = function(isSelectionOutline)
+    {
+        this.IsTextSelectionOutline = isSelectionOutline;
+    }
+
     this.private_StartDrawSelection = function(overlay)
     {
         this.Overlay = overlay;
@@ -4707,9 +4713,6 @@ function CDrawingDocument()
 
         this.Overlay.m_oContext.fillStyle = "rgba(51,102,204,255)";
         this.Overlay.m_oContext.beginPath();
-
-        if (this.IsTextMatrixUse)
-            this.Overlay.m_oContext.strokeStyle = "#9ADBFE";
 
         if (this.m_oWordControl.MobileTouchManager)
         {
@@ -4724,8 +4727,9 @@ function CDrawingDocument()
         ctx.globalAlpha = 0.2;
         ctx.fill();
 
-        if (this.IsTextMatrixUse)
+        if (this.IsTextMatrixUse && this.IsTextSelectionOutline)
         {
+            ctx.strokeStyle = "#9ADBFE";
             ctx.lineWidth = 1;
             ctx.globalAlpha = 1.0;
             ctx.stroke();
@@ -4740,6 +4744,8 @@ function CDrawingDocument()
 
     this.AddPageSelection = function(pageIndex, x, y, w, h)
     {
+        this.IsTextMatrixUse = ((null != this.TextMatrix) && !global_MatrixTransformer.IsIdentity(this.TextMatrix));
+
         if (pageIndex < this.m_lDrawingFirst || pageIndex > this.m_lDrawingEnd)
         {
             if (this.m_oWordControl.MobileTouchManager)
@@ -4857,6 +4863,8 @@ function CDrawingDocument()
 
     this.AddPageSelection2 = function(pageIndex, x, y, width, height)
     {
+        this.IsTextMatrixUse = ((null != this.TextMatrix) && !global_MatrixTransformer.IsIdentity(this.TextMatrix));
+
         //if (pageIndex < 0 || pageIndex >= Math.max(this.m_lPagesCount, this.m_lCountCalculatePages) || Math.abs(width) < 0.001 || Math.abs(height) < 0.001)
         //    return;
         if (Math.abs(width) < 0.001 || Math.abs(height) < 0.001)
