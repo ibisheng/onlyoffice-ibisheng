@@ -153,9 +153,10 @@
 				
 				if(ws.getCellEditMode() === true)//text in cell
 				{
-					//only text
+					//only TEXT
 					var fragments = wb.cellEditor.copySelection();
 					_data = wb.cellEditor._getFragmentsText(fragments);
+					
 					_clipboard.pushData(c_oAscClipboardDataFormat.Text, _data)
 				}
 				else
@@ -169,19 +170,19 @@
 					//HTML
 					if(c_oAscClipboardDataFormat.Html & _formats)
 					{	
-						_data = this._makeTableNode(activeRange, ws);
-						_clipboard.pushData(c_oAscClipboardDataFormat.Html, _data)
+						_data = this._getHtml(activeRange, ws);
+						
+						_clipboard.pushData(c_oAscClipboardDataFormat.Html, _data.html)
 					}
 					//INTERNAL
 					if(c_oAscClipboardDataFormat.Internal & _formats)
 					{
-						_data = this._getBinaryForCopy(worksheetView);
-						_clipboard.pushData(c_oAscClipboardDataFormat.Internal, _data)
-					}
-					
-					if(c_oAscClipboardDataFormat.HtmlElement & _formats)
-					{
+						if(_data && _data.base64)
+							_data = _data.base64;
+						else
+							_data = this._getBinaryForCopy(worksheetView);
 						
+						_clipboard.pushData(c_oAscClipboardDataFormat.Internal, _data)
 					}
 				}
 			},
@@ -435,6 +436,47 @@
 				}
 				
 				return {sBase64: sBase64, html: html, text: this.lStorageText, drawingUrls: drawingUrls};
+			},
+			
+			_getHtml: function(range, worksheet)
+			{
+				var t = this;
+				var sBase64 = null;
+				t._cleanElement();
+				
+				var objectRender = worksheet.objectRender;
+				var isIntoShape = objectRender.controller.getTargetDocContent();
+				
+				var text = t._makeTableNode(range, worksheet, null, isIntoShape);
+				
+				if(text == false)
+					return null;
+
+				
+				t.element.appendChild(text);
+				
+				//TODO возможно стоит убрать отключение истории
+				History.TurnOff();
+				//use binary strings
+				if(copyPasteUseBinary)
+				{	
+					if(isIntoShape)
+					{
+						this.lStorage = {};
+						this.lStorage.htmlInShape = text;
+					}	
+					else
+					{
+						sBase64 = this._getBinaryForCopy(worksheet);
+						$(this.element.children[0]).addClass("xslData;" + sBase64);
+						
+						//for buttons copy/paste
+						this.lStorage = sBase64;
+					}
+				}	
+				History.TurnOn();
+				
+				return {base64: sBase64, html: t.element.innerHTML};
 			},
 			
 			_getHtmlBase64: function(range, worksheet, isCut)
