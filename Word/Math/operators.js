@@ -3815,7 +3815,7 @@ CDelimiter.prototype.Apply_MenuProps = function(Props)
 
         if(Props.ShapeCentred !== undefined && this.Pr.grow == true)
         {
-            var Shp = this.ShapeCentred == true ? DELIMITER_SHAPE_CENTERED : DELIMITER_SHAPE_MATH;
+            var Shp = Props.ShapeCentred == true ? DELIMITER_SHAPE_CENTERED : DELIMITER_SHAPE_MATH;
 
             if(Shp !== this.Pr.shp)
             {
