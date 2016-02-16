@@ -2333,10 +2333,15 @@ CMathContent.prototype.private_LoadFromMenuSymbol = function(Type, Pr)
 
     if (-1 !== Code)
     {
-        var bSimpleInsert = this.Content.length > 0 && this.Content[this.CurPos].Type == para_Math_Run && this.Selection_IsEmpty() == true; // находимся в Run, селект отсутствует
-        var TextPr = bSimpleInsert == false ? new CTextPr() : this.Content[this.CurPos].Get_TextPr();
+        var TextPr, MathPr;
 
-        this.Add_Symbol(Code, TextPr);
+        if(this.Content.length > 0 && this.Content[this.CurPos].Type == para_Math_Run && this.Selection_IsEmpty() == true) // находимся в Run, селект отсутствует
+        {
+            TextPr = this.Content[this.CurPos].Get_TextPr();
+            MathPr = this.Content[this.CurPos].Get_MathPr();
+        }
+
+        this.Add_Symbol(Code, TextPr, MathPr);
     }
 };
 CMathContent.prototype.private_LoadFromMenuFraction = function(Type, Pr)
@@ -2879,14 +2884,19 @@ CMathContent.prototype.Add_Text = function(sText, Paragraph, MathStyle)
         this.CurPos++;
     }
 };
-CMathContent.prototype.Add_Symbol = function(Code, TextPr)
+CMathContent.prototype.Add_Symbol = function(Code, TextPr, MathPr)
 {
     var MathRun = new ParaRun(this.Paragraph, true);
 
     var Symbol = new CMathText(false);
     Symbol.add(Code);
     MathRun.Add(Symbol, true);
-    MathRun.Apply_Pr(TextPr);
+
+    if(TextPr !== undefined)
+        MathRun.Apply_Pr(TextPr);
+
+    if(MathPr !== undefined)
+        MathRun.Set_MathPr(MathPr);
 
     this.Internal_Content_Add(this.CurPos, MathRun, false);
     this.CurPos++;
