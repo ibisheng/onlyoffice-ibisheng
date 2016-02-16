@@ -34,7 +34,6 @@ CChartSpace.prototype.getInvertTransform = CShape.prototype.getInvertTransform;
 CChartSpace.prototype.hit = CShape.prototype.hit;
 CChartSpace.prototype.hitInInnerArea = CShape.prototype.hitInInnerArea;
 CChartSpace.prototype.hitInPath = CShape.prototype.hitInPath;
-CChartSpace.prototype.hitInTextRect = CShape.prototype.hitInTextRect;
 CChartSpace.prototype.getNumByCardDirection = CShape.prototype.getNumByCardDirection;
 CChartSpace.prototype.getCardDirectionByNum = CShape.prototype.getCardDirectionByNum;
 CChartSpace.prototype.getResizeCoefficients = CShape.prototype.getResizeCoefficients;

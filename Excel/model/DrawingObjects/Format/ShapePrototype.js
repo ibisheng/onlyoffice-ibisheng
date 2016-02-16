@@ -83,6 +83,27 @@ CShape.prototype.getDrawingObjectsController = function()
     return null;
 };
 
+CShape.prototype.hitInTextRect = function (x, y)
+{
+    var oController = this.getDrawingObjectsController && this.getDrawingObjectsController();
+    if(oController && (getTargetTextObject(oController) === this || (oController.curState.startTargetTextObject === this)))
+    {
+        var content = this.getDocContent && this.getDocContent();
+        if ( content && this.invertTransformText)
+        {
+            var t_x, t_y;
+            t_x = this.invertTransformText.TransformPointX(x, y);
+            t_y = this.invertTransformText.TransformPointY(x, y);
+            return t_x > 0 && t_x < this.contentWidth && t_y > 0 && t_y < this.contentHeight;
+        }
+    }
+    else
+    {
+        return this.hitInTextRectWord(x, y);
+    }
+
+    return false;
+};
 
 function addToDrawings(worksheet, graphic, position, lockByDefault, anchor)
 {

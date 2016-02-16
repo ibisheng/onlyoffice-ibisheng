@@ -5073,7 +5073,7 @@ DrawingObjectsController.prototype =
         if (oTargetTextObject) {
 
             var warpGeometry = oTargetTextObject.recalcInfo && oTargetTextObject.recalcInfo.warpGeometry;
-            if(warpGeometry && warpGeometry.preset !== "textNoShape")
+            if(warpGeometry && warpGeometry.preset !== "textNoShape" || oTargetTextObject.worksheet)
             {
                 if (oTargetTextObject.recalcInfo.bRecalculatedTitle)
                 {

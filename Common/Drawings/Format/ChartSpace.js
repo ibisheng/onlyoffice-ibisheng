@@ -5450,6 +5450,10 @@ CChartSpace.prototype =
         }
     },
 
+    hitInTextRect: function()
+    {
+        return false;
+    },
 
     recalculateLegend: function()
     {

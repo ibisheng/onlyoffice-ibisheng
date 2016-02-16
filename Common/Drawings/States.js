@@ -152,10 +152,9 @@ StartAddNewShape.prototype =
 
 function checkEmptyPlaceholderContent(content)
 {
-    if(!content ||
-    content.Parent && content.Parent.parent &&
+    if(!content || content.Parent && content.Parent.parent &&
         (content.Is_Empty() && content.Parent.parent.isPlaceholder && content.Parent.parent.isPlaceholder() ||
-            content.Parent.parent.txWarpStruct || content.Parent.parent.recalcInfo && content.Parent.parent.recalcInfo.warpGeometry)  )
+            content.Parent.parent.txWarpStruct || content.Parent.parent.recalcInfo && content.Parent.parent.recalcInfo.warpGeometry || content.Parent.parent.worksheet)  )
         return content;
     return null;
 }
