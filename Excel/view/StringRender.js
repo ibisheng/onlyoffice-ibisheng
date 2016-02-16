@@ -245,67 +245,68 @@
          * @param {String} alignVertical
          * @param {Number} maxWidth
          */
-		StringRender.prototype.getTransformBound = function(angle, x, y, w, h, textW, alignHorizontal, alignVertical, maxWidth) {
+        StringRender.prototype.getTransformBound = function(angle, x, y, w, h, textW, alignHorizontal, alignVertical, maxWidth) {
 
             this.angle          =   0;  //  angle;
             this.fontNeedUpdate =   true;
 
-            var dx = 0, dy = 0, sx = 0, sw = 0,
+            var dx = 0, dy = 0,offsetX = 0,    // смещение BB
+
                 tm = this._doMeasure(maxWidth),
 
                 mul = (90 - (Math.abs(angle)) ) / 90,
-                posh = (angle === 90 || angle === -90) ? textW : Math.abs(Math.sin(angle * Math.PI / 180.0) * textW),
-                posv = (angle === 90 || angle === -90) ? 0 : Math.abs(Math.cos(angle * Math.PI / 180.0) * textW),
+
+                angleSin = Math.sin(angle * Math.PI / 180.0),
+                angleCos = Math.cos(angle * Math.PI / 180.0),
+
+                posh = (angle === 90 || angle === -90) ? textW : Math.abs(angleSin * textW),
+                posv = (angle === 90 || angle === -90) ? 0 : Math.abs(angleCos * textW),
 
                 isHorzLeft      = ('left'   === alignHorizontal),
                 isHorzCenter    = ('center' === alignHorizontal),
                 isHorzRight     = ('right'  === alignHorizontal),
+
                 isVertBottom    = ('bottom' === alignVertical),
                 isVertCenter    = ('center' === alignVertical),
-                isVertTop       = ('top' === alignVertical);
+                isVertTop       = ('top'    === alignVertical);
 
             if (isVertBottom) {
                 if (angle < 0) {
                     if (isHorzLeft) {
-                        dx = (1 - mul) * tm.height;
-                        sw = x + posv + (mul * 0.5) * tm.height;
+                        dx = - (angleSin * tm.height);
                     }
                     else if (isHorzCenter) {
-                        dx = (w + tm.height - posv) * 0.5;
-                        sx = x + (w - posv) * 0.5 - (mul * 0.5) * tm.height;
-                        sw = x + (w + posv) * 0.5 + (mul * 0.5) * tm.height;
+                        dx = (w - angleSin * tm.height - posv) / 2;
+                        offsetX = - (w - posv) / 2 - angleSin * tm.height / 2;
                     }
                     else if (isHorzRight) {
-                        dx = w -  posv;
-                        sx = x + dx - (mul * 0.5) * tm.height;
+                        dx = w - posv + 2;
+                        offsetX = - (w - posv) - angleSin * tm.height - 2;
                     }
                 } else {
                     if (isHorzLeft) {
-                        sw = x + posv + (mul * 0.5) * tm.height;
+
                     }
                     else if (isHorzCenter) {
-                        dx = (w - tm.height - posv) * 0.5;
-                        sx = x + (w - posv) * 0.5 - (mul * 0.5) * tm.height;
-                        sw = x + (w + posv) * 0.5 + (mul * 0.5) * tm.height;
+                        dx = (w - angleSin * tm.height - posv) / 2;
+                        offsetX = - (w - posv) / 2 + angleSin * tm.height / 2;
                     }
                     else if (isHorzRight) {
-                        dx = w - posv - (1 - mul) * tm.height;
-                        sx = x + dx;
+                        dx = asc_calcnpt(w  - posv + 1 + 1 - tm.height * angleSin, 96);
+                        offsetX = - asc_calcnpt(w  - posv + 1 + 1 - tm.height * angleSin, 96);
                     }
                 }
 
-                //
-
                 if (posh < h) {
                     if (angle < 0) {
-                        dy = h - (posh + mul * tm.height);
+                        dy = h - (posh + angleCos * tm.height);
                     }
                     else {
-                        dy = h - mul * tm.height;
+                        dy = h - angleCos * tm.height;
                     }
                 } else {
                     if (angle > 0) {
-                        dy = h - mul * tm.height;
+                        dy = h - angleCos * tm.height;
                     }
                 }
             }
@@ -313,30 +314,27 @@
 
                 if (angle < 0) {
                     if (isHorzLeft) {
-                        dx = (1 - mul * 0.5) * tm.height;
-                        sw = x + posv + (mul * 0.5) * tm.height;
+                        dx = - (angleSin * tm.height);
                     }
                     else if (isHorzCenter) {
-                        dx = (w + tm.height - posv) * 0.5;
-                        sx = x + (w - posv) * 0.5 - (mul * 0.5) * tm.height;
-                        sw = x + (w + posv) * 0.5 + (mul * 0.5) * tm.height;
+                        dx = (w - angleSin * tm.height - posv) / 2;
+                        offsetX = - (w - posv) / 2 - angleSin * tm.height / 2;
                     }
                     else if (isHorzRight) {
-                        dx = w - (mul * 0.5) * tm.height - posv;
-                        sx = x + dx - (mul * 0.5) * tm.height;
+                        dx = w - posv + 2;
+                        offsetX = - (w - posv) - angleSin * tm.height - 2;
                     }
                 } else {
                     if (isHorzLeft) {
-                        sw = x + posv + (mul * 0.5) * tm.height;
+
                     }
                     else if (isHorzCenter)  {
-                        dx = (w - tm.height - posv) * 0.5;
-                        sx = x + (w - posv) * 0.5 - (mul * 0.5) * tm.height;
-                        sw = x + (w + posv) * 0.5 + (mul * 0.5) * tm.height;
+                        dx = (w - angleSin * tm.height - posv) / 2;
+                        offsetX = - (w - posv) / 2 + angleSin * tm.height / 2;
                     }
                     else if (isHorzRight) {
-                        dx = w - posv - tm.height; sx = x + dx;
-                        sx = x + dx - (mul * 0.5) * tm.height;
+                        dx = asc_calcnpt(w  - posv + 1 + 1 - tm.height * angleSin, 96);
+                        offsetX = - asc_calcnpt(w  - posv + 1 + 1 - tm.height * angleSin, 96);
                     }
                 }
 
@@ -344,14 +342,14 @@
 
                 if (posh < h) {
                     if (angle < 0) {
-                        dy = (h - posh) * 0.5;
+                        dy = (h - posh - angleCos * tm.height) * 0.5;
                     }
                     else {
-                        dy = (h + posh) * 0.5;
+                        dy = (h + posh - angleCos * tm.height) * 0.5;
                     }
                 } else {
                     if (angle > 0) {
-                        dy = h - mul * tm.height;
+                        dy = h - angleCos * tm.height;
                     }
                 }
             }
@@ -359,46 +357,41 @@
 
                 if (angle < 0) {
                     if (isHorzLeft) {
-                        dx = (1 - mul * 0.5) * tm.height;
-                        sw = x + posv + (mul * 0.5) * tm.height;
+                        dx = - (angleSin * tm.height);
                     }
                     else if (isHorzCenter) {
-                        dx = (w + tm.height - posv) * 0.5;
-                        sx = x + (w - posv) * 0.5 - (mul * 0.5) * tm.height;
-                        sw = x + (w + posv) * 0.5 + (mul * 0.5) * tm.height;
+                        dx = (w - angleSin * tm.height - posv) / 2;
+                        offsetX = - (w - posv) / 2 - angleSin * tm.height / 2;
                     }
                     else if (isHorzRight) {
-                        dx = w - (mul * 0.5) * tm.height - posv;
-                        sx = x + dx - (mul * 0.5) * tm.height;
+                        dx = w - posv + 2;
+                        offsetX = - (w - posv) - angleSin * tm.height - 2;
                     }
                 } else {
                     if (isHorzLeft) {
-                        sw = x + posv + (mul * 0.5) * tm.height;
                     }
                     else if (isHorzCenter) {
-                        dx = (w - tm.height - posv) * 0.5;
-                        sx = x + (w - posv) * 0.5 - (mul * 0.5) * tm.height;
-                        sw = x + (w + posv) * 0.5 + (mul * 0.5) * tm.height;
+                        dx = (w - angleSin * tm.height - posv) / 2;
+                        offsetX = - (w - posv) / 2 + angleSin * tm.height / 2;
                     }
                     else if (isHorzRight) {
-                        dx = w - posv - tm.height; sx = x + dx;
-                        sx = x + dx - (mul * 0.5) * tm.height;
+                        dx = asc_calcnpt(w  - posv + 1 + 1 - tm.height * angleSin, 96);
+                        offsetX = - asc_calcnpt(w  - posv + 1 + 1 - tm.height * angleSin, 96);
                     }
 
-                    //
-
-                    dy = Math.min(h + tm.height * mul, posh);
+                    dy = Math.min(h + tm.height * angleCos, posh);
                 }
             }
 
-            var bound = { dx: dx, dy: dy, x: x, y: y, sx: sx, sw: sw, height: 0, width: 0 };
+            var bound = { dx: dx, dy: dy, x: x, y: y, height: 0, width: 0, offsetX: offsetX};
 
             if (angle === 90 || angle === -90) {
                 bound.width = tm.height;
                 bound.height = textW;
             } else {
-                bound.height = Math.abs(Math.sin(angle / 180.0 * Math.PI) * textW) + (mul) * tm.height;
-                bound.width = Math.abs(Math.cos(angle / 180.0 * Math.PI) * textW) + Math.abs(Math.sin(angle / 180.0 * Math.PI) * tm.height);
+                bound.height = Math.abs(angleSin * textW) + Math.abs(angleCos * tm.height);
+                bound.width  = Math.abs(angleCos * textW) + Math.abs(angleSin * tm.height);
+
                 // Делаем кратным 1pt
                 bound.height = asc_calcnpt(bound.height, 96);
             }

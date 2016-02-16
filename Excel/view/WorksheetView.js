@@ -2696,8 +2696,8 @@
                 wb = this.cols[col].width;
                 hb = this.rows[row].height;
 
-                txtRotX = ct.textBound.sx + xb1;
-                txtRotW = ct.textBound.sw + xb1;
+                txtRotX = xb1 - ct.textBound.offsetX;
+                txtRotW = ct.textBound.width + xb1 - ct.textBound.offsetX;
 
                 if ( isMerged ) {
 
@@ -2791,12 +2791,12 @@
             if ( ct.angle || 0 ) {
 
                 xb1 = this.cols[col].left - offsetX;
-                yb1 = this.rows[row].top - offsetY;
-                wb = this.cols[col].width;
-                hb = this.rows[row].height;
+                yb1 = this.rows[row].top  - offsetY;
+                wb  = this.cols[col].width;
+                hb  = this.rows[row].height;
 
-                txtRotX = ct.textBound.sx + xb1;
-                txtRotW = ct.textBound.sw + xb1;
+                txtRotX = xb1 - ct.textBound.offsetX;
+                txtRotW = ct.textBound.width + xb1 - ct.textBound.offsetX;
 
                 if ( isMerged ) {
 
@@ -2871,12 +2871,25 @@
 
                 this.stringRender.rotateAtPoint( null, ct.angle, xb1, yb1, ct.textBound.dx, ct.textBound.dy );
                 this.stringRender.restoreInternalState( ct.state ).render( 0, 0, textW, ct.color );
+
+//                var color = new CColor(0, 0, 255, 0.5);
+//
+//                ctx.setStrokeStyle(color).
+//                    moveTo(0, 0).
+//                    lineTo(ct.metrics.width, 0).
+//                    lineTo(ct.metrics.width, ct.metrics.height).
+//                    lineTo(0, ct.metrics.height).
+//                    closePath().
+//                    stroke();
+
                 this.stringRender.resetTransform( null );
 
                 if ( clipUse ) {
                     ctx.restore();
                 }
 
+//                color = new CColor( 0, 0, 255, 0.5 );
+//                ctx.setStrokeStyle(color).strokeRect(xb1 - ct.textBound.offsetX, yb1, ct.textBound.width,  ct.textBound.height);
             }
             else {
                 ctx.save().beginPath().rect( x1, y1, w, h ).clip();
