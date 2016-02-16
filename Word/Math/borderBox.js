@@ -645,6 +645,24 @@ CMathBoxPr.prototype.Apply_AlnAt = function(alnAt)
         this.brk.Apply_AlnAt(alnAt);
     }
 };
+CMathBoxPr.prototype.IsForcedBreak = function()
+{
+    return this.opEmu == true && this.brk !== undefined;
+};
+CMathBoxPr.prototype.Insert_ForcedBreak = function()
+{
+    if(false == this.IsForcedBreak())
+    {
+        this.brk = new CMathBreak();
+    }
+};
+CMathBoxPr.prototype.Delete_ForcedBreak = function()
+{
+    if(true == this.IsForcedBreak())
+    {
+        this.brk = undefined;
+    }
+};
 CMathBoxPr.prototype.Copy = function()
 {
     var NewPr = new CMathBoxPr();
@@ -768,7 +786,7 @@ CBox.prototype.IsForcedBreak = function()
 {
     var bInline = this.ParaMath.Is_Inline();
 
-    return bInline == false && this.Pr.opEmu == true && this.Pr.brk !== undefined;
+    return bInline == false && this.Pr.IsForcedBreak();
 };
 CBox.prototype.Get_AlignBrk = function()
 {
@@ -803,19 +821,45 @@ CBox.prototype.Can_ModifyArgSize = function()
 {
     return false === this.Is_SelectInside();
 };
+CBox.prototype.Apply_MenuProps = function(Props)
+{
+    if(Props.Type === c_oAscMathInterfaceType.Box)
+    {
+        if(Props.Action & c_oMathMenuAction.InsertForcedBreak && true == this.Can_InsertForcedBreak())
+        {
+            History.Add(this, new CChangesMathBoxForcedBreak(true, false));
+            this.raw_ForcedBreak(true);
+        }
+
+        if(Props.Action & c_oMathMenuAction.DeleteForcedBreak && true == this.Can_DeleteForcedBreak())
+        {
+            History.Add(this, new CChangesMathBoxForcedBreak(false, true));
+            this.raw_ForcedBreak(false);
+        }
+    }
+};
 CBox.prototype.Get_InterfaceProps = function()
 {
     return new CMathMenuBox(this);
 };
-CBox.prototype.Can_AddManualBreak = function()
+CBox.prototype.Can_InsertForcedBreak = function()
 {
-    var bInline = this.ParaMath.Is_Inline();
-
-    return false === bInline && true == this.Pr.opEmu;
+    return false === this.IsForcedBreak();
 };
-CBox.prototype.Can_DeleteManualBreak = function()
+CBox.prototype.Can_DeleteForcedBreak = function()
 {
     return this.IsForcedBreak();
+};
+CBox.prototype.raw_ForcedBreak = function(InsertBreak)
+{
+    if(InsertBreak)
+    {
+        this.Pr.Insert_ForcedBreak();
+    }
+    else
+    {
+        this.Pr.Delete_ForcedBreak();
+    }
 };
 
 /**

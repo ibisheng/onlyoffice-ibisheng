@@ -3867,7 +3867,7 @@ var historyitem_Math_MatrixInterval            =  52;
 var historyitem_Math_MatrixPlh                 =  53;
 var historyitem_Math_MatrixMinColumnWidth      =  54;
 var historyitem_Math_BarLinePos                =  55;
-var historyitem_Math_BoxAddForcedBreak         =  56;
+var historyitem_Math_BoxForcedBreak            =  56;
 var historyitem_Math_DegreeSubSupType          =  57;
 
 
@@ -3930,7 +3930,7 @@ function ReadChanges_FromBinary(Reader, Class)
         case historyitem_Math_MatrixPlh             : Changes = new CChangesMathMatrixPlh(); break;
         case historyitem_Math_MatrixMinColumnWidth  : Changes = new CChangesMathMatrixMinColumnWidth(); break;
         case historyitem_Math_BarLinePos            : Changes = new CChangesMathBarLinePos(); break;
-        case historyitem_Math_BoxAddForcedBreak     : Changes = new CChangesMathBoxAddForcedBreak(); break;
+        case historyitem_Math_BoxForcedBreak        : Changes = new CChangesMathBoxForcedBreak(); break;
         case historyitem_Math_DegreeSubSupType      : Changes = new CChangesMathDegreeSubSupType(); break;
     }
 
@@ -6116,14 +6116,40 @@ CChangesMathBarLinePos.prototype.Load_Changes = function(Reader, Class)
     this.Redo(Class);
 };
 
-function CChangesMathBoxAddForcedBreak()
+function CChangesMathBoxForcedBreak(NewBreak, OldBreak)
 {
-
+    this.New = NewBreak;
+    this.Old = OldBreak;
 }
-CChangesMathBoxAddForcedBreak.prototype.Type = historyitem_Math_BoxAddForcedBreak;
-CChangesMathBoxAddForcedBreak.prototype.Undo = function(Class)
+CChangesMathBoxForcedBreak.prototype.Type = historyitem_Math_BoxForcedBreak;
+CChangesMathBoxForcedBreak.prototype.Undo = function(Class)
 {
+    Class.raw_ForcedBreak(this.Old);
+};
+CChangesMathBoxForcedBreak.prototype.Redo = function(Class)
+{
+    Class.raw_ForcedBreak(this.New);
+};
+CChangesMathBoxForcedBreak.prototype.Save_Changes = function(Writer)
+{
+    if ( undefined === this.New )
+    {
+        Writer.WriteBool( true );
+    }
+    else
+    {
+        Writer.WriteBool( false );
+        Writer.WriteBool( this.New );
+    }
+};
+CChangesMathBoxForcedBreak.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
 
+    this.Redo(Class);
 };
 
 

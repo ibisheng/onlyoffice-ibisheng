@@ -2684,11 +2684,11 @@ CMathBase.prototype.Is_SelectInside = function()
 {
     return this.Selection.Use == true && this.Selection.StartPos !== this.Selection.EndPos;
 };
-CMathBase.prototype.Can_AddManualBreak = function()
+CMathBase.prototype.Can_InsertForcedBreak = function()
 {
     return false;
 };
-CMathBase.prototype.Can_DeleteManualBreak = function()
+CMathBase.prototype.Can_DeleteForcedBreak = function()
 {
     return false;
 };
@@ -3016,8 +3016,8 @@ var c_oMathMenuAction = {
     DeleteDelimiterArgument : 0x00000400,
     IncreaseArgumentSize    : 0x00000800,
     DecreaseArgumentSize    : 0x00001000,
-    InsertManualBreak       : 0x00002000,
-    DeleteManualBreak       : 0x00004000,
+    InsertForcedBreak       : 0x00002000,
+    DeleteForcedBreak       : 0x00004000,
     AlignToCharacter        : 0x00008000,
     RemoveDelimiter         : 0x00010000,
     RemoveRadical           : 0x00020000
@@ -3033,16 +3033,16 @@ function CMathMenuBase(oMath)
     {
         this.CanIncreaseArgumentSize = false;
         this.CanDecreaseArgumentSize = false;
-        this.CanInsertManualBreak    = false;
-        this.CanDeleteManualBreak    = false;
+        this.CanInsertForcedBreak    = false;
+        this.CanDeleteForcedBreak    = false;
         this.CanAlignToCharacter     = false;
     }
     else
     {
         this.CanIncreaseArgumentSize = oMath.Can_IncreaseArgumentSize();
         this.CanDecreaseArgumentSize = oMath.Can_DecreaseArgumentSize();
-        this.CanInsertManualBreak    = oMath.Can_AddManualBreak();
-        this.CanDeleteManualBreak    = oMath.Can_DeleteManualBreak();
+        this.CanInsertForcedBreak    = oMath.Can_InsertForcedBreak();
+        this.CanDeleteForcedBreak    = oMath.Can_DeleteForcedBreak();
         this.CanAlignToCharacter     = false;
     }
 }
@@ -3120,11 +3120,11 @@ CMathMenuBase.prototype.decrease_ArgumentSize = function()
 };
 CMathMenuBase.prototype.can_InsertManualBreak = function()
 {
-    return this.CanInsertManualBreak;
+    return this.CanInsertForcedBreak;
 };
 CMathMenuBase.prototype.can_DeleteManualBreak = function()
 {
-    return this.CanDeleteManualBreak;
+    return this.CanDeleteForcedBreak;
 };
 CMathMenuBase.prototype.can_AlignToCharacter = function()
 {
@@ -3132,11 +3132,11 @@ CMathMenuBase.prototype.can_AlignToCharacter = function()
 };
 CMathMenuBase.prototype.insert_ManualBreak = function()
 {
-    this.Action |= c_oMathMenuAction.InsertManualBreak;
+    this.Action |= c_oMathMenuAction.InsertForcedBreak;
 };
 CMathMenuBase.prototype.delete_ManualBreak = function()
 {
-    this.Action |= c_oMathMenuAction.DeleteManualBreak;
+    this.Action |= c_oMathMenuAction.DeleteForcedBreak;
 };
 CMathMenuBase.prototype.align_ToCharacter = function()
 {
