@@ -144,7 +144,48 @@
 					this.element = undefined;
 				}
 			},
-
+			
+			checkCopyToClipboard: function(ws, _clipboard, _formats)
+			{
+				var _data;
+				var activeRange = ws.getSelectedRange();
+				var wb = window["Asc"]["editor"].wb;
+				
+				if(ws.getCellEditMode() === true)//text in cell
+				{
+					//only text
+					var fragments = wb.cellEditor.copySelection();
+					_data = wb.cellEditor._getFragmentsText(fragments);
+					_clipboard.pushData(c_oAscClipboardDataFormat.Text, _data)
+				}
+				else
+				{	
+					//TEXT
+					if (c_oAscClipboardDataFormat.Text & _formats)
+					{
+						//_data = ;
+						//_clipboard.pushData(c_oAscClipboardDataFormat.Text, _data)
+					}
+					//HTML
+					if(c_oAscClipboardDataFormat.Html & _formats)
+					{	
+						_data = this._makeTableNode(activeRange, ws);
+						_clipboard.pushData(c_oAscClipboardDataFormat.Html, _data)
+					}
+					//INTERNAL
+					if(c_oAscClipboardDataFormat.Internal & _formats)
+					{
+						_data = this._getBinaryForCopy(worksheetView);
+						_clipboard.pushData(c_oAscClipboardDataFormat.Internal, _data)
+					}
+					
+					if(c_oAscClipboardDataFormat.HtmlElement & _formats)
+					{
+						
+					}
+				}
+			},
+			
 			copyDesktopEditorButton: function(ElemToSelect, isCut)
 			{
 				if (isCut)

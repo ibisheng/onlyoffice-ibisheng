@@ -581,6 +581,12 @@ var editor;
     return result;
   };
 
+  spreadsheet_api.prototype.asc_CheckCopy = function(_clipboard /* CClipboardData */, _formats)
+  {
+	var result = this.wb.checkCopyToClipboard(_clipboard, _formats);
+	return result;
+  };
+  
   spreadsheet_api.prototype.asc_bIsEmptyClipboard = function() {
     var result = this.wb.bIsEmptyClipboard();
     this.wb.restoreFocus();

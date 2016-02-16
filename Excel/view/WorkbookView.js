@@ -1987,6 +1987,12 @@
       }
     }
   };
+  
+   WorkbookView.prototype.checkCopyToClipboard = function(_clipboard, _formats) {
+    var t = this, ws, v;
+    ws = t.getWorksheet();
+    t.clipboard.checkCopyToClipboard(ws, _clipboard, _formats);
+  };
 
   WorkbookView.prototype.undo = function() {
     if (!this.getCellEditMode()) {
