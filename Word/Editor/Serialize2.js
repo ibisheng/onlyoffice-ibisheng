@@ -246,7 +246,8 @@ var c_oSerProp_cellPrType = {
     CellDel: 7,
     CellIns: 8,
     CellMerge: 9,
-    tcPrChange: 10
+    tcPrChange: 10,
+    textDirection: 11
 };
 var c_oSerProp_secPrType = {
     pgSz: 0,
@@ -3402,7 +3403,7 @@ Binary_tblPrWriter.prototype =
 			}
 		}
     },
-    WriteCellPr: function(cellPr, vMerge)
+    WriteCellPr: function(cellPr, vMerge, cell)
     {
         var oThis = this;
         //GridSpan
@@ -3458,6 +3459,13 @@ Binary_tblPrWriter.prototype =
             this.memory.WriteByte(c_oSerProp_cellPrType.VMerge);
             this.memory.WriteByte(c_oSerPropLenType.Byte);
             this.memory.WriteByte(nVMerge);
+        }
+        var textDirection = cell ? cell.Get_TextDirection() : null;
+        if(null != textDirection)
+        {
+            this.memory.WriteByte(c_oSerProp_cellPrType.textDirection);
+            this.memory.WriteByte(c_oSerPropLenType.Byte);
+            this.memory.WriteByte(textDirection);
         }
     }
 };
@@ -4548,7 +4556,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				if(table.Internal_GetVertMergeCount( nRowIndex, StartGridCol, cell.Get_GridSpan() ) > 1)
 					vMerge = vmerge_Restart;
 			}
-			this.bs.WriteItem(c_oSerDocTableType.Cell_Pr, function(){oThis.btblPrs.WriteCellPr(cell.Pr, vMerge);});
+			this.bs.WriteItem(c_oSerDocTableType.Cell_Pr, function(){oThis.btblPrs.WriteCellPr(cell.Pr, vMerge, cell);});
         }
         //Content
         if(null != cell.Content)
@@ -7362,6 +7370,9 @@ Binary_tblPrReader.prototype =
         }
         else if( c_oSerProp_cellPrType.tcPrChange === type ){
             res = c_oSerConstants.ReadUnknown;//todo
+        }
+        else if( c_oSerProp_cellPrType.textDirection === type ){
+            Pr.TextDirection = this.stream.GetUChar();
         }
         else
             res = c_oSerConstants.ReadUnknown;
