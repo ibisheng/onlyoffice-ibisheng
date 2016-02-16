@@ -64,7 +64,9 @@ var c_oAscError = {
     CannotFillRange: -81,
 
     UserDrop: -100,
-    Warning: -101
+    Warning: -101,
+
+    OpenWarning: 500
   }
 };
 var c_oAscConfirm = {

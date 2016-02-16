@@ -1931,6 +1931,8 @@ function Workbook(eventsHandlers, oApi){
 	this.aCollaborativeChangeElements = [];
 	
 	this.wsHandlers = null;
+
+  this.openErrors = [];
 }
 Workbook.prototype.init=function(bNoBuildDep){
 	if(this.nActive < 0)
@@ -3226,10 +3228,14 @@ Woorksheet.prototype.initPostOpen = function(handlers){
 					}
 				}
 			}
-			if(oFormulaExt.v && oFormulaExt.v.length <= c_oAscMaxFormulaLength) {
-        oCell.setFormula(oFormulaExt.v);
-        if(oFormulaExt.ca) {
-          oCell.sFormulaCA = true;
+			if(oFormulaExt.v) {
+        if (oFormulaExt.v.length <= c_oAscMaxFormulaLength) {
+          oCell.setFormula(oFormulaExt.v);
+          if(oFormulaExt.ca) {
+            oCell.sFormulaCA = true;
+          }
+        } else {
+          this.workbook.openErrors.push(oCell.getName());
         }
       }
 			

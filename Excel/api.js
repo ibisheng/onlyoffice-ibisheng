@@ -1466,6 +1466,11 @@ var editor;
     // Меняем тип состояния (на никакое)
     this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 
+    // Были ошибки при открытии, посылаем предупреждение
+    if (0 < this.wbModel.openErrors.length) {
+      this.sendEvent('asc_onError', c_oAscError.ID.OpenWarning, c_oAscError.Level.NoCritical);
+    }
+
     //this.asc_Resize(); // Убрал, т.к. сверху приходит resize (http://bugzserver/show_bug.cgi?id=14680)
   };
 
