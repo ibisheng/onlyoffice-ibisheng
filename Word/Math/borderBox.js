@@ -567,7 +567,7 @@ CMathMenuBorderBox.prototype.put_HideTopLTR = function(bHideTopLTR){this.HideTop
 CMathMenuBorderBox.prototype.get_HideTopRTL = function(){return this.HideTopRTL;};
 CMathMenuBorderBox.prototype.put_HideTopRTL = function(bHideTopRTL){this.HideTopRTL = bHideTopRTL;};
 
-window["CMathMenuBorderBox"] = CMathMenuBorderBox;
+window["CMathMenuBorderBox"]                   = CMathMenuBorderBox;
 CMathMenuBorderBox.prototype["get_HideTop"]    = CMathMenuBorderBox.prototype.get_HideTop;
 CMathMenuBorderBox.prototype["put_HideTop"]    = CMathMenuBorderBox.prototype.put_HideTop;
 CMathMenuBorderBox.prototype["get_HideBottom"] = CMathMenuBorderBox.prototype.get_HideBottom;

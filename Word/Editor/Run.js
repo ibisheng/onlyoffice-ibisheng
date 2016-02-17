@@ -9903,6 +9903,16 @@ ParaRun.prototype.getPropsForWrite = function()
 
     return {wRPrp: wRPrp, mathRPrp: mathRPrp};
 };
+ParaRun.prototype.Get_MathPr = function(bCopy)
+{
+    if(this.Type = para_Math_Run)
+    {
+        if(bCopy)
+            return this.MathPrp.Copy();
+        else
+            return this.MathPrp;
+    }
+};
 ParaRun.prototype.Math_PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 {
     this.Parent    = Parent;
