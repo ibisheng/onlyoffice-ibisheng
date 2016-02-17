@@ -1260,12 +1260,12 @@
 		  index = this.cellFormulaEnterWSOpen.model.getIndex();
 		  isCellEditMode = isCellEditMode ? isCellEditMode : this.cellFormulaEnterWSOpen.getCellEditMode();
 		  this.cellFormulaEnterWSOpen.setCellEditMode(false);
+		  this.cellFormulaEnterWSOpen = null;
 		  if( index != ws.model.getIndex() ){
 			  this.showWorksheet(index);
 			  this.handlers.trigger("asc_onActiveSheetChanged", index);
 		  }
-		  ws = this.cellFormulaEnterWSOpen;
-		  this.cellFormulaEnterWSOpen = null;
+		  ws = this.getWorksheet(index);
      }
 
 	  for (var i in this.wsViews) {
