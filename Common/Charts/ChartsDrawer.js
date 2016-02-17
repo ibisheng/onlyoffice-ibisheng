@@ -9806,7 +9806,7 @@ valAxisChart.prototype =
 		var pen;
 		var path;
 	
-		pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;	
+		pen = this.cChartSpace.chart.plotArea.valAx.compiledLn;
 		path = this.paths.axisLine;
 		this.cChartDrawer.drawPath(path, pen);
 	},

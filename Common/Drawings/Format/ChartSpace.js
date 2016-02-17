@@ -6837,6 +6837,12 @@ CChartSpace.prototype =
 
                     compiled_grid_lines.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
                     checkBlackUnifill(compiled_grid_lines.Fill, true);
+                    if(spPr && spPr.ln)
+                    {
+                        compiled_grid_lines.merge(spPr.ln);
+                        compiled_grid_lines.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+                    }
+
                     return compiled_grid_lines;
                 }
                 axis.compiledLn = calcGridLine(defaultStyle.axisAndMajorGridLines, axis.spPr, subtleLine, parents);
