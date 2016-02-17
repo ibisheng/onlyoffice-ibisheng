@@ -10038,7 +10038,6 @@ ParaRun.prototype.Math_Correct_Content = function()
 ParaRun.prototype.OnlyOnePlaceholder = function()
 {
     return this.Content.length == 1 && this.Content[0].Type == para_Math_Placeholder;
-
 };
 ParaRun.prototype.Set_MathPr = function(MPrp)
 {

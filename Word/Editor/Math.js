@@ -685,17 +685,20 @@ CParaMathLineWidths.prototype.GetNumberLine = function(Line)
 
 function CMathPageInfo()
 {
-    this.WPages      = [];          // widths on page
-    this.StartLine   = -1;
-    this.StartPage   = -1;
-    this.CurPage     = -1;
+    this.WPages            = [];    // widths on page
+    this.StartLine         = -1;
+    this.StartPage         = -1;
+    this.CurPage           = -1;
+    this.RelativePage      = -1;
 }
 CMathPageInfo.prototype.Reset = function()
 {
-    this.StartLine     = -1;
-    this.StartPage     = -1;
-    this.CurPage       = -1;
-    this.WPages.length =  0;
+    this.StartLine         = -1;
+    this.StartPage         = -1;
+    this.CurPage           = -1;
+    this.RelativePage      = -1;
+    this.WPages.length     =  0;
+
 };
 CMathPageInfo.prototype.Reset_Page = function(_Page)
 {
@@ -716,6 +719,10 @@ CMathPageInfo.prototype.SetStartPos = function(Page, StartLine)
 {
     this.StartPage   = Page;
     this.StartLine   = StartLine;
+};
+CMathPageInfo.prototype.Update_RelativePage = function(RelativePage)
+{
+    this.RelativePage = RelativePage;
 };
 CMathPageInfo.prototype.UpdateCurrentPage = function(Page, ParaLine)
 {
@@ -843,10 +850,13 @@ CMathPageInfo.prototype.IsResetNextPage = function(_Page)
     {
         var Page = _Page - this.StartPage;
         bReset = this.CurPage < Page;
-
     }
 
     return bReset;
+};
+CMathPageInfo.prototype.IsResetRelativePage = function(_RelativePage)
+{
+    return this.CurPage == -1 ? false : _RelativePage !== this.RelativePage;
 };
 CMathPageInfo.prototype.IsFirstLineOnPage = function(_Line, _Page)
 {
@@ -1616,10 +1626,11 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.protected_UpdateSpellChecking();
     }
 
-    var Para      = PRS.Paragraph;
-    var ParaLine  = PRS.Line;
-    var ParaRange = PRS.Range;
-    var Page      = this.Paragraph == null ? 0 : this.Paragraph.Get_AbsolutePage(PRS.Page);
+    var Para         = PRS.Paragraph;
+    var ParaLine     = PRS.Line;
+    var ParaRange    = PRS.Range;
+    var Page         = this.Paragraph == null ? 0 : this.Paragraph.Get_AbsolutePage(PRS.Page);
+    var RelativePage = PRS.Page;
 
     var bStartRange    = this.Root.IsStartRange(ParaLine, ParaRange);
 
@@ -1644,7 +1655,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
         this.PageInfo.Reset();
         this.PageInfo.SetStartPos(Page, ParaLine);
-
+        this.PageInfo.Update_RelativePage(RelativePage);
         this.ParaMathRPI.Reset(PRS, ParaPr);
     }
     else
@@ -1668,7 +1679,16 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         {
             this.ParaMathRPI.Reset(PRS, ParaPr);
             this.PageInfo.Reset_Page(Page);
+
+
         }
+
+        if(true == this.PageInfo.IsResetRelativePage(PRS.Page))
+        {
+            this.ParaMathRPI.Reset(PRS, ParaPr);
+            this.PageInfo.Update_RelativePage(RelativePage);
+        }
+
     }
 
     PRS.MathNotInline = this.ParaMathRPI.bInline  == false; // если неинлайновая формула, то рассчитываем Ranges по максимальному измерению
