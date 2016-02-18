@@ -1943,11 +1943,30 @@ var maxIndividualValues = 10000;
 				
 				for(var i = 0; i < tableParts.length; i++ )
 				{
-					if((tableParts[i].Ref.r1 >= ref.r1 && tableParts[i].Ref.r1 <= ref.r2) || (tableParts[i].Ref.r2 >= ref.r1 && tableParts[i].Ref.r2 <= ref.r2))
+					if(this._intersectionRowRanges(tableParts[i].Ref, ref) === true)
 					{
 						this._setColorStyleTable(tableParts[i].Ref, tableParts[i]);
 					}
 				}
+			},
+			
+			_intersectionRowRanges: function(range1, range2)
+			{	
+				var res = false;
+				
+				if(!range1 || !range2)
+					return false;
+				
+				if((range1.r1 >= range2.r1 && range1.r1 <= range2.r2) || (range1.r2 >= range2.r1 && range1.r2 <= range2.r2))
+				{
+					res = true;
+				}
+				else if((range2.r1 >= range1.r1 && range2.r1 <= range1.r2) || (range2.r2 >= range1.r1 && range2.r2 <= range1.r2))
+				{
+					res = true;
+				}
+				
+				return res;
 			},
 			
 			_moveAutoFilters: function(arnTo, arnFrom, data, copyRange, offLock)
