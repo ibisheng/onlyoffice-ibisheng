@@ -200,10 +200,6 @@
 	};
 
 	function CGradient (c1, c2) {
-		if ( !(this instanceof CGradient) ) {
-			return new CGradient (c1, c2);
-		}
-
 		this.MaxColorIndex = 512;
 		this.base_shift = 8;
 
