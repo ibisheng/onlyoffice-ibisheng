@@ -1530,24 +1530,24 @@
 		t._cleanSelection();
 	};
 
-	CellEditor.prototype._topLineMouseUp = function () {
-		var t = this;
-		this.callTopLineMouseup = false;
-		// при такой комбинации ctrl+a, click, ctrl+a, click не обновляется selectionStart
-		// поэтому выполняем обработку после обработчика системы
-		setTimeout( function () {
-			var b = t.input.selectionStart;
-			var e = t.input.selectionEnd;
-			if ( typeof b !== "undefined" ) {
-				if ( t.cursorPos !== b ) {
-					t._moveCursor( kPosition, b );
-				}
-				if ( b !== e ) {
-					t._selectChars( kPosition, e );
-				}
-			}
-		} );
-	};
+    CellEditor.prototype._topLineMouseUp = function() {
+        var t = this;
+        this.callTopLineMouseup = false;
+        // при такой комбинации ctrl+a, click, ctrl+a, click не обновляется selectionStart
+        // поэтому выполняем обработку после обработчика системы
+        setTimeout(function() {
+            var b = t.input.selectionStart;
+            var e = t.input.selectionEnd;
+            if (typeof b !== "undefined") {
+                if (t.cursorPos !== b || t.selectionBegin !== t.selectionEnd) {
+                    t._moveCursor(kPosition, b);
+                }
+                if (b !== e) {
+                    t._selectChars(kPosition, e);
+                }
+            }
+        });
+    };
 
 	CellEditor.prototype._syncEditors = function () {
 		var t = this;
