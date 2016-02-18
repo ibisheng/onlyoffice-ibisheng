@@ -9111,18 +9111,18 @@ Paragraph.prototype =
         return null;
     },
 
-    Update_CursorType : function(X, Y, PageIndex)
+    Update_CursorType : function(X, Y, CurPage)
     {
+        CurPage = Math.max(0, Math.min(CurPage, this.Pages.length - 1));
         var text_transform = this.Get_ParentTextTransform();
         var MMData = new CMouseMoveData();
-        var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( X, Y, this.Get_StartPage_Absolute() + ( PageIndex - this.PageNum ), text_transform );
+        var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( X, Y, this.Get_AbsolutePage(CurPage), text_transform );
         MMData.X_abs = Coords.X;
         MMData.Y_abs = Coords.Y;
 
-        var Hyperlink = this.Check_Hyperlink(X, Y, PageIndex);
+        var Hyperlink = this.Check_Hyperlink(X, Y, CurPage);
 
-        var PNum = PageIndex;
-        if ( null != Hyperlink && ( PNum >= 0 && PNum < this.Pages.length && Y <= this.Pages[PNum].Bounds.Bottom && Y >= this.Pages[PNum].Bounds.Top ) )
+        if (null != Hyperlink && (Y <= this.Pages[CurPage].Bounds.Bottom && Y >= this.Pages[CurPage].Bounds.Top))
         {
             MMData.Type      = c_oAscMouseMoveDataTypes.Hyperlink;
             MMData.Hyperlink = new CHyperlinkProperty( Hyperlink );
@@ -9135,15 +9135,14 @@ Paragraph.prototype =
         else
             this.DrawingDocument.SetCursorType( "default", MMData );
 
-        var PNum = Math.max( 0, Math.min( PageIndex - this.PageNum, this.Pages.length - 1 ) );
-        var Bounds = this.Pages[PNum].Bounds;
+        var Bounds = this.Pages[CurPage].Bounds;
         if ( true === this.Lock.Is_Locked() && X < Bounds.Right && X > Bounds.Left && Y > Bounds.Top && Y < Bounds.Bottom )
         {
-            var _X = this.Pages[PNum].X;
-            var _Y = this.Pages[PNum].Y;
+            var _X = this.Pages[CurPage].X;
+            var _Y = this.Pages[CurPage].Y;
 
             var MMData = new CMouseMoveData();
-            var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( _X, _Y, this.Get_StartPage_Absolute() + ( PageIndex - this.PageNum ), text_transform );
+            var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( _X, _Y, this.Get_AbsolutePage(CurPage), text_transform );
             MMData.X_abs            = Coords.X - 5;
             MMData.Y_abs            = Coords.Y;
             MMData.Type             = c_oAscMouseMoveDataTypes.LockedObject;

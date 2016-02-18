@@ -328,6 +328,7 @@ ParaText.prototype =
     Read_FromBinary : function(Reader)
     {
         this.Value = Reader.GetLong();
+        this.Set_SpaceAfter(45 === this.Value);
     }
 };
 
