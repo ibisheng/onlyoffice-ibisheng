@@ -1124,75 +1124,11 @@
         this._initPane();
         this._initCellsArea( true );
         this.autoFilters.addFiltersAfterOpen();
-        this._initConditionalFormatting();
         this._cleanCellsTextMetricsCache();
         this._prepareCellTextMetricsCache();
 
         // initializing is completed
         this.handlers.trigger( "initialized" );
-    };
-
-    WorksheetView.prototype._initConditionalFormatting = function () {
-        var oGradient = null;
-        var aCFs = this.model.aConditionalFormatting;
-        var aRules, oRule;
-        var oRuleElement = null;
-        var min = Number.MAX_VALUE;
-        var max = -Number.MAX_VALUE;
-        var tmp;
-        var arrayCells = [];
-        for ( var i in aCFs ) {
-            aRules = aCFs[i].aRules;
-            if ( 0 >= aRules.length ) {
-                continue;
-            }
-            for ( var j in aRules ) {
-                oRule = aRules[j];
-                // ToDo aboveAverage, beginsWith, cellIs, containsBlanks, containsErrors,
-                // ToDo containsText, dataBar, duplicateValues, endsWith, expression, iconSet, notContainsBlanks,
-                // ToDo notContainsErrors, notContainsText, timePeriod, top10, uniqueValues (page 2679)
-                switch ( oRule.Type ) {
-                    case Asc.ECfType.colorScale:
-                        if ( 1 !== oRule.aRuleElements.length ) {
-                            break;
-                        }
-                        oRuleElement = oRule.aRuleElements[0];
-                        // ToDo убрать null === aCFs[i].SqRefRange когда научимся мультиселект обрабатывать (\\192.168.5.2\source\DOCUMENTS\XLSX\Matematika Quantum Sedekah.xlsx)
-                        if ( !(oRuleElement instanceof asc.CColorScale) || null === aCFs[i].SqRefRange ) {
-                            break;
-                        }
-                        aCFs[i].SqRefRange._setPropertyNoEmpty( null, null, function ( c ) {
-                            if ( CellValueType.Number === c.getType() && false === c.isEmptyTextString() ) {
-                                tmp = parseFloat( c.getValueWithoutFormat() );
-                                if ( isNaN( tmp ) ) {
-                                    return;
-                                }
-                                arrayCells.push( {cell: c, val: tmp} );
-                                min = Math.min( min, tmp );
-                                max = Math.max( max, tmp );
-                            }
-                        } );
-
-                        // ToDo CFVO Type (formula, max, min, num, percent, percentile) (page 2681)
-                        // ToDo support 3 colors in rule
-                        if ( 0 < arrayCells.length && 2 === oRuleElement.aColors.length ) {
-                            oGradient = new asc.CGradient( oRuleElement.aColors[0], oRuleElement.aColors[1] );
-                            oGradient.init( min, max );
-
-                            for ( var cell in arrayCells ) {
-                                var dxf = new CellXfs();
-                                dxf.fill = new Fill( {bg: oGradient.calculateColor( arrayCells[cell].val )} );
-                                arrayCells[cell].cell.setConditionalFormattingStyle( dxf );
-                            }
-                        }
-
-                        arrayCells.splice( 0, arrayCells.length );
-                        min = Number.MAX_VALUE;
-                        max = -Number.MAX_VALUE;
-                        break;
-                }
-            }
-        }
     };
 
     WorksheetView.prototype._prepareComments = function () {

@@ -3273,9 +3273,71 @@ Woorksheet.prototype.initPostOpen = function(handlers){
             this.sheetViews[j].pane = null;
         }
     }
+
+  this._initConditionalFormatting();
 	
 	this.handlers = handlers;
 	this._setHandlersTablePart();
+};
+Woorksheet.prototype._initConditionalFormatting = function() {
+  var oGradient = null;
+  var aCFs = this.aConditionalFormatting;
+  var aRules, oRule;
+  var oRuleElement = null;
+  var min = Number.MAX_VALUE;
+  var max = -Number.MAX_VALUE;
+  var arrayCells = [];
+  var tmp, i, j, cell;
+  for (i = 0; i < aCFs.length; ++i) {
+    aRules = aCFs[i].aRules;
+    for (j = 0; j < aRules.length; ++j) {
+      oRule = aRules[j];
+      // ToDo aboveAverage, beginsWith, cellIs, containsBlanks, containsErrors,
+      // ToDo containsText, dataBar, duplicateValues, endsWith, expression, iconSet, notContainsBlanks,
+      // ToDo notContainsErrors, notContainsText, timePeriod, top10, uniqueValues (page 2679)
+      switch (oRule.Type) {
+        case Asc.ECfType.colorScale:
+          if (1 !== oRule.aRuleElements.length) {
+            break;
+          }
+          oRuleElement = oRule.aRuleElements[0];
+          // ToDo убрать null === aCFs[i].SqRefRange когда научимся мультиселект обрабатывать (\\192.168.5.2\source\DOCUMENTS\XLSX\Matematika Quantum Sedekah.xlsx)
+          if (!(oRuleElement instanceof Asc.CColorScale) || null === aCFs[i].SqRefRange) {
+            break;
+          }
+
+          aCFs[i].SqRefRange._setPropertyNoEmpty(null, null, function(c) {
+            if (CellValueType.Number === c.getType() && false === c.isEmptyTextString()) {
+              tmp = parseFloat(c.getValueWithoutFormat());
+              if (isNaN(tmp)) {
+                return;
+              }
+              arrayCells.push({cell: c, val: tmp});
+              min = Math.min(min, tmp);
+              max = Math.max(max, tmp);
+            }
+          });
+
+          // ToDo CFVO Type (formula, max, min, num, percent, percentile) (page 2681)
+          // ToDo support 3 colors in rule
+          if (0 < arrayCells.length && 2 === oRuleElement.aColors.length) {
+            oGradient = new Asc.CGradient(oRuleElement.aColors[0], oRuleElement.aColors[1]);
+            oGradient.init(min, max);
+
+            for (cell = 0; cell < arrayCells.length; ++cell) {
+              var dxf = new CellXfs();
+              dxf.fill = new Fill({bg: oGradient.calculateColor(arrayCells[cell].val)});
+              arrayCells[cell].cell.setConditionalFormattingStyle(dxf);
+            }
+          }
+
+          arrayCells.length = 0;
+          min = Number.MAX_VALUE;
+          max = -Number.MAX_VALUE;
+          break;
+      }
+    }
+  }
 };
 Woorksheet.prototype._forEachCell=function(fAction){
 	for(var rowInd in this.aGCells){
