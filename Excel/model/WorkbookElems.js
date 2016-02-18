@@ -4497,43 +4497,59 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 	{
 		case g_nFormulaTablePartInfo.all: 
 		{
-			break
+			res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r2);
+            //All поразному работает в случае если у таблицы есть или нет строки Totals
+            //При наличии Totals All возвращает диапазон с учетом этой строки.
+			break;
 		}
 		case g_nFormulaTablePartInfo.data: 
 		{
-			break
+			res = new Asc.Range(this.Ref.c1, this.Ref.r1 + 1, this.Ref.c2, this.Ref.r2);
+			break;
 		}
 		case g_nFormulaTablePartInfo.headers: 
 		{
-			break
+			res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r1);
+			break;
 		}
 		case g_nFormulaTablePartInfo.totals: 
 		{
-			break
+			if(this.TotalsRowCount && this.TotalsRowCount >= 1)
+			{
+				res = new Asc.Range(this.Ref.c1, this.Ref.r2, this.Ref.c2, this.Ref.r2);
+			}
+			
+			break;
 		}
 		case g_nFormulaTablePartInfo.thisRow: 
 		{
-			break
+            if( this.Ref.containsRange( objectParam.cell ) ){
+                res = new Asc.Range( this.Ref.c1, objectParam.cell.r1, this.Ref.c2, objectParam.cell.r1 );
+            }
+			break;
 		}
 		case g_nFormulaTablePartInfo.columns: 
 		{
-			var startCol = this._getTableIndexColumnByName(objectParam.startCol);
-			var endCol = this._getTableIndexColumnByName(objectParam.endCol);
+			var startCol = this.getTableIndexColumnByName(objectParam.startCol);
+			var endCol = this.getTableIndexColumnByName(objectParam.endCol);
 			
 			if(startCol === null)
 				break;
 			if(endCol === null)
 				endCol = startCol;
 			
-			res = new Asc.Range(this.Ref.c1 + startCol, this.Ref.r1, this.Ref.c1 + endCol, this.Ref.r2);
-			
-			break
+			res = new Asc.Range(this.Ref.c1 + startCol, this.Ref.r1+1, this.Ref.c1 + endCol, this.Ref.r2);
+			break;
 		}
 	}
+    if( objectParam.includeColumnHeader && res ){
+        res.r1--;
+        res.r1 < 0 ? res.r1 = 0 : null;
+    }
 	return res;
 };
 
-TablePart.prototype._getTableIndexColumnByName = function(name)
+TablePart.prototype.getTableIndexColumnByName = function(name)
 {
 	var res = null;
 	if(name === null || name === undefined || !this.TableColumns)
@@ -4541,9 +4557,27 @@ TablePart.prototype._getTableIndexColumnByName = function(name)
 		
 	for(var i = 0; i < this.TableColumns.length; i++)
 	{
-		if(name === this.TableColumns[i].Name)
+		if(name.toLowerCase() === this.TableColumns[i].Name.toLowerCase())
 		{
 			res = i;
+			break;
+		}
+	}
+	
+	return res;
+};
+
+TablePart.prototype.getTableNameColumnByIndex = function(index)
+{
+	var res = null;
+	if(name === null || name === undefined || !this.TableColumns)
+		return res;
+		
+	for(var i = 0; i < this.TableColumns.length; i++)
+	{
+		if(index === i)
+		{
+			res = this.TableColumns[i].Name;
 			break;
 		}
 	}

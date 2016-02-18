@@ -3788,9 +3788,101 @@ cSQRTPI.prototype.getInfo = function () {
 
 function cSUBTOTAL() {
     cBaseFunction.call( this, "SUBTOTAL" );
+	this.setArgumentsMin( 1 );
+    this.setArgumentsMax( 255 );
 }
 
 cSUBTOTAL.prototype = Object.create( cBaseFunction.prototype )
+cSUBTOTAL.prototype.Calculate = function ( arg ) {
+	var arg0 = arg[0];
+
+	if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+		arg0 = arg0.cross( arguments[1].first );
+	}
+	arg0 = arg0.tocNumber();
+	if ( !(arg0 instanceof cNumber) )
+		return this.value = arg0;
+
+	arg0 = arg0.getValue();
+
+	switch ( arg0 ) {
+		case cSubTotalFunctionType.includes.AVERAGE:
+			this.value = (new cAVERAGE()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.includes.COUNT:
+			this.value = (new cCOUNT()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.includes.COUNTA:
+			this.value = (new cCOUNTA()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.includes.MAX:
+			this.value = (new cMAX()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.includes.MIN:
+			this.value = (new cMIN()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.includes.PRODUCT:
+			this.value = (new cPRODUCT()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.includes.STDEV:
+			this.value = (new cSTDEV()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.includes.STDEVP:
+			this.value = (new cSTDEVP()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.includes.SUM:
+			this.value = (new cSUM()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.includes.VAR:
+			this.value = (new cVAR()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.includes.VARP:
+			this.value = (new cVARP()).Calculate(arg.slice(1));
+			break;
+
+		case cSubTotalFunctionType.excludes.AVERAGE:
+			this.value = (new cAVERAGE()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.excludes.COUNT:
+			this.value = (new cCOUNT()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.excludes.COUNTA:
+			this.value = (new cCOUNTA()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.excludes.MAX:
+			this.value = (new cMAX()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.excludes.MIN:
+			this.value = (new cMIN()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.excludes.PRODUCT:
+			this.value = (new cPRODUCT()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.excludes.STDEV:
+			this.value = (new cSTDEV()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.excludes.STDEVP:
+			this.value = (new cSTDEVP()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.excludes.SUM:
+			this.value = (new cSUM()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.excludes.VAR:
+			this.value = (new cVAR()).Calculate(arg.slice(1));
+			break;
+		case cSubTotalFunctionType.excludes.VARP:
+			this.value = (new cVARP()).Calculate(arg.slice(1));
+			break;
+	}
+
+	return this.value;
+}
+cSUBTOTAL.prototype.getInfo = function () {
+	return {
+		name:this.name,
+		args:"( function-number , argument-list )"
+	};
+}
 
 function cSUM() {
 //    cBaseFunction.call( this, "SUM" );

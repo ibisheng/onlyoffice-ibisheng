@@ -3030,6 +3030,7 @@ var editor;
         cFormulaFunctionToLocale[i] = localName;
       }
     }
+	  build_rx_table_local(oLocalizedData?oLocalizedData["StructureTables"]:null);
     if (this.wb) {
       this.wb.initFormulasList();
     }

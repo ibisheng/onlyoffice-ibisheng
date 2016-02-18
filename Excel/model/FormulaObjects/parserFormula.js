@@ -1,34 +1,35 @@
 ﻿"use strict";
 /** @enum */
 var cElementType = {
-    number      :0,
-    string      :1,
-    bool        :2,
-    error       :3,
-    empty       :4,
-    cellsRange  :5,
-    cell        :6,
-    date        :7,
-    func        :8,
-    operator    :9,
-    name        :10,
-    array       :11,
-    cell3D      :12,
-    cellsRange3D:13
-};
+		number      : 0,
+		string      : 1,
+		bool        : 2,
+		error       : 3,
+		empty       : 4,
+		cellsRange  : 5,
+		cell        : 6,
+		date        : 7,
+		func        : 8,
+		operator    : 9,
+		name        : 10,
+		array       : 11,
+		cell3D      : 12,
+		cellsRange3D: 13,
+		table       : 14
+	},
 /** @enum */
-var cErrorType = {
-    unsupported_function:0,
-    null_value          :1,
-    division_by_zero    :2,
-    wrong_value_type    :3,
-    bad_reference       :4,
-    wrong_name          :5,
-    not_numeric         :6,
-    not_available       :7,
-    getting_data        :8
-};
-var cExcelSignificantDigits = 15, //количество цифр в числе после запятой
+	cErrorType = {
+		unsupported_function: 0,
+		null_value          : 1,
+		division_by_zero    : 2,
+		wrong_value_type    : 3,
+		bad_reference       : 4,
+		wrong_name          : 5,
+		not_numeric         : 6,
+		not_available       : 7,
+		getting_data        : 8
+	},
+	cExcelSignificantDigits = 15, //количество цифр в числе после запятой
     cExcelMaxExponent = 308,
     cExcelMinExponent = -308,
     cExcelDateTimeDigits = 8, //количество цифр после запятой в числах отвечающих за время специализация $18.17.4.2
@@ -36,7 +37,43 @@ var cExcelSignificantDigits = 15, //количество цифр в числе 
     c_Date1900Const = 25568, //разница в днях между 01.01.1970 и 01.01.1900 годами
     c_DateCorrectConst = c_Date1900Const,
     c_sPerDay = 86400,
-    c_msPerDay = c_sPerDay * 1000;
+    c_msPerDay = c_sPerDay * 1000,
+	cStrucTableReservedWords = {
+		all    : "#All",
+		data   : "#Data",
+		headers: "#Headers",
+		totals : "#Totals",
+		thisrow: "#This Row",
+		at     : "@"
+	},
+	cSubTotalFunctionType = {
+		includes: {
+			AVERAGE: 1,
+			COUNT  : 2,
+			COUNTA : 3,
+			MAX    : 4,
+			MIN    : 5,
+			PRODUCT: 6,
+			STDEV  : 7,
+			STDEVP : 8,
+			SUM    : 9,
+			VAR    : 10,
+			VARP   : 11
+		},
+		excludes: {
+			AVERAGE: 101,
+			COUNT  : 102,
+			COUNTA : 103,
+			MAX    : 104,
+			MIN    : 105,
+			PRODUCT: 106,
+			STDEV  : 107,
+			STDEVP : 108,
+			SUM    : 109,
+			VAR    : 110,
+			VARP   : 111
+		}
+	};
 
 Date.prototype.excelNullDate1900 = Date.UTC( 1899, 11, 30, 0, 0, 0 );
 Date.prototype.excelNullDate1904 = Date.UTC( 1904, 0, 1, 0, 0, 0 );
@@ -238,8 +275,8 @@ function cBaseType( val, type ) {
     this.value = val;
 }
 cBaseType.prototype = {
-    constructor   :cBaseType,
-    cloneTo       :function ( oRes ) {
+    constructor   : cBaseType,
+    cloneTo       : function ( oRes ) {
         oRes.needRecalc = this.needRecalc;
         oRes.numFormat = this.numFormat;
         oRes.type = this.type;
@@ -247,19 +284,19 @@ cBaseType.prototype = {
         oRes.ca = this.ca;
         oRes.node = this.node;
     },
-    tryConvert    :function () {
+    tryConvert    : function () {
         return this;
     },
-    getValue      :function () {
+    getValue      : function () {
         return this.value;
     },
-    toString      :function () {
+    toString      : function () {
         return this.value.toString();
     },
-    toLocaleString:function () {
+    toLocaleString: function () {
         return this.toString();
     },
-    setNode       :function ( node ) {
+    setNode       : function ( node ) {
         this.node = node;
     }
 };
@@ -381,12 +418,7 @@ cBool.prototype.tocString = function () {
 };
 cBool.prototype.toLocaleString = function ( digitDelim ) {
     return this.toString();
-    return new cString( this.value ? "TRUE" : "FALSE" );
-    var res = this.value.toString();
-    if ( digitDelim )
-        return res.replace( digitSeparatorDef, digitSeparator );
-    else
-        return res;
+//    return new cString( this.value ? "TRUE" : "FALSE" );
 };
 cBool.prototype.tocBool = function () {
     return this;
@@ -686,16 +718,16 @@ cArea.prototype.getRefMatrix = function () {
         if ( !arr[i - r1] )
             arr[i - r1] = [];
         if (cell)
-            arr[i - r1][j - c1] = new cRef( cell.getName(), t.ws );
+        arr[i - r1][j - c1] = new cRef( cell.getName(), t.ws );
         else
             arr[i - r1][j - c1] = new cRef( t.ws._getCell( i, j ).getName(), t.ws );
     } );
     return arr;
 };
-cArea.prototype.index = function ( r, c, n ) {
+cArea.prototype.index = function ( r, c ) {
     var bbox = this.getBBox0();
     bbox.normalize();
-    var box = {c1:1, c2:bbox.c2 - bbox.c1 + 1, r1:1, r2:bbox.r2 - bbox.r1 + 1};
+    var box = {c1: 1, c2: bbox.c2 - bbox.c1 + 1, r1: 1, r2: bbox.r2 - bbox.r1 + 1};
 
     if ( r < box.r1 || r > box.r2 || c < box.c1 || c > box.c2 ) {
         return new cError( cErrorType.bad_reference );
@@ -1178,7 +1210,7 @@ cRef.prototype.getMatrix = function () {
     ];
 }
 cRef.prototype.getBBox0 = function () {
-		return this.getRange().getBBox0();
+    return this.getRange().getBBox0();
 };
 
 /** @constructor */
@@ -1273,7 +1305,7 @@ cRef3D.prototype.getWS = function () {
 };
 cRef3D.prototype.getBBox0 = function () {
     var range = this.getRange();
-    if( range ){
+    if ( range ) {
         return range.getBBox0();
     }
     return null;
@@ -1391,8 +1423,320 @@ cName.prototype.Calculate = function () {
 };
 
 /** @constructor */
+function cStrucTable( val, wb, ws, cell ) {
+    this.constructor.call( this, val[0], cElementType.table );
+    this.wb = wb;
+    this.ws = ws;
+    this.tableName = val.tableName;
+	this.table = this.wb.getDefinesNames( this.tableName, this.ws ? this.ws.getId() : null );
+    this.reservedColumn = null;
+    this.tableData = null;
+
+    this.createArea( val, cell );
+
+}
+
+cStrucTable.prototype = Object.create( cBaseType.prototype );
+cStrucTable.prototype.addDefinedNameNode = function ( nameReParse ) {
+	if ( !this.table || !this.table.Ref ) {
+		return this.wb.dependencyFormulas.addDefinedNameNode( this.value, null );
+	}
+	return this.wb.getDefinesNames( this.table.Name, this.ws.getId() );
+};
+cStrucTable.prototype.toRef = function () {
+    return this.area ? this.area : new cError( cErrorType.bad_reference );
+};
+cStrucTable.prototype.toString = function () {
+    var tblStr = this.table.Name, columns_1, columns_2;
+    this.columnName ? tblStr += "[%1]" : null;
+    if ( this.oneColumn ) {
+
+		columns_1= this.wb.getTableNameColumnByIndex( this.tableName, this.oneColumnIndex.index );
+		if( columns_1 ){
+			this.oneColumn = columns_1.columnName;
+		}
+
+		return tblStr.replace( "%1", this.oneColumn  );
+    }
+    if ( this.columnRange ) {
+		columns_1 = this.wb.getTableNameColumnByIndex( this.tableName, this.colStartIndex.index );
+		columns_2 = this.wb.getTableNameColumnByIndex( this.tableName, this.colEndIndex.index );
+		if(columns_1){
+			this.colStart = columns_1.columnName
+		}
+		if(columns_2){
+			this.colEnd = columns_2.columnName
+		}
+		return tblStr.replace( "%1", "[" + this.colStart + "]:[" + this.colEnd + "]" );
+    }
+    if ( this.reservedColumn ) {
+        return tblStr.replace( "%1", this.buildLocalTableString(this.reservedColumnIndex,false) );
+    }
+    if ( this.hdt ) {
+        var re = /\[(.*?)\]/ig, m, data = "";
+        while ( null !== (m = re.exec( this.hdt )) ) {
+            data += "[" + m[1] + "]" + functionArgumentSeparatorDef;
+        }
+        data = data.substr( 0, data.length - 1 );
+        if ( this.hdtcstart ) {
+
+			columns_1 = this.wb.getTableNameColumnByIndex( this.tableName, this.colStartIndex.index );
+			if( columns_1 ){
+				this.hdtcstart = columns_1.columnName;
+			}
+
+			data += functionArgumentSeparatorDef + "[" + this.hdtcstart + "]"
+        }
+        if ( this.hdtcend ) {
+
+			columns_2 = this.wb.getTableNameColumnByIndex( this.tableName, this.colStartIndex.index );
+			if( columns_2 ){
+				this.hdtcend = columns_2.columnName;
+			}
+
+            data += ":[" + this.hdtcend + "]"
+        }
+        return tblStr.replace( "%1", data );
+    }
+    return tblStr.replace( "%1", "" );
+};
+cStrucTable.prototype.toLocaleString = function ( digitDelim ) {
+//    return this.toString();
+
+	var tblStr = this.table.Name, columns_1, columns_2;
+	this.columnName ? tblStr += "[%1]" : null;
+	if ( this.oneColumn ) {
+
+		columns_1= this.wb.getTableNameColumnByIndex( this.tableName, this.oneColumnIndex.index );
+		if( columns_1 ){
+			this.oneColumn = columns_1.columnName;
+		}
+
+		return tblStr.replace( "%1", this.oneColumn  );
+	}
+	if ( this.columnRange ) {
+		columns_1 = this.wb.getTableNameColumnByIndex( this.tableName, this.colStartIndex.index );
+		columns_2 = this.wb.getTableNameColumnByIndex( this.tableName, this.colEndIndex.index );
+		if(columns_1){
+			this.colStart = columns_1.columnName
+		}
+		if(columns_2){
+			this.colEnd = columns_2.columnName
+		}
+		return tblStr.replace( "%1", "[" + this.colStart + "]:[" + this.colEnd + "]" );
+	}
+	if ( this.reservedColumn ) {
+		return tblStr.replace( "%1", this.buildLocalTableString(this.reservedColumnIndex,true) );
+	}
+	if ( this.hdt ) {
+		var re = /\[(.*?)\]/ig, m, data = "";
+		while ( null !== (m = re.exec( this.hdt )) ) {
+			data += "[" + m[1] + "]" + functionArgumentSeparatorDef;
+		}
+		data = data.substr( 0, data.length - 1 );
+		if ( this.hdtcstart ) {
+
+			columns_1 = this.wb.getTableNameColumnByIndex( this.tableName, this.colStartIndex.index );
+			if( columns_1 ){
+				this.hdtcstart = columns_1.columnName;
+			}
+
+			data += functionArgumentSeparatorDef + "[" + this.hdtcstart + "]"
+		}
+		if ( this.hdtcend ) {
+
+			columns_2 = this.wb.getTableNameColumnByIndex( this.tableName, this.colStartIndex.index );
+			if( columns_2 ){
+				this.hdtcend = columns_2.columnName;
+			}
+
+			data += ":[" + this.hdtcend + "]"
+		}
+		return tblStr.replace( "%1", data );
+	}
+	return tblStr.replace( "%1", "" );
+};
+cStrucTable.prototype.changeArea = function ( offset ) {
+    return this.area;
+};
+cStrucTable.prototype.createArea = function ( val, cell ) {
+    this.columnName  = val.columnName;
+
+    var paramObj = {param: null, startCol: null, endCol: null, cell: cell.bbox, includeColumnHeader:false};
+
+    function getColumnType( value ) {
+        var res;
+        switch ( value.toLowerCase() ) {
+            case "#"+cStrucTableLocalColumns.a.toLocaleLowerCase():
+            case cStrucTableReservedWords.all.toLocaleLowerCase():
+                res = g_nFormulaTablePartInfo.all;
+                break;
+			case "#"+cStrucTableLocalColumns.d.toLocaleLowerCase():
+            case cStrucTableReservedWords.data.toLocaleLowerCase():
+                res = g_nFormulaTablePartInfo.data;
+                break;
+			case "#"+cStrucTableLocalColumns.h.toLocaleLowerCase():
+            case cStrucTableReservedWords.headers.toLocaleLowerCase():
+                res = g_nFormulaTablePartInfo.headers;
+                break;
+			case "#"+cStrucTableLocalColumns.t.toLocaleLowerCase():
+            case cStrucTableReservedWords.totals.toLocaleLowerCase():
+                res = g_nFormulaTablePartInfo.totals;
+                break;
+			case "#"+cStrucTableLocalColumns.tr.toLocaleLowerCase():
+            case cStrucTableReservedWords.at.toLocaleLowerCase():
+            case cStrucTableReservedWords.thisrow.toLocaleLowerCase():
+                res = g_nFormulaTablePartInfo.thisRow;
+                break;
+            default:
+                res = g_nFormulaTablePartInfo.data;
+                break;
+        }
+        return res;
+    }
+
+    if ( val.oneColumn || val.columnRange ) {
+
+        this.oneColumn = val.oneColumn;
+        this.columnRange = val.columnRange;
+
+        paramObj.param = g_nFormulaTablePartInfo.columns;
+        if ( val.columnRange ) {
+            this.columnRange = val.columnRange;
+            paramObj.startCol = this.colStart = val.colStart;
+            paramObj.endCol = this.colEnd = val.colEnd;
+			if( !this.colEnd )
+				this.colEnd = this.colStart;
+
+			this.colStartIndex = this.wb.getTableIndexColumnByName( this.tableName, this.colStart );
+			this.colEndIndex = this.wb.getTableIndexColumnByName( this.tableName, this.colEnd );
+        }
+        else {
+            paramObj.startCol = this.oneColumn = val.oneColumn;
+			this.oneColumnIndex = this.wb.getTableIndexColumnByName( this.tableName, this.oneColumn );
+        }
+
+        this.tableData = this.wb.getTableRangeForFormula( this.tableName, paramObj );
+
+        if ( !this.tableData ) {
+            this.area = new cError( cErrorType.bad_reference );
+            return;
+        }
+
+        this.area = this.tableData.range.isOneCell() ?
+            new cRef3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb ):
+            new cArea3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb );
+    }
+    else if ( val.reservedColumn || !val.columnName ) {
+		this.reservedColumn = val.reservedColumn || "";
+		this.reservedColumnIndex = paramObj.param = getColumnType( this.reservedColumn );
+
+        this.tableData = this.wb.getTableRangeForFormula( this.tableName, paramObj );
+        if ( !this.tableData ) {
+            this.area = new cError( cErrorType.bad_reference );
+            return;
+        }
+
+		this.area = this.tableData.range.isOneCell() ?
+            new cRef3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb ):
+            new cArea3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb );
+    }
+    else if ( val.hdtcc ) {
+        this.hdt = val.hdt;
+        this.hdtcstart = val.hdtcstart;
+        this.hdtcend = val.hdtcend;
+        var re = /\[(.*?)\]/ig, m, data, range;
+        while ( null !== (m = re.exec( this.hdt )) ) {
+            paramObj.param = getColumnType( m[1] );
+            data = this.wb.getTableRangeForFormula( this.tableName, paramObj );
+
+            if ( !data ) {
+                this.area = new cError( cErrorType.bad_reference );
+                return;
+            }
+
+            if ( range ) {
+                range.union2( data.range );
+            }
+            else {
+                range = data.range;
+            }
+        }
+
+        if ( this.hdtcstart ) {
+            paramObj.param = g_nFormulaTablePartInfo.columns;
+            paramObj.startCol = this.hdtcstart;
+            paramObj.endCol = null;
+
+            if ( this.hdtcend ) {
+                paramObj.endCol = this.hdtcend;
+            }
+
+            paramObj.includeColumnHeader = true;
+            data = this.wb.getTableRangeForFormula( this.tableName, paramObj );
+
+            if ( !data ) {
+                this.area = new cError( cErrorType.bad_reference );
+                return;
+            }
+
+            if ( range ) {
+                range = range.intersection( data.range );
+            }
+            else {
+                range = data.range;
+            }
+        }
+
+        this.tableData = data;
+        this.tableData.range = range;
+
+        this.area = range.isOneCell() ?
+            new cRef3D( range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb ):
+            new cArea3D( range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb );
+    }
+
+    !this.area ? this.area = new cError( cErrorType.bad_reference ) : null;
+};
+cStrucTable.prototype.buildLocalTableString = function (reservedColumn,local) {
+
+	switch(reservedColumn){
+		case g_nFormulaTablePartInfo.all:{
+			if(local)
+				return "#"+cStrucTableLocalColumns.a;
+			return cStrucTableReservedWords.all;
+			break;
+		}
+		case g_nFormulaTablePartInfo.data:{
+			if(local)
+				return "#"+cStrucTableLocalColumns.d;
+			return cStrucTableReservedWords.data;
+			break;
+		}
+		case g_nFormulaTablePartInfo.headers:{
+			if(local)
+				return "#"+cStrucTableLocalColumns.h;
+			return cStrucTableReservedWords.headers;
+			break;
+		}
+		case g_nFormulaTablePartInfo.totals:{
+			if(local)
+				return "#"+cStrucTableLocalColumns.t;
+			return cStrucTableReservedWords.totals;
+			break;
+		}
+		case g_nFormulaTablePartInfo.thisRow:{
+			if(local)
+				return "#"+cStrucTableLocalColumns.tr;
+			return cStrucTableReservedWords.thisrow;
+			break;
+		}
+	}
+}
+
+/** @constructor */
 function cName3D( val, wsFrom, wb, ws ) {
-    this.constructor.call( this, wsFrom+"!"+val, cElementType.name );
+    this.constructor.call( this, wsFrom + "!" + val, cElementType.name );
     this.regSpace = /\$/g;
     this.wb = wb;
     this.ws = ws;
@@ -1404,7 +1748,7 @@ function cName3D( val, wsFrom, wb, ws ) {
 }
 cName3D.prototype = Object.create( cBaseType.prototype );
 cName3D.prototype.toRef = function () {
-    return new cError( cErrorType.wrong_name );
+    return this.area;
 }
 cName3D.prototype.Calculate = function () {
     return new cError( cErrorType.wrong_name );
@@ -1656,24 +2000,24 @@ function cBaseOperator( name, priority, argumentCount ) {
     }
     this.value = null;
     this.formatType = {
-        def       :-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
+        def       : -1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat: -2
     };
     this.numFormat = this.formatType.def;
 }
 
 cBaseOperator.prototype = {
-    constructor    :cBaseOperator,
-    getArguments   :function () {
+    constructor    : cBaseOperator,
+    getArguments   : function () {
         return this.argumentsCurrent;
     },
-    toString       :function () {
+    toString       : function () {
         return this.name;
     },
-    Calculate      :function () {
+    Calculate      : function () {
         return null;
     },
-    Assemble       :function ( arg ) {
+    Assemble       : function ( arg ) {
         var str = "";
         if ( this.argumentsCurrent === 2 ) {
             str = arg[0] + "" + this.name + "" + arg[1];
@@ -1683,7 +2027,7 @@ cBaseOperator.prototype = {
         }
         return new cString( str );
     },
-    Assemble2      :function ( arg, start, count ) {
+    Assemble2      : function ( arg, start, count ) {
         var str = "";
         if ( this.argumentsCurrent === 2 ) {
             str += arg[start + count - 2] + this.name + arg[start + count - 1];
@@ -1693,7 +2037,7 @@ cBaseOperator.prototype = {
         }
         return new cString( str );
     },
-    Assemble2Locale:function ( arg, start, count, locale, digitDelim ) {
+    Assemble2Locale: function ( arg, start, count, locale, digitDelim ) {
         var str = "";
         if ( this.argumentsCurrent === 2 ) {
             str += arg[start + count - 2].toLocaleString( digitDelim ) + this.name + arg[start + count - 1].toLocaleString( digitDelim );
@@ -1714,47 +2058,47 @@ function cBaseFunction( name, argMin, argMax ) {
     this.argumentsCurrent = 0;
     this.argumentsMax = argMax ? argMax : 255;
     this.formatType = {
-        def       :-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
+        def       : -1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat: -2
     };
     this.numFormat = this.formatType.def;
 //    this.isXLFN = rx_sFuncPref.test(this.name);
 }
 
 cBaseFunction.prototype = {
-    constructor       :cBaseFunction,
-    Calculate         :function () {
+    constructor       : cBaseFunction,
+    Calculate         : function () {
         this.value = new cError( cErrorType.wrong_name );
         return this.value;
     },
-    setArgumentsMin   :function ( count ) {
+    setArgumentsMin   : function ( count ) {
         this.argumentsMin = count;
     },
-    setArgumentsMax   :function ( count ) {
+    setArgumentsMax   : function ( count ) {
         this.argumentsMax = count;
     },
-    DecrementArguments:function () {
+    DecrementArguments: function () {
         --this.argumentsCurrent;
     },
-    IncrementArguments:function () {
+    IncrementArguments: function () {
         ++this.argumentsCurrent;
     },
-    setName           :function ( name ) {
+    setName           : function ( name ) {
         this.name = name;
     },
-    setArgumentsCount :function ( count ) {
+    setArgumentsCount : function ( count ) {
         this.argumentsCurrent = count;
     },
-    getArguments      :function () {
+    getArguments      : function () {
         return this.argumentsCurrent;
     },
-    getMaxArguments   :function () {
+    getMaxArguments   : function () {
         return this.argumentsMax;
     },
-    getMinArguments   :function () {
+    getMinArguments   : function () {
         return this.argumentsMin;
     },
-    Assemble          :function ( arg ) {
+    Assemble          : function ( arg ) {
         var str = "";
         for ( var i = 0; i < arg.length; i++ ) {
             str += arg[i].toString();
@@ -1762,12 +2106,12 @@ cBaseFunction.prototype = {
                 str += ",";
             }
         }
-        if( this.isXLFN ){
+        if ( this.isXLFN ) {
             return new cString( "_xlfn." + this.name + "(" + str + ")" );
         }
         return new cString( this.toString() + "(" + str + ")" );
     },
-    Assemble2         :function ( arg, start, count ) {
+    Assemble2         : function ( arg, start, count ) {
 
         var str = "", c = start + count - 1;
         for ( var i = start; i <= c; i++ ) {
@@ -1776,12 +2120,12 @@ cBaseFunction.prototype = {
                 str += ",";
             }
         }
-        if( this.isXLFN ){
+        if ( this.isXLFN ) {
             return new cString( "_xlfn." + this.name + "(" + str + ")" );
         }
         return new cString( this.toString() + "(" + str + ")" );
     },
-    Assemble2Locale   :function ( arg, start, count, locale, digitDelim ) {
+    Assemble2Locale   : function ( arg, start, count, locale, digitDelim ) {
 
         var name = this.toString(),
             str = "", c = start + count - 1,
@@ -1796,10 +2140,10 @@ cBaseFunction.prototype = {
         }
         return new cString( localeName + "(" + str + ")" );
     },
-    toString          :function () {
+    toString          : function () {
         return this.name.replace( rx_sFuncPref, "_xlfn." );
     },
-    setCA             :function ( arg, ca, numFormat ) {
+    setCA             : function ( arg, ca, numFormat ) {
         this.value = arg;
         if ( ca ) {
             this.value.ca = true;
@@ -1809,7 +2153,7 @@ cBaseFunction.prototype = {
         }
         return this.value;
     },
-    setFormat         :function ( f ) {
+    setFormat         : function ( f ) {
         this.numFormat = f;
     }
 };
@@ -1863,34 +2207,34 @@ function cRangeUnionOperator() {
 cRangeUnionOperator.prototype = Object.create( cBaseOperator.prototype );
 cRangeUnionOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], wsId0, wsId1, wb, ws;
-    if ( ( arg0 instanceof cRef || arg0 instanceof cArea || arg0 instanceof cRef3D || arg0 instanceof cArea3D && (wsId0=arg0.wsFrom) == arg0.wsTo ) &&
-         ( arg1 instanceof cRef || arg1 instanceof cArea || arg1 instanceof cRef3D || arg1 instanceof cArea3D && (wsId1=arg1.wsFrom) == arg1.wsTo ) ){
+    if ( ( arg0 instanceof cRef || arg0 instanceof cArea || arg0 instanceof cRef3D || arg0 instanceof cArea3D && (wsId0 = arg0.wsFrom) == arg0.wsTo ) &&
+        ( arg1 instanceof cRef || arg1 instanceof cArea || arg1 instanceof cRef3D || arg1 instanceof cArea3D && (wsId1 = arg1.wsFrom) == arg1.wsTo ) ) {
 
-        if( arg0 instanceof cArea3D ){
+        if ( arg0 instanceof cArea3D ) {
             wsId0 = arg0.wsFrom;
             ws = arg0.getWS();
         }
-        else{
+        else {
             wsId0 = arg0.ws.getId();
             ws = arg0.getWS();
         }
 
-        if( arg1 instanceof cArea3D ){
+        if ( arg1 instanceof cArea3D ) {
             wsId1 = arg1.wsFrom;
             ws = arg1.getWS();
         }
-        else{
+        else {
             wsId1 = arg1.ws.getId();
             ws = arg1.getWS();
         }
 
-        if( wsId0 != wsId1 ){
+        if ( wsId0 != wsId1 ) {
             return this.value = new cError( cErrorType.wrong_value_type );
         }
 
         arg0 = arg0.getBBox0();
         arg1 = arg1.getBBox0();
-        if( !arg0 || !arg1 ){
+        if ( !arg0 || !arg1 ) {
             return this.value = new cError( cErrorType.wrong_value_type );
         }
         arg0 = arg0.union( arg1 );
@@ -2365,9 +2709,9 @@ cGreaterOrEqualOperator.prototype.Calculate = function ( arg ) {
 
 /* cFormulaOperators is container for holding all ECMA-376 operators, see chapter $18.17.2.2 in "ECMA-376, Second Edition, Part 1 - Fundamentals And Markup Language Reference" */
 var cFormulaOperators = {
-    '('       :parentLeft,
-    ')'       :parentRight,
-    '{'       :function () {
+    '('       : parentLeft,
+    ')'       : parentRight,
+    '{'       : function () {
         var r = {};
         r.name = '{';
         r.toString = function () {
@@ -2375,7 +2719,7 @@ var cFormulaOperators = {
         };
         return r;
     },
-    '}'       :function () {
+    '}'       : function () {
         var r = {};
         r.name = '}';
         r.toString = function () {
@@ -2385,21 +2729,21 @@ var cFormulaOperators = {
     },
     /* 50 is highest priority */
     ':'       :cRangeUnionOperator,
-    'un_minus':cUnarMinusOperator,
-    'un_plus' :cUnarPlusOperator,
-    '%'       :cPercentOperator,
-    '^'       :cPowOperator,
-    '*'       :cMultOperator,
-    '/'       :cDivOperator,
-    '+'       :cAddOperator,
-    '-'       :cMinusOperator,
-    '&'       :cConcatSTROperator /*concat str*/,
-    '='       :cEqualsOperator/*equals*/,
-    '<>'      :cNotEqualsOperator,
-    '<'       :cLessOperator,
-    '<='      :cLessOrEqualOperator,
-    '>'       :cGreaterOperator,
-    '>='      :cGreaterOrEqualOperator
+    'un_minus': cUnarMinusOperator,
+    'un_plus' : cUnarPlusOperator,
+    '%'       : cPercentOperator,
+    '^'       : cPowOperator,
+    '*'       : cMultOperator,
+    '/'       : cDivOperator,
+    '+'       : cAddOperator,
+    '-'       : cMinusOperator,
+    '&'       : cConcatSTROperator /*concat str*/,
+    '='       : cEqualsOperator/*equals*/,
+    '<>'      : cNotEqualsOperator,
+    '<'       : cLessOperator,
+    '<='      : cLessOrEqualOperator,
+    '>'       : cGreaterOperator,
+    '>='      : cGreaterOrEqualOperator
     /* 10 is lowest priopity */
 };
 
@@ -3411,9 +3755,9 @@ function parserFormula( formula, _cellId, _ws ) {
 parserFormula.prototype = {
 
     /** @type parserFormula */
-    constructor:parserFormula,
+    constructor: parserFormula,
 
-    clone:function ( formula, cellId, ws ) {
+    clone: function ( formula, cellId, ws ) {
         if ( null == formula )
             formula = this.Formula;
         if ( null == cellId )
@@ -3439,7 +3783,7 @@ parserFormula.prototype = {
         return oRes;
     },
 
-    setFormula:function ( formula ) {
+    setFormula: function ( formula ) {
         this.Formula = formula;
         this.is3D = false;
         this.value = null;
@@ -3457,12 +3801,12 @@ parserFormula.prototype = {
         this.countRef = 0;
     },
 
-    setCellId:function ( cellId ) {
+    setCellId: function ( cellId ) {
         this.cellId = cellId;
         this.cellAddress = g_oCellAddressUtils.getCellAddress( cellId );
     },
 
-    parse:function ( local, digitDelim ) {
+    parse: function ( local, digitDelim ) {
 
         function checkAbsRef( operand_str, found_operand ) {
 
@@ -3536,7 +3880,7 @@ parserFormula.prototype = {
          */
         this.operand_expected = true;
         var wasLeftParentheses = false, wasRigthParentheses = false,
-            found_operand = null, _3DRefTmp = null;
+            found_operand = null, _3DRefTmp = null, _tableTMP = null;
         var cFormulaList = (local && cFormulaFunctionLocalized) ? cFormulaFunctionLocalized : cFormulaFunction;
         while ( this.pCurrPos < this.Formula.length ) {
             this.operand_str = this.Formula[this.pCurrPos];
@@ -3748,8 +4092,8 @@ parserFormula.prototype = {
             else if ( parserHelp.isArray.call( this, this.Formula, this.pCurrPos, digitDelim ) ) {
                 wasLeftParentheses = false;
                 wasRigthParentheses = false;
-                var pH = new parserHelper(), tO = {pCurrPos:0, Formula:this.operand_str, operand_str:""};
-                var arr = new cArray(), operator = { isOperator:false, operatorName:""};
+                var pH = new parserHelper(), tO = {pCurrPos: 0, Formula: this.operand_str, operand_str: ""};
+                var arr = new cArray(), operator = { isOperator: false, operatorName: ""};
                 while ( tO.pCurrPos < tO.Formula.length ) {
 
                     if ( pH.isArraySeparator.call( tO, tO.Formula, tO.pCurrPos, digitDelim ) ) {
@@ -3779,7 +4123,7 @@ parserFormula.prototype = {
                             }
                         }
                         arr.addElement( new cNumber( parseFloat( tO.operand_str ) ) );
-                        operator = { isOperator:false, operatorName:""};
+                        operator = { isOperator: false, operatorName: ""};
                     }
                     else if ( pH.isOperator.call( tO, tO.Formula, tO.pCurrPos ) ) {
                         operator.isOperator = true;
@@ -3837,7 +4181,7 @@ parserFormula.prototype = {
                         _wsTo = ( (_3DRefTmp[2] !== null) && (_3DRefTmp[2] !== undefined) ) ? _3DRefTmp[2] : _wsFrom,
                         wsF = this.wb.getWorksheetByName( _wsFrom ),
                         wsT = this.wb.getWorksheetByName( _wsTo ),
-                        pos = {start:this.pCurrPos - this.operand_str.length - 1, end:this.pCurrPos, index:this.outStack.length};
+                        pos = {start: this.pCurrPos - this.operand_str.length - 1, end: this.pCurrPos, index: this.outStack.length};
 
                     if ( !(wsF && wsT) ) {
                         this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
@@ -3893,11 +4237,19 @@ parserFormula.prototype = {
                     this.countRef++;
                 }
 
+                else if ( _tableTMP = parserHelp.isTable.call( this, this.Formula, this.pCurrPos, local ) ) { // Shall be placed strongly after Area and Ref
+                    found_operand = new cStrucTable( _tableTMP, this.wb, this.ws, this.ws.getCell( this.cellAddress ) );
+                    this.RefPos.push( {start: this.pCurrPos - this.operand_str.length, end: this.pCurrPos, index: this.outStack.length, isName: true, oper:found_operand } );
+                    this.countRef++;
+                }
+
                 /* Referens to DefinedNames */
-                else if ( parserHelp.isName.call( this, this.Formula, this.pCurrPos, this.wb, this.ws )[0] ) { // Shall be placed strongly before Area and Ref
+                else if ( parserHelp.isName.call( this, this.Formula, this.pCurrPos, this.wb, this.ws )[0] ) { // Shall be placed strongly after Area and Ref
                     found_operand = new cName( this.operand_str, this.wb, this.ws );
-//                    this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length, isName: true} );
-                    this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length, isName: true, oper:found_operand } );
+                    if ( found_operand.defName && found_operand.defName.isTable ) {
+                        found_operand = new cStrucTable( parserHelp.isTable( this.operand_str + "[]", 0 ), this.wb, this.ws, this.ws.getCell( this.cellAddress ) );
+                    }
+					this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length, isName: true, oper:found_operand } );
                     this.countRef++;
                 }
 
@@ -3924,12 +4276,12 @@ parserFormula.prototype = {
                     var found_operator = null, operandStr = this.operand_str.replace( rx_sFuncPref, "" ).toUpperCase();
                     if ( operandStr in cFormulaList )
                         found_operator = new cFormulaList[operandStr]();
-                    else if( operandStr in cAllFormulaFunction ){
+                    else if ( operandStr in cAllFormulaFunction ) {
                         found_operator = new cAllFormulaFunction[operandStr]();
                     }
-                    else{
+                    else {
                         found_operator = new cBaseFunction( operandStr );
-                        found_operator.isXLFN  = ( this.operand_str.indexOf("_xlfn.") === 0 );
+                        found_operator.isXLFN = ( this.operand_str.indexOf( "_xlfn." ) === 0 );
                     }
 
                     if ( found_operator != null ) {
@@ -4024,7 +4376,7 @@ parserFormula.prototype = {
         }
     },
 
-    calculate   :function ( isDefName ) {
+    calculate   : function ( isDefName ) {
         if ( this.outStack.length < 1 ) {
             return this.value = new cError( cErrorType.wrong_name );
         }
@@ -4057,6 +4409,9 @@ parserFormula.prototype = {
             else if ( currentElement.type == cElementType.name ) {
                 elemArr.push( currentElement.Calculate() );
             }
+            else if ( currentElement.type == cElementType.table ) {
+                elemArr.push( currentElement.toRef() );
+            }
             else {
                 elemArr.push( currentElement );
             }
@@ -4067,7 +4422,7 @@ parserFormula.prototype = {
     },
 
     /* Метод возвращает все ссылки на ячейки которые участвуют в формуле*/
-    getRef      :function () {
+    getRef      : function () {
         var aOutRef = [];
         for ( var i = 0; i < this.outStack.length; i++ ) {
             var ref = this.outStack[i];
@@ -4078,19 +4433,19 @@ parserFormula.prototype = {
             }
 
             if ( ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea ) {
-                aOutRef.push( {wsId:ref.getWsId(), cell:ref._cells} );
+                aOutRef.push( {wsId: ref.getWsId(), cell: ref._cells} );
             }
             else if ( ref instanceof cArea3D ) {
                 var wsR = ref.wsRange();
                 for ( var j = 0; j < wsR.length; j++ )
-                    aOutRef.push( {wsId:wsR[j].Id, cell:ref._cells} );
+                    aOutRef.push( {wsId: wsR[j].Id, cell: ref._cells} );
             }
         }
         return aOutRef;
     },
 
     /* Для обратной сборки функции иногда необходимо поменять ссылки на ячейки */
-    changeOffset:function ( offset ) {//offset = {offsetCol:intNumber, offsetRow:intNumber}
+    changeOffset: function ( offset ) {//offset = {offsetCol:intNumber, offsetRow:intNumber}
         for ( var i = 0; i < this.outStack.length; i++ ) {
             if ( this.outStack[i] instanceof cRef || this.outStack[i] instanceof cRef3D || this.outStack[i] instanceof cArea ) {
 
@@ -4149,7 +4504,7 @@ parserFormula.prototype = {
         return this;
     },
 
-    setRefError:function ( node ) {
+    setRefError: function ( node ) {
         //когда выставляется setRefError node не сдвигаются, поэтому node.cellId совпадает с elem._cells
         for ( var i = 0; i < this.outStack.length; i++ ) {
             var elem = this.outStack[i];
@@ -4168,7 +4523,7 @@ parserFormula.prototype = {
      offset - на сколько сдвигаем ячейку (offset = {offsetCol:intNumber, offsetRow:intNumber})
      cellId - какую ячейку сдвигаем
      */
-    shiftCells :function ( node, from, to ) {
+    shiftCells : function ( node, from, to ) {
         //node.cellId содержит уже сдвинутое значение
         var sFromName = from.getName(), elem;
         for ( var i = 0; i < this.outStack.length; i++ ) {
@@ -4199,12 +4554,22 @@ parserFormula.prototype = {
         }
     },
 
-    stretchArea   :function ( node, from, to ) {
+    stretchArea   : function ( node, from, to ) {
         //node.cellId содержит уже сдвинутое значение
         var sFromName = from.getName(), elem;
         for ( var i = 0; i < this.outStack.length; i++ ) {
             elem = this.outStack[i];
-            if ( elem instanceof cArea ) {
+            if ( elem.type == cElementType.table ) {
+
+                sFromName = from.getAbsName();
+
+                if ( elem.area.wsFrom == elem.area.wsTo && node.sheetId == elem.area.wsFrom && sFromName == elem.area._cells ) {
+                    elem.area.value = elem.area._cells = node.bbox.getAbsName();
+//                    elem.area.range = elem.area.ws.getRange3( to.r1, to.c1, to.r2, to.c2 );
+                }
+
+            }
+            else if ( elem.type == cElementType.cellsRange ) {
 
                 sFromName = from.getAbsName2( elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2 );
 
@@ -4213,7 +4578,7 @@ parserFormula.prototype = {
                     elem.range = elem.ws.getRange3( to.r1, to.c1, to.r2, to.c2 );
                 }
             }
-            else if ( elem instanceof cArea3D ) {
+            else if ( elem.type == cElementType.cellsRange3D ) {
 
                 sFromName = from.getAbsName2( elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2 );
 
@@ -4226,7 +4591,7 @@ parserFormula.prototype = {
     },
 
     /* При переименовывании листа необходимо поменять название листа в соответствующих ссылках */
-    changeSheet   :function ( lastName, newName ) {
+    changeSheet   : function ( lastName, newName ) {
         if ( this.is3D )
             for ( var i = 0; i < this.outStack.length; i++ ) {
                 if ( this.outStack[i] instanceof cRef3D && this.outStack[i].ws.getName() == lastName ) {
@@ -4240,7 +4605,7 @@ parserFormula.prototype = {
     },
 
     /* Сборка функции в инфиксную форму */
-    assemble      :function ( rFormula ) {
+    assemble      : function ( rFormula ) {
         if ( !rFormula && this.outStack.length == 1 && this.outStack[this.outStack.length - 1] instanceof cError ) {
             return this.Formula;
         }
@@ -4273,7 +4638,7 @@ parserFormula.prototype = {
     },
 
     /* Сборка функции в инфиксную форму */
-    assembleLocale:function ( locale, digitDelim ) {
+    assembleLocale: function ( locale, digitDelim ) {
         var currentElement = null,
             _count = this.outStack.length,
             elemArr = new Array( _count ),
@@ -4302,18 +4667,18 @@ parserFormula.prototype = {
         }
     },
 
-    _changeOffsetHelper:function ( ref, offset ) {
+    _changeOffsetHelper: function ( ref, offset ) {
         var m = ref._cells.match( /\$/g );
         if ( m.length == 1 ) {//для cRef, cRef3D, cArea. $A2, A$2, Sheet1!$A2, Sheet1!A$2, $A2:C4, A$2:C4, A2:$C4, A2:C$4.
             if ( !(ref instanceof cArea) ) {
                 if ( ref._cells.indexOf( "$" ) == 0 ) {
                     r = ref.getRange();
-                    r.setOffset( {offsetCol:0, offsetRow:offset.offsetRow} );
+                    r.setOffset( {offsetCol: 0, offsetRow: offset.offsetRow} );
                     ref.value = ref._cells = "$" + r.first.getID();
                 }
                 else {
                     r = ref.getRange();
-                    r.setOffset( {offsetCol:offset.offsetCol, offsetRow:0} );
+                    r.setOffset( {offsetCol: offset.offsetCol, offsetRow: 0} );
                     ref.value = ref._cells = r.first.getColLetter() + "$" + r.first.getRow();
                 }
             }
@@ -4413,7 +4778,7 @@ parserFormula.prototype = {
         }
     },
 
-    insertSheet:function ( index ) {
+    insertSheet: function ( index ) {
         var bRes = false;
         for ( var i = 0; i < this.outStack.length; i++ ) {
             var elem = this.outStack[i];
@@ -4429,7 +4794,7 @@ parserFormula.prototype = {
         return bRes;
     },
 
-    moveSheet:function ( tempW ) {
+    moveSheet: function ( tempW ) {
         var nRes = 0;
         for ( var i = 0; i < this.outStack.length; i++ ) {
             var elem = this.outStack[i];
@@ -4465,7 +4830,7 @@ parserFormula.prototype = {
         return nRes;
     },
 
-    removeSheet:function ( sheetId ) {
+    removeSheet: function ( sheetId ) {
         var bRes = false;
         var ws = this.wb.getWorksheetById( sheetId );
         if ( ws ) {
@@ -4502,7 +4867,7 @@ parserFormula.prototype = {
         return bRes;
     },
 
-    buildDependencies:function ( nameReParse, defName ) {
+    buildDependencies: function ( nameReParse, defName ) {
 
         var node, ref, nTo, wsR;
 
@@ -4523,7 +4888,7 @@ parserFormula.prototype = {
                 continue;
             }
 
-            if ( ref instanceof cName ) {
+            if ( ref.type == cElementType.name || ref.type == cElementType.table ) {
                 nTo = ref.addDefinedNameNode( /*nameReParse*/ );
                 this.wb.dependencyFormulas.addEdge2( node, nTo );
             }
@@ -4540,7 +4905,7 @@ parserFormula.prototype = {
         }
     },
 
-    parseDiagramRef:function () {
+    parseDiagramRef: function () {
         var res = [
             []
         ];
@@ -4561,11 +4926,11 @@ parserFormula.prototype = {
                         _wsTo = ( (_3DRefTmp[2] !== null) && (_3DRefTmp[2] !== undefined) ) ? _3DRefTmp[2] : _wsFrom;
 
                     if ( parserHelp.isArea.call( this, this.Formula, this.pCurrPos ) ) {
-                        res[res.length - 1].push( {sheetNameFrom:_wsFrom, sheetNameTo:_wsTo, ref:this.operand_str.toUpperCase()} )
+                        res[res.length - 1].push( {sheetNameFrom: _wsFrom, sheetNameTo: _wsTo, ref: this.operand_str.toUpperCase()} )
 
                     }
                     else if ( parserHelp.isRef.call( this, this.Formula, this.pCurrPos ) ) {
-                        res[res.length - 1].push( {sheetNameFrom:_wsFrom, sheetNameTo:_wsTo, ref:this.operand_str.toUpperCase()} )
+                        res[res.length - 1].push( {sheetNameFrom: _wsFrom, sheetNameTo: _wsTo, ref: this.operand_str.toUpperCase()} )
                     }
                 }
             }
@@ -4752,7 +5117,7 @@ function searchRegExp2( s, mask ) {
 }
 
 /*
- Next code take from OpenOffice Source.
+ * Code below has been taken from OpenOffice Source.
  */
 
 var maxGammaArgument = 171.624376956302;

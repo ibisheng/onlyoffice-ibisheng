@@ -565,7 +565,9 @@ var maxIndividualValues = 10000;
 				{
 					var hiddenObj = {start: currentFilter.Ref.r1 + 1, h: null};
 					
-					for(var i = currentFilter.Ref.r1 + 1; i <= currentFilter.Ref.r2; i++)
+					var startRow = autoFilter && autoFilter.Ref ? autoFilter.Ref.r1 + 1 : currentFilter.Ref.r1 + 1;
+					var endRow = autoFilter && autoFilter.Ref ? autoFilter.Ref.r2 : currentFilter.Ref.r2;
+					for(var i = startRow; i <= endRow; i++)
 					{	
 						var isHidden = false;
 						if(autoFilter.FilterColumns && autoFilter.FilterColumns.length)
@@ -596,7 +598,7 @@ var maxIndividualValues = 10000;
 								hiddenObj.start = i;
 							}
 							
-							if(i === currentFilter.Ref.r2)
+							if(i === endRow)
 							{
 								aWs.setRowHidden(hiddenObj.h, hiddenObj.start, i);
 							}
@@ -2887,6 +2889,8 @@ var maxIndividualValues = 10000;
 				var generateName;
 				if(aWs.TableParts)
 				{
+					//TODO: buildRecalc вызывать из модели!!!
+					buildRecalc(aWs.workbook, true, true);
 					for(var i = 0; i < aWs.TableParts.length; i++)
 					{
 						var filter = aWs.TableParts[i];
@@ -2925,6 +2929,7 @@ var maxIndividualValues = 10000;
 									filter.TableColumns[j - tableRange.c1].Name = generateName;
 								}
 							}
+							aWs.handlers.trigger("changeColumnTablePart", filter.DisplayName);
 						}
 					}
 				}

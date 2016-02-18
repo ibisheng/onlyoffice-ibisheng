@@ -557,6 +557,53 @@ function test_defName(){
     return this;
 }
 
+var cStrucTableLocalColumns = {"h": "Headers", "d": "Data", "a": "All", "tr": "This row", "t": "Totals"};
+function build_rx_table_local(local){
+	rx_table_local = build_rx_table(local);
+}
+function build_rx_table(local){
+	cStrucTableLocalColumns = ( local ? local : {"h": "Headers", "d": "Data", "a": "All", "tr": "This row", "t": "Totals"} );
+    var loc_all = cStrucTableLocalColumns.a,
+        loc_headers = cStrucTableLocalColumns.h,
+        loc_data = cStrucTableLocalColumns.d,
+        loc_totals = cStrucTableLocalColumns.t,
+        loc_this_row = cStrucTableLocalColumns.tr,
+        structured_tables_headata = new XRegExp('(?:\\[\\#'+loc_headers+'\\]\\,\\[\\#'+loc_data+'\\])'),
+        structured_tables_datals = new XRegExp('(?:\\[\\#'+loc_data+'\\]\\,\\[\\#'+loc_totals+'\\])' ),
+        structured_tables_userColumn = new XRegExp('(?:[' + str_namedRanges + '\\d.]|\\u0027[#\\[\\]\\u0027]|\\u0020)+'),
+        structured_tables_reservedColumn = new XRegExp('\\#(?:'+loc_all+'|'+loc_headers+'|'+loc_totals+'|'+loc_data+'|'+loc_this_row+')|@');
+
+	return XRegExp.build( '^(?<tableName>{{tableName}})\\[(?<columnName>{{columnName}})?\\]', {
+        tableName : new XRegExp( "^(:?[" + str_namedRanges + "][" + str_namedRanges + "\\d.]*)" ),
+        columnName: XRegExp.build( '(?<reservedColumn>{{reservedColumn}})|(?<oneColumn>{{userColumn}})|(?<columnRange>{{userColumnRange}})|(?<hdtcc>{{hdtcc}})', {
+            userColumn     : structured_tables_userColumn,
+            reservedColumn : structured_tables_reservedColumn,
+            userColumnRange: XRegExp.build( '\\[(?<colStart>{{uc}})\\]\\:\\[(?<colEnd>{{uc}})\\]', {
+                uc: structured_tables_userColumn
+            } ),
+            hdtcc          : XRegExp.build( '(?<hdt>\\[{{rc}}\\]|{{hd}}|{{dt}})(?:\\,(?:\\[(?<hdtcstart>{{uc}})\\])(?:\\:(?:\\[(?<hdtcend>{{uc}})\\]))?)?', {
+                rc: structured_tables_reservedColumn,
+                hd: structured_tables_headata,
+                dt: structured_tables_datals,
+                uc: structured_tables_userColumn
+            } )
+        } )
+    }, 'i' );
+
+    /*
+     structured_tables_headata = new XRegExp('(?:\\[\\#'+getStructureTableLocaleHeadersNames('headers')+'\\]\\,\\[\\#'+getStructureTableLocaleHeadersNames('data')+'\\])');
+     structured_tables_datals = new XRegExp('(?:\\[\\+#'+getStructureTableLocaleHeadersNames('data')+'\\]\\,\\[\\#'+getStructureTableLocaleHeadersNames('totals')+'\\])' );
+     structured_tables_reservedColumn = new XRegExp('\\#(?:'+
+         getStructureTableLocaleHeadersNames('all')+'|'
+         getStructureTableLocaleHeadersNames('headers')+'|'
+         getStructureTableLocaleHeadersNames('totals')+'|'
+         getStructureTableLocaleHeadersNames('data')+'|'
+         getStructureTableLocaleHeadersNames('this_row')+
+         ')|@')
+     */
+
+}
+
 var c_oEditorId = {
     Word:0,
     Spreadsheet:1,
@@ -884,7 +931,7 @@ var str_namedRanges = "A-Za-z\u005F\u0080-\u0081\u0083\u0085-\u0087\u0089-\u008A
     rx_ref = /^ *(\$?[A-Za-z]{1,3}\$?(\d{1,7}))([-+*\/^&%<=>: ;),]|$)/,
     rx_refAll = /^(\$?[A-Za-z]+\$?(\d+))([-+*\/^&%<=>: ;),]|$)/,
     //rx_ref3D_non_quoted = new XRegExp( "^(?<name_from>[\\p{L}\\d.]+)(:(?<name_to>[\\p{L}\\d.]+))?!" ),
-    rx_ref3D_non_quoted = new XRegExp( "^(?<name_from>"+"["+str_namedRanges+"]"+"["+str_namedRanges+"\\d.]+)(:(?<name_to>"+"["+str_namedRanges+"]"+"["+str_namedRanges+"\\d.]+))?!","i" ),
+    rx_ref3D_non_quoted = new XRegExp( "^(?<name_from>["+str_namedRanges+"]["+str_namedRanges+"\\d.]+)(:(?<name_to>["+str_namedRanges+"]["+str_namedRanges+"\\d.]+))?!","i" ),
     rx_ref3D_quoted = new XRegExp( "^'(?<name_from>(?:''|[^\\[\\]'\\/*?:])*)(?::(?<name_to>(?:''|[^\\[\\]'\\/*?:])*))?'!" ),
     rx_ref3D = new XRegExp( "^(?<name_from>[^:]+)(:(?<name_to>[^:]+))?!" ),
     rx_before_operators = /^ *[,()]/,
@@ -910,7 +957,7 @@ var str_namedRanges = "A-Za-z\u005F\u0080-\u0081\u0083\u0085-\u0087\u0089-\u008A
     rg_validHEXNumber = /^[0-9A-F]{1,10}$/i,
     rg_validOCTNumber = /^[0-7]{1,10}$/,
     rg_complex_number = new XRegExp( "^(?<real>[-+]?(?:\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?))?(?<img>([-+]?(\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?)?[ij])?)", "g" ),
-    rx_name = new XRegExp( "^(?<name>" + "[" + str_namedRanges + "]" + "[" + str_namedRanges + "\\d.]*)([-+*\\/^&%<=>: ;),]|$)" ),
+    rx_name = new XRegExp( "^(?<name>" + "[" + str_namedRanges + "][" + str_namedRanges + "\\d.]*)([-+*\\/^&%<=>: ;),]|$)" ),
     rx_defName = new test_defName(),
     rx_arraySeparatorsDef = /^ *[,;] */,
     rx_numberDef = /^ *[+-]?\d*(\d|\.)\d*([eE][+-]?\d+)?/,
@@ -921,7 +968,9 @@ var str_namedRanges = "A-Za-z\u005F\u0080-\u0081\u0083\u0085-\u0087\u0089-\u008A
     emailRe = /^(mailto:)?([a-z0-9'\._-]+@[a-z0-9\.-]+\.[a-z0-9]{2,4})([a-яё0-9\._%+-=\? :&]*)/i,
     ipRe = /^(((https?)|(ftps?)):\/\/)?([\-\wа-яё]*:?[\-\wа-яё]*@)?(((1[0-9]{2}|2[0-4][0-9]|25[0-5]|[1-9][0-9]|[0-9])\.){3}(1[0-9]{2}|2[0-4][0-9]|25[0-5]|[1-9][0-9]|[0-9]))(:\d+)?(\/[%\-\wа-яё]*(\.[\wа-яё]{2,})?(([\wа-яё\-\.\?\\\/+@&#;:`~=%!,\(\)]*)(\.[\wа-яё]{2,})?)*)*\/?/i,
     hostnameRe = /^(((https?)|(ftps?)):\/\/)?([\-\wа-яё]*:?[\-\wа-яё]*@)?(([\-\wа-яё]+\.)+[\wа-яё\-]{2,}(:\d+)?(\/[%\-\wа-яё]*(\.[\wа-яё]{2,})?(([\wа-яё\-\.\?\\\/+@&#;:`~=%!,\(\)]*)(\.[\wа-яё]{2,})?)*)*\/?)/i,
-    localRe = /^(((https?)|(ftps?)):\/\/)([\-\wа-яё]*:?[\-\wа-яё]*@)?(([\-\wа-яё]+)(:\d+)?(\/[%\-\wа-яё]*(\.[\wа-яё]{2,})?(([\wа-яё\-\.\?\\\/+@&#;:`~=%!,\(\)]*)(\.[\wа-яё]{2,})?)*)*\/?)/i;
+    localRe = /^(((https?)|(ftps?)):\/\/)([\-\wа-яё]*:?[\-\wа-яё]*@)?(([\-\wа-яё]+)(:\d+)?(\/[%\-\wа-яё]*(\.[\wа-яё]{2,})?(([\wа-яё\-\.\?\\\/+@&#;:`~=%!,\(\)]*)(\.[\wа-яё]{2,})?)*)*\/?)/i,
+	rx_table = build_rx_table(null),
+	rx_table_local = build_rx_table(null);
 
 function getUrlType(url) {
   var checkvalue = url.replace(new RegExp(' ', 'g'), '%20');
@@ -1146,7 +1195,7 @@ parserHelper.prototype.isError = function ( formula, start_pos ) {
 	}
 	return false;
 };
-parserHelper.prototype.isBoolean = function ( formula, start_pos ) {
+parserHelper.prototype.isBoolean = function ( formula, start_pos, local ) {
 	if ( this instanceof parserHelper ) {
 		this._reset();
 	}
@@ -1232,6 +1281,22 @@ parserHelper.prototype.isRightBrace = function ( formula, start_pos ) {
 	}
 	return false;
 };
+parserHelper.prototype.isTable = function ( formula, start_pos, local ){
+    if ( this instanceof parserHelper ) {
+        this._reset();
+    }
+
+    var subSTR = formula.substring( start_pos ),
+        match = XRegExp.exec( subSTR, local?rx_table_local:rx_table );
+
+    if ( match != null && match["tableName"] ) {
+        this.operand_str = match[0];
+        this.pCurrPos += match[0].length;
+        return match;
+    }
+
+    return false;
+}
 // Парсим ссылку на диапазон в листе
 parserHelper.prototype.parse3DRef = function ( formula ) {
 	// Сначала получаем лист
@@ -1358,7 +1423,6 @@ parserHelper.prototype.setDigitSeparator = function( sep ){
 };
 
 var parserHelp = new parserHelper();
-
 
 var kCurFormatPainterWord = '';
 if (AscBrowser.isIE)

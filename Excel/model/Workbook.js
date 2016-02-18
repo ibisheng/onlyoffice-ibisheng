@@ -1095,6 +1095,7 @@ DependencyGraph.prototype = {
             this.defNameSheets[dfv.sheetId] = defNameSheetsList;
         }
         defNameSheetsList[dfv.nodeId] = dfv;
+		addToArrDefNameRecalc(dfv);
     },
     changeTableName:function(tableName, ws, newRef){
         var table = this.getDefNameNodeByName( tableName, ws ),
@@ -1106,7 +1107,23 @@ DependencyGraph.prototype = {
     delTableName:function(name,ws){
         var table = this.getDefNameNodeByName( name, ws );
         table.Ref = null;
-    }
+    },
+	rebuildTable:function(tableName){
+		var table = this.getDefNameNodeByName( tableName, null ), nSE, se;
+			nSE = table.getSlaveEdges();
+
+		for ( var id in nSE ) {
+			se = nSE[id];
+//			se.deleteMasterEdge( retRes );
+//			this.needRecalc.nodes[se.nodeId] = [se.sheetId, se.cellId ];
+//			this.needRecalc.length++;
+//			addToArrRecalc(se.sheetId, se.cell);
+			se = se.returnCell();
+			if ( se ) {
+				se.setFormula( se.formulaParsed.assemble() );
+			}
+		}
+	}
 };
 
 /** @constructor */
@@ -1425,7 +1442,7 @@ DefNameVertex.prototype = {
     },
 
     changeRefToNewSheet:function( lastName, newName ){
-        if( this.parsedRef.isParsed ){
+        if( !this.isTable && this.parsedRef.isParsed ){
             this.parsedRef = this.parsedRef.changeSheet( lastName, newName );
             this.Ref = this.parsedRef.assemble();
         }
@@ -1945,6 +1962,9 @@ Workbook.prototype.init=function(bNoBuildDep){
 	this.wsHandlers = new asc.asc_CHandlersList(/*handlers*/{
 		"changeRefTablePart"    : function (displayName, ref) {
 			self.dependencyFormulas.changeTableName( displayName, null, ref );
+		},
+		"changeColumnTablePart" : function(tableName){
+			self.dependencyFormulas.rebuildTable(tableName);
 		}
 	});
 	
@@ -2956,8 +2976,36 @@ Workbook.prototype.getTableRangeForFormula = function(name, objectParam){
     {
         var ws = this.aWorksheets[i];
 		res = ws.getTableRangeForFormula(name, objectParam);
-		if(res !== null)
-			break;
+		if(res !== null){
+            res = {wsID:ws.getId(),range:res};
+            break;
+        }
+    }
+	return res;
+};
+Workbook.prototype.getTableIndexColumnByName = function(tableName, columnName){
+	var res = null;
+	for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
+    {
+        var ws = this.aWorksheets[i];
+		res = ws.getTableIndexColumnByName(tableName, columnName);
+		if(res !== null){
+            res = {wsID:ws.getId(), index: res};
+            break;
+        }
+    }
+	return res;
+};
+Workbook.prototype.getTableNameColumnByIndex = function(tableName, columnIndex){
+	var res = null;
+	for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
+    {
+        var ws = this.aWorksheets[i];
+		res = ws.getTableNameColumnByIndex(tableName, columnIndex);
+		if(res !== null){
+            res = {wsID:ws.getId(), columnName: res};
+            break;
+        }
     }
 	return res;
 };
@@ -4877,9 +4925,39 @@ Woorksheet.prototype.getTableRangeForFormula = function(name, objectParam){
 	
 	for(var i = 0; i < this.TableParts.length; i++)
 	{
-		if(this.TableParts[i].Name === name)
+		if(this.TableParts[i].DisplayName === name)
 		{
 			res = this.TableParts[i].getTableRangeForFormula(objectParam);
+			break;
+		}
+	}
+	return res;
+};
+Woorksheet.prototype.getTableIndexColumnByName = function(tableName, columnName){
+	var res = null;
+	if(!this.TableParts)
+		return res;
+	
+	for(var i = 0; i < this.TableParts.length; i++)
+	{
+		if(this.TableParts[i].DisplayName === tableName)
+		{
+			res = this.TableParts[i].getTableIndexColumnByName(columnName);
+			break;
+		}
+	}
+	return res;
+};
+Woorksheet.prototype.getTableNameColumnByIndex = function(tableName, columnIndex){
+	var res = null;
+	if(!this.TableParts)
+		return res;
+	
+	for(var i = 0; i < this.TableParts.length; i++)
+	{
+		if(this.TableParts[i].DisplayName === tableName)
+		{
+			res = this.TableParts[i].getTableNameColumnByIndex(columnIndex);
 			break;
 		}
 	}
