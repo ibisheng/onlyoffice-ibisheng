@@ -3272,7 +3272,8 @@ DrawingObjectsController.prototype =
             }
             if(tx_body)
             {
-                if( tx_body.bodyPr &&  tx_body.bodyPr.vert === nVertTThorz)
+                var oBodyPr = vert_axis.title.getBodyPr();
+                if(oBodyPr && oBodyPr.vert === nVertTThorz)
                 {
                     _label = c_oAscChartVertAxisLabelShowSettings.horizontal;
                 }

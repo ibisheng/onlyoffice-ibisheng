@@ -359,134 +359,112 @@ CDLbl.prototype =
         var _vertical_shift;
         var _text_rect_height = _b - _t;
         var _text_rect_width = _r - _l;
-        if (_body_pr.upright === false)
+        var nVert = _body_pr.vert;
+
+
+
+
+        if (!_body_pr.upright)
         {
-            if (!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
+            if (!(nVert === nVertTTvert || nVert === nVertTTvert270))
             {
-                if (/*_content_height < _text_rect_height*/true)
+                switch (_body_pr.anchor)
                 {
-                    switch (_body_pr.anchor) {
-                        case 0: //b
-                        { // (Text Anchor Enum ( Bottom ))
-                            _vertical_shift = _text_rect_height - _content_height;
-                            break;
-                        }
-                        case 1:    //ctr
-                        {// (Text Anchor Enum ( Center ))
-                            _vertical_shift = (_text_rect_height - _content_height) * 0.5;
-                            break;
-                        }
-                        case 2: //dist
-                        {// (Text Anchor Enum ( Distributed )) TODO: пока выравнивание  по центру. Переделать!
-                            _vertical_shift = (_text_rect_height - _content_height) * 0.5;
-                            break;
-                        }
-                        case 3: //just
-                        {// (Text Anchor Enum ( Justified )) TODO: пока выравнивание  по центру. Переделать!
-                            _vertical_shift = (_text_rect_height - _content_height) * 0.5;
-                            break;
-                        }
-                        case 4: //t
-                        {//Top
-                            _vertical_shift = 0;
-                            break;
-                        }
+                    case 0: //b
+                    { // (Text Anchor Enum ( Bottom ))
+                        _vertical_shift = _text_rect_height - _content_height;
+                        break;
                     }
-
-                }
-                else {
-                    _vertical_shift = 0;
-
-                    //_vertical_shift =  _text_rect_height - _content_height;
-                    /*if(_body_pr.anchor === 0)
-                     {
-                     _vertical_shift =  _text_rect_height - _content_height;
-                     }
-                     else
-                     {
-                     _vertical_shift = 0;
-                     } */
+                    case 1:    //ctr
+                    {// (Text Anchor Enum ( Center ))
+                        _vertical_shift = (_text_rect_height - _content_height) * 0.5;
+                        break;
+                    }
+                    case 2: //dist
+                    {// (Text Anchor Enum ( Distributed )) TODO: пока выравнивание  по центру. Переделать!
+                        _vertical_shift = (_text_rect_height - _content_height) * 0.5;
+                        break;
+                    }
+                    case 3: //just
+                    {// (Text Anchor Enum ( Justified )) TODO: пока выравнивание  по центру. Переделать!
+                        _vertical_shift = (_text_rect_height - _content_height) * 0.5;
+                        break;
+                    }
+                    case 4: //t
+                    {//Top
+                        _vertical_shift = 0;
+                        break;
+                    }
                 }
                 global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
                 if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
                     var alpha = Math.atan2(_dy_t, _dx_t);
-                    global_MatrixTransformer.RotateRadAppend(_text_transform, -alpha - (isRealNumber(_body_pr.rot) ? _body_pr.rot*cToRad2 : 0));
+                    global_MatrixTransformer.RotateRadAppend(_text_transform, -alpha);
                     global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_lt, _t_y_lt);
                 }
                 else {
                     alpha = Math.atan2(_dy_t, _dx_t);
-                    global_MatrixTransformer.RotateRadAppend(_text_transform, Math.PI - alpha - (isRealNumber(_body_pr.rot) ? _body_pr.rot*cToRad2 : 0));
+                    global_MatrixTransformer.RotateRadAppend(_text_transform, Math.PI - alpha);
                     global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_rt, _t_y_rt);
                 }
             }
-            else {
-                if (/*_content_height < _text_rect_width*/true) {
-                    switch (_body_pr.anchor) {
-                        case 0: //b
-                        { // (Text Anchor Enum ( Bottom ))
-                            _vertical_shift = _text_rect_width - _content_height;
-                            break;
-                        }
-                        case 1:    //ctr
-                        {// (Text Anchor Enum ( Center ))
-                            _vertical_shift = (_text_rect_width - _content_height) * 0.5;
-                            break;
-                        }
-                        case 2: //dist
-                        {// (Text Anchor Enum ( Distributed ))
-                            _vertical_shift = (_text_rect_width - _content_height) * 0.5;
-                            break;
-                        }
-                        case 3: //just
-                        {// (Text Anchor Enum ( Justified ))
-                            _vertical_shift = (_text_rect_width - _content_height) * 0.5;
-                            break;
-                        }
-                        case 4: //t
-                        {//Top
-                            _vertical_shift = 0;
-                            break;
-                        }
+            else
+            {
+                switch (_body_pr.anchor)
+                {
+                    case 0: //b
+                    { // (Text Anchor Enum ( Bottom ))
+                        _vertical_shift = _text_rect_width - _content_height;
+                        break;
                     }
-                }
-                else {
-                    _vertical_shift = 0;
-                    /*if(_body_pr.anchor === 0)
-                     {
-                     _vertical_shift =  _text_rect_width - _content_height;
-                     }
-                     else
-                     {
-                     _vertical_shift = 0;
-                     }  */
+                    case 1:    //ctr
+                    {// (Text Anchor Enum ( Center ))
+                        _vertical_shift = (_text_rect_width - _content_height) * 0.5;
+                        break;
+                    }
+                    case 2: //dist
+                    {// (Text Anchor Enum ( Distributed ))
+                        _vertical_shift = (_text_rect_width - _content_height) * 0.5;
+                        break;
+                    }
+                    case 3: //just
+                    {// (Text Anchor Enum ( Justified ))
+                        _vertical_shift = (_text_rect_width - _content_height) * 0.5;
+                        break;
+                    }
+                    case 4: //t
+                    {//Top
+                        _vertical_shift = 0;
+                        break;
+                    }
                 }
                 global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
                 var _alpha;
                 _alpha = Math.atan2(_dy_t, _dx_t);
-                if (_body_pr.vert === nVertTTvert) {
+                if (nVert === nVertTTvert) {
                     if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI * 0.5 + (isRealNumber(_body_pr.rot) ? _body_pr.rot*cToRad2 : 0));
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI * 0.5);
                         global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_rt, _t_y_rt);
                     }
                     else {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, Math.PI * 0.5 - _alpha + (isRealNumber(_body_pr.rot) ? _body_pr.rot*cToRad2 : 0));
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, Math.PI * 0.5 - _alpha);
                         global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_lt, _t_y_lt);
                     }
                 }
                 else {
                     if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI * 1.5 + (isRealNumber(_body_pr.rot) ? _body_pr.rot*cToRad2 : 0));
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI * 1.5);
                         global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_lb, _t_y_lb);
                     }
                     else {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 0.5 - _alpha + (isRealNumber(_body_pr.rot) ? _body_pr.rot*cToRad2 : 0));
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 0.5 - _alpha);
                         global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_rb, _t_y_rb);
                     }
                 }
             }
         }
         else {
-            var _full_rotate = 0;
+
             var _full_flip = {flipH: false, flipV: false};
 
             var _hc = this.extX * 0.5;
@@ -496,70 +474,44 @@ CDLbl.prototype =
 
 
             var _content_width, content_height2;
-            if (checkNormalRotate(_full_rotate) )
+            if (!(nVert === nVertTTvert || nVert === nVertTTvert270))
             {
-                if (!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
-                {
-                    _content_width = _r - _l;
-                    content_height2 = _b - _t;
-                }
-                else
-                {
-                    _content_width = _b - _t;
-                    content_height2 = _r - _l;
-                }
+                _content_width = _r - _l;
+                content_height2 = _b - _t;
             }
-            else {
-                if (!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270)) {
-                    _content_width = _b - _t;
-                    content_height2 = _r - _l;
-
-                }
-                else {
-                    _content_width = _r - _l;
-                    content_height2 = _b - _t;
-                }
+            else
+            {
+                _content_width = _b - _t;
+                content_height2 = _r - _l;
             }
 
-            if (/*_content_height < content_height2*/true) {
-                switch (_body_pr.anchor) {
-                    case 0: //b
-                    { // (Text Anchor Enum ( Bottom ))
-                        _vertical_shift = content_height2 - _content_height;
-                        break;
-                    }
-                    case 1:    //ctr
-                    {// (Text Anchor Enum ( Center ))
-                        _vertical_shift = (content_height2 - _content_height) * 0.5;
-                        break;
-                    }
-                    case 2: //dist
-                    {// (Text Anchor Enum ( Distributed ))
-                        _vertical_shift = (content_height2 - _content_height) * 0.5;
-                        break;
-                    }
-                    case 3: //just
-                    {// (Text Anchor Enum ( Justified ))
-                        _vertical_shift = (content_height2 - _content_height) * 0.5;
-                        break;
-                    }
-                    case 4: //t
-                    {//Top
-                        _vertical_shift = 0;
-                        break;
-                    }
+            switch (_body_pr.anchor)
+            {
+                case 0: //b
+                { // (Text Anchor Enum ( Bottom ))
+                    _vertical_shift = content_height2 - _content_height;
+                    break;
                 }
-            }
-            else {
-                _vertical_shift = 0;
-                /*if(_body_pr.anchor === 0)
-                 {
-                 _vertical_shift =  content_height2 - _content_height;
-                 }
-                 else
-                 {
-                 _vertical_shift = 0;
-                 } */
+                case 1:    //ctr
+                {// (Text Anchor Enum ( Center ))
+                    _vertical_shift = (content_height2 - _content_height) * 0.5;
+                    break;
+                }
+                case 2: //dist
+                {// (Text Anchor Enum ( Distributed ))
+                    _vertical_shift = (content_height2 - _content_height) * 0.5;
+                    break;
+                }
+                case 3: //just
+                {// (Text Anchor Enum ( Justified ))
+                    _vertical_shift = (content_height2 - _content_height) * 0.5;
+                    break;
+                }
+                case 4: //t
+                {//Top
+                    _vertical_shift = 0;
+                    break;
+                }
             }
 
             var _text_rect_xc = _l + (_r - _l) * 0.5;
@@ -584,28 +536,25 @@ CDLbl.prototype =
             }
 
             global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
-            if (_body_pr.vert === nVertTTvert) {
+            if (nVert === nVertTTvert) {
                 global_MatrixTransformer.TranslateAppend(_text_transform, -_content_width * 0.5, -content_height2 * 0.5);
                 global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 1.5);
                 global_MatrixTransformer.TranslateAppend(_text_transform, _content_width * 0.5, content_height2 * 0.5);
 
             }
-            if (_body_pr.vert === nVertTTvert270) {
+            if (nVert === nVertTTvert270) {
                 global_MatrixTransformer.TranslateAppend(_text_transform, -_content_width * 0.5, -content_height2 * 0.5);
                 global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 1.5);
                 global_MatrixTransformer.TranslateAppend(_text_transform, _content_width * 0.5, content_height2 * 0.5);
             }
             global_MatrixTransformer.TranslateAppend(_text_transform, _transformed_text_xc - _content_width * 0.5, _transformed_text_yc - content_height2 * 0.5);
 
-            var l_ins = typeof _body_pr.lIns === "number" ? _body_pr.lIns : 2.54;
-            var t_ins = typeof _body_pr.tIns === "number" ? _body_pr.tIns : 1.27;
-            var r_ins = typeof _body_pr.rIns === "number" ? _body_pr.rIns : 2.54;
-            var b_ins = typeof _body_pr.bIns === "number" ? _body_pr.bIns : 1.27;
-            this.clipRect = {
-                x: -l_ins,
-                y: -_vertical_shift - t_ins,
-                w: this.contentWidth + (r_ins + l_ins),
-                h: this.contentHeight + (b_ins + t_ins)
+            this.clipRect =
+            {
+                x: -_body_pr.lIns,
+                y: -_vertical_shift - _body_pr.tIns,
+                w: this.contentWidth + (_body_pr.rIns + _body_pr.lIns),
+                h: this.contentHeight + (_body_pr.bIns + _body_pr.tIns)
             };
         }
 
@@ -861,6 +810,35 @@ CDLbl.prototype =
         {
             ret.anchor = 1;
         }
+
+
+        //Пока не поддерживаем bodyPr.rot. Костыль под эффект_штурмовика.docx.
+        if(isRealNumber(ret.rot) && 0 !== ret.rot)
+        {
+            if(Math.abs(ret.rot - 5400000) < 1000)
+            {
+                if(ret.vert === nVertTTvert270)
+                {
+                    ret.vert = nVertTThorz;
+                }
+                else if(ret.vert === nVertTThorz)
+                {
+                    ret.vert = nVertTTvert;
+                }
+            }
+            else if(Math.abs(ret.rot + 5400000) < 1000)
+            {
+                if(ret.vert === nVertTTvert)
+                {
+                    ret.vert = nVertTThorz;
+                }
+                else if(ret.vert === nVertTThorz)
+                {
+                    ret.vert = nVertTTvert270;
+                }
+            }
+        }
+        //
 
         switch (ret.vert)
         {
