@@ -2578,7 +2578,7 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
 
     var newN = newName.Name.toLowerCase(), retRes = null, rename = false, nSE, se;
 
-    if ( !rx_defName.test( newN ) || newName.Ref.length == 0 ) {
+    if ( !rx_defName.test( newN ) || !newName.Ref || newName.Ref.length == 0  ) {
         return retRes;
     }
 
