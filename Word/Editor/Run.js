@@ -2859,7 +2859,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     }
                     else
                     {
-                        if (NewX > XEnd - 0.001 && XEnd < 558.7 && PRS.Range >= PRS.RangesCount - 1)
+                        if (true !== TabPos.DefaultTab && NewX > XEnd - 0.001 && XEnd < 558.7 && PRS.Range >= PRS.RangesCount - 1)
                         {
                             Para.Lines[PRS.Line].Ranges[PRS.Range].XEnd = 558.7;
                             XEnd = 558.7;

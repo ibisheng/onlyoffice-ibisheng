@@ -356,6 +356,9 @@ function CDocumentPageColumn()
     this.Y      = 0;
     this.XLimit = 0;
     this.YLimit = 0;
+
+    this.SpaceBefore = 0;
+    this.SpaceAfter  = 0;
 }
 CDocumentPageColumn.prototype.Copy = function()
 {
@@ -1376,7 +1379,10 @@ CDocument.prototype =
         if (null !== YFooter && YFooter < YLimit)
             YLimit = YFooter;
 
-        return {X: X, Y: Y, XLimit: XLimit, YLimit: YLimit};
+        var ColumnSpaceBefore  = (ColumnAbs > 0 ? SectPr.Get_ColumnSpace(ColumnAbs - 1) : 0);
+        var ColumnSpaceAfter   = (ColumnAbs < ColumnsCount - 1 ? SectPr.Get_ColumnSpace(ColumnAbs) : 0);
+
+        return {X: X, Y: Y, XLimit: XLimit, YLimit: YLimit, ColumnSpaceBefore : ColumnSpaceBefore, ColumnSpaceAfter : ColumnSpaceAfter};
     },
 
     Get_PageLimits : function(PageIndex)
@@ -1930,12 +1936,14 @@ CDocument.prototype =
         var PageSection = Page.Sections[SectionIndex];
         var PageColumn  = PageSection.Columns[ColumnIndex];
 
-        PageColumn.X      = X;
-        PageColumn.XLimit = XLimit;
-        PageColumn.Y      = Y;
-        PageColumn.YLimit = YLimit;
-        PageColumn.Pos    = StartIndex;
-        PageColumn.Empty  = false;
+        PageColumn.X           = X;
+        PageColumn.XLimit      = XLimit;
+        PageColumn.Y           = Y;
+        PageColumn.YLimit      = YLimit;
+        PageColumn.Pos         = StartIndex;
+        PageColumn.Empty       = false;
+        PageColumn.SpaceBefore = StartPos.ColumnSpaceBefore;
+        PageColumn.SpaceAfter  = StartPos.ColumnSpaceAfter;
 
         var SectElement  = this.SectionsInfo.Get_SectPr(StartIndex);
         var SectPr       = SectElement.SectPr;
@@ -3095,10 +3103,24 @@ CDocument.prototype =
                 var ColumnStartPos = Column.Pos;
                 var ColumnEndPos   = Column.EndPos;
 
+                if (ColumnsCount > 1)
+                {
+                    pGraphics.SaveGrState();
+
+                    var X    = ColumnIndex === 0 ? 0 : Column.X - Column.SpaceBefore / 2;
+                    var XEnd = (ColumnIndex >=  ColumnsCount - 1 ? Page.Width : Column.XLimit + Column.SpaceAfter / 2);
+                    pGraphics.AddClipRect(X, 0, XEnd - X, Page.Height);
+                }
+
                 for (var ContentPos = ColumnStartPos; ContentPos <= ColumnEndPos; ++ContentPos)
                 {
                     var ElementPageIndex = this.private_GetElementPageIndex(ContentPos, nPageIndex, ColumnIndex, ColumnsCount);
                     this.Content[ContentPos].Draw(ElementPageIndex, pGraphics);
+                }
+
+                if (ColumnsCount > 1)
+                {
+                    pGraphics.RestoreGrState();
                 }
             }
         }

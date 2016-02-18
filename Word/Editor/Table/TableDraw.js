@@ -37,10 +37,6 @@ CTable.prototype.Draw = function(CurPage, pGraphics)
 
     pGraphics.SaveGrState();
 
-    // TODO: Переделать обрезку
-    if (true === this.Is_Inline())
-        pGraphics.AddClipRect(Page.X - 15, Page.Y - 1, Page.XLimit + 30 - Page.X, Page.YLimit - Page.Y + 1);
-
     var bIsSmartGrForcing = false;
     if (pGraphics.StartCheckTableDraw)
         bIsSmartGrForcing = pGraphics.StartCheckTableDraw();
