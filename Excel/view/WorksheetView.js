@@ -2618,7 +2618,7 @@
         var textY = this._calcTextVertPos( y1, y2, bl, ct.metrics, ct.cellVA );
         var textW = this._calcTextWidth( x1ct, x2ct, ct.metrics, ct.cellHA );
 
-        var xb1, yb1, wb, hb, colLeft, colRight, i;
+        var xb1, yb1, wb, hb, colLeft, colRight, i, textAlign;
         var txtRotX, txtRotW, clipUse = false;
 
         if ( drawingCtx ) {
@@ -2708,6 +2708,27 @@
 
                 this.stringRender.rotateAtPoint( drawingCtx, ct.angle, xb1, yb1, ct.textBound.dx, ct.textBound.dy );
                 this.stringRender.restoreInternalState( ct.state ).renderForPrint( drawingCtx, 0, 0, textW, ct.color );
+
+                textAlign = this.stringRender.flags.textAlign;
+                if (isWrapped) {
+                    if (ct.angle < 0) {
+                        if ('top' === ct.cellVA)
+                            this.stringRender.flags.textAlign = 'left';
+                        else if ('center' === ct.cellVA)
+                            this.stringRender.flags.textAlign = 'center';
+                        else if ('bottom' === ct.cellVA)
+                            this.stringRender.flags.textAlign = 'right';
+                    }
+                    else {
+                        if ('top' === ct.cellVA)
+                            this.stringRender.flags.textAlign = 'right';
+                        else if ('center' === ct.cellVA)
+                            this.stringRender.flags.textAlign = 'center';
+                        else if ('bottom' === ct.cellVA)
+                            this.stringRender.flags.textAlign = 'left';
+                    }
+                }
+
                 this.stringRender.resetTransform( drawingCtx );
 
                 if ( clipUse ) {
@@ -2805,8 +2826,30 @@
                     }
                 }
 
-                this.stringRender.rotateAtPoint( null, ct.angle, xb1, yb1, ct.textBound.dx, ct.textBound.dy );
-                this.stringRender.restoreInternalState( ct.state ).render( 0, 0, textW, ct.color );
+                this.stringRender.rotateAtPoint(null, ct.angle, xb1, yb1, ct.textBound.dx, ct.textBound.dy);
+                this.stringRender.restoreInternalState(ct.state);
+
+                textAlign = this.stringRender.flags.textAlign;
+                if (isWrapped) {
+                    if (ct.angle < 0) {
+                        if ('top' === ct.cellVA)
+                            this.stringRender.flags.textAlign = 'left';
+                        else if ('center' === ct.cellVA)
+                            this.stringRender.flags.textAlign = 'center';
+                        else if ('bottom' === ct.cellVA)
+                            this.stringRender.flags.textAlign = 'right';
+                    }
+                    else {
+                        if ('top' === ct.cellVA)
+                            this.stringRender.flags.textAlign = 'right';
+                        else if ('center' === ct.cellVA)
+                            this.stringRender.flags.textAlign = 'center';
+                        else if ('bottom' === ct.cellVA)
+                            this.stringRender.flags.textAlign = 'left';
+                    }
+                }
+
+                this.stringRender.render(0, 0, textW, ct.color);
 
 //                var color = new CColor(0, 0, 255, 0.5);
 //
@@ -2824,8 +2867,11 @@
                     ctx.restore();
                 }
 
-//                color = new CColor( 0, 0, 255, 0.5 );
-//                ctx.setStrokeStyle(color).strokeRect(xb1 - ct.textBound.offsetX, yb1, ct.textBound.width,  ct.textBound.height);
+//                color = new CColor( 255, 0, 0, 0.5 );
+//                ctx.save().
+//                    setStrokeStyle(color).
+//                    strokeRect(xb1 - ct.textBound.offsetX, yb1, ct.textBound.width,  ct.textBound.height).
+//                    restore();
             }
             else {
                 ctx.save().beginPath().rect( x1, y1, w, h ).clip();
@@ -4660,6 +4706,8 @@
             colWidth -= pad;
         }
 
+        var rowHeight = this.rows[row].height;
+
         // ToDo dDigitsCount нужно рассчитывать исходя не из дефалтового шрифта и размера, а исходя из текущего шрифта и размера ячейки
         str = c.getValue2( dDigitsCount, makeFnIsGoodNumFormat( fl, colWidth ) );
         var ha = c.getAlignHorizontalByValue().toLowerCase();
@@ -4680,7 +4728,6 @@
             }
         }
         var oFontColor = c.getFontcolor();
-        var rowHeight = this.rows[row].height;
         var textBound = {};
 
         if ( angle ) {
@@ -4693,9 +4740,27 @@
                 }
             }
 
-            textBound = this.stringRender.getTransformBound( angle, 0, 0, colWidth, rowHeight, tm.width, ha, va, maxW );
+            var textW = tm.width;
+            if (fl.wrapText) {
 
-//  NOTE: надо сделать как в экселе если проекция строчки на Y больше высоты ячейки подставлять # и рисовать все по центру
+                if (this.rows[row].isCustomHeight) {
+                    tm = this._roundTextMetrics( this.stringRender.measureString( str, fl, rowHeight ) );
+                    textBound = this.stringRender.getTransformBound( angle, colWidth, rowHeight, tm.width, ha, va, rowHeight);
+                }
+                else {
+
+                    if (!fMergedRows) {
+                        rowHeight = tm.height;
+                    }
+                    tm = this._roundTextMetrics( this.stringRender.measureString( str, fl, rowHeight ) );
+                    textBound = this.stringRender.getTransformBound( angle, colWidth, rowHeight, tm.width, ha, va, tm.width);
+                }
+            }
+            else {
+                textBound = this.stringRender.getTransformBound( angle, colWidth, rowHeight, textW, ha, va, maxW);
+            }
+
+//  NOTE: если проекция строчки на Y больше высоты ячейки подставлять # и рисовать все по центру
 
 //                    if (fl.isNumberFormat) {
 //                        var prj = Math.abs(Math.sin(angle * Math.PI / 180.0) * tm.width);
@@ -4736,12 +4801,12 @@
             this._addErasedBordersToCache( col - cto.leftSide, col + cto.rightSide, row );
         }
 
-        this._updateRowHeight( tm, col, row, isMerged, fMergedRows, va, ha, angle, maxW, colWidth, textBound );
+        this._updateRowHeight( tm, col, row, fl, isMerged, fMergedRows, va, ha, angle, maxW, colWidth, textBound );
 
         return mc ? mc.c2 : col;
     };
 
-    WorksheetView.prototype._updateRowHeight = function ( tm, col, row, isMerged, fMergedRows, va, ha, angle, maxW, colWidth, textBound ) {
+    WorksheetView.prototype._updateRowHeight = function ( tm, col, row, flags, isMerged, fMergedRows, va, ha, angle, maxW, colWidth, textBound ) {
         var rowInfo = this.rows[row], rowHeight;
         // update row's descender
         if ( va !== kvaTop && va !== kvaCenter && !isMerged ) {
@@ -4755,10 +4820,8 @@
             // Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
             if ( !fMergedRows ) {
                 var newHeight = tm.height;
-                if ( angle ) {
-                    if ( textBound ) {
-                        newHeight = textBound.height;
-                    }
+                if ( angle && textBound ) {
+                    newHeight = Math.max(rowInfo.height,textBound.height);
                 }
 
                 rowInfo.heightReal = rowInfo.height = Math.min( this.maxRowHeight, Math.max( rowInfo.height, newHeight ) );
@@ -4769,7 +4832,14 @@
                     }
 
                     if ( angle ) {
-                        this._fetchCellCache( col, row ).text.textBound = this.stringRender.getTransformBound( angle, 0, 0, colWidth, rowInfo.height, tm.width, ha, va, maxW );
+
+                        if (flags.wrapText && !rowInfo.isCustomHeight) {
+                            maxW = tm.width;
+                        }
+
+                        textBound = this.stringRender.getTransformBound( angle, colWidth, rowInfo.height, tm.width, ha, va, maxW);
+
+                        this._fetchCellCache( col, row ).text.textBound = textBound;
                     }
 
                     this.isChanged = true;

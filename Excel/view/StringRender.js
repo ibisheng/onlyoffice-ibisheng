@@ -236,8 +236,6 @@
 
         /**
          * @param {Number} angle
-         * @param {Number} x
-         * @param {Number} y
          * @param {Number} w
          * @param {Number} h
          * @param {Number} textW
@@ -245,7 +243,9 @@
          * @param {String} alignVertical
          * @param {Number} maxWidth
          */
-        StringRender.prototype.getTransformBound = function(angle, x, y, w, h, textW, alignHorizontal, alignVertical, maxWidth) {
+        StringRender.prototype.getTransformBound = function(angle, w, h, textW, alignHorizontal, alignVertical, maxWidth) {
+
+            // TODO: добавить padding по сторонам
 
             this.angle          =   0;  //  angle;
             this.fontNeedUpdate =   true;
@@ -383,7 +383,7 @@
                 }
             }
 
-            var bound = { dx: dx, dy: dy, x: x, y: y, height: 0, width: 0, offsetX: offsetX};
+            var bound = { dx: dx, dy: dy, height: 0, width: 0, offsetX: offsetX};
 
             if (angle === 90 || angle === -90) {
                 bound.width = tm.height;
