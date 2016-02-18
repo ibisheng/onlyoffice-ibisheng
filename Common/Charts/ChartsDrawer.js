@@ -562,7 +562,7 @@ CChartsDrawer.prototype =
 			var catAx = chartSpace.chart.plotArea.catAx;
 			var curBetween = 0, diffPoints = 0;
 			
-			if(this.calcProp.type == "Scatter" && this.calcProp.widthCanvas != undefined)
+			if(this.calcProp.type == "Scatter" && this.calcProp.widthCanvas != undefined && catAx.xPoints)
 			{
 				if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
@@ -575,7 +575,7 @@ CChartsDrawer.prototype =
 					calculateRight = this.calcProp.widthCanvas / pxToMM - catAx.xPoints[0].pos;
 				}
 			}
-			else if(isHBar && valAx && !isNaN(valAx.posY) && this.calcProp.heightCanvas != undefined)
+			else if(isHBar && valAx && !isNaN(valAx.posY) && this.calcProp.heightCanvas != undefined && catAx.yPoints)
 			{
 				diffPoints = catAx.yPoints[1] ? Math.abs(catAx.yPoints[1].pos - catAx.yPoints[0].pos) : Math.abs(catAx.yPoints[0].pos - valAx.posY) * 2;
 				
@@ -596,7 +596,7 @@ CChartsDrawer.prototype =
 					calculateBottom = this.calcProp.heightCanvas / pxToMM - (catAx.yPoints[catAx.yPoints.length - 1].pos + curBetween);
 				}
 			}
-			else if(valAx && !isNaN(valAx.posX) && this.calcProp.widthCanvas != undefined)
+			else if(valAx && !isNaN(valAx.posX) && this.calcProp.widthCanvas != undefined && catAx.xPoints)
 			{
 				diffPoints = catAx.xPoints[1] ? Math.abs(catAx.xPoints[1].pos - catAx.xPoints[0].pos) : Math.abs(catAx.xPoints[0].pos - valAx.posX) * 2;
 				
