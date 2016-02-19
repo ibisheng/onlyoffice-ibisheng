@@ -363,6 +363,8 @@ function asc_docs_api(name)
     }
 
     this.RevisionChangesStack = [];
+
+    //g_clipboardBase.Init(this);
 }
 asc.extendClass(asc_docs_api, baseEditorsApi);
 
@@ -1816,12 +1818,89 @@ asc_docs_api.prototype.Paste = function()
         }
     }
 };
-asc_docs_api.prototype.asc_CheckCopy = function(_clipboard /* CClipboardData */, _formats)
-{
-	Editor_CheckCopy(this, _clipboard, _formats);
-};
+
 asc_docs_api.prototype.Share = function(){
 
+};
+
+asc_docs_api.prototype.asc_CheckCopy = function(_clipboard /* CClipboardData */, _formats)
+{
+    if (!this.WordControl.m_oLogicDocument)
+    {
+        var _text_object = (c_oAscClipboardDataFormat.Text & _formats) ? { Text : "" } : null;
+        var _html_data = this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Copy(_text_object);
+
+        //TEXT
+        if (c_oAscClipboardDataFormat.Text & _formats)
+        {
+            _clipboard.pushData(c_oAscClipboardDataFormat.Text, _text_object.Text);
+        }
+        //HTML
+        if(c_oAscClipboardDataFormat.Html & _formats)
+        {
+            _clipboard.pushData(c_oAscClipboardDataFormat.Html, _html_data);
+        }
+        return;
+    }
+
+    var sBase64 = null, _data;
+
+    //TEXT
+    if (c_oAscClipboardDataFormat.Text & _formats)
+    {
+        _data = this.WordControl.m_oLogicDocument.Get_SelectedText();
+        _clipboard.pushData(c_oAscClipboardDataFormat.Text, _data)
+    }
+    //HTML
+    if(c_oAscClipboardDataFormat.Html & _formats)
+    {
+        var oCopyProcessor = new CopyProcessor(this);
+        sBase64 = oCopyProcessor.Start();
+        _data = oCopyProcessor.getInnerHtml();
+
+        _clipboard.pushData(c_oAscClipboardDataFormat.Html, _data)
+    }
+    //INTERNAL
+    if(c_oAscClipboardDataFormat.Internal & _formats)
+    {
+        if(sBase64 === null)
+        {
+            var oCopyProcessor = new CopyProcessor(this);
+            sBase64 = oCopyProcessor.Start();
+        }
+
+        _data = sBase64;
+        _clipboard.pushData(c_oAscClipboardDataFormat.Internal, _data)
+    }
+};
+
+asc_docs_api.prototype.asc_SelectionCut = function()
+{
+    var _logicDoc = this.WordControl.m_oLogicDocument;
+    if (!_logicDoc)
+        return;
+
+    if ( false === _logicDoc.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+    {
+        History.Create_NewPoint(historydescription_Cut);
+        _logicDoc.Remove(1, true, true);
+        _logicDoc.Document_UpdateSelectionState();
+    }
+};
+
+asc_docs_api.prototype.asc_PasteData = function(_format, data1, data2)
+{
+    switch (_format)
+    {
+        case c_oAscClipboardDataFormat.HtmlElement:
+            Editor_Paste_Exec(this, data1, data2);
+            break;
+        case c_oAscClipboardDataFormat.Internal:
+            Editor_Paste_Exec(this, null, null, data1);
+            break;
+        default:
+            break;
+    }
 };
 
 function OnSave_Callback(e) {
@@ -5490,6 +5569,15 @@ asc_docs_api.prototype.asc_enableKeyEvents = function(value){
 
 		this.asc_fireCallback("asc_onEnableKeyEventsChanged", value);
 	}
+};
+asc_docs_api.prototype.asc_IsFocus = function(bIsNaturalFocus)
+{
+    var _ret = false;
+    if (this.WordControl.IsFocus)
+        _ret = true;
+    if (_ret && bIsNaturalFocus && this.WordControl.TextBoxInputFocus)
+        _ret = false;
+    return _ret;
 };
 
 asc_docs_api.prototype.asyncServerIdEndLoaded = function()

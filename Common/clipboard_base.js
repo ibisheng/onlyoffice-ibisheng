@@ -11,6 +11,8 @@
 // 5) asc_SelectionCut();
 ///
 
+// Для инициализации вызвать g_clipboardBase.Init(api); в любой момент времени
+
 var c_oAscClipboardDataFormat = {
     Text	    : 1,
     Html	    : 2,
@@ -408,6 +410,11 @@ CClipboardBase.prototype =
 
             }, 100);
         }
+    },
+
+    IsWorking : function()
+    {
+        return (this.CopyFlag || this.PasteFlag) ? true : false;
     },
 
     CommonDiv_Check : function()

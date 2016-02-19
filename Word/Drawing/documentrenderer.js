@@ -1760,7 +1760,7 @@ function CDocMeta()
         }
     }
 
-    this.CopySelection = function(pageNum)
+    this.CopySelection = function(pageNum, _text_format)
     {
         var ret = "";
 
@@ -2021,6 +2021,9 @@ function CDocMeta()
                                     textLine += "<span>";
                                     textLine += lineSpans[i].inner;
                                     textLine += "</span>";
+
+                                    if (_text_format)
+                                        _text_format.Text += lineSpans[i].inner;
                                 }
                             }
                             else
@@ -2048,10 +2051,16 @@ function CDocMeta()
                                     textLine += "<span>";
                                     textLine += lineSpans[i].inner.substring(start, end);
                                     textLine += "</span>";
+
+                                    if (_text_format)
+                                        _text_format.Text += lineSpans[i].inner.substring(start, end);
                                 }
                             }
 
                             textLine += "</p>";
+
+                            if (_text_format)
+                                _text_format.Text += "\n";
 
                             ret += textLine;
                         }
@@ -3053,7 +3062,7 @@ function CDocMeta()
         editor.WordControl.OnUpdateOverlay();
     }
 
-    this.Copy = function()
+    this.Copy = function(_text_format)
     {
         var sel = this.Selection;
         var page1 = sel.Page1;
@@ -3068,7 +3077,7 @@ function CDocMeta()
         var ret = "<div>";
         for (var i = page1; i <= page2; i++)
         {
-            ret += this.CopySelection(i);
+            ret += this.CopySelection(i, _text_format);
         }
         ret += "</div>";
 
