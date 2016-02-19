@@ -555,6 +555,9 @@ CHistory.prototype.Check_UninonLastPoints = function()
 	}
 };
 
+CHistory.prototype.Add_RecalcTableGrid = function()
+{};
+
 CHistory.prototype.Create_NewPoint = function()
 {
 	if ( 0 !== this.TurnOffHistory || 0 !== this.Transaction )
