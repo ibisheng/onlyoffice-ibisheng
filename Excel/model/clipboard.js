@@ -3833,8 +3833,12 @@
 					drawingObject.graphicObject.recalculate();
                     drawingObject.graphicObject.select(ws.objectRender.controller, 0);
 				}
-				
-				window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null, ws.objectRender.asyncImagesDocumentEndLoaded);
+
+                var old_val = api.ImageLoader.bIsAsyncLoadDocumentImages;
+                api.ImageLoader.bIsAsyncLoadDocumentImages = true;
+                api.ImageLoader.LoadDocumentImages(aImagesSync, null, ws.objectRender.asyncImagesDocumentEndLoaded);
+                api.ImageLoader.bIsAsyncLoadDocumentImages = old_val;
+
 				ws.objectRender.showDrawingObjects(true);
                 ws.setSelectionShape(true);
 				ws.objectRender.controller.updateOverlay();
