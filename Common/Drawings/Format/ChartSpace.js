@@ -6733,16 +6733,22 @@ CChartSpace.prototype =
         {
             var plot_area = this.chart.plotArea;
             var default_brush;
-            var tint = 0.20000;
-            if(this.style >=1 && this.style <=32)
-                default_brush = CreateUnifillSolidFillSchemeColor(6, tint);
-            else if(this.style >=33 && this.style <= 34)
-                default_brush = CreateUnifillSolidFillSchemeColor(8, 0.20000);
-            else if(this.style >=35 && this.style <=40)
-                default_brush = CreateUnifillSolidFillSchemeColor(this.style - 35, 0 + tint);
+            if(this.chart.view3D && this.chart.view3D.rAngAx)
+            {
+                default_brush = CreateNoFillUniFill();
+            }
             else
-                default_brush = CreateUnifillSolidFillSchemeColor(8, 0.95000);
-
+            {
+                var tint = 0.20000;
+                if(this.style >=1 && this.style <=32)
+                    default_brush = CreateUnifillSolidFillSchemeColor(6, tint);
+                else if(this.style >=33 && this.style <= 34)
+                    default_brush = CreateUnifillSolidFillSchemeColor(8, 0.20000);
+                else if(this.style >=35 && this.style <=40)
+                    default_brush = CreateUnifillSolidFillSchemeColor(this.style - 35, 0 + tint);
+                else
+                    default_brush = CreateUnifillSolidFillSchemeColor(8, 0.95000);
+            }
             if(plot_area.spPr && plot_area.spPr.Fill)
             {
                 default_brush.merge(plot_area.spPr.Fill);

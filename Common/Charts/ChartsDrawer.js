@@ -184,13 +184,13 @@ CChartsDrawer.prototype =
 			
 			if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
 			{
-				this.gridChart.draw(this);
 				if(this.nDimensionCount === 3)
 				{
 					this.floor3DChart.draw(this);
 					this.sideWall3DChart.draw(this);
 					this.backWall3DChart.draw(this);
 				}
+                this.gridChart.draw(this);
 			}
 			
 			this.chart.draw(this);
@@ -4984,7 +4984,6 @@ drawAreaChart.prototype =
 					}
 					else if(intersectionWithPrevSeriaNear && intersectionWithPrevSeriaNear.x < currentNear.x && (!prevNear || prevNear && prevNear.y > intersectionWithPrevSeriaNear.y))
 					{
-						result = {};
 						prevNear = intersectionWithPrevSeriaNear;
 						prevFar = intersectionWithPrevSeriaFar;
 					}
