@@ -823,19 +823,19 @@ CBox.prototype.Can_ModifyArgSize = function()
 };
 CBox.prototype.Apply_MenuProps = function(Props)
 {
-    if(Props.Type === c_oAscMathInterfaceType.Box)
-    {
-        if(Props.Action & c_oMathMenuAction.InsertForcedBreak && true == this.Can_InsertForcedBreak())
-        {
-            History.Add(this, new CChangesMathBoxForcedBreak(true, false));
-            this.raw_ForcedBreak(true);
-        }
+    // не проверяем изменения на тип !
+    // потому что может прийти свойства из другого (вложенного в Box) мат объекта, но при этом есть возможность вставить/удалить  принудительный перенос для Box
 
-        if(Props.Action & c_oMathMenuAction.DeleteForcedBreak && true == this.Can_DeleteForcedBreak())
-        {
-            History.Add(this, new CChangesMathBoxForcedBreak(false, true));
-            this.raw_ForcedBreak(false);
-        }
+    if(Props.Action & c_oMathMenuAction.InsertForcedBreak && true == this.Can_InsertForcedBreak())
+    {
+        History.Add(this, new CChangesMathBoxForcedBreak(true, false));
+        this.raw_ForcedBreak(true);
+    }
+
+    if(Props.Action & c_oMathMenuAction.DeleteForcedBreak && true == this.Can_DeleteForcedBreak())
+    {
+        History.Add(this, new CChangesMathBoxForcedBreak(false, true));
+        this.raw_ForcedBreak(false);
     }
 };
 CBox.prototype.Get_InterfaceProps = function()
@@ -860,6 +860,29 @@ CBox.prototype.raw_ForcedBreak = function(InsertBreak)
     {
         this.Pr.Delete_ForcedBreak();
     }
+};
+CBox.prototype.Can_ModifyForcedBreak = function(Pr)
+{
+    if(true == this.Can_InsertForcedBreak())
+    {
+        Pr.Set_InsertForcedBreak();
+    }
+    else
+    {
+        Pr.Set_DeleteForcedBreak();
+    }
+};
+CBox.prototype.Apply_ForcedBreak = function(Props)
+{
+    this.Apply_MenuProps(Props);
+
+    // исключаем из Props, чтобы не применить к операторам внути Box
+    // иначе при Drag'n'Drop оператора получим неочевидный результат :  принудительный перенос
+    if(Props.Action & c_oMathMenuAction.InsertForcedBreak)
+        Props.Action ^= c_oMathMenuAction.InsertForcedBreak;
+
+    if(Props.Action & c_oMathMenuAction.DeleteForcedBreak)
+        Props.Action ^= c_oMathMenuAction.DeleteForcedBreak;
 };
 
 /**

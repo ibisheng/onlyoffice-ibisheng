@@ -2588,6 +2588,8 @@ CMathBase.prototype.Reject_RevisionChanges = function(Type, bAll)
 };
 CMathBase.prototype.Set_MenuProps = function(Props)
 {
+    this.Apply_ForcedBreak(Props);
+
     if(this.Selection.Use == false)
     {
         this.Content[this.CurPos].Set_MenuProps(Props);
@@ -2628,9 +2630,18 @@ CMathBase.prototype.Get_MenuProps = function()
         Pos = this.Selection.StartPos;
     }
 
-    if(Pos !== null && true == this.Content[Pos].Check_Composition())
+    var bOutsideComposition   = Pos !== null && true == this.Content[Pos].Check_Composition(),
+        bSelectAllComposition = Pos == null;
+
+    if(bOutsideComposition)
     {
         Pr = this.Content[Pos].Get_MenuProps();
+        this.Can_ModifyForcedBreak(Pr);
+    }
+    else if(bSelectAllComposition == false)
+    {
+        Pr = this.Get_InterfaceProps();
+        this.Content[Pos].Can_ModifyForcedBreak(Pr);
     }
     else
     {
@@ -2641,6 +2652,12 @@ CMathBase.prototype.Get_MenuProps = function()
 };
 CMathBase.prototype.Apply_MenuProps = function()
 {};
+CMathBase.prototype.Can_ModifyForcedBreak = function(Pr)
+{
+};
+CMathBase.prototype.Apply_ForcedBreak = function()
+{
+};
 CMathBase.prototype.Get_DeletedItemsThroughInterface = function()
 {
     var baseContent  = this.getBase();
@@ -3149,6 +3166,16 @@ CMathMenuBase.prototype.remove_DelimiterCharacters = function()
 CMathMenuBase.prototype.remove_Radical = function()
 {
     this.Action |= c_oMathMenuAction.RemoveRadical;
+};
+CMathMenuBase.prototype.Set_InsertForcedBreak = function()
+{
+    this.CanInsertForcedBreak = true;
+    this.CanDeleteForcedBreak = false;
+};
+CMathMenuBase.prototype.Set_DeleteForcedBreak = function()
+{
+    this.CanInsertForcedBreak = false;
+    this.CanDeleteForcedBreak = true;
 };
 
 window["CMathMenuBase"]                                = CMathMenuBase;

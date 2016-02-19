@@ -193,6 +193,7 @@ AmperWidths.prototype.SetDefault = function()
     this.Widths.length = 0;
 };
 
+
 function CGeneralObjectGaps(Left, Right)
 {
     this.left  = Left;
@@ -716,6 +717,17 @@ CMPrp.prototype =
         {
             this.brk.Apply_AlnAt(alnAt);
         }
+    },
+    Insert_ForcedBreak: function(AlnAt)
+    {
+        if(this.brk == undefined)
+            this.brk = new CMathBreak();
+
+        this.brk.Apply_AlnAt(AlnAt);
+    },
+    Delete_ForcedBreak: function()
+    {
+        this.brk = undefined;
     }
 };
 
@@ -3959,7 +3971,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         {
             if(Type == para_Math_Run)
             {
-                if(true === Item.IsStartForcedBreakOperator())
+                if(true === Item.Is_StartForcedBreakOperator())
                 {
                     Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
                 }
@@ -4716,6 +4728,67 @@ CMathContent.prototype.Check_Composition = function()
 
     return Pos !== null && this.Content[Pos].Type == para_Math_Composition;
 };
+CMathContent.prototype.Can_ModifyForcedBreak = function(Pr)
+{
+    var Pos = null;
+    var CurPos;
+
+    if(true === this.Selection.Use)
+    {
+        var StartPos = this.Selection.StartPos,
+            EndPos   = this.Selection.EndPos;
+
+        if ( StartPos > EndPos )
+        {
+            StartPos = this.Selection.EndPos;
+            EndPos   = this.Selection.StartPos;
+        }
+
+
+        var bFirstItem = false;
+        for(CurPos = StartPos; CurPos <= EndPos; CurPos++)
+        {
+            if(true !== this.Content[CurPos].Selection_IsEmpty())
+            {
+                if(bFirstItem == true)
+                    break;
+
+                bFirstItem = true;
+                Pos = CurPos;
+            }
+        }
+    }
+    else
+    {
+        Pos = this.CurPos;
+    }
+
+    if(Pos !== null && this.bOneLine == false)
+    {
+        var bBreakOperator = this.Content[Pos].Check_ForcedBreak();
+        var CurrentRun     = this.Content[Pos];
+        var bCanCheckNearsRun = bBreakOperator == false && false == CurrentRun.Is_SelectionUse();
+        var bPrevItem     = bCanCheckNearsRun && Pos > 0 && true == CurrentRun.Cursor_Is_Start(),
+            bNextItem     = bCanCheckNearsRun && Pos < this.Content.length && true == CurrentRun.Cursor_Is_End();
+
+        var bPrevRun = bPrevItem &&  this.Content[Pos - 1].Type == para_Math_Run,
+            bNextRun = bNextItem &&  this.Content[Pos + 1].Type == para_Math_Run;
+
+        if(bBreakOperator)
+        {
+            this.Content[Pos].Math_Can_ModidyForcedBreak(Pr);
+        }
+        else if(bPrevRun)
+        {
+            this.Content[Pos - 1].Math_Can_ModidyForcedBreak(Pr, true, false);
+        }
+        else if(bNextRun)
+        {
+            this.Content[Pos + 1].Math_Can_ModidyForcedBreak(Pr, false, true);
+        }
+    }
+
+};
 CMathContent.prototype.private_FindCurrentPosInContent = function()
 {
     var Pos = null;
@@ -4724,6 +4797,12 @@ CMathContent.prototype.private_FindCurrentPosInContent = function()
     {
         var StartPos = this.Selection.StartPos,
             EndPos   = this.Selection.EndPos;
+
+        if ( StartPos > EndPos )
+        {
+            StartPos = this.Selection.EndPos;
+            EndPos   = this.Selection.StartPos;
+        }
 
         var bComposition = false;
 
@@ -4770,10 +4849,13 @@ CMathContent.prototype.Set_MenuProps = function(Props)
 
     if(true == this.Is_CurrentContent())
     {
-        this.Apply_MenuProps(Props);
+        this.Apply_MenuProps(Props, Pos);
     }
     else if(false == this.private_IsMenuPropsForContent(Props.Action) &&  true == this.Content[Pos].Can_ApplyMenuPropsToObject())
     {
+        // не нужно проходиться по вложенным элементам
+        // 1. уже применили изменения, продожать нет необходимости
+        // 2. потому что могут совпать типы текущего элемента и вложенного и тогда изменения применятся к обоим элементам
         if(false === this.Delete_ItemToContentThroughInterface(Props, Pos)) // try to delete
         {
             this.Content[Pos].Apply_MenuProps(Props);
@@ -4784,7 +4866,7 @@ CMathContent.prototype.Set_MenuProps = function(Props)
         this.Content[Pos].Set_MenuProps(Props);
     }
 };
-CMathContent.prototype.Apply_MenuProps = function(Props)
+CMathContent.prototype.Apply_MenuProps = function(Props, Pos)
 {
     var ArgSize, NewArgSize;
 
@@ -4799,8 +4881,7 @@ CMathContent.prototype.Apply_MenuProps = function(Props)
             this.Recalc_RunsCompiledPr();
         }
     }
-
-    if(Props.Action & c_oMathMenuAction.DecreaseArgumentSize)
+    else if(Props.Action & c_oMathMenuAction.DecreaseArgumentSize)
     {
         if(true === this.Parent.Can_ModifyArgSize() && true == this.Compiled_ArgSz.Can_Decrease() && true == this.ArgSize.Can_Decrease())
         {
@@ -4812,6 +4893,53 @@ CMathContent.prototype.Apply_MenuProps = function(Props)
 
         }
     }
+
+    var Run;
+
+    if(Pos !== null && Props.Action & c_oMathMenuAction.InsertForcedBreak)
+    {
+        Run = this.private_Get_RunForForcedBreak(Pos);
+        Run.Set_MathForcedBreak(true);
+
+    }
+    else if(Pos !== null && Props.Action & c_oMathMenuAction.DeleteForcedBreak)
+    {
+        Run = this.private_Get_RunForForcedBreak(Pos);
+        Run.Set_MathForcedBreak(false);
+    }
+
+};
+CMathContent.prototype.private_Get_RunForForcedBreak = function(Pos)
+{
+    var CurrentRun          = this.Content[Pos];
+    var bCurrentForcedBreak = this.Content[Pos].Type == para_Math_Run && true == CurrentRun.Check_ForcedBreak(),
+        bPrevForcedBreak    = Pos > 0 && true == CurrentRun.Cursor_Is_Start(),
+        bNextForcedBreak    = Pos < this.Content.length && true == CurrentRun.Cursor_Is_End();
+
+    var Run = null;
+
+    if(bCurrentForcedBreak)
+    {
+        Run = this.Content[Pos];
+
+        var NewRun = Run.Math_SplitRunForcedBreak();
+
+        if(NewRun !== null)
+        {
+            this.Internal_Content_Add(Pos+1, NewRun, true);
+            Run = NewRun;
+        }
+    }
+    else if(bPrevForcedBreak)
+    {
+        Run = this.Content[Pos - 1];
+    }
+    else if(bNextForcedBreak)
+    {
+        Run = this.Content[Pos + 1];
+    }
+
+    return Run;
 };
 CMathContent.prototype.Delete_ItemToContentThroughInterface = function(Props, Pos)
 {
@@ -4884,19 +5012,26 @@ CMathContent.prototype.Get_MenuProps = function()
 
     var Pos = this.private_FindCurrentPosInContent();
 
-    if(Pos !== null)
+    if(Pos !== null && this.Content[Pos].Type == para_Math_Composition)
     {
-        if(this.Content[Pos].Type == para_Math_Composition)
-        {
-            Pr = this.Content[Pos].Get_MenuProps();
-        }
+        Pr = this.Content[Pos].Get_MenuProps();
+    }
+    else
+    {
+        this.Can_ModifyForcedBreak(Pr);
     }
 
     return Pr;
 };
 CMathContent.prototype.private_IsMenuPropsForContent = function(Action)
 {
-    return Action & c_oMathMenuAction.IncreaseArgumentSize || Action & c_oMathMenuAction.DecreaseArgumentSize;
+    // данные изменения могут прийти для любого типа изменений
+    var bInsertForcedBreak = Action & c_oMathMenuAction.InsertForcedBreak,
+        bDeleteForcedBreak = Action & c_oMathMenuAction.DeleteForcedBreak,
+        bIncreaseArgSize   = Action & c_oMathMenuAction.IncreaseArgumentSize,
+        bDecreaseArgSize   = Action & c_oMathMenuAction.DecreaseArgumentSize;
+
+    return bDecreaseArgSize || bIncreaseArgSize || bInsertForcedBreak || bDeleteForcedBreak;
 };
 CMathContent.prototype.Process_AutoCorrect = function(ActionElement)
 {

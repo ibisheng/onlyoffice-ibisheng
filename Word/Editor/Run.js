@@ -425,7 +425,7 @@ ParaRun.prototype.Add = function(Item, bMath)
 
         NewRun.Make_ThisElementCurrent();
     }
-    else if(this.Type == para_Math_Run && this.State.ContentPos == 0 && true === this.IsStartForcedBreakOperator()) // если в начале текущего Run идет принудительный перенос => создаем новый Run
+    else if(this.Type == para_Math_Run && this.State.ContentPos == 0 && true === this.Is_StartForcedBreakOperator()) // если в начале текущего Run идет принудительный перенос => создаем новый Run
     {
         var NewRun = new ParaRun(this.Paragraph, bMath);
         NewRun.Set_Pr(this.Pr.Copy());
@@ -7441,6 +7441,19 @@ ParaRun.prototype.Undo = function(Data)
             this.MathPrp.Apply_AlnAt(Data.Old);
             break;
         }
+        case historyitem_ParaRun_MathForcedBreak:
+        {
+            if(Data.bInsert)
+            {
+                this.MathPrp.Delete_ForcedBreak();
+            }
+            else
+            {
+                this.MathPrp.Insert_ForcedBreak(Data.alnAt);
+            }
+
+            break;
+        }
     }
 };
 
@@ -7869,9 +7882,21 @@ ParaRun.prototype.Redo = function(Data)
             this.MathPrp.Apply_AlnAt(Data.New);
             break;
         }
+        case historyitem_ParaRun_MathForcedBreak:
+        {
+            if(Data.bInsert)
+            {
+                this.MathPrp.Insert_ForcedBreak(Data.alnAt);
+            }
+            else
+            {
+                this.MathPrp.Delete_ForcedBreak();
+            }
+
+            break;
+        }
     }
 };
-
 ParaRun.prototype.Check_HistoryUninon = function(Data1, Data2)
 {
     var Type1 = Data1.Type;
@@ -8479,6 +8504,20 @@ ParaRun.prototype.Save_Changes = function(Data, Writer)
 
             break;
         }
+        case historyitem_ParaRun_MathForcedBreak:
+        {
+            if(Data.bInsert)
+            {
+                Writer.WriteBool( true );
+            }
+            else
+            {
+                Writer.WriteBool( false );
+            }
+
+            break;
+        }
+
     }
 
     return Writer;
@@ -9208,6 +9247,19 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.MathPrp.brk.Apply_AlnAt(Reader.GetLong());
             else
                 this.MathPrp.brk.Apply_AlnAt(undefined);
+
+            break;
+        }
+        case historyitem_ParaRun_MathForcedBreak:
+        {
+            if ( true === Reader.GetBool() )
+            {
+                this.MathPrp.brk = new CMathBreak();
+            }
+            else
+            {
+                this.MathPrp.brk = undefined;
+            }
 
             break;
         }
@@ -10004,6 +10056,107 @@ ParaRun.prototype.Math_UpdateGaps = function(_CurLine, _CurRange, GapsInfo)
 
     }
 };
+ParaRun.prototype.Math_Can_ModidyForcedBreak = function(Pr, bStart, bEnd)
+{
+    var Pos = this.Math_GetPosForcedBreak(bStart, bEnd);
+
+    if(Pos !== null)
+    {
+        if(this.MathPrp.IsBreak())
+        {
+            Pr.Set_DeleteForcedBreak();
+        }
+        else
+        {
+            Pr.Set_InsertForcedBreak();
+        }
+    }
+
+};
+ParaRun.prototype.Math_GetPosForcedBreak = function(bStart, bEnd)
+{
+    var ResultPos = null;
+
+    if(this.Content.length > 0)
+    {
+        var StartPos = this.Selection.StartPos,
+            EndPos   = this.Selection.EndPos,
+            bSelect  = this.Selection.Use;
+
+        if(StartPos > EndPos)
+        {
+            StartPos = this.Selection.EndPos;
+            EndPos   = this.Selection.StartPos;
+        }
+
+        var bCheckTwoItem = bSelect == false || (bSelect == true && EndPos == StartPos),
+            bCheckOneItem = bSelect == true && EndPos - StartPos == 1;
+
+        if(bStart)
+        {
+            ResultPos = this.Content[0].Type == para_Math_BreakOperator ? 0 : ResultPos;
+        }
+        else if(bEnd)
+        {
+            var lastPos = this.Content.length - 1;
+            ResultPos = this.Content[lastPos].Type == para_Math_BreakOperator ? lastPos : ResultPos;
+        }
+        else if(bCheckTwoItem)
+        {
+            var Pos = bSelect == false ? this.State.ContentPos : StartPos;
+            var bPrevBreakOperator  = Pos > 0 ? this.Content[Pos - 1].Type == para_Math_BreakOperator : false,
+                bCurrBreakOperator  = Pos < this.Content.length ? this.Content[Pos].Type == para_Math_BreakOperator : false;
+
+            if(bCurrBreakOperator)
+            {
+                ResultPos = Pos
+            }
+            else if(bPrevBreakOperator)
+            {
+                ResultPos = Pos - 1;
+            }
+
+        }
+        else if(bCheckOneItem)
+        {
+            if(this.Content[StartPos].Type == para_Math_BreakOperator)
+            {
+                ResultPos = StartPos;
+            }
+        }
+    }
+
+    return ResultPos;
+};
+ParaRun.prototype.Check_ForcedBreak = function(bStart, bEnd)
+{
+    return this.Math_GetPosForcedBreak(bStart, bEnd) !== null;
+};
+ParaRun.prototype.Set_MathForcedBreak = function(bInsert)
+{
+    if(bInsert == true && false == this.MathPrp.IsBreak())
+    {
+        History.Add(this, {Type: historyitem_ParaRun_MathForcedBreak, bInsert: true, alnAt: undefined });
+        this.MathPrp.Insert_ForcedBreak();
+    }
+    else if(bInsert == false && true == this.MathPrp.IsBreak())
+    {
+        History.Add(this, {Type: historyitem_ParaRun_MathForcedBreak, bInsert: false, alnAt: this.MathPrp.Get_AlnAt()});
+        this.MathPrp.Delete_ForcedBreak();
+    }
+};
+ParaRun.prototype.Math_SplitRunForcedBreak = function()
+{
+    var Pos =  this.Math_GetPosForcedBreak();
+    var NewRun = null;
+
+    if(Pos != null && Pos > 0) // разбиваем Run на два
+    {
+        NewRun = this.Split_Run(Pos);
+    }
+
+    return NewRun;
+};
 ParaRun.prototype.UpdLastElementForGaps = function(_CurLine, _CurRange, GapsInfo)
 {
     var CurLine  = _CurLine - this.StartLine;
@@ -10069,16 +10222,17 @@ ParaRun.prototype.IsForcedBreak = function()
 {
     return this.MathPrp.IsBreak();
 };
-ParaRun.prototype.IsStartForcedBreakOperator = function()
+ParaRun.prototype.Is_StartForcedBreakOperator = function()
 {
-    var BreakPr = true == this.IsForcedBreak();
-    var StartOperator = this.Content.length > 0 && this.Content[0].Type == para_Math_BreakOperator;
-
-    return BreakPr && StartOperator;
+    return true == this.IsForcedBreak() && true == this.Is_StartBreakOperator();
+};
+ParaRun.prototype.Is_StartBreakOperator = function()
+{
+    return this.Content.length > 0 && this.Content[0].Type == para_Math_BreakOperator;
 };
 ParaRun.prototype.Get_AlignBrk = function()
 {
-    return true == this.IsStartForcedBreakOperator() ? this.MathPrp.Get_AlignBrk() : 0;
+    return true == this.Is_StartForcedBreakOperator() ? this.MathPrp.Get_AlignBrk() : 0;
 };
 ParaRun.prototype.Math_Is_InclineLetter = function()
 {
@@ -10614,7 +10768,7 @@ ParaRun.prototype.Is_UseInParagraph = function()
 };
 ParaRun.prototype.Displace_BreakOperator = function(_CurLine, _CurRange, isForward, CountOperators)
 {
-    if(true === this.IsStartForcedBreakOperator())
+    if(true === this.Is_StartForcedBreakOperator())
     {
         var AlnAt = this.MathPrp.Get_AlnAt();
 
@@ -10633,7 +10787,6 @@ ParaRun.prototype.Displace_BreakOperator = function(_CurLine, _CurRange, isForwa
         }
     }
 };
-
 ParaRun.prototype.Math_UpdateLineMetrics = function(PRS, ParaPr)
 {
     var LineRule = ParaPr.Spacing.LineRule;
@@ -10667,6 +10820,7 @@ ParaRun.prototype.Math_UpdateLineMetrics = function(PRS, ParaPr)
     }
 
 };
+
 function CParaRunStartState(Run)
 {
     this.Paragraph = Run.Paragraph;

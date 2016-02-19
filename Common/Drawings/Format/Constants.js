@@ -954,6 +954,7 @@ var historyitem_ParaRun_ContentReviewInfo = 39; // Изменение инфор
 var historyitem_ParaRun_OnStartSplit      = 40; // Специальное измненение для контролля позиции курсора и селекта
 var historyitem_ParaRun_OnEndSplit        = 41; // Специальное измненение для контролля позиции курсора и селекта
 var historyitem_ParaRun_MathAlnAt         = 42; // меняем alnAt в математических свойствах Run
+var historyitem_ParaRun_MathForcedBreak   = 43; // добавляем/удаляем Forced Break
 
 
 // Типы изменений в классе ParaTextPr
