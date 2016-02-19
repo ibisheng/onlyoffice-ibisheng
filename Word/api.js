@@ -1890,6 +1890,7 @@ asc_docs_api.prototype.asc_SelectionCut = function()
 
 asc_docs_api.prototype.asc_PasteData = function(_format, data1, data2)
 {
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_PasteHotKey);
     switch (_format)
     {
         case c_oAscClipboardDataFormat.HtmlElement:
