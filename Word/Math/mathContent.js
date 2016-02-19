@@ -4769,7 +4769,7 @@ CMathContent.prototype.Can_ModifyForcedBreak = function(Pr)
         var CurrentRun     = this.Content[Pos];
         var bCanCheckNearsRun = bBreakOperator == false && false == CurrentRun.Is_SelectionUse();
         var bPrevItem     = bCanCheckNearsRun && Pos > 0 && true == CurrentRun.Cursor_Is_Start(),
-            bNextItem     = bCanCheckNearsRun && Pos < this.Content.length && true == CurrentRun.Cursor_Is_End();
+            bNextItem     = bCanCheckNearsRun && Pos < this.Content.length - 1 && true == CurrentRun.Cursor_Is_End();
 
         var bPrevRun = bPrevItem &&  this.Content[Pos - 1].Type == para_Math_Run,
             bNextRun = bNextItem &&  this.Content[Pos + 1].Type == para_Math_Run;
