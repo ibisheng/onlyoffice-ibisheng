@@ -883,7 +883,15 @@ CDegreeSubSup.prototype.init = function(props)
 };
 CDegreeSubSup.prototype.fillContent = function()
 {
-    this.NeedBreakContent(0);
+    if(this.Pr.type == DEGREE_SubSup)
+    {
+        this.bCanBreak       = true;
+        this.NumBreakContent = 0;
+    }
+    else
+    {
+        this.bCanBreak       = false;
+    }
 
      this.baseContent = this.Content[0];
      this.iters = new CIterators(this.Content[1], this.Content[2]);
@@ -931,7 +939,7 @@ CDegreeSubSup.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine
 };
 CDegreeSubSup.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 {
-    this.bOneLine = PRS.bMath_OneLine;
+    this.bOneLine = this.bCanBreak == false || PRS.bMath_OneLine == true;
 
     if(this.bOneLine === true)
     {
