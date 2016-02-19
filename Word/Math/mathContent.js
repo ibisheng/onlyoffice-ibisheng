@@ -4730,38 +4730,7 @@ CMathContent.prototype.Check_Composition = function()
 };
 CMathContent.prototype.Can_ModifyForcedBreak = function(Pr)
 {
-    var Pos = null;
-    var CurPos;
-
-    if(true === this.Selection.Use)
-    {
-        var StartPos = this.Selection.StartPos,
-            EndPos   = this.Selection.EndPos;
-
-        if ( StartPos > EndPos )
-        {
-            StartPos = this.Selection.EndPos;
-            EndPos   = this.Selection.StartPos;
-        }
-
-
-        var bFirstItem = false;
-        for(CurPos = StartPos; CurPos <= EndPos; CurPos++)
-        {
-            if(true !== this.Content[CurPos].Selection_IsEmpty())
-            {
-                if(bFirstItem == true)
-                    break;
-
-                bFirstItem = true;
-                Pos = CurPos;
-            }
-        }
-    }
-    else
-    {
-        Pos = this.CurPos;
-    }
+    var Pos = this.private_GetPosRunForForcedBreak();
 
     if(Pos !== null && this.bOneLine == false)
     {
@@ -4787,7 +4756,51 @@ CMathContent.prototype.Can_ModifyForcedBreak = function(Pr)
             this.Content[Pos + 1].Math_Can_ModidyForcedBreak(Pr, false, true);
         }
     }
+};
+CMathContent.prototype.private_GetPosRunForForcedBreak = function()
+{
+    var Pos = null;
 
+    if(true === this.Selection.Use)
+    {
+        var StartPos = this.Selection.StartPos,
+            EndPos   = this.Selection.EndPos;
+
+        if ( StartPos > EndPos )
+        {
+            StartPos = this.Selection.EndPos;
+            EndPos   = this.Selection.StartPos;
+        }
+
+
+        var bHaveSelectedItem = false;
+        for(var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+        {
+            var Item = this.Content[CurPos];
+            var bSelect     = true !== Item.Selection_IsEmpty(),
+                bSelectRun  = bSelect == true && Item.Type == para_Math_Run,
+                bSelectComp = bSelect == true && Item.Type == para_Math_Composition;
+            var bSelectManyRuns = bSelectRun && bHaveSelectedItem;
+
+            if(bSelectComp || bSelectManyRuns)
+            {
+                Pos = null;
+                break;
+            }
+
+            if(bSelectRun)
+            {
+                bHaveSelectedItem = true;
+                Pos = CurPos;
+            }
+        }
+    }
+    else
+    {
+        Pos = this.CurPos;
+    }
+
+    return Pos;
 };
 CMathContent.prototype.private_FindCurrentPosInContent = function()
 {
