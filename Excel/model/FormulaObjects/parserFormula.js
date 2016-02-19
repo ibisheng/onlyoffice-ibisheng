@@ -1447,62 +1447,6 @@ cStrucTable.prototype.toRef = function () {
     return this.area ? this.area : new cError( cErrorType.bad_reference );
 };
 cStrucTable.prototype.toString = function () {
-    var tblStr = this.table.Name, columns_1, columns_2;
-    this.columnName ? tblStr += "[%1]" : null;
-    if ( this.oneColumn ) {
-
-		columns_1= this.wb.getTableNameColumnByIndex( this.tableName, this.oneColumnIndex.index );
-		if( columns_1 ){
-			this.oneColumn = columns_1.columnName;
-		}
-
-		return tblStr.replace( "%1", this.oneColumn  );
-    }
-    if ( this.columnRange ) {
-		columns_1 = this.wb.getTableNameColumnByIndex( this.tableName, this.colStartIndex.index );
-		columns_2 = this.wb.getTableNameColumnByIndex( this.tableName, this.colEndIndex.index );
-		if(columns_1){
-			this.colStart = columns_1.columnName
-		}
-		if(columns_2){
-			this.colEnd = columns_2.columnName
-		}
-		return tblStr.replace( "%1", "[" + this.colStart + "]:[" + this.colEnd + "]" );
-    }
-    if ( this.reservedColumn ) {
-        return tblStr.replace( "%1", this.buildLocalTableString(this.reservedColumnIndex,false) );
-    }
-    if ( this.hdt ) {
-        var re = /\[(.*?)\]/ig, m, data = "";
-        while ( null !== (m = re.exec( this.hdt )) ) {
-            data += "[" + m[1] + "]" + functionArgumentSeparatorDef;
-        }
-        data = data.substr( 0, data.length - 1 );
-        if ( this.hdtcstart ) {
-
-			columns_1 = this.wb.getTableNameColumnByIndex( this.tableName, this.colStartIndex.index );
-			if( columns_1 ){
-				this.hdtcstart = columns_1.columnName;
-			}
-
-			data += functionArgumentSeparatorDef + "[" + this.hdtcstart + "]"
-        }
-        if ( this.hdtcend ) {
-
-			columns_2 = this.wb.getTableNameColumnByIndex( this.tableName, this.colStartIndex.index );
-			if( columns_2 ){
-				this.hdtcend = columns_2.columnName;
-			}
-
-            data += ":[" + this.hdtcend + "]"
-        }
-        return tblStr.replace( "%1", data );
-    }
-    return tblStr.replace( "%1", "" );
-};
-cStrucTable.prototype.toLocaleString = function ( digitDelim ) {
-//    return this.toString();
-
 	var tblStr = this.table.Name, columns_1, columns_2;
 	this.columnName ? tblStr += "[%1]" : null;
 	if ( this.oneColumn ) {
@@ -1512,7 +1456,7 @@ cStrucTable.prototype.toLocaleString = function ( digitDelim ) {
 			this.oneColumn = columns_1.columnName;
 		}
 
-		return tblStr.replace( "%1", this.oneColumn  );
+		return tblStr.replace( "%1", this.oneColumn.replace(/#/g,"'#")  );
 	}
 	if ( this.columnRange ) {
 		columns_1 = this.wb.getTableNameColumnByIndex( this.tableName, this.colStartIndex.index );
@@ -1523,34 +1467,90 @@ cStrucTable.prototype.toLocaleString = function ( digitDelim ) {
 		if(columns_2){
 			this.colEnd = columns_2.columnName
 		}
-		return tblStr.replace( "%1", "[" + this.colStart + "]:[" + this.colEnd + "]" );
+		return tblStr.replace( "%1", "[" + this.colStart.replace(/#/g,"'#") + "]:[" + this.colEnd.replace(/#/g,"'#") + "]" );
+	}
+	if ( this.reservedColumn ) {
+		return tblStr.replace( "%1", this.buildLocalTableString(this.reservedColumnIndex,false) );
+	}
+	if ( this.hdt ) {
+		var re = /\[(.*?)\]/ig, m, data = "",i=0;
+		while ( null !== (m = re.exec( this.hdt )) ) {
+
+			data += "[" + this.buildLocalTableString(this.hdtIndexes[i],false) + "]" + functionArgumentSeparatorDef;
+		}
+		data = data.substr( 0, data.length - 1 );
+		if ( this.hdtcstart ) {
+
+			columns_1 = this.wb.getTableNameColumnByIndex( this.tableName, this.hdtcstartIndex.index );
+			if( columns_1 ){
+				this.hdtcstart = columns_1.columnName;
+			}
+
+			data += functionArgumentSeparatorDef + "[" + this.hdtcstart.replace(/#/g,"'#") + "]"
+		}
+		if ( this.hdtcend ) {
+
+			columns_2 = this.wb.getTableNameColumnByIndex( this.tableName, this.hdtcendIndex.index );
+			if( columns_2 ){
+				this.hdtcend = columns_2.columnName;
+			}
+
+			data += ":[" + this.hdtcend.replace(/#/g,"'#") + "]"
+		}
+		return tblStr.replace( "%1", data );
+	}
+	return tblStr.replace( "%1", "" );
+};
+cStrucTable.prototype.toLocaleString = function () {
+	var tblStr = this.table.Name, columns_1, columns_2;
+	this.columnName ? tblStr += "[%1]" : null;
+	if ( this.oneColumn ) {
+
+		columns_1= this.wb.getTableNameColumnByIndex( this.tableName, this.oneColumnIndex.index );
+		if( columns_1 ){
+			this.oneColumn = columns_1.columnName;
+		}
+
+		return tblStr.replace( "%1", this.oneColumn.replace(/#/g,"'#")  );
+	}
+	if ( this.columnRange ) {
+		columns_1 = this.wb.getTableNameColumnByIndex( this.tableName, this.colStartIndex.index );
+		columns_2 = this.wb.getTableNameColumnByIndex( this.tableName, this.colEndIndex.index );
+		if(columns_1){
+			this.colStart = columns_1.columnName
+		}
+		if(columns_2){
+			this.colEnd = columns_2.columnName
+		}
+		return tblStr.replace( "%1", "[" + this.colStart.replace(/#/g,"'#") + "]:[" + this.colEnd.replace(/#/g,"'#") + "]" );
 	}
 	if ( this.reservedColumn ) {
 		return tblStr.replace( "%1", this.buildLocalTableString(this.reservedColumnIndex,true) );
 	}
 	if ( this.hdt ) {
-		var re = /\[(.*?)\]/ig, m, data = "";
+		var re = /\[(.*?)\]/ig, m, data = "",i=0;
 		while ( null !== (m = re.exec( this.hdt )) ) {
-			data += "[" + m[1] + "]" + functionArgumentSeparatorDef;
+
+			data += "[" + this.buildLocalTableString(this.hdtIndexes[i],true) + "]" + functionArgumentSeparatorDef;
 		}
 		data = data.substr( 0, data.length - 1 );
 		if ( this.hdtcstart ) {
 
-			columns_1 = this.wb.getTableNameColumnByIndex( this.tableName, this.colStartIndex.index );
+			columns_1 = this.wb.getTableNameColumnByIndex( this.tableName, this.hdtcstartIndex.index );
 			if( columns_1 ){
 				this.hdtcstart = columns_1.columnName;
 			}
 
-			data += functionArgumentSeparatorDef + "[" + this.hdtcstart + "]"
+			data += functionArgumentSeparatorDef + "[" + this.hdtcstart.replace(/#/g,"'#") + "]"
 		}
 		if ( this.hdtcend ) {
 
-			columns_2 = this.wb.getTableNameColumnByIndex( this.tableName, this.colStartIndex.index );
+			columns_2 = this.wb.getTableNameColumnByIndex( this.tableName, this.hdtcendIndex.index );
 			if( columns_2 ){
 				this.hdtcend = columns_2.columnName;
 			}
 
-			data += ":[" + this.hdtcend + "]"
+			data += ":[" + this.hdtcend.replace(/#/g,"'#") + "]"
 		}
 		return tblStr.replace( "%1", data );
 	}
@@ -1603,8 +1603,8 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
         paramObj.param = g_nFormulaTablePartInfo.columns;
         if ( val.columnRange ) {
             this.columnRange = val.columnRange;
-            paramObj.startCol = this.colStart = val.colStart;
-            paramObj.endCol = this.colEnd = val.colEnd;
+            paramObj.startCol = this.colStart = val.colStart.replace(/'#/g,"#");
+            paramObj.endCol = this.colEnd = val.colEnd.replace(/'#/g,"#");
 			if( !this.colEnd )
 				this.colEnd = this.colStart;
 
@@ -1612,7 +1612,7 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 			this.colEndIndex = this.wb.getTableIndexColumnByName( this.tableName, this.colEnd );
         }
         else {
-            paramObj.startCol = this.oneColumn = val.oneColumn;
+            paramObj.startCol = this.oneColumn = val.oneColumn.replace(/'#/g,"#");
 			this.oneColumnIndex = this.wb.getTableIndexColumnByName( this.tableName, this.oneColumn );
         }
 
@@ -1643,11 +1643,13 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
     }
     else if ( val.hdtcc ) {
         this.hdt = val.hdt;
-        this.hdtcstart = val.hdtcstart;
+		this.hdtIndexes = [];
+		this.hdtcstart = val.hdtcstart;
         this.hdtcend = val.hdtcend;
         var re = /\[(.*?)\]/ig, m, data, range;
         while ( null !== (m = re.exec( this.hdt )) ) {
             paramObj.param = getColumnType( m[1] );
+			this.hdtIndexes.push(paramObj.param);
             data = this.wb.getTableRangeForFormula( this.tableName, paramObj );
 
             if ( !data ) {
@@ -1664,12 +1666,16 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
         }
 
         if ( this.hdtcstart ) {
-            paramObj.param = g_nFormulaTablePartInfo.columns;
+			this.hdtcstart = this.hdtcstart.replace(/'#/g,"#");
+			paramObj.param = g_nFormulaTablePartInfo.columns;
             paramObj.startCol = this.hdtcstart;
             paramObj.endCol = null;
+			this.hdtcstartIndex = this.wb.getTableIndexColumnByName( this.tableName, this.hdtcstart );
 
             if ( this.hdtcend ) {
+				this.hdtcend = this.hdtcend.replace(/'#/g,"#");
                 paramObj.endCol = this.hdtcend;
+				this.hdtcendIndex = this.wb.getTableIndexColumnByName( this.tableName, this.hdtcend );
             }
 
             paramObj.includeColumnHeader = true;
@@ -4880,6 +4886,10 @@ parserFormula.prototype = {
 
         for ( var i = 0; i < this.outStack.length; i++ ) {
             ref = this.outStack[i];
+
+			/*if ( ref.type == cElementType.table ) {
+				ref = ref.toRef();
+			}*/
 
             if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea || ref instanceof cArea3D) &&
                 ref.isValid() && this.outStack[i + 1] && this.outStack[i + 1] instanceof cBaseFunction &&
