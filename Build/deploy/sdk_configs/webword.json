@@ -213,7 +213,6 @@
                     "apiCommon.js",
                     "downloaderfiles.js",
                     "Images/*.cur",
-                    "Images/fonts_thumbnail**.png",
                     "Native/jquery_native.js",
                     "Native/native.js"
                 ],
