@@ -62,6 +62,12 @@ function CTableCell(Row, ColW)
     {
         Y       : 0,
         CurPage : 0,
+
+        X_start : 0,
+        Y_start : 0,
+        X_end   : 0,
+        Y_end   : 0,
+
         Y_VAlign_offset : [] // Сдвиг, который нужно сделать из-за VAlign (массив по страницам)
     };
 
@@ -617,6 +623,19 @@ CTableCell.prototype =
     //-----------------------------------------------------------------------------------
     // Работаем с содержимым ячейки
     //-----------------------------------------------------------------------------------
+
+    Get_ParentTextTransform: function()
+    {
+        var oParentTransform = this.Row.Table.Get_ParentTextTransform();
+        var oOwnTransform = this.private_GetTextDirectionTransform();
+        if(oOwnTransform && oParentTransform)
+        {
+            global_MatrixTransformer.MultiplyAppend(oOwnTransform, oParentTransform);
+            return oOwnTransform;
+        }
+        return oParentTransform || oOwnTransform;
+    },
+
     Content_Reset : function(X, Y, XLimit, YLimit)
     {
         this.Content.Reset( X, Y, XLimit, YLimit );
@@ -635,20 +654,253 @@ CTableCell.prototype =
 
     Content_Draw : function(PageIndex, pGraphics)
     {
-        //pGraphics.SaveGrState();
-        //
-        //var PageBounds = this.Content.Get_PageBounds(0);
-        //
-        //var Transform = new CMatrix();
-        //global_MatrixTransformer.TranslateAppend(Transform, -this.Content.X, -this.Content.Y);
-        //global_MatrixTransformer.RotateRadAppend(Transform, 0.5 *  Math.PI);
-        //global_MatrixTransformer.TranslateAppend(Transform, this.Content.X, this.Content.Y);
-        //global_MatrixTransformer.TranslateAppend(Transform, 0, this.Content.XLimit - this.Content.X);
-        //pGraphics.transform3(Transform);
+        var TextDirection = this.Get_TextDirection();
+        var bNeedRestore = false;
+        if (textdirection_BTLR === TextDirection || textdirection_TBRL === TextDirection)
+        {
+            bNeedRestore = true;
+            pGraphics.SaveGrState();
+            pGraphics.transform3(this.Get_ParentTextTransform());
+            pGraphics.AddClipRect(0, 0, this.Temp.Y_end - this.Temp.Y_start, this.Temp.X_end - this.Temp.X_start);
+        }
 
         this.Content.Draw(PageIndex, pGraphics);
+        if (bNeedRestore)
+        {
+            pGraphics.RestoreGrState();
+        }
+    },
 
-        //pGraphics.RestoreGrState();
+    Content_Selection_SetStart : function(X, Y, CurPage, MouseEvent)
+    {
+        var _X = X, _Y = Y;
+        var Transform = this.private_GetTextDirectionTransform();
+        if (null !== Transform)
+        {
+            Transform = global_MatrixTransformer.Invert(Transform);
+            _X = Transform.TransformPointX(X, Y);
+            _Y = Transform.TransformPointY(X, Y);
+        }
+
+        this.Content.Selection_SetStart(_X, _Y, CurPage, MouseEvent);
+    },
+
+    Content_Selection_SetEnd : function(X, Y, CurPage, MouseEvent)
+    {
+        var _X = X, _Y = Y;
+        var Transform = this.private_GetTextDirectionTransform();
+        if (null !== Transform)
+        {
+            Transform = global_MatrixTransformer.Invert(Transform);
+            _X = Transform.TransformPointX(X, Y);
+            _Y = Transform.TransformPointY(X, Y);
+        }
+
+        this.Content.Selection_SetEnd(_X, _Y, CurPage, MouseEvent);
+    },
+
+    Content_Selection_Stop : function(X, Y, CurPage, MouseEvent)
+    {
+        var _X = X, _Y = Y;
+        var Transform = this.private_GetTextDirectionTransform();
+        if (null !== Transform)
+        {
+            Transform = global_MatrixTransformer.Invert(Transform);
+            _X = Transform.TransformPointX(X, Y);
+            _Y = Transform.TransformPointY(X, Y);
+        }
+
+        return this.Content.Selection_Stop(_X, _Y, CurPage, MouseEvent);
+    },
+
+    Content_Selection_Check : function(X, Y, CurPage, NearPos)
+    {
+        var _X = X, _Y = Y;
+        var Transform = this.private_GetTextDirectionTransform();
+        if (null !== Transform)
+        {
+            Transform = global_MatrixTransformer.Invert(Transform);
+            _X = Transform.TransformPointX(X, Y);
+            _Y = Transform.TransformPointY(X, Y);
+        }
+        return this.Content.Selection_Check(_X, _Y, CurPage, NearPos);
+    },
+
+    Content_Cursor_MoveAt : function(X, Y, bLine, bDontChangeRealPos, CurPage)
+    {
+        var _X = X, _Y = Y;
+        var Transform = this.private_GetTextDirectionTransform();
+        if (null !== Transform)
+        {
+            Transform = global_MatrixTransformer.Invert(Transform);
+            _X = Transform.TransformPointX(X, Y);
+            _Y = Transform.TransformPointY(X, Y);
+        }
+
+        this.Content.Cursor_MoveAt(_X, _Y, bLine, bDontChangeRealPos, CurPage);
+    },
+
+    Content_Update_CursorType : function(X, Y, CurPage)
+    {
+        var _X = X, _Y = Y;
+        var Transform = this.private_GetTextDirectionTransform();
+        if (null !== Transform)
+        {
+            Transform = global_MatrixTransformer.Invert(Transform);
+            _X = Transform.TransformPointX(X, Y);
+            _Y = Transform.TransformPointY(X, Y);
+        }
+
+        this.Content.Update_CursorType(_X, _Y, CurPage);
+    },
+
+    Content_Selection_Draw_Page : function(CurPage)
+    {
+        var Transform = this.private_GetTextDirectionTransform();
+        var DrawingDocument = this.Row.Table.DrawingDocument;
+        if (null !== Transform && DrawingDocument)
+            DrawingDocument.MultiplyTargetTransform(Transform);
+
+        this.Content.Selection_Draw_Page(CurPage);
+    },
+
+    Content_RecalculateCurPos : function()
+    {
+        var Transform = this.private_GetTextDirectionTransform();
+        var DrawingDocument = this.Row.Table.DrawingDocument;
+        if (null !== Transform && DrawingDocument)
+            DrawingDocument.MultiplyTargetTransform(Transform);
+
+        this.Content.RecalculateCurPos();
+    },
+
+    Content_Get_NearestPos : function(CurPage, X, Y, bAnchor, Drawing)
+    {
+        var _X = X, _Y = Y;
+        var Transform = this.private_GetTextDirectionTransform();
+        if (null !== Transform)
+        {
+            Transform = global_MatrixTransformer.Invert(Transform);
+            _X = Transform.TransformPointX(X, Y);
+            _Y = Transform.TransformPointY(X, Y);
+        }
+
+        return this.Content.Get_NearestPos(CurPage, _X, _Y, bAnchor, Drawing);
+    },
+
+    Content_Is_TableBorder : function(X, Y, CurPage)
+    {
+        var _X = X, _Y = Y;
+        var Transform = this.private_GetTextDirectionTransform();
+        if (null !== Transform)
+        {
+            Transform = global_MatrixTransformer.Invert(Transform);
+            _X = Transform.TransformPointX(X, Y);
+            _Y = Transform.TransformPointY(X, Y);
+        }
+        return this.Content.Is_TableBorder(_X, _Y, CurPage);
+    },
+
+    Content_Is_InText : function(X, Y, CurPage)
+    {
+        var _X = X, _Y = Y;
+        var Transform = this.private_GetTextDirectionTransform();
+        if (null !== Transform)
+        {
+            Transform = global_MatrixTransformer.Invert(Transform);
+            _X = Transform.TransformPointX(X, Y);
+            _Y = Transform.TransformPointY(X, Y);
+        }
+        return this.Content.Is_InText(_X, _Y, CurPage);
+    },
+
+    Content_Is_InDrawing : function(X, Y, CurPage)
+    {
+        var _X = X, _Y = Y;
+        var Transform = this.private_GetTextDirectionTransform();
+        if (null !== Transform)
+        {
+            Transform = global_MatrixTransformer.Invert(Transform);
+            _X = Transform.TransformPointX(X, Y);
+            _Y = Transform.TransformPointY(X, Y);
+        }
+        return this.Content.Is_InDrawing(_X, _Y, CurPage);
+    },
+
+    Content_Get_CurPosXY : function()
+    {
+        return this.Content.Get_CurPosXY();
+    },
+
+    Content_Set_CurPosXY : function(X, Y)
+    {
+        var _X = X, _Y = Y;
+        var Transform = this.private_GetTextDirectionTransform();
+        if (null !== Transform)
+        {
+            Transform = global_MatrixTransformer.Invert(Transform);
+            _X = Transform.TransformPointX(X, Y);
+            _Y = Transform.TransformPointY(X, Y);
+        }
+        return this.Content.Set_CurPosXY(_X, _Y);
+    },
+
+    Content_Cursor_MoveUp_To_LastRow : function(X, Y, AddToSelect)
+    {
+        var _X = X, _Y = Y;
+        var Transform = this.private_GetTextDirectionTransform();
+        if (null !== Transform)
+        {
+            Transform = global_MatrixTransformer.Invert(Transform);
+            _X = Transform.TransformPointX(X, Y);
+            _Y = Transform.TransformPointY(X, Y);
+        }
+        return this.Content.Cursor_MoveUp_To_LastRow(_X, _Y, AddToSelect);
+    },
+
+    Content_Cursor_MoveDown_To_FirstRow : function(X, Y, AddToSelect)
+    {
+        var _X = X, _Y = Y;
+        var Transform = this.private_GetTextDirectionTransform();
+        if (null !== Transform)
+        {
+            Transform = global_MatrixTransformer.Invert(Transform);
+            _X = Transform.TransformPointX(X, Y);
+            _Y = Transform.TransformPointY(X, Y);
+        }
+        return this.Content.Cursor_MoveDown_To_FirstRow(_X, _Y, AddToSelect);
+    },
+
+    Content_Recalculate_MinMaxContentWidth : function(isRotated)
+    {
+        if (undefined === isRotated)
+            isRotated = false;
+
+        if (true === this.Is_VerticalText())
+            isRotated = true === isRotated ? false : true;
+
+        return this.Content.Recalculate_MinMaxContentWidth(isRotated);
+    },
+
+    private_GetTextDirectionTransform : function()
+    {
+        var Transform = null;
+        var TextDirection = this.Get_TextDirection();
+
+        if (textdirection_BTLR === TextDirection)
+        {
+            Transform = new CMatrix();
+            global_MatrixTransformer.RotateRadAppend(Transform, 0.5 *  Math.PI);
+            global_MatrixTransformer.TranslateAppend(Transform, this.Temp.X_start, this.Temp.Y_end);
+        }
+        else if (textdirection_TBRL === TextDirection)
+        {
+            var Transform = new CMatrix();
+            global_MatrixTransformer.RotateRadAppend(Transform, -0.5 *  Math.PI);
+            global_MatrixTransformer.TranslateAppend(Transform, this.Temp.X_end, this.Temp.Y_start);
+        }
+
+        return Transform;
     },
 
     Recalculate : function()
@@ -827,6 +1079,9 @@ CTableCell.prototype =
 
         // VAlign
         this.Set_VAlign(OtherPr.VAlign);
+
+        // TextDirection
+        this.Set_TextDirection(OtherPr.TextDirection);
     },
 
     Get_W : function()
@@ -1102,6 +1357,15 @@ CTableCell.prototype =
         }
     },
 
+    Is_VerticalText : function()
+    {
+        var TextDirection = this.Get_TextDirection();
+        if (textdirection_BTLR === TextDirection || textdirection_TBRL === TextDirection)
+            return true;
+
+        return false;
+    },
+
     Get_TextDirection : function()
     {
         return this.Get_CompiledPr(false).TextDirection;
@@ -1115,6 +1379,32 @@ CTableCell.prototype =
             this.Pr.TextDirection = Value;
             this.Recalc_CompiledPr();
         }
+    },
+
+    Set_TextDirectionFromApi : function(TextDirection)
+    {
+        var isVerticalText = (textdirection_BTLR === TextDirection || textdirection_TBRL === TextDirection) ? true : false;
+
+        // Во время изменения направления текста меняем высоту строки, если надо и отступы и параграфов внутри ячейки.
+        var OldTextDirection = this.Get_TextDirection();
+        this.Set_TextDirection(TextDirection);
+
+        if (OldTextDirection !== TextDirection)
+        {
+            if (true === isVerticalText)
+            {
+                var Row  = this.Row;
+                var RowH = this.Row.Get_Height();
+
+                if (heightrule_Auto === RowH.HRule)
+                    Row.Set_Height(20, heightrule_AtLeast);
+                else if (RowH.Value < 20)
+                    Row.Set_Height(20, RowH.HRule);
+            }
+
+            this.Content.Set_ParaPropsForVerticalTextInCell(isVerticalText);
+        }
+
     },
 
     Get_Borders : function()

@@ -2289,6 +2289,11 @@ CShape.prototype =
         this.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
     },
 
+    Get_ParentTextTransform: function()
+    {
+        return this.transformText.CreateDublicate();
+    },
+
     isEmptyPlaceholder: function () {
         if (this.isPlaceholder()) {
             if (this.nvSpPr.nvPr.ph.type == phType_title
@@ -3370,7 +3375,8 @@ CShape.prototype =
 
     checkHitToBounds: function(x, y)
     {
-        if(this.getObjectType() === historyitem_type_ImageShape && this.parent && this.parent.isShapeChild && this.parent.isShapeChild())
+        if(this.parent  &&(this.getObjectType() === historyitem_type_ImageShape && this.parent.isShapeChild && this.parent.isShapeChild()
+            || this.parent.Get_ParentTextTransform  && this.parent.Get_ParentTextTransform()))
         {
             return true;
         }
@@ -3511,7 +3517,12 @@ CShape.prototype =
             var content = this.getDocContent();
             if(content)
             {
-                drawing_document.UpdateTargetTransform(this.transformText);
+                var oMatrix = null;
+                if(this.transformText)
+                {
+                    oMatrix = this.transformText.CreateDublicate();
+                }
+                drawing_document.UpdateTargetTransform(oMatrix);
                 if ( true === content.Is_SelectionUse() )
                 {
                     // Выделение нумерации

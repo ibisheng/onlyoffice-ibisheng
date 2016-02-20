@@ -5757,22 +5757,28 @@ DrawingObjectsController.prototype =
 
     getTargetTransform: function()
     {
+        var oRet = null;
         if(this.selection.textSelection)
         {
-            return this.selection.textSelection.transformText;
+            oRet =  this.selection.textSelection.transformText;
         }
         else if(this.selection.groupSelection )
         {
             if(this.selection.groupSelection.selection.textSelection)
-                return this.selection.groupSelection.selection.textSelection.transformText;
+                oRet = this.selection.groupSelection.selection.textSelection.transformText;
             else if(this.selection.groupSelection.selection.chartSelection && this.selection.groupSelection.selection.chartSelection.selection.textSelection)
             {
-                return this.selection.groupSelection.selection.chartSelection.selection.textSelection.transformText;
+                oRet = this.selection.groupSelection.selection.chartSelection.selection.textSelection.transformText;
             }
         }
         else if(this.selection.chartSelection && this.selection.chartSelection.selection.textSelection)
         {
-            return this.selection.chartSelection.selection.textSelection.transformText;
+            oRet = this.selection.chartSelection.selection.textSelection.transformText;
+        }
+        if(oRet)
+        {
+            oRet = oRet.CreateDublicate();
+            return oRet;
         }
         return new CMatrix();
     },

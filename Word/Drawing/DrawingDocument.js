@@ -3478,7 +3478,7 @@ function CDrawingDocument()
             this.TextMatrix = matrix;
         else if (matrix)
         {
-            this.TextMatrix.Multiply(matrix, MATRIX_ORDER_APPEND);
+            this.TextMatrix.Multiply(matrix, MATRIX_ORDER_PREPEND);
         }
     }
 

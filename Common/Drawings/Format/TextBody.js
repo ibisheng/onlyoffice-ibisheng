@@ -815,6 +815,15 @@ CTextBody.prototype =
             return this.parent.Is_UseInDocument();
         }
         return false;
+    },
+
+    Get_ParentTextTransform: function()
+    {
+        if(this.parent && this.parent.transformText)
+        {
+            return this.parent.transformText.CreateDublicate();
+        }
+        return null;
     }
 };
 

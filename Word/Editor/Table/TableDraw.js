@@ -469,23 +469,9 @@ CTable.prototype.private_DrawCellsBackround = function(pGraphics, PNum, Row_star
             var X_cell_start = Page.X + CellInfo.X_cell_start;
             var X_cell_end   = Page.X + CellInfo.X_cell_end;
 
-            var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
-            // Мы должны найти сколько объединено вертикально ячеек на данной странице
-            if ( PNum + 1 < this.Pages.length )
-            {
-                if ( CurRow + VMergeCount - 1 >= this.Pages[PNum + 1].FirstRow )
-                {
-                    VMergeCount = this.Pages[PNum + 1].FirstRow + 1 - CurRow;
-                    if ( /*Row_start != Row_last &&*/ false === this.RowsInfo[CurRow + VMergeCount - 1].FirstPage && PNum === this.RowsInfo[CurRow + VMergeCount - 1].StartPage )
-                        VMergeCount--;
-
-                    if ( VMergeCount <= 0 )
-                    {
-                        continue;
-                    }
-                }
-            }
-
+            var VMergeCount = this.private_GetVertMergeCountOnPage(PNum, CurRow, CurGridCol, GridSpan);
+            if (VMergeCount <= 0)
+                continue;
 
             var RealHeight  = this.RowsInfo[CurRow + VMergeCount - 1].Y[PNum] + this.RowsInfo[CurRow + VMergeCount - 1].H[PNum] - Y;
 
@@ -610,20 +596,9 @@ CTable.prototype.private_DrawCellsContent = function(pGraphics, PNum, Row_start,
                     continue;
             }
 
-            var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
-            // Мы должны найти сколько объединено вертикально ячеек на данной странице
-            if ( PNum + 1 < this.Pages.length )
-            {
-                if ( CurRow + VMergeCount - 1 >= this.Pages[PNum + 1].FirstRow )
-                {
-                    VMergeCount = this.Pages[PNum + 1].FirstRow + 1 - CurRow;
-                    if ( /*Row_start != Row_last &&*/ false === this.RowsInfo[CurRow + VMergeCount - 1].FirstPage && PNum === this.RowsInfo[CurRow + VMergeCount - 1].StartPage )
-                        VMergeCount--;
-
-                    if ( VMergeCount <= 0 )
-                        continue;
-                }
-            }
+            var VMergeCount = this.private_GetVertMergeCountOnPage(PNum, CurRow, CurGridCol, GridSpan);
+            if (VMergeCount <= 0)
+                continue;
 
             // Выводим содержимое таблицы
             Cell.Content_Draw(PNum, pGraphics);
@@ -1035,24 +1010,12 @@ CTable.prototype.private_DrawCellsBorders = function(pGraphics, PNum, Row_start,
             var X_cell_start = Page.X + CellInfo.X_cell_start;
             var X_cell_end   = Page.X + CellInfo.X_cell_end;
 
-            var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
-            // Мы должны найти сколько объединено вертикально ячеек на данной странице
-            if ( PNum + 1 < this.Pages.length )
+            var VMergeCount = this.private_GetVertMergeCountOnPage(PNum, CurRow, CurGridCol, GridSpan);
+            if (VMergeCount <= 0)
             {
-                if ( CurRow + VMergeCount - 1 >= this.Pages[PNum + 1].FirstRow )
-                {
-                    VMergeCount = this.Pages[PNum + 1].FirstRow + 1 - CurRow;
-                    if ( /*Row_start != Row_last &&*/ false === this.RowsInfo[CurRow + VMergeCount - 1].FirstPage && PNum === this.RowsInfo[CurRow + VMergeCount - 1].StartPage  )
-                        VMergeCount--;
-
-                    if ( VMergeCount <= 0 )
-                    {
-                        LastBorderTop = { W : 0, L : 0 };
-                        continue;
-                    }
-                }
+                LastBorderTop = {W : 0, L : 0};
+                continue;
             }
-
 
             var RealHeight  = this.RowsInfo[CurRow + VMergeCount - 1].Y[PNum] + this.RowsInfo[CurRow + VMergeCount - 1].H[PNum] - Y;
 

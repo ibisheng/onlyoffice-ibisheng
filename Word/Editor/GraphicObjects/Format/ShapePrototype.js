@@ -426,20 +426,41 @@ CShape.prototype.getArrayWrapIntervals = function(x0,y0, x1, y1, Y0Sp, Y1Sp, Lef
 };
 CShape.prototype.updateTransformMatrix = function()
 {
+    var oParentTransform = null;
+    if(this.parent && this.parent.Get_ParentParagraph)
+    {
+        var oParagraph = this.parent.Get_ParentParagraph();
+        if(oParagraph)
+        {
+            oParentTransform = oParagraph.Get_ParentTextTransform();
+        }
+    }
     this.transform = this.localTransform.CreateDublicate();
     global_MatrixTransformer.TranslateAppend(this.transform, this.posX, this.posY);
+    if(oParentTransform)
+    {
+        global_MatrixTransformer.MultiplyAppend(this.transform, oParentTransform);
+    }
     this.invertTransform = global_MatrixTransformer.Invert(this.transform);
 
     if(this.localTransformText)
     {
         this.transformText = this.localTransformText.CreateDublicate();
         global_MatrixTransformer.TranslateAppend(this.transformText, this.posX, this.posY);
+        if(oParentTransform)
+        {
+            global_MatrixTransformer.MultiplyAppend(this.transformText, oParentTransform);
+        }
         this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
     }
     if(this.localTransformTextWordArt)
     {
         this.transformTextWordArt = this.localTransformTextWordArt.CreateDublicate();
         global_MatrixTransformer.TranslateAppend(this.transformTextWordArt, this.posX, this.posY);
+        if(oParentTransform)
+        {
+            global_MatrixTransformer.MultiplyAppend(this.transformTextWordArt, oParentTransform);
+        }
         this.invertTransformTextWordArt = global_MatrixTransformer.Invert(this.transformTextWordArt);
     }
 
@@ -795,7 +816,6 @@ CShape.prototype.getNearestPos = function(x, y, pageIndex)
         var t_x = this.invertTransformText.TransformPointX(x, y);
         var t_y = this.invertTransformText.TransformPointY(x, y);
         var nearest_pos = this.textBoxContent.Get_NearestPos(pageIndex, t_x, t_y, false);
-        nearest_pos.transform = this.transformText;
         return nearest_pos;
     }
     return null;

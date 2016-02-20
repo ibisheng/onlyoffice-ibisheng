@@ -1197,7 +1197,7 @@ Paragraph.prototype =
         return this.Internal_Recalculate_CurPos( this.CurPos.ContentPos, true, true, false );
     },
 
-    Recalculate_MinMaxContentWidth : function()
+    Recalculate_MinMaxContentWidth : function(isRotated)
     {
         var MinMax = new CParagraphMinMaxContentWidth();
 
@@ -1215,6 +1215,19 @@ Paragraph.prototype =
 
         MinMax.nMinWidth += MinInd;
         MinMax.nMaxWidth += MinInd;
+
+        if (true === isRotated)
+        {
+            ParaPr = this.Get_CompiledPr().ParaPr;
+
+            // Последний пустой параграф не идет в учет
+            if (null === this.Get_DocumentNext() && true === this.Is_Empty())
+                return {Min : 0, Max : 0};
+
+
+            var Min = MinMax.nMaxHeight + ParaPr.Spacing.Before + ParaPr.Spacing.After;
+            return {Min : Min, Max : Min};
+        }
 
         // добавляем 0.001, чтобы избавиться от погрешностей
         return { Min : ( MinMax.nMinWidth > 0 ?  MinMax.nMinWidth + 0.001 : 0 ), Max : ( MinMax.nMaxWidth > 0 ?  MinMax.nMaxWidth + 0.001 : 0 ) };
@@ -8756,6 +8769,7 @@ Paragraph.prototype =
         Result.ContentPos = ContentPos;
         Result.SearchPos  = SearchPosXY.Pos;
         Result.Paragraph  = this;
+        Result.transform  = this.Get_ParentTextTransform();
 
         if ( true === bAnchor && undefined != Drawing && null != Drawing )
             this.Internal_CorrectAnchorPos( Result, Drawing );
@@ -9063,27 +9077,7 @@ Paragraph.prototype =
 
     Get_ParentTextTransform : function()
     {
-        var CurDocContent = this.Parent;
-        while(CurDocContent.Is_TableCellContent())
-        {
-            CurDocContent = CurDocContent.Parent.Row.Table.Parent;
-        }
-        if(CurDocContent.Parent)
-        {
-            if(CurDocContent.Parent.transformText)
-            {
-                return CurDocContent.Parent.transformText;
-            }
-            if(CurDocContent.Parent.parent && CurDocContent.Parent.parent.transformText)
-            {
-                return CurDocContent.Parent.parent.transformText;
-            }
-        }
-        if(CurDocContent.transformText)
-        {
-            return CurDocContent.transformText;
-        }
-        return null;
+        return this.Parent.Get_ParentTextTransform();
     },
 
     Get_ParentTextInvertTransform : function()
@@ -13805,6 +13799,25 @@ Paragraph.prototype.Get_NumberingPage = function()
 
     return -1;
 };
+Paragraph.prototype.Set_ParaPropsForVerticalTextInCell = function(isVerticalText)
+{
+    if (true === isVerticalText)
+    {
+        var Left  = (undefined === this.Pr.Ind.Left || this.Pr.Ind.Left < 0.001 ? 2 : undefined);
+        var Right = (undefined === this.Pr.Ind.Right || this.Pr.Ind.Right < 0.001 ? 2 : undefined);
+
+        this.Set_Ind({Left : Left, Right : Right}, false);
+    }
+    else
+    {
+
+        var Left  = (undefined !== this.Pr.Ind.Left && Math.abs(this.Pr.Ind.Left - 2) < 0.01 ? undefined : this.Pr.Ind.Left);
+        var Right = (undefined !== this.Pr.Ind.Right && Math.abs(this.Pr.Ind.Right - 2) < 0.01 ? undefined : this.Pr.Ind.Right);
+        var First = this.Pr.Ind.FirstLine;
+
+        this.Set_Ind({Left : Left, Right : Right, FirstLine : First}, true);
+    }
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;
@@ -14842,6 +14855,8 @@ function CParagraphMinMaxContentWidth()
     this.nMaxWidth    = 0;
     this.nCurMaxWidth = 0;
     this.bMath_OneLine = false; // for ParaMath
+    this.nMaxHeight    = 0;
+    this.nEndHeight    = 0;
 }
 
 function CParagraphRangeVisibleWidth()

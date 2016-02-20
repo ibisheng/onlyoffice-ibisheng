@@ -672,4 +672,10 @@ var c_oAscPageOrientation = {
   Landscape : 0x01
 };
 
+var c_oAscCellTextDirection = {
+  LRTB : 0x00,
+  TBRL : 0x01,
+  BTLR : 0x02
+};
+
 window["flat_desine"] = false;

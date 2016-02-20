@@ -4472,7 +4472,7 @@ ParaDrawing.prototype =
             pGraphics.m_aDrawings.push(new ParaDrawingStruct(pageIndex, this));
             return;
         }
-        if ( drawing_Inline === this.DrawingType )
+        if ( this.Is_Inline() )
         {
             pGraphics.shapePageIndex = pageIndex;
             this.draw(pGraphics, pageIndex);
@@ -4684,8 +4684,7 @@ ParaDrawing.prototype =
         var PageNum = ParaLayout.PageNum;
 
         var OtherFlowObjects = editor.WordControl.m_oLogicDocument.DrawingObjects.getAllFloatObjectsOnPage( PageNum, this.Parent.Parent );
-        var bInline = ( drawing_Inline === this.DrawingType ? true : false );
-
+        var bInline = this.Is_Inline();
         var W, H;
         if(this.Is_Inline())
         {
@@ -5009,6 +5008,9 @@ ParaDrawing.prototype =
 
     Is_Inline : function()
     {
+        if (!this.Parent || !this.Parent.Get_ParentTextTransform || null !== this.Parent.Get_ParentTextTransform())
+            return true;
+
         return ( drawing_Inline === this.DrawingType ? true : false );
     },
 
@@ -5041,6 +5043,15 @@ ParaDrawing.prototype =
         {
             this.Add_ToDocument(NearPos, true, RunPr);
         }
+    },
+
+    Get_ParentTextTransform: function()
+    {
+        if(this.Parent)
+        {
+            return this.Parent.Get_ParentTextTransform();
+        }
+        return null;
     },
 
     GoTo_Text : function(bBefore, bUpdateStates)
@@ -6170,7 +6181,7 @@ ParaDrawing.prototype =
 
     isShapeChild: function(bRetShape)
     {
-        if(!this.Is_Inline())
+        if(!this.Is_Inline() || !this.DocumentContent)
             return bRetShape ? null : false;
 
         var cur_doc_content = this.DocumentContent;

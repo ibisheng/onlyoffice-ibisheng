@@ -426,6 +426,11 @@ CHeaderFooter.prototype =
         return true;
     },
 
+    Get_ParentTextTransform : function()
+    {
+        return null;
+    },
+
     Is_DrawingShape : function(bRetShape)
     {
         if(bRetShape === true)

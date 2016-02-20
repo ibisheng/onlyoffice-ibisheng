@@ -132,13 +132,23 @@ CGroupShape.prototype =
 
     drawSelectionPage: function(pageIndex)
     {
+        var oMatrix = null;
         if(this.selection.textSelection)
         {
-            this.getDrawingDocument().UpdateTargetTransform(this.selection.textSelection.transformText);
+            if(this.selection.textSelection.transformText)
+            {
+                oMatrix = this.selection.textSelection.transformText.CreateDublicate();
+            }
+            this.getDrawingDocument().UpdateTargetTransform(oMatrix);
             this.selection.textSelection.getDocContent().Selection_Draw_Page(pageIndex);
         }
         else if(this.selection.chartSelection && this.selection.chartSelection.selection.textSelection)
         {
+            if(this.selection.chartSelection.selection.textSelection.transformText)
+            {
+                oMatrix = this.selection.chartSelection.selection.textSelection.transformText.CreateDublicate();
+            }
+            this.getDrawingDocument().UpdateTargetTransform(oMatrix);
             this.selection.chartSelection.selection.textSelection.getDocContent().Selection_Draw_Page(pageIndex);
         }
     },

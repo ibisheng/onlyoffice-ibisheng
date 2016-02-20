@@ -486,16 +486,12 @@ CChartSpace.prototype.getArrayWrapPolygons = function()
 CChartSpace.prototype.checkContentDrawings = function()
 {};
 
-CChartSpace.prototype.checkShapeChildTransform = function()
+CChartSpace.prototype.checkShapeChildTransform = function(transform_text)
 {
     if(this.parent)
     {
-        var parent_shape = this.parent.isShapeChild(true);
-        if(parent_shape)
+        if(transform_text)
         {
-            var transform_text= parent_shape.transformText;
-            global_MatrixTransformer.MultiplyAppend(this.transform, transform_text);
-            this.invertTransform = global_MatrixTransformer.Invert(this.transform);
             if(this.chart)
             {
                 if(this.chart.plotArea)
@@ -553,11 +549,28 @@ CChartSpace.prototype.updateTransformMatrix  = function()
 
     var posX = this.localTransform.tx + this.posX;
     var posY = this.localTransform.ty + this.posY;
+
     this.transform = this.localTransform.CreateDublicate();
     global_MatrixTransformer.TranslateAppend(this.transform, this.posX, this.posY);
+
+    var oParentTransform = null;
+    if(this.parent && this.parent.Get_ParentParagraph)
+    {
+        var oParagraph = this.parent.Get_ParentParagraph();
+        if(oParagraph)
+        {
+            oParentTransform = oParagraph.Get_ParentTextTransform();
+
+            if(oParentTransform)
+            {
+                global_MatrixTransformer.MultiplyAppend(this.transform, oParentTransform);
+            }
+        }
+    }
+
     this.invertTransform = global_MatrixTransformer.Invert(this.transform);
     this.updateChildLabelsTransform(posX,posY);
-    this.checkShapeChildTransform();
+    this.checkShapeChildTransform(oParentTransform);
 };
 CChartSpace.prototype.getArrayWrapIntervals = CShape.prototype.getArrayWrapIntervals;
 CChartSpace.prototype.select = CShape.prototype.select;

@@ -361,7 +361,7 @@ CTable.prototype.private_RecalculateGrid = function()
             for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
             {
                 var Cell         = Row.Get_Cell( CurCell );
-                var CellMinMax   = Cell.Content.Recalculate_MinMaxContentWidth();
+                var CellMinMax   = Cell.Content_Recalculate_MinMaxContentWidth(false);
                 var CellMin      = CellMinMax.Min;
                 var CellMax      = CellMinMax.Max;
                 var GridSpan     = Cell.Get_GridSpan();
@@ -1423,8 +1423,10 @@ CTable.prototype.private_RecalculatePageXY = function(CurPage)
     {
         if (true === this.Is_EmptyPage(CurPage - 1))
             FirstRow = this.Pages[CurPage - 1].FirstRow;
-        else
+        else if (true === this.Pages[CurPage - 1].LastRowSplit)
             FirstRow = this.Pages[CurPage - 1].LastRow;
+        else
+            FirstRow = Math.min(this.Pages[CurPage - 1].LastRow + 1, this.Content.length - 1);
     }
 
     var TempMaxTopBorder = this.Get_MaxTopBorder(FirstRow);
@@ -1700,6 +1702,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             var MaxBotValue_vmerge = -1;
 
             var RowH = Row.Get_Height();
+            var VerticallCells = [];
 
             for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
             {
@@ -1761,6 +1764,12 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                     }
                 }
 
+                if (true === Cell.Is_VerticalText())
+                {
+                    VerticallCells.push(Cell);
+                    continue;
+                }
+
                 Cell.Content.Set_StartPage( CurPage );
                 Cell.Content.Reset( X_content_start, Y_content_start, X_content_end, Y_content_end );
                 Cell.Content.Set_ClipInfo(0, Page.X + CellMetrics.X_cell_start, Page.X + CellMetrics.X_cell_end);
@@ -1786,13 +1795,12 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 CurGridCol += GridSpan;
             }
 
-            // Если заголовок целииком на странице не убирается, тогда мы его попросту не рисуем на данной странице
+            // Если заголовок целиком на странице не убирается, тогда мы его попросту не рисуем на данной странице
             if ( true === bHeaderNextPage )
             {
                 Y = StartPos.Y;
                 TableHeight = 0;
                 HeaderPage.Draw = false;
-
                 break;
             }
 
@@ -1826,10 +1834,66 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             var CellHeight = HeaderPage.RowsInfo[CurRow].TableRowsBottom - Y;
 
             // TODO: улучшить проверку на высоту строки (для строк разбитых на страницы)
-            if ( false === bNextPage && heightrule_AtLeast === RowH.HRule && CellHeight < RowH.Value - MaxTopBorder[CurRow] )
+            if (false === bHeaderNextPage && heightrule_AtLeast === RowH.HRule && CellHeight < RowH.Value - MaxTopBorder[CurRow])
             {
                 CellHeight = RowH.Value - MaxTopBorder[CurRow];
                 HeaderPage.RowsInfo[CurRow].TableRowsBottom = Y + CellHeight;
+            }
+
+            // Рассчитываем ячейки с вертикальным текстом
+            var CellsCount2 = VerticallCells.length;
+            for (var TempCellIndex = 0; TempCellIndex < CellsCount2; TempCellIndex++)
+            {
+                var Cell       = VerticallCells[TempCellIndex];
+                var CurCell    = Cell.Index;
+                var GridSpan   = Cell.Get_GridSpan();
+                var CurGridCol = Cell.Metrics.StartGridCol;
+
+                // Возьмем верхнюю ячейку текущего объединения
+                Cell = this.Internal_Get_StartMergedCell(CurRow, CurGridCol, GridSpan);
+                var cIndex = Cell.Index;
+                var rIndex = Cell.Row.Index;
+                Cell = HeaderPage.Rows[rIndex].Get_Cell( cIndex );
+
+                var CellMar     = Cell.Get_Margins();
+                var CellMetrics = Cell.Row.Get_CellInfo(CurCell);
+
+                var X_content_start = Page.X + CellMetrics.X_content_start;
+                var X_content_end   = Page.X + CellMetrics.X_content_end;
+                var Y_content_start = Cell.Temp.Y;
+                var Y_content_end   = HeaderPage.RowsInfo[CurRow].TableRowsBottom;
+
+                // TODO: При расчете YLimit для ячейки сделать учет толщины нижних
+                //       границ ячейки и таблицы
+                if (null != CellSpacing)
+                {
+                    if (this.Content.length - 1 === CurRow)
+                        Y_content_end -= CellSpacing;
+                    else
+                        Y_content_end -= CellSpacing / 2;
+                }
+
+                var VMergeCount = this.Internal_GetVertMergeCount(CurRow, CurGridCol, GridSpan);
+                var BottomMargin = this.MaxBotMargin[CurRow + VMergeCount - 1];
+                Y_content_end -= BottomMargin;
+
+                Cell.PagesCount = 1;
+                Cell.Content.Set_StartPage(CurPage);
+                Cell.Content.Reset(0, 0, Y_content_end - Y_content_start, 10000);
+                Cell.Content.Set_ClipInfo(CellPageIndex, 0, Y_content_end - Y_content_start);
+                Cell.Temp.X_start = X_content_start;
+                Cell.Temp.Y_start = Y_content_start;
+                Cell.Temp.X_end   = X_content_end;
+                Cell.Temp.Y_end   = Y_content_end;
+
+                // Какие-то ячейки в строке могут быть не разбиты на строки, а какие то разбиты.
+                // Здесь контролируем этот момент, чтобы у тех, которые не разбиты не вызывать
+                // Recalculate_Page от несуществующих страниц.
+                var CellPageIndex = CurPage - Cell.Content.Get_StartPage_Relative();
+                if (0 === CellPageIndex)
+                {
+                    Cell.Content.Recalculate_Page(CellPageIndex, true);
+                }
             }
 
             if ( null != CellSpacing )
@@ -1911,6 +1975,13 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                     var ContentHeight = CellContentBounds.Bottom - CellContentBounds.Top;
 
                     var Dy = 0;
+
+                    if (true === Cell.Is_VerticalText())
+                    {
+                        var CellMetrics = Cell.Row.Get_CellInfo(Cell.Index);
+                        CellHeight = CellMetrics.X_cell_end - CellMetrics.X_cell_start - CellMar.Left.W - CellMar.Right.W;
+                    }
+
                     if ( CellHeight - ContentHeight > 0.001 )
                     {
                         if ( vertalignjc_Bottom === VAlign )
@@ -1945,13 +2016,14 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             this.RowsInfo[CurRow].MaxTopBorder = [];
             this.RowsInfo[CurRow].FirstPage    = true;
             this.RowsInfo[CurRow].StartPage    = CurPage;
+            this.TableRowsBottom[CurRow]       = [];
         }
         else
         {
             this.RowsInfo[CurRow].Pages++;
         }
 
-        this.TableRowsBottom[CurRow] = [];
+        this.TableRowsBottom[CurRow][CurPage] = 0;
 
         var Row         = this.Content[CurRow];
         var CellsCount  = Row.Get_CellsCount();
@@ -2029,6 +2101,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         var RowH = Row.Get_Height();
         var MaxTopMargin = 0;
         var Merged_Cell  = [];
+        var VerticallCells = [];
 
         for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
         {
@@ -2039,7 +2112,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
 
             Row.Update_CellInfo(CurCell);
 
-            var CellMetrics = Row.Get_CellInfo( CurCell );
+            var CellMetrics   = Row.Get_CellInfo( CurCell );
 
             var X_content_start = Page.X + CellMetrics.X_content_start;
             var X_content_end   = Page.X + CellMetrics.X_content_end;
@@ -2088,6 +2161,12 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 }
             }
 
+            if (true === Cell.Is_VerticalText())
+            {
+                VerticallCells.push(Cell);
+                continue;
+            }
+
             var bCanShift = false;
             var ShiftDy   = 0;
             var ShiftDx   = 0;
@@ -2111,7 +2190,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 }
 
                 Cell.PagesCount = 1;
-                Cell.Content.Reset( X_content_start, Y_content_start, X_content_end, Y_content_end );
+                Cell.Content.Reset(X_content_start, Y_content_start, X_content_end, Y_content_end);
             }
 
             // Какие-то ячейки в строке могут быть не разбиты на строки, а какие то разбиты.
@@ -2195,12 +2274,14 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 if ( vmerge_Continue === Vmerge || VMergeCount > 1 )
                     continue;
 
-                if ( true === Cell.Content_Is_ContentOnFirstPage() )
+                if (true === Cell.Is_VerticalText() || true === Cell.Content_Is_ContentOnFirstPage())
                 {
                     bContentOnFirstPage = true;
                 }
                 else
+                {
                     bNoContentOnFirstPage = true;
+                }
             }
 
             if ( true === bContentOnFirstPage && true === bNoContentOnFirstPage )
@@ -2249,6 +2330,12 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
 
                 // Возьмем верхнюю ячейку теккущего объединения
                 Cell = this.Internal_Get_StartMergedCell(CurRow, CurGridCol, GridSpan);
+
+                if (true === Cell.Is_VerticalText())
+                {
+                    VerticallCells.push(Cell);
+                    continue;
+                }
 
                 var CellMar = Cell.Get_Margins();
                 var CellMetrics = Row.Get_CellInfo(CurCell);
@@ -2330,6 +2417,9 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 if ( vmerge_Continue === Vmerge )
                     continue;
 
+                if (true === Cell.Is_VerticalText())
+                    continue;
+
                 if ( true === Cell.Content_Is_ContentOnFirstPage() )
                 {
                     bContentOnFirstPage = true;
@@ -2377,6 +2467,63 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         {
             CellHeight = RowHValue;
             this.TableRowsBottom[CurRow][CurPage] = Y + CellHeight;
+        }
+
+        // Рассчитываем ячейки с вертикальным текстом
+        var CellsCount2 = VerticallCells.length;
+        for (var TempCellIndex = 0; TempCellIndex < CellsCount2; TempCellIndex++)
+        {
+            var Cell       = VerticallCells[TempCellIndex];
+            var CurCell    = Cell.Index;
+            var GridSpan   = Cell.Get_GridSpan();
+            var CurGridCol = Cell.Metrics.StartGridCol;
+
+            // Возьмем верхнюю ячейку текущего объединения
+            Cell = this.Internal_Get_StartMergedCell(CurRow, CurGridCol, GridSpan);
+
+            var CellMar     = Cell.Get_Margins();
+            var CellMetrics = Row.Get_CellInfo(CurCell);
+
+            var X_content_start = Page.X + CellMetrics.X_content_start;
+            var X_content_end   = Page.X + CellMetrics.X_content_end;
+            var Y_content_start = Cell.Temp.Y;
+            var Y_content_end   = this.TableRowsBottom[CurRow][CurPage];
+
+            // TODO: При расчете YLimit для ячейки сделать учет толщины нижних
+            //       границ ячейки и таблицы
+            if (null != CellSpacing)
+            {
+                if (this.Content.length - 1 === CurRow)
+                    Y_content_end -= CellSpacing;
+                else
+                    Y_content_end -= CellSpacing / 2;
+            }
+
+            var VMergeCount = this.Internal_GetVertMergeCount(CurRow, CurGridCol, GridSpan);
+            var BottomMargin = this.MaxBotMargin[CurRow + VMergeCount - 1];
+            Y_content_end -= BottomMargin;
+
+            if ((0 === Cell.Row.Index && true === this.Check_EmptyPages(CurPage - 1)) || Cell.Row.Index > FirstRow || (Cell.Row.Index === FirstRow && true === ResetStartElement))
+            {
+                // TODO: Здесь надо сделать, чтобы ячейка не билась на страницы
+                Cell.PagesCount = 1;
+                Cell.Content.Set_StartPage(CurPage);
+                Cell.Content.Reset(0, 0, Y_content_end - Y_content_start, 10000);
+                Cell.Content.Set_ClipInfo(CellPageIndex, 0, Y_content_end - Y_content_start);
+                Cell.Temp.X_start = X_content_start;
+                Cell.Temp.Y_start = Y_content_start;
+                Cell.Temp.X_end   = X_content_end;
+                Cell.Temp.Y_end   = Y_content_end;
+            }
+
+            // Какие-то ячейки в строке могут быть не разбиты на строки, а какие то разбиты.
+            // Здесь контролируем этот момент, чтобы у тех, которые не разбиты не вызывать
+            // Recalculate_Page от несуществующих страниц.
+            var CellPageIndex = CurPage - Cell.Content.Get_StartPage_Relative();
+            if (0 === CellPageIndex)
+            {
+                Cell.Content.Recalculate_Page(CellPageIndex, true);
+            }
         }
 
         if ( null != CellSpacing )
@@ -2478,14 +2625,21 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             var ContentHeight = CellContentBounds.Bottom - CellContentBounds.Top;
 
             var Dy = 0;
-            if ( CellHeight - ContentHeight > 0.001 )
+
+            if (true === Cell.Is_VerticalText())
             {
-                if ( vertalignjc_Bottom === VAlign )
+                var CellMetrics = Row.Get_CellInfo(CurCell);
+                CellHeight = CellMetrics.X_cell_end - CellMetrics.X_cell_start - CellMar.Left.W - CellMar.Right.W;
+            }
+
+            if (CellHeight - ContentHeight > 0.001)
+            {
+                if (vertalignjc_Bottom === VAlign)
                     Dy = CellHeight - ContentHeight;
-                else if ( vertalignjc_Center === VAlign )
+                else if (vertalignjc_Center === VAlign)
                     Dy = (CellHeight - ContentHeight) / 2;
 
-                Cell.Content.Shift( CellPageIndex, 0, Dy );
+                Cell.Content.Shift(CellPageIndex, 0, Dy);
             }
 
             Cell.Temp.Y_VAlign_offset[CellPageIndex] = Dy;

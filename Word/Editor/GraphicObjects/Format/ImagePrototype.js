@@ -195,13 +195,4 @@ CImageShape.prototype.checkContentDrawings = function()
 CImageShape.prototype.hit = CShape.prototype.hit;
 CImageShape.prototype.checkShapeChildTransform = function()
 {
-    if(this.parent)
-    {
-        var parent_shape = this.parent.isShapeChild(true);
-        if(parent_shape)
-        {
-            global_MatrixTransformer.MultiplyAppend(this.transform, parent_shape.transformText);
-            this.invertTransform = global_MatrixTransformer.Invert(this.transform);
-        }
-    }
 };

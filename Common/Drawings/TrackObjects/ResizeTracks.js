@@ -709,10 +709,10 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
             if(this.originalObject.parent)
             {
-                var parent_shape = this.originalObject.parent.isShapeChild && this.originalObject.parent.isShapeChild(true);
-                if(parent_shape)
+                var parent_transform = this.originalObject.parent.Get_ParentTextTransform && this.originalObject.parent.Get_ParentTextTransform();
+                if(parent_transform)
                 {
-                    global_MatrixTransformer.MultiplyAppend(_transform, parent_shape.transformText);
+                    global_MatrixTransformer.MultiplyAppend(_transform, parent_transform);
                 }
 
             }
@@ -825,10 +825,10 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
             }
             if(this.originalObject.parent)
             {
-                var parent_shape = this.originalObject.parent.isShapeChild &&  this.originalObject.parent.isShapeChild(true);
-                if(parent_shape)
+                var parent_transform = this.originalObject.parent.Get_ParentTextTransform && this.originalObject.parent.Get_ParentTextTransform();
+                if(parent_transform)
                 {
-                    global_MatrixTransformer.MultiplyAppend(_transform, parent_shape.transformText);
+                    global_MatrixTransformer.MultiplyAppend(_transform, parent_transform);
                 }
 
             }
@@ -847,15 +847,19 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
         this.getBounds = function()
         {
             var boundsChecker = new  CSlideBoundsChecker();
-            var tr = this.transform;
-            var parent_shape = this.originalObject && this.originalObject.parent && this.originalObject.parent.isShapeChild && this.originalObject.parent.isShapeChild(true);
-            if(parent_shape)
+            var tr = null;
+            if(this.originalObject && this.originalObject.parent)
             {
-                tr = tr.CreateDublicate();
-                global_MatrixTransformer.MultiplyAppend(tr, parent_shape.invertTransformText);
-            }
-            this.draw(boundsChecker, parent_shape ? tr : null);
+                var parent_transform = this.originalObject.parent.Get_ParentTextTransform && this.originalObject.parent.Get_ParentTextTransform();
+                if(parent_transform)
+                {
+                    tr = this.transform.CreateDublicate();
+                    global_MatrixTransformer.MultiplyAppend(tr, global_MatrixTransformer.Invert(parent_transform));
+                }
 
+            }
+            this.draw(boundsChecker, tr ? tr : null);
+            tr = this.transform;
             var arr_p_x = [];
             var arr_p_y = [];
             arr_p_x.push(tr.TransformPointX(0,0));

@@ -385,7 +385,7 @@ CDocumentPageColumn.prototype.Shift = function(Dx, Dy)
 };
 CDocumentPageColumn.prototype.Reset = function()
 {
-    this.Bounds.Reset()
+    this.Bounds.Reset();
     this.Pos    = 0;
     this.EndPos = -1;
     this.Empty  = true;
@@ -1983,7 +1983,7 @@ CDocument.prototype =
                 if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Is_Empty() && undefined !== PrevElement.Get_SectionPr())
                     PrevElement = PrevElement.Get_DocumentPrev();
 
-                if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && Index !== StartIndex)
+                if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && Index !== Page.Pos)
                 {
                     var EndLine = PrevElement.Pages[PrevElement.Pages.length - 1].EndLine;
                     if (-1 !== EndLine && PrevElement.Lines[EndLine].Info & paralineinfo_BreakRealPage)
@@ -2984,6 +2984,8 @@ CDocument.prototype =
 
         if ( true === CollaborativeEditing.m_bGlobalLockSelection )
             return;
+
+        this.DrawingDocument.UpdateTargetTransform(null);
 
         if ( docpostype_Content === this.CurPos.Type )
         {
@@ -8934,6 +8936,9 @@ CDocument.prototype =
 
     Selection_Draw_Page : function(Page_abs)
     {
+        this.DrawingDocument.UpdateTargetTransform(null);
+        this.DrawingDocument.SetTextSelectionOutline(false);
+
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
@@ -8941,6 +8946,7 @@ CDocument.prototype =
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
+            this.DrawingDocument.SetTextSelectionOutline(true);
             this.DrawingObjects.drawSelectionPage(Page_abs);
         }
         else
@@ -10205,6 +10211,12 @@ CDocument.prototype =
             var Item = this.Content[ContentPos];
             return Item.Is_InText(X, Y, ElementPageIndex);
         }
+    },
+
+
+    Get_ParentTextTransform: function()
+    {
+        return null;
     },
 
     // Проверяем, попали ли мы в автофигуру данного DocumentContent

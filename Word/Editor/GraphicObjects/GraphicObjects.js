@@ -2910,11 +2910,17 @@ CGraphicObjects.prototype =
 
     drawSelectionPage: function(pageIndex)
     {
+        var oMatrix = null;
         if(this.selection.textSelection)
         {
+
             if(this.selection.textSelection.selectStartPage === pageIndex)
             {
-                this.drawingDocument.UpdateTargetTransform(this.selection.textSelection.transformText);
+                if(this.selection.textSelection.transformText)
+                {
+                    oMatrix = this.selection.textSelection.transformText.CreateDublicate();
+                }
+                this.drawingDocument.UpdateTargetTransform(oMatrix);
                 this.selection.textSelection.getDocContent().Selection_Draw_Page(0);
             }
         }
@@ -2927,6 +2933,11 @@ CGraphicObjects.prototype =
         }
         else if(this.selection.chartSelection && this.selection.chartSelection.selectStartPage === pageIndex && this.selection.chartSelection.selection.textSelection)
         {
+            if(this.selection.chartSelection.selection.textSelection.transformText)
+            {
+                oMatrix = this.selection.chartSelection.selection.textSelection.transformText.CreateDublicate();
+            }
+            this.drawingDocument.UpdateTargetTransform(oMatrix);
             this.selection.chartSelection.selection.textSelection.getDocContent().Selection_Draw_Page(0);
         }
     },

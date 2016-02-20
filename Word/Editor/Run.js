@@ -1177,6 +1177,7 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
 
 
                 var RGBA;
+                Para.DrawingDocument.UpdateTargetTransform(Para.Get_ParentTextTransform());
                 if(CurTextPr.TextFill)
                 {
                     CurTextPr.TextFill.check(Para.Get_Theme(), Para.Get_ColorMap());
@@ -3840,7 +3841,9 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
     var nMinWidth    = MinMax.nMinWidth;
     var nMaxWidth    = MinMax.nMaxWidth;
     var nCurMaxWidth = MinMax.nCurMaxWidth;
+    var nMaxHeight   = MinMax.nMaxHeight;
 
+    var bCheckTextHeight = false;
     var Count = this.Content.length;
     for ( var Pos = 0; Pos < Count; Pos++ )
     {
@@ -3878,7 +3881,7 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
                 }
 
                 nCurMaxWidth += ItemWidth;
-
+                bCheckTextHeight = true;
                 break;
             }
             case para_Math_Text:
@@ -3897,7 +3900,7 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
                 }
 
                 nCurMaxWidth += ItemWidth;
-
+                bCheckTextHeight = true;
                 break;
             }
             case para_Space:
@@ -3915,7 +3918,7 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
                 // пробелы, идущие в конце параграфа или перед переносом строки(явным), не
                 // должны учитываться.
                 nSpaceLen += Item.Width / TEXTWIDTH_DIVIDER;//nSpaceLen += Item.Get_Width();
-
+                bCheckTextHeight = true;
                 break;
             }
             case para_Math_BreakOperator:
@@ -3930,7 +3933,7 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
                 }
 
                 nCurMaxWidth += Item.Get_Width() / TEXTWIDTH_DIVIDER;
-
+                bCheckTextHeight = true;
                 break;
             }
 
@@ -3956,6 +3959,16 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
                         nMinWidth = DrawingW;
                 }
 
+                if ((true === Item.Is_Inline() || true === this.Paragraph.Parent.Is_DrawingShape()) && Item.Height > nMaxHeight)
+                {
+                    nMaxHeight = Item.Height;
+                }
+                else if (true === Item.Use_TextWrap())
+                {
+                    var DrawingH = Item.getXfrmExtY();
+                    if (DrawingH > nMaxHeight)
+                        nMaxHeight = DrawingH;
+                }
 
                 if ( nSpaceLen > 0 )
                 {
@@ -3990,7 +4003,7 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
                 }
 
                 nCurMaxWidth += Item.Width;
-
+                bCheckTextHeight = true;
                 break;
             }
 
@@ -4011,7 +4024,7 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
                 }
 
                 nCurMaxWidth += Item.Width;
-
+                bCheckTextHeight = true;
                 break;
             }
 
@@ -4029,7 +4042,7 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
                     nMaxWidth = nCurMaxWidth;
 
                 nCurMaxWidth = 0;
-
+                bCheckTextHeight = true;
                 break;
             }
 
@@ -4041,10 +4054,16 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
                 if ( nCurMaxWidth > nMaxWidth )
                     nMaxWidth = nCurMaxWidth;
 
+                if (nMaxHeight < 0.001)
+                    bCheckTextHeight = true;
+
                 break;
             }
         }
     }
+
+    if (true === bCheckTextHeight && nMaxHeight < this.TextAscent + this.TextDescent)
+        nMaxHeight = this.TextAscent + this.TextDescent;
 
     MinMax.bWord        = bWord;
     MinMax.nWordLen     = nWordLen;
@@ -4052,6 +4071,7 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
     MinMax.nMinWidth    = nMinWidth;
     MinMax.nMaxWidth    = nMaxWidth;
     MinMax.nCurMaxWidth = nCurMaxWidth;
+    MinMax.nMaxHeight   = nMaxHeight;
 };
 
 ParaRun.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRange)
@@ -4210,7 +4230,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
             case para_Math_Ampersand:
             case para_Sym:
             {
-                if ( para_Drawing === ItemType && drawing_Anchor === Item.DrawingType )
+                if ( para_Drawing === ItemType && !Item.Is_Inline() )
                     break;
 
                 if ( CommentsFlag != comments_NoComment )
@@ -4223,7 +4243,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
                 else if ( null !== DrawColl )
                     aColl.Add( Y0, Y1, X, X + ItemWidthVisible, 0, DrawColl.r, DrawColl.g, DrawColl.b );
 
-                if ( para_Drawing != ItemType || drawing_Anchor != Item.DrawingType )
+                if ( para_Drawing != ItemType || Item.Is_Inline() )
                     X += ItemWidthVisible;
 
                 break;
@@ -4399,14 +4419,14 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
                     pGraphics.b_color1(0, 0, 0, 255);
                 }
 
-                if (para_Drawing != ItemType || drawing_Anchor != Item.DrawingType)
+                if (para_Drawing != ItemType || Item.Is_Inline())
                 {
                     Item.Draw(X, Y - this.YOffset, pGraphics);
                     X += Item.Get_WidthVisible();
                 }
 
                 // Внутри отрисовки инлайн-автофигур могут изменится цвета и шрифт, поэтому восстанавливаем настройки
-                if ((para_Drawing === ItemType && drawing_Inline === Item.DrawingType) || (para_Tab === ItemType))
+                if ((para_Drawing === ItemType && Item.Is_Inline()) || (para_Tab === ItemType))
                 {
                     pGraphics.SetTextPr( CurTextPr, Theme );
 
@@ -4663,7 +4683,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             case para_Text:
             case para_Sym:
             {
-                if ( para_Drawing != ItemType || drawing_Anchor != Item.DrawingType )
+                if ( para_Drawing != ItemType || Item.Is_Inline() )
                 {
                     if (true === bRemReview)
                         aStrikeout.Add(StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, ReviewColor.r, ReviewColor.g, ReviewColor.b);

@@ -6453,83 +6453,88 @@ CTableCellPr.prototype =
 
         CellPr.GridSpan = this.GridSpan;
 
-        if ( undefined != this.Shd )
+        if (undefined != this.Shd)
             CellPr.Shd = this.Shd.Copy();
 
-        if ( undefined === this.TableCellMar )
+        if (undefined === this.TableCellMar)
             CellPr.TableCellMar = undefined;
-        else if ( null === this.TableCellMar )
+        else if (null === this.TableCellMar)
             CellPr.TableCellMar = null;
         else
         {
-            CellPr.TableCellMar = {};
+            CellPr.TableCellMar        = {};
             CellPr.TableCellMar.Bottom = undefined != this.TableCellMar.Bottom ? this.TableCellMar.Bottom.Copy() : undefined;
-            CellPr.TableCellMar.Left   = undefined != this.TableCellMar.Left   ? this.TableCellMar.Left.Copy()   : undefined;
-            CellPr.TableCellMar.Right  = undefined != this.TableCellMar.Right  ? this.TableCellMar.Right.Copy()  : undefined;
-            CellPr.TableCellMar.Top    = undefined != this.TableCellMar.Top    ? this.TableCellMar.Top.Copy()    : undefined;
+            CellPr.TableCellMar.Left   = undefined != this.TableCellMar.Left ? this.TableCellMar.Left.Copy() : undefined;
+            CellPr.TableCellMar.Right  = undefined != this.TableCellMar.Right ? this.TableCellMar.Right.Copy() : undefined;
+            CellPr.TableCellMar.Top    = undefined != this.TableCellMar.Top ? this.TableCellMar.Top.Copy() : undefined;
         }
 
-        if ( undefined != this.TableCellBorders.Bottom )
+        if (undefined != this.TableCellBorders.Bottom)
             CellPr.TableCellBorders.Bottom = this.TableCellBorders.Bottom.Copy();
 
-        if ( undefined != this.TableCellBorders.Left )
+        if (undefined != this.TableCellBorders.Left)
             CellPr.TableCellBorders.Left = this.TableCellBorders.Left.Copy();
 
-        if ( undefined != this.TableCellBorders.Right )
+        if (undefined != this.TableCellBorders.Right)
             CellPr.TableCellBorders.Right = this.TableCellBorders.Right.Copy();
 
-        if ( undefined != this.TableCellBorders.Top )
+        if (undefined != this.TableCellBorders.Top)
             CellPr.TableCellBorders.Top = this.TableCellBorders.Top.Copy();
 
-        if ( undefined != this.TableCellW )
+        if (undefined != this.TableCellW)
             CellPr.TableCellW = this.TableCellW.Copy();
 
-        CellPr.VAlign = this.VAlign;
-        CellPr.VMerge = this.VMerge;
+        CellPr.VAlign        = this.VAlign;
+        CellPr.VMerge        = this.VMerge;
+        CellPr.TextDirection = this.TextDirection;
         return CellPr;
     },
 
     Merge : function(CellPr)
     {
-        if ( undefined != CellPr.GridSpan )
+        if (undefined != CellPr.GridSpan)
             this.GridSpan = CellPr.GridSpan;
 
-        if ( undefined != CellPr.Shd )
+        if (undefined != CellPr.Shd)
             this.Shd = CellPr.Shd.Copy();
 
-        if ( undefined === CellPr.TableCellMar )
-        {}
-        else if ( null === CellPr.TableCellMar )
+        if (undefined === CellPr.TableCellMar)
+        {
+        }
+        else if (null === CellPr.TableCellMar)
             this.TableCellMar = null;
         else
         {
-            this.TableCellMar = {};
+            this.TableCellMar        = {};
             this.TableCellMar.Bottom = undefined != CellPr.TableCellMar.Bottom ? CellPr.TableCellMar.Bottom.Copy() : undefined;
-            this.TableCellMar.Left   = undefined != CellPr.TableCellMar.Left   ? CellPr.TableCellMar.Left.Copy()   : undefined;
-            this.TableCellMar.Right  = undefined != CellPr.TableCellMar.Right  ? CellPr.TableCellMar.Right.Copy()  : undefined;
-            this.TableCellMar.Top    = undefined != CellPr.TableCellMar.Top    ? CellPr.TableCellMar.Top.Copy()    : undefined;
+            this.TableCellMar.Left   = undefined != CellPr.TableCellMar.Left ? CellPr.TableCellMar.Left.Copy() : undefined;
+            this.TableCellMar.Right  = undefined != CellPr.TableCellMar.Right ? CellPr.TableCellMar.Right.Copy() : undefined;
+            this.TableCellMar.Top    = undefined != CellPr.TableCellMar.Top ? CellPr.TableCellMar.Top.Copy() : undefined;
         }
 
-        if ( undefined != CellPr.TableCellBorders.Bottom )
+        if (undefined != CellPr.TableCellBorders.Bottom)
             this.TableCellBorders.Bottom = CellPr.TableCellBorders.Bottom.Copy();
 
-        if ( undefined != CellPr.TableCellBorders.Left )
+        if (undefined != CellPr.TableCellBorders.Left)
             this.TableCellBorders.Left = CellPr.TableCellBorders.Left.Copy();
 
-        if ( undefined != CellPr.TableCellBorders.Right )
+        if (undefined != CellPr.TableCellBorders.Right)
             this.TableCellBorders.Right = CellPr.TableCellBorders.Right.Copy();
 
-        if ( undefined != CellPr.TableCellBorders.Top )
+        if (undefined != CellPr.TableCellBorders.Top)
             this.TableCellBorders.Top = CellPr.TableCellBorders.Top.Copy();
 
-        if ( undefined != CellPr.TableCellW )
+        if (undefined != CellPr.TableCellW)
             this.TableCellW = CellPr.TableCellW.Copy();
 
-        if ( undefined != CellPr.VAlign )
+        if (undefined != CellPr.VAlign)
             this.VAlign = CellPr.VAlign;
 
-        if ( undefined != CellPr.VMerge )
+        if (undefined != CellPr.VMerge)
             this.VMerge = CellPr.VMerge;
+
+        if (undefined != CellPr.TextDirection)
+            this.TextDirection = CellPr.TextDirection;
     },
 
     Is_Equal : function(CellPr)
@@ -6556,7 +6561,8 @@ CTableCellPr.prototype =
             || true !== IsEqualStyleObjects(this.TableCellBorders.Top, CellPr.TableCellBorders.Top)
             || true !== IsEqualStyleObjects(this.TableCellW, CellPr.TableCellW)
             || this.VAlign !== CellPr.VAlign
-            || this.VMerge !== CellPr.VMerge)
+            || this.VMerge !== CellPr.VMerge
+            || this.TextDirection !== CellPr.TextDirection)
             return false;
 
         return true;
@@ -6668,6 +6674,7 @@ CTableCellPr.prototype =
 
         this.VAlign = CellPr.VAlign;
         this.VMerge = CellPr.VMerge;
+        this.TextDirection = CellPr.TextDirection;
     },
 
     Check_PresentationPr : function(Theme)
