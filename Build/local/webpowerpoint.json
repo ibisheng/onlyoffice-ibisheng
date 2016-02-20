@@ -162,10 +162,7 @@
 				"../../Common/3rdparty/jsrsasign/jsrsasign-latest-all-min.js"
             ],
             "map": "sdk-all.js.map",
-            "log": "../../PowerPoint/Build/Log",
-            "define": [
-                "ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT=true"
-            ]
+            "log": "../../PowerPoint/Build/Log"
         },
         "defines": {
             "src": [

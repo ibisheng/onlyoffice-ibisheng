@@ -172,10 +172,7 @@
                 "../../Common/3rdparty/XRegExp/xregexp-all-min.js"
             ],
             "map": "sdk-all.js.map",
-            "log": "../../Word/Build/Log",
-            "define": [
-                "ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT=true"
-            ]
+            "log": "../../Word/Build/Log"
         },
         "defines": {
             "src": [],

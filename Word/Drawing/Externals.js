@@ -278,9 +278,6 @@ function ZBase32Encoder()
     };
 }
 
-/** @define {boolean} */
-var ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT = false;
-
 var bIsLocalFontsUse = false;
 
 function _is_support_cors()
@@ -314,8 +311,7 @@ function postLoadScript(scriptName)
             if (_files[i].Id == _mess)
             {
                 var bIsUseOrigF = false;
-                if (ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT && // проставляется в true на этапе сборки
-                    _files[i].CanUseOriginalFormat && // false if load embedded fonts
+                if (_files[i].CanUseOriginalFormat && // false if load embedded fonts
                     bIsSupportOriginalFormatFonts) // false if work on ie9
                     bIsUseOrigF = true;
 
@@ -502,8 +498,7 @@ CFontFileLoader.prototype.LoadFontAsync = function(basePath, _callback, isEmbed)
 		return;
 	}
 
-	if (ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT && // проставляется в true на этапе сборки
-		this.CanUseOriginalFormat && // false if load embedded fonts
+	if (this.CanUseOriginalFormat && // false if load embedded fonts
 		bIsSupportOriginalFormatFonts) // false if work on ie9
 	{
 		this.LoadFontAsync2(basePath, _callback);

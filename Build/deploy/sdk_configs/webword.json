@@ -165,10 +165,7 @@
                 "../../Common/3rdparty/jsrsasign/jsrsasign-latest-all-min.js"
             ],
             "map": "sdk-all.js.map",
-            "log": "../../Word/Build/Log",
-            "define": [
-                "ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT=true"
-            ]
+            "log": "../../Word/Build/Log"
         },
         "defines": {
             "src": [
@@ -201,15 +198,6 @@
                 "src": "sdk-all.js",
                 "dest": "<%= pkg.menu_path %>/Word/"
             },
-            "fonts": {
-                "expand": true,
-                "cwd": "../../Fonts/",
-                "src": [
-                    "js/*.js",
-                    "odttf/*.js"
-                ],
-                "dest": "<%= pkg.menu_path %>/Fonts/"
-            },
             "doc": {
                 "expand": true,
                 "cwd": "../../Word/",
@@ -220,7 +208,6 @@
                 "expand": true,
                 "cwd": "../../Common/",
                 "src": [
-                    "AllFonts.js",
                     "spellcheckapisettings.js",
                     "commonDefines.js",
                     "apiCommon.js",
