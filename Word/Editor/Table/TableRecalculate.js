@@ -1600,11 +1600,28 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         g_oTableId.m_bTurnOff = true;
         History.TurnOff();
 
+        var aContentDrawings = [];
         for ( var Index = 0; Index < this.HeaderInfo.Count; Index++ )
         {
             HeaderPage.Rows[Index] = this.Content[Index].Copy(this);
             HeaderPage.Rows[Index].Index = Index;
+            for(var CellIndex = 0; CellIndex < HeaderPage.Rows[Index].Content.length; ++CellIndex)
+            {
+                HeaderPage.Rows[Index].Content[CellIndex].Content.Get_AllDrawingObjects(aContentDrawings);
+            }
         }
+        for(var DrawingIndex = 0; DrawingIndex < aContentDrawings.length; ++DrawingIndex)
+        {
+            if(aContentDrawings[DrawingIndex] && aContentDrawings[DrawingIndex].GraphicObj)
+            {
+                aContentDrawings[DrawingIndex].GraphicObj.recalculate();
+                if(aContentDrawings[DrawingIndex].GraphicObj.recalculateText)
+                {
+                    aContentDrawings[DrawingIndex].GraphicObj.recalculateText();
+                }
+            }
+        }
+
         g_oTableId.m_bTurnOff = false;
         History.TurnOn();
 
