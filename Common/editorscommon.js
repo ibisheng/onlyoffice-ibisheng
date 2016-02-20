@@ -577,12 +577,12 @@ function build_rx_table(local){
 	return XRegExp.build( '^(?<tableName>{{tableName}})\\[(?<columnName>{{columnName}})?\\]', {
         tableName : new XRegExp( "^(:?[" + str_namedRanges + "][" + str_namedRanges + "\\d.]*)" ),
         columnName: XRegExp.build( '(?<reservedColumn>{{reservedColumn}})|(?<oneColumn>{{userColumn}})|(?<columnRange>{{userColumnRange}})|(?<hdtcc>{{hdtcc}})', {
-            userColumn     : structured_tables_userColumn,
-            reservedColumn : structured_tables_reservedColumn,
-            userColumnRange: XRegExp.build( '\\[(?<colStart>{{uc}})\\]\\:\\[(?<colEnd>{{uc}})\\]', {
+            "userColumn"     : structured_tables_userColumn,
+            "reservedColumn" : structured_tables_reservedColumn,
+            "userColumnRange": XRegExp.build( '\\[(?<colStart>{{uc}})\\]\\:\\[(?<colEnd>{{uc}})\\]', {
                 "uc": structured_tables_userColumn
             } ),
-            hdtcc          : XRegExp.build( '(?<hdt>\\[{{rc}}\\]|{{hd}}|{{dt}})(?:\\,(?:\\[(?<hdtcstart>{{uc}})\\])(?:\\:(?:\\[(?<hdtcend>{{uc}})\\]))?)?', {
+            "hdtcc"          : XRegExp.build( '(?<hdt>\\[{{rc}}\\]|{{hd}}|{{dt}})(?:\\,(?:\\[(?<hdtcstart>{{uc}})\\])(?:\\:(?:\\[(?<hdtcend>{{uc}})\\]))?)?', {
                 "rc": structured_tables_reservedColumn,
 				"hd": structured_tables_headata,
 				"dt": structured_tables_datals,
