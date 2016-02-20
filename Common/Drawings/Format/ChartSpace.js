@@ -6241,20 +6241,41 @@ CChartSpace.prototype =
         {
             return;
         }
+
+        var parent_objects = this.getParentObjects();
         if(oSide.spPr && oSide.spPr.ln)
         {
             oSide.pen = oSide.spPr.ln.createDuplicate();
         }
         else
         {
-            oSide.pen = null;
+            var oCompiledPen = null;
+            if(this.style >= 1 && this.style <= 40 && 2 === nSideType)
+            {
+                if(parent_objects.theme  && parent_objects.theme.themeElements
+                    && parent_objects.theme.themeElements.fmtScheme
+                    && parent_objects.theme.themeElements.fmtScheme.lnStyleLst
+                    && parent_objects.theme.themeElements.fmtScheme.lnStyleLst[0])
+                {
+                    oCompiledPen = parent_objects.theme.themeElements.fmtScheme.lnStyleLst[0].createDuplicate();
+                    if(this.style >= 1 && this.style <= 32)
+                    {
+                        oCompiledPen.Fill = CreateUnifillSolidFillSchemeColor(15, 0.75);
+                    }
+                    else
+                    {
+                        oCompiledPen.Fill = CreateUnifillSolidFillSchemeColor(8, 0.75);
+                    }
+                }
+            }
+            oSide.pen = oCompiledPen;
         }
         if(this.style >= 1 && this.style <= 32)
         {
             if(oSide.spPr && oSide.spPr.Fill)
             {
                 oSide.brush = oSide.spPr.Fill.createDuplicate();
-                if( oSide.brush.fill && oSide.brush.fill.color && (nSideType === 0 || nSideType === 2))
+                if(nSideType === 0 || nSideType === 2)
                 {
                     var cColorMod = new CColorMod;
                     if(nSideType === 2)
@@ -6262,19 +6283,17 @@ CChartSpace.prototype =
                     else
                         cColorMod.val = 35000;
                     cColorMod.name = "shade";
-                    oSide.brush.fill.color.Mods.addMod(cColorMod);
+                    oSide.brush.addColorMod(cColorMod);
                 }
             }
             else
             {
                 oSide.brush = null;
             }
-            return;
         }
         else
         {
             var oSubtleFill;
-            var parent_objects = this.getParentObjects();
             if(parent_objects.theme  && parent_objects.theme.themeElements
                 && parent_objects.theme.themeElements.fmtScheme
                 && parent_objects.theme.themeElements.fmtScheme.fillStyleLst)
@@ -6296,7 +6315,7 @@ CChartSpace.prototype =
                 oDefaultBrush.merge(oSide.spPr.Fill);
             }
 
-            if( oDefaultBrush.fill && oDefaultBrush.fill.color && (nSideType === 0 || nSideType === 2))
+            if(nSideType === 0 || nSideType === 2)
             {
                 var cColorMod = new CColorMod;
                 if(nSideType === 0)
@@ -6304,9 +6323,18 @@ CChartSpace.prototype =
                 else
                     cColorMod.val = 35000;
                 cColorMod.name = "shade";
-                oDefaultBrush.fill.color.Mods.addMod(cColorMod);
+                oDefaultBrush.addColorMod(cColorMod);
             }
             oSide.brush = oDefaultBrush;
+        }
+
+        if(oSide.brush)
+        {
+            oSide.brush.calculate(parent_objects.theme, parent_objects.slide, parent_objects.layout, parent_objects.master, {R: 0, G: 0, B: 0, A: 255});
+        }
+        if(oSide.pen)
+        {
+            oSide.pen.calculate(parent_objects.theme, parent_objects.slide, parent_objects.layout, parent_objects.master, {R: 0, G: 0, B: 0, A: 255});
         }
     },
 

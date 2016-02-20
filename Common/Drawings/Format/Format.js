@@ -1429,6 +1429,16 @@ CUniColor.prototype =
         }
     },
 
+
+    addColorMod: function(mod)
+    {
+        if(!this.Mods)
+        {
+            this.Mods = new CColorModifiers();
+        }
+        this.Mods.addMod(mod.createDuplicate());
+    },
+
     check: function(theme, colorMap)
     {
         if(this.color && this.color.check(theme, colorMap.color_map)/*возвращает был ли изменен RGBA*/)
@@ -2925,6 +2935,60 @@ CUniFill.prototype =
         if(this.fill)
         {
             this.fill.check(theme, colorMap);
+        }
+    },
+
+
+    addColorMod: function(mod)
+    {
+        if(this.fill)
+        {
+            switch(this.fill.type)
+            {
+                case FILL_TYPE_NONE:
+                {
+                    break;
+                }
+                case FILL_TYPE_BLIP:
+                {
+                    break;
+                }
+                case FILL_TYPE_NOFILL:
+                {
+                    break;
+                }
+                case FILL_TYPE_SOLID:
+                {
+                    if(this.fill.color && this.fill.color)
+                    {
+                        this.fill.color.addColorMod(mod);
+                    }
+                    break;
+                }
+                case FILL_TYPE_GRAD:
+                {
+                    for(var i = 0; i < this.fill.colors.length; ++i)
+                    {
+                        if(this.fill.colors[i] && this.fill.colors[i].color)
+                        {
+                            this.fill.colors[i].color.addColorMod(mod);
+                        }
+                    }
+                    break;
+                }
+                case FILL_TYPE_PATT:
+                {
+                    if(this.fill.bgClr)
+                    {
+                        this.fill.bgClr.addColorMod(mod);
+                    }
+                    if(this.fill.fgClr)
+                    {
+                        this.fill.fgClr.addColorMod(mod);
+                    }
+                    break;
+                }
+            }
         }
     },
 
