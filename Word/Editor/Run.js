@@ -10220,7 +10220,7 @@ ParaRun.prototype.IsEqArray = function()
 };
 ParaRun.prototype.IsForcedBreak = function()
 {
-    return this.MathPrp.IsBreak();
+    return false == this.ParaMath.Is_Inline() && true == this.MathPrp.IsBreak();
 };
 ParaRun.prototype.Is_StartForcedBreakOperator = function()
 {
