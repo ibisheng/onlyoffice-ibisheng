@@ -834,7 +834,7 @@ CBox.prototype.Apply_MenuProps = function(Props)
 
     if(Props.Action & c_oMathMenuAction.DeleteForcedBreak && true == this.Can_DeleteForcedBreak())
     {
-        var AlnAt = this.Get_AlignBrk();
+        var AlnAt = this.Pr.Get_AlnAt();
         History.Add(this, new CChangesMathBoxForcedBreak(false, true, AlnAt));
         this.raw_ForcedBreak(false);
     }
