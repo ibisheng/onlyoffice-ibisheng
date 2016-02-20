@@ -1109,18 +1109,20 @@ DependencyGraph.prototype = {
         table.Ref = null;
     },
 	rebuildTable:function(tableName){
-		var table = this.getDefNameNodeByName( tableName, null ), nSE, se;
-			nSE = table.getSlaveEdges();
+		var table = this.getDefNameNodeByName( tableName, null ), nSE, se, nME, range;
 
-		for ( var id in nSE ) {
-			se = nSE[id];
-//			se.deleteMasterEdge( retRes );
-//			this.needRecalc.nodes[se.nodeId] = [se.sheetId, se.cellId ];
-//			this.needRecalc.length++;
-//			addToArrRecalc(se.sheetId, se.cell);
-			se = se.returnCell();
-			if ( se ) {
-				se.setFormula( se.formulaParsed.assemble() );
+		nME = table.getMasterEdges();
+		for ( var id in nME ) {
+			range = this.getInRange( nME[id].sheetId, nME[id].bbox );
+			for ( var i = 0; i < range.length; i++ ) {
+				nSE = range[i].getSlaveEdges();
+				for ( var id in nSE ) {
+					se = nSE[id];
+					se = se.returnCell();
+					if ( se ) {
+						se.setFormula( se.formulaParsed.assemble() );
+					}
+				}
 			}
 		}
 	}
@@ -2599,7 +2601,6 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
            для этого пробегаемся по всем slave, и вызываем пересборку. в результате должна получиться новая формула, где используется новый диапазон.
           #2. поменяли диапазон. нужно перестроить граф зависимосте и пересчитать формулу. находим диапазон; меняем в нем ссылку; разбираем ссылку;
            удаляем старые master и добавляем новые, которые получились в результате разбора новой ссылки; пересчитываем формулу.*/
-
 
         if( !rename ){
             retRes = this.dependencyFormulas.getDefNameNodeByName(newName.Name)

@@ -2890,7 +2890,7 @@ var maxIndividualValues = 10000;
 				if(aWs.TableParts)
 				{
 					//TODO: buildRecalc вызывать из модели!!!
-					buildRecalc(aWs.workbook, true, true);
+					buildRecalc(aWs.workbook, true, false);
 					for(var i = 0; i < aWs.TableParts.length; i++)
 					{
 						var filter = aWs.TableParts[i];

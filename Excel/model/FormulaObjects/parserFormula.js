@@ -1432,7 +1432,8 @@ function cStrucTable( val, wb, ws, cell ) {
     this.reservedColumn = null;
     this.tableData = null;
 
-    this.createArea( val, cell );
+    var ret = this.createArea( val, cell );
+	return (ret && ret.type != cElementType.error) ? this : ret;
 
 }
 
@@ -1610,10 +1611,16 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 
 			this.colStartIndex = this.wb.getTableIndexColumnByName( this.tableName, this.colStart );
 			this.colEndIndex = this.wb.getTableIndexColumnByName( this.tableName, this.colEnd );
+			if( !this.colStartIndex && !this.colEndIndex ){
+				return new cError( cErrorType.bad_reference );
+			}
         }
         else {
             paramObj.startCol = this.oneColumn = val.oneColumn.replace(/'#/g,"#");
 			this.oneColumnIndex = this.wb.getTableIndexColumnByName( this.tableName, this.oneColumn );
+			if( !this.oneColumnIndex ){
+				return new cError( cErrorType.bad_reference );
+			}
         }
 
         this.tableData = this.wb.getTableRangeForFormula( this.tableName, paramObj );
@@ -1672,10 +1679,19 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
             paramObj.endCol = null;
 			this.hdtcstartIndex = this.wb.getTableIndexColumnByName( this.tableName, this.hdtcstart );
 
+			if( !this.hdtcstartIndex ){
+				return new cError( cErrorType.bad_reference );
+			}
+
             if ( this.hdtcend ) {
 				this.hdtcend = this.hdtcend.replace(/'#/g,"#");
                 paramObj.endCol = this.hdtcend;
 				this.hdtcendIndex = this.wb.getTableIndexColumnByName( this.tableName, this.hdtcend );
+
+				if( !this.hdtcendIndex ){
+					return new cError( cErrorType.bad_reference );
+				}
+
             }
 
             paramObj.includeColumnHeader = true;
@@ -1703,6 +1719,7 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
     }
 
     !this.area ? this.area = new cError( cErrorType.bad_reference ) : null;
+	return this.area;
 };
 cStrucTable.prototype.buildLocalTableString = function (reservedColumn,local) {
 
@@ -4234,7 +4251,6 @@ parserFormula.prototype = {
                 }
                 /* Referens to cell A4 */
                 else if ( parserHelp.isRef.call( this, this.Formula, this.pCurrPos, true ) ) {
-//                    this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length} );
                     found_operand = new cRef( this.operand_str.toUpperCase(), this.ws );
                     this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length, oper:found_operand } );
                     if ( this.operand_str.indexOf( "$" ) > -1 ) {
@@ -4243,14 +4259,22 @@ parserFormula.prototype = {
                     this.countRef++;
                 }
 
-                else if ( _tableTMP = parserHelp.isTable.call( this, this.Formula, this.pCurrPos, local ) ) { // Shall be placed strongly after Area and Ref
+                else if ( _tableTMP = parserHelp.isTable.call( this, this.Formula, this.pCurrPos, local ) ) {
                     found_operand = new cStrucTable( _tableTMP, this.wb, this.ws, this.ws.getCell( this.cellAddress ) );
+
+					if(found_operand.type==cElementType.error) {
+						this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
+						this.outStack = [];
+						this.elemArr = [];
+						return false;
+					}
+
                     this.RefPos.push( {start: this.pCurrPos - this.operand_str.length, end: this.pCurrPos, index: this.outStack.length, isName: true, oper:found_operand } );
                     this.countRef++;
                 }
 
                 /* Referens to DefinedNames */
-                else if ( parserHelp.isName.call( this, this.Formula, this.pCurrPos, this.wb, this.ws )[0] ) { // Shall be placed strongly after Area and Ref
+                else if ( parserHelp.isName.call( this, this.Formula, this.pCurrPos, this.wb, this.ws )[0] ) {
                     found_operand = new cName( this.operand_str, this.wb, this.ws );
                     if ( found_operand.defName && found_operand.defName.isTable ) {
                         found_operand = new cStrucTable( parserHelp.isTable( this.operand_str + "[]", 0 ), this.wb, this.ws, this.ws.getCell( this.cellAddress ) );
@@ -4887,9 +4911,9 @@ parserFormula.prototype = {
         for ( var i = 0; i < this.outStack.length; i++ ) {
             ref = this.outStack[i];
 
-			/*if ( ref.type == cElementType.table ) {
+			if ( ref.type == cElementType.table ) {
 				ref = ref.toRef();
-			}*/
+			}
 
             if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea || ref instanceof cArea3D) &&
                 ref.isValid() && this.outStack[i + 1] && this.outStack[i + 1] instanceof cBaseFunction &&
@@ -4898,7 +4922,7 @@ parserFormula.prototype = {
                 continue;
             }
 
-            if ( ref.type == cElementType.name || ref.type == cElementType.table ) {
+            if ( ref.type == cElementType.name ) {
                 nTo = ref.addDefinedNameNode( /*nameReParse*/ );
                 this.wb.dependencyFormulas.addEdge2( node, nTo );
             }
