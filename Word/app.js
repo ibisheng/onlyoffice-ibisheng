@@ -25,7 +25,7 @@ require.config({
         jszip           : '../vendor/jszip/jszip.min',
         jsziputils      : '../vendor/jszip-utils/jszip-utils.min',
         jsrsasign       : '../vendor/jsrsasign/jsrsasign-latest-all-min',
-        allfonts        : '../sdk/Common/AllFonts',
+        //allfonts        : '../sdk/Common/AllFonts',
         //sdk             : '../sdk/Word/sdk-all',
         api             : 'api/documents/api',
         core            : 'common/main/lib/core/application',
@@ -109,7 +109,7 @@ require([
     'jszip',
     'jsziputils',
     'jsrsasign',
-    'allfonts',
+    //'allfonts',
 	'sockjs',
 	'underscore'
 ], function (Backbone, Bootstrap, Core) {
