@@ -173,6 +173,11 @@ baseEditorsApi.prototype.asc_setDocInfo = function(oDocInfo) {
 baseEditorsApi.prototype.asc_SetFontsPath = function(path) {
   this.FontLoader.fontFilesPath = path;
 };
+baseEditorsApi.prototype.asc_enableKeyEvents = function(isEnabled) {
+};
+// Copy/Past/Cut
+baseEditorsApi.prototype.asc_IsFocus = function(bIsNaturalFocus) {
+};
 // Просмотр PDF
 baseEditorsApi.prototype.isPdfViewer = function() {
   return false;

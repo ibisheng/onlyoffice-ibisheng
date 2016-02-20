@@ -106,6 +106,7 @@
     };
 
     this.model = model;
+    this.enableKeyEvents = true;
     this.controller = controller;
     this.handlers = handlers;
     this.wsViewHandlers = null;
@@ -1736,10 +1737,18 @@
     this.handlers.trigger("asc_onZoomChanged", this.getZoom());
   };
 
+  WorkbookView.prototype.getEnableKeyEventsHandler = function(bIsNaturalFocus) {
+    var res = this.enableKeyEvents;
+    if (res && bIsNaturalFocus && this.getCellEditMode() && this.input.isFocused) {
+      res = false;
+    }
+    return res;
+  };
   WorkbookView.prototype.enableKeyEventsHandler = function(f) {
-    this.controller.enableKeyEventsHandler(f);
+    this.enableKeyEvents = !!f;
+    this.controller.enableKeyEventsHandler(this.enableKeyEvents);
     if (this.cellEditor) {
-      this.cellEditor.enableKeyEventsHandler(f);
+      this.cellEditor.enableKeyEventsHandler(this.enableKeyEvents);
     }
   };
 

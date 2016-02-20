@@ -78,6 +78,7 @@ var editor;
     this.isTextArtChangeUrl = false;
 
     //находится ли фокус в рабочей области редактора(используется для copy/paste в MAC)
+    // ToDo убрать, когда Гоша поправит clipboard.js
     this.IsFocus = null;
 
     this.formulasList = null;	// Список всех формул
@@ -1965,6 +1966,14 @@ var editor;
     }
     //наличие фокуса в рабочей области редактора(используется для copy/paste в MAC)
     this.IsFocus = isEnabled;
+  };
+
+  spreadsheet_api.prototype.asc_IsFocus = function(bIsNaturalFocus) {
+    var res = true;
+    if (this.wb) {
+      res = this.wb.getEnableKeyEventsHandler(bIsNaturalFocus);
+    }
+    return res;
   };
 
   spreadsheet_api.prototype.asc_searchEnabled = function(bIsEnabled) {
