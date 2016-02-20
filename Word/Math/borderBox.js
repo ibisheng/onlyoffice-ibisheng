@@ -834,7 +834,8 @@ CBox.prototype.Apply_MenuProps = function(Props)
 
     if(Props.Action & c_oMathMenuAction.DeleteForcedBreak && true == this.Can_DeleteForcedBreak())
     {
-        History.Add(this, new CChangesMathBoxForcedBreak(false, true));
+        var AlnAt = this.Get_AlignBrk();
+        History.Add(this, new CChangesMathBoxForcedBreak(false, true, AlnAt));
         this.raw_ForcedBreak(false);
     }
 };
@@ -850,11 +851,12 @@ CBox.prototype.Can_DeleteForcedBreak = function()
 {
     return this.IsForcedBreak();
 };
-CBox.prototype.raw_ForcedBreak = function(InsertBreak)
+CBox.prototype.raw_ForcedBreak = function(InsertBreak, AlnAt)
 {
     if(InsertBreak)
     {
         this.Pr.Insert_ForcedBreak();
+        this.Pr.Apply_AlnAt(AlnAt);
     }
     else
     {

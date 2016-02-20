@@ -5656,38 +5656,40 @@ CChangesMathBarLinePos.prototype.Load_Changes = function(Reader, Class)
     this.Redo(Class);
 };
 
-function CChangesMathBoxForcedBreak(NewBreak, OldBreak)
+function CChangesMathBoxForcedBreak(NewBreak, OldBreak, OldAlnAt)
 {
-    this.New = NewBreak;
-    this.Old = OldBreak;
+    this.NewBreak = NewBreak;
+
+    this.OldBreak = OldBreak;
+    this.OldAlnAt = OldAlnAt;
 }
 CChangesMathBoxForcedBreak.prototype.Type = historyitem_Math_BoxForcedBreak;
 CChangesMathBoxForcedBreak.prototype.Undo = function(Class)
 {
-    Class.raw_ForcedBreak(this.Old);
+    Class.raw_ForcedBreak(this.OldBreak, this.OldAlnAt);
 };
 CChangesMathBoxForcedBreak.prototype.Redo = function(Class)
 {
-    Class.raw_ForcedBreak(this.New);
+    Class.raw_ForcedBreak(this.NewBreak);
 };
 CChangesMathBoxForcedBreak.prototype.Save_Changes = function(Writer)
 {
-    if ( undefined === this.New )
+    if ( undefined === this.NewBreak )
     {
         Writer.WriteBool( true );
     }
     else
     {
         Writer.WriteBool( false );
-        Writer.WriteBool( this.New );
+        Writer.WriteBool( this.NewBreak );
     }
 };
 CChangesMathBoxForcedBreak.prototype.Load_Changes = function(Reader, Class)
 {
     if (true === Reader.GetBool())
-        this.New = undefined;
+        this.NewBreak = undefined;
     else
-        this.New = Reader.GetBool();
+        this.NewBreak = Reader.GetBool();
 
     this.Redo(Class);
 };
