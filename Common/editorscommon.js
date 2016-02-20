@@ -580,13 +580,13 @@ function build_rx_table(local){
             userColumn     : structured_tables_userColumn,
             reservedColumn : structured_tables_reservedColumn,
             userColumnRange: XRegExp.build( '\\[(?<colStart>{{uc}})\\]\\:\\[(?<colEnd>{{uc}})\\]', {
-                uc: structured_tables_userColumn
+                "uc": structured_tables_userColumn
             } ),
             hdtcc          : XRegExp.build( '(?<hdt>\\[{{rc}}\\]|{{hd}}|{{dt}})(?:\\,(?:\\[(?<hdtcstart>{{uc}})\\])(?:\\:(?:\\[(?<hdtcend>{{uc}})\\]))?)?', {
-                rc: structured_tables_reservedColumn,
-                hd: structured_tables_headata,
-                dt: structured_tables_datals,
-                uc: structured_tables_userColumn
+                "rc": structured_tables_reservedColumn,
+				"hd": structured_tables_headata,
+				"dt": structured_tables_datals,
+				"uc": structured_tables_userColumn
             } )
         } )
     }, 'i' );
