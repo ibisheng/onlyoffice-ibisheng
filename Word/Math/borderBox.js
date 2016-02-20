@@ -782,11 +782,15 @@ CBox.prototype.IsOperatorEmulator = function()
 {
     return this.Pr.opEmu == true;
 };
-CBox.prototype.IsForcedBreak = function()
+CBox.prototype.private_CanUseForcedBreak = function()
 {
     var bInline = this.ParaMath.Is_Inline();
 
-    return bInline == false && this.Pr.IsForcedBreak();
+    return bInline == false && true == this.IsOperatorEmulator();
+};
+CBox.prototype.IsForcedBreak = function()
+{
+    return true == this.private_CanUseForcedBreak() && true == this.Pr.IsForcedBreak();
 };
 CBox.prototype.Get_AlignBrk = function()
 {
@@ -845,11 +849,15 @@ CBox.prototype.Get_InterfaceProps = function()
 };
 CBox.prototype.Can_InsertForcedBreak = function()
 {
-    return false === this.IsForcedBreak();
+    var bCanModifyForcedBreak = this.private_CanUseForcedBreak();
+
+    return bCanModifyForcedBreak == true && false === this.IsForcedBreak();
 };
 CBox.prototype.Can_DeleteForcedBreak = function()
 {
-    return this.IsForcedBreak();
+    var bCanModifyForcedBreak = this.private_CanUseForcedBreak();
+
+    return bCanModifyForcedBreak == true && true == this.IsForcedBreak();
 };
 CBox.prototype.raw_ForcedBreak = function(InsertBreak, AlnAt)
 {
@@ -869,7 +877,7 @@ CBox.prototype.Can_ModifyForcedBreak = function(Pr)
     {
         Pr.Set_InsertForcedBreak();
     }
-    else
+    else if(true == this.Can_DeleteForcedBreak())
     {
         Pr.Set_DeleteForcedBreak();
     }
