@@ -133,6 +133,11 @@ CGraphicFrame.prototype =
         return editor.WordControl.m_oLogicDocument.Get_PageFields();
     },
 
+    Get_ParentTextTransform: function()
+    {
+        return this.transformText;
+    },
+
     getDocContent: function()
     {
         if(this.graphicObject && this.graphicObject.CurCell && ( false === this.graphicObject.Selection.Use || ( true === this.graphicObject.Selection.Use && table_Selection_Text === this.graphicObject.Selection.Type ) ) )

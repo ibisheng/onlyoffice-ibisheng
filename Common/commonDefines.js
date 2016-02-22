@@ -630,6 +630,13 @@ var c_oAscUrlType = {
 	Email: 2
 };
 
+var c_oAscCellTextDirection = {
+    LRTB : 0x00,
+    TBRL : 0x01,
+    BTLR : 0x02
+};
+
+
 var c_oAscEncodings = [
     [ 0,    28596, "ISO-8859-6",       "Arabic (ISO 8859-6)" ],
     [ 1,    720,   "DOS-720",          "Arabic (OEM 720)" ],
