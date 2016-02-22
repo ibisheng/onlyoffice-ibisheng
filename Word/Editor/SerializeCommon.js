@@ -150,7 +150,7 @@ function CPPTXContentLoader()
         this.BaseReader = reader;
         if (this.Reader == null)
             this.Reader = new BinaryPPTYLoader();
-        if(!this.Reader.presentation && presentation)
+        if(presentation)
             this.Reader.presentation = presentation;
 
         var oLogicDocument = this.LogicDocument;
