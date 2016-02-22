@@ -9,7 +9,7 @@ function CheckObjectLine(obj)
 
 function CheckWordArtTextPr(oTextPr)
 {
-    if(oTextPr.TextFill || oTextPr.TextOutline || (oTextPr.Unifill && oTextPr.Unifill.fill && oTextPr.Unifill.fill.type !== FILL_TYPE_SOLID))
+    if(oTextPr.TextFill || oTextPr.TextOutline || (oTextPr.Unifill && oTextPr.Unifill.fill && (oTextPr.Unifill.fill.type !== FILL_TYPE_SOLID || oTextPr.Unifill.transparent != null || oTextPr.Unifill.transparent < 255)))
         return true;
     return false;
 }
@@ -786,18 +786,24 @@ CShape.prototype =
         }
     },
 
-    applyTextFunction: function (docContentFunction, tableFunction, args) {
+    applyTextFunction: function (docContentFunction, tableFunction, args)
+    {
         var content_to_add = this.getDocContent();
-        if (!content_to_add) {
-            if (this.bWordShape) {
+        if (!content_to_add)
+        {
+            if (this.bWordShape)
+            {
                 this.createTextBoxContent();
             }
-            else {
+            else
+            {
                 this.createTextBody();
             }
             content_to_add = this.getDocContent();
+            content_to_add.Cursor_MoveToStartPos();
         }
-        if (content_to_add) {
+        if (content_to_add)
+        {
             docContentFunction.apply(content_to_add, args);
         }
         if(!editor || !editor.noCreatePoint || editor.exucuteHistory)

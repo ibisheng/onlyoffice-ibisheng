@@ -1840,7 +1840,7 @@ asc_docs_api.prototype.ShapeApply = function(prop)
                     History.UndoLastPoint();
                     var slide = this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage];
                     slide.graphicObjects.applyDrawingProps(prop);
-                    slide.graphicObjects.recalculate();
+                    this.WordControl.m_oLogicDocument.Recalculate();
                     this.WordControl.m_oDrawingDocument.OnRecalculatePage(this.WordControl.m_oLogicDocument.CurPage, slide);
                     this.WordControl.m_oDrawingDocument.OnEndRecalculate();
                 }
@@ -1878,7 +1878,7 @@ asc_docs_api.prototype.ShapeApply = function(prop)
                     History.UndoLastPoint();
                     var slide = this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage];
                     slide.graphicObjects.applyDrawingProps(prop);
-                    slide.graphicObjects.recalculate();
+                    this.WordControl.m_oLogicDocument.Recalculate();
                     this.WordControl.m_oDrawingDocument.OnRecalculatePage(this.WordControl.m_oLogicDocument.CurPage, slide);
                     this.WordControl.m_oDrawingDocument.OnEndRecalculate();
                 }
