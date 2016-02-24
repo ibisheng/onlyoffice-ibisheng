@@ -1838,7 +1838,7 @@ ParaRun.prototype.Collect_DocumentStatistics = function(ParaStats)
     }
 };
 
-ParaRun.prototype.Create_FontMap = function(Map, ArgSize)
+ParaRun.prototype.Create_FontMap = function(Map)
 {
     // для Math_Para_Pun argSize учитывается, когда мержатся текстовые настройки в Internal_Compile_Pr()
     if ( undefined !== this.Paragraph && null !== this.Paragraph )
@@ -1854,8 +1854,8 @@ ParaRun.prototype.Create_FontMap = function(Map, ArgSize)
 
             if(null !== this.Parent && undefined !== this.Parent && null !== this.Parent.ParaMath && undefined !== this.Parent.ParaMath)
             {
-                TextPr.FontSize   *= MatGetKoeffArgSize(TextPr.FontSize, ArgSize.value);
-                TextPr.FontSizeCS *= MatGetKoeffArgSize(TextPr.FontSizeCS, ArgSize.value);
+                TextPr.FontSize   = this.Math_GetRealFontSize(TextPr.FontSize);
+                TextPr.FontSizeCS = this.Math_GetRealFontSize(TextPr.FontSizeCS);
             }
         }
         else
@@ -9997,7 +9997,6 @@ ParaRun.prototype.Math_PreRecalc = function(Parent, ParaMath, ArgSize, RPI, Gaps
 
     if(RPI.bCorrect_ConvertFontSize) // изменение FontSize после конвертации из старого формата в новый
     {
-        var ArgSize     = this.Parent.Compiled_ArgSz.value;
         var FontKoef;
 
         if(ArgSize == -1 || ArgSize == -2)
@@ -10033,6 +10032,33 @@ ParaRun.prototype.Math_PreRecalc = function(Parent, ParaMath, ArgSize, RPI, Gaps
         this.Content[Pos].SetUpdateGaps(false);
     }
 
+};
+ParaRun.prototype.Math_GetRealFontSize = function(FontSize)
+{
+    var RealFontSize = FontSize ;
+
+    if(FontSize !== null && FontSize !== undefined)
+    {
+        var ArgSize   = this.Parent.Compiled_ArgSz.value;
+        RealFontSize  = FontSize*MatGetKoeffArgSize(FontSize, ArgSize);
+    }
+
+    return RealFontSize;
+};
+ParaRun.prototype.Math_CompareFontSize = function(ComparableFontSize, bStartLetter)
+{
+    var lng = this.Content.length;
+
+    var Letter = this.Content[lng - 1];
+
+    if(bStartLetter == true)
+        Letter = this.Content[0];
+
+
+    var CompiledPr = this.Get_CompiledPr(false);
+    var LetterFontSize = Letter.Is_LetterCS() ? CompiledPr.FontSizeCS : CompiledPr.FontSize;
+
+    return ComparableFontSize == this.Math_GetRealFontSize(LetterFontSize);
 };
 ParaRun.prototype.Math_EmptyRange = function(_CurLine, _CurRange) // до пересчета нужно узнать будет ли данный Run пустым или нет в данном Range, необходимо для того, чтобы выставить wrapIndent
 {

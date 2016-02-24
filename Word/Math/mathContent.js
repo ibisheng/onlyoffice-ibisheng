@@ -3838,8 +3838,9 @@ CMathContent.prototype.Correct_Selection = function()
 };
 CMathContent.prototype.Create_FontMap = function(Map)
 {
+    // ArgSize компилируется только тогда, когда выставлены все ссылки на родительские классы
     for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; nIndex++)
-        this.Content[nIndex].Create_FontMap(Map, this.Compiled_ArgSz); // ArgSize компилируется только тогда, когда выставлены все ссылки на родительские классы
+        this.Content[nIndex].Create_FontMap(Map);
 };
 CMathContent.prototype.Get_AllFontNames = function(AllFonts)
 {

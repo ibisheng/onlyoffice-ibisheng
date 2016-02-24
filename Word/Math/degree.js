@@ -145,8 +145,8 @@ CDegreeBase.prototype.GetSizeSup = function(oMeasure, Metric)
     {
         lastElem = this.baseContent.GetLastElement();
 
-        var BaseRun  = lastElem.Type == para_Math_Run && mgCtrPrp.FontSize == lastElem.Get_CompiledPr(false).FontSize;
-        bTextElement = BaseRun || (lastElem.Type !== para_Math_Run && lastElem.IsJustDraw());
+        var bSameFontSize  = lastElem.Type == para_Math_Run && lastElem.Math_CompareFontSize(mgCtrPrp.FontSize, false);
+        bTextElement = bSameFontSize || (lastElem.Type !== para_Math_Run && lastElem.IsJustDraw());
     }
 
     var PlH = 0.64*this.ParaMath.GetPlh(oMeasure, mgCtrPrp);
@@ -221,18 +221,14 @@ CDegreeBase.prototype.GetSizeSubScript = function(oMeasure, Metric)
     var mgCtrPrp = this.Get_TxtPrControlLetter();
     var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
-    var bTextElement = false,
-        lastElem;
-
+    var bTextElement = false;
 
     if(!this.baseContent.IsJustDraw())
     {
-        lastElem = this.baseContent.GetLastElement();
+        var lastElem = this.baseContent.GetLastElement();
 
-        var txtPrpControl = this.ParaMath.GetFirstRPrp();// нам нужен текстовые настройки для управляющих элементов без учета ArgSize, а это как раз будут текстовые настройки первого рана
-        // если учтем ArgSize, то для вложенных дробей эта проверка на Run не сработает
-        var BaseRun       = lastElem.Type == para_Math_Run && txtPrpControl.FontSize == lastElem.Get_CompiledPr(false).FontSize;
-        bTextElement      = BaseRun || (lastElem.Type !== para_Math_Run && lastElem.IsJustDraw());
+        var bSameFontSize  = lastElem.Type == para_Math_Run && lastElem.Math_CompareFontSize(mgCtrPrp.FontSize, false);
+        bTextElement      = bSameFontSize || (lastElem.Type !== para_Math_Run && lastElem.IsJustDraw());
     }
 
     var height, ascent, descent;
@@ -243,7 +239,6 @@ CDegreeBase.prototype.GetSizeSubScript = function(oMeasure, Metric)
     {
         //var last = lastElem.size;
         var DownBaseline = 0.9*shCenter;
-
 
         if(iter.ascent - DownBaseline > 3/4*PlH)
             this.upIter = 1/4*PlH;
@@ -488,7 +483,7 @@ CDegree.prototype.setPosition = function(pos, PosInfo)
     var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
     var Len = this.Content.length;
 
-    // у степени всегда итератор идет в конце, поэтому сделать проверку на то, что текущий контент tпоследний (т.е. это и будет итератор)
+    // у степени всегда итератор идет в конце, поэтому сделать проверку на то, что текущий контент последний (т.е. это и будет итератор)
 
     if(this.bOneLine || EndPos == Len - 1)
     {
@@ -740,10 +735,11 @@ CDegreeSubSupBase.prototype.GetSize = function(oMeasure, Metric)
 
     if(!this.baseContent.IsJustDraw())
     {
-        var BaseItem = this.Pr.type == DEGREE_SubSup ? this.baseContent.GetLastElement() : this.baseContent.GetFirstElement();
+        var bFirstItem = this.Pr.type == DEGREE_SubSup;
+        var BaseItem = bFirstItem ? this.baseContent.GetLastElement() : this.baseContent.GetFirstElement();
 
-        var BaseRun  = BaseItem.Type == para_Math_Run && mgCtrPrp.FontSize >= BaseItem.Get_CompiledPr(false).FontSize;
-        TextElement  = BaseRun || (BaseItem.Type !== para_Math_Run && BaseItem.IsJustDraw());
+        var bSameFontSize  = BaseItem.Type == para_Math_Run && BaseItem.Math_CompareFontSize(mgCtrPrp.FontSize, bFirstItem);
+        TextElement  = bSameFontSize || (BaseItem.Type !== para_Math_Run && BaseItem.IsJustDraw());
     }
 
     if(TextElement)

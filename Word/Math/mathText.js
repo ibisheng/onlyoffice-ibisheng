@@ -663,7 +663,6 @@ CMathText.prototype.Measure = function(oMeasure, TextPr, InfoMathText)
     */
 
     var metricsTxt;
-    var letter;
 
     // measure
     if(this.bJDraw)
@@ -677,7 +676,7 @@ CMathText.prototype.Measure = function(oMeasure, TextPr, InfoMathText)
     {
         var ascent, width, height, descent;
 
-        letter = this.private_getCode();
+        var letter = this.private_getCode();
 
         this.FontSlot = InfoMathText.GetFontSlot(letter); // возвращает fontslot_ASCII || fontslot_EastAsia || fontslot_CS || fontslot_HAnsi
 
@@ -955,6 +954,10 @@ CMathText.prototype.Read_FromBinary = function(Reader)
 {
     this.Type  = Reader.GetLong();
     this.value = Reader.GetLong();
+};
+CMathText.prototype.Is_LetterCS = function()
+{
+    return this.FontSlot == fontslot_CS;
 };
 /*CMathText.prototype.Recalculate_Reset = function(StartRange, StartLine, PRS)
 {
