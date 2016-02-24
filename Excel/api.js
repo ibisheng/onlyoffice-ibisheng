@@ -471,6 +471,9 @@ var editor;
       return;
     }
 
+    if (c_oAscFileType.PDF === typeFile) {
+      this.adjustPrint = new asc_CAdjustPrint();
+    }
     this._asc_downloadAs(typeFile, c_oAscAsyncAction.DownloadAs, {downloadType: bIsDownloadEvent ? DownloadType.Download: DownloadType.None});
   };
 
