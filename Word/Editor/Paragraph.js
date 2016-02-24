@@ -1380,7 +1380,7 @@ Paragraph.prototype =
     Internal_Draw_2 : function(CurPage, pGraphics, Pr)
     {
         var isFirstPage = this.Check_FirstPage(CurPage);
-        if ( this.bFromDocument && true === editor.ShowParaMarks && true === isFirstPage && ( true === Pr.ParaPr.KeepNext || true === Pr.ParaPr.KeepLines || true === Pr.ParaPr.PageBreakBefore ) )
+        if ( this.bFromDocument && !pGraphics.Start_Command && true === editor.ShowParaMarks && true === isFirstPage && ( true === Pr.ParaPr.KeepNext || true === Pr.ParaPr.KeepLines || true === Pr.ParaPr.PageBreakBefore ) )
         {
             var SpecFont = { FontFamily: { Name : "Arial", Index : -1 }, FontSize : 12, Italic : false, Bold : false };
             var SpecSym = String.fromCharCode( 0x25AA );
