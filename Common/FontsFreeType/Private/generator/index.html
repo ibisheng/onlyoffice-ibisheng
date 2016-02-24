@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+<head>
+
+    <title>FontEngine</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=IE8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    
+	<script type="text/javascript" src="../Freetype/config.js"></script>
+	<script type="text/javascript" src="../Freetype/base.js"></script>
+	<script type="text/javascript" src="../Freetype/services.js"></script>
+	
+	<script type="text/javascript" src="../Freetype/modules/psaux.js"></script>
+	<script type="text/javascript" src="../Freetype/modules/psnames.js"></script>
+	<script type="text/javascript" src="../Freetype/modules/render.js"></script>
+	<script type="text/javascript" src="../Freetype/modules/sfnt.js"></script>	
+	
+	<script type="text/javascript" src="../Freetype/drivers/truetype.js"></script>
+	<script type="text/javascript" src="../Freetype/drivers/cff.js"></script>
+	<script type="text/javascript" src="../Freetype/drivers/cid.js"></script>
+	<script type="text/javascript" src="../Freetype/drivers/t1.js"></script>
+	<script type="text/javascript" src="../Freetype/drivers/ttinterp.js"></script>
+	
+	<script type="text/javascript" src="../Freetype/freetype.js"></script>
+	
+</head>
+<body>
+	
+	<div id="log" style="font-family:Courier New"/>
+
+	<script>
+	
+	function _correct(_src)
+	{
+		var res = _src;
+		res = res.replace(/&/g,'&amp;');
+		res = res.replace(/</g,'&lt;');
+		res = res.replace(/>/g,'&gt;');
+		res = res.replace(/'/g,'&apos;');
+		res = res.replace(/"/g,'&quot;');
+		return res;
+	}
+
+	var _log = "";
+	var _br = "<br/>";
+	
+	var __obj = {};
+	var __arr = [];
+	
+	for (var i in FT_Common)
+    {
+		if (true === FT_Common[i])
+		{
+			__arr.push("" + i);
+			__obj["" + i] = "true";
+		}
+		else if (false === FT_Common[i])
+		{
+			__arr.push("" + i);
+			__obj["" + i] = "false";
+		}
+		else
+		{	
+			var tof = typeof FT_Common[i];
+
+			if (tof == "number")
+			{
+				__arr.push("" + i);
+				__obj["" + i] = "" + FT_Common[i];
+			}
+		}
+    }
+	
+	function compareStrings(a, b) 
+	{
+		if (a == b)
+			return 0;
+		
+		if (a.indexOf(b) != -1)
+			return -1;
+		
+		if (b.indexOf(a) != -1)
+			return 1;
+			
+		return (a < b) ? -1 : (a > b) ? 1 : 0;
+	}
+	
+	__arr.sort(compareStrings);
+	
+	for (var i = 0; i < __arr.length; i++)
+    {
+		_log += _correct("_vec1.push_back(L\"FT_Common." + __arr[i] + "\"); ");
+		_log += _correct("_vec2.push_back(L\"" + __obj[__arr[i]] + "\");");
+		_log += _br;
+    }
+	
+	/*
+    for (var i in FT_Common)
+    {
+		if (true === FT_Common[i])
+		{
+			_log += _correct("_vec1.push_back(L\"FT_Common." + i + "\"); ");
+			_log += _correct("_vec2.push_back(L\"true\");");
+			_log += _br;
+		}
+		else if (false === FT_Common[i])
+		{
+			_log += _correct("_vec1.push_back(L\"FT_Common." + i + "\"); ");
+			_log += _correct("_vec2.push_back(L\"false\");");
+			_log += _br;
+		}
+		else
+		{	
+			var tof = typeof FT_Common[i];
+
+			if (tof == "number")
+			{
+				_log += _correct("_vec1.push_back(L\"FT_Common." + i + "\"); ");
+				_log += _correct("_vec2.push_back(L\"" + FT_Common[i] + "\");");
+				_log += _br;
+			}
+		}
+    }
+	*/
+	
+	document.getElementById("log").innerHTML = _log;
+
+	</script>
+    	
+</body>
+</html>

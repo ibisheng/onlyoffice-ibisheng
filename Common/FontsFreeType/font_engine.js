@@ -1,8 +1,10 @@
 "use strict";
 
 function _FT_Common()
-{    
-    this.UintToInt = function(v){
+{
+
+
+	this.UintToInt = function(v){
         return (v>2147483647)?v-4294967296:v;
     }
     this.UShort_To_Short = function(v){
@@ -100,7 +102,8 @@ function _FT_Common()
         return ret;
     }
 }
-var FT_Common = new _FT_Common();/******************************************************************************/
+var FT_Common = new _FT_Common();
+/******************************************************************************/
 //                                  SERVICES
 /******************************************************************************/
 
@@ -357,7 +360,8 @@ function FT_ServiceCache()
     this.service_GLYPH_DICT = null;
     this.service_PFR_METRICS = null;
     this.service_WINFNT = null;
-}/******************************************************************************/
+}
+/******************************************************************************/
 // stream
 /******************************************************************************/
 function FT_Frame_Field(v,s,o)
@@ -3909,7 +3913,8 @@ function ft_synthesize_vertical_metrics(metrics, advance)
     metrics.vertBearingX = parseInt(metrics.horiBearingX - metrics.horiAdvance / 2);
     metrics.vertBearingY = parseInt((advance - height) / 2);
     metrics.vertAdvance  = advance;
-}var ft_standard_glyph_names = [".null","nonmarkingreturn","notequal","infinity","lessequal","greaterequal","partialdiff","summation","product","pi","integral",
+}
+var ft_standard_glyph_names = [".null","nonmarkingreturn","notequal","infinity","lessequal","greaterequal","partialdiff","summation","product","pi","integral",
 "Omega","radical","approxequal","Delta","nonbreakingspace","lozenge","apple","franc","Gbreve","gbreve","Idotaccent","Scedilla",
 "scedilla","Cacute","cacute","Ccaron","ccaron","dcroat",".notdef","space","exclam","quotedbl","numbersign","dollar","percent",
 "ampersand","quoteright","parenleft","parenright","asterisk","plus","comma","hyphen","period","slash","zero","one","two","three",
@@ -7997,7 +8002,8 @@ function create_psnames_module(library)
     psnames_mod.generic = null;
 
     return psnames_mod;
-}/******************************************************************************/
+}
+/******************************************************************************/
 // t1tables
 /******************************************************************************/
 function _isdigit(x)
@@ -12150,7 +12156,7 @@ function T1_FieldRec()
     this.location = 0;
     this.type = 0;
     this.reader = null;
-    this.offset = 0; // � ��� ��� ������ ������ ����� ������. � �� ����� � ������
+    this.offset = 0; // у нас это просто индекс члена класса. А не сдвиг в памяти
     this.size = 0;
     this.array_max = 0;
 
@@ -12169,8 +12175,8 @@ function create_dublicate_t1_field(_field)
     ret.location = _field.location;
     ret.type = _field.type;
     ret.reader = _field.reader;
-    ret.offset = _field.offset; // � ��� ��� ������ ������ � ������� (�.�. ��� �� ������� ��� ���� �� �����)
-    ret.size = _field.size;     // �� �������� (�� ������� �������)
+    ret.offset = _field.offset; // у нас это просто индекс в МАССИВЕ (т.е. для не массива это поле не нужно)
+    ret.size = _field.size;     // не пользуем (на будущее оставим)
     ret.array_max = _field.array_max;
 
     ret.count_offset = _field.count_offset;
@@ -12599,6 +12605,7 @@ function create_psaux_module(library)
 
     return psaux_mod;
 }
+
 /******************************************************************************/
 // bdf
 /******************************************************************************/
@@ -18129,6 +18136,7 @@ function create_sfnt_module(library)
     return sfnt_mod;
 }
 
+
 function CRasterMemory()
 {
     this.width = 0;
@@ -20554,7 +20562,8 @@ function ft_smooth_render_generic(render, slot, mode, origin, required_mode)
         FT_Outline_Translate(outline, -origin.x, -origin.y);
 
     return error;
-}var TT_Round_Off             = 5;
+}
+var TT_Round_Off             = 5;
 var TT_Round_To_Half_Grid    = 0;
 var TT_Round_To_Grid         = 1;
 var TT_Round_To_Double_Grid  = 2;
@@ -26997,7 +27006,8 @@ function CSubpixHintingHacks()
     // -----------------------------------------------------------------------
 }
 
-var global_SubpixHintingHacks = new CSubpixHintingHacks();/******************************************************************************/
+var global_SubpixHintingHacks = new CSubpixHintingHacks();
+/******************************************************************************/
 // classes
 /******************************************************************************/
 function TT_Size_Metrics()
@@ -28166,19 +28176,6 @@ function tt_done_blend(memory, blend)
 /******************************************************************************/
 // glyphloader
 /******************************************************************************/
-FT_Common.ARGS_ARE_WORDS         = 0x0001;
-FT_Common.ARGS_ARE_XY_VALUES     = 0x0002;
-FT_Common.ROUND_XY_TO_GRID       = 0x0004;
-FT_Common.WE_HAVE_A_SCALE        = 0x0008;
-FT_Common.MORE_COMPONENTS        = 0x0020;
-FT_Common.WE_HAVE_AN_XY_SCALE    = 0x0040;
-FT_Common.WE_HAVE_A_2X2          = 0x0080;
-FT_Common.WE_HAVE_INSTR          = 0x0100;
-FT_Common.USE_MY_METRICS         = 0x0200;
-FT_Common.OVERLAP_COMPOUND       = 0x0400;
-FT_Common.SCALED_COMPONENT_OFFSET   = 0x0800;
-FT_Common.UNSCALED_COMPONENT_OFFSET = 0x1000;
-
 function load_sbit_image(size, glyph, glyph_index, load_flags)
 {
     var metrics = new TT_SBit_MetricsRec();
@@ -28585,19 +28582,19 @@ function TT_Load_Composite_Glyph(loader)
         count_read += 4;
 
         count = 2;
-        if (subglyph.flags & FT_Common.ARGS_ARE_WORDS)
+        if (subglyph.flags & 1)
             count += 2;
-        if (subglyph.flags & FT_Common.WE_HAVE_A_SCALE)
+        if (subglyph.flags & 8)
             count += 2;
-        else if (subglyph.flags & FT_Common.WE_HAVE_AN_XY_SCALE)
+        else if (subglyph.flags & 64)
             count += 4;
-        else if (subglyph.flags & FT_Common.WE_HAVE_A_2X2)
+        else if (subglyph.flags & 128)
             count += 8;
 
         if (count_read + count > size_read)
             return 21;
 
-        if (subglyph.flags & FT_Common.ARGS_ARE_WORDS)
+        if (subglyph.flags & 1)
         {
             subglyph.arg1 = s.GetShort();
             subglyph.arg2 = s.GetShort();
@@ -28611,17 +28608,17 @@ function TT_Load_Composite_Glyph(loader)
         xx = yy = 0x10000;
         xy = yx = 0;
 
-        if (subglyph.flags & FT_Common.WE_HAVE_A_SCALE)
+        if (subglyph.flags & 8)
         {
             xx = s.GetShort() << 2;
             yy = xx;
         }
-        else if (subglyph.flags & FT_Common.WE_HAVE_AN_XY_SCALE)
+        else if (subglyph.flags & 64)
         {
             xx = s.GetShort() << 2;
             yy = s.GetShort() << 2;
         }
-        else if (subglyph.flags & FT_Common.WE_HAVE_A_2X2)
+        else if (subglyph.flags & 128)
         {
             xx = s.GetShort() << 2;
             yx = s.GetShort() << 2;
@@ -28638,7 +28635,7 @@ function TT_Load_Composite_Glyph(loader)
 
         count_read += count;
 
-    } while (subglyph.flags & FT_Common.MORE_COMPONENTS);
+    } while (subglyph.flags & 32);
 
     gloader.current.num_subglyphs = num_subglyphs;
 
@@ -28795,7 +28792,7 @@ function TT_Process_Composite_Component(loader, subglyph, start_point, num_base_
     var num_points = gloader.base.outline.n_points;
     var x, y;
 
-    var have_scale = (0 == (subglyph.flags & (FT_Common.WE_HAVE_A_SCALE | FT_Common.WE_HAVE_AN_XY_SCALE | FT_Common.WE_HAVE_A_2X2))) ? 0 : 1;
+    var have_scale = (0 == (subglyph.flags & (8 | 64 | 128))) ? 0 : 1;
 
     if (have_scale != 0)
     {
@@ -28803,7 +28800,7 @@ function TT_Process_Composite_Component(loader, subglyph, start_point, num_base_
             FT_Vector_Transform(base_vecs[i], subglyph.transform);
     }
 
-    if (0 == (subglyph.flags & FT_Common.ARGS_ARE_XY_VALUES))
+    if (0 == (subglyph.flags & 2))
     {
         var k = subglyph.arg1;
         var l = subglyph.arg2;
@@ -28826,7 +28823,7 @@ function TT_Process_Composite_Component(loader, subglyph, start_point, num_base_
         if (x == 0 && y == 0)
             return 0;
 
-        if (have_scale != 0 && 0 != (subglyph.flags & FT_Common.SCALED_COMPONENT_OFFSET))
+        if (have_scale != 0 && 0 != (subglyph.flags & 2048))
         {
             var mac_xscale = FT_SqrtFixed(FT_MulFix(subglyph.transform.xx, subglyph.transform.xx) +
                                             FT_MulFix(subglyph.transform.xy, subglyph.transform.xy));
@@ -28846,7 +28843,7 @@ function TT_Process_Composite_Component(loader, subglyph, start_point, num_base_
             x = FT_MulFix(x, x_scale);
             y = FT_MulFix(y, y_scale);
 
-            if (subglyph.flags & FT_Common.ROUND_XY_TO_GRID)
+            if (subglyph.flags & 4)
             {
                 x = FT_PIX_ROUND(x);
                 y = FT_PIX_ROUND(y);
@@ -29705,7 +29702,7 @@ function load_truetype_glyph(loader, glyph_index, recurse_count, header_only)
             var i = 0;
             for (; i < limit; ++i, ++subglyph )
             {
-                if (subglyph.flags & FT_Common.ARGS_ARE_XY_VALUES)
+                if (subglyph.flags & 2)
                 {
                     subglyph.arg1 += (deltas[i].x & 0xFFFF);
                     subglyph.arg2 += (deltas[i].y & 0xFFFF);
@@ -29788,7 +29785,7 @@ function load_truetype_glyph(loader, glyph_index, recurse_count, header_only)
 
         var bIsSubFlags = true;
         if (bIsSubFlags && face.driver.library.tt_hint_props.TT_USE_BYTECODE_INTERPRETER)
-            bIsSubFlags = ((subglyph.flags & FT_Common.WE_HAVE_INSTR) != 0);
+            bIsSubFlags = ((subglyph.flags & 256) != 0);
 
         if (((loader.load_flags & 2) == 0) && bIsSubFlags && num_points > start_point)
             TT_Process_Composite_Glyph(loader, start_point, start_contour);
@@ -30796,7 +30793,8 @@ function create_tt_driver(library)
 
     driver.clazz = new TT_Driver_Class();
     return driver;
-}/******************************************************************************/
+}
+/******************************************************************************/
 // cfftypes
 /******************************************************************************/
 function CFF_IndexRec()
@@ -36762,7 +36760,8 @@ function create_cff_driver(library)
     driver.memory = library.Memory;
 
     return driver;
-}/******************************************************************************/
+}
+/******************************************************************************/
 // afm
 /******************************************************************************/
 function T1_Done_Metrics(memory, fi)
@@ -40399,7 +40398,8 @@ function create_t1_driver(library)
 
     driver.clazz = new T1_Driver_Class();
     return driver;
-}var FT_Error = 0;
+}
+var FT_Error = 0;
 function FT_Library()
 {
     this.Memory = null;
@@ -40469,6 +40469,7 @@ function FT_Library()
             error = this.ft_add_renderer(module);
             if (0 != error)
             {
+                //delete module;
                 return error;
             }
         }
@@ -40617,7 +40618,7 @@ function FT_Library()
                 slot = null;
                 if (FT_Error != 0)
                 {
-					face = null;
+                    face = null;
                     return null;
                 }
 
@@ -40626,7 +40627,7 @@ function FT_Library()
                     var size = FT_New_Size(face);
                     if (FT_Error != 0)
                     {
-						face = null;
+                        face = null;
                         return null;
                     }
 
@@ -41705,3 +41706,4 @@ function FT_CMap_New(clazz, init_data, charmap)
 
     return cmap;
 }
+
