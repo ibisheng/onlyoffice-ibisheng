@@ -4104,6 +4104,7 @@ function CTableProp (tblProp)
         this.CellsVAlign = (undefined != tblProp.CellsVAlign) ? tblProp.CellsVAlign :c_oAscVertAlignJc.Top;
         this.AllowOverlap = (undefined != tblProp.AllowOverlap) ? tblProp.AllowOverlap : undefined;
         this.TableLayout  = tblProp.TableLayout;
+        this.CellsTextDirection = tblProp.CellsTextDirection;
         this.Locked = (undefined != tblProp.Locked) ? tblProp.Locked : false;
 	}
 	else
@@ -4184,6 +4185,8 @@ CTableProp.prototype.get_AllowOverlap = function() {return this.AllowOverlap;};
 CTableProp.prototype.put_AllowOverlap = function(v){this.AllowOverlap = v;};
 CTableProp.prototype.get_TableLayout = function() {return this.TableLayout;};
 CTableProp.prototype.put_TableLayout = function(v){this.TableLayout = v;};
+CTableProp.prototype.get_CellsTextDirection = function(){return this.CellsTextDirection;};
+CTableProp.prototype.put_CellsTextDirection = function(v){this.CellsTextDirection = v;};
 
 function CBorders (obj)
 {
