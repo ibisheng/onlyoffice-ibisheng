@@ -207,6 +207,9 @@ CSectionPr.prototype =
         {
             History.Add(this, { Type: historyitem_Section_PageSize_Size, Old: { W : this.PageSize.W, H : this.PageSize.H }, New: { W : W, H : H } });
 
+            H = Math.max(2.6, H);
+            W = Math.max(12.7, W);
+
             this.PageSize.W = W;
             this.PageSize.H = H;
         }
