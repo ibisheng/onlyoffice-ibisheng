@@ -11183,7 +11183,7 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 189 && false === editor.isViewMode ) // Клавиша Num-
         {
-            if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) && true === e.CtrlKey && true === e.ShiftKey)
+            if (true === e.CtrlKey && true === e.ShiftKey && false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true))
             {
                 this.Create_NewHistoryPoint(historydescription_Document_MinusButton);
 
