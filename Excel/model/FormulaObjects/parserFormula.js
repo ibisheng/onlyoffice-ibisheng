@@ -1427,7 +1427,7 @@ function cStrucTable( val, wb, ws, cell ) {
     this.constructor.call( this, val[0], cElementType.table );
     this.wb = wb;
     this.ws = ws;
-    this.tableName = val.tableName;
+    this.tableName = val['tableName'];
 	this.table = this.wb.getDefinesNames( this.tableName, this.ws ? this.ws.getId() : null );
     this.reservedColumn = null;
     this.tableData = null;
@@ -1561,7 +1561,7 @@ cStrucTable.prototype.changeArea = function ( offset ) {
     return this.area;
 };
 cStrucTable.prototype.createArea = function ( val, cell ) {
-    this.columnName  = val.columnName;
+    this.columnName  = val['columnName'];
 
     var paramObj = {param: null, startCol: null, endCol: null, cell: cell.bbox, includeColumnHeader:false};
 
@@ -1596,16 +1596,16 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
         return res;
     }
 
-    if ( val.oneColumn || val.columnRange ) {
+    if ( val['oneColumn'] || val['columnRange'] ) {
 
-        this.oneColumn = val.oneColumn;
-        this.columnRange = val.columnRange;
+        this.oneColumn = val['oneColumn'];
+        this.columnRange = val['columnRange'];
 
         paramObj.param = g_nFormulaTablePartInfo.columns;
-        if ( val.columnRange ) {
-            this.columnRange = val.columnRange;
-            paramObj.startCol = this.colStart = val.colStart.replace(/'#/g,"#");
-            paramObj.endCol = this.colEnd = val.colEnd.replace(/'#/g,"#");
+        if ( val['columnRange'] ) {
+            this.columnRange = val['columnRange'];
+            paramObj.startCol = this.colStart = val['colStart'].replace(/'#/g,"#");
+            paramObj.endCol = this.colEnd = val['colEnd'].replace(/'#/g,"#");
 			if( !this.colEnd )
 				this.colEnd = this.colStart;
 
@@ -1616,7 +1616,7 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 			}
         }
         else {
-            paramObj.startCol = this.oneColumn = val.oneColumn.replace(/'#/g,"#");
+            paramObj.startCol = this.oneColumn = val['oneColumn'].replace(/'#/g,"#");
 			this.oneColumnIndex = this.wb.getTableIndexColumnByName( this.tableName, this.oneColumn );
 			if( !this.oneColumnIndex ){
 				return new cError( cErrorType.bad_reference );
@@ -1634,8 +1634,8 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
             new cRef3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb ):
             new cArea3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb );
     }
-    else if ( val.reservedColumn || !val.columnName ) {
-		this.reservedColumn = val.reservedColumn || "";
+    else if ( val['reservedColumn'] || !val['columnName'] ) {
+		this.reservedColumn = val['reservedColumn'] || "";
 		this.reservedColumnIndex = paramObj.param = getColumnType( this.reservedColumn );
 
         this.tableData = this.wb.getTableRangeForFormula( this.tableName, paramObj );
@@ -1648,11 +1648,11 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
             new cRef3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb ):
             new cArea3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb );
     }
-    else if ( val.hdtcc ) {
-        this.hdt = val.hdt;
+    else if ( val['hdtcc'] ) {
+        this.hdt = val['hdt'];
 		this.hdtIndexes = [];
-		this.hdtcstart = val.hdtcstart;
-        this.hdtcend = val.hdtcend;
+		this.hdtcstart = val['hdtcstart'];
+        this.hdtcend = val['hdtcend'];
         var re = /\[(.*?)\]/ig, m, data, range;
         while ( null !== (m = re.exec( this.hdt )) ) {
             paramObj.param = getColumnType( m[1] );
