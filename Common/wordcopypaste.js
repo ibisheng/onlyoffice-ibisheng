@@ -3864,7 +3864,10 @@ PasteProcessor.prototype =
 				}
 				else if(base64FromExcel)//вставляем в презентации из таблиц
 				{	
+					History.TurnOff();
 					var excelContent = this._readFromBinaryExcel(base64FromExcel);
+					History.TurnOn();
+					
 					var aContentExcel = excelContent.workbook;
 					var aPastedImages = excelContent.arrImages;
 					
@@ -3882,17 +3885,6 @@ PasteProcessor.prototype =
 						
                         var aContent = {aPastedImages: aPastedImages, images: aImagesToDownload};
 						
-						for(var i = 0; i < arr_shapes.length; ++i)
-						{
-							shape = arr_shapes[i].graphicObject;
-							
-							shape.worksheet = null;
-							shape.drawingBase = null;
-							
-							arr_shapes[i] = new DrawingCopyObject(shape, 0, 0, 0, 0);
-						}
-						
-						
 						//var arrTransforms = objects.arrTransforms;
 						var presentation = editor.WordControl.m_oLogicDocument;
 						oThis = this;
@@ -3902,6 +3894,16 @@ PasteProcessor.prototype =
 						{
 							if(false == oThis.bNested)
 							{
+								for(var i = 0; i < arr_shapes.length; ++i)
+								{
+									shape = arr_shapes[i].graphicObject.copy();
+									
+									shape.worksheet = null;
+									shape.drawingBase = null;
+									
+									arr_shapes[i] = new DrawingCopyObject(shape, 0, 0, 0, 0);
+								}
+								
 								var presentationSelectedContent = new PresentationSelectedContent();
 								presentationSelectedContent.Drawings = arr_shapes;
 						
@@ -3930,8 +3932,11 @@ PasteProcessor.prototype =
 						{
                             sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
                                 var oImageMap = {};
+								
+								History.TurnOff();
                                 ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
                                 oThis.api.pre_Paste(fonts, oImageMap, paste_callback);
+								History.TurnOn();
                             });
 						}
 						else
