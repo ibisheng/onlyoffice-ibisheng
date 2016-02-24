@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+
+    <title>FontEngine</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=IE8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    
+	<script type="text/javascript" src="../Freetype/config.js"></script>
+	<script type="text/javascript" src="../Freetype/base.js"></script>
+	<script type="text/javascript" src="../Freetype/services.js"></script>
+	
+	<script type="text/javascript" src="../Freetype/modules/psaux.js"></script>
+	<script type="text/javascript" src="../Freetype/modules/psnames.js"></script>
+	<script type="text/javascript" src="../Freetype/modules/render.js"></script>
+	<script type="text/javascript" src="../Freetype/modules/sfnt.js"></script>	
+	
+	<script type="text/javascript" src="../Freetype/drivers/truetype.js"></script>
+	<script type="text/javascript" src="../Freetype/drivers/cff.js"></script>
+	<script type="text/javascript" src="../Freetype/drivers/cid.js"></script>
+	<script type="text/javascript" src="../Freetype/drivers/t1.js"></script>
+	<script type="text/javascript" src="../Freetype/drivers/ttinterp.js"></script>
+	
+	<script type="text/javascript" src="../Freetype/freetype.js"></script>
+	
+</head>
+<body>
+	
+	<input type="file" id="input" multiple onchange="handleFiles(this.files)" />
+
+	<script>
+	
+	function LoadFont(_array_buffer)
+	{
+		console.log(_array_buffer.length);
+	}
+	
+	function handleFiles(_files)
+	{
+		var reader = new FileReader();
+		reader.onload = (function() { return function(e) { 
+			LoadFont(new Uint8Array(e.target.result)); 
+			}; 
+		})();
+		reader.readAsArrayBuffer(_files[0]);
+	}
+
+	</script>
+    	
+</body>
+</html>
