@@ -95,35 +95,6 @@
 		_log += _br;
     }
 	
-	/*
-    for (var i in FT_Common)
-    {
-		if (true === FT_Common[i])
-		{
-			_log += _correct("_vec1.push_back(L\"FT_Common." + i + "\"); ");
-			_log += _correct("_vec2.push_back(L\"true\");");
-			_log += _br;
-		}
-		else if (false === FT_Common[i])
-		{
-			_log += _correct("_vec1.push_back(L\"FT_Common." + i + "\"); ");
-			_log += _correct("_vec2.push_back(L\"false\");");
-			_log += _br;
-		}
-		else
-		{	
-			var tof = typeof FT_Common[i];
-
-			if (tof == "number")
-			{
-				_log += _correct("_vec1.push_back(L\"FT_Common." + i + "\"); ");
-				_log += _correct("_vec2.push_back(L\"" + FT_Common[i] + "\");");
-				_log += _br;
-			}
-		}
-    }
-	*/
-	
 	document.getElementById("log").innerHTML = _log;
 
 	</script>
