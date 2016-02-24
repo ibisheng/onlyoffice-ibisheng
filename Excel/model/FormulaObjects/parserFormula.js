@@ -1568,23 +1568,23 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
     function getColumnType( value ) {
         var res;
         switch ( value.toLowerCase() ) {
-            case "#"+cStrucTableLocalColumns.a.toLocaleLowerCase():
+            case "#"+cStrucTableLocalColumns['a'].toLocaleLowerCase():
             case cStrucTableReservedWords.all.toLocaleLowerCase():
                 res = g_nFormulaTablePartInfo.all;
                 break;
-			case "#"+cStrucTableLocalColumns.d.toLocaleLowerCase():
+			case "#"+cStrucTableLocalColumns['d'].toLocaleLowerCase():
             case cStrucTableReservedWords.data.toLocaleLowerCase():
                 res = g_nFormulaTablePartInfo.data;
                 break;
-			case "#"+cStrucTableLocalColumns.h.toLocaleLowerCase():
+			case "#"+cStrucTableLocalColumns['h'].toLocaleLowerCase():
             case cStrucTableReservedWords.headers.toLocaleLowerCase():
                 res = g_nFormulaTablePartInfo.headers;
                 break;
-			case "#"+cStrucTableLocalColumns.t.toLocaleLowerCase():
+			case "#"+cStrucTableLocalColumns['t'].toLocaleLowerCase():
             case cStrucTableReservedWords.totals.toLocaleLowerCase():
                 res = g_nFormulaTablePartInfo.totals;
                 break;
-			case "#"+cStrucTableLocalColumns.tr.toLocaleLowerCase():
+			case "#"+cStrucTableLocalColumns['tr'].toLocaleLowerCase():
             case cStrucTableReservedWords.at.toLocaleLowerCase():
             case cStrucTableReservedWords.thisrow.toLocaleLowerCase():
                 res = g_nFormulaTablePartInfo.thisRow;
@@ -1726,31 +1726,31 @@ cStrucTable.prototype.buildLocalTableString = function (reservedColumn,local) {
 	switch(reservedColumn){
 		case g_nFormulaTablePartInfo.all:{
 			if(local)
-				return "#"+cStrucTableLocalColumns.a;
+				return "#"+cStrucTableLocalColumns['a'];
 			return cStrucTableReservedWords.all;
 			break;
 		}
 		case g_nFormulaTablePartInfo.data:{
 			if(local)
-				return "#"+cStrucTableLocalColumns.d;
+				return "#"+cStrucTableLocalColumns['d'];
 			return cStrucTableReservedWords.data;
 			break;
 		}
 		case g_nFormulaTablePartInfo.headers:{
 			if(local)
-				return "#"+cStrucTableLocalColumns.h;
+				return "#"+cStrucTableLocalColumns['h'];
 			return cStrucTableReservedWords.headers;
 			break;
 		}
 		case g_nFormulaTablePartInfo.totals:{
 			if(local)
-				return "#"+cStrucTableLocalColumns.t;
+				return "#"+cStrucTableLocalColumns['t'];
 			return cStrucTableReservedWords.totals;
 			break;
 		}
 		case g_nFormulaTablePartInfo.thisRow:{
 			if(local)
-				return "#"+cStrucTableLocalColumns.tr;
+				return "#"+cStrucTableLocalColumns['tr'];
 			return cStrucTableReservedWords.thisrow;
 			break;
 		}
