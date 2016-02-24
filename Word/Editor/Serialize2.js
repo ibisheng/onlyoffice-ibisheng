@@ -5944,7 +5944,7 @@ function BinaryStyleTableReader(doc, oReadResult, stream)
             res = this.bcr.Read2(length, function(t, l){
                 return oThis.btblPrr.Read_CellPr(t,l, oNewTableCellPr);
             });
-            style.Set_TableRowPr(oNewTableCellPr);
+            style.Set_TableCellPr(oNewTableCellPr);
 		}
 		else if(c_oSer_sts.Style_TblStylePr == type)
         {
