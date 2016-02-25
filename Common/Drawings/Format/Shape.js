@@ -3910,14 +3910,17 @@ CShape.prototype =
             var oColorMap = this.Get_ColorMap();
             if(!this.bWordShape && (!this.txBody.content || this.txBody.content.Is_Empty()) && this.txBody.content2 != null && !this.txBody.checkCurrentPlaceholder() && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false))
             {
-                if(editor && editor.ShowParaMarks)
-                {
-                    this.txWarpStructParamarks2.draw(graphics, this.transformTextWordArt2, oTheme, oColorMap);
-                }
-                else
-                {
-                    this.txWarpStruct2.draw(graphics, this.transformTextWordArt2, oTheme, oColorMap);
-                }
+				if (graphics.IsNoDrawingEmptyPlaceholder !== true && graphics.IsNoDrawingEmptyPlaceholderText !== true)
+				{
+					if(editor && editor.ShowParaMarks)
+					{
+						this.txWarpStructParamarks2.draw(graphics, this.transformTextWordArt2, oTheme, oColorMap);
+					}
+					else
+					{
+						this.txWarpStruct2.draw(graphics, this.transformTextWordArt2, oTheme, oColorMap);
+					}
+				}
             }
             else
             {
