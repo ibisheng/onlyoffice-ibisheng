@@ -1315,8 +1315,8 @@ CAbstractNum.prototype =
         {
             var Lvl = this.Lvl[Index];
 
-            if ( undefined != Lvl.TextPr && undefined != Lvl.TextPr.FontFamily )
-                AllFonts[Lvl.TextPr.FontFamily.Name] = true;
+            if (undefined !== Lvl.TextPr && Lvl.TextPr.Document_Get_AllFontNames)
+                Lvl.TextPr.Document_Get_AllFontNames(AllFonts);
         }
     },
 
