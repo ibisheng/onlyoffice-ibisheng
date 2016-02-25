@@ -57,7 +57,7 @@ AscBrowser.isMobile = /android|avantgo|blackberry|blazer|compal|elaine|fennec|hi
 AscBrowser.isGecko = (AscBrowser.userAgent.indexOf("gecko/") > -1);
 
 // opera detect
-AscBrowser.isOpera = !!window.opera;
+AscBrowser.isOpera = (!!window.opera || AscBrowser.userAgent.indexOf("opr/") > -1);
 
 // webkit detect
 AscBrowser.isWebkit = !AscBrowser.isIE && (AscBrowser.userAgent.indexOf("webkit") > -1);
@@ -71,7 +71,7 @@ AscBrowser.zoom = 1;
 
 AscBrowser.checkZoom = function()
 {
-    if (AscBrowser.isChrome && document && document.firstElementChild && document.body)
+    if (AscBrowser.isChrome && !AscBrowser.isOpera && document && document.firstElementChild && document.body)
     {
         document.firstElementChild.style.zoom = "reset";
         AscBrowser.zoom = document.body.clientWidth / window.innerWidth;
