@@ -4212,7 +4212,7 @@ parserFormula.prototype = {
                         pos = {start: this.pCurrPos - this.operand_str.length - 1, end: this.pCurrPos, index: this.outStack.length};
 
                     if ( !(wsF && wsT) ) {
-                        this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
+                        this.error.push( c_oAscError.ID.FrmlWrongReferences );
                         this.outStack = [];
                         this.elemArr = [];
                         return false;

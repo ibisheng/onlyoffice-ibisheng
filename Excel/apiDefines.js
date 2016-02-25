@@ -46,6 +46,7 @@ var c_oAscError = {
     FrmlWrongArgumentRange: -36,
     FrmlOperandExpected: -37,
     FrmlParenthesesCorrectCount: -38,
+    FrmlWrongReferences: -39,
 
     InvalidReferenceOrName: -40,
     LockCreateDefName: -41,
