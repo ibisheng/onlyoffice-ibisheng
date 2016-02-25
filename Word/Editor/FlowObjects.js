@@ -142,6 +142,12 @@ CFlowTable.prototype =
             }
             case WRAPPING_TYPE_TOP_AND_BOTTOM:
             {
+                var L = this.X - getValOrDefault(this.Distance.L, DISTANCE_TO_TEXT_LEFTRIGHT);
+                var R = this.X + this.W + getValOrDefault(this.Distance.R, DISTANCE_TO_TEXT_LEFTRIGHT);
+
+                if (R < LeftField || L > RightField)
+                    return ret;
+
                 X0 = x0;
                 X1 = x1;
                 Y1 = bottom;

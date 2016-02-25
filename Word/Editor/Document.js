@@ -1435,6 +1435,31 @@ CDocument.prototype =
         return { X : X, Y : Y, XLimit : XLimit, YLimit : YLimit };
     },
 
+    Get_ColumnFields : function(ElementIndex, ColumnIndex)
+    {
+        var SectPr = this.SectionsInfo.Get_SectPr(ElementIndex).SectPr;
+
+        var Y      = SectPr.Get_PageMargin_Top();
+        var YLimit = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom();
+        var X      = SectPr.Get_PageMargin_Left();
+        var XLimit = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
+
+        var ColumnsCount = SectPr.Get_ColumnsCount();
+        if (ColumnIndex >= ColumnsCount)
+            ColumnIndex = ColumnsCount - 1;
+
+        for (var ColIndex = 0; ColIndex < ColumnIndex; ++ColIndex)
+        {
+            X += SectPr.Get_ColumnWidth(ColIndex);
+            X += SectPr.Get_ColumnSpace(ColIndex);
+        }
+
+        if (ColumnsCount - 1 !== ColumnIndex)
+            XLimit = X + SectPr.Get_ColumnWidth(ColumnIndex);
+
+        return {X: X, XLimit: XLimit};
+    },
+
     Get_Theme : function()
     {
         return this.theme;
@@ -3131,6 +3156,9 @@ CDocument.prototype =
                 var ColumnStartPos = Column.Pos;
                 var ColumnEndPos   = Column.EndPos;
 
+                // Плавающие объекты не должны попадать в клип колонок
+                var FlowElements = [];
+
                 if (ColumnsCount > 1)
                 {
                     pGraphics.SaveGrState();
@@ -3142,13 +3170,27 @@ CDocument.prototype =
 
                 for (var ContentPos = ColumnStartPos; ContentPos <= ColumnEndPos; ++ContentPos)
                 {
-                    var ElementPageIndex = this.private_GetElementPageIndex(ContentPos, nPageIndex, ColumnIndex, ColumnsCount);
-                    this.Content[ContentPos].Draw(ElementPageIndex, pGraphics);
+                    if (true === this.Content[ContentPos].Is_Inline())
+                    {
+                        var ElementPageIndex = this.private_GetElementPageIndex(ContentPos, nPageIndex, ColumnIndex, ColumnsCount);
+                        this.Content[ContentPos].Draw(ElementPageIndex, pGraphics);
+                    }
+                    else
+                    {
+                        FlowElements.push(ContentPos);
+                    }
                 }
 
                 if (ColumnsCount > 1)
                 {
                     pGraphics.RestoreGrState();
+                }
+
+                for (var FlowPos = 0, FlowsCount = FlowElements.length; FlowPos < FlowsCount; ++FlowPos)
+                {
+                    var ContentPos = FlowElements[FlowPos];
+                    var ElementPageIndex = this.private_GetElementPageIndex(ContentPos, nPageIndex, ColumnIndex, ColumnsCount);
+                    this.Content[ContentPos].Draw(ElementPageIndex, pGraphics);
                 }
             }
         }

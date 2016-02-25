@@ -1346,7 +1346,7 @@ Paragraph.prototype.private_RecalculateLineCheckRanges = function(CurLine, CurPa
     else
         Left = false === PRS.UseFirstLine ? this.Pages[CurPage].X + ParaPr.Ind.Left : this.Pages[CurPage].X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
 
-    var PageFields = this.Parent.Get_PageFields(this.private_GetRelativePageIndex(CurPage));
+    var PageFields = this.Parent.Get_ColumnFields ? this.Parent.Get_ColumnFields(this.Get_Index(), this.Get_AbsoluteColumn(CurPage)) : this.Parent.Get_PageFields(this.private_GetRelativePageIndex(CurPage));
 
     var Ranges = PRS.Ranges;
     var Ranges2;
