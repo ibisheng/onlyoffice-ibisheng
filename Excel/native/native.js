@@ -4558,11 +4558,18 @@ function offline_cell_editor_draw(width, height, ratio) {
         wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight,
         cellEditor.textRender.chars.length];
 }
-function offline_cell_editor_open(x, y, width, height, ratio, isSelectAll, isFormulaInsertMode)  {
+function offline_cell_editor_open(x, y, width, height, ratio, isSelectAll, isFormulaInsertMode, c1, r1, c2, r2)  {
     _null_object.width = width * ratio;
     _null_object.height = height * ratio;
 
     var wb = _api.wb;
+    var ws = _api.wb.getWorksheet();
+
+    var range =  ws.visibleRange.clone();
+    ws.visibleRange.c1 = c1;
+    ws.visibleRange.r1 = r1;
+    ws.visibleRange.c2 = c2;
+    ws.visibleRange.r2 = r2;
 
     wb.cellEditor.isSelectAll = isSelectAll;
     if (! isFormulaInsertMode) {
@@ -4570,6 +4577,8 @@ function offline_cell_editor_open(x, y, width, height, ratio, isSelectAll, isFor
     } else {
        // wb.cellEditor._draw();
     }
+
+    ws.visibleRange = range;
 }
 
 function offline_cell_editor_process_input_commands(commands, width, height, ratio) {
@@ -5039,22 +5048,52 @@ function offline_delete() {
 
     return stream;
 }
-function offline_calculate_visible_range(x, y, w, h) {
+function offline_calculate_range(x, y, w, h) {
 
-    var worksheet = _api.wb.getWorksheet();
-    var range = _s._updateRegion(worksheet, x, y, w, h);
+    var ws = _api.wb.getWorksheet();
+    var range = _s._updateRegion(ws, x, y, w, h);
 
-    worksheet.visibleRange.c1 = range.columnBeg < 0 ? 0 : range.columnBeg;
-    worksheet.visibleRange.r1 = range.rowBeg < 0 ? 0 : range.rowBeg;
-    worksheet.visibleRange.c2 = range.columnEnd < 0 ? 0 : range.columnEnd;
-    worksheet.visibleRange.r2 = range.rowEnd < 0 ? 0 : range.rowEnd;
+    range.c1 = range.columnBeg < 0 ? 0 : range.columnBeg;
+    range.r1 = range.rowBeg < 0 ? 0 : range.rowBeg;
+    range.c2 = range.columnEnd < 0 ? 0 : range.columnEnd;
+    range.r2 = range.rowEnd < 0 ? 0 : range.rowEnd;
 
-    return [worksheet.visibleRange.c1, worksheet.visibleRange.r1, worksheet.visibleRange.c2, worksheet.visibleRange.r2,
-        worksheet.cols[worksheet.visibleRange.c1].left,
-        worksheet.rows[worksheet.visibleRange.r1].top,
-        worksheet.cols[worksheet.visibleRange.c1].width,
-        worksheet.rows[worksheet.visibleRange.r1].height
-    ];
+    return [1, range.c1, range.c2, range.r1, range.r2,
+        ws.cols[range.c1].left,
+        ws.rows[range.r1].top,
+        ws.cols[range.c2].left + ws.cols[range.c2].width,
+        ws.rows[range.r2].top  + ws.rows[range.r1].height];
+}
+
+function offline_calculate_complete_range(x, y, w, h) {
+
+    var ws = _api.wb.getWorksheet();
+    var range = _s._updateRegion(ws, x, y, w, h);
+
+    range.c1 = range.columnBeg < 0 ? 0 : range.columnBeg;
+    range.r1 = range.rowBeg < 0 ? 0 : range.rowBeg;
+    range.c2 = range.columnEnd < 0 ? 0 : range.columnEnd;
+    range.r2 = range.rowEnd < 0 ? 0 : range.rowEnd;
+
+    var nativeToEditor = 1.0 / deviceScale * (72.0 / 96.0);
+    w = ( x + w ) * nativeToEditor + ws.headersWidth;
+    h = ( y + h ) * nativeToEditor + ws.headersHeight;
+    x = x * nativeToEditor + ws.headersWidth;
+    y = y * nativeToEditor + ws.headersHeight;
+
+    if (ws.cols[range.c2].left + ws.cols[range.c2].width > w) {
+        range.c2--;
+    }
+
+    if (ws.rows[range.r2].top  + ws.rows[range.r1].height > h) {
+        range.r2--;
+    }
+
+    return [1, range.c1, range.c2, range.r1, range.r2,
+        ws.cols[range.c1].left,
+        ws.rows[range.r1].top,
+        ws.cols[range.c2].left + ws.cols[range.c2].width,
+        ws.rows[range.r2].top  + ws.rows[range.r1].height];
 }
 
 function offline_apply_event(type,params) {
@@ -5904,6 +5943,79 @@ function offline_apply_event(type,params) {
             _return = _stream;
             break;
         }
+
+        case 6000: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_CLEAR_ALL:
+        {
+            _api.asc_emptyCells(c_oAscCleanOptions.All);
+            break;
+        }
+
+        case 6010: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_CLEAR_TEXT
+        {
+            _api.asc_emptyCells(c_oAscCleanOptions.Text);
+            break;
+        }
+
+        case 6020: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_CLEAR_FORMAT
+        {
+            _api.asc_emptyCells(c_oAscCleanOptions.Format);
+            break;
+        }
+
+        case 6030: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_CLEAR_COMMENTS
+        {
+            _api.asc_emptyCells(c_oAscCleanOptions.Comments);
+            break;
+        }
+
+        case 6040: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_CLEAR_HYPERLINKS
+        {
+            _api.asc_emptyCells(c_oAscCleanOptions.Hyperlinks);
+            break;
+        }
+
+        case 6050: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_INSERT_LEFT
+        {
+            _api.asc_insertCells(c_oAscInsertOptions.InsertColumns);
+            break;
+        }
+
+        case 6060: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_INSERT_TOP
+        {
+            _api.asc_insertCells(c_oAscInsertOptions.InsertRows);
+            break;
+        }
+
+        case 6070: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_DELETE_COLUMNES
+        {
+            _api.asc_deleteCells(c_oAscDeleteOptions.DeleteColumns);
+            break;
+        }
+
+        case 6080: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_DELETE_ROWS
+        {
+            _api.asc_deleteCells(c_oAscDeleteOptions.DeleteRows);
+            break;
+        }
+
+        case 6090: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_SHOW_COLUMNES
+        {
+            (0 != params) ? _api.asc_showColumns() : _api.asc_hideColumns();
+            break;
+        }
+
+        case 6100: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_SHOW_ROWS
+        {
+            (0 != params) ? _api.asc_showRows() : _api.asc_hideRows();
+            break;
+        }
+
+        case 6190: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_FREEZE_PANES
+        {
+
+            break;
+        }
+
         default:
             break;
     }
