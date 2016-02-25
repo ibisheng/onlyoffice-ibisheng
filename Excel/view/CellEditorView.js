@@ -884,6 +884,7 @@
 
 				if ( ret ) {
 					range = t._parseRangeStr( r.oper.value );
+					if(!range) return false;
 					range.cursorePos = offset - (_e - _s) + 1;
 					range.formulaRangeLength = _e - _s;
 					t.handlers.trigger( "newRange", range, wsName );

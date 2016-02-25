@@ -4255,7 +4255,7 @@ parserFormula.prototype = {
                     this.countRef++;
                 }
                 /* Referens to cell A4 */
-                else if ( parserHelp.isRef.call( this, this.Formula, this.pCurrPos, true ) ) {
+                else if ( parserHelp.isRef.call( this, this.Formula, this.pCurrPos ) ) {
                     found_operand = new cRef( this.operand_str.toUpperCase(), this.ws );
                     this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length, oper:found_operand } );
                     if ( this.operand_str.indexOf( "$" ) > -1 ) {
