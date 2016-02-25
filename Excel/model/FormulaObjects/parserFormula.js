@@ -15,7 +15,8 @@ var cElementType = {
 		array       : 11,
 		cell3D      : 12,
 		cellsRange3D: 13,
-		table       : 14
+		table       : 14,
+		name3D      : 15
 	},
 /** @enum */
 	cErrorType = {
@@ -1759,7 +1760,7 @@ cStrucTable.prototype.buildLocalTableString = function (reservedColumn,local) {
 
 /** @constructor */
 function cName3D( val, wsFrom, wb, ws ) {
-    this.constructor.call( this, wsFrom + "!" + val, cElementType.name );
+    this.constructor.call( this, wsFrom + "!" + val, cElementType.name3D );
     this.regSpace = /\$/g;
     this.wb = wb;
     this.ws = ws;
