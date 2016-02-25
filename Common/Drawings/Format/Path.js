@@ -1009,7 +1009,7 @@ Path.prototype = {
         var _graphics   = shape_drawer.Graphics;
         var _full_trans = _graphics.m_oFullTransform;
 
-        if (!_graphics || !_full_trans || undefined == _graphics.m_bIntegerGrid)
+        if (!_graphics || !_full_trans || undefined == _graphics.m_bIntegerGrid || true === shape_drawer.bIsNoSmartAttack)
             return this.draw(shape_drawer);
 
         var bIsTransformed = (_full_trans.shx == 0 && _full_trans.shy == 0) ? false : true;

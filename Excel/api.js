@@ -97,6 +97,7 @@ var editor;
     this.formulasList = getFormulasInfo();
     // ToDo нужно ли это
     asc['editor'] = ( asc['editor'] || this );
+    AscBrowser.checkZoom();
   };
 
   spreadsheet_api.prototype.asc_CheckGuiControlColors = function() {

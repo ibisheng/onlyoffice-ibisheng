@@ -192,8 +192,10 @@ CChartsDrawer.prototype =
 				}
                 this.gridChart.draw(this);
 			}
-			
+
+			this.cShapeDrawer.bIsNoSmartAttack = true;
 			this.chart.draw(this);
+			this.cShapeDrawer.bIsNoSmartAttack = false;
 			
 			if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
 			{
