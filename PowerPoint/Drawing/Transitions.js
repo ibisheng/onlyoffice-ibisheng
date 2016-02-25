@@ -2818,6 +2818,13 @@ function CDemonstrationManager(htmlpage)
         }
     }
 
+    this.CorrectSlideNum = function()
+    {
+        this.SlidesCount = this.HtmlPage.m_oDrawingDocument.SlidesCount;
+        if (this.SlideNum > this.SlidesCount)
+            this.SlideNum = this.SlidesCount;
+    }
+
     this.Start = function(main_div_id, start_slide_num, is_play_mode)
     {
         this.SlidesCount = this.HtmlPage.m_oDrawingDocument.SlidesCount;
@@ -3090,6 +3097,8 @@ function CDemonstrationManager(htmlpage)
         if (!this.Mode)
             return;
 
+        this.CorrectSlideNum();
+
         var _is_transition = this.Transition.IsPlaying();
         if (!_is_transition)
             this.SlideNum++;
@@ -3110,6 +3119,8 @@ function CDemonstrationManager(htmlpage)
 
         if (0 != this.SlideNum)
         {
+            this.CorrectSlideNum();
+
             // TODO: backward transition
             this.StartSlideBackward();
             this.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(this.SlideNum);
@@ -3120,6 +3131,8 @@ function CDemonstrationManager(htmlpage)
     {
         if (!this.Mode)
             return;
+
+        this.CorrectSlideNum();
 
         if ((slideNum == this.SlideNum) || (slideNum < 0) || (slideNum >= this.SlidesCount))
             return;
@@ -3201,6 +3214,8 @@ function CDemonstrationManager(htmlpage)
     this.onMouseUp = function(e)
     {
         // next slide
+        oThis.CorrectSlideNum();
+
         var _is_transition = oThis.Transition.IsPlaying();
         if (_is_transition)
         {
