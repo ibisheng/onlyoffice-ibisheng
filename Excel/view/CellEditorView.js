@@ -308,7 +308,7 @@
 	CellEditor.prototype.close = function ( saveValue ) {
 		var opt = this.options, ret;
 
-		if ( saveValue && "function" === typeof opt.saveValueCallback ) {
+		if ( saveValue && "function" === typeof opt.saveValueCallback && 0 < this.undoList.length ) {
 			// Делаем замену текста на автодополнение, если есть select и текст полностью совпал.
 			if ( this.selectionBegin !== this.selectionEnd && !this.isFormula() ) {
 				var s = this._getFragmentsText( this.options.fragments );
