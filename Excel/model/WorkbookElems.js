@@ -4570,7 +4570,7 @@ TablePart.prototype.getTableIndexColumnByName = function(name)
 TablePart.prototype.getTableNameColumnByIndex = function(index)
 {
 	var res = null;
-	if(name === null || name === undefined || !this.TableColumns)
+	if(index === null || index === undefined || !this.TableColumns)
 		return res;
 		
 	for(var i = 0; i < this.TableColumns.length; i++)
