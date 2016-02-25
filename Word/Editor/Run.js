@@ -10266,7 +10266,12 @@ ParaRun.prototype.IsEqArray = function()
 };
 ParaRun.prototype.IsForcedBreak = function()
 {
-    return false == this.ParaMath.Is_Inline() && true == this.MathPrp.IsBreak();
+    var bForcedBreak = false;
+
+    if(this.ParaMath!== null)
+        bForcedBreak = false == this.ParaMath.Is_Inline() && true == this.MathPrp.IsBreak();
+
+    return bForcedBreak;
 };
 ParaRun.prototype.Is_StartForcedBreakOperator = function()
 {
