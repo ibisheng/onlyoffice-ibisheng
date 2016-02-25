@@ -175,7 +175,7 @@
     // Флаг о подписке на эвенты о смене позиции документа (скролл) для меню
     this.isDocumentPlaceChangedEnabled = false;
     // Константы для подстановке формулы (что не нужно добавлять скобки)
-    this.arrExcludeFormulas = ['TRUE', 'FALSE'];
+    this.arrExcludeFormulas = [cBoolLocal["t"].toUpperCase(), cBoolLocal["f"].toUpperCase()];
 
     // Максимальная ширина числа из 0,1,2...,9, померенная в нормальном шрифте(дефалтовый для книги) в px(целое)
     // Ecma-376 Office Open XML Part 1, пункт 18.3.1.13

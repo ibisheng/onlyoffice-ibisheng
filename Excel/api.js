@@ -423,7 +423,7 @@ var editor;
   spreadsheet_api.prototype.asc_setLocale = function(val) {
     g_oDefaultCultureInfo = g_aCultureInfos[val];
     parserHelp.setDigitSeparator( g_oDefaultCultureInfo.NumberDecimalSeparator );
-    if (this.wbModel) {
+	  if (this.wbModel) {
       oGeneralEditFormatCache.cleanCache();
       oNumFormatCache.cleanCache();
       this.wbModel.rebuildColors();
@@ -3043,7 +3043,7 @@ var editor;
         cFormulaFunctionToLocale[i] = localName;
       }
     }
-	  build_rx_table_local(oLocalizedData?oLocalizedData["StructureTables"]:null);
+	  build_local_rx(oLocalizedData?oLocalizedData["LocalFormulaOperands"]:null);
     if (this.wb) {
       this.wb.initFormulasList();
     }

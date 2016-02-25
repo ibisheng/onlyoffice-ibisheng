@@ -2853,7 +2853,7 @@ CCellValue.prototype =
 		if(null != this.number)
 		{
 			if(CellValueType.Bool == this.type)
-				sResult = this.number == 1 ? "TRUE" : "FALSE";
+				sResult = this.number == 1 ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase();
 			else
 				sResult = this.number.toString();
 		}
@@ -2989,7 +2989,7 @@ CCellValue.prototype =
 			else if(CellValueType.Bool == this.type)
 			{
 				if(null != this.number)
-					sText = (0 != this.number) ? "TRUE" : "FALSE";
+					sText = (0 != this.number) ? cBoolLocal["t"].toUpperCase(): cBoolLocal["f"].toUpperCase();
 			}
 			else if(CellValueType.Error == this.type)
 			{
@@ -3038,7 +3038,7 @@ CCellValue.prototype =
 				if(null != this.text || null != this.number)
 				{
 					if (CellValueType.Bool == this.type && null != this.number)
-						oValueText = (this.number == 1) ? "TRUE" : "FALSE";
+						oValueText = (this.number == 1) ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase();
 					else
 					{
 						if(null != this.text)
@@ -3215,10 +3215,10 @@ CCellValue.prototype =
 			else
 			{
 				var sUpText = val.toUpperCase();
-				if("TRUE" == sUpText || "FALSE" == sUpText)
+				if(cBoolLocal["t"].toUpperCase() == sUpText || cBoolLocal["f"].toUpperCase() == sUpText)
 				{
 					this.type = CellValueType.Bool;
-					this.number = ("TRUE" == sUpText) ? 1 : 0;
+					this.number = (cBoolLocal["t"].toUpperCase() == sUpText) ? 1 : 0;
 				}
 				else if("#NULL!" == sUpText || "#DIV/0!" == sUpText || "#NAME?" == sUpText || "#NUM!" == sUpText ||
 					"#N/A" == sUpText || "#REF!" == sUpText || "#VALUE!" == sUpText)

@@ -16,7 +16,7 @@ var cElementType = {
 		cell3D      : 12,
 		cellsRange3D: 13,
 		table       : 14,
-		name3D      : 15
+		name3D       : 15
 	},
 /** @enum */
 	cErrorType = {
@@ -379,7 +379,7 @@ cString.prototype.tocNumber = function () {
 cString.prototype.tocBool = function () {
     var res;
     if ( parserHelp.isBoolean( this.value, 0 ) ) {
-        res = new cBool( parserHelp.operand_str === "TRUE" );
+        res = new cBool( parserHelp.operand_str.toUpperCase() === cBoolLocal["t"].toUpperCase() );
     }
     else {
         res = this;
@@ -401,7 +401,12 @@ cString.prototype.tryConvert = function () {
 
 /** @constructor */
 function cBool( val ) {
-    this.constructor.call( this, val.toString().toUpperCase() === "TRUE", cElementType.bool );
+	var v = false;
+	switch(val.toString().toUpperCase()){
+		case "TRUE":
+		case cBoolLocal["t"].toUpperCase(): v = true;
+	}
+    this.constructor.call( this, v, cElementType.bool );
 }
 
 cBool.prototype = Object.create( cBaseType.prototype );
@@ -417,9 +422,8 @@ cBool.prototype.tocNumber = function () {
 cBool.prototype.tocString = function () {
     return new cString( this.value ? "TRUE" : "FALSE" );
 };
-cBool.prototype.toLocaleString = function ( digitDelim ) {
-    return this.toString();
-//    return new cString( this.value ? "TRUE" : "FALSE" );
+cBool.prototype.toLocaleString = function () {
+    return new cString( this.value ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase() );
 };
 cBool.prototype.tocBool = function () {
     return this;
@@ -4125,7 +4129,7 @@ parserFormula.prototype = {
                             arr.addRow();
                         }
                     }
-                    else if ( pH.isBoolean.call( tO, tO.Formula, tO.pCurrPos ) ) {
+                    else if ( pH.isBoolean.call( tO, tO.Formula, tO.pCurrPos, local ) ) {
                         arr.addElement( new cBool( tO.operand_str ) );
                     }
                     else if ( pH.isString.call( tO, tO.Formula, tO.pCurrPos ) ) {
@@ -4183,7 +4187,7 @@ parserFormula.prototype = {
                 }
 
                 /* Booleans */
-                if ( parserHelp.isBoolean.call( this, this.Formula, this.pCurrPos ) ) {
+                if ( parserHelp.isBoolean.call( this, this.Formula, this.pCurrPos, local ) ) {
                     found_operand = new cBool( this.operand_str );
                 }
 

@@ -559,6 +559,13 @@ function test_defName(){
 
 var cStrucTableLocalColumns = {"h": "Headers", "d": "Data", "a": "All", "tr": "This row", "t": "Totals"},
 	cBoolLocal = {"t":"TRUE","f":"FALSE"};
+
+function build_local_rx(data){
+	build_rx_table_local(data?data["StructureTables"]:null);
+    build_rx_bool_local(data?data["CONST_TRUE_FALSE"]:null);
+//	build_rx_array_local(localBool)
+}
+
 function build_rx_table_local(local){
 	rx_table_local = build_rx_table(local);
 }
@@ -590,19 +597,6 @@ function build_rx_table(local){
             } )
         } )
     }, 'i' );
-
-    /*
-     structured_tables_headata = new XRegExp('(?:\\[\\#'+getStructureTableLocaleHeadersNames('headers')+'\\]\\,\\[\\#'+getStructureTableLocaleHeadersNames('data')+'\\])');
-     structured_tables_datals = new XRegExp('(?:\\[\\+#'+getStructureTableLocaleHeadersNames('data')+'\\]\\,\\[\\#'+getStructureTableLocaleHeadersNames('totals')+'\\])' );
-     structured_tables_reservedColumn = new XRegExp('\\#(?:'+
-         getStructureTableLocaleHeadersNames('all')+'|'
-         getStructureTableLocaleHeadersNames('headers')+'|'
-         getStructureTableLocaleHeadersNames('totals')+'|'
-         getStructureTableLocaleHeadersNames('data')+'|'
-         getStructureTableLocaleHeadersNames('this_row')+
-         ')|@')
-     */
-
 }
 function build_rx_bool_local(local){
 	rx_bool_local = build_rx_bool(local);
@@ -610,13 +604,17 @@ function build_rx_bool_local(local){
 function build_rx_bool(local){
 	cBoolLocal = ( local ? local : {"t":"TRUE","f":"FALSE"} );
 	var f = cBoolLocal['f'], t = cBoolLocal['t'];
-	return new RegExp( "^("+t+"|"+f+")([-+*\\/^&%<=>: ;),]|$)","i" );
+	build_rx_array_local(local)
+	return new RegExp( "^("+t+"|"+f+")","i" );
 }
-function build_rx_array_local(){
-
-	'^\\{(([+-]?\\d*(\\d|\\.)\\d*([eE][+-]?\\d+)?)?(\\"((\\"\\"|[^\\"])*)\\")?(#NULL!|#DIV\\/0!|#VALUE!|#REF!|#NAME\\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\\/A|#GETTING_DATA|FALSE|TRUE)?[,;]?)*\\}'
+function build_rx_array_local(localBool, digitSepar, localError){
+	var localBool = ( localBool ? localBool : {"t":"TRUE","f":"FALSE"} );
+	rx_array_local = build_rx_array(localBool, digitSepar, localError);
 }
-function build_rx_array(local){
+function build_rx_array(localBool, digitSepar, localError){
+	return new RegExp("^\\{(([+-]?\\d*(\\d|\\"+digitSepar+")\\d*([eE][+-]?\\d+)?)?(\"((\"\"|[^\"])*)\")?"+
+			          "(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|"+
+			          localBool["t"]+"|"+localBool["f"]+")?["+arrayRowSeparator+"\\"+arrayColSeparator +"]?)*\\}","i");
 
 }
 var c_oEditorId = {
@@ -1249,7 +1247,7 @@ parserHelper.prototype.isName = function ( formula, start_pos, wb, ws ) {
 
 	if (match != null) {
 		var name = match["name"];
-		if ( name && name.length != 0 /*&& wb.DefinedNames && wb.isDefinedNamesExists( name, ws ? ws.getId() : null )*/ ) {
+		if ( name && name.length != 0 && name != cBoolLocal["t"] && name != cBoolLocal["f"]/*&& wb.DefinedNames && wb.isDefinedNamesExists( name, ws ? ws.getId() : null )*/ ) {
 			this.pCurrPos += name.length;
 			this.operand_str = name;
 			return [ true, name ];
@@ -1425,7 +1423,7 @@ parserHelper.prototype.setDigitSeparator = function( sep ){
         functionArgumentSeparator = ";";
         rx_number = new RegExp("^ *[+-]?\\d*(\\d|\\"+ digitSeparator +")\\d*([eE][+-]?\\d+)?");
         rx_Comma = new RegExp("^ *["+functionArgumentSeparator+"] *");
-		rx_array_local = new RegExp("^\\{(([+-]?\\d*(\\d|\\"+digitSeparator+")\\d*([eE][+-]?\\d+)?)?(\"((\"\"|[^\"])*)\")?(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|FALSE|TRUE)?["+arrayRowSeparator+"\\"+arrayColSeparator +"]?)*\\}","i");
+		build_rx_array_local( cBoolLocal, digitSeparator, null);
         rx_arraySeparators = new RegExp("^ *["+arrayRowSeparator+"\\"+arrayColSeparator+"] *");
     }
     else{
@@ -1435,7 +1433,7 @@ parserHelper.prototype.setDigitSeparator = function( sep ){
         functionArgumentSeparator = functionArgumentSeparatorDef;
         rx_number = new RegExp("^ *[+-]?\\d*(\\d|\\"+ digitSeparatorDef +")\\d*([eE][+-]?\\d+)?");
         rx_Comma = new RegExp("^ *["+functionArgumentSeparatorDef+"] *");
-		rx_array_local = new RegExp("^\\{(([+-]?\\d*(\\d|\\"+digitSeparatorDef+")\\d*([eE][+-]?\\d+)?)?(\"((\"\"|[^\"])*)\")?(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|FALSE|TRUE)?["+arrayRowSeparatorDef+"\\"+arrayColSeparatorDef +"]?)*\\}","i");
+		build_rx_array_local( cBoolLocal, digitSeparatorDef, null);
         rx_arraySeparators = new RegExp("^ *["+arrayRowSeparatorDef+"\\"+arrayColSeparatorDef+"] *");
     }
 };

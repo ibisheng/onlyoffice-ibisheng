@@ -10,7 +10,7 @@ var g_nAllColIndex = -1;
 var g_nAllRowIndex = -1;
 var aStandartNumFormats;
 var aStandartNumFormatsId;
-var start, end, arrRecalc = {}, arrDefNameRecalc = {}, lc = 0;
+var start, end, arrRecalc = {}, arrDefNameRecalc = {}, lc = 0, gFormulaLocaleParse = true, gFormulaLocaleDigetSep = true;
 
 var c_oRangeType =
 {
@@ -2857,6 +2857,8 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
                         wsViews[i].objectRender.controller.resetSelection();
                     }
                 }
+				gFormulaLocaleParse = false;
+				gFormulaLocaleDigetSep = false;
                 History.Clear();
 				History.Create_NewPoint();
 
@@ -2895,6 +2897,8 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
                         }
                     }
                 }
+				gFormulaLocaleParse = true;
+				gFormulaLocaleDigetSep = true;
 				History.UndoRedoEnd(null, oRedoObjectParam, false);
 
 				oThis.bCollaborativeChanges = false;
@@ -5337,7 +5341,7 @@ Cell.prototype.setValue=function(val,callback, isCopyPaste){
                 oldFP = this.formulaParsed;
 			var cellId = g_oCellAddressUtils.getCellId(this.nRow, this.nCol);
             this.formulaParsed = new parserFormula(val.substring(1),cellId,this.ws);
-			if( !this.formulaParsed.parse(true,true) ){
+			if( !this.formulaParsed.parse( gFormulaLocaleParse, gFormulaLocaleDigetSep ) ){
 				switch( this.formulaParsed.error[this.formulaParsed.error.length-1] ){
 					case c_oAscError.ID.FrmlWrongFunctionName:
 						break;
