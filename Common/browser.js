@@ -75,6 +75,8 @@ AscBrowser.checkZoom = function()
     {
         document.firstElementChild.style.zoom = "reset";
         AscBrowser.zoom = document.body.clientWidth / window.innerWidth;
+		
+		AscBrowser.isRetina = (Math.abs(2 - (window.devicePixelRatio / AscBrowser.zoom)) < 0.01);
     }
 };
 
