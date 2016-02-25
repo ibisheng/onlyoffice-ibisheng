@@ -421,8 +421,8 @@ var editor;
   };
   spreadsheet_api.prototype.asc_setLocale = function(val) {
     g_oDefaultCultureInfo = g_aCultureInfos[val];
+    parserHelp.setDigitSeparator( g_oDefaultCultureInfo.NumberDecimalSeparator );
     if (this.wbModel) {
-      parserHelp.setDigitSeparator( g_oDefaultCultureInfo.NumberDecimalSeparator );
       oGeneralEditFormatCache.cleanCache();
       oNumFormatCache.cleanCache();
       this.wbModel.rebuildColors();
