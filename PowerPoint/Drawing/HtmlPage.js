@@ -3329,6 +3329,12 @@ function CEditorPage(api)
     this.GoToPage = function(lPageNum, isFromZoom, bIsAttack)
     {
         var drDoc = this.m_oDrawingDocument;
+		
+		if (!this.m_oScrollVerApi)
+		{
+			// сборка файлов
+			return;
+		}
 
         var _old_empty = this.m_oDrawingDocument.IsEmptyPresentation;
 
