@@ -491,16 +491,7 @@ CNary.prototype.raw_SetLimLoc = function(Value)
     if(this.Pr.limLoc !== Value)
     {
         this.Pr.limLoc = Value;
-
-        var PropsInfo =
-        {
-            limLoc :    Value,
-            sign:       this.Sign,
-            supHide:    this.Pr.supHide,
-            subHide:    this.Pr.subHide
-        };
-
-        this.fillBase(PropsInfo);
+        this.RecalcInfo.bProps = true;
     }
 };
 CNary.prototype.raw_HideUpperIterator = function(Value)
@@ -508,16 +499,7 @@ CNary.prototype.raw_HideUpperIterator = function(Value)
     if(this.Pr.supHide !== Value)
     {
         this.Pr.supHide = Value;
-
-        var PropsInfo =
-        {
-            limLoc :    this.Pr.limLoc,
-            sign:       this.Sign,
-            supHide:    this.Pr.supHide,
-            subHide:    this.Pr.subHide
-        };
-
-        this.fillBase(PropsInfo);
+        this.RecalcInfo.bProps = true;
 
         this.CurPos = 2;
         this.Arg.Cursor_MoveToStartPos();
@@ -528,16 +510,7 @@ CNary.prototype.raw_HideLowerIterator = function(Value)
     if(this.Pr.subHide !== Value)
     {
         this.Pr.subHide = Value;
-
-        var PropsInfo =
-        {
-            limLoc :    this.Pr.limLoc,
-            sign:       this.Sign,
-            supHide:    this.Pr.supHide,
-            subHide:    this.Pr.subHide
-        };
-
-        this.fillBase(PropsInfo);
+        this.RecalcInfo.bProps = true;
 
         this.CurPos = 2;
         this.Arg.Cursor_MoveToStartPos();
@@ -807,6 +780,7 @@ CNary.prototype.Can_ModifyArgSize = function()
 {
     return this.CurPos !== 2 && false === this.Is_SelectInside();
 };
+
 
 /**
  *
