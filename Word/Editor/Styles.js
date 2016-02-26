@@ -7375,13 +7375,7 @@ CTextPr.prototype =
             TextPr.Color = new CDocumentColor(this.Color.r, this.Color.g, this.Color.b, this.Color.Auto);
 
         TextPr.VertAlign = this.VertAlign;
-
-        if ( undefined === this.HighLight )
-            TextPr.HighLight = undefined;
-        else if ( highlight_None === this.HighLight )
-            TextPr.HighLight = highlight_None;
-        else
-            TextPr.HighLight = this.HighLight.Copy();
+        TextPr.HighLight = this.Copy_HighLight();
 
         TextPr.RStyle     = this.RStyle;
         TextPr.Spacing    = this.Spacing;
@@ -7421,6 +7415,18 @@ CTextPr.prototype =
         }
 
         return TextPr;
+    },
+
+    Copy_HighLight : function()
+    {
+        if ( undefined === this.HighLight )
+            return undefined;
+        else if ( highlight_None === this.HighLight )
+            return highlight_None;
+        else
+            return this.HighLight.Copy();
+
+        return undefined;
     },
 
     Merge : function(TextPr)

@@ -6275,9 +6275,11 @@ ParaRun.prototype.Split_Run = function(Pos)
 
 ParaRun.prototype.Clear_TextPr = function()
 {
-    // Данная функция вызывается пока только при изменении стиля параграфа. Оставляем в этой ситуации язык неизмененным.
+    // Данная функция вызывается пока только при изменении стиля параграфа. Оставляем в этой ситуации язык неизмененным,
+    // а также не трогаем highlight.
     var NewTextPr = new CTextPr();
-    NewTextPr.Lang = this.Pr.Lang.Copy();
+    NewTextPr.Lang      = this.Pr.Lang.Copy();
+    NewTextPr.HighLight = this.Pr.Copy_HighLight();
     this.Set_Pr( NewTextPr );
 };
 
