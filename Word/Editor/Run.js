@@ -1243,8 +1243,6 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
                 }
 
                 var PageAbs = Para.Get_AbsolutePage(CurPage)
-                Para.DrawingDocument.UpdateTarget(X, TargetY, PageAbs);
-
                 // TODO: Тут делаем, чтобы курсор не выходил за границы буквицы. На самом деле, надо делать, чтобы
                 //       курсор не выходил за границы строки, но для этого надо делать обрезку по строкам, а без нее
                 //       такой вариант будет смотреться плохо.
@@ -1259,6 +1257,10 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
 
                     Para.DrawingDocument.SetTargetSize( __Y1 - __Y0 );
                     Para.DrawingDocument.UpdateTarget( X, __Y0, PageAbs );
+                }
+                else
+                {
+                    Para.DrawingDocument.UpdateTarget(X, TargetY, PageAbs);
                 }
 
                 if (para_Math_Run === this.Type && null !== this.Parent && true !== this.Parent.bRoot && this.Parent.bMath_OneLine)
