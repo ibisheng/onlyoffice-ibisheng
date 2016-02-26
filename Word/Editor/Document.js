@@ -3144,7 +3144,6 @@ CDocument.prototype =
             pGraphics.End_GlobalAlpha();
 
         this.DrawingObjects.drawBehindDoc( nPageIndex, pGraphics );
-        this.DrawingObjects.drawWrappingObjects( nPageIndex, pGraphics );
 
         var Page = this.Pages[nPageIndex];
         for (var SectionIndex = 0, SectionsCount = Page.Sections.length; SectionIndex < SectionsCount; ++SectionIndex)
@@ -3194,7 +3193,8 @@ CDocument.prototype =
                 }
             }
         }
-        
+
+        this.DrawingObjects.drawWrappingObjects( nPageIndex, pGraphics );
         this.DrawingObjects.drawBeforeObjects( nPageIndex, pGraphics );
 
         // Рисуем границы вокруг страницы (если границы надо рисовать перед текстом)
