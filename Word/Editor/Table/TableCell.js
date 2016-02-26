@@ -776,7 +776,7 @@ CTableCell.prototype =
         if (null !== Transform && DrawingDocument)
             DrawingDocument.MultiplyTargetTransform(Transform);
 
-        this.Content.RecalculateCurPos();
+        return this.Content.RecalculateCurPos();
     },
 
     Content_Get_NearestPos : function(CurPage, X, Y, bAnchor, Drawing)

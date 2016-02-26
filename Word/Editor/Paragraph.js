@@ -5125,6 +5125,8 @@ Paragraph.prototype =
 
     Get_CurPosXY : function()
     {
+
+
         return { X : this.CurPos.RealX, Y : this.CurPos.RealY };
     },
 
