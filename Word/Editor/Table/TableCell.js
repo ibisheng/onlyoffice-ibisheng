@@ -68,6 +68,11 @@ function CTableCell(Row, ColW)
         X_end   : 0,
         Y_end   : 0,
 
+        X_cell_start : 0,
+        X_cell_end   : 0,
+        Y_cell_start : 0,
+        Y_cell_end   : 0,
+
         Y_VAlign_offset : [] // Сдвиг, который нужно сделать из-за VAlign (массив по страницам)
     };
 
@@ -660,8 +665,8 @@ CTableCell.prototype =
         {
             bNeedRestore = true;
             pGraphics.SaveGrState();
+            pGraphics.AddClipRect(this.Temp.X_cell_start, this.Temp.Y_cell_start, this.Temp.X_cell_end - this.Temp.X_cell_start, this.Temp.Y_cell_end - this.Temp.Y_cell_start);
             pGraphics.transform3(this.Get_ParentTextTransform());
-            pGraphics.AddClipRect(0, 0, this.Temp.Y_end - this.Temp.Y_start, this.Temp.X_end - this.Temp.X_start);
         }
 
         this.Content.Draw(PageIndex, pGraphics);

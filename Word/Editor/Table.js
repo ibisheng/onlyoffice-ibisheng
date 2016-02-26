@@ -2065,6 +2065,8 @@ CTable.prototype =
             }
         }
 
+        Pos.X += this.Get_TableOffsetCorrection();
+
         Y += MaxTopBorder;
         
         // Учтем верхнее поле ячейки

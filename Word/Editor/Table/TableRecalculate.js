@@ -1886,6 +1886,12 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 Cell.Temp.X_end   = X_content_end;
                 Cell.Temp.Y_end   = Y_content_end;
 
+                Cell.Temp.X_cell_start = Page.X + CellMetrics.X_cell_start;
+                Cell.Temp.X_cell_end   = Page.X + CellMetrics.X_cell_end;
+                Cell.Temp.Y_cell_start = Y_content_start - CellMar.Top.W;
+                Cell.Temp.Y_cell_end   = Y_content_end + BottomMargin;
+
+
                 // Какие-то ячейки в строке могут быть не разбиты на строки, а какие то разбиты.
                 // Здесь контролируем этот момент, чтобы у тех, которые не разбиты не вызывать
                 // Recalculate_Page от несуществующих страниц.
@@ -2509,11 +2515,15 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 Cell.PagesCount = 1;
                 Cell.Content.Set_StartPage(CurPage);
                 Cell.Content.Reset(0, 0, Y_content_end - Y_content_start, 10000);
-                Cell.Content.Set_ClipInfo(CellPageIndex, 0, Y_content_end - Y_content_start);
                 Cell.Temp.X_start = X_content_start;
                 Cell.Temp.Y_start = Y_content_start;
                 Cell.Temp.X_end   = X_content_end;
                 Cell.Temp.Y_end   = Y_content_end;
+
+                Cell.Temp.X_cell_start = Page.X + CellMetrics.X_cell_start;
+                Cell.Temp.X_cell_end   = Page.X + CellMetrics.X_cell_end;
+                Cell.Temp.Y_cell_start = Y_content_start - CellMar.Top.W;
+                Cell.Temp.Y_cell_end   = Y_content_end + BottomMargin;
             }
 
             // Какие-то ячейки в строке могут быть не разбиты на строки, а какие то разбиты.
