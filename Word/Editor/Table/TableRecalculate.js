@@ -1430,6 +1430,7 @@ CTable.prototype.private_RecalculatePageXY = function(CurPage)
     }
 
     var TempMaxTopBorder = this.Get_MaxTopBorder(FirstRow);
+    this.Pages.length = Math.max(CurPage, 0);
     if (0 === CurPage)
     {
         this.Pages[CurPage] = new CTablePage(this.X, this.Y, this.XLimit, this.YLimit, FirstRow, TempMaxTopBorder);
