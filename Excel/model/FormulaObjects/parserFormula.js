@@ -1176,7 +1176,6 @@ cRef.prototype.getValue = function () {
     }
     else if ( cellType === CellValueType.String ) {
         res = new cString( this.range.getValueWithoutFormat() );
-//        res =  checkTypeCell( "" + this.range.getValueWithoutFormat() );
     }
     else {
         res = checkTypeCell( "" + this.range.getValueWithoutFormat() );
@@ -4070,15 +4069,8 @@ parserFormula.prototype = {
             else if ( parserHelp.isComma.call( this, this.Formula, this.pCurrPos ) ) {
                 wasLeftParentheses = false;
                 wasRigthParentheses = false;
-                /* if( this.operand_expected ){
-                 this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
-                 this.outStack = [];
-                 this.elemArr = [];
-                 return false;
-                 } */
-                var wasLeftParentheses = false;
-                var stackLength = this.elemArr.length;
-                var top_elem = null;
+                var stackLength = this.elemArr.length, top_elem = null;
+
                 if ( this.elemArr.length != 0 && this.elemArr[stackLength - 1].name == "(" && this.operand_expected ) {
                     this.outStack.push( new cEmpty() );
                     top_elem = this.elemArr[stackLength - 1];
@@ -4117,31 +4109,29 @@ parserFormula.prototype = {
             }
 
             /* Array */
-            else if ( parserHelp.isArray.call( this, this.Formula, this.pCurrPos, digitDelim ) ) {
+            else if ( parserHelp.isLeftBrace.call(this, this.Formula, this.pCurrPos) ) {
                 wasLeftParentheses = false;
                 wasRigthParentheses = false;
-                var pH = new parserHelper(), tO = {pCurrPos: 0, Formula: this.operand_str, operand_str: ""};
                 var arr = new cArray(), operator = { isOperator: false, operatorName: ""};
-                while ( tO.pCurrPos < tO.Formula.length ) {
-
-                    if ( pH.isArraySeparator.call( tO, tO.Formula, tO.pCurrPos, digitDelim ) ) {
-                        if ( tO.operand_str == (digitDelim ? arrayRowSeparator : arrayRowSeparatorDef) ) {
+                while ( this.pCurrPos < this.Formula.length && !parserHelp.isRightBrace.call(this, this.Formula, this.pCurrPos) ) {
+                    if ( parserHelp.isArraySeparator.call( this, this.Formula, this.pCurrPos, digitDelim ) ) {
+                        if ( this.operand_str == (digitDelim ? arrayRowSeparator : arrayRowSeparatorDef) ) {
                             arr.addRow();
                         }
                     }
-                    else if ( pH.isBoolean.call( tO, tO.Formula, tO.pCurrPos, local ) ) {
-                        arr.addElement( new cBool( tO.operand_str ) );
+                    else if ( parserHelp.isBoolean.call( this, this.Formula, this.pCurrPos, local ) ) {
+                        arr.addElement( new cBool( this.operand_str ) );
                     }
-                    else if ( pH.isString.call( tO, tO.Formula, tO.pCurrPos ) ) {
-                        arr.addElement( new cString( tO.operand_str ) );
+                    else if ( parserHelp.isString.call( this, this.Formula, this.pCurrPos ) ) {
+                        arr.addElement( new cString( this.operand_str ) );
                     }
-                    else if ( pH.isError.call( tO, tO.Formula, tO.pCurrPos ) ) {
-                        arr.addElement( new cError( tO.operand_str ) );
+                    else if ( parserHelp.isError.call( this, this.Formula, this.pCurrPos ) ) {
+                        arr.addElement( new cError( this.operand_str ) );
                     }
-                    else if ( pH.isNumber.call( tO, tO.Formula, tO.pCurrPos, digitDelim ) ) {
+                    else if ( parserHelp.isNumber.call( this, this.Formula, this.pCurrPos, digitDelim ) ) {
                         if ( operator.isOperator ) {
                             if ( operator.operatorName == "+" || operator.operatorName == "-" ) {
-                                tO.operand_str = operator.operatorName + "" + tO.operand_str
+								this.operand_str = operator.operatorName + "" + this.operand_str
                             }
                             else {
                                 this.outStack = [];
@@ -4150,17 +4140,25 @@ parserFormula.prototype = {
                                 return false;
                             }
                         }
-                        arr.addElement( new cNumber( parseFloat( tO.operand_str ) ) );
+                        arr.addElement( new cNumber( parseFloat( this.operand_str ) ) );
                         operator = { isOperator: false, operatorName: ""};
                     }
-                    else if ( pH.isOperator.call( tO, tO.Formula, tO.pCurrPos ) ) {
+                    else if ( parserHelp.isOperator.call( this, this.Formula, this.pCurrPos ) ) {
                         operator.isOperator = true;
-                        operator.operatorName = tO.operand_str;
+                        operator.operatorName = this.operand_str;
                     }
+					else{
+						this.outStack = [];
+						this.elemArr = [];
+						/*в массиве используется недопустимый параметр*/
+						this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
+						return false;
+					}
                 }
                 if ( !arr.isValidArray() ) {
                     this.outStack = [];
                     this.elemArr = [];
+					/*размер массива не согласован*/
                     this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
                     return false;
                 }
@@ -4182,8 +4180,6 @@ parserFormula.prototype = {
                     this.outStack = [];
                     this.elemArr = [];
                     return false;
-//                    this.outStack = [new cError(cErrorType.unsupported_function)];
-//                    return this.isParsed = true;
                 }
 
                 /* Booleans */
@@ -4268,6 +4264,7 @@ parserFormula.prototype = {
                     found_operand = new cStrucTable( _tableTMP, this.wb, this.ws, this.ws.getCell( this.cellAddress ) );
 
 					if(found_operand.type==cElementType.error) {
+						/*используется неверный именованный диапазон или таблица*/
 						this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
 						this.outStack = [];
 						this.elemArr = [];
@@ -4341,10 +4338,6 @@ parserFormula.prototype = {
                     found_operand = null
                 }
                 else {
-                    /*this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
-                     this.outStack = [];
-                     this.elemArr = [];
-                     return false;*/
                     if ( this.operand_str == null || this.operand_str == "'" ) {
                         this.outStack.push( new cError( cErrorType.wrong_name ) );
                         this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
@@ -4357,14 +4350,10 @@ parserFormula.prototype = {
                     this.operand_expected = false;
                     if ( this.operand_str != null ) {
                         if ( this.operand_str == '"' ) {
-                            //this.Formula = this.Formula.substr(0,this.pCurrPos) + '"' + this.Formula.substr(this.pCurrPos);
                             continue;
                         }
                         this.pCurrPos += this.operand_str.length;
                     }
-//                    break;
-                    /*this.outStack = [new cError(cErrorType.wrong_name)];
-                     return this.isParsed = false;*/
                 }
                 if ( wasRigthParentheses ) {
                     this.elemArr.push( new cMultOperator() );

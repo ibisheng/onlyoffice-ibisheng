@@ -37,19 +37,19 @@ var c_oAscError = {
     UserCountExceed: -22,
 
     /* для формул */
-    FrmlWrongCountParentheses: -30,
-    FrmlWrongOperator: -31,
-    FrmlWrongMaxArgument: -32,
-    FrmlWrongCountArgument: -33,
-    FrmlWrongFunctionName: -34,
-    FrmlAnotherParsingError: -35,
-    FrmlWrongArgumentRange: -36,
-    FrmlOperandExpected: -37,
-    FrmlParenthesesCorrectCount: -38,
-    FrmlWrongReferences: -39,
+    FrmlWrongCountParentheses: -300,
+    FrmlWrongOperator: -301,
+    FrmlWrongMaxArgument: -302,
+    FrmlWrongCountArgument: -303,
+    FrmlWrongFunctionName: -304,
+    FrmlAnotherParsingError: -305,
+    FrmlWrongArgumentRange: -306,
+    FrmlOperandExpected: -307,
+    FrmlParenthesesCorrectCount: -308,
+    FrmlWrongReferences: -309,
 
-    InvalidReferenceOrName: -40,
-    LockCreateDefName: -41,
+    InvalidReferenceOrName: -310,
+    LockCreateDefName: -311,
 
 
     AutoFilterDataRangeError: -50,
