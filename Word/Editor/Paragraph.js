@@ -2406,9 +2406,11 @@ Paragraph.prototype =
             this.Y      += Dy;
             this.XLimit += Dx;
             this.YLimit += Dy;
+
+            this.X_ColumnStart += Dx;
+            this.X_ColumnEnd   += Dx;
         }
 
-        var Page_abs = PageIndex + this.Get_StartPage_Absolute();
         this.Pages[PageIndex].Shift( Dx, Dy );
 
         var StartLine = this.Pages[PageIndex].StartLine;
@@ -2418,7 +2420,6 @@ Paragraph.prototype =
             this.Lines[CurLine].Shift( Dx, Dy );
 
         // Пробегаемся по всем картинкам на данной странице и обновляем координаты
-        var Count = this.Content.length;
         for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
         {
             var Line = this.Lines[CurLine];

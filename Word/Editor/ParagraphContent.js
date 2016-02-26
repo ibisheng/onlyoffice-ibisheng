@@ -4040,6 +4040,7 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
     this.selectX = 0;
     this.selectY = 0;
     this.wrappingType = WRAPPING_TYPE_THROUGH;
+    this.useWrap      = true;
 	
 	if(typeof CWrapPolygon !== "undefined")
 		this.wrappingPolygon = new CWrapPolygon(this);
@@ -4743,6 +4744,7 @@ ParaDrawing.prototype =
         }
 
         this.updatePosition3( this.PageNum, this.X, this.Y, OldPageNum );
+        this.useWrap = this.Use_TextWrap();
     },
 
     Reset_SavedPosition : function()
@@ -5016,6 +5018,10 @@ ParaDrawing.prototype =
 
     Use_TextWrap : function()
     {
+        // Если автофигура привязана к параграфу с рамкой, обтекание не делается
+        if (!this.Parent || !this.Parent.Get_FramePr || (null !== this.Parent.Get_FramePr() && undefined !== this.Parent.Get_FramePr()))
+            return false;
+
         // здесь должна быть проверка, нужно ли использовать обтекание относительно данного объекта,
         // или он просто лежит над или под текстом.
         return ( drawing_Anchor === this.DrawingType && !(this.wrappingType === WRAPPING_TYPE_NONE) );
