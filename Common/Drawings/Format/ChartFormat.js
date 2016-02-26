@@ -15201,7 +15201,7 @@ CLineSeries.prototype =
         }
         for(var i = 0; i < this.dPt.length; ++i)
         {
-            c.addDPt(this.dPt.createDuplicate());
+            c.addDPt(this.dPt[i].createDuplicate());
         }
         if(this.errBars)
         {
