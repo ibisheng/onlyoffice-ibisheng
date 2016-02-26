@@ -1246,30 +1246,10 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
                 // TODO: Тут делаем, чтобы курсор не выходил за границы буквицы. На самом деле, надо делать, чтобы
                 //       курсор не выходил за границы строки, но для этого надо делать обрезку по строкам, а без нее
                 //       такой вариант будет смотреться плохо.
-                if ( undefined != Para.Get_FramePr() )
-                {
-                    var __Y0 = TargetY, __Y1 = TargetY + Height;
-                    var ___Y0 = Para.Pages[CurPage].Y + Para.Lines[CurLine].Top;
-                    var ___Y1 = Para.Pages[CurPage].Y + Para.Lines[CurLine].Bottom;
-
-                    __Y0 = Math.max( __Y0, ___Y0 );
-                    __Y1 = Math.min( __Y1, ___Y1 );
-
-                    Para.DrawingDocument.SetTargetSize( __Y1 - __Y0 );
-                    Para.DrawingDocument.UpdateTarget( X, __Y0, PageAbs );
-                }
-                else
-                {
-                    Para.DrawingDocument.UpdateTarget(X, TargetY, PageAbs);
-                }
-
                 if (para_Math_Run === this.Type && null !== this.Parent && true !== this.Parent.bRoot && this.Parent.bMath_OneLine)
                 {
                     var oBounds = this.Parent.Get_Bounds();
-
                     var __Y0 = TargetY, __Y1 = TargetY + Height;
-                    //var ___Y0 = oBounds.Y - 0.2 * oBounds.H;
-                    //var ___Y1 = oBounds.Y + 1.4 * oBounds.H;
 
                     // пока так
                     // TO DO : переделать
@@ -1285,6 +1265,22 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
 
                     Para.DrawingDocument.SetTargetSize( __Y1 - __Y0 );
                     Para.DrawingDocument.UpdateTarget( X, __Y0, PageAbs );
+                }
+                else if ( undefined != Para.Get_FramePr() )
+                {
+                    var __Y0 = TargetY, __Y1 = TargetY + Height;
+                    var ___Y0 = Para.Pages[CurPage].Y + Para.Lines[CurLine].Top;
+                    var ___Y1 = Para.Pages[CurPage].Y + Para.Lines[CurLine].Bottom;
+
+                    __Y0 = Math.max( __Y0, ___Y0 );
+                    __Y1 = Math.min( __Y1, ___Y1 );
+
+                    Para.DrawingDocument.SetTargetSize( __Y1 - __Y0 );
+                    Para.DrawingDocument.UpdateTarget( X, __Y0, PageAbs );
+                }
+                else
+                {
+                    Para.DrawingDocument.UpdateTarget(X, TargetY, PageAbs);
                 }
             }
         }
