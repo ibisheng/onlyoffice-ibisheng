@@ -5598,13 +5598,24 @@ function BinaryFileReader(doc, openParams)
                         isAlreadyContainsStyle = styleDoc.isEqual(stylePaste.style);
                         if (styleDoc.Name == stylePaste.style.Name)
                             isEqualName = j;
-                        if (isAlreadyContainsStyle) {
+                        if (isAlreadyContainsStyle) 
+						{
                             if (oStyleTypes.par == nStyleType)
                                 elem.pPr.PStyle = j;
                             else if (oStyleTypes.table == nStyleType)
                                 elem.pPr.Set_TableStyle2(j);
 							else if (oStyleTypes.run == nStyleType)
-								elem.pPr.RStyle = j;
+							{
+								//TODO сделать аналогично для Pstyle
+								if(elem.run)
+								{
+									elem.run.Set_RStyle(j);
+								}
+								else
+								{
+									elem.pPr.RStyle = j;
+								}
+							}	
                             else if(oStyleTypes.styleLink == nStyleType)
                                 elem.pPr.StyleLink = j;
                             else if(oStyleTypes.numStyleLink == nStyleType)
@@ -5621,7 +5632,16 @@ function BinaryFileReader(doc, openParams)
                         else if (nStyleType == oStyleTypes.table)
                             elem.pPr.Set_TableStyle2(isEqualName);
 						else if (nStyleType == oStyleTypes.run)
-							elem.pPr.RStyle = isEqualName;
+						{
+							if(elem.run)
+							{
+								elem.run.Set_RStyle(isEqualName);
+							}
+							else
+							{
+								elem.pPr.RStyle = isEqualName;
+							}
+						}	
                         else if(nStyleType == oStyleTypes.styleLink)
                             elem.pPr.StyleLink = isEqualName;
                         else if(nStyleType == oStyleTypes.numStyleLink)
@@ -5637,7 +5657,16 @@ function BinaryFileReader(doc, openParams)
                         else if (nStyleType == oStyleTypes.table)
                             elem.pPr.Set_TableStyle2(nStyleId);
 						else if (nStyleType == oStyleTypes.run)
-							elem.pPr.RStyle = nStyleId;
+						{
+							if(elem.run)
+							{
+								elem.run.Set_RStyle(nStyleId);
+							}
+							else
+							{
+								elem.pPr.RStyle = nStyleId;
+							}
+						}
                         else if(nStyleType == oStyleTypes.styleLink)
                             elem.pPr.StyleLink = nStyleId;
                         else if(nStyleType == oStyleTypes.numStyleLink)
@@ -6751,7 +6780,7 @@ function Binary_rPrReader(doc, oReadResult, stream)
                 break;
 			case c_oSerProp_rPrType.RStyle:
 				var RunStyle = this.stream.GetString2LE(length);
-				this.oReadResult.runStyles.push({pPr: rPr, style: RunStyle});
+				this.oReadResult.runStyles.push({pPr: rPr, style: RunStyle, run: run});
                 break;
 			case c_oSerProp_rPrType.Spacing:
 				rPr.Spacing = this.bcr.ReadDouble();
