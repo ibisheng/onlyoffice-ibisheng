@@ -7820,7 +7820,7 @@ CChartSpace.prototype =
         {
             this.chartObj.draw(this, graphics);
         }
-        if(this.chart)
+        if(this.chart && !this.bEmptySeries)
         {
             if(this.chart.plotArea)
             {

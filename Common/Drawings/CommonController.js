@@ -5412,7 +5412,7 @@ DrawingObjectsController.prototype =
 
     resetSelection: function(noResetContentSelect, bNoCheckChart)
     {
-        if(this.document && bNoCheckChart !== true)
+        if(bNoCheckChart !== true)
         {
             this.checkChartTextSelection();
         }
