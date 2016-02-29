@@ -3171,7 +3171,7 @@ DrawingObjectsController.prototype =
                 checkDataLabels(chart_type).setSeparator(chartSettings.separator);
         }
 
-        if(chart_type.getObjectType() === historyitem_type_LineChart )
+        if(chart_type.getObjectType() === historyitem_type_LineChart && !chart.view3D)
         {
             if(!isRealBool(chartSettings.showMarker))
             {
