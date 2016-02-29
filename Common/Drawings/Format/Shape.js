@@ -9,7 +9,7 @@ function CheckObjectLine(obj)
 
 function CheckWordArtTextPr(oTextPr)
 {
-    if(oTextPr.TextFill || oTextPr.TextOutline || (oTextPr.Unifill && oTextPr.Unifill.fill && (oTextPr.Unifill.fill.type !== FILL_TYPE_SOLID || oTextPr.Unifill.transparent != null || oTextPr.Unifill.transparent < 255)))
+    if(oTextPr.TextFill || oTextPr.TextOutline || (oTextPr.Unifill && oTextPr.Unifill.fill && (oTextPr.Unifill.fill.type !== FILL_TYPE_SOLID || oTextPr.Unifill.transparent != null && oTextPr.Unifill.transparent < 254.5)))
         return true;
     return false;
 }
@@ -518,6 +518,54 @@ function CheckExcelDrawingXfrm(xfrm)
     }
 };
 
+
+function SetXfrmFromMetrics(oDrawing, metrics)
+{
+    CheckSpPrXfrm(oDrawing);
+    var rot = isRealNumber(oDrawing.spPr.xfrm.rot) ? normalizeRotate(oDrawing.spPr.xfrm.rot) : 0;
+
+    var metricExtX, metricExtY;
+    if(!(oDrawing instanceof CGroupShape))
+    {
+        metricExtX = metrics.extX;
+        metricExtY = metrics.extY;
+        if (checkNormalRotate(rot))
+        {
+            oDrawing.spPr.xfrm.setExtX(metrics.extX);
+            oDrawing.spPr.xfrm.setExtY(metrics.extY);
+        }
+        else
+        {
+            oDrawing.spPr.xfrm.setExtX(metrics.extY);
+            oDrawing.spPr.xfrm.setExtY(metrics.extX);
+        }
+    }
+    else
+    {
+        if(isRealNumber(oDrawing.spPr.xfrm.extX) && isRealNumber(oDrawing.spPr.xfrm.extY))
+        {
+            metricExtX = oDrawing.spPr.xfrm.extX;
+            metricExtY = oDrawing.spPr.xfrm.extY;
+        }
+        else
+        {
+            metricExtX = metrics.extX;
+            metricExtY = metrics.extY;
+        }
+    }
+
+    if (checkNormalRotate(rot))
+    {
+        oDrawing.spPr.xfrm.setOffX(metrics.x);
+        oDrawing.spPr.xfrm.setOffY(metrics.y);
+    }
+    else
+    {
+        oDrawing.spPr.xfrm.setOffX(metrics.x + metricExtX/2 - metricExtY/2);
+        oDrawing.spPr.xfrm.setOffY(metrics.y + metricExtY/2 - metricExtX/2);
+    }
+}
+
 function CShape()
 {
     this.nvSpPr         = null;
@@ -818,6 +866,27 @@ CShape.prototype =
             content.Set_ApplyToAll(true);
             content.Remove(-1);
             content.Set_ApplyToAll(false);
+        }
+    },
+
+
+    setBFromSerialize: function(bVal)
+    {
+        History.Add(this, {Type: historyitem_AutoShapes_SetBFromSerialize, oldPr: this.fromSerialize, newPr: bVal});
+        this.fromSerialize = bVal;
+    },
+
+    deleteBFromSerialize: function()
+    {
+        if(this.fromSerialize)
+        {
+            this.setBFromSerialize(false);
+            if(this.drawingBase)
+            {
+                var drawingObject = this.drawingBase;
+                var metrics = drawingObject.getGraphicObjectMetrics();
+                SetXfrmFromMetrics(this, metrics);
+            }
         }
     },
 
@@ -2037,6 +2106,10 @@ CShape.prototype =
         }
         copy.setWordShape(this.bWordShape);
         copy.setBDeleted(this.bDeleted);
+        if(this.fromSerialize)
+        {
+            copy.setBFromSerialize(true);
+        }
         copy.cachedImage = this.getBase64Img();
         copy.cachedPixH = this.cachedPixH;
         copy.cachedPixW = this.cachedPixW;
@@ -2386,7 +2459,58 @@ CShape.prototype =
     {
         if (!isRealObject(this.group))
         {
-            if (this.spPr && this.spPr.xfrm && this.spPr.xfrm.isNotNull())
+            if(this.drawingBase  && this.fromSerialize)
+            {
+                var metrics = this.drawingBase.getGraphicObjectMetrics();
+                this.x = metrics.x;
+                this.y = metrics.y;
+                extX = metrics.extX;
+                extY = metrics.extY;
+                var rot = this.spPr && this.spPr.xfrm && isRealNumber(this.spPr.xfrm.rot) ? normalizeRotate(this.spPr.xfrm.rot) : 0;
+                this.rot = rot;
+                var metricExtX, metricExtY;
+                if(!(this instanceof CGroupShape))
+                {
+                    metricExtX = metrics.extX;
+                    metricExtY = metrics.extY;
+                    if (checkNormalRotate(rot))
+                    {
+                        this.extX = metrics.extX;
+                        this.extY = metrics.extY;
+                    }
+                    else
+                    {
+                        this.extX = metrics.extY;
+                        this.extY = metrics.extX;
+                    }
+                }
+                else
+                {
+                    if(this.spPr && this.spPr.xfrm && isRealNumber(this.spPr.xfrm.extX) && isRealNumber(this.spPr.xfrm.extY))
+                    {
+                        this.extX = this.spPr.xfrm.extX;
+                        this.extY = this.spPr.xfrm.extY;
+                    }
+                    else
+                    {
+                        metricExtX = metrics.extX;
+                        metricExtY = metrics.extY;
+                    }
+                }
+
+                if (checkNormalRotate(rot))
+                {
+                    this.x = metrics.x;
+                    this.y = metrics.y;
+                }
+                else
+                {
+                    this.x = metrics.x + metricExtX/2 - metricExtY/2;
+                    this.y = metrics.y + metricExtY/2 - metricExtX/2;
+                }
+            }
+
+            else if (this.spPr && this.spPr.xfrm && this.spPr.xfrm.isNotNull())
             {
                 var xfrm = this.spPr.xfrm;
                 this.x = xfrm.offX;
@@ -2438,14 +2562,6 @@ CShape.prototype =
                         this.y = 0;
                         extX = this.parent.Extent.W;
                         extY = this.parent.Extent.H;
-                    }
-                    else if(this.drawingBase)
-                    {
-                        var metrics = this.drawingBase.getGraphicObjectMetrics();
-                        this.x = metrics.x;
-                        this.y = metrics.y;
-                        extX = metrics.extX;
-                        extY = metrics.extY;
                     }
                     else
                     {
@@ -4748,6 +4864,11 @@ CShape.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_AutoShapes_SetBFromSerialize:
+            {
+                this.fromSerialize = data.oldPr;
+                break;
+            }
             case historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
@@ -4850,6 +4971,11 @@ CShape.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_AutoShapes_SetBFromSerialize:
+            {
+                this.fromSerialize = data.newPr;
+                break;
+            }
             case historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
@@ -4952,6 +5078,11 @@ CShape.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_AutoShapes_SetBFromSerialize:
+            {
+                writeBool(w, data.newPr);
+                break;
+            }
             case historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 writeDouble(w, data.fromCol   );
@@ -5026,6 +5157,11 @@ CShape.prototype =
             var type = r.GetLong();
             switch (type)
             {
+                case historyitem_AutoShapes_SetBFromSerialize:
+                {
+                    this.fromSerialize = readBool(r);
+                    break;
+                }
                 case historyitem_AutoShapes_SetDrawingBaseCoors:
                 {
                     if(this.drawingBase)

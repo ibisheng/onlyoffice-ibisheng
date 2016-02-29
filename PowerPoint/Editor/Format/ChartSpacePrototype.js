@@ -467,7 +467,7 @@ CChartSpace.prototype.recalculate = function()
         {
             this.recalculateChart();
             this.recalcInfo.recalculateChart = false;
-            if(bCheckLabels)
+            if(bCheckLabels && this.chartObj.nDimensionCount === 3)
             {
                 this.checkAxisLabelsTransform();
             }

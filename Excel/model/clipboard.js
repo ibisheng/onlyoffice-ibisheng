@@ -3558,6 +3558,10 @@
 						return;
 					}
 
+                    if(drawingObject.graphicObject.fromSerialize && drawingObject.graphicObject.setBFromSerialize)
+                    {
+                        drawingObject.graphicObject.setBFromSerialize(false);
+                    }
 					CheckSpPrXfrm(drawingObject.graphicObject);
 					xfrm = drawingObject.graphicObject.spPr.xfrm;
 					
@@ -3571,9 +3575,6 @@
 					
 					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[activeCol].left - ws.getCellLeft(0, 1), 1, 3);
 					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.rows[activeRow].top  - ws.getCellTop(0, 1), 1, 3);
-					
-					xfrm.setOffX(curCol);
-					xfrm.setOffY(curRow);
 
 					drawingObject = ws.objectRender.cloneDrawingObject(drawingObject);
 					drawingObject.graphicObject.setDrawingBase(drawingObject);
@@ -3581,8 +3582,11 @@
 					drawingObject.graphicObject.setDrawingObjects(ws.objectRender);
 					drawingObject.graphicObject.setWorksheet(ws.model);
 
+                    xfrm.setOffX(curCol);
+                    xfrm.setOffY(curRow);
+
+
                     drawingObject.graphicObject.checkRemoveCache &&  drawingObject.graphicObject.checkRemoveCache();
-					//drawingObject.graphicObject.setDrawingDocument(ws.objectRender.drawingDocument);
 
 					drawingObject.graphicObject.addToDrawingObjects();
                     if(drawingObject.graphicObject.checkDrawingBaseCoords)
@@ -3807,6 +3811,7 @@
 							}	
 						}
 					}
+
 
 					CheckSpPrXfrm(drawingObject.graphicObject);
 					xfrm = drawingObject.graphicObject.spPr.xfrm;

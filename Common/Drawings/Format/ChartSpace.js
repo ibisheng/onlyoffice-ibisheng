@@ -361,6 +361,8 @@ CChartSpace.prototype =
     calculateSnapArrays: CShape.prototype.calculateSnapArrays,
     checkDrawingBaseCoords: CShape.prototype.checkDrawingBaseCoords,
     setDrawingBaseCoords: CShape.prototype.setDrawingBaseCoords,
+    deleteBFromSerialize: CShape.prototype.deleteBFromSerialize,
+    setBFromSerialize: CShape.prototype.setBFromSerialize,
 
 
     recalculateTextPr: function()
@@ -1195,6 +1197,10 @@ CChartSpace.prototype =
         copy.cachedImage = this.getBase64Img();
         copy.cachedPixH = this.cachedPixH;
         copy.cachedPixW = this.cachedPixW;
+        if(this.fromSerialize)
+        {
+            copy.setBFromSerialize(true);
+        }
         return copy;
     },
 
@@ -7898,6 +7904,11 @@ CChartSpace.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_AutoShapes_SetBFromSerialize:
+            {
+                this.fromSerialize = data.oldPr;
+                break;
+            }
             case historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
@@ -8024,6 +8035,11 @@ CChartSpace.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_AutoShapes_SetBFromSerialize:
+            {
+                this.fromSerialize = data.newPr;
+                break;
+            }
             case historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
@@ -8152,6 +8168,11 @@ CChartSpace.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_AutoShapes_SetBFromSerialize:
+            {
+                writeBool(w, data.newPr);
+                break;
+            }
             case historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 writeDouble(w, data.fromCol   );
@@ -8286,6 +8307,11 @@ CChartSpace.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_AutoShapes_SetBFromSerialize:
+            {
+                this.fromSerialize = readBool(r);
+                break;
+            }
             case historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
@@ -10167,7 +10193,19 @@ CPageSetup.prototype =
 
 };
 
-function CreateLineChart(chartSeries, type, bUseCache, oOptions)
+
+function CreateView3d(nRotX, nRotY, bRAngAx, nDepthPercent)
+{
+    var oView3d = new CView3d();
+    isRealNumber(nRotX) && oView3d.setRotX(nRotX);
+    isRealNumber(nRotY) && oView3d.setRotY(nRotY);
+    isRealBool(bRAngAx) && oView3d.setRAngAx(bRAngAx);
+    isRealNumber(nDepthPercent) && oView3d.setDepthPercent(nDepthPercent);
+    return oView3d;
+}
+
+
+function CreateLineChart(chartSeries, type, bUseCache, oOptions, b3D)
 {
     var asc_series = chartSeries.series;
     var chart_space = new CChartSpace();
@@ -10177,6 +10215,11 @@ function CreateLineChart(chartSeries, type, bUseCache, oOptions)
     chart_space.setChart(new CChart());
     chart_space.setPrintSettings(new CPrintSettings());
     var chart = chart_space.chart;
+    if(b3D)
+    {
+        chart.setView3D(CreateView3d(15, 20, true, 100));
+        chart.setDefaultWalls();
+    }
     chart.setAutoTitleDeleted(false);
     chart.setPlotArea(new CPlotArea());
     chart.setPlotVisOnly(true);
@@ -10309,7 +10352,7 @@ function CreateLineChart(chartSeries, type, bUseCache, oOptions)
     return chart_space;
 }
 
-function CreateBarChart(chartSeries, type, bUseCache, oOptions)
+function CreateBarChart(chartSeries, type, bUseCache, oOptions, b3D, bDepth)
 {
     var asc_series = chartSeries.series;
     var chart_space = new CChartSpace();
@@ -10320,6 +10363,11 @@ function CreateBarChart(chartSeries, type, bUseCache, oOptions)
     chart_space.setPrintSettings(new CPrintSettings());
     var chart = chart_space.chart;
     chart.setAutoTitleDeleted(false);
+    if(b3D)
+    {
+        chart.setView3D(CreateView3d(15, 20, true, bDepth ? 100 : undefined));
+        chart.setDefaultWalls();
+    }
     chart.setPlotArea(new CPlotArea());
     chart.setPlotVisOnly(true);
     chart.setDispBlanksAs(DISP_BLANKS_AS_GAP);
@@ -10350,6 +10398,10 @@ function CreateBarChart(chartSeries, type, bUseCache, oOptions)
     plot_area.addAxis(val_ax);
 
     var bar_chart = plot_area.charts[0];
+    if(b3D)
+    {
+        bar_chart.set3D(true);
+    }
     bar_chart.setBarDir(BAR_DIR_COL);
     bar_chart.setGrouping(type);
     bar_chart.setVaryColors(false);
@@ -10376,6 +10428,10 @@ function CreateBarChart(chartSeries, type, bUseCache, oOptions)
     bar_chart.setGapWidth(150);
     if(BAR_GROUPING_PERCENT_STACKED === type || BAR_GROUPING_STACKED === type)
         bar_chart.setOverlap(100);
+    if(b3D)
+    {
+        bar_chart.setShape(BAR_SHAPE_BOX);
+    }
     bar_chart.addAxId(cat_ax);
     bar_chart.addAxId(val_ax);
     cat_ax.setScaling(new CScaling());
@@ -10438,7 +10494,7 @@ function CreateBarChart(chartSeries, type, bUseCache, oOptions)
     return chart_space;
 }
 
-function CreateHBarChart(chartSeries, type, bUseCache, oOptions)
+function CreateHBarChart(chartSeries, type, bUseCache, oOptions, b3D)
 {
     var asc_series = chartSeries.series;
     var chart_space = new CChartSpace();
@@ -10449,6 +10505,11 @@ function CreateHBarChart(chartSeries, type, bUseCache, oOptions)
     chart_space.setPrintSettings(new CPrintSettings());
     var chart = chart_space.chart;
     chart.setAutoTitleDeleted(false);
+    if(b3D)
+    {
+        chart.setView3D(CreateView3d(15, 20, true, undefined));
+        chart.setDefaultWalls();
+    }
     chart.setPlotArea(new CPlotArea());
     chart.setPlotVisOnly(true);
     chart.setDispBlanksAs(DISP_BLANKS_AS_GAP);
@@ -10502,6 +10563,10 @@ function CreateHBarChart(chartSeries, type, bUseCache, oOptions)
             FillSeriesTx(series, asc_series[i].TxCache, bUseCache);
         }
         bar_chart.addSer(series);
+        if(b3D)
+        {
+            bar_chart.setShape(BAR_SHAPE_BOX);
+        }
     }
     //bar_chart.setDLbls(new CDLbls());
     //var d_lbls = bar_chart.dLbls;
@@ -10703,7 +10768,7 @@ function CreateAreaChart(chartSeries, type, bUseCache, oOptions)
     return chart_space;
 }
 
-function CreatePieChart(chartSeries, bDoughnut, bUseCache, oOptions)
+function CreatePieChart(chartSeries, bDoughnut, bUseCache, oOptions, b3D)
 {
     var asc_series = chartSeries.series;
     var chart_space = new CChartSpace();
@@ -10714,6 +10779,11 @@ function CreatePieChart(chartSeries, bDoughnut, bUseCache, oOptions)
     chart_space.setChart(new CChart());
     var chart = chart_space.chart;
     chart.setAutoTitleDeleted(false);
+    if(b3D)
+    {
+        chart.setView3D(CreateView3d(30, 0, true, 100));
+        chart.setDefaultWalls();
+    }
     chart.setPlotArea(new CPlotArea());
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());

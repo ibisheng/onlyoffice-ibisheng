@@ -500,7 +500,6 @@ function DrawingObjects() {
         var coordsFrom, coordsTo;
         switch(_t.Type)
         {
-
             case c_oAscCellAnchorType.cellanchorAbsolute:
             {
                 metrics.x = this.Pos.X;
@@ -511,22 +510,28 @@ function DrawingObjects() {
             }
             case c_oAscCellAnchorType.cellanchorOneCell:
             {
-                coordsFrom = _this.coordsManager.calculateCoords(_t.from);
-                metrics.x = pxToMm( coordsFrom.x );
-                metrics.y = pxToMm( coordsFrom.y );
-                metrics.extX = this.ext.cx;
-                metrics.extY = this.ext.cy;
+                if(_this.coordsManager)
+                {
+                    coordsFrom = _this.coordsManager.calculateCoords(_t.from);
+                    metrics.x = pxToMm( coordsFrom.x );
+                    metrics.y = pxToMm( coordsFrom.y );
+                    metrics.extX = this.ext.cx;
+                    metrics.extY = this.ext.cy;
+                }
                 break;
             }
             case c_oAscCellAnchorType.cellanchorTwoCell:
             {
-                coordsFrom = _this.coordsManager.calculateCoords(_t.from);
-                metrics.x = pxToMm( coordsFrom.x );
-                metrics.y = pxToMm( coordsFrom.y );
+                if(_this.coordsManager)
+                {
+                    coordsFrom = _this.coordsManager.calculateCoords(_t.from);
+                    metrics.x = pxToMm( coordsFrom.x );
+                    metrics.y = pxToMm( coordsFrom.y );
 
-                coordsTo = _this.coordsManager.calculateCoords(_t.to);
-                metrics.extX = pxToMm( coordsTo.x - coordsFrom.x );
-                metrics.extY = pxToMm( coordsTo.y - coordsFrom.y );
+                    coordsTo = _this.coordsManager.calculateCoords(_t.to);
+                    metrics.extX = pxToMm( coordsTo.x - coordsFrom.x );
+                    metrics.extY = pxToMm( coordsTo.y - coordsFrom.y );
+                }
                 break;
             }
         }
@@ -915,59 +920,7 @@ function DrawingObjects() {
                 worksheet.expandRowsOnScroll(true); 	// для rowOff
             }
             var metrics = drawingObject.getGraphicObjectMetrics();
-            var isSerialize = drawingObject.graphicObject.fromSerialize;
-            CheckSpPrXfrm(drawingObject.graphicObject);
-            if(isSerialize)
-            {
 
-                var rot = isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
-                rot = normalizeRotate(rot);
-
-                var metricExtX, metricExtY;
-
-                if(drawingObject.graphicObject.getObjectType() !== historyitem_type_GroupShape)
-                {
-                    metricExtX = metrics.extX;
-                    metricExtY = metrics.extY;
-                    if (checkNormalRotate(rot))
-                    {
-                        drawingObject.graphicObject.spPr.xfrm.setExtX(metrics.extX);
-                        drawingObject.graphicObject.spPr.xfrm.setExtY(metrics.extY);
-                    }
-                    else
-                    {
-                        drawingObject.graphicObject.spPr.xfrm.setExtX(metrics.extY);
-                        drawingObject.graphicObject.spPr.xfrm.setExtY(metrics.extX);
-                    }
-                }
-                else
-                {
-                    if(isRealNumber(drawingObject.graphicObject.spPr.xfrm.extX) && isRealNumber(drawingObject.graphicObject.spPr.xfrm.extY))
-                    {
-                        metricExtX = drawingObject.graphicObject.spPr.xfrm.extX;
-                        metricExtY = drawingObject.graphicObject.spPr.xfrm.extY;
-                    }
-                    else
-                    {
-                        metricExtX = metrics.extX;
-                        metricExtY = metrics.extY;
-                    }
-                }
-
-                if (checkNormalRotate(rot))
-                {
-                    drawingObject.graphicObject.spPr.xfrm.setOffX(metrics.x);
-                    drawingObject.graphicObject.spPr.xfrm.setOffY(metrics.y);
-                }
-                else
-                {
-                    drawingObject.graphicObject.spPr.xfrm.setOffX(metrics.x + metricExtX/2 - metricExtY/2);
-                    drawingObject.graphicObject.spPr.xfrm.setOffY(metrics.y + metricExtY/2 - metricExtX/2);
-                }
-
-
-            }
-            delete drawingObject.graphicObject.fromSerialize;
 
             drawingObject.graphicObject.drawingBase = aObjects[i];
             drawingObject.graphicObject.drawingObjects = _this;

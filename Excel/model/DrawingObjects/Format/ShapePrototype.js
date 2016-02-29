@@ -299,13 +299,14 @@ CShape.prototype.addToRecalculate = function()
         controller.objectsForRecalculate[this.Id] = this;
     }
 };
+
 CShape.prototype.handleUpdatePosition = function()
 {
     this.recalcTransform();
     this.recalcBounds();
     this.recalcTransformText();
     this.addToRecalculate();
-    delete this.fromSerialize;
+    //delete this.fromSerialize;
 };
 CShape.prototype.handleUpdateExtents = function()
 {
@@ -315,7 +316,7 @@ CShape.prototype.handleUpdateExtents = function()
     this.recalcTransform();
     this.recalcContent();
     this.addToRecalculate();
-    delete this.fromSerialize;
+   //delete this.fromSerialize;
 };
 CShape.prototype.handleUpdateRot = function()
 {
@@ -327,7 +328,7 @@ CShape.prototype.handleUpdateRot = function()
     this.recalcTransformText();
     this.recalcBounds();
     this.addToRecalculate();
-    delete this.fromSerialize;
+    //delete this.fromSerialize;
 };
 CShape.prototype.handleUpdateFlip = function()
 {
@@ -335,7 +336,7 @@ CShape.prototype.handleUpdateFlip = function()
     this.recalcTransformText();
     this.recalcContent();
     this.addToRecalculate();
-    delete this.fromSerialize;
+    //delete this.fromSerialize;
 };
 CShape.prototype.handleUpdateFill = function()
 {

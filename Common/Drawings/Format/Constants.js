@@ -5,6 +5,7 @@ var historyitem_AutoShapes_SetDrawingBaseCoors = 1000;
 var historyitem_AutoShapes_SetWorksheet = 1002;
 var historyitem_AutoShapes_AddToDrawingObjects = 1003;
 var historyitem_AutoShapes_RemoveFromDrawingObjects = 1004;
+var historyitem_AutoShapes_SetBFromSerialize       = 1009;
 var historyitem_CommonChart_RemoveSeries = 1005;
 var historyitem_CommonSeries_RemoveDPt = 1006;
 var historyitem_CommonLit_RemoveDPt = 1007;

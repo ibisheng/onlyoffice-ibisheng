@@ -79,7 +79,7 @@ CImageShape.prototype.handleUpdatePosition = function()
     this.recalcTransform();
 	this.recalcBounds();
     this.addToRecalculate();
-    delete this.fromSerialize;
+    //delete this.fromSerialize;
 };
 CImageShape.prototype.handleUpdateExtents = function()
 {
@@ -87,20 +87,20 @@ CImageShape.prototype.handleUpdateExtents = function()
     this.recalcBounds();
     this.recalcTransform();
     this.addToRecalculate();
-    delete this.fromSerialize;
+    //delete this.fromSerialize;
 };
 CImageShape.prototype.handleUpdateRot = function()
 {
     this.recalcTransform();
     this.recalcBounds();
     this.addToRecalculate();
-    delete this.fromSerialize;
+    //delete this.fromSerialize;
 };
 CImageShape.prototype.handleUpdateFlip = function()
 {
     this.recalcTransform();
     this.addToRecalculate();
-    delete this.fromSerialize;
+    //delete this.fromSerialize;
 };
 CImageShape.prototype.handleUpdateFill = function()
 {

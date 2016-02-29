@@ -2355,26 +2355,43 @@ DrawingObjectsController.prototype =
             case c_oAscChartTypeSettings.barNormal     :
             case c_oAscChartTypeSettings.barStacked    :
             case c_oAscChartTypeSettings.barStackedPer :
+            case c_oAscChartTypeSettings.barNormal3d           :
+            case c_oAscChartTypeSettings.barStacked3d          :
+            case c_oAscChartTypeSettings.barStackedPer3d       :
+            case c_oAscChartTypeSettings.barNormal3dPerspective:
             case c_oAscChartTypeSettings.hBarNormal    :
             case c_oAscChartTypeSettings.hBarStacked   :
             case c_oAscChartTypeSettings.hBarStackedPer:
+            case c_oAscChartTypeSettings.hBarNormal3d:
+            case c_oAscChartTypeSettings.hBarStacked3d:
+            case c_oAscChartTypeSettings.hBarStackedPer3d:
             {
-                if(type === c_oAscChartTypeSettings.barNormal || type === c_oAscChartTypeSettings.hBarNormal)
+                if(type === c_oAscChartTypeSettings.barNormal || type === c_oAscChartTypeSettings.hBarNormal
+                    || type === c_oAscChartTypeSettings.barNormal3d || type === c_oAscChartTypeSettings.hBarNormal3d )
                     need_groupping = BAR_GROUPING_CLUSTERED;
-                else if(type === c_oAscChartTypeSettings.barStacked || type === c_oAscChartTypeSettings.hBarStacked)
+                else if(type === c_oAscChartTypeSettings.barStacked || type === c_oAscChartTypeSettings.hBarStacked
+                    || type === c_oAscChartTypeSettings.barStacked3d || type === c_oAscChartTypeSettings.hBarStacked3d)
                     need_groupping = BAR_GROUPING_STACKED;
+                else if(type === c_oAscChartTypeSettings.barNormal3dPerspective)
+                    need_groupping = BAR_GROUPING_STANDARD;
                 else
                     need_groupping = BAR_GROUPING_PERCENT_STACKED;
 
-                if(type === c_oAscChartTypeSettings.barNormal || type === c_oAscChartTypeSettings.barStacked
-                    || type === c_oAscChartTypeSettings.barNormal || type === c_oAscChartTypeSettings.barStacked
+                var bNeed3D = type === c_oAscChartTypeSettings.barNormal3d || type === c_oAscChartTypeSettings.barStacked3d
+                    || type === c_oAscChartTypeSettings.barStackedPer3d || type === c_oAscChartTypeSettings.barNormal3dPerspective
+                    || type === c_oAscChartTypeSettings.hBarNormal3d || type === c_oAscChartTypeSettings.hBarStacked3d || type === c_oAscChartTypeSettings.hBarStackedPer3d;
+
+                if( type === c_oAscChartTypeSettings.barNormal || type === c_oAscChartTypeSettings.barStacked
+                    || type === c_oAscChartTypeSettings.barNormal3d || type === c_oAscChartTypeSettings.barStacked3d
                     || type === c_oAscChartTypeSettings.hBarNormal || type === c_oAscChartTypeSettings.hBarStacked
-                    || type === c_oAscChartTypeSettings.hBarNormal || type === c_oAscChartTypeSettings.hBarStacked)
+                    || type === c_oAscChartTypeSettings.hBarNormal3d || type === c_oAscChartTypeSettings.hBarStacked3d
+                    || type === c_oAscChartTypeSettings.barNormal3dPerspective)
                     need_num_fmt = "General";
                 else
                     need_num_fmt = "0%";
 
-                if(type === c_oAscChartTypeSettings.barNormal || type === c_oAscChartTypeSettings.barStacked || type === c_oAscChartTypeSettings.barStackedPer)
+                if(type === c_oAscChartTypeSettings.barNormal || type === c_oAscChartTypeSettings.barStacked || type === c_oAscChartTypeSettings.barStackedPer
+                    || type === c_oAscChartTypeSettings.barNormal3d || type === c_oAscChartTypeSettings.barStacked3d || type === c_oAscChartTypeSettings.barStackedPer3d  || type === c_oAscChartTypeSettings.barNormal3dPerspective)
                     need_bar_dir = BAR_DIR_COL;
                 else
                     need_bar_dir = BAR_DIR_BAR;
@@ -2426,6 +2443,70 @@ DrawingObjectsController.prototype =
                         chart_type.setBarDir(need_bar_dir);
                     }
 
+                    if(bNeed3D)
+                    {
+                        if(!chart_type.b3D)
+                        {
+                            chart_type.set3D(true);
+                        }
+                        if(!chart.view3D)
+                        {
+                            chart.setView3D(new CView3d());
+                        }
+
+                        var oView3d = chart.view3D;
+                        if(15 !== oView3d.rotX)
+                        {
+                            oView3d.setRotX(15);
+                        }
+                        if(20 !== oView3d.rotY)
+                        {
+                            oView3d.setRotY(20);
+                        }
+                        if(true !== oView3d.rAngAx)
+                        {
+                            oView3d.setRAngAx(true);
+                        }
+                        if(c_oAscChartTypeSettings.barNormal3dPerspective === type)
+                        {
+                            if(100 !== oView3d.depthPercent)
+                            {
+                                oView3d.setDepthPercent(100);
+                            }
+                        }
+                        else
+                        {
+                            if(null !== oView3d.depthPercent)
+                            {
+                                oView3d.setDepthPercent(null);
+                            }
+                        }
+
+                        chart.setDefaultWalls();
+                    }
+                    else
+                    {
+                        if(chart_type.b3D)
+                        {
+                            chart_type.set3D(false);
+                        }
+                        if(chart.view3D)
+                        {
+                            chart.setView3D(null);
+                        }
+                        if(chart.floor)
+                        {
+                            chart.setFloor(null);
+                        }
+                        if(chart.sideWall)
+                        {
+                            chart.setSideWall(null);
+                        }
+                        if(chart.backWall)
+                        {
+                            chart.setBackWall(null);
+                        }
+                    }
                     val_axis = axis_by_types.valAx;
                     for(i = 0; i < val_axis.length; ++i)
                     {
@@ -2448,6 +2529,13 @@ DrawingObjectsController.prototype =
 
                     if(BAR_GROUPING_PERCENT_STACKED === need_groupping || BAR_GROUPING_STACKED === need_groupping)
                         new_chart_type.setOverlap(100);
+
+                    if(bNeed3D)
+                    {
+                        chart.setView3D(CreateView3d(15, 20, true, c_oAscChartTypeSettings.barNormal3dPerspective === type ? 100 : undefined));
+                        chart.setDefaultWalls();
+                        new_chart_type.set3D(true);
+                    }
 
                     axis_by_types = new_chart_type.getAxisByTypes();
                     val_axis = axis_by_types.valAx;
@@ -2476,15 +2564,16 @@ DrawingObjectsController.prototype =
             case c_oAscChartTypeSettings.lineNormalMarker    :
             case c_oAscChartTypeSettings.lineStackedMarker   :
             case c_oAscChartTypeSettings.lineStackedPerMarker:
+            case c_oAscChartTypeSettings.line3d:
             {
-                if(type === c_oAscChartTypeSettings.lineNormal || type === c_oAscChartTypeSettings.lineNormalMarker)
+                if(type === c_oAscChartTypeSettings.lineNormal || type === c_oAscChartTypeSettings.lineNormalMarker || type === c_oAscChartTypeSettings.line3d)
                     need_groupping = GROUPING_STANDARD;
                 else if(type === c_oAscChartTypeSettings.lineStacked || type === c_oAscChartTypeSettings.lineStackedMarker)
                     need_groupping = GROUPING_STACKED;
                 else
                     need_groupping = GROUPING_PERCENT_STACKED;
 
-                if(type === c_oAscChartTypeSettings.lineNormal || type === c_oAscChartTypeSettings.lineStacked
+                if(type === c_oAscChartTypeSettings.lineNormal || type === c_oAscChartTypeSettings.lineStacked  || type === c_oAscChartTypeSettings.line3d
                     || type === c_oAscChartTypeSettings.lineNormalMarker || type === c_oAscChartTypeSettings.lineStackedMarker)
                     need_num_fmt = "General";
                 else
@@ -2507,11 +2596,62 @@ DrawingObjectsController.prototype =
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                     }
 
+
+
+                    if(type === c_oAscChartTypeSettings.line3d)
+                    {
+
+                        if(!chart.view3D)
+                        {
+                            chart.setView3D(new CView3d());
+                        }
+
+                        var oView3d = chart.view3D;
+                        if(15 !== oView3d.rotX)
+                        {
+                            oView3d.setRotX(15);
+                        }
+                        if(20 !== oView3d.rotY)
+                        {
+                            oView3d.setRotY(20);
+                        }
+                        if(true !== oView3d.rAngAx)
+                        {
+                            oView3d.setRAngAx(true);
+                        }
+                        if(100 !== oView3d.depthPercent)
+                        {
+                            oView3d.setDepthPercent(100);
+                        }
+                        chart.setDefaultWalls();
+                    }
+                    else
+                    {
+                        if(chart.view3D)
+                        {
+                            chart.setView3D(null);
+                        }
+                        if(chart.floor)
+                        {
+                            chart.setFloor(null);
+                        }
+                        if(chart.sideWall)
+                        {
+                            chart.setSideWall(null);
+                        }
+                        if(chart.backWall)
+                        {
+                            chart.setBackWall(null);
+                        }
+                    }
+
                    // if((isRealBool(chart_type.marker) && chart_type.marker) !== b_marker)
                    //     chart_type.setMarker(b_marker);
                 }
                 else
                 {
+
+
                     new_chart_type = new CLineChart();
                     replaceChart(plot_area, chart_type, new_chart_type);
                     checkSwapAxis(plot_area, chart_type, new_chart_type);
@@ -2525,18 +2665,77 @@ DrawingObjectsController.prototype =
                         if(val_axis[i].numFmt.formatCode !== need_num_fmt)
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                     }
+                    if(type === c_oAscChartTypeSettings.line3d)
+                    {
+                        chart.setView3D(CreateView3d(15, 20, true, 100));
+                        chart.setDefaultWalls();
+                    }
                     new_chart_type.setMarker(b_marker);
                     new_chart_type.setGrouping(need_groupping);
                 }
                 break;
             }
             case c_oAscChartTypeSettings.pie:
+            case c_oAscChartTypeSettings.pie3d:
             {
                 if(chart_type.getObjectType() !== historyitem_type_PieChart)
                 {
                     new_chart_type = new CPieChart();
                     replaceChart(plot_area, chart_type, new_chart_type);
                     new_chart_type.setVaryColors(true);
+                    if(type === c_oAscChartTypeSettings.pie3d)
+                    {
+                        chart.setView3D(CreateView3d(30, 0, true, 100));
+                        chart.setDefaultWalls();
+                    }
+                }
+                else
+                {
+                    if(type === c_oAscChartTypeSettings.pie3d)
+                    {
+                        if(!chart.view3D)
+                        {
+                            chart.setView3D(new CView3d());
+                        }
+
+                        var oView3d = chart.view3D;
+                        if(30 !== oView3d.rotX)
+                        {
+                            oView3d.setRotX(30);
+                        }
+                        if(0 !== oView3d.rotY)
+                        {
+                            oView3d.setRotY(0);
+                        }
+                        if(true !== oView3d.rAngAx)
+                        {
+                            oView3d.setRAngAx(true);
+                        }
+                        if(100 !== oView3d.depthPercent)
+                        {
+                            oView3d.setDepthPercent(100);
+                        }
+                        chart.setDefaultWalls();
+                    }
+                    else
+                    {
+                        if(chart.view3D)
+                        {
+                            chart.setView3D(null);
+                        }
+                        if(chart.floor)
+                        {
+                            chart.setFloor(null);
+                        }
+                        if(chart.sideWall)
+                        {
+                            chart.setSideWall(null);
+                        }
+                        if(chart.backWall)
+                        {
+                            chart.setBackWall(null);
+                        }
+                    }
                 }
                 break;
             }
@@ -3349,7 +3548,16 @@ DrawingObjectsController.prototype =
 
         var calc_chart_type;
         if(chart_type_object_type === historyitem_type_PieChart)
-            calc_chart_type = c_oAscChartTypeSettings.pie;
+        {
+            if(!chart.view3D)
+            {
+                calc_chart_type = c_oAscChartTypeSettings.pie;
+            }
+            else
+            {
+                calc_chart_type = c_oAscChartTypeSettings.pie3d;
+            }
+        }
         else if(chart_type_object_type === historyitem_type_DoughnutChart)
             calc_chart_type = c_oAscChartTypeSettings.doughnut;
         else if(chart_type_object_type === historyitem_type_StockChart)
@@ -3357,28 +3565,29 @@ DrawingObjectsController.prototype =
         else if(chart_type_object_type === historyitem_type_BarChart)
         {
             var b_hbar = chart_type.barDir === BAR_DIR_BAR;
+            var bView3d = chart.view3D && chart_type.b3D;
             if(b_hbar)
             {
                 switch(chart_type.grouping)
                 {
                     case BAR_GROUPING_CLUSTERED:
                     {
-                        calc_chart_type = c_oAscChartTypeSettings.hBarNormal;
+                        calc_chart_type = bView3d ? c_oAscChartTypeSettings.hBarNormal3d : c_oAscChartTypeSettings.hBarNormal;
                         break;
                     }
                     case BAR_GROUPING_STACKED:
                     {
-                        calc_chart_type = c_oAscChartTypeSettings.hBarStacked;
+                        calc_chart_type = bView3d ? c_oAscChartTypeSettings.hBarStacked3d : c_oAscChartTypeSettings.hBarStacked;
                         break;
                     }
                     case BAR_GROUPING_PERCENT_STACKED:
                     {
-                        calc_chart_type = c_oAscChartTypeSettings.hBarStackedPer;
+                        calc_chart_type = bView3d ? c_oAscChartTypeSettings.hBarStackedPer3d : c_oAscChartTypeSettings.hBarStackedPer;
                         break;
                     }
                     default:
                     {
-                        calc_chart_type = c_oAscChartTypeSettings.hBarNormal;
+                        calc_chart_type = bView3d ? c_oAscChartTypeSettings.hBarNormal3d : c_oAscChartTypeSettings.hBarNormal;
                         break;
                     }
                 }
@@ -3389,22 +3598,29 @@ DrawingObjectsController.prototype =
                 {
                     case BAR_GROUPING_CLUSTERED:
                     {
-                        calc_chart_type = c_oAscChartTypeSettings.barNormal;
+                        calc_chart_type = bView3d ? c_oAscChartTypeSettings.barNormal3d : c_oAscChartTypeSettings.barNormal;
                         break;
                     }
                     case BAR_GROUPING_STACKED:
                     {
-                        calc_chart_type = c_oAscChartTypeSettings.barStacked;
+                        calc_chart_type = bView3d ? c_oAscChartTypeSettings.barStacked3d : c_oAscChartTypeSettings.barStacked;
                         break;
                     }
                     case BAR_GROUPING_PERCENT_STACKED:
                     {
-                        calc_chart_type = c_oAscChartTypeSettings.barStackedPer;
+                        calc_chart_type = bView3d ? c_oAscChartTypeSettings.barStackedPer3d : c_oAscChartTypeSettings.barStackedPer;
                         break;
                     }
                     default:
                     {
-                        calc_chart_type = c_oAscChartTypeSettings.barNormal;
+                        if(BAR_GROUPING_STANDARD && bView3d)
+                        {
+                            calc_chart_type = c_oAscChartTypeSettings.barNormal3dPerspective;
+                        }
+                        else
+                        {
+                            calc_chart_type = c_oAscChartTypeSettings.barNormal;
+                        }
                         break;
                     }
                 }
@@ -3426,7 +3642,14 @@ DrawingObjectsController.prototype =
                 }
                 default        :
                 {
-                    calc_chart_type = c_oAscChartTypeSettings.lineNormal;
+                    if(!chart.view3D)
+                    {
+                        calc_chart_type = c_oAscChartTypeSettings.lineNormal;
+                    }
+                    else
+                    {
+                        calc_chart_type = c_oAscChartTypeSettings.line3d;
+                    }
                     break;
                 }
             }
@@ -3602,18 +3825,34 @@ DrawingObjectsController.prototype =
 			case c_oAscChartTypeSettings.lineStackedPer:
 			case c_oAscChartTypeSettings.lineStackedPerMarker:
 				return CreateLineChart(chartSeries, GROUPING_PERCENT_STACKED, bUseCache, options);
+            case c_oAscChartTypeSettings.line3d:
+                return CreateLineChart(chartSeries, GROUPING_STANDARD, bUseCache, options, true);
 			case c_oAscChartTypeSettings.barNormal:
 				return CreateBarChart(chartSeries, BAR_GROUPING_CLUSTERED, bUseCache, options);
 			case c_oAscChartTypeSettings.barStacked:
 				return CreateBarChart(chartSeries, BAR_GROUPING_STACKED, bUseCache, options);
 			case c_oAscChartTypeSettings.barStackedPer:
 				return CreateBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED, bUseCache, options);
+            case c_oAscChartTypeSettings.barNormal3d:
+                return CreateBarChart(chartSeries, BAR_GROUPING_CLUSTERED, bUseCache, options, true);
+            case c_oAscChartTypeSettings.barStacked3d:
+                return CreateBarChart(chartSeries, BAR_GROUPING_STACKED, bUseCache, options, true);
+            case c_oAscChartTypeSettings.barStackedPer3d:
+                return CreateBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED, bUseCache, options, true);
+            case c_oAscChartTypeSettings.barNormal3dPerspective:
+                return CreateBarChart(chartSeries, BAR_GROUPING_STANDARD, bUseCache, options, true, true);
 			case c_oAscChartTypeSettings.hBarNormal:
 				return CreateHBarChart(chartSeries, BAR_GROUPING_CLUSTERED, bUseCache, options);
 			case c_oAscChartTypeSettings.hBarStacked:
 				return CreateHBarChart(chartSeries, BAR_GROUPING_STACKED, bUseCache, options);
 			case c_oAscChartTypeSettings.hBarStackedPer:
 				return CreateHBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED, bUseCache, options);
+            case c_oAscChartTypeSettings.hBarNormal3d:
+                return CreateHBarChart(chartSeries, BAR_GROUPING_CLUSTERED, bUseCache, options, true);
+            case c_oAscChartTypeSettings.hBarStacked3d:
+                return CreateHBarChart(chartSeries, BAR_GROUPING_STACKED, bUseCache, options, true);
+            case c_oAscChartTypeSettings.hBarStackedPer3d:
+                return CreateHBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED, bUseCache, options, true);
 			case c_oAscChartTypeSettings.areaNormal:
 				return CreateAreaChart(chartSeries, GROUPING_STANDARD, bUseCache, options);
 			case c_oAscChartTypeSettings.areaStacked:
@@ -3626,6 +3865,8 @@ DrawingObjectsController.prototype =
 				return CreatePieChart(chartSeries, true, bUseCache, options);
 			case c_oAscChartTypeSettings.pie:
 				return CreatePieChart(chartSeries, false, bUseCache, options);
+            case c_oAscChartTypeSettings.pie3d:
+                return CreatePieChart(chartSeries, false, bUseCache, options, true);
 			case c_oAscChartTypeSettings.scatter:
 			case c_oAscChartTypeSettings.scatterLine:
 			case c_oAscChartTypeSettings.scatterLineMarker:

@@ -170,14 +170,14 @@ CGroupShape.prototype.handleUpdatePosition = function()
     }
     this.recalcBounds();
     this.addToRecalculate();
-    delete this.fromSerialize;
+    //delete this.fromSerialize;
 };
 CGroupShape.prototype.handleUpdateExtents = function()
 {
     this.recalcTransform();
     this.recalcBounds();
     this.addToRecalculate();
-    delete this.fromSerialize;
+    //delete this.fromSerialize;
 };
 CGroupShape.prototype.handleUpdateRot = CGroupShape.prototype.handleUpdatePosition;
 CGroupShape.prototype.handleUpdateFlip = CGroupShape.prototype.handleUpdatePosition;

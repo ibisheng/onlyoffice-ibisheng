@@ -4726,7 +4726,7 @@ BinaryChartWriter.prototype.WriteCT_AreaChart = function (oVal) {
     // });
     // }
 }
-BinaryChartWriter.prototype.WriteCT_PlotArea = function (oVal) {
+BinaryChartWriter.prototype.WriteCT_PlotArea = function (oVal, oChart) {
     var oThis = this;
     this.bs.WriteItem(c_oserct_plotareaLAYOUT, function () {
         oThis.WriteCT_Layout(oVal);
@@ -4767,9 +4767,16 @@ BinaryChartWriter.prototype.WriteCT_PlotArea = function (oVal) {
             });
         }
         else if (chart instanceof CLineChart) {
-            this.bs.WriteItem(c_oserct_plotareaLINECHART, function () {
-                oThis.WriteCT_LineChart(chart);
-            });
+            if(!oChart.view3D) {
+                this.bs.WriteItem(c_oserct_plotareaLINECHART, function () {
+                    oThis.WriteCT_LineChart(chart);
+                });
+            }
+            else {
+                this.bs.WriteItem(c_oserct_plotareaLINE3DCHART, function () {
+                oThis.WriteCT_Line3DChart(chart);
+                });
+            }
         }
         // else if(chart instanceof CLine3DChart)
         // {
@@ -4783,9 +4790,16 @@ BinaryChartWriter.prototype.WriteCT_PlotArea = function (oVal) {
             });
         }
         else if (chart instanceof CPieChart) {
-            this.bs.WriteItem(c_oserct_plotareaPIECHART, function () {
-                oThis.WriteCT_PieChart(chart);
-            });
+            if(!oChart.view3D) {
+                this.bs.WriteItem(c_oserct_plotareaPIECHART, function () {
+                    oThis.WriteCT_PieChart(chart);
+                });
+            }
+            else{
+                this.bs.WriteItem(c_oserct_plotareaPIE3DCHART, function () {
+                    oThis.WriteCT_Pie3DChart(chart);
+                });
+            }
         }
         // else if(chart instanceof CPie3DChart)
         // {
@@ -5058,7 +5072,7 @@ BinaryChartWriter.prototype.WriteCT_Chart = function (oVal) {
     }
     if (null != oVal.plotArea) {
         this.bs.WriteItem(c_oserct_chartPLOTAREA, function () {
-            oThis.WriteCT_PlotArea(oVal.plotArea);
+            oThis.WriteCT_PlotArea(oVal.plotArea, oVal);
         });
     }
     if (null != oVal.legend) {
@@ -10609,8 +10623,12 @@ BinaryChartReader.prototype.ReadCT_View3D = function (type, length, val) {
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DepthPercent(t, l, oNewVal);
         });
-        if (null != oNewVal.m_val)
-            val.setDepthPercent(oNewVal.m_val);
+        if (null != oNewVal.m_val){
+            var nPercent = parseInt(oNewVal.m_val)
+            if(isRealNumber(nPercent)){
+                val.setDepthPercent(nPercent);
+            }
+        }
     }
     else if (c_oserct_view3dRANGAX === type) {
         var oNewVal = { m_val: null };

@@ -121,7 +121,7 @@ CChartSpace.prototype.handleUpdatePosition = function()
   //  this.recalcDLbls();
     //this.setRecalculateInfo();
     this.addToRecalculate();
-    delete this.fromSerialize;
+    //delete this.fromSerialize;
 };
 CChartSpace.prototype.handleUpdateExtents = function()
 {
@@ -130,14 +130,14 @@ CChartSpace.prototype.handleUpdateExtents = function()
     this.recalcTransform();
     this.recalcTitles();
     this.handleUpdateInternalChart();
-    delete this.fromSerialize;
+    //delete this.fromSerialize;
 };
 CChartSpace.prototype.handleUpdateFlip = function()
 {
     this.recalcTransform();
     //this.setRecalculateInfo();
     this.addToRecalculate();
-    delete this.fromSerialize;
+    //delete this.fromSerialize;
 };
 CChartSpace.prototype.handleUpdateChart = function()
 {
@@ -374,7 +374,7 @@ CChartSpace.prototype.recalculate = function()
         {
             this.recalculateChart();
             this.recalcInfo.recalculateChart = false;
-            if(bCheckLabels)
+            if(bCheckLabels && this.chartObj.nDimensionCount === 3)
             {
                 this.checkAxisLabelsTransform();
             }

@@ -122,6 +122,10 @@ CImageShape.prototype =
             copy.setStyle(this.style.createDuplicate());
         }
         copy.setBDeleted(this.bDeleted);
+        if(this.fromSerialize)
+        {
+            copy.setBFromSerialize(true);
+        }
         copy.cachedImage = this.getBase64Img();
         copy.cachedPixH = this.cachedPixH;
         copy.cachedPixW = this.cachedPixW;
@@ -156,6 +160,8 @@ CImageShape.prototype =
     calculateSnapArrays: CShape.prototype.calculateSnapArrays,
     checkDrawingBaseCoords: CShape.prototype.checkDrawingBaseCoords,
     setDrawingBaseCoords: CShape.prototype.setDrawingBaseCoords,
+    deleteBFromSerialize: CShape.prototype.deleteBFromSerialize,
+    setBFromSerialize: CShape.prototype.setBFromSerialize,
 
 
 
@@ -668,6 +674,11 @@ CImageShape.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_AutoShapes_SetBFromSerialize:
+            {
+                this.fromSerialize = data.oldPr;
+                break;
+            }
             case historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
@@ -744,6 +755,11 @@ CImageShape.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_AutoShapes_SetBFromSerialize:
+            {
+                this.fromSerialize = data.newPr;
+                break;
+            }
             case historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
@@ -821,6 +837,11 @@ CImageShape.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
+            case historyitem_AutoShapes_SetBFromSerialize:
+            {
+                writeBool(w, data.newPr);
+                break;
+            }
             case historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 writeDouble(w, data.fromCol   );
@@ -890,6 +911,11 @@ CImageShape.prototype =
         var type = r.GetLong();
         switch(type)
         {
+            case historyitem_AutoShapes_SetBFromSerialize:
+            {
+                this.fromSerialize = readBool(r);
+                break;
+            }
             case historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)

@@ -24678,6 +24678,20 @@ CChart.prototype =
         return this.parent && this.parent.getParentObjects();
     },
 
+
+    setDefaultWalls: function()
+    {
+        var oFloor = new CChartWall();
+        oFloor.setThickness(0);
+        this.setFloor(oFloor);
+        var oSideWall = new CChartWall();
+        oSideWall.setThickness(0);
+        this.setSideWall(oSideWall);
+        var oBackWall = new CChartWall();
+        oBackWall.setThickness(0);
+        this.setBackWall(oBackWall);
+    },
+
     createDuplicate: function()
     {
         var c = new CChart();
@@ -24828,6 +24842,10 @@ CChart.prototype =
     {
         History.Add(this, {Type: historyitem_Chart_SetView3D, oldView3D: this.view3D, newView3D: view3D});
         this.view3D = view3D;
+        if(this.parent)
+        {
+            this.parent.handleUpdateInternalChart();
+        }
     },
 
     setParent: function(pr)
@@ -24916,6 +24934,10 @@ CChart.prototype =
             case historyitem_Chart_SetView3D:
             {
                 this.view3D = data.newView3D;
+                if(this.parent)
+                {
+                    this.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }
@@ -24992,6 +25014,10 @@ CChart.prototype =
             case historyitem_Chart_SetView3D:
             {
                 this.view3D = data.newView3D;
+                if(this.parent)
+                {
+                    this.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }
@@ -25146,6 +25172,10 @@ CChart.prototype =
             case historyitem_Chart_SetView3D:
             {
                 this.view3D = readObject(r);
+                if(this.parent)
+                {
+                    this.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }

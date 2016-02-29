@@ -2761,7 +2761,27 @@
                         }
                     }
                     else
-                        this.bs.WriteItem(c_oSerWorksheetsTypes.Drawing, function(){oThis.WriteDrawing(oDrawing);});
+                    {
+                        var oCurDrawingToWrite;
+                        if(!oDrawing.graphicObject.fromSerialize)
+                        {
+                            this.bs.WriteItem(c_oSerWorksheetsTypes.Drawing, function(){oThis.WriteDrawing(oDrawing);});
+                        }
+                        else
+                        {
+                            var oCurDrawingToWrite = ExecuteNoHistory(function()
+                            {
+                                var oRet = oDrawing.graphicObject.copy();
+                                var oMetrics = oDrawing.getGraphicObjectMetrics();
+                                SetXfrmFromMetrics(oRet, oMetrics);
+                                return oRet;
+                            }, this, []);
+                            var oOldGrObject = oDrawing.graphicObject;
+                            oDrawing.graphicObject = oCurDrawingToWrite;
+                            this.bs.WriteItem(c_oSerWorksheetsTypes.Drawing, function(){oThis.WriteDrawing(oDrawing);});
+                            oDrawing.graphicObject = oOldGrObject;
+                        }
+                    }
                 }
             }
         };
@@ -5809,6 +5829,10 @@
                         oNewDrawing.graphicObject.spPr.xfrm.setOffY(0);
                         oNewDrawing.graphicObject.spPr.xfrm.setExtX(0);
                         oNewDrawing.graphicObject.spPr.xfrm.setExtY(0);
+                    }
+                    if(oNewDrawing.graphicObject.setBFromSerialize)
+                    {
+                        oNewDrawing.graphicObject.setBFromSerialize(true);
                     }
                     oNewDrawing.graphicObject.fromSerialize = true;
                     aDrawings.push(oNewDrawing);

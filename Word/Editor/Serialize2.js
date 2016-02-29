@@ -5963,7 +5963,7 @@ function BinaryStyleTableReader(doc, oReadResult, stream)
         if(c_oSerProp_tblStylePrType.TblStylePr == type)
         {
 			var oRes = {nType: null};
-			var oNewTableStylePr = new CTableStylePr()
+			var oNewTableStylePr = new CTableStylePr();
 			res = this.bcr.Read1(length, function(t, l){
 					return oThis.ReadTblStyleProperty(t, l, oNewTableStylePr, oRes);
 				});

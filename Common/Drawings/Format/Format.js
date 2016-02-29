@@ -6002,6 +6002,14 @@ CXfrm.prototype =
         return duplicate;
     },
 
+    checkFromSerialize: function()
+    {
+        if(this.parent && this.parent.checkFromSerialize)
+        {
+            this.parent.checkFromSerialize();
+        }
+    },
+
     setParent: function(pr)
     {
         History.Add(this, {Type: historyitem_Xfrm_SetParent, oldPr: this.parent, newPr: pr});
@@ -6010,66 +6018,77 @@ CXfrm.prototype =
 
     setOffX: function(pr)
     {
+        this.checkFromSerialize();
         History.Add(this, {Type: historyitem_Xfrm_SetOffX, oldPr: this.offX, newPr: pr});
         this.offX = pr;
         this.handleUpdatePosition();
     },
     setOffY: function(pr)
     {
+        this.checkFromSerialize();
         History.Add(this, {Type: historyitem_Xfrm_SetOffY, oldPr: this.offY, newPr: pr});
         this.offY = pr;
         this.handleUpdatePosition();
     },
     setExtX: function(pr)
     {
+        this.checkFromSerialize();
         History.Add(this, {Type: historyitem_Xfrm_SetExtX, oldPr: this.extX, newPr: pr});
         this.extX = pr;
         this.handleUpdateExtents();
     },
     setExtY: function(pr)
     {
+        this.checkFromSerialize();
         History.Add(this, {Type: historyitem_Xfrm_SetExtY, oldPr: this.extY, newPr: pr});
         this.extY = pr;
         this.handleUpdateExtents();
     },
     setChOffX: function(pr)
     {
+        this.checkFromSerialize();
         History.Add(this, {Type: historyitem_Xfrm_SetChOffX, oldPr: this.chOffX, newPr: pr});
         this.chOffX = pr;
         this.handleUpdateChildOffset();
     },
     setChOffY: function(pr)
     {
+        this.checkFromSerialize();
         History.Add(this, {Type: historyitem_Xfrm_SetChOffY, oldPr: this.chOffY, newPr: pr});
         this.chOffY = pr;
         this.handleUpdateChildOffset();
     },
     setChExtX: function(pr)
     {
+        this.checkFromSerialize();
         History.Add(this, {Type: historyitem_Xfrm_SetChExtX, oldPr: this.chExtX, newPr: pr});
         this.chExtX = pr;
         this.handleUpdateChildExtents();
     },
     setChExtY: function(pr)
     {
+        this.checkFromSerialize();
         History.Add(this, {Type: historyitem_Xfrm_SetChExtY, oldPr: this.chExtY, newPr: pr});
         this.chExtY = pr;
         this.handleUpdateChildExtents();
     },
     setFlipH: function(pr)
     {
+        this.checkFromSerialize();
         History.Add(this, {Type: historyitem_Xfrm_SetFlipH, oldPr: this.flipH, newPr: pr});
         this.flipH = pr;
         this.handleUpdateFlip();
     },
     setFlipV: function(pr)
     {
+        this.checkFromSerialize();
         History.Add(this, {Type: historyitem_Xfrm_SetFlipV, oldPr: this.flipV, newPr: pr});
         this.flipV = pr;
         this.handleUpdateFlip();
     },
     setRot: function(pr)
     {
+        this.checkFromSerialize();
         History.Add(this, {Type: historyitem_Xfrm_SetRot, oldPr: this.rot, newPr: pr});
         this.rot = pr;
         this.handleUpdateRot();
@@ -6602,6 +6621,14 @@ CSpPr.prototype =
     Read_FromBinary2: function (r)
     {
         this.Id = r.GetString2();
+    },
+
+    checkFromSerialize: function()
+    {
+        if(this.parent && this.parent.deleteBFromSerialize)
+        {
+            this.parent.deleteBFromSerialize();
+        }
     },
 
     setParent: function(pr)

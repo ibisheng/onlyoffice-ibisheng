@@ -517,6 +517,12 @@ RotateState.prototype =
                             copy.recalculateTransform();
                         }
                     }
+                    if(tracks[i].originalObject.fromSerialize && tracks[i].originalObject.drawingBase)
+                    {
+                        var drawingObject = tracks[i].originalObject.drawingBase;
+                        var metrics = drawingObject.getGraphicObjectMetrics();
+                        SetXfrmFromMetrics(copy, metrics);
+                    }
                     copy.addToDrawingObjects();
 
                     tracks[i].originalObject = copy;
