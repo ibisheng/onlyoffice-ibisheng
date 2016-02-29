@@ -4664,11 +4664,11 @@
 
         oParser = new parserFormula( "XIRR({-10000,2750,4250,3250,2750},F100:J100,0.1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 0.3733625335188316 );
+		ok( difBetween( oParser.calculate().getValue(), 0.3733625335188316 ) );
 
         ws.getRange2( "F100" ).setValue( 0 );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 0.0024114950175866895 );
+		ok( difBetween( oParser.calculate().getValue(), 0.0024114950175866895 ) );
 
     } )
 
