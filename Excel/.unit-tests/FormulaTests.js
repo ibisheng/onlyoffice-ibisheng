@@ -822,7 +822,7 @@
     test( "Test: wrong ref", function () {
         oParser = new parserFormula( "1+XXX1", "A1", ws );
         ok( oParser.parse() );
-        notStrictEqual( oParser.calculate().getValue(), "#NAME?" );
+        strictEqual( oParser.calculate().getValue(), "#NAME?" );
     } )
 
     test( "Test: \"CODE\"", function () {
