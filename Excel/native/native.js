@@ -4917,7 +4917,6 @@ function offline_copy() {
     if (_api.wb.cellEditor.isOpened) {
         var v = _api.wb.cellEditor.copySelection();
         if (v) {
-            //if (v) { _api.wb.clipboard.copyCellValue(v);}
             sBase64.text = _api.wb.cellEditor._getFragmentsText(v);
             sBase64.sBase64 = '';
             sBase64.drawingUrls = null;
@@ -4979,7 +4978,22 @@ function offline_paste(params) {
 }
 function offline_cut() {
     var worksheet = _api.wb.getWorksheet();
-    var sBase64 = _api.wb.clipboard.getSelectedBinary(true);
+    var sBase64 = {};
+
+    if (_api.wb.cellEditor.isOpened) {
+        var v = _api.wb.cellEditor.copySelection();
+        if (v) {
+            sBase64.text = _api.wb.cellEditor._getFragmentsText(v);
+            sBase64.sBase64 = '';
+            sBase64.drawingUrls = null;
+
+            _api.wb.cellEditor.cutSelection();
+        }
+    }
+    else {
+        sBase64 =  _api.wb.clipboard.getSelectedBinary(true);
+        worksheet.emptySelection(c_oAscCleanOptions.All);
+    }
 
     var _stream = global_memory_stream_menu;
     _stream["ClearNoAttack"]();
@@ -4995,19 +5009,15 @@ function offline_cut() {
     _stream["WriteByte"](0);
     _stream["WriteString2"](sBase64.text);
 
-//    // image
-//    if (null != sBase64.drawingUrls && sBase64.drawingUrls.length > 0)
-//    {
-//        _stream["WriteByte"](1);
-//        _stream["WriteStringA"](sBase64.drawingUrls[0]);
-//    }
+    // image
+    if (null != sBase64.drawingUrls && sBase64.drawingUrls.length > 0)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteStringA"](sBase64.drawingUrls[0]);
+    }
 
-    // owner format
     _stream["WriteByte"](2);
     _stream["WriteStringA"](sBase64.sBase64);
-
-    _stream["WriteByte"](3);
-    _stream["WriteString2"](sBase64.html);
 
     _stream["WriteByte"](255);
 
