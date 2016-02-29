@@ -6316,7 +6316,12 @@ drawPieChart.prototype =
 			for (var i = 0, len = numCache.length; i < len; i++) {
 				val = numCache[i];
 				brush = val.brush;
-				pen = val.pen;
+				
+				if(n === 0 || n === this.paths.series.length - 1)
+					pen = val.pen;
+				else
+					pen = null;
+				
 				path = this.paths.series[n][i];
 				
 				var duplicateBrush = brush;
