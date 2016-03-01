@@ -270,7 +270,8 @@ DependencyGraph.prototype = {
             for (var i in oSlaves) {
                 slave = oSlaves[i];
                 if( slave instanceof DefNameVertex ){
-                    this.wb.delDefinesNames(slave.getAscCDefName());
+					if(!slave.isTable)
+                    	this.wb.delDefinesNames(slave.getAscCDefName());
                     continue;
                 }
                 if (null == toDelete || slave != toDelete[slave.nodeId]) {
@@ -1102,6 +1103,7 @@ DependencyGraph.prototype = {
             newRefClone = newRef.clone(true);
         newRefClone.r1++;
         table.Ref = table.Ref.split("!")[0]+"!"+newRefClone.getAbsName();
+		table.rebuild();
 //        table.Ref = parserHelp.getEscapeSheetName(ws.getName())+"!"+newRef.getAbsName();
     },
     delTableName:function(name,ws){
@@ -1685,6 +1687,7 @@ DefNameVertex.prototype = {
 
     rebuild:function(){
         if(this.Ref){
+			this.deleteAllMasterEdges();
             this.parsedRef = new parserFormula(this.Ref, "", this.wb.getWorksheet(0));
             this.parsedRef.parse();
             this.parsedRef.buildDependencies(null,this);

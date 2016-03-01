@@ -558,12 +558,15 @@ function test_defName(){
 }
 
 var cStrucTableLocalColumns = {"h": "Headers", "d": "Data", "a": "All", "tr": "This row", "t": "Totals"},
-	cBoolLocal = {"t":"TRUE","f":"FALSE"};
+	cBoolLocal = {"t":"TRUE","f":"FALSE"},
+	cErrorLocal = {nil:"#NULL!",div:"#DIV\/0!",value:"#VALUE!",ref:"#REF!",name:"#NAME\\?",num:"#NUM!",na:"#N\/A",getdata:"#GETTING_DATA",uf:"#UNSUPPORTED_FUNCTION!"};
+
 
 function build_local_rx(data){
 	build_rx_table_local(data?data["StructureTables"]:null);
     build_rx_bool_local(data?data["CONST_TRUE_FALSE"]:null);
-//	build_rx_array_local(localBool)
+    build_rx_error_local(data?data["CONST_ERROR"]:null);
+
 }
 
 function build_rx_table_local(local){
@@ -607,6 +610,24 @@ function build_rx_bool(local){
 	build_rx_array_local(local)
 	return new RegExp( "^("+t+"|"+f+")","i" );
 }
+
+function build_rx_error_local(local){
+	rx_error_local = build_rx_error(null/*local*/);
+}
+function build_rx_error(local){
+	cErrorLocal = ( local ? local : {nil:"#NULL!",div:"#DIV\/0!",value:"#VALUE!",ref:"#REF!",name:"#NAME\\?",num:"#NUM!",na:"#N\/A",getdata:"#GETTING_DATA",uf:"#UNSUPPORTED_FUNCTION!"} );
+
+	return new RegExp( "^(" + 	cErrorLocal["nil"] 		+ "|" +
+								cErrorLocal["div"] 		+ "|" +
+								cErrorLocal["value"] 	+ "|" +
+								cErrorLocal["ref"] 		+ "|" +
+								cErrorLocal["name"] 	+ "|" +
+								cErrorLocal["num"] 		+ "|" +
+								cErrorLocal["na"] 		+ "|" +
+								cErrorLocal["getdata"] 	+ "|" +
+								cErrorLocal["uf"] 		+ ")", "i" );
+}
+
 function build_rx_array_local(localBool, digitSepar, localError){
 	var localBool = ( localBool ? localBool : {"t":"TRUE","f":"FALSE"} );
 	rx_array_local = build_rx_array(localBool, digitSepar, localError);
@@ -942,7 +963,7 @@ var str_namedRanges = "A-Za-z\u005F\u0080-\u0081\u0083\u0085-\u0087\u0089-\u008A
     rgRows = /^\$?\d+:\$?\d+/,
     rx_ref = /^ *(\$?[A-Za-z]{1,3}\$?(\d{1,7}))([-+*\/^&%<=>: ;),]|$)/,
     rx_refAll = /^(\$?[A-Za-z]+\$?(\d+))([-+*\/^&%<=>: ;),]|$)/,
-    rx_ref3D_non_quoted = new XRegExp( "^(?<name_from>["+str_namedRanges+"]["+str_namedRanges+"\\d.]+)(:(?<name_to>["+str_namedRanges+"]["+str_namedRanges+"\\d.]+))?!","i" ),
+    rx_ref3D_non_quoted = new XRegExp( "^(?<name_from>["+str_namedRanges+"]["+str_namedRanges+"\\d.]*)(:(?<name_to>["+str_namedRanges+"]["+str_namedRanges+"\\d.]*))?!","i" ),
     rx_ref3D_quoted = new XRegExp( "^'(?<name_from>(?:''|[^\\[\\]'\\/*?:])*)(?::(?<name_to>(?:''|[^\\[\\]'\\/*?:])*))?'!" ),
     rx_ref3D = new XRegExp( "^(?<name_from>[^:]+)(:(?<name_to>[^:]+))?!" ),
     rx_before_operators = /^ *[,()]/,
@@ -951,7 +972,10 @@ var str_namedRanges = "A-Za-z\u005F\u0080-\u0081\u0083\u0085-\u0087\u0089-\u008A
     rx_RightParentheses = /^ *\)/,
     rx_Comma = /^ *[,;] */,
     rx_arraySeparators = /^ *[,;] */,
-    rx_error = /^(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA)/i,
+
+    rx_error = build_rx_error(null ),// /^(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA)/i,
+    rx_error_local = build_rx_error_local(null),// /^(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA)/i,
+
     rx_bool = build_rx_bool(null),
     rx_bool_local = build_rx_bool(null),
     rx_string = /^\"((\"\"|[^\"])*)\"/,
@@ -1198,12 +1222,12 @@ parserHelper.prototype.isArraySeparator = function ( formula, start_pos, digitDe
 	}
 	return false;
 };
-parserHelper.prototype.isError = function ( formula, start_pos ) {
+parserHelper.prototype.isError = function ( formula, start_pos, local ) {
 	if ( this instanceof parserHelper ) {
 		this._reset();
 	}
 
-	var match = (formula.substring( start_pos )).match( rx_error );
+	var match = (formula.substring( start_pos )).match( local?rx_error_local:rx_error );
 	if (match != null) {
 		this.operand_str = match[0];
 		this.pCurrPos += match[0].length;
@@ -1423,7 +1447,7 @@ parserHelper.prototype.setDigitSeparator = function( sep ){
         functionArgumentSeparator = ";";
         rx_number = new RegExp("^ *[+-]?\\d*(\\d|\\"+ digitSeparator +")\\d*([eE][+-]?\\d+)?");
         rx_Comma = new RegExp("^ *["+functionArgumentSeparator+"] *");
-		build_rx_array_local( cBoolLocal, digitSeparator, null);
+//		build_rx_array_local( cBoolLocal, digitSeparator, null);
         rx_arraySeparators = new RegExp("^ *["+arrayRowSeparator+"\\"+arrayColSeparator+"] *");
     }
     else{
@@ -1433,7 +1457,7 @@ parserHelper.prototype.setDigitSeparator = function( sep ){
         functionArgumentSeparator = functionArgumentSeparatorDef;
         rx_number = new RegExp("^ *[+-]?\\d*(\\d|\\"+ digitSeparatorDef +")\\d*([eE][+-]?\\d+)?");
         rx_Comma = new RegExp("^ *["+functionArgumentSeparatorDef+"] *");
-		build_rx_array_local( cBoolLocal, digitSeparatorDef, null);
+//		build_rx_array_local( cBoolLocal, digitSeparatorDef, null);
         rx_arraySeparators = new RegExp("^ *["+arrayRowSeparatorDef+"\\"+arrayColSeparatorDef+"] *");
     }
 };

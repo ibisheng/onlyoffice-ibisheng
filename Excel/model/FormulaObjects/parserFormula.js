@@ -439,6 +439,7 @@ function cError( val ) {
     this.errorType = -1;
 
     switch ( val ) {
+		case cErrorLocal["value"]:
         case "#VALUE!":
         case cErrorType.wrong_value_type:
         {
@@ -446,6 +447,7 @@ function cError( val ) {
             this.errorType = cErrorType.wrong_value_type;
             break;
         }
+		case cErrorLocal["nil"]:
         case "#NULL!":
         case cErrorType.null_value:
         {
@@ -453,6 +455,7 @@ function cError( val ) {
             this.errorType = cErrorType.null_value;
             break;
         }
+		case cErrorLocal["div"]:
         case "#DIV/0!":
         case cErrorType.division_by_zero:
         {
@@ -460,6 +463,7 @@ function cError( val ) {
             this.errorType = cErrorType.division_by_zero;
             break;
         }
+		case cErrorLocal["ref"]:
         case "#REF!":
         case cErrorType.bad_reference:
         {
@@ -467,6 +471,7 @@ function cError( val ) {
             this.errorType = cErrorType.bad_reference;
             break;
         }
+		case cErrorLocal["name"]:
         case "#NAME?":
         case cErrorType.wrong_name:
         {
@@ -474,6 +479,7 @@ function cError( val ) {
             this.errorType = cErrorType.wrong_name;
             break;
         }
+		case cErrorLocal["num"]:
         case "#NUM!":
         case cErrorType.not_numeric:
         {
@@ -481,6 +487,7 @@ function cError( val ) {
             this.errorType = cErrorType.not_numeric;
             break;
         }
+		case cErrorLocal["na"]:
         case "#N/A":
         case cErrorType.not_available:
         {
@@ -488,6 +495,7 @@ function cError( val ) {
             this.errorType = cErrorType.not_available;
             break;
         }
+		case cErrorLocal["getdata"]:
         case "#GETTING_DATA":
         case cErrorType.getting_data:
         {
@@ -495,6 +503,7 @@ function cError( val ) {
             this.errorType = cErrorType.getting_data;
             break;
         }
+		case cErrorLocal["uf"]:
         case "#UNSUPPORTED_FUNCTION!":
         case cErrorType.unsupported_function:
         {
