@@ -1772,23 +1772,19 @@ cStrucTable.prototype.buildLocalTableString = function (reservedColumn,local) {
 
 /** @constructor */
 function cName3D( val, wsFrom, wb, ws ) {
-    this.constructor.call( this, wsFrom + "!" + val, cElementType.name3D );
-    this.regSpace = /\$/g;
-    this.wb = wb;
-    this.ws = ws;
-    //this.defName = this.wb.getDefinesNames( this.value, this.ws ? this.ws.getId() : null );
-    /*if ( this.defName && this.defName.Ref ) {
-     this.ref = new parserFormula( this.defName.Ref, "", this.ws );
-     this.ref.parse();
-     }*/
+	cName.call( this, val, wb, ws );
+	this.type = cElementType.name3D;
+	this.wsFrom = wsFrom;
 }
-cName3D.prototype = Object.create( cBaseType.prototype );
-cName3D.prototype.toRef = function () {
-    return this.area;
-}
-cName3D.prototype.Calculate = function () {
-    return new cError( cErrorType.wrong_name );
-}
+cName3D.prototype = Object.create( cName.prototype );
+cName3D.prototype.toString = function () {
+	if ( this.defName ) {
+		return parserHelp.getEscapeSheetName( this.ws.getName() ) + "!" + this.defName.Name;
+	}
+	else {
+		return parserHelp.getEscapeSheetName( this.wsFrom ) + "!" + this.value;
+	}
+};
 
 /** @constructor */
 function cArray() {
@@ -4439,7 +4435,7 @@ parserFormula.prototype = {
                     elemArr.push( _tmp );
                 }
             }
-            else if ( currentElement.type == cElementType.name ) {
+            else if ( currentElement.type == cElementType.name || currentElement.type == cElementType.name3D ) {
                 elemArr.push( currentElement.Calculate() );
             }
             else if ( currentElement.type == cElementType.table ) {
@@ -4459,7 +4455,7 @@ parserFormula.prototype = {
         var aOutRef = [];
         for ( var i = 0; i < this.outStack.length; i++ ) {
             var ref = this.outStack[i];
-            if ( ref instanceof cName ) {
+            if ( ref instanceof cName || ref instanceof cName3D ) {
                 ref = ref.toRef( this.ws.getId() );
                 if ( ref instanceof cError )
                     continue;
@@ -4925,7 +4921,7 @@ parserFormula.prototype = {
                 continue;
             }
 
-            if ( ref.type == cElementType.name ) {
+            if ( ref.type == cElementType.name || ref.type == cElementType.name3D ) {
                 nTo = ref.addDefinedNameNode( /*nameReParse*/ );
                 this.wb.dependencyFormulas.addEdge2( node, nTo );
             }
