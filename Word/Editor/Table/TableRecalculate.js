@@ -1574,7 +1574,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
     var MaxBotMargin     = this.MaxBotMargin;
 
     var StartPos = this.Pages[CurPage];
-    if (0 === CurPage)
+    if (true === this.Check_EmptyPages(CurPage - 1))
         this.HeaderInfo.PageIndex = -1;
 
     var Page = this.Pages[CurPage];
