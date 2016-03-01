@@ -7,8 +7,9 @@ function CheckObjectLine(obj)
 }
 
 
-function CheckWordArtTextPr(oTextPr)
+function CheckWordArtTextPr(oRun)
 {
+    var oTextPr = oRun.Get_CompiledPr()
     if(oTextPr.TextFill || oTextPr.TextOutline || (oTextPr.Unifill && oTextPr.Unifill.fill && (oTextPr.Unifill.fill.type !== FILL_TYPE_SOLID || oTextPr.Unifill.transparent != null && oTextPr.Unifill.transparent < 254.5)))
         return true;
     return false;
@@ -5353,7 +5354,7 @@ CShape.prototype =
         {
             if(aContent[j].Type === para_Run)
             {
-                if(fCallback(aContent[j].Get_CompiledPr()))
+                if(fCallback(aContent[j]))
                 {
                     return true;
                 }

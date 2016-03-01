@@ -978,17 +978,38 @@ CShape.prototype.setRecalcObject =  function(object)
 };
 
 
-CShape.prototype.setStartPage = function(pageIndex, bNoResetSelectPage)
+CShape.prototype.setStartPage = function(pageIndex, bNoResetSelectPage, bCheckContent)
 {
     if(!(bNoResetSelectPage === true))
         this.selectStartPage = pageIndex;
     var content = this.getDocContent && this.getDocContent();
-    content && content.Set_StartPage(pageIndex);
+    if(content)
+    {
+        content.Set_StartPage(pageIndex);
+        if(true === bCheckContent)
+        {
+            if(this.bWordShape && this.checkContentByCallback && this.checkContentByCallback(content,
+                function(oRun){
+                    for(var i = 0; i < oRun.Content.length; ++i){
+                        if(oRun.Content[i].Type === para_PageNum){
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            ))
+            {
+                this.recalcInfo.recalculateTxBoxContent = true;
+                this.recalcInfo.recalculateTransformText = true;
+                this.recalculateText();
+            }
+        }
+    }
     if(Array.isArray(this.spTree))
     {
         for(var i = 0; i < this.spTree.length; ++i)
         {
-            this.spTree[i].setStartPage && this.spTree[i].setStartPage(pageIndex);
+            this.spTree[i].setStartPage && this.spTree[i].setStartPage(pageIndex, undefined, bCheckContent);
         }
     }
 };

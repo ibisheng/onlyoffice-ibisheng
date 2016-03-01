@@ -4775,7 +4775,10 @@ ParaDrawing.prototype =
         }
         this.setPageIndex(pageIndex);
         if(typeof this.GraphicObj.setStartPage === "function")
-            this.GraphicObj.setStartPage(pageIndex, this.DocumentContent && this.DocumentContent.Is_HdrFtr());
+        {
+            var bIsHfdFtr = this.DocumentContent && this.DocumentContent.Is_HdrFtr();
+            this.GraphicObj.setStartPage(pageIndex, bIsHfdFtr, bIsHfdFtr);
+        }
         var bInline = this.Is_Inline();
         var _x = (this.PositionH.Align || bInline) ? x - this.GraphicObj.bounds.x : x;
         var _y = (this.PositionV.Align || bInline) ? y - this.GraphicObj.bounds.y : y;
