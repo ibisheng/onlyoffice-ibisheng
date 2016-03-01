@@ -14,6 +14,9 @@
  */
 Paragraph.prototype.Recalculate_FastWholeParagraph = function()
 {
+    if (this.Pages.length <= 0)
+        return [];
+
     if (true === this.Parent.Is_HdrFtr(false))
         return [];
 
@@ -152,6 +155,9 @@ Paragraph.prototype.Recalculate_FastWholeParagraph = function()
  */
 Paragraph.prototype.Recalculate_FastRange = function(SimpleChanges)
 {
+    if (this.Pages.length <= 0)
+        return -1;
+
     if (true === this.Parent.Is_HdrFtr(false))
         return -1;
 
