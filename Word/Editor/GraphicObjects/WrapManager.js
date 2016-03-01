@@ -262,6 +262,9 @@ CWrapPolygon.prototype =
             }
             case WRAPPING_TYPE_TOP_AND_BOTTOM:
             {
+                if (this.right < LeftField || this.left > RightField)
+                    return ret;
+
                 ret2.push({X0: x0, X1: x1, Y1: this.bottom});
                 break;
             }
