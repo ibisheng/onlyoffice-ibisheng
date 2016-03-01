@@ -1526,6 +1526,10 @@ CTable.prototype.private_RecalculatePositionX = function(CurPage)
                 this.PositionH_Old = undefined;
             }
         }
+
+        this.Pages[CurPage].X        = this.X;
+        this.Pages[CurPage].XLimit   = this.XLimit;
+        this.Pages[CurPage].X_origin = this.X_origin;
     }
 };
 CTable.prototype.private_RecalculatePage = function(CurPage)
