@@ -1881,7 +1881,6 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 Cell.PagesCount = 1;
                 Cell.Content.Set_StartPage(CurPage);
                 Cell.Content.Reset(0, 0, Y_content_end - Y_content_start, 10000);
-                Cell.Content.Set_ClipInfo(CellPageIndex, 0, Y_content_end - Y_content_start);
                 Cell.Temp.X_start = X_content_start;
                 Cell.Temp.Y_start = Y_content_start;
                 Cell.Temp.X_end   = X_content_end;

@@ -581,6 +581,8 @@ CDocumentContent.prototype =
             this.CurPos.RealX = X;
             this.CurPos.RealY = Y;
         }
+
+        this.ClipInfo = [];
     },
 
     Recalculate : function()
