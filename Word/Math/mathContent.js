@@ -656,7 +656,7 @@ CMPrp.prototype =
     },
     Get_AlignBrk: function()
     {
-        return this.brk !== undefined ? this.brk.Get_AlignBrk() : 0;
+        return this.brk !== undefined ? this.brk.Get_AlignBrk() : null;
     },
     Get_AlnAt: function()
     {
@@ -3891,7 +3891,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 {
     this.bOneLine = PRS.bMath_OneLine;
 
-    // для неинлайн формул :
+    // для неинлайн формул:
     // у операторов, находяхщихся на этом уровне (в Run) приоритет выше, чем у внутренних операторов (внутри мат объектов)
     // возможен только принудительный разрыв
     var bOnlyForcedBreak = PRS.bOnlyForcedBreak;
@@ -4142,52 +4142,6 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 };
-CMathContent.prototype.Get_WrapToLine = function(_CurLine, _CurRange, WrapIndent)
-{
-    // Get_WrapToLine может прийти до Recalculate_Range
-
-    var CurLine  = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-    var Pos = this.protected_GetPrevRangeEndPos(CurLine, CurRange);
-    var ContentLen = this.Content.length;
-    var Wrap = 0;
-
-    if(this.bRoot == false || false == this.IsStartLine(_CurLine, _CurRange))
-    {
-        while(Pos < ContentLen)
-        {
-            var bInline = this.ParaMath.Is_Inline();
-            var Item = this.Content[Pos];
-            var bEmptyRun = Item.Type == para_Math_Run && true == Item.Math_EmptyRange(_CurLine, _CurRange);
-            var bBoxBreak = Item.Type == para_Math_Composition && Item.kind == MATH_BOX && true == Item.IsForcedBreak();
-
-            if(Item.Type == para_Math_Composition)
-            {
-                if(bBoxBreak == true)
-                {
-                    Wrap = 0;
-                }
-                else
-                {
-                    Wrap = Item.Get_WrapToLine(_CurLine, _CurRange, WrapIndent);
-                }
-
-                break;
-            }
-            else if(bEmptyRun == false)
-            {
-                if(false === Item.IsForcedBreak())
-                    Wrap = WrapIndent;
-                break;
-            }
-
-            Pos++;
-        }
-    }
-
-    return Wrap;
-};
 CMathContent.prototype.private_ForceBreakBox = function(PRS, Box, _Depth, PrevLastPos, LastPos)
 {
     var BoxLen = Box.size.width;
@@ -4351,42 +4305,24 @@ CMathContent.prototype.IsEmptyRange = function(_CurLine, _CurRange)
 
     return bEmpty;
 };
-CMathContent.prototype.IsEmptyLine = function(_CurLine)
+CMathContent.prototype.Displace_BreakOperator = function(isForward, bBrkBefore, CountOperators)
 {
-    var CurLine  = _CurLine - this.StartLine;
+    var Pos = this.CurPos;
 
-    var StartRange = ( 0 === CurLine ? this.StartRange : 0 );
-    var RangesCount = StartRange + this.protected_GetRangesCount(CurLine);
-
-    var bEmpty = true;
-
-    for(var _CurRange = StartRange; _CurRange < RangesCount; _CurRange++)
+    if(this.Content[Pos].Type == para_Math_Run)
     {
-        if(false == this.IsEmptyRange(_CurLine, _CurRange))
+        var bApplyBreak = this.Content[Pos].Displace_BreakOperator(isForward, bBrkBefore, CountOperators);
+        var NewPos = bBrkBefore ? Pos + 1 : Pos - 1;
+
+        if(bApplyBreak == false && (this.Content[NewPos].Type == para_Math_Run || this.Content[NewPos].kind == MATH_BOX))
         {
-            bEmpty = false;
-            break;
+            this.Content[NewPos].Displace_BreakOperator(isForward, bBrkBefore, CountOperators);
         }
     }
-
-    return bEmpty;
-};
-CMathContent.prototype.Displace_BreakOperator = function(_CurLine, _CurRange, isForward, CountOperators)
-{
-    var CurLine  = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-    var bNextBox = true === this.Content[StartPos].IsEmptyRange(_CurLine, _CurRange) && StartPos != EndPos && this.Content[StartPos + 1].kind == MATH_BOX;
-
-    if(true === bNextBox) // Next element is Box
+    else
     {
-        StartPos++;
+        this.Content[Pos].Displace_BreakOperator(isForward, bBrkBefore, CountOperators);
     }
-
-    this.Content[StartPos].Displace_BreakOperator(_CurLine, _CurRange, isForward, CountOperators);
 };
 CMathContent.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 {
@@ -4646,48 +4582,37 @@ CMathContent.prototype.Math_Is_End = function(_CurLine, _CurRange)
 
     return result;
 };
-CMathContent.prototype.Get_AlignBrk = function(_CurLine, _CurRange)
+CMathContent.prototype.Get_AlignBrk = function(_CurLine, bBrkBefore)
 {
+    var AlnAt = null;
+
     var CurLine  = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+    var RangesCount = this.protected_GetRangesCount(CurLine - 1);
+    var EndPos = this.protected_GetRangeEndPos(CurLine - 1, RangesCount - 1);
 
-    var AlnAt = 0;
-
-    if(CurLine !== 0)
+    if(CurLine !== 0) // получаем смещение до расчета Recalculate_Range
     {
-        if(true == this.ParaMath.Is_BrkBinBefore())
+        var bEndRun  = this.Content[EndPos].Type == para_Math_Run && true == this.Content[EndPos].Math_Is_End(_CurLine - 1, RangesCount - 1),
+            bNextBox = EndPos < this.Content.length - 1 && this.Content[EndPos + 1].kind == MATH_BOX;
+
+        var bCheckNextBox = bEndRun == true && bNextBox == true && bBrkBefore == true;
+
+        var bRunEmptyRange = this.Content[EndPos].Type == para_Math_Run && this.Content[EndPos].Is_EmptyRange(_CurLine - 1, RangesCount - 1),
+            bPrevBox = EndPos > 0 && this.Content[EndPos - 1].kind == MATH_BOX;
+
+        var bCheckPrevNextBox = bRunEmptyRange == true && bPrevBox == true && bBrkBefore == false;
+
+        if(bCheckPrevNextBox)
         {
-            var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-
-            var Lng = this.Content.length;
-            while(StartPos < Lng - 1 && this.Content[StartPos].Type == para_Math_Run && true == this.Content[StartPos].Is_EmptyRange(_CurLine, _CurRange))
-            {
-                StartPos++;
-            }
-
-            AlnAt = this.Content[StartPos].Get_AlignBrk(_CurLine, _CurRange);
+            AlnAt = this.Content[EndPos - 1].Get_AlignBrk(_CurLine, bBrkBefore);
+        }
+        else if(bCheckNextBox)
+        {
+            AlnAt = this.Content[EndPos + 1].Get_AlignBrk(_CurLine, bBrkBefore);
         }
         else
         {
-            var RangesCount = this.protected_GetRangesCount(CurLine - 1);
-            var EndPos = this.protected_GetRangeEndPos(CurLine - 1, RangesCount - 1);
-
-            var Range = CurLine - 1 == 0 ? this.StartRange + RangesCount - 1 : RangesCount - 1;
-
-            if(EndPos == this.Content.length - 1) // сюда не должны зайти, т.к. ищем AlnAt для оператора из предыдущей строки, соответственно предыдущая строка не может заканчиваться последним элементом
-            {
-                AlnAt = 0;
-            }
-            else
-            {
-                while(EndPos > 0 && this.Content[EndPos].Type == para_Math_Run && true == this.Content[EndPos].Is_EmptyRange(_CurLine - 1, Range))
-                {
-                    EndPos--;
-                }
-
-                AlnAt = this.Content[EndPos].Get_AlignBrk(_CurLine, _CurRange);
-            }
-
+            AlnAt = this.Content[EndPos].Get_AlignBrk(_CurLine, bBrkBefore);
         }
     }
 
@@ -4735,11 +4660,11 @@ CMathContent.prototype.Can_ModifyForcedBreak = function(Pr)
 
     if(Pos !== null && this.bOneLine == false)
     {
-        var bBreakOperator = this.Content[Pos].Check_ForcedBreak();
-        var CurrentRun     = this.Content[Pos];
-        var bCanCheckNearsRun = bBreakOperator == false && false == CurrentRun.Is_SelectionUse();
-        var bPrevItem     = bCanCheckNearsRun && Pos > 0 && true == CurrentRun.Cursor_Is_Start(),
-            bNextItem     = bCanCheckNearsRun && Pos < this.Content.length - 1 && true == CurrentRun.Cursor_Is_End();
+        var bBreakOperator      = this.Content[Pos].Check_ForcedBreak();
+        var CurrentRun          = this.Content[Pos];
+        var bCanCheckNearsRun   = bBreakOperator == false && false == CurrentRun.Is_SelectionUse();
+        var bPrevItem           = bCanCheckNearsRun && Pos > 0 && true == CurrentRun.Cursor_Is_Start(),
+            bNextItem           = bCanCheckNearsRun && Pos < this.Content.length - 1 && true == CurrentRun.Cursor_Is_End();
 
         var bPrevRun = bPrevItem &&  this.Content[Pos - 1].Type == para_Math_Run,
             bNextRun = bNextItem &&  this.Content[Pos + 1].Type == para_Math_Run;

@@ -10275,15 +10275,38 @@ ParaRun.prototype.IsForcedBreak = function()
 };
 ParaRun.prototype.Is_StartForcedBreakOperator = function()
 {
-    return true == this.IsForcedBreak() && true == this.Is_StartBreakOperator();
+    var bStartOperator = this.Content.length > 0 && this.Content[0].Type == para_Math_BreakOperator;
+    return true == this.IsForcedBreak() && true == bStartOperator;
 };
-ParaRun.prototype.Is_StartBreakOperator = function()
+ParaRun.prototype.Get_AlignBrk = function(_CurLine, bBrkBefore)
 {
-    return this.Content.length > 0 && this.Content[0].Type == para_Math_BreakOperator;
-};
-ParaRun.prototype.Get_AlignBrk = function()
-{
-    return true == this.Is_StartForcedBreakOperator() ? this.MathPrp.Get_AlignBrk() : 0;
+    // null      - break отсутствует
+    // 0         - break присутствует, alnAt = undefined
+    // Number    = break присутствует, alnAt = Number
+
+
+    // если оператор находится в конце строки и по этому оператору осушествляется принудительный перенос (Forced)
+    // тогда StartPos = 0, EndPos = 1 (для предыдущей строки), т.к. оператор с принудительным переносом всегда должен находится в начале Run
+
+    var CurLine  = _CurLine - this.StartLine;
+    var AlnAt = null;
+
+    if(CurLine > 0)
+    {
+        var RangesCount = this.protected_GetRangesCount(CurLine - 1);
+        var StartPos = this.protected_GetRangeStartPos(CurLine - 1, RangesCount - 1);
+        var EndPos = this.protected_GetRangeEndPos(CurLine - 1, RangesCount - 1);
+
+        var bStartBreakOperator = bBrkBefore == true && StartPos == 0 && EndPos == 0;
+        var bEndBreakOperator   = bBrkBefore == false && StartPos == 0 && EndPos == 1;
+
+        if(bStartBreakOperator || bEndBreakOperator)
+        {
+            AlnAt = false == this.Is_StartForcedBreakOperator() ? null : this.MathPrp.Get_AlignBrk();
+        }
+    }
+
+    return AlnAt;
 };
 ParaRun.prototype.Math_Is_InclineLetter = function()
 {
@@ -10817,9 +10840,13 @@ ParaRun.prototype.Is_UseInParagraph = function()
 
     return true;
 };
-ParaRun.prototype.Displace_BreakOperator = function(_CurLine, _CurRange, isForward, CountOperators)
+ParaRun.prototype.Displace_BreakOperator = function(isForward, bBrkBefore, CountOperators)
 {
-    if(true === this.Is_StartForcedBreakOperator())
+    var bResult = true;
+    var bFirstItem = this.State.ContentPos == 0 || this.State.ContentPos == 1,
+        bLastItem  = this.State.ContentPos == this.Content.length - 1 || this.State.ContentPos == this.Content.length;
+
+    if(true === this.Is_StartForcedBreakOperator() && bFirstItem == true)
     {
         var AlnAt = this.MathPrp.Get_AlnAt();
 
@@ -10837,6 +10864,12 @@ ParaRun.prototype.Displace_BreakOperator = function(_CurLine, _CurRange, isForwa
             }
         }
     }
+    else
+    {
+        bResult = (bLastItem && bBrkBefore) || (bFirstItem && !bBrkBefore) ? false : true;
+    }
+
+    return bResult; // применили смещение к данному Run
 };
 ParaRun.prototype.Math_UpdateLineMetrics = function(PRS, ParaPr)
 {

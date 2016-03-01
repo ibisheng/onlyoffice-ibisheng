@@ -2102,7 +2102,7 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     PRS.bMath_OneLine = bOneLine;
     PRS.bContainCompareOper = bContainCompareOper;
 };
-CMathBase.prototype.Get_WrapToLine = function(_CurLine, _CurRange, WrapIndent)
+/*CMathBase.prototype.Get_WrapToLine = function(_CurLine, _CurRange, WrapIndent)
 {
     var Wrap = 0;
 
@@ -2117,7 +2117,7 @@ CMathBase.prototype.Get_WrapToLine = function(_CurLine, _CurRange, WrapIndent)
     }
 
     return Wrap;
-};
+};*/
 CMathBase.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
 {
     var bOneLine = MinMax.bMath_OneLine;
@@ -2417,13 +2417,13 @@ CMathBase.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRang
         }
     }
 };
-CMathBase.prototype.Displace_BreakOperator = function(_CurLine, _CurRange, isForward, CountOperators)
+CMathBase.prototype.Displace_BreakOperator = function(isForward, bBrkBefore, CountOperators)
 {
-    this.Content[this.NumBreakContent].Displace_BreakOperator(_CurLine, _CurRange, isForward, CountOperators);
+    this.Content[this.NumBreakContent].Displace_BreakOperator(isForward, bBrkBefore, CountOperators);
 };
-CMathBase.prototype.Get_AlignBrk = function(_CurLine, _CurRange)
+CMathBase.prototype.Get_AlignBrk = function(_CurLine, bBrkBefore)
 {
-    return this.Content[this.NumBreakContent].Get_AlignBrk(_CurLine, _CurRange);
+    return this.Content[this.NumBreakContent].Get_AlignBrk(_CurLine, bBrkBefore);
 };
 CMathBase.prototype.raw_SetReviewType = function(Type, Info)
 {

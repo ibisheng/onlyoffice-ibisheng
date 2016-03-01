@@ -21,6 +21,10 @@ CMathBreak.prototype.Copy = function()
 };
 CMathBreak.prototype.Get_AlignBrk = function()
 {
+    // undefined - break отсутствует
+    // 0         - break присутствует, alnAt = undefined
+    // Number    = break присутствует, alnAt = Number
+
     return this.alnAt !== undefined ? this.alnAt : 0;
 };
 CMathBreak.prototype.Get_AlnAt = function()
@@ -227,6 +231,7 @@ CBorderBox.prototype.recalculateSize = function()
         height += this.gapBrd;
         ascent += this.gapBrd;
     }
+
     if(this.Pr.hideBot == false)
         height += this.gapBrd;
 
@@ -623,13 +628,13 @@ CMathBoxPr.prototype.Set_FromObject = function(Obj)
     else
         this.opEmu = false;
 };
-CMathBoxPr.prototype.Get_AlignBrk = function()
-{
-    return this.brk !== undefined ? this.brk.Get_AlignBrk() : 0;
-};
 CMathBoxPr.prototype.Get_AlnAt = function()
 {
     return this.brk != undefined ? this.brk.Get_AlnAt() : undefined;
+};
+CMathBoxPr.prototype.Get_AlignBrk = function()
+{
+    return this.brk == undefined ? null : this.brk.Get_AlignBrk();
 };
 CMathBoxPr.prototype.Displace_Break = function(isForward)
 {
@@ -794,9 +799,13 @@ CBox.prototype.IsForcedBreak = function()
 };
 CBox.prototype.Get_AlignBrk = function()
 {
-    return this.Pr.Get_AlignBrk();
+    // null      - break отсутствует
+    // 0         - break присутствует, alnAt = undefined
+    // Number    = break присутствует, alnAt = Number
+
+    return false == this.private_CanUseForcedBreak() ? null : this.Pr.Get_AlignBrk();
 };
-CBox.prototype.Displace_BreakOperator = function(_CurLine, _CurRange, isForward, CountOperators)
+CBox.prototype.Displace_BreakOperator = function(isForward, bBrkBefore, CountOperators)
 {
     if(this.Pr.brk !== undefined)
     {

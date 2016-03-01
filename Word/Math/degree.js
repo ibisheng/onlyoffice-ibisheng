@@ -150,7 +150,6 @@ CDegreeBase.prototype.GetSizeSup = function(oMeasure, Metric)
     }
 
     var PlH = 0.64*this.ParaMath.GetPlh(oMeasure, mgCtrPrp);
-    //var UpBaseline = 1.65*shCenter; // расстояние от baseline основания до бейзлайна итератора
     var UpBaseline = 0.75*PlH; // расстояние от baseline основания до бейзлайна итератора
 
     if(bTextElement)

@@ -60,10 +60,6 @@ CFraction.prototype.init = function(props)
     this.setProperties(props);
     this.fillContent();
 };
-CFraction.prototype.getType = function()
-{
-    return this.Pr.type;
-};
 CFraction.prototype.draw = function(x, y, pGraphics, PDSE)
 {
     if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
