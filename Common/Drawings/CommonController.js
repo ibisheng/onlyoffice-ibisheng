@@ -3171,13 +3171,13 @@ DrawingObjectsController.prototype =
                 checkDataLabels(chart_type).setSeparator(chartSettings.separator);
         }
 
-        if(chart_type.getObjectType() === historyitem_type_LineChart && !chart.view3D)
+        if(chart_type.getObjectType() === historyitem_type_LineChart )
         {
-            if(!isRealBool(chartSettings.showMarker))
+            if(!isRealBool(chartSettings.showMarker) || chart.view3D)
             {
                 chartSettings.showMarker = false;
             }
-            if(!isRealBool(chartSettings.bLine))
+            if(!isRealBool(chartSettings.bLine) || chart.view3D)
             {
                 chartSettings.bLine = true;
             }
