@@ -2561,7 +2561,7 @@ CMathContent.prototype.private_LoadFromMenuLargeOperator = function(Type, Pr)
             var Delimiter = BaseMathContent.Add_Delimiter({ctrPrp : Pr.ctrPrp, column : 1}, 1, [null]);
             BaseMathContent = Delimiter.getElementMathContent(0);
             BaseMathContent.Add_Script(false, {ctrPrp: Pr.ctrPrp, type : DEGREE_SUBSCRIPT}, "X", null, "n");
-            BaseMathContent.Add_Text(String.fromCharCode(8898), this.Paragraph);
+            BaseMathContent.Add_Text(String.fromCharCode(8745), this.Paragraph);
             BaseMathContent.Add_Script(false, {ctrPrp: Pr.ctrPrp, type : DEGREE_SUBSCRIPT}, "Y", null, "n");
             break;
     }
