@@ -3627,11 +3627,11 @@ function OfflineEditor () {
         {
             settings.putLegendPos(c_oAscChartLegendShowSettings.none);
         }
-       // settings.putHorAxisLabel(c_oAscChartHorAxisLabelShowSettings.none);
-       // settings.putVertAxisLabel(c_oAscChartVertAxisLabelShowSettings.none);
-       // settings.putDataLabelsPos(c_oAscChartDataLabelsPos.none);
-       // settings.putHorGridLines(c_oAscGridLinesSettings.major);
-       // settings.putVertGridLines(c_oAscGridLinesSettings.none);
+        // settings.putHorAxisLabel(c_oAscChartHorAxisLabelShowSettings.none);
+        // settings.putVertAxisLabel(c_oAscChartVertAxisLabelShowSettings.none);
+        // settings.putDataLabelsPos(c_oAscChartDataLabelsPos.none);
+        // settings.putHorGridLines(c_oAscGridLinesSettings.major);
+        // settings.putVertGridLines(c_oAscGridLinesSettings.none);
 
         var vert_axis_settings = new asc_ValAxisSettings();
         settings.putVertAxisProps(vert_axis_settings);
@@ -3810,7 +3810,7 @@ function OfflineEditor () {
 //                            image: this._drawSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont)
 //                        };
 
-                       // result[n] = new formatTablePictures(options);
+                        // result[n] = new formatTablePictures(options);
                         n++;
 
                         window['native'].EndDrawStyle();
@@ -4083,7 +4083,7 @@ function OfflineEditor () {
                     if(borders.b.s !== c_oAscBorderStyles.None)
                     {
                         ctx.setStrokeStyle(borders.b.c);
-                       // ctx.lineHor(0, ySize-0.5, xSize);
+                        // ctx.lineHor(0, ySize-0.5, xSize);
 
                         nativeRender["PD_PathMoveTo"](0, ySize-0.5);
                         nativeRender["PD_PathLineTo"](xSize, ySize-0.5);
@@ -4217,8 +4217,8 @@ function OfflineEditor () {
             }
         };
 
-       // ChartPreviewManager.prototype = Object.create (ChartPreviewManager.prototype);
-       // ChartPreviewManager.prototype.constructor = ChartPreviewManager;
+        // ChartPreviewManager.prototype = Object.create (ChartPreviewManager.prototype);
+        // ChartPreviewManager.prototype.constructor = ChartPreviewManager;
 
         // chat styles
         ChartPreviewManager.prototype.clearPreviews = function() {
@@ -4274,14 +4274,14 @@ function OfflineEditor () {
 
         };
         ChartPreviewManager.prototype.getChartPreviews = function(chartType) {
-           // console.log('NATIVE getChartPreviews : ' + chartType);
+            // console.log('NATIVE getChartPreviews : ' + chartType);
 
             if (isRealNumber(chartType))
             {
                 var bIsCached = window["native"]["IsCachedChartStyles"](chartType);
                 if (!bIsCached)
                 {
-                   // window["native"]["DD_PrepareNativeDraw"]();
+                    // window["native"]["DD_PrepareNativeDraw"]();
 
                     window['native'].SetStylesType(2);
 
@@ -4291,10 +4291,10 @@ function OfflineEditor () {
                         this.createChartPreview(_graphics, chartType, i);
                     }
 
-                   // var _stream = global_memory_stream_menu;
-                   // _stream["ClearNoAttack"]();
-                   // _stream["WriteByte"](5);
-                   // _api.WordControl.m_oDrawingDocument.Native["DD_EndNativeDraw"](_stream);
+                    // var _stream = global_memory_stream_menu;
+                    // _stream["ClearNoAttack"]();
+                    // _stream["WriteByte"](5);
+                    // _api.WordControl.m_oDrawingDocument.Native["DD_EndNativeDraw"](_stream);
                 }
             }
         };
@@ -4316,7 +4316,7 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
     var ws = _api.wb.getWorksheet();
     var wb = _api.wb;
 
-   _s._resizeWorkRegion(ws, x, y, true);
+    _s._resizeWorkRegion(ws, x, y, true);
 
     var range =  ws.visibleRange.clone();
     range.c1 = _s.col0;
@@ -4351,21 +4351,24 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
 
     if (isRangeResize) {
 
-        var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
+        if (!isViewerMode) {
 
-        var rangeChange = new asc.Range(chartRange[0], chartRange[1], chartRange[2], chartRange[3]);
-        var target = {
-            formulaRange: rangeChange,
-            row: ct.row,
-            target: ct.target,
-            targetArr: -1,
-            col: ct.col,
-            cursor: "se-resize",
-            indexFormulaRange: 0
-        };
-        ws.changeSelectionMoveResizeRangeHandle(x, y, target);
+            var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
 
-   } else {
+            var rangeChange = new asc.Range(chartRange[0], chartRange[1], chartRange[2], chartRange[3]);
+            var target = {
+                formulaRange: rangeChange,
+                row: ct.row,
+                target: ct.target,
+                targetArr: -1,
+                col: ct.col,
+                cursor: "se-resize",
+                indexFormulaRange: 0
+            };
+            ws.changeSelectionMoveResizeRangeHandle(x, y, target);
+        }
+
+    } else {
 
         if (0 != _s.cellPin) {
             ws.leftTopRange = ws.activeRange.clone();
@@ -4406,19 +4409,21 @@ function offline_mouse_move(x, y, isViewerMode, isRangeResize, chartRange) {
     ws.visibleRange = range;
 
     if (isRangeResize) {
-        var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
+        if (!isViewerMode) {
+            var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
 
-        var rangeChange = new asc.Range(chartRange[0], chartRange[1], chartRange[2], chartRange[3]);
-        var target = {
-            formulaRange: rangeChange,
-            row: ct.row,
-            target: ct.target,
-            targetArr: -1,
-            col: ct.col,
-            cursor: "se-resize",
-            indexFormulaRange: 0
-        };
-        ws.changeSelectionMoveResizeRangeHandle(x, y, target);
+            var rangeChange = new asc.Range(chartRange[0], chartRange[1], chartRange[2], chartRange[3]);
+            var target = {
+                formulaRange: rangeChange,
+                row: ct.row,
+                target: ct.target,
+                targetArr: -1,
+                col: ct.col,
+                cursor: "se-resize",
+                indexFormulaRange: 0
+            };
+            ws.changeSelectionMoveResizeRangeHandle(x, y, target);
+        }
     } else {
 
         if (_s.isShapeAction) {
@@ -4478,24 +4483,25 @@ function offline_mouse_up(x, y, isViewerMode, isRangeResize, chartRange) {
     } else {
 
         if (isRangeResize) {
+            if (!isViewerMode) {
+                var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
 
-            var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
+                var target = {
+                    target: 5,
+                    targetArr: -1,
+                    cursor: "se-resize",
+                    indexFormulaRange: 0
+                };
 
-            var target = {
-                target: 5,
-                targetArr: -1,
-                cursor: "se-resize",
-                indexFormulaRange: 0
-            };
+                if (ws.moveRangeDrawingObjectTo) {
+                    ws.moveRangeDrawingObjectTo.c1 = Math.max(0, ws.moveRangeDrawingObjectTo.c1);
+                    ws.moveRangeDrawingObjectTo.c2 = Math.max(0, ws.moveRangeDrawingObjectTo.c2);
+                    ws.moveRangeDrawingObjectTo.r1 = Math.max(0, ws.moveRangeDrawingObjectTo.r1);
+                    ws.moveRangeDrawingObjectTo.r2 = Math.max(0, ws.moveRangeDrawingObjectTo.r2);
+                }
 
-            if (ws.moveRangeDrawingObjectTo) {
-                ws.moveRangeDrawingObjectTo.c1 = Math.max(0, ws.moveRangeDrawingObjectTo.c1);
-                ws.moveRangeDrawingObjectTo.c2 = Math.max(0, ws.moveRangeDrawingObjectTo.c2);
-                ws.moveRangeDrawingObjectTo.r1 = Math.max(0, ws.moveRangeDrawingObjectTo.r1);
-                ws.moveRangeDrawingObjectTo.r2 = Math.max(0, ws.moveRangeDrawingObjectTo.r2);
+                ws.applyMoveResizeRangeHandle(target);
             }
-
-            ws.applyMoveResizeRangeHandle(target);
         } else {
 
             wb._onChangeSelectionDone(-1, -1);
@@ -4513,7 +4519,7 @@ function offline_get_selection(x, y, width, height, autocorrection) {
     return _s.getSelection(x, y, width, height, autocorrection);
 }
 function offline_get_charts_ranges() {
-   return _api.wb.getWorksheet().__chartsRanges();
+    return _api.wb.getWorksheet().__chartsRanges();
 }
 function offline_get_worksheet_bounds() {
     return _s.getMaxBounds();
@@ -4575,7 +4581,7 @@ function offline_cell_editor_open(x, y, width, height, ratio, isSelectAll, isFor
     if (! isFormulaInsertMode) {
         wb._onEditCell(x, y, true, undefined, undefined, true, false);
     } else {
-       // wb.cellEditor._draw();
+        // wb.cellEditor._draw();
     }
 
     ws.visibleRange = range;
@@ -4875,7 +4881,7 @@ function offline_insertFormula(functionName, autoComplete, isDefName) {
     var openEditor = function (res) {
         if (res) {
             // Выставляем переменные, что мы редактируем
-           // t.controller.setCellEditMode(true);
+            // t.controller.setCellEditMode(true);
             ws.setCellEditMode(true);
 
             ws.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
@@ -4885,9 +4891,9 @@ function offline_insertFormula(functionName, autoComplete, isDefName) {
             if (!ws.openCellEditorWithText(wb.cellEditor, functionName, cursorPos, /*isFocus*/false,
                 /*activeRange*/arn)) {
                 ws.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
-               // t.controller.setCellEditMode(false);
-               // t.controller.setStrictClose(false);
-               // t.controller.setFormulaEditMode(false);
+                // t.controller.setCellEditMode(false);
+                // t.controller.setStrictClose(false);
+                // t.controller.setFormulaEditMode(false);
                 ws.setCellEditMode(false);
                 ws.setFormulaEditMode(false);
             }
@@ -5214,7 +5220,11 @@ function offline_apply_event(type,params) {
                         }
                         case 14:
                         {
-                            _imagePr.ChangeLevel = params[_current.pos++];
+                            {
+                                var layer = params[_current.pos++];
+                                _api.asc_setSelectedDrawingObjectLayer(layer);
+                                return _return;
+                            }
                             break;
                         }
                         case 15:
