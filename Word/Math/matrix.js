@@ -867,10 +867,22 @@ CMathMatrix.prototype.Apply_MenuProps = function(Props)
                 }
                 case c_oAscMathInterfaceMatrixColumnRule.Multiple:
                 {
+                    bGapNumber = Props.Gap !== undefined && Props.Gap + 0 == Props.Gap;
+
+                    if(bGapNumber == true && Props.Gap >= 0 && Props.Gap <= 55.87)
+                    {
+                        var Gap = (Props.Gap/0.21163) >> 0,
+                            NextMenuGap = (((0.21163 * (Gap + 1)) * 100 + 0.5) >> 0 ) / 100; // учтем округление  (пример: Props.Gap = 2.96)
+
+                        if(Props.Gap >= NextMenuGap)
+                            Gap++;
+
+                        this.Modify_Interval(this.SpaceColumn, 4, Gap);
+                    }
+
                     break;
                 }
             }
-
         }
 
         if(Props.Action & c_oMathMenuAction.DeleteMatrixRow && this.getRowsCount() > 1)
