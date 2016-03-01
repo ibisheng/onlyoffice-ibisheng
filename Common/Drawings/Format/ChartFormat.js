@@ -2410,6 +2410,10 @@ CBarChart.prototype =
         //axId будут выставлены из родительского класса
         var c = new CBarChart();
         c.setBarDir(this.barDir);
+        if(this.b3D)
+        {
+            c.set3D(true);
+        }
         if(this.dLbls)
         {
             c.setDLbls(this.dLbls.createDuplicate());
