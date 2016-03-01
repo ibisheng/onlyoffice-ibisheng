@@ -608,7 +608,7 @@ function build_rx_bool(local){
 	cBoolLocal = ( local ? local : {"t":"TRUE","f":"FALSE"} );
 	var f = cBoolLocal['f'], t = cBoolLocal['t'];
 	build_rx_array_local(local)
-	return new RegExp( "^("+t+"|"+f+")","i" );
+	return new RegExp( "^("+t+"|"+f+")([-+*\\/^&%<=>: ;),]|$)","i" );
 }
 
 function build_rx_error_local(local){
