@@ -6036,6 +6036,19 @@ function offline_apply_event(type,params) {
             break;
         }
 
+        case 7000: // ASC_SPREADSHEETS_EVENT_TYPE_CHECK_DATA_RANGE
+        {
+            var isValid = _api.asc_checkDataRange(c_oAscSelectionDialogType.Chart, params, false);
+
+            _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteLong"](isValid);
+            _return = _stream;
+
+            console.log('CHECK_DATA_RANGE: ' + isValid);
+            break;
+        }
+
         default:
             break;
     }
