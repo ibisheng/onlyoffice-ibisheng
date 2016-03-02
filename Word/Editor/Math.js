@@ -1299,7 +1299,8 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
         XEnd   = _XLimit;
     }
 
-    var LineState = this.PageInfo.Get_LineState(_CurLine, _Page);
+    var Page = this.Paragraph == null ? 0 : this.Paragraph.Get_AbsolutePage(_Page);
+    var LineState = this.PageInfo.Get_LineState(_CurLine, Page);
     var StyleLine = LineState.StyleLine,
         WidthLine = LineState.Width,
         MaxWidth  = LineState.MaxWidth,
@@ -2221,8 +2222,9 @@ ParaMath.prototype.private_SetShiftY = function(PRS, RY)
 ParaMath.prototype.private_UpdateXLimits = function(PRS)
 {
     var MathSettings = Get_WordDocumentDefaultMathSettings();
-
     var WrapState = this.PageInfo.Get_CurrentWrapState();
+
+    var Page = this.Paragraph == null ? 0 : this.Paragraph.Get_AbsolutePage(PRS.Page);
 
     PRS.X    += MathSettings.Get_LeftMargin(WrapState);
     PRS.XEnd -= MathSettings.Get_RightMargin(WrapState);
@@ -2250,9 +2252,9 @@ ParaMath.prototype.private_UpdateXLimits = function(PRS)
         }
     }
 
-    this.PageInfo.Add_Line(PRS.Line, PRS.Page, AlignAt);
+    this.PageInfo.Add_Line(PRS.Line, Page, AlignAt);
 
-    PRS.X += this.PageInfo.Get_SpaceAlign(PRS.Line, PRS.Page);
+    PRS.X += this.PageInfo.Get_SpaceAlign(PRS.Line, Page);
 
     PRS.XRange = PRS.X;
 };
