@@ -460,68 +460,87 @@ CMathSettings.prototype.Load_Settings = function()
         Settings.rMargin = 37;
     }
 
-
-    this.Load_PropsFromMenu(Settings);
-
-};
-CMathSettings.prototype.Load_PropsFromMenu = function(Settings)
-{
-    this.Pr.Merge(Settings);
-    this.bNeedCompile = true;
-};
-CMathSettings.prototype.Load_Settings_2 = function()
-{
-     var PrevState = TEST_PREV_STATE_MENU;
-     var TypeMathMenu;
-
-     if(this.CompiledPr.brkBin !== BREAK_AFTER)
-     TypeMathMenu = c_oAscMathMenuTypes.BreakAfter;
-     else
-     TypeMathMenu =  c_oAscMathMenuTypes.BreakBefore;
-
-     this.Load_PropsFromMenu(TypeMathMenu);
-
-     TEST_PREV_STATE_MENU = TypeMathMenu;
-};
-CMathSettings.prototype.Load_PropsFromMenu_2 = function(Type)
-{
-    switch(Type)
-    {
-        case c_oAscMathMenuTypes.BreakBefore:
-        {
-            if(this.Pr.brkBin !== BREAK_BEFORE)
-            {
-                this.Pr.brkBin = BREAK_BEFORE;
-                this.bNeedCompile = true;
-            }
-            break;
-        }
-        case c_oAscMathMenuTypes.BreakAfter:
-        {
-            if(this.Pr.brkBin !== BREAK_AFTER)
-            {
-                this.Pr.brkBin = BREAK_AFTER;
-                this.bNeedCompile = true;
-            }
-            break;
-        }
-    }
-};
-CMathSettings.prototype.Get_CopyPr = function()
-{
-    return this.Pr.Copy();
 };
 CMathSettings.prototype.Get_MenuProps = function()
 {
-    return this.CompiledPr.Copy();
+    return new CMathMenuSettings(this.CompiledPr);
 };
-CMathSettings.prototype.Save_Changes = function(Data, Writer)
+CMathSettings.prototype.Set_MenuProps = function(Props)
 {
-    WriteChanges_ToBinary(Data, Writer);
-};
-CMathSettings.prototype.Load_Changes = function(Reader)
-{
-    ReadChanges_FromBinary(Reader, this);
+    if(Props.BrkBin !== undefined)
+    {
+        switch(Props.Justification)
+        {
+            case c_oAscMathInterfaceSettingsAlign.Justify:
+            {
+                this.Pr.brkBin = align_Justify;
+                break;
+            }
+            case c_oAscMathInterfaceSettingsAlign.Center:
+            {
+                this.Pr.brkBin = align_Center;
+                break;
+            }
+            case c_oAscMathInterfaceSettingsAlign.Left:
+            {
+                this.Pr.brkBin = align_Left;
+                break;
+            }
+            case c_oAscMathInterfaceSettingsAlign.Right:
+            {
+                this.Pr.brkBin = align_Right;
+                break;
+            }
+        }
+    }
+
+    if(Props.UseSettings !== undefined)
+    {
+        this.Pr.dispDef = Props.UseSettings;
+    }
+
+    if(Props.IntLim !== undefined)
+    {
+        if(Props.IntLim == c_oAscMathInterfaceNaryLimitLocation.SubSup)
+        {
+            this.Pr.intLim = NARY_SubSup;
+        }
+        else if(Props.IntLim == c_oAscMathInterfaceNaryLimitLocation.UndOvr)
+        {
+            this.Pr.intLim = NARY_UndOvr;
+        }
+    }
+
+    if(Props.NaryLim !== undefined)
+    {
+        if(Props.NaryLim == c_oAscMathInterfaceNaryLimitLocation.SubSup)
+        {
+            this.Pr.naryLim = NARY_SubSup;
+        }
+        else if(Props.NaryLim == c_oAscMathInterfaceNaryLimitLocation.UndOvr)
+        {
+            this.Pr.naryLim = NARY_UndOvr;
+        }
+    }
+
+    if(Props.LeftMargin !== undefined && Props.LeftMargin == Props.LeftMargin + 0)
+    {
+        this.Pr.lMargin = Props.LeftMargin;
+    }
+
+    if(Props.RightMargin !== undefined && Props.RightMargin == Props.RightMargin + 0)
+    {
+        this.Pr.rMargin = Props.RightMargin;
+    }
+
+
+    if(Props.WrapIndent !== undefined && Props.WrapIndent == Props.WrapIndent + 0)
+    {
+        this.Pr.wrapIndent = Props.WrapIndent;
+    }
+
+    this.bNeedCompile = true;
+
 };
 CMathSettings.prototype.Write_ToBinary = function(Writer)
 {
@@ -532,6 +551,98 @@ CMathSettings.prototype.Read_FromBinary = function(Reader)
     this.Pr.Read_FromBinary(Reader);
     this.bNeedCompile = true;
 };
+
+
+function CMathMenuSettings(oMathPr)
+{
+    if(oMathPr)
+    {
+        this.BrkBin = oMathPr.brkBin === BREAK_BEFORE ? c_oAscMathInterfaceSettingsBrkBin.BreakBefore : c_oAscMathInterfaceSettingsBrkBin.BreakAfter;
+
+        switch(oMathPr.defJc)
+        {
+            case align_Justify:
+            {
+                this.Justification  = c_oAscMathInterfaceSettingsAlign.Justify;
+                break;
+            }
+            case align_Center:
+            {
+                this.Justification  = c_oAscMathInterfaceSettingsAlign.Center;
+                break;
+            }
+            case align_Left:
+            {
+                this.Justification  = c_oAscMathInterfaceSettingsAlign.Left;
+                break;
+            }
+            case align_Right :
+            {
+                this.Justification  = c_oAscMathInterfaceSettingsAlign.Right;
+                break;
+            }
+            default:
+            {
+                this.Justification  = align_Justify;
+                break;
+            }
+        }
+
+        this.UseSettings    = oMathPr.dispDef;
+
+        this.IntLim         = oMathPr.intLim === NARY_SubSup ? c_oAscMathInterfaceNaryLimitLocation.SubSup : c_oAscMathInterfaceNaryLimitLocation.UndOvr;
+        this.NaryLim        = oMathPr.naryLim === NARY_SubSup ? c_oAscMathInterfaceNaryLimitLocation.SubSup : c_oAscMathInterfaceNaryLimitLocation.UndOvr;
+
+        this.LeftMargin     = oMathPr.lMargin/10;
+        this.RightMargin    = oMathPr.rMargin/10;
+        this.WrapIndent     = oMathPr.wrapIndent/10;
+    }
+    else
+    {
+        this.BrkBin          = undefined;
+        this.Justification   = undefined;
+        this.UseSettings     = undefined;
+        this.IntLim          = undefined;
+        this.NaryLim         = undefined;
+        this.LeftMargin      = undefined;
+        this.RightMargin     = undefined;
+        this.WrapIndent      = undefined;
+    }
+}
+CMathMenuSettings.prototype.get_BreakBin = function(){ return this.BrkBin;};
+CMathMenuSettings.prototype.put_BreakBin = function(BreakBin){ this.BrkBin = BreakBin;};
+CMathMenuSettings.prototype.get_UseSettings = function(){ return this.UseSettings;};
+CMathMenuSettings.prototype.put_UseSettings = function(UseSettings){ this.UseSettings = UseSettings;};
+CMathMenuSettings.prototype.get_Justification = function(){ return this.Justification;};
+CMathMenuSettings.prototype.put_Justification = function(Align){ this.Justification = Align;};
+CMathMenuSettings.prototype.get_IntLim = function(){ return this.IntLim;};
+CMathMenuSettings.prototype.put_IntLim = function(IntLim){ this.IntLim = IntLim;};
+CMathMenuSettings.prototype.get_NaryLim = function(){ return this.NaryLim;};
+CMathMenuSettings.prototype.put_NaryLim = function(NaryLim){ this.NaryLim = NaryLim;};
+CMathMenuSettings.prototype.get_LeftMargin = function(){ return this.LeftMargin;};
+CMathMenuSettings.prototype.put_LeftMargin = function(lMargin){ this.LeftMargin = lMargin;};
+CMathMenuSettings.prototype.get_RightMargin = function(){ return this.RightMargin;};
+CMathMenuSettings.prototype.put_RightMargin = function(rMargin){ this.RightMargin = rMargin;};
+CMathMenuSettings.prototype.get_WrapIndent = function(){return this.WrapIndent;};
+CMathMenuSettings.prototype.put_WrapIndent = function(WrapIndent){this.WrapIndent = WrapIndent;};
+
+window["CMathMenuSettings"]                         = CMathMenuSettings;
+CMathMenuSettings.prototype["get_BreakBin"]        = CMathMenuSettings.prototype.get_BreakBin;
+CMathMenuSettings.prototype["put_BreakBin"]        = CMathMenuSettings.prototype.put_BreakBin;
+CMathMenuSettings.prototype["get_UseSettings"]     = CMathMenuSettings.prototype.get_UseSettings;
+CMathMenuSettings.prototype["put_UseSettings"]     = CMathMenuSettings.prototype.put_UseSettings;
+CMathMenuSettings.prototype["get_Justification"]   = CMathMenuSettings.prototype.get_Justification;
+CMathMenuSettings.prototype["put_Justification"]   = CMathMenuSettings.prototype.put_Justification;
+CMathMenuSettings.prototype["get_IntLim"]          = CMathMenuSettings.prototype.get_IntLim;
+CMathMenuSettings.prototype["put_IntLim"]          = CMathMenuSettings.prototype.put_IntLim;
+CMathMenuSettings.prototype["get_NaryLim"]         = CMathMenuSettings.prototype.get_NaryLim;
+CMathMenuSettings.prototype["put_NaryLim"]         = CMathMenuSettings.prototype.put_NaryLim;
+CMathMenuSettings.prototype["get_LeftMargin"]      = CMathMenuSettings.prototype.get_LeftMargin;
+CMathMenuSettings.prototype["put_LeftMargin"]      = CMathMenuSettings.prototype.put_LeftMargin;
+CMathMenuSettings.prototype["get_RightMargin"]     = CMathMenuSettings.prototype.get_RightMargin;
+CMathMenuSettings.prototype["put_RightMargin"]     = CMathMenuSettings.prototype.put_RightMargin;
+CMathMenuSettings.prototype["get_WrapIndent"]      = CMathMenuSettings.prototype.get_WrapIndent;
+CMathMenuSettings.prototype["put_WrapIndent"]      = CMathMenuSettings.prototype.put_WrapIndent;
 
 
 function Get_WordDocumentDefaultMathSettings()
