@@ -649,6 +649,21 @@ var c_oAscMathInterfaceGroupCharPos = {
   Bottom : 1
 };
 
+var c_oAscMathInterfaceSettingsBrkBin = {
+  BreakRepeat   : 0x00,
+  BreakBefore   : 0x01,
+  BreakAfter    : 0x02
+};
+
+var c_oAscMathInterfaceSettingsAlign = {
+  Left   : 0,
+  Center : 1,
+  Right  : 2,
+  Justify : 3
+};
+
+
+
 var c_oAscRevisionsChangeType = {
   Unknown: 0x00,
   TextAdd: 0x01,
