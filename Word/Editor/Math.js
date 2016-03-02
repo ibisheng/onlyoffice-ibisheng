@@ -7,8 +7,6 @@
 var g_dMathArgSizeKoeff_1 = 0.76;
 var g_dMathArgSizeKoeff_2 = 0.6498; // 0.76 * 0.855
 
-var TEST_PREV_STATE_MENU = 0;
-
 function CMathPropertiesSettings()
 {
     this.brkBin     = null;
@@ -17,14 +15,12 @@ function CMathPropertiesSettings()
     this.dispDef    = null;
 
     this.intLim     = null;
-
-    this.lMargin    = null;
-
     this.naryLim    = null;
 
+    this.lMargin    = null;
     this.rMargin    = null;
-
     this.wrapIndent = null;
+    this.wrapRight  = null;
 
     //   не реализовано    //
     this.brkBinSub  = null;
@@ -43,8 +39,6 @@ function CMathPropertiesSettings()
 
     this.smallFrac  = null;
 
-    this.wrapRight  = null;
-
     //*********************//
 }
 CMathPropertiesSettings.prototype.SetDefaultPr = function()
@@ -58,6 +52,7 @@ CMathPropertiesSettings.prototype.SetDefaultPr = function()
     this.naryLim    = NARY_UndOvr;
     this.rMargin    = 0;
     this.wrapIndent = 25; // mm
+    this.wrapRight  = false;
 };
 CMathPropertiesSettings.prototype.Merge = function(Pr)
 {
@@ -87,6 +82,9 @@ CMathPropertiesSettings.prototype.Merge = function(Pr)
 	
     if(Pr.mathFont !== null && Pr.mathFont !== undefined)
         this.mathFont = Pr.mathFont;
+
+    if(Pr.wrapRight !== null && Pr.wrapRight !== undefined)
+        this.wrapRight = Pr.wrapRight;
 };
 CMathPropertiesSettings.prototype.Copy = function()
 {
@@ -324,14 +322,10 @@ CMathSettings.prototype.Get_WrapIndent = function(WrapState)
     this.SetCompiledPr();
 
     var wrapIndent = 0;
-    if(WrapState == ALIGN_MARGIN_WRAP || WrapState == ALIGN_WRAP)
+    if(this.wrapRight == false && (WrapState == ALIGN_MARGIN_WRAP || WrapState == ALIGN_WRAP))
         wrapIndent = this.GetPrDispDef().wrapIndent;
 
     return wrapIndent;
-};
-CMathSettings.prototype.IsWrap = function(WrapState)
-{
-    return WrapState == ALIGN_MARGIN_WRAP || WrapState == ALIGN_WRAP;
 };
 CMathSettings.prototype.Get_LeftMargin = function(WrapState)
 {
@@ -376,6 +370,11 @@ CMathSettings.prototype.Get_BrkBin = function()
 {
     this.SetCompiledPr();
     return this.CompiledPr.brkBin;
+};
+CMathSettings.prototype.Get_WrapRight = function()
+{
+    this.SetCompiledPr();
+    return this.CompiledPr.wrapRight;
 };
 CMathSettings.prototype.Load_Settings = function()
 {
@@ -469,26 +468,31 @@ CMathSettings.prototype.Set_MenuProps = function(Props)
 {
     if(Props.BrkBin !== undefined)
     {
+        this.Pr.brkBin = Props.BrkBin == c_oAscMathInterfaceSettingsBrkBin.BreakAfter ? BREAK_AFTER : BREAK_BEFORE;
+    }
+
+    if(Props.Justification !== undefined)
+    {
         switch(Props.Justification)
         {
             case c_oAscMathInterfaceSettingsAlign.Justify:
             {
-                this.Pr.brkBin = align_Justify;
+                this.Pr.defJc = align_Justify;
                 break;
             }
             case c_oAscMathInterfaceSettingsAlign.Center:
             {
-                this.Pr.brkBin = align_Center;
+                this.Pr.defJc = align_Center;
                 break;
             }
             case c_oAscMathInterfaceSettingsAlign.Left:
             {
-                this.Pr.brkBin = align_Left;
+                this.Pr.defJc = align_Left;
                 break;
             }
             case c_oAscMathInterfaceSettingsAlign.Right:
             {
-                this.Pr.brkBin = align_Right;
+                this.Pr.defJc = align_Right;
                 break;
             }
         }
@@ -533,10 +537,14 @@ CMathSettings.prototype.Set_MenuProps = function(Props)
         this.Pr.rMargin = Props.RightMargin;
     }
 
-
     if(Props.WrapIndent !== undefined && Props.WrapIndent == Props.WrapIndent + 0)
     {
         this.Pr.wrapIndent = Props.WrapIndent;
+    }
+
+    if(Props.WrapRight !== undefined && Props.WrapRight !== null)
+    {
+        this.Pr.wrapRight = Props.WrapRight;
     }
 
     this.bNeedCompile = true;
@@ -557,7 +565,7 @@ function CMathMenuSettings(oMathPr)
 {
     if(oMathPr)
     {
-        this.BrkBin = oMathPr.brkBin === BREAK_BEFORE ? c_oAscMathInterfaceSettingsBrkBin.BreakBefore : c_oAscMathInterfaceSettingsBrkBin.BreakAfter;
+        this.BrkBin = oMathPr.brkBin === BREAK_AFTER ? c_oAscMathInterfaceSettingsBrkBin.BreakAfter : c_oAscMathInterfaceSettingsBrkBin.BreakBefore;
 
         switch(oMathPr.defJc)
         {
@@ -596,6 +604,7 @@ function CMathMenuSettings(oMathPr)
         this.LeftMargin     = oMathPr.lMargin/10;
         this.RightMargin    = oMathPr.rMargin/10;
         this.WrapIndent     = oMathPr.wrapIndent/10;
+        this.WrapRight      = oMathPr.wrapRight;
     }
     else
     {
@@ -607,6 +616,7 @@ function CMathMenuSettings(oMathPr)
         this.LeftMargin      = undefined;
         this.RightMargin     = undefined;
         this.WrapIndent      = undefined;
+        this.WrapRight       = undefined;
     }
 }
 CMathMenuSettings.prototype.get_BreakBin = function(){ return this.BrkBin;};
@@ -625,6 +635,8 @@ CMathMenuSettings.prototype.get_RightMargin = function(){ return this.RightMargi
 CMathMenuSettings.prototype.put_RightMargin = function(rMargin){ this.RightMargin = rMargin;};
 CMathMenuSettings.prototype.get_WrapIndent = function(){return this.WrapIndent;};
 CMathMenuSettings.prototype.put_WrapIndent = function(WrapIndent){this.WrapIndent = WrapIndent;};
+CMathMenuSettings.prototype.get_WrapRight = function(){ return this.WrapRight;};
+CMathMenuSettings.prototype.put_WrapRight = function(WrapRight){ this.WrapRight = WrapRight;};
 
 window["CMathMenuSettings"]                         = CMathMenuSettings;
 CMathMenuSettings.prototype["get_BreakBin"]        = CMathMenuSettings.prototype.get_BreakBin;
@@ -643,6 +655,8 @@ CMathMenuSettings.prototype["get_RightMargin"]     = CMathMenuSettings.prototype
 CMathMenuSettings.prototype["put_RightMargin"]     = CMathMenuSettings.prototype.put_RightMargin;
 CMathMenuSettings.prototype["get_WrapIndent"]      = CMathMenuSettings.prototype.get_WrapIndent;
 CMathMenuSettings.prototype["put_WrapIndent"]      = CMathMenuSettings.prototype.put_WrapIndent;
+CMathMenuSettings.prototype["get_WrapRight"]       = CMathMenuSettings.prototype.get_WrapRight;
+CMathMenuSettings.prototype["put_WrapRight"]       = CMathMenuSettings.prototype.put_WrapRight;
 
 
 function Get_WordDocumentDefaultMathSettings()
@@ -1313,7 +1327,11 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _Page, _X, _X
     }
     else
     {
-        if(Jc == align_Justify)
+        if(true == MathSettings.Get_WrapRight()) // флаг свидетельствует о том, что строки кроме первой и строк, выровненных относительно первой, нужно размещать окол правой границы
+        {
+            X = Math.max(XEnd - WidthLine  + WrapLine, XStart);
+        }
+        else if(Jc == align_Justify)
         {
             X = XEnd - XStart > MaxWidth ? XStart + (XEnd - XStart - MaxWidth)/2 + WrapLine : XStart;
         }
@@ -2217,21 +2235,18 @@ ParaMath.prototype.private_UpdateXLimits = function(PRS)
     var AlignAt;
     var Jc = this.Get_Align();
 
-    if(Jc == align_Left || Jc == align_Justify)
-    {
-        var alignBrk = this.Root.Get_AlignBrk(PRS.Line, this.Is_BrkBinBefore());
+    var alignBrk = this.Root.Get_AlignBrk(PRS.Line, this.Is_BrkBinBefore());
 
-        if(alignBrk !== null)
+    if(alignBrk !== null)
+    {
+        if(alignBrk == 0 || Jc == align_Right || Jc == align_Center)
         {
-            if(alignBrk == 0)
-            {
-                AlignAt = 0;
-            }
-            else
-            {
-                var PosAln  = alignBrk < this.DispositionOpers.length ?  alignBrk - 1 : this.DispositionOpers.length - 1;
-                AlignAt = this.DispositionOpers[PosAln];
-            }
+            AlignAt = 0;
+        }
+        else
+        {
+            var PosAln  = alignBrk < this.DispositionOpers.length ?  alignBrk - 1 : this.DispositionOpers.length - 1;
+            AlignAt = this.DispositionOpers[PosAln];
         }
     }
 
