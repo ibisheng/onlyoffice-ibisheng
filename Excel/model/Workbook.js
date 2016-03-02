@@ -1086,16 +1086,33 @@ DependencyGraph.prototype = {
         return sNewName;
     },
     addTableName:function ( sName, ws, Ref ) {
-        var refClone = Ref.clone(true ), dfv, defNameSheetsList;
-        refClone.r1++;
-        dfv = new DefNameVertex( null, sName, parserHelp.get3DRef( ws.getName(), refClone.getAbsName() ), null, this.wb, true );
-        defNameSheetsList = this.defNameSheets[dfv.sheetId];
-        this.defNameList[dfv.nodeId] = dfv;
-        if ( defNameSheetsList == null ) {
-            defNameSheetsList = {};
-            this.defNameSheets[dfv.sheetId] = defNameSheetsList;
-        }
-        defNameSheetsList[dfv.nodeId] = dfv;
+        var refClone, defNameSheetsList, dfv, nSE, se;
+		if(this.defNameSheets["WB"]){
+			dfv = this.defNameSheets["WB"][getDefNameVertexId( null, sName )]
+		}
+		refClone = Ref.clone(true )
+		refClone.r1++;
+		if(!dfv){
+			dfv = new DefNameVertex( null, sName, parserHelp.get3DRef( ws.getName(), refClone.getAbsName() ), null, this.wb, true );
+			defNameSheetsList = this.defNameSheets[dfv.sheetId];
+			this.defNameList[dfv.nodeId] = dfv;
+			if ( defNameSheetsList == null ) {
+				defNameSheetsList = {};
+				this.defNameSheets[dfv.sheetId] = defNameSheetsList;
+			}
+			defNameSheetsList[dfv.nodeId] = dfv;
+		}
+		else{
+			dfv.Ref = parserHelp.get3DRef( ws.getName(), refClone.getAbsName() );
+			nSE = dfv.getSlaveEdges();
+			for ( var id in nSE ) {
+				se = nSE[id];
+				addToArrRecalc(se.sheetId, se.cell);
+				this.wb.needRecalc.nodes[se.nodeId] = [se.sheetId, se.cellId ];
+				this.wb.needRecalc.length++;
+			}
+		}
+
 		addToArrDefNameRecalc(dfv);
     },
     changeTableName:function(tableName, ws, newRef){
@@ -1109,6 +1126,19 @@ DependencyGraph.prototype = {
     delTableName:function(name,ws){
         var table = this.getDefNameNodeByName( name, ws );
         table.Ref = null;
+
+		var nSE, se;
+		nSE = table.getSlaveEdges();
+
+		table.deleteAllMasterEdges();
+
+		for ( var id in nSE ) {
+			se = nSE[id];
+			addToArrRecalc(se.sheetId, se.cell);
+			this.wb.needRecalc.nodes[se.nodeId] = [se.sheetId, se.cellId ];
+			this.wb.needRecalc.length++;
+		}
+		addToArrDefNameRecalc(table);
     },
 	rebuildTable:function(tableName){
 		var table = this.getDefNameNodeByName( tableName, null ), nSE, se, nME, range;
@@ -1963,15 +1993,18 @@ Workbook.prototype.init=function(bNoBuildDep){
 		this.nActive = this.aWorksheets.length - 1;
 	
 	var self = this;
-	
-	this.wsHandlers = new asc.asc_CHandlersList(/*handlers*/{
-		"changeRefTablePart"    : function (displayName, ref) {
+
+	this.wsHandlers = new asc.asc_CHandlersList( /*handlers*/{
+		"changeRefTablePart"   : function ( displayName, ref ) {
 			self.dependencyFormulas.changeTableName( displayName, null, ref );
 		},
-		"changeColumnTablePart" : function(tableName){
-			self.dependencyFormulas.rebuildTable(tableName);
+		"changeColumnTablePart": function ( tableName ) {
+			self.dependencyFormulas.rebuildTable( tableName );
+		},
+		"delTable"             : function ( name, ws ) {
+			self.dependencyFormulas.delTableName( name, ws );
 		}
-	});
+	} );
 	
     //charts
     for(var i = 0, length = this.aWorksheets.length; i < length; ++i)

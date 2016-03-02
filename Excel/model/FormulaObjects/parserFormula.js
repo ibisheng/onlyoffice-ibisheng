@@ -1458,6 +1458,9 @@ cStrucTable.prototype.addDefinedNameNode = function ( nameReParse ) {
 	return this.wb.getDefinesNames( this.table.Name, this.ws.getId() );
 };
 cStrucTable.prototype.toRef = function () {
+	if ( !this.table || !this.table.Ref ) {
+		return new cError( cErrorType.wrong_name );
+	}
     return this.area ? this.area : new cError( cErrorType.bad_reference );
 };
 cStrucTable.prototype.toString = function () {
@@ -2272,7 +2275,101 @@ cRangeUnionOperator.prototype.Calculate = function ( arg ) {
         arg0 = arg0.union( arg1 );
         arg0.normalize( true );
 
+		if( arg0.isOneCell() )
+			this.value = new cRef( arg0.getName(), ws );
+		else
+			this.value = new cArea( arg0.getName(), ws );
+
         this.value = new cArea( arg0.getName(), ws );
+
+    }
+    else {
+        return this.value = new cError( cErrorType.wrong_value_type );
+    }
+
+    if ( this.value instanceof cArea || this.value instanceof cRef || this.value instanceof cRef3D || this.value instanceof cArea3D ) {
+        var r1 = arguments[1], r2 = arguments[2], wb = r1.worksheet.workbook, cellName = r1.getFirst().getID(), wsId = r1.worksheet.getId();
+
+        if ( this.value instanceof cArea && this.value.isValid() ) {
+            var nFrom, nTo;
+
+            if ( r2 ) {
+                nFrom = r2.defName;
+            }
+            else {
+                nFrom = wb.dependencyFormulas.addNode( wsId, cellName );
+            }
+
+            nTo = wb.dependencyFormulas.addNode( this.value.getWsId(), this.value._cells.replace( /\$/g, "" ) );
+            this.value.setNode( nTo );
+            wb.dependencyFormulas.addEdge2( nFrom, nTo );
+        }
+        else if ( this.value instanceof cArea3D && this.value.isValid() ) {
+            var wsR = this.value.wsRange(),
+                nTo, nFrom, _cell = this.value._cells.replace( /\$/g, "" );
+
+            for ( var j = 0; j < wsR.length; j++ ) {
+                if ( r2 ) {
+                    nTo = wb.dependencyFormulas.addNode( wsR[j].Id, _cell );
+                    wb.dependencyFormulas.addEdge2( r2.defName, nTo );
+                }
+                else
+                    wb.dependencyFormulas.addEdge( wsId, cellName.replace( /\$/g, "" ), wsR[j].Id, _cell );
+            }
+        }
+    }
+
+    return this.value;
+};
+
+/** @constructor */
+function cRangeIntersectionOperator() {
+    cBaseOperator.apply( this, [' ', 50, 2] );
+}
+
+cRangeIntersectionOperator.prototype = Object.create( cBaseOperator.prototype );
+cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0], arg1 = arg[1], wsId0, wsId1, wb, ws;
+    if ( ( arg0 instanceof cRef || arg0 instanceof cArea || arg0 instanceof cRef3D || arg0 instanceof cArea3D && (wsId0 = arg0.wsFrom) == arg0.wsTo ) &&
+        ( arg1 instanceof cRef || arg1 instanceof cArea || arg1 instanceof cRef3D || arg1 instanceof cArea3D && (wsId1 = arg1.wsFrom) == arg1.wsTo ) ) {
+
+        if ( arg0 instanceof cArea3D ) {
+            wsId0 = arg0.wsFrom;
+            ws = arg0.getWS();
+        }
+        else {
+            wsId0 = arg0.ws.getId();
+            ws = arg0.getWS();
+        }
+
+        if ( arg1 instanceof cArea3D ) {
+            wsId1 = arg1.wsFrom;
+            ws = arg1.getWS();
+        }
+        else {
+            wsId1 = arg1.ws.getId();
+            ws = arg1.getWS();
+        }
+
+        if ( wsId0 != wsId1 ) {
+            return this.value = new cError( cErrorType.wrong_value_type );
+        }
+
+        arg0 = arg0.getBBox0();
+        arg1 = arg1.getBBox0();
+        if ( !arg0 || !arg1 ) {
+            return this.value = new cError( cErrorType.wrong_value_type );
+        }
+        arg0 = arg0.intersection( arg1 );
+		if( arg0 ){
+        	arg0.normalize( true );
+			if( arg0.isOneCell() )
+				this.value = new cRef( arg0.getName(), ws );
+			else
+				this.value = new cArea( arg0.getName(), ws );
+		}
+		else
+			return this.value = new cError( cErrorType.wrong_value_type );
 
     }
     else {
@@ -2760,7 +2857,8 @@ var cFormulaOperators = {
         return r;
     },
     /* 50 is highest priority */
-    ':'       :cRangeUnionOperator,
+    ':'       : cRangeUnionOperator,
+    ' '       : cRangeIntersectionOperator,
     'un_minus': cUnarMinusOperator,
     'un_plus' : cUnarPlusOperator,
     '%'       : cPercentOperator,
@@ -3922,7 +4020,7 @@ parserFormula.prototype = {
              }*/
 
             /* Operators*/
-            if ( parserHelp.isOperator.call( this, this.Formula, this.pCurrPos )/*  || isNextPtg(this.formula,this.pCurrPos) */ ) {
+            if ( parserHelp.isOperator.call( this, this.Formula, this.pCurrPos ) /*|| parserHelp.isNextPtg.call( this, this.Formula, this.pCurrPos )*/ ) {
                 wasLeftParentheses = false;
                 wasRigthParentheses = false;
                 found_operator = null;
@@ -4911,6 +5009,8 @@ parserFormula.prototype = {
             ref = this.outStack[i];
 
 			if ( ref.type == cElementType.table ) {
+				nTo = ref.addDefinedNameNode( /*nameReParse*/ );
+				this.wb.dependencyFormulas.addEdge2( node, nTo );
 				ref = ref.toRef();
 			}
 

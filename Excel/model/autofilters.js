@@ -308,16 +308,16 @@ var maxIndividualValues = 10000;
 				
 				//*****callBack on add filter
 				var addFilterCallBack = function()
-				{	
+				{
 					History.Create_NewPoint();
 					History.StartTransaction();
-					
+
 					if(tablePartsContainsRange)
 					{
 						cloneFilter = tablePartsContainsRange.clone(null);
 						tablePartsContainsRange.AutoFilter = new AutoFilter();
 						tablePartsContainsRange.AutoFilter.Ref = tablePartsContainsRange.Ref.clone();
-						
+
 						//history
 						t._addHistoryObj(cloneFilter, historyitem_AutoFilter_Add,
 							{activeCells: activeRange, styleName: styleName}, null, cloneFilter.Ref);
@@ -326,37 +326,37 @@ var maxIndividualValues = 10000;
 					{
 						if(addNameColumn && filterRange.r2 >= gc_nMaxRow)
 							filterRange.r2 = gc_nMaxRow - 1;
-						
+
 						if(styleName)
 							aWs.getRange3(filterRange.r1, filterRange.c1, filterRange.r2, filterRange.c2).unmerge();
-						
+
 						if(addNameColumn && !isTurnOffHistory)
 						{
 							if(t._isEmptyCellsUnderRange(rangeWithoutDiff))
 								aWs._moveRange(filterRange,  new Asc.Range(filterRange.c1, filterRange.r1 + 1, filterRange.c2, filterRange.r2));
 							else
 							{
-								//shift down not empty range and move 
+								//shift down not empty range and move
 								aWs.getRange3(filterRange.r2, filterRange.c1, filterRange.r2, filterRange.c2).addCellsShiftBottom();
 								aWs._moveRange(filterRange,  new Asc.Range(filterRange.c1, filterRange.r1 + 1, filterRange.c2, filterRange.r2));
 								//if down tablePart
 								t.insertRows("insCell", new Asc.Range(filterRange.c1, filterRange.r2, filterRange.c2, filterRange.r2), c_oAscInsertOptions.InsertCellsAndShiftDown);
-							}	
+							}
 						}
 
 						//add to model
 						var newTablePart = t._addNewFilter(filterRange, styleName, bWithoutFilter, tablePartDisplayName);
 						var newDisplayName = newTablePart && newTablePart.DisplayName ? newTablePart.DisplayName : null;
-						
+
 						if(styleName)
 							t._setColorStyleTable(aWs.TableParts[aWs.TableParts.length - 1].Ref, aWs.TableParts[aWs.TableParts.length - 1], null, true);
-						
+
 						//history
 						t._addHistoryObj({Ref: filterRange}, historyitem_AutoFilter_Add,
 							{activeCells: filterRange, styleName: styleName, addFormatTableOptionsObj: addFormatTableOptionsObj, displayName: newDisplayName}, null, filterRange, bWithoutFilter);
 						History.SetSelectionRedo(filterRange);
 					}
-					
+
 					//updates
 					if(styleName && addNameColumn)
 						ws.setSelection(filterRange);
@@ -364,7 +364,7 @@ var maxIndividualValues = 10000;
 					
 					History.EndTransaction();
 				};
-				
+
 				//не лочим в случае обыкновенного а/ф
 				if(isTurnOffHistory || !styleName || offLock)
 					addFilterCallBack(true);
@@ -384,7 +384,7 @@ var maxIndividualValues = 10000;
 					filterRange = tablePartsContainsRange.Ref.clone();
 				else if(aWs.AutoFilter)
 					filterRange = aWs.AutoFilter.Ref;
-				
+
 				if(!filterRange)
 					return;
 					
@@ -423,7 +423,7 @@ var maxIndividualValues = 10000;
 					
 					History.EndTransaction();
 				};
-				
+
 				//не лочим в случае обыкновенного а/ф
 				if(isTurnOffHistory || offLock)
 					addFilterCallBack(true);
@@ -467,7 +467,7 @@ var maxIndividualValues = 10000;
 					
 				//не лочим в случае обыкновенного а/ф
 				if(isTurnOffHistory || !styleName)
-					addFilterCallBack(true);
+				addFilterCallBack(true);
 				else
 					ws._isLockedCells(filterRange, /*subType*/null, addFilterCallBack);
 								
@@ -479,7 +479,7 @@ var maxIndividualValues = 10000;
 				var aWs = this._getCurrentWS();
 				var filterRange = aWs.AutoFilter.Ref.clone();
 				var t = this;
-				
+
 				var addNameColumn = false;
 				if(addFormatTableOptionsObj === false)
 					addNameColumn = true;
@@ -522,7 +522,7 @@ var maxIndividualValues = 10000;
 				var oldFilter = filterObj.filter.clone(null);
 				History.Create_NewPoint();
 				History.StartTransaction();
-				
+
 				//change model
 				var autoFilter = filterObj.filter;
 				if(filterObj.filter.TableStyleInfo !== undefined)
@@ -615,7 +615,7 @@ var maxIndividualValues = 10000;
 				this._addHistoryObj(oldFilter, historyitem_AutoFilter_ApplyMF,
 					{activeCells: ar, autoFiltersObject: autoFiltersObject});
 				History.EndTransaction();
-				
+
 				//updates
 				this._reDrawFilters();
 				if(!aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
@@ -1210,7 +1210,7 @@ var maxIndividualValues = 10000;
 							if(cloneData.Ref.isEqual(aWs.TableParts[l].Ref))
 							{
 								this._cleanStyleTable(cloneData.Ref);
-                                aWs.workbook.dependencyFormulas.delTableName(aWs.TableParts[l].DisplayName,aWs.getName());
+								aWs.handlers.trigger("delTable", aWs.TableParts[l].DisplayName,aWs.getName());
                                 aWs.TableParts.splice(l,1);
 							}	
 						}
@@ -1296,7 +1296,7 @@ var maxIndividualValues = 10000;
 							t._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, oldFilter.Ref);
 						
 						if(isTablePart)
-							aWs.workbook.dependencyFormulas.delTableName(oldFilter.DisplayName,aWs.getName())
+							aWs.handlers.trigger("delTable", oldFilter.DisplayName, aWs.getName());
 					} else
 						return oldFilter;
 				};
@@ -1370,7 +1370,7 @@ var maxIndividualValues = 10000;
 			isCheckMoveRange: function(arnFrom, arnTo)
 			{	
 				var aWs = this._getCurrentWS();
-				
+			
 				var tableParts = aWs.TableParts;
 				var tablePart;
 				
@@ -1702,38 +1702,38 @@ var maxIndividualValues = 10000;
 					{
 						if(isTurnOffHistory)
 							History.TurnOff();
-						History.Create_NewPoint();
-						History.StartTransaction();
+					History.Create_NewPoint();
+					History.StartTransaction();
+					
+					var oldFilter = curFilter.clone(null);
+					
+					//изменяем содержимое фильтра
+					if(!curFilter.SortState)
+					{
+						curFilter.SortState = new SortState();
+						curFilter.SortState.Ref = new Asc.Range(startCol, curFilter.Ref.r1, startCol, maxFilterRow);
+						curFilter.SortState.SortConditions = [];
+						curFilter.SortState.SortConditions[0] = new SortCondition();
+					}
+					if(!curFilter.SortState.SortConditions[0])
+						curFilter.SortState.SortConditions[0] = new SortCondition();
 						
-						var oldFilter = curFilter.clone(null);
-						
-						//изменяем содержимое фильтра
-						if(!curFilter.SortState)
-						{
-							curFilter.SortState = new SortState();
-							curFilter.SortState.Ref = new Asc.Range(startCol, curFilter.Ref.r1, startCol, maxFilterRow);
-							curFilter.SortState.SortConditions = [];
-							curFilter.SortState.SortConditions[0] = new SortCondition();
-						}
-						if(!curFilter.SortState.SortConditions[0])
-							curFilter.SortState.SortConditions[0] = new SortCondition();
-							
-						var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
-						
-						curFilter.SortState.SortConditions[0].Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
-						curFilter.SortState.SortConditions[0].ConditionDescending = resType;
-						
+					var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
+					
+					curFilter.SortState.SortConditions[0].Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
+					curFilter.SortState.SortConditions[0].ConditionDescending = resType;
+
 						//cellId = t._rangeToId(cellIdRange);
 						
 						//сама сортировка
 						if(!bRedoChanges && !bUndoChanges)
 							ws.cellCommentator.sortComments(sortRange.sort(resType, startCol));
 
-						if(curFilter.TableStyleInfo)
-							t._setColorStyleTable(curFilter.Ref, curFilter);
-						t._addHistoryObj({oldFilter: oldFilter}, historyitem_AutoFilter_Sort,
-							{activeCells: cellIdRange, type: type, cellId: cellId}, null, curFilter.Ref);
-						History.EndTransaction();
+					if(curFilter.TableStyleInfo)
+						t._setColorStyleTable(curFilter.Ref, curFilter);
+					t._addHistoryObj({oldFilter: oldFilter}, historyitem_AutoFilter_Sort,
+						{activeCells: cellIdRange, type: type, cellId: cellId}, null, curFilter.Ref);
+					History.EndTransaction();
 						
 						if(!aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
 							ws._onUpdateFormatTable(sortRange.bbox, false);
@@ -1745,7 +1745,7 @@ var maxIndividualValues = 10000;
 				
 				//if(cellId)
 					//activeRange = t._idToRange(cellId);
-				
+			
 				var resType = type == 'ascending';
 				var isCellIdString = false;
 				if(cellId !== undefined && cellId != "" && typeof cellId == 'string')
@@ -1845,7 +1845,7 @@ var maxIndividualValues = 10000;
 								if(clean)
 									this._cleanFilterColumnsAndSortState(tablePart, activeCell);
 								return true;
-							}
+								}
 								
 						}
 						else
@@ -1861,7 +1861,7 @@ var maxIndividualValues = 10000;
 					if(clean)
 						this._cleanFilterColumnsAndSortState(aWs.AutoFilter, activeCell);
 					return true;
-				}
+					}
 				
 				return false;
 			},
@@ -2853,7 +2853,7 @@ var maxIndividualValues = 10000;
 				var ws = this.worksheet;
 				return ws.model;
 			},
-			
+
 			_checkClickFrozenArea: function(x, y, offsetX, offsetY, frozenObj)
 			{
 				var ws = this.worksheet;
@@ -3423,10 +3423,10 @@ var maxIndividualValues = 10000;
 				//if(ar.r1 == cloneActiveRange.r1 && ar.r2 == cloneActiveRange.r2 && ar.c1 == cloneActiveRange.c1 && ar.c2 == cloneActiveRange.c2)
 					//return false;
 				//else
-					if(cloneActiveRange)
-						return cloneActiveRange;
-					else
-						return ar;
+				if(cloneActiveRange)
+					return cloneActiveRange;
+				else
+					return ar;
 
 			},
 			
@@ -4092,7 +4092,7 @@ var maxIndividualValues = 10000;
 				var cell = new CellAddress(id);
 				return Asc.Range(cell.col - 1, cell.row - 1, cell.col - 1, cell.row - 1);
 			},
-			
+
 			_reDrawFilters: function(exceptionRange)
 			{
 				var aWs = this._getCurrentWS();
@@ -4394,7 +4394,7 @@ var maxIndividualValues = 10000;
 				return tableColumns;
 			},
 			
-			_generateColumnName: function(tableColumns,indexInsertColumn)
+			_generateColumnName: function(tableColumns, indexInsertColumn)
 			{
 				var index = 1;
 				var isSequence = false;
@@ -4716,7 +4716,7 @@ var maxIndividualValues = 10000;
 			{
 				var result = [];
 				var rangeFilter;
-				
+
 				if(aWs.TableParts)
 				{
 					for(var k = 0; k < aWs.TableParts.length; k++)
@@ -4965,7 +4965,7 @@ var maxIndividualValues = 10000;
 				if(autoFilter && autoFilter.FilterColumns)
 				{
 					filters = autoFilter.FilterColumns;
-					for(var k= 0; k < filters.length; k++)
+					for(var k = 0; k < filters.length; k++)
 					{
 						if(filters[k].ColId == colId)
 						{
@@ -5217,7 +5217,7 @@ var maxIndividualValues = 10000;
 				
 				var res = columnName + nextIndex;
 				return res;
-			}			
+				}
 		};
 
 		/*
