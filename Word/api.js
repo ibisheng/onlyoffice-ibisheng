@@ -7132,6 +7132,19 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, ve
             this.asc_fireCallback("asc_onError",c_oAscError.ID.MobileUnexpectedCharCount,c_oAscError.Level.Critical);
     }
 
+    if (window.NATIVE_EDITOR_ENJINE === true && undefined != window["native"])
+    {
+        window["CDocsCoApi"].prototype.askSaveChanges = function(callback)
+        {
+            callback({"saveLock": false});
+        };
+        window["CDocsCoApi"].prototype.saveChanges = function(arrayChanges, deleteIndex, excelAdditionalInfo)
+        {
+            if (window["native"]["SaveChanges"])
+                window["native"]["SaveChanges"](arrayChanges.join("\",\""), deleteIndex, arrayChanges.length);
+        };
+    }
+
     if (undefined != window["Native"])
         return;
 		
@@ -7198,6 +7211,21 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
 {
     this._coAuthoringSetChanges(changes, new CDocumentColor( 191, 255, 199 ));
 	CollaborativeEditing.Apply_OtherChanges();
+};
+
+window["asc_docs_api"].prototype["asc_nativeInitBuilder"] = function()
+{
+    this.asc_setDocInfo(new window["CDocInfo"]());
+};
+
+window["asc_docs_api"].prototype["asc_SetSilentMode"] = function(bEnabled)
+{
+    if (!this.WordControl.m_oLogicDocument)
+        return;
+    if (bEnabled)
+        this.WordControl.m_oLogicDocument.Start_SilentMode();
+    else
+        this.WordControl.m_oLogicDocument.End_SilentMode();
 };
 
 window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isFull)
