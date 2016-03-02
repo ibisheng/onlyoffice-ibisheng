@@ -1595,9 +1595,6 @@ CDocument.prototype =
 
         //console.log( "Long Recalc " );
 
-        // Очищаем данные пересчета
-        this.RecalcInfo.Reset();
-
         var ChangeIndex = 0;
         var MainChange = false;  
 
@@ -1793,7 +1790,10 @@ CDocument.prototype =
                 StartIndex = this.FullRecalc.StartIndex;
                 StartPage  = this.FullRecalc.PageIndex;
             }
-        }        
+        }
+
+        // Очищаем данные пересчета
+        this.RecalcInfo.Reset();
 
         // Определим, является ли данная страница первой в новой секции
         var bNewSection = ( 0 === StartPage ? true : false );

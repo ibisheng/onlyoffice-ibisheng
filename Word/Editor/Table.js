@@ -6262,7 +6262,6 @@ CTable.prototype =
                     }
 
                     this.Internal_Recalculate_1();
-                    this.Internal_OnContentRecalculate(true, 0, this.Index);
                 }
 
                 this.Selection.Type2 = table_Selection_Common;
@@ -6704,7 +6703,6 @@ CTable.prototype =
                 else
                 {
                     this.Internal_Recalculate_1();
-                    this.Internal_OnContentRecalculate( true, 0, this.Index );
                 }
             }
             else
@@ -6738,7 +6736,6 @@ CTable.prototype =
             else
             {
                 this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
         else
@@ -6767,7 +6764,6 @@ CTable.prototype =
             else
             {
                 this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
         else
@@ -6831,7 +6827,6 @@ CTable.prototype =
                 else
                 {
                     this.Internal_Recalculate_1();
-                    this.Internal_OnContentRecalculate( true, 0, this.Index );
                 }
             }
         }
@@ -8079,7 +8074,6 @@ CTable.prototype =
             else
             {
                 this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
         else
@@ -8108,7 +8102,6 @@ CTable.prototype =
             else
             {
                 this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
         else
@@ -8137,7 +8130,6 @@ CTable.prototype =
             else
             {
                 this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
         else
@@ -8166,7 +8158,6 @@ CTable.prototype =
             else
             {
                 this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
         else
@@ -8196,7 +8187,6 @@ CTable.prototype =
             else
             {
                 this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
         else
@@ -8225,7 +8215,6 @@ CTable.prototype =
             else
             {
                 this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
         else
@@ -8254,7 +8243,6 @@ CTable.prototype =
             else
             {
                 this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
         else if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0)
@@ -8306,7 +8294,6 @@ CTable.prototype =
             else
             {
                 this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
         else
@@ -8335,7 +8322,6 @@ CTable.prototype =
             else
             {
                 this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
         else
@@ -8364,7 +8350,6 @@ CTable.prototype =
             else
             {
                 this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
         else
@@ -8393,7 +8378,6 @@ CTable.prototype =
             else
             {
                 this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
         else
@@ -8422,7 +8406,6 @@ CTable.prototype =
             else
             {
                 this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
         else
@@ -8451,7 +8434,6 @@ CTable.prototype =
             else
             {
                 this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
         else
@@ -8480,7 +8462,6 @@ CTable.prototype =
             else
             {
                 this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
         else
@@ -8509,7 +8490,6 @@ CTable.prototype =
             else
             {
                 this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
         else
@@ -8538,7 +8518,6 @@ CTable.prototype =
             else
             {
                 this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
         else
@@ -8567,7 +8546,6 @@ CTable.prototype =
             else
             {
                 this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
         else
@@ -11066,7 +11044,6 @@ CTable.prototype =
         }
 
         this.Internal_Recalculate_1();
-        this.Internal_OnContentRecalculate( true, 0, this.Index );
         editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
     },
 
