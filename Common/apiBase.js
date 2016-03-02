@@ -77,6 +77,8 @@ function baseEditorsApi(name) {
   this.licenseResult = null;
   // Подключились ли уже к серверу
   this.isOnFirstConnectEnd = false;
+  // Получили ли лицензию
+  this.isOnLoadLicense = false;
 
   this.canSave = true;        // Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
   this.IsUserSave = false;    // Флаг, контролирующий сохранение было сделано пользователем или нет (по умолчанию - нет)
@@ -354,7 +356,7 @@ baseEditorsApi.prototype.asc_getEditorPermissions = function() {
   this._coAuthoringInit();
 };
 baseEditorsApi.prototype._onEndPermissions = function() {
-  if (this.isOnFirstConnectEnd) {
+  if (this.isOnFirstConnectEnd && this.isOnLoadLicense) {
     this.sendEvent('asc_onGetEditorPermissions', new window['Asc'].asc_CAscEditorPermissions());
   }
 };
@@ -394,6 +396,11 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
   };
   this.CoAuthoringApi.onFirstConnect = function() {
     t.isOnFirstConnectEnd = true;
+    t._onEndPermissions();
+  };
+  this.CoAuthoringApi.onLicense = function(res) {
+    t.licenseResult = res;
+    t.isOnLoadLicense = true;
     t._onEndPermissions();
   };
   this.CoAuthoringApi.onWarning = function(e) {

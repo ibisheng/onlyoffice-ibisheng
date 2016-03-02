@@ -81,10 +81,12 @@ baseEditorsApi.prototype._onCheckLicenseEnd = function(err, res) {
   this._onEndPermissions();
 };
 baseEditorsApi.prototype._onEndPermissions = function() {
-  if (null !== this.licenseResult && this.isOnFirstConnectEnd) {
+  if (this.isOnFirstConnectEnd && this.isOnLoadLicense) {
     var oResult = new window['Asc'].asc_CAscEditorPermissions();
-    oResult.asc_setCanLicense(g_oLicenseResult.Success === this.licenseResult.res);
-    oResult.asc_setCanBranding(g_oLicenseResult.Error !== this.licenseResult.res); // Для тех, у кого есть лицензия, branding доступен
+    if (null !== this.licenseResult) {
+      oResult.asc_setCanLicense(g_oLicenseResult.Success === this.licenseResult);
+      oResult.asc_setCanBranding(g_oLicenseResult.Error !== this.licenseResult); // Для тех, у кого есть лицензия, branding доступен
+    }
     this.sendEvent('asc_onGetEditorPermissions', oResult);
   }
 };

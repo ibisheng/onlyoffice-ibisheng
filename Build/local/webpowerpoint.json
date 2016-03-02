@@ -135,7 +135,6 @@
                 "../../Common/apiBase.js",
                 "../../PowerPoint/api.js",
 				"../../Common/Private/license.js",
-                "../../PowerPoint/Private/license.js",
 				"../../PowerPoint/Private/comments.js",
                 "../../PowerPoint/apiCommon.js",
                 "../../Word/apiCommon.js",

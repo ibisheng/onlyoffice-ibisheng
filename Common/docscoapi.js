@@ -32,6 +32,7 @@
       this.onRecalcLocks = options.onRecalcLocks;
       this.onDocumentOpen = options.onDocumentOpen;
       this.onFirstConnect = options.onFirstConnect;
+      this.onLicense = options.onLicense;
     }
   }
 
@@ -99,12 +100,16 @@
       this._CoAuthoringApi.onFirstConnect = function() {
         t.callback_OnFirstConnect();
       };
+      this._CoAuthoringApi.onLicense = function(res) {
+        t.callback_OnLicense(res);
+      };
 
       this._CoAuthoringApi.init(user, docid, documentCallbackUrl, token, editorType, documentFormatSave);
       this._onlineWork = true;
     } else {
       // Фиктивные вызовы
       this.onFirstConnect();
+      this.onLicense();
     }
   };
 
@@ -376,6 +381,11 @@
       this.onFirstConnect();
     }
   };
+  CDocsCoApi.prototype.callback_OnLicense = function(res) {
+    if (this.onLicense) {
+      this.onLicense(res);
+    }
+  };
 
   function LockBufferElement(arrayBlockId, callback) {
     this._arrayBlockId = arrayBlockId;
@@ -403,6 +413,7 @@
       this.onRecalcLocks = options.onRecalcLocks;
       this.onDocumentOpen = options.onDocumentOpen;
       this.onFirstConnect = options.onFirstConnect;
+      this.onLicense = options.onLicense;
     }
     this._state = ConnectionState.None;
     // Online-пользователи в документе
@@ -410,6 +421,7 @@
     this._countEditUsers = 0;
     this._countUsers = 0;
 
+    this.isLicenseInit = false;
     this.isAuthInit = false;
     this._locks = {};
     this._msgBuffer = [];
@@ -1045,6 +1057,13 @@
     this.onWarning(data ? data['description'] : '');
   };
 
+  DocsCoApi.prototype._onLicense = function(data) {
+    if (!this.isLicenseInit) {
+      this.isLicenseInit = true;
+      this.onLicense(data['license']);
+    }
+  };
+
   DocsCoApi.prototype._onAuth = function(data) {
     var t = this;
     if (true === this._isAuth) {
@@ -1197,7 +1216,7 @@
       //TODO: add checks and error handling
       //Get data type
       var dataObject = JSON.parse(e.data);
-      var type = dataObject.type;
+      var type = dataObject['type'];
       switch (type) {
         case 'auth'        :
           t._onAuth(dataObject);
@@ -1243,6 +1262,8 @@
         case 'warning':
           t._onWarning(dataObject);
           break;
+        case 'license':
+          t._onLicense(dataObject);
       }
     };
     sockjs.onclose = function(evt) {

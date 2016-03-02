@@ -162,7 +162,6 @@
                 "../../Common/apiBase.js",
                 "../../Excel/api.js",
 				"../../Common/Private/license.js",
-                "../../Excel/Private/license.js",
 				"../../Excel/Private/comments.js"
             ],
             "dst": "../../Excel/sdk-all.js",

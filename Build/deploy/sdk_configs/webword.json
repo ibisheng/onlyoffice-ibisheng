@@ -122,7 +122,6 @@
                 "../../Common/apiBase.js",
                 "../../Word/api.js",
 				"../../Common/Private/license.js",
-                "../../Word/Private/license.js",
 				"../../Common/Private/versionHistory.js",
 				"../../Word/Private/comments.js",
                 "../../Word/Private/StyleManager.js",
