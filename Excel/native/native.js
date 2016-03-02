@@ -6044,8 +6044,6 @@ function offline_apply_event(type,params) {
             _stream["ClearNoAttack"]();
             _stream["WriteLong"](isValid);
             _return = _stream;
-
-            console.log('CHECK_DATA_RANGE: ' + isValid);
             break;
         }
 
