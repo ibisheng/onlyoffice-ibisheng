@@ -2521,6 +2521,16 @@ CShape.prototype =
                 this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
                 this.flipH = xfrm.flipH === true;
                 this.flipV = xfrm.flipV === true;
+                if(this.extX < 0.01 && this.extY < 0.01)
+                {
+                    if(this.parent && this.parent.Extent && isRealNumber(this.parent.Extent.W) && isRealNumber(this.parent.Extent.H))
+                    {
+                        this.x = 0;
+                        this.y = 0;
+                        this.extX = this.parent.Extent.W;
+                        this.extY = this.parent.Extent.H;
+                    }
+                }
             }
             else
             {
