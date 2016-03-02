@@ -24937,7 +24937,7 @@ CChart.prototype =
             }
             case historyitem_Chart_SetView3D:
             {
-                this.view3D = data.newView3D;
+                this.view3D = data.oldView3D;
                 if(this.parent)
                 {
                     this.parent.handleUpdateInternalChart();
