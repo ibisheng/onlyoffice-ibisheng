@@ -7132,7 +7132,7 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, ve
             this.asc_fireCallback("asc_onError",c_oAscError.ID.MobileUnexpectedCharCount,c_oAscError.Level.Critical);
     }
 
-    if (window.NATIVE_EDITOR_ENJINE === true && undefined != window["native"])
+    if (window["NATIVE_EDITOR_ENJINE"] === true && undefined != window["native"])
     {
         window["CDocsCoApi"].prototype.askSaveChanges = function(callback)
         {
