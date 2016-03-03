@@ -6433,6 +6433,14 @@ PasteProcessor.prototype =
                             nHeight = parseInt(computedStyle.getPropertyValue("height"));
                         }
                     }
+					
+					//TODO пересмотреть! node.getAttribute("width") в FF возврашает "auto" -> изображения в FF не всталяются
+					if(AscBrowser.isMozilla && (!nWidth || !nHeight))
+					{
+						nWidth = parseInt(node.width);
+						nHeight = parseInt(node.height);
+					}
+					
                     var sSrc = node.getAttribute("src");
                     if((!window["Asc"] || (window["Asc"] && window["Asc"]["editor"] === undefined)) && (isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")//первое условие - мы не в редакторе таблиц, тогда выполняем
                         ||  nWidth === 0 ||  nHeight === 0))
