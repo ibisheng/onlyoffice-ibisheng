@@ -2686,7 +2686,7 @@ ParaEnd.prototype =
         var strSectionBreak = "";
         switch ( Type )
         {
-            case section_type_Column     : strSectionBreak = " Section Break (Column) "; break;
+            case section_type_Column     : strSectionBreak = " End of Section "; break;
             case section_type_Continuous : strSectionBreak = " Section Break (Continuous) "; break;
             case section_type_EvenPage   : strSectionBreak = " Section Break (Even Page) "; break;
             case section_type_NextPage   : strSectionBreak = " Section Break (Next Page) "; break;

@@ -132,6 +132,9 @@ CTable.prototype.private_RecalculateCheckPageColumnBreak = function(CurPage)
     if (true !== this.Is_Inline()) // Случай Flow разбирается в Document.js
         return true;
 
+    if (!this.LogicDocument || this.Parent !== this.LogicDocument)
+        return true;
+
     var isPageBreakOnPrevLine   = false;
     var isColumnBreakOnPrevLine = false;
 
@@ -142,9 +145,21 @@ CTable.prototype.private_RecalculateCheckPageColumnBreak = function(CurPage)
 
     if ((0 === CurPage || true === this.Check_EmptyPages(CurPage - 1)) && null !== PrevElement && type_Paragraph === PrevElement.Get_Type())
     {
-        var EndLine = PrevElement.Pages[PrevElement.Pages.length - 1].EndLine;
-        if (-1 !== EndLine && PrevElement.Lines[EndLine].Info & paralineinfo_BreakRealPage)
-            isPageBreakOnPrevLine = true;
+        var bNeedPageBreak = true;
+        if (undefined !== PrevElement.Get_SectionPr())
+        {
+            var PrevSectPr = PrevElement.Get_SectionPr();
+            var CurSectPr  = this.LogicDocument.SectionsInfo.Get_SectPr(this.Index).SectPr;
+            if (section_type_Continuous !== CurSectPr.Get_Type() || true !== CurSectPr.Compare_PageSize(PrevSectPr))
+                bNeedPageBreak = false;
+        }
+
+        if (true === bNeedPageBreak)
+        {
+            var EndLine = PrevElement.Pages[PrevElement.Pages.length - 1].EndLine;
+            if (-1 !== EndLine && PrevElement.Lines[EndLine].Info & paralineinfo_BreakRealPage)
+                isPageBreakOnPrevLine = true;
+        }
     }
 
     // ColumnBreak для случая CurPage > 0 не разбираем здесь, т.к. он срабатывает автоматически

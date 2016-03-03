@@ -2036,8 +2036,17 @@ CDocument.prototype =
 
                 if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && Index !== Page.Pos)
                 {
+                    var bNeedPageBreak = true;
+                    if (undefined !== PrevElement.Get_SectionPr())
+                    {
+                        var PrevSectPr = PrevElement.Get_SectionPr();
+                        var CurSectPr  = this.LogicDocument.SectionsInfo.Get_SectPr(Index).SectPr;
+                        if (section_type_Continuous !== CurSectPr.Get_Type() || true !== CurSectPr.Compare_PageSize(PrevSectPr))
+                            bNeedPageBreak = false;
+                    }
+
                     var EndLine = PrevElement.Pages[PrevElement.Pages.length - 1].EndLine;
-                    if (-1 !== EndLine && PrevElement.Lines[EndLine].Info & paralineinfo_BreakRealPage)
+                    if (true === bNeedPageBreak && -1 !== EndLine && PrevElement.Lines[EndLine].Info & paralineinfo_BreakRealPage)
                         isPageBreakOnPrevLine = true;
 
                     if (-1 !== EndLine && !(PrevElement.Lines[EndLine].Info & paralineinfo_BreakRealPage) && PrevElement.Lines[EndLine].Info & paralineinfo_BreakPage)
