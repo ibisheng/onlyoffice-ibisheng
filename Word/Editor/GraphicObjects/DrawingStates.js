@@ -663,7 +663,10 @@ RotateState.prototype =
                             }
                             else
                             {
-                                original.Set_XY(bounds.posX, bounds.posY, aParentParagraphs[i], original.selectStartPage, bMoveState)
+                                if(true !== this.drawingObjects.arrTrackObjects[i].bTextWarp)
+                                {
+                                    original.Set_XY(bounds.posX, bounds.posY, aParentParagraphs[i], original.GraphicObj.selectStartPage, bMoveState)
+                                }
                             }
                             this.drawingObjects.document.Recalculate();
                         }
