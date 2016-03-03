@@ -324,8 +324,16 @@ CHistory.prototype =
             return false;
 
         var RecalcData = this.Get_RecalcData();
-        if (RecalcData.Flow.length > 0 || RecalcData.HdrFtr.length > 0 || -1 !== RecalcData.Inline.Pos)
+        if (RecalcData.Flow.length > 0 || RecalcData.HdrFtr.length > 0 || -1 !== RecalcData.Inline.Pos || true === RecalcData.Drawings.All)
             return true;
+
+        for(var Key in RecalcData.Drawings.Map)
+        {
+            if(null != g_oTableId.Get_ById(Key))
+            {
+                return true;
+            }
+        }
 
         return false;
     },
