@@ -4842,8 +4842,8 @@ function BinarySettingsTableWriter(memory, doc)
 	this.WriteMathWrapRight = function(WrapRight)
 	{
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
-		this.memory.WriteByte(c_oSerPropLenType.Double);
-		this.memory.WriteDouble(WrapRight);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(WrapRight);
 	}
     this.WriteColorSchemeMapping = function()
     {
@@ -11815,6 +11815,7 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
         }
 		else if (c_oSer_MathPrType.SmallFrac === type)
         {
+			props.smallFrac = true;
 			res = this.bcr.Read2(length, function(t, l){
                 return oThis.ReadMathSmallFrac(t,l,props);
             });	           	
@@ -11827,6 +11828,7 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
         }
 		else if (c_oSer_MathPrType.WrapRight === type)
         {
+			props.wrapRight = true;
 			res = this.bcr.Read2(length, function(t, l){
                 return oThis.ReadMathWrapRight(t,l,props);
             });	           	
