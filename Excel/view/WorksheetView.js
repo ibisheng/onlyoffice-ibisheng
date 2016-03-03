@@ -11793,6 +11793,10 @@
             }
             // Пока вызовем updateRange, но стоит делать просто draw
             this._updateCellsRange( range );
+            // ToDo убрать совсем reinitRanges
+            if ( this.objectRender && this.objectRender.drawingArea ) {
+                this.objectRender.drawingArea.reinitRanges();
+            }
             return;
         }
 
