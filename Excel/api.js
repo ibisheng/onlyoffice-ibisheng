@@ -1839,6 +1839,7 @@ var editor;
     var renameCallback = function(res) {
       if (res) {
         t.wbModel.getWorksheet(i).setName(name);
+        t.sheetsChanged();
       } else {
         t.handlers.trigger("asc_onError", c_oAscError.ID.LockedWorksheetRename, c_oAscError.Level.NoCritical);
       }
