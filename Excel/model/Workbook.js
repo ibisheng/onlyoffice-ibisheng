@@ -957,7 +957,7 @@ DependencyGraph.prototype = {
                     defN.parsedRef = null;
                     retRes[id] = defN;
                 }
-                else {
+                else if( defN.Ref ){
                     defN.Ref = defN.parsedRef.Formula = defN.parsedRef.assemble( true );
                     retRes[id] = defN;
                 }
