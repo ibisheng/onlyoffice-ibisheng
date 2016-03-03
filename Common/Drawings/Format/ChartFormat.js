@@ -2457,7 +2457,7 @@ CBarChart.prototype =
         var i;
         for(i = 0; i < this.series.length; ++i)
         {
-            if(typeof this.series[i].setDLbls === "function")
+            if(typeof this.series[i].setDLbls === "function" && this.series[i].dLbls)
                 this.series[i].setDLbls(null);
         }
     },

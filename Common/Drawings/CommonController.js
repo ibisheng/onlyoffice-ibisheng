@@ -3045,11 +3045,13 @@ DrawingObjectsController.prototype =
             {
                 if(chart_type.dLbls)
                     chart_type.setDLbls(null);
+                chart_type.removeDataLabels();
             }
             else
             {
                 if(isRealNumber(DLBL_POS_DEFINES_MAP[data_labels_pos_setting]))
                 {
+                    chart_type.removeDataLabels();
                     if(!chart_type.dLbls)
                     {
                         var d_lbls = new CDLbls();
@@ -3104,6 +3106,10 @@ DrawingObjectsController.prototype =
                                 || finish_dlbl_pos === DLBL_POS_B))
                             {
                                 finish_dlbl_pos = DLBL_POS_CTR;
+                            }
+                            if(chart.view3D)
+                            {
+                                finish_dlbl_pos = null;
                             }
                             break;
                         }
