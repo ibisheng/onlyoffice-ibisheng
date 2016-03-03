@@ -16264,6 +16264,7 @@ CDocument.prototype.Set_ColumnsProps = function(ColumnsProps)
             }
 
             SectPr.Set_Columns_Cols(Cols);
+            SectPr.Set_Columns_Num(Count);
         }
         else
         {
