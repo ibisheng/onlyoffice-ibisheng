@@ -109,7 +109,7 @@
     } else {
       // Фиктивные вызовы
       this.onFirstConnect();
-      this.onLicense();
+      this.onLicense(null);
     }
   };
 
