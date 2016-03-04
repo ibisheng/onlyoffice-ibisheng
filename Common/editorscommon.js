@@ -1147,13 +1147,13 @@ parserHelper.prototype.is3DRef = function ( formula, start_pos ) {
 	}
 	return [false, null, null];
 };
-parserHelper.prototype.isNextPtg = function ( formula, start_pos ) {
+parserHelper.prototype.isNextPtg = function ( formula, start_pos, digitDelim ) {
 	if ( this instanceof parserHelper ) {
 		this._reset();
 	}
 
 	var subSTR = formula.substring( start_pos ), match;
-	if( subSTR.match( rx_before_operators ) == null && (match = subSTR.match( rx_intersect )) != null ){
+	if( subSTR.match( rx_RightParentheses ) == null && subSTR.match( digitDelim?rx_Comma:rx_CommaDef ) == null && subSTR.match( rx_operators ) == null && (match = subSTR.match( rx_intersect )) != null ){
 		this.pCurrPos += match[0].length;
 		this.operand_str = match[0][0];
 		return true;
@@ -1181,7 +1181,7 @@ parserHelper.prototype.isLeftParentheses = function ( formula, start_pos ) {
 
 	var match = (formula.substring( start_pos )).match( rx_LeftParentheses );
 	if (match != null) {
-		this.operand_str = match[0].replace( rx_space, "" );
+		this.operand_str = match[0].replace( rx_space_g, "" );
 		this.pCurrPos += match[0].length;
 		return true;
 	}
@@ -1194,7 +1194,7 @@ parserHelper.prototype.isRightParentheses = function ( formula, start_pos ) {
 
 	var match = (formula.substring( start_pos )).match( rx_RightParentheses );
 	if (match != null) {
-		this.operand_str = match[0].replace( rx_space, "" );
+		this.operand_str = match[0].replace( rx_space_g, "" );
 		this.pCurrPos += match[0].length;
 		return true;
 	}

@@ -437,6 +437,35 @@
         strictEqual( oParser.calculate().getValue(), 6 );
     } )
 
+	test( "Test: \"Parse intersection\"", function () {
+
+		ws.getRange2( "A7" ).setValue( "1" );
+		ws.getRange2( "A8" ).setValue( "2" );
+		ws.getRange2( "A9" ).setValue( "3" );
+		oParser = new parserFormula( '1     +    (    A7   +A8   )   *   2', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.assemble(), "1+(A7+A8)*2" );
+		strictEqual( oParser.calculate().getValue(), 7 );
+
+		oParser = new parserFormula( 'sum                    A1:A5', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.assemble(), "sum A1:A5" );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+		oParser = new parserFormula( 'sum(   A1:A5    ,        B1:B5     )     ', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.assemble(), "SUM(A1:A5,B1:B5)" );
+		strictEqual( oParser.calculate().getValue(), 0 );
+
+		oParser = new parserFormula( 'sum(   A1:A5    ,        B1:B5  , "    3 , 14 15 92 6 "   )     ', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.assemble(), 'SUM(A1:A5,B1:B5,"    3 , 14 15 92 6 ")' );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+	} )
+
+
+
     test( "Test: \"Arithmetical operations\"", function () {
         oParser = new parserFormula( '1+3', "A1", ws );
         ok( oParser.parse() );

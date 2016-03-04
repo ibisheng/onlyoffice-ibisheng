@@ -4020,7 +4020,7 @@ parserFormula.prototype = {
              }*/
 
             /* Operators*/
-            if ( parserHelp.isOperator.call( this, this.Formula, this.pCurrPos ) /*|| parserHelp.isNextPtg.call( this, this.Formula, this.pCurrPos )*/ ) {
+            if ( parserHelp.isOperator.call( this, this.Formula, this.pCurrPos ) || parserHelp.isNextPtg.call( this, this.Formula, this.pCurrPos ) ) {
                 wasLeftParentheses = false;
                 wasRigthParentheses = false;
                 found_operator = null;
@@ -4034,6 +4034,9 @@ parserFormula.prototype = {
                         this.operand_expected = true;
                         found_operator = new cFormulaOperators['un_plus']();
                     }
+					else if( this.operand_str == " " ){
+						continue;
+					}
                     else {
                         this.error.push( c_oAscError.ID.FrmlWrongOperator );
                         this.outStack = [];
@@ -4058,6 +4061,9 @@ parserFormula.prototype = {
                         this.operand_expected = false;
                         found_operator = new cFormulaOperators['%']();
                     }
+					else if ( this.operand_str == " " && this.pCurrPos == this.Formula.length) {
+						continue;
+					}
                     else {
                         if ( this.operand_str in cFormulaOperators ) {
                             found_operator = new cFormulaOperators[this.operand_str]();
@@ -4218,7 +4224,7 @@ parserFormula.prototype = {
                 var arr = new cArray(), operator = { isOperator: false, operatorName: ""};
                 while ( this.pCurrPos < this.Formula.length && !parserHelp.isRightBrace.call(this, this.Formula, this.pCurrPos) ) {
                     if ( parserHelp.isArraySeparator.call( this, this.Formula, this.pCurrPos, digitDelim ) ) {
-                        if ( this.operand_str == (digitDelim ? arrayRowSeparator : arrayRowSeparatorDef) ) {
+                        if ( digitDelim ? rx_arraySeparators.test(this.operand_str) : rx_arraySeparatorsDef.test(this.operand_str) ) {
                             arr.addRow();
                         }
                     }
