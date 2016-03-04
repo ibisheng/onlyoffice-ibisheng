@@ -5400,10 +5400,13 @@ CChartSpace.prototype =
 						 for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
 						{
 							oLabel = oAxisLabels.arrLabels[i];
-							deltaX = oLabel.localTransformText.tx - oCatAx.xPoints[i].pos;
-							deltaY = oLabel.localTransformText.ty - oAxisLabels.y;
-							oNewPos = oCatAx.transformXPoints[i];
-							oLabel.setPosition2(oNewPos.x + deltaX, oNewPos.y + deltaY);
+                            if(oLabel)
+                            {
+                                deltaX = oLabel.localTransformText.tx - oCatAx.xPoints[i].pos;
+                                deltaY = oLabel.localTransformText.ty - oAxisLabels.y;
+                                oNewPos = oCatAx.transformXPoints[i];
+                                oLabel.setPosition2(oNewPos.x + deltaX, oNewPos.y + deltaY);
+                            }
 						}
 					}
                    
@@ -5414,10 +5417,13 @@ CChartSpace.prototype =
 						for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
 						{
 							oLabel = oAxisLabels.arrLabels[i];
-							deltaX = oLabel.localTransformText.tx - oAxisLabels.x;
-							deltaY = oLabel.localTransformText.ty - oValAx.yPoints[i].pos;
-							oNewPos = oValAx.transformYPoints[i];
-							oLabel.setPosition2(oNewPos.x + deltaX, oNewPos.y + deltaY);
+                            if(oLabel)
+                            {
+                                deltaX = oLabel.localTransformText.tx - oAxisLabels.x;
+                                deltaY = oLabel.localTransformText.ty - oValAx.yPoints[i].pos;
+                                oNewPos = oValAx.transformYPoints[i];
+                                oLabel.setPosition2(oNewPos.x + deltaX, oNewPos.y + deltaY);
+                            }
 						}
 					}
                     
@@ -5432,10 +5438,13 @@ CChartSpace.prototype =
                         for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
                         {
                             oLabel = oAxisLabels.arrLabels[i];
-                            deltaX = oLabel.localTransformText.tx - oValAx.xPoints[i].pos;
-                            deltaY = oLabel.localTransformText.ty - oAxisLabels.y;
-                            oNewPos = oValAx.transformXPoints[i];
-                            oLabel.setPosition2(oNewPos.x + deltaX, oNewPos.y + deltaY);
+                            if(oLabel)
+                            {
+                                deltaX = oLabel.localTransformText.tx - oValAx.xPoints[i].pos;
+                                deltaY = oLabel.localTransformText.ty - oAxisLabels.y;
+                                oNewPos = oValAx.transformXPoints[i];
+                                oLabel.setPosition2(oNewPos.x + deltaX, oNewPos.y + deltaY);
+                            }
                         }
                     }
 
@@ -5447,10 +5456,13 @@ CChartSpace.prototype =
                         for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
                         {
                             oLabel = oAxisLabels.arrLabels[i];
-                            deltaX = oLabel.localTransformText.tx - oAxisLabels.x;
-                            deltaY = oLabel.localTransformText.ty - oCatAx.yPoints[i].pos;
-                            oNewPos = oCatAx.transformYPoints[i];
-                            oLabel.setPosition2(oNewPos.x + deltaX, oNewPos.y + deltaY);
+                            if(oLabel)
+                            {
+                                deltaX = oLabel.localTransformText.tx - oAxisLabels.x;
+                                deltaY = oLabel.localTransformText.ty - oCatAx.yPoints[i].pos;
+                                oNewPos = oCatAx.transformYPoints[i];
+                                oLabel.setPosition2(oNewPos.x + deltaX, oNewPos.y + deltaY);
+                            }
                         }
                     }
                 }

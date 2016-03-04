@@ -473,7 +473,17 @@ CTextBody.prototype =
                             }
                             if(isRealNumber(font_scale))
                             {
+                                var bReset = false;
+                                if(g_oIdCounter.m_bLoad)
+                                {
+                                    bReset = true;
+                                    g_oIdCounter.m_bLoad = false;
+                                }
                                  var redFontSize = Math.round(parg.Get_CompiledPr(false).TextPr.FontSize*font_scale);
+                                if(bReset)
+                                {
+                                    g_oIdCounter.m_bLoad = true;
+                                }
                                 this.checkParagraphContent(parg, font_scale, true, redFontSize);
                             }
                         }
