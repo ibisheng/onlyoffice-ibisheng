@@ -142,16 +142,35 @@ CGlyphData.prototype =
 
             if (this.m_oCanvas != null)
             {
-                this.m_oContext.fillStyle = "rgb(" + this.R + "," + this.G + "," + this.B + ")";
-                this.m_oContext.fillRect(0,0,w,h);
+				if (AscBrowser.isMozilla && AscBrowser.isLinuxOS)
+				{
+					this.m_oContext.fillStyle = (this.R == 0xFF && this.G == 0xFF && this.B == 0xFF) ? "rgb(255,255,254)" : "rgb(" + this.R + "," + this.G + "," + this.B + ")";
+					this.m_oContext.fillRect(0,0,w,h);
+				}
+				else
+				{
+					this.m_oContext.fillStyle = "rgb(" + this.R + "," + this.G + "," + this.B + ")";
+					this.m_oContext.fillRect(0,0,w,h);
+				}
             }
             else
             {
-                var _raster = this.RasterData;
-                _raster.Chunk.CanvasCtx.fillStyle = "rgb(" + this.R + "," + this.G + "," + this.B + ")";
-                var _x = _raster.Line.Height * _raster.Index;
-                var _y = _raster.Line.Y;
-                this.RasterData.Chunk.CanvasCtx.fillRect(_x, _y, w, h);
+				if (AscBrowser.isMozilla && AscBrowser.isLinuxOS)
+				{
+					var _raster = this.RasterData;
+					_raster.Chunk.CanvasCtx.fillStyle = (this.R == 0xFF && this.G == 0xFF && this.B == 0xFF) ? "rgb(255,255,254)" : "rgb(" + this.R + "," + this.G + "," + this.B + ")";
+					var _x = _raster.Line.Height * _raster.Index;
+					var _y = _raster.Line.Y;
+					this.RasterData.Chunk.CanvasCtx.fillRect(_x, _y, w, h);
+				}
+				else
+				{
+					var _raster = this.RasterData;
+					_raster.Chunk.CanvasCtx.fillStyle = "rgb(" + this.R + "," + this.G + "," + this.B + ")";
+					var _x = _raster.Line.Height * _raster.Index;
+					var _y = _raster.Line.Y;
+					this.RasterData.Chunk.CanvasCtx.fillRect(_x, _y, w, h);
+				}
             }
         }
         else

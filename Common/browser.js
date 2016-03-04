@@ -67,6 +67,8 @@ AscBrowser.isArm = (AscBrowser.userAgent.indexOf("arm") > -1);
 
 AscBrowser.isMozilla = !AscBrowser.isIE && (AscBrowser.userAgent.indexOf("firefox") > -1);
 
+AscBrowser.isLinuxOS = (AscBrowser.userAgent.indexOf(" linux ") > -1);
+
 AscBrowser.zoom = 1;
 
 AscBrowser.checkZoom = function()
