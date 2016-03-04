@@ -1787,6 +1787,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 if (true === Cell.Is_VerticalText())
                 {
                     VerticallCells.push(Cell);
+                    CurGridCol += GridSpan;
                     continue;
                 }
 
@@ -2189,6 +2190,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             if (true === Cell.Is_VerticalText())
             {
                 VerticallCells.push(Cell);
+                CurGridCol += GridSpan;
                 continue;
             }
 
@@ -2359,6 +2361,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 if (true === Cell.Is_VerticalText())
                 {
                     VerticallCells.push(Cell);
+                    CurGridCol += GridSpan;
                     continue;
                 }
 
