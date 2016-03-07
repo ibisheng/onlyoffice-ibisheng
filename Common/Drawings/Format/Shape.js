@@ -3609,7 +3609,7 @@ CShape.prototype =
             ty = this.invertTransformText.TransformPointY(x, y);
             if(e.Button === g_mouse_button_right)
             {
-                if(content.Selection_Check(tx, ty, isRealObject(this.parent) && isRealNumber(this.parent.num) ? this.parent.num : 0))
+                if(content.Selection_Check(tx, ty,  0))
                 {
                     this.rightButtonFlag = true;
                     return;
