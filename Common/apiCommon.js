@@ -2731,6 +2731,21 @@
   prot["asc_getImagesCount"] =  COpenProgress.prototype.asc_getImagesCount;
   prot["asc_getCurrentImage"] =  COpenProgress.prototype.asc_getCurrentImage;
   window["COpenProgress"] = COpenProgress;
+
+
+
+    function CErrorData()
+    {
+        this.Value = 0;
+    }
+
+    CErrorData.prototype.put_Value = function(v){ this.Value = v; };
+    CErrorData.prototype.get_Value = function() { return this.Value; };
+    prot = CErrorData.prototype;
+    prot["put_Value"] = CErrorData.prototype.put_Value;
+    prot["get_Value"] = CErrorData.prototype.get_Value;
+    window["CErrorData"] = CErrorData;
+
 }
 )(window);
 
@@ -2793,6 +2808,7 @@ var COpenProgress = window["COpenProgress"];
 var asc_TextArtProperties = window["asc_TextArtProperties"];
 var asc_TextArtTranslate = window["asc_TextArtTranslate"];
 var CDocInfo = window["CDocInfo"];
+var CErrorData = window["CErrorData"];
 
 
 

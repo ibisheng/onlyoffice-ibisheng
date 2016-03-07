@@ -6811,14 +6811,7 @@ function  _asc_scrollTo (x,y)
 	editor.WordControl.m_oScrollVerApi.scrollToY(y);
 }
 
-function CErrorData()
-{
-    this.Value = 0;
-}
 
-CErrorData.prototype.put_Value = function(v){ this.Value = v; };
-CErrorData.prototype.get_Value = function() { return this.Value; };
-//test
 
 // Вставка диаграмм
 asc_docs_api.prototype.asc_getChartObject = function(type)
