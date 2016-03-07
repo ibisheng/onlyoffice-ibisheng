@@ -3521,14 +3521,6 @@
 					}
 				};
 
-				if(startRow < 0)
-				{
-					startRow = 0;
-				}
-				if(startCol < 0)
-				{
-					startCol = 0;
-				}
 
 				for(var i = 0; i < data.Drawings.length; i++)
 				{	

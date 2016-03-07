@@ -673,6 +673,10 @@ TextArtPreviewManager.prototype.getCanvas = function()
 TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
 {
 	var oShape = this.getShape();
+    if(!oShape)
+    {
+        return null;
+    }
 	var oContent = oShape.getDocContent();
 
 	var textStr = "abcde";
@@ -831,11 +835,18 @@ TextArtPreviewManager.prototype.getShape =  function()
 	}
 	else
 	{
-		if(editor && editor.WordControl && editor.WordControl.m_oLogicDocument.Slides && editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage])
+		if(editor && editor.WordControl && Array.isArray(editor.WordControl.m_oLogicDocument.Slides))
 		{
-			oShape.setParent(editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage]);
-			oParent = editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage];
-			bWord = false;
+            if(editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage])
+            {
+                oShape.setParent(editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage]);
+                oParent = editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage];
+                bWord = false;
+            }
+            else
+            {
+                return null;
+            }
 		}
 	}
 	var oParentObjects = oShape.getParentObjects();
@@ -879,6 +890,10 @@ TextArtPreviewManager.prototype.getTAShape = function()
 	if(!this.TAShape)
 	{
 		var oShape = this.getShape();
+        if(!oShape)
+        {
+            return null;
+        }
 		var oContent = oShape.getDocContent();
 		var sText = "Ta";
 		var oParagraph = oContent.Content[0];
@@ -902,6 +917,10 @@ TextArtPreviewManager.prototype.getWordArtPreview = function(prst)
 	var ctx = _canvas.getContext('2d');
 	var graphics = new CGraphics();
 	var oShape = this.getShapeByPrst(prst);
+    if(!oShape)
+    {
+        return "";
+    }
 	graphics.init(ctx, _canvas.width, _canvas.height, oShape.extX, oShape.extY);
 	graphics.m_oFontManager = g_fontManager;
 	graphics.transform(1,0,0,1,0,0);
@@ -933,6 +952,11 @@ TextArtPreviewManager.prototype.generateTextArtStyles = function()
         var ctx = _canvas.getContext('2d');
         var graphics = new CGraphics();
         var oShape = this.getTAShape();
+        if(!oShape)
+        {
+            this.TextArtStyles.length = 0;
+            return;
+        }
         oShape.recalculate();
 
         graphics.m_oFontManager = g_fontManager;
