@@ -246,7 +246,7 @@ function CopyRunToPPTX(Run, Paragraph, bHyper)
     for ( var CurPos = 0; CurPos < Run.Content.length; CurPos++ )
     {
         var Item = Run.Content[CurPos];
-        if ( para_End !== Item.Type && Item.Type !== para_Drawing)
+        if ( para_End !== Item.Type && Item.Type !== para_Drawing && Item.Type !== para_Comment)
         {
             NewRun.Add_ToContent( PosToAdd, Item.Copy(), false );
             ++PosToAdd;

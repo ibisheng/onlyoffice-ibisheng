@@ -723,7 +723,7 @@ Paragraph.prototype =
     Internal_Content_Remove2 : function(Pos, Count)
     {
         var CommentsToDelete = [];
-        if ( true === this.DeleteCommentOnRemove && null !== this.LogicDocument )
+        if ( true === this.DeleteCommentOnRemove && null !== this.LogicDocument && null != this.LogicDocument.Comments)
         {
             var DocumentComments = this.LogicDocument.Comments;
             for ( var Index = Pos; Index < Pos + Count; Index++ )

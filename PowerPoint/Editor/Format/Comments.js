@@ -10,8 +10,467 @@ var comments_NoComment        = 0;
 var comments_NonActiveComment = 1;
 var comments_ActiveComment    = 2;
 
-function ParaComment()
-{}
+function ParaComment(Start, Id)
+{
+    this.Id = g_oIdCounter.Get_NewId();
+
+    this.Paragraph = null;
+
+    this.Start     = Start;
+    this.CommentId = Id;
+
+    this.Type  = para_Comment;
+
+    this.StartLine  = 0;
+    this.StartRange = 0;
+
+    this.Lines = [];
+    this.LinesLength = 0;
+}
+
+ParaComment.prototype =
+{
+    Get_Id : function()
+    {
+        return this.Id;
+    },
+
+    Set_CommentId : function(NewCommentId)
+    {
+    },
+
+    Set_Paragraph : function(Paragraph)
+    {
+        this.Paragraph = Paragraph;
+    },
+
+    Is_Empty : function()
+    {
+        return true;
+    },
+
+    Is_CheckingNearestPos : function()
+    {
+        return false;
+    },
+
+    Get_CompiledTextPr : function()
+    {
+        return null;
+    },
+
+    Clear_TextPr : function()
+    {
+
+    },
+
+    Remove : function()
+    {
+        return false;
+    },
+
+    Get_DrawingObjectRun : function(Id)
+    {
+        return null;
+    },
+
+    Get_DrawingObjectContentPos : function(Id, ContentPos, Depth)
+    {
+        return false;
+    },
+
+    Get_Layout : function(DrawingLayout, UseContentPos, ContentPos, Depth)
+    {
+    },
+
+    Get_NextRunElements : function(RunElements, UseContentPos, Depth)
+    {
+    },
+
+    Get_PrevRunElements : function(RunElements, UseContentPos, Depth)
+    {
+    },
+
+    Collect_DocumentStatistics : function(ParaStats)
+    {
+    },
+
+    Create_FontMap : function(Map)
+    {
+    },
+
+    Get_AllFontNames : function(AllFonts)
+    {
+    },
+
+    Get_SelectedText : function(bAll, bClearText)
+    {
+        return "";
+    },
+
+    Get_SelectionDirection : function()
+    {
+        return 1;
+    },
+
+    Clear_TextFormatting : function( DefHyper )
+    {
+    },
+
+    Can_AddDropCap : function()
+    {
+        return null;
+    },
+
+    Get_TextForDropCap : function(DropCapText, UseContentPos, ContentPos, Depth)
+    {
+    },
+
+    Get_StartTabsCount : function(TabsCounter)
+    {
+        return true;
+    },
+
+    Remove_StartTabs : function(TabsCounter)
+    {
+        return true;
+    },
+
+    Copy : function(Selected)
+    {
+        return new ParaComment(this.Start, this.CommentId);
+    },
+
+    CopyContent : function(Selected)
+    {
+        return [];
+    },
+
+    Split : function()
+    {
+        return new ParaRun();
+    },
+
+    Apply_TextPr : function()
+    {
+    },
+
+    Check_RevisionsChanges : function(Checker, ContentPos, Depth)
+    {
+    },
+
+    Get_ParaPosByContentPos : function(ContentPos, Depth)
+    {
+        return new CParaPos(this.StartRange, this.StartLine, 0, 0);
+    },
+//-----------------------------------------------------------------------------------
+// Функции пересчета
+//-----------------------------------------------------------------------------------
+
+    Recalculate_Reset : function(StartRange, StartLine)
+    {
+        this.StartLine   = StartLine;
+        this.StartRange  = StartRange;
+    },
+
+    Recalculate_Range : function(PRS, ParaPr)
+    {
+    },
+
+    Recalculate_Set_RangeEndPos : function(PRS, PRP, Depth)
+    {
+    },
+
+    Recalculate_LineMetrics : function(PRS, ParaPr, _CurLine, _CurRange)
+    {
+    },
+
+    Recalculate_Range_Width : function(PRSC, _CurLine, _CurRange)
+    {
+    },
+
+    Recalculate_Range_Spaces : function(PRSA, CurLine, CurRange, CurPage)
+    {
+    },
+
+    Recalculate_PageEndInfo : function(PRSI, _CurLine, _CurRange)
+    {
+    },
+
+    Save_RecalculateObject : function(Copy)
+    {
+    },
+
+    Load_RecalculateObject : function(RecalcObj, Parent)
+    {
+    },
+
+    Prepare_RecalculateObject : function()
+    {
+    },
+
+    Is_EmptyRange : function(_CurLine, _CurRange)
+    {
+        return true;
+    },
+
+    Check_Range_OnlyMath : function(Checker, CurRange, CurLine)
+    {
+    },
+
+    Check_MathPara : function(Checker)
+    {
+    },
+
+    Check_PageBreak : function()
+    {
+        return false;
+    },
+
+    Check_BreakPageEnd : function(PBChecker)
+    {
+        return true;
+    },
+
+    Recalculate_CurPos : function(X, Y, CurrentRun, _CurRange, _CurLine, CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
+    {
+        return { X : X };
+    },
+
+    Recalculate_MinMaxContentWidth : function()
+    {
+
+    },
+
+    Get_Range_VisibleWidth : function(RangeW, _CurLine, _CurRange)
+    {
+    },
+
+    Shift_Range : function(Dx, Dy, _CurLine, _CurRange)
+    {
+    },
+//-----------------------------------------------------------------------------------
+// Функции отрисовки
+//-----------------------------------------------------------------------------------
+    Draw_HighLights : function(PDSH)
+    {
+    },
+
+    Draw_Elements : function(PDSE)
+    {
+    },
+
+    Draw_Lines : function(PDSL)
+    {
+    },
+//-----------------------------------------------------------------------------------
+// Функции для работы с курсором
+//-----------------------------------------------------------------------------------
+    Is_CursorPlaceable : function()
+    {
+        return false;
+    },
+
+    Cursor_Is_Start : function()
+    {
+        return true;
+    },
+
+    Cursor_Is_NeededCorrectPos : function()
+    {
+        return true;
+    },
+
+    Cursor_Is_End : function()
+    {
+        return true;
+    },
+
+    Cursor_MoveToStartPos : function()
+    {
+    },
+
+    Cursor_MoveToEndPos : function(SelectFromEnd)
+    {
+    },
+
+    Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+    {
+        return false;
+    },
+
+    Get_ParaContentPos : function(bSelection, bStart, ContentPos)
+    {
+    },
+
+    Set_ParaContentPos : function(ContentPos, Depth)
+    {
+    },
+
+    Get_PosByElement : function(Class, ContentPos, Depth, UseRange, Range, Line)
+    {
+        if ( this === Class )
+            return true;
+
+        return false;
+    },
+
+    Get_ElementByPos : function(ContentPos, Depth)
+    {
+        return this;
+    },
+
+    Get_ClassesByPos : function(Classes, ContentPos, Depth)
+    {
+        Classes.push(this);
+    },
+
+    Get_PosByDrawing : function(Id, ContentPos, Depth)
+    {
+        return false;
+    },
+
+    Get_RunElementByPos : function(ContentPos, Depth)
+    {
+        return null;
+    },
+
+    Get_LastRunInRange : function(_CurLine, _CurRange)
+    {
+        return null;
+    },
+
+    Get_LeftPos : function(SearchPos, ContentPos, Depth, UseContentPos)
+    {
+    },
+
+    Get_RightPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+    {
+    },
+
+    Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos)
+    {
+    },
+
+    Get_WordEndPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+    {
+    },
+
+    Get_EndRangePos : function(_CurLine, _CurRange, SearchPos, Depth)
+    {
+        return false;
+    },
+
+    Get_StartRangePos : function(_CurLine, _CurRange, SearchPos, Depth)
+    {
+        return false;
+    },
+
+    Get_StartRangePos2 : function(_CurLine, _CurRange, ContentPos, Depth)
+    {
+    },
+
+    Get_StartPos : function(ContentPos, Depth)
+    {
+    },
+
+    Get_EndPos : function(BehindEnd, ContentPos, Depth)
+    {
+    },
+//-----------------------------------------------------------------------------------
+// Функции для работы с селектом
+//-----------------------------------------------------------------------------------
+    Set_SelectionContentPos : function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
+    {
+    },
+
+    Selection_Stop : function()
+    {
+    },
+
+    Selection_Remove : function()
+    {
+    },
+
+    Select_All : function(Direction)
+    {
+    },
+
+    Selection_DrawRange : function(_CurLine, _CurRange, SelectionDraw)
+    {
+    },
+
+    Selection_IsEmpty : function(CheckEnd)
+    {
+        return true;
+    },
+
+    Selection_CheckParaEnd : function()
+    {
+        return false;
+    },
+
+    Is_SelectedAll : function(Props)
+    {
+        return true;
+    },
+
+    Selection_CorrectLeftPos : function(Direction)
+    {
+        return true;
+    },
+
+    Selection_CheckParaContentPos : function(ContentPos)
+    {
+        return true;
+    },
+//----------------------------------------------------------------------------------------------------------------------
+// Функции совместного редактирования
+//----------------------------------------------------------------------------------------------------------------------
+    Undo : function(Data)
+    {
+    },
+
+    Redo : function(Data)
+    {
+    },
+
+    Save_Changes : function(Data, Writer)
+    {
+    },
+
+    Load_Changes : function(Reader)
+    {
+    },
+
+    Refresh_RecalcData : function()
+    {
+    },
+
+    Write_ToBinary2 : function(Writer)
+    {
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+    }
+};
+ParaComment.prototype.Get_CurrentParaPos = function()
+{
+    return new CParaPos(this.StartRange, this.StartLine, 0, 0);
+};
+ParaComment.prototype.Get_TextPr = function(ContentPos, Depth)
+{
+    return new CTextPr();
+};
+//----------------------------------------------------------------------------------------------------------------------
+// Разное
+//----------------------------------------------------------------------------------------------------------------------
+ParaComment.prototype.Set_ReviewType = function(ReviewType, RemovePrChange){};
+ParaComment.prototype.Set_ReviewTypeWithInfo = function(ReviewType, ReviewInfo){};
+ParaComment.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth){};
+ParaComment.prototype.Accept_RevisionChanges = function(Type, bAll){};
+ParaComment.prototype.Reject_RevisionChanges = function(Type, bAll){};
 
 function CWriteCommentData()
 {
