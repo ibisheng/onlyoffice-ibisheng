@@ -2369,7 +2369,7 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 				this.value = new cArea( arg0.getName(), ws );
 		}
 		else
-			return this.value = new cError( cErrorType.wrong_value_type );
+			return this.value = new cError( cErrorType.null_value );
 
     }
     else {
@@ -4802,6 +4802,7 @@ parserFormula.prototype = {
 
     _changeOffsetHelper: function ( ref, offset ) {
         var m = ref._cells.match( /\$/g );
+		if(!m){return;}
         if ( m.length == 1 ) {//для cRef, cRef3D, cArea. $A2, A$2, Sheet1!$A2, Sheet1!A$2, $A2:C4, A$2:C4, A2:$C4, A2:C$4.
             if ( !(ref instanceof cArea) ) {
                 if ( ref._cells.indexOf( "$" ) == 0 ) {
