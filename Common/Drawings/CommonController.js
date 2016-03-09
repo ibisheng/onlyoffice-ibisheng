@@ -651,7 +651,7 @@ DrawingObjectsController.prototype =
 
             object.selectionSetStart(e, x, y, pageIndex);
 
-            this.changeCurrentState(new TextAddState(this, object));
+            this.changeCurrentState(new TextAddState(this, object, x, y));
             return true;
         }
         else

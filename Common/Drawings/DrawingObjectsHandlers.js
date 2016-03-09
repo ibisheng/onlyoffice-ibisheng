@@ -249,7 +249,7 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
                                 cur_grouped_object.selectTitle(title, pageIndex);
                                 cur_grouped_object.selection.textSelection = title;
                                 title.selectionSetStart(e, x, y, pageIndex);
-                                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title));
+                                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title, x, y));
                                 if(e.ClickCount <= 1)
                                 {
                                     drawingObjectsController.updateSelectionState();
@@ -330,7 +330,7 @@ function handleChart(drawing, drawingObjectsController, e, x, y, group, pageInde
                         drawing.selection.textSelection = title;
                     }
                     title.selectionSetStart(e, x, y, pageIndex);
-                    drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title));
+                    drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title, x, y));
                     if(e.ClickCount <= 1)
                     {
                         drawingObjectsController.updateSelectionState();
@@ -432,7 +432,7 @@ function handleInlineChart(drawing, drawingObjectsController, e, x, y, pageIndex
                     drawing.selectTitle(title, pageIndex);
                     drawing.selection.textSelection = title;
                     title.selectionSetStart(e, x, y, pageIndex);
-                    drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title));
+                    drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title, x, y));
                     if(e.ClickCount <= 1)
                     {
                         drawingObjectsController.updateSelectionState();
@@ -590,7 +590,7 @@ function handleFloatTable(drawing, drawingObjectsController, e, x, y, group, pag
                     drawingObjectsController.selectObject(group, pageIndex);
                     drawingObjectsController.selection.groupSelection = group;
                 }
-                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawing));
+                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawing, x, y));
                 return true;
             }
             else

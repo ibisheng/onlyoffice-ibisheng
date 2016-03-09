@@ -1230,10 +1230,12 @@ ChangeAdjInGroupState.prototype =
     onMouseUp: MoveInGroupState.prototype.onMouseUp
 };
 
-function TextAddState(drawingObjects, majorObject)
+function TextAddState(drawingObjects, majorObject, startX, startY)
 {
-    this.drawingObjects =drawingObjects;
+    this.drawingObjects = drawingObjects;
     this.majorObject = majorObject;
+    this.startX = startX;
+    this.startY = startY;
 }
 
 TextAddState.prototype =
@@ -1251,6 +1253,15 @@ TextAddState.prototype =
         {
             this.onMouseUp(e, x, y, pageIndex);
             return;
+        }
+        if(isRealNumber(this.startX) && isRealNumber(this.startY))
+        {
+            if(Math.abs(this.startX - x) < 0.001 && Math.abs(this.startY - y) < 0.001)
+            {
+                return;
+            }
+            this.startX = undefined;
+            this.startY = undefined;
         }
         this.majorObject.selectionSetEnd(e, x, y, pageIndex);
         if(!(this.majorObject.getObjectType() === historyitem_type_GraphicFrame && this.majorObject.graphicObject.Selection.Type2 === table_Selection_Border))
