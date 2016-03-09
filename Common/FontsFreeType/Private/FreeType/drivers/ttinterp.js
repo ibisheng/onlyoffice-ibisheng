@@ -22,8 +22,8 @@ function TT_CallRec()
     this.Caller_Range   = 0;
     this.Caller_IP      = 0;
     this.Cur_Count      = 0;
-    this.Cur_Restart    = 0;
-    this.Cur_End        = 0;
+
+    this.Def            = null;
 }
 
 function SPH_TweakRule()
@@ -807,7 +807,7 @@ function TT_Run_Context(exec, debug)
     exec.GS.dualVector.x = exec.GS.projVector.x;
     exec.GS.dualVector.y = exec.GS.projVector.y;
 
-    if (exec.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING)//#ifdef TT_CONFIG_OPTION_UNPATENTED_HINTING
+    if (exec.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_UNPATENTED_HINTING)//#ifdef TT_CONFIG_OPTION_UNPATENTED_HINTING
     {
         exec.GS.both_x_axis = true;
     }//#endif
@@ -5352,9 +5352,18 @@ function TT_RunIns(exc)
     var _tt_hints = exc.face.driver.library.tt_hint_props;
     if (_tt_hints.TT_CONFIG_OPTION_SUBPIXEL_HINTING) //#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
     {
-        if (exc.ignore_x_mode)
-            exc.iup_called = false;
+        //if (exc.ignore_x_mode)
+        exc.iup_called = false;
     }//#endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
+
+    var opcode_pattern = [
+        [
+            0x06, /* SPVTL   */
+            0x7D, /* RDTG    */
+        ]
+    ];
+    var opcode_pointer = [ 0 ];
+    var opcode_size    = [ 1 ];
 
     /* set CVT functions */
     exc.tt_metrics.ratio = 0;
@@ -5426,6 +5435,30 @@ function TT_RunIns(exc)
         exc.step_ins = true;
         exc.error    = 0;
 
+        if (_tt_hints.TT_CONFIG_OPTION_SUBPIXEL_HINTING) //#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
+        {
+            for (var i_patt = 0; i_patt < opcode_pattern.length; i_patt++)
+            {
+                if (opcode_pointer[i_patt] < opcode_size[i_patt] &&
+                    exc.opcode == opcode_pattern[i_patt][opcode_pointer[i_patt]])
+                {
+                    opcode_pointer[i_patt] += 1;
+
+                    if ( opcode_pointer[i_patt] == opcode_size[i_patt] )
+                    {
+                        switch ( i_patt )
+                        {
+                            case 0:
+                                break;
+                        }
+                        opcode_pointer[i_patt] = 0;
+                    }
+                }
+                else
+                    opcode_pointer[i_patt] = 0;
+            }
+        }//#endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
+
         Instruct_Dispatch[exc.opcode](exc, exc.stack, exc.args);
  
         var bSuiteLabel = false;
@@ -5454,8 +5487,7 @@ function TT_RunIns(exc)
                             callrec.Caller_Range = exc.curRange;
                             callrec.Caller_IP    = exc.IP + 1;
                             callrec.Cur_Count    = 1;
-                            callrec.Cur_Restart  = _def.start;
-                            callrec.Cur_End      = _def.end;
+                            callrec.Def          = _def;
 
                             if (Ins_Goto_CodeRange(def.range, def.start) == 1)
                                 return SetErrorAndReturn(exc);
@@ -5558,412 +5590,210 @@ function Move_CVT_Stretched(exc, idx, value)
 /*********************************************************************/
 function CSubpixHintingHacks()
 {
-    this.FAMILY_CLASS_Rules = {};
-
-    var _object_MS_Legacy_Fonts = {};
-    _object_MS_Legacy_Fonts["Aharoni"] = true;
-    _object_MS_Legacy_Fonts["Andale Mono"] = true;
-    _object_MS_Legacy_Fonts["Andalus"] = true;
-    _object_MS_Legacy_Fonts["Angsana New"] = true;
-    _object_MS_Legacy_Fonts["AngsanaUPC"] = true;
-    _object_MS_Legacy_Fonts["Arabic Transparent"] = true;
-    _object_MS_Legacy_Fonts["Arial Black"] = true;
-    _object_MS_Legacy_Fonts["Arial Narrow"] = true;
-    _object_MS_Legacy_Fonts["Arial Unicode MS"] = true;
-    _object_MS_Legacy_Fonts["Arial"] = true;
-    _object_MS_Legacy_Fonts["Batang"] = true;
-    _object_MS_Legacy_Fonts["Browallia New"] = true;
-    _object_MS_Legacy_Fonts["BrowalliaUPC"] = true;
-    _object_MS_Legacy_Fonts["Comic Sans MS"] = true;
-    _object_MS_Legacy_Fonts["Cordia New"] = true;
-    _object_MS_Legacy_Fonts["CordiaUPC"] = true;
-    _object_MS_Legacy_Fonts["Courier New"] = true;
-    _object_MS_Legacy_Fonts["DFKai-SB"] = true;
-    _object_MS_Legacy_Fonts["David Transparent"] = true;
-    _object_MS_Legacy_Fonts["David"] = true;
-    _object_MS_Legacy_Fonts["DilleniaUPC"] = true;
-    _object_MS_Legacy_Fonts["Estrangelo Edessa"] = true;
-    _object_MS_Legacy_Fonts["EucrosiaUPC"] = true;
-    _object_MS_Legacy_Fonts["FangSong_GB2312"] = true;
-    _object_MS_Legacy_Fonts["Fixed Miriam Transparent"] = true;
-    _object_MS_Legacy_Fonts["FrankRuehl"] = true;
-    _object_MS_Legacy_Fonts["Franklin Gothic Medium"] = true;
-    _object_MS_Legacy_Fonts["FreesiaUPC"] = true;
-    _object_MS_Legacy_Fonts["Garamond"] = true;
-    _object_MS_Legacy_Fonts["Gautami"] = true;
-    _object_MS_Legacy_Fonts["Georgia"] = true;
-    _object_MS_Legacy_Fonts["Gulim"] = true;
-    _object_MS_Legacy_Fonts["Impact"] = true;
-    _object_MS_Legacy_Fonts["IrisUPC"] = true;
-    _object_MS_Legacy_Fonts["JasmineUPC"] = true;
-    _object_MS_Legacy_Fonts["KaiTi_GB2312"] = true;
-    _object_MS_Legacy_Fonts["KodchiangUPC"] = true;
-    _object_MS_Legacy_Fonts["Latha"] = true;
-    _object_MS_Legacy_Fonts["Levenim MT"] = true;
-    _object_MS_Legacy_Fonts["LilyUPC"] = true;
-    _object_MS_Legacy_Fonts["Lucida Console"] = true;
-    _object_MS_Legacy_Fonts["Lucida Sans Unicode"] = true;
-    _object_MS_Legacy_Fonts["MS Gothic"] = true;
-    _object_MS_Legacy_Fonts["MS Mincho"] = true;
-    _object_MS_Legacy_Fonts["MV Boli"] = true;
-    _object_MS_Legacy_Fonts["Mangal"] = true;
-    _object_MS_Legacy_Fonts["Marlett"] = true;
-    _object_MS_Legacy_Fonts["Microsoft Sans Serif"] = true;
-    _object_MS_Legacy_Fonts["Mingliu"] = true;
-    _object_MS_Legacy_Fonts["Miriam Fixed"] = true;
-    _object_MS_Legacy_Fonts["Miriam Transparent"] = true;
-    _object_MS_Legacy_Fonts["Miriam"] = true;
-    _object_MS_Legacy_Fonts["Narkisim"] = true;
-    _object_MS_Legacy_Fonts["Palatino Linotype"] = true;
-    _object_MS_Legacy_Fonts["Raavi"] = true;
-    _object_MS_Legacy_Fonts["Rod Transparent"] = true;
-    _object_MS_Legacy_Fonts["Rod"] = true;
-    _object_MS_Legacy_Fonts["Shruti"] = true;
-    _object_MS_Legacy_Fonts["SimHei"] = true;
-    _object_MS_Legacy_Fonts["Simplified Arabic Fixed"] = true;
-    _object_MS_Legacy_Fonts["Simplified Arabic"] = true;
-    _object_MS_Legacy_Fonts["Simsun"] = true;
-    _object_MS_Legacy_Fonts["Sylfaen"] = true;
-    _object_MS_Legacy_Fonts["Symbol"] = true;
-    _object_MS_Legacy_Fonts["Tahoma"] = true;
-    _object_MS_Legacy_Fonts["Times New Roman"] = true;
-    _object_MS_Legacy_Fonts["Traditional Arabic"] = true;
-    _object_MS_Legacy_Fonts["Trebuchet MS"] = true;
-    _object_MS_Legacy_Fonts["Tunga"] = true;
-    _object_MS_Legacy_Fonts["Verdana"] = true;
-    _object_MS_Legacy_Fonts["Webdings"] = true;
-    _object_MS_Legacy_Fonts["Wingdings"] = true;
-
-    var _object_Core_MS_Legacy_Fonts = {};
-    _object_Core_MS_Legacy_Fonts["Arial Black"] = true;
-    _object_Core_MS_Legacy_Fonts["Arial Narrow"] = true;
-    _object_Core_MS_Legacy_Fonts["Arial Unicode MS"] = true;
-    _object_Core_MS_Legacy_Fonts["Arial"] = true;
-    _object_Core_MS_Legacy_Fonts["Comic Sans MS"] = true;
-    _object_Core_MS_Legacy_Fonts["Courier New"] = true;
-    _object_Core_MS_Legacy_Fonts["Garamond"] = true;
-    _object_Core_MS_Legacy_Fonts["Georgia"] = true;
-    _object_Core_MS_Legacy_Fonts["Impact"] = true;
-    _object_Core_MS_Legacy_Fonts["Lucida Console"] = true;
-    _object_Core_MS_Legacy_Fonts["Lucida Sans Unicode"] = true;
-    _object_Core_MS_Legacy_Fonts["Microsoft Sans Serif"] = true;
-    _object_Core_MS_Legacy_Fonts["Palatino Linotype"] = true;
-    _object_Core_MS_Legacy_Fonts["Tahoma"] = true;
-    _object_Core_MS_Legacy_Fonts["Times New Roman"] = true;
-    _object_Core_MS_Legacy_Fonts["Trebuchet MS"] = true;
-    _object_Core_MS_Legacy_Fonts["Verdana"] = true;
-
-    var _object_Apple_Legacy_Fonts = {};
-    _object_Apple_Legacy_Fonts["Geneva"] = true;
-    _object_Apple_Legacy_Fonts["Times"] = true;
-    _object_Apple_Legacy_Fonts["Monaco"] = true;
-    _object_Apple_Legacy_Fonts["Century"] = true;
-    _object_Apple_Legacy_Fonts["Chalkboard"] = true;
-    _object_Apple_Legacy_Fonts["Lobster"] = true;
-    _object_Apple_Legacy_Fonts["Century Gothic"] = true;
-    _object_Apple_Legacy_Fonts["Optima"] = true;
-    _object_Apple_Legacy_Fonts["Lucida Grande"] = true;
-    _object_Apple_Legacy_Fonts["Gill Sans"] = true;
-    _object_Apple_Legacy_Fonts["Baskerville"] = true;
-    _object_Apple_Legacy_Fonts["Helvetica"] = true;
-    _object_Apple_Legacy_Fonts["Helvetica Neue"] = true;
-
-    var _object_Legacy_Sans_Fonts = {};
-    _object_Legacy_Sans_Fonts["Andale Mono"] = true;
-    _object_Legacy_Sans_Fonts["Arial Unicode MS"] = true;
-    _object_Legacy_Sans_Fonts["Arial"] = true;
-    _object_Legacy_Sans_Fonts["Century Gothic"] = true;
-    _object_Legacy_Sans_Fonts["Comic Sans MS"] = true;
-    _object_Legacy_Sans_Fonts["Franklin Gothic Medium"] = true;
-    _object_Legacy_Sans_Fonts["Geneva"] = true;
-    _object_Legacy_Sans_Fonts["Lucida Console"] = true;
-    _object_Legacy_Sans_Fonts["Lucida Grande"] = true;
-    _object_Legacy_Sans_Fonts["Lucida Sans Unicode"] = true;
-    _object_Legacy_Sans_Fonts["Lucida Sans Typewriter"] = true;
-    _object_Legacy_Sans_Fonts["Microsoft Sans Serif"] = true;
-    _object_Legacy_Sans_Fonts["Monaco"] = true;
-    _object_Legacy_Sans_Fonts["Tahoma"] = true;
-    _object_Legacy_Sans_Fonts["Trebuchet MS"] = true;
-    _object_Legacy_Sans_Fonts["Verdana"] = true;
-
-    var _object_Misc_Legacy_Fonts = {};
-    _object_Misc_Legacy_Fonts["Dark Courier"] = true;
-
-    var _object_Verdana_Clones = {};
-    _object_Verdana_Clones["DejaVu Sans"] = true;
-    _object_Verdana_Clones["Bitstream Vera Sans"] = true;
-
-    var _object_Verdana_and_Clones = {};
-    _object_Verdana_and_Clones["DejaVu Sans"] = true;
-    _object_Verdana_and_Clones["Bitstream Vera Sans"] = true;
-    _object_Verdana_and_Clones["Verdana"] = true;
-
-    this.FAMILY_CLASS_Rules["MS Legacy Fonts"] = _object_MS_Legacy_Fonts;
-    this.FAMILY_CLASS_Rules["Core MS Legacy Fonts"] = _object_Core_MS_Legacy_Fonts;
-    this.FAMILY_CLASS_Rules["Apple Legacy Fonts"] = _object_Apple_Legacy_Fonts;
-    this.FAMILY_CLASS_Rules["Legacy Sans Fonts"] = _object_Legacy_Sans_Fonts;
-    this.FAMILY_CLASS_Rules["Misc Legacy Fonts"] = _object_Misc_Legacy_Fonts;
-    this.FAMILY_CLASS_Rules["Verdana Clones"] = _object_Verdana_Clones;
-    this.FAMILY_CLASS_Rules["Verdana and Clones"] = _object_Verdana_and_Clones;
-
-    _object_MS_Legacy_Fonts = null;
-    _object_Core_MS_Legacy_Fonts = null;
-    _object_Apple_Legacy_Fonts = null;
-    _object_Legacy_Sans_Fonts = null;
-    _object_Misc_Legacy_Fonts = null;
-    _object_Verdana_Clones = null;
-    _object_Verdana_and_Clones = null;
-
-    this.STYLE_CLASS_Rules = {};
-
-    var _object_Regular_Class = {};
-    _object_Regular_Class["Regular"] = true;
-    _object_Regular_Class["Book"] = true;
-    _object_Regular_Class["Medium"] = true;
-    _object_Regular_Class["Roman"] = true;
-    _object_Regular_Class["Normal"] = true;
-
-    var _object_RegularItalic_Class = {};
-    _object_RegularItalic_Class["Regular"] = true;
-    _object_RegularItalic_Class["Book"] = true;
-    _object_RegularItalic_Class["Medium"] = true;
-    _object_RegularItalic_Class["Italic"] = true;
-    _object_RegularItalic_Class["Oblique"] = true;
-    _object_RegularItalic_Class["Roman"] = true;
-    _object_RegularItalic_Class["Normal"] = true;
-
-    var _object_BoldBoldItalic_Class = {};
-    _object_BoldBoldItalic_Class["Bold"] = true;
-    _object_BoldBoldItalic_Class["Bold Italic"] = true;
-    _object_BoldBoldItalic_Class["Black"] = true;
-
-    var _object_BoldItalicBoldItalic_Class = {};
-    _object_BoldItalicBoldItalic_Class["Bold"] = true;
-    _object_BoldItalicBoldItalic_Class["Bold Italic"] = true;
-    _object_BoldItalicBoldItalic_Class["Black"] = true;
-    _object_BoldItalicBoldItalic_Class["Italic"] = true;
-    _object_BoldItalicBoldItalic_Class["Oblique"] = true;
-
-    var _object_RegularBold_Class = {};
-    _object_RegularBold_Class["Regular"] = true;
-    _object_RegularBold_Class["Book"] = true;
-    _object_RegularBold_Class["Medium"] = true;
-    _object_RegularBold_Class["Normal"] = true;
-    _object_RegularBold_Class["Roman"] = true;
-    _object_RegularBold_Class["Bold"] = true;
-    _object_RegularBold_Class["Black"] = true;
-
-    this.STYLE_CLASS_Rules["Regular Class"] = _object_Regular_Class;
-    this.STYLE_CLASS_Rules["Regular/Italic Class"] = _object_RegularItalic_Class;
-    this.STYLE_CLASS_Rules["Bold/BoldItalic Class"] = _object_BoldBoldItalic_Class;
-    this.STYLE_CLASS_Rules["Bold/Italic/BoldItalic Class"] = _object_BoldItalicBoldItalic_Class;
-    this.STYLE_CLASS_Rules["Regular/Bold Class"] = _object_RegularBold_Class;
-
-    this.is_member_of_family_class = function(detected_font_name, rule_font_name)
+    this.Correct_Init_Obj = function(_class)
     {
-        /* Does font name match rule family? */
-        if (detected_font_name == rule_font_name)
-            return true;
-
-        /* Is font name a wildcard ""? */
-        if (rule_font_name == "")
-            return true;
-
-        var _fcr = this.FAMILY_CLASS_Rules[rule_font_name];
-        if (undefined !== _fcr)
+        for (var prop in _class)
         {
-            if (undefined !== _fcr[detected_font_name])
-                return true;
+            if (!_class.hasOwnProperty(prop))
+                continue;
+
+            var _arr = _class[prop];
+            var _obj = {};
+
+            var _len = _arr.length;
+            for (var i = 0; i < _len; i++)
+                _obj[_arr[i]] = true;
+
+            _class[prop] = _obj;
         }
+    };
 
-        return false;
-    }
-
-    this.is_member_of_style_class = function(detected_font_style, rule_font_style)
+    this.FAMILY_CLASS_Rules =
     {
-        /* Does font style match rule style? */
-        if (detected_font_style == rule_font_style)
-            return true;
+        "MS Legacy Fonts" : [
+            "Aharoni",
+            "Andale Mono",
+            "Andalus",
+            "Angsana New",
+            "AngsanaUPC",
+            "Arabic Transparent",
+            "Arial Black",
+            "Arial Narrow",
+            "Arial Unicode MS",
+            "Arial",
+            "Batang",
+            "Browallia New",
+            "BrowalliaUPC",
+            "Comic Sans MS",
+            "Cordia New",
+            "CordiaUPC",
+            "Courier New",
+            "DFKai-SB",
+            "David Transparent",
+            "David",
+            "DilleniaUPC",
+            "Estrangelo Edessa",
+            "EucrosiaUPC",
+            "FangSong_GB2312",
+            "Fixed Miriam Transparent",
+            "FrankRuehl",
+            "Franklin Gothic Medium",
+            "FreesiaUPC",
+            "Garamond",
+            "Gautami",
+            "Georgia",
+            "Gulim",
+            "Impact",
+            "IrisUPC",
+            "JasmineUPC",
+            "KaiTi_GB2312",
+            "KodchiangUPC",
+            "Latha",
+            "Levenim MT",
+            "LilyUPC",
+            "Lucida Console",
+            "Lucida Sans Unicode",
+            "MS Gothic",
+            "MS Mincho",
+            "MV Boli",
+            "Mangal",
+            "Marlett",
+            "Microsoft Sans Serif",
+            "Mingliu",
+            "Miriam Fixed",
+            "Miriam Transparent",
+            "Miriam",
+            "Narkisim",
+            "Palatino Linotype",
+            "Raavi",
+            "Rod Transparent",
+            "Rod",
+            "Shruti",
+            "SimHei",
+            "Simplified Arabic Fixed",
+            "Simplified Arabic",
+            "Simsun",
+            "Sylfaen",
+            "Symbol",
+            "Tahoma",
+            "Times New Roman",
+            "Traditional Arabic",
+            "Trebuchet MS",
+            "Tunga",
+            "Verdana",
+            "Webdings",
+            "Wingdings"
+        ],
+        "Core MS Legacy Fonts" : [
+            "Arial Black",
+            "Arial Narrow",
+            "Arial Unicode MS",
+            "Arial",
+            "Comic Sans MS",
+            "Courier New",
+            "Garamond",
+            "Georgia",
+            "Impact",
+            "Lucida Console",
+            "Lucida Sans Unicode",
+            "Microsoft Sans Serif",
+            "Palatino Linotype",
+            "Tahoma",
+            "Times New Roman",
+            "Trebuchet MS",
+            "Verdana"
+        ],
+        "Apple Legacy Fonts" : [
+            "Geneva",
+            "Times",
+            "Monaco",
+            "Century",
+            "Chalkboard",
+            "Lobster",
+            "Century Gothic",
+            "Optima",
+            "Lucida Grande",
+            "Gill Sans",
+            "Baskerville",
+            "Helvetica",
+            "Helvetica Neue"
+        ],
+        "Legacy Sans Fonts" : [
+            "Andale Mono",
+            "Arial Unicode MS",
+            "Arial",
+            "Century Gothic",
+            "Comic Sans MS",
+            "Franklin Gothic Medium",
+            "Geneva",
+            "Lucida Console",
+            "Lucida Grande",
+            "Lucida Sans Unicode",
+            "Lucida Sans Typewriter",
+            "Microsoft Sans Serif",
+            "Monaco",
+            "Tahoma",
+            "Trebuchet MS",
+            "Verdana"
+        ],
+        "Misc Legacy Fonts" : [
+            "Dark Courier"
+        ],
+        "Verdana Clones" : [
+            "DejaVu Sans",
+            "Bitstream Vera Sans"
+        ],
+        "Verdana and Clones" : [
+            "DejaVu Sans",
+            "Bitstream Vera Sans",
+            "Verdana"
+        ]
+    };
 
-        /* Is font style a wildcard ""? */
-        if (rule_font_style == "")
-            return true;
+    this.Correct_Init_Obj(this.FAMILY_CLASS_Rules);
 
-        /* Is font style contained in a class list? */
-        var _scr = this.STYLE_CLASS_Rules[rule_font_style];
-        if (undefined !== _scr)
-        {
-            if (undefined !== _scr[detected_font_style])
-                return true;
-        }
-
-        return false;
-    }
-
-    this.sph_test_tweak = function(face, family, ppem, style, glyph_index, rule, num_rules)
+    this.STYLE_CLASS_Rules =
     {
-        /* rule checks may be able to be optimized further */
-        for (var i = 0; i < num_rules; i++)
-        {
-            if (family != "" && this.is_member_of_family_class(family, rule[i].family))
-            {
-                if (rule[i].ppem == 0 || rule[i].ppem == ppem)
-                {
-                    if (style != "" && this.is_member_of_style_class(style, rule[i].style))
-                    {
-                        if (rule[i].glyph == 0 || FT_Get_Char_Index(face, rule[i].glyph) == glyph_index)
-                            return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
+        "Regular Class" : [
+            "Regular",
+            "Book",
+            "Medium",
+            "Roman",
+            "Normal"
+        ],
+        "Regular/Italic Class" : [
+            "Regular",
+            "Book",
+            "Medium",
+            "Italic",
+            "Oblique",
+            "Roman",
+            "Normal"
+        ],
+        "Bold/BoldItalic Class" : [
+            "Bold",
+            "Bold Italic",
+            "Black"
+        ],
+        "Bold/Italic/BoldItalic Class" : [
+            "Bold",
+            "Bold Italic",
+            "Black",
+            "Italic",
+            "Oblique"
+        ],
+        "Regular/Bold Class" : [
+            "Regular",
+            "Book",
+            "Medium",
+            "Normal",
+            "Roman",
+            "Bold",
+            "Black"
+        ]
+    };
 
-    this.scale_test_tweak = function(face, family, ppem, style, glyph_index, rule, num_rules)
-    {
-        /* rule checks may be able to be optimized further */
-        for (var i = 0; i < num_rules; i++)
-        {
-            if (family != "" && this.is_member_of_family_class(family, rule[i].family))
-            {
-                if (rule[i].ppem == 0 || rule[i].ppem == ppem)
-                {
-                    if (style != "" && this.is_member_of_style_class(style, rule[i].style))
-                    {
-                        if (rule[i].glyph == 0 || FT_Get_Char_Index(face, rule[i].glyph) == glyph_index)
-                            return rule[i].scale;
-                    }
-                }
-            }
-        }
-        return 1000;
-    }
-
-    this.sph_set_tweaks = function(loader, glyph_index)
-    {
-        var face = loader.face;
-        var family = face.family_name;
-        var ppem = loader.size.metrics.x_ppem;
-        var style = face.style_name;
-
-        /* don't apply rules if style isn't set */
-        if (face.style_name == "")
-            return;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.PIXEL_HINTING_Rules, this.PIXEL_HINTING_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_PIXEL_HINTING;
-
-        if (loader.exec.sph_tweak_flags & FT_Common.SPH_TWEAK_PIXEL_HINTING)
-        {
-            loader.exec.ignore_x_mode = false;
-            return;
-        }
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.ALLOW_X_DMOVE_Rules, this.ALLOW_X_DMOVE_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_ALLOW_X_DMOVE;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.ALLOW_X_DMOVEX_Rules, this.ALLOW_X_DMOVEX_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_ALLOW_X_DMOVEX;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.ALLOW_X_MOVE_ZP2_Rules, this.ALLOW_X_MOVE_ZP2_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_ALLOW_X_MOVE_ZP2;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.ALWAYS_DO_DELTAP_Rules, this.ALWAYS_DO_DELTAP_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_ALWAYS_DO_DELTAP;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.ALWAYS_SKIP_DELTAP_Rules, this.ALWAYS_SKIP_DELTAP_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_ALWAYS_SKIP_DELTAP;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.DEEMBOLDEN_Rules, this.DEEMBOLDEN_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_DEEMBOLDEN;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.DELTAP_SKIP_EXAGGERATED_VALUES_Rules, this.DELTAP_SKIP_EXAGGERATED_VALUES_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_DELTAP_SKIP_EXAGGERATED_VALUES;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.DO_SHPIX_Rules, this.DO_SHPIX_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_DO_SHPIX;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.EMBOLDEN_Rules, this.EMBOLDEN_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_EMBOLDEN;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.MIAP_HACK_Rules, this.MIAP_HACK_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_MIAP_HACK;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.NORMAL_ROUND_Rules, this.NORMAL_ROUND_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_NORMAL_ROUND;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.NO_ALIGNRP_AFTER_IUP_Rules, this.NO_ALIGNRP_AFTER_IUP_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_NO_ALIGNRP_AFTER_IUP;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.NO_CALL_AFTER_IUP_Rules, this.NO_CALL_AFTER_IUP_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_NO_CALL_AFTER_IUP;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.NO_DELTAP_AFTER_IUP_Rules, this.NO_DELTAP_AFTER_IUP_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_NO_DELTAP_AFTER_IUP;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.RASTERIZER_35_Rules, this.RASTERIZER_35_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_RASTERIZER_35;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.SKIP_INLINE_DELTAS_Rules, this.SKIP_INLINE_DELTAS_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_SKIP_INLINE_DELTAS;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.SKIP_IUP_Rules, this.SKIP_IUP_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_SKIP_IUP;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.MIRP_CVT_ZERO_Rules, this.MIRP_CVT_ZERO_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_MIRP_CVT_ZERO;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.SKIP_OFFPIXEL_Y_MOVES_Rules, this.SKIP_OFFPIXEL_Y_MOVES_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_SKIP_OFFPIXEL_Y_MOVES;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.SKIP_OFFPIXEL_Y_MOVES_Rules_Exceptions, this.SKIP_OFFPIXEL_Y_MOVES_RULES_EXCEPTIONS_SIZE))
-            loader.exec.sph_tweak_flags &= ~FT_Common.SPH_TWEAK_SKIP_OFFPIXEL_Y_MOVES;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.SKIP_NONPIXEL_Y_MOVES_Rules, this.SKIP_NONPIXEL_Y_MOVES_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_SKIP_NONPIXEL_Y_MOVES;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.SKIP_NONPIXEL_Y_MOVES_Rules_Exceptions, this.SKIP_NONPIXEL_Y_MOVES_RULES_EXCEPTIONS_SIZE))
-            loader.exec.sph_tweak_flags &= ~FT_Common.SPH_TWEAK_SKIP_NONPIXEL_Y_MOVES;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.ROUND_NONPIXEL_Y_MOVES_Rules, this.ROUND_NONPIXEL_Y_MOVES_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_ROUND_NONPIXEL_Y_MOVES;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.ROUND_NONPIXEL_Y_MOVES_Rules_Exceptions, this.ROUND_NONPIXEL_Y_MOVES_RULES_EXCEPTIONS_SIZE))
-            loader.exec.sph_tweak_flags &= ~FT_Common.SPH_TWEAK_ALLOW_X_DMOVE;
-
-        if (loader.exec.sph_tweak_flags & FT_Common.SPH_TWEAK_RASTERIZER_35)
-            loader.exec.rasterizer_version = 35;
-        else
-            loader.exec.rasterizer_version = FT_Common.SPH_OPTION_SET_RASTERIZER_VERSION;
-
-        /* re-execute fpgm always to avoid problems */
-        loader.exec.size.cvt_ready = false;
-        tt_size_ready_bytecode(loader.exec.size, (loader.load_flags & FT_Common.FT_LOAD_PEDANTIC) != 0);
-
-        if ((loader.load_flags & FT_Common.FT_LOAD_NO_HINTING) == 0)
-        {
-            if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.TIMES_NEW_ROMAN_HACK_Rules, this.TIMES_NEW_ROMAN_HACK_RULES_SIZE))
-                loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_TIMES_NEW_ROMAN_HACK;
-
-            if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.COURIER_NEW_2_HACK_Rules, this.COURIER_NEW_2_HACK_RULES_SIZE))
-                loader.exec.sph_tweak_flags |= FT_Common.SPH_TWEAK_COURIER_NEW_2_HACK;
-        }
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.COMPATIBILITY_MODE_Rules, this.COMPATIBILITY_MODE_RULES_SIZE))
-        {
-            loader.exec.compatibility_mode = true;
-            loader.exec.ignore_x_mode      = true;
-        }
-        else
-            loader.exec.compatibility_mode = false;
-
-        if ((loader.load_flags & FT_Common.FT_LOAD_NO_HINTING) == 0)
-        {
-            if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.COMPATIBLE_WIDTHS_Rules, this.COMPATIBLE_WIDTHS_RULES_SIZE))
-                loader.exec.compatible_widths = true;
-        }
-    }
+    this.Correct_Init_Obj(this.STYLE_CLASS_Rules);
 
     /***************************************************************/
     /***************************************************************/
@@ -5976,7 +5806,7 @@ function CSubpixHintingHacks()
         _ret.style = style;
         _ret.glyph = glyph;
         return _ret;
-    }
+    };
     this._create_SPH_ScaleRule = function(family, ppem, style, glyph, scale)
     {
         var _ret = new SPH_ScaleRule();
@@ -5986,137 +5816,75 @@ function CSubpixHintingHacks()
         _ret.glyph = glyph;
         _ret.scale = scale;
         return _ret;
-    }
+    };
 
-    this.COMPATIBILITY_MODE_RULES_SIZE = 4;
+    /* Force special legacy fixes for fonts.                                 */
     this.COMPATIBILITY_MODE_Rules = [
-        this._create_SPH_TweakRule("MS Legacy Fonts", 0, "", 0),
-        this._create_SPH_TweakRule("Apple Legacy Fonts", 0, "", 0),
-        this._create_SPH_TweakRule("Misc Legacy Fonts", 0, "", 0),
-        this._create_SPH_TweakRule("Verdana Clones", 0, "", 0)
-    ];
-
-    this.PIXEL_HINTING_RULES_SIZE = 4;
-    this.PIXEL_HINTING_Rules = [
-        /* these characters are almost always safe */
-        this._create_SPH_TweakRule("", 0, "", "<".charCodeAt(0)),
-        this._create_SPH_TweakRule("", 0, "", ">".charCodeAt(0)),
-        /* fixes the vanishing stem */
-        this._create_SPH_TweakRule("Times New Roman", 0, "Bold", "A".charCodeAt(0)),
-        this._create_SPH_TweakRule("Times New Roman", 0, "Bold", "V".charCodeAt(0))
-    ];
-
-    /* According to Greg Hitchcock and the MS whitepaper, this should work   */
-    /* on all legacy MS fonts, but creates artifacts with some.  Only using  */
-    /* where absolutely necessary.                                           */
-    this.SKIP_INLINE_DELTAS_RULES_SIZE = 1;
-    this.SKIP_INLINE_DELTAS_Rules = [
         this._create_SPH_TweakRule("-", 0, "", 0)
     ];
 
+    /* Don't do subpixel (ignore_x_mode) hinting; do normal hinting.         */
+    this.PIXEL_HINTING_Rules = [
+        /* these characters are almost always safe */
+        this._create_SPH_TweakRule("Courier New", 12, "Italic", "z".charCodeAt(0)),
+        this._create_SPH_TweakRule("Courier New", 11, "Italic", "z".charCodeAt(0))
+    ];
 
     /* Subpixel hinting ignores SHPIX rules on X.  Force SHPIX for these.    */
-    this.DO_SHPIX_RULES_SIZE = 1;
     this.DO_SHPIX_Rules = [
         this._create_SPH_TweakRule("-", 0, "", 0)
     ];
 
-
     /* Skip Y moves that start with a point that is not on a Y pixel         */
     /* boundary and don't move that point to a Y pixel boundary.             */
-    this.SKIP_NONPIXEL_Y_MOVES_RULES_SIZE = 10;
     this.SKIP_NONPIXEL_Y_MOVES_Rules = [
         /* fix vwxyz thinness*/
-        this._create_SPH_TweakRule("Consolas", 0, "Regular", 0),
-        /* fix tiny gap at top of m */
-        this._create_SPH_TweakRule("Arial", 0, "Regular", "m".charCodeAt(0)),
+        this._create_SPH_TweakRule("Consolas", 0, "", 0),
         /* Fix thin middle stems */
-        this._create_SPH_TweakRule("Core MS Legacy Fonts", 0, "Regular/Bold Class", "N".charCodeAt(0)),
-        this._create_SPH_TweakRule("Lucida Grande", 0, "", "N".charCodeAt(0)),
-        this._create_SPH_TweakRule("Lucida Grande", 0, "Bold", "y".charCodeAt(0)),
+        this._create_SPH_TweakRule("Core MS Legacy Fonts", 0, "Regular", 0),
         /* Cyrillic small letter I */
-        this._create_SPH_TweakRule("Legacy Sans Fonts", 0, "", 0x438),
-        this._create_SPH_TweakRule("Verdana Clones", 0, "","N".charCodeAt(0)),
-        this._create_SPH_TweakRule("Ubuntu", 0, "Regular Class", "N".charCodeAt(0)),
-        /* Fix misshapen x */
-        this._create_SPH_TweakRule("Verdana", 0, "Bold", "x".charCodeAt(0)),
-        /* Fix misshapen s */
-        this._create_SPH_TweakRule("Tahoma", 0, "", "s".charCodeAt(0))
-    ];
-
-    this.SKIP_NONPIXEL_Y_MOVES_RULES_EXCEPTIONS_SIZE = 6;
-    this.SKIP_NONPIXEL_Y_MOVES_Rules_Exceptions = [
-        this._create_SPH_TweakRule("Tahoma", 0, "", "N".charCodeAt(0)),
-        this._create_SPH_TweakRule("Comic Sans MS", 0, "", "N".charCodeAt(0)),
-        this._create_SPH_TweakRule("Verdana", 0, "Regular/Bold Class", "N".charCodeAt(0)),
-        this._create_SPH_TweakRule("Verdana", 11, "Bold", "x".charCodeAt(0)),
-        /* Cyrillic small letter I */
-        this._create_SPH_TweakRule("Arial", 0, "", 0x438),
-        this._create_SPH_TweakRule("Trebuchet MS", 0, "Bold", 0)
-    ];
-
-
-    /* Skip Y moves that move a point off a Y pixel boundary.                */
-    /* This fixes Tahoma, Trebuchet oddities and some issues with `$'.       */
-    this.SKIP_OFFPIXEL_Y_MOVES_RULES_SIZE = 5;
-    this.SKIP_OFFPIXEL_Y_MOVES_Rules = [
-        this._create_SPH_TweakRule("MS Legacy Fonts", 0, "", 0),
-        this._create_SPH_TweakRule("Apple Legacy Fonts", 0, "", 0),
-        this._create_SPH_TweakRule("Misc Legacy Fonts", 0, "", 0),
-        this._create_SPH_TweakRule("Ubuntu", 0, "Regular Class", 0),
+        this._create_SPH_TweakRule("Legacy Sans Fonts", 0, "", 0),
+        /* Fix artifacts with some Regular & Bold */
         this._create_SPH_TweakRule("Verdana Clones", 0, "", 0)
     ];
 
+    this.SKIP_NONPIXEL_Y_MOVES_Rules_Exceptions = [
+        /* Fixes < and > */
+        this._create_SPH_TweakRule("Courier New", 0, "Regular", 0)
+    ];
 
-    this.SKIP_OFFPIXEL_Y_MOVES_RULES_EXCEPTIONS_SIZE = 1;
+    this.SKIP_NONPIXEL_Y_MOVES_DELTAP_Rules = [
+        /* Maintain thickness of diagonal in 'N' */
+        this._create_SPH_TweakRule("Times New Roman", 0, "Regular/Bold Class", "N".charCodeAt(0)),
+        this._create_SPH_TweakRule("Georgia", 0, "Regular/Bold Class", "N".charCodeAt(0))
+    ];
+
+    /* Skip Y moves that move a point off a Y pixel boundary.                */
+    this.SKIP_OFFPIXEL_Y_MOVES_Rules = [
+        this._create_SPH_TweakRule("-", 0, "", 0)
+    ];
+
     this.SKIP_OFFPIXEL_Y_MOVES_Rules_Exceptions = [
         this._create_SPH_TweakRule("-", 0, "", 0)
     ];
 
-
     /* Round moves that don't move a point to a Y pixel boundary.            */
-    this.ROUND_NONPIXEL_Y_MOVES_RULES_SIZE = 3;
     this.ROUND_NONPIXEL_Y_MOVES_Rules = [
         /* Droid font instructions don't snap Y to pixels */
         this._create_SPH_TweakRule("Droid Sans", 0, "Regular/Italic Class", 0),
-        this._create_SPH_TweakRule("Droid Sans Mono", 0, "", 0),
-        this._create_SPH_TweakRule("Ubuntu", 0, "", 0)
+        this._create_SPH_TweakRule("Droid Sans Mono", 0, "", 0)
     ];
 
-
-    this.ROUND_NONPIXEL_Y_MOVES_RULES_EXCEPTIONS_SIZE = 3;
     this.ROUND_NONPIXEL_Y_MOVES_Rules_Exceptions = [
-        this._create_SPH_TweakRule("Droid Sans", 12, "Bold", 0),
-        this._create_SPH_TweakRule("Droid Sans", 13, "Bold", 0),
-        this._create_SPH_TweakRule("Droid Sans", 16, "Bold", 0)
+        this._create_SPH_TweakRule("-", 0, "", 0)
     ];
-
-
-    /* Allow a Direct_Move_X along X freedom vector if matched.              */
-    this.ALLOW_X_DMOVEX_RULES_SIZE = 1;
-    this.ALLOW_X_DMOVEX_Rules = [
-        this._create_SPH_TweakRule("-", 0, "Regular", 0)
-    ];
-
 
     /* Allow a Direct_Move along X freedom vector if matched.                */
-    this.ALLOW_X_DMOVE_RULES_SIZE = 1;
     this.ALLOW_X_DMOVE_Rules = [
         /* Fixes vanishing diagonal in 4 */
         this._create_SPH_TweakRule("Verdana", 0, "Regular", "4".charCodeAt(0))
     ];
 
-
-    /* Allow a ZP2 move along freedom vector if matched;                     */
-    /* This is called from SHP, SHPIX, SHC, SHZ.                             */
-    this.ALLOW_X_MOVE_ZP2_RULES_SIZE = 1;
-    this.ALLOW_X_MOVE_ZP2_Rules = [
-        this._create_SPH_TweakRule("-", 0, "", 0)
-    ];
-
-
-    /* Return MS rasterizer version 35 if matched.                           */
-    this.RASTERIZER_35_RULES_SIZE = 8;
     this.RASTERIZER_35_Rules = [
         /* This seems to be the only way to make these look good */
         this._create_SPH_TweakRule("Times New Roman", 0, "Regular", "i".charCodeAt(0)),
@@ -6129,41 +5897,35 @@ function CSubpixHintingHacks()
         this._create_SPH_TweakRule("Times", 0, "", 0)
     ];
 
-
     /* Don't round to the subpixel grid.  Round to pixel grid.               */
-    this.NORMAL_ROUND_RULES_SIZE = 2;
     this.NORMAL_ROUND_Rules = [
-        /* Fix point "explosions" */
-        this._create_SPH_TweakRule("Courier New", 0, "", 0),
-        this._create_SPH_TweakRule("Verdana", 10, "Regular", "4".charCodeAt(0))
+        /* Fix serif thickness for certain ppems */
+        /* Can probably be generalized somehow   */
+        this._create_SPH_TweakRule("Courier New", 0, "", 0)
     ];
-
 
     /* Skip IUP instructions if matched.                                     */
-    this.SKIP_IUP_RULES_SIZE = 1;
     this.SKIP_IUP_Rules = [
-        this._create_SPH_TweakRule("Arial", 13, "Regular", "a".charCodeAt(0))
+        this._create_SPH_TweakRule("Arial", 13, "Regular", "a".charCodeAt(0)),
     ];
 
-
     /* Skip MIAP Twilight hack if matched.                                   */
-    this.MIAP_HACK_RULES_SIZE = 1;
     this.MIAP_HACK_Rules = [
         this._create_SPH_TweakRule("Geneva", 12, "", 0)
     ];
 
-
     /* Skip DELTAP instructions if matched.                                  */
-    this.ALWAYS_SKIP_DELTAP_RULES_SIZE = 16;
     this.ALWAYS_SKIP_DELTAP_Rules = [
         this._create_SPH_TweakRule("Georgia", 0, "Regular", "k".charCodeAt(0)),
-        /* fixes problems with W M w */
-        this._create_SPH_TweakRule("Trebuchet MS", 0, "Italic", 0),
         /* fix various problems with e in different versions */
         this._create_SPH_TweakRule("Trebuchet MS", 14, "Regular", "e".charCodeAt(0)),
         this._create_SPH_TweakRule("Trebuchet MS", 13, "Regular", "e".charCodeAt(0)),
         this._create_SPH_TweakRule("Trebuchet MS", 15, "Regular", "e".charCodeAt(0)),
+        this._create_SPH_TweakRule("Trebuchet MS", 0, "Italic", "v".charCodeAt(0)),
+        this._create_SPH_TweakRule("Trebuchet MS", 0, "Italic", "w".charCodeAt(0)),
+        this._create_SPH_TweakRule("Trebuchet MS", 0, "Regular", "Y".charCodeAt(0)),
         this._create_SPH_TweakRule("Arial", 11, "Regular", "s".charCodeAt(0)),
+        /* prevent problems with '3' and others */
         this._create_SPH_TweakRule("Verdana", 10, "Regular", 0),
         this._create_SPH_TweakRule("Verdana", 9, "Regular", 0),
         /* Cyrillic small letter short I */
@@ -6172,75 +5934,40 @@ function CSubpixHintingHacks()
         this._create_SPH_TweakRule("Arial", 10, "Regular", "6".charCodeAt(0)),
         this._create_SPH_TweakRule("Arial", 0, "Bold/BoldItalic Class", "a".charCodeAt(0)),
         /* Make horizontal stems consistent with the rest */
+        this._create_SPH_TweakRule("Arial", 24, "Bold", "a".charCodeAt(0)),
+        this._create_SPH_TweakRule("Arial", 25, "Bold", "a".charCodeAt(0)),
         this._create_SPH_TweakRule("Arial", 24, "Bold", "s".charCodeAt(0)),
         this._create_SPH_TweakRule("Arial", 25, "Bold", "s".charCodeAt(0)),
-        this._create_SPH_TweakRule("Arial", 24, "Bold", "a".charCodeAt(0)),
-        this._create_SPH_TweakRule("Arial", 25, "Bold", "a".charCodeAt(0))
+        this._create_SPH_TweakRule("Arial", 34, "Bold", "s".charCodeAt(0)),
+        this._create_SPH_TweakRule("Arial", 35, "Bold", "s".charCodeAt(0)),
+        this._create_SPH_TweakRule("Arial", 36, "Bold", "s".charCodeAt(0)),
+        this._create_SPH_TweakRule("Arial", 25, "Regular", "s".charCodeAt(0)),
+        this._create_SPH_TweakRule("Arial", 26, "Regular", "s".charCodeAt(0))
     ];
-
 
     /* Always do DELTAP instructions if matched.                             */
-    this.ALWAYS_DO_DELTAP_RULES_SIZE = 2;
     this.ALWAYS_DO_DELTAP_Rules = [
-        this._create_SPH_TweakRule("Verdana Clones", 17, "Regular Class", "K".charCodeAt(0)),
-        this._create_SPH_TweakRule("Verdana Clones", 17, "Regular Class", "k".charCodeAt(0))
-    ];
-
-
-    /* Do an extra RTG instruction in DELTAP if matched.                     */
-    this.DELTAP_RTG_RULES_SIZE = 1;
-    this.DELTAP_RTG_Rules = [
         this._create_SPH_TweakRule("-", 0, "", 0)
     ];
-
-
-    /* Force CVT distance to zero in MIRP.                                   */
-    this.MIRP_CVT_ZERO_RULES_SIZE = 1;
-    this.MIRP_CVT_ZERO_Rules = [
-        this._create_SPH_TweakRule("-", 0, "", 0)
-    ];
-
-
-    /* Skip moves that meet or exceed 1 pixel.                               */
-    this.DELTAP_SKIP_EXAGGERATED_VALUES_RULES_SIZE = 1;
-    this.DELTAP_SKIP_EXAGGERATED_VALUES_Rules = [
-        /* Fix vanishing stems */
-        this._create_SPH_TweakRule("Ubuntu", 0, "Regular", "M".charCodeAt(0))
-    ];
-
 
     /* Don't allow ALIGNRP after IUP.                                        */
-    this.NO_ALIGNRP_AFTER_IUP_RULES_SIZE = 4;
     this.NO_ALIGNRP_AFTER_IUP_Rules = [
         /* Prevent creation of dents in outline */
-        this._create_SPH_TweakRule("Courier New", 0, "Bold", "C".charCodeAt(0)),
-        this._create_SPH_TweakRule("Courier New", 0, "Bold", "D".charCodeAt(0)),
-        this._create_SPH_TweakRule("Courier New", 0, "Bold", "Q".charCodeAt(0)),
-        this._create_SPH_TweakRule("Courier New", 0, "Bold", "0".charCodeAt(0))
+        this._create_SPH_TweakRule("-", 0, "", 0)
     ];
-
 
     /* Don't allow DELTAP after IUP.                                         */
-    this.NO_DELTAP_AFTER_IUP_RULES_SIZE = 2;
     this.NO_DELTAP_AFTER_IUP_Rules = [
-        this._create_SPH_TweakRule("Arial", 0, "Bold", "N".charCodeAt(0)),
-        this._create_SPH_TweakRule("Verdana", 0, "Regular", "4".charCodeAt(0))
+        this._create_SPH_TweakRule("-", 0, "", 0)
     ];
-
 
     /* Don't allow CALL after IUP.                                           */
-    this.NO_CALL_AFTER_IUP_RULES_SIZE = 4;
     this.NO_CALL_AFTER_IUP_Rules = [
         /* Prevent creation of dents in outline */
-        this._create_SPH_TweakRule("Courier New", 0, "Bold", "O".charCodeAt(0)),
-        this._create_SPH_TweakRule("Courier New", 0, "Bold", "Q".charCodeAt(0)),
-        this._create_SPH_TweakRule("Courier New", 0, "Bold", "k".charCodeAt(0)),
-        this._create_SPH_TweakRule("Courier New", 0, "Bold Italic", "M".charCodeAt(0))
+        this._create_SPH_TweakRule("-", 0, "", 0)
     ];
 
-
     /* De-embolden these glyphs slightly.                                    */
-    this.DEEMBOLDEN_RULES_SIZE = 9;
     this.DEEMBOLDEN_Rules = [
         this._create_SPH_TweakRule("Courier New", 0, "Bold", "A".charCodeAt(0)),
         this._create_SPH_TweakRule("Courier New", 0, "Bold", "W".charCodeAt(0)),
@@ -6253,28 +5980,14 @@ function CSubpixHintingHacks()
         this._create_SPH_TweakRule("Courier New", 0, "Bold", "v".charCodeAt(0))
     ];
 
-
     /* Embolden these glyphs slightly.                                       */
-    this.EMBOLDEN_RULES_SIZE = 5;
     this.EMBOLDEN_Rules = [
-        this._create_SPH_TweakRule("Courier New", 12, "Italic", "z".charCodeAt(0)),
-        this._create_SPH_TweakRule("Courier New", 11, "Italic", "z".charCodeAt(0)),
-        this._create_SPH_TweakRule("Courier New", 10, "Italic", "z".charCodeAt(0)),
         this._create_SPH_TweakRule("Courier New", 0, "Regular", 0),
         this._create_SPH_TweakRule("Courier New", 0, "Italic", 0)
     ];
 
-
-    /* Do an extra RDTG instruction in DELTAP if matched.                    */
-    this.DELTAP_RDTG_RULES_SIZE = 1;
-    this.DELTAP_RDTG_Rules = [
-        this._create_SPH_TweakRule("-", 0, "", 0)
-    ];
-
-
     /* This is a CVT hack that makes thick horizontal stems on 2, 5, 7       */
     /* similar to Windows XP.                                                */
-    this.TIMES_NEW_ROMAN_HACK_RULES_SIZE = 12;
     this.TIMES_NEW_ROMAN_HACK_Rules = [
         this._create_SPH_TweakRule("Times New Roman", 16, "Italic", "2".charCodeAt(0)),
         this._create_SPH_TweakRule("Times New Roman", 16, "Italic", "5".charCodeAt(0)),
@@ -6290,10 +6003,8 @@ function CSubpixHintingHacks()
         this._create_SPH_TweakRule("Times New Roman", 17, "Regular", "7".charCodeAt(0))
     ];
 
-
     /* This fudges distance on 2 to get rid of the vanishing stem issue.     */
     /* A real solution to this is certainly welcome.                         */
-    this.COURIER_NEW_2_HACK_RULES_SIZE = 15;
     this.COURIER_NEW_2_HACK_Rules = [
         this._create_SPH_TweakRule("Courier New", 10, "Regular", "2".charCodeAt(0)),
         this._create_SPH_TweakRule("Courier New", 11, "Regular", "2".charCodeAt(0)),
@@ -6313,12 +6024,11 @@ function CSubpixHintingHacks()
     ];
 
 
-    // #ifndef FORCE_NATURAL_WIDTHS -----------------------------------------------
+    this.FORCE_NATURAL_WIDTHS = false;
 
     /* Use compatible widths with these glyphs.  Compatible widths is always */
     /* on when doing B/W TrueType instructing, but is used selectively here, */
     /* typically on glyphs with 3 or more vertical stems.                    */
-    this.COMPATIBLE_WIDTHS_RULES_SIZE = 38;
     this.COMPATIBLE_WIDTHS_Rules = [
         this._create_SPH_TweakRule("Arial Unicode MS", 12, "Regular Class", "m".charCodeAt(0)),
         this._create_SPH_TweakRule("Arial Unicode MS", 14, "Regular Class", "m".charCodeAt(0)),
@@ -6369,7 +6079,6 @@ function CSubpixHintingHacks()
     /* more visually pleasing glyphs in certain cases.                       */
     /* This sometimes needs to be coordinated with compatible width rules.   */
     /* A value of 1000 corresponds to a scaled value of 1.0.                 */
-    this.X_SCALING_RULES_SIZE = 50;
     this.X_SCALING_Rules = [
         this._create_SPH_ScaleRule("DejaVu Sans", 12, "Regular Class", "m".charCodeAt(0), 950),
         this._create_SPH_ScaleRule("Verdana and Clones", 12, "Regular Class", "a".charCodeAt(0), 1100),
@@ -6412,7 +6121,7 @@ function CSubpixHintingHacks()
         this._create_SPH_ScaleRule("Tahoma", 11, "Regular Class", "l".charCodeAt(0), 975),
         this._create_SPH_ScaleRule("Tahoma", 11, "Regular Class", "j".charCodeAt(0), 900),
         this._create_SPH_ScaleRule("Tahoma", 11, "Regular Class", "m".charCodeAt(0), 918),
-        this._create_SPH_ScaleRule("Verdana", 10, "Regular/Italic Class".charCodeAt(0), 0, 1100),
+        this._create_SPH_ScaleRule("Verdana", 10, "Regular/Italic Class", 0, 1100),
         this._create_SPH_ScaleRule("Verdana", 12, "Regular Class", "m".charCodeAt(0), 975),
         this._create_SPH_ScaleRule("Verdana", 12, "Regular/Italic Class", 0, 1050),
         this._create_SPH_ScaleRule("Verdana", 13, "Regular/Italic Class", "i".charCodeAt(0), 950),
@@ -6425,20 +6134,196 @@ function CSubpixHintingHacks()
         this._create_SPH_ScaleRule("Trebuchet MS", 12, "Regular Class", "m".charCodeAt(0), 800)
     ];
 
-    // #else -----------------------------------------------------------------
     /*
-    this.COMPATIBLE_WIDTHS_RULES_SIZE = 1;
     this.COMPATIBLE_WIDTHS_Rules = [
         this._create_SPH_TweakRule("-", 0, "", 0)
     ];
 
-
-    this.X_SCALING_RULES_SIZE = 1;
     this.X_SCALING_Rules = [
         this._create_SPH_ScaleRule("-", 0, "", 0, 1000)
     ];
     */
-    // -----------------------------------------------------------------------
+
+    this.TWEAK_RULES = function(_loader, _glyph_index, _rules, _flag)
+    {
+        var face = _loader.face;
+        if (this.sph_test_tweak(face, face.family_name, _loader.size.metrics.x_ppem, face.style_name, glyph_index, _rules, _rules.length))
+            loader.exec.sph_tweak_flags |= _flag;
+    };
+    this.TWEAK_RULES_EXCEPTIONS = function(_loader, _glyph_index, _rules, _flag)
+    {
+        var face = _loader.face;
+        if (this.sph_test_tweak(face, face.family_name, _loader.size.metrics.x_ppem, face.style_name, glyph_index, _rules, _rules.length))
+            loader.exec.sph_tweak_flags &= ~_flagS;
+    };
+
+    this.is_member_of_family_class = function(detected_font_name, rule_font_name)
+    {
+        /* Does font name match rule family? */
+        if (detected_font_name == rule_font_name)
+            return true;
+
+        /* Is font name a wildcard ""? */
+        if (rule_font_name == "")
+            return true;
+
+        var _fcr = this.FAMILY_CLASS_Rules[rule_font_name];
+        if (undefined !== _fcr)
+        {
+            if (undefined !== _fcr[detected_font_name])
+                return true;
+        }
+
+        return false;
+    };
+
+    this.is_member_of_style_class = function(detected_font_style, rule_font_style)
+    {
+        /* Does font style match rule style? */
+        if (detected_font_style == rule_font_style)
+            return true;
+
+        /* Is font style a wildcard ""? */
+        if (rule_font_style == "")
+            return true;
+
+        /* Is font style contained in a class list? */
+        var _scr = this.STYLE_CLASS_Rules[rule_font_style];
+        if (undefined !== _scr)
+        {
+            if (undefined !== _scr[detected_font_style])
+                return true;
+        }
+
+        return false;
+    };
+
+    this.sph_test_tweak = function(face, family, ppem, style, glyph_index, rule, num_rules)
+    {
+        /* rule checks may be able to be optimized further */
+        for (var i = 0; i < num_rules; i++)
+        {
+            if (family != "" && this.is_member_of_family_class(family, rule[i].family))
+            {
+                if (rule[i].ppem == 0 || rule[i].ppem == ppem)
+                {
+                    if (style != "" && this.is_member_of_style_class(style, rule[i].style))
+                    {
+                        if (rule[i].glyph == 0 || FT_Get_Char_Index(face, rule[i].glyph) == glyph_index)
+                            return true;
+                    }
+                }
+            }
+        }
+        return false;
+    };
+
+    this.scale_test_tweak = function(face, family, ppem, style, glyph_index, rule, num_rules)
+    {
+        /* rule checks may be able to be optimized further */
+        for (var i = 0; i < num_rules; i++)
+        {
+            if (family != "" && this.is_member_of_family_class(family, rule[i].family))
+            {
+                if (rule[i].ppem == 0 || rule[i].ppem == ppem)
+                {
+                    if (style != "" && this.is_member_of_style_class(style, rule[i].style))
+                    {
+                        if (rule[i].glyph == 0 || FT_Get_Char_Index(face, rule[i].glyph) == glyph_index)
+                            return rule[i].scale;
+                    }
+                }
+            }
+        }
+        return 1000;
+    };
+
+    this.sph_test_tweak_x_scaling = function(face, family, ppem, style, glyph_index)
+    {
+        return this.scale_test_tweak(face, family, ppem, style, glyph_index, this.X_SCALING_Rules, this.X_SCALING_Rules.length);
+    };
+
+    this.sph_set_tweaks = function(loader, glyph_index)
+    {
+        var face = loader.face;
+
+        /* don't apply rules if style isn't set */
+        if (face.style_name == "")
+            return;
+
+        this.TWEAK_RULES(loader, glyph_index, this.PIXEL_HINTING_Rules, FT_Common.SPH_TWEAK_PIXEL_HINTING);
+
+        if (loader.exec.sph_tweak_flags & FT_Common.SPH_TWEAK_PIXEL_HINTING)
+        {
+            loader.exec.ignore_x_mode = false;
+            return;
+        }
+
+        this.TWEAK_RULES(loader, glyph_index, this.ALLOW_X_DMOVE_Rules, FT_Common.SPH_TWEAK_ALLOW_X_DMOVE);
+        this.TWEAK_RULES(loader, glyph_index, this.ALWAYS_DO_DELTAP_Rules, FT_Common.SPH_TWEAK_ALWAYS_DO_DELTAP);
+        this.TWEAK_RULES(loader, glyph_index, this.ALWAYS_SKIP_DELTAP_Rules, FT_Common.SPH_TWEAK_ALWAYS_SKIP_DELTAP);
+        this.TWEAK_RULES(loader, glyph_index, this.DEEMBOLDEN_Rules, FT_Common.SPH_TWEAK_DEEMBOLDEN);
+        this.TWEAK_RULES(loader, glyph_index, this.DO_SHPIX_Rules, FT_Common.SPH_TWEAK_DO_SHPIX);
+        this.TWEAK_RULES(loader, glyph_index, this.EMBOLDEN_Rules, FT_Common.SPH_TWEAK_EMBOLDEN);
+        this.TWEAK_RULES(loader, glyph_index, this.MIAP_HACK_Rules, FT_Common.SPH_TWEAK_MIAP_HACK);
+        this.TWEAK_RULES(loader, glyph_index, this.NORMAL_ROUND_Rules, FT_Common.SPH_TWEAK_NORMAL_ROUND);
+        this.TWEAK_RULES(loader, glyph_index, this.NO_ALIGNRP_AFTER_IUP_Rules, FT_Common.SPH_TWEAK_NO_ALIGNRP_AFTER_IUP);
+        this.TWEAK_RULES(loader, glyph_index, this.NO_CALL_AFTER_IUP_Rules, FT_Common.SPH_TWEAK_NO_CALL_AFTER_IUP);
+        this.TWEAK_RULES(loader, glyph_index, this.NO_DELTAP_AFTER_IUP_Rules, FT_Common.SPH_TWEAK_NO_DELTAP_AFTER_IUP);
+        this.TWEAK_RULES(loader, glyph_index, this.RASTERIZER_35_Rules, FT_Common.SPH_TWEAK_RASTERIZER_35);
+        this.TWEAK_RULES(loader, glyph_index, this.SKIP_IUP_Rules, FT_Common.SPH_TWEAK_SKIP_IUP);
+
+        this.TWEAK_RULES(loader, glyph_index, this.SKIP_OFFPIXEL_Y_MOVES_Rules, FT_Common.SPH_TWEAK_SKIP_OFFPIXEL_Y_MOVES);
+        this.TWEAK_RULES_EXCEPTIONS(loader, glyph_index, this.SKIP_OFFPIXEL_Y_MOVES_Rules_Exceptions, FT_Common.SPH_TWEAK_SKIP_OFFPIXEL_Y_MOVES);
+
+        this.TWEAK_RULES(loader, glyph_index, this.SKIP_NONPIXEL_Y_MOVES_DELTAP_Rules, FT_Common.SPH_TWEAK_SKIP_NONPIXEL_Y_MOVES_DELTAP);
+
+        this.TWEAK_RULES(loader, glyph_index, this.SKIP_NONPIXEL_Y_MOVES_Rules, FT_Common.SPH_TWEAK_SKIP_NONPIXEL_Y_MOVES);
+        this.TWEAK_RULES_EXCEPTIONS(loader, glyph_index, this.SKIP_NONPIXEL_Y_MOVES_Rules_Exceptions, FT_Common.SPH_TWEAK_SKIP_NONPIXEL_Y_MOVES);
+
+        this.TWEAK_RULES(loader, glyph_index, this.ROUND_NONPIXEL_Y_MOVES_Rules, FT_Common.SPH_TWEAK_ROUND_NONPIXEL_Y_MOVES);
+        this.TWEAK_RULES_EXCEPTIONS(loader, glyph_index, this.ROUND_NONPIXEL_Y_MOVES_Rules_Exceptions, FT_Common.SPH_TWEAK_ROUND_NONPIXEL_Y_MOVES);
+
+        if (loader.exec.sph_tweak_flags & FT_Common.SPH_TWEAK_RASTERIZER_35)
+        {
+            if (loader.exec.rasterizer_version != FT_Common.TT_INTERPRETER_VERSION_35)
+            {
+                loader.exec.rasterizer_version  = FT_Common.TT_INTERPRETER_VERSION_35;
+                loader.exec.size.cvt_ready      = false;
+
+                tt_size_ready_bytecode(loader.exec.size, (loader.load_flags & FT_Common.FT_LOAD_PEDANTIC) != 0);
+            }
+            else
+                loader.exec.rasterizer_version  = FT_Common.TT_INTERPRETER_VERSION_35;
+        }
+        else
+        {
+            if (loader.exec.rasterizer_version != FT_Common.SPH_OPTION_SET_RASTERIZER_VERSION)
+            {
+                loader.exec.rasterizer_version  = FT_Common.SPH_OPTION_SET_RASTERIZER_VERSION;
+                loader.exec.size.cvt_ready      = false;
+
+                tt_size_ready_bytecode(loader.exec.size, (loader.load_flags & FT_Common.FT_LOAD_PEDANTIC) != 0);
+            }
+            else
+                loader.exec.rasterizer_version = FT_Common.SPH_OPTION_SET_RASTERIZER_VERSION;
+        }
+
+        if ((loader.load_flags & FT_Common.FT_LOAD_NO_HINTING) == 0)
+        {
+            this.TWEAK_RULES(loader, glyph_index, this.TIMES_NEW_ROMAN_HACK_Rules, FT_Common.SPH_TWEAK_TIMES_NEW_ROMAN_HACK);
+            this.TWEAK_RULES(loader, glyph_index, this.COURIER_NEW_2_HACK_Rules, FT_Common.COURIER_NEW_2_HACK_Rules);
+        }
+
+        if (this.sph_test_tweak(face, face.family_name, loader.size.metrics.x_ppem, face.style_name, glyph_index, this.COMPATIBILITY_MODE_Rules, this.COMPATIBILITY_MODE_Rules.length))
+            loader.exec.face.sph_compatibility_mode = true;
+
+        if (((loader.load_flags & FT_Common.FT_LOAD_NO_HINTING) == 0) && !loader.exec.compatible_widths)
+        {
+            if (this.sph_test_tweak(face, face.family_name, loader.size.metrics.x_ppem, face.style_name, glyph_index, this.COMPATIBLE_WIDTHS_Rules, this.COMPATIBLE_WIDTHS_Rules.length))
+                loader.exec.face.sph_compatibility_mode = true;
+        }
+    };
 }
 
 var global_SubpixHintingHacks = new CSubpixHintingHacks();

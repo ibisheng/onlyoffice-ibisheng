@@ -307,6 +307,10 @@ function TT_Face()
     this.read_glyph_header = null;
     this.read_simple_glyph = null;
     this.read_composite_glyph = null;
+
+    this.sph_found_func_flags = 0;  /* special functions found */
+                                    /* for this face           */
+    this.sph_compatibility_mode = false;
 }
 /******************************************************************************/
 // gxvar
@@ -1210,10 +1214,14 @@ function TT_Get_HMetrics(face, idx)
 {
     return face.sfnt.get_metrics(face, 0, idx);
 }
-function TT_Get_VMetrics(face, idx)
+function TT_Get_VMetrics(face, idx, yMax)
 {
     if (face.vertical_info === true)
         return face.sfnt.get_metrics(face, 1, idx);
+    else if (face.os2.version != 0xFFFF)
+        return {bearing : (face.os2.sTypoAscender - yMax), advance : (face.os2.sTypoAscender - face.os2.sTypoDescender)};
+    else
+        return {bearing : (face.horizontal.Ascender - yMax), advance : (face.horizontal.Ascender - face.horizontal.Descender)};
 
     return {bearing : 0, advance : face.units_per_EM};
 }
@@ -1223,7 +1231,7 @@ function tt_get_metrics(loader, glyph_index)
     var face = loader.face;
 
     var h = TT_Get_HMetrics(face, glyph_index);
-    var v = TT_Get_VMetrics(face, glyph_index);
+    var v = TT_Get_VMetrics(face, glyph_index, loader.bbox.yMax);
 
     loader.left_bearing = h.bearing;
     loader.advance      = h.advance;
@@ -1251,7 +1259,7 @@ function tt_get_metrics_incr_overrides(loader, glyph_index)
     var face = loader.face;
 
     var h = TT_Get_HMetrics(face, glyph_index);
-    var v = TT_Get_VMetrics(face, glyph_index);
+    var v = TT_Get_VMetrics(face, glyph_index, 0);
 
     if (face.internal.incremental_interface && face.internal.incremental_interface.funcs.get_glyph_metrics)
     {
@@ -1712,8 +1720,7 @@ function TT_Process_Simple_Glyph(loader)
         var ppem = loader.size.metrics.x_ppem;
         if ((loader.load_flags & FT_Common.FT_LOAD_NO_HINTING) == 0)
         {
-            x_scale_factor = global_SubpixHintingHacks.scale_test_tweak(_face, _face.family_name, ppem, _face.style_name, loader.glyph_index,
-                global_SubpixHintingHacks.X_SCALING_Rules, global_SubpixHintingHacks.X_SCALING_RULES_SIZE);
+            x_scale_factor = global_SubpixHintingHacks.sph_test_tweak_x_scaling(_face, _face.family_name, ppem, _face.style_name, loader.glyph_index);
         }
 
         if ((loader.load_flags & FT_Common.FT_LOAD_NO_SCALE) == 0 || x_scale_factor != 1000)
@@ -2329,6 +2336,30 @@ function tt_loader_init(loader, size, glyph, load_flags, glyf_table_only)
 
     return 0;
 }
+
+function tt_face_get_device_metrics(face, ppem, gindex)
+{
+    var _ret = null;
+    var record_size = face.hdmx_record_size;
+
+    for (var nn = 0; nn < face.hdmx_record_count; nn++ )
+    {
+        if ( face.hdmx_record_sizes[nn] == ppem )
+        {
+            gindex += 2;
+            if (gindex < record_size)
+            {
+                _ret = dublicate_pointer(face.hdmx_table);
+                _ret.pos += (8 + nn * record_size + gindex);
+            }
+
+            break;
+        }
+    }
+
+    return _ret;
+}
+
 function compute_glyph_metrics(loader, glyph_index)
 {
     var bbox = new FT_BBox();
@@ -2358,7 +2389,20 @@ function compute_glyph_metrics(loader, glyph_index)
 
     if (face.postscript.isFixedPitch == 0 && (loader.load_flags & FT_Common.FT_LOAD_NO_HINTING) == 0)
     {
-        // TODO:
+        var widthp = tt_face_get_device_metrics(face, loader.size.metrics.x_ppem, glyph_index);
+
+        if (face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING)
+        {
+            var ignore_x_mode = (FT_LOAD_TARGET_MODE(loader.load_flags) != FT_Common.FT_RENDER_MODE_MONO);
+
+            if (null != widthp && ((ignore_x_mode && loader.exec.compatible_widths) || !ignore_x_mode || FT_Common.SPH_OPTION_BITMAP_WIDTHS))
+                glyph.metrics.horiAdvance = widthp.data[widthp.pos] << 6;
+        }
+        else
+        {
+            if (null != widthp)
+                glyph.metrics.horiAdvance = widthp.data[widthp.pos] << 6;
+        }
     }
 
     glyph.metrics.width  = bbox.xMax - bbox.xMin;
@@ -2584,6 +2628,10 @@ function load_truetype_glyph(loader, glyph_index, recurse_count, header_only)
             return error;
     }
 
+    var subpixel_ = (loader.exec && loader.exec.subpixel_hinting) ? true : false;
+    var subpixel_ = (loader.exec && loader.exec.grayscale_hinting) ? true : false;
+    var use_aw_2_  = (subpixel_ && grayscale_);
+
     if (loader.byte_len == 0 || loader.n_contours == 0)
     {
         loader.bbox.xMin = 0;
@@ -2598,9 +2646,9 @@ function load_truetype_glyph(loader, glyph_index, recurse_count, header_only)
         loader.pp1.y = 0;
         loader.pp2.x = loader.pp1.x + loader.advance;
         loader.pp2.y = 0;
-        loader.pp3.x = 0;
+        loader.pp3.x = use_aw_2_ ? (loader.advance >> 0) : 0;
         loader.pp3.y = loader.top_bearing + loader.bbox.yMax;
-        loader.pp4.x = 0;
+        loader.pp4.x = use_aw_2_ ? (loader.advance >> 0) : 0;
         loader.pp4.y = loader.pp3.y - loader.vadvance;
 
         //#ifdef FT_CONFIG_OPTION_INCREMENTAL
@@ -2640,9 +2688,9 @@ function load_truetype_glyph(loader, glyph_index, recurse_count, header_only)
     loader.pp1.y = 0;
     loader.pp2.x = loader.pp1.x + loader.advance;
     loader.pp2.y = 0;
-    loader.pp3.x = 0;
+    loader.pp3.x = use_aw_2_ ? (loader.advance >> 0) : 0;
     loader.pp3.y = loader.top_bearing + loader.bbox.yMax;
-    loader.pp4.x = 0;
+    loader.pp4.x = use_aw_2_ ? (loader.advance >> 0) : 0;
     loader.pp4.y = loader.pp3.y - loader.vadvance;
 
     //#ifdef FT_CONFIG_OPTION_INCREMENTAL
@@ -3468,7 +3516,8 @@ function tt_get_advances(face, start, count, flags, advances)
     {
         for (var nn = 0; nn < count; nn++)
         {
-            var res = TT_Get_VMetrics(face, start + nn);
+            /* since we don't need `tsb', we use zero for `yMax' parameter */
+            var res = TT_Get_VMetrics(face, start + nn, 0);
             advances[nn] = res.ah;
         }
     }
