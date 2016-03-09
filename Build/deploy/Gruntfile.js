@@ -16,9 +16,9 @@ module.exports = function(grunt) {
 		
 		grunt.util.spawn({
 			cmd: 'svnversion',
-			args: ['../../../../../'],
+			args: ['../../'],
 			}, function (error, result, code) {
-				if (null !== error) {
+				if (null === error) {
 					revision = result;
 				}
 				
@@ -177,6 +177,7 @@ module.exports = function(grunt) {
 			packageFile['info']['rev'] = process.env['SVN_REVISION'];
 		}
 		else{
+			grunt.log.ok('Use revision number \"' + revision + '\" from svnversion!'.yellow);
 			packageFile['info']['rev'] = revision;
 		}
 		grunt.file.write(defaultConfig, JSON.stringify(pkg, null, 4));
