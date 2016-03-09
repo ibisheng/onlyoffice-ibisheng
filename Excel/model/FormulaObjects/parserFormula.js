@@ -1464,7 +1464,11 @@ cStrucTable.prototype.toRef = function () {
     return this.area ? this.area : new cError( cErrorType.bad_reference );
 };
 cStrucTable.prototype.toString = function () {
-	var tblStr = this.table.Name, columns_1, columns_2;
+	var tblStr, columns_1, columns_2;
+	if( !this.table ){
+		return this.value;
+	}
+	tblStr = this.table.Name;
 	this.columnName ? tblStr += "[%1]" : null;
 	if ( this.oneColumn ) {
 
@@ -1519,7 +1523,11 @@ cStrucTable.prototype.toString = function () {
 	return tblStr.replace( "%1", "" );
 };
 cStrucTable.prototype.toLocaleString = function () {
-	var tblStr = this.table.Name, columns_1, columns_2;
+	var tblStr, columns_1, columns_2;
+	if( !this.table ){
+		return this.value;
+	}
+	tblStr = this.table.Name;
 	this.columnName ? tblStr += "[%1]" : null;
 	if ( this.oneColumn ) {
 
