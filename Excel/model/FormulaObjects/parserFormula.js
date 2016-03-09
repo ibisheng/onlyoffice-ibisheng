@@ -4232,7 +4232,7 @@ parserFormula.prototype = {
                 var arr = new cArray(), operator = { isOperator: false, operatorName: ""};
                 while ( this.pCurrPos < this.Formula.length && !parserHelp.isRightBrace.call(this, this.Formula, this.pCurrPos) ) {
                     if ( parserHelp.isArraySeparator.call( this, this.Formula, this.pCurrPos, digitDelim ) ) {
-                        if ( digitDelim ? rx_arraySeparators.test(this.operand_str) : rx_arraySeparatorsDef.test(this.operand_str) ) {
+                        if ( this.operand_str == (digitDelim ? arrayRowSeparator : arrayRowSeparatorDef) ) {
                             arr.addRow();
                         }
                     }
