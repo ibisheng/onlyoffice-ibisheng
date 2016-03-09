@@ -5335,7 +5335,7 @@ PasteProcessor.prototype =
 								
 							//TODO убираю пока при всатвке извне underline/bold/italic у стиля маркера
 							oTextPr.Bold = oTextPr.Underline = oTextPr.Italic = undefined;
-							if(oFirstTextChild.nodeName.toLowerCase() == "a")
+							if(oFirstTextChild.nodeName.toLowerCase() == "a" && oTextPr.Color)
 								oTextPr.Color.Set(0, 0, 0);
 							
 							//�������� ��������� �� node
