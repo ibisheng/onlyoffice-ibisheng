@@ -1918,7 +1918,13 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage)
     if ( null === Tab )
     {
         if ( X < PageStart.X + ParaPr.Ind.Left )
+        {
             NewX = PageStart.X + ParaPr.Ind.Left;
+        }
+        else if (Default_Tab_Stop < 0.001)
+        {
+            NewX = X;
+        }
         else
         {
             NewX = PageStart.X;

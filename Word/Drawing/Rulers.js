@@ -2350,24 +2350,27 @@ function CHorRuler()
             _positon_y = this.m_nBottom + 1.5;
 
             var _min_default_value = Math.max(0, this.m_dMaxTab);
-            while (true)
+            if (this.m_dDefaultTab > 0.01)
             {
-                if ((_margin_left + position_default_tab) > this.m_dMarginRight)
-                    break;
-
-                if (position_default_tab < _min_default_value)
+                while (true)
                 {
+                    if ((_margin_left + position_default_tab) > this.m_dMarginRight)
+                        break;
+
+                    if (position_default_tab < _min_default_value)
+                    {
+                        position_default_tab += this.m_dDefaultTab;
+                        continue;
+                    }
+
+                    var _x = parseInt((_margin_left + position_default_tab) * dKoef_mm_to_pix) + left + 0.5;
+                    context.beginPath();
+                    context.moveTo(_x, _positon_y);
+                    context.lineTo(_x, _positon_y + 3);
+                    context.stroke();
+
                     position_default_tab += this.m_dDefaultTab;
-                    continue;
                 }
-
-                var _x = parseInt((_margin_left + position_default_tab) * dKoef_mm_to_pix) + left + 0.5;
-                context.beginPath();
-                context.moveTo(_x, _positon_y);
-                context.lineTo(_x, _positon_y + 3);
-                context.stroke();
-
-                position_default_tab += this.m_dDefaultTab;
             }
 
             // custom tabs
