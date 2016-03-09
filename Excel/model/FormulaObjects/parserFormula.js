@@ -1653,10 +1653,11 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
             this.area = new cError( cErrorType.bad_reference );
             return;
         }
-
-        this.area = this.tableData.range.isOneCell() ?
-            new cRef3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb ):
-            new cArea3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb );
+		if( this.tableData.range ){
+			this.area = this.tableData.range.isOneCell() ?
+				new cRef3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb ):
+				new cArea3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb );
+		}
     }
     else if ( val['reservedColumn'] || !val['columnName'] ) {
 		this.reservedColumn = val['reservedColumn'] || "";
@@ -1667,10 +1668,11 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
             this.area = new cError( cErrorType.bad_reference );
             return;
         }
-
-		this.area = this.tableData.range.isOneCell() ?
-            new cRef3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb ):
-            new cArea3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb );
+		if( this.tableData.range ){
+			this.area = this.tableData.range.isOneCell() ?
+				new cRef3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb ):
+				new cArea3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb );
+		}
     }
     else if ( val['hdtcc'] ) {
         this.hdt = val['hdt'];
@@ -1736,10 +1738,11 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 
         this.tableData = data;
         this.tableData.range = range;
-
-        this.area = range.isOneCell() ?
-            new cRef3D( range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb ):
-            new cArea3D( range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb );
+		if( range ){
+			this.area = range.isOneCell() ?
+				new cRef3D( range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb ):
+				new cArea3D( range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb );
+		}
     }
 
     !this.area ? this.area = new cError( cErrorType.bad_reference ) : null;

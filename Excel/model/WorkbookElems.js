@@ -4523,9 +4523,9 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 		}
 		case g_nFormulaTablePartInfo.thisRow: 
 		{
-            if( this.Ref.containsRange( objectParam.cell ) ){
+//            if( this.Ref.containsRange( objectParam.cell ) ){
                 res = new Asc.Range( this.Ref.c1, objectParam.cell.r1, this.Ref.c2, objectParam.cell.r1 );
-            }
+//            }
 			break;
 		}
 		case g_nFormulaTablePartInfo.columns: 

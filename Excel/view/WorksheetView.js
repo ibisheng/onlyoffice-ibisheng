@@ -3544,7 +3544,7 @@
         }
 
         // Отрисовка квадратов для move/resize
-        if ( fillColor ) {
+        if ( fillColor && !range.isName ) {
             if ( drawLeftSide && drawTopSide ) {
                 ctx.fillRect( x1 - this.width_1px, y1 - this.height_1px, this.width_4px, this.height_4px );
             }
@@ -4010,7 +4010,7 @@
         var strokeColor, fillColor, colorIndex, uniqueColorIndex = 0, tmpColors = [];
         for ( i = 0; i < arrRanges.length; ++i ) {
             var oFormulaRange = arrRanges[i].clone( true );
-
+			if(arrRanges[i].isName)oFormulaRange.isName=true;
             colorIndex = asc.getUniqueRangeColor( arrRanges, i, tmpColors );
             if ( null == colorIndex ) {
                 colorIndex = uniqueColorIndex++;
@@ -6143,8 +6143,9 @@
         var arrRanges = this.isFormulaEditMode ? this.arrActiveFormulaRanges : this.arrActiveChartsRanges, targetArr = this.isFormulaEditMode ? 0 : -1;
         for ( i = 0, l = arrRanges.length; i < l; ++i ) {
             oFormulaRange = arrRanges[i].clone( true );
+            oFormulaRange.isName = arrRanges[i].isName;
             oFormulaRangeIn = oFormulaRange.intersectionSimple( vr );
-            if ( oFormulaRangeIn ) {
+            if ( oFormulaRangeIn && !oFormulaRange.isName ) {
                 xFormula1 = this.cols[oFormulaRangeIn.c1].left - offsetX;
                 xFormula2 = this.cols[oFormulaRangeIn.c2].left + this.cols[oFormulaRangeIn.c2].width - offsetX;
                 yFormula1 = this.rows[oFormulaRangeIn.r1].top - offsetY;

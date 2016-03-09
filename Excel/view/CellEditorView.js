@@ -813,19 +813,21 @@
 //             var __e__ = new Date().getTime();
 //             console.log("e-s "+ (__e__ - __s__));
 
-		this._formula = new parserFormula( s.substr( 1 ), "A1", ws );
+		this._formula = new parserFormula( s.substr( 1 ), this.options.cellName, ws );
 		this._formula.parse();
 
-		var r, offset, _e, _s, wsName = null;
+		var r, offset, _e, _s, wsName = null, refStr, isName = false;
 
 		if ( this._formula.RefPos && this._formula.RefPos.length > 0 ) {
 			for ( var index = 0; index < this._formula.RefPos.length; index++ ) {
 				wsName = null;
+				isName = false;
 				r = this._formula.RefPos[index];
 
 				offset = r.end;
 				_e = r.end;
 				_s = r.start;
+
 
 				switch ( r.oper.type ) {
 					case cElementType.cell          :
@@ -834,6 +836,7 @@
 							wsName = wsOPEN.model.getName();
 						}
 						ret = true;
+						refStr = r.oper.value;
 						break;
 					}
 					case cElementType.cell3D        :
@@ -841,6 +844,7 @@
 						ret = true;
 						wsName = r.oper.ws.getName();
 						_s = _e - r.oper.value.length;
+						refStr = r.oper.value;
 						break;
 					}
 					case cElementType.cellsRange    :
@@ -849,6 +853,7 @@
 							wsName = wsOPEN.model.getName();
 						}
 						ret = true;
+						refStr = r.oper.value;
 						break;
 					}
 					case cElementType.cellsRange3D  :
@@ -857,36 +862,46 @@
 							continue;
 						}
 						ret = true;
+						refStr = r.oper.value;
 						wsName = r.oper.getWS().getName();
 						_s = _e - r.oper.value.length;
 						break;
 					}
-					/*case cElementType.name          :{
-					 continue;
-					 var nameRef = r.oper.toRef();
-					 switch( nameRef.type ){
-					 case cElementType.cellsRange          :{
-					 break;
-					 }
-					 case cElementType.cellsRange3D          :{
-					 break;
-					 }
-					 case cElementType.cell3D        :{
-					 break;
-					 }
-					 }
-					 wsName = nameRef.getWS().getName();
-					 break;
-					 }*/
+					case cElementType.name          :
+					{
+						continue;
+						/*var nameRef = r.oper.toRef();
+						if( nameRef instanceof cError ) continue;
+						switch ( nameRef.type ) {
+
+							case cElementType.cellsRange3D          :{
+								if ( !r.oper.isSingleSheet() ) {
+									continue;
+								}
+							}
+							case cElementType.cellsRange          :
+							case cElementType.cell3D        :
+							{
+								ret = true;
+								refStr = nameRef.value;
+								wsName = nameRef.getWS().getName();
+								_s = _e - r.oper.value.length;
+								break;
+							}
+						}
+						isName = true;
+						break;*/
+					}
 					default                         :
 						continue;
 				}
 
 				if ( ret ) {
-					range = t._parseRangeStr( r.oper.value );
+					range = t._parseRangeStr( refStr );
 					if(!range) return false;
 					range.cursorePos = offset - (_e - _s) + 1;
 					range.formulaRangeLength = _e - _s;
+					if(isName)range.isName = isName;
 					t.handlers.trigger( "newRange", range, wsName );
 				}
 			}
@@ -898,14 +913,14 @@
 		var t = this,
 			s = t.textRender.getChars( 0, t.textRender.getCharsCount() ),
 			range,
-			arrFR = this.handlers.trigger( "getFormulaRanges" );
+			arrFR = this.handlers.trigger( "getFormulaRanges" ),a;
 
 		for ( var id = 0; id < arrFR.length; id++ ) {
 			/*так как у нас уже есть некий массив с рейнджами, которые в формуле, то пробегаемся по ним и смотрим,
 			 * находится ли курсор в позиции над этим диапазоном, дабы не парсить всю формулу заново
 			 * необходимо чтобы парсить случаи когда используется что-то такое sumnas2:K2 - sumnas2 невалидная ссылка.
 			 * */
-			var a = arrFR[id];
+			a = arrFR[id];
 			if ( t.cursorPos >= a.cursorePos && t.cursorPos <= a.cursorePos + a.formulaRangeLength ) {
 				return {index: a.cursorePos, length: a.formulaRangeLength, range: a.clone( true )};
 			}
@@ -916,7 +931,7 @@
 			wsOPEN = this.handlers.trigger( "getCellFormulaEnterWSOpen" ),
 			ws = wsOPEN ? wsOPEN.model : this.handlers.trigger( "getActiveWS" );
 
-		this._formula = new parserFormula( s.substr( 1 ), "A1", ws );
+		this._formula = new parserFormula( s.substr( 1 ), this.options.cellName, ws );
 		this._formula.parse();
 
 		if ( this._formula.RefPos && this._formula.RefPos.length > 0 ) {
