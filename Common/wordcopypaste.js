@@ -7313,7 +7313,7 @@ PasteProcessor.prototype =
         for(var i = 0, length = node.childNodes.length; i < length; ++i)
         {
             var tr = node.childNodes[i];
-            if("tr" == tr.nodeName.toLowerCase())
+            if("tr" == tr.nodeName.toLowerCase() && tr.children.length !== 0)//в случае, если внутри строки нет ни одной ячейки, не добавляем данную строку
             {
                 var row = table.Internal_Add_Row(table.Content.length, 0);
                 this._ExecuteTableRowPresentation(tr, row, aSumGrid, spacing, oRowSpans, bUseScaleKoef, dScaleKoef, arrShapes, arrImages, arrTables);
