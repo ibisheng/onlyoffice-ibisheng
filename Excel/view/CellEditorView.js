@@ -445,7 +445,8 @@
 	};
 
 	CellEditor.prototype.canEnterCellRange = function () {
-		var isRange = this._findRangeUnderCursor().range !== null;
+		var fR = this._findRangeUnderCursor()
+		var isRange = (fR.range !== null && !fR.range.isName);
 		var prevChar = this.textRender.getChars( this.cursorPos - 1, 1 );
 		return isRange || this.rangeChars.indexOf( prevChar ) >= 0;
 	};
@@ -869,8 +870,8 @@
 					}
 					case cElementType.name          :
 					{
-						continue;
-						/*var nameRef = r.oper.toRef();
+//						continue;
+						var nameRef = r.oper.toRef();
 						if( nameRef instanceof cError ) continue;
 						switch ( nameRef.type ) {
 
@@ -890,7 +891,7 @@
 							}
 						}
 						isName = true;
-						break;*/
+						break;
 					}
 					default                         :
 						continue;
@@ -922,12 +923,14 @@
 			 * */
 			a = arrFR[id];
 			if ( t.cursorPos >= a.cursorePos && t.cursorPos <= a.cursorePos + a.formulaRangeLength ) {
-				return {index: a.cursorePos, length: a.formulaRangeLength, range: a.clone( true )};
+				range = a.clone(true);
+				range.isName = a.isName;
+				return {index: a.cursorePos, length: a.formulaRangeLength, range: range };
 			}
 		}
 
 		/*не нашли диапазонов под курсором, парсим формулу*/
-		var r, offset, _e, _s, wsName = null, ret = false,
+		var r, offset, _e, _s, wsName = null, ret = false, refStr, isName = false,
 			wsOPEN = this.handlers.trigger( "getCellFormulaEnterWSOpen" ),
 			ws = wsOPEN ? wsOPEN.model : this.handlers.trigger( "getActiveWS" );
 
@@ -949,11 +952,13 @@
 						if ( wsOPEN ) {
 							wsName = wsOPEN.model.getName();
 						}
+						refStr = r.oper.value;
 						ret = true;
 						break;
 					}
 					case cElementType.cell3D        :
 					{
+						refStr = r.oper.value;
 						ret = true;
 						wsName = r.oper.ws.getName();
 						_s = _e - r.oper.value.length + 1;
@@ -964,6 +969,7 @@
 						if ( wsOPEN ) {
 							wsName = wsOPEN.model.getName();
 						}
+						refStr = r.oper.value;
 						ret = true;
 						break;
 					}
@@ -973,8 +979,35 @@
 							continue;
 						}
 						ret = true;
+						refStr = r.oper.value;
 						wsName = r.oper.getWS().getName();
 						_s = _e - r.oper.value.length + 1;
+						break;
+					}
+					case cElementType.name          :
+					{
+//						continue;
+						var nameRef = r.oper.toRef();
+						if ( nameRef instanceof cError ) continue;
+						switch ( nameRef.type ) {
+
+							case cElementType.cellsRange3D          :
+							{
+								if ( !r.oper.isSingleSheet() ) {
+									continue;
+								}
+							}
+							case cElementType.cellsRange          :
+							case cElementType.cell3D        :
+							{
+								ret = true;
+								refStr = nameRef.value;
+								wsName = nameRef.getWS().getName();
+								_s = _e - r.oper.value.length;
+								break;
+							}
+						}
+						isName = true;
 						break;
 					}
 					default                         :
@@ -987,11 +1020,13 @@
 						if ( this.handlers.trigger( "getActiveWS" ) && this.handlers.trigger( "getActiveWS" ).getName() != wsName ) {
 							return {index: -1, length: 0, range: null};
 						}
+						range.isName = isName
 						return {index: _s, length: r.oper.value.length, range: range, wsName: wsName};
 					}
 				}
 			}
 		}
+		range ? range.isName = isName : null;
 		return !range ?
 		{index: -1, length: 0, range: null} :
 		{index: _s, length: r.oper.value.length, range: range, wsName: wsName};
