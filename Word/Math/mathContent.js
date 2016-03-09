@@ -1006,11 +1006,20 @@ CMathContent.prototype.Is_InclineLetter = function()
 };
 CMathContent.prototype.IsPlaceholder = function()
 {
-    var flag = false;
+    var bPlh = false;
     if(!this.bRoot && this.Content.length == 1)
-        flag  = this.Content[0].IsPlaceholder();
+        bPlh  = this.Content[0].IsPlaceholder();
 
-    return flag;
+    return bPlh;
+};
+CMathContent.prototype.Can_GetSelection = function()
+{
+    var bPlh = false;
+
+    if(this.Content.length == 1)
+        bPlh  = this.Content[0].IsPlaceholder();
+
+    return bPlh || this.bRoot == false;
 };
 CMathContent.prototype.IsJustDraw = function()
 {
@@ -1301,7 +1310,7 @@ CMathContent.prototype.Correct_Content = function(bInnerCorrection)
 
         }
 
-        if(bEmptyContent && this.bRoot == false)
+        if(bEmptyContent)
         {
             this.Content[0].fillPlaceholders();
             this.Content[0].Recalc_CompiledPr(true);
@@ -2224,6 +2233,8 @@ CMathContent.prototype.Load_FromMenu = function(Type, Paragraph)
         this.private_LoadFromMenuOperator(Type, Pr);
     else if (MainType === c_oAscMathMainType.Matrix)
         this.private_LoadFromMenuMatrix(Type, Pr);
+    else if(MainType == c_oAscMathMainType.Empty_Content)
+        this.private_LoadFromMenuDefaultText(Type, Pr);
 };
 CMathContent.prototype.private_LoadFromMenuSymbol = function(Type, Pr)
 {
@@ -2861,6 +2872,10 @@ CMathContent.prototype.private_LoadFromMenuMatrix = function(Type, Pr)
         case c_oAscMathType.Matrix_Flat_Round  : this.Add_MatrixWithBrackets(null, null, Pr.ctrPrp, 3, 3, false, [null, String.fromCharCode(8943), null, String.fromCharCode(8942), String.fromCharCode(8945), String.fromCharCode(8942), null, String.fromCharCode(8943), null]); break;
         case c_oAscMathType.Matrix_Flat_Square : this.Add_MatrixWithBrackets(  91,   93, Pr.ctrPrp, 3, 3, false, [null, String.fromCharCode(8943), null, String.fromCharCode(8942), String.fromCharCode(8945), String.fromCharCode(8942), null, String.fromCharCode(8943), null]); break;
     }
+};
+CMathContent.prototype.private_LoadFromMenuDefaultText = function(Type, Pr)
+{
+
 };
 CMathContent.prototype.Add_Element = function(Element)
 {

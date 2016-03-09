@@ -670,7 +670,7 @@ function Get_WordDocumentDefaultMathSettings()
 function MathMenu(type)
 {
 	this.Type = para_Math;
-	this.Menu = type;
+	this.Menu = type == undefined ? c_oAscMathType.Default_Text : type;
 }
 MathMenu.prototype =
 {
@@ -1119,13 +1119,7 @@ ParaMath.prototype.Get_Text = function(Text)
 
 ParaMath.prototype.Is_Empty = function()
 {
-    if (this.Root.Content.length <= 0)
-        return true;
-
-    if (1 === this.Root.Content.length)
-        return this.Root.Content[0].Is_Empty({SkipPlcHldr : true});
-
-    return false;
+    return this.Root.Content.length == 0;
 };
 
 ParaMath.prototype.Is_CheckingNearestPos = function()
@@ -1366,7 +1360,12 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
         // Если данный элемент - ран, удаляем внутри рана, если нет, тогда удаляем целиком элемент
         if (para_Math_Run === oElement.Type)
         {
-            if ((true === oElement.IsPlaceholder()) || (false === oElement.Remove(Direction) && true !== this.bSelectionUse))
+            if (true === oElement.IsPlaceholder() && oElement.Parent.bRoot == true)
+            {
+                this.Root.Remove_FromContent(0, 1);
+                return true;
+            }
+            else if ((true === oElement.IsPlaceholder()) || (false === oElement.Remove(Direction) && true !== this.bSelectionUse))
             {
                 if ((Direction > 0 && oContent.Content.length - 1 === nStartPos) || (Direction < 0 && 0 === nStartPos))
                 {
@@ -3195,7 +3194,7 @@ ParaMath.prototype.Get_ContentSelection = function()
     var Bounds = null;
     var oContent = this.GetSelectContent().Content;
 
-    if (oContent.bRoot == false)
+    if (true == oContent.Can_GetSelection())
     {
         if(oContent.bOneLine)
         {

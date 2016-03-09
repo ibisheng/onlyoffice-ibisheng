@@ -178,7 +178,8 @@ var c_oAscMathMainType = {
   Accent: 0x08,
   LimitLog: 0x09,
   Operator: 0x0a,
-  Matrix: 0x0b
+  Matrix: 0x0b,
+  Empty_Content: 0x0c
 };
 
 var c_oAscMathMainTypeStrings = {};
@@ -194,6 +195,7 @@ c_oAscMathMainTypeStrings[c_oAscMathMainType.Accent       ] = "Accent";
 c_oAscMathMainTypeStrings[c_oAscMathMainType.LimitLog     ] = "LimitLog";
 c_oAscMathMainTypeStrings[c_oAscMathMainType.Operator     ] = "Operator";
 c_oAscMathMainTypeStrings[c_oAscMathMainType.Matrix       ] = "Matrix";
+c_oAscMathMainTypeStrings[c_oAscMathMainType.Empty_Content] = "Empty_Content";
 
 var c_oAscMathType = {
 //----------------------------------------------------------------------------------------------------------------------
@@ -547,7 +549,9 @@ var c_oAscMathType = {
   Matrix_2_2_LineBracket: 0x0b030002,
   Matrix_2_2_DLineBracket: 0x0b030003,
   Matrix_Flat_Round: 0x0b040000,
-  Matrix_Flat_Square: 0x0b040001
+  Matrix_Flat_Square: 0x0b040001,
+//----------------------------------------------------------------------------------------------------------------------
+  Default_Text: 0x0c000000
 };
 
 var c_oAscMathInterfaceType = {
