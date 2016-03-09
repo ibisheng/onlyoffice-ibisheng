@@ -3444,6 +3444,9 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                 if (true === Para.Parent.Is_TableCellContent() && false === Item.Is_LayoutInCell())
                 {
                     PageLimitsOrigin = LogicDocument.Get_PageLimits(PageAbs);
+                    var PageFieldsOrigin = LogicDocument.Get_PageFields(PageAbs);
+                    ColumnStartX = PageFieldsOrigin.X;
+                    ColumnEndX   = PageFieldsOrigin.XLimit;
                 }
 
                 if ( true != Item.Use_TextWrap() )
