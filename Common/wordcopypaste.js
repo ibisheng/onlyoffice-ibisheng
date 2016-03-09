@@ -3972,7 +3972,17 @@ PasteProcessor.prototype =
                     arrShapes.push(shape);
 					
                     oThis._ExecutePresentation(node, {}, true, true, false, arrShapes, arrImages, arrTables);
-
+					
+					//если не добавили даные внутрь arrShapes - удаляем пустой CShape
+					if(arrShapes.length === 1 && arrShapes[0].txBody && arrShapes[0].txBody.content && arrShapes[0].txBody.content.Content && arrShapes[0].txBody.content.Content.length === 1)
+					{
+						var txBodyContent = arrShapes[0].txBody.content.Content[0].Content;
+						if(txBodyContent && txBodyContent.length === 2 && txBodyContent[0].Content && txBodyContent[0].Content.length === 0)
+						{
+							arrShapes = [];
+						}
+					}	
+					
 					for(var i = 0; i < arrShapes.length; ++i)
                     {
                         shape = arrShapes[i];
