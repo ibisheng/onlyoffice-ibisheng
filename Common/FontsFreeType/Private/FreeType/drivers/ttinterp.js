@@ -6282,13 +6282,13 @@ function CSubpixHintingHacks()
     {
         var face = _loader.face;
         if (this.sph_test_tweak(face, face.family_name, _loader.size.metrics.x_ppem, face.style_name, _glyph_index, _rules, _rules.length))
-            loader.exec.sph_tweak_flags |= _flag;
+            _loader.exec.sph_tweak_flags |= _flag;
     };
     this.TWEAK_RULES_EXCEPTIONS = function(_loader, _glyph_index, _rules, _flag)
     {
         var face = _loader.face;
         if (this.sph_test_tweak(face, face.family_name, _loader.size.metrics.x_ppem, face.style_name, _glyph_index, _rules, _rules.length))
-            loader.exec.sph_tweak_flags &= ~_flagS;
+            _loader.exec.sph_tweak_flags &= ~_flag;
     };
 
     this.is_member_of_family_class = function(detected_font_name, rule_font_name)
