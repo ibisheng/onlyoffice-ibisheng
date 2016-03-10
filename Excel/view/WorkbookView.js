@@ -132,10 +132,12 @@
 
 	this.isCellEditMode = false;
 
-    this.formulasList = null;		// Список всех формул
+    this.formulasList = [];		// Список всех формул
     this.lastFormulaPos = -1; 		// Последняя позиция формулы
     this.lastFormulaNameLength = '';		// Последний кусок формулы
     this.skipHelpSelector = false;	// Пока true - не показываем окно подсказки
+    // Константы для подстановке формулы (что не нужно добавлять скобки)
+    this.arrExcludeFormulas = [];
 
     this.lastFindOptions = null;	// Последний поиск (параметры)
     this.lastFindResults = {};		// Результаты поиска (для поиска по всей книге, чтобы перейти на другой лист)
@@ -174,8 +176,6 @@
 
     // Флаг о подписке на эвенты о смене позиции документа (скролл) для меню
     this.isDocumentPlaceChangedEnabled = false;
-    // Константы для подстановке формулы (что не нужно добавлять скобки)
-    this.arrExcludeFormulas = [cBoolLocal["t"].toUpperCase(), cBoolLocal["f"].toUpperCase()];
 
     // Максимальная ширина числа из 0,1,2...,9, померенная в нормальном шрифте(дефалтовый для книги) в px(целое)
     // Ecma-376 Office Open XML Part 1, пункт 18.3.1.13
@@ -2493,8 +2493,10 @@
   WorkbookView.prototype.initFormulasList = function() {
     this.formulasList = [];
     var oFormulaList = cFormulaFunctionLocalized ? cFormulaFunctionLocalized : cFormulaFunction;
-    for (var f in oFormulaList)
+    for (var f in oFormulaList) {
       this.formulasList.push(f);
+    }
+    this.arrExcludeFormulas = [cBoolLocal["t"].toUpperCase(), cBoolLocal["f"].toUpperCase()];
   };
 
   WorkbookView.prototype._setHintsProps = function(bIsHinting, bIsSubpixHinting) {
