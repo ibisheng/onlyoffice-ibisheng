@@ -2004,6 +2004,8 @@
   };
 
   WorkbookView.prototype.undo = function() {
+	gFormulaLocaleParse = false;
+	gFormulaLocaleDigetSep = false;
     if (!this.getCellEditMode()) {
       if (!History.Undo() && this.collaborativeEditing.getFast() && this.collaborativeEditing.getCollaborativeEditing()) {
         this.Api.sync_TryUndoInFastCollaborative();
@@ -2011,6 +2013,8 @@
     } else {
       this.cellEditor.undo();
     }
+	gFormulaLocaleParse = true;
+	gFormulaLocaleDigetSep = true;
   };
 
   WorkbookView.prototype.redo = function() {

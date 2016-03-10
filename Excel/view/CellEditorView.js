@@ -445,7 +445,7 @@
 	};
 
 	CellEditor.prototype.canEnterCellRange = function () {
-		var fR = this._findRangeUnderCursor()
+		var fR = this._findRangeUnderCursor();
 		var isRange = (fR.range !== null && !fR.range.isName);
 		var prevChar = this.textRender.getChars( this.cursorPos - 1, 1 );
 		return isRange || this.rangeChars.indexOf( prevChar ) >= 0;
