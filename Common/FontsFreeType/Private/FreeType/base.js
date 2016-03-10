@@ -912,6 +912,20 @@ function FT_LOAD_TARGET(x)
 {
     return ((x & 15) << 16);
 }
+
+function FT_PAD_FLOOR(x, n)
+{
+    return x & (~(n-1));
+}
+function FT_PAD_ROUND(x, n)
+{
+    return (x + (n >> 1)) & (~(n-1));
+}
+function FT_PAD_CEIL(x, n)
+{
+    return (x + n - 1) & (~(n-1));
+}
+
 function FT_PIX_FLOOR(x)
 {
     return x & ~63;
@@ -2658,6 +2672,11 @@ function dublicate_vector(v)
     _v.x = v.x;
     _v.y = v.y;
     return _v;
+}
+function copy_vector(dst, src)
+{
+    dst.x = src.x;
+    dst.y = src.y;
 }
 function FT_BBox()
 {

@@ -185,6 +185,7 @@ function TT_DefRecord()
     this.opc   = 0;             /* function #, or instruction code        */
     this.active = false;        /* is it active?                          */
     this.inline_delta = false;  /* is function that defines inline delta? */
+    this.sph_fdef_flags = 0;
 }
 
 function TT_CodeRange()
@@ -332,6 +333,10 @@ function TT_ExecContextRec()
 
     this.sph_tweak_flags = 0;       /* flags to control */
                                     /* hint tweaks      */
+
+    this.sph_in_func_flags = 0;     /* flags to indicate if in   */
+                                    /* special functions         */
+
     // #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
 }
 
@@ -1182,96 +1187,31 @@ function TT_VecLen(X, Y)
     return FT_Vector_Length(v);
 }
 
+var FT_Hypot = TT_VecLen;
+
+function FT_DivFix14(a, b)
+{
+    return FT_DivFix(a, b << 2);
+}
+
 function Normalize(exc, Vx, Vy, R)
 {
     if (Vx > FT_Common.m_i || Vy > FT_Common.m_i)
         alert("error");
 
-    var W = 0;
-    var S1, S2;
-
-    if (Math.abs(Vx) < 0x10000 && Math.abs(Vy) < 0x10000)
+    if (Math.abs(Vx) < 0x4000 && Math.abs(Vy) < 0x4000)
     {
-        Vx *= 0x100;
-        Vy *= 0x100;
-
-        Vx = (Vx & 0xFFFFFFFF);
-        Vy = (Vy & 0xFFFFFFFF);
-
-        W = TT_VecLen(Vx, Vy);
-
-        if (W == 0)
-        {
-            /* XXX: UNDOCUMENTED! It seems that it is possible to try   */
-            /*      to normalize the vector (0,0).  Return immediately. */
+        if (0 == Vx && 0 == Vy)
             return 0;
-        }
 
-        R.x = FT_Common.UShort_To_Short(FT_DivFix(Vx, W << 2) & 0xFFFF);
-        R.y = FT_Common.UShort_To_Short(FT_DivFix(Vy, W << 2) & 0xFFFF);
-
-        return 0;
+        Vx *= 0x4000;
+        Vy *= 0x4000;
     }
 
-    W = TT_VecLen(Vx, Vy);
+    var W = FT_Hypot(Vx, Vy);
 
-    Vx = FT_DivFix(Vx, W << 2);
-    Vy = FT_DivFix(Vy, W << 2);
-
-    W = Vx * Vx + Vy * Vy;
-    W = (W & 0xFFFFFFFF);
-
-    /* Now, we want that Sqrt( W ) = 0x4000 */
-    /* Or 0x10000000 <= W < 0x10004000      */
-
-    if (Vx < 0)
-    {
-        Vx = -Vx;
-        S1 = 1;
-    }
-    else
-        S1 = 0;
-
-    if (Vy < 0)
-    {
-        Vy = -Vy;
-        S2 = 1;
-    }
-    else
-        S2 = 0;
-
-    while (W < 0x10000000)
-    {
-        /* We need to increase W by a minimal amount */
-        if (Vx < Vy)
-            Vx++;
-        else
-            Vy++;
-
-        W = Vx * Vx + Vy * Vy;
-    }
-
-    while (W >= 0x10004000)
-    {
-        /* We need to decrease W by a minimal amount */
-        if (Vx < Vy)
-            Vx--;
-        else
-            Vy--;
-
-        W = Vx * Vx + Vy * Vy;
-    }
-
-    /* Note that in various cases, we can only  */
-    /* compute a Sqrt(W) of 0x3FFF, eg. Vx = Vy */
-    if (S1 == 1)
-        Vx = -Vx;
-
-    if (S2 == 1)
-        Vy = -Vy;
-
-    R.x = FT_Common.UShort_To_Short(Vx & 0xFFFF);   /* Type conversion */
-    R.y = FT_Common.UShort_To_Short(Vy & 0xFFFF);   /* Type conversion */
+    R.x = FT_Common.UShort_To_Short(FT_DivFix14(Vx, W) & 0xFFFF);   /* Type conversion */
+    R.y = FT_Common.UShort_To_Short(FT_DivFix14(Vy, W) & 0xFFFF);   /* Type conversion */
 
     return 0;
 }
@@ -1370,17 +1310,13 @@ function Direct_Move(exc, zone, point, distance)
             {
                  zone.cur[zone._offset_cur + point].x += FT_MulDiv(distance, v, exc.F_dot_P);
             }
-            zone.tags[zone._offset_tags + point] |= FT_Common.FT_CURVE_TAG_TOUCH_X;
         }
         else
         {
             zone.cur[zone._offset_cur + point].x += FT_MulDiv(distance, v, exc.F_dot_P);
-
-            // DEBUG
-            zone.cur[zone._offset_cur + point].x &= 0xFFFFFFFF;
-
-            zone.tags[zone._offset_tags + point] |= FT_Common.FT_CURVE_TAG_TOUCH_X;
         }
+
+        zone.tags[zone._offset_tags + point] |= FT_Common.FT_CURVE_TAG_TOUCH_X;
     }
 
     v = exc.GS.freeVector.y;
@@ -1388,10 +1324,6 @@ function Direct_Move(exc, zone, point, distance)
     if (v != 0)
     {
         zone.cur[zone._offset_cur + point].y += FT_MulDiv(distance, v, exc.F_dot_P);
-
-        // DEBUG
-        zone.cur[zone._offset_cur + point].y &= 0xFFFFFFFF;
-
         zone.tags[zone._offset_tags + point] |= FT_Common.FT_CURVE_TAG_TOUCH_Y;
     }
 }
@@ -1406,9 +1338,6 @@ function Direct_Move_Orig(exc, zone, point, distance)
     if (v != 0)
     {
         zone.org[zone._offset_org + point].x += FT_MulDiv(distance, v, exc.F_dot_P);
-
-        // DEBUG
-        zone.org[zone._offset_org + point].x &= 0xFFFFFFFF;
     }
 
     v = exc.GS.freeVector.y;
@@ -1416,9 +1345,6 @@ function Direct_Move_Orig(exc, zone, point, distance)
     if (v != 0)
     {
         zone.org[zone._offset_org + point].y += FT_MulDiv(distance, v, exc.F_dot_P);
-
-        // DEBUG
-        zone.org[zone._offset_cur + point].y &= 0xFFFFFFFF;
     }
 }
 
@@ -1429,22 +1355,15 @@ function Direct_Move_X(exc, zone, point, distance)
 
     if (exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING)
     {
-        if (!exc.ignore_x_mode || (exc.sph_tweak_flags & FT_Common.SPH_TWEAK_ALLOW_X_DMOVEX) != 0)
+        if (!exc.ignore_x_mode)
         {
             zone.cur[zone._offset_cur + point].x += distance;
-
-            // DEBUG
-            zone.cur[zone._offset_cur + point].x &= 0xFFFFFFFF;
         }
         zone.tags[zone._offset_tags + point] |= FT_Common.FT_CURVE_TAG_TOUCH_X;
     }
     else
     {
         zone.cur[zone._offset_cur + point].x += distance;
-
-        // DEBUG
-        zone.cur[zone._offset_cur + point].x &= 0xFFFFFFFF;
-
         zone.tags[zone._offset_tags + point] |= FT_Common.FT_CURVE_TAG_TOUCH_X;
     }
 }
@@ -1455,10 +1374,6 @@ function Direct_Move_Y(exc, zone, point, distance)
         alert("error");
 
     zone.cur[zone._offset_cur + point].y += distance;
-
-    // DEBUG
-    zone.cur[zone._offset_cur + point].y &= 0xFFFFFFFF;
-
     zone.tags[zone._offset_tags + point] |= FT_Common.FT_CURVE_TAG_TOUCH_Y;
 }
 
@@ -1468,9 +1383,6 @@ function Direct_Move_Orig_X(exc, zone, point, distance)
         alert("error");
 
     zone.org[zone._offset_org + point].x += distance;
-
-    // DEBUG
-    zone.org[zone._offset_org + point].x &= 0xFFFFFFFF;
 }
 
 function Direct_Move_Orig_Y(exc, zone, point, distance)
@@ -1479,9 +1391,6 @@ function Direct_Move_Orig_Y(exc, zone, point, distance)
         alert("error");
     
     zone.org[zone._offset_org + point].y += distance;
-
-    // DEBUG
-    zone.org[zone._offset_org + point].y &= 0xFFFFFFFF;
 }
 
 // ------
@@ -1534,7 +1443,7 @@ function Round_None(exc, distance, compensation)
     if (distance >= 0)
     {
         val = distance + compensation;
-        if (distance && val < 0)
+        if (distance != 0 && val < 0)
             val = 0;
     }
     else
@@ -1555,7 +1464,7 @@ function Round_To_Grid(exc, distance, compensation)
     if (distance >= 0)
     {
         val = distance + compensation + 32;
-        if (distance && val > 0)
+        if (distance != 0 && val > 0)
             val &= ~63;
         else
             val = 0;
@@ -1579,7 +1488,7 @@ function Round_Up_To_Grid(exc, distance, compensation)
     if (distance >= 0)
     {
         val = distance + compensation + 63;
-        if (distance && val > 0)
+        if (distance != 0 && val > 0)
             val &= ~63;
         else
             val = 0;
@@ -1625,7 +1534,7 @@ function Round_To_Half_Grid(exc, distance, compensation)
     if (distance >= 0)
     {
         val = FT_PIX_FLOOR(distance + compensation) + 32;
-        if (distance && val < 0)
+        if (distance != 0 && val < 0)
             val = 0;
     }
     else
@@ -1646,14 +1555,14 @@ function Round_To_Double_Grid(exc, distance, compensation)
     if (distance >= 0)
     {
         val = distance + compensation + 16;
-        if (distance && val > 0)
+        if (distance != 0 && val > 0)
             val &= ~31;
         else
             val = 0;
     }
     else
     {
-        val = -((compensation - distance + 16) & ~31);
+        val = -FT_PAD_ROUND(compensation - distance, 32);
         if (val > 0)
             val = 0;
     }
@@ -1670,7 +1579,7 @@ function Round_Super(exc, distance, compensation)
     if (distance >= 0)
     {
         val = (distance - exc.phase + exc.threshold + compensation) & -exc.period;
-        if (distance && val < 0)
+        if (distance != 0 && val < 0)
             val = 0;
         val += exc.phase;
     }
@@ -1693,7 +1602,7 @@ function Round_Super_45(exc, distance, compensation)
     if (distance >= 0)
     {
         val = (((distance - exc.phase + exc.threshold + compensation) / exc.period) >> 0) * exc.period;
-        if (distance && val < 0)
+        if (distance != 0 && val < 0)
             val = 0;
         val += exc.phase;
     }
@@ -1964,7 +1873,7 @@ function Move_Zp2_Point(exc, point, dx, dy, touch)
 ////////////////////////////////////////////////////////
 function Ins_SVTCA(exc, args, args_pos)
 {
-    var A = 0;
+    var A = ;
     var B = 0x4000;
     if ((exc.opcode & 1) == 1)
     {
@@ -2317,7 +2226,7 @@ function Ins_JMPR(exc, args, args_pos)
     if (args[args_pos] == 0 && exc.args == 0)
         exc.error = FT_Common.FT_Err_Bad_Argument;
     exc.IP += args[args_pos];
-    if (exc.IP < 0 || (exc.callTop > 0 && exc.IP > exc.callStack[exc.callTop - 1].Cur_End))
+    if (exc.IP < 0 || (exc.callTop > 0 && exc.IP > exc.callStack[exc.callTop - 1].Def.end))
         exc.error = FT_Common.FT_Err_Bad_Argument;
     exc.step_ins = 0;
 }
@@ -2414,7 +2323,7 @@ function Ins_ALIGNPTS(exc, args, args_pos)
     var v1 = exc.zp0.cur[exc.zp0._offset_cur + p2];
     var v2 = exc.zp1.cur[exc.zp1._offset_cur + p1];
 
-    var distance = (exc.func_project(exc, v1.x - v2.x, v1.y - v2.y) / 2) >> 0;
+    var distance = exc.func_project(exc, v1.x - v2.x, v1.y - v2.y) >> 1;
 
     exc.func_move(exc, exc.zp1, p1, distance);
     exc.func_move(exc, exc.zp0, p2, -distance);
@@ -2440,8 +2349,7 @@ function Ins_UNKNOWN(exc, args, args_pos)
             call.Caller_Range = exc.curRange;
             call.Caller_IP    = exc.IP + 1;
             call.Cur_Count    = 1;
-            call.Cur_Restart  = defs[def].start;
-            call.Cur_End      = defs[def].end;
+            call.Def = defs[def];
 
             Ins_Goto_CodeRange(defs[def].range, defs[def].start);
 
@@ -2494,7 +2402,7 @@ function Ins_LOOPCALL(exc, args, args_pos)
     /* If this isn't true, we need to look up the function table.   */
     var defs = exc.FDefs;
     var def = F;
-    if (exc.maxFunc + 1 != exc.numFDefs || exc.FDefs[def].opc != F)
+    if (exc.maxFunc + 1 != exc.numFDefs || defs[def].opc != F)
     {
         /* look up the FDefs table */
         def = 0;
@@ -2517,6 +2425,14 @@ function Ins_LOOPCALL(exc, args, args_pos)
         return;
     }
 
+    if (exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING)
+    {
+        if (exc.ignore_x_mode && (defs[def].sph_fdef_flags & FT_Common.SPH_FDEF_VACUFORM_ROUND_1))
+            return;
+
+        exc.sph_in_func_flags = defs[def].sph_fdef_flags;
+    }
+
     /* check stack */
     if (exc.callTop >= exc.callSize)
     {
@@ -2531,8 +2447,7 @@ function Ins_LOOPCALL(exc, args, args_pos)
         pCrec.Caller_Range = exc.curRange;
         pCrec.Caller_IP    = exc.IP + 1;
         pCrec.Cur_Count    = args[args_pos];
-        pCrec.Cur_Restart  = defs[def].start;
-        pCrec.Cur_End      = defs[def].end;
+        pCrec.Def          = defs[def];
 
         exc.callTop++;
 
@@ -2585,6 +2500,16 @@ function Ins_CALL(exc, args, args_pos)
         return;
     }
 
+    if (exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING)
+    {
+        if (exc.ignore_x_mode &&
+            ((exc.iup_called && (exc.sph_tweak_flags & FT_Common.SPH_TWEAK_NO_CALL_AFTER_IUP)) ||
+                defs[def].sph_fdef_flags & FT_Common.SPH_FDEF_VACUFORM_ROUND_1))
+            return;
+
+        exc.sph_in_func_flags = defs[def].sph_fdef_flags;
+    }
+
     /* check the call stack */
     if (exc.callTop >= exc.callSize)
     {
@@ -2597,8 +2522,7 @@ function Ins_CALL(exc, args, args_pos)
     pCrec.Caller_Range = exc.curRange;
     pCrec.Caller_IP    = exc.IP + 1;
     pCrec.Cur_Count    = 1;
-    pCrec.Cur_Restart  = defs[def].start;
-    pCrec.Cur_End      = defs[def].end;
+    pCrec.Def = defs[def];
 
     exc.callTop++;
 
@@ -2648,9 +2572,18 @@ function Ins_FDEF(exc, args, args_pos)
     defs[rec].start        = exc.IP + 1;
     defs[rec].active       = true;
     defs[rec].inline_delta = false;
+    defs[rec].sph_fdef_flags = 0x0000;
 
     if (n > exc.maxFunc)
         exc.maxFunc = 0xFFFF & n;
+
+    if (bIsSubpix)
+    {
+        /* We don't know for sure these are typeman functions, */
+        /* however they are only active when RS 22 is called   */
+        if (n >= 64 && n <= 66)
+            defs[rec].sph_fdef_flags |= FT_Common.SPH_FDEF_TYPEMAN_STROKES;
+    }
 
     /* Now skip the whole function definition. */
     /* We don't allow nested IDEFS & FDEFs.    */
@@ -2659,22 +2592,101 @@ function Ins_FDEF(exc, args, args_pos)
     {
         if (bIsSubpix)//#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
         {
-            /* arguments to opcodes are skipped by `SKIP_Code' */
-            var opcode_pattern = [];
-            opcode_pattern[0] = [/* #0 TTFautohint bytecode (old) */
-                       0x20, /* DUP     */
-                       0x64, /* ABS     */
-                       0xB0, /* PUSHB_1 */
-                             /*   32    */
-                       0x60, /* ADD     */
-                       0x66, /* FLOOR   */
-                       0x23, /* SWAP    */
-                       0xB0,  /* PUSHB_1 */
-                       0,0,0,0,0
-                   ];
-            var opcode_patterns = 1;
-            var opcode_pointer = [0];
-            var opcode_size = [7];
+            var opcode_pattern = [
+            /* #0 inline delta function 1 */
+            [
+                0x4B, /* PPEM    */
+                0x53, /* GTEQ    */
+                0x23, /* SWAP    */
+                0x4B, /* PPEM    */
+                0x51, /* LTEQ    */
+                0x5A, /* AND     */
+                0x58, /* IF      */
+                0x38, /*   SHPIX */
+                0x1B, /* ELSE    */
+                0x21, /*   POP   */
+                0x21, /*   POP   */
+                0x59  /* EIF     */
+            ],
+            /* #1 inline delta function 2 */
+            [
+                0x4B, /* PPEM    */
+                0x54, /* EQ      */
+                0x58, /* IF      */
+                0x38, /*   SHPIX */
+                0x1B, /* ELSE    */
+                0x21, /*   POP   */
+                0x21, /*   POP   */
+                0x59  /* EIF     */
+            ],
+            /* #2 diagonal stroke function */
+            [
+                0x20, /* DUP     */
+                0x20, /* DUP     */
+                0xB0, /* PUSHB_1 */
+                /*   1     */
+                0x60, /* ADD     */
+                0x46, /* GC_cur  */
+                0xB0, /* PUSHB_1 */
+                /*   64    */
+                0x23, /* SWAP    */
+                0x42  /* WS      */
+            ],
+            /* #3 VacuFormRound function */
+            [
+                0x45, /* RCVT    */
+                0x23, /* SWAP    */
+                0x46, /* GC_cur  */
+                0x60, /* ADD     */
+                0x20, /* DUP     */
+                0xB0  /* PUSHB_1 */
+                /*   38    */
+            ],
+            /* #4 TTFautohint bytecode (old) */
+            [
+                0x20, /* DUP     */
+                0x64, /* ABS     */
+                0xB0, /* PUSHB_1 */
+                /*   32    */
+                0x60, /* ADD     */
+                0x66, /* FLOOR   */
+                0x23, /* SWAP    */
+                0xB0  /* PUSHB_1 */
+            ],
+            /* #5 spacing function 1 */
+            [
+                0x01, /* SVTCA_x */
+                0xB0, /* PUSHB_1 */
+                /*   24    */
+                0x43, /* RS      */
+                0x58  /* IF      */
+            ],
+            /* #6 spacing function 2 */
+            [
+                0x01, /* SVTCA_x */
+                0x18, /* RTG     */
+                0xB0, /* PUSHB_1 */
+                /*   24    */
+                0x43, /* RS      */
+                0x58  /* IF      */
+            ],
+            /* #7 TypeMan Talk DiagEndCtrl function */
+            [
+                0x01, /* SVTCA_x */
+                0x20, /* DUP     */
+                0xB0, /* PUSHB_1 */
+                /*   3     */
+                0x25, /* CINDEX  */
+            ],
+            /* #8 TypeMan Talk Align */
+            [
+                0x06, /* SPVTL   */
+                0x7D, /* RDTG    */
+            ]
+            ];
+            var opcode_patterns = opcode_pattern.length;
+            var opcode_pointer = [  0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+            var opcode_size    = [ 12, 8, 8, 6, 7, 4, 5, 4, 2 ];
 
             for (var i = 0; i < opcode_patterns; i++)
             {
@@ -2686,9 +2698,78 @@ function Ins_FDEF(exc, args, args_pos)
                     {
                         switch ( i )
                         {
-                        case 0:
-                            exc.size.ttfautohinted = true;
-                            break;
+                            case 0:
+                                defs[rec].sph_fdef_flags        |= FT_Common.SPH_FDEF_INLINE_DELTA_1;
+                                exc.face.sph_found_func_flags   |= FT_Common.SPH_FDEF_INLINE_DELTA_1;
+                                break;
+
+                            case 1:
+                                defs[rec].sph_fdef_flags        |= FT_Common.SPH_FDEF_INLINE_DELTA_2;
+                                exc.face.sph_found_func_flags   |= FT_Common.SPH_FDEF_INLINE_DELTA_2;
+                                break;
+
+                            case 2:
+                                switch ( n )
+                                {
+                                    /* needs to be implemented still */
+                                    case 58:
+                                        defs[rec].sph_fdef_flags        |= FT_Common.SPH_FDEF_DIAGONAL_STROKE;
+                                        exc.face.sph_found_func_flags   |= FT_Common.SPH_FDEF_DIAGONAL_STROKE;
+                                }
+                                break;
+
+                            case 3:
+                                switch ( n )
+                                {
+                                    case 0:
+                                        defs[rec].sph_fdef_flags        |= FT_Common.SPH_FDEF_VACUFORM_ROUND_1;
+                                        exc.face.sph_found_func_flags   |= FT_Common.SPH_FDEF_VACUFORM_ROUND_1;
+                                }
+                                break;
+
+                            case 4:
+                                /* probably not necessary to detect anymore */
+                                defs[rec].sph_fdef_flags            |= FT_Common.SPH_FDEF_TTFAUTOHINT_1;
+                                exc.face.sph_found_func_flags       |= FT_Common.SPH_FDEF_TTFAUTOHINT_1;
+                                break;
+
+                            case 5:
+                                switch ( n )
+                                {
+                                    case 0:
+                                    case 1:
+                                    case 2:
+                                    case 4:
+                                    case 7:
+                                    case 8:
+                                        defs[rec].sph_fdef_flags        |= FT_Common.SPH_FDEF_SPACING_1;
+                                        exc.face.sph_found_func_flags   |= FT_Common.SPH_FDEF_SPACING_1;
+                                }
+                                break;
+
+                            case 6:
+                                switch ( n )
+                                {
+                                    case 0:
+                                    case 1:
+                                    case 2:
+                                    case 4:
+                                    case 7:
+                                    case 8:
+                                        defs[rec].sph_fdef_flags        |= FT_Common.SPH_FDEF_SPACING_2;
+                                        exc.face.sph_found_func_flags   |= FT_Common.SPH_FDEF_SPACING_2;
+                                }
+                                break;
+
+                            case 7:
+                                defs[rec].sph_fdef_flags        |= FT_Common.SPH_FDEF_TYPEMAN_DIAGENDCTRL;
+                                exc.face.sph_found_func_flags   |= FT_Common.SPH_FDEF_TYPEMAN_DIAGENDCTRL;
+                                break;
+
+                            case 8:
+                                //defs[rec].sph_fdef_flags        |= FT_Common.SPH_FDEF_TYPEMAN_DIAGENDCTRL;
+                                //exc.face.sph_found_func_flags   |= FT_Common.SPH_FDEF_TYPEMAN_DIAGENDCTRL;
+                                break;
                         }
                         opcode_pointer[i] = 0;
                     }
@@ -2696,6 +2777,10 @@ function Ins_FDEF(exc, args, args_pos)
                 else
                     opcode_pointer[i] = 0;
             }
+
+            /* Set sph_compatibility_mode only when deltas are detected */
+            exc.face.sph_compatibility_mode = ((exc.face.sph_found_func_flags & FT_Common.SPH_FDEF_INLINE_DELTA_1) |
+                                                (exc.face.sph_found_func_flags & FT_Common.SPH_FDEF_INLINE_DELTA_2));
         } //#endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
 
         switch (exc.opcode)
@@ -2715,6 +2800,10 @@ function Ins_FDEF(exc, args, args_pos)
 
 function Ins_ENDF(exc, args, args_pos)
 {
+    var bIsSubpix = exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING;
+    if (bIsSubpix)
+        exc.sph_in_func_flags = 0x0000;
+
     if (exc.callTop <= 0)     /* We encountered an ENDF without a call */
     {
         exc.error = FT_Common.FT_Err_ENDF_In_Exec_Stream;
@@ -2727,21 +2816,10 @@ function Ins_ENDF(exc, args, args_pos)
     pRec.Cur_Count--;
     exc.step_ins = false;
 
-    var bIsSubpix = exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING;
-
-    if (bIsSubpix) //#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
-    {
-        /*
-        *  CUR.ignore_x_mode may be turned off prior to function calls.  This
-        *  ensures it is turned back on.
-        */
-        exc.ignore_x_mode = (exc.subpixel_hinting || exc.grayscale_hinting) && !(exc.sph_tweak_flags & FT_Common.SPH_TWEAK_PIXEL_HINTING);
-    }//#endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
-
     if (pRec.Cur_Count > 0)
     {
         exc.callTop++;
-        exc.IP = pRec.Cur_Restart;
+        exc.IP = pRec.Def.start;
     }
     else
     {
@@ -3110,7 +3188,17 @@ function Ins_SHP(exc, args, args_pos)
             }
         }
         else
-            Move_Zp2_Point(exc, point, dx, dy, true);
+        {
+            if (exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING)
+            {
+                if (exc.ignore_x_mode)
+                    Move_Zp2_Point(exc, point, 0, dy, true);
+                else
+                    Move_Zp2_Point(exc, point, dx, dy, true);
+            }
+            else
+                Move_Zp2_Point(exc, point, dx, dy, true);
+        }
 
         exc.GS.loop--;
     }
@@ -3246,50 +3334,60 @@ function Ins_SHPIX(exc, args, args_pos)
                 else
                     B1 = exc.zp2.cur[exc.zp2._offset_cur + point].x;
 
-                if (exc.GS.freeVector.y != 0 && (exc.sph_tweak_flags & FT_Common.SPH_TWEAK_SKIP_INLINE_DELTAS))
+                if (!exc.face.sph_compatibility_mode && exc.GS.freeVector.y != 0)
                 {
-                    exc.GS.loop--;
-                    continue;
-                }
-
-                if (exc.ignore_x_mode && !exc.compatibility_mode && exc.GS.freeVector.y != 0)
                     Move_Zp2_Point(exc, point, dx, dy, true);
-                else if (exc.ignore_x_mode && exc.compatibility_mode)
-                {
-                    if (exc.ignore_x_mode && (exc.sph_tweak_flags & FT_Common.SPH_TWEAK_ROUND_NONPIXEL_Y_MOVES))
+
+                    /* save new point */
+                    if (exc.GS.freeVector.y != 0)
                     {
-                        dx = FT_PIX_ROUND( B1 + dx ) - B1;
-                        dy = FT_PIX_ROUND( B1 + dy ) - B1;
+                        B2 = exc.zp2.cur[exc.zp2._offset_cur + point].y;
+
+                        /* reverse any disallowed moves */
+                        if ((exc.sph_tweak_flags & FT_Common.SPH_TWEAK_SKIP_NONPIXEL_Y_MOVES) &&
+                            (B1 & 63) != 0 &&
+                            (B2 & 63) != 0 &&
+                            B1 != B2)
+                            Move_Zp2_Point(exc, point, -dx, -dy, true);
+                    }
+                }
+                else if (exc.face.sph_compatibility_mode)
+                {
+                    if (exc.sph_tweak_flags & FT_Common.SPH_TWEAK_ROUND_NONPIXEL_Y_MOVES)
+                    {
+                        dx = FT_PIX_ROUND(B1 + dx) - B1;
+                        dy = FT_PIX_ROUND(B1 + dy) - B1;
+                    }
+
+                    /* skip post-iup deltas */
+                    if (exc.iup_called &&
+                        ((exc.sph_in_func_flags & FT_Common.SPH_FDEF_INLINE_DELTA_1) ||
+                        (exc.sph_in_func_flags & FT_Common.SPH_FDEF_INLINE_DELTA_2)))
+                    {
+                        exc.GS.loop -= 1;
+                        continue;
                     }
 
                     if (!(exc.sph_tweak_flags & FT_Common.SPH_TWEAK_ALWAYS_SKIP_DELTAP) &&
                         ((exc.is_composite && exc.GS.freeVector.y != 0) ||
                         (exc.zp2.tags[exc.zp2._offset_tags + point] & FT_Common.FT_CURVE_TAG_TOUCH_Y) ||
                         (exc.sph_tweak_flags & FT_Common.SPH_TWEAK_DO_SHPIX)))
-                        Move_Zp2_Point(exc, point, dx, dy, true);
-                }
+                        Move_Zp2_Point(exc, point, 0, dy, true);
 
-                /* save new point */
-                if (exc.GS.freeVector.y != 0)
-                    B2 = exc.zp2.cur[exc.zp2._offset_cur + point].y;
-                else
-                    B2 = exc.zp2.cur[exc.zp2._offset_cur + point].x;
+                    /* save new point */
+                    if (exc.GS.freeVector.y != 0)
+                    {
+                        B2 = exc.zp2.cur[exc.zp2._offset_cur + point].y;
 
-                /* reverse any disallowed moves */
-                if (((exc.sph_tweak_flags & FT_Common.SPH_TWEAK_SKIP_NONPIXEL_Y_MOVES) &&
-                     exc.GS.freeVector.y != 0 &&
-                     B1 % 64 != 0  &&
-                     B2 % 64 != 0  &&
-                     B1 != B2 ) ||
-                   ((exc.sph_tweak_flags & FT_Common.SPH_TWEAK_SKIP_OFFPIXEL_Y_MOVES) &&
-                     exc.GS.freeVector.y != 0 &&
-                     B1 % 64 == 0 &&
-                     B2 % 64 != 0 &&
-                     B1 != B2 &&
-                     !exc.size.ttfautohinted))
-                {
-                    Move_Zp2_Point(exc, point, -dx, -dy, true);
+                        /* reverse any disallowed moves */
+                        if ((B1 & 63) == 0 &&
+                            (B2 & 63) != 0 &&
+                            B1 != B2)
+                            Move_Zp2_Point(exc, point, 0, -dy, true);
+                    }
                 }
+                else if (exc.sph_in_func_flags & FT_Common.SPH_FDEF_TYPEMAN_DIAGENDCTRL)
+                    Move_Zp2_Point(exc, point, dx, dy, true);
             }
             else
                 Move_Zp2_Point(exc, point, dx, dy, true);
@@ -3436,7 +3534,24 @@ function Ins_IP(exc, args, args_pos)
         cur_dist = exc.func_project(exc, v1.x - v2.x, v1.y - v2.y);
 
         if (org_dist != 0)
-            new_dist = (old_range != 0) ? FT_MulDiv(org_dist, cur_range, old_range) : cur_dist;
+        {
+            if (old_range != 0)
+                new_dist = FT_MulDiv(org_dist, cur_range, old_range);
+            else
+            {
+                /* This is the same as what MS does for the invalid case:  */
+                /*                                                         */
+                /*   delta = (Original_Pt - Original_RP1) -                */
+                /*           (Current_Pt - Current_RP1)                    */
+                /*                                                         */
+                /* In FreeType speak:                                      */
+                /*                                                         */
+                /*   new_dist = cur_dist -                                 */
+                /*              org_dist - cur_dist;                       */
+
+                new_dist = -org_dist;
+            }
+        }
         else
             new_dist = 0;
 
@@ -3471,9 +3586,9 @@ function Ins_MSIRP(exc, args, args_pos)
     /* twilight points (confirmed by Greg Hitchcock)   */
     if (exc.GS.gep1 == 0)
     {
-        exc.zp1.org[exc.zp1._offset_org + point] = exc.zp0.org[exc.zp0._offset_org + exc.GS.rp0];
+        copy_vector(exc.zp1.org[exc.zp1._offset_org + point], exc.zp0.org[exc.zp0._offset_org + exc.GS.rp0]);
         exc.func_move_orig(exc, exc.zp1, point, args[args_pos + 1]);
-        exc.zp1.cur[exc.zp1._offset_cur + point] = exc.zp1.org[exc.zp1._offset_org + point];
+        copy_vector(exc.zp1.cur[exc.zp1._offset_cur + point], exc.zp1.org[exc.zp1._offset_org + point]);
     }
 
     var v1 = exc.zp1.cur[exc.zp1._offset_cur + point];
@@ -3482,7 +3597,6 @@ function Ins_MSIRP(exc, args, args_pos)
 
     if (exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING) // #ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
     {
-        control_value_cutin = exc.GS.control_value_cutin;
         if (exc.ignore_x_mode && exc.GS.freeVector.x != 0 && (Math.abs(distance - args[args_pos + 1]) >= control_value_cutin))
             distance = args[args_pos + 1];
     } // #endif
@@ -3562,7 +3676,7 @@ function Ins_MIAP(exc, args, args_pos)
     var bIsSubpix = exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING;
     if (bIsSubpix) // #ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
     {
-        if (exc.ignore_x_mode && exc.GS.freeVector.x != 0 && (exc.sph_tweak_flags & FT_Common.SPH_TWEAK_NORMAL_ROUND) == 0)
+        if (exc.ignore_x_mode && exc.GS.freeVector.x != 0 && exc.GS.freeVector.y == 0 && (exc.sph_tweak_flags & FT_Common.SPH_TWEAK_NORMAL_ROUND) == 0)
             control_value_cutin = 0;
     } // #endif
 
@@ -3600,12 +3714,7 @@ function Ins_MIAP(exc, args, args_pos)
 
     if (exc.GS.gep0 == 0)   /* If in twilight zone */
     {
-        if (bIsSubpix)
-        {
-            if (exc.compatibility_mode)
-                exc.zp0.org[exc.zp0._offset_org + point].x = TT_MulFix14(distance, exc.GS.freeVector.x);
-        }
-        else
+        if (!bIsSubpix)
         {
             exc.zp0.org[exc.zp0._offset_org + point].x = TT_MulFix14(distance, exc.GS.freeVector.x);
         }
@@ -3617,7 +3726,7 @@ function Ins_MIAP(exc, args, args_pos)
 
     if (bIsSubpix)
     {
-        if ((exc.sph_tweak_flags & FT_Common.SPH_TWEAK_MIAP_HACK) != 0 && distance > 0 && exc.GS.freeVector.y != 0)
+        if (exc.ignore_x_mode && (exc.sph_tweak_flags & FT_Common.SPH_TWEAK_MIAP_HACK) != 0 && distance > 0 && exc.GS.freeVector.y != 0)
             distance = 0;
     }
 
@@ -3626,7 +3735,7 @@ function Ins_MIAP(exc, args, args_pos)
 
     if ((exc.opcode & 1) != 0)   /* rounding and control cut-in flag */
     {
-        if (Math.abs( distance - org_dist) > control_value_cutin)
+        if (Math.abs(distance - org_dist) > control_value_cutin)
             distance = org_dist;
 
         if (bIsSubpix)
@@ -3727,7 +3836,10 @@ function Ins_RS(exc, args, args_pos)
             /* subpixel hinting - avoid Typeman Dstroke and */
             /* IStroke and Vacuform rounds                  */
 
-            if (exc.compatibility_mode && (I == 24 || I == 22 || I == 8))
+            if (exc.compatibility_mode &&
+                ((I == 24) && (exc.face.sph_found_func_flags & (FT_Common.SPH_FDEF_SPACING_1 | FT_Common.SPH_FDEF_SPACING_2))) ||
+                ((I == 22) && (exc.sph_in_func_flags & FT_Common.SPH_FDEF_TYPEMAN_STROKES)) ||
+                ((I == 8) && (exc.face.sph_found_func_flags & FT_Common.SPH_FDEF_VACUFORM_ROUND_1) && exc.iup_called))
                 args[args_pos] = 0;
             else
                 args[args_pos] = exc.storage[I];
@@ -3911,7 +4023,7 @@ function Current_Ratio(exc)
         {
             var x = TT_MulFix14(exc.tt_metrics.x_ratio, exc.GS.projVector.x);
             var y = TT_MulFix14(exc.tt_metrics.y_ratio, exc.GS.projVector.y);
-            exc.tt_metrics.ratio = TT_VecLen(x, y);
+            exc.tt_metrics.ratio = FT_Hypot(x, y);
         }
     }
     return exc.tt_metrics.ratio;
@@ -3986,7 +4098,7 @@ function Ins_ODD(exc, args, args_pos)
 }
 function Ins_EVEN(exc, args, args_pos)
 {
-    args[args_pos] = ((exc.func_round(exc, args[args_pos], 0) & 127) == 64) ? 1 : 0;
+    args[args_pos] = ((exc.func_round(exc, args[args_pos], 0) & 127) == 0) ? 1 : 0;
 }
 function Ins_IF(exc, args, args_pos)
 {
@@ -4111,6 +4223,16 @@ function Ins_DELTAP(exc, args, args_pos)
     var B2 = 0;
 
     var bIsSubpix = exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING;
+
+    if (bIsSubpix)
+    {
+        if (exc.ignore_x_mode && exc.iup_called && (exc.sph_tweak_flags & FT_Common.SPH_TWEAK_NO_DELTAP_AFTER_IUP) != 0)
+        {
+            exc.new_top = exc.args;
+            return;
+        }
+    }
+
     // TODO: unpatented
 
     var nump = args[args_pos];   /* some points theoretically may occur more
@@ -4190,11 +4312,12 @@ function Ins_DELTAP(exc, args, args_pos)
                         else
                             B1 = exc.zp0.cur[exc.zp0._offset_cur + A].x;
 
-                        /* Standard Subpixel Hinting:  Allow y move */
-                        if (!exc.compatibility_mode && exc.GS.freeVector.y != 0)
+                        /*
+                        // Standard Subpixel Hinting:  Allow y move
+                        if (!exc.face.sph_compatibility_mode && exc.GS.freeVector.y != 0)
                             exc.func_move(exc, exc.zp0, A, B);
-                         /* Compatibility Mode: Allow x or y move if point touched in Y direction */
-                        else if (exc.compatibility_mode && (exc.sph_tweak_flags & FT_Common.SPH_TWEAK_ALWAYS_SKIP_DELTAP) == 0)
+                        // Compatibility Mode: Allow x or y move if point touched in Y direction
+                        else */if (exc.face.sph_compatibility_mode && (exc.sph_tweak_flags & FT_Common.SPH_TWEAK_ALWAYS_SKIP_DELTAP) == 0)
                         {
                             /* save the y value of the point now; compare after move */
                             B1 = exc.zp0.cur[exc.zp0._offset_cur + A].y;
@@ -4213,9 +4336,9 @@ function Ins_DELTAP(exc, args, args_pos)
                         B2 = exc.zp0.cur[exc.zp0._offset_cur + A].y;
 
                         /* Reverse this move if it results in a disallowed move */
-                        if (exc.GS.freeVector.y != 0 && (((exc.sph_tweak_flags & FT_Common.SPH_TWEAK_SKIP_OFFPIXEL_Y_MOVES) &&
-                                    (B1 % 64) == 0 && (B2 % 64) != 0 && !exc.size.ttfautohinted) ||
-                                    ((exc.sph_tweak_flags & FT_Common.SPH_TWEAK_SKIP_NONPIXEL_Y_MOVES) && (B1 % 64) != 0 && (B2 % 64) != 0)))
+                        if (exc.GS.freeVector.y != 0 &&
+                            ((exc.face.sph_compatibility_mode && (B1 & 63) == 0 && (B2 & 63) != 0 ) ||
+                            ((exc.sph_tweak_flags & FT_Common.SPH_TWEAK_SKIP_NONPIXEL_Y_MOVES_DELTAP) != 0 && (B1 & 63) != 0 && (B2 & 63) != 0)))
                             exc.func_move(exc, exc.zp0, A, -B);
                     }
                 }
@@ -4316,7 +4439,7 @@ function Ins_JROT(exc, args, args_pos)
         if (args[args_pos] == 0 && exc.args == 0)
             exc.error = FT_Common.FT_Err_Bad_Argument;
         exc.IP += args[args_pos];
-        if (exc.IP < 0 || (exc.callTop > 0 && exc.IP > exc.callStack[exc.callTop - 1].Cur_End))
+        if (exc.IP < 0 || (exc.callTop > 0 && exc.IP > exc.callStack[exc.callTop - 1].Def.end))
             exc.error = FT_Common.FT_Err_Bad_Argument;
         exc.step_ins = false;
     }
@@ -4329,7 +4452,7 @@ function Ins_JROF(exc, args, args_pos)
         if (args[args_pos] == 0 && exc.args == 0)
             exc.error = FT_Common.FT_Err_Bad_Argument;
         exc.IP += args[args_pos];
-        if (exc.IP < 0 || (exc.callTop > 0 && exc.IP > exc.callStack[exc.callTop - 1].Cur_End))
+        if (exc.IP < 0 || (exc.callTop > 0 && exc.IP > exc.callStack[exc.callTop - 1].Def.end))
             exc.error = FT_Common.FT_Err_Bad_Argument;
         exc.step_ins = false;
     }
@@ -4510,6 +4633,12 @@ function Ins_SDPVTL(exc, args, args_pos)
     A = v1.x - v2.x;
     B = v1.y - v2.y;
 
+    if ( A == 0 && B == 0 )
+    {
+        A    = 0x4000;
+        aOpc = 0;
+    }
+
     if ((aOpc & 1) != 0)
     {
         var C =  B;   /* counter clockwise rotation */
@@ -4543,13 +4672,13 @@ function Ins_GETINFO(exc, args, args_pos)
         else
         {
             if ((args[args_pos] & 1) != 0)
-                K = 35;
+                K = FT_Common.TT_INTERPRETER_VERSION_35;
         }
     }
     else
     {
         if ((args[args_pos] & 1) != 0)
-            K = 35;
+            K = FT_Common.TT_INTERPRETER_VERSION_35;
     }
 
     /********************************/
@@ -4557,7 +4686,7 @@ function Ins_GETINFO(exc, args, args_pos)
     /* Selector Bit:  1             */
     /* Return Bit(s): 8             */
     /*                              */
-    if (( args[args_pos] & 2) != 0 && exc.tt_metrics.rotated)
+    if ((args[args_pos] & 2) != 0 && exc.tt_metrics.rotated)
         K |= 0x80;
 
     /********************************/
@@ -4578,7 +4707,7 @@ function Ins_GETINFO(exc, args, args_pos)
 
     if (bIsSubpix) //#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
     {
-        if (exc.ignore_x_mode && exc.rasterizer_version >= 35)
+        if (exc.ignore_x_mode && exc.rasterizer_version >= FT_Common.TT_INTERPRETER_VERSION_35)
         {
             /********************************/
             /* HINTING FOR GRAYSCALE        */
@@ -4588,16 +4717,15 @@ function Ins_GETINFO(exc, args, args_pos)
             if ((args[args_pos] & 32) != 0 && exc.grayscale_hinting)
                 K |= 1 << 12;
 
-            /********************************/
-            /* HINTING FOR SUBPIXEL         */
-            /* Selector Bit:  6             */
-            /* Return Bit(s): 13            */
-            /*                              */
-            if ((args[args_pos] & 64) != 0 && exc.subpixel_hinting && exc.rasterizer_version >= 37)
+            if (exc.rasterizer_version >= 37)
             {
-                K |= 1 << 13;
-
-                /* the stuff below is irrelevant if subpixel_hinting is not set */
+                /********************************/
+                /* HINTING FOR SUBPIXEL         */
+                /* Selector Bit:  6             */
+                /* Return Bit(s): 13            */
+                /*                              */
+                if ((args[0] & 64) != 0 && exc.subpixel_hinting)
+                    K |= 1 << 13;
 
                 /********************************/
                 /* COMPATIBLE WIDTHS ENABLED    */
@@ -4605,7 +4733,7 @@ function Ins_GETINFO(exc, args, args_pos)
                 /* Return Bit(s): 14            */
                 /*                              */
                 /* Functionality still needs to be added */
-                if ((args[args_pos] & 128) != 0 && exc.compatible_widths)
+                if ((args[0] & 128) != 0 && exc.compatible_widths)
                     K |= 1 << 14;
 
                 /********************************/
@@ -4614,7 +4742,7 @@ function Ins_GETINFO(exc, args, args_pos)
                 /* Return Bit(s): 15            */
                 /*                              */
                 /* Functionality still needs to be added */
-                if ((args[args_pos] & 256) != 0 && exc.symmetrical_smoothing)
+                if ((args[0] & 256 ) != 0 && exc.symmetrical_smoothing)
                     K |= 1 << 15;
 
                 /********************************/
@@ -4623,7 +4751,7 @@ function Ins_GETINFO(exc, args, args_pos)
                 /* Return Bit(s): 16            */
                 /*                              */
                 /* Functionality still needs to be added */
-                if ((args[args_pos] & 512) != 0 && exc.bgr)
+                if ((args[0] & 512) != 0 && exc.bgr)
                     K |= 1 << 16;
 
                 if (exc.rasterizer_version >= 38)
@@ -4634,7 +4762,7 @@ function Ins_GETINFO(exc, args, args_pos)
                     /* Return Bit(s): 17            */
                     /*                              */
                     /* Functionality still needs to be added */
-                    if ((args[args_pos] & 1024) != 0 && exc.subpixel_positioned)
+                    if ((args[0] & 1024) != 0 && exc.subpixel_positioned)
                         K |= 1 << 17;
                 }
             }
@@ -4804,6 +4932,7 @@ function Ins_MDRP(exc, args, args_pos)
         exc.GS.rp2 = point;
         if ((exc.opcode & 16) != 0)
             exc.GS.rp0 = point;
+        return;
     }
 
     /* XXX: Is there some undocumented feature while in the */
@@ -4917,6 +5046,7 @@ function Ins_MIRP(exc, args, args_pos)
         if ((exc.opcode & 16) != 0)
             exc.GS.rp0 = point;
         exc.GS.rp2 = point;
+        return;
     }
 
     var cvt_dist = 0;
@@ -4925,12 +5055,6 @@ function Ins_MIRP(exc, args, args_pos)
     else
         cvt_dist = exc.func_read_cvt(exc, cvtEntry - 1);
         
-    if (bIsSubpix)
-    {
-        if (exc.sph_tweak_flags & FT_Common.SPH_TWEAK_MIRP_CVT_ZERO)
-            cvt_dist = 0;
-    }
-
     /* single width test */
     if (Math.abs(cvt_dist - exc.GS.single_width_value) < exc.GS.single_width_cutin)
     {
@@ -4948,8 +5072,7 @@ function Ins_MIRP(exc, args, args_pos)
         exc.zp1.org[exc.zp1._offset_org + point].x = _v.x + TT_MulFix14(cvt_dist, exc.GS.freeVector.x);
         exc.zp1.org[exc.zp1._offset_org + point].y = _v.y + TT_MulFix14(cvt_dist, exc.GS.freeVector.y);
 
-        exc.zp1.cur[exc.zp1._offset_cur + point].x = exc.zp1.org[exc.zp1._offset_org + point].x;
-        exc.zp1.cur[exc.zp1._offset_cur + point].y = exc.zp1.org[exc.zp1._offset_org + point].y;
+        copy_vector(exc.zp1.cur[exc.zp1._offset_cur + point], exc.zp1.org[exc.zp1._offset_org + point]);
     }
 
     var v1 = exc.zp1.org[exc.zp1._offset_org + point];
@@ -4971,7 +5094,7 @@ function Ins_MIRP(exc, args, args_pos)
 
     if (bIsSubpix) //#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
     {
-        if (exc.GS.freeVector.y != 0 && (exc.sph_tweak_flags & FT_Common.SPH_TWEAK_TIMES_NEW_ROMAN_HACK) != 0)
+        if (exc.ignore_x_mode && exc.GS.freeVector.y != 0 && (exc.sph_tweak_flags & FT_Common.SPH_TWEAK_TIMES_NEW_ROMAN_HACK) != 0)
         {
             if (cur_dist < -64)
                 cvt_dist -= 16;
@@ -5005,7 +5128,18 @@ function Ins_MIRP(exc, args, args_pos)
         distance = exc.func_round(exc, cvt_dist, exc.tt_metrics.compensations[exc.opcode & 3]);
     }
     else
+    {
+        if (bIsSubpix)
+        {
+            /* do cvt cut-in always in MIRP for sph */
+            if (exc.ignore_x_mode && exc.GS.gep0 == exc.GS.gep1)
+            {
+                if (Math.abs(cvt_dist - org_dist) > control_value_cutin)
+                    cvt_dist = org_dist;
+            }
+        }
         distance = Round_None(exc, cvt_dist, exc.tt_metrics.compensations[exc.opcode & 3]);
+    }
 
     /* minimum distance test */
     if ((exc.opcode & 8) != 0)
@@ -5034,7 +5168,7 @@ function Ins_MIRP(exc, args, args_pos)
         if (exc.ignore_x_mode && exc.GS.freeVector.y != 0 && (exc.sph_tweak_flags & FT_Common.SPH_TWEAK_ROUND_NONPIXEL_Y_MOVES) != 0)
             distance = FT_PIX_ROUND(B1 + distance - cur_dist) - B1 + cur_dist;
 
-        if (exc.GS.freeVector.y != 0 && (exc.opcode & 16) == 0 && (exc.opcode & 8) == 0 && (exc.sph_tweak_flags & FT_Common.SPH_TWEAK_COURIER_NEW_2_HACK) != 0)
+        if (exc.ignore_x_mode && exc.GS.freeVector.y != 0 && (exc.opcode & 16) == 0 && (exc.opcode & 8) == 0 && (exc.sph_tweak_flags & FT_Common.SPH_TWEAK_COURIER_NEW_2_HACK) != 0)
             distance += 64;
 
         exc.func_move(exc, exc.zp1, point, distance - cur_dist);
@@ -5045,15 +5179,16 @@ function Ins_MIRP(exc, args, args_pos)
         /* Reverse move if necessary */
         if (exc.ignore_x_mode)
         {
-            if ((exc.sph_tweak_flags & FT_Common.SPH_TWEAK_SKIP_OFFPIXEL_Y_MOVES) != 0 && exc.GS.freeVector.y != 0 && (B1 % 64) == 0 &&
-                        (B2 % 64) != 0 && !exc.size.ttfautohinted)
+            if (exc.face.sph_compatibility_mode &&
+                exc.GS.freeVector.y != 0 &&
+                ( B1 & 63 ) == 0 &&
+                ( B2 & 63 ) != 0)
                 reverse_move = true;
 
-            if ((exc.sph_tweak_flags & FT_Common.SPH_TWEAK_SKIP_NONPIXEL_Y_MOVES) != 0 && exc.GS.freeVector.y != 0 &&
-                        (B2 % 64) != 0 && (B1 % 64) != 0)
-                reverse_move = true;
-
-            if ((exc.sph_tweak_flags & FT_Common.SPH_TWEAK_DELTAP_SKIP_EXAGGERATED_VALUES) != 0 && !reverse_move && Math.abs(B1 - B2) >= 64)
+            if ((exc.sph_tweak_flags & FT_Common.SPH_TWEAK_SKIP_NONPIXEL_Y_MOVES) &&
+                exc.GS.freeVector.y != 0 &&
+                ( B2 & 63 ) != 0 &&
+                ( B1 & 63 ) != 0)
                 reverse_move = true;
         }
 
@@ -5352,7 +5487,6 @@ function TT_RunIns(exc)
     var _tt_hints = exc.face.driver.library.tt_hint_props;
     if (_tt_hints.TT_CONFIG_OPTION_SUBPIXEL_HINTING) //#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
     {
-        //if (exc.ignore_x_mode)
         exc.iup_called = false;
     }//#endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
 
@@ -5376,7 +5510,7 @@ function TT_RunIns(exc)
     }
     else
     {
-      /* square pixels, use normal routines */
+        /* square pixels, use normal routines */
         exc.func_read_cvt  = Read_CVT;
         exc.func_write_cvt = Write_CVT;
         exc.func_move_cvt  = Move_CVT;
@@ -6147,13 +6281,13 @@ function CSubpixHintingHacks()
     this.TWEAK_RULES = function(_loader, _glyph_index, _rules, _flag)
     {
         var face = _loader.face;
-        if (this.sph_test_tweak(face, face.family_name, _loader.size.metrics.x_ppem, face.style_name, glyph_index, _rules, _rules.length))
+        if (this.sph_test_tweak(face, face.family_name, _loader.size.metrics.x_ppem, face.style_name, _glyph_index, _rules, _rules.length))
             loader.exec.sph_tweak_flags |= _flag;
     };
     this.TWEAK_RULES_EXCEPTIONS = function(_loader, _glyph_index, _rules, _flag)
     {
         var face = _loader.face;
-        if (this.sph_test_tweak(face, face.family_name, _loader.size.metrics.x_ppem, face.style_name, glyph_index, _rules, _rules.length))
+        if (this.sph_test_tweak(face, face.family_name, _loader.size.metrics.x_ppem, face.style_name, _glyph_index, _rules, _rules.length))
             loader.exec.sph_tweak_flags &= ~_flagS;
     };
 

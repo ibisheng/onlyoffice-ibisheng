@@ -2629,7 +2629,7 @@ function load_truetype_glyph(loader, glyph_index, recurse_count, header_only)
     }
 
     var subpixel_ = (loader.exec && loader.exec.subpixel_hinting) ? true : false;
-    var subpixel_ = (loader.exec && loader.exec.grayscale_hinting) ? true : false;
+    var grayscale_ = (loader.exec && loader.exec.grayscale_hinting) ? true : false;
     var use_aw_2_  = (subpixel_ && grayscale_);
 
     if (loader.byte_len == 0 || loader.n_contours == 0)
