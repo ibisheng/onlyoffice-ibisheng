@@ -1440,11 +1440,14 @@
 		var curLeft = asc_round( ((kRightAlign !== this.textFlags.textAlign || this.cursorPos !== charsCount) && cur !== null && cur.left !== null ? cur.left : this._getContentPosition()) * this.kx );
 		var curTop = asc_round( ((cur !== null ? cur.top : 0) + y) * this.ky );
 		var curHeight = asc_round( (cur !== null ? cur.height : this._getContentHeight()) * this.ky );
-		var i, dy;
+		var i, dy, nCount = this.textRender.getLinesCount();
 
-		while ( this.textRender.getLinesCount() > 1 ) {
+		while (1 < nCount) {
 			if ( curTop + curHeight - 1 > h ) {
 				i = i === undefined ? 0 : i + 1;
+				if (i === nCount) {
+					break;
+				}
 				dy = this.textRender.getLineInfo( i ).th;
 				y -= dy;
 				curTop -= asc_round( dy * this.ky );
