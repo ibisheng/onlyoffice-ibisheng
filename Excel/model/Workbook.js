@@ -1033,7 +1033,9 @@ DependencyGraph.prototype = {
                     dN.Ref = dN.Ref.replace(oName,nName);
             }
             else{
-                dN.relinkRef(oName, nName);
+				if( dN.Ref ){
+                	dN.relinkRef(oName, nName);
+				}
             }
         }
 
