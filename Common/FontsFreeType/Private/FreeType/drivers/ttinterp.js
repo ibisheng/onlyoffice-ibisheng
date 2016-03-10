@@ -1873,7 +1873,7 @@ function Move_Zp2_Point(exc, point, dx, dy, touch)
 ////////////////////////////////////////////////////////
 function Ins_SVTCA(exc, args, args_pos)
 {
-    var A = ;
+    var A = 0;
     var B = 0x4000;
     if ((exc.opcode & 1) == 1)
     {
