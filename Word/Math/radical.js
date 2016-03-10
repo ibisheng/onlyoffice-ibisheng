@@ -47,7 +47,8 @@ CSignRadical.prototype.draw = function(x, y, pGraphics, PDSE)
     var sin2 = 0.876,
         tg =  1.848;
 
-    var yy4 = this.pos.y + y + Height;
+
+    var yy4 = this.pos.y + y + Height + 0.35;
     var xx4;
     var shift = penW1*0.2336;
 
@@ -162,52 +163,50 @@ CSignRadical.prototype.draw = function(x, y, pGraphics, PDSE)
     PDSE.Graphics._s();
 
 };
-CSignRadical.prototype.recalculateSize = function(oMeasure, sizeArg)
+CSignRadical.prototype.recalculateSize = function(oMeasure, sizeArg, bInline)
 {
-    var txtPrp = this.Parent.Get_CompiledCtrPrp();
+    var height = 0;
+    var FontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
+    var measureH = 0.27438 * FontSize;
 
-    var height, width;
-    var plH = 9.877777777777776 * txtPrp.FontSize/36;
+    var H1;
 
-    this.gapArg = txtPrp.FontSize*g_dKoef_pt_to_mm*0.077108; /// расстояние до аргумента
-    this.gapSign = txtPrp.FontSize*g_dKoef_pt_to_mm*0.094492; /// расстояние до значка радикала
+    var H0 =  measureH*1.07,
+        H2 = measureH*2.8,
+        H3 = measureH*4.08,
+        H4 = measureH*5.7,
+        H5 = measureH*7.15;
+
+    if(bInline)
+    {
+        this.gapArg =   measureH*0.01; /// расстояние до аргумента
+        this.gapSign =  0; /// расстояние до значка радикала
+
+        H1 = measureH*1.47;
+    }
+    else
+    {
+        this.gapArg =  measureH*0.0991; /// расстояние до аргумента
+        this.gapSign = measureH*0.1215; /// расстояние до значка радикала
+
+        H1 = measureH*1.6235;
+    }
 
     var heightArg = sizeArg.height + this.gapArg,
-        widthArg  = sizeArg.width;
-
-
-    //////////  Height  ///////////
-
-    /*var H0 = plH*1.2,
-     H1 = plH*1.50732421875,
-     H2 = plH*2.760986328125,
-     H3 = plH*4.217578125,
-     H4 = plH*5.52197265625,
-     H5 = plH*7.029296875;*/
-
-    var H0 = plH*1.07,
-    //H1 = plH*1.50732421875,
-        H1 = plH*1.6234788833214036,
-        H2 = plH*2.8,
-        H3 = plH*4.08,
-        H4 = plH*5.7,
-        H5 = plH*7.15;
-
+        widthArg = sizeArg.width;
 
     this.measure.bHigh = false;
 
-    var bDescentArg = sizeArg.height - sizeArg.ascent > 0.4*txtPrp.FontSize/11; // т.к. у нас почему-то для строчных букв "а" и тп descent не нулевой, см метрики в mathText.js
+    var bDescentArg = sizeArg.height - sizeArg.ascent > 0.036*FontSize; // т.к. у нас почему-то для строчных букв "а" и тп descent не нулевой, см метрики в mathText.js
 
     if(heightArg < H0 && !bDescentArg)
-        height = H0*1.12;
-    //height = H0*1.058;
+        height = H0;
     else if( heightArg < H1)
-        //height = H1*0.9284532335069441;
         height = H1;
     else if( heightArg < H2 )
         height = H2;
     else if( heightArg < H3 )
-        height = H3*1.04;
+        height = H3;
     else if( heightArg < H4 )
         height = H4;
     else if( heightArg < H5 )
@@ -217,17 +216,16 @@ CSignRadical.prototype.recalculateSize = function(oMeasure, sizeArg)
         height = heightArg;
         this.measure.bHigh = true;
     }
-
     ////////////////////////////////////
 
 
     //////////  Size of tick  //////////
 
-    var minHgtRad = plH * 1.130493164,
-        maxHgtRad = plH * 7.029296875;
+    var minHgtRad = 1.13*measureH,
+        maxHgtRad = 7.03*measureH;
 
-    var minHgtTick = plH*0.6,
-        maxHgtTick = 1.2*plH;
+    var minHgtTick = 0.6*measureH,
+        maxHgtTick = 1.2*measureH;
 
     var heightTick, widthSlash,
         gapLeft;
@@ -235,46 +233,43 @@ CSignRadical.prototype.recalculateSize = function(oMeasure, sizeArg)
     if ( heightArg > maxHgtRad )
     {
         heightTick = maxHgtTick;
-        widthSlash = plH * 0.67;
+        widthSlash = 0.67*measureH;
 
-        gapLeft = 0.2*plH;
+        gapLeft = 0.2*measureH;
     }
     else
     {
-        var H;
+        var zetta;
 
-        if(heightArg < H1)
-        {
-            H = H1;
-            var zetta = height < H1 ? 0.75 : 0.82;
-            widthSlash = plH *zetta;
-        }
+        if(height < H1)
+            zetta = 0.75;
+        else if(heightArg < H1)
+            zetta = 0.82;
         else
-        {
-            H = height;
-            widthSlash = plH * 0.8681086138556986;
-        }
+            zetta = 0.868;
+
+        widthSlash = measureH *zetta;
+        var H = heightArg < H1 ? H1 : height;
+
         var alpha =  (H - minHgtRad)/(2*maxHgtRad);
         heightTick = minHgtTick*(1 + alpha);
 
-        gapLeft = 0.12683105468750022* plH;
+        gapLeft = 0.127* measureH;
     }
-
 
     this.measure.widthSlash = widthSlash;
 
     this.measure.heightTick = heightTick;
-    this.measure.widthTick = 0.1196002747872799*txtPrp.FontSize;
+    this.measure.widthTick = 0.13*FontSize;
 
     //////////////////////////////
 
-    //////////   WidthБ Height  //////////
-    width = widthSlash + gapLeft + widthArg;
-    height += this.gapSign;
-    //////////////////////////////
+    //////////   Width, Height  //////////
 
-    this.size.height = height;
-    this.size.width  = width;
+    this.size.height = height + this.gapSign;
+    this.size.width  = widthSlash + gapLeft + widthArg;
+
+    //////////////////////////////
 };
 CSignRadical.prototype.setPosition = function(pos)
 {
@@ -488,7 +483,7 @@ CRadical.prototype.recalculateSize = function(oMeasure)
     var shTop,
         height, width, ascent;
 
-    this.signRadical.recalculateSize(oMeasure, this.RealBase.size);
+    this.signRadical.recalculateSize(oMeasure, this.RealBase.size, this.ParaMath.Is_Inline());
 
     var txtPrp = this.Get_CompiledCtrPrp();
     var sign = this.signRadical.size,
