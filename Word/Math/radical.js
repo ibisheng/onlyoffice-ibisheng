@@ -480,8 +480,7 @@ CRadical.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 };
 CRadical.prototype.recalculateSize = function(oMeasure)
 {
-    var shTop,
-        height, width, ascent;
+    var shTop, width, ascent;
 
     this.signRadical.recalculateSize(oMeasure, this.RealBase.size, this.ParaMath.Is_Inline());
 
@@ -496,28 +495,19 @@ CRadical.prototype.recalculateSize = function(oMeasure)
 
     if(this.Pr.type == SQUARE_RADICAL)
     {
-        //base = this.elements[0][0].size;
         shTop = (sign.height - gSign - this.RealBase.size.height)/2;
         shTop = shTop > 0 ? shTop : 0;
 
         ascent = gapBase + shTop + this.RealBase.size.ascent;
 
-        height = sign.height > ascent - this.RealBase.size.ascent + this.RealBase.size.height ? sign.height : ascent - this.RealBase.size.ascent + this.RealBase.size.height;
-        width  = sign.width;
-
-        //ascent = height - (base.height - base.ascent);
-
-        width += this.GapLeft + this.GapRight;
+        this.size.ascent = ascent;
+        this.size.height = sign.height > ascent - this.RealBase.size.ascent + this.RealBase.size.height ? sign.height : ascent - this.RealBase.size.ascent + this.RealBase.size.height;
+        this.size.width = sign.width + this.GapLeft + this.GapRight;
     }
     else if(this.Pr.type == DEGREE_RADICAL)
     {
-        //degr = this.elements[0][0].size;
-        //base = this.elements[0][1].size;
-
         var wTick = this.signRadical.measure.widthTick,
             hTick = this.signRadical.measure.heightTick;
-
-        var plH = 9.877777777777776 * txtPrp.FontSize /36;
 
         // общие gaps
         var gapHeight = 0.011*txtPrp.FontSize; // добавляем это расстояние к общей высоте радикала, также как и gapWidth
@@ -525,36 +515,26 @@ CRadical.prototype.recalculateSize = function(oMeasure)
 
         var wDegree = this.Iterator.size.width > wTick ? this.Iterator.size.width - wTick : 0;
         width = wDegree + sign.width + this.gapWidth;
-        width += this.GapLeft + this.GapRight;
-
-        var gapDegree;
-        if( this.RealBase.size.height < plH )
-            gapDegree = 1.5*txtPrp.FontSize/36;
-        else
-            gapDegree = 3*txtPrp.FontSize/36;
-
-        var h1 = gapHeight + this.Iterator.size.height + gapDegree + hTick,
-            h2 = sign.height;
+        this.size.width = width + this.GapLeft + this.GapRight;
 
         shTop = (sign.height - gSign - this.RealBase.size.height)/2;
 
+        var h1 = this.Iterator.size.height + ((0.65*sign.height + 0.5) >> 0),
+            h2 = sign.height;
+
         if(h1 > h2)
         {
-            height =  h1;
-            ascent = height - sign.height + gapBase + shTop + this.RealBase.size.ascent;
+            this.size.height = h1;
+            this.size.ascent = h1 - sign.height + gapBase + shTop + this.RealBase.size.ascent;
         }
         else
         {
-            height =  h2;
-            ascent = gapBase + shTop + this.RealBase.size.ascent;
+            this.size.height = h2;
+            this.size.ascent = gapBase + shTop + this.RealBase.size.ascent;
         }
 
-        this.gapDegree = height - h1 + gapHeight;
+        this.gapDegree = this.size.height - h1;
     }
-
-    this.size.height = height;
-    this.size.width  = width;
-    this.size.ascent = ascent;
 };
 CRadical.prototype.Resize = function(oMeasure, RPI)
 {
