@@ -568,7 +568,7 @@
             "OfflineApp" : true
         };
     }
-    api.asc_setDocInfo(c_DocInfo);
+    api.asc_setDocInfo(new Asc.asc_CDocInfo(c_DocInfo));
 	api.asc_registerCallback('asc_onGetEditorPermissions', function(){
 		api.asc_LoadDocument();
 	});
