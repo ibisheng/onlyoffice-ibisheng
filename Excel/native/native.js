@@ -4306,7 +4306,7 @@ function offline_stz(v) {_s.zoom = v; _api.asc_setZoom(v);}
 function offline_ds(x, y, width, height, ratio) {_s.drawSheet(x, y, width, height, ratio);}
 function offline_dh(x, y, width, height, type, ratio) {_s.drawHeader(x, y, width, height, type, ratio);}
 
-function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeResize, chartRange) {
+function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeResize, isChartRange, indexRange, resizeRange, targetCol, targetRow) {
     _s.isShapeAction = false;
 
     var ws = _api.wb.getWorksheet();
@@ -4351,17 +4351,21 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
 
             var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
 
-            var rangeChange = new asc.Range(chartRange[0], chartRange[1], chartRange[2], chartRange[3]);
+            //console.log(JSON.stringify(ct));
+
+            ws.startCellMoveResizeRange = null;
+
+            var rangeChange = new asc.Range(resizeRange[0], resizeRange[1], resizeRange[2], resizeRange[3]);
             var target = {
                 formulaRange: rangeChange,
-                row: ct.row,
+                row: ct.row, //isChartRange ? ct.row : targetRow,
+                col: ct.col, //isChartRange ? ct.col : targetCol,
                 target: ct.target,
-                targetArr: -1,
-                col: ct.col,
+                targetArr: isChartRange ? -1 : 0,
                 cursor: "se-resize",
-                indexFormulaRange: 0
+                indexFormulaRange: indexRange
             };
-            ws.changeSelectionMoveResizeRangeHandle(x, y, target);
+            ws.changeSelectionMoveResizeRangeHandle(x, y, target, wb.cellEditor);
         }
 
     } else {
@@ -4395,7 +4399,7 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
 
     return null;
 }
-function offline_mouse_move(x, y, isViewerMode, isRangeResize, chartRange) {
+function offline_mouse_move(x, y, isViewerMode, isRangeResize, isChartRange, indexRange, resizeRange, targetCol, targetRow) {
     var ws = _api.wb.getWorksheet();
     var wb = _api.wb;
 
@@ -4408,17 +4412,17 @@ function offline_mouse_move(x, y, isViewerMode, isRangeResize, chartRange) {
         if (!isViewerMode) {
             var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
 
-            var rangeChange = new asc.Range(chartRange[0], chartRange[1], chartRange[2], chartRange[3]);
+            var rangeChange = new asc.Range(resizeRange[0], resizeRange[1], resizeRange[2], resizeRange[3]);
             var target = {
-                formulaRange: rangeChange,
-                row: ct.row,
+                //formulaRange: rangeChange,
+                row: isChartRange ? ct.row : targetRow,
+                col: isChartRange ? ct.col : targetCol,
                 target: ct.target,
-                targetArr: -1,
-                col: ct.col,
+                targetArr: isChartRange ? -1 : 0,
                 cursor: "se-resize",
-                indexFormulaRange: 0
+                indexFormulaRange: indexRange
             };
-            ws.changeSelectionMoveResizeRangeHandle(x, y, target);
+            ws.changeSelectionMoveResizeRangeHandle(x, y, target, wb.cellEditor);
         }
     } else {
 
@@ -4459,7 +4463,7 @@ function offline_mouse_move(x, y, isViewerMode, isRangeResize, chartRange) {
 
     return null;
 }
-function offline_mouse_up(x, y, isViewerMode, isRangeResize, chartRange) {
+function offline_mouse_up(x, y, isViewerMode, isRangeResize, isChartRange, indexRange, resizeRange, targetCol, targetRow) {
     var ret = null;
     var ws = _api.wb.getWorksheet();
     var wb = _api.wb;
@@ -4481,13 +4485,14 @@ function offline_mouse_up(x, y, isViewerMode, isRangeResize, chartRange) {
 
         if (isRangeResize) {
             if (!isViewerMode) {
-                var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
-
+               // var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
                 var target = {
+                    //row: isChartRange ? ct.row : targetRow,
+                    //col: isChartRange ? ct.col : targetCol,
                     target: 5,
-                    targetArr: -1,
+                    targetArr: isChartRange ? -1 : 0,
                     cursor: "se-resize",
-                    indexFormulaRange: 0
+                    indexFormulaRange: indexRange
                 };
 
                 if (ws.moveRangeDrawingObjectTo) {
