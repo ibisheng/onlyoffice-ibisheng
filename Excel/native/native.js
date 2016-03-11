@@ -3767,9 +3767,7 @@ function OfflineEditor () {
 
         // AUTOFILTERS
 
-        var pxToMM = 1;//72 / 96;
-        //var styleThumbnailWidth = 61 * pxToMM;
-        //var styleThumbnailHeight = 46 * pxToMM;
+        var pxToMM = 1;
 
         var styleThumbnailWidth  = Math.floor(92.0 * pxToMM);
         var styleThumbnailHeight = Math.floor(48.0 * pxToMM);
@@ -4217,9 +4215,6 @@ function OfflineEditor () {
             }
         };
 
-        // ChartPreviewManager.prototype = Object.create (ChartPreviewManager.prototype);
-        // ChartPreviewManager.prototype.constructor = ChartPreviewManager;
-
         // chat styles
         ChartPreviewManager.prototype.clearPreviews = function() {
             window["native"]["ClearCacheChartStyles"]();
@@ -4301,6 +4296,7 @@ function OfflineEditor () {
 
     };
     this.offline_afteInit = function () {
+        window.AscAlwaysSaveAspectOnResizeTrack = true;
     };
 }
 var _s = new OfflineEditor();
@@ -4428,6 +4424,7 @@ function offline_mouse_move(x, y, isViewerMode, isRangeResize, chartRange) {
 
         if (_s.isShapeAction) {
             if (!isViewerMode) {
+
                 var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
                 ws.objectRender.graphicObjectMouseMove(e, x, y);
             }
@@ -4619,18 +4616,24 @@ function offline_cell_editor_process_input_commands(commands, width, height, rat
             // MOVE
             case 2: {
                 position = value;
-                cellEditor._moveCursor(-11, position);
+                if (position < 0) {
+                    cellEditor._moveCursor(position); // var kEndOfText = -4;
+                } else {
+                    cellEditor._moveCursor(-11, position);
+                }
                 break;
             }
 
             // SELECT
             case 3: {
+
                 left = value;
                 right = value2;
 
                 cellEditor.cursorPos = left;
                 cellEditor.selectionBegin = left;
                 cellEditor.selectionEnd = right;
+
                 break;
             }
 
@@ -6044,6 +6047,33 @@ function offline_apply_event(type,params) {
             _stream["ClearNoAttack"]();
             _stream["WriteLong"](isValid);
             _return = _stream;
+            break;
+        }
+
+        case 7010: // ASC_SPREADSHEETS_EVENT_TYPE_SET_COLUMN_WIDTH
+        {
+            var width = params[0];
+            var fromColumn = params[1];
+            var toColumn = params[2];
+
+            var ws = _api.wb.getWorksheet();
+            ws.changeColumnWidth(toColumn, width, 0);
+
+            // _api.asc_setColumnWidth(params);
+
+            break;
+        }
+
+        case 7020: // ASC_SPREADSHEETS_EVENT_TYPE_SET_ROW_HEIGHT
+        {
+            var height = params[0];
+            var fromRow = params[1];
+            var toRow = params[2];
+
+            var ws = _api.wb.getWorksheet();
+            ws.changeRowHeight(toRow, height, 0);
+
+            // _api.asc_setRowHeight(params);
             break;
         }
 
