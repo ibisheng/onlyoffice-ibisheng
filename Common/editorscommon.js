@@ -1098,10 +1098,10 @@ parserHelper.prototype.isArea = function ( formula, start_pos ) {
 	var subSTR = formula.substring( start_pos );
 	var match = subSTR.match( rgRange ) || subSTR.match( rgCols ) || subSTR.match( rgRows );
 	if (match != null) {
-        var m0 = match[0].split(":");
+        var m0 = match[1].split(":");
         if( g_oCellAddressUtils.getCellAddress(m0[0]).isValid() && g_oCellAddressUtils.getCellAddress(m0[1]).isValid() ){
-            this.pCurrPos += match[0].length;
-            this.operand_str = match[0];
+            this.pCurrPos += match[1].length;
+            this.operand_str = match[1];
             return true;
         }
 	}
