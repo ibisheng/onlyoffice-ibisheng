@@ -166,8 +166,17 @@ CSignRadical.prototype.draw = function(x, y, pGraphics, PDSE)
 CSignRadical.prototype.recalculateSize = function(oMeasure, sizeArg, bInline)
 {
     var height = 0;
-    var FontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
-    var measureH = 0.27438 * FontSize;
+    var CtrPrp = this.Parent.Get_CompiledCtrPrp(),
+        FontSize = CtrPrp.FontSize;
+
+    var Symbol5 = new CMathText(true);
+    Symbol5.add(0x35);
+    Symbol5.Measure(oMeasure, CtrPrp);
+
+    var measureH = Symbol5.size.height;
+
+    // высота символов изменяется непропорционально размерам шрифта
+    // поэтому ориентируемся на высоту символа 5
 
     var H1;
 
@@ -179,10 +188,10 @@ CSignRadical.prototype.recalculateSize = function(oMeasure, sizeArg, bInline)
 
     if(bInline)
     {
-        this.gapArg =   measureH*0.01; /// расстояние до аргумента
+        this.gapArg =   measureH*0.015; /// расстояние до аргумента
         this.gapSign =  0; /// расстояние до значка радикала
 
-        H1 = measureH*1.47;
+        H1 = measureH*1.45;
     }
     else
     {
@@ -197,7 +206,12 @@ CSignRadical.prototype.recalculateSize = function(oMeasure, sizeArg, bInline)
 
     this.measure.bHigh = false;
 
-    var bDescentArg = sizeArg.height - sizeArg.ascent > 0.036*FontSize; // т.к. у нас почему-то для строчных букв "а" и тп descent не нулевой, см метрики в mathText.js
+    var letterG = new CMathText(true);
+    letterG.add(0x67);
+    letterG.Measure(oMeasure, CtrPrp);
+
+    var Descent = letterG.size.height - letterG.size.ascent;
+    var bDescentArg = sizeArg.height - sizeArg.ascent > 0.9*Descent;
 
     if(heightArg < H0 && !bDescentArg)
         height = H0;
@@ -221,11 +235,13 @@ CSignRadical.prototype.recalculateSize = function(oMeasure, sizeArg, bInline)
 
     //////////  Size of tick  //////////
 
-    var minHgtRad = 1.13*measureH,
-        maxHgtRad = 7.03*measureH;
+    var measureTick = 0.27438 * FontSize;
 
-    var minHgtTick = 0.6*measureH,
-        maxHgtTick = 1.2*measureH;
+    var minHgtRad = 1.13*measureTick,
+        maxHgtRad = 7.03*measureTick;
+
+    var minHgtTick = 0.6*measureTick,
+        maxHgtTick = 1.2*measureTick;
 
     var heightTick, widthSlash,
         gapLeft;
@@ -233,9 +249,9 @@ CSignRadical.prototype.recalculateSize = function(oMeasure, sizeArg, bInline)
     if ( heightArg > maxHgtRad )
     {
         heightTick = maxHgtTick;
-        widthSlash = 0.67*measureH;
+        widthSlash = 0.67*measureTick;
 
-        gapLeft = 0.2*measureH;
+        gapLeft = 0.2*measureTick;
     }
     else
     {
@@ -248,13 +264,13 @@ CSignRadical.prototype.recalculateSize = function(oMeasure, sizeArg, bInline)
         else
             zetta = 0.868;
 
-        widthSlash = measureH *zetta;
+        widthSlash = measureTick *zetta;
         var H = heightArg < H1 ? H1 : height;
 
         var alpha =  (H - minHgtRad)/(2*maxHgtRad);
         heightTick = minHgtTick*(1 + alpha);
 
-        gapLeft = 0.127* measureH;
+        gapLeft = 0.127* measureTick;
     }
 
     this.measure.widthSlash = widthSlash;
