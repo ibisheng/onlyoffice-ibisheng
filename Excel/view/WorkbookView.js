@@ -462,6 +462,9 @@
             if (!self.lockDraw) {
               ws.cleanSelection();
             }
+  		    for (var i in self.wsViews) {
+				self.wsViews[i].cleanFormulaRanges();
+		    }
             ws.cleanFormulaRanges();
             ws.setFormulaEditMode.apply(ws, arguments);
           }

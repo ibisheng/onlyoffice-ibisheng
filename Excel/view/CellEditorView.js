@@ -870,7 +870,6 @@
 					}
 					case cElementType.name          :
 					{
-//						continue;
 						var nameRef = r.oper.toRef();
 						if( nameRef instanceof cError ) continue;
 						switch ( nameRef.type ) {
@@ -1205,7 +1204,7 @@
 		if ( isFormula ) {
 			funcPos = asc_lastidx( s, t.reNotFormula, t.cursorPos ) + 1;
 			if ( funcPos > 0 ) {
-				match = s.slice( funcPos ).match( t.reFormula );
+				match = s.slice( funcPos, t.cursorPos ).match( t.reFormula );
 			}
 			if ( match ) {
 				funcName = match[1];
