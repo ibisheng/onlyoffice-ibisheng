@@ -192,10 +192,6 @@ CChartsDrawer.prototype =
 				}
                 this.gridChart.draw(this);
 			}
-
-			this.cShapeDrawer.bIsNoSmartAttack = true;
-			this.chart.draw(this);
-			this.cShapeDrawer.bIsNoSmartAttack = false;
 			
 			if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
 			{
@@ -203,6 +199,10 @@ CChartsDrawer.prototype =
 				this.valAxisChart.draw(this);
 				this.serAxisChart.draw(this);
 			}
+			
+			this.cShapeDrawer.bIsNoSmartAttack = true;
+			this.chart.draw(this);
+			this.cShapeDrawer.bIsNoSmartAttack = false;
 		}
 	},
 	
