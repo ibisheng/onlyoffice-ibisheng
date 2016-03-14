@@ -308,29 +308,33 @@
 	CellEditor.prototype.close = function ( saveValue ) {
 		var opt = this.options, ret;
 
-		if ( saveValue && "function" === typeof opt.saveValueCallback && 0 < this.undoList.length ) {
-			// Делаем замену текста на автодополнение, если есть select и текст полностью совпал.
-			if ( this.selectionBegin !== this.selectionEnd && !this.isFormula() ) {
-				var s = this._getFragmentsText( this.options.fragments );
-				if ( !isNumber( s ) ) {
-					var arrAutoComplete = this._getAutoComplete( s.toLowerCase() );
-					if ( 1 === arrAutoComplete.length ) {
-						var newValue = arrAutoComplete[0];
-						this.selectionBegin = this.textRender.getBeginOfText();
-						this.cursorPos = this.selectionEnd = this.textRender.getEndOfText();
-						this.noUpdateMode = true;
-						this._addChars( newValue );
-						this.noUpdateMode = false;
+		if (saveValue && "function" === typeof opt.saveValueCallback) {
+			var isFormula = this.isFormula();
+			// Для формул делаем пересчет всегда. Для остального - только если мы изменили что-то. http://bugzserver/show_bug.cgi?id=31889
+			if (0 < this.undoList.length || isFormula) {
+				// Делаем замену текста на автодополнение, если есть select и текст полностью совпал.
+				if (this.selectionBegin !== this.selectionEnd && !isFormula) {
+					var s = this._getFragmentsText(this.options.fragments);
+					if (!isNumber(s)) {
+						var arrAutoComplete = this._getAutoComplete(s.toLowerCase());
+						if (1 === arrAutoComplete.length) {
+							var newValue = arrAutoComplete[0];
+							this.selectionBegin = this.textRender.getBeginOfText();
+							this.cursorPos = this.selectionEnd = this.textRender.getEndOfText();
+							this.noUpdateMode = true;
+							this._addChars(newValue);
+							this.noUpdateMode = false;
+						}
 					}
 				}
-			}
 
-			ret = this._wrapFragments( opt.fragments ); // восстанавливаем символы \n
-			ret = opt.saveValueCallback( opt.fragments, this.textFlags, /*skip NL check*/ret );
-			if ( !ret ) {
-				// При ошибке нужно выставить флаг, чтобы по стрелкам не закрывался редактор
-				this.handlers.trigger( 'setStrictClose', true );
-				return false;
+				ret = this._wrapFragments(opt.fragments); // восстанавливаем символы \n
+				ret = opt.saveValueCallback(opt.fragments, this.textFlags, /*skip NL check*/ret);
+				if (!ret) {
+					// При ошибке нужно выставить флаг, чтобы по стрелкам не закрывался редактор
+					this.handlers.trigger('setStrictClose', true);
+					return false;
+				}
 			}
 		}
 
