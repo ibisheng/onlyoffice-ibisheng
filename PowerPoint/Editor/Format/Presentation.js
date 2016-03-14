@@ -2883,7 +2883,13 @@ CPresentation.prototype =
     {
         e.ctrlKey = e.CtrlKey;
         e.shiftKey = e.ShiftKey;
+        var nStartPage = this.CurPage;
         this.Slides[this.CurPage].graphicObjects && this.Slides[this.CurPage].graphicObjects.onMouseUp(e, X, Y);
+        if(nStartPage !== this.CurPage)
+        {
+            this.DrawingDocument.CheckTargetShow();
+            this.Document_UpdateSelectionState();
+        }
         if(e.Button === g_mouse_button_right && !this.noShowContextMenu)
         {
             var ContextData = new CContextMenuData();
