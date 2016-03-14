@@ -359,6 +359,7 @@ function Editor_Copy(api, bCut)
                     ElemToSelect.innerHTML = "";
                     Editor_Copy_Event(e, ElemToSelect);
 
+					api.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_CutHotKey);
                     api.WordControl.m_oLogicDocument.Remove(1, true, true);
                     api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
                 }
