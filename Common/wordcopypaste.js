@@ -6445,10 +6445,24 @@ PasteProcessor.prototype =
                     }
 					
 					//TODO пересмотреть! node.getAttribute("width") в FF возврашает "auto" -> изображения в FF не всталяются
-					if(AscBrowser.isMozilla && (!nWidth || !nHeight))
+					if((!nWidth || !nHeight))
 					{
-						nWidth = parseInt(node.width);
-						nHeight = parseInt(node.height);
+						if(AscBrowser.isMozilla)
+						{
+							nWidth = parseInt(node.width);
+							nHeight = parseInt(node.height);
+						}
+						else if(AscBrowser.isChrome)
+						{
+							if(nWidth && !nHeight)
+							{
+								nHeight = nWidth;
+							}
+							else if(!nWidth && nHeight)
+							{
+								nWidth = nHeight;
+							}
+						}
 					}
 					
                     var sSrc = node.getAttribute("src");
