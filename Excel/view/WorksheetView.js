@@ -10452,7 +10452,12 @@
         if ( this.objectRender && this.objectRender.drawingArea ) {
             this.objectRender.drawingArea.reinitRanges();
         }
-        return (nLastCols !== this.nColsCount || bIsMaxCols);
+
+		if ( nLastCols !== this.nColsCount )
+			return 1;
+		if ( bIsMaxCols )
+			return 2;
+		return (nLastCols !== this.nColsCount || bIsMaxCols);
     };
 
     WorksheetView.prototype.expandRowsOnScroll = function ( isNotActive, updateRowsCount, newRowsCount ) {
@@ -10495,7 +10500,12 @@
         if ( this.objectRender && this.objectRender.drawingArea ) {
             this.objectRender.drawingArea.reinitRanges();
         }
-        return (nLastRows !== this.nRowsCount || bIsMaxRows);
+
+		if ( nLastRows !== this.nRowsCount )
+			return 1;
+		if ( bIsMaxRows )
+			return 2;
+		return (nLastRows !== this.nRowsCount || bIsMaxRows);
     };
 
     WorksheetView.prototype.onChangeWidthCallback = function ( col, r1, r2, onlyIfMore ) {

@@ -1555,6 +1555,8 @@ function ScrollObject( elemID, settings, dbg ) {
 
     this.scroller = {x:0, y:1, h:0, w:0};
 
+	this.correct = 0;
+
     this.canvas = null;
     this.context = null;
 
@@ -1986,7 +1988,7 @@ ScrollObject.prototype = {
             // Новое смещение превышает maxScroll, надо вызвать ивент, спрашивающий что делать.
             // Чтобы не создавать новый, использую onscrollVEnd, он все равно больше нигде не используется
             // 50 = max число wheelScrollLine, если она больше, то будет работать неправильно
-            for ( var c = 50; destY > this.maxScrollY && c > 0; --c ) {
+			for ( var c = 50; destY > this.maxScrollY+this.correct && c > 0; --c ) {
                 this.handleEvents( "onscrollVEnd", {} );
                 vend = true;
             }
@@ -2050,7 +2052,7 @@ ScrollObject.prototype = {
             isBottom = false;
         }
         else if ( destX > this.maxScrollX ) {
-            for ( var c = 50; destX > this.maxScrollX && c > 0; --c ) {
+            for ( var c = 50; destX > this.maxScrollX+this.correct && c > 0; --c ) {
                 this.handleEvents( "onscrollHEnd", {} );
                 hend = true;
             }

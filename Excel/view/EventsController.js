@@ -220,7 +220,7 @@
 		};
 
 		/** @param [whichSB] {Number}  Scroll bar to reinit (1=vertical, 2=horizontal) */
-		asc_CEventsController.prototype.reinitializeScroll = function (whichSB) {
+		asc_CEventsController.prototype.reinitializeScroll = function (whichSB,canScroll) {
 		    if (window["NATIVE_EDITOR_ENJINE"])
 		        return;
 
@@ -233,16 +233,24 @@
 			if (isVert || isHoriz) {
 				this.handlers.trigger("reinitializeScroll", whichSB, function (vSize, hSize) {
 					if (isVert) {
-						vSize = self.vsb.offsetHeight + Math.max(vSize * opt.vscrollStep, 1);
+						vSize = self.vsb.offsetHeight + Math.max( (vSize + 1) * opt.vscrollStep, 1 );
 //                        this.m_dScrollY_max = vSize;
     					self.vsbHSt.height = vSize + "px";
+						self.vsbApi.correct = 0;
+						if ( canScroll ) {
+							self.vsbApi.correct = opt.vscrollStep * 5;
+						}
 						self.vsbApi.Reinit(opt, opt.vscrollStep * ws.getFirstVisibleRow(/*allowPane*/true));
 					}
 					if (isHoriz) {
-						hSize = self.hsb.offsetWidth + Math.max(hSize * opt.hscrollStep, 1);
+						hSize = self.hsb.offsetWidth + Math.max( (hSize + 1) * opt.hscrollStep, 1 );
 //                        this.m_dScrollX_max = hSize ;
+						self.hsbHSt.correct = 0;
+						if ( canScroll ) {
+							self.hsbApi.correct = opt.hscrollStep * 5;
+						}
 						self.hsbHSt.width = hSize + "px";
-						self.hsbApi.Reinit(opt, opt.vscrollStep * ws.getFirstVisibleCol(/*allowPane*/true));
+						self.hsbApi.Reinit(opt, opt.hscrollStep * ws.getFirstVisibleCol(/*allowPane*/true));
 					}
 				});
 			}

@@ -465,7 +465,7 @@
   		    for (var i in self.wsViews) {
 				self.wsViews[i].cleanFormulaRanges();
 		    }
-            ws.cleanFormulaRanges();
+//            ws.cleanFormulaRanges();
             ws.setFormulaEditMode.apply(ws, arguments);
           }
         }, "updateEditorState": function(state) {
@@ -1306,7 +1306,10 @@
   WorkbookView.prototype._onAddColumn = function(isNotActive) {
     var res = this.getWorksheet().expandColsOnScroll(isNotActive);
     if (res) {
-      this.controller.reinitializeScroll(/*horizontal*/2);
+		if(res == 1)
+      		this.controller.reinitializeScroll(/*horizontal*/2);
+		else
+      		this.controller.reinitializeScroll(/*horizontal*/2,true);
     }
   };
 
@@ -1315,7 +1318,10 @@
     if (res) {  // Добавлены строки
       // после добавления controller.settings.wheelScrollLines
       // ws.scrollVertical() здесь не нужен, scroll.js сам все разрулит
-      this.controller.reinitializeScroll(/*vertical*/1);
+		if(res == 1)
+      		this.controller.reinitializeScroll(/*vertical*/1);
+		else
+			this.controller.reinitializeScroll(/*vertical*/1,true);
     }
   };
 
