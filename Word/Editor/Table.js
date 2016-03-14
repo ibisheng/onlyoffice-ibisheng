@@ -5672,7 +5672,10 @@ CTable.prototype =
         this.DrawingDocument.TargetStart();
         this.DrawingDocument.TargetShow();
         this.CurCell.Content_Cursor_MoveAt(X, Y, false, true, CurPage - this.CurCell.Content.Get_StartPage_Relative());
-        this.RecalculateCurPos();
+        if(this.LogicDocument)
+        {
+            this.LogicDocument.RecalculateCurPos();
+        }
     },
 
     Selection_SetStart : function(X, Y, CurPage, MouseEvent)
