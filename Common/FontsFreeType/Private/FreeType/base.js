@@ -919,7 +919,7 @@ function FT_PAD_FLOOR(x, n)
 }
 function FT_PAD_ROUND(x, n)
 {
-    return (x + (n >> 1)) & (~(n-1));
+    return (x + (n >>> 1)) & (~(n-1));
 }
 function FT_PAD_CEIL(x, n)
 {

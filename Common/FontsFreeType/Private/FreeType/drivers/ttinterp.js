@@ -1791,6 +1791,9 @@ function TT_MulFix14(a, b)
         hi += 1;
 
     mid = FT_Common.IntToUInt(((lo >> 14) | (hi << 18)) & 0xFFFFFFFF);
+
+    //console.log("(" + a + ", " + b + "): " + (sign >= 0 ? mid : -mid));
+
     return sign >= 0 ? mid : -mid;
 }
 
@@ -1839,6 +1842,8 @@ function TT_DotFix14(ax, ay, bx, by)
     l = FT_Common.IntToUInt(l & 0xFFFFFFFF);
     
     hi += ((l < lo) ? 1 : 0);
+
+    //console.log("(" + ax + ", " + ay + ", " + bx + ", " + by + "): " + (((hi << 18) | (l >> 14)) & 0xFFFFFFFF));
 
     return ((hi << 18) | (l >> 14)) & 0xFFFFFFFF;
 }

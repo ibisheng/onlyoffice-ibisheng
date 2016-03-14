@@ -668,6 +668,16 @@ function _FT_Common()
 
     this.TABLE_EXTEND = 5;
 
+    /* the Cordic shrink factor 0.858785336480436 * 2^32 */
+    this.FT_TRIG_SCALE = 0xDBD95B16;
+
+    /* the highest bit in overflow-safe vector components, */
+    /* MSB of 0.858785336480436 * sqrt(0.5) * 2^30         */
+    this.FT_TRIG_SAFE_MSB = 29;
+
+    /* this table was generated for FT_PI = 180L << 16, i.e. degrees */
+    this.FT_TRIG_MAX_ITERS = 23;
+
     // константы строковые
     this.SYMBOL_CONST_SR                = "\r".charCodeAt(0);
     this.SYMBOL_CONST_SN                = "\n".charCodeAt(0);
@@ -958,11 +968,6 @@ function _FT_Common()
 
     this.FT_ANGLE_PI  = (180 << 16);
     this.FT_ANGLE_PI2 = (this.FT_ANGLE_PI / 2);
-    this.FT_TRIG_MAX_ITERS = 23;
-
-    this.FT_TRIG_SCALE = 0x9B74EDA8;
-    if (this.FT_TRIG_SCALE < 0)
-        this.FT_TRIG_SCALE = this.IntToUInt(this.FT_TRIG_SCALE);
 
     this.tt_coderange_none  = 0;
     this.tt_coderange_font  = 1;

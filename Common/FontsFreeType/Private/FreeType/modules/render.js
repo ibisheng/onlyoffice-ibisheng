@@ -384,15 +384,15 @@ function ft_trig_prenorm(vec)
         shift += 1;
     }
 
-    if (shift <= 27)
+    if (shift <= FT_Common.FT_TRIG_SAFE_MSB)
     {
-        shift  = 27 - shift;
+        shift  = FT_Common.FT_TRIG_SAFE_MSB - shift;
         vec.x = x << shift;
         vec.y = y << shift;
     }
     else
     {
-        shift -= 27;
+        shift -= FT_Common.FT_TRIG_SAFE_MSB;
         vec.x = x >> shift;
         vec.y = y >> shift;
         shift = -shift;
@@ -401,53 +401,75 @@ function ft_trig_prenorm(vec)
     return shift;
 }
 
-var ft_trig_arctan_table = [2949120, 1740967, 919879, 466945, 234379, 117304, 58666, 29335, 14668, 7334,
-    3667, 1833, 917, 458, 229, 115, 57, 29, 14, 7, 4, 2, 1];
+var ft_trig_arctan_table = [1740967, 919879, 466945, 234379, 117304, 58666, 29335, 14668, 7334,
+    3667, 1833, 917, 458, 229, 115, 57, 29, 14, 7, 4, 2, 1, 0];
 
 function ft_trig_pseudo_polarize(vec)
 {
     var x = vec.x;
     var y = vec.y;
 
-    /* Get the vector into the right half plane */
     var theta = 0;
-    if (x < 0)
+    var xtemp = 0;
+
+    /* Get the vector into [-PI/4,PI/4] sector */
+    if ( y > x )
     {
-        x = -x;
-        y = -y;
-        theta = 2 * FT_Common.FT_ANGLE_PI2;
+        if ( y > -x )
+        {
+            theta =  FT_Common.FT_ANGLE_PI2;
+            xtemp =  y;
+            y     = -x;
+            x     =  xtemp;
+        }
+        else
+        {
+            theta =  y > 0 ? FT_Common.FT_ANGLE_PI : -FT_Common.FT_ANGLE_PI;
+            x     = -x;
+            y     = -y;
+        }
+    }
+    else
+    {
+        if ( y < -x )
+        {
+            theta = -FT_Common.FT_ANGLE_PI2;
+            xtemp = -y;
+            y     =  x;
+            x     =  xtemp;
+        }
+        else
+        {
+            theta = 0;
+        }
     }
 
-    if (y > 0)
-        theta = - theta;
+    arctanptr = 0;
 
-    var arctanptr = 0;
-    var xtemp = 0;
     /* Pseudorotations, with right shifts */
-    i = 0;
-    do
+    for ( i = 1, b = 1; i < FT_Common.FT_TRIG_MAX_ITERS; b <<= 1, i++ )
     {
         if ( y > 0 )
         {
-            xtemp  = x + (y >> i);
-            y      = y - (x >> i);
+            xtemp  = x + ( ( y + b ) >> i );
+            y      = y - ( ( x + b ) >> i );
             x      = xtemp;
             theta += ft_trig_arctan_table[arctanptr++];
         }
         else
         {
-            xtemp  = x - (y >> i);
-            y      = y + (x >> i);
+            xtemp  = x - ( ( y + b ) >> i );
+            y      = y + ( ( x + b ) >> i );
             x      = xtemp;
             theta -= ft_trig_arctan_table[arctanptr++];
         }
-    } while (++i < FT_Common.FT_TRIG_MAX_ITERS);
+    }
 
     /* round theta */
-    if (theta >= 0)
-        theta = ((theta + 16) & ~31);
+    if ( theta >= 0 )
+        theta = FT_PAD_ROUND( theta, 32 );
     else
-        theta = -((-theta + 16) & ~31);
+        theta = -FT_PAD_ROUND( -theta, 32 );
 
     vec.x = x;
     vec.y = theta;
@@ -458,28 +480,25 @@ function ft_trig_downscale(val)
     var s   = val;
     val = (val >= 0) ? val : -val;
 
-    var v1 = FT_Common.IntToUInt(val >> 16);
-    var v2 = FT_Common.IntToUInt(val & 0xFFFF);
+    var v1 = val >>> 16;
+    var v2 = FT_Common.Short_To_UShort(val & 0xFFFF);
 
-    var k1 = 0x9B74;   /* constant */
-    var k2 = 0xEDA8;   /* constant */
+    var k1 =  0xDBD9;   /* constant */
+    var k2 = 0x5B16;   /* constant */
 
     var hi   = k1 * v1;
     var lo1  = k1 * v2 + k2 * v1;       /* can't overflow */
 
-    var lo2  = ( k2 * v2 ) / 65536;
-    lo2 = lo2 >> 0;
+    var lo2  = ( k2 * v2 ) >>> 16;
+
     var lo3  = ( lo1 >= lo2 ) ? lo1 : lo2;
     lo1 += lo2;
 
-    lo1 = FT_Common.IntToUInt(lo1);
-
-    hi  += lo1 >> 16;
+    hi  += (lo1 >>> 16);
     if (lo1 < lo3)
         hi += 0x10000;
 
-    val  = hi;
-    val = FT_Common.UintToInt(val);
+    var val  = FT_Common.UintToInt(hi);
 
     return (s >= 0) ? val : -val;
 }
