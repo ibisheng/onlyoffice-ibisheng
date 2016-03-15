@@ -3292,10 +3292,10 @@ CAnchorPosition.prototype =
         this.ColumnEndX    = ParaLayout.ColumnEndX;
         this.Left_Margin   = ParaLayout.Left_Margin;
         this.Right_Margin  = ParaLayout.Right_Margin;
-        this.Page_W        = ParaLayout.Page_W;
+        this.Page_W        = PageLimits.XLimit - PageLimits.X;// ParaLayout.Page_W;
         this.Top_Margin    = ParaLayout.Top_Margin;
         this.Bottom_Margin = ParaLayout.Bottom_Margin;
-        this.Page_H        = ParaLayout.Page_H;
+        this.Page_H        = PageLimits.YLimit - PageLimits.Y;// ParaLayout.Page_H;
         this.Margin_H      = ParaLayout.Margin_H;
         this.Margin_V      = ParaLayout.Margin_V;
         this.LineTop       = ParaLayout.LineTop;
@@ -3304,7 +3304,7 @@ CAnchorPosition.prototype =
         this.Page_Y        = PageLimits.Y;
     },
 
-    Calculate_X : function(bInline, RelativeFrom, bAlign, Value)
+    Calculate_X : function(bInline, RelativeFrom, bAlign, Value, bPercent)
     {
         if ( true === bInline )
         {
@@ -3416,16 +3416,22 @@ CAnchorPosition.prototype =
                             }
                         }
                     }
+                    else if (true === bPercent)
+                    {
+                        this.CalcX = this.Page_X + this.Left_Margin * Value / 100;
+                    }
                     else
+                    {
                         this.CalcX = Value;
+                    }
 
                     break;
                 }
 
                 case c_oAscRelativeFromH.Margin:
                 {
-                    var X_s = this.Left_Margin;
-                    var X_e = this.Page_W - this.Right_Margin;
+                    var X_s = this.Page_X + this.Left_Margin;
+                    var X_e = this.Page_X + this.Page_W - this.Right_Margin;
 
                     if ( true === bAlign )
                     {
@@ -3452,8 +3458,14 @@ CAnchorPosition.prototype =
                             }
                         }
                     }
+                    else if (true === bPercent)
+                    {
+                        this.CalcX = X_s + (X_e - X_s) * Value / 100;
+                    }
                     else
+                    {
                         this.CalcX = this.Margin_H + Value;
+                    }
 
                     break;
                 }
@@ -3485,16 +3497,22 @@ CAnchorPosition.prototype =
                             }
                         }
                     }
+                    else if (true === bPercent)
+                    {
+                        this.CalcX = this.Page_X + this.Page_W * Value / 100;
+                    }
                     else
+                    {
                         this.CalcX = Value + this.Page_X;
+                    }
 
                     break;
                 }
 
                 case c_oAscRelativeFromH.RightMargin:
                 {
-                    var X_s = this.Page_W - this.Right_Margin;
-                    var X_e = this.Page_W;
+                    var X_s = this.Page_X + this.Page_W - this.Right_Margin;
+                    var X_e = this.Page_X + this.Page_W;
 
                     if ( true === bAlign )
                     {
@@ -3521,8 +3539,14 @@ CAnchorPosition.prototype =
                             }
                         }
                     }
+                    else if (true === bPercent)
+                    {
+                        this.CalcX = X_s + (X_e - X_s) * Value / 100;
+                    }
                     else
+                    {
                         this.CalcX = X_s + Value;
+                    }
 
                     break;
                 }
@@ -3532,7 +3556,7 @@ CAnchorPosition.prototype =
         return this.CalcX;
     },
 
-    Calculate_Y : function(bInline, RelativeFrom, bAlign, Value)
+    Calculate_Y : function(bInline, RelativeFrom, bAlign, Value, bPercent)
     {
         if ( true === bInline )
         {
@@ -3573,8 +3597,17 @@ CAnchorPosition.prototype =
                             }
                         }
                     }
+                    else if (true === bPercent)
+                    {
+                        if (Math.abs(this.Page_Y) > 0.001)
+                            this.CalcY = this.Margin_V;
+                        else
+                            this.CalcY = _Y + this.Bottom_Margin * Value / 100;
+                    }
                     else
+                    {
                         this.CalcY = _Y + Value;
+                    }
 
                     break;
                 }
@@ -3642,8 +3675,17 @@ CAnchorPosition.prototype =
                             }
                         }
                     }
+                    else if (true === bPercent)
+                    {
+                        if (Math.abs(this.Page_Y) > 0.001)
+                            this.CalcY = this.Margin_V;
+                        else
+                            this.CalcY = Y_s + (Y_e - Y_s) * Value / 100;
+                    }
                     else
+                    {
                         this.CalcY = this.Margin_V + Value;
+                    }
 
                     break;
                 }
@@ -3674,8 +3716,17 @@ CAnchorPosition.prototype =
                             }
                         }
                     }
+                    else if (true === bPercent)
+                    {
+                        if (Math.abs(this.Page_Y) > 0.001)
+                            this.CalcY = this.Margin_V;
+                        else
+                            this.CalcY = this.Page_H * Value / 100;
+                    }
                     else
+                    {
                         this.CalcY = Value + this.Page_Y;
+                    }
 
                     break;
                 }
@@ -3722,6 +3773,13 @@ CAnchorPosition.prototype =
                                 break;
                             }
                         }
+                    }
+                    else if (true === bPercent)
+                    {
+                        if (Math.abs(this.Page_Y) > 0.001)
+                            this.CalcY = this.Margin_V;
+                        else
+                            this.CalcY = this.Top_Margin * Value / 100;
                     }
                     else
                         this.CalcY = Y_s + Value;
@@ -4018,7 +4076,8 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
     {
         RelativeFrom      : c_oAscRelativeFromH.Column, // Относительно чего вычисляем координаты
         Align             : false,                      // true : В поле Value лежит тип прилегания, false - в поле Value лежит точное значени
-        Value             : 0                           //
+        Value             : 0,                          //
+        Percent           : false                       // Значение Valuе задано в процентах
     };
 
     // Позиция по горизонтали
@@ -4026,7 +4085,8 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
     {
         RelativeFrom      : c_oAscRelativeFromV.Paragraph, // Относительно чего вычисляем координаты
         Align             : false,                         // true : В поле Value лежит тип прилегания, false - в поле Value лежит точное значени
-        Value             : 0                              //
+        Value             : 0,                             //
+        Percent           : false                          // Значение Valuе задано в процентах
     };
 
     // Данный поля используются для перемещения Flow-объекта
@@ -4396,7 +4456,7 @@ ParaDrawing.prototype =
         var bNeedUpdateWH = false, newW = this.Extent.W, newH = this.Extent.H;
         if ( undefined != Props.PositionH )
         {
-            this.Set_PositionH( Props.PositionH.RelativeFrom, Props.PositionH.UseAlign, ( true === Props.PositionH.UseAlign ? Props.PositionH.Align : Props.PositionH.Value ) );
+            this.Set_PositionH( Props.PositionH.RelativeFrom, Props.PositionH.UseAlign, ( true === Props.PositionH.UseAlign ? Props.PositionH.Align : Props.PositionH.Value ), Props.PositionH.Percent);
             if(Props.PositionH.UseAlign)
             {
                 bNeedUpdateWH = true;
@@ -4408,7 +4468,7 @@ ParaDrawing.prototype =
         }
         if ( undefined != Props.PositionV )
         {
-            this.Set_PositionV( Props.PositionV.RelativeFrom, Props.PositionV.UseAlign, ( true === Props.PositionV.UseAlign ? Props.PositionV.Align : Props.PositionV.Value ) );
+            this.Set_PositionV( Props.PositionV.RelativeFrom, Props.PositionV.UseAlign, ( true === Props.PositionV.UseAlign ? Props.PositionV.Align : Props.PositionV.Value ), Props.PositionV.Percent);
             if(this.PositionV.UseAlign)
             {
                 bNeedUpdateWH = true;
@@ -4587,8 +4647,8 @@ ParaDrawing.prototype =
         }
 
         var d = this.Distance;
-        c.Set_PositionH(this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value );
-        c.Set_PositionV(this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value );
+        c.Set_PositionH(this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value, this.PositionH.Percent);
+        c.Set_PositionV(this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value, this.PositionV.Percent);
         c.Set_Distance(d.L, d.T, d.R, d.B);
         c.Set_AllowOverlap(this.AllowOverlap);
         c.Set_WrappingType(this.wrappingType);
@@ -4671,6 +4731,7 @@ ParaDrawing.prototype =
             this.PositionH.RelativeFrom = this.PositionH_Old.RelativeFrom2;
             this.PositionH.Align        = this.PositionH_Old.Align2;
             this.PositionH.Value        = this.PositionH_Old.Value2;
+            this.PositionH.Percent      = this.PositionH_Old.Percent2;
         }
 
         if ( undefined != this.PositionV_Old )
@@ -4678,6 +4739,7 @@ ParaDrawing.prototype =
             this.PositionV.RelativeFrom = this.PositionV_Old.RelativeFrom2;
             this.PositionV.Align        = this.PositionV_Old.Align2;
             this.PositionV.Value        = this.PositionV_Old.Value2;
+            this.PositionV.Percent      = this.PositionV_Old.Percent2;
         }
 
         this.Parent          = Paragraph;
@@ -4705,8 +4767,8 @@ ParaDrawing.prototype =
                 H = this.getXfrmExtY();
         }
         this.Internal_Position.Set( W, H, this.YOffset, ParaLayout, PageLimitsOrigin);
-        this.Internal_Position.Calculate_X(bInline, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
-        this.Internal_Position.Calculate_Y(bInline, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
+        this.Internal_Position.Calculate_X(bInline, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value, this.PositionH.Percent);
+        this.Internal_Position.Calculate_Y(bInline, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value, this.PositionV.Percent);
         this.Internal_Position.Correct_Values(bInline, PageLimits, this.AllowOverlap, this.Use_TextWrap(), OtherFlowObjects);
 
         var OldPageNum = this.PageNum;
@@ -4721,12 +4783,13 @@ ParaDrawing.prototype =
             this.PositionH.RelativeFrom = this.PositionH_Old.RelativeFrom;
             this.PositionH.Align        = this.PositionH_Old.Align;
             this.PositionH.Value        = this.PositionH_Old.Value;
+            this.PositionH.Percent      = this.PositionH_Old.Percent;
 
             // Рассчитаем сдвиг с учетом старой привязки
             var Value = this.Internal_Position.Calculate_X_Value(this.PositionH_Old.RelativeFrom);
-            this.Set_PositionH( this.PositionH_Old.RelativeFrom, false, Value );
+            this.Set_PositionH(this.PositionH_Old.RelativeFrom, false, Value, false);
             // На всякий случай пересчитаем заново координату
-            this.X = this.Internal_Position.Calculate_X(bInline, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
+            this.X = this.Internal_Position.Calculate_X(bInline, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value, this.PositionH.Percent);
         }
 
         if ( undefined != this.PositionV_Old )
@@ -4735,12 +4798,13 @@ ParaDrawing.prototype =
             this.PositionV.RelativeFrom = this.PositionV_Old.RelativeFrom;
             this.PositionV.Align        = this.PositionV_Old.Align;
             this.PositionV.Value        = this.PositionV_Old.Value;
+            this.PositionV.Percent      = this.PositionV_Old.Percent;
 
             // Рассчитаем сдвиг с учетом старой привязки
             var Value = this.Internal_Position.Calculate_Y_Value(this.PositionV_Old.RelativeFrom);
-            this.Set_PositionV( this.PositionV_Old.RelativeFrom, false, Value );
+            this.Set_PositionV(this.PositionV_Old.RelativeFrom, false, Value, false);
             // На всякий случай пересчитаем заново координату
-            this.Y = this.Internal_Position.Calculate_Y(bInline, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value, PageLimitsOrigin);
+            this.Y = this.Internal_Position.Calculate_Y(bInline, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value, this.PositionV.Percent);
         }
 
         this.updatePosition3( this.PageNum, this.X, this.Y, OldPageNum );
@@ -4910,20 +4974,22 @@ ParaDrawing.prototype =
         this.AllowOverlap = AllowOverlap;
     },
 
-    Set_PositionH : function(RelativeFrom, Align, Value)
+    Set_PositionH : function(RelativeFrom, Align, Value, Percent)
     {
-        History.Add( this, { Type : historyitem_Drawing_PositionH, Old : { RelativeFrom : this.PositionH.RelativeFrom, Align : this.PositionH.Align, Value : this.PositionH.Value }, New : { RelativeFrom : RelativeFrom, Align : Align, Value : Value }  } );
+        History.Add( this, { Type : historyitem_Drawing_PositionH, Old : { RelativeFrom : this.PositionH.RelativeFrom, Align : this.PositionH.Align, Value : this.PositionH.Value, Percent : this.PositionH.Percent }, New : { RelativeFrom : RelativeFrom, Align : Align, Value : Value, Percent : Percent }  } );
         this.PositionH.RelativeFrom = RelativeFrom;
         this.PositionH.Align        = Align;
         this.PositionH.Value        = Value;
+        this.PositionH.Percent      = Percent;
     },
 
-    Set_PositionV : function(RelativeFrom, Align, Value)
+    Set_PositionV : function(RelativeFrom, Align, Value, Percent)
     {
-        History.Add( this, { Type : historyitem_Drawing_PositionV, Old : { RelativeFrom : this.PositionV.RelativeFrom, Align : this.PositionV.Align, Value : this.PositionV.Value }, New : { RelativeFrom : RelativeFrom, Align : Align, Value : Value }  } );
+        History.Add( this, { Type : historyitem_Drawing_PositionV, Old : { RelativeFrom : this.PositionV.RelativeFrom, Align : this.PositionV.Align, Value : this.PositionV.Value, Percent : this.PositionV.Percent }, New : { RelativeFrom : RelativeFrom, Align : Align, Value : Value, Percent : Percent }  } );
         this.PositionV.RelativeFrom = RelativeFrom;
         this.PositionV.Align        = Align;
         this.PositionV.Value        = Value;
+        this.PositionV.Percent      = Percent;
     },
 
     Set_Locked : function(bLocked)
@@ -4977,8 +5043,8 @@ ParaDrawing.prototype =
         var _H = (this.PositionV.Align ? this.Extent.H : this.getXfrmExtY() );
 
         this.Internal_Position.Set(_W, _H, this.YOffset, Layout.ParagraphLayout, Layout.PageLimits);
-        this.Internal_Position.Calculate_X(false, c_oAscRelativeFromH.Page, false, X - Layout.PageLimits.X);
-        this.Internal_Position.Calculate_Y(false, c_oAscRelativeFromV.Page, false, Y - Layout.PageLimits.Y);
+        this.Internal_Position.Calculate_X(false, c_oAscRelativeFromH.Page, false, X - Layout.PageLimits.X, false);
+        this.Internal_Position.Calculate_Y(false, c_oAscRelativeFromV.Page, false, Y - Layout.PageLimits.Y, false);
         this.Internal_Position.Correct_Values(false, Layout.PageLimits, this.AllowOverlap, this.Use_TextWrap(), []);
 
         if (true === bChangeX)
@@ -4987,10 +5053,10 @@ ParaDrawing.prototype =
 
             // Рассчитаем сдвиг с учетом старой привязки
             var ValueX = this.Internal_Position.Calculate_X_Value(this.PositionH.RelativeFrom);
-            this.Set_PositionH(this.PositionH.RelativeFrom, false, ValueX);
+            this.Set_PositionH(this.PositionH.RelativeFrom, false, ValueX, false);
 
             // На всякий случай пересчитаем заново координату
-            this.X = this.Internal_Position.Calculate_X(false, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
+            this.X = this.Internal_Position.Calculate_X(false, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value, this.PositionH.Percent);
         }
 
         if (true === bChangeY)
@@ -4999,10 +5065,10 @@ ParaDrawing.prototype =
 
             // Рассчитаем сдвиг с учетом старой привязки
             var ValueY = this.Internal_Position.Calculate_Y_Value(this.PositionV.RelativeFrom);
-            this.Set_PositionV(this.PositionV.RelativeFrom, false, ValueY);
+            this.Set_PositionV(this.PositionV.RelativeFrom, false, ValueY, false);
 
             // На всякий случай пересчитаем заново координату
-            this.Y = this.Internal_Position.Calculate_Y(false, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
+            this.Y = this.Internal_Position.Calculate_Y(false, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value, this.PositionV.Percent);
         }
     },
 
@@ -5255,6 +5321,7 @@ ParaDrawing.prototype =
                 this.PositionH.RelativeFrom = Data.Old.RelativeFrom;
                 this.PositionH.Align        = Data.Old.Align;
                 this.PositionH.Value        = Data.Old.Value;
+                this.PositionH.Percent      = Data.Old.Percent;
 
                 break;
             }
@@ -5264,6 +5331,7 @@ ParaDrawing.prototype =
                 this.PositionV.RelativeFrom = Data.Old.RelativeFrom;
                 this.PositionV.Align        = Data.Old.Align;
                 this.PositionV.Value        = Data.Old.Value;
+                this.PositionV.Percent      = Data.Old.Percent;
 
                 break;
             }
@@ -5399,6 +5467,7 @@ ParaDrawing.prototype =
                 this.PositionH.RelativeFrom = Data.New.RelativeFrom;
                 this.PositionH.Align        = Data.New.Align;
                 this.PositionH.Value        = Data.New.Value;
+                this.PositionH.Percent      = Data.New.Percent;
                 break;
             }
 
@@ -5407,6 +5476,7 @@ ParaDrawing.prototype =
                 this.PositionV.RelativeFrom = Data.New.RelativeFrom;
                 this.PositionV.Align        = Data.New.Align;
                 this.PositionV.Value        = Data.New.Value;
+                this.PositionV.Percent      = Data.New.Percent;
                 break;
             }
 
@@ -5791,6 +5861,7 @@ ParaDrawing.prototype =
                 // Bool : Align
                 //   true  -> Long   : Value
                 //   false -> Double : Value
+                // Bool : Percent
 
                 Writer.WriteLong( Data.New.RelativeFrom );
                 Writer.WriteBool( Data.New.Align );
@@ -5798,6 +5869,7 @@ ParaDrawing.prototype =
                     Writer.WriteLong( Data.New.Value );
                 else
                     Writer.WriteDouble( Data.New.Value );
+                Writer.WriteBool(Data.New.Percent);
 
                 break;
             }
@@ -5978,6 +6050,8 @@ ParaDrawing.prototype =
                 else
                     this.PositionH.Value = Reader.GetDouble();
 
+                this.PositionH.Percent = Reader.GetBool();
+
                 break;
             }
 
@@ -5995,6 +6069,8 @@ ParaDrawing.prototype =
                     this.PositionV.Value = Reader.GetLong();
                 else
                     this.PositionV.Value = Reader.GetDouble();
+
+                this.PositionV.Percent = Reader.GetBool();
 
                 break;
             }
@@ -6779,8 +6855,8 @@ ParaDrawing.prototype =
             g.setParent(c);
         }
         var d = this.Distance;
-        c.Set_PositionH( this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value );
-        c.Set_PositionV( this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value );
+        c.Set_PositionH( this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value, this.PositionH.Percent);
+        c.Set_PositionV( this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value, this.PositionV.Percent);
         c.Set_Distance(d.L, d.T, d.R, d.B);
         c.Set_AllowOverlap(this.AllowOverlap);
         c.Set_WrappingType(this.wrappingType);

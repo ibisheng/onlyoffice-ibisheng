@@ -2306,8 +2306,8 @@ CDocumentContent.prototype =
                     Drawing.Set_WrappingType( WRAPPING_TYPE_SQUARE );
                     Drawing.Set_BehindDoc( false );
                     Drawing.Set_Distance( 3.2, 0, 3.2, 0 );
-                    Drawing.Set_PositionH(c_oAscRelativeFromH.Column, false, 0);
-                    Drawing.Set_PositionV(c_oAscRelativeFromV.Paragraph, false, 0);
+                    Drawing.Set_PositionH(c_oAscRelativeFromH.Column, false, 0, false);
+                    Drawing.Set_PositionV(c_oAscRelativeFromV.Paragraph, false, 0, false);
                 }
                 this.Paragraph_Add( Drawing );
                 this.Select_DrawingObject( Drawing.Get_Id() );
@@ -2336,15 +2336,17 @@ CDocumentContent.prototype =
                 Drawing.Set_WrappingType( WRAPPING_TYPE_NONE );
                 Drawing.Set_BehindDoc( false );
                 Drawing.Set_Distance( 3.2, 0, 3.2, 0 );
-                Drawing.Set_PositionH(c_oAscRelativeFromH.Column, false, 0);
-                Drawing.Set_PositionV(c_oAscRelativeFromV.Paragraph, false, 0);
+                Drawing.Set_PositionH(c_oAscRelativeFromH.Column, false, 0, false);
+                Drawing.Set_PositionV(c_oAscRelativeFromV.Paragraph, false, 0, false);
                 if ( true == this.Selection.Use )
                     this.Remove( 1, true );
                 this.Paragraph_Add( Drawing );
-                if(TextArt.bSelectedText){
+                if(TextArt.bSelectedText)
+                {
                     this.Select_DrawingObject(Drawing.Get_Id());
                 }
-                else{
+                else
+                {
                     var oContent = Drawing.GraphicObj.getDocContent();
                     oContent.Content[0].Document_SetThisElementCurrent(false);
                     this.LogicDocument.Select_All();

@@ -25,6 +25,7 @@ function CImagePositionH(obj)
         this.UseAlign     = ( undefined === obj.UseAlign     ) ? undefined : obj.UseAlign;
         this.Align        = ( undefined === obj.Align        ) ? undefined : obj.Align;
         this.Value        = ( undefined === obj.Value        ) ? undefined : obj.Value;
+        this.Percent      = ( undefined === obj.Percent      ) ? undefined : obj.Percent;
     }
     else
     {
@@ -32,6 +33,7 @@ function CImagePositionH(obj)
         this.UseAlign     = undefined;
         this.Align        = undefined;
         this.Value        = undefined;
+        this.Percent      = undefined;
     }
 }
 
@@ -43,6 +45,9 @@ CImagePositionH.prototype.get_Align = function()  { return this.Align; };
 CImagePositionH.prototype.put_Align = function(v) { this.Align = v; };
 CImagePositionH.prototype.get_Value = function()  { return this.Value; };
 CImagePositionH.prototype.put_Value = function(v) { this.Value = v; };
+CImagePositionH.prototype.get_Percent = function() {return this.Percent};
+CImagePositionH.prototype.put_Percent = function(v) {this.Percent = v;};
+
 
 function CImagePositionV(obj)
 {
@@ -52,6 +57,7 @@ function CImagePositionV(obj)
         this.UseAlign     = ( undefined === obj.UseAlign     ) ? undefined : obj.UseAlign;
         this.Align        = ( undefined === obj.Align        ) ? undefined : obj.Align;
         this.Value        = ( undefined === obj.Value        ) ? undefined : obj.Value;
+        this.Percent      = ( undefined === obj.Percent      ) ? undefined : obj.Percent;
     }
     else
     {
@@ -59,6 +65,7 @@ function CImagePositionV(obj)
         this.UseAlign     = undefined;
         this.Align        = undefined;
         this.Value        = undefined;
+        this.Percent      = undefined;
     }
 }
 
@@ -70,6 +77,8 @@ CImagePositionV.prototype.get_Align = function()  { return this.Align; };
 CImagePositionV.prototype.put_Align = function(v) { this.Align = v; };
 CImagePositionV.prototype.get_Value = function()  { return this.Value; };
 CImagePositionV.prototype.put_Value = function(v) { this.Value = v; };
+CImagePositionV.prototype.get_Percent = function() {return this.Percent};
+CImagePositionV.prototype.put_Percent = function(v) {this.Percent = v;};
 
 function CPosition( obj )
 {

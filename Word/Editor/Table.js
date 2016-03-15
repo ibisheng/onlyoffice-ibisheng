@@ -76,7 +76,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     };
 
     this.Pr = new CTablePr();
-    this.Pr.TableW = new CTableMeasurement( tblwidth_Auto, 0 );
+    this.Pr.TableW = new CTableMeasurement(tblwidth_Auto, 0);
 
     this.TableGridNeedRecalc = true;
     this.bPresentation = bPresentation === true;
@@ -228,10 +228,12 @@ CTable.prototype =
 
         var Pr = {};
 
-        if ( tblwidth_Auto === TablePr.TableW.Type )
+        if (tblwidth_Auto === TablePr.TableW.Type)
             Pr.TableWidth = null;
-        else
+        else if (tblwidth_Mm === TablePr.TableW.Type)
             Pr.TableWidth = TablePr.TableW.W;
+        else// if (tblwidth_Pct === TablePr.TableW.Type)
+            Pr.TableWidth = -TablePr.TableW.W;
 
         Pr.AllowOverlap = this.AllowOverlap;
 
@@ -1081,20 +1083,22 @@ CTable.prototype =
         }
 
         // TableWidth (ширина таблицы)
-        if ( "undefined" != typeof(Props.TableWidth) )
+        if (undefined !== Props.TableWidth)
         {
-            if ( null === Props.TableWidth && tblwidth_Auto != TablePr.TableW.Type )
+            if (null === Props.TableWidth && tblwidth_Auto != TablePr.TableW.Type)
             {
-                this.Set_TableW( tblwidth_Auto, 0 );
+                this.Set_TableW(tblwidth_Auto, 0);
                 bRecalc_All = true;
             }
-            else if ( null != Props.TableWidth )
+            else if (Props.TableWidth > -0.001)
             {
-                if ( tblwidth_Auto === TablePr.TableW.Type || Props.TableWidth != TablePr.TableW.W )
-                {
-                    this.Set_TableW( tblwidth_Mm, Props.TableWidth );
-                    bRecalc_All = true;
-                }
+                this.Set_TableW(tblwidth_Mm, Props.TableWidth);
+                bRecalc_All = true;
+            }
+            else
+            {
+                this.Set_TableW(tblwidth_Pct, Math.abs(Props.TableWidth));
+                bRecalc_All = true;
             }
         }
 
@@ -2726,6 +2730,12 @@ CTable.prototype =
                     var CellMargins  = Cell.Get_Margins();
                     var CellMarginsW = CellMargins.Left.W + CellMargins.Right.W;
                     var CellW        = Cell.Get_W();
+                    var CellWW       = null;
+
+                    if (tblwidth_Mm === CellW.Type)
+                        CellWW = CellW.W;
+                    else if (tblwidth_Pct === CellW.Type)
+                        CellWW = (this.XLimit - this.X) * CellW.W / 100;
 
                     // Если GridSpan > 1, тогда все равно маргины учитываются в первую колоноку спана
                     if (MinMargin[CurGridCol] < CellMarginsW)
@@ -2741,16 +2751,16 @@ CTable.prototype =
                         if (false === MaxFlags[CurGridCol] && MaxContent[CurGridCol] < CellMax)
                             MaxContent[CurGridCol] = CellMax;
 
-                        if (CellW.Type === tblwidth_Mm)
+                        if (null !== CellWW)
                         {
                             if (false === MaxFlags[CurGridCol])
                             {
                                 MaxFlags[CurGridCol]   = true;
-                                MaxContent[CurGridCol] = Math.max(CellW.W, CellMin);
+                                MaxContent[CurGridCol] = Math.max(CellWW, CellMin);
                             }
                             else
                             {
-                                MaxContent[CurGridCol] = Math.max(MaxContent[CurGridCol], CellW.W, CellMin);
+                                MaxContent[CurGridCol] = Math.max(MaxContent[CurGridCol], CellWW, CellMin);
                             }
                         }
                     }
@@ -2774,8 +2784,8 @@ CTable.prototype =
                         // Если у нас в объединении несколько колонок, тогда явно записанная ширина ячейки не
                         // перекрывает ширину ни одной из колонок, она всего лишь участвует в определении
                         // максимальной ширины.
-                        if (CellW.Type === tblwidth_Mm && CellW.W > CellMax)
-                            CellMax = CellW.W;
+                        if (null !== CellWW && CellWW > CellMax)
+                            CellMax = CellWW;
 
                         if (SumSpanMaxContent < CellMax)
                         {

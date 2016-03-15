@@ -3412,19 +3412,33 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                 var Page_Width  = LD_PageLimits.XLimit;
                 var Page_Height = LD_PageLimits.YLimit;
 
-                var X_Left_Field   = LD_PageFields.X;
-                var Y_Top_Field    = LD_PageFields.Y;
-                var X_Right_Field  = LD_PageFields.XLimit;
-                var Y_Bottom_Field = LD_PageFields.YLimit;
-
-                var X_Left_Margin   = X_Left_Field;
-                var X_Right_Margin  = Page_Width  - X_Right_Field;
-                var Y_Bottom_Margin = Page_Height - Y_Bottom_Field;
-                var Y_Top_Margin    = Y_Top_Field;
-
                 var DrawingObjects = Para.Parent.DrawingObjects;
                 var PageLimits     = Para.Parent.Get_PageLimits(PageRel);
                 var PageFields     = Para.Parent.Get_PageFields(PageRel);
+
+                var X_Left_Field   = PageFields.X;
+                var Y_Top_Field    = PageFields.Y;
+                var X_Right_Field  = PageFields.XLimit;
+                var Y_Bottom_Field = PageFields.YLimit;
+
+                var X_Left_Margin   = PageFields.X - PageLimits.X;
+                var Y_Top_Margin    = PageFields.Y - PageLimits.Y;
+                var X_Right_Margin  = PageLimits.XLimit - PageFields.XLimit;
+                var Y_Bottom_Margin = PageLimits.YLimit - PageFields.YLimit;
+
+                if (true === Para.Parent.Is_TableCellContent() && (true !== Item.Use_TextWrap() || false === Item.Is_LayoutInCell()))
+                {
+                    X_Left_Field   = LD_PageFields.X;
+                    Y_Top_Field    = LD_PageFields.Y;
+                    X_Right_Field  = LD_PageFields.XLimit;
+                    Y_Bottom_Field = LD_PageFields.YLimit;
+
+                    X_Left_Margin   = X_Left_Field;
+                    X_Right_Margin  = Page_Width  - X_Right_Field;
+                    Y_Bottom_Margin = Page_Height - Y_Bottom_Field;
+                    Y_Top_Margin    = Y_Top_Field;
+                }
+
 
                 var ColumnStartX = (0 === CurPage ? Para.X_ColumnStart : Para.Pages[CurPage].X     );
                 var ColumnEndX   = (0 === CurPage ? Para.X_ColumnEnd   : Para.Pages[CurPage].XLimit);

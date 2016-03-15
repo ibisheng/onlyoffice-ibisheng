@@ -8265,8 +8265,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
                 if(c_oAscWrapStyle.Flow == image.Type)
                 {
                     drawing.Set_DrawingType(drawing_Anchor);
-                    drawing.Set_PositionH(c_oAscRelativeFromH.Page, false, image.X);
-                    drawing.Set_PositionV(c_oAscRelativeFromV.Page, false, image.Y);
+                    drawing.Set_PositionH(c_oAscRelativeFromH.Page, false, image.X, false);
+                    drawing.Set_PositionV(c_oAscRelativeFromV.Page, false, image.Y, false);
                     if(image.Paddings)
                         drawing.Set_Distance(image.Paddings.Left, image.Paddings.Top, image.Paddings.Right, image.Paddings.Bottom);
                 }
@@ -8637,24 +8637,26 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			var oNewPositionH = {
 				RelativeFrom      : c_oAscRelativeFromH.Column, // Относительно чего вычисляем координаты
 				Align             : false,                      // true : В поле Value лежит тип прилегания, false - в поле Value лежит точное значени
-				Value             : 0                           //
+				Value             : 0,                          //
+                Percent           : false
 			};
 			res = this.bcr.Read2(length, function(t, l){
                     return oThis.ReadPositionHV(t, l, oNewPositionH);
                 });
-			oParaDrawing.Set_PositionH(oNewPositionH.RelativeFrom , oNewPositionH.Align , oNewPositionH.Value);
+			oParaDrawing.Set_PositionH(oNewPositionH.RelativeFrom , oNewPositionH.Align , oNewPositionH.Value, oNewPositionH.Percent);
 		}
 		else if( c_oSerImageType2.PositionV === type )
 		{
 			var oNewPositionV = {
 				RelativeFrom      : c_oAscRelativeFromV.Paragraph, // Относительно чего вычисляем координаты
 				Align             : false,                         // true : В поле Value лежит тип прилегания, false - в поле Value лежит точное значени
-				Value             : 0                              //
+				Value             : 0,                             //
+                Percent           : false
 			};
 			res = this.bcr.Read2(length, function(t, l){
                     return oThis.ReadPositionHV(t, l, oNewPositionV);
                 });
-			oParaDrawing.Set_PositionV(oNewPositionV.RelativeFrom , oNewPositionV.Align , oNewPositionV.Value);
+			oParaDrawing.Set_PositionV(oNewPositionV.RelativeFrom , oNewPositionV.Align , oNewPositionV.Value, oNewPositionV.Percent);
 		}
 		else if( c_oSerImageType2.SimplePos === type )
 		{
