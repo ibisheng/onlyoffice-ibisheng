@@ -1303,8 +1303,8 @@
     this.getWorksheet().emptySelection(c_oAscCleanOptions.Text);
   };
 
-  WorkbookView.prototype._onAddColumn = function(isNotActive) {
-    var res = this.getWorksheet().expandColsOnScroll(isNotActive);
+  WorkbookView.prototype._onAddColumn = function() {
+    var res = this.getWorksheet().expandColsOnScroll(true);
     if (res) {
 		if(res == 1)
       		this.controller.reinitializeScroll(/*horizontal*/2);
@@ -1313,8 +1313,8 @@
     }
   };
 
-  WorkbookView.prototype._onAddRow = function(isNotActive) {
-    var res = this.getWorksheet().expandRowsOnScroll(isNotActive);
+  WorkbookView.prototype._onAddRow = function() {
+    var res = this.getWorksheet().expandRowsOnScroll(true);
     if (res) {  // Добавлены строки
       // после добавления controller.settings.wheelScrollLines
       // ws.scrollVertical() здесь не нужен, scroll.js сам все разрулит

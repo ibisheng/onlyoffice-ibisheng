@@ -1555,7 +1555,8 @@ function ScrollObject( elemID, settings, dbg ) {
 
     this.scroller = {x:0, y:1, h:0, w:0};
 
-	this.correct = 0;
+    this.endByX = false;
+    this.endByY = false;
 
     this.canvas = null;
     this.context = null;
@@ -1984,11 +1985,11 @@ ScrollObject.prototype = {
             isTop = true;
             isBottom = false;
         }
-        else if ( destY > this.maxScrollY ) {
+        else if ( destY > this.maxScrollY && !this.endByY ) {
             // Новое смещение превышает maxScroll, надо вызвать ивент, спрашивающий что делать.
             // Чтобы не создавать новый, использую onscrollVEnd, он все равно больше нигде не используется
             // 50 = max число wheelScrollLine, если она больше, то будет работать неправильно
-			for ( var c = 50; destY > this.maxScrollY+this.correct && c > 0; --c ) {
+			for ( var c = 50; destY > this.maxScrollY && c > 0; --c ) {
                 this.handleEvents( "onscrollVEnd", {} );
                 vend = true;
             }
@@ -1996,7 +1997,8 @@ ScrollObject.prototype = {
                 // Обработчик onscrollVEnd решил, что расширение области скрола не нужно, изменяем destY
                 destY = this.maxScrollY;
             }
-            isTop = false, isBottom = true;
+            isTop = false;
+            isBottom = true;
         }
 
         this.scroller.y = destY / Math.max( 1, this.scrollCoeff ) + this.arrowPosition;
@@ -2051,15 +2053,16 @@ ScrollObject.prototype = {
             isTop = true;
             isBottom = false;
         }
-        else if ( destX > this.maxScrollX ) {
-            for ( var c = 50; destX > this.maxScrollX+this.correct && c > 0; --c ) {
+        else if ( destX > this.maxScrollX && !this.endByX ) {
+            for ( var c = 50; destX > this.maxScrollX && c > 0; --c ) {
                 this.handleEvents( "onscrollHEnd", {} );
                 hend = true;
             }
             if ( destX > this.maxScrollX ) {
                 destX = this.maxScrollX;
             }
-            isTop = false, isBottom = true;
+            isTop = false;
+            isBottom = true;
         }
 
         this.scroller.x = destX / Math.max( 1, this.scrollCoeff ) + this.arrowPosition;

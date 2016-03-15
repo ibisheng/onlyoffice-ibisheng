@@ -5789,15 +5789,16 @@
                     offsetX: offsetX, offsetY: offsetY
                 } ) );
             }
-            // Отрисовывать нужно всегда, вдруг бордеры
-            this._drawFrozenPaneLines();
-            this._fixSelectionOfMergedCells();
-            this._drawSelection();
-
-            if ( widthChanged ) {
-                this.handlers.trigger( "reinitializeScrollX" );
-            }
         }
+        // Отрисовывать нужно всегда, вдруг бордеры
+        this._drawFrozenPaneLines();
+        this._fixSelectionOfMergedCells();
+        this._drawSelection();
+
+        if (widthChanged) {
+            this.handlers.trigger("reinitializeScrollX");
+        }
+
 
         if ( reinitScrollY ) {
             this.handlers.trigger( "reinitializeScrollY" );
@@ -5946,14 +5947,15 @@
                     offsetX: offsetX, offsetY: offsetY
                 } ) );
             }
-            // Отрисовывать нужно всегда, вдруг бордеры
-            this._drawFrozenPaneLines();
-            this._fixSelectionOfMergedCells();
-            this._drawSelection();
         }
 
-        if ( reinitScrollX ) {
-            this.handlers.trigger( "reinitializeScrollX" );
+        // Отрисовывать нужно всегда, вдруг бордеры
+        this._drawFrozenPaneLines();
+        this._fixSelectionOfMergedCells();
+        this._drawSelection();
+
+        if (reinitScrollX) {
+            this.handlers.trigger("reinitializeScrollX");
         }
 
         this.handlers.trigger( "onDocumentPlaceChanged" );

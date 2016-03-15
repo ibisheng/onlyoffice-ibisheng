@@ -219,8 +219,11 @@
 			this.isSelectionDialogMode = isSelectionDialogMode;
 		};
 
-		/** @param [whichSB] {Number}  Scroll bar to reinit (1=vertical, 2=horizontal) */
-		asc_CEventsController.prototype.reinitializeScroll = function (whichSB,canScroll) {
+		/**
+		 * @param [whichSB] {Number}  Scroll bar to reinit (1=vertical, 2=horizontal)
+		 * @param [endScroll] {Boolean}  Scroll in the end of document
+		 * */
+		asc_CEventsController.prototype.reinitializeScroll = function (whichSB, endScroll) {
 		    if (window["NATIVE_EDITOR_ENJINE"])
 		        return;
 
@@ -236,19 +239,13 @@
 						vSize = self.vsb.offsetHeight + Math.max( (vSize + 1) * opt.vscrollStep, 1 );
 //                        this.m_dScrollY_max = vSize;
     					self.vsbHSt.height = vSize + "px";
-						self.vsbApi.correct = 0;
-						if ( canScroll ) {
-							self.vsbApi.correct = opt.vscrollStep * 5;
-						}
+						self.vsbApi.endByY = !!endScroll;
 						self.vsbApi.Reinit(opt, opt.vscrollStep * ws.getFirstVisibleRow(/*allowPane*/true));
 					}
 					if (isHoriz) {
 						hSize = self.hsb.offsetWidth + Math.max( (hSize + 1) * opt.hscrollStep, 1 );
 //                        this.m_dScrollX_max = hSize ;
-						self.hsbHSt.correct = 0;
-						if ( canScroll ) {
-							self.hsbApi.correct = opt.hscrollStep * 5;
-						}
+						self.hsbApi.endByX = !!endScroll;
 						self.hsbHSt.width = hSize + "px";
 						self.hsbApi.Reinit(opt, opt.hscrollStep * ws.getFirstVisibleCol(/*allowPane*/true));
 					}
@@ -354,7 +351,7 @@
 					self.handlers.trigger("scrollY", evt.scrollPositionY / opt.vscrollStep);
 				});
 				this.vsbApi.bind("scrollVEnd", function(evt) {
-					self.handlers.trigger("addRow",true);
+					self.handlers.trigger("addRow");
 				});
 				this.vsbApi.onLockMouse = function(evt){
                     self.vsbApiLockMouse = true;
@@ -377,7 +374,7 @@
 					self.handlers.trigger("scrollX", evt.scrollPositionX / opt.hscrollStep);
 				});
 				this.hsbApi.bind("scrollHEnd",function(evt) {
-						self.handlers.trigger("addColumn",true);
+						self.handlers.trigger("addColumn");
 					});
 				this.hsbApi.onLockMouse = function(){
                     self.hsbApiLockMouse = true;
