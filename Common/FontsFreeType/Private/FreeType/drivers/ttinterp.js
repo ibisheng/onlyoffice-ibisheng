@@ -1776,13 +1776,13 @@ function TT_MulFix14(a, b)
     if (b < 0)
         b = -b;
 
-    var ah = ((a >> 16) & 0xFFFF);
+    var ah = ((a >>> 16) & 0xFFFF);
     var al = (a & 0xFFFF);
 
     var lo = FT_Common.IntToUInt((al * b) & 0xFFFFFFFF);
     var mid = FT_Common.IntToUInt((ah * b) & 0xFFFFFFFF);
-    var hi = FT_Common.IntToUInt(mid >> 16);
-    mid = FT_Common.IntToUInt(((mid << 16) + (1 << 13)) & 0xFFFFFFFF); /* rounding */
+    var hi = mid >>> 16;
+    mid = FT_Common.IntToUInt((mid << 16) & 0xFFFFFFFF) + (1 << 13); /* rounding */
     lo += mid;
 
     lo = FT_Common.IntToUInt(lo & 0xFFFFFFFF);
@@ -1790,7 +1790,7 @@ function TT_MulFix14(a, b)
     if (lo < mid)
         hi += 1;
 
-    mid = FT_Common.IntToUInt(((lo >> 14) | (hi << 18)) & 0xFFFFFFFF);
+    mid = FT_Common.IntToUInt(((lo >>> 14) | (hi << 18)) & 0xFFFFFFFF);
 
     //console.log("(" + a + ", " + b + "): " + (sign >= 0 ? mid : -mid));
 
@@ -4985,7 +4985,7 @@ function Ins_MDRP(exc, args, args_pos)
         if (bIsSubpix)
         {
             if (exc.ignore_x_mode && exc.GS.freeVector.x != 0)
-                distance = Round_None(org_dist, exc.tt_metrics.compensations[exc.opcode & 3]);
+                distance = Round_None(exc, org_dist, exc.tt_metrics.compensations[exc.opcode & 3]);
             else
                 distance = exc.func_round(exc, org_dist, exc.tt_metrics.compensations[exc.opcode & 3]);
         }

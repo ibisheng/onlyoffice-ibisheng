@@ -1008,29 +1008,30 @@ function Int64()
 }
 function ft_multo64(x, y, z)
 {
-    var lo1, hi1, lo2, hi2, lo, hi, i1, i2;
+    var lo1 = x & 0x0000FFFF;  var hi1 = x >>> 16;
+    var lo2 = y & 0x0000FFFF;  var hi2 = y >>> 16;
 
-    lo1 = x & 0x0000FFFF;  hi1 = x >>> 16;
-    lo2 = y & 0x0000FFFF;  hi2 = y >>> 16;
+    var lo = lo1 * lo2;
+    var i1 = lo1 * hi2;
+    var i2 = lo2 * hi1;
+    var hi = hi1 * hi2;
 
-    lo = lo1 * lo2;
-    i1 = lo1 * hi2;
-    i2 = lo2 * hi1;
-    hi = hi1 * hi2;
-
-
+    /* Check carry overflow of i1 + i2 */
     i1 += i2;
     if (i1 < i2)
         hi += (1 << 16);
     
-    hi += i1 >>> 16;
+    hi += (i1 >>> 16);
     i1  = (i1 << 16) & 0xFFFFFFFF;
     if (i1 < 0)
         i1 += FT_Common.a_i;
 
-
-    
+    /* Check carry overflow of i1 + lo */
     lo += i1;
+
+    if (lo > FT_Common.a_i)
+        lo = FT_Common.IntToUInt(lo & 0xFFFFFFFF);
+
     if (lo < i1)
         hi++;
 
@@ -1043,17 +1044,15 @@ function ft_div64by32(hi, lo, y)
     var r = hi;
 
     if (r >= y)
-        return 2147483647;
+        return 0x7FFFFFFF;
 
     var i = 32;
     do
     {
         r = (r << 1) & 0xFFFFFFFF;
         q = (q << 1) & 0xFFFFFFFF;
-        if (q < 0)
-            q += FT_Common.a_i;
 
-        r  |= lo >>> 31;
+        r  |= (lo >>> 31);
         if (r < 0)
             r += FT_Common.a_i;
 
@@ -1062,6 +1061,10 @@ function ft_div64by32(hi, lo, y)
             r -= y;
             q |= 1;
         }
+
+        if (q < 0)
+            q += FT_Common.a_i;
+
         lo = (lo << 1) & 0xFFFFFFFF;
         if (lo < 0)
             lo += FT_Common.a_i;
@@ -1089,14 +1092,13 @@ function FT_MulDiv(a, b, c)
     if (a == 0 || b == c)
         return a;
 
-    var s = 1;
-    if ( a < 0 ) { a = -a; s = -1; }
-    if ( b < 0 ) { b = -b; s = -s; }
-    if ( c < 0 ) { c = -c; s = -s; }
+    var s  = a; a = Math.abs(a);
+    s ^= b; b = Math.abs(b);
+    s ^= c; c = Math.abs(c);
 
     if (a <= 46340 && b <= 46340 && c <= 176095 && c > 0)
         a = ((a * b + (c >> 1)) / c) >> 0;
-    else if (c > 0)
+    else if (FT_Common.UintToInt(c) > 0)
     {
         ft_multo64(a >= 0 ? a : a + FT_Common.a_i, b >= 0 ? b : b + FT_Common.a_i, temp1);
 
@@ -1157,22 +1159,21 @@ function FT_DivFix(a, b)
     {
         q = 0x7FFFFFFF;
     }
-    else if ((a >> 16) == 0)
+    else if ((a >>> 16) == 0)
     {
-        q = parseInt((a * 65536 + parseInt(b / 2)) / b);
-        //q = parseInt((((a << 16) & 0xFFFFFFFF) + (b >> 1)) / b);
+        q = ((a * 65536 + (b >>> 1)) / b) >> 0;
         if (q < 0)
             q += FT_Common.a_i;
     }
     else
     {
-        temp1.hi  = (a >> 16);
+        temp1.hi  = (a >>> 16);
         temp1.lo  = (a << 16) & 0xFFFFFFFF;
         if (temp1.lo < 0)
             temp1.lo += FT_Common.a_i;
 
         temp2.hi = 0;
-        temp2.lo = (b >> 1);
+        temp2.lo = (b >>> 1);
 
         if (temp2.lo < 0)
             temp2.lo += FT_Common.a_i;
