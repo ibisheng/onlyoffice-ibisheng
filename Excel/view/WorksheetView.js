@@ -7182,7 +7182,7 @@
         var curTablePart = tablePartsOptions >= 0 ? this.model.TableParts[tablePartsOptions] : null;
 
         cell_info.autoFilterInfo = new asc_CAutoFilterInfo();
-        cell_info.autoFilterInfo.tableStyleName = curTablePart ? curTablePart.TableStyleInfo.Name : null;
+        cell_info.autoFilterInfo.tableStyleName = curTablePart && curTablePart.TableStyleInfo ? curTablePart.TableStyleInfo.Name : null;
         cell_info.autoFilterInfo.tableName = curTablePart ? curTablePart.DisplayName : null;
         if ( -2 === tablePartsOptions ) {
             cell_info.autoFilterInfo.isAutoFilter = null;

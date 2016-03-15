@@ -451,8 +451,11 @@ var maxIndividualValues = 10000;
 					History.StartTransaction();
 					
 					cloneFilter = isTablePartsContainsRange.clone(null);
-							
+
+                    if(!isTablePartsContainsRange.TableStyleInfo)
+                        isTablePartsContainsRange.TableStyleInfo = new TableStyleInfo();
 					isTablePartsContainsRange.TableStyleInfo.Name = styleName;
+
 					t._setColorStyleTable(isTablePartsContainsRange.Ref, isTablePartsContainsRange);
 					
 					ws._onUpdateFormatTable(isTablePartsContainsRange.Ref, false, true);
@@ -1342,8 +1345,10 @@ var maxIndividualValues = 10000;
 						for(var i = 0; i < selectedTableParts.length; i++)
 						{
 							var cloneFilter = selectedTableParts[i].clone(null);
-							
-							selectedTableParts[i].TableStyleInfo.Name = null;
+
+                            if(selectedTableParts[i].TableStyleInfo)
+							    selectedTableParts[i].TableStyleInfo.Name = null;
+
 							t._cleanStyleTable(selectedTableParts[i].Ref);
 							
 							t._addHistoryObj(cloneFilter, historyitem_AutoFilter_CleanFormat, {activeCells: range});
@@ -4460,7 +4465,7 @@ var maxIndividualValues = 10000;
 				if((bbox.c2 - bbox.c1) > maxValCol)
 					bbox.c2 = bbox.c1 + maxValCol;
 				
-				var style = options.TableStyleInfo.clone();
+				var style = options.TableStyleInfo ? options.TableStyleInfo.clone() : null;
 				var styleForCurTable;
 				//todo из файла
 				var headerRowCount = 1;
