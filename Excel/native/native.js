@@ -777,7 +777,6 @@ var FT_Common = new _FT_Common();
 
 var global_memory_stream_menu = CreateNativeMemoryStream();
 
-
 function asc_menu_ReadColor(_params, _cursor) {
     var _color = new asc_CColor();
     var _continue = true;
@@ -3032,7 +3031,7 @@ function OfflineEditor () {
             region = this._updateRegion(worksheet, x, y, width, height);
         }
 
-        this.selection = _api.wb.getWorksheet()._getDrawSelection_Local(region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd);
+        this.selection = _api.wb.getWorksheet().__selection(region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd);
 
         return this.selection;
     };
@@ -3168,13 +3167,13 @@ function OfflineEditor () {
         var colRowHeaders = _api.asc_getSheetViewSettings();
 
         if (colRowHeaders.asc_getShowGridLines()) {
-            worksheet._drawGrid_Local(undefined,
+            worksheet.__drawGrid(undefined,
                 region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd,
                 worksheet.cols[region.columnBeg].left + region.columnOff, worksheet.rows[region.rowBeg].top + region.rowOff,
                 width + region.columnOff, height + region.rowOff);
         }
 
-        worksheet._drawCellsAndBorders_Local(undefined,
+        worksheet.__drawCellsAndBorders(undefined,
             region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd,
             worksheet.cols[region.columnBeg].left + region.columnOff, worksheet.rows[region.rowBeg].top + region.rowOff);
     };
@@ -3190,9 +3189,9 @@ function OfflineEditor () {
         var isRow = type == PageType.PageLeftType || type == PageType.PageCornerType;
 
         if (!isColumn && isRow)
-            worksheet._drawRowHeaders_Local(undefined, region.rowBeg, region.rowEnd, undefined, 0, region.rowOff);
+            worksheet.__drawRowHeaders(undefined, region.rowBeg, region.rowEnd, undefined, 0, region.rowOff);
         else if (isColumn && !isRow)
-            worksheet._drawColumnHeaders_Local(undefined, region.columnBeg, region.columnEnd, undefined, region.columnOff, 0);
+            worksheet.__drawColumnHeaders(undefined, region.columnBeg, region.columnEnd, undefined, region.columnOff, 0);
         else if (isColumn && isRow)
             worksheet._drawCorner();
     };
@@ -4449,9 +4448,9 @@ function offline_mouse_move(x, y, isViewerMode, isRangeResize, isChartRange, ind
                 ws.enterCellRange(wb.cellEditor);
             } else {
                 if (-1 == _s.cellPin)
-                    ws._changeSelectionTopLeft(x, y, true, true, true);
+                    ws.__changeSelectionTopLeft(x, y, true, true, true);
                 else if (1 === _s.cellPin)
-                    ws._changeSelectionTopLeft(x, y, true, true, false);
+                    ws.__changeSelectionTopLeft(x, y, true, true, false);
                 else {
                     ws.changeSelectionEndPoint(x, y, true, true);
                 }

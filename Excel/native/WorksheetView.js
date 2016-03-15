@@ -1,7 +1,7 @@
 
 window["Asc"].WorksheetView = WorksheetView;
 
-WorksheetView.prototype._drawColumnHeaders_Local = function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
+WorksheetView.prototype.__drawColumnHeaders = function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
     if (undefined === drawingCtx && false === this.model.sheetViews[0].asc_getShowRowColHeaders())
         return;
 
@@ -33,12 +33,12 @@ WorksheetView.prototype._drawColumnHeaders_Local = function (drawingCtx, start, 
 
     // draw column headers
     for (var i = start; i <= end; ++i) {
-        this._drawHeader_Local(drawingCtx, c[i].left - c[start].left - offsetX, offsetY,
+        this.__drawHeader(drawingCtx, c[i].left - c[start].left - offsetX, offsetY,
             c[i].width, this.headersHeight, style, true, i);
     }
 };
 
-WorksheetView.prototype._drawHeader_Local = function (drawingCtx, x, y, w, h, style, isColHeader, index) {
+WorksheetView.prototype.__drawHeader = function (drawingCtx, x, y, w, h, style, isColHeader, index) {
     // Для отрисовки невидимого столбца/строки
     var isZeroHeader = false;
     if (-1 !== index) {
@@ -137,7 +137,7 @@ WorksheetView.prototype._drawHeader_Local = function (drawingCtx, x, y, w, h, st
     }
 };
 
-WorksheetView.prototype._drawRowHeaders_Local = function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
+WorksheetView.prototype.__drawRowHeaders = function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
     if (undefined === drawingCtx && false === this.model.sheetViews[0].asc_getShowRowColHeaders())
         return;
 
@@ -169,18 +169,18 @@ WorksheetView.prototype._drawRowHeaders_Local = function (drawingCtx, start, end
 
     // draw row headers
     for (var i = start; i <= end; ++i) {
-        this._drawHeader_Local(drawingCtx, offsetX, r[i].top - r[start].top - offsetY,
+        this.__drawHeader(drawingCtx, offsetX, r[i].top - r[start].top - offsetY,
             this.headersWidth, r[i].height, style, false, i);
     }
 };
 
-WorksheetView.prototype._drawGrid_Local = function (drawingCtx, c1, r1, c2, r2, leftFieldInPt, topFieldInPt, width, height) {
+WorksheetView.prototype.__drawGrid = function (drawingCtx, c1, r1, c2, r2, leftFieldInPt, topFieldInPt, width, height) {
     var range = new asc_Range(c1, r1, c2, r2);
     this._prepareCellTextMetricsCache(range);
     this._drawGrid(drawingCtx, range, leftFieldInPt, topFieldInPt, width, height);
 };
 
-WorksheetView.prototype._drawCellsAndBorders_Local = function (drawingCtx,  c1, r1, c2, r2, offsetXForDraw, offsetYForDraw) {
+WorksheetView.prototype.__drawCellsAndBorders = function (drawingCtx,  c1, r1, c2, r2, offsetXForDraw, offsetYForDraw) {
     var range = new asc_Range(c1, r1, c2, r2);
 
     this._drawCellsAndBorders(drawingCtx, range, offsetXForDraw, offsetYForDraw);
@@ -201,6 +201,16 @@ WorksheetView.prototype._drawCellsAndBorders_Local = function (drawingCtx,  c1, 
 
     window.native["SwitchMemoryLayer"]();
 
+    g_oTextMeasurer.m_oFont = null;
+    g_oTextMeasurer.m_oTextPr = null;
+    g_oTextMeasurer.m_oGrFonts = new CGrRFonts();
+    g_oTextMeasurer.m_oLastFont = new CFontSetup();
+    g_oTextMeasurer.LastFontOriginInfo = { Name : "", Replace : null };
+    g_oTextMeasurer.Ascender  = 0;
+    g_oTextMeasurer.Descender = 0;
+    g_oTextMeasurer.Height = 0;
+    g_oTextMeasurer.UnitsPerEm = 0;
+
     this.objectRender.showDrawingObjectsEx(false);
 
     this.cellsLeft = cellsLeft_Local;
@@ -208,7 +218,7 @@ WorksheetView.prototype._drawCellsAndBorders_Local = function (drawingCtx,  c1, 
     this.visibleRange = oldrange;
 };
 
-WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFrozen) {
+WorksheetView.prototype.__selection = function (c1, r1, c2, r2, isFrozen) {
 
     var native_selection = [];
 
@@ -577,12 +587,7 @@ WorksheetView.prototype._getDrawSelection_Local = function (c1, r1, c2, r2, isFr
     //}
 };
 
-WorksheetView.prototype._updateCache = function(c1, r1, c2, r2) {
-    var range = new asc_Range(c1, r1, c2, r2);
-    this._prepareCellTextMetricsCache(range);
-};
-
-WorksheetView.prototype._changeSelectionTopLeft = function (x, y, isCoord, isSelectMode, isTopLeft) {
+WorksheetView.prototype.__changeSelectionTopLeft = function (x, y, isCoord, isSelectMode, isTopLeft) {
     //var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] : this.activeRange;
 
     var isMoveActiveCellToLeftTop = false;
@@ -772,10 +777,10 @@ WorksheetView.prototype.__drawFormulaRanges = function (arrRanges, offsetX, offs
                 bottom = this.rows[Math.max(0,arrRanges[i].r2)].top + this.rows[Math.max(0,arrRanges[i].r2)].height - offsetY;
         }
 
-       // else if (5 === type) { // range image
-       // }
-       // else if (6 === type) { // range chart
-       // }
+        // else if (5 === type) { // range image
+        // }
+        // else if (6 === type) { // range chart
+        // }
 
         ranges.push(left);
         ranges.push(top);

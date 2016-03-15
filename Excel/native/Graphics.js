@@ -540,6 +540,8 @@ CGraphics.prototype =
         this.TextureFillTransformScaleX = 1 / this.m_oCoordTransform.sx;
         this.TextureFillTransformScaleY = 1 / this.m_oCoordTransform.sy;
 
+        this.LastFontOriginInfo = { Name : "", Replace : null };
+
         /*
          if (this.IsThumbnail)
          {
@@ -553,6 +555,8 @@ CGraphics.prototype =
          this.m_oContext.mozImageSmoothingEnabled = false;
          */
 
+        //this.ClearParams();
+
         this.m_oLastFont.Clear();
         this.Native["PD_Save"]();
 
@@ -560,6 +564,18 @@ CGraphics.prototype =
     },
     EndDraw : function()
     {
+    },
+
+    ClearParams : function()
+    {
+        this.m_oTextPr      = null;
+        this.m_oGrFonts     = new CGrRFonts();
+        this.m_oLastFont    = new CFontSetup();
+
+        this.IsUseFonts2    = false;
+        this.m_oLastFont2   = null;
+
+        this.m_bIntegerGrid = true;
     },
 
     put_GlobalAlpha : function(enable, alpha)
@@ -815,6 +831,10 @@ CGraphics.prototype =
 
         if (!this.m_bIntegerGrid)
             this.Native["PD_transform"](this.m_oCoordTransform.sx,0,0,this.m_oCoordTransform.sy,0, 0);
+
+        //this.ClearParams();
+
+        this.Native["PD_reset"]();
     },
 
     transform3 : function(m, isNeedInvert)
@@ -1174,17 +1194,17 @@ CGraphics.prototype =
         var _fontinfo = g_fontApplication.GetFontInfo(font.FontFamily.Name, oFontStyle, this.LastFontOriginInfo);
         var _info = GetLoadInfoForMeasurer(_fontinfo, oFontStyle);
 
-        var _last_font = this.IsUseFonts2 ? this.m_oLastFont2 : this.m_oLastFont;
-
-        _last_font.SetUpName = font.FontFamily.Name;
-        _last_font.SetUpSize = font.FontSize;
-        _last_font.SetUpStyle = oFontStyle;
+        this.m_oLastFont.SetUpName = font.FontFamily.Name;
+        this.m_oLastFont.SetUpSize = font.FontSize;
+        this.m_oLastFont.SetUpStyle = oFontStyle;
 
         var flag = 0;
         if (_info.NeedBold)     flag |= 0x01;
         if (_info.NeedItalic)   flag |= 0x02;
         if (_info.SrcBold)      flag |= 0x04;
         if (_info.SrcItalic)    flag |= 0x08;
+
+        g_oTextMeasurer.Measurer["LoadFont"](_info.Path, _info.FaceIndex, font.FontSize, flag);
 
         this.Native["PD_LoadFont"](_info.Path, _info.FaceIndex, font.FontSize, flag);
     },
@@ -1203,7 +1223,7 @@ CGraphics.prototype =
     SetFontSlot : function(slot, fontSizeKoef)
     {
         var _rfonts = this.m_oTextPr.RFonts;
-        var _lastFont = this.IsUseFonts2 ? this.m_oLastFont2 : this.m_oLastFont;
+        var _lastFont = this.m_oLastFont;
 
         switch (slot)
         {
@@ -1255,20 +1275,25 @@ CGraphics.prototype =
         if (_lastFont.Bold)
             _style += 1;
 
-        _lastFont.SetUpName = _lastFont.Name;
-        _lastFont.SetUpSize = _lastFont.Size;
-        _lastFont.SetUpStyle = _style;
+    //    if (_lastFont.Name != _lastFont.SetUpName || _lastFont.Size != _lastFont.SetUpSize || _style != _lastFont.SetUpStyle)
+        {
+            _lastFont.SetUpName = _lastFont.Name;
+            _lastFont.SetUpSize = _lastFont.Size;
+            _lastFont.SetUpStyle = _style;
 
-        var _fontinfo = g_fontApplication.GetFontInfo(_lastFont.SetUpName, _lastFont.SetUpStyle, this.LastFontOriginInfo);
-        var _info = GetLoadInfoForMeasurer(_fontinfo, _lastFont.SetUpStyle);
+            var _fontinfo = g_fontApplication.GetFontInfo(_lastFont.SetUpName, _lastFont.SetUpStyle, this.LastFontOriginInfo);
+            var _info = GetLoadInfoForMeasurer(_fontinfo, _lastFont.SetUpStyle);
 
-        var flag = 0;
-        if (_info.NeedBold)     flag |= 0x01;
-        if (_info.NeedItalic)   flag |= 0x02;
-        if (_info.SrcBold)      flag |= 0x04;
-        if (_info.SrcItalic)    flag |= 0x08;
+            var flag = 0;
+            if (_info.NeedBold)     flag |= 0x01;
+            if (_info.NeedItalic)   flag |= 0x02;
+            if (_info.SrcBold)      flag |= 0x04;
+            if (_info.SrcItalic)    flag |= 0x08;
 
-        this.Native["PD_LoadFont"](_info.Path, _info.FaceIndex, _lastFont.SetUpSize, flag);
+            g_oTextMeasurer.Measurer["LoadFont"](_info.Path, _info.FaceIndex, _lastFont.SetUpSize, flag);
+
+            this.Native["PD_LoadFont"](_info.Path, _info.FaceIndex, _lastFont.SetUpSize, flag);
+        }
     },
 
     GetTextPr : function()
@@ -1282,7 +1307,10 @@ CGraphics.prototype =
         if (null != this.LastFontOriginInfo.Replace)
             _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
 
-        this.Native["PD_FillText"](x,y,_code);
+       // var _x = this.m_oInvertFullTransform.TransformPointX(x,y);
+       // var _y = this.m_oInvertFullTransform.TransformPointY(x,y);
+
+        this.Native["PD_FillText"](x, y, _code);
     },
     t : function(text,x,y)
     {
