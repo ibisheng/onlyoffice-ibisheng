@@ -1631,7 +1631,9 @@ function CFontFile(fileName, faceIndex)
             return;
         }
 
-        if (this.m_pFace.family_name == "MS Mincho" || this.m_pFace.family_name == "Castellar")
+        if (this.m_pFace.family_name == "MS Mincho" ||
+            this.m_pFace.family_name == "Castellar" ||
+            this.m_pFace.family_name == "Microsoft JhengHei UI Light")
             this.HintsSupport = false;
     }
 

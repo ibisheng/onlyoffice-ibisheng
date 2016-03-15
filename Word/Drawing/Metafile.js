@@ -1259,11 +1259,11 @@ CMetafile.prototype =
             this.Memory.WriteLong(style);
         }
     },
-    FillText : function(x,y,text)
+    FillText : function(x,y,text,isNoReplaceAttack)
     {
         this.Memory.WriteByte(CommandType.ctDrawText);
 
-        if (null != this.LastFontOriginInfo.Replace && 1 == text.length)
+        if ((true !== isNoReplaceAttack) && null != this.LastFontOriginInfo.Replace && 1 == text.length)
         {
             var _code = text.charCodeAt(0);
             _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
@@ -1276,17 +1276,23 @@ CMetafile.prototype =
     },
 	FillTextCode : function(x,y,code)
     {
-        var _font_info = window.g_font_infos[window.g_map_font_index[this.m_oFont.Name]];
-        var _is_face_index_no_0 = (_font_info.faceIndexR <= 0 && _font_info.faceIndexI <= 0 && _font_info.faceIndexB <= 0 && _font_info.faceIndexBI <= 0);
+        var _font_info = window.g_font_infos[window.g_map_font_index[this.m_oFont.Name]];       
 
-        if (code < 0xFFFF && (_is_face_index_no_0 || window["native"] !== undefined))
+        if (code < 0xFFFF)
             return this.FillText(x, y, String.fromCharCode(code));
+		else
+		{
+			var codePt = code - 0x10000;
+			return this.FillText(x, y, String.fromCharCode(0xD800 + (codePt >> 10), 0xDC00 + (codePt & 0x3FF)), true);
+		}
 
         if (window["native"] !== undefined)
         {
             // TODO:
             return;
         }
+		
+		var _is_face_index_no_0 = (_font_info.faceIndexR <= 0 && _font_info.faceIndexI <= 0 && _font_info.faceIndexB <= 0 && _font_info.faceIndexBI <= 0);
 
         var _old_pos = this.Memory.pos;
 

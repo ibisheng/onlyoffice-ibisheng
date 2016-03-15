@@ -1275,6 +1275,20 @@ function FT_LOAD_TARGET(x)
 {
     return ((x & 15) << 16);
 }
+
+function FT_PAD_FLOOR(x, n)
+{
+    return x & (~(n-1));
+}
+function FT_PAD_ROUND(x, n)
+{
+    return (x + (n >>> 1)) & (~(n-1));
+}
+function FT_PAD_CEIL(x, n)
+{
+    return (x + n - 1) & (~(n-1));
+}
+
 function FT_PIX_FLOOR(x)
 {
     return x & ~63;
@@ -1357,29 +1371,30 @@ function Int64()
 }
 function ft_multo64(x, y, z)
 {
-    var lo1, hi1, lo2, hi2, lo, hi, i1, i2;
+    var lo1 = x & 0x0000FFFF;  var hi1 = x >>> 16;
+    var lo2 = y & 0x0000FFFF;  var hi2 = y >>> 16;
 
-    lo1 = x & 0x0000FFFF;  hi1 = x >>> 16;
-    lo2 = y & 0x0000FFFF;  hi2 = y >>> 16;
+    var lo = lo1 * lo2;
+    var i1 = lo1 * hi2;
+    var i2 = lo2 * hi1;
+    var hi = hi1 * hi2;
 
-    lo = lo1 * lo2;
-    i1 = lo1 * hi2;
-    i2 = lo2 * hi1;
-    hi = hi1 * hi2;
-
-
+    /* Check carry overflow of i1 + i2 */
     i1 += i2;
     if (i1 < i2)
         hi += (1 << 16);
     
-    hi += i1 >>> 16;
+    hi += (i1 >>> 16);
     i1  = (i1 << 16) & 0xFFFFFFFF;
     if (i1 < 0)
         i1 += 4294967296;
 
-
-    
+    /* Check carry overflow of i1 + lo */
     lo += i1;
+
+    if (lo >= 4294967296)
+        lo = FT_Common.IntToUInt(lo & 0xFFFFFFFF);
+
     if (lo < i1)
         hi++;
 
@@ -1392,17 +1407,15 @@ function ft_div64by32(hi, lo, y)
     var r = hi;
 
     if (r >= y)
-        return 2147483647;
+        return 0x7FFFFFFF;
 
     var i = 32;
     do
     {
         r = (r << 1) & 0xFFFFFFFF;
         q = (q << 1) & 0xFFFFFFFF;
-        if (q < 0)
-            q += 4294967296;
 
-        r  |= lo >>> 31;
+        r  |= (lo >>> 31);
         if (r < 0)
             r += 4294967296;
 
@@ -1411,6 +1424,10 @@ function ft_div64by32(hi, lo, y)
             r -= y;
             q |= 1;
         }
+
+        if (q < 0)
+            q += 4294967296;
+
         lo = (lo << 1) & 0xFFFFFFFF;
         if (lo < 0)
             lo += 4294967296;
@@ -1438,14 +1455,13 @@ function FT_MulDiv(a, b, c)
     if (a == 0 || b == c)
         return a;
 
-    var s = 1;
-    if ( a < 0 ) { a = -a; s = -1; }
-    if ( b < 0 ) { b = -b; s = -s; }
-    if ( c < 0 ) { c = -c; s = -s; }
+    var s  = a; a = Math.abs(a);
+    s ^= b; b = Math.abs(b);
+    s ^= c; c = Math.abs(c);
 
     if (a <= 46340 && b <= 46340 && c <= 176095 && c > 0)
         a = ((a * b + (c >> 1)) / c) >> 0;
-    else if (c > 0)
+    else if (FT_Common.UintToInt(c) > 0)
     {
         ft_multo64(a >= 0 ? a : a + 4294967296, b >= 0 ? b : b + 4294967296, temp1);
 
@@ -1506,22 +1522,21 @@ function FT_DivFix(a, b)
     {
         q = 0x7FFFFFFF;
     }
-    else if ((a >> 16) == 0)
+    else if ((a >>> 16) == 0)
     {
-        q = parseInt((a * 65536 + parseInt(b / 2)) / b);
-        //q = parseInt((((a << 16) & 0xFFFFFFFF) + (b >> 1)) / b);
+        q = ((a * 65536 + (b >>> 1)) / b) >> 0;
         if (q < 0)
             q += 4294967296;
     }
     else
     {
-        temp1.hi  = (a >> 16);
+        temp1.hi  = (a >>> 16);
         temp1.lo  = (a << 16) & 0xFFFFFFFF;
         if (temp1.lo < 0)
             temp1.lo += 4294967296;
 
         temp2.hi = 0;
-        temp2.lo = (b >> 1);
+        temp2.lo = (b >>> 1);
 
         if (temp2.lo < 0)
             temp2.lo += 4294967296;
@@ -3021,6 +3036,11 @@ function dublicate_vector(v)
     _v.x = v.x;
     _v.y = v.y;
     return _v;
+}
+function copy_vector(dst, src)
+{
+    dst.x = src.x;
+    dst.y = src.y;
 }
 function FT_BBox()
 {
@@ -18523,15 +18543,15 @@ function ft_trig_prenorm(vec)
         shift += 1;
     }
 
-    if (shift <= 27)
+    if (shift <= 29)
     {
-        shift  = 27 - shift;
+        shift  = 29 - shift;
         vec.x = x << shift;
         vec.y = y << shift;
     }
     else
     {
-        shift -= 27;
+        shift -= 29;
         vec.x = x >> shift;
         vec.y = y >> shift;
         shift = -shift;
@@ -18540,53 +18560,76 @@ function ft_trig_prenorm(vec)
     return shift;
 }
 
-var ft_trig_arctan_table = [2949120, 1740967, 919879, 466945, 234379, 117304, 58666, 29335, 14668, 7334,
-    3667, 1833, 917, 458, 229, 115, 57, 29, 14, 7, 4, 2, 1];
+var ft_trig_arctan_table = [1740967, 919879, 466945, 234379, 117304, 58666, 29335, 14668, 7334,
+    3667, 1833, 917, 458, 229, 115, 57, 29, 14, 7, 4, 2, 1, 0];
 
 function ft_trig_pseudo_polarize(vec)
 {
     var x = vec.x;
     var y = vec.y;
 
-    /* Get the vector into the right half plane */
     var theta = 0;
-    if (x < 0)
+    var xtemp = 0;
+
+    /* Get the vector into [-PI/4,PI/4] sector */
+    if ( y > x )
     {
-        x = -x;
-        y = -y;
-        theta = 2 * 5898240;
+        if ( y > -x )
+        {
+            theta =  5898240;
+            xtemp =  y;
+            y     = -x;
+            x     =  xtemp;
+        }
+        else
+        {
+            theta =  y > 0 ? 11796480 : -11796480;
+            x     = -x;
+            y     = -y;
+        }
+    }
+    else
+    {
+        if ( y < -x )
+        {
+            theta = -5898240;
+            xtemp = -y;
+            y     =  x;
+            x     =  xtemp;
+        }
+        else
+        {
+            theta = 0;
+        }
     }
 
-    if (y > 0)
-        theta = - theta;
-
     var arctanptr = 0;
-    var xtemp = 0;
+    var i, b;
+
     /* Pseudorotations, with right shifts */
-    i = 0;
-    do
+    for ( i = 1, b = 1; i < 23; b <<= 1, i++ )
     {
         if ( y > 0 )
         {
-            xtemp  = x + (y >> i);
-            y      = y - (x >> i);
+            xtemp  = x + ( ( y + b ) >> i );
+            y      = y - ( ( x + b ) >> i );
             x      = xtemp;
             theta += ft_trig_arctan_table[arctanptr++];
         }
         else
         {
-            xtemp  = x - (y >> i);
-            y      = y + (x >> i);
+            xtemp  = x - ( ( y + b ) >> i );
+            y      = y + ( ( x + b ) >> i );
             x      = xtemp;
             theta -= ft_trig_arctan_table[arctanptr++];
         }
-    } while (++i < 23);
+    }
 
     /* round theta */
-    if (theta >= 0)
-        theta = ((theta + 16) & ~31);
+    if ( theta >= 0 )
+        theta = FT_PAD_ROUND( theta, 32 );
     else
-        theta = -((-theta + 16) & ~31);
+        theta = -FT_PAD_ROUND( -theta, 32 );
 
     vec.x = x;
     vec.y = theta;
@@ -18597,28 +18640,25 @@ function ft_trig_downscale(val)
     var s   = val;
     val = (val >= 0) ? val : -val;
 
-    var v1 = FT_Common.IntToUInt(val >> 16);
-    var v2 = FT_Common.IntToUInt(val & 0xFFFF);
+    var v1 = val >>> 16;
+    var v2 = FT_Common.Short_To_UShort(val & 0xFFFF);
 
-    var k1 = 0x9B74;   /* constant */
-    var k2 = 0xEDA8;   /* constant */
+    var k1 =  0xDBD9;   /* constant */
+    var k2 = 0x5B16;   /* constant */
 
     var hi   = k1 * v1;
     var lo1  = k1 * v2 + k2 * v1;       /* can't overflow */
 
-    var lo2  = ( k2 * v2 ) / 65536;
-    lo2 = lo2 >> 0;
+    var lo2  = ( k2 * v2 ) >>> 16;
+
     var lo3  = ( lo1 >= lo2 ) ? lo1 : lo2;
     lo1 += lo2;
 
-    lo1 = FT_Common.IntToUInt(lo1);
-
-    hi  += lo1 >> 16;
+    hi  += (lo1 >>> 16);
     if (lo1 < lo3)
         hi += 0x10000;
 
-    val  = hi;
-    val = FT_Common.UintToInt(val);
+    var val  = FT_Common.UintToInt(hi);
 
     return (s >= 0) ? val : -val;
 }
@@ -20587,8 +20627,8 @@ function TT_CallRec()
     this.Caller_Range   = 0;
     this.Caller_IP      = 0;
     this.Cur_Count      = 0;
-    this.Cur_Restart    = 0;
-    this.Cur_End        = 0;
+
+    this.Def            = null;
 }
 
 function SPH_TweakRule()
@@ -20750,6 +20790,7 @@ function TT_DefRecord()
     this.opc   = 0;             /* function #, or instruction code        */
     this.active = false;        /* is it active?                          */
     this.inline_delta = false;  /* is function that defines inline delta? */
+    this.sph_fdef_flags = 0;
 }
 
 function TT_CodeRange()
@@ -20897,6 +20938,10 @@ function TT_ExecContextRec()
 
     this.sph_tweak_flags = 0;       /* flags to control */
                                     /* hint tweaks      */
+
+    this.sph_in_func_flags = 0;     /* flags to indicate if in   */
+                                    /* special functions         */
+
     // #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
 }
 
@@ -21372,7 +21417,7 @@ function TT_Run_Context(exec, debug)
     exec.GS.dualVector.x = exec.GS.projVector.x;
     exec.GS.dualVector.y = exec.GS.projVector.y;
 
-    if (exec.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING)//#ifdef TT_CONFIG_OPTION_UNPATENTED_HINTING
+    if (exec.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_UNPATENTED_HINTING)//#ifdef TT_CONFIG_OPTION_UNPATENTED_HINTING
     {
         exec.GS.both_x_axis = true;
     }//#endif
@@ -21747,96 +21792,31 @@ function TT_VecLen(X, Y)
     return FT_Vector_Length(v);
 }
 
+var FT_Hypot = TT_VecLen;
+
+function FT_DivFix14(a, b)
+{
+    return FT_DivFix(a, b << 2);
+}
+
 function Normalize(exc, Vx, Vy, R)
 {
     if (Vx > 2147483647 || Vy > 2147483647)
         alert("error");
 
-    var W = 0;
-    var S1, S2;
-
-    if (Math.abs(Vx) < 0x10000 && Math.abs(Vy) < 0x10000)
+    if (Math.abs(Vx) < 0x4000 && Math.abs(Vy) < 0x4000)
     {
-        Vx *= 0x100;
-        Vy *= 0x100;
-
-        Vx = (Vx & 0xFFFFFFFF);
-        Vy = (Vy & 0xFFFFFFFF);
-
-        W = TT_VecLen(Vx, Vy);
-
-        if (W == 0)
-        {
-            /* XXX: UNDOCUMENTED! It seems that it is possible to try   */
-            /*      to normalize the vector (0,0).  Return immediately. */
+        if (0 == Vx && 0 == Vy)
             return 0;
-        }
 
-        R.x = FT_Common.UShort_To_Short(FT_DivFix(Vx, W << 2) & 0xFFFF);
-        R.y = FT_Common.UShort_To_Short(FT_DivFix(Vy, W << 2) & 0xFFFF);
-
-        return 0;
+        Vx *= 0x4000;
+        Vy *= 0x4000;
     }
 
-    W = TT_VecLen(Vx, Vy);
+    var W = FT_Hypot(Vx, Vy);
 
-    Vx = FT_DivFix(Vx, W << 2);
-    Vy = FT_DivFix(Vy, W << 2);
-
-    W = Vx * Vx + Vy * Vy;
-    W = (W & 0xFFFFFFFF);
-
-    /* Now, we want that Sqrt( W ) = 0x4000 */
-    /* Or 0x10000000 <= W < 0x10004000      */
-
-    if (Vx < 0)
-    {
-        Vx = -Vx;
-        S1 = 1;
-    }
-    else
-        S1 = 0;
-
-    if (Vy < 0)
-    {
-        Vy = -Vy;
-        S2 = 1;
-    }
-    else
-        S2 = 0;
-
-    while (W < 0x10000000)
-    {
-        /* We need to increase W by a minimal amount */
-        if (Vx < Vy)
-            Vx++;
-        else
-            Vy++;
-
-        W = Vx * Vx + Vy * Vy;
-    }
-
-    while (W >= 0x10004000)
-    {
-        /* We need to decrease W by a minimal amount */
-        if (Vx < Vy)
-            Vx--;
-        else
-            Vy--;
-
-        W = Vx * Vx + Vy * Vy;
-    }
-
-    /* Note that in various cases, we can only  */
-    /* compute a Sqrt(W) of 0x3FFF, eg. Vx = Vy */
-    if (S1 == 1)
-        Vx = -Vx;
-
-    if (S2 == 1)
-        Vy = -Vy;
-
-    R.x = FT_Common.UShort_To_Short(Vx & 0xFFFF);   /* Type conversion */
-    R.y = FT_Common.UShort_To_Short(Vy & 0xFFFF);   /* Type conversion */
+    R.x = FT_Common.UShort_To_Short(FT_DivFix14(Vx, W) & 0xFFFF);   /* Type conversion */
+    R.y = FT_Common.UShort_To_Short(FT_DivFix14(Vy, W) & 0xFFFF);   /* Type conversion */
 
     return 0;
 }
@@ -21935,17 +21915,13 @@ function Direct_Move(exc, zone, point, distance)
             {
                  zone.cur[zone._offset_cur + point].x += FT_MulDiv(distance, v, exc.F_dot_P);
             }
-            zone.tags[zone._offset_tags + point] |= 8;
         }
         else
         {
             zone.cur[zone._offset_cur + point].x += FT_MulDiv(distance, v, exc.F_dot_P);
-
-            // DEBUG
-            zone.cur[zone._offset_cur + point].x &= 0xFFFFFFFF;
-
-            zone.tags[zone._offset_tags + point] |= 8;
         }
+
+        zone.tags[zone._offset_tags + point] |= 8;
     }
 
     v = exc.GS.freeVector.y;
@@ -21953,10 +21929,6 @@ function Direct_Move(exc, zone, point, distance)
     if (v != 0)
     {
         zone.cur[zone._offset_cur + point].y += FT_MulDiv(distance, v, exc.F_dot_P);
-
-        // DEBUG
-        zone.cur[zone._offset_cur + point].y &= 0xFFFFFFFF;
-
         zone.tags[zone._offset_tags + point] |= 16;
     }
 }
@@ -21971,9 +21943,6 @@ function Direct_Move_Orig(exc, zone, point, distance)
     if (v != 0)
     {
         zone.org[zone._offset_org + point].x += FT_MulDiv(distance, v, exc.F_dot_P);
-
-        // DEBUG
-        zone.org[zone._offset_org + point].x &= 0xFFFFFFFF;
     }
 
     v = exc.GS.freeVector.y;
@@ -21981,9 +21950,6 @@ function Direct_Move_Orig(exc, zone, point, distance)
     if (v != 0)
     {
         zone.org[zone._offset_org + point].y += FT_MulDiv(distance, v, exc.F_dot_P);
-
-        // DEBUG
-        zone.org[zone._offset_cur + point].y &= 0xFFFFFFFF;
     }
 }
 
@@ -21994,22 +21960,15 @@ function Direct_Move_X(exc, zone, point, distance)
 
     if (exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING)
     {
-        if (!exc.ignore_x_mode || (exc.sph_tweak_flags & 2) != 0)
+        if (!exc.ignore_x_mode)
         {
             zone.cur[zone._offset_cur + point].x += distance;
-
-            // DEBUG
-            zone.cur[zone._offset_cur + point].x &= 0xFFFFFFFF;
         }
         zone.tags[zone._offset_tags + point] |= 8;
     }
     else
     {
         zone.cur[zone._offset_cur + point].x += distance;
-
-        // DEBUG
-        zone.cur[zone._offset_cur + point].x &= 0xFFFFFFFF;
-
         zone.tags[zone._offset_tags + point] |= 8;
     }
 }
@@ -22020,10 +21979,6 @@ function Direct_Move_Y(exc, zone, point, distance)
         alert("error");
 
     zone.cur[zone._offset_cur + point].y += distance;
-
-    // DEBUG
-    zone.cur[zone._offset_cur + point].y &= 0xFFFFFFFF;
-
     zone.tags[zone._offset_tags + point] |= 16;
 }
 
@@ -22033,9 +21988,6 @@ function Direct_Move_Orig_X(exc, zone, point, distance)
         alert("error");
 
     zone.org[zone._offset_org + point].x += distance;
-
-    // DEBUG
-    zone.org[zone._offset_org + point].x &= 0xFFFFFFFF;
 }
 
 function Direct_Move_Orig_Y(exc, zone, point, distance)
@@ -22044,9 +21996,6 @@ function Direct_Move_Orig_Y(exc, zone, point, distance)
         alert("error");
     
     zone.org[zone._offset_org + point].y += distance;
-
-    // DEBUG
-    zone.org[zone._offset_org + point].y &= 0xFFFFFFFF;
 }
 
 // ------
@@ -22099,7 +22048,7 @@ function Round_None(exc, distance, compensation)
     if (distance >= 0)
     {
         val = distance + compensation;
-        if (distance && val < 0)
+        if (distance != 0 && val < 0)
             val = 0;
     }
     else
@@ -22120,7 +22069,7 @@ function Round_To_Grid(exc, distance, compensation)
     if (distance >= 0)
     {
         val = distance + compensation + 32;
-        if (distance && val > 0)
+        if (distance != 0 && val > 0)
             val &= ~63;
         else
             val = 0;
@@ -22144,7 +22093,7 @@ function Round_Up_To_Grid(exc, distance, compensation)
     if (distance >= 0)
     {
         val = distance + compensation + 63;
-        if (distance && val > 0)
+        if (distance != 0 && val > 0)
             val &= ~63;
         else
             val = 0;
@@ -22190,7 +22139,7 @@ function Round_To_Half_Grid(exc, distance, compensation)
     if (distance >= 0)
     {
         val = FT_PIX_FLOOR(distance + compensation) + 32;
-        if (distance && val < 0)
+        if (distance != 0 && val < 0)
             val = 0;
     }
     else
@@ -22211,14 +22160,14 @@ function Round_To_Double_Grid(exc, distance, compensation)
     if (distance >= 0)
     {
         val = distance + compensation + 16;
-        if (distance && val > 0)
+        if (distance != 0 && val > 0)
             val &= ~31;
         else
             val = 0;
     }
     else
     {
-        val = -((compensation - distance + 16) & ~31);
+        val = -FT_PAD_ROUND(compensation - distance, 32);
         if (val > 0)
             val = 0;
     }
@@ -22235,7 +22184,7 @@ function Round_Super(exc, distance, compensation)
     if (distance >= 0)
     {
         val = (distance - exc.phase + exc.threshold + compensation) & -exc.period;
-        if (distance && val < 0)
+        if (distance != 0 && val < 0)
             val = 0;
         val += exc.phase;
     }
@@ -22258,7 +22207,7 @@ function Round_Super_45(exc, distance, compensation)
     if (distance >= 0)
     {
         val = (((distance - exc.phase + exc.threshold + compensation) / exc.period) >> 0) * exc.period;
-        if (distance && val < 0)
+        if (distance != 0 && val < 0)
             val = 0;
         val += exc.phase;
     }
@@ -22432,13 +22381,13 @@ function TT_MulFix14(a, b)
     if (b < 0)
         b = -b;
 
-    var ah = ((a >> 16) & 0xFFFF);
+    var ah = ((a >>> 16) & 0xFFFF);
     var al = (a & 0xFFFF);
 
     var lo = FT_Common.IntToUInt((al * b) & 0xFFFFFFFF);
     var mid = FT_Common.IntToUInt((ah * b) & 0xFFFFFFFF);
-    var hi = FT_Common.IntToUInt(mid >> 16);
-    mid = FT_Common.IntToUInt(((mid << 16) + (1 << 13)) & 0xFFFFFFFF); /* rounding */
+    var hi = mid >>> 16;
+    mid = FT_Common.IntToUInt((mid << 16) & 0xFFFFFFFF) + (1 << 13); /* rounding */
     lo += mid;
 
     lo = FT_Common.IntToUInt(lo & 0xFFFFFFFF);
@@ -22446,7 +22395,10 @@ function TT_MulFix14(a, b)
     if (lo < mid)
         hi += 1;
 
-    mid = FT_Common.IntToUInt(((lo >> 14) | (hi << 18)) & 0xFFFFFFFF);
+    mid = FT_Common.IntToUInt(((lo >>> 14) | (hi << 18)) & 0xFFFFFFFF);
+
+    //console.log("(" + a + ", " + b + "): " + (sign >= 0 ? mid : -mid));
+
     return sign >= 0 ? mid : -mid;
 }
 
@@ -22496,6 +22448,8 @@ function TT_DotFix14(ax, ay, bx, by)
     
     hi += ((l < lo) ? 1 : 0);
 
+    //console.log("(" + ax + ", " + ay + ", " + bx + ", " + by + "): " + (((hi << 18) | (l >> 14)) & 0xFFFFFFFF));
+
     return ((hi << 18) | (l >> 14)) & 0xFFFFFFFF;
 }
 
@@ -22504,17 +22458,7 @@ function Move_Zp2_Point(exc, point, dx, dy, touch)
     // TODO: unpatented
     if (exc.GS.freeVector.x != 0)
     {
-        if (exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING) //#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
-        {
-            if (!exc.ignore_x_mode || (exc.ignore_x_mode && (exc.sph_tweak_flags & 4)))
-            {
-                exc.zp2.cur[exc.zp2._offset_cur + point].x += dx;
-            }
-        }
-        else
-        {
-            exc.zp2.cur[exc.zp2._offset_cur + point].x += dx;
-        }
+        exc.zp2.cur[exc.zp2._offset_cur + point].x += dx;
         if (touch)
             exc.zp2.tags[exc.zp2._offset_tags + point] |= 8;
     }
@@ -22882,7 +22826,7 @@ function Ins_JMPR(exc, args, args_pos)
     if (args[args_pos] == 0 && exc.args == 0)
         exc.error = 132;
     exc.IP += args[args_pos];
-    if (exc.IP < 0 || (exc.callTop > 0 && exc.IP > exc.callStack[exc.callTop - 1].Cur_End))
+    if (exc.IP < 0 || (exc.callTop > 0 && exc.IP > exc.callStack[exc.callTop - 1].Def.end))
         exc.error = 132;
     exc.step_ins = 0;
 }
@@ -22979,7 +22923,7 @@ function Ins_ALIGNPTS(exc, args, args_pos)
     var v1 = exc.zp0.cur[exc.zp0._offset_cur + p2];
     var v2 = exc.zp1.cur[exc.zp1._offset_cur + p1];
 
-    var distance = (exc.func_project(exc, v1.x - v2.x, v1.y - v2.y) / 2) >> 0;
+    var distance = exc.func_project(exc, v1.x - v2.x, v1.y - v2.y) >> 1;
 
     exc.func_move(exc, exc.zp1, p1, distance);
     exc.func_move(exc, exc.zp0, p2, -distance);
@@ -23005,8 +22949,7 @@ function Ins_UNKNOWN(exc, args, args_pos)
             call.Caller_Range = exc.curRange;
             call.Caller_IP    = exc.IP + 1;
             call.Cur_Count    = 1;
-            call.Cur_Restart  = defs[def].start;
-            call.Cur_End      = defs[def].end;
+            call.Def = defs[def];
 
             Ins_Goto_CodeRange(defs[def].range, defs[def].start);
 
@@ -23059,7 +23002,7 @@ function Ins_LOOPCALL(exc, args, args_pos)
     /* If this isn't true, we need to look up the function table.   */
     var defs = exc.FDefs;
     var def = F;
-    if (exc.maxFunc + 1 != exc.numFDefs || exc.FDefs[def].opc != F)
+    if (exc.maxFunc + 1 != exc.numFDefs || defs[def].opc != F)
     {
         /* look up the FDefs table */
         def = 0;
@@ -23082,6 +23025,14 @@ function Ins_LOOPCALL(exc, args, args_pos)
         return;
     }
 
+    if (exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING)
+    {
+        if (exc.ignore_x_mode && (defs[def].sph_fdef_flags & 8))
+            return;
+
+        exc.sph_in_func_flags = defs[def].sph_fdef_flags;
+    }
+
     /* check stack */
     if (exc.callTop >= exc.callSize)
     {
@@ -23096,8 +23047,7 @@ function Ins_LOOPCALL(exc, args, args_pos)
         pCrec.Caller_Range = exc.curRange;
         pCrec.Caller_IP    = exc.IP + 1;
         pCrec.Cur_Count    = args[args_pos];
-        pCrec.Cur_Restart  = defs[def].start;
-        pCrec.Cur_End      = defs[def].end;
+        pCrec.Def          = defs[def];
 
         exc.callTop++;
 
@@ -23150,6 +23100,16 @@ function Ins_CALL(exc, args, args_pos)
         return;
     }
 
+    if (exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING)
+    {
+        if (exc.ignore_x_mode &&
+            ((exc.iup_called && (exc.sph_tweak_flags & 1024)) ||
+                defs[def].sph_fdef_flags & 8))
+            return;
+
+        exc.sph_in_func_flags = defs[def].sph_fdef_flags;
+    }
+
     /* check the call stack */
     if (exc.callTop >= exc.callSize)
     {
@@ -23162,8 +23122,7 @@ function Ins_CALL(exc, args, args_pos)
     pCrec.Caller_Range = exc.curRange;
     pCrec.Caller_IP    = exc.IP + 1;
     pCrec.Cur_Count    = 1;
-    pCrec.Cur_Restart  = defs[def].start;
-    pCrec.Cur_End      = defs[def].end;
+    pCrec.Def = defs[def];
 
     exc.callTop++;
 
@@ -23213,9 +23172,18 @@ function Ins_FDEF(exc, args, args_pos)
     defs[rec].start        = exc.IP + 1;
     defs[rec].active       = true;
     defs[rec].inline_delta = false;
+    defs[rec].sph_fdef_flags = 0x0000;
 
     if (n > exc.maxFunc)
         exc.maxFunc = 0xFFFF & n;
+
+    if (bIsSubpix)
+    {
+        /* We don't know for sure these are typeman functions, */
+        /* however they are only active when RS 22 is called   */
+        if (n >= 64 && n <= 66)
+            defs[rec].sph_fdef_flags |= 128;
+    }
 
     /* Now skip the whole function definition. */
     /* We don't allow nested IDEFS & FDEFs.    */
@@ -23224,22 +23192,101 @@ function Ins_FDEF(exc, args, args_pos)
     {
         if (bIsSubpix)//#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
         {
-            /* arguments to opcodes are skipped by `SKIP_Code' */
-            var opcode_pattern = [];
-            opcode_pattern[0] = [/* #0 TTFautohint bytecode (old) */
-                       0x20, /* DUP     */
-                       0x64, /* ABS     */
-                       0xB0, /* PUSHB_1 */
-                             /*   32    */
-                       0x60, /* ADD     */
-                       0x66, /* FLOOR   */
-                       0x23, /* SWAP    */
-                       0xB0,  /* PUSHB_1 */
-                       0,0,0,0,0
-                   ];
-            var opcode_patterns = 1;
-            var opcode_pointer = [0];
-            var opcode_size = [7];
+            var opcode_pattern = [
+            /* #0 inline delta function 1 */
+            [
+                0x4B, /* PPEM    */
+                0x53, /* GTEQ    */
+                0x23, /* SWAP    */
+                0x4B, /* PPEM    */
+                0x51, /* LTEQ    */
+                0x5A, /* AND     */
+                0x58, /* IF      */
+                0x38, /*   SHPIX */
+                0x1B, /* ELSE    */
+                0x21, /*   POP   */
+                0x21, /*   POP   */
+                0x59  /* EIF     */
+            ],
+            /* #1 inline delta function 2 */
+            [
+                0x4B, /* PPEM    */
+                0x54, /* EQ      */
+                0x58, /* IF      */
+                0x38, /*   SHPIX */
+                0x1B, /* ELSE    */
+                0x21, /*   POP   */
+                0x21, /*   POP   */
+                0x59  /* EIF     */
+            ],
+            /* #2 diagonal stroke function */
+            [
+                0x20, /* DUP     */
+                0x20, /* DUP     */
+                0xB0, /* PUSHB_1 */
+                /*   1     */
+                0x60, /* ADD     */
+                0x46, /* GC_cur  */
+                0xB0, /* PUSHB_1 */
+                /*   64    */
+                0x23, /* SWAP    */
+                0x42  /* WS      */
+            ],
+            /* #3 VacuFormRound function */
+            [
+                0x45, /* RCVT    */
+                0x23, /* SWAP    */
+                0x46, /* GC_cur  */
+                0x60, /* ADD     */
+                0x20, /* DUP     */
+                0xB0  /* PUSHB_1 */
+                /*   38    */
+            ],
+            /* #4 TTFautohint bytecode (old) */
+            [
+                0x20, /* DUP     */
+                0x64, /* ABS     */
+                0xB0, /* PUSHB_1 */
+                /*   32    */
+                0x60, /* ADD     */
+                0x66, /* FLOOR   */
+                0x23, /* SWAP    */
+                0xB0  /* PUSHB_1 */
+            ],
+            /* #5 spacing function 1 */
+            [
+                0x01, /* SVTCA_x */
+                0xB0, /* PUSHB_1 */
+                /*   24    */
+                0x43, /* RS      */
+                0x58  /* IF      */
+            ],
+            /* #6 spacing function 2 */
+            [
+                0x01, /* SVTCA_x */
+                0x18, /* RTG     */
+                0xB0, /* PUSHB_1 */
+                /*   24    */
+                0x43, /* RS      */
+                0x58  /* IF      */
+            ],
+            /* #7 TypeMan Talk DiagEndCtrl function */
+            [
+                0x01, /* SVTCA_x */
+                0x20, /* DUP     */
+                0xB0, /* PUSHB_1 */
+                /*   3     */
+                0x25, /* CINDEX  */
+            ],
+            /* #8 TypeMan Talk Align */
+            [
+                0x06, /* SPVTL   */
+                0x7D, /* RDTG    */
+            ]
+            ];
+            var opcode_patterns = opcode_pattern.length;
+            var opcode_pointer = [  0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+            var opcode_size    = [ 12, 8, 8, 6, 7, 4, 5, 4, 2 ];
 
             for (var i = 0; i < opcode_patterns; i++)
             {
@@ -23251,9 +23298,78 @@ function Ins_FDEF(exc, args, args_pos)
                     {
                         switch ( i )
                         {
-                        case 0:
-                            exc.size.ttfautohinted = true;
-                            break;
+                            case 0:
+                                defs[rec].sph_fdef_flags        |= 1;
+                                exc.face.sph_found_func_flags   |= 1;
+                                break;
+
+                            case 1:
+                                defs[rec].sph_fdef_flags        |= 2;
+                                exc.face.sph_found_func_flags   |= 2;
+                                break;
+
+                            case 2:
+                                switch ( n )
+                                {
+                                    /* needs to be implemented still */
+                                    case 58:
+                                        defs[rec].sph_fdef_flags        |= 4;
+                                        exc.face.sph_found_func_flags   |= 4;
+                                }
+                                break;
+
+                            case 3:
+                                switch ( n )
+                                {
+                                    case 0:
+                                        defs[rec].sph_fdef_flags        |= 8;
+                                        exc.face.sph_found_func_flags   |= 8;
+                                }
+                                break;
+
+                            case 4:
+                                /* probably not necessary to detect anymore */
+                                defs[rec].sph_fdef_flags            |= 16;
+                                exc.face.sph_found_func_flags       |= 16;
+                                break;
+
+                            case 5:
+                                switch ( n )
+                                {
+                                    case 0:
+                                    case 1:
+                                    case 2:
+                                    case 4:
+                                    case 7:
+                                    case 8:
+                                        defs[rec].sph_fdef_flags        |= 32;
+                                        exc.face.sph_found_func_flags   |= 32;
+                                }
+                                break;
+
+                            case 6:
+                                switch ( n )
+                                {
+                                    case 0:
+                                    case 1:
+                                    case 2:
+                                    case 4:
+                                    case 7:
+                                    case 8:
+                                        defs[rec].sph_fdef_flags        |= 64;
+                                        exc.face.sph_found_func_flags   |= 64;
+                                }
+                                break;
+
+                            case 7:
+                                defs[rec].sph_fdef_flags        |= 256;
+                                exc.face.sph_found_func_flags   |= 256;
+                                break;
+
+                            case 8:
+                                //defs[rec].sph_fdef_flags        |= 256;
+                                //exc.face.sph_found_func_flags   |= 256;
+                                break;
                         }
                         opcode_pointer[i] = 0;
                     }
@@ -23261,6 +23377,10 @@ function Ins_FDEF(exc, args, args_pos)
                 else
                     opcode_pointer[i] = 0;
             }
+
+            /* Set sph_compatibility_mode only when deltas are detected */
+            exc.face.sph_compatibility_mode = ((exc.face.sph_found_func_flags & 1) |
+                                                (exc.face.sph_found_func_flags & 2));
         } //#endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
 
         switch (exc.opcode)
@@ -23280,6 +23400,10 @@ function Ins_FDEF(exc, args, args_pos)
 
 function Ins_ENDF(exc, args, args_pos)
 {
+    var bIsSubpix = exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING;
+    if (bIsSubpix)
+        exc.sph_in_func_flags = 0x0000;
+
     if (exc.callTop <= 0)     /* We encountered an ENDF without a call */
     {
         exc.error = 136;
@@ -23292,21 +23416,10 @@ function Ins_ENDF(exc, args, args_pos)
     pRec.Cur_Count--;
     exc.step_ins = false;
 
-    var bIsSubpix = exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING;
-
-    if (bIsSubpix) //#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
-    {
-        /*
-        *  CUR.ignore_x_mode may be turned off prior to function calls.  This
-        *  ensures it is turned back on.
-        */
-        exc.ignore_x_mode = (exc.subpixel_hinting || exc.grayscale_hinting) && !(exc.sph_tweak_flags & 32768);
-    }//#endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
-
     if (pRec.Cur_Count > 0)
     {
         exc.callTop++;
-        exc.IP = pRec.Cur_Restart;
+        exc.IP = pRec.Def.start;
     }
     else
     {
@@ -23592,7 +23705,7 @@ function Ins_IUP(exc, args, args_pos)
         if (exc.ignore_x_mode)
         {
             exc.iup_called = 1;
-            if (exc.sph_tweak_flags & 524288)
+            if (exc.sph_tweak_flags & 32768)
                 return;
         }
     } //#endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
@@ -23675,7 +23788,17 @@ function Ins_SHP(exc, args, args_pos)
             }
         }
         else
-            Move_Zp2_Point(exc, point, dx, dy, true);
+        {
+            if (exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING)
+            {
+                if (exc.ignore_x_mode)
+                    Move_Zp2_Point(exc, point, 0, dy, true);
+                else
+                    Move_Zp2_Point(exc, point, dx, dy, true);
+            }
+            else
+                Move_Zp2_Point(exc, point, dx, dy, true);
+        }
 
         exc.GS.loop--;
     }
@@ -23811,50 +23934,60 @@ function Ins_SHPIX(exc, args, args_pos)
                 else
                     B1 = exc.zp2.cur[exc.zp2._offset_cur + point].x;
 
-                if (exc.GS.freeVector.y != 0 && (exc.sph_tweak_flags & 262144))
+                if (!exc.face.sph_compatibility_mode && exc.GS.freeVector.y != 0)
                 {
-                    exc.GS.loop--;
-                    continue;
-                }
-
-                if (exc.ignore_x_mode && !exc.compatibility_mode && exc.GS.freeVector.y != 0)
                     Move_Zp2_Point(exc, point, dx, dy, true);
-                else if (exc.ignore_x_mode && exc.compatibility_mode)
-                {
-                    if (exc.ignore_x_mode && (exc.sph_tweak_flags & 131072))
+
+                    /* save new point */
+                    if (exc.GS.freeVector.y != 0)
                     {
-                        dx = FT_PIX_ROUND( B1 + dx ) - B1;
-                        dy = FT_PIX_ROUND( B1 + dy ) - B1;
+                        B2 = exc.zp2.cur[exc.zp2._offset_cur + point].y;
+
+                        /* reverse any disallowed moves */
+                        if ((exc.sph_tweak_flags & 65536) &&
+                            (B1 & 63) != 0 &&
+                            (B2 & 63) != 0 &&
+                            B1 != B2)
+                            Move_Zp2_Point(exc, point, -dx, -dy, true);
+                    }
+                }
+                else if (exc.face.sph_compatibility_mode)
+                {
+                    if (exc.sph_tweak_flags & 16384)
+                    {
+                        dx = FT_PIX_ROUND(B1 + dx) - B1;
+                        dy = FT_PIX_ROUND(B1 + dy) - B1;
                     }
 
-                    if (!(exc.sph_tweak_flags & 16) &&
+                    /* skip post-iup deltas */
+                    if (exc.iup_called &&
+                        ((exc.sph_in_func_flags & 1) ||
+                        (exc.sph_in_func_flags & 2)))
+                    {
+                        exc.GS.loop -= 1;
+                        continue;
+                    }
+
+                    if (!(exc.sph_tweak_flags & 4) &&
                         ((exc.is_composite && exc.GS.freeVector.y != 0) ||
                         (exc.zp2.tags[exc.zp2._offset_tags + point] & 16) ||
-                        (exc.sph_tweak_flags & 256)))
-                        Move_Zp2_Point(exc, point, dx, dy, true);
-                }
+                        (exc.sph_tweak_flags & 32)))
+                        Move_Zp2_Point(exc, point, 0, dy, true);
 
-                /* save new point */
-                if (exc.GS.freeVector.y != 0)
-                    B2 = exc.zp2.cur[exc.zp2._offset_cur + point].y;
-                else
-                    B2 = exc.zp2.cur[exc.zp2._offset_cur + point].x;
+                    /* save new point */
+                    if (exc.GS.freeVector.y != 0)
+                    {
+                        B2 = exc.zp2.cur[exc.zp2._offset_cur + point].y;
 
-                /* reverse any disallowed moves */
-                if (((exc.sph_tweak_flags & 1048576) &&
-                     exc.GS.freeVector.y != 0 &&
-                     B1 % 64 != 0  &&
-                     B2 % 64 != 0  &&
-                     B1 != B2 ) ||
-                   ((exc.sph_tweak_flags & 2097152) &&
-                     exc.GS.freeVector.y != 0 &&
-                     B1 % 64 == 0 &&
-                     B2 % 64 != 0 &&
-                     B1 != B2 &&
-                     !exc.size.ttfautohinted))
-                {
-                    Move_Zp2_Point(exc, point, -dx, -dy, true);
+                        /* reverse any disallowed moves */
+                        if ((B1 & 63) == 0 &&
+                            (B2 & 63) != 0 &&
+                            B1 != B2)
+                            Move_Zp2_Point(exc, point, 0, -dy, true);
+                    }
                 }
+                else if (exc.sph_in_func_flags & 256)
+                    Move_Zp2_Point(exc, point, dx, dy, true);
             }
             else
                 Move_Zp2_Point(exc, point, dx, dy, true);
@@ -24001,7 +24134,24 @@ function Ins_IP(exc, args, args_pos)
         cur_dist = exc.func_project(exc, v1.x - v2.x, v1.y - v2.y);
 
         if (org_dist != 0)
-            new_dist = (old_range != 0) ? FT_MulDiv(org_dist, cur_range, old_range) : cur_dist;
+        {
+            if (old_range != 0)
+                new_dist = FT_MulDiv(org_dist, cur_range, old_range);
+            else
+            {
+                /* This is the same as what MS does for the invalid case:  */
+                /*                                                         */
+                /*   delta = (Original_Pt - Original_RP1) -                */
+                /*           (Current_Pt - Current_RP1)                    */
+                /*                                                         */
+                /* In FreeType speak:                                      */
+                /*                                                         */
+                /*   new_dist = cur_dist -                                 */
+                /*              org_dist - cur_dist;                       */
+
+                new_dist = -org_dist;
+            }
+        }
         else
             new_dist = 0;
 
@@ -24019,7 +24169,7 @@ function Ins_MSIRP(exc, args, args_pos)
     if (exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING)
     {
         control_value_cutin = exc.GS.control_value_cutin;
-        if (exc.ignore_x_mode && exc.GS.freeVector.x != 0 && ((exc.sph_tweak_flags & 2048) == 0))
+        if (exc.ignore_x_mode && exc.GS.freeVector.x != 0 && ((exc.sph_tweak_flags & 256) == 0))
             control_value_cutin = 0;
     }
 
@@ -24036,9 +24186,9 @@ function Ins_MSIRP(exc, args, args_pos)
     /* twilight points (confirmed by Greg Hitchcock)   */
     if (exc.GS.gep1 == 0)
     {
-        exc.zp1.org[exc.zp1._offset_org + point] = exc.zp0.org[exc.zp0._offset_org + exc.GS.rp0];
+        copy_vector(exc.zp1.org[exc.zp1._offset_org + point], exc.zp0.org[exc.zp0._offset_org + exc.GS.rp0]);
         exc.func_move_orig(exc, exc.zp1, point, args[args_pos + 1]);
-        exc.zp1.cur[exc.zp1._offset_cur + point] = exc.zp1.org[exc.zp1._offset_org + point];
+        copy_vector(exc.zp1.cur[exc.zp1._offset_cur + point], exc.zp1.org[exc.zp1._offset_org + point]);
     }
 
     var v1 = exc.zp1.cur[exc.zp1._offset_cur + point];
@@ -24047,7 +24197,6 @@ function Ins_MSIRP(exc, args, args_pos)
 
     if (exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING) // #ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
     {
-        control_value_cutin = exc.GS.control_value_cutin;
         if (exc.ignore_x_mode && exc.GS.freeVector.x != 0 && (Math.abs(distance - args[args_pos + 1]) >= control_value_cutin))
             distance = args[args_pos + 1];
     } // #endif
@@ -24065,7 +24214,7 @@ function Ins_ALIGNRP(exc, args, args_pos)
 {
     if (exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING)//#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
     {
-        if (exc.ignore_x_mode && exc.iup_called && (exc.sph_tweak_flags & 4096) != 0)
+        if (exc.ignore_x_mode && exc.iup_called && (exc.sph_tweak_flags & 512) != 0)
         {
             exc.error = 134;
             exc.GS.loop = 1;
@@ -24127,7 +24276,7 @@ function Ins_MIAP(exc, args, args_pos)
     var bIsSubpix = exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING;
     if (bIsSubpix) // #ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
     {
-        if (exc.ignore_x_mode && exc.GS.freeVector.x != 0 && (exc.sph_tweak_flags & 2048) == 0)
+        if (exc.ignore_x_mode && exc.GS.freeVector.x != 0 && exc.GS.freeVector.y == 0 && (exc.sph_tweak_flags & 256) == 0)
             control_value_cutin = 0;
     } // #endif
 
@@ -24165,12 +24314,7 @@ function Ins_MIAP(exc, args, args_pos)
 
     if (exc.GS.gep0 == 0)   /* If in twilight zone */
     {
-        if (bIsSubpix)
-        {
-            if (exc.compatibility_mode)
-                exc.zp0.org[exc.zp0._offset_org + point].x = TT_MulFix14(distance, exc.GS.freeVector.x);
-        }
-        else
+        if (!bIsSubpix)
         {
             exc.zp0.org[exc.zp0._offset_org + point].x = TT_MulFix14(distance, exc.GS.freeVector.x);
         }
@@ -24182,7 +24326,7 @@ function Ins_MIAP(exc, args, args_pos)
 
     if (bIsSubpix)
     {
-        if ((exc.sph_tweak_flags & 1024) != 0 && distance > 0 && exc.GS.freeVector.y != 0)
+        if (exc.ignore_x_mode && (exc.sph_tweak_flags & 128) != 0 && distance > 0 && exc.GS.freeVector.y != 0)
             distance = 0;
     }
 
@@ -24191,7 +24335,7 @@ function Ins_MIAP(exc, args, args_pos)
 
     if ((exc.opcode & 1) != 0)   /* rounding and control cut-in flag */
     {
-        if (Math.abs( distance - org_dist) > control_value_cutin)
+        if (Math.abs(distance - org_dist) > control_value_cutin)
             distance = org_dist;
 
         if (bIsSubpix)
@@ -24292,7 +24436,10 @@ function Ins_RS(exc, args, args_pos)
             /* subpixel hinting - avoid Typeman Dstroke and */
             /* IStroke and Vacuform rounds                  */
 
-            if (exc.compatibility_mode && (I == 24 || I == 22 || I == 8))
+            if (exc.compatibility_mode &&
+                ((I == 24) && (exc.face.sph_found_func_flags & (32 | 64))) ||
+                ((I == 22) && (exc.sph_in_func_flags & 128)) ||
+                ((I == 8) && (exc.face.sph_found_func_flags & 8) && exc.iup_called))
                 args[args_pos] = 0;
             else
                 args[args_pos] = exc.storage[I];
@@ -24476,7 +24623,7 @@ function Current_Ratio(exc)
         {
             var x = TT_MulFix14(exc.tt_metrics.x_ratio, exc.GS.projVector.x);
             var y = TT_MulFix14(exc.tt_metrics.y_ratio, exc.GS.projVector.y);
-            exc.tt_metrics.ratio = TT_VecLen(x, y);
+            exc.tt_metrics.ratio = FT_Hypot(x, y);
         }
     }
     return exc.tt_metrics.ratio;
@@ -24551,7 +24698,7 @@ function Ins_ODD(exc, args, args_pos)
 }
 function Ins_EVEN(exc, args, args_pos)
 {
-    args[args_pos] = ((exc.func_round(exc, args[args_pos], 0) & 127) == 64) ? 1 : 0;
+    args[args_pos] = ((exc.func_round(exc, args[args_pos], 0) & 127) == 0) ? 1 : 0;
 }
 function Ins_IF(exc, args, args_pos)
 {
@@ -24676,6 +24823,16 @@ function Ins_DELTAP(exc, args, args_pos)
     var B2 = 0;
 
     var bIsSubpix = exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING;
+
+    if (bIsSubpix)
+    {
+        if (exc.ignore_x_mode && exc.iup_called && (exc.sph_tweak_flags & 2048) != 0)
+        {
+            exc.new_top = exc.args;
+            return;
+        }
+    }
+
     // TODO: unpatented
 
     var nump = args[args_pos];   /* some points theoretically may occur more
@@ -24745,7 +24902,7 @@ function Ins_DELTAP(exc, args, args_pos)
                     *  - glyph is specifically set to allow it
                     *  - glyph is composite and freedom vector is not subpixel vector
                     */
-                    if (!exc.ignore_x_mode || (exc.sph_tweak_flags & 8) != 0 ||
+                    if (!exc.ignore_x_mode || (exc.sph_tweak_flags & 2) != 0 ||
                         (exc.is_composite && exc.GS.freeVector.y != 0))
                         exc.func_move(exc, exc.zp0, A, B);
                     else if (exc.ignore_x_mode) /* Otherwise apply subpixel hinting and compatibility mode rules */
@@ -24755,16 +24912,17 @@ function Ins_DELTAP(exc, args, args_pos)
                         else
                             B1 = exc.zp0.cur[exc.zp0._offset_cur + A].x;
 
-                        /* Standard Subpixel Hinting:  Allow y move */
-                        if (!exc.compatibility_mode && exc.GS.freeVector.y != 0)
+                        /*
+                        // Standard Subpixel Hinting:  Allow y move
+                        if (!exc.face.sph_compatibility_mode && exc.GS.freeVector.y != 0)
                             exc.func_move(exc, exc.zp0, A, B);
-                         /* Compatibility Mode: Allow x or y move if point touched in Y direction */
-                        else if (exc.compatibility_mode && (exc.sph_tweak_flags & 16) == 0)
+                        // Compatibility Mode: Allow x or y move if point touched in Y direction
+                        else */if (exc.face.sph_compatibility_mode && (exc.sph_tweak_flags & 4) == 0)
                         {
                             /* save the y value of the point now; compare after move */
                             B1 = exc.zp0.cur[exc.zp0._offset_cur + A].y;
 
-                            if ((exc.sph_tweak_flags & 131072) != 0)
+                            if ((exc.sph_tweak_flags & 16384) != 0)
                                 B = FT_PIX_ROUND(B1 + B) - B1;
 
                             /*
@@ -24778,9 +24936,9 @@ function Ins_DELTAP(exc, args, args_pos)
                         B2 = exc.zp0.cur[exc.zp0._offset_cur + A].y;
 
                         /* Reverse this move if it results in a disallowed move */
-                        if (exc.GS.freeVector.y != 0 && (((exc.sph_tweak_flags & 2097152) &&
-                                    (B1 % 64) == 0 && (B2 % 64) != 0 && !exc.size.ttfautohinted) ||
-                                    ((exc.sph_tweak_flags & 1048576) && (B1 % 64) != 0 && (B2 % 64) != 0)))
+                        if (exc.GS.freeVector.y != 0 &&
+                            ((exc.face.sph_compatibility_mode && (B1 & 63) == 0 && (B2 & 63) != 0 ) ||
+                            ((exc.sph_tweak_flags & 524288) != 0 && (B1 & 63) != 0 && (B2 & 63) != 0)))
                             exc.func_move(exc, exc.zp0, A, -B);
                     }
                 }
@@ -24881,7 +25039,7 @@ function Ins_JROT(exc, args, args_pos)
         if (args[args_pos] == 0 && exc.args == 0)
             exc.error = 132;
         exc.IP += args[args_pos];
-        if (exc.IP < 0 || (exc.callTop > 0 && exc.IP > exc.callStack[exc.callTop - 1].Cur_End))
+        if (exc.IP < 0 || (exc.callTop > 0 && exc.IP > exc.callStack[exc.callTop - 1].Def.end))
             exc.error = 132;
         exc.step_ins = false;
     }
@@ -24894,7 +25052,7 @@ function Ins_JROF(exc, args, args_pos)
         if (args[args_pos] == 0 && exc.args == 0)
             exc.error = 132;
         exc.IP += args[args_pos];
-        if (exc.IP < 0 || (exc.callTop > 0 && exc.IP > exc.callStack[exc.callTop - 1].Cur_End))
+        if (exc.IP < 0 || (exc.callTop > 0 && exc.IP > exc.callStack[exc.callTop - 1].Def.end))
             exc.error = 132;
         exc.step_ins = false;
     }
@@ -25075,6 +25233,12 @@ function Ins_SDPVTL(exc, args, args_pos)
     A = v1.x - v2.x;
     B = v1.y - v2.y;
 
+    if ( A == 0 && B == 0 )
+    {
+        A    = 0x4000;
+        aOpc = 0;
+    }
+
     if ((aOpc & 1) != 0)
     {
         var C =  B;   /* counter clockwise rotation */
@@ -25122,7 +25286,7 @@ function Ins_GETINFO(exc, args, args_pos)
     /* Selector Bit:  1             */
     /* Return Bit(s): 8             */
     /*                              */
-    if (( args[args_pos] & 2) != 0 && exc.tt_metrics.rotated)
+    if ((args[args_pos] & 2) != 0 && exc.tt_metrics.rotated)
         K |= 0x80;
 
     /********************************/
@@ -25153,16 +25317,15 @@ function Ins_GETINFO(exc, args, args_pos)
             if ((args[args_pos] & 32) != 0 && exc.grayscale_hinting)
                 K |= 1 << 12;
 
-            /********************************/
-            /* HINTING FOR SUBPIXEL         */
-            /* Selector Bit:  6             */
-            /* Return Bit(s): 13            */
-            /*                              */
-            if ((args[args_pos] & 64) != 0 && exc.subpixel_hinting && exc.rasterizer_version >= 37)
+            if (exc.rasterizer_version >= 37)
             {
-                K |= 1 << 13;
-
-                /* the stuff below is irrelevant if subpixel_hinting is not set */
+                /********************************/
+                /* HINTING FOR SUBPIXEL         */
+                /* Selector Bit:  6             */
+                /* Return Bit(s): 13            */
+                /*                              */
+                if ((args[0] & 64) != 0 && exc.subpixel_hinting)
+                    K |= 1 << 13;
 
                 /********************************/
                 /* COMPATIBLE WIDTHS ENABLED    */
@@ -25170,7 +25333,7 @@ function Ins_GETINFO(exc, args, args_pos)
                 /* Return Bit(s): 14            */
                 /*                              */
                 /* Functionality still needs to be added */
-                if ((args[args_pos] & 128) != 0 && exc.compatible_widths)
+                if ((args[0] & 128) != 0 && exc.compatible_widths)
                     K |= 1 << 14;
 
                 /********************************/
@@ -25179,7 +25342,7 @@ function Ins_GETINFO(exc, args, args_pos)
                 /* Return Bit(s): 15            */
                 /*                              */
                 /* Functionality still needs to be added */
-                if ((args[args_pos] & 256) != 0 && exc.symmetrical_smoothing)
+                if ((args[0] & 256 ) != 0 && exc.symmetrical_smoothing)
                     K |= 1 << 15;
 
                 /********************************/
@@ -25188,7 +25351,7 @@ function Ins_GETINFO(exc, args, args_pos)
                 /* Return Bit(s): 16            */
                 /*                              */
                 /* Functionality still needs to be added */
-                if ((args[args_pos] & 512) != 0 && exc.bgr)
+                if ((args[0] & 512) != 0 && exc.bgr)
                     K |= 1 << 16;
 
                 if (exc.rasterizer_version >= 38)
@@ -25199,7 +25362,7 @@ function Ins_GETINFO(exc, args, args_pos)
                     /* Return Bit(s): 17            */
                     /*                              */
                     /* Functionality still needs to be added */
-                    if ((args[args_pos] & 1024) != 0 && exc.subpixel_positioned)
+                    if ((args[0] & 1024) != 0 && exc.subpixel_positioned)
                         K |= 1 << 17;
                 }
             }
@@ -25354,7 +25517,7 @@ function Ins_MDRP(exc, args, args_pos)
 
     if (bIsSubpix)
     {
-        if (exc.ignore_x_mode && exc.GS.freeVector.x != 0 && (exc.sph_tweak_flags & 2048) == 0)
+        if (exc.ignore_x_mode && exc.GS.freeVector.x != 0 && (exc.sph_tweak_flags & 256) == 0)
             minimum_distance = 0;
     }
 
@@ -25369,6 +25532,7 @@ function Ins_MDRP(exc, args, args_pos)
         exc.GS.rp2 = point;
         if ((exc.opcode & 16) != 0)
             exc.GS.rp0 = point;
+        return;
     }
 
     /* XXX: Is there some undocumented feature while in the */
@@ -25416,7 +25580,7 @@ function Ins_MDRP(exc, args, args_pos)
         if (bIsSubpix)
         {
             if (exc.ignore_x_mode && exc.GS.freeVector.x != 0)
-                distance = Round_None(org_dist, exc.tt_metrics.compensations[exc.opcode & 3]);
+                distance = Round_None(exc, org_dist, exc.tt_metrics.compensations[exc.opcode & 3]);
             else
                 distance = exc.func_round(exc, org_dist, exc.tt_metrics.compensations[exc.opcode & 3]);
         }
@@ -25468,7 +25632,7 @@ function Ins_MIRP(exc, args, args_pos)
 
     if (bIsSubpix)
     {
-        if (exc.ignore_x_mode && exc.GS.freeVector.x != 0 && (exc.sph_tweak_flags & 2048) == 0)
+        if (exc.ignore_x_mode && exc.GS.freeVector.x != 0 && (exc.sph_tweak_flags & 256) == 0)
             control_value_cutin = minimum_distance = 0;
     }
 
@@ -25482,6 +25646,7 @@ function Ins_MIRP(exc, args, args_pos)
         if ((exc.opcode & 16) != 0)
             exc.GS.rp0 = point;
         exc.GS.rp2 = point;
+        return;
     }
 
     var cvt_dist = 0;
@@ -25490,12 +25655,6 @@ function Ins_MIRP(exc, args, args_pos)
     else
         cvt_dist = exc.func_read_cvt(exc, cvtEntry - 1);
         
-    if (bIsSubpix)
-    {
-        if (exc.sph_tweak_flags & 8388608)
-            cvt_dist = 0;
-    }
-
     /* single width test */
     if (Math.abs(cvt_dist - exc.GS.single_width_value) < exc.GS.single_width_cutin)
     {
@@ -25513,8 +25672,7 @@ function Ins_MIRP(exc, args, args_pos)
         exc.zp1.org[exc.zp1._offset_org + point].x = _v.x + TT_MulFix14(cvt_dist, exc.GS.freeVector.x);
         exc.zp1.org[exc.zp1._offset_org + point].y = _v.y + TT_MulFix14(cvt_dist, exc.GS.freeVector.y);
 
-        exc.zp1.cur[exc.zp1._offset_cur + point].x = exc.zp1.org[exc.zp1._offset_org + point].x;
-        exc.zp1.cur[exc.zp1._offset_cur + point].y = exc.zp1.org[exc.zp1._offset_org + point].y;
+        copy_vector(exc.zp1.cur[exc.zp1._offset_cur + point], exc.zp1.org[exc.zp1._offset_org + point]);
     }
 
     var v1 = exc.zp1.org[exc.zp1._offset_org + point];
@@ -25536,7 +25694,7 @@ function Ins_MIRP(exc, args, args_pos)
 
     if (bIsSubpix) //#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
     {
-        if (exc.GS.freeVector.y != 0 && (exc.sph_tweak_flags & 4194304) != 0)
+        if (exc.ignore_x_mode && exc.GS.freeVector.y != 0 && (exc.sph_tweak_flags & 262144) != 0)
         {
             if (cur_dist < -64)
                 cvt_dist -= 16;
@@ -25570,7 +25728,18 @@ function Ins_MIRP(exc, args, args_pos)
         distance = exc.func_round(exc, cvt_dist, exc.tt_metrics.compensations[exc.opcode & 3]);
     }
     else
+    {
+        if (bIsSubpix)
+        {
+            /* do cvt cut-in always in MIRP for sph */
+            if (exc.ignore_x_mode && exc.GS.gep0 == exc.GS.gep1)
+            {
+                if (Math.abs(cvt_dist - org_dist) > control_value_cutin)
+                    cvt_dist = org_dist;
+            }
+        }
         distance = Round_None(exc, cvt_dist, exc.tt_metrics.compensations[exc.opcode & 3]);
+    }
 
     /* minimum distance test */
     if ((exc.opcode & 8) != 0)
@@ -25596,10 +25765,10 @@ function Ins_MIRP(exc, args, args_pos)
         var B1 = exc.zp1.cur[exc.zp1._offset_cur + point].y;
 
         /* Round moves if necessary */
-        if (exc.ignore_x_mode && exc.GS.freeVector.y != 0 && (exc.sph_tweak_flags & 131072) != 0)
+        if (exc.ignore_x_mode && exc.GS.freeVector.y != 0 && (exc.sph_tweak_flags & 16384) != 0)
             distance = FT_PIX_ROUND(B1 + distance - cur_dist) - B1 + cur_dist;
 
-        if (exc.GS.freeVector.y != 0 && (exc.opcode & 16) == 0 && (exc.opcode & 8) == 0 && (exc.sph_tweak_flags & 32) != 0)
+        if (exc.ignore_x_mode && exc.GS.freeVector.y != 0 && (exc.opcode & 16) == 0 && (exc.opcode & 8) == 0 && (exc.sph_tweak_flags & 8) != 0)
             distance += 64;
 
         exc.func_move(exc, exc.zp1, point, distance - cur_dist);
@@ -25610,15 +25779,16 @@ function Ins_MIRP(exc, args, args_pos)
         /* Reverse move if necessary */
         if (exc.ignore_x_mode)
         {
-            if ((exc.sph_tweak_flags & 2097152) != 0 && exc.GS.freeVector.y != 0 && (B1 % 64) == 0 &&
-                        (B2 % 64) != 0 && !exc.size.ttfautohinted)
+            if (exc.face.sph_compatibility_mode &&
+                exc.GS.freeVector.y != 0 &&
+                ( B1 & 63 ) == 0 &&
+                ( B2 & 63 ) != 0)
                 reverse_move = true;
 
-            if ((exc.sph_tweak_flags & 1048576) != 0 && exc.GS.freeVector.y != 0 &&
-                        (B2 % 64) != 0 && (B1 % 64) != 0)
-                reverse_move = true;
-
-            if ((exc.sph_tweak_flags & 128) != 0 && !reverse_move && Math.abs(B1 - B2) >= 64)
+            if ((exc.sph_tweak_flags & 65536) &&
+                exc.GS.freeVector.y != 0 &&
+                ( B2 & 63 ) != 0 &&
+                ( B1 & 63 ) != 0)
                 reverse_move = true;
         }
 
@@ -25917,9 +26087,17 @@ function TT_RunIns(exc)
     var _tt_hints = exc.face.driver.library.tt_hint_props;
     if (_tt_hints.TT_CONFIG_OPTION_SUBPIXEL_HINTING) //#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
     {
-        if (exc.ignore_x_mode)
-            exc.iup_called = false;
+        exc.iup_called = false;
     }//#endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
+
+    var opcode_pattern = [
+        [
+            0x06, /* SPVTL   */
+            0x7D, /* RDTG    */
+        ]
+    ];
+    var opcode_pointer = [ 0 ];
+    var opcode_size    = [ 1 ];
 
     /* set CVT functions */
     exc.tt_metrics.ratio = 0;
@@ -25932,7 +26110,7 @@ function TT_RunIns(exc)
     }
     else
     {
-      /* square pixels, use normal routines */
+        /* square pixels, use normal routines */
         exc.func_read_cvt  = Read_CVT;
         exc.func_write_cvt = Write_CVT;
         exc.func_move_cvt  = Move_CVT;
@@ -25991,6 +26169,30 @@ function TT_RunIns(exc)
         exc.step_ins = true;
         exc.error    = 0;
 
+        if (_tt_hints.TT_CONFIG_OPTION_SUBPIXEL_HINTING) //#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
+        {
+            for (var i_patt = 0; i_patt < opcode_pattern.length; i_patt++)
+            {
+                if (opcode_pointer[i_patt] < opcode_size[i_patt] &&
+                    exc.opcode == opcode_pattern[i_patt][opcode_pointer[i_patt]])
+                {
+                    opcode_pointer[i_patt] += 1;
+
+                    if ( opcode_pointer[i_patt] == opcode_size[i_patt] )
+                    {
+                        switch ( i_patt )
+                        {
+                            case 0:
+                                break;
+                        }
+                        opcode_pointer[i_patt] = 0;
+                    }
+                }
+                else
+                    opcode_pointer[i_patt] = 0;
+            }
+        }//#endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
+
         Instruct_Dispatch[exc.opcode](exc, exc.stack, exc.args);
  
         var bSuiteLabel = false;
@@ -26019,8 +26221,7 @@ function TT_RunIns(exc)
                             callrec.Caller_Range = exc.curRange;
                             callrec.Caller_IP    = exc.IP + 1;
                             callrec.Cur_Count    = 1;
-                            callrec.Cur_Restart  = _def.start;
-                            callrec.Cur_End      = _def.end;
+                            callrec.Def          = _def;
 
                             if (Ins_Goto_CodeRange(def.range, def.start) == 1)
                                 return SetErrorAndReturn(exc);
@@ -26123,412 +26324,210 @@ function Move_CVT_Stretched(exc, idx, value)
 /*********************************************************************/
 function CSubpixHintingHacks()
 {
-    this.FAMILY_CLASS_Rules = {};
-
-    var _object_MS_Legacy_Fonts = {};
-    _object_MS_Legacy_Fonts["Aharoni"] = true;
-    _object_MS_Legacy_Fonts["Andale Mono"] = true;
-    _object_MS_Legacy_Fonts["Andalus"] = true;
-    _object_MS_Legacy_Fonts["Angsana New"] = true;
-    _object_MS_Legacy_Fonts["AngsanaUPC"] = true;
-    _object_MS_Legacy_Fonts["Arabic Transparent"] = true;
-    _object_MS_Legacy_Fonts["Arial Black"] = true;
-    _object_MS_Legacy_Fonts["Arial Narrow"] = true;
-    _object_MS_Legacy_Fonts["Arial Unicode MS"] = true;
-    _object_MS_Legacy_Fonts["Arial"] = true;
-    _object_MS_Legacy_Fonts["Batang"] = true;
-    _object_MS_Legacy_Fonts["Browallia New"] = true;
-    _object_MS_Legacy_Fonts["BrowalliaUPC"] = true;
-    _object_MS_Legacy_Fonts["Comic Sans MS"] = true;
-    _object_MS_Legacy_Fonts["Cordia New"] = true;
-    _object_MS_Legacy_Fonts["CordiaUPC"] = true;
-    _object_MS_Legacy_Fonts["Courier New"] = true;
-    _object_MS_Legacy_Fonts["DFKai-SB"] = true;
-    _object_MS_Legacy_Fonts["David Transparent"] = true;
-    _object_MS_Legacy_Fonts["David"] = true;
-    _object_MS_Legacy_Fonts["DilleniaUPC"] = true;
-    _object_MS_Legacy_Fonts["Estrangelo Edessa"] = true;
-    _object_MS_Legacy_Fonts["EucrosiaUPC"] = true;
-    _object_MS_Legacy_Fonts["FangSong_GB2312"] = true;
-    _object_MS_Legacy_Fonts["Fixed Miriam Transparent"] = true;
-    _object_MS_Legacy_Fonts["FrankRuehl"] = true;
-    _object_MS_Legacy_Fonts["Franklin Gothic Medium"] = true;
-    _object_MS_Legacy_Fonts["FreesiaUPC"] = true;
-    _object_MS_Legacy_Fonts["Garamond"] = true;
-    _object_MS_Legacy_Fonts["Gautami"] = true;
-    _object_MS_Legacy_Fonts["Georgia"] = true;
-    _object_MS_Legacy_Fonts["Gulim"] = true;
-    _object_MS_Legacy_Fonts["Impact"] = true;
-    _object_MS_Legacy_Fonts["IrisUPC"] = true;
-    _object_MS_Legacy_Fonts["JasmineUPC"] = true;
-    _object_MS_Legacy_Fonts["KaiTi_GB2312"] = true;
-    _object_MS_Legacy_Fonts["KodchiangUPC"] = true;
-    _object_MS_Legacy_Fonts["Latha"] = true;
-    _object_MS_Legacy_Fonts["Levenim MT"] = true;
-    _object_MS_Legacy_Fonts["LilyUPC"] = true;
-    _object_MS_Legacy_Fonts["Lucida Console"] = true;
-    _object_MS_Legacy_Fonts["Lucida Sans Unicode"] = true;
-    _object_MS_Legacy_Fonts["MS Gothic"] = true;
-    _object_MS_Legacy_Fonts["MS Mincho"] = true;
-    _object_MS_Legacy_Fonts["MV Boli"] = true;
-    _object_MS_Legacy_Fonts["Mangal"] = true;
-    _object_MS_Legacy_Fonts["Marlett"] = true;
-    _object_MS_Legacy_Fonts["Microsoft Sans Serif"] = true;
-    _object_MS_Legacy_Fonts["Mingliu"] = true;
-    _object_MS_Legacy_Fonts["Miriam Fixed"] = true;
-    _object_MS_Legacy_Fonts["Miriam Transparent"] = true;
-    _object_MS_Legacy_Fonts["Miriam"] = true;
-    _object_MS_Legacy_Fonts["Narkisim"] = true;
-    _object_MS_Legacy_Fonts["Palatino Linotype"] = true;
-    _object_MS_Legacy_Fonts["Raavi"] = true;
-    _object_MS_Legacy_Fonts["Rod Transparent"] = true;
-    _object_MS_Legacy_Fonts["Rod"] = true;
-    _object_MS_Legacy_Fonts["Shruti"] = true;
-    _object_MS_Legacy_Fonts["SimHei"] = true;
-    _object_MS_Legacy_Fonts["Simplified Arabic Fixed"] = true;
-    _object_MS_Legacy_Fonts["Simplified Arabic"] = true;
-    _object_MS_Legacy_Fonts["Simsun"] = true;
-    _object_MS_Legacy_Fonts["Sylfaen"] = true;
-    _object_MS_Legacy_Fonts["Symbol"] = true;
-    _object_MS_Legacy_Fonts["Tahoma"] = true;
-    _object_MS_Legacy_Fonts["Times New Roman"] = true;
-    _object_MS_Legacy_Fonts["Traditional Arabic"] = true;
-    _object_MS_Legacy_Fonts["Trebuchet MS"] = true;
-    _object_MS_Legacy_Fonts["Tunga"] = true;
-    _object_MS_Legacy_Fonts["Verdana"] = true;
-    _object_MS_Legacy_Fonts["Webdings"] = true;
-    _object_MS_Legacy_Fonts["Wingdings"] = true;
-
-    var _object_Core_MS_Legacy_Fonts = {};
-    _object_Core_MS_Legacy_Fonts["Arial Black"] = true;
-    _object_Core_MS_Legacy_Fonts["Arial Narrow"] = true;
-    _object_Core_MS_Legacy_Fonts["Arial Unicode MS"] = true;
-    _object_Core_MS_Legacy_Fonts["Arial"] = true;
-    _object_Core_MS_Legacy_Fonts["Comic Sans MS"] = true;
-    _object_Core_MS_Legacy_Fonts["Courier New"] = true;
-    _object_Core_MS_Legacy_Fonts["Garamond"] = true;
-    _object_Core_MS_Legacy_Fonts["Georgia"] = true;
-    _object_Core_MS_Legacy_Fonts["Impact"] = true;
-    _object_Core_MS_Legacy_Fonts["Lucida Console"] = true;
-    _object_Core_MS_Legacy_Fonts["Lucida Sans Unicode"] = true;
-    _object_Core_MS_Legacy_Fonts["Microsoft Sans Serif"] = true;
-    _object_Core_MS_Legacy_Fonts["Palatino Linotype"] = true;
-    _object_Core_MS_Legacy_Fonts["Tahoma"] = true;
-    _object_Core_MS_Legacy_Fonts["Times New Roman"] = true;
-    _object_Core_MS_Legacy_Fonts["Trebuchet MS"] = true;
-    _object_Core_MS_Legacy_Fonts["Verdana"] = true;
-
-    var _object_Apple_Legacy_Fonts = {};
-    _object_Apple_Legacy_Fonts["Geneva"] = true;
-    _object_Apple_Legacy_Fonts["Times"] = true;
-    _object_Apple_Legacy_Fonts["Monaco"] = true;
-    _object_Apple_Legacy_Fonts["Century"] = true;
-    _object_Apple_Legacy_Fonts["Chalkboard"] = true;
-    _object_Apple_Legacy_Fonts["Lobster"] = true;
-    _object_Apple_Legacy_Fonts["Century Gothic"] = true;
-    _object_Apple_Legacy_Fonts["Optima"] = true;
-    _object_Apple_Legacy_Fonts["Lucida Grande"] = true;
-    _object_Apple_Legacy_Fonts["Gill Sans"] = true;
-    _object_Apple_Legacy_Fonts["Baskerville"] = true;
-    _object_Apple_Legacy_Fonts["Helvetica"] = true;
-    _object_Apple_Legacy_Fonts["Helvetica Neue"] = true;
-
-    var _object_Legacy_Sans_Fonts = {};
-    _object_Legacy_Sans_Fonts["Andale Mono"] = true;
-    _object_Legacy_Sans_Fonts["Arial Unicode MS"] = true;
-    _object_Legacy_Sans_Fonts["Arial"] = true;
-    _object_Legacy_Sans_Fonts["Century Gothic"] = true;
-    _object_Legacy_Sans_Fonts["Comic Sans MS"] = true;
-    _object_Legacy_Sans_Fonts["Franklin Gothic Medium"] = true;
-    _object_Legacy_Sans_Fonts["Geneva"] = true;
-    _object_Legacy_Sans_Fonts["Lucida Console"] = true;
-    _object_Legacy_Sans_Fonts["Lucida Grande"] = true;
-    _object_Legacy_Sans_Fonts["Lucida Sans Unicode"] = true;
-    _object_Legacy_Sans_Fonts["Lucida Sans Typewriter"] = true;
-    _object_Legacy_Sans_Fonts["Microsoft Sans Serif"] = true;
-    _object_Legacy_Sans_Fonts["Monaco"] = true;
-    _object_Legacy_Sans_Fonts["Tahoma"] = true;
-    _object_Legacy_Sans_Fonts["Trebuchet MS"] = true;
-    _object_Legacy_Sans_Fonts["Verdana"] = true;
-
-    var _object_Misc_Legacy_Fonts = {};
-    _object_Misc_Legacy_Fonts["Dark Courier"] = true;
-
-    var _object_Verdana_Clones = {};
-    _object_Verdana_Clones["DejaVu Sans"] = true;
-    _object_Verdana_Clones["Bitstream Vera Sans"] = true;
-
-    var _object_Verdana_and_Clones = {};
-    _object_Verdana_and_Clones["DejaVu Sans"] = true;
-    _object_Verdana_and_Clones["Bitstream Vera Sans"] = true;
-    _object_Verdana_and_Clones["Verdana"] = true;
-
-    this.FAMILY_CLASS_Rules["MS Legacy Fonts"] = _object_MS_Legacy_Fonts;
-    this.FAMILY_CLASS_Rules["Core MS Legacy Fonts"] = _object_Core_MS_Legacy_Fonts;
-    this.FAMILY_CLASS_Rules["Apple Legacy Fonts"] = _object_Apple_Legacy_Fonts;
-    this.FAMILY_CLASS_Rules["Legacy Sans Fonts"] = _object_Legacy_Sans_Fonts;
-    this.FAMILY_CLASS_Rules["Misc Legacy Fonts"] = _object_Misc_Legacy_Fonts;
-    this.FAMILY_CLASS_Rules["Verdana Clones"] = _object_Verdana_Clones;
-    this.FAMILY_CLASS_Rules["Verdana and Clones"] = _object_Verdana_and_Clones;
-
-    _object_MS_Legacy_Fonts = null;
-    _object_Core_MS_Legacy_Fonts = null;
-    _object_Apple_Legacy_Fonts = null;
-    _object_Legacy_Sans_Fonts = null;
-    _object_Misc_Legacy_Fonts = null;
-    _object_Verdana_Clones = null;
-    _object_Verdana_and_Clones = null;
-
-    this.STYLE_CLASS_Rules = {};
-
-    var _object_Regular_Class = {};
-    _object_Regular_Class["Regular"] = true;
-    _object_Regular_Class["Book"] = true;
-    _object_Regular_Class["Medium"] = true;
-    _object_Regular_Class["Roman"] = true;
-    _object_Regular_Class["Normal"] = true;
-
-    var _object_RegularItalic_Class = {};
-    _object_RegularItalic_Class["Regular"] = true;
-    _object_RegularItalic_Class["Book"] = true;
-    _object_RegularItalic_Class["Medium"] = true;
-    _object_RegularItalic_Class["Italic"] = true;
-    _object_RegularItalic_Class["Oblique"] = true;
-    _object_RegularItalic_Class["Roman"] = true;
-    _object_RegularItalic_Class["Normal"] = true;
-
-    var _object_BoldBoldItalic_Class = {};
-    _object_BoldBoldItalic_Class["Bold"] = true;
-    _object_BoldBoldItalic_Class["Bold Italic"] = true;
-    _object_BoldBoldItalic_Class["Black"] = true;
-
-    var _object_BoldItalicBoldItalic_Class = {};
-    _object_BoldItalicBoldItalic_Class["Bold"] = true;
-    _object_BoldItalicBoldItalic_Class["Bold Italic"] = true;
-    _object_BoldItalicBoldItalic_Class["Black"] = true;
-    _object_BoldItalicBoldItalic_Class["Italic"] = true;
-    _object_BoldItalicBoldItalic_Class["Oblique"] = true;
-
-    var _object_RegularBold_Class = {};
-    _object_RegularBold_Class["Regular"] = true;
-    _object_RegularBold_Class["Book"] = true;
-    _object_RegularBold_Class["Medium"] = true;
-    _object_RegularBold_Class["Normal"] = true;
-    _object_RegularBold_Class["Roman"] = true;
-    _object_RegularBold_Class["Bold"] = true;
-    _object_RegularBold_Class["Black"] = true;
-
-    this.STYLE_CLASS_Rules["Regular Class"] = _object_Regular_Class;
-    this.STYLE_CLASS_Rules["Regular/Italic Class"] = _object_RegularItalic_Class;
-    this.STYLE_CLASS_Rules["Bold/BoldItalic Class"] = _object_BoldBoldItalic_Class;
-    this.STYLE_CLASS_Rules["Bold/Italic/BoldItalic Class"] = _object_BoldItalicBoldItalic_Class;
-    this.STYLE_CLASS_Rules["Regular/Bold Class"] = _object_RegularBold_Class;
-
-    this.is_member_of_family_class = function(detected_font_name, rule_font_name)
+    this.Correct_Init_Obj = function(_class)
     {
-        /* Does font name match rule family? */
-        if (detected_font_name == rule_font_name)
-            return true;
-
-        /* Is font name a wildcard ""? */
-        if (rule_font_name == "")
-            return true;
-
-        var _fcr = this.FAMILY_CLASS_Rules[rule_font_name];
-        if (undefined !== _fcr)
+        for (var prop in _class)
         {
-            if (undefined !== _fcr[detected_font_name])
-                return true;
+            if (!_class.hasOwnProperty(prop))
+                continue;
+
+            var _arr = _class[prop];
+            var _obj = {};
+
+            var _len = _arr.length;
+            for (var i = 0; i < _len; i++)
+                _obj[_arr[i]] = true;
+
+            _class[prop] = _obj;
         }
+    };
 
-        return false;
-    }
-
-    this.is_member_of_style_class = function(detected_font_style, rule_font_style)
+    this.FAMILY_CLASS_Rules =
     {
-        /* Does font style match rule style? */
-        if (detected_font_style == rule_font_style)
-            return true;
+        "MS Legacy Fonts" : [
+            "Aharoni",
+            "Andale Mono",
+            "Andalus",
+            "Angsana New",
+            "AngsanaUPC",
+            "Arabic Transparent",
+            "Arial Black",
+            "Arial Narrow",
+            "Arial Unicode MS",
+            "Arial",
+            "Batang",
+            "Browallia New",
+            "BrowalliaUPC",
+            "Comic Sans MS",
+            "Cordia New",
+            "CordiaUPC",
+            "Courier New",
+            "DFKai-SB",
+            "David Transparent",
+            "David",
+            "DilleniaUPC",
+            "Estrangelo Edessa",
+            "EucrosiaUPC",
+            "FangSong_GB2312",
+            "Fixed Miriam Transparent",
+            "FrankRuehl",
+            "Franklin Gothic Medium",
+            "FreesiaUPC",
+            "Garamond",
+            "Gautami",
+            "Georgia",
+            "Gulim",
+            "Impact",
+            "IrisUPC",
+            "JasmineUPC",
+            "KaiTi_GB2312",
+            "KodchiangUPC",
+            "Latha",
+            "Levenim MT",
+            "LilyUPC",
+            "Lucida Console",
+            "Lucida Sans Unicode",
+            "MS Gothic",
+            "MS Mincho",
+            "MV Boli",
+            "Mangal",
+            "Marlett",
+            "Microsoft Sans Serif",
+            "Mingliu",
+            "Miriam Fixed",
+            "Miriam Transparent",
+            "Miriam",
+            "Narkisim",
+            "Palatino Linotype",
+            "Raavi",
+            "Rod Transparent",
+            "Rod",
+            "Shruti",
+            "SimHei",
+            "Simplified Arabic Fixed",
+            "Simplified Arabic",
+            "Simsun",
+            "Sylfaen",
+            "Symbol",
+            "Tahoma",
+            "Times New Roman",
+            "Traditional Arabic",
+            "Trebuchet MS",
+            "Tunga",
+            "Verdana",
+            "Webdings",
+            "Wingdings"
+        ],
+        "Core MS Legacy Fonts" : [
+            "Arial Black",
+            "Arial Narrow",
+            "Arial Unicode MS",
+            "Arial",
+            "Comic Sans MS",
+            "Courier New",
+            "Garamond",
+            "Georgia",
+            "Impact",
+            "Lucida Console",
+            "Lucida Sans Unicode",
+            "Microsoft Sans Serif",
+            "Palatino Linotype",
+            "Tahoma",
+            "Times New Roman",
+            "Trebuchet MS",
+            "Verdana"
+        ],
+        "Apple Legacy Fonts" : [
+            "Geneva",
+            "Times",
+            "Monaco",
+            "Century",
+            "Chalkboard",
+            "Lobster",
+            "Century Gothic",
+            "Optima",
+            "Lucida Grande",
+            "Gill Sans",
+            "Baskerville",
+            "Helvetica",
+            "Helvetica Neue"
+        ],
+        "Legacy Sans Fonts" : [
+            "Andale Mono",
+            "Arial Unicode MS",
+            "Arial",
+            "Century Gothic",
+            "Comic Sans MS",
+            "Franklin Gothic Medium",
+            "Geneva",
+            "Lucida Console",
+            "Lucida Grande",
+            "Lucida Sans Unicode",
+            "Lucida Sans Typewriter",
+            "Microsoft Sans Serif",
+            "Monaco",
+            "Tahoma",
+            "Trebuchet MS",
+            "Verdana"
+        ],
+        "Misc Legacy Fonts" : [
+            "Dark Courier"
+        ],
+        "Verdana Clones" : [
+            "DejaVu Sans",
+            "Bitstream Vera Sans"
+        ],
+        "Verdana and Clones" : [
+            "DejaVu Sans",
+            "Bitstream Vera Sans",
+            "Verdana"
+        ]
+    };
 
-        /* Is font style a wildcard ""? */
-        if (rule_font_style == "")
-            return true;
+    this.Correct_Init_Obj(this.FAMILY_CLASS_Rules);
 
-        /* Is font style contained in a class list? */
-        var _scr = this.STYLE_CLASS_Rules[rule_font_style];
-        if (undefined !== _scr)
-        {
-            if (undefined !== _scr[detected_font_style])
-                return true;
-        }
-
-        return false;
-    }
-
-    this.sph_test_tweak = function(face, family, ppem, style, glyph_index, rule, num_rules)
+    this.STYLE_CLASS_Rules =
     {
-        /* rule checks may be able to be optimized further */
-        for (var i = 0; i < num_rules; i++)
-        {
-            if (family != "" && this.is_member_of_family_class(family, rule[i].family))
-            {
-                if (rule[i].ppem == 0 || rule[i].ppem == ppem)
-                {
-                    if (style != "" && this.is_member_of_style_class(style, rule[i].style))
-                    {
-                        if (rule[i].glyph == 0 || FT_Get_Char_Index(face, rule[i].glyph) == glyph_index)
-                            return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
+        "Regular Class" : [
+            "Regular",
+            "Book",
+            "Medium",
+            "Roman",
+            "Normal"
+        ],
+        "Regular/Italic Class" : [
+            "Regular",
+            "Book",
+            "Medium",
+            "Italic",
+            "Oblique",
+            "Roman",
+            "Normal"
+        ],
+        "Bold/BoldItalic Class" : [
+            "Bold",
+            "Bold Italic",
+            "Black"
+        ],
+        "Bold/Italic/BoldItalic Class" : [
+            "Bold",
+            "Bold Italic",
+            "Black",
+            "Italic",
+            "Oblique"
+        ],
+        "Regular/Bold Class" : [
+            "Regular",
+            "Book",
+            "Medium",
+            "Normal",
+            "Roman",
+            "Bold",
+            "Black"
+        ]
+    };
 
-    this.scale_test_tweak = function(face, family, ppem, style, glyph_index, rule, num_rules)
-    {
-        /* rule checks may be able to be optimized further */
-        for (var i = 0; i < num_rules; i++)
-        {
-            if (family != "" && this.is_member_of_family_class(family, rule[i].family))
-            {
-                if (rule[i].ppem == 0 || rule[i].ppem == ppem)
-                {
-                    if (style != "" && this.is_member_of_style_class(style, rule[i].style))
-                    {
-                        if (rule[i].glyph == 0 || FT_Get_Char_Index(face, rule[i].glyph) == glyph_index)
-                            return rule[i].scale;
-                    }
-                }
-            }
-        }
-        return 1000;
-    }
-
-    this.sph_set_tweaks = function(loader, glyph_index)
-    {
-        var face = loader.face;
-        var family = face.family_name;
-        var ppem = loader.size.metrics.x_ppem;
-        var style = face.style_name;
-
-        /* don't apply rules if style isn't set */
-        if (face.style_name == "")
-            return;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.PIXEL_HINTING_Rules, this.PIXEL_HINTING_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 32768;
-
-        if (loader.exec.sph_tweak_flags & 32768)
-        {
-            loader.exec.ignore_x_mode = false;
-            return;
-        }
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.ALLOW_X_DMOVE_Rules, this.ALLOW_X_DMOVE_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 1;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.ALLOW_X_DMOVEX_Rules, this.ALLOW_X_DMOVEX_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 2;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.ALLOW_X_MOVE_ZP2_Rules, this.ALLOW_X_MOVE_ZP2_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 4;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.ALWAYS_DO_DELTAP_Rules, this.ALWAYS_DO_DELTAP_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 8;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.ALWAYS_SKIP_DELTAP_Rules, this.ALWAYS_SKIP_DELTAP_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 16;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.DEEMBOLDEN_Rules, this.DEEMBOLDEN_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 64;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.DELTAP_SKIP_EXAGGERATED_VALUES_Rules, this.DELTAP_SKIP_EXAGGERATED_VALUES_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 128;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.DO_SHPIX_Rules, this.DO_SHPIX_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 256;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.EMBOLDEN_Rules, this.EMBOLDEN_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 512;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.MIAP_HACK_Rules, this.MIAP_HACK_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 1024;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.NORMAL_ROUND_Rules, this.NORMAL_ROUND_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 2048;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.NO_ALIGNRP_AFTER_IUP_Rules, this.NO_ALIGNRP_AFTER_IUP_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 4096;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.NO_CALL_AFTER_IUP_Rules, this.NO_CALL_AFTER_IUP_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 8192;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.NO_DELTAP_AFTER_IUP_Rules, this.NO_DELTAP_AFTER_IUP_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 16384;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.RASTERIZER_35_Rules, this.RASTERIZER_35_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 65536;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.SKIP_INLINE_DELTAS_Rules, this.SKIP_INLINE_DELTAS_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 262144;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.SKIP_IUP_Rules, this.SKIP_IUP_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 524288;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.MIRP_CVT_ZERO_Rules, this.MIRP_CVT_ZERO_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 8388608;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.SKIP_OFFPIXEL_Y_MOVES_Rules, this.SKIP_OFFPIXEL_Y_MOVES_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 2097152;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.SKIP_OFFPIXEL_Y_MOVES_Rules_Exceptions, this.SKIP_OFFPIXEL_Y_MOVES_RULES_EXCEPTIONS_SIZE))
-            loader.exec.sph_tweak_flags &= ~2097152;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.SKIP_NONPIXEL_Y_MOVES_Rules, this.SKIP_NONPIXEL_Y_MOVES_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 1048576;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.SKIP_NONPIXEL_Y_MOVES_Rules_Exceptions, this.SKIP_NONPIXEL_Y_MOVES_RULES_EXCEPTIONS_SIZE))
-            loader.exec.sph_tweak_flags &= ~1048576;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.ROUND_NONPIXEL_Y_MOVES_Rules, this.ROUND_NONPIXEL_Y_MOVES_RULES_SIZE))
-            loader.exec.sph_tweak_flags |= 131072;
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.ROUND_NONPIXEL_Y_MOVES_Rules_Exceptions, this.ROUND_NONPIXEL_Y_MOVES_RULES_EXCEPTIONS_SIZE))
-            loader.exec.sph_tweak_flags &= ~1;
-
-        if (loader.exec.sph_tweak_flags & 65536)
-            loader.exec.rasterizer_version = 35;
-        else
-            loader.exec.rasterizer_version = 38;
-
-        /* re-execute fpgm always to avoid problems */
-        loader.exec.size.cvt_ready = false;
-        tt_size_ready_bytecode(loader.exec.size, (loader.load_flags & 128) != 0);
-
-        if ((loader.load_flags & 2) == 0)
-        {
-            if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.TIMES_NEW_ROMAN_HACK_Rules, this.TIMES_NEW_ROMAN_HACK_RULES_SIZE))
-                loader.exec.sph_tweak_flags |= 4194304;
-
-            if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.COURIER_NEW_2_HACK_Rules, this.COURIER_NEW_2_HACK_RULES_SIZE))
-                loader.exec.sph_tweak_flags |= 32;
-        }
-
-        if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.COMPATIBILITY_MODE_Rules, this.COMPATIBILITY_MODE_RULES_SIZE))
-        {
-            loader.exec.compatibility_mode = true;
-            loader.exec.ignore_x_mode      = true;
-        }
-        else
-            loader.exec.compatibility_mode = false;
-
-        if ((loader.load_flags & 2) == 0)
-        {
-            if (this.sph_test_tweak(face, family, ppem, style, glyph_index, this.COMPATIBLE_WIDTHS_Rules, this.COMPATIBLE_WIDTHS_RULES_SIZE))
-                loader.exec.compatible_widths = true;
-        }
-    }
+    this.Correct_Init_Obj(this.STYLE_CLASS_Rules);
 
     /***************************************************************/
     /***************************************************************/
@@ -26541,7 +26540,7 @@ function CSubpixHintingHacks()
         _ret.style = style;
         _ret.glyph = glyph;
         return _ret;
-    }
+    };
     this._create_SPH_ScaleRule = function(family, ppem, style, glyph, scale)
     {
         var _ret = new SPH_ScaleRule();
@@ -26551,137 +26550,75 @@ function CSubpixHintingHacks()
         _ret.glyph = glyph;
         _ret.scale = scale;
         return _ret;
-    }
+    };
 
-    this.COMPATIBILITY_MODE_RULES_SIZE = 4;
+    /* Force special legacy fixes for fonts.                                 */
     this.COMPATIBILITY_MODE_Rules = [
-        this._create_SPH_TweakRule("MS Legacy Fonts", 0, "", 0),
-        this._create_SPH_TweakRule("Apple Legacy Fonts", 0, "", 0),
-        this._create_SPH_TweakRule("Misc Legacy Fonts", 0, "", 0),
-        this._create_SPH_TweakRule("Verdana Clones", 0, "", 0)
-    ];
-
-    this.PIXEL_HINTING_RULES_SIZE = 4;
-    this.PIXEL_HINTING_Rules = [
-        /* these characters are almost always safe */
-        this._create_SPH_TweakRule("", 0, "", "<".charCodeAt(0)),
-        this._create_SPH_TweakRule("", 0, "", ">".charCodeAt(0)),
-        /* fixes the vanishing stem */
-        this._create_SPH_TweakRule("Times New Roman", 0, "Bold", "A".charCodeAt(0)),
-        this._create_SPH_TweakRule("Times New Roman", 0, "Bold", "V".charCodeAt(0))
-    ];
-
-    /* According to Greg Hitchcock and the MS whitepaper, this should work   */
-    /* on all legacy MS fonts, but creates artifacts with some.  Only using  */
-    /* where absolutely necessary.                                           */
-    this.SKIP_INLINE_DELTAS_RULES_SIZE = 1;
-    this.SKIP_INLINE_DELTAS_Rules = [
         this._create_SPH_TweakRule("-", 0, "", 0)
     ];
 
+    /* Don't do subpixel (ignore_x_mode) hinting; do normal hinting.         */
+    this.PIXEL_HINTING_Rules = [
+        /* these characters are almost always safe */
+        this._create_SPH_TweakRule("Courier New", 12, "Italic", "z".charCodeAt(0)),
+        this._create_SPH_TweakRule("Courier New", 11, "Italic", "z".charCodeAt(0))
+    ];
 
     /* Subpixel hinting ignores SHPIX rules on X.  Force SHPIX for these.    */
-    this.DO_SHPIX_RULES_SIZE = 1;
     this.DO_SHPIX_Rules = [
         this._create_SPH_TweakRule("-", 0, "", 0)
     ];
 
-
     /* Skip Y moves that start with a point that is not on a Y pixel         */
     /* boundary and don't move that point to a Y pixel boundary.             */
-    this.SKIP_NONPIXEL_Y_MOVES_RULES_SIZE = 10;
     this.SKIP_NONPIXEL_Y_MOVES_Rules = [
         /* fix vwxyz thinness*/
-        this._create_SPH_TweakRule("Consolas", 0, "Regular", 0),
-        /* fix tiny gap at top of m */
-        this._create_SPH_TweakRule("Arial", 0, "Regular", "m".charCodeAt(0)),
+        this._create_SPH_TweakRule("Consolas", 0, "", 0),
         /* Fix thin middle stems */
-        this._create_SPH_TweakRule("Core MS Legacy Fonts", 0, "Regular/Bold Class", "N".charCodeAt(0)),
-        this._create_SPH_TweakRule("Lucida Grande", 0, "", "N".charCodeAt(0)),
-        this._create_SPH_TweakRule("Lucida Grande", 0, "Bold", "y".charCodeAt(0)),
+        this._create_SPH_TweakRule("Core MS Legacy Fonts", 0, "Regular", 0),
         /* Cyrillic small letter I */
-        this._create_SPH_TweakRule("Legacy Sans Fonts", 0, "", 0x438),
-        this._create_SPH_TweakRule("Verdana Clones", 0, "","N".charCodeAt(0)),
-        this._create_SPH_TweakRule("Ubuntu", 0, "Regular Class", "N".charCodeAt(0)),
-        /* Fix misshapen x */
-        this._create_SPH_TweakRule("Verdana", 0, "Bold", "x".charCodeAt(0)),
-        /* Fix misshapen s */
-        this._create_SPH_TweakRule("Tahoma", 0, "", "s".charCodeAt(0))
-    ];
-
-    this.SKIP_NONPIXEL_Y_MOVES_RULES_EXCEPTIONS_SIZE = 6;
-    this.SKIP_NONPIXEL_Y_MOVES_Rules_Exceptions = [
-        this._create_SPH_TweakRule("Tahoma", 0, "", "N".charCodeAt(0)),
-        this._create_SPH_TweakRule("Comic Sans MS", 0, "", "N".charCodeAt(0)),
-        this._create_SPH_TweakRule("Verdana", 0, "Regular/Bold Class", "N".charCodeAt(0)),
-        this._create_SPH_TweakRule("Verdana", 11, "Bold", "x".charCodeAt(0)),
-        /* Cyrillic small letter I */
-        this._create_SPH_TweakRule("Arial", 0, "", 0x438),
-        this._create_SPH_TweakRule("Trebuchet MS", 0, "Bold", 0)
-    ];
-
-
-    /* Skip Y moves that move a point off a Y pixel boundary.                */
-    /* This fixes Tahoma, Trebuchet oddities and some issues with `$'.       */
-    this.SKIP_OFFPIXEL_Y_MOVES_RULES_SIZE = 5;
-    this.SKIP_OFFPIXEL_Y_MOVES_Rules = [
-        this._create_SPH_TweakRule("MS Legacy Fonts", 0, "", 0),
-        this._create_SPH_TweakRule("Apple Legacy Fonts", 0, "", 0),
-        this._create_SPH_TweakRule("Misc Legacy Fonts", 0, "", 0),
-        this._create_SPH_TweakRule("Ubuntu", 0, "Regular Class", 0),
+        this._create_SPH_TweakRule("Legacy Sans Fonts", 0, "", 0),
+        /* Fix artifacts with some Regular & Bold */
         this._create_SPH_TweakRule("Verdana Clones", 0, "", 0)
     ];
 
+    this.SKIP_NONPIXEL_Y_MOVES_Rules_Exceptions = [
+        /* Fixes < and > */
+        this._create_SPH_TweakRule("Courier New", 0, "Regular", 0)
+    ];
 
-    this.SKIP_OFFPIXEL_Y_MOVES_RULES_EXCEPTIONS_SIZE = 1;
+    this.SKIP_NONPIXEL_Y_MOVES_DELTAP_Rules = [
+        /* Maintain thickness of diagonal in 'N' */
+        this._create_SPH_TweakRule("Times New Roman", 0, "Regular/Bold Class", "N".charCodeAt(0)),
+        this._create_SPH_TweakRule("Georgia", 0, "Regular/Bold Class", "N".charCodeAt(0))
+    ];
+
+    /* Skip Y moves that move a point off a Y pixel boundary.                */
+    this.SKIP_OFFPIXEL_Y_MOVES_Rules = [
+        this._create_SPH_TweakRule("-", 0, "", 0)
+    ];
+
     this.SKIP_OFFPIXEL_Y_MOVES_Rules_Exceptions = [
         this._create_SPH_TweakRule("-", 0, "", 0)
     ];
 
-
     /* Round moves that don't move a point to a Y pixel boundary.            */
-    this.ROUND_NONPIXEL_Y_MOVES_RULES_SIZE = 3;
     this.ROUND_NONPIXEL_Y_MOVES_Rules = [
         /* Droid font instructions don't snap Y to pixels */
         this._create_SPH_TweakRule("Droid Sans", 0, "Regular/Italic Class", 0),
-        this._create_SPH_TweakRule("Droid Sans Mono", 0, "", 0),
-        this._create_SPH_TweakRule("Ubuntu", 0, "", 0)
+        this._create_SPH_TweakRule("Droid Sans Mono", 0, "", 0)
     ];
 
-
-    this.ROUND_NONPIXEL_Y_MOVES_RULES_EXCEPTIONS_SIZE = 3;
     this.ROUND_NONPIXEL_Y_MOVES_Rules_Exceptions = [
-        this._create_SPH_TweakRule("Droid Sans", 12, "Bold", 0),
-        this._create_SPH_TweakRule("Droid Sans", 13, "Bold", 0),
-        this._create_SPH_TweakRule("Droid Sans", 16, "Bold", 0)
+        this._create_SPH_TweakRule("-", 0, "", 0)
     ];
-
-
-    /* Allow a Direct_Move_X along X freedom vector if matched.              */
-    this.ALLOW_X_DMOVEX_RULES_SIZE = 1;
-    this.ALLOW_X_DMOVEX_Rules = [
-        this._create_SPH_TweakRule("-", 0, "Regular", 0)
-    ];
-
 
     /* Allow a Direct_Move along X freedom vector if matched.                */
-    this.ALLOW_X_DMOVE_RULES_SIZE = 1;
     this.ALLOW_X_DMOVE_Rules = [
         /* Fixes vanishing diagonal in 4 */
         this._create_SPH_TweakRule("Verdana", 0, "Regular", "4".charCodeAt(0))
     ];
 
-
-    /* Allow a ZP2 move along freedom vector if matched;                     */
-    /* This is called from SHP, SHPIX, SHC, SHZ.                             */
-    this.ALLOW_X_MOVE_ZP2_RULES_SIZE = 1;
-    this.ALLOW_X_MOVE_ZP2_Rules = [
-        this._create_SPH_TweakRule("-", 0, "", 0)
-    ];
-
-
-    /* Return MS rasterizer version 35 if matched.                           */
-    this.RASTERIZER_35_RULES_SIZE = 8;
     this.RASTERIZER_35_Rules = [
         /* This seems to be the only way to make these look good */
         this._create_SPH_TweakRule("Times New Roman", 0, "Regular", "i".charCodeAt(0)),
@@ -26694,41 +26631,35 @@ function CSubpixHintingHacks()
         this._create_SPH_TweakRule("Times", 0, "", 0)
     ];
 
-
     /* Don't round to the subpixel grid.  Round to pixel grid.               */
-    this.NORMAL_ROUND_RULES_SIZE = 2;
     this.NORMAL_ROUND_Rules = [
-        /* Fix point "explosions" */
-        this._create_SPH_TweakRule("Courier New", 0, "", 0),
-        this._create_SPH_TweakRule("Verdana", 10, "Regular", "4".charCodeAt(0))
+        /* Fix serif thickness for certain ppems */
+        /* Can probably be generalized somehow   */
+        this._create_SPH_TweakRule("Courier New", 0, "", 0)
     ];
-
 
     /* Skip IUP instructions if matched.                                     */
-    this.SKIP_IUP_RULES_SIZE = 1;
     this.SKIP_IUP_Rules = [
-        this._create_SPH_TweakRule("Arial", 13, "Regular", "a".charCodeAt(0))
+        this._create_SPH_TweakRule("Arial", 13, "Regular", "a".charCodeAt(0)),
     ];
 
-
     /* Skip MIAP Twilight hack if matched.                                   */
-    this.MIAP_HACK_RULES_SIZE = 1;
     this.MIAP_HACK_Rules = [
         this._create_SPH_TweakRule("Geneva", 12, "", 0)
     ];
 
-
     /* Skip DELTAP instructions if matched.                                  */
-    this.ALWAYS_SKIP_DELTAP_RULES_SIZE = 16;
     this.ALWAYS_SKIP_DELTAP_Rules = [
         this._create_SPH_TweakRule("Georgia", 0, "Regular", "k".charCodeAt(0)),
-        /* fixes problems with W M w */
-        this._create_SPH_TweakRule("Trebuchet MS", 0, "Italic", 0),
         /* fix various problems with e in different versions */
         this._create_SPH_TweakRule("Trebuchet MS", 14, "Regular", "e".charCodeAt(0)),
         this._create_SPH_TweakRule("Trebuchet MS", 13, "Regular", "e".charCodeAt(0)),
         this._create_SPH_TweakRule("Trebuchet MS", 15, "Regular", "e".charCodeAt(0)),
+        this._create_SPH_TweakRule("Trebuchet MS", 0, "Italic", "v".charCodeAt(0)),
+        this._create_SPH_TweakRule("Trebuchet MS", 0, "Italic", "w".charCodeAt(0)),
+        this._create_SPH_TweakRule("Trebuchet MS", 0, "Regular", "Y".charCodeAt(0)),
         this._create_SPH_TweakRule("Arial", 11, "Regular", "s".charCodeAt(0)),
+        /* prevent problems with '3' and others */
         this._create_SPH_TweakRule("Verdana", 10, "Regular", 0),
         this._create_SPH_TweakRule("Verdana", 9, "Regular", 0),
         /* Cyrillic small letter short I */
@@ -26737,75 +26668,40 @@ function CSubpixHintingHacks()
         this._create_SPH_TweakRule("Arial", 10, "Regular", "6".charCodeAt(0)),
         this._create_SPH_TweakRule("Arial", 0, "Bold/BoldItalic Class", "a".charCodeAt(0)),
         /* Make horizontal stems consistent with the rest */
+        this._create_SPH_TweakRule("Arial", 24, "Bold", "a".charCodeAt(0)),
+        this._create_SPH_TweakRule("Arial", 25, "Bold", "a".charCodeAt(0)),
         this._create_SPH_TweakRule("Arial", 24, "Bold", "s".charCodeAt(0)),
         this._create_SPH_TweakRule("Arial", 25, "Bold", "s".charCodeAt(0)),
-        this._create_SPH_TweakRule("Arial", 24, "Bold", "a".charCodeAt(0)),
-        this._create_SPH_TweakRule("Arial", 25, "Bold", "a".charCodeAt(0))
+        this._create_SPH_TweakRule("Arial", 34, "Bold", "s".charCodeAt(0)),
+        this._create_SPH_TweakRule("Arial", 35, "Bold", "s".charCodeAt(0)),
+        this._create_SPH_TweakRule("Arial", 36, "Bold", "s".charCodeAt(0)),
+        this._create_SPH_TweakRule("Arial", 25, "Regular", "s".charCodeAt(0)),
+        this._create_SPH_TweakRule("Arial", 26, "Regular", "s".charCodeAt(0))
     ];
-
 
     /* Always do DELTAP instructions if matched.                             */
-    this.ALWAYS_DO_DELTAP_RULES_SIZE = 2;
     this.ALWAYS_DO_DELTAP_Rules = [
-        this._create_SPH_TweakRule("Verdana Clones", 17, "Regular Class", "K".charCodeAt(0)),
-        this._create_SPH_TweakRule("Verdana Clones", 17, "Regular Class", "k".charCodeAt(0))
-    ];
-
-
-    /* Do an extra RTG instruction in DELTAP if matched.                     */
-    this.DELTAP_RTG_RULES_SIZE = 1;
-    this.DELTAP_RTG_Rules = [
         this._create_SPH_TweakRule("-", 0, "", 0)
     ];
-
-
-    /* Force CVT distance to zero in MIRP.                                   */
-    this.MIRP_CVT_ZERO_RULES_SIZE = 1;
-    this.MIRP_CVT_ZERO_Rules = [
-        this._create_SPH_TweakRule("-", 0, "", 0)
-    ];
-
-
-    /* Skip moves that meet or exceed 1 pixel.                               */
-    this.DELTAP_SKIP_EXAGGERATED_VALUES_RULES_SIZE = 1;
-    this.DELTAP_SKIP_EXAGGERATED_VALUES_Rules = [
-        /* Fix vanishing stems */
-        this._create_SPH_TweakRule("Ubuntu", 0, "Regular", "M".charCodeAt(0))
-    ];
-
 
     /* Don't allow ALIGNRP after IUP.                                        */
-    this.NO_ALIGNRP_AFTER_IUP_RULES_SIZE = 4;
     this.NO_ALIGNRP_AFTER_IUP_Rules = [
         /* Prevent creation of dents in outline */
-        this._create_SPH_TweakRule("Courier New", 0, "Bold", "C".charCodeAt(0)),
-        this._create_SPH_TweakRule("Courier New", 0, "Bold", "D".charCodeAt(0)),
-        this._create_SPH_TweakRule("Courier New", 0, "Bold", "Q".charCodeAt(0)),
-        this._create_SPH_TweakRule("Courier New", 0, "Bold", "0".charCodeAt(0))
+        this._create_SPH_TweakRule("-", 0, "", 0)
     ];
-
 
     /* Don't allow DELTAP after IUP.                                         */
-    this.NO_DELTAP_AFTER_IUP_RULES_SIZE = 2;
     this.NO_DELTAP_AFTER_IUP_Rules = [
-        this._create_SPH_TweakRule("Arial", 0, "Bold", "N".charCodeAt(0)),
-        this._create_SPH_TweakRule("Verdana", 0, "Regular", "4".charCodeAt(0))
+        this._create_SPH_TweakRule("-", 0, "", 0)
     ];
-
 
     /* Don't allow CALL after IUP.                                           */
-    this.NO_CALL_AFTER_IUP_RULES_SIZE = 4;
     this.NO_CALL_AFTER_IUP_Rules = [
         /* Prevent creation of dents in outline */
-        this._create_SPH_TweakRule("Courier New", 0, "Bold", "O".charCodeAt(0)),
-        this._create_SPH_TweakRule("Courier New", 0, "Bold", "Q".charCodeAt(0)),
-        this._create_SPH_TweakRule("Courier New", 0, "Bold", "k".charCodeAt(0)),
-        this._create_SPH_TweakRule("Courier New", 0, "Bold Italic", "M".charCodeAt(0))
+        this._create_SPH_TweakRule("-", 0, "", 0)
     ];
 
-
     /* De-embolden these glyphs slightly.                                    */
-    this.DEEMBOLDEN_RULES_SIZE = 9;
     this.DEEMBOLDEN_Rules = [
         this._create_SPH_TweakRule("Courier New", 0, "Bold", "A".charCodeAt(0)),
         this._create_SPH_TweakRule("Courier New", 0, "Bold", "W".charCodeAt(0)),
@@ -26818,28 +26714,14 @@ function CSubpixHintingHacks()
         this._create_SPH_TweakRule("Courier New", 0, "Bold", "v".charCodeAt(0))
     ];
 
-
     /* Embolden these glyphs slightly.                                       */
-    this.EMBOLDEN_RULES_SIZE = 5;
     this.EMBOLDEN_Rules = [
-        this._create_SPH_TweakRule("Courier New", 12, "Italic", "z".charCodeAt(0)),
-        this._create_SPH_TweakRule("Courier New", 11, "Italic", "z".charCodeAt(0)),
-        this._create_SPH_TweakRule("Courier New", 10, "Italic", "z".charCodeAt(0)),
         this._create_SPH_TweakRule("Courier New", 0, "Regular", 0),
         this._create_SPH_TweakRule("Courier New", 0, "Italic", 0)
     ];
 
-
-    /* Do an extra RDTG instruction in DELTAP if matched.                    */
-    this.DELTAP_RDTG_RULES_SIZE = 1;
-    this.DELTAP_RDTG_Rules = [
-        this._create_SPH_TweakRule("-", 0, "", 0)
-    ];
-
-
     /* This is a CVT hack that makes thick horizontal stems on 2, 5, 7       */
     /* similar to Windows XP.                                                */
-    this.TIMES_NEW_ROMAN_HACK_RULES_SIZE = 12;
     this.TIMES_NEW_ROMAN_HACK_Rules = [
         this._create_SPH_TweakRule("Times New Roman", 16, "Italic", "2".charCodeAt(0)),
         this._create_SPH_TweakRule("Times New Roman", 16, "Italic", "5".charCodeAt(0)),
@@ -26855,10 +26737,8 @@ function CSubpixHintingHacks()
         this._create_SPH_TweakRule("Times New Roman", 17, "Regular", "7".charCodeAt(0))
     ];
 
-
     /* This fudges distance on 2 to get rid of the vanishing stem issue.     */
     /* A real solution to this is certainly welcome.                         */
-    this.COURIER_NEW_2_HACK_RULES_SIZE = 15;
     this.COURIER_NEW_2_HACK_Rules = [
         this._create_SPH_TweakRule("Courier New", 10, "Regular", "2".charCodeAt(0)),
         this._create_SPH_TweakRule("Courier New", 11, "Regular", "2".charCodeAt(0)),
@@ -26878,12 +26758,11 @@ function CSubpixHintingHacks()
     ];
 
 
-    // #ifndef FORCE_NATURAL_WIDTHS -----------------------------------------------
+    this.FORCE_NATURAL_WIDTHS = false;
 
     /* Use compatible widths with these glyphs.  Compatible widths is always */
     /* on when doing B/W TrueType instructing, but is used selectively here, */
     /* typically on glyphs with 3 or more vertical stems.                    */
-    this.COMPATIBLE_WIDTHS_RULES_SIZE = 38;
     this.COMPATIBLE_WIDTHS_Rules = [
         this._create_SPH_TweakRule("Arial Unicode MS", 12, "Regular Class", "m".charCodeAt(0)),
         this._create_SPH_TweakRule("Arial Unicode MS", 14, "Regular Class", "m".charCodeAt(0)),
@@ -26934,7 +26813,6 @@ function CSubpixHintingHacks()
     /* more visually pleasing glyphs in certain cases.                       */
     /* This sometimes needs to be coordinated with compatible width rules.   */
     /* A value of 1000 corresponds to a scaled value of 1.0.                 */
-    this.X_SCALING_RULES_SIZE = 50;
     this.X_SCALING_Rules = [
         this._create_SPH_ScaleRule("DejaVu Sans", 12, "Regular Class", "m".charCodeAt(0), 950),
         this._create_SPH_ScaleRule("Verdana and Clones", 12, "Regular Class", "a".charCodeAt(0), 1100),
@@ -26977,7 +26855,7 @@ function CSubpixHintingHacks()
         this._create_SPH_ScaleRule("Tahoma", 11, "Regular Class", "l".charCodeAt(0), 975),
         this._create_SPH_ScaleRule("Tahoma", 11, "Regular Class", "j".charCodeAt(0), 900),
         this._create_SPH_ScaleRule("Tahoma", 11, "Regular Class", "m".charCodeAt(0), 918),
-        this._create_SPH_ScaleRule("Verdana", 10, "Regular/Italic Class".charCodeAt(0), 0, 1100),
+        this._create_SPH_ScaleRule("Verdana", 10, "Regular/Italic Class", 0, 1100),
         this._create_SPH_ScaleRule("Verdana", 12, "Regular Class", "m".charCodeAt(0), 975),
         this._create_SPH_ScaleRule("Verdana", 12, "Regular/Italic Class", 0, 1050),
         this._create_SPH_ScaleRule("Verdana", 13, "Regular/Italic Class", "i".charCodeAt(0), 950),
@@ -26990,20 +26868,196 @@ function CSubpixHintingHacks()
         this._create_SPH_ScaleRule("Trebuchet MS", 12, "Regular Class", "m".charCodeAt(0), 800)
     ];
 
-    // #else -----------------------------------------------------------------
     /*
-    this.COMPATIBLE_WIDTHS_RULES_SIZE = 1;
     this.COMPATIBLE_WIDTHS_Rules = [
         this._create_SPH_TweakRule("-", 0, "", 0)
     ];
 
-
-    this.X_SCALING_RULES_SIZE = 1;
     this.X_SCALING_Rules = [
         this._create_SPH_ScaleRule("-", 0, "", 0, 1000)
     ];
     */
-    // -----------------------------------------------------------------------
+
+    this.TWEAK_RULES = function(_loader, _glyph_index, _rules, _flag)
+    {
+        var face = _loader.face;
+        if (this.sph_test_tweak(face, face.family_name, _loader.size.metrics.x_ppem, face.style_name, _glyph_index, _rules, _rules.length))
+            _loader.exec.sph_tweak_flags |= _flag;
+    };
+    this.TWEAK_RULES_EXCEPTIONS = function(_loader, _glyph_index, _rules, _flag)
+    {
+        var face = _loader.face;
+        if (this.sph_test_tweak(face, face.family_name, _loader.size.metrics.x_ppem, face.style_name, _glyph_index, _rules, _rules.length))
+            _loader.exec.sph_tweak_flags &= ~_flag;
+    };
+
+    this.is_member_of_family_class = function(detected_font_name, rule_font_name)
+    {
+        /* Does font name match rule family? */
+        if (detected_font_name == rule_font_name)
+            return true;
+
+        /* Is font name a wildcard ""? */
+        if (rule_font_name == "")
+            return true;
+
+        var _fcr = this.FAMILY_CLASS_Rules[rule_font_name];
+        if (undefined !== _fcr)
+        {
+            if (undefined !== _fcr[detected_font_name])
+                return true;
+        }
+
+        return false;
+    };
+
+    this.is_member_of_style_class = function(detected_font_style, rule_font_style)
+    {
+        /* Does font style match rule style? */
+        if (detected_font_style == rule_font_style)
+            return true;
+
+        /* Is font style a wildcard ""? */
+        if (rule_font_style == "")
+            return true;
+
+        /* Is font style contained in a class list? */
+        var _scr = this.STYLE_CLASS_Rules[rule_font_style];
+        if (undefined !== _scr)
+        {
+            if (undefined !== _scr[detected_font_style])
+                return true;
+        }
+
+        return false;
+    };
+
+    this.sph_test_tweak = function(face, family, ppem, style, glyph_index, rule, num_rules)
+    {
+        /* rule checks may be able to be optimized further */
+        for (var i = 0; i < num_rules; i++)
+        {
+            if (family != "" && this.is_member_of_family_class(family, rule[i].family))
+            {
+                if (rule[i].ppem == 0 || rule[i].ppem == ppem)
+                {
+                    if (style != "" && this.is_member_of_style_class(style, rule[i].style))
+                    {
+                        if (rule[i].glyph == 0 || FT_Get_Char_Index(face, rule[i].glyph) == glyph_index)
+                            return true;
+                    }
+                }
+            }
+        }
+        return false;
+    };
+
+    this.scale_test_tweak = function(face, family, ppem, style, glyph_index, rule, num_rules)
+    {
+        /* rule checks may be able to be optimized further */
+        for (var i = 0; i < num_rules; i++)
+        {
+            if (family != "" && this.is_member_of_family_class(family, rule[i].family))
+            {
+                if (rule[i].ppem == 0 || rule[i].ppem == ppem)
+                {
+                    if (style != "" && this.is_member_of_style_class(style, rule[i].style))
+                    {
+                        if (rule[i].glyph == 0 || FT_Get_Char_Index(face, rule[i].glyph) == glyph_index)
+                            return rule[i].scale;
+                    }
+                }
+            }
+        }
+        return 1000;
+    };
+
+    this.sph_test_tweak_x_scaling = function(face, family, ppem, style, glyph_index)
+    {
+        return this.scale_test_tweak(face, family, ppem, style, glyph_index, this.X_SCALING_Rules, this.X_SCALING_Rules.length);
+    };
+
+    this.sph_set_tweaks = function(loader, glyph_index)
+    {
+        var face = loader.face;
+
+        /* don't apply rules if style isn't set */
+        if (face.style_name == "")
+            return;
+
+        this.TWEAK_RULES(loader, glyph_index, this.PIXEL_HINTING_Rules, 4096);
+
+        if (loader.exec.sph_tweak_flags & 4096)
+        {
+            loader.exec.ignore_x_mode = false;
+            return;
+        }
+
+        this.TWEAK_RULES(loader, glyph_index, this.ALLOW_X_DMOVE_Rules, 1);
+        this.TWEAK_RULES(loader, glyph_index, this.ALWAYS_DO_DELTAP_Rules, 2);
+        this.TWEAK_RULES(loader, glyph_index, this.ALWAYS_SKIP_DELTAP_Rules, 4);
+        this.TWEAK_RULES(loader, glyph_index, this.DEEMBOLDEN_Rules, 16);
+        this.TWEAK_RULES(loader, glyph_index, this.DO_SHPIX_Rules, 32);
+        this.TWEAK_RULES(loader, glyph_index, this.EMBOLDEN_Rules, 64);
+        this.TWEAK_RULES(loader, glyph_index, this.MIAP_HACK_Rules, 128);
+        this.TWEAK_RULES(loader, glyph_index, this.NORMAL_ROUND_Rules, 256);
+        this.TWEAK_RULES(loader, glyph_index, this.NO_ALIGNRP_AFTER_IUP_Rules, 512);
+        this.TWEAK_RULES(loader, glyph_index, this.NO_CALL_AFTER_IUP_Rules, 1024);
+        this.TWEAK_RULES(loader, glyph_index, this.NO_DELTAP_AFTER_IUP_Rules, 2048);
+        this.TWEAK_RULES(loader, glyph_index, this.RASTERIZER_35_Rules, 8192);
+        this.TWEAK_RULES(loader, glyph_index, this.SKIP_IUP_Rules, 32768);
+
+        this.TWEAK_RULES(loader, glyph_index, this.SKIP_OFFPIXEL_Y_MOVES_Rules, 131072);
+        this.TWEAK_RULES_EXCEPTIONS(loader, glyph_index, this.SKIP_OFFPIXEL_Y_MOVES_Rules_Exceptions, 131072);
+
+        this.TWEAK_RULES(loader, glyph_index, this.SKIP_NONPIXEL_Y_MOVES_DELTAP_Rules, 524288);
+
+        this.TWEAK_RULES(loader, glyph_index, this.SKIP_NONPIXEL_Y_MOVES_Rules, 65536);
+        this.TWEAK_RULES_EXCEPTIONS(loader, glyph_index, this.SKIP_NONPIXEL_Y_MOVES_Rules_Exceptions, 65536);
+
+        this.TWEAK_RULES(loader, glyph_index, this.ROUND_NONPIXEL_Y_MOVES_Rules, 16384);
+        this.TWEAK_RULES_EXCEPTIONS(loader, glyph_index, this.ROUND_NONPIXEL_Y_MOVES_Rules_Exceptions, 16384);
+
+        if (loader.exec.sph_tweak_flags & 8192)
+        {
+            if (loader.exec.rasterizer_version != 35)
+            {
+                loader.exec.rasterizer_version  = 35;
+                loader.exec.size.cvt_ready      = false;
+
+                tt_size_ready_bytecode(loader.exec.size, (loader.load_flags & 128) != 0);
+            }
+            else
+                loader.exec.rasterizer_version  = 35;
+        }
+        else
+        {
+            if (loader.exec.rasterizer_version != 38)
+            {
+                loader.exec.rasterizer_version  = 38;
+                loader.exec.size.cvt_ready      = false;
+
+                tt_size_ready_bytecode(loader.exec.size, (loader.load_flags & 128) != 0);
+            }
+            else
+                loader.exec.rasterizer_version = 38;
+        }
+
+        if ((loader.load_flags & 2) == 0)
+        {
+            this.TWEAK_RULES(loader, glyph_index, this.TIMES_NEW_ROMAN_HACK_Rules, 262144);
+            this.TWEAK_RULES(loader, glyph_index, this.COURIER_NEW_2_HACK_Rules, 8);
+        }
+
+        if (this.sph_test_tweak(face, face.family_name, loader.size.metrics.x_ppem, face.style_name, glyph_index, this.COMPATIBILITY_MODE_Rules, this.COMPATIBILITY_MODE_Rules.length))
+            loader.exec.face.sph_compatibility_mode = true;
+
+        if (((loader.load_flags & 2) == 0) && !loader.exec.compatible_widths)
+        {
+            if (this.sph_test_tweak(face, face.family_name, loader.size.metrics.x_ppem, face.style_name, glyph_index, this.COMPATIBLE_WIDTHS_Rules, this.COMPATIBLE_WIDTHS_Rules.length))
+                loader.exec.face.sph_compatibility_mode = true;
+        }
+    };
 }
 
 var global_SubpixHintingHacks = new CSubpixHintingHacks();
@@ -27316,6 +27370,10 @@ function TT_Face()
     this.read_glyph_header = null;
     this.read_simple_glyph = null;
     this.read_composite_glyph = null;
+
+    this.sph_found_func_flags = 0;  /* special functions found */
+                                    /* for this face           */
+    this.sph_compatibility_mode = false;
 }
 /******************************************************************************/
 // gxvar
@@ -28219,10 +28277,14 @@ function TT_Get_HMetrics(face, idx)
 {
     return face.sfnt.get_metrics(face, 0, idx);
 }
-function TT_Get_VMetrics(face, idx)
+function TT_Get_VMetrics(face, idx, yMax)
 {
     if (face.vertical_info === true)
         return face.sfnt.get_metrics(face, 1, idx);
+    else if (face.os2.version != 0xFFFF)
+        return {bearing : (face.os2.sTypoAscender - yMax), advance : (face.os2.sTypoAscender - face.os2.sTypoDescender)};
+    else
+        return {bearing : (face.horizontal.Ascender - yMax), advance : (face.horizontal.Ascender - face.horizontal.Descender)};
 
     return {bearing : 0, advance : face.units_per_EM};
 }
@@ -28232,7 +28294,7 @@ function tt_get_metrics(loader, glyph_index)
     var face = loader.face;
 
     var h = TT_Get_HMetrics(face, glyph_index);
-    var v = TT_Get_VMetrics(face, glyph_index);
+    var v = TT_Get_VMetrics(face, glyph_index, loader.bbox.yMax);
 
     loader.left_bearing = h.bearing;
     loader.advance      = h.advance;
@@ -28260,7 +28322,7 @@ function tt_get_metrics_incr_overrides(loader, glyph_index)
     var face = loader.face;
 
     var h = TT_Get_HMetrics(face, glyph_index);
-    var v = TT_Get_VMetrics(face, glyph_index);
+    var v = TT_Get_VMetrics(face, glyph_index, 0);
 
     if (face.internal.incremental_interface && face.internal.incremental_interface.funcs.get_glyph_metrics)
     {
@@ -28721,8 +28783,7 @@ function TT_Process_Simple_Glyph(loader)
         var ppem = loader.size.metrics.x_ppem;
         if ((loader.load_flags & 2) == 0)
         {
-            x_scale_factor = global_SubpixHintingHacks.scale_test_tweak(_face, _face.family_name, ppem, _face.style_name, loader.glyph_index,
-                global_SubpixHintingHacks.X_SCALING_Rules, global_SubpixHintingHacks.X_SCALING_RULES_SIZE);
+            x_scale_factor = global_SubpixHintingHacks.sph_test_tweak_x_scaling(_face, _face.family_name, ppem, _face.style_name, loader.glyph_index);
         }
 
         if ((loader.load_flags & 1) == 0 || x_scale_factor != 1000)
@@ -29064,9 +29125,9 @@ function TT_Hint_Glyph(loader, is_composite)
 
     if (_tt_hints.TT_CONFIG_OPTION_SUBPIXEL_HINTING) //#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
     {
-        if (loader.exec.sph_tweak_flags & 64)
+        if (loader.exec.sph_tweak_flags & 16)
             FT_Outline_EmboldenXY(loader.gloader.current.outline, -24, 0);
-        else if (loader.exec.sph_tweak_flags & 512)
+        else if (loader.exec.sph_tweak_flags & 64)
             FT_Outline_EmboldenXY(loader.gloader.current.outline, 24, 0);
     }//#endif
     return 0;
@@ -29226,7 +29287,7 @@ function tt_loader_init(loader, size, glyph, load_flags, glyf_table_only)
 
                 exec.ignore_x_mode = subpixel_hinting || grayscale_hinting;
                 exec.rasterizer_version = 38;
-                if (exec.sph_tweak_flags & 65536)
+                if (exec.sph_tweak_flags & 8192)
                     exec.rasterizer_version = 35;
 
                 if (true)
@@ -29338,6 +29399,30 @@ function tt_loader_init(loader, size, glyph, load_flags, glyf_table_only)
 
     return 0;
 }
+
+function tt_face_get_device_metrics(face, ppem, gindex)
+{
+    var _ret = null;
+    var record_size = face.hdmx_record_size;
+
+    for (var nn = 0; nn < face.hdmx_record_count; nn++ )
+    {
+        if ( face.hdmx_record_sizes[nn] == ppem )
+        {
+            gindex += 2;
+            if (gindex < record_size)
+            {
+                _ret = dublicate_pointer(face.hdmx_table);
+                _ret.pos += (8 + nn * record_size + gindex);
+            }
+
+            break;
+        }
+    }
+
+    return _ret;
+}
+
 function compute_glyph_metrics(loader, glyph_index)
 {
     var bbox = new FT_BBox();
@@ -29367,7 +29452,20 @@ function compute_glyph_metrics(loader, glyph_index)
 
     if (face.postscript.isFixedPitch == 0 && (loader.load_flags & 2) == 0)
     {
-        // TODO:
+        var widthp = tt_face_get_device_metrics(face, loader.size.metrics.x_ppem, glyph_index);
+
+        if (face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING)
+        {
+            var ignore_x_mode = (FT_LOAD_TARGET_MODE(loader.load_flags) != 2);
+
+            if (null != widthp && ((ignore_x_mode && loader.exec.compatible_widths) || !ignore_x_mode || false))
+                glyph.metrics.horiAdvance = widthp.data[widthp.pos] << 6;
+        }
+        else
+        {
+            if (null != widthp)
+                glyph.metrics.horiAdvance = widthp.data[widthp.pos] << 6;
+        }
     }
 
     glyph.metrics.width  = bbox.xMax - bbox.xMin;
@@ -29593,6 +29691,10 @@ function load_truetype_glyph(loader, glyph_index, recurse_count, header_only)
             return error;
     }
 
+    var subpixel_ = (loader.exec && loader.exec.subpixel_hinting) ? true : false;
+    var grayscale_ = (loader.exec && loader.exec.grayscale_hinting) ? true : false;
+    var use_aw_2_  = (subpixel_ && grayscale_);
+
     if (loader.byte_len == 0 || loader.n_contours == 0)
     {
         loader.bbox.xMin = 0;
@@ -29607,9 +29709,9 @@ function load_truetype_glyph(loader, glyph_index, recurse_count, header_only)
         loader.pp1.y = 0;
         loader.pp2.x = loader.pp1.x + loader.advance;
         loader.pp2.y = 0;
-        loader.pp3.x = 0;
+        loader.pp3.x = use_aw_2_ ? (loader.advance >> 0) : 0;
         loader.pp3.y = loader.top_bearing + loader.bbox.yMax;
-        loader.pp4.x = 0;
+        loader.pp4.x = use_aw_2_ ? (loader.advance >> 0) : 0;
         loader.pp4.y = loader.pp3.y - loader.vadvance;
 
         //#ifdef FT_CONFIG_OPTION_INCREMENTAL
@@ -29649,9 +29751,9 @@ function load_truetype_glyph(loader, glyph_index, recurse_count, header_only)
     loader.pp1.y = 0;
     loader.pp2.x = loader.pp1.x + loader.advance;
     loader.pp2.y = 0;
-    loader.pp3.x = 0;
+    loader.pp3.x = use_aw_2_ ? (loader.advance >> 0) : 0;
     loader.pp3.y = loader.top_bearing + loader.bbox.yMax;
-    loader.pp4.x = 0;
+    loader.pp4.x = use_aw_2_ ? (loader.advance >> 0) : 0;
     loader.pp4.y = loader.pp3.y - loader.vadvance;
 
     //#ifdef FT_CONFIG_OPTION_INCREMENTAL
@@ -30477,7 +30579,8 @@ function tt_get_advances(face, start, count, flags, advances)
     {
         for (var nn = 0; nn < count; nn++)
         {
-            var res = TT_Get_VMetrics(face, start + nn);
+            /* since we don't need `tsb', we use zero for `yMax' parameter */
+            var res = TT_Get_VMetrics(face, start + nn, 0);
             advances[nn] = res.ah;
         }
     }
