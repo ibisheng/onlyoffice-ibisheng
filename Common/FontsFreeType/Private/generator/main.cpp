@@ -338,7 +338,8 @@ void GetConfigMap(std::vector<std::wstring>& _vec1, std::vector<std::wstring>& _
     _vec1.push_back(L"FT_Common.FT_SUBGLYPH_FLAG_USE_MY_METRICS"); _vec2.push_back(L"512");
     _vec1.push_back(L"FT_Common.FT_SUBGLYPH_FLAG_XY_SCALE"); _vec2.push_back(L"64");
     _vec1.push_back(L"FT_Common.FT_TRIG_MAX_ITERS"); _vec2.push_back(L"23");
-    _vec1.push_back(L"FT_Common.FT_TRIG_SCALE"); _vec2.push_back(L"2608131496");
+    _vec1.push_back(L"FT_Common.FT_TRIG_SAFE_MSB"); _vec2.push_back(L"29");
+    _vec1.push_back(L"FT_Common.FT_TRIG_SCALE"); _vec2.push_back(L"3688454934");
     _vec1.push_back(L"FT_Common.GX_TC_RESERVED_TUPLE_FLAGS"); _vec2.push_back(L"28672");
     _vec1.push_back(L"FT_Common.GX_TC_TUPLES_SHARE_POINT_NUMBERS"); _vec2.push_back(L"32768");
     _vec1.push_back(L"FT_Common.GX_TC_TUPLE_COUNT_MASK"); _vec2.push_back(L"4095");

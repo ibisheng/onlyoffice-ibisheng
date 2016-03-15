@@ -1029,7 +1029,7 @@ function ft_multo64(x, y, z)
     /* Check carry overflow of i1 + lo */
     lo += i1;
 
-    if (lo > FT_Common.a_i)
+    if (lo >= FT_Common.a_i)
         lo = FT_Common.IntToUInt(lo & 0xFFFFFFFF);
 
     if (lo < i1)

@@ -1853,17 +1853,7 @@ function Move_Zp2_Point(exc, point, dx, dy, touch)
     // TODO: unpatented
     if (exc.GS.freeVector.x != 0)
     {
-        if (exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING) //#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
-        {
-            if (!exc.ignore_x_mode || (exc.ignore_x_mode && (exc.sph_tweak_flags & FT_Common.SPH_TWEAK_ALLOW_X_MOVE_ZP2)))
-            {
-                exc.zp2.cur[exc.zp2._offset_cur + point].x += dx;
-            }
-        }
-        else
-        {
-            exc.zp2.cur[exc.zp2._offset_cur + point].x += dx;
-        }
+        exc.zp2.cur[exc.zp2._offset_cur + point].x += dx;
         if (touch)
             exc.zp2.tags[exc.zp2._offset_tags + point] |= FT_Common.FT_CURVE_TAG_TOUCH_X;
     }
@@ -6451,7 +6441,7 @@ function CSubpixHintingHacks()
         if ((loader.load_flags & FT_Common.FT_LOAD_NO_HINTING) == 0)
         {
             this.TWEAK_RULES(loader, glyph_index, this.TIMES_NEW_ROMAN_HACK_Rules, FT_Common.SPH_TWEAK_TIMES_NEW_ROMAN_HACK);
-            this.TWEAK_RULES(loader, glyph_index, this.COURIER_NEW_2_HACK_Rules, FT_Common.COURIER_NEW_2_HACK_Rules);
+            this.TWEAK_RULES(loader, glyph_index, this.COURIER_NEW_2_HACK_Rules, FT_Common.SPH_TWEAK_COURIER_NEW_2_HACK);
         }
 
         if (this.sph_test_tweak(face, face.family_name, loader.size.metrics.x_ppem, face.style_name, glyph_index, this.COMPATIBILITY_MODE_Rules, this.COMPATIBILITY_MODE_Rules.length))

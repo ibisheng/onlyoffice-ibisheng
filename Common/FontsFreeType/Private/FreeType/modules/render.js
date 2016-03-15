@@ -444,7 +444,8 @@ function ft_trig_pseudo_polarize(vec)
         }
     }
 
-    arctanptr = 0;
+    var arctanptr = 0;
+    var i, b;
 
     /* Pseudorotations, with right shifts */
     for ( i = 1, b = 1; i < FT_Common.FT_TRIG_MAX_ITERS; b <<= 1, i++ )
